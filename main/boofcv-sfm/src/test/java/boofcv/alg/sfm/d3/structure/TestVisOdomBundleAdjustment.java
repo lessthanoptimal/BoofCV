@@ -155,14 +155,14 @@ class TestVisOdomBundleAdjustment {
 
 		// See if the frame is recycled correctly
 		alg.reset();
-		alg.addFrame(null,2);
+		alg.addFrameDebug(2);
 		assertEquals(1,alg.frames.size);
 		assertSame(frameA,alg.frames.get(0));
 		assertEquals(2,frameA.id);
 		assertEquals(0,frameA.frame_to_world.T.x, UtilEjml.TEST_F64);
 
 		// Add one more frame now
-		BFrame frameB = alg.addFrame(null,11);
+		BFrame frameB = alg.addFrameDebug(11);
 		assertEquals(2,alg.frames.size);
 		assertSame(frameB,alg.getLastFrame());
 		assertEquals(11,frameB.id);

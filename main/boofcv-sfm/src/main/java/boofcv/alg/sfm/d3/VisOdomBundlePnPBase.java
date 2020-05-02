@@ -20,6 +20,7 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.sfm.d3.VisualOdometry;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d3.structure.MaxGeoKeyFrameManager;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
@@ -33,6 +34,7 @@ import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
 
 import javax.annotation.Nullable;
@@ -68,7 +70,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	protected final List<Track> initialVisible = new ArrayList<>();
 
 	// transform from the current camera view to the key frame
-	protected final Se3_F64 current_to_key = new Se3_F64();
+	protected final Se3_F64 current_to_previous = new Se3_F64();
 	/** transform from the current camera view to the world frame */
 	protected final Se3_F64 current_to_world = new Se3_F64();
 
@@ -103,7 +105,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 */
 	public void reset() {
 		if( verbose != null ) verbose.println("VO: reset()");
-		current_to_key.reset();
+		current_to_previous.reset();
 		cameraModels.clear();
 		scene.reset();
 		first = true;
@@ -148,6 +150,30 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 				bt.worldLoc.w = 1.0;
 			}
 		}
+	}
+
+	protected boolean performKeyFrameMaintenance(PointTracker<?> tracker , int newFrames ) {
+		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,maxKeyFrames,newFrames, scene);
+		if( dropFrameIndexes.size == 0 )
+			return false;
+		boolean droppedCurrentFrame = dropFrameIndexes.getTail(0) == scene.frames.size-1;
+		for (int i = dropFrameIndexes.size-1; i >= 0; i--) {
+			// indexes are ordered from lowest to highest, so you can remove frames without
+			// changing the index in the list
+			VisOdomBundleAdjustment.BFrame frameToDrop = scene.frames.get(dropFrameIndexes.get(i));
+
+			// update data structures
+			scene.removeFrame(frameToDrop, removedBundleTracks);
+
+			// Drop tracks which have been dropped due to their error level
+			for (int removeIdx = 0; removeIdx < removedBundleTracks.size(); removeIdx++) {
+				dropVisualTrack(removedBundleTracks.get(removeIdx));
+			}
+
+			dropTracksNotVisibleAndTooFewObservations();
+		}
+		updateListOfVisibleTracksForOutput();
+		return droppedCurrentFrame;
 	}
 
 	/**

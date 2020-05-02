@@ -84,6 +84,45 @@ import java.util.Random;
 public class FactoryPointTracker {
 
 	/**
+	 * Can create and configure any built in tracker.
+	 * @param config Specifies the tracker
+	 * @param imageType Type of input image
+	 * @param derivType Type of derivative image. If null then the default is used
+	 * @return Instance of the tracker
+	 */
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
+	PointTracker<I> tracker( ConfigPointTracker config, Class<I> imageType, @Nullable Class<D> derivType) {
+		if( config.typeTracker == ConfigPointTracker.TrackerType.KLT ) {
+			return klt(config.klt,config.detDesc.detectPoint,imageType, derivType);
+		}
+
+		DetectDescribePoint detDesc = FactoryDetectDescribe.generic(config.detDesc, imageType);
+		AssociateDescription associate = createAssociate(config,detDesc);
+
+		switch( config.typeTracker ) {
+			case DDA: return FactoryPointTracker.dda(detDesc, new AssociateDescTo2D(associate), config.dda);
+			case HYBRID: return FactoryPointTracker.combined(
+					detDesc,associate,config.klt,config.hybrid.reactivateThreshold,imageType);
+		}
+		throw new RuntimeException("BUG! KLT all trackers should have been handled already");
+	}
+
+	private static AssociateDescription createAssociate( ConfigPointTracker config ,
+														 DetectDescribePoint detDesc )
+	{
+		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
+		int DOF = detDesc.createDescription().size();
+
+		switch( config.typeAssociate ) {
+			case GREEDY: return FactoryAssociation.greedy(config.associateGreedy,scorer);
+			case KD_TREE: return FactoryAssociation.kdtree(config.associateNN,DOF);
+			case RANDOM_FOREST: FactoryAssociation.kdRandomForest(
+					config.associateNN,DOF, 10, 5, 1233445565);
+			default: throw new IllegalArgumentException("Unknown association");
+		}
+	}
+
+	/**
 	 * Pyramid KLT feature tracker.
 	 *
 	 * @see boofcv.alg.tracker.klt.PyramidKltTracker

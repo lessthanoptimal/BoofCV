@@ -40,6 +40,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
@@ -79,12 +80,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	private T inputLeft;
 	private T inputRight;
 
-	// when the inlier set is less than this number new features are detected
-	private final int thresholdAdd;
-
-	// discard tracks after they have not been in the inlier set for this many updates in a row
-	private final int thresholdRetire;
-
 	// computes camera motion
 	private @Getter final ModelMatcher<Se3_F64, Stereo2D3D> matcher;
 	private @Getter final ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
@@ -110,28 +105,37 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 	//----- Data structures for Bundle Adjustment and Track Information
 	private BFrame currentLeft, currentRight;
+	private BFrame previousLeft;
 
 	// Ensures that the epipolar constraint still applies to the tracks
 	private final StereoConsistencyCheck stereoCheck;
 
 	// known stereo baseline
-	private final Se3_F64 left_to_right = new Se3_F64();
+	private final Se3_F64 world_to_prev = new Se3_F64();
 
 	/** List of tracks from left image that remain after geometric filters have been applied */
 	private @Getter final List<PointTrack> candidates = new ArrayList<>();
 
-	// transform from key frame to world frame
-	private final Se3_F64 key_to_world = new Se3_F64();
+	// Internal profiling
+	private @Getter double timeTracking,timeEstimate,timeBundle,timeDropUnused, timeSceneMaintenance,timeSpawn;
 
 	//---------------------------------------------------------------------------------------------------
 	//----------- Internal Work Space
 	FastQueue<Stereo2D3D> listStereo2D3D = new FastQueue<>(Stereo2D3D::new);
 
+	private final Se3_F64 left_to_right = new Se3_F64();
+	private final Se3_F64 right_to_left = new Se3_F64();
+	Point4D_F64 prevLoc4 = new Point4D_F64();
+
+	// storage for the triangulated location in the camera frame
+	Point3D_F64 cameraP3 = new Point3D_F64();
+	// Normalized image coordinate for pixel track observations
+	Point2D_F64 normLeft = new Point2D_F64();
+	Point2D_F64 normRight = new Point2D_F64();
+
 	/**
 	 * Specifies internal algorithms and parameters
 	 *
-	 * @param thresholdAdd When the number of inliers is below this number new features are detected
-	 * @param thresholdRetire When a feature has not been in the inlier list for this many ticks it is dropped
 	 * @param epilolarTol Tolerance in pixels for enforcing the epipolar constraint
 	 * @param trackerLeft Tracker used for left camera
 	 * @param trackerRight Tracker used for right camera
@@ -141,7 +145,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	 * @param matcher Robust motion model estimation with outlier rejection
 	 * @param modelRefiner Non-linear refinement of motion model
 	 */
-	public VisOdomDualTrackPnP(int thresholdAdd, int thresholdRetire, double epilolarTol,
+	public VisOdomDualTrackPnP(double epilolarTol,
 							   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
 							   DescribeRegionPoint<T,Desc> describe,
 							   AssociateDescription2D<Desc> assocL2R,
@@ -154,8 +158,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 			throw new IllegalArgumentException("Both unique source and destination must be ensure by association");
 
 		this.describe = describe;
-		this.thresholdAdd = thresholdAdd;
-		this.thresholdRetire = thresholdRetire;
 		this.trackerLeft = trackerLeft;
 		this.trackerRight = trackerRight;
 		this.assocL2R = assocL2R;
@@ -179,7 +181,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	}
 
 	public void setCalibration(StereoParameters param) {
-
+		right_to_left.set(param.rightToLeft);
 		param.rightToLeft.invert(left_to_right);
 
 		CameraModel left = new CameraModel();
@@ -187,12 +189,9 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		CameraModel right = new CameraModel();
 		right.pixelToNorm = LensDistortionFactory.narrow(param.right).undistort_F64(true,false);
 
-		cameraModels.clear();
+		stereoCheck.setCalibration(param);
 		cameraModels.add(left);
 		cameraModels.add(right);
-
-		stereoCheck.setCalibration(param);
-
 		scene.addCamera(param.left);
 		scene.addCamera(param.right);
 	}
@@ -219,36 +218,47 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		this.inputLeft = left;
 		this.inputRight = right;
 
+		//=============================================================================================
+		//========== Visually track features
+		double time0 = System.nanoTime();
 		// Create a new frame for the current image
-		currentRight = scene.addFrame(trackerRight.getFrameID());
-		currentLeft  = scene.addFrame(trackerLeft.getFrameID());
+		currentLeft  = scene.addFrame(CAMERA_LEFT,trackerLeft.getFrameID());
+		currentRight = scene.addFrame(CAMERA_RIGHT,trackerRight.getFrameID());
+		// TODO in the future when bundle adjustment supports rigid relationships between two views use that here
 
 		// Track objects given the new images
 		trackerLeft.process(left);
 		trackerRight.process(right);
+		double time1 = System.nanoTime();
 
+		//=============================================================================================
+		//========== Initialize VO from the first image and return
 		if( first ) {
 			first = false;
 			frameManager.initialize(scene.cameras);
 			addNewTracks();
+			// The left camera is the world frame right now
+			currentRight.frame_to_world.set(right_to_left);
 			return true;
 		}
 
-		// if one tracker dropped a track then drop the same track in the other camera
+		// This will be used as a reference for motion estimation
+		previousLeft = scene.frames.getTail(2);
+
+		// If one tracker dropped a track then drop the same track in the other camera
 		mutualTrackDrop();
-		// Find tracks which are still good
+		// Find tracks which pass a geometric test and put into candidates list
 		selectStereoVisualTracks();
+		// Robustly estimate motion using features in candidates list
 		if( !estimateMotion() ) {
 			removedBundleTracks.clear();
 			scene.removeFrame(currentRight,removedBundleTracks);
 			scene.removeFrame(currentLeft,removedBundleTracks);
 			return false;
 		}
+
 		addInlierObservationsToScene();
 		removeOldUnusedVisibleTracks();
-
-		if( modelRefiner != null )
-			refineMotionEstimate();
 
 		//=============================================================================================
 		//========== Refine the scene's state estimate
@@ -261,13 +271,28 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		dropBadBundleTracks();
 
 		long time4 = System.nanoTime();
-		boolean droppedCurrentFrame = performKeyFrameMaintenance();
+		boolean droppedCurrentFrame = performKeyFrameMaintenance(trackerLeft,2);
 		long time5 = System.nanoTime();
 		if( !droppedCurrentFrame ) {
 			// We are keeping the current frame! Spawn new tracks inside of it
 			addNewTracks();
 		}
 		long time6 = System.nanoTime();
+
+		//=============================================================================================
+		//========== Summarize profiling results
+		timeTracking = (time1-time0)*1e-6;
+		timeEstimate = (time2-time1)*1e-6;
+		timeBundle = (time3-time2)*1e-6;
+		timeDropUnused = (time4-time3)*1e-6;
+		timeSceneMaintenance = (time5-time4)*1e-6;
+		timeSpawn = (time6-time5)*1e-6;
+
+		if( profileOut != null ) {
+			double timeTotal = (time6-time0)*1e-6;
+			profileOut.printf("DualVO: TRK %5.1f Est %5.1f Bun %5.1f DU %5.1f Scene %5.1f Spn  %5.1f TOTAL %5.1f\n",
+					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance,timeSpawn,timeTotal);
+		}
 
 		return true;
 	}
@@ -283,29 +308,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		triangulateNotSelectedBundleTracks();
 	}
 
-	private boolean performKeyFrameMaintenance() {
-		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(trackerLeft,maxKeyFrames,2, scene);
-		boolean droppedCurrentFrame = false;
-		for (int i = dropFrameIndexes.size-1; i >= 0; i--) {
-			// indexes are ordered from lowest to highest, so you can remove frames without
-			// changing the index in the list
-			BFrame frameToDrop = scene.frames.get(dropFrameIndexes.get(i));
-			droppedCurrentFrame |= frameToDrop == scene.frames.getTail();
-
-			// update data structures
-			scene.removeFrame(frameToDrop, removedBundleTracks);
-
-			// Drop tracks which have been dropped due to their error level
-			for (int removeIdx = 0; removeIdx < removedBundleTracks.size(); removeIdx++) {
-				dropVisualTrack(removedBundleTracks.get(removeIdx));
-			}
-
-			dropTracksNotVisibleAndTooFewObservations();
-		}
-		updateListOfVisibleTracksForOutput();
-		return droppedCurrentFrame;
-	}
-
 	/**
 	 * Given the set of active tracks, estimate the cameras motion robustly
 	 * @return true if successful
@@ -314,18 +316,22 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		CameraModel leftCM = cameraModels.get(CAMERA_LEFT);
 		CameraModel rightCM = cameraModels.get(CAMERA_RIGHT);
 
-		// organize the data
+		// Perform motion estimation relative to the most recent key frame
+		previousLeft.frame_to_world.invert(world_to_prev);
+
+		// Put observation and prior knowledge into a format the model matcher will understand
 		listStereo2D3D.growArray(candidates.size());
 		listStereo2D3D.reset();
 		for( PointTrack l : candidates ) {
 			Stereo2D3D stereo = listStereo2D3D.grow();
 
 			// Get the track location
-			TrackInfo info = l.getCookie();
-			PointTrack r = info.visualRight;
+			TrackInfo bt = l.getCookie();
+			PointTrack r = bt.visualRight;
 
-			// Get the 3D coordinate of the point
-			PerspectiveOps.homogenousTo3dPositiveZ(info.worldLoc,1e8,1e-8,stereo.location);
+			// Get the 3D coordinate of the point in the 'previous' frame
+			SePointOps_F64.transform(world_to_prev,bt.worldLoc,prevLoc4);
+			PerspectiveOps.homogenousTo3dPositiveZ(prevLoc4,1e8,1e-8,stereo.location);
 
 			// compute normalized image coordinate for track in left and right image
 			leftCM.pixelToNorm.compute(l.pixel.x,l.pixel.y,stereo.leftObs);
@@ -336,8 +342,19 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		if( !matcher.process(listStereo2D3D.toList()) )
 			return false;
 
-		Se3_F64 keyToCurr = matcher.getModelParameters();
-		keyToCurr.invert(current_to_key);
+		Se3_F64 previous_to_current;
+
+		if( modelRefiner != null ) {
+			previous_to_current = new Se3_F64();
+			modelRefiner.fitModel(matcher.getMatchSet(), matcher.getModelParameters(), previous_to_current);
+		} else {
+			previous_to_current = matcher.getModelParameters();
+		}
+
+		// Convert the found transforms back to world
+		previous_to_current.invert(current_to_previous);
+		current_to_previous.concat(previousLeft.frame_to_world,currentLeft.frame_to_world);
+		right_to_left.concat(currentLeft.frame_to_world,currentRight.frame_to_world);
 
 		return true;
 	}
@@ -347,54 +364,17 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		int N = matcher.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
 			int index = matcher.getInputIndex(i);
-			TrackInfo info = candidates.get(index).getCookie();
-			info.lastInlier = getFrameID();
-			info.inlier = true;
+			TrackInfo bt = candidates.get(index).getCookie();
+			bt.lastInlier = getFrameID();
+			bt.inlier = true;
 
-			PointTrack l = info.visualTrack;
-			PointTrack r = info.visualRight;
+			PointTrack l = bt.visualTrack;
+			PointTrack r = bt.visualRight;
 
-			scene.addObservation(currentLeft, info, l.pixel.x, l.pixel.y);
-			scene.addObservation(currentRight, info, r.pixel.x, r.pixel.y);
+			scene.addObservation(currentLeft, bt, l.pixel.x, l.pixel.y);
+			scene.addObservation(currentRight, bt, r.pixel.x, r.pixel.y);
 
-			inlierTracks.add( info );
-		}
-	}
-
-	/**
-	 * Non-linear refinement of motion estimate
-	 */
-	private void refineMotionEstimate() {
-		CameraModel leftCM = cameraModels.get(CAMERA_LEFT);
-		CameraModel rightCM = cameraModels.get(CAMERA_RIGHT);
-
-		int totalInleirs = matcher.getMatchSet().size();
-
-		// use observations from the inlier set
-		listStereo2D3D.growArray(totalInleirs);
-		listStereo2D3D.reset();
-
-		for( int i = 0; i < totalInleirs; i++ ) {
-			Stereo2D3D stereo = listStereo2D3D.grow();
-			int index = matcher.getInputIndex(i);
-			TrackInfo info = candidates.get(index).getCookie();
-
-			PointTrack l = info.visualTrack;
-			PointTrack r = info.visualRight;
-
-			// compute normalized image coordinate for track in left and right image
-			leftCM.pixelToNorm.compute(l.pixel.x,l.pixel.y,stereo.leftObs);
-			rightCM.pixelToNorm.compute(r.pixel.x,r.pixel.y,stereo.rightObs);
-
-			// Save the 3D location
-			PerspectiveOps.homogenousTo3dPositiveZ(info.worldLoc,1e8,1e-8,stereo.location);
-		}
-
-		// refine the motion estimate using non-linear optimization
-		Se3_F64 key_to_curr = current_to_key.invert(null);
-		Se3_F64 found = new Se3_F64();
-		if( modelRefiner.fitModel(listStereo2D3D.toList(),key_to_curr,found) ) {
-			found.invert(current_to_key);
+			inlierTracks.add( bt );
 		}
 	}
 
@@ -403,15 +383,15 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	 */
 	private void mutualTrackDrop() {
 		for( PointTrack t : trackerLeft.getDroppedTracks(null) ) {
-			TrackInfo info = t.getCookie();
-			trackerRight.dropTrack(info.visualRight);
-			info.visualTrack = null; // This tells the scene that it is no longer in the visual tracker
+			TrackInfo bt = t.getCookie();
+			trackerRight.dropTrack(bt.visualRight);
+			bt.visualTrack = null; // This tells the scene that it is no longer in the visual tracker
 		}
 		for( PointTrack t : trackerRight.getDroppedTracks(null) ) {
-			TrackInfo info = t.getCookie();
-			if( info.visualTrack != null ) {
-				trackerLeft.dropTrack(info.visualTrack);
-				info.visualTrack = null;
+			TrackInfo bt = t.getCookie();
+			if( bt.visualTrack != null ) {
+				trackerLeft.dropTrack(bt.visualTrack);
+				bt.visualTrack = null;
 			}
 		}
 	}
@@ -424,38 +404,44 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		// mark tracks in right frame that are active
 		List<PointTrack> activeRight = trackerRight.getActiveTracks(null);
 		for( PointTrack t : activeRight ) {
-			TrackInfo info = t.getCookie();
-			info.lastSeenRightFrame = frameID;
+			TrackInfo bt = t.getCookie();
+			// If the visual track is null then it got dropped earlier
+			if( bt.visualTrack == null )
+				continue;
+			bt.lastSeenRightFrame = frameID;
 		}
 
 		List<PointTrack> activeLeft = trackerLeft.getActiveTracks(null);
 		candidates.clear();
 		for( PointTrack left : activeLeft ) {
-			TrackInfo info = left.getCookie();
+			TrackInfo bt = left.getCookie();
 
-			if( info.lastSeenRightFrame != frameID ) {
+			if( bt.lastSeenRightFrame != frameID ) {
 				continue;
 			}
 
+			if( bt.visualTrack == null )
+				throw new RuntimeException("BUG!!! Should have been skipped over in the right camera");
+
 			// check epipolar constraint and see if it is still valid
-			if( stereoCheck.checkPixel(info.visualTrack.pixel, info.visualRight.pixel) ) {
-				info.lastStereoFrame = frameID;
+			if( stereoCheck.checkPixel(bt.visualTrack.pixel, bt.visualRight.pixel) ) {
+				bt.lastStereoFrame = frameID;
 				candidates.add(left);
 			}
 		}
 	}
 
 	/**
-	 * Removes tracks which have not been included in the inlier set recently
+	 * Removes tracks which have not been included in the inlier set recently from the visual tracker
 	 */
 	private void removeOldUnusedVisibleTracks() {
-		long currentFramID = getFrameID();
+		long currentFrameID = getFrameID();
 
 		// Drop unused tracks from the left camera
 		trackerLeft.dropTracks(track -> {
 			TrackInfo bt = track.getCookie();
 			if( bt == null ) throw new RuntimeException("BUG!");
-			if( currentFramID - bt.lastInlier >= thresholdRetireTracks) {
+			if( currentFrameID - bt.lastInlier >= thresholdRetireTracks) {
 				if( bt.inlier ) throw new RuntimeException("BUG! if inlier it just got used");
 				bt.visualTrack = null;
 				return true;
@@ -470,7 +456,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 			if( bt == null ) throw new RuntimeException("BUG!");
 			if( bt.visualTrack == null )
 				return true;
-			if( currentFramID - bt.lastInlier >= thresholdRetireTracks ) {
+			if( currentFrameID - bt.lastInlier >= thresholdRetireTracks ) {
 				throw new RuntimeException("BUG! Should have already been dropped by left camera");
 			}
 			return false;
@@ -501,12 +487,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		assocL2R.associate();
 		FastAccess<AssociatedIndex> matches = assocL2R.getMatches();
 
-		// storage for the triangulated location in the camera frame
-		Point3D_F64 cameraP3 = new Point3D_F64();
-		// Normalized image coordinate for pixel track observations
-		Point2D_F64 normLeft = new Point2D_F64();
-		Point2D_F64 normRight = new Point2D_F64();
-
 		for( int i = 0; i < matches.size; i++ ) {
 			AssociatedIndex m = matches.get(i);
 
@@ -524,7 +504,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 			if( triangulate2.triangulate(normLeft,normRight, left_to_right,cameraP3) )
 			{
 				// put the track into the current keyframe coordinate system
-				SePointOps_F64.transform(current_to_key,cameraP3,cameraP3);
+				SePointOps_F64.transform(current_to_previous,cameraP3,cameraP3);
 				btrack.worldLoc.set(cameraP3.x, cameraP3.y, cameraP3.z, 1.0);
 
 				// Finalize the track data structure
@@ -541,11 +521,10 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 			}
 		}
 
-		// drop tracks that were not associated
+		// drop visual tracks that were not associated
 		GrowQueue_I32 unassignedRight = assocL2R.getUnassociatedDestination();
 		for( int i = 0; i < unassignedRight.size; i++ ) {
 			int index = unassignedRight.get(i);
-//			System.out.println(" unassigned right "+newRight.get(index).x+" "+newRight.get(index).y);
 			trackerRight.dropTrack(spawnedRight.get(index));
 		}
 		GrowQueue_I32 unassignedLeft = assocL2R.getUnassociatedSource();
@@ -555,6 +534,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		}
 
 		// Let the frame manager know how many tracks were just spawned
+		// Only need to pass in the left tracker here since it will be used as the control to decide when
+		// key frames needs to be saved
 		frameManager.handleSpawnedTracks(trackerLeft, scene.cameras.get(CAMERA_LEFT));
 	}
 

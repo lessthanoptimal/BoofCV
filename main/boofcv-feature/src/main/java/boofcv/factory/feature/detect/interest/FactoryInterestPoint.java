@@ -45,6 +45,12 @@ import boofcv.struct.pyramid.PyramidFloat;
  */
 public class FactoryInterestPoint {
 
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
+	InterestPointDetector<T> generic( ConfigDetectInterestPoint config , Class<T> inputType, Class<D> derivType )
+	{
+		throw new RuntimeException("Implement");
+	}
+
 	/**
 	 * Wraps {@link GeneralFeatureDetector} inside an {@link InterestPointDetector}.
 	 *

@@ -72,6 +72,7 @@ Version : 0.36
   * All stereo visual odometry algorithms now support multiple key frames and bundle adjustment
   * TODO update DualTrack
   * TODO update Quad
+  * TODO GUI - Add Kernel Radius to Corner Detector Config
 - Stereo
   * Added sparse disparity with Census and NCC
   * Added Census support for F32 images
@@ -111,7 +112,7 @@ TODO Sparse Disparity Undistort using camera model
   * TODO try improving 3-view by estimating lens distortion in projective camera
   * TODO Scene Reconstruction from arbitrary number of photos
   * TODO triangulate N-points calibrated homogenous coordinates
-
+  * TODO Add rigid relationships between views. Can be fixed or not.
 TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
 TODO Videos - hough line detectors
             - chessboard corner detector + improvements

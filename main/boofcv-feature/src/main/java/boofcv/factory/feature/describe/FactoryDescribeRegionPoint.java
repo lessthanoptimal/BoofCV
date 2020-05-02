@@ -43,6 +43,22 @@ import java.util.Random;
 public class FactoryDescribeRegionPoint {
 
 	/**
+	 * Factory function for creating many different types of region descriptors
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends ImageGray<T>,Desc extends TupleDesc>
+	DescribeRegionPoint<T,Desc> generic(ConfigDescribeRegionPoint config , Class<T> imageType) {
+		switch(config.type) {
+			case SURF_FAST: return (DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surfFast, imageType);
+			case SURF_STABLE: return(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surfStability, imageType);
+			case SIFT: return (DescribeRegionPoint)FactoryDescribeRegionPoint.sift(config.scaleSpaceSift,config.sift, imageType);
+			case BRIEF: return (DescribeRegionPoint)FactoryDescribeRegionPoint.brief(config.brief, imageType);
+			case TEMPLATE: return (DescribeRegionPoint)FactoryDescribeRegionPoint.template(config.template, imageType);
+			default: throw new IllegalArgumentException("Unknown descriptor");
+		}
+	}
+
+	/**
 	 * <p>
 	 * Creates a SURF descriptor.  SURF descriptors are invariant to illumination, orientation, and scale.
 	 * BoofCV provides two variants. This SURF variant created here is designed for speed and sacrifices some stability.

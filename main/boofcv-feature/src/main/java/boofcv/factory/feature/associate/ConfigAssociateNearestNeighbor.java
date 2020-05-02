@@ -45,6 +45,12 @@ public class ConfigAssociateNearestNeighbor implements Configuration {
 	 */
 	public double maxErrorThreshold = -1;
 
+	/**
+	 * The maximum number of nodes it will search in a KD-Tree. Setting a limit will improve speed at the cost
+	 * of accuracy.
+	 */
+	public int maxNodesSearched = Integer.MAX_VALUE;
+
 	@Override
 	public void checkValidity() {
 		if( scoreRatioThreshold <= 0 )

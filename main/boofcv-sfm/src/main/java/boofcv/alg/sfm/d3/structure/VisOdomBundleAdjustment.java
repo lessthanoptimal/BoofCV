@@ -191,12 +191,18 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public BFrame addFrame( long id ) {
 		if( cameras.size != 1 )
 			throw new IllegalArgumentException("To use this function there must be one and only one camera");
-		return addFrame(cameras.get(0),id);
+		return addFrame(0,id);
 	}
 
-	public BFrame addFrame( BCamera camera , long id ) {
+	public BFrame addFrame( int cameraIndex , long id ) {
 		BFrame frame = frames.grow();
-		frame.camera = camera;
+		frame.camera = cameras.get(cameraIndex);
+		frame.id = id;
+		return frame;
+	}
+
+	BFrame addFrameDebug( long id ) {
+		BFrame frame = frames.grow();
 		frame.id = id;
 		return frame;
 	}

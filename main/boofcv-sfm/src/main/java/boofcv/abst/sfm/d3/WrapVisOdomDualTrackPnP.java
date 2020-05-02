@@ -55,57 +55,56 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	PnPStereoDistanceReprojectionSq distanceStereo;
 	AssociateStereo2D<?> assoc;
 
-	VisOdomDualTrackPnP<T,?> alg;
+	VisOdomDualTrackPnP<T,?> visualOdometry;
 
 	Class<T> imageType;
 
 	boolean success;
 
-	public WrapVisOdomDualTrackPnP(PnPStereoEstimator pnp,
+	public WrapVisOdomDualTrackPnP(VisOdomDualTrackPnP<T, ?> visualOdometry, PnPStereoEstimator pnp,
 								   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono,
 								   PnPStereoDistanceReprojectionSq distanceStereo,
 								   AssociateStereo2D<?> assoc,
-								   VisOdomDualTrackPnP<T, ?> alg,
 								   RefinePnPStereo refine,
 								   Class<T> imageType) {
+		this.visualOdometry = visualOdometry;
 		this.pnp = pnp;
 		this.distanceMono = distanceMono;
 		this.distanceStereo = distanceStereo;
 		this.assoc = assoc;
-		this.alg = alg;
 		this.refine = refine;
 		this.imageType = imageType;
 	}
 
 	@Override
 	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
-		VisOdomDualTrackPnP.TrackInfo info = alg.getCandidates().get(index).getCookie();
+		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getCandidates().get(index).getCookie();
 		PerspectiveOps.homogenousTo3dPositiveZ(info.worldLoc,1e8,1e-8,world);
 		return true;
 	}
 
-	@Override public int getTotalTracks() {return alg.getCandidates().size();}
-	@Override public long getTrackId(int index) {return alg.getCandidates().get(index).featureId;}
+	@Override public int getTotalTracks() {return visualOdometry.getCandidates().size();}
+	@Override public long getTrackId(int index) {return visualOdometry.getCandidates().get(index).featureId;}
 
 	@Override
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
-		pixel.set( alg.getCandidates().get(index).pixel );
+		pixel.set( visualOdometry.getCandidates().get(index).pixel );
 	}
 
 	@Override
 	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
-		return PointTrack.extractTrackPixels(storage,alg.getCandidates());
+		return PointTrack.extractTrackPixels(storage, visualOdometry.getCandidates());
 	}
 
 	@Override
 	public boolean isTrackInlier(int index) {
-		VisOdomDualTrackPnP.TrackInfo info = alg.getCandidates().get(index).getCookie();
-		return info.lastInlier == alg.getFrameID();
+		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getCandidates().get(index).getCookie();
+		return info.lastInlier == visualOdometry.getFrameID();
 	}
 
 	@Override public boolean isTrackNew(int index) {
-		VisOdomDualTrackPnP.TrackInfo info = alg.getCandidates().get(index).getCookie();
-		return info.visualTrack.spawnFrameID == alg.getFrameID();
+		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getCandidates().get(index).getCookie();
+		return info.visualTrack.spawnFrameID == visualOdometry.getFrameID();
 	}
 
 	@Override
@@ -115,7 +114,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 		pnp.setLeftToRight(leftToRight);
 		if( refine != null )
 			refine.setLeftToRight(leftToRight);
-		alg.setCalibration(parameters);
+		visualOdometry.setCalibration(parameters);
 
 		CameraPinholeBrown left = parameters.left;
 		distanceMono.setIntrinsic(0,left);
@@ -125,15 +124,16 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 		assoc.setCalibration(parameters);
 	}
 
-	@Override public void reset() {alg.reset();}
-	@Override public Se3_F64 getCameraToWorld() {return alg.getCurrentToWorld();}
-	@Override public long getFrameID() {return alg.getFrameID();}
-	@Override public boolean process(T leftImage, T rightImage) {return success = alg.process(leftImage,rightImage);}
+	@Override public void reset() {
+		visualOdometry.reset();}
+	@Override public Se3_F64 getCameraToWorld() {return visualOdometry.getCurrentToWorld();}
+	@Override public long getFrameID() {return visualOdometry.getFrameID();}
+	@Override public boolean process(T leftImage, T rightImage) {return success = visualOdometry.process(leftImage,rightImage);}
 
 	@Override
 	public boolean isFault() {
 		if( !success)
-			return alg.isFault();
+			return visualOdometry.isFault();
 		else
 			return false;
 	}
@@ -142,6 +142,6 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-		alg.setVerbose(out,configuration);
+		visualOdometry.setVerbose(out,configuration);
 	}
 }

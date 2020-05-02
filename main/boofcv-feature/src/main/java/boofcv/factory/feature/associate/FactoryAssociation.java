@@ -70,12 +70,11 @@ public class FactoryAssociation {
 	 * @see org.ddogleg.nn.alg.searches.KdTreeSearch1Bbf
 	 *
 	 * @param dimension Number of elements in the feature vector
-	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.
 	 * @return Association using approximate nearest neighbor
 	 */
-	public static AssociateDescription<TupleDesc_F64> kdtree( @Nullable ConfigAssociateNearestNeighbor configNN ,
-															  int dimension, int maxNodesSearched ) {
-		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(dimension),maxNodesSearched);
+	public static AssociateDescription<TupleDesc_F64> kdtree(
+			@Nullable ConfigAssociateNearestNeighbor configNN , int dimension ) {
+		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(dimension),configNN.maxNodesSearched);
 
 		return associateNearestNeighbor(configNN,nn);
 	}
@@ -88,29 +87,28 @@ public class FactoryAssociation {
 	 * @see org.ddogleg.nn.wrap.KdForestBbfNearestNeighbor
 	 *
 	 * @param dimension Number of elements in the feature vector
-	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.
 	 * @param numTrees Number of trees that are considered.  Try 10 and tune.
 	 * @param numConsiderSplit Number of nodes that are considered when generating a tree.  Must be less than the
 	 *                         point's dimension.  Try 5
 	 * @param randomSeed Seed used by random number generator
 	 * @return Association using approximate nearest neighbor
 	 */
-	public static AssociateDescription<TupleDesc_F64> kdRandomForest( ConfigAssociateNearestNeighbor configNN ,
+	public static AssociateDescription<TupleDesc_F64> kdRandomForest( @Nullable ConfigAssociateNearestNeighbor configNN ,
 																	  int dimension,
-																	  int maxNodesSearched ,
 																	  int numTrees ,
 																	  int numConsiderSplit ,
 																	  long randomSeed) {
+		if( configNN == null )
+			configNN = new ConfigAssociateNearestNeighbor();
 		NearestNeighbor nn = FactoryNearestNeighbor.kdRandomForest(
 				new KdTreeTuple_F64(dimension),
-				maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
+				configNN.maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
 
 		return associateNearestNeighbor(configNN,nn);
 	}
 
 	public static AssociateNearestNeighbor<TupleDesc_F64>
-	associateNearestNeighbor( @Nullable ConfigAssociateNearestNeighbor config ,
-							  NearestNeighbor nn )
+	associateNearestNeighbor( @Nullable ConfigAssociateNearestNeighbor config ,  NearestNeighbor nn )
 	{
 		if( config == null )
 			config = new ConfigAssociateNearestNeighbor();

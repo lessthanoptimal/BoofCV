@@ -76,15 +76,15 @@ public class ExampleVisualOdometryStereo {
 
 		var configDet = new ConfigPointDetector();
 		configDet.type = PointDetectorTypes.SHI_TOMASI;
-		configDet.shiTomasi.radius = 2;
-		configDet.general.maxFeatures = 400;
-		configDet.general.radius = 4;
+		configDet.shiTomasi.radius = 4;
+		configDet.general.maxFeatures = 300;
+		configDet.general.radius = 5;
 
 		// We will estimate the location of features using block matching stereo
 		var configBM = new ConfigDisparityBM();
 		configBM.errorType = DisparityError.CENSUS;
 		configBM.disparityMin = 0;
-		configBM.disparityRange = 100;
+		configBM.disparityRange = 50;
 		configBM.regionRadiusX = 3;
 		configBM.regionRadiusY = 3;
 		configBM.maxPerPixelError = 30;
@@ -95,8 +95,8 @@ public class ExampleVisualOdometryStereo {
 		// Configurations related to how the structure is chained together frame to frame
 		var configPnP = new ConfigVisOdomDepthPnP();
 		configPnP.keyframes.geoMinCoverage = 0.4;
-		configPnP.ransacIterations = 500;
-		configPnP.ransacInlierTol = 1.5;
+		configPnP.ransacIterations = 200;
+		configPnP.ransacInlierTol = 1.0;
 
 		// Declare each component then visual odometry
 		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet,GrayU8.class, GrayS16.class);

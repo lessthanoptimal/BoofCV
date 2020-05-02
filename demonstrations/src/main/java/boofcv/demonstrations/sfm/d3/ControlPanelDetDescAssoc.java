@@ -253,9 +253,9 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 
 			ConfigAssociateNearestNeighbor configNN = controlAssocNN.config;
 			switch( selectedAssociate ) {
-				case 1: return FactoryAssociation.kdtree(configNN,DOF, 75);
+				case 1: return FactoryAssociation.kdtree(configNN,DOF);
 				case 2: return FactoryAssociation.kdRandomForest(
-						configNN,DOF, 75, 10, 5, 1233445565);
+						configNN,DOF, 10, 5, 1233445565);
 				default:
 					throw new IllegalArgumentException("Unknown association");
 			}

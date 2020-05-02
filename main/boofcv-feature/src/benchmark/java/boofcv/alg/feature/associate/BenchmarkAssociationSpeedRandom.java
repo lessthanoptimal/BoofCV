@@ -67,8 +67,8 @@ public class BenchmarkAssociationSpeedRandom {
 
 		greedy = FactoryAssociation.greedy(new ConfigAssociateGreedy(false),score);
 		greedyBackwards = FactoryAssociation.greedy(new ConfigAssociateGreedy(true),score);
-		kdtree = FactoryAssociation.kdtree(null,DOF,500);
-		forest = FactoryAssociation.kdRandomForest(null,DOF,500,15,5,1233445565);
+		kdtree = FactoryAssociation.kdtree(null,DOF);
+		forest = FactoryAssociation.kdRandomForest(null,DOF,15,5,1233445565);
 
 //		kdtree.setSource(listA);
 	}

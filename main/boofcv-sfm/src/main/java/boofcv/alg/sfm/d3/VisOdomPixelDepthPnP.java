@@ -42,7 +42,6 @@ import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +87,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 	//=================================================================
 	//======== Workspace Variables
 	List<PointTrack> tmpVisualTracks = new ArrayList<>();
+	Point4D_F64 prevLoc4 = new Point4D_F64();
+	Se3_F64 world_to_prev = new Se3_F64();
 
 	/**
 	 * Configures magic numbers and estimation algorithms.
@@ -123,7 +124,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 	public void reset() {
 		super.reset();
 		tracker.reset();
-		current_to_key.reset();
+		current_to_previous.reset();
 	}
 
 	/**
@@ -137,8 +138,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 		timeTracking = timeBundle = timeSceneMaintenance = timeDropUnused = timeEstimate = timeSpawn = 0;
 
 		//=============================================================================================
-		//========== Track visual features
-
+		//========== Visually track features
 		long time0 = System.nanoTime();
 		tracker.process(image);
 		long time1 = System.nanoTime();
@@ -190,7 +190,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 		//========== Perform maintenance by dropping elements from the scene
 		dropBadBundleTracks();
 		long time4 = System.nanoTime();
-		boolean droppedCurrentFrame = performKeyFrameMaintenance();
+		boolean droppedCurrentFrame = performKeyFrameMaintenance(tracker,1);
 		long time5 = System.nanoTime();
 		if( !droppedCurrentFrame ) {
 			// it decided to keep the current track. Spawn new tracks in the current frame
@@ -239,24 +239,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 			verbose.println("   Tracker active   " + tracker.getTotalActive());
 			verbose.println("   Tracker inactive " + tracker.getTotalInactive());
 		}
-	}
-
-	private boolean performKeyFrameMaintenance() {
-		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,maxKeyFrames,1, scene);
-		boolean droppedCurrentFrame = false;
-		for (int i = dropFrameIndexes.size-1; i >= 0; i--) {
-			// indexes are ordered from lowest to highest, so you can remove frames without
-			// changing the index in the list
-			BFrame frameToDrop = scene.frames.get(dropFrameIndexes.get(i));
-			droppedCurrentFrame |= frameToDrop == scene.frames.getTail();
-
-			// update data structures
-			scene.removeFrame(frameToDrop, removedBundleTracks);
-			dropRemovedBundleTracks();
-			dropTracksNotVisibleAndTooFewObservations();
-		}
-		updateListOfVisibleTracksForOutput();
-		return droppedCurrentFrame;
 	}
 
 	/**
@@ -409,8 +391,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 	private boolean estimateMotion( List<PointTrack> active ) {
 		Point2Transform2_F64 pixelToNorm = cameraModels.get(0).pixelToNorm;
 
-		var prevLoc4 = new Point4D_F64();
-		var world_to_prev = new Se3_F64();
 		framePrevious.frame_to_world.invert(world_to_prev);
 
 		// Create a list of observations for PnP
@@ -436,18 +416,18 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 		if( !motionEstimator.process( observationsPnP.toList() ) )
 			return false;
 
-		Se3_F64 key_to_current;
+		Se3_F64 previous_to_current;
 
 		if( refine != null ) {
-			key_to_current = new Se3_F64();
-			refine.fitModel(motionEstimator.getMatchSet(), motionEstimator.getModelParameters(), key_to_current);
+			previous_to_current = new Se3_F64();
+			refine.fitModel(motionEstimator.getMatchSet(), motionEstimator.getModelParameters(), previous_to_current);
 		} else {
-			key_to_current = motionEstimator.getModelParameters();
+			previous_to_current = motionEstimator.getModelParameters();
 		}
 
 		// Change everything back to the world frame
-		key_to_current.invert(current_to_key);
-		current_to_key.concat(framePrevious.frame_to_world,frameCurrent.frame_to_world);
+		previous_to_current.invert(current_to_previous);
+		current_to_previous.concat(framePrevious.frame_to_world,frameCurrent.frame_to_world);
 
 		return true;
 	}

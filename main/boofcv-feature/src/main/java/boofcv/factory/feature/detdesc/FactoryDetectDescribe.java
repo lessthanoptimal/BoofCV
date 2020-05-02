@@ -37,13 +37,20 @@ import boofcv.alg.feature.detdesc.CompleteSift;
 import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar;
 import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar_MT;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
@@ -60,6 +67,72 @@ import javax.annotation.Nullable;
  * @author Peter Abeles
  */
 public class FactoryDetectDescribe {
+
+	/**
+	 * Generic factory for all detector / descriptors
+	 */
+	public static <T extends ImageGray<T>>
+	DetectDescribePoint<T,BrightFeature> generic( ConfigDetectDescribe config , Class<T> imageType )
+	{
+		DetectDescribePoint detDesc = null;
+
+		if( config.typeDetector == ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN ) {
+			switch (config.typeDescribe) {
+				case SURF_FAST:detDesc = FactoryDetectDescribe.surfFast(
+						config.detectFastHessian, config.describeSurfFast,null,imageType);
+					break;
+				case SURF_STABLE:detDesc = FactoryDetectDescribe.surfStable(
+						config.detectFastHessian, config.describeSurfStability,null,imageType);
+					break;
+			}
+		} else if( config.typeDescribe == ConfigDescribeRegionPoint.DescriptorType.SIFT ) {
+			var configSift = new ConfigCompleteSift();
+			configSift.scaleSpace = config.scaleSpaceSift;
+			configSift.detector = config.detectSift;
+			configSift.describe = config.describeSift;
+			detDesc = FactoryDetectDescribe.sift(configSift);
+		}
+
+		if( detDesc != null )
+			return detDesc;
+
+		InterestPointDetector detector;
+		switch(config.typeDetector) {
+			case FAST_HESSIAN: detector = FactoryInterestPoint.fastHessian(config.detectFastHessian); break;
+			case SIFT: detector =
+					FactoryInterestPoint.sift(config.scaleSpaceSift,config.detectSift,imageType); break;
+			case POINT: {
+				GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint,imageType,null);
+				detector = FactoryInterestPoint.wrapPoint(
+						alg, config.detectPoint.scaleRadius, imageType, alg.getDerivType());
+			} break;
+			default: throw new IllegalArgumentException("Unknown detector");
+		}
+		DescribeRegionPoint descriptor;
+		switch(config.typeDescribe) {
+			case SURF_FAST:
+				descriptor = FactoryDescribeRegionPoint.surfFast(config.describeSurfFast, imageType); break;
+			case SURF_STABLE:
+				descriptor = FactoryDescribeRegionPoint.surfStable(config.describeSurfStability, imageType); break;
+			case SIFT: descriptor =
+					FactoryDescribeRegionPoint.sift(config.scaleSpaceSift,config.describeSift, imageType); break;
+			case BRIEF: descriptor = FactoryDescribeRegionPoint.brief(config.describeBrief, imageType); break;
+			case TEMPLATE: descriptor =
+					FactoryDescribeRegionPoint.template(config.describeTemplate, imageType); break;
+			default: throw new IllegalArgumentException("Unknown descriptor");
+		}
+
+		OrientationImage orientation = null;
+
+		// only compute orientation if the descriptor will use it
+		if( descriptor.isOriented() ) {
+			Class integralType = GIntegralImageOps.getIntegralType(imageType);
+			OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
+			orientation = FactoryOrientation.convertImage(orientationII, imageType);
+		}
+
+		return FactoryDetectDescribe.fuseTogether(detector,orientation,descriptor);
+	}
 
 	/**
 	 * Creates a new SIFT feature detector and describer.

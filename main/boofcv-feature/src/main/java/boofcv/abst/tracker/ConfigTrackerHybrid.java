@@ -21,22 +21,17 @@ package boofcv.abst.tracker;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link DetectDescribeAssociate}
- *
  * @author Peter Abeles
  */
-public class ConfigTrackerDda implements Configuration {
-	/**
-	 * Update the description each time its successfully matched?
-	 */
-	public boolean updateDescription = false;
+public class ConfigTrackerHybrid implements Configuration {
 
 	/**
-	 * Random seed
+	 * Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 */
-	public long seed=0xDEADBEEF;
+	public int reactivateThreshold = 50;
 
 	@Override
 	public void checkValidity() {
+
 	}
 }

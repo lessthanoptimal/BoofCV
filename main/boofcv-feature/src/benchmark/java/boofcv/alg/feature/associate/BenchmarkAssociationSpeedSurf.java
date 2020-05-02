@@ -22,6 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
+import boofcv.factory.feature.associate.ConfigAssociateNearestNeighbor;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.io.UtilIO;
@@ -110,19 +111,24 @@ public class BenchmarkAssociationSpeedSurf {
 		}
 	}
 
-	public static void main( String argsp[ ] ) {
+	public static void main( String[] args ) {
 		BenchmarkAssociationSpeedSurf app = new BenchmarkAssociationSpeedSurf();
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 		
 		int DOF = app.detector.createDescription().size();
 
+		var configKD = new ConfigAssociateNearestNeighbor();
+		configKD.maxNodesSearched = 800;
+
 		ProfileOperation.printOpsPerSec(app.createProfile("Greedy",
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(false),score)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(app.createProfile("Greedy Backwards",
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true),score)),TEST_TIME);
+		ProfileOperation.printOpsPerSec(app.createProfile("KD-Tree",
+				FactoryAssociation.kdtree(configKD,DOF)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(app.createProfile("Random Forest",
-				FactoryAssociation.kdRandomForest(null,DOF, 500, 15, 5, 1233445565)),TEST_TIME);
+				FactoryAssociation.kdRandomForest(configKD,DOF, 15, 5, 1233445565)),TEST_TIME);
 		
 	}
 }

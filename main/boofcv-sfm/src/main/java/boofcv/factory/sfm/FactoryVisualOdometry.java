@@ -52,10 +52,12 @@ import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
+import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.EstimatorToGenerator;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
@@ -73,6 +75,8 @@ import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+
+import javax.annotation.Nullable;
 
 /**
  * Factory for creating visual odometry algorithms.
@@ -406,11 +410,84 @@ public class FactoryVisualOdometry {
 		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
-		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(thresholdAdd, thresholdRetire, epipolarPixelTol,
-				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP,null);
-		alg.setDescribeRadius(describeRadius);
+		return null;
+//		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(thresholdAdd, thresholdRetire, epipolarPixelTol,
+//				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP,null);
+//		alg.setDescribeRadius(describeRadius);
+//
+//		return new WrapVisOdomDualTrackPnP<>(pnpStereo, distanceMono, distanceStereo, associateStereo, alg, refinePnP, imageType);
+	}
 
-		return new WrapVisOdomDualTrackPnP<>(pnpStereo, distanceMono, distanceStereo, associateStereo, alg, refinePnP, imageType);
+	/**
+	 * Creates an instance of {@link VisOdomDualTrackPnP}.
+	 *
+	 * @param configVO Configuration
+	 * @param imageType Type of input image
+	 * @return The new instance
+	 */
+	public static <T extends ImageGray<T>, Desc extends TupleDesc>
+	StereoVisualOdometry<T> stereoDualTrackerPnP( @Nullable ConfigStereoDualTrackPnP configVO, Class<T> imageType) {
+		if( configVO == null )
+			configVO = new ConfigStereoDualTrackPnP();
+		configVO.checkValidity();
+
+		EstimateNofPnP pnp = FactoryMultiView.pnp_N(configVO.pnp, -1);
+		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
+		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
+
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
+
+		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
+		double ransacTOL = 2*configVO.ransacInlierTol * configVO.ransacInlierTol;
+
+		ModelMatcher<Se3_F64, Stereo2D3D> motion =new Ransac<>
+				(configVO.ransacSeed, manager, generator, distanceStereo, configVO.ransacIterations, ransacTOL);
+		RefinePnPStereo refinePnP = null;
+
+		if( configVO.refineIterations > 0 ) {
+			refinePnP = new PnPStereoRefineRodrigues(1e-12,configVO.refineIterations);
+		}
+
+		Triangulate2ViewsMetric triangulate2 = FactoryMultiView.triangulate2ViewMetric(
+				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
+
+		PointTracker<T> trackerLeft = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
+		PointTracker<T> trackerRight = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
+
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
+		bundleAdjustment.configure(1e-3,1e-3,configVO.bundleIterations);
+
+		VisOdomKeyFrameManager keyframe;
+		switch (configVO.keyframes.type) {
+			case MAX_GEO: keyframe = new MaxGeoKeyFrameManager(configVO.keyframes.geoMinCoverage);break;
+			case TICK_TOCK: keyframe = new TickTockKeyFrameManager(configVO.keyframes.tickPeriod);break;
+			default: throw new IllegalArgumentException("Unknown type "+configVO.keyframes.type);
+		}
+
+		DescribeRegionPoint<T,Desc> descriptor = FactoryDescribeRegionPoint.generic(configVO.stereoDescribe,imageType);
+		Class<Desc> descType = descriptor.getDescriptionType();
+		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
+		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, configVO.epipolarTol, descType);
+
+		// need to make sure associations are unique
+		AssociateDescription2D<Desc> associateUnique = associateL2R;
+		if( !associateL2R.uniqueDestination() || !associateL2R.uniqueSource() ) {
+			associateUnique = new EnforceUniqueByScore.Describe2D<>(associateL2R, true, true);
+		}
+
+		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(
+				configVO.epipolarTol,trackerLeft, trackerRight, descriptor, associateUnique, triangulate2,
+				motion, refinePnP, bundleAdjustment );
+
+		alg.setFrameManager(keyframe);
+		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
+		alg.getScene().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
+		alg.getScene().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
+
+		return new WrapVisOdomDualTrackPnP<>(
+				alg, pnpStereo, distanceMono, distanceStereo, associateL2R, refinePnP,imageType);
 	}
 
 	/**
