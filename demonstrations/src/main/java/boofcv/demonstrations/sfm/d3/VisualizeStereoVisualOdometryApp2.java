@@ -21,7 +21,7 @@ package boofcv.demonstrations.sfm.d3;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP;
+import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
@@ -291,8 +291,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 		// Number of tracks being optimized by bundle adjustment
 		final int bundleTracks;
-		if( alg instanceof WrapVisOdomPixelDepthPnP) {
-			FastAccess<BTrack> tracks = ((WrapVisOdomPixelDepthPnP)alg).getAlgorithm().getScene().tracks;
+		if( alg instanceof WrapVisOdomMonoStereoDepthPnP) {
+			FastAccess<BTrack> tracks = ((WrapVisOdomMonoStereoDepthPnP)alg).getAlgorithm().getScene().tracks;
 			int count = 0;
 			for (int i = 0; i < tracks.size; i++) {
 				if( tracks.get(i).selected ) {

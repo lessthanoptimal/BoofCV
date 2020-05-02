@@ -18,20 +18,31 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<GrayF32> {
+public class TestWrapVisOdomStereoDualTrackPnP extends CheckVisualOdometryStereoSim<GrayF32> {
 
-	public TestWrapVisOdomDualTrackPnP() {
-		super(GrayF32.class);
-	}
+	public TestWrapVisOdomStereoDualTrackPnP() {super(GrayF32.class);}
 
 	@Override
 	public StereoVisualOdometry<GrayF32> createAlgorithm() {
-		return FactoryVisualOdometry.stereoDualTrackerPnP(null,GrayF32.class);
+		var config = new ConfigStereoDualTrackPnP();
+
+		config.sbaConverge.maxIterations = 10;
+		config.ransac.inlierThreshold = 1.5;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		config.tracker.klt.templateRadius = 3;
+		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
+		config.tracker.detDesc.detectPoint.general.radius = 3;
+
+//		config.stereoRadius = 5;
+
+		return FactoryVisualOdometry.stereoDualTrackerPnP(config,GrayF32.class);
 	}
 }

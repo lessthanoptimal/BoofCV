@@ -19,7 +19,6 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.PerspectiveOps;
@@ -78,33 +77,35 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 
 	@Override
 	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
-		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getCandidates().get(index).getCookie();
+		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getVisibleTracks().get(index);
 		PerspectiveOps.homogenousTo3dPositiveZ(info.worldLoc,1e8,1e-8,world);
 		return true;
 	}
 
-	@Override public int getTotalTracks() {return visualOdometry.getCandidates().size();}
-	@Override public long getTrackId(int index) {return visualOdometry.getCandidates().get(index).featureId;}
+	@Override public int getTotalTracks() {return visualOdometry.getVisibleTracks().size();}
+	@Override public long getTrackId(int index) {return visualOdometry.getVisibleTracks().get(index).id;}
 
 	@Override
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
-		pixel.set( visualOdometry.getCandidates().get(index).pixel );
+		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
+		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
+		pixel.set( visualOdometry.getVisibleTracks().get(index).visualTrack.pixel );
 	}
 
 	@Override
 	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
-		return PointTrack.extractTrackPixels(storage, visualOdometry.getCandidates());
+		throw new RuntimeException("Not supported any more");
 	}
 
 	@Override
 	public boolean isTrackInlier(int index) {
-		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getCandidates().get(index).getCookie();
+		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getVisibleTracks().get(index);
 		return info.lastInlier == visualOdometry.getFrameID();
 	}
 
 	@Override public boolean isTrackNew(int index) {
-		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getCandidates().get(index).getCookie();
-		return info.visualTrack.spawnFrameID == visualOdometry.getFrameID();
+		VisOdomDualTrackPnP.TrackInfo track = visualOdometry.getVisibleTracks().get(index);
+		return track.visualTrack.spawnFrameID == visualOdometry.getFrameID();
 	}
 
 	@Override

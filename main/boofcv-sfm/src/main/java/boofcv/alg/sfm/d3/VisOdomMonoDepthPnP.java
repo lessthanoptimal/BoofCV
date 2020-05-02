@@ -63,8 +63,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
-		extends VisOdomBundlePnPBase<VisOdomPixelDepthPnP.Track> {
+public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
+		extends VisOdomBundlePnPBase<VisOdomMonoDepthPnP.Track> {
 
 	// tracks features in the image
 	private final @Getter PointTracker<T> tracker;
@@ -98,11 +98,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 	 * @param refine Optional algorithm for refining the pose estimate.  Can be null.
 	 * @param tracker Point feature tracker.
 	 */
-	public VisOdomPixelDepthPnP(ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
-								ImagePixelTo3D pixelTo3D,
-								RefinePnP refine ,
-								PointTracker<T> tracker ,
-								BundleAdjustment<SceneStructureMetric> bundleAdjustment )
+	public VisOdomMonoDepthPnP(ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
+							   ImagePixelTo3D pixelTo3D,
+							   RefinePnP refine ,
+							   PointTracker<T> tracker ,
+							   BundleAdjustment<SceneStructureMetric> bundleAdjustment )
 	{
 		this.motionEstimator = motionEstimator;
 		this.pixelTo3D = pixelTo3D;
@@ -340,11 +340,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 		// TODO make this optionally concurrent
 		// estimate 3D coordinate using stereo vision
 		for( PointTrack t : spawned ) {
-			for (int i = 0; i < visibleTracks.size(); i++) {
-				if( visibleTracks.get(i).visualTrack == t ) {
-					throw new RuntimeException("Bug. Adding duplicate track: " + visibleTracks.get(i).id + " " + t.featureId);
-				}
-			}
+//			for (int i = 0; i < visibleTracks.size(); i++) {
+//				if( visibleTracks.get(i).visualTrack == t ) {
+//					throw new RuntimeException("Bug. Adding duplicate track: " + visibleTracks.get(i).id + " " + t.featureId);
+//				}
+//			}
 
 			// discard point if it can't localized
 			if( !pixelTo3D.process(t.pixel.x,t.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
@@ -373,10 +373,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>>
 
 				scene.addObservation(frameCurrent, btrack, t.pixel.x , t.pixel.y);
 
-				for (int i = 0; i < visibleTracks.size(); i++) {
-					if( visibleTracks.get(i).visualTrack == t )
-						throw new RuntimeException("Bug. Adding duplicate track: "+t.featureId);
-				}
+//				for (int i = 0; i < visibleTracks.size(); i++) {
+//					if( visibleTracks.get(i).visualTrack == t )
+//						throw new RuntimeException("Bug. Adding duplicate track: "+t.featureId);
+//				}
 
 				visibleTracks.add(btrack);
 			}

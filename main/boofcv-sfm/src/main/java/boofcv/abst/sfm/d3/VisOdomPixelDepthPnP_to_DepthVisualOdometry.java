@@ -23,7 +23,7 @@ import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
+import boofcv.alg.sfm.d3.VisOdomMonoDepthPnP;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
@@ -46,7 +46,7 @@ import java.util.Set;
 import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
 /**
- * Wrapper around {@link VisOdomPixelDepthPnP} for {@link DepthVisualOdometry}.
+ * Wrapper around {@link VisOdomMonoDepthPnP} for {@link DepthVisualOdometry}.
  *
  * @author Peter Abeles
  */
@@ -57,7 +57,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 {
 	// low level algorithm
 	DepthSparse3D<Depth> sparse3D;
-	VisOdomPixelDepthPnP<Vis> alg;
+	VisOdomMonoDepthPnP<Vis> alg;
 	DistanceFromModelMultiView<Se3_F64,Point2D3D> distance;
 	ImageType<Vis> visualType;
 	Class<Depth> depthType;
@@ -65,7 +65,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 
 	List<PointTrack> active = new ArrayList<>();
 
-	public VisOdomPixelDepthPnP_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D, VisOdomPixelDepthPnP<Vis> alg,
+	public VisOdomPixelDepthPnP_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D, VisOdomMonoDepthPnP<Vis> alg,
 													   DistanceFromModelMultiView<Se3_F64, Point2D3D> distance,
 													   ImageType<Vis> visualType, Class<Depth> depthType) {
 		this.sparse3D = sparse3D;
@@ -112,7 +112,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 			Point2D3DTrack t = active.get(index).getCookie();
 			return t.lastInlier == alg.getFrameID();
 		} catch( RuntimeException ignore){}
-		VisOdomPixelDepthPnP.Track t = active.get(index).getCookie();
+		VisOdomMonoDepthPnP.Track t = active.get(index).getCookie();
 		return t.lastUsed == alg.getFrameID();
 	}
 

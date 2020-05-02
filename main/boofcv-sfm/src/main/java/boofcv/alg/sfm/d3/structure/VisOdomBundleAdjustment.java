@@ -60,6 +60,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	@Getter SelectTracksInFrameForBundleAdjustment selectTracks =
 			new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 
+	final Se3_F64 world_to_view = new Se3_F64();
+
 	public VisOdomBundleAdjustment( BundleAdjustment<SceneStructureMetric> bundleAdjustment,
 									Factory<T> factoryTracks ) {
 		this.tracks = new FastQueue<>(factoryTracks,BTrack::reset);
@@ -105,11 +107,11 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		}
 
 		// TODO make the first frame at origin. This is done to avoid numerical after traveling a good distance
-		final var worldToFrame = new Se3_F64();
 		for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
-			frames.get(frameIdx).frame_to_world.invert(worldToFrame);
-			structure.setView(frameIdx,frameIdx==0,worldToFrame);
-			structure.connectViewToCamera(frameIdx,0);
+			BFrame bf = frames.get(frameIdx);
+			bf.frame_to_world.invert(world_to_view);
+			structure.setView(frameIdx,frameIdx==0,world_to_view);
+			structure.connectViewToCamera(frameIdx,bf.camera.index);
 			frames.get(frameIdx).listIndex = frameIdx; // save the index since it's needed in the next loop
 		}
 
@@ -117,14 +119,14 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		// this requires it to have a different index
 		int featureBundleIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
-			BTrack t = tracks.get(trackIdx);
-			if( !t.selected)
+			BTrack bt = tracks.get(trackIdx);
+			if( !bt.selected)
 				continue;
-			Point4D_F64 p = t.worldLoc;
+			Point4D_F64 p = bt.worldLoc;
 			structure.setPoint(featureBundleIdx,p.x,p.y,p.z,p.w);
 
-			for (int obsIdx = 0; obsIdx < t.observations.size; obsIdx++) {
-				BObservation o = t.observations.get(obsIdx);
+			for (int obsIdx = 0; obsIdx < bt.observations.size; obsIdx++) {
+				BObservation o = bt.observations.get(obsIdx);
 				SceneObservations.View view = observations.getView(o.frame.listIndex);
 				view.add(featureBundleIdx,(float)o.pixel.x,(float)o.pixel.y);
 			}
@@ -142,17 +144,17 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	private void copyResults() {
 		// skip the first frame since it's fixed
 		for (int frameIdx = 1; frameIdx < frames.size; frameIdx++) {
-			BFrame frame = frames.get(frameIdx);
-			structure.views.get(frameIdx).worldToView.invert(frame.frame_to_world);
+			BFrame bf = frames.get(frameIdx);
+			structure.views.get(frameIdx).worldToView.invert(bf.frame_to_world);
 		}
 
 		int featureIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
-			BTrack t = tracks.get(trackIdx);
-			if( !t.selected)
+			BTrack bt = tracks.get(trackIdx);
+			if( !bt.selected)
 				continue;
 			SceneStructureMetric.Point sp = structure.points.get(featureIdx);
-			sp.get(t.worldLoc);
+			sp.get(bt.worldLoc);
 			featureIdx++;
 		}
 	}
@@ -221,14 +223,14 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		boolean pruneObservations = false;
 
 		// Remove all references to this frame from its tracks
-		for (int i = 0; i < frame.tracks.size; i++ ) {
-			BTrack t = frame.tracks.get(i);
+		for (int trackIdx = 0; trackIdx < frame.tracks.size; trackIdx++ ) {
+			BTrack bt = frame.tracks.get(trackIdx);
 
-			if( !t.removeRef(frame) )
-				throw new RuntimeException("Bug: Track not in frame. frame.id "+frame.id+" track.id "+t.id);
+			if( !bt.removeRef(frame) )
+				throw new RuntimeException("Bug: Track not in frame. frame.id "+frame.id+" track.id "+bt.id);
 
 			// If the track no longer has observations remove it from the master track list
-			if( t.observations.size() == 0 ) {
+			if( bt.observations.size() == 0 ) {
 				pruneObservations = true;
 			}
 		}
@@ -268,17 +270,17 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public void sanityCheck() {
 		var trackSet = new TLongHashSet();
 
-		for (int i = 0; i < frames.size; i++) {
-			BFrame frame = frames.get(i);
+		for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
+			BFrame bf = frames.get(frameIdx);
 
-			for (int trackIdx = 0; trackIdx < frame.tracks.size; trackIdx++) {
-				BTrack t = frame.tracks.get(trackIdx);
-				trackSet.add(t.id);
-				if( !t.isObservedBy(frame) ) {
-					throw new RuntimeException("Frame's track list is out of date. frame.id="+frame.id+" track.id="+t.id+" obs.size "+t.observations.size);
+			for (int trackIdx = 0; trackIdx < bf.tracks.size; trackIdx++) {
+				BTrack bt = bf.tracks.get(trackIdx);
+				trackSet.add(bt.id);
+				if( !bt.isObservedBy(bf) ) {
+					throw new RuntimeException("Frame's track list is out of date. frame.id="+bf.id+" track.id="+bt.id+" obs.size "+bt.observations.size);
 				} else {
-					if( tracks.isUnused((T)t) ) {
-						throw new RuntimeException("BUG! Track is in unused list. frame.id="+frame.id+" track.id="+t.id);
+					if( tracks.isUnused((T)bt) ) {
+						throw new RuntimeException("BUG! Track is in unused list. frame.id="+bf.id+" track.id="+bt.id);
 					}
 				}
 			}

@@ -19,6 +19,7 @@
 package boofcv.factory.sfm;
 
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
+import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
@@ -26,7 +27,7 @@ import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
- * Configuration for {@link boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP}. Stereo visual odometry where features
+ * Configuration for {@link WrapVisOdomMonoStereoDepthPnP}. Stereo visual odometry where features
  * are tracked only in the left camera. The right camera is only used for the initial depth estimate of a new
  * feature and ignored otherwise.
  *

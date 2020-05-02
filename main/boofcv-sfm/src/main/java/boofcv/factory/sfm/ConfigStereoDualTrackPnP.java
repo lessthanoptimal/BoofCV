@@ -29,14 +29,17 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  *
  * @author Peter Abeles
  */
-public class ConfigStereoDualTrackPnP extends ConfigVisOdomTrackPnP{
-
+public class ConfigStereoDualTrackPnP extends ConfigVisOdomTrackPnP
+{
 	/** Used to track features in each camera independently */
 	public ConfigPointTracker tracker = new ConfigPointTracker();
 
 	/** Feature descriptor for stereo association */
 	public ConfigDescribeRegionPoint stereoDescribe = new ConfigDescribeRegionPoint();
 	// TODO add in fancier sanity checks for stereo association
+
+	/** Radius used when computing feature descriptors for stereo matching */
+	public double stereoRadius = 11.0;
 
 	/** Tolerance for matching stereo features along epipolar line in Pixels */
 	public double epipolarTol = 1.5;

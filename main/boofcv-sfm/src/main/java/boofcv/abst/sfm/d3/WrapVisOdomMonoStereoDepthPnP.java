@@ -22,7 +22,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.StereoSparse3D;
-import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
+import boofcv.alg.sfm.d3.VisOdomMonoDepthPnP;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageGray;
@@ -43,11 +43,11 @@ import java.util.Set;
  */
 // TODO WARNING! active list has been modified by dropping and adding tracks
 // this is probably true of other SFM algorithms
-public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
+public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D {
 
 	// low level algorithm
-	VisOdomPixelDepthPnP<T> alg;
+	VisOdomMonoDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
 	DistanceFromModelMultiView<Se3_F64,Point2D3D> distance;
 	Class<T> imageType;
@@ -55,10 +55,10 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 
 	List<PointTrack> active = new ArrayList<>();
 
-	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
-									StereoSparse3D<T> stereo,
-									DistanceFromModelMultiView<Se3_F64,Point2D3D> distance,
-									Class<T> imageType) {
+	public WrapVisOdomMonoStereoDepthPnP(VisOdomMonoDepthPnP<T> alg,
+										 StereoSparse3D<T> stereo,
+										 DistanceFromModelMultiView<Se3_F64,Point2D3D> distance,
+										 Class<T> imageType) {
 		this.alg = alg;
 		this.stereo = stereo;
 		this.distance = distance;
@@ -101,7 +101,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 
 	@Override
 	public boolean isTrackNew(int index) {
-		VisOdomPixelDepthPnP.Track track = alg.getVisibleTracks().get(index);
+		VisOdomMonoDepthPnP.Track track = alg.getVisibleTracks().get(index);
 		return track.visualTrack.spawnFrameID == alg.getFrameID();
 	}
 
@@ -148,7 +148,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 		return alg.getFrameID();
 	}
 
-	public VisOdomPixelDepthPnP<T> getAlgorithm() {
+	public VisOdomMonoDepthPnP<T> getAlgorithm() {
 		return alg;
 	}
 

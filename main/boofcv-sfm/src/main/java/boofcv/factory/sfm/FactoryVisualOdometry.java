@@ -180,7 +180,7 @@ public class FactoryVisualOdometry {
 	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and
 	 * estimates the range of tracks once when first detected using disparity between left and right cameras.
 	 *
-	 * @see VisOdomPixelDepthPnP
+	 * @see VisOdomMonoDepthPnP
 	 *
 	 * @param configVO Configuration for visual odometry
 	 * @param sparseDisparity Estimates the 3D location of features
@@ -229,19 +229,19 @@ public class FactoryVisualOdometry {
 			default: throw new IllegalArgumentException("Unknown type "+configVO.keyframes.type);
 		}
 
-		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		VisOdomMonoDepthPnP<T> alg = new VisOdomMonoDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 		alg.setFrameManager(keyframe);
 		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
 		alg.getScene().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
 		alg.getScene().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
-		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
+		return new WrapVisOdomMonoStereoDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 
 	/**
 	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and
 	 * estimates the range of tracks once when first detected using disparity between left and right cameras.
 	 *
-	 * @see VisOdomPixelDepthPnP
+	 * @see VisOdomMonoDepthPnP
 	 *
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
 	 *                     a value &le; 0 to add features every frame.
@@ -286,18 +286,18 @@ public class FactoryVisualOdometry {
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
 		bundleAdjustment.configure(1e-3,1e-3,3);
 
-		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		VisOdomMonoDepthPnP<T> alg = new VisOdomMonoDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 
 		alg.setThresholdRetireTracks(thresholdRetire);
 
-		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
+		return new WrapVisOdomMonoStereoDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 
 	/**
 	 * Depth sensor based visual odometry algorithm which runs a sparse feature tracker in the visual camera and
 	 * estimates the range of tracks once when first detected using the depth sensor.
 	 *
-	 * @see VisOdomPixelDepthPnP
+	 * @see VisOdomMonoDepthPnP
 	 *
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
 	 *                     a value &le; 0 to add features every frame.
@@ -342,7 +342,7 @@ public class FactoryVisualOdometry {
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
 		bundleAdjustment.configure(1e-3,1e-3,3);
 
-		VisOdomPixelDepthPnP<Vis> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		VisOdomMonoDepthPnP<Vis> alg = new VisOdomMonoDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 		alg.setThresholdRetireTracks(thresholdRetire);
 
 		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<>
@@ -482,6 +482,7 @@ public class FactoryVisualOdometry {
 				configVO.epipolarTol,trackerLeft, trackerRight, descriptor, associateUnique, triangulate2,
 				motion, refinePnP, bundleAdjustment );
 
+		alg.setDescribeRadius(configVO.stereoRadius);
 		alg.setFrameManager(keyframe);
 		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
 		alg.getScene().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;

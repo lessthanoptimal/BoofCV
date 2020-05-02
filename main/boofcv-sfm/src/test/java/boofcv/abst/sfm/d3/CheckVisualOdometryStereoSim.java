@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
+abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 	extends VideoSequenceSimulator<I>
 {
 	StereoParameters param = createStereoParam();
@@ -70,7 +70,7 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 	public abstract StereoVisualOdometry<I> createAlgorithm();
 
 	@Test
-	public void changeInputSize() {
+	void changeInputSize() {
 		StereoVisualOdometry<I> algorithm = createAlgorithm();
 
 		I leftSmall = GeneralizedImageOps.createSingleBand(inputType,width/2,height/2);
@@ -89,19 +89,21 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 		paramSmall.left.width = paramSmall.right.width = leftSmall.width;
 		paramSmall.left.height = paramSmall.right.height = leftSmall.height;
 
+		algorithm.reset();
 		algorithm.setCalibration(paramSmall);
-		algorithm.process(leftSmall,rightSmall);
+		assertTrue(algorithm.process(leftSmall,rightSmall));
 
 		StereoParameters paramLarge = createStereoParam();
 		paramLarge.left.width = paramLarge.right.width = leftLarge.width;
 		paramLarge.left.height = paramLarge.right.height = leftLarge.height;
 
+		algorithm.reset();
 		algorithm.setCalibration(paramLarge);
-		algorithm.process(leftLarge,rightSmall);
+		assertTrue(algorithm.process(leftLarge,rightSmall));
 	}
 
 	@Test
-	public void moveForward() {
+	void moveForward() {
 		StereoVisualOdometry<I> algorithm = createAlgorithm();
 
 		algorithm.reset();
@@ -128,8 +130,8 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
 
-			worldToLeft.getT().print();
-			foundWorldToLeft.getT().print();
+//			worldToLeft.getT().print();
+//			foundWorldToLeft.getT().print();
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
 			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );

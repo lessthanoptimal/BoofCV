@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Peter Abeles
  */
-class TestVisOdomPixelDepthPnP  {
+class TestVisOdomMonoDepthPnP {
 
 	@Test
 	public void stuff() {

@@ -65,8 +65,8 @@ public class SelectTracksInFrameForBundleAdjustment {
 		selected.clear();
 
 		// Mark all tracks as not selected
-		for (int i = 0; i < sba.tracks.size; i++) {
-			sba.tracks.get(i).selected = false;
+		for (int trackIdx = 0; trackIdx < sba.tracks.size; trackIdx++) {
+			sba.tracks.get(trackIdx).selected = false;
 		}
 
 		// skip degenerate situation
@@ -111,7 +111,6 @@ public class SelectTracksInFrameForBundleAdjustment {
 		selectNewTracks(selected);
 	}
 
-
 	/**
 	 * Initializes the grid data structure. Counts number of already selected tracks and adds unselected
 	 * tracks to the list. A track is only considered for selection if it has the minimum number of observations.
@@ -123,15 +122,15 @@ public class SelectTracksInFrameForBundleAdjustment {
 		grid.initialize(targetLength,imageWidth, imageHeight);
 		final FastArray<BTrack> tracks = frame.tracks;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
-			BTrack t = tracks.get(trackIdx);
-			VisOdomBundleAdjustment.BObservation o = t.findObservationBy(frame);
+			BTrack bt = tracks.get(trackIdx);
+			VisOdomBundleAdjustment.BObservation o = bt.findObservationBy(frame);
 			if( o == null )
 				throw new RuntimeException("BUG! track in frame not observed by frame");
 			Info cell = grid.getCellAtPixel((int)o.pixel.x, (int)o.pixel.y);
-			if( t.selected )
+			if( bt.selected )
 				cell.alreadySelected++;
-			else if( t.observations.size >= minTrackObservations )
-				cell.unselected.add(t);
+			else if( bt.observations.size >= minTrackObservations )
+				cell.unselected.add(bt);
 		}
 	}
 
@@ -146,8 +145,8 @@ public class SelectTracksInFrameForBundleAdjustment {
 		// this will result in a more even distribution.
 		while( true ) {
 			int before = total;
-			for (int i = 0; i < grid.cells.size && total < maxFeaturesPerFrame; i++) {
-				Info cell = grid.cells.data[i];
+			for (int cellIdx = 0; cellIdx < grid.cells.size && total < maxFeaturesPerFrame; cellIdx++) {
+				Info cell = grid.cells.data[cellIdx];
 
 				// See if there are remaining points that have already been selected. If so count that as a selection
 				// and move on
