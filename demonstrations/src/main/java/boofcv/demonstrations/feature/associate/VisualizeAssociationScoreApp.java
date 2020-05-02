@@ -26,6 +26,8 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.sfm.d3.ControlPanelDetDescAssoc;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.BoofSwingUtil;
@@ -258,8 +260,8 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 			// custom configurations for this demo
-			configFastHessian.maxFeaturesPerScale = 200;
-			configSiftDetector.maxFeaturesPerScale = 400;
+			configDetDesc.detectFastHessian.maxFeaturesPerScale = 200;
+			configDetDesc.detectSift.maxFeaturesPerScale = 400;
 
 			// create the algorithm controls
 			initializeControlsGUI();
@@ -340,10 +342,12 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if( comboDetect == e.getSource() ) {
-				selectedDetector = comboDetect.getSelectedIndex();
+				configDetDesc.typeDetector =
+						ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
 				handleDetectorChanged();
 			} else if( comboDescribe == e.getSource() ){
-				selectedDescriptor = comboDescribe.getSelectedIndex();
+				configDetDesc.typeDescribe =
+						ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
 				handleDescriptorChanged();
 			} else if( scoreTypes == e.getSource() ) {
 				ScoreItem item = (ScoreItem)scoreTypes.getSelectedItem();

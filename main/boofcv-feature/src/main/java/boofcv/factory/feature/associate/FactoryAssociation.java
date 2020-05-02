@@ -19,6 +19,7 @@
 package boofcv.factory.feature.associate;
 
 import boofcv.abst.feature.associate.*;
+import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.alg.feature.associate.*;
 import boofcv.concurrency.BoofConcurrency;
@@ -36,6 +37,22 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("unchecked")
 public class FactoryAssociation {
+
+	public static <D> AssociateDescription<D> generic( ConfigAssociate config, DescriptorInfo info )
+	{
+		int DOF = info.createDescription().size();
+
+		switch( config.type ) {
+			case GREEDY: {
+				ScoreAssociation scorer = FactoryAssociation.defaultScore(info.getDescriptionType());
+				return FactoryAssociation.greedy(config.greedy,scorer);
+			}
+			case KD_TREE: return (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor,DOF);
+			case RANDOM_FOREST: FactoryAssociation.kdRandomForest(
+					config.nearestNeighbor,DOF, 10, 5, 1233445565);
+			default: throw new IllegalArgumentException("Unknown association");
+		}
+	}
 
 	/**
 	 * Returns an algorithm for associating features together which uses a brute force greedy algorithm.

@@ -21,8 +21,7 @@ package boofcv.factory.tracker;
 import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.factory.feature.associate.ConfigAssociateGreedy;
-import boofcv.factory.feature.associate.ConfigAssociateNearestNeighbor;
+import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.struct.Configuration;
 
@@ -35,36 +34,33 @@ public class ConfigPointTracker implements Configuration {
 
 	/** Specifies the tracking strategy used */
 	public TrackerType typeTracker = TrackerType.KLT;
-	/** The association algorithm used. Not always used. */
-	public AssociationType typeAssociate = AssociationType.GREEDY;
 
 	/** Configuration for KLT. Detector is specified using detectorPoint. */
 	public ConfigPKlt klt = new ConfigPKlt();
+
 	/** Special configuration for DDA tracker */
 	public ConfigTrackerDda dda = new ConfigTrackerDda();
+
 	/** Special configuration for hybrid tracker */
 	public ConfigTrackerHybrid hybrid = new ConfigTrackerHybrid();
 
 	/** Configuration for detectors and descriptors */
 	public ConfigDetectDescribe detDesc = new ConfigDetectDescribe();
 
-	public ConfigAssociateGreedy associateGreedy = new ConfigAssociateGreedy();
-	public ConfigAssociateNearestNeighbor associateNN = new ConfigAssociateNearestNeighbor();
-	
+	/** Association for detect and describe approach */
+	public ConfigAssociate associate = new ConfigAssociate();
+
 
 	@Override
 	public void checkValidity() {
 		klt.checkValidity();
-		associateGreedy.checkValidity();
-		associateNN.checkValidity();
+		dda.checkValidity();
+		hybrid.checkValidity();
+		detDesc.checkValidity();
+		associate.checkValidity();
 	}
 
 	public enum TrackerType {
 		KLT,DDA,HYBRID
 	}
-
-	public enum AssociationType {
-		GREEDY, KD_TREE, RANDOM_FOREST,
-	}
-
 }

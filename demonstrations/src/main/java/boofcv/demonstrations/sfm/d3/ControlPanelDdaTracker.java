@@ -23,6 +23,10 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.factory.feature.associate.ConfigAssociate;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -43,14 +47,26 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 	public ControlPanelDdaTracker(Listener listener) {
 		this.listener = listener;
 
-		configFastHessian.maxFeaturesPerScale = 400;
-		configAssocGreedy.scoreRatioThreshold = 0.75;
-		configPointDetector.general.threshold = 100;
-		configPointDetector.general.radius = 4;
-		configPointDetector.shiTomasi.radius = 4;
+		configDetDesc.detectFastHessian.maxFeaturesPerScale = 400;
+		configDetDesc.detectPoint.general.threshold = 100;
+		configDetDesc.detectPoint.general.radius = 4;
+		configDetDesc.detectPoint.shiTomasi.radius = 4;
+		configAssociate.greedy.scoreRatioThreshold = 0.75;
+	}
 
-		initializeControlsGUI();
+	public ControlPanelDdaTracker(Listener listener,
+								  ConfigTrackerDda configTracker,
+								  ConfigDetectDescribe detDesc ,
+								  ConfigAssociate associate ) {
+		this.listener = listener;
 
+		configDetDesc = detDesc;
+		configAssociate = associate;
+	}
+
+	@Override
+	public void initializeControlsGUI() {
+		super.initializeControlsGUI();
 		addLabeled(comboDetect,"Detect","Point feature detectors");
 		addLabeled(comboDescribe,"Describe","Point feature Descriptors");
 		addLabeled(comboAssociate,"Associate","Feature association Approach");
@@ -92,13 +108,15 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 	public void controlChanged(final Object source) {
 		int which = -1;
 		if (source == comboDetect) {
-			selectedDetector = comboDetect.getSelectedIndex();
+			configDetDesc.typeDetector =
+					ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
 			which = 0;
 		} else if (source == comboDescribe) {
-			selectedDescriptor = comboDescribe.getSelectedIndex();
+			configDetDesc.typeDescribe =
+					ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
 			which = 1;
 		} else if (source == comboAssociate) {
-			selectedAssociate = comboAssociate.getSelectedIndex();
+			configAssociate.type = ConfigAssociate.AssociationType.values()[comboAssociate.getSelectedIndex()];
 			which = 2;
 		}
 		updateActiveControls(which);

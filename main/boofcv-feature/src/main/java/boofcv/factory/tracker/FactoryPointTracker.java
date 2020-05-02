@@ -97,7 +97,7 @@ public class FactoryPointTracker {
 		}
 
 		DetectDescribePoint detDesc = FactoryDetectDescribe.generic(config.detDesc, imageType);
-		AssociateDescription associate = createAssociate(config,detDesc);
+		AssociateDescription associate = FactoryAssociation.generic(config.associate,detDesc);
 
 		switch( config.typeTracker ) {
 			case DDA: return FactoryPointTracker.dda(detDesc, new AssociateDescTo2D(associate), config.dda);
@@ -105,21 +105,6 @@ public class FactoryPointTracker {
 					detDesc,associate,config.klt,config.hybrid.reactivateThreshold,imageType);
 		}
 		throw new RuntimeException("BUG! KLT all trackers should have been handled already");
-	}
-
-	private static AssociateDescription createAssociate( ConfigPointTracker config ,
-														 DetectDescribePoint detDesc )
-	{
-		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		int DOF = detDesc.createDescription().size();
-
-		switch( config.typeAssociate ) {
-			case GREEDY: return FactoryAssociation.greedy(config.associateGreedy,scorer);
-			case KD_TREE: return FactoryAssociation.kdtree(config.associateNN,DOF);
-			case RANDOM_FOREST: FactoryAssociation.kdRandomForest(
-					config.associateNN,DOF, 10, 5, 1233445565);
-			default: throw new IllegalArgumentException("Unknown association");
-		}
 	}
 
 	/**

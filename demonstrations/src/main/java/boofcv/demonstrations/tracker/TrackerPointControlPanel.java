@@ -22,10 +22,8 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.demonstrations.sfm.d3.ControlPanelDdaTracker;
-import boofcv.demonstrations.sfm.d3.ControlPanelHybridTracker;
-import boofcv.demonstrations.sfm.d3.ControlPanelPointTrackerKlt;
 import boofcv.demonstrations.sfm.d3.ControlPanelPointTrackers;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
@@ -81,40 +79,7 @@ public class TrackerPointControlPanel
 	public TrackerPointControlPanel( Listener listener ) {
 		this.listener = listener;
 
-		int maxFeatures = 800;
-		int detRadius = 5;
-
-		var controlKlt = new ControlPanelPointTrackerKlt(listener::handleAlgorithmUpdated) {
-			@Override
-			public void initializeConfiguration() {
-				configDetect.general.maxFeatures = maxFeatures;
-				configDetect.general.radius = detRadius;
-				configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-				configKlt.templateRadius = 3;
-				super.initializeConfiguration();
-			}
-		};
-		var controlDda = new ControlPanelDdaTracker(listener::handleAlgorithmUpdated) {
-			@Override
-			public void initializeControlsGUI() {
-				configPointDetector.general.maxFeatures = maxFeatures;
-				configPointDetector.general.radius = detRadius;
-				super.initializeControlsGUI();
-			}
-		};
-		var controlHybrid = new ControlPanelHybridTracker(listener::handleAlgorithmUpdated) {
-			@Override
-			public void initializeControlsGUI() {
-				configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-				configKlt.templateRadius = 3;
-
-				configPointDetector.general.radius = detRadius;
-				configPointDetector.general.maxFeatures = maxFeatures;
-				super.initializeControlsGUI();
-			}
-		};
-
-		controlTracker = new ControlPanelPointTrackers(listener::handleAlgorithmUpdated,controlKlt,controlDda,controlHybrid);
+		controlTracker = new ControlPanelPointTrackers(listener::handleAlgorithmUpdated,createConfig());
 
 		textArea.setEditable(false);
 		textArea.setWrapStyleWord(true);
@@ -148,6 +113,19 @@ public class TrackerPointControlPanel
 		add(textArea);
 		addVerticalGlue();
 		add(createHorizontalPanel(buttonStep,buttonPause));
+	}
+
+	private static ConfigPointTracker createConfig() {
+		int maxFeatures = 800;
+		int detRadius = 5;
+
+		ConfigPointTracker config = new ConfigPointTracker();
+		config.detDesc.detectPoint.general.maxFeatures = maxFeatures;
+		config.detDesc.detectPoint.general.radius = detRadius;
+		config.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		config.klt.templateRadius = 3;
+
+		return config;
 	}
 
 

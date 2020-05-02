@@ -442,7 +442,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 			TrackInfo bt = track.getCookie();
 			if( bt == null ) throw new RuntimeException("BUG!");
 			if( currentFrameID - bt.lastInlier >= thresholdRetireTracks) {
-				if( bt.inlier ) throw new RuntimeException("BUG! if inlier it just got used");
 				bt.visualTrack = null;
 				return true;
 			}
@@ -534,9 +533,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		}
 
 		// Let the frame manager know how many tracks were just spawned
-		// Only need to pass in the left tracker here since it will be used as the control to decide when
-		// key frames needs to be saved
 		frameManager.handleSpawnedTracks(trackerLeft, scene.cameras.get(CAMERA_LEFT));
+		frameManager.handleSpawnedTracks(trackerRight, scene.cameras.get(CAMERA_RIGHT));
 	}
 
 	/**

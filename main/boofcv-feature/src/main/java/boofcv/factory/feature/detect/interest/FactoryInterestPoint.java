@@ -31,6 +31,8 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
+import javax.annotation.Nullable;
+
 /**
  * <p>Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
  * interface </p>
@@ -46,9 +48,18 @@ import boofcv.struct.pyramid.PyramidFloat;
 public class FactoryInterestPoint {
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> generic( ConfigDetectInterestPoint config , Class<T> inputType, Class<D> derivType )
+	InterestPointDetector<T> generic( ConfigDetectInterestPoint config , Class<T> inputType, @Nullable Class<D> derivType )
 	{
-		throw new RuntimeException("Implement");
+		switch(config.type) {
+			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian);
+			case SIFT: return FactoryInterestPoint.sift(config.scaleSpaceSift,config.sift,inputType);
+			case POINT: {
+				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point,inputType,derivType);
+				return FactoryInterestPoint.wrapPoint(alg, config.point.scaleRadius,inputType, derivType);
+			}
+			default:
+				throw new IllegalArgumentException("Unknown detector");
+		}
 	}
 
 	/**

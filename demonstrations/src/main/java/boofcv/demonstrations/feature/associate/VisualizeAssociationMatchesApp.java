@@ -28,6 +28,9 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.sfm.d3.ControlPanelDetDescAssoc;
+import boofcv.factory.feature.associate.ConfigAssociate;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.BoofSwingUtil;
@@ -284,9 +287,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		public AssociateControls() {
 
 			// Customize the configurations
-			configFastHessian.extract.radius = 2;
-			configFastHessian.maxFeaturesPerScale = 200;
-			configSiftDetector.maxFeaturesPerScale = 400;
+			configDetDesc.detectFastHessian.extract.radius = 2;
+			configDetDesc.detectFastHessian.maxFeaturesPerScale = 200;
+			configDetDesc.detectSift.maxFeaturesPerScale = 400;
 
 			// Declare all the controls
 			initializeControlsGUI();
@@ -346,15 +349,18 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if( comboDetect == e.getSource() ) {
-				selectedDetector = comboDetect.getSelectedIndex();
+				configDetDesc.typeDetector =
+						ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
 				handleDetectorChanged();
 			} else if( comboDescribe == e.getSource() ){
-				selectedDescriptor = comboDescribe.getSelectedIndex();
+				configDetDesc.typeDescribe =
+						ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
 				handleDescriptorChanged();
 			} else if( comboAssociate == e.getSource() ){
-				selectedAssociate = comboAssociate.getSelectedIndex();
+				configAssociate.type = ConfigAssociate.AssociationType.values()[comboAssociate.getSelectedIndex()];
 				handleAssociatorChanged();
 			}
+
 			algorithmChange = true;
 			reprocessInput();
 		}

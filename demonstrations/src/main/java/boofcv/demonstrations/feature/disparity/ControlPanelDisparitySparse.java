@@ -60,10 +60,10 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	/**
 	 * Configures the control panel
 	 *
-	 * @param config Default configuration
 	 * @param listener Listener for when changes are made.
+	 * @param config Default configuration
 	 */
-	public ControlPanelDisparitySparse(ConfigDisparityBM config, Listener listener)
+	public ControlPanelDisparitySparse(Listener listener, ConfigDisparityBM config)
 	{
 		setBorder(BorderFactory.createEmptyBorder());
 		this.config = config;
@@ -254,7 +254,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	}
 
 	public static void main(String[] args) {
-		var controls = new ControlPanelDisparitySparse(new ConfigDisparityBM(),()->{});
+		var controls = new ControlPanelDisparitySparse(()->{}, new ConfigDisparityBM());
 		ShowImages.showWindow(controls,"Controls");
 	}
 }

@@ -18,24 +18,18 @@
 
 package boofcv.demonstrations.sfm.d3;
 
-import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP;
-import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
 import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
-import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -70,9 +64,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static boofcv.gui.BoofSwingUtil.*;
 import static boofcv.io.image.ConvertBufferedImage.checkCopy;
@@ -180,37 +172,28 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	public StereoVisualOdometry<T> createSelectedAlgorithm() {
 		Class<T> imageType = getImageType(0).getImageClass();
 
-		PointTracker<T> tracker = controls.controlTrackers.createTracker(getImageType(0));
-		StereoDisparitySparse<T> disparity = controls.controlDisparity.createAlgorithm(imageType);
-		ConfigVisOdomDepthPnP configPnpDepth = controls.controlPnpDepth.config;
-		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoDepthPnP(configPnpDepth,disparity,tracker,imageType);
-
-		Set<String> configuration = new HashSet<>();
-		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
-//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
-		alg.setVerbose(System.out,configuration);
-
-		return alg;
+		if( controls.approach == 0 )
+			return controls.controlMonoTrack.createVisOdom(imageType);
+		else
+			return controls.controlDualTrack.createVisOdom(imageType);
 	}
 
-	private static ConfigPKlt createConfigKlt() {
-		var config = new ConfigPKlt();
-		config.toleranceFB = 3;
-		config.pruneClose = true;
-		config.config.maxIterations = 25;
-		config.templateRadius = 4;
-		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
-		return config;
-	}
+	private static ConfigPointTracker createConfigPointTracker() {
+		ConfigPointTracker config = new ConfigPointTracker();
+		config.klt.toleranceFB = 3;
+		config.klt.pruneClose = true;
+		config.klt.config.maxIterations = 25;
+		config.klt.templateRadius = 4;
+		config.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
-	private static ConfigPointDetector createConfigKltDetect() {
-		var config = new ConfigPointDetector();
-		config.type = PointDetectorTypes.SHI_TOMASI;
-		config.shiTomasi.radius = 3;
-		config.general.threshold = 1.0f;
-		config.general.radius = 5;
-		config.general.maxFeatures = 300;
-		config.general.selector.type = SelectLimitTypes.BEST_N;
+		config.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.detDesc.detectPoint.shiTomasi.radius = 3;
+		config.detDesc.detectPoint.general.threshold = 1.0f;
+		config.detDesc.detectPoint.general.radius = 5;
+		config.detDesc.detectPoint.general.maxFeatures = 300;
+		config.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+
 		return config;
 	}
 
@@ -414,6 +397,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		boolean showInliers = false;
 		boolean showNew = false;
 
+		int approach = 0; // which visual odometry approach has been selected
+
 		double maxDepth=0; // Maximum depth a feature is from the camera when last viewed
 		boolean showCameras=true; // show camera locations in 3D view
 		boolean showCloud=true; // Show point cloud created from feature tracks
@@ -433,7 +418,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		protected JLabel labelTraveled = new JLabel();
 
 		// Panel which contains all controls
-		protected JPanel panelAlgControls = new JPanel(new BorderLayout());
+//		protected JPanel panelAlgControls = new JPanel(new BorderLayout());
+		final JComboBox<String> comboApproach = combo(0,"Mono Stereo","Dual Track","Quad View");
+		final JPanel panelApproach = new JPanel(new BorderLayout());
 
 		// Stereo Visualization Controls
 		final JCheckBox checkInliers = checkbox("Inliers",showInliers,"Only draw inliers");
@@ -448,12 +435,13 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		final ControlPanelPointCloud cloudColor = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
 
 		// controls for different algorithms
-		ControlPanelVisOdomDepthPnP controlPnpDepth = new ControlPanelVisOdomDepthPnP(()->bUpdateAlg.setEnabled(true));
-		ControlPanelPointTrackers controlTrackers = new ControlPanelPointTrackers(()->bUpdateAlg.setEnabled(true),
-				new ControlPanelPointTrackerKlt( ()->bUpdateAlg.setEnabled(true),createConfigKltDetect(),createConfigKlt()),
-				new ControlPanelDdaTracker(()->bUpdateAlg.setEnabled(true)),
-				new ControlPanelHybridTracker(()->bUpdateAlg.setEnabled(true)));
-		ControlPanelDisparitySparse controlDisparity = new ControlPanelDisparitySparse(createConfigDisparity(),()->bUpdateAlg.setEnabled(true));
+		ControlPanelStereoDualTrackPnP controlDualTrack = new ControlPanelStereoDualTrackPnP();
+		ControlPanelStereoMonoTrackPnP controlMonoTrack = new ControlPanelStereoMonoTrackPnP(createConfigPointTracker(),createConfigDisparity(),
+				()->bUpdateAlg.setEnabled(true));
+//		ControlPanelVisOdomDepthPnP controlPnpDepth = new ControlPanelVisOdomDepthPnP(()->bUpdateAlg.setEnabled(true));
+//		ControlPanelPointTrackers controlTrackers = new ControlPanelPointTrackers(()->bUpdateAlg.setEnabled(true),
+//				createConfigPointTracker());
+//		ControlPanelDisparitySparse controlDisparity = new ControlPanelDisparitySparse(()->bUpdateAlg.setEnabled(true), createConfigDisparity());
 
 		public ControlPanel() {
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
@@ -486,18 +474,14 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			panelVisuals.add(fillHorizontally(panelStereo));
 			panelVisuals.add(fillHorizontally(panelCloud));
 
-			var tuningTabs = new JTabbedPane();
-			tuningTabs.addTab("VO",panelAlgControls);
-			tuningTabs.addTab("Tracker",controlTrackers);
-			tuningTabs.addTab("Stereo",controlDisparity);
-
 			var panelTuning = new JPanel();
 			panelTuning.setLayout(new BoxLayout(panelTuning,BoxLayout.Y_AXIS));
-			panelTuning.add(tuningTabs);
+			panelTuning.add(comboApproach);
+			panelTuning.add(panelApproach);
 			addVerticalGlue(panelTuning);
 			addAlignCenter(bUpdateAlg,panelTuning);
 
-			panelAlgControls.add(BorderLayout.CENTER, controlPnpDepth);
+			panelApproach.add(BorderLayout.CENTER, controlMonoTrack);
 
 			var tabbedTopPane = new JTabbedPane();
 			tabbedTopPane.addTab("Visuals",panelVisuals);
@@ -554,6 +538,17 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			} else if( source == spinMaxTrackAge ) {
 				maxTrackAge = ((Number)spinMaxTrackAge.getValue()).intValue();
 				cloudPanel.update();
+			} else if( source == comboApproach ) {
+				approach = comboApproach.getSelectedIndex();
+				JPanel control = null;
+				switch( approach ) {
+					case 0: control = controlMonoTrack; break;
+					default: control = controlDualTrack; break;
+				}
+				panelApproach.removeAll();
+				panelApproach.add(BorderLayout.CENTER, control);
+				panelApproach.validate();
+				bUpdateAlg.setEnabled(true);
 			}
 		}
 	}

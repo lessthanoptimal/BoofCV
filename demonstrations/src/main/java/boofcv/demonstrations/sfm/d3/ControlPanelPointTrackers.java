@@ -19,11 +19,11 @@
 package boofcv.demonstrations.sfm.d3;
 
 import boofcv.abst.tracker.PointTracker;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
@@ -33,10 +33,9 @@ import java.awt.*;
  * @author Peter Abeles
  */
 public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
-	public static final String[] FAMILIES = {"KLT","DDA","Hybrid"};
-	int selectedFamily = 0;
+	ConfigPointTracker.TrackerType selectedFamily = ConfigPointTracker.TrackerType.KLT;
 
-	JComboBox<String> cFamily = combo(selectedFamily, FAMILIES);
+	JComboBox<String> cFamily = combo(selectedFamily.ordinal(), ConfigPointTracker.TrackerType.values());
 	JPanel mainPanel = new JPanel(new BorderLayout());
 
 	ControlPanelPointTrackerKlt controlKlt;
@@ -49,47 +48,49 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	Listener listener;
 
 	public ControlPanelPointTrackers( Listener listener ,
-									  @Nullable ControlPanelPointTrackerKlt klt,
-									  @Nullable ControlPanelDdaTracker dda,
-									  @Nullable ControlPanelHybridTracker hybrid ) {
+									  ConfigPointTracker config )
+	{
 		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 
-		controlKlt = klt != null ? klt : new ControlPanelPointTrackerKlt(listener::changePointTracker);
-		controlDda = dda != null ? dda : new ControlPanelDdaTracker(listener::changePointTracker);
-		controlHybrid = hybrid != null ? hybrid : new ControlPanelHybridTracker(listener::changePointTracker);
+		controlKlt = config == null ? new ControlPanelPointTrackerKlt(listener::changePointTracker)
+				: new ControlPanelPointTrackerKlt(listener::changePointTracker,config.detDesc.detectPoint,config.klt);
+		controlDda = config == null ? new ControlPanelDdaTracker(listener::changePointTracker)
+				: new ControlPanelDdaTracker(listener::changePointTracker,config.dda,config.detDesc,config.associate);
+		controlHybrid = config == null ?  new ControlPanelHybridTracker(listener::changePointTracker)
+				: new ControlPanelHybridTracker(listener::changePointTracker);
 
-		int selected = selectedFamily;
-		selectedFamily = -1; // so that it will update
+		controlDda.initializeControlsGUI();
+		controlHybrid.initializeControlsGUI();
+
+		ConfigPointTracker.TrackerType selected = selectedFamily;
+		selectedFamily = null; // so that it will update
 		changeFamily(selected);
 
 		addLabeled(cFamily,"Family","Which high level point tracker type");
 		add(mainPanel);
 	}
 
-	public ControlPanelPointTrackers( Listener listener ) {
-		this(listener,null,null,null);
-	}
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker( ImageType<T> imageType ) {
 		switch( selectedFamily ) {
-			case 0: return controlKlt.createTracker(imageType);
-			case 1: return controlDda.createTracker(imageType);
-			case 2: return controlHybrid.createTracker(imageType);
+			case KLT: return controlKlt.createTracker(imageType);
+			case DDA: return controlDda.createTracker(imageType);
+			case HYBRID: return controlHybrid.createTracker(imageType);
 			default: throw new RuntimeException("Not yet supported");
 		}
 	}
 
-	private void changeFamily( int which ) {
+	private void changeFamily( ConfigPointTracker.TrackerType which ) {
 		if( which == selectedFamily )
 			return;
 		if( previous != null )
 			mainPanel.remove(previous);
 		switch( which ) {
-			case 0: previous = controlKlt; break;
-			case 1: previous = controlDda; break;
-			case 2: previous = controlHybrid; break;
+			case KLT: previous = controlKlt; break;
+			case DDA: previous = controlDda; break;
+			case HYBRID: previous = controlHybrid; break;
 			default: throw new RuntimeException("BUG");
 		}
 		selectedFamily = which;
@@ -100,7 +101,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	@Override
 	public void controlChanged(final Object source) {
 		if( source == cFamily ) {
-			changeFamily(cFamily.getSelectedIndex());
+			changeFamily(ConfigPointTracker.TrackerType.values()[cFamily.getSelectedIndex()]);
 		}
 		listener.changePointTracker();
 	}

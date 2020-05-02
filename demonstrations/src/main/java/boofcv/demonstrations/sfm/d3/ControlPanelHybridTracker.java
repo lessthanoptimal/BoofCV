@@ -20,8 +20,13 @@ package boofcv.demonstrations.sfm.d3;
 
 import boofcv.abst.feature.describe.ConfigTemplateDescribe;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.feature.associate.ConfigAssociate;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -43,6 +48,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 
 	public ControlPanelPointTrackerKlt controlKlt;
 	protected ConfigPKlt configKlt = new ConfigPKlt();
+	protected ConfigTrackerHybrid configHybrid = new ConfigTrackerHybrid();
 
 	// Container that specific controls are inserted into
 	private JPanel controlPanel = new JPanel(new BorderLayout());
@@ -58,20 +64,29 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 		configKlt.pruneClose = true;
 		configKlt.templateRadius = 3;
 		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-		configAssocGreedy.scoreRatioThreshold = 0.75;
-		configPointDetector.general.threshold = 100;
-		configPointDetector.general.radius = 4;
-		configPointDetector.shiTomasi.radius = 4;
+		configAssociate.greedy.scoreRatioThreshold = 0.75;
+		configDetDesc.detectPoint.general.threshold = 100;
+		configDetDesc.detectPoint.general.radius = 4;
+		configDetDesc.detectPoint.shiTomasi.radius = 4;
+		configDetDesc.describeTemplate.type = ConfigTemplateDescribe.Type.NCC;
+		configHybrid.reactivateThreshold = 50;
 
-		selectedDetector = 2; // point
-		selectedDescriptor = 4; // template
-		configTemplate.type = ConfigTemplateDescribe.Type.NCC;
+		configDetDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		configDetDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.TEMPLATE;
+	}
 
-		initializeControlsGUI();
-		updateActiveControls(selectedSelection);
+	public ControlPanelHybridTracker(Listener listener,
+									 ConfigTrackerHybrid configHybrid,
+									 ConfigPKlt configKlt,
+									 ConfigDetectDescribe configDetDesc,
+									 ConfigAssociate configAssociate ) {
+		this.listener = listener;
+		ddaPanel.setLayout(new BoxLayout(ddaPanel, BoxLayout.Y_AXIS));
 
-		addLabeled(spinnerSelection,"Component","Select a component of the tracker to modify");
-		add(controlPanel);
+		this.configHybrid = configHybrid;
+		this.configKlt = configKlt;
+		this.configDetDesc = configDetDesc;
+		this.configAssociate = configAssociate;
 	}
 
 	@Override
@@ -79,6 +94,11 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 		super.initializeControlsGUI();
 		controlKlt = new ControlPanelPointTrackerKlt(()->listener.changedHybridTracker(),null,configKlt);
 		controlKlt.setBorder(BorderFactory.createEmptyBorder());
+
+		updateActiveControls(selectedSelection);
+
+		addLabeled(spinnerSelection,"Component","Select a component of the tracker to modify");
+		add(controlPanel);
 	}
 
 	private void updateActiveControls( int which ) {
@@ -111,7 +131,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 		DetectDescribePoint detDesc = createDetectDescribe(inputType);
 
 		PointTracker<T> tracker = FactoryPointTracker.combined(detDesc,createAssociate(detDesc),
-				configKlt,50,imageType.getImageClass());
+				configKlt,configHybrid.reactivateThreshold,imageType.getImageClass());
 		return tracker;
 	}
 
@@ -121,12 +141,14 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 	@Override
 	public void controlChanged(final Object source) {
 		System.out.println("Control changed");
-		if( source == comboDetect ) {
-			selectedDetector = comboDetect.getSelectedIndex();
-		} else if( source == comboDescribe ) {
-			selectedDescriptor = comboDescribe.getSelectedIndex();
-		} else if( source == comboAssociate ) {
-			selectedAssociate = comboAssociate.getSelectedIndex();
+		if (source == comboDetect) {
+			configDetDesc.typeDetector =
+					ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
+		} else if (source == comboDescribe) {
+			configDetDesc.typeDescribe =
+					ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
+		} else if (source == comboAssociate) {
+			configAssociate.type = ConfigAssociate.AssociationType.values()[comboAssociate.getSelectedIndex()];
 		}
 		updateActiveControls(spinnerSelection.getSelectedIndex());
 		listener.changedHybridTracker();
