@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,14 +33,14 @@ public class ConfigRansac implements Configuration {
 	/**
 	 * Maximum number of iterations RANSAC will perform
 	 */
-	public int maxIterations;
+	public int iterations;
 	/**
 	 * Inlier threshold.
 	 */
 	public double inlierThreshold;
 
-	public ConfigRansac(int maxIterations, double inlierThreshold) {
-		this.maxIterations = maxIterations;
+	public ConfigRansac(int iterations, double inlierThreshold) {
+		this.iterations = iterations;
 		this.inlierThreshold = inlierThreshold;
 	}
 

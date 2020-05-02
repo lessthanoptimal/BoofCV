@@ -128,7 +128,7 @@ public class ThreeViewEstimateMetricScene {
 	 * Sets configurations to their default value
 	 */
 	public ThreeViewEstimateMetricScene() {
-		configRansac.maxIterations = 500;
+		configRansac.iterations = 500;
 		configRansac.inlierThreshold = 1;
 
 		configError.model = ConfigTrifocalError.Model.REPROJECTION_REFINE;

@@ -59,7 +59,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		MockDetector detector = new MockDetector();
 		PairwiseImageMatching alg = create(detector);
-		alg.getConfigRansac().maxIterations = 100;
+		alg.getConfigRansac().iterations = 100;
 
 		PairwiseImageGraph graph = computeGraphScenario0(detector, alg);
 
@@ -103,7 +103,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		MockDetector detector = new MockDetector();
 		PairwiseImageMatching alg = create(detector);
-		alg.getConfigRansac().maxIterations = 100;
+		alg.getConfigRansac().iterations = 100;
 
 		PairwiseImageGraph graph = computeGraphScenario1(detector, alg);
 
@@ -148,7 +148,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	public void withIslands() {
 		MockDetector detector = new MockDetector();
 		PairwiseImageMatching alg = create(detector);
-		alg.getConfigRansac().maxIterations = 100;
+		alg.getConfigRansac().iterations = 100;
 		String cameraName = "camera";
 
 		Map<String, Point2Transform2_F64> camerasPixelToNorm = new HashMap<>();
@@ -224,7 +224,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	public void reset() {
 		MockDetector detector = new MockDetector();
 		PairwiseImageMatching alg = create(detector);
-		alg.getConfigRansac().maxIterations = 100;
+		alg.getConfigRansac().iterations = 100;
 
 		PairwiseImageGraph graph0 = computeGraphScenario0(detector, alg);
 		alg.reset();

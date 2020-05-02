@@ -53,6 +53,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 
+		// TODO pass in copies since each control panel is independent
 		controlKlt = config == null ? new ControlPanelPointTrackerKlt(listener::changePointTracker)
 				: new ControlPanelPointTrackerKlt(listener::changePointTracker,config.detDesc.detectPoint,config.klt);
 		controlDda = config == null ? new ControlPanelDdaTracker(listener::changePointTracker)

@@ -85,7 +85,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 
 	protected PairwiseImageMatching(){
 		configRansac.inlierThreshold = 2.5;
-		configRansac.maxIterations = 4000;
+		configRansac.iterations = 4000;
 	}
 
 	protected void declareModelFitting() {

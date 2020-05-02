@@ -24,7 +24,7 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
+import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
@@ -33,9 +33,9 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<GrayF32> {
+public class TestWrapVisOdomStereoMonoPnP extends CheckVisualOdometryStereoSim<GrayF32> {
 
-	public TestWrapVisOdomPixelDepthPnP() {
+	public TestWrapVisOdomStereoMonoPnP() {
 		super(GrayF32.class);
 	}
 
@@ -55,8 +55,8 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<G
 		configKLT.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		configKLT.templateRadius = 3;
 
-		var configPnP = new ConfigVisOdomDepthPnP();
-		configPnP.ransacIterations = 200;
+		var configPnP = new ConfigVisOdomTrackPnP();
+		configPnP.ransac.iterations = 200;
 
 		ConfigPointDetector configDetector = new ConfigPointDetector();
 		configDetector.general.maxFeatures = 600;
@@ -68,7 +68,7 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<G
 		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKLT, configDetector,
 				GrayF32.class, GrayF32.class);
 
-		return FactoryVisualOdometry.stereoDepthPnP(configPnP,disparity,tracker,GrayF32.class);
+		return FactoryVisualOdometry.stereoMonoPnP(configPnP,disparity,tracker,GrayF32.class);
 	}
 
 }

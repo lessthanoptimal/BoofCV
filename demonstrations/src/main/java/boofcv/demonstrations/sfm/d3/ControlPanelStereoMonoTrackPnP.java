@@ -23,10 +23,8 @@ import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
+import boofcv.factory.sfm.ConfigStereoMonoPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
@@ -42,15 +40,15 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 
 
 
-	ControlPanelVisOdomDepthPnP controlPnpDepth;
+	ControlPanelVisOdomTrackPnP controlPnpDepth;
 	ControlPanelPointTrackers controlTrackers;
 	ControlPanelDisparitySparse controlDisparity;
 
-	public ControlPanelStereoMonoTrackPnP(ConfigPointTracker configTracker , ConfigDisparityBM configDisparity, Listener listener ) {
+	public ControlPanelStereoMonoTrackPnP(ConfigStereoMonoPnP config, Listener listener ) {
 		setLayout(new BorderLayout());
-		controlPnpDepth = new ControlPanelVisOdomDepthPnP(listener::changedStereoMonoTrackPnP);
-		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoMonoTrackPnP,configTracker);
-		controlDisparity = new ControlPanelDisparitySparse(listener::changedStereoMonoTrackPnP, configDisparity);
+		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoMonoTrackPnP, config);
+		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoMonoTrackPnP,config.tracker);
+		controlDisparity = new ControlPanelDisparitySparse(listener::changedStereoMonoTrackPnP, config.disparity);
 
 		var panelAlgControls = new JPanel(new BorderLayout());
 		var tuningTabs = new JTabbedPane();
@@ -72,8 +70,7 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 
 		PointTracker<T> tracker = controlTrackers.createTracker(ImageType.single(imageType));
 		StereoDisparitySparse<T> disparity = controlDisparity.createAlgorithm(imageType);
-		ConfigVisOdomDepthPnP configPnpDepth = controlPnpDepth.config;
-		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoDepthPnP(configPnpDepth,disparity,tracker,imageType);
+		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoMonoPnP(controlPnpDepth.config,disparity,tracker,imageType);
 
 		Set<String> configuration = new HashSet<>();
 		configuration.add(VisualOdometry.VERBOSE_RUNTIME);

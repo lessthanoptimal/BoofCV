@@ -28,7 +28,7 @@ import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
+import boofcv.factory.sfm.ConfigStereoMonoPnP;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -178,35 +178,34 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			return controls.controlDualTrack.createVisOdom(imageType);
 	}
 
-	private static ConfigPointTracker createConfigPointTracker() {
-		ConfigPointTracker config = new ConfigPointTracker();
-		config.klt.toleranceFB = 3;
-		config.klt.pruneClose = true;
-		config.klt.config.maxIterations = 25;
-		config.klt.templateRadius = 4;
-		config.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+	private static ConfigStereoMonoPnP createConfigStereoMonoPnP() {
+		ConfigStereoMonoPnP config = new ConfigStereoMonoPnP();
 
-		config.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
-		config.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
-		config.detDesc.detectPoint.shiTomasi.radius = 3;
-		config.detDesc.detectPoint.general.threshold = 1.0f;
-		config.detDesc.detectPoint.general.radius = 5;
-		config.detDesc.detectPoint.general.maxFeatures = 300;
-		config.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 
-		return config;
-	}
+		config.tracker.klt.toleranceFB = 3;
+		config.tracker.klt.pruneClose = true;
+		config.tracker.klt.config.maxIterations = 25;
+		config.tracker.klt.templateRadius = 4;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
-	private static ConfigDisparityBM createConfigDisparity() {
-		var config = new ConfigDisparityBM();
-		config.disparityMin = 0;
-		config.disparityRange = 50;
-		config.regionRadiusX = 3;
-		config.regionRadiusY = 3;
-		config.maxPerPixelError = 30;
-		config.texture = 0.05;
-		config.subpixel = true;
-		config.validateRtoL = 1;
+		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
+		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
+		config.tracker.detDesc.detectPoint.general.radius = 5;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
+		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+
+		config.disparity.disparityMin = 0;
+		config.disparity.disparityRange = 50;
+		config.disparity.regionRadiusX = 3;
+		config.disparity.regionRadiusY = 3;
+		config.disparity.maxPerPixelError = 30;
+		config.disparity.texture = 0.05;
+		config.disparity.subpixel = true;
+		config.disparity.validateRtoL = 1;
+
 		return config;
 	}
 
@@ -418,7 +417,6 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		protected JLabel labelTraveled = new JLabel();
 
 		// Panel which contains all controls
-//		protected JPanel panelAlgControls = new JPanel(new BorderLayout());
 		final JComboBox<String> comboApproach = combo(0,"Mono Stereo","Dual Track","Quad View");
 		final JPanel panelApproach = new JPanel(new BorderLayout());
 
@@ -436,12 +434,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 		// controls for different algorithms
 		ControlPanelStereoDualTrackPnP controlDualTrack = new ControlPanelStereoDualTrackPnP();
-		ControlPanelStereoMonoTrackPnP controlMonoTrack = new ControlPanelStereoMonoTrackPnP(createConfigPointTracker(),createConfigDisparity(),
-				()->bUpdateAlg.setEnabled(true));
-//		ControlPanelVisOdomDepthPnP controlPnpDepth = new ControlPanelVisOdomDepthPnP(()->bUpdateAlg.setEnabled(true));
-//		ControlPanelPointTrackers controlTrackers = new ControlPanelPointTrackers(()->bUpdateAlg.setEnabled(true),
-//				createConfigPointTracker());
-//		ControlPanelDisparitySparse controlDisparity = new ControlPanelDisparitySparse(()->bUpdateAlg.setEnabled(true), createConfigDisparity());
+		ControlPanelStereoMonoTrackPnP controlMonoTrack = new ControlPanelStereoMonoTrackPnP(
+				createConfigStereoMonoPnP(), ()->bUpdateAlg.setEnabled(true));
 
 		public ControlPanel() {
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);

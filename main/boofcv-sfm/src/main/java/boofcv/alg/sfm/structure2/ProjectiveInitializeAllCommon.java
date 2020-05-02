@@ -116,7 +116,7 @@ public class ProjectiveInitializeAllCommon {
 	GrowQueue_I32 seedToStructure = new GrowQueue_I32();
 
 	public ProjectiveInitializeAllCommon() {
-		configRansac.maxIterations = 500;
+		configRansac.iterations = 500;
 		configRansac.inlierThreshold = 1;
 
 		triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC);

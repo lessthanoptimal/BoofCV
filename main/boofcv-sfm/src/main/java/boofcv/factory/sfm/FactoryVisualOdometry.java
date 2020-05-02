@@ -189,13 +189,13 @@ public class FactoryVisualOdometry {
 	 * @return StereoVisualOdometry
 	 */
 	public static <T extends ImageGray<T>>
-	StereoVisualOdometry<T> stereoDepthPnP( ConfigVisOdomDepthPnP configVO ,
-											StereoDisparitySparse<T> sparseDisparity ,
-											PointTracker<T> tracker ,
-											Class<T> imageType)
+	StereoVisualOdometry<T> stereoMonoPnP(ConfigVisOdomTrackPnP configVO ,
+										  StereoDisparitySparse<T> sparseDisparity ,
+										  PointTracker<T> tracker ,
+										  Class<T> imageType)
 	{
 		if( configVO == null )
-			configVO = new ConfigVisOdomDepthPnP();
+			configVO = new ConfigVisOdomTrackPnP();
 
 		// Range from sparse disparity
 		var pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
@@ -207,19 +207,20 @@ public class FactoryVisualOdometry {
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<>(estimator);
 
 		// Need to square the error RANSAC inliers
-		double ransacTOL = configVO.ransacInlierTol * configVO.ransacInlierTol;
+		double ransacTOL = configVO.ransac.inlierThreshold * configVO.ransac.inlierThreshold;
 
-		var motion = new Ransac<>(configVO.ransacSeed, manager, generator, distance,
-				configVO.ransacIterations, ransacTOL);
+		var motion = new Ransac<>(configVO.ransac.randSeed, manager, generator, distance,
+				configVO.ransac.iterations, ransacTOL);
+
 
 		RefinePnP refine = null;
 
-		if( configVO.pnpRefineIterations > 0 ) {
-			refine = FactoryMultiView.pnpRefine(1e-12,configVO.pnpRefineIterations);
+		if( configVO.refineIterations > 0 ) {
+			refine = FactoryMultiView.pnpRefine(1e-12,configVO.refineIterations);
 		}
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
-		bundleAdjustment.configure(1e-3,1e-3,configVO.bundleIterations);
+		bundleAdjustment.configure(configVO.sbaConverge.ftol,configVO.sbaConverge.gtol,configVO.sbaConverge.maxIterations);
 
 		VisOdomKeyFrameManager keyframe;
 		switch (configVO.keyframes.type) {
@@ -440,10 +441,10 @@ public class FactoryVisualOdometry {
 		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
 
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
-		double ransacTOL = 2*configVO.ransacInlierTol * configVO.ransacInlierTol;
+		double ransacTOL = 2*configVO.ransac.inlierThreshold * configVO.ransac.inlierThreshold;
 
-		ModelMatcher<Se3_F64, Stereo2D3D> motion =new Ransac<>
-				(configVO.ransacSeed, manager, generator, distanceStereo, configVO.ransacIterations, ransacTOL);
+		ModelMatcher<Se3_F64, Stereo2D3D> motion =new Ransac<>(configVO.ransac.randSeed, manager, generator,
+				distanceStereo, configVO.ransac.iterations, ransacTOL);
 		RefinePnPStereo refinePnP = null;
 
 		if( configVO.refineIterations > 0 ) {
@@ -457,7 +458,7 @@ public class FactoryVisualOdometry {
 		PointTracker<T> trackerRight = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
-		bundleAdjustment.configure(1e-3,1e-3,configVO.bundleIterations);
+		bundleAdjustment.configure(configVO.sbaConverge.ftol,configVO.sbaConverge.gtol,configVO.sbaConverge.maxIterations);
 
 		VisOdomKeyFrameManager keyframe;
 		switch (configVO.keyframes.type) {

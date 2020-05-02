@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,7 +123,7 @@ public class FactoryMultiViewRobust {
 		// convert from pixels to pixels squared
 		double threshold = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new RansacMultiView<>(ransac.randSeed, manager, generator, distance, ransac.maxIterations, threshold);
+		return new RansacMultiView<>(ransac.randSeed, manager, generator, distance, ransac.iterations, threshold);
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class FactoryMultiViewRobust {
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold * 2.0;
 
 		return new RansacMultiView<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
-				ransac.maxIterations, ransacTOL);
+				ransac.iterations, ransacTOL);
 	}
 
 	public static ModelMatcherMultiview<DMatrixRMaj, AssociatedPair>  essentialRansac(@Nullable ConfigEssential essential,
@@ -266,7 +266,7 @@ public class FactoryMultiViewRobust {
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
 
 		return new RansacMultiView<>(ransac.randSeed, managerE, generateE, errorMetric,
-				ransac.maxIterations, ransacTOL);
+				ransac.iterations, ransacTOL);
 	}
 
 
@@ -300,7 +300,7 @@ public class FactoryMultiViewRobust {
 
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
 
-		return new Ransac<>(ransac.randSeed, managerF, generateF, errorMetric, ransac.maxIterations, ransacTOL);
+		return new Ransac<>(ransac.randSeed, managerF, generateF, errorMetric, ransac.iterations, ransacTOL);
 	}
 
 	/**
@@ -361,7 +361,7 @@ public class FactoryMultiViewRobust {
 
 		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new Ransac<>(ransac.randSeed, manager, modelFitter, distance, ransac.maxIterations, ransacTol);
+		return new Ransac<>(ransac.randSeed, manager, modelFitter, distance, ransac.iterations, ransacTol);
 	}
 
 	/**
@@ -383,7 +383,7 @@ public class FactoryMultiViewRobust {
 		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
 
 		return new RansacMultiView<>
-				(ransac.randSeed, manager, modelFitter, distance, ransac.maxIterations, ransacTol);
+				(ransac.randSeed, manager, modelFitter, distance, ransac.iterations, ransacTol);
 	}
 
 	/**
@@ -431,6 +431,6 @@ public class FactoryMultiViewRobust {
 		ModelManager<TrifocalTensor> manager = new ManagerTrifocalTensor();
 		ModelGenerator<TrifocalTensor,AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
 
-		return new Ransac<>(ransac.randSeed, manager, generator, distance, ransac.maxIterations, ransacTol);
+		return new Ransac<>(ransac.randSeed, manager, generator, distance, ransac.iterations, ransacTol);
 	}
 }

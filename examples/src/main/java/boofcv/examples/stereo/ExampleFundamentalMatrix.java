@@ -77,7 +77,7 @@ public class ExampleFundamentalMatrix {
 
 		ConfigRansac configRansac = new ConfigRansac();
 		configRansac.inlierThreshold = inlierThreshold;
-		configRansac.maxIterations = 1000;
+		configRansac.iterations = 1000;
 		ConfigFundamental configFundamental = new ConfigFundamental();
 		configFundamental.which = EnumFundamental.LINEAR_7;
 		configFundamental.numResolve = 2;

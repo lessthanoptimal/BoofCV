@@ -19,38 +19,52 @@
 package boofcv.demonstrations.sfm.d3;
 
 import boofcv.factory.geo.EnumPNP;
-import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
+import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
 
 /**
- * Controls for {@link ConfigVisOdomDepthPnP}
+ * Controls for {@link ConfigVisOdomTrackPnP}
  *
  * @author Peter Abeles
  */
-public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
-	public final ConfigVisOdomDepthPnP config = new ConfigVisOdomDepthPnP();
+public class ControlPanelVisOdomTrackPnP extends StandardAlgConfigPanel {
+	public final ConfigVisOdomTrackPnP config;
 
 	private final EnumPNP[] VALUES_PNP = new EnumPNP[]{EnumPNP.P3P_GRUNERT,EnumPNP.P3P_FINSTERWALDER,EnumPNP.EPNP};
 
-	private final JSpinner spinRansacIter = spinner(config.ransacIterations,0,9999,1);
-	private final JSpinner spinRansacTol = spinner(config.ransacInlierTol,0.0,50.0,0.2);
-	private final JSpinner spinRefinePnP = spinner(config.pnpRefineIterations,0,999,1);
-	private final JComboBox<String> comboPnpType = combo(config.pnp.ordinal(),VALUES_PNP);
-	private final JSpinner spinBundleMaxIter = spinner(config.bundleIterations,0,999,1);
-	private final JSpinner spinBundleFeatFrame = spinner(config.bundleMaxFeaturesPerFrame,0,999,1);
-	private final JSpinner spinBundleMinObs = spinner(config.bundleMinObservations,2,50,1);
+	private final JSpinner spinRansacIter;
+	private final JSpinner spinRansacTol;
+	private final JSpinner spinRefinePnP;
+	private final JComboBox<String> comboPnpType;
+	private final JSpinner spinBundleMaxIter;
+	private final JSpinner spinBundleFeatFrame;
+	private final JSpinner spinBundleMinObs;
 
-	private final JSpinner spinDropOutliers = spinner(config.dropOutlierTracks,0,999,1);
-	private final JSpinner spinMaxKeyFrames = spinner(config.maxKeyFrames,2,999,1);
-	private final JSpinner spinKeyCoverage = spinner(config.keyframes.geoMinCoverage,0.0,1.0,0.05,"0.0E0",8);
+	private final JSpinner spinDropOutliers;
+	private final JSpinner spinMaxKeyFrames;
+	private final JSpinner spinKeyCoverage;
 
 	private final Listener listener;
 
-	public ControlPanelVisOdomDepthPnP(Listener listener) {
+	public ControlPanelVisOdomTrackPnP(Listener listener, ConfigVisOdomTrackPnP config_) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
+		this.config = config_==null? new ConfigVisOdomTrackPnP() : config_;
+
+		spinRansacIter = spinner(config.ransac.iterations,0,9999,1);
+		spinRansacTol = spinner(config.ransac.inlierThreshold,0.0,50.0,0.2);
+		spinRefinePnP = spinner(config.refineIterations,0,999,1);
+		comboPnpType = combo(config.pnp.ordinal(),VALUES_PNP);
+		spinBundleMaxIter = spinner(config.sbaConverge.maxIterations,0,999,1);
+		spinBundleFeatFrame = spinner(config.bundleMaxFeaturesPerFrame,0,999,1);
+		spinBundleMinObs = spinner(config.bundleMinObservations,2,50,1);
+
+		spinDropOutliers = spinner(config.dropOutlierTracks,0,999,1);
+		spinMaxKeyFrames = spinner(config.maxKeyFrames,2,999,1);
+		spinKeyCoverage = spinner(config.keyframes.geoMinCoverage,0.0,1.0,0.05,"0.0E0",8);
+
 		var panelPnP = new StandardAlgConfigPanel();
 		panelPnP.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"PnP"));
 		panelPnP.addLabeled(spinRansacIter,"RANSAC Iter","Maximum RANSAC iterations");
@@ -79,13 +93,13 @@ public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
 	@Override
 	public void controlChanged(final Object source) {
 		if( spinRansacIter == source ) {
-			config.ransacIterations = (Integer)spinRansacIter.getValue();
+			config.ransac.iterations = (Integer)spinRansacIter.getValue();
 		} else if( spinRansacTol == source ) {
-			config.ransacInlierTol = (Double) spinRansacTol.getValue();
+			config.ransac.inlierThreshold = (Double) spinRansacTol.getValue();
 		} else if( spinRefinePnP == source ) {
-			config.pnpRefineIterations = (Integer)spinRefinePnP.getValue();
+			config.refineIterations = (Integer)spinRefinePnP.getValue();
 		} else if( spinBundleMaxIter == source ) {
-			config.bundleIterations = (Integer) spinBundleMaxIter.getValue();
+			config.sbaConverge.maxIterations = (Integer) spinBundleMaxIter.getValue();
 		} else if( spinBundleFeatFrame == source ) {
 			config.bundleMaxFeaturesPerFrame = (Integer) spinBundleFeatFrame.getValue();
 		} else if( spinBundleMinObs == source ) {

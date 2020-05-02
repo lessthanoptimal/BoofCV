@@ -28,7 +28,7 @@ import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
+import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.io.MediaManager;
@@ -93,15 +93,15 @@ public class ExampleVisualOdometryStereo {
 		configBM.subpixel = true;
 
 		// Configurations related to how the structure is chained together frame to frame
-		var configPnP = new ConfigVisOdomDepthPnP();
+		var configPnP = new ConfigVisOdomTrackPnP();
 		configPnP.keyframes.geoMinCoverage = 0.4;
-		configPnP.ransacIterations = 200;
-		configPnP.ransacInlierTol = 1.0;
+		configPnP.ransac.iterations = 200;
+		configPnP.ransac.inlierThreshold = 1.0;
 
 		// Declare each component then visual odometry
 		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet,GrayU8.class, GrayS16.class);
 		StereoDisparitySparse<GrayU8> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayU8.class);
-		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoDepthPnP(configPnP,disparity,tracker, GrayU8.class);
+		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(configPnP,disparity,tracker, GrayU8.class);
 
 		// Optionally dump verbose debugging information to stdout
 //		Set<String> configuration = new HashSet<>();
@@ -113,6 +113,7 @@ public class ExampleVisualOdometryStereo {
 		visodom.setCalibration(stereoParam);
 
 		// Process the video sequence and output the location plus number of inliers
+		long startTime = System.nanoTime();
 		while( video1.hasNext() ) {
 			GrayU8 left = video1.next();
 			GrayU8 right = video2.next();
@@ -126,6 +127,7 @@ public class ExampleVisualOdometryStereo {
 
 			System.out.printf("Location %8.2f %8.2f %8.2f    %s\n", T.x, T.y, T.z, trackStats(visodom));
 		}
+		System.out.printf("FPS %4.2f\n", video1.getFrameNumber()/((System.nanoTime()-startTime)*1e-9));
 	}
 
 	/**

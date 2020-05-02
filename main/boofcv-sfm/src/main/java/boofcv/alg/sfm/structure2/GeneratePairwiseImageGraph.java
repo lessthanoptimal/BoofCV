@@ -69,12 +69,12 @@ public class GeneratePairwiseImageGraph {
 	 */
 	public GeneratePairwiseImageGraph() {
 		ConfigRansac configRansacF = new ConfigRansac();
-		configRansacF.maxIterations = 500;
+		configRansacF.iterations = 500;
 		configRansacF.inlierThreshold = 1;
 
 		// F computes epipolar error, which isn't as strict as reprojection error for H, so give H a larger error tol
 		ConfigRansac configRansacH = new ConfigRansac();
-		configRansacH.maxIterations = 500;
+		configRansacH.iterations = 500;
 		configRansacH.inlierThreshold = 2.0;
 
 		ConfigFundamental configF = new ConfigFundamental();

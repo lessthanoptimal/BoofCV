@@ -203,7 +203,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		System.out.println("Total Matched Triples = "+associateThree.getMatches().size);
 
 		ConfigRansac configRansac = new ConfigRansac();
-		configRansac.maxIterations = 500;
+		configRansac.iterations = 500;
 		configRansac.inlierThreshold = 1;
 
 		ConfigTrifocal configTri = new ConfigTrifocal();
