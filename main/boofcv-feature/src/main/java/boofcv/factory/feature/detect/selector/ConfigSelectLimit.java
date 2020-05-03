@@ -65,4 +65,16 @@ public class ConfigSelectLimit implements Configuration {
 		config.uniform.regionScaleFactor = inverseRegionScale;
 		return config;
 	}
+
+	public void setTo(ConfigSelectLimit src) {
+		this.type = src.type;
+		this.randomSeed = src.randomSeed;
+		this.uniform.setTo(uniform);
+	}
+
+	public ConfigSelectLimit copy() {
+		var out = new ConfigSelectLimit();
+		out.setTo(this);
+		return out;
+	}
 }

@@ -87,4 +87,20 @@ public class ConfigFastHessian implements Configuration {
 	@Override
 	public void checkValidity() {
 	}
+
+	public void setTo( ConfigFastHessian src ) {
+		this.extract.setTo(src.extract);
+		this.maxFeaturesPerScale = src.maxFeaturesPerScale;
+		this.initialSampleStep = src.initialSampleStep;
+		this.initialSize = src.initialSize;
+		this.numberScalesPerOctave = src.numberScalesPerOctave;
+		this.numberOfOctaves = src.numberOfOctaves;
+		this.scaleStepSize = src.scaleStepSize;
+	}
+
+	public ConfigFastHessian copy() {
+		var dst = new ConfigFastHessian();
+		dst.setTo(this);
+		return dst;
+	}
 }

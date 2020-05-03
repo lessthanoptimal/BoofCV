@@ -51,4 +51,10 @@ public class ConfigRansac implements Configuration {
 	public void checkValidity() {
 
 	}
+
+	public void setTo( ConfigRansac src ) {
+		this.randSeed = src.randSeed;
+		this.iterations = src.iterations;
+		this.inlierThreshold = src.inlierThreshold;
+	}
 }

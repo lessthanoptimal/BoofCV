@@ -49,6 +49,16 @@ public class ConfigDescribeRegionPoint implements Configuration {
 		template.checkValidity();
 	}
 
+	public void setTo( ConfigDescribeRegionPoint src ) {
+		this.type = src.type;
+		this.scaleSpaceSift.setTo(src.scaleSpaceSift);
+		this.surfFast.setTo(src.surfFast);
+		this.surfStability.setTo(src.surfStability);
+		this.sift.setTo(src.sift);
+		this.brief.setTo(src.brief);
+		this.template.setTo(src.template);
+	}
+
 	public enum DescriptorType {
 		SURF_FAST,SURF_STABLE,SIFT,BRIEF,TEMPLATE,
 	}

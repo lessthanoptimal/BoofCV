@@ -55,9 +55,11 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 
 		// TODO pass in copies since each control panel is independent
 		controlKlt = config == null ? new ControlPanelPointTrackerKlt(listener::changePointTracker)
-				: new ControlPanelPointTrackerKlt(listener::changePointTracker,config.detDesc.detectPoint,config.klt);
+				: new ControlPanelPointTrackerKlt(listener::changePointTracker,
+				config.detDesc.detectPoint.copy(),config.klt);
 		controlDda = config == null ? new ControlPanelDdaTracker(listener::changePointTracker)
-				: new ControlPanelDdaTracker(listener::changePointTracker,config.dda,config.detDesc,config.associate);
+				: new ControlPanelDdaTracker(listener::changePointTracker,
+				config.dda.copy(),config.detDesc.copy(),config.associate.copy());
 		controlHybrid = config == null ?  new ControlPanelHybridTracker(listener::changePointTracker)
 				: new ControlPanelHybridTracker(listener::changePointTracker);
 

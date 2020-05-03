@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,5 +68,13 @@ public class ConfigBrief implements Configuration {
 
 	@Override
 	public void checkValidity() {
+	}
+
+	public void setTo( ConfigBrief src ) {
+		this.radius = src.radius;
+		this.numPoints = src.numPoints;
+		this.blurSigma = src.blurSigma;
+		this.blurRadius = src.blurRadius;
+		this.fixed = src.fixed;
 	}
 }

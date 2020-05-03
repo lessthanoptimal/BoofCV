@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.interest;
+package boofcv.abst.feature.detect.interest;
 
-import boofcv.abst.feature.detect.interest.WrapSiftDetector;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.image.GrayF32;

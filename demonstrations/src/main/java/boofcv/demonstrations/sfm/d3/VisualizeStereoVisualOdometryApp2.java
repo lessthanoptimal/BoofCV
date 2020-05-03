@@ -230,12 +230,12 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
 		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
 
-		config.ransac.inlierThreshold = 1.5;
+		config.scene.ransac.inlierThreshold = 1.5;
 		config.stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 		config.stereoRadius = 6;
 		config.epipolarTol = 1.0;
 
-		config.keyframes.geoMinCoverage = 0.4;
+		config.scene.keyframes.geoMinCoverage = 0.4;
 
 		return config;
 	}
@@ -566,7 +566,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				cloudPanel.update();
 			} else if( source == comboApproach ) {
 				approach = comboApproach.getSelectedIndex();
-				JPanel control = null;
+				JComponent control = null;
 				switch( approach ) {
 					case 0: control = controlMonoTrack; break;
 					default: control = controlDualTrack; break;

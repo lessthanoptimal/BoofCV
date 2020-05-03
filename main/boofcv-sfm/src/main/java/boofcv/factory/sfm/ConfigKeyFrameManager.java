@@ -58,4 +58,10 @@ public class ConfigKeyFrameManager implements Configuration {
 		if( tickPeriod <= 0 )
 			throw new IllegalArgumentException("tickPeriod must be greater than zero");
 	}
+
+	public void setTo( ConfigKeyFrameManager src ) {
+		this.type = src.type;
+		this.geoMinCoverage = src.geoMinCoverage;
+		this.tickPeriod = src.tickPeriod;
+	}
 }

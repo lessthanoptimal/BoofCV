@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestConfigGridUniform {
+class TestConfigGridUniform extends StandardConfigurationChecks {
 	/**
 	 * Compare to hand computed solution
 	 */

@@ -438,7 +438,7 @@ public class FactoryVisualOdometry {
 		PointTracker<T> trackerLeft = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
 		PointTracker<T> trackerRight = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
 
-		return stereoDualTrackerPnP(configVO,trackerLeft,trackerRight,configVO,imageType);
+		return stereoDualTrackerPnP(configVO.scene,trackerLeft,trackerRight,configVO,imageType);
 	}
 
 	public static <T extends ImageGray<T>, Desc extends TupleDesc>
@@ -448,7 +448,7 @@ public class FactoryVisualOdometry {
 												  ConfigStereoDualTrackPnP hack,
 												  Class<T> imageType) {
 		if( configVO == null )
-			configVO = new ConfigStereoDualTrackPnP();
+			configVO = new ConfigVisOdomTrackPnP();
 		configVO.checkValidity();
 
 		EstimateNofPnP pnp = FactoryMultiView.pnp_N(configVO.pnp, -1);

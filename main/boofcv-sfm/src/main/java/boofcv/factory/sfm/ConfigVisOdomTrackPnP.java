@@ -70,4 +70,18 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 		if( bundleMinObservations < 2 )
 			throw new IllegalArgumentException("bundleMinObservations must be >= 2");
 	}
+
+	public void setTo( ConfigVisOdomTrackPnP src ) {
+		this.sba.setTo(src.sba);
+		this.sbaConverge.setTo(src.sbaConverge);
+		this.bundleMaxFeaturesPerFrame = src.bundleMaxFeaturesPerFrame;
+		this.bundleMinObservations = src.bundleMinObservations;
+		this.dropOutlierTracks = src.dropOutlierTracks;
+		this.maxKeyFrames = src.maxKeyFrames;
+		this.ransac.setTo(src.ransac);
+		this.refineIterations = src.refineIterations;
+		this.pnp = src.pnp;
+		this.keyframes.setTo(src.keyframes);
+	}
+
 }

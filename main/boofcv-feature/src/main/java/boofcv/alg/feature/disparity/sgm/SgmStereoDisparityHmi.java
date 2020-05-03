@@ -80,8 +80,8 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 								  SgmDisparitySelector selector ) {
 		super(new SgmMutualInformation_U8(stereoMI),selector);
 		this.stereoMI = stereoMI;
-		pyrLeft.getConfigLayers().set(configPyr);
-		pyrRight.getConfigLayers().set(configPyr);
+		pyrLeft.getConfigLayers().setTo(configPyr);
+		pyrRight.getConfigLayers().setTo(configPyr);
 	}
 
 	public SgmStereoDisparityHmi(ConfigDiscreteLevels configPyr,
@@ -90,8 +90,8 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 								 SgmCostFromBlocks<GrayU8> blockScore ) {
 		super(blockScore,selector);
 		this.stereoMI = stereoMI;
-		pyrLeft.getConfigLayers().set(configPyr);
-		pyrRight.getConfigLayers().set(configPyr);
+		pyrLeft.getConfigLayers().setTo(configPyr);
+		pyrRight.getConfigLayers().setTo(configPyr);
 	}
 
 	/**

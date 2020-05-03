@@ -37,7 +37,7 @@ import java.util.Set;
 /**
  * @author Peter Abeles
  */
-public class ControlPanelStereoDualTrackPnP extends StandardAlgConfigPanel {
+public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 
 	ControlPanelVisOdomTrackPnP controlPnpDepth;
 	ControlPanelPointTrackers controlTrackers;
@@ -47,27 +47,20 @@ public class ControlPanelStereoDualTrackPnP extends StandardAlgConfigPanel {
 	final ConfigStereoDualTrackPnP config;
 
 	public ControlPanelStereoDualTrackPnP(ConfigStereoDualTrackPnP config, Listener listener ) {
+		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 		this.config = config;
 
-		setLayout(new BorderLayout());
-		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoDualTrackPnP, config);
+		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoDualTrackPnP, config.scene);
 		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoDualTrackPnP,config.tracker);
 		controlStereo = new StereoControls();
 
 		var panelAlgControls = new JPanel(new BorderLayout());
-		var tuningTabs = new JTabbedPane();
-		tuningTabs.addTab("VO",panelAlgControls);
-		tuningTabs.addTab("Tracker",controlTrackers);
-		tuningTabs.addTab("Stereo",controlStereo);
-
 		panelAlgControls.add(BorderLayout.CENTER, controlPnpDepth);
 
-		var panelTuning = new JPanel();
-		panelTuning.setLayout(new BoxLayout(panelTuning,BoxLayout.Y_AXIS));
-		panelTuning.add(tuningTabs);
-
-		add(BorderLayout.CENTER, tuningTabs);
+		addTab("VO",panelAlgControls);
+		addTab("Tracker",controlTrackers);
+		addTab("Stereo",controlStereo);
 	}
 
 	public <T extends ImageGray<T>>
@@ -115,15 +108,12 @@ public class ControlPanelStereoDualTrackPnP extends StandardAlgConfigPanel {
 
 	public class DescribeControl extends ControlPanelDetDescAssoc {
 
-		JPanel panelDescriptor = new JPanel();
+		JPanel panelDescriptor = new JPanel(new BorderLayout());
 
 		public DescribeControl() {
-			configDetDesc.typeDescribe = config.stereoDescribe.type;
-			configDetDesc.describeTemplate = config.stereoDescribe.template;
-			configDetDesc.describeSurfFast = config.stereoDescribe.surfFast;
-			configDetDesc.describeSurfStability = config.stereoDescribe.surfStability;
-			configDetDesc.describeBrief = config.stereoDescribe.brief;
-			configDetDesc.describeSift = config.stereoDescribe.sift;
+			configDetDesc.copyRefFrom(config.stereoDescribe);
+
+			panelDescriptor.setBorder(BorderFactory.createTitledBorder("Descriptor"));
 
 			setBorder(BorderFactory.createEmptyBorder());
 			initializeControlsGUI();
@@ -134,6 +124,7 @@ public class ControlPanelStereoDualTrackPnP extends StandardAlgConfigPanel {
 		}
 
 		private void handleDescriptorChanged() {
+			config.stereoDescribe.type = configDetDesc.typeDescribe;
 			panelDescriptor.removeAll();
 			panelDescriptor.add(getDescriptorPanel(),BorderLayout.CENTER);
 			panelDescriptor.invalidate();
@@ -148,7 +139,7 @@ public class ControlPanelStereoDualTrackPnP extends StandardAlgConfigPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if( comboDescribe == e.getSource() ) {
-				config.stereoDescribe.type =
+				configDetDesc.typeDescribe =
 						ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
 				handleDescriptorChanged();
 				listener.changedStereoDualTrackPnP();

@@ -52,4 +52,15 @@ public class ConfigShiTomasi implements Configuration {
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be greater than zero");
 	}
+
+	public void setTo( ConfigShiTomasi src ) {
+		this.weighted = src.weighted;
+		this.radius = src.radius;
+	}
+
+	public ConfigShiTomasi copy() {
+		var dst = new ConfigShiTomasi();
+		dst.setTo(this);
+		return dst;
+	}
 }

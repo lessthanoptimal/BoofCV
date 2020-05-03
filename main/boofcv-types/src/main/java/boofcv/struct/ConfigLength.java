@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,8 +93,15 @@ public class ConfigLength implements Configuration {
 			throw new IllegalArgumentException("length and/or fraction must be >= 0");
 	}
 
+	public void setTo( ConfigLength src ) {
+		this.length = src.length;
+		this.fraction = src.fraction;
+	}
+
 	public ConfigLength copy() {
-		return new ConfigLength(length,fraction);
+		var out = new ConfigLength();
+		out.setTo(this);
+		return out;
 	}
 
 	@Override

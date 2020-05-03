@@ -124,7 +124,7 @@ public class SelectTracksInFrameForBundleAdjustment {
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack bt = tracks.get(trackIdx);
 			VisOdomBundleAdjustment.BObservation o = bt.findObservationBy(frame);
-			if( o == null )
+			if( o == null ) // TODO Running mono-klt generated this exception with r=1
 				throw new RuntimeException("BUG! track in frame not observed by frame");
 			Info cell = grid.getCellAtPixel((int)o.pixel.x, (int)o.pixel.y);
 			if( bt.selected )

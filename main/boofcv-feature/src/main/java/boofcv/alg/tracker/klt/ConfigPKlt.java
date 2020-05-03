@@ -69,4 +69,12 @@ public class ConfigPKlt implements Configuration
 	public void checkValidity() {
 
 	}
+
+	public void setTo( ConfigPKlt src ) {
+		this.config.setTo(src.config);
+		this.toleranceFB = src.toleranceFB;
+		this.templateRadius = src.templateRadius;
+		this.pyramidLevels.setTo(src.pyramidLevels);
+		this.pruneClose = src.pruneClose;
+	}
 }

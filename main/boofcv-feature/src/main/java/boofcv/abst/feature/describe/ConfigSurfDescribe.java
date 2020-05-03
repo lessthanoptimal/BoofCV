@@ -56,6 +56,11 @@ public abstract class ConfigSurfDescribe implements Configuration {
 		 * Weighting factor's sigma.  Try 4.5
 		 */
 		public double weightSigma = 4.5;
+
+		public void setTo( Fast src ) {
+			super.setTo(src);
+			this.weightSigma = src.weightSigma;
+		}
 	}
 
 	/**
@@ -76,9 +81,23 @@ public abstract class ConfigSurfDescribe implements Configuration {
 		 * Sigma used to weight points in the large grid. Typically 2.5
 		 */
 		public double sigmaSubRegion = 2.5;
+
+		public void setTo( Stability src ) {
+			super.setTo(src);
+			this.overLap = src.overLap;
+			this.sigmaLargeGrid = src.sigmaLargeGrid;
+			this.sigmaSubRegion = src.sigmaSubRegion;
+		}
 	}
 
 	@Override
 	public void checkValidity() {
+	}
+
+	public void setTo( ConfigSurfDescribe src ) {
+		this.widthLargeGrid = src.widthLargeGrid;
+		this.widthSubRegion = src.widthSubRegion;
+		this.widthSample = src.widthSample;
+		this.useHaar = src.useHaar;
 	}
 }

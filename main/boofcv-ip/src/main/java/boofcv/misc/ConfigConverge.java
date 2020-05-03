@@ -37,10 +37,14 @@ public class ConfigConverge implements Configuration {
 		this.maxIterations = maxIterations;
 	}
 
+	public ConfigConverge( ConfigConverge src ) {
+		setTo(src);
+	}
+
 	public ConfigConverge() {
 	}
 
-	public void set( ConfigConverge src ) {
+	public void setTo(ConfigConverge src ) {
 		this.ftol = src.ftol;
 		this.gtol = src.gtol;
 		this.maxIterations = src.maxIterations;

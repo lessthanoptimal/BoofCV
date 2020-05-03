@@ -63,4 +63,13 @@ public class ConfigPointTracker implements Configuration {
 	public enum TrackerType {
 		KLT,DDA,HYBRID
 	}
+
+	public void setTo( ConfigPointTracker src ) {
+		this.typeTracker = src.typeTracker;
+		this.klt.setTo(src.klt);
+		this.dda.setTo(src.dda);
+		this.hybrid.setTo(src.hybrid);
+		this.detDesc.setTo(src.detDesc);
+		this.associate.setTo(src.associate);
+	}
 }

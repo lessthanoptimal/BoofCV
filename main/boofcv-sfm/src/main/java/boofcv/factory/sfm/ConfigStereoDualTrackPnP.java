@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.ConfigPointTracker;
+import boofcv.struct.Configuration;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
@@ -29,8 +30,11 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  *
  * @author Peter Abeles
  */
-public class ConfigStereoDualTrackPnP extends ConfigVisOdomTrackPnP
+public class ConfigStereoDualTrackPnP implements Configuration
 {
+	/** Configuration for building and optimizing a local scene */
+	public ConfigVisOdomTrackPnP scene = new ConfigVisOdomTrackPnP();
+
 	/** Used to track features in each camera independently */
 	public ConfigPointTracker tracker = new ConfigPointTracker();
 
@@ -61,11 +65,19 @@ public class ConfigStereoDualTrackPnP extends ConfigVisOdomTrackPnP
 
 	@Override
 	public void checkValidity() {
-		super.checkValidity();
-		if( maxKeyFrames < 4 )
+		scene.checkValidity();
+		if( scene.maxKeyFrames < 4 )
 			throw new IllegalArgumentException("There must be at least 4 key frames");
 
 		tracker.checkValidity();
 		stereoDescribe.checkValidity();
+	}
+
+	public void setTo( ConfigStereoDualTrackPnP src ) {
+		this.scene.setTo(src.scene);
+		this.tracker.setTo(src.tracker);
+		this.stereoDescribe.setTo(src.stereoDescribe);
+		this.stereoRadius = src.stereoRadius;
+		this.epipolarTol = src.epipolarTol;
 	}
 }

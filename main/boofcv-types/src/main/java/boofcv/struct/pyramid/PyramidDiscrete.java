@@ -55,12 +55,12 @@ public abstract class PyramidDiscrete<T extends ImageBase<T>> extends ImagePyram
 	{
 		super(imageType,saveOriginalReference);
 		if( configLayers != null )
-			this.configLayers.set(configLayers);
+			this.configLayers.setTo(configLayers);
 	}
 
 	protected PyramidDiscrete( PyramidDiscrete<T> orig ) {
 		super(orig);
-		this.configLayers.set(orig.configLayers);
+		this.configLayers.setTo(orig.configLayers);
 	}
 
 	@Override

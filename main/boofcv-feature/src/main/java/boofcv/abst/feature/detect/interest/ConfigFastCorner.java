@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,5 +60,17 @@ public class ConfigFastCorner implements Configuration {
 
 		if( minContinuous < 9 || minContinuous > 12 )
 			throw new IllegalArgumentException("minContinuous must be from 9 to 12, inclusive");
+	}
+
+	public void setTo(ConfigFastCorner src ) {
+		this.pixelTol = src.pixelTol;
+		this.minContinuous = src.minContinuous;
+		this.maxFeatures = src.maxFeatures;
+	}
+
+	public ConfigFastCorner copy() {
+		var dst = new ConfigFastCorner();
+		dst.setTo(this);
+		return dst;
 	}
 }

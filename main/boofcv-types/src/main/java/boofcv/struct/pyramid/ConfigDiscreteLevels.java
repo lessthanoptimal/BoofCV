@@ -88,7 +88,7 @@ public class ConfigDiscreteLevels implements Configuration {
 		return (int)Math.floor(levels)+1;
 	}
 
-	public void set( ConfigDiscreteLevels config ) {
+	public void setTo(ConfigDiscreteLevels config ) {
 		this.numLevelsRequested = config.numLevelsRequested;
 		this.minWidth = config.minWidth;
 		this.minHeight = config.minHeight;

@@ -56,4 +56,11 @@ public class ConfigAssociateNearestNeighbor implements Configuration {
 		if( scoreRatioThreshold <= 0 )
 			throw new IllegalArgumentException("Ratio must be more than zero");
 	}
+
+	public void setTo( ConfigAssociateNearestNeighbor src ) {
+		this.distanceIsSquared = src.distanceIsSquared;
+		this.scoreRatioThreshold = src.scoreRatioThreshold;
+		this.maxErrorThreshold = src.maxErrorThreshold;
+		this.maxNodesSearched = src.maxNodesSearched;
+	}
 }

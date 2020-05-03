@@ -53,4 +53,11 @@ public class ConfigDetectInterestPoint implements Configuration {
 		POINT,FAST_HESSIAN,SIFT,
 	}
 
+	public void setTo( ConfigDetectInterestPoint src ) {
+		this.type = src.type;
+		this.scaleSpaceSift.setTo(src.scaleSpaceSift);
+		this.point.setTo(src.point);
+		this.fastHessian.setTo(src.fastHessian);
+		this.sift.setTo(src.sift);
+	}
 }

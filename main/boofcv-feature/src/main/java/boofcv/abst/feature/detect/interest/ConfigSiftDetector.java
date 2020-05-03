@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,5 +70,17 @@ public class ConfigSiftDetector implements Configuration {
 	@Override
 	public void checkValidity() {
 
+	}
+
+	public void setTo( ConfigSiftDetector src ) {
+		this.extract.setTo(src.extract);
+		this.maxFeaturesPerScale = src.maxFeaturesPerScale;
+		this.edgeR = src.edgeR;
+	}
+
+	public ConfigSiftDetector copy() {
+		var out = new ConfigSiftDetector();
+		out.setTo(this);
+		return out;
 	}
 }

@@ -47,7 +47,14 @@ public class ConfigSiftDescribe implements Configuration {
 	public double maxDescriptorElementValue=0.2;
 
 	@Override
-	public void checkValidity() {
-		
+	public void checkValidity() {}
+
+	public void setTo( ConfigSiftDescribe src ) {
+		this.widthSubregion = src.widthSubregion;
+		this.widthGrid = src.widthGrid;
+		this.numHistogramBins = src.numHistogramBins;
+		this.sigmaToPixels = src.sigmaToPixels;
+		this.weightingSigmaFraction = src.weightingSigmaFraction;
+		this.maxDescriptorElementValue = src.maxDescriptorElementValue;
 	}
 }

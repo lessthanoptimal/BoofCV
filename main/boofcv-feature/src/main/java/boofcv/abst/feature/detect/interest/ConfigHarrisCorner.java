@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,5 +60,17 @@ public class ConfigHarrisCorner implements Configuration {
 	public void checkValidity() {
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be greater than zero");
+	}
+
+	public void setTo( ConfigHarrisCorner src ) {
+		this.weighted = src.weighted;
+		this.radius = src.radius;
+		this.kappa = src.kappa;
+	}
+
+	public ConfigHarrisCorner copy() {
+		var out = new ConfigHarrisCorner();
+		out.setTo(this);
+		return out;
 	}
 }

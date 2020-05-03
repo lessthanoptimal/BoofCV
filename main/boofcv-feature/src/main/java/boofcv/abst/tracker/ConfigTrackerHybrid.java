@@ -34,4 +34,14 @@ public class ConfigTrackerHybrid implements Configuration {
 	public void checkValidity() {
 
 	}
+
+	public void setTo( ConfigTrackerHybrid src ) {
+		this.reactivateThreshold = src.reactivateThreshold;
+	}
+
+	public ConfigTrackerHybrid copy() {
+		var out = new ConfigTrackerHybrid();
+		out.setTo(this);
+		return out;
+	}
 }

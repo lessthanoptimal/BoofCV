@@ -60,4 +60,15 @@ public class ConfigGridUniform implements Configuration {
 		if( regionScaleFactor < 1.0 )
 			throw new IllegalArgumentException("Scale factor must be greater than zero");
 	}
+
+	public void setTo( ConfigGridUniform src ) {
+		this.regionScaleFactor = src.regionScaleFactor;
+		this.minCellLength = src.minCellLength;
+	}
+
+	public ConfigGridUniform copy() {
+		var out = new ConfigGridUniform();
+		out.setTo(this);
+		return out;
+	}
 }

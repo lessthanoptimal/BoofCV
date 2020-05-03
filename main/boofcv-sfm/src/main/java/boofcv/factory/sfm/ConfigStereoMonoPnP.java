@@ -24,6 +24,7 @@ import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.tracker.ConfigPointTracker;
+import boofcv.struct.Configuration;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
@@ -33,7 +34,11 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  *
  * @author Peter Abeles
  */
-public class ConfigStereoMonoPnP extends ConfigVisOdomTrackPnP {
+public class ConfigStereoMonoPnP implements Configuration {
+
+	/** Configuration for building and optimizing a local scene */
+	public ConfigVisOdomTrackPnP scene = new ConfigVisOdomTrackPnP();
+
 	/** Tracker configuration for left camera */
 	public ConfigPointTracker tracker = new ConfigPointTracker();
 
@@ -60,8 +65,14 @@ public class ConfigStereoMonoPnP extends ConfigVisOdomTrackPnP {
 
 	@Override
 	public void checkValidity() {
-		super.checkValidity();
+		scene.checkValidity();
 		tracker.checkValidity();
 		disparity.checkValidity();
+	}
+
+	public void setTo( ConfigStereoMonoPnP src ) {
+		this.scene.setTo(src.scene);
+		this.tracker.setTo(src.tracker);
+		this.disparity.setTo(src.disparity);
 	}
 }

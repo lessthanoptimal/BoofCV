@@ -5,6 +5,7 @@ dependencies {
     api project(':main:boofcv-calibration')
 
     testImplementation project(':main:boofcv-geo').sourceSets.test.output
+    testImplementation project(':main:boofcv-types').sourceSets.test.output
     testImplementation project(':main:boofcv-simulation')
     testImplementation project(':integration:boofcv-swing')
 }

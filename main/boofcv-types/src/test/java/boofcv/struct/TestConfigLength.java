@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,15 +21,21 @@ package boofcv.struct;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestConfigLength {
+class TestConfigLength extends StandardConfigurationChecks {
+
+	public TestConfigLength() {
+		super(ConfigLength.class);
+	}
 
 	@Test
-	public void fixed() {
+	void fixed() {
 		ConfigLength c = ConfigLength.fixed(3);
 
 		assertEquals(3,c.length, UtilEjml.TEST_F64);
@@ -37,7 +43,7 @@ public class TestConfigLength {
 	}
 
 	@Test
-	public void relative() {
+	void relative() {
 		ConfigLength c = ConfigLength.relative(0.01,0);
 
 		assertEquals(0,c.length, UtilEjml.TEST_F64);
@@ -45,7 +51,7 @@ public class TestConfigLength {
 	}
 
 	@Test
-	public void compute() {
+	void compute() {
 		ConfigLength c = ConfigLength.fixed(3);
 		assertEquals(3,c.compute(200), UtilEjml.TEST_F64);
 
@@ -60,10 +66,15 @@ public class TestConfigLength {
 	}
 
 	@Test
-	public void copy() {
+	void copy() {
 		ConfigLength found = new ConfigLength(2,0.1).copy();
 
 		assertEquals(2,found.length, UtilEjml.TEST_F64);
 		assertEquals(0.1,found.fraction,UtilEjml.TEST_F64);
+	}
+
+	@Override
+	public Configuration createNotDefault(Random rand) {
+		return  new ConfigLength(2,0.1);
 	}
 }

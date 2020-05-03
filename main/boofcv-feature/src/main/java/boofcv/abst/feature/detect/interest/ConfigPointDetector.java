@@ -58,4 +58,19 @@ public class ConfigPointDetector implements Configuration {
 		if( scaleRadius <= 0 )
 			throw new IllegalArgumentException("Radius must be a positive number");
 	}
+
+	public void setTo( ConfigPointDetector src ) {
+		this.type = src.type;
+		this.scaleRadius = src.scaleRadius;
+		this.general.setTo(src.general);
+		this.harris.setTo(src.harris);
+		this.shiTomasi.setTo(src.shiTomasi);
+		this.fast.setTo(src.fast);
+	}
+
+	public ConfigPointDetector copy() {
+		var out = new ConfigPointDetector();
+		out.setTo(this);
+		return out;
+	}
 }

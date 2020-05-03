@@ -44,7 +44,7 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 
 	public ControlPanelStereoMonoTrackPnP(ConfigStereoMonoPnP config, Listener listener ) {
 		setLayout(new BorderLayout());
-		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoMonoTrackPnP, config);
+		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoMonoTrackPnP, config.scene);
 		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoMonoTrackPnP,config.tracker);
 		controlDisparity = new ControlPanelDisparitySparse(listener::changedStereoMonoTrackPnP, config.disparity);
 

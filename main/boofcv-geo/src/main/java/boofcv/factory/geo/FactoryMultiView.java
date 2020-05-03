@@ -415,7 +415,7 @@ public class FactoryMultiView {
 		switch( config.which) {
 			case GEOMETRIC:
 				RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
-				alg.getConverge().set(config.convergence);
+				alg.getConverge().setTo(config.convergence);
 				alg.setScale(config.normalizePixels);
 				return new WrapRefineThreeViewProjectiveGeometric(alg);
 		}

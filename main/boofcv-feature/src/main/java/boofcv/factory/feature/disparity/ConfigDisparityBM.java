@@ -83,6 +83,21 @@ public class ConfigDisparityBM implements Configuration {
 	 */
 	public BorderType border = BorderType.REFLECT;
 
+	public void setTo( ConfigDisparityBM src ) {
+		this.disparityMin = src.disparityMin;
+		this.disparityRange = src.disparityRange;
+		this.regionRadiusX = src.regionRadiusX;
+		this.regionRadiusY = src.regionRadiusY;
+		this.maxPerPixelError = src.maxPerPixelError;
+		this.validateRtoL = src.validateRtoL;
+		this.texture = src.texture;
+		this.subpixel = src.subpixel;
+		this.errorType = src.errorType;
+		this.configCensus.setTo(src.configCensus);
+		this.configNCC.setTo(src.configNCC);
+		this.border = src.border;
+	}
+
 	@Override
 	public void checkValidity() {
 		if( disparityMin < 0 )

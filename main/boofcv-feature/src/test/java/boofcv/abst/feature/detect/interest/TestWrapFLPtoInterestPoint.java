@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.interest;
+package boofcv.abst.feature.detect.interest;
 
-import boofcv.abst.feature.detect.interest.WrapFPtoInterestPoint;
-import boofcv.alg.feature.detect.interest.FeaturePyramid;
+import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.GrayS16;
@@ -30,18 +29,17 @@ import boofcv.struct.pyramid.PyramidFloat;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestWrapFPtoInterestPoint extends GeneralInterestPointDetectorChecks {
+public class TestWrapFLPtoInterestPoint extends GeneralInterestPointDetectorChecks {
 
 	Class imageType = GrayU8.class;
 	Class derivType = GrayS16.class;
 
 	double scales[] = new double[]{1.0,2.0,3.0,4.0};
 
-	FeaturePyramid fp = FactoryInterestPointAlgs.hessianPyramid(3, 1, 200, imageType, derivType);
-
+	FeatureLaplacePyramid flp = FactoryInterestPointAlgs.hessianLaplace(3, 1, 200, imageType, derivType);
 	PyramidFloat ss = FactoryPyramid.scaleSpacePyramid(scales, imageType);
 
-	public TestWrapFPtoInterestPoint() {
-		configure(new WrapFPtoInterestPoint(fp, ss), false, true, imageType);
+	public TestWrapFLPtoInterestPoint() {
+		configure(new WrapFLPtoInterestPoint(flp, ss), false, true, imageType);
 	}
 }

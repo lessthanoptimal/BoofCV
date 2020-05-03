@@ -39,4 +39,15 @@ public class ConfigTrackerDda implements Configuration {
 	@Override
 	public void checkValidity() {
 	}
+
+	public void setTo( ConfigTrackerDda src ) {
+		this.updateDescription = src.updateDescription;
+		this.seed = src.seed;
+	}
+
+	public ConfigTrackerDda copy() {
+		var out = new ConfigTrackerDda();
+		out.setTo(this);
+		return out;
+	}
 }

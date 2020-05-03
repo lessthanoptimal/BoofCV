@@ -55,4 +55,10 @@ public class ConfigTemplateDescribe implements Configuration {
 		 */
 		NCC
 	}
+
+	public void setTo( ConfigTemplateDescribe src ) {
+		this.type = src.type;
+		this.width = src.width;
+		this.height = src.height;
+	}
 }

@@ -65,6 +65,11 @@ public class ConfigAssociateGreedy implements Configuration {
 	public void checkValidity() {
 		if( scoreRatioThreshold < 0.0)
 			throw new IllegalArgumentException("scoreRatioThreshold must be greater than or equal to 0");
+	}
 
+	public void setTo( ConfigAssociateGreedy src ) {
+		this.forwardsBackwards = src.forwardsBackwards;
+		this.scoreRatioThreshold = src.scoreRatioThreshold;
+		this.maxErrorThreshold = src.maxErrorThreshold;
 	}
 }

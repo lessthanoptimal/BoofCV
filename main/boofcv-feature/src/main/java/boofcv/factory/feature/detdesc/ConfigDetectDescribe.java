@@ -51,6 +51,26 @@ public class ConfigDetectDescribe implements Configuration {
 	/** SIFT scale invariant blob detector */
 	public ConfigSiftDetector detectSift = new ConfigSiftDetector();
 
+	public void copyRefTo(ConfigDescribeRegionPoint dst ) {
+		dst.type = this.typeDescribe;
+		dst.scaleSpaceSift = this.scaleSpaceSift;
+		dst.template = this.describeTemplate;
+		dst.surfFast = this.describeSurfFast;
+		dst.surfStability = this.describeSurfStability;
+		dst.brief = this.describeBrief;
+		dst.sift = this.describeSift;
+	}
+
+	public void copyRefFrom(ConfigDescribeRegionPoint src ) {
+		this.typeDescribe = src.type;
+		this.scaleSpaceSift = src.scaleSpaceSift;
+		this.describeTemplate = src.template;
+		this.describeSurfFast = src.surfFast;
+		this.describeSurfStability = src.surfStability;
+		this.describeBrief = src.brief;
+		this.describeSift = src.sift;
+	}
+
 	@Override
 	public void checkValidity() {
 		scaleSpaceSift.checkValidity();
@@ -64,5 +84,25 @@ public class ConfigDetectDescribe implements Configuration {
 		detectPoint.checkValidity();
 		detectFastHessian.checkValidity();
 		detectSift.checkValidity();
+	}
+
+	public void setTo( ConfigDetectDescribe src ) {
+		this.typeDescribe = src.typeDescribe;
+		this.typeDetector = src.typeDetector;
+		this.scaleSpaceSift.setTo(src.scaleSpaceSift);
+		this.describeSurfFast.setTo(src.describeSurfFast);
+		this.describeSurfStability.setTo(src.describeSurfStability);
+		this.describeSift.setTo(src.describeSift);
+		this.describeBrief.setTo(src.describeBrief);
+		this.describeTemplate.setTo(src.describeTemplate);
+		this.detectPoint.setTo(src.detectPoint);
+		this.detectFastHessian.setTo(src.detectFastHessian);
+		this.detectSift.setTo(src.detectSift);
+	}
+
+	public ConfigDetectDescribe copy() {
+		var out = new ConfigDetectDescribe();
+		out.setTo(this);
+		return out;
 	}
 }

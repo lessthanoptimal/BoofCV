@@ -1,3 +1,4 @@
 dependencies {
     api project(':main:boofcv-types')
+    testImplementation project(':main:boofcv-types').sourceSets.test.output
 }

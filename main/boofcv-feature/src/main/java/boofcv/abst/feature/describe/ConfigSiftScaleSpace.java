@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,5 +65,12 @@ public class ConfigSiftScaleSpace implements Configuration {
 	@Override
 	public void checkValidity() {
 
+	}
+
+	public void setTo( ConfigSiftScaleSpace src ) {
+		this.sigma0 = src.sigma0;
+		this.numScales = src.numScales;
+		this.firstOctave = src.firstOctave;
+		this.lastOctave = src.lastOctave;
 	}
 }

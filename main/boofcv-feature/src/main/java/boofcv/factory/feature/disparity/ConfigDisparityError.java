@@ -39,6 +39,10 @@ public interface ConfigDisparityError extends Configuration {
 		public void checkValidity() {
 
 		}
+
+		public void setTo( Census src ) {
+			this.variant = src.variant;
+		}
 	}
 
 	/**
@@ -62,6 +66,11 @@ public interface ConfigDisparityError extends Configuration {
 		@Override
 		public void checkValidity() {
 
+		}
+
+		public void setTo( NCC src ) {
+			this.eps = src.eps;
+			this.normalizeInput = src.normalizeInput;
 		}
 	}
 
@@ -92,6 +101,13 @@ public interface ConfigDisparityError extends Configuration {
 		@Override
 		public void checkValidity() {
 
+		}
+
+		public void setTo( HMI src ) {
+			this.totalGrayLevels = src.totalGrayLevels;
+			this.pyramidLayers.setTo(src.pyramidLayers);
+			this.smoothingRadius = src.smoothingRadius;
+			this.extraIterations = src.extraIterations;
 		}
 	}
 }

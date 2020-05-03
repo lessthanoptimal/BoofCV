@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,13 +83,13 @@ public class ConfigExtract implements Configuration {
 	public ConfigExtract() {
 	}
 
-	public void setTo( ConfigExtract orig ) {
-		this.radius = orig.radius;
-		this.threshold = orig.threshold;
-		this.ignoreBorder = orig.ignoreBorder;
-		this.useStrictRule = orig.useStrictRule;
-		this.detectMinimums = orig.detectMinimums;
-		this.detectMaximums = orig.detectMaximums;
+	public void setTo( ConfigExtract src ) {
+		this.radius = src.radius;
+		this.threshold = src.threshold;
+		this.ignoreBorder = src.ignoreBorder;
+		this.useStrictRule = src.useStrictRule;
+		this.detectMinimums = src.detectMinimums;
+		this.detectMaximums = src.detectMaximums;
 	}
 
 	@Override

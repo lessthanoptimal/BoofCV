@@ -16,26 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.pyramid;
+package boofcv.abst.feature.describe;
 
-import boofcv.struct.pyramid.ConfigDiscreteLevels;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.Configuration;
+import boofcv.struct.StandardConfigurationChecks;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-class TestConfigPyramid2 {
-	@Test
-	void handleSelected() {
-		// well defined cases
-		assertEquals(3,new ConfigDiscreteLevels(-1,10,-1).computeLayers(40,80));
-		assertEquals(3,new ConfigDiscreteLevels(-1,-1,20).computeLayers(40,80));
-		assertEquals(3,new ConfigDiscreteLevels(3,-1,-1).computeLayers(40,80));
+class TestConfigBrief extends StandardConfigurationChecks {
+	public TestConfigBrief() {
+		super(ConfigBrief.class);
+	}
 
-		// ambiguous
-		assertEquals(2,new ConfigDiscreteLevels(-1,11,-1).computeLayers(40,80));
-		assertEquals(2,new ConfigDiscreteLevels(-1,-1,21).computeLayers(40,80));
+	@Override
+	public Configuration createNotDefault(Random rand) {
+		var config = new ConfigBrief();
+		config.radius = -5;
+		config.numPoints = 10;
+		config.blurSigma = 10;
+		config.blurRadius = 10;
+		config.fixed = false;
+		return config;
 	}
 }
