@@ -38,8 +38,6 @@ import java.util.Set;
  */
 public class ControlPanelStereoMonoTrackPnP extends JPanel {
 
-
-
 	ControlPanelVisOdomTrackPnP controlPnpDepth;
 	ControlPanelPointTrackers controlTrackers;
 	ControlPanelDisparitySparse controlDisparity;

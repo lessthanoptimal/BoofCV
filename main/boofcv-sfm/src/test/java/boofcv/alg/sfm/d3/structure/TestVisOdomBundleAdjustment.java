@@ -277,7 +277,7 @@ class TestVisOdomBundleAdjustment {
 
 		for (int i = 0; i < cloud.size(); i++) {
 			Point3D_F64 X = cloud.get(i);
-			vsba.addTrack(X.x,X.y,X.z,1.0).inlier = true;
+			vsba.addTrack(X.x,X.y,X.z,1.0).hasBeenInlier = true;
 		}
 
 		for (int viewidx = 0; viewidx < 5; viewidx++) {

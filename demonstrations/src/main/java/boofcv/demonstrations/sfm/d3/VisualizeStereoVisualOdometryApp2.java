@@ -26,8 +26,10 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
+import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
 import boofcv.factory.sfm.ConfigStereoMonoPnP;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.BoofSwingUtil;
@@ -205,6 +207,35 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.disparity.texture = 0.05;
 		config.disparity.subpixel = true;
 		config.disparity.validateRtoL = 1;
+
+		return config;
+	}
+
+	private static ConfigStereoDualTrackPnP createConfigStereoDualPnP() {
+		var config = new ConfigStereoDualTrackPnP();
+
+		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+
+		config.tracker.klt.toleranceFB = 3;
+		config.tracker.klt.pruneClose = true;
+		config.tracker.klt.config.maxIterations = 25;
+		config.tracker.klt.templateRadius = 4;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+
+		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
+		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
+		config.tracker.detDesc.detectPoint.general.radius = 5;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
+		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+
+		config.ransac.inlierThreshold = 1.5;
+		config.stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		config.stereoRadius = 6;
+		config.epipolarTol = 1.0;
+
+		config.keyframes.geoMinCoverage = 0.4;
 
 		return config;
 	}
@@ -433,7 +464,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		final ControlPanelPointCloud cloudColor = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
 
 		// controls for different algorithms
-		ControlPanelStereoDualTrackPnP controlDualTrack = new ControlPanelStereoDualTrackPnP();
+		ControlPanelStereoDualTrackPnP controlDualTrack = new ControlPanelStereoDualTrackPnP(
+				createConfigStereoDualPnP(), ()->bUpdateAlg.setEnabled(true));
 		ControlPanelStereoMonoTrackPnP controlMonoTrack = new ControlPanelStereoMonoTrackPnP(
 				createConfigStereoMonoPnP(), ()->bUpdateAlg.setEnabled(true));
 
@@ -479,7 +511,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 			var tabbedTopPane = new JTabbedPane();
 			tabbedTopPane.addTab("Visuals",panelVisuals);
-			tabbedTopPane.addTab("Tuning",panelTuning);
+			tabbedTopPane.addTab("Configure",panelTuning);
 
 			addLabeled(videoFrameLabel,"Frame");
 			addLabeled(processingTimeLabel,"Processing (ms)");

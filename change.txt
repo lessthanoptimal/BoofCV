@@ -73,6 +73,8 @@ Version : 0.36
   * TODO update DualTrack
   * TODO update Quad
   * TODO GUI - Add Kernel Radius to Corner Detector Config
+  * TODO why so few tracks at first and tends to glitch. for all
+  * TODO visualize track age with color??
 - Stereo
   * Added sparse disparity with Census and NCC
   * Added Census support for F32 images

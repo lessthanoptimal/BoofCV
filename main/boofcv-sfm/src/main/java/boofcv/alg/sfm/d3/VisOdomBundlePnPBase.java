@@ -80,9 +80,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	// is this the first camera view being processed?
 	protected boolean first = true;
 
-	/**
-	 * Lens distortion camera models
-	 */
+	/** Lens distortion fpr the cameras */
 	protected @Getter final List<CameraModel> cameraModels = new ArrayList<>();
 
 	/** Triangulates points not optimized by bundle adjustment */

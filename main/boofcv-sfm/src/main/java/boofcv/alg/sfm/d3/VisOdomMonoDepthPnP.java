@@ -66,7 +66,7 @@ import java.util.List;
 public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		extends VisOdomBundlePnPBase<VisOdomMonoDepthPnP.Track> {
 
-	// tracks features in the image
+	/** Point image feature tracker */
 	private final @Getter PointTracker<T> tracker;
 	/** used to estimate a feature's 3D position from image range data */
 	private final @Getter ImagePixelTo3D pixelTo3D;
@@ -210,7 +210,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		if( profileOut != null ) {
 			double timeTotal = (time6-time0)*1e-6;
-			profileOut.printf("StereoVO: TRK %5.1f Est %5.1f Bun %5.1f DU %5.1f Scene %5.1f Spn  %5.1f TOTAL %5.1f\n",
+			profileOut.printf("TIME: TRK %5.1f Est %5.1f Bun %5.1f DU %5.1f Scene %5.1f Spn  %5.1f TOTAL %5.1f\n",
 					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance,timeSpawn,timeTotal);
 		}
 
@@ -246,10 +246,12 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	 */
 	private void optimizeTheScene() {
 		// Update the state estimate
-		scene.optimize();
+		if( scene.isOptimizeActive() ) {
+			scene.optimize();
+			triangulateNotSelectedBundleTracks();
+		}
 		// Save the output
 		current_to_world.set(frameCurrent.frame_to_world);
-		triangulateNotSelectedBundleTracks();
 	}
 
 	private void handleDroppedVisualTracks() {
@@ -299,7 +301,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			PointTrack p = active.get(index);
 			Track t = p.getCookie();
 			t.lastUsed = frameID;
-			t.inlier = true;
+			t.hasBeenInlier = true;
 			scene.addObservation(frameCurrent, t, p.pixel.x, p.pixel.y);
 			inlierTracks.add( t );
 		}

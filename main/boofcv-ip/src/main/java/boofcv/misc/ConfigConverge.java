@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class ConfigConverge implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( maxIterations <= 0)
-			throw new IllegalArgumentException("Max iterations has to be set to a value more than zero");
+		if( maxIterations < 0)
+			throw new IllegalArgumentException("Max iterations has to be set to a value more than or equal to zero");
 	}
 }

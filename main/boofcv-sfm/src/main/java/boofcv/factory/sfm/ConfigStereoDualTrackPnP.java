@@ -56,6 +56,7 @@ public class ConfigStereoDualTrackPnP extends ConfigVisOdomTrackPnP
 		tracker.detDesc.detectPoint.general.radius = 5;
 
 		stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		stereoDescribe.brief.fixed = true;
 	}
 
 	@Override

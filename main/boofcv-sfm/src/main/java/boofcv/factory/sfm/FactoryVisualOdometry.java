@@ -219,9 +219,12 @@ public class FactoryVisualOdometry {
 			refine = FactoryMultiView.pnpRefine(1e-12,configVO.refineIterations);
 		}
 
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
-		bundleAdjustment.configure(configVO.sbaConverge.ftol,configVO.sbaConverge.gtol,configVO.sbaConverge.maxIterations);
-
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = null;
+		if( configVO.sbaConverge.maxIterations > 0 ) {
+			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
+			bundleAdjustment.configure(configVO.sbaConverge.ftol, configVO.sbaConverge.gtol,
+					configVO.sbaConverge.maxIterations);
+		}
 		VisOdomKeyFrameManager keyframe;
 		switch (configVO.keyframes.type) {
 			case MAX_GEO: keyframe = new MaxGeoKeyFrameManager(configVO.keyframes.geoMinCoverage);break;
@@ -426,8 +429,24 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of input image
 	 * @return The new instance
 	 */
-	public static <T extends ImageGray<T>, Desc extends TupleDesc>
+	public static <T extends ImageGray<T>>
 	StereoVisualOdometry<T> stereoDualTrackerPnP( @Nullable ConfigStereoDualTrackPnP configVO, Class<T> imageType) {
+		if( configVO == null )
+			configVO = new ConfigStereoDualTrackPnP();
+		configVO.checkValidity();
+
+		PointTracker<T> trackerLeft = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
+		PointTracker<T> trackerRight = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
+
+		return stereoDualTrackerPnP(configVO,trackerLeft,trackerRight,configVO,imageType);
+	}
+
+	public static <T extends ImageGray<T>, Desc extends TupleDesc>
+	StereoVisualOdometry<T> stereoDualTrackerPnP( ConfigVisOdomTrackPnP configVO,
+												  PointTracker<T> trackerLeft,
+												  PointTracker<T> trackerRight,
+												  ConfigStereoDualTrackPnP hack,
+												  Class<T> imageType) {
 		if( configVO == null )
 			configVO = new ConfigStereoDualTrackPnP();
 		configVO.checkValidity();
@@ -454,12 +473,12 @@ public class FactoryVisualOdometry {
 		Triangulate2ViewsMetric triangulate2 = FactoryMultiView.triangulate2ViewMetric(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
-		PointTracker<T> trackerLeft = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
-		PointTracker<T> trackerRight = FactoryPointTracker.tracker(configVO.tracker,imageType,null);
-
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
-		bundleAdjustment.configure(configVO.sbaConverge.ftol,configVO.sbaConverge.gtol,configVO.sbaConverge.maxIterations);
-
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = null;
+		if( configVO.sbaConverge.maxIterations > 0 ) {
+			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
+			bundleAdjustment.configure(configVO.sbaConverge.ftol, configVO.sbaConverge.gtol,
+					configVO.sbaConverge.maxIterations);
+		}
 		VisOdomKeyFrameManager keyframe;
 		switch (configVO.keyframes.type) {
 			case MAX_GEO: keyframe = new MaxGeoKeyFrameManager(configVO.keyframes.geoMinCoverage);break;
@@ -467,10 +486,10 @@ public class FactoryVisualOdometry {
 			default: throw new IllegalArgumentException("Unknown type "+configVO.keyframes.type);
 		}
 
-		DescribeRegionPoint<T,Desc> descriptor = FactoryDescribeRegionPoint.generic(configVO.stereoDescribe,imageType);
+		DescribeRegionPoint<T,Desc> descriptor = FactoryDescribeRegionPoint.generic(hack.stereoDescribe,imageType);
 		Class<Desc> descType = descriptor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
-		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, configVO.epipolarTol, descType);
+		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, hack.epipolarTol, descType);
 
 		// need to make sure associations are unique
 		AssociateDescription2D<Desc> associateUnique = associateL2R;
@@ -479,10 +498,10 @@ public class FactoryVisualOdometry {
 		}
 
 		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(
-				configVO.epipolarTol,trackerLeft, trackerRight, descriptor, associateUnique, triangulate2,
+				hack.epipolarTol,trackerLeft, trackerRight, descriptor, associateUnique, triangulate2,
 				motion, refinePnP, bundleAdjustment );
 
-		alg.setDescribeRadius(configVO.stereoRadius);
+		alg.setDescribeRadius(hack.stereoRadius);
 		alg.setFrameManager(keyframe);
 		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
 		alg.getScene().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;

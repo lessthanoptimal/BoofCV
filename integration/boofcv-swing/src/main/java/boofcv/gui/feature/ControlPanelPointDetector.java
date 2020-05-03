@@ -37,6 +37,8 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 	public ConfigPointDetector config;
 
 	private final JComboBox<String> comboType;
+	private final JSpinner spinnerKernel;
+	private final JCheckBox checkWeighted;
 	private final JSpinner spinnerRadius;
 	private final ControlPanelExtractor controlExtractor;
 	private final JSpinner spinnerMaxFeatures;
@@ -49,20 +51,60 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		this.config = config;
 		this.listener = listener;
 
+		spinnerKernel = spinner(1,1,1000,1);
+		checkWeighted = checkbox("Weighted",false,"Gaussian weighted or block");
 		spinnerRadius = spinner(config.scaleRadius,1.0,500.0,1.0);
 		comboType = combo(config.type.ordinal(),PointDetectorTypes.FIRST_ONLY);
 		controlExtractor = new ControlPanelExtractor(config.general,listener::handleChangePointDetector);
 		spinnerMaxFeatures = spinner(config.general.maxFeatures,-1,9999,50);
 
+		setKernelSize();
+		setWeighted();
+
 		controlExtractor.setBorder(BorderFactory.createEmptyBorder());
 		comboSelector = combo(config.general.selector.type.ordinal(), SelectLimitTypes.values());
 
 		addLabeled(comboType,"Type","Type of corner or blob detector");
+		addLabeled(spinnerKernel,"Kernel","Radius of convolutional kernel");
+		addAlignCenter(checkWeighted);
 		addLabeled(spinnerRadius,"Scale/Radius","Specified size given to scale invariant descriptors");
 		add(controlExtractor);
 		addLabeled(spinnerMaxFeatures,"Max Features","Maximum features it will detect. <= 0 for no limit");
 		addLabeled(comboSelector,  "Select",
 				"Method used to select points when more have been detected than the maximum allowed");
+	}
+
+	private void setKernelSize() {
+		int radius = -1;
+		switch( config.type ) {
+			case SHI_TOMASI: radius = config.shiTomasi.radius; break;
+			case HARRIS: radius = config.harris.radius; break;
+		}
+		spinnerKernel.removeChangeListener(this);
+		if( radius == -1 ) {
+			spinnerKernel.setEnabled(false);
+		} else {
+			spinnerKernel.setEnabled(true);
+			spinnerKernel.setValue(radius);
+		}
+		spinnerKernel.addChangeListener(this);
+	}
+
+	private void setWeighted() {
+		checkWeighted.removeActionListener(this);
+		switch( config.type ) {
+			case SHI_TOMASI:
+				checkWeighted.setEnabled(true);
+				checkWeighted.setSelected(config.shiTomasi.weighted);
+				break;
+			case HARRIS:
+				checkWeighted.setEnabled(true);
+				checkWeighted.setSelected(config.harris.weighted);
+				break;
+			default:
+				checkWeighted.setEnabled(false);
+		}
+		checkWeighted.addActionListener(this);
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
@@ -74,12 +116,24 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 	public void controlChanged(final Object source) {
 		if (source == comboType) {
 			config.type = PointDetectorTypes.FIRST_ONLY[comboType.getSelectedIndex()];
+			setKernelSize();
+			setWeighted();
 		} else if( source == spinnerMaxFeatures ) {
 			config.general.maxFeatures = ((Number) spinnerMaxFeatures.getValue()).intValue();
 		} else if( source == comboSelector) {
 			config.general.selector.type = SelectLimitTypes.values()[comboSelector.getSelectedIndex()];
 		} else if( source == spinnerRadius ) {
 			config.scaleRadius = ((Number) spinnerRadius.getValue()).doubleValue();
+		} else if( source == spinnerKernel ) {
+			switch( config.type ) {
+				case SHI_TOMASI: config.shiTomasi.radius = ((Number) spinnerKernel.getValue()).intValue(); break;
+				case HARRIS: config.harris.radius = ((Number) spinnerKernel.getValue()).intValue(); break;
+			}
+		} else if( source == checkWeighted ) {
+			switch( config.type ) {
+				case SHI_TOMASI: config.shiTomasi.weighted = checkWeighted.isSelected(); break;
+				case HARRIS: config.harris.weighted = checkWeighted.isSelected(); break;
+			}
 		} else {
 			throw new RuntimeException("Unknown source");
 		}

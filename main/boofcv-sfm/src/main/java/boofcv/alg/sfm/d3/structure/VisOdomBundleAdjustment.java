@@ -81,6 +81,11 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		copyResults();
 	}
 
+	/** Returns true if it is configured to be optimized */
+	public boolean isOptimizeActive() {
+		return bundleAdjustment != null;
+	}
+
 	/**
 	 * Adds a new camera to the scene
 	 */
@@ -314,8 +319,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		public PointTrack visualTrack;
 		public final Point4D_F64 worldLoc = new Point4D_F64();
 		public final FastQueue<BObservation> observations = new FastQueue<>(BObservation::new, BObservation::reset);
-		/** if true then the track should be considered for optimization inside of bundle adjustment */
-		public boolean inlier;
+		/** if true then the track has been an inlier at least once and should be considered for optimization */
+		public boolean hasBeenInlier;
 		/** true if it was selected for inclusion in the optimization */
 		public boolean selected;
 
@@ -338,7 +343,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		public void reset() {
 			worldLoc.set(0,0,0,0);
 			observations.reset();
-			inlier = false;
+			hasBeenInlier = false;
 			selected = false;
 			visualTrack = null;
 			id = -1;
