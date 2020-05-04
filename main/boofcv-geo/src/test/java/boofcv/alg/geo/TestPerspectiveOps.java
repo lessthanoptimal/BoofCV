@@ -33,10 +33,7 @@ import georegression.struct.EulerType;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.point.*;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.affine.AffinePointOps_F64;
@@ -705,7 +702,19 @@ class TestPerspectiveOps {
 	}
 
 	@Test
-	void homogenousTo3D() {
-		fail("Implement");
+	void homogenousTo3dPositiveZ() {
+		Point3D_F64 found = new Point3D_F64();
+		PerspectiveOps.homogenousTo3dPositiveZ(new Point4D_F64(4,6,8,2),1e8,1e-8,found);
+		assertEquals(0.0,found.distance(2,3,4), UtilEjml.TEST_F64);
+
+		// positive constraint is only enforced for points at infinity
+		PerspectiveOps.homogenousTo3dPositiveZ(new Point4D_F64(4,6,8,-2),1e8,1e-8,found);
+		assertEquals(0.0,found.distance(-2,-3,-4), UtilEjml.TEST_F64);
+
+		// point at infinity. chose to put it in front with positive z
+		double r = 1e8;
+		double d = Math.sqrt(4.0*4.0 + 6.0*6.0 + 8.0*8.0);
+		PerspectiveOps.homogenousTo3dPositiveZ(new Point4D_F64(-4,-6,-8,0),r,1e-8,found);
+		assertEquals(0.0,found.distance(4*r/d,6*r/d,8*r/d), UtilEjml.TEST_F64);
 	}
 }

@@ -294,7 +294,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 		long time4 = System.nanoTime();
 		boolean droppedCurrentFrame = performKeyFrameMaintenance(trackerLeft,2);
-		updateListOfVisibleTracksForOutput();
 		long time5 = System.nanoTime();
 		if( !droppedCurrentFrame ) {
 			if( verbose != null ) verbose.println("Saving new key frames");
@@ -547,7 +546,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 				bt.visualTrack = trackL;
 				bt.visualRight = trackR;
 				bt.lastStereoFrame = bt.lastSeenRightFrame = frameID;
-				bt.lastInlier = -1;
 				trackL.cookie = bt;
 				trackR.cookie = bt;
 

@@ -70,11 +70,9 @@ Version : 0.36
 - Visual Odometry
   * Re-wrote VisualizeStereoVisualOdometryApp. Much better visualization and more configurable
   * All stereo visual odometry algorithms now support multiple key frames and bundle adjustment
-  * TODO update DualTrack
-  * TODO update Quad
-  * TODO GUI - Add Kernel Radius to Corner Detector Config
-  * TODO why so few tracks at first and tends to glitch. for all
-  * TODO visualize track age with color??
+  * TODO Update Quad
+  * TODO Fix that null pointer in dual track
+  * TODO Fix halting issue in visualization
 - Stereo
   * Added sparse disparity with Census and NCC
   * Added Census support for F32 images
@@ -105,8 +103,9 @@ TODO Regression
    - Template matching
 
 TODO Geometry
-   - Triangulation which minimizes pixel error
+   - Triangulation refine which minimizes pixel error
    - Triangulation for a calibrated camera and homogenous coordinates
+   - P3P equivalent for multiple cameras with known relationships
 
 TODO Sparse Disparity Undistort using camera model
 

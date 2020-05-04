@@ -26,9 +26,9 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomStereoDualTrackPnP extends CheckVisualOdometryStereoSim<GrayF32> {
+public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<GrayF32> {
 
-	public TestWrapVisOdomStereoDualTrackPnP() {super(GrayF32.class);}
+	public TestWrapVisOdomDualTrackPnP() {super(GrayF32.class);}
 
 	@Override
 	public StereoVisualOdometry<GrayF32> createAlgorithm() {

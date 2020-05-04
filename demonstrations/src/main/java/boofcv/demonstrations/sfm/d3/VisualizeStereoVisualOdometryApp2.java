@@ -96,6 +96,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	final FastQueue<Se3_F64> egoMotion_cam_to_world = new FastQueue<>(Se3_F64::new); // estimated ego motion
 	final GrowQueue_I32 visibleTracks = new GrowQueue_I32(); // index of tracks visible in current frame in 'features'
 	final TLongIntMap trackId_to_arrayIdx = new TLongIntHashMap(); // track ID to array Index
+	volatile long latestFrameID; // the frame ID after processing the most recent image
 	//-------------- END lock
 
 	// number if stereo frames processed
@@ -199,6 +200,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
 		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
 
+		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
+		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
+
 		config.disparity.disparityMin = 0;
 		config.disparity.disparityRange = 50;
 		config.disparity.regionRadiusX = 3;
@@ -229,6 +233,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.general.radius = 5;
 		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
 		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+
+		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
+		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
 
 		config.scene.ransac.inlierThreshold = 1.5;
 		config.stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
@@ -304,6 +311,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		boolean success = alg.process(inputLeft,inputRight);
 		long time1 = System.nanoTime();
 
+		latestFrameID = alg.getFrameID();
 		Se3_F64 camera_to_world = alg.getCameraToWorld();
 		Se3_F64 world_to_camera = camera_to_world.invert(null);
 
@@ -435,6 +443,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		int showEveryCameraN = 5; // show the camera every N frames
 		// the maximum number of frames in the past the track was first spawned and stuff be visible. 0 = infinite
 		int maxTrackAge=0;
+		int trackColors=0; // 0 = depth, 1 = age
 
 		final JLabel videoFrameLabel = new JLabel();
 		final JButton bPause = button("Pause",true);
@@ -451,9 +460,10 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		final JComboBox<String> comboApproach = combo(0,"Mono Stereo","Dual Track","Quad View");
 		final JPanel panelApproach = new JPanel(new BorderLayout());
 
-		// Stereo Visualization Controls
+		// Image Visualization Controls
 		final JCheckBox checkInliers = checkbox("Inliers",showInliers,"Only draw inliers");
 		final JCheckBox checkNew = checkbox("New",showNew,"Highlight new tracks");
+		final JComboBox<String> comboTrackColors = combo(trackColors,"Depth","Age");
 
 		// Cloud Visualization Controls
 		final JSpinner spinMaxDepth = spinner(maxDepth,0.0,100.0,1.0);
@@ -483,8 +493,10 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			panelInfo.addLabeled(labelBundleN,"Bundle Tracks","Features included in bundle adjustment");
 			panelInfo.addLabeled(labelTraveled,"Distance","Distance traveled in world units");
 
-			JPanel panelStereo = gridPanel(0,2,0,2,checkInliers, checkNew);
-			panelStereo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Stereo"));
+			var panelImage = new StandardAlgConfigPanel();
+			panelImage.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Image"));
+			panelImage.add(fillHorizontally(gridPanel(0,2,0,2,checkInliers, checkNew)));
+			panelImage.addLabeled(comboTrackColors,"Color","How tracks are colored in the image");
 
 			var panelCloud = new StandardAlgConfigPanel();
 			panelCloud.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Cloud"));
@@ -497,7 +509,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			var panelVisuals = new JPanel();
 			panelVisuals.setLayout(new BoxLayout(panelVisuals,BoxLayout.Y_AXIS));
 			panelVisuals.add(fillHorizontally(panelInfo));
-			panelVisuals.add(fillHorizontally(panelStereo));
+			panelVisuals.add(fillHorizontally(panelImage));
 			panelVisuals.add(fillHorizontally(panelCloud));
 
 			var panelTuning = new JPanel();
@@ -547,6 +559,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				stereoPanel.repaint();
 			} else if( source == checkNew ) {
 				showNew = checkNew.isSelected();
+				stereoPanel.repaint();
+			} else if( source == comboTrackColors ) {
+				trackColors = comboTrackColors.getSelectedIndex();
 				stereoPanel.repaint();
 			} else if( source == checkCloud ) {
 				showCloud = checkCloud.isSelected();
@@ -614,6 +629,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			var tranRight = new AffineTransform(scale,0,0,scale,0,lh*scale);
 			g2.drawImage(right,tranRight,null);
 
+			final long latestFrameID = VisualizeStereoVisualOdometryApp2.this.latestFrameID;
+
 			// Draw point features
 			synchronized (features) {
 				if( visibleTracks.size == 0 )
@@ -621,10 +638,14 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 				// Adaptive colorize depths based on distribution in current frame
 				var depths = new GrowQueue_F64();
+				long maxAge = Long.MAX_VALUE;
 				depths.reset();
 				for (int i = 0; i < visibleTracks.size; i++) {
-					depths.add( features.get(visibleTracks.get(i)).depth );
+					FeatureInfo f = features.get(visibleTracks.get(i));
+					maxAge = Math.min(maxAge,f.firstFrame);
+					depths.add(f.depth );
 				}
+				maxAge = latestFrameID - maxAge;
 				depths.sort();
 				double depthScale = depths.getFraction(0.8);
 
@@ -635,11 +656,18 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 					if( !(!controls.showInliers || f.inlier) )
 						continue;
 
-					double r = f.depth / depthScale;
-					if (r < 0) r = 0;
-					else if (r > 1) r = 1;
+					int color;
+					if( controls.trackColors == 0 ) { // Colorized based on depth
+						double r = f.depth / depthScale;
+						if (r < 0) r = 0;
+						else if (r > 1) r = 1;
+						color = (255 << 16) | ((int) (255 * r) << 8);
+					} else { // Colorize based on age
+						double fraction = (latestFrameID-f.firstFrame)/(double)maxAge;
+						double fractionGreen = Math.max(0,0.3-fraction)/0.3;
+						color = ((int)(255*fraction) << 16) | ((int) (255 * fractionGreen) << 8) | 0x99;
+					}
 
-					int color = (255 << 16) | ((int) (255 * r) << 8);
 					VisualizeFeatures.drawPoint(g2, f.pixel.x * scale, f.pixel.y * scale, 4.0, new Color(color), false);
 
 					// if requested, draw a circle around tracks spawned in this frame
