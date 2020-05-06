@@ -32,11 +32,9 @@ import boofcv.struct.Configuration;
 public class ConfigVisOdomTrackPnP implements Configuration {
 
 	/** Configuration for Bundle Adjustment */
-	public ConfigBundleAdjustment sba = new ConfigBundleAdjustment();
-
+	public ConfigBundleAdjustment bundle = new ConfigBundleAdjustment();
 	/** Convergence criteria for bundle adjustment. Set max iterations to &le; 0 to disable */
-	public ConfigConverge sbaConverge = new ConfigConverge(1e-3,1e-3,1);
-
+	public ConfigConverge bundleConverge = new ConfigConverge(1e-3,1e-3,1);
 	/**
 	 * Maximum number of features optimized in bundle adjustment per key frame. This is a very good way to limit
 	 * the amount of CPU used. If not positive then unlimited. &le; 0 to disable.
@@ -64,7 +62,7 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		sbaConverge.checkValidity();
+		bundleConverge.checkValidity();
 		keyframes.checkValidity();
 
 		if( bundleMinObservations < 2 )
@@ -72,8 +70,8 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 	}
 
 	public void setTo( ConfigVisOdomTrackPnP src ) {
-		this.sba.setTo(src.sba);
-		this.sbaConverge.setTo(src.sbaConverge);
+		this.bundle.setTo(src.bundle);
+		this.bundleConverge.setTo(src.bundleConverge);
 		this.bundleMaxFeaturesPerFrame = src.bundleMaxFeaturesPerFrame;
 		this.bundleMinObservations = src.bundleMinObservations;
 		this.dropOutlierTracks = src.dropOutlierTracks;
@@ -83,5 +81,4 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 		this.pnp = src.pnp;
 		this.keyframes.setTo(src.keyframes);
 	}
-
 }

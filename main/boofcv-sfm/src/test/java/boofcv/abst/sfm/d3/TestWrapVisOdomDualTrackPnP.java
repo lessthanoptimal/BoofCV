@@ -34,7 +34,7 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Gr
 	public StereoVisualOdometry<GrayF32> createAlgorithm() {
 		var config = new ConfigStereoDualTrackPnP();
 
-		config.scene.sbaConverge.maxIterations = 10;
+		config.scene.bundleConverge.maxIterations = 10;
 		config.scene.ransac.inlierThreshold = 1.5;
 		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		config.tracker.klt.templateRadius = 3;

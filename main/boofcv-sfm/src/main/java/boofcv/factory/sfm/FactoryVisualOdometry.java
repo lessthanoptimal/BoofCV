@@ -85,7 +85,6 @@ import javax.annotation.Nullable;
  */
 public class FactoryVisualOdometry {
 
-
 	/**
 	 * Monocular plane based visual odometry algorithm which uses both points on the plane and off plane for motion
 	 * estimation.
@@ -220,10 +219,10 @@ public class FactoryVisualOdometry {
 		}
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = null;
-		if( configVO.sbaConverge.maxIterations > 0 ) {
-			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
-			bundleAdjustment.configure(configVO.sbaConverge.ftol, configVO.sbaConverge.gtol,
-					configVO.sbaConverge.maxIterations);
+		if( configVO.bundleConverge.maxIterations > 0 ) {
+			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.bundle);
+			bundleAdjustment.configure(configVO.bundleConverge.ftol, configVO.bundleConverge.gtol,
+					configVO.bundleConverge.maxIterations);
 		}
 		VisOdomKeyFrameManager keyframe;
 		switch (configVO.keyframes.type) {
@@ -474,10 +473,10 @@ public class FactoryVisualOdometry {
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = null;
-		if( configVO.sbaConverge.maxIterations > 0 ) {
-			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
-			bundleAdjustment.configure(configVO.sbaConverge.ftol, configVO.sbaConverge.gtol,
-					configVO.sbaConverge.maxIterations);
+		if( configVO.bundleConverge.maxIterations > 0 ) {
+			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.bundle);
+			bundleAdjustment.configure(configVO.bundleConverge.ftol, configVO.bundleConverge.gtol,
+					configVO.bundleConverge.maxIterations);
 		}
 		VisOdomKeyFrameManager keyframe;
 		switch (configVO.keyframes.type) {

@@ -57,7 +57,7 @@ public class ControlPanelVisOdomTrackPnP extends StandardAlgConfigPanel {
 		spinRansacTol = spinner(config.ransac.inlierThreshold,0.0,50.0,0.2);
 		spinRefinePnP = spinner(config.refineIterations,0,999,1);
 		comboPnpType = combo(config.pnp.ordinal(),VALUES_PNP);
-		spinBundleMaxIter = spinner(config.sbaConverge.maxIterations,0,999,1);
+		spinBundleMaxIter = spinner(config.bundleConverge.maxIterations,0,999,1);
 		spinBundleFeatFrame = spinner(config.bundleMaxFeaturesPerFrame,0,999,1);
 		spinBundleMinObs = spinner(config.bundleMinObservations,2,50,1);
 
@@ -99,7 +99,7 @@ public class ControlPanelVisOdomTrackPnP extends StandardAlgConfigPanel {
 		} else if( spinRefinePnP == source ) {
 			config.refineIterations = (Integer)spinRefinePnP.getValue();
 		} else if( spinBundleMaxIter == source ) {
-			config.sbaConverge.maxIterations = (Integer) spinBundleMaxIter.getValue();
+			config.bundleConverge.maxIterations = (Integer) spinBundleMaxIter.getValue();
 		} else if( spinBundleFeatFrame == source ) {
 			config.bundleMaxFeaturesPerFrame = (Integer) spinBundleFeatFrame.getValue();
 		} else if( spinBundleMinObs == source ) {

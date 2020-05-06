@@ -73,6 +73,8 @@ Version : 0.36
   * TODO Update Quad
   * TODO Fix that null pointer in dual track
   * TODO Fix halting issue in visualization
+  * TODO Fix invalid association approach with BRIEF
+  * TODO Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
 - Stereo
   * Added sparse disparity with Census and NCC
   * Added Census support for F32 images

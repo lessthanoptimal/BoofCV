@@ -46,7 +46,7 @@ public interface VisualOdometry<M> extends VerbosePrint {
 	 *
 	 * @return true if a fatal error has occurred.
 	 */
-	boolean isFault();
+	boolean isFault(); // TODO delete
 
 	/**
 	 * Returns the estimated motion relative to the first frame in which a fatal error
@@ -54,10 +54,26 @@ public interface VisualOdometry<M> extends VerbosePrint {
 	 *
 	 * @return Found pose.
 	 */
-	M getCameraToWorld();
+	M getCameraToWorld(); // TODO delete
 
 	/**
 	 * Returns the ID of the most recently processed frame. Starts at zero and increments with each call to process.
 	 */
 	long getFrameID();
+
+	// The idea with the origin frame is that only information back to that frame is considered when estimating the
+	// current pose.
+
+	/**
+	 * returns the ID of the origin frame that motion is estimated relative to
+	 */
+//	long getOriginFrameID();
+
+	/**
+	 * Relationship between the current frame and the origin frame.
+	 *
+	 * @param storage Where the transform is written to
+	 * @return true if it is known or false if it is not
+	 */
+//	boolean getCurrentToOrigin( M storage );
 }
