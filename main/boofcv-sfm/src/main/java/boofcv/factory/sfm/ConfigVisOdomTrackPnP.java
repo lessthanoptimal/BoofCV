@@ -50,7 +50,7 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 	/** Drop tracks if they have been outliers for this many frames in a row */
 	public int dropOutlierTracks = 2;
 	/** Maximum number of key frames it will save. Must be at least 4*/
-	public int maxKeyFrames = 8;
+	public int maxKeyFrames = 5;
 	/** Configuration for RANSAC. Used to robustly estimate frame-to-frame motion */
 	public ConfigRansac ransac = new ConfigRansac(500,1.5);
 	/** Number of iterations to perform when refining the initial frame-to-frame motion estimate. Disable &le; 0 */

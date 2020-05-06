@@ -22,6 +22,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.gui.image.SaveImageOnClick;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
@@ -54,6 +55,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>
@@ -78,6 +80,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	// Wireframes which will be rendered. Also the LOCK
 	private final FastQueue<Wireframe> wireframes = new FastQueue<>(Wireframe::new);
+	private final ReentrantLock lockWireFrame = new ReentrantLock();
 
 	// Maximum render distance
 	float maxRenderDistance = Float.MAX_VALUE;
@@ -89,29 +92,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// intrinsic camera parameters
 	float hfov = UtilAngle.radian(50);
 
-	//--------- Work Variables for Rendering
-	// transform from world frame to camera frame
-	// Only write to it inside the UI thread. If it is read outside of the UI thread then it needs to be locked
-	final Se3_F32 worldToCamera = new Se3_F32();
-
-	// used when rendering wireframes
-	private final FastQueue<Point3D_F32> cameraPts = new FastQueue<>(Point3D_F32::new);
-	private final FastQueue<Point2D_F32> pixels = new FastQueue<>(Point2D_F32::new);
-	private final GrowQueue_B visible = new GrowQueue_B();
-
-	// used when rendering the point cloud
-	private final Point3D_F32 worldPt = new Point3D_F32();
-	private final Point3D_F32 cameraPt = new Point3D_F32();
-	private final Point3D_F32 pixel = new Point3D_F32();
-
-	// how far it moves in the world frame for each key press
-	float stepSize;
-
-	GrayS32 imageRgb = new GrayS32(1,1);
-	GrayF32 imageDepth = new GrayF32(1,1);
-
-	BufferedImage imageOutput = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
-	//--------- END work variables
+	// work space for rendering. Must be locked
+	private final RenderingWork rendering = new RenderingWork();
 
 	private int dotRadius = 2; // radius of square dot
 	int backgroundColor = 0; // RGB 32-bit format
@@ -123,6 +105,33 @@ public class PointCloudViewerPanelSwing extends JPanel
 	Keyboard keyboard = new Keyboard();
 	ScheduledExecutorService pressedTask;
 
+	// how far it moves in the world frame for each key press
+	volatile float stepSize;
+
+	private static class RenderingWork {
+		// Lock which must be enforced when rendering
+		private final ReentrantLock lock = new ReentrantLock();
+
+		// transform from world frame to camera frame
+		// Only write to it inside the UI thread. If it is read outside of the UI thread then it needs to be locked
+		final Se3_F32 worldToCamera = new Se3_F32();
+
+		// used when rendering wireframes
+		private final FastQueue<Point3D_F32> cameraPts = new FastQueue<>(Point3D_F32::new);
+		private final FastQueue<Point2D_F32> pixels = new FastQueue<>(Point2D_F32::new);
+		private final GrowQueue_B visible = new GrowQueue_B();
+
+		// used when rendering the point cloud
+		private final Point3D_F32 worldPt = new Point3D_F32();
+		private final Point3D_F32 cameraPt = new Point3D_F32();
+		private final Point2D_F32 pixel = new Point2D_F32();
+
+		GrayS32 imageRgb = new GrayS32(1,1);
+		GrayF32 imageDepth = new GrayF32(1,1);
+
+		BufferedImage imageOutput = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+	}
+
 	public PointCloudViewerPanelSwing(float keyStepSize ) {
 
 		addMouseListener(new SaveImageOnClick(this));
@@ -132,7 +141,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 		addMouseWheelListener(this);
 		setFocusable(true);
 		requestFocus();
-		this.stepSize = keyStepSize;
+
+		stepSize = keyStepSize;
 
 		addFocusListener(new FocusListener(){
 			@Override
@@ -167,7 +177,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 	}
 
 	public void addWireFrame(List<Point3D_F64> vertexes, boolean closed, int rgb, int radiusPixels) {
-		synchronized (wireframes) {
+		try {
+			lockWireFrame.lock();
 			if (vertexes.size() <= 1)
 				return;
 			Wireframe wf = wireframes.grow();
@@ -181,11 +192,18 @@ public class PointCloudViewerPanelSwing extends JPanel
 			if (closed) {
 				ConvertFloatType.convert(vertexes.get(0), wf.vertexes.grow());
 			}
+		} finally {
+			lockWireFrame.unlock();
 		}
 	}
 
 	public void setWorldToCamera( Se3_F32 worldToCamera ) {
-		this.worldToCamera.set(worldToCamera);
+		try {
+			rendering.lock.lock();
+			rendering.worldToCamera.set(worldToCamera);
+		} finally {
+			rendering.lock.unlock();
+		}
 	}
 
 	public void setHorizontalFieldOfView( float radians ) {
@@ -197,8 +215,11 @@ public class PointCloudViewerPanelSwing extends JPanel
 			cloudXyz.reset();
 			cloudColor.reset();
 		}
-		synchronized (wireframes) {
+		try {
+			lockWireFrame.lock();
 			wireframes.reset();
+		} finally {
+			lockWireFrame.unlock();
 		}
 	}
 
@@ -232,34 +253,46 @@ public class PointCloudViewerPanelSwing extends JPanel
 	public Se3_F32 getWorldToCamera(@Nullable Se3_F32 worldToCamera ) {
 		if( worldToCamera == null )
 			worldToCamera = new Se3_F32();
-		synchronized (this.worldToCamera ) {
-			worldToCamera.set(this.worldToCamera);
+		try {
+			rendering.lock.lock();
+			worldToCamera.set(rendering.worldToCamera);
+		} finally {
+			rendering.lock.unlock();
 		}
 		return worldToCamera;
 	}
 
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		try {
+			rendering.lock.lock();
+			projectScene();
+			rendering.imageOutput = ConvertBufferedImage.checkDeclare(
+					rendering.imageRgb.width, rendering.imageRgb.height, rendering.imageOutput, BufferedImage.TYPE_INT_RGB);
+			DataBufferInt buffer = (DataBufferInt) rendering.imageOutput.getRaster().getDataBuffer();
+			System.arraycopy(rendering.imageRgb.data, 0, buffer.getData(), 0, rendering.imageRgb.width * rendering.imageRgb.height);
+			g.drawImage(rendering.imageOutput, 0, 0, null);
 
-		projectScene();
-		imageOutput = ConvertBufferedImage.checkDeclare(imageRgb.width,imageRgb.height,imageOutput,BufferedImage.TYPE_INT_RGB);
-		DataBufferInt buffer = (DataBufferInt)imageOutput.getRaster().getDataBuffer();
-		System.arraycopy(imageRgb.data,0,buffer.getData(),0,imageRgb.width*imageRgb.height);
-		g.drawImage(imageOutput,0,0,null);
+		} finally {
+			rendering.lock.unlock();
+		}
 	}
 
-	private synchronized void projectScene() {
+	private void projectScene() {
+		if( !rendering.lock.isLocked() )
+			throw new RuntimeException("Must be locked already");
+
 		int w = getWidth();
 		int h = getHeight();
 
-		imageDepth.reshape(w,h);
-		imageRgb.reshape(w,h);
+		rendering.imageDepth.reshape(w,h);
+		rendering.imageRgb.reshape(w,h);
 
 		CameraPinhole intrinsic = PerspectiveOps.createIntrinsic(w,h,UtilAngle.degree(hfov));
 
-		ImageMiscOps.fill(imageDepth,Float.MAX_VALUE);
-		ImageMiscOps.fill(imageRgb,backgroundColor);
+		ImageMiscOps.fill(rendering.imageDepth,Float.MAX_VALUE);
+		ImageMiscOps.fill(rendering.imageRgb,backgroundColor);
 
 		float maxDistanceSq = maxRenderDistance*maxRenderDistance;
 		if( Float.isInfinite(maxDistanceSq))
@@ -268,12 +301,25 @@ public class PointCloudViewerPanelSwing extends JPanel
 		synchronized (cloudXyz) {
 			renderCloud(intrinsic, colorizer, maxDistanceSq);
 		}
-		synchronized (wireframes) {
+
+		try {
+			lockWireFrame.lock();
 			renderWireframes(intrinsic, maxDistanceSq);
+		} finally {
+			lockWireFrame.unlock();
 		}
 	}
 
 	private void renderCloud(CameraPinhole intrinsic, final PointCloudViewer.Colorizer colorizer, float maxDistanceSq) {
+		if( !rendering.lock.isLocked() )
+			throw new RuntimeException("Must be locked already");
+
+		final Point2D_F32 pixel = rendering.pixel;
+		final Point3D_F32 worldPt = rendering.worldPt;
+		final Point3D_F32 cameraPt = rendering.worldPt;
+		final Se3_F32 worldToCamera = rendering.worldToCamera;
+		final GrayF32 imageDepth = rendering.imageDepth;
+
 		final float fx = (float)intrinsic.fx;
 		final float fy = (float)intrinsic.fy;
 		final float cx = (float)intrinsic.cx;
@@ -323,10 +369,24 @@ public class PointCloudViewerPanelSwing extends JPanel
 	 * Draws wire frame sprites
 	 */
 	private void renderWireframes(CameraPinhole intrinsic, float maxDistanceSq ) {
+		if( !rendering.lock.isLocked() )
+			throw new RuntimeException("Must be locked already");
+		if( !lockWireFrame.isLocked() )
+			throw new RuntimeException("Wireframe must already be locked");
+
+		final FastQueue<Point3D_F32> cameraPts = rendering.cameraPts;
+		final FastQueue<Point2D_F32> pixels = rendering.pixels;
+		final GrowQueue_B visible = rendering.visible;
+		final Se3_F32 worldToCamera = rendering.worldToCamera;
+		final GrayF32 imageDepth = rendering.imageDepth;
+
 		final float fx = (float)intrinsic.fx;
 		final float fy = (float)intrinsic.fy;
 		final float cx = (float)intrinsic.cx;
 		final float cy = (float)intrinsic.cy;
+
+		// The number of points can blow up. This will pick a reasonable max to abort
+		final int maxDotsPerLine = rendering.imageDepth.width;
 
 		for (int wireIdx = 0; wireIdx < wireframes.size; wireIdx++) {
 			Wireframe wf = wireframes.get(wireIdx);
@@ -349,21 +409,28 @@ public class PointCloudViewerPanelSwing extends JPanel
 			// A line is drawn by rending square dots every pixel. This was done because it was easy to program
 			// rendering a smooth line is a way someone could improve this code
 			for (int i = 0, j = 1; j < wf.vertexes.size; i = j, j++) {
-				if (!visible.get(i) || !visible.get(j))
+				if (!visible.data[i] || !visible.data[j])
 					continue;
 				Point2D_F32 a = pixels.get(i);
 				Point2D_F32 b = pixels.get(j);
 				Point3D_F32 A = cameraPts.get(i);
 				Point3D_F32 B = cameraPts.get(j);
 
+				// If both pixels are outside the image skip and move on
+				if( !BoofMiscOps.isInside(imageDepth,a.x,a.y) && !BoofMiscOps.isInside(imageDepth,b.x,b.y) )
+					continue;
+				// NOTE: if one was outside then a good idea would be to find the intersection
+
 				float distance = a.distance(b);
 				// Draw the dots less often when the radius is larger make it render faster
 				int N = (int) Math.ceil(distance / (1.0 + 1.5 * wf.radiusPixels));
 
-				// skip the rest if it's too small
-				if (N < 1)
+				// skip the rest if it's too small or too big
+				// When it's too bug all the known cases are when one corner is outside the image
+				if (N < 1 || N > maxDotsPerLine)
 					continue;
 
+				final Point3D_F32 cameraPt = rendering.worldPt;
 				for (int locidx = 0; locidx < N; locidx++) {
 					// interpolate to find the coordinate along the line in 2D and 3D
 					float lineLoc = locidx / (float) N;
@@ -416,6 +483,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 	 * Renders a dot as a square sprite with the specified color
 	 */
 	private void renderDot( int cx , int cy , float Z , int rgb, final int dotRadius ) {
+		final GrayF32 imageDepth = rendering.imageDepth;
+		final GrayS32 imageRgb = rendering.imageRgb;
+
 		for (int i = -dotRadius; i <= dotRadius; i++) {
 			int y = cy+i;
 			if( y < 0 || y >= imageRgb.height )
@@ -471,7 +541,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 	}
 
 	private void handleKeyPress() {
-		Vector3D_F32 T = worldToCamera.getT();
+		double x=0,y=0,z=0;
+		boolean reset = false;
+		boolean change = true;
 
 		synchronized (pressed) {
 			double multiplier = shiftPressed?5:1;
@@ -479,16 +551,34 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 			for( int k : keys ) {
 				switch( k ) {
-					case KeyEvent.VK_W:T.z -= stepSize*multiplier; break;
-					case KeyEvent.VK_S:T.z += stepSize*multiplier; break;
-					case KeyEvent.VK_A:T.x += stepSize*multiplier; break;
-					case KeyEvent.VK_D:T.x -= stepSize*multiplier; break;
-					case KeyEvent.VK_Q:T.y -= stepSize*multiplier; break;
-					case KeyEvent.VK_E:T.y += stepSize*multiplier; break;
-					case KeyEvent.VK_H:worldToCamera.reset(); break;
+					case KeyEvent.VK_W:z -= multiplier; break;
+					case KeyEvent.VK_S:z += multiplier; break;
+					case KeyEvent.VK_A:x += multiplier; break;
+					case KeyEvent.VK_D:x -= multiplier; break;
+					case KeyEvent.VK_Q:y -= multiplier; break;
+					case KeyEvent.VK_E:y += multiplier; break;
+					case KeyEvent.VK_H:reset=true; break;
+					default: change = false; break;
 				}
 			}
 		}
+
+		if( change ) {
+			try {
+				rendering.lock.lock();
+				final float stepSize = this.stepSize;
+				final Vector3D_F32 T = rendering.worldToCamera.getT();
+				T.x += stepSize * x;
+				T.y += stepSize * y;
+				T.z += stepSize * z;
+				if (reset) {
+					rendering.worldToCamera.reset();
+				}
+			} finally {
+				rendering.lock.unlock();
+			}
+		}
+
 		repaint();
 	}
 
@@ -539,9 +629,13 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 		Se3_F32 rotTran = new Se3_F32();
 		ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
-		synchronized (worldToCamera) {
-			Se3_F32 temp = worldToCamera.concat(rotTran, null);
-			worldToCamera.set(temp);
+
+		try {
+			rendering.lock.lock();
+			Se3_F32 temp = rendering.worldToCamera.concat(rotTran, null);
+			rendering.worldToCamera.set(temp);
+		} finally {
+			rendering.lock.unlock();
 		}
 
 		prevX = e.getX();
@@ -552,6 +646,14 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	@Override
 	public void mouseMoved(MouseEvent e) {}
+
+	public float getStepSize() {
+		return stepSize;
+	}
+
+	public void setStepSize( float size ) {
+		stepSize = size;
+	}
 
 	public int getDotRadius() {
 		return dotRadius;

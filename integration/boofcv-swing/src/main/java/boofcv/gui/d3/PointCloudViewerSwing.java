@@ -53,7 +53,7 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 
 	@Override
 	public void setTranslationStep(double step) {
-		BoofSwingUtil.invokeNowOrLater(()->panel.stepSize = (float)step);
+		BoofSwingUtil.invokeNowOrLater(()->panel.setStepSize((float)step));
 	}
 
 	@Override

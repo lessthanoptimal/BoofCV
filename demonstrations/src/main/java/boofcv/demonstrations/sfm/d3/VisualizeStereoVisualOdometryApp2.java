@@ -203,6 +203,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
 		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
 
+		config.scene.maxKeyFrames = 4;
+
 		config.disparity.disparityMin = 0;
 		config.disparity.disparityRange = 50;
 		config.disparity.regionRadiusX = 3;
@@ -237,6 +239,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
 		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
 
+		config.scene.maxKeyFrames = 6;
 		config.scene.ransac.inlierThreshold = 1.5;
 		config.stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 		config.stereoRadius = 6;

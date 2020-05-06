@@ -72,7 +72,6 @@ Version : 0.36
   * All stereo visual odometry algorithms now support multiple key frames and bundle adjustment
   * TODO Update Quad
   * TODO Fix that null pointer in dual track
-  * TODO Fix halting issue in visualization
   * TODO Fix invalid association approach with BRIEF
   * TODO Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
 - Stereo
