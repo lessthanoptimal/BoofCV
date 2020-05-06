@@ -116,6 +116,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 		var split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,stereoPanel,cloudPanel);
 		split.setDividerLocation(320);
+		setAutomaticImageResize(split);
 
 		controls.setPreferredSize(new Dimension(200,0));
 
@@ -123,6 +124,22 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		add(BorderLayout.CENTER, split);
 
 		setPreferredSize(new Dimension(1200,600));
+	}
+
+	/**
+	 * Resize the image view automatically as the divider is changed
+	 */
+	private void setAutomaticImageResize(JSplitPane split) {
+		split.addPropertyChangeListener(changeEvent -> {
+			String propertyName = changeEvent.getPropertyName();
+			if (propertyName.equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
+				final T left = inputLeft;
+				if( left == null )
+					return;
+				double scale = split.getDividerLocation()/(double)left.width;
+				controls.setZoom(Math.min(1.0,scale));
+			}
+		});
 	}
 
 	@Override
