@@ -11,6 +11,7 @@ dependencies {
     api project(':integration:boofcv-swing')
 
     implementation project(':integration:boofcv-ffmpeg')
+    implementation project(':integration:boofcv-jcodec')
     implementation project(':integration:boofcv-WebcamCapture')
 
     api 'org.reflections:reflections:0.9.10'

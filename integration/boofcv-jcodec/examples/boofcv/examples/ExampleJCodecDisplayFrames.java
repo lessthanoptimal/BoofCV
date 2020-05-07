@@ -67,7 +67,7 @@ public class ExampleJCodecDisplayFrames {
 			gui.repaint();
 
 			try {
-				Thread.sleep(22);
+				Thread.sleep(200);
 			} catch (InterruptedException ignore) {}
 		}
 		System.out.println("Only read FPS = "+(totalNano/1000000.0)/sequence.getFrameNumber());

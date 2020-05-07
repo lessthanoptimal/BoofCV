@@ -64,7 +64,7 @@ public class FactoryDenseOpticalFlow {
 
 		if( configKlt == null ) {
 			configKlt = new ConfigPKlt();
-			configKlt.pyramidLevels = ConfigDiscreteLevels.minSize(30);
+			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(3);
 		}
 
 		if( derivType == null ) {

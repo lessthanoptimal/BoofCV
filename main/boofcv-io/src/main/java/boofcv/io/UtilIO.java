@@ -866,6 +866,41 @@ public class UtilIO {
 			throw new IOException("Failed to delete file: " + f);
 	}
 
+	public static String checkIfJarAndCopyToTemp(String filename ) {
+		// InputStream can't be seeked. This is a problem. Hack around it is to write the file
+		// to a temporary file or see if it's a file  pass that in
+		URL url = ensureURL(filename);
+		if( url == null )
+			throw new RuntimeException("Invalid: "+filename);
+		switch( url.getProtocol() ) {
+			case "file":
+				filename = url.getPath();
+				// the filename will include an extra / in windows, this is fine
+				// in Java but FFMPEG can't handle it. So this will strip off the
+				// extra character and be cross platform
+				filename = new File(filename).getAbsolutePath();
+				break;
+
+			case "jar":
+				System.out.println("Copying the file from the jar as a work around");
+				String suffix = FilenameUtils.getExtension(filename);
+				// copy the resource into a temporary file
+				try {
+					InputStream in = openStream(filename);
+					if( in == null ) throw new RuntimeException("Failed to open "+filename);
+					final File tempFile = File.createTempFile("boofcv_jar_hack_", suffix);
+					tempFile.deleteOnExit();
+					copyToFile(in,tempFile);
+					filename = tempFile.getAbsolutePath();
+				} catch( IOException e ) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+				break;
+		}
+		return filename;
+	}
+
 	public interface FileTest {
 		boolean isTarget( File f );
 	}

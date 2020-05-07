@@ -33,6 +33,7 @@ public class UtilJCodec {
 	 * @param output BoofCV image
 	 */
 	public static void convertToBoof(Picture input, ImageBase output) {
+		output.reshape(input.getWidth(), input.getHeight());
 		if( input.getColor() == ColorSpace.RGB ) {
 			ImplConvertJCodecPicture.RGB_to_PLU8(input, (Planar<GrayU8>) output);
 		} else if( input.getColor() == ColorSpace.YUV420 ) {

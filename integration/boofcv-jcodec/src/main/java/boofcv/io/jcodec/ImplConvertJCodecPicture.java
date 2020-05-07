@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class ImplConvertJCodecPicture {
 
 		output.reshape(input.getWidth(),input.getHeight());
 
-		int dataIn[] = input.getData()[0];
+		byte dataIn[] = input.getData()[0];
 
 		GrayU8 out0 = output.getBand(0);
 		GrayU8 out1 = output.getBand(1);
@@ -63,9 +63,9 @@ public class ImplConvertJCodecPicture {
 
 	public static void yuv420_to_PlRgb_U8(Picture input, Planar<GrayU8> output) {
 
-		int[] Y = input.getPlaneData(0);
-		int[] U = input.getPlaneData(1);
-		int[] V = input.getPlaneData(2);
+		byte[] Y = input.getPlaneData(0);
+		byte[] U = input.getPlaneData(1);
+		byte[] V = input.getPlaneData(2);
 
 		GrayU8 R = output.getBand(0);
 		GrayU8 G = output.getBand(1);
@@ -80,9 +80,9 @@ public class ImplConvertJCodecPicture {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(Y[indexY++] & 0xFF) - 16;
-				int cr = (U[indexUV] & 0xFF) - 128;
-				int cb = (V[indexUV] & 0xFF) - 128;
+				int y = 1191*(Y[indexY++] + 128) - 16;
+				int cr = U[indexUV];
+				int cb = V[indexUV];
 
 				if( y < 0 ) y = 0;
 
@@ -105,9 +105,9 @@ public class ImplConvertJCodecPicture {
 
 	public static void yuv420_to_PlRgb_F32(Picture input, Planar<GrayF32> output) {
 
-		int[] Y = input.getPlaneData(0);
-		int[] U = input.getPlaneData(1);
-		int[] V = input.getPlaneData(2);
+		byte[] Y = input.getPlaneData(0);
+		byte[] U = input.getPlaneData(1);
+		byte[] V = input.getPlaneData(2);
 
 		GrayF32 R = output.getBand(0);
 		GrayF32 G = output.getBand(1);
@@ -122,9 +122,9 @@ public class ImplConvertJCodecPicture {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(Y[indexY++] & 0xFF) - 16;
-				int cr = (U[indexUV] & 0xFF) - 128;
-				int cb = (V[indexUV] & 0xFF) - 128;
+				int y = 1191*(Y[indexY++] + 128) - 16;
+				int cr = U[indexUV];
+				int cb = V[indexUV];
 
 				if( y < 0 ) y = 0;
 
@@ -147,7 +147,7 @@ public class ImplConvertJCodecPicture {
 
 	public static void yuv420_to_U8(Picture input, GrayU8 output) {
 
-		int[] Y = input.getPlaneData(0);
+		byte[] Y = input.getPlaneData(0);
 
 		final int yStride = output.width;
 
@@ -156,7 +156,7 @@ public class ImplConvertJCodecPicture {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(Y[indexY++] & 0xFF) - 16;
+				int y = 1191*(Y[indexY++] + 128) - 16;
 				if( y < 0 ) y = 0;
 				y = y >> 10;
 
@@ -169,7 +169,7 @@ public class ImplConvertJCodecPicture {
 
 	public static void yuv420_to_F32(Picture input, GrayF32 output) {
 
-		int[] Y = input.getPlaneData(0);
+		byte[] Y = input.getPlaneData(0);
 
 		final int yStride = output.width;
 
@@ -178,7 +178,7 @@ public class ImplConvertJCodecPicture {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(Y[indexY++] & 0xFF) - 16;
+				int y = 1191*(Y[indexY++] + 128) - 16;
 				if( y < 0 ) y = 0;
 				y = y >> 10;
 

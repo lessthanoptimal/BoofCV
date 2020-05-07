@@ -91,6 +91,9 @@ Version : 0.36
   * Demonstration recent file list is now in YAML format and supports multiple files
   * Added settings
   * Added the ability to switch between different swing themes; darklaf and material-ui
+  * It will default to JCodec if all else fails when trying to load a movie.
+- JCodec
+  * It finally works correctly! Updated to latest release and fixed bad code in BoofCV.
 - Color
   * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
   * Fixed conversion between XYZ/LAB and RGB by applying Gamma correction.

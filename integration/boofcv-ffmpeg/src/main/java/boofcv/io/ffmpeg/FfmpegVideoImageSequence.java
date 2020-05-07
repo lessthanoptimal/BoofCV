@@ -29,10 +29,6 @@ import org.bytedeco.copiedstuff.FrameGrabber;
 import org.bytedeco.copiedstuff.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 import static org.bytedeco.javacpp.avutil.AV_LOG_ERROR;
 import static org.bytedeco.javacpp.avutil.av_log_set_level;
@@ -139,37 +135,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 
 	@Override
 	public void reset() {
-
-		// InputStream can't be seeked. This is a problem. Hack around it is to write the file
-		// to a temporary file or see if it's a file  pass that in
-		URL url = UtilIO.ensureURL(filename);
-		if( url == null )
-			throw new RuntimeException("Invalid: "+finished);
-		switch( url.getProtocol() ) {
-			case "file":
-				filename = url.getPath();
-				// the filename will include an extra / in windows, this is fine
-				// in Java but FFMPEG can't handle it. So this will strip off the
-				// extra character and be cross platform
-				filename = new File(filename).getAbsolutePath();
-				break;
-
-			case "jar":
-				System.out.println("Copying the file from the jar to work around ffmpeg");
-				// copy the resource into a temporary file
-				try {
-					InputStream in = UtilIO.openStream(filename);
-					if( in == null ) throw new RuntimeException("Failed to open "+filename);
-					final File tempFile = File.createTempFile("boofcv_ffmpeg_", ".mp4");
-					tempFile.deleteOnExit();
-					UtilIO.copyToFile(in,tempFile);
-					filename = tempFile.getAbsolutePath();
-				} catch( IOException e ) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-				break;
-		}
+		filename = UtilIO.checkIfJarAndCopyToTemp(filename);
 
 		this.frameGrabber = new FFmpegFrameGrabber(filename);
 		try {
@@ -191,4 +157,5 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 			finished = true;
 		}
 	}
+
 }

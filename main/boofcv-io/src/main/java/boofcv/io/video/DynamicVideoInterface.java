@@ -70,34 +70,36 @@ public class DynamicVideoInterface implements VideoInterface {
 				return new LoadFileImageSequence<>(imageType,url.getFile(),null);
 		}
 
+		String lowerName = fileName.toLowerCase();
+
 		InputStream stream=null;
 		try {
 			stream = url.openStream();
 
 			// Use built in movie readers for these file types
-			if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||
-					fileName.endsWith("mjpg") || fileName.endsWith("MJPG") ) {
+			if( lowerName.endsWith("mjpeg") || lowerName.endsWith("mjpg") ) {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
 				List<byte[]> data = codec.read(stream);
 				return new JpegByteImageSequence<>(imageType, data, false);
-			} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
+			} else if( lowerName.endsWith("mpng") ) {
 				return new ImageStreamSequence<>(stream, true, imageType);
 			}
 
 			try {
-				if( ffmpeg != null ) {
+				if (ffmpeg != null) {
 					return ffmpeg.load(fileName, imageType);
 				}
-			} catch( RuntimeException e ){
-//				e.printStackTrace();
-				return null;
-			}
+			} catch( UnsatisfiedLinkError e ){
+				// Trying to run on an architecture it doesn't have a binary for.
+				ffmpeg = null;
+			} catch( RuntimeException ignore ){}
 
 			try {
 				if( jcodec != null ) {
-					if( fileName.endsWith(".mp4") || fileName.endsWith(".MP4")) {
-						return jcodec.load(fileName,imageType);
-					}
+					SimpleImageSequence<T> sequence = jcodec.load(fileName,imageType);
+					System.err.println("WARNING: Using JCodec to read in movie files as a last resort. " +
+							"Great that it works, but it's very slow. Might want to look at alternatives.");
+					return sequence;
 				}
 			} catch( RuntimeException ignore ){}
 			System.err.println("No working codec found for file: " + fileName);

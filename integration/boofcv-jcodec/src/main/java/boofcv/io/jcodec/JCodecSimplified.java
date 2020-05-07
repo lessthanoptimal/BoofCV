@@ -18,20 +18,23 @@
 
 package boofcv.io.jcodec;
 
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
+import org.ddogleg.struct.FastQueue;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
-import org.jcodec.common.NIOUtils;
+import org.jcodec.api.PictureWithMetadata;
+import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.model.Picture;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+import static org.jcodec.api.FrameGrab.createFrameGrab;
 
 /**
  * Reads movie files using JCodec
@@ -40,15 +43,25 @@ import java.io.IOException;
  */
 public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequence<T>
 {
+	// For information on frame order see https://github.com/jcodec/jcodec/issues/165
+	// From issue:
+	//   That's b-frame reordering. FrameGrab is low-delay so it doesn't reorder frames for you.
+	//   Transcoder however does have the logic of frame reordering built-in.
+	//
+	//   In B-frame sequence frames are stored in weird order where a P-frame that's a future reference is transmitted
+	//   first followed by all the B-frames that refer to it.
+	private static final int REORDER_LENGTH = 5;
+
 	FrameGrab grabber;
 
 	T image;
 	// type of output image
 	ImageType<T> typeOutput;
 
-	Picture frameCurrent;
-	Picture frameNext;
-	int frame = 0;
+	FastQueue<PictureInfo> reorder = new FastQueue<>(PictureInfo::new);
+	int width,height;
+	boolean endOfFile = false;
+	int frame = -1;
 
 	String filename;
 
@@ -61,30 +74,48 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 
 	@Override
 	public int getWidth() {
-		return frameNext.getWidth();
+		return width;
 	}
 
 	@Override
 	public int getHeight() {
-		return frameNext.getHeight();
+		return height;
 	}
 
 	@Override
 	public boolean hasNext() {
-		return frameNext != null;
+		return reorder.size > 0;
 	}
 
 	@Override
 	public T next() {
-		frameCurrent = frameNext;
-		try {
-			frameNext = grabber.getNativeFrame();
-		} catch (IOException e) {
-			frameNext = null;
+		// select the next image from what has already been loaded
+		PictureInfo best = reorder.get(0);
+
+		int bestIndex = 0;
+		for (int i = 1; i < reorder.size; i++) {
+			PictureInfo p = reorder.get(i);
+			if( best.timestamp > p.timestamp ) {
+				best = p;
+				bestIndex = i;
+			}
+		}
+		// Convert the next image in the sequence into the output image
+		UtilJCodec.convertToBoof(best.picture, image);
+
+		// remove the next and recycle the data
+		reorder.removeSwap(bestIndex);
+
+		// load the next frame in the sequence
+		if( !endOfFile ) {
+			try {
+				grabAndCopy(reorder.grow());
+			} catch (IOException e) {
+				reorder.removeTail();
+				endOfFile = true;
+			}
 		}
 
-		image.reshape(frameCurrent.getWidth(), frameCurrent.getHeight());
-		UtilJCodec.convertToBoof(frameCurrent, image);
 		frame++;
 		return image;
 	}
@@ -96,13 +127,8 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 
 	@Override
 	public <InternalImage> InternalImage getGuiImage() {
-		Planar<GrayU8> boofColor = new Planar<>(GrayU8.class,
-				frameCurrent.getWidth(),frameCurrent.getHeight(),3);
-
-		BufferedImage output = new BufferedImage(boofColor.width,boofColor.height,BufferedImage.TYPE_INT_RGB);
-
-		UtilJCodec.convertToBoof(frameCurrent,boofColor);
-		ConvertBufferedImage.convertTo(boofColor,output,true);
+		BufferedImage output = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.convertTo(image,output,true);
 		return (InternalImage)output;
 	}
 
@@ -128,16 +154,46 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 
 	@Override
 	public void reset() {
+		filename = UtilIO.checkIfJarAndCopyToTemp(filename);
 		try {
-			grabber = new FrameGrab(NIOUtils.readableFileChannel(new File(filename)));
+			grabber = createFrameGrab(NIOUtils.readableChannel(new File(filename)));
 		} catch (IOException | JCodecException e) {
 			throw new RuntimeException(e);
 		}
-		try {
-			frameCurrent = null;
-			frameNext = grabber.getNativeFrame();
-		} catch (IOException e) {
-			frameNext = null;
+		frame = -1;
+
+		// read in the full set of images to get correct order
+		endOfFile = false;
+		while( reorder.size < REORDER_LENGTH ) {
+			try {
+				grabAndCopy(reorder.grow());
+			} catch (IOException e) {
+				reorder.removeTail();
+				endOfFile = true;
+				break;
+			}
 		}
+
+		if( reorder.size > 0 ) {
+			PictureInfo p = reorder.get(0);
+			width = p.picture.getWidth();
+			height = p.picture.getHeight();
+		}
+	}
+
+	private void grabAndCopy( PictureInfo info ) throws IOException {
+		PictureWithMetadata p = grabber.getNativeFrameWithMetadata();
+		if( info.picture == null || !info.picture.compatible(p.getPicture())) {
+			info.picture = p.getPicture().cloneCropped();
+		} else {
+			info.picture.copyFrom(p.getPicture());
+		}
+		info.timestamp = p.getTimestamp();
+	}
+
+	private static class PictureInfo
+	{
+		Picture picture;
+		double timestamp;
 	}
 }
