@@ -24,9 +24,10 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.factory.feature.associate.ConfigAssociate;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.associate.ConfigAssociate.AssociationType;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint.DescriptorType;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
-import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint.DetectorType;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -108,15 +109,21 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 	public void controlChanged(final Object source) {
 		int which = -1;
 		if (source == comboDetect) {
-			configDetDesc.typeDetector =
-					ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
+			configDetDesc.typeDetector = DetectorType.values()[comboDetect.getSelectedIndex()];
 			which = 0;
 		} else if (source == comboDescribe) {
-			configDetDesc.typeDescribe =
-					ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
+			configDetDesc.typeDescribe = DescriptorType.values()[comboDescribe.getSelectedIndex()];
 			which = 1;
+			// since BRIEF is binary only greedy association is supported
+			if( configDetDesc.typeDescribe == DescriptorType.BRIEF ) {
+				configAssociate.type = AssociationType.GREEDY;
+				comboAssociate.setEnabled(false);
+			} else {
+				configAssociate.type = AssociationType.values()[comboAssociate.getSelectedIndex()];
+				comboAssociate.setEnabled(true);
+			}
 		} else if (source == comboAssociate) {
-			configAssociate.type = ConfigAssociate.AssociationType.values()[comboAssociate.getSelectedIndex()];
+			configAssociate.type = AssociationType.values()[comboAssociate.getSelectedIndex()];
 			which = 2;
 		}
 		updateActiveControls(which);

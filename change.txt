@@ -11,8 +11,8 @@ Version : 0.36
   * If stable release, fail uploadArchives if dirty
 - Android
   * Changed a sort function in ChessboardCornerClusterFinder for Android compatibility
-- Starting to use Java 14 syntax (e.g. var and switch expression) but still will produce Java 1.8 byte code
-  https://github.com/bsideup/jabel
+- Using Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
+  * https://github.com/bsideup/jabel
 - Misc
   * Change the definition of a floating point value to be inside image bounds if it's less than width or height
     before it was < width-1, and < height-1. This conforms to rounding down standard.
@@ -79,7 +79,6 @@ Version : 0.36
   * Added Census support for F32 images
   * Changed how correlation texture check is done. Before two identical peaks didn't get filtered.
   * Added sparse forwards-backwards validation
-  * Fixed subtle bug in dense forwards-backwards validation where it was truncated by one is most situations
 - Android
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity
@@ -93,7 +92,8 @@ Version : 0.36
   * Added the ability to switch between different swing themes; darklaf and material-ui
   * It will default to JCodec if all else fails when trying to load a movie.
 - JCodec
-  * It finally works correctly! Updated to latest release and fixed bad code in BoofCV.
+  * Finally fully integrated and MP4 videos can be read on all systems!
+  * Updated to latest release and fixed bad code in BoofCV.
 - Color
   * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
   * Fixed conversion between XYZ/LAB and RGB by applying Gamma correction.

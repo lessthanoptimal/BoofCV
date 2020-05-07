@@ -177,6 +177,7 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel {
 	public AssociateDescription createAssociate( DescriptorInfo descriptor ) {
 
 		if( configAssociate.type != ConfigAssociate.AssociationType.GREEDY ) {
+			// The best way to handle this situation is to make it so the user can't select this combination of options
 			if (!TupleDesc_F64.class.isAssignableFrom(descriptor.getDescriptionType())) {
 				JOptionPane.showMessageDialog(this, "Requires TupleDesc_F64 description type");
 				// not really sure what to do here. I'll just force it to be greedy to avoid a crash

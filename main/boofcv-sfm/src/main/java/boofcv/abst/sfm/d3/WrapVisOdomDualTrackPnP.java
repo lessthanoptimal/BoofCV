@@ -34,6 +34,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 
 import javax.annotation.Nullable;
 import java.io.PrintStream;
@@ -48,11 +49,11 @@ import java.util.Set;
 public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D
 {
-	RefinePnPStereo refine;
-	PnPStereoEstimator pnp;
-	DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono;
-	PnPStereoDistanceReprojectionSq distanceStereo;
-	AssociateStereo2D<?> assoc;
+	@Getter	RefinePnPStereo refine;
+	@Getter	PnPStereoEstimator pnp;
+	@Getter	DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono;
+	@Getter	PnPStereoDistanceReprojectionSq distanceStereo;
+	@Getter	AssociateStereo2D<?> assoc;
 
 	VisOdomDualTrackPnP<T,?> visualOdometry;
 
@@ -144,5 +145,9 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
 		visualOdometry.setVerbose(out,configuration);
+	}
+
+	public VisOdomDualTrackPnP<T,?> getAlgorithm() {
+		return visualOdometry;
 	}
 }

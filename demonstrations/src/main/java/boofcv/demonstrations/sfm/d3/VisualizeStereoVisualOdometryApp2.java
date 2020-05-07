@@ -21,6 +21,7 @@ package boofcv.demonstrations.sfm.d3;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
+import boofcv.abst.sfm.d3.WrapVisOdomDualTrackPnP;
 import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
@@ -348,20 +349,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			extractFeatures(world_to_camera,(AccessPointTracks3D) alg, buffered);
 		}
 
-		// Number of tracks being optimized by bundle adjustment
-		final int bundleTracks;
-		if( alg instanceof WrapVisOdomMonoStereoDepthPnP) {
-			FastAccess<BTrack> tracks = ((WrapVisOdomMonoStereoDepthPnP)alg).getAlgorithm().getScene().tracks;
-			int count = 0;
-			for (int i = 0; i < tracks.size; i++) {
-				if( tracks.get(i).selected ) {
-					count++;
-				}
-			}
-			bundleTracks = count;
-		} else {
-			bundleTracks = -1;
-		}
+		final int bundleTracks= countTracksUsedInBundleAdjustment();
 
 		// Update the visualization
 		int frame = this.frame;
@@ -375,6 +363,32 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			cloudPanel.update();
 		});
 		this.frame++;
+	}
+
+	/**
+	 * Counts the number of tracks being used by bundle adjustment
+	 */
+	private int countTracksUsedInBundleAdjustment() {
+		FastAccess<BTrack> tracks = null;
+		int bundleTracks;
+		if( alg instanceof WrapVisOdomMonoStereoDepthPnP) {
+			tracks = ((WrapVisOdomMonoStereoDepthPnP)alg).getAlgorithm().getScene().tracks;
+		} else if( alg instanceof WrapVisOdomDualTrackPnP) {
+			tracks = ((WrapVisOdomDualTrackPnP)alg).getAlgorithm().getScene().tracks;
+		}
+
+		if( tracks != null ) {
+			int total=0;
+			for (int i = 0; i < tracks.size; i++) {
+				BTrack bt = tracks.get(i);
+				if( bt.selected )
+					total++;
+			}
+			bundleTracks = total;
+		} else {
+			bundleTracks = -1;
+		}
+		return bundleTracks;
 	}
 
 	/**
@@ -609,6 +623,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				panelApproach.removeAll();
 				panelApproach.add(BorderLayout.CENTER, control);
 				panelApproach.validate();
+				panelApproach.repaint();
 				bUpdateAlg.setEnabled(true);
 			}
 		}
