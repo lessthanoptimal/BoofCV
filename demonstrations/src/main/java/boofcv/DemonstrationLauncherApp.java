@@ -164,6 +164,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DenseFlowApp.class);
 
 		createNodes(root,"Segmentation",
+				VisualizeBackgroundModelApp.class,
 				DemoImageThresholdingApp.class,
 				DemoBinaryBlobLabelOpsApp.class,
 				VisualizeImageSegmentationApp.class,
@@ -180,7 +181,6 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				VisualizeLineRansac.class);
 
 		createNodes(root, "Trackers",
-				VisualizeBackgroundModelApp.class,
 				VideoTrackerObjectQuadApp.class,
 				VideoTrackerPointFeaturesApp.class,
 				VisualizeCirculantTrackerApp.class);
