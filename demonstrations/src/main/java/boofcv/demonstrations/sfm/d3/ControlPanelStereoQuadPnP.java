@@ -18,15 +18,11 @@
 
 package boofcv.demonstrations.sfm.d3;
 
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
-import boofcv.abst.tracker.PointTracker;
-import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
-import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;
+import boofcv.factory.sfm.ConfigStereoQuadPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,25 +32,18 @@ import java.util.Set;
 /**
  * @author Peter Abeles
  */
-public class ControlPanelStereoMonoTrackPnP extends JPanel {
+public class ControlPanelStereoQuadPnP extends JPanel {
 
-	ControlPanelVisOdomTrackPnP controlPnpDepth;
-	ControlPanelPointTrackers controlTrackers;
-	ControlPanelDisparitySparse controlDisparity;
+	ConfigStereoQuadPnP config;
 
-	public ControlPanelStereoMonoTrackPnP(ConfigStereoMonoTrackPnP config, Listener listener ) {
+	public ControlPanelStereoQuadPnP(ConfigStereoQuadPnP config, Listener listener ) {
 		setLayout(new BorderLayout());
-		controlPnpDepth = new ControlPanelVisOdomTrackPnP(listener::changedStereoMonoTrackPnP, config.scene);
-		controlTrackers = new ControlPanelPointTrackers(listener::changedStereoMonoTrackPnP,config.tracker);
-		controlDisparity = new ControlPanelDisparitySparse(listener::changedStereoMonoTrackPnP, config.disparity);
+
+		this.config = config;
 
 		var panelAlgControls = new JPanel(new BorderLayout());
 		var tuningTabs = new JTabbedPane();
-		tuningTabs.addTab("VO",panelAlgControls);
-		tuningTabs.addTab("Tracker",controlTrackers);
-		tuningTabs.addTab("Stereo",controlDisparity);
 
-		panelAlgControls.add(BorderLayout.CENTER, controlPnpDepth);
 
 		var panelTuning = new JPanel();
 		panelTuning.setLayout(new BoxLayout(panelTuning,BoxLayout.Y_AXIS));
@@ -66,13 +55,11 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 	public <T extends ImageGray<T>>
 	StereoVisualOdometry<T> createVisOdom(Class<T> imageType ) {
 
-		PointTracker<T> tracker = controlTrackers.createTracker(ImageType.single(imageType));
-		StereoDisparitySparse<T> disparity = controlDisparity.createAlgorithm(imageType);
-		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoMonoPnP(controlPnpDepth.config,disparity,tracker,imageType);
+		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoQuadPnP(config,imageType);
 
 		Set<String> configuration = new HashSet<>();
 		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
-//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
+		configuration.add(VisualOdometry.VERBOSE_TRACKING);
 		alg.setVerbose(System.out,configuration);
 
 		return alg;

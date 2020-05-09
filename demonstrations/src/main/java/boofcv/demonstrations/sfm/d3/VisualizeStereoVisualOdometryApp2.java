@@ -31,7 +31,8 @@ import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
-import boofcv.factory.sfm.ConfigStereoMonoPnP;
+import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;
+import boofcv.factory.sfm.ConfigStereoQuadPnP;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -195,12 +196,14 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 		if( controls.approach == 0 )
 			return controls.controlMonoTrack.createVisOdom(imageType);
-		else
+		else if( controls.approach == 1 )
 			return controls.controlDualTrack.createVisOdom(imageType);
+		else
+			return controls.controlQuad.createVisOdom(imageType);
 	}
 
-	private static ConfigStereoMonoPnP createConfigStereoMonoPnP() {
-		ConfigStereoMonoPnP config = new ConfigStereoMonoPnP();
+	private static ConfigStereoMonoTrackPnP createConfigStereoMonoPnP() {
+		ConfigStereoMonoTrackPnP config = new ConfigStereoMonoTrackPnP();
 
 		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 
@@ -264,6 +267,12 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.epipolarTol = 1.0;
 
 		config.scene.keyframes.geoMinCoverage = 0.4;
+
+		return config;
+	}
+
+	private static ConfigStereoQuadPnP createConfigStereoQuadPnP() {
+		var config = new ConfigStereoQuadPnP();
 
 		return config;
 	}
@@ -469,7 +478,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		boolean showInliers = false;
 		boolean showNew = false;
 
-		int approach = 0; // which visual odometry approach has been selected
+		int approach = 2; // which visual odometry approach has been selected
 
 		double maxDepth=0; // Maximum depth a feature is from the camera when last viewed
 		boolean showCameras=true; // show camera locations in 3D view
@@ -512,6 +521,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				createConfigStereoDualPnP(), ()->bUpdateAlg.setEnabled(true));
 		ControlPanelStereoMonoTrackPnP controlMonoTrack = new ControlPanelStereoMonoTrackPnP(
 				createConfigStereoMonoPnP(), ()->bUpdateAlg.setEnabled(true));
+		ControlPanelStereoQuadPnP controlQuad = new ControlPanelStereoQuadPnP(
+				createConfigStereoQuadPnP(),()->bUpdateAlg.setEnabled(true));
 
 		public ControlPanel() {
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
@@ -553,7 +564,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			addVerticalGlue(panelTuning);
 			addAlignCenter(bUpdateAlg,panelTuning);
 
-			panelApproach.add(BorderLayout.CENTER, controlMonoTrack);
+			panelApproach.add(BorderLayout.CENTER, getControlVisOdom());
 
 			var tabbedTopPane = new JTabbedPane();
 			tabbedTopPane.addTab("Visuals",panelVisuals);
@@ -615,17 +626,23 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				cloudPanel.update();
 			} else if( source == comboApproach ) {
 				approach = comboApproach.getSelectedIndex();
-				JComponent control = null;
-				switch( approach ) {
-					case 0: control = controlMonoTrack; break;
-					default: control = controlDualTrack; break;
-				}
+				JComponent control = getControlVisOdom();
 				panelApproach.removeAll();
 				panelApproach.add(BorderLayout.CENTER, control);
 				panelApproach.validate();
 				panelApproach.repaint();
 				bUpdateAlg.setEnabled(true);
 			}
+		}
+
+		private JComponent getControlVisOdom() {
+			JComponent control = null;
+			switch( approach ) {
+				case 0: control = controlMonoTrack; break;
+				case 1: control = controlDualTrack; break;
+				case 2: control = controlQuad; break;
+			}
+			return control;
 		}
 	}
 

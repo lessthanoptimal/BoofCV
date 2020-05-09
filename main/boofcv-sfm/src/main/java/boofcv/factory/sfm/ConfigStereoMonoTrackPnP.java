@@ -34,7 +34,7 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  *
  * @author Peter Abeles
  */
-public class ConfigStereoMonoPnP implements Configuration {
+public class ConfigStereoMonoTrackPnP implements Configuration {
 
 	/** Configuration for building and optimizing a local scene */
 	public ConfigVisOdomTrackPnP scene = new ConfigVisOdomTrackPnP();
@@ -70,7 +70,7 @@ public class ConfigStereoMonoPnP implements Configuration {
 		disparity.checkValidity();
 	}
 
-	public void setTo( ConfigStereoMonoPnP src ) {
+	public void setTo( ConfigStereoMonoTrackPnP src ) {
 		this.scene.setTo(src.scene);
 		this.tracker.setTo(src.tracker);
 		this.disparity.setTo(src.disparity);

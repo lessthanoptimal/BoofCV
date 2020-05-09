@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment.BTrack>  implements VerbosePrint {
+public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment.BTrack> implements VerbosePrint {
 
 	/** discard tracks after they have not been in the inlier set for this many updates in a row */
 	protected @Getter @Setter int thresholdRetireTracks;

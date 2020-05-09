@@ -18,12 +18,12 @@
 
 package boofcv.factory.sfm;
 
-import boofcv.abst.feature.associate.AssociateDescTo2D;
+import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.EnforceUniqueByScore;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detdesc.DetectDescribeMulti;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
@@ -37,7 +37,6 @@ import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d3.*;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.abst.tracker.PointTrackerTwoPass;
-import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.pose.*;
@@ -50,9 +49,9 @@ import boofcv.alg.sfm.d3.structure.TickTockKeyFrameManager;
 import boofcv.alg.sfm.d3.structure.VisOdomKeyFrameManager;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
-import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.EstimatorToGenerator;
@@ -83,6 +82,7 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class FactoryVisualOdometry {
 
 	/**
@@ -510,32 +510,81 @@ public class FactoryVisualOdometry {
 				alg, pnpStereo, distanceMono, distanceStereo, associateL2R, refinePnP,imageType);
 	}
 
-	/**
-	 * Stereo visual odometry which uses the two most recent stereo observations (total of four views) to estimate
-	 * motion.
-	 *
-	 * @see VisOdomQuadPnP
-	 *
-	 * @param inlierPixelTol Pixel tolerance for RANSAC inliers - Euclidean distance
-	 * @param epipolarPixelTol Feature association tolerance in pixels.
-	 * @param maxDistanceF2F Maximum allowed distance between two features in pixels
-	 * @param maxAssociationError Maxium error between two features when associating.
-	 * @param ransacIterations Number of iterations RANSAC will perform
-	 * @param refineIterations Number of refinement iterations
-	 * @param detector Which feature detector to use
-	 * @param imageType Type of input image
-	 */
-	public static <T extends ImageGray<T>,Desc extends TupleDesc>
-	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
-										   double epipolarPixelTol ,
-										   double maxDistanceF2F,
-										   double maxAssociationError,
-										   int ransacIterations ,
-										   int refineIterations ,
-										   DetectDescribeMulti<T,Desc> detector,
-										   Class<T> imageType )
+//	/**
+//	 * Stereo visual odometry which uses the two most recent stereo observations (total of four views) to estimate
+//	 * motion.
+//	 *
+//	 * @see VisOdomStereoQuadPnP
+//	 *
+//	 * @param inlierPixelTol Pixel tolerance for RANSAC inliers - Euclidean distance
+//	 * @param epipolarPixelTol Feature association tolerance in pixels.
+//	 * @param maxDistanceF2F Maximum allowed distance between two features in pixels
+//	 * @param maxAssociationError Maxium error between two features when associating.
+//	 * @param ransacIterations Number of iterations RANSAC will perform
+//	 * @param refineIterations Number of refinement iterations
+//	 * @param detector Which feature detector to use
+//	 * @param imageType Type of input image
+//	 */
+//	public static <T extends ImageGray<T>,Desc extends TupleDesc>
+//	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
+//										   double epipolarPixelTol ,
+//										   double maxDistanceF2F,
+//										   double maxAssociationError,
+//										   int ransacIterations ,
+//										   int refineIterations ,
+//										   DetectDescribeMulti<T,Desc> detector,
+//										   Class<T> imageType )
+//	{
+//		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
+//		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+//		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
+//		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
+//
+//		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+//		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
+//
+//		// euclidean error squared from left + right images
+//		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
+//
+//		ModelMatcher<Se3_F64, Stereo2D3D> motion =
+//				new Ransac<>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
+//
+//		RefinePnPStereo refinePnP = null;
+//
+//		if( refineIterations > 0 ) {
+//			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
+//		}
+//		Class<Desc> descType = detector.getDescriptionType();
+//
+//		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
+//
+//		// TODO need a better way to keep track of what error is squared and not
+//		AssociateDescription2D<Desc> assocSame;
+//		if( maxDistanceF2F > 0 ) {
+//			AssociateMaxDistanceNaive<Desc> a = new AssociateMaxDistanceNaive<>(scorer, true, maxAssociationError);
+//			a.setSquaredDistance(true);
+//			a.setMaxDistance(maxDistanceF2F);
+//			assocSame = a;
+//		} else {
+//			assocSame = new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),scorer));
+//		}
+//
+//		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
+//		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
+//				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
+//
+//		associateStereo.setMaxScoreThreshold(maxAssociationError);
+//
+//		VisOdomStereoQuadPnP<T,Desc> alg = new VisOdomStereoQuadPnP(
+//				detector, assocSame, associateStereo, triangulate, motion, refinePnP, null);
+//
+//		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateStereo, distanceStereo, distanceMono, imageType);
+//	}
+
+	public static <T extends ImageGray<T>, Desc extends TupleDesc>
+	StereoVisualOdometry<T> stereoQuadPnP( ConfigStereoQuadPnP config, Class<T> imageType)
 	{
-		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
+		EstimateNofPnP pnp = FactoryMultiView.pnp_N(config.pnp, -1);
 		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
@@ -543,42 +592,45 @@ public class FactoryVisualOdometry {
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
 
-		// euclidean error squared from left + right images
-		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
+		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
+		double ransacTOL = 2*config.ransac.inlierThreshold * config.ransac.inlierThreshold;
 
-		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-				new Ransac<>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
-
+		ModelMatcher<Se3_F64, Stereo2D3D> motion =new Ransac<>(config.ransac.randSeed, manager, generator,
+				distanceStereo, config.ransac.iterations, ransacTOL);
 		RefinePnPStereo refinePnP = null;
 
-		if( refineIterations > 0 ) {
-			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
+		if( config.refineIterations > 0 ) {
+			refinePnP = new PnPStereoRefineRodrigues(1e-12,config.refineIterations);
 		}
+
+		DetectDescribePoint<T,Desc> detector = (DetectDescribePoint)
+				FactoryDetectDescribe.generic(config.detectDescribe,imageType);
+
 		Class<Desc> descType = detector.getDescriptionType();
 
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 
-		// TODO need a better way to keep track of what error is squared and not
-		AssociateDescription2D<Desc> assocSame;
-		if( maxDistanceF2F > 0 ) {
-			AssociateMaxDistanceNaive<Desc> a = new AssociateMaxDistanceNaive<>(scorer, true, maxAssociationError);
-			a.setSquaredDistance(true);
-			a.setMaxDistance(maxDistanceF2F);
-			assocSame = a;
-		} else {
-			assocSame = new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),scorer));
-		}
+		// need to make sure associations are unique
+		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, config.epipolarTol, descType);
+		associateL2R.setMaxScoreThreshold(config.associateL2R.maxErrorThreshold);
 
-		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
+		AssociateDescription<Desc> associateF2F = FactoryAssociation.greedy(config.associateF2F,scorer);
+
 		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
-		associateStereo.setMaxScoreThreshold(maxAssociationError);
 
-		VisOdomQuadPnP<T,Desc> alg = new VisOdomQuadPnP<>(
-				detector, assocSame, associateStereo, triangulate, motion, refinePnP);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = null;
+		if( config.bundleConverge.maxIterations > 0 ) {
+			bundleAdjustment = FactoryMultiView.bundleSparseMetric(config.bundle);
+			bundleAdjustment.configure(config.bundleConverge.ftol, config.bundleConverge.gtol,
+					config.bundleConverge.maxIterations);
+		}
 
-		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateStereo, distanceStereo, distanceMono, imageType);
+		VisOdomStereoQuadPnP<T,Desc> alg = new VisOdomStereoQuadPnP<>(
+				detector, associateF2F, associateL2R, triangulate, motion, refinePnP, bundleAdjustment);
+
+		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateL2R, distanceStereo, distanceMono, imageType);
 	}
 
 	/**

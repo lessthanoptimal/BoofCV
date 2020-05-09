@@ -144,7 +144,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 
 	@Override
 	public void setMaxScoreThreshold(double score) {
-		this.scoreThreshold = score;
+		this.scoreThreshold = score < 0.0 ? Double.MAX_VALUE : score;
 	}
 
 	@Override

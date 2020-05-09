@@ -23,17 +23,16 @@ import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.RefinePnPStereo;
-import boofcv.alg.sfm.d3.VisOdomQuadPnP;
+import boofcv.alg.sfm.d3.VisOdomStereoQuadPnP;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
@@ -43,21 +42,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Wrapper around {@link VisOdomQuadPnP} for {@link StereoVisualOdometry}.
+ * Wrapper around {@link VisOdomStereoQuadPnP} for {@link StereoVisualOdometry}.
  *
  * @author Peter Abeles
  */
 public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		implements StereoVisualOdometry<T>, AccessPointTracks3D
 {
-	VisOdomQuadPnP<T,TD> alg;
+	VisOdomStereoQuadPnP<T,TD> alg;
 	RefinePnPStereo refine;
 	AssociateStereo2D<TD> associateStereo;
 	PnPStereoDistanceReprojectionSq distance;
 	DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono;
 	Class<T> imageType;
+	// Doesn't really have tracks. So it's hacked by given every feature a new ID
+	long totalFeatures;
 
-	public WrapVisOdomQuadPnP(VisOdomQuadPnP<T, TD> alg,
+	public WrapVisOdomQuadPnP(VisOdomStereoQuadPnP<T, TD> alg,
 							  RefinePnPStereo refine,
 							  AssociateStereo2D<TD> associateStereo,
 							  PnPStereoDistanceReprojectionSq distance,
@@ -74,20 +75,17 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
-		FastQueue<VisOdomQuadPnP.QuadView> features =  alg.getQuadViews();
-		world.set( features.get(index).X );
+		Se3_F64 left_to_world = alg.getLeftToWorld();
+		FastQueue<VisOdomStereoQuadPnP.QuadView> features =  alg.getQuadViews();
+		SePointOps_F64.transform(left_to_world,features.get(index).X,world);
 		return true;
 	}
 
 	@Override
-	public int getTotalTracks() {
-		return alg.getQuadViews().size;
-	}
+	public int getTotalTracks() {return alg.getQuadViews().size;}
 
 	@Override
-	public long getTrackId(int index) {
-		return 0;
-	}
+	public long getTrackId(int index) {return index+totalFeatures;}
 
 	@Override
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
@@ -101,9 +99,9 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		else
 			storage.clear();
 
-		FastQueue<VisOdomQuadPnP.QuadView> features =  alg.getQuadViews();
+		FastQueue<VisOdomStereoQuadPnP.QuadView> features =  alg.getQuadViews();
 
-		for( VisOdomQuadPnP.QuadView v : features.toList() )
+		for( VisOdomStereoQuadPnP.QuadView v : features.toList() )
 			storage.add(v.v2); // new left camera
 
 		return storage;
@@ -111,18 +109,12 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public boolean isTrackInlier(int index) {
-		ModelMatcher<Se3_F64, Stereo2D3D> matcher = alg.getMatcher();
-		int N = matcher.getMatchSet().size();
-		for( int i = 0; i < N; i++ ) {
-			if( matcher.getInputIndex(i) == index )
-				return true;
-		}
-		return false;
+		return alg.getQuadViews().get(index).inlier;
 	}
 
 	@Override
 	public boolean isTrackNew(int index) {
-		return false;// its always new
+		return true;
 	}
 
 	@Override
@@ -158,7 +150,8 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public boolean process(T leftImage, T rightImage) {
-		return alg.process(leftImage,rightImage);
+		totalFeatures += alg.getQuadViews().size;
+		return alg.process(leftImage, rightImage);
 	}
 
 	@Override
@@ -173,6 +166,6 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-
+		alg.setVerbose(out,configuration);
 	}
 }

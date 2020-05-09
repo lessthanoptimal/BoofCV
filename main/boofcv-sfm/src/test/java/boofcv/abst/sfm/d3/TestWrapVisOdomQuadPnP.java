@@ -18,20 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detdesc.DetectDescribeMulti;
-import boofcv.abst.feature.detdesc.DetectDescribeMultiFusion;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
-import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
-import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.factory.sfm.ConfigStereoQuadPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.GrayF32;
 
@@ -46,17 +33,7 @@ public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<GrayF32
 
 	@Override
 	public StereoVisualOdometry<GrayF32> createAlgorithm() {
-		GeneralFeatureIntensity intensity =
-				FactoryIntensityPoint.shiTomasi(1, false, GrayF32.class);
-		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 0, true, false, true));
-		FeatureSelectLimit selector = new FeatureSelectNBest();
-		GeneralFeatureDetector<GrayF32,GrayF32> general =
-				new GeneralFeatureDetector<>(intensity, nonmax, selector);
-		general.setMaxFeatures(600);
-		DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,GrayF32.class,GrayF32.class);
-		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, GrayF32.class);
-		DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
-
-		return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5, 200, Double.MAX_VALUE, 300, 50, detDescMulti, GrayF32.class);
+		ConfigStereoQuadPnP config = new ConfigStereoQuadPnP();
+		return FactoryVisualOdometry.stereoQuadPnP(config, GrayF32.class);
 	}
 }

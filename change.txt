@@ -70,9 +70,8 @@ Version : 0.36
 - Visual Odometry
   * Re-wrote VisualizeStereoVisualOdometryApp. Much better visualization and more configurable
   * All stereo visual odometry algorithms now support multiple key frames and bundle adjustment
-  * TODO Update Quad
+  * Note that Quad lost spatial association and ability to handle sets. It should gain that back in the next release.
   * TODO Fix that null pointer in dual track
-  * TODO Fix invalid association approach with BRIEF
   * TODO Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
 - Stereo
   * Added sparse disparity with Census and NCC
@@ -83,6 +82,7 @@ Version : 0.36
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity
   * SimpleCamera2Activity::cameraIntrinsicNominal() returns false if it fails
+  * TODO Bitmap processing example
 - Applications
   * Fixed calibration detector apps bug where scale got missed up when playing a movie
 - OpenKinect: Removed integration package since it hadn't been used in years
@@ -102,6 +102,29 @@ Version : 0.36
   * Added ColorDiff - Computes metrics for the difference between colors
     - Thanks Jairo Rotava for the code contribution!
 
+TODO DetectDescribe
+   - Integrate in sets and remove specialized class
+   - Request the set a feature belongs in. Provide a lambda to get all features in a set?
+   - This should make it easier to spread association by set through out the code base
+     Trackers and Visual Odometry are initial targets
+
+TODO Stereo Association
+   - Formalize with a factory
+   - Do everything that greedy does now
+
+- Scene Reconstruction
+  * TODO when associating objects split into feature types, e.g. white and black blobs
+  * TODO try improving 3-view by estimating lens distortion in projective camera
+  * TODO Scene Reconstruction from arbitrary number of photos
+  * TODO triangulate N-points calibrated homogenous coordinates
+  * TODO Add rigid relationships between views. Can be fixed or not.
+
+TODO Sparse Disparity Undistort using camera model
+
+TODO Visual Odometry
+  * Fully integrate feature sets into all the code
+  * Use spatial information when association
+
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
    - Template matching
@@ -111,13 +134,6 @@ TODO Geometry
    - Triangulation for a calibrated camera and homogenous coordinates
    - P3P equivalent for multiple cameras with known relationships
 
-TODO Sparse Disparity Undistort using camera model
-
-- Scene Reconstruction
-  * TODO try improving 3-view by estimating lens distortion in projective camera
-  * TODO Scene Reconstruction from arbitrary number of photos
-  * TODO triangulate N-points calibrated homogenous coordinates
-  * TODO Add rigid relationships between views. Can be fixed or not.
 TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
 TODO Videos - hough line detectors
             - chessboard corner detector + improvements

@@ -72,9 +72,10 @@ import java.util.List;
 public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		extends VisOdomBundlePnPBase<VisOdomDualTrackPnP.TrackInfo> {
 
-	// TODO must modify so that tracks can exist in one camera after the initial spawn. Requiring tracks always
-	//      be mutual greatly increases the number of dropped tracks when there's motion blur
-	// TODO Why are there so many more tracks in KITTI?
+	// TODO must modify so that tracks can exist in only one camera after the initial spawn. Requiring tracks always
+	//      be mutual greatly increases the number of dropped tracks when there is motion blur
+	// TODO Apply a rigid constraints in SBA when that feature has been added
+	// TODO Add more checks to stereo association. Similar to what's done in greedy now
 
 	// index of the left camera in the camera list
 	public static final int CAMERA_LEFT = 0;
