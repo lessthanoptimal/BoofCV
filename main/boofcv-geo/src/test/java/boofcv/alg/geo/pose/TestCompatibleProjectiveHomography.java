@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		MultiViewOps.extractCameraMatrices(T,P2,P3);
 		CommonOps_DDRM.setIdentity(P1);
 
-		TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC);
+		TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC());
 		List<Point2D_F64> observations = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			observations.add(new Point2D_F64());

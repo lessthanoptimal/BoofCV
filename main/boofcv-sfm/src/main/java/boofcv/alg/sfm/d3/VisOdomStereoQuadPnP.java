@@ -230,25 +230,29 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 */
 	public boolean process( T left , T right ) {
 		frameID++;
+		long time0 = System.nanoTime();
+		detectFeatures(left,right);
+		long time1 = System.nanoTime();
+		associateL2R();
+
 		if( frameID==0 ) {
-			associateL2R(left, right);
+			if( verbose != null ) verbose.println("first frame");
 			// mark all features as having no track
 			keyToTrackIdx.resize(featsLeft1.location[0].size);
 			keyToTrackIdx.fill(-1);
 		} else {
-			// Find features which are visible across all four views
-			long time0 = System.nanoTime();
-			associateL2R(left, right);
-			long time1 = System.nanoTime();
-			associateF2F();
 			long time2 = System.nanoTime();
+			associateF2F();
+			long time3 = System.nanoTime();
 			cyclicConsistency();
 			removeTracksNotConsistent();
 
 			// Estimate the motion robustly
-			long time3 = System.nanoTime();
-			if ( !robustMotionEstimate())
+			long time4 = System.nanoTime();
+			if ( !robustMotionEstimate()) {
+				if( verbose != null ) verbose.println("Failed to estimate motion");
 				return false;
+			}
 			Se3_F64 key_to_curr = matcher.getModelParameters();
 			// get a better pose estimate
 			refineMotionEstimate(key_to_curr);
@@ -256,28 +260,29 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 			triangulateWithFourCameras(key_to_curr);
 
 			// get the best estimate using bundle adjustment
-			long time4 = System.nanoTime();
+			long time5 = System.nanoTime();
 			performBundleAdjustment(key_to_curr);
 
 			// Drop and update tracks in preperation for the next frame
-			long time5 = System.nanoTime();
+			long time6 = System.nanoTime();
 			performTrackMaintenance(key_to_curr);
 			// compound the just found motion with the previously found motion
 			key_to_curr.invert(curr_to_key);
 			prevLeft_to_world.set(left_to_world);
 			curr_to_key.concat(prevLeft_to_world, left_to_world);
-			long time6 = System.nanoTime();
+			long time7 = System.nanoTime();
 
 			if( profileOut != null ) {
-				double milliL2R = (time1-time0)*1e-6;
-				double milliF2F = (time2-time1)*1e-6;
-				double milliCyc = (time3-time2)*1e-6;
-				double milliEst = (time4-time3)*1e-6;
-				double milliBun = (time5-time4)*1e-6;
-				double milliMnt = (time6-time5)*1e-6;
+				double milliDet = (time1-time0)*1e-6;
+				double milliL2R = (time2-time1)*1e-6;
+				double milliF2F = (time3-time2)*1e-6;
+				double milliCyc = (time4-time3)*1e-6;
+				double milliEst = (time5-time4)*1e-6;
+				double milliBun = (time6-time5)*1e-6;
+				double milliMnt = (time7-time6)*1e-6;
 
-				profileOut.printf("TIME: L2R %5.1f F2F %5.1f Cyc %5.1f Est %5.1f Bun %5.1f Mnt %5.1f Total: %5.1f\n",
-						milliL2R,milliF2F,milliCyc,milliEst,milliBun,milliMnt,(time6-time0)*1e-6);
+				profileOut.printf("TIME: Det %5.1f L2R %5.1f F2F %5.1f Cyc %5.1f Est %5.1f Bun %5.1f Mnt %5.1f Total: %5.1f\n",
+						milliDet,milliL2R,milliF2F,milliCyc,milliEst,milliBun,milliMnt,(time7-time0)*1e-6);
 			}
 		}
 
@@ -371,13 +376,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		}
 	}
 
-	/**
-	 * Associates image features from the left and right camera together while applying epipolar constraints.
-	 *
-	 * @param left Image from left camera
-	 * @param right Image from right camera
-	 */
-	private void associateL2R( T left , T right ) {
+	private void detectFeatures( T left , T right ) {
 		// make the previous new observations into the new old ones
 		ImageInfo<TD> tmp = featsLeft1;
 		featsLeft1 = featsLeft0; featsLeft0 = tmp;
@@ -390,7 +389,12 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 		describeImage(left,featsLeft1);
 		describeImage(right,featsRight1);
+	}
 
+	/**
+	 * Associates image features from the left and right camera together while applying epipolar constraints.
+	 */
+	private void associateL2R() {
 		// detect and associate features in the current stereo pair
 		for( int i = 0; i < 1; i++ ) {
 			SetMatches matches = setMatches[i];

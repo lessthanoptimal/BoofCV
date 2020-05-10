@@ -20,6 +20,7 @@ package boofcv.gui.feature;
 
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.gui.StandardAlgConfigPanel;
+import lombok.Getter;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
@@ -32,9 +33,9 @@ import javax.swing.*;
 public class ControlPanelAssociateGreedy extends StandardAlgConfigPanel {
 	public final ConfigAssociateGreedy config;
 
-	private final JCheckBox checkForwardsBackwards;
-	private final JSpinner spinnerRatio;
-	private final JSpinner spinnerMaxError;
+	private final @Getter JCheckBox checkForwardsBackwards;
+	private final @Getter JSpinner spinnerRatio;
+	private final @Getter JSpinner spinnerMaxError;
 
 	private final Listener listener;
 

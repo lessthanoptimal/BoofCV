@@ -480,7 +480,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		boolean showInliers = false;
 		boolean showNew = false;
 
-		int approach = 2; // which visual odometry approach has been selected
+		int approach = 0; // which visual odometry approach has been selected
 
 		double maxDepth=0; // Maximum depth a feature is from the camera when last viewed
 		boolean showCameras=true; // show camera locations in 3D view
@@ -503,7 +503,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		protected JLabel labelTraveled = new JLabel();
 
 		// Panel which contains all controls
-		final JComboBox<String> comboApproach = combo(0,"Mono Stereo","Dual Track","Quad View");
+		final JComboBox<String> comboApproach = combo(approach,"Mono Stereo","Dual Track","Quad View");
 		final JPanel panelApproach = new JPanel(new BorderLayout());
 
 		// Image Visualization Controls

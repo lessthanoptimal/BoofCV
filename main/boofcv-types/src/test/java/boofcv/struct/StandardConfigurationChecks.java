@@ -46,7 +46,8 @@ public abstract class StandardConfigurationChecks {
 		try {
 			type = (Class<Configuration>) Class.forName(name);
 		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Try using the manual constructor");
+			throw new RuntimeException(
+					"No class found after removing Test from name. Try using the manual constructor");
 		}
 	}
 

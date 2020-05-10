@@ -18,10 +18,12 @@
 
 package boofcv.factory.sfm;
 
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.EnumPNP;
@@ -46,13 +48,13 @@ public class ConfigStereoQuadPnP implements Configuration {
 	/** Configuration for RANSAC. Used to robustly estimate frame-to-frame motion */
 	public ConfigRansac ransac = new ConfigRansac(500,1.5);
 	/** Number of iterations to perform when refining the initial frame-to-frame motion estimate. Disable &le; 0 */
-	public int refineIterations = 25;
+	public int refineIterations = 50;
 
 	/** Which feature detector / descriptor should it use*/
 	public ConfigDetectDescribe detectDescribe = new ConfigDetectDescribe();
 
 	/** Association approach for matching frames across time steps */
-	public ConfigAssociateGreedy associateF2F = new ConfigAssociateGreedy(true,0.9,-1);
+	public ConfigAssociateGreedy associateF2F = new ConfigAssociateGreedy(true,1.0,-1);
 	/** Association approach for matching stereo pairs */
 	public ConfigAssociateGreedy associateL2R = new ConfigAssociateGreedy(false,1.0,-1);
 
@@ -60,10 +62,34 @@ public class ConfigStereoQuadPnP implements Configuration {
 	public double epipolarTol = 1.0;
 
 	{
-		detectDescribe.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_FAST;
+		detectDescribe.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		detectDescribe.describeBrief.fixed = true;
+
 		detectDescribe.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
-		detectDescribe.detectFastHessian.extract.radius = 3;
-		detectDescribe.detectFastHessian.maxFeaturesPerScale = 400;
+		detectDescribe.detectFastHessian.extract.radius = 2;
+		detectDescribe.detectFastHessian.maxFeaturesPerScale = 200;
+		detectDescribe.detectFastHessian.numberOfOctaves = 4;
+
+		// while not active, let's give it a reasonable configuration for a point detector
+		detectDescribe.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		detectDescribe.detectPoint.scaleRadius = 11;
+		detectDescribe.detectPoint.shiTomasi.radius = 3;
+		detectDescribe.detectPoint.general.threshold = 1.0f;
+		detectDescribe.detectPoint.general.radius = 4;
+		detectDescribe.detectPoint.general.maxFeatures = 500;
+		detectDescribe.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+	}
+
+	public void setTo( ConfigStereoQuadPnP src ) {
+		this.bundle.setTo(src.bundle);
+		this.bundleConverge.setTo(src.bundleConverge);
+		this.pnp = src.pnp;
+		this.ransac.setTo(src.ransac);
+		this.refineIterations = src.refineIterations;
+		this.detectDescribe.setTo(src.detectDescribe);
+		this.associateF2F.setTo(src.associateF2F);
+		this.associateL2R.setTo(src.associateL2R);
+		this.epipolarTol = src.epipolarTol;
 	}
 
 	@Override
