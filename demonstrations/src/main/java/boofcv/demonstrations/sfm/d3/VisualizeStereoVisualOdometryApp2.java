@@ -439,6 +439,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 					f = features.get(arrayIndex);
 					access.getTrackPixel(i,f.pixel);
 				}
+				f.lastFrame = frame;
 				visibleTracks.add(arrayIndex);
 
 				access.getTrackWorld3D(i,f.world);
@@ -470,6 +471,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		public long id; // unique tracker id for the feature
 		public int rgb; // color in first frame
 		public int firstFrame; // first frame the track was seen in
+		public int lastFrame; // last frame the track was seen in
 	}
 
 	class ControlPanel extends DetectBlackShapePanel {
@@ -486,6 +488,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		int showEveryCameraN = 5; // show the camera every N frames
 		// the maximum number of frames in the past the track was first spawned and stuff be visible. 0 = infinite
 		int maxTrackAge=0;
+		int minTrackDuration=1;// Only show in 3D if the number of frames the track was seen was at least this amount
 		int trackColors=0; // 0 = depth, 1 = age
 
 		final JLabel videoFrameLabel = new JLabel();
@@ -514,6 +517,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		final JSpinner spinCameraN = spinner(showEveryCameraN,1,500,1);
 		final JCheckBox checkCloud = checkbox("Cloud",showCloud,"Show sparse point cloud");
 		final JSpinner spinMaxTrackAge = spinner(maxTrackAge,0,999,5);
+		final JSpinner spinMinDuration = spinner(minTrackDuration,1,999,1);
 		final ControlPanelPointCloud cloudColor = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
 
 		// controls for different algorithms
@@ -547,6 +551,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			panelCloud.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Cloud"));
 			panelCloud.addLabeled(spinMaxDepth,"Max Depth","Maximum distance relative to stereo baseline");
 			panelCloud.addLabeled(spinMaxTrackAge,"Max Age","Only draw tracks which were first seen than this value");
+			panelCloud.addLabeled(spinMinDuration,"Min Duration","Only draw tracks if they have been seen for this many frames");
 			panelCloud.add(fillHorizontally(gridPanel(2,checkCameras,spinCameraN)));
 			panelCloud.addAlignLeft(checkCloud);
 			panelCloud.add(cloudColor);
@@ -623,6 +628,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				cloudPanel.update();
 			} else if( source == spinMaxTrackAge ) {
 				maxTrackAge = ((Number)spinMaxTrackAge.getValue()).intValue();
+				cloudPanel.update();
+			} else if( source == spinMinDuration ) {
+				minTrackDuration = ((Number)spinMinDuration.getValue()).intValue();
 				cloudPanel.update();
 			} else if( source == comboApproach ) {
 				approach = comboApproach.getSelectedIndex();
@@ -803,6 +811,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 						if (controls.maxDepth > 0 && f.depth > maxDepth)
 							continue;
 						if(controls.maxTrackAge > 0 && frameID > f.firstFrame+controls.maxTrackAge )
+							continue;
+						if(f.lastFrame-f.firstFrame+1 < controls.minTrackDuration )
 							continue;
 						gui.addPoint(f.world.x, f.world.y, f.world.z, f.rgb);
 					}
