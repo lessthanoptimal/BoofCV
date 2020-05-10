@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,8 +111,28 @@ public class StereoParameters implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Makes 'this' identical to 'src'.
+	 * @param src The set of parameters that is to be copied.
+	 */
+	public void set( StereoParameters src ) {
+		if( this.left == null )
+			this.left = new CameraPinholeBrown(src.left);
+		else
+			this.left.set(src.left);
+		if( this.right == null )
+			this.right = new CameraPinholeBrown(src.right);
+		else
+			this.right.set(src.right);
+
+		if( this.rightToLeft == null )
+			this.rightToLeft = src.rightToLeft.copy();
+		else
+			this.rightToLeft.set(src.rightToLeft);
+	}
+
 	public void print() {
-		double euler[] = ConvertRotation3D_F64.matrixToEuler(rightToLeft.getR(), EulerType.XYZ,(double[])null);
+		double[] euler = ConvertRotation3D_F64.matrixToEuler(rightToLeft.getR(), EulerType.XYZ,(double[])null);
 		Vector3D_F64 t = rightToLeft.getT();
 		System.out.println();
 		System.out.println("Left Camera");

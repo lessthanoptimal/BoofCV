@@ -76,20 +76,20 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	@Override
 	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
 		Se3_F64 left_to_world = alg.getLeftToWorld();
-		FastQueue<VisOdomStereoQuadPnP.QuadView> features =  alg.getQuadViews();
+		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features =  alg.getTrackQuads();
 		SePointOps_F64.transform(left_to_world,features.get(index).X,world);
 		return true;
 	}
 
 	@Override
-	public int getTotalTracks() {return alg.getQuadViews().size;}
+	public int getTotalTracks() {return alg.getTrackQuads().size;}
 
 	@Override
-	public long getTrackId(int index) {return alg.getQuadViews().get(index).id;}
+	public long getTrackId(int index) {return alg.getTrackQuads().get(index).id;}
 
 	@Override
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
-		pixel.set(alg.getQuadViews().get(index).v2);
+		pixel.set(alg.getTrackQuads().get(index).v2);
 	}
 
 	@Override
@@ -99,9 +99,9 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		else
 			storage.clear();
 
-		FastQueue<VisOdomStereoQuadPnP.QuadView> features =  alg.getQuadViews();
+		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features =  alg.getTrackQuads();
 
-		for( VisOdomStereoQuadPnP.QuadView v : features.toList() )
+		for( VisOdomStereoQuadPnP.TrackQuad v : features.toList() )
 			storage.add(v.v2); // new left camera
 
 		return storage;
@@ -109,13 +109,13 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public boolean isTrackInlier(int index) {
-		return alg.getQuadViews().get(index).inlier;
+		return alg.getTrackQuads().get(index).inlier;
 	}
 
 	@Override
 	public boolean isTrackNew(int index) {
 		long frameId = alg.getFrameID();
-		return alg.getQuadViews().get(index).firstSceneFrameID == frameId;
+		return alg.getTrackQuads().get(index).firstSceneFrameID == frameId;
 	}
 
 	@Override
@@ -151,7 +151,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public boolean process(T leftImage, T rightImage) {
-		totalFeatures += alg.getQuadViews().size;
+		totalFeatures += alg.getTrackQuads().size;
 		return alg.process(leftImage, rightImage);
 	}
 

@@ -630,6 +630,8 @@ public class FactoryVisualOdometry {
 		VisOdomStereoQuadPnP<T,Desc> alg = new VisOdomStereoQuadPnP<>(
 				detector, associateF2F, associateL2R, triangulate, motion, refinePnP, bundleAdjustment);
 
+		alg.getBundleConverge().setTo(config.bundleConverge);
+
 		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateL2R, distanceStereo, distanceMono, imageType);
 	}
 
