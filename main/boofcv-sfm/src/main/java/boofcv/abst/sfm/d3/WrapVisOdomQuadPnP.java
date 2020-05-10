@@ -85,7 +85,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	public int getTotalTracks() {return alg.getQuadViews().size;}
 
 	@Override
-	public long getTrackId(int index) {return index+totalFeatures;}
+	public long getTrackId(int index) {return alg.getQuadViews().get(index).id;}
 
 	@Override
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
@@ -114,7 +114,8 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public boolean isTrackNew(int index) {
-		return true;
+		long frameId = alg.getFrameID();
+		return alg.getQuadViews().get(index).firstSceneFrameID == frameId;
 	}
 
 	@Override

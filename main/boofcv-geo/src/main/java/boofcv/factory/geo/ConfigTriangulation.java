@@ -40,15 +40,21 @@ public class ConfigTriangulation {
 	 */
 	public ConfigConverge optimization = new ConfigConverge(1e-8,1e-8,10);
 
-	public static final ConfigTriangulation DLT = new ConfigTriangulation(Type.DLT);
-	public static final ConfigTriangulation ALGEBRAIC = new ConfigTriangulation(Type.ALGEBRAIC);
-	public static final ConfigTriangulation GEOMETRIC = new ConfigTriangulation(Type.GEOMETRIC);
-
 	public ConfigTriangulation() {
 	}
 
 	public ConfigTriangulation(Type type) {
 		this.type = type;
+	}
+
+	public static ConfigTriangulation DLT() {
+		return new ConfigTriangulation(Type.DLT);
+	}
+	public static ConfigTriangulation ALGEBRAIC() {
+		return new ConfigTriangulation(Type.ALGEBRAIC);
+	}
+	public static ConfigTriangulation GEOMETRIC() {
+		return new ConfigTriangulation(Type.GEOMETRIC);
 	}
 
 	public enum Type {

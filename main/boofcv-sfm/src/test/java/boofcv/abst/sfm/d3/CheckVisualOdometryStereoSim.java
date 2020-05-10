@@ -114,7 +114,7 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		for( int i = 0; i < 10; i++ ) {
-			System.out.println("Step i = "+i);
+//			System.out.println("Step i = "+i);
 			worldToLeft.getT().z = i*0.05;
 
 			worldToLeft.concat(leftToRight,worldToRight);
@@ -131,8 +131,8 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
 
-			worldToLeft.getT().print();
-			foundWorldToLeft.getT().print();
+//			worldToLeft.getT().print();
+//			foundWorldToLeft.getT().print();
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
 			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );

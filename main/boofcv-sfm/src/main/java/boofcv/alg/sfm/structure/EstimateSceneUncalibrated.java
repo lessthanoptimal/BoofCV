@@ -69,7 +69,7 @@ public class EstimateSceneUncalibrated
 	FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 	GrowQueue_F64 errors = new GrowQueue_F64();
 
-	Triangulate2ViewsProjective triangulator = FactoryMultiView.triangulate2ViewProjective(ConfigTriangulation.GEOMETRIC);
+	Triangulate2ViewsProjective triangulator = FactoryMultiView.triangulate2ViewProjective(ConfigTriangulation.GEOMETRIC());
 
 	// Verbose output to standard out
 	PrintStream verbose;

@@ -119,7 +119,7 @@ public class ProjectiveInitializeAllCommon {
 		configRansac.iterations = 500;
 		configRansac.inlierThreshold = 1;
 
-		triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC);
+		triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC());
 
 		P1 = CommonOps_DDRM.identity(3,4);
 		P2 = new DMatrixRMaj(3,4);

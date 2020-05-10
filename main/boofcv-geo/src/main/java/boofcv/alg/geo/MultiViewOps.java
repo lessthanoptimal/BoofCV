@@ -1663,7 +1663,7 @@ public class MultiViewOps {
 	public static void triangulatePoints(SceneStructureMetric structure , SceneObservations observations )
 	{
 		TriangulateNViewsMetric triangulation = FactoryMultiView.
-				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC);
+				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC());
 
 		List<RemoveBrownPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.size; i++) {
