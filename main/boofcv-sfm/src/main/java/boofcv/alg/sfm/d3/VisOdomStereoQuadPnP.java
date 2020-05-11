@@ -149,6 +149,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	private final FastQueue<Point2D_F64> listNorm = new FastQueue<>(Point2D_F64::new);
 	private final FastQueue<Se3_F64> listWorldToView = new FastQueue<>(Se3_F64::new);
 	private final List<TrackQuad> inliers = new ArrayList<>();
+	private final List<TrackQuad> consistentTracks = new ArrayList<>();
 	private final Se3_F64 found = new Se3_F64();
 
 	/**
@@ -245,12 +246,16 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 			associateF2F();
 			long time3 = System.nanoTime();
 			cyclicConsistency();
-			removeTracksNotConsistent();
+			putConsistentTracksIntoList();
 
 			// Estimate the motion robustly
 			long time4 = System.nanoTime();
 			if ( !robustMotionEstimate()) {
 				if( verbose != null ) verbose.println("Failed to estimate motion");
+				// odds are that it's totally hosed and you should reset
+				// this will undo the most recent tracking results and if the features are still in view it might
+				// be able to recover
+				abortTrackingResetKeyFrame();
 				return false;
 			}
 			Se3_F64 key_to_curr = matcher.getModelParameters();
@@ -298,12 +303,24 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	/**
-	 * Remove tracks where it was unable meet 4-frame consistency in the new stereo image
+	 * Handle an aborted update. Undo the latest tracking so that the same frame will be a key frame again.
 	 */
-	private void removeTracksNotConsistent() {
-		for (int i = trackQuads.size-1; i >= 0; i--) {
-			if( trackQuads.get(i).leftCurrIndex == -1 ) {
-				trackQuads.removeSwap(i);
+	private void abortTrackingResetKeyFrame() {
+		swapFeatureFrames();
+		for( int i = 0; i < 1; i++ ) {
+			SetMatches matches = setMatches[i];
+			matches.swap();
+		}
+	}
+
+	/**
+	 * Puts all the found consistent tracks into a list
+	 */
+	private void putConsistentTracksIntoList() {
+		consistentTracks.clear();
+		for (int i = 0; i < trackQuads.size; i++) {
+			if( trackQuads.get(i).leftCurrIndex != -1 ) {
+				consistentTracks.add(trackQuads.get(i));
 			}
 		}
 	}
@@ -322,8 +339,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		// (left key -> left curr) -> (left curr -> right curr)
 		key_to_curr.concat(left_to_right,listWorldToView.get(3));
 
-		for (int quadIdx = trackQuads.size-1; quadIdx >= 0; quadIdx--) {
-			TrackQuad q = trackQuads.get(quadIdx);
+		for (int quadIdx = 0; quadIdx < consistentTracks.size(); quadIdx++) {
+			TrackQuad q = consistentTracks.get(quadIdx);
 
 			// This could be cached but isn't a bottle neck so it's being left like this since the code is simpler
 			leftPixelToNorm.compute(q.v0.x,q.v0.y, listNorm.get(0));
@@ -332,13 +349,13 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 			rightPixelToNorm.compute(q.v3.x,q.v3.y, listNorm.get(3));
 
 			if( !triangulateN.triangulate(listNorm.toList(), listWorldToView.toList(),X) ) {
-				trackQuads.removeSwap(quadIdx);
+				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
 				continue;
 			}
 
 			// something is really messed up if it thinks it's behind the camera
 			if( X.z <= 0.0 ) {
-				trackQuads.removeSwap(quadIdx);
+				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
 				continue;
 			}
 
@@ -356,7 +373,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		for (int quadIdx = trackQuads.size-1; quadIdx >= 0; quadIdx--) {
 			TrackQuad quad = trackQuads.get(quadIdx);
 			if( quad.leftCurrIndex == -1 ) {
-				throw new RuntimeException("BUG! Should have already been pruned");
+				trackQuads.removeSwap(quadIdx);
+				continue;
 			}
 			// Convert the coordinate system from the old left to the new left camera
 			SePointOps_F64.transform(key_to_curr,quad.X,quad.X);
@@ -378,10 +396,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	private void detectFeatures( T left , T right ) {
 		// make the previous new observations into the new old ones
-		ImageInfo<TD> tmp = featsLeft1;
-		featsLeft1 = featsLeft0; featsLeft0 = tmp;
-		tmp = featsRight1;
-		featsRight1 = featsRight0; featsRight0 = tmp;
+		swapFeatureFrames();
 
 		// detect and associate features in the two images
 		featsLeft1.reset();
@@ -389,6 +404,18 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 		describeImage(left,featsLeft1);
 		describeImage(right,featsRight1);
+	}
+
+	/**
+	 * Swap the feature lists between key and current frames
+	 */
+	private void swapFeatureFrames() {
+		ImageInfo<TD> tmp = featsLeft1;
+		featsLeft1 = featsLeft0;
+		featsLeft0 = tmp;
+		tmp = featsRight1;
+		featsRight1 = featsRight0;
+		featsRight0 = tmp;
 	}
 
 	/**
@@ -561,8 +588,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		modelFitData.reset();
 
 		// use 0 -> 1 stereo associations to estimate each feature's 3D position
-		for(int i = 0; i < trackQuads.size; i++ ) {
-			TrackQuad quad = trackQuads.get(i);
+		for(int i = 0; i < consistentTracks.size(); i++ ) {
+			TrackQuad quad = consistentTracks.get(i);
 			Stereo2D3D data = modelFitData.grow();
 			leftPixelToNorm.compute(quad.v2.x,quad.v2.y,data.leftObs);
 			rightPixelToNorm.compute(quad.v3.x,quad.v3.y,data.rightObs);
@@ -577,7 +604,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		// mark features which are inliers
 		int numInliers = matcher.getMatchSet().size();
 		for (int i = 0; i < numInliers; i++) {
-			trackQuads.get(matcher.getInputIndex(i)).inlier = true;
+			consistentTracks.get(matcher.getInputIndex(i)).inlier = true;
 		}
 
 		return true;
@@ -608,9 +635,9 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 		// Must only process inlier tracks here
 		inliers.clear();
-		for (int trackIdx = 0; trackIdx < trackQuads.size; trackIdx++) {
-			TrackQuad t = trackQuads.get(trackIdx);
-			if( t.inlier )
+		for (int trackIdx = 0; trackIdx < consistentTracks.size(); trackIdx++) {
+			TrackQuad t = consistentTracks.get(trackIdx);
+			if( t.leftCurrIndex != -1 && t.inlier )
 				inliers.add(t);
 		}
 

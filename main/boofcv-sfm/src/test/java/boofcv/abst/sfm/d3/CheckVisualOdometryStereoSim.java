@@ -30,6 +30,7 @@ import georegression.struct.se.Se3_F64;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -139,6 +140,52 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 		}
 	}
 
+	/**
+	 * Move in forward direction, then give it a completely black frame which should cause it to fail motion estimation,
+	 * then give it the real frame. It should resume VO as usual. If an implementation should not handle this situation
+	 * gracefully then override this test and skip it.
+	 */
+	@Test
+	void singleBadFrame() {
+		StereoVisualOdometry<I> algorithm = createAlgorithm();
+
+		algorithm.reset();
+		algorithm.setCalibration(param);
+
+		Se3_F64 worldToLeft = new Se3_F64();
+		Se3_F64 worldToRight = new Se3_F64();
+		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
+
+		int traveled = 0;
+		for( int i = 0; i < 5; i++ ) {
+			boolean badFrame = false;
+			if( i == 3 ) {
+				badFrame = true;
+				GImageMiscOps.fill(left,0);
+				GImageMiscOps.fill(right,0);
+			} else {
+				worldToLeft.getT().z = traveled++ * 0.05;
+				worldToLeft.concat(leftToRight, worldToRight);
+
+				// render the images
+				setIntrinsic(param.getLeft());
+				left.setTo(render(worldToLeft));
+				setIntrinsic(param.getRight());
+				right.setTo(render(worldToRight));
+			}
+			// process the images
+			assertEquals(!badFrame,algorithm.process(left,right));
+
+			if( badFrame )
+				continue;
+
+			// Compare to truth.  Only go for a crude approximation
+			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
+
+			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
+			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );
+		}
+	}
 
 	public StereoParameters createStereoParam() {
 		StereoParameters ret = new StereoParameters();
