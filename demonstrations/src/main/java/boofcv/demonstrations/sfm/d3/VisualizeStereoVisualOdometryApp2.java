@@ -254,7 +254,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
 		config.tracker.detDesc.detectPoint.general.radius = 5;
-		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 20;
 		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
 
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
@@ -480,7 +480,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		boolean showInliers = false;
 		boolean showNew = false;
 
-		int approach = 0; // which visual odometry approach has been selected
+		int approach = 1; // which visual odometry approach has been selected
 
 		double maxDepth=0; // Maximum depth a feature is from the camera when last viewed
 		boolean showCameras=true; // show camera locations in 3D view

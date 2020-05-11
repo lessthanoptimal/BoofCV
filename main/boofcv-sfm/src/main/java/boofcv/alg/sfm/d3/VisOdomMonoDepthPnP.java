@@ -272,9 +272,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	}
 
 	@Override
-	protected void dropVisualTrack(BTrack track) {
-		if( track.visualTrack != null )
-			tracker.dropTrack(track.visualTrack);
+	protected void dropVisualTrack(PointTrack track) {
+		tracker.dropTrack(track);
 	}
 
 	/**

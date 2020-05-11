@@ -233,7 +233,7 @@ class TestVisOdomBundlePnPBase {
 		}
 
 		@Override
-		protected void dropVisualTrack(BTrack track) {
+		protected void dropVisualTrack(PointTrack track) {
 			countDropVisual++;
 		}
 

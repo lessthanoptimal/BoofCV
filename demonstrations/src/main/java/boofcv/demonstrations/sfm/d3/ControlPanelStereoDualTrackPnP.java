@@ -19,7 +19,6 @@
 package boofcv.demonstrations.sfm.d3;
 
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
@@ -31,8 +30,6 @@ import boofcv.struct.image.ImageType;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Peter Abeles
@@ -72,10 +69,10 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 		StereoVisualOdometry<T> alg = FactoryVisualOdometry.stereoDualTrackerPnP(controlPnpDepth.config,
 				trackerLeft,trackerRight,config,imageType);
 
-		Set<String> configuration = new HashSet<>();
-		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
-		configuration.add(VisualOdometry.VERBOSE_TRACKING);
-		alg.setVerbose(System.out,configuration);
+//		Set<String> configuration = new HashSet<>();
+//		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
+//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
+//		alg.setVerbose(System.out,configuration);
 
 		return alg;
 	}

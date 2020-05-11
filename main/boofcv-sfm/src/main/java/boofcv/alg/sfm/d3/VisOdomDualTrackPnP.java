@@ -274,7 +274,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		selectCandidateStereoTracks();
 		// Robustly estimate motion using features in candidates list
 		if( !estimateMotion() ) {
-			System.out.println("!!! Motion Failed !!!");
+			if( verbose != null ) verbose.println("!!! Motion Failed !!!");
 			removedBundleTracks.clear();
 			scene.removeFrame(currentRight,removedBundleTracks);
 			scene.removeFrame(currentLeft,removedBundleTracks);
@@ -614,8 +614,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	}
 
 	@Override
-	protected void dropVisualTrack(BTrack track) {
-		PointTrack left = track.visualTrack; // TODO This was null when processing KITTI
+	protected void dropVisualTrack(PointTrack left) {
 		TrackInfo info = left.getCookie();
 		PointTrack right = info.visualRight;
 		trackerLeft.dropTrack(left);

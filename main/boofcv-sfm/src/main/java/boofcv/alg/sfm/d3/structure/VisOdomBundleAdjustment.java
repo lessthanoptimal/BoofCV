@@ -221,7 +221,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * @param removedVisualTracks List of tracks which were removed and were being visually tracked
 	 *                      because they had no more observations. Cleared each call.
 	 */
-	public void removeFrame( BFrame frame , List<BTrack> removedVisualTracks ) {
+	public void removeFrame( BFrame frame , List<PointTrack> removedVisualTracks ) {
 		removedVisualTracks.clear();
 		int index = frames.indexOf(frame);
 		if( index < 0 )
@@ -249,7 +249,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 				if (tracks.get(i).observations.size == 0) {
 					BTrack t = tracks.removeSwap(i);
 					if( t.visualTrack != null ) {
-						removedVisualTracks.add(t);
+						removedVisualTracks.add(t.visualTrack);
 						if( t.visualTrack.cookie != t ) {
 							System.out.println("BUG! bt="+t.id+" tt="+t.visualTrack.featureId);
 							throw new RuntimeException("BUG!");

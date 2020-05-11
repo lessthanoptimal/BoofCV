@@ -20,6 +20,7 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.sfm.d3.VisualOdometry;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d3.structure.MaxGeoKeyFrameManager;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment;
@@ -102,7 +103,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 
 	//=================================================================
 	//======== Workspace Variables
-	List<BTrack> removedBundleTracks = new ArrayList<>();
+	List<PointTrack> removedBundleTracks = new ArrayList<>();
 
 	//======== Triangulation related
 	// observations in normalized image coordinates
@@ -291,7 +292,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 //					System.out.println("  Removing track from frame: "+bt.id);
 					bf.tracks.removeSwap(tidx);
 					if( bt.visualTrack != null ) {
-						dropVisualTrack(bt);
+						dropVisualTrack(bt.visualTrack);
 						bt.visualTrack = null;
 					}
 				}
@@ -302,7 +303,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/**
 	 * Given the BTrack drop all visual tracks which belong to it.
 	 */
-	protected abstract void dropVisualTrack( BTrack track );
+	protected abstract void dropVisualTrack( PointTrack track );
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
