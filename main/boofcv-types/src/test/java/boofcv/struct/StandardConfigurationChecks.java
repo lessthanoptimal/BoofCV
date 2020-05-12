@@ -120,9 +120,9 @@ public abstract class StandardConfigurationChecks {
 			// after setTo() they should be the same
 			for (Field f : fields) {
 				if (f.getType().isEnum() || f.getType().isPrimitive())
-					assertEquals(f.get(src), f.get(dst), f.getName());
+					assertEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
 				else
-					assertNotEquals(f.get(src), f.get(dst), f.getName());
+					assertNotEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
 				// if they are equal that means it copied the reference
 			}
 

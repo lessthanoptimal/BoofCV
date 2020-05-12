@@ -8,6 +8,15 @@ TODO Disparity post processing
  - Fill in holes
  - mark small disparities as invalid
 
+TODO Geometry Wish List
+   - Triangulation refine which minimizes pixel error
+   - P3P equivalent for multiple cameras with known relationships
+
+TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
+TODO Videos - hough line detectors
+            - chessboard corner detector + improvements
+            - stereo and VO updates
+
 TODO assisted self calibration
 TODO hough circle detector
 TODO concurrent SIFT

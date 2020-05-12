@@ -64,6 +64,16 @@ public class ConfigBackgroundGmm extends ConfigBackground {
 	 */
 	public float significantWeight = 0.01f;
 
+	public void setTo( ConfigBackgroundGmm src ) {
+		super.setTo(src);
+		this.learningPeriod = src.learningPeriod;
+		this.initialVariance = src.initialVariance;
+		this.decayCoefient = src.decayCoefient;
+		this.maxDistance = src.maxDistance;
+		this.numberOfGaussian = src.numberOfGaussian;
+		this.significantWeight = src.significantWeight;
+	}
+
 	@Override
 	public void checkValidity() {
 		if( learningPeriod <= 0 )

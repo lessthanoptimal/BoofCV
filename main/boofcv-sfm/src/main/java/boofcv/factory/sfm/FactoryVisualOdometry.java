@@ -251,6 +251,7 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of image being processed.
 	 * @return StereoVisualOdometry
 	 */
+	@Deprecated
 	public static <T extends ImageGray<T>>
 	StereoVisualOdometry<T> stereoDepth(double inlierPixelTol,
 										int thresholdAdd,
@@ -308,6 +309,7 @@ public class FactoryVisualOdometry {
 	 * @param depthType Type of depth image being processed.
 	 * @return StereoVisualOdometry
 	 */
+	@Deprecated
 	public static <Vis extends ImageGray<Vis>, Depth extends ImageGray<Depth>>
 	DepthVisualOdometry<Vis,Depth> depthDepthPnP(double inlierPixelTol,
 												 int thresholdAdd,
@@ -401,73 +403,6 @@ public class FactoryVisualOdometry {
 	}
 
 	/**
-	 * Creates a stereo visual odometry algorithm that independently tracks features in left and right camera.
-	 *
-	 * @see VisOdomDualTrackPnP
-	 *
-	 * @param thresholdAdd When the number of inliers is below this number new features are detected
-	 * @param thresholdRetire When a feature has not been in the inlier list for this many ticks it is dropped
-	 * @param inlierPixelTol Tolerance in pixels for defining an inlier during robust model matching.  Typically 1.5
-	 * @param epipolarPixelTol Tolerance in pixels for enforcing the epipolar constraint
-	 * @param ransacIterations Number of iterations performed by RANSAC.  Try 300 or more.
-	 * @param refineIterations Number of iterations done during non-linear optimization.  Try 50 or more.
-	 * @param trackerLeft Tracker used for left camera
-	 * @param trackerRight Tracker used for right camera
-	 * @param descriptor Describes points
-	 * @param describeRadius Radius passed in when describing points. Try 11.0
-	 * @param imageType Type of image being processed
-	 * @return Stereo visual odometry algorithm.
-	 */
-	public static <T extends ImageGray<T>, Desc extends TupleDesc>
-	StereoVisualOdometry<T> stereoDualTrackerPnP(int thresholdAdd, int thresholdRetire,
-												 double inlierPixelTol,
-												 double epipolarPixelTol,
-												 int ransacIterations,
-												 int refineIterations,
-												 PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
-												 DescribeRegionPoint<T,Desc> descriptor,
-												 double describeRadius,
-												 Class<T> imageType)
-	{
-		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
-		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
-		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
-		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
-
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
-
-		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
-		double ransacTOL = 2*inlierPixelTol*inlierPixelTol;
-
-		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-				new Ransac<>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
-
-		RefinePnPStereo refinePnP = null;
-
-		Class<Desc> descType = descriptor.getDescriptionType();
-		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
-		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
-
-		// need to make sure associations are unique
-		AssociateDescription2D<Desc> associateUnique = FactoryAssociation.ensureUnique(associateStereo);
-
-		if( refineIterations > 0 ) {
-			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-		}
-
-		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
-				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
-
-		return null;
-//		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(thresholdAdd, thresholdRetire, epipolarPixelTol,
-//				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP,null);
-//		alg.setDescribeRadius(describeRadius);
-//
-//		return new WrapVisOdomDualTrackPnP<>(pnpStereo, distanceMono, distanceStereo, associateStereo, alg, refinePnP, imageType);
-	}
-
-	/**
 	 * Creates an instance of {@link VisOdomDualTrackPnP}.
 	 *
 	 * @param configVO Configuration
@@ -556,77 +491,12 @@ public class FactoryVisualOdometry {
 				alg, pnpStereo, distanceMono, distanceStereo, associateL2R, refinePnP,imageType);
 	}
 
-//	/**
-//	 * Stereo visual odometry which uses the two most recent stereo observations (total of four views) to estimate
-//	 * motion.
-//	 *
-//	 * @see VisOdomStereoQuadPnP
-//	 *
-//	 * @param inlierPixelTol Pixel tolerance for RANSAC inliers - Euclidean distance
-//	 * @param epipolarPixelTol Feature association tolerance in pixels.
-//	 * @param maxDistanceF2F Maximum allowed distance between two features in pixels
-//	 * @param maxAssociationError Maxium error between two features when associating.
-//	 * @param ransacIterations Number of iterations RANSAC will perform
-//	 * @param refineIterations Number of refinement iterations
-//	 * @param detector Which feature detector to use
-//	 * @param imageType Type of input image
-//	 */
-//	public static <T extends ImageGray<T>,Desc extends TupleDesc>
-//	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
-//										   double epipolarPixelTol ,
-//										   double maxDistanceF2F,
-//										   double maxAssociationError,
-//										   int ransacIterations ,
-//										   int refineIterations ,
-//										   DetectDescribeMulti<T,Desc> detector,
-//										   Class<T> imageType )
-//	{
-//		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
-//		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
-//		PnPStereoDistanceReprojectionSq distanceStereo = new PnPStereoDistanceReprojectionSq();
-//		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
-//
-//		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-//		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
-//
-//		// euclidean error squared from left + right images
-//		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
-//
-//		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-//				new Ransac<>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
-//
-//		RefinePnPStereo refinePnP = null;
-//
-//		if( refineIterations > 0 ) {
-//			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
-//		}
-//		Class<Desc> descType = detector.getDescriptionType();
-//
-//		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
-//
-//		// TODO need a better way to keep track of what error is squared and not
-//		AssociateDescription2D<Desc> assocSame;
-//		if( maxDistanceF2F > 0 ) {
-//			AssociateMaxDistanceNaive<Desc> a = new AssociateMaxDistanceNaive<>(scorer, true, maxAssociationError);
-//			a.setSquaredDistance(true);
-//			a.setMaxDistance(maxDistanceF2F);
-//			assocSame = a;
-//		} else {
-//			assocSame = new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),scorer));
-//		}
-//
-//		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
-//		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
-//				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
-//
-//		associateStereo.setMaxScoreThreshold(maxAssociationError);
-//
-//		VisOdomStereoQuadPnP<T,Desc> alg = new VisOdomStereoQuadPnP(
-//				detector, assocSame, associateStereo, triangulate, motion, refinePnP, null);
-//
-//		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateStereo, distanceStereo, distanceMono, imageType);
-//	}
-
+	/**
+	 * Creates a stereo visual odometry algorithm that uses the two most recent frames (4 images total) to estimate
+	 * motion.
+	 *
+	 * @see VisOdomStereoQuadPnP
+	 */
 	public static <T extends ImageGray<T>, Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoQuadPnP( ConfigStereoQuadPnP config, Class<T> imageType)
 	{

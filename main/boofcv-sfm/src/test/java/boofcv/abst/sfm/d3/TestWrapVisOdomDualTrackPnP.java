@@ -18,31 +18,76 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<GrayF32> {
+public class TestWrapVisOdomDualTrackPnP
+{
+	@Nested
+	public class TrackerKlt extends CheckVisualOdometryStereoSim<GrayF32> {
 
-	public TestWrapVisOdomDualTrackPnP() {super(GrayF32.class);}
+		public TrackerKlt() {
+			super(GrayF32.class);
+		}
 
-	@Override
-	public StereoVisualOdometry<GrayF32> createAlgorithm() {
-		var config = new ConfigStereoDualTrackPnP();
+		@Override
+		void singleBadFrame() {
+			// skip this since KLT can't recover from bad frames since it overwrites the result
+		}
 
-		config.scene.bundleConverge.maxIterations = 10;
-		config.scene.ransac.inlierThreshold = 1.5;
-		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
-		config.tracker.klt.templateRadius = 3;
-		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
-		config.tracker.detDesc.detectPoint.general.radius = 3;
+		@Override
+		public StereoVisualOdometry<GrayF32> createAlgorithm() {
 
-//		config.stereoRadius = 5;
+			var config = new ConfigStereoDualTrackPnP();
 
-		return FactoryVisualOdometry.stereoDualTrackerPnP(config,GrayF32.class);
+			config.scene.ransac.iterations = 200;
+			config.scene.ransac.inlierThreshold = 1.5;
+
+			config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+			config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+			config.tracker.klt.templateRadius = 3;
+			config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
+			config.tracker.detDesc.detectPoint.general.radius = 3;
+
+			return FactoryVisualOdometry.stereoDualTrackerPnP(config,GrayF32.class);
+		}
+	}
+
+	@Nested
+	public class TrackerDDA extends CheckVisualOdometryStereoSim<GrayF32> {
+
+		public TrackerDDA() {
+			super(GrayF32.class);
+		}
+
+		@Override
+		public StereoVisualOdometry<GrayF32> createAlgorithm() {
+
+			var config = new ConfigStereoDualTrackPnP();
+
+			config.scene.ransac.iterations = 200;
+			config.scene.ransac.inlierThreshold = 1.5;
+
+			config.tracker.typeTracker = ConfigPointTracker.TrackerType.DDA;
+			config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+			config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
+			config.tracker.detDesc.detectPoint.scaleRadius = 12;
+			config.tracker.detDesc.detectPoint.general.radius = 3;
+			config.tracker.detDesc.detectPoint.general.threshold = 0;
+			config.tracker.detDesc.detectPoint.shiTomasi.radius = 2;
+			config.tracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+			config.tracker.detDesc.describeBrief.fixed = true;
+
+			return FactoryVisualOdometry.stereoDualTrackerPnP(config,GrayF32.class);
+		}
 	}
 }

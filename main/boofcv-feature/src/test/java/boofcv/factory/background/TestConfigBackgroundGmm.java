@@ -18,21 +18,7 @@
 
 package boofcv.factory.background;
 
-import boofcv.struct.Configuration;
+import boofcv.struct.StandardConfigurationChecks;
 
-/**
- * Common configuration for all {@link boofcv.alg.background.BackgroundModel}
- *
- * @author Peter Abeles
- */
-public abstract class ConfigBackground implements Configuration {
-
-	/**
-	 * Specifies what value a pixel should be assigned if no statistical information is available.
-	 */
-	public int unknownValue = 0;
-
-	public void setTo( ConfigBackground src ) {
-		this.unknownValue = src.unknownValue;
-	}
+public class TestConfigBackgroundGmm extends StandardConfigurationChecks {
 }

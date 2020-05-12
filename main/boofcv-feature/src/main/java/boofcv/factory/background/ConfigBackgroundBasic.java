@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,16 @@ public class ConfigBackgroundBasic extends ConfigBackground {
 	public ConfigBackgroundBasic(float threshold, float learnRate) {
 		this.threshold = threshold;
 		this.learnRate = learnRate;
+	}
+
+	public ConfigBackgroundBasic() {
+	}
+
+	public void setTo(ConfigBackgroundBasic src ) {
+		super.setTo(src);
+		this.learnRate = src.learnRate;
+		this.threshold = src.threshold;
+		this.interpolation = src.interpolation;
 	}
 
 	@Override

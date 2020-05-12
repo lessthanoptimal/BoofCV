@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,6 +68,18 @@ public class ConfigBackgroundGaussian extends ConfigBackground {
 	public ConfigBackgroundGaussian(float threshold, float learnRate) {
 		this.threshold = threshold;
 		this.learnRate = learnRate;
+	}
+
+	public ConfigBackgroundGaussian() {
+	}
+
+	public void setTo(ConfigBackgroundGaussian src ) {
+		super.setTo(src);
+		this.learnRate = src.learnRate;
+		this.threshold = src.threshold;
+		this.initialVariance = src.initialVariance;
+		this.minimumDifference = src.minimumDifference;
+		this.interpolation = src.interpolation;
 	}
 
 	@Override
