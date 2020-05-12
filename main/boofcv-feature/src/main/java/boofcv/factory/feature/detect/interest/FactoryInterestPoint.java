@@ -25,6 +25,7 @@ import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.interest.*;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -54,6 +55,8 @@ public class FactoryInterestPoint {
 			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian);
 			case SIFT: return FactoryInterestPoint.sift(config.scaleSpaceSift,config.sift,inputType);
 			case POINT: {
+				if( derivType == null )
+					derivType = GImageDerivativeOps.getDerivativeType(inputType);
 				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point,inputType,derivType);
 				return FactoryInterestPoint.wrapPoint(alg, config.point.scaleRadius,inputType, derivType);
 			}
@@ -73,6 +76,8 @@ public class FactoryInterestPoint {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, double scaleRadius , Class<T> inputType, Class<D> derivType) {
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
 		ImageGradient<T, D> gradient = null;
 		ImageHessian<D> hessian = null;

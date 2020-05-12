@@ -45,7 +45,7 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel {
+public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPanel {
 	protected JComboBox<String> comboDetect;
 	protected JComboBox<String> comboDescribe;
 	protected JComboBox<String> comboAssociate;
@@ -67,11 +67,11 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel {
 	public ControlPanelAssociateGreedy controlAssocGreedy;
 	public ControlPanelAssociateNearestNeighbor controlAssocNN;
 
-	public ControlPanelDetDescAssoc() {
+	public ControlPanelDetDescAssocBase() {
 	}
 
-	public ControlPanelDetDescAssoc(ConfigDetectDescribe configDetDesc,
-									ConfigAssociate configAssociate)
+	public ControlPanelDetDescAssocBase(ConfigDetectDescribe configDetDesc,
+										ConfigAssociate configAssociate)
 	{
 		this.configDetDesc = configDetDesc;
 		this.configAssociate = configAssociate;

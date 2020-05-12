@@ -19,9 +19,7 @@
 package boofcv.demonstrations.sfm.multiview;
 
 import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
@@ -36,9 +34,7 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
-import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.UtilDisparitySwing;
@@ -58,7 +54,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.feature.AssociatedTripleIndex;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.image.*;
 import boofcv.visualize.PointCloudViewer;
@@ -95,17 +91,16 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	DemoThreeViewControls controls = new DemoThreeViewControls(this);
 
-	DetectDescribePoint<GrayU8, BrightFeature> detDesc;
-	ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
+	DetectDescribePoint<GrayU8, TupleDesc> detDesc;
+	AssociateDescription<TupleDesc> associate;
 
-	AssociateThreeByPairs<BrightFeature> associateThree = new AssociateThreeByPairs<>(associate,BrightFeature.class);
+	AssociateThreeByPairs<TupleDesc> associateThree;
 	FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple::new);
 
 	ThreeViewEstimateMetricScene structureEstimator = new ThreeViewEstimateMetricScene();
 
 	FastQueue<Point2D_F64> locations[] = new FastQueue[3];
-	FastQueue<BrightFeature> features[] = new FastQueue[3];
+	FastQueue<TupleDesc> features[] = new FastQueue[3];
 	ImageDimension dimensions[] = new ImageDimension[3];
 
 	BufferedImage buff[] = new BufferedImage[3];
@@ -133,6 +128,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	final Object lockProcessing = new Object();
 	boolean processing = false;
+	boolean exceptionOccurred = false; // if true that means a fatal error occured while processing
 	boolean hasAllImages = false;
 	// change panels automatically while computing. Only do this the first time an image is opened
 	// after that you might be tweaking a setting and don't want the view to change
@@ -145,12 +141,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		JMenu fileMenu = menuBar.getMenu(0);
 		fileMenu.remove(1);
 
-		detDesc = FactoryDetectDescribe.surfStable( new ConfigFastHessian(
-				0, 4, 1000, 1, 9, 4, 2), null,null, GrayU8.class);
-
 		for (int i = 0; i < 3; i++) {
 			locations[i] = new FastQueue<>(Point2D_F64::new);
-			features[i] = UtilFeature.createQueue(detDesc,100);
 			dimensions[i] = new ImageDimension();
 		}
 
@@ -266,30 +258,12 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			gui.remove(0);
 
 		switch( controls.view ) {
-			case 0: {
-				gui.add(BorderLayout.CENTER,guiImage);
-			} break;
-
-			case 1:
-				gui.add(BorderLayout.CENTER,guiAssoc);
-				break;
-
-			case 2:
-				gui.add(BorderLayout.CENTER,rectifiedPanel);
-				break;
-
-			case 3:
-				gui.add(BorderLayout.CENTER,guiDisparity);
-				break;
-
-			case 4: {
-				gui.add(BorderLayout.CENTER,guiPointCloud.getComponent());
-			} break;
-
-
-			default:
-				gui.add(BorderLayout.CENTER,guiImage);
-				break;
+			case 0: gui.add(BorderLayout.CENTER,guiImage); break;
+			case 1: gui.add(BorderLayout.CENTER,guiAssoc); break;
+			case 2: gui.add(BorderLayout.CENTER,rectifiedPanel); break;
+			case 3: gui.add(BorderLayout.CENTER,guiDisparity); break;
+			case 4: gui.add(BorderLayout.CENTER,guiPointCloud.getComponent()); break;
+			default: gui.add(BorderLayout.CENTER,guiImage); break;
 		}
 
 		gui.validate();
@@ -337,9 +311,12 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		// If the scale changes then the images need to be loaded again because they are
 		// scaled upon input
-		if( controls.scaleChanged ) {
+		// if features changed the input doesn't need to be reloaded but the features need to be computed again
+		// this could be done slightly more efficiently by skipping loading
+		if( controls.scaleChanged || controls.featuresChanged ) {
 			reprocessInput();
 		} else {
+			exceptionOccurred = false;
 			boolean skipAssociate = false;
 			boolean skipSparseStructure = false;
 			if( !controls.assocChanged ) {
@@ -375,37 +352,58 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		BufferedImage buffered = scaleBuffered(bufferedIn);
 
 		if( sourceID == 0 ) {
+			exceptionOccurred = false;
 			BoofSwingUtil.invokeNowOrLater(()->{
 				guiImage.setImage(buffered);
-				controls.setViews(0);
+				if( automaticChangeViews )
+					controls.setViews(0);
 			});
+		} else if( exceptionOccurred ) {
+			// abort if something went wrong on a prior image
+			return;
 		}
 
-		// ok this is ugly.... find a way to not convert the image twice
-		ConvertBufferedImage.convertFrom(buffered,input,true);
-		System.out.println("Processing image "+sourceID+"  shape "+input.width+" "+input.height);
-		System.out.println("  "+inputFilePath);
-		dimensions[sourceID].set(input.width,input.height);
-		buff[sourceID] = buffered;
+		try {
+			// ok this is ugly.... find a way to not convert the image twice
+			ConvertBufferedImage.convertFrom(buffered, input, true);
+			System.out.println("Processing image " + sourceID + "  shape " + input.width + " " + input.height);
+			System.out.println("  " + inputFilePath);
+			dimensions[sourceID].set(input.width, input.height);
+			buff[sourceID] = buffered;
 
-		// assume the image center is the principle point
-		double cx = input.width/2;
-		double cy = input.height/2;
+			// assume the image center is the principle point
+			double cx = input.width / 2;
+			double cy = input.height / 2;
 
-		// detect features
-		detDesc.detect((GrayU8)input);
-		locations[sourceID].reset();
-		features[sourceID].reset();
+			// detect features
+			if (controls.featuresChanged) {
+				controls.featuresChanged = false;
+				declareFeatureMatching();
+			}
+			detDesc.detect((GrayU8) input);
+			locations[sourceID].reset();
+			features[sourceID].reset();
 
-		// save results
-		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
-			Point2D_F64 pixel = detDesc.getLocation(i);
-			locations[sourceID].grow().set(pixel.x-cx,pixel.y-cy);
-			features[sourceID].grow().setTo(detDesc.getDescription(i));
+			// save results
+			for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
+				Point2D_F64 pixel = detDesc.getLocation(i);
+				locations[sourceID].grow().set(pixel.x - cx, pixel.y - cy);
+				features[sourceID].grow().setTo(detDesc.getDescription(i));
+			}
+			System.out.println("   found features " + features[sourceID].size);
+		} catch( RuntimeException e ) {
+			// Mark the problem, log the error, notify the user
+			exceptionOccurred = true;
+			e.printStackTrace();
+			BoofSwingUtil.invokeNowOrLater(()-> {
+				controls.clearText();
+				controls.addText("Failed computing features!\n" + e.getMessage() + "\n");
+			});
+			BoofSwingUtil.warningDialog(this,e);
+			return;
 		}
-		System.out.println("   found features "+features[sourceID].size);
 
-		if( sourceID < 2 )
+		if( sourceID < 2 && !exceptionOccurred )
 			return;
 
 		synchronized (lockProcessing) {
@@ -416,6 +414,16 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		controls.assocChanged = false;
 		controls.stereoChanged = false;
 		safeProcessImages(false,false);
+	}
+
+	private void declareFeatureMatching() {
+		detDesc = (DetectDescribePoint)controls.controlsDetDescAssoc.createDetectDescribe(GrayU8.class);
+		associate = controls.controlsDetDescAssoc.createAssociate(detDesc);
+		associate = FactoryAssociation.ensureUnique(associate);
+		associateThree = new AssociateThreeByPairs<>(associate,detDesc.getDescriptionType());
+		for (int i = 0; i < 3; i++) {
+			features[i] = UtilFeature.createQueue(detDesc,100);
+		}
 	}
 
 	private boolean isProcessing() {
@@ -465,7 +473,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		try {
 			processImages(skipAssociate,skipSparseStructure);
 		} catch (RuntimeException e ) {
-
+			e.printStackTrace();
+			controls.addText("Failed! "+e.getMessage());
+			BoofSwingUtil.warningDialog(this,e);
 		} finally {
 			SwingUtilities.invokeLater(()->setMenuBarEnabled(true));
 
@@ -558,7 +568,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 
 		// Pick the two best views to compute stereo from
-		int[]selected = selectBestPair(structureEstimator.structure);
+		int[] selected = selectBestPair(structureEstimator.structure);
 
 		if ( !computeStereoCloud(selected[0],selected[1], cx, cy,skipStructure,_automaticChangeViews) )
 			return;

@@ -25,7 +25,7 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.demonstrations.sfm.d3.ControlPanelDetDescAssoc;
+import boofcv.demonstrations.sfm.d3.ControlPanelDetDescAssocBase;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
@@ -242,7 +242,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progress + 2));
 	}
 
-	public class VisualizeScorePanel extends ControlPanelDetDescAssoc implements ActionListener {
+	public class VisualizeScorePanel extends ControlPanelDetDescAssocBase implements ActionListener {
 		JLabel labelSize = new JLabel();
 
 		// Containers for different sets of controls

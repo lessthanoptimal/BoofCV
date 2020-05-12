@@ -43,7 +43,7 @@ public class ControlPanelStereoQuadPnP extends JTabbedPane {
 
 	final ConfigStereoQuadPnP config;
 
-	final ControlPanelDetDescAssoc panelFeatures;
+	final ControlPanelDetDescAssocBase panelFeatures;
 	final ControlPanelMotion panelMotion;
 	final ControlPanelAssociate panelAssociate;
 
@@ -108,7 +108,7 @@ public class ControlPanelStereoQuadPnP extends JTabbedPane {
 		}
 	}
 
-	public class ControlPanelFeatures extends ControlPanelDetDescAssoc
+	public class ControlPanelFeatures extends ControlPanelDetDescAssocBase
 	{
 		private final JPanel controlPanel = new JPanel(new BorderLayout());
 

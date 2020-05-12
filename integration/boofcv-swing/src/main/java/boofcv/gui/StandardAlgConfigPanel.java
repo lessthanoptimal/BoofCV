@@ -295,6 +295,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 
 		if( tooltip != null ) {
 			label.setToolTipText(tooltip);
+			target.setToolTipText(tooltip);
 		}
 	}
 

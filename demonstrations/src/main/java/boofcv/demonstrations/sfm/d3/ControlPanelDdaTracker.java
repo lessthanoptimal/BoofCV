@@ -40,7 +40,7 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
-public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
+public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 
 	private final JPanel controlPanel = new JPanel(new BorderLayout());
 	private final Listener listener;

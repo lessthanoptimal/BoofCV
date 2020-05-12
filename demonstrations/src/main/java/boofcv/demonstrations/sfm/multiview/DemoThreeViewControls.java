@@ -19,6 +19,10 @@
 package boofcv.demonstrations.sfm.multiview;
 
 import boofcv.demonstrations.feature.disparity.ControlPanelDisparityDense;
+import boofcv.demonstrations.sfm.d3.ControlPanelDdaComboTabs;
+import boofcv.factory.feature.associate.ConfigAssociate;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.feature.disparity.ConfigDisparitySGM;
 import boofcv.factory.feature.disparity.DisparityError;
@@ -27,9 +31,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
@@ -39,18 +41,6 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	implements ChangeListener, ActionListener
 {
 
-	JComboBox imageView;
-
-	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
-	JSpinner sMaxSize;
-	JSpinner sInliers;
-	JSpinner sPrune;
-	JCheckBox cFocalAuto;
-	JSpinner sFocal;
-	JButton bCompute = new JButton("Compute");
-
-	JTextArea textInfo = new JTextArea();
-
 	int view=0;
 	int maxImageSize=800;
 	double inliers = 1.0;
@@ -58,24 +48,32 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	boolean autoFocal=true;
 	int focal = 500;
 
+	JComboBox<String> imageView = combo(view,"Image 1","Matches","Rectified","Disparity","3D");
+
+	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
+	JSpinner sMaxSize = spinner(maxImageSize,50,1200,50);
+	JSpinner sInliers = spinner(inliers,0.1,10.0,0.1);
+	JSpinner sPrune = spinner(prune,0,100,5);
+	JCheckBox cFocalAuto = checkbox("Auto Focal",autoFocal,
+			"Automatic initial guess for focal length or user specified");
+	JSpinner sFocal = spinner(focal,100,3000,50);
+	JButton bCompute = button("Compute",true);
+
+	JTextArea textInfo = new JTextArea();
+
+	ControlPanelDdaComboTabs controlsDetDescAssoc = new ControlPanelCustomDDA();
 	ControlPanelDisparityDense controlDisparity;
 
 	DemoThreeViewStereoApp owner;
 
 	boolean scaleChanged = true;
+	boolean featuresChanged = true;
 	boolean assocChanged = true;
 	boolean stereoChanged = true;
 
 	public DemoThreeViewControls( DemoThreeViewStereoApp owner ) {
 		this.owner = owner;
-		imageView = combo(view,"Image 1","Matches","Rectified","Disparity","3D");
-		sMaxSize = spinner(maxImageSize,50,1200,50);
-		sInliers = spinner(inliers,0.1,10.0,0.1);
-		sPrune = spinner(prune,0,100,5);
-		cFocalAuto = checkbox("Auto Focal",autoFocal);
-		sFocal = spinner(focal,100,3000,50);
-		bCompute.addActionListener(this);
-		bCompute.setMinimumSize(bCompute.getPreferredSize());
+
 		addDisparityControls();
 
 		textInfo.setEditable(false);
@@ -85,7 +83,8 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		}
 
 		JTabbedPane tabs = new JTabbedPane();
-		tabs.addTab("Self",createSelfCalibPanel());
+		tabs.addTab("Calib",createSelfCalibPanel());
+		tabs.addTab("Feats",controlsDetDescAssoc);
 		tabs.addTab("Stereo",controlDisparity);
 		tabs.setMaximumSize(tabs.getPreferredSize());
 
@@ -113,11 +112,12 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 	private JPanel createSelfCalibPanel() {
 		StandardAlgConfigPanel panel = new StandardAlgConfigPanel();
-		panel.addLabeled(sMaxSize,"Image Size");
-		panel.addLabeled(sInliers,"Inliers");
-		panel.addLabeled(sPrune,"Prune");
+		panel.addLabeled(sMaxSize,"Max Image Size",
+				"Maximum width/height of input image. Image is scaled down if larger");
+		panel.addLabeled(sInliers,"Inliers (px)","RANSAC inlier threshold in pixels for reprojection error.");
+		panel.addLabeled(sPrune,"Prune %","Prunes this percent of the worse matches after computing the solution once.");
 		panel.addAlignLeft(cFocalAuto);
-		panel.addLabeled(sFocal,"Focal");
+		panel.addLabeled(sFocal,"Focal","User specified value for focal length in pixels.");
 		return panel;
 	}
 
@@ -144,37 +144,66 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
+	public void controlChanged(final Object source) {
 		boolean compute = true;
-		if( e.getSource() == sInliers ) {
+		if( source == sInliers ) {
 			inliers = ((Number)sInliers.getValue()).doubleValue();
 			stereoChanged = true;
-		} else if( e.getSource() == sPrune ) {
+		} else if( source == sPrune ) {
 			prune = ((Number)sInliers.getValue()).intValue();
 			stereoChanged = true;
-		} else if( e.getSource() == sFocal ) {
+		} else if( source == sFocal ) {
 			focal = ((Number)sFocal.getValue()).intValue();
 			stereoChanged = true;
-		} else if( e.getSource() == sMaxSize ) {
+		} else if( source == sMaxSize ) {
 			maxImageSize = ((Number)sMaxSize.getValue()).intValue();
 			scaleChanged = true;
+		} else if( source == imageView ) {
+			view = imageView.getSelectedIndex();
+			owner.updateVisibleGui();
+			compute = false;
+		} else if( source == cFocalAuto ) {
+			autoFocal = cFocalAuto.isSelected();
+			sFocal.setEnabled(!autoFocal);
+			stereoChanged = true;
+		} else if( source == bCompute ) {
+			owner.handleComputePressed();
+			compute = false;
 		}
 		if( compute )
 			bCompute.setEnabled(true);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
-			view = imageView.getSelectedIndex();
-			owner.updateVisibleGui();
-		} else if( e.getSource() == cFocalAuto ) {
-			autoFocal = cFocalAuto.isSelected();
-			sFocal.setEnabled(!autoFocal);
-			stereoChanged = true;
-			bCompute.setEnabled(true);
-		} else if( e.getSource() == bCompute ) {
-			owner.handleComputePressed();
+	private class ControlPanelCustomDDA extends ControlPanelDdaComboTabs {
+
+		public ControlPanelCustomDDA() {
+			super(()->{featuresChanged=true;bCompute.setEnabled(true);}, true);
+		}
+
+		@Override
+		public void initializeControlsGUI() {
+			configDetDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
+			configDetDesc.detectFastHessian.extract.radius = 4;
+			configDetDesc.detectFastHessian.maxFeaturesPerScale = 1000;
+
+			configDetDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
+
+			configAssociate.type = ConfigAssociate.AssociationType.GREEDY;
+			configAssociate.greedy.scoreRatioThreshold = 1.0;
+			configAssociate.greedy.forwardsBackwards = true;
+			configAssociate.greedy.maxErrorThreshold = -1.0;
+
+			// Give it reasonable settings for non-defaults
+			// limit memory consumption
+			configDetDesc.detectPoint.general.radius = 5;
+			configDetDesc.detectPoint.general.maxFeatures = 1000;
+			configDetDesc.detectPoint.scaleRadius = 14;
+
+			// it will pick better maximums with this
+			configDetDesc.detectPoint.shiTomasi.radius = 4;
+			configDetDesc.detectPoint.harris.radius = 4;
+
+			super.initializeControlsGUI();
 		}
 	}
 }

@@ -48,9 +48,33 @@ public class FactoryAssociation {
 				return FactoryAssociation.greedy(config.greedy,scorer);
 			}
 			case KD_TREE: return (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor,DOF);
-			case RANDOM_FOREST: FactoryAssociation.kdRandomForest(
+			case RANDOM_FOREST: return (AssociateDescription)FactoryAssociation.kdRandomForest(
 					config.nearestNeighbor,DOF, 10, 5, 1233445565);
-			default: throw new IllegalArgumentException("Unknown association");
+			default: throw new IllegalArgumentException("Unknown association: "+config.type);
+		}
+	}
+
+	/**
+	 * Checks and if neccisary wraps the association to ensure that it returns only unique associations
+	 */
+	public static <D> AssociateDescription<D> ensureUnique( AssociateDescription<D> associate )
+	{
+		if( !associate.uniqueDestination() || !associate.uniqueSource() ) {
+			return new EnforceUniqueByScore.Describe<>(associate,true,true);
+		} else {
+			return associate;
+		}
+	}
+
+	/**
+	 * Checks and if neccisary wraps the association to ensure that it returns only unique associations
+	 */
+	public static <D> AssociateDescription2D<D> ensureUnique( AssociateDescription2D<D> associate )
+	{
+		if( !associate.uniqueDestination() || !associate.uniqueSource() ) {
+			return new EnforceUniqueByScore.Describe2D<>(associate,true,true);
+		} else {
+			return associate;
 		}
 	}
 

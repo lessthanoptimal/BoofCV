@@ -103,7 +103,7 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 		}
 	}
 
-	public class DescribeControl extends ControlPanelDetDescAssoc {
+	public class DescribeControl extends ControlPanelDetDescAssocBase {
 
 		JPanel panelDescriptor = new JPanel(new BorderLayout());
 

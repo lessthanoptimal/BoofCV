@@ -401,10 +401,7 @@ public class FactoryVisualOdometry {
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
 
 		// need to make sure associations are unique
-		AssociateDescription2D<Desc> associateUnique = associateStereo;
-		if( !associateStereo.uniqueDestination() || !associateStereo.uniqueSource() ) {
-			associateUnique = new EnforceUniqueByScore.Describe2D<>(associateStereo, true, true);
-		}
+		AssociateDescription2D<Desc> associateUnique = FactoryAssociation.ensureUnique(associateStereo);
 
 		if( refineIterations > 0 ) {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
@@ -491,7 +488,7 @@ public class FactoryVisualOdometry {
 		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, hack.epipolarTol, descType);
 
 		// need to make sure associations are unique
-		AssociateDescription2D<Desc> associateUnique = associateL2R;
+		AssociateDescription2D<Desc> associateUnique = FactoryAssociation.ensureUnique(associateL2R);
 		if( !associateL2R.uniqueDestination() || !associateL2R.uniqueSource() ) {
 			associateUnique = new EnforceUniqueByScore.Describe2D<>(associateL2R, true, true);
 		}

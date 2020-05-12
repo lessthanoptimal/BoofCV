@@ -40,7 +40,7 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
-public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
+public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	Listener listener;
 
 	int selectedSelection = 0;
@@ -140,7 +140,6 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 
 	@Override
 	public void controlChanged(final Object source) {
-		System.out.println("Control changed");
 		if (source == comboDetect) {
 			configDetDesc.typeDetector =
 					ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];

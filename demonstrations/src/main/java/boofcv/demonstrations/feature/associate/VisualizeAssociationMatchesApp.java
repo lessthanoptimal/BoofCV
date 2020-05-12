@@ -27,10 +27,7 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.demonstrations.sfm.d3.ControlPanelDetDescAssoc;
-import boofcv.factory.feature.associate.ConfigAssociate;
-import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
-import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.demonstrations.sfm.d3.ControlPanelDdaComboTabs;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.BoofSwingUtil;
@@ -47,7 +44,6 @@ import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -256,7 +252,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 				}
 			}
 		} else {
-			orientation.setObjectRadius(10);
+			double radiusScale = controls.configDetDesc.detectPoint.scaleRadius;
+			orientation.setObjectRadius(radiusScale);
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				double yaw = 0;
 
@@ -266,7 +263,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 				}
 
 				TupleDesc d = descs.grow();
-				if (descriptor.process(pt.x, pt.y, yaw, 1, d)) {
+				if (descriptor.process(pt.x, pt.y, yaw, radiusScale, d)) {
 					locs.add(pt.copy());
 				} else {
 					descs.removeTail();
@@ -275,94 +272,61 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		}
 	}
 
-	class AssociateControls extends ControlPanelDetDescAssoc {
-		JLabel labelTime = new JLabel();
-		JLabel labelSize = new JLabel();
-
-		// Containers for different sets of controls
-		JPanel panelDetector = new JPanel(new BorderLayout());
-		JPanel panelDescriptor = new JPanel(new BorderLayout());
-		JPanel panelAssociate = new JPanel(new BorderLayout());
+	class AssociateControls extends ControlPanelDdaComboTabs {
+		final JLabel labelTime = new JLabel();
+		final JLabel labelSize = new JLabel();
 
 		public AssociateControls() {
+			super(()->{
+				algorithmChange = true;
+				reprocessInput();
+			},false);
 
+			initializeControlsGUI();
+
+			layoutComponents();
+
+			handleDetectorChanged();
+			handleDescriptorChanged();
+			handleAssociatorChanged();
+		}
+
+		@Override
+		public void initializeControlsGUI() {
 			// Customize the configurations
 			configDetDesc.detectFastHessian.extract.radius = 2;
 			configDetDesc.detectFastHessian.maxFeaturesPerScale = 200;
 			configDetDesc.detectSift.maxFeaturesPerScale = 400;
 
-			// Declare all the controls
-			initializeControlsGUI();
+			// limit memory consumption
+			configDetDesc.detectPoint.general.radius = 5;
+			configDetDesc.detectPoint.general.maxFeatures = 600;
+			configDetDesc.detectPoint.scaleRadius = 14;
 
-			// Finish
+			// it will pick better maximums with this
+			configDetDesc.detectPoint.shiTomasi.radius = 4;
+			configDetDesc.detectPoint.harris.radius = 4;
+
+
+			super.initializeControlsGUI();
+		}
+
+		@Override
+		protected void layoutComponents() {
 			labelTime.setPreferredSize(new Dimension(70,26));
 			labelTime.setHorizontalAlignment(SwingConstants.RIGHT);
 
-			JTabbedPane tabbed = new JTabbedPane();
-			tabbed.addTab("Detect",panelDetector);
-			tabbed.addTab("Describe",panelDescriptor);
-			tabbed.addTab("Associate",panelAssociate);
-
-			handleDetectorChanged();
-			handleDescriptorChanged();
-			handleAssociatorChanged();
-
 			addLabeled(labelTime,"Time (ms)");
 			add(labelSize);
-			addLabeled(comboDetect,"Detect");
-			addLabeled(comboDescribe,"Describe");
-			addLabeled(comboAssociate,"Associate");
-			add(tabbed);
+			super.layoutComponents();
 		}
 
-		protected void handleControlsUpdated() {
-			algorithmChange = true;
-			reprocessInput();
-		}
-
-		private void handleDetectorChanged() {
-			panelDetector.removeAll();
-			panelDetector.add(getDetectorPanel(),BorderLayout.CENTER);
-			panelDetector.invalidate();
-		}
-
-		private void handleDescriptorChanged() {
-			panelDescriptor.removeAll();
-			panelDescriptor.add(getDescriptorPanel(),BorderLayout.CENTER);
-			panelDescriptor.invalidate();
-		}
-
-		private void handleAssociatorChanged() {
-			panelAssociate.removeAll();
-			panelAssociate.add(getAssociatePanel(),BorderLayout.CENTER);
-			panelAssociate.invalidate();
-		}
-
-		public void setTime( double milliseconds ) {
+		public void setTime(double milliseconds ) {
 			labelTime.setText(String.format("%.1f",milliseconds));
 		}
 
 		public void setImageSize( int width , int height ) {
 			labelSize.setText(width+" x "+height);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( comboDetect == e.getSource() ) {
-				configDetDesc.typeDetector =
-						ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
-				handleDetectorChanged();
-			} else if( comboDescribe == e.getSource() ){
-				configDetDesc.typeDescribe =
-						ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
-				handleDescriptorChanged();
-			} else if( comboAssociate == e.getSource() ){
-				configAssociate.type = ConfigAssociate.AssociationType.values()[comboAssociate.getSelectedIndex()];
-				handleAssociatorChanged();
-			}
-
-			algorithmChange = true;
-			reprocessInput();
 		}
 	}
 
