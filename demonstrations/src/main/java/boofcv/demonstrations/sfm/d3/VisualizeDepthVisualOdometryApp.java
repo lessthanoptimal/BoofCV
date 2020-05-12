@@ -18,40 +18,31 @@
 
 package boofcv.demonstrations.sfm.d3;
 
-import boofcv.abst.feature.associate.AssociateDescTo2D;
-import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.DepthVisualOdometry;
 import boofcv.abst.sfm.d3.PyramidDirectColorDepth_to_DepthVisualOdometry;
-import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.abst.tracker.PointTrackerToTwoPass;
-import boofcv.abst.tracker.PointTrackerTwoPass;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.factory.feature.associate.ConfigAssociateGreedy;
-import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.associate.ConfigAssociate;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
+import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
-import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.Polygon3DSequenceViewer;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F32;
-import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.*;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.point.Point2D_F64;
@@ -214,8 +205,8 @@ public class VisualizeDepthVisualOdometryApp
 		handleRunningStatus(Status.RUNNING);
 
 		guiCam3D.init();
-		guiCam3D.setFocalLength(300);
-		guiCam3D.setStepSize(0.05);
+		// set the step size dynamically based on the scene
+		guiCam3D.setFocalLength(config.visualParam.fx);
 		guiCam3D.setPreferredSize(new Dimension(config.visualParam.width, config.visualParam.height));
 
 		viewPanel.setPreferredSize(new Dimension(width*2+20, height));
@@ -251,6 +242,12 @@ public class VisualizeDepthVisualOdometryApp
 		Arrays.sort(ranges);
 		double maxRange = ranges[(int)(ranges.length*0.8)];
 
+		// Attempt to set the step size dynamically based on the scale of the scene
+		if( points.size() > 0 && guiCam3D.getStepSize() == 0.0 ) {
+			guiCam3D.setStepSize(0.02*ranges[(int)(ranges.length*0.5)]);
+		}
+
+
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_F64 pixel = points.get(i);
 
@@ -280,8 +277,6 @@ public class VisualizeDepthVisualOdometryApp
 		}
 
 		numTracks = points.size();
-
-
 
 //		g2.setColor(Color.BLACK);
 //		g2.fillRect(25,15,80,45);
@@ -410,50 +405,75 @@ public class VisualizeDepthVisualOdometryApp
 
 		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(1e-3);
 
-		ConfigPKlt configPKlt = new ConfigPKlt();
-		configPKlt.templateRadius = 3;
-		configPKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		var configVO = new ConfigVisOdomTrackPnP();
+		configVO.refineIterations = 40;
+		configVO.ransac.inlierThreshold = 1.5;
+		configVO.ransac.iterations = 200;
+
+		ConfigPointTracker configTracker = new ConfigPointTracker();
+
+		configTracker.klt.templateRadius = 3;
+		configTracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+
+		configTracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		configTracker.detDesc.detectPoint.scaleRadius = 12;
+		configTracker.detDesc.detectPoint.shiTomasi.radius = 3;
+		configTracker.detDesc.detectPoint.general.threshold = 1.0f;
+		configTracker.detDesc.detectPoint.general.radius = 4;
+		configTracker.detDesc.detectPoint.general.maxFeatures = 400;
+		configTracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+
+		configTracker.associate.type = ConfigAssociate.AssociationType.GREEDY;
+		configTracker.associate.greedy.forwardsBackwards = true;
+		configTracker.associate.greedy.scoreRatioThreshold = 0.8;
 
 		algType = AlgType.UNKNOWN;
 		if (whichAlg == 0) {
 			algType = AlgType.FEATURE;
 
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600, 3, 1);
+			configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 
-			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.klt(configPKlt, configDetector,
-					imageType, derivType);
+			PointTracker tracker = FactoryPointTracker.tracker(configTracker,imageType, derivType);
+			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
-			alg = FactoryVisualOdometry.
-					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
+//			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600, 3, 1);
+//			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.klt(configPKlt, configDetector,
+//					imageType, derivType);
+//			alg = FactoryVisualOdometry.
+//					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
 		} else if (whichAlg == 1) {
 			algType = AlgType.FEATURE;
 
-			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600, 3, 1);
+			configTracker.typeTracker = ConfigPointTracker.TrackerType.DDA;
+			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+			configTracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 
-			GeneralFeatureDetector detector = FactoryPointTracker.createShiTomasi(configExtract, derivType);
-			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(null, imageType);
+			PointTracker tracker = FactoryPointTracker.tracker(configTracker,imageType, derivType);
 
-			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
+			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
-			AssociateDescription2D<TupleDesc_B> associate =
-					new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,150),score));
-
-			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1,
-					new ConfigTrackerDda(), imageType);
-
-			alg = FactoryVisualOdometry.
-					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
+//			alg = FactoryVisualOdometry.
+//					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
 		} else if (whichAlg == 2) {
 			algType = AlgType.FEATURE;
 
-			PointTracker tracker = FactoryPointTracker.
-					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),
-							configPKlt, 50, null, null, imageType, derivType);
+			configTracker.typeTracker = ConfigPointTracker.TrackerType.HYBRID;
+			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+			configTracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
 
-			PointTrackerTwoPass twopass = new PointTrackerToTwoPass<>(tracker);
+			PointTracker tracker = FactoryPointTracker.tracker(configTracker,imageType, derivType);
 
-			alg = FactoryVisualOdometry.
-					depthDepthPnP(1.5, 120, 3, 200, 50, false, sparseDepth, twopass, imageType, GrayU16.class);
+			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
+
+//			PointTracker tracker = FactoryPointTracker.
+//					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),
+//							configPKlt, 50, null, null, imageType, derivType);
+//
+//			PointTrackerTwoPass twopass = new PointTrackerToTwoPass<>(tracker);
+//
+//			alg = FactoryVisualOdometry.
+//					depthDepthPnP(1.5, 120, 3, 200, 50, false, sparseDepth, twopass, imageType, GrayU16.class);
 		} else if (whichAlg == 3) {
 			algType = AlgType.DIRECT;
 			alg = FactoryVisualOdometry.
@@ -464,29 +484,15 @@ public class VisualizeDepthVisualOdometryApp
 
 		if (algType != prevAlgType) {
 			switch( prevAlgType ) {
-				case FEATURE:
-					mainPanel.remove(featurePanel);
-					break;
-
-				case DIRECT:
-					mainPanel.remove(directPanel);
-					break;
-
-				default:
-					mainPanel.remove(algorithmPanel);
-					break;
+				case FEATURE: mainPanel.remove(featurePanel); break;
+				case DIRECT: mainPanel.remove(directPanel); break;
+				default: mainPanel.remove(algorithmPanel); break;
 			}
 
 			switch (algType) {
-				case FEATURE:
-					mainPanel.add(featurePanel, BorderLayout.NORTH);
-					break;
-				case DIRECT:
-					mainPanel.add(directPanel, BorderLayout.NORTH);
-					break;
-				default:
-					mainPanel.add(algorithmPanel, BorderLayout.NORTH);
-					break;
+				case FEATURE: mainPanel.add(featurePanel, BorderLayout.NORTH); break;
+				case DIRECT: mainPanel.add(directPanel, BorderLayout.NORTH); break;
+				default: mainPanel.add(algorithmPanel, BorderLayout.NORTH); break;
 			}
 			mainPanel.invalidate();
 		}
@@ -499,40 +505,21 @@ public class VisualizeDepthVisualOdometryApp
 		final Color color;
 
 		switch( status ) {
-			case RUNNING:
-				color = Color.BLACK;
-				break;
-
-			case PAUSED:
-				color = Color.RED;
-				break;
-
-			case FINISHED:
-				color = Color.RED;
-				break;
-
-			default:
-				color = Color.BLUE;
+			case RUNNING: color = Color.BLACK; break;
+			case PAUSED: color = Color.RED; break;
+			case FINISHED: color = Color.RED; break;
+			default: color = Color.BLUE;
 		}
 
 		text = status.name();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				switch( algType ) {
-					case FEATURE:
-						featurePanel.setStatus(text,color);
-						break;
-
-					case DIRECT:
-						directPanel.setStatus(text,color);
-						break;
-
-					default:
-						algorithmPanel.setStatus(text,color);
-						break;
-				}
-			}});
+		SwingUtilities.invokeLater(() -> {
+			switch( algType ) {
+				case FEATURE: featurePanel.setStatus(text,color); break;
+				case DIRECT: directPanel.setStatus(text,color); break;
+				default: algorithmPanel.setStatus(text,color); break;
+			}
+		});
 	}
 
 	@Override
@@ -604,15 +591,27 @@ public class VisualizeDepthVisualOdometryApp
 
 	public static void main( String args[] ) throws FileNotFoundException {
 
+//		List<PathLabel> inputs = new ArrayList<>();
+//		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));
+//		inputs.add(new PathLabel("Hallway", UtilIO.pathExample("kinect/straight/config.txt")));
+//
+//		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(inputs);
+//
+//		app.openFile(new File(inputs.get(0).getPath()));
+//		app.waitUntilInputSizeIsKnown();
+//
+//		ShowImages.showWindow(app, "Depth Visual Odometry",true);
+
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));
 		inputs.add(new PathLabel("Hallway", UtilIO.pathExample("kinect/straight/config.txt")));
 
-		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(inputs);
+		SwingUtilities.invokeLater(()->{
+			var app = new VisualizeDepthVisualOdometryApp(inputs);
 
-		app.openFile(new File(inputs.get(0).getPath()));
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app, "Depth Visual Odometry",true);
+			// Processing time takes a bit so don't open right away
+			app.openExample(inputs.get(0));
+			app.displayImmediate("RGB-D Visual Odometry");
+		});
 	}
 }

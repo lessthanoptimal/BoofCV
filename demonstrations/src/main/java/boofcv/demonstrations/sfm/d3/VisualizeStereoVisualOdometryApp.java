@@ -18,428 +18,830 @@
 
 package boofcv.demonstrations.sfm.d3;
 
-import boofcv.abst.feature.associate.AssociateDescTo2D;
-import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detdesc.DetectDescribeMulti;
-import boofcv.abst.feature.detdesc.DetectDescribeMultiFusion;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.interest.*;
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.tracker.PointTracker;
-import boofcv.abst.tracker.PointTrackerToTwoPass;
-import boofcv.abst.tracker.PointTrackerTwoPass;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
-import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.factory.feature.associate.ConfigAssociateGreedy;
-import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.FactoryPointTracker;
-import boofcv.gui.StereoVideoAppBase;
-import boofcv.gui.VisualizeApp;
-import boofcv.gui.d3.Polygon3DSequenceViewer;
+import boofcv.abst.sfm.d3.WrapVisOdomDualTrackPnP;
+import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
+import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
+import boofcv.demonstrations.shapes.DetectBlackShapePanel;
+import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
+import boofcv.factory.sfm.ConfigStereoDualTrackPnP;
+import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;
+import boofcv.factory.sfm.ConfigStereoQuadPnP;
+import boofcv.factory.tracker.ConfigPointTracker;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.feature.VisualizeFeatures;
-import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.GrayF32;
+import boofcv.io.calibration.CalibrationIO;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.calib.StereoParameters;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import gnu.trove.map.TLongIntMap;
+import gnu.trove.map.hash.TLongIntHashMap;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.gui.BoofSwingUtil.*;
+import static boofcv.io.image.ConvertBufferedImage.checkCopy;
+import static boofcv.io.image.ConvertBufferedImage.convertFrom;
+
+// TODO visualize success and faults
+
 /**
+ * Visualizes stereo visual odometry.
+ *
  * @author Peter Abeles
  */
-public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
-		extends StereoVideoAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
+public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
+		extends DemonstrationBase
 {
+	// Main GUI elements for the app
+	ControlPanel controls = new ControlPanel();
+	StereoPanel stereoPanel = new StereoPanel();
+	PointCloudPanel cloudPanel = new PointCloudPanel();
 
-	VisualOdometryPanel guiInfo;
+	StereoVisualOdometry<T> alg;
+	T inputLeft, inputRight;
+	StereoParameters stereoParameters;
 
-	ImagePanel guiLeft;
-	ImagePanel guiRight;
-	Polygon3DSequenceViewer guiCam3D;
+	//-------------- Control lock on features
+	final FastQueue<FeatureInfo> features = new FastQueue<>(FeatureInfo::new);
+	final FastQueue<Se3_F64> egoMotion_cam_to_world = new FastQueue<>(Se3_F64::new); // estimated ego motion
+	final GrowQueue_I32 visibleTracks = new GrowQueue_I32(); // index of tracks visible in current frame in 'features'
+	final TLongIntMap trackId_to_arrayIdx = new TLongIntHashMap(); // track ID to array Index
+	volatile long latestFrameID; // the frame ID after processing the most recent image
+	//-------------- END lock
 
-	StereoVisualOdometry<I> alg;
+	// number if stereo frames processed
+	int frame = 0;
+	// total distance traveled
+	double traveled = 0;
+	final Se3_F64 prev_to_world = new Se3_F64();
 
-	boolean hasProcessedImage = false;
-	boolean noFault;
+	public VisualizeStereoVisualOdometryApp(List<PathLabel> examples,
+											Class<T> imageType ) {
+		super(true, false, examples, ImageType.single(imageType),ImageType.single(imageType));
+		customFileInput = true;
 
-	boolean showTracks;
-	boolean showInliers;
+		alg = createSelectedAlgorithm();
+		inputLeft = alg.getImageType().createImage(1,1);
+		inputRight = alg.getImageType().createImage(1,1);
 
-	int numFaults;
-	int numTracks;
-	int numInliers;
-	int whichAlg;
+		var split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,stereoPanel,cloudPanel);
+		split.setDividerLocation(320);
+		setAutomaticImageResize(split);
 
-	public VisualizeStereoVisualOdometryApp( Class<I> imageType ) {
-		super(1, imageType);
+		controls.setPreferredSize(new Dimension(200,0));
 
-		addAlgorithm(0, "Single Depth : KLT", 0);
-		addAlgorithm(0, "Single Depth : ST-BRIEF", 1);
-		addAlgorithm(0, "Single Depth : ST-SURF-KLT", 2);
-		addAlgorithm(0, "Dual Track : KLT + SURF", 3);
-		addAlgorithm(0, "Quad Match : ST-BRIEF", 4);
+		add(BorderLayout.WEST, controls);
+		add(BorderLayout.CENTER, split);
 
-		guiInfo = new VisualOdometryPanel(VisualOdometryPanel.Type.STEREO);
-		guiLeft = new ImagePanel();
-		guiRight = new ImagePanel();
-		guiCam3D = new Polygon3DSequenceViewer();
-
-		add(guiInfo, BorderLayout.WEST);
-		add(guiRight, BorderLayout.EAST);
-		setMainGUI(guiLeft);
-
-		guiLeft.addMouseListener(this);
-		guiInfo.setListener(this);
+		setPreferredSize(new Dimension(1200,600));
 	}
 
-	private void drawFeatures( AccessPointTracks3D tracker , BufferedImage image )  {
-
-
-		Graphics2D g2 = image.createGraphics();
-
-		numInliers=0;
-		int N = numTracks = tracker.getTotalTracks();
-		if( N == 0 )
-			return;
-
-		var ranges = new GrowQueue_F64(N);
-
-		var world = new Point3D_F64();
-		for( int i = 0; i < N; i++ ) {
-			tracker.getTrackWorld3D(i, world);
-			ranges.add(world.z);
-		}
-		ranges.sort();
-		double maxRange = ranges.getFraction(0.8);
-
-		var pixel = new Point2D_F64();
-		for( int i = 0; i < N; i++ ) {
-			tracker.getTrackPixel(i,pixel);
-
-			if( tracker.isTrackInlier(i) ) {
-				if( showInliers )
-					VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,7,Color.BLUE,false);
-				numInliers++;
-			}
-
-			if( showTracks && tracker.isTrackNew(i) ) {
-				VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,Color.GREEN);
-				continue;
-			}
-
-			if( !showTracks )
-				continue;
-
-			tracker.getTrackWorld3D(i,world);
-			double r = world.z/maxRange;
-			if( r < 0 ) r = 0;
-			else if( r > 1 ) r = 1;
-
-			int color = (255 << 16) | ((int)(255*r) << 8);
-
-
-			VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,new Color(color));
-		}
-	}
-
-	@Override
-	protected void process(SimpleImageSequence<I> sequence1, SimpleImageSequence<I> sequence2 ) {
-		// stop the image processing code
-		stopWorker();
-
-		sequence1.setLoop(false);
-		sequence2.setLoop(false);
-
-		this.sequence1 = sequence1;
-		this.sequence2 = sequence2;
-
-		// start everything up and resume processing
-		doRefreshAll();
-	}
-
-	@Override
-	protected void updateAlg(I frame1, BufferedImage buffImage1, I frame2, BufferedImage buffImage2) {
-		if( config.left.width != frame1.width || config.left.height != frame1.height )
-			throw new IllegalArgumentException("Miss match between calibration and actual image size");
-
-		noFault = alg.process(frame1,frame2);
-	}
-
-	@Override
-	protected void updateAlgGUI(I frame1, final BufferedImage buffImage1,
-								I frame2, final BufferedImage buffImage2, final double fps) {
-		if( !noFault)
-			numFaults++;
-
-		showTracks = guiInfo.isShowAll();
-		showInliers = guiInfo.isShowInliers();
-		drawFeatures((AccessPointTracks3D)alg,buffImage1);
-
-		final Se3_F64 leftToWorld = alg.getCameraToWorld().copy();
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				guiLeft.setImage(buffImage1);
-				guiRight.setImage(buffImage2);
-				guiLeft.autoSetPreferredSize();
-				guiRight.autoSetPreferredSize();
-				guiLeft.repaint();
-				guiRight.repaint();
-
-				guiInfo.setCameraToWorld(leftToWorld);
-				guiInfo.setNumFaults(numFaults);
-				guiInfo.setNumTracks(numTracks);
-				guiInfo.setNumInliers(numInliers);
-				guiInfo.setFps(fps);
+	/**
+	 * Resize the image view automatically as the divider is changed
+	 */
+	private void setAutomaticImageResize(JSplitPane split) {
+		split.addPropertyChangeListener(changeEvent -> {
+			String propertyName = changeEvent.getPropertyName();
+			if (propertyName.equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
+				final T left = inputLeft;
+				if( left == null )
+					return;
+				double scale = split.getDividerLocation()/(double)left.width;
+				controls.setZoom(Math.min(1.0,scale));
 			}
 		});
-
-
-		double r = config.getBaseline();
-
-		Point3D_F64 p1 = new Point3D_F64(-r,-r,0);
-		Point3D_F64 p2 = new Point3D_F64(r,-r,0);
-		Point3D_F64 p3 = new Point3D_F64(r,r,0);
-		Point3D_F64 p4 = new Point3D_F64(-r,r,0);
-
-		SePointOps_F64.transform(leftToWorld,p1,p1);
-		SePointOps_F64.transform(leftToWorld,p2,p2);
-		SePointOps_F64.transform(leftToWorld,p3,p3);
-		SePointOps_F64.transform(leftToWorld,p4,p4);
-
-		guiCam3D.add(p1,p2,p3,p4);
-		guiCam3D.repaint();
-
-		hasProcessedImage = true;
 	}
-
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	protected void openFileMenuBar() {
+		OpenStereoSequencesChooser.Selected s = BoofSwingUtil.openStereoChooser(window,true);
+		if( s == null )
+			return;
 
-		numFaults = 0;
-		if( cookies != null )
-			whichAlg = (Integer)cookies[0];
-		alg = createStereoDepth(whichAlg);
-		alg.setCalibration(config);
-		alg.reset();
+		final var files = new ArrayList<File>();
+		files.add(s.left);
+		files.add(s.right);
+		files.add(s.calibration);
 
-		guiInfo.reset();
-
-		handleRunningStatus(2);
-
-		CameraPinholeBrown right = config.right;
-		guiCam3D.init();
-		guiCam3D.setFocalLength(300);
-		guiCam3D.setStepSize(config.getBaseline());
-		guiCam3D.setPreferredSize(new Dimension(right.width, right.height));
-		guiCam3D.setMaximumSize(guiCam3D.getPreferredSize());
-		startWorkerThread();
+		openFiles(files);
 	}
 
-	private StereoVisualOdometry<I> createStereoDepth( int whichAlg ) {
+	@Override
+	protected void customAddToFileMenu(JMenu menuFile) {
+		menuFile.addSeparator();
 
-		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		var configBM = new ConfigDisparityBM();
-		configBM.disparityMin = 2;
-		configBM.disparityRange = 150;
-		configBM.regionRadiusX = 3;
-		configBM.regionRadiusY = 3;
-		configBM.maxPerPixelError = 30;
-		configBM.texture = -1;
-		configBM.subpixel = true;
-		StereoDisparitySparse<I> disparity =
-				FactoryStereoDisparity.sparseRectifiedBM(configBM,imageType);
+		JMenuItem itemSaveCloud = new JMenuItem("Save Point Cloud");
+		itemSaveCloud.addActionListener(e -> savePointCloud());
+		menuFile.add(itemSaveCloud);
+	}
 
-		ConfigPKlt configKlt = new ConfigPKlt();
-		configKlt.toleranceFB = 3;
-		configKlt.pruneClose = true;
-		configKlt.templateRadius = 3;
-		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+	/**
+	 * Saves the sparse cloud created by VO
+	 */
+	private void savePointCloud() {
+		// Make sure the cloud isn't being modified by stopping any processing that might be going on
+		stopAllInputProcessing();
+		// Save it to disk
+		BoofSwingUtil.savePointCloudDialog(this,KEY_PREVIOUS_DIRECTORY,cloudPanel.gui);
+	}
 
-		ConfigPointDetector configDetKlt = new ConfigPointDetector();
-		configDetKlt.type = PointDetectorTypes.SHI_TOMASI;
-		configDetKlt.general.maxFeatures = 1000;
-		configDetKlt.general.radius = 4;
-		configDetKlt.general.threshold = 0.1f;
+	/**
+	 * Stop whatever it's doing, create a new visual odometry instance, start processing input sequence from the start
+	 */
+	public void resetWithNewAlgorithm() {
+		BoofSwingUtil.checkGuiThread();
 
-		if( whichAlg == 0 ) {
-			PointTracker<I> tracker = FactoryPointTracker.klt(configKlt, configDetKlt,imageType,derivType);
+		// disable now that we are using it's controls
+		controls.bUpdateAlg.setEnabled(false);
 
-			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, false, disparity, tracker, imageType);
-		} else if( whichAlg == 1 ) {
-			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(1000,4,0.1f);
+		stopAllInputProcessing();
+		alg = createSelectedAlgorithm();
+		reprocessInput();
+	}
 
-			GeneralFeatureDetector detector = FactoryPointTracker.createShiTomasi(configExtract, derivType);
-			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(null,imageType);
+	public StereoVisualOdometry<T> createSelectedAlgorithm() {
+		Class<T> imageType = getImageType(0).getImageClass();
 
-			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
+		if( controls.approach == 0 )
+			return controls.controlMonoTrack.createVisOdom(imageType);
+		else if( controls.approach == 1 )
+			return controls.controlDualTrack.createVisOdom(imageType);
+		else
+			return controls.controlQuad.createVisOdom(imageType);
+	}
 
-			AssociateDescription2D<TupleDesc_B> associate =
-					new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,150),score));
+	private static ConfigStereoMonoTrackPnP createConfigStereoMonoPnP() {
+		ConfigStereoMonoTrackPnP config = new ConfigStereoMonoTrackPnP();
 
-			PointTracker<I> tracker = FactoryPointTracker.dda(detector, describe, associate, 1, imageType);
+		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 
-			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, tracker, imageType);
-		} else if( whichAlg == 2 ) {
-			PointTracker<I> tracker = FactoryPointTracker.
-					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0),
-							configKlt, 50, null, null, imageType, derivType);
+		config.tracker.klt.toleranceFB = 3;
+		config.tracker.klt.pruneClose = true;
+		config.tracker.klt.config.maxIterations = 25;
+		config.tracker.klt.templateRadius = 4;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
-			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<>(tracker);
+		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
+		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
+		config.tracker.detDesc.detectPoint.general.radius = 5;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
+		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
 
-			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, twopass, imageType);
-		} else if( whichAlg == 3 ) {
-			PointTracker<I> trackerLeft = FactoryPointTracker.klt(configKlt, configDetKlt,imageType,derivType);
-			PointTracker<I> trackerRight = FactoryPointTracker.klt(configKlt, configDetKlt,imageType,derivType);
+		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
+		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
 
-			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
+		config.scene.maxKeyFrames = 4;
 
-			return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,
-					trackerLeft, trackerRight,describe,11.0, imageType);
-		} else if( whichAlg == 4 ) {
-			// TODO Fix this. Totally broken and needs to be re-done. Plus name doesn't match what it is
-//			GeneralFeatureIntensity intensity =
-//					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,defaultType);
-			GeneralFeatureIntensity intensity =
-					FactoryIntensityPoint.shiTomasi(2,false,imageType);
-			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
-			FeatureSelectLimit selector = new FeatureSelectNBest();
-			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax,selector);
-			general.setMaxFeatures(1000);
-			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,11.0,imageType,derivType);
-//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),defaultType);
-//			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,defaultType);
-			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
-			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
+		config.disparity.disparityMin = 0;
+		config.disparity.disparityRange = 50;
+		config.disparity.regionRadiusX = 3;
+		config.disparity.regionRadiusY = 3;
+		config.disparity.maxPerPixelError = 30;
+		config.disparity.texture = 0.05;
+		config.disparity.subpixel = true;
+		config.disparity.validateRtoL = 1;
 
-			return null;
+		return config;
+	}
+
+	private static ConfigStereoDualTrackPnP createConfigStereoDualPnP() {
+		var config = new ConfigStereoDualTrackPnP();
+
+		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+
+		config.tracker.klt.toleranceFB = 3;
+		config.tracker.klt.pruneClose = true;
+		config.tracker.klt.config.maxIterations = 25;
+		config.tracker.klt.templateRadius = 4;
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+
+		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
+		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
+		config.tracker.detDesc.detectPoint.general.radius = 5;
+		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
+		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+
+		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
+		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
+
+		config.scene.maxKeyFrames = 6;
+		config.scene.ransac.inlierThreshold = 1.5;
+		config.stereoDescribe.type = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
+		config.stereoRadius = 6;
+		config.epipolarTol = 1.0;
+
+		config.scene.keyframes.geoMinCoverage = 0.4;
+
+		return config;
+	}
+
+	private static ConfigStereoQuadPnP createConfigStereoQuadPnP() {
+		var config = new ConfigStereoQuadPnP();
+
+		return config;
+	}
+
+	@Override
+	protected boolean openFiles(List<File> filePaths, List<File> outSequence, List<File> outImages) {
+		if( filePaths.size() == 2 ) {
+			File pathCalibration = new File(filePaths.get(0).getParentFile(),"stereo.yaml");
+			stereoParameters = CalibrationIO.load(pathCalibration);
+		} else if( filePaths.size() == 3 ){
+			stereoParameters = CalibrationIO.load(filePaths.get(2));
 		} else {
-			throw new RuntimeException("Unknown selection");
+			throw new RuntimeException("Unexpected number of files "+filePaths.size());
 		}
+
+		outSequence.add( filePaths.get(0) );
+		outSequence.add( filePaths.get(1) );
+		return true;
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		if( stereoParameters == null )
+			throw new RuntimeException("stereoParameters should have been loaded in openFiles()");
+		frame = 0;
+		traveled = 0.0;
+		prev_to_world.reset();
+		egoMotion_cam_to_world.reset();
+		alg.reset();
+		alg.setCalibration(stereoParameters);
 
-		stopWorker();
+		synchronized (features) {
+			features.reset();
+			trackId_to_arrayIdx.clear();
+			visibleTracks.reset();
+		}
 
-		whichAlg = (Integer)cookie;
+		double hfov = PerspectiveOps.computeHFov(stereoParameters.left);
 
-		sequence1.reset();
-		sequence2.reset();
-
-		refreshAll(null);
+		SwingUtilities.invokeLater(()-> {
+			// change the scale so that the entire image is visible
+			stereoPanel.setPreferredSize(new Dimension(width,height*2));
+			double scale = BoofSwingUtil.selectZoomToShowAll(stereoPanel, width, height*2);
+			controls.setZoom(scale);
+			cloudPanel.configureViewer(hfov);
+			cloudPanel.gui.setTranslationStep(stereoParameters.getBaseline());
+		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return hasProcessedImage;
-	}
-
-	@Override
-	protected void handleRunningStatus(int status) {
-		final String text;
-		final Color color;
-
-		switch( status ) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+		switch( sourceID ) {
 			case 0:
-				text = "RUNNING";
-				color = Color.BLACK;
-				break;
-
+				stereoPanel.left = checkCopy(buffered,stereoPanel.left);
+				convertFrom(buffered,true,inputLeft); break;
 			case 1:
-				text = "PAUSED";
-				color = Color.RED;
-				break;
-
-			case 2:
-				text = "FINISHED";
-				color = Color.RED;
-				break;
-
-			default:
-				text = "UNKNOWN";
-				color = Color.BLUE;
+				stereoPanel.right = checkCopy(buffered,stereoPanel.right);
+				convertFrom(buffered,true,inputRight);break;
+			default: throw new RuntimeException("BUG");
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				guiInfo.setStatus(text,color);
-			}});
+		if( sourceID == 0 )
+			return;
+
+		long time0 = System.nanoTime();
+		boolean success = alg.process(inputLeft,inputRight);
+		long time1 = System.nanoTime();
+
+		latestFrameID = alg.getFrameID();
+		Se3_F64 camera_to_world = alg.getCameraToWorld();
+		Se3_F64 world_to_camera = camera_to_world.invert(null);
+
+		// Save the camera motion history
+		egoMotion_cam_to_world.grow().set(camera_to_world);
+
+		if( success ) {
+			// Sum up the total distance traveled. This will be approximate since it optimizes past history
+			traveled += prev_to_world.concat(world_to_camera,null).T.norm();
+			prev_to_world.set(camera_to_world);
+		}
+
+		if( alg instanceof AccessPointTracks3D ) {
+			extractFeatures(world_to_camera,(AccessPointTracks3D) alg, buffered);
+		}
+
+		final int bundleTracks= countTracksUsedInBundleAdjustment();
+
+		// Update the visualization
+		int frame = this.frame;
+		SwingUtilities.invokeLater(()->{
+			controls.setFrame(frame);
+			controls.setProcessingTimeMS((time1-time0)*1e-6);
+			controls.setImageSize(buffered.getWidth(),buffered.getHeight());
+			controls.setBundleTracks(bundleTracks);
+			controls.setDistanceTraveled(traveled);
+			stereoPanel.repaint();
+			cloudPanel.update();
+		});
+		this.frame++;
 	}
 
-	@Override
-	public void eventVoPanel(final int view) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if( view == 0 ) {
-					remove(guiCam3D);
-					add(guiRight, BorderLayout.EAST);
+	/**
+	 * Counts the number of tracks being used by bundle adjustment
+	 */
+	private int countTracksUsedInBundleAdjustment() {
+		FastAccess<BTrack> tracks = null;
+		int bundleTracks;
+		if( alg instanceof WrapVisOdomMonoStereoDepthPnP) {
+			tracks = ((WrapVisOdomMonoStereoDepthPnP)alg).getAlgorithm().getScene().tracks;
+		} else if( alg instanceof WrapVisOdomDualTrackPnP) {
+			tracks = ((WrapVisOdomDualTrackPnP)alg).getAlgorithm().getScene().tracks;
+		}
+
+		if( tracks != null ) {
+			int total=0;
+			for (int i = 0; i < tracks.size; i++) {
+				BTrack bt = tracks.get(i);
+				if( bt.selected )
+					total++;
+			}
+			bundleTracks = total;
+		} else {
+			bundleTracks = -1;
+		}
+		return bundleTracks;
+	}
+
+	/**
+	 * Extracts and copies information about the features currently visible
+	 */
+	public void extractFeatures(Se3_F64 world_to_camera, AccessPointTracks3D access , BufferedImage image ) {
+		synchronized (features) {
+			visibleTracks.reset();
+			final var camera3D = new Point3D_F64();
+			final int N = access.getTotalTracks();
+			int totalInliers = 0;
+			for (int i = 0; i < N; i++) {
+				long id = access.getTrackId(i);
+				if( id == -1 )
+					throw new RuntimeException("BUG! Got id = -1");
+				int arrayIndex;
+				FeatureInfo f;
+				if( access.isTrackNew(i) ) {
+					arrayIndex = features.size;
+					f = features.grow();
+					f.id = id;
+					f.firstFrame = frame;
+					if( trackId_to_arrayIdx.containsKey(id) )
+						System.err.println("BUG! Already contains key of new track: "+id);
+					trackId_to_arrayIdx.put(id,arrayIndex);
+					access.getTrackPixel(i,f.pixel);
+					// Grab the pixel's color for visualization
+					int x = (int)f.pixel.x;
+					int y = (int)f.pixel.y;
+					if(BoofMiscOps.isInside(image.getWidth(), image.getHeight(),x,y)) {
+						f.rgb = image.getRGB(x,y);
+					} else {
+						// default to the color red if it's outside the image. Pure red is unusual and should make
+						// it easy to see bugs
+						f.rgb = 0xFF0000;
+					}
 				} else {
-					remove(guiRight);
-					add(guiCam3D,BorderLayout.EAST);
+					arrayIndex = trackId_to_arrayIdx.get(id);
+					f = features.get(arrayIndex);
+					access.getTrackPixel(i,f.pixel);
 				}
-				revalidate();
-				repaint();
-			}});
+				f.lastFrame = frame;
+				visibleTracks.add(arrayIndex);
+
+				access.getTrackWorld3D(i,f.world);
+				SePointOps_F64.transform(world_to_camera,f.world,camera3D);
+				f.depth = camera3D.z;
+				f.inlier = access.isTrackInlier(i);
+				if( f.inlier )
+					totalInliers++;
+			}
+
+			int _totalInliers = totalInliers;
+			BoofSwingUtil.invokeNowOrLater(()->{
+				controls.setInliersTracks(_totalInliers);
+				controls.setVisibleTracks(N);
+			});
+		}
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	// Information copied from VO algorithm. This increased how much the processing thread is decoupled from
+	// the GUI thread leading to a better user experience
+	static class FeatureInfo
+	{
+		// Most recently visible pixel coordinate
+		public final Point2D_F64 pixel = new Point2D_F64();
+		// 3D Location of feature in world coordinates
+		public final Point3D_F64 world = new Point3D_F64();
+		public boolean inlier; // if it is an inlier that was used to estimate VO
+		public double depth; // depth in current camera frame
+		public long id; // unique tracker id for the feature
+		public int rgb; // color in first frame
+		public int firstFrame; // first frame the track was seen in
+		public int lastFrame; // last frame the track was seen in
+	}
 
-		Class type = GrayF32.class;
-//		Class type = GrayU8.class;
+	class ControlPanel extends DetectBlackShapePanel {
 
-		VisualizeStereoVisualOdometryApp app = new VisualizeStereoVisualOdometryApp(type);
+		// flags that toggle what's visualized in stereo panel view
+		boolean showInliers = false;
+		boolean showNew = false;
 
-//		app.setMediaManager(new XugglerMediaManager());
+		int approach = 0; // which visual odometry approach has been selected
 
-		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Inside", UtilIO.pathExample("vo/library/config.txt")));
-		inputs.add(new PathLabel("Outside", UtilIO.pathExample("vo/backyard/config.txt")));
-		inputs.add(new PathLabel("Urban", UtilIO.pathExample("vo/rockville/config.txt")));
+		double maxDepth=0; // Maximum depth a feature is from the camera when last viewed
+		boolean showCameras=true; // show camera locations in 3D view
+		boolean showCloud=true; // Show point cloud created from feature tracks
+		int showEveryCameraN = 5; // show the camera every N frames
+		// the maximum number of frames in the past the track was first spawned and stuff be visible. 0 = infinite
+		int maxTrackAge=0;
+		int minTrackDuration=1;// Only show in 3D if the number of frames the track was seen was at least this amount
+		int trackColors=0; // 0 = depth, 1 = age
 
-		app.setInputList(inputs);
+		final JLabel videoFrameLabel = new JLabel();
+		final JButton bPause = button("Pause",true);
+		final JButton bStep = button("Step",true);
+		final JButton bUpdateAlg = button("Update",false,(e)->resetWithNewAlgorithm());
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		// Statistical Info
+		protected JLabel labelInliersN = new JLabel();
+		protected JLabel labelVisibleN = new JLabel();
+		protected JLabel labelBundleN = new JLabel();
+		protected JLabel labelTraveled = new JLabel();
+
+		// Panel which contains all controls
+		final JComboBox<String> comboApproach = combo(approach,"Mono Stereo","Dual Track","Quad View");
+		final JPanel panelApproach = new JPanel(new BorderLayout());
+
+		// Image Visualization Controls
+		final JCheckBox checkInliers = checkbox("Inliers",showInliers,"Only draw inliers");
+		final JCheckBox checkNew = checkbox("New",showNew,"Highlight new tracks");
+		final JComboBox<String> comboTrackColors = combo(trackColors,"Depth","Age");
+
+		// Cloud Visualization Controls
+		final JSpinner spinMaxDepth = spinner(maxDepth,0.0,100.0,1.0);
+		final JCheckBox checkCameras = checkbox("Cameras",showCameras,"Render camera locations");
+		final JSpinner spinCameraN = spinner(showEveryCameraN,1,500,1);
+		final JCheckBox checkCloud = checkbox("Cloud",showCloud,"Show sparse point cloud");
+		final JSpinner spinMaxTrackAge = spinner(maxTrackAge,0,999,5);
+		final JSpinner spinMinDuration = spinner(minTrackDuration,1,999,1);
+		final ControlPanelPointCloud cloudColor = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
+
+		// controls for different algorithms
+		ControlPanelStereoDualTrackPnP controlDualTrack = new ControlPanelStereoDualTrackPnP(
+				createConfigStereoDualPnP(), ()->bUpdateAlg.setEnabled(true));
+		ControlPanelStereoMonoTrackPnP controlMonoTrack = new ControlPanelStereoMonoTrackPnP(
+				createConfigStereoMonoPnP(), ()->bUpdateAlg.setEnabled(true));
+		ControlPanelStereoQuadPnP controlQuad = new ControlPanelStereoQuadPnP(
+				createConfigStereoQuadPnP(),()->bUpdateAlg.setEnabled(true));
+
+		public ControlPanel() {
+			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
+
+			cloudColor.setBorder(BorderFactory.createEmptyBorder()); // save screen real estate
+
+			spinCameraN.setToolTipText("Show the camera location every N frames");
+
+			var panelInfo = new StandardAlgConfigPanel();
+			panelInfo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Statistics"));
+			panelInfo.addLabeled(labelInliersN,"Inliers Tracks","Tracks that were inliers in this frame");
+			panelInfo.addLabeled(labelVisibleN,"Visible Tracks", "Total number of active visible tracks");
+			panelInfo.addLabeled(labelBundleN,"Bundle Tracks","Features included in bundle adjustment");
+			panelInfo.addLabeled(labelTraveled,"Distance","Distance traveled in world units");
+
+			var panelImage = new StandardAlgConfigPanel();
+			panelImage.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Image"));
+			panelImage.add(fillHorizontally(gridPanel(0,2,0,2,checkInliers, checkNew)));
+			panelImage.addLabeled(comboTrackColors,"Color","How tracks are colored in the image");
+
+			var panelCloud = new StandardAlgConfigPanel();
+			panelCloud.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Cloud"));
+			panelCloud.addLabeled(spinMaxDepth,"Max Depth","Maximum distance relative to stereo baseline");
+			panelCloud.addLabeled(spinMaxTrackAge,"Max Age","Only draw tracks which were first seen than this value");
+			panelCloud.addLabeled(spinMinDuration,"Min Duration","Only draw tracks if they have been seen for this many frames");
+			panelCloud.add(fillHorizontally(gridPanel(2,checkCameras,spinCameraN)));
+			panelCloud.addAlignLeft(checkCloud);
+			panelCloud.add(cloudColor);
+
+			var panelVisuals = new JPanel();
+			panelVisuals.setLayout(new BoxLayout(panelVisuals,BoxLayout.Y_AXIS));
+			panelVisuals.add(fillHorizontally(panelInfo));
+			panelVisuals.add(fillHorizontally(panelImage));
+			panelVisuals.add(fillHorizontally(panelCloud));
+
+			var panelTuning = new JPanel();
+			panelTuning.setLayout(new BoxLayout(panelTuning,BoxLayout.Y_AXIS));
+			panelTuning.add(comboApproach);
+			panelTuning.add(panelApproach);
+			addVerticalGlue(panelTuning);
+			addAlignCenter(bUpdateAlg,panelTuning);
+
+			panelApproach.add(BorderLayout.CENTER, getControlVisOdom());
+
+			var tabbedTopPane = new JTabbedPane();
+			tabbedTopPane.addTab("Visuals",panelVisuals);
+			tabbedTopPane.addTab("Configure",panelTuning);
+
+			addLabeled(videoFrameLabel,"Frame");
+			addLabeled(processingTimeLabel,"Processing (ms)");
+			addLabeled(imageSizeLabel,"Image");
+			addLabeled(selectZoom,"Zoom");
+			add(tabbedTopPane);
+			addVerticalGlue();
+			add(fillHorizontally(gridPanel(2,bPause,bStep)));
 		}
 
-		ShowImages.showWindow(app, "Stereo Visual Odometry",true);
+		public void setInliersTracks( int count ) { labelInliersN.setText(""+count); }
+		public void setVisibleTracks( int count ) { labelVisibleN.setText(""+count); }
+		public void setBundleTracks( int count ) { labelBundleN.setText(""+count); }
+		public void setDistanceTraveled( double distance ) { labelTraveled.setText(String.format("%.1f",distance)); }
+		public void setFrame( int frame ) { videoFrameLabel.setText(""+frame); }
+
+		@Override
+		public void controlChanged(Object source) {
+			if( source == selectZoom ) {
+				zoom = (Double)selectZoom.getValue();
+				stereoPanel.setScale(zoom);
+			} else if( source == bPause ) {
+				boolean paused = !streamPaused;
+				streamPaused = paused;
+				bPause.setText(paused?"Resume":"Paused");
+			} else if( source == bStep ) {
+				if( streamPaused )
+					streamPaused = false;
+				streamStepCounter = 1;
+				bPause.setText("Resume");
+			} else if( source == checkInliers ) {
+				showInliers = checkInliers.isSelected();
+				stereoPanel.repaint();
+			} else if( source == checkNew ) {
+				showNew = checkNew.isSelected();
+				stereoPanel.repaint();
+			} else if( source == comboTrackColors ) {
+				trackColors = comboTrackColors.getSelectedIndex();
+				stereoPanel.repaint();
+			} else if( source == checkCloud ) {
+				showCloud = checkCloud.isSelected();
+				cloudPanel.update();
+			} else if( source == checkCameras ) {
+				showCameras = checkCameras.isSelected();
+				spinCameraN.setEnabled(showCameras);
+				cloudPanel.update();
+			} else if( source == spinCameraN ) {
+				showEveryCameraN = ((Number)spinCameraN.getValue()).intValue();
+				cloudPanel.update();
+			} else if( source == spinMaxDepth ) {
+				maxDepth = ((Number)spinMaxDepth.getValue()).doubleValue();
+				cloudPanel.update();
+			} else if( source == spinMaxTrackAge ) {
+				maxTrackAge = ((Number)spinMaxTrackAge.getValue()).intValue();
+				cloudPanel.update();
+			} else if( source == spinMinDuration ) {
+				minTrackDuration = ((Number)spinMinDuration.getValue()).intValue();
+				cloudPanel.update();
+			} else if( source == comboApproach ) {
+				approach = comboApproach.getSelectedIndex();
+				JComponent control = getControlVisOdom();
+				panelApproach.removeAll();
+				panelApproach.add(BorderLayout.CENTER, control);
+				panelApproach.validate();
+				panelApproach.repaint();
+				bUpdateAlg.setEnabled(true);
+			}
+		}
+
+		private JComponent getControlVisOdom() {
+			JComponent control = null;
+			switch( approach ) {
+				case 0: control = controlMonoTrack; break;
+				case 1: control = controlDualTrack; break;
+				case 2: control = controlQuad; break;
+			}
+			return control;
+		}
+	}
+
+	class StereoPanel extends JPanel {
+		BufferedImage left,right;
+		double scale = 1.0;
+		BasicStroke strokeThin = new BasicStroke(3.0f);
+
+		public void setScale( double scale ) {
+			if( this.scale == scale )
+				return;
+			this.scale = scale;
+			repaint();
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+
+			final BufferedImage left = this.left;
+			final BufferedImage right = this.right;
+			if( left == null || right == null )
+				return;
+
+			final int lh = left.getHeight();
+			final double scale = this.scale;
+
+			var g2 = (Graphics2D)g;
+			// improve graphics quality
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			// Draw the scaled images
+			var tranLeft = new AffineTransform(scale,0,0,scale,0,0);
+			g2.drawImage(left,tranLeft,null);
+			var tranRight = new AffineTransform(scale,0,0,scale,0,lh*scale);
+			g2.drawImage(right,tranRight,null);
+
+			final long latestFrameID = VisualizeStereoVisualOdometryApp.this.latestFrameID;
+
+			// Draw point features
+			synchronized (features) {
+				if( visibleTracks.size == 0 )
+					return;
+
+				// Adaptive colorize depths based on distribution in current frame
+				var depths = new GrowQueue_F64();
+				long maxAge = Long.MAX_VALUE;
+				depths.reset();
+				for (int i = 0; i < visibleTracks.size; i++) {
+					FeatureInfo f = features.get(visibleTracks.get(i));
+					maxAge = Math.min(maxAge,f.firstFrame);
+					depths.add(f.depth );
+				}
+				maxAge = latestFrameID - maxAge;
+				depths.sort();
+				double depthScale = depths.getFraction(0.8);
+
+				for (int i = 0; i < visibleTracks.size; i++) {
+					FeatureInfo f = features.get(visibleTracks.get(i));
+
+					// if showInliers is true then only draw if it's an inlier
+					if( !(!controls.showInliers || f.inlier) )
+						continue;
+
+					int color;
+					if( controls.trackColors == 0 ) { // Colorized based on depth
+						double r = f.depth / depthScale;
+						if (r < 0) r = 0;
+						else if (r > 1) r = 1;
+						color = (255 << 16) | ((int) (255 * r) << 8);
+					} else { // Colorize based on age
+						double fraction = (latestFrameID-f.firstFrame)/(double)maxAge;
+						double fractionGreen = Math.max(0,0.3-fraction)/0.3;
+						color = ((int)(255*fraction) << 16) | ((int) (255 * fractionGreen) << 8) | 0x99;
+					}
+
+					VisualizeFeatures.drawPoint(g2, f.pixel.x * scale, f.pixel.y * scale, 4.0, new Color(color), false);
+
+					// if requested, draw a circle around tracks spawned in this frame
+					if( controls.showNew && f.firstFrame == (frame-1) ) {
+						g2.setStroke(strokeThin);
+						g2.setColor(Color.GREEN);
+						VisualizeFeatures.drawCircle(g2,f.pixel.x*scale, f.pixel.y*scale,5.0);
+					}
+				}
+			}
+		}
+	}
+
+	class PointCloudPanel extends JPanel {
+		PointCloudViewer gui = VisualizeData.createPointCloudViewer();
+		FastQueue<Point3D_F64> vertexes = new FastQueue<>(Point3D_F64::new);
+
+		public PointCloudPanel() {
+			super(new BorderLayout());
+
+			gui.setDotSize(1);
+
+			add(BorderLayout.CENTER,gui.getComponent());
+		}
+
+		public void configureViewer( double hfov ) {
+			gui.setCameraHFov(hfov);
+		}
+
+		public void updateVisuals(boolean repaint) {
+			double d = stereoParameters.getBaseline();
+			controls.cloudColor.configure(gui,d*10,d/2.0);
+			if( repaint )
+				repaint();
+		}
+
+		/**
+		 * Updates using the latest set of features visible
+		 */
+		public void update()
+		{
+			BoofSwingUtil.checkGuiThread();
+			updateVisuals(false);
+			final double maxDepth = controls.maxDepth*stereoParameters.getBaseline()*10;
+			final double r = stereoParameters.getBaseline()/2.0;
+			final long frameID = alg.getFrameID();
+
+			gui.clearPoints();
+			if( controls.showCameras ) {
+				synchronized (features) {
+					// if configured to do so, only render the more recent cameras
+					int startIndex = 0;
+					if( controls.maxTrackAge > 0 )
+						startIndex = Math.max(0, egoMotion_cam_to_world.size-controls.maxTrackAge);
+					for (int i = startIndex; i < egoMotion_cam_to_world.size; i += controls.showEveryCameraN) {
+						Se3_F64 cam_to_world = egoMotion_cam_to_world.get(i);
+
+						// Represent the camera with a box
+						vertexes.reset();
+						vertexes.grow().set(-r, -r, 0);
+						vertexes.grow().set(r, -r, 0);
+						vertexes.grow().set(r, r, 0);
+						vertexes.grow().set(-r, r, 0);
+
+						for (int j = 0; j < vertexes.size; j++) {
+							var p = vertexes.get(j);
+							SePointOps_F64.transform(cam_to_world, p, p);
+						}
+
+						gui.addWireFrame(vertexes.toList(), true, 0xFF0000, 1);
+					}
+				}
+			}
+
+			if( controls.showCloud ) {
+				synchronized (features) {
+					for (int i = 0; i < features.size; i++) {
+						FeatureInfo f = features.get(i);
+						if (!f.inlier)
+							continue;
+						if (controls.maxDepth > 0 && f.depth > maxDepth)
+							continue;
+						if(controls.maxTrackAge > 0 && frameID > f.firstFrame+controls.maxTrackAge )
+							continue;
+						if(f.lastFrame-f.firstFrame+1 < controls.minTrackDuration )
+							continue;
+						gui.addPoint(f.world.x, f.world.y, f.world.z, f.rgb);
+					}
+				}
+			}
+			repaint();
+		}
+	}
+
+	private static PathLabel createExample( String name ) {
+		String path0 = UtilIO.pathExample("vo/"+name+"/left.mjpeg");
+		String path1 = UtilIO.pathExample("vo/"+name+"/right.mjpeg");
+
+		return new PathLabel(name,path0,path1);
+	}
+
+	public static void main(String[] args) {
+		List<PathLabel> examples = new ArrayList<>();
+
+		examples.add(createExample("backyard"));
+		examples.add(createExample("rockville"));
+		examples.add(createExample("library"));
+
+		SwingUtilities.invokeLater(()->{
+			var app = new VisualizeStereoVisualOdometryApp<>(examples, GrayU8.class);
+
+			// Processing time takes a bit so don't open right away
+			app.openExample(examples.get(0));
+			app.displayImmediate("Stereo Visual Odometry");
+		});
 	}
 }

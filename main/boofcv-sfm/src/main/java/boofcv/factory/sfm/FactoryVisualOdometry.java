@@ -211,7 +211,6 @@ public class FactoryVisualOdometry {
 		var motion = new Ransac<>(configVO.ransac.randSeed, manager, generator, distance,
 				configVO.ransac.iterations, ransacTOL);
 
-
 		RefinePnP refine = null;
 
 		if( configVO.refineIterations > 0 ) {
@@ -346,6 +345,56 @@ public class FactoryVisualOdometry {
 
 		VisOdomMonoDepthPnP<Vis> alg = new VisOdomMonoDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 		alg.setThresholdRetireTracks(thresholdRetire);
+
+		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<>
+				(sparseDepth, alg, distance, ImageType.single(visualType), depthType);
+	}
+
+	public static <Vis extends ImageGray<Vis>, Depth extends ImageGray<Depth>>
+	DepthVisualOdometry<Vis,Depth> depthDepthPnP( ConfigVisOdomTrackPnP configVO ,
+												  DepthSparse3D<Depth> sparseDepth,
+												  PointTracker<Vis> tracker ,
+												  Class<Vis> visualType , Class<Depth> depthType ) {
+
+		// Range from sparse disparity
+		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<>(sparseDepth);
+
+		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(configVO.pnp,-1,1);
+		final DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<>(estimator);
+
+		// 1/2 a pixel tolerance for RANSAC inliers
+		double ransacTOL = configVO.ransac.inlierThreshold * configVO.ransac.inlierThreshold;
+
+		var motion = new Ransac<>(configVO.ransac.randSeed, manager, generator, distance,
+				configVO.ransac.iterations, ransacTOL);
+
+		RefinePnP refine = null;
+
+		if( configVO.refineIterations > 0 ) {
+			refine = FactoryMultiView.pnpRefine(1e-12,configVO.refineIterations);
+		}
+
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = null;
+		if( configVO.bundleConverge.maxIterations > 0 ) {
+			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.bundle);
+			bundleAdjustment.configure(configVO.bundleConverge.ftol, configVO.bundleConverge.gtol,
+					configVO.bundleConverge.maxIterations);
+		}
+		VisOdomKeyFrameManager keyframe;
+		switch (configVO.keyframes.type) {
+			case MAX_GEO: keyframe = new MaxGeoKeyFrameManager(configVO.keyframes.geoMinCoverage);break;
+			case TICK_TOCK: keyframe = new TickTockKeyFrameManager(configVO.keyframes.tickPeriod);break;
+			default: throw new IllegalArgumentException("Unknown type "+configVO.keyframes.type);
+		}
+
+		VisOdomMonoDepthPnP<Vis> alg = new VisOdomMonoDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		alg.setFrameManager(keyframe);
+		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
+		alg.getScene().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
+		alg.getScene().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
 
 		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<>
 				(sparseDepth, alg, distance, ImageType.single(visualType), depthType);

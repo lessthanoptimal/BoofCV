@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	final List<Poly> polygons = new ArrayList<>();
 
 	// transform from world frame to camera frame
-	Se3_F64 worldToCamera = new Se3_F64();
+	final Se3_F64 worldToCamera = new Se3_F64();
 
 	// intrinsic camera calibration
 	DMatrixRMaj K = new DMatrixRMaj(3,3);
@@ -94,8 +94,12 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	}
 
 	public void init() {
-		synchronized (polygons) {
+		synchronized (worldToCamera) {
 			worldToCamera.reset();
+		}
+
+		synchronized (polygons) {
+
 			polygons.clear();
 		}
 	}
@@ -155,6 +159,11 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	}
 
 	private void renderPolygons(Graphics2D g2) {
+		// Create a local copy of the camera so that mouse doesn't need to block on polygons rendering
+		Se3_F64 worldToCamera;
+		synchronized (this.worldToCamera) {
+			worldToCamera = this.worldToCamera.copy();
+		}
 		for (Poly poly : polygons) {
 			SePointOps_F64.transform(worldToCamera, poly.pts[0], p1);
 			GeometryMath_F64.mult(K, p1, x1);
@@ -197,22 +206,22 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		Vector3D_F64 T = worldToCamera.getT();
+		synchronized (worldToCamera) {
+			Vector3D_F64 T = worldToCamera.getT();
 
-		if( e.getKeyChar() == 'w' ) {
-			T.z -= stepSize;
-		} else if( e.getKeyChar() == 's' ) {
-			T.z += stepSize;
-		} else if( e.getKeyChar() == 'a' ) {
-			T.x += stepSize;
-		} else if( e.getKeyChar() == 'd' ) {
-			T.x -= stepSize;
-		} else if( e.getKeyChar() == 'q' ) {
-			T.y -= stepSize;
-		} else if( e.getKeyChar() == 'e' ) {
-			T.y += stepSize;
-		} else if( e.getKeyChar() == 'h' ) {
-			synchronized (polygons) {
+			if (e.getKeyChar() == 'w') {
+				T.z -= stepSize;
+			} else if (e.getKeyChar() == 's') {
+				T.z += stepSize;
+			} else if (e.getKeyChar() == 'a') {
+				T.x += stepSize;
+			} else if (e.getKeyChar() == 'd') {
+				T.x -= stepSize;
+			} else if (e.getKeyChar() == 'q') {
+				T.y -= stepSize;
+			} else if (e.getKeyChar() == 'e') {
+				T.y += stepSize;
+			} else if (e.getKeyChar() == 'h') {
 				worldToCamera.reset();
 			}
 		}
@@ -253,13 +262,13 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		double rotY = 0;
 		double rotZ = 0;
 
-		rotY += (e.getX() - prevX)*0.01;
-		rotX += (prevY - e.getY())*0.01;
+		rotY += (e.getX() - prevX)*0.005;
+		rotX += (prevY - e.getY())*0.005;
 
 		Se3_F64 rotTran = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
-		Se3_F64 temp = worldToCamera.concat(rotTran,null);
-		synchronized (polygons) {
+		synchronized (worldToCamera) {
+			Se3_F64 temp = worldToCamera.concat(rotTran,null);
 			worldToCamera.set(temp);
 		}
 
