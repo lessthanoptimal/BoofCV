@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
+
 package boofcv.factory.background;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-public class TestConfigBackgroundGaussian extends StandardConfigurationChecks {
-}
+public class TestConfigBackgroundGaussian extends StandardConfigurationChecks {}
+

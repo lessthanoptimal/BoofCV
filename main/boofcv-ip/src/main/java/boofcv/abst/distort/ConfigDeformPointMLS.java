@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,13 @@ public class ConfigDeformPointMLS implements Configuration {
 	 */
 	public float alpha = 3.0f/2.0f;
 
-	@Override
-	public void checkValidity() {
-
+	public void setTo( ConfigDeformPointMLS src ) {
+		this.type = src.type;
+		this.cols = src.cols;
+		this.rows = src.rows;
+		this.alpha = src.alpha;
 	}
+
+	@Override
+	public void checkValidity() {}
 }

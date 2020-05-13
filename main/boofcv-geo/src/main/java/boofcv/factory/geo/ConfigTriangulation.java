@@ -24,11 +24,12 @@ import boofcv.alg.geo.triangulate.PixelDepthLinearMetric;
 import boofcv.alg.geo.triangulate.Triangulate2ViewsGeometricMetric;
 import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import boofcv.misc.ConfigConverge;
+import boofcv.struct.Configuration;
 
 /**
  * @author Peter Abeles
  */
-public class ConfigTriangulation {
+public class ConfigTriangulation implements Configuration {
 
 	/**
 	 * Which algorithm to use
@@ -38,7 +39,7 @@ public class ConfigTriangulation {
 	/**
 	 * If an iterative technique is selected this is the convergence criteria
 	 */
-	public ConfigConverge optimization = new ConfigConverge(1e-8,1e-8,10);
+	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,10);
 
 	public ConfigTriangulation() {
 	}
@@ -55,6 +56,16 @@ public class ConfigTriangulation {
 	}
 	public static ConfigTriangulation GEOMETRIC() {
 		return new ConfigTriangulation(Type.GEOMETRIC);
+	}
+
+	public void setTo( ConfigTriangulation src ) {
+		this.type = src.type;
+		this.converge.setTo(src.converge);
+	}
+
+	@Override
+	public void checkValidity() {
+
 	}
 
 	public enum Type {

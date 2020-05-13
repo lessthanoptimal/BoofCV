@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.segmentation;
 
+import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
 
 /**
@@ -25,7 +26,7 @@ import boofcv.struct.ConnectRule;
  *
  * @author Peter Abeles
  */
-public class ConfigWatershed {
+public class ConfigWatershed implements Configuration {
 	/**
 	 * Connectivity rule
 	 */
@@ -44,4 +45,12 @@ public class ConfigWatershed {
 		this.connectRule = connectRule;
 		this.minimumRegionSize = minimumRegionSize;
 	}
+
+	public void setTo( ConfigWatershed src ) {
+		this.connectRule = src.connectRule;
+		this.minimumRegionSize = src.minimumRegionSize;
+	}
+
+	@Override
+	public void checkValidity() {}
 }

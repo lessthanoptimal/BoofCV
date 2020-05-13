@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,12 @@
 
 package boofcv.factory.flow;
 
+import boofcv.struct.Configuration;
+
 /**
  * @author Peter Abeles
  */
-public class ConfigOpticalFlowBlockPyramid {
+public class ConfigOpticalFlowBlockPyramid implements Configuration {
 
 	/**
 	 * Radius of the search area
@@ -46,15 +48,18 @@ public class ConfigOpticalFlowBlockPyramid {
 	 */
 	public int maxPyramidLayers = 20;
 
-	public ConfigOpticalFlowBlockPyramid(int searchRadius, int regionRadius, int maxPerPixelError,
-										 double pyramidScale, int maxPyramidLayers) {
-		this.searchRadius = searchRadius;
-		this.regionRadius = regionRadius;
-		this.maxPerPixelError = maxPerPixelError;
-		this.pyramidScale = pyramidScale;
-		this.maxPyramidLayers = maxPyramidLayers;
+	public ConfigOpticalFlowBlockPyramid() {}
+
+	public void setTo( ConfigOpticalFlowBlockPyramid src ) {
+		this.searchRadius = src.searchRadius;
+		this.regionRadius = src.regionRadius;
+		this.maxPerPixelError = src.maxPerPixelError;
+		this.pyramidScale = src.pyramidScale;
+		this.maxPyramidLayers = src.maxPyramidLayers;
 	}
 
-	public ConfigOpticalFlowBlockPyramid() {
+	@Override
+	public void checkValidity() {
+
 	}
 }

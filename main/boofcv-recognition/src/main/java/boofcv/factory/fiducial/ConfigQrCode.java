@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,6 +99,14 @@ public class ConfigQrCode implements Configuration {
 		ConfigQrCode config = new ConfigQrCode();
 		config.threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
 		return config;
+	}
+
+	public void setTo( ConfigQrCode src ) {
+		this.threshold.setTo(src.threshold);
+		this.polygon.setTo(src.polygon);
+		this.versionMinimum = src.versionMinimum;
+		this.versionMaximum = src.versionMaximum;
+		this.forceEncoding = src.forceEncoding;
 	}
 
 	@Override

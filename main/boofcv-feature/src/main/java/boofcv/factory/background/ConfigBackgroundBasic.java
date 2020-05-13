@@ -25,7 +25,7 @@ import boofcv.alg.interpolate.InterpolationType;
  *
  * @author Peter Abeles
  */
-public class ConfigBackgroundBasic extends ConfigBackground {
+public class ConfigBackgroundBasic extends BaseConfigBackground {
 
 	/**
 	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive.  0 = static  1.0 = instant.
@@ -55,10 +55,9 @@ public class ConfigBackgroundBasic extends ConfigBackground {
 		this.learnRate = learnRate;
 	}
 
-	public ConfigBackgroundBasic() {
-	}
+	public ConfigBackgroundBasic() {}
 
-	public void setTo(ConfigBackgroundBasic src ) {
+	public void setTo( ConfigBackgroundBasic src ) {
 		super.setTo(src);
 		this.learnRate = src.learnRate;
 		this.threshold = src.threshold;

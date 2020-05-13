@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.segmentation;
 
+import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
 
 /**
@@ -25,7 +26,7 @@ import boofcv.struct.ConnectRule;
  *
  * @author Peter Abeles
  */
-public class ConfigFh04 {
+public class ConfigFh04 implements Configuration {
 	/**
 	 * Tuning parameter.  Larger regions are preferred for larger values of K.  Try 100
 	 */
@@ -45,8 +46,7 @@ public class ConfigFh04 {
 	 */
 	public int approximateSortBins = 0;
 
-	public ConfigFh04() {
-	}
+	public ConfigFh04() {}
 
 	public ConfigFh04(float k, int minimumRegionSize) {
 		K = k;
@@ -65,4 +65,14 @@ public class ConfigFh04 {
 		this.connectRule = connectRule;
 		this.approximateSortBins = approximateSortBins;
 	}
+
+	public void setTo( ConfigFh04 src ) {
+		this.K = src.K;
+		this.minimumRegionSize = src.minimumRegionSize;
+		this.connectRule = src.connectRule;
+		this.approximateSortBins = src.approximateSortBins;
+	}
+
+	@Override
+	public void checkValidity() {}
 }

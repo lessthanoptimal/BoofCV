@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,10 +62,17 @@ public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
 		this.sampleWidth = sampleWidth;
 	}
 
-	public ConfigSlidingIntegral() {
+	public ConfigSlidingIntegral() {}
+
+	public void setTo( ConfigSlidingIntegral src ) {
+		this.objectRadiusToScale = src.objectRadiusToScale;
+		this.samplePeriod = src.samplePeriod;
+		this.windowSize = src.windowSize;
+		this.radius = src.radius;
+		this.weightSigma = src.weightSigma;
+		this.sampleWidth = src.sampleWidth;
 	}
 
 	@Override
-	public void checkValidity() {
-	}
+	public void checkValidity() {}
 }

@@ -114,7 +114,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		// TODO remove and replace with calibrated homogenous coordinates when it exists
 		ConfigTriangulation config = new ConfigTriangulation();
 		config.type = ConfigTriangulation.Type.GEOMETRIC;
-		config.optimization.maxIterations = 10;
+		config.converge.maxIterations = 10;
 		triangulateN = FactoryMultiView.triangulateNViewCalibrated(config);
 	}
 

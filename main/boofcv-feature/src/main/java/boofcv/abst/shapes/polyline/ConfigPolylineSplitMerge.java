@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.ConfigLength;
  *
  * @author Peter Abeles
  */
-public class ConfigPolylineSplitMerge extends ConfigPolyline {
+public class ConfigPolylineSplitMerge extends BaseConfigPolyline {
 	/**
 	 * The minimum length of a side
 	 */
@@ -74,6 +74,18 @@ public class ConfigPolylineSplitMerge extends ConfigPolyline {
 	 * this feature.
 	 */
 	public int refineIterations = 10;
+
+	public void setTo( ConfigPolylineSplitMerge src ) {
+		super.setTo(src);
+		this.minimumSideLength = src.minimumSideLength;
+		this.extraConsider.setTo(src.extraConsider);
+		this.cornerScorePenalty = src.cornerScorePenalty;
+		this.thresholdSideSplitScore = src.thresholdSideSplitScore;
+		this.maxNumberOfSideSamples = src.maxNumberOfSideSamples;
+		this.convexTest = src.convexTest;
+		this.maxSideError.setTo(src.maxSideError);
+		this.refineIterations = src.refineIterations;
+	}
 
 	@Override
 	public void checkValidity() {

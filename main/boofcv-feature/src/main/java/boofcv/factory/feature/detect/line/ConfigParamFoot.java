@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,10 @@ public class ConfigParamFoot implements Configuration {
 	 * Lines which are this close to the origin of the transformed image are ignored.  Try 5.
 	 */
 	public int minDistanceFromOrigin = 5;
+
+	public void setTo( ConfigParamFoot src ) {
+		this.minDistanceFromOrigin = src.minDistanceFromOrigin;
+	}
 
 	@Override
 	public void checkValidity() {

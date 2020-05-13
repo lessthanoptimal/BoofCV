@@ -19,6 +19,7 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.alg.tracker.klt.ConfigKlt;
+import boofcv.struct.Configuration;
 
 /**
  * Configuration file for TLD tracker.
@@ -27,7 +28,7 @@ import boofcv.alg.tracker.klt.ConfigKlt;
  *
  * @author Peter Abeles
  */
-public class TldParameters {
+public class ConfigTld implements Configuration {
 
 	/**
 	 * Maximum number of NCC templates it will examine inside the detection cascade.  Used to limit the amount
@@ -138,8 +139,35 @@ public class TldParameters {
 	 */
 	public ConfigKlt trackerConfig;
 
-	public TldParameters() {
+	public ConfigTld() {
 		trackerConfig = new ConfigKlt();
 		trackerConfig.maxIterations = 50;
+	}
+
+	public void setTo( ConfigTld src ) {
+		this.maximumCascadeConsider = src.maximumCascadeConsider;
+		this.numNegativeFerns = src.numNegativeFerns;
+		this.maximumErrorFB = src.maximumErrorFB;
+		this.trackerGridWidth = src.trackerGridWidth;
+		this.trackerFeatureRadius = src.trackerFeatureRadius;
+		this.detectMinimumSide = src.detectMinimumSide;
+		this.motionIterations = src.motionIterations;
+		this.regionConnect = src.regionConnect;
+		this.overlapUpper = src.overlapUpper;
+		this.overlapLower = src.overlapLower;
+		this.thresholdSimilarArea = src.thresholdSimilarArea;
+		this.confidenceThresholdStrong = src.confidenceThresholdStrong;
+		this.confidenceThresholdUpper = src.confidenceThresholdUpper;
+		this.confidenceThresholdLower = src.confidenceThresholdLower;
+		this.randomSeed = src.randomSeed;
+		this.numFerns = src.numFerns;
+		this.fernSize = src.fernSize;
+		this.confidenceAccept = src.confidenceAccept;
+		this.scaleSpread = src.scaleSpread;
+	}
+
+	@Override
+	public void checkValidity() {
+
 	}
 }

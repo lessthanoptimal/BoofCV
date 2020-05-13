@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,6 +97,16 @@ public class ConfigSquareGridBinary implements Configuration {
 	}
 
 	public ConfigSquareGridBinary() {
+	}
+
+	public void setTo( ConfigSquareGridBinary src ) {
+		this.configDetector.setTo(src.configDetector);
+		this.configThreshold.setTo(src.configThreshold);
+		this.ids = src.ids == null ? null : src.ids.clone();
+		this.numRows = src.numRows;
+		this.numCols = src.numCols;
+		this.squareWidth = src.squareWidth;
+		this.spaceWidth = src.spaceWidth;
 	}
 
 	@Override

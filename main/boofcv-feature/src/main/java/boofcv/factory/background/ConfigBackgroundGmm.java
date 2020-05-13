@@ -28,7 +28,7 @@ package boofcv.factory.background;
  *
  * @author Peter Abeles
  */
-public class ConfigBackgroundGmm extends ConfigBackground {
+public class ConfigBackgroundGmm extends BaseConfigBackground {
 
 	/**
 	 * Specifies how fast it will adjust to changes in the image. Must be greater than zero.
@@ -63,6 +63,8 @@ public class ConfigBackgroundGmm extends ConfigBackground {
 	 * to fade into the background. Probably one of the first tuning variables you should mess with.
 	 */
 	public float significantWeight = 0.01f;
+
+	public ConfigBackgroundGmm() {}
 
 	public void setTo( ConfigBackgroundGmm src ) {
 		super.setTo(src);

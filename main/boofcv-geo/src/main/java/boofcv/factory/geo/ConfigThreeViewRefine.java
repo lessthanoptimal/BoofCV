@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,13 +20,14 @@ package boofcv.factory.geo;
 
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.misc.ConfigConverge;
+import boofcv.struct.Configuration;
 
 /**
  * Configuration for
  *
  * @author Peter Abeles
  */
-public class ConfigThreeViewRefine {
+public class ConfigThreeViewRefine implements Configuration {
 	/**
 	 * If true pixel coordinates will be normalized using {@link LowLevelMultiViewOps}. Set to false
 	 * only if pixels have already been scaled.
@@ -36,12 +37,23 @@ public class ConfigThreeViewRefine {
 	/**
 	 * Convergence criteria
 	 */
-	public ConfigConverge convergence = new ConfigConverge(1e-8,1e-8,100);
+	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,100);
 
 	/**
 	 * Specifies which algorithm to apply
 	 */
 	public Algorithm which = Algorithm.GEOMETRIC;
+
+	public void setTo( ConfigThreeViewRefine src ) {
+		this.normalizePixels = src.normalizePixels;
+		this.converge.setTo(src.converge);
+		this.which = src.which;
+	}
+
+	@Override
+	public void checkValidity() {
+
+	}
 
 	public enum Algorithm {
 		/**

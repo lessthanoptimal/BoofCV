@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,6 +98,24 @@ public class ConfigDisparitySGM implements Configuration {
 	 */
 	public BorderType border = BorderType.REFLECT;
 
+	public void setTo(ConfigDisparitySGM src) {
+		this.disparityMin = src.disparityMin;
+		this.disparityRange = src.disparityRange;
+		this.maxError = src.maxError;
+		this.validateRtoL = src.validateRtoL;
+		this.texture = src.texture;
+		this.subpixel = src.subpixel;
+		this.penaltySmallChange = src.penaltySmallChange;
+		this.penaltyLargeChange = src.penaltyLargeChange;
+		this.paths = src.paths;
+		this.errorType = src.errorType;
+		this.useBlocks=src.useBlocks;
+		this.configCensus.setTo(src.configCensus);
+		this.configHMI.setTo(src.configHMI);
+		this.configBlockMatch.setTo(src.configBlockMatch);
+		this.border = src.border;
+	}
+
 	public static class ConfigBlockMatchError implements Configuration {
 
 		/**
@@ -111,9 +129,15 @@ public class ConfigDisparitySGM implements Configuration {
 
 		public BlockMatchingApproach approach=BlockMatchingApproach.BEST5;
 
+		public void setTo(ConfigBlockMatchError src) {
+			this.radiusX = src.radiusX;
+			this.radiusY = src.radiusY;
+		}
+
 		@Override
 		public void checkValidity() {
-
+			if( radiusX <= 0 || radiusY <= 0 )
+				throw new IllegalArgumentException("Radius must be positive");
 		}
 	}
 

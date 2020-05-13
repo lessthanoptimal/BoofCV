@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,10 +67,6 @@ public class ConfigHornSchunckPyramid implements Configuration {
 	 */
 	public InterpolationType interpolation = InterpolationType.BILINEAR;
 
-
-	@Override
-	public void checkValidity() {}
-
 	public ConfigHornSchunckPyramid() {
 	}
 
@@ -78,4 +74,20 @@ public class ConfigHornSchunckPyramid implements Configuration {
 		this.alpha = alpha;
 		this.maxInnerIterations = maxInnerIterations;
 	}
+
+	public void setTo( ConfigHornSchunckPyramid src ) {
+		this.alpha = src.alpha;
+		this.SOR_RELAXATION = src.SOR_RELAXATION;
+		this.numWarps = src.numWarps;
+		this.maxInnerIterations = src.maxInnerIterations;
+		this.convergeTolerance = src.convergeTolerance;
+		this.pyrScale = src.pyrScale;
+		this.pyrSigma = src.pyrSigma;
+		this.pyrMaxLayers = src.pyrMaxLayers;
+		this.interpolation = src.interpolation;
+	}
+
+	@Override
+	public void checkValidity() {}
+
 }

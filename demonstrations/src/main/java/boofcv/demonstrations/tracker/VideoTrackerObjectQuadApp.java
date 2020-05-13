@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -195,7 +195,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		if( whichAlg == 0 )
 			tracker = FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), imageClass);
 		else if( whichAlg == 1 )
-			tracker = FactoryTrackerObjectQuad.tld(new ConfigTld(false),imageClass);
+			tracker = FactoryTrackerObjectQuad.tld(new ConfigTrackerTld(false),imageClass);
 		else if( whichAlg == 2 ) {
 			ConfigComaniciu2003 config = new ConfigComaniciu2003();
 			config.scaleChange = 0;

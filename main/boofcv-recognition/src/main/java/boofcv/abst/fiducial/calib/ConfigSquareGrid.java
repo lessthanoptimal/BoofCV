@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,6 +58,11 @@ public class ConfigSquareGrid implements Configuration {
 		square.refineGray.lineSamples = 15;
 		square.refineGray.convergeTolPixels = 0.2;
 		square.refineGray.maxIterations = 10;
+	}
+
+	public void setTo( ConfigSquareGrid src ) {
+		this.thresholding.setTo(src.thresholding);
+		this.square.setTo(src.square);
 	}
 
 	@Override

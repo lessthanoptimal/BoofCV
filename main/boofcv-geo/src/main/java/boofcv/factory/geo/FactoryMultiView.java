@@ -415,7 +415,7 @@ public class FactoryMultiView {
 		switch( config.which) {
 			case GEOMETRIC:
 				RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
-				alg.getConverge().setTo(config.convergence);
+				alg.getConverge().setTo(config.converge);
 				alg.setScale(config.normalizePixels);
 				return new WrapRefineThreeViewProjectiveGeometric(alg);
 		}
@@ -600,7 +600,7 @@ public class FactoryMultiView {
 
 			case GEOMETRIC: {
 				TriangulateNViewsMetric estimator = new WrapNViewsTriangulateMetricDLT();
-				TriangulateRefineMetricLS refiner = new TriangulateRefineMetricLS(config.optimization.gtol,config.optimization.maxIterations);
+				TriangulateRefineMetricLS refiner = new TriangulateRefineMetricLS(config.converge.gtol,config.converge.maxIterations);
 				return new TriangulateThenRefineMetric(estimator,refiner);
 			}
 
@@ -626,7 +626,7 @@ public class FactoryMultiView {
 			case ALGEBRAIC:
 			case GEOMETRIC: {
 				TriangulateNViewsProjective estimator = new WrapNViewsTriangulateProjectiveDLT();
-				TriangulateRefineProjectiveLS refiner = new TriangulateRefineProjectiveLS(config.optimization.gtol,config.optimization.maxIterations);
+				TriangulateRefineProjectiveLS refiner = new TriangulateRefineProjectiveLS(config.converge.gtol,config.converge.maxIterations);
 				return new TriangulateThenRefineProjective(estimator,refiner);
 			}
 		}

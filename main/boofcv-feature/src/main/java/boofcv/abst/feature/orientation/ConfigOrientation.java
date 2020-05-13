@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,14 +30,10 @@ public interface ConfigOrientation extends Configuration {
 	/**
 	 * Orientation estimation which takes in an integral image
 	 */
-	public static interface Integral extends ConfigOrientation {
-
-	}
+	interface Integral extends ConfigOrientation {}
 
 	/**
 	 * Orientation estimation which takes in the image gradient
 	 */
-	public static interface Gradient extends ConfigOrientation {
-
-	}
+	interface Gradient extends ConfigOrientation {}
 }

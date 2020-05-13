@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,6 +73,16 @@ public class ConfigHoughFootSubimage implements Configuration {
 		this.maxLines = maxLines;
 		this.totalHorizontalDivisions = totalHorizontalDivisions;
 		this.totalVerticalDivisions = totalVerticalDivisions;
+	}
+
+	public void setTo( ConfigHoughFootSubimage src ) {
+		this.localMaxRadius = src.localMaxRadius;
+		this.minCounts = src.minCounts;
+		this.minDistanceFromOrigin = src.minDistanceFromOrigin;
+		this.thresholdEdge = src.thresholdEdge;
+		this.maxLines = src.maxLines;
+		this.totalHorizontalDivisions = src.totalHorizontalDivisions;
+		this.totalVerticalDivisions = src.totalVerticalDivisions;
 	}
 
 	@Override

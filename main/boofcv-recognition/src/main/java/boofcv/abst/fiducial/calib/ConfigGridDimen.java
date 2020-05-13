@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class ConfigGridDimen implements Configuration {
 	public ConfigGridDimen() {
 	}
 
-	public void set( ConfigGridDimen src ) {
+	public void setTo( ConfigGridDimen src ) {
 		this.numRows = src.numRows;
 		this.numCols = src.numCols;
 		this.shapeSize = src.shapeSize;

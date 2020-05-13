@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class FactoryPointsToPolyline {
 	/**
 	 * Generic function for create polyline algorithms based on configuration type
 	 */
-	public static PointsToPolyline create( @Nonnull ConfigPolyline config ) {
+	public static PointsToPolyline create( @Nonnull BaseConfigPolyline config ) {
 		if( config instanceof ConfigSplitMergeLineFit ) {
 			return splitMerge((ConfigSplitMergeLineFit)config);
 		} else if( config instanceof ConfigPolylineSplitMerge ) {

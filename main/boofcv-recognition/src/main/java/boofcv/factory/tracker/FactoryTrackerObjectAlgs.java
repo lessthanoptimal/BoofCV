@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.alg.tracker.meanshift.*;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
-import boofcv.alg.tracker.tld.TldParameters;
+import boofcv.alg.tracker.tld.ConfigTld;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
@@ -43,7 +43,7 @@ import boofcv.struct.image.*;
 public class FactoryTrackerObjectAlgs {
 
 	public static <T extends ImageGray<T>,D extends ImageGray<D>>
-	TldTracker<T,D> createTLD( TldParameters config ,
+	TldTracker<T,D> createTLD( ConfigTld config ,
 							   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
 							   Class<T> imageType , Class<D> derivType ) {
 		return new TldTracker<>(config, interpolate, gradient, imageType, derivType);

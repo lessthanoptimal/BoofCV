@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.segmentation;
 
+import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
 
 /**
@@ -26,7 +27,7 @@ import boofcv.struct.ConnectRule;
  *
  * @author Peter Abeles
  */
-public class ConfigSlic {
+public class ConfigSlic implements Configuration {
 	/**
 	 * Number of regions which will be initially seeded.  The actually number of regions at the end will
 	 * vary a bit due to merging of small regions and the image border.
@@ -52,5 +53,20 @@ public class ConfigSlic {
 	public ConfigSlic(int numberOfRegions, float spacialWeight) {
 		this.numberOfRegions = numberOfRegions;
 		this.spacialWeight = spacialWeight;
+	}
+
+	public ConfigSlic(){}
+
+	public void setTo( ConfigSlic src ) {
+		this.numberOfRegions = src.numberOfRegions;
+		this.spacialWeight = src.spacialWeight;
+		this.totalIterations = src.totalIterations;
+		this.connectRule = src.connectRule;
+	}
+
+	@Override
+	public void checkValidity() {
+		if( numberOfRegions <= 0 )
+			throw new IllegalArgumentException("Number of regions must be greater than zero");
 	}
 }

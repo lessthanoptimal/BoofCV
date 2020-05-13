@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,12 @@ public class ConfigLMedS implements Configuration {
 	public ConfigLMedS(long randSeed, int totalCycles) {
 		this.randSeed = randSeed;
 		this.totalCycles = totalCycles;
+	}
+
+	public void setTo( ConfigLMedS src ) {
+		this.randSeed = src.randSeed;
+		this.totalCycles = src.totalCycles;
+		this.errorFraction = src.errorFraction;
 	}
 
 	@Override

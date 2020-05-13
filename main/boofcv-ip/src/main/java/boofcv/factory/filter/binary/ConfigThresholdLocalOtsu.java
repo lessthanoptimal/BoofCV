@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,5 +58,11 @@ public class ConfigThresholdLocalOtsu extends ConfigThreshold {
 
 	public ConfigThresholdLocalOtsu() {
 		this.type = ThresholdType.BLOCK_OTSU;
+	}
+
+	public void setTo( ConfigThresholdLocalOtsu src ) {
+		super.setTo(src);
+		this.tuning = src.tuning;
+		this.useOtsu2 = src.useOtsu2;
 	}
 }

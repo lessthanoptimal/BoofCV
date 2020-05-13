@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,12 @@ public class ConfigPnP implements Configuration {
 	 * Number of iterations for EPNP. Ignored by everything else
 	 */
 	public int epnpIterations = 10;
+
+	public void setTo( ConfigPnP src ) {
+		this.which = src.which;
+		this.numResolve = src.numResolve;
+		this.epnpIterations = src.epnpIterations;
+	}
 
 	@Override
 	public void checkValidity() {

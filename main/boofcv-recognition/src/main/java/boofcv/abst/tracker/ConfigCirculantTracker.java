@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,14 @@
 
 package boofcv.abst.tracker;
 
+import boofcv.struct.Configuration;
+
 /**
  * Configuration for {@link boofcv.alg.tracker.circulant.CirculantTracker}.
  *
  * @author Peter Abeles
  */
-public class ConfigCirculantTracker {
+public class ConfigCirculantTracker implements Configuration {
 	/**
 	 * Spatial bandwidth.  Proportional to target size.
 	 */
@@ -64,5 +66,20 @@ public class ConfigCirculantTracker {
 	}
 
 	public ConfigCirculantTracker() {
+	}
+
+	public void setTo( ConfigCirculantTracker src ) {
+		this.output_sigma_factor = src.output_sigma_factor;
+		this.sigma = src.sigma;
+		this.lambda = src.lambda;
+		this.interp_factor = src.interp_factor;
+		this.maxPixelValue = src.maxPixelValue;
+		this.padding = src.padding;
+		this.workSpace = src.workSpace;
+	}
+
+	@Override
+	public void checkValidity() {
+
 	}
 }

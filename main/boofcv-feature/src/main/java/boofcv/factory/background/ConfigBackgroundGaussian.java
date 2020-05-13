@@ -25,7 +25,7 @@ import boofcv.alg.interpolate.InterpolationType;
  *
  * @author Peter Abeles
  */
-public class ConfigBackgroundGaussian extends ConfigBackground {
+public class ConfigBackgroundGaussian extends BaseConfigBackground {
 
 	/**
 	 * Specifies how fast it will adapt to changes in the background. From 0 to 1, inclusive.  0 = static  1.0 = instant.
@@ -73,7 +73,7 @@ public class ConfigBackgroundGaussian extends ConfigBackground {
 	public ConfigBackgroundGaussian() {
 	}
 
-	public void setTo(ConfigBackgroundGaussian src ) {
+	public void setTo( ConfigBackgroundGaussian src ) {
 		super.setTo(src);
 		this.learnRate = src.learnRate;
 		this.threshold = src.threshold;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,6 +81,15 @@ public class ConfigFiducialBinary implements Configuration {
 
 	public ConfigFiducialBinary(double targetWidth) {
 		this.targetWidth = targetWidth;
+	}
+
+	public void setTo( ConfigFiducialBinary src ) {
+		this.targetWidth = src.targetWidth;
+		this.ambiguousThreshold = src.ambiguousThreshold;
+		this.gridWidth = src.gridWidth;
+		this.borderWidthFraction = src.borderWidthFraction;
+		this.minimumBlackBorderFraction = src.minimumBlackBorderFraction;
+		this.squareDetector.setTo(src.squareDetector);
 	}
 
 	@Override

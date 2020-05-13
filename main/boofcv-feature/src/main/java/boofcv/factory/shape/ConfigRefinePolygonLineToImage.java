@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,6 +56,15 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 	 * small shapes and can prevent divergence.
 	 */
 	public double maxCornerChangePixel = 2.0;
+
+	public void setTo( ConfigRefinePolygonLineToImage src ) {
+		this.cornerOffset = src.cornerOffset;
+		this.lineSamples = src.lineSamples;
+		this.sampleRadius = src.sampleRadius;
+		this.maxIterations = src.maxIterations;
+		this.convergeTolPixels = src.convergeTolPixels;
+		this.maxCornerChangePixel = src.maxCornerChangePixel;
+	}
 
 	@Override
 	public void checkValidity() {

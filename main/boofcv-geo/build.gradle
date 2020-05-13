@@ -1,5 +1,6 @@
 dependencies {
     api project(':main:boofcv-ip')
 
+    testImplementation project(':main:boofcv-types').sourceSets.test.output
     testImplementation project(':integration:boofcv-swing')
 }

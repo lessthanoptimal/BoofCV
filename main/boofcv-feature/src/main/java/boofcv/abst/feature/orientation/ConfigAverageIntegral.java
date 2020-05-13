@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,6 +58,14 @@ public class ConfigAverageIntegral implements ConfigOrientation {
 	}
 
 	public ConfigAverageIntegral() {
+	}
+
+	public void setTo( ConfigAverageIntegral src ) {
+		this.objectRadiusToScale = src.objectRadiusToScale;
+		this.radius = src.radius;
+		this.samplePeriod = src.samplePeriod;
+		this.sampleWidth = src.sampleWidth;
+		this.weightSigma = src.weightSigma;
 	}
 
 	@Override

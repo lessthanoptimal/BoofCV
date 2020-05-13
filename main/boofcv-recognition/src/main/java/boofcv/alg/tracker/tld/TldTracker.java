@@ -65,7 +65,7 @@ import java.util.Random;
 public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// specified configuration parameters for the tracker
-	private TldParameters config;
+	private ConfigTld config;
 
 	// selected region for output
 	private Rectangle2D_F64 targetRegion = new Rectangle2D_F64();
@@ -116,7 +116,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 *
 	 * @param config Configuration class which specifies the tracker's behavior
 	 */
-	public TldTracker( TldParameters config ,
+	public TldTracker( ConfigTld config ,
 					   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
 					   Class<T> imageType , Class<D> derivType) {
 		this.config = config;
@@ -434,7 +434,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		return trackerRegion;
 	}
 
-	public TldParameters getConfig() {
+	public ConfigTld getConfig() {
 		return config;
 	}
 

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestTldLearning {
 
 	Random rand = new Random(234);
-	TldParameters config = new TldParameters();
+	ConfigTld config = new ConfigTld();
 
 	@Test
 	public void initialLearning() {

@@ -18,6 +18,7 @@ Version : 0.36
     before it was < width-1, and < height-1. This conforms to rounding down standard.
   * Created FiducialTracker interface
   * Updated for DDogleg's FastAccess, FastArray, and FastQueue
+  * Config* now all implement setTo() and this is enforced with a unit test
 - Added Project Lombok for auto generating setters/getters
 - Kotlin
   * Initial release with specialized support for Kotlin

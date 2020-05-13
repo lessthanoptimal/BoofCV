@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.demonstrations.tracker;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.tracker.tld.TldParameters;
+import boofcv.alg.tracker.tld.ConfigTld;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -60,7 +60,7 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
 
-		tracker = new TldTracker<>(new TldParameters(), interpolate, gradient, imageType, derivType);
+		tracker = new TldTracker<>(new ConfigTld(), interpolate, gradient, imageType, derivType);
 	}
 
 	public void process( final SimpleImageSequence<T> sequence ) {

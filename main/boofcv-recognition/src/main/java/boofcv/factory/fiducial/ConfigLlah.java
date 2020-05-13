@@ -53,6 +53,14 @@ public class ConfigLlah implements Configuration {
 	public ConfigLlah() {
 	}
 
+	public void setTo( ConfigLlah src ) {
+		this.numberOfNeighborsN = src.numberOfNeighborsN;
+		this.sizeOfCombinationM = src.sizeOfCombinationM;
+		this.quantizationK = src.quantizationK;
+		this.hashTableSize = src.hashTableSize;
+		this.hashType = src.hashType;
+	}
+
 	@Override
 	public void checkValidity() {
 		if( numberOfNeighborsN <= 0 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.shape;
 
-import boofcv.abst.shapes.polyline.ConfigPolyline;
+import boofcv.abst.shapes.polyline.BaseConfigPolyline;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
@@ -30,7 +30,7 @@ import boofcv.struct.ConfigLength;
  * @author Peter Abeles
  */
 @Deprecated
-public class ConfigSplitMergeLineFit extends ConfigPolyline {
+public class ConfigSplitMergeLineFit extends BaseConfigPolyline {
 	/**
 	 * A line is split if a point along the contour between the two end points has a distance from the line
 	 * which is greater than this fraction of the line's length
@@ -65,6 +65,16 @@ public class ConfigSplitMergeLineFit extends ConfigPolyline {
 	 * Does the contour loop?
 	 */
 	public boolean loop = true;
+
+	public void setTo( ConfigSplitMergeLineFit src ) {
+		super.setTo(src);
+		this.splitFraction = src.splitFraction;
+		this.iterations = src.iterations;
+		this.refine = src.refine;
+		this.pruneSplitPenalty = src.pruneSplitPenalty;
+		this.minimumSide.setTo(src.minimumSide);
+		this.loop = src.loop;
+	}
 
 	@Override
 	public void checkValidity() {

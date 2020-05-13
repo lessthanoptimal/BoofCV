@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,6 +78,20 @@ public class ConfigBroxWarping implements Configuration {
 	 * Type of interpolation used.  Bilinear recommended
 	 */
 	public InterpolationType interpolation = InterpolationType.BILINEAR;
+
+	public void setTo( ConfigBroxWarping src ) {
+		this.alpha = src.alpha;
+		this.gamma = src.gamma;
+		this.SOR_RELAXATION = src.SOR_RELAXATION;
+		this.numOuter = src.numOuter;
+		this.numInner = src.numInner;
+		this.maxIterationsSor = src.maxIterationsSor;
+		this.convergeToleranceSor = src.convergeToleranceSor;
+		this.pyrScale = src.pyrScale;
+		this.pyrSigma = src.pyrSigma;
+		this.pyrMaxLayers = src.pyrMaxLayers;
+		this.interpolation = src.interpolation;
+	}
 
 	@Override
 	public void checkValidity() {}

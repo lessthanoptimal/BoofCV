@@ -16,23 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.factory.background;
 
-import boofcv.struct.Configuration;
+package boofcv.factory.feature.dense;
 
-/**
- * Common configuration for all {@link boofcv.alg.background.BackgroundModel}
- *
- * @author Peter Abeles
- */
-public abstract class ConfigBackground implements Configuration {
+import boofcv.struct.StandardConfigurationChecks;
 
-	/**
-	 * Specifies what value a pixel should be assigned if no statistical information is available.
-	 */
-	public int unknownValue = 0;
+public class TestConfigDenseHoG extends StandardConfigurationChecks {}
 
-	public void setTo( ConfigBackground src ) {
-		this.unknownValue = src.unknownValue;
-	}
-}

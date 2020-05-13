@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,11 +54,18 @@ public class ConfigHoughBinary implements Configuration {
 	 */
 	public double mergeDistance = 10;
 
-	public ConfigHoughBinary() {
-	}
+	public ConfigHoughBinary() {}
 
 	public ConfigHoughBinary(int maxLines) {
 		this.maxLines = maxLines;
+	}
+
+	public void setTo( ConfigHoughBinary src ) {
+		this.localMaxRadius = src.localMaxRadius;
+		this.minCounts.setTo(src.minCounts);
+		this.maxLines = src.maxLines;
+		this.mergeAngle = src.mergeAngle;
+		this.mergeDistance = src.mergeDistance;
 	}
 
 	@Override

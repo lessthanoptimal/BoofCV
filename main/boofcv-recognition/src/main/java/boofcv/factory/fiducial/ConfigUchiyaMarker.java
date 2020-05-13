@@ -98,6 +98,20 @@ public class ConfigUchiyaMarker implements Configuration {
 		// checkEdge.minimumEdgeIntensity = 15;
 	}
 
+	public void setTo( ConfigUchiyaMarker src ) {
+		this.markerLength = src.markerLength;
+		this.threshold.setTo(src.threshold);
+		this.llah.setTo(src.llah);
+		this.ransac.setTo(src.ransac);
+		this.contourRule = src.contourRule;
+		this.markerLength = src.markerLength;
+		this.contourMinimumLength = src.contourMinimumLength;
+		this.maxDistanceFromEllipse = src.maxDistanceFromEllipse;
+		this.minimumMinorAxis = src.minimumMinorAxis;
+		this.maxMajorToMinorRatio = src.maxMajorToMinorRatio;
+		this.checkEdge.setTo(src.checkEdge);
+	}
+
 	@Override
 	public void checkValidity() {
 		llah.checkValidity();

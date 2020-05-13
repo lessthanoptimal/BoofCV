@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,6 +133,19 @@ public class ConfigThreshold implements Configuration {
 		config.type = type;
 		config.width = width;
 		return (T)config;
+	}
+
+	public void setTo( ConfigThreshold src ) {
+		this.type = src.type;
+		this.fixedThreshold = src.fixedThreshold;
+		this.scale = src.scale;
+		this.down = src.down;
+		this.width.setTo(src.width);
+		this.savolaK = src.savolaK;
+		this.nickK = src.nickK;
+		this.minPixelValue = src.minPixelValue;
+		this.maxPixelValue = src.maxPixelValue;
+		this.thresholdFromLocalBlocks = src.thresholdFromLocalBlocks;
 	}
 
 	@Override

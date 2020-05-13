@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.abst.shapes.polyline.ConfigPolyline;
+import boofcv.abst.shapes.polyline.BaseConfigPolyline;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.gui.JConfigLength;
@@ -65,7 +65,7 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		this(owner,new ConfigPolylineSplitMerge());
 	}
 
-	public PolylineControlPanel(ShapeGuiListener owner, ConfigPolyline config ) {
+	public PolylineControlPanel(ShapeGuiListener owner, BaseConfigPolyline config ) {
 		this.owner = owner;
 
 		if( config instanceof ConfigPolylineSplitMerge ) {

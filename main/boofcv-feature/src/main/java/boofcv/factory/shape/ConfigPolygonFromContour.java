@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.shape;
 
-import boofcv.abst.shapes.polyline.ConfigPolyline;
+import boofcv.abst.shapes.polyline.BaseConfigPolyline;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.struct.ConfigLength;
@@ -45,7 +45,7 @@ public class ConfigPolygonFromContour implements Configuration {
 	/**
 	 * Configuration for fitting a polygon to the contour.
 	 */
-	public ConfigPolyline contourToPoly = new ConfigPolylineSplitMerge();
+	public BaseConfigPolyline contourToPoly = new ConfigPolylineSplitMerge();
 
 	/**
 	 * <p>
@@ -88,6 +88,18 @@ public class ConfigPolygonFromContour implements Configuration {
 		contourToPoly.maximumSides = maximumSides;
 
 		this.clockwise = clockwise;
+	}
+
+	public ConfigPolygonFromContour(){}
+
+	public void setTo( ConfigPolygonFromContour src ) {
+		this.canTouchBorder = src.canTouchBorder;
+		this.contourRule = src.contourRule;
+		this.contourToPoly.setTo(src.contourToPoly);
+		this.minimumEdgeIntensity = src.minimumEdgeIntensity;
+		this.tangentEdgeIntensity = src.tangentEdgeIntensity;
+		this.minimumContour.setTo(src.minimumContour);
+		this.clockwise = src.clockwise;
 	}
 
 	@Override

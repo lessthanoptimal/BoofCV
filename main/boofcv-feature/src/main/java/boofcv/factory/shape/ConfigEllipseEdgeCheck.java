@@ -43,6 +43,12 @@ public class ConfigEllipseEdgeCheck implements Configuration {
 	 */
 	public double checkRadialDistance = 1.5;
 
+	public void setTo( ConfigEllipseEdgeCheck src ) {
+		this.minimumEdgeIntensity = src.minimumEdgeIntensity;
+		this.numSampleContour = src.numSampleContour;
+		this.checkRadialDistance = src.checkRadialDistance;
+	}
+
 	@Override
 	public void checkValidity() {
 

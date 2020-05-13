@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,13 @@ public class ConfigMeanShiftSearch implements Configuration {
 		this.convergenceTol = convergenceTol;
 	}
 
-	public ConfigMeanShiftSearch() {
+	public ConfigMeanShiftSearch() {}
+
+	public void setTo( ConfigMeanShiftSearch src ) {
+		this.maxIterations = src.maxIterations;
+		this.convergenceTol = src.convergenceTol;
+		this.odd = src.odd;
+		this.positiveOnly = src.positiveOnly;
 	}
 
 	@Override

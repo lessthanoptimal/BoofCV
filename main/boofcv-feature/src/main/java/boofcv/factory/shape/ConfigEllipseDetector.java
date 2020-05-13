@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,8 +98,22 @@ public class ConfigEllipseDetector implements Configuration {
 	 */
 	public double maxMajorToMinorRatio = 20.0;
 
-	@Override
-	public void checkValidity() {
-
+	public void setTo( ConfigEllipseDetector src ) {
+		this.maxDistanceFromEllipse = src.maxDistanceFromEllipse;
+		this.minimumContour = src.minimumContour;
+		this.maximumContour = src.maximumContour;
+		this.contourRule = src.contourRule;
+		this.minimumMinorAxis = src.minimumMinorAxis;
+		this.processInternal = src.processInternal;
+		this.maxIterations = src.maxIterations;
+		this.convergenceTol = src.convergenceTol;
+		this.numSampleContour = src.numSampleContour;
+		this.refineRadialSamples = src.refineRadialSamples;
+		this.minimumEdgeIntensity = src.minimumEdgeIntensity;
+		this.checkRadialDistance = src.checkRadialDistance;
+		this.maxMajorToMinorRatio = src.maxMajorToMinorRatio;
 	}
+
+	@Override
+	public void checkValidity() {}
 }

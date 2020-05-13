@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,10 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	 */
 	public double minimumSpread = 10;
 
+	{
+		scale = 0.85;
+	}
+
 	public ConfigThresholdBlockMinMax(int width , double minimumSpread, boolean down ) {
 		this(ConfigLength.fixed(width),minimumSpread,down);
 	}
@@ -50,8 +54,9 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	public ConfigThresholdBlockMinMax() {
 	}
 
-	{
-		scale = 0.85;
+	public void setTo( ConfigThresholdBlockMinMax src ) {
+		super.setTo(src);
+		this.minimumSpread = src.minimumSpread;
 	}
 
 	@Override

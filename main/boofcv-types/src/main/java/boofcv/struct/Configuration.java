@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,5 +32,12 @@ public interface Configuration extends Serializable {
 	 * Checks to see if the configuration is valid. If it is invalid, throw an exception explaining what is
 	 * incorrect.
 	 */
-	public void checkValidity();
+	void checkValidity();
+
+	// Why don't we have this below? The setTo() function is required but not part of the interface because if
+	// it was part of the interface there would be two options 1) no runtime type checking. 2) recursive
+	// generics and weaker type checking. By having each implementation implement it's own custom function we
+	// get strong typing at compile time. Plus there is no situation where calling setTo() on the raw interface
+	// would be useful has surfaced after all this time...
+//	void setTo( Configuration src );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,6 @@ public class ConfigCircleRegularGrid implements Configuration {
 	 */
 	public ConfigEllipseDetector ellipse = new ConfigEllipseDetector();
 
-
 	/**
 	 * How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect match and 0.0 = infinite
 	 * difference in size
@@ -59,6 +58,13 @@ public class ConfigCircleRegularGrid implements Configuration {
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
 		thresholding.scale = 0.85;
+	}
+
+	public void setTo( ConfigCircleRegularGrid src ) {
+		this.thresholding.setTo(src.thresholding);
+		this.ellipse.setTo(src.ellipse);
+		this.ellipseSizeSimilarity = src.ellipseSizeSimilarity;
+		this.edgeIntensitySimilarityTolerance = src.edgeIntensitySimilarityTolerance;
 	}
 
 	@Override

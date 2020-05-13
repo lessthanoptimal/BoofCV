@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,11 @@ public class ConfigDenseSift implements Configuration {
 		this.sampling = sampling;
 	}
 
-	public ConfigDenseSift() {
+	public ConfigDenseSift() {}
+
+	public void setTo( ConfigDenseSift src ) {
+		this.sift.setTo(src.sift);
+		this.sampling.setTo(src.sampling);
 	}
 
 	@Override

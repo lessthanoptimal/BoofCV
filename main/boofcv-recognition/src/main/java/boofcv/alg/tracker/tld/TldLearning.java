@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,12 +57,12 @@ public class TldLearning<T extends ImageGray<T>> {
 	private ImageRectangle targetRegion_I32 = new ImageRectangle();
 
 	private TldHelperFunctions helper = new TldHelperFunctions();
-	private TldParameters config;
+	private ConfigTld config;
 
 	/**
 	 * Creates and configures learning
 	 */
-	public TldLearning(Random rand, TldParameters config,
+	public TldLearning(Random rand, ConfigTld config,
 					   TldTemplateMatching<T> template, TldVarianceFilter<T> variance, TldFernClassifier<T> fern,
 					   TldDetection<T> detection ) {
 		this.rand = rand;

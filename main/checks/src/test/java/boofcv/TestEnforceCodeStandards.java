@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("StringConcatenationInLoop")
-public class EnforceCodeStandards {
+public class TestEnforceCodeStandards {
 	// Skip over these directories since they don't contain library code
 	String[] blacklistConfig = new String[]{"autocode","boofcv-core","checks"};
 
@@ -70,10 +70,20 @@ public class EnforceCodeStandards {
 			File dirTest = new File(module,"src/test");
 
 			Collection<File> files = FileUtils.listFiles(dirSrc,
-					new RegexFileFilter("Config\\S*.java"),
+					new RegexFileFilter("Config[A-Z]\\S*.java"),
 					DirectoryFileFilter.DIRECTORY);
 
 			for( File classFile : files ) {
+
+				String text = UtilIO.readAsString(new FileInputStream(classFile));
+				assertNotNull(text);
+
+				// There is a weird situation that I decided to keep. A Config* was only an interface
+				// but you don't want to skip over situations where they forgot to implement Configuration or
+				// it extends a class and you can't see directly that it was an instance of Configuration
+				if( text.contains("extends Configuration") && !text.contains("implements Configuration"))
+					continue;
+
 				Path f = dirSrc.toPath().relativize(classFile.toPath());
 				File testFile = dirTest.toPath().resolve(f).toFile();
 				testFile = new File(testFile.getParentFile(),"Test"+testFile.getName());
@@ -82,10 +92,10 @@ public class EnforceCodeStandards {
 					continue;
 				}
 
-				String text = UtilIO.readAsString(new FileInputStream(testFile));
+				text = UtilIO.readAsString(new FileInputStream(testFile));
 				assertNotNull(text);
 
-				if( !text.contains("import boofcv.struct.StandardConfigurationChecks;"))
+				if( !text.contains("extends StandardConfigurationChecks"))
 					invalid.add(testFile);
 			}
 		}
@@ -93,7 +103,9 @@ public class EnforceCodeStandards {
 		// Print out the problems to make it easier to fix
 		for( File f : missing ) {
 			System.out.println("Missing "+f.getPath());
-			generateDefaultConfigTest(f);
+			// commented out since a unit test really shouldn't auto generate code and commit it to git. Plus
+			// the commit part won't work on all architectures
+//			generateDefaultConfigTest(f);
 		}
 		for( File f : invalid ) {
 			System.out.println("Invalid "+f.getPath());

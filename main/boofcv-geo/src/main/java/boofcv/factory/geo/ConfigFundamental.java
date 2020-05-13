@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,12 @@ public class ConfigFundamental implements Configuration {
 	public ErrorModel errorModel = ErrorModel.GEOMETRIC;
 
 	public ConfigFundamental() {
+	}
+
+	public void setTo( ConfigFundamental src ) {
+		this.which = src.which;
+		this.numResolve = src.numResolve;
+		this.errorModel = src.errorModel;
 	}
 
 	@Override

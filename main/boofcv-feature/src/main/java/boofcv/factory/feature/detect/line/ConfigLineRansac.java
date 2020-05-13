@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,13 @@ public class ConfigLineRansac implements Configuration {
 		this.connectLines = connectLines;
 	}
 
-	public ConfigLineRansac() {
+	public ConfigLineRansac() {}
+
+	public void setTo( ConfigLineRansac src ) {
+		this.regionSize = src.regionSize;
+		this.thresholdEdge = src.thresholdEdge;
+		this.thresholdAngle = src.thresholdAngle;
+		this.connectLines = src.connectLines;
 	}
 
 	@Override

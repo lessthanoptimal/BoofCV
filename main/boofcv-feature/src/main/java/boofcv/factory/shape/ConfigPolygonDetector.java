@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,6 +74,14 @@ public class ConfigPolygonDetector implements Configuration {
 	}
 
 	public ConfigPolygonDetector() {
+	}
+
+	public void setTo( ConfigPolygonDetector src ) {
+		this.detector.setTo(src.detector);
+		this.minimumRefineEdgeIntensity = src.minimumRefineEdgeIntensity;
+		this.refineContour = src.refineContour;
+		this.adjustForThresholdBias = src.adjustForThresholdBias;
+		this.refineGray.setTo(src.refineGray);
 	}
 
 	@Override

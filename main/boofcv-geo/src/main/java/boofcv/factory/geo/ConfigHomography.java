@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,10 @@ public class ConfigHomography implements Configuration {
 	}
 
 	public ConfigHomography() {
+	}
+
+	public void setTo( ConfigHomography src ) {
+		this.normalize = src.normalize;
 	}
 
 	@Override

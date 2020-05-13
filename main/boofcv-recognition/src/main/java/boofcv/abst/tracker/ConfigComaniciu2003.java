@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,14 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.interpolate.InterpolationType;
+import boofcv.struct.Configuration;
 
 /**
  * Configuration for {@link Comaniciu2003_to_TrackerObjectQuad}.
  *
  * @author Peter Abeles
  */
-public class ConfigComaniciu2003 {
+public class ConfigComaniciu2003 implements Configuration {
 	/**
 	 * Number of points it samples along each axis of the rectangle.  Default is 30.
 	 */
@@ -94,4 +95,21 @@ public class ConfigComaniciu2003 {
 
 	public ConfigComaniciu2003() {
 	}
+
+	public void setTo( ConfigComaniciu2003 src ) {
+		this.numSamples = src.numSamples;
+		this.numSigmas = src.numSigmas;
+		this.numHistogramBins = src.numHistogramBins;
+		this.maxPixelValue = src.maxPixelValue;
+		this.updateHistogram = src.updateHistogram;
+		this.meanShiftMinimumChange = src.meanShiftMinimumChange;
+		this.meanShiftMaxIterations = src.meanShiftMaxIterations;
+		this.scaleWeight = src.scaleWeight;
+		this.scaleChange = src.scaleChange;
+		this.minimumSizeRatio = src.minimumSizeRatio;
+		this.interpolation = src.interpolation;
+	}
+
+	@Override
+	public void checkValidity() {}
 }

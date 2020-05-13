@@ -36,9 +36,7 @@ public interface ConfigDisparityError extends Configuration {
 		public CensusVariants variant = CensusVariants.BLOCK_5_5;
 
 		@Override
-		public void checkValidity() {
-
-		}
+		public void checkValidity() {}
 
 		public void setTo( Census src ) {
 			this.variant = src.variant;
@@ -64,9 +62,7 @@ public interface ConfigDisparityError extends Configuration {
 		public boolean normalizeInput=true;
 
 		@Override
-		public void checkValidity() {
-
-		}
+		public void checkValidity() {}
 
 		public void setTo( NCC src ) {
 			this.eps = src.eps;

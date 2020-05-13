@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class TestTldDetection {
 	@Test
 	public void computeTemplateConfidence() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
-		alg.config = new TldParameters();
+		alg.config = new ConfigTld();
 		alg.config.confidenceThresholdUpper = 0.6;
 		alg.template = new HelperTemplate();
 
@@ -59,7 +59,7 @@ public class TestTldDetection {
 	@Test
 	public void selectBestRegionsFern_largerN() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
-		alg.config = new TldParameters();
+		alg.config = new ConfigTld();
 		alg.config.maximumCascadeConsider = 20;
 
 		// check eliminate ones which are more N than P
@@ -81,7 +81,7 @@ public class TestTldDetection {
 	@Test
 	public void selectBestRegionsFern_smaller() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
-		alg.config = new TldParameters();
+		alg.config = new ConfigTld();
 		alg.config.maximumCascadeConsider = 20;
 
 		// all 10 should be accepted
@@ -102,7 +102,7 @@ public class TestTldDetection {
 	@Test
 	public void selectBestRegionsFern_larger() {
 		TldDetection<GrayU8> alg = new TldDetection<>();
-		alg.config = new TldParameters();
+		alg.config = new ConfigTld();
 		alg.config.maximumCascadeConsider = 20;
 
 		// all 10 should be accepted

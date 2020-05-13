@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.Configuration;
  * Common class for all polyline algorithms. All variables here can also be set using the
  * {@link PointsToPolyline} interface.
  */
-public abstract class ConfigPolyline implements Configuration {
+public abstract class BaseConfigPolyline implements Configuration {
 	/**
 	 * If true then the polyline forms a loops. Otherwise the end points are disconnected from each other.
 	 */
@@ -44,4 +44,11 @@ public abstract class ConfigPolyline implements Configuration {
 	 * Does it require that the found polygons be convex?
 	 */
 	public boolean convex = true;
+
+	public void setTo( BaseConfigPolyline src ) {
+		this.loops = src.loops;
+		this.minimumSides = src.minimumSides;
+		this.maximumSides = src.maximumSides;
+		this.convex = src.convex;
+	}
 }

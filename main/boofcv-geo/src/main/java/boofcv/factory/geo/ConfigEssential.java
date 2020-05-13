@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,12 @@ public class ConfigEssential implements Configuration {
 	public int numResolve = 2;
 
 	public ConfigEssential() {
+	}
+
+	public void setTo( ConfigEssential src ) {
+		this.which = src.which;
+		this.errorModel = src.errorModel;
+		this.numResolve = src.numResolve;
 	}
 
 	@Override

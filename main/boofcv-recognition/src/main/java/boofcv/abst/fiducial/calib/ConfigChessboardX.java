@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,6 +93,20 @@ public class ConfigChessboardX implements Configuration {
 	 * square. BoofCV calibration targets always have this requirements. Other projects might not.
 	 */
 	public boolean gridRequireCornerSquares = false;
+
+	public void setTo( ConfigChessboardX src ) {
+		this.detNonMaxRadius = src.detNonMaxRadius;
+		this.detNonMaxThresholdRatio = src.detNonMaxThresholdRatio;
+		this.detRefinedXCornerThreshold = src.detRefinedXCornerThreshold;
+		this.detPyramidTopSize = src.detPyramidTopSize;
+		this.connEdgeThreshold = src.connEdgeThreshold;
+		this.connDirectionTol = src.connDirectionTol;
+		this.connOrientationTol = src.connOrientationTol;
+		this.connAmbiguousTol = src.connAmbiguousTol;
+		this.connMaxNeighbors = src.connMaxNeighbors;
+		this.connMaxNeighborDistance = src.connMaxNeighborDistance;
+		this.gridRequireCornerSquares = src.gridRequireCornerSquares;
+	}
 
 	@Override
 	public void checkValidity() {

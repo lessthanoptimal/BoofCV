@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,6 +76,17 @@ public class ConfigHoughGradient implements Configuration {
 		this.minDistanceFromOrigin = minDistanceFromOrigin;
 		this.thresholdEdge = thresholdEdge;
 		this.maxLines = maxLines;
+	}
+
+	public void setTo( ConfigHoughGradient src ) {
+		this.localMaxRadius = src.localMaxRadius;
+		this.minCounts = src.minCounts;
+		this.minDistanceFromOrigin = src.minDistanceFromOrigin;
+		this.thresholdEdge = src.thresholdEdge;
+		this.maxLines = src.maxLines;
+		this.mergeAngle = src.mergeAngle;
+		this.mergeDistance = src.mergeDistance;
+		this.refineRadius = src.refineRadius;
 	}
 
 	@Override

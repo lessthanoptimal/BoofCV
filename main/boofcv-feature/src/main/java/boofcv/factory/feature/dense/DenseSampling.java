@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,5 +39,10 @@ public class DenseSampling {
 	}
 
 	public DenseSampling() {
+	}
+
+	public void setTo(DenseSampling src) {
+		this.periodX = src.periodX;
+		this.periodY = src.periodY;
 	}
 }

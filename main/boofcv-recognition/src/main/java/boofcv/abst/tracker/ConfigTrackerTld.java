@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.interpolate.InterpolationType;
-import boofcv.alg.tracker.tld.TldParameters;
 import boofcv.struct.Configuration;
 
 /**
@@ -27,12 +26,12 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigTld implements Configuration {
+public class ConfigTrackerTld implements Configuration {
 
 	/**
 	 * Configuration parameters
 	 */
-	public TldParameters parameters = new TldParameters();
+	public boofcv.alg.tracker.tld.ConfigTld parameters = new boofcv.alg.tracker.tld.ConfigTld();
 
 	/**
 	 * Specifies the type of interpolation.  More stable with bilinear, but nearest-neighbor can be
@@ -45,7 +44,7 @@ public class ConfigTld implements Configuration {
 
 	}
 
-	public ConfigTld( boolean stable ) {
+	public ConfigTrackerTld(boolean stable ) {
 		if( !stable ) {
 			interpolate = InterpolationType.NEAREST_NEIGHBOR;
 			parameters.scaleSpread = 0; // turns off a good chunk of scale invariance
@@ -54,6 +53,11 @@ public class ConfigTld implements Configuration {
 		}
 	}
 
-	public ConfigTld() {
+	public ConfigTrackerTld() {
+	}
+
+	public void setTo( ConfigTrackerTld src ) {
+		this.parameters.setTo(src.parameters);
+		this.interpolate = src.interpolate;
 	}
 }

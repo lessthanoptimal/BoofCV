@@ -82,13 +82,29 @@ public abstract class StandardConfigurationChecks {
 					} else if( short.class == f.getType() ) {
 						o = (short)(((short)o)+1);
 					} else if( int.class == f.getType() ) {
-						o = (int)(((int)o)+1);
+						int before = (int)o;
+						int value = rand.nextInt();
+						while( value == before )
+							value = rand.nextInt();
+						o = value;
 					} else if( long.class == f.getType() ) {
-						o = (long)(((long)o)+1);
+						long before = (long)o;
+						long value = rand.nextLong();
+						while( value == before )
+							value = rand.nextLong();
+						o = value;
 					} else if( float.class == f.getType() ) {
-						o = (float)(((float)o)+1);
+						float before = (float)o;
+						float value = rand.nextFloat();
+						while( value == before )
+							value = rand.nextFloat();
+						o = value;
 					} else if( double.class == f.getType() ) {
-						o = (double)(((double)o)+1);
+						double before = (double)o;
+						double value = rand.nextDouble();
+						while( value == before )
+							value = rand.nextDouble();
+						o = value;
 					} else {
 						throw new RuntimeException("BUG "+f.getType().getSimpleName());
 					}
@@ -112,14 +128,28 @@ public abstract class StandardConfigurationChecks {
 			Field[] fields = type.getFields();
 			// first see if the not default configuration was set up correctly
 			for (Field f : fields) {
-				assertNotEquals(f.get(src), f.get(dst));
+				boolean onlyOneOption = false;
+
+				// If it's an enum with only one value then it can't be not equals
+				if( f.getType().isEnum() ) {
+					if( f.getType().getEnumConstants().length == 1 )
+						onlyOneOption = true;
+				}
+				// if it's null it should stay null
+				if( f.get(src) == null )
+					onlyOneOption = true;
+
+				if( onlyOneOption )
+					assertEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
+				else
+					assertNotEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
 			}
 
 			m.invoke(dst, src);
 
 			// after setTo() they should be the same
 			for (Field f : fields) {
-				if (f.getType().isEnum() || f.getType().isPrimitive())
+				if (f.getType().isEnum() || f.getType().isPrimitive() || f.get(src) == null )
 					assertEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
 				else
 					assertNotEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");

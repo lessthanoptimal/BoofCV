@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,6 +65,13 @@ public class ConfigFiducialImage implements Configuration {
 	}
 
 	public ConfigFiducialImage() {
+	}
+
+	public void setTo( ConfigFiducialImage src ) {
+		this.maxErrorFraction = src.maxErrorFraction;
+		this.borderWidthFraction = src.borderWidthFraction;
+		this.minimumBlackBorderFraction = src.minimumBlackBorderFraction;
+		this.squareDetector.setTo(src.squareDetector);
 	}
 
 	@Override
