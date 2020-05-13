@@ -37,7 +37,7 @@ public interface Configuration extends Serializable {
 	// Why don't we have this below? The setTo() function is required but not part of the interface because if
 	// it was part of the interface there would be two options 1) no runtime type checking. 2) recursive
 	// generics and weaker type checking. By having each implementation implement it's own custom function we
-	// get strong typing at compile time. Plus there is no situation where calling setTo() on the raw interface
-	// would be useful has surfaced after all this time...
+	// get strong typing at compile time. Plus there has been no situation where calling setTo() on the raw interface
+	// would have been useful after all this time...
 //	void setTo( Configuration src );
 }
