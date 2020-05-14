@@ -82,7 +82,7 @@ Version : 0.36
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity
   * SimpleCamera2Activity::cameraIntrinsicNominal() returns false if it fails
-  * TODO Bitmap processing example
+  * Added Bitmap processing example
 - Applications
   * Fixed calibration detector apps bug where scale got missed up when playing a movie
 - OpenKinect: Removed integration package since it hadn't been used in years

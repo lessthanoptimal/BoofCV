@@ -22,5 +22,11 @@
 		android:text="QR Code"
 		android:onClick="clickedQrCode"
 		android:id="@+id/button_qrcode"/>
+	<Button
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="Bitmap Image"
+		android:onClick="clickedBitmap"
+		android:id="@+id/button_open_image"/>
 </LinearLayout>
 

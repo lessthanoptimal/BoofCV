@@ -24,7 +24,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -57,6 +56,11 @@ public class MainActivity extends Activity {
 
 	public void clickedQrCode( View view ) {
 		Intent intent = new Intent(this, QrCodeActivity.class);
+		startActivity(intent);
+	}
+
+	public void clickedBitmap( View view ) {
+		Intent intent = new Intent(this, BitmapActivity.class);
 		startActivity(intent);
 	}
 
