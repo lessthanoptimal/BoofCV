@@ -316,7 +316,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 		final Point2D_F32 pixel = rendering.pixel;
 		final Point3D_F32 worldPt = rendering.worldPt;
-		final Point3D_F32 cameraPt = rendering.worldPt;
+		final Point3D_F32 cameraPt = rendering.cameraPt;
 		final Se3_F32 worldToCamera = rendering.worldToCamera;
 		final GrayF32 imageDepth = rendering.imageDepth;
 

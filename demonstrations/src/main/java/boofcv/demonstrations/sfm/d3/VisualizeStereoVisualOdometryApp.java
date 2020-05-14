@@ -64,6 +64,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -73,8 +74,6 @@ import java.util.List;
 import static boofcv.gui.BoofSwingUtil.*;
 import static boofcv.io.image.ConvertBufferedImage.checkCopy;
 import static boofcv.io.image.ConvertBufferedImage.convertFrom;
-
-// TODO visualize success and faults
 
 /**
  * Visualizes stereo visual odometry.
@@ -101,6 +100,9 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	volatile long latestFrameID; // the frame ID after processing the most recent image
 	//-------------- END lock
 
+	// if true that means it will change the view to match the latest estimate
+	boolean followCamera = false;
+
 	// number if stereo frames processed
 	int frame = 0;
 	// total distance traveled
@@ -111,6 +113,8 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 											Class<T> imageType ) {
 		super(true, false, examples, ImageType.single(imageType),ImageType.single(imageType));
 		customFileInput = true;
+
+		addViewMenu();
 
 		alg = createSelectedAlgorithm();
 		inputLeft = alg.getImageType().createImage(1,1);
@@ -126,6 +130,17 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		add(BorderLayout.CENTER, split);
 
 		setPreferredSize(new Dimension(1200,600));
+	}
+
+	/**
+	 * Create a view menu that let's you easily set the 3D view to different locations
+	 */
+	private void addViewMenu() {
+		JMenu menuView = new JMenu("View");
+		menuView.add(BoofSwingUtil.createMenuItem("Home",this::setViewToHome));
+		menuView.add(BoofSwingUtil.createMenuItem("Latest",this::setViewToLatest));
+		menuView.add(BoofSwingUtil.createMenuItem("Follow", KeyEvent.VK_F,KeyEvent.VK_F,this::setViewToFollow));
+		menuBar.add(menuView);
 	}
 
 	/**
@@ -297,6 +312,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		if( stereoParameters == null )
 			throw new RuntimeException("stereoParameters should have been loaded in openFiles()");
+		followCamera = false;
 		frame = 0;
 		traveled = 0.0;
 		prev_to_world.reset();
@@ -363,6 +379,9 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		// Update the visualization
 		int frame = this.frame;
 		SwingUtilities.invokeLater(()->{
+			if( followCamera ) {
+				cloudPanel.gui.setCameraToWorld(camera_to_world);
+			}
 			controls.setFrame(frame);
 			controls.setProcessingTimeMS((time1-time0)*1e-6);
 			controls.setImageSize(buffered.getWidth(),buffered.getHeight());
@@ -739,6 +758,30 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 				}
 			}
 		}
+	}
+
+	/** Set's the 3D camera view to be the origin */
+	void setViewToHome() {
+		BoofSwingUtil.checkGuiThread();
+		followCamera = false;
+		cloudPanel.gui.setCameraToWorld(new Se3_F64());
+	}
+
+	/** Set's the 3D camera view to be latest estimate */
+	void setViewToLatest() {
+		BoofSwingUtil.checkGuiThread();
+		followCamera = false;
+		if( egoMotion_cam_to_world.size <= 0 ) {
+			return;
+		}
+		Se3_F64 last = egoMotion_cam_to_world.getTail();
+		cloudPanel.gui.setCameraToWorld(last);
+	}
+
+	/** Set's the 3D camera view continuous be set to the latest */
+	void setViewToFollow() {
+		BoofSwingUtil.checkGuiThread();
+		followCamera = !followCamera;
 	}
 
 	class PointCloudPanel extends JPanel {

@@ -26,6 +26,7 @@ import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.io.image.ConvertImageMisc;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;
@@ -549,6 +550,19 @@ public class BoofSwingUtil {
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		field.setValue(current);
 		return field;
+	}
+
+	public static JMenuItem createMenuItem(String name  , int mnmonic , int accelerator, BoofLambdas.Process action ) {
+		JMenuItem item = new JMenuItem(name);
+		BoofSwingUtil.setMenuItemKeys(item, mnmonic,accelerator);
+		item.addActionListener(e->action.process());
+		return item;
+	}
+
+	public static JMenuItem createMenuItem(String name ,BoofLambdas.Process action ) {
+		JMenuItem item = new JMenuItem(name);
+		item.addActionListener(e->action.process());
+		return item;
 	}
 
 	public static void setMenuItemKeys( JMenuItem menu , int mnmonic , int accelerator ) {
