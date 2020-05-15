@@ -71,8 +71,9 @@ Version : 0.36
 - Visual Odometry
   * Re-wrote VisualizeStereoVisualOdometryApp. Much better visualization and more configurable
   * All stereo visual odometry algorithms now support multiple key frames and bundle adjustment
-  * Note that Quad lost spatial association and ability to handle sets. It should gain that back in the next release.
-  * TODO Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
+  * Note all approaches lost 2D spatial association, ability to feature handle sets, and two pass tracking.
+  * While this simplified the code the loss of 2D association did degrade runtime performance significantly for Quad.
+  * Those are all scheduled for consideration in the next release with a cleaner interface
 - Stereo
   * Added sparse disparity with Census and NCC
   * Added Census support for F32 images
@@ -107,12 +108,20 @@ Version : 0.36
 TODO DetectDescribe
    - Integrate in sets and remove specialized class
    - Request the set a feature belongs in. Provide a lambda to get all features in a set?
-   - This should make it easier to spread association by set through out the code base
-     Trackers and Visual Odometry are initial targets
 
-TODO Stereo Association
+TODO Visual Odomtry
+  - Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
+  - Integrate new feature sets API and use it in association
+  - Bring back association with 2D information and make it configurable
+    * This has been verified to increase computational expense in Quad tracker by a large margin
+  - Consider bringing back the two pass association approach
+  - Consider having a motion estimate be a hint provided to VO as an input
+
+TODO Stereo Feature Association
    - Formalize with a factory
    - Do everything that greedy does now
+   - Take in max distance as a parameter too
+   - Verify that it doesn't allow impossible associations either
 
 - Scene Reconstruction
   * TODO when associating objects split into feature types, e.g. white and black blobs
@@ -127,9 +136,6 @@ TODO Regression
 
 TODO Sparse Disparity Undistort using camera model
 
-TODO Visual Odometry
-  * Fully integrate feature sets into all the code
-  * Use spatial information when association
 
 ---------------------------------------------
 Date    : 2019-Dec-23
