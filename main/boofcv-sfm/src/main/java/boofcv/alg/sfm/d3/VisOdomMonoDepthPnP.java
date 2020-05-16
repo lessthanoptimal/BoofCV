@@ -151,11 +151,11 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		//=============================================================================================
 		//========== Initialize VO from the first image and return
 		if( first ) {
-			if( verbose != null ) verbose.println("VO: First Frame");
 			first = false;
 			spawnNewTracksForNewKeyFrame(visibleTracks);
 			frameManager.initialize(scene.cameras);
 			frameManager.handleSpawnedTracks(tracker, scene.cameras.getTail());
+			if( verbose != null ) verbose.println("VO: First Frame. Spawned="+visibleTracks.size());
 			return true;
 		}
 
@@ -175,6 +175,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			updateListOfVisibleTracksForOutput();
 			return false;
 		}
+		if( verbose != null ) verbose.println("   Inliers          "+motionEstimator.getMatchSet().size());
+
 		// what the name says and also marks the inliers as inliers
 		addObservationsOfInliersToScene(activeVisualTracks);
 		// Drop tracker tracks which aren't being used inside of the inlier set
@@ -189,6 +191,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		//=============================================================================================
 		//========== Perform maintenance by dropping elements from the scene
 		dropBadBundleTracks();
+		updateListOfVisibleTracksForOutput();
+		if( verbose != null ) verbose.println("   Bad Bundle Trk   "+ totalDroppedTracksBadBundle);
 		long time4 = System.nanoTime();
 		boolean droppedCurrentFrame = performKeyFrameMaintenance(tracker,1);
 		long time5 = System.nanoTime();
@@ -313,6 +317,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	private void removeOldUnusedVisibleTracks() {
 		final long trackerFrame = getFrameID();
 
+		int beforeCount = tracker.getTotalActive() + tracker.getTotalInactive();
+
 		// This will go through all tracks, active and inactive
 		tracker.dropTracks(track -> {
 			Track bt = track.getCookie();
@@ -323,6 +329,9 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			}
 			return false;
 		});
+
+		int afterCount = tracker.getTotalActive() + tracker.getTotalInactive();
+		if( verbose != null ) verbose.println("   Dropped Unused   "+(beforeCount-afterCount));
 	}
 
 	/**

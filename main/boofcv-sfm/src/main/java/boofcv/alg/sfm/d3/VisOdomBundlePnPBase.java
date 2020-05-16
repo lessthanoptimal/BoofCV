@@ -79,6 +79,8 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/** Tracks which are visible in the most recently processed frame */
 	protected @Getter final List<Track> visibleTracks = new ArrayList<>();
 	// initial list of visible tracks before dropping during maintenance
+	// The original list of visual tracks isn't reported since we need full tracking information and some of those
+	// tracks will be dropped and data recycled.
 	protected final List<Track> initialVisible = new ArrayList<>();
 
 	// transform from the current camera view to the key frame
@@ -100,6 +102,9 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	protected @Getter @Setter PrintStream profileOut;
 	// Verbose debug information
 	protected @Getter PrintStream verbose;
+
+	// Total number of tracks dropped due to large bundle adjustment errors
+	protected int totalDroppedTracksBadBundle;
 
 	//=================================================================
 	//======== Workspace Variables
@@ -274,6 +279,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		}
 
 		// Remove it from the master tracks list
+		totalDroppedTracksBadBundle = scene.tracks.size;
 		for (int tidx = scene.tracks.size-1; tidx >= 0; tidx--) {
 			BTrack bt = scene.tracks.get(tidx);
 			if( bt.observations.size == 0 ) {
@@ -281,6 +287,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 				scene.tracks.removeSwap(tidx);
 			}
 		}
+		totalDroppedTracksBadBundle -= scene.tracks.size; // the delta is the number of dropped tracks
 
 		// Do a second pass since if it was removed in the first pass it might not be removed from all the frames
 		// if it was good in an earlier one

@@ -93,15 +93,15 @@ public class ExampleVisualOdometryStereo {
 		configBM.subpixel = true;
 
 		// Configurations related to how the structure is chained together frame to frame
-		var configPnP = new ConfigVisOdomTrackPnP();
-		configPnP.keyframes.geoMinCoverage = 0.4;
-		configPnP.ransac.iterations = 200;
-		configPnP.ransac.inlierThreshold = 1.0;
+		var configVisOdom = new ConfigVisOdomTrackPnP();
+		configVisOdom.keyframes.geoMinCoverage = 0.4;
+		configVisOdom.ransac.iterations = 200;
+		configVisOdom.ransac.inlierThreshold = 1.0;
 
 		// Declare each component then visual odometry
 		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet,GrayU8.class, GrayS16.class);
 		StereoDisparitySparse<GrayU8> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayU8.class);
-		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(configPnP,disparity,tracker, GrayU8.class);
+		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(configVisOdom,disparity,tracker, GrayU8.class);
 
 		// Optionally dump verbose debugging information to stdout
 //		Set<String> configuration = new HashSet<>();
