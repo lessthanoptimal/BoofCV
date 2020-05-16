@@ -57,9 +57,9 @@ public class ConfigDisparityBM implements Configuration {
 	public int validateRtoL=1;
 	/**
 	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
-	 * Try 0.1. Disable with a value &le; 0
+	 * Try 0.15 unless NCC then 0.005. Disable with a value &le; 0
 	 */
-	public double texture = 0.1;
+	public double texture = 0.15;
 	/**
 	 * If subpixel should be used to find disparity or not. If on then output disparity image needs to me GrayF32.
 	 * If false then GrayU8.
