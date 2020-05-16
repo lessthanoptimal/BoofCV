@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -63,13 +64,17 @@ public class WrapDetectDescribeSurf
 	// orientation of features
 	protected GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
 
+	ImageType<T> imageType;
+
 	public WrapDetectDescribeSurf(FastHessianFeatureDetector<II> detector,
 								  OrientationIntegral<II> orientation,
-								  DescribePointSurf<II> describe)
+								  DescribePointSurf<II> describe,
+								  Class<T> imageType )
 	{
 		this.detector = detector;
 		this.orientation = orientation;
 		this.describe = describe;
+		this.imageType = ImageType.single(imageType);
 
 		features = new SurfFeatureQueue(describe.getDescriptionLength());
 	}
@@ -82,6 +87,11 @@ public class WrapDetectDescribeSurf
 	@Override
 	public BrightFeature getDescription(int index) {
 		return features.get(index);
+	}
+
+	@Override
+	public ImageType<T> getInputType() {
+		return imageType;
 	}
 
 	@Override

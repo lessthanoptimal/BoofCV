@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 
@@ -43,11 +44,13 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	T gray;
 	II grayII;
 	Planar<II> bandII;
+	ImageType<Planar<T>> inputType;
 
 	public SurfPlanar_to_DetectDescribePoint(DetectDescribeSurfPlanar<II> alg ,
 											 Class<T> imageType, Class<II> integralType)
 	{
 		this.alg = alg;
+		this.inputType = ImageType.pl(alg.getDescribe().getNumBands(),imageType);
 
 		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		grayII = GeneralizedImageOps.createSingleBand(integralType,1,1);
@@ -84,6 +87,11 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	@Override
 	public BrightFeature getDescription(int index) {
 		return alg.getDescription(index);
+	}
+
+	@Override
+	public ImageType<Planar<T>> getInputType() {
+		return inputType;
 	}
 
 	@Override

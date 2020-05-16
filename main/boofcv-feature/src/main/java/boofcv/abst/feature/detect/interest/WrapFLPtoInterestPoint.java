@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.detect.interest;
 import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_F64;
 
@@ -81,5 +82,10 @@ public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	@Override
 	public boolean hasOrientation() {
 		return false;
+	}
+
+	@Override
+	public ImageType<T> getInputType() {
+		return ss.getImageType();
 	}
 }

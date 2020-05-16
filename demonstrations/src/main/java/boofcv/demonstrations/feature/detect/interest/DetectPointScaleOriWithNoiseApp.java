@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
 		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, true,imageType));
 		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(
-				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4)));
+				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4),imageType));
 		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null,new ConfigSiftDetector(2*maxScaleFeatures),imageType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +59,8 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements InterestPointScaleSpacePyramid<T> {
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
-	private GeneralFeatureDetector<T, D> detector;
-	private float baseThreshold;
+	private @Getter final GeneralFeatureDetector<T, D> detector;
+	private final float baseThreshold;
 	// feature intensity in the pyramid
 	protected GrayF32 intensities[];
 	protected int spaceIndex = 0;

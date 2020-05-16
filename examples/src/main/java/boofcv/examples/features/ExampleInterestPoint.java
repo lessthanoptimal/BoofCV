@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class ExampleInterestPoint {
 		// Create a Fast Hessian detector from the SURF paper.
 		// Other detectors can be used in this example too.
 		InterestPointDetector<T> detector = FactoryInterestPoint.fastHessian(
-				new ConfigFastHessian(10, 2, 100, 2, 9, 3, 4));
+				new ConfigFastHessian(10, 2, 100, 2, 9, 3, 4),imageType);
 
 		// find interest points in the image
 		detector.detect(input);

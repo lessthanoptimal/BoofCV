@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -87,5 +88,10 @@ public class InterestPointDetectorOverride<T extends ImageGray<T>>
 		if( orientation == null )
 			return detector.hasOrientation();
 		return true;
+	}
+
+	@Override
+	public ImageType<T> getInputType() {
+		return detector.getInputType();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.core.image.GConvertImage;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -35,9 +36,11 @@ public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
 
 	CompleteSift alg;
 	GrayF32 imageFloat = new GrayF32(1,1);
+	ImageType<I> inputType;
 
-	public DetectDescribe_CompleteSift(CompleteSift alg) {
+	public DetectDescribe_CompleteSift(CompleteSift alg, Class<I> inputType) {
 		this.alg = alg;
+		this.inputType = ImageType.single(inputType);
 	}
 
 	@Override
@@ -51,13 +54,18 @@ public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
 	}
 
 	@Override
+	public ImageType<I> getInputType() {
+		return inputType;
+	}
+
+	@Override
 	public Class<BrightFeature> getDescriptionType() {
 		return BrightFeature.class;
 	}
 
 	@Override
 	public void detect(I input) {
-		if( input instanceof GrayF32)
+		if( !inputType.getDataType().isInteger() )
 			alg.process((GrayF32)input);
 		else {
 			imageFloat.reshape(input.width,input.height);

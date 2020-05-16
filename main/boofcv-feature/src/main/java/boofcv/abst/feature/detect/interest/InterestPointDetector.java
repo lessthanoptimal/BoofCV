@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
  * Interface for automatic interest point detection in an image.  Optional support is
@@ -49,4 +50,9 @@ public interface InterestPointDetector< T extends ImageBase> extends FoundPointS
 	 * @return true if it estimates the orientation
 	 */
 	boolean hasOrientation();
+
+	/**
+	 * Get the expected input image type
+	 */
+	ImageType<T> getInputType();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,8 @@ package boofcv.abst.feature.detect.interest;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -29,25 +30,25 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class WrapSiftDetector<T extends ImageBase<T>>
+public class WrapSiftDetector<T extends ImageGray<T>>
 		implements InterestPointDetector<T>
 {
 	SiftDetector detector;
 
 	GrayF32 imageFloat = new GrayF32(1,1);
 
-	Class<T> inputType;
+	ImageType<T> inputType;
 
 	public WrapSiftDetector(SiftDetector detector, Class<T> inputType ) {
 		this.detector = detector;
-		this.inputType = inputType;
+		this.inputType = ImageType.single(inputType);
 	}
 
 	@Override
 	public void detect(T image) {
 
 		GrayF32 input;
-		if( image instanceof GrayF32) {
+		if( !inputType.getDataType().isInteger() ) {
 			input = (GrayF32)image;
 		} else {
 			imageFloat.reshape(image.width,image.height);
@@ -86,5 +87,10 @@ public class WrapSiftDetector<T extends ImageBase<T>>
 	@Override
 	public boolean hasOrientation() {
 		return false;
+	}
+
+	@Override
+	public ImageType<T> getInputType() {
+		return inputType;
 	}
 }

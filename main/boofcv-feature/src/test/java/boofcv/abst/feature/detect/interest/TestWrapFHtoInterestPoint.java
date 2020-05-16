@@ -38,7 +38,7 @@ public class TestWrapFHtoInterestPoint {
 
 	@Test
 	public void standard() {
-		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector);
+		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector,GrayU8.class);
 
 		new GeneralInterestPointDetectorChecks(alg,false,true,GrayU8.class){}.performAllTests();
 	}

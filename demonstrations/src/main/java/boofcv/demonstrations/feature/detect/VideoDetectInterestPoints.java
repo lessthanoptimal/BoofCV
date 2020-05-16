@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,7 +113,7 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 
 		InterestPointDetector<T> detector;
 
-		detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 100, 2, 9, 4, 4));
+		detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 100, 2, 9, 4, 4),imageType);
 //		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,defaultType,derivType);
 //		detector = FactoryInterestPoint.wrapDetector(feature,new double[]{1,2,4,6,8,12},defaultType);
 

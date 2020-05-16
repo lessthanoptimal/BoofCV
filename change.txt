@@ -19,6 +19,7 @@ Version : 0.36
   * Created FiducialTracker interface
   * Updated for DDogleg's FastAccess, FastArray, and FastQueue
   * Config's now all implement setTo() and this is enforced with a unit test
+  * Planar images now update the number of bands in ImageType when the number of bands is reshaped
 - Added Project Lombok for auto generating setters/getters
 - Kotlin
   * Initial release with specialized support for Kotlin

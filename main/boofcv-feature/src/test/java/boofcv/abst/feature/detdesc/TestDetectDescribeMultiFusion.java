@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class TestDetectDescribeMultiFusion {
 		new GenericTestsDetectDescribeMulti(GrayF32.class,BrightFeature.class) {
 			@Override
 			public DetectDescribeMulti createDetDesc() {
-				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
+				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null, GrayF32.class);
 				final OrientationImage ori = FactoryOrientationAlgs.nogradient(5,5, GrayF32.class);
 				final DescribeRegionPoint<GrayF32,BrightFeature> desc =
 						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
@@ -95,7 +95,7 @@ public class TestDetectDescribeMultiFusion {
 
 			@Override
 			public DetectDescribeMulti createDetDesc() {
-				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
+				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null, GrayF32.class);
 				final DescribeRegionPoint<GrayF32,BrightFeature> desc =
 						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 				DetectDescribePoint ddp = new DetectDescribeFusion(detector,null,desc);

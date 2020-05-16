@@ -120,7 +120,7 @@ public class CompareConvertedDescriptionsApp {
 		String file2 = UtilIO.pathExample("stitch/kayak_02.jpg");
 
 		InterestPointDetector<GrayF32> detector =
-				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1,10,-1,2,9,4,4));
+				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1,10,-1,2,9,4,4), GrayF32.class);
 
 		DescribeRegionPoint<GrayF32,TupleDesc_F64> describeA =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);

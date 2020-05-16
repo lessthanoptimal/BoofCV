@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
@@ -83,6 +84,11 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	@Override
 	public TD getDescription(int index) {
 		return descs.get(index);
+	}
+
+	@Override
+	public ImageType<T> getInputType() {
+		return detector.getInputType();
 	}
 
 	@Override

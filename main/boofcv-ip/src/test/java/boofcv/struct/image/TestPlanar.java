@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,13 +40,13 @@ public class TestPlanar {
 	public void constructor() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,imgWidth, imgHeight, 3);
 
-		assertTrue(GrayU8.class == img.getBandType());
-		assertTrue(3 == img.bands.length);
-		assertTrue(3 == img.getNumBands());
-		assertTrue(imgWidth == img.width);
-		assertTrue(imgHeight == img.height);
+		assertSame(GrayU8.class, img.getBandType());
+		assertEquals(3, img.bands.length);
+		assertEquals(3, img.getNumBands());
+		assertEquals(imgWidth, img.width);
+		assertEquals(imgHeight, img.height);
 		for (int i = 0; i < 3; i++) {
-			assertTrue(img.bands[i] != null);
+			assertNotNull(img.bands[i]);
 		}
 	}
 
@@ -54,7 +54,7 @@ public class TestPlanar {
 	public void getBand() {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,imgWidth, imgHeight, 3);
 
-		assertTrue(img.getBand(0) != null);
+		assertNotNull(img.getBand(0));
 
 		try {
 			img.getBand(-1);
@@ -112,6 +112,7 @@ public class TestPlanar {
 		assertEquals(5,img.getBand(0).getWidth());
 		assertEquals(4,img.getBand(0).getHeight());
 		assertEquals(2,img.getNumBands());
+		assertEquals(2,img.getImageType().numBands);
 
 		// number of bands constant
 		img.reshape(5,5, 2);
@@ -120,6 +121,7 @@ public class TestPlanar {
 		assertEquals(5, img.getBand(0).getWidth());
 		assertEquals(5, img.getBand(0).getHeight());
 		assertEquals(2, img.getNumBands());
+		assertEquals(2,img.getImageType().numBands);
 
 		// reshape to something larger
 		img.reshape(15, 21);
@@ -128,6 +130,7 @@ public class TestPlanar {
 		assertEquals(15, img.getBand(0).getWidth());
 		assertEquals(21, img.getBand(0).getHeight());
 		assertEquals(2,  img.getNumBands());
+		assertEquals(2,img.getImageType().numBands);
 
 		// increase number of bands
 		img.reshape(15, 21,3);
@@ -136,6 +139,8 @@ public class TestPlanar {
 		assertEquals(15, img.getBand(0).getWidth());
 		assertEquals(21, img.getBand(0).getHeight());
 		assertEquals(3,  img.getNumBands());
+		assertEquals(3,img.getImageType().numBands);
+
 	}
 
 	@Test
@@ -220,9 +225,9 @@ public class TestPlanar {
 
 		img.reorderBands(2,0,1);
 
-		assertTrue( band0 == img.getBand(1));
-		assertTrue( band1 == img.getBand(2));
-		assertTrue( band2 == img.getBand(0));
+		assertSame(band0, img.getBand(1));
+		assertSame(band1, img.getBand(2));
+		assertSame(band2, img.getBand(0));
 	}
 
 	@Test
@@ -230,9 +235,11 @@ public class TestPlanar {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 2);
 
 		assertEquals(2, img.getNumBands());
+		assertEquals(2, img.getImageType().numBands);
 
 		img.setNumberOfBands(3);
 		assertEquals(3, img.getNumBands());
+		assertEquals(3, img.getImageType().numBands);
 		for (int i = 0; i < img.getNumBands(); i++) {
 			assertEquals(5, img.getBand(i).width);
 			assertEquals(10, img.getBand(i).height);
@@ -240,6 +247,7 @@ public class TestPlanar {
 
 		img.setNumberOfBands(1);
 		assertEquals(1, img.getNumBands());
+		assertEquals(1, img.getImageType().numBands);
 		for (int i = 0; i < img.getNumBands(); i++) {
 			assertEquals(5, img.getBand(i).width);
 			assertEquals(10, img.getBand(i).height);
@@ -257,7 +265,7 @@ public class TestPlanar {
 		img.getBand(2).set(1,1,200);
 
 		int expected0 = (233<<16) | (16<<8) | (128);
-		int expected1 = (16<<16) | (0<<8) | (200);
+		int expected1 = (16<<16)  |           (200);
 
 		assertEquals(expected0,img.get24u8(0,1));
 		assertEquals(expected1,img.get24u8(1,1));
@@ -277,7 +285,7 @@ public class TestPlanar {
 		img.getBand(3).set(1,1,200);
 
 		int expected0 = (208<<24) | (233<<16) | (16<<8) | (128);
-		int expected1 = (217<<24) | (16<<16)  | (0<<8)  | (200);
+		int expected1 = (217<<24) | (16<<16)  |           (200);
 
 		assertEquals(expected0,img.get32u8(0,1));
 		assertEquals(expected1,img.get32u8(1,1));
@@ -288,7 +296,7 @@ public class TestPlanar {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,5);
 
 		int expected0 = (208<<24) | (233<<16) | (16<<8) | (128);
-		int expected1 = (217<<24) | (16<<16)  | (0<<8)  | (200);
+		int expected1 = (217<<24) | (16<<16)  |           (200);
 
 		img.set32u8(0,1,expected0);
 		img.set32u8(1,1,expected1);
@@ -310,7 +318,7 @@ public class TestPlanar {
 		Planar<GrayU8> img = new Planar<>(GrayU8.class,2,3,3);
 
 		int expected0 = (233<<16) | (16<<8) | (128);
-		int expected1 = (16<<16)  | (0<<8)  | (200);
+		int expected1 = (16<<16)  |           (200);
 
 		img.set24u8(0,1,expected0);
 		img.set24u8(1,1,expected1);

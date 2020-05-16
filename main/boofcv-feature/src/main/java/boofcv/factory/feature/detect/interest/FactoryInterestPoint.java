@@ -52,7 +52,7 @@ public class FactoryInterestPoint {
 	InterestPointDetector<T> generic( ConfigDetectInterestPoint config , Class<T> inputType, @Nullable Class<D> derivType )
 	{
 		switch(config.type) {
-			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian);
+			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian,inputType);
 			case SIFT: return FactoryInterestPoint.sift(config.scaleSpaceSift,config.sift,inputType);
 			case POINT: {
 				if( derivType == null )
@@ -147,8 +147,8 @@ public class FactoryInterestPoint {
 	 * @see FastHessianFeatureDetector
 	 */
 	public static <T extends ImageGray<T>>
-	InterestPointDetector<T> fastHessian( ConfigFastHessian config ) {
-		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config));
+	InterestPointDetector<T> fastHessian( ConfigFastHessian config, Class<T> imageType ) {
+		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config),imageType);
 	}
 
 	public static <T extends ImageGray<T>>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
@@ -122,6 +123,9 @@ public class TestInterestPointDetectorOverride {
 
 		@Override
 		public boolean hasOrientation() {return orientation;}
+
+		@Override
+		public ImageType getInputType() { return null; }
 	}
 
 	private static class DummyOrientation implements OrientationImage {

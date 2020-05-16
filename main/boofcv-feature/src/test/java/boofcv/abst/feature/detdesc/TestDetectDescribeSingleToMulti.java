@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
@@ -62,6 +63,11 @@ public class TestDetectDescribeSingleToMulti {
 		@Override
 		public TupleDesc_F64 getDescription(int index) {
 			return new TupleDesc_F64(10);
+		}
+
+		@Override
+		public ImageType<GrayF32> getInputType() {
+			return ImageType.SB_F32;
 		}
 
 		@Override

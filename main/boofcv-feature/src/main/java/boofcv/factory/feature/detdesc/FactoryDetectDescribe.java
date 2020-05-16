@@ -90,7 +90,7 @@ public class FactoryDetectDescribe {
 			configSift.scaleSpace = config.scaleSpaceSift;
 			configSift.detector = config.detectSift;
 			configSift.describe = config.describeSift;
-			detDesc = FactoryDetectDescribe.sift(configSift);
+			detDesc = FactoryDetectDescribe.sift(configSift, imageType);
 		}
 
 		if( detDesc != null )
@@ -98,7 +98,7 @@ public class FactoryDetectDescribe {
 
 		InterestPointDetector detector;
 		switch(config.typeDetector) {
-			case FAST_HESSIAN: detector = FactoryInterestPoint.fastHessian(config.detectFastHessian); break;
+			case FAST_HESSIAN: detector = FactoryInterestPoint.fastHessian(config.detectFastHessian,imageType); break;
 			case SIFT: detector =
 					FactoryInterestPoint.sift(config.scaleSpaceSift,config.detectSift,imageType); break;
 			case POINT: {
@@ -143,7 +143,7 @@ public class FactoryDetectDescribe {
 	 * @return SIFT
 	 */
 	public static <T extends ImageGray<T>>
-	DetectDescribePoint<T,BrightFeature> sift( @Nullable ConfigCompleteSift config )
+	DetectDescribePoint<T,BrightFeature> sift( @Nullable ConfigCompleteSift config, Class<T> imageType)
 	{
 		if( config == null )
 			config = new ConfigCompleteSift();
@@ -165,7 +165,7 @@ public class FactoryDetectDescribe {
 		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configDetector.extract);
 		NonMaxLimiter nonMax = new NonMaxLimiter(nns,configDetector.maxFeaturesPerScale);
 		CompleteSift dds = new CompleteSift(scaleSpace,configDetector.edgeR,nonMax,orientation,describe);
-		return new DetectDescribe_CompleteSift<>(dds);
+		return new DetectDescribe_CompleteSift<>(dds,imageType);
 	}
 
 	/**
@@ -201,9 +201,9 @@ public class FactoryDetectDescribe {
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
 		if(BoofConcurrency.USE_CONCURRENT) {
-			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe);
+			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe, imageType);
 		} else {
-			return new WrapDetectDescribeSurf<>(detector, orientation, describe);
+			return new WrapDetectDescribeSurf<>(detector, orientation, describe, imageType);
 		}
 	}
 
@@ -292,9 +292,9 @@ public class FactoryDetectDescribe {
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
 		if(BoofConcurrency.USE_CONCURRENT) {
-			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe);
+			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe, imageType);
 		} else {
-			return new WrapDetectDescribeSurf<>(detector, orientation, describe);
+			return new WrapDetectDescribeSurf<>(detector, orientation, describe, imageType);
 		}
 	}
 

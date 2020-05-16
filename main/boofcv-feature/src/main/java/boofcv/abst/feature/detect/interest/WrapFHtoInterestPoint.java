@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -39,9 +40,11 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 	FastHessianFeatureDetector<II> detector;
 	List<ScalePoint> location;
 	II integral;
+	ImageType<T> inputType;
 
-	public WrapFHtoInterestPoint(FastHessianFeatureDetector<II> detector) {
+	public WrapFHtoInterestPoint(FastHessianFeatureDetector<II> detector, Class<T> inputType ) {
 		this.detector = detector;
+		this.inputType = ImageType.single(inputType);
 	}
 
 	@Override
@@ -85,5 +88,10 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 	@Override
 	public boolean hasOrientation() {
 		return false;
+	}
+
+	@Override
+	public ImageType<T> getInputType() {
+		return inputType;
 	}
 }

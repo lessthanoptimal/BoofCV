@@ -27,6 +27,7 @@ import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
@@ -168,22 +169,7 @@ public class TestCombinedTrackerScalePoint {
 
 		int N;
 
-		private DummyAssoc(int n) {
-			N = n;
-		}
-
-		@Override
-		public void setSource(FastAccess listSrc) {
-		}
-
-		@Override
-		public void setDestination(FastAccess listDst) {
-		}
-
-		@Override
-		public void associate() {
-
-		}
+		private DummyAssoc(int n) {N = n;}
 
 		@Override
 		public FastQueue<AssociatedIndex> getMatches() {
@@ -196,72 +182,32 @@ public class TestCombinedTrackerScalePoint {
 			return queue;
 		}
 
-		@Override
-		public GrowQueue_I32 getUnassociatedSource() {
-			return null;
-		}
-
-		@Override
-		public GrowQueue_I32 getUnassociatedDestination() {
-			return null;
-		}
-
-		@Override
-		public void setMaxScoreThreshold(double score) {
-		}
-
-		@Override
-		public MatchScoreType getScoreType() {
-			return MatchScoreType.NORM_ERROR;
-		}
-
-		@Override
-		public boolean uniqueSource() {
-			return false;
-		}
-
-		@Override
-		public boolean uniqueDestination() {
-			return false;
-		}
+		@Override public void setSource(FastAccess listSrc) {}
+		@Override public void setDestination(FastAccess listDst) {}
+		@Override public void associate() {}
+		@Override public GrowQueue_I32 getUnassociatedSource() {return null;}
+		@Override public GrowQueue_I32 getUnassociatedDestination() {return null;}
+		@Override public void setMaxScoreThreshold(double score) {}
+		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
+		@Override public boolean uniqueSource() {return false;}
+		@Override public boolean uniqueDestination() {return false;}
 	}
 
 	private static class DummyDetector implements DetectDescribePoint {
 
 		int N;
 
-		private DummyDetector(int n) {
-			N = n;
-		}
-
-		@Override
-		public TupleDesc createDescription() {return null;}
-
-		@Override
-		public TupleDesc getDescription(int index) {return null;}
-
-		@Override
-		public Class getDescriptionType() {return null;}
-
-		@Override
-		public void detect(ImageBase input) {}
-
-		@Override
-		public int getNumberOfFeatures() {return N;}
-
-		@Override
-		public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64(2,2);}
-
-		@Override
-		public double getRadius(int featureIndex) {return 0;}
-
-		@Override
-		public double getOrientation(int featureIndex) {return 0;}
-
-		@Override
-		public boolean hasScale() {return false;}
-
-		@Override
-		public boolean hasOrientation() {return false;}
+		private DummyDetector(int n) {N = n;}
+		@Override public TupleDesc createDescription() {return null;}
+		@Override public TupleDesc getDescription(int index) {return null;}
+		@Override public ImageType getInputType() {return null;}
+		@Override public Class getDescriptionType() {return null;}
+		@Override public void detect(ImageBase input) {}
+		@Override public int getNumberOfFeatures() {return N;}
+		@Override public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64(2,2);}
+		@Override public double getRadius(int featureIndex) {return 0;}
+		@Override public double getOrientation(int featureIndex) {return 0;}
+		@Override public boolean hasScale() {return false;}
+		@Override public boolean hasOrientation() {return false;}
 	}
 }

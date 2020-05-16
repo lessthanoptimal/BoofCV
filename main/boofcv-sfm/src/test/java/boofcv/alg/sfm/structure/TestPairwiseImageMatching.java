@@ -32,6 +32,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -268,6 +269,11 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		@Override
 		public TupleDesc_F64 getDescription(int index) {
 			return descriptions.get(visible.get(index));
+		}
+
+		@Override
+		public ImageType<GrayF32> getInputType() {
+			return ImageType.SB_F32;
 		}
 
 		@Override

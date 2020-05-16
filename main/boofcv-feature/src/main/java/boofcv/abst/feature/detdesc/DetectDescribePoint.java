@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
  * Interface for detecting and describing point features. By detecting and describing at the same time some algorithms
@@ -43,5 +44,10 @@ public interface DetectDescribePoint<T extends ImageBase<T>, Desc extends TupleD
 	 * @return Feature descriptor
 	 */
 	Desc getDescription(int index);
+
+	/**
+	 * Get the expected input image type
+	 */
+	ImageType<T> getInputType();
 }
 

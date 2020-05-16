@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,9 @@ public class WrapDetectDescribeSurf_MT<T extends ImageGray<T>, II extends ImageG
 
 	public WrapDetectDescribeSurf_MT(FastHessianFeatureDetector<II> detector,
 									 OrientationIntegral<II> orientation,
-									 DescribePointSurf<II> describe) {
-		super(detector, orientation, describe);
+									 DescribePointSurf<II> describe,
+									 Class<T> inputType ) {
+		super(detector, orientation, describe, inputType );
 	}
 
 	@Override

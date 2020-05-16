@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastQueue;
@@ -115,5 +116,10 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	@Override
 	public boolean hasOrientation() {
 		return false;
+	}
+
+	@Override
+	public ImageType<T> getInputType() {
+		return ImageType.single(super.detector.getImageType());
 	}
 }

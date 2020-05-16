@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -240,6 +240,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 			this.stride = width;
 			this.width = width;
 			this.height = height;
+			this.imageType.numBands = numberOfBands;
 		} else {
 			reshape(width, height);
 		}
@@ -319,6 +320,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 			bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
 		}
 		this.bands = bands;
+		this.imageType.numBands = this.bands.length;
 	}
 
 	/**
