@@ -12,7 +12,6 @@
   * See what needs to be updated since TAG_NAME "git diff --name-status TAG_NAME examples"
 - Make sure external dependencies are meet and everything builds
   * Android
-  * OpenKinect
 
 --- Fresh Checkout ---
 
@@ -35,13 +34,10 @@ scp boofcv-$VERSION-src.zip pabeles@frs.sourceforge.net:/home/frs/project/boofcv
 - Tag git
 - Update version on website
 
--- Applications
+--- Applications
 Update prebuilt applications and demonstrations using https://github.com/lessthanoptimal/BoofApplications
 
-----
-Gradle
-
-To post a SNAPSHOT or full release:
+--- Releasing to Maven Central
 
 Clean, build, and upload to Sonatype
   ./gradlew clean;./gradlew assemble;./gradlew uploadArchives -Dorg.gradle.parallel=false

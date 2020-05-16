@@ -96,7 +96,7 @@ public class ShowImages {
 
 		frame.add(panel, BorderLayout.CENTER);
 		frame.pack();
-		frame.setLocationByPlatform(true);
+		setFrameLocation(frame);
 		frame.setVisible(true);
 		if( closeOnExit )
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -136,7 +136,7 @@ public class ShowImages {
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 			frame.pack();
-			frame.setLocationRelativeTo(null); // centers window in the monitor
+			setFrameLocation(frame);
 
 			// prevent it from creating a window larger than the screen
 			int width = frame.getWidth();
@@ -165,11 +165,18 @@ public class ShowImages {
 		frame.add(component, BorderLayout.CENTER);
 
 		frame.pack();
-		frame.setLocationRelativeTo(null); // centers window in the monitor
+		setFrameLocation(frame);
 		if( closeOnExit )
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		return frame;
+	}
+
+	/**
+	 * Set location using a single function call to make sure all operations follow the same standard
+	 */
+	private static void setFrameLocation(JFrame frame) {
+		frame.setLocationByPlatform(true);
 	}
 
 	public static ImagePanel showWindow(ImageGray<?> img , Colorization type, String title, boolean closeOnExit ) {

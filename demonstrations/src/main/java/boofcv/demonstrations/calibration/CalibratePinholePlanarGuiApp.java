@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -208,6 +208,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 
 			JFrame frame = new JFrame("Pinhole Calribation with Planar Targets");
 			frame.add(app, BorderLayout.CENTER);
+			frame.setLocationByPlatform(true);
 			frame.pack();
 			frame.setVisible(true);
 			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

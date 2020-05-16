@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2020
+Date    : 2020/May/16
 Version : 0.36
 
 - Build
@@ -18,7 +18,7 @@ Version : 0.36
     before it was < width-1, and < height-1. This conforms to rounding down standard.
   * Created FiducialTracker interface
   * Updated for DDogleg's FastAccess, FastArray, and FastQueue
-  * Config* now all implement setTo() and this is enforced with a unit test
+  * Config's now all implement setTo() and this is enforced with a unit test
 - Added Project Lombok for auto generating setters/getters
 - Kotlin
   * Initial release with specialized support for Kotlin
@@ -102,40 +102,6 @@ Version : 0.36
   * Added XYZ/LAB to RGB conversion.
   * Added ColorDiff - Computes metrics for the difference between colors
     - Thanks Jairo Rotava for the code contribution!
-
-----------Next Release
-
-TODO DetectDescribe
-   - Integrate in sets and remove specialized class
-   - Request the set a feature belongs in. Provide a lambda to get all features in a set?
-
-TODO Visual Odomtry
-  - Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
-  - Integrate new feature sets API and use it in association
-  - Bring back association with 2D information and make it configurable
-    * This has been verified to increase computational expense in Quad tracker by a large margin
-  - Consider bringing back the two pass association approach
-  - Consider having a motion estimate be a hint provided to VO as an input
-
-TODO Stereo Feature Association
-   - Formalize with a factory
-   - Do everything that greedy does now
-   - Take in max distance as a parameter too
-   - Verify that it doesn't allow impossible associations either
-
-- Scene Reconstruction
-  * TODO when associating objects split into feature types, e.g. white and black blobs
-  * TODO try improving 3-view by estimating lens distortion in projective camera
-  * TODO Scene Reconstruction from arbitrary number of photos
-  * TODO triangulate N-points using calibrated homogenous coordinates
-  * TODO Add rigid relationships between views. Can be fixed or not.
-
-TODO Regression
-   - Dump runtime results into their own directory for each device. Use hostname?
-   - Template matching
-
-TODO Sparse Disparity Undistort using camera model
-
 
 ---------------------------------------------
 Date    : 2019-Dec-23

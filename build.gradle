@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.36-SNAPSHOT'
+    version = '0.36'
 
     ext.COMMONS_IO_VERSION = '2.6'
 
@@ -89,8 +89,8 @@ subprojects {
     }
 
     dependencies {
-        api (group: 'org.georegression', name: 'georegression', version: '0.22-SNAPSHOT')
-        api (group: 'org.ddogleg', name: 'ddogleg', version: '0.18-SNAPSHOT')
+        api (group: 'org.georegression', name: 'georegression', version: '0.22')
+        api (group: 'org.ddogleg', name: 'ddogleg', version: '0.18')
 
         compileOnly 'org.projectlombok:lombok:1.18.10'
 

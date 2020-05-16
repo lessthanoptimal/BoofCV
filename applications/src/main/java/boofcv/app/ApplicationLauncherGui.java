@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,6 +55,7 @@ public class ApplicationLauncherGui extends JPanel {
 		logo.setPreferredSize(new Dimension(500,250));
 
 		JButton bCreateQR = createButton("QR Code",CreateQrCodeGui::new);
+//		JButton bCreateDots = createButton("Random Dot",CreateFiducialRandomDot::new);
 		JButton bCreateCalib = createButton("Calibration",CreateCalibrationTargetGui::new);
 		JButton bCreateFidBin = createButton("Square Binary",CreateFiducialSquareBinaryGui::new);
 		JButton bCreateFidImage = createButton("Square Image",CreateFiducialSquareImageGui::new);
@@ -132,7 +133,7 @@ public class ApplicationLauncherGui extends JPanel {
 	public JPanel buttonPanel( String title, JButton ...buttons ) {
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.WHITE);
-		panel.setPreferredSize(new Dimension(200,240));
+		panel.setPreferredSize(new Dimension(200,buttons.length*60));
 		panel.setMaximumSize(panel.getPreferredSize());
 		panel.setLayout(new BoxLayout(panel,BoxLayout.Y_AXIS));
 		panel.add(Box.createRigidArea(new Dimension(0,10)));
