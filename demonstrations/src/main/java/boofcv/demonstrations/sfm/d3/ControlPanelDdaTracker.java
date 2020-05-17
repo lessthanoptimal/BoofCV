@@ -29,6 +29,7 @@ import boofcv.factory.feature.describe.ConfigDescribeRegionPoint.DescriptorType;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint.DetectorType;
 import boofcv.factory.tracker.FactoryPointTracker;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -45,8 +46,13 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 	private final JPanel controlPanel = new JPanel(new BorderLayout());
 	private final Listener listener;
 
+	private final ConfigTrackerDda configDDA;
+	private ControlTracker controlTrackerDDA;
+
 	public ControlPanelDdaTracker(Listener listener) {
 		this.listener = listener;
+
+		this.configDDA = new ConfigTrackerDda();
 
 		configDetDesc.detectFastHessian.maxFeaturesPerScale = 400;
 		configDetDesc.detectPoint.general.threshold = 100;
@@ -60,6 +66,7 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 								  ConfigDetectDescribe detDesc ,
 								  ConfigAssociate associate ) {
 		this.listener = listener;
+		this.configDDA = configTracker;
 
 		configDetDesc = detDesc;
 		configAssociate = associate;
@@ -68,6 +75,9 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 	@Override
 	public void initializeControlsGUI() {
 		super.initializeControlsGUI();
+		controlTrackerDDA = new ControlTracker();
+		controlTrackerDDA.setBorder(BorderFactory.createTitledBorder("Tracker"));
+		add(controlTrackerDDA);
 		addLabeled(comboDetect,"Detect","Point feature detectors");
 		addLabeled(comboDescribe,"Describe","Point feature Descriptors");
 		addLabeled(comboAssociate,"Associate","Feature association Approach");
@@ -82,8 +92,6 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker(ImageType<T> imageType ) {
 		Class inputType = imageType.getImageClass();
-
-		ConfigTrackerDda configDDA = new ConfigTrackerDda();
 
 		DetectDescribePoint detDesc = createDetectDescribe(inputType);
 		AssociateDescription2D associate = new AssociateDescTo2D(createAssociate(detDesc));
@@ -128,6 +136,28 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 		}
 		updateActiveControls(which);
 		listener.changedPointTrackerDda();
+	}
+
+	public class ControlTracker extends StandardAlgConfigPanel {
+		JSpinner spinnerMaxUnused = spinner(configDDA.maxUnusedTracks,0,5000,10);
+		JCheckBox checkUpdate = checkbox("Update Description",configDDA.updateDescription);
+
+		public ControlTracker() {
+			addLabeled(spinnerMaxUnused,"Max Unused","Maximum number of unused/not visible tracks kept around");
+			addAlignLeft(checkUpdate,"If the description is updated after every frame or not");
+		}
+
+		@Override
+		public void controlChanged(final Object source) {
+			if( source == spinnerMaxUnused ) {
+				configDDA.maxUnusedTracks = (Integer)spinnerMaxUnused.getValue();
+			} else if( source == checkUpdate ) {
+				configDDA.updateDescription = checkUpdate.isSelected();
+			} else {
+				throw new RuntimeException("BUG");
+			}
+			listener.changedPointTrackerDda();
+		}
 	}
 
 	public interface Listener {

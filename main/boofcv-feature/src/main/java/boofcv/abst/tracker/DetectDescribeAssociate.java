@@ -82,6 +82,9 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	// Random number generator
 	protected Random rand;
 
+	// Temporary storage for tracks which have been selected to be dropped because there are too many non-visible tracks
+	List<PointTrack> excessiveList = new ArrayList<>();
+
 	/**
 	 * Configures tracker
 	 *
@@ -202,12 +205,14 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 				unassociated.data[i] = unassociated.data[selected];
 				unassociated.data[selected] = a;
 			}
-			List<PointTrack> dropList = new ArrayList<>();
+
+			excessiveList.clear();
 			for (int i = 0; i < numDrop; i++) {
-				dropList.add( info.tracks.get(unassociated.get(i)) );
+				excessiveList.add( info.tracks.get(unassociated.get(i)) );
 			}
-			for (int i = 0; i < dropList.size(); i++) {
-				dropTrack(dropList.get(i));
+			for (int i = 0; i < excessiveList.size(); i++) {
+				tracksDropped.add(excessiveList.get(i));
+				dropTrack(excessiveList.get(i));
 			}
 		}
 	}
@@ -317,10 +322,10 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		p.pixel.set(x, y);
 		((Desc)p.getDescription()).setTo(desc);
 		if( checkValidSpawn(setIndex,p) ) {
-			if( tracksAll.contains(p))
-				throw new RuntimeException("Contained twice all! p.id="+p.featureId);
-			if( tracksActive.contains(p))
-				throw new RuntimeException("Contained twice active! p.id="+p.featureId);
+//			if( tracksAll.contains(p))
+//				throw new RuntimeException("Contained twice all! p.id="+p.featureId);
+//			if( tracksActive.contains(p))
+//				throw new RuntimeException("Contained twice active! p.id="+p.featureId);
 			p.spawnFrameID = frameID;
 			p.setId = setIndex;
 			p.featureId = featureID++;
@@ -331,10 +336,10 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 			tracksAll.add(p);
 			return p;
 		} else {
-			if( tracksAll.contains(p))
-				throw new RuntimeException("Contained??? ! p.id="+p.featureId);
-			if( unused.contains(p))
-				throw new RuntimeException("Already in unused!");
+//			if( tracksAll.contains(p))
+//				throw new RuntimeException("Contained??? ! p.id="+p.featureId);
+//			if( unused.contains(p))
+//				throw new RuntimeException("Already in unused!");
 			unused.add(p);
 			return null;
 		}
@@ -354,8 +359,8 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		PointTrack p;
 		if( unused.size() > 0 ) {
 			p = unused.remove( unused.size()-1 );
-			if( unused.contains(p))
-				throw new RuntimeException("BUG!");
+//			if( unused.contains(p))
+//				throw new RuntimeException("BUG!");
 		} else {
 			p = new PointTrack();
 			p.setDescription(manager.createDescription());
@@ -365,11 +370,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 
 	@Override
 	public void dropAllTracks() {
-		for( var p : tracksAll ) {
-			if( unused.contains(p) ) {
-				throw new RuntimeException("Already in unused!");
-			}
-		}
+//		for( var p : tracksAll ) {
+//			if( unused.contains(p) ) {
+//				throw new RuntimeException("Already in unused!");
+//			}
+//		}
 		unused.addAll(tracksAll);
 		tracksActive.clear();
 		tracksInactive.clear();
@@ -415,8 +420,6 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		// it must be in the all list
 		// recycle the data
 		unused.add(track);
-		track.setId = -1;
-		track.featureId = -1;
 		return true;
 	}
 
@@ -434,8 +437,6 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 			tracksInactive.remove(track);
 			// recycle the data
 			unused.add(track);
-			track.setId = -1;
-			track.featureId = -1;
 		}
 	}
 

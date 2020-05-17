@@ -42,6 +42,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 	}
 
+
 	/**
 	 * Wraps the input panel inside another panel that will fill the control panel horizontally
 	 */
@@ -61,6 +62,11 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		};
 		hack.add(panel,BorderLayout.CENTER);
 		return hack;
+	}
+
+	protected void addToolTip( JComponent component , String toolTip ) {
+		component.setToolTipText(toolTip);
+		add(component);
 	}
 
 	protected JConfigLength configLength(ConfigLength initial , int min , int max ) {
@@ -212,6 +218,21 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return c;
 	}
 
+	public void addAlignLeft( JComponent target , String tooltip ) {
+		target.setToolTipText(tooltip);
+		addAlignLeft(target,this);
+	}
+
+	public void addAlignRight( JComponent target , String tooltip  ) {
+		target.setToolTipText(tooltip);
+		addAlignRight(target,this);
+	}
+
+	public void addAlignCenter( JComponent target , String tooltip  ) {
+		target.setToolTipText(tooltip);
+		addAlignCenter(target,this);
+	}
+
 	public void addAlignLeft( JComponent target ) {
 		addAlignLeft(target,this);
 	}
@@ -223,7 +244,6 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	public void addAlignCenter( JComponent target ) {
 		addAlignCenter(target,this);
 	}
-
 
 	public static void addAlignLeft( JComponent target, JPanel owner ) {
 		JPanel p = new JPanel();

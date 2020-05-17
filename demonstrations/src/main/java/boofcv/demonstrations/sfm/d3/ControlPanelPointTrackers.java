@@ -98,6 +98,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 		}
 		selectedFamily = which;
 		mainPanel.add(BorderLayout.CENTER,previous);
+		mainPanel.validate();
 		mainPanel.repaint();
 	}
 
