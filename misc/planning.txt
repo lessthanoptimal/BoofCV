@@ -1,5 +1,9 @@
 ----------Next Release
 
+TODO PointTracker
+  - Add last seen field to track
+  - has image motion 2D been updated to drop old unassociated tracks?
+
 TODO Random Dots
   - GUI for creating markers
   - See if they can be speed up any

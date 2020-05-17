@@ -202,7 +202,13 @@ public class TestImageMotionPointTrackerKey {
 		public boolean dropTrack(PointTrack track) {numDropped++;return true;}
 
 		@Override
-		public void dropTracks(Dropper dropper) {throw new RuntimeException("HMM");}
+		public void dropTracks(Dropper dropper) {
+			for( PointTrack t : list ) {
+				if( dropper.shouldDropTrack(t) ) {
+					numDropped++;
+				}
+			}
+		}
 
 		@Override
 		public List<PointTrack> getAllTracks( List<PointTrack> list ) {

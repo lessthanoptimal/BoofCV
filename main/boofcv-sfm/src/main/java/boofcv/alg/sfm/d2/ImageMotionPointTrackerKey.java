@@ -151,15 +151,10 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 	private void pruneUnusedTracks() {
 		final long frameID = tracker.getFrameID();
-		List<PointTrack> all = tracker.getAllTracks(null);
-		for( PointTrack t : all ) {
-			AssociatedPairTrack p = t.getCookie();
-
-			if( frameID - p.lastUsed >= thresholdOutlierPrune) {
-				if( !tracker.dropTrack(t) )
-					throw new RuntimeException("Drop track failed. Must be a bug in the tracker");
-			}
-		}
+		tracker.dropTracks(track -> {
+			AssociatedPairTrack p = track.getCookie();
+			return frameID - p.lastUsed >= thresholdOutlierPrune;
+		});
 	}
 
 	/**
