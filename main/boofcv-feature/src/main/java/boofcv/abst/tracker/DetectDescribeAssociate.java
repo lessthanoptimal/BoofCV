@@ -76,6 +76,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	boolean updateDescription;
 
 	// maximum number of tracks it will keep track of that were not associated before it starts discarding
+	protected int maxInactiveTracks;
 	protected GrowQueue_I32 unassociatedIdx = new GrowQueue_I32();
 
 	// Random number generator
@@ -93,6 +94,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		this.manager = manager;
 		this.associate = associate;
 		this.updateDescription = config.updateDescription;
+		this.maxInactiveTracks = config.maxUnusedTracks;
 		this.rand = new Random(config.seed);
 
 		sets = new SetTrackInfo[manager.getNumberOfSets()];
@@ -176,11 +178,36 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 					}
 				}
 
+				pruneExcessiveInactiveTracks(info, unassociatedIdx);
+
 				// clean up
 				for (int j = 0; j < sets.length; j++) {
 					sets[j].featSrc.reset();
 					sets[j].locSrc.reset();
 				}
+			}
+		}
+	}
+
+	/**
+	 * If there are too many unassociated tracks, randomly select some of those tracks and drop them
+	 */
+	private void pruneExcessiveInactiveTracks(SetTrackInfo<Desc> info, GrowQueue_I32 unassociated) {
+		if( unassociated.size > maxInactiveTracks ) {
+			// make the first N elements the ones which will be dropped
+			int numDrop = unassociated.size-maxInactiveTracks;
+			for (int i = 0; i < numDrop; i++) {
+				int selected = rand.nextInt(unassociated.size-i)+i;
+				int a = unassociated.get(i);
+				unassociated.data[i] = unassociated.data[selected];
+				unassociated.data[selected] = a;
+			}
+			List<PointTrack> dropList = new ArrayList<>();
+			for (int i = 0; i < numDrop; i++) {
+				dropList.add( info.tracks.get(unassociated.get(i)) );
+			}
+			for (int i = 0; i < dropList.size(); i++) {
+				dropTrack(dropList.get(i));
 			}
 		}
 	}
