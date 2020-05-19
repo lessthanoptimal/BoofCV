@@ -293,18 +293,18 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	}
 
 	@Override
-	protected boolean openFiles(List<File> filePaths, List<File> outSequence, List<File> outImages) {
-		if( filePaths.size() == 2 ) {
-			File pathCalibration = new File(filePaths.get(0).getParentFile(),"stereo.yaml");
-			stereoParameters = CalibrationIO.load(pathCalibration);
-		} else if( filePaths.size() == 3 ){
-			stereoParameters = CalibrationIO.load(filePaths.get(2));
+	protected boolean openFiles(String[] filePaths, List<String> outSequence, List<String> outImages) {
+		if( filePaths.length == 2 ) {
+			File f = new File(filePaths[0]).getParentFile();
+			stereoParameters = CalibrationIO.load(new File(f,"stereo.yaml"));
+		} else if( filePaths.length == 3 ){
+			stereoParameters = CalibrationIO.load(filePaths[2]);
 		} else {
-			throw new RuntimeException("Unexpected number of files "+filePaths.size());
+			throw new RuntimeException("Unexpected number of files "+filePaths.length);
 		}
 
-		outSequence.add( filePaths.get(0) );
-		outSequence.add( filePaths.get(1) );
+		outSequence.add( filePaths[0] );
+		outSequence.add( filePaths[1] );
 		return true;
 	}
 

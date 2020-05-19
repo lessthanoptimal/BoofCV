@@ -101,7 +101,9 @@ public class DynamicVideoInterface implements VideoInterface {
 							"Great that it works, but it's very slow. Might want to look at alternatives.");
 					return sequence;
 				}
-			} catch( RuntimeException ignore ){}
+			} catch( RuntimeException e ){
+				System.err.println("JCodec Error: "+e.getMessage());
+			}
 			System.err.println("No working codec found for file: " + fileName);
 
 		} catch (IOException e) {

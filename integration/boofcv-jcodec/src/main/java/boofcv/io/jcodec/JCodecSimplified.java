@@ -142,10 +142,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 	}
 
 	@Override
-	public void setLoop(boolean loop) {
-		if( loop )
-			throw new IllegalArgumentException("Not supported");
-	}
+	public void setLoop(boolean loop) {}
 
 	@Override
 	public ImageType<T> getImageType() {

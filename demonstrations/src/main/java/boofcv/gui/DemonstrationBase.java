@@ -558,11 +558,17 @@ public abstract class DemonstrationBase extends JPanel {
 	protected void openFiles( List<File> filePaths ) {
 		if( filePaths.size() == 0 )
 			return;
-		final String path = massageFilePath(filePaths.get(0));
-		if( path == null )
-			return;
-		inputFilePath = path;
-		inputFileSet = BoofMiscOps.toStringArray(filePaths);
+
+		// Need to massage the file path to work inside of Jars
+		inputFileSet = new String[filePaths.size()];
+		for (int i = 0; i < filePaths.size(); i++) {
+			inputFileSet[i] = massageFilePath(filePaths.get(i));
+			if( inputFileSet[i] == null ) {
+				System.err.println("Failed to massage file "+filePaths.get(i));
+				return;
+			}
+		}
+		inputFilePath = inputFileSet[0];
 
 		// update recent items menu
 		BoofSwingUtil.invokeNowOrLater(() -> {
@@ -573,21 +579,20 @@ public abstract class DemonstrationBase extends JPanel {
 
 		stopAllInputProcessing();
 
-		List<File> sequences = new ArrayList<>();
-		List<File> images = new ArrayList<>();
+		List<String> sequences = new ArrayList<>();
+		List<String> images = new ArrayList<>();
 
-		if( !openFiles(filePaths,sequences,images) )
+		if( !openFiles(inputFileSet,sequences,images) )
 			return;
 
 		if( !sequences.isEmpty() && !images.isEmpty() )
 			throw new IllegalArgumentException("Only one of these can be not empty");
 
 		if( !sequences.isEmpty() ) {
-			openVideo(false,toPathArray(sequences));
+			openVideo(false,sequences.toArray(new String[0]));
 		} else {
-			openImageSet(false,toPathArray(sequences));
+			openImageSet(false,images.toArray(new String[0]));
 		}
-		inputFileSet = BoofMiscOps.toStringArray(filePaths);
 	}
 
 	protected String selectRecentFileName( List<File> filePaths ) {
@@ -610,9 +615,9 @@ public abstract class DemonstrationBase extends JPanel {
 	 * to be opened and processed. Can only handle images OR sequences and not both.
 	 * @return true if it was successful or false if it failed
 	 */
-	protected boolean openFiles( List<File> filePaths ,
-								 List<File> outSequence ,
-								 List<File> outImages )
+	protected boolean openFiles( String[] filePaths ,
+								 List<String> outSequence ,
+								 List<String> outImages )
 	{
 		throw new RuntimeException("Override this function to implement custom file opening");
 	}

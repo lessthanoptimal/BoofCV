@@ -8,6 +8,8 @@ Version : 0.36.1
 
 - Fixed loading Uchiya Marker description from a jar in the Example
 - Fixed Uchiya Marker Demonstration when running from a jar
+- Fixed Stereo Visual Odometry demonstration when running from a jar
+  * This should also fix anything in the future which uses file sets
 
 ---------------------------------------------
 Date    : 2020/May/17
