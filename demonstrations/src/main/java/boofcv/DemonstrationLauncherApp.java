@@ -46,10 +46,7 @@ import boofcv.demonstrations.feature.detect.line.VisualizeLineRansac;
 import boofcv.demonstrations.feature.disparity.VisualizeStereoDisparity;
 import boofcv.demonstrations.feature.flow.DenseFlowApp;
 import boofcv.demonstrations.feature.orientation.ShowFeatureOrientationApp;
-import boofcv.demonstrations.fiducial.DetectQrCodeApp;
-import boofcv.demonstrations.fiducial.FiducialTrackerDemoApp;
-import boofcv.demonstrations.fiducial.VisualizeSquareBinaryFiducial;
-import boofcv.demonstrations.fiducial.VisualizeSquareFiducial;
+import boofcv.demonstrations.fiducial.*;
 import boofcv.demonstrations.imageprocessing.*;
 import boofcv.demonstrations.segmentation.VisualizeImageSegmentationApp;
 import boofcv.demonstrations.segmentation.VisualizeWatershedApp;
@@ -150,6 +147,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 		createNodes(root,"Fiducial / Markers",
 				FiducialTrackerDemoApp.class,
 				DetectQrCodeApp.class,
+				DetectUchiyaMarkerApp.class,
 				VisualizeSquareBinaryFiducial.class,
 				VisualizeSquareFiducial.class);
 

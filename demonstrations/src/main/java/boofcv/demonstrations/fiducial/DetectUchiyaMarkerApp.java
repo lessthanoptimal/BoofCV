@@ -58,6 +58,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 	CameraPinholeBrown intrinsic;
 	final ConfigUchiyaMarker config = new ConfigUchiyaMarker();
-	File fileDefinitions = new File("."); // used to see if the definition was already loaded
+	String pathDefinitions =""; // used to see if the definition was already loaded
 
 	//------------ BEGIN LOCK
 	final Object lockTracker = new Object();
@@ -150,18 +151,18 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 	@Override
 	public void openFile(File file) {
 		if(FilenameUtils.getExtension(file.getName()).toLowerCase().equals("yaml")) {
-			loadDefinition(file);
+			loadDefinition(UtilIO.ensureURL(file.getPath()));
 		} else {
 			super.openFile(file);
 		}
 	}
 
-	private void loadDefinition(File file) {
+	private void loadDefinition(URL url) {
 		try {
 			synchronized (lockTracker) {
-				definition = FiducialIO.loadRandomDotYaml(file);
+				definition = FiducialIO.loadRandomDotYaml(url);
 			}
-			fileDefinitions = file;
+			pathDefinitions = url.getPath();
 			createDetector(false);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
@@ -176,22 +177,26 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		if( method != InputMethod.IMAGE && method != InputMethod.VIDEO )
 			return;
 
-
 		URL url = UtilIO.ensureURL(inputFilePath);
-		if( url != null && url.getProtocol().equals("file") ) {
+
+		if( url != null ) {
+			// This "should" work with any URL protocol
 			try {
+				String protocol = url.getProtocol();
 				String path = URLDecoder.decode(url.getPath(), "UTF-8");
-				File filePath = new File(path);
-				File directory = filePath.getParentFile();
+				File intrinsicPath = new File(path);
+				File directory = intrinsicPath.getParentFile();
 
 				// first see if there's an intrinsic specialized for this object
-				intrinsic = UtilIO.loadExampleIntrinsic(media,filePath);
+				intrinsic = UtilIO.loadExampleIntrinsic(media,intrinsicPath);
 
 				File fileDef = new File(directory, "descriptions.yaml");
-				if (fileDef.exists() && !fileDefinitions.getAbsolutePath().equals(fileDef.getAbsolutePath())) {
-					loadDefinition(fileDef);
+				URL urlDef = new URL(protocol+":"+fileDef.getPath());
+
+				if ( !pathDefinitions.equals(urlDef.getPath()) ) {
+					loadDefinition(urlDef);
 				}
-			} catch (UnsupportedEncodingException e) {
+			} catch (UnsupportedEncodingException | MalformedURLException e) {
 				e.printStackTrace();
 			}
 		}

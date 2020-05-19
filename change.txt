@@ -3,6 +3,13 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2020/May/18
+Version : 0.36.1
+
+- Fixed loading Uchiya Marker description from a jar in the Example
+- Fixed Uchiya Marker Demonstration when running from a jar
+
+---------------------------------------------
 Date    : 2020/May/17
 Version : 0.36
 

@@ -19,10 +19,12 @@
 package boofcv.io.fiducial;
 
 import boofcv.BoofVersion;
+import boofcv.io.UtilIO;
 import georegression.struct.point.Point2D_F64;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,15 +80,22 @@ public class FiducialIO {
 		createYmlObject().dump(map,out);
 	}
 
-	public static RandomDotDefinition loadRandomDotYaml(File file ) {
+	public static RandomDotDefinition loadRandomDotYaml(URL url) {
 		try {
-			FileReader reader = new FileReader(file);
+			InputStreamReader reader = new InputStreamReader(url.openStream());
 			RandomDotDefinition ret = loadRandomDotYaml(reader);
 			reader.close();
 			return ret;
 		} catch( IOException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static RandomDotDefinition loadRandomDotYaml(File file ) {
+		URL url = UtilIO.ensureURL(file.getPath());
+		if( url == null )
+			throw new RuntimeException("Null url path. file="+file.getPath());
+		return loadRandomDotYaml(url);
 	}
 
 	/**
