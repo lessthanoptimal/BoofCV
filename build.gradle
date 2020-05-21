@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.36.1'
+    version = '0.37-SNAPSHOT'
 
     ext.COMMONS_IO_VERSION = '2.6'
 
@@ -33,8 +33,8 @@ subprojects {
     apply plugin: 'signing'
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_14
+        targetCompatibility = JavaVersion.VERSION_14
     }
 
     // Creates Java 8 byte code
@@ -120,8 +120,13 @@ subprojects {
             benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19') // don't upgrade to 1.21! much slower
         }
 
-        // needed to use Java 11 with 8 byte code
-        annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
+        // needed to use Java 11+ syntax with Java 1.8 byte code
+        annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'){
+            exclude group: 'net.bytebuddy', module: 'byte-buddy'
+            exclude group: 'net.bytebuddy', module: 'byte-buddy-agent'
+        }
+        annotationProcessor("net.bytebuddy:byte-buddy:1.10.10")
+        annotationProcessor("net.bytebuddy:byte-buddy-agent:1.10.10")
         // @Getter @Setter
         annotationProcessor 'org.projectlombok:lombok:1.18.10'
     }

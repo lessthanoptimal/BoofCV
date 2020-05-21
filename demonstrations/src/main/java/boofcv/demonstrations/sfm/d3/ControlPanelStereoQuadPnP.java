@@ -127,10 +127,10 @@ public class ControlPanelStereoQuadPnP extends JTabbedPane {
 			controlPanel.removeAll();
 			String title;
 			JPanel inside;
-			switch( which ) {
-				case 0: inside = getDetectorPanel(); title = "Detect";break;
-				case 1: inside = getDescriptorPanel(); title = "Describe";break;
-				default: throw new RuntimeException("BUG!");
+			switch (which) {
+				case 0 -> {inside = getDetectorPanel(); title = "Detect";}
+				case 1 -> {inside = getDescriptorPanel(); title = "Describe";}
+				default -> throw new RuntimeException("BUG!");
 			}
 			controlPanel.setBorder(BorderFactory.createTitledBorder(title));
 			if( inside != null )

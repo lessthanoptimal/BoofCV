@@ -101,12 +101,12 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 
 	private void updateActiveControls( int which ) {
 		controlPanel.removeAll();
-		JPanel inside = null;
-		switch( which ) {
-			case 0: inside = getDetectorPanel(); break;
-			case 1: inside = getDescriptorPanel(); break;
-			case 2: inside = getAssociatePanel(); break;
-		}
+		JPanel inside = switch (which) {
+			case 0 -> getDetectorPanel();
+			case 1 -> getDescriptorPanel();
+			case 2 -> getAssociatePanel();
+			default -> null;
+		};
 		if( inside != null )
 			controlPanel.add(BorderLayout.CENTER,inside);
 		controlPanel.validate();

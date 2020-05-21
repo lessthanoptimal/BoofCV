@@ -3,6 +3,53 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2020
+Version : 0.37
+
+- Build
+  * Switch to Java 14 syntax. Still generating 1.8 byte code
+
+TODO PointTracker
+  - Add last seen field to track
+  - has image motion 2D been updated to drop old unassociated tracks?
+
+TODO Random Dots
+  - GUI for creating markers
+  - See if they can be speed up any
+
+TODO DetectDescribe
+  - Integrate in sets and remove specialized class
+  - Request the set a feature belongs in. Provide a lambda to get all features in a set?
+
+TODO Visual Odomtry
+  - Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
+  - Integrate new feature sets API and use it in association
+  - Bring back association with 2D information and make it configurable
+    * This has been verified to increase computational expense in Quad tracker by a large margin
+  - Consider bringing back the two pass association approach
+  - Consider having a motion estimate be a hint provided to VO as an input
+
+TODO Stereo Feature Association
+   - Formalize with a factory
+   - Do everything that greedy does now
+   - Take in max distance as a parameter too
+   - Verify that it doesn't allow impossible associations either
+
+- Scene Reconstruction
+  * TODO when associating objects split into feature types, e.g. white and black blobs
+  * TODO try improving 3-view by estimating lens distortion in projective camera
+  * TODO Scene Reconstruction from arbitrary number of photos
+  * TODO triangulate N-points using calibrated homogenous coordinates
+  * TODO Add rigid relationships between views. Can be fixed or not.
+
+TODO Regression
+   - Dump runtime results into their own directory for each device. Use hostname?
+   - Template matching
+
+TODO Sparse Disparity Undistort using camera model
+
+
+---------------------------------------------
 Date    : 2020/May/18
 Version : 0.36.1
 

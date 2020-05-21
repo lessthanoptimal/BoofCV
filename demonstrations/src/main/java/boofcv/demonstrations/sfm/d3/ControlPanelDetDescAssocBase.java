@@ -112,32 +112,31 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	protected abstract void handleControlsUpdated();
 
 	public JPanel getDetectorPanel() {
-		switch(configDetDesc.typeDetector) {
-			case FAST_HESSIAN: return controlDetectFastHessian;
-			case SIFT: return controlDetectSift;
-			case POINT: return controlDetectPoint;
-			default: throw new IllegalArgumentException("Unknown");
-		}
+		return switch (configDetDesc.typeDetector) {
+			case FAST_HESSIAN -> controlDetectFastHessian;
+			case SIFT -> controlDetectSift;
+			case POINT -> controlDetectPoint;
+			default -> throw new IllegalArgumentException("Unknown"); // to future proof it if more is added
+		};
 	}
 
 	public JPanel getDescriptorPanel() {
-		switch(configDetDesc.typeDescribe) {
-			case SURF_FAST: return controlDescSurfFast;
-			case SURF_STABLE: return controlDescSurfStable;
-			case SIFT: return controlDescSift;
-			case BRIEF: return controlDescBrief;
-			case TEMPLATE: return controlDescTemplate;
-			default: throw new IllegalArgumentException("Unknown");
-		}
+		return switch (configDetDesc.typeDescribe) {
+			case SURF_FAST -> controlDescSurfFast;
+			case SURF_STABLE -> controlDescSurfStable;
+			case SIFT -> controlDescSift;
+			case BRIEF -> controlDescBrief;
+			case TEMPLATE -> controlDescTemplate;
+			default -> throw new IllegalArgumentException("Unknown"); // to future proof it if more is added
+		};
 	}
 
 	public JPanel getAssociatePanel() {
-		switch(configAssociate.type) {
-			case GREEDY: return controlAssocGreedy;
-			case KD_TREE:
-			case RANDOM_FOREST: return controlAssocNN;
-			default: throw new IllegalArgumentException("Unknown");
-		}
+		return switch (configAssociate.type) {
+			case GREEDY -> controlAssocGreedy;
+			case KD_TREE, RANDOM_FOREST -> controlAssocNN;
+			default -> throw new IllegalArgumentException("Unknown");
+		};
 	}
 
 	/**
