@@ -73,7 +73,6 @@ There are also several integration modules which help BoofCV interact with exter
 | boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.
 | boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmpeg wrapper is used for reading video files.
 | boofcv-jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
-| boofcv-openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
 | boofcv-swing         | Visualization using Java Swing
 | boofcv-WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
 
