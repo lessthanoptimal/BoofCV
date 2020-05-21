@@ -60,6 +60,16 @@ public class WrapSiftDetector<T extends ImageGray<T>>
 	}
 
 	@Override
+	public int getNumberOfSets() {
+		return 2;
+	}
+
+	@Override
+	public int getSet(int index) {
+		return detector.getDetections().get(index).white ? 0 : 1;
+	}
+
+	@Override
 	public int getNumberOfFeatures() {
 		return detector.getDetections().size();
 	}

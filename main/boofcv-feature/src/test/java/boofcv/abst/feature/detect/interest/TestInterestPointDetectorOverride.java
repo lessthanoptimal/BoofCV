@@ -20,9 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.RegionOrientation;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
@@ -93,7 +91,7 @@ public class TestInterestPointDetectorOverride {
 		assertTrue(o.setRadius);
 	}
 
-	private static class DummyPoint implements InterestPointDetector {
+	private static class DummyPoint extends InterestPointDetectorAbstract {
 
 		public boolean scale;
 		public boolean orientation;
@@ -103,29 +101,12 @@ public class TestInterestPointDetectorOverride {
 			this.scale = scale;
 		}
 
-		@Override
-		public void detect(ImageBase input) {}
-
-		@Override
-		public int getNumberOfFeatures() {return 2;}
-
-		@Override
-		public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64();}
-
-		@Override
-		public double getRadius(int featureIndex) {return 1;}
-
-		@Override
-		public double getOrientation(int featureIndex) {return 2;}
-
-		@Override
-		public boolean hasScale() {return scale;}
-
-		@Override
-		public boolean hasOrientation() {return orientation;}
-
-		@Override
-		public ImageType getInputType() { return null; }
+		@Override public int getNumberOfFeatures() {return 2;}
+		@Override public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64();}
+		@Override public double getRadius(int featureIndex) {return 1;}
+		@Override public double getOrientation(int featureIndex) {return 2;}
+		@Override public boolean hasScale() {return scale;}
+		@Override public boolean hasOrientation() {return orientation;}
 	}
 
 	private static class DummyOrientation implements OrientationImage {

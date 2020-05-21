@@ -55,6 +55,16 @@ public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	}
 
 	@Override
+	public int getNumberOfSets() {
+		return 1;
+	}
+
+	@Override
+	public int getSet(int index) {
+		return 0;
+	}
+
+	@Override
 	public int getNumberOfFeatures() {
 		return location.size();
 	}

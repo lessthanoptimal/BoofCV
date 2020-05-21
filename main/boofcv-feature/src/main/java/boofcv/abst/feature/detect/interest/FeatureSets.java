@@ -18,45 +18,24 @@
 
 package boofcv.abst.feature.detect.interest;
 
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
-
 /**
- * Interface for automatic interest point detection in an image.  Optional support is
- * provided for scale and orientation.
- *
  * Features can belong to multiple set. A feature set indicates that the features were some how detected using
  * mutually exclusive methods. A classical example comes from blob detectors where there will naturally be
  * two sets composed of dark and white blobs.
  *
  * @author Peter Abeles
  */
-// TODO Rename to DetectorInterestPoint? or DetectorPointSO
-public interface InterestPointDetector< T extends ImageBase> extends FoundPointSO, FeatureSets {
-
+public interface FeatureSets {
 	/**
-	 * Detects interest points inside the provided image.
+	 * The number of feature sets.
 	 *
-	 * @param input Input features are detected inside of.
+	 * @return number of feature sets
 	 */
-	void detect( T input );
+	int getNumberOfSets();
 
 	/**
-	 * Does the interest point detector have scale information
-	 *
-	 * @return true if it has scale information and false otherwise
+	 * Returns the set that a feature belongs in
+	 * @param index Which feature
 	 */
-	boolean hasScale();
-
-	/**
-	 * If the interest point detector estimates the feature's orientation
-	 *
-	 * @return true if it estimates the orientation
-	 */
-	boolean hasOrientation();
-
-	/**
-	 * Get the expected input image type
-	 */
-	ImageType<T> getInputType();
+	int getSet(int index);
 }

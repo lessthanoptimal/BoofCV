@@ -75,6 +75,16 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	}
 
 	@Override
+	public int getNumberOfSets() {
+		return 2;
+	}
+
+	@Override
+	public int getSet(int index) {
+		return alg.getDescription(index).white ? 0 : 1;
+	}
+
+	@Override
 	public boolean hasScale() {
 		return true;
 	}

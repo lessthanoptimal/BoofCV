@@ -123,6 +123,16 @@ public class WrapDetectDescribeSurf
 		computeDescriptors();
 	}
 
+	@Override
+	public int getNumberOfSets() {
+		return 2;
+	}
+
+	@Override
+	public int getSet(int index) {
+		return features.get(index).white ? 0 : 1;
+	}
+
 	protected void computeDescriptors() {
 		orientation.setImage(ii);
 		describe.setImage(ii);

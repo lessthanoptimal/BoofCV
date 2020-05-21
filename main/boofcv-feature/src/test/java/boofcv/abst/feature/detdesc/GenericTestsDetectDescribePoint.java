@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 					assertTrue( !Double.isNaN(desc.getDouble(j)) && !Double.isInfinite(desc.getDouble(j)));
 				}
 
-				assertTrue(desc!=null);
+				assertNotNull(desc);
 				assertTrue(p.x != 0 && p.y != 0);
 				assertTrue(p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height );
 
@@ -116,12 +116,12 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 			if( hasScale )
 				assertTrue(numScaleNotOne>0);
 			else
-				assertTrue(numScaleNotOne==0);
+				assertEquals(0, numScaleNotOne);
 
 			if( hasOrientation )
 				assertTrue(numOrientationNotZero>0);
 			else
-				assertTrue(numOrientationNotZero==0);
+				assertEquals(0, numOrientationNotZero);
 		}
 	}
 
@@ -164,21 +164,29 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	public void hasScale() {
 		DetectDescribePoint<T,D> alg = createDetDesc();
 
-		assertTrue(hasScale == alg.hasScale());
+		assertEquals(hasScale, alg.hasScale());
 	}
 
 	@Test
 	public void hasOrientation() {
 		DetectDescribePoint<T,D> alg = createDetDesc();
 
-		assertTrue(hasOrientation == alg.hasOrientation());
+		assertEquals(hasOrientation, alg.hasOrientation());
 	}
 
 	@Test
 	public void getDescriptorType() {
 		DetectDescribePoint<T,D> alg = createDetDesc();
 
-		assertTrue(descType==alg.getDescriptionType());
+		assertSame(descType, alg.getDescriptionType());
+	}
+
+	/**
+	 * BVery basic sanity check to see if sets is correctly implemented
+	 */
+	@Test
+	public void sets() {
+		fail("implement");
 	}
 
 	private void checkIdenticalResponse(DetectDescribePoint<T, D> alg1, DetectDescribePoint<T, D> alg2) {

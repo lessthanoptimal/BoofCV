@@ -75,6 +75,16 @@ public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
 	}
 
 	@Override
+	public int getNumberOfSets() {
+		return 2;
+	}
+
+	@Override
+	public int getSet(int index) {
+		return alg.getDescriptions().get(index).white ? 0 : 1;
+	}
+
+	@Override
 	public int getNumberOfFeatures() {
 		return alg.getDescriptions().size;
 	}

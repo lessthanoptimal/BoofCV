@@ -20,7 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detdesc.DetectDescribePointAbstract;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
@@ -243,7 +243,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		return new PairwiseImageMatching(detector,associate);
 	}
 
-	public class MockDetector implements DetectDescribePoint<GrayF32,TupleDesc_F64>
+	public class MockDetector extends DetectDescribePointAbstract<GrayF32,TupleDesc_F64>
 	{
 		List<Point3D_F64> locations3D = new ArrayList<>();
 		List<TupleDesc_F64> descriptions = new ArrayList<>();
@@ -308,17 +308,6 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 				pixels.grow().set(pixel);
 			}
 		}
-
-		@Override
-		public boolean hasScale() {
-			return false;
-		}
-
-		@Override
-		public boolean hasOrientation() {
-			return false;
-		}
-
 		@Override
 		public int getNumberOfFeatures() {
 			return visible.size;
@@ -327,16 +316,6 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		@Override
 		public Point2D_F64 getLocation(int featureIndex) {
 			return pixels.get(featureIndex);
-		}
-
-		@Override
-		public double getRadius(int featureIndex) {
-			return 0;
-		}
-
-		@Override
-		public double getOrientation(int featureIndex) {
-			return 0;
 		}
 	}
 

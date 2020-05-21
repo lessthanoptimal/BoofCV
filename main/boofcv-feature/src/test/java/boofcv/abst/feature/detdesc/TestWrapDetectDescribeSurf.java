@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,9 @@ import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -41,5 +44,13 @@ public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<
 	@Override
 	public DetectDescribePoint<GrayF32, BrightFeature> createDetDesc() {
 		return FactoryDetectDescribe.surfStable(null,null,null, GrayF32.class);
+	}
+
+	/**
+	 * More rigorous test to see if sets is done correctly specific to SURF
+	 */
+	@Test
+	void setsRigorous() {
+		fail("implement");
 	}
 }

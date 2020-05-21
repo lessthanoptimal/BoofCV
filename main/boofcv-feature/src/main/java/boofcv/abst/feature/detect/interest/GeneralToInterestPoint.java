@@ -41,8 +41,11 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 		extends EasyGeneralFeatureDetector<T,D>
 		implements InterestPointDetector<T>
 {
-
+	int numSets;
 	double radius;
+
+	// Index at which it transitions from set 0 to set 1
+	int indexOfSetSplit;
 
 	// list of points it found
 	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<>(10, Point2D_F64::new);
@@ -52,6 +55,13 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 								  Class<T> imageType, Class<D> derivType) {
 		super(detector,imageType,derivType);
 		this.radius = radius;
+
+		// Maximums and minimums are each considered a different set
+		this.numSets = 0;
+		if( detector.isDetectMinimums() )
+			numSets++;
+		if( detector.isDetectMinimums() )
+			numSets++;
 	}
 
 	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
@@ -86,6 +96,22 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 			}
 		}
 
+		if( numSets == 2 ) {
+			// If there are two sets the maximums will be set 0 and minimums set 1
+			indexOfSetSplit = detector.getMaximums().size;
+		} else {
+			indexOfSetSplit = Integer.MAX_VALUE;
+		}
+	}
+
+	@Override
+	public int getNumberOfSets() {
+		return numSets;
+	}
+
+	@Override
+	public int getSet(int index) {
+		return index < indexOfSetSplit ? 0 : 1;
 	}
 
 	@Override

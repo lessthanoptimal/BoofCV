@@ -93,10 +93,7 @@ public class TestDetectDescribeFusion {
 		}.allTests();
 	}
 
-	public static class DummyDetector implements InterestPointDetector {
-
-		@Override
-		public void detect(ImageBase input) {}
+	public static class DummyDetector extends DetectDescribePointAbstract {
 
 		@Override
 		public int getNumberOfFeatures() {
@@ -126,11 +123,6 @@ public class TestDetectDescribeFusion {
 		@Override
 		public boolean hasOrientation() {
 			return true;
-		}
-
-		@Override
-		public ImageType getInputType() {
-			return null;
 		}
 	}
 

@@ -61,6 +61,16 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 	}
 
 	@Override
+	public int getNumberOfSets() {
+		return 1;
+	}
+
+	@Override
+	public int getSet(int index) {
+		return 0; // For SURF the "set" isn't found out until it computes the descriptor
+	}
+
+	@Override
 	public int getNumberOfFeatures() {
 		return location.size();
 	}

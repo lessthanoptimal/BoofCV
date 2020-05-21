@@ -51,7 +51,7 @@ public class TestDetectDescribeSingleToMulti {
 		assertTrue(null != alg.getFeatureSet(0).getDescription(0));
 	}
 
-	protected static class Helper implements DetectDescribePoint<GrayF32,TupleDesc_F64> {
+	protected static class Helper extends DetectDescribePointAbstract<GrayF32,TupleDesc_F64> {
 
 		boolean calledDetect = false;
 

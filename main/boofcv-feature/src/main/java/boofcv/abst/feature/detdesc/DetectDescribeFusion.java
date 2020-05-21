@@ -133,6 +133,16 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	}
 
 	@Override
+	public int getNumberOfSets() {
+		return detector.getNumberOfSets();
+	}
+
+	@Override
+	public int getSet(int index) {
+		return detector.getSet(index);
+	}
+
+	@Override
 	public int getNumberOfFeatures() {
 		return location.size();
 	}

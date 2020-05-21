@@ -24,6 +24,7 @@ import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -35,7 +36,8 @@ public class TestGeneralToInterestPoint {
 	/**
 	 * Several basic functionality tests
 	 */
-	public void various() {
+	@Test
+	void various() {
 		Helper detector = new Helper();
 		detector.maximum = true;
 		GeneralToInterestPoint<GrayF32,GrayF32> alg =
@@ -57,7 +59,7 @@ public class TestGeneralToInterestPoint {
 	 * Makes sure both minimums and maximums are added
 	 */
 	@Test
-	public void checkMinimumsMaximums() {
+	void checkMinimumsMaximums() {
 		Helper detector = new Helper();
 		GeneralToInterestPoint<GrayF32,GrayF32> alg =
 				new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
@@ -82,12 +84,19 @@ public class TestGeneralToInterestPoint {
 		assertEquals(6,alg.getNumberOfFeatures());
 	}
 
+	/**
+	 * See if it correctly sets the number of sets and the sets each feature belongs to
+	 */
+	@Test
+	void checkSets() {
+		fail("Implement");
+	}
+
 	public static class Helper extends GeneralFeatureDetector<GrayF32,GrayF32> {
 
 		public int calledProcess = 0;
 		public boolean minimum = false;
 		public boolean maximum = false;
-
 
 		@Override
 		public void process(GrayF32 image,

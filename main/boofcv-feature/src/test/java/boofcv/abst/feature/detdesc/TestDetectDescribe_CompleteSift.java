@@ -26,6 +26,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author Peter Abeles
  */
@@ -34,6 +36,7 @@ public class TestDetectDescribe_CompleteSift
 {
 	Class types[] = new Class[]{GrayF32.class,GrayU8.class};
 
+	// TODO convert to a subclass?
 	@Test
 	public void allTypes() {
 		for( final Class type : types ) {
@@ -43,6 +46,14 @@ public class TestDetectDescribe_CompleteSift
 				@Override
 				public DetectDescribePoint createDetDesc() {
 					return FactoryDetectDescribe.sift(null,type);
+				}
+
+				/**
+				 * More rigorous test to see if sets is done correctly specific to SIFT
+				 */
+				@Test
+				void setsRigorous() {
+					fail("implement");
 				}
 			}.allTests();
 		}
