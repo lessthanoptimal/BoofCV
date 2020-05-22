@@ -238,7 +238,7 @@ public class CalibrationIO {
 	public static <T> T load(Reader reader ) {
 		Yaml yaml = createYmlObject();
 
-		Map<String,Object> data = (Map<String, Object>) yaml.load(reader);
+		Map<String,Object> data = yaml.load(reader);
 
 		try {
 			reader.close();

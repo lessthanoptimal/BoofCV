@@ -7,7 +7,7 @@ Date    : 2020
 Version : 0.37
 
 - Build
-  * Switch to Java 14 syntax. Still generating 1.8 byte code
+  * Switch to Java 14 syntax. Still generating Java 1.8 byte code
 
 TODO PointTracker
   - Add last seen field to track
@@ -41,10 +41,6 @@ TODO Stereo Feature Association
   * TODO Scene Reconstruction from arbitrary number of photos
   * TODO triangulate N-points using calibrated homogenous coordinates
   * TODO Add rigid relationships between views. Can be fixed or not.
-
-TODO Regression
-   - Dump runtime results into their own directory for each device. Use hostname?
-   - Template matching
 
 TODO Sparse Disparity Undistort using camera model
 
