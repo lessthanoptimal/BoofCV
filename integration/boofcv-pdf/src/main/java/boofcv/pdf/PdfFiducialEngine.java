@@ -42,11 +42,14 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 	public PDPageContentStream pcs;
 	public double offsetX,offsetY;
 	public double markerWidth;
+	public double markerHeight;
 
-	public PdfFiducialEngine(PDDocument document, PDPageContentStream pcs, double markerWidth) {
+	public PdfFiducialEngine(PDDocument document, PDPageContentStream pcs,
+							 double markerWidth, double markerHeight ) {
 		this.document = document;
 		this.pcs = pcs;
 		this.markerWidth = markerWidth;
+		this.markerHeight = markerHeight;
 	}
 
 	@Override
@@ -135,6 +138,6 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 		return (float)(offsetX + x);
 	}
 	public float adjustY( double y ) {
-		return (float)(offsetY + markerWidth - y);
+		return (float)(offsetY + markerHeight - y);
 	}
 }

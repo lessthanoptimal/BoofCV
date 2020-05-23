@@ -257,7 +257,7 @@ public class FactoryFiducial {
 
 		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,check,uchiya);
 
-		return new Uchiya_to_FiducialDetector<T>(tracker, config.markerLength, ImageType.single(imageType));
+		return new Uchiya_to_FiducialDetector<T>(tracker, config.markerWidth, config.markerHeight, ImageType.single(imageType));
 	}
 
 }

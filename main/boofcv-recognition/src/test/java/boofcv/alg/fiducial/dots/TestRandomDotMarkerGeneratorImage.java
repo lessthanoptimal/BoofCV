@@ -58,7 +58,7 @@ class TestRandomDotMarkerGeneratorImage {
 
 		alg.configure(width,height,40);
 		alg.setRadius(7);
-		alg.render(points,markerWidth);
+		alg.render(points,markerWidth,markerWidth);
 
 		GrayU8 image = alg.getImage();
 		assertEquals(width, image.width);

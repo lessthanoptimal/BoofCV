@@ -53,8 +53,9 @@ implements FiducialTracker<T>
 	/** If not null timing information will be printed */
 	@Setter PrintStream printTiming;
 
-	// Length of a side on the marker.
-	final double markerLength;
+	// Width and height of the marker
+	final double markerWidth;
+	final double markerHeight;
 
 	// Storage
 	final FastQueue<Point2D3D> control3D = new FastQueue<>(Point2D3D::new);
@@ -62,9 +63,12 @@ implements FiducialTracker<T>
 	// Local work space
 	final Point2D_F64 norm = new Point2D_F64();
 
-	public Uchiya_to_FiducialDetector(UchiyaMarkerImageTracker<T> tracker, double markerLength, ImageType<T> imageType ) {
+	public Uchiya_to_FiducialDetector(UchiyaMarkerImageTracker<T> tracker,
+									  double markerWidth, double markerHeight,
+									  ImageType<T> imageType ) {
 		this.tracker = tracker;
-		this.markerLength = markerLength;
+		this.markerWidth = markerWidth;
+		this.markerHeight = markerHeight;
 		this.imageType = imageType;
 	}
 
@@ -109,11 +113,12 @@ implements FiducialTracker<T>
 
 		UchiyaMarkerTracker.Track track = tracker.getTracks().get(which);
 
-		double r = markerLength/2.0;
-		HomographyPointOps_F64.transform(track.doc_to_imagePixel,-r,-r,storage.get(0));
-		HomographyPointOps_F64.transform(track.doc_to_imagePixel, r,-r,storage.get(1));
-		HomographyPointOps_F64.transform(track.doc_to_imagePixel, r, r,storage.get(2));
-		HomographyPointOps_F64.transform(track.doc_to_imagePixel,-r, r,storage.get(3));
+		double rx = markerWidth/2.0;
+		double ry = markerHeight/2.0;
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel,-rx,-ry,storage.get(0));
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel, rx,-ry,storage.get(1));
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel, rx, ry,storage.get(2));
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel,-rx, ry,storage.get(3));
 
 		return storage;
 	}
@@ -131,18 +136,18 @@ implements FiducialTracker<T>
 
 	@Override
 	public double getWidth(int which) {
-		return markerLength;
+		return Math.max(markerWidth,markerHeight);
 	}
 
 
 	@Override
 	public double getSideWidth(int which) {
-		return markerLength;
+		return markerWidth;
 	}
 
 	@Override
 	public double getSideHeight(int which) {
-		return markerLength;
+		return markerHeight;
 	}
 
 	@Override
@@ -188,12 +193,14 @@ implements FiducialTracker<T>
 	public LlahDocument addMarker(List<Point2D_F64> locations2D ) {
 
 		// sanity check the document
-		double radius = markerLength/2.0;
+		double radiusX = markerWidth/2.0;
+		double radiusY = markerHeight/2.0;
 
 		for (int i = 0; i < locations2D.size(); i++) {
 			Point2D_F64 p = locations2D.get(i);
-			if( p.x < -radius || p.x > radius || p.y < -radius || p.y > radius )
-				throw new IllegalArgumentException("Marker length is "+markerLength+" and "+p+" is out of bounds");
+			if( p.x < -radiusX || p.x > radiusX || p.y < -radiusY || p.y > radiusY )
+				throw new IllegalArgumentException(
+						"Marker size is ("+markerWidth+","+markerHeight+") and "+p+" is out of bounds");
 		}
 
 		return getLlahOperations().createDocument(locations2D);

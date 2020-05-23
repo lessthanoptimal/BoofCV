@@ -104,18 +104,15 @@ public class RandomDotMarkerGenerator {
 	 *
 	 * @param dots dots on the marker. They should be inside a region -width/2 to width/2.
 	 */
-	public void render( List<Point2D_F64> dots , double markerWidth ) {
+	public void render( List<Point2D_F64> dots , double markerWidth, double markerHeight ) {
 
-		// The length of the square the circle's centers can appear inside of
-		// We assume the dots have already been adjusted to appear entirely inside the marker
-		double drawLength = Math.min(documentRegion.width,documentRegion.height);
 
 		// nFind the shift needed to put a point in the center of the draw region
 		double regionCenterX = documentRegion.width/2;
 		double regionCenterY = documentRegion.height/2;
 
 		// transform from points to paper coordinates
-		double point_to_pixel = drawLength/markerWidth;
+		double point_to_pixel = Math.min(documentRegion.width/markerWidth,documentRegion.height/markerHeight);
 
 		render.init();
 		dotsAdjusted.reset();

@@ -111,7 +111,8 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		if( definition == null ) {
 			return;
 		}
-		config.markerLength = definition.markerWidth;
+		config.markerWidth = definition.markerWidth;
+		config.markerHeight = definition.markerHeight;
 		// Avoid recomputing the LLAH dictionary if possible
 		LlahOperations before = tracker != null ? tracker.getLlahOperations() : null;
 

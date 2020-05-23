@@ -53,6 +53,8 @@ public abstract class CreateFiducialDocumentPDF {
 	public boolean drawLineBorder = false;
 
 	public float markerWidth;
+	// If > 0 then it specifies the height, otherwise a square marker is assumed.
+	public float markerHeight = -1.0f;
 	public float spaceBetween;
 
 	String documentName;
@@ -92,10 +94,13 @@ public abstract class CreateFiducialDocumentPDF {
 		if( markerWidth <= 0 || spaceBetween <= 0)
 			throw new RuntimeException("Must specify the marker's dimensions. Width and spacing");
 
-		float sizeBox = (markerWidth+spaceBetween)*UNIT_TO_POINTS;
+		float markerHeight = this.markerHeight > 0 ? this.markerHeight : this.markerWidth;
 
-		int numRows = (int)Math.floor(pageHeight/sizeBox);
-		int numCols = (int)Math.floor(pageWidth/sizeBox);
+		float sizeBoxX = (markerWidth+spaceBetween)*UNIT_TO_POINTS;
+		float sizeBoxY = (markerHeight+spaceBetween)*UNIT_TO_POINTS;
+
+		int numRows = (int)Math.floor(pageHeight/sizeBoxY);
+		int numCols = (int)Math.floor(pageWidth/sizeBoxX);
 
 		if( numRows == 0 || numCols == 0) {
 			throw new IOException("Marker too big to fit on a single page.");
@@ -112,8 +117,8 @@ public abstract class CreateFiducialDocumentPDF {
 		}
 
 		// offset used to center
-		float centerX = (pageHeight-sizeBox*numRows)/2f;
-		float centerY = (pageWidth-sizeBox*numCols)/2f;
+		float centerX = (pageHeight-sizeBoxY*numRows)/2f;
+		float centerY = (pageWidth-sizeBoxX*numCols)/2f;
 
 		// see if multiple pages are required
 		int markersPerPage = numRows*numCols;
@@ -126,7 +131,8 @@ public abstract class CreateFiducialDocumentPDF {
 			PDPage page = new PDPage(rectangle);
 			document.addPage(page);
 			PDPageContentStream pcs = new PDPageContentStream(document , page);
-			PdfFiducialEngine r = new PdfFiducialEngine(document,pcs,markerWidth*UNIT_TO_POINTS);
+			PdfFiducialEngine r = new PdfFiducialEngine(document,pcs,
+					markerWidth*UNIT_TO_POINTS,markerHeight*UNIT_TO_POINTS);
 			configureRenderer(r);
 
 			if( showInfo ) {
@@ -141,12 +147,12 @@ public abstract class CreateFiducialDocumentPDF {
 			}
 
 			for (int row = 0; row < numRows; row++) {
-				r.offsetY = centerX + row*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
+				r.offsetY = centerX + row*sizeBoxY + UNIT_TO_POINTS*spaceBetween/2f;
 
 				for (int col = 0; col < numCols; col++, markerIndex++) {
 					if( !gridFill && markerIndex >= totalMarkers )
 						break;
-					r.offsetX = centerY + col*sizeBox + UNIT_TO_POINTS*spaceBetween/2f;
+					r.offsetX = centerY + col*sizeBoxX + UNIT_TO_POINTS*spaceBetween/2f;
 					render(markerIndex%totalMarkers);
 
 					if( showInfo ) {
@@ -165,7 +171,7 @@ public abstract class CreateFiducialDocumentPDF {
 						pcs.showText(message);
 						pcs.endText();
 						pcs.beginText();
-						pcs.newLineAtOffset( (float)r.offsetX, (float)r.offsetY+markerWidth*UNIT_TO_POINTS+offset-7);
+						pcs.newLineAtOffset( (float)r.offsetX, (float)r.offsetY+markerHeight*UNIT_TO_POINTS+offset-7);
 						pcs.showText(createMarkerSizeString());
 						pcs.endText();
 					}
@@ -173,7 +179,7 @@ public abstract class CreateFiducialDocumentPDF {
 			}
 
 			if( drawGrid ) {
-				printGrid(pcs, centerY , centerX ,numRows,numCols,sizeBox);
+				printGrid(pcs,centerY,centerX,numRows,numCols,sizeBoxX,sizeBoxY);
 			}
 
 			pcs.close();
@@ -183,7 +189,12 @@ public abstract class CreateFiducialDocumentPDF {
 	protected abstract String getMarkerType();
 
 	protected String createMarkerSizeString() {
-		return String.format("%4.1f %2s",markerWidth,units.getAbbreviation());
+		if( this.markerHeight <= 0 ) {
+			return String.format("%4.1f %2s",markerWidth,units.getAbbreviation());
+		} else {
+			return String.format("%4.1f x %4.1f %2s",markerWidth,markerHeight,units.getAbbreviation());
+
+		}
 	}
 
 	protected abstract void configureRenderer( PdfFiducialEngine pdfengine );
@@ -194,7 +205,7 @@ public abstract class CreateFiducialDocumentPDF {
 	 * Draws the grid in light grey on the document
 	 */
 	private void printGrid(PDPageContentStream pcs, float offsetX , float offsetY,
-						   int numRows, int numCols , float sizeBox ) throws IOException {
+						   int numRows, int numCols , float sizeBoxX, float sizeBoxY ) throws IOException {
 		float pageWidth = (float)paper.convertWidth(units)*UNIT_TO_POINTS;
 		float pageHeight = (float)paper.convertHeight(units)*UNIT_TO_POINTS;
 
@@ -202,12 +213,12 @@ public abstract class CreateFiducialDocumentPDF {
 		pcs.setStrokingColor(0.75);
 
 		for (int i = 0; i <= numCols; i++) {
-			float x = offsetX + i*sizeBox;
+			float x = offsetX + i*sizeBoxX;
 			pcs.moveTo(x,0);
 			pcs.lineTo(x,pageHeight);
 		}
 		for (int i = 0; i <= numRows; i++) {
-			float y = offsetY + i*sizeBox;
+			float y = offsetY + i*sizeBoxY;
 			pcs.moveTo(0,y);
 			pcs.lineTo(pageWidth,y);
 		}

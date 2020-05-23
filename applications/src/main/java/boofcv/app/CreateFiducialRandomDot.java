@@ -46,7 +46,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class CreateFiducialRandomDot extends BaseFiducialSquare {
-	@Option(name="-n",aliases = {"--DotsPerMarker"}, usage="Number of dots per marker")
+	@Option(name="-n",aliases = {"--DotsPerMarker"}, usage="Maximum number of dots per marker")
 	public int maxDotsPerMarker =30;
 
 	@Option(name="-um",aliases = {"--UniqueMarkers"}, usage="Number of unique markers that it should create")
@@ -67,6 +67,9 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	@Option(name = "--MarkerBorder", usage = "Draws a black line at the marker's border.")
 	public boolean drawLineBorder = false;
 
+	@Option(name = "-h", aliases = {"--MarkerHeight"}, usage = "Height of each marker.  In document units. If -1 then square")
+	public float markerHeight = -1; // when parsed it will be set to a non-negative value
+
 	List<List<Point2D_F64>> markers = new ArrayList<>();
 
 	@Override
@@ -75,6 +78,12 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 
 		if( dumpLocations )
 			saveMarkersToYaml();
+	}
+
+	@Override
+	protected void printPdfInfo() {
+		super.printPdfInfo();
+		System.out.println("   marker height : " + markerHeight + " (" + unit.abbreviation + ")");
 	}
 
 	/**
@@ -89,6 +98,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		def.dotDiameter = dotDiameter;
 		def.maxDotsPerMarker = maxDotsPerMarker;
 		def.markerWidth = markerWidth;
+		def.markerHeight = markerHeight;
 		def.units = unit.getAbbreviation();
 		def.markers.addAll( markers );
 
@@ -100,6 +110,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	protected CreateFiducialDocumentImage createRendererImage(String filename) {
 		var ret = new CreateRandomDotDocumentImage(filename);
 		ret.dotDiameter = dotDiameter;
+		ret.markerHeight = (int)markerHeight;
 		return ret;
 	}
 
@@ -108,6 +119,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		var ret = new CreateRandomDotDocumentPDF(documentName, paper, units);
 		ret.dotDiameter = dotDiameter;
 		ret.drawLineBorder = drawLineBorder;
+		ret.markerHeight = markerHeight;
 		return ret;
 	}
 
@@ -124,13 +136,18 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	@Override
 	public void finishParsing() {
 		super.finishParsing();
+
+		// assume square if height is not specified
+		if( markerHeight < 0 )
+			markerHeight = markerWidth;
+
 		Random rand = new Random(randomSeed);
 
 		double spacingDiameter = this.spaceDiameter<=0?dotDiameter:this.spaceDiameter;
 
 		for( int i = 0; i < totalUnique; i++ ) {
 			List<Point2D_F64> marker = RandomDotMarkerGenerator.createRandomMarker(rand,
-					maxDotsPerMarker, markerWidth, markerWidth,spacingDiameter);
+					maxDotsPerMarker, markerWidth, markerHeight,spacingDiameter);
 			markers.add( marker );
 		}
 	}

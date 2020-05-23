@@ -18,7 +18,6 @@
 
 package boofcv.app.fiducials;
 
-import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
@@ -35,14 +34,14 @@ import java.io.File;
 public abstract class CreateFiducialDocumentImage {
 
 	String documentName;
-	FiducialImageEngine render = new FiducialImageEngine();
 
 	public int markerWidth;
+	// If > 0 then it specifies the height, otherwise a square marker is assumed.
+	public int markerHeight=-1;
 
 	public CreateFiducialDocumentImage(String documentName ) {
 		this.documentName = documentName;
 	}
-
 
 	protected void save( GrayU8 fiducial , String name ) {
 		String fileName;

@@ -37,7 +37,7 @@ public class RandomDotDefinition {
 	public int maxDotsPerMarker = -1;
 	/** How wide the marker's bounding rectangle is */
 	public double markerWidth = -1;
-	/** How tall the marker's bounding rectangle is. If this is not specified then it's assumed to be square */
+	/** How tall the marker's bounding rectangle is. */
 	public double markerHeight = -1;
 	/** Units the the marker is in */
 	public String units = "";

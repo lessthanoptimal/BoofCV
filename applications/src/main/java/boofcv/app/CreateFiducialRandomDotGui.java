@@ -171,6 +171,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		owner.dumpLocations = true;
 		owner.fileName = outputFile;
 		owner.sendToPrinter = sendToPrinter;
+		owner.markerHeight = (float)(owner.markerWidth*controls.markerRatio);
 
 		try {
 			owner.run();
@@ -188,7 +189,8 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		def.randomSeed = owner.randomSeed;
 		def.maxDotsPerMarker = owner.maxDotsPerMarker;
 		def.dotDiameter = owner.dotDiameter;
-		def.markerWidth = def.markerHeight = owner.markerWidth;
+		def.markerWidth = owner.markerWidth;
+		def.markerHeight = owner.markerWidth*controls.markerRatio;
 		def.units = owner.unit.getAbbreviation();
 		owner.markers.clear();
 
@@ -215,14 +217,13 @@ public class CreateFiducialRandomDotGui extends JPanel {
 
 		// dot diameter rendered in the image
 		double dd = owner.dotDiameter*(width/owner.markerWidth);
-//		int height = (int)(width*(def.markerHeight/def.markerWidth));
-		int height = width;
+		int height = (int)(width*controls.markerRatio);
 
 		// Generate the preview image
 		var generator = new RandomDotMarkerGeneratorImage();
 		generator.setRadius(dd/2.0);
 		generator.configure(width,height,20);
-		generator.render(owner.markers.get(controls.viewMarkerIndex),owner.markerWidth);
+		generator.render(owner.markers.get(controls.viewMarkerIndex),def.markerWidth, def.markerHeight);
 
 		GrayU8 gray = generator.getImage();
 		BufferedImage out = new BufferedImage(gray.width, gray.height, BufferedImage.TYPE_INT_RGB);
@@ -242,6 +243,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		int totalMarkers = 1;       // number of markers it will generate
 		double spaceDiameter = -1;  // space between the markers
 		int viewMarkerIndex = 0;    // which marker is being displayed in the preview
+		double markerRatio = 1.0;   // height / width ratio of the marker
 
 		// Store two different sets of units for image vs pdf since if you interchange the two you get very bad results
 		double widthPdf = owner.markerWidth;
@@ -253,6 +255,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 		JComboBox<String> comboPaper = combo(PaperSize.values().indexOf(owner.paperSize),PaperSize.values().toArray());
 		JComboBox<String> comboUnits = combo( owner.unit.ordinal(),Unit.values());
 		JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(owner.markerWidth,0.0,Double.NaN);
+		JSpinner spinnerRatio = spinner(markerRatio,0.0001,1000.0,0.05);
 		JFormattedTextField fieldRandomSeed = BoofSwingUtil.createHexTextField(owner.randomSeed);
 		JCheckBox checkFillGrid = checkbox("Fill Grid",owner.gridFill,"Fill in all space in the document with markers");
 		JCheckBox checkDrawGrid = checkbox("Draw Grid", owner.drawGrid,"Draw the grid in the document");
@@ -278,6 +281,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 			addLabeled(spinnerTotalMarkers,"Total Markers","The number of markers it will generate");
 			addLabeled(fieldMarkerWidth,"Marker Width",
 					"Width and Height of the markers. If image then this is pixels. Use command line for rectangular markers.");
+			addLabeled(spinnerRatio,"Height/Width","Ratio of the markers height/width");
 			addLabeled(comboUnits,"Units","Units that the width is specified in");
 			addLabeled(spinnerMaxDots,"Max Dots","Max number of possible dots in a marker");
 			addLabeled(spinnerDotDiameter,"Dot Diameter","How wide a marker is");
@@ -310,9 +314,9 @@ public class CreateFiducialRandomDotGui extends JPanel {
 					owner.markerWidth = (float)widthPdf;
 				}
 				updateMarkers();
-//			} else if( source == spinnerMarkerHeight ) {
-//				def.markerHeight = ((Number)spinnerMarkerHeight.getValue()).doubleValue();
-//				updateMarkers();
+			} else if( source == spinnerRatio ) {
+				markerRatio = ((Number)spinnerRatio.getValue()).doubleValue();
+				updateMarkers();
 			} else if( source == spinnerDotDiameter ) {
 				if( isPixels() ) {
 					diameterPixels = ((Number)spinnerDotDiameter.getValue()).intValue();

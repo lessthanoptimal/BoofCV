@@ -11,6 +11,7 @@ Version : 0.37
 - Random Dot Markers
   * Created GUI for generating markers. Print or save to disk
   * Fully integrated into Applications
+  * Rectangular markers are now fully supported
 
 TODO PointTracker
   - Add last seen field to track

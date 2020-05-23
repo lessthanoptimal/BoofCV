@@ -48,6 +48,8 @@ public class CreateSquareFiducialDocumentImage extends CreateFiducialDocumentIma
 	}
 
 	public void render( java.util.List<String> names , GrowQueue_I64 patterns , int gridWidth ) {
+		if( markerHeight > 0 )
+			throw new IllegalArgumentException("markerHeight must be < 0 since only square is supported");
 		generator.setMarkerWidth(markerWidth);
 		generator.setBlackBorder(blackBorderFractionalWidth);
 		render.configure(whiteBorderPixels,(int)generator.getMarkerWidth());
@@ -58,6 +60,8 @@ public class CreateSquareFiducialDocumentImage extends CreateFiducialDocumentIma
 	}
 
 	public void render( java.util.List<String> names , List<GrayU8> patterns ) {
+		if( markerHeight > 0 )
+			throw new IllegalArgumentException("markerHeight must be < 0 since only square is supported");
 		generator.setMarkerWidth(markerWidth);
 		render.configure(whiteBorderPixels,(int)generator.getMarkerWidth());
 		for (int i = 0; i < patterns.size(); i++) {

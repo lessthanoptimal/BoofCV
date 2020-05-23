@@ -44,7 +44,6 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 	PdfFiducialEngine renderer;
 
 	public double dotDiameter;
-//	public boolean drawBorderLine;
 
 	public CreateRandomDotDocumentPDF(String documentName, PaperSize paper, Unit units) {
 		super(documentName, paper, units);
@@ -57,11 +56,13 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 
 	@Override
 	protected void configureRenderer(PdfFiducialEngine renderer) {
+		if( markerHeight < 0 )
+			throw new IllegalArgumentException("Must specify marker height even if square");
 		this.renderer = renderer;
 		g = new RandomDotMarkerGenerator();
 		g.setRadius(UNIT_TO_POINTS*dotDiameter/2.0);
 		g.getDocumentRegion().setWidth(markerWidth*UNIT_TO_POINTS);
-		g.getDocumentRegion().setHeight(markerWidth*UNIT_TO_POINTS);
+		g.getDocumentRegion().setHeight(markerHeight*UNIT_TO_POINTS);
 		g.setRender(renderer);
 	}
 
@@ -77,7 +78,7 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 			p.y *= UNIT_TO_POINTS;
 			scaled.add( p );
 		}
-		g.render(scaled,markerWidth*UNIT_TO_POINTS);
+		g.render(scaled,markerWidth*UNIT_TO_POINTS, markerHeight*UNIT_TO_POINTS);
 
 		// draw optional black box around the marker
 		if( drawLineBorder ) {

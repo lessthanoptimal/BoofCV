@@ -121,6 +121,10 @@ public class FiducialIO {
 		if( data.containsKey("units"))
 			def.units = (String) data.get("units");
 
+		// assume it's square if height is not specified
+		if( def.markerHeight <= 0)
+			def.markerHeight = def.markerWidth;
+
 		List<List<List<Double>>> listMarkers = (List<List<List<Double>>>)data.get("markers");
 
 		for (int markerIdx = 0; markerIdx < listMarkers.size(); markerIdx++) {

@@ -65,7 +65,7 @@ class TestUchiyaMarkerImageTracker {
 		var generator = new RandomDotMarkerGeneratorImage();
 		generator.setRadius(dotDiameter/2.0);
 		generator.configure(200,200,30);
-		generator.render(documents.get(targetID),markerWidth);
+		generator.render(documents.get(targetID),markerWidth, markerWidth);
 
 		List<Point2D_F64> centers = generator.getDotsAdjusted().toList();
 

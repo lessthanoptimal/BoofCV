@@ -104,46 +104,48 @@ public abstract class BaseFiducialSquare {
 
 		System.out.println("   File Name    : "+fileName);
 		if (fileType.equals("pdf")) {
-			System.out.println("   Document     : PDF");
-			System.out.println("   paper        : " + paperSize);
-			System.out.println("   info         : " + (!disablePrintInfo));
-			System.out.println("   units        : " + unit);
-			System.out.println("   marker width : " + markerWidth + " (" + unit.abbreviation + ")");
+			printPdfInfo();
 		} else {
-			System.out.println("   Document     : Image");
-			System.out.println("   marker width : " + markerWidth + " (pixels)");
-			System.out.println("   white border : " + spaceBetween + " (pixels)");
+			printImageInfo();
 		}
 		System.out.println();
 
-		switch (fileType) {
-			case "pdf": {
-				CreateFiducialDocumentPDF renderer = createRendererPdf(fileName, paperSize, unit);
-				renderer.markerWidth = markerWidth;
-				renderer.spaceBetween = spaceBetween;
-				renderer.gridFill = gridFill;
-				renderer.drawGrid = drawGrid;
-				renderer.showInfo = !hideInfo;
-				try {
-					callRenderPdf(renderer);
-					if (sendToPrinter) {
-						renderer.sendToPrinter();
-					} else {
-						renderer.saveToDisk();
-					}
-				} catch (PrinterException e) {
-					throw new IOException(e);
+		if ("pdf".equals(fileType)) {
+			CreateFiducialDocumentPDF renderer = createRendererPdf(fileName, paperSize, unit);
+			renderer.markerWidth = markerWidth;
+			renderer.spaceBetween = spaceBetween;
+			renderer.gridFill = gridFill;
+			renderer.drawGrid = drawGrid;
+			renderer.showInfo = !hideInfo;
+			try {
+				callRenderPdf(renderer);
+				if (sendToPrinter) {
+					renderer.sendToPrinter();
+				} else {
+					renderer.saveToDisk();
 				}
+			} catch (PrinterException e) {
+				throw new IOException(e);
 			}
-			break;
-
-			default: {
-				CreateFiducialDocumentImage renderer = createRendererImage(fileName);
-				renderer.markerWidth = (int)markerWidth;
-				callRenderImage(renderer);
-			}
-			break;
+		} else {
+			CreateFiducialDocumentImage renderer = createRendererImage(fileName);
+			renderer.markerWidth = (int) markerWidth;
+			callRenderImage(renderer);
 		}
+	}
+
+	protected void printImageInfo() {
+		System.out.println("   Document      : Image");
+		System.out.println("   white border  : " + spaceBetween + " (pixels)");
+		System.out.println("   marker width  : " + markerWidth + " (pixels)");
+	}
+
+	protected void printPdfInfo() {
+		System.out.println("   Document      : PDF");
+		System.out.println("   paper         : " + paperSize);
+		System.out.println("   info          : " + (!disablePrintInfo));
+		System.out.println("   units         : " + unit);
+		System.out.println("   marker width  : " + markerWidth + " (" + unit.abbreviation + ")");
 	}
 
 	protected abstract CreateFiducialDocumentImage createRendererImage(String filename );
@@ -171,10 +173,11 @@ public abstract class BaseFiducialSquare {
 	public void finishParsing() {
 		getFileTypeFromFileName();
 
+		if (markerWidth < 0) {
+			throw new RuntimeException("Must specify markerWidth");
+		}
+
 		if (fileType.equals("pdf")) {
-			if (markerWidth < 0) {
-				throw new RuntimeException("Must specify markerWidth");
-			}
 			if( spaceBetween == 0 )
 				spaceBetween = markerWidth/4;
 

@@ -36,9 +36,13 @@ import boofcv.struct.ConnectRule;
 public class ConfigUchiyaMarker implements Configuration {
 
 	/**
-	 * Specifies the marker's width and height. This must match width used to generate the random dots.
+	 * Specifies the marker's width. This must match width used to generate the random dots.
 	 */
-	public double markerLength = -1.0;
+	public double markerWidth = -1.0;
+	/**
+	 * Specifies the marker's height. This must match width used to generate the random dots.
+	 */
+	public double markerHeight = -1.0;
 
 	/**
 	 * Specifies how images are thresholded and converted into a binary format
@@ -99,12 +103,12 @@ public class ConfigUchiyaMarker implements Configuration {
 	}
 
 	public void setTo( ConfigUchiyaMarker src ) {
-		this.markerLength = src.markerLength;
+		this.markerWidth = src.markerWidth;
+		this.markerHeight = src.markerHeight;
 		this.threshold.setTo(src.threshold);
 		this.llah.setTo(src.llah);
 		this.ransac.setTo(src.ransac);
 		this.contourRule = src.contourRule;
-		this.markerLength = src.markerLength;
 		this.contourMinimumLength = src.contourMinimumLength;
 		this.maxDistanceFromEllipse = src.maxDistanceFromEllipse;
 		this.minimumMinorAxis = src.minimumMinorAxis;
@@ -115,7 +119,9 @@ public class ConfigUchiyaMarker implements Configuration {
 	@Override
 	public void checkValidity() {
 		llah.checkValidity();
-		if( markerLength <= 0 )
-			throw new IllegalArgumentException("Marker length must set!");
+		if( markerWidth <= 0 )
+			throw new IllegalArgumentException("Marker's width must set!");
+		if( markerHeight <= 0 )
+			throw new IllegalArgumentException("Marker's height must set!");
 	}
 }

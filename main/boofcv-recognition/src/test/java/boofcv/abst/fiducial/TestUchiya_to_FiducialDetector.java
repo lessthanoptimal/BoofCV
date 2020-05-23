@@ -60,7 +60,8 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 	{
 		var config = new ConfigUchiyaMarker();
 		config.ransac.inlierThreshold = 1.0;
-		config.markerLength = markerLength;
+		config.markerWidth = markerLength;
+		config.markerHeight = markerLength;
 
 		Uchiya_to_FiducialDetector detector = FactoryFiducial.randomDots(config,imageType.getImageClass());
 		for( var pts : documents ) {
@@ -77,7 +78,7 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 		var generator = new RandomDotMarkerGeneratorImage();
 		generator.setRadius(20);
 		generator.configure(600,600,20);
-		generator.render(documents.get(target), markerLength);
+		generator.render(documents.get(target), markerLength, markerLength);
 
 //		ShowImages.showBlocking(generator.getImage(),"Raw Render",1000);
 

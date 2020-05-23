@@ -58,7 +58,8 @@ public class ExampleFiducialRandomDots {
 		// The only parameter that you have to set is markerLength. It's used to compute bounding
 		// boxes and similar. If you don't know what the width is just set it to 1.0
 		ConfigUchiyaMarker config = new ConfigUchiyaMarker();
-		config.markerLength = defs.markerWidth;
+		config.markerWidth = defs.markerWidth;
+		config.markerHeight = defs.markerHeight;
 
 		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config, GrayU8.class);
 
