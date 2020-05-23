@@ -190,12 +190,12 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 		}
 
 		if( controls.mode != null ){
-			switch( controls.mode ) {
-				case NUMERIC:encoder.addNumeric(controls.message);break;
-				case ALPHANUMERIC:encoder.addAlphanumeric(controls.message);break;
-				case BYTE:encoder.addBytes(controls.message);break;
-				case KANJI:encoder.addKanji(controls.message);break;
-				default: encoder.addAutomatic(controls.message);break;
+			switch (controls.mode) {
+				case NUMERIC -> encoder.addNumeric(controls.message);
+				case ALPHANUMERIC -> encoder.addAlphanumeric(controls.message);
+				case BYTE -> encoder.addBytes(controls.message);
+				case KANJI -> encoder.addKanji(controls.message);
+				default -> encoder.addAutomatic(controls.message);
 			}
 		} else {
 			encoder.addAutomatic(controls.message);

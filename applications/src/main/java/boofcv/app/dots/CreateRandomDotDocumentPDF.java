@@ -39,13 +39,12 @@ import java.util.List;
 public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 
 	List<List<Point2D_F64>> markers;
-	@Getter
-	RandomDotMarkerGenerator g;
+	@Getter RandomDotMarkerGenerator g;
 
 	PdfFiducialEngine renderer;
 
 	public double dotDiameter;
-	public boolean drawBorderLine;
+//	public boolean drawBorderLine;
 
 	public CreateRandomDotDocumentPDF(String documentName, PaperSize paper, Unit units) {
 		super(documentName, paper, units);
@@ -81,7 +80,7 @@ public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 		g.render(scaled,markerWidth*UNIT_TO_POINTS);
 
 		// draw optional black box around the marker
-		if( drawBorderLine ) {
+		if( drawLineBorder ) {
 			try {
 				drawFiducialBorder();
 			} catch (IOException e) {

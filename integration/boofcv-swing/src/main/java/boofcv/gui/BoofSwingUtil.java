@@ -42,6 +42,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultFormatter;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -54,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -235,49 +237,49 @@ public class BoofSwingUtil {
 		} else {
 			prefs = Preferences.userRoot().node(preferenceName);
 		}
+		File defaultFile = new File(defaultPath);
 		File previousPath=new File(prefs.get(KEY_PREVIOUS_SELECTION, defaultPath));
+		if( !previousPath.exists() ) {
+			previousPath = defaultFile;
+		}
+		if( !openFile ) {
+			// If the file type for the previous selection is wrong then use the default file name
+			if( previousPath.isFile() ) {
+				String ext = FilenameUtils.getExtension(defaultPath);
+				if (ext.equalsIgnoreCase(FilenameUtils.getExtension(previousPath.getName()))) {
+					previousPath = new File(previousPath.getParent(),defaultFile.getName());
+				}
+			}
+		}
+
 		JFileChooser chooser = new JFileChooser(previousPath);
-		if( previousPath.isFile() )
+		if( !openFile || previousPath.exists() )
 			chooser.setSelectedFile(previousPath);
 
 		boolean selectDirectories = false;
-		escape:for( FileTypes t : filters ) {
+		for( FileTypes t : filters ) {
 			javax.swing.filechooser.FileFilter ff;
-			switch( t ) {
-				case FILES:
-					ff = new javax.swing.filechooser.FileFilter() {
-						@Override
-						public boolean accept(File pathname) {
-							return true;
-						}
-						@Override
-						public String getDescription() {
-							return "All";
-						}
-					};
-					break;
+			ff = switch (t) {
+				case FILES -> new javax.swing.filechooser.FileFilter() {
+					@Override
+					public boolean accept(File pathname) {
+						return true;
+					}
 
-				case YAML:
-					ff = new FileNameExtensionFilter("yaml", "yaml","yml");
-					break;
-
-				case XML:
-					ff = new FileNameExtensionFilter("xml", "xml");
-					break;
-
-				case IMAGES:
-					ff = new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
-					break;
-				case VIDEOS:
-					ff = new FileNameExtensionFilter("Videos","mpg","mp4","mov","avi","wmv");
-					break;
-
-				case DIRECTORIES:
-					selectDirectories = true;
-					break escape;
-				default:
-					throw new RuntimeException("Unknown file type");
-			}
+					@Override
+					public String getDescription() {
+						return "All";
+					}
+				};
+				case YAML -> new FileNameExtensionFilter("yaml", "yaml", "yml");
+				case XML -> new FileNameExtensionFilter("xml", "xml");
+				case IMAGES -> new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
+				case VIDEOS -> new FileNameExtensionFilter("Videos", "mpg", "mp4", "mov", "avi", "wmv");
+				case DIRECTORIES -> {selectDirectories = true; yield null;}
+				default -> throw new RuntimeException("Unknown file type");
+			};
+			if( ff == null )
+				break;
 			chooser.addChoosableFileFilter(ff);
 		}
 
@@ -550,6 +552,40 @@ public class BoofSwingUtil {
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		field.setValue(current);
 		return field;
+	}
+
+	public static JFormattedTextField createHexTextField( long current ) {
+		HexFormatter formatter = new HexFormatter();
+		formatter.setValueClass(Long.class);
+		formatter.setAllowsInvalid(true);
+//		formatter.setCommitsOnValidEdit(true);
+		JFormattedTextField field = new JFormattedTextField(formatter);
+		field.setHorizontalAlignment(JTextField.RIGHT);
+		field.setValue(current);
+		return field;
+	}
+
+	private static class HexFormatter extends DefaultFormatter {
+		@Override
+		public Object stringToValue(String text) throws ParseException {
+			if( text == null )
+				return 0L;
+			try {
+				if( text.startsWith("0x") ) {
+					text = text.substring(2);
+				}
+				return Long.valueOf(text, 16);
+			} catch (NumberFormatException nfe) {
+				throw new ParseException(text, 0);
+			}
+		}
+
+		@Override
+		public String valueToString(Object value) {
+			if( value == null )
+				return "";
+			return "0x"+Long.toHexString((Long) value).toUpperCase();
+		}
 	}
 
 	public static JMenuItem createMenuItem(String name  , int mnmonic , int accelerator, BoofLambdas.Process action ) {

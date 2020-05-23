@@ -47,7 +47,7 @@ import java.util.Random;
  */
 public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	@Option(name="-n",aliases = {"--DotsPerMarker"}, usage="Number of dots per marker")
-	public int numberOfDots=30;
+	public int maxDotsPerMarker =30;
 
 	@Option(name="-um",aliases = {"--UniqueMarkers"}, usage="Number of unique markers that it should create")
 	public int totalUnique=1;
@@ -58,7 +58,6 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	@Option(name = "--SpaceDiameter", usage = "Specify to use space dots using a different diameter. In document units")
 	public double spaceDiameter = -1;
 
-
 	@Option(name = "-rs", aliases = {"--RandomSeed"}, usage = "Random seed used to create the markers")
 	public long randomSeed=0xDEAD_BEEFL;
 
@@ -66,7 +65,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	public boolean dumpLocations = false;
 
 	@Option(name = "--MarkerBorder", usage = "Draws a black line at the marker's border.")
-	public boolean drawBorderLines = false;
+	public boolean drawLineBorder = false;
 
 	List<List<Point2D_F64>> markers = new ArrayList<>();
 
@@ -88,7 +87,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		var def = new RandomDotDefinition();
 		def.randomSeed = randomSeed;
 		def.dotDiameter = dotDiameter;
-		def.maxDotsPerMarker = numberOfDots;
+		def.maxDotsPerMarker = maxDotsPerMarker;
 		def.markerWidth = markerWidth;
 		def.units = unit.getAbbreviation();
 		def.markers.addAll( markers );
@@ -108,13 +107,13 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	protected CreateFiducialDocumentPDF createRendererPdf(String documentName, PaperSize paper, Unit units) {
 		var ret = new CreateRandomDotDocumentPDF(documentName, paper, units);
 		ret.dotDiameter = dotDiameter;
-		ret.drawBorderLine = drawBorderLines;
+		ret.drawLineBorder = drawLineBorder;
 		return ret;
 	}
 
 	@Override
 	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
-		((CreateRandomDotDocumentPDF)renderer).render(markers,numberOfDots,randomSeed);
+		((CreateRandomDotDocumentPDF)renderer).render(markers, maxDotsPerMarker,randomSeed);
 	}
 
 	@Override
@@ -127,11 +126,11 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		super.finishParsing();
 		Random rand = new Random(randomSeed);
 
-		double spaceDiameter = this.spaceDiameter<=0?dotDiameter:this.spaceDiameter;
+		double spacingDiameter = this.spaceDiameter<=0?dotDiameter:this.spaceDiameter;
 
 		for( int i = 0; i < totalUnique; i++ ) {
 			List<Point2D_F64> marker = RandomDotMarkerGenerator.createRandomMarker(rand,
-					numberOfDots, markerWidth, markerWidth,spaceDiameter * 2.0);
+					maxDotsPerMarker, markerWidth, markerWidth,spacingDiameter);
 			markers.add( marker );
 		}
 	}
@@ -148,8 +147,8 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 				" and dumps a description to yaml");
 		System.out.println("--MarkerBorder --DumpYaml -w 8 -um 4 -n 30 -o dots.pdf");
 		System.out.println();
-//		System.out.println("Opens a GUI");
-//		System.out.println("--GUI");
+		System.out.println("Opens a GUI");
+		System.out.println("--GUI");
 
 		System.exit(-1);
 	}
@@ -165,7 +164,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		try {
 			parser.parseArgument(args);
 			if( generator.guiMode ) {
-				BoofSwingUtil.invokeNowOrLater(CreateFiducialSquareBinaryGui::new);
+				BoofSwingUtil.invokeNowOrLater(()->new CreateFiducialRandomDotGui(generator));
 			} else {
 				generator.finishParsing();
 				generator.run();

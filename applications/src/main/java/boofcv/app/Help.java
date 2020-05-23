@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ public class Help {
 	static Class []options = new Class[]{
 			CreateFiducialSquareImage.class,
 			CreateFiducialSquareBinary.class,
+			CreateFiducialRandomDot.class,
 			BatchRemoveLensDistortion.class,
 			BatchDownsizeImage.class,
 			FiducialDetection.class,

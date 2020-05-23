@@ -8,13 +8,15 @@ Version : 0.37
 
 - Build
   * Switch to Java 14 syntax. Still generating Java 1.8 byte code
+- Random Dot Markers
+  * Created GUI for generating markers. Print or save to disk
+  * Fully integrated into Applications
 
 TODO PointTracker
   - Add last seen field to track
   - has image motion 2D been updated to drop old unassociated tracks?
 
 TODO Random Dots
-  - GUI for creating markers
   - See if they can be speed up any
 
 TODO DetectDescribe

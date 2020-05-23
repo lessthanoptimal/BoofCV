@@ -33,8 +33,7 @@ import java.util.List;
  */
 public class CreateRandomDotDocumentImage extends CreateFiducialDocumentImage {
 
-	@Getter
-	RandomDotMarkerGeneratorImage g = new RandomDotMarkerGeneratorImage();
+	@Getter RandomDotMarkerGeneratorImage g = new RandomDotMarkerGeneratorImage();
 
 	public double dotDiameter;
 
