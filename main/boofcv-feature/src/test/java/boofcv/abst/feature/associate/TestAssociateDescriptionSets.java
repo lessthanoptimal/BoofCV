@@ -16,42 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.misc;
+package boofcv.abst.feature.associate;
 
-import java.util.List;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Set of commonly used functions for Lambdas
- *
  * @author Peter Abeles
  */
-public interface BoofLambdas {
-
-	interface MassageString {
-		String process( String input );
-	}
-
-	interface Factory<T> {
-		T newInstance();
-	}
-
-	interface Process {
-		void process();
-	}
-
-	interface ProcessObject<T> {
-		void process(T object);
-	}
-
-	interface ProcessI {
-		void process( int a );
-	}
-
-	interface ProcessII {
-		void process( int a, int b );
-	}
-
-	interface SelectElement<T> {
-		int select(List<T> list);
+class TestAssociateDescriptionSets {
+	@Test
+	void foo() {
+		fail("Implement");
 	}
 }

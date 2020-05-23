@@ -25,7 +25,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -51,6 +52,15 @@ public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<
 	 */
 	@Test
 	void setsRigorous() {
-		fail("implement");
+		DetectDescribePoint<GrayF32,BrightFeature> alg = createDetDesc();
+
+		assertEquals(2, alg.getNumberOfSets());
+		alg.detect(image);
+		int[] counts = new int[2];
+		for (int i = 0; i < alg.getNumberOfFeatures(); i++) {
+			counts[alg.getSet(i)]++;
+		}
+		assertTrue(counts[0]>0);
+		assertTrue(counts[1]>0);
 	}
 }

@@ -18,6 +18,11 @@ Version : 0.37
   * Added support for YUYV color format used in webcams
 - GUI
   * Added clip and fog controls to point cloud controls
+- Feature Sets
+  * "Sets" has been redesigned and added to the generic interfaces.
+  * This makes it easier and less complicated to only associate "dark" or "bright" features with each other
+  * Added back in or added for the first time association with sets using `AssociateDescriptionSets`
+  * Created UtilPointFeatures to simplify working with `sets`
 
 TODO PointTracker
   - Add last seen field to track
@@ -29,12 +34,17 @@ TODO RegionOrientation
 TODO Random Dots
   - See if they can be speed up any
 
+TODO SURF
+  - Make it so that sets can be determined by FastHessian and not at descriptor calculation?
+
 TODO Interest Point Detector
   - Limit max features returned and bring over that other thing too
 
 TODO DetectDescribe
   - Integrate in sets and remove specialized class
-  - Request the set a feature belongs in. Provide a lambda to get all features in a set?
+     * Three View
+     * Create a new example for association with sets?
+  - Simplify and add sets to Associate2D
 
 TODO Visual Odometry
   - Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments

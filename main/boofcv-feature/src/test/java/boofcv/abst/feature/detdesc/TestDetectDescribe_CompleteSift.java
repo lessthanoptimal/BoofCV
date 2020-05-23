@@ -18,15 +18,12 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
@@ -34,28 +31,27 @@ import static org.junit.jupiter.api.Assertions.fail;
 @SuppressWarnings("ALL")
 public class TestDetectDescribe_CompleteSift
 {
-	Class types[] = new Class[]{GrayF32.class,GrayU8.class};
+	@Nested
+	public class U8 extends GenericTestsDetectDescribePoint {
+		protected U8() {
+			super(true,true,ImageType.SB_U8,BrightFeature.class);
+		}
 
-	// TODO convert to a subclass?
-	@Test
-	public void allTypes() {
-		for( final Class type : types ) {
-			final Class derivType = GImageDerivativeOps.getDerivativeType(type);
-			new GenericTestsDetectDescribePoint(true,true,ImageType.single(type),BrightFeature.class) {
+		@Override
+		public DetectDescribePoint createDetDesc() {
+			return FactoryDetectDescribe.sift(null,GrayU8.class);
+		}
+	}
 
-				@Override
-				public DetectDescribePoint createDetDesc() {
-					return FactoryDetectDescribe.sift(null,type);
-				}
+	@Nested
+	public class F32 extends GenericTestsDetectDescribePoint {
+		protected F32() {
+			super(true,true,ImageType.SB_F32,BrightFeature.class);
+		}
 
-				/**
-				 * More rigorous test to see if sets is done correctly specific to SIFT
-				 */
-				@Test
-				void setsRigorous() {
-					fail("implement");
-				}
-			}.allTests();
+		@Override
+		public DetectDescribePoint createDetDesc() {
+			return FactoryDetectDescribe.sift(null,GrayF32.class);
 		}
 	}
 }

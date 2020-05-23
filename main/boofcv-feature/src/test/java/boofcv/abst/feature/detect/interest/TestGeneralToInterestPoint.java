@@ -24,7 +24,6 @@ import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -44,11 +43,13 @@ public class TestGeneralToInterestPoint {
 				new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 
 		alg.detect(input);
+		assertEquals(1, alg.getNumberOfSets());
 
 		assertEquals(6,alg.getNumberOfFeatures());
 		for( int i = 0; i < alg.getNumberOfFeatures(); i++) {
 			assertEquals(2.5, alg.getRadius(i),1e-8);
 			assertEquals(0, alg.getOrientation(i),1e-8);
+			assertEquals(0,alg.getSet(i));
 		}
 
 		assertEquals(1, detector.calledProcess);
@@ -61,35 +62,45 @@ public class TestGeneralToInterestPoint {
 	@Test
 	void checkMinimumsMaximums() {
 		Helper detector = new Helper();
-		GeneralToInterestPoint<GrayF32,GrayF32> alg =
-				new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 
 		// both turned off
+		var alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 		alg.detect(input);
-		assertEquals(0,alg.getNumberOfFeatures());
+		assertEquals(0, alg.getNumberOfSets());
+		assertEquals(0, alg.getNumberOfFeatures());
 
 		// just minimums
 		detector.minimum = true;
+		alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 		alg.detect(input);
-		assertEquals(5,alg.getNumberOfFeatures());
+		assertEquals(1, alg.getNumberOfSets());
+		assertEquals(5, alg.getNumberOfFeatures());
+		for (int i = 0; i < alg.getNumberOfFeatures(); i++) {
+			assertEquals(0,alg.getSet(i));
+		}
 
 		// both minimums and maximums
 		detector.maximum = true;
+		alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 		alg.detect(input);
+		assertEquals(2, alg.getNumberOfSets());
 		assertEquals(11,alg.getNumberOfFeatures());
+		for (int i = 0; i < 6; i++) {
+			assertEquals(0,alg.getSet(i));
+		}
+		for (int i = 6; i < alg.getNumberOfFeatures(); i++) {
+			assertEquals(1,alg.getSet(i));
+		}
 
 		// just maximums
 		detector.minimum = false;
+		alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 		alg.detect(input);
+		assertEquals(1, alg.getNumberOfSets());
 		assertEquals(6,alg.getNumberOfFeatures());
-	}
-
-	/**
-	 * See if it correctly sets the number of sets and the sets each feature belongs to
-	 */
-	@Test
-	void checkSets() {
-		fail("Implement");
+		for (int i = 0; i < alg.getNumberOfFeatures(); i++) {
+			assertEquals(0,alg.getSet(i));
+		}
 	}
 
 	public static class Helper extends GeneralFeatureDetector<GrayF32,GrayF32> {
@@ -121,24 +132,9 @@ public class TestGeneralToInterestPoint {
 			return ret;
 		}
 
-		@Override
-		public boolean isDetectMinimums() {
-			return minimum;
-		}
-
-		@Override
-		public boolean isDetectMaximums() {
-			return maximum;
-		}
-
-		@Override
-		public boolean getRequiresGradient() {
-			return false;
-		}
-
-		@Override
-		public boolean getRequiresHessian() {
-			return false;
-		}
+		@Override public boolean isDetectMinimums() { return minimum; }
+		@Override public boolean isDetectMaximums() { return maximum; }
+		@Override public boolean getRequiresGradient() { return false; }
+		@Override public boolean getRequiresHessian() { return false; }
 	}
 }

@@ -66,11 +66,14 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	}
 
 	public void allTests() {
-		detectFeatures();
-		checkSubImage();
-		hasScale();
-		hasOrientation();
 		checkMultipleCalls();
+		checkSubImage();
+		detectFeatures();
+		failBandMissMatch();
+		getDescriptorType();
+		hasOrientation();
+		hasScale();
+		sets();
 	}
 
 	public abstract DetectDescribePoint<T,D> createDetDesc();
@@ -186,7 +189,18 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	 */
 	@Test
 	public void sets() {
-		fail("implement");
+		DetectDescribePoint<T,D> alg = createDetDesc();
+		alg.detect(image);
+
+		// Must have at least one set
+		assertTrue(alg.getNumberOfSets()>=1);
+
+		// See if all features are within the allowed range of sets
+		final int N = alg.getNumberOfFeatures();
+		for( int i = 0; i < N; i++ ) {
+			int set = alg.getSet(i);
+			assertTrue(set >= 0 && set < alg.getNumberOfFeatures());
+		}
 	}
 
 	private void checkIdenticalResponse(DetectDescribePoint<T, D> alg1, DetectDescribePoint<T, D> alg2) {
@@ -208,6 +222,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 			}
 
 			assertTrue(matched != -1 );
+			assertEquals(alg1.getSet(i), alg2.getSet(i));
 
 			D desc1 = alg1.getDescription(i);
 			D desc2 = alg2.getDescription(matched);

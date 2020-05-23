@@ -60,7 +60,7 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 		this.numSets = 0;
 		if( detector.isDetectMinimums() )
 			numSets++;
-		if( detector.isDetectMinimums() )
+		if( detector.isDetectMaximums() )
 			numSets++;
 	}
 
