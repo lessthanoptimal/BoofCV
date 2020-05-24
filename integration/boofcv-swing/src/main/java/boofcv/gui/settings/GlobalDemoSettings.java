@@ -45,9 +45,13 @@ public class GlobalDemoSettings implements Cloneable {
 
 	private static String KEY_THEME = "theme";
 	private static String KEY_CONTROLS3D = "controls3D";
+	private static String KEY_VERBOSE_RUNTIME = "verboseRuntime";
+	private static String KEY_VERBOSE_TRACKING = "verboseTracking";
 
 	public ThemesUI theme = ThemesUI.DEFAULT;
 	public Controls3D controls3D = Controls3D.WASD;
+	public boolean verboseRuntime = false;
+	public boolean verboseTracking = false;
 
 	static {
 		SETTINGS.load();
@@ -59,6 +63,8 @@ public class GlobalDemoSettings implements Cloneable {
 		try {
 			theme = ThemesUI.valueOf(prefs.get(KEY_THEME, theme.name()));
 			controls3D = Controls3D.valueOf(prefs.get(KEY_CONTROLS3D, controls3D.name()));
+			verboseRuntime = prefs.getBoolean(KEY_VERBOSE_RUNTIME,verboseRuntime);
+			verboseTracking = prefs.getBoolean(KEY_VERBOSE_TRACKING,verboseTracking);
 		} catch( RuntimeException e ) {
 			// save the current state to fix whatever went wrong
 			save();
@@ -71,6 +77,8 @@ public class GlobalDemoSettings implements Cloneable {
 
 		prefs.put(KEY_THEME, theme.name());
 		prefs.put(KEY_CONTROLS3D, controls3D.name());
+		prefs.putBoolean(KEY_VERBOSE_RUNTIME, verboseRuntime);
+		prefs.putBoolean(KEY_VERBOSE_TRACKING, verboseTracking);
 
 		try {
 			prefs.sync();
@@ -125,6 +133,8 @@ public class GlobalDemoSettings implements Cloneable {
 	public GlobalDemoSettings copy() {
 		GlobalDemoSettings ret = new GlobalDemoSettings();
 		ret.theme = this.theme;
+		ret.verboseRuntime = this.verboseRuntime;
+		ret.verboseTracking = this.verboseTracking;
 		return ret;
 	}
 

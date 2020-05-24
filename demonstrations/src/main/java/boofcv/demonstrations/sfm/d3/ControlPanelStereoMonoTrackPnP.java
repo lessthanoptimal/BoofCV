@@ -20,7 +20,6 @@ package boofcv.demonstrations.sfm.d3;
 
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
 import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;
@@ -30,8 +29,6 @@ import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Peter Abeles
@@ -68,14 +65,8 @@ public class ControlPanelStereoMonoTrackPnP extends JPanel {
 
 		PointTracker<T> tracker = controlTrackers.createTracker(ImageType.single(imageType));
 		StereoDisparitySparse<T> disparity = controlDisparity.createAlgorithm(imageType);
-		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoMonoPnP(controlPnpDepth.config,disparity,tracker,imageType);
 
-		Set<String> configuration = new HashSet<>();
-		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
-//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
-		alg.setVerbose(System.out,configuration);
-
-		return alg;
+		return FactoryVisualOdometry.stereoMonoPnP(controlPnpDepth.config,disparity,tracker,imageType);
 	}
 
 	public interface Listener {

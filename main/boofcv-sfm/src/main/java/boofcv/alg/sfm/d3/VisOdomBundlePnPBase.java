@@ -314,6 +314,11 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		// Default to no verbosity
+		this.profileOut = null;
+		this.verbose = null;
+
+		// Update verbosity levels
 		if( configuration == null ) {
 			this.verbose = out;
 			return;

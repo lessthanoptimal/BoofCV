@@ -41,6 +41,9 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 	JComboBox<String> comboThemes = combo(settings.theme.ordinal(), GlobalDemoSettings.ThemesUI.values());
 	JComboBox<String> comboControl3D = combo(settings.controls3D.ordinal(), GlobalDemoSettings.Controls3D.values());
 
+	JCheckBox checkVerboseRuntime = checkbox("Verbose Runtime",settings.verboseRuntime);
+	JCheckBox checkVerboseTracking = checkbox("Verbose Tracking",settings.verboseTracking);
+
 	JButton bSave = new JButton("Save");
 	JButton bReset = new JButton("Reset");
 
@@ -53,15 +56,17 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 		bSave.addActionListener((e)-> handleSave());
 		bReset.addActionListener((e)-> handleReset());
 
-		addLabeled(comboThemes,"Themes");
+		addLabeled(comboThemes,"Themes","Change the Swing theme");
 		addLabeled(comboControl3D,"Control3D");
+		addAlignLeft(checkVerboseRuntime,"Turn on verbose output to stdout");
+		addAlignLeft(checkVerboseTracking,"Turn on verbose output to stdout");
 		addVerticalGlue();
 		JPanel foo = JSpringPanel.createLockedSides(bReset,bSave,30);
 		foo.setBorder(BorderFactory.createEmptyBorder(6,10,6,10));
 		foo.setPreferredSize(new Dimension(0,40));
 		foo.setMaximumSize(new Dimension(5000,40));
 		add(foo);
-		setPreferredSize(new Dimension(250,120));
+		setPreferredSize(new Dimension(250,180));
 	}
 
 	private void handleSave() {
@@ -89,6 +94,10 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 			changedTheme = true;
 		} else if( e.getSource() == comboControl3D ) {
 			settings.controls3D = GlobalDemoSettings.Controls3D.values()[comboControl3D.getSelectedIndex()];
+		} else if( e.getSource() == checkVerboseRuntime ) {
+			settings.verboseRuntime = checkVerboseRuntime.isSelected();
+		} else if( e.getSource() == checkVerboseTracking ) {
+			settings.verboseTracking = checkVerboseTracking.isSelected();
 		}
 	}
 

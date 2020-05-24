@@ -21,6 +21,7 @@ package boofcv.demonstrations.sfm.d3;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
+import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.sfm.d3.WrapVisOdomDualTrackPnP;
 import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
 import boofcv.alg.geo.PerspectiveOps;
@@ -39,6 +40,7 @@ import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.gui.settings.GlobalDemoSettings;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -69,7 +71,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static boofcv.gui.BoofSwingUtil.*;
 import static boofcv.io.image.ConvertBufferedImage.checkCopy;
@@ -209,12 +213,12 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	public StereoVisualOdometry<T> createSelectedAlgorithm() {
 		Class<T> imageType = getImageType(0).getImageClass();
 
-		if( controls.approach == 0 )
-			return controls.controlMonoTrack.createVisOdom(imageType);
-		else if( controls.approach == 1 )
-			return controls.controlDualTrack.createVisOdom(imageType);
-		else
-			return controls.controlQuad.createVisOdom(imageType);
+		return switch( controls.approach ) {
+			case 0 -> controls.controlMonoTrack.createVisOdom(imageType);
+			case 1 -> controls.controlDualTrack.createVisOdom(imageType);
+			case 2 -> controls.controlQuad.createVisOdom(imageType);
+			default -> throw new RuntimeException("Unknown approach "+controls.approach);
+		};
 	}
 
 	private static ConfigStereoMonoTrackPnP createConfigStereoMonoPnP() {
@@ -320,6 +324,8 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		alg.reset();
 		alg.setCalibration(stereoParameters);
 
+		configureVerbosity();
+
 		synchronized (features) {
 			features.reset();
 			trackId_to_arrayIdx.clear();
@@ -336,6 +342,20 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 			cloudPanel.configureViewer(hfov);
 			cloudPanel.gui.setTranslationStep(stereoParameters.getBaseline());
 		});
+	}
+
+	private void configureVerbosity() {
+		// Turn on verbose output if requested in global settings
+		GlobalDemoSettings settings = GlobalDemoSettings.SETTINGS.copy();
+		Set<String> configuration = new HashSet<>();
+		if( settings.verboseTracking )
+			configuration.add(VisualOdometry.VERBOSE_TRACKING);
+		if( settings.verboseRuntime )
+			configuration.add(VisualOdometry.VERBOSE_RUNTIME);
+		if( configuration.isEmpty() )
+			alg.setVerbose(null,null);
+		else
+			alg.setVerbose(System.out,configuration);
 	}
 
 	@Override
