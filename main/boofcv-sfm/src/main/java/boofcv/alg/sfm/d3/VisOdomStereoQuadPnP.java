@@ -20,6 +20,8 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
+import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.UtilPointFeatures;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
@@ -27,7 +29,6 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.sfm.d3.VisualOdometry;
-import boofcv.alg.descriptor.UtilFeature;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
@@ -102,7 +103,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	// Detects feature inside the image
 	private final DetectDescribePoint<T,TD> detector;
 	// Associates feature between the same camera
-	private final AssociateDescription<TD> assocF2F;
+	private final AssociateDescriptionSets<TD> assocF2F;
 	// Associates features from left to right camera
 	private final AssociateDescription2D<TD> assocL2R;
 
@@ -110,10 +111,10 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	private final @Getter FastQueue<TrackQuad> trackQuads = new FastQueue<>(TrackQuad::new, TrackQuad::reset);
 
 	// features info extracted from the stereo pairs. 0 = previous 1 = current
-	private ImageInfo<TD> featsLeft0,featsLeft1;
-	private ImageInfo<TD> featsRight0,featsRight1;
-	// Matched features between all four images.  One set of matches for each type of detected feature
-	private final SetMatches[] setMatches;
+	private ImageInfo featsLeft0,featsLeft1;
+	private ImageInfo featsRight0,featsRight1;
+	// Matched features between all four images
+	private final QuadMatches matches = new QuadMatches();
 
 	// stereo baseline going from left to right
 	private final Se3_F64 left_to_right = new Se3_F64();
@@ -171,7 +172,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 								BundleAdjustment<SceneStructureMetric> bundleAdjustment )
 	{
 		this.detector = detector;
-		this.assocF2F = assocF2F;
+		this.assocF2F = new AssociateDescriptionSets<>(assocF2F,detector.getDescriptionType());
 		this.assocL2R = assocL2R;
 		this.triangulate = triangulate;
 		this.matcher = matcher;
@@ -180,15 +181,12 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 		this.triangulateN = FactoryMultiView.triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC());
 
-		setMatches = new SetMatches[ 1 ];
-		for( int i = 0; i < setMatches.length; i++ ) {
-			setMatches[i] = new SetMatches();
-		}
+		featsLeft0 = new ImageInfo();
+		featsLeft1 = new ImageInfo();
+		featsRight0 = new ImageInfo();
+		featsRight1 = new ImageInfo();
 
-		featsLeft0 = new ImageInfo<>(detector);
-		featsLeft1 = new ImageInfo<>(detector);
-		featsRight0 = new ImageInfo<>(detector);
-		featsRight1 = new ImageInfo<>(detector);
+		this.assocF2F.initialize(detector.getNumberOfSets());
 
 		listNorm.resize(4);
 		listWorldToView.resize(4);
@@ -214,8 +212,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		featsLeft1.reset();
 		featsRight0.reset();
 		featsRight1.reset();
-		for( SetMatches m : setMatches )
-			m.reset();
+		matches.reset();
 		curr_to_key.reset();
 		left_to_world.reset();
 		frameID = -1;
@@ -239,7 +236,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		if( frameID==0 ) {
 			if( verbose != null ) verbose.println("first frame");
 			// mark all features as having no track
-			keyToTrackIdx.resize(featsLeft1.location[0].size);
+			keyToTrackIdx.resize(featsLeft1.locationPixels.size);
 			keyToTrackIdx.fill(-1);
 		} else {
 			long time2 = System.nanoTime();
@@ -292,7 +289,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		}
 
 		if( verbose != null ) {
-			int leftDetections = featsLeft1.location[0].size;
+			int leftDetections = featsLeft1.locationPixels.size;
 			int inliers = matcher.getMatchSet().size();
 			int matchesL2R = assocL2R.getMatches().size;
 			verbose.printf("Viso: Det: %4d L2R: %4d, Quad: %4d Inliers: %d\n",
@@ -307,10 +304,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 */
 	private void abortTrackingResetKeyFrame() {
 		swapFeatureFrames();
-		for( int i = 0; i < 1; i++ ) {
-			SetMatches matches = setMatches[i];
-			matches.swap();
-		}
+		matches.swap();
 	}
 
 	/**
@@ -386,7 +380,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		}
 
 		// Create a lookup table from feature index to track index
-		keyToTrackIdx.resize(featsLeft1.location[0].size);
+		keyToTrackIdx.resize(featsLeft1.locationPixels.size);
 		keyToTrackIdx.fill(-1);
 		for (int quadIdx = 0; quadIdx < trackQuads.size; quadIdx++) {
 			TrackQuad quad = trackQuads.get(quadIdx);
@@ -410,7 +404,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 * Swap the feature lists between key and current frames
 	 */
 	private void swapFeatureFrames() {
-		ImageInfo<TD> tmp = featsLeft1;
+		ImageInfo tmp = featsLeft1;
 		featsLeft1 = featsLeft0;
 		featsLeft0 = tmp;
 		tmp = featsRight1;
@@ -423,22 +417,19 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 */
 	private void associateL2R() {
 		// detect and associate features in the current stereo pair
-		for( int i = 0; i < 1; i++ ) {
-			SetMatches matches = setMatches[i];
-			matches.swap();
-			matches.match2to3.reset();
+		matches.swap();
+		matches.match2to3.reset();
 
-			FastQueue<Point2D_F64> leftLoc = featsLeft1.location[i];
-			FastQueue<Point2D_F64> rightLoc = featsRight1.location[i];
+		FastQueue<Point2D_F64> leftLoc = featsLeft1.locationPixels;
+		FastQueue<Point2D_F64> rightLoc = featsRight1.locationPixels;
 
-			assocL2R.setSource(leftLoc,featsLeft1.description[i]);
-			assocL2R.setDestination(rightLoc, featsRight1.description[i]);
-			assocL2R.associate();
+		assocL2R.setSource(leftLoc,featsLeft1.description);
+		assocL2R.setDestination(rightLoc, featsRight1.description);
+		assocL2R.associate();
 
-			FastAccess<AssociatedIndex> found = assocL2R.getMatches();
+		FastAccess<AssociatedIndex> found = assocL2R.getMatches();
 
-			setMatches(matches.match2to3, found, leftLoc.size);
-		}
+		setMatches(matches.match2to3, found, leftLoc.size);
 	}
 
 	/**
@@ -446,23 +437,19 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 */
 	private void associateF2F()
 	{
-		for( int i = 0; i < 1; i++ ) {
-			SetMatches matches = setMatches[i];
+		// old left to new left
+		UtilPointFeatures.setSource(featsLeft0.description,featsLeft0.sets,assocF2F);
+		UtilPointFeatures.setDestination(featsLeft1.description,featsLeft1.sets,assocF2F);
+		assocF2F.associate();
 
-			// old left to new left
-			assocF2F.setSource(featsLeft0.description[i]);
-			assocF2F.setDestination(featsLeft1.description[i]);
-			assocF2F.associate();
+		setMatches(matches.match0to2, assocF2F.getMatches(), featsLeft0.locationPixels.size);
 
-			setMatches(matches.match0to2, assocF2F.getMatches(), featsLeft0.location[i].size);
+		// old right to new right
+		UtilPointFeatures.setSource(featsRight0.description,featsRight0.sets,assocF2F);
+		UtilPointFeatures.setDestination(featsRight1.description,featsRight1.sets,assocF2F);
+		assocF2F.associate();
 
-			// old right to new right
-			assocF2F.setSource(featsRight0.description[i]);
-			assocF2F.setDestination(featsRight1.description[i]);
-			assocF2F.associate();
-
-			setMatches(matches.match1to3, assocF2F.getMatches(), featsRight0.location[i].size);
-		}
+		setMatches(matches.match1to3, assocF2F.getMatches(), featsRight0.locationPixels.size);
 	}
 
 	/**
@@ -476,57 +463,54 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 			trackQuads.get(i).leftCurrIndex = -1;
 		}
 
-		for( int setIdx = 0; setIdx < 1; setIdx++ ) {
-			FastQueue<Point2D_F64> obs0 = featsLeft0.location[setIdx];
-			FastQueue<Point2D_F64> obs1 = featsRight0.location[setIdx];
-			FastQueue<Point2D_F64> obs2 = featsLeft1.location[setIdx];
-			FastQueue<Point2D_F64> obs3 = featsRight1.location[setIdx];
+		FastQueue<Point2D_F64> obs0 = featsLeft0.locationPixels;
+		FastQueue<Point2D_F64> obs1 = featsRight0.locationPixels;
+		FastQueue<Point2D_F64> obs2 = featsLeft1.locationPixels;
+		FastQueue<Point2D_F64> obs3 = featsRight1.locationPixels;
 
-			SetMatches matches = setMatches[setIdx];
 
-			if( matches.match0to1.size != matches.match0to2.size )
-				throw new RuntimeException("Failed sanity check");
+		if( matches.match0to1.size != matches.match0to2.size )
+			throw new RuntimeException("Failed sanity check");
 
-			for( int indexIn0 = 0; indexIn0 < matches.match0to1.size; indexIn0++ ) {
-				int indexIn1 = matches.match0to1.data[indexIn0];
-				int indexIn2 = matches.match0to2.data[indexIn0];
+		for( int indexIn0 = 0; indexIn0 < matches.match0to1.size; indexIn0++ ) {
+			int indexIn1 = matches.match0to1.data[indexIn0];
+			int indexIn2 = matches.match0to2.data[indexIn0];
 
-				if( indexIn1 < 0 || indexIn2 < 0 )
-					continue;
+			if( indexIn1 < 0 || indexIn2 < 0 )
+				continue;
 
-				int indexIn3a = matches.match1to3.data[indexIn1];
-				int indexIn3b = matches.match2to3.data[indexIn2];
+			int indexIn3a = matches.match1to3.data[indexIn1];
+			int indexIn3b = matches.match2to3.data[indexIn2];
 
-				if( indexIn3a < 0 || indexIn3b < 0 )
-					continue;
+			if( indexIn3a < 0 || indexIn3b < 0 )
+				continue;
 
-				if( indexIn3a != indexIn3b )
-					continue;
+			if( indexIn3a != indexIn3b )
+				continue;
 
-				// passed the consistency test! Now see if the feature is already matched to a track
-				TrackQuad quad;
-				int trackIdx = keyToTrackIdx.get(indexIn0);
-				if( trackIdx == -1 ) {
-					quad = trackQuads.grow();
-					quad.id = totalTracks++;
-					quad.firstSceneFrameID = frameID;
-				} else {
-					quad = trackQuads.get(trackIdx);
-					quad.inlier = false;
-				}
-				quad.v0 = obs0.get(indexIn0);
-				quad.v1 = obs1.get(indexIn1);
-				quad.v2 = obs2.get(indexIn2);
-				quad.v3 = obs3.get(indexIn3a);
-
-				// if the feature did't have a track it's location needs to tbe triangulated
-				if( trackIdx == -1 ) {
-					if (!triangulateTrackTwoViews(quad))
-						continue;
-				}
-				// save it's index in the new frame left frame
-				quad.leftCurrIndex = indexIn2;
+			// passed the consistency test! Now see if the feature is already matched to a track
+			TrackQuad quad;
+			int trackIdx = keyToTrackIdx.get(indexIn0);
+			if( trackIdx == -1 ) {
+				quad = trackQuads.grow();
+				quad.id = totalTracks++;
+				quad.firstSceneFrameID = frameID;
+			} else {
+				quad = trackQuads.get(trackIdx);
+				quad.inlier = false;
 			}
+			quad.v0 = obs0.get(indexIn0);
+			quad.v1 = obs1.get(indexIn1);
+			quad.v2 = obs2.get(indexIn2);
+			quad.v3 = obs3.get(indexIn3a);
+
+			// if the feature did't have a track it's location needs to tbe triangulated
+			if( trackIdx == -1 ) {
+				if (!triangulateTrackTwoViews(quad))
+					continue;
+			}
+			// save it's index in the new frame left frame
+			quad.leftCurrIndex = indexIn2;
 		}
 	}
 
@@ -568,15 +552,17 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Computes image features and stores the results in info
 	 */
-	private void describeImage(T image , ImageInfo<TD> info ) {
+	private void describeImage(T image , ImageInfo info ) {
 		detector.detect(image);
-		FastQueue<Point2D_F64> l = info.location[0];
-		FastQueue<TD> d = info.description[0];
-		l.reset();
-		d.reset();
+		FastQueue<Point2D_F64> l = info.locationPixels;
+		FastQueue<TD> d = info.description;
+		l.resize(detector.getNumberOfFeatures());
+		d.resize(detector.getNumberOfFeatures());
+		info.sets.resize(detector.getNumberOfFeatures());
 		for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
-			l.grow().set( detector.getLocation(i) );
-			d.grow().setTo( detector.getDescription(i) );
+			l.data[i].set( detector.getLocation(i) );
+			d.data[i].setTo( detector.getDescription(i) );
+			info.sets.data[i] = detector.getSet(i);
 		}
 	}
 
@@ -691,33 +677,26 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Storage for detected features inside an image
 	 */
-	public static class ImageInfo<TD>
+	public class ImageInfo
 	{
-		FastQueue<Point2D_F64> location[];
-		FastQueue<TD> description[];
-
-		public ImageInfo( DetectDescribePoint detector ) {
-			location = new FastQueue[ 1 ];
-			description = new FastQueue[ 1];
-
-			for( int i = 0; i < location.length; i++ ) {
-				location[i] = new FastQueue<>(100, Point2D_F64::new);
-				description[i] = UtilFeature.createQueue(detector,100);
-			}
-		}
+		// Descriptor of each feature
+		FastQueue<TD> description = new FastQueue<>(detector::createDescription);
+		// The set each feature belongs in
+		GrowQueue_I32 sets = new GrowQueue_I32();
+		// The observed location in the image of each feature (pixels)
+		FastQueue<Point2D_F64> locationPixels = new FastQueue<>(Point2D_F64::new);
 
 		public void reset() {
-			for( int i = 0; i < location.length; i++ ) {
-				location[i].reset();
-				description[i].reset();
-			}
+			locationPixels.reset();
+			description.reset();
+			sets.reset();
 		}
 	}
 
 	/**
 	 * Correspondences between images
 	 */
-	public static class SetMatches {
+	public static class QuadMatches {
 		// previous left to previous right
 		GrowQueue_I32 match0to1 = new GrowQueue_I32(10);
 		// previous left to current left
