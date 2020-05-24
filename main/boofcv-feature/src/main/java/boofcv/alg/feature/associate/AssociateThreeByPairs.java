@@ -19,10 +19,13 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.AssociateDescriptionSets;
 import boofcv.abst.feature.associate.AssociateThreeDescription;
+import boofcv.abst.feature.associate.UtilPointFeatures;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.MatchScoreType;
+import boofcv.struct.feature.TupleDesc;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
@@ -34,17 +37,20 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<Desc> {
+public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateThreeDescription<Desc> {
 
 	// image to image association
-	protected AssociateDescription<Desc> associator;
+	protected AssociateDescriptionSets<Desc> associator;
 
 	// Reference to descriptions in each image
-	protected FastQueue<Desc> featuresA,featuresB,featuresC;
+	protected FastAccess<Desc> featuresA,featuresB,featuresC;
+	protected GrowQueue_I32 setsA,setsB,setsC;
 
-	// work space varaibles
+	// work space variables
 	protected FastArray<Desc> tmpB;
 	protected FastArray<Desc> tmpA;
+	protected GrowQueue_I32 tmpSetsA = new GrowQueue_I32();
+	protected GrowQueue_I32 tmpSetsB = new GrowQueue_I32();
 
 	// storage for final output
 	protected FastQueue<AssociatedTripleIndex> matches = new FastQueue<>(AssociatedTripleIndex::new);
@@ -61,25 +67,33 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 	public AssociateThreeByPairs(AssociateDescription<Desc> associator, Class<Desc> type ) {
 		if( !associator.uniqueDestination() || !associator.uniqueSource() )
 			throw new IllegalArgumentException("Both source and destination need to be unique");
-		this.associator = associator;
+		this.associator = new AssociateDescriptionSets<>(associator,type);
 
 		tmpB = new FastArray<>(type);
 		tmpA = new FastArray<>(type);
 	}
 
 	@Override
-	public void setFeaturesA(FastQueue<Desc> features) {
+	public void initialize(int numberOfSets) {
+		associator.initialize(numberOfSets);
+	}
+
+	@Override
+	public void setFeaturesA(FastAccess<Desc> features, GrowQueue_I32 sets) {
 		this.featuresA = features;
+		this.setsA = sets;
 	}
 
 	@Override
-	public void setFeaturesB(FastQueue<Desc> features) {
+	public void setFeaturesB(FastAccess<Desc> features, GrowQueue_I32 sets) {
 		this.featuresB = features;
+		this.setsB = sets;
 	}
 
 	@Override
-	public void setFeaturesC(FastQueue<Desc> features) {
+	public void setFeaturesC(FastAccess<Desc> features, GrowQueue_I32 sets) {
 		this.featuresC = features;
+		this.setsC = sets;
 	}
 
 	@Override
@@ -87,33 +101,38 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 		matches.reset();
 
 		// Associate view A to view B
-		associator.setSource(featuresA);
-		associator.setDestination(featuresB);
+		UtilPointFeatures.setSource(featuresA,setsA,associator);
+		UtilPointFeatures.setDestination(featuresB,setsB,associator);
 		associator.associate();
 		FastAccess<AssociatedIndex> pairs = associator.getMatches();
-		tmpB.reset();
-		tmpA.reset();
+		tmpA.resize(pairs.size); tmpSetsA.resize(pairs.size);
+		tmpB.resize(pairs.size); tmpSetsB.resize(pairs.size);
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
 			matches.grow().set(p.src,p.dst,-1);
 			// indexes of tmp lists will be the same as matches
-			tmpA.add(featuresA.data[p.src]);
-			tmpB.add(featuresB.data[p.dst]);
+			tmpA.data[i] = featuresA.data[p.src];
+			tmpB.data[i] = featuresB.data[p.dst];
+
+			tmpSetsA.data[i] = setsA.data[p.src];
+			tmpSetsB.data[i] = setsB.data[p.dst];
 		}
 
 		// Associate view B to view C, but only consider previously associated features in B
-		associator.setSource(tmpB);
-		associator.setDestination(featuresC);
+		UtilPointFeatures.setSource(tmpB,tmpSetsB,associator);
+		UtilPointFeatures.setDestination(featuresC,setsC,associator);
 		associator.associate();
 		pairs = associator.getMatches();
-		tmpB.reset();
+		tmpB.resize(pairs.size); tmpSetsB.resize(pairs.size);
 		srcToC.resize(pairs.size);
 		FastArray<Desc> tmpC = tmpB; // do this to make the code easier to read
+		GrowQueue_I32 tmpSetsC = tmpSetsB;
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
 			// tmpSrc points to indexes in matches
 			matches.get(p.src).c = p.dst;
-			tmpC.add(featuresC.data[p.dst]);
+			tmpC.data[i] = featuresC.data[p.dst];
+			tmpSetsC.data[i] = setsC.data[p.dst];
 			srcToC.data[i] = p.dst;           // save mapping back to original input index
 		}
 		// mark the unmatched as unmatched
@@ -124,8 +143,8 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 		}
 
 		// Associate view C to view A but only consider features which are currently in the triple
-		associator.setSource(tmpC);
-		associator.setDestination(tmpA);
+		UtilPointFeatures.setSource(tmpC,tmpSetsC,associator);
+		UtilPointFeatures.setDestination(tmpA,tmpSetsA,associator);
 		associator.associate();
 		pairs = associator.getMatches();
 		for (int i = 0; i < pairs.size; i++) {

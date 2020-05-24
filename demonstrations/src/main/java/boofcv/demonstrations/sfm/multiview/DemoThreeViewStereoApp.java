@@ -62,6 +62,7 @@ import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -99,9 +100,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	ThreeViewEstimateMetricScene structureEstimator = new ThreeViewEstimateMetricScene();
 
-	FastQueue<Point2D_F64> locations[] = new FastQueue[3];
-	FastQueue<TupleDesc> features[] = new FastQueue[3];
-	ImageDimension dimensions[] = new ImageDimension[3];
+	FastQueue<Point2D_F64>[] locations = new FastQueue[3];
+	FastQueue<TupleDesc>[] features = new FastQueue[3];
+	GrowQueue_I32[] featureSets = new GrowQueue_I32[3];
+	ImageDimension[] dimensions = new ImageDimension[3];
 
 	BufferedImage buff[] = new BufferedImage[3];
 
@@ -144,6 +146,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		for (int i = 0; i < 3; i++) {
 			locations[i] = new FastQueue<>(Point2D_F64::new);
 			dimensions[i] = new ImageDimension();
+			featureSets[i] = new GrowQueue_I32();
 		}
 
 		rectifiedPanel.setImages(visualRect1,visualRect2);
@@ -381,14 +384,16 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				declareFeatureMatching();
 			}
 			detDesc.detect((GrayU8) input);
-			locations[sourceID].reset();
-			features[sourceID].reset();
+			locations[sourceID].resize(detDesc.getNumberOfFeatures());
+			features[sourceID].resize(detDesc.getNumberOfFeatures());
+			featureSets[sourceID].resize(detDesc.getNumberOfFeatures());
 
 			// save results
 			for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 				Point2D_F64 pixel = detDesc.getLocation(i);
-				locations[sourceID].grow().set(pixel.x - cx, pixel.y - cy);
-				features[sourceID].grow().setTo(detDesc.getDescription(i));
+				locations[sourceID].data[i].set(pixel.x - cx, pixel.y - cy);
+				features[sourceID].data[i].setTo(detDesc.getDescription(i));
+				featureSets[sourceID].data[i] = detDesc.getSet(i);
 			}
 			System.out.println("   found features " + features[sourceID].size);
 		} catch( RuntimeException e ) {
@@ -505,9 +510,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		if( !skipAssociate ) {
 			System.out.println("Associating three views");
-			associateThree.setFeaturesA(features[0]);
-			associateThree.setFeaturesB(features[1]);
-			associateThree.setFeaturesC(features[2]);
+			associateThree.initialize(detDesc.getNumberOfSets());
+			associateThree.setFeaturesA(features[0], featureSets[0]);
+			associateThree.setFeaturesB(features[1], featureSets[1]);
+			associateThree.setFeaturesC(features[2], featureSets[2]);
 			associateThree.associate();
 
 			FastQueue<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();

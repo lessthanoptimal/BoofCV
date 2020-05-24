@@ -26,6 +26,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +40,9 @@ class TestAssociateThreeByPairs {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -50,14 +54,23 @@ class TestAssociateThreeByPairs {
 			featuresC.grow().set(i);
 		}
 
+		// there is only one set
+		featuresSetA.resize(featuresA.size);
+		featuresSetA.fill(0);
+		featuresSetB.resize(featuresB.size);
+		featuresSetB.fill(0);
+		featuresSetC.resize(featuresC.size);
+		featuresSetC.fill(0);
+
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,1e-8),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
-		alg.setFeaturesA(featuresA);
-		alg.setFeaturesB(featuresB);
-		alg.setFeaturesC(featuresC);
+		alg.initialize(1);
+		alg.setFeaturesA(featuresA, featuresSetA);
+		alg.setFeaturesB(featuresB, featuresSetB);
+		alg.setFeaturesC(featuresC, featuresSetC);
 
 		alg.associate();
 
@@ -81,6 +94,9 @@ class TestAssociateThreeByPairs {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -92,15 +108,23 @@ class TestAssociateThreeByPairs {
 			featuresC.grow().set(i+0.2);
 		}
 
+		// there is only one set
+		featuresSetA.resize(featuresA.size);
+		featuresSetA.fill(0);
+		featuresSetB.resize(featuresB.size);
+		featuresSetB.fill(0);
+		featuresSetC.resize(featuresC.size);
+		featuresSetC.fill(0);
+
 		double maxError = 0.1*0.1+0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
-		alg.setFeaturesA(featuresA);
-		alg.setFeaturesB(featuresB);
-		alg.setFeaturesC(featuresC);
+		alg.setFeaturesA(featuresA, featuresSetA);
+		alg.setFeaturesB(featuresB, featuresSetB);
+		alg.setFeaturesC(featuresC, featuresSetC);
 
 		alg.associate();
 
@@ -117,6 +141,9 @@ class TestAssociateThreeByPairs {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -128,15 +155,24 @@ class TestAssociateThreeByPairs {
 			featuresC.grow().set(i+0.22);
 		}
 
+		// there is only one set
+		featuresSetA.resize(featuresA.size);
+		featuresSetA.fill(0);
+		featuresSetB.resize(featuresB.size);
+		featuresSetB.fill(0);
+		featuresSetC.resize(featuresC.size);
+		featuresSetC.fill(0);
+
+
 		double maxError = 0.1*0.1+0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
-		alg.setFeaturesA(featuresA);
-		alg.setFeaturesB(featuresB);
-		alg.setFeaturesC(featuresC);
+		alg.setFeaturesA(featuresA, featuresSetA);
+		alg.setFeaturesB(featuresB, featuresSetB);
+		alg.setFeaturesC(featuresC, featuresSetC);
 
 		alg.associate();
 
@@ -153,6 +189,9 @@ class TestAssociateThreeByPairs {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
+		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -164,15 +203,23 @@ class TestAssociateThreeByPairs {
 			featuresC.grow().set(i+0.3);
 		}
 
+		// there is only one set
+		featuresSetA.resize(featuresA.size);
+		featuresSetA.fill(0);
+		featuresSetB.resize(featuresB.size);
+		featuresSetB.fill(0);
+		featuresSetC.resize(featuresC.size);
+		featuresSetC.fill(0);
+
 		double maxError = 0.1*0.1+0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
-		alg.setFeaturesA(featuresA);
-		alg.setFeaturesB(featuresB);
-		alg.setFeaturesC(featuresC);
+		alg.setFeaturesA(featuresA, featuresSetA);
+		alg.setFeaturesB(featuresB, featuresSetB);
+		alg.setFeaturesC(featuresC, featuresSetC);
 
 		alg.associate();
 

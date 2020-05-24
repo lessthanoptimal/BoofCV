@@ -70,6 +70,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -155,6 +156,9 @@ public class ExampleTrifocalStereoUncalibrated {
 		FastQueue<BrightFeature> features01 = UtilFeature.createQueue(detDesc,100);
 		FastQueue<BrightFeature> features02 = UtilFeature.createQueue(detDesc,100);
 		FastQueue<BrightFeature> features03 = UtilFeature.createQueue(detDesc,100);
+		GrowQueue_I32 featureSet01 = new GrowQueue_I32();
+		GrowQueue_I32 featureSet02 = new GrowQueue_I32();
+		GrowQueue_I32 featureSet03 = new GrowQueue_I32();
 
 		// Converting data formats for the found features into what can be processed by SFM algorithms
 		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
@@ -171,18 +175,21 @@ public class ExampleTrifocalStereoUncalibrated {
 			Point2D_F64 pixel = detDesc.getLocation(i);
 			locations01.grow().set(pixel.x-cx,pixel.y-cy);
 			features01.grow().setTo(detDesc.getDescription(i));
+			featureSet01.add(detDesc.getSet(i));
 		}
 		detDesc.detect(image02);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
 			locations02.grow().set(pixel.x-cx,pixel.y-cy);
 			features02.grow().setTo(detDesc.getDescription(i));
+			featureSet02.add(detDesc.getSet(i));
 		}
 		detDesc.detect(image03);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
 			locations03.grow().set(pixel.x-cx,pixel.y-cy);
 			features03.grow().setTo(detDesc.getDescription(i));
+			featureSet03.add(detDesc.getSet(i));
 		}
 
 		System.out.println("features01.size = "+features01.size);
@@ -194,9 +201,10 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		AssociateThreeByPairs<BrightFeature> associateThree = new AssociateThreeByPairs<>(associate,BrightFeature.class);
 
-		associateThree.setFeaturesA(features01);
-		associateThree.setFeaturesB(features02);
-		associateThree.setFeaturesC(features03);
+		associateThree.initialize(detDesc.getNumberOfSets());
+		associateThree.setFeaturesA(features01, featureSet01);
+		associateThree.setFeaturesB(features02, featureSet02);
+		associateThree.setFeaturesC(features03, featureSet03);
 
 		associateThree.associate();
 

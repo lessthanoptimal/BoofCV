@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,9 @@ package boofcv.abst.feature.associate;
 
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
@@ -31,22 +33,30 @@ import org.ddogleg.struct.FastQueue;
 public interface AssociateThreeDescription<Desc> {
 
 	/**
-	 * Specify descriptors in image A
-	 * @param features feature descriptors
+	 * Must call first. It specifies the number of sets feature descriptors can belong inside of
 	 */
-	void setFeaturesA( FastQueue<Desc> features );
+	void initialize( int numberOfSets );
+
+	/**
+	 * Specify descriptors in image A
+	 * @param features (Input) feature descriptors. Reference is saved.
+	 * @param sets (Input) Which sets the features belong to. Reference is saved.
+	 */
+	void setFeaturesA(FastAccess<Desc> features , GrowQueue_I32 sets);
 
 	/**
 	 * Specify descriptors in image B
-	 * @param features feature descriptors
+	 * @param features feature descriptors. Reference is saved.
+	 * @param sets (Input) Which sets the features belong to. Reference is saved.
 	 */
-	void setFeaturesC( FastQueue<Desc> features );
+	void setFeaturesC(FastAccess<Desc> features , GrowQueue_I32 sets );
 
 	/**
 	 * Specify descriptors in image C
-	 * @param features feature descriptors
+	 * @param features feature descriptors. Reference is saved.
+	 * @param sets (Input) Which sets the features belong to. Reference is saved.
 	 */
-	void setFeaturesB( FastQueue<Desc> features );
+	void setFeaturesB(FastAccess<Desc> features , GrowQueue_I32 sets );
 
 	/**
 	 * Finds the best match for each item in the source list with an item in the destination list.
@@ -59,7 +69,6 @@ public interface AssociateThreeDescription<Desc> {
 	 * @return List of associated features.
 	 */
 	FastQueue<AssociatedTripleIndex> getMatches();
-
 
 	/**
 	 * Associations are only considered if their score is less than or equal to the specified threshold.  To remove
