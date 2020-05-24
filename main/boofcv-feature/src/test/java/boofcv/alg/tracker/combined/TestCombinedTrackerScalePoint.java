@@ -18,19 +18,17 @@
 
 package boofcv.alg.tracker.combined;
 
-import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.AssociateDescriptionSets;
 import boofcv.abst.feature.detdesc.DetectDescribePointAbstract;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -39,10 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class TestCombinedTrackerScalePoint {
+class TestCombinedTrackerScalePoint {
 
 	@Test
-	public void reset() {
+	void reset() {
 		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
 
 		addTracks(alg.tracksDormant, 1);
@@ -64,7 +62,7 @@ public class TestCombinedTrackerScalePoint {
 	}
 
 	@Test
-	public void dropAllTracks() {
+	void dropAllTracks() {
 		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
 
 		addTracks(alg.tracksDormant,1);
@@ -85,7 +83,7 @@ public class TestCombinedTrackerScalePoint {
 	}
 
 	@Test
-	public void updateTracks() {
+	void updateTracks() {
 		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
 
 		alg.trackerKlt = new DummyKlt();
@@ -105,12 +103,12 @@ public class TestCombinedTrackerScalePoint {
 	}
 
 	@Test
-	public void associateAllToDetected() {
+	void associateAllToDetected() {
 		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
 
 		alg.detectedDesc = new FastArray(BrightFeature.class);
 		alg.knownDesc = new FastArray(BrightFeature.class);
-		alg.associate = new DummyAssoc(15);
+		alg.associate = new DummyAssoc(20);
 		alg.detector = new DummyDetector(20);
 		alg.trackerKlt = new DummyKlt();
 
@@ -162,14 +160,20 @@ public class TestCombinedTrackerScalePoint {
 		public void setDescription( float x , float y , PyramidKltFeature ret ) {}
 	}
 
-	private static class DummyAssoc implements AssociateDescription {
 
+	private static class DummyAssoc extends AssociateDescriptionSets {
 		int N;
 
-		private DummyAssoc(int n) {N = n;}
+		public DummyAssoc(int N ) {
+			super(null,BrightFeature.class);
+			this.N = N;
+		}
 
 		@Override
-		public FastQueue<AssociatedIndex> getMatches() {
+		public void initialize(int numberOfSets) {}
+
+		@Override
+		public FastAccess<AssociatedIndex> getMatches() {
 			FastQueue<AssociatedIndex> queue = new FastQueue<>(N, AssociatedIndex::new);
 
 			for( int i = 0; i < N; i++ ) {
@@ -178,16 +182,6 @@ public class TestCombinedTrackerScalePoint {
 
 			return queue;
 		}
-
-		@Override public void setSource(FastAccess listSrc) {}
-		@Override public void setDestination(FastAccess listDst) {}
-		@Override public void associate() {}
-		@Override public GrowQueue_I32 getUnassociatedSource() {return null;}
-		@Override public GrowQueue_I32 getUnassociatedDestination() {return null;}
-		@Override public void setMaxScoreThreshold(double score) {}
-		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
-		@Override public boolean uniqueSource() {return false;}
-		@Override public boolean uniqueDestination() {return false;}
 	}
 
 	private static class DummyDetector extends DetectDescribePointAbstract {
@@ -197,5 +191,7 @@ public class TestCombinedTrackerScalePoint {
 		private DummyDetector(int n) {N = n;}
 		@Override public int getNumberOfFeatures() {return N;}
 		@Override public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64(2,2);}
+		@Override public int getNumberOfSets() {return 1;}
+		@Override public int getSet(int index) {return 0;}
 	}
 }

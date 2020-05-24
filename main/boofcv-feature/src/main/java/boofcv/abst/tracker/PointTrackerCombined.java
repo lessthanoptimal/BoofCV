@@ -151,7 +151,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 
 			p.pixel.set(t.pixel);
 			p.setDescription(t);
-			p.featureId = t.featureId;
+			p.featureId = t.trackID;
 			p.spawnFrameID = frameID;
 		}
 

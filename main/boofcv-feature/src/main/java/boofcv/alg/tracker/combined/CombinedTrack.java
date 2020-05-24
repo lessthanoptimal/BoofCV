@@ -28,13 +28,16 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class CombinedTrack<TD extends TupleDesc> {
+	// Location of the track in the image in pixels
 	public final Point2D_F64 pixel = new Point2D_F64();
 	// KLT feature description
 	public PyramidKltFeature track;
 	// DDA type description
-	public TD desc;
+	public TD featureDesc;
 	// Feature ID
-	public long featureId;
+	public long trackID;
+	// The feature set that the feature belongs to
+	public int featureSet;
 
 	// user storage
 	Object cookie;

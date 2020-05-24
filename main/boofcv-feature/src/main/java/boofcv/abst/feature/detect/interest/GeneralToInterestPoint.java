@@ -54,14 +54,7 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 								  double radius,
 								  Class<T> imageType, Class<D> derivType) {
 		super(detector,imageType,derivType);
-		this.radius = radius;
-
-		// Maximums and minimums are each considered a different set
-		this.numSets = 0;
-		if( detector.isDetectMinimums() )
-			numSets++;
-		if( detector.isDetectMaximums() )
-			numSets++;
+		configure(detector, radius);
 	}
 
 	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
@@ -70,7 +63,18 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 								  double radius,
 								  Class<D> derivType) {
 		super(detector, gradient, hessian, derivType);
+		configure(detector, radius);
+	}
+
+	private void configure(GeneralFeatureDetector<T, D> detector, double radius) {
 		this.radius = radius;
+
+		// Maximums and minimums are each considered a different set
+		this.numSets = 0;
+		if (detector.isDetectMinimums())
+			numSets++;
+		if (detector.isDetectMaximums())
+			numSets++;
 	}
 
 	@Override

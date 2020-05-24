@@ -42,9 +42,9 @@ TODO Interest Point Detector
 
 TODO DetectDescribe
   - Integrate in sets and remove specialized class
-     * Three View
-     * Create a new example for association with sets?
   - Simplify and add sets to Associate2D
+     * PointTacker DDA
+     * PointTracker Combined
 
 TODO Visual Odometry
   - Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments

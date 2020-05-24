@@ -67,6 +67,8 @@ public class AssociateDescriptionSets<Desc> implements Associate {
 	 * function.
 	 */
 	public void initialize(int numberOfSets ) {
+		assert(numberOfSets>0);
+
 		countSrc = 0;
 		countDst = 0;
 		unassociatedDst.reset();
@@ -88,7 +90,7 @@ public class AssociateDescriptionSets<Desc> implements Associate {
 	}
 
 	/**
-	 * Removes all data for the destination descritpors.
+	 * Removes all data for the destination descriptors.
 	 */
 	public void clearDestination() {
 		unassociatedDst.reset();

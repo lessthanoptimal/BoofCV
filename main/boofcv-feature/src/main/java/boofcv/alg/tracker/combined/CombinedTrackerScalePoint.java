@@ -19,7 +19,9 @@
 package boofcv.alg.tracker.combined;
 
 import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.AssociateDescriptionSets;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
@@ -27,6 +29,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +58,7 @@ public class CombinedTrackerScalePoint
 	// feature detector and describer
 	protected DetectDescribePoint<I,TD> detector;
 	// Used to associate features using their DDA description
-	protected AssociateDescription<TD> associate;
+	protected AssociateDescriptionSets<TD> associate;
 
 	// all active tracks that have been tracked purely by KLT
 	protected List<CombinedTrack<TD>> tracksPureKlt = new ArrayList<>();
@@ -71,6 +74,8 @@ public class CombinedTrackerScalePoint
 	// local storage used by association
 	protected FastArray<TD> detectedDesc;
 	protected FastArray<TD> knownDesc;
+	protected GrowQueue_I32 detectedSet = new GrowQueue_I32();
+	protected GrowQueue_I32 knownSet = new GrowQueue_I32();
 
 	// number of tracks it has created
 	protected long totalTracks = 0;
@@ -91,10 +96,11 @@ public class CombinedTrackerScalePoint
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 
-		detectedDesc = new FastArray<TD>(detector.getDescriptionType());
-		knownDesc = new FastArray<TD>( detector.getDescriptionType());
+		detectedDesc = new FastArray<>(detector.getDescriptionType());
+		knownDesc = new FastArray<>( detector.getDescriptionType());
 
-		this.associate = associate;
+		this.associate = new AssociateDescriptionSets<>(associate,detector.getDescriptionType());
+		this.associate.initialize(detector.getNumberOfSets());
 	}
 
 	/**
@@ -188,15 +194,16 @@ public class CombinedTrackerScalePoint
 				track = tracksUnused.pop();
 			} else {
 				track = new CombinedTrack<>();
-				track.desc = detector.createDescription();
+				track.featureDesc = detector.createDescription();
 				track.track = trackerKlt.createNewTrack();
 			}
 
 			// create the descriptor for tracking
 			trackerKlt.setDescription((float)p.x,(float)p.y,track.track);
 			// set track ID and location
-			track.featureId = totalTracks++;
-			track.desc.setTo(d);
+			track.trackID = totalTracks++;
+			track.featureDesc.setTo(d);
+			track.featureSet = detectedSet.get(i);
 			track.pixel.set(p);
 
 			// update list of active tracks
@@ -212,27 +219,33 @@ public class CombinedTrackerScalePoint
 	 * @param known List of known tracks
 	 */
 	private void associateToDetected( List<CombinedTrack<TD>> known ) {
+		int N = detector.getNumberOfFeatures();
+
 		// initialize data structures
-		detectedDesc.reset();
-		knownDesc.reset();
+		detectedDesc.resize(N);
+		detectedSet.resize(N);
 
 		// create a list of detected feature descriptions
-		int N = detector.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
-			detectedDesc.add(detector.getDescription(i));
+			detectedDesc.data[i] = detector.getDescription(i);
+			detectedSet.data[i] = detector.getSet(i);
 		}
 
 		// create a list of previously created track descriptions
-		for( CombinedTrack<TD> t : known ) {
-			knownDesc.add(t.desc);
+		knownDesc.resize(known.size());
+		knownSet.resize(known.size());
+		for (int i = 0; i < known.size(); i++) {
+			CombinedTrack<TD> t = known.get(i);
+			knownDesc.data[i] = t.featureDesc;
+			knownSet.data[i] = t.featureSet;
 		}
 
 		// associate features
-		associate.setSource(knownDesc);
-		associate.setDestination(detectedDesc);
+		UtilFeature.setSource(knownDesc,knownSet,associate);
+		UtilFeature.setDestination(detectedDesc,detectedSet,associate);
 		associate.associate();
 
-		N = Math.max(known.size(),detector.getNumberOfFeatures());
+		N = Math.max(known.size(),N);
 		if( associated.length < N )
 			associated = new boolean[N];
 	}
