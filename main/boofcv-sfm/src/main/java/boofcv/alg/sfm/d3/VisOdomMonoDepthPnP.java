@@ -191,7 +191,6 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		//=============================================================================================
 		//========== Perform maintenance by dropping elements from the scene
 		dropBadBundleTracks();
-		updateListOfVisibleTracksForOutput();
 		if( verbose != null ) verbose.println("   Bad Bundle Trk   "+ totalDroppedTracksBadBundle);
 		long time4 = System.nanoTime();
 		boolean droppedCurrentFrame = performKeyFrameMaintenance(tracker,1);
@@ -363,7 +362,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			} else {
 				if( scene.findByTrackerTrack(t) != null ) {
 					Track btrack = scene.findByTrackerTrack(t);
-					System.out.println("BUG! Tracker recycled... bt="+btrack.id+" tt="+t.featureId);
+//					System.out.println("BUG! Tracker recycled... bt="+btrack.id+" tt="+t.featureId);
 					throw new RuntimeException("BUG! Recycled tracker track too early tt="+t.featureId);
 				}
 				// Save the track's 3D location and add it to the current frame

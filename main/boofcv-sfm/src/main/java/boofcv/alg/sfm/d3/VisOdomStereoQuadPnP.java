@@ -775,6 +775,11 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		// Default to no verbose messages
+		this.verbose = null;
+		this.profileOut = null;
+
+		// Update the level of verbosity based on the request
 		if( configuration == null ) {
 			this.verbose = out;
 			return;

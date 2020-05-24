@@ -66,15 +66,8 @@ public class ControlPanelStereoDualTrackPnP extends JTabbedPane {
 		PointTracker<T> trackerLeft = controlTrackers.createTracker(ImageType.single(imageType));
 		PointTracker<T> trackerRight = controlTrackers.createTracker(ImageType.single(imageType));
 
-		StereoVisualOdometry<T> alg = FactoryVisualOdometry.stereoDualTrackerPnP(controlPnpDepth.config,
+		return FactoryVisualOdometry.stereoDualTrackerPnP(controlPnpDepth.config,
 				trackerLeft,trackerRight,config,imageType);
-
-//		Set<String> configuration = new HashSet<>();
-//		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
-//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
-//		alg.setVerbose(System.out,configuration);
-
-		return alg;
 	}
 
 	public class StereoControls extends StandardAlgConfigPanel {

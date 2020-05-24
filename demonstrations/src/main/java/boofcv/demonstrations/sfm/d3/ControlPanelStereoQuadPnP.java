@@ -19,7 +19,6 @@
 package boofcv.demonstrations.sfm.d3;
 
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.geo.EnumPNP;
@@ -31,8 +30,6 @@ import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Control Panel for {@link ConfigStereoQuadPnP}
@@ -66,15 +63,7 @@ public class ControlPanelStereoQuadPnP extends JTabbedPane {
 
 	public <T extends ImageGray<T>>
 	StereoVisualOdometry<T> createVisOdom(Class<T> imageType ) {
-
-		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoQuadPnP(config,imageType);
-
-		Set<String> configuration = new HashSet<>();
-		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
-		configuration.add(VisualOdometry.VERBOSE_TRACKING);
-		alg.setVerbose(System.out,configuration);
-
-		return alg;
+		return FactoryVisualOdometry.stereoQuadPnP(config,imageType);
 	}
 
 	public class ControlPanelAssociate extends StandardAlgConfigPanel {
