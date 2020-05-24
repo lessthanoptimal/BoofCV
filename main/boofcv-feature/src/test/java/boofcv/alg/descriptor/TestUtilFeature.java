@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -93,5 +94,15 @@ public class TestUtilFeature {
 		UtilFeature.normalizeSumOne(feature);
 		for( int i = 0; i < feature.value.length; i++ )
 			assertEquals(0,feature.value[i],1e-4);
+	}
+
+	@Test
+	void setSource() {
+		fail("implement");
+	}
+
+	@Test
+	void setDestination() {
+		fail("implement");
 	}
 }

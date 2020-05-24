@@ -21,7 +21,6 @@ package boofcv.alg.sfm.d3;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.AssociateDescriptionSets;
-import boofcv.abst.feature.associate.UtilPointFeatures;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
@@ -29,6 +28,7 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.sfm.d3.VisualOdometry;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
@@ -438,15 +438,15 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	private void associateF2F()
 	{
 		// old left to new left
-		UtilPointFeatures.setSource(featsLeft0.description,featsLeft0.sets,assocF2F);
-		UtilPointFeatures.setDestination(featsLeft1.description,featsLeft1.sets,assocF2F);
+		UtilFeature.setSource(featsLeft0.description,featsLeft0.sets,assocF2F);
+		UtilFeature.setDestination(featsLeft1.description,featsLeft1.sets,assocF2F);
 		assocF2F.associate();
 
 		setMatches(matches.match0to2, assocF2F.getMatches(), featsLeft0.locationPixels.size);
 
 		// old right to new right
-		UtilPointFeatures.setSource(featsRight0.description,featsRight0.sets,assocF2F);
-		UtilPointFeatures.setDestination(featsRight1.description,featsRight1.sets,assocF2F);
+		UtilFeature.setSource(featsRight0.description,featsRight0.sets,assocF2F);
+		UtilFeature.setDestination(featsRight1.description,featsRight1.sets,assocF2F);
 		assocF2F.associate();
 
 		setMatches(matches.match1to3, assocF2F.getMatches(), featsRight0.locationPixels.size);

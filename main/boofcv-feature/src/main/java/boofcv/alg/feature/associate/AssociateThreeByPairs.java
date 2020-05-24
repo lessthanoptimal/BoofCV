@@ -21,7 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescriptionSets;
 import boofcv.abst.feature.associate.AssociateThreeDescription;
-import boofcv.abst.feature.associate.UtilPointFeatures;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.MatchScoreType;
@@ -101,8 +101,8 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		matches.reset();
 
 		// Associate view A to view B
-		UtilPointFeatures.setSource(featuresA,setsA,associator);
-		UtilPointFeatures.setDestination(featuresB,setsB,associator);
+		UtilFeature.setSource(featuresA,setsA,associator);
+		UtilFeature.setDestination(featuresB,setsB,associator);
 		associator.associate();
 		FastAccess<AssociatedIndex> pairs = associator.getMatches();
 		tmpA.resize(pairs.size); tmpSetsA.resize(pairs.size);
@@ -119,8 +119,8 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		}
 
 		// Associate view B to view C, but only consider previously associated features in B
-		UtilPointFeatures.setSource(tmpB,tmpSetsB,associator);
-		UtilPointFeatures.setDestination(featuresC,setsC,associator);
+		UtilFeature.setSource(tmpB,tmpSetsB,associator);
+		UtilFeature.setDestination(featuresC,setsC,associator);
 		associator.associate();
 		pairs = associator.getMatches();
 		tmpB.resize(pairs.size); tmpSetsB.resize(pairs.size);
@@ -143,8 +143,8 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		}
 
 		// Associate view C to view A but only consider features which are currently in the triple
-		UtilPointFeatures.setSource(tmpC,tmpSetsC,associator);
-		UtilPointFeatures.setDestination(tmpA,tmpSetsA,associator);
+		UtilFeature.setSource(tmpC,tmpSetsC,associator);
+		UtilFeature.setDestination(tmpA,tmpSetsA,associator);
 		associator.associate();
 		pairs = associator.getMatches();
 		for (int i = 0; i < pairs.size; i++) {

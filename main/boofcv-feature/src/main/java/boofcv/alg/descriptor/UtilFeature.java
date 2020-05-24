@@ -18,11 +18,14 @@
 
 package boofcv.alg.descriptor;
 
+import boofcv.abst.feature.associate.AssociateDescriptionSets;
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
 
@@ -127,6 +130,42 @@ public class UtilFeature {
 
 		for (int i = 0; i < desc.size(); i++) {
 			desc.value[i] /= sum;
+		}
+	}
+
+	/**
+	 * Adds the feature descriptor and its set to the association algorithm
+	 * @param descriptors (Input) Descriptor of each feature
+	 * @param sets (Input) Set each feature belongs in
+	 * @param association (Output) association algorithm which is having its source configured
+	 */
+	public static <TD extends TupleDesc>
+	void setSource(FastAccess<TD> descriptors , GrowQueue_I32 sets , AssociateDescriptionSets<TD> association )
+	{
+		assert(descriptors.size==sets.size);
+
+		association.clearSource();
+		final int N = descriptors.size;
+		for (int i = 0; i < N; i++) {
+			association.addSource(descriptors.data[i],sets.data[i]);
+		}
+	}
+
+	/**
+	 * Adds the feature descriptor and its set to the association algorithm
+	 * @param descriptors (Input) Descriptor of each feature
+	 * @param sets (Input) Set each feature belongs in
+	 * @param association (Output) association algorithm which is having its destination configured
+	 */
+	public static <TD extends TupleDesc>
+	void setDestination(FastAccess<TD> descriptors , GrowQueue_I32 sets , AssociateDescriptionSets<TD> association )
+	{
+		assert(descriptors.size==sets.size);
+
+		association.clearDestination();
+		final int N = descriptors.size;
+		for (int i = 0; i < N; i++) {
+			association.addDestination(descriptors.data[i],sets.data[i]);
 		}
 	}
 }
