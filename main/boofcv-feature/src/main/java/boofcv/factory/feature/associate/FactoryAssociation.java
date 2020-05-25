@@ -179,11 +179,11 @@ public class FactoryAssociation {
 		if( NccFeature.class.isAssignableFrom(tupleType) ) {
 			return (ScoreAssociation)new ScoreAssociateNccFeature();
 		} else if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
-			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F64();
+			return (ScoreAssociation)new ScoreAssociateEuclideanSq.F64();
 		} else if( tupleType == TupleDesc_F32.class ) {
-			return (ScoreAssociation)new ScoreAssociateEuclideanSq_F32();
+			return (ScoreAssociation)new ScoreAssociateEuclideanSq.F32();
 		} else if( tupleType == TupleDesc_U8.class ) {
-			return (ScoreAssociation)new ScoreAssociateSad_U8();
+			return (ScoreAssociation)new ScoreAssociateSad.U8();
 		} else if( tupleType == TupleDesc_B.class  ) {
 			return (ScoreAssociation)new ScoreAssociateHamming_B();
 		} else {
@@ -200,13 +200,13 @@ public class FactoryAssociation {
 	public static <D>
 	ScoreAssociation<D> scoreSad( Class<D> tupleType ) {
 		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
-			return (ScoreAssociation)new ScoreAssociateSad_F64();
+			return (ScoreAssociation)new ScoreAssociateSad.F64();
 		} else if( tupleType == TupleDesc_F32.class ) {
-			return (ScoreAssociation)new ScoreAssociateSad_F32();
+			return (ScoreAssociation)new ScoreAssociateSad.F32();
 		} else if( tupleType == TupleDesc_U8.class ) {
-			return (ScoreAssociation)new ScoreAssociateSad_U8();
+			return (ScoreAssociation)new ScoreAssociateSad.U8();
 		} else if( tupleType == TupleDesc_S8.class ) {
-			return (ScoreAssociation)new ScoreAssociateSad_S8();
+			return (ScoreAssociation)new ScoreAssociateSad.S8();
 		} else {
 			throw new IllegalArgumentException("SAD score not supported for type "+tupleType.getSimpleName());
 		}
@@ -233,12 +233,12 @@ public class FactoryAssociation {
 	ScoreAssociation<D> scoreEuclidean( Class<D> tupleType , boolean squared ) {
 		if( TupleDesc_F64.class.isAssignableFrom(tupleType) ) {
 			if( squared )
-				return (ScoreAssociation)new ScoreAssociateEuclideanSq_F64();
+				return (ScoreAssociation)new ScoreAssociateEuclideanSq.F64();
 			else
 				return (ScoreAssociation)new ScoreAssociateEuclidean_F64();
 		} else if( tupleType == TupleDesc_F32.class ) {
 			if( squared )
-				return (ScoreAssociation)new ScoreAssociateEuclideanSq_F32();
+				return (ScoreAssociation)new ScoreAssociateEuclideanSq.F32();
 		}
 
 		throw new IllegalArgumentException("Euclidean score not yet supported for type "+tupleType.getSimpleName());

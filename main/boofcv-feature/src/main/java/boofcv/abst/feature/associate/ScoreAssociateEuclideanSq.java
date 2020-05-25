@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,24 +20,25 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.struct.feature.MatchScoreType;
+import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_F64;
-
 
 /**
  * Scores based on Euclidean distance squared
  *
- * @see DescriptorDistance#euclideanSq(TupleDesc_F64, TupleDesc_F64)
+ * @see DescriptorDistance#euclideanSq(TupleDesc_F32, TupleDesc_F32)
  *
  * @author Peter Abeles
  */
-public class ScoreAssociateEuclideanSq_F64 implements ScoreAssociation<TupleDesc_F64> {
-	@Override
-	public double score(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclideanSq(a, b);
+public interface ScoreAssociateEuclideanSq<Desc> extends ScoreAssociation<Desc> {
+
+	class F32 implements ScoreAssociateEuclideanSq<TupleDesc_F32> {
+		@Override public double score(TupleDesc_F32 a, TupleDesc_F32 b) { return DescriptorDistance.euclideanSq(a, b); }
+		@Override public MatchScoreType getScoreType()                  { return MatchScoreType.NORM_ERROR; }
 	}
 
-	@Override
-	public MatchScoreType getScoreType() {
-		return MatchScoreType.NORM_ERROR;
+	class F64 implements ScoreAssociateEuclideanSq<TupleDesc_F64> {
+		@Override public double score(TupleDesc_F64 a, TupleDesc_F64 b) { return DescriptorDistance.euclideanSq(a, b); }
+		@Override public MatchScoreType getScoreType()                  { return MatchScoreType.NORM_ERROR; }
 	}
 }

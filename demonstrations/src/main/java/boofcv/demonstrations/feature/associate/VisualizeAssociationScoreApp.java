@@ -250,7 +250,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		JPanel panelDescriptor = new JPanel(new BorderLayout());
 
 		// selects which image to view
-		JComboBox scoreTypes = new JComboBox();
+		JComboBox<ScoreItem> scoreTypes = new JComboBox<>();
 
 		Class type;
 		ScoreAssociation selected;
@@ -320,17 +320,17 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			} else if( type == NccFeature.class ) {
 				scoreTypes.addItem(new ScoreItem(new ScoreAssociateNccFeature(),"NCC"));
 				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(),"Euclidean"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq_F64(),"Euclidean2"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_F64(),"SAD"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F64(),"Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F64(),"SAD"));
 			} else if( TupleDesc_F64.class.isAssignableFrom(type) ) {
 				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(),"Euclidean"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq_F64(),"Euclidean2"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_F64(),"SAD"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F64(),"Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F64(),"SAD"));
 			} else if( type == TupleDesc_F32.class ) {
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq_F32(),"Euclidean2"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_F32(),"SAD"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F32(),"Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F32(),"SAD"));
 			} else if( type == TupleDesc_U8.class ) {
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_U8(),"SAD"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.U8(),"SAD"));
 			} else {
 				throw new RuntimeException("Unknown description type "+type.getSimpleName());
 			}
