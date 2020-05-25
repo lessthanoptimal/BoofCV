@@ -96,6 +96,7 @@ public class FactoryPointTracker {
 			return klt(config.klt,config.detDesc.detectPoint,imageType, derivType);
 		}
 
+		// TODO consider checking to see if it is a point detector and template. If so use DdaManagerDetectDescribePoint
 		DetectDescribePoint detDesc = FactoryDetectDescribe.generic(config.detDesc, imageType);
 		AssociateDescription associate = FactoryAssociation.generic(config.associate,detDesc);
 
@@ -119,6 +120,7 @@ public class FactoryPointTracker {
 	 * @param derivType     Image derivative  type.
 	 * @return KLT based tracker.
 	 */
+	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> klt(int numLevels, @Nullable ConfigPointDetector configDetect, int featureRadius,
 							 Class<I> imageType, Class<D> derivType) {
@@ -184,6 +186,7 @@ public class FactoryPointTracker {
 	 * @return SURF based tracker.
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
+	@Deprecated
 	public static <I extends ImageGray<I>>
 	PointTracker<I> dda_FH_SURF_Fast(
 										  ConfigFastHessian configDetector ,
@@ -219,6 +222,7 @@ public class FactoryPointTracker {
 	 * @return SURF based tracker.
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
+	@Deprecated
 	public static <I extends ImageGray<I>>
 	PointTracker<I> dda_FH_SURF_Stable(
 											ConfigFastHessian configDetector ,
@@ -252,6 +256,7 @@ public class FactoryPointTracker {
 	 * @param imageType           Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
+	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> dda_ST_BRIEF(int maxAssociationError,
 									  ConfigGeneralDetector configExtract,
@@ -289,6 +294,7 @@ public class FactoryPointTracker {
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param imageType           Type of image being processed.
 	 */
+	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> dda_FAST_BRIEF(ConfigFastCorner configFast,
 								   ConfigGeneralDetector configExtract,
@@ -304,8 +310,8 @@ public class FactoryPointTracker {
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<>(
-						FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),score));
+				new AssociateDescTo2D<>( FactoryAssociation.greedy(
+						new ConfigAssociateGreedy(true,maxAssociationError),score));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
 				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
@@ -323,7 +329,9 @@ public class FactoryPointTracker {
 	 * @param configExtract Configuration for extracting features
 	 * @param describeRadius Radius of the region being described.  Try 2.
 	 * @param imageType      Type of image being processed.
-	 * @param derivType      Type of image used to store the image derivative. null == use default     */
+	 * @param derivType      Type of image used to store the image derivative. null == use default
+	 */
+	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> dda_ST_NCC(ConfigGeneralDetector configExtract, int describeRadius,
 									Class<I> imageType, @Nullable Class<D> derivType) {
@@ -369,30 +377,20 @@ public class FactoryPointTracker {
 										AssociateDescription2D<Desc> associate ,
 										ConfigTrackerDda config ) {
 
-		DetectDescribeFusion<I,Desc> fused =
-				new DetectDescribeFusion<>(detector, orientation, describe);
-
-		DdaManagerDetectDescribePoint<I,Desc> manager =
-				new DdaManagerDetectDescribePoint<>(fused);
-
-		DetectDescribeAssociate<I,Desc> dat =
-				new DetectDescribeAssociate<>(manager, associate, config);
+		DetectDescribeFusion<I,Desc> fused = new DetectDescribeFusion<>(detector, orientation, describe);
+		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(fused);
+		DetectDescribeAssociate<I,Desc> dat = new DetectDescribeAssociate<>(manager, associate, config);
 
 		return dat;
 	}
 
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
 	DetectDescribeAssociate<I,Desc> dda( DetectDescribePoint<I, Desc> detDesc,
-										AssociateDescription2D<Desc> associate ,
+										 AssociateDescription2D<Desc> associate ,
 										 ConfigTrackerDda config) {
 
-		DdaManagerDetectDescribePoint<I,Desc> manager =
-				new DdaManagerDetectDescribePoint<>(detDesc);
-
-		DetectDescribeAssociate<I,Desc> dat =
-				new DetectDescribeAssociate<>(manager, associate, config);
-
-		return dat;
+		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(detDesc);
+		return new DetectDescribeAssociate<>(manager, associate, config);
 	}
 
 	/**
@@ -410,6 +408,7 @@ public class FactoryPointTracker {
 	 * @param <I>            Input image type.
 	 * @return SURF based tracker.
 	 */
+	@Deprecated
 	public static <I extends ImageGray<I>>
 	PointTracker<I> combined_FH_SURF_KLT( ConfigPKlt kltConfig ,
 										  int reactivateThreshold ,
@@ -445,6 +444,7 @@ public class FactoryPointTracker {
 	 * @param imageType      Type of image the input is.
 	 * @param derivType      Image derivative type.        @return SURF based tracker.
 	 */
+	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
 										 ConfigPKlt kltConfig,
@@ -545,9 +545,7 @@ public class FactoryPointTracker {
 						Class<I> imageType) {
 
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detector, imageType, null);
-
-		DdaManagerGeneralPoint<I,D,Desc> manager =
-				new DdaManagerGeneralPoint<>(easy, describe, scale);
+		DdaManagerGeneralPoint<I,D,Desc> manager = new DdaManagerGeneralPoint<>(easy, describe, scale);
 
 		return new DetectDescribeAssociate<>(manager, associate, new ConfigTrackerDda());
 	}
@@ -557,6 +555,7 @@ public class FactoryPointTracker {
 	 * Variable detectRadius to control the number of features.  When larger features are used weighting should
 	 * be set to true, but because this is so small, it is set to false
 	 */
+	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureDetector<I, D> createShiTomasi(ConfigGeneralDetector config ,
 												 Class<D> derivType)

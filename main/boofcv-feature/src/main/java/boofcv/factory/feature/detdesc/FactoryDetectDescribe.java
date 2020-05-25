@@ -78,12 +78,10 @@ public class FactoryDetectDescribe {
 
 		if( config.typeDetector == ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN ) {
 			switch (config.typeDescribe) {
-				case SURF_FAST:detDesc = FactoryDetectDescribe.surfFast(
-						config.detectFastHessian, config.describeSurfFast,null,imageType);
-					break;
-				case SURF_STABLE:detDesc = FactoryDetectDescribe.surfStable(
-						config.detectFastHessian, config.describeSurfStability,null,imageType);
-					break;
+				case SURF_FAST -> detDesc = FactoryDetectDescribe.surfFast(
+						config.detectFastHessian, config.describeSurfFast, config.orientation.averageIntegral, imageType);
+				case SURF_STABLE -> detDesc = FactoryDetectDescribe.surfStable(
+						config.detectFastHessian, config.describeSurfStability, config.orientation.slidingIntegral, imageType);
 			}
 		} else if( config.typeDescribe == ConfigDescribeRegionPoint.DescriptorType.SIFT ) {
 			var configSift = new ConfigCompleteSift();
@@ -97,38 +95,42 @@ public class FactoryDetectDescribe {
 			return detDesc;
 
 		InterestPointDetector detector;
-		switch(config.typeDetector) {
-			case FAST_HESSIAN: detector = FactoryInterestPoint.fastHessian(config.detectFastHessian,imageType); break;
-			case SIFT: detector =
-					FactoryInterestPoint.sift(config.scaleSpaceSift,config.detectSift,imageType); break;
-			case POINT: {
-				GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint,imageType,null);
+		switch (config.typeDetector) {
+			case FAST_HESSIAN -> detector = FactoryInterestPoint.fastHessian(config.detectFastHessian, imageType);
+			case SIFT -> detector =
+					FactoryInterestPoint.sift(config.scaleSpaceSift, config.detectSift, imageType);
+			case POINT -> {
+				GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint, imageType, null);
 				detector = FactoryInterestPoint.wrapPoint(
 						alg, config.detectPoint.scaleRadius, imageType, alg.getDerivType());
-			} break;
-			default: throw new IllegalArgumentException("Unknown detector");
+			}
+			default -> throw new IllegalArgumentException("Unknown detector");
 		}
-		DescribeRegionPoint descriptor;
-		switch(config.typeDescribe) {
-			case SURF_FAST:
-				descriptor = FactoryDescribeRegionPoint.surfFast(config.describeSurfFast, imageType); break;
-			case SURF_STABLE:
-				descriptor = FactoryDescribeRegionPoint.surfStable(config.describeSurfStability, imageType); break;
-			case SIFT: descriptor =
-					FactoryDescribeRegionPoint.sift(config.scaleSpaceSift,config.describeSift, imageType); break;
-			case BRIEF: descriptor = FactoryDescribeRegionPoint.brief(config.describeBrief, imageType); break;
-			case TEMPLATE: descriptor =
-					FactoryDescribeRegionPoint.template(config.describeTemplate, imageType); break;
-			default: throw new IllegalArgumentException("Unknown descriptor");
-		}
+		DescribeRegionPoint descriptor = switch (config.typeDescribe) {
+			case SURF_FAST -> FactoryDescribeRegionPoint.surfFast(config.describeSurfFast, imageType);
+			case SURF_STABLE -> FactoryDescribeRegionPoint.surfStable(config.describeSurfStability, imageType);
+			case SIFT -> FactoryDescribeRegionPoint.sift(config.scaleSpaceSift, config.describeSift, imageType);
+			case BRIEF -> FactoryDescribeRegionPoint.brief(config.describeBrief, imageType);
+			case TEMPLATE -> FactoryDescribeRegionPoint.template(config.describeTemplate, imageType);
+			default -> throw new IllegalArgumentException("Unknown descriptor");
+		};
 
 		OrientationImage orientation = null;
 
 		// only compute orientation if the descriptor will use it
 		if( descriptor.isOriented() ) {
-			Class integralType = GIntegralImageOps.getIntegralType(imageType);
-			OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
-			orientation = FactoryOrientation.convertImage(orientationII, imageType);
+//			if( descriptor.isScalable() ) {
+				Class integralType = GIntegralImageOps.getIntegralType(imageType);
+				OrientationIntegral orientationII =
+				switch( config.orientation.type ) {
+					case AVERAGE-> FactoryOrientationAlgs.average_ii(config.orientation.averageIntegral, integralType);
+					case SLIDING -> FactoryOrientationAlgs.sliding_ii(config.orientation.slidingIntegral, integralType);
+					default -> throw new RuntimeException("Unsupported orientation type for scalable.");
+				};
+				orientation = FactoryOrientation.convertImage(orientationII, imageType);
+//			}
+			// TODO add fixed scale orientations
+			// TODO move into FactoryOrientation
 		}
 
 		return FactoryDetectDescribe.fuseTogether(detector,orientation,descriptor);

@@ -22,6 +22,7 @@ import boofcv.abst.feature.describe.*;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
+import boofcv.abst.feature.orientation.ConfigOrientation2;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.struct.Configuration;
@@ -50,6 +51,9 @@ public class ConfigDetectDescribe implements Configuration {
 	public ConfigFastHessian detectFastHessian = new ConfigFastHessian();
 	/** SIFT scale invariant blob detector */
 	public ConfigSiftDetector detectSift = new ConfigSiftDetector();
+
+	/** Configuration for estimating the region's orientation */
+	public ConfigOrientation2 orientation = new ConfigOrientation2();
 
 	public void copyRefTo(ConfigDescribeRegionPoint dst ) {
 		dst.type = this.typeDescribe;

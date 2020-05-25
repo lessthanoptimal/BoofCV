@@ -61,6 +61,7 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 
 		numSets = detector.getDetector().isDetectMinimums() ? 1 : 0;
 		numSets += detector.getDetector().isDetectMaximums() ? 1 : 0;
+		assert(numSets>0);
 
 		descriptors = UtilFeature.createQueue(describe,100);
 	}
@@ -121,6 +122,4 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 	public Class<Desc> getDescriptionType() {
 		return describe.getDescriptionType();
 	}
-
-
 }

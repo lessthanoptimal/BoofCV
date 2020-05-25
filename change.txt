@@ -17,6 +17,9 @@ TODO PointTracker
   - Add last seen field to track
   - has image motion 2D been updated to drop old unassociated tracks?
 
+TODO RegionOrientation
+  - Clean up the mess that's the configuration
+
 TODO Random Dots
   - See if they can be speed up any
 
