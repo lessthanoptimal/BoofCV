@@ -26,6 +26,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public interface BoofLambdas {
+
+	interface MassageString {
+		String process( String input );
+	}
+
 	interface Process {
 		void process();
 	}

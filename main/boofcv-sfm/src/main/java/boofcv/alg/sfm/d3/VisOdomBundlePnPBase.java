@@ -142,7 +142,6 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 				visibleTracks.add(t);
 			}
 		}
-		System.out.println("visibleTracks.size "+visibleTracks.size());
 	}
 
 	/**

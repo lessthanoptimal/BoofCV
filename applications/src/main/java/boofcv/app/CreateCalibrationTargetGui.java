@@ -168,7 +168,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f,"calibration_target.pdf");
 
-			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath());
+			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath(),null);
 			if (f == null) {
 				return;
 			}

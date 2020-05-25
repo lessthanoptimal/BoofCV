@@ -131,7 +131,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f,"qrcode."+controls.format);
 
-			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath());
+			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath(),null);
 			if (f == null) {
 				return;
 			}

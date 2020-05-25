@@ -81,7 +81,7 @@ public class CameraCalibrationGui extends JPanel
 		bOutput.setPreferredSize(new Dimension(30,30));
 		bOutput.setMaximumSize(bOutput.getPreferredSize());
 		bOutput.addActionListener(a->{
-			File f = BoofSwingUtil.fileChooser(null,this,false,textOutput.getText());
+			File f = BoofSwingUtil.fileChooser(null,this,false,textOutput.getText(),null);
 			if( f != null ) {
 				textOutput.setText(f.getAbsolutePath());
 			}

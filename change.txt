@@ -12,6 +12,8 @@ Version : 0.37
   * Created GUI for generating markers. Print or save to disk
   * Fully integrated into Applications
   * Rectangular markers are now fully supported
+- PointTracker
+  * Orientation is now configurable using the new interface
 
 TODO PointTracker
   - Add last seen field to track
@@ -23,11 +25,14 @@ TODO RegionOrientation
 TODO Random Dots
   - See if they can be speed up any
 
+TODO Interest Point Detector
+  - Limit max features returned and bring over that other thing too
+
 TODO DetectDescribe
   - Integrate in sets and remove specialized class
   - Request the set a feature belongs in. Provide a lambda to get all features in a set?
 
-TODO Visual Odomtry
+TODO Visual Odometry
   - Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
   - Integrate new feature sets API and use it in association
   - Bring back association with 2D information and make it configurable

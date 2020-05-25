@@ -133,7 +133,7 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 			File f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f,defaultSaveName+"."+controls.format);
 
-			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath());
+			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath(),null);
 			if (f == null) {
 				return;
 			}

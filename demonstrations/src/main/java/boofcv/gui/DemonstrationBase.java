@@ -569,6 +569,7 @@ public abstract class DemonstrationBase extends JPanel {
 			}
 		}
 		inputFilePath = inputFileSet[0];
+		String[] copyFileSet = inputFileSet.clone();
 
 		// update recent items menu
 		BoofSwingUtil.invokeNowOrLater(() -> {
@@ -593,6 +594,9 @@ public abstract class DemonstrationBase extends JPanel {
 		} else {
 			openImageSet(false,images.toArray(new String[0]));
 		}
+
+		// openVideo() and openImageSet() will mangle the inputFileSet and potentially remove files
+		inputFileSet = copyFileSet;
 	}
 
 	protected String selectRecentFileName( List<File> filePaths ) {

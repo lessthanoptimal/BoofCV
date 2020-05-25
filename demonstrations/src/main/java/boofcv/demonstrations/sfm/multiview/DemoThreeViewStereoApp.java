@@ -205,7 +205,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 
 		String home = BoofSwingUtil.getDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY);
-		File f = BoofSwingUtil.fileChooser(null,this,false,home, BoofSwingUtil.FileTypes.YAML);
+		File f = BoofSwingUtil.fileChooser(null,this,false,home,null, BoofSwingUtil.FileTypes.YAML);
 		if( f == null )
 			return;
 		BoofSwingUtil.saveDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,f);

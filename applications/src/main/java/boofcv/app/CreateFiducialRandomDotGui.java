@@ -149,7 +149,14 @@ public class CreateFiducialRandomDotGui extends JPanel {
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f,"dotmarker."+owner.fileType);
 
-			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath());
+			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath(),(s)->{
+				File parent = new File(s).getParentFile();
+				String base = FilenameUtils.getBaseName(s);
+				File ff = new File(parent,base + "." + owner.fileType);
+				System.out.println(s);
+				System.out.println(ff.getPath());
+				return ff.getPath();
+			});
 			if (f == null) {
 				return;
 			}

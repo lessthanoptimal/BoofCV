@@ -38,6 +38,7 @@ import org.ddogleg.struct.FastQueue;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -118,7 +119,7 @@ public class BoofSwingUtil {
 	}
 
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
-		return fileChooser(null,parent,false,new File(".").getPath(),filters);
+		return fileChooser(null,parent,false,new File(".").getPath(),null,filters);
 	}
 
 	public static String[] openImageSetChooser(Window parent , OpenImageSetDialog.Mode mode , int numberOfImages) {
@@ -191,7 +192,7 @@ public class BoofSwingUtil {
 	 * preference is specific to the application still
 	 */
 	public static File openFileChooser(String preferenceName, FileTypes ...filters) {
-		return fileChooser(preferenceName,null,true,new File(".").getPath(),filters);
+		return fileChooser(preferenceName,null,true,new File(".").getPath(),null,filters);
 	}
 
 	public static File openFilePreview(String preferenceName, FileTypes ...filters) {
@@ -221,11 +222,17 @@ public class BoofSwingUtil {
 			// Default to the new preview if they only want to see images
 			return fileChooserPreview(null, parent, true, defaultPath, filters);
 		} else {
-			return fileChooser(null, parent, true, defaultPath, filters);
+			return fileChooser(null, parent, true, defaultPath, null, filters);
 		}
 	}
 
-	public static File fileChooser(String preferenceName, Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
+	/**
+	 *
+	 * @param massageName A lambda that lets you change the name of the previous path. Useful when a file type is selected.
+	 */
+	public static File fileChooser(String preferenceName, Component parent, boolean openFile, String defaultPath ,
+								   @Nullable BoofLambdas.MassageString massageName,
+								   FileTypes ...filters) {
 
 		if( preferenceName == null && parent != null ) {
 			preferenceName = parent.getClass().getSimpleName();
@@ -237,22 +244,13 @@ public class BoofSwingUtil {
 		} else {
 			prefs = Preferences.userRoot().node(preferenceName);
 		}
-		File defaultFile = new File(defaultPath);
 		File previousPath=new File(prefs.get(KEY_PREVIOUS_SELECTION, defaultPath));
-		if( !previousPath.exists() ) {
-			previousPath = defaultFile;
+		if( massageName != null ) {
+			previousPath = new File(massageName.process(previousPath.getPath()));
 		}
-		if( !openFile ) {
-			// If the file type for the previous selection is wrong then use the default file name
-			if( previousPath.isFile() ) {
-				String ext = FilenameUtils.getExtension(defaultPath);
-				if (ext.equalsIgnoreCase(FilenameUtils.getExtension(previousPath.getName()))) {
-					previousPath = new File(previousPath.getParent(),defaultFile.getName());
-				}
-			}
-		}
-
 		JFileChooser chooser = new JFileChooser(previousPath);
+		// If opening a file you want the file to exist if it's automatically selected. If saving you always want it
+		// set to this value
 		if( !openFile || previousPath.exists() )
 			chooser.setSelectedFile(previousPath);
 
