@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,22 +45,22 @@ public class ConvertYV12 {
     public static void yu12ToBoof(byte[] data, int width, int height, ImageBase output) {
 
         if( output instanceof Planar) {
-            Planar ms = (Planar) output;
-            ms.reshape(width,height,3);
+            Planar pl = (Planar) output;
+            pl.reshape(width,height,3);
 
             if( BoofConcurrency.USE_CONCURRENT ) {
-                if (ms.getBandType() == GrayU8.class) {
-                    ImplConvertYV12_MT.yv12ToPlanarRgb_U8(data, ms);
-                } else if (ms.getBandType() == GrayF32.class) {
-                    ImplConvertYV12_MT.yv12ToPlanarRgb_F32(data, ms);
+                if (pl.getBandType() == GrayU8.class) {
+                    ImplConvertYV12_MT.yv12ToPlanarRgb_U8(data, pl);
+                } else if (pl.getBandType() == GrayF32.class) {
+                    ImplConvertYV12_MT.yv12ToPlanarRgb_F32(data, pl);
                 } else {
                     throw new IllegalArgumentException("Unsupported output band format");
                 }
             } else {
-                if (ms.getBandType() == GrayU8.class) {
-                    ImplConvertYV12.yv12ToPlanarRgb_U8(data, ms);
-                } else if (ms.getBandType() == GrayF32.class) {
-                    ImplConvertYV12.yv12ToPlanarRgb_F32(data, ms);
+                if (pl.getBandType() == GrayU8.class) {
+                    ImplConvertYV12.yv12ToPlanarRgb_U8(data, pl);
+                } else if (pl.getBandType() == GrayF32.class) {
+                    ImplConvertYV12.yv12ToPlanarRgb_F32(data, pl);
                 } else {
                     throw new IllegalArgumentException("Unsupported output band format");
                 }
@@ -109,8 +109,7 @@ public class ConvertYV12 {
      */
     public static GrayU8 yu12ToGray(byte[] data , int width , int height , GrayU8 output ) {
         if( output != null ) {
-            if( output.width != width || output.height != height )
-                throw new IllegalArgumentException("output width and height must be "+width+" "+height);
+            output.reshape(width,height);
         } else {
             output = new GrayU8(width,height);
         }
@@ -135,8 +134,7 @@ public class ConvertYV12 {
      */
     public static GrayF32 yu12ToGray(byte[] data , int width , int height , GrayF32 output ) {
         if( output != null ) {
-            if( output.width != width || output.height != height )
-                throw new IllegalArgumentException("output width and height must be "+width+" "+height);
+            output.reshape(width,height);
         } else {
             output = new GrayF32(width,height);
         }

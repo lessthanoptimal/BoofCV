@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestConvertYV12 {
+class TestConvertYuyv {
 
 	Random rand = new Random(234);
 	int width = 20;
@@ -44,12 +44,12 @@ class TestConvertYV12 {
 
 		for( Class type : types ) {
 			ImageGray image = GeneralizedImageOps.createSingleBand(type,width,height);
-			ConvertYV12.yu12ToBoof(data,width,height,image);
+			ConvertYuyv.yuyvToBoof(data,width,height,image);
 
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
 					double found = GeneralizedImageOps.get(image,x,y);
-					int expected = data[y*width+x] & 0xFF;
+					int expected = data[y*width*2+x*2] & 0xFF;
 
 					assertEquals(expected,found,1e-8);
 				}
@@ -65,12 +65,12 @@ class TestConvertYV12 {
 		Planar<GrayU8> yuv = new Planar<>(GrayU8.class,width,height,3);
 		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,width,height,3);
 
-		yv12ToPlanar(data, width, height, yuv);
+		yuyvToPlanar(data, width, height, yuv);
 		ColorYuv.yuvToRgb(yuv,rgb);
 
 		for( ImageType type : types ) {
 			ImageMultiBand image = (ImageMultiBand)type.createImage(width,height);
-			ConvertYV12.yu12ToBoof(data,width,height,image);
+			ConvertYuyv.yuyvToBoof(data,width,height,image);
 
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
@@ -86,43 +86,33 @@ class TestConvertYV12 {
 	}
 
 	private byte[] random( int width , int height ) {
-		int length = width*height + (width*height/4)*2;
+		int length = width*height*2;
 		byte[] data = new byte[length];
 		rand.nextBytes(data);
 		return data;
 	}
 
-	void yv12ToPlanar(byte[] data , int width , int height , Planar<GrayU8> yuv ) {
+	void yuyvToPlanar(byte[] data , int width , int height , Planar<GrayU8> yuv ) {
 		yuv.reshape(width, height);
 
 		int size = width*height;
 
 		System.arraycopy(data,0,yuv.getBand(0).getData(),0,size);
 
-		int index = size;
-		for (int y = 0; y < height / 2; y++) {
-			for (int x = 0; x < width / 2; x++, index++) {
-				int value = data[index] & 0xFF;
+		for (int y = 0; y < height; y++) {
+			int indexY = y*width*2;
+			int indexU = indexY+1;
+			for (int x = 0; x < width; x++, indexY+=2) {
+				int Y = data[indexY] & 0xFF;
+				int U = data[indexU] & 0xFF;
+				int V = data[indexU+2] & 0xFF;
 
-				for (int i = 0; i < 2; i++) {
-					for (int j = 0; j < 2; j++) {
-						yuv.getBand(1).set(2*x+j,2*y+i,value);
-					}
-				}
+				yuv.getBand(0).set(x,y,Y);
+				yuv.getBand(1).set(x,y,U);
+				yuv.getBand(2).set(x,y,V);
+
+				indexU += 4*(x&0x1);
 			}
 		}
-
-		for (int y = 0; y < height / 2; y++) {
-			for (int x = 0; x < width / 2; x++, index++) {
-				int value = data[index] & 0xFF;
-
-				for (int i = 0; i < 2; i++) {
-					for (int j = 0; j < 2; j++) {
-						yuv.getBand(2).set(2*x+j,2*y+i,value);
-					}
-				}
-			}
-		}
-
 	}
 }

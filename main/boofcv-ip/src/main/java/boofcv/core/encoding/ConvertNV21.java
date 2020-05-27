@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,12 +44,12 @@ public class ConvertNV21 {
 	public static void nv21ToBoof(byte[] data, int width, int height, ImageBase output) {
 
 		if( output instanceof Planar) {
-			Planar ms = (Planar) output;
+			Planar pl = (Planar) output;
 
-			if (ms.getBandType() == GrayU8.class) {
-				ConvertNV21.nv21TPlanarRgb_U8(data, width, height, ms);
-			} else if (ms.getBandType() == GrayF32.class) {
-				ConvertNV21.nv21ToPlanarRgb_F32(data, width, height , ms);
+			if (pl.getBandType() == GrayU8.class) {
+				ConvertNV21.nv21TPlanarRgb_U8(data, width, height, pl);
+			} else if (pl.getBandType() == GrayF32.class) {
+				ConvertNV21.nv21ToPlanarRgb_F32(data, width, height , pl);
 			} else {
 				throw new IllegalArgumentException("Unsupported output band format");
 			}
