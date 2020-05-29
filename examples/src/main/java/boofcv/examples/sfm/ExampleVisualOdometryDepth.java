@@ -18,15 +18,16 @@
 
 package boofcv.examples.sfm;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.DepthVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
-import boofcv.abst.tracker.PointTrackerTwoPass;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -43,7 +44,6 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Bare bones example showing how to estimate the camera's ego-motion using a depth camera system, e.g. Kinect.
@@ -53,7 +53,7 @@ import java.io.IOException;
  */
 public class ExampleVisualOdometryDepth {
 
-	public static void main( String args[] ) throws IOException {
+	public static void main( String args[] ) {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
@@ -68,9 +68,14 @@ public class ExampleVisualOdometryDepth {
 		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		configKlt.templateRadius = 3;
 
-		PointTrackerTwoPass<GrayU8> tracker =
-				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1),
-						GrayU8.class, GrayS16.class);
+		ConfigPointDetector configDet = new ConfigPointDetector();
+		configDet.type = PointDetectorTypes.SHI_TOMASI;
+		configDet.shiTomasi.radius = 3;
+		configDet.general.maxFeatures = 600;
+		configDet.general.radius = 3;
+		configDet.general.threshold = 1;
+
+		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet, GrayU8.class, GrayS16.class);
 
 		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(1e-3);
 

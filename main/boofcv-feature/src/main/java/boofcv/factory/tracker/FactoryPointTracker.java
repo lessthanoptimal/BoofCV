@@ -40,7 +40,6 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
-import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
@@ -203,9 +202,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,imageType);
 
-		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<>(fused);
-
-		return new DetectDescribeAssociate<>(manager, generalAssoc, new ConfigTrackerDda());
+		return new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda());
 	}
 
 	/**
@@ -239,9 +236,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<>(fused);
-
-		return new DetectDescribeAssociate<>(manager, generalAssoc, new ConfigTrackerDda());
+		return new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda());
 	}
 
 	/**
@@ -267,19 +262,22 @@ public class FactoryPointTracker {
 
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
+		DescribeRegionPoint describeBrief = new WrapDescribeBrief<>(brief, imageType);
 
 		GeneralFeatureDetector<I, D> detectPoint = createShiTomasi(configExtract, derivType);
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detectPoint, imageType, derivType);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),score));
+				new AssociateDescTo2D<>(FactoryAssociation.greedy(
+						new ConfigAssociateGreedy(true,maxAssociationError),score));
 
-		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
-				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(detectPoint, 1, imageType, derivType);
 
-		return new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
+		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detector,null,describeBrief);
+
+
+		return new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda());
 	}
 
 	/**
@@ -303,9 +301,9 @@ public class FactoryPointTracker {
 	{
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
+		DescribeRegionPoint describeBrief = new WrapDescribeBrief<>(brief, imageType);
 
 		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(configExtract, configFast, imageType);
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(corner, imageType, null);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
@@ -313,10 +311,10 @@ public class FactoryPointTracker {
 				new AssociateDescTo2D<>( FactoryAssociation.greedy(
 						new ConfigAssociateGreedy(true,maxAssociationError),score));
 
-		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
-				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, null);
+		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detector,null,describeBrief);
 
-		return new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
+		return new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda());
 	}
 
 	/**
@@ -341,10 +339,10 @@ public class FactoryPointTracker {
 
 		int w = 2*describeRadius+1;
 
-		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
+		DescribePointPixelRegionNCC<I> ncc = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
+		DescribeRegionPoint describeNCC = new WrapDescribePixelRegionNCC(ncc, imageType);
 
 		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(corner, imageType, derivType);
 
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
@@ -352,10 +350,10 @@ public class FactoryPointTracker {
 				new AssociateDescTo2D<>(
 						FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
 
-		DdaManagerGeneralPoint<I,D,NccFeature> manager =
-				new DdaManagerGeneralPoint<>(easy, new WrapDescribePixelRegionNCC<>(alg, imageType), 1.0);
+		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, null);
+		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detector,null,describeNCC);
 
-		return new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
+		return new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda());
 	}
 
 	/**
@@ -371,26 +369,21 @@ public class FactoryPointTracker {
 	 * @return tracker
 	 */
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
-	DetectDescribeAssociate<I,Desc> dda(InterestPointDetector<I> detector,
-										OrientationImage<I> orientation ,
-										DescribeRegionPoint<I, Desc> describe,
-										AssociateDescription2D<Desc> associate ,
-										ConfigTrackerDda config ) {
+	DetectDescribeAssociateTracker<I,Desc> dda(InterestPointDetector<I> detector,
+											   OrientationImage<I> orientation ,
+											   DescribeRegionPoint<I, Desc> describe,
+											   AssociateDescription2D<Desc> associate ,
+											   ConfigTrackerDda config ) {
 
 		DetectDescribeFusion<I,Desc> fused = new DetectDescribeFusion<>(detector, orientation, describe);
-		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(fused);
-		DetectDescribeAssociate<I,Desc> dat = new DetectDescribeAssociate<>(manager, associate, config);
-
-		return dat;
+		return new DetectDescribeAssociateTracker<>(fused, associate, config);
 	}
 
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
-	DetectDescribeAssociate<I,Desc> dda( DetectDescribePoint<I, Desc> detDesc,
-										 AssociateDescription2D<Desc> associate ,
-										 ConfigTrackerDda config) {
-
-		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(detDesc);
-		return new DetectDescribeAssociate<>(manager, associate, config);
+	DetectDescribeAssociateTracker<I,Desc> dda(DetectDescribePoint<I, Desc> detDesc,
+											   AssociateDescription2D<Desc> associate ,
+											   ConfigTrackerDda config) {
+		return new DetectDescribeAssociateTracker<>(detDesc, associate, config);
 	}
 
 	/**
@@ -543,11 +536,10 @@ public class FactoryPointTracker {
 						AssociateDescription2D<Desc> associate,
 						double scale,
 						Class<I> imageType) {
+		InterestPointDetector<I> detectInterest = FactoryInterestPoint.wrapPoint(detector, scale, imageType, null);
+		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detectInterest,null,describe);
 
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detector, imageType, null);
-		DdaManagerGeneralPoint<I,D,Desc> manager = new DdaManagerGeneralPoint<>(easy, describe, scale);
-
-		return new DetectDescribeAssociate<>(manager, associate, new ConfigTrackerDda());
+		return new DetectDescribeAssociateTracker<>(fused, associate, new ConfigTrackerDda());
 	}
 
 	/**

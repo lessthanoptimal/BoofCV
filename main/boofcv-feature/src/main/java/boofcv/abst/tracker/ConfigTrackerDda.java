@@ -21,7 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link DetectDescribeAssociate}
+ * Configuration for {@link DetectDescribeAssociateTracker}
  *
  * @author Peter Abeles
  */

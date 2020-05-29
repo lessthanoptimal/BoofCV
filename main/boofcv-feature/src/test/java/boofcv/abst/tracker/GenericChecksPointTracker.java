@@ -155,10 +155,10 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 		ImageMiscOps.addGaussian(image,rand,2,0,255);
 		processImage((T)image);
 
-		int BeforeEach = tracker.getAllTracks(null).size();
+		int beforeEach = tracker.getAllTracks(null).size();
 		int beforeActive = tracker.getActiveTracks(null).size();
 
-		assertTrue(BeforeEach > 0);
+		assertTrue(beforeEach > 0);
 		assertTrue(beforeActive>0);
 		assertEquals(0, tracker.getNewTracks(null).size());
 		checkInside(tracker.getAllTracks(null));
@@ -166,7 +166,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 		// Call spawn again.  There should be more tracks now
 		tracker.spawnTracks();
 
-		assertTrue(BeforeEach < tracker.getAllTracks(null).size());
+		assertTrue(beforeEach < tracker.getAllTracks(null).size());
 		assertTrue(beforeActive < tracker.getActiveTracks(null).size());
 		checkInside(tracker.getAllTracks(null));
 
@@ -218,7 +218,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 		tracker.spawnTracks();
 
 		// no new tracks are spawned so their ID's should not be updated
-		for (int i = 0; i < 3; i++) {
+		for (int frame = 0; frame < 3; frame++) {
 			for( var t : tracker.getActiveTracks(null) ) {
 				assertEquals(0,t.spawnFrameID);
 			}

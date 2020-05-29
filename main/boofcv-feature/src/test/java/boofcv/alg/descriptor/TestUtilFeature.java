@@ -105,4 +105,15 @@ public class TestUtilFeature {
 	void setDestination() {
 		fail("implement");
 	}
+
+	@Test
+	void setSource_2D() {
+		fail("implement");
+	}
+
+	@Test
+	void setDestination_2D() {
+		fail("implement");
+	}
+
 }

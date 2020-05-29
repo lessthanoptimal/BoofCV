@@ -169,8 +169,8 @@ class TestCombinedTrackerScalePoint {
 			this.N = N;
 		}
 
-		@Override
-		public void initialize(int numberOfSets) {}
+		@Override public void initialize(int numberOfSets) {}
+		@Override public void associate() {}
 
 		@Override
 		public FastAccess<AssociatedIndex> getMatches() {

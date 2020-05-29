@@ -19,10 +19,12 @@
 package boofcv.alg.descriptor;
 
 import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -166,6 +168,50 @@ public class UtilFeature {
 		final int N = descriptors.size;
 		for (int i = 0; i < N; i++) {
 			association.addDestination(descriptors.data[i],sets.data[i]);
+		}
+	}
+
+	/**
+	 * Adds the feature descriptor and its set to the association algorithm
+	 * @param descriptors (Input) Descriptor of each feature
+	 * @param sets (Input) Set each feature belongs in
+	 * @param locs (Input) Pixel coordinate that each feature was found at
+	 * @param association (Output) association algorithm which is having its source configured
+	 */
+	public static <TD extends TupleDesc>
+	void setSource(FastAccess<TD> descriptors , GrowQueue_I32 sets , FastAccess<Point2D_F64> locs,
+				   AssociateDescriptionSets2D<TD> association )
+	{
+		assert(descriptors.size==sets.size);
+		assert(descriptors.size==locs.size);
+
+		association.clearSource();
+		final int N = descriptors.size;
+		for (int i = 0; i < N; i++) {
+			Point2D_F64 l = locs.data[i];
+			association.addSource(descriptors.data[i],l.x,l.y,sets.data[i]);
+		}
+	}
+
+	/**
+	 * Adds the feature descriptor and its set to the association algorithm
+	 * @param descriptors (Input) Descriptor of each feature
+	 * @param sets (Input) Set each feature belongs in
+	 * @param locs (Input) Pixel coordinate that each feature was found at
+	 * @param association (Output) association algorithm which is having its destination configured
+	 */
+	public static <TD extends TupleDesc>
+	void setDestination(FastAccess<TD> descriptors , GrowQueue_I32 sets , FastAccess<Point2D_F64> locs,
+						AssociateDescriptionSets2D<TD> association )
+	{
+		assert(descriptors.size==sets.size);
+		assert(descriptors.size==locs.size);
+
+		association.clearDestination();
+		final int N = descriptors.size;
+		for (int i = 0; i < N; i++) {
+			Point2D_F64 l = locs.data[i];
+			association.addDestination(descriptors.data[i],l.x,l.y,sets.data[i]);
 		}
 	}
 }

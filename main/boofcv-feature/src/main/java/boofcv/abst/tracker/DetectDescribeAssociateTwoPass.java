@@ -19,14 +19,11 @@
 package boofcv.abst.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastAccess;
 
 /**
- * Changes behavior of {@link DetectDescribeAssociate} so that it conforms to the {@link PointTrackerTwoPass} interface.
+ * Changes behavior of {@link DetectDescribeAssociateTracker} so that it conforms to the {@link PointTrackerTwoPass} interface.
  * It can now take hints for where tracks might appear in the image.   If possible
  * {@link AssociateDescription2D#setSource} will only be called once
  * on the second pass.
@@ -34,7 +31,7 @@ import org.ddogleg.struct.FastAccess;
  * @author Peter Abeles
  */
 public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends TupleDesc>
-	extends DetectDescribeAssociate<I,Desc> implements PointTrackerTwoPass<I>
+	extends DetectDescribeAssociateTracker<I,Desc> implements PointTrackerTwoPass<I>
 {
 	// associate used in the second pass
 	AssociateDescription2D<Desc> associate2;
@@ -54,7 +51,7 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 										  AssociateDescription2D<Desc> associate2,
 										  ConfigTrackerDda config )
 	{
-		super(manager, associate, config);
+//		super(manager, associate, config);
 		this.associate2 = associate2;
 	}
 
@@ -67,91 +64,90 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 		tracksDropped.clear();
 		tracksNew.clear();
 
-		manager.detectFeatures(input);
-
-		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
-			SetTrackInfo<Desc> info = sets[setIndex];
-
-			info.featDst.reset();
-			info.locDst.reset();
-			manager.getFeatures(setIndex,info.locDst,info.featDst);
-
-			// skip if there are no features
-			if( !tracksAll.isEmpty() ) {
-				putIntoSrcList(info);
-
-				associate.setSource(info.locSrc, info.featSrc);
-				associate.setDestination(info.locDst, info.featDst);
-				associate.associate();
-
-				updateTrackLocation(info,associate.getMatches());
-			}
-
-		}
+//		manager.detectFeatures(input);
+//
+//		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+//			SetTrackInfo<Desc> info = sets[setIndex];
+//
+//			info.featDst.reset();
+//			info.locDst.reset();
+//			manager.getFeatures(setIndex,info.locDst,info.featDst);
+//
+//			// skip if there are no features
+//			if( !tracksAll.isEmpty() ) {
+//				putIntoSrcList(info);
+//
+//				associate.setSource(info.locSrc, info.featSrc);
+//				associate.setDestination(info.locDst, info.featDst);
+//				associate.associate();
+//
+//				updateTrackLocation(info,associate.getMatches());
+//			}
+//
+//		}
 	}
 
 	@Override
 	public void performSecondPass() {
-		if( tracksAll.isEmpty() )
-			return;
-
-		boolean setSource = associate2 != associate && !sourceSet2 && sets.length==1;
-		if( setSource ) {
-			sourceSet2 = true;
-		}
-		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
-			SetTrackInfo<Desc> info = sets[setIndex];
-			// minimize the number of times set source is called.  In some implementations of associate this is an
-			// expensive operation
-			if (setSource) {
-				associate.setSource(info.locSrc, info.featSrc);
-			}
-			associate2.setDestination(info.locDst, info.featDst);
-			associate2.associate();
-
-			updateTrackLocation(info,associate2.getMatches());
-		}
-
+//		if( tracksAll.isEmpty() )
+//			return;
+//
+//		boolean setSource = associate2 != associate && !sourceSet2 && sets.length==1;
+//		if( setSource ) {
+//			sourceSet2 = true;
+//		}
+//		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+//			SetTrackInfo<Desc> info = sets[setIndex];
+//			// minimize the number of times set source is called.  In some implementations of associate this is an
+//			// expensive operation
+//			if (setSource) {
+//				associate.setSource(info.locSrc, info.featSrc);
+//			}
+//			associate2.setDestination(info.locDst, info.featDst);
+//			associate2.associate();
+//
+//			updateTrackLocation(info,associate2.getMatches());
+//		}
 	}
 
 	@Override
 	public void finishTracking() {
-		if( tracksAll.isEmpty() )
-			return;
-
-		// Update the track state using association information
-		tracksActive.clear();
-
-		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
-			SetTrackInfo<Desc> info = sets[setIndex];
-			updateTrackState(info);
-
-			// add unassociated to the list
-			for (int i = 0; i < info.tracks.size(); i++) {
-				if (!info.isAssociated[i])
-					tracksInactive.add(info.tracks.get(i));
-			}
-		}
+//		if( tracksAll.isEmpty() )
+//			return;
+//
+//		// Update the track state using association information
+//		tracksActive.clear();
+//
+//		for (int setIndex = 0; setIndex < sets.length; setIndex++) {
+//			SetTrackInfo<Desc> info = sets[setIndex];
+//			updateTrackState(info);
+//
+//			// add unassociated to the list
+//			for (int i = 0; i < info.tracks.size(); i++) {
+//				if (!info.isAssociated[i])
+//					tracksInactive.add(info.tracks.get(i));
+//			}
+//		}
 	}
 
 	/**
 	 * Update each track's location only and not its description.  Update the active list too
 	 */
-	protected void updateTrackLocation( SetTrackInfo<Desc> info, FastAccess<AssociatedIndex> matches) {
-		info.matches.resize(matches.size);
-		for (int i = 0; i < matches.size; i++) {
-			info.matches.get(i).set(matches.get(i));
-		}
-
-		tracksActive.clear();
-		for( int i = 0; i < info.matches.size; i++ ) {
-			AssociatedIndex indexes = info.matches.data[i];
-			PointTrack track = info.tracks.get(indexes.src);
-			Point2D_F64 loc = info.locDst.data[indexes.dst];
-			track.pixel.set(loc.x, loc.y);
-			tracksActive.add(track);
-		}
-	}
+//	protected void updateTrackLocation( SetTrackInfo<Desc> info, FastAccess<AssociatedIndex> matches) {
+//		info.matches.resize(matches.size);
+//		for (int i = 0; i < matches.size; i++) {
+//			info.matches.get(i).set(matches.get(i));
+//		}
+//
+//		tracksActive.clear();
+//		for( int i = 0; i < info.matches.size; i++ ) {
+//			AssociatedIndex indexes = info.matches.data[i];
+//			PointTrack track = info.tracks.get(indexes.src);
+//			Point2D_F64 loc = info.locDst.data[indexes.dst];
+//			track.pixel.set(loc.x, loc.y);
+//			tracksActive.add(track);
+//		}
+//	}
 
 	@Override
 	public void setHint( double pixelX , double pixelY , PointTrack track ) {

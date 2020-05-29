@@ -36,7 +36,6 @@ import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d3.*;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.pose.*;
@@ -318,7 +317,7 @@ public class FactoryVisualOdometry {
 												 int refineIterations ,
 												 boolean doublePass ,
 												 DepthSparse3D<Depth> sparseDepth,
-												 PointTrackerTwoPass<Vis> tracker ,
+												 PointTracker<Vis> tracker ,
 												 Class<Vis> visualType , Class<Depth> depthType ) {
 
 		// Range from sparse disparity

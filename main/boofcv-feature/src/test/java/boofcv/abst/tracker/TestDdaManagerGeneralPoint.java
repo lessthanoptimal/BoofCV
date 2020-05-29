@@ -71,8 +71,8 @@ public class TestDdaManagerGeneralPoint extends GenericChecksPointTracker<GrayF3
 		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
 		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
 
-		DetectDescribeAssociate<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
-		return tracker;
+//		DetectDescribeAssociate<GrayF32,TupleDesc_B> tracker =
+//				new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
+		return null;
 	}
 }

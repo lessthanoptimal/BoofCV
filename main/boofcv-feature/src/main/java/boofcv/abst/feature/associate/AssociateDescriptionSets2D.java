@@ -18,50 +18,51 @@
 
 package boofcv.abst.feature.associate;
 
+import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
+
 /**
- * Feature set aware association algorithm. It works by breaking sorting descriptors into their sets and then
+ * Feature set aware association algorithm that takes in account image location. It works by breaking sorting
+ * descriptors into their sets and then
  * performing association independently. The matches are then combined together again into a single list.
  *
  * @author Peter Abeles
  */
-public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
+public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
+	AssociateDescription2D<Desc> associator;
 
-	// Regular association algorithm
-	final AssociateDescription<Desc> associator;
-
-	/**
-	 * Provides the association algorithm and the descriptor type
-	 * @param associator Association algorithm
-	 * @param type Type of descriptor
-	 */
-	public AssociateDescriptionSets(AssociateDescription<Desc> associator, Class<Desc> type) {
+	public AssociateDescriptionSets2D(AssociateDescription2D<Desc> associator, Class<Desc> type) {
 		super(associator,type);
 		this.associator = associator;
+	}
+
+	@Override
+	protected SetStruct newSetStruct() {
+		return new SetStruct2D();
 	}
 
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addSource( Desc description , int set )
+	public void addSource( Desc description, double pixelX, double pixelY, int set )
 	{
-		final SetStruct ss = sets.data[set];
+		final SetStruct2D ss = (SetStruct2D)sets.data[set];
 		ss.src.add(description);
+		ss.pixelsSrc.grow().set(pixelX,pixelY);
 		ss.indexSrc.add(countSrc++);
 	}
 
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.
 	 */
-	public void addDestination( Desc description , int set )
+	public void addDestination( Desc description, double pixelX, double pixelY, int set )
 	{
-		final SetStruct ss = sets.data[set];
+		final SetStruct2D ss = (SetStruct2D)sets.data[set];
 		ss.dst.add(description);
+		ss.pixelsDst.grow().set(pixelX,pixelY);
 		ss.indexDst.add(countDst++);
 	}
 
-	/**
-	 * Associates each set of features independently then puts them back into a single list for output
-	 */
 	@Override
 	public void associate() {
 		if( sets.size <= 0 )
@@ -74,14 +75,30 @@ public class AssociateDescriptionSets<Desc> extends BaseAssociateSets<Desc> {
 
 		// Compute results inside each set and copy them over into the output structure
 		for (int setIdx = 0; setIdx < sets.size; setIdx++) {
-			SetStruct set = sets.get(setIdx);
+			SetStruct2D set = (SetStruct2D)sets.get(setIdx);
 
 			// Associate features inside this set
-			associator.setSource(set.src);
-			associator.setDestination(set.dst);
+			associator.setSource(set.pixelsSrc, set.src);
+			associator.setDestination(set.pixelsDst, set.dst);
 			associator.associate();
 
 			saveSetAssociateResults(set);
+		}
+	}
+
+	/**
+	 * Adds 2D image coordinates to the set
+	 */
+	class SetStruct2D extends SetStruct {
+		// feature locations in each set
+		FastQueue<Point2D_F64> pixelsSrc = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> pixelsDst = new FastQueue<>(Point2D_F64::new);
+
+		@Override
+		public void reset() {
+			super.reset();
+			pixelsSrc.reset();
+			pixelsDst.reset();
 		}
 	}
 }

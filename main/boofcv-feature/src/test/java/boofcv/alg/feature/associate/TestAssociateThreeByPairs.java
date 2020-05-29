@@ -121,6 +121,7 @@ class TestAssociateThreeByPairs {
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
+		alg.initialize(1);
 
 		alg.setFeaturesA(featuresA, featuresSetA);
 		alg.setFeaturesB(featuresB, featuresSetB);
@@ -169,6 +170,7 @@ class TestAssociateThreeByPairs {
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
+		alg.initialize(1);
 
 		alg.setFeaturesA(featuresA, featuresSetA);
 		alg.setFeaturesB(featuresB, featuresSetB);
@@ -216,6 +218,7 @@ class TestAssociateThreeByPairs {
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
+		alg.initialize(1);
 
 		alg.setFeaturesA(featuresA, featuresSetA);
 		alg.setFeaturesB(featuresB, featuresSetB);
