@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.feature.disparity;
+package boofcv.gui.controls;
 
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;

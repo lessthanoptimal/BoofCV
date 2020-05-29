@@ -53,7 +53,7 @@ public interface PointCloudReader {
 	 */
 	int getRGB( int index );
 
-	static PointCloudReader wrap3FRGB( float[] cloud, float[] rgb, int offset , int length ) {
+	static PointCloudReader wrap3FRGB( float[] cloud, int[] rgb, int offset , int length ) {
 		return new PointCloudReader() {
 			@Override
 			public int size() {return length;}

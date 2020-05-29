@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.sfm.d3;
+package boofcv.gui.controls;
 
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
 import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.struct.image.ImageGray;

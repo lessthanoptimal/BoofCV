@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.feature.disparity;
+package boofcv.gui.controls;
 
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -40,18 +40,18 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		implements ChangeListener, ActionListener
 {
 	// which image to show
-	int selectedView;
+	public int selectedView;
 
 	public double zoom = 1;
 
-	boolean concurrent=true;
-	boolean recompute=true;
+	public boolean concurrent=true;
+	public boolean recompute=true;
 
 	// scale factor for input images
-	int inputScale = 100;
+	public int inputScale = 100;
 
 	// Background color for disparity
-	int backgroundColorDisparity = 0x000000;
+	public int backgroundColorDisparity = 0x000000;
 
 	protected JLabel processingTimeLabel = new JLabel();
 	protected JLabel imageSizeLabel = new JLabel();
@@ -59,19 +59,17 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	// For zooming in and out of images
 	protected JSpinner selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,0.1);
 
-	JButton bColorBackGround = new JButton();
-
 	// how much the input should be scaled down by
 	JSpinner inputScaleSpinner = spinner(inputScale,5,100,10);
 	// selects which image to view
 	JComboBox viewSelector = combo(selectedView,"Disparity","Left","Right","View 3D");
 
-	ControlCustomCloud controlCloud = new ControlCustomCloud();
+	public ControlCustomCloud controlCloud = new ControlCustomCloud();
 
 	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
-	ControlPanelDisparityDense controlDisparity;
+	public ControlPanelDisparityDense controlDisparity;
 
 	// listener for changes in states
 	Listener listener;
@@ -132,11 +130,9 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		if( e.getSource() == inputScaleSpinner) {
 			inputScale = ((Number) inputScaleSpinner.getValue()).intValue();
 			listener.changeInputScale();
-			return;
 		} else if( e.getSource() == selectZoom ) {
 			zoom = ((Number) selectZoom.getValue()).doubleValue();
 			listener.changeZoom();
-			return;
 		} else {
 			throw new RuntimeException("Egads");
 		}
@@ -188,7 +184,7 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		}
 
 		@Override
-		protected int getActiveBackgroundColor() {
+		public int getActiveBackgroundColor() {
 			if( selectedView == 0 ) {
 				return backgroundColorDisparity;
 			} else if( selectedView == 3 ) {
@@ -199,7 +195,7 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		}
 
 		@Override
-		protected void setColorButtonColor(int colorRGB) {
+		public void setColorButtonColor(int colorRGB) {
 			if( selectedView == 0 ) {
 				backgroundColorDisparity = colorRGB;
 			} else if( selectedView == 3 ) {

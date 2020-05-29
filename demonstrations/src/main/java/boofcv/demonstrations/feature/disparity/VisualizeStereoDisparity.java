@@ -28,6 +28,7 @@ import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
+import boofcv.gui.controls.ControlPanelDisparityDisplay;
 import boofcv.gui.d3.UtilDisparitySwing;
 import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.image.ImageZoomPanel;

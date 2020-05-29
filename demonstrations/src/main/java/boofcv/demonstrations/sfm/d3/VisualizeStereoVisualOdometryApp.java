@@ -26,7 +26,6 @@ import boofcv.abst.sfm.d3.WrapVisOdomDualTrackPnP;
 import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
@@ -38,6 +37,10 @@ import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.ControlPanelPointCloud;
+import boofcv.gui.controls.ControlPanelStereoDualTrackPnP;
+import boofcv.gui.controls.ControlPanelStereoMonoTrackPnP;
+import boofcv.gui.controls.ControlPanelStereoQuadPnP;
 import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.settings.GlobalDemoSettings;
@@ -557,7 +560,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		final JCheckBox checkCloud = checkbox("Cloud",showCloud,"Show sparse point cloud");
 		final JSpinner spinMaxTrackAge = spinner(maxTrackAge,0,999,5);
 		final JSpinner spinMinDuration = spinner(minTrackDuration,1,999,1);
-		final ControlPanelPointCloud cloudColor = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
+		final ControlPanelPointCloud cloudControl = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
 
 		// controls for different algorithms
 		ControlPanelStereoDualTrackPnP controlDualTrack = new ControlPanelStereoDualTrackPnP(
@@ -570,7 +573,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		public ControlPanel() {
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
 
-			cloudColor.setBorder(BorderFactory.createEmptyBorder()); // save screen real estate
+			cloudControl.setBorder(BorderFactory.createEmptyBorder()); // save screen real estate
 
 			spinCameraN.setToolTipText("Show the camera location every N frames");
 
@@ -593,7 +596,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 			panelCloud.addLabeled(spinMinDuration,"Min Duration","Only draw tracks if they have been seen for this many frames");
 			panelCloud.add(fillHorizontally(gridPanel(2,checkCameras,spinCameraN)));
 			panelCloud.addAlignLeft(checkCloud);
-			panelCloud.add(cloudColor);
+			panelCloud.add(cloudControl);
 
 			var panelVisuals = new JPanel();
 			panelVisuals.setLayout(new BoxLayout(panelVisuals,BoxLayout.Y_AXIS));
@@ -822,7 +825,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 		public void updateVisuals(boolean repaint) {
 			double d = stereoParameters.getBaseline();
-			controls.cloudColor.configure(gui,d*10,d/2.0);
+			controls.cloudControl.configure(gui,d*10,d/2.0);
 			if( repaint )
 				repaint();
 		}

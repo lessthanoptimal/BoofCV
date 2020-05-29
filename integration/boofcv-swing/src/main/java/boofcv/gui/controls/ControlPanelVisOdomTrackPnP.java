@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.sfm.d3;
+package boofcv.gui.controls;
 
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.sfm.ConfigVisOdomTrackPnP;

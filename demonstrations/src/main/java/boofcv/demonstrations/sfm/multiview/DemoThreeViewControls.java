@@ -18,8 +18,6 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
-import boofcv.demonstrations.feature.disparity.ControlPanelDisparityDense;
-import boofcv.demonstrations.sfm.d3.ControlPanelDdaComboTabs;
 import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
@@ -28,6 +26,8 @@ import boofcv.factory.feature.disparity.ConfigDisparitySGM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.ControlPanelDdaComboTabs;
+import boofcv.gui.controls.ControlPanelDisparityDense;
 import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;

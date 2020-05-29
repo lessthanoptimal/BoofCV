@@ -42,6 +42,13 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 	}
 
+	protected JFormattedTextField textfield( double value , double min , double max , int panelWidth ) {
+		JFormattedTextField field = BoofSwingUtil.createTextField(value, min, max);
+		field.addActionListener(this);
+		field.setPreferredSize(new Dimension(panelWidth,24));
+		field.setMaximumSize(field.getPreferredSize());
+		return field;
+	}
 
 	/**
 	 * Wraps the input panel inside another panel that will fill the control panel horizontally

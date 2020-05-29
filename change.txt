@@ -16,6 +16,8 @@ Version : 0.37
   * Orientation is now configurable using the new interface
 - Color
   * Added support for YUYV color format used in webcams
+- GUI
+  * Added clip and fog controls to point cloud controls
 
 TODO PointTracker
   - Add last seen field to track

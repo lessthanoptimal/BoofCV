@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.feature.disparity;
+package boofcv.gui.controls;
 
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.misc.BoofLambdas;
@@ -36,6 +36,11 @@ public class ControlPanelPointCloud extends StandardAlgConfigPanel {
 	// which color in colorizers should it use
 	int colorScheme = 0;
 
+	// clip distance for rendering. Disabled if <= 0
+	public double clipDistance = 0;
+	// If it should use "fog" when rendering the cloud
+	public boolean fog = false;
+
 	// range 0 to 1000
 	public int periodAdjust=500;
 	public int offsetAdjust=500;
@@ -53,6 +58,9 @@ public class ControlPanelPointCloud extends StandardAlgConfigPanel {
 	protected final JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,120);
 	protected final JSlider sliderSpeed3D = slider(0,1000,speedAdjust,120);
 
+	protected JFormattedTextField fieldClip = textfield(clipDistance,0,Double.NaN,100);
+	protected JCheckBox checkFog = checkbox("",fog,"Turn on/off fog");
+
 	// callback for when the background color has changed
 	protected @Setter BoofLambdas.Process callbackBackground = ()->{};
 	// callback for when any other setting has changed
@@ -65,7 +73,17 @@ public class ControlPanelPointCloud extends StandardAlgConfigPanel {
 	}
 
 	public ControlPanelPointCloud() {
+		layoutControls();
+	}
+
+	protected void layoutControls() {
+		JPanel clipPanel = new JPanel();
+		clipPanel.setLayout(new BoxLayout(clipPanel,BoxLayout.X_AXIS));
+		clipPanel.add(fieldClip);
+		clipPanel.add(checkFog);
+
 		addLabeled(createColorPanel(),"Color","Point cloud colorization method");
+		addLabeled(clipPanel,"Clip","Set to a non-zero value to specify a max distance for rendering");
 		addLabeled(sliderOffsetColor,"Offset", "Pseudo color offset of periodic function");
 		addLabeled(sliderPeriodColor,"Period", "The pseudo color's period");
 		addLabeled(sliderSpeed3D,"Speed","Adjust translational speed through point cloud");
@@ -93,6 +111,13 @@ public class ControlPanelPointCloud extends StandardAlgConfigPanel {
 		}
 		pcv.setBackgroundColor(backgroundColor3D);
 		pcv.setTranslationStep(speedScale()*translateBaseline);
+		if( clipDistance > 0 ) {
+			pcv.setClipDistance(clipDistance);
+			pcv.setFog(fog);
+		} else {
+			pcv.setClipDistance(Double.MAX_VALUE);
+			pcv.setFog(false);
+		}
 	}
 
 	public void setEnabledAll( boolean enabled ) {
@@ -101,6 +126,8 @@ public class ControlPanelPointCloud extends StandardAlgConfigPanel {
 		sliderPeriodColor.setEnabled(enabled);
 		sliderSpeed3D.setEnabled(enabled);
 		bColorBackGround.setEnabled(enabled);
+		fieldClip.setEnabled(enabled);
+		checkFog.setEnabled(enabled);
 	}
 
 	/**
@@ -160,6 +187,10 @@ public class ControlPanelPointCloud extends StandardAlgConfigPanel {
 			speedAdjust = sliderSpeed3D.getValue();
 		} else if( source == comboColorizer) {
 			colorScheme = comboColorizer.getSelectedIndex();
+		} else if( source == checkFog ) {
+			fog = checkFog.isSelected();
+		} else if( source == fieldClip ) {
+			clipDistance = ((Number)fieldClip.getValue()).doubleValue();
 		} else {
 			throw new RuntimeException("Egads");
 		}

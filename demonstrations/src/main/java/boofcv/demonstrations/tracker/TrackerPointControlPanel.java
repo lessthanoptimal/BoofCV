@@ -22,9 +22,9 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.demonstrations.sfm.d3.ControlPanelPointTrackers;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.ControlPanelPointTrackers;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 import javax.swing.*;

@@ -64,6 +64,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bUtilScanQrCode = createButton("Batch QR Code",BatchScanQrCodesGui::new);
 		JButton bUtilDown = createButton("Batch Downsize",BatchDownsizeImageGui::new);
 		JButton bUtilUndist = createButton("Batch Undistort",BatchRemoveLensDistortionGui::new);
+		JButton bUtilViewCloud = createButton("Cloud Viewer", PointCloudViewerApp::new);
 
 		// open the man website for help
 		JButton bHelp = new JButton("Help");
@@ -91,7 +92,7 @@ public class ApplicationLauncherGui extends JPanel {
 
 		JPanel panelLeft = buttonPanel("Create / Print",
 				bCreateQR,bCreateDots,bCreateCalib,bCreateFidBin,bCreateFidImage);
-		JPanel panelRight = buttonPanel("Tools",bUtilCalib,bUtilScanQrCode,bUtilDown,bUtilUndist);
+		JPanel panelRight = buttonPanel("Tools",bUtilCalib,bUtilScanQrCode,bUtilDown,bUtilUndist,bUtilViewCloud);
 
 		layout.putConstraint(SpringLayout.WEST, panelLeft, 60, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, panelLeft, 0, SpringLayout.SOUTH, logo);
