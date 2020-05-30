@@ -16,11 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.abst.tracker;
+package boofcv.alg.tracker.dda;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
+import boofcv.abst.tracker.ConfigTrackerDda;
+import boofcv.abst.tracker.PointTrack;
+import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+
+import java.util.List;
 
 /**
  * Changes behavior of {@link DetectDescribeAssociateTracker} so that it conforms to the {@link PointTrackerTwoPass} interface.
@@ -31,7 +36,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends TupleDesc>
-	extends DetectDescribeAssociateTracker<I,Desc> implements PointTrackerTwoPass<I>
+	implements PointTrackerTwoPass<I>
 {
 	// associate used in the second pass
 	AssociateDescription2D<Desc> associate2;
@@ -41,13 +46,11 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 	/**
 	 * Configure the tracker.  The parameters associate and associate2 can be the same instance.
 	 *
-	 * @param manager Feature manager
 	 * @param associate Association algorithm for the first pass
 	 * @param associate2 Association algorithm for the second pass
 	 * @param config Configures behavior
 	 */
-	public DetectDescribeAssociateTwoPass(DdaFeatureManager<I, Desc> manager,
-										  AssociateDescription2D<Desc> associate,
+	public DetectDescribeAssociateTwoPass(AssociateDescription2D<Desc> associate,
 										  AssociateDescription2D<Desc> associate2,
 										  ConfigTrackerDda config )
 	{
@@ -57,12 +60,12 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 
 	@Override
 	public void process( I input ) {
-		frameID++;
-		sourceSet2 = false;
-		tracksActive.clear();
-		tracksInactive.clear();
-		tracksDropped.clear();
-		tracksNew.clear();
+//		frameID++;
+//		sourceSet2 = false;
+//		tracksActive.clear();
+//		tracksInactive.clear();
+//		tracksDropped.clear();
+//		tracksNew.clear();
 
 //		manager.detectFeatures(input);
 //
@@ -85,6 +88,76 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 //			}
 //
 //		}
+	}
+
+	@Override
+	public void reset() {
+
+	}
+
+	@Override
+	public long getFrameID() {
+		return 0;
+	}
+
+	@Override
+	public int getTotalActive() {
+		return 0;
+	}
+
+	@Override
+	public int getTotalInactive() {
+		return 0;
+	}
+
+	@Override
+	public void dropAllTracks() {
+
+	}
+
+	@Override
+	public int getMaxSpawn() {
+		return 0;
+	}
+
+	@Override
+	public boolean dropTrack(PointTrack track) {
+		return false;
+	}
+
+	@Override
+	public void dropTracks(Dropper dropper) {
+
+	}
+
+	@Override
+	public List<PointTrack> getAllTracks(List<PointTrack> list) {
+		return null;
+	}
+
+	@Override
+	public List<PointTrack> getActiveTracks(List<PointTrack> list) {
+		return null;
+	}
+
+	@Override
+	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
+		return null;
+	}
+
+	@Override
+	public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
+		return null;
+	}
+
+	@Override
+	public List<PointTrack> getNewTracks(List<PointTrack> list) {
+		return null;
+	}
+
+	@Override
+	public void spawnTracks() {
+
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.tracker.dda.DetectDescribeAssociateTwoPass;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -70,11 +71,11 @@ public class TestDetectDescribeAssociateTwoPass extends GenericChecksPointTracke
 		EasyGeneralFeatureDetector<GrayF32,GrayF32> easy = new
 				EasyGeneralFeatureDetector<>(corner, GrayF32.class, GrayF32.class);
 
-		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
-		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
+//		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
+//		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
 
 		DetectDescribeAssociateTwoPass<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociateTwoPass<>(manager, association, association, new ConfigTrackerDda());
+				new DetectDescribeAssociateTwoPass<>(association, association, new ConfigTrackerDda());
 		return tracker;
 	}
 }

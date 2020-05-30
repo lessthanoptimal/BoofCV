@@ -19,8 +19,8 @@
 package boofcv.abst.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.tracker.combined.CombinedTrack;
-import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
+import boofcv.alg.tracker.hybrid.HybridTrack;
+import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link CombinedTrackerScalePoint} for {@link PointTracker}. Features are respawned when the
+ * Wrapper around {@link HybridTrackerScalePoint} for {@link PointTracker}. Features are respawned when the
  * number of active tracks drops below a threshold automatically.  This threshold is realtive to the number
  * of tracks spawned previously and is adjusted when the user requests that tracks are dropped.
  *
@@ -42,10 +42,10 @@ import java.util.List;
  */
 // TODO drop after no associate after X detections
 // TODO Speed up combination of respawn and spawn
-public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
+public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 		implements PointTracker<I> {
 
-	CombinedTrackerScalePoint<I,D, Desc> tracker;
+	HybridTrackerScalePoint<I,D, Desc> tracker;
 
 	// ID of the most recently processed frame
 	protected long frameID=-1;
@@ -62,10 +62,10 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 
 	boolean detected;
 
-	public PointTrackerCombined(CombinedTrackerScalePoint<I, D, Desc> tracker,
-								ConfigDiscreteLevels configLevels,
-								int reactivateThreshold,
-								Class<I> imageType, Class<D> derivType) {
+	public PointTrackerHybrid(HybridTrackerScalePoint<I, D, Desc> tracker,
+							  ConfigDiscreteLevels configLevels,
+							  int reactivateThreshold,
+							  Class<I> imageType, Class<D> derivType) {
 		this.tracker = tracker;
 		this.reactivateThreshold = reactivateThreshold;
 		this.derivType = ImageType.single(derivType);
@@ -124,11 +124,11 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 		}
 
 		// Update the PointTrack state for KLT tracks
-		for( CombinedTrack<Desc> t : tracker.getPureKlt() ) {
+		for( HybridTrack<Desc> t : tracker.getPureKlt() ) {
 			((PointTrack)t.getCookie()).pixel.set(t.pixel);
 		}
 
-		for( CombinedTrack<Desc> t : tracker.getReactivated() ) {
+		for( HybridTrack<Desc> t : tracker.getReactivated() ) {
 			((PointTrack)t.getCookie()).pixel.set(t.pixel);
 		}
 	}
@@ -140,9 +140,9 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 		}
 		tracker.spawnTracksFromDetected();
 
-		List<CombinedTrack<Desc>> spawned = tracker.getSpawned();
+		List<HybridTrack<Desc>> spawned = tracker.getSpawned();
 
-		for( CombinedTrack<Desc> t : spawned ) {
+		for( HybridTrack<Desc> t : spawned ) {
 			PointTrack p = t.getCookie();
 			if( p == null ) {
 				p = new PointTrack();
@@ -172,7 +172,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 
 	@Override
 	public boolean dropTrack(PointTrack track) {
-		if( tracker.dropTrack((CombinedTrack<Desc>) track.getDescription()) ) {
+		if( tracker.dropTrack((HybridTrack<Desc>) track.getDescription()) ) {
 			// make sure if the user drops a lot of tracks that doesn't force a constant respawn
 			previousSpawn--;
 			return true;
@@ -188,7 +188,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 		dropTracks(dropper, tracker.getDormant());
 	}
 
-	private void dropTracks(Dropper dropper, List<CombinedTrack<Desc>> tracks) {
+	private void dropTracks(Dropper dropper, List<HybridTrack<Desc>> tracks) {
 		for (int i = tracks.size()-1; i >= 0; i--) {
 			PointTrack track = tracks.get(i).getCookie();
 			if( dropper.shouldDropTrack(track) ) {
@@ -255,7 +255,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 		return list;
 	}
 
-	private void addToList( List<CombinedTrack<Desc>> in , List<PointTrack> out ) {
+	private void addToList(List<HybridTrack<Desc>> in , List<PointTrack> out ) {
 		for( int i = 0; i < in.size(); i++ ) {
 			out.add( (PointTrack)in.get(i).getCookie() );
 		}

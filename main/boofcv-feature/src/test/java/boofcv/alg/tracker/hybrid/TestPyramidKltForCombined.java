@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.combined;
+package boofcv.alg.tracker.hybrid;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
@@ -54,11 +54,11 @@ class TestPyramidKltForCombined {
 	GrayF32[] derivY;
 
 
-	public PyramidKltForCombined<GrayF32,GrayF32> createAlg()
+	public PyramidKltForHybrid<GrayF32,GrayF32> createAlg()
 	{
 		ConfigKlt config = new ConfigKlt();
 
-		return new PyramidKltForCombined<>(config, 5, GrayF32.class, GrayF32.class);
+		return new PyramidKltForHybrid<>(config, 5, GrayF32.class, GrayF32.class);
 	}
 
 	@BeforeEach
@@ -81,7 +81,7 @@ class TestPyramidKltForCombined {
 
 	@Test
 	void setDescription() {
-		PyramidKltForCombined<GrayF32,GrayF32> alg = createAlg();
+		PyramidKltForHybrid<GrayF32,GrayF32> alg = createAlg();
 
 		alg.setInputs(pyramid,derivX,derivY);
 
@@ -105,7 +105,7 @@ class TestPyramidKltForCombined {
 
 	@Test
 	void performTracking() {
-		PyramidKltForCombined<GrayF32,GrayF32> alg = createAlg();
+		PyramidKltForHybrid<GrayF32,GrayF32> alg = createAlg();
 
 		alg.setInputs(pyramid,derivX,derivY);
 

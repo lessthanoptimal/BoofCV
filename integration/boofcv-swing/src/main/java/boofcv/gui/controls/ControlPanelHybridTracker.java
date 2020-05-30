@@ -130,7 +130,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 
 		DetectDescribePoint detDesc = createDetectDescribe(inputType);
 
-		PointTracker<T> tracker = FactoryPointTracker.combined(detDesc,createAssociate(detDesc),
+		PointTracker<T> tracker = FactoryPointTracker.hybrid(detDesc,createAssociate(detDesc),
 				configKlt,configHybrid.reactivateThreshold,imageType.getImageClass());
 		return tracker;
 	}

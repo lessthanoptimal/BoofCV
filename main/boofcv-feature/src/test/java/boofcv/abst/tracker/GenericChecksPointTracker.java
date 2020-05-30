@@ -20,6 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.tracker.dda.DetectDescribeAssociateTwoPass;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;

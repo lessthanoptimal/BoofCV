@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.combined;
+package boofcv.alg.tracker.hybrid;
 
 import boofcv.abst.feature.associate.AssociateDescriptionSets;
 import boofcv.abst.feature.detdesc.DetectDescribePointAbstract;
@@ -37,11 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-class TestCombinedTrackerScalePoint {
+class TestHybridTrackerScalePoint {
 
 	@Test
 	void reset() {
-		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
+		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
 
 		addTracks(alg.tracksDormant, 1);
 		addTracks(alg.tracksPureKlt, 2);
@@ -63,7 +63,7 @@ class TestCombinedTrackerScalePoint {
 
 	@Test
 	void dropAllTracks() {
-		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
+		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
 
 		addTracks(alg.tracksDormant,1);
 		addTracks(alg.tracksPureKlt,2);
@@ -84,7 +84,7 @@ class TestCombinedTrackerScalePoint {
 
 	@Test
 	void updateTracks() {
-		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
+		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
 
 		alg.trackerKlt = new DummyKlt();
 
@@ -104,7 +104,7 @@ class TestCombinedTrackerScalePoint {
 
 	@Test
 	void associateAllToDetected() {
-		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
+		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
 
 		alg.detectedDesc = new FastArray(BrightFeature.class);
 		alg.knownDesc = new FastArray(BrightFeature.class);
@@ -125,13 +125,13 @@ class TestCombinedTrackerScalePoint {
 
 		// make sure the KLT tracks haven't been changed
 		for( Object a : alg.tracksPureKlt ) {
-			CombinedTrack c = (CombinedTrack)a;
+			HybridTrack c = (HybridTrack)a;
 			assertEquals(0,c.pixel.x,1e-8);
 			assertEquals(0,c.pixel.y,1e-8);
 		}
 		// the others should have
 		for( Object a : alg.tracksReactivated ) {
-			CombinedTrack c = (CombinedTrack)a;
+			HybridTrack c = (HybridTrack)a;
 			assertTrue(0 != c.pixel.x);
 			assertTrue(0 != c.pixel.y);
 		}
@@ -139,13 +139,13 @@ class TestCombinedTrackerScalePoint {
 
 	private void addTracks( List l , int num ) {
 		for( int i = 0; i < num; i++ ) {
-			CombinedTrack t =new CombinedTrack();
+			HybridTrack t =new HybridTrack();
 			t.track = new PyramidKltFeature(2,5);
 			l.add( t );
 		}
 	}
 
-	private static class DummyKlt extends PyramidKltForCombined {
+	private static class DummyKlt extends PyramidKltForHybrid {
 		int count = 0;
 
 		@Override

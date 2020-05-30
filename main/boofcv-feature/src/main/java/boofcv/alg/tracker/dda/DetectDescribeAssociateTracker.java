@@ -16,11 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.abst.tracker;
+package boofcv.alg.tracker.dda;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.tracker.ConfigTrackerDda;
+import boofcv.abst.tracker.PointTrack;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -44,8 +47,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends TupleDesc>
-		implements PointTracker<I> {
-
+{
 	// associates features between two images together
 	protected AssociateDescriptionSets2D<TD> associate;
 
@@ -53,18 +55,18 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	protected DetectDescribePoint<I,TD> detector;
 
 	// all tracks
-	protected FastQueue<PointTrack> tracksAll;
+	protected @Getter FastQueue<PointTrack> tracksAll;
 	// recently associated tracks
-	protected List<PointTrack> tracksActive = new ArrayList<>();
+	protected @Getter List<PointTrack> tracksActive = new ArrayList<>();
 	// tracks not matched to any recent features
-	protected List<PointTrack> tracksInactive = new ArrayList<>();
+	protected @Getter List<PointTrack> tracksInactive = new ArrayList<>();
 	// tracks dropped by the tracker
-	protected List<PointTrack> tracksDropped = new ArrayList<>();
+	protected @Getter List<PointTrack> tracksDropped = new ArrayList<>();
 	// tracks recently spawned
-	protected List<PointTrack> tracksNew = new ArrayList<>();
+	protected @Getter List<PointTrack> tracksNew = new ArrayList<>();
 
 	// ID of the most recently processed frame
-	protected long frameID=-1;
+	protected @Getter long frameID=-1;
 
 	// number of features created.  Used to assign unique IDs
 	protected long featureID = 0;
@@ -141,29 +143,18 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		t.setCookie(cookie);
 	}
 
-	@Override
+	/**
+	 * Discards all tracking history
+	 */
 	public void reset() {
 		dropAllTracks();
 		featureID = 0;
 		frameID = -1;
 	}
 
-	@Override
-	public long getFrameID() {
-		return frameID;
-	}
-
-	@Override
-	public int getTotalActive() {
-		return tracksActive.size();
-	}
-
-	@Override
-	public int getTotalInactive() {
-		return tracksInactive.size();
-	}
-
-	@Override
+	/**
+	 * Detect features and associate with existing tracks
+	 */
 	public void process( I input ) {
 		frameID++;
 		tracksActive.clear();
@@ -275,7 +266,6 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	/**
 	 * Takes the current crop of detected features and makes them the keyframe
 	 */
-	@Override
 	public void spawnTracks() {
 		// setup data structures
 		associatedTable.resize(dstDesc.size);
@@ -330,7 +320,9 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		return true;
 	}
 
-	@Override
+	/**
+	 * Drops all tracks
+	 */
 	public void dropAllTracks() {
 		tracksActive.clear();
 		tracksInactive.clear();
@@ -338,17 +330,12 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		tracksNew.clear();
 	}
 
-	@Override
-	public int getMaxSpawn() {
-		return 0; // a hard max is not supported by the detector
-	}
 
 	/**
 	 * Remove from active list and mark so that it is dropped in the next cycle
 	 *
 	 * @param track The track which is to be dropped
 	 */
-	@Override
 	public boolean dropTrack(PointTrack track) {
 
 		int indexInAll = tracksAll.indexOf(track);
@@ -361,6 +348,9 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		return true;
 	}
 
+	/**
+	 * Given the index of the track in the `all` list, drop it from the tracker
+	 */
 	private PointTrack dropTrackIndexInAll(int indexInAll) {
 		PointTrack track = tracksAll.removeSwap(indexInAll);
 
@@ -374,68 +364,12 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		return track;
 	}
 
-	@Override
-	public void dropTracks(Dropper dropper) {
+	public void dropTracks(PointTracker.Dropper dropper) {
 		for (int i = tracksAll.size()-1; i >= 0; i--) {
 			PointTrack track = tracksAll.get(i);
 			if( !dropper.shouldDropTrack(track))
 				continue;
-			tracksAll.removeSwap(i);
-			tracksActive.remove(track);
-			tracksInactive.remove(track);
+			dropTrackIndexInAll(i);
 		}
-	}
-
-	@Override
-	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
-		if( list == null )
-			list = new ArrayList<>();
-		else
-			list.clear();
-
-		list.addAll(tracksActive);
-		return list;
-	}
-
-	@Override
-	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
-		if( list == null )
-			list = new ArrayList<>();
-		else
-			list.clear();
-
-		list.addAll(tracksDropped);
-		return list;
-	}
-
-	@Override
-	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
-		if( list == null )
-			list = new ArrayList<>();
-
-		list.addAll(tracksNew);
-		return list;
-	}
-
-	@Override
-	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
-		if( list == null )
-			list = new ArrayList<>();
-		else
-			list.clear();
-
-		list.addAll(tracksAll.toList());
-		return list;
-	}
-
-	@Override
-	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
-		if( list == null )
-			list = new ArrayList<>();
-		else
-			list.clear();
-
-		list.addAll(tracksInactive);
-		return list;
 	}
 }

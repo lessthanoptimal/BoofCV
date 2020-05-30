@@ -22,8 +22,8 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
-import boofcv.alg.tracker.combined.PyramidKltForCombined;
+import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
+import boofcv.alg.tracker.hybrid.PyramidKltForHybrid;
 import boofcv.alg.tracker.klt.ConfigKlt;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.tracker.klt.KltTracker;
@@ -99,7 +99,7 @@ public class FactoryTrackerAlg {
 	/**
 	 * Creates a tracker that is a hybrid between KLT and Detect-Describe-Associate (DDA) trackers.
 	 *
-	 * @see boofcv.alg.tracker.combined.CombinedTrackerScalePoint
+	 * @see HybridTrackerScalePoint
 	 *
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
@@ -107,20 +107,20 @@ public class FactoryTrackerAlg {
 	 * @param imageType Input image type.    @return Feature tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
-	CombinedTrackerScalePoint<I,D,Desc> combined(DetectDescribePoint<I, Desc> detector,
-												 AssociateDescription<Desc> associate,
-												 @Nullable ConfigPKlt kltConfig ,
-												 Class<I> imageType,
-												 @Nullable Class<D> derivType)
+	HybridTrackerScalePoint<I,D,Desc> hybrid(DetectDescribePoint<I, Desc> detector,
+											 AssociateDescription<Desc> associate,
+											 @Nullable ConfigPKlt kltConfig ,
+											 Class<I> imageType,
+											 @Nullable Class<D> derivType)
 	{
 		if( kltConfig == null)
 			kltConfig = new ConfigPKlt();
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<>(kltConfig.config,
+		PyramidKltForHybrid<I,D> klt = new PyramidKltForHybrid<>(kltConfig.config,
 				kltConfig.templateRadius,imageType, derivType);
 
-		return new CombinedTrackerScalePoint<>(klt, detector, associate);
+		return new HybridTrackerScalePoint<>(klt, detector, associate);
 	}
 }

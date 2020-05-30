@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.combined;
+package boofcv.alg.tracker.hybrid;
 
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.*;
@@ -25,11 +25,11 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 /**
- * Pyramidal KLT tracker designed for {@link CombinedTrackerScalePoint}.
+ * Pyramidal KLT tracker designed for {@link HybridTrackerScalePoint}.
  *
  * @author Peter Abeles
  */
-public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D>> {
+public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/** configuration for low level KLT tracker */
 	public ConfigKlt config;
 
@@ -43,9 +43,9 @@ public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D
 	// the tracker
 	protected PyramidKltTracker<I, D> tracker;
 
-	public PyramidKltForCombined(ConfigKlt config,
-								 int featureRadius,
-								 Class<I> inputType, Class<D> derivType) {
+	public PyramidKltForHybrid(ConfigKlt config,
+							   int featureRadius,
+							   Class<I> inputType, Class<D> derivType) {
 		this.config = config;
 		this.featureRadius = featureRadius;
 
@@ -56,7 +56,7 @@ public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D
 		tracker = new PyramidKltTracker<>(klt);
 	}
 
-	protected PyramidKltForCombined() {
+	protected PyramidKltForHybrid() {
 	}
 
 	public void setDescription( float x , float y , PyramidKltFeature ret ) {

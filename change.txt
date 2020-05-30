@@ -27,6 +27,7 @@ Version : 0.37
 TODO PointTracker
   - Add last seen field to track
   - has image motion 2D been updated to drop old unassociated tracks?
+  - Redesign PointTrackerTwoPass into PointTrackerHint
 
 TODO RegionOrientation
   - Clean up the mess that's the configuration

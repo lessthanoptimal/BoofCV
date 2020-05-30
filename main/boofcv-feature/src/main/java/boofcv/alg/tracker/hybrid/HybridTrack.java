@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.combined;
+package boofcv.alg.tracker.hybrid;
 
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * An image feature track for {@link CombinedTrackerScalePoint}.
+ * An image feature track for {@link HybridTrackerScalePoint}.
  *
  * @author Peter Abeles
  */
-public class CombinedTrack<TD extends TupleDesc> {
+public class HybridTrack<TD extends TupleDesc> {
 	// Location of the track in the image in pixels
 	public final Point2D_F64 pixel = new Point2D_F64();
 	// KLT feature description

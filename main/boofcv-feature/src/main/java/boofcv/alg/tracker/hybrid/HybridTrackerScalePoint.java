@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.tracker.combined;
+package boofcv.alg.tracker.hybrid;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescriptionSets;
@@ -46,14 +46,14 @@ import java.util.Stack;
  * @author Peter Abeles
  */
 // TODO Two versions.  One for InterestPointDetector and one for corners
-public class CombinedTrackerScalePoint
+public class HybridTrackerScalePoint
 		<I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc> {
 
 	// current image in sequence
 	private I input;
 
 	// The KLT tracker used to perform the nominal track update
-	protected PyramidKltForCombined<I,D> trackerKlt;
+	protected PyramidKltForHybrid<I,D> trackerKlt;
 
 	// feature detector and describer
 	protected DetectDescribePoint<I,TD> detector;
@@ -61,15 +61,15 @@ public class CombinedTrackerScalePoint
 	protected AssociateDescriptionSets<TD> associate;
 
 	// all active tracks that have been tracked purely by KLT
-	protected List<CombinedTrack<TD>> tracksPureKlt = new ArrayList<>();
+	protected List<HybridTrack<TD>> tracksPureKlt = new ArrayList<>();
 	// tracks that had been dropped by KLT but have been reactivated
-	protected List<CombinedTrack<TD>> tracksReactivated = new ArrayList<>();
+	protected List<HybridTrack<TD>> tracksReactivated = new ArrayList<>();
 	// tracks that are not actively being tracked
-	protected List<CombinedTrack<TD>> tracksDormant = new ArrayList<>();
+	protected List<HybridTrack<TD>> tracksDormant = new ArrayList<>();
 	// recently spawned tracks
-	protected List<CombinedTrack<TD>> tracksSpawned = new ArrayList<>();
+	protected List<HybridTrack<TD>> tracksSpawned = new ArrayList<>();
 	// track points whose data is to be reused
-	protected Stack<CombinedTrack<TD>> tracksUnused = new Stack<>();
+	protected Stack<HybridTrack<TD>> tracksUnused = new Stack<>();
 
 	// local storage used by association
 	protected FastArray<TD> detectedDesc;
@@ -90,9 +90,9 @@ public class CombinedTrackerScalePoint
 	 * @param detector Feature detector
 	 * @param associate Association algorithm
 	 */
-	public CombinedTrackerScalePoint(PyramidKltForCombined<I, D> trackerKlt,
-									 DetectDescribePoint<I,TD> detector,
-									 AssociateDescription<TD> associate ) {
+	public HybridTrackerScalePoint(PyramidKltForHybrid<I, D> trackerKlt,
+								   DetectDescribePoint<I,TD> detector,
+								   AssociateDescription<TD> associate ) {
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 
@@ -106,7 +106,7 @@ public class CombinedTrackerScalePoint
 	/**
 	 * Used for unit tests
 	 */
-	protected CombinedTrackerScalePoint() {
+	protected HybridTrackerScalePoint() {
 	}
 
 	/**
@@ -146,9 +146,9 @@ public class CombinedTrackerScalePoint
 	/**
 	 * Tracks features in the list using KLT and update their state
 	 */
-	private void trackUsingKlt(List<CombinedTrack<TD>> tracks) {
+	private void trackUsingKlt(List<HybridTrack<TD>> tracks) {
 		for( int i = 0; i < tracks.size();  ) {
-			CombinedTrack<TD> track = tracks.get(i);
+			HybridTrack<TD> track = tracks.get(i);
 
 			if( !trackerKlt.performTracking(track.track) ) {
 				// handle the dropped track
@@ -188,12 +188,12 @@ public class CombinedTrackerScalePoint
 
 			TD d = detectedDesc.get(i);
 
-			CombinedTrack<TD> track;
+			HybridTrack<TD> track;
 
 			if( tracksUnused.size() > 0 ) {
 				track = tracksUnused.pop();
 			} else {
-				track = new CombinedTrack<>();
+				track = new HybridTrack<>();
 				track.featureDesc = detector.createDescription();
 				track.track = trackerKlt.createNewTrack();
 			}
@@ -218,7 +218,7 @@ public class CombinedTrackerScalePoint
 	 *
 	 * @param known List of known tracks
 	 */
-	private void associateToDetected( List<CombinedTrack<TD>> known ) {
+	private void associateToDetected( List<HybridTrack<TD>> known ) {
 		int N = detector.getNumberOfFeatures();
 
 		// initialize data structures
@@ -235,7 +235,7 @@ public class CombinedTrackerScalePoint
 		knownDesc.resize(known.size());
 		knownSet.resize(known.size());
 		for (int i = 0; i < known.size(); i++) {
-			CombinedTrack<TD> t = known.get(i);
+			HybridTrack<TD> t = known.get(i);
 			knownDesc.data[i] = t.featureDesc;
 			knownSet.data[i] = t.featureSet;
 		}
@@ -257,7 +257,7 @@ public class CombinedTrackerScalePoint
 	 */
 	public void associateAllToDetected() {
 		// initialize data structures
-		List<CombinedTrack<TD>> all = new ArrayList<>();
+		List<HybridTrack<TD>> all = new ArrayList<>();
 		all.addAll(tracksReactivated);
 		all.addAll(tracksDormant);
 		all.addAll(tracksPureKlt);
@@ -284,7 +284,7 @@ public class CombinedTrackerScalePoint
 			if( a.src >= numTainted )
 				continue;
 
-			CombinedTrack<TD> t = all.get(a.src);
+			HybridTrack<TD> t = all.get(a.src);
 
 			t.pixel.set(detector.getLocation(a.dst));
 			trackerKlt.setDescription((float) t.pixel.x, (float) t.pixel.y, t.track);
@@ -305,7 +305,7 @@ public class CombinedTrackerScalePoint
 	 * @param track The track being dropped
 	 * @return true if the track was being tracked and data was recycled false if not.
 	 */
-	public boolean dropTrack( CombinedTrack<TD> track ) {
+	public boolean dropTrack( HybridTrack<TD> track ) {
 		if( !tracksPureKlt.remove(track) )
 			if( !tracksReactivated.remove(track) )
 				if( !tracksDormant.remove(track) )
@@ -315,23 +315,23 @@ public class CombinedTrackerScalePoint
 		return true;
 	}
 
-	public List<CombinedTrack<TD>> getSpawned() {
+	public List<HybridTrack<TD>> getSpawned() {
 		return tracksSpawned;
 	}
 
-	public List<CombinedTrack<TD>> getPureKlt() {
+	public List<HybridTrack<TD>> getPureKlt() {
 		return tracksPureKlt;
 	}
 
-	public List<CombinedTrack<TD>> getReactivated() {
+	public List<HybridTrack<TD>> getReactivated() {
 		return tracksReactivated;
 	}
 
-	public List<CombinedTrack<TD>> getDormant() {
+	public List<HybridTrack<TD>> getDormant() {
 		return tracksDormant;
 	}
 
-	public PyramidKltForCombined<I, D> getTrackerKlt() {
+	public PyramidKltForHybrid<I, D> getTrackerKlt() {
 		return trackerKlt;
 	}
 
@@ -354,7 +354,7 @@ public class CombinedTrackerScalePoint
 		tracksDormant.clear();
 	}
 
-	public void addUnused(CombinedTrack<TD> track) {
+	public void addUnused(HybridTrack<TD> track) {
 		tracksUnused.add(track);
 	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.abst.tracker;
 
+import boofcv.alg.tracker.dda.DetectDescribeAssociateTracker;
 import boofcv.struct.Configuration;
 
 /**

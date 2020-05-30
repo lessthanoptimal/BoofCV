@@ -23,34 +23,28 @@ import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestDetectDescribeAssociateTracker extends GenericChecksPointTracker<GrayF32> {
+class TestPointTrackerHybrid extends GenericChecksPointTracker<GrayF32> {
 
-	protected TestDetectDescribeAssociateTracker() {
+	public TestPointTrackerHybrid() {
 		super(true, false);
 	}
 
 	@Override
 	public PointTracker<GrayF32> createTracker() {
 		ConfigPointTracker config = new ConfigPointTracker();
-		config.typeTracker = ConfigPointTracker.TrackerType.DDA;
+		config.typeTracker = ConfigPointTracker.TrackerType.HYBRID;
 		config.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
-		config.detDesc.detectPoint.shiTomasi.radius = 3;
-		config.detDesc.detectPoint.general.radius = 3;
+		config.detDesc.detectPoint.shiTomasi.radius = 2;
+		config.detDesc.detectPoint.general.radius = 2;
+		config.detDesc.detectPoint.general.maxFeatures = 100;
 		config.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 		config.detDesc.describeBrief.fixed = true;
+		config.associate.greedy.maxErrorThreshold = 400;
 
-		return FactoryPointTracker.tracker(config,GrayF32.class,null);
-	}
-
-	@Test
-	void pruneExcessiveInactiveTracks() {
-		fail("Implement");
+		return FactoryPointTracker.tracker(config, GrayF32.class, null);
 	}
 }

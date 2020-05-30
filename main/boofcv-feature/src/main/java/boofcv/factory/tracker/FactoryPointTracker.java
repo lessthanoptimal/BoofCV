@@ -43,7 +43,8 @@ import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
+import boofcv.alg.tracker.dda.DetectDescribeAssociateTracker;
+import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
@@ -101,7 +102,7 @@ public class FactoryPointTracker {
 
 		switch( config.typeTracker ) {
 			case DDA: return FactoryPointTracker.dda(detDesc, new AssociateDescTo2D(associate), config.dda);
-			case HYBRID: return FactoryPointTracker.combined(
+			case HYBRID: return FactoryPointTracker.hybrid(
 					detDesc,associate,config.klt,config.hybrid.reactivateThreshold,imageType);
 		}
 		throw new RuntimeException("BUG! KLT all trackers should have been handled already");
@@ -176,7 +177,6 @@ public class FactoryPointTracker {
 	 * of SURF.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
@@ -202,7 +202,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,imageType);
 
-		return new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda());
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda()));
 	}
 
 	/**
@@ -210,7 +210,6 @@ public class FactoryPointTracker {
 	 * of SURF.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
@@ -236,7 +235,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		return new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda());
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda()));
 	}
 
 	/**
@@ -244,7 +243,6 @@ public class FactoryPointTracker {
 	 *
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointBrief
-	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param configExtract Configuration for extracting features
@@ -277,7 +275,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detector,null,describeBrief);
 
 
-		return new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda());
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda()));
 	}
 
 	/**
@@ -285,7 +283,6 @@ public class FactoryPointTracker {
 	 *
 	 * @see FastCornerDetector
 	 * @see DescribePointBrief
-	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configFast Configuration for FAST detector
 	 * @param configExtract Configuration for extracting features
@@ -314,7 +311,7 @@ public class FactoryPointTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, null);
 		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detector,null,describeBrief);
 
-		return new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda());
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda()));
 	}
 
 	/**
@@ -322,7 +319,6 @@ public class FactoryPointTracker {
 	 *
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointPixelRegionNCC
-	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configExtract Configuration for extracting features
 	 * @param describeRadius Radius of the region being described.  Try 2.
@@ -353,7 +349,7 @@ public class FactoryPointTracker {
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, null);
 		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detector,null,describeNCC);
 
-		return new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda());
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, association, new ConfigTrackerDda()));
 	}
 
 	/**
@@ -380,17 +376,16 @@ public class FactoryPointTracker {
 	}
 
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
-	DetectDescribeAssociateTracker<I,Desc> dda(DetectDescribePoint<I, Desc> detDesc,
+	PointTrackerDda<I,Desc> dda(DetectDescribePoint<I, Desc> detDesc,
 											   AssociateDescription2D<Desc> associate ,
 											   ConfigTrackerDda config) {
-		return new DetectDescribeAssociateTracker<>(detDesc, associate, config);
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(detDesc, associate, config));
 	}
 
 	/**
 	 * Creates a tracker which detects Fast-Hessian features, describes them with SURF, nominally tracks them using KLT.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param kltConfig Configuration for KLT tracker
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
@@ -418,7 +413,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,imageType);
 
-		return combined(fused,generalAssoc, kltConfig,reactivateThreshold, imageType);
+		return hybrid(fused,generalAssoc, kltConfig,reactivateThreshold, imageType);
 	}
 
 	/**
@@ -427,7 +422,6 @@ public class FactoryPointTracker {
 	 *
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configExtract Configuration for extracting features
 	 * @param kltConfig Configuration for KLT
@@ -469,14 +463,14 @@ public class FactoryPointTracker {
 			orientation = FactoryOrientation.convertImage(orientationII,imageType);
 		}
 
-		return combined(detector,orientation,regionDesc,generalAssoc, kltConfig,reactivateThreshold,
+		return hybrid(detector,orientation,regionDesc,generalAssoc, kltConfig,reactivateThreshold,
 				imageType);
 	}
 
 	/**
 	 * Creates a tracker that is a hybrid between KLT and Detect-Describe-Associate (DDA) trackers.
 	 *
-	 * @see CombinedTrackerScalePoint
+	 * @see HybridTrackerScalePoint
 	 *
 	 * @param detector Feature detector.
 	 * @param orientation Optional feature orientation.  Can be null.
@@ -487,23 +481,23 @@ public class FactoryPointTracker {
 	 * @param imageType Input image type.     @return Feature tracker
 	 */
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
-	PointTracker<I> combined(InterestPointDetector<I> detector,
-							 OrientationImage<I> orientation,
-							 DescribeRegionPoint<I, Desc> describe,
-							 AssociateDescription<Desc> associate,
-							 ConfigPKlt kltConfig ,
-							 int reactivateThreshold,
-							 Class<I> imageType)
+	PointTracker<I> hybrid(InterestPointDetector<I> detector,
+						   OrientationImage<I> orientation,
+						   DescribeRegionPoint<I, Desc> describe,
+						   AssociateDescription<Desc> associate,
+						   ConfigPKlt kltConfig ,
+						   int reactivateThreshold,
+						   Class<I> imageType)
 	{
 		DetectDescribeFusion<I,Desc> fused = new DetectDescribeFusion<>(detector, orientation, describe);
 
-		return combined(fused,associate, kltConfig, reactivateThreshold,imageType);
+		return hybrid(fused,associate, kltConfig, reactivateThreshold,imageType);
 	}
 
 	/**
 	 * Creates a tracker that is a hybrid between KLT and Detect-Describe-Associate (DDA) trackers.
 	 *
-	 * @see CombinedTrackerScalePoint
+	 * @see HybridTrackerScalePoint
 	 *
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
@@ -512,10 +506,10 @@ public class FactoryPointTracker {
 	 * @param imageType Input image type.     @return Feature tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
-	PointTracker<I> combined(DetectDescribePoint<I, Desc> detector,
-							 AssociateDescription<Desc> associate,
-							 ConfigPKlt kltConfig ,
-							 int reactivateThreshold, Class<I> imageType )
+	PointTracker<I> hybrid(DetectDescribePoint<I, Desc> detector,
+						   AssociateDescription<Desc> associate,
+						   ConfigPKlt kltConfig ,
+						   int reactivateThreshold, Class<I> imageType )
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
@@ -523,10 +517,10 @@ public class FactoryPointTracker {
 			kltConfig = new ConfigPKlt();
 		}
 
-		CombinedTrackerScalePoint<I, D,Desc> tracker =
-				FactoryTrackerAlg.combined(detector,associate, kltConfig,imageType,derivType);
+		HybridTrackerScalePoint<I, D,Desc> tracker =
+				FactoryTrackerAlg.hybrid(detector,associate, kltConfig,imageType,derivType);
 
-		return new PointTrackerCombined<>(tracker, kltConfig.pyramidLevels, reactivateThreshold, imageType, derivType);
+		return new PointTrackerHybrid<>(tracker, kltConfig.pyramidLevels, reactivateThreshold, imageType, derivType);
 	}
 
 
@@ -537,9 +531,9 @@ public class FactoryPointTracker {
 						double scale,
 						Class<I> imageType) {
 		InterestPointDetector<I> detectInterest = FactoryInterestPoint.wrapPoint(detector, scale, imageType, null);
-		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detectInterest,null,describe);
+		DetectDescribePoint<I,Desc> fused = FactoryDetectDescribe.fuseTogether(detectInterest,null,describe);
 
-		return new DetectDescribeAssociateTracker<>(fused, associate, new ConfigTrackerDda());
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, associate, new ConfigTrackerDda()));
 	}
 
 	/**

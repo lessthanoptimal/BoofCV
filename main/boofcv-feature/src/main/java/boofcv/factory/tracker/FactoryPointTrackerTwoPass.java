@@ -23,7 +23,9 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.abst.tracker.*;
+import boofcv.abst.tracker.ConfigTrackerDda;
+import boofcv.abst.tracker.PointTrackerTwoPass;
+import boofcv.abst.tracker.PointTrackerTwoPassKltPyramid;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
@@ -79,12 +81,13 @@ public class FactoryPointTrackerTwoPass {
 
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detector, imageType, null);
 
-		DdaManagerGeneralPoint<I,D,Desc> manager = new DdaManagerGeneralPoint<>(easy, describe, scale);
-
-		if( associate2 == null )
-			associate2 = associate1;
-
-		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, config);
+//		DdaManagerGeneralPoint<I,D,Desc> manager = new DdaManagerGeneralPoint<>(easy, describe, scale);
+//
+//		if( associate2 == null )
+//			associate2 = associate1;
+//
+//		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, config);
+		return null;
 	}
 
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
@@ -94,11 +97,12 @@ public class FactoryPointTrackerTwoPass {
 							   ConfigTrackerDda config ) {
 
 
-		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(detectDescribe);
-
-		if( associate2 == null )
-			associate2 = associate1;
-
-		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, config);
+//		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(detectDescribe);
+//
+//		if( associate2 == null )
+//			associate2 = associate1;
+//
+//		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, config);
+		return null;
 	}
 }
