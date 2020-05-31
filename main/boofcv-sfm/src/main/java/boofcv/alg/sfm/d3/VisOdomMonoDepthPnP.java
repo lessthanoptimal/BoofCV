@@ -300,12 +300,12 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		long frameID = getFrameID();
 		for( int i = 0; i < N; i++ ) {
 			int index = motionEstimator.getInputIndex(i);
-			PointTrack p = active.get(index);
-			Track t = p.getCookie();
-			t.lastUsed = frameID;
-			t.hasBeenInlier = true;
-			scene.addObservation(frameCurrent, t, p.pixel.x, p.pixel.y);
-			inlierTracks.add( t );
+			PointTrack pt = active.get(index);
+			Track bt = pt.getCookie();
+			bt.lastUsed = frameID;
+			bt.hasBeenInlier = true;
+			scene.addObservation(frameCurrent, bt, pt.pixel.x, pt.pixel.y);
+			inlierTracks.add( bt );
 		}
 	}
 
@@ -348,7 +348,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		// TODO make this optionally concurrent
 		// estimate 3D coordinate using stereo vision
-		for( PointTrack t : spawned ) {
+		for( PointTrack pt : spawned ) {
 //			for (int i = 0; i < visibleTracks.size(); i++) {
 //				if( visibleTracks.get(i).visualTrack == t ) {
 //					throw new RuntimeException("Bug. Adding duplicate track: " + visibleTracks.get(i).id + " " + t.featureId);
@@ -356,21 +356,21 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 //			}
 
 			// discard point if it can't localized
-			if( !pixelTo3D.process(t.pixel.x,t.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
-//				System.out.println("Dropped pixelTo3D  tt="+t.featureId);
-				tracker.dropTrack(t);
+			if( !pixelTo3D.process(pt.pixel.x,pt.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
+//				System.out.println("Dropped pixelTo3D  tt="+pt.featureId);
+				tracker.dropTrack(pt);
 			} else {
-				if( scene.findByTrackerTrack(t) != null ) {
-					Track btrack = scene.findByTrackerTrack(t);
+				if( scene.findByTrackerTrack(pt) != null ) {
+					Track btrack = scene.findByTrackerTrack(pt);
 //					System.out.println("BUG! Tracker recycled... bt="+btrack.id+" tt="+t.featureId);
-					throw new RuntimeException("BUG! Recycled tracker track too early tt="+t.featureId);
+					throw new RuntimeException("BUG! Recycled tracker track too early tt="+pt.featureId);
 				}
 				// Save the track's 3D location and add it to the current frame
 				Track btrack = scene.addTrack(pixelTo3D.getX(),pixelTo3D.getY(),pixelTo3D.getZ(),pixelTo3D.getW());
 				btrack.lastUsed = frameID;
-				btrack.visualTrack = t;
-				btrack.id = t.featureId;
-				t.cookie = btrack;
+				btrack.visualTrack = pt;
+				btrack.id = pt.featureId;
+				pt.cookie = btrack;
 
 //				System.out.println("new track bt="+btrack.id+" tt.id="+t.featureId);
 
@@ -380,7 +380,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 				// Homogeneous coordinates so the distance is determined by the ratio of w and other elements
 				btrack.worldLoc.normalize();
 
-				scene.addObservation(frameCurrent, btrack, t.pixel.x , t.pixel.y);
+				scene.addObservation(frameCurrent, btrack, pt.pixel.x , pt.pixel.y);
 
 //				for (int i = 0; i < visibleTracks.size(); i++) {
 //					if( visibleTracks.get(i).visualTrack == t )

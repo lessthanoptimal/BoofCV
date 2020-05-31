@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Peter Abeles
  */
 class TestAssociateDescriptionSets {
+	// TODO make sure you do everything that's in the standard set. unassociated indexes were wrong
 	@Test
 	void foo() {
 		fail("Implement");

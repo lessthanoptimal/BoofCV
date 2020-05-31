@@ -93,8 +93,8 @@ public class PruneCloseTracks<T> {
 	/**
 	 * Processes existing tracks and adds tracks to drop list if they are too close to other tracks and
 	 * considered less desirable
-	 * @param tracks (Input) List of tracks
-	 * @param dropTracks (Output)
+	 * @param tracks (Input) List of tracks. Not modified.
+	 * @param dropTracks (Output) List of tracks that need to be dropped by the tracker
 	 */
 	public void process( List<T> tracks , List<T> dropTracks ) {
 

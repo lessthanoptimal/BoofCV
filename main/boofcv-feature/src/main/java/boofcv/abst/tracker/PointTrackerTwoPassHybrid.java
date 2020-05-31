@@ -33,10 +33,9 @@ public class PointTrackerTwoPassHybrid<I extends ImageGray<I>, D extends ImageGr
 {
 	public PointTrackerTwoPassHybrid(HybridTrackerScalePoint<I, D, Desc> tracker,
 									 ConfigDiscreteLevels configLevels,
-									 int reactivateThreshold,
 									 Class<I> imageType, Class<D> derivType)
 	{
-		super(tracker, configLevels, reactivateThreshold, imageType, derivType);
+		super(tracker, configLevels, imageType, derivType);
 	}
 
 	@Override

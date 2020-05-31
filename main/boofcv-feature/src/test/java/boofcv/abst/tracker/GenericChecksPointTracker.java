@@ -148,8 +148,8 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 		tracker.spawnTracks();
 
 		assertTrue(tracker.getAllTracks(null).size() > 0);
-		assertTrue(tracker.getActiveTracks(null).size()>0);
-		assertEquals(tracker.getActiveTracks(null).size(), tracker.getNewTracks(null).size());
+		assertTrue(tracker.getTotalActive()>0);
+		assertEquals(tracker.getTotalActive(), tracker.getNewTracks(null).size());
 		checkInside(tracker.getAllTracks(null));
 
 		// Tweak the input image and make sure that everything has the expected size
@@ -274,7 +274,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 	 * Cause tracks to be dropped during the update
 	 */
 	@Test
-	void testUpdateTrackDrop() {
+	void updateThenDropTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -320,7 +320,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 	}
 	
 	@Test
-	void testRequestDrop() {
+	void dropTrack() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -342,7 +342,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	void testTrackUpdate() {
+	void trackUpdate() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();

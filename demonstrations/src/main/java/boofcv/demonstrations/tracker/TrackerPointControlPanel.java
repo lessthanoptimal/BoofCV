@@ -125,6 +125,9 @@ public class TrackerPointControlPanel
 		config.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		config.klt.templateRadius = 3;
 
+		config.detDesc.detectFastHessian.maxFeaturesPerScale = 500;
+		config.detDesc.detectSift.maxFeaturesPerScale = 500;
+
 		return config;
 	}
 

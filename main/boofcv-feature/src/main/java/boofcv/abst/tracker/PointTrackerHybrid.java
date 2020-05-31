@@ -24,14 +24,17 @@ import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
+import org.ddogleg.struct.FastQueue;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.abst.tracker.PointTrackerDda.addAllTracksInList;
 
 /**
  * Wrapper around {@link HybridTrackerScalePoint} for {@link PointTracker}. Features are respawned when the
@@ -40,16 +43,20 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO drop after no associate after X detections
-// TODO Speed up combination of respawn and spawn
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 		implements PointTracker<I> {
 
 	HybridTrackerScalePoint<I,D, Desc> tracker;
 
-	// ID of the most recently processed frame
-	protected long frameID=-1;
+	// Threshold which decides enough tracks have been dropped that it should try to respawn some of the ones it
+	// dropped
+	public final ConfigLength thresholdRespawn = ConfigLength.relative(0.4,50);
 
+	// Number of active tracks after respawning
+	private int countAfterSpawn;
+
+	I image;
 	PyramidDiscrete<I> pyramid;
 	D[] derivX;
 	D[] derivY;
@@ -57,17 +64,13 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 
 	ImageGradient<I,D> gradient;
 
-	int reactivateThreshold;
-	int previousSpawn;
-
-	boolean detected;
+	// If true that means feature detection has already been called once and new features can be spawned
+	boolean detectCalled;
 
 	public PointTrackerHybrid(HybridTrackerScalePoint<I, D, Desc> tracker,
 							  ConfigDiscreteLevels configLevels,
-							  int reactivateThreshold,
 							  Class<I> imageType, Class<D> derivType) {
 		this.tracker = tracker;
-		this.reactivateThreshold = reactivateThreshold;
 		this.derivType = ImageType.single(derivType);
 
 		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,true, ImageType.single(imageType));
@@ -77,32 +80,9 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	}
 
 	@Override
-	public void reset() {
-		tracker.reset();
-		previousSpawn = 0;
-		detected = false;
-		frameID=-1;
-	}
-
-	@Override
-	public long getFrameID() {
-		return frameID;
-	}
-
-	@Override
-	public int getTotalActive() {
-		return tracker.getReactivated().size() + tracker.getPureKlt().size();
-	}
-
-	@Override
-	public int getTotalInactive() {
-		return tracker.getDormant().size();
-	}
-
-	@Override
 	public void process(I image) {
-		frameID++;
-		detected = false;
+		this.image = image;
+		detectCalled = false;
 
 		// update the image pyramid
 		pyramid.process(image);
@@ -112,69 +92,53 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 		}
 		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
 
-		// pass in filtered inputs
-		tracker.updateTracks(image, pyramid, derivX, derivY);
-
-		int numActive = tracker.getPureKlt().size() + tracker.getReactivated().size();
-
-		if( previousSpawn-numActive > reactivateThreshold) {
-			detected = true;
-			tracker.associateAllToDetected();
-			previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();
+		// Perform KLT tracking
+		tracker.updateTracks(pyramid, derivX, derivY);
+		// Perform DDA tracking when the number of pure KLT has dropped significantly from the previous attempt
+		if( tracker.getTracksActive().size < thresholdRespawn.computeI(countAfterSpawn) ) {
+			detectCalled = true;
+			tracker.associateInactiveTracks(image);
+			countAfterSpawn = tracker.getTracksActive().size;
 		}
-
-		// Update the PointTrack state for KLT tracks
-		for( HybridTrack<Desc> t : tracker.getPureKlt() ) {
-			((PointTrack)t.getCookie()).pixel.set(t.pixel);
-		}
-
-		for( HybridTrack<Desc> t : tracker.getReactivated() ) {
-			((PointTrack)t.getCookie()).pixel.set(t.pixel);
-		}
+		// Drop KLT tracks which are too close to each other
+		tracker.pruneActiveTracksWhichAreTooClose();
+		// Perform track maintenance
+		tracker.dropExcessiveInactiveTracks();
 	}
 
 	@Override
-	public void spawnTracks() {
-		if( !detected ) {
-			tracker.associateAllToDetected();
+	public void dropTracks(Dropper dropper) {
+		FastQueue<HybridTrack<Desc>> all = tracker.getTracksAll();
+
+		for (int i = all.size-1; i >= 0; i--) {
+			if( !dropper.shouldDropTrack(all.get(i)) )
+				continue;
+
+			tracker.dropTrackByAllIndex(i);
+			countAfterSpawn--;
 		}
-		tracker.spawnTracksFromDetected();
+	}
 
-		List<HybridTrack<Desc>> spawned = tracker.getSpawned();
-
-		for( HybridTrack<Desc> t : spawned ) {
-			PointTrack p = t.getCookie();
-			if( p == null ) {
-				p = new PointTrack();
-				t.setCookie(p);
-			}
-
-			p.pixel.set(t.pixel);
-			p.setDescription(t);
-			p.featureId = t.trackID;
-			p.spawnFrameID = frameID;
+	@Override public void spawnTracks() {
+		if( !detectCalled ) {
+			tracker.associateInactiveTracks(image);
 		}
-
-		previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();
+		tracker.spawnNewTracks();
+		countAfterSpawn = tracker.getTracksActive().size;
 	}
 
-	@Override
-	public void dropAllTracks() {
-		tracker.dropAllTracks();
+	@Override public void reset() {
+		countAfterSpawn = 0;
+		tracker.reset();
 	}
-
-	@Override
-	public int getMaxSpawn() {
-		return 0;
-		// returning zero here since there is no good answer.
-		// The detector employed doesn't have a normal hard limit
-	}
-
-	@Override
-	public boolean dropTrack(PointTrack track) {
-		if( tracker.dropTrack((HybridTrack<Desc>) track.getDescription()) ) {
-			// make sure if the user drops a lot of tracks that doesn't force a constant respawn
-			previousSpawn--;
+	@Override public long getFrameID() {return tracker.getFrameID();}
+	@Override public int getTotalActive() { return tracker.getTracksActive().size();}
+	@Override public int getTotalInactive() { return tracker.getTracksInactive().size();}
+	@Override public void dropAllTracks() { tracker.dropAllTracks(); }
+	@Override public int getMaxSpawn() { return 0; } // returning zero here since there is no good answer.
+	@Override public boolean dropTrack(PointTrack track) {
+		if( tracker.dropTrack((HybridTrack<Desc>) track) ) {
+			countAfterSpawn--;
 			return true;
 		} else {
 			return false;
@@ -182,82 +146,27 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	}
 
 	@Override
-	public void dropTracks(Dropper dropper) {
-		dropTracks(dropper, tracker.getPureKlt());
-		dropTracks(dropper, tracker.getReactivated());
-		dropTracks(dropper, tracker.getDormant());
-	}
-
-	private void dropTracks(Dropper dropper, List<HybridTrack<Desc>> tracks) {
-		for (int i = tracks.size()-1; i >= 0; i--) {
-			PointTrack track = tracks.get(i).getCookie();
-			if( dropper.shouldDropTrack(track) ) {
-				tracker.addUnused(tracks.remove(i));
-				previousSpawn--;
-			}
-		}
-	}
-
-	@Override
 	public List<PointTrack> getAllTracks(List<PointTrack> list) {
-		if( list == null ) {
-			list = new ArrayList<>();
-		}
-
-		addToList(tracker.getReactivated(),list);
-		addToList(tracker.getPureKlt(),list);
-		addToList(tracker.getDormant(),list);
-
-		return list;
+		return addAllTracksInList((List)tracker.getTracksAll().toList(), list);
 	}
 
 	@Override
 	public List<PointTrack> getActiveTracks(List<PointTrack> list) {
-		if( list == null ) {
-			list = new ArrayList<>();
-		}
-
-		addToList(tracker.getReactivated(),list);
-		addToList(tracker.getPureKlt(),list);
-
-		return list;
+		return addAllTracksInList((List)tracker.getTracksActive().toList(), list);
 	}
 
 	@Override
 	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
-		if( list == null ) {
-			list = new ArrayList<>();
-		}
-
-		addToList(tracker.getDormant(),list);
-
-		return list;
+		return addAllTracksInList((List)tracker.getTracksInactive().toList(), list);
 	}
 
 	@Override
 	public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
-		if( list == null ) {
-			list = new ArrayList<>();
-		}
-
-		// it never drops tracks
-		return list;
+		return addAllTracksInList((List)tracker.getTracksDropped(), list);
 	}
 
 	@Override
 	public List<PointTrack> getNewTracks(List<PointTrack> list) {
-		if( list == null ) {
-			list = new ArrayList<>();
-		}
-
-		addToList(tracker.getSpawned(),list);
-
-		return list;
-	}
-
-	private void addToList(List<HybridTrack<Desc>> in , List<PointTrack> out ) {
-		for( int i = 0; i < in.size(); i++ ) {
-			out.add( (PointTrack)in.get(i).getCookie() );
-		}
+		return addAllTracksInList((List)tracker.getTracksSpawned(), list);
 	}
 }

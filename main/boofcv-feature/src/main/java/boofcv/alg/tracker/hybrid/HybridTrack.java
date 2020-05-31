@@ -18,35 +18,22 @@
 
 package boofcv.alg.tracker.hybrid;
 
+import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.feature.TupleDesc;
-import georegression.struct.point.Point2D_F64;
 
 /**
  * An image feature track for {@link HybridTrackerScalePoint}.
  *
  * @author Peter Abeles
  */
-public class HybridTrack<TD extends TupleDesc> {
-	// Location of the track in the image in pixels
-	public final Point2D_F64 pixel = new Point2D_F64();
+public class HybridTrack<TD extends TupleDesc> extends PointTrack {
 	// KLT feature description
-	public PyramidKltFeature track;
+	public PyramidKltFeature trackKlt;
 	// DDA type description
-	public TD featureDesc;
-	// Feature ID
-	public long trackID;
-	// The feature set that the feature belongs to
-	public int featureSet;
-
-	// user storage
-	Object cookie;
-
-	public <T>T getCookie() {
-		return (T)cookie;
-	}
-
-	public void setCookie(Object cookie) {
-		this.cookie = cookie;
-	}
+	public TD descriptor;
+	// the last frame was updated at
+	public long lastUpdatedFrame; // todo remove when moved into PointTrack
+	// If the track has been respawned or not
+	public boolean respawned;
 }

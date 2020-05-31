@@ -27,120 +27,123 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 class TestHybridTrackerScalePoint {
 
 	@Test
-	void reset() {
-		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-
-		addTracks(alg.tracksDormant, 1);
-		addTracks(alg.tracksPureKlt, 2);
-		addTracks(alg.tracksReactivated, 4);
-		addTracks(alg.tracksSpawned, 8);
-		addTracks(alg.tracksUnused, 2);
-
-		alg.totalTracks = 5;
-
-		alg.reset();
-
-		assertEquals(0,alg.tracksDormant.size());
-		assertEquals(0,alg.tracksPureKlt.size());
-		assertEquals(0,alg.tracksReactivated.size());
-		assertEquals(0,alg.tracksSpawned.size());
-		assertEquals(9,alg.tracksUnused.size());
-		assertEquals(0,alg.totalTracks);
+	void implement() {
+		fail("implement");
 	}
 
-	@Test
-	void dropAllTracks() {
-		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-
-		addTracks(alg.tracksDormant,1);
-		addTracks(alg.tracksPureKlt,2);
-		addTracks(alg.tracksReactivated,4);
-		addTracks(alg.tracksSpawned,8);
-		addTracks(alg.tracksUnused, 2);
-		alg.totalTracks = 5;
-
-		alg.dropAllTracks();
-
-		assertEquals(0,alg.tracksDormant.size());
-		assertEquals(0,alg.tracksPureKlt.size());
-		assertEquals(0,alg.tracksReactivated.size());
-		assertEquals(0,alg.tracksSpawned.size());
-		assertEquals(9,alg.tracksUnused.size());
-		assertEquals(5,alg.totalTracks);
-	}
-
-	@Test
-	void updateTracks() {
-		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-
-		alg.trackerKlt = new DummyKlt();
-
-		addTracks(alg.tracksPureKlt,8);
-
-		// this should be cleared
-		alg.tracksSpawned.add(1);
-
-		alg.updateTracks(null,null,null,null);
-
-		// tracks after 5 should be dropped
-		assertEquals(5, alg.tracksPureKlt.size());
-		assertEquals(3, alg.tracksDormant.size());
-		assertEquals(0, alg.tracksUnused.size());
-		assertEquals(0, alg.tracksSpawned.size());
-	}
-
-	@Test
-	void associateAllToDetected() {
-		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-
-		alg.detectedDesc = new FastArray(BrightFeature.class);
-		alg.knownDesc = new FastArray(BrightFeature.class);
-		alg.associate = new DummyAssoc(20);
-		alg.detector = new DummyDetector(20);
-		alg.trackerKlt = new DummyKlt();
-
-		addTracks(alg.tracksDormant,3);
-		addTracks(alg.tracksReactivated,4);
-		addTracks(alg.tracksPureKlt,8);
-
-		alg.associateAllToDetected();
-
-		// all dormant should be reactivated
-		assertEquals(0,alg.tracksDormant.size());
-		assertEquals(7,alg.tracksReactivated.size());
-		assertEquals(8,alg.tracksPureKlt.size());
-
-		// make sure the KLT tracks haven't been changed
-		for( Object a : alg.tracksPureKlt ) {
-			HybridTrack c = (HybridTrack)a;
-			assertEquals(0,c.pixel.x,1e-8);
-			assertEquals(0,c.pixel.y,1e-8);
-		}
-		// the others should have
-		for( Object a : alg.tracksReactivated ) {
-			HybridTrack c = (HybridTrack)a;
-			assertTrue(0 != c.pixel.x);
-			assertTrue(0 != c.pixel.y);
-		}
-	}
+//	@Test
+//	void reset() {
+//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
+//
+//		addTracks(alg.tracksDormant, 1);
+//		addTracks(alg.tracksPureKlt, 2);
+//		addTracks(alg.tracksReactivated, 4);
+//		addTracks(alg.tracksSpawned, 8);
+//		addTracks(alg.tracksUnused, 2);
+//
+//		alg.totalTracks = 5;
+//
+//		alg.reset();
+//
+//		assertEquals(0,alg.tracksDormant.size());
+//		assertEquals(0,alg.tracksPureKlt.size());
+//		assertEquals(0,alg.tracksReactivated.size());
+//		assertEquals(0,alg.tracksSpawned.size());
+//		assertEquals(9,alg.tracksUnused.size());
+//		assertEquals(0,alg.totalTracks);
+//	}
+//
+//	@Test
+//	void dropAllTracks() {
+//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
+//
+//		addTracks(alg.tracksDormant,1);
+//		addTracks(alg.tracksPureKlt,2);
+//		addTracks(alg.tracksReactivated,4);
+//		addTracks(alg.tracksSpawned,8);
+//		addTracks(alg.tracksUnused, 2);
+//		alg.totalTracks = 5;
+//
+//		alg.dropAllTracks();
+//
+//		assertEquals(0,alg.tracksDormant.size());
+//		assertEquals(0,alg.tracksPureKlt.size());
+//		assertEquals(0,alg.tracksReactivated.size());
+//		assertEquals(0,alg.tracksSpawned.size());
+//		assertEquals(9,alg.tracksUnused.size());
+//		assertEquals(5,alg.totalTracks);
+//	}
+//
+//	@Test
+//	void updateTracks() {
+//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
+//
+//		alg.trackerKlt = new DummyKlt();
+//
+//		addTracks(alg.tracksPureKlt,8);
+//
+//		// this should be cleared
+//		alg.tracksSpawned.add(1);
+//
+//		alg.updateTracks(null,null,null,null);
+//
+//		// tracks after 5 should be dropped
+//		assertEquals(5, alg.tracksPureKlt.size());
+//		assertEquals(3, alg.tracksDormant.size());
+//		assertEquals(0, alg.tracksUnused.size());
+//		assertEquals(0, alg.tracksSpawned.size());
+//	}
+//
+//	@Test
+//	void associateAllToDetected() {
+//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
+//
+//		alg.detectedDesc = new FastArray(BrightFeature.class);
+//		alg.knownDesc = new FastArray(BrightFeature.class);
+//		alg.associate = new DummyAssoc(20);
+//		alg.detector = new DummyDetector(20);
+//		alg.trackerKlt = new DummyKlt();
+//
+//		addTracks(alg.tracksDormant,3);
+//		addTracks(alg.tracksReactivated,4);
+//		addTracks(alg.tracksPureKlt,8);
+//
+//		alg.associateAllToDetected();
+//
+//		// all dormant should be reactivated
+//		assertEquals(0,alg.tracksDormant.size());
+//		assertEquals(7,alg.tracksReactivated.size());
+//		assertEquals(8,alg.tracksPureKlt.size());
+//
+//		// make sure the KLT tracks haven't been changed
+//		for( Object a : alg.tracksPureKlt ) {
+//			HybridTrack c = (HybridTrack)a;
+//			assertEquals(0,c.pixel.x,1e-8);
+//			assertEquals(0,c.pixel.y,1e-8);
+//		}
+//		// the others should have
+//		for( Object a : alg.tracksReactivated ) {
+//			HybridTrack c = (HybridTrack)a;
+//			assertTrue(0 != c.pixel.x);
+//			assertTrue(0 != c.pixel.y);
+//		}
+//	}
 
 	private void addTracks( List l , int num ) {
 		for( int i = 0; i < num; i++ ) {
 			HybridTrack t =new HybridTrack();
-			t.track = new PyramidKltFeature(2,5);
+			t.trackKlt = new PyramidKltFeature(2,5);
 			l.add( t );
 		}
 	}

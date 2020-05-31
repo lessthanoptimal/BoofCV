@@ -35,7 +35,7 @@ public class PointTrack {
 	/**
 	 * The type of feature it belongs to
 	 */
-	public int setId;
+	public int detectorSetId;
 	/**
 	 * Unique ID associated with this feature
 	 */

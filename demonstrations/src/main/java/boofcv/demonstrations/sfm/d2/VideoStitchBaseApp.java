@@ -25,6 +25,7 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.PlToGrayMotion2D;
+import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
@@ -133,14 +134,15 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	}
 
 	protected PointTracker<I> createTracker() {
-		ConfigPKlt config = new ConfigPKlt();
-		config.templateRadius = 3;
-		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		ConfigPKlt configKlt = new ConfigPKlt();
+		configKlt.templateRadius = 3;
+		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
 		configFH.initialSampleStep = 2;
 		configFH.maxFeaturesPerScale = 250;
 
+		ConfigTrackerHybrid configHybrid = new ConfigTrackerHybrid();
 
 		ImageType imageType = super.getImageType(0);
 		Class imageClass = imageType.getImageClass();
@@ -154,7 +156,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 				configDetector.general.maxFeatures = maxFeatures;
 				configDetector.general.radius = 3;
 				configDetector.general.threshold = 1;
-				return FactoryPointTracker.klt(config, configDetector, imageClass, derivClass);
+				return FactoryPointTracker.klt(configKlt, configDetector, imageClass, derivClass);
 			}
 			case ST_BRIEF:
 				return FactoryPointTracker. dda_ST_BRIEF(150,
@@ -163,7 +165,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 				return FactoryPointTracker.dda_FH_SURF_Fast(configFH, null, null, imageClass);
 			case ST_SURF_KLT:
 				return FactoryPointTracker.combined_FH_SURF_KLT(
-						config, 100, configFH, null, null, imageClass);
+						configKlt, configHybrid, configFH, null, null, imageClass);
 
 			default:
 				throw new RuntimeException("Unknown tracker: "+type);

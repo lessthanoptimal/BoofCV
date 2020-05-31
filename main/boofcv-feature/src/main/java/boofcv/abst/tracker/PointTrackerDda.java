@@ -22,6 +22,7 @@ import boofcv.alg.tracker.dda.DetectDescribeAssociateTracker;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,37 +52,37 @@ public class PointTrackerDda<I extends ImageGray<I>, TD extends TupleDesc>
 	@Override public void spawnTracks() { tracker.spawnTracks(); }
 
 	@Override
-	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
-		return addAllTracksInList(list, tracker.getTracksActive());
+	public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
+		return addAllTracksInList(tracker.getTracksActive(), list);
 	}
 
 	@Override
-	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
-		return addAllTracksInList(list, tracker.getTracksDropped());
+	public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
+		return addAllTracksInList(tracker.getTracksDropped(), list);
 	}
 
 	@Override
-	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
-		return addAllTracksInList(list, tracker.getTracksNew());
+	public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
+		return addAllTracksInList(tracker.getTracksNew(), list);
 	}
 
 	@Override
-	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
-		return addAllTracksInList(list, tracker.getTracksAll().toList());
+	public List<PointTrack> getAllTracks( @Nullable List<PointTrack> list ) {
+		return addAllTracksInList(tracker.getTracksAll().toList(), list);
 	}
 
 	@Override
-	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
-		return addAllTracksInList(list, tracker.getTracksInactive());
+	public List<PointTrack> getInactiveTracks(@Nullable List<PointTrack> list) {
+		return addAllTracksInList(tracker.getTracksInactive(), list);
 	}
 
-	private static List<PointTrack> addAllTracksInList(List<PointTrack> list, List<PointTrack> tracksActive) {
-		if (list == null)
-			list = new ArrayList<>();
+	public static List<PointTrack> addAllTracksInList(List<PointTrack> tracks, @Nullable List<PointTrack> output) {
+		if (output == null)
+			output = new ArrayList<>();
 		else
-			list.clear();
+			output.clear();
 
-		list.addAll(tracksActive);
-		return list;
+		output.addAll(tracks);
+		return output;
 	}
 }

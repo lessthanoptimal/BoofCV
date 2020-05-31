@@ -20,41 +20,49 @@ package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateGreedy;
 import boofcv.struct.feature.TupleDesc_F64;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
 class TestWrapAssociateGreedy {
 
-	@Test
-	void normal() {
-		new StandardTests() {
-			@Override
-			public AssociateDescription<TupleDesc_F64> createAlg() {
-				ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
-				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
-				return new WrapAssociateGreedy<>(greedy);
-			}
-		}.allTests();
+	@Nested
+	public class Normal extends StandardTests {
+		@Override
+		public AssociateDescription<TupleDesc_F64> createAlg() {
+			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
+			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
+			return new WrapAssociateGreedy<>(greedy);
+		}
 	}
 
-	@Test
-	void backwards() {
-		new StandardTests() {
-			@Override
-			public AssociateDescription<TupleDesc_F64> createAlg() {
-				ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
-				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, true);
-				return new WrapAssociateGreedy<>(greedy);
-			}
-		}.allTests();
+	@Nested
+	public class Backwards extends StandardTests {
+		@Override
+		public AssociateDescription<TupleDesc_F64> createAlg() {
+			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
+			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, true);
+			return new WrapAssociateGreedy<>(greedy);
+		}
+	}
+
+	@Nested
+	public class RatioTest extends StandardTests {
+		@Override
+		public AssociateDescription<TupleDesc_F64> createAlg() {
+			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
+			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
+			greedy.setRatioTest(0.75);
+			return new WrapAssociateGreedy<>(greedy);
+		}
 	}
 
 	private static abstract class StandardTests extends StandardAssociateDescriptionChecks<TupleDesc_F64>
 	{
 		public StandardTests() {
 			super(TupleDesc_F64.class);
+			distanceIsSquared = false;
 		}
 
 		@Override

@@ -22,10 +22,10 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Standard tests for implementations of AssociateDescription
@@ -51,6 +51,9 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		checkSetThreshold();
 		uniqueSource();
 		uniqueDestination();
+		checkUnassociatedLists();
+		checkUnassociatedLists_emptySrc();
+		checkUnassociatedLists_emptyDst();
 	}
 
 	/**
@@ -64,17 +67,17 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	}
 
 	@Test
-	public void checkScoreType() {
+	void checkScoreType() {
 		AssociateDescription<Desc> alg = createAlg();
 
-		assertTrue(MatchScoreType.NORM_ERROR == alg.getScoreType(),"Test are designed for norm error");
+		assertSame(MatchScoreType.NORM_ERROR, alg.getScoreType(), "Test are designed for norm error");
 	}
 
 	/**
 	 * Basic tests where there should be unique association in both direction
 	 */
 	@Test
-	public void basicTests() {
+	void basicTests() {
 		// test the cases where the number of matches is more than and less than the maximum
 		performBasicTest(20);
 		performBasicTest(40);
@@ -173,7 +176,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	}
 
 	@Test
-	public void checkUnassociatedLists() {
+	void checkUnassociatedLists() {
 		init();
 
 		AssociateDescription<Desc> alg = createAlg();
@@ -198,7 +201,62 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	}
 
 	@Test
-	public void uniqueSource() {
+	void checkUnassociatedLists_emptySrc() {
+		init();
+
+		AssociateDescription<Desc> alg = createAlg();
+
+		listDst.add( c(1+0.1) );
+		listDst.add( c(2+0.05) );
+		listDst.add( c(3+0.05) );
+		listDst.add( c(20) );  // can't be paired with anything
+
+		// set threshold so that one pair won't be considered
+		alg.setMaxScoreThreshold(distanceIsSquared?0.07*0.07:0.07);
+		alg.setSource(listSrc);
+		alg.setDestination(listDst);
+		alg.associate();
+
+		assertEquals(0,alg.getMatches().size);
+		assertEquals(0,alg.getUnassociatedSource().size);
+		assertEquals(4,alg.getUnassociatedDestination().size);
+
+		GrowQueue_I32 unassociated = alg.getUnassociatedDestination();
+		unassociated.sort();
+		for( int i = 0; i < unassociated.size; i++ ) {
+			assertEquals(i,unassociated.get(i));
+		}
+	}
+
+	@Test
+	void checkUnassociatedLists_emptyDst() {
+		init();
+
+		AssociateDescription<Desc> alg = createAlg();
+
+		listSrc.add( c(1) );
+		listSrc.add( c(2) );
+		listSrc.add( c(3) );
+
+		// set threshold so that one pair won't be considered
+		alg.setMaxScoreThreshold(distanceIsSquared?0.07*0.07:0.07);
+		alg.setSource(listSrc);
+		alg.setDestination(listDst);
+		alg.associate();
+
+		assertEquals(0,alg.getMatches().size);
+		assertEquals(3,alg.getUnassociatedSource().size);
+		assertEquals(0,alg.getUnassociatedDestination().size);
+
+		GrowQueue_I32 unassociated = alg.getUnassociatedSource();
+		unassociated.sort();
+		for( int i = 0; i < unassociated.size; i++ ) {
+			assertEquals(i,unassociated.get(i));
+		}
+	}
+
+	@Test
+	void uniqueSource() {
 		init();
 
 		listSrc.add(c(1));
@@ -219,7 +277,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	}
 
 	@Test
-	public void uniqueDestination() {
+	void uniqueDestination() {
 		init();
 
 		listSrc.add( c(1) );

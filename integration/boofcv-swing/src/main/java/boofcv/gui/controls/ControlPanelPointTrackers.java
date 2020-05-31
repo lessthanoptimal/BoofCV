@@ -35,7 +35,7 @@ import java.awt.*;
 public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	ConfigPointTracker.TrackerType selectedFamily = ConfigPointTracker.TrackerType.KLT;
 
-	JComboBox<String> cFamily = combo(selectedFamily.ordinal(), ConfigPointTracker.TrackerType.values());
+	JComboBox<String> cFamily;
 	JPanel mainPanel = new JPanel(new BorderLayout());
 
 	ControlPanelPointTrackerKlt controlKlt;
@@ -56,16 +56,20 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 		// TODO pass in copies since each control panel is independent
 		controlKlt = config == null ? new ControlPanelPointTrackerKlt(listener::changePointTracker)
 				: new ControlPanelPointTrackerKlt(listener::changePointTracker,
-				config.detDesc.detectPoint.copy(),config.klt);
+				config.detDesc.detectPoint.copy(),config.klt.copy());
 		controlDda = config == null ? new ControlPanelDdaTracker(listener::changePointTracker)
 				: new ControlPanelDdaTracker(listener::changePointTracker,
 				config.dda.copy(),config.detDesc.copy(),config.associate.copy());
 		controlHybrid = config == null ?  new ControlPanelHybridTracker(listener::changePointTracker)
-				: new ControlPanelHybridTracker(listener::changePointTracker);
+				: new ControlPanelHybridTracker(listener::changePointTracker,config.hybrid,config.klt.copy(),
+				config.detDesc.copy(),config.associate.copy());
+		if( config != null )
+			selectedFamily = config.typeTracker;
 
 		controlDda.initializeControlsGUI();
 		controlHybrid.initializeControlsGUI();
 
+		cFamily = combo(selectedFamily.ordinal(), ConfigPointTracker.TrackerType.values());
 		ConfigPointTracker.TrackerType selected = selectedFamily;
 		selectedFamily = null; // so that it will update
 		changeFamily(selected);
@@ -77,12 +81,12 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker( ImageType<T> imageType ) {
-		switch( selectedFamily ) {
-			case KLT: return controlKlt.createTracker(imageType);
-			case DDA: return controlDda.createTracker(imageType);
-			case HYBRID: return controlHybrid.createTracker(imageType);
-			default: throw new RuntimeException("Not yet supported");
-		}
+		return switch (selectedFamily) {
+			case KLT -> controlKlt.createTracker(imageType);
+			case DDA -> controlDda.createTracker(imageType);
+			case HYBRID -> controlHybrid.createTracker(imageType);
+			default -> throw new RuntimeException("Not yet supported");
+		};
 	}
 
 	private void changeFamily( ConfigPointTracker.TrackerType which ) {
@@ -90,12 +94,12 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 			return;
 		if( previous != null )
 			mainPanel.remove(previous);
-		switch( which ) {
-			case KLT: previous = controlKlt; break;
-			case DDA: previous = controlDda; break;
-			case HYBRID: previous = controlHybrid; break;
-			default: throw new RuntimeException("BUG");
-		}
+		previous = switch (which) {
+			case KLT -> controlKlt;
+			case DDA -> controlDda;
+			case HYBRID -> controlHybrid;
+			default -> throw new RuntimeException("BUG");
+		};
 		selectedFamily = which;
 		mainPanel.add(BorderLayout.CENTER,previous);
 		mainPanel.validate();

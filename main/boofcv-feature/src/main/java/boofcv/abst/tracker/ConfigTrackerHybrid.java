@@ -18,6 +18,7 @@
 
 package boofcv.abst.tracker;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -26,9 +27,26 @@ import boofcv.struct.Configuration;
 public class ConfigTrackerHybrid implements Configuration {
 
 	/**
-	 * Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
+	 * KLT tracks can drift to being on top of each other. This will prune a few if that happens
 	 */
-	public int reactivateThreshold = 50;
+	public boolean pruneCloseTracks=false;
+
+	/**
+	 * If there are more than this number of unused tracks they will be randomly discarded. This is intended to
+	 * prevent unbounded growth of unused tracks even if tracks are not explicity pruned.
+	 */
+	public int maxInactiveTracks = 500;
+
+	/**
+	 * It will attempt to respawn old dropped tracks when the number of active tracks drops below this value.
+	 * The fractional part is relative to the number of tracks after the last spawn or most recent respawn.
+	 */
+	public ConfigLength thresholdRespawn = ConfigLength.relative(0.4,50);
+
+	/**
+	 * Random seed
+	 */
+	public long seed=0xDEADBEEF;
 
 	@Override
 	public void checkValidity() {
@@ -36,7 +54,10 @@ public class ConfigTrackerHybrid implements Configuration {
 	}
 
 	public void setTo( ConfigTrackerHybrid src ) {
-		this.reactivateThreshold = src.reactivateThreshold;
+		this.pruneCloseTracks = src.pruneCloseTracks;
+		this.maxInactiveTracks = src.maxInactiveTracks;
+		this.seed = src.seed;
+		this.thresholdRespawn.setTo(src.thresholdRespawn);
 	}
 
 	public ConfigTrackerHybrid copy() {

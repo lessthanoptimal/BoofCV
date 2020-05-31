@@ -203,7 +203,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 	private String stringPointInfo(PointTrack best) {
 		String text = "Track ID "+best.featureId+"\n";
-		text += "Set      "+best.setId+"\n";
+		text += "Set      "+best.detectorSetId +"\n";
 		text += "Duration "+(frameIdGui-best.spawnFrameID)+"\n";
 		text += String.format("Location %7.2f %7.2f",best.pixel.x,best.pixel.y);
 		return text;

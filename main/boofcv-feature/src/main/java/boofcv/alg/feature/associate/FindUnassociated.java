@@ -20,6 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -33,38 +34,48 @@ public class FindUnassociated {
 	GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 	GrowQueue_I32 unassociatedDst = new GrowQueue_I32();
 	// list that indicates what was associated in the source list
-	GrowQueue_I32 matched = new GrowQueue_I32();
+	GrowQueue_B matched = new GrowQueue_B();
 
-	public GrowQueue_I32 checkSource(FastAccess<AssociatedIndex> matches , int num ) {
-		matched.resize(num);
-		for( int i = 0; i < matched.size; i++ ) {
-			matched.data[i] = 0;
-		}
+	/**
+	 *
+	 * @param matches List of matched features
+	 * @param featureCount Number of source features
+	 * @return indexes of unassociated features from source
+	 */
+	public GrowQueue_I32 checkSource(FastAccess<AssociatedIndex> matches , int featureCount ) {
+		matched.resize(featureCount);
+		matched.fill(false);
+
 		for( int i = 0; i < matches.size; i++ ) {
-			matched.data[matches.get(i).src] = 1;
+			matched.data[matches.get(i).src] = true;
 		}
 
 		unassociatedSrc.reset();
-		for( int i = 0; i < matched.size; i++ ) {
-			if( matched.data[i] == 0 ) {
+		for( int i = 0; i < featureCount; i++ ) {
+			if( !matched.data[i] ) {
 				unassociatedSrc.add(i);
 			}
 		}
 		return unassociatedSrc;
 	}
 
-	public GrowQueue_I32 checkDestination( FastAccess<AssociatedIndex> matches , int num ) {
-		matched.resize(num);
-		for( int i = 0; i < matched.size; i++ ) {
-			matched.data[i] = 0;
-		}
+	/**
+	 *
+	 * @param matches List of matched features
+	 * @param featureCount Number of destination features
+	 * @return indexes of unassociated features from destination
+	 */
+	public GrowQueue_I32 checkDestination( FastAccess<AssociatedIndex> matches , final int featureCount ) {
+		matched.resize(featureCount);
+		matched.fill(false);
+
 		for( int i = 0; i < matches.size; i++ ) {
-			matched.data[matches.get(i).dst] = 1;
+			matched.data[matches.get(i).dst] = true;
 		}
 
 		unassociatedDst.reset();
-		for( int i = 0; i < matched.size; i++ ) {
-			if( matched.data[i] == 0 ) {
+		for( int i = 0; i < featureCount; i++ ) {
+			if( !matched.data[i] ) {
 				unassociatedDst.add(i);
 			}
 		}

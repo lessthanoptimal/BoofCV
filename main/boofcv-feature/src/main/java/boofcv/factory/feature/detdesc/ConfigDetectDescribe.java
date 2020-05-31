@@ -65,6 +65,17 @@ public class ConfigDetectDescribe implements Configuration {
 		dst.sift = this.describeSift;
 	}
 
+	/**
+	 * Returns the non-max radius for the selected configuration
+	 */
+	public int findNonMaxRadius() {
+		return switch (typeDetector) {
+			case POINT -> detectPoint.general.radius;
+			case FAST_HESSIAN -> detectFastHessian.extract.radius;
+			case SIFT -> detectSift.extract.radius;
+		};
+	}
+
 	public void copyRefFrom(ConfigDescribeRegionPoint src ) {
 		this.typeDescribe = src.type;
 		this.scaleSpaceSift = src.scaleSpaceSift;

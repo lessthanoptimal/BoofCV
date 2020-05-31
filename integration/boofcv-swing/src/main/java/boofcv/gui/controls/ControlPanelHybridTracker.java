@@ -18,6 +18,7 @@
 
 package boofcv.gui.controls;
 
+import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.describe.ConfigTemplateDescribe;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerHybrid;
@@ -32,6 +33,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
@@ -69,24 +71,23 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 		configDetDesc.detectPoint.general.radius = 4;
 		configDetDesc.detectPoint.shiTomasi.radius = 4;
 		configDetDesc.describeTemplate.type = ConfigTemplateDescribe.Type.NCC;
-		configHybrid.reactivateThreshold = 50;
 
 		configDetDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 		configDetDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.TEMPLATE;
 	}
 
 	public ControlPanelHybridTracker(Listener listener,
-									 ConfigTrackerHybrid configHybrid,
-									 ConfigPKlt configKlt,
-									 ConfigDetectDescribe configDetDesc,
-									 ConfigAssociate configAssociate ) {
+									 @Nullable ConfigTrackerHybrid configHybrid,
+									 @Nullable ConfigPKlt configKlt,
+									 @Nullable ConfigDetectDescribe configDetDesc,
+									 @Nullable ConfigAssociate configAssociate ) {
 		this.listener = listener;
 		ddaPanel.setLayout(new BoxLayout(ddaPanel, BoxLayout.Y_AXIS));
 
-		this.configHybrid = configHybrid;
-		this.configKlt = configKlt;
-		this.configDetDesc = configDetDesc;
-		this.configAssociate = configAssociate;
+		this.configHybrid = configHybrid != null ? configHybrid : this.configHybrid;
+		this.configKlt = configKlt != null ? configKlt : this.configKlt;
+		this.configDetDesc = configDetDesc != null ? configDetDesc : this.configDetDesc;
+		this.configAssociate = configAssociate != null ? configAssociate : this.configAssociate;
 	}
 
 	@Override
@@ -130,9 +131,8 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 
 		DetectDescribePoint detDesc = createDetectDescribe(inputType);
 
-		PointTracker<T> tracker = FactoryPointTracker.hybrid(detDesc,createAssociate(detDesc),
-				configKlt,configHybrid.reactivateThreshold,imageType.getImageClass());
-		return tracker;
+		return FactoryPointTracker.hybrid(detDesc,new AssociateDescTo2D(createAssociate(detDesc)),
+				configDetDesc.findNonMaxRadius(), configKlt, configHybrid, imageType.getImageClass());
 	}
 
 	@Override

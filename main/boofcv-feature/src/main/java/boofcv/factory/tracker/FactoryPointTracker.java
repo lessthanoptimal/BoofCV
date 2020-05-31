@@ -98,12 +98,12 @@ public class FactoryPointTracker {
 
 		// TODO consider checking to see if it is a point detector and template. If so use DdaManagerDetectDescribePoint
 		DetectDescribePoint detDesc = FactoryDetectDescribe.generic(config.detDesc, imageType);
-		AssociateDescription associate = FactoryAssociation.generic(config.associate,detDesc);
+		AssociateDescription2D associate = new AssociateDescTo2D(FactoryAssociation.generic(config.associate,detDesc));
 
 		switch( config.typeTracker ) {
-			case DDA: return FactoryPointTracker.dda(detDesc, new AssociateDescTo2D(associate), config.dda);
+			case DDA: return FactoryPointTracker.dda(detDesc, associate, config.dda);
 			case HYBRID: return FactoryPointTracker.hybrid(
-					detDesc,associate,config.klt,config.hybrid.reactivateThreshold,imageType);
+					detDesc,associate,config.detDesc.findNonMaxRadius(),config.klt,config.hybrid,imageType);
 		}
 		throw new RuntimeException("BUG! KLT all trackers should have been handled already");
 	}
@@ -343,8 +343,8 @@ public class FactoryPointTracker {
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
 		AssociateDescription2D<NccFeature> association =
-				new AssociateDescTo2D<>(
-						FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
+				new AssociateDescTo2D<>(FactoryAssociation.greedy(
+						new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
 
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, null);
 		DetectDescribePoint fused = FactoryDetectDescribe.fuseTogether(detector,null,describeNCC);
@@ -388,7 +388,6 @@ public class FactoryPointTracker {
 	 * @see DescribePointSurf
 	 *
 	 * @param kltConfig Configuration for KLT tracker
-	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
 	 * @param configOrientation Configuration for region orientation
@@ -399,7 +398,7 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>>
 	PointTracker<I> combined_FH_SURF_KLT( ConfigPKlt kltConfig ,
-										  int reactivateThreshold ,
+										  ConfigTrackerHybrid configHybrid,
 										  ConfigFastHessian configDetector ,
 										  ConfigSurfDescribe.Stability configDescribe ,
 										  ConfigSlidingIntegral configOrientation ,
@@ -408,12 +407,12 @@ public class FactoryPointTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
 
-		AssociateDescription<BrightFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+		AssociateDescription2D<BrightFeature> generalAssoc = new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,imageType);
 
-		return hybrid(fused,generalAssoc, kltConfig,reactivateThreshold, imageType);
+		return hybrid(fused, generalAssoc, configDetector.extract.radius, kltConfig,configHybrid, imageType);
 	}
 
 	/**
@@ -425,7 +424,6 @@ public class FactoryPointTracker {
 	 *
 	 * @param configExtract Configuration for extracting features
 	 * @param kltConfig Configuration for KLT
-	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param configDescribe Configuration for SURF descriptor
 	 * @param configOrientation Configuration for region orientation.  If null then orientation isn't estimated
 	 * @param imageType      Type of image the input is.
@@ -435,7 +433,7 @@ public class FactoryPointTracker {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
 										 ConfigPKlt kltConfig,
-										 int reactivateThreshold,
+										 ConfigTrackerHybrid configHybrid,
 										 ConfigSurfDescribe.Stability configDescribe,
 										 ConfigSlidingIntegral configOrientation,
 										 Class<I> imageType,
@@ -453,7 +451,7 @@ public class FactoryPointTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
 
-		AssociateDescription<BrightFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+		AssociateDescription2D<BrightFeature> generalAssoc = new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
 
 		OrientationImage<I> orientation = null;
 
@@ -463,8 +461,8 @@ public class FactoryPointTracker {
 			orientation = FactoryOrientation.convertImage(orientationII,imageType);
 		}
 
-		return hybrid(detector,orientation,regionDesc,generalAssoc, kltConfig,reactivateThreshold,
-				imageType);
+		return hybrid(detector,orientation,regionDesc,generalAssoc, configExtract.radius,
+				kltConfig,configHybrid,imageType);
 	}
 
 	/**
@@ -477,21 +475,21 @@ public class FactoryPointTracker {
 	 * @param describe Feature description
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT tracker
-	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param imageType Input image type.     @return Feature tracker
 	 */
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
 	PointTracker<I> hybrid(InterestPointDetector<I> detector,
 						   OrientationImage<I> orientation,
 						   DescribeRegionPoint<I, Desc> describe,
-						   AssociateDescription<Desc> associate,
+						   AssociateDescription2D<Desc> associate,
+						   int tooCloseRadius,
 						   ConfigPKlt kltConfig ,
-						   int reactivateThreshold,
+						   ConfigTrackerHybrid configHybrid,
 						   Class<I> imageType)
 	{
 		DetectDescribeFusion<I,Desc> fused = new DetectDescribeFusion<>(detector, orientation, describe);
 
-		return hybrid(fused,associate, kltConfig, reactivateThreshold,imageType);
+		return hybrid(fused,associate, tooCloseRadius, kltConfig, configHybrid, imageType);
 	}
 
 	/**
@@ -502,14 +500,15 @@ public class FactoryPointTracker {
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT tracker
-	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param imageType Input image type.     @return Feature tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	PointTracker<I> hybrid(DetectDescribePoint<I, Desc> detector,
-						   AssociateDescription<Desc> associate,
+						   AssociateDescription2D<Desc> associate,
+						   int tooCloseRadius,
 						   ConfigPKlt kltConfig ,
-						   int reactivateThreshold, Class<I> imageType )
+						   ConfigTrackerHybrid configHybrid,
+						   Class<I> imageType )
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
@@ -517,10 +516,18 @@ public class FactoryPointTracker {
 			kltConfig = new ConfigPKlt();
 		}
 
-		HybridTrackerScalePoint<I, D,Desc> tracker =
-				FactoryTrackerAlg.hybrid(detector,associate, kltConfig,imageType,derivType);
+		// if the radius is negative then prune too close is disabled
+		if( !configHybrid.pruneCloseTracks ) {
+			tooCloseRadius = -1;
+		}
 
-		return new PointTrackerHybrid<>(tracker, kltConfig.pyramidLevels, reactivateThreshold, imageType, derivType);
+		HybridTrackerScalePoint<I, D,Desc> tracker =
+				FactoryTrackerAlg.hybrid(detector,associate, tooCloseRadius, kltConfig, configHybrid, imageType,derivType);
+		tracker.rand = new Random(configHybrid.seed);
+
+		var pointHybrid = new PointTrackerHybrid<>(tracker, kltConfig.pyramidLevels, imageType, derivType);
+		pointHybrid.thresholdRespawn.setTo(configHybrid.thresholdRespawn);
+		return pointHybrid;
 	}
 
 

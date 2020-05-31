@@ -18,8 +18,9 @@
 
 package boofcv.factory.tracker;
 
-import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
@@ -89,8 +90,8 @@ public class FactoryTrackerAlg {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.bilinearRectangle(imageType);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.bilinearRectangle(derivType);
 
 		KltTracker<I, D> klt = new KltTracker<>(interpInput, interpDeriv, config);
 		return new PyramidKltTracker<>(klt);
@@ -108,11 +109,15 @@ public class FactoryTrackerAlg {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	HybridTrackerScalePoint<I,D,Desc> hybrid(DetectDescribePoint<I, Desc> detector,
-											 AssociateDescription<Desc> associate,
+											 AssociateDescription2D<Desc> associate,
+											 int tooCloseRadius,
 											 @Nullable ConfigPKlt kltConfig ,
+											 @Nullable ConfigTrackerHybrid configHybrid,
 											 Class<I> imageType,
 											 @Nullable Class<D> derivType)
 	{
+		if( configHybrid == null )
+			configHybrid = new ConfigTrackerHybrid();
 		if( kltConfig == null)
 			kltConfig = new ConfigPKlt();
 		if( derivType == null )
@@ -121,6 +126,8 @@ public class FactoryTrackerAlg {
 		PyramidKltForHybrid<I,D> klt = new PyramidKltForHybrid<>(kltConfig.config,
 				kltConfig.templateRadius,imageType, derivType);
 
-		return new HybridTrackerScalePoint<>(klt, detector, associate);
+		var tracker = new HybridTrackerScalePoint<>(klt, detector, associate, tooCloseRadius );
+		tracker.maxInactiveTracks = configHybrid.maxInactiveTracks;
+		return tracker;
 	}
 }

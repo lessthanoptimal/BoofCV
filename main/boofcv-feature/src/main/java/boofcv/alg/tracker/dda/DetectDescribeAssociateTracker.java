@@ -31,7 +31,10 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.*;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,13 +79,9 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 
 	// maximum number of tracks it will keep track of that were not associated before it starts discarding
 	protected int maxInactiveTracks;
-	protected GrowQueue_I32 unassociatedIdx = new GrowQueue_I32();
 
 	// Random number generator
 	protected Random rand;
-
-	// Temporary storage for tracks which have been selected to be dropped because there are too many non-visible tracks
-//	List<PointTrack> excessiveList = new ArrayList<>();
 
 	// destination features are ones which were detected in this frame
 	protected FastArray<TD> dstDesc;
@@ -93,9 +92,6 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	protected FastArray<TD> srcDesc;
 	protected GrowQueue_I32 srcSet = new GrowQueue_I32();
 	protected FastArray<Point2D_F64> srcPixels = new FastArray<>(Point2D_F64.class);
-
-	// Look up table to see if a track or feature was associated
-	protected GrowQueue_B associatedTable = new GrowQueue_B();
 
 	/**
 	 * Configures tracker
@@ -184,12 +180,9 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		performTracking();
 
 		// add unassociated to the list
-		unassociatedIdx.reset();
-		for( int j = 0; j < tracksAll.size(); j++ ) {
-			if( !associatedTable.data[j] ) {
-				unassociatedIdx.add(j);
-				tracksInactive.add(tracksAll.get(j));
-			}
+		GrowQueue_I32 unassociatedIdx = associate.getUnassociatedSource();
+		for( int j = 0; j < unassociatedIdx.size(); j++ ) {
+			tracksInactive.add(tracksAll.get(unassociatedIdx.get(j)));
 		}
 
 		pruneExcessiveInactiveTracks(unassociatedIdx);
@@ -233,17 +226,13 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			PointTrack t = tracksAll.get(i);
 			srcDesc.data[i] = t.getDescription();
 			srcPixels.data[i] = t.pixel;
-			srcSet.data[i] = t.setId;
+			srcSet.data[i] = t.detectorSetId;
 		}
 
 		// Associate existing tracks with detections
 		UtilFeature.setSource(srcDesc, srcSet, srcPixels,associate);
 		UtilFeature.setDestination(dstDesc, dstSet, dstPixels,associate);
 		associate.associate();
-
-		// Mark which tracks were associated with detections in the look up table
-		associatedTable.resize(tracksAll.size());
-		associatedTable.fill(false);
 
 		FastAccess<AssociatedIndex> matches = associate.getMatches();
 
@@ -258,8 +247,6 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			if(updateDescription) {
 				((TD)track.getDescription()).setTo(dstDesc.get(indexes.dst));
 			}
-
-			associatedTable.data[indexes.src] = true;
 		}
 	}
 
@@ -267,26 +254,22 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	 * Takes the current crop of detected features and makes them the keyframe
 	 */
 	public void spawnTracks() {
-		// setup data structures
-		associatedTable.resize(dstDesc.size);
-		associatedTable.fill(false);
-
 		// If there are no tracks then associate is not called. Reset() could have been called at associate is
 		// in an undefined state
-		if( tracksAll.size > 0 ) {
-			FastAccess<AssociatedIndex> matches = associate.getMatches();
-			for (int i = 0; i < matches.size; i++) {
-				associatedTable.data[matches.data[i].dst] = true;
+		if( tracksAll.size == 0 ) {
+			for( int i = 0; i < dstDesc.size; i++ ) {
+				Point2D_F64 loc = dstPixels.get(i);
+				addNewTrack(dstSet.get(i), loc.x,loc.y,dstDesc.get(i));
 			}
+			return;
 		}
 
 		// create new tracks from latest unassociated detected features
-		for( int i = 0; i < dstDesc.size; i++ ) {
-			if( associatedTable.data[i] )
-				continue;
-
-			Point2D_F64 loc = dstPixels.get(i);
-			addNewTrack(dstSet.get(i), loc.x,loc.y,dstDesc.get(i));
+		GrowQueue_I32 unassociated = associate.getUnassociatedDestination();
+		for( int i = 0; i < unassociated.size; i++ ) {
+			int indexDst = unassociated.get(i);
+			Point2D_F64 loc = dstPixels.get(indexDst);
+			addNewTrack(dstSet.get(i), loc.x,loc.y,dstDesc.get(indexDst));
 		}
 	}
 
@@ -303,7 +286,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			return;
 		}
 		p.spawnFrameID = frameID;
-		p.setId = set;
+		p.detectorSetId = set;
 		p.featureId = featureID++;
 
 //		if( tracksActive.contains(p))

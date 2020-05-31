@@ -18,22 +18,25 @@
 
 package boofcv.alg.tracker.hybrid;
 
-import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.AssociateDescription2D;
+import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.descriptor.UtilFeature;
+import boofcv.alg.tracker.PruneCloseTracks;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Random;
 
 /**
  * <p>
@@ -45,43 +48,56 @@ import java.util.Stack;
  *
  * @author Peter Abeles
  */
-// TODO Two versions.  One for InterestPointDetector and one for corners
-public class HybridTrackerScalePoint
-		<I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc> {
+public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc>
+{
+	// The max number of allowed unassociated tracks before it starts to drop them
+	public int maxInactiveTracks = 200;
+	// Used to select tracks to drop
+	public Random rand = new Random(345);
 
-	// current image in sequence
-	private I input;
+	// Size of input image
+	private int imageWidth, imageHeight;
 
-	// The KLT tracker used to perform the nominal track update
-	protected PyramidKltForHybrid<I,D> trackerKlt;
+	/** The KLT tracker used to perform the nominal track update */
+	protected @Getter PyramidKltForHybrid<I,D> trackerKlt;
 
-	// feature detector and describer
-	protected DetectDescribePoint<I,TD> detector;
-	// Used to associate features using their DDA description
-	protected AssociateDescriptionSets<TD> associate;
+	// tolerance for forwards-backwards validation for KLT tracks in pixels at level 0. disabled if < 0
+	protected double toleranceFB=-1; // TODO implement this
 
-	// all active tracks that have been tracked purely by KLT
-	protected List<HybridTrack<TD>> tracksPureKlt = new ArrayList<>();
-	// tracks that had been dropped by KLT but have been reactivated
-	protected List<HybridTrack<TD>> tracksReactivated = new ArrayList<>();
-	// tracks that are not actively being tracked
-	protected List<HybridTrack<TD>> tracksDormant = new ArrayList<>();
-	// recently spawned tracks
-	protected List<HybridTrack<TD>> tracksSpawned = new ArrayList<>();
-	// track points whose data is to be reused
-	protected Stack<HybridTrack<TD>> tracksUnused = new Stack<>();
+	/** feature detector and describer */
+	protected @Getter DetectDescribePoint<I,TD> detector;
+	/** Used to associate features using their DDA description */
+	protected @Getter AssociateDescriptionSets2D<TD> associate;
+
+	/** List of all tracks and stores unused track data for future re-use */
+	protected @Getter FastQueue<HybridTrack<TD>> tracksAll;
+
+	/** all active tracks that have been tracked purely by KLT */
+	protected @Getter FastArray<HybridTrack<TD>> tracksActive = new FastArray(HybridTrack.class);
+	/** tracks not visible in the current frame and were not updated */
+	protected @Getter FastArray<HybridTrack<TD>> tracksInactive = new FastArray(HybridTrack.class);
+	 /** recently spawned tracks */
+	protected @Getter List<HybridTrack<TD>> tracksSpawned = new ArrayList<>();
+	 /** tracks which were dropped this frame */
+	protected @Getter List<HybridTrack<TD>> tracksDropped = new ArrayList<>();
 
 	// local storage used by association
 	protected FastArray<TD> detectedDesc;
 	protected FastArray<TD> knownDesc;
 	protected GrowQueue_I32 detectedSet = new GrowQueue_I32();
 	protected GrowQueue_I32 knownSet = new GrowQueue_I32();
+	protected FastArray<Point2D_F64> detectedPixels = new FastArray<>(Point2D_F64.class);
+	protected FastArray<Point2D_F64> knownPixels = new FastArray<>(Point2D_F64.class);
 
-	// number of tracks it has created
+	// number of tracks it has created. Used to assign track IDs
 	protected long totalTracks = 0;
 
-	// Marks a known track as being associated
-	private boolean associated[] = new boolean[1];
+	// number of frames which have been processed
+	private @Getter long frameID = -1;
+
+	// Used to prune points close by
+	PruneCloseTracks<HybridTrack<TD>> pruneClose;
+	List<HybridTrack<TD>> closeDropped = new ArrayList<>();
 
 	/**
 	 * Configures tracker
@@ -89,25 +105,47 @@ public class HybridTrackerScalePoint
 	 * @param trackerKlt KLT tracker used nominally
 	 * @param detector Feature detector
 	 * @param associate Association algorithm
+	 * @param tooCloseRadius If tracks are less than or equal to this distance to each other some will be pruned
 	 */
 	public HybridTrackerScalePoint(PyramidKltForHybrid<I, D> trackerKlt,
 								   DetectDescribePoint<I,TD> detector,
-								   AssociateDescription<TD> associate ) {
+								   AssociateDescription2D<TD> associate,
+								   int tooCloseRadius) {
+		if( !associate.uniqueDestination() || !associate.uniqueSource() )
+			throw new IllegalArgumentException("Associations must be unique");
+
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 
 		detectedDesc = new FastArray<>(detector.getDescriptionType());
 		knownDesc = new FastArray<>( detector.getDescriptionType());
 
-		this.associate = new AssociateDescriptionSets<>(associate,detector.getDescriptionType());
+		this.associate = new AssociateDescriptionSets2D<>(associate,detector.getDescriptionType());
 		this.associate.initialize(detector.getNumberOfSets());
+
+		this.tracksAll = new FastQueue<>(this::createNewTrack);
+		if( tooCloseRadius > 0 ) {
+			this.pruneClose = new PruneCloseTracks<>(tooCloseRadius, new PruneCloseTracks.TrackInfo<>() {
+				@Override public void getLocation(HybridTrack<TD> track, Point2D_F64 l) {l.set(track.pixel);}
+				@Override public long getID(HybridTrack<TD> track) {return track.featureId;}
+			});
+		}
 	}
 
 	/**
 	 * Used for unit tests
 	 */
-	protected HybridTrackerScalePoint() {
+	protected HybridTrackerScalePoint() {}
+
+	/**
+	 * Creates a new track and sets the descriptor
+	 */
+	protected HybridTrack<TD> createNewTrack() {
+		var track = new HybridTrack<TD>();
+		track.descriptor = detector.createDescription();
+		return track;
 	}
+
 
 	/**
 	 * Sets the tracker into its initial state.  Previously declared track data structures are saved
@@ -116,185 +154,185 @@ public class HybridTrackerScalePoint
 	public void reset() {
 		dropAllTracks();
 		totalTracks = 0;
+		frameID = -1;
 	}
 
 	/**
 	 * Updates the location and description of tracks using KLT.  Saves a reference
-	 * to the input image for future processing.
+	 * to the input image for future processing.  Also updates the `totalPureKlt` count.
 	 *
-	 * @param input Input image.
 	 * @param pyramid Image pyramid of input.
 	 * @param derivX Derivative pyramid of input x-axis
 	 * @param derivY Derivative pyramid of input y-axis
 	 */
-	public void updateTracks( I input ,
-							  PyramidDiscrete<I> pyramid ,
+	public void updateTracks( PyramidDiscrete<I> pyramid ,
 							  D[] derivX,
-							  D[] derivY ) {
-		// forget recently dropped or spawned tracks
-		tracksSpawned.clear();
+							  D[] derivY )
+	{
+		this.imageWidth = pyramid.getInputWidth();
+		this.imageHeight = pyramid.getInputWidth();
+		this.tracksDropped.clear();
+		this.tracksSpawned.clear();
+		frameID++;
+//		System.out.println("frame: "+frameID+" active "+tracksActive.size+" all "+tracksAll.size);
 
-		// save references
-		this.input = input;
-
+		// Run the KLT tracker
 		trackerKlt.setInputs(pyramid, derivX, derivY);
 
-		trackUsingKlt(tracksPureKlt);
-		trackUsingKlt(tracksReactivated);
-	}
+		// TODO add forwards-backwards validation
+		for( int i = tracksActive.size()-1; i >= 0; i-- ) {
+			HybridTrack<TD> track = tracksActive.get(i);
 
-	/**
-	 * Tracks features in the list using KLT and update their state
-	 */
-	private void trackUsingKlt(List<HybridTrack<TD>> tracks) {
-		for( int i = 0; i < tracks.size();  ) {
-			HybridTrack<TD> track = tracks.get(i);
-
-			if( !trackerKlt.performTracking(track.track) ) {
-				// handle the dropped track
-				tracks.remove(i);
-				tracksDormant.add(track);
+			if( !trackerKlt.performTracking(track.trackKlt) ) {
+				// The track got dropped by KLT but will still be around as an inactive track
+				tracksActive.removeSwap(i);
+				tracksInactive.add(track);
 			} else {
-				track.pixel.set(track.track.x,track.track.y);
-				i++;
+				track.lastUpdatedFrame = frameID;
+				track.pixel.set(track.trackKlt.x,track.trackKlt.y);
 			}
 		}
 	}
 
 	/**
-	 * From the found interest points create new tracks.  Tracks are only created at points
-	 * where there are no existing tracks.
-	 *
-	 * Note: Must be called after {@link #associateAllToDetected}.
+	 * KLT tracks can drift towards each other (camera moving away) and this is often a bad situation as little new
+	 * information is added by each track
 	 */
-	public void spawnTracksFromDetected() {
-		// mark detected features with no matches as available
-		FastAccess<AssociatedIndex> matches = associate.getMatches();
+	public void pruneActiveTracksWhichAreTooClose() {
+		if( pruneClose == null )
+			return;
 
-		int N = detector.getNumberOfFeatures();
-		for( int i = 0; i < N; i++ )
-			associated[i] = false;
+		pruneClose.init(imageWidth, imageHeight);
+		pruneClose.process(tracksActive.toList(),closeDropped);
 
-		for( AssociatedIndex i : matches.toList() ) {
-			associated[i.dst] = true;
-		}
-
-		// spawn new tracks for unassociated detected features
-		for( int i = 0; i < N; i++ ) {
-			if( associated[i])
-				continue;
-
-			Point2D_F64 p = detector.getLocation(i);
-
-			TD d = detectedDesc.get(i);
-
-			HybridTrack<TD> track;
-
-			if( tracksUnused.size() > 0 ) {
-				track = tracksUnused.pop();
-			} else {
-				track = new HybridTrack<>();
-				track.featureDesc = detector.createDescription();
-				track.track = trackerKlt.createNewTrack();
-			}
-
-			// create the descriptor for tracking
-			trackerKlt.setDescription((float)p.x,(float)p.y,track.track);
-			// set track ID and location
-			track.trackID = totalTracks++;
-			track.featureDesc.setTo(d);
-			track.featureSet = detectedSet.get(i);
-			track.pixel.set(p);
-
-			// update list of active tracks
-			tracksPureKlt.add(track);
-			tracksSpawned.add(track);
+		for (int dropIdx = 0; dropIdx < closeDropped.size(); dropIdx++) {
+			HybridTrack<TD> track = closeDropped.get(dropIdx);
+			dropTrackByAllIndex(tracksAll.indexOf(track));
+			tracksDropped.add(track);
 		}
 	}
 
-
 	/**
-	 * Associates pre-existing tracks to newly detected features
-	 *
-	 * @param known List of known tracks
+	 * These tracks were dropped by KLT at some point in the past. See if any of the recent detection match them
 	 */
-	private void associateToDetected( List<HybridTrack<TD>> known ) {
+	public void associateInactiveTracks( I input ) {
+		// TODO add ability to specify location of active tracks so those pixels can be skipped
+		// TODO add ability to specify the maximum number of detections to return
+		detector.detect(input);
+		// TODO add ability to force a maximum limit on number of active tracks?
+
 		int N = detector.getNumberOfFeatures();
 
 		// initialize data structures
 		detectedDesc.resize(N);
 		detectedSet.resize(N);
+		detectedPixels.resize(N);
 
 		// create a list of detected feature descriptions
 		for( int i = 0; i < N; i++ ) {
 			detectedDesc.data[i] = detector.getDescription(i);
 			detectedSet.data[i] = detector.getSet(i);
+			detectedPixels.data[i] = detector.getLocation(i);
 		}
 
-		// create a list of previously created track descriptions
-		knownDesc.resize(known.size());
-		knownSet.resize(known.size());
-		for (int i = 0; i < known.size(); i++) {
-			HybridTrack<TD> t = known.get(i);
-			knownDesc.data[i] = t.featureDesc;
-			knownSet.data[i] = t.featureSet;
+		// Associate against all the tracks, including active ones. By considering active and not just inactive
+		// tracks we should be able to reduce the false positive rate
+		knownDesc.resize(tracksAll.size());
+		knownSet.resize(tracksAll.size());
+		knownPixels.resize(tracksAll.size());
+		for (int i = 0; i < tracksAll.size(); i++) {
+			HybridTrack<TD> t = tracksAll.get(i);
+			knownDesc.data[i] = t.descriptor;
+			knownSet.data[i] = t.detectorSetId;
+			knownPixels.data[i] = t.pixel;
 		}
 
 		// associate features
-		UtilFeature.setSource(knownDesc,knownSet,associate);
-		UtilFeature.setDestination(detectedDesc,detectedSet,associate);
+		UtilFeature.setSource(knownDesc,knownSet,knownPixels,associate);
+		UtilFeature.setDestination(detectedDesc,detectedSet,detectedPixels,associate);
 		associate.associate();
 
-		N = Math.max(known.size(),N);
-		if( associated.length < N )
-			associated = new boolean[N];
+		// Re-active / re-initial all non pure KLT tracks
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
+		for (int i = 0; i < matches.size; i++) {
+			// If the track is active skip it
+			HybridTrack<TD> track = tracksAll.get(matches.get(i).src);
+			Point2D_F64 detectedPixel = detectedPixels.data[matches.get(i).dst];
+
+			// Re-spawning an inactive track is tricky. Let's say DDA gets it right 80% of the time, if we just do a KLT
+			// track after respawning it will then be reliably wrong 20% each time this is called. That number will
+			// increase with time. Doing so resulted in MUCH worse tracking performance. Until a way to ensure
+			// detected tracks match the original one to a very high level of accuracy it's better to just
+			// re-init all non pure KLT tracks
+			boolean active = track.lastUpdatedFrame == frameID;
+			if( !track.respawned && active) { // skip pure KLT tracks
+				continue;
+			}
+
+			// re-active the track and update it's state
+			track.respawned = true;
+			track.lastUpdatedFrame = frameID;
+			track.pixel.set(detectedPixel);
+			trackerKlt.setDescription((float)detectedPixel.x,(float)detectedPixel.y,track.trackKlt);
+			if( !active ) { // don't add the same track twice to the active list
+				tracksActive.add(track);
+			}
+		}
+
+		// Updated inactive list by removing tracks which have become active
+		for (int i = tracksInactive.size()-1; i >= 0; i--) {
+			if( tracksInactive.get(i).lastUpdatedFrame == frameID ) {
+				tracksInactive.removeSwap(i);
+			}
+		}
 	}
 
 	/**
-	 * Associate all tracks in any state to the latest observations.  If a dormant track is associated it
-	 * will be reactivated.  If a reactivated track is associated it's state will be updated.  PureKLT
-	 * tracks are left unmodified.
+	 * Spawns new tracks from the list of unassociated detections. Must call {@link #associateInactiveTracks} first.
 	 */
-	public void associateAllToDetected() {
-		// initialize data structures
-		List<HybridTrack<TD>> all = new ArrayList<>();
-		all.addAll(tracksReactivated);
-		all.addAll(tracksDormant);
-		all.addAll(tracksPureKlt);
+	public void spawnNewTracks() {
+		// mark detected features with no matches as available
+		GrowQueue_I32 unassociatedDetected = associate.getUnassociatedDestination();
 
-		int numTainted = tracksReactivated.size() + tracksDormant.size();
+		// spawn new tracks for unassociated detected features
+		for( int unassociatedIdx = 0; unassociatedIdx < unassociatedDetected.size; unassociatedIdx++ ) {
+			int detectedIdx = unassociatedDetected.get(unassociatedIdx);
 
-		tracksReactivated.clear();
-		tracksDormant.clear();
+			Point2D_F64 p = detectedPixels.data[detectedIdx];
 
-		// detect features
-		detector.detect(input);
-		// associate features
-		associateToDetected(all);
+			HybridTrack<TD> track = tracksAll.grow();
 
-		FastAccess<AssociatedIndex> matches = associate.getMatches();
+			// KLT track descriptor shape isn't known until after the first image has been processed
+			if( track.trackKlt == null)
+				track.trackKlt = trackerKlt.createNewTrack();
+			// create the descriptor for KLT tracking
+			trackerKlt.setDescription((float)p.x,(float)p.y,track.trackKlt);
+			// set track ID and location
+			track.respawned = false;
+			track.spawnFrameID = track.lastUpdatedFrame = frameID;
+			track.featureId = totalTracks++;
+			track.descriptor.setTo(detectedDesc.get(detectedIdx));
+			track.detectorSetId = detectedSet.get(detectedIdx);
+			track.pixel.set(p);
 
-		// See which features got respawned and which ones are made dormant
-		for( int i = 0; i < numTainted; i++ ) {
-			associated[i] = false;
+			// update list of active tracks
+			tracksActive.add(track);
+			tracksSpawned.add(track);
 		}
+	}
 
-		for( AssociatedIndex a : matches.toList() ) {
-			// don't mess with pure-KLT tracks
-			if( a.src >= numTainted )
-				continue;
+	/**
+	 * If there are too many inactive tracks drop some of them
+	 */
+	public void dropExcessiveInactiveTracks() {
+		if( tracksInactive.size() > maxInactiveTracks ) {
+			int numDrop = tracksInactive.size()-maxInactiveTracks;
+			for (int i = 0; i < numDrop; i++) {
+				// Randomly select tracks to drop
+				int selectedIdx = rand.nextInt(tracksInactive.size());
 
-			HybridTrack<TD> t = all.get(a.src);
-
-			t.pixel.set(detector.getLocation(a.dst));
-			trackerKlt.setDescription((float) t.pixel.x, (float) t.pixel.y, t.track);
-			tracksReactivated.add(t);
-			associated[a.src] = true;
-		}
-
-		for( int i = 0; i < numTainted; i++ ) {
-			if( !associated[i] ) {
-				tracksDormant.add(all.get(i));
+				// Remove the selected track from the inactive list and add it tot he dropped list
+				tracksDropped.add(tracksInactive.removeSwap(selectedIdx));
 			}
 		}
 	}
@@ -306,55 +344,54 @@ public class HybridTrackerScalePoint
 	 * @return true if the track was being tracked and data was recycled false if not.
 	 */
 	public boolean dropTrack( HybridTrack<TD> track ) {
-		if( !tracksPureKlt.remove(track) )
-			if( !tracksReactivated.remove(track) )
-				if( !tracksDormant.remove(track) )
-					return false;
-
-		tracksUnused.add(track);
+		int index = tracksAll.indexOf(track);
+		if( index < 0 )
+			return false;
+		HybridTrack<TD> dropped = dropTrackByAllIndex(index);
+		assert dropped == track;
 		return true;
 	}
 
-	public List<HybridTrack<TD>> getSpawned() {
-		return tracksSpawned;
-	}
+	/**
+	 * Drops the track using its index in all. Note that removeSwap is used so the order will change
+	 * @return The dropped track
+	 */
+	public HybridTrack<TD> dropTrackByAllIndex( int index ) {
+		HybridTrack<TD> track = tracksAll.removeSwap(index);
 
-	public List<HybridTrack<TD>> getPureKlt() {
-		return tracksPureKlt;
-	}
+		if( tracksActive.contains(track) && tracksInactive.contains(track))
+			throw new RuntimeException("BUG");
 
-	public List<HybridTrack<TD>> getReactivated() {
-		return tracksReactivated;
-	}
+		boolean found = false;
+		{
+			// TODO update code when ddogleg adds a remove function
+			int indexActive = tracksActive.indexOf(track);
+			if( indexActive >= 0 ) {
+				found = true;
+				tracksActive.remove(indexActive);
+			}
+		}
+		if( !found ) {
+			int indexInactive = tracksInactive.indexOf(track);
+			if( indexInactive >= 0 ) {
+				found = true;
+				tracksInactive.remove(indexInactive);
+			}
+		}
+		// Sanity Check: The track should have been in at least one of those lists
+		assert found;
 
-	public List<HybridTrack<TD>> getDormant() {
-		return tracksDormant;
-	}
-
-	public PyramidKltForHybrid<I, D> getTrackerKlt() {
-		return trackerKlt;
-	}
-
-	public DetectDescribePoint<I, TD> getDetector() {
-		return detector;
+		return track;
 	}
 
 	/**
 	 * Drops all tracks and recycles the data
 	 */
 	public void dropAllTracks() {
-		tracksUnused.addAll(tracksDormant);
-		tracksUnused.addAll(tracksPureKlt);
-		tracksUnused.addAll(tracksReactivated);
-
+		tracksAll.reset();
+		tracksActive.reset();
+		tracksInactive.reset();
 		tracksSpawned.clear();
-		tracksPureKlt.clear();
-		tracksReactivated.clear();
-		tracksSpawned.clear();
-		tracksDormant.clear();
-	}
-
-	public void addUnused(HybridTrack<TD> track) {
-		tracksUnused.add(track);
+		tracksDropped.clear();
 	}
 }

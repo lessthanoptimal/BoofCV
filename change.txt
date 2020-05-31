@@ -29,6 +29,9 @@ TODO PointTracker
   - has image motion 2D been updated to drop old unassociated tracks?
   - Redesign PointTrackerTwoPass into PointTrackerHint
 
+TODO Update Hybrid Tracker's GUI controls
+TODO Make pyramid specification fully configurable
+
 TODO RegionOrientation
   - Clean up the mess that's the configuration
 

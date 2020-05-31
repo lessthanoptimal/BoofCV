@@ -77,4 +77,10 @@ public class ConfigPKlt implements Configuration
 		this.pyramidLevels.setTo(src.pyramidLevels);
 		this.pruneClose = src.pruneClose;
 	}
+
+	public ConfigPKlt copy() {
+		var ret = new ConfigPKlt();
+		ret.setTo(this);
+		return ret;
+	}
 }

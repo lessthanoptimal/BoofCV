@@ -124,13 +124,13 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 		// Copy unassociated indexes over and updated indexes to input indexes
 		GrowQueue_I32 setUnassociatedSrc = _associator.getUnassociatedSource();
 		before = unassociatedSrc.size;
-		unassociatedSrc.resize(unassociatedSrc.size+setUnassociatedSrc.size);
+		unassociatedSrc.extend(before+setUnassociatedSrc.size);
 		for (int i = 0; i < setUnassociatedSrc.size; i++) {
 			unassociatedSrc.data[before+i] = set.indexSrc.data[setUnassociatedSrc.get(i)];
 		}
 		GrowQueue_I32 setUnassociatedDst = _associator.getUnassociatedDestination();
 		before = unassociatedDst.size;
-		unassociatedDst.resize(unassociatedDst.size+setUnassociatedDst.size);
+		unassociatedDst.extend(before+setUnassociatedDst.size);
 		for (int i = 0; i < setUnassociatedDst.size; i++) {
 			unassociatedDst.data[before+i] = set.indexDst.data[setUnassociatedDst.get(i)];
 		}

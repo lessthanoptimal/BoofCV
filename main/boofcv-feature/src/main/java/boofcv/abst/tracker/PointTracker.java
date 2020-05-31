@@ -20,6 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -133,7 +134,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getAllTracks(List<PointTrack> list);
+	List<PointTrack> getAllTracks( @Nullable List<PointTrack> list);
 
 	/**
 	 * Returns a list of active tracks. An active track is defined as a track
@@ -143,7 +144,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getActiveTracks(List<PointTrack> list);
+	List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list);
 
 	/**
 	 * Returns a list of inactive tracks.  A track is inactive if it is not
@@ -153,7 +154,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getInactiveTracks(List<PointTrack> list);
+	List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list);
 
 	/**
 	 * Returns a list of tracks dropped by the tracker during the most recent update.
@@ -163,7 +164,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getDroppedTracks(List<PointTrack> list);
+	List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list);
 
 	/**
 	 * Returns a list of tracks that have been added since process was called.
@@ -172,7 +173,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	List<PointTrack> getNewTracks(List<PointTrack> list);
+	List<PointTrack> getNewTracks( @Nullable List<PointTrack> list);
 
 	/**
 	 * Automatically selects new features in the image to track. Returned tracks must
