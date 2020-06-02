@@ -88,8 +88,10 @@ public class FactoryAssociation {
 	 * @return AssociateDescription
 	 */
 	public static <D> AssociateDescription<D>
-	greedy( ConfigAssociateGreedy config, ScoreAssociation<D> score )
+	greedy( @Nullable ConfigAssociateGreedy config, ScoreAssociation<D> score )
 	{
+		if( config == null )
+			config = new ConfigAssociateGreedy();
 		AssociateGreedyBase<D> alg;
 
 		if(BoofConcurrency.USE_CONCURRENT ) {

@@ -30,7 +30,7 @@ class TestWrapAssociateGreedy {
 	@Nested
 	public class Normal extends StandardTests {
 		@Override
-		public AssociateDescription<TupleDesc_F64> createAlg() {
+		public AssociateDescription<TupleDesc_F64> createAssociate() {
 			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
 			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
 			return new WrapAssociateGreedy<>(greedy);
@@ -40,7 +40,7 @@ class TestWrapAssociateGreedy {
 	@Nested
 	public class Backwards extends StandardTests {
 		@Override
-		public AssociateDescription<TupleDesc_F64> createAlg() {
+		public AssociateDescription<TupleDesc_F64> createAssociate() {
 			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
 			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, true);
 			return new WrapAssociateGreedy<>(greedy);
@@ -50,12 +50,14 @@ class TestWrapAssociateGreedy {
 	@Nested
 	public class RatioTest extends StandardTests {
 		@Override
-		public AssociateDescription<TupleDesc_F64> createAlg() {
+		public AssociateDescription<TupleDesc_F64> createAssociate() {
 			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
 			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
-			greedy.setRatioTest(0.75);
 			return new WrapAssociateGreedy<>(greedy);
 		}
+
+		// Disable this test since it's not compatible with the ratio test
+		@Override public void checkSetThreshold(){};
 	}
 
 	private static abstract class StandardTests extends StandardAssociateDescriptionChecks<TupleDesc_F64>

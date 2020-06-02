@@ -12,51 +12,45 @@ Version : 0.37
   * Created GUI for generating markers. Print or save to disk
   * Fully integrated into Applications
   * Rectangular markers are now fully supported
+  * TODO See if they can be speed up any
 - PointTracker
   * Orientation is now configurable using the new interface
+  * Added back in or added for the first time association with sets using `AssociateDescriptionSets`
+  * TODO added last seen field to track state
 - Color
   * Added support for YUYV color format used in webcams
 - GUI
   * Added clip and fog controls to point cloud controls
 - Feature Sets
-  * "Sets" has been redesigned and added to the generic interfaces.
+  * Created FeatureSets interface that specifies how sets are handled by feature detectors
   * This makes it easier and less complicated to only associate "dark" or "bright" features with each other
-  * Added back in or added for the first time association with sets using `AssociateDescriptionSets`
-  * Created UtilPointFeatures to simplify working with `sets`
+  * Added functions to UtilFeatures to simplify adding sets to association algorithms
+- Visual Odometry
+  * Updated to take advantage of new 'sets' API in PointTracker
+  * DDA and Hybrid have been updated to use the new 2D association API
+  * Updated code to take advantage of better data structure/functions since they were first created
+  * TODO Updated Config to make it easier to specify some 2D aware association algorithms
+         Update GUI for 2D association too
+- Demonstration Applications
+  * TODO Image pyramid is now fully configurable and not just levels
+  * TODO Continued improving controls in StereoVisualOdometry
+    TODO Update Hybrid Tracker's GUI controls
+- RegionOrientation
+  * Can now specify feature orientation approach using Configuration class
+  * TODO finish cleaning up that mess
+- General Feature Detector
+  * TODO SelectLimit applied to bright/dark features combined? Was this already done?
+- SURF Feature Detector
+  * TODO moved computation of dark/white feature into detector
+  * TODO Added support for limiting the total number of features returned with SelectLimit
+- SIFT Feature Detector
+  * TODO Added support for limiting the total number of features returned with SelectLimit
 
 TODO PointTracker
-  - Add last seen field to track
-  - has image motion 2D been updated to drop old unassociated tracks?
   - Redesign PointTrackerTwoPass into PointTrackerHint
-
-TODO Update Hybrid Tracker's GUI controls
-TODO Make pyramid specification fully configurable
-
-TODO RegionOrientation
-  - Clean up the mess that's the configuration
-
-TODO Random Dots
-  - See if they can be speed up any
-
-TODO SURF
-  - Make it so that sets can be determined by FastHessian and not at descriptor calculation?
-
-TODO Interest Point Detector
-  - Limit max features returned and bring over that other thing too
-
-TODO DetectDescribe
-  - Integrate in sets and remove specialized class
-  - Simplify and add sets to Associate2D
-     * PointTacker DDA
-     * PointTracker Combined
-
-TODO Visual Odometry
-  - Change API so that VisualOdometry's output is relative to a frame and it specifies that frame. See code comments
-  - Integrate new feature sets API and use it in association
-  - Bring back association with 2D information and make it configurable
-    * This has been verified to increase computational expense in Quad tracker by a large margin
-  - Consider bringing back the two pass association approach
-  - Consider having a motion estimate be a hint provided to VO as an input
+    * Could this be done by adding two functions: hint(motion) and undo() to undo the last association
+  - Update Visual Odometry to use this new API when it makes sense
+    * This would be similar to the old two-pass VO approach which got removed
 
 TODO Stereo Feature Association
    - Formalize with a factory

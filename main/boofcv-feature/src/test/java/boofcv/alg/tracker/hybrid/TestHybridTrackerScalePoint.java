@@ -18,13 +18,16 @@
 
 package boofcv.alg.tracker.hybrid;
 
-import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.AbstractAssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePointAbstract;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
+import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
@@ -32,115 +35,143 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 class TestHybridTrackerScalePoint {
 
-	@Test
-	void implement() {
-		fail("implement");
+	int width=100,height=120;
+
+	private HybridTrackerScalePoint<GrayF32, GrayF32, TupleDesc_F64> createAlgorithm() {
+		var trackerKlt = new DummyKlt();
+		var detector = new DummyDetector(5);
+		var associate = new DummyAssoc(5);
+
+		return new HybridTrackerScalePoint(trackerKlt,detector,associate,10);
 	}
 
-//	@Test
-//	void reset() {
-//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-//
-//		addTracks(alg.tracksDormant, 1);
-//		addTracks(alg.tracksPureKlt, 2);
-//		addTracks(alg.tracksReactivated, 4);
-//		addTracks(alg.tracksSpawned, 8);
-//		addTracks(alg.tracksUnused, 2);
-//
-//		alg.totalTracks = 5;
-//
-//		alg.reset();
-//
-//		assertEquals(0,alg.tracksDormant.size());
-//		assertEquals(0,alg.tracksPureKlt.size());
-//		assertEquals(0,alg.tracksReactivated.size());
-//		assertEquals(0,alg.tracksSpawned.size());
-//		assertEquals(9,alg.tracksUnused.size());
-//		assertEquals(0,alg.totalTracks);
-//	}
-//
-//	@Test
-//	void dropAllTracks() {
-//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-//
-//		addTracks(alg.tracksDormant,1);
-//		addTracks(alg.tracksPureKlt,2);
-//		addTracks(alg.tracksReactivated,4);
-//		addTracks(alg.tracksSpawned,8);
-//		addTracks(alg.tracksUnused, 2);
-//		alg.totalTracks = 5;
-//
-//		alg.dropAllTracks();
-//
-//		assertEquals(0,alg.tracksDormant.size());
-//		assertEquals(0,alg.tracksPureKlt.size());
-//		assertEquals(0,alg.tracksReactivated.size());
-//		assertEquals(0,alg.tracksSpawned.size());
-//		assertEquals(9,alg.tracksUnused.size());
-//		assertEquals(5,alg.totalTracks);
-//	}
-//
-//	@Test
-//	void updateTracks() {
-//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-//
-//		alg.trackerKlt = new DummyKlt();
-//
-//		addTracks(alg.tracksPureKlt,8);
-//
-//		// this should be cleared
-//		alg.tracksSpawned.add(1);
-//
-//		alg.updateTracks(null,null,null,null);
-//
-//		// tracks after 5 should be dropped
-//		assertEquals(5, alg.tracksPureKlt.size());
-//		assertEquals(3, alg.tracksDormant.size());
-//		assertEquals(0, alg.tracksUnused.size());
-//		assertEquals(0, alg.tracksSpawned.size());
-//	}
-//
-//	@Test
-//	void associateAllToDetected() {
-//		HybridTrackerScalePoint alg = new HybridTrackerScalePoint();
-//
-//		alg.detectedDesc = new FastArray(BrightFeature.class);
-//		alg.knownDesc = new FastArray(BrightFeature.class);
-//		alg.associate = new DummyAssoc(20);
-//		alg.detector = new DummyDetector(20);
-//		alg.trackerKlt = new DummyKlt();
-//
-//		addTracks(alg.tracksDormant,3);
-//		addTracks(alg.tracksReactivated,4);
-//		addTracks(alg.tracksPureKlt,8);
-//
-//		alg.associateAllToDetected();
-//
-//		// all dormant should be reactivated
-//		assertEquals(0,alg.tracksDormant.size());
-//		assertEquals(7,alg.tracksReactivated.size());
-//		assertEquals(8,alg.tracksPureKlt.size());
-//
-//		// make sure the KLT tracks haven't been changed
-//		for( Object a : alg.tracksPureKlt ) {
-//			HybridTrack c = (HybridTrack)a;
-//			assertEquals(0,c.pixel.x,1e-8);
-//			assertEquals(0,c.pixel.y,1e-8);
-//		}
-//		// the others should have
-//		for( Object a : alg.tracksReactivated ) {
-//			HybridTrack c = (HybridTrack)a;
-//			assertTrue(0 != c.pixel.x);
-//			assertTrue(0 != c.pixel.y);
-//		}
-//	}
+	@Test
+	void reset() {
+		HybridTrackerScalePoint alg = createAlgorithm();
 
-	private void addTracks( List l , int num ) {
+		addTracks(alg.tracksAll, 1);
+		addTracks(alg.tracksActive.toList(), 1);
+		addTracks(alg.tracksInactive.toList(), 2);
+		addTracks(alg.tracksSpawned, 8);
+		addTracks(alg.tracksDropped, 2);
+		alg.frameID = 30;
+		alg.totalTracks = 5;
+
+		alg.reset();
+
+		assertEquals(0,alg.tracksAll.size());
+		assertEquals(0,alg.tracksActive.size());
+		assertEquals(0,alg.tracksInactive.size());
+		assertEquals(0,alg.tracksSpawned.size());
+		assertEquals(0,alg.tracksDropped.size());
+		assertEquals(-1,alg.frameID);
+		assertEquals(0,alg.totalTracks);
+	}
+
+	@Test
+	void dropAllTracks() {
+		HybridTrackerScalePoint alg = createAlgorithm();
+
+		addTracks(alg.tracksAll, 1);
+		addTracks(alg.tracksActive.toList(), 1);
+		addTracks(alg.tracksInactive.toList(), 2);
+		addTracks(alg.tracksSpawned, 8);
+		addTracks(alg.tracksDropped, 2);
+
+		alg.dropAllTracks();
+
+		assertEquals(0,alg.tracksAll.size());
+		assertEquals(0,alg.tracksActive.size());
+		assertEquals(0,alg.tracksInactive.size());
+		assertEquals(0,alg.tracksSpawned.size());
+		assertEquals(0,alg.tracksDropped.size());
+	}
+
+	@Test
+	void dropTrackByAllIndex() {
+		HybridTrackerScalePoint alg = createAlgorithm();
+
+		alg.trackerKlt = new DummyKlt();
+
+		addTracks(alg.tracksAll,8);
+		alg.tracksActive.addAll(alg.tracksAll);
+
+		HybridTrack track = alg.dropTrackByAllIndex(6);
+		assertEquals(7, alg.tracksAll.size());
+		assertEquals(7, alg.tracksActive.size());
+		assertEquals(0, alg.tracksInactive.size());
+		// tracks dropped by tracker are added to the dropped list. That might not be the case here
+		assertEquals(0, alg.tracksDropped.size());
+
+		assertFalse(alg.tracksAll.contains(track));
+	}
+
+	@Test
+	void updateTracks() {
+		HybridTrackerScalePoint alg = createAlgorithm();
+
+		alg.trackerKlt = new DummyKlt();
+
+		addTracks(alg.tracksAll,8);
+		alg.tracksActive.addAll(alg.tracksAll);
+
+		// this should be cleared
+		alg.tracksSpawned.add(1);
+
+		alg.updateTracks(new DummyPyramid(),null,null);
+
+		// tracks after 5 should be dropped
+		assertEquals(8, alg.tracksAll.size());
+		assertEquals(5, alg.tracksActive.size());
+		assertEquals(3, alg.tracksInactive.size());
+		assertEquals(0, alg.tracksDropped.size());
+		assertEquals(0, alg.tracksSpawned.size());
+	}
+
+	@Test
+	void dropExcessiveInactiveTracks() {
+		var alg = createAlgorithm();
+		alg.maxInactiveTracks = 20;
+		addTracks(alg.tracksAll,50);
+		for (int i = 0; i < 30; i++) {
+			alg.tracksInactive.add(alg.tracksAll.get(i));
+		}
+
+		alg.dropExcessiveInactiveTracks();
+		assertEquals(40,alg.tracksAll.size);
+		assertEquals(20,alg.tracksInactive.size);
+	}
+
+	@Test
+	void pruneActiveTracksWhichAreTooClose() {
+		var alg = createAlgorithm();
+		alg.imageWidth = width;
+		alg.imageHeight = height;
+		addTracks(alg.tracksAll,8);
+		// assign all tracks to the same pixel
+		for( var t : alg.tracksAll.toList() ) {
+			t.pixel.set(5,5);
+		}
+		alg.pruneActiveTracksWhichAreTooClose();
+
+		// only one should survive since they have the same location
+		addTracks(alg.tracksAll,1);
+	}
+
+	private void addTracks( FastQueue<HybridTrack<TupleDesc_F64>> l , int num ) {
+		for( int i = 0; i < num; i++ ) {
+			HybridTrack t = l.grow();
+			t.trackKlt = new PyramidKltFeature(2,5);
+		}
+	}
+
+	private void addTracks( List<HybridTrack> l , int num ) {
 		for( int i = 0; i < num; i++ ) {
 			HybridTrack t =new HybridTrack();
 			t.trackKlt = new PyramidKltFeature(2,5);
@@ -148,32 +179,21 @@ class TestHybridTrackerScalePoint {
 		}
 	}
 
-	private static class DummyKlt extends PyramidKltForHybrid {
+	private static class DummyKlt extends PyramidKltForHybrid<GrayF32,GrayF32> {
 		int count = 0;
 
-		@Override
-		public boolean performTracking(  PyramidKltFeature feature ) {
-			return count++ < 5;
-		}
-
-		@Override
-		public void setInputs(ImagePyramid image , ImageGray[] derivX , ImageGray[] derivY ) {}
-
-		@Override
-		public void setDescription( float x , float y , PyramidKltFeature ret ) {}
+		@Override public boolean performTracking(  PyramidKltFeature feature ) {return count++ < 5;}
+		@Override public void setInputs(ImagePyramid<GrayF32> image , GrayF32[] derivX , GrayF32[] derivY ) {}
+		@Override public void setDescription( float x , float y , PyramidKltFeature ret ) {}
 	}
 
 
-	private static class DummyAssoc extends AssociateDescriptionSets {
+	private static class DummyAssoc extends AbstractAssociateDescription2D<TupleDesc_F64> {
 		int N;
 
 		public DummyAssoc(int N ) {
-			super(null,BrightFeature.class);
 			this.N = N;
 		}
-
-		@Override public void initialize(int numberOfSets) {}
-		@Override public void associate() {}
 
 		@Override
 		public FastAccess<AssociatedIndex> getMatches() {
@@ -185,16 +205,32 @@ class TestHybridTrackerScalePoint {
 
 			return queue;
 		}
+
+		@Override public boolean uniqueSource() {return true;}
+		@Override public boolean uniqueDestination() {return true;}
 	}
 
-	private static class DummyDetector extends DetectDescribePointAbstract {
-
+	private static class DummyDetector extends DetectDescribePointAbstract<GrayF32,TupleDesc_F64> {
 		int N;
-
 		private DummyDetector(int n) {N = n;}
 		@Override public int getNumberOfFeatures() {return N;}
 		@Override public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64(2,2);}
 		@Override public int getNumberOfSets() {return 1;}
 		@Override public int getSet(int index) {return 0;}
+		@Override public TupleDesc_F64 createDescription() {return new TupleDesc_F64(1);}
+		@Override public Class<TupleDesc_F64> getDescriptionType() {return TupleDesc_F64.class;};
+	}
+
+	private class DummyPyramid extends PyramidDiscrete<GrayF32> {
+
+		public DummyPyramid() {
+			super(ImageType.SB_F32, true,ConfigDiscreteLevels.levels(2));
+			initialize(width,height);
+		}
+
+		@Override public void process(GrayF32 input) {}
+		@Override public double getSampleOffset(int layer) {return 0;}
+		@Override public double getSigma(int layer) {return 0;}
+		@Override public <IP extends ImagePyramid<GrayF32>> IP copyStructure() {return null;}
 	}
 }

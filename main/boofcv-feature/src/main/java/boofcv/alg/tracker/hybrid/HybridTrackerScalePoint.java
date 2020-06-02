@@ -56,7 +56,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	public Random rand = new Random(345);
 
 	// Size of input image
-	private int imageWidth, imageHeight;
+	protected int imageWidth, imageHeight;
 
 	/** The KLT tracker used to perform the nominal track update */
 	protected @Getter PyramidKltForHybrid<I,D> trackerKlt;
@@ -69,7 +69,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	/** Used to associate features using their DDA description */
 	protected @Getter AssociateDescriptionSets2D<TD> associate;
 
-	/** List of all tracks and stores unused track data for future re-use */
+	/** List of all tracks (active + inactive) and stores unused track data for future re-use */
 	protected @Getter FastQueue<HybridTrack<TD>> tracksAll;
 
 	/** all active tracks that have been tracked purely by KLT */
@@ -93,7 +93,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	protected long totalTracks = 0;
 
 	// number of frames which have been processed
-	private @Getter long frameID = -1;
+	@Getter long frameID = -1;
 
 	// Used to prune points close by
 	PruneCloseTracks<HybridTrack<TD>> pruneClose;
@@ -131,11 +131,6 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 			});
 		}
 	}
-
-	/**
-	 * Used for unit tests
-	 */
-	protected HybridTrackerScalePoint() {}
 
 	/**
 	 * Creates a new track and sets the descriptor
@@ -332,7 +327,9 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 				int selectedIdx = rand.nextInt(tracksInactive.size());
 
 				// Remove the selected track from the inactive list and add it tot he dropped list
-				tracksDropped.add(tracksInactive.removeSwap(selectedIdx));
+				HybridTrack<TD> track = tracksInactive.removeSwap(selectedIdx);
+				int indexAll = tracksAll.indexOf(track);
+				tracksAll.removeSwap(indexAll);
 			}
 		}
 	}
@@ -359,8 +356,8 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	public HybridTrack<TD> dropTrackByAllIndex( int index ) {
 		HybridTrack<TD> track = tracksAll.removeSwap(index);
 
-		if( tracksActive.contains(track) && tracksInactive.contains(track))
-			throw new RuntimeException("BUG");
+//		if( tracksActive.contains(track) && tracksInactive.contains(track))
+//			throw new RuntimeException("BUG");
 
 		boolean found = false;
 		{

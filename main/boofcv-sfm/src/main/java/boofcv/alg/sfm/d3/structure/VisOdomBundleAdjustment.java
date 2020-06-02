@@ -46,9 +46,9 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	/** List of all tracks that can be feed into bundle adjustment */
 	public final FastQueue<T> tracks;
 	/** List of all frames that can be feed into bundle adjustment */
-	public final FastQueue<BFrame> frames = new FastQueue<>(BFrame::new,BFrame::reset);
+	public final FastQueue<BFrame> frames = new FastQueue<>(BFrame::new, BFrame::reset);
 	/** List of all the cameras */
-	public final FastQueue<BCamera> cameras = new FastQueue<>(BCamera::new,BCamera::reset);
+	public final FastQueue<BCamera> cameras = new FastQueue<>(BCamera::new, BCamera::reset);
 
 	public SceneStructureMetric structure = new SceneStructureMetric(true);
 	public SceneObservations observations = new SceneObservations();
@@ -57,14 +57,12 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public List<BTrack> selectedTracks = new ArrayList<>();
 
 	// Reduce the number of tracks feed into bundle adjustment to make it run at a reasonable speed
-	@Getter SelectTracksInFrameForBundleAdjustment selectTracks =
-			new SelectTracksInFrameForBundleAdjustment(0xBEEF);
+	@Getter SelectTracksInFrameForBundleAdjustment selectTracks = new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 
 	final Se3_F64 world_to_view = new Se3_F64();
 
-	public VisOdomBundleAdjustment( BundleAdjustment<SceneStructureMetric> bundleAdjustment,
-									Factory<T> factoryTracks ) {
-		this.tracks = new FastQueue<>(factoryTracks,BTrack::reset);
+	public VisOdomBundleAdjustment(BundleAdjustment<SceneStructureMetric> bundleAdjustment, Factory<T> factoryTracks) {
+		this.tracks = new FastQueue<>(factoryTracks, BTrack::reset);
 		this.bundleAdjustment = bundleAdjustment;
 	}
 
@@ -72,10 +70,10 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * Performs bundle adjustment on the scene and updates parameters
 	 */
 	public void optimize() {
-		selectTracks.selectTracks(this,selectedTracks);
+		selectTracks.selectTracks(this, selectedTracks);
 		setupBundleStructure();
 
-		bundleAdjustment.setParameters(structure,observations);
+		bundleAdjustment.setParameters(structure, observations);
 		bundleAdjustment.optimize(structure);
 
 		copyResults();
@@ -89,9 +87,9 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	/**
 	 * Adds a new camera to the scene
 	 */
-	public BCamera addCamera( CameraPinholeBrown camera ) {
+	public BCamera addCamera(CameraPinholeBrown camera) {
 		BCamera output = cameras.grow();
-		output.index = cameras.size-1;
+		output.index = cameras.size - 1;
 		output.original = camera;
 		output.bundleCamera.set(camera);
 		return output;
@@ -106,17 +104,17 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 		// Initialize data structures
 		observations.initialize(frames.size);
-		structure.initialize(cameras.size,frames.size,totalBundleTracks);
+		structure.initialize(cameras.size, frames.size, totalBundleTracks);
 		for (int cameraIdx = 0; cameraIdx < cameras.size; cameraIdx++) {
-			structure.setCamera(cameraIdx,true, cameras.get(cameraIdx).bundleCamera);
+			structure.setCamera(cameraIdx, true, cameras.get(cameraIdx).bundleCamera);
 		}
 
 		// TODO make the first frame at origin. This is done to avoid numerical after traveling a good distance
 		for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
 			BFrame bf = frames.get(frameIdx);
 			bf.frame_to_world.invert(world_to_view);
-			structure.setView(frameIdx,frameIdx==0,world_to_view);
-			structure.connectViewToCamera(frameIdx,bf.camera.index);
+			structure.setView(frameIdx, frameIdx == 0, world_to_view);
+			structure.connectViewToCamera(frameIdx, bf.camera.index);
 			frames.get(frameIdx).listIndex = frameIdx; // save the index since it's needed in the next loop
 		}
 
@@ -125,21 +123,22 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		int featureBundleIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack bt = tracks.get(trackIdx);
-			if( !bt.selected)
+			if (!bt.selected) {
 				continue;
+			}
 			Point4D_F64 p = bt.worldLoc;
-			structure.setPoint(featureBundleIdx,p.x,p.y,p.z,p.w);
+			structure.setPoint(featureBundleIdx, p.x, p.y, p.z, p.w);
 
 			for (int obsIdx = 0; obsIdx < bt.observations.size; obsIdx++) {
 				BObservation o = bt.observations.get(obsIdx);
 				SceneObservations.View view = observations.getView(o.frame.listIndex);
-				view.add(featureBundleIdx,(float)o.pixel.x,(float)o.pixel.y);
+				view.add(featureBundleIdx, (float) o.pixel.x, (float) o.pixel.y);
 			}
 			featureBundleIdx++;
 		}
 
 		// Sanity check
-		if( featureBundleIdx != structure.points.size )
+		if (featureBundleIdx != structure.points.size)
 			throw new RuntimeException("BUG! tracks feed in and points don't match");
 	}
 
@@ -156,8 +155,9 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		int featureIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack bt = tracks.get(trackIdx);
-			if( !bt.selected)
+			if (!bt.selected) {
 				continue;
+			}
 			SceneStructureMetric.Point sp = structure.points.get(featureIdx);
 			sp.get(bt.worldLoc);
 			featureIdx++;
@@ -173,42 +173,43 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		cameras.reset();
 	}
 
-	public void addObservation(BFrame frame , T track , double pixelX , double pixelY ) {
+	public void addObservation(BFrame frame, T track, double pixelX, double pixelY) {
 		BObservation o = track.observations.grow();
 		o.frame = frame;
-		o.pixel.set(pixelX,pixelY);
+		o.pixel.set(pixelX, pixelY);
 		frame.tracks.add(track);
 	}
+
 	/** Searches for a track that has the following tracker track. null is none were found */
-	public T findByTrackerTrack( PointTrack target ) {
+	public T findByTrackerTrack(PointTrack target) {
 		for (int i = 0; i < tracks.size; i++) {
-			if( tracks.get(i).visualTrack == target ) {
+			if (tracks.get(i).visualTrack == target) {
 				return tracks.get(i);
 			}
 		}
 		return null;
 	}
 
-	public T addTrack( double x , double y , double z , double w ) {
+	public T addTrack(double x, double y, double z, double w) {
 		T track = tracks.grow();
-		track.worldLoc.set(x,y,z,w);
+		track.worldLoc.set(x, y, z, w);
 		return track;
 	}
 
-	public BFrame addFrame( long id ) {
-		if( cameras.size != 1 )
+	public BFrame addFrame(long id) {
+		if (cameras.size != 1)
 			throw new IllegalArgumentException("To use this function there must be one and only one camera");
-		return addFrame(0,id);
+		return addFrame(0, id);
 	}
 
-	public BFrame addFrame( int cameraIndex , long id ) {
+	public BFrame addFrame(int cameraIndex, long id) {
 		BFrame frame = frames.grow();
 		frame.camera = cameras.get(cameraIndex);
 		frame.id = id;
 		return frame;
 	}
 
-	BFrame addFrameDebug( long id ) {
+	BFrame addFrameDebug(long id) {
 		BFrame frame = frames.grow();
 		frame.id = id;
 		return frame;
@@ -219,39 +220,40 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * it is also removed from the master list.
 	 *
 	 * @param removedVisualTracks List of tracks which were removed and were being visually tracked
-	 *                      because they had no more observations. Cleared each call.
+	 *                            because they had no more observations. Cleared each call.
 	 */
-	public void removeFrame( BFrame frame , List<PointTrack> removedVisualTracks ) {
+	public void removeFrame(BFrame frame, List<PointTrack> removedVisualTracks) {
 		removedVisualTracks.clear();
 		int index = frames.indexOf(frame);
-		if( index < 0 )
+		if (index < 0) {
 			throw new RuntimeException("BUG! frame not in frames list");
+		}
 
 		// denotes if at least one observations was knocked down to zero observations
 		boolean pruneObservations = false;
 
 		// Remove all references to this frame from its tracks
-		for (int trackIdx = 0; trackIdx < frame.tracks.size; trackIdx++ ) {
+		for (int trackIdx = 0; trackIdx < frame.tracks.size; trackIdx++) {
 			BTrack bt = frame.tracks.get(trackIdx);
 
-			if( !bt.removeRef(frame) )
-				throw new RuntimeException("Bug: Track not in frame. frame.id "+frame.id+" track.id "+bt.id);
+			if (!bt.removeRef(frame))
+				throw new RuntimeException("Bug: Track not in frame. frame.id " + frame.id + " track.id " + bt.id);
 
 			// If the track no longer has observations remove it from the master track list
-			if( bt.observations.size() == 0 ) {
+			if (bt.observations.size() == 0) {
 				pruneObservations = true;
 			}
 		}
 
-		if( pruneObservations ) {
+		if (pruneObservations) {
 			// Search through all observations and remove the ones not in use any more
 			for (int i = tracks.size - 1; i >= 0; i--) {
 				if (tracks.get(i).observations.size == 0) {
 					BTrack t = tracks.removeSwap(i);
-					if( t.visualTrack != null ) {
+					if (t.visualTrack != null) {
 						removedVisualTracks.add(t.visualTrack);
-						if( t.visualTrack.cookie != t ) {
-							System.out.println("BUG! bt="+t.id+" tt="+t.visualTrack.featureId);
+						if (t.visualTrack.cookie != t) {
+							System.out.println("BUG! bt=" + t.id + " tt=" + t.visualTrack.featureId);
 							throw new RuntimeException("BUG!");
 						}
 						t.visualTrack = null; // mark it as null so that we know it has been dropped
@@ -263,15 +265,12 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		frames.remove(index);
 	}
 
-	public BFrame getLastFrame() {
-		return frames.get(frames.size-1);
-	}
-	public BFrame getFirstFrame() {
-		return frames.get(0);
-	}
-	public BCamera getCamera( int index ) {
-		return cameras.get(index);
-	}
+	public BFrame getLastFrame() { return frames.get(frames.size - 1); }
+
+	public BFrame getFirstFrame() { return frames.get(0);}
+
+	public BCamera getCamera(int index) {return cameras.get(index);}
+
 	/**
 	 * Sees if the graph structure is internally consistent. Used for debugging
 	 */
@@ -284,11 +283,11 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			for (int trackIdx = 0; trackIdx < bf.tracks.size; trackIdx++) {
 				BTrack bt = bf.tracks.get(trackIdx);
 				trackSet.add(bt.id);
-				if( !bt.isObservedBy(bf) ) {
-					throw new RuntimeException("Frame's track list is out of date. frame.id="+bf.id+" track.id="+bt.id+" obs.size "+bt.observations.size);
+				if (!bt.isObservedBy(bf)) {
+					throw new RuntimeException("Frame's track list is out of date. frame.id=" + bf.id + " track.id=" + bt.id + " obs.size " + bt.observations.size);
 				} else {
-					if( tracks.isUnused((T)bt) ) {
-						throw new RuntimeException("BUG! Track is in unused list. frame.id="+bf.id+" track.id="+bt.id);
+					if (tracks.isUnused((T) bt)) {
+						throw new RuntimeException("BUG! Track is in unused list. frame.id=" + bf.id + " track.id=" + bt.id);
 					}
 				}
 			}
@@ -301,18 +300,17 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 //					trackSet.size()+" vs track.size "+tracks.size);
 	}
 
-	public static class BObservation{
+	public static class BObservation {
 		public final Point2D_F64 pixel = new Point2D_F64();
 		public BFrame frame;
 
 		public void reset() {
-			pixel.set(-1,-1);
+			pixel.set(-1, -1);
 			frame = null;
 		}
 	}
 
-	public static class BTrack
-	{
+	public static class BTrack {
 		// the ID of the PointTrack which created this
 		public long id;
 		/**
@@ -327,24 +325,26 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		/** true if it was selected for inclusion in the optimization */
 		public boolean selected;
 
-		public boolean isObservedBy( BFrame frame ) {
+		public boolean isObservedBy(BFrame frame) {
 			for (int i = 0; i < observations.size; i++) {
-				if( observations.data[i].frame == frame )
+				if (observations.data[i].frame == frame) {
 					return true;
+				}
 			}
 			return false;
 		}
 
-		public BObservation findObservationBy( BFrame frame ) {
+		public BObservation findObservationBy(BFrame frame) {
 			for (int i = 0; i < observations.size; i++) {
-				if( observations.data[i].frame == frame )
+				if (observations.data[i].frame == frame) {
 					return observations.data[i];
+				}
 			}
 			return null;
 		}
 
 		public void reset() {
-			worldLoc.set(0,0,0,0);
+			worldLoc.set(0, 0, 0, 0);
 			observations.reset();
 			hasBeenInlier = false;
 			selected = false;
@@ -354,11 +354,12 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 		/**
 		 * Removes the observations to the specified frame
+		 *
 		 * @return true if a match was found and removed. False otherwise.
 		 */
 		public boolean removeRef(BFrame frame) {
-			for (int i = observations.size-1; i >= 0; i-- ) {
-				if( observations.data[i].frame == frame ) {
+			for (int i = observations.size - 1; i >= 0; i--) {
+				if (observations.data[i].frame == frame) {
 					observations.removeSwap(i);
 					return true;
 				}
@@ -376,8 +377,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * A BFrame is a key frame. Each keyframe represents the state at the time of a specific image frame in the
 	 * sequence.
 	 */
-	public static class BFrame
-	{
+	public static class BFrame {
 		// ID of the image used to create the BFrame
 		public long id;
 		// Which camera generated the image the BFrame is derived from
@@ -396,8 +396,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		}
 	}
 
-	public static class BCamera
-	{
+	public static class BCamera {
 		// array index
 		public int index;
 		public CameraPinholeBrown original;

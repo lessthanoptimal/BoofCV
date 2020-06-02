@@ -32,7 +32,6 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.tracker.*;
-import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
@@ -187,22 +186,20 @@ public class FactoryPointTracker {
 	// TODO remove maxTracks?  Use number of detected instead
 	@Deprecated
 	public static <I extends ImageGray<I>>
-	PointTracker<I> dda_FH_SURF_Fast(
-										  ConfigFastHessian configDetector ,
-										  ConfigSurfDescribe.Fast configDescribe ,
-										  ConfigAverageIntegral configOrientation ,
-										  Class<I> imageType)
+	PointTracker<I> dda_FH_SURF_Fast( ConfigFastHessian configDetector ,
+									  ConfigSurfDescribe.Fast configDescribe ,
+									  ConfigAverageIntegral configOrientation ,
+									  Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score));
-
-		AssociateDescription2D<BrightFeature> generalAssoc =
-				new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
+		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score);
+		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
 
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,imageType);
 
-		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda()));
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, associate2D, new ConfigTrackerDda()));
 	}
 
 	/**
@@ -220,22 +217,20 @@ public class FactoryPointTracker {
 	// TODO remove maxTracks?  Use number of detected instead
 	@Deprecated
 	public static <I extends ImageGray<I>>
-	PointTracker<I> dda_FH_SURF_Stable(
-											ConfigFastHessian configDetector ,
-											ConfigSurfDescribe.Stability configDescribe ,
-											ConfigSlidingIntegral configOrientation ,
-											Class<I> imageType)
+	PointTracker<I> dda_FH_SURF_Stable( ConfigFastHessian configDetector ,
+										ConfigSurfDescribe.Stability configDescribe ,
+										ConfigSlidingIntegral configOrientation ,
+										Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score));
-
-		AssociateDescription2D<BrightFeature> generalAssoc =
-				new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
+		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score);
+		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
 
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, generalAssoc, new ConfigTrackerDda()));
+		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, associate2D, new ConfigTrackerDda()));
 	}
 
 	/**
@@ -405,14 +400,14 @@ public class FactoryPointTracker {
 										  Class<I> imageType) {
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
-
-		AssociateDescription2D<BrightFeature> generalAssoc = new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
+		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score);
+		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
 
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,imageType);
 
-		return hybrid(fused, generalAssoc, configDetector.extract.radius, kltConfig,configHybrid, imageType);
+		return hybrid(fused, associate2D, configDetector.extract.radius, kltConfig,configHybrid, imageType);
 	}
 
 	/**
@@ -449,9 +444,9 @@ public class FactoryPointTracker {
 				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
-
-		AssociateDescription2D<BrightFeature> generalAssoc = new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
+		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score);
+		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
 
 		OrientationImage<I> orientation = null;
 
@@ -461,7 +456,7 @@ public class FactoryPointTracker {
 			orientation = FactoryOrientation.convertImage(orientationII,imageType);
 		}
 
-		return hybrid(detector,orientation,regionDesc,generalAssoc, configExtract.radius,
+		return hybrid(detector,orientation,regionDesc,associate2D, configExtract.radius,
 				kltConfig,configHybrid,imageType);
 	}
 

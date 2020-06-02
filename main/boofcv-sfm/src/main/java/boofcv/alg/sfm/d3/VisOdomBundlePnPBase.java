@@ -59,7 +59,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/** Maximum number of allowed key frames in the scene */
 	public int maxKeyFrames = 6;
 
-	/** Minimum number of feature to be triangulated which was not included in bundle adjustment.  */
+	/** Minimum number of feature to be triangulated which was not included in bundle adjustment. */
 	public int minObservationsTriangulate = 3;
 
 	/**
@@ -123,7 +123,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 * Resets the algorithm into its original state
 	 */
 	public void reset() {
-		if( verbose != null ) verbose.println("VO: reset()");
+		if (verbose != null) verbose.println("VO: reset()");
 		current_to_world.reset();
 		current_to_previous.reset();
 		cameraModels.clear();
@@ -138,7 +138,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	protected void updateListOfVisibleTracksForOutput() {
 		for (int i = 0; i < initialVisible.size(); i++) {
 			Track t = initialVisible.get(i);
-			if( t.visualTrack != null ) {
+			if (t.visualTrack != null) {
 				visibleTracks.add(t);
 			}
 		}
@@ -154,7 +154,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 			final BTrack bt = scene.tracks.data[trackIdx];
 			// skip selected since they have already been optimized or only too few observations since
 			// results will be unstable
-			if( bt.selected || bt.observations.size < minObservationsTriangulate)
+			if (bt.selected || bt.observations.size < minObservationsTriangulate)
 				continue;
 
 			observationsNorm.reset();
@@ -162,13 +162,13 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 			for (int obsIdx = 0; obsIdx < bt.observations.size; obsIdx++) {
 				BObservation bo = bt.observations.get(obsIdx);
 				CameraModel cm = cameraModels.get(bo.frame.camera.index);
-				cm.pixelToNorm.compute(bo.pixel.x,bo.pixel.y,observationsNorm.grow());
+				cm.pixelToNorm.compute(bo.pixel.x, bo.pixel.y, observationsNorm.grow());
 				bo.frame.frame_to_world.invert(listOf_world_to_frame.grow());
 				// NOTE: This invert could be cached. Doesn't need to be done a million times
 			}
 
 			// NOTE: If there is a homogenous metric triangulation added in the future replace this with that
-			if( triangulateN.triangulate(observationsNorm.toList(), listOf_world_to_frame.toList(),found3D) ) {
+			if (triangulateN.triangulate(observationsNorm.toList(), listOf_world_to_frame.toList(), found3D)) {
 				bt.worldLoc.x = found3D.x;
 				bt.worldLoc.y = found3D.y;
 				bt.worldLoc.z = found3D.z;
@@ -180,15 +180,16 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/**
 	 * Drops specified keyframes from the scene. Returns true if the current frame was dropped
 	 *
-	 * @param tracker tracker
+	 * @param tracker   tracker
 	 * @param newFrames Number of new frames added to the scene
 	 * @return true if current frame
 	 */
-	protected boolean performKeyFrameMaintenance( PointTracker<?> tracker , int newFrames ) {
-		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,maxKeyFrames,newFrames, scene);
-		if( dropFrameIndexes.size == 0 )
+	protected boolean performKeyFrameMaintenance(PointTracker<?> tracker, int newFrames) {
+		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene);
+		if (dropFrameIndexes.size == 0) {
 			return false;
-		boolean droppedCurrentFrame = dropFrameIndexes.getTail(0) == scene.frames.size-1;
+		}
+		boolean droppedCurrentFrame = dropFrameIndexes.getTail(0) == scene.frames.size - 1;
 
 		dropFramesFromScene(dropFrameIndexes);
 		dropTracksNotVisibleAndTooFewObservations();
@@ -203,7 +204,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 * @param dropFrameIndexes List of indexes to drop. Sorted from lowest to highest
 	 */
 	protected void dropFramesFromScene(GrowQueue_I32 dropFrameIndexes) {
-		for (int i = dropFrameIndexes.size-1; i >= 0; i--) {
+		for (int i = dropFrameIndexes.size - 1; i >= 0; i--) {
 			// indexes are ordered from lowest to highest, so you can remove frames without
 			// changing the index in the list
 			BFrame frameToDrop = scene.frames.get(dropFrameIndexes.get(i));
@@ -227,9 +228,9 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		final int minObservationsNotVisible = this.minObservationsNotVisible;
 
 		// iteration through track lists in reverse order because of removeSwap()
-		for (int tidx = scene.tracks.size-1; tidx >= 0; tidx--) {
+		for (int tidx = scene.tracks.size - 1; tidx >= 0; tidx--) {
 			BTrack bt = scene.tracks.get(tidx);
-			if( bt.visualTrack == null && bt.observations.size < minObservationsNotVisible ) {
+			if (bt.visualTrack == null && bt.observations.size < minObservationsNotVisible) {
 				bt.observations.reset(); // Mark it as dropped. Formally remove it in the next loop
 				scene.tracks.removeSwap(tidx);
 //				System.out.println("drop old bt="+bt.id+" vt=NONE");
@@ -239,9 +240,9 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		// Need to remove the dropped tracks from each frame that saw them.
 		for (int fidx = 0; fidx < scene.frames.size; fidx++) {
 			BFrame bf = scene.frames.get(fidx);
-			for (int tidx = bf.tracks.size-1; tidx >= 0; tidx--) {
+			for (int tidx = bf.tracks.size - 1; tidx >= 0; tidx--) {
 				BTrack bt = bf.tracks.get(tidx);
-				if( bt.observations.size == 0 ) {
+				if (bt.observations.size == 0) {
 					bf.tracks.removeSwap(tidx);
 //					System.out.println("removing track="+bt.id+" from frame="+bf.id);
 				}
@@ -258,16 +259,17 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 			BFrame bf = scene.frames.get(fidx);
 			bf.frame_to_world.invert(world_to_frame);
 
-			for (int tidx = bf.tracks.size-1; tidx >= 0; tidx--) {
+			for (int tidx = bf.tracks.size - 1; tidx >= 0; tidx--) {
 				BTrack bt = bf.tracks.get(tidx);
 				// Remove from frame if it was already marked for removal
-				if( bt.observations.size == 0 )
+				if (bt.observations.size == 0) {
 					continue;
+				}
 
 				// test to see if the feature is behind the camera while avoiding divided by zero errors
 				SePointOps_F64.transform(world_to_frame, bt.worldLoc, cameraLoc);
 
-				if( Math.signum(cameraLoc.z) * Math.signum(cameraLoc.w) < 0 ) {
+				if (Math.signum(cameraLoc.z) * Math.signum(cameraLoc.w) < 0) {
 					// this marks it for removal later on
 					bt.observations.reset();
 //					System.out.println("Dropping bad track. id="+bt.id+" z="+(cameraLoc.z/cameraLoc.w));
@@ -280,10 +282,12 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 
 		// Remove it from the master tracks list
 		totalDroppedTracksBadBundle = scene.tracks.size;
-		for (int tidx = scene.tracks.size-1; tidx >= 0; tidx--) {
+		for (int tidx = scene.tracks.size - 1; tidx >= 0; tidx--) {
 			BTrack bt = scene.tracks.get(tidx);
-			if( bt.observations.size == 0 ) {
-				if( bt.id == -1 ) throw new RuntimeException("BUG! Dropping a track that was never initialized");
+			if (bt.observations.size == 0) {
+				if (bt.id == -1) {
+					throw new RuntimeException("BUG! Dropping a track that was never initialized");
+				}
 				scene.tracks.removeSwap(tidx);
 			}
 		}
@@ -293,12 +297,12 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		// if it was good in an earlier one
 		for (int fidx = 0; fidx < scene.frames.size; fidx++) {
 			BFrame bf = scene.frames.get(fidx);
-			for (int tidx = bf.tracks.size-1; tidx >= 0; tidx--) {
+			for (int tidx = bf.tracks.size - 1; tidx >= 0; tidx--) {
 				BTrack bt = bf.tracks.get(tidx);
-				if( bt.observations.size == 0 ) {
+				if (bt.observations.size == 0) {
 //					System.out.println("  Removing track from frame: "+bt.id);
 					bf.tracks.removeSwap(tidx);
-					if( bt.visualTrack != null ) {
+					if (bt.visualTrack != null) {
 						dropVisualTrack(bt.visualTrack);
 						bt.visualTrack = null;
 					}
@@ -310,7 +314,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/**
 	 * Given the BTrack drop all visual tracks which belong to it.
 	 */
-	protected abstract void dropVisualTrack( PointTrack track );
+	protected abstract void dropVisualTrack(PointTrack track);
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
@@ -319,15 +323,17 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		this.verbose = null;
 
 		// Update verbosity levels
-		if( configuration == null ) {
+		if (configuration == null) {
 			this.verbose = out;
 			return;
 		}
 
-		if( configuration.contains(VisualOdometry.VERBOSE_RUNTIME))
+		if (configuration.contains(VisualOdometry.VERBOSE_RUNTIME)) {
 			this.profileOut = out;
-		if( configuration.contains(VisualOdometry.VERBOSE_TRACKING))
+		}
+		if (configuration.contains(VisualOdometry.VERBOSE_TRACKING)) {
 			this.verbose = out;
+		}
 	}
 
 	public Se3_F64 getCurrentToWorld() {

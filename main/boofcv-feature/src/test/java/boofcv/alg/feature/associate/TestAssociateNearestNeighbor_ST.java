@@ -45,7 +45,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 	}
 
 	@Override
-	public AssociateDescription<TupleDesc_F64> createAlg() {
+	public AssociateDescription<TupleDesc_F64> createAssociate() {
 		// exhaustive algorithm will produce perfect results
 		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
 		return new AssociateNearestNeighbor_ST<>(exhaustive);

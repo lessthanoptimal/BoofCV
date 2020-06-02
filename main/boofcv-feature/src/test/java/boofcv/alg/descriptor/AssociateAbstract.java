@@ -16,80 +16,56 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.associate;
+package boofcv.alg.descriptor;
 
-import boofcv.alg.feature.associate.AssociateSurfBasic;
-import boofcv.alg.feature.associate.FindUnassociated;
+import boofcv.abst.feature.associate.Associate;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
- * Wrapper around {@link AssociateSurfBasic} for {@link AssociateDescription}.
- *
  * @author Peter Abeles
  */
-public class WrapAssociateSurfBasic implements AssociateDescription<BrightFeature> {
-
-	AssociateSurfBasic alg;
-
-	// creates a list of unassociated features from the list of matches
-	FindUnassociated unassociated = new FindUnassociated();
-
-	public WrapAssociateSurfBasic(AssociateSurfBasic alg) {
-		this.alg = alg;
-	}
-
-	@Override
-	public void setSource(FastAccess<BrightFeature> listSrc) {
-		alg.setSrc(listSrc);
-	}
-
-	@Override
-	public void setDestination(FastAccess<BrightFeature> listDst) {
-		alg.setDst(listDst);
-	}
+public class AssociateAbstract implements Associate {
 
 	@Override
 	public void associate() {
-		alg.associate();
+
 	}
 
 	@Override
-	public FastQueue<AssociatedIndex> getMatches() {
-		return alg.getMatches();
+	public FastAccess<AssociatedIndex> getMatches() {
+		return null;
 	}
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return alg.getUnassociatedSrc();
+		return null;
 	}
 
 	@Override
 	public GrowQueue_I32 getUnassociatedDestination() {
-		return unassociated.checkDestination(alg.getMatches(),alg.totalDestination());
+		return null;
 	}
 
 	@Override
 	public void setMaxScoreThreshold(double score) {
-		alg.getAssoc().setMaxScoreThreshold(score);
+
 	}
 
 	@Override
 	public MatchScoreType getScoreType() {
-		return alg.getAssoc().getScoreType();
+		return null;
 	}
 
 	@Override
 	public boolean uniqueSource() {
-		return alg.getAssoc().uniqueSource();
+		return false;
 	}
 
 	@Override
 	public boolean uniqueDestination() {
-		return alg.getAssoc().uniqueDestination();
+		return false;
 	}
 }

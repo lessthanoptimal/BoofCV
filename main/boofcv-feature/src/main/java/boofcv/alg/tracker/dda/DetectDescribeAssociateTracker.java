@@ -57,7 +57,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	// Detects and describes image features
 	protected DetectDescribePoint<I,TD> detector;
 
-	// all tracks
+	// all tracks. active and inactive.
 	protected @Getter FastQueue<PointTrack> tracksAll;
 	// recently associated tracks
 	protected @Getter List<PointTrack> tracksActive = new ArrayList<>();
@@ -185,13 +185,13 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			tracksInactive.add(tracksAll.get(unassociatedIdx.get(j)));
 		}
 
-		pruneExcessiveInactiveTracks(unassociatedIdx);
+		dropExcessiveInactiveTracks(unassociatedIdx);
 	}
 
 	/**
 	 * If there are too many unassociated tracks, randomly select some of those tracks and drop them
 	 */
-	private void pruneExcessiveInactiveTracks(GrowQueue_I32 unassociated) {
+	void dropExcessiveInactiveTracks(GrowQueue_I32 unassociated) {
 		if( unassociated.size > maxInactiveTracks ) {
 			// make the first N elements the ones which will be dropped
 			int numDrop = unassociated.size-maxInactiveTracks;
@@ -281,10 +281,6 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		p.pixel.set(x, y);
 		((TD)p.getDescription()).setTo(desc);
 
-		if( !checkValidSpawn(set,p) ) {
-			tracksAll.removeTail();
-			return;
-		}
 		p.spawnFrameID = frameID;
 		p.detectorSetId = set;
 		p.featureId = featureID++;
@@ -297,13 +293,6 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	}
 
 	/**
-	 * Returns true if a new track can be spawned here.  Intended to be overloaded
-	 */
-	protected boolean checkValidSpawn( int setIndex, PointTrack p ) {
-		return true;
-	}
-
-	/**
 	 * Drops all tracks
 	 */
 	public void dropAllTracks() {
@@ -312,7 +301,6 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		tracksAll.reset();
 		tracksNew.clear();
 	}
-
 
 	/**
 	 * Remove from active list and mark so that it is dropped in the next cycle
@@ -342,7 +330,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		found |= tracksInactive.remove(track);
 
 		// if a track has been drop it must be in `all` and `active` OR `inactive` lists
-		assert(found);
+		assert found;
 
 		return track;
 	}

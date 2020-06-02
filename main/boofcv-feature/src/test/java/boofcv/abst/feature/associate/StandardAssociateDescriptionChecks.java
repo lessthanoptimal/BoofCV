@@ -59,7 +59,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	/**
 	 * Match error must be less than the specified euclidean error
 	 */
-	public abstract AssociateDescription<Desc> createAlg();
+	public abstract AssociateDescription<Desc> createAssociate();
 
 	protected void init() {
 		listSrc.reset();
@@ -68,7 +68,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 
 	@Test
 	void checkScoreType() {
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 
 		assertSame(MatchScoreType.NORM_ERROR, alg.getScoreType(), "Test are designed for norm error");
 	}
@@ -86,7 +86,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	private void performBasicTest(int numFeatures ) {
 		init();
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 		alg.setMaxScoreThreshold(0.01);
 
 		for( int i = 0; i < numFeatures; i++ ) {
@@ -133,7 +133,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		listSrc.add( c(1) );
 		listDst.add( c(100) );
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);
 		alg.associate();
@@ -150,7 +150,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		listSrc.add( c(1) );
 		listDst.add( c(1+0.1) );
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);
 
@@ -179,7 +179,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	void checkUnassociatedLists() {
 		init();
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 
 		listSrc.add( c(1) );
 		listSrc.add( c(2) );
@@ -204,7 +204,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	void checkUnassociatedLists_emptySrc() {
 		init();
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 
 		listDst.add( c(1+0.1) );
 		listDst.add( c(2+0.05) );
@@ -232,7 +232,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	void checkUnassociatedLists_emptyDst() {
 		init();
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 
 		listSrc.add( c(1) );
 		listSrc.add( c(2) );
@@ -263,7 +263,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		listDst.add( c(1) );
 		listDst.add( c(1.001) );
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);
 		alg.associate();
@@ -284,7 +284,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		listSrc.add( c(1.001) );
 		listDst.add( c(1) );
 
-		AssociateDescription<Desc> alg = createAlg();
+		AssociateDescription<Desc> alg = createAssociate();
 		alg.setSource(listSrc);
 		alg.setDestination(listDst);
 		alg.associate();

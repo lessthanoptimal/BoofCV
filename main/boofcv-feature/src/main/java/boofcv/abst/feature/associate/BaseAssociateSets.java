@@ -147,14 +147,14 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 	/**
 	 * Stores data specific to a feature set
 	 */
-	class SetStruct {
+	protected class SetStruct {
 		// Descriptors inside this set
-		FastArray<Desc> src = new FastArray<>(type);
-		FastArray<Desc> dst = new FastArray<>(type);
+		public FastArray<Desc> src = new FastArray<>(type);
+		public FastArray<Desc> dst = new FastArray<>(type);
 
 		// index of the descriptors in the input list
-		GrowQueue_I32 indexSrc = new GrowQueue_I32();
-		GrowQueue_I32 indexDst = new GrowQueue_I32();
+		public GrowQueue_I32 indexSrc = new GrowQueue_I32();
+		public GrowQueue_I32 indexDst = new GrowQueue_I32();
 
 		public void reset() {
 			src.reset();
