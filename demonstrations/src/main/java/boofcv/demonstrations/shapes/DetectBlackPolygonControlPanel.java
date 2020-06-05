@@ -22,8 +22,8 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
-import boofcv.gui.JConfigLength;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.JConfigLength;
 import boofcv.struct.ConnectRule;
 
 import javax.swing.*;

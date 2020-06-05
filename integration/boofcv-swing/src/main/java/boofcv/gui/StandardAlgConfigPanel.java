@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.gui.controls.JConfigLength;
 import boofcv.struct.ConfigLength;
 
 import javax.swing.*;

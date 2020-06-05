@@ -40,7 +40,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 
 	private final Listener listener;
 
-	private final JSpinner spinnerLevels;
+	private final JPyramidLevels controlLevels;
 	private final JCheckBox checkPruneClose;
 	private final JSpinner spinnerIterations;
 	private final JSpinner spinnerMaxError;
@@ -59,7 +59,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 
 		initializeConfiguration();
 
-		spinnerLevels = spinner(this.configKlt.pyramidLevels.numLevelsRequested,1,20,1);
+		controlLevels = new JPyramidLevels(this.configKlt.pyramidLevels,listener::changedPointTrackerKlt);
 		checkPruneClose = checkbox("Prune Close", this.configKlt.pruneClose,"If true then tracks which are clustered close to each other are pruned");
 		spinnerIterations = spinner(this.configKlt.config.maxIterations,1,500,1);
 		spinnerMaxError = spinner(this.configKlt.config.maxPerPixelError,0.0,255.0,5.0);
@@ -72,7 +72,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 			controlDetector = null;
 		}
 
-		addLabeled(spinnerLevels,"Pyr. Levels","Number of layers in image pyramid");
+		addLabeled(controlLevels,"Pyramid");
 		addAlignLeft(checkPruneClose);
 		addLabeled(spinnerDescRadius,"Template Radius","Radius of square template that is tracked");
 		addLabeled(spinnerIterations,"Max Iterations","KLT iterations when tracking");
@@ -99,9 +99,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 
 	@Override
 	public void controlChanged(final Object source) {
-		if( source == spinnerLevels) {
-			configKlt.pyramidLevels.numLevelsRequested = ((Number) spinnerLevels.getValue()).intValue();
-		} else if( source == spinnerDescRadius) {
+		if( source == spinnerDescRadius) {
 			configKlt.templateRadius = ((Number) spinnerDescRadius.getValue()).intValue();
 		} else if( source == spinnerMaxError) {
 			configKlt.config.maxPerPixelError = ((Number) spinnerMaxError.getValue()).floatValue();

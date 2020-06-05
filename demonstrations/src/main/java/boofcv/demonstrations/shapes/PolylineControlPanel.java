@@ -21,8 +21,8 @@ package boofcv.demonstrations.shapes;
 import boofcv.abst.shapes.polyline.BaseConfigPolyline;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.factory.shape.ConfigSplitMergeLineFit;
-import boofcv.gui.JConfigLength;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.JConfigLength;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

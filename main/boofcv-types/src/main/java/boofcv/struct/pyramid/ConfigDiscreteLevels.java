@@ -69,7 +69,7 @@ public class ConfigDiscreteLevels implements Configuration {
 	 * @return Number of layers
 	 */
 	public int computeLayers( int width , int height ) {
-		if( numLevelsRequested > 0 ) {
+		if( isFixedLevels() ) {
 			return numLevelsRequested;
 		} else if( minWidth > 0 ) {
 			return computeNumLevels(width,minWidth);
@@ -88,6 +88,13 @@ public class ConfigDiscreteLevels implements Configuration {
 		return (int)Math.floor(levels)+1;
 	}
 
+	/**
+	 * Returns true if configured to have a fixed number of levels in the pyramid
+	 */
+	public boolean isFixedLevels() {
+		return numLevelsRequested > 0;
+	}
+
 	public void setTo(ConfigDiscreteLevels config ) {
 		this.numLevelsRequested = config.numLevelsRequested;
 		this.minWidth = config.minWidth;
@@ -96,6 +103,15 @@ public class ConfigDiscreteLevels implements Configuration {
 
 	@Override
 	public void checkValidity() {
+		if( numLevelsRequested <= 0 && minWidth <= 0 && minHeight <= 0 )
+			throw new IllegalArgumentException("Must specify a valid pyramid");
+	}
 
+	public String toString() {
+		if( isFixedLevels() ) {
+			return "DiscreteLevels{ levels="+numLevelsRequested+" }";
+		} else {
+			return "DiscreteLevels{ minWidth="+minWidth+" minHeight="+minHeight+" }";
+		}
 	}
 }

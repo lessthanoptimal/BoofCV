@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.factory.feature.detect.line.ConfigParamPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.JConfigLength;
 import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.controls.JConfigLength;
 import boofcv.gui.feature.ImageLinePanelZoom;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;

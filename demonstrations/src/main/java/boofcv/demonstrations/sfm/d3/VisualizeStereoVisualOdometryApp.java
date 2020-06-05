@@ -233,7 +233,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.klt.pruneClose = true;
 		config.tracker.klt.config.maxIterations = 25;
 		config.tracker.klt.templateRadius = 4;
-		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.minSize(40);
 
 		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
@@ -269,7 +269,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.klt.pruneClose = true;
 		config.tracker.klt.config.maxIterations = 25;
 		config.tracker.klt.templateRadius = 4;
-		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		config.tracker.klt.pyramidLevels = ConfigDiscreteLevels.minSize(40);
 
 		config.tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;

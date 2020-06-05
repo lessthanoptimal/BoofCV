@@ -23,8 +23,8 @@ import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.ImageHistogramPanel;
-import boofcv.gui.JConfigLength;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.JConfigLength;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 
