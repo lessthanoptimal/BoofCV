@@ -29,6 +29,7 @@ import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.tracker.FactoryPointTracker;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
@@ -53,6 +54,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	protected ConfigTrackerHybrid configHybrid = new ConfigTrackerHybrid();
 
 	// Container that specific controls are inserted into
+	private ControlTracker controlTracker;
 	private JPanel controlPanel = new JPanel(new BorderLayout());
 	private JPanel ddaPanel = new JPanel();
 
@@ -93,11 +95,13 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	@Override
 	public void initializeControlsGUI() {
 		super.initializeControlsGUI();
+		controlTracker = new ControlTracker();
 		controlKlt = new ControlPanelPointTrackerKlt(()->listener.changedHybridTracker(),null,configKlt);
 		controlKlt.setBorder(BorderFactory.createEmptyBorder());
 
 		updateActiveControls(selectedSelection);
 
+		add(controlTracker);
 		addLabeled(spinnerSelection,"Component","Select a component of the tracker to modify");
 		add(controlPanel);
 	}
@@ -151,6 +155,32 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 		}
 		updateActiveControls(spinnerSelection.getSelectedIndex());
 		listener.changedHybridTracker();
+	}
+
+	public class ControlTracker extends StandardAlgConfigPanel {
+		JSpinner spinnerMaxInactive = spinner(configHybrid.maxInactiveTracks,0,5000,10);
+		JCheckBox checkPruneClose = checkbox("Prune Close",configHybrid.pruneCloseTracks);
+		JConfigLength jRespawn = configLength(configHybrid.thresholdRespawn,0,1000);
+
+		public ControlTracker() {
+			addLabeled(spinnerMaxInactive,"Max Inactive","Maximum number of inactive/not visible tracks kept around");
+			addAlignLeft(checkPruneClose,"Prune tracks if they get too close to each other");
+			addLabeled(jRespawn,"Respawn","Respawn tracks when the number of active tracks drops below this threshold");
+		}
+
+		@Override
+		public void controlChanged(final Object source) {
+			if( source == spinnerMaxInactive) {
+				configHybrid.maxInactiveTracks = (Integer) spinnerMaxInactive.getValue();
+			} else if( source == checkPruneClose ) {
+				configHybrid.pruneCloseTracks = checkPruneClose.isSelected();
+			} else if( source == jRespawn ) {
+				configHybrid.thresholdRespawn.setTo(jRespawn.getValue());
+			} else {
+				throw new RuntimeException("BUG");
+			}
+			listener.changedHybridTracker();
+		}
 	}
 
 	public interface Listener {

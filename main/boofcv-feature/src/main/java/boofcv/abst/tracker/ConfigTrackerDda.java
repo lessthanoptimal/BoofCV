@@ -32,10 +32,10 @@ public class ConfigTrackerDda implements Configuration {
 	 */
 	public boolean updateDescription = false;
 	/**
-	 * If there are more than this number of unused tracks they will be randomly discarded. This is intended to
-	 * prevent unbounded growth of unused tracks even if tracks are not explicity pruned.
+	 * If there are more than this number of inactive tracks then inactive tracks will be randomly discarded until
+	 * there is this many left.
 	 */
-	public int maxUnusedTracks=500;
+	public int maxInactiveTracks =500;
 
 	/**
 	 * Random seed
@@ -48,7 +48,7 @@ public class ConfigTrackerDda implements Configuration {
 
 	public void setTo( ConfigTrackerDda src ) {
 		this.updateDescription = src.updateDescription;
-		this.maxUnusedTracks = src.maxUnusedTracks;
+		this.maxInactiveTracks = src.maxInactiveTracks;
 		this.seed = src.seed;
 	}
 

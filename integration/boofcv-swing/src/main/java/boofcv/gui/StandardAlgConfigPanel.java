@@ -36,7 +36,7 @@ import java.text.DecimalFormat;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
-public class StandardAlgConfigPanel extends JPanel implements ActionListener, ChangeListener {
+public class StandardAlgConfigPanel extends JPanel implements ActionListener, ChangeListener, JConfigLength.Listener {
 
 	public StandardAlgConfigPanel() {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -78,7 +78,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	protected JConfigLength configLength(ConfigLength initial , int min , int max ) {
-		JConfigLength control = new JConfigLength((JConfigLength.Listener)this,true);
+		JConfigLength control = new JConfigLength(this,true);
 		control.setValue(initial);
 		control.setLengthBounds(min,max);
 		control.setMaximumSize(control.getPreferredSize());
@@ -423,6 +423,11 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		controlChanged(e.getSource());
 	}
 
+	@Override
+	public void changeConfigLength(JConfigLength source, double fraction, double length) {
+		controlChanged(source);
+	}
+
 	/**
 	 * In almost all situations we just need to know that the state of a control has changed. No need to implement
 	 * seperate listeners for all
@@ -430,4 +435,5 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	public void controlChanged( Object source ) {
 		throw new RuntimeException("You need to override controlChanges() or implement actionPerformed()/stateChanged()");
 	}
+
 }

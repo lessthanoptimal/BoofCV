@@ -33,8 +33,7 @@ Version : 0.37
          Update GUI for 2D association too
 - Demonstration Applications
   * Discrete image pyramid can now be configured with both min pixels and levels
-  * TODO Continued improving controls in StereoVisualOdometry
-    TODO Update Hybrid Tracker's GUI controls
+  * Updated Hybrid Tracker's GUI controls
 - RegionOrientation
   * Can now specify feature orientation approach using Configuration class
   * TODO finish cleaning up that mess

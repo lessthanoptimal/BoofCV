@@ -139,7 +139,7 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 	}
 
 	public class ControlTracker extends StandardAlgConfigPanel {
-		JSpinner spinnerMaxUnused = spinner(configDDA.maxUnusedTracks,0,5000,10);
+		JSpinner spinnerMaxUnused = spinner(configDDA.maxInactiveTracks,0,5000,10);
 		JCheckBox checkUpdate = checkbox("Update Description",configDDA.updateDescription);
 
 		public ControlTracker() {
@@ -150,7 +150,7 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 		@Override
 		public void controlChanged(final Object source) {
 			if( source == spinnerMaxUnused ) {
-				configDDA.maxUnusedTracks = (Integer)spinnerMaxUnused.getValue();
+				configDDA.maxInactiveTracks = (Integer)spinnerMaxUnused.getValue();
 			} else if( source == checkUpdate ) {
 				configDDA.updateDescription = checkUpdate.isSelected();
 			} else {
