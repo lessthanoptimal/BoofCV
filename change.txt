@@ -32,6 +32,8 @@ Version : 0.37
   * Updated to take advantage of new 'sets' API in PointTracker
   * DDA and Hybrid have been updated to use the new 2D association API
   * Updated code to take advantage of better data structure/functions since they were first created
+- Examples
+  * Updated ExampleImageEnhance to include color images
 - Demonstration Applications
   * Discrete image pyramid can now be configured with both min pixels and levels
   * Updated Hybrid Tracker's GUI controls

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.examples.enhance;
 
 import boofcv.alg.enhance.EnhanceImageOps;
+import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
@@ -26,6 +27,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -72,6 +75,36 @@ public class ExampleImageEnhancement {
 	}
 
 	/**
+	 * Same as above but on a color image.
+	 */
+	public static void histogramColor() {
+		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
+		Planar<GrayU8> color = ConvertBufferedImage.convertFrom(buffered,true, ImageType.PL_U8);
+		Planar<GrayU8> adjusted = color.createSameShape();
+
+		int histogram[] = new int[256];
+		int transform[] = new int[256];
+
+		ListDisplayPanel panel = new ListDisplayPanel();
+
+		// Apply the correction to each color band independently. Alternatively, you could compute the adjustment
+		// on a gray scale image then apply the same transform to each band
+		for (int bandIdx = 0; bandIdx < color.getNumBands(); bandIdx++) {
+			ImageStatistics.histogram(color.getBand(bandIdx),0, histogram);
+			EnhanceImageOps.equalize(histogram, transform);
+			EnhanceImageOps.applyTransform(color.getBand(bandIdx), transform, adjusted.getBand(bandIdx));
+		}
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted, null, true), "Global");
+
+		GEnhanceImageOps.equalizeLocal(color, 50, adjusted, 256, null);
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null, true),"Local");
+		panel.addImage(buffered, "Original");
+
+		panel.setPreferredSize(new Dimension(color.width, color.height));
+		mainPanel.addItem(panel, "Histogram Color");
+	}
+
+	/**
 	 * When an image is sharpened the intensity of edges are made more extreme while flat regions remain unchanged.
 	 */
 	public static void sharpen() {
@@ -94,10 +127,34 @@ public class ExampleImageEnhancement {
 		mainPanel.addItem(panel, "Sharpen");
 	}
 
+	/**
+	 * Same as above but on a color image
+	 */
+	public static void sharpenColor() {
+		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
+		Planar<GrayU8> color = ConvertBufferedImage.convertFrom(buffered,true, ImageType.PL_U8);
+		Planar<GrayU8> adjusted = color.createSameShape();
+
+		ListDisplayPanel panel = new ListDisplayPanel();
+
+		GEnhanceImageOps.sharpen4(color, adjusted);
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null, true),"Sharpen-4");
+
+		GEnhanceImageOps.sharpen8(color, adjusted);
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null, true),"Sharpen-8");
+
+		panel.addImage(buffered,"Original");
+
+		panel.setPreferredSize(new Dimension(color.width,color.height));
+		mainPanel.addItem(panel, "Sharpen Color");
+	}
+
 	public static void main( String args[] )
 	{
 		histogram();
+		histogramColor();
 		sharpen();
+		sharpenColor();
 		ShowImages.showWindow(mainPanel,"Enhancement",true);
 	}
 

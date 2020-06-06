@@ -104,7 +104,7 @@ public class GradientActivity extends VisualizeCamera2Activity
 
 	/**
 	 * This is where you specify custom camera settings. See {@link boofcv.android.camera2.SimpleCamera2Activity}'s
-	 * JavaDoc for more funcitons which you can override.
+	 * JavaDoc for more functions which you can override.
 	 *
 	 * @param captureRequestBuilder Used to configure the camera.
 	 */
