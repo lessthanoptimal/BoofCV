@@ -38,6 +38,7 @@ public class TestAssociateDescTo2D {
 		Dummy dummy = new Dummy();
 
 		AssociateDescTo2D<TupleDesc_F64> alg = new AssociateDescTo2D<>(dummy);
+		alg.initialize(100,100);
 
 		FastArray<TupleDesc_F64> listSrc = new FastArray<>(TupleDesc_F64.class);
 		FastArray<TupleDesc_F64> listDst = new FastArray<>(TupleDesc_F64.class);

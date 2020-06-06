@@ -59,6 +59,7 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 			textLength = new JFormattedTextField(NumberFormat.getNumberInstance());
 		}
 
+		toggleFixed.setToolTipText("Check for relative threshold");
 		toggleFixed.setSelected(modeRelative);
 		toggleFixed.addActionListener(this);
 		toggleFixed.setMaximumSize(toggleFixed.getPreferredSize());
@@ -66,9 +67,11 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 		JFormattedTextField jftf = ((JSpinner.DefaultEditor)spinnerFraction.getEditor()).getTextField();
 		jftf.setColumns(3);
 		spinnerFraction.addChangeListener(this);
+		spinnerFraction.setToolTipText("Fractional value");
 		textLength.setValue(valueFraction.length);
 		textLength.setColumns(4);
 		textLength.addPropertyChangeListener("value",this);
+		textLength.setToolTipText("Selected length or minimum length if fractional");
 
 		add(toggleFixed);
 		add(spinnerFraction);
@@ -143,7 +146,6 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 				updateValues(valueFixed.fraction, valueFixed.length);
 			}
 		}
-
 	}
 
 	@Override

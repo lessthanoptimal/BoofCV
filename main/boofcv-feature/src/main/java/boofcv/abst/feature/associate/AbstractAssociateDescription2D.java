@@ -31,6 +31,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public class AbstractAssociateDescription2D<Desc> implements AssociateDescription2D<Desc>
 {
+	@Override public void initialize(int imageWidth, int imageHeight) {}
 	@Override public void setSource(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {}
 	@Override public void setDestination(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {}
 	@Override public void associate() {}

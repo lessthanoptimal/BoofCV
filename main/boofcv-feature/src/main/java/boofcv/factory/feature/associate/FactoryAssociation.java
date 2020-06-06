@@ -23,6 +23,7 @@ import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.alg.feature.associate.*;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -44,7 +45,7 @@ public class FactoryAssociation {
 
 		switch( config.type ) {
 			case GREEDY: {
-				ScoreAssociation scorer = FactoryAssociation.defaultScore(info.getDescriptionType());
+				ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(info.getDescriptionType());
 				return FactoryAssociation.greedy(config.greedy,scorer);
 			}
 			case KD_TREE: return (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor,DOF);
@@ -53,6 +54,25 @@ public class FactoryAssociation {
 			default: throw new IllegalArgumentException("Unknown association: "+config.type);
 		}
 	}
+
+	/**
+	 * Creates a generic association algorithm that uses descriptors as well as the 2D location of
+	 * image features.
+	 */
+	public static <D> AssociateDescription2D<D> generic2( ConfigAssociate config, DescriptorInfo info )
+	{
+		if( config.maximumDistancePixels.fraction == 1.0 ) {
+			return new AssociateDescTo2D<>(generic(config,info));
+		}
+
+		// only greedy is supported at this time
+		if (config.type == ConfigAssociate.AssociationType.GREEDY) {
+			ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(info.getDescriptionType());
+			return FactoryAssociation.greedy2D(config.greedy, config.maximumDistancePixels, scorer);
+		}
+		throw new IllegalArgumentException("Unknown association: " + config.type);
+	}
+
 
 	/**
 	 * Checks and if neccisary wraps the association to ensure that it returns only unique associations
@@ -80,7 +100,7 @@ public class FactoryAssociation {
 
 	/**
 	 * Returns an algorithm for associating features together which uses a brute force greedy algorithm.
-	 * See {@link AssociateGreedy} for details.
+	 * See {@link AssociateGreedyDesc} for details.
 	 * 
 	 * @param score Computes the fit score between two features.
 	 * @param config Configuration
@@ -92,18 +112,53 @@ public class FactoryAssociation {
 	{
 		if( config == null )
 			config = new ConfigAssociateGreedy();
-		AssociateGreedyBase<D> alg;
+		AssociateGreedyDescBase<D> alg;
 
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			alg = new AssociateGreedy_MT<>(score, config.forwardsBackwards);
+			alg = new AssociateGreedyDesc_MT<>(score);
 		} else {
-			alg = new AssociateGreedy<>(score, config.forwardsBackwards);
+			alg = new AssociateGreedyDesc<>(score);
 		}
+
+		alg.setBackwardsValidation(config.forwardsBackwards);
 		alg.setMaxFitError(config.maxErrorThreshold);
 		alg.setRatioTest(config.scoreRatioThreshold);
 		return new WrapAssociateGreedy<>(alg);
 	}
 
+	/**
+	 * Returns an algorithm for associating features together which uses a brute force greedy algorithm.
+	 * See {@link AssociateGreedyDesc} for details.
+	 *
+	 * @param score Computes the fit score between two features.
+	 * @param config Configuration
+	 * @param maxDistance Specifies maximum distance allowed.
+	 * @param <D> Data structure being associated
+	 * @return AssociateDescription
+	 */
+	public static <D> AssociateDescription2D<D>
+	greedy2D(@Nullable ConfigAssociateGreedy config, ConfigLength maxDistance, ScoreAssociation<D> score )
+	{
+		if( config == null )
+			config = new ConfigAssociateGreedy();
+
+		AssociateImageDistanceFunction distance = new AssociateImageDistanceEuclideanSq();
+
+		AssociateGreedyBase2D<D> alg;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			alg = new AssociateGreedyBruteForce2D_MT<>(score,distance);
+		} else {
+			alg = new AssociateGreedyBruteForce2D<>(score,distance);
+		}
+
+		// square distance since that's what the distance measure returns
+		alg.getMaxDistanceLength().setTo(maxDistance);
+		alg.setBackwardsValidation(config.forwardsBackwards);
+		alg.setMaxFitError(config.maxErrorThreshold);
+		alg.setRatioTest(config.scoreRatioThreshold);
+
+		return new WrapAssociateGreedy2D<D>(alg);
+	}
 
 	/**
 	 * Approximate association using a K-D tree degree of moderate size (10-15) that uses a best-bin-first search
@@ -117,6 +172,8 @@ public class FactoryAssociation {
 	 */
 	public static AssociateDescription<TupleDesc_F64> kdtree(
 			@Nullable ConfigAssociateNearestNeighbor configNN , int dimension ) {
+		if( configNN == null )
+			configNN = new ConfigAssociateNearestNeighbor();
 		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(dimension),configNN.maxNodesSearched);
 
 		return associateNearestNeighbor(configNN,nn);

@@ -19,6 +19,7 @@
 package boofcv.factory.sfm;
 
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
+import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
@@ -54,7 +55,7 @@ public class ConfigStereoQuadPnP implements Configuration {
 	public ConfigDetectDescribe detectDescribe = new ConfigDetectDescribe();
 
 	/** Association approach for matching frames across time steps */
-	public ConfigAssociateGreedy associateF2F = new ConfigAssociateGreedy(true,1.0,-1);
+	public ConfigAssociate associateF2F = new ConfigAssociate();
 	/** Association approach for matching stereo pairs */
 	public ConfigAssociateGreedy associateL2R = new ConfigAssociateGreedy(false,1.0,-1);
 
@@ -78,6 +79,8 @@ public class ConfigStereoQuadPnP implements Configuration {
 		detectDescribe.detectPoint.general.radius = 4;
 		detectDescribe.detectPoint.general.maxFeatures = 500;
 		detectDescribe.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+
+		associateF2F.type = ConfigAssociate.AssociationType.GREEDY;
 	}
 
 	public void setTo( ConfigStereoQuadPnP src ) {

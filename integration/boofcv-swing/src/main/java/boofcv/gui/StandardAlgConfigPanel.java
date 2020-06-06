@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.gui.controls.JConfigLength;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.ConfigLength;
 
 import javax.swing.*;
@@ -79,6 +80,16 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 
 	protected JConfigLength configLength(ConfigLength initial , int min , int max ) {
 		JConfigLength control = new JConfigLength(this,true);
+		control.setValue(initial);
+		control.setLengthBounds(min,max);
+		control.setMaximumSize(control.getPreferredSize());
+		return control;
+	}
+
+	protected JConfigLength configLength(ConfigLength initial , int min , int max , BoofLambdas.Process listener ) {
+		JConfigLength.Listener cl = (source, fraction, length) -> listener.process();
+
+		JConfigLength control = new JConfigLength(cl,true);
 		control.setValue(initial);
 		control.setLengthBounds(min,max);
 		control.setMaximumSize(control.getPreferredSize());

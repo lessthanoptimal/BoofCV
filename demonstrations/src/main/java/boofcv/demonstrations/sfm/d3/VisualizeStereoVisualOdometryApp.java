@@ -239,12 +239,13 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
 		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
-		config.tracker.detDesc.detectPoint.general.radius = 5;
+		config.tracker.detDesc.detectPoint.general.radius = 3;
 		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
 		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
 
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
 		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
+		config.tracker.associate.maximumDistancePixels.setRelative(0.25,0);
 
 		config.scene.maxKeyFrames = 4;
 
@@ -281,6 +282,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
 		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
+		config.tracker.associate.maximumDistancePixels.setRelative(0.25,0);
 
 		config.scene.maxKeyFrames = 6;
 		config.scene.ransac.inlierThreshold = 1.5;
@@ -295,6 +297,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 	private static ConfigStereoQuadPnP createConfigStereoQuadPnP() {
 		var config = new ConfigStereoQuadPnP();
+		config.associateF2F.maximumDistancePixels.setRelative(0.25,0);
 
 		return config;
 	}

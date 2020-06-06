@@ -19,10 +19,9 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastAccess;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -43,16 +42,14 @@ import org.ddogleg.struct.FastAccess;
  * @author Peter Abeles
  */
 @SuppressWarnings({"Duplicates"})
-public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
+public class AssociateGreedyDesc_MT<D> extends AssociateGreedyDescBase<D> {
 	/**
 	 * Configure association
 	 *
 	 * @param score Computes the association score.
-	 * @param backwardsValidation If true then backwards validation is performed.
 	 */
-	public AssociateGreedy(ScoreAssociation<D> score,
-						   boolean backwardsValidation) {
-		super(score,backwardsValidation);
+	public AssociateGreedyDesc_MT(ScoreAssociation<D> score) {
+		super(score);
 	}
 
 	/**
@@ -62,20 +59,13 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 	 * @param dst Destination list.
 	 */
 	@Override
-	public void associate(FastAccess<D> src , FastAccess<D> dst )
+	public void associate(final FastAccess<D> src , final FastAccess<D> dst )
 	{
-		fitQuality.reset();
-		pairs.reset();
-		workBuffer.reset();
-
-		pairs.resize(src.size);
-		fitQuality.resize(src.size);
-		workBuffer.resize(src.size*dst.size);
+		setupForAssociate(src.size,dst.size);
 
 		final double ratioTest = this.ratioTest;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-		for( int i = 0; i < src.size; i++ ) {
+		BoofConcurrency.loopFor(0, src.size, i -> {
 			D a = src.data[i];
 			double bestScore = maxFitError;
 			double secondBest = bestScore;
@@ -86,7 +76,7 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 				D b = dst.data[j];
 
 				double fit = score.score(a,b);
-				workBuffer.set(workIdx+j,fit);
+				scoreMatrix.set(workIdx+j,fit);
 
 				if( fit <= bestScore ) {
 					bestIndex = j;
@@ -98,7 +88,7 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 			if( ratioTest < 1.0 && bestIndex != -1 && bestScore != 0.0 ) {
 				// the second best could lie after the best was seen
 				for (int j = bestIndex+1; j < dst.size; j++) {
-					double fit = workBuffer.get(workIdx+j);
+					double fit = scoreMatrix.get(workIdx+j);
 					if( fit < secondBest ) {
 						secondBest = fit;
 					}
@@ -109,28 +99,12 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 			}
 
 			fitQuality.set(i,bestScore);
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( backwardsValidation ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-			for( int i = 0; i < src.size; i++ ) {
-				int match = pairs.data[i];
-				if( match == -1 )
-					//CONCURRENT_BELOW return;
-					continue;
-
-				double scoreToBeat = workBuffer.data[i*dst.size+match];
-
-				for( int j = 0; j < src.size; j++ , match += dst.size ) {
-					if( workBuffer.data[match] <= scoreToBeat && j != i) {
-						pairs.data[i] = -1;
-						fitQuality.data[i] = Double.MAX_VALUE;
-						break;
-					}
-				}
-			}
-			//CONCURRENT_ABOVE });
+			BoofConcurrency.loopFor(0, src.size, i -> {
+				forwardsBackwards(i,src.size,dst.size);
+			});
 		}
 	}
 }

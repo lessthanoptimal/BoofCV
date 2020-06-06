@@ -50,7 +50,6 @@ public class ConfigPointTracker implements Configuration {
 	/** Association for detect and describe approach */
 	public ConfigAssociate associate = new ConfigAssociate();
 
-
 	@Override
 	public void checkValidity() {
 		klt.checkValidity();

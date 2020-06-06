@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.AssociateGreedy;
+import boofcv.alg.feature.associate.AssociateGreedyDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.jupiter.api.Nested;
 
@@ -32,7 +32,7 @@ class TestWrapAssociateGreedy {
 		@Override
 		public AssociateDescription<TupleDesc_F64> createAssociate() {
 			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
-			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
+			AssociateGreedyDesc<TupleDesc_F64> greedy = new AssociateGreedyDesc<>(score);
 			return new WrapAssociateGreedy<>(greedy);
 		}
 	}
@@ -42,7 +42,8 @@ class TestWrapAssociateGreedy {
 		@Override
 		public AssociateDescription<TupleDesc_F64> createAssociate() {
 			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
-			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, true);
+			AssociateGreedyDesc<TupleDesc_F64> greedy = new AssociateGreedyDesc<>(score);
+			greedy.setBackwardsValidation(true);
 			return new WrapAssociateGreedy<>(greedy);
 		}
 	}
@@ -52,7 +53,7 @@ class TestWrapAssociateGreedy {
 		@Override
 		public AssociateDescription<TupleDesc_F64> createAssociate() {
 			ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
-			AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
+			AssociateGreedyDesc<TupleDesc_F64> greedy = new AssociateGreedyDesc<>(score);
 			return new WrapAssociateGreedy<>(greedy);
 		}
 

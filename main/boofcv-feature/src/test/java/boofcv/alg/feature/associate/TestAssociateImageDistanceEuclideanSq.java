@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,39 +18,21 @@
 
 package boofcv.alg.feature.associate;
 
+import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
-public class TestAssociateMaxDistanceNaive {
-
-	Random rand = new Random(234);
-
-	/**
-	 * Change the tolerance and see which features it associates
-	 */
+class TestAssociateImageDistanceEuclideanSq {
 	@Test
-	public void checkDistanceCalculation() {
-
-		double theta = Math.PI*rand.nextDouble()*2;
-		double c = Math.cos(theta);
-		double s = Math.sin(theta);
-		double r = 3;
-
-
-		Point2D_F64 a1 = new Point2D_F64(10,20);
-		Point2D_F64 b1 = new Point2D_F64(a1.x + c*r,a1.y + s*r);
-
-		AssociateMaxDistanceNaive alg = new AssociateMaxDistanceNaive(null,false,Double.MAX_VALUE);
-
-		alg.setActiveSource(a1);
-		assertEquals(3*3,alg.computeDistanceToSource(b1),1e-8);
+	void checkDistance() {
+		var alg = new AssociateImageDistanceEuclideanSq();
+		alg.setSource(-1, new Point2D_F64(5, 7));
+		double expected = UtilPoint2D_F64.distanceSq(5, 7, 10, 1.5);
+		assertEquals(expected, alg.distance(-1, new Point2D_F64(10, 1.5)));
 	}
 }

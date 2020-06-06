@@ -46,12 +46,22 @@ public class ConfigLength implements Configuration {
 	public ConfigLength() {
 	}
 
-	public static ConfigLength fixed(double pixels ) {
-		return new ConfigLength(pixels,-1);
+	public static ConfigLength fixed(double length ) {
+		return new ConfigLength(length,-1);
 	}
 
-	public static ConfigLength relative(double fraction , int minimum ) {
+	public static ConfigLength relative(double fraction , double minimum ) {
 		return new ConfigLength(minimum,fraction);
+	}
+
+	public void setFixed( double length ) {
+		this.fraction = -1;
+		this.length = length;
+	}
+
+	public void setRelative( double fraction, double minimum ) {
+		this.fraction = fraction;
+		this.length = minimum;
 	}
 
 	public double compute(double totalLength) {

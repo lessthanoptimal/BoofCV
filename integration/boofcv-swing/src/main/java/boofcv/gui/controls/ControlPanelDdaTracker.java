@@ -18,7 +18,6 @@
 
 package boofcv.gui.controls;
 
-import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerDda;
@@ -74,6 +73,7 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 
 	@Override
 	public void initializeControlsGUI() {
+		super.associateWithPixels = true;
 		super.initializeControlsGUI();
 		controlTrackerDDA = new ControlTracker();
 		controlTrackerDDA.setBorder(BorderFactory.createTitledBorder("Tracker"));
@@ -94,7 +94,7 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 		Class inputType = imageType.getImageClass();
 
 		DetectDescribePoint detDesc = createDetectDescribe(inputType);
-		AssociateDescription2D associate = new AssociateDescTo2D(createAssociate(detDesc));
+		AssociateDescription2D associate = createAssociate2(detDesc);
 
 		return FactoryPointTracker.dda(detDesc,associate, configDDA);
 	}

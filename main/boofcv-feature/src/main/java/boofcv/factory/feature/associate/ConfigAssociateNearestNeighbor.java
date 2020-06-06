@@ -32,6 +32,7 @@ public class ConfigAssociateNearestNeighbor implements Configuration {
 	 * is true then when the score ratio is computed the square root will be used.
 	 */
 	public boolean distanceIsSquared = true;
+	// should be not be in the config? seems very error prone. have flag in the score function
 
 	/**
 	 * If less than one then the best two matches are found the ratio is defined as the distance of the best

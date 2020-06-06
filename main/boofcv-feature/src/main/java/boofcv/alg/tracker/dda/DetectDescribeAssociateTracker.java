@@ -152,6 +152,8 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	 * Detect features and associate with existing tracks
 	 */
 	public void process( I input ) {
+		if( frameID == -1 )
+			associate.initialize(input.width,input.height);
 		frameID++;
 		tracksActive.clear();
 		tracksInactive.clear();

@@ -38,7 +38,9 @@ public abstract class StandardAssociateDescription2DChecks<Desc> extends Standar
 
 	@Override
 	public AssociateDescription<Desc> createAssociate() {
-		return new From2DTo1D<>(createAssociate2D());
+		AssociateDescription2D<Desc> a = createAssociate2D();
+		a.initialize(100,100);
+		return new From2DTo1D<>(a);
 	}
 
 	public static class From2DTo1D<Desc>

@@ -95,9 +95,8 @@ public class FactoryPointTracker {
 			return klt(config.klt,config.detDesc.detectPoint,imageType, derivType);
 		}
 
-		// TODO consider checking to see if it is a point detector and template. If so use DdaManagerDetectDescribePoint
 		DetectDescribePoint detDesc = FactoryDetectDescribe.generic(config.detDesc, imageType);
-		AssociateDescription2D associate = new AssociateDescTo2D(FactoryAssociation.generic(config.associate,detDesc));
+		AssociateDescription2D associate = FactoryAssociation.generic2(config.associate,detDesc);
 
 		switch( config.typeTracker ) {
 			case DDA: return FactoryPointTracker.dda(detDesc, associate, config.dda);

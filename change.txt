@@ -25,12 +25,13 @@ Version : 0.37
   * Created FeatureSets interface that specifies how sets are handled by feature detectors
   * This makes it easier and less complicated to only associate "dark" or "bright" features with each other
   * Added functions to UtilFeatures to simplify adding sets to association algorithms
+- Feature Association
+  * Greedy 2D now can do all the validation tests that the regular one can do
+  * Greedy 2D now has a concurrent version
 - Visual Odometry
   * Updated to take advantage of new 'sets' API in PointTracker
   * DDA and Hybrid have been updated to use the new 2D association API
   * Updated code to take advantage of better data structure/functions since they were first created
-  * TODO Updated Config to make it easier to specify some 2D aware association algorithms
-         Update GUI for 2D association too
 - Demonstration Applications
   * Discrete image pyramid can now be configured with both min pixels and levels
   * Updated Hybrid Tracker's GUI controls

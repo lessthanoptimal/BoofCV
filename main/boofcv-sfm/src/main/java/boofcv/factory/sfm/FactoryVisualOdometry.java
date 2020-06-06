@@ -18,7 +18,6 @@
 
 package boofcv.factory.sfm;
 
-import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.EnforceUniqueByScore;
 import boofcv.abst.feature.associate.ScoreAssociation;
@@ -523,13 +522,13 @@ public class FactoryVisualOdometry {
 
 		Class<Desc> descType = detector.getDescriptionType();
 
-		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 
 		// need to make sure associations are unique
+		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, config.epipolarTol, descType);
 		associateL2R.setMaxScoreThreshold(config.associateL2R.maxErrorThreshold);
 
-		AssociateDescription<Desc> associateF2F = FactoryAssociation.greedy(config.associateF2F,scorer);
+		AssociateDescription2D<Desc> associateF2F = FactoryAssociation.generic2(config.associateF2F,detector);
 
 		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));

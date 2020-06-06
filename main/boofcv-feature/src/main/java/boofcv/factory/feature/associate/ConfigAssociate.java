@@ -18,9 +18,14 @@
 
 package boofcv.factory.feature.associate;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for associating using descriptors only
+ *
+ * @see boofcv.abst.feature.associate.AssociateDescription
+ *
  * @author Peter Abeles
  */
 public class ConfigAssociate implements Configuration {
@@ -30,6 +35,15 @@ public class ConfigAssociate implements Configuration {
 
 	public ConfigAssociateGreedy greedy = new ConfigAssociateGreedy();
 	public ConfigAssociateNearestNeighbor nearestNeighbor = new ConfigAssociateNearestNeighbor();
+
+	/**
+	 * Specifies the maximum distance allowed between associated pixels. This is only used when creating
+	 * an association algorithm that supports 2D information.
+	 *
+	 * If an absolute value is specified then it's in units of pixels. If relative then it is a fraction of
+	 * max(imageWidth, imageHeight)
+	 */
+	public ConfigLength maximumDistancePixels = ConfigLength.relative(1.0,0.0);
 
 	@Override
 	public void checkValidity() {

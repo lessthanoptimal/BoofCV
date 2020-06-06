@@ -67,31 +67,41 @@ public class ControlPanelStereoQuadPnP extends JTabbedPane {
 	}
 
 	public class ControlPanelAssociate extends StandardAlgConfigPanel {
-		private final ControlPanelAssociateGreedy panelAssociateF2F;
-		private final ControlPanelAssociateGreedy panelAssociateL2R;
+		private final ControlPanelAssociateGreedy controlAssociateF2F;
+		private final ControlPanelAssociateGreedy controlAssociateL2R;
+		private final JConfigLength controlMaxDistance;
 		private final JSpinner spinnerEpipolarTol;
 		public ControlPanelAssociate() {
 			setBorder(BorderFactory.createEmptyBorder());
-			panelAssociateL2R = new ControlPanelAssociateGreedy(config.associateL2R,()->listener.changedStereoQuadPnP());
-			panelAssociateF2F = new ControlPanelAssociateGreedy(config.associateF2F,()->listener.changedStereoQuadPnP());
-			panelAssociateL2R.setBorder(BorderFactory.createTitledBorder("Left to Right"));
-			panelAssociateF2F.setBorder(BorderFactory.createTitledBorder("Frame to Frame"));
+			controlAssociateL2R = new ControlPanelAssociateGreedy(config.associateL2R,()->listener.changedStereoQuadPnP());
+			controlAssociateF2F = new ControlPanelAssociateGreedy(config.associateF2F.greedy,()->listener.changedStereoQuadPnP());
+			controlMaxDistance = configLength(config.associateF2F.maximumDistancePixels,0,2000);
+			controlAssociateL2R.setBorder(BorderFactory.createTitledBorder("Left to Right"));
+			controlAssociateF2F.setBorder(BorderFactory.createEmptyBorder());
+
+			var panelF2F = new StandardAlgConfigPanel();
+			panelF2F.add(controlAssociateF2F);
+			panelF2F.addLabeled(controlMaxDistance,"Max Distance","Maximum distance away two features can be associated");
+			panelF2F.setBorder(BorderFactory.createTitledBorder("Frame to Frame"));
 
 			// disable since stereo doesn't support these features yet
-			panelAssociateL2R.getCheckForwardsBackwards().setEnabled(false);
-			panelAssociateL2R.getSpinnerRatio().setEnabled(false);
+			controlAssociateL2R.getCheckForwardsBackwards().setEnabled(false);
+			controlAssociateL2R.getSpinnerRatio().setEnabled(false);
 
 			spinnerEpipolarTol = spinner(config.epipolarTol,0.0,999.9,0.1);
 
-			add(panelAssociateL2R);
-			add(panelAssociateF2F);
+			add(controlAssociateL2R);
+			add(panelF2F);
 			addLabeled(spinnerEpipolarTol,"Stereo Tol",
 					"How far away a point can be from the epipolar line to be considered for a match");
 		}
 		@Override
 		public void controlChanged(final Object source) {
 			if( source == spinnerEpipolarTol ) {
-				config.epipolarTol = ((Number)spinnerEpipolarTol.getValue()).doubleValue();
+				config.epipolarTol = ((Number) spinnerEpipolarTol.getValue()).doubleValue();
+				listener.changedStereoQuadPnP();
+			} else if( source == controlMaxDistance) {
+				config.associateF2F.maximumDistancePixels.setTo(controlMaxDistance.getValue());
 				listener.changedStereoQuadPnP();
 			}
 		}

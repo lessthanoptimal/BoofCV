@@ -27,33 +27,35 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestAssociateGreedy_MT {
+class TestAssociateGreedyDesc_MT {
 	@Test
 	void compare() {
 		compare(false, 1.0);
-		compare(true, 1.0);
+		compare(true , 1.0);
 		compare(false, 0.1);
-		compare(true, 0.1);
+		compare(true , 0.1);
 	}
 
 	void compare( boolean backwards , double ratioTest ) {
 		FastQueue<TupleDesc_F64> a = createData(200);
 		FastQueue<TupleDesc_F64> b = createData(200);
 
-		AssociateGreedy<TupleDesc_F64> sequentialAlg = new AssociateGreedy<>( new ScoreAssociateEuclidean_F64(), backwards);
+		AssociateGreedyDesc<TupleDesc_F64> sequentialAlg = new AssociateGreedyDesc<>( new ScoreAssociateEuclidean_F64());
+		sequentialAlg.backwardsValidation = backwards;
 		sequentialAlg.setRatioTest(ratioTest);
 		sequentialAlg.setMaxFitError(0.5);
 		sequentialAlg.associate(a,b);
 
-		AssociateGreedy_MT<TupleDesc_F64> parallelAlg = new AssociateGreedy_MT<>( new ScoreAssociateEuclidean_F64(), backwards);
+		AssociateGreedyDesc_MT<TupleDesc_F64> parallelAlg = new AssociateGreedyDesc_MT<>( new ScoreAssociateEuclidean_F64());
+		parallelAlg.backwardsValidation = backwards;
 		parallelAlg.setRatioTest(ratioTest);
 		parallelAlg.setMaxFitError(0.5);
 		parallelAlg.associate(a,b);
 
-		int[] pairs0 = sequentialAlg.getPairs();
-		int[] pairs1 = parallelAlg.getPairs();
-		double[] quality0 = sequentialAlg.getFitQuality();
-		double[] quality1 = parallelAlg.getFitQuality();
+		int[] pairs0 = sequentialAlg.getPairs().data;
+		int[] pairs1 = parallelAlg.getPairs().data;
+		double[] quality0 = sequentialAlg.getFitQuality().data;
+		double[] quality1 = parallelAlg.getFitQuality().data;
 
 		assertEquals(pairs0.length,pairs1.length);
 

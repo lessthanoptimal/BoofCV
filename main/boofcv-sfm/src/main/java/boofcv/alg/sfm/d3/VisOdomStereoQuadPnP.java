@@ -18,9 +18,8 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.AssociateDescriptionSets;
+import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
@@ -103,7 +102,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	// Detects feature inside the image
 	private final DetectDescribePoint<T,TD> detector;
 	// Associates feature between the same camera
-	private final AssociateDescriptionSets<TD> assocF2F;
+	private final AssociateDescriptionSets2D<TD> assocF2F;
 	// Associates features from left to right camera
 	private final AssociateDescription2D<TD> assocL2R;
 
@@ -164,7 +163,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 * @param modelRefiner Non-linear refinement of motion estimation
 	 */
 	public VisOdomStereoQuadPnP(DetectDescribePoint<T,TD> detector,
-								AssociateDescription<TD> assocF2F,
+								AssociateDescription2D<TD> assocF2F,
 								AssociateDescription2D<TD> assocL2R ,
 								Triangulate2ViewsMetric triangulate,
 								ModelMatcher<Se3_F64, Stereo2D3D> matcher,
@@ -172,7 +171,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 								BundleAdjustment<SceneStructureMetric> bundleAdjustment )
 	{
 		this.detector = detector;
-		this.assocF2F = new AssociateDescriptionSets<>(assocF2F,detector.getDescriptionType());
+		this.assocF2F = new AssociateDescriptionSets2D<>(assocF2F,detector.getDescriptionType());
 		this.assocL2R = assocL2R;
 		this.triangulate = triangulate;
 		this.matcher = matcher;
@@ -227,6 +226,9 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 * @return true if motion was estimated and false if not
 	 */
 	public boolean process( T left , T right ) {
+		if( frameID == -1 ) {
+			assocF2F.initialize(left.width,left.height);
+		}
 		frameID++;
 		long time0 = System.nanoTime();
 		detectFeatures(left,right);
@@ -438,15 +440,15 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	private void associateF2F()
 	{
 		// old left to new left
-		UtilFeature.setSource(featsLeft0.description,featsLeft0.sets,assocF2F);
-		UtilFeature.setDestination(featsLeft1.description,featsLeft1.sets,assocF2F);
+		UtilFeature.setSource(featsLeft0.description,featsLeft0.sets,featsLeft0.locationPixels,assocF2F);
+		UtilFeature.setDestination(featsLeft1.description,featsLeft1.sets,featsLeft1.locationPixels,assocF2F);
 		assocF2F.associate();
 
 		setMatches(matches.match0to2, assocF2F.getMatches(), featsLeft0.locationPixels.size);
 
 		// old right to new right
-		UtilFeature.setSource(featsRight0.description,featsRight0.sets,assocF2F);
-		UtilFeature.setDestination(featsRight1.description,featsRight1.sets,assocF2F);
+		UtilFeature.setSource(featsRight0.description,featsRight0.sets,featsRight0.locationPixels,assocF2F);
+		UtilFeature.setDestination(featsRight1.description,featsRight1.sets,featsRight1.locationPixels,assocF2F);
 		assocF2F.associate();
 
 		setMatches(matches.match1to3, assocF2F.getMatches(), featsRight0.locationPixels.size);

@@ -18,44 +18,46 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
-import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 /**
  * @author Peter Abeles
  */
-class TestAssociateGreedy {
+public abstract class GenericAssociateGreedyChecks {
+	protected abstract AssociateGreedyBase<TupleDesc_F64> createAlgorithm();
 
-	ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
+	protected abstract void associate(AssociateGreedyBase<TupleDesc_F64> alg ,
+									  FastAccess<TupleDesc_F64> src, FastAccess<TupleDesc_F64> dst );
 
 	@Test
 	void basic() {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, false);
+		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
 		alg.setMaxFitError(0.5);
 
-		alg.associate(a,b);
+		associate(alg, a,b);
 
-		int[] pairs = alg.getPairs();
+		GrowQueue_I32 pairs = alg.getPairs();
 
-		assertEquals(2,pairs[0]);
-		assertEquals(-1,pairs[1]);
-		assertEquals(0,pairs[2]);
-		assertEquals(1,pairs[3]);
+		assertEquals( 2,pairs.get(0));
+		assertEquals(-1,pairs.get(1));
+		assertEquals( 0,pairs.get(2));
+		assertEquals( 1,pairs.get(3));
 
-		double[] fitScore = alg.getFitQuality();
+		GrowQueue_F64 fitScore = alg.getFitQuality();
 
-		assertEquals(0,fitScore[0],1e-5);
-		assertEquals(0,fitScore[2],1e-5);
-		assertEquals(0,fitScore[3],1e-5);
+		assertEquals(0,fitScore.get(0),1e-5);
+		assertEquals(0,fitScore.get(2),1e-5);
+		assertEquals(0,fitScore.get(3),1e-5);
 	}
 
 	@Test
@@ -64,17 +66,17 @@ class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> b = createData(3,4,1.1,40);
 
 		// large margin for error
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, false);
+		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
 		alg.setMaxFitError(10);
 
-		alg.associate(a,b);
-		assertEquals(2,alg.getPairs()[1]);
+		associate(alg, a,b);
+		assertEquals(2,alg.getPairs().get(1));
 
 		// small margin for error, no association
-		alg = new AssociateGreedy<>(score, false);
+		alg = createAlgorithm();
 		alg.setMaxFitError(0.1);
-		alg.associate(a,b);
-		assertEquals(-1,alg.getPairs()[1]);
+		associate(alg, a,b);
+		assertEquals(-1,alg.getPairs().get(1));
 	}
 
 	@Test
@@ -82,23 +84,24 @@ class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,8);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,10);
 
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, true);
+		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
+		alg.backwardsValidation = true;
 		alg.setMaxFitError(10);
 
-		alg.associate(a,b);
+		associate(alg, a,b);
 
-		int[] pairs = alg.getPairs();
+		GrowQueue_I32 pairs = alg.getPairs();
 
-		assertEquals(2,pairs[0]);
-		assertEquals(-1,pairs[1]);
-		assertEquals(0,pairs[2]);
-		assertEquals(3,pairs[3]);
+		assertEquals( 2,pairs.get(0));
+		assertEquals(-1,pairs.get(1));
+		assertEquals( 0,pairs.get(2));
+		assertEquals( 3,pairs.get(3));
 
-		double[] fitScore = alg.getFitQuality();
+		GrowQueue_F64 fitScore = alg.getFitQuality();
 
-		assertEquals(0,fitScore[0],1e-5);
-		assertEquals(0,fitScore[2],1e-5);
-		assertEquals(2,fitScore[3],1e-5);
+		assertEquals(0,fitScore.get(0),1e-5);
+		assertEquals(0,fitScore.get(2),1e-5);
+		assertEquals(2,fitScore.get(3),1e-5);
 	}
 
 	@Test
@@ -108,31 +111,32 @@ class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,10);
 		FastQueue<TupleDesc_F64> b = createData(1,2,3.01,4);
 
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, false);
+		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
 
 		// ratio test is turned off by default
-		alg.associate(a,b);
-		int[] pairs = alg.getPairs();
+		associate(alg, a,b);
+		GrowQueue_I32 pairs = alg.getPairs();
 		for (int i = 0; i < 4; i++) {
-			assertEquals(i,pairs[i]);
+			assertEquals(i,pairs.get(i));
 		}
 
 		// set it so that 4 will be rejected
 		alg.setRatioTest(0.1);
-		alg.associate(a,b);
+		associate(alg, a,b);
 		pairs = alg.getPairs();
-		assertEquals(0,pairs[0]);
-		assertEquals(1,pairs[1]);
-		assertEquals(2,pairs[2]);
-		assertEquals(-1,pairs[3]);
+		assertEquals( 0,pairs.get(0));
+		assertEquals( 1,pairs.get(1));
+		assertEquals( 2,pairs.get(2));
+		assertEquals(-1,pairs.get(3));
 	}
 
-	private FastQueue<TupleDesc_F64> createData( double ...values )
+	protected FastQueue<TupleDesc_F64> createData( double ...values )
 	{
 		FastQueue<TupleDesc_F64> ret = new FastQueue<>(()-> new TupleDesc_F64(1));
+		ret.resize(values.length);
 
 		for( int i = 0; i < values.length; i++ ) {
-			ret.grow().set(values[i]);
+			ret.get(i).set(values[i]);
 		}
 
 		return ret;

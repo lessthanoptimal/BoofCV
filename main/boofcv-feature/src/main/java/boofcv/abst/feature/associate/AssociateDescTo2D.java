@@ -32,9 +32,16 @@ import org.ddogleg.struct.GrowQueue_I32;
 public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 
 	AssociateDescription<D> alg;
+	// sanity check to detect bad usage of this interface. Not needed for this implementation
+	boolean calledInitialize = false;
 
 	public AssociateDescTo2D(AssociateDescription<D> alg) {
 		this.alg = alg;
+	}
+
+	@Override
+	public void initialize(int imageWidth, int imageHeight) {
+		calledInitialize = true;
 	}
 
 	@Override
@@ -49,6 +56,7 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 
 	@Override
 	public void associate() {
+		assert(calledInitialize);
 		alg.associate();
 	}
 

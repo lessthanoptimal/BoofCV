@@ -18,7 +18,6 @@
 
 package boofcv.gui.controls;
 
-import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.describe.ConfigTemplateDescribe;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerHybrid;
@@ -94,6 +93,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 
 	@Override
 	public void initializeControlsGUI() {
+		super.associateWithPixels = true;
 		super.initializeControlsGUI();
 		controlTracker = new ControlTracker();
 		controlKlt = new ControlPanelPointTrackerKlt(()->listener.changedHybridTracker(),null,configKlt);
@@ -135,7 +135,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 
 		DetectDescribePoint detDesc = createDetectDescribe(inputType);
 
-		return FactoryPointTracker.hybrid(detDesc,new AssociateDescTo2D(createAssociate(detDesc)),
+		return FactoryPointTracker.hybrid(detDesc,createAssociate2(detDesc),
 				configDetDesc.findNonMaxRadius(), configKlt, configHybrid, imageType.getImageClass());
 	}
 

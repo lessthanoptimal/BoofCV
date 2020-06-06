@@ -36,10 +36,39 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 		this.associator = associator;
 	}
 
+	/**
+	 * Initializes association.
+	 *
+	 * @see AssociateDescription2D#initialize(int, int)
+	 */
+	public void initialize(int imageWidth , int imageHeight ) {
+		this.associator.initialize(imageWidth, imageHeight);
+	}
+
 	@Override
 	protected SetStruct newSetStruct() {
 		return new SetStruct2D();
 	}
+
+	@Override
+	public void clearSource() {
+		super.clearSource();
+		for (int i = 0; i < sets.size; i++) {
+			SetStruct2D set = (SetStruct2D)sets.get(i);
+			set.pixelsSrc.reset();
+		}
+	}
+
+
+	@Override
+	public void clearDestination() {
+		super.clearDestination();
+		for (int i = 0; i < sets.size; i++) {
+			SetStruct2D set = (SetStruct2D)sets.get(i);
+			set.pixelsDst.reset();
+		}
+	}
+
 
 	/**
 	 * Adds a new descriptor and its set to the list. The order that descriptors are added is important and saved.

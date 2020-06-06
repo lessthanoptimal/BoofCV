@@ -21,7 +21,6 @@ package boofcv.abst.feature.associate;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
-import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -51,6 +50,7 @@ class TestAssociateDescriptionSets2D {
 		alg.addDestination(c(7.9),5,5,0);
 		alg.addDestination(c(9.9),5,5,0);
 
+		alg.initialize(100,100);
 		alg.associate();
 
 		assertEquals(5,alg.getMatches().size);
@@ -97,30 +97,6 @@ class TestAssociateDescriptionSets2D {
 		@Override
 		protected TupleDesc_F64 c(double value) {
 			return TestAssociateDescriptionSets.c(value);
-		}
-	}
-
-	private static class ConvertAssociateSets2D<Desc> extends AssociateDescriptionSets2D<Desc> implements AssociateDescription2D<Desc>
-	{
-		public ConvertAssociateSets2D(AssociateDescription2D<Desc> associator, Class<Desc> type) {
-			super(associator, type);
-			initialize(1);
-		}
-
-		@Override
-		public void setSource(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {
-			for (int i = 0; i < location.size; i++) {
-				Point2D_F64 p = location.get(i);
-				addSource(descriptions.get(i),p.x,p.y,0);
-			}
-		}
-
-		@Override
-		public void setDestination(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {
-			for (int i = 0; i < location.size; i++) {
-				Point2D_F64 p = location.get(i);
-				addDestination(descriptions.get(i),p.x,p.y,0);
-			}
 		}
 	}
 }

@@ -19,26 +19,23 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.struct.feature.TupleDesc_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
- * Brute force greedy association for objects described by a {@link TupleDesc_F64}.  An
- * object is associated with whichever object has the best fit score and every possible combination
- * is examined.  If there are a large number of features this can be quite slow.
+ * Performs association by greedily assigning matches to the src list from the dst list if they minimize a score
+ * function. Optional additional checks can be done. Backwards Validation sees of the dst feature would also
+ * select the src feature as its best match. Ratio Test sees if the second best match has a similar score to the
+ * first. If it does it's likely that the best match is ambiguous. Matches can also be rejected if they exceed
+ * a maximum fit score limit. In practice, forward-backwards and ratio test pruning are very effective.
  * </p>
  *
- * <p>
- * Optionally, backwards validation can be used to reduce the number of false associations.
- * Backwards validation works by checking to see if two objects are mutually the best association
- * for each other.  First an association is found from src to dst, then the best fit in dst is
- * associated with feature in src.
- * </p>
+ * <p>Internally it compare a score matrix while performing the greedy src to dst assignments. This score matrix
+ * is then used to quickly perform a look up when doing forwards-backwards validation.</p>
  *
  * @param <D> Feature description type.
  *
@@ -50,16 +47,16 @@ public abstract class AssociateGreedyBase<D> {
 	@Getter ScoreAssociation<D> score;
 	/** worst allowed fit score to associate */
 	@Getter double maxFitError = Double.MAX_VALUE;
-	// stores the quality of fit score
-	GrowQueue_F64 fitQuality = new GrowQueue_F64(100);
-	// stores indexes of associated
-	GrowQueue_I32 pairs = new GrowQueue_I32(100);
-	// various
-	GrowQueue_F64 workBuffer = new GrowQueue_F64(100);
+	/** Fit score for each assigned pair */
+	@Getter GrowQueue_F64 fitQuality = new GrowQueue_F64(100);
+	/** Look up table with the index of dst features that have been assigned to src features. pairs[src] = dst */
+	@Getter GrowQueue_I32 pairs = new GrowQueue_I32(100);
+	// Score matrix in row-major format. rows = src.size, cols = dst.size
+	@Getter DMatrixRMaj scoreMatrix = new DMatrixRMaj(1,1);
 	/**
-	 * if true backwardsValidation is done
+	 * if true forwards-backwards validation is. For a match to be accepted it must be the best match in both directions
 	 */
-	@Getter @Setter boolean backwardsValidation;
+	@Getter @Setter boolean backwardsValidation = false;
 	/**
 	 * For a solution to be accepted the second best score must be better than the best score by this ratio.
 	 * A value &ge; 1.0 will effective turn this test off
@@ -70,41 +67,48 @@ public abstract class AssociateGreedyBase<D> {
 	 * Configure association
 	 *
 	 * @param score Computes the association score.
-	 * @param backwardsValidation If true then backwards validation is performed.
 	 */
-	AssociateGreedyBase(ScoreAssociation<D> score,
-						boolean backwardsValidation) {
+	AssociateGreedyBase(ScoreAssociation<D> score) {
 		this.score = score;
-		this.backwardsValidation = backwardsValidation;
 	}
 
 	/**
-	 * Associates the two sets objects against each other by minimizing fit score.
-	 *
-	 * @param src Source list.
-	 * @param dst Destination list.
+	 * Clears and allocates memory before association starts.
+	 * @param sizeSrc size of src list
+	 * @param sizeDst size of dst list
 	 */
-	public abstract void associate( FastAccess<D> src , FastAccess<D> dst );
+	protected void setupForAssociate( int sizeSrc , int sizeDst ) {
+		fitQuality.reset();
+		pairs.reset();
 
-	/**
-	 * Returns a list of association pairs.  Each element in the returned list corresponds
-	 * to an element in the src list.  The value contained in the index indicate which element
-	 * in the dst list that object was associated with.  If a value of -1 is stored then
-	 * no association was found.
-	 *
-	 * @return Array containing associations by src index.
-	 */
-	public int[] getPairs() {
-		return pairs.data;
+		pairs.resize(sizeSrc);
+		fitQuality.resize(sizeSrc);
+		scoreMatrix.reshape(sizeSrc,sizeDst);
 	}
 
 	/**
-	 * Quality of fit scores for each association.  Lower fit scores are better.
-	 *
-	 * @return Array of fit sources by src index.
+	 * Uses score matrix to validate the assignment of src feature `indexSrc`
+	 * @param indexSrc Index of source feature being validated
+	 * @param sizeSrc size of src list
+	 * @param sizeDst size of dst list
 	 */
-	public double[] getFitQuality() {
-		return fitQuality.data;
+	public final void forwardsBackwards( final int indexSrc, final int sizeSrc, final  int sizeDst) {
+		// Look up the index that this src feature was matched with
+		final int indexDst = pairs.data[indexSrc];
+		if( indexDst == -1 )
+			return;
+
+		double scoreToBeat = scoreMatrix.data[indexSrc*sizeDst+indexDst];
+		int indexScore = indexDst;
+
+		// compare the score against all the other possible matches in source
+		for( int indexSrcCmp = 0; indexSrcCmp < sizeSrc; indexSrcCmp++ , indexScore += sizeDst ) {
+			if( scoreMatrix.data[indexScore] <= scoreToBeat && indexSrcCmp != indexSrc) {
+				pairs.data[indexSrc] = -1;
+				fitQuality.data[indexSrc] = Double.MAX_VALUE;
+				break;
+			}
+		}
 	}
 
 	public void setMaxFitError(double maxFitError) {

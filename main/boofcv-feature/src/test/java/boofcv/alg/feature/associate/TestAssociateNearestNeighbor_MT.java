@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestAssociateNearestNeighbor_MT {
 	@Test
 	void compare() {
-		FastQueue<TupleDesc_F64> dataSrc = TestAssociateGreedy_MT.createData(200);
-		FastQueue<TupleDesc_F64> dataDst = TestAssociateGreedy_MT.createData(200);
+		FastQueue<TupleDesc_F64> dataSrc = TestAssociateGreedyDesc_MT.createData(200);
+		FastQueue<TupleDesc_F64> dataDst = TestAssociateGreedyDesc_MT.createData(200);
 
 		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
 

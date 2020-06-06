@@ -65,6 +65,9 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 		this.scorer = scorer;
 	}
 
+	@Override
+	public void initialize(int imageWidth, int imageHeight) {}
+
 	/**
 	 * Converts location into rectified coordinates and saved a reference to the description.
 	 */

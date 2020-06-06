@@ -23,12 +23,10 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigShiTomasi;
-import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.tracker.dda.DetectDescribeAssociateTwoPass;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -60,10 +58,10 @@ public class TestDetectDescribeAssociateTwoPass extends GenericChecksPointTracke
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		// use an association algorithm which uses the track's pose information
-		AssociateMaxDistanceNaive<TupleDesc_B> association =
-				new AssociateMaxDistanceNaive<>(score, true, 400);
-		association.setSquaredDistance(true);
-		association.setMaxDistance(20);
+//		AssociateMaxDistanceNaive<TupleDesc_B> association =
+//				new AssociateMaxDistanceNaive<>(score, true, 400);
+//		association.setSquaredDistance(true);
+//		association.setMaxDistance(20);
 
 		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
 				new WrapDescribeBrief<>(brief,GrayF32.class);
@@ -74,8 +72,9 @@ public class TestDetectDescribeAssociateTwoPass extends GenericChecksPointTracke
 //		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
 //		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
 
-		DetectDescribeAssociateTwoPass<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociateTwoPass<>(association, association, new ConfigTrackerDda());
-		return tracker;
+//		DetectDescribeAssociateTwoPass<GrayF32,TupleDesc_B> tracker =
+//				new DetectDescribeAssociateTwoPass<>(association, association, new ConfigTrackerDda());
+//		return tracker;
+		return null;
 	}
 }

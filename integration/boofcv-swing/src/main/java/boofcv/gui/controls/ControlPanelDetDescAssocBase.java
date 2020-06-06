@@ -19,6 +19,7 @@
 package boofcv.gui.controls;
 
 import boofcv.abst.feature.associate.AssociateDescription;
+import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -54,7 +55,6 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	public ConfigDetectDescribe configDetDesc = new ConfigDetectDescribe();
 	public ConfigAssociate configAssociate = new ConfigAssociate();
 
-
 	// Controls for different detectors / descriptors
 	public ControlPanelSiftDetector controlDetectSift;
 	public ControlPanelFastHessian controlDetectFastHessian;
@@ -66,6 +66,11 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	public ControlPanelDescribeTemplate controlDescTemplate;
 	public ControlPanelAssociateGreedy controlAssocGreedy;
 	public ControlPanelAssociateNearestNeighbor controlAssocNN;
+	public JConfigLength controlAssocMaxDistance;
+	public boolean associateWithPixels = false;
+
+	// Control panel for associating with 2d pixels
+	public StandardAlgConfigPanel panelAssociate2D = new StandardAlgConfigPanel();
 
 	public ControlPanelDetDescAssocBase() {
 	}
@@ -80,7 +85,11 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	public void initializeControlsGUI() {
 		comboDetect    = combo(configDetDesc.typeDetector.ordinal(),ConfigDetectInterestPoint.DetectorType.values() );
 		comboDescribe  = combo(configDetDesc.typeDescribe.ordinal(),ConfigDescribeRegionPoint.DescriptorType.values() );
-		comboAssociate = combo(configAssociate.type.ordinal(),ConfigAssociate.AssociationType.values());
+		if( associateWithPixels ) {
+			comboAssociate = combo(configAssociate.type.ordinal(), ConfigAssociate.AssociationType.GREEDY);
+		} else {
+			comboAssociate = combo(configAssociate.type.ordinal(), ConfigAssociate.AssociationType.values());
+		}
 
 		controlDetectSift = new ControlPanelSiftDetector(configDetDesc.scaleSpaceSift, configDetDesc.detectSift,this::handleControlsUpdated);
 		controlDetectFastHessian = new ControlPanelFastHessian(configDetDesc.detectFastHessian,this::handleControlsUpdated);
@@ -92,6 +101,10 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		controlDescTemplate = new ControlPanelDescribeTemplate(configDetDesc.describeTemplate,this::handleControlsUpdated);
 		controlAssocGreedy = new ControlPanelAssociateGreedy(configAssociate.greedy,this::handleControlsUpdated);
 		controlAssocNN = new ControlPanelAssociateNearestNeighbor(configAssociate.nearestNeighbor,this::handleControlsUpdated);
+		controlAssocMaxDistance = configLength(configAssociate.maximumDistancePixels,0,2000,this::handleControlsUpdated);
+
+		panelAssociate2D.addLabeled(controlAssocMaxDistance,"Max Dist","Maximum distance two features can be to be associated");
+		panelAssociate2D.add(controlAssocGreedy);
 
 		controlDetectSift.setBorder(BorderFactory.createEmptyBorder());
 		controlDetectFastHessian.setBorder(BorderFactory.createEmptyBorder());
@@ -103,6 +116,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		controlDescTemplate.setBorder(BorderFactory.createEmptyBorder());
 		controlAssocGreedy.setBorder(BorderFactory.createEmptyBorder());
 		controlAssocNN.setBorder(BorderFactory.createEmptyBorder());
+		panelAssociate2D.setBorder(BorderFactory.createEmptyBorder());
 	}
 
 	/**
@@ -132,11 +146,15 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	}
 
 	public JPanel getAssociatePanel() {
-		return switch (configAssociate.type) {
-			case GREEDY -> controlAssocGreedy;
-			case KD_TREE, RANDOM_FOREST -> controlAssocNN;
-			default -> throw new IllegalArgumentException("Unknown");
-		};
+		if( associateWithPixels ) {
+			return panelAssociate2D;
+		} else {
+			return switch (configAssociate.type) {
+				case GREEDY -> controlAssocGreedy;
+				case KD_TREE, RANDOM_FOREST -> controlAssocNN;
+				default -> throw new IllegalArgumentException("Unknown");
+			};
+		}
 	}
 
 	/**
@@ -185,5 +203,21 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		}
 
 		return FactoryAssociation.generic(configAssociate,descriptor);
+	}
+
+	public AssociateDescription2D createAssociate2(DescriptorInfo descriptor ) {
+
+		configAssociate.maximumDistancePixels.setTo(controlAssocMaxDistance.getValue());
+
+		if( configAssociate.type != ConfigAssociate.AssociationType.GREEDY ) {
+			// The best way to handle this situation is to make it so the user can't select this combination of options
+			if (!TupleDesc_F64.class.isAssignableFrom(descriptor.getDescriptionType())) {
+				JOptionPane.showMessageDialog(this, "Requires TupleDesc_F64 description type");
+				// not really sure what to do here. I'll just force it to be greedy to avoid a crash
+				configAssociate.type = ConfigAssociate.AssociationType.GREEDY;
+			}
+		}
+
+		return FactoryAssociation.generic2(configAssociate,descriptor);
 	}
 }

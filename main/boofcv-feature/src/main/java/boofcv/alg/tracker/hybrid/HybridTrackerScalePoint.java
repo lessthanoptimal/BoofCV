@@ -168,6 +168,9 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 		this.imageHeight = pyramid.getInputWidth();
 		this.tracksDropped.clear();
 		this.tracksSpawned.clear();
+		if( frameID == -1 )
+			associate.initialize(imageWidth, imageHeight);
+
 		frameID++;
 //		System.out.println("frame: "+frameID+" active "+tracksActive.size+" all "+tracksAll.size);
 

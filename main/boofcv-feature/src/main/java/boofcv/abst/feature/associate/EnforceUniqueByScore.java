@@ -155,6 +155,11 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 		}
 
 		@Override
+		public void initialize(int imageWidth, int imageHeight) {
+			association.initialize(imageWidth, imageHeight);
+		}
+
+		@Override
 		public void setSource( FastAccess<Point2D_F64> location , FastAccess<Desc> listSrc) {
 			association.setSource(location, listSrc);
 			numSource = listSrc.size;

@@ -18,23 +18,25 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.AssociateGreedyBase;
+import boofcv.alg.feature.associate.AssociateGreedyDesc;
+import boofcv.alg.feature.associate.AssociateGreedyDescBase;
 import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
 
 /**
- * Wrapper around algorithms contained inside of {@link boofcv.alg.feature.associate.AssociateGreedy}.
+ * Wrapper around algorithms contained inside of {@link AssociateGreedyDesc}.
  *
  * @author Peter Abeles
  */
 public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
-	AssociateGreedyBase<T> alg;
+	AssociateGreedyDescBase<T> alg;
 
 	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex::new);
 
@@ -51,7 +53,7 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	 *
 	 * @param alg
 	 */
-	public WrapAssociateGreedy( AssociateGreedyBase<T> alg ) {
+	public WrapAssociateGreedy( AssociateGreedyDescBase<T> alg ) {
 		this.alg = alg;
 	}
 
@@ -80,14 +82,14 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 		unassocSrc.reset();
 		alg.associate(listSrc,listDst);
 
-		int pairs[] = alg.getPairs();
-		double score[] = alg.getFitQuality();
+		GrowQueue_I32 pairs = alg.getPairs();
+		GrowQueue_F64 score = alg.getFitQuality();
 
 		matches.reset();
 		for( int i = 0; i < listSrc.size; i++ ) {
-			int dst = pairs[i];
+			int dst = pairs.data[i];
 			if( dst >= 0 )
-				matches.grow().setAssociation(i,dst,score[i]);
+				matches.grow().setAssociation(i,dst,score.data[i]);
 			else
 				unassocSrc.add(i);
 		}

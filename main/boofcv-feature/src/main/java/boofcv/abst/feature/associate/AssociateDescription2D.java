@@ -33,6 +33,16 @@ import org.ddogleg.struct.FastAccess;
 public interface AssociateDescription2D<Desc> extends Associate {
 
 	/**
+	 * Initialize by specifying the image width/height. Used to precompute internal data
+	 * structures and set thresholds. If images are different sizes just use the largest
+	 * width/height
+	 *
+	 * @param imageWidth Input image width
+	 * @param imageHeight Input image height
+	 */
+	void initialize( int imageWidth , int imageHeight );
+
+	/**
 	 * Provide the location and descriptions for source features.
 	 *
 	 * @param location Feature locations.
