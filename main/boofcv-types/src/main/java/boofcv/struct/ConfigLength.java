@@ -64,6 +64,12 @@ public class ConfigLength implements Configuration {
 		this.length = minimum;
 	}
 
+	/**
+	 * Computes the length. If a relative length is used then it will be relative to the input.
+	 *
+	 * @param totalLength What a relative value is relative to
+	 * @return The length
+	 */
 	public double compute(double totalLength) {
 
 		double size;
@@ -77,10 +83,12 @@ public class ConfigLength implements Configuration {
 		return size;
 	}
 
+	/** True if a relative length is specified */
 	public boolean isRelative() {
 		return fraction >= 0;
 	}
 
+	/** True if a fixed length is specified */
 	public boolean isFixed() {
 		return fraction < 0;
 	}
@@ -88,19 +96,25 @@ public class ConfigLength implements Configuration {
 	public int computeI( double totalLength ) {
 		double size = compute(totalLength);
 		if( size >= 0 )
-			return (int)(size+0.5);
+			return (int)Math.round(size);
 		else
 			return -1;
 	}
 
+	/**
+	 * Returns the length as a rounded integer.
+	 */
 	public int getLengthI() {
-		return (int)(length + 0.5);
+		return (int)Math.round(length);
 	}
 
 	@Override
 	public void checkValidity() {
 		if( length < 0 && fraction < 0 )
 			throw new IllegalArgumentException("length and/or fraction must be >= 0");
+		if( isRelative() )
+			if( fraction < 0 || fraction > 1.0 )
+				throw new IllegalArgumentException("Fractional value must be from 0.0maxFeatures to 1.0, inclusive");
 	}
 
 	public void setTo( ConfigLength src ) {

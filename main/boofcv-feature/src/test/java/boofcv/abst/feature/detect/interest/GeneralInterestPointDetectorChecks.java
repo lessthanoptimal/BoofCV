@@ -44,25 +44,24 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 	private InterestPointDetector<T> detector;
 
 	private boolean hasOrientation;
-	private boolean hasScale;
+	private boolean hasRadius;
 
 	private T image;
 
 	public GeneralInterestPointDetectorChecks(InterestPointDetector<T> detector,
-											  boolean hasOrientation, boolean hasScale,
+											  boolean hasOrientation, boolean hasRadius,
 											  Class<T> imageType ) {
-		configure(detector,hasOrientation,hasScale,imageType);
+		configure(detector,hasOrientation, hasRadius,imageType);
 	}
 
-	public GeneralInterestPointDetectorChecks() {
-	}
+	public GeneralInterestPointDetectorChecks() {}
 
 	public void configure(InterestPointDetector<T> detector,
-						  boolean hasOrientation, boolean hasScale,
+						  boolean hasOrientation, boolean hasRadius,
 						  Class<T> imageType ) {
 		this.detector = detector;
 		this.hasOrientation = hasOrientation;
-		this.hasScale = hasScale;
+		this.hasRadius = hasRadius;
 
 		// create a random input image
 		image = GeneralizedImageOps.createSingleBand(imageType,60,80);
@@ -78,7 +77,7 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 	@Test
 	public void checkExpectedCharacteristics() {
 		assertTrue(hasOrientation == detector.hasOrientation());
-		assertTrue(hasScale == detector.hasScale());
+		assertTrue(hasRadius == detector.hasScale());
 	}
 
 	/**
@@ -92,7 +91,7 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 
 		// number of times each of these are not zero
 		int numPoint = 0;
-		int numScale = 0;
+		int numRadius = 0;
 		int numYaw = 0;
 
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
@@ -104,7 +103,7 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 				numPoint++;
 
 			if( radius != 1 )
-				numScale++;
+				numRadius++;
 
 			if( yaw != 0 )
 				numYaw++;
@@ -112,15 +111,15 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 
 		assertTrue(numPoint > 0 );
 
-		if( hasScale )
-			assertTrue(numScale > 0 );
+		if(hasRadius)
+			assertTrue(numRadius > 0 );
 		else
-			assertTrue(numScale == 0);
+			assertEquals(0, numRadius);
 
 		if( hasOrientation )
 			assertTrue(numYaw > 0 );
 		else
-			assertTrue(numYaw == 0);
+			assertEquals(0, numYaw);
 	}
 
 	/**

@@ -24,9 +24,11 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.interest.*;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageGray;
@@ -55,6 +57,11 @@ public class FactoryInterestPoint {
 			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian,inputType);
 			case SIFT: return FactoryInterestPoint.sift(config.scaleSpaceSift,config.sift,inputType);
 			case POINT: {
+				// check for exceptions that don't use the GeneralFeatureDetector
+				if( config.point.type == PointDetectorTypes.FAST && !config.point.fast.nonMax) {
+					return createFast(config.point.fast,inputType);
+				}
+
 				if( derivType == null )
 					derivType = GImageDerivativeOps.getDerivativeType(inputType);
 				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point,inputType,derivType);
@@ -63,6 +70,28 @@ public class FactoryInterestPoint {
 			default:
 				throw new IllegalArgumentException("Unknown detector");
 		}
+	}
+
+	/**
+	 * Creates a Fast corner detector with no non-maximum suppression
+	 *
+	 * @param configFast Configuration for FAST feature detector
+	 * @param imageType ype of input image.
+	 * @see FastCornerDetector
+	 */
+	public static <T extends ImageGray<T>>
+	InterestPointDetector<T> createFast( @Nullable ConfigFastCorner configFast , Class<T> imageType) {
+		if( configFast == null )
+			configFast = new ConfigFastCorner();
+		configFast.checkValidity();
+
+		if( configFast.nonMax)
+			throw new RuntimeException("This interface does not provide support for feature intensity. Use the other one.");
+
+		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
+		alg.getMaxFeatures().setTo(configFast.maxFeatures);
+
+		return new FastToInterestPoint<>(alg);
 	}
 
 	/**

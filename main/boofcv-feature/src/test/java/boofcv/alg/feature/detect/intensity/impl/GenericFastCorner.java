@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public abstract class GenericFastCorner {
 //			input.print();
 			alg.process(input,intensity);
 
-			QueueCorner corners = high?alg.getCornersHigh():alg.getCornersLow();
+			QueueCorner corners = high?alg.getCandidatesHigh():alg.getCandidatesLow();
 			assertEquals(1,corners.size);
 			Point2D_I16 found = corners.get(0);
 			assertEquals(w/2,found.x);
@@ -100,19 +100,19 @@ public abstract class GenericFastCorner {
 
 		alg.process(input,intensity);
 
-		assertEquals(validator.getCandidatesLow().size,alg.getCornersLow().size);
-		assertEquals(validator.getCandidatesHigh().size,alg.getCornersHigh().size);
+		assertEquals(validator.getCandidatesLow().size,alg.getCandidatesLow().size);
+		assertEquals(validator.getCandidatesHigh().size,alg.getCandidatesHigh().size);
 
 		for( int i = 0; i < validator.getCandidatesLow().size(); i++ ) {
 			Point2D_I16 v = validator.getCandidatesLow().get(i);
-			Point2D_I16 a = alg.getCornersLow().get(i);
+			Point2D_I16 a = alg.getCandidatesLow().get(i);
 
 			assertEquals(v.x,a.x);
 			assertEquals(v.y,a.y);
 		}
 		for( int i = 0; i < validator.getCandidatesHigh().size(); i++ ) {
 			Point2D_I16 v = validator.getCandidatesHigh().get(i);
-			Point2D_I16 a = alg.getCornersHigh().get(i);
+			Point2D_I16 a = alg.getCandidatesHigh().get(i);
 
 			assertEquals(v.x,a.x);
 			assertEquals(v.y,a.y);

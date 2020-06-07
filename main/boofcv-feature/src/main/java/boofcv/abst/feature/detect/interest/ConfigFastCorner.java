@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
@@ -41,9 +42,17 @@ public class ConfigFastCorner implements Configuration {
 	public int minContinuous=9;
 
 	/**
-	 * Maximum fraction of pixels which can be marked as corners. 0 to 1
+	 * Maximum number of pixels it will mark as corners. Tuning FAST is difficult and this is to prevent it from using
+	 * an extremely large amount of resources unexpectedly. If a fractional value is specified then that's relative
+	 * to the total number of pixels in the image.
 	 */
-	public double maxFeatures=0.1;
+	public ConfigLength maxFeatures = ConfigLength.fixed(2000);
+
+	/**
+	 * If true then a non-maximum suppression will be used with corner intensity based on the heuristic (see code).
+	 * Otherwise it will just return the raw detections. Faster with out non-max but a lot more false positives.
+	 */
+	public boolean nonMax = true;
 
 	public ConfigFastCorner(int pixelTol, int minContinuous) {
 		this.pixelTol = pixelTol;
@@ -55,8 +64,7 @@ public class ConfigFastCorner implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( maxFeatures < 0 || maxFeatures > 1 )
-			throw new IllegalArgumentException("maxfeatures must be from 0 to 1, inclusive");
+		maxFeatures.checkValidity();
 
 		if( minContinuous < 9 || minContinuous > 12 )
 			throw new IllegalArgumentException("minContinuous must be from 9 to 12, inclusive");
@@ -66,6 +74,7 @@ public class ConfigFastCorner implements Configuration {
 		this.pixelTol = src.pixelTol;
 		this.minContinuous = src.minContinuous;
 		this.maxFeatures = src.maxFeatures;
+		this.nonMax = src.nonMax;
 	}
 
 	public ConfigFastCorner copy() {

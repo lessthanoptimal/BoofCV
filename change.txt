@@ -37,11 +37,15 @@ Version : 0.37
 - Demonstration Applications
   * Discrete image pyramid can now be configured with both min pixels and levels
   * Updated Hybrid Tracker's GUI controls
+- FAST feature detector
+  * TODO Now compatible with KLT when not using non-maximum
+         This needs to support FeatureSelectLimit
+  * TODO Configurable in the GUI
 - RegionOrientation
   * Can now specify feature orientation approach using Configuration class
   * TODO finish cleaning up that mess
 - General Feature Detector
-  * TODO SelectLimit applied to bright/dark features combined? Was this already done?
+  * TODO SelectLimit applied to bright/dark features combined
 - SURF Feature Detector
   * TODO moved computation of dark/white feature into detector
   * TODO Added support for limiting the total number of features returned with SelectLimit

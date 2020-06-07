@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -32,12 +33,13 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import georegression.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -67,12 +69,13 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	VisualizePanel imagePanel = new VisualizePanel();
 	ControlPanel controls = new ControlPanel();
 
-	PointDetector<T> detector;
+	InterestPointDetector<T> detector;
 	boolean detectorChanged = true;
 
 	final Object featureLock = new Object();
-	List<QueueCorner> sets = new ArrayList<>();
-	// END OWNED BY LOCK
+	final FastQueue<Point2D_F64> featureLocs = new FastQueue<>(Point2D_F64::new);
+	final GrowQueue_I32 featureSets = new GrowQueue_I32();
+	int totalSets;
 
 	// filter the speed to make the numbers less erratic
 	MovingAverage period = new MovingAverage();
@@ -116,21 +119,22 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 		final double seconds;
 		long timeBefore = System.nanoTime();
-		detector.process((T)input);
+		detector.detect((T)input);
 		long timeAfter = System.nanoTime();
 		seconds = (timeAfter-timeBefore)*1e-9;
 
 		synchronized (featureLock) {
-			for (int i = 0; i < detector.totalSets(); i++) {
-				QueueCorner src = detector.getPointSet(i);
-				QueueCorner dst = sets.get(i);
-				dst.reset();
-				dst.appendAll(src);
+			totalSets = detector.getNumberOfSets();
+			featureLocs.resize(detector.getNumberOfFeatures());
+			featureSets.resize(detector.getNumberOfFeatures());
+
+			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
+				featureLocs.get(i).set(detector.getLocation(i));
+				featureSets.set(i,detector.getSet(i));
 			}
 		}
 
 		BoofSwingUtil.invokeNowOrLater(() -> {
-
 			controls.setProcessingTime(period.update(seconds));
 			imagePanel.setImage(buffered);
 			imagePanel.repaint();
@@ -157,13 +161,10 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 			synchronized (featureLock) {
 				double r = 5;
-				for (int setIndex = 0; setIndex < sets.size(); setIndex++) {
-					Color color = setIndex == 0 ? Color.RED : Color.BLUE;
-					QueueCorner points = sets.get(setIndex);
-					for (int i = 0; i < points.size; i++) {
-						Point2D_I16 c = points.get(i);
-						VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,color,true,circle);
-					}
+				for (int i = 0; i < featureLocs.size; i++) {
+					Point2D_F64 c = featureLocs.get(i);
+					Color color = featureSets.get(i) == 0 ? Color.RED : Color.BLUE;
+					VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,color,true,circle);
 				}
 			}
 		}
@@ -318,7 +319,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	private void createFast() {
 		controls.adjustControls(false,true);
 		ConfigFastCorner configFast = new ConfigFastCorner(controls.fastPixelTol,9);
-		changeDetector(FactoryDetectPoint.createFast(configFast,imageClass));
+		configFast.nonMax = false;
+		detector = FactoryInterestPoint.createFast(configFast,imageClass);
 	}
 
 	private void createKitRos() {
@@ -345,23 +347,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	}
 
 	private void changeDetector(GeneralFeatureDetector fd) {
-		detector = new GeneralToPointDetector(fd,imageClass, derivClass);
-
-		sets.clear();
-		for (int i = 0; i < detector.totalSets(); i++) {
-			sets.add( new QueueCorner());
-		}
+		detector = new GeneralToInterestPoint(fd,-1,imageClass, derivClass);
 	}
-
-	private void changeDetector(PointDetector fd) {
-		detector = fd;
-
-		sets.clear();
-		for (int i = 0; i < detector.totalSets(); i++) {
-			sets.add( new QueueCorner());
-		}
-	}
-
 
 	public static void main(String[] args) {
 		List<PathLabel> examples = new ArrayList<>();

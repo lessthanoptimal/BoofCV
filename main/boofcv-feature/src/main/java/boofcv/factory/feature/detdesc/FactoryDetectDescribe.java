@@ -28,6 +28,7 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.feature.orientation.*;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
@@ -100,9 +101,12 @@ public class FactoryDetectDescribe {
 			case SIFT -> detector =
 					FactoryInterestPoint.sift(config.scaleSpaceSift, config.detectSift, imageType);
 			case POINT -> {
-				GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint, imageType, null);
-				detector = FactoryInterestPoint.wrapPoint(
-						alg, config.detectPoint.scaleRadius, imageType, alg.getDerivType());
+				if( config.detectPoint.type == PointDetectorTypes.FAST && !config.detectPoint.fast.nonMax )
+					detector = FactoryInterestPoint.createFast(config.detectPoint.fast,imageType);
+				else {
+					GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint, imageType, null);
+					detector = FactoryInterestPoint.wrapPoint(alg, config.detectPoint.scaleRadius, imageType, alg.getDerivType());
+				}
 			}
 			default -> throw new IllegalArgumentException("Unknown detector");
 		}

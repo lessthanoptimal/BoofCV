@@ -23,7 +23,7 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Wrapper around children of {@link FastCornerDetector}.
+ * Wrapper around {@link FastCornerDetector} for {@link GeneralFeatureIntensity}.
  * 
  * @author Peter Abeles
  */
@@ -43,53 +43,14 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 		alg.process(input,intensity);
 	}
 
-	@Override
-	public QueueCorner getCandidatesMin() {
-		return alg.getCornersLow();
-	}
-
-	@Override
-	public QueueCorner getCandidatesMax() {
-		return alg.getCornersHigh();
-	}
-
-	@Override
-	public boolean getRequiresGradient() {
-		return false;
-	}
-
-	@Override
-	public boolean getRequiresHessian() {
-		return false;
-	}
-
-	@Override
-	public boolean hasCandidates() {
-		return true;
-	}
-
-	@Override
-	public int getIgnoreBorder() {
-		return alg.getIgnoreBorder();
-	}
-
-	@Override
-	public boolean localMinimums() {
-		return true;
-	}
-
-	@Override
-	public boolean localMaximums() {
-		return true;
-	}
-
-	@Override
-	public Class<I> getImageType() {
-		return alg.getImageType();
-	}
-
-	@Override
-	public Class<D> getDerivType() {
-		return null;
-	}
+	@Override public QueueCorner getCandidatesMin()    { return alg.getCandidatesLow(); }
+	@Override public QueueCorner getCandidatesMax()    { return alg.getCandidatesHigh(); }
+	@Override public boolean     getRequiresGradient() { return false; }
+	@Override public boolean     getRequiresHessian()  { return false; }
+	@Override public boolean     hasCandidates()       { return true; }
+	@Override public int         getIgnoreBorder()     { return alg.getIgnoreBorder(); }
+	@Override public boolean     localMinimums()       { return true; }
+	@Override public boolean     localMaximums()       { return true; }
+	@Override public Class<I>    getImageType()        { return alg.getImageType(); }
+	@Override public Class<D>    getDerivType()        { return null; }
 }

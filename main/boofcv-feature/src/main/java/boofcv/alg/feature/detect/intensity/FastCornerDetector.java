@@ -20,9 +20,11 @@ package boofcv.alg.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.impl.FastCornerInterface;
 import boofcv.misc.DiscretizedCircle;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import lombok.Getter;
 
 /**
  * <p>
@@ -75,8 +77,8 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	private int stride = 0;
 
 	// list of pixels that might be corners.
-	private QueueCorner candidatesLow = new QueueCorner(10);
-	private QueueCorner candidatesHigh = new QueueCorner(10);
+	private @Getter QueueCorner candidatesLow = new QueueCorner(10);
+	private @Getter QueueCorner candidatesHigh = new QueueCorner(10);
 
 	// reference to the input image
 	protected T image;
@@ -85,10 +87,9 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	protected FastCornerInterface<T> helper;
 
 	/**
-	 * Maximum number of pixels that can be considered corners. Some times it can go a bit bonkers and
-	 * label so many pixels that on low memory systems it uses up all the memory!
+	 * Maximum number features. If relative then relative to number of pixels in the image
 	 */
-	protected double maxFeaturesFraction = 1.0;
+	protected @Getter final ConfigLength maxFeatures = ConfigLength.fixed(2000);
 
 	/**
 	 * Constructor
@@ -99,29 +100,15 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 		this.helper = helper;
 	}
 
-	public QueueCorner getCornersLow() {
-		return candidatesLow;
-	}
-	public QueueCorner getCornersHigh() {
-		return candidatesHigh;
-	}
-
-	@Override
-	public int getRadius() {
-		return radius;
-	}
-
-	@Override
-	public int getIgnoreBorder() {
-		return radius;
-	}
+	@Override public int getRadius() {return radius;}
+	@Override public int getIgnoreBorder() {return radius;}
 
 	/**
 	 * Computes fast corner features and their intensity. The intensity is needed if non-max suppression is
 	 * used
 	 */
 	public void process( T image , GrayF32 intensity ) {
-		int maxFeatures = (int)(maxFeaturesFraction*image.width*image.height);
+		int maxFeatures = this.maxFeatures.computeI(image.width*image.height);
 		candidatesLow.reset();
 		candidatesHigh.reset();
 		this.image = image;
@@ -159,7 +146,7 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	 * Computes fast corner features
 	 */
 	public void process( T image ) {
-		int maxFeatures = (int)(maxFeaturesFraction*image.width*image.height);
+		int maxFeatures = this.maxFeatures.computeI(image.width*image.height);
 		candidatesLow.reset();
 		candidatesHigh.reset();
 		this.image = image;
@@ -186,16 +173,6 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
 				break;
 		}
-	}
-
-	public double getMaxFeaturesFraction() {
-		return maxFeaturesFraction;
-	}
-
-	public void setMaxFeaturesFraction(double maxFeaturesFraction) {
-		if( maxFeaturesFraction <= 0 || maxFeaturesFraction > 1 )
-			throw new IllegalArgumentException("0 to 1");
-		this.maxFeaturesFraction = maxFeaturesFraction;
 	}
 
 	public Class<T> getImageType() {

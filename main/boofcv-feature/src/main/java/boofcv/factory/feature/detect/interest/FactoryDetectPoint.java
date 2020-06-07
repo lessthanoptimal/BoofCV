@@ -69,18 +69,18 @@ public class FactoryDetectPoint {
 			case LAPLACIAN: config.general.detectMinimums = true; break;
 		}
 
-		switch( config.type ) {
-			case HARRIS: return FactoryDetectPoint.createHarris(config.general,config.harris,derivType);
-			case SHI_TOMASI: return FactoryDetectPoint.createShiTomasi(config.general,config.shiTomasi,derivType);
-			case FAST: return FactoryDetectPoint.createFast(config.general, config.fast, imageType);
-			case KIT_ROS: return FactoryDetectPoint.createKitRos(config.general,derivType);
-			case MEDIUM: return FactoryDetectPoint.createMedian(config.general,imageType);
-			case DETERMINANT: return FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.DETERMINANT,config.general,imageType);
-			case LAPLACIAN: return FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.TRACE, config.general, imageType);
-			case DETERMINANT_H: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, derivType);
-			case LAPLACIAN_H: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.TRACE, derivType);
-			default: throw new IllegalArgumentException("Unknown type "+config.type);
-		}
+		return switch (config.type) {
+			case HARRIS -> FactoryDetectPoint.createHarris(config.general, config.harris, derivType);
+			case SHI_TOMASI -> FactoryDetectPoint.createShiTomasi(config.general, config.shiTomasi, derivType);
+			case FAST -> FactoryDetectPoint.createFast(config.general, config.fast, imageType);
+			case KIT_ROS -> FactoryDetectPoint.createKitRos(config.general, derivType);
+			case MEDIUM -> FactoryDetectPoint.createMedian(config.general, imageType);
+			case DETERMINANT -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.DETERMINANT, config.general, imageType);
+			case LAPLACIAN -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.TRACE, config.general, imageType);
+			case DETERMINANT_H -> FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, derivType);
+			case LAPLACIAN_H -> FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.TRACE, derivType);
+			default -> throw new IllegalArgumentException("Unknown type " + config.type);
+		};
 	}
 
 	/**
@@ -165,29 +165,13 @@ public class FactoryDetectPoint {
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
 
+		if( !configFast.nonMax)
+			throw new RuntimeException("Can't use this interface if you wish to not compute a feature intensity");
+
 		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
-		alg.setMaxFeaturesFraction(configFast.maxFeatures);
+		alg.getMaxFeatures().setTo(configFast.maxFeatures);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<>(alg);
 		return createGeneral(intensity, configDetector);
-	}
-
-	/**
-	 * Creates a Fast corner detector
-	 *
-	 * @param configFast Configuration for FAST feature detector
-	 * @param imageType ype of input image.
-	 * @see FastCornerDetector
-	 */
-	public static <T extends ImageGray<T>>
-	PointDetector<T> createFast( @Nullable ConfigFastCorner configFast , Class<T> imageType) {
-		if( configFast == null )
-			configFast = new ConfigFastCorner();
-		configFast.checkValidity();
-
-		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
-		alg.setMaxFeaturesFraction(configFast.maxFeatures);
-
-		return new WrapFastToPointDetector<>(alg);
 	}
 
 	/**

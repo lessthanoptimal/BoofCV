@@ -39,6 +39,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 	private final JComboBox<String> comboType;
 	private final JSpinner spinnerKernel;
 	private final JCheckBox checkWeighted;
+	private final JCheckBox checkIntensity;
 	private final JSpinner spinnerRadius;
 	private final ControlPanelExtractor controlExtractor;
 	private final JSpinner spinnerMaxFeatures;
@@ -53,6 +54,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 
 		spinnerKernel = spinner(1,1,1000,1);
 		checkWeighted = checkbox("Weighted",false,"Gaussian weighted or block");
+		checkIntensity = checkbox("Non-Max",true,"Use non-max suppression or not");
 		spinnerRadius = spinner(config.scaleRadius,1.0,500.0,1.0);
 		comboType = combo(config.type.ordinal(),PointDetectorTypes.FIRST_ONLY);
 		controlExtractor = new ControlPanelExtractor(config.general,listener::handleChangePointDetector);
@@ -60,13 +62,14 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 
 		setKernelSize();
 		setWeighted();
+		setIntensity();
 
 		controlExtractor.setBorder(BorderFactory.createEmptyBorder());
 		comboSelector = combo(config.general.selector.type.ordinal(), SelectLimitTypes.values());
 
 		addLabeled(comboType,"Type","Type of corner or blob detector");
 		addLabeled(spinnerKernel,"Kernel","Radius of convolutional kernel");
-		addAlignCenter(checkWeighted);
+		add(createHorizontalPanel(checkWeighted,checkIntensity));
 		addLabeled(spinnerRadius,"Scale/Radius","Specified size given to scale invariant descriptors");
 		add(controlExtractor);
 		addLabeled(spinnerMaxFeatures,"Max Features","Maximum features it will detect. <= 0 for no limit");
@@ -92,19 +95,29 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 
 	private void setWeighted() {
 		checkWeighted.removeActionListener(this);
-		switch( config.type ) {
-			case SHI_TOMASI:
+		switch (config.type) {
+			case SHI_TOMASI -> {
 				checkWeighted.setEnabled(true);
 				checkWeighted.setSelected(config.shiTomasi.weighted);
-				break;
-			case HARRIS:
+			}
+			case HARRIS -> {
 				checkWeighted.setEnabled(true);
 				checkWeighted.setSelected(config.harris.weighted);
-				break;
-			default:
-				checkWeighted.setEnabled(false);
+			}
+			default -> checkWeighted.setEnabled(false);
 		}
 		checkWeighted.addActionListener(this);
+	}
+
+	private void setIntensity() {
+		checkIntensity.removeActionListener(this);
+		boolean isFast = config.type == PointDetectorTypes.FAST;
+		checkIntensity.setEnabled(isFast);
+		if( isFast ) {
+			checkIntensity.setSelected(config.fast.nonMax);
+		}
+
+		checkIntensity.addActionListener(this);
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
@@ -118,6 +131,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 			config.type = PointDetectorTypes.FIRST_ONLY[comboType.getSelectedIndex()];
 			setKernelSize();
 			setWeighted();
+			setIntensity();
 		} else if( source == spinnerMaxFeatures ) {
 			config.general.maxFeatures = ((Number) spinnerMaxFeatures.getValue()).intValue();
 		} else if( source == comboSelector) {
@@ -125,14 +139,18 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		} else if( source == spinnerRadius ) {
 			config.scaleRadius = ((Number) spinnerRadius.getValue()).doubleValue();
 		} else if( source == spinnerKernel ) {
-			switch( config.type ) {
-				case SHI_TOMASI: config.shiTomasi.radius = ((Number) spinnerKernel.getValue()).intValue(); break;
-				case HARRIS: config.harris.radius = ((Number) spinnerKernel.getValue()).intValue(); break;
+			switch (config.type) {
+				case SHI_TOMASI -> config.shiTomasi.radius = ((Number) spinnerKernel.getValue()).intValue();
+				case HARRIS -> config.harris.radius = ((Number) spinnerKernel.getValue()).intValue();
 			}
 		} else if( source == checkWeighted ) {
-			switch( config.type ) {
-				case SHI_TOMASI: config.shiTomasi.weighted = checkWeighted.isSelected(); break;
-				case HARRIS: config.harris.weighted = checkWeighted.isSelected(); break;
+			switch (config.type) {
+				case SHI_TOMASI -> config.shiTomasi.weighted = checkWeighted.isSelected();
+				case HARRIS -> config.harris.weighted = checkWeighted.isSelected();
+			}
+		} else if( source == checkIntensity ) {
+			if( config.type == PointDetectorTypes.FAST ) {
+				config.fast.nonMax = checkWeighted.isSelected();
 			}
 		} else {
 			throw new RuntimeException("Unknown source");
