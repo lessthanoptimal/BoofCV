@@ -78,7 +78,7 @@ public class ConfigStereoQuadPnP implements Configuration {
 		detectDescribe.detectPoint.general.threshold = 1.0f;
 		detectDescribe.detectPoint.general.radius = 4;
 		detectDescribe.detectPoint.general.maxFeatures = 500;
-		detectDescribe.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+		detectDescribe.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 
 		associateF2F.type = ConfigAssociate.AssociationType.GREEDY;
 	}

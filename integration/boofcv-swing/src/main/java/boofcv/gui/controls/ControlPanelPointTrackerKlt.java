@@ -41,6 +41,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	private final Listener listener;
 
 	private final JPyramidLevels controlLevels;
+	private final JSpinner spinnerMaxTracks;
 	private final JCheckBox checkPruneClose;
 	private final JSpinner spinnerIterations;
 	private final JSpinner spinnerMaxError;
@@ -60,6 +61,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		initializeConfiguration();
 
 		controlLevels = new JPyramidLevels(this.configKlt.pyramidLevels,listener::changedPointTrackerKlt);
+		spinnerMaxTracks = spinner(configKlt.maximumTracks,0,10000,10);
 		checkPruneClose = checkbox("Prune Close", this.configKlt.pruneClose,"If true then tracks which are clustered close to each other are pruned");
 		spinnerIterations = spinner(this.configKlt.config.maxIterations,1,500,1);
 		spinnerMaxError = spinner(this.configKlt.config.maxPerPixelError,0.0,255.0,5.0);
@@ -68,11 +70,14 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		if( configDetect != null ) {
 			controlDetector = new ControlPanelPointDetector(this.configDetect, listener::changedPointTrackerKlt);
 			controlDetector.setBorder(BorderFactory.createTitledBorder("Detect"));
+			// KLT controls the maximum number of detected features so disable that option
+			controlDetector.getControlGeneralCorner().getSpinnerMaxFeatures().setEnabled(false);
 		} else {
 			controlDetector = null;
 		}
 
 		addLabeled(controlLevels,"Pyramid");
+		addLabeled(spinnerMaxTracks,"Track Limit","Maximum number of allowed tracks. 0 = unlimited");
 		addAlignLeft(checkPruneClose);
 		addLabeled(spinnerDescRadius,"Template Radius","Radius of square template that is tracked");
 		addLabeled(spinnerIterations,"Max Iterations","KLT iterations when tracking");
@@ -101,6 +106,8 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	public void controlChanged(final Object source) {
 		if( source == spinnerDescRadius) {
 			configKlt.templateRadius = ((Number) spinnerDescRadius.getValue()).intValue();
+		} else if( source == spinnerMaxTracks) {
+			configKlt.maximumTracks = ((Number) spinnerMaxTracks.getValue()).intValue();
 		} else if( source == spinnerMaxError) {
 			configKlt.config.maxPerPixelError = ((Number) spinnerMaxError.getValue()).floatValue();
 		} else if( source == spinnerForwardsBackwards ) {

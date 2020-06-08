@@ -20,6 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 
 /**
@@ -30,10 +31,12 @@ import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 public enum PointDetectorTypes {
 	/**
 	 * Maximums only
+	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 */
 	SHI_TOMASI,
 	/**
 	 * Maximums only
+	 * @see boofcv.alg.feature.detect.intensity.HarrisCornerIntensity
 	 */
 	HARRIS,
 	/**
@@ -52,13 +55,13 @@ public enum PointDetectorTypes {
 	 */
 	DETERMINANT,
 	/**
-	 *
+	 * @see boofcv.alg.feature.detect.intensity.KitRosCornerIntensity
 	 */
 	KIT_ROS,
 	/**
-	 *
+	 * @see MedianCornerIntensity
 	 */
-	MEDIUM,
+	MEDIAN,
 	/**
 	 * Computed using the Hessian image. Maximums and minimums
 	 * @see HessianBlobIntensity
@@ -73,5 +76,5 @@ public enum PointDetectorTypes {
 	/**
 	 * Point types which take in the input image or the gradient (first-derivative) image only.
 	 */
-	public static final PointDetectorTypes[] FIRST_ONLY = new PointDetectorTypes[]{SHI_TOMASI,HARRIS,FAST,LAPLACIAN,DETERMINANT,KIT_ROS,MEDIUM};
+	public static final PointDetectorTypes[] FIRST_ONLY = new PointDetectorTypes[]{SHI_TOMASI,HARRIS,FAST,LAPLACIAN,DETERMINANT,KIT_ROS, MEDIAN};
 }

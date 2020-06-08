@@ -60,7 +60,7 @@ public class ConfigStereoMonoTrackPnP implements Configuration {
 		config.detDesc.detectPoint.general.threshold = 1.0f;
 		config.detDesc.detectPoint.general.radius = 5;
 		config.detDesc.detectPoint.general.maxFeatures = 300;
-		config.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+		config.detDesc.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 	}
 
 	@Override

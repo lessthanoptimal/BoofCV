@@ -24,7 +24,7 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -163,12 +163,12 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 		float max = ImageStatistics.maxAbs(intensity);
 		float threshold = max * thresholdFraction;
 
-		FeatureSelectLimit selector = new FeatureSelectNBest();
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
 
 		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(minSeparation, threshold, radius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg, extractor, selector);
-		detector.setMaxFeatures(numFeatures);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg,null, extractor, selector);
+		detector.setFeatureLimit(numFeatures);
 		detector.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		QueueCorner foundCorners = detector.getMaximums();
 

@@ -86,7 +86,7 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
 		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
 		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
-		pixel.set( alg.getVisibleTracks().get(index).visualTrack.pixel );
+		pixel.setTo( alg.getVisibleTracks().get(index).visualTrack.pixel );
 	}
 
 	@Override

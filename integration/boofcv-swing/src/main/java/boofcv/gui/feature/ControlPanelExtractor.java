@@ -43,7 +43,7 @@ public class ControlPanelExtractor extends StandardAlgConfigPanel {
 		spinnerRadius = spinner(config.radius,0, 999,1);
 		spinnerThreshold = spinner(config.threshold,0.0, 100000,1.0,"0.0E0",8);
 
-		addLabeled(spinnerRadius,"Radius","Non-Maximum supression radius");
+		addLabeled(spinnerRadius,"Radius","Non-Maximum suppression radius");
 		addLabeled(spinnerThreshold,"Threshold","Minimum detection threshold. Set to 0 to disable");
 	}
 

@@ -96,6 +96,14 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return control;
 	}
 
+	protected JButton buttonIcon( String name , boolean enabled ) {
+		JButton b = BoofSwingUtil.createButtonIconGUI(name,24,24);
+		b.setEnabled(enabled);
+		b.addActionListener(this);
+		return b;
+	}
+
+
 	protected JButton button( String name , boolean enabled ) {
 		return button(name,enabled,this);
 	}

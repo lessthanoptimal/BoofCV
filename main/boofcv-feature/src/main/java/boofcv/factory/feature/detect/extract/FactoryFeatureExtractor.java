@@ -22,9 +22,10 @@ import boofcv.abst.feature.detect.extract.*;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.*;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_I16;
 
 import javax.annotation.Nullable;
 
@@ -41,18 +42,20 @@ public class FactoryFeatureExtractor {
 	 *
 	 *
 	 * @param intensity   Feature intensity algorithm
-	 * @param extractor   Feature extraction algorithm.
+	 * @param extractorMin   Feature extraction algorithm for local minimums
+	 * @param extractorMax   Feature extraction algorithm for local maximums
 	 * @param selector    Selects features when there is more than the maximum allowed
 	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
 	 * @return General feature detector
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
-										 NonMaxSuppression extractor,
-										 FeatureSelectLimit selector,
+										 @Nullable NonMaxSuppression extractorMin,
+										 @Nullable NonMaxSuppression extractorMax,
+										 FeatureSelectLimitIntensity<Point2D_I16> selector,
 										 int maxFeatures ) {
-		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<>(intensity, extractor, selector);
-		det.setMaxFeatures(maxFeatures);
+		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
+		det.setFeatureLimit(maxFeatures);
 
 		return det;
 	}

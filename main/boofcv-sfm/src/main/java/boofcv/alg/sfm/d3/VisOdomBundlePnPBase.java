@@ -186,12 +186,11 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 */
 	protected boolean performKeyFrameMaintenance(PointTracker<?> tracker, int newFrames) {
 		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene);
-		if (dropFrameIndexes.size == 0) {
-			return false;
+		boolean droppedCurrentFrame = false;
+		if (dropFrameIndexes.size != 0) {
+			droppedCurrentFrame = dropFrameIndexes.getTail(0) == scene.frames.size - 1;
+			dropFramesFromScene(dropFrameIndexes);
 		}
-		boolean droppedCurrentFrame = dropFrameIndexes.getTail(0) == scene.frames.size - 1;
-
-		dropFramesFromScene(dropFrameIndexes);
 		dropTracksNotVisibleAndTooFewObservations();
 		updateListOfVisibleTracksForOutput();
 

@@ -30,6 +30,8 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,9 @@ import java.util.List;
 public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D>>
 		implements PointTracker<I>
 {
+	// If this is a positive number it specifies the maximum number of allowed tracks
+	public @Getter @Setter int maximumAllowedTracks = -1;
+
 	// reference to input image
 	protected I input;
 
@@ -219,19 +224,30 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		float scaleBottom = (float)currPyr.basePyramid.getScale(0);
 
 		// exclude active tracks
-		excludeList.reset();
+		excludeList.resize(active.size());
 		for (int i = 0; i < active.size(); i++) {
 			PyramidKltFeature f = active.get(i);
-			excludeList.append((int) (f.x / scaleBottom), (int) (f.y / scaleBottom));
+			excludeList.get(i).set((int) (f.x / scaleBottom), (int) (f.y / scaleBottom));
 		}
 
-		// find new tracks, but no more than the max
-		detector.setExcludeMaximum(excludeList);
+		// Don't want to detect features again which are already being tracked
+		detector.setExclude(excludeList);
+		// Don't exceed the maximum tracking limit
+		if( maximumAllowedTracks > 0 ) {
+			int limit = maximumAllowedTracks - excludeList.size;
+			if( limit <= 0 )
+				return;
+			detector.setFeatureLimit(maximumAllowedTracks - excludeList.size);
+		} else
+			detector.setFeatureLimit(-1);
 		detector.process(currPyr.basePyramid.getLayer(0), currPyr.derivX[0], currPyr.derivY[0], null, null, null);
 
-		// extract the features
-		QueueCorner found = detector.getMaximums();
+		// Create new tracks from the detected features
+		addToTracks(scaleBottom, detector.getMinimums());
+		addToTracks(scaleBottom, detector.getMaximums());
+	}
 
+	private void addToTracks(float scaleBottom, QueueCorner found) {
 		for (int i = 0; i < found.size(); i++) {
 			Point2D_I16 pt = found.get(i);
 
@@ -276,7 +292,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 	@Override
 	public int getMaxSpawn() {
-		return detector.getMaxFeatures();
+		return maximumAllowedTracks;
 	}
 
 	@Override

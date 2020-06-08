@@ -37,15 +37,23 @@ Version : 0.37
 - Demonstration Applications
   * Discrete image pyramid can now be configured with both min pixels and levels
   * Updated Hybrid Tracker's GUI controls
+- FeatureSelectLimit
+  * Supports multiple point types
+  * Variant with and without intensity information
+  * TODO generalized how intensity information can be collected
 - FAST feature detector
-  * TODO Now compatible with KLT when not using non-maximum
-         This needs to support FeatureSelectLimit
-  * TODO Configurable in the GUI
+  * Configurable in the GUI
+  * TODO Create concurrent variant. is candidate non-max concurrent?
 - RegionOrientation
   * Can now specify feature orientation approach using Configuration class
   * TODO finish cleaning up that mess
+- PointTrackerKltPyramid
+  * It now manages the track limit itself instead of letting the detector handle it
 - General Feature Detector
-  * TODO SelectLimit applied to bright/dark features combined
+  * Exclude list is no longer subtracted from requested detections
+  * Single exclude list for max and min
+  * When both max and min are detected excluded is correctly handled now
+  * Feature limit is split between max and min
 - SURF Feature Detector
   * TODO moved computation of dark/white feature into detector
   * TODO Added support for limiting the total number of features returned with SelectLimit

@@ -19,12 +19,14 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -37,27 +39,47 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 {
 	@Getter FastCornerDetector<T> detector;
 	// Storage for all the found corners
-	private FastQueue<Point2D_F64> found = new FastQueue<>(Point2D_F64::new);
+	private final FastQueue<Point2D_F64> found = new FastQueue<>(Point2D_F64::new);
 	// total number of low corners. Used to identify which set a feature belongs in
 	private int totalLow;
 
-	public FastToInterestPoint(FastCornerDetector<T> detector ) {
+	// selects the features with the largest intensity
+	protected @Getter FeatureSelectLimit<Point2D_I16> selectMax;
+	protected QueueCorner selected = new QueueCorner();
+	/** Maximum number of features it can select per set */
+	public @Getter @Setter int featureLimitPerSet = Integer.MAX_VALUE;
+
+	public FastToInterestPoint(FastCornerDetector<T> detector , FeatureSelectLimit<Point2D_I16> selectMax ) {
 		this.detector = detector;
+		this.selectMax = selectMax;
 	}
 
 	@Override
 	public void detect(T input) {
 		detector.process(input);
+
+		// get all the low candidates
 		QueueCorner low = detector.getCandidatesLow();
-		QueueCorner high = detector.getCandidatesHigh();
-		totalLow = low.size;
-		found.resize(totalLow+high.size);
-		for (int i = 0; i < totalLow; i++) {
-			Point2D_I16 c = low.get(i);
+		// If there are too many select a subset based on this rule
+		selectMax.select(input.width,input.height,null,low,featureLimitPerSet,selected);
+		// Note how many low corners there are so that the set is known in the future
+		totalLow = selected.size;
+		// copy the results
+		found.resize(totalLow);
+		for (int i = 0; i < selected.size; i++) {
+			Point2D_I16 c = selected.get(i);
 			found.get(i).set(c.x,c.y);
 		}
-		for (int i = 0; i < high.size; i++) {
-			Point2D_I16 c = high.get(i);
+
+		// Do the same for high corners
+		QueueCorner high = detector.getCandidatesHigh();
+		selectMax.select(input.width,input.height,null,high,featureLimitPerSet,selected);
+		// predeclare and reshape the array
+		found.growArray(found.size+selected.size);
+		found.size =found.size+selected.size;
+		// copy the new elements into the found array
+		for (int i = 0; i < selected.size; i++) {
+			Point2D_I16 c = selected.get(i);
 			found.get(i+totalLow).set(c.x,c.y);
 		}
 	}
@@ -76,7 +98,7 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 
 	@Override public Point2D_F64 getLocation(int featureIndex) { return found.get(featureIndex); }
 
-	@Override public double getRadius(int featureIndex) { return detector.getRadius(); }
+	@Override public double getRadius(int featureIndex) { return 1.0; }
 
 	@Override public double getOrientation(int featureIndex) { return 0; }
 }

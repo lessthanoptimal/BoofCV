@@ -42,7 +42,7 @@ public interface InterestPointDetector< T extends ImageBase> extends FoundPointS
 	void detect( T input );
 
 	/**
-	 * Does the interest point detector have scale information
+	 * Does the interest point detector have scale information. This made available through the radius.
 	 *
 	 * @return true if it has scale information and false otherwise
 	 */

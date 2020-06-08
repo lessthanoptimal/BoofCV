@@ -24,7 +24,7 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -145,10 +145,10 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 		extractor.setIgnoreBorder(radius + 10);
 		extractor.setThresholdMaximum(10f);
 
-		FeatureSelectLimit selector = new FeatureSelectNBest();
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
 
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
-		detector.setMaxFeatures(maxCorners);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity,null, extractor, selector);
+		detector.setFeatureLimit(maxCorners);
 
 		VideoDetectCorners<T, D> display = new VideoDetectCorners<>(sequence, detector, derivType);
 

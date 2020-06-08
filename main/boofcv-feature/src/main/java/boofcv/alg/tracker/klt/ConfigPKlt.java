@@ -52,8 +52,12 @@ public class ConfigPKlt implements Configuration
 	 */
 	public boolean pruneClose=false;
 
-	public ConfigPKlt() {
-	}
+	/**
+	 * Specifies the maximum number of features it can track. If < 0 then there is no limit
+	 */
+	public int maximumTracks = -1;
+
+	public ConfigPKlt() {}
 
 	public ConfigPKlt(int templateRadius) {
 		this.templateRadius = templateRadius;
@@ -67,7 +71,8 @@ public class ConfigPKlt implements Configuration
 
 	@Override
 	public void checkValidity() {
-
+		config.checkValidity();
+		pyramidLevels.checkValidity();
 	}
 
 	public void setTo( ConfigPKlt src ) {

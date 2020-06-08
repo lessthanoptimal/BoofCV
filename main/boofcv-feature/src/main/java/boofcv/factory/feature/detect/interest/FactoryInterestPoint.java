@@ -26,13 +26,17 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.interest.*;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
+import georegression.struct.point.Point2D_I16;
 
 import javax.annotation.Nullable;
 
@@ -59,7 +63,7 @@ public class FactoryInterestPoint {
 			case POINT: {
 				// check for exceptions that don't use the GeneralFeatureDetector
 				if( config.point.type == PointDetectorTypes.FAST && !config.point.fast.nonMax) {
-					return createFast(config.point.fast,inputType);
+					return createFast(config.point.fast,config.point.general.maxFeatures, config.point.general.selector,inputType);
 				}
 
 				if( derivType == null )
@@ -80,7 +84,10 @@ public class FactoryInterestPoint {
 	 * @see FastCornerDetector
 	 */
 	public static <T extends ImageGray<T>>
-	InterestPointDetector<T> createFast( @Nullable ConfigFastCorner configFast , Class<T> imageType) {
+	InterestPointDetector<T> createFast(@Nullable ConfigFastCorner configFast ,
+										int featureLimitPerSet,
+										@Nullable ConfigSelectLimit configSelect,
+										Class<T> imageType) {
 		if( configFast == null )
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
@@ -91,7 +98,11 @@ public class FactoryInterestPoint {
 		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
 		alg.getMaxFeatures().setTo(configFast.maxFeatures);
 
-		return new FastToInterestPoint<>(alg);
+		FeatureSelectLimit<Point2D_I16> selector = FactorySelectLimit.spatial(configSelect, Point2D_I16.class);
+
+		var ret = new FastToInterestPoint<>(alg,selector);
+		ret.setFeatureLimitPerSet(featureLimitPerSet);
+		return ret;
 	}
 
 	/**

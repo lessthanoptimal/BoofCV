@@ -32,13 +32,14 @@ import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.*;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_I16;
 
 import javax.annotation.Nullable;
 
@@ -68,9 +69,9 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		FeatureSelectLimit selector = new FeatureSelectNBest();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
-		detector.setMaxFeatures(maxFeatures);
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 
@@ -97,9 +98,9 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(harris);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		FeatureSelectLimit selector = new FeatureSelectNBest();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
-		detector.setMaxFeatures(maxFeatures);
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 
@@ -125,9 +126,9 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		FeatureSelectLimit selector = new FeatureSelectNBest();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
-		detector.setMaxFeatures(maxFeatures);
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 
@@ -156,9 +157,9 @@ public class FactoryInterestPointAlgs {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(harris);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
-		FeatureSelectLimit selector = new FeatureSelectNBest();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
-		detector.setMaxFeatures(maxFeatures);
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType,derivType);
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);

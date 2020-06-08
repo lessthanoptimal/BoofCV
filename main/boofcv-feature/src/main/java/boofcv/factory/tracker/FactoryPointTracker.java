@@ -165,9 +165,11 @@ public class FactoryPointTracker {
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidLevels,-1,2,true, ImageType.single(imageType));
 
-		return new PointTrackerKltPyramid<>(config.config, config.toleranceFB,
+		var ret = new PointTrackerKltPyramid<>(config.config, config.toleranceFB,
 				config.templateRadius, config.pruneClose, pyramid, detector,
 				gradient, interpInput, interpDeriv, derivType);
+		ret.maximumAllowedTracks = config.maximumTracks;
+		return ret;
 	}
 
 	/**

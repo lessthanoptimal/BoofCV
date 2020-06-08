@@ -29,7 +29,7 @@ import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 public class ConfigGeneralDetector extends ConfigExtract {
 
 	/**
-	 * Specifies the maximum number of features it will detect.  If a value is specified then the 'maxFeature' most
+	 * Specifies the maximum number of features it will detect.  If a value is specified then the 'maxFeatures' most
 	 * intense features are returned.  Set to a value &le; 0 to return all selected features.  Default is -1.
 	 */
 	public int maxFeatures = -1;
@@ -38,7 +38,7 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	 */
 	public ConfigSelectLimit selector = ConfigSelectLimit.selectBestN();
 
-	public ConfigGeneralDetector(int maxFeatures ,
+	public ConfigGeneralDetector(int maxFeatures,
 								 int radius, float threshold, int ignoreBorder, boolean useStrictRule,
 								 boolean detectMinimums, boolean detectMaximums) {
 		super(radius, threshold, ignoreBorder, useStrictRule, detectMinimums, detectMaximums);
@@ -55,7 +55,7 @@ public class ConfigGeneralDetector extends ConfigExtract {
 		this.maxFeatures = maxFeatures;
 	}
 
-	public ConfigGeneralDetector(int maxFeatures , ConfigExtract config ) {
+	public ConfigGeneralDetector(int maxFeatures, ConfigExtract config ) {
 		this.maxFeatures = maxFeatures;
 		if( config != null ) {
 			super.setTo(config);

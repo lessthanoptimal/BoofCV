@@ -77,8 +77,8 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	private int stride = 0;
 
 	// list of pixels that might be corners.
-	private @Getter QueueCorner candidatesLow = new QueueCorner(10);
-	private @Getter QueueCorner candidatesHigh = new QueueCorner(10);
+	private final @Getter QueueCorner candidatesLow = new QueueCorner(10);
+	private final @Getter QueueCorner candidatesHigh = new QueueCorner(10);
 
 	// reference to the input image
 	protected T image;

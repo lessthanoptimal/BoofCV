@@ -18,26 +18,29 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import boofcv.struct.image.GrayF32;
-import georegression.struct.point.Point2D_I16;
+import georegression.struct.GeoTuple;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
+import javax.annotation.Nullable;
+
 /**
- * This selects features in the order they were detected. This is probably the worst built in strategy, primarily
- * included as a way to verify that the others are doing something.
+ * Selects features periodically in the order they were detected until it hits the limit. This is better than just
+ * selecting the first N since features tend to ordered in a very specific way, e.g. top to bottom. you're more likely
+ * to get a spread out less biased set this way
  *
  * @author Peter Abeles
  */
-public class FeatureSelectFirst implements FeatureSelectLimit {
+public class FeatureSelectN<Point extends GeoTuple<Point>> implements FeatureSelectLimit<Point> {
 	@Override
-	public void select(GrayF32 intensity, boolean positive, FastAccess<Point2D_I16> prior,
-					   FastAccess<Point2D_I16> detected, int limit, FastQueue<Point2D_I16> selected)
-	{
-		selected.reset();
+	public void select( int imageWidth, int imageHeight,
+						@Nullable FastAccess<Point> prior,
+						FastAccess<Point> detected, int limit, FastQueue<Point> selected) {
 		int N = Math.min(detected.size,limit);
+		selected.resize(N);
 		for (int i = 0; i < N; i++) {
-			selected.grow().set(detected.get(i));
+			int selectedIdx = i*detected.size/N;
+			selected.get(i).setTo(detected.get(selectedIdx));
 		}
 	}
 }

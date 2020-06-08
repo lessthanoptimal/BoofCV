@@ -102,7 +102,8 @@ public class FactoryDetectDescribe {
 					FactoryInterestPoint.sift(config.scaleSpaceSift, config.detectSift, imageType);
 			case POINT -> {
 				if( config.detectPoint.type == PointDetectorTypes.FAST && !config.detectPoint.fast.nonMax )
-					detector = FactoryInterestPoint.createFast(config.detectPoint.fast,imageType);
+					detector = FactoryInterestPoint.createFast(config.detectPoint.fast,
+							config.detectPoint.general.maxFeatures,config.detectPoint.general.selector,imageType);
 				else {
 					GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint, imageType, null);
 					detector = FactoryInterestPoint.wrapPoint(alg, config.detectPoint.scaleRadius, imageType, alg.getDerivType());

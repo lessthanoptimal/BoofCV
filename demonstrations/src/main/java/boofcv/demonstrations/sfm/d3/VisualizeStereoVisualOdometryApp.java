@@ -81,6 +81,8 @@ import java.util.Set;
 import static boofcv.gui.BoofSwingUtil.*;
 import static boofcv.io.image.ConvertBufferedImage.checkCopy;
 import static boofcv.io.image.ConvertBufferedImage.convertFrom;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 /**
  * Visualizes stereo visual odometry.
@@ -131,7 +133,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		split.setDividerLocation(320);
 		setAutomaticImageResize(split);
 
-		controls.setPreferredSize(new Dimension(200,0));
+		controls.setPreferredSize(new Dimension(220,0));
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, split);
@@ -241,7 +243,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
 		config.tracker.detDesc.detectPoint.general.radius = 3;
 		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
-		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
 		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
@@ -278,7 +280,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
 		config.tracker.detDesc.detectPoint.general.radius = 5;
 		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
-		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
 		config.tracker.associate.nearestNeighbor.scoreRatioThreshold = 0.75;
@@ -366,14 +368,16 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-		switch( sourceID ) {
-			case 0:
-				stereoPanel.left = checkCopy(buffered,stereoPanel.left);
-				convertFrom(buffered,true,inputLeft); break;
-			case 1:
-				stereoPanel.right = checkCopy(buffered,stereoPanel.right);
-				convertFrom(buffered,true,inputRight);break;
-			default: throw new RuntimeException("BUG");
+		switch (sourceID) {
+			case 0 -> {
+				stereoPanel.left = checkCopy(buffered, stereoPanel.left);
+				convertFrom(buffered, true, inputLeft);
+			}
+			case 1 -> {
+				stereoPanel.right = checkCopy(buffered, stereoPanel.right);
+				convertFrom(buffered, true, inputRight);
+			}
+			default -> throw new RuntimeException("BUG");
 		}
 
 		if( sourceID == 0 )
@@ -537,8 +541,8 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		int trackColors=0; // 0 = depth, 1 = age
 
 		final JLabel videoFrameLabel = new JLabel();
-		final JButton bPause = button("Pause",true);
-		final JButton bStep = button("Step",true);
+		final JButton bPause = buttonIcon("Pause24.gif",true);
+		final JButton bStep = buttonIcon("StepForward24.gif",true);
 		final JButton bUpdateAlg = button("Update",false,(e)->resetWithNewAlgorithm());
 
 		// Statistical Info
@@ -612,21 +616,30 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 			panelTuning.add(comboApproach);
 			panelTuning.add(panelApproach);
 			addVerticalGlue(panelTuning);
-			addAlignCenter(bUpdateAlg,panelTuning);
 
 			panelApproach.add(BorderLayout.CENTER, getControlVisOdom());
 
-			var tabbedTopPane = new JTabbedPane();
+			var tabbedTopPane = new JTabbedPane() {
+				@Override
+				public Dimension getPreferredSize() {
+					// This hack is needed so that it the scrollbar will only expand vertically
+					Dimension d = super.getPreferredSize();
+					return new Dimension(200,d.height);
+				}
+			};
 			tabbedTopPane.addTab("Visuals",panelVisuals);
 			tabbedTopPane.addTab("Configure",panelTuning);
+
+			// put it in a scroll pane so that it is possible to see everything even in a small screen
+			var scrollTopPane = new JScrollPane(tabbedTopPane,
+					VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_NEVER);
 
 			addLabeled(videoFrameLabel,"Frame");
 			addLabeled(processingTimeLabel,"Processing (ms)");
 			addLabeled(imageSizeLabel,"Image");
 			addLabeled(selectZoom,"Zoom");
-			add(tabbedTopPane);
-			addVerticalGlue();
-			add(fillHorizontally(gridPanel(2,bPause,bStep)));
+			add(scrollTopPane);
+			add(createHorizontalPanel(bUpdateAlg,bPause,bStep));
 		}
 
 		public void setInliersTracks( int count ) { labelInliersN.setText(""+count); }
@@ -641,14 +654,12 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 				zoom = (Double)selectZoom.getValue();
 				stereoPanel.setScale(zoom);
 			} else if( source == bPause ) {
-				boolean paused = !streamPaused;
-				streamPaused = paused;
-				bPause.setText(paused?"Resume":"Paused");
+				streamPaused = !streamPaused;
+//				bPause.setText(paused?"Resume":"Paused");
 			} else if( source == bStep ) {
-				if( streamPaused )
-					streamPaused = false;
+				streamPaused = false;
 				streamStepCounter = 1;
-				bPause.setText("Resume");
+//				bPause.setText("Resume");
 			} else if( source == checkInliers ) {
 				showInliers = checkInliers.isSelected();
 				stereoPanel.repaint();

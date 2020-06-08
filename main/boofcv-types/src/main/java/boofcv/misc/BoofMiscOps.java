@@ -20,7 +20,7 @@ package boofcv.misc;
 
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
-import georegression.struct.point.Point2D_I16;
+import georegression.struct.GeoTuple;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
@@ -65,9 +65,14 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static void copyAll_2D_I16(FastAccess<Point2D_I16> src, FastQueue<Point2D_I16> dst ) {
+	/**
+	 * Copies all of src into dst by appended it onto it
+	 */
+	public static<Point extends GeoTuple<Point>>
+	void copyAll(FastAccess<Point> src, FastQueue<Point> dst ) {
+		dst.growArray(dst.size+src.size);
 		for (int i = 0; i < src.size; i++) {
-			dst.grow().set(src.get(i));
+			dst.grow().setTo(src.get(i));
 		}
 	}
 

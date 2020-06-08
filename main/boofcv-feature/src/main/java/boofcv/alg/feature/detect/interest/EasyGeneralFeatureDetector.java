@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,7 +115,7 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 		if (detector.getRequiresHessian())
 			hessian.process(derivX, derivY, derivXX, derivYY, derivXY);
 
-		detector.setExcludeMaximum(exclude);
+		detector.setExclude(exclude);
 		detector.process(input, derivX, derivY, derivXX, derivYY, derivXY);
 	}
 

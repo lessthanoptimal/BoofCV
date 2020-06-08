@@ -61,9 +61,6 @@ public class JPyramidLevels extends JPanel implements ActionListener {
 		fieldPixels.setPreferredSize(fieldLevels.getPreferredSize());
 		fieldPixels.setMaximumSize(fieldPixels.getPreferredSize());
 
-		fieldLevels.addPropertyChangeListener(e-> JPyramidLevels.this.actionPerformed(fieldLevels));
-		fieldPixels.addPropertyChangeListener(e-> JPyramidLevels.this.actionPerformed(fieldPixels));
-
 		isFixedLevels = config.isFixedLevels();
 		if(isFixedLevels) {
 			numberOfLevels = config.numLevelsRequested;
@@ -74,6 +71,15 @@ public class JPyramidLevels extends JPanel implements ActionListener {
 		fieldPixels.setValue(minPixels);
 		updateType(isFixedLevels);
 
+		// Now that everything has been configured set up the listeners
+		fieldLevels.addPropertyChangeListener(e-> {
+			if( e.getPropertyName().equals("value"))
+				JPyramidLevels.this.actionPerformed(fieldLevels);
+		});
+		fieldPixels.addPropertyChangeListener(e-> {
+			if( e.getPropertyName().equals("value"))
+				JPyramidLevels.this.actionPerformed(fieldPixels);
+		});
 		bType.addActionListener(this);
 		fieldLevels.addActionListener(this);
 		fieldPixels.addActionListener(this);

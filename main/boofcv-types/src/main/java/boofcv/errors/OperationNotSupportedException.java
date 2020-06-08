@@ -16,19 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.interest;
-
-import boofcv.alg.feature.detect.intensity.FastCornerDetector;
-import boofcv.alg.feature.detect.intensity.impl.ImplFastCorner11_U8;
-import boofcv.alg.feature.detect.selector.FeatureSelectN;
-import boofcv.struct.image.GrayU8;
+package boofcv.errors;
 
 /**
+ * Thrown when an operation is not supported
+ *
  * @author Peter Abeles
  */
-class TestFastToInterestPoint extends GeneralInterestPointDetectorChecks<GrayU8> {
-	public TestFastToInterestPoint() {
-		super(new FastToInterestPoint<>(new FastCornerDetector<>(new ImplFastCorner11_U8(20)),
-				new FeatureSelectN<>()), false, false, GrayU8.class);
+public class OperationNotSupportedException extends RuntimeException {
+	public OperationNotSupportedException() {}
+
+	public OperationNotSupportedException(String message) {
+		super(message);
+	}
+
+	public OperationNotSupportedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public OperationNotSupportedException(Throwable cause) {
+		super(cause);
+	}
+
+	public OperationNotSupportedException(String message, Throwable cause,
+										  boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
 }

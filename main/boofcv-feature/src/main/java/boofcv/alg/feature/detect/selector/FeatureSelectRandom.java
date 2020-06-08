@@ -19,12 +19,12 @@
 package boofcv.alg.feature.detect.selector;
 
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.GrayF32;
-import georegression.struct.point.Point2D_I16;
+import georegression.struct.GeoTuple;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 /**
@@ -33,7 +33,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class FeatureSelectRandom implements FeatureSelectLimit {
+public class FeatureSelectRandom<Point extends GeoTuple<Point>> implements FeatureSelectLimit<Point> {
 
 	// Random number generator used to select points
 	final Random rand;
@@ -46,15 +46,15 @@ public class FeatureSelectRandom implements FeatureSelectLimit {
 	}
 
 	@Override
-	public void select(GrayF32 intensity, boolean positive,
-					   FastAccess<Point2D_I16> prior, FastAccess<Point2D_I16> detected, int limit,
-					   FastQueue<Point2D_I16> selected)
+	public void select( int imageWidth, int imageHeight,
+						@Nullable FastAccess<Point> prior,
+						FastAccess<Point> detected, int limit, FastQueue<Point> selected)
 	{
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!
 		if( detected.size <= limit ) {
-			BoofMiscOps.copyAll_2D_I16(detected,selected);
+			BoofMiscOps.copyAll(detected,selected);
 			return;
 		}
 
@@ -65,9 +65,10 @@ public class FeatureSelectRandom implements FeatureSelectLimit {
 		}
 
 		// randomly select points up to the limit
+		selected.resize(limit);
 		for (int i = 0; i < limit; i++) {
 			int idx = rand.nextInt(indexes.size-i);
-			selected.grow().set( detected.data[ indexes.data[idx] ]);
+			selected.get(i).setTo( detected.data[ indexes.data[idx] ]);
 			// copy an unused value over the used value
 			indexes.data[idx] = indexes.data[indexes.size-i-1];
 		}

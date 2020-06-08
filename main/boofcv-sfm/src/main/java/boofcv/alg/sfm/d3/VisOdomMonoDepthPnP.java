@@ -201,6 +201,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			frameManager.handleSpawnedTracks(tracker, scene.cameras.getTail());
 		}
 		long time6 = System.nanoTime();
+		if( verbose != null )
+			verbose.println("   Visible All      "+ (tracker.getTotalInactive()+tracker.getTotalActive()));
 
 		//=============================================================================================
 		//========== Summarize profiling results
@@ -343,6 +345,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		long frameID = tracker.getFrameID();
 
+		int totalRejected = 0;
+
 		tracker.spawnTracks();
 		List<PointTrack> spawned = tracker.getNewTracks(null);
 
@@ -358,10 +362,11 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			// discard point if it can't localized
 			if( !pixelTo3D.process(pt.pixel.x,pt.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
 //				System.out.println("Dropped pixelTo3D  tt="+pt.featureId);
+				totalRejected++;
 				tracker.dropTrack(pt);
 			} else {
 				if( scene.findByTrackerTrack(pt) != null ) {
-					Track btrack = scene.findByTrackerTrack(pt);
+//					Track btrack = scene.findByTrackerTrack(pt);
 //					System.out.println("BUG! Tracker recycled... bt="+btrack.id+" tt="+t.featureId);
 					throw new RuntimeException("BUG! Recycled tracker track too early tt="+pt.featureId);
 				}
@@ -390,6 +395,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 				visibleTracks.add(btrack);
 			}
 		}
+		if( verbose != null ) verbose.println("   Rejected spawned "+totalRejected);
 	}
 
 	/**

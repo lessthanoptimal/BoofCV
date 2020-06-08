@@ -46,7 +46,7 @@ public class ConfigFastCorner implements Configuration {
 	 * an extremely large amount of resources unexpectedly. If a fractional value is specified then that's relative
 	 * to the total number of pixels in the image.
 	 */
-	public ConfigLength maxFeatures = ConfigLength.fixed(2000);
+	public ConfigLength maxFeatures = ConfigLength.relative(0.1,0);
 
 	/**
 	 * If true then a non-maximum suppression will be used with corner intensity based on the heuristic (see code).
@@ -73,7 +73,7 @@ public class ConfigFastCorner implements Configuration {
 	public void setTo(ConfigFastCorner src ) {
 		this.pixelTol = src.pixelTol;
 		this.minContinuous = src.minContinuous;
-		this.maxFeatures = src.maxFeatures;
+		this.maxFeatures.setTo(src.maxFeatures);
 		this.nonMax = src.nonMax;
 	}
 

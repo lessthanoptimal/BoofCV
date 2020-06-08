@@ -19,6 +19,8 @@
 package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.QueueCorner;
+import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 /**
  * @author Peter Abeles
  */
-class TestFeatureSelectFirst extends ChecksFeatureSelectLimit {
+class TestFeatureSelectN extends ChecksFeatureSelectLimit.I16 {
 	@Override
-	public FeatureSelectFirst createAlgorithm() {
-		return new FeatureSelectFirst();
+	public FeatureSelectN<Point2D_I16> createAlgorithm() {
+		return new FeatureSelectN<>();
 	}
 
 	/**
@@ -38,16 +40,16 @@ class TestFeatureSelectFirst extends ChecksFeatureSelectLimit {
 	 */
 	@Test
 	void checkOrder() {
-		QueueCorner detected = createRandom(15);
+		FastQueue<Point2D_I16> detected = createRandom(15);
 
 		QueueCorner found = new QueueCorner();
-		FeatureSelectFirst alg = createAlgorithm();
-		alg.select(intensity,true,null,detected,10,found);
+		FeatureSelectN<Point2D_I16> alg = createAlgorithm();
+		alg.select(width,height,null,detected,10,found);
 
 		assertEquals(10,found.size);
 		for (int i = 0; i < found.size; i++) {
-			assertNotSame(found.get(i), detected.get(i));
-			assertEquals(found.get(i), detected.get(i));
+			int matchIdx = detected.indexOf(found.get(i));
+			assertNotSame(found.get(i), detected.get(matchIdx));
 		}
 	}
 }

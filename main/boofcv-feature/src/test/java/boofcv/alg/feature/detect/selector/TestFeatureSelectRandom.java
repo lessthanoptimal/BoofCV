@@ -19,6 +19,8 @@
 package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.QueueCorner;
+import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestFeatureSelectRandom extends ChecksFeatureSelectLimit {
+class TestFeatureSelectRandom extends ChecksFeatureSelectLimit.I16 {
 
 	@Override
-	public FeatureSelectRandom createAlgorithm() {
-		return new FeatureSelectRandom(0xFEED);
+	public FeatureSelectRandom<Point2D_I16> createAlgorithm() {
+		return new FeatureSelectRandom<>(0xFEED);
 	}
 
 	/**
@@ -39,13 +41,13 @@ class TestFeatureSelectRandom extends ChecksFeatureSelectLimit {
 	 */
 	@Test
 	void checkOrderChanges() {
-		QueueCorner detected = createRandom(15);
+		FastQueue<Point2D_I16> detected = createRandom(15);
 
-		FeatureSelectRandom alg = createAlgorithm();
+		FeatureSelectRandom<Point2D_I16> alg = createAlgorithm();
 		QueueCorner foundA = new QueueCorner();
-		alg.select(intensity,true,null,detected,10,foundA);
+		alg.select(width,height,null,detected,10,foundA);
 		QueueCorner foundB = new QueueCorner();
-		alg.select(intensity,true,null,detected,10,foundB);
+		alg.select(width,height,null,detected,10,foundB);
 
 		assertEquals(10,foundA.size);
 		assertEquals(10,foundB.size);

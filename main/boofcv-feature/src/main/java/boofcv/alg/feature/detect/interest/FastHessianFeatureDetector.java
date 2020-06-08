@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.struct.QueueCorner;
@@ -89,7 +89,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;
 	// If too many features have been selected this is used to resolve the ambiguity
-	private FeatureSelectLimit selectMax;
+	private FeatureSelectLimitIntensity<Point2D_I16> selectMax;
 	private FastQueue<Point2D_I16> selected = new FastQueue<>(Point2D_I16::new);
 	// the maximum number of returned feature per scale
 	private int maxFeaturesPerScale;
@@ -141,7 +141,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			this.maxFeaturesPerScale = maxFeaturesPerScale;
-			selectMax = new FeatureSelectNBest();
+			selectMax = new FeatureSelectNBest.I16();
 		}
 		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;

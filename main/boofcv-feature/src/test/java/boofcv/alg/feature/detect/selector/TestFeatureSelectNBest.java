@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import georegression.struct.point.Point2D_I16;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,11 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestFeatureSelectNBest extends ChecksFeatureSelectLimit {
+class TestFeatureSelectNBest extends ChecksFeatureSelectLimitIntensity.I16 {
 
 	@Override
-	public FeatureSelectNBest createAlgorithm() {
-		return new FeatureSelectNBest();
+	public FeatureSelectNBest<Point2D_I16> createAlgorithm() {
+		return new FeatureSelectNBest.I16();
 	}
 
 	/**
@@ -52,7 +53,7 @@ class TestFeatureSelectNBest extends ChecksFeatureSelectLimit {
 		detected.append(8,8);
 
 		QueueCorner found = new QueueCorner();
-		FeatureSelectNBest alg = new FeatureSelectNBest();
+		FeatureSelectNBest<Point2D_I16> alg = new FeatureSelectNBest.I16();
 		alg.select(intensity,true,null,detected,20, found);
 
 		assertEquals(4,found.size);

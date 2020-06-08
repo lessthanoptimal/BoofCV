@@ -18,18 +18,18 @@
 
 package boofcv.factory.feature.detect.selector;
 
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link FeatureSelectLimit}
+ * Configuration for {@link FeatureSelectLimitIntensity}
  *
  * @author Peter Abeles
  */
 public class ConfigSelectLimit implements Configuration {
 	/** Specified which selector to use */
-	public SelectLimitTypes type = SelectLimitTypes.BEST_N;
+	public SelectLimitTypes type = SelectLimitTypes.SELECT_N;
 
 	/**
 	 *  Random seed used by RANDOM selector
@@ -53,7 +53,7 @@ public class ConfigSelectLimit implements Configuration {
 	}
 
 	public static ConfigSelectLimit selectBestN() {
-		return new ConfigSelectLimit(SelectLimitTypes.BEST_N,-1);
+		return new ConfigSelectLimit(SelectLimitTypes.SELECT_N,-1);
 	}
 
 	public static ConfigSelectLimit selectRandom(long seed) {
@@ -61,7 +61,7 @@ public class ConfigSelectLimit implements Configuration {
 	}
 
 	public static ConfigSelectLimit selectUniform(double inverseRegionScale) {
-		ConfigSelectLimit config = new ConfigSelectLimit(SelectLimitTypes.UNIFORM_BEST,-1);
+		ConfigSelectLimit config = new ConfigSelectLimit(SelectLimitTypes.UNIFORM,-1);
 		config.uniform.regionScaleFactor = inverseRegionScale;
 		return config;
 	}

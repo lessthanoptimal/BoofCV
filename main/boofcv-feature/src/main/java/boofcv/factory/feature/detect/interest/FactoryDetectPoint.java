@@ -26,7 +26,7 @@ import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
@@ -35,6 +35,7 @@ import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_I16;
 
 import javax.annotation.Nullable;
 
@@ -74,7 +75,7 @@ public class FactoryDetectPoint {
 			case SHI_TOMASI -> FactoryDetectPoint.createShiTomasi(config.general, config.shiTomasi, derivType);
 			case FAST -> FactoryDetectPoint.createFast(config.general, config.fast, imageType);
 			case KIT_ROS -> FactoryDetectPoint.createKitRos(config.general, derivType);
-			case MEDIUM -> FactoryDetectPoint.createMedian(config.general, imageType);
+			case MEDIAN -> FactoryDetectPoint.createMedian(config.general, imageType);
 			case DETERMINANT -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.DETERMINANT, config.general, imageType);
 			case LAPLACIAN -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.TRACE, config.general, imageType);
 			case DETERMINANT_H -> FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, derivType);
@@ -224,19 +225,11 @@ public class FactoryDetectPoint {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
-		GeneralFeatureIntensity<T, D> intensity;
-		switch (type) {
-			case DETERMINANT:
-				intensity = FactoryIntensityPoint.hessianDet(imageType);
-				break;
-
-			case TRACE:
-				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian(imageType);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown type");
-		}
+		GeneralFeatureIntensity<T, D> intensity = switch (type) {
+			case DETERMINANT -> FactoryIntensityPoint.hessianDet(imageType);
+			case TRACE -> (GeneralFeatureIntensity) FactoryIntensityPoint.laplacian(imageType);
+			default -> throw new IllegalArgumentException("Unknown type");
+		};
 		return createGeneral(intensity, configDetector);
 	}
 
@@ -250,19 +243,26 @@ public class FactoryDetectPoint {
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createGeneral(GeneralFeatureIntensity<T, D> intensity,
 											   ConfigGeneralDetector config ) {
-		// create a copy since it's going to modify the detector config
 		ConfigGeneralDetector foo = new ConfigGeneralDetector();
 		foo.setTo(config);
 		config = foo;
 		config.ignoreBorder += config.radius;
-		if( !intensity.localMaximums() )
+
+		NonMaxSuppression extractorMin = null;
+		NonMaxSuppression extractorMax = null;
+		if( intensity.localMinimums() ) {
+			config.detectMinimums = true;
 			config.detectMaximums = false;
-		if( !intensity.localMinimums() )
+			extractorMin = FactoryFeatureExtractor.nonmax(config);
+		}
+		if( intensity.localMaximums() ) {
 			config.detectMinimums = false;
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
-		FeatureSelectLimit selector = FactorySelectLimit.create(config.selector);
-		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<>(intensity, extractor, selector);
-		det.setMaxFeatures(config.maxFeatures);
+			config.detectMaximums = true;
+			extractorMax = FactoryFeatureExtractor.nonmax(config);
+		}
+		FeatureSelectLimitIntensity<Point2D_I16> selector = FactorySelectLimit.intensity(config.selector, Point2D_I16.class);
+		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
+		det.setFeatureLimit(config.maxFeatures);
 
 		return det;
 	}

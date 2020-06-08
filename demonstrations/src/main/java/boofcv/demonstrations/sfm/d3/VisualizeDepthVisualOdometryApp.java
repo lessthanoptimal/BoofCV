@@ -421,7 +421,7 @@ public class VisualizeDepthVisualOdometryApp
 		configTracker.detDesc.detectPoint.general.threshold = 1.0f;
 		configTracker.detDesc.detectPoint.general.radius = 4;
 		configTracker.detDesc.detectPoint.general.maxFeatures = 400;
-		configTracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.BEST_N;
+		configTracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 
 		configTracker.associate.type = ConfigAssociate.AssociationType.GREEDY;
 		configTracker.associate.greedy.forwardsBackwards = true;

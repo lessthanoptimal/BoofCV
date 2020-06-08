@@ -18,30 +18,28 @@
 
 package boofcv.alg.feature.detect.selector;
 
+import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
 
 /**
- * Selects a subset of the features inside the image until it hits the requested number.
- *
- * @see FeatureSelectLimitIntensity
+ * Converts {@link FeatureSelectLimit} into {@link FeatureSelectLimitIntensity}.
  *
  * @author Peter Abeles
  */
-public interface FeatureSelectLimit<Point> {
-	/**
-	 * Selects features inside the image.
-	 *
-	 * @param imageWidth Width of the image the features were detected in
-	 * @param imageHeight Height of the image the features were detected in
-	 * @param prior (Input) Locations of previously detected features
-	 * @param detected (Input) Locations of newly detected features
-	 * @param limit (Input) The maximum number of new features detected
-	 * @param selected (Output) Selected features. Element count not exceed the limit. Reset on every call.
-	 */
-	void select( int imageWidth, int imageHeight,
-				 @Nullable FastAccess<Point> prior,
-				 FastAccess<Point> detected, int limit , FastQueue<Point> selected );
+public class ConvertLimitToIntensity<Point> implements FeatureSelectLimitIntensity<Point>
+{
+	FeatureSelectLimit<Point> alg;
+
+	public ConvertLimitToIntensity(FeatureSelectLimit<Point> alg) {
+		this.alg = alg;
+	}
+
+	@Override
+	public void select(GrayF32 intensity, boolean positive, @Nullable FastAccess<Point> prior,
+					   FastAccess<Point> detected, int limit, FastQueue<Point> selected) {
+		alg.select(intensity.width,intensity.height,prior,detected,limit,selected);
+	}
 }

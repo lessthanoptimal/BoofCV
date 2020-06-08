@@ -21,46 +21,38 @@ package boofcv.alg.feature.detect.selector;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
-import boofcv.struct.image.GrayF32;
 import georegression.struct.GeoTuple;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.sorting.QuickSort_F32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
- * Attempts to select features uniformly across the image with a preference for locally more intense features. This
- * is done by breaking the image up into a grid. Then features are added by selecting the most intense feature from
- * each grid. If a cell has a prior feature in it then it is skipped for that iteration and the prior counter is
- * decremented. This is repeated until the limit has been reached or there are no more features to add.
+ * Attempts to select features uniformly across the image. This is done by breaking the image up into a grid and
+ * selecting a specific number randomly from each grid cell.
  *
  * @author Peter Abeles
  */
-public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
-		implements FeatureSelectLimitIntensity<Point> {
+public abstract class FeatureSelectUniform<Point extends GeoTuple<Point>>
+		implements FeatureSelectLimit<Point> {
 
 	/** Configuration for uniformly selecting a grid */
 	public ConfigGridUniform configUniform = new ConfigGridUniform();
 
-	// Grid for storing a set of objects
-	ImageGrid<Info<Point>> grid = new ImageGrid<>(Info::new,Info::reset);
+	// Used to select points randomly inside a cell
+	public Random rand = new Random(0xDEADBEEF);
 
-	// Workspace variables for sorting the cells
-	GrowQueue_F32 pointIntensity = new GrowQueue_F32();
-	QuickSort_F32 sorter = new QuickSort_F32();
-	GrowQueue_I32 indexes = new GrowQueue_I32();
-	List<Point> workList = new ArrayList<>();
+	// Grid for storing a set of objects
+	ImageGrid<Info<Point>> grid = new ImageGrid<>(Info::new, Info::reset);
 
 	@Override
-	public void select(GrayF32 intensity, boolean positive,
+	public void select(int imageWidth, int imageHeight,
 					   @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
 					   FastQueue<Point> selected)
 	{
@@ -73,8 +65,8 @@ public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
 		}
 
 		// Adjust the grid to the requested limit and image shape
-		int targetCellSize = configUniform.selectTargetCellSize(limit,intensity.width,intensity.height);
-		grid.initialize(targetCellSize,intensity.width,intensity.height);
+		int targetCellSize = configUniform.selectTargetCellSize(limit,imageWidth, imageHeight);
+		grid.initialize(targetCellSize,imageWidth, imageHeight);
 
 		// Note all the prior features
 		if( prior != null ) {
@@ -89,9 +81,6 @@ public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
 			Point p = detected.data[i];
 			getGridCell(p).detected.add(p);
 		}
-
-		// Sort elements in each cell in order be inverse preference
-		sortCellLists(intensity, positive);
 
 		// Add points until the limit has been reached or there are no more cells to add
 		final FastAccess<Info<Point>> cells = grid.cells;
@@ -113,58 +102,15 @@ public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
 				// Are there any detected features remaining?
 				if (info.detected.isEmpty())
 					continue;
-				selected.grow().setTo( info.detected.remove( info.detected.size()-1) );
+
+				// Randomly select one and add it tot he grid
+				selected.grow().setTo(info.detected.remove( rand.nextInt(info.detected.size())));
 				change = true;
 			}
 			if( !change )
 				break;
 		}
 	}
-
-	/**
-	 * Sort points in cells based on their intensity
-	 */
-	private void sortCellLists(GrayF32 intensity, boolean positive) {
-		// Add points to the grid elements and sort them based feature intensity
-		final FastAccess<Info<Point>> cells = grid.cells;
-		for (int cellidx = 0; cellidx < cells.size; cellidx++) {
-			final List<Point> cellPoints = cells.get(cellidx).detected;
-			if( cellPoints.isEmpty() )
-				continue;
-			final int N = cellPoints.size();
-			pointIntensity.resize(N);
-			indexes.resize(N);
-
-			// select the score's sign so that the most desirable is at the end of the list
-			// That way elements can be removed from the top of the list, which is less expensive.
-			if( positive ) {
-				for (int pointIdx = 0; pointIdx < N; pointIdx++) {
-					Point p = cellPoints.get(pointIdx);
-					pointIntensity.data[pointIdx] = getIntensity(intensity,p);
-				}
-			} else {
-				for (int pointIdx = 0; pointIdx < N; pointIdx++) {
-					Point p = cellPoints.get(pointIdx);
-					pointIntensity.data[pointIdx] = -getIntensity(intensity,p);
-				}
-			}
-			sorter.sort(pointIntensity.data,0,N,indexes.data);
-
-			// Extract an ordered list of points based on intensity and swap out the cell list to avoid a copy
-			workList.clear();
-			for (int i = 0; i < N; i++) {
-				workList.add( cellPoints.get(indexes.data[i]));
-			}
-			List<Point> tmp = cells.data[cellidx].detected;
-			cells.data[cellidx].detected = workList;
-			workList = tmp;
-		}
-	}
-
-	/**
-	 * Looks up the feature intensity given the point
-	 */
-	protected abstract float getIntensity( GrayF32 intensity, Point p );
 
 	/**
 	 * Returns the grid cell that contains the point
@@ -189,12 +135,7 @@ public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
 	/**
 	 * Implementation for {@link Point2D_I16}
 	 */
-	public static class I16 extends FeatureSelectUniformBest<Point2D_I16> {
-		@Override
-		protected float getIntensity(GrayF32 intensity, Point2D_I16 p) {
-			return intensity.unsafe_get(p.x,p.y);
-		}
-
+	public static class I16 extends FeatureSelectUniform<Point2D_I16> {
 		@Override
 		protected Info<Point2D_I16> getGridCell(Point2D_I16 p) {
 			return grid.getCellAtPixel(p.x,p.y);
@@ -204,12 +145,7 @@ public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
 	/**
 	 * Implementation for {@link Point2D_F32}
 	 */
-	public static class F32 extends FeatureSelectUniformBest<Point2D_F32> {
-		@Override
-		protected float getIntensity(GrayF32 intensity, Point2D_F32 p) {
-			return intensity.unsafe_get((int)p.x,(int)p.y);
-		}
-
+	public static class F32 extends FeatureSelectUniform<Point2D_F32> {
 		@Override
 		protected Info<Point2D_F32> getGridCell(Point2D_F32 p) {
 			return grid.getCellAtPixel((int)p.x,(int)p.y);
@@ -219,12 +155,7 @@ public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
 	/**
 	 * Implementation for {@link Point2D_F64}
 	 */
-	public static class F64 extends FeatureSelectUniformBest<Point2D_F64> {
-		@Override
-		protected float getIntensity(GrayF32 intensity, Point2D_F64 p) {
-			return intensity.unsafe_get((int)p.x,(int)p.y);
-		}
-
+	public static class F64 extends FeatureSelectUniform<Point2D_F64> {
 		@Override
 		protected Info<Point2D_F64> getGridCell(Point2D_F64 p) {
 			return grid.getCellAtPixel((int)p.x,(int)p.y);
