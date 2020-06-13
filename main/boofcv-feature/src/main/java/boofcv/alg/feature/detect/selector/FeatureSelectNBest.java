@@ -45,6 +45,7 @@ public abstract class FeatureSelectNBest<Point extends GeoTuple<Point>> implemen
 	@Override
 	public void select(GrayF32 intensity , boolean positive, @Nullable FastAccess<Point> prior,
 					   FastAccess<Point> detected, int limit , FastQueue<Point> selected) {
+		assert(limit>0);
 		selected.reset();
 
 		if (detected.size <= limit) {

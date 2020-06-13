@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.filter.derivative.HessianThreeDeterminant;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
@@ -56,12 +56,12 @@ public class WrapperHessianThreeImageDetIntensity<I extends ImageGray<I>,D exten
 	}
 
 	@Override
-	public QueueCorner getCandidatesMin() {
+	public ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public QueueCorner getCandidatesMax() {
+	public ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

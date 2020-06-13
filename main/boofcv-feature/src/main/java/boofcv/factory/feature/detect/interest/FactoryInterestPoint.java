@@ -61,11 +61,6 @@ public class FactoryInterestPoint {
 			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian,inputType);
 			case SIFT: return FactoryInterestPoint.sift(config.scaleSpaceSift,config.sift,inputType);
 			case POINT: {
-				// check for exceptions that don't use the GeneralFeatureDetector
-				if( config.point.type == PointDetectorTypes.FAST && !config.point.fast.nonMax) {
-					return createFast(config.point.fast,config.point.general.maxFeatures, config.point.general.selector,inputType);
-				}
-
 				if( derivType == null )
 					derivType = GImageDerivativeOps.getDerivativeType(inputType);
 				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point,inputType,derivType);
@@ -92,16 +87,12 @@ public class FactoryInterestPoint {
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
 
-		if( configFast.nonMax)
-			throw new RuntimeException("This interface does not provide support for feature intensity. Use the other one.");
-
 		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
-		alg.getMaxFeatures().setTo(configFast.maxFeatures);
 
 		FeatureSelectLimit<Point2D_I16> selector = FactorySelectLimit.spatial(configSelect, Point2D_I16.class);
 
 		var ret = new FastToInterestPoint<>(alg,selector);
-		ret.setFeatureLimitPerSet(featureLimitPerSet);
+		ret.setFeatureLimitPerSet(featureLimitPerSet<=0?Integer.MAX_VALUE:featureLimitPerSet);
 		return ret;
 	}
 

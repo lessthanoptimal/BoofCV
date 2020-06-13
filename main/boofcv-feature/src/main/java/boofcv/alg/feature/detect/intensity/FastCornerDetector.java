@@ -20,8 +20,7 @@ package boofcv.alg.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.impl.FastCornerInterface;
 import boofcv.misc.DiscretizedCircle;
-import boofcv.struct.ConfigLength;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
@@ -77,19 +76,14 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	private int stride = 0;
 
 	// list of pixels that might be corners.
-	private final @Getter QueueCorner candidatesLow = new QueueCorner(10);
-	private final @Getter QueueCorner candidatesHigh = new QueueCorner(10);
+	private final @Getter ListIntPoint2D candidatesLow = new ListIntPoint2D();
+	private final @Getter ListIntPoint2D candidatesHigh = new ListIntPoint2D();
 
 	// reference to the input image
 	protected T image;
 
 	// Used to sample the image and compute the score
 	protected FastCornerInterface<T> helper;
-
-	/**
-	 * Maximum number features. If relative then relative to number of pixels in the image
-	 */
-	protected @Getter final ConfigLength maxFeatures = ConfigLength.fixed(2000);
 
 	/**
 	 * Constructor
@@ -108,9 +102,9 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	 * used
 	 */
 	public void process( T image , GrayF32 intensity ) {
-		int maxFeatures = this.maxFeatures.computeI(image.width*image.height);
-		candidatesLow.reset();
-		candidatesHigh.reset();
+		candidatesLow.configure(image.width,image.height);
+		candidatesHigh.configure(image.width,image.height);
+
 		this.image = image;
 
 		if( stride != image.stride ) {
@@ -128,17 +122,14 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 
 				if( result < 0 ) {
 					intensity.data[indexIntensity] = helper.scoreLower(index);
-					candidatesLow.append(x,y);
+					candidatesLow.add(x,y);
 				} else if( result > 0) {
 					intensity.data[indexIntensity] = helper.scoreUpper(index);
-					candidatesHigh.append(x,y);
+					candidatesHigh.add(x,y);
 				} else {
 					intensity.data[indexIntensity] = 0;
 				}
 			}
-			// check on a per row basis to reduce impact on performance
-			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
-				break;
 		}
 	}
 
@@ -146,9 +137,9 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	 * Computes fast corner features
 	 */
 	public void process( T image ) {
-		int maxFeatures = this.maxFeatures.computeI(image.width*image.height);
-		candidatesLow.reset();
-		candidatesHigh.reset();
+		candidatesLow.configure(image.width,image.height);
+		candidatesHigh.configure(image.width,image.height);
+
 		this.image = image;
 
 		if( stride != image.stride ) {
@@ -164,14 +155,11 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 				int result = helper.checkPixel(index);
 
 				if( result < 0 ) {
-					candidatesLow.append(x,y);
+					candidatesLow.add(x,y);
 				} else if( result > 0 ) {
-					candidatesHigh.append(x,y);
+					candidatesHigh.add(x,y);
 				}
 			}
-			// check on a per row basis to reduce impact on performance
-			if( candidatesLow.size + candidatesHigh.size >= maxFeatures )
-				break;
 		}
 	}
 

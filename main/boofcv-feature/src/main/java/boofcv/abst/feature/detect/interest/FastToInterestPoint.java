@@ -44,14 +44,17 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 	private int totalLow;
 
 	// selects the features with the largest intensity
-	protected @Getter FeatureSelectLimit<Point2D_I16> selectMax;
+	protected @Getter FeatureSelectLimit<Point2D_I16> selectLimit;
 	protected QueueCorner selected = new QueueCorner();
 	/** Maximum number of features it can select per set */
 	public @Getter @Setter int featureLimitPerSet = Integer.MAX_VALUE;
 
-	public FastToInterestPoint(FastCornerDetector<T> detector , FeatureSelectLimit<Point2D_I16> selectMax ) {
+	// temporary storage for corner candidates
+	QueueCorner candidates = new QueueCorner();
+
+	public FastToInterestPoint(FastCornerDetector<T> detector , FeatureSelectLimit<Point2D_I16> selectLimit) {
 		this.detector = detector;
-		this.selectMax = selectMax;
+		this.selectLimit = selectLimit;
 	}
 
 	@Override
@@ -59,9 +62,10 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 		detector.process(input);
 
 		// get all the low candidates
-		QueueCorner low = detector.getCandidatesLow();
+		candidates.reset();
+		detector.getCandidatesLow().copyInto(candidates);
 		// If there are too many select a subset based on this rule
-		selectMax.select(input.width,input.height,null,low,featureLimitPerSet,selected);
+		selectLimit.select(input.width,input.height,null,candidates,featureLimitPerSet,selected);
 		// Note how many low corners there are so that the set is known in the future
 		totalLow = selected.size;
 		// copy the results
@@ -72,11 +76,12 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 		}
 
 		// Do the same for high corners
-		QueueCorner high = detector.getCandidatesHigh();
-		selectMax.select(input.width,input.height,null,high,featureLimitPerSet,selected);
+		candidates.reset();
+		detector.getCandidatesHigh().copyInto(candidates);
+		selectLimit.select(input.width,input.height,null,candidates,featureLimitPerSet,selected);
 		// predeclare and reshape the array
 		found.growArray(found.size+selected.size);
-		found.size =found.size+selected.size;
+		found.size = found.size+selected.size;
 		// copy the new elements into the found array
 		for (int i = 0; i < selected.size; i++) {
 			Point2D_I16 c = selected.get(i);

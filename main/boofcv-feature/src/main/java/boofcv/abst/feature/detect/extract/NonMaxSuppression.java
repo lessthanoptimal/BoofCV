@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.detect.extract;
 
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
@@ -65,44 +66,44 @@ public interface NonMaxSuppression {
 	 * @param foundMin (Output) Storage for found minimums. Can be null if not used.
 	 * @param foundMax (Output) Storage for found maximums. Can be null if not used.
 	 */
-	public void process(GrayF32 intensity,
-						QueueCorner candidateMin, QueueCorner candidateMax,
-						QueueCorner foundMin, QueueCorner foundMax );
+	void process(GrayF32 intensity,
+				 ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
+				 QueueCorner foundMin, QueueCorner foundMax );
 
 	/**
 	 * Returns true if the algorithm requires a candidate list of corners.
 	 *
 	 * @return true if candidates are required.
 	 */
-	public boolean getUsesCandidates();
+	boolean getUsesCandidates();
 
 	/**
 	 * Maximum value for detected minimums
 	 *
 	 * @return threshold for feature selection
 	 */
-	public float getThresholdMinimum();
+	float getThresholdMinimum();
 
 	/**
 	 * Minimum value for detected maximums
 	 *
 	 * @return threshold for feature selection
 	 */
-	public float getThresholdMaximum();
+	float getThresholdMaximum();
 
 	/**
 	 * Change the feature selection threshold for finding local minimums.
 	 *
 	 * @param threshold The new selection threshold.
 	 */
-	public void setThresholdMinimum(float threshold);
+	void setThresholdMinimum(float threshold);
 
 	/**
 	 * Change the feature selection threshold for finding local maximums.
 	 *
 	 * @param threshold The new selection threshold.
 	 */
-	public void setThresholdMaximum(float threshold);
+	void setThresholdMaximum(float threshold);
 
 	/**
 	 * Defines the region inside the image in which a pixel can be an extreme.
@@ -110,14 +111,14 @@ public interface NonMaxSuppression {
 	 *
 	 * @param border Border size in pixels.
 	 */
-	public void setIgnoreBorder(int border);
+	void setIgnoreBorder(int border);
 
 	/**
 	 * Returns the size of the image border.
 	 *
 	 * @return border size
 	 */
-	public int getIgnoreBorder();
+	int getIgnoreBorder();
 
 	/**
 	 * Species the search radius for the feature

@@ -20,7 +20,6 @@ package boofcv.gui.feature;
 
 import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.controls.JConfigLength;
 
 import javax.swing.*;
 
@@ -34,7 +33,6 @@ public class ControlPanelFastCorner extends StandardAlgConfigPanel {
 
 	private final JSpinner sPixelTol;
 	private final JSpinner sContinuous;
-	private final JConfigLength lengthMaxFeatures;
 
 	private final Listener listener;
 
@@ -45,11 +43,9 @@ public class ControlPanelFastCorner extends StandardAlgConfigPanel {
 
 		sPixelTol = spinner(config.pixelTol,0,255,1);
 		sContinuous = spinner(config.minContinuous,9,12,1);
-		lengthMaxFeatures = configLength(config.maxFeatures,0,4000,listener::handleFastCorner);
 
 		addLabeled(sPixelTol,"Tolerance","Tolerance for deciding if two pixels are significantly different");
 		addLabeled(sContinuous,"Continuous","How many continuous pixels are required for it to be a corner");
-		addLabeled(lengthMaxFeatures,"Stop","Stops detecting features if this is exceeded. Relative to number of pixels.");
 	}
 
 	@Override

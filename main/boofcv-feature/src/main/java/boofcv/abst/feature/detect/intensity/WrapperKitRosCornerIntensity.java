@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.KitRosCornerIntensity;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
@@ -57,12 +57,12 @@ public class WrapperKitRosCornerIntensity<I extends ImageGray<I>,D extends Image
 	}
 
 	@Override
-	public QueueCorner getCandidatesMin() {
+	public ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public QueueCorner getCandidatesMax() {
+	public ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

@@ -55,6 +55,20 @@ public class ConfigExtract implements Configuration {
 	 */
 	public boolean detectMaximums = true;
 
+	public static ConfigExtract max( int radius, float threshold, int ignoreBorder , boolean useStrictRule ) {
+		var ret = new ConfigExtract(radius,threshold,ignoreBorder,useStrictRule);
+		ret.detectMaximums = true;
+		ret.detectMinimums = false;
+		return ret;
+	}
+
+	public static ConfigExtract min( int radius, float threshold, int ignoreBorder , boolean useStrictRule ) {
+		var ret = new ConfigExtract(radius,threshold,ignoreBorder,useStrictRule);
+		ret.detectMaximums = false;
+		ret.detectMinimums = true;
+		return ret;
+	}
+
 	public ConfigExtract(int radius, float threshold, int ignoreBorder, boolean useStrictRule,
 						 boolean detectMinimums, boolean detectMaximums)
 	{

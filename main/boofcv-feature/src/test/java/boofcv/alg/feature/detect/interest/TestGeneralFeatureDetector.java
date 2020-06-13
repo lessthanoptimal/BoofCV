@@ -24,6 +24,7 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
@@ -150,13 +151,18 @@ class TestGeneralFeatureDetector {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
 		intensity.minimums = min;
 		intensity.maximums = max;
-		HelperExtractor extractorMin = new HelperExtractor(true, true);
-		extractorMin.minimums = min;
-		extractorMin.maximums = false;
-		HelperExtractor extractorMax = new HelperExtractor(true, true);
-		extractorMin.minimums = false;
-		extractorMin.maximums = max;
-
+		HelperExtractor extractorMin = null;
+		if( min ) {
+			extractorMin = new HelperExtractor(true, true);
+			extractorMin.minimums = true;
+			extractorMin.maximums = false;
+		}
+		HelperExtractor extractorMax = null;
+		if( max ) {
+			extractorMax = new HelperExtractor(true, true);
+			extractorMax.minimums = false;
+			extractorMax.maximums = true;
+		}
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
 				new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
 
@@ -168,8 +174,10 @@ class TestGeneralFeatureDetector {
 		if( max )
 			assertEquals(1, intensity.candidatesMaxCalled);
 		assertEquals(1, intensity.processCalled);
-		assertEquals(min?1:0, extractorMin.numTimesProcessed);
-		assertEquals(max?1:0, extractorMax.numTimesProcessed);
+		if( min )
+			assertEquals(1, extractorMin.numTimesProcessed);
+		if( max )
+			assertEquals(1, extractorMax.numTimesProcessed);
 	}
 
 	/**
@@ -300,12 +308,18 @@ class TestGeneralFeatureDetector {
 
 		@Override
 		public void process(GrayF32 intensity,
-							QueueCorner candidateMin, QueueCorner candidateMax,
+							ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
 							QueueCorner foundMin, QueueCorner foundMax) {
 			numTimesProcessed++;
 
-			foundMax.append(1, 1);
-			foundMax.append(2, 2);
+			if( foundMin != null ) {
+				foundMin.append(1, 1);
+				foundMin.append(2, 2);
+			}
+			if( foundMax != null ) {
+				foundMax.append(1, 1);
+				foundMax.append(2, 2);
+			}
 		}
 
 		@Override
@@ -365,7 +379,7 @@ class TestGeneralFeatureDetector {
 		boolean requiresHessian;
 		boolean hasCandidates;
 
-		public QueueCorner candidates = new QueueCorner(10);
+		public ListIntPoint2D candidates = new ListIntPoint2D();
 		public int processCalled = 0;
 		public int candidatesMinCalled = 0;
 		public int candidatesMaxCalled = 0;
@@ -392,13 +406,13 @@ class TestGeneralFeatureDetector {
 		}
 
 		@Override
-		public QueueCorner getCandidatesMin() {
+		public ListIntPoint2D getCandidatesMin() {
 			candidatesMinCalled++;
 			return candidates;
 		}
 
 		@Override
-		public QueueCorner getCandidatesMax() {
+		public ListIntPoint2D getCandidatesMax() {
 			candidatesMaxCalled++;
 			return candidates;
 		}

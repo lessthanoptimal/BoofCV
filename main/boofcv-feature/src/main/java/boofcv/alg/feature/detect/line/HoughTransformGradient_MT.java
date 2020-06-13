@@ -20,9 +20,10 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -35,7 +36,9 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 {
 
 	// storage for candidates in each thread's block
-	private final FastQueue<QueueCorner> blockCandidates = new FastQueue<>(QueueCorner::new);
+	private final FastQueue<ListIntPoint2D> blockCandidates = new FastQueue<>(ListIntPoint2D::new);
+
+	Point2D_I32 p = new Point2D_I32();
 
 	/**
 	 * Specifies parameters of transform.
@@ -51,9 +54,10 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 	@Override
 	void transform(GrayU8 binary )
 	{
+		candidates.configure(transform.width,transform.height);
 		blockCandidates.reset();
 		BoofConcurrency.loopBlocks(0,binary.height,blockCandidates,(storage,y0,y1)->{
-			storage.reset();
+			storage.configure(transform.width,transform.height);
 			for (int y = y0; y < y1; y++) {
 				int start = binary.startIndex + y*binary.stride;
 				int end = start + binary.width;
@@ -68,11 +72,11 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 		});
 
 		// Combine results found in each thread together
-		this.candidates.reset();
 		for (int i = 0; i < blockCandidates.size; i++) {
-			QueueCorner s = blockCandidates.get(i);
-			for (int j = 0; j < s.size; j++) {
-				candidates.grow().set(s.get(j));
+			ListIntPoint2D s = blockCandidates.get(i);
+			for (int j = 0; j < s.size(); j++) {
+				s.get(j,p);
+				candidates.add(p.x,p.y);
 			}
 		}
 	}

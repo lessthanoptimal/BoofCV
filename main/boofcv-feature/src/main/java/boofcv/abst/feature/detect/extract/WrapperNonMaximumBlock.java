@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.feature.detect.extract.NonMaxBlock;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
@@ -39,7 +40,7 @@ public class WrapperNonMaximumBlock implements NonMaxSuppression {
 
 	@Override
 	public void process(GrayF32 intensity,
-						QueueCorner candidateMin, QueueCorner candidateMax,
+						ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
 						QueueCorner foundMin, QueueCorner foundMax) {
 		alg.process(intensity, foundMin, foundMax );
 	}

@@ -76,8 +76,8 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 
 	@Test
 	public void checkExpectedCharacteristics() {
-		assertTrue(hasOrientation == detector.hasOrientation());
-		assertTrue(hasRadius == detector.hasScale());
+		assertEquals(hasOrientation, detector.hasOrientation());
+		assertEquals(hasRadius, detector.hasScale());
 	}
 
 	/**

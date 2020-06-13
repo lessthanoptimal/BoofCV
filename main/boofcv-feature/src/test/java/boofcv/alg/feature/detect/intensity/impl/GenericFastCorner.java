@@ -22,10 +22,11 @@ import boofcv.alg.feature.detect.intensity.DetectorFastNaive;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.DiscretizedCircle;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I16;
+import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -79,9 +80,9 @@ public abstract class GenericFastCorner {
 //			input.print();
 			alg.process(input,intensity);
 
-			QueueCorner corners = high?alg.getCandidatesHigh():alg.getCandidatesLow();
-			assertEquals(1,corners.size);
-			Point2D_I16 found = corners.get(0);
+			ListIntPoint2D corners = high?alg.getCandidatesHigh():alg.getCandidatesLow();
+			assertEquals(1,corners.size());
+			Point2D_I32 found = corners.get(0);
 			assertEquals(w/2,found.x);
 			assertEquals(h/2,found.y);
 		}
@@ -100,19 +101,19 @@ public abstract class GenericFastCorner {
 
 		alg.process(input,intensity);
 
-		assertEquals(validator.getCandidatesLow().size,alg.getCandidatesLow().size);
-		assertEquals(validator.getCandidatesHigh().size,alg.getCandidatesHigh().size);
+		assertEquals(validator.getCandidatesLow().size,alg.getCandidatesLow().size());
+		assertEquals(validator.getCandidatesHigh().size,alg.getCandidatesHigh().size());
 
 		for( int i = 0; i < validator.getCandidatesLow().size(); i++ ) {
 			Point2D_I16 v = validator.getCandidatesLow().get(i);
-			Point2D_I16 a = alg.getCandidatesLow().get(i);
+			Point2D_I32 a = alg.getCandidatesLow().get(i);
 
 			assertEquals(v.x,a.x);
 			assertEquals(v.y,a.y);
 		}
 		for( int i = 0; i < validator.getCandidatesHigh().size(); i++ ) {
 			Point2D_I16 v = validator.getCandidatesHigh().get(i);
-			Point2D_I16 a = alg.getCandidatesHigh().get(i);
+			Point2D_I32 a = alg.getCandidatesHigh().get(i);
 
 			assertEquals(v.x,a.x);
 			assertEquals(v.y,a.y);

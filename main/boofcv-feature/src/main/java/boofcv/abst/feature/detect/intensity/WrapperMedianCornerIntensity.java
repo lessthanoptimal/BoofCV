@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
@@ -70,12 +70,12 @@ public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends Imag
 	}
 
 	@Override
-	public QueueCorner getCandidatesMin() {
+	public ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public QueueCorner getCandidatesMax() {
+	public ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

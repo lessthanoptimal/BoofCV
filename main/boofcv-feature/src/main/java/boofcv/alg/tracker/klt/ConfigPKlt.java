@@ -53,7 +53,10 @@ public class ConfigPKlt implements Configuration
 	public boolean pruneClose=false;
 
 	/**
-	 * Specifies the maximum number of features it can track. If < 0 then there is no limit
+	 * Specifies the maximum number of features it can track. If < 0 then there is no limit.
+	 *
+	 * <p>NOTE: {@link boofcv.abst.tracker.PointTrackerKltPyramid} will manage the number of detections and will
+	 * override {@link boofcv.abst.feature.detect.interest.ConfigGeneralDetector#maxFeatures}.</p>
 	 */
 	public int maximumTracks = -1;
 
@@ -81,6 +84,7 @@ public class ConfigPKlt implements Configuration
 		this.templateRadius = src.templateRadius;
 		this.pyramidLevels.setTo(src.pyramidLevels);
 		this.pruneClose = src.pruneClose;
+		this.maximumTracks = src.maximumTracks;
 	}
 
 	public ConfigPKlt copy() {

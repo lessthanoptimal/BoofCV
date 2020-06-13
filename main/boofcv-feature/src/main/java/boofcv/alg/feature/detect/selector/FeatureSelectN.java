@@ -37,6 +37,7 @@ public class FeatureSelectN<Point extends GeoTuple<Point>> implements FeatureSel
 						@Nullable FastAccess<Point> prior,
 						FastAccess<Point> detected, int limit, FastQueue<Point> selected) {
 		int N = Math.min(detected.size,limit);
+		assert(N>0);
 		selected.resize(N);
 		for (int i = 0; i < N; i++) {
 			int selectedIdx = i*detected.size/N;

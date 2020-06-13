@@ -64,6 +64,7 @@ public abstract class FeatureSelectUniformBest<Point extends GeoTuple<Point>>
 					   @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
 					   FastQueue<Point> selected)
 	{
+		assert(limit>0);
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!

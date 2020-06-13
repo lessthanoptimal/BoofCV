@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.intensity;
 
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
@@ -63,14 +63,14 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageG
 	 *
 	 * @return List of potential features.  If not supported then null is returned.
 	 */
-	QueueCorner getCandidatesMin();
+	ListIntPoint2D getCandidatesMin();
 
 	/**
 	 *  (Optional) Returns a list of candidate for local maximums.
 	 *
 	 * @return List of potential features.  If not supported then null is returned.
 	 */
-	QueueCorner getCandidatesMax();
+	ListIntPoint2D getCandidatesMax();
 
 	/**
 	 * If the image gradient is required for calculations.

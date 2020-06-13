@@ -26,6 +26,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.weights.WeightPixelGaussian_F32;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
@@ -66,7 +67,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	// found lines in transform space
 	final QueueCorner foundLines = new QueueCorner(10);
 	// list of points in the transform with non-zero values
-	final QueueCorner candidates = new QueueCorner(10);
+	final ListIntPoint2D candidates = new ListIntPoint2D();
 	// line intensities for later pruning
 	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
 
@@ -117,7 +118,6 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 		parameters.initialize(derivX.width,derivX.height,transform);
 		ImageMiscOps.fill(transform,0);
 
-		candidates.reset();
 		_derivX.wrap(derivX);
 		_derivY.wrap(derivY);
 		transform(binary);
@@ -181,7 +181,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	 * @param derivX gradient of point.
 	 * @param derivY gradient of point.
 	 */
-	final protected void parameterize( final QueueCorner candidates, final int x , final int y , float derivX , float derivY )
+	final protected void parameterize( final ListIntPoint2D candidates, final int x , final int y , float derivX , float derivY )
 	{
 		Point2D_F32 parameter = new Point2D_F32();
 		parameters.parameterize(x,y,derivX,derivY,parameter);
@@ -201,13 +201,13 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 		addParameters(candidates,x0+1,y0+1, (wx)*(wy));
 	}
 
-	final protected void addParameters( QueueCorner candidates, int x , int y , float amount ) {
+	final protected void addParameters( ListIntPoint2D candidates, int x , int y , float amount ) {
 		if( transform.isInBounds(x,y)) {
 			int index = transform.startIndex+y*transform.stride+x;
 			// keep track of candidate pixels so that a sparse search can be done
 			// to detect lines
 			if( transform.data[index] == 0 )
-				candidates.append(x,y);
+				candidates.add(x,y);
 			transform.data[index] += amount;
 		}
 	}
@@ -237,6 +237,8 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 
 	void transform(GrayU8 binary )
 	{
+		candidates.configure(transform.width,transform.height);
+
 		// apply the transform to the entire image
 		for( int y = 0; y < binary.height; y++ ) {
 			int start = binary.startIndex + y*binary.stride;

@@ -19,10 +19,10 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -40,21 +40,22 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	}
 
 	@Override
-	protected void examineMinimum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
+	protected void examineMinimum(GrayF32 intensityImage , ListIntPoint2D candidates , FastQueue<Point2D_I16> found ) {
 		found.reset();
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
 		// little cost to creating a thread so let it select the minimum block size
-		BoofConcurrency.loopBlocks(0,candidates.size,searches,(blockData,idx0,idx1)->{
+		BoofConcurrency.loopBlocks(0,candidates.size(),searches,(blockData,idx0,idx1)->{
+			final Point2D_I16 pt = blockData.pt;
 			final QueueCorner threadCorners = blockData.corners;
 			final NonMaxCandidate.Search search = blockData.search;
 
 			threadCorners.reset();
 			search.initialize(intensityImage);
 
-			for (int iter = idx0; iter < idx1; iter++) {
-				Point2D_I16 pt = candidates.data[iter];
+			for (int candidateIdx = idx0; candidateIdx < idx1; candidateIdx++) {
+				candidates.get(candidateIdx,pt);
 
 				if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 					continue;
@@ -82,21 +83,22 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	}
 
 	@Override
-	protected void examineMaximum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
+	protected void examineMaximum(GrayF32 intensityImage , ListIntPoint2D candidates , FastQueue<Point2D_I16> found ) {
 		found.reset();
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
 		// little cost to creating a thread so let it select the minimum block size
-		BoofConcurrency.loopBlocks(0,candidates.size,searches,(blockData,idx0,idx1)-> {
+		BoofConcurrency.loopBlocks(0,candidates.size(),searches,(blockData,idx0,idx1)-> {
+			final Point2D_I16 pt = blockData.pt;
 			final QueueCorner threadCorners = blockData.corners;
 			final NonMaxCandidate.Search search = blockData.search;
 
 			threadCorners.reset();
 			search.initialize(intensityImage);
 
-			for (int iter = idx0; iter < idx1; iter++) {
-				Point2D_I16 pt = candidates.data[iter];
+			for (int candidateIdx = idx0; candidateIdx < idx1; candidateIdx++) {
+				candidates.get(candidateIdx,pt);
 
 				if (pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 					continue;
@@ -130,6 +132,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	protected static class SearchData {
 		public final Search search;
 		public final QueueCorner corners = new QueueCorner();
+		public final Point2D_I16 pt = new Point2D_I16();
 
 		public SearchData(Search search) {
 			this.search = search;

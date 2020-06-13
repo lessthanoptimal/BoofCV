@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.feature.detect.extract.NonMaxExtractorNaive;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
@@ -47,7 +48,7 @@ public class WrapperNonMaximumNaive implements NonMaxSuppression {
 
 	@Override
 	public void process(GrayF32 intensity,
-						QueueCorner candidateMin, QueueCorner candidateMax,
+						ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
 						QueueCorner foundMin, QueueCorner foundMax) {
 		alg.process(intensity, foundMax);
 	}

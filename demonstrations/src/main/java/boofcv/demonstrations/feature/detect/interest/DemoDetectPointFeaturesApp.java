@@ -319,7 +319,6 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	private void createFast() {
 		controls.adjustControls(false,true);
 		ConfigFastCorner configFast = new ConfigFastCorner(controls.fastPixelTol,9);
-		configFast.nonMax = false;
 		detector = FactoryInterestPoint.createFast(configFast,
 				controls.configExtract.maxFeatures,
 				controls.configExtract.selector,

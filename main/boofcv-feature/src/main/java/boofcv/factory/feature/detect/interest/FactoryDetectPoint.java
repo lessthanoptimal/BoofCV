@@ -166,11 +166,7 @@ public class FactoryDetectPoint {
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
 
-		if( !configFast.nonMax)
-			throw new RuntimeException("Can't use this interface if you wish to not compute a feature intensity");
-
 		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
-		alg.getMaxFeatures().setTo(configFast.maxFeatures);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<>(alg);
 		return createGeneral(intensity, configDetector);
 	}

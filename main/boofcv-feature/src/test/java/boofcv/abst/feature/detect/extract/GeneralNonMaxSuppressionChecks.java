@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
@@ -43,8 +44,8 @@ public abstract class GeneralNonMaxSuppressionChecks {
 	NonMaxSuppression alg;
 
 	GrayF32 image = new GrayF32(width,height);
-	QueueCorner candidatesMin = new QueueCorner(10);
-	QueueCorner candidatesMax = new QueueCorner(10);
+	ListIntPoint2D candidatesMin = new ListIntPoint2D();
+	ListIntPoint2D candidatesMax = new ListIntPoint2D();
 
 	QueueCorner foundMax = new QueueCorner(10);
 	QueueCorner foundMin = new QueueCorner(10);
@@ -71,8 +72,8 @@ public abstract class GeneralNonMaxSuppressionChecks {
 
 		ImageMiscOps.fill(image,0);
 		if( alg.getUsesCandidates() ) {
-			candidatesMin.reset();
-			candidatesMax.reset();
+			candidatesMin.configure(width,height);
+			candidatesMax.configure(width,height);
 		} else {
 			candidatesMin = null;
 			candidatesMax = null;
@@ -104,8 +105,8 @@ public abstract class GeneralNonMaxSuppressionChecks {
 			checkFor(3,4,foundMin);
 
 		// All points from the list, none should be found
-		candidatesMin.reset();
-		candidatesMax.reset();
+		candidatesMin.configure(width,height);
+		candidatesMax.configure(width,height);
 		foundMin.reset(); foundMax.reset();
 		alg.process(image,candidatesMin, candidatesMax,foundMin,foundMax);
 		assertEquals(0, foundMin.size);
@@ -248,9 +249,10 @@ public abstract class GeneralNonMaxSuppressionChecks {
 
 	private void resetCandidates() {
 		if( candidatesMin != null )
-			candidatesMin.reset();
+			candidatesMin.configure(width,height);
+
 		if( candidatesMax != null )
-			candidatesMax.reset();
+			candidatesMax.configure(width,height);
 	}
 
 	/**
@@ -265,9 +267,9 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		for( int i = 0; i < image.height; i++ )
 			for( int j = 0; j < image.width; j++ ) {
 				if( candidatesMin != null )
-					candidatesMin.append(j,i);
+					candidatesMin.add(j,i);
 				if( candidatesMax != null )
-					candidatesMax.append(j,i);
+					candidatesMax.add(j,i);
 			}
 
 		// the original input image
@@ -318,9 +320,9 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		image.set(x,y,intensity);
 		if( alg.getUsesCandidates() ) {
 			if( isMax )
-				candidatesMax.append(x,y);
+				candidatesMax.add(x,y);
 			else
-				candidatesMin.append(x,y);
+				candidatesMin.add(x,y);
 		}
 	}
 }

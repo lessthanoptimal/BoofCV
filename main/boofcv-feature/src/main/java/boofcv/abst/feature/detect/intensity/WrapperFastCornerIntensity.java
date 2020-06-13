@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -43,14 +43,14 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 		alg.process(input,intensity);
 	}
 
-	@Override public QueueCorner getCandidatesMin()    { return alg.getCandidatesLow(); }
-	@Override public QueueCorner getCandidatesMax()    { return alg.getCandidatesHigh(); }
-	@Override public boolean     getRequiresGradient() { return false; }
-	@Override public boolean     getRequiresHessian()  { return false; }
-	@Override public boolean     hasCandidates()       { return true; }
-	@Override public int         getIgnoreBorder()     { return alg.getIgnoreBorder(); }
-	@Override public boolean     localMinimums()       { return true; }
-	@Override public boolean     localMaximums()       { return true; }
-	@Override public Class<I>    getImageType()        { return alg.getImageType(); }
-	@Override public Class<D>    getDerivType()        { return null; }
+	@Override public ListIntPoint2D getCandidatesMin()    { return alg.getCandidatesLow(); }
+	@Override public ListIntPoint2D getCandidatesMax()    { return alg.getCandidatesHigh(); }
+	@Override public boolean        getRequiresGradient() { return false; }
+	@Override public boolean        getRequiresHessian()  { return false; }
+	@Override public boolean        hasCandidates()       { return true; }
+	@Override public int            getIgnoreBorder()     { return alg.getIgnoreBorder(); }
+	@Override public boolean        localMinimums()       { return true; }
+	@Override public boolean        localMaximums()       { return true; }
+	@Override public Class<I>       getImageType()        { return alg.getImageType(); }
+	@Override public Class<D>       getDerivType()        { return null; }
 }

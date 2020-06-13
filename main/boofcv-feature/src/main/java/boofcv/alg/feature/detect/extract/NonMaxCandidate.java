@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
@@ -49,6 +49,9 @@ public class NonMaxCandidate {
 	// upper bound on detectable extremes in the image
 	protected int endBorderX, endBorderY;
 
+	// work space variables
+	protected Point2D_I16 pt = new Point2D_I16();
+
 	public NonMaxCandidate( Search search ) {
 		this.search = search;
 	}
@@ -58,8 +61,8 @@ public class NonMaxCandidate {
 	 * null then that test is skipped.
 	 */
 	public void process(GrayF32 intensityImage,
-						@Nullable FastAccess<Point2D_I16> candidatesMin,
-						@Nullable FastAccess<Point2D_I16> candidatesMax,
+						@Nullable ListIntPoint2D candidatesMin,
+						@Nullable ListIntPoint2D candidatesMax,
 						FastQueue<Point2D_I16> foundMin , FastQueue<Point2D_I16> foundMax ) {
 
 		this.input = intensityImage;
@@ -78,15 +81,15 @@ public class NonMaxCandidate {
 			foundMax.reset();
 			examineMaximum(intensityImage, candidatesMax, foundMax);
 		}
-
 	}
 
-	protected void examineMinimum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
+	protected void examineMinimum(GrayF32 intensityImage , ListIntPoint2D candidates , FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
-		for (int iter = 0; iter < candidates.size; iter++) {
-			Point2D_I16 pt = candidates.data[iter];
+		for (int pointIdx = 0; pointIdx < candidates.size(); pointIdx++) {
+			final Point2D_I16 pt = this.pt;
+			candidates.get(pointIdx,pt);
 
 			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 				continue;
@@ -106,12 +109,13 @@ public class NonMaxCandidate {
 		}
 	}
 
-	protected void examineMaximum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
+	protected void examineMaximum(GrayF32 intensityImage , ListIntPoint2D candidates , FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
-		for (int iter = 0; iter < candidates.size; iter++) {
-			Point2D_I16 pt = candidates.data[iter];
+		for (int pointIdx = 0; pointIdx < candidates.size(); pointIdx++) {
+			final Point2D_I16 pt = this.pt;
+			candidates.get(pointIdx,pt);
 
 			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 				continue;

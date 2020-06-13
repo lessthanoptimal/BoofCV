@@ -67,10 +67,12 @@ public class FactoryInterestPointAlgs {
 										Class<T> imageType,
 										Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
+		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
@@ -96,10 +98,12 @@ public class FactoryInterestPointAlgs {
 									   Class<D> derivType) {
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(harris);
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
+		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
@@ -124,10 +128,12 @@ public class FactoryInterestPointAlgs {
 											   Class<T> imageType,
 											   Class<D> derivType) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
+		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
@@ -155,10 +161,12 @@ public class FactoryInterestPointAlgs {
 											  Class<D> derivType) {
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(harris);
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
+		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType,derivType);

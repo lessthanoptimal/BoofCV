@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -53,12 +53,12 @@ public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends Imag
 	}
 
 	@Override
-	public QueueCorner getCandidatesMin() {
+	public ListIntPoint2D getCandidatesMin() {
 		return null;
 	}
 
 	@Override
-	public QueueCorner getCandidatesMax() {
+	public ListIntPoint2D getCandidatesMax() {
 		return null;
 	}
 

@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
@@ -29,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 
-	QueueCorner candidatesMin = new QueueCorner();
-	QueueCorner candidatesMax  = new QueueCorner();
+	ListIntPoint2D candidatesMin = new ListIntPoint2D();
+	ListIntPoint2D candidatesMax = new ListIntPoint2D();
 
 	NonMaxCandidate nonmax;
 
@@ -55,8 +56,8 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 	}
 
 	public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
-									  QueueCorner candidatesMin , QueueCorner candidatesMax,
-									  QueueCorner foundMinimum, QueueCorner foundMaximum)
+							 ListIntPoint2D candidatesMin , ListIntPoint2D candidatesMax,
+							 QueueCorner foundMinimum, QueueCorner foundMaximum)
 	{
 		nonmax.radius = radius;
 		nonmax.ignoreBorder = border;
@@ -67,13 +68,13 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 	}
 
 	public void allCandidates( int w,  int h ) {
-		candidatesMin.reset();
-		candidatesMax.reset();
+		candidatesMin.configure(w,h);
+		candidatesMax.configure(w,h);
 
 		for( int y = 0; y < h; y++ ) {
 			for( int x = 0; x < w; x++ ) {
-				candidatesMin.append(x,y);
-				candidatesMax.append(x,y);
+				candidatesMin.add(x,y);
+				candidatesMax.add(x,y);
 			}
 		}
 	}
@@ -95,8 +96,10 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 
 		intensity.set(2, 5, -30);
 
-		candidatesMin.append(2,5);
-		candidatesMax.append(3,5);
+		candidatesMin.configure(intensity.width,intensity.height);
+		candidatesMax.configure(intensity.width,intensity.height);
+		candidatesMin.add(2,5);
+		candidatesMax.add(3,5);
 
 		foundMinimum.reset();foundMaximum.reset();
 		findMaximums(intensity, 0.5f, 1, 0, null, candidatesMax, foundMinimum, foundMaximum);
