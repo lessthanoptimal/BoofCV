@@ -213,7 +213,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 	 * Ensures that the spawn ID is set correctly
 	 */
 	@Test
-	void trackSpawnID() {
+	void spawnFrame_and_lastSeenFrame() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -221,6 +221,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 		// no new tracks are spawned so their ID's should not be updated
 		for (int frame = 0; frame < 3; frame++) {
 			for( var t : tracker.getActiveTracks(null) ) {
+				assertEquals(frame,t.lastSeenFrameID);
 				assertEquals(0,t.spawnFrameID);
 			}
 			processImage((T)image);
@@ -242,6 +243,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 		int count1 = 0;
 
 		for( var t : tracker.getActiveTracks(null) ) {
+			assertEquals(4,t.lastSeenFrameID);
 			if( t.spawnFrameID == 0 )
 				count0++;
 			else if( t.spawnFrameID == 4)

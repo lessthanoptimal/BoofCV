@@ -16,7 +16,7 @@ Version : 0.37
 - PointTracker
   * Orientation is now configurable using the new interface
   * Added back in or added for the first time association with sets using `AssociateDescriptionSets`
-  * TODO added last seen field to track state
+  * Added PointTrack.lastSeenFrameID field
 - Color
   * Added support for YUYV color format used in webcams
 - GUI

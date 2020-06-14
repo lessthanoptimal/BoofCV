@@ -94,6 +94,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 					active.add(t);
 					PointTrack p = t.getCookie();
 					p.pixel.set(t.x,t.y);
+					p.lastSeenFrameID = frameID;
 					success = true;
 				}
 			}
@@ -121,6 +122,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 					active.add(t);
 					PointTrack p = t.getCookie();
 					p.pixel.set(t.x,t.y);
+					p.lastSeenFrameID = frameID;
 					success = true;
 				}
 			}

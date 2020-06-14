@@ -47,6 +47,9 @@ public class PointTrack {
 	/** The frame the track was spawned at */
 	public long spawnFrameID;
 
+	/** The last frame the track was seen at */
+	public long lastSeenFrameID;
+
 	/** Description of this feature that is used internally.  Don't mess with this */
 	private Object description;
 
@@ -76,12 +79,14 @@ public class PointTrack {
 	public void set( PointTrack t ) {
 		featureId = t.featureId;
 		spawnFrameID = t.spawnFrameID;
+		lastSeenFrameID = t.lastSeenFrameID;
 		pixel.set(t.pixel);
 		cookie = t.cookie;
 		description = t.description;
 	}
 	
 	public void reset() {
+		lastSeenFrameID = -1;
 		spawnFrameID = -1;
 		featureId = -1;
 		cookie = null;

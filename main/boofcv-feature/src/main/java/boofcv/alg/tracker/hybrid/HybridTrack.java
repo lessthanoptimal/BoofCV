@@ -32,8 +32,6 @@ public class HybridTrack<TD extends TupleDesc> extends PointTrack {
 	public PyramidKltFeature trackKlt;
 	// DDA type description
 	public TD descriptor;
-	// the last frame was updated at
-	public long lastUpdatedFrame; // todo remove when moved into PointTrack
 	// If the track has been respawned or not
 	public boolean respawned;
 }

@@ -186,7 +186,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 				tracksActive.removeSwap(i);
 				tracksInactive.add(track);
 			} else {
-				track.lastUpdatedFrame = frameID;
+				track.lastSeenFrameID = frameID;
 				track.pixel.set(track.trackKlt.x,track.trackKlt.y);
 			}
 		}
@@ -262,14 +262,14 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 			// increase with time. Doing so resulted in MUCH worse tracking performance. Until a way to ensure
 			// detected tracks match the original one to a very high level of accuracy it's better to just
 			// re-init all non pure KLT tracks
-			boolean active = track.lastUpdatedFrame == frameID;
+			boolean active = track.lastSeenFrameID == frameID;
 			if( !track.respawned && active) { // skip pure KLT tracks
 				continue;
 			}
 
 			// re-active the track and update it's state
 			track.respawned = true;
-			track.lastUpdatedFrame = frameID;
+			track.lastSeenFrameID = frameID;
 			track.pixel.set(detectedPixel);
 			trackerKlt.setDescription((float)detectedPixel.x,(float)detectedPixel.y,track.trackKlt);
 			if( !active ) { // don't add the same track twice to the active list
@@ -279,7 +279,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 
 		// Updated inactive list by removing tracks which have become active
 		for (int i = tracksInactive.size()-1; i >= 0; i--) {
-			if( tracksInactive.get(i).lastUpdatedFrame == frameID ) {
+			if( tracksInactive.get(i).lastSeenFrameID == frameID ) {
 				tracksInactive.removeSwap(i);
 			}
 		}
@@ -307,7 +307,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 			trackerKlt.setDescription((float)p.x,(float)p.y,track.trackKlt);
 			// set track ID and location
 			track.respawned = false;
-			track.spawnFrameID = track.lastUpdatedFrame = frameID;
+			track.spawnFrameID = track.lastSeenFrameID = frameID;
 			track.featureId = totalTracks++;
 			track.descriptor.setTo(detectedDesc.get(detectedIdx));
 			track.detectorSetId = detectedSet.get(detectedIdx);

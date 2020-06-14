@@ -76,6 +76,7 @@ class TestDetectDescribeAssociateTracker {
 
 		PointTrack t = alg.tracksAll.get(0);
 		assertEquals(7,t.spawnFrameID);
+		assertEquals(7,t.lastSeenFrameID);
 		assertEquals(8,t.featureId);
 		assertEquals(9,t.detectorSetId);
 		assertEquals(1,t.pixel.x, UtilEjml.TEST_F64);

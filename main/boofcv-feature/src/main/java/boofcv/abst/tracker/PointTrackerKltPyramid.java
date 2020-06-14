@@ -196,6 +196,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		if( checkValidSpawn(p) ) {
 			p.featureId = totalFeatures++;
 			p.spawnFrameID = frameID;
+			p.lastSeenFrameID = frameID;
 			active.add(t);
 			return p;
 		}
@@ -265,6 +266,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			if( checkValidSpawn(p) ) {
 				p.featureId = totalFeatures++;
 				p.spawnFrameID = frameID;
+				p.lastSeenFrameID = frameID;
 				p.prev.set(t.x,t.y);
 
 				// add to appropriate lists
@@ -327,6 +329,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 				if( image.isInBounds((int)t.x,(int)t.y) && tracker.setDescription(t) ) {
 					PointTrack p = t.getCookie();
 					p.pixel.set(t.x,t.y);
+					p.lastSeenFrameID = frameID;
 					success = true;
 				}
 			}

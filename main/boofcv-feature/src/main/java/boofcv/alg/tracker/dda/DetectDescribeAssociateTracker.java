@@ -243,6 +243,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			PointTrack track = tracksAll.get(indexes.src);
 			Point2D_F64 loc = dstPixels.data[indexes.dst];
 			track.pixel.set(loc.x, loc.y);
+			track.lastSeenFrameID = frameID;
 			tracksActive.add(track);
 
 			// update the description
@@ -284,6 +285,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		((TD)p.getDescription()).setTo(desc);
 
 		p.spawnFrameID = frameID;
+		p.lastSeenFrameID = frameID;
 		p.detectorSetId = set;
 		p.featureId = featureID++;
 
