@@ -40,6 +40,18 @@ import static boofcv.io.calibration.CalibrationIO.createYmlObject;
 public class FiducialIO {
 
 	/**
+	 * See {@link #saveRandomDotYaml(RandomDotDefinition, Writer)} but to a file.
+	 */
+	public static void saveRandomDotYaml(RandomDotDefinition definition, File file ) {
+		try {
+			Writer writer = new FileWriter(file);
+			saveRandomDotYaml(definition,writer);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
 	 * Saves a Uchiya definition in BoofCV YAML format.
 	 *
 	 * @param definition Definition to be saved.
