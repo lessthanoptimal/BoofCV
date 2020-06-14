@@ -20,7 +20,7 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
-		implements DescribeRegionPoint<T,BrightFeature> {
+		implements DescribeRegionPoint<T, TupleDesc_F64> {
 
 	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;
@@ -47,8 +47,8 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 	}
 
 	@Override
-	public BrightFeature createDescription() {
-		return new BrightFeature(surf.getDescriptionLength());
+	public TupleDesc_F64 createDescription() {
+		return new TupleDesc_F64(surf.getDescriptionLength());
 	}
 
 	@Override
@@ -63,9 +63,9 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation , double radius, BrightFeature storage) {
+	public boolean process(double x, double y, double orientation , double radius, TupleDesc_F64 storage) {
 		double scale = radius/canonicalRadius;
-		surf.describe(x,y, orientation, scale, storage);
+		surf.describe(x,y, orientation, scale, true, storage);
 		return true;
 	}
 
@@ -90,7 +90,7 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 	}
 
 	@Override
-	public Class<BrightFeature> getDescriptionType() {
-		return BrightFeature.class;
+	public Class<TupleDesc_F64> getDescriptionType() {
+		return TupleDesc_F64.class;
 	}
 }

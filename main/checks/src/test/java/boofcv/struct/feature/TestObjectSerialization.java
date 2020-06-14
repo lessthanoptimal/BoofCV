@@ -71,23 +71,6 @@ class TestObjectSerialization {
 	}
 
 	@Test
-	void testSurfFeature() {
-		BrightFeature orig = new BrightFeature(20);
-		orig.white = true;
-		for( int i = 0; i < orig.value.length; i++ ) {
-			orig.value[i] = i;
-		}
-
-		BrightFeature found = serializeDeSerialize(orig);
-
-		assertNotNull(found);
-		assertEquals(orig.white,found.white);
-		for( int i = 0; i < orig.value.length; i++ ) {
-			assertEquals(orig.value[i],found.value[i],1e-8);
-		}
-	}
-
-	@Test
 	void testNccFeature() {
 		NccFeature orig = new NccFeature(20);
 		orig.mean = 1.2;

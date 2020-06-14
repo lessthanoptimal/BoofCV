@@ -23,12 +23,12 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeatureQueue;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.List;
@@ -47,7 +47,7 @@ import java.util.List;
  */
 public class WrapDetectDescribeSurf
 		<T extends ImageGray<T>, II extends ImageGray<II>>
-	implements DetectDescribePoint<T,BrightFeature>
+	implements DetectDescribePoint<T, TupleDesc_F64>
 {
 	// SURF algorithms
 	protected FastHessianFeatureDetector<II> detector;
@@ -58,7 +58,7 @@ public class WrapDetectDescribeSurf
 	protected II ii;
 
 	// storage for computed features
-	protected SurfFeatureQueue features;
+	protected FastQueue<TupleDesc_F64> features;
 	// detected scale points
 	protected List<ScalePoint> foundPoints;
 	// orientation of features
@@ -76,16 +76,16 @@ public class WrapDetectDescribeSurf
 		this.describe = describe;
 		this.imageType = ImageType.single(imageType);
 
-		features = new SurfFeatureQueue(describe.getDescriptionLength());
+		features = new FastQueue<>(describe::createDescription);
 	}
 
 	@Override
-	public BrightFeature createDescription() {
+	public TupleDesc_F64 createDescription() {
 		return describe.createDescription();
 	}
 
 	@Override
-	public BrightFeature getDescription(int index) {
+	public TupleDesc_F64 getDescription(int index) {
 		return features.get(index);
 	}
 
@@ -95,8 +95,8 @@ public class WrapDetectDescribeSurf
 	}
 
 	@Override
-	public Class<BrightFeature> getDescriptionType() {
-		return BrightFeature.class;
+	public Class<TupleDesc_F64> getDescriptionType() {
+		return TupleDesc_F64.class;
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class WrapDetectDescribeSurf
 
 	@Override
 	public int getSet(int index) {
-		return features.get(index).white ? 0 : 1;
+		return foundPoints.get(index).white ? 0 : 1;
 	}
 
 	protected void computeDescriptors() {
@@ -138,11 +138,11 @@ public class WrapDetectDescribeSurf
 		describe.setImage(ii);
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
-			double radius = p.scale* BoofDefaults.SURF_SCALE_TO_RADIUS;
+			double radius = p.scale*BoofDefaults.SURF_SCALE_TO_RADIUS;
 
 			orientation.setObjectRadius(radius);
 			double angle = orientation.compute(p.x,p.y);
-			describe.describe(p.x,p.y, angle, p.scale, features.get(i));
+			describe.describe(p.x,p.y, angle, p.scale, true, features.get(i));
 			featureAngles.set(i,angle);
 		}
 	}

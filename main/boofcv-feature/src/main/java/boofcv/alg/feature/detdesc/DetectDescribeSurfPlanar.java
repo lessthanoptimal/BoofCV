@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,12 @@ package boofcv.alg.feature.detdesc;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurfPlanar;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeatureQueue;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 
 
 	// storage for computed features
-	protected SurfFeatureQueue descriptions;
+	protected FastQueue<TupleDesc_F64> descriptions;
 	// detected scale points
 	protected List<ScalePoint> foundPoints;
 	// orientation of features
@@ -67,15 +67,19 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 		this.orientation = orientation;
 		this.describe = describe;
 
-		descriptions = new SurfFeatureQueue(describe.getDescriptorLength());
+		descriptions = new FastQueue<>(()->new TupleDesc_F64(describe.getDescriptorLength()));
 	}
 
-	public BrightFeature createDescription() {
+	public TupleDesc_F64 createDescription() {
 		return describe.createDescription();
 	}
 
-	public BrightFeature getDescription(int index) {
+	public TupleDesc_F64 getDescription(int index) {
 		return descriptions.get(index);
+	}
+
+	public boolean isWhite( int index ) {
+		return detector.getFoundPoints().get(index).white;
 	}
 
 	/**

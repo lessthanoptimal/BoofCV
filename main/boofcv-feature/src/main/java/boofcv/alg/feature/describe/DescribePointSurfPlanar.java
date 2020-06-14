@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.descriptor.UtilFeature;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
@@ -67,16 +66,16 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 		descriptorLength = describe.getDescriptionLength()*numBands;
 	}
 
-	public BrightFeature createDescription() {
-		return new BrightFeature(descriptorLength);
+	public TupleDesc_F64 createDescription() {
+		return new TupleDesc_F64(descriptorLength);
 	}
 
 	public int getDescriptorLength() {
 		return descriptorLength;
 	}
 
-	public Class<BrightFeature> getDescriptionType() {
-		return BrightFeature.class;
+	public Class<TupleDesc_F64> getDescriptionType() {
+		return TupleDesc_F64.class;
 	}
 
 	/**
@@ -94,12 +93,12 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 		this.colorII = colorII;
 	}
 
-	public void describe(double x, double y, double angle, double scale, BrightFeature desc)
+	public void describe(double x, double y, double angle, double scale, TupleDesc_F64 desc)
 	{
 		int featureIndex = 0;
 		for(int band = 0; band < colorII.getNumBands(); band++ ) {
 			describe.setImage(colorII.getBand(band));
-			describe.describe(x,y, angle, scale, bandDesc);
+			describe.describe(x,y, angle, scale, false, bandDesc);
 			System.arraycopy(bandDesc.value,0,desc.value,featureIndex,bandDesc.size());
 			featureIndex += bandDesc.size();
 		}
@@ -107,7 +106,6 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>>
 		UtilFeature.normalizeL2(desc);
 
 		describe.setImage(grayII);
-		desc.white = describe.computeLaplaceSign((int)(x+0.5),(int)(y+0.5),scale);
 	}
 
 	public DescribePointSurf<II> getDescribe() {

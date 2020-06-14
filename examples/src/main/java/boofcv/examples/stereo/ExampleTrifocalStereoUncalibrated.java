@@ -56,7 +56,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedTripleIndex;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.GrayF32;
@@ -146,16 +146,16 @@ public class ExampleTrifocalStereoUncalibrated {
 		GrayU8 image03 = ConvertImage.average(color03,null);
 
 		// using SURF features. Robust and fairly fast to compute
-		DetectDescribePoint<GrayU8,BrightFeature> detDesc = FactoryDetectDescribe.surfStable(
+		DetectDescribePoint<GrayU8,TupleDesc_F64> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null,null, GrayU8.class);
 
 		FastQueue<Point2D_F64> locations01 = new FastQueue<>(Point2D_F64::new);
 		FastQueue<Point2D_F64> locations02 = new FastQueue<>(Point2D_F64::new);
 		FastQueue<Point2D_F64> locations03 = new FastQueue<>(Point2D_F64::new);
 
-		FastQueue<BrightFeature> features01 = UtilFeature.createQueue(detDesc,100);
-		FastQueue<BrightFeature> features02 = UtilFeature.createQueue(detDesc,100);
-		FastQueue<BrightFeature> features03 = UtilFeature.createQueue(detDesc,100);
+		FastQueue<TupleDesc_F64> features01 = UtilFeature.createQueue(detDesc,100);
+		FastQueue<TupleDesc_F64> features02 = UtilFeature.createQueue(detDesc,100);
+		FastQueue<TupleDesc_F64> features03 = UtilFeature.createQueue(detDesc,100);
 		GrowQueue_I32 featureSet01 = new GrowQueue_I32();
 		GrowQueue_I32 featureSet02 = new GrowQueue_I32();
 		GrowQueue_I32 featureSet03 = new GrowQueue_I32();
@@ -196,10 +196,10 @@ public class ExampleTrifocalStereoUncalibrated {
 		System.out.println("features02.size = "+features02.size);
 		System.out.println("features03.size = "+features03.size);
 
-		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
 
-		AssociateThreeByPairs<BrightFeature> associateThree = new AssociateThreeByPairs<>(associate,BrightFeature.class);
+		AssociateThreeByPairs<TupleDesc_F64> associateThree = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
 		associateThree.initialize(detDesc.getNumberOfSets());
 		associateThree.setFeaturesA(features01, featureSet01);

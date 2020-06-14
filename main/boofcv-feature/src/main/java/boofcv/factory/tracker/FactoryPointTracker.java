@@ -60,7 +60,10 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.feature.*;
+import boofcv.struct.feature.NccFeature;
+import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
@@ -193,11 +196,11 @@ public class FactoryPointTracker {
 									  Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+		AssociateDescription<TupleDesc_F64> assoc = (AssociateDescription)
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score);
-		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
+		AssociateDescription2D<TupleDesc_F64> associate2D = new AssociateDescTo2D<>(assoc);
 
-		DetectDescribePoint<I,BrightFeature> fused =
+		DetectDescribePoint<I,TupleDesc_F64> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,imageType);
 
 		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, associate2D, new ConfigTrackerDda()));
@@ -224,11 +227,11 @@ public class FactoryPointTracker {
 										Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+		AssociateDescription<TupleDesc_F64> assoc = (AssociateDescription)
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score);
-		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
+		AssociateDescription2D<TupleDesc_F64> associate2D = new AssociateDescTo2D<>(assoc);
 
-		DetectDescribePoint<I,BrightFeature> fused =
+		DetectDescribePoint<I,TupleDesc_F64> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
 		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(fused, associate2D, new ConfigTrackerDda()));
@@ -401,11 +404,11 @@ public class FactoryPointTracker {
 										  Class<I> imageType) {
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+		AssociateDescription<TupleDesc_F64> assoc = (AssociateDescription)
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score);
-		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
+		AssociateDescription2D<TupleDesc_F64> associate2D = new AssociateDescTo2D<>(assoc);
 
-		DetectDescribePoint<I,BrightFeature> fused =
+		DetectDescribePoint<I,TupleDesc_F64> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,imageType);
 
 		return hybrid(fused, associate2D, configDetector.extract.radius, kltConfig,configHybrid, imageType);
@@ -441,13 +444,13 @@ public class FactoryPointTracker {
 		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
-		DescribeRegionPoint<I,BrightFeature> regionDesc
+		DescribeRegionPoint<I,TupleDesc_F64> regionDesc
 				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateDescription<BrightFeature> assoc = (AssociateDescription)
+		AssociateDescription<TupleDesc_F64> assoc = (AssociateDescription)
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score);
-		AssociateDescription2D<BrightFeature> associate2D = new AssociateDescTo2D<>(assoc);
+		AssociateDescription2D<TupleDesc_F64> associate2D = new AssociateDescTo2D<>(assoc);
 
 		OrientationImage<I> orientation = null;
 

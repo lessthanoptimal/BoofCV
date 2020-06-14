@@ -22,7 +22,7 @@ import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -37,7 +37,7 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extends ImageGray<II>>
-		implements DetectDescribePoint<Planar<T>,BrightFeature>
+		implements DetectDescribePoint<Planar<T>, TupleDesc_F64>
 {
 	DetectDescribeSurfPlanar<II> alg;
 
@@ -81,7 +81,7 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 
 	@Override
 	public int getSet(int index) {
-		return alg.getDescription(index).white ? 0 : 1;
+		return alg.isWhite(index) ? 0 : 1;
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	}
 
 	@Override
-	public BrightFeature getDescription(int index) {
+	public TupleDesc_F64 getDescription(int index) {
 		return alg.getDescription(index);
 	}
 
@@ -105,13 +105,13 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray<T>, II extend
 	}
 
 	@Override
-	public BrightFeature createDescription() {
+	public TupleDesc_F64 createDescription() {
 		return alg.createDescription();
 	}
 
 	@Override
-	public Class<BrightFeature> getDescriptionType() {
-		return BrightFeature.class;
+	public Class<TupleDesc_F64> getDescriptionType() {
+		return TupleDesc_F64.class;
 	}
 
 	@Override

@@ -28,7 +28,10 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.struct.feature.*;
+import boofcv.struct.feature.NccFeature;
+import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.*;
 
 import javax.annotation.Nullable;
@@ -72,7 +75,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfFast(@Nullable ConfigSurfDescribe.Fast config , Class<T> imageType) {
+	DescribeRegionPoint<T,TupleDesc_F64> surfFast(@Nullable ConfigSurfDescribe.Fast config , Class<T> imageType) {
 
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -92,7 +95,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfColorFast(@Nullable ConfigSurfDescribe.Fast config , ImageType<T> imageType) {
+	DescribeRegionPoint<T,TupleDesc_F64> surfColorFast(@Nullable ConfigSurfDescribe.Fast config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -122,7 +125,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfStable(@Nullable ConfigSurfDescribe.Stability config, Class<T> imageType) {
+	DescribeRegionPoint<T,TupleDesc_F64> surfStable(@Nullable ConfigSurfDescribe.Stability config, Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -141,7 +144,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageBase<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
+	DescribeRegionPoint<T,TupleDesc_F64> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);

@@ -21,6 +21,8 @@ Version : 0.37
   * Added support for YUYV color format used in webcams
 - GUI
   * Added clip and fog controls to point cloud controls
+- Features
+  * Removed BrightFeature since whiteness has been moved into the detector in all situations
 - Feature Sets
   * Created FeatureSets interface that specifies how sets are handled by feature detectors
   * This makes it easier and less complicated to only associate "dark" or "bright" features with each other
@@ -41,9 +43,8 @@ Version : 0.37
   * Supports multiple point types
   * Variant with and without intensity information
   * TODO generalized how intensity information can be collected
-- FAST feature detector
+- FAST Corner feature detector
   * Configurable in the GUI
-  * TODO Create concurrent variant. is candidate non-max concurrent?
 - RegionOrientation
   * Can now specify feature orientation approach using Configuration class
   * TODO finish cleaning up that mess
@@ -55,7 +56,7 @@ Version : 0.37
   * When both max and min are detected excluded is correctly handled now
   * Feature limit is split between max and min
 - SURF Feature Detector
-  * TODO moved computation of dark/white feature into detector
+  * Moved computation of dark/white feature into detector
   * TODO Added support for limiting the total number of features returned with SelectLimit
 - SIFT Feature Detector
   * TODO Added support for limiting the total number of features returned with SelectLimit

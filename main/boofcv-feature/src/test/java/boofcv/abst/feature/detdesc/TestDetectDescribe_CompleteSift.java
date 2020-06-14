@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detdesc;
 
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -34,7 +34,7 @@ public class TestDetectDescribe_CompleteSift
 	@Nested
 	public class U8 extends GenericTestsDetectDescribePoint {
 		protected U8() {
-			super(true,true,ImageType.SB_U8,BrightFeature.class);
+			super(true,true,ImageType.SB_U8,TupleDesc_F64.class);
 		}
 
 		@Override
@@ -46,7 +46,7 @@ public class TestDetectDescribe_CompleteSift
 	@Nested
 	public class F32 extends GenericTestsDetectDescribePoint {
 		protected F32() {
-			super(true,true,ImageType.SB_F32,BrightFeature.class);
+			super(true,true,ImageType.SB_F32,TupleDesc_F64.class);
 		}
 
 		@Override

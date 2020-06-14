@@ -61,7 +61,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		initializeConfiguration();
 
 		controlLevels = new JPyramidLevels(this.configKlt.pyramidLevels,listener::changedPointTrackerKlt);
-		spinnerMaxTracks = spinner(configKlt.maximumTracks,0,10000,10);
+		spinnerMaxTracks = spinner(configKlt.maximumTracks,-1,10000,10);
 		checkPruneClose = checkbox("Prune Close", this.configKlt.pruneClose,"If true then tracks which are clustered close to each other are pruned");
 		spinnerIterations = spinner(this.configKlt.config.maxIterations,1,500,1);
 		spinnerMaxError = spinner(this.configKlt.config.maxPerPixelError,0.0,255.0,5.0);

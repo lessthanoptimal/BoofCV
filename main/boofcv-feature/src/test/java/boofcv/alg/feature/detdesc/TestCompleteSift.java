@@ -26,8 +26,8 @@ import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_F64;
@@ -63,7 +63,7 @@ public class TestCompleteSift {
 
 		GrowQueue_F64 orientations = alg.getOrientations();
 		FastAccess<ScalePoint> locations = alg.getLocations();
-		FastAccess<BrightFeature> descriptions = alg.getDescriptions();
+		FastAccess<TupleDesc_F64> descriptions = alg.getDescriptions();
 
 		assertTrue(orientations.size>10);
 		assertEquals(orientations.size,locations.size);

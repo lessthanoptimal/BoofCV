@@ -24,8 +24,8 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -66,13 +66,13 @@ public class TestDetectDescribeFusion {
 
 	@Test
 	public void checkWithOrientation() {
-		new GenericTestsDetectDescribePoint(true,true, ImageType.single(GrayF32.class),BrightFeature.class) {
+		new GenericTestsDetectDescribePoint(true,true, ImageType.single(GrayF32.class),TupleDesc_F64.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {
 				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null,GrayF32.class);
 				final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,GrayF32.class);
-				final DescribeRegionPoint<GrayF32,BrightFeature> desc =
+				final DescribeRegionPoint<GrayF32,TupleDesc_F64> desc =
 						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,ori,desc);
 			}
@@ -82,11 +82,11 @@ public class TestDetectDescribeFusion {
 	@Test
 	public void checkWithoutOrientation() {
 
-		new GenericTestsDetectDescribePoint(true,false, ImageType.single(GrayF32.class),BrightFeature.class) {
+		new GenericTestsDetectDescribePoint(true,false, ImageType.single(GrayF32.class),TupleDesc_F64.class) {
 			@Override
 			public DetectDescribePoint createDetDesc() {
 				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null,GrayF32.class);
-				final DescribeRegionPoint<GrayF32,BrightFeature> desc =
+				final DescribeRegionPoint<GrayF32,TupleDesc_F64> desc =
 						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,null,desc);
 			}
@@ -133,7 +133,7 @@ public class TestDetectDescribeFusion {
 		@Override public void setImage(ImageBase image) {}
 
 		@Override public TupleDesc createDescription() {
-			return new BrightFeature(10);
+			return new TupleDesc_F64(10);
 		}
 
 		@Override
@@ -143,7 +143,7 @@ public class TestDetectDescribeFusion {
 		@Override public boolean isScalable() {return false;}
 		@Override public boolean isOriented() {return false;}
 		@Override public Class getDescriptionType() {
-			return BrightFeature.class;
+			return TupleDesc_F64.class;
 		}
 		@Override public ImageType getImageType() {return null;}
 		@Override public double getCanonicalWidth() {

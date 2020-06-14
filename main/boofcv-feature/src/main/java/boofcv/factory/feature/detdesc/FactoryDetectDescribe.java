@@ -52,8 +52,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageMultiBand;
@@ -72,7 +72,7 @@ public class FactoryDetectDescribe {
 	 * Generic factory for all detector / descriptors
 	 */
 	public static <T extends ImageGray<T>>
-	DetectDescribePoint<T,BrightFeature> generic( ConfigDetectDescribe config , Class<T> imageType )
+	DetectDescribePoint<T,TupleDesc_F64> generic( ConfigDetectDescribe config , Class<T> imageType )
 	{
 		DetectDescribePoint detDesc = null;
 
@@ -144,7 +144,7 @@ public class FactoryDetectDescribe {
 	 * @return SIFT
 	 */
 	public static <T extends ImageGray<T>>
-	DetectDescribePoint<T,BrightFeature> sift( @Nullable ConfigCompleteSift config, Class<T> imageType)
+	DetectDescribePoint<T,TupleDesc_F64> sift( @Nullable ConfigCompleteSift config, Class<T> imageType)
 	{
 		if( config == null )
 			config = new ConfigCompleteSift();
@@ -190,7 +190,7 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfFast( @Nullable ConfigFastHessian configDetector ,
+	DetectDescribePoint<T,TupleDesc_F64> surfFast( @Nullable ConfigFastHessian configDetector ,
 												   @Nullable ConfigSurfDescribe.Fast configDesc,
 												   @Nullable ConfigAverageIntegral configOrientation,
 												   Class<T> imageType) {
@@ -225,7 +225,7 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfColorFast( @Nullable ConfigFastHessian configDetector ,
+	DetectDescribePoint<T,TupleDesc_F64> surfColorFast( @Nullable ConfigFastHessian configDetector ,
 														@Nullable ConfigSurfDescribe.Fast configDesc,
 														@Nullable ConfigAverageIntegral configOrientation,
 														ImageType<T> imageType) {
@@ -281,7 +281,7 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfStable( @Nullable ConfigFastHessian configDetector,
+	DetectDescribePoint<T,TupleDesc_F64> surfStable( @Nullable ConfigFastHessian configDetector,
 													 @Nullable ConfigSurfDescribe.Stability configDescribe,
 													 @Nullable ConfigSlidingIntegral configOrientation,
 													 Class<T> imageType ) {
@@ -317,7 +317,7 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DetectDescribePoint<T,BrightFeature> surfColorStable( @Nullable ConfigFastHessian configDetector,
+	DetectDescribePoint<T,TupleDesc_F64> surfColorStable( @Nullable ConfigFastHessian configDetector,
 														  @Nullable ConfigSurfDescribe.Stability configDescribe,
 														  @Nullable ConfigSlidingIntegral configOrientation,
 														  ImageType<T> imageType ) {

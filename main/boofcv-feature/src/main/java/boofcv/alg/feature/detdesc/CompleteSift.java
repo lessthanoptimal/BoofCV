@@ -25,8 +25,8 @@ import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
@@ -50,7 +50,7 @@ public class CompleteSift extends SiftDetector
 	// describes the keypoints
 	DescribePointSift<GrayF32> describe;
 	// storage for found features
-	FastQueue<BrightFeature> features;
+	FastQueue<TupleDesc_F64> features;
 	// found orientations and feature locations
 	FastArray<ScalePoint> locations = new FastArray<>(ScalePoint.class);
 	GrowQueue_F64 orientations = new GrowQueue_F64();
@@ -80,7 +80,7 @@ public class CompleteSift extends SiftDetector
 		this.describe = describe;
 
 		final int dof = describe.getDescriptorLength();
-		features = new FastQueue<>(()->new BrightFeature(dof));
+		features = new FastQueue<>(()->new TupleDesc_F64(dof));
 	}
 
 	@Override
@@ -121,9 +121,7 @@ public class CompleteSift extends SiftDetector
 		// describe each feature
 		GrowQueue_F64 angles = orientation.getOrientations();
 		for (int i = 0; i < angles.size; i++) {
-			BrightFeature feature = features.grow();
-			feature.white = p.white;
-			describe.process(localX,localY,localSigma,angles.get(i),feature);
+			describe.process(localX,localY,localSigma,angles.get(i),features.grow());
 
 			orientations.add(angles.get(i));
 			locations.add(p);
@@ -134,7 +132,7 @@ public class CompleteSift extends SiftDetector
 		return locations;
 	}
 
-	public FastAccess<BrightFeature> getDescriptions() {
+	public FastAccess<TupleDesc_F64> getDescriptions() {
 		return features;
 	}
 

@@ -40,8 +40,8 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -152,8 +152,8 @@ public class ExampleImageStitching {
 		// Detect using the standard SURF feature descriptor and describer
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
-		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,2),scorer);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,2),scorer);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =

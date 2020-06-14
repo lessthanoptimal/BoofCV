@@ -22,6 +22,9 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
+import boofcv.alg.transform.ii.DerivativeIntegralImage;
+import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.ImageBorder_F32;
@@ -71,6 +74,10 @@ import java.util.List;
  * </p>
  *
  * <p>
+ * Laplacian sign is used to decide if a point is white or not. This can be used to split detected points into two sets.
+ * </p>
+ *
+ * <p>
  * Note: Interpolation is performed by fitting a second order polynomial instead of a quadratic, as
  * suggested in the paper. See comments in {@link #polyPeak(float, float, float)}.
  * </p>
@@ -85,6 +92,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class FastHessianFeatureDetector<II extends ImageGray<II>> {
+
+	// Reference to pass in integral image
+	private II integral;
 
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;
@@ -110,7 +120,11 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	private int numberOfOctaves;
 
 	// local variables that are predeclared
-	private int sizes[];
+	private int[] sizes;
+
+	// storage for kernels used to compute laplacian sign
+	protected IntegralKernel kerXX;
+	protected IntegralKernel kerYY;
 
 	// how often the image is sampled in the first octave
 	// a value of 1 would mean every pixel is sampled
@@ -200,6 +214,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	 */
 	protected void detectOctave( II integral , int skip , int ...featureSize ) {
 
+		this.integral = integral;
 		int w = integral.width/skip;
 		int h = integral.height/skip;
 
@@ -290,9 +305,28 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 				float interpS = levelSize+peakS*sizeStep;
 
 				double scale =  1.2*interpS/9.0;
-				foundPoints.grow().set(interpX,interpY,scale);
+				boolean white = computeLaplaceSign((int)(interpX+0.5),(int)(interpY+0.5),scale);
+				foundPoints.grow().set(interpX,interpY,scale,white);
 			}
 		}
+	}
+
+	/**
+	 * Compute the sign of the Laplacian using a sparse convolution.
+	 *
+	 * @param x center
+	 * @param y center
+	 * @param scale scale of the feature
+	 * @return true if positive
+	 */
+	public boolean computeLaplaceSign(int x, int y, double scale) {
+		int s = (int)Math.ceil(scale);
+		kerXX = DerivativeIntegralImage.kernelDerivXX(9*s,kerXX);
+		kerYY = DerivativeIntegralImage.kernelDerivYY(9*s,kerYY);
+		double lap = GIntegralImageOps.convolveSparse(integral,kerXX,x,y);
+		lap += GIntegralImageOps.convolveSparse(integral,kerYY,x,y);
+
+		return lap > 0;
 	}
 
 	/**

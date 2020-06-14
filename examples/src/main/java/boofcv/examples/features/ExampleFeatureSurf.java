@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
@@ -58,7 +58,7 @@ public class ExampleFeatureSurf {
 	 */
 	public static void easy( GrayF32 image ) {
 		// create the detector and descriptors
-		DetectDescribePoint<GrayF32,BrightFeature> surf = FactoryDetectDescribe.
+		DetectDescribePoint<GrayF32,TupleDesc_F64> surf = FactoryDetectDescribe.
 				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,GrayF32.class);
 
 		 // specify the image to process
@@ -104,7 +104,7 @@ public class ExampleFeatureSurf {
 
 		List<ScalePoint> points = detector.getFoundPoints();
 
-		List<BrightFeature> descriptions = new ArrayList<>();
+		List<TupleDesc_F64> descriptions = new ArrayList<>();
 
 		for( ScalePoint p : points ) {
 			// estimate orientation
@@ -112,8 +112,8 @@ public class ExampleFeatureSurf {
 			double angle = orientation.compute(p.x,p.y);
 			
 			// extract the SURF description for this region
-			BrightFeature desc = descriptor.createDescription();
-			descriptor.describe(p.x,p.y,angle,p.scale,desc);
+			TupleDesc_F64 desc = descriptor.createDescription();
+			descriptor.describe(p.x,p.y,angle,p.scale, true, desc);
 
 			// save everything for processing later on
 			descriptions.add(desc);

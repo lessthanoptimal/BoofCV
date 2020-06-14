@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.feature.describe.impl.TestImplSurfDescribeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseImageGradient;
 import boofcv.testing.BoofTesting;
@@ -62,14 +62,14 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	public void checkSubImage() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
-		BrightFeature expected = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, expected);
+		TupleDesc_F64 expected = alg.createDescription();
+		alg.describe(c_x,c_y, 0, 1, true, expected);
 
 		II sub = BoofTesting.createSubImageOf(ii);
 
 		alg.setImage(sub);
-		BrightFeature found = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, found);
+		TupleDesc_F64 found = alg.createDescription();
+		alg.describe(c_x,c_y, 0, 1, true, found);
 
 		assertTrue(isSimilar(expected,found));
 	}
@@ -81,10 +81,10 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	public void changeScale() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
-		BrightFeature a = alg.createDescription();
-		BrightFeature b = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, a);
-		alg.describe(c_x,c_y, 0, 1.5, b);
+		TupleDesc_F64 a = alg.createDescription();
+		TupleDesc_F64 b = alg.createDescription();
+		alg.describe(c_x,c_y, 0, 1, true, a);
+		alg.describe(c_x,c_y, 0, 1.5, true, b);
 
 		assertFalse(isSimilar(a,b));
 	}
@@ -96,18 +96,15 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	public void changeRotation() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
-		BrightFeature a = alg.createDescription();
-		BrightFeature b = alg.createDescription();
-		alg.describe(c_x,c_y, 0, 1, a);
-		alg.describe(c_x,c_y, 1, 1, b);
+		TupleDesc_F64 a = alg.createDescription();
+		TupleDesc_F64 b = alg.createDescription();
+		alg.describe(c_x,c_y, 0, 1, true, a);
+		alg.describe(c_x,c_y, 1, 1, true, b);
 
 		assertFalse(isSimilar(a,b));
 	}
 
-	private boolean isSimilar(BrightFeature a, BrightFeature b ) {
-		if( a.white != b.white)
-			return false;
-
+	private boolean isSimilar(TupleDesc_F64 a, TupleDesc_F64 b ) {
 		for( int i = 0; i < 64; i++ ) {
 			double diff = Math.abs(a.value[i] - b.value[i]);
 
@@ -127,8 +124,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	
 		for( int i = 0; i < 10; i++ ) {
 			double angle = (2.0*Math.PI*i)/10;
-			alg.describe(0,0, angle, 1, alg.createDescription());
-			alg.describe(ii.width-1,ii.height-1, angle, 1, alg.createDescription());
+			alg.describe(0,0, angle, 1, true, alg.createDescription());
+			alg.describe(ii.width-1,ii.height-1, angle, 1, true, alg.createDescription());
 		}
 	}
 
@@ -143,8 +140,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);
 		alg.setImage(ii);
 		
-		BrightFeature feat = alg.createDescription();
-		alg.describe(20,20, 0.75, 1, feat);
+		TupleDesc_F64 feat = alg.createDescription();
+		alg.describe(20,20, 0.75, 1, true, feat);
 
 		for( double f : feat.value )
 			assertEquals(0,f,1e-4);
@@ -164,8 +161,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
-		BrightFeature feat = alg.createDescription();
-		alg.describe(15,15, 0, 1, feat);
+		TupleDesc_F64 feat = alg.createDescription();
+		alg.describe(15,15, 0, 1, true, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(feat.value[i],feat.value[i+1],1e-4);
@@ -175,7 +172,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 		}
 
 		// now orient the feature along the y-axis
-		alg.describe(15,15, Math.PI / 2.0, 1, feat);
+		alg.describe(15,15, Math.PI / 2.0, 1, true, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(-feat.value[i+2],feat.value[i+3],1e-4);
@@ -197,8 +194,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
-		BrightFeature feat = alg.createDescription();
-		alg.describe(25,25, 0, 1.5, feat);
+		TupleDesc_F64 feat = alg.createDescription();
+		alg.describe(25,25, 0, 1.5, true, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
 			assertEquals(feat.value[i],feat.value[i+1],1e-4);

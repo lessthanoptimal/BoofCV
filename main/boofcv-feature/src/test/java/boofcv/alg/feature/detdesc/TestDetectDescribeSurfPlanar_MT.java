@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
@@ -102,10 +102,13 @@ class TestDetectDescribeSurfPlanar_MT {
 					continue;
 				}
 
-				BrightFeature fd_st = desc_ST.getDescription(idx_st);
-				BrightFeature fd_mt = desc_MT.getDescription(idx_mt);
+				if( desc_ST.isWhite(idx_st) != desc_MT.isWhite(idx_mt) ) {
+					continue;
+				}
 
-				assertEquals(fd_st.white,fd_mt.white);
+				TupleDesc_F64 fd_st = desc_ST.getDescription(idx_st);
+				TupleDesc_F64 fd_mt = desc_MT.getDescription(idx_mt);
+
 				assertEquals(0, DescriptorDistance.sad(fd_st,fd_mt));
 				matched = true;
 				break;

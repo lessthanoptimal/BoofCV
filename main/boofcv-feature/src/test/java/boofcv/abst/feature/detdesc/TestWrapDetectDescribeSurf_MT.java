@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.detdesc;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
@@ -35,27 +35,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestWrapDetectDescribeSurf_MT extends GenericTestsDetectDescribePoint<GrayF32, BrightFeature>
+class TestWrapDetectDescribeSurf_MT extends GenericTestsDetectDescribePoint<GrayF32, TupleDesc_F64>
 {
 	static {
 		BoofConcurrency.USE_CONCURRENT = true;
 	}
 
 	TestWrapDetectDescribeSurf_MT() {
-		super(true, true, ImageType.single(GrayF32.class), BrightFeature.class);
+		super(true, true, ImageType.single(GrayF32.class), TupleDesc_F64.class);
 	}
 
 	@Override
-	public DetectDescribePoint<GrayF32, BrightFeature> createDetDesc() {
+	public DetectDescribePoint<GrayF32, TupleDesc_F64> createDetDesc() {
 		return FactoryDetectDescribe.surfStable(null,null,null, GrayF32.class);
 	}
 
 	@Test
 	void compare() {
 		BoofConcurrency.USE_CONCURRENT = false;
-		DetectDescribePoint<GrayF32, BrightFeature> surfA = createDetDesc();
+		DetectDescribePoint<GrayF32, TupleDesc_F64> surfA = createDetDesc();
 		BoofConcurrency.USE_CONCURRENT = true;
-		DetectDescribePoint<GrayF32, BrightFeature> surfB = createDetDesc();
+		DetectDescribePoint<GrayF32, TupleDesc_F64> surfB = createDetDesc();
 
 		GrayF32 image = new GrayF32(400,300);
 		GImageMiscOps.fillUniform(image, rand, 0, 100);
@@ -76,16 +76,15 @@ class TestWrapDetectDescribeSurf_MT extends GenericTestsDetectDescribePoint<Gray
 					continue;
 				if( surfA.getRadius(i) != surfB.getRadius(j))
 					continue;
+				if( surfA.getSet(i) != surfB.getSet(j))
+					continue;
 				Point2D_F64 pa = surfA.getLocation(i);
 				Point2D_F64 pb = surfB.getLocation(j);
 				if( pa.distance(pb) > UtilEjml.TEST_F64 )
 					continue;
 
-				BrightFeature a = surfA.getDescription(i);
-				BrightFeature b = surfB.getDescription(j);
-
-				if(a.white != b.white)
-					continue;
+				TupleDesc_F64 a = surfA.getDescription(i);
+				TupleDesc_F64 b = surfB.getDescription(j);
 
 				matched = true;
 				for (int k = 0; k < a.size(); k++) {

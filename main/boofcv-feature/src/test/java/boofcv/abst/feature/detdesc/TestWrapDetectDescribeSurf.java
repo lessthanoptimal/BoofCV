@@ -20,7 +20,7 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<GrayF32,BrightFeature>
+public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<GrayF32,TupleDesc_F64>
 {
 
 	static {
@@ -39,11 +39,11 @@ public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<
 	}
 
 	TestWrapDetectDescribeSurf() {
-		super(true, true, ImageType.single(GrayF32.class), BrightFeature.class);
+		super(true, true, ImageType.single(GrayF32.class), TupleDesc_F64.class);
 	}
 
 	@Override
-	public DetectDescribePoint<GrayF32, BrightFeature> createDetDesc() {
+	public DetectDescribePoint<GrayF32, TupleDesc_F64> createDetDesc() {
 		return FactoryDetectDescribe.surfStable(null,null,null, GrayF32.class);
 	}
 
@@ -52,7 +52,7 @@ public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<
 	 */
 	@Test
 	void setsRigorous() {
-		DetectDescribePoint<GrayF32,BrightFeature> alg = createDetDesc();
+		DetectDescribePoint<GrayF32,TupleDesc_F64> alg = createDetDesc();
 
 		assertEquals(2, alg.getNumberOfSets());
 		alg.detect(image);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertImage;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 import org.junit.jupiter.api.Test;
@@ -64,18 +64,16 @@ public class TestDescribePointSurfPlanar {
 			double angle = rand.nextDouble()*Math.PI*2;
 			double scale = rand.nextDouble()*10+0.9;
 
-			BrightFeature found = alg.createDescription();
+			TupleDesc_F64 found = alg.createDescription();
 			alg.describe(x,y,angle,scale,found);
 
 			desc.setImage(gray);
-			boolean expectedLaplace = desc.computeLaplaceSign((int)(x+0.5),(int)(y+0.5),scale);
-			assertEquals(expectedLaplace,found.white);
 
-			BrightFeature expected = desc.createDescription();
+			TupleDesc_F64 expected = desc.createDescription();
 
 			for( int b = 0; b < 3; b++ ) {
 				desc.setImage(input.getBand(b));
-				desc.describe(x,y,angle,scale,expected);
+				desc.describe(x,y,angle,scale, true, expected);
 
 				// should be off by a constant scale factor since it is normalized across all bands not just one
 				double norm = 0;

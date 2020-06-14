@@ -20,7 +20,7 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.alg.feature.detdesc.CompleteSift;
 import boofcv.core.image.GConvertImage;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -32,7 +32,7 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
-		implements DetectDescribePoint<I,BrightFeature> {
+		implements DetectDescribePoint<I, TupleDesc_F64> {
 
 	CompleteSift alg;
 	GrayF32 imageFloat = new GrayF32(1,1);
@@ -44,12 +44,12 @@ public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
 	}
 
 	@Override
-	public BrightFeature createDescription() {
-		return new BrightFeature(alg.getDescriptorLength());
+	public TupleDesc_F64 createDescription() {
+		return new TupleDesc_F64(alg.getDescriptorLength());
 	}
 
 	@Override
-	public BrightFeature getDescription(int index) {
+	public TupleDesc_F64 getDescription(int index) {
 		return alg.getDescriptions().data[index];
 	}
 
@@ -59,8 +59,8 @@ public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
 	}
 
 	@Override
-	public Class<BrightFeature> getDescriptionType() {
-		return BrightFeature.class;
+	public Class<TupleDesc_F64> getDescriptionType() {
+		return TupleDesc_F64.class;
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
 
 	@Override
 	public int getSet(int index) {
-		return alg.getDescriptions().get(index).white ? 0 : 1;
+		return alg.getLocations().get(index).white ? 0 : 1;
 	}
 
 	@Override

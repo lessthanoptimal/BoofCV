@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detdesc;
 
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -28,15 +28,15 @@ import boofcv.struct.image.Planar;
  * @author Peter Abeles
  */
 public class TestSurfPlanar_to_DetectDescribePoint extends
-		GenericTestsDetectDescribePoint<Planar<GrayF32>,BrightFeature>
+		GenericTestsDetectDescribePoint<Planar<GrayF32>,TupleDesc_F64>
 {
 
 	public TestSurfPlanar_to_DetectDescribePoint() {
-		super(true, true, ImageType.pl(3, GrayF32.class), BrightFeature.class);
+		super(true, true, ImageType.pl(3, GrayF32.class), TupleDesc_F64.class);
 	}
 
 	@Override
-	public DetectDescribePoint<Planar<GrayF32>, BrightFeature> createDetDesc() {
+	public DetectDescribePoint<Planar<GrayF32>, TupleDesc_F64> createDetDesc() {
 		return FactoryDetectDescribe.surfColorStable(null, null, null, imageType);
 	}
 }

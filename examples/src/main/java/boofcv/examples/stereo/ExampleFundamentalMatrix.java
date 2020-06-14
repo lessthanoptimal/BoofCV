@@ -33,7 +33,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.fitting.modelset.ModelFitter;
@@ -134,10 +134,10 @@ public class ExampleFundamentalMatrix {
 				new ConfigFastHessian(0, 2, 400, 1, 9, 4, 4), null,null, GrayF32.class);
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
-		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
 
-		ExampleAssociatePoints<GrayF32,BrightFeature> findMatches =
+		ExampleAssociatePoints<GrayF32,TupleDesc_F64> findMatches =
 				new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);
 
 		findMatches.associate(left,right);

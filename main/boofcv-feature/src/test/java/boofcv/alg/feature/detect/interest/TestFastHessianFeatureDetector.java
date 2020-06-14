@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,13 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.GrayF32;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -48,5 +52,34 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 		alg.detect(integral);
 
 		return alg.getFoundPoints().size();
+	}
+
+	/**
+	 * Computes features inside a random image and sees if there is a reasonable ratio of the two types of features.
+	 * This will catch things like it only detecting white or black.
+	 */
+	@Test
+	void areThereBothWhiteAndBlackFeatures() {
+		var input = new GrayF32(width, height);
+		GImageMiscOps.fillUniform(input,rand,0,255);
+
+		var ii = input.createSameShape();
+		IntegralImageOps.transform(input,ii);
+
+		var alg = (FastHessianFeatureDetector<GrayF32>)createDetector(500);
+
+		alg.detect(ii);
+
+		int N = alg.getFoundPoints().size();
+		int countWhite=0;
+		for (int i = 0; i < N; i++) {
+			if( alg.getFoundPoints().get(i).isWhite() )
+				countWhite++;
+		}
+
+		// arbitrary threshold for what can be expected.
+		int minimum = N*3/10;
+		assertTrue(countWhite>minimum);
+		assertTrue((N-countWhite)>minimum);
 	}
 }

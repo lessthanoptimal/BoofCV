@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,8 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.descriptor.UtilFeature;
-import boofcv.alg.transform.ii.DerivativeIntegralImage;
-import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
@@ -95,10 +91,6 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	// does not include sample kernel size
 	protected int radiusDescriptor;
 
-	// storage for kernels used to compute laplacian sign
-	protected IntegralKernel kerXX;
-	protected IntegralKernel kerYY;
-
 	/**
 	 * Creates a SURF descriptor of arbitrary dimension by changing how the local region is sampled.
 	 *
@@ -145,8 +137,8 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		this(4,5,3, 4.5 , false,inputType);
 	}
 
-	public BrightFeature createDescription() {
-		return new BrightFeature(featureDOF);
+	public TupleDesc_F64 createDescription() {
+		return new TupleDesc_F64(featureDOF);
 	}
 
 	public void setImage( II integralImage ) {
@@ -159,57 +151,36 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 * Computes the SURF descriptor for the specified interest point.  If the feature
 	 * goes outside of the image border (including convolution kernels) then null is returned.
 	 * </p>
-	 *
 	 * @param x Location of interest point.
 	 * @param y Location of interest point.
 	 * @param angle The angle the feature is pointing at in radians.
 	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
+	 * @param normalize Apply L2 normalization to the descriptor
 	 * @param ret storage for the feature. Must have 64 values.
 	 */
-	public void describe(double x, double y, double angle, double scale, BrightFeature ret)
+	public void describe(double x, double y, double angle, double scale, boolean normalize, TupleDesc_F64 ret)
 	{
-		describe(x, y, angle, scale, (TupleDesc_F64) ret);
+		if( ret.value.length != featureDOF )
+			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" elements");
 
-		// normalize feature vector to have an Euclidean length of 1
-		// adds light invariance
-		UtilFeature.normalizeL2(ret);
-
-		// Laplacian's sign
-		ret.white = computeLaplaceSign((int)(x+0.5),(int)(y+0.5), scale);
-	}
-
-	/**
-	 * Compute SURF descriptor, but without laplacian sign
-	 *
-	 * @param x Location of interest point.
-	 * @param y Location of interest point.
-	 * @param angle The angle the feature is pointing at in radians.
-	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
-	 * @param ret storage for the feature. Must have 64 values.
-	 */
-	public void describe(double x, double y, double angle, double scale, TupleDesc_F64 ret)
-	{
 		double c = Math.cos(angle),s=Math.sin(angle);
+
+		this.gradient.setImage(ii);
+		this.gradient.setWidth(widthSample*scale);
 
 		// By assuming that the entire feature is inside the image faster algorithms can be used
 		// the results are also of dubious value when interacting with the image border.
-		boolean isInBounds =
-				SurfDescribeOps.isInside(ii,x,y, radiusDescriptor,widthSample,scale,c,s);
-
-		// declare the feature if needed
-		if( ret == null )
-			ret = new BrightFeature(featureDOF);
-		else if( ret.value.length != featureDOF )
-			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
-
-		gradient.setImage(ii);
-		gradient.setWidth(widthSample*scale);
+		boolean isInBounds = SurfDescribeOps.isInside(ii,x,y, radiusDescriptor,widthSample,scale,c,s);
 
 		// use a safe method if its along the image border
-		SparseImageGradient gradient = isInBounds ? this.gradient : this.gradientSafe;
+		SparseImageGradient<II,?> gradient = isInBounds ? this.gradient : this.gradientSafe;
 
 		// extract descriptor
 		features(x, y, c, s, scale, gradient , ret.value);
+
+		// normalize feature vector to have an Euclidean length of 1 which adds light invariance
+		if( normalize )
+			UtilFeature.normalizeL2(ret);
 	}
 
 	/**
@@ -294,23 +265,6 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		}
 	}
 
-	/**
-	 * Compute the sign of the Laplacian using a sparse convolution.
-	 *
-	 * @param x center
-	 * @param y center
-	 * @param scale scale of the feature
-	 * @return true if positive
-	 */
-	public boolean computeLaplaceSign(int x, int y, double scale) {
-		int s = (int)Math.ceil(scale);
-		kerXX = DerivativeIntegralImage.kernelDerivXX(9*s,kerXX);
-		kerYY = DerivativeIntegralImage.kernelDerivYY(9*s,kerYY);
-		double lap = GIntegralImageOps.convolveSparse(ii,kerXX,x,y);
-		lap += GIntegralImageOps.convolveSparse(ii,kerYY,x,y);
-
-		return lap > 0;
-	}
 
 	public int getDescriptionLength() {
 		return featureDOF;

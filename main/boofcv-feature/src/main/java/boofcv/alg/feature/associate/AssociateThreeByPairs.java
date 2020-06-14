@@ -98,6 +98,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 
 	@Override
 	public void associate() {
+		sanityCheck();
 		matches.reset();
 
 		// Associate view A to view B
@@ -164,6 +165,19 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 
 		// Prune triplets which don't match
 		pruneMatches();
+	}
+
+	/**
+	 * Makes sure the user didn't screw up by passing in the same lists. This could happen if they assumed a copy
+	 * was being made internally.
+	 */
+	private void sanityCheck() {
+		assert(featuresA!=featuresB);
+		assert(featuresA!=featuresC);
+		assert(featuresB!=featuresC);
+		assert(setsA!=setsB);
+		assert(setsA!=setsC);
+		assert(setsB!=setsC);
 	}
 
 	/**
