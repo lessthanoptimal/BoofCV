@@ -231,6 +231,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 
+		config.tracker.klt.maximumTracks = 300;
 		config.tracker.klt.toleranceFB = 3;
 		config.tracker.klt.pruneClose = true;
 		config.tracker.klt.config.maxIterations = 25;
@@ -242,7 +243,6 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
 		config.tracker.detDesc.detectPoint.general.radius = 3;
-		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
 		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
@@ -268,6 +268,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 		config.tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 
+		config.tracker.klt.maximumTracks = 300;
 		config.tracker.klt.toleranceFB = 3;
 		config.tracker.klt.pruneClose = true;
 		config.tracker.klt.config.maxIterations = 25;
@@ -279,7 +280,6 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
 		config.tracker.detDesc.detectPoint.general.threshold = 1.0f;
 		config.tracker.detDesc.detectPoint.general.radius = 5;
-		config.tracker.detDesc.detectPoint.general.maxFeatures = 300;
 		config.tracker.detDesc.detectPoint.general.selector.type = SelectLimitTypes.SELECT_N;
 
 		config.tracker.associate.greedy.scoreRatioThreshold = 0.75;
