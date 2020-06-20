@@ -77,7 +77,8 @@ public class VisualizeHoughBinary
 	int blurRadius = 2;
 	int view = 0;
 	boolean logIntensity = false;
-	boolean mergeSimilar=true;
+	boolean mergeSimilar= true;
+	boolean showLines = true;
 
 	// is this the first time the image has been opened?
 	boolean firstOpenImage = true;
@@ -192,6 +193,8 @@ public class VisualizeHoughBinary
 
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			if( !showLines )
+				return;
 			if (view == 0) {
 				super.paintInPanel(tran, g2);
 			} else if (view == 2) {
@@ -230,18 +233,18 @@ public class VisualizeHoughBinary
 		public void handleViewChange( int newView ) {
 			boolean centerAndRescale = false;
 			switch (newView) {
-				case 0:
+				case 0 -> {
 					centerAndRescale = view == 2;
 					setImage(input);
-					break;
-				case 1:
+				}
+				case 1 -> {
 					centerAndRescale = view == 2;
 					setImage(renderedBinary);
-					break;
-				case 2:
+				}
+				case 2 -> {
 					centerAndRescale = view < 2;
 					setImage(renderedTran);
-					break;
+				}
 			}
 			view = newView;
 			autoScaleCenterOnSetImage = centerAndRescale;
@@ -260,6 +263,7 @@ public class VisualizeHoughBinary
 		JConfigLength lengthCounts = new JConfigLength(this,false);
 		JSpinner spinnerLocalMax = spinner(configHough.localMaxRadius, 1, 100, 2);
 		JCheckBox checkMergeSimilar = checkbox("Merge Similar",mergeSimilar);
+		JCheckBox checkShowLines = checkbox("Show Lines",showLines);
 
 		public ControlPanel() {
 			super(BoofSwingUtil.MIN_ZOOM, BoofSwingUtil.MAX_ZOOM, 0.5, false);
@@ -277,6 +281,7 @@ public class VisualizeHoughBinary
 			addLabeled(lengthCounts, "Min. Count");
 			addLabeled(spinnerLocalMax, "Local Max");
 			addAlignLeft(checkMergeSimilar);
+			addAlignLeft(checkShowLines);
 			addVerticalGlue();
 		}
 
@@ -319,6 +324,9 @@ public class VisualizeHoughBinary
 				mergeSimilar = checkMergeSimilar.isSelected();
 				createAlg();
 				reprocessImageOnly();
+			} else if( e.getSource() == checkShowLines ) {
+				showLines = checkShowLines.isSelected();
+				imagePanel.repaint();
 			}
 		}
 

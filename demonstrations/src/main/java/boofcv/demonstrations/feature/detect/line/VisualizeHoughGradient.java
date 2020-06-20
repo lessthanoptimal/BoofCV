@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,6 +88,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 	boolean logIntensity = false;
 	Type type = Type.FOOT;
 	boolean mergeSimilar=true;
+	boolean showLines = true;
 
 	GrayF32 transformLog = new GrayF32(1,1);
 
@@ -237,6 +238,9 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			if( !showLines )
+				return;
+
 			if( view == 0 ) {
 				super.paintInPanel(tran,g2);
 			} else if( view == 2 ) {
@@ -301,6 +305,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		JSpinner spinnerEdgeThresh = spinner(configHough.thresholdEdge,1,100,2);
 		JSpinner spinnerRefRadius = spinner(configHough.refineRadius,0,20,1);
 		JCheckBox checkMergeSimilar = checkbox("Merge Similar",mergeSimilar);
+		JCheckBox checkShowLines = checkbox("Show Lines",showLines);
 
 		JSpinner spinnerResRange = spinner(configPolar.resolutionRange, 0.1, 50, 0.5);
 		JSpinner spinnerBinsAngle = spinner(configPolar.numBinsAngle, 10, 1000, 1);
@@ -318,6 +323,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 			addLabeled(spinnerEdgeThresh,"Edge Thresh");
 			addLabeled(spinnerRefRadius,"Refine Radius");
 			addAlignLeft(checkMergeSimilar);
+			addAlignLeft(checkShowLines);
 			addSeparator(120);
 			addLabeled(spinnerResRange, "Res. Range");
 			addLabeled(spinnerBinsAngle, "Bins Angle");
@@ -379,6 +385,9 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 				mergeSimilar = checkMergeSimilar.isSelected();
 				createAlg();
 				reprocessImageOnly();
+			} else if( e.getSource() == checkShowLines ) {
+				showLines = checkShowLines.isSelected();
+				imagePanel.repaint();
 			}
 		}
 	}
