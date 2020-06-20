@@ -134,9 +134,7 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 		}
 
 		@Override
-		public void reset() {
-			throw new RuntimeException("Not supported");
-		}
+		public void reset() {}
 
 		@Override
 		public BufferedImage getGuiImage() {
