@@ -38,10 +38,7 @@ public class ConfigHoughGradient implements Configuration {
 	 * Lines which are this close to the origin of the transformed image are ignored.  Try 5.
 	 */
 	public int minDistanceFromOrigin = 5;
-	/**
-	 * Threshold for classifying pixels as edge or not.  Try 30.
-	 */
-	public float thresholdEdge = 30;
+
 	/**
 	 * Maximum number of lines to return. If &le; 0 it will return them all.
 	 */
@@ -62,6 +59,11 @@ public class ConfigHoughGradient implements Configuration {
 	 */
 	public int refineRadius = 3;
 
+	/**
+	 * How the gradient is thresholded
+	 */
+	public ConfigEdgeThreshold edgeThreshold = new ConfigEdgeThreshold();
+
 	public ConfigHoughGradient() {
 	}
 
@@ -74,7 +76,7 @@ public class ConfigHoughGradient implements Configuration {
 		this.localMaxRadius = localMaxRadius;
 		this.minCounts = minCounts;
 		this.minDistanceFromOrigin = minDistanceFromOrigin;
-		this.thresholdEdge = thresholdEdge;
+		this.edgeThreshold.threshold = thresholdEdge;
 		this.maxLines = maxLines;
 	}
 
@@ -82,7 +84,7 @@ public class ConfigHoughGradient implements Configuration {
 		this.localMaxRadius = src.localMaxRadius;
 		this.minCounts = src.minCounts;
 		this.minDistanceFromOrigin = src.minDistanceFromOrigin;
-		this.thresholdEdge = src.thresholdEdge;
+		this.edgeThreshold.setTo(src.edgeThreshold);
 		this.maxLines = src.maxLines;
 		this.mergeAngle = src.mergeAngle;
 		this.mergeDistance = src.mergeDistance;

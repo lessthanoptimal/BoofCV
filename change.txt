@@ -39,6 +39,7 @@ Version : 0.37
 - Demonstration Applications
   * Discrete image pyramid can now be configured with both min pixels and levels
   * Updated Hybrid Tracker's GUI controls
+  * Updated Hough Binary and Hough Gradient to allow clicking in transformed image and more
 - FeatureSelectLimit
   * Supports multiple point types
   * Variant with and without intensity information

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.line.ConfigHoughGradient;
 import boofcv.factory.feature.detect.line.ConfigLineRansac;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.struct.image.GrayU8;
@@ -85,7 +86,7 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 		GImageMiscOps.addUniform(input,new Random(234),0,20);
 
 		houghFoot = FactoryDetectLine.houghLineFoot(null,null, imageType);
-		houghPolar = FactoryDetectLine.houghLinePolar(null,null, imageType);
+		houghPolar = FactoryDetectLine.houghLinePolar((ConfigHoughGradient)null,null, imageType);
 		houghFootSub = FactoryDetectLine.houghLineFootSub(null, imageType);
 		detectorSegment = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
 	}

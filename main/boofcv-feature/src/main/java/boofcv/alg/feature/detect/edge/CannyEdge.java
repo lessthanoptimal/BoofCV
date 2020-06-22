@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 
@@ -108,7 +109,9 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * @param threshHigh Upper threshold. &ge; 0.
 	 * @param output (Might be option) Output binary image.  Edge pixels are marked with 1 and everything else 0.
 	 */
-	public void process(T input , float threshLow, float threshHigh , GrayU8 output ) {
+	public void process(T input , float threshLow, float threshHigh , @Nullable GrayU8 output ) {
+		if( output != null )
+			output.reshape(input);
 
 		if( threshLow < 0 || threshHigh < 0 )
 			throw new IllegalArgumentException("Threshold must be >= zero!");

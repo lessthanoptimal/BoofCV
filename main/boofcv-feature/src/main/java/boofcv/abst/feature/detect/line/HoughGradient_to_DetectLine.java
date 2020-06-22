@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.alg.feature.detect.line.HoughTransformGradient;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -50,7 +49,7 @@ import java.util.List;
 public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends ImageGray<D>>
 	implements DetectLine<I>
 {
-	HoughTransformGradient hough;
+	HoughTransformGradient<D> hough;
 	// computes image gradient
 	ImageGradient<I,D> gradient;
 	D derivX, derivY;
@@ -61,11 +60,10 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 	// storage for edge binary image
 	GrayU8 binary = new GrayU8(1,1);
 
-	// threshold for intensity image
-	float thresholdEdge = 20;
-
-	// should it apply non-max or not
-	boolean nonMaxSuppression=true;
+	// Minimum edge intensity to be used when computing edge mask
+	public float thresholdEdge = 20.0f;
+	// If non-maximum suppression is used when computing edge mask
+	public boolean nonMaxSuppression = true;
 
 	Class<I> inputType;
 	Class<D> derivType;
@@ -79,9 +77,6 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 
 		derivX = GeneralizedImageOps.createSingleBand(derivType,1,1);
 		derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
-	}
-	public HoughGradient_to_DetectLine( HoughTransformGradient hough,  Class<I> inputType ) {
-		this(hough, FactoryDerivative.prewitt(inputType,(Class<D>)null), inputType);
 	}
 
 	@Override
@@ -121,7 +116,7 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 		return binary;
 	}
 
-	public HoughTransformGradient getHough() {
+	public HoughTransformGradient<D> getHough() {
 		return hough;
 	}
 

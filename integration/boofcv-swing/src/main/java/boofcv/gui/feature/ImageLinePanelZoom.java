@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,9 +63,9 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 		selectedLine = -1;
 	}
 
-	public synchronized int findLine( double x , double y , double tolerance ) {
+	public synchronized int findLine( double x , double y , float tolerance ) {
 		int bestLine = -1;
-		float bestDistance = Float.MAX_VALUE;
+		float bestDistance = tolerance;
 
 		for (int i = 0; i < lines.size(); i++) {
 			float d = Distance2D_F32.distance(lines.get(i),(float)x,(float)y);

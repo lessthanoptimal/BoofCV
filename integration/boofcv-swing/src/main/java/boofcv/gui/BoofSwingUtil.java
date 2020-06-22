@@ -563,6 +563,15 @@ public class BoofSwingUtil {
 		return field;
 	}
 
+	/**
+	 * Wraps the component in the center of a BorderLayout
+	 */
+	public static JComponent wrapBorder(JComponent comp) {
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(comp,BorderLayout.CENTER);
+		return panel;
+	}
+
 	private static class HexFormatter extends DefaultFormatter {
 		@Override
 		public Object stringToValue(String text) throws ParseException {

@@ -18,6 +18,8 @@
 
 package boofcv.factory.feature.detect.line;
 
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
@@ -27,6 +29,21 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigHoughBinary implements Configuration {
+
+	/**
+	 * Approach used to compute a binary image
+	 */
+	public Binarization binarization = Binarization.EDGE;
+
+	/**
+	 * How the image is thresholded if {@link Binarization#IMAGE} is selected
+	 */
+	public ConfigThreshold thresholdImage = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
+
+	/**
+	 * How the gradient is thresholded if {@link Binarization#EDGE} is selected
+	 */
+	public ConfigEdgeThreshold thresholdEdge = new ConfigEdgeThreshold();
 
 	/**
 	 * Radius for local maximum suppression.  Try 2.
@@ -61,6 +78,9 @@ public class ConfigHoughBinary implements Configuration {
 	}
 
 	public void setTo( ConfigHoughBinary src ) {
+		this.binarization = src.binarization;
+		this.thresholdImage.setTo(src.thresholdImage);
+		this.thresholdEdge.setTo(src.thresholdEdge);
 		this.localMaxRadius = src.localMaxRadius;
 		this.minCounts.setTo(src.minCounts);
 		this.maxLines = src.maxLines;
@@ -71,5 +91,19 @@ public class ConfigHoughBinary implements Configuration {
 	@Override
 	public void checkValidity() {
 
+	}
+
+	/**
+	 * Approach used to compute a binary image
+	 */
+	public enum Binarization {
+		/**
+		 * Applies a threshold to the input image
+		 */
+		IMAGE,
+		/**
+		 * Applies a threshold to the gradient magnitude.
+		 */
+		EDGE
 	}
 }

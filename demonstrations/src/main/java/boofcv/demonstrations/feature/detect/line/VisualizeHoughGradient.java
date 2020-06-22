@@ -45,10 +45,8 @@ import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -115,17 +113,26 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
 				controlPanel.setCursor(p.x,p.y);
 
-				if( SwingUtilities.isLeftMouseButton(e)) {
-					imagePanel.centerView(p.x,p.y);
-
-					if( view == 0 ) {
-						int s = imagePanel.findLine(p.x, p.y, 5.0 / imagePanel.getScale());
-						if (s != -1) {
-							imagePanel.setSelected(s);
-							imagePanel.repaint();
-						}
-					}
+				if( !SwingUtilities.isLeftMouseButton(e)) {
+					return;
 				}
+
+				float tolerance = 10.0f / (float)imagePanel.getScale();
+				int s = -1;
+				if( view == 0 ) {
+					s = imagePanel.findLine(p.x, p.y, tolerance);
+				} else if( view == 2 ) {
+					s = findLineInTransformed((int)p.x,(int)p.y,tolerance);
+				}
+				if (s != -1) {
+					// deselect if clicked twice
+					if( imagePanel.getSelected() == s )
+						s = -1;
+				} else {
+					imagePanel.centerView(p.x, p.y);
+				}
+				imagePanel.setSelected(s);
+				imagePanel.repaint();
 			}
 		});
 		imagePanel.setListener(scale -> controlPanel.setScale(scale));
@@ -149,14 +156,12 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		}
 
 		synchronized (lockAlg) {
-			switch( type ) {
-				case FOOT:
-					lineDetector = (HoughGradient_to_DetectLine)FactoryDetectLine.houghLineFoot(configHough,configFoot,imageType);
-					break;
-				case POLAR:
-					lineDetector = (HoughGradient_to_DetectLine)FactoryDetectLine.houghLinePolar(configHough,configPolar,imageType);
-					break;
-			}
+			lineDetector = switch (type) {
+				case FOOT -> lineDetector = (HoughGradient_to_DetectLine)
+						FactoryDetectLine.houghLineFoot(configHough, configFoot, imageType);
+				case POLAR -> lineDetector = (HoughGradient_to_DetectLine)
+						FactoryDetectLine.houghLinePolar(configHough, configPolar, imageType);
+			};
 		}
 
 		SwingUtilities.invokeLater(()->{
@@ -231,6 +236,24 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		});
 	}
 
+	private int findLineInTransformed( int x , int y , double tolerance) {
+		Point2D_F64 location = new Point2D_F64();
+		synchronized (lockAlg) {
+			double bestDistance = tolerance;
+			int bestIndex = -1;
+			List<LineParametric2D_F32> lines = lineDetector.getHough().getLinesMerged();
+			for (int i = 0; lines != null && i < lines.size(); i++) {
+				LineParametric2D_F32 l = lines.get(i);
+				lineDetector.getHough().getParameters().lineToCoordinate(l, location);
+				if( location.distance2(x,y) < bestDistance ) {
+					bestDistance = location.distance2(x,y);
+					bestIndex = i;
+				}
+			}
+			return bestIndex;
+		}
+	}
+
 	private class Visualization extends ImageLinePanelZoom {
 		BufferedImage input;
 		Ellipse2D.Double c = new Ellipse2D.Double();
@@ -250,16 +273,19 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 
 		public void handleViewChange( int newView ) {
 			boolean centerAndRescale = false;
-			switch(newView) {
-				case 0:
+			switch (newView) {
+				case 0 -> {
 					centerAndRescale = view == 2;
-					setImage(input);break;
-				case 1:
+					setImage(input);
+				}
+				case 1 -> {
 					centerAndRescale = view == 2;
-					setImage(renderedBinary);break;
-				case 2:
+					setImage(renderedBinary);
+				}
+				case 2 -> {
 					centerAndRescale = view < 2;
-					setImage(renderedTran);break;
+					setImage(renderedTran);
+				}
 			}
 			view = newView;
 			autoScaleCenterOnSetImage = centerAndRescale;
@@ -295,16 +321,17 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 	private class ControlPanel extends ViewedImageInfoPanel
 			implements ChangeListener, ActionListener
 	{
-		JComboBox<String> comboView = combo(0,"Lines","Edges","Parameter Space");
+		JComboBox<String> comboView = combo(0,"Lines","Edges","Transformed");
 		JCheckBox checkLog = checkbox("Log Intensity",logIntensity);
 		JComboBox<String> comboType = combo(type.ordinal(),"Foot","Polar");
 		JSpinner spinnerMaxLines = spinner(configHough.maxLines,0,200,1);
 		JSpinner spinnerBlur = spinner(blurRadius,0,20,1);
 		JSpinner spinnerMinCount = spinner(configHough.minCounts,1,100,1);
 		JSpinner spinnerLocalMax = spinner(configHough.localMaxRadius,1,100,2);
-		JSpinner spinnerEdgeThresh = spinner(configHough.thresholdEdge,1,100,2);
 		JSpinner spinnerRefRadius = spinner(configHough.refineRadius,0,20,1);
 		JCheckBox checkMergeSimilar = checkbox("Merge Similar",mergeSimilar);
+		ControlPanelEdgeThreshold controlEdgeThreshold = new ControlPanelEdgeThreshold(configHough.edgeThreshold,
+				VisualizeHoughGradient.this::handleConfigChange);
 		JCheckBox checkShowLines = checkbox("Show Lines",showLines);
 
 		JSpinner spinnerResRange = spinner(configPolar.resolutionRange, 0.1, 50, 0.5);
@@ -312,84 +339,71 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 
 		public ControlPanel() {
 			super(BoofSwingUtil.MIN_ZOOM,BoofSwingUtil.MAX_ZOOM,0.5,false);
-			add(comboView);
-			addAlignLeft(checkLog);
-			addSeparator(120);
-			addLabeled(comboType,"Param. Type");
-			addLabeled(spinnerMaxLines,"Max Lines");
-			addLabeled(spinnerBlur,"Blur Radius");
-			addLabeled(spinnerMinCount,"Min. Count");
-			addLabeled(spinnerLocalMax,"Local Max");
-			addLabeled(spinnerEdgeThresh,"Edge Thresh");
-			addLabeled(spinnerRefRadius,"Refine Radius");
-			addAlignLeft(checkMergeSimilar);
-			addAlignLeft(checkShowLines);
-			addSeparator(120);
-			addLabeled(spinnerResRange, "Res. Range");
-			addLabeled(spinnerBinsAngle, "Bins Angle");
+
+			controlEdgeThreshold.setBorder(BorderFactory.createTitledBorder("Edge Threshold"));
+			controlEdgeThreshold.setMaximumSize(controlEdgeThreshold.getPreferredSize());
+			addLabeled(comboView,"View");
+			addAlignLeft(checkLog,"Transform parameter space visualization by applying log");
+			addAlignLeft(checkShowLines,"Show lines");
+			addSeparator(140);
+			addLabeled(comboType,"Param. Type","Line equation parameterization");
+			addLabeled(spinnerMaxLines,"Max Lines","Maximum number of lines it will detect");
+			addLabeled(spinnerBlur,"Blur Radius","Amount of blur applied to the image");
+			addLabeled(spinnerMinCount,"Min. Count","Minimum number of counts/votes inside the transformed image");
+			addLabeled(spinnerLocalMax,"Local Max","Non-maximum suppression radius");
+			addLabeled(spinnerRefRadius,"Refine Radius","Radius of mean-shift refinement. Set to zero to turn off.");
+			addAlignLeft(checkMergeSimilar,"Check to see if two lines are similar and if so merge them");
+			addLabeled(spinnerResRange, "Res. Range","Resolution of range discretization (pixels) in transformed");
+			addLabeled(spinnerBinsAngle, "Bins Angle","Number of bins for angles in transform");
+			addAlignCenter(BoofSwingUtil.wrapBorder(controlEdgeThreshold),"Threshold for thresholding an edge");
 			addVerticalGlue();
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if (e.getSource() == spinnerResRange) {
+		public void controlChanged(final Object source) {
+			if (source == spinnerResRange) {
 				configPolar.resolutionRange = (Double) spinnerResRange.getValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if (e.getSource() == spinnerBinsAngle) {
+				handleConfigChange();
+			} else if (source == spinnerBinsAngle) {
 				configPolar.numBinsAngle = (Integer)spinnerBinsAngle.getValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == spinnerMaxLines ) {
+				handleConfigChange();
+			} else if( source == spinnerMaxLines ) {
 				configHough.maxLines = (Integer) spinnerMaxLines.getValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == spinnerBlur ) {
+				handleConfigChange();
+			} else if( source == spinnerBlur ) {
 				blurRadius = (Integer) spinnerBlur.getValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == spinnerMinCount ) {
+				handleConfigChange();
+			} else if( source == spinnerMinCount ) {
 				configHough.minCounts = (Integer) spinnerMinCount.getValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == spinnerLocalMax ) {
+				handleConfigChange();
+			} else if( source == spinnerLocalMax ) {
 				configHough.localMaxRadius = (Integer) spinnerLocalMax.getValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == spinnerEdgeThresh ) {
-				configHough.thresholdEdge = ((Number) spinnerEdgeThresh.getValue()).floatValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == spinnerRefRadius ) {
+				handleConfigChange();
+			} else if( source == spinnerRefRadius ) {
 				configHough.refineRadius = (Integer) spinnerRefRadius.getValue();
-				createAlg();
-				reprocessImageOnly();
-			} else {
-				super.stateChanged(e);
-			}
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboType ) {
+				handleConfigChange();
+			} else if( source == comboType ) {
 				type = Type.values()[comboType.getSelectedIndex()];
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == comboView ) {
+				handleConfigChange();
+			} else if( source == comboView ) {
 				imagePanel.handleViewChange(comboView.getSelectedIndex());
 				imagePanel.repaint();
-			} else if( e.getSource() == checkLog ) {
+			} else if( source == checkLog ) {
 				logIntensity = checkLog.isSelected();
 				reprocessImageOnly();
-			} else if( e.getSource() == checkMergeSimilar ) {
+			} else if( source == checkMergeSimilar ) {
 				mergeSimilar = checkMergeSimilar.isSelected();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == checkShowLines ) {
+				handleConfigChange();
+			} else if( source == checkShowLines ) {
 				showLines = checkShowLines.isSelected();
 				imagePanel.repaint();
 			}
 		}
+	}
+
+	private void handleConfigChange() {
+		createAlg();
+		reprocessImageOnly();
 	}
 
 	enum Type {

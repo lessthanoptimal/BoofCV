@@ -104,6 +104,8 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 			zoom = ((Number)selectZoom.getValue()).doubleValue();
 			if( listener != null )
 				listener.zoomChanged(zoom);
+		} else {
+			super.stateChanged(e);
 		}
 	}
 
