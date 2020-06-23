@@ -19,29 +19,31 @@
 package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.image.GrayF32;
-import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastArray;
 
 import javax.annotation.Nullable;
 
 /**
- * Converts {@link FeatureSelectLimit} into {@link FeatureSelectLimitIntensity}.
+ * Samples the intensity at the specified point.
  *
  * @author Peter Abeles
  */
-public class ConvertLimitToIntensity<Point> implements FeatureSelectLimitIntensity<Point>
-{
-	FeatureSelectLimit<Point> alg;
+public interface SampleIntensity<Point> {
+	/**
+	 * Returns the intensity. If the sampling method does not require the intensity image then it may be null.
+	 * @param intensity Image with intensity information. May be null if sampling method does not use it.
+	 * @param index Index of the point in the list
+	 * @param p Coordinate being sampled. Must be inside the image
+	 * @return The intensity at the sample point
+	 */
+	float sample(@Nullable GrayF32 intensity , int index, Point p );
 
-	public ConvertLimitToIntensity(FeatureSelectLimit<Point> alg) {
-		this.alg = alg;
-	}
+	/**
+	 * Pixel coordinate x-axis
+	 */
+	int getX( Point p );
 
-	@Override
-	public void select(GrayF32 intensity, boolean positive, @Nullable FastAccess<Point> prior,
-					   FastAccess<Point> detected, int limit, FastArray<Point> selected) {
-		alg.select(intensity.width,intensity.height,prior,detected,limit,selected);
-	}
-
-	@Override public void setSampler(SampleIntensity<Point> sampler) {}
+	/**
+	 * Pixel coordinate y-axis
+	 */
+	int getY( Point p );
 }

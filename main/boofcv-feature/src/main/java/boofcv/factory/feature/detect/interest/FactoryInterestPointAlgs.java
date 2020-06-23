@@ -34,6 +34,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.*;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
+import boofcv.alg.feature.detect.selector.SampleIntensityImage;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -71,7 +72,7 @@ public class FactoryInterestPointAlgs {
 				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
 				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
-		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
@@ -102,7 +103,7 @@ public class FactoryInterestPointAlgs {
 				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
 				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
-		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
@@ -132,7 +133,7 @@ public class FactoryInterestPointAlgs {
 				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
 				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
-		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
@@ -165,7 +166,7 @@ public class FactoryInterestPointAlgs {
 				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
 				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
-		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin,extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 

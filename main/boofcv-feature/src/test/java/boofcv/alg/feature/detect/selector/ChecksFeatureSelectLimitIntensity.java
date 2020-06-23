@@ -22,14 +22,14 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Generic tests that applied to all {@link FeatureSelectLimitIntensity}.
@@ -44,7 +44,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 
 	public abstract FeatureSelectLimitIntensity<Point> createAlgorithm();
 
-	public abstract FastQueue<Point> createQueue();
+	public abstract FastArray<Point> createArray();
 
 	@BeforeEach
 	public void setup() {
@@ -59,7 +59,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 		FastQueue<Point> detected = createRandom(15);
 
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
-		FastQueue<Point> found = createQueue();
+		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
 			alg.select(intensity,count==0,null,detected,30,found);
@@ -70,8 +70,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 			// see if there's the expected count in the output. The order should also be the same
 			assertEquals(15, found.size);
 			for (int i = 0; i < found.size; i++) {
-				assertNotSame(found.get(i), detected.get(i));
-				assertEquals(found.get(i), detected.get(i));
+				assertSame(found.get(i), detected.get(i));
 			}
 		}
 	}
@@ -82,12 +81,12 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 	@Test
 	void multipleCalls_MoreThan_SelectCleared() {
 		FastQueue<Point> prior = createRandom(20);
-		FastQueue<Point> detected = createRandom(30);
 
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
-		FastQueue<Point> found = createQueue();
+		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
+			FastQueue<Point> detected = createRandom(30);
 			alg.select(intensity,count==0,prior,detected,22,found);
 
 			// partial check to make sure the input wasn't modified
@@ -96,8 +95,9 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 
 			// see if there's the expected count in the output. The order should also be the same
 			assertEquals(22, found.size);
+			// Make sure elements from previous calls were not saved and returned
 			for (int i = 0; i < found.size; i++) {
-				assertNotSame(found.get(i), detected.get(i));
+				assertTrue(detected.contains(found.get(i)));
 			}
 		}
 	}
@@ -109,7 +109,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 	void priorIsBlowUp() {
 		FastQueue<Point> prior = createRandom(20);
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
-		FastQueue<Point> found = createQueue();
+		FastArray<Point> found = createArray();
 
 		alg.select(intensity,true,prior,createRandom(15),30,found);
 		alg.select(intensity,true,prior,createRandom(15),10,found);
@@ -121,13 +121,13 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 
 	public static abstract class I16 extends ChecksFeatureSelectLimitIntensity<Point2D_I16> {
 		@Override
-		public FastQueue<Point2D_I16> createQueue() {
-			return new FastQueue<>(Point2D_I16::new);
+		public FastArray<Point2D_I16> createArray() {
+			return new FastArray<>(Point2D_I16.class);
 		}
 
 		@Override
 		protected FastQueue<Point2D_I16> createRandom(int i2) {
-			FastQueue<Point2D_I16> detected = createQueue();
+			FastQueue<Point2D_I16> detected = new FastQueue<>(Point2D_I16::new);
 			for (int i = 0; i < i2; i++) {
 				detected.grow().set(rand.nextInt(width), rand.nextInt(height));
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -145,7 +145,7 @@ public class VisualizeFeatures {
 			}
 			int r = (int)(p.scale*scaleToRadius +0.5);
 			int w = r*2+1;
-			g2.drawOval((int)p.x-r,(int)p.y-r,w,w);
+			g2.drawOval((int)p.pixel.x-r,(int)p.pixel.y-r,w,w);
 		}
 	}
 

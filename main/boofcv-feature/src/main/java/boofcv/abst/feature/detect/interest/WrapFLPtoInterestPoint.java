@@ -71,7 +71,7 @@ public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return location.get(featureIndex);
+		return location.get(featureIndex).pixel;
 	}
 
 	@Override

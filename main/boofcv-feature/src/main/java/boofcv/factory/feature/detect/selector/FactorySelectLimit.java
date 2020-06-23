@@ -39,38 +39,41 @@ public class FactorySelectLimit {
 	 */
 	public static<Point extends GeoTuple<Point>>
 	FeatureSelectLimitIntensity<Point> intensity(@Nullable ConfigSelectLimit config , Class<Point> type ) {
+		FeatureSelectLimitIntensity<Point>  ret = intensity(config);
+		ret.setSampler(imageSampler(type));
+		return ret;
+	}
+
+	/**
+	 * Creates and returns {@link FeatureSelectLimitIntensity} using a {@link ConfigSelectLimit configuration}.
+	 * @param config Creates the specified select limit. if null it defaults to {@link ConfigSelectLimit}.
+	 */
+	public static<Point extends GeoTuple<Point>>
+	FeatureSelectLimitIntensity<Point> intensity(@Nullable ConfigSelectLimit config) {
 		if( config == null )
 			config = new ConfigSelectLimit();
 
 		return switch (config.type) {
-			case SELECT_N -> {
-				FeatureSelectLimitIntensity ret;
-				if( type == Point2D_I16.class ) {
-					ret = new FeatureSelectNBest.I16();
-				} else if( type == Point2D_F32.class ) {
-					ret = new FeatureSelectNBest.F32();
-				} else if( type == Point2D_F64.class ) {
-					ret = new FeatureSelectNBest.F64();
-				} else {
-					throw new IllegalArgumentException("Unknown point type " + type.getSimpleName());
-				}
-				yield ret;
-			}
+			case SELECT_N -> new FeatureSelectNBest<>();
 			case RANDOM -> new ConvertLimitToIntensity<>(new FeatureSelectRandom<Point>(config.randomSeed));
-			case UNIFORM -> {
-				FeatureSelectLimitIntensity ret;
-				if( type == Point2D_I16.class ) {
-					ret = new FeatureSelectUniformBest.I16();
-				} else if( type == Point2D_F32.class ) {
-					ret = new FeatureSelectUniformBest.F32();
-				} else if( type == Point2D_F64.class ) {
-					ret = new FeatureSelectUniformBest.F64();
-				} else {
-					throw new IllegalArgumentException("Unknown point type " + type.getSimpleName());
-				}
-				yield ret;
-			}
+			case UNIFORM -> new FeatureSelectUniformBest<>();
 		};
+	}
+
+	/**
+	 * Creates the correct {@link SampleIntensityImage} for the given point type
+	 */
+	public static<Point extends GeoTuple<Point>>
+	SampleIntensity<Point> imageSampler( Class<Point> type ) {
+		if( type == Point2D_I16.class ) {
+			return (SampleIntensity)new SampleIntensityImage.I16();
+		} else if( type == Point2D_F32.class ) {
+			return (SampleIntensity)new SampleIntensityImage.F32();
+		} else if( type == Point2D_F64.class ) {
+			return (SampleIntensity)new SampleIntensityImage.F64();
+		} else {
+			throw new IllegalArgumentException("Unknown point type " + type.getSimpleName());
+		}
 	}
 
 	/**

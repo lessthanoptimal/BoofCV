@@ -76,7 +76,7 @@ public class WrapSiftDetector<T extends ImageGray<T>>
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return detector.getDetections().get(featureIndex);
+		return detector.getDetections().get(featureIndex).pixel;
 	}
 
 	@Override

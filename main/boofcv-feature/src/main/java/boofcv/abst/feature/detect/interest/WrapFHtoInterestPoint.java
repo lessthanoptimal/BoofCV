@@ -57,7 +57,7 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 
 		detector.detect(integral);
 
-		location = detector.getFoundPoints();
+		location = detector.getFoundFeatures();
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return location.get(featureIndex);
+		return location.get(featureIndex).pixel;
 	}
 
 	@Override

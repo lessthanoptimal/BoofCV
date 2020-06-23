@@ -79,7 +79,7 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 	}
 
 	public boolean isWhite( int index ) {
-		return detector.getFoundPoints().get(index).white;
+		return detector.getFoundFeatures().get(index).white;
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 		detector.detect(grayII);
 
 		// describe the found interest points
-		foundPoints = detector.getFoundPoints();
+		foundPoints = detector.getFoundFeatures();
 
 		descriptions.resize(foundPoints.size());
 		featureAngles.resize(foundPoints.size());
@@ -111,9 +111,9 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
 			orientation.setObjectRadius(p.scale);
-			double angle = orientation.compute(p.x,p.y);
+			double angle = orientation.compute(p.pixel.x,p.pixel.y);
 
-			describe.describe(p.x, p.y, angle, p.scale, descriptions.get(i));
+			describe.describe(p.pixel.x, p.pixel.y, angle, p.scale, descriptions.get(i));
 
 			featureAngles.set(i,angle);
 		}
@@ -128,7 +128,7 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 	}
 
 	public Point2D_F64 getLocation(int featureIndex) {
-		return foundPoints.get(featureIndex);
+		return foundPoints.get(featureIndex).pixel;
 	}
 
 	public double getRadius(int featureIndex) {

@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.selector;
 
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import javax.annotation.Nullable;
 
@@ -43,5 +43,5 @@ public interface FeatureSelectLimit<Point> {
 	 */
 	void select( int imageWidth, int imageHeight,
 				 @Nullable FastAccess<Point> prior,
-				 FastAccess<Point> detected, int limit , FastQueue<Point> selected );
+				 FastAccess<Point> detected, int limit , FastArray<Point> selected );
 }

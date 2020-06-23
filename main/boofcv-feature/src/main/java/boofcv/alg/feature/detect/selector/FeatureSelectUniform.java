@@ -18,15 +18,13 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
-import georegression.struct.GeoTuple;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -39,8 +37,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class FeatureSelectUniform<Point extends GeoTuple<Point>>
-		implements FeatureSelectLimit<Point> {
+public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<Point> {
 
 	/** Configuration for uniformly selecting a grid */
 	public ConfigGridUniform configUniform = new ConfigGridUniform();
@@ -54,14 +51,15 @@ public abstract class FeatureSelectUniform<Point extends GeoTuple<Point>>
 	@Override
 	public void select(int imageWidth, int imageHeight,
 					   @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
-					   FastQueue<Point> selected)
+					   FastArray<Point> selected)
 	{
 		assert(limit>0);
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!
 		if( (prior == null || prior.size==0) && detected.size <= limit ) {
-			BoofMiscOps.copyAll(detected,selected);
+			// make a copy of the results with no pruning since it already has the desired number, or less
+			selected.addAll(detected);
 			return;
 		}
 
@@ -105,7 +103,7 @@ public abstract class FeatureSelectUniform<Point extends GeoTuple<Point>>
 					continue;
 
 				// Randomly select one and add it tot he grid
-				selected.grow().setTo(info.detected.remove( rand.nextInt(info.detected.size())));
+				selected.add(info.detected.remove( rand.nextInt(info.detected.size())));
 				change = true;
 			}
 			if( !change )

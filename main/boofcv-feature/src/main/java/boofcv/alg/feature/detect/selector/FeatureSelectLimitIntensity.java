@@ -20,13 +20,16 @@ package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import javax.annotation.Nullable;
 
 /**
  * Selects features inside the image until it hits a limit. Feature intensity is available to aide in the selection
  * process.
+ *
+ * By using {@link SampleIntensity} it's possible to support approaches which use the intensity image and ones which
+ * have features with intensity image and no access to an intensity image.
  *
  * @author Peter Abeles
  */
@@ -44,5 +47,10 @@ public interface FeatureSelectLimitIntensity<Point> {
 	 * @param selected (Output) Selected features. Element count not exceed the limit. Reset on every call.
 	 */
 	void select(GrayF32 intensity , boolean positive, @Nullable FastAccess<Point> prior,
-				FastAccess<Point> detected, int limit , FastQueue<Point> selected );
+				FastAccess<Point> detected, int limit , FastArray<Point> selected );
+
+	/**
+	 * Specifies how the intensity will be sampled.
+	 */
+	void setSampler( SampleIntensity<Point> sampler );
 }

@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.selector;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.QueueCorner;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +49,7 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 			}
 		}
 		int cellSize = 10;
-		QueueCorner found = new QueueCorner();
+		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectUniform<Point2D_I16> alg = createAlgorithm();
 		// make it easy to know the cell size
 		alg.configUniform = new TestFeatureSelectUniform.HackedConfig(cellSize);
@@ -59,7 +60,7 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 	}
 
 	private void checkSpread(QueueCorner detected, int cellSize,
-	int cellCount, QueueCorner found, FeatureSelectUniform<Point2D_I16> alg)
+							 int cellCount, FastArray<Point2D_I16> found, FeatureSelectUniform<Point2D_I16> alg)
 	{
 		int limit = cellCount*6;
 		alg.select(width,height,null,detected,limit,found);
@@ -83,8 +84,8 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 		int width = 30;
 		int height = 20;
 		// One detected feature in each cell
-		QueueCorner prior = new QueueCorner();
-		QueueCorner detected = new QueueCorner();
+		var prior = new QueueCorner();
+		var detected = new QueueCorner();
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
@@ -97,7 +98,7 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 			prior.grow().set(x+2,2);
 		}
 
-		QueueCorner found = new QueueCorner();
+		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectUniform<Point2D_I16> alg = createAlgorithm();
 		// make it easy to know the cell size
 		alg.configUniform = new HackedConfig(cellSize);
@@ -135,7 +136,7 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 			}
 		}
 
-		QueueCorner found = new QueueCorner();
+		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectUniform<Point2D_I16> alg = createAlgorithm();
 		// make it easy to know the cell size
 		alg.configUniform = new HackedConfig(cellSize);

@@ -18,29 +18,29 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastArray;
+import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.image.GrayF32;
 
 import javax.annotation.Nullable;
 
 /**
- * Selects features periodically in the order they were detected until it hits the limit. This is better than just
- * selecting the first N since features tend to ordered in a very specific way, e.g. top to bottom. you're more likely
- * to get a spread out less biased set this way
+ * Uses the intensity value in {@link ScalePoint} to return the intensity
  *
  * @author Peter Abeles
  */
-public class FeatureSelectN<Point> implements FeatureSelectLimit<Point> {
+public class SampleIntensityScalePoint implements SampleIntensity<ScalePoint> {
 	@Override
-	public void select( int imageWidth, int imageHeight,
-						@Nullable FastAccess<Point> prior,
-						FastAccess<Point> detected, int limit, FastArray<Point> selected) {
-		final int N = Math.min(detected.size,limit);
-		assert(N>0);
-		selected.resize(N);
-		for (int i = 0; i < N; i++) {
-			int selectedIdx = i*detected.size/N;
-			selected.set(i,detected.get(selectedIdx));
-		}
+	public float sample(@Nullable GrayF32 intensity, int index, ScalePoint p) {
+		return p.intensity;
+	}
+
+	@Override
+	public int getX(ScalePoint p) {
+		return (int)p.pixel.x;
+	}
+
+	@Override
+	public int getY(ScalePoint p) {
+		return (int)p.pixel.y;
 	}
 }

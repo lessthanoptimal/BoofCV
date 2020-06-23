@@ -21,6 +21,8 @@ package boofcv.alg.feature.detect.selector;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.QueueCorner;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +35,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 
 	@Override
 	public FeatureSelectUniformBest<Point2D_I16> createAlgorithm() {
-		return new FeatureSelectUniformBest.I16();
+		return new FeatureSelectUniformBest<>(new SampleIntensityImage.I16());
 	}
 
 	/**
@@ -68,7 +70,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 			}
 		}
 
-		QueueCorner found = new QueueCorner();
+		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectUniformBest<Point2D_I16> alg = createAlgorithm();
 		// make it easy to know the cell size
 		alg.configUniform = new HackedConfig(cellSize);
@@ -90,7 +92,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		}
 	}
 
-	private void checkInside(int x, int y, QueueCorner found) {
+	private void checkInside(int x, int y, FastAccess<Point2D_I16> found) {
 		for (int i = 0; i < found.size; i++) {
 			if( found.get(i).isIdentical(x,y) )
 				return;
@@ -98,8 +100,8 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		fail("not found inside "+x+" "+y);
 	}
 
-	private void checkSpread(boolean positive,QueueCorner detected, int cellSize,
-							 int cellCount, QueueCorner found, FeatureSelectUniformBest<Point2D_I16> alg)
+	private void checkSpread(boolean positive, QueueCorner detected, int cellSize,
+							 int cellCount, FastArray<Point2D_I16> found, FeatureSelectUniformBest<Point2D_I16> alg)
 	{
 		int limit = cellCount*6;
 		alg.select(intensity,positive,null,detected,limit,found);
@@ -142,7 +144,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 			prior.grow().set(x+2,2);
 		}
 
-		QueueCorner found = new QueueCorner();
+		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectUniformBest<Point2D_I16> alg = createAlgorithm();
 		// make it easy to know the cell size
 		alg.configUniform = new HackedConfig(cellSize);
@@ -185,7 +187,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 			}
 		}
 
-		QueueCorner found = new QueueCorner();
+		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectUniformBest<Point2D_I16> alg = createAlgorithm();
 		// make it easy to know the cell size
 		alg.configUniform = new HackedConfig(cellSize);

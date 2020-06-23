@@ -51,7 +51,7 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 		GrayF32 integral = IntegralImageOps.transform(input,null);
 		alg.detect(integral);
 
-		return alg.getFoundPoints().size();
+		return alg.getFoundFeatures().size();
 	}
 
 	/**
@@ -70,10 +70,10 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 
 		alg.detect(ii);
 
-		int N = alg.getFoundPoints().size();
+		int N = alg.getFoundFeatures().size();
 		int countWhite=0;
 		for (int i = 0; i < N; i++) {
-			if( alg.getFoundPoints().get(i).isWhite() )
+			if( alg.getFoundFeatures().get(i).isWhite() )
 				countWhite++;
 		}
 

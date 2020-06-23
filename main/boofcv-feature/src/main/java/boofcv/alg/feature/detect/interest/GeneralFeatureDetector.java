@@ -21,12 +21,14 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.FastArray;
 
 import javax.annotation.Nullable;
 
@@ -59,7 +61,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 
 	// selects the features with the largest intensity
 	protected @Getter FeatureSelectLimitIntensity<Point2D_I16> selectMax;
-	protected QueueCorner selected = new QueueCorner();
+	protected FastArray<Point2D_I16> selected = new FastArray<>(Point2D_I16.class);
 	/**
 	 * The maximum number of features that can be detected. If both maximums and minimums can be detected the the limit
 	 * per set will be half this. If not a positive value then there is no limit.
@@ -194,7 +196,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 			selectMax.select(intensity,positive,excluded,detected,numSelect,selected);
 			// selected is filled with corners from found, so hopefully implementation details of reset don't change
 			detected.reset();
-			detected.appendAll(selected);
+			BoofMiscOps.copyAll(selected,detected);
 		}
 	}
 

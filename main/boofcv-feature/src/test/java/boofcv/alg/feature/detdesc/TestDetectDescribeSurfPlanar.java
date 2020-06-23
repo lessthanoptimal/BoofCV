@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class TestDetectDescribeSurfPlanar {
 
 		// see if it detects the same number of points
 		detector.detect(gray);
-		int expected = detector.getFoundPoints().size();
+		int expected = detector.getFoundFeatures().size();
 
 		alg.detect(gray,input);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,78 +19,75 @@
 package boofcv.struct.feature;
 
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Where a point of interest was detected and at what scale.
  *
  * @author Peter Abeles
  */
-public class ScalePoint extends Point2D_F64 {
-	/**
-	 * The scale the feature was detected at.  Exact meaning of "scale" is implementation dependent
-	 */
-	public double scale;
-	// does the blob correspond to a black or white region
-	public boolean white;
+public class ScalePoint {
+	/** location of interest point */
+	public final Point2D_F64 pixel = new Point2D_F64();
+	/** The scale the feature was detected at.  Exact meaning of "scale" is implementation dependent */
+	public @Getter @Setter double scale;
+	/** does the blob correspond to a black or white region */
+	public @Getter @Setter boolean white;
+	/** Feature intensity where it was selected */
+	public @Getter @Setter float intensity = Float.NaN;
 
 	public ScalePoint(double x, double y, double scale) {
-		super(x, y);
+		this.pixel.set(x,y);
 		this.scale = scale;
 	}
 
-	public ScalePoint(double x, double y,
-					  double scale, boolean white ) {
-		set(x, y, scale, white);
+	public ScalePoint(double x, double y, double scale, boolean white ) {
+		setTo(x, y, scale, white);
 	}
 
-	public ScalePoint() {
-	}
+	public ScalePoint() {}
 
-	public void set(double x, double y, double scale) {
-		set(x, y);
+	public void setTo(double x, double y, double scale) {
+		this.pixel.set(x,y);
 		this.scale = scale;
+		this.intensity = Float.NaN;
 	}
 
-	public void set(double x, double y, double scale, boolean white ) {
-		set(x, y);
+	public void setTo(double x, double y, double scale, boolean white ) {
+		this.pixel.set(x,y);
 		this.scale = scale;
 		this.white = white;
+		this.intensity = Float.NaN;
 	}
 
-	public boolean isWhite() {
-		return white;
-	}
-
-	public double getScale() {
-		return scale;
-	}
-
-	public void setScale(double scale) {
+	public void setTo(double x, double y, double scale, boolean white, float intensity ) {
+		this.pixel.set(x,y);
 		this.scale = scale;
-	}
-
-	public void setWhite(boolean white) {
 		this.white = white;
+		this.intensity = this.intensity;
 	}
 
 	public ScalePoint copy() {
-		return new ScalePoint(x,y, scale,white);
+		var ret = new ScalePoint();
+		ret.setTo(this);
+		return ret;
 	}
 
-	public void set(ScalePoint p) {
+	public void setTo(ScalePoint p) {
 		this.scale = p.scale;
-		this.x = p.x;
-		this.y = p.y;
+		this.pixel.set(p.pixel);
 		this.white = p.white;
+		this.intensity = p.intensity;
 	}
 
 	@Override
 	public String toString() {
 		return "ScalePoint{" +
-				"scale=" + scale +
+				"pixel=" + pixel +
+				", scale=" + scale +
 				", white=" + white +
-				", x=" + x +
-				", y=" + y +
+				", intensity=" + intensity +
 				'}';
 	}
 }

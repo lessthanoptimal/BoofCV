@@ -111,8 +111,8 @@ public class CompleteSift extends SiftDetector
 	protected void handleDetection(ScalePoint p) {
 
 		// adjust the image for the down sampling in each octave
-		double localX = p.x / pixelScaleToInput;
-		double localY = p.y / pixelScaleToInput;
+		double localX = p.pixel.x / pixelScaleToInput;
+		double localY = p.pixel.y / pixelScaleToInput;
 		double localSigma = p.scale / pixelScaleToInput;
 
 		// find potential orientations first

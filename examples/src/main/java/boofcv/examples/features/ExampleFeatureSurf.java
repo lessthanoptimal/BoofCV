@@ -102,18 +102,18 @@ public class ExampleFeatureSurf {
 		orientation.setImage(integral);
 		descriptor.setImage(integral);
 
-		List<ScalePoint> points = detector.getFoundPoints();
+		List<ScalePoint> points = detector.getFoundFeatures();
 
 		List<TupleDesc_F64> descriptions = new ArrayList<>();
 
 		for( ScalePoint p : points ) {
 			// estimate orientation
 			orientation.setObjectRadius( p.scale*BoofDefaults.SURF_SCALE_TO_RADIUS);
-			double angle = orientation.compute(p.x,p.y);
+			double angle = orientation.compute(p.pixel.x,p.pixel.y);
 			
 			// extract the SURF description for this region
 			TupleDesc_F64 desc = descriptor.createDescription();
-			descriptor.describe(p.x,p.y,angle,p.scale, true, desc);
+			descriptor.describe(p.pixel.x,p.pixel.y,angle,p.scale, true, desc);
 
 			// save everything for processing later on
 			descriptions.add(desc);

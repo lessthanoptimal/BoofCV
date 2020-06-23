@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class TestSiftDetector {
 				boolean found = false;
 				for (int i = 0; i < detections.size(); i++) {
 					ScalePoint p = detections.get(i);
-					if (p.distance(c_x, c_y) <= 0.2) {
+					if (p.pixel.distance(c_x, c_y) <= 0.2) {
 						assertEquals(radius*1.25, p.scale, 0.5);
 						assertTrue(white == p.white);
 						found = true;
@@ -114,8 +114,8 @@ public class TestSiftDetector {
 			alg.processFeatureCandidate(15, 16, 100, sign > 0);
 
 			ScalePoint p = alg.getDetections().get(0);
-			assertEquals(15 * 2, p.x, 1e-8);
-			assertEquals(16 * 2, p.y, 1e-8);
+			assertEquals(15 * 2, p.pixel.x, 1e-8);
+			assertEquals(16 * 2, p.pixel.y, 1e-8);
 			assertEquals(5, p.scale, 1e-8);
 		}
 	}
@@ -151,13 +151,13 @@ public class TestSiftDetector {
 
 			ScalePoint p = alg.getDetections().get(0);
 			// make sure it is close
-			assertTrue(Math.abs(x * 2 - p.x) < 2);
-			assertTrue(Math.abs(y * 2 - p.y) < 2);
+			assertTrue(Math.abs(x * 2 - p.pixel.x) < 2);
+			assertTrue(Math.abs(y * 2 - p.pixel.y) < 2);
 			assertTrue(Math.abs(5 - p.scale) < 2);
 
 			// see if its shifted in the correct direction
-			assertTrue( x*2 > p.x );
-			assertTrue( y*2 > p.y );
+			assertTrue( x*2 > p.pixel.x );
+			assertTrue( y*2 > p.pixel.y );
 			assertTrue( 5 > p.scale );
 
 			// do a test just for scale since the code branches depending on the sign

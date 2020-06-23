@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,9 +62,9 @@ public class DetectFastHessianApp {
 		T integral = GIntegralImageOps.transform(workImage,null);
 		det.detect(integral);
 
-		System.out.println("total features found: "+det.getFoundPoints().size());
+		System.out.println("total features found: "+det.getFoundFeatures().size());
 
-		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(),
+		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundFeatures(),
 				BoofDefaults.SURF_SCALE_TO_RADIUS);
 
 		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName(),true);

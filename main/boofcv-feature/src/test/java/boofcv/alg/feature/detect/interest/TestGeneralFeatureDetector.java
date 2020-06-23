@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
+import boofcv.alg.feature.detect.selector.SampleIntensityImage;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
@@ -40,7 +41,7 @@ class TestGeneralFeatureDetector {
 
 	int width = 10;
 	int height = 12;
-	FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest.I16();
+	FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 
 	/**
 	 * Several basic detection tests

@@ -18,15 +18,10 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
-import georegression.struct.GeoTuple;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I16;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import javax.annotation.Nullable;
 
@@ -36,22 +31,26 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
-public abstract class FeatureSelectNBest<Point extends GeoTuple<Point>> implements FeatureSelectLimitIntensity<Point> {
+public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Point> {
 
 	// list of the found best corners
 	int[] indexes = new int[1];
 	float[] indexIntensity = new float[1];
 
+	SampleIntensity<Point> sampler;
+
+	public FeatureSelectNBest(SampleIntensity<Point> sampler) {this.sampler = sampler;}
+	public FeatureSelectNBest() {}
+
 	@Override
 	public void select(GrayF32 intensity , boolean positive, @Nullable FastAccess<Point> prior,
-					   FastAccess<Point> detected, int limit , FastQueue<Point> selected) {
+					   FastAccess<Point> detected, int limit , FastArray<Point> selected) {
 		assert(limit>0);
 		selected.reset();
 
 		if (detected.size <= limit) {
-			// make a copy of the results with no pruning since it already
-			// has the desired number, or less
-			BoofMiscOps.copyAll(detected,selected);
+			// make a copy of the results with no pruning since it already has the desired number, or less
+			selected.addAll(detected);
 			return;
 		}
 
@@ -69,12 +68,12 @@ public abstract class FeatureSelectNBest<Point extends GeoTuple<Point>> implemen
 				Point pt = points[i];
 				// quick select selects the k smallest
 				// I want the k-biggest so the negative is used
-				indexIntensity[i] = -getIntensity(intensity,pt);
+				indexIntensity[i] = -sampler.sample(intensity,i,pt);
 			}
 		} else {
 			for (int i = 0; i < detected.size; i++) {
 				Point pt = points[i];
-				indexIntensity[i] = getIntensity(intensity,pt);
+				indexIntensity[i] = sampler.sample(intensity,i,pt);
 			}
 		}
 
@@ -82,42 +81,12 @@ public abstract class FeatureSelectNBest<Point extends GeoTuple<Point>> implemen
 
 		selected.resize(limit);
 		for (int i = 0; i < limit; i++) {
-			selected.get(i).setTo(detected.data[indexes[i]]);
+			selected.set(i, detected.data[indexes[i]]);
 		}
 	}
 
-	/**
-	 * Looks up the feature intensity given the point
-	 */
-	protected abstract float getIntensity( GrayF32 intensity, Point p );
-
-	/**
-	 * Implementation for {@link Point2D_I16}
-	 */
-	public static class I16 extends FeatureSelectNBest<Point2D_I16> {
-		@Override
-		protected float getIntensity(GrayF32 intensity, Point2D_I16 p) {
-			return intensity.unsafe_get(p.x,p.y);
-		}
-	}
-
-	/**
-	 * Implementation for {@link Point2D_F32}
-	 */
-	public static class F32 extends FeatureSelectNBest<Point2D_F32> {
-		@Override
-		protected float getIntensity(GrayF32 intensity, Point2D_F32 p) {
-			return intensity.unsafe_get((int)p.x,(int)p.y);
-		}
-	}
-
-	/**
-	 * Implementation for {@link Point2D_F64}
-	 */
-	public static class F64 extends FeatureSelectNBest<Point2D_F64> {
-		@Override
-		protected float getIntensity(GrayF32 intensity, Point2D_F64 p) {
-			return intensity.unsafe_get((int)p.x,(int)p.y);
-		}
+	@Override
+	public void setSampler(SampleIntensity<Point> sampler) {
+		this.sampler = sampler;
 	}
 }

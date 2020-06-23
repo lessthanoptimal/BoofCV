@@ -281,8 +281,8 @@ public class SiftDetector {
 		ScalePoint p = detections.grow();
 
 		// Compute the interpolated coordinate of the point in the original image coordinates
-		p.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
-		p.y = pixelScaleToInput*(y + polyPeak(y0, value, y2));
+		p.pixel.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
+		p.pixel.y = pixelScaleToInput*(y + polyPeak(y0, value, y2));
 
 		// find the peak then do bilinear interpolate between the two appropriate sigmas
 		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1

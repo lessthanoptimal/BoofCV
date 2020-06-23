@@ -91,7 +91,7 @@ public class DetectDescribe_CompleteSift<I extends ImageGray<I>>
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return alg.getLocations().get(featureIndex);
+		return alg.getLocations().get(featureIndex).pixel;
 	}
 
 	@Override

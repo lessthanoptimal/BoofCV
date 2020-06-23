@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -45,7 +46,7 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 
 	// selects the features with the largest intensity
 	protected @Getter FeatureSelectLimit<Point2D_I16> selectLimit;
-	protected QueueCorner selected = new QueueCorner();
+	protected FastArray<Point2D_I16> selected = new FastArray<>(Point2D_I16.class);
 	/** Maximum number of features it can select per set */
 	public @Getter @Setter int featureLimitPerSet = Integer.MAX_VALUE;
 

@@ -55,8 +55,8 @@ public class WrapDetectDescribeSurf_MT<T extends ImageGray<T>, II extends ImageG
 				double radius = p.scale*BoofDefaults.SURF_SCALE_TO_RADIUS;
 
 				orientation.setObjectRadius(radius);
-				double angle = orientation.compute(p.x,p.y);
-				describe.describe(p.x,p.y, angle, p.scale, true, features.get(i));
+				double angle = orientation.compute(p.pixel.x,p.pixel.y);
+				describe.describe(p.pixel.x,p.pixel.y, angle, p.scale, true, features.get(i));
 				featureAngles.set(i,angle);
 			}
 		});

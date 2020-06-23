@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.selector;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
@@ -36,12 +37,12 @@ class TestConvertFeatureSelectLimitToIntensity {
 	void callTheFunction() {
 		Dummy<Point2D_I16> dummy = new Dummy<>();
 
-		GrayF32 intensity = new GrayF32(30,40);
+		var intensity = new GrayF32(30,40);
 
 		FeatureSelectLimitIntensity<Point2D_I16> wrapped = new ConvertLimitToIntensity<>(dummy);
 
-		FastQueue<Point2D_I16> detected = new FastQueue<>(Point2D_I16::new);
-		FastQueue<Point2D_I16> selected = new FastQueue<>(Point2D_I16::new);
+		var detected = new FastQueue<>(Point2D_I16::new);
+		var selected = new FastArray<>(Point2D_I16.class);
 
 
 		wrapped.select(intensity,true,null,detected,100,selected);
@@ -57,7 +58,7 @@ class TestConvertFeatureSelectLimitToIntensity {
 
 		@Override
 		public void select(int imageWidth, int imageHeight, @Nullable FastAccess<Point> prior,
-						   FastAccess<Point> detected, int limit, FastQueue<Point> selected) {
+						   FastAccess<Point> detected, int limit, FastArray<Point> selected) {
 			this.width = imageWidth;
 			this.height = imageHeight;
 			this.limit = limit;

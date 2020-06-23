@@ -22,6 +22,8 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
+import boofcv.alg.feature.detect.selector.SampleIntensityImage;
+import boofcv.alg.feature.detect.selector.SampleIntensityScalePoint;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
@@ -32,7 +34,9 @@ import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
+import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
@@ -99,10 +103,16 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;
 	// If too many features have been selected this is used to resolve the ambiguity
-	private FeatureSelectLimitIntensity<Point2D_I16> selectMax;
-	private FastQueue<Point2D_I16> selected = new FastQueue<>(Point2D_I16::new);
+	private FeatureSelectLimitIntensity<Point2D_I16> selectFeaturesInScale;
+	private FastArray<Point2D_I16> selectedScale = new FastArray<>(Point2D_I16.class);
 	// the maximum number of returned feature per scale
 	private int maxFeaturesPerScale;
+
+	// Used for selecting the features across all scales
+	private FeatureSelectLimitIntensity<ScalePoint> selectAll;
+	private @Getter FastArray<ScalePoint> selectedAll = new FastArray<>(ScalePoint.class);
+	/** Maximum number of features it can return after combining results across all scales */
+	public int maxFeaturesAll;
 
 	// local sub-space
 	private GrayF32 intensity[];
@@ -155,8 +165,10 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			this.maxFeaturesPerScale = maxFeaturesPerScale;
-			selectMax = new FeatureSelectNBest.I16();
+			selectFeaturesInScale = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		}
+		selectAll = new FeatureSelectNBest<>(new SampleIntensityScalePoint());
+
 		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;
 		this.numberOfOctaves = numberOfOctaves;
@@ -202,6 +214,9 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		}
 
 		// todo save previously computed sizes for reuse in higher octaves and reuse it
+		// Select points using intensity information from the final list. The scale point's intensity is used
+		// so the image can be passed in as null
+//		selectAll.select(null,true,null,foundPoints,maxFeaturesAll,selectedAll);
 	}
 
 	/**
@@ -267,12 +282,11 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		int ignoreWidth = intensity[index1].width-ignoreRadius;
 		int ignoreHeight = intensity[index1].height-ignoreRadius;
 
-
 		// if configured to do so, only select the features with the highest intensity
 		FastAccess<Point2D_I16> features;
-		if( selectMax != null ) {
-			selectMax.select(intensity[index1],true,null,foundFeatures,maxFeaturesPerScale,selected);
-			features = selected;
+		if( selectFeaturesInScale != null ) {
+			selectFeaturesInScale.select(intensity[index1],true,null,foundFeatures,maxFeaturesPerScale, selectedScale);
+			features = selectedScale;
 		} else {
 			features = foundFeatures;
 		}
@@ -288,10 +302,10 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 			if( f.x < ignoreRadius || f.x >= ignoreWidth || f.y < ignoreRadius || f.y >= ignoreHeight )
 				continue;
 
-			float val = inten1.get(f.x,f.y);
+			float intenF = inten1.get(f.x,f.y);
 
 			// see if it is a max in scale-space too
-			if( checkMax(inten0,val,f.x,f.y) && checkMax(inten2,val,f.x,f.y) ) {
+			if( checkMax(inten0,intenF,f.x,f.y) && checkMax(inten2,intenF,f.x,f.y) ) {
 
 				// find the feature's location to sub-pixel accuracy using a second order polynomial
 				// NOTE: In the original paper this was done using a quadratic.  See comments above.
@@ -306,7 +320,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 				double scale =  1.2*interpS/9.0;
 				boolean white = computeLaplaceSign((int)(interpX+0.5),(int)(interpY+0.5),scale);
-				foundPoints.grow().set(interpX,interpY,scale,white);
+				foundPoints.grow().setTo(interpX,interpY,scale,white,intenF);
 			}
 		}
 	}
@@ -413,8 +427,8 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	 *
 	 * @return Found interest points.
 	 */
-	public List<ScalePoint> getFoundPoints() {
-		return foundPoints.toList();
+	public List<ScalePoint> getFoundFeatures() {
+		return (selectAll == null ? foundPoints : selectedAll).toList();
 	}
 
 	/**

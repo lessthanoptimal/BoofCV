@@ -18,10 +18,8 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import boofcv.misc.BoofMiscOps;
-import georegression.struct.GeoTuple;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.annotation.Nullable;
@@ -33,7 +31,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class FeatureSelectRandom<Point extends GeoTuple<Point>> implements FeatureSelectLimit<Point> {
+public class FeatureSelectRandom<Point> implements FeatureSelectLimit<Point> {
 
 	// Random number generator used to select points
 	final Random rand;
@@ -48,14 +46,15 @@ public class FeatureSelectRandom<Point extends GeoTuple<Point>> implements Featu
 	@Override
 	public void select( int imageWidth, int imageHeight,
 						@Nullable FastAccess<Point> prior,
-						FastAccess<Point> detected, int limit, FastQueue<Point> selected)
+						FastAccess<Point> detected, int limit, FastArray<Point> selected)
 	{
 		assert(limit>0);
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!
 		if( detected.size <= limit ) {
-			BoofMiscOps.copyAll(detected,selected);
+			// make a copy of the results with no pruning since it already has the desired number, or less
+			selected.addAll(detected);
 			return;
 		}
 
@@ -69,7 +68,7 @@ public class FeatureSelectRandom<Point extends GeoTuple<Point>> implements Featu
 		selected.resize(limit);
 		for (int i = 0; i < limit; i++) {
 			int idx = rand.nextInt(indexes.size-i);
-			selected.get(i).setTo( detected.data[ indexes.data[idx] ]);
+			selected.set(i, detected.data[ indexes.data[idx] ]);
 			// copy an unused value over the used value
 			indexes.data[idx] = indexes.data[indexes.size-i-1];
 		}

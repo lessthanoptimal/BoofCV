@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class ScaleSpacePointPanel extends JPanel {
 				this.points.add(p.copy());
 			} else {
 				ScalePoint c = unused.remove( unused.size()-1 );
-				c.set(p);
+				c.setTo(p);
 			}
 			this.points.add(p);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,9 +49,9 @@ public class DetectDescribeSurfPlanar_MT<II extends ImageGray<II>> extends Detec
 			for (int i = i0; i < i1; i++) {
 				ScalePoint p = foundPoints.get(i);
 				orientation.setObjectRadius(p.scale);
-				double angle = orientation.compute(p.x, p.y);
+				double angle = orientation.compute(p.pixel.x, p.pixel.y);
 
-				describe.describe(p.x, p.y, angle, p.scale, descriptions.get(i));
+				describe.describe(p.pixel.x, p.pixel.y, angle, p.scale, descriptions.get(i));
 
 				featureAngles.set(i,angle);
 			}

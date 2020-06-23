@@ -20,13 +20,13 @@ package boofcv.alg.feature.detect.selector;
 
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Generic tests that applied to all {@link FeatureSelectLimitIntensity}.
@@ -40,7 +40,7 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 
 	public abstract FeatureSelectLimit<Point> createAlgorithm();
 
-	public abstract FastQueue<Point> createQueue();
+	public abstract FastArray<Point> createArray();
 
 	/**
 	 * Should just copy detected corners in this case. prior is null and less than max
@@ -50,7 +50,7 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 		FastQueue<Point> detected = createRandom(15);
 
 		FeatureSelectLimit<Point> alg = createAlgorithm();
-		FastQueue<Point> found = createQueue();
+		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
 			alg.select(width,height,null,detected,30,found);
@@ -58,37 +58,38 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 			// partial check to make sure the input wasn't modified
 			assertEquals(15, detected.size);
 
-			// see if there's the expected count in the output. The order should also be the same
+			// see if there's the expected count in the output and that it returned the same list
 			assertEquals(15, found.size);
 			for (int i = 0; i < found.size; i++) {
-				assertNotSame(found.get(i), detected.get(i));
-				assertEquals(found.get(i), detected.get(i));
+				assertSame(found.get(i), detected.get(i));
 			}
 		}
 	}
 
 	/**
-	 * Makes sure select is cleared when called multiple times and there are more featuers than requested
+	 * Makes sure select is cleared when called multiple times and there are more features than requested
 	 */
 	@Test
 	void multipleCalls_MoreThan_SelectCleared() {
 		FastQueue<Point> prior = createRandom(20);
-		FastQueue<Point> detected = createRandom(30);
+
 
 		FeatureSelectLimit<Point> alg = createAlgorithm();
-		FastQueue<Point> found = createQueue();
+		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
+			FastQueue<Point> detected = createRandom(30);
 			alg.select(width,height,prior,detected,22,found);
 
 			// partial check to make sure the input wasn't modified
 			assertEquals(20, prior.size);
 			assertEquals(30, detected.size);
 
-			// see if there's the expected count in the output. The order should also be the same
+			// see if there's the expected count in the output.
 			assertEquals(22, found.size);
+			// Make sure elements from previous calls were not saved and returned
 			for (int i = 0; i < found.size; i++) {
-				assertNotSame(found.get(i), detected.get(i));
+				assertTrue(detected.contains(found.get(i)));
 			}
 		}
 	}
@@ -100,7 +101,7 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 	void priorIsBlowUp() {
 		FastQueue<Point> prior = createRandom(20);
 		FeatureSelectLimit<Point> alg = createAlgorithm();
-		FastQueue<Point> found = createQueue();
+		FastArray<Point> found = createArray();
 
 		alg.select(width,height,prior,createRandom(15),30,found);
 		alg.select(width,height,prior,createRandom(15),10,found);
@@ -112,13 +113,13 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 
 	public static abstract class I16 extends ChecksFeatureSelectLimit<Point2D_I16> {
 		@Override
-		public FastQueue<Point2D_I16> createQueue() {
-			return new FastQueue<>(Point2D_I16::new);
+		public FastArray<Point2D_I16> createArray() {
+			return new FastArray<>(Point2D_I16.class);
 		}
 
 		@Override
 		protected FastQueue<Point2D_I16> createRandom(int i2) {
-			FastQueue<Point2D_I16> detected = createQueue();
+			FastQueue<Point2D_I16> detected = new FastQueue<>(Point2D_I16::new);
 			for (int i = 0; i < i2; i++) {
 				detected.grow().set(rand.nextInt(width), rand.nextInt(height));
 			}
