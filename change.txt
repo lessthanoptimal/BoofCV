@@ -22,7 +22,7 @@ Version : 0.37
 - GUI
   * Added clip and fog controls to point cloud controls
 - Features
-  * Removed BrightFeature since whiteness has been moved into the detector in all situations
+  * Removed BrightFeature since dark/white has been moved into the detector in all situations
 - Feature Sets
   * Created FeatureSets interface that specifies how sets are handled by feature detectors
   * This makes it easier and less complicated to only associate "dark" or "bright" features with each other
@@ -43,9 +43,10 @@ Version : 0.37
 - FeatureSelectLimit
   * Supports multiple point types
   * Variant with and without intensity information
-  * TODO generalized how intensity information can be collected
+  * Spatial approaches work when there are no images and intensity is derived from features
 - FAST Corner feature detector
   * Configurable in the GUI
+  * More efficient storage of candidate corners
 - RegionOrientation
   * Can now specify feature orientation approach using Configuration class
   * TODO finish cleaning up that mess
@@ -61,8 +62,6 @@ Version : 0.37
   * Added support for limiting the total number of features returned with SelectLimit
 - SIFT Feature Detector
   * Added support for limiting the total number of features returned with SelectLimit
-
-TODO FeatureSelectLimitIntensity handle case where there is no input image and it needs to use spatial info
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint

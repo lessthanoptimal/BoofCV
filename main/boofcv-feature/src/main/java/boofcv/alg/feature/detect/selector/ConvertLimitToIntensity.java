@@ -38,9 +38,12 @@ public class ConvertLimitToIntensity<Point> implements FeatureSelectLimitIntensi
 	}
 
 	@Override
-	public void select(GrayF32 intensity, boolean positive, @Nullable FastAccess<Point> prior,
+	public void select(GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
 					   FastAccess<Point> detected, int limit, FastArray<Point> selected) {
-		alg.select(intensity.width,intensity.height,prior,detected,limit,selected);
+		width = intensity == null ? width : intensity.width;
+		height = intensity == null ? height : intensity.height;
+
+		alg.select(width,height,prior,detected,limit,selected);
 	}
 
 	@Override public void setSampler(SampleIntensity<Point> sampler) {}

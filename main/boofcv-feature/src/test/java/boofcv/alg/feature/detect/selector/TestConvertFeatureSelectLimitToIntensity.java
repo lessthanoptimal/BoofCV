@@ -45,7 +45,7 @@ class TestConvertFeatureSelectLimitToIntensity {
 		var selected = new FastArray<>(Point2D_I16.class);
 
 
-		wrapped.select(intensity,true,null,detected,100,selected);
+		wrapped.select(intensity, -1, -1, true,null,detected,100,selected);
 
 		assertEquals(intensity.width,dummy.width);
 		assertEquals(intensity.height,dummy.height);

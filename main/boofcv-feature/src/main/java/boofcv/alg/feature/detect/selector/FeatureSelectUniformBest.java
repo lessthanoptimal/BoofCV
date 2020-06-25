@@ -59,12 +59,16 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 	public FeatureSelectUniformBest() {}
 
 	@Override
-	public void select(GrayF32 intensity, boolean positive,
+	public void select( @Nullable GrayF32 intensity, int width, int height, boolean positive,
 					   @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
 					   FastArray<Point> selected)
 	{
 		assert(limit>0);
 		selected.reset();
+
+		// Get the image shape from whatever source is available
+		width = intensity == null ? width : intensity.width;
+		height = intensity == null ? height : intensity.height;
 
 		// the limit is more than the total number of features. Return them all!
 		if( (prior == null || prior.size==0) && detected.size <= limit ) {
@@ -74,8 +78,8 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 		}
 
 		// Adjust the grid to the requested limit and image shape
-		int targetCellSize = configUniform.selectTargetCellSize(limit,intensity.width,intensity.height);
-		grid.initialize(targetCellSize,intensity.width,intensity.height);
+		int targetCellSize = configUniform.selectTargetCellSize(limit,width,height);
+		grid.initialize(targetCellSize,width,height);
 
 		// Note all the prior features
 		if( prior != null ) {

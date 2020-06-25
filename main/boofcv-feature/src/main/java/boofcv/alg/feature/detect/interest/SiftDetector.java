@@ -207,7 +207,7 @@ public class SiftDetector {
 		} while( scaleSpace.computeNextOctave() );
 
 		if( maxFeaturesAll > 0 )
-			selectFeaturesAll.select(null,true,null, detectionsAll,maxFeaturesAll,selectedAll);
+			selectFeaturesAll.select(null, input.width, input.height, true,null, detectionsAll,maxFeaturesAll,selectedAll);
 	}
 
 	/**

@@ -43,8 +43,8 @@ public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Po
 	public FeatureSelectNBest() {}
 
 	@Override
-	public void select(GrayF32 intensity , boolean positive, @Nullable FastAccess<Point> prior,
-					   FastAccess<Point> detected, int limit , FastArray<Point> selected) {
+	public void select(GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
+					   FastAccess<Point> detected, int limit, FastArray<Point> selected) {
 		assert(limit>0);
 		selected.reset();
 

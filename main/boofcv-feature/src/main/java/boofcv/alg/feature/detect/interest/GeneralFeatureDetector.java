@@ -194,7 +194,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 										QueueCorner output, int numSelect, boolean positive) {
 		output.reset();
 		if (numSelect > 0) {
-			selectMax.select(intensity,positive,excluded,found,numSelect,selected);
+			selectMax.select(intensity, -1, -1, positive,excluded,found,numSelect,selected);
 			output.appendAll(selected);
 		} else {
 			output.appendAll(found);

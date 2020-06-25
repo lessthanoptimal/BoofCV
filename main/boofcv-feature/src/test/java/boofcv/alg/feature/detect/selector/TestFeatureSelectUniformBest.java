@@ -104,7 +104,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 							 int cellCount, FastArray<Point2D_I16> found, FeatureSelectUniformBest<Point2D_I16> alg)
 	{
 		int limit = cellCount*6;
-		alg.select(intensity,positive,null,detected,limit,found);
+		alg.select(intensity, -1, -1, positive,null,detected,limit,found);
 
 		assertEquals(limit,found.size);
 		int[] cells = new int[6];
@@ -151,7 +151,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 
 		// Since there is a prior feature in every cell and 6 features were requested nothing should be returned
 		// since the prior features already constributed to the spread
-		alg.select(intensity,positive,prior,detected,3,found);
+		alg.select(intensity, -1, -1, positive,prior,detected,3,found);
 		assertEquals(3,found.size);
 		// the found features should all be in the bottom row since it gives preference to cells without priors
 		for (int x = 0, idx=0; x < width; x += cellSize,idx++) {
@@ -159,7 +159,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 			assertEquals(12,found.get(idx).y);
 		}
 		// We now request two and 6 of the detected features should be returned
-		alg.select(intensity,positive,prior,detected,6,found);
+		alg.select(intensity, -1, -1, positive,prior,detected,6,found);
 		assertEquals(6,found.size);
 	}
 
@@ -193,8 +193,13 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		alg.configUniform = new HackedConfig(cellSize);
 
 		// a bug earlier aborted because the total count didn't change when every cell had a prior in it
-		alg.select(intensity,positive,prior,detected,6,found);
+		alg.select(intensity, -1, -1, positive,prior,detected,6,found);
 		assertEquals(6,found.size);
+	}
+
+	@Test
+	void inputImageisNull() {
+		fail("Implement");
 	}
 
 	private static class HackedConfig extends ConfigGridUniform {

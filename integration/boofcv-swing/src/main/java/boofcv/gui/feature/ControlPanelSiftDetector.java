@@ -20,6 +20,7 @@ package boofcv.gui.feature;
 
 import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ShowImages;
 
@@ -35,6 +36,8 @@ public class ControlPanelSiftDetector extends StandardAlgConfigPanel {
 
 	private final ControlPanelExtractor controlExtractor;
 	private final JSpinner spinnerMaxPerScale;
+	private final JSpinner spinnerMaxAll;
+	private final JComboBox<String> comboSelector;
 	private final JSpinner spinnerEdgeResponse;
 	private final ControlPanelSiftScaleSpace controlSS;
 
@@ -53,11 +56,16 @@ public class ControlPanelSiftDetector extends StandardAlgConfigPanel {
 		this.controlExtractor = new ControlPanelExtractor(configDetector.extract,listener::handleChangeSiftDetector);
 		this.controlSS = new ControlPanelSiftScaleSpace(configSS,listener::handleChangeSiftDetector);
 		this.spinnerMaxPerScale = spinner(configDetector.maxFeaturesPerScale,0,9999,100);
+		this.spinnerMaxAll = spinner(configDetector.maxFeaturesAll,-1,9999,100);
+		this.comboSelector = combo(configDetector.selector.type.ordinal(), SelectLimitTypes.values());
 		this.spinnerEdgeResponse = spinner(configDetector.edgeR,1.0,1000.0,1.0);
 
 		var controlDetection = new StandardAlgConfigPanel();
 		controlDetection.add(controlExtractor);
 		controlDetection.addLabeled(spinnerMaxPerScale,"Max-Per-Scale","Maximum number of features detected per scale");
+		controlDetection.addLabeled(spinnerMaxAll,"Max-All","Maximum number of features allowed");
+		controlDetection.addLabeled(comboSelector,  "Type",
+				"Method used to select points when more have been detected than the maximum allowed");
 		controlDetection.addLabeled(spinnerEdgeResponse,"Max Edge","Maximum edge response. Larger values are more tolerant");
 
 		// Remove borders and label border
@@ -72,7 +80,11 @@ public class ControlPanelSiftDetector extends StandardAlgConfigPanel {
 	@Override
 	public void controlChanged(final Object source) {
 		if (source == spinnerMaxPerScale) {
-			configDetector.maxFeaturesPerScale = ((Number)spinnerMaxPerScale.getValue()).intValue();
+			configDetector.maxFeaturesPerScale = ((Number) spinnerMaxPerScale.getValue()).intValue();
+		} else if (source == spinnerMaxAll) {
+			configDetector.maxFeaturesAll = ((Number)spinnerMaxAll.getValue()).intValue();
+		} else if (source == comboSelector) {
+			configDetector.selector.type = SelectLimitTypes.values()[comboSelector.getSelectedIndex()];
 		} else if( source == spinnerEdgeResponse ) {
 			configDetector.edgeR = ((Number)spinnerEdgeResponse.getValue()).doubleValue();
 		}

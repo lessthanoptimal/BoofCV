@@ -216,7 +216,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		// Select points using intensity information from the final list. The scale point's intensity is used
 		// so the image can be passed in as null
 		if( maxFeaturesAll > 0 )
-			selectFeaturesAll.select(null,true,null, featuresAllScales,maxFeaturesAll,selectedAll);
+			selectFeaturesAll.select(null, integral.width, integral.height, true,null, featuresAllScales,maxFeaturesAll,selectedAll);
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		// if configured to do so, only select the features with the highest intensity
 		FastAccess<Point2D_I16> features;
 		if( maxFeaturesPerScale > 0 ) {
-			selectFeaturesInScale.select(intensity[index1],true,null,foundFeatures,maxFeaturesPerScale, selectedScale);
+			selectFeaturesInScale.select(intensity[index1], -1, -1, true,null,foundFeatures,maxFeaturesPerScale, selectedScale);
 			features = selectedScale;
 		} else {
 			features = foundFeatures;

@@ -98,7 +98,7 @@ public class NonMaxLimiter {
 		}
 
 		if( maxTotalFeatures > 0 ) {
-			selector.select(intensity, true, null, foundAll, maxTotalFeatures, foundSelected);
+			selector.select(intensity, -1, -1, true, null, foundAll, maxTotalFeatures, foundSelected);
 		} else {
 			foundSelected.clear();
 			foundSelected.addAll(foundAll);

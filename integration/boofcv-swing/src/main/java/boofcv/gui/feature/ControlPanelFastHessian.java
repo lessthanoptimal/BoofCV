@@ -19,6 +19,7 @@
 package boofcv.gui.feature;
 
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.annotation.Nullable;
@@ -34,6 +35,8 @@ public class ControlPanelFastHessian extends StandardAlgConfigPanel {
 
 	private final ControlPanelExtractor controlExtractor;
 	private final JSpinner spinnerMaxPerScale;
+	private final JSpinner spinnerMaxAll;
+	private final JComboBox<String> comboSelector;
 	private final JSpinner spinnerInitialSample;
 	private final JSpinner spinnerInitialSize;
 	private final JSpinner spinnerScalesPerOctave;
@@ -48,6 +51,8 @@ public class ControlPanelFastHessian extends StandardAlgConfigPanel {
 
 		this.controlExtractor = new ControlPanelExtractor(config.extract,listener::handleChangeFastHessian);
 		spinnerMaxPerScale = spinner(config.maxFeaturesPerScale,-1,9999,100);
+		this.spinnerMaxAll = spinner(config.maxFeaturesAll,-1,9999,100);
+		this.comboSelector = combo(config.selector.type.ordinal(), SelectLimitTypes.values());
 		spinnerInitialSample = spinner(config.initialSampleStep,1,10,1);
 		spinnerInitialSize = spinner(config.initialSize,3,999,2);
 		spinnerScalesPerOctave = spinner(config.numberScalesPerOctave,1,100,1);
@@ -58,6 +63,8 @@ public class ControlPanelFastHessian extends StandardAlgConfigPanel {
 
 		add(controlExtractor);
 		addLabeled(spinnerMaxPerScale,"Max-Per-Scale","Maximum number of features detected per scale");
+		addLabeled(spinnerMaxAll,"Max-All","Maximum number of features allowed");
+		addLabeled(comboSelector,"Type", "Method used to select points when more have been detected than the maximum allowed");
 		addLabeled(spinnerInitialSample,"Sample Step","How often pixels are sampled in first octave");
 		addLabeled(spinnerInitialSize,"Kernel Size","Size of sampling kernel");
 		addLabeled(spinnerScalesPerOctave,"Scales","Number of scales per octave");
@@ -69,6 +76,10 @@ public class ControlPanelFastHessian extends StandardAlgConfigPanel {
 	public void controlChanged(final Object source) {
 		if (source == spinnerMaxPerScale) {
 			config.maxFeaturesPerScale = ((Number)spinnerMaxPerScale.getValue()).intValue();
+		} else if (source == spinnerMaxAll) {
+			config.maxFeaturesAll = ((Number)spinnerMaxAll.getValue()).intValue();
+		} else if (source == comboSelector) {
+			config.selector.type = SelectLimitTypes.values()[comboSelector.getSelectedIndex()];
 		} else if (source == spinnerInitialSample) {
 			config.initialSampleStep = ((Number) spinnerInitialSample.getValue()).intValue();
 		} else if (source == spinnerInitialSize) {

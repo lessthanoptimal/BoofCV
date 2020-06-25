@@ -55,7 +55,7 @@ class TestFeatureSelectNBest extends ChecksFeatureSelectLimitIntensity.I16 {
 
 		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectNBest<Point2D_I16> alg = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
-		alg.select(intensity,true,null,detected,20, found);
+		alg.select(intensity, -1, -1, true,null,detected,20, found);
 
 		assertEquals(4,found.size);
 	}

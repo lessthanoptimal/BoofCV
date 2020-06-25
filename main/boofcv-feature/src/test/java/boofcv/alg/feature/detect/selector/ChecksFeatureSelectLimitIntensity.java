@@ -62,7 +62,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
-			alg.select(intensity,count==0,null,detected,30,found);
+			alg.select(intensity, -1, -1, count==0,null,detected,30,found);
 
 			// partial check to make sure the input wasn't modified
 			assertEquals(15, detected.size);
@@ -87,7 +87,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 
 		for (int count = 0; count < 2; count++) {
 			FastQueue<Point> detected = createRandom(30);
-			alg.select(intensity,count==0,prior,detected,22,found);
+			alg.select(intensity, -1, -1, count==0,prior,detected,22,found);
 
 			// partial check to make sure the input wasn't modified
 			assertEquals(20, prior.size);
@@ -111,10 +111,10 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
 
-		alg.select(intensity,true,prior,createRandom(15),30,found);
-		alg.select(intensity,true,prior,createRandom(15),10,found);
-		alg.select(intensity,true,null,createRandom(15),30,found);
-		alg.select(intensity,true,null,createRandom(15),10,found);
+		alg.select(intensity, -1, -1, true,prior,createRandom(15),30,found);
+		alg.select(intensity, -1, -1, true,prior,createRandom(15),10,found);
+		alg.select(intensity, -1, -1, true,null,createRandom(15),30,found);
+		alg.select(intensity, -1, -1, true,null,createRandom(15),10,found);
 	}
 
 	protected abstract FastQueue<Point> createRandom(int i2);
