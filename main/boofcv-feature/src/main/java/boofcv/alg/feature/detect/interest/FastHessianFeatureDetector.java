@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
-import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.alg.feature.detect.selector.SampleIntensityImage;
 import boofcv.alg.feature.detect.selector.SampleIntensityScalePoint;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
@@ -105,32 +104,32 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	// If too many features have been selected this is used to resolve the ambiguity
 	private FeatureSelectLimitIntensity<Point2D_I16> selectFeaturesInScale;
 	private FastArray<Point2D_I16> selectedScale = new FastArray<>(Point2D_I16.class);
-	// the maximum number of returned feature per scale
-	private int maxFeaturesPerScale;
+	/** the maximum number of returned feature per scale. If <= 0 then all are returned. */
+	public int maxFeaturesPerScale=-1;
 
 	// Used for selecting the features across all scales
-	private FeatureSelectLimitIntensity<ScalePoint> selectAll;
-	private @Getter FastArray<ScalePoint> selectedAll = new FastArray<>(ScalePoint.class);
-	/** Maximum number of features it can return after combining results across all scales */
-	public int maxFeaturesAll;
+	private FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll;
+	private FastArray<ScalePoint> selectedAll = new FastArray<>(ScalePoint.class);
+	/** Maximum number of features after combining results across all scales. if <= 0 then all are returned */
+	public int maxFeaturesAll=-1;
 
 	// local sub-space
 	private GrayF32 intensity[];
 	private int spaceIndex = 0;
 	private QueueCorner foundFeatures = new QueueCorner(100);
 
-	// List of found feature points
-	private FastQueue<ScalePoint> foundPoints = new FastQueue<>(10, ScalePoint::new);
+	// List of found feature points from all scales combined together
+	private FastQueue<ScalePoint> featuresAllScales = new FastQueue<>(10, ScalePoint::new);
 
 	// size of detected feature at the smallest scale
-	private int initialSize;
+	private @Getter final int initialSize;
 	// increment between kernel sizes as it goes up in scale
-	private int scaleStepSize;
+	private @Getter final int scaleStepSize;
 	// the number of octaves it examines
-	private int numberOfOctaves;
+	private @Getter final int numberOfOctaves;
 
 	// local variables that are predeclared
-	private int[] sizes;
+	private final int[] sizes;
 
 	// storage for kernels used to compute laplacian sign
 	protected IntegralKernel kerXX;
@@ -138,7 +137,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 	// how often the image is sampled in the first octave
 	// a value of 1 would mean every pixel is sampled
-	private int initialSampleRate;
+	private final int initialSampleRate;
 
 	/**
 	 * <p>
@@ -150,31 +149,32 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	 * * Note that FH-15 requires the image to be up sampled first. See [1] for details.
 	 * </p>
 	 * @param extractor Feature extractor used to find local maximums in 2D image.
-	 * @param maxFeaturesPerScale Maximum number of features it can find per image scale.  If set &le; 0 then the all potential
-	 * features will be returned, which is how it is in the original paper.
+	 * @param selectFeaturesInScale How to prune excessive features inside a single scale
+	 * @param selectFeaturesAll How to prune excessive features after combining all scales
 	 * @param initialSampleRate How often pixels are sampled in the first octave.
 	 * @param initialSize Size/width of the smallest feature/kernel in the lowest octave.
 	 * @param numberScalesPerOctave How many different feature sizes are considered in a single octave
 	 * @param numberOfOctaves How many different octaves are considered.
 	 * @param scaleStepSize Increment between kernel sizes as it goes up in scale.  Try 6
 	 */
-	public FastHessianFeatureDetector(NonMaxSuppression extractor, int maxFeaturesPerScale,
+	public FastHessianFeatureDetector(NonMaxSuppression extractor,
+									  FeatureSelectLimitIntensity<Point2D_I16> selectFeaturesInScale,
+									  FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
 									  int initialSampleRate, int initialSize,
 									  int numberScalesPerOctave,
 									  int numberOfOctaves, int scaleStepSize) {
 		this.extractor = extractor;
-		if( maxFeaturesPerScale > 0 ) {
-			this.maxFeaturesPerScale = maxFeaturesPerScale;
-			selectFeaturesInScale = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
-		}
-		selectAll = new FeatureSelectNBest<>(new SampleIntensityScalePoint());
-
+		this.selectFeaturesInScale = selectFeaturesInScale;
+		this.selectFeaturesAll = selectFeaturesAll;
 		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;
 		this.numberOfOctaves = numberOfOctaves;
 		this.scaleStepSize = scaleStepSize;
 
 		sizes = new int[ numberScalesPerOctave ];
+
+		selectFeaturesInScale.setSampler(new SampleIntensityImage.I16());
+		selectFeaturesAll.setSampler(new SampleIntensityScalePoint());
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 				intensity[i] = new GrayF32(integral.width,integral.height);
 			}
 		}
-		foundPoints.reset();
+		featuresAllScales.reset();
 
 		// computes feature intensity every 'skip' pixels
 		int skip = initialSampleRate;
@@ -212,11 +212,11 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 			octaveSize += sizeStep;
 			sizeStep += sizeStep;
 		}
-
 		// todo save previously computed sizes for reuse in higher octaves and reuse it
 		// Select points using intensity information from the final list. The scale point's intensity is used
 		// so the image can be passed in as null
-//		selectAll.select(null,true,null,foundPoints,maxFeaturesAll,selectedAll);
+		if( maxFeaturesAll > 0 )
+			selectFeaturesAll.select(null,true,null, featuresAllScales,maxFeaturesAll,selectedAll);
 	}
 
 	/**
@@ -284,7 +284,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 		// if configured to do so, only select the features with the highest intensity
 		FastAccess<Point2D_I16> features;
-		if( selectFeaturesInScale != null ) {
+		if( maxFeaturesPerScale > 0 ) {
 			selectFeaturesInScale.select(intensity[index1],true,null,foundFeatures,maxFeaturesPerScale, selectedScale);
 			features = selectedScale;
 		} else {
@@ -293,6 +293,9 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 		int levelSize = size[level];
 		int sizeStep = levelSize-size[level-1];
+
+		// grow the internal array all at once if needed
+		featuresAllScales.growArray(featuresAllScales.size+features.size);
 
 		// see if these local maximums are also a maximum in scale-space
 		for( int i = 0; i < features.size; i++ ) {
@@ -320,7 +323,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 				double scale =  1.2*interpS/9.0;
 				boolean white = computeLaplaceSign((int)(interpX+0.5),(int)(interpY+0.5),scale);
-				foundPoints.grow().setTo(interpX,interpY,scale,white,intenF);
+				featuresAllScales.grow().setTo(interpX,interpY,scale,white,intenF);
 			}
 		}
 	}
@@ -428,7 +431,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	 * @return Found interest points.
 	 */
 	public List<ScalePoint> getFoundFeatures() {
-		return (selectAll == null ? foundPoints : selectedAll).toList();
+		return (maxFeaturesAll <= 0 ? featuresAllScales : selectedAll).toList();
 	}
 
 	/**

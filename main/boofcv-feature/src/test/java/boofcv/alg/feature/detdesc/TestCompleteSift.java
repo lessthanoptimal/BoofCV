@@ -26,6 +26,8 @@ import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
@@ -75,12 +77,13 @@ public class TestCompleteSift {
 		SiftScaleSpace ss = new SiftScaleSpace(-1,4,3,1.6);
 
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,1,true,true,true));
-		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,300);
+		NonMaxLimiter limiter = new NonMaxLimiter(
+				nonmax, FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()),300);
 		OrientationHistogramSift<GrayF32> ori =
 				new OrientationHistogramSift<>(36,1.5,GrayF32.class);
 		DescribePointSift<GrayF32> describe =
 				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 
-		return new CompleteSift(ss,10,limiter,ori,describe);
+		return new CompleteSift(ss,FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()),10,limiter,ori,describe);
 	}
 }

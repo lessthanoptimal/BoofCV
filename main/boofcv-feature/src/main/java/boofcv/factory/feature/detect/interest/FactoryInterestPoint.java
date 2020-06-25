@@ -20,13 +20,13 @@ package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.interest.*;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -34,6 +34,7 @@ import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
+import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
@@ -191,11 +192,12 @@ public class FactoryInterestPoint {
 		if( configDet == null )
 			configDet = new ConfigSiftDetector();
 
-		SiftScaleSpace scaleSpace =
-				new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
-		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(configDet.extract);
-		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,configDet.maxFeaturesPerScale);
-		SiftDetector detector = new SiftDetector(scaleSpace,configDet.edgeR,limiter);
+		var ss = new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
+				configDet.extract,configDet.selector,configDet.maxFeaturesPerScale);
+		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDet.selector);
+		var detector = new SiftDetector(ss,selectorAll,configDet.edgeR,nonmax);
+		detector.maxFeaturesAll = configDet.maxFeaturesAll;
 
 		return new WrapSiftDetector<>(detector, imageType);
 	}

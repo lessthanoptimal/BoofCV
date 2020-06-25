@@ -48,7 +48,7 @@ public class FactorySelectLimit {
 	 * Creates and returns {@link FeatureSelectLimitIntensity} using a {@link ConfigSelectLimit configuration}.
 	 * @param config Creates the specified select limit. if null it defaults to {@link ConfigSelectLimit}.
 	 */
-	public static<Point extends GeoTuple<Point>>
+	public static<Point>
 	FeatureSelectLimitIntensity<Point> intensity(@Nullable ConfigSelectLimit config) {
 		if( config == null )
 			config = new ConfigSelectLimit();

@@ -38,7 +38,9 @@ import boofcv.alg.feature.detect.selector.SampleIntensityImage;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
+import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 
@@ -192,9 +194,17 @@ public class FactoryInterestPointAlgs {
 
 		// ignore border is overwritten by Fast Hessian at detection time
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config.extract);
-		return new FastHessianFeatureDetector<>(extractor, config.maxFeaturesPerScale,
+		FeatureSelectLimitIntensity<Point2D_I16> limitLevels = FactorySelectLimit.intensity(config.selector);
+		FeatureSelectLimitIntensity<ScalePoint> limitAll = FactorySelectLimit.intensity(config.selector);
+
+		var alg = new FastHessianFeatureDetector<>(extractor, limitLevels, limitAll,
 				config.initialSampleStep, config.initialSize, config.numberScalesPerOctave,
 				config.numberOfOctaves, config.scaleStepSize);
+
+		alg.maxFeaturesPerScale = config.maxFeaturesPerScale;
+		alg.maxFeaturesAll = config.maxFeaturesAll;
+
+		return (FastHessianFeatureDetector)alg;
 	}
 
 	/**
@@ -209,9 +219,12 @@ public class FactoryInterestPointAlgs {
 			configDetector = new ConfigSiftDetector();
 
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
-				configDetector.extract,configDetector.maxFeaturesPerScale);
+				configDetector.extract,configDetector.selector,configDetector.maxFeaturesPerScale);
 		SiftScaleSpace ss = new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,
 				configSS.numScales,configSS.sigma0);
-		return new SiftDetector(ss,configDetector.edgeR,nonmax);
+		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDetector.selector);
+		final var alg = new SiftDetector(ss,selectorAll,configDetector.edgeR,nonmax);
+		alg.maxFeaturesAll = configDetector.maxFeaturesAll;
+		return alg;
 	}
 }

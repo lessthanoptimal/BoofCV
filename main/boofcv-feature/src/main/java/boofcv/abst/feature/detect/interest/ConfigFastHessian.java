@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.struct.Configuration;
 
 /**
@@ -34,10 +35,20 @@ public class ConfigFastHessian implements Configuration {
 	public ConfigExtract extract = new ConfigExtract(2,1,0,true);
 
 	/**
-	 * Maximum number of features that non-maximum suppression (NMS) can return from each scale. Features with higher
-	 * intensity scores are given preference.  If &le; 0 NMS will return all features it finds.
+	 * The maximum number of features it can detect in a single scale. Useful if you want to prevent high frequency
+	 * features from dominating. If &le; 0 then it will have no limit.
 	 */
 	public int maxFeaturesPerScale = -1;
+
+	/**
+	 * Maximum number of features it will return in total. If &le; 0 then it will have no limit.
+	 */
+	public int maxFeaturesAll = -1;
+
+	/**
+	 * Approach used to select features when more than the maximum have been detected
+	 */
+	public ConfigSelectLimit selector = ConfigSelectLimit.selectBestN();
 
 	/**
 	 * How often pixels are sampled in the first octave.  Typically 1 or 2.
@@ -96,6 +107,8 @@ public class ConfigFastHessian implements Configuration {
 		this.numberScalesPerOctave = src.numberScalesPerOctave;
 		this.numberOfOctaves = src.numberOfOctaves;
 		this.scaleStepSize = src.scaleStepSize;
+		this.maxFeaturesAll = src.maxFeaturesAll;
+		this.selector.setTo(src.selector);
 	}
 
 	public ConfigFastHessian copy() {

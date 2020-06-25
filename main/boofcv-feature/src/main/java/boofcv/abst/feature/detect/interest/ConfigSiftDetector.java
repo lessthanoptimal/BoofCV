@@ -20,6 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.struct.Configuration;
 
 /**
@@ -35,9 +36,20 @@ public class ConfigSiftDetector implements Configuration {
 	public ConfigExtract extract = new ConfigExtract(2,0,1,true,true,true);
 
 	/**
-	 * The maximum number of features it can detect in a single space
+	 * The maximum number of features it can detect in a single scale. Useful if you want to prevent high frequency
+	 * features from dominating. If &le; 0 then it will have no limit.
 	 */
 	public int maxFeaturesPerScale = 0;
+
+	/**
+	 * Maximum number of features it will return in total. If &le; 0 then it will have no limit.
+	 */
+	public int maxFeaturesAll = -1;
+
+	/**
+	 * Approach used to select features when more than the maximum have been detected
+	 */
+	public ConfigSelectLimit selector = ConfigSelectLimit.selectBestN();
 
 	/**
 	 * Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
@@ -75,6 +87,8 @@ public class ConfigSiftDetector implements Configuration {
 	public void setTo( ConfigSiftDetector src ) {
 		this.extract.setTo(src.extract);
 		this.maxFeaturesPerScale = src.maxFeaturesPerScale;
+		this.maxFeaturesAll = src.maxFeaturesAll;
+		this.selector.setTo(src.selector);
 		this.edgeR = src.edgeR;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,12 @@
 
 package boofcv.abst.feature.detect.extract;
 
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.image.GrayF32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,12 +42,13 @@ public class TestNonMaxLimiter {
 		intensity.set(1,20,-25);
 
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,0,true,true,true));
-
-		NonMaxLimiter limiter = new NonMaxLimiter(extractor,20);
+		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector =
+				FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+		NonMaxLimiter limiter = new NonMaxLimiter(extractor,selector,20);
 
 		limiter.process(intensity);
 
-		FastQueue<NonMaxLimiter.LocalExtreme> found = limiter.getLocalExtreme();
+		FastAccess<NonMaxLimiter.LocalExtreme> found = limiter.getFeatures();
 		assertEquals(4,found.size());
 
 		for (int i = 0; i < found.size(); i++) {
@@ -67,12 +71,13 @@ public class TestNonMaxLimiter {
 		intensity.set(1,20,-25);
 
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,0,true,true,true));
-
-		NonMaxLimiter limiter = new NonMaxLimiter(extractor,2);
+		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector =
+				FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+		NonMaxLimiter limiter = new NonMaxLimiter(extractor,selector,2);
 
 		limiter.process(intensity);
 
-		FastQueue<NonMaxLimiter.LocalExtreme> found = limiter.getLocalExtreme();
+		FastAccess<NonMaxLimiter.LocalExtreme> found = limiter.getFeatures();
 		assertEquals(2,found.size());
 
 		for (int i = 0; i < found.size(); i++) {

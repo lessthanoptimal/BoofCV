@@ -23,6 +23,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.ScalePoint;
@@ -66,15 +67,17 @@ public class CompleteSift extends SiftDetector
 	 * Configures SIFT
 	 *
 	 * @param scaleSpace Scale-space that features are computed inside of
-	 * @param edgeR Edge threshold.  See {@link SiftDetector#SiftDetector(SiftScaleSpace, double, NonMaxLimiter)}
-	 * @param extractor Finds minimums and maximums.  See {@link SiftDetector#SiftDetector(SiftScaleSpace, double, NonMaxLimiter)}
+	 * @param edgeR Edge threshold.  See {@link SiftDetector#SiftDetector}
+	 * @param extractor Finds minimums and maximums.  See {@link SiftDetector#SiftDetector}
 	 * @param orientation Estimates feature orientation(s)
 	 * @param describe Describes a SIFT feature
 	 */
-	public CompleteSift(SiftScaleSpace scaleSpace, double edgeR, NonMaxLimiter extractor,
+	public CompleteSift(SiftScaleSpace scaleSpace,
+						FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
+						double edgeR, NonMaxLimiter extractor,
 						OrientationHistogramSift<GrayF32> orientation,
 						DescribePointSift<GrayF32> describe) {
-		super(scaleSpace, edgeR, extractor);
+		super(scaleSpace,selectFeaturesAll, edgeR, extractor);
 
 		this.orientation = orientation;
 		this.describe = describe;

@@ -21,7 +21,6 @@ package boofcv.examples.features;
 import boofcv.BoofDefaults;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
@@ -31,7 +30,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
@@ -58,8 +57,13 @@ public class ExampleFeatureSurf {
 	 */
 	public static void easy( GrayF32 image ) {
 		// create the detector and descriptors
+		ConfigFastHessian configDetector = new ConfigFastHessian();
+		configDetector.extract = new ConfigExtract(2, 0, 5, true);
+		configDetector.maxFeaturesPerScale = 200;
+		configDetector.initialSampleStep = 2;
+
 		DetectDescribePoint<GrayF32,TupleDesc_F64> surf = FactoryDetectDescribe.
-				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,GrayF32.class);
+				surfStable(configDetector, null, null,GrayF32.class);
 
 		 // specify the image to process
 		surf.detect(image);
@@ -69,6 +73,8 @@ public class ExampleFeatureSurf {
 	}
 
 	/**
+	 * UPDATE THESE COMMENTS. SURF FEATURE NO LONGER EXISTS
+	 *
 	 * Configured exactly the same as the easy example above, but require a lot more code and a more in depth
 	 * understanding of how SURF works and is configured.  Instead of TupleDesc_F64, SurfFeature are computed in
 	 * this case.  They are almost the same as TupleDesc_F64, but contain the Laplacian's sign which can be used
@@ -81,10 +87,11 @@ public class ExampleFeatureSurf {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(GrayF32.class);
 		
 		// define the feature detection algorithm
-		NonMaxSuppression extractor =
-				FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 0, 5, true));
-		FastHessianFeatureDetector<II> detector =
-				new FastHessianFeatureDetector<>(extractor, 200, 2, 9, 4, 4, 6);
+		ConfigFastHessian config = new ConfigFastHessian();
+		config.extract = new ConfigExtract(2, 0, 5, true);
+		config.maxFeaturesPerScale = 200;
+		config.initialSampleStep = 2;
+		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(config);
 
 		// estimate orientation
 		OrientationIntegral<II> orientation = 

@@ -20,10 +20,10 @@ package boofcv.demonstrations.feature.detect.interest;
 
 import boofcv.BoofDefaults;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -56,8 +56,13 @@ public class DetectFastHessianApp {
 	private static <T extends ImageGray<T>> void doStuff(Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract( 5 , 1 , 5, true) );
-		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<>(extractor, NUM_FEATURES, 2, 9, 4, 4, 6);
+		ConfigFastHessian config = new ConfigFastHessian();
+		config.extract = new ConfigExtract(5, 1, 5, true);
+		config.maxFeaturesPerScale = 200;
+		config.maxFeaturesAll = 400;
+		config.initialSampleStep = 2;
+
+		FastHessianFeatureDetector<T> det = FactoryInterestPointAlgs.fastHessian(config);
 
 		T integral = GIntegralImageOps.transform(workImage,null);
 		det.detect(integral);
@@ -70,7 +75,7 @@ public class DetectFastHessianApp {
 		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName(),true);
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 		doStuff(GrayF32.class,input);

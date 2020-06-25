@@ -20,13 +20,17 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
-import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,11 +39,13 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSiftDetector {
 
+	Random rand = new Random(345);
+	
 	/**
 	 * Tests the ability to detect a single square feature at multiple scales and color
 	 */
 	@Test
-	public void process() {
+	void process() {
 		int c_x = 40,c_y=42;
 
 		SiftDetector alg = createDetector();
@@ -56,8 +62,8 @@ public class TestSiftDetector {
 
 				alg.process(input);
 
-				FastQueue<ScalePoint> detections = alg.getDetections();
-				assertTrue(detections.size > 0);
+				List<ScalePoint> detections = alg.getDetections();
+				assertTrue(detections.size() > 0);
 
 				boolean found = false;
 				for (int i = 0; i < detections.size(); i++) {
@@ -74,7 +80,7 @@ public class TestSiftDetector {
 	}
 
 	@Test
-	public void isScaleSpaceExtremum() {
+	void isScaleSpaceExtremum() {
 		GrayF32 upper = new GrayF32(30,40);
 		GrayF32 current = new GrayF32(30,40);
 		GrayF32 lower = new GrayF32(30,40);
@@ -97,7 +103,7 @@ public class TestSiftDetector {
 	 * Interpolation shouldn't change the location since its equal on all sides
 	 */
 	@Test
-	public void processFeatureCandidate_NoChange() {
+	void processFeatureCandidate_NoChange() {
 		GrayF32 upper = new GrayF32(30,40);
 		GrayF32 current = new GrayF32(30,40);
 		GrayF32 lower = new GrayF32(30,40);
@@ -109,7 +115,7 @@ public class TestSiftDetector {
 		alg.derivXX.setImage(current); alg.derivXY.setImage(current); alg.derivYY.setImage(current);
 
 		for( float sign :  new float[]{-1,1} ) {
-			alg.detections.reset();
+			alg.detectionsAll.reset();
 			current.set(15, 16, sign*100);
 			alg.processFeatureCandidate(15, 16, 100, sign > 0);
 
@@ -125,7 +131,7 @@ public class TestSiftDetector {
 	 * away from the pixel level peak.
 	 */
 	@Test
-	public void processFeatureCandidate_Shift() {
+	void processFeatureCandidate_Shift() {
 		GrayF32 upper = new GrayF32(30,40);
 		GrayF32 current = new GrayF32(30,40);
 		GrayF32 lower = new GrayF32(30,40);
@@ -138,7 +144,7 @@ public class TestSiftDetector {
 
 		int x = 15,y = 16;
 		for( float sign :  new float[]{-1,1} ) {
-			alg.detections.reset();
+			alg.detectionsAll.reset();
 			current.set(x, y-1, sign*90);
 			current.set(x, y, sign*100);
 			current.set(x, y+1, sign*80);
@@ -164,7 +170,7 @@ public class TestSiftDetector {
 			upper.set(x, y, sign*90);
 			lower.set(x, y, sign*80);
 
-			alg.detections.reset();
+			alg.detectionsAll.reset();
 			alg.processFeatureCandidate(15, 16, sign*100, sign > 0);
 			assertTrue(Math.abs(5 - p.scale) < 2);
 			assertTrue( 5 < p.scale );
@@ -173,7 +179,7 @@ public class TestSiftDetector {
 	}
 
 	@Test
-	public void isEdge() {
+	void isEdge() {
 		// create an edge
 		GrayF32 input = new GrayF32(100,120);
 		GImageMiscOps.fillRectangle(input,100,0,0,50,120);
@@ -194,9 +200,61 @@ public class TestSiftDetector {
 
 	private SiftDetector createDetector() {
 		SiftScaleSpace ss = new SiftScaleSpace(-1,5,3,1.6);
-		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,1,true,true,true));
-		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,1000);
-		return new SiftDetector(ss,10,limiter);
+		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
+				new ConfigExtract(1,0,1,true,true,true),
+				ConfigSelectLimit.selectBestN(),1000);
+		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+		return new SiftDetector(ss,selectorAll,10,nonmax);
 	}
 
+	/**
+	 * Sees if fewer points are selected when max per level is adjusted
+	 */
+	@Test
+	void respondsToMaxPerLevel() {
+		// no limit to detection
+		var detector = createDetector();
+		detector.getExtractor().setMaxTotalFeatures(-1);
+
+		var input = new GrayF32(100,120);
+		GImageMiscOps.fillUniform(input,rand,0,255);
+
+		detector.process(input);
+		int countUnlimited = detector.getDetections().size();
+
+		// hardly limit it
+		detector.getExtractor().setMaxTotalFeatures(5);
+		detector.process(input);
+		int countLimited = detector.getDetections().size();
+		assertTrue(countLimited>=5);
+		assertTrue(countLimited*2 < countUnlimited);
+	}
+
+	/**
+	 * Will not exceed when the max total is set
+	 */
+	@Test
+	void strictEnforcesMaxTotal() {
+		// no limit to detection
+		var detector = createDetector();
+
+		var input = new GrayF32(100,120);
+		GImageMiscOps.fillUniform(input,rand,0,255);
+
+		detector.process(input);
+		int countUnlimited = detector.getDetections().size();
+		assertTrue(countUnlimited>=30);
+
+		// force it to be a smaller number
+		detector.maxFeaturesAll = countUnlimited/2;
+		detector.process(input);
+		int countLimited = detector.getDetections().size();
+		assertEquals(countUnlimited/2,countLimited);
+
+		// force it to be a larger number
+		detector.maxFeaturesAll = countUnlimited*2;
+		detector.process(input);
+		countLimited = detector.getDetections().size();
+		assertEquals(countUnlimited,countLimited);
+	}
 }

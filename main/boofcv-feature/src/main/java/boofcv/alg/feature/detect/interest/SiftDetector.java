@@ -20,6 +20,8 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
+import boofcv.alg.feature.detect.selector.SampleIntensityScalePoint;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
@@ -29,7 +31,12 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
+import lombok.Getter;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
+
+import java.util.List;
 
 import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
 
@@ -92,8 +99,11 @@ public class SiftDetector {
 	// In the paper this is (r+1)**2/r
 	double edgeThreshold;
 
+	/** Maximum number of features after combining results across all scales. if <= 0 then all are returned */
+	public int maxFeaturesAll=-1;
+
 	// all the found detections in a single octave
-	protected FastQueue<ScalePoint> detections = new FastQueue<>(ScalePoint::new);
+	protected FastQueue<ScalePoint> detectionsAll = new FastQueue<>(ScalePoint::new);
 
 	// Computes image derivatives. used in edge rejection
 	ImageConvolveSparse<GrayF32,?> derivXX;
@@ -107,7 +117,11 @@ public class SiftDetector {
 	double sigmaLower, sigmaTarget, sigmaUpper;
 
 	// finds features from 2D intensity image
-	private NonMaxLimiter extractor;
+	private @Getter	NonMaxLimiter extractor;
+
+	// Used to select features from the combined set when there are too many
+	private FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll;
+	private FastArray<ScalePoint> selectedAll = new FastArray<>(ScalePoint.class);
 
 	/**
 	 * Configures SIFT detector
@@ -117,6 +131,7 @@ public class SiftDetector {
 	 * @param extractor Spatial feature detector that can be configured to limit the number of detected features in each scale.
 	 */
 	public SiftDetector(SiftScaleSpace scaleSpace ,
+						FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
 						double edgeR ,
 						NonMaxLimiter extractor ) {
 		if( !extractor.getNonmax().canDetectMaximums() || !extractor.getNonmax().canDetectMinimums() )
@@ -133,6 +148,8 @@ public class SiftDetector {
 		this.extractor = extractor;
 
 		this.edgeThreshold = (edgeR+1)*(edgeR+1)/edgeR;
+		this.selectFeaturesAll = selectFeaturesAll;
+		selectFeaturesAll.setSampler(new SampleIntensityScalePoint());
 
 		createSparseDerivatives();
 	}
@@ -165,7 +182,7 @@ public class SiftDetector {
 	public void process( GrayF32 input ) {
 
 		scaleSpace.initialize(input);
-		detections.reset();
+		detectionsAll.reset();
 
 		do {
 			// scale from octave to input image
@@ -188,6 +205,9 @@ public class SiftDetector {
 				detectFeatures(j);
 			}
 		} while( scaleSpace.computeNextOctave() );
+
+		if( maxFeaturesAll > 0 )
+			selectFeaturesAll.select(null,true,null, detectionsAll,maxFeaturesAll,selectedAll);
 	}
 
 	/**
@@ -198,7 +218,7 @@ public class SiftDetector {
 	 */
 	protected void detectFeatures( int scaleIndex ) {
 		extractor.process(dogTarget);
-		FastQueue<NonMaxLimiter.LocalExtreme> found = extractor.getLocalExtreme();
+		FastAccess<NonMaxLimiter.LocalExtreme> found = extractor.getFeatures();
 
 		derivXX.setImage(dogTarget);
 		derivXY.setImage(dogTarget);
@@ -207,11 +227,7 @@ public class SiftDetector {
 		for (int i = 0; i < found.size; i++) {
 			NonMaxLimiter.LocalExtreme e = found.get(i);
 
-			if( e.max ) {
-				if( isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), 1f)) {
-					processFeatureCandidate(e.location.x,e.location.y,e.getValue(),e.max);
-				}
-			} else if( isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), -1f)) {
+			if( isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), e.max ? 1f : -1f)) {
 				processFeatureCandidate(e.location.x,e.location.y,e.getValue(),e.max);
 			}
 		}
@@ -259,7 +275,7 @@ public class SiftDetector {
 	 * @param value value of the extremum
 	 * @param maximum true if it was a maximum
 	 */
-	protected void processFeatureCandidate( int x , int y , float value ,boolean maximum ) {
+	protected void processFeatureCandidate( int x, int y, float value, boolean maximum ) {
 		// suppress response along edges
 		if( isEdge(x,y) )
 			return;
@@ -278,7 +294,7 @@ public class SiftDetector {
 		float s0 = dogLower.unsafe_get(x , y )*signAdj;
 		float s2 = dogUpper.unsafe_get(x , y )*signAdj;
 
-		ScalePoint p = detections.grow();
+		ScalePoint p = detectionsAll.grow();
 
 		// Compute the interpolated coordinate of the point in the original image coordinates
 		p.pixel.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
@@ -294,6 +310,9 @@ public class SiftDetector {
 
 		// a maximum corresponds to a dark object and a minimum to a whiter object
 		p.white = !maximum;
+
+		// Set the intensity to a positive value
+		p.intensity = maximum ? value : -value;
 
 		handleDetection(p);
 	}
@@ -330,7 +349,10 @@ public class SiftDetector {
 		}
 	}
 
-	public FastQueue<ScalePoint> getDetections() {
-		return detections;
+	/**
+	 * All the found and selected detections across scale space
+	 */
+	public List<ScalePoint> getDetections() {
+		return( (maxFeaturesAll > 0 ? selectedAll : detectionsAll).toList() );
 	}
 }

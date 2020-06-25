@@ -24,6 +24,8 @@ import boofcv.alg.feature.detect.extract.*;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 
@@ -147,13 +149,14 @@ public class FactoryFeatureExtractor {
 
 	/**
 	 * Creates a non-maximum limiter using the specified configuration
-	 * @param config non-maxumum settings
+	 * @param configExtract non-maxumum settings
 	 * @param maxFeatures maximum allowed features
 	 * @return The NonMaxLimiter
 	 */
-	public static NonMaxLimiter nonmaxLimiter( @Nullable ConfigExtract config , int maxFeatures ) {
-		NonMaxSuppression nonmax = nonmax(config);
-		return new NonMaxLimiter(nonmax,maxFeatures);
+	public static NonMaxLimiter nonmaxLimiter(@Nullable ConfigExtract configExtract , ConfigSelectLimit configSelect, int maxFeatures ) {
+		NonMaxSuppression nonmax = nonmax(configExtract);
+		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector = FactorySelectLimit.intensity(configSelect);
+		return new NonMaxLimiter(nonmax,selector,maxFeatures);
 	}
 
 }

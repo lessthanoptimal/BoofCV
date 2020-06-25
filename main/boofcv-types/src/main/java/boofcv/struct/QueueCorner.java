@@ -19,6 +19,7 @@
 package boofcv.struct;
 
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 
@@ -50,9 +51,11 @@ public class QueueCorner extends FastQueue<Point2D_I16> {
 	 * Adds a copy of each element in 'list' which is owned by 'this' queue
 	 * @param list The list that is to added and copied
 	 */
-	public final void appendAll(QueueCorner list ) {
+	public final void appendAll(FastAccess<Point2D_I16> list ) {
+		int sizeBefore = size;
+		resize(sizeBefore+list.size);
 		for (int i = 0; i < list.size; i++) {
-			grow().set(list.get(i));
+			get(sizeBefore+i).set(list.get(i));
 		}
 	}
 }

@@ -21,9 +21,14 @@ package boofcv.abst.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
+import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayU8;
-import org.junit.jupiter.api.Test;
+import georegression.struct.point.Point2D_I16;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
@@ -31,16 +36,17 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("unchecked")
 public class TestWrapFHtoInterestPoint {
 
-	// some reasonable input algorithms
-	NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 5, true));
-	FastHessianFeatureDetector detector = new FastHessianFeatureDetector(extractor,150,
-			1,9, 4,4, 6);
-
-	@Test
-	public void standard() {
-		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector,GrayU8.class);
-
-		new GeneralInterestPointDetectorChecks(alg,false,true,GrayU8.class){}.performAllTests();
+	@Nested
+	public class Standard extends GeneralInterestPointDetectorChecks {
+		public Standard() {
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 5, true));
+			FeatureSelectLimitIntensity<Point2D_I16> limitLevels = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+			FeatureSelectLimitIntensity<ScalePoint> limitAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+			var detector = new FastHessianFeatureDetector(extractor,limitLevels,limitAll,
+					1,9, 4,4, 6);
+			detector.maxFeaturesPerScale = 150;
+			var alg = new WrapFHtoInterestPoint(detector,GrayU8.class);
+			configure(alg,false,true,GrayU8.class);
+		}
 	}
-
 }

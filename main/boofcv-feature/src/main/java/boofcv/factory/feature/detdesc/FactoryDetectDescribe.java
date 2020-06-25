@@ -18,18 +18,15 @@
 
 package boofcv.factory.feature.detdesc;
 
-import boofcv.abst.feature.describe.ConfigSiftDescribe;
-import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.*;
-import boofcv.abst.feature.detect.extract.NonMaxLimiter;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.orientation.*;
-import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.abst.feature.orientation.ConfigAverageIntegral;
+import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
+import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.DescribePointSurfMod;
 import boofcv.alg.feature.describe.DescribePointSurfPlanar;
@@ -38,14 +35,11 @@ import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar;
 import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar_MT;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.feature.detect.interest.SiftScaleSpace;
-import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -54,7 +48,6 @@ import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
@@ -146,26 +139,7 @@ public class FactoryDetectDescribe {
 	public static <T extends ImageGray<T>>
 	DetectDescribePoint<T,TupleDesc_F64> sift( @Nullable ConfigCompleteSift config, Class<T> imageType)
 	{
-		if( config == null )
-			config = new ConfigCompleteSift();
-
-		ConfigSiftScaleSpace configSS = config.scaleSpace;
-		ConfigSiftDetector configDetector = config.detector;
-		ConfigSiftOrientation configOri = config.orientation;
-		ConfigSiftDescribe configDesc = config.describe;
-
-		SiftScaleSpace scaleSpace = new SiftScaleSpace(
-				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
-		OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<>(
-				configOri.histogramSize,configOri.sigmaEnlarge,GrayF32.class);
-		DescribePointSift<GrayF32> describe = new DescribePointSift<>(
-				configDesc.widthSubregion,configDesc.widthGrid, configDesc.numHistogramBins,
-				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
-				configDesc.maxDescriptorElementValue,GrayF32.class);
-
-		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configDetector.extract);
-		NonMaxLimiter nonMax = new NonMaxLimiter(nns,configDetector.maxFeaturesPerScale);
-		CompleteSift dds = new CompleteSift(scaleSpace,configDetector.edgeR,nonMax,orientation,describe);
+		CompleteSift dds = FactoryDetectDescribeAlgs.sift(config);
 		return new DetectDescribe_CompleteSift<>(dds,imageType);
 	}
 

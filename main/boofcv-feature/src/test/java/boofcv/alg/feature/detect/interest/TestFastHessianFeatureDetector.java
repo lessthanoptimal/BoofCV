@@ -20,12 +20,18 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
+import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
+import georegression.struct.point.Point2D_I16;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -41,7 +47,11 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 	@Override
 	protected Object createDetector( int maxFeatures ) {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 1, 5, true));
-		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4, 6);
+		FeatureSelectLimitIntensity<Point2D_I16> limitLevels = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+		FeatureSelectLimitIntensity<ScalePoint> limitAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+		var alg = new FastHessianFeatureDetector(extractor,limitLevels,limitAll,1, 9,4,4, 6);
+		alg.maxFeaturesPerScale = maxFeatures;
+		return alg;
 	}
 
 	@SuppressWarnings({"unchecked"})
@@ -81,5 +91,59 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 		int minimum = N*3/10;
 		assertTrue(countWhite>minimum);
 		assertTrue((N-countWhite)>minimum);
+	}
+
+	/**
+	 * Sees if fewer points are selected when max per level is adjusted
+	 */
+	@Test
+	void respondsToMaxPerLevel() {
+		// no limit to detection
+		var detector = (FastHessianFeatureDetector)createDetector(-1);
+
+		var input = new GrayF32(width, height);
+		GImageMiscOps.fillUniform(input,rand,0,255);
+		var ii = input.createSameShape();
+		IntegralImageOps.transform(input,ii);
+
+		detector.detect(ii);
+		int countUnlimited = detector.getFoundFeatures().size();
+
+		// hardly limit it
+		detector.maxFeaturesPerScale = 5;
+		detector.detect(ii);
+		int countLimited = detector.getFoundFeatures().size();
+		assertTrue(countLimited>=5);
+		assertTrue(countLimited*2 < countUnlimited);
+	}
+
+	/**
+	 * Will not exceed when the max total is set
+	 */
+	@Test
+	void strictEnforcesMaxTotal() {
+		// no limit to detection
+		var detector = (FastHessianFeatureDetector)createDetector(-1);
+
+		var input = new GrayF32(width, height);
+		GImageMiscOps.fillUniform(input,rand,0,255);
+		var ii = input.createSameShape();
+		IntegralImageOps.transform(input,ii);
+
+		detector.detect(ii);
+		int countUnlimited = detector.getFoundFeatures().size();
+		assertTrue(countUnlimited>=30);
+
+		// force it to be a smaller number
+		detector.maxFeaturesAll = countUnlimited/2;
+		detector.detect(ii);
+		int countLimited = detector.getFoundFeatures().size();
+		assertEquals(countUnlimited/2,countLimited);
+
+		// force it to be a larger number
+		detector.maxFeaturesAll = countUnlimited*2;
+		detector.detect(ii);
+		countLimited = detector.getFoundFeatures().size();
+		assertEquals(countUnlimited,countLimited);
 	}
 }

@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -76,6 +75,9 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 
 	// computes the feature intensity image
 	protected GeneralFeatureIntensity<I, D> intensity;
+
+	// Storage for initial set of found features
+	protected QueueCorner found = new QueueCorner(10);
 
 	/**
 	 * Specifies which algorithms to use and configures the detector.
@@ -158,24 +160,22 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 		if( intensity.localMinimums() ) {
 			markExcludedPixels(intensityImage,-Float.MAX_VALUE);
 			if (intensity.hasCandidates()) {
-				extractorMin.process(intensityImage, intensity.getCandidatesMin(), null, minimums, null);
+				extractorMin.process(intensityImage, intensity.getCandidatesMin(), null, found, null);
 			} else {
-				extractorMin.process(intensityImage, null, null, minimums, null);
+				extractorMin.process(intensityImage, null, null, found, null);
 			}
+			resolveSelectAmbiguity(intensityImage, exclude,found, minimums, limitPerSetMin, false);
 		}
 
 		if( intensity.localMaximums() ) {
 			markExcludedPixels(intensityImage,Float.MAX_VALUE);
 			if (intensity.hasCandidates()) {
-				extractorMax.process(intensityImage, null, intensity.getCandidatesMax(), null, maximums);
+				extractorMax.process(intensityImage, null, intensity.getCandidatesMax(), null, found);
 			} else {
-				extractorMax.process(intensityImage, null, null, null, maximums);
+				extractorMax.process(intensityImage, null, null, null, found);
 			}
+			resolveSelectAmbiguity(intensityImage, exclude,found, maximums, limitPerSetMax, true);
 		}
-
-		// optionally select the most intense features only
-		resolveSelectAmbiguity(intensityImage, exclude, minimums, limitPerSetMin, false);
-		resolveSelectAmbiguity(intensityImage, exclude, maximums, limitPerSetMax, true);
 	}
 
 	private void markExcludedPixels(GrayF32 intensityImage, float value) {
@@ -190,13 +190,14 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	/**
 	 * More features were detected than requested. Need to select a subset of them
 	 */
-	private void resolveSelectAmbiguity(GrayF32 intensity, QueueCorner excluded, QueueCorner detected ,
-										int numSelect, boolean positive) {
+	private void resolveSelectAmbiguity(GrayF32 intensity, QueueCorner excluded, QueueCorner found ,
+										QueueCorner output, int numSelect, boolean positive) {
+		output.reset();
 		if (numSelect > 0) {
-			selectMax.select(intensity,positive,excluded,detected,numSelect,selected);
-			// selected is filled with corners from found, so hopefully implementation details of reset don't change
-			detected.reset();
-			BoofMiscOps.copyAll(selected,detected);
+			selectMax.select(intensity,positive,excluded,found,numSelect,selected);
+			output.appendAll(selected);
+		} else {
+			output.appendAll(found);
 		}
 	}
 

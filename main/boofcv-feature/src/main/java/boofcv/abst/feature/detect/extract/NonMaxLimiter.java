@@ -18,11 +18,18 @@
 
 package boofcv.abst.feature.detect.extract;
 
+import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
+import boofcv.alg.feature.detect.selector.SampleIntensity;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.sorting.QuickSelect;
+import lombok.Getter;
+import lombok.Setter;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
+
+import javax.annotation.Nullable;
 
 /**
  * Adds the ability to specify the maximum number of points that you wish to return.  The selected
@@ -32,26 +39,39 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class NonMaxLimiter {
-	NonMaxSuppression nonmax;
+	@Getter NonMaxSuppression nonmax;
 
-	int maxTotalFeatures;
+	/** Maximum number of features it can return. If %le; 0 then there will be no limit */
+	@Getter	@Setter	int maxTotalFeatures;
 
+	// Detected minimums and maximums
 	QueueCorner originalMin = new QueueCorner();
 	QueueCorner originalMax = new QueueCorner();
 
-	FastQueue<LocalExtreme> localExtreme = new FastQueue<>(LocalExtreme::new);
+	// Selects features when too many are detected
+	FeatureSelectLimitIntensity<LocalExtreme> selector;
+	// All detected features
+	FastQueue<LocalExtreme> foundAll = new FastQueue<>(LocalExtreme::new);
+	// Just the selected features
+	FastArray<LocalExtreme> foundSelected = new FastArray<>(LocalExtreme.class);
 
 	/**
 	 * Configures the limiter
 	 * @param nonmax Non-maximum suppression algorithm
 	 * @param maxTotalFeatures The total number of allowed features it can return.  Set to a value &le; 0 to disable.
 	 */
-	public NonMaxLimiter(NonMaxSuppression nonmax, int maxTotalFeatures) {
+	public NonMaxLimiter(NonMaxSuppression nonmax,
+						 FeatureSelectLimitIntensity<LocalExtreme> selector,
+						 int maxTotalFeatures) {
 		this.nonmax = nonmax;
-		if( maxTotalFeatures <= 0 )
-			this.maxTotalFeatures = Integer.MAX_VALUE;
-		else
-			this.maxTotalFeatures = maxTotalFeatures;
+		this.selector = selector;
+		this.maxTotalFeatures = maxTotalFeatures;
+
+		selector.setSampler(new SampleIntensity<>() {
+			@Override public float sample(@Nullable GrayF32 intensity, int index, LocalExtreme p) { return p.intensity;}
+			@Override public int getX(LocalExtreme p) {return p.location.x;}
+			@Override public int getY(LocalExtreme p) {return p.location.y;}
+		});
 	}
 
 	/**
@@ -65,38 +85,28 @@ public class NonMaxLimiter {
 		originalMax.reset();
 		nonmax.process(intensity,null,null,originalMin,originalMax);
 
-		localExtreme.reset();
+		foundAll.reset();
 		for (int i = 0; i < originalMin.size; i++) {
 			Point2D_I16 p = originalMin.get(i);
 			float val = intensity.unsafe_get(p.x,p.y);
-			localExtreme.grow().set(-val,false,p);
+			foundAll.grow().set(-val,false,p);
 		}
 		for (int i = 0; i < originalMax.size; i++) {
 			Point2D_I16 p = originalMax.get(i);
 			float val = intensity.unsafe_get(p.x, p.y);
-			localExtreme.grow().set(val,true,p);
+			foundAll.grow().set(val,true,p);
 		}
 
-		if( localExtreme.size > maxTotalFeatures ) {
-			QuickSelect.select(localExtreme.data, maxTotalFeatures, localExtreme.size);
-			localExtreme.size = maxTotalFeatures;
+		if( maxTotalFeatures > 0 ) {
+			selector.select(intensity, true, null, foundAll, maxTotalFeatures, foundSelected);
+		} else {
+			foundSelected.clear();
+			foundSelected.addAll(foundAll);
 		}
 	}
 
-	public FastQueue<LocalExtreme> getLocalExtreme() {
-		return localExtreme;
-	}
-
-	public int getMaxTotalFeatures() {
-		return maxTotalFeatures;
-	}
-
-	public void setMaxTotalFeatures(int maxTotalFeatures) {
-		this.maxTotalFeatures = maxTotalFeatures;
-	}
-
-	public NonMaxSuppression getNonmax() {
-		return nonmax;
+	public FastAccess<LocalExtreme> getFeatures() {
+		return foundSelected;
 	}
 
 	/**
