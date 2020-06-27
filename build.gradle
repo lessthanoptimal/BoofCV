@@ -269,7 +269,7 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
 
 // Creates a single jar which contains all the subprojects in main and integration
 task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJava" }) {
-    baseName = 'BoofCV'
+    archiveFile.set(file("boofcv-v${project.version}.jar"))
 
     from files(javadocProjects.collect { project(it).sourceSets.main.output }) {
         exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
