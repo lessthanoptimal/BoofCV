@@ -56,10 +56,8 @@ public class PerspectiveOps {
 	/**
 	 * Approximates a pinhole camera using the distoriton model
 	 * @param p2n Distorted pixel to undistorted normalized image coordinates
-	 * @return
 	 */
-	public static CameraPinhole approximatePinhole( Point2Transform2_F64 p2n ,
-													int width , int height )
+	public static CameraPinhole approximatePinhole( Point2Transform2_F64 p2n , int width , int height )
 	{
 		Point2D_F64 na = new Point2D_F64();
 		Point2D_F64 nb = new Point2D_F64();
@@ -367,11 +365,11 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel(CameraModel param , double x , double y , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel(CameraModel param , double x , double y , @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.convertNormToPixel(param, x, y, pixel);
 	}
 
-	public static Point2D_F64 convertNormToPixel( CameraPinhole param , double x , double y , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( CameraPinhole param , double x , double y , @Nullable Point2D_F64 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 		pixel.x = param.fx * x + param.skew * y + param.cx;
@@ -392,7 +390,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F32 convertNormToPixel(CameraModel param , float x , float y , Point2D_F32 pixel ) {
+	public static Point2D_F32 convertNormToPixel(CameraModel param , float x , float y , @Nullable Point2D_F32 pixel ) {
 		return ImplPerspectiveOps_F32.convertNormToPixel(param, x, y, pixel);
 	}
 
@@ -409,7 +407,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel(CameraModel param , Point2D_F64 norm , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel(CameraModel param , Point2D_F64 norm , @Nullable Point2D_F64 pixel ) {
 		return convertNormToPixel(param,norm.x,norm.y,pixel);
 	}
 
@@ -426,7 +424,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm , Point2D_F64 pixel )
+	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm , @Nullable Point2D_F64 pixel )
 	{
 		return ImplPerspectiveOps_F64.convertNormToPixel(K, norm, pixel);
 	}
@@ -444,7 +442,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm(CameraModel param , Point2D_F64 pixel , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm(CameraModel param , Point2D_F64 pixel , @Nullable Point2D_F64 norm ) {
 		return ImplPerspectiveOps_F64.convertPixelToNorm(param, pixel, norm);
 	}
 
@@ -461,7 +459,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F32 convertPixelToNorm(CameraModel param , Point2D_F32 pixel , Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm(CameraModel param , Point2D_F32 pixel , @Nullable Point2D_F32 norm ) {
 		return ImplPerspectiveOps_F32.convertPixelToNorm(param, pixel, norm);
 	}
 
@@ -478,7 +476,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K , Point2D_F64 pixel , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K , Point2D_F64 pixel , @Nullable Point2D_F64 norm ) {
 		return ImplPerspectiveOps_F64.convertPixelToNorm(K, pixel, norm);
 	}
 
@@ -495,11 +493,14 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F32 convertPixelToNorm( FMatrixRMaj K , Point2D_F32 pixel , Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm( FMatrixRMaj K , Point2D_F32 pixel , @Nullable Point2D_F32 norm ) {
 		return ImplPerspectiveOps_F32.convertPixelToNorm(K, pixel, norm);
 	}
 
-	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic , double x , double y, Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic ,
+												  double x , double y,
+												  @Nullable Point2D_F64 norm )
+	{
 		return ImplPerspectiveOps_F64.convertPixelToNorm(intrinsic, x,y, norm);
 	}
 
@@ -513,22 +514,19 @@ public class PerspectiveOps {
 	 * @param pixel (Output) storage for the rendered pixel
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X, Point2D_F64 pixel) {
+	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
+										  @Nullable Point2D_F64 pixel) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,K,X, pixel);
-//		if( K == null )
-//			return renderPixel(worldToCamera,X);
-//		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
-//				K.data[0], K.data[1], K.data[2], K.data[4], K.data[5], X);
 	}
 
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point3D_F64 X, Point2D_F64 pixel) {
-		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
-				K.fy, K.skew, K.cx, K.fy, K.cy, X, pixel);
+	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point3D_F64 X,
+										  @Nullable Point2D_F64 pixel) {
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K.fx, K.skew, K.cx, K.fy, K.cy, X, pixel);
 	}
 
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, Point3D_F64 X, Point2D_F64 pixel) {
-		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
-				1, 0, 0, 1, 0, X, pixel);
+	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, Point3D_F64 X,
+										  @Nullable Point2D_F64 pixel) {
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, 1, 0, 0, 1, 0, X, pixel);
 	}
 
 	/**
@@ -540,7 +538,7 @@ public class PerspectiveOps {
 	 * @param pixel (Output) Storage for output pixel. Can be null
 	 * @return 2D Render point on image plane
 	 */
-	public static Point2D_F64 renderPixel(CameraPinhole intrinsic, Point3D_F64 X, Point2D_F64 pixel) {
+	public static Point2D_F64 renderPixel(CameraPinhole intrinsic, Point3D_F64 X, @Nullable Point2D_F64 pixel) {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 		pixel.set(X.x/X.z,X.y/X.z);

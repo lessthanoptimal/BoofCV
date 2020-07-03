@@ -367,7 +367,7 @@ class TestPerspectiveOps {
 	void renderPixel_intrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		CameraPinholeBrown intrinsic = new CameraPinholeBrown(100,150,0.1,120,209,500,600);
+		CameraPinhole intrinsic = new CameraPinhole(100,150,0.1,120,209,500,600);
 
 		double normX = X.x/X.z;
 		double normY = X.y/X.z;
@@ -382,26 +382,56 @@ class TestPerspectiveOps {
 	}
 
 	@Test
-	void renderPixel_cameramatrix() {
+	void renderPixel_SE3_intrinsic()
+	{
+		Se3_F64 worldToCamera = SpecialEuclideanOps_F64.eulerXyz(0.2,0.01,-0.03,0.1,-0.05,0.03,null);
+
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
-
-		Se3_F64 worldToCamera = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.05,0.03,worldToCamera.getR());
-		worldToCamera.getT().set(0.2,0.01,-0.03);
-
-		DMatrixRMaj K = RandomMatrices_DDRM.triangularUpper(3, 0, -1, 1, rand);
-
 		Point3D_F64 X_cam = SePointOps_F64.transform(worldToCamera,X,null);
-		Point2D_F64 found;
 
-		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(worldToCamera.R,worldToCamera.T,K,null);
+		CameraPinhole intrinsic = new CameraPinhole(100,150,0.1,120,209,500,600);
 
 		Point2D_F64 expected = new Point2D_F64();
 		expected.x = X_cam.x/X_cam.z;
 		expected.y = X_cam.y/X_cam.z;
-		GeometryMath_F64.mult(K,expected,expected);
+		expected.x = intrinsic.fx*expected.x + intrinsic.cx + intrinsic.skew*expected.y;
+		expected.y = intrinsic.fy*expected.y + intrinsic.cy;
 
-		found = PerspectiveOps.renderPixel(P,X);
+		Point2D_F64 found = PerspectiveOps.renderPixel(worldToCamera,intrinsic,X, null);
+
+		assertEquals(expected.x,found.x,1e-8);
+		assertEquals(expected.y,found.y,1e-8);
+	}
+
+	@Test
+	void renderPixel_SE3_K_matrix() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
+
+		Se3_F64 worldToCamera = SpecialEuclideanOps_F64.eulerXyz(0.2,0.01,-0.03,0.1,-0.05,0.03,null);
+
+		CameraPinhole intrinsic = new CameraPinhole(100,150,0.1,120,209,500,600);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
+
+		Point2D_F64 expected = PerspectiveOps.renderPixel(worldToCamera,intrinsic,X, null);
+		Point2D_F64 found = PerspectiveOps.renderPixel(worldToCamera,K,X, null);
+
+		assertEquals(expected.x,found.x,1e-8);
+		assertEquals(expected.y,found.y,1e-8);
+	}
+
+	@Test
+	void renderPixel_cameramatrix() {
+		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
+
+		Se3_F64 worldToCamera = SpecialEuclideanOps_F64.eulerXyz(0.2,0.01,-0.03,0.1,-0.05,0.03,null);
+
+		DMatrixRMaj K = RandomMatrices_DDRM.triangularUpper(3, 0, -1, 1, rand);
+
+		Point2D_F64 expected = PerspectiveOps.renderPixel(worldToCamera,K,X,null);
+
+		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(worldToCamera.R,worldToCamera.T,K,null);
+		Point2D_F64 found = PerspectiveOps.renderPixel(P,X);
+
 		assertEquals(expected.x,found.x,1e-8);
 		assertEquals(expected.y,found.y,1e-8);
 	}

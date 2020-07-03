@@ -62,6 +62,8 @@ Version : 0.37
   * Added support for limiting the total number of features returned with SelectLimit
 - SIFT Feature Detector
   * Added support for limiting the total number of features returned with SelectLimit
+- PerspectiveOps
+  * Fixed a bug in one of the renderPixel() functions (used fy instead of fx)
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint
