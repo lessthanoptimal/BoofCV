@@ -197,7 +197,7 @@ public class SceneObservations {
 				int a = v.point.get(obsIdx);
 				for (int i = obsIdx+1; i < v.size(); i++) {
 					if( a == v.point.get(i)) {
-						new RuntimeException("Same point is viewed more than once in the same view");
+						throw new RuntimeException("Same point is viewed more than once in the same view");
 					}
 				}
 			}

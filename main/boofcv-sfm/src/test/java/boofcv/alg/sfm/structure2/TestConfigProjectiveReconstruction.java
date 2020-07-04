@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,18 +18,9 @@
 
 package boofcv.alg.sfm.structure2;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.struct.StandardConfigurationChecks;
 
 /**
  * @author Peter Abeles
  */
-@Disabled
-class TestDoStuffFromPairwiseGraph {
-	@Test
-	void stuff() {
-		fail("implement");
-	}
-}
+class TestConfigProjectiveReconstruction extends StandardConfigurationChecks {}

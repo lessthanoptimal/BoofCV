@@ -163,7 +163,7 @@ public class ScaleSceneStructure {
 	}
 
 	public void applyScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
-										   SceneObservations observations )
+												  SceneObservations observations )
 	{
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			NormalizationPoint2D n = pixelScaling.get(viewIdx);

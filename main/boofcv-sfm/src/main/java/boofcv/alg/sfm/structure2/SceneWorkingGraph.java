@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.sfm.structure2;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.AssociatedTripleIndex;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
@@ -188,6 +189,10 @@ public class SceneWorkingGraph {
 
 	}
 
+	public Collection<View> getAllViews() {
+		return views.values();
+	}
+
 	public class Feature {
 		// the ID or index of the feature
 		public int index;
@@ -218,7 +223,7 @@ public class SceneWorkingGraph {
 		public PairwiseImageGraph2.View pview;
 		// view to global
 		// provides a way to lookup features given their ID in the view
-		public final Map<Integer,Feature> v2g = new HashMap<>();
+		public final TIntObjectHashMap<Feature> v2g = new TIntObjectHashMap<>();
 
 		// projective camera matrix
 		public final DMatrixRMaj camera = new DMatrixRMaj(3,4);
@@ -226,6 +231,7 @@ public class SceneWorkingGraph {
 		public void reset() {
 			pview = null;
 			v2g.clear();
+			camera.zero();
 		}
 	}
 }

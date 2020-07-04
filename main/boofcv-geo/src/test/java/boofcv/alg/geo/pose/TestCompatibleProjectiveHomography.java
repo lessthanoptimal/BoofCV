@@ -377,7 +377,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		CommonOps_DDRM.divide(B,n);
 
 		if( Math.signum(B.data[bestIdx]) != Math.signum(A.data[bestIdx])) {
-			CommonOps_DDRM.scale(-1,A);
+			CommonOps_DDRM.scale(-1,B);
 		}
 	}
 }

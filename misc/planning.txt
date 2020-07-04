@@ -25,6 +25,7 @@ TODO concurrent SIFT
 TODO concurrent dense features?
 TODO Estimate focal lengths given disparity image
 TODO Scharr gradient http://www.hlevkin.com/articles/SobelScharrGradients5x5.pdf
+TODO That new sorting algorithm which is better than quick sort
 
 TODO SGM - Consider YDX order. Profile to see if it's faster
 TODO Calibration
@@ -84,7 +85,6 @@ TODO
   * Optimise Census Transform block code. Can make about 4x faster
   * Optimise NCC
 
-
 TOP ITEMS
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph
@@ -108,7 +108,6 @@ TOP ITEMS
 - integrate into this a script which will check the readme and other files for out of date references to the old version
   check date in readme to see if it's correct
 
-
 Less High Priority Next Release
 
 - Concurrency
@@ -118,7 +117,7 @@ Less High Priority Next Release
   * Dense Features
 
 - Filters
-  * Median Filter: When even do average of two median terms
+  * Median Filter: When even there's an number do average of two median terms
 
 - 16-bit images
   * Binary Thresholding - Improved handling of 16-bit images
@@ -128,10 +127,6 @@ Less High Priority Next Release
   * sparse block math
   * parameterize rotation. Rotation +x unit vector  around Z then local Y. Use vector for axis-angle
     - 3 parameters, no normalization I think
-
-- Chessboard Detector
-  * Split shapes with contour that barely touch. This is more of a problem in large images.
-  * Handle case where squares touch border in large images better. Block region size had to be increased.
 
 - Polyline
   * Fit a large contour where only a small part of it is a square. Use found corners in fiducials
@@ -145,11 +140,6 @@ Less High Priority Next Release
 - Thresholding
   * Handle shadows better in calibration targets
   * Identifisd 3 distributions and picks a threshold between the two smallest
-
-- Stereo Rectification
-  * Make it easier.  Single class like in pyboof
-- Stereo Disparity
-  * make float images contain actual disparity, not offset.  negative values for invalid
 
 - Monocular Reconstruction
   * "Live Dense Reconstruction with a Single Moving Camera" is probably a good starting point

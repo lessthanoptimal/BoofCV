@@ -56,6 +56,16 @@ public class PairwiseImageGraph2 {
 		return mapNodes.get(id);
 	}
 
+	public Motion connect( View a , View b ) {
+		Motion m = edges.grow();
+		m.src = a;
+		m.dst = b;
+		m.index = edges.size-1;
+		a.connections.add(m);
+		b.connections.add(m);
+		return m;
+	}
+
 	public static class View {
 		/**
 		 * Unique identifier for this view
@@ -74,6 +84,10 @@ public class PairwiseImageGraph2 {
 		void init( String id ) {
 			this.id = id;
 			this.connections.reset();
+		}
+
+		public View connection( int index ) {
+			return connections.get(index).other(this);
 		}
 
 		public Motion findMotion( View target ) {
@@ -111,31 +125,27 @@ public class PairwiseImageGraph2 {
 		/**
 		 * 3x3 matrix describing epipolar geometry. Fundamental, Essential, or Homography
 		 */
-		public DMatrixRMaj F = new DMatrixRMaj(3,3);
+		public final DMatrixRMaj F = new DMatrixRMaj(3,3);
 
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean is3D;
 
 		/**
-		 * Number of features from fundamental/essential
+		 * Number of inliers when an 3D model (Fundamental/Essential) was fit to observations.
 		 */
 		public int countF;
 		/**
-		 * Number of features from homography.
+		 * Number of inliers when a homography was fit to observations.
 		 */
 		public int countH;
 
-		/**
-		 * indexes of features in the match list that are inliers to the found F and H matrix
-		 */
-		public FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex::new);
+		/** Indexes of features in 'src' and 'dst' views which are inliers to the model {@link #F} */
+		public final FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex::new);
 
-		public View src;
-		public View dst;
+		/** Two views that this motion connects */
+		public View src,dst;
 
-		/**
-		 * Index of motion in edge list.
-		 */
+		/** Index of motion in {@link #edges}*/
 		public int index;
 
 		public void init() {
@@ -146,6 +156,7 @@ public class PairwiseImageGraph2 {
 			dst = null;
 		}
 
+		/** Given one of the view this motion connects return the other */
 		public View other( View src ) {
 			if( src == this.src) {
 				return dst;
