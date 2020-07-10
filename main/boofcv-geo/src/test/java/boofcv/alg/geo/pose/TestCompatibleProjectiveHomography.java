@@ -130,6 +130,53 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 	}
 
 	/**
+	 * A known issue is when there are two views and one of them has a zeros column
+	 */
+	@Test
+	void fitCameras_zeroColumn() {
+		createScene(0,true);
+
+		// view 0 will have a camera with the edge case. both A and B will have zeros in right most column, col=3
+		List<DMatrixRMaj> camerasA = new ArrayList<>(super.cameras);
+		List<DMatrixRMaj> camerasB = new ArrayList<>(this.camerasB);
+		camerasA.remove(2);
+		camerasB.remove(2);
+
+		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
+
+		// Test in both directions
+		DMatrixRMaj H = new DMatrixRMaj(4,4);
+		assertTrue(alg.fitCameras(camerasA,camerasB,H));
+		checkCamerasH( camerasA, camerasB, H, 1e-7);
+
+		assertTrue(alg.fitCameras(camerasB,camerasA,H));
+		checkCamerasH( camerasB, camerasA, H, 1e-7);
+	}
+
+	/**
+	 * Feed in the same set of camera matrices and see if an identity matrix is returned
+	 */
+	@Test
+	void fitCameras_identity() {
+		createScene(0,true);
+
+		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
+		DMatrixRMaj H = new DMatrixRMaj(4,4);
+		assertTrue(alg.fitCameras(cameras,cameras,H));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(H,UtilEjml.TEST_F64));
+		assertTrue(alg.fitCameras(camerasB,camerasB,H));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(H,UtilEjml.TEST_F64));
+
+		// try it with two cameras only now
+		cameras.remove(2);
+		camerasB.remove(2);
+		assertTrue(alg.fitCameras(cameras,cameras,H));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(H,UtilEjml.TEST_F64));
+		assertTrue(alg.fitCameras(camerasB,camerasB,H));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(H,UtilEjml.TEST_F64));
+	}
+
+	/**
 	 * Checks to see if the columns in H are the null space and that independent scales of the camera matrices
 	 * do not matter.
 	 */
@@ -272,24 +319,21 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 
 	private void checkCamerasH(DMatrixRMaj H, double tol )
 	{
-		DMatrixRMaj P1 = cameras.get(0);
-		DMatrixRMaj P2 = cameras.get(1);
-		DMatrixRMaj P3 = cameras.get(2);
+		checkCamerasH(cameras,camerasB,H,tol);
+	}
 
-		DMatrixRMaj PP = new DMatrixRMaj(3,4);
-		for (int i = 0; i < 3; i++) {
+	private void checkCamerasH(List<DMatrixRMaj> camerasA, List<DMatrixRMaj> camerasB, DMatrixRMaj H, double tol )
+	{
+		assertEquals(camerasA.size(),camerasB.size());
+
+		DMatrixRMaj A = new DMatrixRMaj(3,4);
+		for (int i = 0; i < camerasA.size(); i++) {
 			// Check P*H = P'
+			CommonOps_DDRM.mult(camerasA.get(i), H, A);
+			DMatrixRMaj B = camerasB.get(i);
+			commonScale(B,A);
 
-			switch (i) {
-				case 0 -> CommonOps_DDRM.mult(P1, H, PP);
-				case 1 -> CommonOps_DDRM.mult(P2, H, PP);
-				case 2 -> CommonOps_DDRM.mult(P3, H, PP);
-			}
-
-			DMatrixRMaj A = camerasB.get(i);
-			commonScale(A,PP);
-
-			assertTrue(MatrixFeatures_DDRM.isIdentical(A,PP,tol));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(B,A,tol));
 		}
 	}
 

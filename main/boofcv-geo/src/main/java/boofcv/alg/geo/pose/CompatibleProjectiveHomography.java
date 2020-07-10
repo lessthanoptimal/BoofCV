@@ -29,9 +29,11 @@ import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.optimization.UtilOptimize;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
+import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.dense.row.linsol.svd.SolvePseudoInverseSvd_DDRM;
@@ -39,6 +41,7 @@ import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.interfaces.linsol.LinearSolverDense;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Algorithms for finding a 4x4 homography which can convert two camera matrices of the same view but differ in only
@@ -72,13 +75,20 @@ public class CompatibleProjectiveHomography {
 	DMatrixRMaj A = new DMatrixRMaj(1,1);
 	DMatrixRMaj B = new DMatrixRMaj(1,1);
 
-	private Point4D_F64 a = new Point4D_F64();
-	private Point4D_F64 b = new Point4D_F64();
+	private final Point4D_F64 a = new Point4D_F64();
+
+	// Scrambled versions of input camera matrices. See include comments
+	private final FastQueue<DMatrixRMaj> copyA = new FastQueue<>(()->new DMatrixRMaj(3,4));
+	private final FastQueue<DMatrixRMaj> copyB = new FastQueue<>(()->new DMatrixRMaj(3,4));
+
+	// RM = random matrix. Used to scramble inputs. See code comments below for why orthogonal
+	private final DMatrixRMaj RM = RandomMatrices_DDRM.orthogonal(4,4,new Random(3245));
+	private final DMatrixRMaj tmp4x4 = new DMatrixRMaj(4,4);
 
 	// PinvP = pinv(P)*P
-	private DMatrixRMaj PinvP = new DMatrixRMaj(4,4);
+	private final DMatrixRMaj PinvP = new DMatrixRMaj(4,4);
 	// storage for nullspace of P
-	private DMatrixRMaj h = new DMatrixRMaj(1,1);
+	private final DMatrixRMaj h = new DMatrixRMaj(1,1);
 
 	// Distance functions for non-linear optimization
 	private DistanceWorldEuclidean distanceWorld = new DistanceWorldEuclidean();
@@ -176,27 +186,50 @@ public class CompatibleProjectiveHomography {
 
 		final int size = cameras1.size();
 
+		// If any of the camera matrices has all zeros in one of the column (typically column 3) that can
+		// cause a singularity. This is especially problematic when only two views are available.
+		// To get around that problem we scramble the camera matrices so that it's extremely unlikely for there
+		// to be zeros in any of the columns.
+		// P1*RM*HH = P2*RM
+		// H = RM*HH*inv(RM) = RM*HH*RM'
+		// RM is a random orthogonal matrix. This is desirable since it won't change the scaling and the inverse is
+		// simply it's transpose
+		copyA.reset();
+		copyB.reset();
+		for (int i = 0; i < size; i++) {
+			CommonOps_DDRM.mult(cameras1.get(i),RM,copyA.grow());
+			CommonOps_DDRM.mult(cameras2.get(i),RM,copyB.grow());
+		}
+
+		// A solution is found in both direction because if a column is zero or nearly zero  there are two
+		// singular values in that column potentially resulting in an invalid solution. A brute force approach is used
+		// to get around that problem by finding H in both directions and picking the one with the smallest error
 		H.reshape(4,4);
 		h.reshape(4,1);
 		A.reshape(size*3,4);
 
 		for (int col = 0; col < 4; col++) {
 			for (int i = 0; i < size; i++) {
-				DMatrixRMaj P1 = cameras1.get(i);
-				DMatrixRMaj P2 = cameras2.get(i);
+				DMatrixRMaj P1 = copyA.get(i);
+				DMatrixRMaj P2 = copyB.get(i);
 
 				cameraCrossProductMatrix(P1,P2,col,i*3);
 			}
 
 			if( !nullspace.process(A,1,h) )
 				return false;
+
 			CommonOps_DDRM.insert(h,H,0,col);
 		}
 
 		// Fix the scale for each column now
-		resolveColumnScale(cameras1, cameras2, H);
+		resolveColumnScale(copyA.toList(), copyB.toList(), H);
 
-		// NOTE: This does seem a bit overly complex. Is there a way to simplfy the code? Maybe a solve for all of H
+		// Undo the earlier scrambling. See equations above.
+		CommonOps_DDRM.mult(RM,H,tmp4x4);
+		CommonOps_DDRM.multTransB(tmp4x4,RM,H);
+
+		// NOTE: This does seem a bit overly complex. Is there a way to simplify the code? Maybe a solve for all of H
 		//       at once and not have to deal with column scales?
 
 		return true;
@@ -240,8 +273,8 @@ public class CompatibleProjectiveHomography {
 		}
 
 		// compute the scale for each column
+		CommonOps_DDRM.mult(cameras1.get(selected),H,A);
 		for (int col = 0; col < 4; col++) {
-			CommonOps_DDRM.mult(cameras1.get(selected),H,A);
 			CommonOps_DDRM.extractColumn(A,col,B);
 			double found = NormOps_DDRM.normF(B);
 			// by using the norm to compute scale we lose sign information. To determine the sign look at the
