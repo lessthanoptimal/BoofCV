@@ -24,9 +24,11 @@ import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -99,44 +102,75 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		assertTrue(alg.fitPoints(worldPts,sceneB,H));
 
 		checkCamerasH(H, 1e-7 );
+		checkWorldPointsH(H,1e-7);
 	}
 
 	@Test
 	void fitCameras() {
-		fitCameras(true);
-		fitCameras(false);
-	}
-	void fitCameras(boolean planar) {
-		createScene(10,planar);
+		// planar not makes no difference since points are not considered
+		createScene(0,true);
 
 		List<DMatrixRMaj> camerasA = new ArrayList<>(super.cameras);
 		List<DMatrixRMaj> camerasB = new ArrayList<>(this.camerasB);
 
 		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
 
+		// Test with three pairs of cameras
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
 		assertTrue(alg.fitCameras(camerasA,camerasB,H));
-//		checkCamerasH( H, 0.1);
-		// Skipped the above test since it has bad results. need to work on this
-		// It's disturbing that 3 views has worse results than 2-views
+		checkCamerasH( H, 1e-7);
 
-		// should still work with 2 cameras
+		// Should work with two cameras, the minimum case
 		camerasA.remove(0);
 		camerasB.remove(0);
 		assertTrue(alg.fitCameras(camerasA,camerasB,H));
-		checkCamerasH( H, 0.1);
+
+		checkCamerasH( H, 1e-7);
+		checkWorldPointsH(H,1e-7);
 	}
 
 	/**
-	 * With a realistic H it produces poor results. Test the math with a random matrix
+	 * Checks to see if the columns in H are the null space and that independent scales of the camera matrices
+	 * do not matter.
+	 */
+	@Test
+	void cameraCrossProductMatrix() {
+		DMatrixRMaj H = RandomMatrices_DDRM.rectangle(4,4,rand);
+		DMatrixRMaj A1 = RandomMatrices_DDRM.rectangle(3,4,rand);
+		DMatrixRMaj A2 = RandomMatrices_DDRM.rectangle(3,4,rand);
+
+		DMatrixRMaj B1 = new DMatrixRMaj(3,4);
+		DMatrixRMaj B2 = new DMatrixRMaj(3,4);
+
+		CommonOps_DDRM.mult(A1,H,B1);
+		CommonOps_DDRM.mult(A2,H,B2);
+
+		// make sure the scale of B doesn't matter
+		CommonOps_DDRM.scale(-1.2,B1);
+		CommonOps_DDRM.scale(2.5,B2);
+
+		DMatrixRMaj h = new DMatrixRMaj(4,1);
+		for (int col = 0; col < 4; col++) {
+			CommonOps_DDRM.extractColumn(H,col,h);
+			CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
+
+			alg.A.reshape(6,4);
+			alg.cameraCrossProductMatrix(A1,B1,col,0);
+			alg.cameraCrossProductMatrix(A2,B2,col,3);
+
+			DMatrixRMaj ns = new DMatrixRMaj(6,1);
+
+			CommonOps_DDRM.mult(alg.A,h,ns);
+			assertTrue(MatrixFeatures_DDRM.isZeros(ns, UtilEjml.TEST_F64));
+		}
+	}
+
+	/**
+	 * Test more situations with random matrices
 	 */
 	@Test
 	void fitCameras_RandomH() {
-		fitCameras_RandomH(true);
-		fitCameras_RandomH(false);
-	}
-	void fitCameras_RandomH(boolean planar ) {
-		createScene(10,planar);
+		createScene(0,false);
 
 		DMatrixRMaj H = RandomMatrices_DDRM.rectangle(4,4,rand);
 
@@ -243,23 +277,39 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		DMatrixRMaj P3 = cameras.get(2);
 
 		DMatrixRMaj PP = new DMatrixRMaj(3,4);
-		for (int i = (tol>0.001?1:0); i < 3; i++) {
-
+		for (int i = 0; i < 3; i++) {
 			// Check P*H = P'
 
-			switch(i) {
-				case 0:CommonOps_DDRM.mult(P1, H, PP);break;
-				case 1:CommonOps_DDRM.mult(P2, H, PP);break;
-				case 2:CommonOps_DDRM.mult(P3, H, PP);break;
+			switch (i) {
+				case 0 -> CommonOps_DDRM.mult(P1, H, PP);
+				case 1 -> CommonOps_DDRM.mult(P2, H, PP);
+				case 2 -> CommonOps_DDRM.mult(P3, H, PP);
 			}
 
 			DMatrixRMaj A = camerasB.get(i);
 			commonScale(A,PP);
 
-//			System.out.println("------------");
-//			A.print();
-//			PP.print();
 			assertTrue(MatrixFeatures_DDRM.isIdentical(A,PP,tol));
+		}
+	}
+
+	private void checkWorldPointsH(DMatrixRMaj H , double tol ) {
+		Point4D_F64 found = new Point4D_F64();
+		for (int i = 0; i < triples.size(); i++) {
+
+			Point4D_F64 X = worldPts.get(i);
+			Point4D_F64 Xb = sceneB.get(i);
+
+			GeometryMath_F64.mult(H,Xb,found);
+
+			X.scale(1.0/X.norm());
+			found.scale(1.0/found.norm());
+
+			double error = X.distance(found);
+			found.scale(-1);
+			error = Math.min(error,X.distance(found));
+
+			assertEquals(0.0,error,tol);
 		}
 	}
 

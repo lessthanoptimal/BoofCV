@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.dense.row.linsol.svd.SolvePseudoInverseSvd_DDRM;
@@ -62,14 +63,14 @@ import java.util.List;
 public class CompatibleProjectiveHomography {
 
 	// Linear solver. Change to SVD if a more robust one is needed
-	public LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(200,16);
+	public LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.pseudoInverse(true);
 	public SolveNullSpace<DMatrixRMaj> nullspace = new SolveNullSpaceSvd_DDRM();
 	public SolvePseudoInverseSvd_DDRM solvePInv = new SolvePseudoInverseSvd_DDRM();
 	// in the paper it doesn't specify so it probably uses a simpler pseudo inverse. A+ = A'inv(A*A')
 
 	// workspace variables for A*X=B
-	private DMatrixRMaj A = new DMatrixRMaj(1,1);
-	private DMatrixRMaj B = new DMatrixRMaj(1,1);
+	DMatrixRMaj A = new DMatrixRMaj(1,1);
+	DMatrixRMaj B = new DMatrixRMaj(1,1);
 
 	private Point4D_F64 a = new Point4D_F64();
 	private Point4D_F64 b = new Point4D_F64();
@@ -155,12 +156,12 @@ public class CompatibleProjectiveHomography {
 
 	/**
 	 * Computes homography which relate common projective camera transforms to each other by solving a linear
-	 * system. Non-linear refinement is recommended, before bundle adjustment.
+	 * system. A Direct Linear Transform is used due to scale ambiguity. Non-linear refinement is recommended,
+	 * before bundle adjustment. Two or more camera matrices are required.
 	 *
 	 * <p>P1[i] = P2[i]*inv(H)</p>
 	 *
-	 * <p>NOTE: This will work with planar scenes!</p>
-	 * <p>NOTE: It's likely that this approach can be improved. See in code comments</p>
+	 * <p>NOTE: This will work with planar scenes</p>
 	 *
 	 * @param cameras1 list of camera matrices
 	 * @param cameras2 list of camera matrices, same views as camera1
@@ -173,27 +174,133 @@ public class CompatibleProjectiveHomography {
 		if( cameras1.size() < 2 )
 			throw new IllegalArgumentException("At least two cameras are required");
 
-		// NOTE: I don't really understand why this doesn't produce better results. Current suspicion in that
-		// data needs to be normalized first to minimize errors
-
 		final int size = cameras1.size();
 
+		H.reshape(4,4);
+		h.reshape(4,1);
 		A.reshape(size*3,4);
-		B.reshape(size*3,4);
 
-		for (int i = 0; i < size; i++) {
-			DMatrixRMaj P1 = cameras1.get(i);
-			DMatrixRMaj P2 = cameras2.get(i);
+		for (int col = 0; col < 4; col++) {
+			for (int i = 0; i < size; i++) {
+				DMatrixRMaj P1 = cameras1.get(i);
+				DMatrixRMaj P2 = cameras2.get(i);
 
-			CommonOps_DDRM.insert(P1,A,i*3,0);
-			CommonOps_DDRM.insert(P2,B,i*3,0);
+				cameraCrossProductMatrix(P1,P2,col,i*3);
+			}
+
+			if( !nullspace.process(A,1,h) )
+				return false;
+			CommonOps_DDRM.insert(h,H,0,col);
 		}
 
-		if( !solver.setA(A) )
-			return false;
-		H.reshape(4,4);
-		solver.solve(B,H);
+		// Fix the scale for each column now
+		resolveColumnScale(cameras1, cameras2, H);
+
+		// NOTE: This does seem a bit overly complex. Is there a way to simplfy the code? Maybe a solve for all of H
+		//       at once and not have to deal with column scales?
+
 		return true;
+	}
+
+	/**
+	 * Since each column was solved for independently the columns will have different scales. We need to make
+	 * them have the same scale be careful about sign
+	 */
+	private void resolveColumnScale(List<DMatrixRMaj> cameras1, List<DMatrixRMaj> cameras2, DMatrixRMaj H) {
+		B.reshape(3,1);
+		h.zero();
+
+		// Carefully select a pair of camera matrices to determine scale from. Need to avoid the situation where
+		// a column is all zeros. However, since the scale can float a simple test to see if it is near zero won't work.
+		// Instead we look for the camera matrix with the best worst-case column
+		int selected = -1;
+		double smallestRatio = Double.MAX_VALUE;
+		for (int cameraIdx = 0; cameraIdx < cameras1.size(); cameraIdx++) {
+			CommonOps_DDRM.mult(cameras1.get(cameraIdx),H,A);
+
+			// A ratio close to the max value of 1.0 is less desirable
+			double worstRatio = 0.0;
+			for (int col = 0; col < 4; col++) {
+				CommonOps_DDRM.extractColumn(A,col,B);
+
+				double maxValueAbs = CommonOps_DDRM.elementMaxAbs(B);
+				double minValueAbs = CommonOps_DDRM.elementMinAbs(B);
+
+				// avoid divide by zero error
+				double ratio = maxValueAbs!=0.0?minValueAbs/maxValueAbs:1.0;
+
+				worstRatio = Math.max(worstRatio,ratio);
+			}
+
+			// this selects the matrix with best worst case scenario
+			if( worstRatio < smallestRatio ) {
+				smallestRatio = worstRatio;
+				selected = cameraIdx;
+			}
+		}
+
+		// compute the scale for each column
+		for (int col = 0; col < 4; col++) {
+			CommonOps_DDRM.mult(cameras1.get(selected),H,A);
+			CommonOps_DDRM.extractColumn(A,col,B);
+			double found = NormOps_DDRM.normF(B);
+			// by using the norm to compute scale we lose sign information. To determine the sign look at the
+			// element with the largest absolute value. this avoids noise dominating sign
+			int indexMaxAbs = -1;
+			double maxAbs = 0;
+			for (int i = 0; i < 3; i++) {
+				if( Math.abs(B.data[i]) > maxAbs ) {
+					maxAbs = Math.abs(B.data[i]);
+					indexMaxAbs = i;
+				}
+			}
+			double foundSign = Math.signum(B.data[indexMaxAbs]);
+			CommonOps_DDRM.extractColumn(cameras2.get(selected),col,B);
+			double expected = NormOps_DDRM.normF(B);
+			double scale = expected/found;
+			if( foundSign != Math.signum(B.data[indexMaxAbs]))
+				scale *= -1;
+
+			for (int row = 0; row < 4; row++) {
+				H.set(row,col, H.get(row,col)*scale);
+			}
+		}
+	}
+
+	/**
+	 * Apply cross product. P2(:,col) cross P1*H = 0
+	 * @param column Which column is being solved for
+	 * @param rowInA First row in A it should write to
+	 */
+	void cameraCrossProductMatrix( DMatrixRMaj P1 , DMatrixRMaj P2, int column , int rowInA )
+	{
+		double b1 = P2.unsafe_get(0,column);
+		double b2 = P2.unsafe_get(1,column);
+		double b3 = P2.unsafe_get(2,column);
+
+		double a11 = P1.unsafe_get(0,0), a12 = P1.unsafe_get(0,1), a13 = P1.unsafe_get(0,2), a14 = P1.unsafe_get(0,3);
+		double a21 = P1.unsafe_get(1,0), a22 = P1.unsafe_get(1,1), a23 = P1.unsafe_get(1,2), a24 = P1.unsafe_get(1,3);
+		double a31 = P1.unsafe_get(2,0), a32 = P1.unsafe_get(2,1), a33 = P1.unsafe_get(2,2), a34 = P1.unsafe_get(2,3);
+
+		// row 1
+		A.data[rowInA*4    ] = b2*a31 - b3*a21;
+		A.data[rowInA*4 + 1] = b2*a32 - b3*a22;
+		A.data[rowInA*4 + 2] = b2*a33 - b3*a23;
+		A.data[rowInA*4 + 3] = b2*a34 - b3*a24;
+
+		// row 2
+		rowInA += 1;
+		A.data[rowInA*4    ] = b3*a11 - b1*a31;
+		A.data[rowInA*4 + 1] = b3*a12 - b1*a32;
+		A.data[rowInA*4 + 2] = b3*a13 - b1*a33;
+		A.data[rowInA*4 + 3] = b3*a14 - b1*a34;
+
+		// row 3
+		rowInA += 1;
+		A.data[rowInA*4    ] = b1*a21 - b2*a11;
+		A.data[rowInA*4 + 1] = b1*a22 - b2*a12;
+		A.data[rowInA*4 + 2] = b1*a23 - b2*a13;
+		A.data[rowInA*4 + 3] = b1*a24 - b2*a14;
 	}
 
 	/**

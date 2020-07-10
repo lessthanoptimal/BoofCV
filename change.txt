@@ -64,6 +64,12 @@ Version : 0.37
   * Added support for limiting the total number of features returned with SelectLimit
 - PerspectiveOps
   * Fixed a bug in one of the renderPixel() functions (used fy instead of fx)
+- Scene Reconstruction
+  * Fixed bug in CompatibleProjectiveHomography when using camera matrices only
+  * TODO Projective from arbitrary images using PairwiseImageGraph
+  * TODO Projective to Metric for arbitrary scene
+- Sparse Bundle Adjustment
+  * TODO Add rigid relationships between views. Can be fixed or not.
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint
@@ -80,9 +86,7 @@ TODO Stereo Feature Association
 - Scene Reconstruction
   * TODO when associating objects split into feature types, e.g. white and black blobs
   * TODO try improving 3-view by estimating lens distortion in projective camera
-  * TODO Scene Reconstruction from arbitrary number of photos
   * TODO triangulate N-points using calibrated homogenous coordinates
-  * TODO Add rigid relationships between views. Can be fixed or not.
 
 TODO Sparse Disparity Undistort using camera model
 
