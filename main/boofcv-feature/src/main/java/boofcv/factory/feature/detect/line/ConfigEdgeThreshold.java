@@ -31,7 +31,7 @@ public class ConfigEdgeThreshold implements Configuration {
 	/**
 	 * Which method to use to compute the gradient
 	 */
-	public DerivativeType gradient = DerivativeType.SOBEL;
+	public DerivativeType gradient = DerivativeType.PREWITT;
 
 	/**
 	 * Threshold for classifying pixels as edge or not.  Try 30.
