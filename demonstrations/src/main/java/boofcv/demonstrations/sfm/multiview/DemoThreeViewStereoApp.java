@@ -44,6 +44,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.PathLabel;
+import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -475,6 +476,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// prevent user from opening another image at the same time
 		SwingUtilities.invokeLater(()->setMenuBarEnabled(false));
 
+		// Display a dialog that shows it's processing
+		ProcessThread progress = new ProcessThread(this);
+		progress.start();
+
 		try {
 			processImages(skipAssociate,skipSparseStructure);
 		} catch (RuntimeException e ) {
@@ -483,6 +488,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			BoofSwingUtil.warningDialog(this,e);
 		} finally {
 			SwingUtilities.invokeLater(()->setMenuBarEnabled(true));
+			progress.stopThread();
 
 			synchronized (lockProcessing) {
 				processing = false;
@@ -818,6 +824,25 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 	}
 
+	/**
+	 * Displays a progress monitor and updates its state periodically
+	 */
+	private static class ProcessThread extends ProgressMonitorThread
+	{
+		int state = 0;
+
+		public ProcessThread( JComponent owner ) {
+			super(new ProgressMonitor(owner, "Recovering Structure", "Cancel Does Nothing", 0, 100));
+		}
+
+		@Override
+		public void doRun() {
+			SwingUtilities.invokeLater(() -> {
+				monitor.setProgress(state);
+				state = (++state % 100);
+			});
+		}
+	}
 
 	private static PathLabel createExample( String name ) {
 		String path0 = UtilIO.pathExample("triple/"+name+"_01.jpg");

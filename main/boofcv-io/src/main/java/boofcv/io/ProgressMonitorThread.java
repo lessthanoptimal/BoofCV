@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,14 +36,9 @@ public abstract class ProgressMonitorThread extends Thread {
 	public synchronized void run() {
 		while( active ) {
 			doRun();
-			try {
-				wait(200);
-			} catch (InterruptedException e) {}
+			try { wait(200); } catch (InterruptedException ignored) {}
 		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				monitor.close();
-			}});
+		SwingUtilities.invokeLater(() -> monitor.close());
 	}
 	
 	public abstract void doRun();
