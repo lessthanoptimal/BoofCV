@@ -37,6 +37,9 @@ Version : 0.37
 - Examples
   * Updated ExampleImageEnhance to include color images
 - Demonstration Applications
+  * Examples are no longer added to recent file list
+  * openFile() now works again with relative file paths
+  * Clear recent item list
   * Discrete image pyramid can now be configured with both min pixels and levels
   * Updated Hybrid Tracker's GUI controls
   * Updated Hough Binary and Hough Gradient to allow clicking in transformed image and more

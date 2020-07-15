@@ -274,19 +274,33 @@ public abstract class DemonstrationBase extends JPanel {
 			return;
 		menuRecent.removeAll();
 		List<BoofSwingUtil.RecentFiles> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
+
 		for( BoofSwingUtil.RecentFiles info : recentFiles ) {
 			JMenuItem recentItem = new JMenuItem(info.name);
 			recentItem.addActionListener(e -> {
 				if( customFileInput ) {
-					openFiles(BoofMiscOps.toFileList(info.files));
+					openFiles(BoofMiscOps.toFileList(info.files), true);
 				} else if( info.files.size() == 1 ) {
-					openFile(new File(info.files.get(0)));
+					openFile(new File(info.files.get(0)), true);
 				} else {
 					System.err.println("updateRecentItems() Not custom and not one. Not sure what to do");
 				}
 			});
 			menuRecent.add(recentItem);
 		}
+
+		// don't add clear option if there is nothing to clear
+		if( recentFiles.size() == 0 )
+			return;
+
+		// Add the option to clear the list of recent files
+		JMenuItem clearItem = new JMenuItem("Clear Recent");
+		clearItem.addActionListener(e->{
+			menuRecent.removeAll();
+			BoofSwingUtil.saveRecentFiles(DemonstrationBase.this.getClass().getSimpleName(),new ArrayList<>());
+		});
+		menuRecent.addSeparator();
+		menuRecent.add(clearItem);
 	}
 
 	/**
@@ -295,22 +309,18 @@ public abstract class DemonstrationBase extends JPanel {
 	public void openExample( Object o ) {
 		if (o instanceof PathLabel) {
 			PathLabel p = (PathLabel)o;
+			for (int i = 0; i < p.path.length; i++) {
+				p.path[i] = massageExampleFilePath(p.path[i]);
+			}
 
 			if( customFileInput ) {
-				openFiles(p.getPathFiles());
+				openFiles(p.getPathFiles(), false);
 				return;
 			}
 
 			if( p.path.length == 1 )
-				openFile(new File(p.path[0]));
+				openFile(new File(p.path[0]), false);
 			else {
-				// TODO clean up how there are multiple paths to open from a set of files
-				BoofSwingUtil.invokeNowOrLater(() -> {
-					BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
-							selectRecentFileName(BoofMiscOps.toFileList(p.path)) , BoofMiscOps.asList(p.path));
-					updateRecentItems();
-				});
-
 //				openFile(new File(p.path[0]));
 				if( allowImages )
 					openImageSet(false,p.path);
@@ -318,7 +328,8 @@ public abstract class DemonstrationBase extends JPanel {
 					openVideo(false,p.path);
 			}
 		} else if (o instanceof String) {
-			openFile(new File((String) o));
+			String path = massageExampleFilePath((String)o);
+			openFile(new File(path), false);
 		} else {
 			throw new IllegalArgumentException("Unknown example object type.  Please override openExample()");
 		}
@@ -409,17 +420,26 @@ public abstract class DemonstrationBase extends JPanel {
 	 * be stopped.
 	 */
 	public void openFile(File file) {
-		final String path = massageFilePath(file);
-		if( path == null )
-			return;
-		inputFilePath = path;
+		openFile(file,true);
+	}
+
+	/**
+	 * Opens a file.  First it will attempt to open it as an image.  If that fails it will try opening it as a
+	 * video.  If all else fails tell the user it has failed.  If a streaming source was running before it will
+	 * be stopped.
+	 */
+	public void openFile(File file, boolean addToRecent) {
+		inputFilePath =  systemToUnix(file.getPath());;
 
 		// update recent items menu
-		BoofSwingUtil.invokeNowOrLater(() -> {
-			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
-					selectRecentFileName(BoofMiscOps.asList(file)) , BoofMiscOps.asList(path));
-			updateRecentItems();
-		});
+		if( addToRecent ) {
+			String path = inputFilePath;
+			BoofSwingUtil.invokeNowOrLater(() -> {
+				BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
+						selectRecentFileName(BoofMiscOps.asList(file)), BoofMiscOps.asList(path));
+				updateRecentItems();
+			});
+		}
 
 		BufferedImage buffered = inputFilePath.endsWith("mjpeg") || !allowImages ? null : UtilImageIO.loadImage(inputFilePath);
 		if( buffered == null ) {
@@ -430,13 +450,13 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 	}
 
-	public String massageFilePath( File file ) {
-		String path = systemToUnix(file.getPath());
+	public String massageExampleFilePath(final String path ) {
+		String modifiedPath = systemToUnix(path);
 //		System.out.println("demo.openFile() = "+path);
 		URL url = null;
 
 		try {
-			url = new URL(path);
+			url = new URL(modifiedPath);
 			if( !UtilIO.validURL(url)) {
 //				System.out.println("  invalid URL");
 				url = null;
@@ -446,9 +466,9 @@ public abstract class DemonstrationBase extends JPanel {
 		if( url == null ) {
 //			System.out.println("Invalid URL");
 			try {
-				url = new File(UtilIO.pathExample(file.getPath())).toURI().toURL();
+				url = new File(UtilIO.pathExample(path)).toURI().toURL();
 				if (!UtilIO.validURL(url)) {
-					System.err.println("Can't open " + file.getPath());
+					System.err.println("Can't open " + path);
 					return null;
 				}
 				return url.toString();
@@ -458,14 +478,13 @@ public abstract class DemonstrationBase extends JPanel {
 			}
 		} else {
 			// input URL was valid, so use it directly
-			return path;
+			return modifiedPath;
 //			System.out.println("Valid URL using "+inputFilePath);
 		}
 	}
 
 	/**
 	 * Opens a set of images
-	 * @param files
 	 */
 	public void openImageSet(boolean reopen, String ...files ) {
 		synchronized (lockStartingProcess) {
@@ -542,7 +561,7 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 
 		if( closest != null && closest.isFile() ) {
-			openFile(closest);
+			openFile(closest, true);
 		} else {
 			if( closest != null ) {
 				System.err.println("Next file isn't a file. name="+closest.getName());
@@ -552,31 +571,32 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 	}
 
+	protected void openFiles(List<File> filePaths) {
+		this.openFiles(filePaths,true);
+	}
 	/**
 	 * Opens a set of files using a custom function to extract images and sequences
 	 */
-	protected void openFiles( List<File> filePaths ) {
+	protected void openFiles(List<File> filePaths, boolean addToRecent) {
 		if( filePaths.size() == 0 )
 			return;
 
 		// Need to massage the file path to work inside of Jars
 		inputFileSet = new String[filePaths.size()];
 		for (int i = 0; i < filePaths.size(); i++) {
-			inputFileSet[i] = massageFilePath(filePaths.get(i));
-			if( inputFileSet[i] == null ) {
-				System.err.println("Failed to massage file "+filePaths.get(i));
-				return;
-			}
+			inputFileSet[i] = filePaths.get(i).getPath();
 		}
 		inputFilePath = inputFileSet[0];
 		String[] copyFileSet = inputFileSet.clone();
 
 		// update recent items menu
-		BoofSwingUtil.invokeNowOrLater(() -> {
-			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
-					selectRecentFileName(filePaths), BoofMiscOps.asList(inputFileSet));
-			updateRecentItems();
-		});
+		if( addToRecent ) {
+			BoofSwingUtil.invokeNowOrLater(() -> {
+				BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
+						selectRecentFileName(filePaths), BoofMiscOps.asList(inputFileSet));
+				updateRecentItems();
+			});
+		}
 
 		stopAllInputProcessing();
 
@@ -863,7 +883,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		File file = BoofSwingUtil.openFileChooser(DemonstrationBase.this,array);
 		if (file != null) {
-			openFile(file);
+			openFile(file, true);
 		}
 	}
 
@@ -906,8 +926,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 			boolean first = true;
 			for (int i = 0; i < files.length && !requestStop; i++) {
-				File f = new File(files[i]);
-				String path = massageFilePath(f);
+				String path = files[i];
 				inputFilePath = path;
 				if( path == null ) {
 					System.err.println("Error["+i+"] path "+files[i]);
@@ -920,7 +939,7 @@ public abstract class DemonstrationBase extends JPanel {
 					continue;
 				}
 				if( first ) {
-					setInputName(f.getName());
+					setInputName(new File(files[i]).getName());
 				}
 				handleInputChange(i, inputMethod, buffered.getWidth(), buffered.getHeight());
 
@@ -1062,7 +1081,7 @@ public abstract class DemonstrationBase extends JPanel {
 	 */
 	public void reprocessInput() {
 		if( customFileInput ) {
-			openFiles(BoofMiscOps.toFileList(inputFileSet));
+			openFiles(BoofMiscOps.toFileList(inputFileSet), true);
 			return;
 		}
 		if ( inputMethod == InputMethod.VIDEO ) {

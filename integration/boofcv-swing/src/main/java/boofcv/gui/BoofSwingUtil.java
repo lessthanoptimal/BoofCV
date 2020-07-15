@@ -437,6 +437,10 @@ public class BoofSwingUtil {
 		r.files = filePaths;
 		files.add(0,r);
 
+		saveRecentFiles(preferenceName, files);
+	}
+
+	public static void saveRecentFiles(String preferenceName, List<RecentFiles> files) {
 		DumperOptions options = new DumperOptions();
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		Yaml yaml = new Yaml(options);
