@@ -130,8 +130,8 @@ public class ProjectiveExpandByOneView {
 		camerasGlobal.clear();
 		camerasLocal.add(utils.P2);
 		camerasLocal.add(utils.P3);
-		camerasGlobal.add(workGraph.lookupView(utils.viewB.id).camera);
-		camerasGlobal.add(workGraph.lookupView(utils.viewC.id).camera);
+		camerasGlobal.add(workGraph.lookupView(utils.viewB.id).projective);
+		camerasGlobal.add(workGraph.lookupView(utils.viewC.id).projective);
 
 		return findCompatible.fitCameras(camerasLocal, camerasGlobal, localToGlobal);
 	}

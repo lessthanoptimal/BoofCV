@@ -18,10 +18,14 @@
 
 package boofcv.alg.sfm.structure2;
 
-import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.AssociatedTripleIndex;
+import boofcv.struct.calib.CameraPinhole;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.*;
@@ -31,43 +35,21 @@ import java.util.*;
  */
 public class SceneWorkingGraph {
 
-	private Map<String,View> views = new HashMap<>();
-	private List<Feature> features = new ArrayList<>();
-	private List<Observation> observations = new ArrayList<>();
+	public final Map<String,View> views = new HashMap<>();
+	public final List<Feature> features = new ArrayList<>(); // TODO change to something else so remove() is faster
+
+	public void reset() {
+		views.clear();
+		features.clear();
+	}
 
 	public View lookupView( String id ) {
 		return views.get(id);
 	}
 
-	/**
-	 * Initializes
-	 * @param pv
-	 * @return
-	 */
-	public View initialize( PairwiseImageGraph2.View pv ) {
-		View v = addView(pv);
-		for (int featIdx = 0; featIdx < pv.totalFeatures; featIdx++) {
-			Feature f = createFeature();
-			f.index = featIdx;
-			f.known = false;
-			Observation o = createObservation();
-			o.viewIdx = featIdx;
-			o.view = v;
-			f.visible.add(o);
-			v.v2g.put(featIdx,f);
-		}
-		return v;
-	}
 
 	public boolean isKnown( PairwiseImageGraph2.View pview ) {
 		return views.containsKey(pview.id);
-	}
-
-	public Feature lookupFeature( PairwiseImageGraph2.View pview , int viewIdx ) {
-		View v = views.get(pview.id);
-		if( v == null )
-			return null;
-		return v.v2g.get(viewIdx);
 	}
 
 	public View addView( PairwiseImageGraph2.View pview ) {
@@ -77,145 +59,77 @@ public class SceneWorkingGraph {
 		return v;
 	}
 
-	/**
-	 * Adds the view and the feature's associated with it. All of its features are labeled as known, unknown,
-	 * or contradiction. If known then this view is added to the feature. If unknown then a new feature is created.
-	 * Features which are contradictions are ignored.
-	 */
-	public View addViewAndFeatures( PairwiseImageGraph2.View pview ) {
-		View viewA = addView(pview);
-
-		int[] l2g = findKnownFeatures(pview);
-		addLocalFeatures(pview, viewA, l2g);
-
-		return viewA;
-	}
-
-	private int[] findKnownFeatures(PairwiseImageGraph2.View pview) {
-		// look up table from local index to global index
-		int[] l2g = new int[ pview.totalFeatures ];
-		Arrays.fill(l2g,-1);
-
-		// Go through all connections and find features which are already known
-		for (int connIdx = 0; connIdx < pview.connections.size; connIdx++) {
-			PairwiseImageGraph2.Motion m = pview.connections.get(connIdx);
-
-			boolean isSrc = m.src==pview;
-
-			View viewB = lookupView((isSrc?m.dst:m.src).id);
-
-			// Go through all the inliers and see if the feature is already known. If it is known
-			// then update the table
-			for (int inlierIdx = 0; inlierIdx < m.inliers.size; inlierIdx++) {
-				AssociatedIndex a = m.inliers.data[inlierIdx];
-				int indexA; // index of the feature in viewA
-				Feature f;  // Reference to the global feature
-				if( isSrc ) {
-					indexA = a.src;
-					f = viewB.v2g.get(a.dst);
-				} else {
-					indexA = a.dst;
-					f = viewB.v2g.get(a.src);
-				}
-
-				// Update the look up table. if there's a contradiction ignore the feature
-				if( f != null ) {
-					int currentId = l2g[indexA];
-					if( currentId == -1 ) {
-						l2g[indexA] = f.index;
-					} else if( currentId != -2 && currentId != f.index ) {
-						// mark it as there being a conflict
-						l2g[indexA] = -2;
-					}
-				}
-			}
-		}
-		return l2g;
-	}
-
-	private void addLocalFeatures(PairwiseImageGraph2.View pview, View viewA, int[] l2g) {
-		for (int viewIdx = 0; viewIdx < pview.totalFeatures; viewIdx++) {
-			// There was a contradiction and the feature should be skipped
-			if( l2g[viewIdx] == -2 )
-				continue;
-
-			Observation o = createObservation();
-			o.view = viewA;
-			o.viewIdx = viewIdx;
-			Feature f;
-			if( l2g[viewIdx] == -1 ) {
-				// The feature is unknown, so create a new feature
-				f = createFeature();
-
-			} else {
-				// The view is known, so add this view to the feature
-				f = features.get(l2g[viewIdx] );
-			}
-			f.visible.add(o);
-			viewA.v2g.put(viewIdx,f);
-		}
-	}
-
 	public Feature createFeature() {
 		Feature f = new Feature();
 		f.reset();
-		f.index = features.size();
 		features.add(f);
 		return f;
-	}
-
-	private Observation createObservation() {
-		Observation o = new Observation();
-		observations.add(o);
-		return o;
-	}
-
-	/**
-	 *
-	 * @param feature The feature being observed
-	 * @param view The view it was observed in
-	 * @param index The index of the feature in the view
-	 */
-	public void addObservation( Feature feature , View view , int index ) {
-		Observation o = createObservation();
-		o.view = view;
-		o.viewIdx = index;
-		feature.visible.add(o);
-	}
-
-	public void lookupCommon(String viewA, String viewB, String viewC,
-							 List<Feature> features ,
-							 FastQueue<AssociatedTripleIndex> matches ) {
-
 	}
 
 	public Collection<View> getAllViews() {
 		return views.values();
 	}
 
-	public class Feature {
-		// the ID or index of the feature
-		public int index;
-		// if true then the feature's 3D location is known
-		public boolean known;
+	public static class Feature {
+		// location in world coordinates
+		public final Point3D_F64 location = new Point3D_F64();
 		// which views it's visible in
-		public final List<Observation> visible = new ArrayList<>();
+		public final List<Observation> observations = new ArrayList<>();
 
 		public void reset() {
-			index = -1;
-			known = false;
-			visible.clear();
+			location.set(Double.NaN,Double.NaN,Double.NaN);
+			observations.clear();
+		}
+
+		public Point2D_F64 findObservation(View v) {
+			for (int i = 0; i < observations.size(); i++) {
+				if( observations.get(i).view == v )
+					return observations.get(i).pixel;
+			}
+			return null;
 		}
 	}
 
-	public class Observation {
+	public static class Observation {
+		// The view this feature was observed in
 		public View view;
-		// index of the feature in the view
-		public int viewIdx;
+		// index/identifier for the observation of this feature in the view
+		public int observationIdx;
+		// The value of the observation in the image. pixels
+		public final Point2D_F64 pixel = new Point2D_F64();
+
+		public Observation() {}
+
+		public Observation(View view, int observationIdx) {
+			this.view = view;
+			this.observationIdx = observationIdx;
+		}
 
 		public void reset() {
 			this.view = null;
-			this.viewIdx = -1;
+			this.observationIdx = -1;
+		}
+	}
+
+	/**
+	 * Information on the set of inlier observations used to compute the camera location
+	 */
+	public static class InlierInfo
+	{
+		// List of views from which these inliers were selected from
+		// the first view is always the view which contains this set of info
+		public final FastArray<PairwiseImageGraph2.View> views = new FastArray<>(PairwiseImageGraph2.View.class);
+		// indexes of observations for each view listed in 'views'.  obs[view][idx] will refer to the same feature
+		// for all 'idx'
+		public final FastQueue<GrowQueue_I32> observations = new FastQueue<>(GrowQueue_I32::new);
+
+		public boolean isEmpty() {
+			return observations.size==0;
+		}
+
+		public void reset() {
+			views.reset();
+			observations.reset();
 		}
 	}
 
@@ -223,15 +137,44 @@ public class SceneWorkingGraph {
 		public PairwiseImageGraph2.View pview;
 		// view to global
 		// provides a way to lookup features given their ID in the view
-		public final TIntObjectHashMap<Feature> v2g = new TIntObjectHashMap<>();
+		public final TIntObjectHashMap<Feature> obs_to_feat = new TIntObjectHashMap<>();
+
+		// Specifies which observations were used to compute the projective transform for this view
+		// If empty that means one set of inliers are used to multiple views and only one view needed this to be saved
+		// this happens for the seed view
+		public final InlierInfo projectiveInliers = new InlierInfo();
 
 		// projective camera matrix
-		public final DMatrixRMaj camera = new DMatrixRMaj(3,4);
+		public final DMatrixRMaj projective = new DMatrixRMaj(3,4);
+		// metric camera
+		public final CameraPinhole pinhole = new CameraPinhole();
+		public final Se3_F64 world_to_view = new Se3_F64();
+
+		// index in list of views. Only value during construction of SBA data structures
+		public int index;
+
+		/**
+		 * Given the observation index return the feature associated with it. Return null if there are none
+		 */
+		public Feature getFeatureFromObs( int observationIdx ) {
+			return obs_to_feat.get(observationIdx);
+		}
+
+		/**
+		 * Assigns the specified observation in this view to the specified feature
+		 * @param observationIdx Index of the observation
+		 * @param feature Which feature it belongs to
+		 */
+		public void setObsToFeature( int observationIdx , Feature feature ) {
+			obs_to_feat.put(observationIdx,feature);
+		}
 
 		public void reset() {
 			pview = null;
-			v2g.clear();
-			camera.zero();
+			obs_to_feat.clear();
+			projective.zero();
+			pinhole.reset();
+			projectiveInliers.reset();
 		}
 	}
 }

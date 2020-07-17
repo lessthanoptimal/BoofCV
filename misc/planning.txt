@@ -36,8 +36,13 @@ TODO Calibration
 TODO Perspective-n-conic
 TODO Find an algorithm which solves for pose of a stereo camera system from two observation pairs.
 
+TODO Self Calibration from Camera Matrices - SelfCalibrationLinearDualQuadratic
+  - Identify as many edge cases as possible and develop specialized solutions if needed
+  - camera translates only along 2 DOF
+  - Unknown apsect fails but known doesn't. See ProjectiveToMetricReconstruction tests
+
 TODO Uchiya Markers
-   - Compte to original implementation
+   - Compare to original implementation
    - Speed up every step. See below
    - Detect "dots" instead of ellipses. i.e. only look at radius. stdev for major/minor axis?
    - Reduce amount of duplicate calculations related to LLAH

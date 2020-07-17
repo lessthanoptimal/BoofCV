@@ -23,12 +23,14 @@ import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
+import boofcv.testing.BoofTesting;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.data.DMatrixRMaj;
@@ -43,10 +45,9 @@ import java.util.Random;
  * @author Peter Abeles
  */
 class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
-	CameraPinhole intrinsic = new CameraPinhole(400,410,0,420,420,800,800);
-	int numFeatures = 100;
-	int numViewConnect;
-	Random rand;
+	public CameraPinhole intrinsic = new CameraPinhole(400,410,0,420,420,800,800);
+	public int numFeatures = 100;
+	public Random rand = BoofTesting.createRandom(3);
 	List<String> viewIds = new ArrayList<>();
 	List<List<Point2D_F64>> viewObs = new ArrayList<>();
 	// look up table from view index to feature index
@@ -54,23 +55,37 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 	List<int[]> featToView = new ArrayList<>();
 	public List<Point3D_F64> feats3D;
 
-	public List<Se3_F64> listOriginToView = new ArrayList<>();
-	public List<DMatrixRMaj> listCameraMatrices = new ArrayList<>();
+	public FastArray<Se3_F64> listOriginToView = new FastArray<>(Se3_F64.class);
+	public FastArray<DMatrixRMaj> listCameraMatrices = new FastArray<>(DMatrixRMaj.class);
 
 	public PairwiseImageGraph2 graph = new PairwiseImageGraph2();
+
+	public MockLookupSimilarImagesCircleAround(){}
+
+	public MockLookupSimilarImagesCircleAround setIntrinsic( CameraPinhole intrinsic ) {
+		this.intrinsic = intrinsic;
+		return this;
+	}
+
+	public MockLookupSimilarImagesCircleAround setFeatures( int numFeatures ) {
+		this.numFeatures = numFeatures;
+		return this;
+	}
+
+	public MockLookupSimilarImagesCircleAround setSeed( long seed ) {
+		rand = BoofTesting.createRandom(seed);
+		return this;
+	}
 
 	/**
 	 * Configures the scene
 	 *
 	 * @param numViews number of views to create
 	 * @param numViewConnect Specifies 1/2 the number of views each view will be connected to.
-	 * @param seed random number generator seed
 	 */
-	public MockLookupSimilarImagesCircleAround(int numViews , int numViewConnect, long seed) {
-		this.rand = new Random(seed);
-
-		for (int i = 0; i < numViews; i++) {
-			viewIds.add("View_"+i);
+	public MockLookupSimilarImagesCircleAround init(int numViews , int numViewConnect) {
+		for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
+			viewIds.add("View_"+viewCnt);
 		}
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
@@ -82,16 +97,16 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 		double pathRadius = 2;
 
 		// render pixel coordinates of all points
-		for (int i = 0; i < numViews; i++) {
+		for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
 			Se3_F64 camera_to_world = new Se3_F64();
 			Se3_F64 world_to_camera = new Se3_F64();
-			double yaw = 2.0*Math.PI*i/numViews;
+			double yaw = 2.0*Math.PI*viewCnt/numViews;
 
 			// camera lie on the (X,Z) plane with +y pointed down.
 			// This is done to make the camera coordinate system and the world coordinate system have a more close
 			// relationship
 			camera_to_world.T.x = Math.cos(yaw)*pathRadius;
-			camera_to_world.T.y = 0;
+			camera_to_world.T.y = rand.nextGaussian()*pathRadius*0.1; // geometric diversity for self calibration
 			camera_to_world.T.z = Math.sin(yaw)*pathRadius;
 
 			// camera is pointing in the opposite direction of it's world location
@@ -123,8 +138,8 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 			featToView.add(f2v);
 
 			// note the featIdx is the index of the feature in the view
-			for (int viewIdx = 0; viewIdx < feats3D.size(); viewIdx++) {
-				Point3D_F64 X = feats3D.get(v2f[viewIdx]);
+			for (int featCnt = 0; featCnt < feats3D.size(); featCnt++) {
+				Point3D_F64 X = feats3D.get(v2f[featCnt]);
 				Point2D_F64 pixel = PerspectiveOps.renderPixel(world_to_camera,intrinsic,X, null);
 				if( pixel == null )
 					throw new RuntimeException("Out of FOV");
@@ -135,7 +150,7 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 		// Create the pairwise graph
 		for (int i = 0; i < numViews; i++) {
 			View v = graph.createNode(viewIds.get(i));
-			v.totalFeatures = numFeatures;
+			v.totalObservations = numFeatures;
 		}
 
 		// Only connect neighbors to each other
@@ -166,6 +181,28 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 				}
 			}
 		}
+
+		return this;
+	}
+
+	public SceneWorkingGraph createWorkingGraph() {
+		var working = new SceneWorkingGraph();
+		for( int viewCnt = 0; viewCnt < graph.nodes.size; viewCnt++ ) {
+			PairwiseImageGraph2.View pv = graph.nodes.get(viewCnt);
+			SceneWorkingGraph.View wv = working.addView(pv);
+			wv.projective.set(listCameraMatrices.get(viewCnt));
+
+			wv.projectiveInliers.views.add(pv);
+			wv.projectiveInliers.observations.grow().addAll(featToView.get(viewCnt),0,numFeatures);
+			for (int connCnt = 0; connCnt < pv.connections.size; connCnt++) {
+				PairwiseImageGraph2.Motion m = pv.connections.get(connCnt);
+				PairwiseImageGraph2.View mv = m.other(pv);
+				int mv_index = graph.nodes.indexOf(mv);
+				wv.projectiveInliers.views.add(mv);
+				wv.projectiveInliers.observations.grow().addAll(featToView.get(mv_index),0,numFeatures);
+			}
+		}
+		return working;
 	}
 
 	@Override

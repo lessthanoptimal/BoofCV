@@ -118,7 +118,7 @@ public class GeneratePairwiseImageGraph {
 			db.findSimilar(src,similar);
 			db.lookupPixelFeats(src,srcFeats);
 
-			graph.nodes.get(idxTgt).totalFeatures = srcFeats.size;
+			graph.nodes.get(idxTgt).totalObservations = srcFeats.size;
 
 			for (int idxSimilar = 0; idxSimilar < similar.size(); idxSimilar++) {
 				String dst = similar.get(idxSimilar);

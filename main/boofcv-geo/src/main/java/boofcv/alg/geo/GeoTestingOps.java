@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,14 @@
 package boofcv.alg.geo;
 
 
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import georegression.struct.se.Se3_F64;
+import org.ejml.UtilEjml;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,5 +123,31 @@ public class GeoTestingOps {
 			total += d*d;
 		}
 		return total*0.5;
+	}
+
+	/**
+	 * Checks to see if the two SE3 are equal up to a scale factor
+	 * @param tolT Translational tolerance
+	 * @param tolRad Rotational tolerance in radians
+	 * @return true if within tolerance
+	 */
+	public static boolean isEqualsScale(Se3_F64 a , Se3_F64 b , double tolT , double tolRad ) {
+		double scaleA = a.T.norm();
+		double scale = scaleA / b.T.norm();
+
+		if(UtilEjml.isUncountable(scale))
+			scale = 1;
+
+
+		double dx = a.T.x - scale*b.T.x;
+		double dy = a.T.y - scale*b.T.y;
+		double dz = a.T.z - scale*b.T.z;
+		if( Math.sqrt(dx*dx + dy*dy + dz*dz) > scaleA*tolT )
+			return false;
+
+		var R = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.multTransB(a.R,b.R,R);
+		double errorRad = ConvertRotation3D_F64.matrixToRodrigues(R,null).theta;
+		return Math.abs(errorRad) <= tolRad;
 	}
 }

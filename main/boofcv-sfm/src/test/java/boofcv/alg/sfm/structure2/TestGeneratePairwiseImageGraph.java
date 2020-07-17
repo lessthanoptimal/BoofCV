@@ -74,7 +74,7 @@ class TestGeneratePairwiseImageGraph {
 		assertEquals(4,graph.mapNodes.size());
 		for (int i = 0; i < graph.nodes.size; i++) {
 			PairwiseImageGraph2.View v = graph.nodes.get(i);
-			assertTrue(v.totalFeatures>50);
+			assertTrue(v.totalObservations >50);
 			assertEquals(3,v.connections.size);
 			assertNotNull(graph.mapNodes.get(v.id));
 		}

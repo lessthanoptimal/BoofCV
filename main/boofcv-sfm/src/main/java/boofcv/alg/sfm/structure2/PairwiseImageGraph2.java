@@ -72,9 +72,9 @@ public class PairwiseImageGraph2 {
 		 */
 		public String id;
 		/**
-		 * Total number of features in this view
+		 * Total number of features observations in this view
 		 */
-		public int totalFeatures;
+		public int totalObservations;
 
 		/**
 		 * List of motions associated with this view. It can be either the src or dst

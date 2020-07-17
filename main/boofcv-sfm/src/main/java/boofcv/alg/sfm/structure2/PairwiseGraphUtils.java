@@ -27,6 +27,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.pose.PoseFromPairLinear6;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.Motion;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
+import boofcv.alg.sfm.structure2.SceneWorkingGraph.InlierInfo;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryMultiViewRobust;
@@ -142,9 +143,9 @@ public class PairwiseGraphUtils {
 		if( connectIdx.size < 1 )
 			throw new RuntimeException("Called when there are no connections");
 		// if true then it is visible in all tracks
-		visibleAll.resize(seed.totalFeatures);
+		visibleAll.resize(seed.totalObservations);
 		// used to keep track of which features are visible in the current motion
-		visibleMotion.resize(seed.totalFeatures);
+		visibleMotion.resize(seed.totalObservations);
 
 		// Only look at features in the motions that were used to compute the score
 		for (int idxMotion = 0; idxMotion < connectIdx.size; idxMotion++) {
@@ -161,12 +162,12 @@ public class PairwiseGraphUtils {
 				visibleAll.setTo(visibleMotion);
 				continue;
 			}
-			for (int i = 0; i < seed.totalFeatures; i++) {
+			for (int i = 0; i < seed.totalObservations; i++) {
 				visibleAll.data[i] &= visibleMotion.data[i];
 			}
 		}
 		GrowQueue_I32 common = new GrowQueue_I32(visibleAll.count(true));
-		for (int i = 0; i < seed.totalFeatures; i++) {
+		for (int i = 0; i < seed.totalObservations; i++) {
 			if( visibleAll.data[i] ) {
 				common.add(i);
 			}
@@ -192,7 +193,7 @@ public class PairwiseGraphUtils {
 	 * {@link #commonIdx} by index of feature in {@link #seed}.
 	 */
 	public void findCommonFeatures() {
-		final int N = seed.totalFeatures;
+		final int N = seed.totalObservations;
 		commonIdx.reset();
 		for (int featureIdxA = 0; featureIdxA < N; featureIdxA++) {
 			// this feature must be visible in all 3 views
@@ -262,6 +263,33 @@ public class PairwiseGraphUtils {
 		inliersThreeView = ransac.getMatchSet();
 
 		return true;
+	}
+
+	/**
+	 * Saves which features were inside the inlier set as indexes of the seed view's original feature set
+	 */
+	public void saveRansacInliers(SceneWorkingGraph.View view ) {
+		int N = inliersThreeView.size();
+		InlierInfo info = view.projectiveInliers;
+
+		info.observations.reset();
+		info.observations.resize(3);
+		info.observations.get(0).setTo(commonIdx);
+		GrowQueue_I32 indexesB = info.observations.get(1);
+		GrowQueue_I32 indexesC =info.observations.get(2);
+
+		info.observations.resize(N);
+		for (int i = 0; i < N; i++) {
+			int inputIdx = ransac.getInputIndex(i);
+			int indexA = commonIdx.get(inputIdx);
+			indexesB.add( table_A_to_B.data[indexA] );
+			indexesC.add( table_A_to_C.data[indexA] );
+		}
+
+		info.views.clear();
+		info.views.add(seed);
+		info.views.add(viewB);
+		info.views.add(viewC);
 	}
 
 	/**
@@ -380,7 +408,7 @@ public class PairwiseGraphUtils {
 										   Motion edge,
 										   GrowQueue_I32 table_a_to_b)
 	{
-		table_a_to_b.resize(viewA.totalFeatures,-1);
+		table_a_to_b.resize(viewA.totalObservations,-1);
 		boolean src_is_A = edge.src == viewA;
 		for (int i = 0; i < edge.inliers.size; i++) {
 			AssociatedIndex assoc = edge.inliers.get(i);

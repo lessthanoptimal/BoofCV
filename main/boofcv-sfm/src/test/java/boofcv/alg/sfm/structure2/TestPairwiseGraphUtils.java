@@ -45,13 +45,13 @@ class TestPairwiseGraphUtils {
 	@Test
 	void findCommonFeatures() {
 		PairwiseImageGraph2.View seed = new PairwiseImageGraph2.View();
-		seed.totalFeatures = 100;
+		seed.totalObservations = 100;
 
 		for (int i = 0; i < 2; i++) {
 			PairwiseImageGraph2.Motion motion = new PairwiseImageGraph2.Motion();
 			motion.src = seed;
 			motion.dst = new PairwiseImageGraph2.View();
-			motion.dst.totalFeatures = 110; // give it a few extra and see if that causes a problem
+			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
 
 			for (int j = 0; j < 100; j++) {
 				motion.inliers.grow().setAssociation(j,j,0);
@@ -63,7 +63,7 @@ class TestPairwiseGraphUtils {
 		PairwiseImageGraph2.Motion motionBC = new PairwiseImageGraph2.Motion();
 		motionBC.src = seed.connections.get(0).dst;
 		motionBC.dst = seed.connections.get(1).dst;
-		for (int i = 0; i < seed.totalFeatures; i++) {
+		for (int i = 0; i < seed.totalObservations; i++) {
 			motionBC.inliers.grow().setAssociation(i,i,0);
 		}
 		motionBC.src.connections.add(motionBC);
@@ -77,7 +77,7 @@ class TestPairwiseGraphUtils {
 		alg.createThreeViewLookUpTables();
 		alg.findCommonFeatures();
 
-		assertEquals(seed.totalFeatures,alg.commonIdx.size);
+		assertEquals(seed.totalObservations,alg.commonIdx.size);
 		for (int i = 0; i < alg.commonIdx.size; i++) {
 			assertEquals(i,alg.commonIdx.get(i));
 		}
@@ -86,10 +86,10 @@ class TestPairwiseGraphUtils {
 	@Test
 	void findCommonFeatures_list() {
 		PairwiseImageGraph2.View seed = new PairwiseImageGraph2.View();
-		seed.totalFeatures = 100;
+		seed.totalObservations = 100;
 		GrowQueue_I32 seedFeatsIdx = new GrowQueue_I32();
 
-		for (int i = 0; i < seed.totalFeatures/2; i++) {
+		for (int i = 0; i < seed.totalObservations /2; i++) {
 			seedFeatsIdx.add(i);
 		}
 
@@ -97,7 +97,7 @@ class TestPairwiseGraphUtils {
 			PairwiseImageGraph2.Motion motion = new PairwiseImageGraph2.Motion();
 			motion.src = seed;
 			motion.dst = new PairwiseImageGraph2.View();
-			motion.dst.totalFeatures = 110; // give it a few extra and see if that causes a problem
+			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
 
 			for (int j = 0; j < 100; j++) {
 				motion.inliers.grow().setAssociation(j,j,0);
@@ -109,7 +109,7 @@ class TestPairwiseGraphUtils {
 		PairwiseImageGraph2.Motion motionBC = new PairwiseImageGraph2.Motion();
 		motionBC.src = seed.connections.get(0).dst;
 		motionBC.dst = seed.connections.get(1).dst;
-		for (int i = 0; i < seed.totalFeatures; i++) {
+		for (int i = 0; i < seed.totalObservations; i++) {
 			motionBC.inliers.grow().setAssociation(i,i,0);
 		}
 		motionBC.src.connections.add(motionBC);
@@ -123,7 +123,7 @@ class TestPairwiseGraphUtils {
 		alg.createThreeViewLookUpTables();
 		alg.findCommonFeatures(seedFeatsIdx);
 
-		assertEquals(seed.totalFeatures/2,alg.commonIdx.size);
+		assertEquals(seed.totalObservations /2,alg.commonIdx.size);
 		for (int i = 0; i < alg.commonIdx.size; i++) {
 			assertEquals(i,alg.commonIdx.get(i));
 		}
@@ -353,7 +353,7 @@ class TestPairwiseGraphUtils {
 		}
 		motion.src = new PairwiseImageGraph2.View();
 		motion.dst = new PairwiseImageGraph2.View();
-		motion.src.totalFeatures = motion.dst.totalFeatures = table_src_to_dst.size;
+		motion.src.totalObservations = motion.dst.totalObservations = table_src_to_dst.size;
 		motion.inliers.shuffle(rand); // shuffle this to make the order interesting to test
 
 		GrowQueue_I32 found_src_to_dst = new GrowQueue_I32(table_src_to_dst.size);
@@ -379,6 +379,11 @@ class TestPairwiseGraphUtils {
 		for (int i = 0; i < table_src_to_dst.size; i++) {
 			assertEquals(table_src_to_dst.data[i], found_src_to_dst.data[i]);
 		}
+	}
+
+	@Test
+	void saveInlierIndexes() {
+		fail("Implement");
 	}
 
 	@Nested

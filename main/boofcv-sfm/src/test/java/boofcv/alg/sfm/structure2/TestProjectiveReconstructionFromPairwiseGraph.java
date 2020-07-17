@@ -47,7 +47,7 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 	void process_perfect_linear_3() {
 		var alg = new ProjectiveReconstructionFromPairwiseGraph();
 		alg.getInitProjective().utils.configConvergeSBA.maxIterations = 0; // TODO remove.  SBA causes an error. Normalization?
-		var db = new MockLookupSimilarImagesCircleAround(3,1,0xDEADBEEF);
+		var db = new MockLookupSimilarImagesCircleAround().init(3,1);
 
 		assertTrue(alg.process(db,db.graph));
 
@@ -61,7 +61,7 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 	void process_perfect_linear_10() {
 		var alg = new ProjectiveReconstructionFromPairwiseGraph();
 		alg.getInitProjective().utils.configConvergeSBA.maxIterations = 0; // TODO remove. SBA causes an error. Normalization?
-		var db = new MockLookupSimilarImagesCircleAround(10,2,0xDEADBEEF);
+		var db = new MockLookupSimilarImagesCircleAround().init(10,2);
 
 		assertTrue(alg.process(db,db.graph));
 
@@ -81,7 +81,7 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 
 		for( String id : db.viewIds ) {
 //			System.out.println("id="+id+" index="+db.viewIds.indexOf(id));
-			listA.add( alg.workGraph.lookupView( id ).camera );
+			listA.add( alg.workGraph.lookupView( id ).projective);
 			listB.add( db.listCameraMatrices.get( db.viewIds.indexOf(id)) );
 		}
 

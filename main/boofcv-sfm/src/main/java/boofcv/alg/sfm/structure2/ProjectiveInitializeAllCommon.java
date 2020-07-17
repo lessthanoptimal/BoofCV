@@ -187,7 +187,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 */
 	void createStructureLookUpTables(View viewA) {
 		final int numInliers = utils.ransac.getMatchSet().size();
-		seedToStructure.resize(viewA.totalFeatures);
+		seedToStructure.resize(viewA.totalObservations);
 		seedToStructure.fill(-1); // -1 indicates no match
 		inlierToSeed.resize(numInliers);
 		for (int i = 0; i < numInliers; i++) {

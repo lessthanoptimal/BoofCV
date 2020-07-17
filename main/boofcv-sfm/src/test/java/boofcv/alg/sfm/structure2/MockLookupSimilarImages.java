@@ -117,7 +117,7 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 	private void constructGraph(int numViews) {
 		for (int i = 0; i < numViews; i++) {
 			PairwiseImageGraph2.View v = graph.createNode(viewIds.get(i));
-			v.totalFeatures = numFeatures;
+			v.totalObservations = numFeatures;
 		}
 		// connect all views to each other
 		for (int i = 0; i < numViews; i++) {

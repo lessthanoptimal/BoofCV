@@ -62,6 +62,14 @@ public class CameraPinhole extends CameraModel {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
+	/**
+	 * Sets all variables to zero.
+	 */
+	public void reset() {
+		fx=fy=skew=cx=cy=0.0;
+		width=height=0;
+	}
+
 	public CameraPinhole fsetK(double fx, double fy,
 							   double skew,
 							   double cx, double cy,

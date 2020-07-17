@@ -31,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * Given a {@link PairwiseImageGraph2} that describes how a set of images are related to each other based on point
  * features, compute a projective reconstruction of the camera matrices for each view. The reconstructed location
@@ -103,6 +105,7 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 	 */
 	public boolean process( LookupSimilarImages db , PairwiseImageGraph2 graph ) {
 		exploredViews.clear();
+		workGraph.reset();
 
 		// Score nodes for their ability to be seeds
 		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(graph);
@@ -147,9 +150,12 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 			View view = initProjective.getPairwiseGraphViewByStructureIndex(structViewIdx);
 			if( verbose != null ) verbose.println("  init view.id="+view.id);
 			DMatrixRMaj cameraMatrix = initProjective.utils.structure.views.get(structViewIdx).worldToView;
-			workGraph.addView(view).camera.set(cameraMatrix);
+			workGraph.addView(view).projective.set(cameraMatrix);
 			exploredViews.add(view.id);
 		}
+
+		// save which features were used for later use in metric reconstruction
+		utils.saveRansacInliers(workGraph.lookupView(utils.seed.id));
 
 		return true;
 	}
@@ -179,7 +185,11 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 
 			// save the results
 			SceneWorkingGraph.View wview = workGraph.addView(selected);
-			wview.camera.set(cameraMatrix);
+			wview.projective.set(cameraMatrix);
+
+			// save which features were used for later use in metric reconstruction
+			assertBoof(utils.seed==wview.pview);// just being paranoid
+			utils.saveRansacInliers(wview);
 
 			// Add views which are neighbors
 			addOpenForView(wview.pview, open);

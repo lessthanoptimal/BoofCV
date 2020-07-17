@@ -64,7 +64,7 @@ public class SelfCalibrationBase {
 	 * The projective is defined as P[i]=[A[i] | a[i]] where P is 3 by 4 matrix.
 	 *
 	 * @param viewI projective matrix representing the transform from the current camera
-	 *                       to the coordinate system's origin. 3 x 4
+	 *                       to the coordinate system's origin. 3 x 4. A copy is saved internally.
 	 */
 	public void addCameraMatrix(DMatrixRMaj viewI ) {
 		Projective pr = cameras.grow();

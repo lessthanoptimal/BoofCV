@@ -52,7 +52,7 @@ class TestProjectiveExpandByOneView {
 			for (int startNode = 0; startNode < 2; startNode++) {
 				var working = new SceneWorkingGraph();
 				for (int i = startNode; i < 3; i++) {
-					working.addView(db.graph.nodes.get(i)).camera.set(db.listCameraMatrices.get(i));
+					working.addView(db.graph.nodes.get(i)).projective.set(db.listCameraMatrices.get(i));
 				}
 
 				View target = db.graph.nodes.get(targetIdx);
@@ -85,8 +85,8 @@ class TestProjectiveExpandByOneView {
 		SceneWorkingGraph.View workB = working.addView(alg.utils.viewB);
 		SceneWorkingGraph.View workC = working.addView(alg.utils.viewC);
 
-		CommonOps_DDRM.mult(alg.utils.P2,H,workB.camera);
-		CommonOps_DDRM.mult(alg.utils.P3,H,workC.camera);
+		CommonOps_DDRM.mult(alg.utils.P2,H,workB.projective);
+		CommonOps_DDRM.mult(alg.utils.P3,H,workC.projective);
 
 		assertTrue(alg.computeConversionHomography());
 		// check results
