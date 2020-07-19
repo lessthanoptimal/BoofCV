@@ -32,6 +32,10 @@ import java.util.List;
 public class PointTrackerDefault<T extends ImageBase<T>> implements PointTracker<T> {
 	public long frameID;
 
+	public PointTrackerDefault() {
+		reset();
+	}
+
 	@Override
 	public void process(T image) {
 		frameID++;

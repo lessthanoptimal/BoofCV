@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,6 +50,12 @@ public class AssociatedIndex {
 		this.src = src;
 		this.dst = dst;
 		this.fitScore = fitScore;
+	}
+
+	public void set(int src , int dst ) {
+		this.src = src;
+		this.dst = dst;
+		this.fitScore = 0;
 	}
 
 	public void set( AssociatedIndex a ) {
