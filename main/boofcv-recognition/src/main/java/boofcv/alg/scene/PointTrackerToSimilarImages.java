@@ -102,6 +102,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	 */
 	Frame createFrameSaveObservations(PointTracker<?> tracker) {
 		// get a list of all the tracks which are visible in this frame
+		tracks.clear();
 		tracker.getActiveTracks(tracks);
 
 		// Create a new frame and record all the tracks visible in this frame
@@ -247,7 +248,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	/**
 	 * Describes how two frames are related to each other through common observations of the same feature
 	 */
-	protected static class Matches {
+	public static class Matches {
 		// observation indexes for the same object in each frame
 		public int[] src;
 		public int[] dst;
@@ -277,7 +278,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	/**
 	 * Observations for a frame. Arrays are used to reduce memory footprint.
 	 */
-	protected static class Frame {
+	public static class Frame {
 		// Unique ID assigned to this frame
 		public String frameID;
 		// pixel observations for all the tracks (x,y) interleaved. This is floats and not doubles since we really

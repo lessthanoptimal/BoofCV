@@ -27,13 +27,13 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.ConvertDMatrixStruct;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * Given a {@link LookupSimilarImages graph of images} with similar appearance, create a graph in which
@@ -47,7 +47,7 @@ import java.util.Map;
  *
  * @author Peter Abeles
  */
-public class GeneratePairwiseImageGraph {
+public class GeneratePairwiseImageGraph implements VerbosePrint {
 	public PairwiseImageGraph2 graph = new PairwiseImageGraph2();
 	private List<String> imageIds;
 
@@ -63,6 +63,8 @@ public class GeneratePairwiseImageGraph {
 	 * If number of matches from fundamental divided by homography is more than this then it is considered a 3D scene
 	 */
 	public double ratio3D = 1.5;
+
+	private PrintStream verbose;
 
 	/**
 	 * Configures and declares concensum matching algorithms
@@ -110,6 +112,8 @@ public class GeneratePairwiseImageGraph {
 			graph.createNode(imageIds.get(idxTgt));
 		}
 
+		if( verbose != null ) verbose.println("total images = "+imageIds.size());
+
 		// For each image examine all related images for a true geometric relationship
 		// if one exists then add an edge to the graph describing their relationship
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
@@ -117,6 +121,8 @@ public class GeneratePairwiseImageGraph {
 
 			db.findSimilar(src,similar);
 			db.lookupPixelFeats(src,srcFeats);
+
+			if( verbose != null ) verbose.println("ID="+src+" similar="+similar.size()+"  obs="+srcFeats.size);
 
 			graph.nodes.get(idxTgt).totalObservations = srcFeats.size;
 
@@ -165,6 +171,8 @@ public class GeneratePairwiseImageGraph {
 		if( ransacH.process(pairs.toList()) ) {
 			countH = ransacH.getMatchSet().size();
 		}
+
+		if( verbose != null ) verbose.println("   ransac F="+countF+" H="+countH+" out of "+pairs.size());
 
 		// fail if not enough features are remaining after RANSAC
 		if( Math.max(countF,countH) < minimumInliers )
@@ -229,5 +237,10 @@ public class GeneratePairwiseImageGraph {
 
 	public void setRatio3D(double ratio3D) {
 		this.ratio3D = ratio3D;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		this.verbose = out;
 	}
 }
