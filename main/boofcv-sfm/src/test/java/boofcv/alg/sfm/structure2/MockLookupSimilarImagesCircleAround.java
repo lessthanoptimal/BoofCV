@@ -157,9 +157,9 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 		for (int viewIdxI = 0; viewIdxI < numViews; viewIdxI++) {
 			View vi = graph.nodes.get(viewIdxI);
 			for (int neighborOffset = 1; neighborOffset <= numViewConnect; neighborOffset++) {
-				int viewIdxJ = (viewIdxI+neighborOffset)%numViews;
-				if( viewIdxI == viewIdxJ )
-					throw new RuntimeException("BUG");
+				int viewIdxJ = viewIdxI+neighborOffset;
+				if( viewIdxJ >= numViews )
+					break;
 				// next view while wrapping around
 				View vj = graph.nodes.get(viewIdxJ);
 				// mix of the src/dst to exercise more code during testing

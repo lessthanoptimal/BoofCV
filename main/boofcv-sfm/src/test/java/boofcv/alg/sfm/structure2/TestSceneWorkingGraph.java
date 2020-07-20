@@ -20,7 +20,7 @@ package boofcv.alg.sfm.structure2;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -28,16 +28,37 @@ import static org.junit.jupiter.api.Assertions.fail;
 class TestSceneWorkingGraph {
 	@Test
 	void isKnown() {
-		fail("Implement");
+		var alg = new SceneWorkingGraph();
+		var viewA = new PairwiseImageGraph2.View();
+		viewA.id = "moo";
+		var  viewB = new PairwiseImageGraph2.View();
+		viewB.id = "boo";
+
+		assertFalse(alg.isKnown(viewA));
+		assertFalse(alg.isKnown(viewB));
+		alg.addView(viewB);
+		assertFalse(alg.isKnown(viewA));
+		assertTrue(alg.isKnown(viewB));
+		alg.addView(viewA);
+		assertTrue(alg.isKnown(viewA));
+		assertTrue(alg.isKnown(viewB));
 	}
 
 	@Test
 	void addView() {
-		fail("Implement");
+		var alg = new SceneWorkingGraph();
+		var pview = new PairwiseImageGraph2.View();
+		pview.id = "moo";
+		SceneWorkingGraph.View found = alg.addView(pview);
+		assertSame(found.pview,pview);
+		assertSame(found,alg.views.get(pview.id));
 	}
 
 	@Test
 	void createFeature() {
-		fail("Implement");
+		var alg = new SceneWorkingGraph();
+		SceneWorkingGraph.Feature found = alg.createFeature();
+		assertEquals(1, alg.features.size());
+		assertSame(alg.features.get(0), found);
 	}
 }

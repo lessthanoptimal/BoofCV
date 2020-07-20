@@ -50,6 +50,8 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  * In the future multiple seeds will be used to reduce the amount of error which accumulates as the scene spreads out
  * from its initial location
  *
+ * <p>Output: {@link #getWorkGraph()}</p>
+ *
  * @see ProjectiveInitializeAllCommon
  * @see ProjectiveExpandByOneView
  * @see PairwiseGraphUtils
@@ -58,14 +60,11 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  */
 public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 
-	/**
-	 * Contains the found projective scene
-	 */
+	/** Contains the found projective scene */
 	public final @Getter SceneWorkingGraph workGraph = new SceneWorkingGraph();
-
-	// Computes the initial scene from the seed and some of it's neighbors
+	/** Computes the initial scene from the seed and some of it's neighbors */
 	private final @Getter ProjectiveInitializeAllCommon initProjective;
-	// Adds a new view to an existing projective scene
+	/** Adds a new view to an existing projective scene */
 	private final @Getter ProjectiveExpandByOneView expandProjective;
 	// Common functions used in projective reconstruction
 	final PairwiseGraphUtils utils;
@@ -114,22 +113,33 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 		if( seeds.size() == 0 )
 			return false;
 
-		if( verbose != null ) verbose.println("Selected "+seeds.size()+" seeds out of "+graph.nodes.size);
+		if( verbose != null ) verbose.println("Selected "+seeds.size()+" seeds out of "+graph.nodes.size+" nodes");
 
 		// For now we are keeping this very simple. Only a single seed is considered
 		SeedInfo info = seeds.get(0);
+
+		// TODO redo every component to use shifted pixels
+		// TODO redo every component to use scaled pixels
 
 		// Find the common features
 		GrowQueue_I32 common = utils.findCommonFeatures(info.seed,info.motions);
 		if( common.size < 6 ) // if less than the minimum it will fail
 			return false;
 
-		if( verbose != null ) verbose.println("Seed.id="+info.seed.id+" common="+common.size);
+		if( verbose != null ) verbose.println("Selected seed.id="+info.seed.id+" common="+common.size);
 
+		// TODO build up a scene so that SBA can be run on the whole thing
 		if (!estimateInitialSceneFromSeed(db, info, common))
 			return false;
 
+		// NOTE: Computing H to scale camera matrices didn't prevent them from vanishing
+
 		expandScene(db);
+
+		// TODO compute features across all views for SBA
+		// NOTE: Could do one last bundle adjustment on the entire scene. not doing that here since it would
+		//       be a pain to code up since features need to be tracked across all the images and triangulated
+		// TODO Note that the scene should be properly scale first if this is done.
 
 		if( verbose != null ) verbose.println("Done");
 		return true;
@@ -146,9 +156,10 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 		}
 
 		// Save found camera matrices for each view it was estimated in
+		if( verbose != null ) verbose.println("Saving initial seed camera matrices");
 		for (int structViewIdx = 0; structViewIdx < initProjective.utils.structure.views.size; structViewIdx++) {
 			View view = initProjective.getPairwiseGraphViewByStructureIndex(structViewIdx);
-			if( verbose != null ) verbose.println("  init view.id="+view.id);
+			if( verbose != null ) verbose.println("  view.id=`"+view.id+"`");
 			DMatrixRMaj cameraMatrix = initProjective.utils.structure.views.get(structViewIdx).worldToView;
 			workGraph.addView(view).projective.set(cameraMatrix);
 			exploredViews.add(view.id);
@@ -164,11 +175,11 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 	 * Adds all the remaining views to the scene
 	 */
 	private void expandScene(LookupSimilarImages db) {
+		if( verbose != null ) verbose.println("ENTER Expanding Scene:");
 		// Create a list of views that can be added the work graph
 		FastArray<View> open = findAllOpenViews();
 
 		// Grow the projective scene until there are no more views to process
-		if( verbose != null ) verbose.println("Expanding Scene:");
 		DMatrixRMaj cameraMatrix = new DMatrixRMaj(3,4);
 		while( open.size > 0 ) {
 			View selected = selectNextToProcess(open);
@@ -178,9 +189,12 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 			}
 
 			if(!expandProjective.process(db,workGraph,selected,cameraMatrix)) {
-				if( verbose != null )
-					verbose.println("Failed to expand/add view="+selected.id+". Discarding.");
+				if( verbose != null ) verbose.println("  Failed to expand/add view="+selected.id+". Discarding.");
 				continue;
+			}
+			if( verbose != null ) {
+				verbose.println("  Success Expanding: view=" + selected.id + "  inliers="
+						+ utils.inliersThreeView.size() + " / " + utils.matchesTriple.size);
 			}
 
 			// save the results
@@ -194,6 +208,7 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 			// Add views which are neighbors
 			addOpenForView(wview.pview, open);
 		}
+		if( verbose != null ) verbose.println("EXIT Expanding Scene");
 	}
 
 	/**
@@ -228,44 +243,61 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 			if( found.contains(o) )
 				continue;
 
+			if( verbose != null ) verbose.println("  adding to open list view.id='"+o.id+"'");
 			found.add(o);
 			exploredViews.add(o.id);
 		}
 	}
 
 	/**
-	 * Selects next View to process based on the score of it's known connections. At least two connections is preferred
-	 * and the score is based on the worst score of the two connections.
+	 * Selects next View to process based on the score of it's known connections. Two connections which both
+	 * connect to each other is required.
 	 */
 	View selectNextToProcess( FastArray<View> open ) {
 		int bestIdx = -1;
 		double bestScore = 0.0;
-		int bestConnections = 0;
-		for (int openIdx = 0; openIdx < open.size; openIdx++) {
-			View pview = open.get(openIdx);
+		int bestValidCount = 0;
 
-			int totalConnections = 0;
-			double score = Double.MAX_VALUE;
+		List<PairwiseImageGraph2.View> valid = new ArrayList<>();
+
+		for (int openIdx = 0; openIdx < open.size; openIdx++) {
+			final View pview = open.get(openIdx);
+
+			// Create a list of valid views pview can connect too
+			valid.clear();
 			for (int connIdx = 0; connIdx < pview.connections.size; connIdx++) {
 				PairwiseImageGraph2.Motion m = pview.connections.get(connIdx);
 				View dst = m.other(pview);
-
-				// View must already be known for connection to be considered
-				if( !workGraph.isKnown(dst) )
+				if( !m.is3D || !workGraph.isKnown(dst) )
 					continue;
+				valid.add(dst);
+			}
+			double bestLocalScore = 0.0;
+			for (int idx0 = 0; idx0 < valid.size(); idx0++) {
+				View dst = valid.get(idx0);
 
-				// Only save the worst score
-				score = Math.min(score,utils.scoreMotion.score(m));
-				totalConnections++;
+				for (int idx1 = idx0+1; idx1 < valid.size(); idx1++) {
+					if( null == dst.findMotion(valid.get(idx1)) )
+						continue;
+
+					PairwiseImageGraph2.Motion m0 = pview.findMotion(dst);
+					PairwiseImageGraph2.Motion m1 = pview.findMotion(valid.get(idx1));
+					PairwiseImageGraph2.Motion m2 = dst.findMotion(valid.get(idx1));
+
+					double s = Math.min(utils.scoreMotion.score(m0),utils.scoreMotion.score(m1));
+					s = Math.min(s,utils.scoreMotion.score(m2));
+
+					bestLocalScore = Math.max(s,bestLocalScore);
+				}
 			}
 
-			// Prefer two connections
-			if( bestConnections < totalConnections && bestConnections < 2 ) {
-				bestConnections = totalConnections;
-				bestScore = score;
-				bestIdx = openIdx;
-			} else if( bestConnections == totalConnections && score != Double.MAX_VALUE && bestScore < score ) {
-				bestScore = score;
+//			System.out.println("view.id="+pview.id+"  valid.size"+valid.size()+" score="+bestLocalScore);
+
+			// strongly prefer 3 or more. Technically the above test won't check for this but in the future it will
+			// so this test serves as a reminder
+			if( Math.min(3,valid.size()) >= bestValidCount && bestLocalScore > bestScore ) {
+				bestValidCount = Math.min(3,valid.size());
+				bestScore = bestLocalScore;
 				bestIdx = openIdx;
 			}
 		}
@@ -274,7 +306,7 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 			return null;
 
 		View selected = open.removeSwap(bestIdx);
-		if( verbose != null ) verbose.println("  open.size="+open.size+" selected.id="+selected.id+" score="+bestScore+" conn="+bestConnections);
+		if( verbose != null ) verbose.println("  open.size="+open.size+" selected.id="+selected.id+" score="+bestScore+" conn="+bestValidCount);
 
 		return selected;
 	}

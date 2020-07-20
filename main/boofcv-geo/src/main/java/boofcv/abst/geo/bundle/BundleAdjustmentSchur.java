@@ -90,6 +90,13 @@ public class BundleAdjustmentSchur<Structure extends SceneStructure, M extends D
 
 		double before = minimizer.getFunctionValue();
 		for( int i = 0; i < maxIterations && !stopRequested; i++ ) {
+//			DMatrixRMaj residual = ((UnconLeastSqLevenbergMarquardtSchur_F64)minimizer).residuals;
+//			for (int j = 0; j < residual.numRows; j++) {
+//				double r = residual.data[j];
+//				if( Math.abs(r) > 1 ) {
+//					System.out.println(j+" large residual "+r);
+//				}
+//			}
 			if( minimizer.iterate() )
 				break;
 		}

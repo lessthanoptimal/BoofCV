@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.structure2;
 
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.pose.CompatibleProjectiveHomography;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.Motion;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
@@ -41,48 +42,49 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestProjectiveReconstructionFromPairwiseGraph {
 
 	/**
-	 * Test with the minimum number of views
+	 * Random scene with fairly linear motion. Everything is randomized and physical constraints on camera are enforced
 	 */
 	@Test
-	void process_perfect_linear_3() {
+	void process_perfect() {
+		// NOTE: Accuracy degrades as the number of views increases. The tolerance is also hard coded at 1e-5 and 1e-7 or 1e-8
+		//       would be more reasonable upper limit
+		//       Additional work should be put into this so that accuracy with perfect data is independent of the number
+		//       of views.
+
 		var alg = new ProjectiveReconstructionFromPairwiseGraph();
-		alg.getInitProjective().utils.configConvergeSBA.maxIterations = 0; // TODO remove.  SBA causes an error. Normalization?
-		var db = new MockLookupSimilarImagesCircleAround().init(3,1);
-
-		assertTrue(alg.process(db,db.graph));
-
-		checkCameraMatrices(alg, db);
-	}
-
-	/**
-	 * Test with a bunch of views
-	 */
-	@Test
-	void process_perfect_linear_10() {
-		var alg = new ProjectiveReconstructionFromPairwiseGraph();
-		alg.getInitProjective().utils.configConvergeSBA.maxIterations = 0; // TODO remove. SBA causes an error. Normalization?
-		var db = new MockLookupSimilarImagesCircleAround().init(10,2);
-
-		assertTrue(alg.process(db,db.graph));
-
-		checkCameraMatrices(alg, db);
+		for (int numViews = 3; numViews <= 20; numViews++) {
+			System.out.println("numViews = "+numViews);
+			var db = new MockLookupSimilarImagesRealistic().setLoop(false).setSeed(numViews).setFeatures(450).pathLine(numViews,0.30,6.0,2);
+			PairwiseImageGraph2 graph = db.createPairwise();
+			assertTrue(alg.process(db,graph));
+			checkCameraMatrices(alg,db);
+		}
 	}
 
 	/**
 	 * Compare found camera matrices against truth by converting them into the same projective scale
 	 */
-	private void checkCameraMatrices(ProjectiveReconstructionFromPairwiseGraph alg, MockLookupSimilarImagesCircleAround db) {
-		List<SceneWorkingGraph.View> foundViews = new ArrayList<>(alg.workGraph.getAllViews());
-		assertEquals(db.graph.nodes.size, foundViews.size());
+	private void checkCameraMatrices(ProjectiveReconstructionFromPairwiseGraph alg, MockLookupSimilarImagesRealistic db) {
+		List<SceneWorkingGraph.View> foundViews = alg.workGraph.getAllViews();
+		assertEquals(db.views.size(), foundViews.size());
+
+		// Undo apply and undo the shift in pixel coordinates
+		DMatrixRMaj M_inv = CommonOps_DDRM.identity(3);
+		M_inv.set(0,2,db.intrinsic.width/2);
+		M_inv.set(1,2,db.intrinsic.height/2);
+
+		var tmp = new DMatrixRMaj(3,4);
 
 		CompatibleProjectiveHomography compatible = new CompatibleProjectiveHomography();
 		List<DMatrixRMaj> listA = new ArrayList<>();
 		List<DMatrixRMaj> listB = new ArrayList<>();
 
-		for( String id : db.viewIds ) {
-//			System.out.println("id="+id+" index="+db.viewIds.indexOf(id));
-			listA.add( alg.workGraph.lookupView( id ).projective);
-			listB.add( db.listCameraMatrices.get( db.viewIds.indexOf(id)) );
+		for( MockLookupSimilarImagesRealistic.View mv : db.views ) {
+			DMatrixRMaj found = alg.workGraph.lookupView( mv.id ).projective;
+//			found.print();
+			CommonOps_DDRM.mult(M_inv,found, tmp);
+			listA.add( tmp.copy() );
+			listB.add( mv.camera );
 		}
 
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
@@ -92,9 +94,9 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 		for (int i = 0; i < listA.size(); i++) {
 			CommonOps_DDRM.mult(listA.get(i),H,found);
 			DMatrixRMaj expected = listB.get(i);
-			double scale = expected.get(0,0)/found.get(0,0);
+			double scale = MultiViewOps.findScale(found,expected);
 			CommonOps_DDRM.scale(scale,found);
-			double tol = CommonOps_DDRM.elementMaxAbs(found)*1e-4;
+			double tol = CommonOps_DDRM.elementMaxAbs(found)*1e-6; // TODO change to 1e-7
 			assertTrue(MatrixFeatures_DDRM.isIdentical(expected,found, tol));
 		}
 	}
@@ -119,19 +121,26 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 	}
 
 	/**
-	 * Simple tests which gives it an obvious answer
+	 * All three connections (a->b, a->c, b->c)  must have good scores for it to be selected
 	 */
 	@Test
-	void selectNextToProcess() {
+	void selectNextToProcess_AllScoresGood() {
 		var alg = new ProjectiveReconstructionFromPairwiseGraph();
 
 		// Create a linear graph and make every node known and add it to the list
 		var open = new FastArray<>(View.class);
-		PairwiseImageGraph2 graph = createLinearGraph(8, 1);
+		PairwiseImageGraph2 graph = createLinearGraph(8, 2);
+		// Ensure every view has at most 3 connections to make designing this test easier
+		removeLastConnection(graph);
+
 		open.addAll(graph.nodes);
 		open.forEach((i,o)->alg.workGraph.addView(o));
-		View expected = open.get(4);
-		expected.connections.forEach((i,o)->o.countH=50); // make them have better scores
+		View expected = open.get(4); // make #4 only have a slightly better score, and a valid set of connections
+		View expectedConnA = expected.connections.get(0).other(expected);
+		View expectedConnB = expected.connections.get(1).other(expected);
+		expected.connections.get(0).countH = 80;
+		expected.connections.get(1).countH = 80;
+		expectedConnA.findMotion(expectedConnB).countH = 80; // it picks the lowest scored connection
 
 		View selected = alg.selectNextToProcess(open);
 		assertSame(expected, selected);
@@ -146,40 +155,43 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 
 		// Create a linear graph and make every node known and add it to the list
 		var open = new FastArray<>(View.class);
-		PairwiseImageGraph2 graph = createLinearGraph(12, 1);
-		open.addAll(graph.nodes);
-		// This view is not known and will be ignored
-		open.get(4).connections.forEach((i,o)->o.countH=50); // ensure this view has a better score
-		// this view is known but has a worse score
-		View expected = open.get(8);
-		expected.connections.forEach((i,o)->o.countH=70); // ensure this view has a better score
-		alg.workGraph.addView(open.get(8));
-		open.forEach(7,10,(i,o)->alg.workGraph.addView(o));
+		PairwiseImageGraph2 graph = createLinearGraph(8, 2);
+		// Ensure every view has at most 3 connections to make designing this test easier
+		removeLastConnection(graph);
 
+		open.addAll(graph.nodes);
+		// Only #7 will have a full set of known connections
+		open.forEach(5,8,(i,o)->alg.workGraph.addView(o));
+		View expected = open.get(7);
 		View selected = alg.selectNextToProcess(open);
+
+		// if all where known then #2 would be selected since it's earlier in the order
 		assertSame(expected, selected);
 	}
 
+	private void removeLastConnection(PairwiseImageGraph2 graph) {
+		for (int i = 0; i < graph.nodes.size - 1; i++) {
+			FastArray<Motion> conn = graph.nodes.get(i).connections;
+			conn.remove(conn.size - 1);
+		}
+	}
+
 	/**
-	 * Set up a situation where if the code relies on the score only it will select the wrong view
+	 * Fail if two connections have no common connection between them
 	 */
 	@Test
-	void selectNextToProcess_PreferTwoConnections() {
+	void selectNextToProcess_TwoConnections_NoCommon() {
 		var alg = new ProjectiveReconstructionFromPairwiseGraph();
 
-		// Create a linear graph and make every node known and add it to the list
+		// Each view will have two connections but the connections with not be connected to each other
 		var open = new FastArray<>(View.class);
 		PairwiseImageGraph2 graph = createLinearGraph(8, 1);
+
 		open.addAll(graph.nodes);
 		open.forEach((i,o)->alg.workGraph.addView(o));
-		View expected = open.get(4); // make #4 only have a slightly better score, and two connections
-		expected.connections.forEach((i,o)->o.countH=80);
-		View modified = open.get(5); // will have a massive better score but only one connection
-		modified.connections.remove(0);
-		modified.connections.get(0).countH = 20;
 
 		View selected = alg.selectNextToProcess(open);
-		assertSame(expected, selected);
+		assertSame(null, selected);
 	}
 
 	@Test
@@ -191,7 +203,7 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 			PairwiseImageGraph2 graph = createLinearGraph(8, 1);
 			Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
 			List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
-			assertEquals(2, seeds.size()); // determined through manual inspection
+			assertEquals(3, seeds.size()); // determined through manual inspection
 			sanityCheckSeeds(seeds);
 		}
 
@@ -206,17 +218,17 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 
 		// Let's make one node clearly very desirable and see if it's selected
 		{
-			PairwiseImageGraph2 graph = createLinearGraph(9, 1);
 			// select different targets to stress the system more
-			for (int targetIdx = 0; targetIdx < 3; targetIdx++) {
+			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
+				PairwiseImageGraph2 graph = createLinearGraph(9, 1);
 				View target = graph.nodes.get(targetIdx);
 				target.connections.forEach((i,o)->o.countH=20);
 
 				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
 				List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
-				assertEquals(3, seeds.size()); // determined through manual inspection
+				assertTrue(3 == seeds.size() || 2 == seeds.size()); // determined through manual inspection
 				sanityCheckSeeds(seeds);
-				assertTrue(seeds.contains(mapScores.get(target.id)));
+				assertSame(seeds.get(0).seed,target);
 			}
 		}
 	}
@@ -279,7 +291,9 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 		for (int i = 0; i < numViews; i++) {
 			View va = graph.nodes.get(i);
 			for (int j = 1; j <= numConnect; j++) {
-				int idx = (i+j)%numViews;
+				int idx = i+j;
+				if( idx >= numViews)
+					break;
 				View vb = graph.nodes.get(idx);
 				Motion c = graph.connect(va,vb);
 				c.is3D = true;

@@ -23,11 +23,15 @@ import boofcv.alg.sfm.structure2.PairwiseImageGraph2.Motion;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Expands an existing projective scene to include a new view. At least two neighbors with a known projective transform
@@ -48,7 +52,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ProjectiveExpandByOneView {
+public class ProjectiveExpandByOneView implements VerbosePrint {
 
 	// Used to make two sets of equivalent projective transforms compatible with each other
 	CompatibleProjectiveHomography findCompatible = new CompatibleProjectiveHomography();
@@ -59,6 +63,9 @@ public class ProjectiveExpandByOneView {
 	/** Common algorithms for reconstructing the projective scene */
 	@Getter	@Setter PairwiseGraphUtils utils = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
 
+	// If not null then print debugging information
+	PrintStream verbose;
+
 	//------------------------- Local work space
 
 	// Storage fort he two selected connections with known cameras
@@ -66,6 +73,7 @@ public class ProjectiveExpandByOneView {
 
 	// homography to convert local camera matrices into ones in global
 	DMatrixRMaj localToGlobal = new DMatrixRMaj(4,4);
+	DMatrixRMaj globalToLocal = new DMatrixRMaj(4,4);
 
 	// Storage for camera matrices
 	List<DMatrixRMaj> camerasLocal = new ArrayList<>();
@@ -79,45 +87,66 @@ public class ProjectiveExpandByOneView {
 	 *
 	 * @param db (Input) image data base
 	 * @param workGraph (Input) scene graph
-	 * @param seed (Input) The view that needs its projective camera estimated
+	 * @param target (Input) The view that needs its projective camera estimated and the graph is being expanded into
 	 * @param cameraMatrix (output) the found camera matrix
 	 * @return true if successful and the camera matrix computed
 	 */
 	public boolean process( LookupSimilarImages db ,
 							SceneWorkingGraph workGraph ,
-							View seed ,
+							View target ,
 							DMatrixRMaj cameraMatrix )
 	{
 		this.workGraph = workGraph;
 		this.utils.db = db;
 
 		// Select two known connected Views
-		if( !selectTwoConnections(seed,connections) )
+		if( !selectTwoConnections(target,connections) ) {
+			if( verbose != null ) {
+				verbose.println( "Failed to expand because two connections couldn't be found. valid.size=" +
+						validCandidates.size());
+				for (int i = 0; i < validCandidates.size(); i++) {
+					verbose.println("   valid view.id='"+validCandidates.get(i).other(target).id+"'");
+				}
+			}
 			return false;
+		}
 
 		// Find features which are common between all three views
-		utils.seed = seed;
-		utils.viewB = connections.get(0).other(seed);
-		utils.viewC = connections.get(1).other(seed);
+		utils.seed = target;
+		utils.viewB = connections.get(0).other(target);
+		utils.viewC = connections.get(1).other(target);
 		utils.createThreeViewLookUpTables();
 		utils.findCommonFeatures();
+
+		if( verbose != null ) {
+			verbose.println( "Expanding to view='"+target.id+"' using views ( '"+utils.viewB.id+"' , '"+utils.viewC.id+
+					"') common="+utils.commonIdx.size+" valid.size="+validCandidates.size());
+		}
 
 		// Estimate trifocal tensor using three view observations
 		utils.createTripleFromCommon();
 		if( !utils.estimateProjectiveCamerasRobustly() )
 			return false;
 
-		// Bundle adjustment
-		utils.initializeSbaSceneThreeView();
+		// Compute the conversion which will make the two frames compatible
+		if (!computeConversionHomography()) // TODO refine by minimizing reprojection error
+			return false;
+
+		// Improve the fit using bundle adjustment. This will reduce the rate at which errors are built up since
+		// It's important to optimize in the local frame since numbers involved will not be too large or small
+		// NOTE: Still might not be a bad idea to adjust the scale of everything first
+		// The lines below convert the known camera frames from global into local frame
+		CommonOps_DDRM.invert(localToGlobal,globalToLocal);
+		CommonOps_DDRM.mult(workGraph.lookupView(utils.viewB.id).projective,globalToLocal,utils.P2);
+		CommonOps_DDRM.mult(workGraph.lookupView(utils.viewC.id).projective,globalToLocal,utils.P3);
+
+		// fix cameras P2 and P3 and let everything else float
+		utils.initializeSbaSceneThreeView(false);
 		utils.initializeSbaObservationsThreeView();
 		utils.refineWithBundleAdjustment();
 
-		// Make the two projective frames compatible
-		if (!computeConversionHomography())
-			return false;
-
-		// Add the view to the scene graph and save the found projective camera
-		CommonOps_DDRM.mult(utils.P1,localToGlobal,cameraMatrix);
+		// Convert the refined results into global projective frame
+		CommonOps_DDRM.mult(utils.structure.getViews().get(0).worldToView,localToGlobal,cameraMatrix);
 
 		return true;
 	}
@@ -153,8 +182,8 @@ public class ProjectiveExpandByOneView {
 		createListOfValid(target, validCandidates);
 
 		double bestScore = 0.0;
-		for (int connectionIdx = 0; connectionIdx < validCandidates.size(); connectionIdx++) {
-			Motion connectB = validCandidates.get(connectionIdx);
+		for (int connectionCnt = 0; connectionCnt < validCandidates.size(); connectionCnt++) {
+			Motion connectB = validCandidates.get(connectionCnt);
 			Motion connectC = findBestCommon(target,connectB, validCandidates);
 			if( connectC == null )
 				continue; // no common connection could be found
@@ -223,5 +252,10 @@ public class ProjectiveExpandByOneView {
 		}
 
 		return bestConnection;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		this.verbose = out;
 	}
 }

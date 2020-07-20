@@ -22,6 +22,7 @@ import boofcv.errors.BoofAssertFailure;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 import georegression.struct.GeoTuple;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
@@ -54,6 +55,14 @@ public class BoofMiscOps {
 		if( value >= max )
 			return max;
 		return value;
+	}
+
+	public static void offsetPixels(final List<Point2D_F64> list , final double dx, final double dy ) {
+		for (int i = 0; i < list.size(); i++) {
+			Point2D_F64 p = list.get(i);
+			p.x += dx;
+			p.y += dy;
+		}
 	}
 
 	public static String[] toStringArray( List<File> files ) {

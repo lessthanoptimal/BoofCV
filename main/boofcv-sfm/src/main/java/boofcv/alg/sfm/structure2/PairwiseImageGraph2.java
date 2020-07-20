@@ -108,7 +108,6 @@ public class PairwiseImageGraph2 {
 			return -1;
 		}
 
-
 		/**
 		 * Adds the views that it's connected to from the list
 		 */
@@ -118,6 +117,10 @@ public class PairwiseImageGraph2 {
 			for (int i = 0; i < length; i++) {
 				views.add( connections.get(indexes[i]).other(this));
 			}
+		}
+
+		public String toString() {
+			return "PView{id="+id+", conn="+connections.size+", obs="+totalObservations+"}";
 		}
 	}
 
@@ -165,6 +168,11 @@ public class PairwiseImageGraph2 {
 			} else {
 				throw new RuntimeException("BUG!");
 			}
+		}
+
+		@Override
+		public String toString() {
+			return "Motion( "+(is3D?"3D ":"")+" '"+src.id+"' <-> '"+dst.id+"')";
 		}
 	}
 }

@@ -24,6 +24,8 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.pose.CompatibleProjectiveHomography;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.Motion;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.testing.BoofTesting;
@@ -49,6 +51,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestProjectiveInitializeAllCommon {
 
+	final static double reprojectionTol = 1e-5;
+	final static double matrixTol = 1e-4;
+
 	Random rand = BoofTesting.createRandom(3);
 
 	/**
@@ -56,24 +61,30 @@ class TestProjectiveInitializeAllCommon {
 	 */
 	@Test
 	void perfect_connections_2() {
+
+		// NOTES: Using regular pixels maxed out at 12
+		//        With zero centering maxed out at 14
+
 		var alg = new ProjectiveInitializeAllCommon();
+//		alg.utils.sba.setVerbose(System.out,null);
 
 		for (int seedIdx = 0; seedIdx < 3; seedIdx++) {
-			var db = new MockLookupSimilarImages(4,0xDEADBEEF);
-			View seed = db.graph.nodes.get(seedIdx);
+			var db = new MockLookupSimilarImagesRealistic().pathCircle(4,2);
+			PairwiseImageGraph2 graph = db.createPairwise();
+
+			View seed = graph.nodes.get(seedIdx);
 			var seedConnIdx = GrowQueue_I32.array(0,2);
 
-			// Give a subset as a test to see if the size is being properly pass down the chain
-			int offset = 0;
-			int numFeatures = db.feats3D.size()-offset;
-			var seedFeatsIdx = GrowQueue_I32.range(0,numFeatures);
-			PrimitiveArrays.shuffle(seedFeatsIdx.data,0,seedFeatsIdx.size,rand); // order should not matter
+			// in this specific scenario all features are visible by all frames
+			var seedFeatsIdx = GrowQueue_I32.range(0,db.numFeatures);
+			// however not all features are in the inlier set. Remove all features not in inlier set
+			removeConnectionOutliers(seed, seedFeatsIdx);
 
 			// Reconstruct the projective scene
 			assertTrue(alg.projectiveSceneN(db,seed,seedFeatsIdx,seedConnIdx));
 
 			// test results
-			checkReconstruction(alg, db, seedConnIdx, numFeatures, 1e-4);
+			checkReconstruction(alg, db, seedConnIdx, reprojectionTol);
 			checkCameraMatrices(alg, db);
 		}
 	}
@@ -88,8 +99,11 @@ class TestProjectiveInitializeAllCommon {
 		for (int numConnections = 3; numConnections <= 6; numConnections++) {
 			// do a few trials since things are randomized to shake out more bugs potentially
 			for (int trial = 0; trial < 3; trial++) {
-				var db = new MockLookupSimilarImages(6,0xDEADBEEF);
-				View seed = db.graph.nodes.get(0);
+				var db = new MockLookupSimilarImagesRealistic().pathCircle(6,2);
+				List<String> viewIdStr = db.getImageIDs();
+
+				PairwiseImageGraph2 graph = db.createPairwise();
+				View seed = graph.nodes.get(0);
 
 				// randomly select the connections
 				var seedConnIdx = new GrowQueue_I32();
@@ -101,18 +115,44 @@ class TestProjectiveInitializeAllCommon {
 				}
 				PrimitiveArrays.shuffle(seedConnIdx.data,0,seedConnIdx.size,rand); // order should not matter
 
-				// Give a subset as a test to see if the size is being properly pass down the chain
-				var seedFeatsIdx = new GrowQueue_I32();
-				int offset = 0;
-				int numFeatures = db.feats3D.size()-offset;
-				for (int i = offset; i < numFeatures; i++) { seedFeatsIdx.add(i);}
+				// index of connected views in ground truth
+				var connectedViewidx = new GrowQueue_I32();
+				for (int i = 0; i < seedConnIdx.size; i++) {
+					String id = seed.connections.get(seedConnIdx.get(i)).other(seed).id;
+					connectedViewidx.add( viewIdStr.indexOf(id) );
+				}
+
+				// in this specific scenario all features are visible by all frames
+				var seedFeatsIdx = GrowQueue_I32.range(0,db.numFeatures);
+				// however not all features are in the inlier set. Remove all features not in inlier set
+				removeConnectionOutliers(seed, seedFeatsIdx);
+
 				PrimitiveArrays.shuffle(seedFeatsIdx.data,0,seedFeatsIdx.size,rand); // order should not matter
 
 				// Reconstruct the projective scene
 				assertTrue(alg.projectiveSceneN(db,seed,seedFeatsIdx,seedConnIdx));
 
 				// test results
-				checkReconstruction(alg, db, seedConnIdx, numFeatures, 1e-4);
+				checkReconstruction(alg, db, seedConnIdx, reprojectionTol);
+			}
+		}
+	}
+
+	private void removeConnectionOutliers(View seed, GrowQueue_I32 seedFeatsIdx) {
+		for( Motion m : seed.connections.toList() ) {
+			// mark all indexes which are inliers
+			boolean isSrc = m.src == seed;
+			boolean[] inlier = new boolean[seed.totalObservations];
+			for(AssociatedIndex a : m.inliers.toList() ) {
+				inlier[isSrc?a.src:a.dst] = true;
+			}
+			// remove the outliers
+			for (int i = 0; i < inlier.length; i++) {
+				if( !inlier[i] ) {
+					int idx = seedFeatsIdx.indexOf(i);
+					if( idx >= 0 )
+						seedFeatsIdx.remove(idx);
+				}
 			}
 		}
 	}
@@ -146,7 +186,6 @@ class TestProjectiveInitializeAllCommon {
 		checkConfiguration(alg,db,false,true,false, 1e-4);
 		checkConfiguration(alg,db,false,true,true, 1e-4);
 		checkConfiguration(alg,db,false,false,false, 1e-4);
-
 	}
 
 	private void checkConfiguration( ProjectiveInitializeAllCommon alg, MockLookupSimilarImages db,
@@ -222,19 +261,75 @@ class TestProjectiveInitializeAllCommon {
 	}
 
 	/**
+	 * Check reconstruction by seeing if it's consistent with the input observations
+	 */
+	private void checkReconstruction(ProjectiveInitializeAllCommon alg,
+									 MockLookupSimilarImagesRealistic db,
+									 GrowQueue_I32 seedConnIdx,
+									 double reprojectionTol ) {
+
+		final SceneStructureProjective structure = alg.getStructure();
+
+		// Sanity check the number of each type of structure
+		assertEquals(seedConnIdx.size+1,structure.views.size);
+
+		List<String> viewIds = BoofMiscOps.collectList(db.views,v->v.id);
+		int dbIndexSeed = viewIds.indexOf(alg.getPairwiseGraphViewByStructureIndex(0).id);
+
+		// Check results for consistency. Can't do a direct comparision to ground truth since a different
+		// but equivalent projective frame would have been estimated.
+		Point4D_F64 X = new Point4D_F64();
+		Point2D_F64 found = new Point2D_F64();
+		for (int i = 0; i < alg.inlierToSeed.size; i++) {
+			int seedFeatureIdx = alg.inlierToSeed.get(i);
+			int truthFeatIdx = db.observationToFeatureIdx(dbIndexSeed,seedFeatureIdx);
+			int structureIdx = alg.seedToStructure.get(seedFeatureIdx);
+			assertTrue(structureIdx>=0); // only features that have structure should be in this list
+
+			// Get the estimated point in 3D
+			structure.points.get(structureIdx).get(X);
+
+			// Project the point to the camera using found projection matrices
+			for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
+				int viewDbIdx = viewIds.indexOf(alg.getPairwiseGraphViewByStructureIndex(viewIdx).id);
+				// Project this feature to the camera
+				DMatrixRMaj P = structure.views.get(viewIdx).worldToView;
+				PerspectiveOps.renderPixel(P,X,found);
+				// undo the offset
+				found.x += db.intrinsic.width/2;
+				found.y += db.intrinsic.height/2;
+
+				// Lookup the expected pixel location
+				// The seed feature ID and the ground truth feature ID are the same
+				Point2D_F64 expected = db.featureToObservation(viewDbIdx,truthFeatIdx).pixel;
+
+				assertEquals(0.0,expected.distance(found), reprojectionTol);
+			}
+		}
+	}
+
+	/**
 	 * Check camera matrices directly by computing a matrix which allows direct comparision of the two sets
 	 */
 	private void checkCameraMatrices( ProjectiveInitializeAllCommon alg,
-									  MockLookupSimilarImages db )
+									  MockLookupSimilarImagesRealistic db )
 	{
 		List<DMatrixRMaj> listA = new ArrayList<>();
 		List<DMatrixRMaj> listB = new ArrayList<>();
 
+		// Undo the shift in pixel coordinates
+		DMatrixRMaj M = CommonOps_DDRM.identity(3);
+		M.set(0,2,db.intrinsic.width/2);
+		M.set(1,2,db.intrinsic.height/2);
+
+		List<String> viewIds = BoofMiscOps.collectList(db.views,v->v.id);
 		for (int i = 0; i < 3; i++) {
 			View view = alg.getPairwiseGraphViewByStructureIndex(i);
-			listA.add(alg.utils.structure.views.get(i).worldToView);
-			int viewDbIdx = db.viewIds.indexOf(view.id);
-			listB.add(db.listCameraMatrices.get(viewDbIdx));
+			DMatrixRMaj P = new DMatrixRMaj(3,4);
+			CommonOps_DDRM.mult(M,alg.utils.structure.views.get(i).worldToView,P);
+			listA.add(P);
+			int viewDbIdx = viewIds.indexOf(view.id);
+			listB.add(db.views.get(viewDbIdx).camera);
 		}
 
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
@@ -248,7 +343,7 @@ class TestProjectiveInitializeAllCommon {
 			DMatrixRMaj expected = listB.get(i);
 			double scale = expected.get(0,0)/found.get(0,0);
 			CommonOps_DDRM.scale(scale,found);
-			assertTrue(MatrixFeatures_DDRM.isEquals(expected,found, 1e-4));
+			assertTrue(MatrixFeatures_DDRM.isEquals(expected,found, matrixTol));
 		}
 	}
 

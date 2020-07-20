@@ -211,11 +211,18 @@ public abstract class SceneStructureCommon implements SceneStructure {
 			p.z = coordinate[2];
 		}
 
-		public void get(Point4D_F64 p ) {
+		public void get( Point4D_F64 p ) {
 			p.x = coordinate[0];
 			p.y = coordinate[1];
 			p.z = coordinate[2];
 			p.w = coordinate[3];
+		}
+
+		public void get3( Point4D_F64 p ) {
+			p.x = coordinate[0];
+			p.y = coordinate[1];
+			p.z = coordinate[2];
+			p.w = 1.0;
 		}
 
 		public double getX() {

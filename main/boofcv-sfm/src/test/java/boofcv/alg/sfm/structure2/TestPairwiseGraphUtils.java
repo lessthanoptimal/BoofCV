@@ -21,9 +21,11 @@ package boofcv.alg.sfm.structure2;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.TrifocalTensor;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
+import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
@@ -32,6 +34,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -209,7 +212,7 @@ class TestPairwiseGraphUtils {
 
 		alg.inliersThreeView.add( new AssociatedTriple() );
 
-		alg.initializeSbaSceneThreeView();
+		alg.initializeSbaSceneThreeView(true);
 
 		assertEquals(1,alg.structure.points.size);
 
@@ -382,8 +385,61 @@ class TestPairwiseGraphUtils {
 	}
 
 	@Test
-	void saveInlierIndexes() {
-		fail("Implement");
+	void saveRansacInliers() {
+		var alg = new PairwiseGraphUtils();
+
+		SceneWorkingGraph.View viewA = new SceneWorkingGraph.View();
+		viewA.pview = new PairwiseImageGraph2.View();
+		viewA.pview.totalObservations = 120;
+
+		int numInliers = 50;
+		alg.seed = viewA.pview;
+		alg.viewB = new PairwiseImageGraph2.View();
+		alg.viewC = new PairwiseImageGraph2.View();
+
+		// tables need to cover every observation in A
+		alg.table_A_to_B.setTo(GrowQueue_I32.range(0,viewA.pview.totalObservations));
+		alg.table_A_to_C.setTo(GrowQueue_I32.range(0,viewA.pview.totalObservations));
+		PrimitiveArrays.shuffle(alg.table_A_to_B.data,0,alg.table_A_to_B.size, rand);
+		PrimitiveArrays.shuffle(alg.table_A_to_C.data,0,alg.table_A_to_C.size, rand);
+
+		alg.commonIdx.setTo(GrowQueue_I32.range(0,numInliers*2));
+
+		// just add elements until it hits the desired size
+		alg.inliersThreeView = new ArrayList<>();
+		for (int i = 0; i < numInliers; i++) {
+			alg.inliersThreeView.add(new AssociatedTriple());
+		}
+
+		// j = i*2
+		alg.ransac = new MockRansac();
+
+		alg.saveRansacInliers(viewA);
+
+		SceneWorkingGraph.InlierInfo inliers = viewA.projectiveInliers;
+		assertEquals(3, inliers.views.size);
+		assertSame(alg.seed, inliers.views.get(0));
+		assertSame(alg.viewB, inliers.views.get(1));
+		assertSame(alg.viewC, inliers.views.get(2));
+		assertEquals(3, inliers.observations.size);
+		for (int i = 0; i < 3; i++) {
+			GrowQueue_I32 indexes = inliers.observations.get(i);
+			assertEquals(numInliers,indexes.size);
+
+			if( i == 0 ) {
+				for (int j = 0; j < numInliers; j++) {
+					assertEquals(j*2, indexes.get(j));
+				}
+			} else if( i == 1 ) {
+				for (int j = 0; j < numInliers; j++) {
+					assertEquals(alg.table_A_to_B.get(j*2), indexes.get(j));
+				}
+			} else {
+				for (int j = 0; j < numInliers; j++) {
+					assertEquals(alg.table_A_to_C.get(j*2), indexes.get(j));
+				}
+			}
+		}
 	}
 
 	@Nested
@@ -407,5 +463,18 @@ class TestPairwiseGraphUtils {
 			double score2 = scorer.score(m);
 			assertTrue(score2 > score1);
 		}
+	}
+
+	private static class MockRansac implements ModelMatcher<TrifocalTensor, AssociatedTriple>
+	{
+		@Override public boolean process(List<AssociatedTriple> dataSet) { return false; }
+		@Override public TrifocalTensor getModelParameters() { return null; }
+		@Override public List<AssociatedTriple> getMatchSet() { return null; }
+		@Override public int getInputIndex(int matchIndex) { return matchIndex*2; }
+		@Override public double getFitQuality() { return 0; }
+		@Override public int getMinimumSize() { return 0; }
+		@Override public void reset() {}
+		@Override public Class<AssociatedTriple> getPointType() { return null; }
+		@Override public Class<TrifocalTensor> getModelType() { return null; }
 	}
 }

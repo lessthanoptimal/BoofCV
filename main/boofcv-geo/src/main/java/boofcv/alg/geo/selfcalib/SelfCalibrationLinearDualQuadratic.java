@@ -20,6 +20,8 @@ package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
+import lombok.Getter;
+import lombok.Setter;
 import boofcv.struct.calib.CameraPinhole;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
@@ -66,12 +68,12 @@ import java.util.Arrays;
  */
 public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
-	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10,10,
+	@Getter SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10,10,
 			false,true,true);
 
 	// constraints
-	boolean knownAspect;
-	boolean zeroSkew;
+	@Getter boolean knownAspect;
+	@Getter boolean zeroSkew;
 
 	// number of equations
 	int eqs;
@@ -86,7 +88,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	DMatrix4x4 Q = new DMatrix4x4();
 
 	// A singular value is considered zero if it is smaller than this number
-	double singularThreshold=1e-3;
+	@Getter @Setter double singularThreshold=1e-3;
 
 	//---------------- Internal workspace
 	private final DMatrixRMaj L = new DMatrixRMaj(1,1);

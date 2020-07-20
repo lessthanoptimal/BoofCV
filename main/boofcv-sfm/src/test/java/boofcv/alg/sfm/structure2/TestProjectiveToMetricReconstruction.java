@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.alg.geo.GeoTestingOps.isEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -52,6 +53,7 @@ public class TestProjectiveToMetricReconstruction {
 	 */
 	@Test
 	void process_almost_perfect_scene() {
+		// TODO udpate to new mock
 		var db = new MockLookupSimilarImagesCircleAround().setIntrinsic(intrinsic).init(10,1);
 		ProjectiveToMetricReconstruction alg = createAlg();
 
@@ -70,7 +72,7 @@ public class TestProjectiveToMetricReconstruction {
 			// check the cameras out
 			assertEquals(intrinsic.fx, v.pinhole.fx, 0.1);
 			assertEquals(intrinsic.fy, v.pinhole.fy, 0.1);
-			// principle point should be recentered
+			// principle point should be re-centered
 			assertEquals(intrinsic.cx, v.pinhole.cx, 1e-7);
 			assertEquals(intrinsic.cy, v.pinhole.cy, 1e-7);
 			BundlePinholeSimplified bundle = (BundlePinholeSimplified)alg.getRefinedCamera(id);
@@ -102,18 +104,22 @@ public class TestProjectiveToMetricReconstruction {
 			assertEquals(0.0,o.pixel.distance(found), 1e-5);
 		}));
 	}
+	@Test
+	void process_realistic() {
+		fail("Implement");
+	}
 
 	@Test
 	void upgradeViewsToMetric() {
 		var db = new MockLookupSimilarImagesCircleAround().setIntrinsic(intrinsic).init(6,1);
-		var alg = new ProjectiveToMetricReconstruction();
+		ProjectiveToMetricReconstruction alg = createAlg();
 		alg.config = new ConfigProjectiveToMetric();
 
 		alg.initialize(db,db.createWorkingGraph());
 		assertTrue(alg.upgradeViewsToMetric());
 
-		assertEquals(6,alg.workViews.size());
-		for( SceneWorkingGraph.View v : alg.workViews ) {
+		assertEquals(6,alg.graph.viewList.size());
+		for( SceneWorkingGraph.View v : alg.graph.viewList ) {
 			assertEquals(intrinsic.fx, v.pinhole.fx, UtilEjml.TEST_F64_SQ);
 			assertEquals(intrinsic.fy, v.pinhole.fy, UtilEjml.TEST_F64_SQ);
 			assertEquals(intrinsic.width, v.pinhole.width);
@@ -131,7 +137,7 @@ public class TestProjectiveToMetricReconstruction {
 		alg.initialize(db,working);
 		// set metric transform up using ground truth
 		db.listOriginToView.forEach((i,o)-> working.views.get(db.viewIds.get(i)).world_to_view.set(o));
-		alg.workViews.forEach(o->o.pinhole.set(intrinsicZero));
+		alg.graph.viewList.forEach(o->o.pinhole.set(intrinsicZero));
 
 		alg.createFeaturesFromInliers();
 
@@ -142,8 +148,7 @@ public class TestProjectiveToMetricReconstruction {
 		// Since every feature is visible in every frame and the inlier was set was constructed so that index 'i' in
 		// the inlier set matches with feature 'i' this test will work
 		for (int featCnt = 0; featCnt < db.numFeatures; featCnt++) {
-			assertEquals(0.0,
-					working.features.get(featCnt).location.distance(db.feats3D.get(featCnt)),1e-7);
+			assertTrue(isEquals(db.feats3D.get(featCnt),working.features.get(featCnt).location,1e-7));
 			SceneWorkingGraph.Feature f = working.features.get(featCnt);
 			f.observations.forEach( o->assertSame(f,o.view.obs_to_feat.get(o.observationIdx)));
 		}
@@ -173,7 +178,7 @@ public class TestProjectiveToMetricReconstruction {
 		alg.initialize(db,working);
 
 		// Pick a view and a couple of other views it's connected to
-		SceneWorkingGraph.View v0 = alg.workViews.get(0);
+		SceneWorkingGraph.View v0 = alg.graph.viewList.get(1);
 		SceneWorkingGraph.View v1 = working.lookupView(v0.pview.connections.get(0).other(v0.pview).id);
 		SceneWorkingGraph.View v2 = working.lookupView(v0.pview.connections.get(1).other(v0.pview).id);
 
@@ -224,10 +229,10 @@ public class TestProjectiveToMetricReconstruction {
 		alg.initialize(db,working);
 		// set metric transform up using ground truth
 		db.listOriginToView.forEach((i,o)-> working.views.get(db.viewIds.get(i)).world_to_view.set(o));
-		alg.workViews.forEach(o->o.pinhole.set(intrinsicZero));
+		alg.graph.viewList.forEach(o->o.pinhole.set(intrinsicZero));
 
 		Point3D_F64 X = new Point3D_F64();
-		SceneWorkingGraph.View view0 = alg.workViews.get(0);
+		SceneWorkingGraph.View view0 = alg.graph.viewList.get(0);
 
 		alg.loadInlierObservations(view0.projectiveInliers);
 
@@ -252,12 +257,12 @@ public class TestProjectiveToMetricReconstruction {
 
 		// set metric transform up using ground truth
 		db.listOriginToView.forEach((i,o)-> working.views.get(db.viewIds.get(i)).world_to_view.set(o));
-		alg.workViews.forEach(o->o.pinhole.set(intrinsicZero));
+		alg.graph.viewList.forEach(o->o.pinhole.set(intrinsicZero));
 
 		// create a very simple scene with all features at the origin and all visible
 		for (int featCnt = 0; featCnt < db.numFeatures; featCnt++) {
 			SceneWorkingGraph.Feature f = new SceneWorkingGraph.Feature();
-			f.location.set(0,0,0); // origin should be visible by all
+			f.location.set(0,0,0,1); // origin should be visible by all
 			for( SceneWorkingGraph.View v : working.views.values() ) {
 				SceneWorkingGraph.Observation o = new SceneWorkingGraph.Observation(v,featCnt);
 				f.observations.add(o);
@@ -288,8 +293,8 @@ public class TestProjectiveToMetricReconstruction {
 
 		//  see if it was removed from any of the views
 		int totalWithMissing = 0;
-		for (int i = 0; i < alg.workViews.size(); i++) {
-			if( alg.workViews.get(i).obs_to_feat.size() != db.numFeatures )
+		for (int i = 0; i < alg.graph.viewList.size(); i++) {
+			if( alg.graph.viewList.get(i).obs_to_feat.size() != db.numFeatures )
 				totalWithMissing++;
 		}
 		assertTrue(totalWithMissing>0 && totalWithMissing < 6);

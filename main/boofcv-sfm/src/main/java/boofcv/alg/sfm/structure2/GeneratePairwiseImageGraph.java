@@ -172,7 +172,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 			countH = ransacH.getMatchSet().size();
 		}
 
-		if( verbose != null ) verbose.println("   ransac F="+countF+" H="+countH+" out of "+pairs.size());
+		if( verbose != null ) verbose.println("   dst='"+dst+"' ransac F="+countF+" H="+countH+" pairs.size="+pairs.size());
 
 		// fail if not enough features are remaining after RANSAC
 		if( Math.max(countF,countH) < minimumInliers )
@@ -213,9 +213,10 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 		int N = ransac.getMatchSet().size();
 		edge.inliers.reset();
+		edge.inliers.resize(N);
 		for (int i = 0; i < N; i++) {
 			int idx = ransac.getInputIndex(i);
-			edge.inliers.grow().set(matches.get(idx));
+			edge.inliers.get(i).set(matches.get(idx));
 		}
 	}
 

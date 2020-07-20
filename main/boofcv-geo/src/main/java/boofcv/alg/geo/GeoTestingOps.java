@@ -150,4 +150,15 @@ public class GeoTestingOps {
 		double errorRad = ConvertRotation3D_F64.matrixToRodrigues(R,null).theta;
 		return Math.abs(errorRad) <= tolRad;
 	}
+
+	public static boolean isEquals( Point3D_F64 a , Point4D_F64 b , double tol ) {
+		if( b.w == 0.0 )
+			return false;
+
+		if( Math.abs(a.x-(b.x/b.w)) > tol )
+			return false;
+		if( Math.abs(a.y-(b.y/b.w)) > tol )
+			return false;
+		return !(Math.abs(a.z - (b.z / b.w)) > tol);
+	}
 }

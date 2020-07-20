@@ -77,6 +77,10 @@ Version : 0.37
 - MultiViewOps
   * Fixed decomposeMetricCamera() so that it doesn't change the scale of T. This messed up common frames
 
+Projective Exploration
+- Normalize before triangulation
+- Normalize before trying to upgrade scene to metric?
+
 TODO Move projective to metric and similar from multiview to perspective
 TODO Refactor DistanceFromModel.computeDistance() to distance() and distances() just before release
 TODO rename RansacMultiView to RansacCalibrated

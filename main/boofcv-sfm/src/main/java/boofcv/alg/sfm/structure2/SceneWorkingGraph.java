@@ -20,7 +20,7 @@ package boofcv.alg.sfm.structure2;
 
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.ddogleg.struct.FastArray;
@@ -28,18 +28,33 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
+ * A scene graph which is designed to be easy to manipulate as the scene's structure is determined. Intended to be
+ * used with {@link PairwiseImageGraph2}.
+ *
  * @author Peter Abeles
  */
 public class SceneWorkingGraph {
 
+	/** List of all views in the scene graph. Look up based on the image/view's id */
 	public final Map<String,View> views = new HashMap<>();
+	public final List<View> viewList = new ArrayList<>();
+	/** List of all features in the scene */
 	public final List<Feature> features = new ArrayList<>(); // TODO change to something else so remove() is faster
 
+	/**
+	 * Resets it into it's initial state.
+	 */
 	public void reset() {
 		views.clear();
+		viewList.clear();
 		features.clear();
 	}
 
@@ -55,7 +70,8 @@ public class SceneWorkingGraph {
 	public View addView( PairwiseImageGraph2.View pview ) {
 		View v = new View();
 		v.pview = pview;
-		views.put(v.pview.id,v);
+		assertBoof(null==views.put(v.pview.id,v),"There shouldn't be an existing view with the same key");
+		viewList.add(v);
 		return v;
 	}
 
@@ -66,18 +82,21 @@ public class SceneWorkingGraph {
 		return f;
 	}
 
-	public Collection<View> getAllViews() {
-		return views.values();
+	public List<View> getAllViews() {
+		return viewList;
 	}
 
+	/**
+	 * A 3D point feature and the list of observations of this feature.
+	 */
 	public static class Feature {
 		// location in world coordinates
-		public final Point3D_F64 location = new Point3D_F64();
+		public final Point4D_F64 location = new Point4D_F64();
 		// which views it's visible in
 		public final List<Observation> observations = new ArrayList<>();
 
 		public void reset() {
-			location.set(Double.NaN,Double.NaN,Double.NaN);
+			location.set(Double.NaN,Double.NaN,Double.NaN,Double.NaN);
 			observations.clear();
 		}
 
@@ -90,6 +109,10 @@ public class SceneWorkingGraph {
 		}
 	}
 
+	/**
+	 * Observation (pixel coordinates) of an image feature inside of a {@link View}. Specifies which observation in
+	 * the view it's associated with, the view, and a copy of the actual obnervation.
+	 */
 	public static class Observation {
 		// The view this feature was observed in
 		public View view;
@@ -108,6 +131,7 @@ public class SceneWorkingGraph {
 		public void reset() {
 			this.view = null;
 			this.observationIdx = -1;
+			this.pixel.set(Double.NaN,-Double.NaN);
 		}
 	}
 
@@ -133,7 +157,10 @@ public class SceneWorkingGraph {
 		}
 	}
 
-	public class View {
+	/**
+	 * Data structure related to an image. Points to image features, intrinsic parameters, and extrinsic parameters.
+	 */
+	static public class View {
 		public PairwiseImageGraph2.View pview;
 		// view to global
 		// provides a way to lookup features given their ID in the view

@@ -23,6 +23,7 @@ import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.scene.PointTrackerToSimilarImages;
 import boofcv.alg.sfm.structure2.*;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
@@ -78,11 +79,12 @@ public class ExampleMultiviewSceneReconstruction {
 			String id = similarImages.frames.getTail().frameID;
 			System.out.println("frame id = "+id+" active="+active+" dropped="+dropped);
 
-			if( sequence.getFrameNumber() >= 10 )
+			if( sequence.getFrameNumber() >= 6 )
 				break;
 		}
 
-		System.out.println("Creating pairwise");
+		System.out.println("----------------------------------------------------------------------------");
+		System.out.println("### Creating Pairwise");
 		var generatePairwise = new GeneratePairwiseImageGraph();
 		generatePairwise.setVerbose(System.out,null);
 		generatePairwise.process(similarImages);
@@ -107,19 +109,22 @@ public class ExampleMultiviewSceneReconstruction {
 		System.out.println("  nodes with no 3D "+nodesWithNo3D);
 
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("Projective Reconstruction");
+		System.out.println("### Projective Reconstruction");
 		var projective = new ProjectiveReconstructionFromPairwiseGraph();
 		projective.setVerbose(System.out,null);
+		projective.getInitProjective().setVerbose(System.out,null);
+//		projective.getExpandProjective().setVerbose(System.out,null);
 		if( !projective.process(similarImages,pairwise) ) {
 			System.err.println("Projective failed");
 			System.exit(0);
 		}
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("Metric Reconstruction");
+		System.out.println("### Metric Reconstruction");
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
 		TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated(null);
 		var metric = new ProjectiveToMetricReconstruction(new ConfigProjectiveToMetric(),bundleAdjustment,triangulator);
 		metric.setVerbose(System.out,null);
+//		metric.getBundleAdjustment().setVerbose(System.out,0);
 		if( !metric.process(similarImages,projective.getWorkGraph()) ) {
 			System.err.println("Metric failed");
 			System.exit(0);
@@ -127,8 +132,10 @@ public class ExampleMultiviewSceneReconstruction {
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Printing a few of the camera");
-		for (int i = 0; i < 5; i++) {
-			projective.getWorkGraph().views.get(""+(10+i)).pinhole.print();
+		for( var v : projective.getWorkGraph().views.values() ) {
+			BundlePinholeSimplified c = metric.getRefinedCamera(v.pview.id);
+			System.out.println("view='"+v.pview.id+"' "+c);
+//			v.pinhole.print();
 		}
 		// TODO visualize
 		System.out.println("done");
