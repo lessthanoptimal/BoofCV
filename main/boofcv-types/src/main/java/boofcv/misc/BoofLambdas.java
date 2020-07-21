@@ -27,30 +27,37 @@ import java.util.List;
  */
 public interface BoofLambdas {
 
+	@FunctionalInterface
 	interface MassageString {
 		String process( String input );
 	}
 
+	@FunctionalInterface
 	interface Factory<T> {
 		T newInstance();
 	}
 
+	@FunctionalInterface
 	interface Process {
 		void process();
 	}
 
+	@FunctionalInterface
 	interface ProcessObject<T> {
 		void process(T object);
 	}
 
+	@FunctionalInterface
 	interface ProcessI {
 		void process( int a );
 	}
 
+	@FunctionalInterface
 	interface ProcessII {
 		void process( int a, int b );
 	}
 
+	@FunctionalInterface
 	interface SelectElement<T> {
 		int select(List<T> list);
 	}
