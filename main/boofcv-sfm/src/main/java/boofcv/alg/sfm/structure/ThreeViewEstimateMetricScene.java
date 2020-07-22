@@ -40,12 +40,15 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
+import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
 
@@ -77,7 +80,7 @@ import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
  *
  * @author Peter Abeles
  */
-public class ThreeViewEstimateMetricScene {
+public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 	// Make all configurations public for ease of manipulation
 	public ConfigRansac configRansac = new ConfigRansac();
@@ -95,7 +98,6 @@ public class ThreeViewEstimateMetricScene {
 
 	// how much and where it should print to
 	private PrintStream verbose;
-	private int verboseLevel;
 
 	// Projective camera matrices
 	protected DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
@@ -244,8 +246,7 @@ public class ThreeViewEstimateMetricScene {
 	 */
 	private void findBestValidSolution(BundleAdjustment<SceneStructureMetric> bundleAdjustment) {
 		// prints out useful debugging information that lets you know how well it's converging
-		if( verbose != null && verboseLevel > 0 )
-			bundleAdjustment.setVerbose(verbose,0);
+		bundleAdjustment.setVerbose(verbose,null);
 
 		// Specifies convergence criteria
 		bundleAdjustment.configure(convergeSBA.ftol, convergeSBA.gtol, convergeSBA.maxIterations);
@@ -490,12 +491,12 @@ public class ThreeViewEstimateMetricScene {
 		triangulatePoints(structure,observations);
 	}
 
-	public void setVerbose( PrintStream verbose , int level ) {
-		this.verbose = verbose;
-		this.verboseLevel = level;
-	}
-
 	public SceneStructureMetric getStructure() {
 		return structure;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		this.verbose = out;
 	}
 }

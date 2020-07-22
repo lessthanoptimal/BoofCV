@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import org.ejml.data.DMatrix;
 
 import javax.annotation.Nullable;
 import java.io.PrintStream;
+import java.util.Set;
 
 /**
  * Implementation of bundle adjustment using Shur Complement and generic sparse matrices.
@@ -103,12 +104,6 @@ public class BundleAdjustmentSchur<Structure extends SceneStructure, M extends D
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, int level) {
-		this.verbose = out;
-		this.minimizer.setVerbose(out,level);
-	}
-
-	@Override
 	public void requestStop() {
 		stopRequested = true;
 	}
@@ -116,6 +111,12 @@ public class BundleAdjustmentSchur<Structure extends SceneStructure, M extends D
 	@Override
 	public boolean isStopRequested() {
 		return stopRequested;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		this.verbose = out;
+		this.minimizer.setVerbose(out,0);
 	}
 
 	public interface Codec<Structure extends SceneStructure>

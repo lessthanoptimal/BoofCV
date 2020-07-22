@@ -197,7 +197,7 @@ public class CalibrationPlanarGridZhang99 {
 			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		}
 
-		bundleAdjustment.setVerbose(verbose,0);
+		bundleAdjustment.setVerbose(verbose,null);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-20, 1e-20, 200);
 

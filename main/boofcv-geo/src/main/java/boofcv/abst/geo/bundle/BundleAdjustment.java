@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import org.ddogleg.struct.Stoppable;
-
-import javax.annotation.Nullable;
-import java.io.PrintStream;
+import org.ddogleg.struct.VerbosePrint;
 
 /**
  * High level interface for bundle adjustment. Bundle adjustment is the process of optimizing in batch parameters
@@ -29,7 +27,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public interface BundleAdjustment<Structure extends SceneStructure> extends Stoppable {
+public interface BundleAdjustment<Structure extends SceneStructure> extends Stoppable, VerbosePrint {
 
 	/**
 	 * Configures optimization parameters. meaning of all of these parameters is implementation dependent. They
@@ -66,12 +64,4 @@ public interface BundleAdjustment<Structure extends SceneStructure> extends Stop
 	 * @return score
 	 */
 	double getFitScore();
-
-	/**
-	 * If set to a non-null output then extra information will be printed to the specified stream.
-	 *
-	 * @param out Stream that is printed to. Set to null to disable
-	 * @param level (Future use) Parameter which can be used to specify level of verbose output. Set to zero for now.
-	 */
-	void setVerbose(@Nullable PrintStream out , int level );
 }

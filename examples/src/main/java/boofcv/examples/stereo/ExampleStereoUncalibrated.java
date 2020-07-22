@@ -200,7 +200,7 @@ public class ExampleStereoUncalibrated {
 		// Create and configure the bundle adjustment solver
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		// prints out useful debugging information that lets you know how well it's converging
-		bundleAdjustment.setVerbose(System.out,0);
+		bundleAdjustment.setVerbose(System.out,null);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-6, 1e-6, 100);
 
