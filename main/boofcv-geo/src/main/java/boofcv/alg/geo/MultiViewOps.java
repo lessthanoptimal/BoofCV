@@ -68,6 +68,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * <p>
  * Contains commonly used operations used in 2-view and 3-view perspective geometry.
@@ -1709,6 +1711,32 @@ public class MultiViewOps {
 			triangulation.triangulate(normObs.toList(),worldToViews,X);
 			sp.set(X.x,X.y,X.z);
 		}
+	}
+
+	/**
+	 * Finds this scale which minimizes the difference between `a` and `b`. ||scale*a-b||
+	 * @param a (Input) matrix
+	 * @param b (Input) matrix
+	 * @return scale factor
+	 */
+	public static double findScale( DMatrixRMaj a , DMatrixRMaj b ) {
+		assertBoof(a.numRows==b.numRows);
+		assertBoof(a.numCols==b.numCols);
+
+		final int N = a.getNumElements();
+		double sum = 0.0;
+		double weights = 0.0;
+		for (int i = 0; i < N; i++) {
+			double valA = a.data[i];
+			double valB = b.data[i];
+			if( valA == 0.0 )
+				continue;
+			double weight = Math.abs(valB);
+			sum += weight*(valB/valA);
+			weights += weight;
+		}
+
+		return sum/weights;
 	}
 
 }

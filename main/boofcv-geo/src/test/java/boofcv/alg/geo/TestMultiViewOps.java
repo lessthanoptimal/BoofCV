@@ -1275,4 +1275,15 @@ class TestMultiViewOps {
 			assertEquals(0, points.get(i).distance(X), UtilEjml.TEST_F64_SQ);
 		}
 	}
+
+	@Test
+	void findScale() {
+		double expected = -1.8;
+		DMatrixRMaj a = RandomMatrices_DDRM.rectangleGaussian(5,5, 0, 2, rand);
+		DMatrixRMaj b = a.copy();
+		CommonOps_DDRM.scale(expected,b);
+
+		double found = MultiViewOps.findScale(a,b);
+		assertEquals(expected, found, UtilEjml.TEST_F64);
+	}
 }
