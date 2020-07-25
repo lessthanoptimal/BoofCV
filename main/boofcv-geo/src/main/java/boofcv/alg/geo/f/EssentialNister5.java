@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,19 +62,19 @@ import java.util.List;
 public class EssentialNister5 {
 
 	// Linear system describing p'*E*q = 0
-	private DMatrixRMaj Q = new DMatrixRMaj(5,9);
+	private final DMatrixRMaj Q = new DMatrixRMaj(5,9);
 	// contains the span of A
-	private DMatrixRMaj nullspace = new DMatrixRMaj(9,9);
-	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQRP_DDRM();
+	private final DMatrixRMaj nullspace = new DMatrixRMaj(9,9);
+	private final SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQRP_DDRM();
 
 	// where all the ugly equations go
-	private HelperNister5 helper = new HelperNister5();
+	private final HelperNister5 helper = new HelperNister5();
 
 	// the span containing E
-	private double []X = new double[9];
-	private double []Y = new double[9];
-	private double []Z = new double[9];
-	private double []W = new double[9];
+	private final double []X = new double[9];
+	private final double []Y = new double[9];
+	private final double []Z = new double[9];
+	private final double []W = new double[9];
 
 	// unknowns for E = x*X + y*Y + z*Z + W
 	private double x,y,z;
@@ -83,16 +83,16 @@ public class EssentialNister5 {
 	LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(10);
 
 	// Storage for linear systems
-	private DMatrixRMaj A1 = new DMatrixRMaj(10,10);
-	private DMatrixRMaj A2 = new DMatrixRMaj(10,10);
-	private DMatrixRMaj C = new DMatrixRMaj(10,10);
+	private final DMatrixRMaj A1 = new DMatrixRMaj(10,10);
+	private final DMatrixRMaj A2 = new DMatrixRMaj(10,10);
+	private final DMatrixRMaj C = new DMatrixRMaj(10,10);
 
 	// Used for finding polynomial roots
-	private FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
-	private PolynomialRoots findRoots = new WrapRealRootsSturm(sturm);
+	private final FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
+	private final PolynomialRoots findRoots = new WrapRealRootsSturm(sturm);
 
 	// private PolynomialRoots findRoots = new RootFinderCompanion();
-	private Polynomial poly = new Polynomial(11);
+	private final Polynomial poly = new Polynomial(11);
 
 	/**
 	 * Computes the essential matrix from point correspondences.
@@ -115,7 +115,8 @@ public class EssentialNister5 {
 		helper.setupA2(A2);
 
 		// instead of Gauss-Jordan elimination LU decomposition is used to solve the system
-		solver.setA(A1);
+		if( !solver.setA(A1) )
+			return false;
 		solver.solve(A2, C);
 
 		// construct the z-polynomial matrix.  Equations 11-14
