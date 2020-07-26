@@ -101,10 +101,9 @@ public class ProjectiveInitializeAllCommon {
 
 	// Indicates if debugging information should be printed
 	PrintStream verbose;
-	int verboseLevel;
 
 	//-------------- Internal workspace variables
-	int selectedTriple[] = new int[2];
+	int[] selectedTriple = new int[2];
 	FastQueue<AssociatedTripleIndex> matchesTripleIdx = new FastQueue<>(AssociatedTripleIndex::new);
 	FastQueue<AssociatedTriple> matchesTriple = new FastQueue<>(AssociatedTriple::new);
 	// triangulated 3D homogenous points in seed reference frame
@@ -232,7 +231,7 @@ public class ProjectiveInitializeAllCommon {
 	/**
 	 * Exhaustively look at all triplets that connect with the seed view
 	 */
-	boolean selectInitialTriplet( View seed , GrowQueue_I32 edgeIdxs , int selected[] ) {
+	boolean selectInitialTriplet(View seed , GrowQueue_I32 edgeIdxs , int[] selected) {
 		double bestScore = 0;
 		for (int i = 0; i < edgeIdxs.size; i++) {
 			View viewB = seed.connections.get(i).other(seed);
@@ -555,7 +554,7 @@ public class ProjectiveInitializeAllCommon {
 			scaler.applyScale(structure,observations);
 		}
 
-		sba.setVerbose(verbose,verboseLevel);
+		sba.setVerbose(verbose,null);
 		sba.setParameters(structure,observations);
 		sba.configure(converge.ftol,converge.gtol,converge.maxIterations);
 
@@ -579,6 +578,5 @@ public class ProjectiveInitializeAllCommon {
 	 */
 	public void setVerbose( PrintStream verbose , int level ) {
 		this.verbose = verbose;
-		this.verboseLevel = level;
 	}
 }
