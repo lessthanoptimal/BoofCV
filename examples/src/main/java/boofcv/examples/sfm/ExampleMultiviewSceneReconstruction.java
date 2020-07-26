@@ -110,7 +110,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(configSBA);
 		sba.configure(1e-10,1e-10,100);
-		sba.setVerbose(System.out,0);
+		sba.setVerbose(System.out,null);
 
 		// Scale to improve numerical accuracy
 		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
