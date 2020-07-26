@@ -48,6 +48,11 @@ public interface BoofLambdas {
 	}
 
 	@FunctionalInterface
+	interface MassageObject<T> {
+		T process(T object);
+	}
+
+	@FunctionalInterface
 	interface ProcessI {
 		void process( int a );
 	}
@@ -60,5 +65,10 @@ public interface BoofLambdas {
 	@FunctionalInterface
 	interface SelectElement<T> {
 		int select(List<T> list);
+	}
+
+	@FunctionalInterface
+	interface ProcessIndex<T> {
+		void process( int index , T object );
 	}
 }

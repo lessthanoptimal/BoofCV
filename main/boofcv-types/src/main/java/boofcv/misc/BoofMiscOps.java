@@ -531,4 +531,11 @@ public class BoofMiscOps {
 		if( !result )
 			throw new IllegalArgumentException(message);
 	}
+
+	public static <T> void forIdx( List<T> list, BoofLambdas.ProcessIndex<T> func )
+	{
+		for (int i = 0; i < list.size(); i++) {
+			func.process(i,list.get(i));
+		}
+	}
 }

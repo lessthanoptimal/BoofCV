@@ -21,6 +21,11 @@ package boofcv.testing;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.*;
 import boofcv.struct.image.*;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.struct.so.Rodrigues_F64;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -71,6 +76,49 @@ public class BoofTesting {
 
 		return type;
 	}
+
+	/**
+	 * Checks to see if the two transforms are equal up to a scale factor. Rotation is tested using a single angle
+	 * and translation using magnitude
+	 * @param expected the expected transform
+	 * @param found the found transform
+	 * @param tolAngle radians
+	 * @param tolT fractional error tolernace
+	 */
+	public static void assertEqualsToScale(Se3_F64 expected, Se3_F64 found , double tolAngle , double tolT )
+	{
+		var R = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.multTransA(expected.R,found.R,R);
+		Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(R,null);
+		assertEquals(0.0,rod.theta,tolAngle);
+
+		double normFound = found.T.norm();
+		double normExpected = expected.T.norm();
+
+		if( normExpected == 0.0 ) {
+			assertEquals(0.0, normFound, tolT);
+			return;
+		}
+
+		double scale = normFound/normExpected;
+
+		double dx = expected.T.x*scale - found.T.x;
+		double dy = expected.T.y*scale - found.T.y;
+		double dz = expected.T.z*scale - found.T.z;
+		double r = Math.sqrt(dx*dx + dy*dy + dz*dz);
+		assertEquals(0.0, r, tolT,expected.T+" "+found.T);
+	}
+
+	private static void assertEquals( double expected , double found , double tol ) {
+		if( Math.abs(expected-found) > tol )
+			throw new RuntimeException("Error too large. expected="+expected+" found="+found+" tol="+tol);
+	}
+
+	private static void assertEquals( double expected , double found , double tol , String message) {
+		if( Math.abs(expected-found) > tol )
+			throw new RuntimeException("Error too large. expected="+expected+" found="+found+" tol="+tol+"\n"+message);
+	}
+
 
 	/**
 	 * <p>
