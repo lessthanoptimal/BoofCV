@@ -181,13 +181,13 @@ public class BoofMiscOps {
 	}
 
 	public static String toString( Reader r ) {
-		char buff[] = new char[1024];
+		char[] buff = new char[1024];
 
 		StringBuilder string = new StringBuilder();
 		try {
 			while(true) {
 				int size = r.read(buff);
-			    if( size < 0 )
+				if( size < 0 )
 					break;
 				string.append(buff, 0, size);
 			}
@@ -196,8 +196,8 @@ public class BoofMiscOps {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static int countNotZero( int a[] , int size ) {
+
+	public static int countNotZero(int[] a, int size ) {
 		int ret = 0;
 		for( int i = 0; i < size; i++ ) {
 			if( a[i] != 0 )
@@ -206,15 +206,15 @@ public class BoofMiscOps {
 		return ret;
 	}
 
-	public static double[] convertTo_F64( int a[] ) {
+	public static double[] convertTo_F64(int[] a) {
 		double[] ret = new double[ a.length ];
 		for( int i = 0; i < a.length; i++ ) {
-			ret[i] = (int)a[i];
+			ret[i] = a[i];
 		}
 		return ret;
 	}
 
-	public static float[] convertTo_F32( double a[] , float[] ret) {
+	public static float[] convertTo_F32(double[] a, float[] ret) {
 		if( ret == null )
 			ret = new float[ a.length ];
 		for( int i = 0; i < a.length; i++ ) {
@@ -223,7 +223,7 @@ public class BoofMiscOps {
 		return ret;
 	}
 
-	public static int[] convertTo_I32( double a[] , int[] ret) {
+	public static int[] convertTo_I32(double[] a, int[] ret) {
 		if( ret == null )
 			ret = new int[ a.length ];
 		for( int i = 0; i < a.length; i++ ) {
@@ -260,9 +260,7 @@ public class BoofMiscOps {
 
 		if( r.y0 < 0 )
 			return false;
-		if( r.y1 > b.height )
-			return false;
-		return true;
+		return r.y1 <= b.height;
 	}
 
 	/**
@@ -282,9 +280,7 @@ public class BoofMiscOps {
 
 		if( y-radius < 0 )
 			return false;
-		if( y+radius >= b.height )
-			return false;
-		return true;
+		return y + radius < b.height;
 	}
 
 	/**
@@ -304,9 +300,7 @@ public class BoofMiscOps {
 
 		if( y-radius < 0 )
 			return false;
-		if( y+radius > b.height-1 )
-			return false;
-		return true;
+		return !(y + radius > b.height - 1);
 	}
 
 	/**
@@ -326,9 +320,7 @@ public class BoofMiscOps {
 
 		if( y-radius < 0 )
 			return false;
-		if( y+radius > b.height-1 )
-			return false;
-		return true;
+		return !(y + radius > b.height - 1);
 	}
 
 	public static boolean isInside(ImageBase b, int x , int y , int radiusWidth , int radiusHeight ) {
@@ -339,9 +331,7 @@ public class BoofMiscOps {
 
 		if( y-radiusHeight < 0 )
 			return false;
-		if( y+radiusHeight >= b.height )
-			return false;
-		return true;
+		return y + radiusHeight < b.height;
 	}
 
 	public static boolean isInside(ImageBase b, int c_x , int c_y , int radius , double theta ) {
@@ -356,10 +346,7 @@ public class BoofMiscOps {
 			return false;
 		else if( !checkInBounds(b,c_x,c_y,r,r,c,s))
 			return false;
-		else if( !checkInBounds(b,c_x,c_y,r,-r,c,s))
-			return false;
-
-		return true;
+		else return checkInBounds(b, c_x, c_y, r, -r, c, s);
 	}
 
 	private static boolean checkInBounds( ImageBase b , int c_x , int c_y , int dx , int dy , float c , float s )
@@ -461,7 +448,7 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static int[] convertArray( double input[] , int output[] ) {
+	public static int[] convertArray(double[] input, int[] output) {
 		if( output == null )
 			output = new int[input.length];
 
@@ -472,7 +459,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static long[] convertArray( double input[] , long output[] ) {
+	public static long[] convertArray(double[] input, long[] output) {
 		if( output == null )
 			output = new long[input.length];
 
@@ -483,7 +470,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray( double input[] , float output[] ) {
+	public static float[] convertArray(double[] input, float[] output) {
 		if( output == null )
 			output = new float[input.length];
 
@@ -494,7 +481,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static double[] convertArray( float input[] , double output[] ) {
+	public static double[] convertArray(float[] input, double[] output) {
 		if( output == null )
 			output = new double[input.length];
 
@@ -505,7 +492,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static int[] convertArray( float input[] , int output[] ) {
+	public static int[] convertArray(float[] input, int[] output) {
 		if( output == null )
 			output = new int[input.length];
 
@@ -516,7 +503,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray( int input[] , float output[] ) {
+	public static float[] convertArray(int[] input, float[] output) {
 		if( output == null )
 			output = new float[input.length];
 
@@ -533,5 +520,15 @@ public class BoofMiscOps {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void assertBoof( boolean result ) {
+		if( !result )
+			throw new RuntimeException("assert failed");
+	}
+
+	public static void assertBoof( boolean result , String message ) {
+		if( !result )
+			throw new IllegalArgumentException(message);
 	}
 }
