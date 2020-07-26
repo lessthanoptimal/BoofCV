@@ -538,4 +538,16 @@ public class BoofMiscOps {
 			func.process(i,list.get(i));
 		}
 	}
+
+	/**
+	 * Extracts elements from a list and returns a list
+	 */
+	public static <In,Out> List<Out> collectList( List<In> list , BoofLambdas.Extract<In,Out> func ) {
+		List<Out> out = new ArrayList<>();
+		for (int i = 0; i < list.size(); i++) {
+			In input = list.get(i);
+			out.add( func.process(input) );
+		}
+		return out;
+	}
 }

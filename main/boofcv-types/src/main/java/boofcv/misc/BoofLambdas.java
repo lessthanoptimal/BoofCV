@@ -68,6 +68,11 @@ public interface BoofLambdas {
 	}
 
 	@FunctionalInterface
+	interface Extract<In,Out> {
+		Out process(In o);
+	}
+
+	@FunctionalInterface
 	interface ProcessIndex<T> {
 		void process( int index , T object );
 	}
