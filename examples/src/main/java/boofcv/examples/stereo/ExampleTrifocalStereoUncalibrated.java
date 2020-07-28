@@ -252,7 +252,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
-		MultiViewOps.extractCameraMatrices(model,P2,P3);
+		MultiViewOps.trifocalCameraMatrices(model,P2,P3);
 
 		// Most of the time this refinement step makes little difference, but in some edges cases it appears
 		// to help convergence

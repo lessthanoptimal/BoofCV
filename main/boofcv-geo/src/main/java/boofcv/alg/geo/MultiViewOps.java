@@ -646,7 +646,7 @@ public class MultiViewOps {
 	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
 	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
 	 */
-	public static void extractCameraMatrices( TrifocalTensor tensor , DMatrixRMaj P2 , DMatrixRMaj P3 ) {
+	public static void trifocalCameraMatrices(TrifocalTensor tensor , DMatrixRMaj P2 , DMatrixRMaj P3 ) {
 		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
 		e.setTensor(tensor);
 		e.extractCamera(P2,P3);
@@ -946,10 +946,25 @@ public class MultiViewOps {
 	 * @return Essential matrix
 	 */
 	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F , DMatrixRMaj K , @Nullable DMatrixRMaj outputE ) {
+		return fundamentalToEssential(F,K,K,outputE);
+	}
+
+	/**
+	 * Given the calibration matrix, convert the fundamental matrix into an essential matrix. E = K[2]<sup>T</sup>*F*k[1]. The
+	 * singular values of the resulting E matrix are forced to be [1,1,0]
+	 *
+	 * @param F (Input) Fundamental matrix. 3x3
+	 * @param K1 (Input) Calibration matrix view 1 (3x3)
+	 * @param K2 (Input) Calibration matrix view 2 (3x3)
+	 * @param outputE (Output) Found essential matrix
+	 * @return Essential matrix
+	 */
+	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F , DMatrixRMaj K1 , DMatrixRMaj K2,
+													  @Nullable DMatrixRMaj outputE ) {
 		if( outputE == null )
 			outputE = new DMatrixRMaj(3,3);
 
-		PerspectiveOps.multTranA(K,F,K,outputE);
+		PerspectiveOps.multTranA(K2,F,K1,outputE);
 
 		// this is unlikely to be a perfect essential matrix. reduce the error by enforcing essential constraints
 		SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true,true,false);
@@ -1071,8 +1086,9 @@ public class MultiViewOps {
 	 * @param cameraMatrix Input: Camera matrix, 3 by 4
 	 * @param K Output: Camera calibration matrix, 3 by 3.
 	 * @param worldToView Output: The rotation and translation.
+	 * @return true if decompose was successful
 	 */
-	public static void decomposeMetricCamera(DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView) {
+	public static boolean decomposeMetricCamera(DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView) {
 		DMatrixRMaj A = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.extract(cameraMatrix, 0, 3, 0, 3, A, 0, 0);
 		worldToView.T.set(cameraMatrix.get(0,3),cameraMatrix.get(1,3),cameraMatrix.get(2,3));
@@ -1086,7 +1102,7 @@ public class MultiViewOps {
 		CommonOps_DDRM.mult(Pv,A,A_p);
 		CommonOps_DDRM.transpose(A_p);
 		if( !qr.decompose(A_p) )
-			throw new RuntimeException("QR decomposition failed!  Bad input?");
+			return false;
 
 		// extract the rotation
 		qr.getQ(A,false);
@@ -1120,6 +1136,7 @@ public class MultiViewOps {
 			throw new RuntimeException("Inverse failed!  Bad input?");
 
 		GeometryMath_F64.mult(A, worldToView.T, worldToView.T);
+		return true;
 	}
 
 	/**
@@ -1357,18 +1374,19 @@ public class MultiViewOps {
 	 * @param worldToView (Output) Transform from world to camera view
 	 * @param K (Output) Camera calibration matrix
 	 */
-	public static void projectiveToMetric( DMatrixRMaj cameraMatrix , DMatrixRMaj H ,
+	public static boolean projectiveToMetric( DMatrixRMaj cameraMatrix , DMatrixRMaj H ,
 										   Se3_F64 worldToView , DMatrixRMaj K )
 	{
 		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
 		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
 
-		MultiViewOps.decomposeMetricCamera(tmp,K,worldToView);
+		return MultiViewOps.decomposeMetricCamera(tmp,K,worldToView);
 	}
 
 	/**
 	 * Convert the projective camera matrix into a metric transform given the rectifying homography and a
-	 * known calibration matrix.
+	 * known calibration matrix. This simplifies the math compared to {@link #projectiveToMetric} where it needs
+	 * to extract `K`.
 	 *
 	 * {@code P = K*[R|T]*H} where H is the inverse of the rectifying homography.
 	 *
@@ -1480,7 +1498,7 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Rectifying homography to dual absolute quadratic.
+	 * Rectifying / calibrating homography to dual absolute quadratic.
 	 *
 	 * <p>Q = H*I*H<sup>T</sup> = H(:,1:3)*H(:,1:3)'</p>
 	 * <p>where I = diag(1 1 1 0)</p>

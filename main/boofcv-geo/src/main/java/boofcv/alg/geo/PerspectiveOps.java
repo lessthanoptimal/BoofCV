@@ -648,7 +648,7 @@ public class PerspectiveOps {
 	/**
 	 * Splits the projection matrix into a 3x3 matrix and 3x1 vector.
 	 *
-	 * @param P (Input) 3x4 projection matirx
+	 * @param P (Input) 3x4 projection matrix
 	 * @param M (Output) M = P(:,0:2)
 	 * @param T (Output) T = P(:,3)
 	 */

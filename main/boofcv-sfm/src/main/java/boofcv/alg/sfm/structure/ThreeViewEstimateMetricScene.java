@@ -320,7 +320,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		List<AssociatedTriple> inliers = ransac.getMatchSet();
 		TrifocalTensor model = ransac.getModelParameters();
 
-		MultiViewOps.extractCameraMatrices(model,P2,P3);
+		MultiViewOps.trifocalCameraMatrices(model,P2,P3);
 
 		// Most of the time this makes little difference, but in some edges cases this enables it to
 		// converge correctly

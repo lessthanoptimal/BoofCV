@@ -59,7 +59,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		DMatrixRMaj P1 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
-		MultiViewOps.extractCameraMatrices(T,P2,P3);
+		MultiViewOps.trifocalCameraMatrices(T,P2,P3);
 		CommonOps_DDRM.setIdentity(P1);
 
 		TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC());

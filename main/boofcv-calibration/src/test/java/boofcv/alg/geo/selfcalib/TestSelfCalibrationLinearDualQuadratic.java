@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 
-		MultiViewOps.extractCameraMatrices(tensor,P2,P3);
+		MultiViewOps.trifocalCameraMatrices(tensor,P2,P3);
 
 		SelfCalibrationLinearDualQuadratic alg = new SelfCalibrationLinearDualQuadratic(1.0);
 		alg.addCameraMatrix(P1);

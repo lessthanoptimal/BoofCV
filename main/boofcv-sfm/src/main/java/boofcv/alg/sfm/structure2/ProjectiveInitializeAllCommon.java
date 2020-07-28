@@ -223,7 +223,7 @@ public class ProjectiveInitializeAllCommon {
 		// Extract camera matrices
 		TrifocalTensor model = ransac.getModelParameters();
 
-		MultiViewOps.extractCameraMatrices(model,P2,P3);
+		MultiViewOps.trifocalCameraMatrices(model,P2,P3);
 
 		return true;
 	}

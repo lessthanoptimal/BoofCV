@@ -486,7 +486,7 @@ class TestMultiViewOps {
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 
 		TrifocalTensor input = tensor.copy();
-		MultiViewOps.extractCameraMatrices(input, P2, P3);
+		MultiViewOps.trifocalCameraMatrices(input, P2, P3);
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )
@@ -697,8 +697,9 @@ class TestMultiViewOps {
 	}
 
 	@Test
-	void fundamentalToEssential() {
+	void fundamentalToEssential_one() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
+
 		for (int i = 0; i < 50; i++) {
 			double Tx = rand.nextGaussian();
 			double Ty = rand.nextGaussian();
@@ -713,6 +714,33 @@ class TestMultiViewOps {
 			DMatrixRMaj F = MultiViewOps.createFundamental(E,K);
 
 			DMatrixRMaj found = MultiViewOps.fundamentalToEssential(F,K,null);
+
+			double scale = NormOps_DDRM.normF(E)/NormOps_DDRM.normF(found);
+			CommonOps_DDRM.scale(scale,found);
+
+			assertTrue(MatrixFeatures_DDRM.isIdentical(E,found,UtilEjml.TEST_F64));
+		}
+	}
+
+	@Test
+	void fundamentalToEssential_two() {
+		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(250, 310, 0.5, 120, 200);
+
+		for (int i = 0; i < 50; i++) {
+			double Tx = rand.nextGaussian();
+			double Ty = rand.nextGaussian();
+			double Tz = rand.nextGaussian();
+			double rotX = rand.nextGaussian();
+			double rotY = rand.nextGaussian();
+			double rotZ = rand.nextGaussian();
+
+			Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(Tx,Ty,Tz,rotX,rotY,rotZ,null);
+
+			DMatrixRMaj E = MultiViewOps.createEssential(m.R,m.T,null);
+			DMatrixRMaj F = MultiViewOps.createFundamental(E,K1,K2);
+
+			DMatrixRMaj found = MultiViewOps.fundamentalToEssential(F,K1,K2,null);
 
 			double scale = NormOps_DDRM.normF(E)/NormOps_DDRM.normF(found);
 			CommonOps_DDRM.scale(scale,found);
@@ -976,28 +1004,34 @@ class TestMultiViewOps {
 
 	@Test
 	void projectiveToMetric() {
-		// Construct a projective camera matrix from its definition
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
-		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
-
-		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(T.R,T.T,K,null);
-
-		// Apply an arbitrary homography to it
-		DMatrixRMaj H = CommonOps_DDRM.diag(0.1,-2.1,1.2,3);
-		DMatrixRMaj H_inv = H.createLike();
-		CommonOps_DDRM.invert(H,H_inv);
-		DMatrixRMaj PH = P.createLike();
-		CommonOps_DDRM.mult(P,H,PH);
-
-		// extract the metric parameters
 		DMatrixRMaj foundK = new DMatrixRMaj(3,3);
-		Se3_F64 foundT = new Se3_F64();
+		for (int i = 0; i < 50; i++) {
+			double Tx = rand.nextGaussian();
+			double Ty = rand.nextGaussian();
+			double Tz = rand.nextGaussian();
+			double rotX = rand.nextGaussian();
+			double rotY = rand.nextGaussian();
+			double rotZ = rand.nextGaussian();
 
-		MultiViewOps.projectiveToMetric(PH,H_inv,foundT,foundK);
+			Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(Tx,Ty,Tz,rotX,rotY,rotZ,null);
 
-		assertTrue(MatrixFeatures_DDRM.isIdentical(K,foundK,UtilEjml.TEST_F64));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(T.R,foundT.R,UtilEjml.TEST_F64));
-		assertEquals(0,T.T.distance(foundT.T), UtilEjml.TEST_F64);
+			DMatrixRMaj P = PerspectiveOps.createCameraMatrix(m.R,m.T,K,null);
+
+			Equation eq = new Equation(P,"P",K,"K");
+			eq.process("p=[-0.9,0.1,0.7]'").
+					process("H=[K zeros(3,1);-p'*K 1]").
+					process("P=P*H").process("H_inv=inv(H)");
+
+			DMatrixRMaj H_inv = eq.lookupDDRM("H_inv");
+
+			Se3_F64 found = new Se3_F64();
+
+			MultiViewOps.projectiveToMetric(P,H_inv,found,foundK);
+
+			assertTrue(MatrixFeatures_DDRM.isEquals(K,foundK, UtilEjml.TEST_F64));
+			assertEquals(0,m.T.distance(found.T), UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
