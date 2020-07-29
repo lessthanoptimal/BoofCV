@@ -1075,13 +1075,14 @@ public class MultiViewOps {
 	/**
 	 * <p>
 	 * Decomposes a metric camera matrix P=K*[R|T], where A is an upper triangular camera calibration
-	 * matrix, R is a rotation matrix, and T is a translation vector.
+	 * matrix, R is a rotation matrix, and T is a translation vector. If {@link PerspectiveOps#createCameraMatrix}
+	 * is called using the returned value you will get an equivalent camera matrix.
+	 * </p>
 	 *
 	 * <ul>
 	 * <li> NOTE: There are multiple valid solutions to this problem and only one solution is returned.
 	 * <li> NOTE: The camera center will be on the plane at infinity.
 	 * </ul>
-	 * </p>
 	 *
 	 * @param cameraMatrix Input: Camera matrix, 3 by 4
 	 * @param K Output: Camera calibration matrix, 3 by 3.
@@ -1128,14 +1129,19 @@ public class MultiViewOps {
 			worldToView.T.scale(-1);
 		}
 
-		// make sure it's a proper camera matrix
-		CommonOps_DDRM.divide(K,K.get(2,2));
+		// save the scale so that T is scaled correctly. This is important when upgrading common projective cameras
+		double scale = K.get(2,2);
 
-		// could do a very fast triangule inverse. EJML doesn't have one for upper triangle, yet.
+		// make sure it's a proper camera matrix and this is more numerically stable to invert
+		CommonOps_DDRM.divide(K,scale);
+
+		// could do a very fast triangulate inverse. EJML doesn't have one for upper triangle, yet.
 		if( !CommonOps_DDRM.invert(K,A) )
-			throw new RuntimeException("Inverse failed!  Bad input?");
+			return false;
 
 		GeometryMath_F64.mult(A, worldToView.T, worldToView.T);
+		worldToView.T.divide(scale);
+
 		return true;
 	}
 
@@ -1384,11 +1390,15 @@ public class MultiViewOps {
 	}
 
 	/**
+	 * <p>
 	 * Convert the projective camera matrix into a metric transform given the rectifying homography and a
 	 * known calibration matrix. This simplifies the math compared to {@link #projectiveToMetric} where it needs
 	 * to extract `K`.
-	 *
+	 * </p>
 	 * {@code P = K*[R|T]*H} where H is the inverse of the rectifying homography.
+	 *
+	 * <p>WARNING: Do not use if converting multiple cameras that have a common projective frame. You will lose the
+	 * scale factor if you use this function. {@link #projectiveToMetric} instead.</p>
 	 *
 	 * @param cameraMatrix (Input) camera matrix. 3x4
 	 * @param H (Input) Rectifying homography. 4x4

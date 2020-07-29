@@ -73,6 +73,8 @@ Version : 0.37
   * TODO Projective to Metric for arbitrary scene
 - Sparse Bundle Adjustment
   * TODO Add rigid relationships between views. Can be fixed or not.
+- MultiViewOps
+  * Fixed decomposeMetricCamera() so that it doesn't change the scale of T. This messed up common frames
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint

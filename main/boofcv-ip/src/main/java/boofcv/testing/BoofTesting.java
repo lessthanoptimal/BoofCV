@@ -79,7 +79,42 @@ public class BoofTesting {
 
 	/**
 	 * Checks to see if the two transforms are equal up to a scale factor. Rotation is tested using a single angle
-	 * and translation using magnitude
+	 * and translation using magnitude. NOTE: The direction of the translation is NOT considered part of the
+	 * sign ambiguity in this came.
+	 *
+	 * @param expected the expected transform
+	 * @param found the found transform
+	 * @param tolAngle radians
+	 * @param tolT fractional error tolernace
+	 */
+	public static void assertEqualsToScaleS(Se3_F64 expected, Se3_F64 found , double tolAngle , double tolT )
+	{
+		var R = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.multTransA(expected.R,found.R,R);
+		Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(R,null);
+		assertEquals(0.0,rod.theta,tolAngle);
+
+		double normFound = found.T.norm();
+		double normExpected = expected.T.norm();
+
+		if( normExpected == 0.0 ) {
+			assertEquals(0.0, normFound, tolT);
+			return;
+		}
+
+		double scale = normFound/normExpected;
+
+		double dx = expected.T.x*scale - found.T.x;
+		double dy = expected.T.y*scale - found.T.y;
+		double dz = expected.T.z*scale - found.T.z;
+		double r = Math.sqrt(dx*dx + dy*dy + dz*dz);
+		assertEquals(0.0, r, tolT,"scale="+scale+" E="+expected.T+" F="+found.T);
+	}
+
+	/**
+	 * Checks to see if the two transforms are equal up to a scale factor. Rotation is tested using a single angle
+	 * and translation using magnitude. NOTE: Scale ambiguity also includes sign ambiguity for translation.
+	 *
 	 * @param expected the expected transform
 	 * @param found the found transform
 	 * @param tolAngle radians
@@ -101,12 +136,23 @@ public class BoofTesting {
 		}
 
 		double scale = normFound/normExpected;
+		int largestIdx = -1;
+		double largestMag = 0;
+		for (int i = 0; i < 3; i++) {
+			double mag = Math.abs(expected.T.getIdx(i));
+			if( mag > largestMag ) {
+				largestMag = mag;
+				largestIdx = i;
+			}
+		}
+		if( Math.signum(expected.T.getIdx(largestIdx)) != Math.signum(found.T.getIdx(largestIdx)))
+			scale *= -1;
 
 		double dx = expected.T.x*scale - found.T.x;
 		double dy = expected.T.y*scale - found.T.y;
 		double dz = expected.T.z*scale - found.T.z;
 		double r = Math.sqrt(dx*dx + dy*dy + dz*dz);
-		assertEquals(0.0, r, tolT,expected.T+" "+found.T);
+		assertEquals(0.0, r, tolT,"scale="+scale+" E="+expected.T+" F="+found.T);
 	}
 
 	private static void assertEquals( double expected , double found , double tol ) {

@@ -850,18 +850,20 @@ class TestMultiViewOps {
 			Se3_F64 foundWorldToView = new Se3_F64();
 			MultiViewOps.decomposeMetricCamera(P, foundK, foundWorldToView);
 
+			// When you recombine everything it should produce the same camera matrix
+			var foundP = PerspectiveOps.createCameraMatrix(foundWorldToView.R,foundWorldToView.T,foundK,null);
+			double scale = MultiViewOps.findScale(foundP,P);
+			CommonOps_DDRM.scale(scale,foundP);
+			assertTrue(MatrixFeatures_DDRM.isIdentical(foundP,P, UtilEjml.TEST_F64));
+
 			// see if it extract the input
 			assertEquals(1,CommonOps_DDRM.det(foundWorldToView.R), UtilEjml.TEST_F64);
 			assertTrue(MatrixFeatures_DDRM.isIdentical(K,foundK, UtilEjml.TEST_F64));
 			assertTrue(MatrixFeatures_DDRM.isIdentical(worldToView.R,foundWorldToView.R, UtilEjml.TEST_F64));
 
-			Vector3D_F64 T = worldToView.T;
-			double sT = T.norm();
-			double sTp = foundWorldToView.T.norm();
-
-			assertEquals(T.x, foundWorldToView.T.x*sT/sTp, UtilEjml.TEST_F64);
-			assertEquals(T.y, foundWorldToView.T.y*sT/sTp, UtilEjml.TEST_F64);
-			assertEquals(T.z, foundWorldToView.T.z*sT/sTp, UtilEjml.TEST_F64);
+			// make sure it didn't change the scale of the decomposed T
+			// this is very important when decomposing cameras which had a common projective frame
+			assertEquals(0.0,worldToView.T.distance(foundWorldToView.T),UtilEjml.TEST_F64);
 		}
 	}
 
