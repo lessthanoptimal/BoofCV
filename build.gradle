@@ -89,8 +89,10 @@ subprojects {
     }
 
     dependencies {
-        api (group: 'org.georegression', name: 'georegression', version: '0.23-SNAPSHOT')
-        api (group: 'org.ddogleg', name: 'ddogleg', version: '0.18')
+        api (group: 'org.georegression', name: 'georegression', version: '0.23-SNAPSHOT') {
+            exclude group: 'org.ddogleg'
+        }
+        api (group: 'org.ddogleg', name: 'ddogleg', version: '0.19-SNAPSHOT')
 
         compileOnly 'org.projectlombok:lombok:1.18.10'
 
