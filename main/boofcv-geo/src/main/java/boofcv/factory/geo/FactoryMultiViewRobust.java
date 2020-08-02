@@ -29,10 +29,14 @@ import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.alg.geo.robust.*;
+import boofcv.alg.geo.selfcalib.DistanceMetricTripleReprojection23;
+import boofcv.alg.geo.selfcalib.MetricCameraTriple;
+import boofcv.alg.geo.selfcalib.ModelManagerMetricCameraTriple;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.struct.image.ImageDimension;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -410,21 +414,20 @@ public class FactoryMultiViewRobust {
 		double ransacTol;
 		DistanceFromModel<TrifocalTensor,AssociatedTriple> distance;
 
-		switch( error.model) {
-			case REPROJECTION: {
-				ransacTol = 3.0*ransac.inlierThreshold*ransac.inlierThreshold;
+		switch (error.model) {
+			case REPROJECTION -> {
+				ransacTol = 3.0 * ransac.inlierThreshold * ransac.inlierThreshold;
 				distance = new DistanceTrifocalReprojectionSq();
-			} break;
-			case REPROJECTION_REFINE:
-				ransacTol = 3.0*ransac.inlierThreshold*ransac.inlierThreshold;
-				distance = new DistanceTrifocalReprojectionSq(error.converge.gtol,error.converge.maxIterations);
-				break;
-			case POINT_TRANSFER:
-				ransacTol = 2.0*ransac.inlierThreshold*ransac.inlierThreshold;
+			}
+			case REPROJECTION_REFINE -> {
+				ransacTol = 3.0 * ransac.inlierThreshold * ransac.inlierThreshold;
+				distance = new DistanceTrifocalReprojectionSq(error.converge.gtol, error.converge.maxIterations);
+			}
+			case POINT_TRANSFER -> {
+				ransacTol = 2.0 * ransac.inlierThreshold * ransac.inlierThreshold;
 				distance = new DistanceTrifocalTransferSq();
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown error model "+error.model);
+			}
+			default -> throw new IllegalArgumentException("Unknown error model " + error.model);
 		}
 
 		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(trifocal);
@@ -432,5 +435,27 @@ public class FactoryMultiViewRobust {
 		ModelGenerator<TrifocalTensor,AssociatedTriple> generator = new GenerateTrifocalTensor(estimator);
 
 		return new Ransac<>(ransac.randSeed, manager, generator, distance, ransac.iterations, ransacTol);
+	}
+
+	/**
+	 * Projective to metric self calibration from 3-views
+	 *
+	 * @param selfcalib (Input) configuration for self calibration
+	 * @param ransac (Input) configuration for RANSAC
+	 * @return RANSAC
+	 */
+	public static RansacProjective<MetricCameraTriple, AssociatedTriple>
+	metricThreeViewRansac( @Nullable ConfigSelfCalibration selfcalib,
+						   @Nonnull ConfigRansac ransac)
+	{
+		// Pixel error squared in two views
+		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold*2;
+
+		var generator = FactoryMultiView.selfCalibThree(selfcalib);
+		var manager = new ModelManagerMetricCameraTriple();
+		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
+				(new DistanceMetricTripleReprojection23(),3);
+
+		return new RansacProjective<>(ransac.randSeed, manager, generator, distance, ransac.iterations, ransacTol);
 	}
 }

@@ -37,11 +37,15 @@ import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.h.HomographyTotalLeastSquares;
 import boofcv.alg.geo.pose.*;
+import boofcv.alg.geo.robust.ModelGeneratorViews;
+import boofcv.alg.geo.selfcalib.*;
 import boofcv.alg.geo.triangulate.*;
 import boofcv.alg.geo.trifocal.RefineThreeViewProjectiveGeometric;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.image.ImageDimension;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.struct.point.Point3D_F64;
@@ -668,5 +672,51 @@ public class FactoryMultiView {
 	 */
 	public static RefineTriangulateProjective triangulateRefineProj(ConfigConverge config ) {
 		return new TriangulateRefineProjectiveLS(config.gtol,config.maxIterations);
+	}
+
+	/**
+	 * Three-view self calibration based on various methods. Read documentation carefully since partially known
+	 * calibration is the norm and often the principle point needs to be zero.
+	 *
+	 * @param config (Input) Configuration for metric elevation. Can be null.
+	 * @return ModelGenerator
+	 */
+	public static ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
+	selfCalibThree( @Nullable ConfigSelfCalibration config ) {
+		if( config == null )
+			config = new ConfigSelfCalibration();
+		config.checkValidity();
+
+		Estimate1ofTrifocalTensor trifocal = trifocal_1(config.trifocal);
+
+		return switch( config.type ) {
+			case DUAL_QUADRATIC -> {
+				final ConfigSelfCalibDualQuadratic c = config.dualQuadratic;
+				var selfCalib = c.knownAspectRatio ?
+						new SelfCalibrationLinearDualQuadratic(c.aspectRatio) :
+						new SelfCalibrationLinearDualQuadratic(c.zeroSkew);
+
+				yield new GenerateMetricTripleDualQuadratic(trifocal,selfCalib);
+			}
+
+			case ESSENTIAL_GUESS -> {
+				final ConfigSelfCalibEssentialGuess c = config.essentialGuess;
+				var selfCalib = new SelfCalibrationEssentialGuessAndCheck();
+				selfCalib.fixedFocus = c.fixedFocus;
+				selfCalib.numberOfSamples = c.numberOfSamples;
+				selfCalib.sampleFocalRatioMin = c.sampleMin;
+				selfCalib.sampleFocalRatioMax = c.sampleMax;
+
+				yield new GenerateMetricTripleEssentialGuessAndCheck(trifocal,selfCalib);
+			}
+
+			case PRACTICAL_GUESS -> {
+				var selfCalib = new SelfCalibrationGuessAndCheckFocus();
+				final ConfigSelfCalibPracticalGuess c = config.practicalGuess;
+				selfCalib.setSampling( c.sampleMin, c.sampleMax, c.numberOfSamples);
+				selfCalib.setSingleCamera(c.fixedFocus);
+				yield new GenerateMetricTriplePracticalGuessAndCheck(trifocal,selfCalib);
+			}
+		};
 	}
 }
