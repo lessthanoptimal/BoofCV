@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,17 +18,17 @@
 
 package boofcv.alg.geo;
 
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.misc.test.GeometryUnitTest;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,45 +44,32 @@ public class TestDecomposeEssential {
 	 */
 	@Test
 	public void checkAgainstKnown() {
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
-		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
-
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
-
-		DecomposeEssential alg = new DecomposeEssential();
-		alg.decompose(E);
-
-		List<Se3_F64> solutions = alg.getSolutions();
-
-		assertEquals(4,solutions.size());
-
-		checkUnique(solutions);
-
-		checkHasOriginal(solutions,R,T);
-	}
-
-	/**
-	 * Checks to see if the same solution is returned when invoked multiple times
-	 */
-	@Test
-	public void multipleCalls() {
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
-		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
-
-		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
+		List<Se3_F64> testCases = new ArrayList<>();
+		testCases.add(SpecialEuclideanOps_F64.eulerXyz(0.1,-0.4,0.5,2,1,-3,null));
+		testCases.add(SpecialEuclideanOps_F64.eulerXyz(-0.1,0.4,-0.5,2,1,-3,null));
+		testCases.add(SpecialEuclideanOps_F64.eulerXyz(0.1,-0.4,0.5,-2,-1,3,null));
+		testCases.add(SpecialEuclideanOps_F64.eulerXyz(-0.1,0.4,-0.5,-2,-1,3,null));
+		testCases.add(SpecialEuclideanOps_F64.eulerXyz(0,0,0.1,0,0,0,null));
+		testCases.add(SpecialEuclideanOps_F64.eulerXyz(1,0.1,-2,-0.1,0,0.05,null).invert(null));
 
 		DecomposeEssential alg = new DecomposeEssential();
-		// call it twice and see if it breaks
-		alg.decompose(E);
-		alg.decompose(E);
 
-		List<Se3_F64> solutions = alg.getSolutions();
+		for( Se3_F64 expected : testCases ) {
+			DMatrixRMaj E = MultiViewOps.createEssential(expected.R, expected.T, null);
 
-		assertEquals(4,solutions.size());
+			alg.decompose(E);
 
-		checkUnique(solutions);
+			List<Se3_F64> solutions = alg.getSolutions();
 
-		checkHasOriginal(solutions, R,T);
+			assertEquals(4, solutions.size());
+
+			checkUnique(solutions);
+
+			double length = expected.T.norm();
+			assertEquals(alg.getTranslationLength(), length, UtilEjml.TEST_F64);
+
+			checkHasOriginal(solutions, expected);
+		}
 	}
 
 	/**
@@ -106,12 +93,14 @@ public class TestDecomposeEssential {
 	/**
 	 * See if an equivalent to the input matrix exists
 	 */
-	private void checkHasOriginal( List<Se3_F64> solutions , DMatrixRMaj R ,Vector3D_F64 T  ) {
+	private void checkHasOriginal( List<Se3_F64> solutions , Se3_F64 expected ) {
+
+		expected.T.divide(expected.T.norm());
 
 		int numMatches = 0;
 		for( Se3_F64 se : solutions ) {
-			if(MatrixFeatures_DDRM.isIdentical(R,se.getR(),1e-4)) {
-				if( T.distance(se.getT()) < 1e-4 )
+			if(MatrixFeatures_DDRM.isIdentical(expected.R,se.getR(),1e-4)) {
+				if( expected.T.distance(se.getT()) < 1e-4 )
 					numMatches++;
 			}
 		}

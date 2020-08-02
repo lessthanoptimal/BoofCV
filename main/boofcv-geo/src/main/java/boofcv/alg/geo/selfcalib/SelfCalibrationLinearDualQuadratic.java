@@ -20,6 +20,9 @@ package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.struct.calib.CameraPinhole;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
@@ -30,9 +33,7 @@ import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * <p>
@@ -79,13 +80,17 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	double aspectRatio;
 
 	// Found calibration parameters
-	List<Intrinsic> solutions = new ArrayList<>();
+	FastQueue<Intrinsic> solutions = new FastQueue<>(Intrinsic::new);
 
 	// The dual absolute quadratic
 	DMatrix4x4 Q = new DMatrix4x4();
 
 	// A singular value is considered zero if it is smaller than this number
 	double singularThreshold=1e-3;
+
+	//---------------- Internal workspace
+	private final DMatrixRMaj L = new DMatrixRMaj(1,1);
+	private DMatrixRMaj w_i = new DMatrixRMaj(3,3);
 
 	/**
 	 * Constructor for zero-principle point and (optional) zero-skew
@@ -116,17 +121,27 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	}
 
 	/**
+	 * Resets it into its initial state
+	 */
+	public void reset() {
+		cameras.reset();
+	}
+
+	/**
 	 * Solve for camera calibration. A sanity check is performed to ensure that a valid calibration is found.
 	 * All values must be countable numbers and the focal lengths must be positive numbers.
 	 *
 	 * @return Indicates if it was successful or not. If it fails it says why
 	 */
 	public GeometricResult solve() {
-		if( cameras.size < minimumProjectives )
+		solutions.reset();
+
+		if( cameras.size < minimumProjectives ) {
 			throw new IllegalArgumentException("You need at least "+minimumProjectives+" motions");
+		}
 
 		int N = cameras.size;
-		DMatrixRMaj L = new DMatrixRMaj(N*eqs,10);
+		L.reshape(N*eqs,10);
 
 		// Convert constraints into a (N*eqs) by 10 matrix. Null space is Q
 		constructMatrix(L);
@@ -141,7 +156,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 		// determine if the solution is good by looking at two smallest singular values
 		// If there isn't a steep drop it either isn't singular or more there is more than 1 singular value
-		double sv[] = svd.getSingularValues();
+		double[] sv = svd.getSingularValues();
 		Arrays.sort(sv);
 		if( singularThreshold*sv[1] <= sv[0] )  {
 //			System.out.println("ratio = "+(sv[0]/sv[1]));
@@ -183,13 +198,12 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	 * Computes the calibration for each view..
 	 */
 	private void computeSolutions(DMatrix4x4 Q) {
-		DMatrixRMaj w_i = new DMatrixRMaj(3,3);
-
 		for (int i = 0; i < cameras.size; i++) {
 			computeW(cameras.get(i),Q,w_i);
-			Intrinsic calib = solveForCalibration(w_i);
-			if( sanityCheck(calib)) {
-				solutions.add(calib);
+			Intrinsic calib = solutions.grow();
+			solveForCalibration(w_i,calib);
+			if( !sanityCheck(calib)) {
+				solutions.removeTail();
 			}
 		}
 	}
@@ -197,9 +211,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	/**
 	 * Given the solution for w and the constraints solve for the remaining parameters
 	 */
-	private Intrinsic solveForCalibration(DMatrixRMaj w) {
-		Intrinsic calib = new Intrinsic();
-
+	private void solveForCalibration(DMatrixRMaj w, Intrinsic calib) {
 //		CholeskyDecomposition_F64<DMatrixRMaj> chol = DecompositionFactory_DDRM.chol(false);
 //
 //		chol.decompose(w.copy());
@@ -224,7 +236,6 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 			calib.skew = w.get(0,1)/calib.fy;
 			calib.fx = Math.sqrt(w.get(0,0) - calib.skew*calib.skew);
 		}
-		return calib;
 	}
 
 	/**
@@ -333,7 +344,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 		this.singularThreshold = singularThreshold;
 	}
 
-	public List<Intrinsic> getSolutions() {
+	public FastAccess<Intrinsic> getSolutions() {
 		return solutions;
 	}
 
@@ -347,5 +358,14 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 	public static class Intrinsic {
 		public double fx,fy,skew;
+
+		/** Copies the values into this class in to the more generalized {@link boofcv.struct.calib.CameraPinhole} */
+		public void copyTo(CameraPinhole pinhole ) {
+			pinhole.fx = fx;
+			pinhole.fy = fy;
+			pinhole.skew = skew;
+			pinhole.cx = 0;
+			pinhole.cy = 0;
+		}
 	}
 }

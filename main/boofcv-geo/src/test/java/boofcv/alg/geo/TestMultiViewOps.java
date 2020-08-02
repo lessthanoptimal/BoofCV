@@ -26,6 +26,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.testing.BoofTesting;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPoint3D_F64;
@@ -65,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestMultiViewOps {
 
-	Random rand = new Random(234);
+	Random rand = BoofTesting.createRandom(4);
 
 	// camera calibration matrix
 	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
@@ -460,7 +461,7 @@ class TestMultiViewOps {
 		DMatrixRMaj found3 = new DMatrixRMaj(3,3);
 
 		TrifocalTensor input = tensor.copy();
-		MultiViewOps.extractFundamental(input, found2, found3);
+		MultiViewOps.trifocalFundamental(input, found2, found3);
 
 		// make sure the input was not modified
 		for( int i = 0; i < 3; i++ )

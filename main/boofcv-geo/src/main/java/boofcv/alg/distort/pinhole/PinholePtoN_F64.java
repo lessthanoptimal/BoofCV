@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort.pinhole;
 
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 
@@ -43,6 +44,10 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 
 	public PinholePtoN_F64() {}
 
+	public void set(CameraPinhole pinhole) {
+		set(pinhole.fx,pinhole.fy,pinhole.skew,pinhole.cx,pinhole.cy);
+	}
+
 	public void set(/**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 
 		// analytic solution to matrix inverse
@@ -52,7 +57,6 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 		a22 = (double)(1.0/fy);
 		a23 = (double)(-cy/fy);
 	}
-
 
 	@Override
 	public void compute(double x, double y, Point2D_F64 out) {

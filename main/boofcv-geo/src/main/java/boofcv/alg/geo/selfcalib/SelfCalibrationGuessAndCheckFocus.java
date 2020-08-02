@@ -65,16 +65,29 @@ import java.util.List;
  */
 public class SelfCalibrationGuessAndCheckFocus {
 
+	// Development Note
+	// There was an attempt to modify this to use reprojection error like TrifocalBruteForceSelfCalibration to select
+	// the best hypothesis. It didn't work very well. The likely cause is that the camera motion estimate from
+	// the rectifying homography was poor.
+
+	//----------------------- Configuration Parameters
+	// if true the first two cameras are assumed to have the same or approximately the same focus length
+	boolean fixedFocus;
+	// Defines which focus lengths are sampled based on a log scale
+	// Note that image has been normalized and 1.0 = focal length of image diagonal
+	double sampleMin=0.3,sampleMax=3;
+	int numSamples=50;
+
+	//--------------------- Input Related
 	// storage for internally normalized camera matrices
 	FastQueue<DMatrixRMaj> normalizedP;
 
+	//--------------------- Output Related
 	// used to estimate the plane at infinity
 	EstimatePlaneAtInfinityGivenK estimatePlaneInf = new EstimatePlaneAtInfinityGivenK();
 	Vector3D_F64 planeInf = new Vector3D_F64();
 
-	// if true the first two cameras are assumed to have the same or approximately the same focus length
-	boolean sameFocus;
-
+	//---------------------------------- Internal Work Space
 	// intrinsic camera calibration matrix for view 1
 	DMatrixRMaj K1 = new DMatrixRMaj(3,3);
 
@@ -93,11 +106,7 @@ public class SelfCalibrationGuessAndCheckFocus {
 	DMatrixRMaj V = new DMatrixRMaj(3,3);
 	DMatrixRMaj Vinv = new DMatrixRMaj(3,3);
 
-	// Defines which focus lengths are sampled based on a log scale
-	// Note that image has been normalized and 1.0 = focal length of image diagonal
-	double sampleMin=0.3,sampleMax=3;
-	int numSamples=50;
-	double scores[] = new double[numSamples];
+	double[] scores = new double[numSamples];
 
 	// Weights for score function
 	double w_sk = 1.0/0.01; // zero skew
@@ -115,12 +124,7 @@ public class SelfCalibrationGuessAndCheckFocus {
 	PrintStream verbose;
 
 	public SelfCalibrationGuessAndCheckFocus() {
-		normalizedP = new FastQueue<DMatrixRMaj>(DMatrixRMaj::new ) {
-			@Override
-			protected DMatrixRMaj createInstance() {
-				return new DMatrixRMaj(3,4);
-			}
-		};
+		normalizedP = new FastQueue<>(()->new DMatrixRMaj(3,4));
 	}
 
 	/**
@@ -161,7 +165,9 @@ public class SelfCalibrationGuessAndCheckFocus {
 	/**
 	 * Computes the best rectifying homography given the set of camera matrices. Must call {@link #setCamera} first.
 	 *
-	 * @param cameraMatrices camera matrices for view 2 and beyond. view 1 is implicit and assumed to be P = [I|0]
+	 * <P>DO NOT ADD P1=[I|0] it is implicit!</P>
+	 *
+	 * @param cameraMatrices (Input) camera matrices for view 2 and beyond. Do not add the implicit P1=[I|0]
 	 * @return true if successful or false if it fails
 	 */
 	public boolean process(List<DMatrixRMaj> cameraMatrices) {
@@ -190,7 +196,7 @@ public class SelfCalibrationGuessAndCheckFocus {
 
 		// Find the best combinations of focal lengths
 		double bestScore;
-		if( sameFocus ) {
+		if(fixedFocus) {
 			bestScore = findBestFocusOne(normalizedP.get(0));
 		} else {
 			bestScore = findBestFocusTwo(normalizedP.get(0));
@@ -357,12 +363,12 @@ public class SelfCalibrationGuessAndCheckFocus {
 		return totalScore;
 	}
 
-	public boolean isSameFocus() {
-		return sameFocus;
+	public boolean isFixedFocus() {
+		return fixedFocus;
 	}
 
 	public void setSingleCamera(boolean sameFocus) {
-		this.sameFocus = sameFocus;
+		this.fixedFocus = sameFocus;
 	}
 
 	/**

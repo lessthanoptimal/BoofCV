@@ -23,6 +23,7 @@ import boofcv.struct.image.*;
 import georegression.struct.GeoTuple;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.data.DMatrixRMaj;
 
 import java.io.File;
 import java.io.IOException;
@@ -549,5 +550,24 @@ public class BoofMiscOps {
 			out.add( func.process(input) );
 		}
 		return out;
+	}
+
+	/**
+	 * Finds the row at the specified column with the maximum absolute value
+	 * @param A (input) matrix
+	 * @param column column to inspect
+	 * @return The row index
+	 */
+	public static int columnMaxAbsRow(DMatrixRMaj A , int column ) {
+		int selected = -1;
+		double largestValue = -1;
+		for (int row = 0; row < A.numRows; row++) {
+			double v = Math.abs(A.unsafe_get(row,column));
+			if( v > largestValue ) {
+				largestValue = v;
+				selected = row;
+			}
+		}
+		return selected;
 	}
 }

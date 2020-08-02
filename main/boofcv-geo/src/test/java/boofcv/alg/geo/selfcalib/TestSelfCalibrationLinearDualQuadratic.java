@@ -30,6 +30,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -120,7 +121,7 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 
 		assertEquals(GeometricResult.SUCCESS,alg.solve());
 
-		List<Intrinsic> found = alg.getSolutions();
+		FastAccess<Intrinsic> found = alg.getSolutions();
 		assertEquals(3,found.size());
 		for (int i = 0; i < found.size(); i++) {
 			Intrinsic f = found.get(i);

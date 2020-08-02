@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Camera calibration for when the camera's motion is purely rotational and has no translational
  * component and camera parameters can change every frame. Linear constraints need to be specified
- * on camera parameters.  Based off of variable calibration Algorithm 19.3 on page 482 in [1].
+ * on camera parameters. Based off of variable calibration Algorithm 19.3 on page 482 in [1].
  *
  * <pre>
  * Steps:

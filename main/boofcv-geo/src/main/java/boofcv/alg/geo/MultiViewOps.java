@@ -59,9 +59,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF4;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
-import org.ejml.dense.row.SpecializedOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import org.ejml.interfaces.decomposition.QRDecomposition;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import javax.annotation.Nullable;
@@ -625,7 +623,7 @@ public class MultiViewOps {
 	 * @param F21 Output: Fundamental matrix for views 1 and 2. Modified.
 	 * @param F31 Output: Fundamental matrix for views 1 and 3. Modified.
 	 */
-	public static void extractFundamental( TrifocalTensor tensor , DMatrixRMaj F21 , DMatrixRMaj F31 ) {
+	public static void trifocalFundamental(TrifocalTensor tensor , DMatrixRMaj F21 , DMatrixRMaj F31 ) {
 		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
 		e.setTensor(tensor);
 		e.extractFundmental(F21,F31);
@@ -1090,59 +1088,7 @@ public class MultiViewOps {
 	 * @return true if decompose was successful
 	 */
 	public static boolean decomposeMetricCamera(DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView) {
-		DMatrixRMaj A = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.extract(cameraMatrix, 0, 3, 0, 3, A, 0, 0);
-		worldToView.T.set(cameraMatrix.get(0,3),cameraMatrix.get(1,3),cameraMatrix.get(2,3));
-
-		QRDecomposition<DMatrixRMaj> qr = DecompositionFactory_DDRM.qr(3, 3);
-
-		// Need to do an RQ decomposition, but we only have QR
-		// by permuting the rows in KR we can get the desired result
-		DMatrixRMaj Pv = SpecializedOps_DDRM.pivotMatrix(null,new int[]{2,1,0},3,false);
-		DMatrixRMaj A_p = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.mult(Pv,A,A_p);
-		CommonOps_DDRM.transpose(A_p);
-		if( !qr.decompose(A_p) )
-			return false;
-
-		// extract the rotation
-		qr.getQ(A,false);
-		CommonOps_DDRM.multTransB(Pv,A,worldToView.R);
-
-		// extract the calibration matrix
-		qr.getR(K,false);
-		CommonOps_DDRM.multTransB(Pv,K,A);
-		CommonOps_DDRM.mult(A,Pv,K);
-
-		// there are four solutions, massage it so that it's the correct one.
-		// each of these row/column negations produces the same camera matrix
-		for (int i = 0; i < 3; i++) {
-			if( K.get(i,i) < 0) {
-				CommonOps_DDRM.scaleCol(-1,K,i);
-				CommonOps_DDRM.scaleRow(-1,worldToView.R,i);
-			}
-		}
-
-		// rotation matrices have det() == 1
-		if( CommonOps_DDRM.det(worldToView.R) < 0 ) {
-			CommonOps_DDRM.scale(-1,worldToView.R);
-			worldToView.T.scale(-1);
-		}
-
-		// save the scale so that T is scaled correctly. This is important when upgrading common projective cameras
-		double scale = K.get(2,2);
-
-		// make sure it's a proper camera matrix and this is more numerically stable to invert
-		CommonOps_DDRM.divide(K,scale);
-
-		// could do a very fast triangulate inverse. EJML doesn't have one for upper triangle, yet.
-		if( !CommonOps_DDRM.invert(K,A) )
-			return false;
-
-		GeometryMath_F64.mult(A, worldToView.T, worldToView.T);
-		worldToView.T.divide(scale);
-
-		return true;
+		return new DecomposeProjectiveToMetric().decomposeMetricCamera(cameraMatrix,K,worldToView);
 	}
 
 	/**
@@ -1383,10 +1329,7 @@ public class MultiViewOps {
 	public static boolean projectiveToMetric( DMatrixRMaj cameraMatrix , DMatrixRMaj H ,
 										   Se3_F64 worldToView , DMatrixRMaj K )
 	{
-		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
-
-		return MultiViewOps.decomposeMetricCamera(tmp,K,worldToView);
+		return new DecomposeProjectiveToMetric().projectiveToMetric(cameraMatrix, H, worldToView, K);
 	}
 
 	/**
@@ -1406,42 +1349,7 @@ public class MultiViewOps {
 												 DMatrixRMaj H , DMatrixRMaj K,
 												 Se3_F64 worldToView )
 	{
-		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.mult(cameraMatrix,H,tmp);
-
-		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(K,K_inv);
-
-		DMatrixRMaj P = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.mult(K_inv,tmp,P);
-
-		CommonOps_DDRM.extract(P,0,0,worldToView.R);
-		worldToView.T.x = P.get(0,3);
-		worldToView.T.y = P.get(1,3);
-		worldToView.T.z = P.get(2,3);
-
-		SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true,true,true);
-
-		DMatrixRMaj R = worldToView.R;
-		if( !svd.decompose(R))
-			return false;
-
-		CommonOps_DDRM.multTransB(svd.getU(null,false),svd.getV(null,false),R);
-
-		// determinant should be +1
-		double det = CommonOps_DDRM.det(R);
-		if( det < 0 ) {
-			CommonOps_DDRM.scale(-1,R);
-			worldToView.T.scale(-1);
-		}
-
-		// recover the scale of T. This is important when trying to construct a common metric frame from a common
-		// projective frame
-		double[] sv = svd.getSingularValues();
-		double sv_mag = (sv[0]+sv[1]+sv[2])/3.0;
-		worldToView.T.divideIP(sv_mag);
-
-		return true;
+		return new DecomposeProjectiveToMetric().projectiveToMetricKnownK(cameraMatrix,H,K,worldToView);
 	}
 
 	/**
@@ -1689,11 +1597,11 @@ public class MultiViewOps {
 	}
 
 	/**
-	 * Convience function for initializing bundle adjustment parameters. Triangulates points using camera
+	 * Convenience function for initializing bundle adjustment parameters. Triangulates points using camera
 	 * position and pixel observations.
 	 *
-	 * @param structure
-	 * @param observations
+	 * @param structure camera locations
+	 * @param observations observations of features in the images
 	 */
 	public static void triangulatePoints(SceneStructureMetric structure , SceneObservations observations )
 	{

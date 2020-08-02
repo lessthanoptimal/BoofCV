@@ -58,7 +58,7 @@ import java.util.Random;
  * <ol>
  * <li>Fitzgibbon, Andrew W., and Andrew Zisserman. "Automatic camera recovery for closed or open image sequences."
  * European conference on computer vision. Springer, Berlin, Heidelberg, 1998.</li>
- * <li> P. Abeles, "BoofCV Technical Report: Automatic Camera Calibration" 2018-1 </li>
+ * <li> P. Abeles, "BoofCV Technical Report: Automatic Camera Calibration" 2020-1 </li>
  * </ul>
  *
  * @author Peter Abeles
