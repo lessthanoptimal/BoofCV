@@ -49,6 +49,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -73,7 +74,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Computes a stereo point cloud using three uncalibrated images. Visualizes different pre-processing steps and
@@ -106,7 +110,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	GrowQueue_I32[] featureSets = new GrowQueue_I32[3];
 	ImageDimension[] dimensions = new ImageDimension[3];
 
-	BufferedImage buff[] = new BufferedImage[3];
+	BufferedImage[] buff = new BufferedImage[3];
 
 	// Rectify and remove lens distortion for stereo processing
 	DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
@@ -139,6 +143,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	public DemoThreeViewStereoApp(List<PathLabel> examples) {
 		super(true, false, examples, ImageType.single(GrayU8.class));
+		useCustomOpenFiles = true;
 
 		// remove some unused items from the menu bar. This app is an exception
 		JMenu fileMenu = menuBar.getMenu(0);
@@ -174,7 +179,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,3);
 		if( files == null )
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
+		BoofSwingUtil.invokeNowOrLater(()->openFiles(BoofMiscOps.toFileList(files),true));
 	}
 
 	@Override
@@ -257,17 +262,24 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		BoofSwingUtil.savePointCloudDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,guiPointCloud);
 	}
 
+	@Override
+	protected boolean openCustomFiles(String[] filePaths, List<String> outSequence, List<String> outImages) {
+		assertBoof(filePaths.length==3,"Expected 3 images to be selected");
+		outImages.addAll(Arrays.asList(filePaths));
+		return true;
+	}
+
 	void updateVisibleGui() {
 		if( gui.getComponentCount() > 0 )
 			gui.remove(0);
 
-		switch( controls.view ) {
-			case 0: gui.add(BorderLayout.CENTER,guiImage); break;
-			case 1: gui.add(BorderLayout.CENTER,guiAssoc); break;
-			case 2: gui.add(BorderLayout.CENTER,rectifiedPanel); break;
-			case 3: gui.add(BorderLayout.CENTER,guiDisparity); break;
-			case 4: gui.add(BorderLayout.CENTER,guiPointCloud.getComponent()); break;
-			default: gui.add(BorderLayout.CENTER,guiImage); break;
+		switch (controls.view) {
+			case 0 -> gui.add(BorderLayout.CENTER, guiImage);
+			case 1 -> gui.add(BorderLayout.CENTER, guiAssoc);
+			case 2 -> gui.add(BorderLayout.CENTER, rectifiedPanel);
+			case 3 -> gui.add(BorderLayout.CENTER, guiDisparity);
+			case 4 -> gui.add(BorderLayout.CENTER, guiPointCloud.getComponent());
+			default -> gui.add(BorderLayout.CENTER, guiImage);
 		}
 
 		gui.validate();

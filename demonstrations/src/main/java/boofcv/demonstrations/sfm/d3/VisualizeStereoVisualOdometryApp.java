@@ -121,7 +121,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	public VisualizeStereoVisualOdometryApp(List<PathLabel> examples,
 											Class<T> imageType ) {
 		super(true, false, examples, ImageType.single(imageType),ImageType.single(imageType));
-		customFileInput = true;
+		useCustomOpenFiles = true;
 
 		addViewMenu();
 
@@ -305,7 +305,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	}
 
 	@Override
-	protected boolean openFiles(String[] filePaths, List<String> outSequence, List<String> outImages) {
+	protected boolean openCustomFiles(String[] filePaths, List<String> outSequence, List<String> outImages) {
 		if( filePaths.length == 2 ) {
 			File f = new File(filePaths[0]).getParentFile();
 			stereoParameters = CalibrationIO.load(new File(f,"stereo.yaml"));

@@ -94,7 +94,8 @@ public abstract class DemonstrationBase extends JPanel {
 	private volatile boolean startingProcess = false;
 
 	protected MediaManager media = new DefaultMediaManager();
-	protected boolean customFileInput = false;
+	// Will force a custom function for opening a file. This is required if multiple files are selected as input
+	protected boolean useCustomOpenFiles = false;
 	protected boolean allowVideos = true;
 	protected boolean allowImages = true;
 
@@ -278,12 +279,12 @@ public abstract class DemonstrationBase extends JPanel {
 		for( BoofSwingUtil.RecentFiles info : recentFiles ) {
 			JMenuItem recentItem = new JMenuItem(info.name);
 			recentItem.addActionListener(e -> {
-				if( customFileInput ) {
+				if( useCustomOpenFiles ) {
 					openFiles(BoofMiscOps.toFileList(info.files), true);
 				} else if( info.files.size() == 1 ) {
 					openFile(new File(info.files.get(0)), true);
 				} else {
-					System.err.println("updateRecentItems() Not custom and not one. Not sure what to do");
+					openFiles(BoofMiscOps.toFileList(info.files),true);
 				}
 			});
 			menuRecent.add(recentItem);
@@ -313,7 +314,7 @@ public abstract class DemonstrationBase extends JPanel {
 				p.path[i] = massageExampleFilePath(p.path[i]);
 			}
 
-			if( customFileInput ) {
+			if(useCustomOpenFiles) {
 				openFiles(p.getPathFiles(), false);
 				return;
 			}
@@ -603,7 +604,7 @@ public abstract class DemonstrationBase extends JPanel {
 		List<String> sequences = new ArrayList<>();
 		List<String> images = new ArrayList<>();
 
-		if( !openFiles(inputFileSet,sequences,images) )
+		if( !openCustomFiles(inputFileSet,sequences,images) )
 			return;
 
 		if( !sequences.isEmpty() && !images.isEmpty() )
@@ -639,9 +640,9 @@ public abstract class DemonstrationBase extends JPanel {
 	 * to be opened and processed. Can only handle images OR sequences and not both.
 	 * @return true if it was successful or false if it failed
 	 */
-	protected boolean openFiles( String[] filePaths ,
-								 List<String> outSequence ,
-								 List<String> outImages )
+	protected boolean openCustomFiles(String[] filePaths ,
+									  List<String> outSequence ,
+									  List<String> outImages )
 	{
 		throw new RuntimeException("Override this function to implement custom file opening");
 	}
@@ -870,7 +871,7 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Open file in the menu bar was invoked by the user
 	 */
 	protected void openFileMenuBar() {
-		if( customFileInput) {
+		if(useCustomOpenFiles) {
 			throw new RuntimeException("If customFileInput you must overload and provide a custom function");
 		}
 
@@ -1080,7 +1081,7 @@ public abstract class DemonstrationBase extends JPanel {
 	 * there is no need to reprocess, the next image will be handled soon enough.
 	 */
 	public void reprocessInput() {
-		if( customFileInput ) {
+		if(useCustomOpenFiles) {
 			openFiles(BoofMiscOps.toFileList(inputFileSet), true);
 			return;
 		}
