@@ -44,6 +44,11 @@ import java.util.List;
  * 3) Compute K using Cholesky decomposition w = U*U<sup>T</sup>. Actually implemented as an algebraic formula.
  * </pre>
  *
+ * <p>
+ * There will be a sign ambiguity in the returned result for the translation vector. That can be resolved by checking
+ * for positive depth of triangulated features.
+ * </p>
+ *
  * <ol>
  * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
  * </ol>

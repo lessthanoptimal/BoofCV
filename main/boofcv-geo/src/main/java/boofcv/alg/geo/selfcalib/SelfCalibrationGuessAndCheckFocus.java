@@ -54,6 +54,11 @@ import java.util.List;
  *     <li>Extracting K using absolute quadratic instead of rectifying homography</li>
  * </ol>
  *
+ * <p>
+ * There will be a sign ambiguity in the returned result for the translation vector. That can be resolved by checking
+ * for positive depth of triangulated features.
+ * </p>
+ *
  * @see EstimatePlaneAtInfinityGivenK
  *
  * <p>

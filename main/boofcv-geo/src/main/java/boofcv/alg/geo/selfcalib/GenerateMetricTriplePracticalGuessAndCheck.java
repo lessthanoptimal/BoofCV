@@ -60,6 +60,8 @@ public class GenerateMetricTriplePracticalGuessAndCheck implements
 	// intrinsic calibration matrix
 	final DMatrixRMaj K = new DMatrixRMaj(3,3);
 
+	ResolveSignAmbiguityPositiveDepth resolveSign = new ResolveSignAmbiguityPositiveDepth();
+
 	public GenerateMetricTriplePracticalGuessAndCheck(Estimate1ofTrifocalTensor trifocal, SelfCalibrationGuessAndCheckFocus alg) {
 		this.trifocal = trifocal;
 		this.alg = alg;
@@ -95,6 +97,8 @@ public class GenerateMetricTriplePracticalGuessAndCheck implements
 		if( !MultiViewOps.projectiveToMetric(P3,H,result.view_1_to_3,K) )
 			return false;
 		PerspectiveOps.matrixToPinhole(K,-1,-1,result.view3);
+
+		resolveSign.process(dataSet,result);
 
 		return true;
 	}

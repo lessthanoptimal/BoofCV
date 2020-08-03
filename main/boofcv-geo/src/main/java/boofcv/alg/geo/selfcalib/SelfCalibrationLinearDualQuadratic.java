@@ -90,7 +90,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 
 	//---------------- Internal workspace
 	private final DMatrixRMaj L = new DMatrixRMaj(1,1);
-	private DMatrixRMaj w_i = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj w_i = new DMatrixRMaj(3,3);
 
 	/**
 	 * Constructor for zero-principle point and (optional) zero-skew
@@ -279,6 +279,8 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 //			double scale = NormOps_DDF3.normF(P.A);
 //			CommonOps_DDF3.divide(P.A,scale);
 //			CommonOps_DDF3.divide(P.a,scale);
+			// Scaling camera matrices P on input by [1/f 0 0; 0 1/f 0; 0 0 1] seems to make it slightly worse on
+			// real world data!
 
 			// constraint for a zero principle point
 

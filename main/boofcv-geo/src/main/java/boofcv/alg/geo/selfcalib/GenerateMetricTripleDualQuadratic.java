@@ -70,6 +70,8 @@ public class GenerateMetricTripleDualQuadratic implements
 	// Storage for tensor
 	final TrifocalTensor tensor = new TrifocalTensor();
 
+	ResolveSignAmbiguityPositiveDepth resolveSign = new ResolveSignAmbiguityPositiveDepth();
+
 	public GenerateMetricTripleDualQuadratic(Estimate1ofTrifocalTensor trifocal,
 											 SelfCalibrationLinearDualQuadratic selfCalib) {
 		this.trifocal = trifocal;
@@ -114,6 +116,8 @@ public class GenerateMetricTripleDualQuadratic implements
 			return false;
 		if( !MultiViewOps.projectiveToMetric(P3,H,result.view_1_to_3,K) )
 			return false;
+
+		resolveSign.process(dataSet,result);
 
 		return true;
 	}
