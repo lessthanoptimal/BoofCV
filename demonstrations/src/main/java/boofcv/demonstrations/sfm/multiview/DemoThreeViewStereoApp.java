@@ -89,7 +89,8 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
 public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	JPanel gui = new JPanel();
-	AssociatedTriplePanel guiAssoc = new AssociatedTriplePanel();
+	AssociatedTriplePanel guiMatches = new AssociatedTriplePanel();
+	AssociatedTriplePanel guiInliers= new AssociatedTriplePanel();
 	ImagePanel guiImage = new ImagePanel();
 	ImagePanel guiDisparity = new ImagePanel();
 	RectifiedPairPanel rectifiedPanel = new RectifiedPairPanel(true);
@@ -275,10 +276,11 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		switch (controls.view) {
 			case 0 -> gui.add(BorderLayout.CENTER, guiImage);
-			case 1 -> gui.add(BorderLayout.CENTER, guiAssoc);
-			case 2 -> gui.add(BorderLayout.CENTER, rectifiedPanel);
-			case 3 -> gui.add(BorderLayout.CENTER, guiDisparity);
-			case 4 -> gui.add(BorderLayout.CENTER, guiPointCloud.getComponent());
+			case 1 -> gui.add(BorderLayout.CENTER, guiMatches);
+			case 2 -> gui.add(BorderLayout.CENTER, guiInliers);
+			case 3 -> gui.add(BorderLayout.CENTER, rectifiedPanel);
+			case 4 -> gui.add(BorderLayout.CENTER, guiDisparity);
+			case 5 -> gui.add(BorderLayout.CENTER, guiPointCloud.getComponent());
 			default -> gui.add(BorderLayout.CENTER, guiImage);
 		}
 
@@ -547,9 +549,12 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 					controls.addText(String.format("Feats[%d] %d\n",i,features[i].size));
 				}
 				controls.addText("Associated "+associated.size+"\n");
-				guiAssoc.setPixelOffset(cx, cy);
-				guiAssoc.setImages(buff[0], buff[1], buff[2]);
-				guiAssoc.setAssociation(associated.toList());
+				guiMatches.setPixelOffset(cx, cy);
+				guiMatches.setImages(buff[0], buff[1], buff[2]);
+				guiMatches.setAssociation(associated.toList());
+				guiInliers.setPixelOffset(cx,cy);
+				guiInliers.setImages(buff[0], buff[1], buff[2]);
+				guiInliers.setAssociation(new ArrayList<>());
 				if( _automaticChangeViews )
 					controls.setViews(1);
 			});
@@ -574,6 +579,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			}
 
 			SwingUtilities.invokeLater(()->{
+				guiInliers.setAssociation(structureEstimator.ransac.getMatchSet());
+				if( _automaticChangeViews )
+					controls.setViews(2);
 				int n = structureEstimator.ransac.getMatchSet().size();
 				double score = structureEstimator.bundleAdjustment.getFitScore();
 				int numObs = structureEstimator.observations.getObservationCount();
@@ -645,7 +653,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				rectifiedPanel.setImages(visualRect1, visualRect2);
 				if( _automaticChangeViews )
-					controls.setViews(2);
+					controls.setViews(3);
 			});
 		} else {
 			SwingUtilities.invokeLater(() -> controls.addText("Skipping Rectify\n"));
@@ -674,7 +682,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			VisualizeImageData.disparity(disparity, visualDisparity, disparityRange, 0);
 			guiDisparity.setImageRepaint(visualDisparity);
 			if( _automaticChangeViews )
-				controls.setViews(3);
+				controls.setViews(4);
 		});
 
 		System.out.println("Computing Point Cloud");
@@ -832,7 +840,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
 
 		if( _automaticChangeViews ) {
-			BoofSwingUtil.invokeNowOrLater(() -> controls.setViews(4));
+			BoofSwingUtil.invokeNowOrLater(() -> controls.setViews(5));
 		}
 	}
 

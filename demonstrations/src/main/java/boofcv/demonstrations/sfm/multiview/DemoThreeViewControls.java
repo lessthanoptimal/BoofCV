@@ -32,7 +32,10 @@ import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 /**
  * @author Peter Abeles
@@ -48,7 +51,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	boolean autoFocal=true;
 	int focal = 500;
 
-	JComboBox<String> imageView = combo(view,"Image 1","Matches","Rectified","Disparity","3D");
+	JComboBox<String> imageView = combo(view,"Image 1","Matches","Inliers","Rectified","Disparity","3D");
 
 	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
 	JSpinner sMaxSize = spinner(maxImageSize,50,1200,50);
@@ -94,6 +97,30 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		addAlignCenter(bCompute);
 
 		disableComputeButton();
+
+		addKeyActions();
+	}
+
+	/**
+	 * Change the view using a keyboard command
+	 */
+	public void addKeyActions() {
+		for (int index = 0; index < imageView.getItemCount(); index++) {
+			InputMap inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+			ActionMap actionMap = getActionMap();
+
+			KeyStroke wStroke = KeyStroke.getKeyStroke(KeyEvent.VK_1+index, Event.CTRL_MASK);
+			inputMap.put(wStroke, wStroke.toString());
+			int _index = index;
+			actionMap.put(wStroke.toString(), new AbstractAction() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if( !isEnabled() )
+						return;
+					imageView.setSelectedIndex(_index);
+				}
+			});
+		}
 	}
 
 	private void addDisparityControls() {
