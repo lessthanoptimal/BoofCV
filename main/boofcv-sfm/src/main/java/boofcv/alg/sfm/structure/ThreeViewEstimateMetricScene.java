@@ -24,20 +24,20 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.geo.GeometricResult;
+import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.MultiViewOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
-import boofcv.alg.geo.selfcalib.EstimatePlaneAtInfinityGivenK;
-import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.factory.geo.*;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.struct.image.ImageDimension;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.VerbosePrint;
@@ -105,7 +105,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	protected DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 
 	// storage for pinhole cameras
-	protected List<CameraPinhole> listPinhole = new ArrayList<>();
+	public final List<CameraPinhole> listPinhole = new ArrayList<>();
 
 	// Refines the structure
 	public BundleAdjustment<SceneStructureMetric> bundleAdjustment;
@@ -221,23 +221,30 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		// see if it's configured to not prune
 		if( pruneFraction == 1.0 )
 			return;
+		if( verbose != null ) verbose.println("Pruning Outliers");
+
 		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure,observations);
 		pruner.pruneObservationsByErrorRank(pruneFraction);
 		pruner.pruneViews(10);
 		pruner.prunePoints(1);
 		bundleAdjustment.setParameters(structure,observations);
+		double before = bundleAdjustment.getFitScore();
 		bundleAdjustment.optimize(structure);
+		if( verbose != null ) verbose.println("   before "+before+" after "+bundleAdjustment.getFitScore());
 
 		if( verbose != null ) {
 			verbose.println("\nCamera");
 			for (int i = 0; i < structure.cameras.size; i++) {
-				verbose.println(structure.cameras.data[i].getModel().toString());
+				verbose.println("  "+structure.cameras.data[i].getModel().toString());
 			}
-			verbose.println("\n\nworldToView");
+			verbose.println("\nworldToView");
 			for (int i = 0; i < structure.views.size; i++) {
-				verbose.println(structure.views.data[i].worldToView.toString());
+				if( verbose != null ) {
+					Se3_F64 se = structure.views.data[i].worldToView;
+					Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(se.R,null);
+					verbose.println("  T="+se.T+"  R="+rod);
+				}
 			}
-			verbose.println("Fit Score: " + bundleAdjustment.getFitScore());
 		}
 	}
 
@@ -245,9 +252,6 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	 * Tries a bunch of stuff to ensure that it can find the best solution which is physically possible
 	 */
 	private void findBestValidSolution(BundleAdjustment<SceneStructureMetric> bundleAdjustment) {
-		// prints out useful debugging information that lets you know how well it's converging
-		bundleAdjustment.setVerbose(verbose,null);
-
 		// Specifies convergence criteria
 		bundleAdjustment.configure(convergeSBA.ftol, convergeSBA.gtol, convergeSBA.maxIterations);
 
@@ -257,13 +261,14 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		// ensure that the points are in front of the camera and are a valid solution
 		if( checkBehindCamera(structure) ) {
 			if( verbose != null )
-				verbose.println("  flipping view");
+				verbose.println("  #1 Points Behind. Flipping view");
 			flipAround(structure,observations);
 			bundleAdjustment.setParameters(structure,observations);
 			bundleAdjustment.optimize(structure);
 		}
 
 		double bestScore = bundleAdjustment.getFitScore();
+		if( verbose != null ) verbose.println("First Pass: SBA score "+bestScore);
 		List<Se3_F64> bestPose = new ArrayList<>();
 		List<BundlePinholeSimplified> bestCameras = new ArrayList<>();
 		for (int i = 0; i < structure.views.size; i++) {
@@ -288,7 +293,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		if( checkBehindCamera(structure) ) {
 			if( verbose != null )
-				verbose.println("  flipping view");
+				verbose.println("  #2 Points Behind. Flipping view");
 			flipAround(structure,observations);
 			bundleAdjustment.setParameters(structure,observations);
 			bundleAdjustment.optimize(structure);
@@ -296,7 +301,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		// revert to old settings
 		if( verbose != null )
-			verbose.println(" ORIGINAL / NEW = " + bestScore+" / "+bundleAdjustment.getFitScore());
+			verbose.println(" First Pass / Transpose(R) = " + bestScore+" / "+bundleAdjustment.getFitScore());
 		if( bundleAdjustment.getFitScore() > bestScore ) {
 			if( verbose != null )
 				verbose.println("  recomputing old structure");
@@ -309,7 +314,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			bundleAdjustment.setParameters(structure,observations);
 			bundleAdjustment.optimize(structure);
 			if( verbose != null )
-				verbose.println("  score = "+bundleAdjustment.getFitScore());
+				verbose.println("  score after reverting = "+bundleAdjustment.getFitScore()+"  original "+bestScore);
 		}
 	}
 
@@ -376,71 +381,74 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	boolean projectiveToMetric() {
 
 		// homography from projective to metric
-		DMatrixRMaj H = new DMatrixRMaj(4,4);
+
 		listPinhole.clear();
 
 		if( manualFocalLength <= 0 ) {
 			// Estimate calibration parameters
-			SelfCalibrationLinearDualQuadratic selfcalib = new SelfCalibrationLinearDualQuadratic(1.0);
-			selfcalib.addCameraMatrix(P1);
-			selfcalib.addCameraMatrix(P2);
-			selfcalib.addCameraMatrix(P3);
+			var config = new ConfigSelfCalibDualQuadratic();
+//			var config = new ConfigSelfCalibEssentialGuess();
+//			config.numberOfSamples = 200;
+//			config.fixedFocus = true;
+//			config.sampleMin = 0.6;
+//			config.sampleMax = 1.5;
 
-			GeometricResult result = selfcalib.solve();
-			if (GeometricResult.SOLVE_FAILED != result && selfcalib.getSolutions().size() == 3) {
-				for (int i = 0; i < 3; i++) {
-					SelfCalibrationLinearDualQuadratic.Intrinsic c = selfcalib.getSolutions().get(i);
-					CameraPinhole p = new CameraPinhole(c.fx, c.fy, 0, 0, 0, width, height);
-					listPinhole.add(p);
-				}
-			} else {
-				// TODO Handle this better
-				System.out.println("Self calibration failed!");
-				for (int i = 0; i < 3; i++) {
-					CameraPinhole p = new CameraPinhole(width / 2, width / 2, 0, 0, 0, width, height);
-					listPinhole.add(p);
-				}
+			var selfcalib = FactoryMultiView.projectiveToMetric(config);
+
+			List<ImageDimension> dimensions = new ArrayList<>();
+			for (int i = 0; i < 3; i++) {
+				dimensions.add( new ImageDimension(width,height));
 			}
-			// convert camera matrix from projective to metric
-			if( !MultiViewOps.absoluteQuadraticToH(selfcalib.getQ(),H) ) {
-				if( verbose != null ) {
-					verbose.println("Projective to metric failed");
-				}
-				return false;
+			List<DMatrixRMaj> cameras = new ArrayList<>();
+			cameras.add(P2);
+			cameras.add(P3);
+			List<List<Point2D_F64>> observations = MultiViewOps.splits3Lists(ransac.getMatchSet(),null);
+
+			var results = new MetricCameras();
+			boolean success = selfcalib.process(dimensions,cameras,observations,results);
+
+			if (success) {
+				listPinhole.addAll(results.intrinsics.toList());
+				worldToView.get(0).reset();
+				worldToView.get(1).set(results.motion_1_to_k.get(0));
+				worldToView.get(2).set(results.motion_1_to_k.get(1));
+			} else {
+//				// TODO Handle this better
+//				System.out.println("Self calibration failed!");
+//				for (int i = 0; i < 3; i++) {
+//					CameraPinhole p = new CameraPinhole(width / 2, width / 2, 0, 0, 0, width, height);
+//					listPinhole.add(p);
+//				}
+				throw new RuntimeException("Estimate H from known intrinsics");
 			}
 		} else {
-			// Assume all cameras have a fixed known focal length
-			EstimatePlaneAtInfinityGivenK estimateV = new EstimatePlaneAtInfinityGivenK();
-			estimateV.setCamera1(manualFocalLength,manualFocalLength,0,0,0);
-			estimateV.setCamera2(manualFocalLength,manualFocalLength,0,0,0);
-
-			Vector3D_F64 v = new Vector3D_F64(); // plane at infinity
-			if( !estimateV.estimatePlaneAtInfinity(P2,v))
-				throw new RuntimeException("Failed!");
-
-			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(manualFocalLength,manualFocalLength,0,0,0);
-			MultiViewOps.createProjectiveToMetric(K,v.x,v.y,v.z,1,H);
-
-			for (int i = 0; i < 3; i++) {
-				CameraPinhole p = new CameraPinhole(manualFocalLength,manualFocalLength, 0, 0, 0, width, height);
-				listPinhole.add(p);
-			}
+			throw new RuntimeException("Estimate H from known intrinsics");
+//			// Assume all cameras have a fixed known focal length
+//			EstimatePlaneAtInfinityGivenK estimateV = new EstimatePlaneAtInfinityGivenK();
+//			estimateV.setCamera1(manualFocalLength,manualFocalLength,0,0,0);
+//			estimateV.setCamera2(manualFocalLength,manualFocalLength,0,0,0);
+//
+//			Vector3D_F64 v = new Vector3D_F64(); // plane at infinity
+//			if( !estimateV.estimatePlaneAtInfinity(P2,v))
+//				throw new RuntimeException("Failed!");
+//
+//			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(manualFocalLength,manualFocalLength,0,0,0);
+//			MultiViewOps.createProjectiveToMetric(K,v.x,v.y,v.z,1,H);
+//
+//			for (int i = 0; i < 3; i++) {
+//				CameraPinhole p = new CameraPinhole(manualFocalLength,manualFocalLength, 0, 0, 0, width, height);
+//				listPinhole.add(p);
+//			}
 		}
 
 		if( verbose != null ) {
+			verbose.println("Initial Intrinsic Estimate:");
 			for (int i = 0; i < 3; i++) {
 				CameraPinhole r = listPinhole.get(i);
-				verbose.println("fx=" + r.fx + " fy=" + r.fy + " skew=" + r.skew);
+				verbose.printf("  fx = %6.1f, fy = %6.1f, skew = %6.3f\n",r.fx,r.fy,r.skew);
 			}
-			verbose.println("Projective to metric");
+			verbose.println("Initial Motion Estimate:");
 		}
-
-		DMatrixRMaj K = new DMatrixRMaj(3,3);
-
-		// ignore K since we already have that
-		MultiViewOps.projectiveToMetric(P1,H,worldToView.get(0),K);
-		MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
-		MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
 
 		// scale is arbitrary. Set max translation to 1
 		double maxT = 0;
@@ -450,7 +458,8 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		for( Se3_F64 p : worldToView ) {
 			p.T.scale(1.0/maxT);
 			if( verbose != null ) {
-				verbose.println(p);
+				Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(p.R,null);
+				verbose.println("  T="+p.T+"  R="+rod);
 			}
 		}
 

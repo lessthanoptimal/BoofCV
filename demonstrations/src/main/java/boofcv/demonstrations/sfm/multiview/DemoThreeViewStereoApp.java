@@ -166,6 +166,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		add(BorderLayout.CENTER, gui);
 
 		setPreferredSize(new Dimension(900,700));
+		structureEstimator.setVerbose(System.out,null);
 	}
 
 	@Override
@@ -586,11 +587,17 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				double score = structureEstimator.bundleAdjustment.getFitScore();
 				int numObs = structureEstimator.observations.getObservationCount();
 				int numPoints = structureEstimator.structure.points.size;
-				controls.addText(String.format("Tri Feats %d\n",n));
+				controls.addText(String.format("Inliers %d\n",n));
+				controls.addText("Initial Intrinsic\n");
+				for (int i = 0; i < 3; i++) {
+					CameraPinhole c = structureEstimator.listPinhole.get(i);
+					controls.addText(String.format("  fx=%6.1f fy=%6.1f sk=%.2f\n",c.fx,c.fy,c.skew));
+				}
+
+				controls.addText("SBA Intrinsic\n");
 				for (int i = 0; i < 3; i++) {
 					BundlePinholeSimplified c = structureEstimator.structure.cameras.get(i).getModel();
-					controls.addText(String.format("cam[%d] f=%.1f\n",i,c.f));
-					controls.addText(String.format("   k1=%.2f k2=%.2f\n",c.k1,c.k2));
+					controls.addText(String.format("  f=%.1f k1=%.2f k2=%.2f\n",c.f,c.k1,c.k2));
 				}
 				controls.addText(String.format("SBA Obs %4d Pts %d\n",numObs,numPoints));
 				controls.addText(String.format("SBA fit score %.3f\n",score));
