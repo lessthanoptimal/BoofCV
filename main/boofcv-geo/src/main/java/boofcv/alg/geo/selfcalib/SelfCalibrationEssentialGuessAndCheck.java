@@ -18,13 +18,18 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
 
 import javax.annotation.Nullable;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -92,6 +97,14 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	/** Generates and scores a hypothesis given two intrinsic camera matrices */
 	public @Getter final TwoViewToCalibratingHomography calibrator = new TwoViewToCalibratingHomography();
 
+	// SVD use to compute fit score. Just need singular values
+	private final SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, false, false, false);
+	// storage for essential matrix used
+	final DMatrixRMaj E = new DMatrixRMaj(3,3);
+	// storage for guess intrinsic camera matrices
+	final DMatrixRMaj K1 = new DMatrixRMaj(3,3);
+	final DMatrixRMaj K2 = new DMatrixRMaj(3,3);
+
 	// If not null then verbose information is printed
 	private PrintStream verbose;
 
@@ -127,16 +140,15 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 		// coeffients for linear to log scale
 		double logCoef = Math.log(sampleFocalRatioMax / sampleFocalRatioMin)/(numberOfSamples-1);
 
-		DMatrixRMaj K1 = new DMatrixRMaj(3,3);
-		K1.set(2,2,1);
-
 		isLimit = false;
 
 		if(fixedFocus) {
-			searchFixedFocus(observations, logCoef, K1);
+			searchFixedFocus(logCoef);
 		} else {
-			searchDynamicFocus(observations, logCoef, K1);
+			searchDynamicFocus(logCoef);
 		}
+		// compute the rectifying homography from the best solution
+		computeHomography(focalLengthA,focalLengthB,observations);
 
 		// DESIGN NOTE:
 		// Could fit a 1-D or 2-D quadratic and get additional accuracy. Then compute the H at that value
@@ -149,15 +161,13 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	/**
 	 * Assumes that each camera can have an independent focal length value and searches a 2D grid
 	 *
-	 * @param observations observations of the features used to select beset result
 	 * @param logCoef coeffient for log scale
-	 * @param K1 intrinsic camera calibration matrix for view-1
 	 */
-	private void searchDynamicFocus(List<AssociatedPair> observations, double logCoef, DMatrixRMaj K1) {
-		double bestError = Double.MAX_VALUE;
-
-		var K2 = new DMatrixRMaj(3,3);
+	private void searchDynamicFocus(double logCoef) {
+		K1.set(2,2,1);
 		K2.set(2,2,1);
+
+		double bestError = Double.MAX_VALUE;
 
 		for (int idxA = 0; idxA < numberOfSamples; idxA++) {
 			double focalRatioA = sampleFocalRatioMin * Math.exp(logCoef * idxA);
@@ -172,31 +182,41 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 				K2.set(0, 0, focalPixelsB);
 				K2.set(1, 1, focalPixelsB);
 
-				calibrator.process(K1, K2, observations);
+				PerspectiveOps.multTranA(K2,calibrator.F21,K1,E);
 
-				double error = calibrator.bestModelError;
+				if( !svd.decompose(E))
+					continue;
+
+				double error = computeFitError();
+
 				if( verbose != null )
-					verbose.printf("[%3d,%3d] f1=%5.2f f2=%5.2f error=%f invalid=%d\n",idxA,idxB,focalPixelsA,focalPixelsB,error,calibrator.bestInvalid);
+					verbose.printf("[%3d,%3d] f1=%5.2f f2=%5.2f error=%f\n",idxA,idxB,focalPixelsA,focalPixelsB,error);
 				if( error < bestError ) {
 					isLimit = idxA == 0 || idxA == numberOfSamples-1;
 					isLimit |= idxB == 0 || idxB == numberOfSamples-1;
 					bestError = error;
 					focalLengthA = focalPixelsA;
 					focalLengthB = focalPixelsB;
-					rectifyingHomography.set(calibrator.getCalibrationHomography());
 				}
 			}
 		}
 	}
 
+	private void computeHomography( double F1, double F2, List<AssociatedPair> observations ) {
+		var K1 = CommonOps_DDRM.diag(F1,F1,1);
+		var K2 = CommonOps_DDRM.diag(F2,F2,1);
+
+		calibrator.process(K1, K2, observations);
+		rectifyingHomography.set(calibrator.getCalibrationHomography());
+	}
+
 	/**
 	 * Assumes that there is only one focal length value and searches for the optical value
 	 *
-	 * @param observations observations of the features used to select beset result
 	 * @param logCoef coeffient for log scale
-	 * @param K1 intrinsic camera calibration matrix for view-1
 	 */
-	private void searchFixedFocus(List<AssociatedPair> observations, double logCoef, DMatrixRMaj K1) {
+	private void searchFixedFocus(double logCoef) {
+		K1.set(2,2,1);
 		double bestError = Double.MAX_VALUE;
 
 		for (int idxA = 0; idxA < numberOfSamples; idxA++) {
@@ -207,25 +227,47 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 			K1.set(0, 0, focalPixelsA);
 			K1.set(1, 1, focalPixelsA);
 
-			if( !calibrator.process(K1, K1, observations) )
+			// Use known calibration to compute essential matrix
+			PerspectiveOps.multTranA(K1,calibrator.F21,K1,E);
+
+			// Use the singular values to evaluate
+			if( !svd.decompose(E))
 				continue;
 
-			// Using known constraints on K doesn't seem to work as a better error metric
-//			double error = Math.abs(K3.get(0,1)) + Math.abs(K3.get(0,2)) + Math.abs(K3.get(1,2));
+			double error = computeFitError();
 
-			double error = calibrator.bestModelError;
-			if( verbose != null )
-				verbose.printf("[%3d] f=%5.2f svd-error=%f invalid=%d\n", idxA, focalPixelsA, error, calibrator.bestInvalid);
+			if( verbose != null ) verbose.printf("[%3d] f=%5.2f svd-error=%f\n", idxA, focalPixelsA, error);
 
 			if( error < bestError ) {
 				isLimit = idxA == 0 || idxA == numberOfSamples-1;
 				bestError = error;
 				focalLengthA = focalPixelsA;
-				rectifyingHomography.set(calibrator.getCalibrationHomography());
 			}
 		}
 		// Copy results to the other camera
 		focalLengthB = focalLengthA;
+	}
+
+	/**
+	 * Checks the two singular values are the same like it should be in a real essential matrix
+	 */
+	private double computeFitError() {
+		double[] sv = svd.getSingularValues();
+		// Find the two largest singular values
+		double v0,v1;
+		if( sv[0] > sv[1] ) {
+			v0 = sv[0];
+			v1 = sv[1];
+		} else {
+			v0 = sv[1];
+			v1 = sv[0];
+		}
+		if( v1 < sv[2] ) {
+			v1 = sv[2];
+		}
+		Arrays.sort(sv, 0, 3);
+		double mean = (v0+v1) / 2.0;
+		return Math.abs(v0 - mean);
 	}
 
 	@Override

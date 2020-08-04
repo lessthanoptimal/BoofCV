@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageDimension;
  */
 class TestGenerateMetricTripleEssentialGuessAndCheck extends CommonGenerateMetricCameraTripleChecks {
 	public TestGenerateMetricTripleEssentialGuessAndCheck() {
-		totalTrials = 20; // reduce number of trials to make it run faster
+		totalTrials = 15; // reduce number of trials to make it run faster
 	}
 
 	@Override
@@ -38,12 +38,8 @@ class TestGenerateMetricTripleEssentialGuessAndCheck extends CommonGenerateMetri
 		Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(null);
 		var alg = new SelfCalibrationEssentialGuessAndCheck();
 		alg.fixedFocus = false;
-//		alg.numberOfSamples = 200; // <-- can solve without cheating with this setting but is slow
-//		alg.configure(300,2500);
-
-		// For sake of speed the configuration below is used even though it cheats a bit
-		alg.numberOfSamples = 20;
-		alg.configure(0.5,1.1);
+		alg.numberOfSamples = 200;
+		alg.configure(0.3,2.5);
 
 		return new GenerateMetricTripleEssentialGuessAndCheck(trifocal,alg);
 	}
