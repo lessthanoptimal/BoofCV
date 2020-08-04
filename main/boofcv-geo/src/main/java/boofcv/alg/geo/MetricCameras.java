@@ -16,46 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.struct.image;
+package boofcv.alg.geo;
 
+import boofcv.struct.calib.CameraPinhole;
+import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
+ * Describes the camera pose and intrinsic parameters for a set of cameras.
+ *
  * @author Peter Abeles
  */
-public class ImageDimension {
-	public int width;
-	public int height;
+public class MetricCameras {
+	/** Motion relative to first camera.
+	 * First camera is implicit, not included in this list, and assumed to be the origin */
+	public final FastQueue<Se3_F64> motion_1_to_k = new FastQueue<>(Se3_F64::new);
+	/** Intrinsic parameters for all cameras */
+	public final FastQueue<CameraPinhole> intrinsics = new FastQueue<>(CameraPinhole::new);
 
-	public ImageDimension(int width, int height) {
-		this.width = width;
-		this.height = height;
-	}
-
-	public ImageDimension() {
-	}
-
-	public void setTo( ImageDimension src ) {
-		this.width = src.width;
-		this.height = src.height;
-	}
-
-	public void set( int width , int height ) {
-		this.width = width;
-		this.height = height;
-	}
-
-	@Override
-	public String toString() {
-		return "ImageDimension{" +
-				"width=" + width +
-				", height=" + height +
-				'}';
-	}
-
-	/**
-	 * Returns the value of largest side. I.e. max(width,height)
-	 */
-	public int getMaxLength() {
-		return Math.max(width,height);
+	public void reset() {
+		motion_1_to_k.reset();
+		intrinsics.reset();
 	}
 }

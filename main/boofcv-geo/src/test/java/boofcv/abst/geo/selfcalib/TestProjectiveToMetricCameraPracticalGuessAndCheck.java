@@ -16,30 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.selfcalib;
+package boofcv.abst.geo.selfcalib;
 
-import boofcv.abst.geo.Estimate1ofTrifocalTensor;
-import boofcv.alg.geo.robust.ModelGeneratorViews;
-import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.image.ImageDimension;
+import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
 
 /**
  * @author Peter Abeles
  */
-class TestGenerateMetricTriplePracticalGuessAndCheck extends CommonGenerateMetricCameraTripleChecks {
-	public TestGenerateMetricTriplePracticalGuessAndCheck() {
+class TestProjectiveToMetricCameraPracticalGuessAndCheck extends CommonProjectiveToMetricCamerasChecks {
+	public TestProjectiveToMetricCameraPracticalGuessAndCheck() {
 		skewTol = 0.1;
-		minimumFractionSuccess = 0.9; // more unstable than most
 	}
 
 	@Override
-	public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> createGenerator() {
-		Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(null);
-		var alg = new SelfCalibrationGuessAndCheckFocus();
+	public ProjectiveToMetricCameras createEstimator() {
+		var alg = new SelfCalibrationPraticalGuessAndCheckFocus();
 		alg.setSampling(0.3,2,100);
 		alg.setSingleCamera(false);
-
-		return new GenerateMetricTriplePracticalGuessAndCheck(trifocal,alg);
+		return new ProjectiveToMetricCameraPracticalGuessAndCheck(alg);
 	}
 }

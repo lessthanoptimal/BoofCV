@@ -445,7 +445,7 @@ public class FactoryMultiViewRobust {
 	 * @return RANSAC
 	 */
 	public static RansacProjective<MetricCameraTriple, AssociatedTriple>
-	metricThreeViewRansac( @Nullable ConfigSelfCalibration selfcalib,
+	metricThreeViewRansac( @Nullable ConfigPixelsToMetric selfcalib,
 						   @Nonnull ConfigRansac ransac)
 	{
 		// Pixel error squared in two views

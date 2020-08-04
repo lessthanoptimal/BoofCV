@@ -38,6 +38,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Tuple2;
 import org.ddogleg.struct.Tuple3;
 import org.ejml.UtilEjml;
@@ -1349,5 +1350,35 @@ class TestMultiViewOps {
 
 		double found = MultiViewOps.findScale(a,b);
 		assertEquals(expected, found, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	void splits3Lists() {
+		FastQueue<AssociatedTriple> triples = new FastQueue<>(AssociatedTriple::new);
+		for (int i = 0; i < 8; i++) {
+			triples.grow().set(
+					rand.nextGaussian(),rand.nextGaussian(),
+					rand.nextGaussian(),rand.nextGaussian(),
+					rand.nextGaussian(),rand.nextGaussian());
+		}
+
+		List<List<Point2D_F64>> found = MultiViewOps.splits3Lists(triples.toList(),null);
+		checkSplit3Lists(triples, found);
+
+		// see if it properly resets the list
+		found.get(1).remove(3);
+		MultiViewOps.splits3Lists(triples.toList(),found);
+		checkSplit3Lists(triples, found);
+	}
+
+	private void checkSplit3Lists(FastQueue<AssociatedTriple> triples, List<List<Point2D_F64>> found) {
+		assertEquals(3,found.size());
+		for (int i = 0; i < 3; i++) {
+			List<Point2D_F64> list = found.get(i);
+			assertEquals(triples.size, list.size());
+			for (int j = 0; j < list.size(); j++) {
+				assertSame(triples.get(j).get(i), list.get(j));
+			}
+		}
 	}
 }

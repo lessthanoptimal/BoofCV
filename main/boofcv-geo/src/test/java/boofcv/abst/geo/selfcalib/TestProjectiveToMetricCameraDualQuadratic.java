@@ -16,24 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.selfcalib;
+package boofcv.abst.geo.selfcalib;
 
-import boofcv.abst.geo.Estimate1ofTrifocalTensor;
-import boofcv.alg.geo.robust.ModelGeneratorViews;
-import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.image.ImageDimension;
+import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 
 /**
  * @author Peter Abeles
  */
-class TestGenerateMetricTripleDualQuadratic extends CommonGenerateMetricCameraTripleChecks {
+class TestProjectiveToMetricCameraDualQuadratic extends CommonProjectiveToMetricCamerasChecks {
 	@Override
-	public ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension> createGenerator()
-	{
-		Estimate1ofTrifocalTensor trifocal = FactoryMultiView.trifocal_1(null);
+	public ProjectiveToMetricCameras createEstimator() {
 		var alg = new SelfCalibrationLinearDualQuadratic(1.0);
-
-		return new GenerateMetricTripleDualQuadratic(trifocal,alg);
+		return new ProjectiveToMetricCameraDualQuadratic(alg);
 	}
 }

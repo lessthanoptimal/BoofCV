@@ -63,7 +63,7 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 		CommonOps_DDRM.mult(P1a,H,P1);
 		CommonOps_DDRM.mult(P2a,H,P2);
 
-		SelfCalibrationGuessAndCheckFocus alg = new SelfCalibrationGuessAndCheckFocus();
+		SelfCalibrationPraticalGuessAndCheckFocus alg = new SelfCalibrationPraticalGuessAndCheckFocus();
 //		alg.setVerbose(System.out,0);
 		alg.setSampling(0.1,3,200);
 		alg.setSingleCamera(true);
@@ -118,7 +118,7 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 		CommonOps_DDRM.mult(P1a,H,P1);
 		CommonOps_DDRM.mult(P2a,H,P2);
 
-		SelfCalibrationGuessAndCheckFocus alg = new SelfCalibrationGuessAndCheckFocus();
+		SelfCalibrationPraticalGuessAndCheckFocus alg = new SelfCalibrationPraticalGuessAndCheckFocus();
 //		alg.setVerbose(System.out,0);
 		alg.setSampling(0.1,3,200);
 		alg.setCamera(skew,cx,cy,width,height);
@@ -178,7 +178,7 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 		// make sure it is scale invariant
 		CommonOps_DDRM.scale(2.6,P2);
 
-		SelfCalibrationGuessAndCheckFocus alg = new SelfCalibrationGuessAndCheckFocus();
+		SelfCalibrationPraticalGuessAndCheckFocus alg = new SelfCalibrationPraticalGuessAndCheckFocus();
 //		alg.setSingleCamera(true);
 		alg.setSampling(0.1,3,200);
 		alg.setCamera(skew,cx,cy,width,height);
@@ -225,7 +225,7 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 	 */
 	@Test
 	public void setCamera_properties() {
-		SelfCalibrationGuessAndCheckFocus alg = new SelfCalibrationGuessAndCheckFocus();
+		SelfCalibrationPraticalGuessAndCheckFocus alg = new SelfCalibrationPraticalGuessAndCheckFocus();
 		alg.setCamera(skew,cx,cy,width,height);
 
 		// a point on the center should be zero
@@ -253,7 +253,7 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 	 */
 	@Test
 	public void setCamera_equation() {
-		SelfCalibrationGuessAndCheckFocus alg = new SelfCalibrationGuessAndCheckFocus();
+		SelfCalibrationPraticalGuessAndCheckFocus alg = new SelfCalibrationPraticalGuessAndCheckFocus();
 		alg.setCamera(skew,cx,cy,width,height);
 
 		Equation eq = new Equation(skew,"sk",cx,"cx",cy,"cy");

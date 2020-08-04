@@ -28,6 +28,8 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import java.io.PrintStream;
 import java.util.List;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * <p>
  *     Computes the best projective to metric 4x4 rectifying homography matrix by guessing different values
@@ -68,7 +70,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class SelfCalibrationGuessAndCheckFocus {
+public class SelfCalibrationPraticalGuessAndCheckFocus {
 
 	// Development Note
 	// There was an attempt to modify this to use reprojection error like TrifocalBruteForceSelfCalibration to select
@@ -128,7 +130,7 @@ public class SelfCalibrationGuessAndCheckFocus {
 	// if not null debug info is printed
 	PrintStream verbose;
 
-	public SelfCalibrationGuessAndCheckFocus() {
+	public SelfCalibrationPraticalGuessAndCheckFocus() {
 		normalizedP = new FastQueue<>(()->new DMatrixRMaj(3,4));
 	}
 
@@ -176,8 +178,8 @@ public class SelfCalibrationGuessAndCheckFocus {
 	 * @return true if successful or false if it fails
 	 */
 	public boolean process(List<DMatrixRMaj> cameraMatrices) {
-		if( cameraMatrices.size() == 0 )
-			throw new IllegalArgumentException("Must contain at least 1 matrix");
+		assertBoof(V.data[0] != 0.0,"Must call setCamera()");
+		assertBoof(cameraMatrices.size() > 0,"'cameraMatrices' contain at least 1 matrix");
 
 		// Apply normalization as suggested in the paper, then force the first camera matrix to be [I|0] again
 		CommonOps_DDRM.setIdentity(tmpP);

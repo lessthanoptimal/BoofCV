@@ -128,7 +128,13 @@ public class MultiViewOps {
 	 * Page 415 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
 	 * </p>
 	 *
-	 * @param P2 Camera matrix for view 1. 3x4 matrix
+	 * <p>
+	 * WARNING: This method of creating a trifocal tensor might be numerically less accurate. A unit test had to be
+	 * changed which used this method to use another approach to constructing the tensor because it was failing even
+	 * with perfect data. With some thought this issue could be fixed.
+	 * </p>
+	 *
+	 * @param P1 Camera matrix for view 1. 3x4 matrix
 	 * @param P2 Camera matrix for view 2. 3x4 matrix
 	 * @param P3 Camera matrix for view 3. 3x4 matrix
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
@@ -140,7 +146,7 @@ public class MultiViewOps {
 			ret = new TrifocalTensor();
 
 		// invariant to scale. So pick something more reasonable and maybe reduce overflow
-		double scale = 0;
+		double scale = 1;
 		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P1));
 		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P2));
 		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P3));
@@ -1058,11 +1064,14 @@ public class MultiViewOps {
 	 * @param P (Input) camera matrix 3x4
 	 * @param H (Output) 4x4 matrix
 	 */
-	public static void projectiveToIdentityH(DMatrixRMaj P , DMatrixRMaj H ) {
+	public static DMatrixRMaj projectiveToIdentityH(DMatrixRMaj P , @Nullable DMatrixRMaj H ) {
+		if( H == null )
+			H = new DMatrixRMaj(4,4);
 		ProjectiveToIdentity alg = new ProjectiveToIdentity();
 		if( !alg.process(P))
 			throw new RuntimeException("WTF this failed?? Probably NaN in P");
 		alg.computeH(H);
+		return H;
 	}
 
 	/**
@@ -1721,4 +1730,36 @@ public class MultiViewOps {
 		return sum/weights;
 	}
 
+	/**
+	 * Lists a list of {@link AssociatedTriple} into a list of observations for each camera independently.
+	 * @param src (Input) list of {@link AssociatedTriple}
+	 * @param dst (Output) list of lists. Can be null.
+	 * @return list of lists.
+	 */
+	public static List<List<Point2D_F64>>
+	splits3Lists(List<AssociatedTriple> src , @Nullable List<List<Point2D_F64>> dst ) {
+		// Ensure dst is a list that contains 3 empty lists
+		if( dst == null ) {
+			dst = new ArrayList<>();
+		}
+		if( dst.size() != 3 ) {
+			dst.clear();
+			for (int i = 0; i < 3; i++) {
+				dst.add( new ArrayList<>() );
+			}
+		} else {
+			for (int i = 0; i < 3; i++) {
+				dst.get(i).clear();
+			}
+		}
+
+		for (int i = 0; i < src.size(); i++) {
+			AssociatedTriple a = src.get(i);
+			dst.get(0).add(a.p1);
+			dst.get(1).add(a.p2);
+			dst.get(2).add(a.p3);
+		}
+
+		return dst;
+	}
 }

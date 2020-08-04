@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,6 +65,12 @@ public class AssociatedTriple {
 		this.p1.set(p1);
 		this.p2.set(p2);
 		this.p3.set(p3);
+	}
+
+	public void set( double x1, double y1, double x2, double y2, double x3, double y3 ) {
+		this.p1.set(x1,y1);
+		this.p2.set(x2,y2);
+		this.p3.set(x3,y3);
 	}
 
 	public AssociatedTriple copy() {

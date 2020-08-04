@@ -20,6 +20,7 @@ package boofcv.alg.geo.selfcalib;
 
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
+import boofcv.alg.geo.MetricCameras;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
@@ -27,6 +28,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
 
 import java.util.List;
+
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * There's a sign ambiguity which flips the translation vector for several self calibration functions. This
@@ -48,6 +51,65 @@ public class ResolveSignAmbiguityPositiveDepth {
 	// precompute how to convert pixels into normalized image coordinates
 	PinholePtoN_F64 normalize1 = new PinholePtoN_F64();
 	PinholePtoN_F64 normalize2 = new PinholePtoN_F64();
+
+	/**
+	 * Processes the results and observations to fix the sign
+	 *
+	 * @param observations (input) Observations in pixels
+	 * @param views (input/output) the current solution and modified to have the correct sign on output
+	 */
+	public void process(List<List<Point2D_F64>> observations, MetricCameras views ) {
+		assertBoof(observations.size()>0);
+		int best = -1;
+		int bestInvalid = Integer.MAX_VALUE;
+
+		normalize1.set(views.intrinsics.get(0));
+		normalize2.set(views.intrinsics.get(1));
+
+		final int N = observations.get(0).size();
+		assertBoof(N==observations.get(1).size());
+
+		List<Point2D_F64> observations1 = observations.get(0);
+		List<Point2D_F64> observations2 = observations.get(1);
+
+		for (int trial = 0; trial < 2; trial++) {
+			int foundInvalid = 0;
+			for (int obsIdx = 0; obsIdx < N; obsIdx++) {
+				Point2D_F64 pixel1 = observations1.get(obsIdx);
+				Point2D_F64 pixel2 = observations2.get(obsIdx);
+
+
+				// Convert from pixels to normalized image coordinates
+				normalize1.compute(pixel1.x, pixel1.y, n1);
+				normalize2.compute(pixel2.x, pixel2.y, n2);
+
+				// Find point in view-1 reference frame and check constraint
+				triangulate.triangulate(n1, n2, views.motion_1_to_k.get(0), pointIn1);
+				if (pointIn1.z < 0)
+					foundInvalid++;
+
+				// Find in view-2 and check +z constraint
+				SePointOps_F64.transform(views.motion_1_to_k.get(0), pointIn1, Xcam);
+				if (Xcam.z < 0)
+					foundInvalid++;
+			}
+
+			// flip to test other hypothesis next iteration
+			views.motion_1_to_k.get(0).T.scale(-1);
+
+			// save best
+			if( bestInvalid > foundInvalid ) {
+				bestInvalid = foundInvalid;
+				best = trial;
+			}
+		}
+
+		if( best == 1 ) {
+			for (int viewIdx = 0; viewIdx < views.motion_1_to_k.size; viewIdx++) {
+				views.motion_1_to_k.get(viewIdx).T.scale(-1);
+			}
+		}
+	}
 
 	/**
 	 * Processes the results and observations to fix the sign

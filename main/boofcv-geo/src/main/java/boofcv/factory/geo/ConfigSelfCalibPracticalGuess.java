@@ -18,12 +18,13 @@
 
 package boofcv.factory.geo;
 
+import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
 import boofcv.struct.Configuration;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
- * Configuration for {@link boofcv.alg.geo.selfcalib.SelfCalibrationGuessAndCheckFocus}
+ * Configuration for {@link SelfCalibrationPraticalGuessAndCheckFocus}
  *
  * @author Peter Abeles
  */

@@ -18,8 +18,10 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
@@ -27,6 +29,7 @@ import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPoint3D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -50,6 +53,7 @@ public class CommonThreeViewSelfCalibration {
 
 	protected List<Se3_F64> list_world_to_cameras;
 	protected List<Point3D_F64> cloud;
+	protected List<List<Point2D_F64>> observationsN = new ArrayList<>();
 	protected List<AssociatedTriple> observations3;
 	protected List<AssociatedPair> observations2;
 	protected List<DMatrixRMaj> projective;
@@ -87,11 +91,16 @@ public class CommonThreeViewSelfCalibration {
 	protected void simulateScene( double noiseSigma ) {
 		List<CameraPinhole> cameras = BoofMiscOps.asList(cameraA,cameraB,cameraC);
 		cloud = new ArrayList<>();
+		observationsN = new ArrayList<>();
 		observations3 = new ArrayList<>();
 		observations2 = new ArrayList<>();
 		projective = new ArrayList<>();
 
 		cloud = UtilPoint3D_F64.random(-1,1,numFeatures,rand);
+
+		for (int i = 0; i < 3; i++) {
+			observationsN.add( new ArrayList<>() );
+		}
 
 		BoofMiscOps.forIdx(list_world_to_cameras,(idx,world_to_camera)->{
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(idx),(DMatrixRMaj)null);
@@ -113,9 +122,17 @@ public class CommonThreeViewSelfCalibration {
 
 			observations3.add(a);
 			observations2.add( new AssociatedPair(a.p1,a.p2));
+			observationsN.get(0).add(a.p1);
+			observationsN.get(1).add(a.p2);
+			observationsN.get(2).add(a.p3);
 		}
+		// When input is noisy so will the trifocal tensor be
+		Estimate1ofTrifocalTensor estimator = FactoryMultiView.trifocal_1(null);
+		estimator.process(observations3,tensor);
 
-		MultiViewOps.createTrifocal(projective.get(0),projective.get(1),projective.get(2),tensor);
+		// The method of creating a trifocal tensor was found to cause a unit test to fail due to numerical instability
+		// other less sensitive methods did pass using it though
+//		MultiViewOps.createTrifocal(projective.get(0),projective.get(1),projective.get(2),tensor);
 		MultiViewOps.trifocalCameraMatrices(tensor,P2,P3);
 		MultiViewOps.trifocalFundamental(tensor,F21,F31);
 	}

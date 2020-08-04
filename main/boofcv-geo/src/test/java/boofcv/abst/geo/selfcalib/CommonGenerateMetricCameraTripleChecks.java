@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.selfcalib;
+package boofcv.abst.geo.selfcalib;
 
 import boofcv.alg.geo.robust.ModelGeneratorViews;
+import boofcv.alg.geo.selfcalib.CommonThreeViewSelfCalibration;
+import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.image.ImageDimension;

@@ -25,7 +25,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigSelfCalibration implements Configuration {
+public class ConfigPixelsToMetric implements Configuration {
 
 	/** Which algorithm to use. The default will change as the recommended best approach is updated. */
 	public Type type = Type.DUAL_QUADRATIC;
@@ -45,7 +45,7 @@ public class ConfigSelfCalibration implements Configuration {
 		practicalGuess.checkValidity();
 	}
 
-	public void setTo( ConfigSelfCalibration src ) {
+	public void setTo( ConfigPixelsToMetric src ) {
 		this.type = src.type;
 		this.trifocal.setTo(src.trifocal);
 		this.dualQuadratic.setTo(src.dualQuadratic);

@@ -16,8 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.factory.geo;
+package boofcv.abst.geo.selfcalib;
 
-import boofcv.struct.StandardConfigurationChecks;
+import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
 
-public class TestConfigSelfCalibration extends StandardConfigurationChecks {}
+/**
+ * @author Peter Abeles
+ */
+class TestProjectiveToMetricCameraEssentialGuessAndCheck extends CommonProjectiveToMetricCamerasChecks {
+	@Override
+	public ProjectiveToMetricCameras createEstimator() {
+		var alg = new SelfCalibrationEssentialGuessAndCheck();
+		alg.fixedFocus = false;
+		alg.numberOfSamples = 200;
+		alg.configure(0.3,2.5);
+		return new ProjectiveToMetricCameraEssentialGuessAndCheck(alg);
+	}
+}

@@ -25,6 +25,7 @@ import boofcv.abst.geo.h.HomographyDLT_to_Epipolar;
 import boofcv.abst.geo.h.HomographyTLS_to_Epipolar;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.pose.*;
+import boofcv.abst.geo.selfcalib.*;
 import boofcv.abst.geo.triangulate.*;
 import boofcv.abst.geo.trifocal.WrapRefineThreeViewProjectiveGeometric;
 import boofcv.abst.geo.trifocal.WrapTrifocalAlgebraicPoint7;
@@ -38,7 +39,10 @@ import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.h.HomographyTotalLeastSquares;
 import boofcv.alg.geo.pose.*;
 import boofcv.alg.geo.robust.ModelGeneratorViews;
-import boofcv.alg.geo.selfcalib.*;
+import boofcv.alg.geo.selfcalib.MetricCameraTriple;
+import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
+import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
+import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
 import boofcv.alg.geo.triangulate.*;
 import boofcv.alg.geo.trifocal.RefineThreeViewProjectiveGeometric;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
@@ -682,41 +686,80 @@ public class FactoryMultiView {
 	 * @return ModelGenerator
 	 */
 	public static ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
-	selfCalibThree( @Nullable ConfigSelfCalibration config ) {
+	selfCalibThree( @Nullable ConfigPixelsToMetric config ) {
 		if( config == null )
-			config = new ConfigSelfCalibration();
+			config = new ConfigPixelsToMetric();
 		config.checkValidity();
 
 		Estimate1ofTrifocalTensor trifocal = trifocal_1(config.trifocal);
+		ProjectiveToMetricCameras selfcalib =
+				switch( config.type ) {
+					case DUAL_QUADRATIC -> projectiveToMetric(config.dualQuadratic);
+					case ESSENTIAL_GUESS -> projectiveToMetric(config.essentialGuess);
+					case PRACTICAL_GUESS -> projectiveToMetric(config.practicalGuess);
+				};
 
-		return switch( config.type ) {
-			case DUAL_QUADRATIC -> {
-				final ConfigSelfCalibDualQuadratic c = config.dualQuadratic;
-				var selfCalib = c.knownAspectRatio ?
-						new SelfCalibrationLinearDualQuadratic(c.aspectRatio) :
-						new SelfCalibrationLinearDualQuadratic(c.zeroSkew);
+		return new GenerateMetricTripleFromProjective(trifocal,selfcalib);
+	}
 
-				yield new GenerateMetricTripleDualQuadratic(trifocal,selfCalib);
-			}
+	/**
+	 * {@link ProjectiveToMetricCameras} based upon {@link SelfCalibrationLinearDualQuadratic}
+	 *
+	 * @param config (Input) Configuration. Can be null.
+	 * @return {@link ProjectiveToMetricCameras}
+	 */
+	public static ProjectiveToMetricCameras
+	projectiveToMetric( @Nullable ConfigSelfCalibDualQuadratic config ) {
+		if( config == null )
+			config = new ConfigSelfCalibDualQuadratic();
+		config.checkValidity();
 
-			case ESSENTIAL_GUESS -> {
-				final ConfigSelfCalibEssentialGuess c = config.essentialGuess;
-				var selfCalib = new SelfCalibrationEssentialGuessAndCheck();
-				selfCalib.fixedFocus = c.fixedFocus;
-				selfCalib.numberOfSamples = c.numberOfSamples;
-				selfCalib.sampleFocalRatioMin = c.sampleMin;
-				selfCalib.sampleFocalRatioMax = c.sampleMax;
+		final ConfigSelfCalibDualQuadratic c = config;
+		var selfCalib = c.knownAspectRatio ?
+				new SelfCalibrationLinearDualQuadratic(c.aspectRatio) :
+				new SelfCalibrationLinearDualQuadratic(c.zeroSkew);
 
-				yield new GenerateMetricTripleEssentialGuessAndCheck(trifocal,selfCalib);
-			}
+		return new ProjectiveToMetricCameraDualQuadratic(selfCalib);
+	}
 
-			case PRACTICAL_GUESS -> {
-				var selfCalib = new SelfCalibrationGuessAndCheckFocus();
-				final ConfigSelfCalibPracticalGuess c = config.practicalGuess;
-				selfCalib.setSampling( c.sampleMin, c.sampleMax, c.numberOfSamples);
-				selfCalib.setSingleCamera(c.fixedFocus);
-				yield new GenerateMetricTriplePracticalGuessAndCheck(trifocal,selfCalib);
-			}
-		};
+	/**
+	 * {@link ProjectiveToMetricCameras} based upon {@link SelfCalibrationEssentialGuessAndCheck}
+	 *
+	 * @param config (Input) Configuration. Can be null.
+	 * @return {@link ProjectiveToMetricCameras}
+	 */
+	public static ProjectiveToMetricCameras
+	projectiveToMetric( @Nullable ConfigSelfCalibEssentialGuess config ) {
+		if( config == null )
+			config = new ConfigSelfCalibEssentialGuess();
+		config.checkValidity();
+
+		final ConfigSelfCalibEssentialGuess c = config;
+		var selfCalib = new SelfCalibrationEssentialGuessAndCheck();
+		selfCalib.fixedFocus = c.fixedFocus;
+		selfCalib.numberOfSamples = c.numberOfSamples;
+		selfCalib.sampleFocalRatioMin = c.sampleMin;
+		selfCalib.sampleFocalRatioMax = c.sampleMax;
+
+		return new ProjectiveToMetricCameraEssentialGuessAndCheck(selfCalib);
+	}
+
+	/**
+	 * {@link ProjectiveToMetricCameras} based upon {@link SelfCalibrationPraticalGuessAndCheckFocus}
+	 *
+	 * @param config (Input) Configuration. Can be null.
+	 * @return {@link ProjectiveToMetricCameras}
+	 */
+	public static ProjectiveToMetricCameras
+	projectiveToMetric( @Nullable ConfigSelfCalibPracticalGuess config ) {
+		if( config == null )
+			config = new ConfigSelfCalibPracticalGuess();
+		config.checkValidity();
+
+		final ConfigSelfCalibPracticalGuess c = config;
+		var selfCalib = new SelfCalibrationPraticalGuessAndCheckFocus();
+		selfCalib.setSampling( c.sampleMin, c.sampleMax, c.numberOfSamples);
+		selfCalib.setSingleCamera(c.fixedFocus);
+		return new ProjectiveToMetricCameraPracticalGuessAndCheck(selfCalib);
 	}
 }
