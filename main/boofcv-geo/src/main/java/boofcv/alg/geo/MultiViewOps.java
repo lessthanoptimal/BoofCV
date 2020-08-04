@@ -916,6 +916,47 @@ public class MultiViewOps {
 	}
 
 	/**
+	 * <p>Given an implicit P1=[I|0] camera matrix and P2 compute a fundamental matrix.</p>
+	 *
+	 * {@code F= [e']_x P2*P1+, where P1+ is the pseudo inverse of P1, and e' = P2*C, with P*C=0}
+	 *
+	 * @param P2 (Input) camera matrix for view 2
+	 * @param F21 (Output) Fundamental matrix from view 1 to 2
+	 * @return Fundamental matrix.
+	 */
+	public static DMatrixRMaj projectiveToFundamental( DMatrixRMaj P2 , @Nullable DMatrixRMaj F21 )
+	{
+		if( F21 == null )
+			F21 = new DMatrixRMaj(3,3);
+
+		// P2 = [A|b]
+		// Since P1 = [I|0] F then becomes cross(b)*A
+
+		// Extract sub matrices from P2
+		// Do all the math by hand to avoid memory creation. This is relatively simple
+		double b1 = P2.unsafe_get(0,3);
+		double b2 = P2.unsafe_get(1,3);
+		double b3 = P2.unsafe_get(2,3);
+
+		double a11 = P2.data[0], a12 = P2.data[1], a13 = P2.data[2];
+		double a21 = P2.data[4], a22 = P2.data[5], a23 = P2.data[6];
+		double a31 = P2.data[8], a32 = P2.data[9], a33 = P2.data[10];
+
+		// matrix multiplication below
+		F21.data[0] = -b3*a21 + b2*a31;
+		F21.data[1] = -b3*a22 + b2*a32;
+		F21.data[2] = -b3*a23 + b2*a33;
+		F21.data[3] =  b3*a11 - b1*a31;
+		F21.data[4] =  b3*a12 - b1*a32;
+		F21.data[5] =  b3*a13 - b1*a33;
+		F21.data[6] = -b2*a11 + b1*a21;
+		F21.data[7] = -b2*a12 + b1*a22;
+		F21.data[8] = -b2*a13 + b1*a23;
+
+		return F21;
+	}
+
+	/**
 	 * <p>
 	 * Given a fundamental matrix a pair of camera matrices P0 and P1 can be extracted. Same
 	 * {@link #fundamentalToProjective(DMatrixRMaj, Point3D_F64, Vector3D_F64, double)} but with the suggested values

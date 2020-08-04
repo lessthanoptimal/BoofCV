@@ -21,6 +21,7 @@ package boofcv.alg.geo;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.h.CommonHomographyInducedPlane;
+import boofcv.alg.geo.impl.ProjectiveToIdentity;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -686,7 +687,7 @@ class TestMultiViewOps {
 		DMatrixRMaj F21 = MultiViewOps.projectiveToFundamental(P1,P2,null);
 
 		// test by seeing if a skew symmetric matrix is produced with the formula below
-		Equation eq = new Equation(P1,"P1",P2,"P2",P3,"P3",F21,"F21");
+		Equation eq = new Equation(P1,"P1",P2,"P2",F21,"F21");
 		eq.process("A = P2'*F21*P1");
 		DMatrixRMaj A = eq.lookupDDRM("A");
 
@@ -695,6 +696,30 @@ class TestMultiViewOps {
 				assertEquals(A.get(row,col),-A.get(col,row), 1e-8);
 			}
 		}
+	}
+
+	@Test
+	void projectiveToFundamental_One() {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
+		Se3_F64 M11 = new Se3_F64();
+		Se3_F64 M12 = SpecialEuclideanOps_F64.eulerXyz(-1, 0, -0.2, EulerType.XYZ, 0,-.2, 0, null);
+
+		DMatrixRMaj P1 = PerspectiveOps.createCameraMatrix(M11.R,M11.T,K,null);
+		DMatrixRMaj P2 = PerspectiveOps.createCameraMatrix(M12.R,M12.T,K,null);
+
+		// Force P1 to be identity
+		DMatrixRMaj H = new DMatrixRMaj(4,4);
+		ProjectiveToIdentity p2i = new ProjectiveToIdentity();
+		assertTrue(p2i.process(P1));
+		p2i.computeH(H);
+		CommonOps_DDRM.mult(P1.copy(),H,P1);
+		CommonOps_DDRM.mult(P2.copy(),H,P2);
+
+		// Compare results against two camera variant
+		DMatrixRMaj F21_expected = MultiViewOps.projectiveToFundamental(P1,P2,null);
+		DMatrixRMaj F21 = MultiViewOps.projectiveToFundamental(P2,null);
+
+		assertTrue(MatrixFeatures_DDRM.isIdentical(F21_expected,F21, UtilEjml.TEST_F64));
 	}
 
 	@Test
