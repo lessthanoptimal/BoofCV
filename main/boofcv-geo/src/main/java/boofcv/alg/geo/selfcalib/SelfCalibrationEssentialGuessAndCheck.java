@@ -267,7 +267,7 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 		}
 		Arrays.sort(sv, 0, 3);
 		double mean = (v0+v1) / 2.0;
-		return Math.abs(v0 - mean);
+		return Math.abs(v0 - mean)/mean;
 	}
 
 	@Override
