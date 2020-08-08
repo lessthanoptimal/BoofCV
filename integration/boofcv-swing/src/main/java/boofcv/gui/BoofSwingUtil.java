@@ -248,11 +248,7 @@ public class BoofSwingUtil {
 		if( massageName != null ) {
 			previousPath = new File(massageName.process(previousPath.getPath()));
 		}
-		JFileChooser chooser = new JFileChooser(previousPath);
-		// If opening a file you want the file to exist if it's automatically selected. If saving you always want it
-		// set to this value
-		if( !openFile || previousPath.exists() )
-			chooser.setSelectedFile(previousPath);
+		JFileChooser chooser = new JFileChooser();
 
 		boolean selectDirectories = false;
 		for( FileTypes t : filters ) {
@@ -287,8 +283,18 @@ public class BoofSwingUtil {
 			else
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		}
+
 		if( chooser.getChoosableFileFilters().length > 1 ) {
 			chooser.setFileFilter(chooser.getChoosableFileFilters()[1]);
+		}
+
+		// Always show the directory containing the selection
+		// If the previous is a selected directory then show the parent containing that directory
+		// If it's a file then show the file containing the directory
+		File currentDirectory = previousPath.isDirectory() ? previousPath.getParentFile() : previousPath;
+		if( currentDirectory.exists() ) {
+			chooser.setCurrentDirectory(currentDirectory);
+			chooser.setSelectedFile(previousPath);
 		}
 
 		File selected = null;
