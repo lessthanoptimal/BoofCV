@@ -79,6 +79,7 @@ Version : 0.37
 TODO Move projective to metric and similar from multiview to perspective
 TODO Refactor DistanceFromModel.computeDistance() to distance() and distances() just before release
 TODO rename RansacMultiView to RansacCalibrated
+TODO rename FactoryMultiView.triangulateNViewCalibrated to metric
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint
