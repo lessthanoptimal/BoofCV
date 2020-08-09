@@ -20,8 +20,10 @@ package boofcv.alg.sfm.structure2;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -32,6 +34,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -255,6 +258,21 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 		return graph;
 	}
 
+	/**
+	 * Create a working graph filled with metric and projective ground truth
+	 */
+	public SceneWorkingGraph createWorkingGraph( PairwiseImageGraph2 pairwise ) {
+		var working = new SceneWorkingGraph();
+		pairwise.nodes.forEach((i,v)->working.addView(v));
+
+		working.viewList.forEach(v->v.pinhole.set(intrinsic));
+		BoofMiscOps.forIdx(working.viewList,(i,v)->v.projective.set(views.get(i).camera));
+		BoofMiscOps.forIdx(working.viewList,(i,v)->v.world_to_view.set(views.get(i).world_to_view));
+		BoofMiscOps.forIdx(working.viewList,(i,v)->v.index=i);
+
+		return working;
+	}
+
 	@Override
 	public List<String> getImageIDs() {
 		List<String> ids = new ArrayList<>();
@@ -305,6 +323,43 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	@Override
 	public void lookupShape(String target, ImageDimension shape) {
 		shape.set(intrinsic.width,intrinsic.height);
+	}
+
+	/**
+	 * Create a set of 3 observations of the same feature from any set of 3 views
+	 * @param viewIdx which views to use
+	 * @param triples (output) pixel observations
+	 * @param featureIdx (output)which features were in common
+	 */
+	public void createTripleObs(int[] viewIdx, FastQueue<AssociatedTriple> triples, GrowQueue_I32 featureIdx )
+	{
+		BoofMiscOps.assertBoof(viewIdx.length==3);
+
+		triples.reset();
+		featureIdx.reset();
+
+		View view0 = views.get(viewIdx[0]);
+		AssociatedTriple a = new AssociatedTriple();
+		for (int obsI = 0; obsI < view0.observations.size(); obsI++) {
+			Observation o = view0.observations.get(obsI);
+			a.set(0,o.pixel.x,o.pixel.y);
+			boolean matched = true;
+			for (int i = 1; i < 3; i++) {
+				View viewI = views.get(viewIdx[i]);
+				int obsIdx = viewI.findIndex(o.feature);
+				if( obsIdx < 0 ) {
+					matched = false;
+					break;
+				}
+				Point2D_F64 pixel = viewI.observations.get(obsIdx).pixel;
+				a.set(i, pixel.x, pixel.y);
+			}
+			if( !matched ) {
+				continue;
+			}
+			triples.grow().set(a);
+			featureIdx.add( points.indexOf(o.feature) );
+		}
 	}
 
 	/**

@@ -25,14 +25,14 @@ import boofcv.alg.geo.robust.ModelGeneratorViews;
 import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.AssociatedTuple;
+import boofcv.struct.geo.AssociatedTupleN;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.ImageDimension;
-import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,7 +57,7 @@ public class GenerateMetricTripleFromProjective implements
 	@Getter final DMatrixRMaj P3;
 
 	// Data structures which have been converted
-	@Getter final List<List<Point2D_F64>> observationsN = new ArrayList<>();
+	@Getter final FastQueue<AssociatedTuple> observationsN = new FastQueue<>(()->new AssociatedTupleN(3));
 	@Getter final FastQueue<DMatrixRMaj> projective = new FastQueue<>(()->new DMatrixRMaj(3,4));
 	@Getter final FastQueue<ImageDimension> dimensions = new FastQueue<>(ImageDimension::new);
 	@Getter final MetricCameras metricN = new MetricCameras();
@@ -93,9 +93,9 @@ public class GenerateMetricTripleFromProjective implements
 		extractor.setTensor(tensor);
 		extractor.extractCamera(P2,P3);
 
-		MultiViewOps.splits3Lists(observationTriple, observationsN);
+		MultiViewOps.convert(observationTriple, observationsN);
 
-		if( !projectiveToMetric.process(dimensions.toList(),projective.toList(), observationsN,metricN) )
+		if( !projectiveToMetric.process(dimensions.toList(),projective.toList(),observationsN.toList(),metricN) )
 			return false;
 
 		// Converts the output

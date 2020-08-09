@@ -26,6 +26,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -39,6 +40,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
@@ -426,6 +428,45 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 					continue;
 				Point2D_F64 o = utils.featsB.get(seedIsSrc?a.dst:a.src);
 				obsView.add(structId,(float)o.x,(float)o.y);
+			}
+		}
+	}
+
+	/**
+	 * Copies results into a format that's useful for projective to metric conversion
+	 * @param viewIds ID of each view
+	 * @param dimensions Shape of images in each view
+	 * @param cameraMatrices Found camera matrices
+	 * @param observations Found observations shifted to have (0,0) center
+	 */
+	public void lookupInfoForMetricElevation(List<String> viewIds,
+											 FastQueue<ImageDimension> dimensions,
+											 FastQueue<DMatrixRMaj> cameraMatrices,
+											 FastQueue<AssociatedTupleDN> observations)
+	{
+		// Initialize all data structures to the correct size
+		int numViews = utils.structure.views.size;
+		viewIds.clear();
+		dimensions.resize(numViews);
+		cameraMatrices.resize(numViews);
+		observations.resize(inlierToSeed.size);
+
+		for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
+			observations.get(obsIdx).resize(numViews);
+		}
+
+		// Copy results from bundle adjustment data structures
+		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
+			cameraMatrices.get(viewIdx).set(utils.structure.views.get(viewIdx).worldToView);
+			String id = viewsByStructureIndex.get(viewIdx).id;
+			viewIds.add( id );
+			utils.db.lookupShape(id, dimensions.get(viewIdx) );
+
+			SceneObservations.View oview = utils.observations.views.get(viewIdx);
+			assertBoof(oview.size()== observations.size);
+
+			for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
+				oview.get(obsIdx,observations.get(obsIdx).get(viewIdx));
 			}
 		}
 	}

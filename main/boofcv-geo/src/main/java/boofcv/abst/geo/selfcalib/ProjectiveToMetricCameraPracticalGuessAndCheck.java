@@ -23,8 +23,8 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.selfcalib.ResolveSignAmbiguityPositiveDepth;
 import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
+import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
-import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -53,10 +53,9 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 
 	@Override
 	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
-						   List<List<Point2D_F64>> observations, MetricCameras metricViews)
+						   List<AssociatedTuple> observations, MetricCameras metricViews)
 	{
-		assertBoof(views.size()+1==observations.size());
-		assertBoof(dimensions.size()==observations.size());
+		assertBoof(views.size()+1==dimensions.size());
 		metricViews.reset();
 
 		// tell it the image size

@@ -23,8 +23,8 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
-import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
@@ -53,10 +53,9 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 
 	@Override
 	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
-						   List<List<Point2D_F64>> observations, MetricCameras metricViews)
+						   List<AssociatedTuple> observations, MetricCameras metricViews)
 	{
-		assertBoof(views.size()+1==observations.size());
-		assertBoof(dimensions.size()==observations.size());
+		assertBoof(views.size()+1==dimensions.size());
 		metricViews.reset();
 
 		// initialize
@@ -67,15 +66,7 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 		MultiViewOps.projectiveToFundamental(P2,F21);
 
 		// Convert observations into AssociatedPairs
-		int numObservations = observations.get(0).size();
-		List<Point2D_F64> observations1 = observations.get(0);
-		List<Point2D_F64> observations2 = observations.get(1);
-		assertBoof(observations1.size()==observations2.size());
-
-		pairs.resize(numObservations);
-		for (int i = 0; i < observations.size(); i++) {
-			pairs.get(i).set(observations1.get(i),observations2.get(i));
-		}
+		MultiViewOps.convert(observations,0,1,pairs);
 
 		// Projective to Metric calibration
 		if( !selfCalib.process(F21,P2,pairs.toList()) )

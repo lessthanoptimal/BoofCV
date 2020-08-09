@@ -22,9 +22,11 @@ import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.selfcalib.CommonThreeViewSelfCalibration;
 import boofcv.alg.geo.selfcalib.ResolveSignAmbiguityPositiveDepth;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.geo.AssociatedTuple;
+import boofcv.struct.geo.AssociatedTupleN;
 import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofTesting;
-import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
@@ -150,12 +152,9 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 				-1.8370892,  -.061992654,  .486096194, -1.00684043,
 				.000185405, -.010046842,  31.8668685, -.000209807);
 
-		List<List<Point2D_F64>> observations = new ArrayList<>();
-		observations.add(new ArrayList<>());
-		observations.add(new ArrayList<>());
-		observations.add(new ArrayList<>());
+		FastQueue<AssociatedTuple> observations = new FastQueue<>(()->new AssociatedTupleN(3));
 
-		// These are infront of both cameras
+		// These are in front of both cameras
 		add( -47.208221435546875,-14.024078369140625 , -49.9302978515625,36.35797119140625 , -50.079071044921875,77.59286499023438, observations);
 		add( -203.9057159423828,70.39932250976562 , -207.64544677734375,124.38552856445312 , -206.31866455078125,172.38186645507812, observations);
 		add( -362.7781524658203,-218.54442596435547 , -361.6542053222656,-160.6702880859375 , -363.30285263061523,-107.35969543457031, observations);
@@ -188,20 +187,21 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		var results = new MetricCameras();
 
 		ProjectiveToMetricCameras alg = createEstimator();
-		assertTrue(alg.process(dimensions,inputCameras,observations,results));
+		assertTrue(alg.process(dimensions,inputCameras,observations.toList(),results));
 
 		// Yes internally most implementations run this function, but the number of invalid was > 0 before
 		var checkMatches = new ResolveSignAmbiguityPositiveDepth();
-		checkMatches.process(observations,results);
+		checkMatches.process(observations.toList(),results);
 		assertFalse(checkMatches.signChanged);
 		assertEquals(0,checkMatches.bestInvalid);
 	}
 
-	void add( double x1, double y1, double x2, double y2, double x3, double y3 , List<List<Point2D_F64>> observations)
+	void add( double x1, double y1, double x2, double y2, double x3, double y3 , FastQueue<AssociatedTuple> observations)
 	{
-		observations.get(0).add( new Point2D_F64(x1,y1));
-		observations.get(1).add( new Point2D_F64(x2,y2));
-		observations.get(2).add( new Point2D_F64(x3,y3));
+		AssociatedTuple a = observations.grow();
+		a.set(0,x1,y1);
+		a.set(1,x2,y2);
+		a.set(2,x3,y3);
 	}
 
 	/**

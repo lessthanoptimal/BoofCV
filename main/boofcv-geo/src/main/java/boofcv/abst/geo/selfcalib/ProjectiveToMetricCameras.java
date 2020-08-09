@@ -19,8 +19,8 @@
 package boofcv.abst.geo.selfcalib;
 
 import boofcv.alg.geo.MetricCameras;
+import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
-import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public interface ProjectiveToMetricCameras {
 	 * @param results (Output) Storage for found metric upgrade
 	 * @return true if successful or false if it failed
 	 */
-	boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views, List<List<Point2D_F64>> observations,
+	boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views, List<AssociatedTuple> observations,
 					MetricCameras results);
 
 	/**

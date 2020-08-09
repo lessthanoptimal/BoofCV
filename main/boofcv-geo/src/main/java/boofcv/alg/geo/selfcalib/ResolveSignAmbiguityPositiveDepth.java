@@ -23,6 +23,7 @@ import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.AssociatedTuple;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -65,20 +66,18 @@ public class ResolveSignAmbiguityPositiveDepth {
 	 * @param observations (input) Observations in pixels
 	 * @param views (input/output) the current solution and modified to have the correct sign on output
 	 */
-	public void process(List<List<Point2D_F64>> observations, MetricCameras views ) {
+	public void process(List<AssociatedTuple> observations, MetricCameras views ) {
+		assertBoof(views.intrinsics.size==views.motion_1_to_k.size+1);
 		assertBoof(observations.size()>0);
-		assertBoof(observations.size()==views.motion_1_to_k.size+1);
-		assertBoof(observations.size()==views.intrinsics.size);
 
-		final int numViews = observations.size();
-		final int N = observations.get(0).size();
+		final int numViews = views.intrinsics.size;
+		final int numObs = observations.size();
 
 		normalizers.resize(numViews);
 		pixelNorms.resize(numViews);
 		worldToViews.resize(numViews);
 
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
-			assertBoof(N==observations.get(viewIdx).size());
 			normalizers.get(viewIdx).set(views.intrinsics.get(viewIdx));
 		}
 		for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
@@ -90,10 +89,10 @@ public class ResolveSignAmbiguityPositiveDepth {
 		bestInvalid = Integer.MAX_VALUE;
 		for (int trial = 0; trial < 4; trial++) {
 			int foundInvalid = 0;
-			for (int obsIdx = 0; obsIdx < N; obsIdx++) {
+			for (int obsIdx = 0; obsIdx < numObs; obsIdx++) {
 				// convert pixels into normalized image coordinates
 				for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
-					Point2D_F64 pixel = observations.get(viewIdx).get(obsIdx);
+					Point2D_F64 pixel = observations.get(obsIdx).get(viewIdx);
 					normalizers.get(viewIdx).compute(pixel.x, pixel.y, pixelNorms.get(viewIdx));
 				}
 

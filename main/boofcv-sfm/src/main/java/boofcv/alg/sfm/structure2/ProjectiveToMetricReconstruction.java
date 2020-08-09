@@ -48,7 +48,7 @@ import java.util.Set;
 import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
- * Upgrades a projective reconstruction into a metric reconstruction. Following the steps listed below:
+ * Upgrades a projective reconstruction from N-views into a metric reconstruction. Following the steps listed below:
  * <ol>
  *     <li>Dual quadratic self calibration via projective camera matrices</li>
  *     <li>Create features from set of projective observation inliers and triangulation in metric space</li>
@@ -58,6 +58,13 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  *
  * Output: Most of the results are written to the provided {@link SceneWorkingGraph}. The one exception is the
  * bundle adjustment refined camera. To get those parameters call {@link #getRefinedCamera(String)}.
+ *
+ * <p>WARNING: This approach primarily acts as a warning to others for what not to do. The projective
+ * reconstructions have a serious issue where the scale rapidly converges towards extreme small values
+ * the farther you are from the seed. The initial idea was that the metric reconstruction would work better
+ * with more views but that didn't appear to be the case either since projective to metric is very sensitive
+ * to noise. Upon reviewing literature again it seems everyone does the projective to metric elevation
+ * from a small number of views (2 to 3 is typical) instead of an arbitrary large number.</p>
  *
  * @author Peter Abeles
  */

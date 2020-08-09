@@ -25,8 +25,8 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.selfcalib.ResolveSignAmbiguityPositiveDepth;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
+import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
-import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
 import org.ejml.data.DMatrixRMaj;
@@ -64,10 +64,9 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 
 	@Override
 	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
-						   List<List<Point2D_F64>> observations, MetricCameras metricViews)
+						   List<AssociatedTuple> observations, MetricCameras metricViews)
 	{
-		assertBoof(views.size()+1==observations.size());
-		assertBoof(dimensions.size()==observations.size());
+		assertBoof(views.size()+1==dimensions.size());
 		metricViews.reset();
 
 		// Determine metric parameters

@@ -585,4 +585,12 @@ public class BoofMiscOps {
 		}
 		return selected;
 	}
+
+	public static <T>List<T> createListFilled(int total , BoofLambdas.Factory<T> factory ) {
+		List<T> out = new ArrayList<>();
+		for (int i = 0; i < total; i++) {
+			out.add(factory.newInstance());
+		}
+		return out;
+	}
 }

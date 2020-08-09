@@ -31,15 +31,17 @@ import boofcv.factory.geo.*;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.struct.geo.AssociatedTuple;
+import boofcv.struct.geo.AssociatedTupleN;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.ImageDimension;
 import georegression.geometry.ConvertRotation3D_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -402,10 +404,11 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			List<DMatrixRMaj> cameras = new ArrayList<>();
 			cameras.add(P2);
 			cameras.add(P3);
-			List<List<Point2D_F64>> observations = MultiViewOps.splits3Lists(ransac.getMatchSet(),null);
+			FastQueue<AssociatedTuple> observations = new FastQueue<>(()->new AssociatedTupleN(3));
+			MultiViewOps.convert(ransac.getMatchSet(),observations);
 
 			var results = new MetricCameras();
-			boolean success = selfcalib.process(dimensions,cameras,observations,results);
+			boolean success = selfcalib.process(dimensions,cameras,observations.toList(),results);
 
 			if (success) {
 				listPinhole.addAll(results.intrinsics.toList());

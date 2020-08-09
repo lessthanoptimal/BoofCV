@@ -38,10 +38,7 @@ import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.geo.PairLineNorm;
-import boofcv.struct.geo.TrifocalTensor;
+import boofcv.struct.geo.*;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -1780,5 +1777,33 @@ public class MultiViewOps {
 		}
 
 		return dst;
+	}
+
+	public static void convert(List<AssociatedTriple> src , FastQueue<AssociatedTuple> dst ) {
+		dst.resize(src.size());
+		if(src.size()==0)
+			return;
+		assertBoof(dst.get(0).size()==3);
+
+		for (int i = 0; i < src.size(); i++) {
+			AssociatedTriple a = src.get(i);
+			AssociatedTuple b = dst.get(i);
+			b.set(0,a.p1);
+			b.set(1,a.p2);
+			b.set(2,a.p3);
+		}
+	}
+
+	public static void convert(List<AssociatedTuple> src , int idx0 , int idx1,
+							   FastQueue<AssociatedPair> dst ) {
+		dst.resize(src.size());
+		if(src.size()==0)
+			return;
+		assertBoof(src.get(0).size()==3);
+
+		for (int i = 0; i < src.size(); i++) {
+			AssociatedTuple a = src.get(i);
+			dst.get(i).set(a.get(idx0),a.get(idx1));
+		}
 	}
 }

@@ -18,8 +18,14 @@
 
 package boofcv.alg.sfm.structure2;
 
+import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
+import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
+import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.ScoreIndex;
+import boofcv.struct.geo.AssociatedTupleDN;
+import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
@@ -34,44 +40,19 @@ import java.util.*;
 import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
- * Given a {@link PairwiseImageGraph2} that describes how a set of images are related to each other based on point
- * features, compute a projective reconstruction of the camera matrices for each view. The reconstructed location
- * of scene points are not saved.
- *
- * Summary of approach:
- * <ol>
- *     <li>Input: {@link PairwiseImageGraph2}</li>
- *     <li>Select images/views to act as seeds</li>
- *     <li>Pick the first seed and perform initial reconstruction from its neighbors and common features</li>
- *     <li>For each remaining unknown view with a 3D relationship to a known view, find its camera matrix</li>
- *     <li>Stop when no more valid views can be found</li>
- * </ol>
- *
- * In the future multiple seeds will be used to reduce the amount of error which accumulates as the scene spreads out
- * from its initial location
- *
- * <p>Output: {@link #getWorkGraph()}</p>
- *
- * <p>WARNING: There are serious issues with N-view projective scenes. See {@link ProjectiveToMetricReconstruction}
- * for a brief summary of the problems.</p>
- * <p>NOTE: One possible way (not tested) to mitigate those issues would be to scale pixels using a 3x3 matrix
- * that essentially resembles the inverse of an intrinsic matrix. At that point you might as well do a metric
- * reconstruction.</p>
- *
- * @see ProjectiveInitializeAllCommon
- * @see ProjectiveExpandByOneView
- * @see PairwiseGraphUtils
+ * TODO WRITE THIS
  *
  * @author Peter Abeles
  */
-public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
+public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 
 	/** Contains the found projective scene */
 	public final @Getter SceneWorkingGraph workGraph = new SceneWorkingGraph();
 	/** Computes the initial scene from the seed and some of it's neighbors */
 	private final @Getter ProjectiveInitializeAllCommon initProjective;
-	/** Adds a new view to an existing projective scene */
-	private final @Getter ProjectiveExpandByOneView expandProjective;
+
+	private final ProjectiveToMetricCameras projectiveToMetric = FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
+
 	// Common functions used in projective reconstruction
 	final PairwiseGraphUtils utils;
 
@@ -84,21 +65,19 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 	// list of views that have already been explored
 	HashSet<String> exploredViews = new HashSet<>();
 	// information related to each view being a potential seed
-	FastQueue<SeedInfo> seedScores = new FastQueue<>(SeedInfo::new,SeedInfo::reset);
+	FastQueue<SeedInfo> seedScores = new FastQueue<>(SeedInfo::new, SeedInfo::reset);
 
-	public ProjectiveReconstructionFromPairwiseGraph(PairwiseGraphUtils utils) {
+	public MetricViewsFromUncalibratedPairwiseGraph(PairwiseGraphUtils utils) {
 		this.utils = utils;
 		initProjective = new ProjectiveInitializeAllCommon();
 		initProjective.utils = utils;
-		expandProjective = new ProjectiveExpandByOneView();
-		expandProjective.utils = utils;
 	}
 
-	public ProjectiveReconstructionFromPairwiseGraph(ConfigProjectiveReconstruction config) {
+	public MetricViewsFromUncalibratedPairwiseGraph(ConfigProjectiveReconstruction config) {
 		this(new PairwiseGraphUtils(config));
 	}
 
-	public ProjectiveReconstructionFromPairwiseGraph() {
+	public MetricViewsFromUncalibratedPairwiseGraph() {
 		this(new ConfigProjectiveReconstruction());
 	}
 
@@ -124,9 +103,6 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 		// For now we are keeping this very simple. Only a single seed is considered
 		SeedInfo info = seeds.get(0);
 
-		// TODO redo every component to use shifted pixels
-		// TODO redo every component to use scaled pixels
-
 		// Find the common features
 		GrowQueue_I32 common = utils.findCommonFeatures(info.seed,info.motions);
 		if( common.size < 6 ) // if less than the minimum it will fail
@@ -134,18 +110,27 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 
 		if( verbose != null ) verbose.println("Selected seed.id="+info.seed.id+" common="+common.size);
 
-		// TODO build up a scene so that SBA can be run on the whole thing
-		if (!estimateInitialSceneFromSeed(db, info, common))
+
+		if (!estimateProjectiveSceneFromSeed(db, info, common))
 			return false;
 
-		// NOTE: Computing H to scale camera matrices didn't prevent them from vanishing
+		// Save found camera matrices for each view it was estimated in
+		if( verbose != null ) verbose.println("Saving initial seed camera matrices");
 
-		expandScene(db);
+		// TODO from seed get metric reconstruction
+		List<String> viewIds = new ArrayList<>();
+		FastQueue<ImageDimension> dimensions = new FastQueue<>(ImageDimension::new);
+		FastQueue<DMatrixRMaj> views = new FastQueue<>(()->new DMatrixRMaj(3,4));
+		FastQueue<AssociatedTupleDN> observations = new FastQueue<>(AssociatedTupleDN::new);
 
-		// TODO compute features across all views for SBA
-		// NOTE: Could do one last bundle adjustment on the entire scene. not doing that here since it would
-		//       be a pain to code up since features need to be tracked across all the images and triangulated
-		// TODO Note that the scene should be properly scale first if this is done.
+		initProjective.lookupInfoForMetricElevation(viewIds,dimensions,views,observations);
+		MetricCameras results = new MetricCameras();
+//		projectiveToMetric.process(viewIds,dimensions,views,observations,results);
+
+		// TODO save which features were inliers at every stage so that the 3D cloud can be computed later on
+
+		// TODO expand the scene by finding connected triplets
+
 
 		if( verbose != null ) verbose.println("Done");
 		return true;
@@ -154,7 +139,7 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 	/**
 	 * Initializes the scene at the seed view
 	 */
-	private boolean estimateInitialSceneFromSeed(LookupSimilarImages db, SeedInfo info, GrowQueue_I32 common) {
+	private boolean estimateProjectiveSceneFromSeed(LookupSimilarImages db, SeedInfo info, GrowQueue_I32 common) {
 		// initialize projective scene using common tracks
 		if( !initProjective.projectiveSceneN(db,info.seed,common,info.motions) ) {
 			if( verbose != null ) verbose.println("Failed initialize seed");
@@ -194,10 +179,10 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 				break;
 			}
 
-			if(!expandProjective.process(db,workGraph,selected,cameraMatrix)) {
-				if( verbose != null ) verbose.println("  Failed to expand/add view="+selected.id+". Discarding.");
-				continue;
-			}
+//			if(!expandProjective.process(db,workGraph,selected,cameraMatrix)) {
+//				if( verbose != null ) verbose.println("  Failed to expand/add view="+selected.id+". Discarding.");
+//				continue;
+//			}
 			if( verbose != null ) {
 				verbose.println("  Success Expanding: view=" + selected.id + "  inliers="
 						+ utils.inliersThreeView.size() + " / " + utils.matchesTriple.size);
@@ -264,7 +249,7 @@ public class ProjectiveReconstructionFromPairwiseGraph implements VerbosePrint {
 		double bestScore = 0.0;
 		int bestValidCount = 0;
 
-		List<PairwiseImageGraph2.View> valid = new ArrayList<>();
+		List<View> valid = new ArrayList<>();
 
 		for (int openIdx = 0; openIdx < open.size; openIdx++) {
 			final View pview = open.get(openIdx);

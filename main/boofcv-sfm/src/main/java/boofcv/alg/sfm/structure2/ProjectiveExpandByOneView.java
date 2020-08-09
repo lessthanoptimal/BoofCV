@@ -21,17 +21,11 @@ package boofcv.alg.sfm.structure2;
 import boofcv.alg.geo.pose.CompatibleProjectiveHomography;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.Motion;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
-import lombok.Getter;
-import lombok.Setter;
-import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Expands an existing projective scene to include a new view. At least two neighbors with a known projective transform
@@ -52,19 +46,10 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class ProjectiveExpandByOneView implements VerbosePrint {
+public class ProjectiveExpandByOneView extends ExpandByOneView {
 
 	// Used to make two sets of equivalent projective transforms compatible with each other
 	CompatibleProjectiveHomography findCompatible = new CompatibleProjectiveHomography();
-
-	// Reference to the working scene graph
-	SceneWorkingGraph workGraph;
-
-	/** Common algorithms for reconstructing the projective scene */
-	@Getter	@Setter PairwiseGraphUtils utils = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
-
-	// If not null then print debugging information
-	PrintStream verbose;
 
 	//------------------------- Local work space
 
@@ -78,9 +63,6 @@ public class ProjectiveExpandByOneView implements VerbosePrint {
 	// Storage for camera matrices
 	List<DMatrixRMaj> camerasLocal = new ArrayList<>();
 	List<DMatrixRMaj> camerasGlobal = new ArrayList<>();
-
-	// candidates for being used as known connections
-	List<Motion> validCandidates = new ArrayList<>();
 
 	/**
 	 * Attempts to estimate the camera model in the global projective space for the specified view
@@ -163,99 +145,5 @@ public class ProjectiveExpandByOneView implements VerbosePrint {
 		camerasGlobal.add(workGraph.lookupView(utils.viewC.id).projective);
 
 		return findCompatible.fitCameras(camerasLocal, camerasGlobal, localToGlobal);
-	}
-
-	/**
-	 * Selects two views which are connected to the target by maximizing a score function. The two selected
-	 * views must have 3D information, be connected to each other, and have a known camera matrix. These three views
-	 * will then be used to estimate a trifocal tensor
-	 *
-	 * @param target (input) A view
-	 * @param connections (output) the two selected connected views to the target
-	 * @return true if successful or false if it failed
-	 */
-	public boolean selectTwoConnections( View target , List<Motion> connections )
-	{
-		connections.clear();
-
-		// Create a list of connections in the target that can be used
-		createListOfValid(target, validCandidates);
-
-		double bestScore = 0.0;
-		for (int connectionCnt = 0; connectionCnt < validCandidates.size(); connectionCnt++) {
-			Motion connectB = validCandidates.get(connectionCnt);
-			Motion connectC = findBestCommon(target,connectB, validCandidates);
-			if( connectC == null )
-				continue; // no common connection could be found
-
-			double score = utils.scoreMotion.score(connectB) + utils.scoreMotion.score(connectC);
-			if( score > bestScore ) {
-				bestScore = score;
-				connections.clear();
-				connections.add(connectB);
-				connections.add(connectC);
-			}
-		}
-
-		return !connections.isEmpty();
-	}
-
-	/**
-	 * Finds all the connections from the target view which are 3D and have known other views
-	 * @param target (input)
-	 * @param validConnections (output)
-	 */
-	void createListOfValid(View target, List<Motion> validConnections) {
-		validConnections.clear();
-		for (int connectionIdx = 0; connectionIdx < target.connections.size; connectionIdx++) {
-			Motion connectB = target.connections.get(connectionIdx);
-			if( !connectB.is3D || !workGraph.isKnown(connectB.other(target)))
-				continue;
-			validConnections.add(connectB);
-		}
-	}
-
-	/**
-	 * Selects the view C which has the best connection from A to C and B to C. Best is defined using the
-	 * scoring function and being 3D.
-	 *
-	 * @param viewA (input) The root node all motions must connect to
-	 * @param connAB (input) A connection from view A to view B
-	 * @param validConnections (input) List of connections that are known to be valid potential solutions
-	 * @return The selected common view. null if none could be found
-	 */
-	public Motion findBestCommon( View viewA, Motion connAB , List<Motion> validConnections)
-	{
-		double bestScore = 0.0;
-		Motion bestConnection = null;
-
-		View viewB = connAB.other(viewA);
-
-		for (int connIdx = 0; connIdx < validConnections.size(); connIdx++) {
-			Motion connAC = validConnections.get(connIdx);
-			if( connAC == connAB )
-				continue;
-			View viewC = connAC.other(viewA);
-
-			// The views must form a complete loop with 3D information
-			Motion connBC = viewB.findMotion(viewC);
-			if( null == connBC || !connBC.is3D )
-				continue;
-
-			// Maximize worst case 3D information
-			double score = Math.min(utils.scoreMotion.score(connAC) , utils.scoreMotion.score(connBC));
-
-			if( score > bestScore ) {
-				bestScore = score;
-				bestConnection = connAC;
-			}
-		}
-
-		return bestConnection;
-	}
-
-	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-		this.verbose = out;
 	}
 }
