@@ -27,8 +27,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>

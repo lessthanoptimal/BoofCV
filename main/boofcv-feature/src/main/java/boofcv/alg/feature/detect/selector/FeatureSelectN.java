@@ -20,8 +20,7 @@ package boofcv.alg.feature.detect.selector;
 
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Selects features periodically in the order they were detected until it hits the limit. This is better than just

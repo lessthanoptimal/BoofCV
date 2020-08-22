@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
 import org.ejml.UtilEjml;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 
 /**

@@ -23,8 +23,8 @@ import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ShowImages;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 /**

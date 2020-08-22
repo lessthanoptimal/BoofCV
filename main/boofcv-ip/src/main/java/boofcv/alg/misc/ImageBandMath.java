@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,13 @@
 
 package boofcv.alg.misc;
 
-import boofcv.struct.image.*;
 import boofcv.alg.misc.impl.ImplImageBandMath;
 import boofcv.alg.misc.impl.ImplImageBandMath_MT;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Generated;
-import javax.annotation.Nullable;
 
 /**
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 	private void process(int rows, int cols, EllipseClustersIntoHexagonalGrid alg) {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.data0 );
+		nodes.add( grid.d0 );
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 	}
@@ -108,18 +108,18 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
 
-		for( EllipseRotated_F64 e : grid.data1 ) {
+		for( EllipseRotated_F64 e : grid.d1 ) {
 			AffinePointOps_F64.transform(affine, e.center, e.center);
 		}
 
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.data0 );
+		nodes.add( grid.d0 );
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 	}
 
 	private void processAndCheck(int rows, int cols, EllipseClustersIntoHexagonalGrid alg, Tuple2<List<Node>, List<EllipseRotated_F64>> grid, List<List<Node>> nodes) {
-		alg.process(grid.data1, nodes);
+		alg.process(grid.d1, nodes);
 
 		FastQueue<Grid> found = alg.getGrids();
 
@@ -140,17 +140,17 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		List<List<Node>> nodes = new ArrayList<>();
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
-		nodes.add( grid0.data0 );
-		nodes.add( grid1.data0 );
-		ellipses.addAll( grid0.data1 );
-		ellipses.addAll( grid1.data1 );
+		nodes.add( grid0.d0 );
+		nodes.add( grid1.d0 );
+		ellipses.addAll( grid0.d1 );
+		ellipses.addAll( grid1.d1 );
 
 		// adjust indexing for second grid
-		for( Node n : grid1.data0 ) {
+		for( Node n : grid1.d0 ) {
 			n.cluster = 1;
-			n.which += grid0.data1.size();
+			n.which += grid0.d1.size();
 			for (int i = 0; i < n.connections.size(); i++) {
-				n.connections.data[i] += grid0.data1.size();
+				n.connections.data[i] += grid0.d1.size();
 			}
 		}
 
@@ -177,7 +177,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
 
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.data0 );
+		nodes.add( grid.d0 );
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 
@@ -186,7 +186,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		grid = createHexagonalGrid(rows, cols, 0.5, 1);
 		alg = new EllipseClustersIntoHexagonalGrid();
 		nodes.clear();
-		nodes.add( grid.data0 );
+		nodes.add( grid.d0 );
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 	}
@@ -201,9 +201,9 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
 
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.data0 );
+		nodes.add( grid.d0 );
 
-		alg.process(grid.data1, nodes);
+		alg.process(grid.d1, nodes);
 
 		assertEquals(0, alg.getGrids().size);
 	}
@@ -224,7 +224,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,hexY*2.1);
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.data1,input.data0);
+		alg.computeNodeInfo(input.d1,input.d0);
 		alg.findContour(true);
 
 		List<NodeInfo> column0 = new ArrayList<>();
@@ -267,7 +267,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,1.1);
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.data1,input.data0);
+		alg.computeNodeInfo(input.d1,input.d0);
 		alg.findContour(true);
 
 		List<NodeInfo> column0 = new ArrayList<>();
@@ -300,7 +300,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,2);
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.data1,input.data0);
+		alg.computeNodeInfo(input.d1,input.d0);
 
 		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
 
@@ -312,7 +312,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		alg.listInfo.get(3).ellipse.set(0,1,1,1,0);
 		input = connectEllipses(ellipses,1.1);
-		alg.computeNodeInfo(input.data1,input.data0);
+		alg.computeNodeInfo(input.d1,input.d0);
 		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
 		assertTrue(found == null);
 
@@ -331,7 +331,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,2);
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.data1,input.data0);
+		alg.computeNodeInfo(input.d1,input.d0);
 
 		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosestSide(alg.listInfo.get(2),alg.listInfo.get(0));
 
@@ -343,7 +343,7 @@ public class TestEllipseClustersIntoHexagonalGrid {
 
 		alg.listInfo.get(3).ellipse.set(0,1,1,1,0);
 		input = connectEllipses(ellipses,1.1);
-		alg.computeNodeInfo(input.data1,input.data0);
+		alg.computeNodeInfo(input.d1,input.d0);
 		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
 		assertTrue(found == null);
 	}

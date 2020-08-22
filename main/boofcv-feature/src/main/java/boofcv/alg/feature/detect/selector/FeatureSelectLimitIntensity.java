@@ -21,8 +21,7 @@ package boofcv.alg.feature.detect.selector;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Selects features inside the image until it hits a limit. Feature intensity is available to aide in the selection

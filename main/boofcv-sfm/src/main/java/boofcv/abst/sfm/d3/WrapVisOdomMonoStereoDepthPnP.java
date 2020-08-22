@@ -31,8 +31,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;

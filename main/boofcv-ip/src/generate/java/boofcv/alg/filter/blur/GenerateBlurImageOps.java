@@ -66,7 +66,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import boofcv.struct.convolve.Kernel1D_S32;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
-				"import javax.annotation.Nullable;\n" +
+				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"/**\n" +
 				" * Catch all class for function which \"blur\" an image, typically used to \"reduce\" the amount\n" +

@@ -25,8 +25,8 @@ import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -23,9 +23,9 @@ import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 

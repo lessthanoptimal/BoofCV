@@ -21,8 +21,8 @@ package boofcv.gui.feature;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.gui.StandardAlgConfigPanel;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,7 @@ import boofcv.alg.segmentation.slic.SegmentSlic;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for {@link ImageSuperpixels} algorithms, which are used to segment the image into super pixels.

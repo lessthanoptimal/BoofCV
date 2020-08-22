@@ -1,5 +1,5 @@
 plugins {
-    id "com.peterabeles.gversion" version "1.7.0" apply false
+    id "com.peterabeles.gversion" version "1.8.3" apply false
 }
 
 ext.libpath = file('./').absolutePath
@@ -41,6 +41,14 @@ subprojects {
     compileJava {
         options.compilerArgs += [ "--release", "8"]
 //        options.compilerArgs += '--enable-preview'
+    }
+
+    // To make ErrorProne and Kotlin plugins happy
+    configurations.all {
+        resolutionStrategy {
+            force 'com.google.code.findbugs:jsr305:3.0.2'
+            force 'org.jetbrains:annotations:20.0.0'
+        }
     }
 
     // Fail on jar conflict
@@ -89,17 +97,14 @@ subprojects {
     }
 
     dependencies {
-        api (group: 'org.georegression', name: 'georegression', version: '0.23-SNAPSHOT') {
-            exclude group: 'org.ddogleg'
-        }
+        api (group: 'org.georegression', name: 'georegression', version: '0.23-SNAPSHOT')
         api (group: 'org.ddogleg', name: 'ddogleg', version: '0.19-SNAPSHOT')
-
-        compileOnly 'org.projectlombok:lombok:1.18.10'
 
         compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
 
-        implementation 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
-        implementation 'javax.annotation:jsr250-api:1.0'       // @Generated
+        compileOnly 'org.projectlombok:lombok:1.18.10'
+        compileOnly 'org.jetbrains:annotations:20.0.0' // @Nullable
+        compileOnly 'javax.annotation:jsr250-api:1.0'  // @Generated
 
         testImplementation( 'org.junit.jupiter:junit-jupiter-api:5.4.0' )
         testRuntimeOnly( 'org.junit.jupiter:junit-jupiter-engine:5.4.0' )

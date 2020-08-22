@@ -25,8 +25,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

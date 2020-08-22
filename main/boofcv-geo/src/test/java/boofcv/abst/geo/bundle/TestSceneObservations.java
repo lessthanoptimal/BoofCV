@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,11 +63,26 @@ public class TestSceneObservations {
 		v.add(8,3,3);
 		v.add(3,4,2);
 
-		v.set(2,-1,-2);
+		v.set(2,4,-1,-2);
+		assertEquals(4,v.point.get(2));
+		Point2D_F64 p = new Point2D_F64();
+		v.get(2,p);
+		assertTrue(p.distance2(-1,-2) < 1e-7);
+	}
+
+	@Test
+	public void View_setPixel() {
+		View v = new View();
+
+		v.add(5,1,2);
+		v.add(1,2,3);
+		v.add(8,3,3);
+		v.add(3,4,2);
+
+		v.setPixel(2,-1,-2);
 		assertEquals(8,v.point.get(2));
 		Point2D_F64 p = new Point2D_F64();
 		v.get(2,p);
 		assertTrue(p.distance2(-1,-2) < 1e-7);
-
 	}
 }

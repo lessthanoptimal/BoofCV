@@ -22,8 +22,8 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 

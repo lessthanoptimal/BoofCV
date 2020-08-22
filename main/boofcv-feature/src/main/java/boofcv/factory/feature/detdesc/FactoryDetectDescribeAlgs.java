@@ -33,8 +33,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Peter Abeles

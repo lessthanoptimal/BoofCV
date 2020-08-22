@@ -38,8 +38,7 @@ import boofcv.struct.image.*;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,7 @@ package boofcv.factory.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Creates detectors of calibration targets.  These detectors return found key points in the image and

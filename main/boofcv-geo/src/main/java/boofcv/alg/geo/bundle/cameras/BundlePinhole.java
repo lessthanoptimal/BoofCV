@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,12 +41,24 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 	}
 
 	public BundlePinhole(CameraPinhole intrinsic ) {
+		setTo(intrinsic);
+	}
+
+	public void setTo(CameraPinhole intrinsic) {
 		zeroSkew = intrinsic.skew == 0;
 		fx = intrinsic.fx;
 		fy = intrinsic.fy;
 		cx = intrinsic.cx;
 		cy = intrinsic.cy;
 		skew = intrinsic.skew;
+	}
+
+	public void copyInto(CameraPinhole intrinsic) {
+		intrinsic.fx = fx;
+		intrinsic.fy = fy;
+		intrinsic.cx = cx;
+		intrinsic.cy = cy;
+		intrinsic.skew = skew;
 	}
 
 	@Override

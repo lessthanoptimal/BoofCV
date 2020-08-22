@@ -946,8 +946,8 @@ class TestMultiViewOps {
 		List<Vector3D_F64> solutionsN = new ArrayList<>();
 
 		for( Tuple2<Se3_F64,Vector3D_F64> t : found ) {
-			solutionsSE.add( t.data0 );
-			solutionsN.add( t.data1 );
+			solutionsSE.add( t.d0 );
+			solutionsN.add( t.d1 );
 		}
 
 		TestDecomposeHomography.checkHasOriginal(solutionsSE, solutionsN, R, T, d, N);
@@ -1263,13 +1263,13 @@ class TestMultiViewOps {
 
 		Tuple2<List<Point2D_F64>,List<Point2D_F64>> found = MultiViewOps.split2(triples);
 
-		assertEquals(triples.size(),found.data0.size());
-		assertEquals(triples.size(),found.data1.size());
+		assertEquals(triples.size(),found.d0.size());
+		assertEquals(triples.size(),found.d1.size());
 
 		for (int i = 0; i < triples.size(); i++) {
 			AssociatedPair t = triples.get(i);
-			assertSame(t.p1, found.data0.get(i));
-			assertSame(t.p2, found.data1.get(i));
+			assertSame(t.p1, found.d0.get(i));
+			assertSame(t.p2, found.d1.get(i));
 		}
 	}
 

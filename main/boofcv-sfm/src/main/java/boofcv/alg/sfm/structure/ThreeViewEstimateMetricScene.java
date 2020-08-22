@@ -43,8 +43,8 @@ import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;

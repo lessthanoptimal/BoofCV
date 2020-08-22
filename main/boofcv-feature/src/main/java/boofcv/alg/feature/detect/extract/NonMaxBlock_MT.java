@@ -22,8 +22,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastQueue;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>Concurrent implementation of {@link NonMaxBlock_MT}. Every row of block is run in its own threads.

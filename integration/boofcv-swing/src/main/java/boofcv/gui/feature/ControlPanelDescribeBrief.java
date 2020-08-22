@@ -20,8 +20,8 @@ package boofcv.gui.feature;
 
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.gui.StandardAlgConfigPanel;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 /**

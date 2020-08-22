@@ -27,8 +27,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 
 /**

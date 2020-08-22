@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print(
 				"import javax.annotation.Generated;\n" +
-				"import javax.annotation.Nullable;\n" +
+				"import org.jetbrains.annotations.Nullable;\n" +
 				"import boofcv.concurrency.FWorkArrays;\n" +
 				"import boofcv.concurrency.IWorkArrays;\n" +
 				"import boofcv.struct.image.*;\n" +

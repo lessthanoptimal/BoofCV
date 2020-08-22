@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class TestEllipseClustersIntoGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows, cols);
 
 		EllipseClustersIntoGrid alg = new HelperAlg();
-		alg.computeNodeInfo(grid.data1,grid.data0);
+		alg.computeNodeInfo(grid.d1,grid.d0);
 
 		List<List<NodeInfo>> gridLists = convertIntoGridOfLists(0, rows, cols, alg);
 
@@ -93,7 +93,7 @@ public class TestEllipseClustersIntoGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
 		EllipseClustersIntoGrid alg = new HelperAlg();
-		alg.computeNodeInfo(grid.data1,grid.data0);
+		alg.computeNodeInfo(grid.d1,grid.d0);
 
 		alg.listInfo.get(0).marked = true;
 		alg.listInfo.get(1).marked = true;
@@ -110,7 +110,7 @@ public class TestEllipseClustersIntoGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
 
 		EllipseClustersIntoGrid alg = new HelperAlg();
-		alg.computeNodeInfo(grid.data1,grid.data0);
+		alg.computeNodeInfo(grid.d1,grid.d0);
 
 		alg.listInfo.get(0).marked = true;
 		alg.listInfo.get(1).marked = true;
@@ -156,7 +156,7 @@ public class TestEllipseClustersIntoGrid {
 
 		// use internal algorithm to set up its data structure.  Correct of this function is
 		// directly tested elsewhere
-		alg.computeNodeInfo(grid.data1,grid.data0);
+		alg.computeNodeInfo(grid.d1,grid.d0);
 
 		// now find the contour
 		assertTrue(alg.findContour(true));

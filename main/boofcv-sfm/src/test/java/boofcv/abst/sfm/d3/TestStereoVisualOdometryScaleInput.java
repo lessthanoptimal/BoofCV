@@ -25,9 +25,9 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 

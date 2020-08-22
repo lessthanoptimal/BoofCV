@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,7 @@ package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Projective camera model. pixel (x,y) = (X/Z , Y/Z)
@@ -43,7 +41,7 @@ public class BundleCameraProjective implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void jacobian(double camX, double camY, double camZ, @Nonnull double[] pointX, @Nonnull double[] pointY, boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY) {
+	public void jacobian(double camX, double camY, double camZ, double[] pointX, double[] pointY, boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY) {
 		pointX[0] = 1/camZ;
 		pointX[1] = 0;
 		pointX[2] = -camX/(camZ*camZ);

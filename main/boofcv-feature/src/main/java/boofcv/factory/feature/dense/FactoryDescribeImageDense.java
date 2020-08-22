@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating {@link DescribeImageDense}.

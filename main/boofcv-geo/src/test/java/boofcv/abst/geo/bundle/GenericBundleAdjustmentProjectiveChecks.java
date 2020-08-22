@@ -49,11 +49,11 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
 
-		alg.setParameters(a.data0,a.data1);
-		alg.optimize(a.data0); // don't assertTrue() since it can fail
+		alg.setParameters(a.d0,a.d1);
+		alg.optimize(a.d0); // don't assertTrue() since it can fail
 
 		Tuple2<SceneStructureProjective, SceneObservations> b = createHorizontalMotion( 123);
-		assertEquals(a.data0,b.data0,1e-6);
+		assertEquals(a.d0,b.d0,1e-6);
 	}
 
 	/**
@@ -66,13 +66,13 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
 		Tuple2<SceneStructureProjective, SceneObservations> c = createHorizontalMotion( 234);
 		addNoiseToPoint3D(c);
-		alg.setParameters(a.data0,a.data1);
-		alg.optimize(c.data0);
-		alg.setParameters(a.data0,a.data1);
-		alg.optimize(a.data0);
+		alg.setParameters(a.d0,a.d1);
+		alg.optimize(c.d0);
+		alg.setParameters(a.d0,a.d1);
+		alg.optimize(a.d0);
 
 		Tuple2<SceneStructureProjective, SceneObservations> b = createHorizontalMotion( 123);
-		assertEquals(a.data0,b.data0,1e-6);
+		assertEquals(a.d0,b.d0,1e-6);
 	}
 
 	@Test
@@ -82,7 +82,7 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
 
 		// Add noise to every observation
-		SceneObservations observations = a.data1;
+		SceneObservations observations = a.d1;
 		for (int i = 0; i < observations.views.size; i++) {
 			SceneObservations.View v = observations.views.data[i];
 			for (int j = 0; j < v.point.size; j++) {
@@ -91,11 +91,11 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 			}
 		}
 
-		alg.setParameters(a.data0,a.data1);
-		assertTrue(alg.optimize(a.data0));
+		alg.setParameters(a.d0,a.d1);
+		assertTrue(alg.optimize(a.d0));
 
 		Tuple2<SceneStructureProjective, SceneObservations> b = createHorizontalMotion( 123);
-		assertEquals(a.data0,b.data0,0.02);
+		assertEquals(a.d0,b.d0,0.02);
 	}
 
 	@Test
@@ -107,20 +107,20 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		// Add noise to every 3D point
 		addNoiseToPoint3D(a);
 
-		alg.setParameters(a.data0,a.data1);
-		assertTrue(alg.optimize(a.data0));
+		alg.setParameters(a.d0,a.d1);
+		assertTrue(alg.optimize(a.d0));
 
 		// Since reprojection errors are perfect it should do a very good job reducing the residuals
-		checkReprojectionError(a.data0,a.data1,1e-4);
+		checkReprojectionError(a.d0,a.d1,1e-4);
 
 		// even though observations are perfect it might have only converged towards a locally optimal solution thats
 		// close to the optimal one
 		Tuple2<SceneStructureProjective, SceneObservations> b = createHorizontalMotion( 123);
-		assertEquals(a.data0,b.data0,0.1);
+		assertEquals(a.d0,b.d0,0.1);
 	}
 
 	private void addNoiseToPoint3D(Tuple2<SceneStructureProjective, SceneObservations> a) {
-		SceneStructureProjective structure = a.data0;
+		SceneStructureProjective structure = a.d0;
 		for (int i = 0; i < structure.points.size; i++) {
 			SceneStructureProjective.Point p = structure.points.data[i];
 			p.coordinate[0] += rand.nextGaussian()*0.1;
@@ -137,7 +137,7 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 
 		// Add noise to every view pose estimate. Except 0 since that's the world coordinates and it's easier to check
 		// errors if that's unmolested
-		SceneStructureProjective structure = a.data0;
+		SceneStructureProjective structure = a.d0;
 		for (int i = 1; i < structure.views.size; i++) {
 			SceneStructureProjective.View v = structure.views.data[i];
 			v.worldToView.data[3 ] += rand.nextGaussian()*0.1;
@@ -145,16 +145,16 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 			v.worldToView.data[11] += rand.nextGaussian()*0.1;
 		}
 
-		alg.setParameters(a.data0,a.data1);
-		assertTrue(alg.optimize(a.data0));
+		alg.setParameters(a.d0,a.d1);
+		assertTrue(alg.optimize(a.d0));
 
 		// Since reprojection errors are perfect it should do a very good job reducing the residuals
-		checkReprojectionError(a.data0,a.data1,1e-4);
+		checkReprojectionError(a.d0,a.d1,1e-4);
 
 		// even though observations are perfect it might have only converged towards a locally optimal solution thats
 		// close to the optimal one
 		Tuple2<SceneStructureProjective, SceneObservations> b = createHorizontalMotion( 123);
-		assertEquals(a.data0,b.data0,0.1);
+		assertEquals(a.d0,b.d0,0.1);
 	}
 
 	static void checkReprojectionError(SceneStructureProjective structure , SceneObservations observations , double tol ) {

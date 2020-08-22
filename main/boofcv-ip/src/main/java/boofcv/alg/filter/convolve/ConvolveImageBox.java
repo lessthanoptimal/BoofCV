@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ import boofcv.struct.border.ImageBorderValue;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Convolves a kernel which is composed entirely of 1's across an image.  This special kernel can be highly optimized

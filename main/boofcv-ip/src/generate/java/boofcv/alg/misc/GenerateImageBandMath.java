@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
-				"import javax.annotation.Nullable;\n" +
+				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"/**\n" +
 				" *\n" +

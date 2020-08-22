@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,7 +96,7 @@ public class PruneStructureFromSceneProjective {
 			Errors e = errors.get(i);
 
 			SceneObservations.View v = observations.views.data[e.view];
-			v.set(e.pointIndexInView, Float.NaN, Float.NaN);
+			v.setPixel(e.pointIndexInView, Float.NaN, Float.NaN);
 		}
 
 		// Remove all marked features
@@ -218,7 +218,7 @@ public class PruneStructureFromSceneProjective {
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
 				v.get(indexInView, observation);
 
-				if( !Double.isNaN(v.observations.get(indexInView*2)))
+				if( !Double.isNaN(observation.x))
 					continue;
 
 				// Tell the feature it is no longer visible in this view

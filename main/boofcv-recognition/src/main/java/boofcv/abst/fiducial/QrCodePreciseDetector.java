@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**

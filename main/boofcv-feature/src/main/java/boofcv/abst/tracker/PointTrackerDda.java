@@ -21,8 +21,8 @@ package boofcv.abst.tracker;
 import boofcv.alg.tracker.dda.DetectDescribeAssociateTracker;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 

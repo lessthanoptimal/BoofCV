@@ -34,8 +34,8 @@ import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.ReshapeMatrix;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Computes the Jacobian for {@link BundleAdjustmentSchur} for generic matrices.

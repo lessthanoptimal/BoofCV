@@ -34,8 +34,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;

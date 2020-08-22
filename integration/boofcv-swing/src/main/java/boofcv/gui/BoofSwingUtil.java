@@ -35,10 +35,10 @@ import boofcv.struct.image.ImageGray;
 import boofcv.visualize.PointCloudViewer;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

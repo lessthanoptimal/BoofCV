@@ -26,8 +26,6 @@ import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DMatrixRMaj;
 
-import javax.annotation.Nonnull;
-
 /**
  * Computes numerical jacobian from {@link BundleAdjustmentCamera}. The specific numerical Jacobian
  * algorithm is configurable by overriding {@link #createNumericalAlgorithm(FunctionNtoM)}.
@@ -83,8 +81,8 @@ public class BundleCameraNumericJacobian {
 	 * @param pointX (Output) Partial of projected x' relative to input camera point.<code>[@x'/@camX, @ x' / @ camY, @ x' / @ camZ]</code> length 3
 	 * @param pointY (Output) Partial of projected y' relative to input camera point.<code>[@y'/@camX, @ y' / @ camY, @ y' / @ camZ]</code> length 3
 	 */
-	public void jacobianPoint( double camX, double camY, double camZ,
-							   @Nonnull double pointX[], @Nonnull double pointY[]) {
+	public void jacobianPoint(double camX, double camY, double camZ,
+							  double[] pointX, double[] pointY) {
 		funcPoint.setParameters(intrinsic);
 		X[0] = camX;X[1] = camY;X[2] = camZ;
 		jacobian.reshape(2,3);
@@ -106,7 +104,7 @@ public class BundleCameraNumericJacobian {
 	 * @param calibY (Output) Partial of projected y' relative to calibration parameters. length N
 	 */
 	public void jacobianIntrinsics(double camX, double camY, double camZ,
-								   @Nonnull double calibX[], @Nonnull double calibY[]) {
+								   double[] calibX, double[] calibY) {
 		funcIntrinsic.X.set(camX,camY,camZ);
 
 		jacobian.reshape(2,numIntrinsic);

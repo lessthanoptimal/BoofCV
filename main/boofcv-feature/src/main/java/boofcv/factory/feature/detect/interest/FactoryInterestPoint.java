@@ -38,8 +38,7 @@ import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>Factory for creating interest point detectors which conform to the {@link InterestPointDetector}

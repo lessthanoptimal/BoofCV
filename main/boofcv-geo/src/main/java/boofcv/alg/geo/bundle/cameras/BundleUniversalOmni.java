@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,7 @@ import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of {@link boofcv.struct.calib.CameraUniversalOmni} for bundle adjustment
@@ -200,7 +198,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 
 	@Override
 	public void jacobian(double camX, double camY, double camZ,
-						 @Nonnull double[] inputX, @Nonnull double[] inputY,
+						 double[] inputX, double[] inputY,
 						 boolean computeIntrinsic,
 						 @Nullable double[] calibX, @Nullable double[] calibY)
 	{

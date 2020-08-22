@@ -36,6 +36,7 @@ import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.alg.geo.trifocal.TrifocalTransfer;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -61,8 +62,8 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1072,6 +1073,24 @@ public class MultiViewOps {
 			throw new RuntimeException("WTF this failed?? Probably NaN in P");
 		alg.computeH(H);
 		return H;
+	}
+
+	/**
+	 * Computes a homography transform which will make the first camera in the list identity and modifies
+	 * the camera matrices using that homography
+	 * @param cameraMatrices (input/output) Converts
+	 * @param H (output + Optional) storage for homography
+	 */
+	public static void projectiveMakeFirstIdentity(List<DMatrixRMaj> cameraMatrices, @Nullable DMatrixRMaj H)
+	{
+		BoofMiscOps.assertBoof(cameraMatrices.size()>=1);
+		H = projectiveToIdentityH(cameraMatrices.get(0),H);
+		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
+		for (int i = 0; i < cameraMatrices.size(); i++) {
+			DMatrixRMaj P = cameraMatrices.get(i);
+			CommonOps_DDRM.mult(P,H,tmp);
+			P.set(tmp);
+		}
 	}
 
 	/**

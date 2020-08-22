@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,6 @@ import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-import javax.annotation.Nonnull;
-
 /**
  * Returns low level implementations of dense image descriptor algorithms.
  *
@@ -34,7 +32,7 @@ import javax.annotation.Nonnull;
 public class FactoryDescribeImageDenseAlg {
 
 	public static <T extends ImageBase<T>>
-	DescribeDenseHogAlg<T> hog(@Nonnull ConfigDenseHoG config , ImageType<T> imageType ) {
+	DescribeDenseHogAlg<T> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
 		config.checkValidity();
 
 		return new DescribeDenseHogAlg<>(config.orientationBins, config.pixelsPerCell,
@@ -44,7 +42,7 @@ public class FactoryDescribeImageDenseAlg {
 	}
 
 	public static <T extends ImageBase<T>>
-	DescribeDenseHogFastAlg<T> hogFast(@Nonnull ConfigDenseHoG config , ImageType<T> imageType ) {
+	DescribeDenseHogFastAlg<T> hogFast(ConfigDenseHoG config , ImageType<T> imageType ) {
 		config.checkValidity();
 
 		return new DescribeDenseHogFastAlg(config.orientationBins,config.pixelsPerCell

@@ -38,8 +38,8 @@ import georegression.struct.ConvertFloatType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 

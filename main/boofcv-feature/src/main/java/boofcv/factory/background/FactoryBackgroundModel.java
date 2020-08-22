@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,7 @@ import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating implementations of {@link BackgroundModelStationary} and {@link boofcv.alg.background.BackgroundModelMoving}
@@ -45,7 +43,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryBasic<T> stationaryBasic(@Nonnull ConfigBackgroundBasic config , ImageType<T> imageType ) {
+	BackgroundStationaryBasic<T> stationaryBasic(ConfigBackgroundBasic config , ImageType<T> imageType ) {
 
 		config.checkValidity();
 
@@ -71,7 +69,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingBasic<T,Motion> movingBasic(@Nonnull ConfigBackgroundBasic config ,
+	BackgroundMovingBasic<T,Motion> movingBasic(ConfigBackgroundBasic config ,
 												Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
 
 		config.checkValidity();
@@ -110,7 +108,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>>
-	BackgroundStationaryGaussian<T> stationaryGaussian(@Nonnull ConfigBackgroundGaussian config , ImageType<T> imageType ) {
+	BackgroundStationaryGaussian<T> stationaryGaussian(ConfigBackgroundGaussian config , ImageType<T> imageType ) {
 
 		config.checkValidity();
 
@@ -148,7 +146,7 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase<T>,Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingGaussian<T,Motion> movingGaussian( @Nonnull ConfigBackgroundGaussian config ,
+	BackgroundMovingGaussian<T,Motion> movingGaussian( ConfigBackgroundGaussian config ,
 													   Point2Transform2Model_F32<Motion> transform,
 													   ImageType<T> imageType ) {
 

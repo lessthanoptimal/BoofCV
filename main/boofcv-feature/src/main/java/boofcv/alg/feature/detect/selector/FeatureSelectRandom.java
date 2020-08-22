@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.selector;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Random;
 
 /**

@@ -22,8 +22,8 @@ import android.graphics.Bitmap;
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I8;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 /**

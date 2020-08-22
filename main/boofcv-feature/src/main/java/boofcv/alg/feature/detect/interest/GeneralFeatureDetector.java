@@ -28,8 +28,7 @@ import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.FastArray;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>

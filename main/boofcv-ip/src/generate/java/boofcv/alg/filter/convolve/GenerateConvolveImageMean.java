@@ -67,7 +67,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
-				"import javax.annotation.Nullable;\n" +
+				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"\n" +
 				"/**\n" +

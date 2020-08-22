@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.fiducial.qrcode;
 
 import org.ddogleg.struct.GrowQueue_I8;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 
 import static boofcv.alg.fiducial.qrcode.EciEncoding.getEciCharacterSet;

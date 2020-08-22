@@ -31,8 +31,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
 

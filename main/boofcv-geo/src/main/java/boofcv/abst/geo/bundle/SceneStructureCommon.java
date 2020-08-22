@@ -46,7 +46,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	public SceneStructureCommon(boolean homogenous) {
 		this.homogenous = homogenous;
 		pointSize = homogenous ? 4 : 3;
-		points = new FastQueue<>(Point.class,()->new Point(pointSize));
+		points = new FastQueue<>(()->new Point(pointSize),Point::reset);
 	}
 
 	/**
@@ -164,7 +164,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		/**
 		 * Where the point is in the world reference frame. 3D or 4D space
 		 */
-		public double coordinate[];
+		public double[] coordinate;
 
 		/**
 		 * Indexes of the views that this point appears in

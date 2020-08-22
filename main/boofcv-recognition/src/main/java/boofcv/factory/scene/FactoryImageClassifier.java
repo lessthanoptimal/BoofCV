@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,8 @@ public class FactoryImageClassifier {
 
 		ClassifierAndSource ret = new ClassifierAndSource();
 
-		ret.data0 = new ImageClassifierVggCifar10();
-		ret.data1 = sources;
+		ret.d0 = new ImageClassifierVggCifar10();
+		ret.d1 = sources;
 
 		return ret;
 	}
@@ -63,8 +63,8 @@ public class FactoryImageClassifier {
 
 		ClassifierAndSource ret = new ClassifierAndSource();
 
-		ret.data0 = new ImageClassifierNiNImageNet();
-		ret.data1 = sources;
+		ret.d0 = new ImageClassifierNiNImageNet();
+		ret.d1 = sources;
 
 		return ret;
 	}

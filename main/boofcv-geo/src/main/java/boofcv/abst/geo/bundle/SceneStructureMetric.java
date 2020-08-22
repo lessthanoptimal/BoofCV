@@ -274,6 +274,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		public int indexFirst;
 
 		public void reset() {
+			known = false;
 			objectToWorld.reset();
 			points = null;
 			indexFirst = -1;

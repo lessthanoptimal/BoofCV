@@ -22,8 +22,7 @@ import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastQueue;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p/>

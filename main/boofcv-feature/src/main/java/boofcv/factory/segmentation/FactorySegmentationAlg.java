@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for low level segmentation algorithms.
@@ -173,7 +171,7 @@ public class FactorySegmentationAlg {
 	}
 
 	public static<T extends ImageBase<T>>
-	SegmentSlic<T> slic(@Nonnull ConfigSlic config , ImageType<T> imageType )
+	SegmentSlic<T> slic(ConfigSlic config , ImageType<T> imageType )
 	{
 		if( config == null )
 			throw new IllegalArgumentException("No default configuration since the number of segments must be specified.");

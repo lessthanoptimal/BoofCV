@@ -27,8 +27,8 @@ import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 

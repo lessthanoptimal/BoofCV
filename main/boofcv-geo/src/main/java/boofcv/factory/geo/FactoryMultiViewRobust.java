@@ -48,9 +48,7 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ejml.data.DMatrixRMaj;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating robust false-positive tolerant estimation algorithms in multi-view geometry.  These
@@ -77,7 +75,7 @@ public class FactoryMultiViewRobust {
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpLMedS(@Nullable ConfigPnP configPnP,
-																	 @Nonnull ConfigLMedS configLMedS)
+																	 ConfigLMedS configLMedS)
 	{
 		if( configPnP == null )
 			configPnP = new ConfigPnP();
@@ -111,7 +109,7 @@ public class FactoryMultiViewRobust {
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpRansac( @Nullable ConfigPnP pnp,
-																	   @Nonnull ConfigRansac ransac )
+																	   ConfigRansac ransac )
 	{
 		if( pnp == null )
 			pnp = new ConfigPnP();
@@ -145,7 +143,7 @@ public class FactoryMultiViewRobust {
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineLMedS( @Nullable ConfigEssential essential,
-																				@Nonnull ConfigLMedS lmeds )
+																				ConfigLMedS lmeds )
 	{
 		if( essential == null )
 			essential = new ConfigEssential();
@@ -169,8 +167,8 @@ public class FactoryMultiViewRobust {
 		return config;
 	}
 
-	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalLMedS(@Nonnull ConfigFundamental fundamental,
-																			 @Nonnull ConfigLMedS lmeds ) {
+	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalLMedS(ConfigFundamental fundamental,
+																			 ConfigLMedS lmeds ) {
 
 		fundamental.checkValidity();
 		lmeds.checkValidity();
@@ -214,7 +212,7 @@ public class FactoryMultiViewRobust {
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, AssociatedPair> baselineRansac(@Nullable ConfigEssential essential,
-																				@Nonnull ConfigRansac ransac )
+																				ConfigRansac ransac )
 	{
 		if( essential == null )
 			essential = new ConfigEssential();
@@ -245,7 +243,7 @@ public class FactoryMultiViewRobust {
 	}
 
 	public static ModelMatcherMultiview<DMatrixRMaj, AssociatedPair>  essentialRansac(@Nullable ConfigEssential essential,
-																					  @Nonnull ConfigRansac ransac )
+																					  ConfigRansac ransac )
 	{
 		if( essential == null )
 			essential = new ConfigEssential();
@@ -275,8 +273,8 @@ public class FactoryMultiViewRobust {
 
 
 	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalRansac(
-			@Nonnull ConfigFundamental fundamental,
-			@Nonnull ConfigRansac ransac ) {
+			ConfigFundamental fundamental,
+			ConfigRansac ransac ) {
 
 		fundamental.checkValidity();
 		ransac.checkValidity();
@@ -323,7 +321,7 @@ public class FactoryMultiViewRobust {
 	 * @return Homography estimator
 	 */
 	public static LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-	homographyLMedS(@Nullable ConfigHomography homography , @Nonnull ConfigLMedS configLMedS )
+	homographyLMedS(@Nullable ConfigHomography homography , ConfigLMedS configLMedS )
 	{
 		if( homography == null )
 			homography = new ConfigHomography();
@@ -354,7 +352,7 @@ public class FactoryMultiViewRobust {
 	 * @return Homography estimator
 	 */
 	public static Ransac<Homography2D_F64,AssociatedPair>
-	homographyRansac( @Nullable ConfigHomography homography , @Nonnull ConfigRansac ransac )
+	homographyRansac( @Nullable ConfigHomography homography , ConfigRansac ransac )
 	{
 		if( homography == null )
 			homography = new ConfigHomography();
@@ -378,7 +376,7 @@ public class FactoryMultiViewRobust {
 	 * @return Ransac
 	 */
 	public static RansacMultiView<Homography2D_F64,AssociatedPair>
-	homographyCalibratedRansac( @Nonnull ConfigRansac ransac )
+	homographyCalibratedRansac( ConfigRansac ransac )
 	{
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(false);
@@ -403,7 +401,7 @@ public class FactoryMultiViewRobust {
 	public static Ransac<TrifocalTensor, AssociatedTriple>
 	trifocalRansac( @Nullable ConfigTrifocal trifocal ,
 					@Nullable ConfigTrifocalError error,
-					@Nonnull ConfigRansac ransac ) {
+					ConfigRansac ransac ) {
 		if( trifocal == null )
 			trifocal = new ConfigTrifocal();
 		if( error == null )
@@ -446,7 +444,7 @@ public class FactoryMultiViewRobust {
 	 */
 	public static RansacProjective<MetricCameraTriple, AssociatedTriple>
 	metricThreeViewRansac( @Nullable ConfigPixelsToMetric selfcalib,
-						   @Nonnull ConfigRansac ransac)
+						   ConfigRansac ransac)
 	{
 		// Pixel error squared in two views
 		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold*2;

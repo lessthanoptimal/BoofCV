@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,11 +52,11 @@ public class TestEllipseClustersIntoRegularGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = TestEllipseClustersIntoGrid.createRegularGrid(rows, cols);
 
 		List<List<Node>> clusters = new ArrayList<>();
-		clusters.add( grid.data0 );
+		clusters.add( grid.d0 );
 
 		EllipseClustersIntoRegularGrid alg = new EllipseClustersIntoRegularGrid();
 
-		alg.process(grid.data1,clusters);
+		alg.process(grid.d1,clusters);
 
 		FastQueue<Grid> found = alg.getGrids();
 
@@ -77,7 +77,7 @@ public class TestEllipseClustersIntoRegularGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = TestEllipseClustersIntoGrid.createRegularGrid(rows, cols);
 
 		EllipseClustersIntoRegularGrid alg = new EllipseClustersIntoRegularGrid();
-		alg.computeNodeInfo(grid.data1,grid.data0);
+		alg.computeNodeInfo(grid.d1,grid.d0);
 
 		// split into the two grids
 		List<List<NodeInfo>> input = convertIntoGridOfLists(0, rows, cols, alg);
@@ -94,7 +94,7 @@ public class TestEllipseClustersIntoRegularGrid {
 		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = TestEllipseClustersIntoGrid.createRegularGrid(rows, cols);
 
 		EllipseClustersIntoRegularGrid alg = new EllipseClustersIntoRegularGrid();
-		alg.computeNodeInfo(grid.data1,grid.data0);
+		alg.computeNodeInfo(grid.d1,grid.d0);
 
 		// split into the two grids
 		List<List<NodeInfo>> input = convertIntoGridOfLists(0, rows, cols, alg);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,11 +35,11 @@ import java.util.List;
 public class ClassifierAndSource extends Tuple2<ImageClassifier<Planar<GrayF32>>,List<String>>
 {
 	public ImageClassifier<Planar<GrayF32>> getClassifier() {
-		return data0;
+		return d0;
 	}
 
 	public List<String> getSource() {
-		return data1;
+		return d1;
 	}
 
 }

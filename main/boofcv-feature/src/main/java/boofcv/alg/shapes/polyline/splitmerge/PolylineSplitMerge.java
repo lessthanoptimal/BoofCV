@@ -25,11 +25,11 @@ import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.DogLinkedList;
+import org.ddogleg.struct.DogLinkedList.Element;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.ddogleg.struct.LinkedList;
-import org.ddogleg.struct.LinkedList.Element;
 
 import java.util.List;
 
@@ -105,7 +105,7 @@ public class PolylineSplitMerge {
 	private LineSegment2D_F64 line = new LineSegment2D_F64();
 
 	// the corner list that's being built
-	LinkedList<Corner> list = new LinkedList<>();
+	DogLinkedList<Corner> list = new DogLinkedList<>();
 	FastQueue<Corner> corners = new FastQueue<>(Corner::new);
 
 	private SplitSelector splitter = new MaximumLineDistance();
@@ -288,7 +288,7 @@ public class PolylineSplitMerge {
 	/**
 	 * Computes the score for a list
 	 */
-	static double computeScore( LinkedList<Corner> list , double cornerPenalty , boolean loops ) {
+	static double computeScore( DogLinkedList<Corner> list , double cornerPenalty , boolean loops ) {
 		double sumSides = 0;
 		Element<Corner> e = list.getHead();
 		Element<Corner> end = loops ? null : list.getTail();

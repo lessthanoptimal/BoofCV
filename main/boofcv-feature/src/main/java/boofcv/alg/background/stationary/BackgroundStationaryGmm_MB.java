@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of {@link BackgroundAlgorithmGmm} for {@link ImageMultiBand}.

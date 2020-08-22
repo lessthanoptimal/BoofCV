@@ -32,8 +32,8 @@ import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.List;
 

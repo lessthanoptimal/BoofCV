@@ -114,7 +114,22 @@ public class SceneObservations {
 			observations.remove(index,index+1);
 		}
 
-		public void set(int index, float x , float y ) {
+		/**
+		 * Sets the feature Id and observation for an observation
+		 *
+		 * @param index Which observation to set
+		 * @param featureIdx The feature which was observed
+		 * @param x observation x-axis
+		 * @param y observation y-axis
+		 */
+		public void set(int index, int featureIdx, float x , float y ) {
+			point.set(index,featureIdx);
+			index *= 2;
+			observations.data[index] = x;
+			observations.data[index+1] = y;
+		}
+
+		public void setPixel(int index, float x , float y ) {
 			index *= 2;
 			observations.data[index] = x;
 			observations.data[index+1] = y;

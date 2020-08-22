@@ -19,8 +19,8 @@
 package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**

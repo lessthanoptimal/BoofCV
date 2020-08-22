@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,7 @@ import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.*;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.image.ImageGray;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for detecting higher level shapes
@@ -105,7 +103,7 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	DetectPolygonFromContour<T> polygonContour(@Nonnull ConfigPolygonFromContour config, Class<T> imageType)
+	DetectPolygonFromContour<T> polygonContour(ConfigPolygonFromContour config, Class<T> imageType)
 	{
 		config.checkValidity();
 
@@ -122,7 +120,7 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	RefinePolygonToGray<T> refinePolygon(@Nonnull ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
+	RefinePolygonToGray<T> refinePolygon(ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
 		return new RefinePolygonToGrayLine<>(
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,

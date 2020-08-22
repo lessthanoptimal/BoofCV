@@ -36,8 +36,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I16;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>

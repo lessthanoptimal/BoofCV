@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.misc.GrlConstants;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.LinkedList.Element;
+import org.ddogleg.struct.DogLinkedList.Element;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -146,7 +146,7 @@ public class TestPolylineSplitMerge {
 		// make it have a stricter error test and it should fail
 		alg.setMaxSideError(ConfigLength.fixed(1));
 		assertFalse(alg.process(contour));
-		assertTrue(null==alg.getBestPolyline());
+		assertNull(alg.getBestPolyline());
 	}
 
 	@Test
@@ -389,7 +389,7 @@ public class TestPolylineSplitMerge {
 		c4.object.splitable = false;
 		c4.object.sideError = 20;
 
-		assertTrue(c2==alg.selectCornerToSplit(true));
+		assertSame(c2, alg.selectCornerToSplit(true));
 	}
 
 	@Test
@@ -427,7 +427,7 @@ public class TestPolylineSplitMerge {
 		c4.object.splitError0 = 1;
 		c4.object.splitError1 = 1;
 
-		assertTrue(c2==alg.selectCornerToSplit(false));
+		assertSame(c2, alg.selectCornerToSplit(false));
 	}
 
 
@@ -507,7 +507,7 @@ public class TestPolylineSplitMerge {
 		PolylineSplitMerge.ErrorValue foundError = new PolylineSplitMerge.ErrorValue();
 		Element<Corner> found = alg.selectCornerToRemove(contour,foundError,true);
 
-		assertTrue(expected == found);
+		assertSame(expected, found);
 		assertEquals(0,foundError.value, GrlConstants.TEST_F64);
 
 	}
@@ -527,11 +527,11 @@ public class TestPolylineSplitMerge {
 
 		// fails because it has 3 sides
 		PolylineSplitMerge.ErrorValue foundError = new PolylineSplitMerge.ErrorValue();
-		assertTrue( null == alg.selectCornerToRemove(contour,foundError,true));
+		assertNull(alg.selectCornerToRemove(contour, foundError, true));
 
 		// won't fail because it has more than 3 corners. There is no good choice to remove but it will still pick one
 		alg.addCorner(26);
-		assertTrue( null != alg.selectCornerToRemove(contour,foundError,true));
+		assertNotNull(alg.selectCornerToRemove(contour, foundError, true));
 		assertTrue(foundError.value>1);
 	}
 
@@ -819,8 +819,8 @@ public class TestPolylineSplitMerge {
 		alg.list.pushTail(b);
 		alg.list.pushTail(c);
 
-		assertTrue(c==alg.next(alg.list.find(b)).object);
-		assertTrue(a==alg.next(alg.list.find(c)).object);
+		assertSame(c, alg.next(alg.list.find(b)).object);
+		assertSame(a, alg.next(alg.list.find(c)).object);
 	}
 
 	@Test
@@ -835,8 +835,8 @@ public class TestPolylineSplitMerge {
 		alg.list.pushTail(b);
 		alg.list.pushTail(c);
 
-		assertTrue(a==alg.previous(alg.list.find(b)).object);
-		assertTrue(c==alg.previous(alg.list.find(a)).object);
+		assertSame(a, alg.previous(alg.list.find(b)).object);
+		assertSame(c, alg.previous(alg.list.find(a)).object);
 	}
 
 	/**

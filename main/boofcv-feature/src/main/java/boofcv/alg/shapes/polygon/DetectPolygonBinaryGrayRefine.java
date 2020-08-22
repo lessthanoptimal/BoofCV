@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 

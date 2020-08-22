@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating line and line segment detectors.

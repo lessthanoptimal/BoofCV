@@ -20,8 +20,7 @@ package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Uses the intensity value in {@link ScalePoint} to return the intensity

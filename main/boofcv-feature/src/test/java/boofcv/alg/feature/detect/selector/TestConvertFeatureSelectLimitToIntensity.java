@@ -23,9 +23,8 @@ import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
-
-import javax.annotation.Nullable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

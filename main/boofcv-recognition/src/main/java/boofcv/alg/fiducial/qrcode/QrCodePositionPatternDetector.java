@@ -45,8 +45,8 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**

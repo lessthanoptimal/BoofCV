@@ -22,8 +22,8 @@ import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.SchurJacobian;
 import org.ejml.data.DMatrix;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 

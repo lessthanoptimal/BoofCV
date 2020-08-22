@@ -31,8 +31,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>The Census Transform [1] computes a bit mask for each pixel in the image. If a neighboring pixel is greater than the

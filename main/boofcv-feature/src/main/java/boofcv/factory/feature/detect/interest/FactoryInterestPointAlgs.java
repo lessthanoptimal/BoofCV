@@ -43,8 +43,7 @@ import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for non-generic specific implementations of interest point detection algorithms.

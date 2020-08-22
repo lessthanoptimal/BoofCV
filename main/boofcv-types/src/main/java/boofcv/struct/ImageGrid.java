@@ -20,9 +20,9 @@ package boofcv.struct;
 
 import boofcv.concurrency.BoofConcurrency;
 import lombok.Getter;
+import org.ddogleg.struct.DProcess;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.Process;
 
 /**
  * Breaks the image up into a grid. For use when processing individual regions of the image at a time. The size
@@ -39,7 +39,7 @@ public class ImageGrid<T> {
 	// length of a cell along each direction
 	@Getter public int lengthX, lengthY;
 
-	public ImageGrid(Factory<T> factory , Process<T> reset) {
+	public ImageGrid(Factory<T> factory , DProcess<T> reset) {
 		cells = new FastQueue<T>(factory, reset);
 	}
 

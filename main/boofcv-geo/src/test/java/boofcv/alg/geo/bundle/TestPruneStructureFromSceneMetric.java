@@ -86,7 +86,7 @@ class TestPruneStructureFromSceneMetric {
 			list.set(selected,list.get(list.size()-i-1));
 			list.set(list.size()-i-1,o);
 
-			observations.views.data[o.view].set(o.point,1000f,1000f);
+			observations.views.data[o.view].setPixel(o.point,1000f,1000f);
 		}
 		observations.checkOneObservationPerView();
 	}

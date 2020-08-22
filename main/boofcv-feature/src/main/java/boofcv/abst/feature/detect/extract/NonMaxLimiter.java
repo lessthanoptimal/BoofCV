@@ -28,8 +28,7 @@ import lombok.Setter;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Adds the ability to specify the maximum number of points that you wish to return.  The selected

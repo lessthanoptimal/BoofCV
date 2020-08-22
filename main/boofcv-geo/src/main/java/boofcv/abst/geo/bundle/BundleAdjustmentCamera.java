@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import georegression.struct.point.Point2D_F64;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Generalized camera model for bundle adjustment. By implementing this function you can swap in and out
@@ -36,14 +34,14 @@ public interface BundleAdjustmentCamera {
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
-	void setIntrinsic(double parameters[], int offset);
+	void setIntrinsic(double[] parameters, int offset);
 
 	/**
 	 * Copies the intrinsic camera into the array.
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
-	void getIntrinsic(double parameters[], int offset);
+	void getIntrinsic(double[] parameters, int offset);
 
 	/**
 	 * Project the 3D point in the camera reference frame onto the camera's image plane.
@@ -69,9 +67,9 @@ public interface BundleAdjustmentCamera {
 	 * @param calibY (Output) Partial of projected y' relative to calibration parameters. length N
 	 */
 	void jacobian(double camX, double camY, double camZ,
-				  @Nonnull double pointX[], @Nonnull double pointY[],
+				  double[] pointX, double[] pointY,
 				  boolean computeIntrinsic,
-				  @Nullable double calibX[], @Nullable double calibY[]);
+				  @Nullable double[] calibX, @Nullable double[] calibY);
 
 	/**
 	 * Returns the number of intrinsic parameters for this model. If the camera is known then the number of parameters

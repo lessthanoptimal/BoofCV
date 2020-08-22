@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.color.ColorFormat;
 import boofcv.concurrency.BWorkArrays;
 import boofcv.core.encoding.impl.ImplConvertYuv420_888;
 import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 /**

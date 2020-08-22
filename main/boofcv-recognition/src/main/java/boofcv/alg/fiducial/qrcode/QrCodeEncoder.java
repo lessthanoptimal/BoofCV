@@ -21,8 +21,8 @@ package boofcv.alg.fiducial.qrcode;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.ejml.ops.CommonOps_BDRM;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;

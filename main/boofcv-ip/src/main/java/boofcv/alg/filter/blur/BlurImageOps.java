@@ -36,8 +36,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Catch all class for function which "blur" an image, typically used to "reduce" the amount

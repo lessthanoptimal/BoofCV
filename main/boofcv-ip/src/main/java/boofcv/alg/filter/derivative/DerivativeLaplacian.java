@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>

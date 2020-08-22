@@ -72,8 +72,7 @@ import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating visual odometry algorithms.

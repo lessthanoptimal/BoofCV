@@ -100,7 +100,7 @@ public class PruneStructureFromSceneMetric {
 			Errors e = errors.get(i);
 
 			SceneObservations.View v = observations.views.get(e.view);
-			v.set(e.pointIndexInView, Float.NaN, Float.NaN);
+			v.setPixel(e.pointIndexInView,Float.NaN, Float.NaN);
 		}
 
 		// Remove all marked features
@@ -161,7 +161,7 @@ public class PruneStructureFromSceneMetric {
 
 				// Is the feature behind this view and can't be seen?
 				if( X.z <= 0 ) {
-					v.set(pointIndex, Float.NaN, Float.NaN);
+					v.setPixel(pointIndex, Float.NaN, Float.NaN);
 				}
 			}
 		}

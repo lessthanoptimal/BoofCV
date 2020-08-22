@@ -39,8 +39,7 @@ import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating fiducial detectors which implement {@link FiducialDetector}.

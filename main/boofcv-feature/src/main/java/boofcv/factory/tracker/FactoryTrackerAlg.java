@@ -32,8 +32,7 @@ import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating feature trackers algorithms.

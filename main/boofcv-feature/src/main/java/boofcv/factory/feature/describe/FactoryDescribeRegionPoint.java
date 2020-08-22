@@ -33,8 +33,8 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Random;
 
 

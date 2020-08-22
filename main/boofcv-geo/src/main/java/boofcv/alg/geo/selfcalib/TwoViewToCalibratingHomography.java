@@ -110,8 +110,6 @@ public class TwoViewToCalibratingHomography {
 	// motion from camera views
 	private final Se3_F64 view_1_to_2 = new Se3_F64();
 
-	// estimated intrisic matrix for view-3
-	private final DMatrixRMaj K3 = new DMatrixRMaj(3,3);
 	// H for elevating projective to metric view
 	private final DMatrixRMaj calibratingH = new DMatrixRMaj(4,4);
 
@@ -131,12 +129,12 @@ public class TwoViewToCalibratingHomography {
 	private final DecomposeProjectiveToMetric projectiveToMetric = new DecomposeProjectiveToMetric();
 
 	// Used to normalize data for better stability when used in a linear solver
-	DMatrixRMaj K1_inv = new DMatrixRMaj(3,3);
-	DMatrixRMaj K2_prime = new DMatrixRMaj(3,3);
-	DMatrixRMaj P1_prime = new DMatrixRMaj(3,4);
-	DMatrixRMaj P2_prime = new DMatrixRMaj(3,4);
-	DMatrixRMaj H_prime = new DMatrixRMaj(4,4);
-	DMatrixRMaj P_tmp = new DMatrixRMaj(3,4);
+	private final DMatrixRMaj K1_inv = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj K2_prime = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj P1_prime = new DMatrixRMaj(3,4);
+	private final DMatrixRMaj P2_prime = new DMatrixRMaj(3,4);
+	private final DMatrixRMaj H_prime = new DMatrixRMaj(4,4);
+	private final DMatrixRMaj P_tmp = new DMatrixRMaj(3,4);
 
 	/**
 	 * Specify known geometric relationship between the two views
@@ -193,7 +191,6 @@ public class TwoViewToCalibratingHomography {
 				bestSolutionIdx = motionIdx;
 				bestModelError = projectiveToMetric.singularError; // this is the same for every hypothesis
 			}
-//			System.out.println(motionIdx+" invalid="+foundInvalid+" score="+score);
 		}
 		return bestSolutionIdx >= 0;
 	}

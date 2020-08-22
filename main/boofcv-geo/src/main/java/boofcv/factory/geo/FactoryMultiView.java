@@ -65,8 +65,7 @@ import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating abstracted algorithms related to multi-view geometry

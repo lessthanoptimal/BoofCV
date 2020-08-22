@@ -19,8 +19,8 @@
 package boofcv.gui.dialogs;
 
 import boofcv.gui.BoofSwingUtil;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;

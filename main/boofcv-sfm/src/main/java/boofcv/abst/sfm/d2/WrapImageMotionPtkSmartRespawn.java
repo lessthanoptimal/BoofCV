@@ -26,8 +26,8 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.GrowQueue_B;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 

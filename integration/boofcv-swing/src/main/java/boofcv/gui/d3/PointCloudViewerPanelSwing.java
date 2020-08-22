@@ -42,8 +42,8 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
