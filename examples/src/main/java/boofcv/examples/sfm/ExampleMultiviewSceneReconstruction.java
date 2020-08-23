@@ -19,16 +19,13 @@
 package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
-import boofcv.abst.geo.TriangulateNViewsMetric;
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.scene.PointTrackerToSimilarImages;
-import boofcv.alg.sfm.structure2.*;
+import boofcv.alg.sfm.structure2.GeneratePairwiseImageGraph;
+import boofcv.alg.sfm.structure2.MetricFromUncalibratedPairwiseGraph;
+import boofcv.alg.sfm.structure2.PairwiseImageGraph2;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.io.MediaManager;
@@ -79,8 +76,8 @@ public class ExampleMultiviewSceneReconstruction {
 			String id = similarImages.frames.getTail().frameID;
 			System.out.println("frame id = "+id+" active="+active+" dropped="+dropped);
 
-			if( sequence.getFrameNumber() >= 6 )
-				break;
+//			if( sequence.getFrameNumber() >= 20 )
+//				break;
 		}
 
 		System.out.println("----------------------------------------------------------------------------");
@@ -109,33 +106,22 @@ public class ExampleMultiviewSceneReconstruction {
 		System.out.println("  nodes with no 3D "+nodesWithNo3D);
 
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("### Projective Reconstruction");
-		var projective = new ProjectiveReconstructionFromPairwiseGraph();
-		projective.setVerbose(System.out,null);
-		projective.getInitProjective().setVerbose(System.out,null);
-//		projective.getExpandProjective().setVerbose(System.out,null);
-		if( !projective.process(similarImages,pairwise) ) {
-			System.err.println("Projective failed");
-			System.exit(0);
-		}
-		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Metric Reconstruction");
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
-		TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated(null);
-		var metric = new ProjectiveToMetricReconstruction(new ConfigProjectiveToMetric(),bundleAdjustment,triangulator);
+		var metric = new MetricFromUncalibratedPairwiseGraph();
 		metric.setVerbose(System.out,null);
-//		metric.getBundleAdjustment().setVerbose(System.out,0);
-		if( !metric.process(similarImages,projective.getWorkGraph()) ) {
-			System.err.println("Metric failed");
+		metric.getInitProjective().setVerbose(System.out,null);
+//		projective.getExpandProjective().setVerbose(System.out,null);
+		if( !metric.process(similarImages,pairwise) ) {
+			System.err.println("Reconstruction failed");
 			System.exit(0);
 		}
 
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("Printing a few of the camera");
-		for( var v : projective.getWorkGraph().views.values() ) {
-			BundlePinholeSimplified c = metric.getRefinedCamera(v.pview.id);
-			System.out.println("view='"+v.pview.id+"' "+c);
-//			v.pinhole.print();
+		System.out.println("Printing view info");
+		for( var v : metric.getWorkGraph().viewList ) {
+			System.out.printf("view='%s' fx=%.1f t={%.1f, %.1f, %.1f}\n",v.pview.id,
+					v.pinhole.fx,
+					v.world_to_view.T.x,v.world_to_view.T.y,v.world_to_view.T.z);
 		}
 		// TODO visualize
 		System.out.println("done");
