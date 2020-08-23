@@ -18,6 +18,7 @@
 
 package boofcv.misc;
 
+import boofcv.errors.BoofAssertFailure;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 import georegression.struct.GeoTuple;
@@ -524,13 +525,21 @@ public class BoofMiscOps {
 	}
 
 	public static void assertBoof( boolean result ) {
-		if( !result )
-			throw new RuntimeException("assert failed");
+		assertBoof(result,"Assert failed.");
 	}
 
 	public static void assertBoof( boolean result , String message ) {
 		if( !result )
-			throw new IllegalArgumentException(message);
+			throw new BoofAssertFailure(message);
+	}
+
+	public static void assertEq( int valA, int valB) {
+		assertEq(valA, valB,"not equals");
+	}
+
+	public static void assertEq( int valA, int valB, String message ) {
+		if( valA != valB )
+			throw new BoofAssertFailure(valA+" != "+valB+" "+message);
 	}
 
 	public static <T> void forIdx( List<T> list, BoofLambdas.ProcessIndex<T> func )
