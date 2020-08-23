@@ -28,8 +28,10 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class MetricCameras {
-	/** Motion relative to first camera.
-	 * First camera is implicit, not included in this list, and assumed to be the origin */
+	/**
+	 * Motion relative to first camera.
+	 * First camera is implicit, not included in this list, and assumed to be the origin
+	 */
 	public final FastQueue<Se3_F64> motion_1_to_k = new FastQueue<>(Se3_F64::new);
 	/** Intrinsic parameters for all cameras */
 	public final FastQueue<CameraPinhole> intrinsics = new FastQueue<>(CameraPinhole::new);

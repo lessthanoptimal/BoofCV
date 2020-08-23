@@ -39,7 +39,6 @@ import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -256,13 +255,13 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 
 		for( SceneWorkingGraph.View target_v : graph.views.values() ) {
 			// if there are no inliers saved with this view skip it.
-			if( target_v.projectiveInliers.isEmpty() )
+			if( target_v.inliers.isEmpty() )
 				continue;
 			// quick sanity check to see if the data structure fulfills its contract
-			assertBoof(target_v.projectiveInliers.views.get(0)==target_v.pview);
+			assertBoof(target_v.inliers.views.get(0)==target_v.pview);
 
 			// grab inlier information for this view. local variables are just short cuts
-			final SceneWorkingGraph.InlierInfo inliers = target_v.projectiveInliers;
+			final SceneWorkingGraph.InlierInfo inliers = target_v.inliers;
 			assertBoof(inliers.observations.size == inliers.views.size);
 			final int numViews = inliers.views.size;
 			final int numInliers = inliers.observations.get(0).size;

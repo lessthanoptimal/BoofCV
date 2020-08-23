@@ -158,6 +158,7 @@ class TestPairwiseGraphUtils {
 		}
 	}
 
+	@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 	@Test
 	void createTripleFromCommon() {
 		var alg = new PairwiseGraphUtils();
@@ -177,6 +178,11 @@ class TestPairwiseGraphUtils {
 		alg.commonIdx.add(0);
 		alg.createTripleFromCommon();
 		assertEquals(1,alg.matchesTriple.size);
+		// undo the shift in pixel coordinates
+		for (int i = 0; i < 3; i++) {
+			alg.matchesTriple.get(0).get(i).x += db.intrinsic.width/2;
+			alg.matchesTriple.get(0).get(i).y += db.intrinsic.height/2;
+		}
 		assertEquals(0.0,alg.matchesTriple.get(0).p1.distance(db.viewObs.get(0).get(0)));
 		assertEquals(0.0,alg.matchesTriple.get(0).p2.distance(db.viewObs.get(1).get(1)));
 		assertEquals(0.0,alg.matchesTriple.get(0).p3.distance(db.viewObs.get(3).get(5)));
@@ -414,32 +420,48 @@ class TestPairwiseGraphUtils {
 		// j = i*2
 		alg.ransac = new MockRansac();
 
-		alg.saveRansacInliers(viewA);
+		// Go through all 3 possible views as the first view in the inliers
+		for (int firstView = 0; firstView < 3; firstView++) {
+			SceneWorkingGraph.View view0 = new SceneWorkingGraph.View();
+			view0.pview = switch(firstView) {
+				case 0 -> alg.seed;
+				case 1 -> alg.viewB;
+				case 2 -> alg.viewC;
+				default -> throw new RuntimeException("BUG");
+			};
+			//-------- Call the function being tested
+			alg.saveRansacInliers(view0);
 
-		SceneWorkingGraph.InlierInfo inliers = viewA.projectiveInliers;
-		assertEquals(3, inliers.views.size);
-		assertSame(alg.seed, inliers.views.get(0));
-		assertSame(alg.viewB, inliers.views.get(1));
-		assertSame(alg.viewC, inliers.views.get(2));
-		assertEquals(3, inliers.observations.size);
-		for (int i = 0; i < 3; i++) {
-			GrowQueue_I32 indexes = inliers.observations.get(i);
-			assertEquals(numInliers,indexes.size);
+			// Check the results
+			SceneWorkingGraph.InlierInfo inliers = view0.inliers;
+			assertEquals(3, inliers.views.size);
+			assertSame(view0.pview, inliers.views.get(0));
+			assertNotSame(view0.pview, inliers.views.get(1));
+			assertNotSame(view0.pview, inliers.views.get(2));
+			assertEquals(3, inliers.observations.size);
+			for (int checkView = 0; checkView < 3; checkView++) {
+				PairwiseImageGraph2.View v = inliers.views.get(checkView);
+				GrowQueue_I32 indexes = inliers.observations.get(checkView);
+				assertEquals(numInliers,indexes.size);
 
-			if( i == 0 ) {
-				for (int j = 0; j < numInliers; j++) {
-					assertEquals(j*2, indexes.get(j));
-				}
-			} else if( i == 1 ) {
-				for (int j = 0; j < numInliers; j++) {
-					assertEquals(alg.table_A_to_B.get(j*2), indexes.get(j));
-				}
-			} else {
-				for (int j = 0; j < numInliers; j++) {
-					assertEquals(alg.table_A_to_C.get(j*2), indexes.get(j));
+				if( alg.seed == v) {
+					for (int j = 0; j < numInliers; j++) {
+						assertEquals(j*2, indexes.get(j));
+					}
+				} else if( alg.viewB == v) {
+					for (int j = 0; j < numInliers; j++) {
+						assertEquals(alg.table_A_to_B.get(j*2), indexes.get(j));
+					}
+				} else if( alg.viewC == v ){
+					for (int j = 0; j < numInliers; j++) {
+						assertEquals(alg.table_A_to_C.get(j*2), indexes.get(j));
+					}
+				} else {
+					fail("BUG");
 				}
 			}
 		}
+
 	}
 
 	@Nested

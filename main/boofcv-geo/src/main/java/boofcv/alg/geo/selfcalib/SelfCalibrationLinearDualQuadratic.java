@@ -20,9 +20,9 @@ package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.struct.calib.CameraPinhole;
 import lombok.Getter;
 import lombok.Setter;
-import boofcv.struct.calib.CameraPinhole;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
@@ -338,14 +338,6 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 				L.data[index++] = B.a1*B.a1*RR - B.a2*B.a2;
 			}
 		}
-	}
-
-	public double getSingularThreshold() {
-		return singularThreshold;
-	}
-
-	public void setSingularThreshold(double singularThreshold) {
-		this.singularThreshold = singularThreshold;
 	}
 
 	public FastAccess<Intrinsic> getSolutions() {

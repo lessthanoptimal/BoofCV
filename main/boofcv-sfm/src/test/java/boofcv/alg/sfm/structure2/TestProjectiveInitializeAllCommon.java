@@ -49,10 +49,11 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 class TestProjectiveInitializeAllCommon {
 
 	final static double reprojectionTol = 1e-5;
-	final static double matrixTol = 1e-4;
+	final static double matrixTol = 1e-3;
 
 	Random rand = BoofTesting.createRandom(3);
 
@@ -249,12 +250,14 @@ class TestProjectiveInitializeAllCommon {
 				// Project this feature to the camera
 				DMatrixRMaj P = structure.views.get(viewIdx).worldToView;
 				PerspectiveOps.renderPixel(P,X,found);
+				// undo the offset
+				found.x += db.intrinsic.width/2;
+				found.y += db.intrinsic.height/2;
 
 				// Lookup the expected pixel location
 				// The seed feature ID and the ground truth feature ID are the same
 				int viewFeatIdx = db.featToView.get(viewDbIdx)[truthFeatIdx];
 				Point2D_F64 expected = db.viewObs.get(viewDbIdx).get(viewFeatIdx);
-
 				assertEquals(0.0,expected.distance(found), reprojectionTol);
 			}
 		}

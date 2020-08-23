@@ -18,46 +18,37 @@
 
 package boofcv.alg.sfm.structure2;
 
-import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
-import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
-import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.ScoreIndex;
-import boofcv.struct.geo.AssociatedTupleDN;
-import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
-import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
-
 /**
- * TODO WRITE THIS
+ * Contains common functions useful for perform a full scene reconstruction from a {@link PairwiseImageGraph2}.
+ * This includes selecting the seed views, selecting next views to expand to, and boiler plate.
+ *
+ * @see MetricFromUncalibratedPairwiseGraph
+ * @see ProjectiveReconstructionFromPairwiseGraph
  *
  * @author Peter Abeles
  */
-public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
+public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 	/** Contains the found projective scene */
 	public final @Getter SceneWorkingGraph workGraph = new SceneWorkingGraph();
-	/** Computes the initial scene from the seed and some of it's neighbors */
-	private final @Getter ProjectiveInitializeAllCommon initProjective;
-
-	private final ProjectiveToMetricCameras projectiveToMetric = FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
 
 	// Common functions used in projective reconstruction
-	final PairwiseGraphUtils utils;
+	protected PairwiseGraphUtils utils;
 
 	// If not null then verbose debugging information is printed
-	PrintStream verbose;
+	protected @Nullable PrintStream verbose;
 
 	//--------------------------------------------- Internal workspace
 	// scores of individual motions for a View
@@ -67,145 +58,14 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 	// information related to each view being a potential seed
 	FastQueue<SeedInfo> seedScores = new FastQueue<>(SeedInfo::new, SeedInfo::reset);
 
-	public MetricViewsFromUncalibratedPairwiseGraph(PairwiseGraphUtils utils) {
+	public ReconstructionFromPairwiseGraph(PairwiseGraphUtils utils) {
 		this.utils = utils;
-		initProjective = new ProjectiveInitializeAllCommon();
-		initProjective.utils = utils;
-	}
-
-	public MetricViewsFromUncalibratedPairwiseGraph(ConfigProjectiveReconstruction config) {
-		this(new PairwiseGraphUtils(config));
-	}
-
-	public MetricViewsFromUncalibratedPairwiseGraph() {
-		this(new ConfigProjectiveReconstruction());
-	}
-
-	/**
-	 * Performs a projective reconstruction of the scene from the views contained in the graph
-	 * @param db (input) Contains information on each image
-	 * @param graph (input) Relationship between the images
-	 * @return true if successful or false if it failed and results can't be used
-	 */
-	public boolean process( LookupSimilarImages db , PairwiseImageGraph2 graph ) {
-		exploredViews.clear();
-		workGraph.reset();
-
-		// Score nodes for their ability to be seeds
-		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(graph);
-		List<SeedInfo> seeds = selectSeeds(seedScores,mapScores);
-
-		if( seeds.size() == 0 )
-			return false;
-
-		if( verbose != null ) verbose.println("Selected "+seeds.size()+" seeds out of "+graph.nodes.size+" nodes");
-
-		// For now we are keeping this very simple. Only a single seed is considered
-		SeedInfo info = seeds.get(0);
-
-		// Find the common features
-		GrowQueue_I32 common = utils.findCommonFeatures(info.seed,info.motions);
-		if( common.size < 6 ) // if less than the minimum it will fail
-			return false;
-
-		if( verbose != null ) verbose.println("Selected seed.id="+info.seed.id+" common="+common.size);
-
-
-		if (!estimateProjectiveSceneFromSeed(db, info, common))
-			return false;
-
-		// Save found camera matrices for each view it was estimated in
-		if( verbose != null ) verbose.println("Saving initial seed camera matrices");
-
-		// TODO from seed get metric reconstruction
-		List<String> viewIds = new ArrayList<>();
-		FastQueue<ImageDimension> dimensions = new FastQueue<>(ImageDimension::new);
-		FastQueue<DMatrixRMaj> views = new FastQueue<>(()->new DMatrixRMaj(3,4));
-		FastQueue<AssociatedTupleDN> observations = new FastQueue<>(AssociatedTupleDN::new);
-
-		initProjective.lookupInfoForMetricElevation(viewIds,dimensions,views,observations);
-		MetricCameras results = new MetricCameras();
-//		projectiveToMetric.process(viewIds,dimensions,views,observations,results);
-
-		// TODO save which features were inliers at every stage so that the 3D cloud can be computed later on
-
-		// TODO expand the scene by finding connected triplets
-
-
-		if( verbose != null ) verbose.println("Done");
-		return true;
-	}
-
-	/**
-	 * Initializes the scene at the seed view
-	 */
-	private boolean estimateProjectiveSceneFromSeed(LookupSimilarImages db, SeedInfo info, GrowQueue_I32 common) {
-		// initialize projective scene using common tracks
-		if( !initProjective.projectiveSceneN(db,info.seed,common,info.motions) ) {
-			if( verbose != null ) verbose.println("Failed initialize seed");
-			return false;
-		}
-
-		// Save found camera matrices for each view it was estimated in
-		if( verbose != null ) verbose.println("Saving initial seed camera matrices");
-		for (int structViewIdx = 0; structViewIdx < initProjective.utils.structure.views.size; structViewIdx++) {
-			View view = initProjective.getPairwiseGraphViewByStructureIndex(structViewIdx);
-			if( verbose != null ) verbose.println("  view.id=`"+view.id+"`");
-			DMatrixRMaj cameraMatrix = initProjective.utils.structure.views.get(structViewIdx).worldToView;
-			workGraph.addView(view).projective.set(cameraMatrix);
-			exploredViews.add(view.id);
-		}
-
-		// save which features were used for later use in metric reconstruction
-		utils.saveRansacInliers(workGraph.lookupView(utils.seed.id));
-
-		return true;
-	}
-
-	/**
-	 * Adds all the remaining views to the scene
-	 */
-	private void expandScene(LookupSimilarImages db) {
-		if( verbose != null ) verbose.println("ENTER Expanding Scene:");
-		// Create a list of views that can be added the work graph
-		FastArray<View> open = findAllOpenViews();
-
-		// Grow the projective scene until there are no more views to process
-		DMatrixRMaj cameraMatrix = new DMatrixRMaj(3,4);
-		while( open.size > 0 ) {
-			View selected = selectNextToProcess(open);
-			if( selected == null ) {
-				if( verbose != null ) verbose.println("  No valid views left. open.size="+open.size);
-				break;
-			}
-
-//			if(!expandProjective.process(db,workGraph,selected,cameraMatrix)) {
-//				if( verbose != null ) verbose.println("  Failed to expand/add view="+selected.id+". Discarding.");
-//				continue;
-//			}
-			if( verbose != null ) {
-				verbose.println("  Success Expanding: view=" + selected.id + "  inliers="
-						+ utils.inliersThreeView.size() + " / " + utils.matchesTriple.size);
-			}
-
-			// save the results
-			SceneWorkingGraph.View wview = workGraph.addView(selected);
-			wview.projective.set(cameraMatrix);
-
-			// save which features were used for later use in metric reconstruction
-			assertBoof(utils.seed==wview.pview);// just being paranoid
-			utils.saveRansacInliers(wview);
-
-			// Add views which are neighbors
-			addOpenForView(wview.pview, open);
-		}
-		if( verbose != null ) verbose.println("EXIT Expanding Scene");
 	}
 
 	/**
 	 * Searches all connections to known views and creates a list of connected views which have a 3D relationship
 	 */
-	FastArray<View> findAllOpenViews() {
+	protected FastArray<View> findAllOpenViews() {
 		FastArray<View> found = new FastArray<>(View.class);
 
 		for( SceneWorkingGraph.View wview : workGraph.getAllViews() ) {
@@ -221,7 +81,7 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 	 * @param view (Input) Inspects connected views to add to found
 	 * @param found (Output) Storage for selected views
 	 */
-	void addOpenForView(View view, FastArray<View> found) {
+	protected void addOpenForView(View view, FastArray<View> found) {
 		for( PairwiseImageGraph2.Motion c :  view.connections.toList() ) {
 			if( !c.is3D )
 				continue;
@@ -234,7 +94,7 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 			if( found.contains(o) )
 				continue;
 
-			if( verbose != null ) verbose.println("  adding to open list view.id='"+o.id+"'");
+			if( verbose != null ) verbose.println("  Adding to open list view.id='"+o.id+"'");
 			found.add(o);
 			exploredViews.add(o.id);
 		}
@@ -244,7 +104,7 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 	 * Selects next View to process based on the score of it's known connections. Two connections which both
 	 * connect to each other is required.
 	 */
-	View selectNextToProcess( FastArray<View> open ) {
+	protected View selectNextToProcess( FastArray<View> open ) {
 		int bestIdx = -1;
 		double bestScore = 0.0;
 		int bestValidCount = 0;
@@ -282,8 +142,6 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 				}
 			}
 
-//			System.out.println("view.id="+pview.id+"  valid.size"+valid.size()+" score="+bestLocalScore);
-
 			// strongly prefer 3 or more. Technically the above test won't check for this but in the future it will
 			// so this test serves as a reminder
 			if( Math.min(3,valid.size()) >= bestValidCount && bestLocalScore > bestScore ) {
@@ -293,11 +151,24 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 			}
 		}
 
-		if( bestIdx < 0 )
+		if( bestIdx < 0 ) {
+			if( verbose != null ) {
+				verbose.println("  Failed to find a valid view to connect. open.size=" + open.size);
+				for (int i = 0; i < open.size; i++) {
+					View v = open.get(i);
+					verbose.print("    id='"+v.id+"' conn={ ");
+					for (int j = 0; j < v.connections.size; j++) {
+						verbose.print("'"+v.connections.get(j).other(v).id+"' ");
+					}
+					verbose.println("}");
+				}
+			}
+
 			return null;
+		}
 
 		View selected = open.removeSwap(bestIdx);
-		if( verbose != null ) verbose.println("  open.size="+open.size+" selected.id="+selected.id+" score="+bestScore+" conn="+bestValidCount);
+		if( verbose != null ) verbose.println("  open.size="+open.size+" selected.id='"+selected.id+"' score="+bestScore+" conn="+bestValidCount);
 
 		return selected;
 	}
@@ -305,13 +176,13 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 	/**
 	 * Considers every view in the graph as a potential seed and computes their scores
 	 */
-	Map<String, SeedInfo> scoreNodesAsSeeds(PairwiseImageGraph2 graph) {
+	protected Map<String, SeedInfo> scoreNodesAsSeeds(PairwiseImageGraph2 graph) {
 		seedScores.reset();
 		Map<String,SeedInfo> mapScores = new HashMap<>();
 		for (int idxView = 0; idxView < graph.nodes.size; idxView++) {
 			View v = graph.nodes.get(idxView);
 			SeedInfo info = seedScores.grow();
-			score(v,info);
+			scoreAsSeed(v,info);
 			mapScores.put(v.id,info);
 		}
 		return mapScores;
@@ -326,7 +197,7 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 	 * @param lookupInfo (input) Used to lookup SeedInfo by View ID
 	 * @return List of seeds with the best seeds first.
 	 */
-	List<SeedInfo> selectSeeds(FastQueue<SeedInfo> candidates, Map<String, SeedInfo> lookupInfo) {
+	protected List<SeedInfo> selectSeeds(FastQueue<SeedInfo> candidates, Map<String, SeedInfo> lookupInfo) {
 		// Storage for selected seeds
 		List<SeedInfo> seeds = new ArrayList<>();
 		// sort it so best scores are last
@@ -372,7 +243,7 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 	/**
 	 * Score a view for how well it could be a seed based on the the 3 best 3D motions associated with it
 	 */
-	SeedInfo score( View target , SeedInfo output ) {
+	protected SeedInfo scoreAsSeed(View target , SeedInfo output ) {
 		output.seed = target;
 		scoresMotions.reset();
 
@@ -404,7 +275,7 @@ public class MetricViewsFromUncalibratedPairwiseGraph implements VerbosePrint {
 	/**
 	 * Information related to a view acting as a seed to spawn a projective graph
 	 */
-	static class SeedInfo implements Comparable<SeedInfo> {
+	protected static class SeedInfo implements Comparable<SeedInfo> {
 		// The potential initial seed
 		View seed;
 		// score for how good of a seed this node would make. higher is better

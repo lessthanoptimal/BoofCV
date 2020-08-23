@@ -67,10 +67,16 @@ public class SceneWorkingGraph {
 		return views.containsKey(pview.id);
 	}
 
+	/**
+	 * Adds a new view to the graph. If the view already exists an exception is thrown
+	 * @param pview (Input) Pairwise view to create the new view from.
+	 * @return The new view created
+	 */
 	public View addView( PairwiseImageGraph2.View pview ) {
 		View v = new View();
 		v.pview = pview;
-		assertBoof(null==views.put(v.pview.id,v),"There shouldn't be an existing view with the same key");
+		assertBoof(null==views.put(v.pview.id,v),
+				"There shouldn't be an existing view with the same key: '"+v.pview.id+"'");
 		viewList.add(v);
 		return v;
 	}
@@ -145,7 +151,7 @@ public class SceneWorkingGraph {
 		public final FastArray<PairwiseImageGraph2.View> views = new FastArray<>(PairwiseImageGraph2.View.class);
 		// indexes of observations for each view listed in 'views'.  obs[view][idx] will refer to the same feature
 		// for all 'idx'
-		public final FastQueue<GrowQueue_I32> observations = new FastQueue<>(GrowQueue_I32::new);
+		public final FastQueue<GrowQueue_I32> observations = new FastQueue<>(GrowQueue_I32::new,GrowQueue_I32::reset);
 
 		public boolean isEmpty() {
 			return observations.size==0;
@@ -169,7 +175,7 @@ public class SceneWorkingGraph {
 		// Specifies which observations were used to compute the projective transform for this view
 		// If empty that means one set of inliers are used to multiple views and only one view needed this to be saved
 		// this happens for the seed view
-		public final InlierInfo projectiveInliers = new InlierInfo();
+		public final InlierInfo inliers = new InlierInfo();
 
 		// projective camera matrix
 		public final DMatrixRMaj projective = new DMatrixRMaj(3,4);
@@ -201,7 +207,7 @@ public class SceneWorkingGraph {
 			obs_to_feat.clear();
 			projective.zero();
 			pinhole.reset();
-			projectiveInliers.reset();
+			inliers.reset();
 		}
 	}
 }

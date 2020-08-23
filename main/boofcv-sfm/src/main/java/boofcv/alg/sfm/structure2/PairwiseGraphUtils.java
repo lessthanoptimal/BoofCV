@@ -282,18 +282,29 @@ public class PairwiseGraphUtils {
 	}
 
 	/**
-	 * Saves which features were inside the inlier set as indexes of the seed view's original feature set
+	 * Saves which features were used as inliers.
+	 *
+	 * @param view Which view should be the first view in the list and have its inliers updated.
 	 */
 	public void saveRansacInliers(SceneWorkingGraph.View view ) {
-		assertBoof(view.pview == seed,"view must be the seed view");
+		int viewIdx = seed == view.pview ? 0 : viewB == view.pview ? 1 : viewC == view.pview ? 2 : -1;
+
+		int[] order = switch(viewIdx) {
+			case 0 -> new int[]{0,1,2};
+			case 1 -> new int[]{1,0,2};
+			case 2 -> new int[]{2,1,0};
+			default -> throw new RuntimeException("Passed in view is not any of the three expected");
+		};
+
 		int numInliers = inliersThreeView.size();
-		final InlierInfo info = view.projectiveInliers;
+		final InlierInfo info = view.inliers;
+		assertBoof(info.views.size==0,"Inliers should not have already been set for this view");
 
 		info.observations.reset();
 		info.observations.resize(3);
-		final GrowQueue_I32 indexesA = info.observations.get(0);
-		final GrowQueue_I32 indexesB = info.observations.get(1);
-		final GrowQueue_I32 indexesC = info.observations.get(2);
+		final GrowQueue_I32 indexesA = info.observations.get(order[0]);
+		final GrowQueue_I32 indexesB = info.observations.get(order[1]);
+		final GrowQueue_I32 indexesC = info.observations.get(order[2]);
 
 		for (int inlierCnt = 0; inlierCnt < numInliers; inlierCnt++) {
 			int inputIdx = ransac.getInputIndex(inlierCnt);
@@ -303,10 +314,16 @@ public class PairwiseGraphUtils {
 			indexesC.add( table_A_to_C.data[indexA] );
 		}
 
-		info.views.clear();
-		info.views.add(seed);
-		info.views.add(viewB);
-		info.views.add(viewC);
+		info.views.resize(3);
+		for (int i = 0; i < 3; i++) {
+			View v = switch (i) {
+				case 0 -> seed;
+				case 1 -> viewB;
+				case 2 -> viewC;
+				default -> throw new RuntimeException("BUG");
+			};
+			info.views.set(order[i],v);
+		}
 	}
 
 	/**

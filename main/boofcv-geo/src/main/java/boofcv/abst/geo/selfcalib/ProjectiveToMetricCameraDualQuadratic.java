@@ -34,7 +34,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.assertEq;
 
 /**
  * Wrapper around {@link SelfCalibrationLinearDualQuadratic} for {@link ProjectiveToMetricCameras}.
@@ -66,7 +66,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
 						   List<AssociatedTuple> observations, MetricCameras metricViews)
 	{
-		assertBoof(views.size()+1==dimensions.size());
+		assertEq(views.size()+1,dimensions.size(),"View[0] is implicitly identity and not included");
 		metricViews.reset();
 
 		// Determine metric parameters
@@ -88,7 +88,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 			return false;
 
 		FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions = selfCalib.getSolutions();
-		if( solutions.size != 3 )
+		if( solutions.size != dimensions.size() )
 			return false;
 
 		for (int i = 0; i < solutions.size; i++) {

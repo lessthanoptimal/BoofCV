@@ -36,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 class TestProjectiveExpandByOneView {
-	Random rand = BoofTesting.createRandom(0);
+	private final Random rand = BoofTesting.createRandom(0);
+	private final static double MATRIX_TOL = 1e-4;
 
 	@Test
 	void perfect() {
@@ -73,7 +74,7 @@ class TestProjectiveExpandByOneView {
 				DMatrixRMaj expected = db.views.get(targetIdx).camera;
 				double scale = MultiViewOps.findScale(found,expected);
 				CommonOps_DDRM.scale(scale,found);
-				assertTrue(MatrixFeatures_DDRM.isEquals(expected,found, 1e-7));
+				assertTrue(MatrixFeatures_DDRM.isEquals(expected,found, MATRIX_TOL));
 			}
 		}
 	}

@@ -40,6 +40,8 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.*;
 import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.UtilPoint3D_F64;
+import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -1745,6 +1747,18 @@ public class MultiViewOps {
 
 		return sum/weights;
 	}
+
+	/**
+	 * Finds the scale which minimizes the difference between `a` and `b`. ||scale*a-b||
+	 * @param a (Input) 3D coordinate
+	 * @param b (Input) 3D coordinate
+	 * @return scale factor
+	 */
+	public static double findScale(GeoTuple3D_F64<?> a , GeoTuple3D_F64<?> b ) {
+		int which = UtilPoint3D_F64.axisLargestAbs(a);
+		return b.getIdx(which) / a.getIdx(which);
+	}
+
 
 	/**
 	 * Lists a list of {@link AssociatedTriple} into a list of observations for each camera independently.

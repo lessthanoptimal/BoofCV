@@ -71,10 +71,15 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	@Getter	@Setter	PairwiseGraphUtils utils = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
 
 	/**
-	 * List of feature indexes in the seed view that are the inliers from robust model matching. This is what was
-	 * used to estimate all the camera matrices and
+	 * List of feature indexes in the seed view that are the inliers from robust model matching.
 	 */
 	protected @Getter final GrowQueue_I32 inlierToSeed = new GrowQueue_I32();
+	/**
+	 * List of feature indexes for connected views. Order is in `seedConnIdx` order. Each array of inliers points
+	 * to the same feature as each index in 'inlierToSeed'.
+	 */
+	protected @Getter final FastQueue<GrowQueue_I32> inlierIndexes =
+			new FastQueue<>(GrowQueue_I32::new,GrowQueue_I32::reset);
 
 	protected final FastArray<View> viewsByStructureIndex = new FastArray<>(View.class);
 
@@ -397,6 +402,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	protected void createObservationsForBundleAdjustment(GrowQueue_I32 seedConnIdx) {
 		// seed view + the motions
 		utils.observations.initialize(seedConnIdx.size+1);
+		inlierIndexes.resize(seedConnIdx.size);
 
 		// Observations for the seed view are a special case
 		{
@@ -404,7 +410,6 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			for (int i = 0; i < inlierToSeed.size; i++) {
 				int id = inlierToSeed.data[i];
 				Point2D_F64 o = utils.featsA.get(id); // featsA is never modified after initially loaded
-
 				id = seedToStructure.data[id];
 				obsView.add(id, (float) o.x, (float) o.y);
 			}
@@ -420,12 +425,18 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			utils.db.lookupPixelFeats(v.id,utils.featsB);
 			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
 
+			// indicate which observation from this view contributed to which 3D feature
+			GrowQueue_I32 connInlierIndexes = inlierIndexes.get(motionIdx);
+			connInlierIndexes.resize(inlierToSeed.size);
+
 			for (int epipolarInlierIdx = 0; epipolarInlierIdx < m.inliers.size; epipolarInlierIdx++) {
 				AssociatedIndex a = m.inliers.get(epipolarInlierIdx);
 				// See if the feature is one of inliers computed from 3-view RANSAC
 				int structId = seedToStructure.data[seedIsSrc?a.src:a.dst];
 				if( structId < 0 )
 					continue;
+				// get the observation in this view to that feature[structId]
+				connInlierIndexes.set(structId,seedIsSrc?a.dst:a.src);
 				Point2D_F64 o = utils.featsB.get(seedIsSrc?a.dst:a.src);
 				obsView.add(structId,(float)o.x,(float)o.y);
 			}
@@ -434,10 +445,10 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/**
 	 * Copies results into a format that's useful for projective to metric conversion
-	 * @param viewIds ID of each view
-	 * @param dimensions Shape of images in each view
-	 * @param cameraMatrices Found camera matrices
-	 * @param observations Found observations shifted to have (0,0) center
+	 * @param viewIds (Output) ID of each view
+	 * @param dimensions (Output) Shape of images in each view
+	 * @param cameraMatrices (Output) Found camera matrices. view[0] is skipped since it is identity
+	 * @param observations (Output) Found observations shifted to have (0,0) center
 	 */
 	public void lookupInfoForMetricElevation(List<String> viewIds,
 											 FastQueue<ImageDimension> dimensions,
@@ -445,10 +456,10 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 											 FastQueue<AssociatedTupleDN> observations)
 	{
 		// Initialize all data structures to the correct size
-		int numViews = utils.structure.views.size;
+		final int numViews = utils.structure.views.size;
 		viewIds.clear();
 		dimensions.resize(numViews);
-		cameraMatrices.resize(numViews);
+		cameraMatrices.resize(numViews-1);
 		observations.resize(inlierToSeed.size);
 
 		for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
@@ -457,13 +468,14 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// Copy results from bundle adjustment data structures
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
-			cameraMatrices.get(viewIdx).set(utils.structure.views.get(viewIdx).worldToView);
+			if( viewIdx != 0 )
+				cameraMatrices.get(viewIdx-1).set(utils.structure.views.get(viewIdx).worldToView);
 			String id = viewsByStructureIndex.get(viewIdx).id;
 			viewIds.add( id );
 			utils.db.lookupShape(id, dimensions.get(viewIdx) );
 
 			SceneObservations.View oview = utils.observations.views.get(viewIdx);
-			assertBoof(oview.size()== observations.size);
+			assertBoof(oview.size() == observations.size);
 
 			for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
 				oview.get(obsIdx,observations.get(obsIdx).get(viewIdx));

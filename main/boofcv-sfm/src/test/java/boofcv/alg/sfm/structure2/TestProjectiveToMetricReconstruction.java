@@ -234,12 +234,12 @@ public class TestProjectiveToMetricReconstruction {
 		Point3D_F64 X = new Point3D_F64();
 		SceneWorkingGraph.View view0 = alg.graph.viewList.get(0);
 
-		alg.loadInlierObservations(view0.projectiveInliers);
+		alg.loadInlierObservations(view0.inliers);
 
 		// Since every feature is visible in every frame and the inlier was set was constructed so that index 'i' in
 		// the inlier set matches with feature 'i' this test will work
 		for (int featCnt = 0; featCnt < db.numFeatures; featCnt++) {
-			alg.triangulateFeature(view0.projectiveInliers,featCnt,X);
+			alg.triangulateFeature(view0.inliers,featCnt,X);
 			assertEquals(0.0,X.distance(db.feats3D.get(featCnt)),1e-7);
 		}
 	}
