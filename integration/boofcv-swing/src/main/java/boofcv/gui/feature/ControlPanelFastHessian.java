@@ -52,7 +52,7 @@ public class ControlPanelFastHessian extends StandardAlgConfigPanel {
 		this.controlExtractor = new ControlPanelExtractor(config.extract,listener::handleChangeFastHessian);
 		spinnerMaxPerScale = spinner(config.maxFeaturesPerScale,-1,9999,100);
 		this.spinnerMaxAll = spinner(config.maxFeaturesAll,-1,9999,100);
-		this.comboSelector = combo(config.selector.type.ordinal(), SelectLimitTypes.values());
+		this.comboSelector = combo(config.selector.type.ordinal(), (Object[]) SelectLimitTypes.values());
 		spinnerInitialSample = spinner(config.initialSampleStep,1,10,1);
 		spinnerInitialSize = spinner(config.initialSize,3,999,2);
 		spinnerScalesPerOctave = spinner(config.numberScalesPerOctave,1,100,1);

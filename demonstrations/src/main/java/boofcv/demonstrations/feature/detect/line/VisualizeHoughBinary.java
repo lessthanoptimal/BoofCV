@@ -292,7 +292,7 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 		JCheckBox checkLog = checkbox("Log Intensity", logIntensity);
 		JCheckBox checkShowLines = checkbox("Show Lines",showLines);
 		JComboBox<String> comboBinarization = combo(configHough.binarization.ordinal(),
-				ConfigHoughBinary.Binarization.values());
+				(Object[]) ConfigHoughBinary.Binarization.values());
 		JSpinner spinnerResRange = spinner(configPolar.resolutionRange, 0.1, 50, 0.5);
 		JSpinner spinnerBinsAngle = spinner(configPolar.numBinsAngle, 10, 1000, 1);
 		JSpinner spinnerMaxLines = spinner(configHough.maxLines, 0, 200, 1);

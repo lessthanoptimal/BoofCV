@@ -38,8 +38,8 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 
 	GlobalDemoSettings settings = GlobalDemoSettings.SETTINGS.copy();
 
-	JComboBox<String> comboThemes = combo(settings.theme.ordinal(), GlobalDemoSettings.ThemesUI.values());
-	JComboBox<String> comboControl3D = combo(settings.controls3D.ordinal(), GlobalDemoSettings.Controls3D.values());
+	JComboBox<String> comboThemes = combo(settings.theme.ordinal(), (Object[]) GlobalDemoSettings.ThemesUI.values());
+	JComboBox<String> comboControl3D = combo(settings.controls3D.ordinal(), (Object[]) GlobalDemoSettings.Controls3D.values());
 
 	JCheckBox checkVerboseRuntime = checkbox("Verbose Runtime",settings.verboseRuntime);
 	JCheckBox checkVerboseTracking = checkbox("Verbose Tracking",settings.verboseTracking);

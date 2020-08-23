@@ -57,7 +57,7 @@ public class ControlPanelSiftDetector extends StandardAlgConfigPanel {
 		this.controlSS = new ControlPanelSiftScaleSpace(configSS,listener::handleChangeSiftDetector);
 		this.spinnerMaxPerScale = spinner(configDetector.maxFeaturesPerScale,0,9999,100);
 		this.spinnerMaxAll = spinner(configDetector.maxFeaturesAll,-1,9999,100);
-		this.comboSelector = combo(configDetector.selector.type.ordinal(), SelectLimitTypes.values());
+		this.comboSelector = combo(configDetector.selector.type.ordinal(), (Object[]) SelectLimitTypes.values());
 		this.spinnerEdgeResponse = spinner(configDetector.edgeR,1.0,1000.0,1.0);
 
 		var controlDetection = new StandardAlgConfigPanel();

@@ -83,12 +83,12 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	}
 
 	public void initializeControlsGUI() {
-		comboDetect    = combo(configDetDesc.typeDetector.ordinal(),ConfigDetectInterestPoint.DetectorType.values() );
-		comboDescribe  = combo(configDetDesc.typeDescribe.ordinal(),ConfigDescribeRegionPoint.DescriptorType.values() );
+		comboDetect    = combo(configDetDesc.typeDetector.ordinal(),(Object[]) ConfigDetectInterestPoint.DetectorType.values() );
+		comboDescribe  = combo(configDetDesc.typeDescribe.ordinal(),(Object[]) ConfigDescribeRegionPoint.DescriptorType.values() );
 		if( associateWithPixels ) {
 			comboAssociate = combo(configAssociate.type.ordinal(), ConfigAssociate.AssociationType.GREEDY);
 		} else {
-			comboAssociate = combo(configAssociate.type.ordinal(), ConfigAssociate.AssociationType.values());
+			comboAssociate = combo(configAssociate.type.ordinal(), (Object[]) ConfigAssociate.AssociationType.values());
 		}
 
 		controlDetectSift = new ControlPanelSiftDetector(configDetDesc.scaleSpaceSift, configDetDesc.detectSift,this::handleControlsUpdated);

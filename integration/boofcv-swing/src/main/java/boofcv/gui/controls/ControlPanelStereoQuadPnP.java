@@ -174,7 +174,7 @@ public class ControlPanelStereoQuadPnP extends JTabbedPane {
 			spinRansacIter = spinner(config.ransac.iterations,0,9999,1);
 			spinRansacTol = spinner(config.ransac.inlierThreshold,0.0,50.0,0.2);
 			spinRefinePnP = spinner(config.refineIterations,0,999,1);
-			comboPnpType = combo(config.pnp.ordinal(),VALUES_PNP);
+			comboPnpType = combo(config.pnp.ordinal(), (Object[]) VALUES_PNP);
 			spinBundleMaxIter = spinner(config.bundleConverge.maxIterations,0,999,1);
 
 			var panelPnP = new StandardAlgConfigPanel();

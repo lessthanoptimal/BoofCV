@@ -69,7 +69,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 		controlDda.initializeControlsGUI();
 		controlHybrid.initializeControlsGUI();
 
-		cFamily = combo(selectedFamily.ordinal(), ConfigPointTracker.TrackerType.values());
+		cFamily = combo(selectedFamily.ordinal(), (Object[]) ConfigPointTracker.TrackerType.values());
 		ConfigPointTracker.TrackerType selected = selectedFamily;
 		selectedFamily = null; // so that it will update
 		changeFamily(selected);

@@ -44,7 +44,7 @@ public class ControlPanelGeneralCorner extends StandardAlgConfigPanel {
 		this.listener = listener;
 
 		controlExtract = new ControlPanelExtractor(config,listener::handleGeneralCorner);
-		comboSelector = combo(config.selector.type.ordinal(), SelectLimitTypes.values());
+		comboSelector = combo(config.selector.type.ordinal(), (Object[]) SelectLimitTypes.values());
 		spinnerMaxFeatures = spinner(config.maxFeatures,-1,9999,50);
 
 		var panelSelector = new StandardAlgConfigPanel();

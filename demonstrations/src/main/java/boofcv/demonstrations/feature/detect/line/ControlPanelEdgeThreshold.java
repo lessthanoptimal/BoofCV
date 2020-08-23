@@ -42,7 +42,7 @@ public class ControlPanelEdgeThreshold extends StandardAlgConfigPanel {
 		this.config = config;
 		this.listener = listener;
 
-		comboDerivative = combo(config.gradient.ordinal(), DerivativeType.values());
+		comboDerivative = combo(config.gradient.ordinal(), (Object[]) DerivativeType.values());
 		sThreshold = spinner(config.threshold,0,1000,1.0f);
 		cNonMax = checkbox("Non-Max",config.nonMax,"Apply gradient non-maximum suppression");
 

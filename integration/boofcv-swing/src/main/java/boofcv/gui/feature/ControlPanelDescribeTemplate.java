@@ -41,7 +41,7 @@ public class ControlPanelDescribeTemplate extends StandardAlgConfigPanel {
 		config = config_==null?new ConfigTemplateDescribe():config_;
 		this.listener = listener;
 
-		comboType = combo(config.type.ordinal(),ConfigTemplateDescribe.Type.values());
+		comboType = combo(config.type.ordinal(),(Object[]) ConfigTemplateDescribe.Type.values());
 		spinnerWidth = spinner(config.width,1,999,1);
 		spinnerHeight = spinner(config.height,1,999,1);
 

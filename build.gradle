@@ -149,6 +149,7 @@ subprojects {
     }
 
     javadoc.failOnError = false
+    javadoc.enabled = !project.version.contains("SNAPSHOT") // disable to stop it from spamming stdout
     artifacts {
         archives sourcesJar
     }

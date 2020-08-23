@@ -54,7 +54,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		this.listener = listener;
 
 		spinnerScaleRadius = spinner(config.scaleRadius,1.0,500.0,1.0);
-		comboType = combo(config.type.ordinal(),PointDetectorTypes.FIRST_ONLY);
+		comboType = combo(config.type.ordinal(),(Object[]) PointDetectorTypes.FIRST_ONLY);
 		controlGeneralCorner = new ControlPanelGeneralCorner(config.general,listener::handleChangePointDetector);
 
 		controlsDefault = new DefaultControls();

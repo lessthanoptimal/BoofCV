@@ -260,7 +260,7 @@ public class CreateFiducialRandomDotGui extends JPanel {
 
 		JComboBox<String> comboOutputFormat = combo(0,"pdf","png","bmp","jpg","ppm","pgm");
 		JComboBox<String> comboPaper = combo(PaperSize.values().indexOf(owner.paperSize),PaperSize.values().toArray());
-		JComboBox<String> comboUnits = combo( owner.unit.ordinal(),Unit.values());
+		JComboBox<String> comboUnits = combo( owner.unit.ordinal(),(Object[])Unit.values());
 		JFormattedTextField fieldMarkerWidth = BoofSwingUtil.createTextField(owner.markerWidth,0.0,Double.NaN);
 		JSpinner spinnerRatio = spinner(markerRatio,0.0001,1000.0,0.05);
 		JFormattedTextField fieldRandomSeed = BoofSwingUtil.createHexTextField(owner.randomSeed);

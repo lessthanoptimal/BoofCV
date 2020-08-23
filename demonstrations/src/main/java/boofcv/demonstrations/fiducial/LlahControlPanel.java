@@ -46,7 +46,7 @@ public class LlahControlPanel extends StandardAlgConfigPanel {
 		spinnerN = spinner(config.numberOfNeighborsN,3,20,1);
 		spinnerM = spinner(config.sizeOfCombinationM,3,20,1);
 		spinnerK = spinner(config.quantizationK,3,200,1);
-		cInvariant = combo(config.hashType.ordinal(), ConfigLlah.HashType.values());
+		cInvariant = combo(config.hashType.ordinal(), (Object[]) ConfigLlah.HashType.values());
 
 		// disable by default to prevent accidental clicking and potential freezing
 		spinnerN.setEnabled(false);
