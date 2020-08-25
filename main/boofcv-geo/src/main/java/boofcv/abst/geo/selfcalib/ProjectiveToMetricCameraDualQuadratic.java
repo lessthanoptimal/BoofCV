@@ -96,11 +96,18 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 		}
 
 		// skip the first view since it's the origin and already known
+		double largestT = 0.0;
 		for (int i = 0; i < views.size(); i++) {
 			DMatrixRMaj P = views.get(i);
 			PerspectiveOps.pinholeToMatrix(metricViews.intrinsics.get(i+1),K);
 			if( !MultiViewOps.projectiveToMetricKnownK(P,H,K,metricViews.motion_1_to_k.grow()) )
 				return false;
+			largestT = Math.max(largestT,metricViews.motion_1_to_k.getTail().T.norm());
+		}
+
+		// Ensure the found motion has a scale around 1.0
+		for (int i = 0; i < metricViews.motion_1_to_k.size; i++) {
+			metricViews.motion_1_to_k.get(i).T.divide(largestT);
 		}
 
 		resolveSign.process(observations, metricViews);

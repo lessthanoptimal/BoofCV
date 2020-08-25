@@ -254,4 +254,12 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		assertEquals(expected.cx, found.cx, princpleTol);
 		assertEquals(expected.cy, found.cy, princpleTol);
 	}
+
+	/**
+	 * Make sure the found translation has a scale around 1.0
+	 */
+	@Test
+	void scaleOfTranslation() {
+		fail("Implement");
+	}
 }
