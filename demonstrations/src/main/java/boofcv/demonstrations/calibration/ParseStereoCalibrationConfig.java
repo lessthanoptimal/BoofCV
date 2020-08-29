@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,8 +82,7 @@ public class ParseStereoCalibrationConfig extends BaseCalibrationConfig {
 					rightImages.add(new File(v[2]));
 			}
 
-		} catch (IOException e) {
-		}
+		} catch (IOException ignore) {}
 
 		if( infoFile == null || rightImages.size() == 0 ||
 				leftImages.size() != rightImages.size() )

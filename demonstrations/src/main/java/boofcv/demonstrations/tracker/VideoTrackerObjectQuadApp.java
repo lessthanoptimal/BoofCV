@@ -34,10 +34,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +78,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	double FPS = 0;
 
 	// GUI component which lets the user select which algorithm to run
-	JComboBox selectAlgorithm;
+	JComboBox<String> selectAlgorithm;
 	boolean hasDefaultRect = false;
 
 	public VideoTrackerObjectQuadApp(List<PathLabel> examples,
@@ -98,7 +95,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		add(infoBar, BorderLayout.WEST);
 		add(videoPanel, BorderLayout.CENTER);
 
-		selectAlgorithm = new JComboBox();
+		selectAlgorithm = new JComboBox<String>();
 		selectAlgorithm.addItem( "Circulant" );
 		selectAlgorithm.addItem( "TLD" );
 		selectAlgorithm.addItem( "Mean-Shift Region Fixed" );
@@ -117,10 +114,8 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		if( !(method == InputMethod.VIDEO || method == InputMethod.WEBCAM) )
 			throw new IllegalArgumentException("Must be a video or webcam!");
 
-		if( method == InputMethod.VIDEO)
-			setPaused(true); // paused the video or webcam so that user can select
-		else
-			setPaused(false);
+		// paused the video or webcam so that user can select
+		setPaused(method == InputMethod.VIDEO);
 
 		if( !hasDefaultRect ) {
 			videoPanel.setMode(TrackerObjectQuadPanel.Mode.IDLE);
@@ -339,7 +334,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 
 			in.close();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

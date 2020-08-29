@@ -30,6 +30,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * Renders fiducials to PDF documents.
@@ -70,7 +71,7 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 			pcs.curveTo(adjustX(cx-k*r), adjustY(cy-r), adjustX(cx-r), adjustY(cy-k*r), adjustX(cx-r), adjustY(cy));
 			pcs.fill();
 		} catch( IOException e ) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -97,7 +98,7 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 
 			pcs.fillEvenOdd();
 		} catch( IOException e ) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -111,7 +112,7 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 			pcs.addRect(adjustX(x0), adjustY(y0)-(float)height, (float)width, (float)height);
 			pcs.fill();
 		} catch( IOException e ) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -124,7 +125,7 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 			PDImageXObject pdImage = JPEGFactory.createFromImage(document,buffered);
 			pcs.drawImage(pdImage, adjustX(x0), (float)(offsetY+y0),(float)(x1-x0),(float)(y1-y0));
 		} catch( IOException e ) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

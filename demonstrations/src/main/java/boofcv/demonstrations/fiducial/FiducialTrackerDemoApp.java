@@ -62,6 +62,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -259,7 +260,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 							ConfigSquareGridBinary.parseSimple(Files.newBufferedReader(configFile.toPath()));
 					detector = FactoryFiducial.calibSquareGridBinary(config, imageClass);
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					throw new UncheckedIOException(e);
 				}
 			} break;
 			case CALIB_CIRCLE_HEXAGONAL_GRID: {

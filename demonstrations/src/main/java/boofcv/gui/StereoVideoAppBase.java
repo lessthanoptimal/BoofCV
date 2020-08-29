@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 
 /**
  * Base class for processing sequences of stereo images.
@@ -117,7 +114,7 @@ public abstract class StereoVideoAppBase <I extends ImageGray<I>>
 
 			process(video1,video2);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -176,8 +173,7 @@ public abstract class StereoVideoAppBase <I extends ImageGray<I>>
 							long period = System.currentTimeMillis()-startTime-10;
 							if( period > 0 )
 								wait(period);
-						} catch (InterruptedException e) {
-						}
+						} catch (InterruptedException ignore) {}
 					}
 				}
 			}

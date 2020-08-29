@@ -27,6 +27,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,7 +117,7 @@ public class JpegByteImageSequence<T extends ImageBase<T>> implements SimpleImag
 		try {
 			imageNext = ImageIO.read(new ByteArrayInputStream(jpegData.get(index)));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

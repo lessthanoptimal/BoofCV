@@ -92,7 +92,7 @@ public class CalibrationIO {
 		try {
 			save(parameters, new FileWriter(filePath));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -132,7 +132,7 @@ public class CalibrationIO {
 		try {
 			save(parameters,new FileWriter(outputPath));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -148,7 +148,7 @@ public class CalibrationIO {
 		try {
 			save(rigidBody,new FileWriter(outputPath));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -173,7 +173,7 @@ public class CalibrationIO {
 		try {
 			save(parameters,new FileWriter(outputPath));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -211,8 +211,8 @@ public class CalibrationIO {
 			throw new RuntimeException("Null path");
 		try {
 			return load( new InputStreamReader(path.openStream()) );
-		} catch (IOException e ) {
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -243,7 +243,7 @@ public class CalibrationIO {
 		try {
 			reader.close();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 
 		return load(data);

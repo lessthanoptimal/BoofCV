@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -152,7 +153,7 @@ public class UtilIO {
 	 */
 	public static URL simplifyJarPath( URL url ) {
 		try {
-			String segments[] = url.toString().split(".jar!/");
+			String[] segments = url.toString().split(".jar!/");
 			String path = simplifyJarPath(segments[1]);
 			return new URL(segments[0]+".jar!/"+path);
 		} catch (IOException e) {
@@ -329,7 +330,7 @@ public class UtilIO {
 		// otherwise search through the classpath for the library
 		String classPath = System.getProperty("java.class.path");
 
-		String stuff[] = classPath.split(":");
+		String[] stuff = classPath.split(":");
 
 		for (String s : stuff) {
 			File f = new File(s);
@@ -368,7 +369,7 @@ public class UtilIO {
 			out.close();
 			fileOut.close();
 		} catch(IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -441,7 +442,6 @@ public class UtilIO {
 	 * The expected parameters are class.getPackage().getName(), class.getSimpleName()
 	 * @param pkg package containing the class
 	 * @param app simple class name
-	 * @return
 	 */
 	public static String getSourcePath(String pkg, String app) {
 		String path = "";
@@ -579,7 +579,7 @@ public class UtilIO {
 		if( !d.isDirectory() )
 			throw new IllegalArgumentException("Must specify an directory. "+directory);
 
-		File files[] = d.listFiles();
+		File[] files = d.listFiles();
 
 		for( File f : files ) {
 			if( f.isDirectory() || f.isHidden() )
@@ -613,7 +613,7 @@ public class UtilIO {
 		if( !d.isDirectory() )
 			throw new IllegalArgumentException("Must specify an directory. "+directory);
 
-		File files[] = d.listFiles();
+		File[] files = d.listFiles();
 
 		for( File f : files ) {
 			if( f.isDirectory() || f.isHidden() )
@@ -648,7 +648,7 @@ public class UtilIO {
 		if( !d.isDirectory() )
 			throw new IllegalArgumentException("Must specify an directory");
 
-		File files[] = d.listFiles();
+		File[] files = d.listFiles();
 
 		for( File f : files ) {
 			if( f.isDirectory() || f.isHidden() )
@@ -716,7 +716,7 @@ public class UtilIO {
 				targetPath += prefix;
 			}
 
-			final Enumeration e = jarfile.entries();
+			final Enumeration<JarEntry> e = jarfile.entries();
 			while( e.hasMoreElements() ) {
 				final ZipEntry ze = (ZipEntry) e.nextElement();
 //				System.out.println("  ze.anme="+ze.getName());
@@ -783,7 +783,7 @@ public class UtilIO {
 
 			String targetPath = connection.getEntryName()+"/";
 
-			final Enumeration e = jarfile.entries();
+			final Enumeration<JarEntry> e = jarfile.entries();
 			while( e.hasMoreElements() ) {
 				final ZipEntry ze = (ZipEntry) e.nextElement();
 //				System.out.println("  ze.anme="+ze.getName());
@@ -834,7 +834,7 @@ public class UtilIO {
 		try {
 			if( in == null ) throw new RuntimeException("Input is null");
 			FileOutputStream out = new FileOutputStream(file);
-			byte buffer[] = new byte[1024*1024];
+			byte[] buffer = new byte[1024*1024];
 			while( in.available() > 0 ) {
 				int amount = in.read(buffer,0,buffer.length);
 				out.write(buffer,0,amount);
@@ -842,8 +842,7 @@ public class UtilIO {
 			out.close();
 			in.close();
 		} catch( IOException e ) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -893,8 +892,7 @@ public class UtilIO {
 					copyToFile(in,tempFile);
 					filename = tempFile.getAbsolutePath();
 				} catch( IOException e ) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
+					throw new UncheckedIOException(e);
 				}
 				break;
 		}

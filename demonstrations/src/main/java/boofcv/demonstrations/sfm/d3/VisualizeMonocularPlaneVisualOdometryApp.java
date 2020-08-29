@@ -58,6 +58,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 		extends VideoProcessAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
@@ -184,7 +185,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 			process(video);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -227,18 +228,16 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 		final Se3_F64 leftToWorld = alg.getCameraToWorld().copy();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				guiLeft.setImage(buffImage1);
-				guiLeft.autoSetPreferredSize();
-				guiLeft.repaint();
+		SwingUtilities.invokeLater(() -> {
+			guiLeft.setImage(buffImage1);
+			guiLeft.autoSetPreferredSize();
+			guiLeft.repaint();
 
-				guiInfo.setCameraToWorld(leftToWorld);
-				guiInfo.setNumFaults(numFaults);
-				guiInfo.setNumTracks(numTracks);
-				guiInfo.setNumInliers(numInliers);
-				guiInfo.setFps(fps);
-			}
+			guiInfo.setCameraToWorld(leftToWorld);
+			guiInfo.setNumFaults(numFaults);
+			guiInfo.setNumTracks(numTracks);
+			guiInfo.setNumInliers(numInliers);
+			guiInfo.setFps(fps);
 		});
 
 
@@ -398,7 +397,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 			}});
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main(String[] args) {
 
 		Class type = GrayF32.class;
 //		Class type = GrayU8.class;

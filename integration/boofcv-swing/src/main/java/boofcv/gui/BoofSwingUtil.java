@@ -54,6 +54,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -629,7 +630,6 @@ public class BoofSwingUtil {
 
 	/**
 	 * Sets rendering hints that will enable antialiasing and make sub pixel rendering look good
-	 * @param g2
 	 */
 	public static void antialiasing( Graphics2D g2 ) {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
@@ -705,7 +705,7 @@ public class BoofSwingUtil {
 			button.setPreferredSize(new Dimension(width,height));
 			return button;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

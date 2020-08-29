@@ -65,7 +65,7 @@ public class MjpegStreamSequence<T extends ImageBase<T>>
 				next = ImageIO.read(new ByteArrayInputStream(data));
 				frameNumber++;
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new UncheckedIOException(e);
 			}
 		}
 	}
@@ -108,8 +108,7 @@ public class MjpegStreamSequence<T extends ImageBase<T>>
 	public void close() {
 		try {
 			in.close();
-		} catch (IOException e) {
-		}
+		} catch (IOException ignore) {}
 		in = null;
 	}
 

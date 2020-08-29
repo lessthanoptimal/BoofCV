@@ -52,7 +52,7 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 	int frameNumber;
 	ImageType<T> imageType;
 	GrowQueue_I8 buffer = new GrowQueue_I8();
-	byte rawData[];
+	byte[] rawData;
 
 	public ImageStreamSequence(InputStream in, boolean storeData , ImageType<T> imageType) {
 		if( storeData ) {
@@ -60,7 +60,7 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 				rawData = VideoMjpegCodec.convertToByteArray(in);
 				this.in = new DataInputStream(new ByteArrayInputStream(rawData));
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new UncheckedIOException(e);
 			}
 		} else {
 			this.in = new DataInputStream(in);
@@ -82,7 +82,7 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 				next = ImageIO.read(new ByteArrayInputStream(buffer.data,0,buffer.size));
 				frameNumber++;
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new UncheckedIOException(e);
 			}
 	}
 
@@ -122,10 +122,7 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 
 	@Override
 	public void close() {
-		try {
-			in.close();
-		} catch (IOException e) {
-		}
+		try { in.close();} catch (IOException ignore) {}
 		in = null;
 	}
 
@@ -140,7 +137,6 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 			throw new RuntimeException("Can't loop");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public ImageType<T> getImageType() {
 		return imageType;
@@ -165,8 +161,8 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 		}
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
-		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",true, ImageType.single(GrayU16.class));
+	public static void main(String[] args) throws FileNotFoundException {
+		var stream = new ImageStreamSequence<>("combined.mpng",true, ImageType.single(GrayU16.class));
 
 		while( stream.hasNext() ) {
 			System.out.println("Image");

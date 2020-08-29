@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ public class VideoMjpegCodec {
 				byte data[] = readJpegData(in, EOI);
 				ret.add(data);
 			}
-		} catch (IOException e) {
-		}
+		} catch (IOException ignore) {}
 		return ret;
 	}
 
@@ -61,7 +60,7 @@ public class VideoMjpegCodec {
 			if( findMarker(in,SOI) && in.available() > 0 ) {
 				return readJpegData(in, EOI);
 			}
-		} catch (IOException e) {}
+		} catch (IOException ignore) {}
 		return null;
 	}
 

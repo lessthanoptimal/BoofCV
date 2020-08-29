@@ -47,7 +47,7 @@ public class FiducialIO {
 			Writer writer = new FileWriter(file);
 			saveRandomDotYaml(definition,writer);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class FiducialIO {
 			reader.close();
 			return ret;
 		} catch( IOException e ) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

@@ -75,6 +75,7 @@ import java.util.List;
 // TODO Add feature point cloud to VO view?
 // TODO Click on polygon to get the frame it was generated from?
 // TODO Add log to file option for location and 3D cloud
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class VisualizeDepthVisualOdometryApp
 		extends DemonstrationBase implements VisualOdometryPanel2.Listener, ActionListener
 {
@@ -115,13 +116,13 @@ public class VisualizeDepthVisualOdometryApp
 	BufferedImage bufferedRGB;
 
 	protected VisualDepthParameters config;
-	JComboBox selectAlgorithm;
+	JComboBox<String> selectAlgorithm;
 
 	public VisualizeDepthVisualOdometryApp(List<PathLabel> examples ) {
 		super(true,false,examples);
 
 
-		selectAlgorithm = new JComboBox();
+		selectAlgorithm = new JComboBox<>();
 		selectAlgorithm.addItem( "Single P3P : KLT" );
 		selectAlgorithm.addItem( "Single P3P : ST-BRIEF" );
 		selectAlgorithm.addItem( "Single P3P : ST-SURF-KLT" );
@@ -180,7 +181,7 @@ public class VisualizeDepthVisualOdometryApp
 			config = CalibrationIO.load(media.openFile(lineConfig));
 			openVideo(false,line1,line2);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -332,14 +333,9 @@ public class VisualizeDepthVisualOdometryApp
 			renderedDepth = new BufferedImage(imageDepth.width,imageDepth.height,BufferedImage.TYPE_INT_RGB);
 		}
 
-		switch( algType) {
-			case FEATURE:
-				drawFeatures((AccessPointTracks3D)alg,bufferedRGB);
-			break;
-
-			case DIRECT:
-				fractionInBounds = ((PyramidDirectColorDepth_to_DepthVisualOdometry)alg).getFractionInBounds();
-				break;
+		switch (algType) {
+			case FEATURE -> drawFeatures((AccessPointTracks3D) alg, bufferedRGB);
+			case DIRECT -> fractionInBounds = ((PyramidDirectColorDepth_to_DepthVisualOdometry) alg).getFractionInBounds();
 		}
 
 		final Se3_F64 leftToWorld = ((Se3_F64)alg.getCameraToWorld()).copy();
@@ -364,15 +360,14 @@ public class VisualizeDepthVisualOdometryApp
 
 				statusPanel.setPaused(streamPaused);
 
-				switch( algType ) {
-					case FEATURE: {
+				switch (algType) {
+					case FEATURE -> {
 						featurePanel.setNumTracks(numTracks);
 						featurePanel.setNumInliers(numInliers);
-					} break;
-
-					case DIRECT: {
+					}
+					case DIRECT -> {
 						directPanel.setInBounds(fractionInBounds);
-					} break;
+					}
 				}
 			}
 		});
@@ -483,16 +478,16 @@ public class VisualizeDepthVisualOdometryApp
 		}
 
 		if (algType != prevAlgType) {
-			switch( prevAlgType ) {
-				case FEATURE: mainPanel.remove(featurePanel); break;
-				case DIRECT: mainPanel.remove(directPanel); break;
-				default: mainPanel.remove(algorithmPanel); break;
+			switch (prevAlgType) {
+				case FEATURE -> mainPanel.remove(featurePanel);
+				case DIRECT -> mainPanel.remove(directPanel);
+				default -> mainPanel.remove(algorithmPanel);
 			}
 
 			switch (algType) {
-				case FEATURE: mainPanel.add(featurePanel, BorderLayout.NORTH); break;
-				case DIRECT: mainPanel.add(directPanel, BorderLayout.NORTH); break;
-				default: mainPanel.add(algorithmPanel, BorderLayout.NORTH); break;
+				case FEATURE -> mainPanel.add(featurePanel, BorderLayout.NORTH);
+				case DIRECT -> mainPanel.add(directPanel, BorderLayout.NORTH);
+				default -> mainPanel.add(algorithmPanel, BorderLayout.NORTH);
 			}
 			mainPanel.invalidate();
 		}
@@ -502,22 +497,20 @@ public class VisualizeDepthVisualOdometryApp
 
 	protected void handleRunningStatus(Status status) {
 		final String text;
-		final Color color;
-
-		switch( status ) {
-			case RUNNING: color = Color.BLACK; break;
-			case PAUSED: color = Color.RED; break;
-			case FINISHED: color = Color.RED; break;
-			default: color = Color.BLUE;
-		}
+		final Color color = switch (status) {
+			case RUNNING -> Color.BLACK;
+			case PAUSED -> Color.RED;
+			case FINISHED -> Color.RED;
+			default -> Color.BLUE;
+		};
 
 		text = status.name();
 
 		SwingUtilities.invokeLater(() -> {
-			switch( algType ) {
-				case FEATURE: featurePanel.setStatus(text,color); break;
-				case DIRECT: directPanel.setStatus(text,color); break;
-				default: algorithmPanel.setStatus(text,color); break;
+			switch (algType) {
+				case FEATURE -> featurePanel.setStatus(text, color);
+				case DIRECT -> directPanel.setStatus(text, color);
+				default -> algorithmPanel.setStatus(text, color);
 			}
 		});
 	}
@@ -551,12 +544,7 @@ public class VisualizeDepthVisualOdometryApp
 
 	@Override
 	protected void enterPausedState() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				statusPanel.setPaused(true);
-			}
-		});
+		SwingUtilities.invokeLater(() -> statusPanel.setPaused(true));
 	}
 
 	@Override
@@ -589,7 +577,7 @@ public class VisualizeDepthVisualOdometryApp
 		DIRECT
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 
 //		List<PathLabel> inputs = new ArrayList<>();
 //		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));

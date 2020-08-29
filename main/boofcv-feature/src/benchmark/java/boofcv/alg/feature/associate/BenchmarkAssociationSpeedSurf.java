@@ -37,6 +37,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 
 /**
@@ -56,7 +57,7 @@ public class BenchmarkAssociationSpeedSurf {
 	DetectDescribePoint<GrayF32,TupleDesc_F64> detector;
 
 	public BenchmarkAssociationSpeedSurf() {
-		detector = (DetectDescribePoint)FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
+		detector = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
 		listA = createSet(image1);
 		listB = createSet(image2);
 		
@@ -103,11 +104,9 @@ public class BenchmarkAssociationSpeedSurf {
 			for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 				ret.add( detector.getDescription(i).copy() );
 			}
-			
 			return ret;
-			
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

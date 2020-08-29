@@ -26,10 +26,7 @@ import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -195,7 +192,7 @@ public class BoofMiscOps {
 			}
 			return string.toString();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 

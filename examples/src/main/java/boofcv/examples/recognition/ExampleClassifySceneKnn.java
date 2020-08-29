@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,7 @@ import org.ddogleg.nn.NearestNeighbor;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -261,7 +262,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 				DeepBoofDataBaseOps.decompressZip(dst, dst.getParentFile(), true);
 				System.out.println("Download complete!");
 			} catch( IOException e ) {
-				throw new RuntimeException(e);
+				throw new UncheckedIOException(e);
 			}
 		} else {
 			System.out.println("Delete and download again if there are file not found errors");

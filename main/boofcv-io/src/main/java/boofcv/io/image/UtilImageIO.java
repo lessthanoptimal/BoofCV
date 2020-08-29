@@ -181,7 +181,7 @@ public class UtilImageIO {
 	public static void saveImage(BufferedImage img, String fileName) {
 		try {
 			String type;
-			String a[] = fileName.split("[.]");
+			String[] a = fileName.split("[.]");
 			if (a.length > 0) {
 				type = a[a.length - 1];
 			} else {
@@ -199,7 +199,7 @@ public class UtilImageIO {
 					throw new IllegalArgumentException("No writer appropriate found");
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -215,7 +215,7 @@ public class UtilImageIO {
 	 * @param image Image which is to be saved.
 	 * @param fileName Name of the output file.  The type is determined by the extension.
 	 */
-	public static void saveImage( ImageBase image , String fileName ) {
+	public static void saveImage( ImageBase<?> image , String fileName ) {
 		BufferedImage out = ConvertBufferedImage.convertTo(image,null,true);
 		saveImage(out,fileName);
 	}
@@ -265,7 +265,7 @@ public class UtilImageIO {
 		String line = readLine(in);
 		while( line.charAt(0) == '#')
 			line = readLine(in);
-		String s[] = line.split(" ");
+		String[] s = line.split(" ");
 		int w = Integer.parseInt(s[0]);
 		int h = Integer.parseInt(s[1]);
 		readLine(in);
@@ -281,7 +281,7 @@ public class UtilImageIO {
 		boolean useFailSafe = storage.getType() != BufferedImage.TYPE_INT_RGB;
 		// try using the internal array for better performance
 		if( storage.getRaster().getDataBuffer().getDataType() == DataBuffer.TYPE_INT ) {
-			int rgb[] =  ((DataBufferInt)storage.getRaster().getDataBuffer()).getData();
+			int[] rgb =  ((DataBufferInt)storage.getRaster().getDataBuffer()).getData();
 
 			int indexIn = 0;
 			int indexOut = 0;
@@ -315,7 +315,6 @@ public class UtilImageIO {
 	 *                Better performance of type BufferedImage.TYPE_BYTE_GRAY.  If null or width/height incorrect a new image
 	 *                will be declared.
 	 * @return The read in image
-	 * @throws IOException
 	 */
 	public static BufferedImage loadPGM( InputStream inputStream , BufferedImage storage ) throws IOException {
 		DataInputStream in = new DataInputStream(inputStream);
@@ -324,7 +323,7 @@ public class UtilImageIO {
 		String line = readLine(in);
 		while( line.charAt(0) == '#')
 			line = readLine(in);
-		String s[] = line.split(" ");
+		String[] s = line.split(" ");
 		int w = Integer.parseInt(s[0]);
 		int h = Integer.parseInt(s[1]);
 		readLine(in);
@@ -340,7 +339,7 @@ public class UtilImageIO {
 		boolean useFailSafe = storage.getType() != BufferedImage.TYPE_BYTE_GRAY;
 		// try using the internal array for better performance
 		if( storage.getRaster().getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE ) {
-			byte gray[] =  ((DataBufferByte)storage.getRaster().getDataBuffer()).getData();
+			byte[] gray =  ((DataBufferByte)storage.getRaster().getDataBuffer()).getData();
 
 			int indexIn = 0;
 			int indexOut = 0;
@@ -402,7 +401,7 @@ public class UtilImageIO {
 		String line = readLine(in);
 		while( line.charAt(0) == '#')
 			line = readLine(in);
-		String s[] = line.split(" ");
+		String[] s = line.split(" ");
 		int w = Integer.parseInt(s[0]);
 		int h = Integer.parseInt(s[1]);
 		readLine(in);
@@ -417,7 +416,7 @@ public class UtilImageIO {
 			temp = new GrowQueue_I8(length);
 		temp.resize(length);
 
-		byte data[] = temp.data;
+		byte[] data = temp.data;
 		read(in,data,length);
 
 		GrayU8 band0 = storage.getBand(0);
@@ -468,7 +467,7 @@ public class UtilImageIO {
 		String line = readLine(in);
 		while( line.charAt(0) == '#')
 			line = readLine(in);
-		String s[] = line.split(" ");
+		String[] s = line.split(" ");
 		int w = Integer.parseInt(s[0]);
 		int h = Integer.parseInt(s[1]);
 		readLine(in);
@@ -499,7 +498,7 @@ public class UtilImageIO {
 		if( temp == null )
 			temp = new GrowQueue_I8();
 		temp.resize(rgb.width*rgb.height*3);
-		byte data[] = temp.data;
+		byte[] data = temp.data;
 
 		GrayU8 band0 = rgb.getBand(0);
 		GrayU8 band1 = rgb.getBand(1);
@@ -551,7 +550,7 @@ public class UtilImageIO {
 		}
 	}
 
-	private static void read( DataInputStream in , byte data[], int length ) throws IOException {
+	private static void read(DataInputStream in , byte[] data, int length ) throws IOException {
 		int total = 0;
 		while( total < length ) {
 			total += in.read(data, total, length-total);

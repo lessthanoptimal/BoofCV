@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,17 +41,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public abstract class SelectAlgorithmAndInputPanel extends JPanel
 		implements ActionListener, VisualizeApp
 {
 	JToolBar toolbar;
 	// each combo box is used to select different algorithms
-	JComboBox algBoxes[];
+	JComboBox[] algBoxes;
 	// used to select the input image
 	JComboBox imageBox;
 	// when selected it shows the original image
 	protected JCheckBox originalCheck;
-	List<Object> algCookies[];
+	List<Object>[] algCookies;
 	// list of input names and where to get the inputs
 	protected List<PathLabel> inputRefs;
 	protected String baseDirectory="";
@@ -74,7 +76,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 		super(new BorderLayout());
 		toolbar = new JToolBar();
 
-		imageBox = new JComboBox();
+		imageBox = new JComboBox<>();
 		toolbar.add(imageBox);
 		imageBox.addActionListener(this);
 		imageBox.setMaximumSize(imageBox.getPreferredSize());
@@ -82,7 +84,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 		algBoxes = new JComboBox[numAlgFamilies];
 		algCookies = new List[numAlgFamilies];
 		for( int i = 0; i < numAlgFamilies; i++ ) {
-			JComboBox b = algBoxes[i] = new JComboBox();
+			var b = algBoxes[i] = new JComboBox<>();
 			toolbar.add( b);
 			b.addActionListener(this);
 			b.setMaximumSize(b.getPreferredSize());
@@ -128,7 +130,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 			setInputList(refs);
 
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -165,10 +167,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public void setMainGUI( final Component gui ) {
 		postAlgorithmEvents = true;
 		this.gui = gui;
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				add(gui,BorderLayout.CENTER);
-			}});
+		SwingUtilities.invokeLater(() -> add(gui,BorderLayout.CENTER));
 	}
 
 	/**
@@ -180,17 +179,16 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 */
 	public void setInputImage( BufferedImage image ) {
 		inputImage = image;
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if( inputImage == null ) {
-					originalCheck.setEnabled(false);
-				} else {
-					originalCheck.setEnabled(true);
-					origPanel.setImage(inputImage);
-					origPanel.setPreferredSize(new Dimension(inputImage.getWidth(),inputImage.getHeight()));
-					origPanel.repaint();
-				}
-			}});
+		SwingUtilities.invokeLater(() -> {
+			if( inputImage == null ) {
+				originalCheck.setEnabled(false);
+			} else {
+				originalCheck.setEnabled(true);
+				origPanel.setImage(inputImage);
+				origPanel.setPreferredSize(new Dimension(inputImage.getWidth(),inputImage.getHeight()));
+				origPanel.repaint();
+			}
+		});
 	}
 
 	/**
@@ -201,21 +199,17 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public void setInputList(final List<PathLabel> inputRefs) {
 		this.inputRefs = inputRefs;
 		
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				for( int i = 0; i < inputRefs.size(); i++ ) {
-					imageBox.addItem(inputRefs.get(i).getLabel());
-				}
-			}});
+		SwingUtilities.invokeLater(() -> {
+			for( int i = 0; i < inputRefs.size(); i++ ) {
+				imageBox.addItem(inputRefs.get(i).getLabel());
+			}
+		});
 	}
 
 
 	public void addAlgorithm(final int indexFamily, final String name, Object cookie) {
 		algCookies[indexFamily].add(cookie);
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				algBoxes[indexFamily].addItem(name);
-			}});
+		SwingUtilities.invokeLater(() -> algBoxes[indexFamily].addItem(name));
 	}
 
 	/**
@@ -224,39 +218,34 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 *
 	 */
 	public void doRefreshAll() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				// collect the current state inside the GUI thread
-				final Object state[] = new Object[ algCookies.length ];
-				for( int i = 0; i < state.length; i++ ) {
-					state[i] = algCookies[i].get(algBoxes[i].getSelectedIndex());
-				}
-				// create a new thread to process this change
-				new Thread() {
-					public void run() {
-						setActiveGUI(false);
-						refreshAll(state);
-						setActiveGUI(true);
-					}
-				}.start();
-			}});
+		SwingUtilities.invokeLater(() -> {
+			// collect the current state inside the GUI thread
+			final Object[] state = new Object[ algCookies.length ];
+			for( int i = 0; i < state.length; i++ ) {
+				state[i] = algCookies[i].get(algBoxes[i].getSelectedIndex());
+			}
+			// create a new thread to process this change
+			new Thread(() -> {
+				setActiveGUI(false);
+				refreshAll(state);
+				setActiveGUI(true);
+			}).start();
+		});
 	}
 
 	/**
 	 * Enables/disables the ability to interact with the algorithms GUI.
 	 */
 	private void setActiveGUI( final boolean isEnabled ) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				toolbar.setEnabled(isEnabled);
-				for( JComboBox b : algBoxes ) {
-					b.setEnabled(isEnabled);
-				}
-				for( JComponent b : addedComponents ) {
-					b.setEnabled(isEnabled);
-				}
-				imageBox.setEnabled(isEnabled);
+		SwingUtilities.invokeLater(() -> {
+			toolbar.setEnabled(isEnabled);
+			for( JComboBox<?> b : algBoxes ) {
+				b.setEnabled(isEnabled);
 			}
+			for( JComponent b : addedComponents ) {
+				b.setEnabled(isEnabled);
+			}
+			imageBox.setEnabled(isEnabled);
 		});
 	}
 
@@ -280,11 +269,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 				final String name = (String)algBoxes[i].getSelectedItem();
 				final int indexFamily = i;
 
-				new Thread() {
-					public void run() {
-						performSetAlgorithm(indexFamily,name, cookie);
-					}
-				}.start();
+				new Thread(() -> performSetAlgorithm(indexFamily,name, cookie)).start();
 				return;
 			}
 		}
@@ -292,11 +277,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 		if( e.getSource() == imageBox ) {
 			// notify the main GUI to change the input image
 			final String name = (String)imageBox.getSelectedItem();
-			new Thread() {
-				public void run() {
-					performChangeInput(name, imageBox.getSelectedIndex());
-				}
-			}.start();
+			new Thread(() -> performChangeInput(name, imageBox.getSelectedIndex())).start();
 		} else if( e.getSource() == originalCheck ) {
 			origPanel.setSize(gui.getWidth(),gui.getHeight());
 			// swap the main GUI with a picture of the original input image
@@ -339,7 +320,6 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	/**
 	 * A request has been made to change the processing algorithm.  NOT called from a GUI thread.
 	 *
-	 * @param indexFamily
 	 * @param name Display name of the algorithm.
 	 * @param cookie Reference to user defined data.
 	 */
