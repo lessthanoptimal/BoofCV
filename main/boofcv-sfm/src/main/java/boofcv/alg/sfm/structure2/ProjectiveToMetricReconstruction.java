@@ -26,7 +26,6 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.ImageDimension;
@@ -145,12 +144,6 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 				copyBundleAdjustmentResults();
 			}
 		}
-		// undo how the principle point was forced to be (0,0)
-		for (int viewCnt = 0; viewCnt < sceneGraph.viewList.size(); viewCnt++) {
-			SceneWorkingGraph.View v = sceneGraph.viewList.get(viewCnt);
-			v.pinhole.cx = v.pinhole.width/2;
-			v.pinhole.cy = v.pinhole.height/2;
-		}
 
 		return true;
 	}
@@ -163,12 +156,9 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 		this.graph = sceneGraph;
 
 		// Save the shape of each image
-		ImageDimension shape = new ImageDimension();
 		for (int viewCnt = 0; viewCnt < sceneGraph.viewList.size(); viewCnt++) {
 			SceneWorkingGraph.View v = sceneGraph.viewList.get(viewCnt);
-			db.lookupShape(v.pview.id,shape);
-			v.pinhole.width = shape.width;
-			v.pinhole.height = shape.height;
+			db.lookupShape(v.pview.id,v.imageDimension);
 		}
 	}
 
@@ -222,7 +212,8 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 			SelfCalibrationLinearDualQuadratic.Intrinsic intrinsic = solutions.get(viewIdx);
 			SceneWorkingGraph.View wv = graph.viewList.get(viewIdx);
 			// the image shape was already set
-			wv.pinhole.fsetK(intrinsic.fx,intrinsic.fy,intrinsic.skew,0,0,wv.pinhole.width,wv.pinhole.height);
+			wv.intrinsic.reset();
+			wv.intrinsic.f = (intrinsic.fx+intrinsic.fy)/2.0;
 
 			// ignore K since we already have that
 			MultiViewOps.projectiveToMetric(wv.projective,H,wv.world_to_view,K);
@@ -387,6 +378,7 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 
 		triangulateObs.reset();
 		triangulateViews.reset();
+		CameraPinhole pinhole = new CameraPinhole();
 		for (int inlierViewCnt = 0; inlierViewCnt < numViews; inlierViewCnt++) {
 			SceneWorkingGraph.View wview = graph.views.get(info.views.get(inlierViewCnt).id);
 
@@ -396,11 +388,12 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 			Point2D_F64 observationPixel = listInfo.get(inlierViewCnt).pixels.get(observationIdx);
 
 			// Don't forget the the camera model has it's origin at the image center
-			double pixelX = observationPixel.x - wview.pinhole.width/2;
-			double pixelY = observationPixel.y - wview.pinhole.height/2;
+			double pixelX = observationPixel.x - wview.imageDimension.width/2;
+			double pixelY = observationPixel.y - wview.imageDimension.height/2;
 
 			// Go from pixels to normalized image coordinates
-			PerspectiveOps.convertPixelToNorm(wview.pinhole,pixelX,pixelY,triangulateObs.grow());
+			wview.intrinsic.convertTo(pinhole);
+			PerspectiveOps.convertPixelToNorm(pinhole,pixelX,pixelY,triangulateObs.grow());
 
 			// compute origin_to_viewI in view0's reference frame
 			origin_to_world.concat(wview.world_to_view,triangulateViews.grow());
@@ -454,12 +447,8 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 		for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
 			SceneWorkingGraph.View wview = graph.viewList.get(viewCnt);
 			wview.index = viewCnt;
-			CameraPinhole cp = wview.pinhole;
-			BundlePinholeSimplified bp = new BundlePinholeSimplified();
 
-			bp.f = cp.fx;
-
-			structure.setCamera(viewCnt,false,bp);
+			structure.setCamera(viewCnt,false,wview.intrinsic);
 			structure.setView(viewCnt,viewCnt==0,wview.world_to_view);
 			structure.connectViewToCamera(viewCnt,viewCnt);
 		}
@@ -472,7 +461,7 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 				SceneWorkingGraph.Observation o = f.observations.get(obsCnt);
 				structure.connectPointToView(featureCnt,o.view.index);
 				// the camera model assumes the optical center is (0,0)
-				CameraPinhole cp = o.view.pinhole;
+				ImageDimension cp = o.view.imageDimension;
 				final double recentered_x = o.pixel.x - cp.width/2;
 				final double recentered_y = o.pixel.y - cp.height/2;
 				observations.getView(o.view.index).add(featureCnt, (float)recentered_x, (float)recentered_y);

@@ -43,7 +43,7 @@ class TestMetricExpandByOneView {
 		// make sure (cx,cy) = (width/2, height/2) or else unit test will fail because it doesn't perfectly
 		// match the model
 		var db = new MockLookupSimilarImagesRealistic().
-				setIntrinsic(new CameraPinhole(400,420,0,400,400,800,800)).
+				setIntrinsic(new CameraPinhole(400,400,0,400,400,800,800)).
 				pathLine(5,0.3,1.5,2);
 		var alg = new MetricExpandByOneView();
 
@@ -65,8 +65,6 @@ class TestMetricExpandByOneView {
 							  MetricExpandByOneView alg, int targetViewIdx) {
 		PairwiseImageGraph2 pairwise = db.createPairwise();
 		SceneWorkingGraph workGraph = db.createWorkingGraph(pairwise);
-		// make the estimated intrinsic have zero principle point
-		workGraph.viewList.forEach(v-> v.pinhole.cx = v.pinhole.cy = 0.0);
 
 		// Decide which view will be estimated
 		PairwiseImageGraph2.View target = pairwise.nodes.get(targetViewIdx);
@@ -80,10 +78,8 @@ class TestMetricExpandByOneView {
 		SceneWorkingGraph.View found = workGraph.views.get(target.id);
 
 		// Check calibration
-		assertEquals(db.intrinsic.fx, found.pinhole.fx, 1e-4);
-		assertEquals(db.intrinsic.fy, found.pinhole.fy, 1e-4);
-		assertEquals(0.0, found.pinhole.cx, 1e-4);
-		assertEquals(0.0, found.pinhole.cy, 1e-4);
+		assertEquals(db.intrinsic.fx, found.intrinsic.f, 1e-4);
+		assertEquals(db.intrinsic.fy, found.intrinsic.f, 1e-4);
 
 		// Check pose
 		BoofTesting.assertEquals(db.views.get(targetViewIdx).world_to_view,found.world_to_view,0.01,0.01);
@@ -120,8 +116,6 @@ class TestMetricExpandByOneView {
 							  MetricExpandByOneView alg, int targetViewIdx) {
 		PairwiseImageGraph2 pairwise = db.createPairwise();
 		SceneWorkingGraph workGraph = db.createWorkingGraph(pairwise);
-		// make the estimated intrinsic have zero principle point
-		workGraph.viewList.forEach(v-> v.pinhole.cx = v.pinhole.cy = 0.0);
 
 		// Decide which view will be estimated
 		PairwiseImageGraph2.View target = pairwise.nodes.get(targetViewIdx);
@@ -138,7 +132,9 @@ class TestMetricExpandByOneView {
 	 */
 	@Test
 	void computeCalibratingHomography() {
-		var db = new MockLookupSimilarImagesRealistic().pathLine(5,0.3,1.5,2);
+		var db = new MockLookupSimilarImagesRealistic().
+				setIntrinsic(new CameraPinhole(400,400,0,0,0,800,800)).
+				pathLine(5,0.3,1.5,2);
 		PairwiseImageGraph2 pairwise = db.createPairwise();
 
 		var alg = new MetricExpandByOneView();

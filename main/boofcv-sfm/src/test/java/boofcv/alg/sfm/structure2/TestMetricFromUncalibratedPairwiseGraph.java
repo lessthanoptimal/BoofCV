@@ -74,11 +74,8 @@ class TestMetricFromUncalibratedPairwiseGraph {
 
 		//------------- Check intrinsic parameters
 		for (SceneWorkingGraph.View v : foundViews) {
-			assertEquals(db.intrinsic.fx, v.pinhole.fx, focalTol);
-			assertEquals(db.intrinsic.fy, v.pinhole.fy, focalTol);
-			assertEquals(0.0, v.pinhole.skew, 1e-8);
-			assertEquals(0.0, v.pinhole.cx, 1e-8);
-			assertEquals(0.0, v.pinhole.cy, 1e-8);
+			assertEquals(db.intrinsic.fx, v.intrinsic.f, focalTol);
+			assertEquals(db.intrinsic.fy, v.intrinsic.f, focalTol);
 		}
 
 		//------------- Check camera motion up to scale
@@ -123,7 +120,8 @@ class TestMetricFromUncalibratedPairwiseGraph {
 			// skip zero since it's implicit
 			if( viewIdx > 0 )
 				results.motion_1_to_k.grow().T.set(1,viewIdx,0);
-			results.intrinsics.grow().fx = 100+viewIdx;
+			CameraPinhole pinhole = results.intrinsics.grow();
+			pinhole.fx = pinhole.fy = 100+viewIdx;
 			graph.createNode(viewIds.get(viewIdx));
 		}
 
@@ -137,7 +135,7 @@ class TestMetricFromUncalibratedPairwiseGraph {
 			assertTrue(wgraph.isKnown(pview));
 			SceneWorkingGraph.View wview = wgraph.lookupView(viewId);
 
-			assertEquals(100+idx,wview.pinhole.fx, 1e-8);
+			assertEquals(100+idx,wview.intrinsic.f, 1e-8);
 			assertEquals(idx==0?0:1,wview.world_to_view.T.x, 1e-8);
 			assertEquals(idx,wview.world_to_view.T.y, 1e-8);
 		});

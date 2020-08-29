@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * Common parent for metric and projective expand scene by one. Mostly contains functions for selecting which of the
  * known views it should use
@@ -71,8 +73,15 @@ public abstract class ExpandByOneView implements VerbosePrint {
 			PairwiseImageGraph2.Motion connectC = findBestCommon(target,connectB, validCandidates);
 			if( connectC == null )
 				continue; // no common connection could be found
+			PairwiseImageGraph2.View viewB = connectB.other(target);
+			PairwiseImageGraph2.View viewC = connectC.other(target);
 
-			double score = utils.scoreMotion.score(connectB) + utils.scoreMotion.score(connectC);
+			PairwiseImageGraph2.Motion connectBtoC = viewB.findMotion(viewC);
+			assertBoof(connectBtoC!=null,"BUG");
+
+			double score = Math.min(utils.scoreMotion.score(connectB) , utils.scoreMotion.score(connectC));
+			score = Math.min(score,utils.scoreMotion.score(connectBtoC));
+
 			if( score > bestScore ) {
 				bestScore = score;
 				connections.clear();
@@ -80,6 +89,7 @@ public abstract class ExpandByOneView implements VerbosePrint {
 				connections.add(connectC);
 			}
 		}
+		if( verbose != null ) verbose.printf("best selected pair score=%f\n",bestScore);
 
 		return !connections.isEmpty();
 	}

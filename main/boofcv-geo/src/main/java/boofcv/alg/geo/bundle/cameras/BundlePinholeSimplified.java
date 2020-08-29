@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,11 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.FancyPrint;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * A pinhole camera with radial distortion that is fully described using three parameters. Focal length and two
@@ -144,10 +147,45 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 				'}';
 	}
 
+	public void reset() {
+		k1 = k2 = f = 0.0;
+	}
+
 	public void set( BundlePinholeSimplified c ) {
 		this.f  = c.f;
 		this.k1 = c.k1;
 		this.k2 = c.k2;
+	}
+
+	public void set( CameraPinhole c ) {
+		this.f  = (c.fx+c.fy)/2.0;
+		this.k1 = 0.0;
+		this.k2 = 0.0;
+	}
+
+	public void set( DMatrixRMaj K ) {
+		this.f  = (K.get(0,0)+K.get(1,1))/2.0;
+		this.k1 = 0.0;
+		this.k2 = 0.0;
+	}
+
+	public void convertTo(DMatrixRMaj K) {
+		K.reshape(3,3);
+		K.zero();
+		K.unsafe_set(0,0,f);
+		K.unsafe_set(1,1,f);
+		K.unsafe_set(2,2,1);
+	}
+
+	public void convertTo(CameraPinhole out) {
+		out.fx = out.fy = this.f;
+		out.cx = out.cy = 0.0;
+		out.skew = 0.0;
+	}
+
+	public void convertTo(CameraPinholeBrown out) {
+		this.convertTo((CameraPinhole)out);
+		out.fsetRadial(this.k1, this.k2);
 	}
 
 	public BundlePinholeSimplified copy() {

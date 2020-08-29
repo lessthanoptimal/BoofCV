@@ -24,8 +24,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.MultiViewOps;
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.bundle.cameras.BundlePinhole;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.Motion;
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
@@ -158,9 +157,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 					"') common="+utils.commonIdx.size+" valid.size="+validCandidates.size());
 		}
 
-		// make sure preconditions are being meet
-		sanityCheckCameraModel();
-
 		// Estimate trifocal tensor using three view observations
 		utils.createTripleFromCommon();
 		if( !utils.estimateProjectiveCamerasRobustly() )
@@ -182,51 +178,67 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			refineWithBundleAdjustment(workGraph);
 		}
 
+		// Match the local coordinate system's scale to the global coordinate system's scale
+		int which = UtilPoint3D_F64.axisLargestAbs(view1_to_view2.T);
+		double scale = view1_to_view2.T.getIdx(which)/view1_to_view2H.T.getIdx(which);
+		view1_to_target.T.scale(scale);
+
 		// Convert local coordinate into world coordinates for the view's pose
 		Se3_F64 world_to_view1 = workGraph.views.get(utils.seed.id).world_to_view;
 		world_to_view1.concat(view1_to_target, wtarget.world_to_view);
 
+		if( verbose != null ) {
+			verbose.printf("Rescaled Local T={%.1f %.1f %.1f) scale=%f\n",
+					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z,scale);
+			verbose.printf("Final Global   T={%.1f %.1f %.1f)\n",
+					wtarget.world_to_view.T.x, wtarget.world_to_view.T.y, wtarget.world_to_view.T.z);
+		}
+
 		return true;
-	}
-
-	/**
-	 * The intrinsic camera model is assumed to have (0,0) principle point. Since input pixels observations don't
-	 * have that the image center is subtracted from them (w/2, h/2) when computing trifocal tensor. This is common
-	 * practice for projective to metric upgrade. Below we sanity check it to make sure this constraint is being obeyed
-	 */
-	private void sanityCheckCameraModel() {
-		SceneWorkingGraph.View wview1 = workGraph.lookupView(utils.seed.id);
-		SceneWorkingGraph.View wview2 = workGraph.lookupView(utils.viewB.id);
-
-		assertBoof(wview1.pinhole.cx == 0.0);
-		assertBoof(wview1.pinhole.cy == 0.0);
-		assertBoof(wview2.pinhole.cx == 0.0);
-		assertBoof(wview2.pinhole.cy == 0.0);
 	}
 
 	/**
 	 * Use previously computed calibration homography to upgrade projective scene to metric
 	 */
 	private void upgradeToMetric(SceneWorkingGraph.View wview, DMatrixRMaj H_cal) {
+		// Compute metric upgrade from found projective camera matrices
+		MultiViewOps.projectiveToMetric(utils.P2,H_cal, view1_to_view2H,K_target); // discard K_target
 		MultiViewOps.projectiveToMetric(utils.P3,H_cal, view1_to_target,K_target);
-		PerspectiveOps.matrixToPinhole(K_target,0,0, wview.pinhole);
+		wview.intrinsic.set(K_target);
 
-		// resolve scale ambiguity using the known relationship between view1 and view2
+		// Normalize the scale so that it's close to 1.0
+		double normTarget = view1_to_target.T.norm();
+		view1_to_target.T.divide(normTarget);
+		view1_to_view2H.T.divide(normTarget);
+
+		// Let's use the "known" view1_to_view2, but to do that we will need to resolve the scale ambiguity
 		SceneWorkingGraph.View wview1 = workGraph.lookupView(utils.seed.id);
 		SceneWorkingGraph.View wview2 = workGraph.lookupView(utils.viewB.id);
 		wview1.world_to_view.invert(null).concat(wview2.world_to_view,view1_to_view2);
 
 		// use the largest axis (which should not be equal to 0.0) to determine the scale + sign
-		MultiViewOps.projectiveToMetric(utils.P2,H_cal, view1_to_view2H,K_target);
 		int which = UtilPoint3D_F64.axisLargestAbs(view1_to_view2.T);
-		double scale = view1_to_view2.T.getIdx(which)/view1_to_view2H.T.getIdx(which);
+		double scale = view1_to_view2H.T.getIdx(which)/view1_to_view2.T.getIdx(which);
 		if(UtilEjml.isUncountable(scale)) {
 			scale = 0.0; // if pathological fail gracefully
 		}
-		view1_to_target.T.scale(scale);
 
 		if( verbose != null ) {
-			verbose.println("Initial metric K="+wview.pinhole+" T="+view1_to_target.T);
+			// print the found view 1 to view 2 using local information only
+			verbose.printf("L View 1 to 2     T={%.1f %.1f %.1f)\n",
+					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
+		}
+
+		// Now set the global view-1 to view-2 at the local scale
+		view1_to_view2H.set(view1_to_view2);
+		view1_to_view2H.T.scale(scale);
+
+		if( verbose != null ) {
+			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f)\n",
+					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
+			verbose.printf("Initial fx=%6.1f k1=%6.3f k2=%6.3f T={%.1f %.1f %.1f)\n",
+					wview.intrinsic.f, wview.intrinsic.k1, wview.intrinsic.k2,
+					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
 		}
 	}
 
@@ -253,20 +265,20 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		// Camera parameters and Se3 for all views can change to mitigate past mistakes
 		// if there was a past mistake the idea is that it can be recovered from here, however if a mistake is
 		// made here it will be compensated for by being ignored in future calls.
-		structure.setCamera(0,false,wview1.pinhole);
-		structure.setCamera(1,false,wview2.pinhole);
-		structure.setCamera(2,false,wview3.pinhole);
+		structure.setCamera(0,true, wview1.intrinsic);
+		structure.setCamera(1,true, wview2.intrinsic);
+		structure.setCamera(2,false,wview3.intrinsic);
 		structure.setView(0,true,view1_to_view1);
-		structure.setView(1,false,view1_to_view2);
+		structure.setView(1,false,view1_to_view2H);
 		structure.setView(2,false,view1_to_target);
 		structure.connectViewToCamera(0,0);
 		structure.connectViewToCamera(1,1);
 		structure.connectViewToCamera(2,2);
 
 		// Add observations and 3D feature locations
-		normalize1.set(wview1.pinhole);
-		normalize2.set(wview2.pinhole);
-		normalize3.set(wview3.pinhole);
+		normalize1.set(wview1.intrinsic.f,wview1.intrinsic.f,0,0,0);
+		normalize2.set(wview2.intrinsic.f,wview2.intrinsic.f,0,0,0);
+		normalize3.set(wview3.intrinsic.f,wview3.intrinsic.f,0,0,0);
 
 		SceneObservations.View viewObs1 = observations.getView(0);
 		SceneObservations.View viewObs2 = observations.getView(1);
@@ -301,11 +313,16 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			throw new RuntimeException("Handle this");
 
 		// copy results for output
-		((BundlePinhole)structure.cameras.get(2).model).copyInto(wview3.pinhole);
+		wview3.intrinsic.set((BundlePinholeSimplified)structure.cameras.get(2).model);
+		view1_to_view2H.set(structure.views.get(1).worldToView);
 		view1_to_target.set(structure.views.get(2).worldToView);
 
 		if( verbose != null ) {
-			verbose.println("Refined metric K=" + wview3.pinhole + " T=" + view1_to_target.T);
+			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f)\n",
+					view1_to_view2H.T.x, view1_to_view2H.T.y, view1_to_view2H.T.z);
+			verbose.printf("Refined fx=%6.1f k1=%6.3f k2=%6.3f T={%.1f %.1f %.1f)\n",
+					wview3.intrinsic.f, wview3.intrinsic.k1, wview3.intrinsic.k2,
+					view1_to_target.T.x, view1_to_target.T.y, view1_to_target.T.z);
 		}
 	}
 
@@ -318,8 +335,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		MultiViewOps.projectiveToFundamental(utils.P2, F21);
 		projectiveHomography.initialize(F21,utils.P2);
 
-		PerspectiveOps.pinholeToMatrix(workGraph.lookupView(utils.seed.id).pinhole, K1);
-		PerspectiveOps.pinholeToMatrix(workGraph.lookupView(utils.viewB.id).pinhole, K2);
+		workGraph.lookupView(utils.seed.id).intrinsic.convertTo(K1);
+		workGraph.lookupView(utils.viewB.id).intrinsic.convertTo(K2);
 
 		FastQueue<AssociatedTriple> triples = utils.matchesTriple;
 		pairs.resize(triples.size());

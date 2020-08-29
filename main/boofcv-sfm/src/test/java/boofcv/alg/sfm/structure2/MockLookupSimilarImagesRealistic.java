@@ -265,7 +265,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 		var working = new SceneWorkingGraph();
 		pairwise.nodes.forEach((i,v)->working.addView(v));
 
-		working.viewList.forEach(v->v.pinhole.set(intrinsic));
+		working.viewList.forEach(v->v.intrinsic.set(intrinsic));
 		BoofMiscOps.forIdx(working.viewList,(i,v)->v.projective.set(views.get(i).camera));
 		BoofMiscOps.forIdx(working.viewList,(i,v)->v.world_to_view.set(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.viewList,(i,v)->v.index=i);

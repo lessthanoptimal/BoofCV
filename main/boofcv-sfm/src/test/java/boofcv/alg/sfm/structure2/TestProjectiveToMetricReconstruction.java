@@ -70,12 +70,11 @@ public class TestProjectiveToMetricReconstruction {
 			String id = db.viewIds.get(truthIdx);
 			SceneWorkingGraph.View v = working.views.get(id);
 			// check the cameras out
-			assertEquals(intrinsic.fx, v.pinhole.fx, 0.1);
-			assertEquals(intrinsic.fy, v.pinhole.fy, 0.1);
-			// principle point should be re-centered
-			assertEquals(intrinsic.cx, v.pinhole.cx, 1e-7);
-			assertEquals(intrinsic.cy, v.pinhole.cy, 1e-7);
-			BundlePinholeSimplified bundle = (BundlePinholeSimplified)alg.getRefinedCamera(id);
+			assertEquals(intrinsic.fx, v.intrinsic.f, 0.1);
+			assertEquals(intrinsic.fy, v.intrinsic.f, 0.1);
+			assertEquals(intrinsic.width, v.imageDimension.width);
+			assertEquals(intrinsic.height, v.imageDimension.height);
+			BundlePinholeSimplified bundle = alg.getRefinedCamera(id);
 			assertEquals(0.0,bundle.k1, 0.001);
 			assertEquals(0.0,bundle.k2, 0.001);
 
@@ -99,8 +98,8 @@ public class TestProjectiveToMetricReconstruction {
 			Point3D_F64 cameraX = new Point3D_F64();
 			SePointOps_F64.transform(o.view.world_to_view,f.location,cameraX);
 			camera.project(cameraX.x,cameraX.y,cameraX.z,found);
-			found.x += o.view.pinhole.width/2;
-			found.y += o.view.pinhole.height/2;
+			found.x += o.view.imageDimension.width/2;
+			found.y += o.view.imageDimension.height/2;
 			assertEquals(0.0,o.pixel.distance(found), 1e-5);
 		}));
 	}
@@ -120,10 +119,10 @@ public class TestProjectiveToMetricReconstruction {
 
 		assertEquals(6,alg.graph.viewList.size());
 		for( SceneWorkingGraph.View v : alg.graph.viewList ) {
-			assertEquals(intrinsic.fx, v.pinhole.fx, UtilEjml.TEST_F64_SQ);
-			assertEquals(intrinsic.fy, v.pinhole.fy, UtilEjml.TEST_F64_SQ);
-			assertEquals(intrinsic.width, v.pinhole.width);
-			assertEquals(intrinsic.height, v.pinhole.height);
+			assertEquals(intrinsic.fx, v.intrinsic.f, UtilEjml.TEST_F64_SQ);
+			assertEquals(intrinsic.fy, v.intrinsic.f, UtilEjml.TEST_F64_SQ);
+			assertEquals(intrinsic.width, v.imageDimension.width);
+			assertEquals(intrinsic.height, v.imageDimension.height);
 		}
 	}
 
@@ -137,7 +136,7 @@ public class TestProjectiveToMetricReconstruction {
 		alg.initialize(db,working);
 		// set metric transform up using ground truth
 		db.listOriginToView.forEach((i,o)-> working.views.get(db.viewIds.get(i)).world_to_view.set(o));
-		alg.graph.viewList.forEach(o->o.pinhole.set(intrinsicZero));
+		alg.graph.viewList.forEach(o->o.intrinsic.set(intrinsicZero));
 
 		alg.createFeaturesFromInliers();
 
@@ -229,7 +228,7 @@ public class TestProjectiveToMetricReconstruction {
 		alg.initialize(db,working);
 		// set metric transform up using ground truth
 		db.listOriginToView.forEach((i,o)-> working.views.get(db.viewIds.get(i)).world_to_view.set(o));
-		alg.graph.viewList.forEach(o->o.pinhole.set(intrinsicZero));
+		alg.graph.viewList.forEach(o->o.intrinsic.set(intrinsicZero));
 
 		Point3D_F64 X = new Point3D_F64();
 		SceneWorkingGraph.View view0 = alg.graph.viewList.get(0);
@@ -257,7 +256,7 @@ public class TestProjectiveToMetricReconstruction {
 
 		// set metric transform up using ground truth
 		db.listOriginToView.forEach((i,o)-> working.views.get(db.viewIds.get(i)).world_to_view.set(o));
-		alg.graph.viewList.forEach(o->o.pinhole.set(intrinsicZero));
+		alg.graph.viewList.forEach(o->o.intrinsic.set(intrinsicZero));
 
 		// create a very simple scene with all features at the origin and all visible
 		for (int featCnt = 0; featCnt < db.numFeatures; featCnt++) {

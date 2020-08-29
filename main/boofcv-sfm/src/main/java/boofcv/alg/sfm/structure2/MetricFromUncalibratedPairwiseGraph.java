@@ -74,7 +74,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
 
 	// Uses known metric views to expand the metric reconstruction by one view
-	private final MetricExpandByOneView expandMetric = new MetricExpandByOneView();
+	private final @Getter MetricExpandByOneView expandMetric = new MetricExpandByOneView();
 
 	public MetricFromUncalibratedPairwiseGraph(PairwiseGraphUtils utils) {
 		super(utils);
@@ -104,6 +104,13 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Score nodes for their ability to be seeds
 		Map<String, SeedInfo> mapScores = scoreNodesAsSeeds(graph);
 		List<SeedInfo> seeds = selectSeeds(seedScores,mapScores);
+
+		// Multiple Seed Approach
+		// - Each seed will have it's own work graph
+		// - Expand the seeds until two views in two graphs are in common. Those two views must also be neighbors
+		// - Compute the common transform and find scale factor
+		// - Merge the two graphs
+		// Allow for multiple outputs of different graphs
 
 		if( seeds.size() == 0 )
 			return false;
@@ -197,7 +204,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			SceneWorkingGraph.View wview = workGraph.addView(pview);
 			if( i > 0 )
 				wview.world_to_view.set(results.motion_1_to_k.get(i-1));
-			wview.pinhole.set(results.intrinsics.get(i));
+			wview.intrinsic.set(results.intrinsics.get(i));
 		}
 
 		// Save the inliers used to construct the metric scene
@@ -250,10 +257,6 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			// Saves the set of inliers used to estimate this views metric view for later use
 			SceneWorkingGraph.View wview = workGraph.lookupView(selected.id);
 			utils.saveRansacInliers(wview);
-
-			// These fundamental assumptions are being made
-			// TODO move to expandMetric and include in esetimation of calibrating homography for better results
-			wview.pinhole.cx = wview.pinhole.cy = wview.pinhole.skew = 0.0;
 
 			// Add neighboring views which have yet to be added to the open list
 			addOpenForView(wview.pview, open);

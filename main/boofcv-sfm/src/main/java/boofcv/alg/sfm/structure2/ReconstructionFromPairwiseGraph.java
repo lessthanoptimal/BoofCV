@@ -203,6 +203,8 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		// sort it so best scores are last
 		Collections.sort(candidates.toList());
 
+		// Should geometry should be used to select the minimum possible score not just a relative score?
+
 		// ignore nodes with too low of a score
 		double minScore = candidates.get(candidates.size()-1).score*0.2;
 

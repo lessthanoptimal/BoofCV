@@ -110,6 +110,7 @@ public class ExampleMultiviewSceneReconstruction {
 		var metric = new MetricFromUncalibratedPairwiseGraph();
 		metric.setVerbose(System.out,null);
 		metric.getInitProjective().setVerbose(System.out,null);
+		metric.getExpandMetric().setVerbose(System.out,null);
 //		projective.getExpandProjective().setVerbose(System.out,null);
 		if( !metric.process(similarImages,pairwise) ) {
 			System.err.println("Reconstruction failed");
@@ -118,10 +119,15 @@ public class ExampleMultiviewSceneReconstruction {
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Printing view info");
-		for( var v : metric.getWorkGraph().viewList ) {
-			System.out.printf("view='%s' fx=%.1f t={%.1f, %.1f, %.1f}\n",v.pview.id,
-					v.pinhole.fx,
-					v.world_to_view.T.x,v.world_to_view.T.y,v.world_to_view.T.z);
+		for( PairwiseImageGraph2.View pv : pairwise.nodes.toList() ) {
+			var wv = metric.getWorkGraph().lookupView(pv.id);
+			if(wv == null )
+				continue;
+			int order = metric.workGraph.viewList.indexOf(wv);
+
+			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f}\n",order,wv.pview.id,
+					wv.intrinsic.f,wv.intrinsic.k1,wv.intrinsic.k2,
+					wv.world_to_view.T.x,wv.world_to_view.T.y,wv.world_to_view.T.z);
 		}
 		// TODO visualize
 		System.out.println("done");

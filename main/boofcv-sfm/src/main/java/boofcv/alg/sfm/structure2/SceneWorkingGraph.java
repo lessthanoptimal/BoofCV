@@ -18,7 +18,8 @@
 
 package boofcv.alg.sfm.structure2;
 
-import boofcv.struct.calib.CameraPinhole;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -180,8 +181,9 @@ public class SceneWorkingGraph {
 		// projective camera matrix
 		public final DMatrixRMaj projective = new DMatrixRMaj(3,4);
 		// metric camera
-		public final CameraPinhole pinhole = new CameraPinhole();
+		public final BundlePinholeSimplified intrinsic = new BundlePinholeSimplified();
 		public final Se3_F64 world_to_view = new Se3_F64();
+		public final ImageDimension imageDimension = new ImageDimension();
 
 		// index in list of views. Only value during construction of SBA data structures
 		public int index;
@@ -206,7 +208,7 @@ public class SceneWorkingGraph {
 			pview = null;
 			obs_to_feat.clear();
 			projective.zero();
-			pinhole.reset();
+			intrinsic.reset();
 			inliers.reset();
 		}
 	}
