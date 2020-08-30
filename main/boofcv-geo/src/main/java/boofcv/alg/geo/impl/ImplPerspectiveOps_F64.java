@@ -206,9 +206,33 @@ public class ImplPerspectiveOps_F64 {
 		return GeometryMath_F64.mult(K, pixel, pixel);
 	}
 
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera,
+	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera,
 										  double fx, double skew, double cx, double fy, double cy,
 										  Point3D_F64 X, @Nullable Point2D_F64 pixel) {
+
+		Point3D_F64 X_cam = new Point3D_F64();
+
+		SePointOps_F64.transform(worldToCamera, X, X_cam);
+
+		// see if it's behind the camera
+		if( X_cam.z <= 0 )
+			return null;
+
+		if( pixel == null )
+			pixel = new Point2D_F64();
+
+		double xx = X_cam.x/X_cam.z;
+		double yy = X_cam.y/X_cam.z;
+
+		pixel.x = fx*xx + skew*yy + cx;
+		pixel.y = fy*yy + cy;
+
+		return pixel;
+	}
+
+	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera,
+													double fx, double skew, double cx, double fy, double cy,
+													Point4D_F64 X, @Nullable Point2D_F64 pixel) {
 
 		Point3D_F64 X_cam = new Point3D_F64();
 

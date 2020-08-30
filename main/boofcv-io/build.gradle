@@ -1,6 +1,7 @@
 dependencies {
     api project(':main:boofcv-ip')
     api project(':main:boofcv-geo')
+    api project(':main:boofcv-sfm')
     api project(':main:boofcv-calibration')
 
     api group: 'org.yaml', name: 'snakeyaml', version: '1.23'

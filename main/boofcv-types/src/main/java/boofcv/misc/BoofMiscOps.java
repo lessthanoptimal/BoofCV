@@ -32,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Miscellaneous functions which have no better place to go.
@@ -592,5 +593,12 @@ public class BoofMiscOps {
 			out.add(factory.newInstance());
 		}
 		return out;
+	}
+
+	public static <V>V getOrThrow(Map map, Object key) {
+		V value = (V)map.get(key);
+		if( value == null )
+			throw new IllegalArgumentException("Key not found in map. key="+key);
+		return value;
 	}
 }

@@ -158,6 +158,13 @@ public class SceneWorkingGraph {
 			return observations.size==0;
 		}
 
+		/**
+		 * Returns total number of features are included in this inlier set
+		 */
+		public int getInlierCount() {
+			return observations.get(0).size;
+		}
+
 		public void reset() {
 			views.reset();
 			observations.reset();
@@ -205,7 +212,9 @@ public class SceneWorkingGraph {
 		}
 
 		public void reset() {
+			index = -1;
 			pview = null;
+			imageDimension.set(-1,-1);
 			obs_to_feat.clear();
 			projective.zero();
 			intrinsic.reset();

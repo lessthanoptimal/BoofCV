@@ -514,17 +514,22 @@ public class PerspectiveOps {
 	 * @param pixel (Output) storage for the rendered pixel
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
+	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
 										  @Nullable Point2D_F64 pixel) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,K,X, pixel);
 	}
 
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point3D_F64 X,
+	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point3D_F64 X,
 										  @Nullable Point2D_F64 pixel) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K.fx, K.skew, K.cx, K.fy, K.cy, X, pixel);
 	}
 
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, Point3D_F64 X,
+	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point4D_F64 X,
+										  @Nullable Point2D_F64 pixel) {
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K.fx, K.skew, K.cx, K.fy, K.cy, X, pixel);
+	}
+
+	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, Point3D_F64 X,
 										  @Nullable Point2D_F64 pixel) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, 1, 0, 0, 1, 0, X, pixel);
 	}

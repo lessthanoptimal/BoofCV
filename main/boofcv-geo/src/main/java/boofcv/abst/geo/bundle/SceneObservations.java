@@ -96,9 +96,9 @@ public class SceneObservations {
 	}
 
 	public static class View {
-		// list of Point ID's which this view can see
+		// list of Point ID's which this view can see. -1 indicates the point has been removed
 		public GrowQueue_I32 point = new GrowQueue_I32();
-		// The observation of the point in the view in an interleaved format. In image pixels.
+		// The observation of the point in the view in an interleaved format (x,y). In image pixels.
 		public GrowQueue_F32 observations = new GrowQueue_F32();
 
 		public int size() {

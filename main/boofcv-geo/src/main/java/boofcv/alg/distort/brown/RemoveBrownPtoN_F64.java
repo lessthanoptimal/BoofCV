@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,7 +85,21 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	public RemoveBrownPtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
+		if( params != null && params.radial.length == radial.length ) {
+			System.arraycopy(radial,0,params.radial,0,radial.length);
+			return this;
+		}
 		params = new RadialTangential_F64(radial,t1,t2);
+		return this;
+	}
+
+	public RemoveBrownPtoN_F64 setDistortion( /**/double radial1,  /**/double radial2 ) {
+		if( params != null && params.radial.length == 2 ) {
+			params.radial[0] = radial1;
+			params.radial[1] = radial2;
+			return this;
+		}
+		params = new RadialTangential_F64(new double[]{radial1,radial2},0.0,0.0);
 		return this;
 	}
 
@@ -108,7 +122,7 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	@Override
 	public RemoveBrownPtoN_F64 copyConcurrent() {
 		RemoveBrownPtoN_F64 ret = new RemoveBrownPtoN_F64(tol);
-		ret.fx = fx; // don't use set since it recompuets it. inputs would be floats not double, so diff solution
+		ret.fx = fx; // don't use set since it recomputes it. inputs would be floats not double, so diff solution
 		ret.fy = fy;
 		ret.skew = skew;
 		ret.cx = cx;

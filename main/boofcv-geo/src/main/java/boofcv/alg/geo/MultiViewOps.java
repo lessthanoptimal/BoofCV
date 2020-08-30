@@ -1756,7 +1756,10 @@ public class MultiViewOps {
 	 */
 	public static double findScale(GeoTuple3D_F64<?> a , GeoTuple3D_F64<?> b ) {
 		int which = UtilPoint3D_F64.axisLargestAbs(a);
-		return b.getIdx(which) / a.getIdx(which);
+		double bottom = a.getIdx(which);
+		if( bottom == 0.0 )
+			return 0.0;
+		return b.getIdx(which) / bottom;
 	}
 
 

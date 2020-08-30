@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static boofcv.misc.BoofMiscOps.getOrThrow;
+
 /**
  * Functions for loading and saving camera calibration related data structures from/to disk
  *
@@ -259,7 +261,7 @@ public class CalibrationIO {
 
 		if( model.equals(MODEL_PINHOLE)) {
 			CameraPinhole parameters = new CameraPinhole();
-			loadPinhole((Map<String,Object> )data.get("pinhole"),parameters);
+			loadPinhole(getOrThrow(data,"pinhole"),parameters);
 
 			return (T)parameters;
 		} else if( model.equals(MODEL_PINHOLE_RADIAL_TAN) ) {
@@ -267,7 +269,7 @@ public class CalibrationIO {
 
 			loadPinhole((Map<String, Object>) data.get("pinhole"), parameters);
 
-			Map<String, Object> distortion = (Map<String, Object>) data.get("radial_tangential");
+			Map<String, Object> distortion = getOrThrow(data,"radial_tangential");
 			if( distortion.containsKey("radial") ) {
 				List<Double> list = (List<Double>) distortion.get("radial");
 				if( list != null ) {
@@ -286,10 +288,10 @@ public class CalibrationIO {
 		} else if( model.equals(MODEL_OMNIDIRECTIONAL_UNIVERSAL) ) {
 			CameraUniversalOmni parameters = new CameraUniversalOmni(0);
 
-			loadPinhole((Map<String, Object>) data.get("pinhole"), parameters);
+			loadPinhole(getOrThrow(data,"pinhole"), parameters);
 			parameters.mirrorOffset = (double)data.get("mirror_offset");
 
-			Map<String, Object> distortion = (Map<String, Object>) data.get("radial_tangential");
+			Map<String, Object> distortion = getOrThrow(data,"radial_tangential");
 			if( distortion.containsKey("radial") ) {
 				List<Double> list = (List<Double>) distortion.get("radial");
 				if( list != null ) {
@@ -307,23 +309,23 @@ public class CalibrationIO {
 
 		} else if( model.equals(MODEL_STEREO) ) {
 			StereoParameters parameters = new StereoParameters();
-			parameters.left = load((Map<String, Object>)data.get("left"));
-			parameters.right = load((Map<String, Object>)data.get("right"));
-			parameters.rightToLeft = loadSe3((Map<String, Object>)data.get("rightToLeft"),null);
+			parameters.left = load((Map<String, Object>)getOrThrow(data,"left"));
+			parameters.right = load((Map<String, Object>)getOrThrow(data,"right"));
+			parameters.rightToLeft = loadSe3(getOrThrow(data,"rightToLeft"),null);
 			return (T) parameters;
 		} else if( model.equals(MODEL_VISUAL_DEPTH) ) {
 			VisualDepthParameters parameters = new VisualDepthParameters();
-			parameters.maxDepth = (Number)data.get("max_depth");
-			parameters.pixelNoDepth = (Number)data.get("no_depth");
-			parameters.visualParam = load((Map<String, Object>)data.get("intrinsic"));
+			parameters.maxDepth = getOrThrow(data,"max_depth");
+			parameters.pixelNoDepth = getOrThrow(data,"no_depth");
+			parameters.visualParam = load((Map<String, Object>)getOrThrow(data,"intrinsic"));
 			return (T)parameters;
 		} else if( model.equals(MODEL_MONO_PLANE) ) {
 			MonoPlaneParameters parameters = new MonoPlaneParameters();
-			parameters.intrinsic = load((Map<String, Object>)data.get("intrinsic"));
-			parameters.planeToCamera = loadSe3((Map<String, Object>)data.get("plane_to_camera"),null);
+			parameters.intrinsic = load((Map<String, Object>)getOrThrow(data,"intrinsic"));
+			parameters.planeToCamera = loadSe3(getOrThrow(data,"plane_to_camera"),null);
 			return (T) parameters;
 		} else if( model.equals(MODEL_RIGID_BODY) ) {
-			return (T) loadSe3((Map<String, Object>)data.get("parameters"),null);
+			return (T) loadSe3(getOrThrow(data,"parameters"),null);
 		} else {
 			throw new RuntimeException("Unknown camera model: "+model);
 		}
@@ -374,7 +376,7 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static Map<String,Object> putParamsPinhole(CameraPinhole parameters  ) {
+	public static Map<String,Object> putParamsPinhole(CameraPinhole parameters  ) {
 		Map<String,Object> map = new HashMap<>();
 
 		map.put("width",parameters.width);
@@ -388,7 +390,7 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static Map<String,Object> putParamsRadialTangent(CameraPinholeBrown parameters ) {
+	public static Map<String,Object> putParamsRadialTangent(CameraPinholeBrown parameters ) {
 		Map<String,Object> map = new HashMap<>();
 
 		if( parameters.radial != null )
@@ -399,7 +401,7 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static Map<String,Object> putSe3( Se3_F64 transform ) {
+	public static Map<String,Object> putSe3( Se3_F64 transform ) {
 		Map<String,Object> map = new HashMap<>();
 
 		map.put("rotation",transform.R.data);
@@ -410,24 +412,24 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static void loadPinhole(Map<String,Object> map , CameraPinhole parameters ) {
-		parameters.width = (int)map.get("width");
-		parameters.height = (int)map.get("height");
-		parameters.fx = (double)map.get("fx");
-		parameters.fy = (double)map.get("fy");
-		parameters.skew = (double)map.get("skew");
-		parameters.cx = (double)map.get("cx");
-		parameters.cy = (double)map.get("cy");
+	public static void loadPinhole(Map<String,Object> map , CameraPinhole parameters ) {
+		parameters.width = getOrThrow(map,"width");
+		parameters.height = getOrThrow(map,"height");
+		parameters.fx = getOrThrow(map,"fx");
+		parameters.fy = getOrThrow(map,"fy");
+		parameters.skew = getOrThrow(map,"skew");
+		parameters.cx = getOrThrow(map,"cx");
+		parameters.cy = getOrThrow(map,"cy");
 	}
 
-	private static Se3_F64 loadSe3(Map<String,Object> map , Se3_F64 transform) {
+	public static Se3_F64 loadSe3(Map<String,Object> map , Se3_F64 transform) {
 		if( transform == null )
 			transform = new Se3_F64();
-		List<Double> rotation = (List<Double>)map.get("rotation");
+		List<Double> rotation = getOrThrow(map,"rotation");
 
-		transform.T.x = (double)map.get("x");
-		transform.T.y = (double)map.get("y");
-		transform.T.z = (double)map.get("z");
+		transform.T.x = getOrThrow(map,"x");
+		transform.T.y = getOrThrow(map,"y");
+		transform.T.z = getOrThrow(map,"z");
 
 		for (int i = 0; i < 9; i++) {
 			transform.R.data[i] = rotation.get(i);

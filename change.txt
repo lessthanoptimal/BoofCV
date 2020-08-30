@@ -70,8 +70,9 @@ Version : 0.37
 - Scene Reconstruction
   * Fixed bug in CompatibleProjectiveHomography when using camera matrices only
   * Projective from arbitrary images using PairwiseImageGraph
-  * TODO Projective to Metric for arbitrary scene
-  * TODO Look at how projective cameras are normalized in SBA. It seems to cause issues
+  * Projective to Metric for arbitrary number of views
+  * TODO MetricFromUncalibratedPairwiseGraph needs to identify mistakes and fix them
+  * TODO Create validation tests for at least 3 scenarios with known constant motion along one axis
 - Sparse Bundle Adjustment
   * TODO Add rigid relationships between views. Can be fixed or not.
 - MultiViewOps
@@ -85,6 +86,10 @@ TODO Move projective to metric and similar from multiview to perspective
 TODO Refactor DistanceFromModel.computeDistance() to distance() and distances() just before release
 TODO rename RansacMultiView to RansacCalibrated
 TODO rename FactoryMultiView.triangulateNViewCalibrated to metric
+TODO DDogleg make forEach and forIdx consistent
+
+TODO Multi-View Stereo
+  - Use existing two view stereo to cludge something together
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint

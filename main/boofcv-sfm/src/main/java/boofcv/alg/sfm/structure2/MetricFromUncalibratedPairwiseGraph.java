@@ -76,6 +76,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	// Uses known metric views to expand the metric reconstruction by one view
 	private final @Getter MetricExpandByOneView expandMetric = new MetricExpandByOneView();
 
+	private final RefineMetricWorkingGraph refineWorking = new RefineMetricWorkingGraph();
+
 	public MetricFromUncalibratedPairwiseGraph(PairwiseGraphUtils utils) {
 		super(utils);
 		initProjective = new ProjectiveInitializeAllCommon();
@@ -89,6 +91,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	public MetricFromUncalibratedPairwiseGraph() {
 		this(new ConfigProjectiveReconstruction());
+	}
+
+	{
+		// prune outlier observations and run SBA a second time
+		refineWorking.bundleAdjustment.keepFraction = 0.95;
 	}
 
 	/**
@@ -133,6 +140,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// Elevate initial seed to metric
 		if (!projectiveSeedToMetric(graph))
 			return false;
+
+		// Refine initial estimate
+		refineWorking.process(db,workGraph);
 
 		// Expand to the remaining views one at a time
 		expandMetricScene(db);
@@ -257,6 +267,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			// Saves the set of inliers used to estimate this views metric view for later use
 			SceneWorkingGraph.View wview = workGraph.lookupView(selected.id);
 			utils.saveRansacInliers(wview);
+
+			// TODO Refining at this point is essential for long term stability but optimizing everything is not scalable
+			// maybe identify views with large residuals and optimizing up to N views surrounding them to fix the issue?
+			refineWorking.process(db,workGraph);
 
 			// Add neighboring views which have yet to be added to the open list
 			addOpenForView(wview.pview, open);
