@@ -17,7 +17,7 @@ allprojects {
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
-project.ext.set("deepboof_version", '0.4')
+project.ext.set("deepboof_version", '0.5-SNAPSHOT')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
