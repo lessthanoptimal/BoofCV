@@ -40,8 +40,8 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-class MockLookupSimilarImages implements LookupSimilarImages{
-	CameraPinhole intrinsic = new CameraPinhole(400,410,0,420,420,800,800);
+class MockLookupSimilarImages implements LookupSimilarImages {
+	CameraPinhole intrinsic = new CameraPinhole(400, 410, 0, 420, 420, 800, 800);
 	int numFeatures = 100;
 
 	Random rand;
@@ -57,14 +57,14 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 
 	public PairwiseImageGraph2 graph = new PairwiseImageGraph2();
 
-	public MockLookupSimilarImages( int numViews , long seed) {
+	public MockLookupSimilarImages( int numViews, long seed ) {
 		this.rand = new Random(seed);
 
 		for (int i = 0; i < numViews; i++) {
-			viewIds.add("View "+i);
+			viewIds.add("View " + i);
 		}
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj) null);
 
 		// 3D location of points in view 0 reference frame
 		feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, numFeatures, rand);
@@ -72,15 +72,15 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 		// render pixel coordinates of all points
 		for (int i = 0; i < numViews; i++) {
 			Se3_F64 view0_to_viewi = SpecialEuclideanOps_F64.eulerXyz(
-					0.01 + 0.1*i,0,rand.nextGaussian()*0.03,
-					rand.nextGaussian()*0.03,rand.nextGaussian()*0.03,rand.nextGaussian()*0.1,null);
+					0.01 + 0.1 * i, 0, rand.nextGaussian() * 0.03,
+					rand.nextGaussian() * 0.03, rand.nextGaussian() * 0.03, rand.nextGaussian() * 0.1, null);
 
 			// first view is the origin
-			if( i == 0 )
+			if (i == 0)
 				view0_to_viewi.reset();
 
 			// Create the camera matrix P
-			DMatrixRMaj P = PerspectiveOps.createCameraMatrix(view0_to_viewi.R, view0_to_viewi.T,K,null);
+			DMatrixRMaj P = PerspectiveOps.createCameraMatrix(view0_to_viewi.R, view0_to_viewi.T, K, null);
 
 			// save information on the view
 			listOriginToView.add(view0_to_viewi);
@@ -93,8 +93,8 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 			// create look up table from view to feature
 			// we don't want features to have same index because that's not realistic and would hide bugs
 			int[] v2f = PrimitiveArrays.fillCounting(numFeatures);
-			if( i > 0 )
-				PrimitiveArrays.shuffle(v2f,0, numFeatures,rand);
+			if (i > 0)
+				PrimitiveArrays.shuffle(v2f, 0, numFeatures, rand);
 			viewToFeat.add(v2f);
 
 			// save reverse table for fast lookup later
@@ -107,14 +107,14 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 			// note the featIdx is the index of the feature in the view
 			for (int viewIdx = 0; viewIdx < feats3D.size(); viewIdx++) {
 				Point3D_F64 X = feats3D.get(v2f[viewIdx]);
-				viewPixels.add(PerspectiveOps.renderPixel(view0_to_viewi,intrinsic,X, null));
+				viewPixels.add(PerspectiveOps.renderPixel(view0_to_viewi, intrinsic, X, null));
 			}
 		}
 
 		constructGraph(numViews);
 	}
 
-	private void constructGraph(int numViews) {
+	private void constructGraph( int numViews ) {
 		for (int i = 0; i < numViews; i++) {
 			PairwiseImageGraph2.View v = graph.createNode(viewIds.get(i));
 			v.totalObservations = numFeatures;
@@ -122,13 +122,13 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 		// connect all views to each other
 		for (int i = 0; i < numViews; i++) {
 			String nameI = viewIds.get(i);
-			for (int j = i+1; j < numViews; j++) {
+			for (int j = i + 1; j < numViews; j++) {
 				String nameJ = viewIds.get(j);
 
 				PairwiseImageGraph2.Motion edge = new PairwiseImageGraph2.Motion();
 				edge.is3D = true;
 				// swap src and dst to exercise more edge cases
-				if( j%2 == 0 ) {
+				if (j % 2 == 0) {
 					edge.src = graph.mapNodes.get(nameI);
 					edge.dst = graph.mapNodes.get(nameJ);
 				} else {
@@ -142,7 +142,7 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 				int[] tableJ = featToView.get(j);
 
 				for (int k = 0; k < numFeatures; k++) {
-					if( j%2 == 0 ) {
+					if (j % 2 == 0) {
 						edge.inliers.grow().setAssociation(tableI[k], tableJ[k], 0.0);
 					} else {
 						edge.inliers.grow().setAssociation(tableJ[k], tableI[k], 0.0);
@@ -162,17 +162,17 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 	}
 
 	@Override
-	public void findSimilar(String target, List<String> similar) {
+	public void findSimilar( String target, List<String> similar ) {
 		similar.clear();
 		for (int i = 0; i < viewIds.size(); i++) {
-			if( !viewIds.get(i).equals(target) ) {
+			if (!viewIds.get(i).equals(target)) {
 				similar.add(viewIds.get(i));
 			}
 		}
 	}
 
 	@Override
-	public void lookupPixelFeats(String target, FastQueue<Point2D_F64> features) {
+	public void lookupPixelFeats( String target, FastQueue<Point2D_F64> features ) {
 		int index = viewIds.indexOf(target);
 		List<Point2D_F64> l = viewObs.get(index);
 		features.reset();
@@ -182,27 +182,26 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 	}
 
 	@Override
-	public boolean lookupMatches(String viewA, String viewB, FastQueue<AssociatedIndex> pairs)
-	{
+	public boolean lookupMatches( String viewA, String viewB, FastQueue<AssociatedIndex> pairs ) {
 		int[] tableA = featToView.get(indexOfView(viewA));
 		int[] tableB = featToView.get(indexOfView(viewB));
 
 		pairs.reset();
 		for (int i = 0; i < numFeatures; i++) {
-			pairs.grow().setAssociation(tableA[i],tableB[i],0);
+			pairs.grow().setAssociation(tableA[i], tableB[i], 0);
 		}
 
 		return true;
 	}
 
 	@Override
-	public void lookupShape(String target, ImageDimension shape) {
-		shape.set(intrinsic.width,intrinsic.height);
+	public void lookupShape( String target, ImageDimension shape ) {
+		shape.set(intrinsic.width, intrinsic.height);
 	}
 
 	public int indexOfView( String name ) {
 		for (int i = 0; i < viewIds.size(); i++) {
-			if( name.equals(viewIds.get(i)))
+			if (name.equals(viewIds.get(i)))
 				return i;
 		}
 		return -1;

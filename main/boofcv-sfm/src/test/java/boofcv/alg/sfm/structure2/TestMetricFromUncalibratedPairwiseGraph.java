@@ -57,18 +57,18 @@ class TestMetricFromUncalibratedPairwiseGraph {
 			// Need to increase the number of features to ensure everything is connected properly and that there is
 			// enough info for a good estimate
 			var db = new MockLookupSimilarImagesRealistic().setLoop(false).
-					setIntrinsic(new CameraPinhole(410,410,0,400,400,800,800)).
-					setSeed(numViews).setFeatures(Math.max(400,50*numViews)).pathLine(numViews,0.30,6.0,2);
+					setIntrinsic(new CameraPinhole(410, 410, 0, 400, 400, 800, 800)).
+					setSeed(numViews).setFeatures(Math.max(400, 50 * numViews)).pathLine(numViews, 0.30, 6.0, 2);
 			PairwiseImageGraph2 graph = db.createPairwise();
-			assertTrue(alg.process(db,graph));
-			checkReconstruction(alg,db);
+			assertTrue(alg.process(db, graph));
+			checkReconstruction(alg, db);
 		}
 	}
 
 	/**
 	 * Compare found camera matrices against truth by converting them into the same projective scale
 	 */
-	private void checkReconstruction(MetricFromUncalibratedPairwiseGraph alg, MockLookupSimilarImagesRealistic db) {
+	private void checkReconstruction( MetricFromUncalibratedPairwiseGraph alg, MockLookupSimilarImagesRealistic db ) {
 		List<SceneWorkingGraph.View> foundViews = alg.workGraph.getAllViews();
 		assertEquals(db.views.size(), foundViews.size());
 
@@ -84,16 +84,16 @@ class TestMetricFromUncalibratedPairwiseGraph {
 		Se3_F64 fndWorld_to_origin = alg.workGraph.lookupView(originID).world_to_view;
 		Se3_F64 expWorld_to_origin = db.views.get(0).world_to_view;
 
-		for( var trueView : db.views ) {
+		for (var trueView : db.views) {
 			SceneWorkingGraph.View wview = alg.workGraph.lookupView(trueView.id);
-			Se3_F64 found    = wview.world_to_view.invert(null).concat(fndWorld_to_origin,null);
-			Se3_F64 expected = trueView.world_to_view.invert(null).concat(expWorld_to_origin,null);
+			Se3_F64 found = wview.world_to_view.invert(null).concat(fndWorld_to_origin, null);
+			Se3_F64 expected = trueView.world_to_view.invert(null).concat(expWorld_to_origin, null);
 
 			// These are only equal up to a scale + sign ambiguity
-			double scale = MultiViewOps.findScale(found.T,expected.T);
+			double scale = MultiViewOps.findScale(found.T, expected.T);
 			found.T.scale(scale);
 
-			BoofTesting.assertEquals(expected,found,0.001,locationTol);
+			BoofTesting.assertEquals(expected, found, 0.001, locationTol);
 		}
 
 		// Should also check the inliers to see if they make sense.
@@ -102,15 +102,15 @@ class TestMetricFromUncalibratedPairwiseGraph {
 	@Test
 	void saveMetricSeed() {
 		var graph = new PairwiseImageGraph2();
-		List<String> viewIds = BoofMiscOps.asList("A","B","C");
-		var inlierToSeed = GrowQueue_I32.array(1,3,5,7,9);
-		var inlierToOther = new FastQueue<>(GrowQueue_I32::new,GrowQueue_I32::reset);
+		List<String> viewIds = BoofMiscOps.asList("A", "B", "C");
+		var inlierToSeed = GrowQueue_I32.array(1, 3, 5, 7, 9);
+		var inlierToOther = new FastQueue<>(GrowQueue_I32::new, GrowQueue_I32::reset);
 
 		// create distintive sets of inlier indexes for each view
-		for (int otherIdx = 0; otherIdx < viewIds.size()-1; otherIdx++) {
+		for (int otherIdx = 0; otherIdx < viewIds.size() - 1; otherIdx++) {
 			GrowQueue_I32 inliers = inlierToOther.grow();
 			for (int i = 0; i < inlierToSeed.size; i++) {
-				inliers.add(inlierToSeed.get(i)+1+otherIdx);
+				inliers.add(inlierToSeed.get(i) + 1 + otherIdx);
 			}
 		}
 
@@ -118,46 +118,46 @@ class TestMetricFromUncalibratedPairwiseGraph {
 		var results = new MetricCameras();
 		for (int viewIdx = 0; viewIdx < viewIds.size(); viewIdx++) {
 			// skip zero since it's implicit
-			if( viewIdx > 0 )
-				results.motion_1_to_k.grow().T.set(1,viewIdx,0);
+			if (viewIdx > 0)
+				results.motion_1_to_k.grow().T.set(1, viewIdx, 0);
 			CameraPinhole pinhole = results.intrinsics.grow();
-			pinhole.fx = pinhole.fy = 100+viewIdx;
+			pinhole.fx = pinhole.fy = 100 + viewIdx;
 			graph.createNode(viewIds.get(viewIdx));
 		}
 
 		var alg = new MetricFromUncalibratedPairwiseGraph();
-		alg.saveMetricSeed(graph,viewIds,inlierToSeed,inlierToOther,results);
+		alg.saveMetricSeed(graph, viewIds, inlierToSeed, inlierToOther, results);
 		SceneWorkingGraph wgraph = alg.getWorkGraph();
 
 		// See metric view info got saved correctly
-		BoofMiscOps.forIdx(viewIds,(idx,viewId)->{
+		BoofMiscOps.forIdx(viewIds, ( idx, viewId ) -> {
 			PairwiseImageGraph2.View pview = graph.lookupNode(viewId);
 			assertTrue(wgraph.isKnown(pview));
 			SceneWorkingGraph.View wview = wgraph.lookupView(viewId);
 
-			assertEquals(100+idx,wview.intrinsic.f, 1e-8);
-			assertEquals(idx==0?0:1,wview.world_to_view.T.x, 1e-8);
-			assertEquals(idx,wview.world_to_view.T.y, 1e-8);
+			assertEquals(100 + idx, wview.intrinsic.f, 1e-8);
+			assertEquals(idx == 0 ? 0 : 1, wview.world_to_view.T.x, 1e-8);
+			assertEquals(idx, wview.world_to_view.T.y, 1e-8);
 		});
 
 		// See if inliers got saved correctly
-		BoofMiscOps.forIdx(viewIds,(idx,viewId)->{
+		BoofMiscOps.forIdx(viewIds, ( idx, viewId ) -> {
 			SceneWorkingGraph.View wview = wgraph.lookupView(viewId);
 
-			if( idx != 0 ) {
+			if (idx != 0) {
 				// only the first view (the seed) should have inliers saved
-				assertEquals(0,wview.inliers.views.size);
-				assertEquals(0,wview.inliers.observations.size);
+				assertEquals(0, wview.inliers.views.size);
+				assertEquals(0, wview.inliers.observations.size);
 				return;
 			}
 
-			assertEquals(viewIds.size(),wview.inliers.views.size);
-			assertEquals(viewIds.size(),wview.inliers.observations.size);
-			assertEquals(viewId,wview.inliers.views.get(0).id);
+			assertEquals(viewIds.size(), wview.inliers.views.size);
+			assertEquals(viewIds.size(), wview.inliers.observations.size);
+			assertEquals(viewId, wview.inliers.views.get(0).id);
 			for (int checkIdx = 0; checkIdx < viewIds.size(); checkIdx++) {
 				final int c = checkIdx;
 				GrowQueue_I32 obs = wview.inliers.observations.get(checkIdx);
-				obs.forIdx((i,value)-> assertEquals(i*2+1+c,value));
+				obs.forIdx(( i, value ) -> assertEquals(i * 2 + 1 + c, value));
 			}
 		});
 	}

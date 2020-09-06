@@ -43,8 +43,8 @@ class TestMetricExpandByOneView {
 		// make sure (cx,cy) = (width/2, height/2) or else unit test will fail because it doesn't perfectly
 		// match the model
 		var db = new MockLookupSimilarImagesRealistic().
-				setIntrinsic(new CameraPinhole(400,400,0,400,400,800,800)).
-				pathLine(5,0.3,1.5,2);
+				setIntrinsic(new CameraPinhole(400, 400, 0, 400, 400, 800, 800)).
+				pathLine(5, 0.3, 1.5, 2);
 		var alg = new MetricExpandByOneView();
 
 		// Perfect without SBA - Will normally not be done this way, but with perfect data it should return
@@ -61,8 +61,8 @@ class TestMetricExpandByOneView {
 		}
 	}
 
-	private void checkPerfect(MockLookupSimilarImagesRealistic db,
-							  MetricExpandByOneView alg, int targetViewIdx) {
+	private void checkPerfect( MockLookupSimilarImagesRealistic db,
+							   MetricExpandByOneView alg, int targetViewIdx ) {
 		PairwiseImageGraph2 pairwise = db.createPairwise();
 		SceneWorkingGraph workGraph = db.createWorkingGraph(pairwise);
 
@@ -73,7 +73,7 @@ class TestMetricExpandByOneView {
 		workGraph.viewList.remove(workGraph.views.remove(target.id));
 
 		// add the target view
-		assertTrue(alg.process(db,workGraph,target));
+		assertTrue(alg.process(db, workGraph, target));
 
 		SceneWorkingGraph.View found = workGraph.views.get(target.id);
 
@@ -82,7 +82,7 @@ class TestMetricExpandByOneView {
 		assertEquals(db.intrinsic.fy, found.intrinsic.f, 1e-4);
 
 		// Check pose
-		BoofTesting.assertEquals(db.views.get(targetViewIdx).world_to_view,found.world_to_view,0.01,0.01);
+		BoofTesting.assertEquals(db.views.get(targetViewIdx).world_to_view, found.world_to_view, 0.01, 0.01);
 	}
 
 	/**
@@ -91,13 +91,13 @@ class TestMetricExpandByOneView {
 	@Test
 	void fail_and_doNotAdd() {
 		var db = new MockLookupSimilarImagesRealistic().
-				setIntrinsic(new CameraPinhole(400,420,0,400,400,800,800)).
-				pathLine(5,0.3,1.5,2);
+				setIntrinsic(new CameraPinhole(400, 420, 0, 400, 400, 800, 800)).
+				pathLine(5, 0.3, 1.5, 2);
 
 		// force it to fail at these two different points
 		var alg1 = new MetricExpandByOneView() {
-			public boolean selectTwoConnections(PairwiseImageGraph2.View target ,
-												List<PairwiseImageGraph2.Motion> connections ) {
+			public boolean selectTwoConnections( PairwiseImageGraph2.View target,
+												 List<PairwiseImageGraph2.Motion> connections ) {
 				return false;
 			}
 		};
@@ -108,12 +108,12 @@ class TestMetricExpandByOneView {
 			}}
 		};
 
-		fail_and_doNotAdd(db,alg1,0);
-		fail_and_doNotAdd(db,alg2,0);
+		fail_and_doNotAdd(db, alg1, 0);
+		fail_and_doNotAdd(db, alg2, 0);
 	}
 
-	private void fail_and_doNotAdd(MockLookupSimilarImagesRealistic db,
-							  MetricExpandByOneView alg, int targetViewIdx) {
+	private void fail_and_doNotAdd( MockLookupSimilarImagesRealistic db,
+									MetricExpandByOneView alg, int targetViewIdx ) {
 		PairwiseImageGraph2 pairwise = db.createPairwise();
 		SceneWorkingGraph workGraph = db.createWorkingGraph(pairwise);
 
@@ -123,7 +123,7 @@ class TestMetricExpandByOneView {
 		workGraph.viewList.remove(workGraph.views.remove(target.id));
 
 		// This should fail and not add it to the work graph
-		assertFalse(alg.process(db,workGraph,target));
+		assertFalse(alg.process(db, workGraph, target));
 		assertFalse(workGraph.isKnown(target));
 	}
 
@@ -133,8 +133,8 @@ class TestMetricExpandByOneView {
 	@Test
 	void computeCalibratingHomography() {
 		var db = new MockLookupSimilarImagesRealistic().
-				setIntrinsic(new CameraPinhole(400,400,0,0,0,800,800)).
-				pathLine(5,0.3,1.5,2);
+				setIntrinsic(new CameraPinhole(400, 400, 0, 0, 0, 800, 800)).
+				pathLine(5, 0.3, 1.5, 2);
 		PairwiseImageGraph2 pairwise = db.createPairwise();
 
 		var alg = new MetricExpandByOneView();
@@ -144,32 +144,32 @@ class TestMetricExpandByOneView {
 		alg.utils.viewB = pairwise.nodes.get(1);
 		alg.utils.viewC = pairwise.nodes.get(2);
 
-		int[] viewIdx = new int[]{1,0,2};
+		int[] viewIdx = new int[]{1, 0, 2};
 
 		// P1 might not be identity
 		DMatrixRMaj P1 = db.views.get(viewIdx[0]).camera;
 		alg.utils.P2.set(db.views.get(viewIdx[1]).camera);
 		alg.utils.P3.set(db.views.get(viewIdx[2]).camera);
 		// make sure P1 is identity, which is what it would be coming out of the trifocal tensor
-		List<DMatrixRMaj> cameras = BoofMiscOps.asList(P1.copy(),alg.utils.P2,alg.utils.P3);
-		MultiViewOps.projectiveMakeFirstIdentity(cameras,null);
+		List<DMatrixRMaj> cameras = BoofMiscOps.asList(P1.copy(), alg.utils.P2, alg.utils.P3);
+		MultiViewOps.projectiveMakeFirstIdentity(cameras, null);
 
 		// Create the pixel observations
-		db.createTripleObs(viewIdx,alg.utils.matchesTriple,new GrowQueue_I32());
+		db.createTripleObs(viewIdx, alg.utils.matchesTriple, new GrowQueue_I32());
 
 		// Compute the homogrpahy
 		assertTrue(alg.computeCalibratingHomography());
 
 		// Test it by seeing it it returns the expected camera matrix
 		DMatrixRMaj H = alg.projectiveHomography.getCalibrationHomography();
-		DMatrixRMaj foundK = new DMatrixRMaj(3,3);
+		DMatrixRMaj foundK = new DMatrixRMaj(3, 3);
 		Se3_F64 view_0_to_2 = new Se3_F64();
-		MultiViewOps.projectiveToMetric(alg.utils.P3,H,view_0_to_2,foundK);
+		MultiViewOps.projectiveToMetric(alg.utils.P3, H, view_0_to_2, foundK);
 
-		assertEquals(db.intrinsic.fx, foundK.get(0,0), 1e-7);
-		assertEquals(db.intrinsic.fy, foundK.get(1,1), 1e-7);
-		assertEquals(db.intrinsic.cx, foundK.get(0,2), 1e-7);
-		assertEquals(db.intrinsic.cy, foundK.get(1,2), 1e-7);
-		assertEquals(db.intrinsic.skew, foundK.get(0,1), 1e-7);
+		assertEquals(db.intrinsic.fx, foundK.get(0, 0), 1e-7);
+		assertEquals(db.intrinsic.fy, foundK.get(1, 1), 1e-7);
+		assertEquals(db.intrinsic.cx, foundK.get(0, 2), 1e-7);
+		assertEquals(db.intrinsic.cy, foundK.get(1, 2), 1e-7);
+		assertEquals(db.intrinsic.skew, foundK.get(0, 1), 1e-7);
 	}
 }

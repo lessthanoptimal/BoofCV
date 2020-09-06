@@ -20,7 +20,6 @@ package boofcv.alg.sfm.structure2;
 
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.*;
-import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.ConfigConverge;
 import lombok.Getter;
@@ -36,60 +35,60 @@ import java.io.PrintStream;
  */
 public class MetricBundleAdjustmentUtils {
 	/** Configures convergence criteria for SBA */
-	public final @Getter ConfigConverge configConverge = new ConfigConverge(1e-5,1e-5,30);
+	public final @Getter ConfigConverge configConverge = new ConfigConverge(1e-5, 1e-5, 30);
 	/** Toggles on and off scaling parameters */
 	public @Getter @Setter boolean configScale = false;
 
 	/** Optional second pass where outliers observations. Fraction specifies that the best X fraction are kept. */
-	public double keepFraction=1.0;
+	public double keepFraction = 1.0;
 
 	/** The estimated scene structure. This the final estimated scene state */
-	protected final @Getter	SceneStructureMetric structure = new SceneStructureMetric(true);
-	protected final @Getter	SceneObservations observations = new SceneObservations();
+	protected final @Getter SceneStructureMetric structure = new SceneStructureMetric(true);
+	protected final @Getter SceneObservations observations = new SceneObservations();
 	protected @Getter @Setter BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
-	protected @Getter @Setter TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated((ConfigTriangulation)null);
+	protected @Getter @Setter TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated(null);
 	protected @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
 
 	/**
 	 * Uses the already configured structure and observations to perform bundle adjustment
 	 */
 	public boolean process( @Nullable PrintStream verbose ) {
-		if( configConverge.maxIterations == 0)
+		if (configConverge.maxIterations == 0)
 			return true;
-		if( configScale )
-			scaler.applyScale(structure,observations);
-		sba.configure(configConverge.ftol,configConverge.gtol,configConverge.maxIterations);
+		if (configScale)
+			scaler.applyScale(structure, observations);
+		sba.configure(configConverge.ftol, configConverge.gtol, configConverge.maxIterations);
 
-		sba.setParameters(structure,observations);
+		sba.setParameters(structure, observations);
 		if( verbose != null ) verbose.println("SBA BEFORE        average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 		if( !sba.optimize(structure) )
 			return false;
 		if( verbose != null ) verbose.println("SBA AFTER         average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 
-		if( keepFraction < 1.0 ) {
+		if (keepFraction < 1.0) {
 			// don't prune views since they might be required
-			prune(keepFraction,-1,1);
-			sba.setParameters(structure,observations);
-			if( verbose != null ) verbose.println("SBA PRUNED-BEFORE average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
-			if( !sba.optimize(structure) )
+			prune(keepFraction, -1, 1);
+			sba.setParameters(structure, observations);
+			if (verbose != null) verbose.println("SBA PRUNED-BEFORE average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+			if (!sba.optimize(structure))
 				return false;
 			if( verbose != null ) verbose.println("SBA PRUNED-AFTER average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 		}
 
-		if( configScale )
-			scaler.undoScale(structure,observations);
+		if (configScale)
+			scaler.undoScale(structure, observations);
 		return true;
 	}
 
 	/**
 	 * Prunes outliers and views/points with too few points/observations
 	 */
-	public void prune( double keepFraction , int pruneViews , int prunePoints ) {
-		prunePoints = Math.max(1,prunePoints);
+	public void prune( double keepFraction, int pruneViews, int prunePoints ) {
+		prunePoints = Math.max(1, prunePoints);
 
-		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure, observations);
 		pruner.pruneObservationsByErrorRank(keepFraction);
-		if( pruneViews > 0 )
+		if (pruneViews > 0)
 			pruner.pruneViews(pruneViews);
 		pruner.prunePoints(prunePoints);
 	}
@@ -97,7 +96,7 @@ public class MetricBundleAdjustmentUtils {
 	/**
 	 * Prints the number of different data structures in the scene
 	 */
-	public void printCounts(PrintStream out) {
+	public void printCounts( PrintStream out ) {
 		out.println("Points=" + structure.points.size);
 		out.println("Views=" + structure.views.size);
 		out.println("Cameras=" + structure.cameras.size);

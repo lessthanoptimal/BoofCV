@@ -50,7 +50,7 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  * @author Peter Abeles
  */
 class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
-	public CameraPinhole intrinsic = new CameraPinhole(400,410,0,420,420,800,800);
+	public CameraPinhole intrinsic = new CameraPinhole(400, 410, 0, 420, 420, 800, 800);
 	public int numFeatures = 100;
 	public Random rand = BoofTesting.createRandom(3);
 	public boolean loop = true;
@@ -58,32 +58,32 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	List<Feature> points = new ArrayList<>();
 	List<View> views = new ArrayList<>();
 
-	public MockLookupSimilarImagesRealistic(){}
+	public MockLookupSimilarImagesRealistic() {}
 
-	public MockLookupSimilarImagesRealistic setIntrinsic(CameraPinhole intrinsic ) {
+	public MockLookupSimilarImagesRealistic setIntrinsic( CameraPinhole intrinsic ) {
 		this.intrinsic = intrinsic;
 		return this;
 	}
 
-	public MockLookupSimilarImagesRealistic setFeatures(int numFeatures ) {
+	public MockLookupSimilarImagesRealistic setFeatures( int numFeatures ) {
 		this.numFeatures = numFeatures;
 		return this;
 	}
 
-	public MockLookupSimilarImagesRealistic setSeed(long seed ) {
+	public MockLookupSimilarImagesRealistic setSeed( long seed ) {
 		rand = BoofTesting.createRandom(seed);
 		return this;
 	}
 
-	public MockLookupSimilarImagesRealistic setLoop(boolean loop ) {
+	public MockLookupSimilarImagesRealistic setLoop( boolean loop ) {
 		this.loop = loop;
 		return this;
 	}
 
-	public MockLookupSimilarImagesRealistic pathLine(int numViews , double stepLength, double pathLength, int numViewConnect) {
+	public MockLookupSimilarImagesRealistic pathLine( int numViews, double stepLength, double pathLength, int numViewConnect ) {
 		double r = 0.5;
 
-		for( Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -r, pathLength+r,-r,r,-r,r, numFeatures, rand)) {
+		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -r, pathLength + r, -r, r, -r, r, numFeatures, rand)) {
 			Feature f = new Feature();
 			f.world.set(X);
 			points.add(f);
@@ -96,26 +96,26 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 
 			// Move the camera down the x-axis and push back enough to see most of the points
 			camera_to_world.T.x = stepLength*viewCnt;
-			camera_to_world.T.y = rand.nextGaussian() * 0.05;
-			camera_to_world.T.z = rand.nextGaussian() * 0.05 - 2 * r;
+			camera_to_world.T.y = rand.nextGaussian()*0.05;
+			camera_to_world.T.z = rand.nextGaussian()*0.05 - 2*r;
 
 			// Point camera towards the cloud of points
-			double noiseRotX = rand.nextGaussian() * 0.01;
-			double noiseRotY = rand.nextGaussian() * 0.01;
-			double noiseRotZ = rand.nextGaussian() * 0.01;
+			double noiseRotX = rand.nextGaussian()*0.01;
+			double noiseRotY = rand.nextGaussian()*0.01;
+			double noiseRotZ = rand.nextGaussian()*0.01;
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, noiseRotX, noiseRotY, noiseRotZ, camera_to_world.R);
-			list_camera_to_world.add( camera_to_world );
+			list_camera_to_world.add(camera_to_world);
 		}
 
-		generate(list_camera_to_world,numViewConnect);
+		generate(list_camera_to_world, numViewConnect);
 		return this;
 	}
 
-	public MockLookupSimilarImagesRealistic pathCircle(int numViews , int numViewConnect) {
+	public MockLookupSimilarImagesRealistic pathCircle( int numViews, int numViewConnect ) {
 		// Radius of the cameras circling the origin
 		double pathRadius = 2;
 
-		for( Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -0.5, 0.5, numFeatures, rand)) {
+		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -0.5, 0.5, numFeatures, rand)) {
 			Feature f = new Feature();
 			f.world.set(X);
 			points.add(f);
@@ -136,20 +136,20 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 			camera_to_world.T.z = Math.sin(yaw)*pathRadius;
 
 			// camera is pointing in the opposite direction of it's world location
-			ConvertRotation3D_F64.rodriguesToMatrix(new Rodrigues_F64(yaw+Math.PI/2,0,-1,0),camera_to_world.R);
+			ConvertRotation3D_F64.rodriguesToMatrix(new Rodrigues_F64(yaw + Math.PI/2, 0, -1, 0), camera_to_world.R);
 
-			list_camera_to_world.add( camera_to_world );
+			list_camera_to_world.add(camera_to_world);
 		}
 
-		generate(list_camera_to_world,numViewConnect);
+		generate(list_camera_to_world, numViewConnect);
 		return this;
 	}
 
 	/**
 	 * Renders the scene using only ready generated points and image coordinates
 	 */
-	public MockLookupSimilarImagesRealistic generate(List<Se3_F64> list_camera_to_world, int numViewConnect) {
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
+	public MockLookupSimilarImagesRealistic generate( List<Se3_F64> list_camera_to_world, int numViewConnect ) {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
 		int numViews = list_camera_to_world.size();
 
@@ -177,11 +177,11 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 				o.pixel.set(pixel);
 				v.observations.add(o);
 			}
-			assertBoof(v.observations.size()>0);
+			assertBoof(v.observations.size() > 0);
 
 //			System.out.println("view="+viewCnt+" obs.size="+v.observations.size());
 			// Randomize the order of the observations
-			Collections.shuffle(v.observations,rand);
+			Collections.shuffle(v.observations, rand);
 			views.add(v);
 		}
 
@@ -190,17 +190,17 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 		for (int idx0 = 0; idx0 < views.size(); idx0++) {
 			View a = views.get(idx0);
 			for (int offset = 1; offset <= numViewConnect; offset++) {
-				int idx1 = idx0+offset;
+				int idx1 = idx0 + offset;
 				// when wrapping be careful to not connect to the same node twice
-				if( idx1 >= views.size() ) {
-					if( !loop )
+				if (idx1 >= views.size()) {
+					if (!loop)
 						continue;
 					idx1 %= views.size();
-					if( idx1+numViewConnect >= idx0 )
+					if (idx1 + numViewConnect >= idx0)
 						continue;
 				}
 				View b = views.get(idx1);
-				if( a.fractionOverlap(b) < 0.5 ) {
+				if (a.fractionOverlap(b) < 0.5) {
 //					System.out.println("REJECT "+idx0+" <-> "+idx1+" Fraction Overlap: "+a.fractionOverlap(b));
 					continue;
 				}
@@ -216,7 +216,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	public PairwiseImageGraph2 createPairwise() {
 		var graph = new PairwiseImageGraph2();
 		// Create all the views in the graph
-		views.forEach(v->graph.createNode(v.id));
+		views.forEach(v -> graph.createNode(v.id));
 
 		for (int viewCnt = 0; viewCnt < views.size(); viewCnt++) {
 			View v = views.get(viewCnt);
@@ -224,12 +224,12 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 
 			pv.totalObservations = v.observations.size();
 
-			for( View b : v.connected ) {
+			for (View b : v.connected) {
 				int indexViewB = views.indexOf(b);
-				if( indexViewB < viewCnt )
+				if (indexViewB < viewCnt)
 					continue;
 				PairwiseImageGraph2.View pb = graph.nodes.get(indexViewB);
-				PairwiseImageGraph2.Motion m = graph.connect(pv,pb);
+				PairwiseImageGraph2.Motion m = graph.connect(pv, pb);
 				m.is3D = true;
 
 				boolean swap = rand.nextBoolean();
@@ -240,16 +240,16 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 				List<AssociatedIndex> shared = v.findShared(b);
 
 				m.countF = shared.size();
-				m.countH = m.countF / 3;
+				m.countH = m.countF/3;
 
-				Collections.shuffle(shared,rand);
+				Collections.shuffle(shared, rand);
 				int minShared = (int)(0.85*shared.size());
-				int numInliers = minShared+rand.nextInt(shared.size()-minShared);
+				int numInliers = minShared + rand.nextInt(shared.size() - minShared);
 				for (int i = 0; i < numInliers; i++) {
 					AssociatedIndex a = shared.get(i);
 
-					if( swap )
-						m.inliers.grow().set(a.dst,a.src);
+					if (swap)
+						m.inliers.grow().set(a.dst, a.src);
 					else
 						m.inliers.grow().set(a);
 				}
@@ -263,12 +263,12 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	 */
 	public SceneWorkingGraph createWorkingGraph( PairwiseImageGraph2 pairwise ) {
 		var working = new SceneWorkingGraph();
-		pairwise.nodes.forEach((i,v)->working.addView(v));
+		pairwise.nodes.forEach(( i, v ) -> working.addView(v));
 
-		working.viewList.forEach(v->v.intrinsic.set(intrinsic));
-		BoofMiscOps.forIdx(working.viewList,(i,v)->v.projective.set(views.get(i).camera));
-		BoofMiscOps.forIdx(working.viewList,(i,v)->v.world_to_view.set(views.get(i).world_to_view));
-		BoofMiscOps.forIdx(working.viewList,(i,v)->v.index=i);
+		working.viewList.forEach(v -> v.intrinsic.set(intrinsic));
+		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.projective.set(views.get(i).camera));
+		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.world_to_view.set(views.get(i).world_to_view));
+		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.index = i);
 
 		return working;
 	}
@@ -276,64 +276,63 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	@Override
 	public List<String> getImageIDs() {
 		List<String> ids = new ArrayList<>();
-		views.forEach(o->ids.add(o.id));
+		views.forEach(o -> ids.add(o.id));
 		return ids;
 	}
 
 	@Override
-	public void findSimilar(String target, List<String> similar) {
+	public void findSimilar( String target, List<String> similar ) {
 		View view = getView(target);
 
 		similar.clear();
-		view.connected.forEach(v->similar.add(v.id));
+		view.connected.forEach(v -> similar.add(v.id));
 	}
 
 	@Override
-	public void lookupPixelFeats(String target, FastQueue<Point2D_F64> features) {
+	public void lookupPixelFeats( String target, FastQueue<Point2D_F64> features ) {
 		View view = getView(target);
 
 		features.reset();
-		view.observations.forEach(o->features.grow().setTo(o.pixel));
+		view.observations.forEach(o -> features.grow().setTo(o.pixel));
 	}
 
-	private View getView(String target) {
+	private View getView( String target ) {
 		for (int i = 0; i < views.size(); i++) {
-			if( views.get(i).id.equals(target))
+			if (views.get(i).id.equals(target))
 				return views.get(i);
 		}
-		throw new RuntimeException("Did not find view id="+target);
+		throw new RuntimeException("Did not find view id=" + target);
 	}
 
 	@Override
-	public boolean lookupMatches(String identA, String identB, FastQueue<AssociatedIndex> pairs)
-	{
+	public boolean lookupMatches( String identA, String identB, FastQueue<AssociatedIndex> pairs ) {
 		View viewA = getView(identA);
 		View viewB = getView(identB);
 
-		if( !viewA.connected.contains(viewB) )
+		if (!viewA.connected.contains(viewB))
 			return false;
 
 		pairs.reset();
 		List<AssociatedIndex> shared = viewA.findShared(viewB);
-		shared.forEach(a->pairs.grow().set(a));
+		shared.forEach(a -> pairs.grow().set(a));
 
 		return true;
 	}
 
 	@Override
-	public void lookupShape(String target, ImageDimension shape) {
-		shape.set(intrinsic.width,intrinsic.height);
+	public void lookupShape( String target, ImageDimension shape ) {
+		shape.set(intrinsic.width, intrinsic.height);
 	}
 
 	/**
 	 * Create a set of 3 observations of the same feature from any set of 3 views
+	 *
 	 * @param viewIdx which views to use
 	 * @param triples (output) pixel observations
 	 * @param featureIdx (output)which features were in common
 	 */
-	public void createTripleObs(int[] viewIdx, FastQueue<AssociatedTriple> triples, GrowQueue_I32 featureIdx )
-	{
-		BoofMiscOps.assertBoof(viewIdx.length==3);
+	public void createTripleObs( int[] viewIdx, FastQueue<AssociatedTriple> triples, GrowQueue_I32 featureIdx ) {
+		BoofMiscOps.assertBoof(viewIdx.length == 3);
 
 		triples.reset();
 		featureIdx.reset();
@@ -342,40 +341,40 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 		AssociatedTriple a = new AssociatedTriple();
 		for (int obsI = 0; obsI < view0.observations.size(); obsI++) {
 			Observation o = view0.observations.get(obsI);
-			a.set(0,o.pixel.x,o.pixel.y);
+			a.set(0, o.pixel.x, o.pixel.y);
 			boolean matched = true;
 			for (int i = 1; i < 3; i++) {
 				View viewI = views.get(viewIdx[i]);
 				int obsIdx = viewI.findIndex(o.feature);
-				if( obsIdx < 0 ) {
+				if (obsIdx < 0) {
 					matched = false;
 					break;
 				}
 				Point2D_F64 pixel = viewI.observations.get(obsIdx).pixel;
 				a.set(i, pixel.x, pixel.y);
 			}
-			if( !matched ) {
+			if (!matched) {
 				continue;
 			}
 			triples.grow().set(a);
-			featureIdx.add( points.indexOf(o.feature) );
+			featureIdx.add(points.indexOf(o.feature));
 		}
 	}
 
 	/**
 	 * Returns the feature index given a view and the observation in the view
 	 */
-	public int observationToFeatureIdx(int viewIdx, int observationIdx) {
+	public int observationToFeatureIdx( int viewIdx, int observationIdx ) {
 		View v = views.get(viewIdx);
 		Feature f = v.observations.get(observationIdx).feature;
 		return points.indexOf(f);
 	}
 
-	public Observation featureToObservation(int viewIdx , int featureIdx ) {
+	public Observation featureToObservation( int viewIdx, int featureIdx ) {
 		View v = views.get(viewIdx);
 		Feature f = points.get(featureIdx);
 		for (int i = 0; i < v.observations.size(); i++) {
-			if( v.observations.get(i).feature == f )
+			if (v.observations.get(i).feature == f)
 				return v.observations.get(i);
 		}
 		return null;
@@ -394,17 +393,17 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 		public String id;
 		// List of all observation
 		public List<Observation> observations = new ArrayList<>();
-		// Tranform from world to this view
+		// Transform from world to this view
 		public Se3_F64 world_to_view = new Se3_F64();
 		// camera matrix. used in projective transform
-		public DMatrixRMaj camera = new DMatrixRMaj(3,4);
+		public DMatrixRMaj camera = new DMatrixRMaj(3, 4);
 
 		public List<View> connected = new ArrayList<>();
 
 		public int findIndex( Feature f ) {
 			for (int i = 0; i < observations.size(); i++) {
 				Observation o = observations.get(i);
-				if( o.feature == f ) {
+				if (o.feature == f) {
 					return i;
 				}
 			}
@@ -415,17 +414,17 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 			List<AssociatedIndex> shared = new ArrayList<>();
 			for (int indexA = 0; indexA < observations.size(); indexA++) {
 				int indexB = v.findIndex(observations.get(indexA).feature);
-				if( indexB < 0 )
+				if (indexB < 0)
 					continue;
 
-				shared.add( new AssociatedIndex(indexA,indexB) );
+				shared.add(new AssociatedIndex(indexA, indexB));
 			}
 			return shared;
 		}
 
 		public double fractionOverlap( View v ) {
 			int total = findShared(v).size();
-			return Math.min(total/(double)v.observations.size(),total/(double)observations.size());
+			return Math.min(total/(double)v.observations.size(), total/(double)observations.size());
 		}
 	}
 }

@@ -68,7 +68,7 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
 public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/** Common algorithms for reconstructing the projective scene */
-	@Getter	@Setter	PairwiseGraphUtils utils = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
+	@Getter @Setter PairwiseGraphUtils utils = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
 
 	/**
 	 * List of feature indexes in the seed view that are the inliers from robust model matching.
@@ -79,7 +79,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * to the same feature as each index in 'inlierToSeed'.
 	 */
 	protected @Getter final FastQueue<GrowQueue_I32> inlierIndexes =
-			new FastQueue<>(GrowQueue_I32::new,GrowQueue_I32::reset);
+			new FastQueue<>(GrowQueue_I32::new, GrowQueue_I32::reset);
 
 	protected final FastArray<View> viewsByStructureIndex = new FastArray<>(View.class);
 
@@ -109,26 +109,27 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param seedConnIdx (Input) Indexes of motions in the seed view to use when initializing
 	 * @return true is successful or false if it failed
 	 */
-	public boolean projectiveSceneN(LookupSimilarImages db ,
-									View seed , GrowQueue_I32 seedFeatsIdx , GrowQueue_I32 seedConnIdx ) {
+	public boolean projectiveSceneN( LookupSimilarImages db,
+									 View seed, GrowQueue_I32 seedFeatsIdx, GrowQueue_I32 seedConnIdx ) {
 		// Check preconditions. Exceptions are thrown since these are easily checked and shouldn't be ignored under
 		// the assumption that geometry was simply bad
-		assertBoof(seedFeatsIdx.size>=6,
+		assertBoof(seedFeatsIdx.size >= 6,
 				"need at least 6 common features to estimate camera matrix");
-		assertBoof(seedConnIdx.size>=2,
+		assertBoof(seedConnIdx.size >= 2,
 				"2-views, a.k.a. stereo, is a special case and requires different logic and isn't yet supported");
 		assertBoof(seed.connections.size >= seedConnIdx.size,
 				"Can't have more seed connection indexes than actual connections");
 
-		if( verbose != null ) verbose.println("ENTER projectiveSceneN: seed="+seed.id+" common.size="+seedFeatsIdx.size+" conn.size="+seedConnIdx.size);
+		if (verbose != null)
+			verbose.println("ENTER projectiveSceneN: seed=" + seed.id + " common.size=" + seedFeatsIdx.size + " conn.size=" + seedConnIdx.size);
 
-			// initialize data structures
+		// initialize data structures
 		utils.db = db;
 		viewsByStructureIndex.reset();
 
 		// find the 3 view combination with the best score
-		if( !selectInitialTriplet(seed,seedConnIdx,selectedTriple)) {
-			if( verbose != null ) verbose.println("failed to select initial triplet");
+		if (!selectInitialTriplet(seed, seedConnIdx, selectedTriple)) {
+			if (verbose != null) verbose.println("failed to select initial triplet");
 			return false;
 		}
 
@@ -139,15 +140,15 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		utils.createThreeViewLookUpTables();
 		utils.findCommonFeatures(seedFeatsIdx);
 
-		if( verbose != null ) {
+		if (verbose != null) {
 			verbose.println("Selected Triplet: seed='" + utils.seed.id + "' viewB='" + utils.viewB.id + "' viewC='" +
-					utils.viewC.id + "' common.size=" + utils.commonIdx.size+" connections.size="+seedConnIdx.size);
+					utils.viewC.id + "' common.size=" + utils.commonIdx.size + " connections.size=" + seedConnIdx.size);
 		}
 
 		// Estimate the initial projective cameras using trifocal tensor
 		utils.createTripleFromCommon();
-		if( !utils.estimateProjectiveCamerasRobustly() ) {
-			if( verbose != null ) verbose.println("failed to created projective from initial triplet");
+		if (!utils.estimateProjectiveCamerasRobustly()) {
+			if (verbose != null) verbose.println("failed to created projective from initial triplet");
 			return false;
 		}
 
@@ -156,11 +157,11 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// Estimate projective cameras for each view not in the original triplet
 		// This is simple because the 3D coordinate of each point is already known
-		if( seedConnIdx.size > 2 ) { // only do if more than 3 views
+		if (seedConnIdx.size > 2) { // only do if more than 3 views
 			initializeStructureForAllViews(db, utils.ransac.getMatchSet().size(), seed, seedConnIdx);
 
 			if (!findRemainingCameraMatrices(db, seed, seedConnIdx)) {
-				if( verbose != null ) verbose.println("Finding remaining cameras failed. TODO recover from this");
+				if (verbose != null) verbose.println("Finding remaining cameras failed. TODO recover from this");
 				return false;
 			}
 		} else {
@@ -168,13 +169,13 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			utils.initializeSbaSceneThreeView(true);
 			utils.initializeSbaObservationsThreeView();
 			viewsByStructureIndex.resize(3);
-			viewsByStructureIndex.set(0,utils.seed);
-			viewsByStructureIndex.set(1,utils.viewB);
-			viewsByStructureIndex.set(2,utils.viewC);
+			viewsByStructureIndex.set(0, utils.seed);
+			viewsByStructureIndex.set(1, utils.viewB);
+			viewsByStructureIndex.set(2, utils.viewC);
 		}
 
 		// sanity check for bugs
-		viewsByStructureIndex.forEach((i,o)-> assertBoof(o!=null));
+		viewsByStructureIndex.forEach(( i, o ) -> assertBoof(o != null));
 
 		// create observation data structure for SBA
 		createObservationsForBundleAdjustment(seedConnIdx);
@@ -187,36 +188,36 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Initializes the bundle adjustment structure for all views not just the initial set of 3. The seed view is
 	 * view index=0. The other views are in order of `seedConnIdx` after that.
 	 */
-	private void initializeStructureForAllViews(LookupSimilarImages db, int numberOfFeatures, View seed, GrowQueue_I32 seedConnIdx) {
-		utils.observations.initialize(1+seedConnIdx.size);
-		utils.structure.initialize(1+seedConnIdx.size,numberOfFeatures);
-		viewsByStructureIndex.resize(utils.structure.views.size,null);
+	private void initializeStructureForAllViews( LookupSimilarImages db, int numberOfFeatures, View seed, GrowQueue_I32 seedConnIdx ) {
+		utils.observations.initialize(1 + seedConnIdx.size);
+		utils.structure.initialize(1 + seedConnIdx.size, numberOfFeatures);
+		viewsByStructureIndex.resize(utils.structure.views.size, null);
 
 		utils.triangulateFeatures();
 
 		// Added the seed view
-		db.lookupShape(seed.id,shape);
-		utils.structure.setView(0,true, utils.P1,shape.width,shape.height);
+		db.lookupShape(seed.id, shape);
+		utils.structure.setView(0, true, utils.P1, shape.width, shape.height);
 
 		// Add the two views connected to it. Note that the index of these views is based on their index
 		// in the seedConnIdx list
-		int indexSbaViewB = 1+seedConnIdx.indexOf(selectedTriple[0]);
-		int indexSbaViewC = 1+seedConnIdx.indexOf(selectedTriple[1]);
-		assertBoof(indexSbaViewB > 0 && indexSbaViewC > 0,"indexOf() failed");
+		int indexSbaViewB = 1 + seedConnIdx.indexOf(selectedTriple[0]);
+		int indexSbaViewC = 1 + seedConnIdx.indexOf(selectedTriple[1]);
+		assertBoof(indexSbaViewB > 0 && indexSbaViewC > 0, "indexOf() failed");
 
 		for (int i = 0; i < 2; i++) {
 			Motion motion = seed.connections.get(selectedTriple[i]);
 			View view = motion.other(seed);
-			db.lookupShape(view.id,shape);
+			db.lookupShape(view.id, shape);
 			utils.structure.setView(
-					i==0?indexSbaViewB:indexSbaViewC,false,
-					i==0?utils.P2:utils.P3,shape.width,shape.height);
+					i == 0 ? indexSbaViewB : indexSbaViewC, false,
+					i == 0 ? utils.P2 : utils.P3, shape.width, shape.height);
 		}
 
 		// create lookup table
-		viewsByStructureIndex.set(0,seed);
-		viewsByStructureIndex.set(indexSbaViewB,utils.viewB);
-		viewsByStructureIndex.set(indexSbaViewC,utils.viewC);
+		viewsByStructureIndex.set(0, seed);
+		viewsByStructureIndex.set(indexSbaViewB, utils.viewB);
+		viewsByStructureIndex.set(indexSbaViewC, utils.viewC);
 
 		// Observations for the initial three view
 		SceneObservations.View view1 = utils.observations.getView(0);
@@ -226,19 +227,19 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		for (int i = 0; i < utils.inliersThreeView.size(); i++) {
 			AssociatedTriple t = utils.inliersThreeView.get(i);
 
-			view1.add(i,(float)t.p1.x,(float)t.p1.y);
-			view2.add(i,(float)t.p2.x,(float)t.p2.y);
-			view3.add(i,(float)t.p3.x,(float)t.p3.y);
+			view1.add(i, (float)t.p1.x, (float)t.p1.y);
+			view2.add(i, (float)t.p2.x, (float)t.p2.y);
+			view3.add(i, (float)t.p3.x, (float)t.p3.y);
 		}
 	}
 
 	/**
 	 * Create look up tables to go from seed feature index to structure feature index.
-	 *                                       ransac inlier index to seed feature index
+	 * ransac inlier index to seed feature index
 	 *
 	 * Only points that are in the inlier set are part of the scene's structure.
 	 */
-	void createStructureLookUpTables(View viewA) {
+	void createStructureLookUpTables( View viewA ) {
 		final int numInliers = utils.ransac.getMatchSet().size();
 		seedToStructure.resize(viewA.totalObservations);
 		seedToStructure.fill(-1); // -1 indicates no match
@@ -255,22 +256,23 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/**
 	 * Exhaustively look at all triplets that connect with the seed view
+	 *
 	 * @param edgeIdxs (input) List of edges in seed it will consider
 	 * @param selected (output) Indexes of the two selected edges going out of `seed`
 	 */
-	boolean selectInitialTriplet( View seed , GrowQueue_I32 edgeIdxs , int[] selected ) {
-		assertBoof(selected.length==2);
+	boolean selectInitialTriplet( View seed, GrowQueue_I32 edgeIdxs, int[] selected ) {
+		assertBoof(selected.length == 2);
 		double bestScore = 0; // zero is used for invalid triples
 		for (int i = 0; i < edgeIdxs.size; i++) {
 			int edgeI = edgeIdxs.get(i);
 			View viewB = seed.connections.get(edgeI).other(seed);
 
-			for (int j = i+1; j < edgeIdxs.size; j++) {
+			for (int j = i + 1; j < edgeIdxs.size; j++) {
 				int edgeJ = edgeIdxs.get(j);
 				View viewC = seed.connections.get(edgeJ).other(seed);
 
-				double s = scoreTripleView(seed,viewB,viewC);
-				if( s > bestScore ) {
+				double s = scoreTripleView(seed, viewB, viewC);
+				if (s > bestScore) {
 					bestScore = s;
 					selected[0] = edgeI;
 					selected[1] = edgeJ;
@@ -282,13 +284,14 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/**
 	 * Evaluates how well this set of 3-views can be used to estimate the scene's 3D structure
+	 *
 	 * @return higher is better. zero means worthless
 	 */
-	double scoreTripleView(View seedA, View viewB , View viewC ) {
+	double scoreTripleView( View seedA, View viewB, View viewC ) {
 		Motion motionAB = seedA.findMotion(viewB);
 		Motion motionAC = seedA.findMotion(viewC);
 		Motion motionBC = viewB.findMotion(viewC);
-		if( motionBC == null )
+		if (motionBC == null)
 			return 0;
 
 		double score = 0;
@@ -305,8 +308,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 *
 	 * @return true if successful or false if not
 	 */
-	boolean findRemainingCameraMatrices(LookupSimilarImages db, View seed, GrowQueue_I32 seedConnIdx) {
-		assertBoof(inlierToSeed.size==utils.inliersThreeView.size());
+	boolean findRemainingCameraMatrices( LookupSimilarImages db, View seed, GrowQueue_I32 seedConnIdx ) {
+		assertBoof(inlierToSeed.size == utils.inliersThreeView.size());
 
 		// Look up the 3D coordinates of features from the scene's structure previously computed
 		points3D.reset(); // points in 3D
@@ -323,41 +326,41 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			assocPixel.get(i).p1.set(utils.inliersThreeView.get(i).p1);
 		}
 
-		var cameraMatrix = new DMatrixRMaj(3,4);
+		var cameraMatrix = new DMatrixRMaj(3, 4);
 		for (int motionIdx = 0; motionIdx < seedConnIdx.size; motionIdx++) {
 			int connectionIdx = seedConnIdx.get(motionIdx);
 			// skip views already in the scene's structure
-			if( connectionIdx == selectedTriple[0] || connectionIdx == selectedTriple[1])
+			if (connectionIdx == selectedTriple[0] || connectionIdx == selectedTriple[1])
 				continue;
 			Motion edge = seed.connections.get(connectionIdx);
 			View viewI = edge.other(seed);
 
 			// Lookup pixel locations of features in the connected view
 			db.lookupShape(viewI.id, utils.dimenB);
-			db.lookupPixelFeats(viewI.id,utils.featsB);
-			BoofMiscOps.offsetPixels(utils.featsB.toList(),-utils.dimenB.width/2, -utils.dimenB.height/2);
+			db.lookupPixelFeats(viewI.id, utils.featsB);
+			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
 
-			if ( !computeCameraMatrix(seed, edge,utils.featsB,cameraMatrix) ) {
-				if( verbose != null ) verbose.println("Pose estimator failed! view='"+viewI.id+"'");
+			if (!computeCameraMatrix(seed, edge, utils.featsB, cameraMatrix)) {
+				if (verbose != null) verbose.println("Pose estimator failed! view='" + viewI.id + "'");
 				return false; // TODO skip over this view instead
 			}
-			if( verbose != null ) verbose.println("Expanded initial scene to include view='"+viewI.id+"'");
+			if (verbose != null) verbose.println("Expanded initial scene to include view='" + viewI.id + "'");
 
 			//---------------------------------------------------------------------------
 			// Add all the information from this view to SBA data structure
-			int indexSbaView = motionIdx+1;
+			int indexSbaView = motionIdx + 1;
 			// image information and found camera matrix
-			db.lookupShape(edge.other(seed).id,shape);
-			utils.structure.setView(indexSbaView,false,cameraMatrix,shape.width,shape.height);
+			db.lookupShape(edge.other(seed).id, shape);
+			utils.structure.setView(indexSbaView, false, cameraMatrix, shape.width, shape.height);
 			// observation of features
 			SceneObservations.View sbaObsView = utils.observations.getView(indexSbaView);
-			assertBoof(sbaObsView.size()==0,"Must be reset to initial state first");
+			assertBoof(sbaObsView.size() == 0, "Must be reset to initial state first");
 			for (int i = 0; i < inlierToSeed.size; i++) {
 				Point2D_F64 p = assocPixel.get(i).p2;
-				sbaObsView.add(i,(float)p.x,(float)p.y);
+				sbaObsView.add(i, (float)p.x, (float)p.y);
 			}
 
-			viewsByStructureIndex.set(indexSbaView,viewI);
+			viewsByStructureIndex.set(indexSbaView, viewI);
 		}
 
 		return true;
@@ -372,8 +375,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param cameraMatrix (Output) resulting camera matrix
 	 * @return true if successful
 	 */
-	boolean computeCameraMatrix(View seed, Motion edge, FastQueue<Point2D_F64> featsB, DMatrixRMaj cameraMatrix ) {
-		assertBoof(assocPixel.size==inlierToSeed.size);
+	boolean computeCameraMatrix( View seed, Motion edge, FastQueue<Point2D_F64> featsB, DMatrixRMaj cameraMatrix ) {
+		assertBoof(assocPixel.size == inlierToSeed.size);
 
 		// how to convert a feature in the seed to one in viewI
 		PairwiseGraphUtils.createTableViewAtoB(seed, edge, utils.table_A_to_B);
@@ -383,11 +386,11 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			int seedIdx = inlierToSeed.get(i);
 			int dstIdx = utils.table_A_to_B.data[seedIdx];
 			// Assume that p1 from the seed view has already been set
-			assocPixel.get(i).p2.set( featsB.get(dstIdx) );
+			assocPixel.get(i).p2.set(featsB.get(dstIdx));
 		}
 
 		// Estimate the camera matrix given homogenous pixel observations
-		if( utils.poseEstimator.processHomogenous(assocPixel.toList(), points3D.toList()) ) {
+		if (utils.poseEstimator.processHomogenous(assocPixel.toList(), points3D.toList())) {
 			cameraMatrix.set(utils.poseEstimator.getProjective());
 			return true;
 		} else {
@@ -397,11 +400,12 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/**
 	 * Convert observations into a format which bundle adjustment will understand
+	 *
 	 * @param seedConnIdx Which edges in seed to use
 	 */
-	protected void createObservationsForBundleAdjustment(GrowQueue_I32 seedConnIdx) {
+	protected void createObservationsForBundleAdjustment( GrowQueue_I32 seedConnIdx ) {
 		// seed view + the motions
-		utils.observations.initialize(seedConnIdx.size+1);
+		utils.observations.initialize(seedConnIdx.size + 1);
 		inlierIndexes.resize(seedConnIdx.size);
 
 		// Observations for the seed view are a special case
@@ -411,18 +415,18 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 				int id = inlierToSeed.data[i];
 				Point2D_F64 o = utils.featsA.get(id); // featsA is never modified after initially loaded
 				id = seedToStructure.data[id];
-				obsView.add(id, (float) o.x, (float) o.y);
+				obsView.add(id, (float)o.x, (float)o.y);
 			}
 		}
 
 		// Now add observations for edges connected to the seed
 		for (int motionIdx = 0; motionIdx < seedConnIdx.size(); motionIdx++) {
-			SceneObservations.View obsView = utils.observations.getView(motionIdx+1);
+			SceneObservations.View obsView = utils.observations.getView(motionIdx + 1);
 			Motion m = utils.seed.connections.get(seedConnIdx.get(motionIdx));
 			View v = m.other(utils.seed);
 			boolean seedIsSrc = m.src == utils.seed;
 			utils.db.lookupShape(v.id, utils.dimenB);
-			utils.db.lookupPixelFeats(v.id,utils.featsB);
+			utils.db.lookupPixelFeats(v.id, utils.featsB);
 			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
 
 			// indicate which observation from this view contributed to which 3D feature
@@ -432,34 +436,34 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			for (int epipolarInlierIdx = 0; epipolarInlierIdx < m.inliers.size; epipolarInlierIdx++) {
 				AssociatedIndex a = m.inliers.get(epipolarInlierIdx);
 				// See if the feature is one of inliers computed from 3-view RANSAC
-				int structId = seedToStructure.data[seedIsSrc?a.src:a.dst];
-				if( structId < 0 )
+				int structId = seedToStructure.data[seedIsSrc ? a.src : a.dst];
+				if (structId < 0)
 					continue;
 				// get the observation in this view to that feature[structId]
-				connInlierIndexes.set(structId,seedIsSrc?a.dst:a.src);
-				Point2D_F64 o = utils.featsB.get(seedIsSrc?a.dst:a.src);
-				obsView.add(structId,(float)o.x,(float)o.y);
+				connInlierIndexes.set(structId, seedIsSrc ? a.dst : a.src);
+				Point2D_F64 o = utils.featsB.get(seedIsSrc ? a.dst : a.src);
+				obsView.add(structId, (float)o.x, (float)o.y);
 			}
 		}
 	}
 
 	/**
 	 * Copies results into a format that's useful for projective to metric conversion
+	 *
 	 * @param viewIds (Output) ID of each view
 	 * @param dimensions (Output) Shape of images in each view
 	 * @param cameraMatrices (Output) Found camera matrices. view[0] is skipped since it is identity
 	 * @param observations (Output) Found observations shifted to have (0,0) center
 	 */
-	public void lookupInfoForMetricElevation(List<String> viewIds,
-											 FastQueue<ImageDimension> dimensions,
-											 FastQueue<DMatrixRMaj> cameraMatrices,
-											 FastQueue<AssociatedTupleDN> observations)
-	{
+	public void lookupInfoForMetricElevation( List<String> viewIds,
+											  FastQueue<ImageDimension> dimensions,
+											  FastQueue<DMatrixRMaj> cameraMatrices,
+											  FastQueue<AssociatedTupleDN> observations ) {
 		// Initialize all data structures to the correct size
 		final int numViews = utils.structure.views.size;
 		viewIds.clear();
 		dimensions.resize(numViews);
-		cameraMatrices.resize(numViews-1);
+		cameraMatrices.resize(numViews - 1);
 		observations.resize(inlierToSeed.size);
 
 		for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
@@ -468,17 +472,17 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// Copy results from bundle adjustment data structures
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
-			if( viewIdx != 0 )
-				cameraMatrices.get(viewIdx-1).set(utils.structure.views.get(viewIdx).worldToView);
+			if (viewIdx != 0)
+				cameraMatrices.get(viewIdx - 1).set(utils.structure.views.get(viewIdx).worldToView);
 			String id = viewsByStructureIndex.get(viewIdx).id;
-			viewIds.add( id );
-			utils.db.lookupShape(id, dimensions.get(viewIdx) );
+			viewIds.add(id);
+			utils.db.lookupShape(id, dimensions.get(viewIdx));
 
 			SceneObservations.View oview = utils.observations.views.get(viewIdx);
 			assertBoof(oview.size() == observations.size);
 
 			for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
-				oview.get(obsIdx,observations.get(obsIdx).get(viewIdx));
+				oview.get(obsIdx, observations.get(obsIdx).get(viewIdx));
 			}
 		}
 	}
@@ -498,7 +502,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
 	}
 }

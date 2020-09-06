@@ -35,7 +35,7 @@ import java.util.List;
  *     <li>Input: A seed view and the known graph</li>
  *     <li>Selects two other views with known camera matrices</li>
  *     <li>Finds features in common with all three views</li>
-*      <li>Trifocal tensor and RANSAC to find the unknown seed camera matrix</li>
+ *     <li>Trifocal tensor and RANSAC to find the unknown seed camera matrix</li>
  *     <li>Bundle Adjustment to refine estimate</li>
  *     <li>Makes the new camera matrix compatible with the existing ones</li>
  * </ol>
@@ -57,8 +57,8 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 	List<Motion> connections = new ArrayList<>();
 
 	// homography to convert local camera matrices into ones in global
-	DMatrixRMaj localToGlobal = new DMatrixRMaj(4,4);
-	DMatrixRMaj globalToLocal = new DMatrixRMaj(4,4);
+	DMatrixRMaj localToGlobal = new DMatrixRMaj(4, 4);
+	DMatrixRMaj globalToLocal = new DMatrixRMaj(4, 4);
 
 	// Storage for camera matrices
 	List<DMatrixRMaj> camerasLocal = new ArrayList<>();
@@ -73,21 +73,20 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 	 * @param cameraMatrix (output) the found camera matrix
 	 * @return true if successful and the camera matrix computed
 	 */
-	public boolean process( LookupSimilarImages db ,
-							SceneWorkingGraph workGraph ,
-							View target ,
-							DMatrixRMaj cameraMatrix )
-	{
+	public boolean process( LookupSimilarImages db,
+							SceneWorkingGraph workGraph,
+							View target,
+							DMatrixRMaj cameraMatrix ) {
 		this.workGraph = workGraph;
 		this.utils.db = db;
 
 		// Select two known connected Views
-		if( !selectTwoConnections(target,connections) ) {
-			if( verbose != null ) {
-				verbose.println( "Failed to expand because two connections couldn't be found. valid.size=" +
+		if (!selectTwoConnections(target, connections)) {
+			if (verbose != null) {
+				verbose.println("Failed to expand because two connections couldn't be found. valid.size=" +
 						validCandidates.size());
 				for (int i = 0; i < validCandidates.size(); i++) {
-					verbose.println("   valid view.id='"+validCandidates.get(i).other(target).id+"'");
+					verbose.println("   valid view.id='" + validCandidates.get(i).other(target).id + "'");
 				}
 			}
 			return false;
@@ -100,14 +99,14 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 		utils.createThreeViewLookUpTables();
 		utils.findCommonFeatures();
 
-		if( verbose != null ) {
-			verbose.println( "Expanding to view='"+target.id+"' using views ( '"+utils.viewB.id+"' , '"+utils.viewC.id+
-					"') common="+utils.commonIdx.size+" valid.size="+validCandidates.size());
+		if (verbose != null) {
+			verbose.println("Expanding to view='" + target.id + "' using views ( '" + utils.viewB.id + "' , '" + utils.viewC.id +
+					"') common=" + utils.commonIdx.size + " valid.size=" + validCandidates.size());
 		}
 
 		// Estimate trifocal tensor using three view observations
 		utils.createTripleFromCommon();
-		if( !utils.estimateProjectiveCamerasRobustly() )
+		if (!utils.estimateProjectiveCamerasRobustly())
 			return false;
 
 		// Compute the conversion which will make the two frames compatible
@@ -118,9 +117,9 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 		// It's important to optimize in the local frame since numbers involved will not be too large or small
 		// NOTE: Still might not be a bad idea to adjust the scale of everything first
 		// The lines below convert the known camera frames from global into local frame
-		CommonOps_DDRM.invert(localToGlobal,globalToLocal);
-		CommonOps_DDRM.mult(workGraph.lookupView(utils.viewB.id).projective,globalToLocal,utils.P2);
-		CommonOps_DDRM.mult(workGraph.lookupView(utils.viewC.id).projective,globalToLocal,utils.P3);
+		CommonOps_DDRM.invert(localToGlobal, globalToLocal);
+		CommonOps_DDRM.mult(workGraph.lookupView(utils.viewB.id).projective, globalToLocal, utils.P2);
+		CommonOps_DDRM.mult(workGraph.lookupView(utils.viewC.id).projective, globalToLocal, utils.P3);
 
 		// fix cameras P2 and P3 and let everything else float
 		utils.initializeSbaSceneThreeView(false);
@@ -128,7 +127,7 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 		utils.refineWithBundleAdjustment();
 
 		// Convert the refined results into global projective frame
-		CommonOps_DDRM.mult(utils.structure.getViews().get(0).worldToView,localToGlobal,cameraMatrix);
+		CommonOps_DDRM.mult(utils.structure.getViews().get(0).worldToView, localToGlobal, cameraMatrix);
 
 		return true;
 	}

@@ -25,6 +25,8 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.VerbosePrint;
@@ -48,21 +50,21 @@ import java.util.*;
  * @author Peter Abeles
  */
 public class GeneratePairwiseImageGraph implements VerbosePrint {
-	public PairwiseImageGraph2 graph = new PairwiseImageGraph2();
+	public final @Getter PairwiseImageGraph2 graph = new PairwiseImageGraph2();
 	private List<String> imageIds;
 
 	// concensus matching algorithms
 	ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
-	ModelMatcher<Homography2D_F64,AssociatedPair> ransacH;
+	ModelMatcher<Homography2D_F64, AssociatedPair> ransacH;
 
 	/**
 	 * The minimum number of inliers for an edge to be accepted
 	 */
-	public int minimumInliers = 30;
+	public @Getter @Setter int minimumInliers = 30;
 	/**
 	 * If number of matches from fundamental divided by homography is more than this then it is considered a 3D scene
 	 */
-	public double ratio3D = 1.5;
+	public @Getter @Setter double ratio3D = 1.5;
 
 	private PrintStream verbose;
 
@@ -83,8 +85,8 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		configF.errorModel = ConfigFundamental.ErrorModel.GEOMETRIC;
 		configF.numResolve = 1;
 
-		ransac3D = FactoryMultiViewRobust.fundamentalRansac(configF,configRansacF);
-		ransacH = FactoryMultiViewRobust.homographyRansac(null,configRansacH);
+		ransac3D = FactoryMultiViewRobust.fundamentalRansac(configF, configRansacF);
+		ransacH = FactoryMultiViewRobust.homographyRansac(null, configRansacH);
 	}
 
 	/**
@@ -104,25 +106,25 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
 		// map to quickly look up the ID of a view
-		Map<String,Integer> imageToindex = new HashMap<>();
+		Map<String, Integer> imageToindex = new HashMap<>();
 
 		// Create a node in the graph for each image
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
-			imageToindex.put(imageIds.get(idxTgt),idxTgt);
+			imageToindex.put(imageIds.get(idxTgt), idxTgt);
 			graph.createNode(imageIds.get(idxTgt));
 		}
 
-		if( verbose != null ) verbose.println("total images = "+imageIds.size());
+		if (verbose != null) verbose.println("total images = " + imageIds.size());
 
 		// For each image examine all related images for a true geometric relationship
 		// if one exists then add an edge to the graph describing their relationship
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
 			String src = imageIds.get(idxTgt);
 
-			db.findSimilar(src,similar);
-			db.lookupPixelFeats(src,srcFeats);
+			db.findSimilar(src, similar);
+			db.lookupPixelFeats(src, srcFeats);
 
-			if( verbose != null ) verbose.println("ID="+src+" similar="+similar.size()+"  obs="+srcFeats.size);
+			if (verbose != null) verbose.println("ID=" + src + " similar=" + similar.size() + "  obs=" + srcFeats.size);
 
 			graph.nodes.get(idxTgt).totalObservations = srcFeats.size;
 
@@ -131,20 +133,20 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 				// make sure it isn't considering the same motion twice
 				int dstIdx = imageToindex.get(dst);
-				if( dstIdx <= idxTgt )
+				if (dstIdx <= idxTgt)
 					continue;
 
 				// get information on the features and association
-				db.lookupPixelFeats(dst,dstFeats);
-				db.lookupMatches(src,dst,matches);
+				db.lookupPixelFeats(dst, dstFeats);
+				db.lookupMatches(src, dst, matches);
 
 				pairs.reset();
 				for (int i = 0; i < matches.size; i++) {
 					AssociatedIndex m = matches.get(i);
-					pairs.grow().set(srcFeats.get(m.src),dstFeats.get(m.dst));
+					pairs.grow().set(srcFeats.get(m.src), dstFeats.get(m.dst));
 				}
 
-				createEdge(src,dst,pairs,matches);
+				createEdge(src, dst, pairs, matches);
 			}
 		}
 	}
@@ -158,58 +160,59 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	 * @param pairs Associated features pixels
 	 * @param matches Associated features feature indexes
 	 */
-	protected void createEdge( String src , String dst ,
-							   FastQueue<AssociatedPair> pairs , FastQueue<AssociatedIndex> matches ) {
+	protected void createEdge( String src, String dst,
+							   FastQueue<AssociatedPair> pairs, FastQueue<AssociatedIndex> matches ) {
 		// Fitting Essential/Fundamental works when the scene is not planar and not pure rotation
 		int countF = 0;
-		if( ransac3D.process(pairs.toList()) ) {
+		if (ransac3D.process(pairs.toList())) {
 			countF = ransac3D.getMatchSet().size();
 		}
 
 		// Fitting homography will work when all or part of the scene is planar or motion is pure rotation
 		int countH = 0;
-		if( ransacH.process(pairs.toList()) ) {
+		if (ransacH.process(pairs.toList())) {
 			countH = ransacH.getMatchSet().size();
 		}
 
 		if( verbose != null ) verbose.println("   dst='"+dst+"' ransac F="+countF+" H="+countH+" pairs.size="+pairs.size());
 
 		// fail if not enough features are remaining after RANSAC
-		if( Math.max(countF,countH) < minimumInliers )
+		if (Math.max(countF, countH) < minimumInliers)
 			return;
 
 		// The idea here is that if the number features for F is greater than H then it's a 3D scene.
 		// If they are similar then it might be a plane
-		boolean is3D = countF > countH*ratio3D;
+		boolean is3D = countF > countH * ratio3D;
 
 		PairwiseImageGraph2.Motion edge = graph.edges.grow();
 		edge.is3D = is3D;
 		edge.countF = countF;
 		edge.countH = countH;
-		edge.index = graph.edges.size-1;
+		edge.index = graph.edges.size - 1;
 		edge.src = graph.lookupNode(src);
 		edge.dst = graph.lookupNode(dst);
 		edge.src.connections.add(edge);
 		edge.dst.connections.add(edge);
 
-		if( is3D ) {
-			saveInlierMatches(ransac3D, matches,edge);
+		if (is3D) {
+			saveInlierMatches(ransac3D, matches, edge);
 			edge.F.set(ransac3D.getModelParameters());
 		} else {
-			saveInlierMatches(ransacH, matches,edge);
+			saveInlierMatches(ransacH, matches, edge);
 			Homography2D_F64 H = ransacH.getModelParameters();
-			ConvertDMatrixStruct.convert(H,edge.F);
+			ConvertDMatrixStruct.convert(H, edge.F);
 		}
 	}
 
 	/**
 	 * Puts the inliers from RANSAC into the edge's list of associated features
+	 *
 	 * @param ransac RANSAC
 	 * @param matches List of matches from feature association
 	 * @param edge The edge that the inliers are to be saved to
 	 */
-	private void saveInlierMatches(ModelMatcher<?, ?> ransac,
-								   FastQueue<AssociatedIndex> matches, PairwiseImageGraph2.Motion edge) {
+	private void saveInlierMatches( ModelMatcher<?, ?> ransac,
+									FastQueue<AssociatedIndex> matches, PairwiseImageGraph2.Motion edge ) {
 
 		int N = ransac.getMatchSet().size();
 		edge.inliers.reset();
@@ -220,28 +223,8 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		}
 	}
 
-	public PairwiseImageGraph2 getGraph() {
-		return graph;
-	}
-
-	public int getMinimumInliers() {
-		return minimumInliers;
-	}
-
-	public void setMinimumInliers(int minimumInliers) {
-		this.minimumInliers = minimumInliers;
-	}
-
-	public double getRatio3D() {
-		return ratio3D;
-	}
-
-	public void setRatio3D(double ratio3D) {
-		this.ratio3D = ratio3D;
-	}
-
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
 	}
 }

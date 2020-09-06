@@ -48,51 +48,51 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 
 		var alg = new ProjectiveReconstructionFromPairwiseGraph();
 		for (int numViews = 3; numViews <= 20; numViews++) {
-			System.out.println("numViews = "+numViews);
-			var db = new MockLookupSimilarImagesRealistic().setLoop(false).setSeed(numViews).setFeatures(450).pathLine(numViews,0.30,6.0,2);
+			System.out.println("numViews = " + numViews);
+			var db = new MockLookupSimilarImagesRealistic().setLoop(false).setSeed(numViews).setFeatures(450).pathLine(numViews, 0.30, 6.0, 2);
 			PairwiseImageGraph2 graph = db.createPairwise();
-			assertTrue(alg.process(db,graph));
-			checkCameraMatrices(alg,db);
+			assertTrue(alg.process(db, graph));
+			checkCameraMatrices(alg, db);
 		}
 	}
 
 	/**
 	 * Compare found camera matrices against truth by converting them into the same projective scale
 	 */
-	private void checkCameraMatrices(ProjectiveReconstructionFromPairwiseGraph alg, MockLookupSimilarImagesRealistic db) {
+	private void checkCameraMatrices( ProjectiveReconstructionFromPairwiseGraph alg, MockLookupSimilarImagesRealistic db ) {
 		List<SceneWorkingGraph.View> foundViews = alg.workGraph.getAllViews();
 		assertEquals(db.views.size(), foundViews.size());
 
 		// Undo apply and undo the shift in pixel coordinates
 		DMatrixRMaj M_inv = CommonOps_DDRM.identity(3);
-		M_inv.set(0,2,db.intrinsic.width/2);
-		M_inv.set(1,2,db.intrinsic.height/2);
+		M_inv.set(0, 2, db.intrinsic.width/2);
+		M_inv.set(1, 2, db.intrinsic.height/2);
 
-		var tmp = new DMatrixRMaj(3,4);
+		var tmp = new DMatrixRMaj(3, 4);
 
 		CompatibleProjectiveHomography compatible = new CompatibleProjectiveHomography();
 		List<DMatrixRMaj> listA = new ArrayList<>();
 		List<DMatrixRMaj> listB = new ArrayList<>();
 
-		for( MockLookupSimilarImagesRealistic.View mv : db.views ) {
-			DMatrixRMaj found = alg.workGraph.lookupView( mv.id ).projective;
+		for (MockLookupSimilarImagesRealistic.View mv : db.views) {
+			DMatrixRMaj found = alg.workGraph.lookupView(mv.id).projective;
 //			found.print();
-			CommonOps_DDRM.mult(M_inv,found, tmp);
-			listA.add( tmp.copy() );
-			listB.add( mv.camera );
+			CommonOps_DDRM.mult(M_inv, found, tmp);
+			listA.add(tmp.copy());
+			listB.add(mv.camera);
 		}
 
-		DMatrixRMaj H = new DMatrixRMaj(4,4);
-		assertTrue(compatible.fitCameras(listA,listB,H));
+		DMatrixRMaj H = new DMatrixRMaj(4, 4);
+		assertTrue(compatible.fitCameras(listA, listB, H));
 
-		DMatrixRMaj found = new DMatrixRMaj(3,4);
+		DMatrixRMaj found = new DMatrixRMaj(3, 4);
 		for (int i = 0; i < listA.size(); i++) {
-			CommonOps_DDRM.mult(listA.get(i),H,found);
+			CommonOps_DDRM.mult(listA.get(i), H, found);
 			DMatrixRMaj expected = listB.get(i);
-			double scale = MultiViewOps.findScale(found,expected);
-			CommonOps_DDRM.scale(scale,found);
+			double scale = MultiViewOps.findScale(found, expected);
+			CommonOps_DDRM.scale(scale, found);
 			double tol = CommonOps_DDRM.elementMaxAbs(found)*1e-6; // TODO change to 1e-7
-			assertTrue(MatrixFeatures_DDRM.isIdentical(expected,found, tol));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(expected, found, tol));
 		}
 	}
 }

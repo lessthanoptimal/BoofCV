@@ -45,7 +45,7 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
 public class SceneWorkingGraph {
 
 	/** List of all views in the scene graph. Look up based on the image/view's id */
-	public final Map<String,View> views = new HashMap<>();
+	public final Map<String, View> views = new HashMap<>();
 	public final List<View> viewList = new ArrayList<>();
 	/** List of all features in the scene */
 	public final List<Feature> features = new ArrayList<>(); // TODO change to something else so remove() is faster
@@ -63,21 +63,21 @@ public class SceneWorkingGraph {
 		return views.get(id);
 	}
 
-
 	public boolean isKnown( PairwiseImageGraph2.View pview ) {
 		return views.containsKey(pview.id);
 	}
 
 	/**
 	 * Adds a new view to the graph. If the view already exists an exception is thrown
+	 *
 	 * @param pview (Input) Pairwise view to create the new view from.
 	 * @return The new view created
 	 */
 	public View addView( PairwiseImageGraph2.View pview ) {
 		View v = new View();
 		v.pview = pview;
-		assertBoof(null==views.put(v.pview.id,v),
-				"There shouldn't be an existing view with the same key: '"+v.pview.id+"'");
+		assertBoof(null == views.put(v.pview.id, v),
+				"There shouldn't be an existing view with the same key: '" + v.pview.id + "'");
 		viewList.add(v);
 		return v;
 	}
@@ -103,13 +103,13 @@ public class SceneWorkingGraph {
 		public final List<Observation> observations = new ArrayList<>();
 
 		public void reset() {
-			location.set(Double.NaN,Double.NaN,Double.NaN,Double.NaN);
+			location.set(Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 			observations.clear();
 		}
 
-		public Point2D_F64 findObservation(View v) {
+		public Point2D_F64 findObservation( View v ) {
 			for (int i = 0; i < observations.size(); i++) {
-				if( observations.get(i).view == v )
+				if (observations.get(i).view == v)
 					return observations.get(i).pixel;
 			}
 			return null;
@@ -130,7 +130,7 @@ public class SceneWorkingGraph {
 
 		public Observation() {}
 
-		public Observation(View view, int observationIdx) {
+		public Observation( View view, int observationIdx ) {
 			this.view = view;
 			this.observationIdx = observationIdx;
 		}
@@ -138,32 +138,25 @@ public class SceneWorkingGraph {
 		public void reset() {
 			this.view = null;
 			this.observationIdx = -1;
-			this.pixel.set(Double.NaN,-Double.NaN);
+			this.pixel.set(Double.NaN, -Double.NaN);
 		}
 	}
 
 	/**
 	 * Information on the set of inlier observations used to compute the camera location
 	 */
-	public static class InlierInfo
-	{
+	public static class InlierInfo {
 		// List of views from which these inliers were selected from
 		// the first view is always the view which contains this set of info
 		public final FastArray<PairwiseImageGraph2.View> views = new FastArray<>(PairwiseImageGraph2.View.class);
 		// indexes of observations for each view listed in 'views'.  obs[view][idx] will refer to the same feature
 		// for all 'idx'
-		public final FastQueue<GrowQueue_I32> observations = new FastQueue<>(GrowQueue_I32::new,GrowQueue_I32::reset);
+		public final FastQueue<GrowQueue_I32> observations = new FastQueue<>(GrowQueue_I32::new, GrowQueue_I32::reset);
 
-		public boolean isEmpty() {
-			return observations.size==0;
-		}
+		public boolean isEmpty() { return observations.size == 0; }
 
-		/**
-		 * Returns total number of features are included in this inlier set
-		 */
-		public int getInlierCount() {
-			return observations.get(0).size;
-		}
+		/**  Returns total number of features are included in this inlier set */
+		public int getInlierCount() { return observations.get(0).size; }
 
 		public void reset() {
 			views.reset();
@@ -186,7 +179,7 @@ public class SceneWorkingGraph {
 		public final InlierInfo inliers = new InlierInfo();
 
 		// projective camera matrix
-		public final DMatrixRMaj projective = new DMatrixRMaj(3,4);
+		public final DMatrixRMaj projective = new DMatrixRMaj(3, 4);
 		// metric camera
 		public final BundlePinholeSimplified intrinsic = new BundlePinholeSimplified();
 		public final Se3_F64 world_to_view = new Se3_F64();
@@ -204,21 +197,27 @@ public class SceneWorkingGraph {
 
 		/**
 		 * Assigns the specified observation in this view to the specified feature
+		 *
 		 * @param observationIdx Index of the observation
 		 * @param feature Which feature it belongs to
 		 */
-		public void setObsToFeature( int observationIdx , Feature feature ) {
-			obs_to_feat.put(observationIdx,feature);
+		public void setObsToFeature( int observationIdx, Feature feature ) {
+			obs_to_feat.put(observationIdx, feature);
 		}
 
 		public void reset() {
 			index = -1;
 			pview = null;
-			imageDimension.set(-1,-1);
+			imageDimension.set(-1, -1);
 			obs_to_feat.clear();
 			projective.zero();
 			intrinsic.reset();
 			inliers.reset();
+		}
+
+		@Override
+		public String toString() {
+			return "View{id='" + pview.id + "' inliers=" + (!inliers.isEmpty()) + "}";
 		}
 	}
 }

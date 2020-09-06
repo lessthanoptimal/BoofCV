@@ -60,8 +60,7 @@ public abstract class ExpandByOneView implements VerbosePrint {
 	 * @param connections (output) the two selected connected views to the target
 	 * @return true if successful or false if it failed
 	 */
-	public boolean selectTwoConnections(PairwiseImageGraph2.View target , List<PairwiseImageGraph2.Motion> connections )
-	{
+	public boolean selectTwoConnections( PairwiseImageGraph2.View target, List<PairwiseImageGraph2.Motion> connections ) {
 		connections.clear();
 
 		// Create a list of connections in the target that can be used
@@ -70,40 +69,41 @@ public abstract class ExpandByOneView implements VerbosePrint {
 		double bestScore = 0.0;
 		for (int connectionCnt = 0; connectionCnt < validCandidates.size(); connectionCnt++) {
 			PairwiseImageGraph2.Motion connectB = validCandidates.get(connectionCnt);
-			PairwiseImageGraph2.Motion connectC = findBestCommon(target,connectB, validCandidates);
-			if( connectC == null )
+			PairwiseImageGraph2.Motion connectC = findBestCommon(target, connectB, validCandidates);
+			if (connectC == null)
 				continue; // no common connection could be found
 			PairwiseImageGraph2.View viewB = connectB.other(target);
 			PairwiseImageGraph2.View viewC = connectC.other(target);
 
 			PairwiseImageGraph2.Motion connectBtoC = viewB.findMotion(viewC);
-			assertBoof(connectBtoC!=null,"BUG");
+			assertBoof(connectBtoC != null, "BUG");
 
-			double score = Math.min(utils.scoreMotion.score(connectB) , utils.scoreMotion.score(connectC));
-			score = Math.min(score,utils.scoreMotion.score(connectBtoC));
+			double score = Math.min(utils.scoreMotion.score(connectB), utils.scoreMotion.score(connectC));
+			score = Math.min(score, utils.scoreMotion.score(connectBtoC));
 
-			if( score > bestScore ) {
+			if (score > bestScore) {
 				bestScore = score;
 				connections.clear();
 				connections.add(connectB);
 				connections.add(connectC);
 			}
 		}
-		if( verbose != null ) verbose.printf("best selected pair score=%f\n",bestScore);
+		if (verbose != null) verbose.printf("best selected pair score=%f\n", bestScore);
 
 		return !connections.isEmpty();
 	}
 
 	/**
 	 * Finds all the connections from the target view which are 3D and have known other views
+	 *
 	 * @param target (input)
 	 * @param validConnections (output)
 	 */
-	void createListOfValid(PairwiseImageGraph2.View target, List<PairwiseImageGraph2.Motion> validConnections) {
+	void createListOfValid( PairwiseImageGraph2.View target, List<PairwiseImageGraph2.Motion> validConnections ) {
 		validConnections.clear();
 		for (int connectionIdx = 0; connectionIdx < target.connections.size; connectionIdx++) {
 			PairwiseImageGraph2.Motion connectB = target.connections.get(connectionIdx);
-			if( !connectB.is3D || !workGraph.isKnown(connectB.other(target)))
+			if (!connectB.is3D || !workGraph.isKnown(connectB.other(target)))
 				continue;
 			validConnections.add(connectB);
 		}
@@ -118,8 +118,7 @@ public abstract class ExpandByOneView implements VerbosePrint {
 	 * @param validConnections (input) List of connections that are known to be valid potential solutions
 	 * @return The selected common view. null if none could be found
 	 */
-	public PairwiseImageGraph2.Motion findBestCommon(PairwiseImageGraph2.View viewA, PairwiseImageGraph2.Motion connAB , List<PairwiseImageGraph2.Motion> validConnections)
-	{
+	public PairwiseImageGraph2.Motion findBestCommon( PairwiseImageGraph2.View viewA, PairwiseImageGraph2.Motion connAB, List<PairwiseImageGraph2.Motion> validConnections ) {
 		double bestScore = 0.0;
 		PairwiseImageGraph2.Motion bestConnection = null;
 
@@ -127,19 +126,19 @@ public abstract class ExpandByOneView implements VerbosePrint {
 
 		for (int connIdx = 0; connIdx < validConnections.size(); connIdx++) {
 			PairwiseImageGraph2.Motion connAC = validConnections.get(connIdx);
-			if( connAC == connAB )
+			if (connAC == connAB)
 				continue;
 			PairwiseImageGraph2.View viewC = connAC.other(viewA);
 
 			// The views must form a complete loop with 3D information
 			PairwiseImageGraph2.Motion connBC = viewB.findMotion(viewC);
-			if( null == connBC || !connBC.is3D )
+			if (null == connBC || !connBC.is3D)
 				continue;
 
 			// Maximize worst case 3D information
-			double score = Math.min(utils.scoreMotion.score(connAC) , utils.scoreMotion.score(connBC));
+			double score = Math.min(utils.scoreMotion.score(connAC), utils.scoreMotion.score(connBC));
 
-			if( score > bestScore ) {
+			if (score > bestScore) {
 				bestScore = score;
 				bestConnection = connAC;
 			}
@@ -149,7 +148,7 @@ public abstract class ExpandByOneView implements VerbosePrint {
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
 	}
 }

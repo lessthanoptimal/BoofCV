@@ -37,7 +37,7 @@ public class PairwiseImageGraph2 {
 	public FastQueue<View> nodes = new FastQueue<>(View::new);
 	public FastQueue<Motion> edges = new FastQueue<>(Motion::new);
 
-	public Map<String,View> mapNodes = new HashMap<>();
+	public Map<String, View> mapNodes = new HashMap<>();
 
 	public void reset() {
 		mapNodes.clear();
@@ -48,7 +48,7 @@ public class PairwiseImageGraph2 {
 	public View createNode( String id ) {
 		View v = nodes.grow();
 		v.init(id);
-		mapNodes.put(id,v);
+		mapNodes.put(id, v);
 		return v;
 	}
 
@@ -56,11 +56,11 @@ public class PairwiseImageGraph2 {
 		return mapNodes.get(id);
 	}
 
-	public Motion connect( View a , View b ) {
+	public Motion connect( View a, View b ) {
 		Motion m = edges.grow();
 		m.src = a;
 		m.dst = b;
-		m.index = edges.size-1;
+		m.index = edges.size - 1;
 		a.connections.add(m);
 		b.connections.add(m);
 		return m;
@@ -92,7 +92,7 @@ public class PairwiseImageGraph2 {
 
 		public Motion findMotion( View target ) {
 			int idx = findMotionIdx(target);
-			if( idx == -1 )
+			if (idx == -1)
 				return null;
 			else
 				return connections.get(idx);
@@ -101,7 +101,7 @@ public class PairwiseImageGraph2 {
 		public int findMotionIdx( View target ) {
 			for (int i = 0; i < connections.size; i++) {
 				Motion m = connections.get(i);
-				if( m.src == target || m.dst == target ) {
+				if (m.src == target || m.dst == target) {
 					return i;
 				}
 			}
@@ -111,44 +111,39 @@ public class PairwiseImageGraph2 {
 		/**
 		 * Adds the views that it's connected to from the list
 		 */
-		public void getConnections(int[] indexes , int length ,
-								   List<View> views ) {
+		public void getConnections( int[] indexes, int length,
+									List<View> views ) {
 			views.clear();
 			for (int i = 0; i < length; i++) {
-				views.add( connections.get(indexes[i]).other(this));
+				views.add(connections.get(indexes[i]).other(this));
 			}
 		}
 
+		@Override
 		public String toString() {
-			return "PView{id="+id+", conn="+connections.size+", obs="+totalObservations+"}";
+			return "PView{id=" + id + ", conn=" + connections.size + ", obs=" + totalObservations + "}";
 		}
 	}
 
 	public static class Motion {
-		/**
-		 * 3x3 matrix describing epipolar geometry. Fundamental, Essential, or Homography
-		 */
-		public final DMatrixRMaj F = new DMatrixRMaj(3,3);
+		/** 3x3 matrix describing epipolar geometry. Fundamental, Essential, or Homography */
+		public final DMatrixRMaj F = new DMatrixRMaj(3, 3);
 
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean is3D;
 
-		/**
-		 * Number of inliers when an 3D model (Fundamental/Essential) was fit to observations.
-		 */
+		/** Number of inliers when an 3D model (Fundamental/Essential) was fit to observations. */
 		public int countF;
-		/**
-		 * Number of inliers when a homography was fit to observations.
-		 */
+		/** Number of inliers when a homography was fit to observations. */
 		public int countH;
 
 		/** Indexes of features in 'src' and 'dst' views which are inliers to the model {@link #F} */
 		public final FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex::new);
 
 		/** Two views that this motion connects */
-		public View src,dst;
+		public View src, dst;
 
-		/** Index of motion in {@link #edges}*/
+		/** Index of motion in {@link #edges} */
 		public int index;
 
 		public void init() {
@@ -159,11 +154,15 @@ public class PairwiseImageGraph2 {
 			dst = null;
 		}
 
+		public boolean isConnected( View v ) {
+			return v == src || v == dst;
+		}
+
 		/** Given one of the view this motion connects return the other */
 		public View other( View src ) {
-			if( src == this.src) {
+			if (src == this.src) {
 				return dst;
-			} else if( src == dst){
+			} else if (src == dst) {
 				return this.src;
 			} else {
 				throw new RuntimeException("BUG!");
@@ -172,7 +171,7 @@ public class PairwiseImageGraph2 {
 
 		@Override
 		public String toString() {
-			return "Motion( "+(is3D?"3D ":"")+" '"+src.id+"' <-> '"+dst.id+"')";
+			return "Motion( " + (is3D ? "3D " : "") + " '" + src.id + "' <-> '" + dst.id + "')";
 		}
 	}
 }

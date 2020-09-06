@@ -32,7 +32,7 @@ import boofcv.struct.Configuration;
  */
 public class ConfigProjectiveReconstruction implements Configuration {
 	/** Configurations for running RANSAC */
-	public ConfigRansac ransac = new ConfigRansac(500,1);
+	public ConfigRansac ransac = new ConfigRansac(500, 1);
 	/** How trifocal tensor error is computed inside of RANSAC */
 	public ConfigTrifocal ransacTrifocal = new ConfigTrifocal();
 	/** How trifocal tensor error is computed inside of RANSAC */
@@ -40,7 +40,7 @@ public class ConfigProjectiveReconstruction implements Configuration {
 	/** Optimization parameters for SBA */
 	public ConfigBundleAdjustment sba = new ConfigBundleAdjustment();
 	/** Converge tolerance for SBA */
-	public ConfigConverge sbaConverge = new ConfigConverge(1e-8,1e-8,50);
+	public ConfigConverge sbaConverge = new ConfigConverge(1e-8, 1e-8, 50);
 	/** Toggles scaling inputs for SBA */
 	public boolean sbaScale = false;
 
@@ -52,7 +52,7 @@ public class ConfigProjectiveReconstruction implements Configuration {
 		sbaConverge.checkValidity();
 	}
 
-	public void setTo(ConfigProjectiveReconstruction config) {
+	public void setTo( ConfigProjectiveReconstruction config ) {
 		ransac.setTo(config.ransac);
 		ransacTrifocal.setTo(config.ransacTrifocal);
 		ransacError.setTo(config.ransacError);

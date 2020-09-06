@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,11 +35,10 @@ public interface LookupSimilarImages {
 	List<String> getImageIDs();
 
 	/**
-	 *
 	 * @param target ID of target image
 	 * @param similar Storage for IDs of similar images. Cleared upon each call
 	 */
-	void findSimilar( String target , List<String> similar );
+	void findSimilar( String target, List<String> similar );
 
 	/**
 	 * Looks up pixel observations of features in the specified view.
@@ -47,21 +46,23 @@ public interface LookupSimilarImages {
 	 * @param target ID of target image
 	 * @param features Storage for pixel observations. Cleared upon each call
 	 */
-	void lookupPixelFeats(String target , FastQueue<Point2D_F64> features );
+	void lookupPixelFeats( String target, FastQueue<Point2D_F64> features );
 
 	/**
 	 * Looks up associated features between the two views. Which view
+	 *
 	 * @param viewA name of view A
 	 * @param viewB name of view B
 	 * @param pairs Storage for associated features. Cleared upon each call
 	 * @return true if views are similar and have known associations. False if not and results should be ignored
 	 */
-	boolean lookupMatches(String viewA, String viewB , FastQueue<AssociatedIndex> pairs );
+	boolean lookupMatches( String viewA, String viewB, FastQueue<AssociatedIndex> pairs );
 
 	/**
 	 * Looks up the original images width and height
+	 *
 	 * @param target (Input) the image to retrieve from
 	 * @param shape (Output) storage for width and height
 	 */
-	void lookupShape(String target , ImageDimension shape );
+	void lookupShape( String target, ImageDimension shape );
 }

@@ -24,7 +24,7 @@ import boofcv.misc.ConfigConverge;
  * @author Peter Abeles
  */
 public class ConfigProjectiveToMetric {
-	public double aspectRatio=1.0;
+	public double aspectRatio = 1.0;
 	/** Converge tolerance for SBA */
-	public ConfigConverge sbaConverge = new ConfigConverge(1e-8,1e-8,50);
+	public ConfigConverge sbaConverge = new ConfigConverge(1e-8, 1e-8, 50);
 }

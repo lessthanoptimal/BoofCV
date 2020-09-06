@@ -41,15 +41,15 @@ class TestReconstructionFromPairwiseGraph {
 		var found = new FastArray<>(PairwiseImageGraph2.View.class);
 
 		// it should add these two children since they are unknown
-		alg.addOpenForView(graph.nodes.get(4),found);
-		assertEquals(2,found.size);
+		alg.addOpenForView(graph.nodes.get(4), found);
+		assertEquals(2, found.size);
 		assertTrue(found.contains(graph.nodes.get(3)));
 		assertTrue(found.contains(graph.nodes.get(5)));
 
 		// they should not be added a second time
 		found.clear();
-		alg.addOpenForView(graph.nodes.get(4),found);
-		assertEquals(0,found.size);
+		alg.addOpenForView(graph.nodes.get(4), found);
+		assertEquals(0, found.size);
 	}
 
 	/**
@@ -66,7 +66,7 @@ class TestReconstructionFromPairwiseGraph {
 		removeLastConnection(graph);
 
 		open.addAll(graph.nodes);
-		open.forEach((i,o)->alg.workGraph.addView(o));
+		open.forEach(( i, o ) -> alg.workGraph.addView(o));
 		PairwiseImageGraph2.View expected = open.get(4); // make #4 only have a slightly better score, and a valid set of connections
 		PairwiseImageGraph2.View expectedConnA = expected.connections.get(0).other(expected);
 		PairwiseImageGraph2.View expectedConnB = expected.connections.get(1).other(expected);
@@ -93,7 +93,7 @@ class TestReconstructionFromPairwiseGraph {
 
 		open.addAll(graph.nodes);
 		// Only #7 will have a full set of known connections
-		open.forEach(5,8,(i,o)->alg.workGraph.addView(o));
+		open.forEach(5, 8, ( i, o ) -> alg.workGraph.addView(o));
 		PairwiseImageGraph2.View expected = open.get(7);
 		PairwiseImageGraph2.View selected = alg.selectNextToProcess(open);
 
@@ -101,7 +101,7 @@ class TestReconstructionFromPairwiseGraph {
 		assertSame(expected, selected);
 	}
 
-	private void removeLastConnection(PairwiseImageGraph2 graph) {
+	private void removeLastConnection( PairwiseImageGraph2 graph ) {
 		for (int i = 0; i < graph.nodes.size - 1; i++) {
 			FastArray<PairwiseImageGraph2.Motion> conn = graph.nodes.get(i).connections;
 			conn.remove(conn.size - 1);
@@ -120,7 +120,7 @@ class TestReconstructionFromPairwiseGraph {
 		PairwiseImageGraph2 graph = createLinearGraph(8, 1);
 
 		open.addAll(graph.nodes);
-		open.forEach((i,o)->alg.workGraph.addView(o));
+		open.forEach(( i, o ) -> alg.workGraph.addView(o));
 
 		PairwiseImageGraph2.View selected = alg.selectNextToProcess(open);
 		assertSame(null, selected);
@@ -154,13 +154,13 @@ class TestReconstructionFromPairwiseGraph {
 			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
 				PairwiseImageGraph2 graph = createLinearGraph(9, 1);
 				PairwiseImageGraph2.View target = graph.nodes.get(targetIdx);
-				target.connections.forEach((i,o)->o.countH=20);
+				target.connections.forEach(( i, o ) -> o.countH = 20);
 
 				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
 				List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);
 				assertTrue(3 == seeds.size() || 2 == seeds.size()); // determined through manual inspection
 				sanityCheckSeeds(seeds);
-				assertSame(seeds.get(0).seed,target);
+				assertSame(seeds.get(0).seed, target);
 			}
 		}
 	}
@@ -172,9 +172,9 @@ class TestReconstructionFromPairwiseGraph {
 		// make sure non of the seeds are connected to each other
 		for (int i = 0; i < seeds.size(); i++) {
 			SeedInfo a = seeds.get(i);
-			for (int j = i+1; j < seeds.size(); j++) {
+			for (int j = i + 1; j < seeds.size(); j++) {
 				SeedInfo b = seeds.get(j);
-				assertNull( a.seed.findMotion(b.seed) );
+				assertNull(a.seed.findMotion(b.seed));
 			}
 		}
 	}
@@ -184,8 +184,8 @@ class TestReconstructionFromPairwiseGraph {
 		var alg = new Helper();
 
 		// first has the best connection but should have a worse sum score
-		SeedInfo info0 = alg.scoreAsSeed(viewByConnections(90,200,150,80), new SeedInfo());
-		SeedInfo info1 = alg.scoreAsSeed(viewByConnections(90,190,185,150), new SeedInfo());
+		SeedInfo info0 = alg.scoreAsSeed(viewByConnections(90, 200, 150, 80), new SeedInfo());
+		SeedInfo info1 = alg.scoreAsSeed(viewByConnections(90, 190, 185, 150), new SeedInfo());
 		assertTrue(info1.score > info0.score);
 
 		// the new score has a much higher single score but it's a single score
@@ -197,10 +197,10 @@ class TestReconstructionFromPairwiseGraph {
 		assertEquals(0.0, info3.score, UtilEjml.TEST_F64);
 	}
 
-	private PairwiseImageGraph2.View viewByConnections(int ...counts ) {
+	private PairwiseImageGraph2.View viewByConnections( int... counts ) {
 		PairwiseImageGraph2.View v = new PairwiseImageGraph2.View();
 		v.id = "id";
-		for( int count : counts ) {
+		for (int count : counts) {
 			PairwiseImageGraph2.Motion m = new PairwiseImageGraph2.Motion();
 			m.countF = count;
 			m.countH = 100;
@@ -213,21 +213,21 @@ class TestReconstructionFromPairwiseGraph {
 	/**
 	 * Creates a graph which has a linear set of connected views. Each view is connected to 2*numConnect neighbors.
 	 */
-	private PairwiseImageGraph2 createLinearGraph( int numViews , int numConnect) {
+	private PairwiseImageGraph2 createLinearGraph( int numViews, int numConnect ) {
 		var graph = new PairwiseImageGraph2();
 
 		for (int i = 0; i < numViews; i++) {
-			graph.createNode(""+i);
+			graph.createNode("" + i);
 		}
 
 		for (int i = 0; i < numViews; i++) {
 			PairwiseImageGraph2.View va = graph.nodes.get(i);
 			for (int j = 1; j <= numConnect; j++) {
-				int idx = i+j;
-				if( idx >= numViews)
+				int idx = i + j;
+				if (idx >= numViews)
 					break;
 				PairwiseImageGraph2.View vb = graph.nodes.get(idx);
-				PairwiseImageGraph2.Motion c = graph.connect(va,vb);
+				PairwiseImageGraph2.Motion c = graph.connect(va, vb);
 				c.is3D = true;
 				c.countH = 100;
 				c.countF = 120;
@@ -238,9 +238,6 @@ class TestReconstructionFromPairwiseGraph {
 	}
 
 	private class Helper extends ReconstructionFromPairwiseGraph {
-
-		public Helper() {
-			super(new PairwiseGraphUtils());
-		}
+		public Helper() {super(new PairwiseGraphUtils());}
 	}
 }

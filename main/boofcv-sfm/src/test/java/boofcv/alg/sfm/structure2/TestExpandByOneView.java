@@ -58,8 +58,8 @@ class TestExpandByOneView {
 		View viewC = seed.connection(2);
 		View viewD = seed.connection(3);
 
-		Motion connBC = graph.connect(viewB,viewC);
-		Motion connBD = graph.connect(viewD,viewB);
+		Motion connBC = graph.connect(viewB, viewC);
+		Motion connBD = graph.connect(viewD, viewB);
 
 		connBD.is3D = connBC.is3D = true;
 		connBC.countH = connBD.countH = 50;
@@ -70,7 +70,7 @@ class TestExpandByOneView {
 		alg.workGraph = working;
 
 		var found = new ArrayList<Motion>();
-		assertTrue(alg.selectTwoConnections(seed,found));
+		assertTrue(alg.selectTwoConnections(seed, found));
 
 		assertTrue(found.contains(seed.connections.get(1)));
 		assertTrue(found.contains(seed.connections.get(3)));
@@ -87,8 +87,8 @@ class TestExpandByOneView {
 			Motion mA = graph.connect(seed, viewI);
 
 			// is3D and being known are at different frequencies and will only intersect twice
-			mA.is3D = i%2==0;
-			if( i%3==0)
+			mA.is3D = i % 2 == 0;
+			if (i % 3 == 0)
 				working.addView(viewI);
 		}
 
@@ -96,9 +96,9 @@ class TestExpandByOneView {
 		alg.workGraph = working;
 
 		List<Motion> valid = new ArrayList<>();
-		alg.createListOfValid(seed,valid);
+		alg.createListOfValid(seed, valid);
 
-		assertEquals(2,valid.size());
+		assertEquals(2, valid.size());
 	}
 
 	/**
@@ -115,27 +115,27 @@ class TestExpandByOneView {
 		List<Motion> connectionsA = new ArrayList<>();
 
 		for (int i = 0; i < 6; i++) {
-			View viewI = graph.createNode(""+i);
+			View viewI = graph.createNode("" + i);
 
 			// make sure src/dst is handled correctly
-			Motion mA = i%2==0?graph.connect(viewA,viewI):graph.connect(viewI,viewA);
-			mA.countF = 100+i;
+			Motion mA = i % 2 == 0 ? graph.connect(viewA, viewI) : graph.connect(viewI, viewA);
+			mA.countF = 100 + i;
 			mA.countH = 80;
 			mA.is3D = true;
 
 			connectionsA.add(mA);
 
-			if( i >= 5 ) // not all the nodes will be connected to A and B
+			if (i >= 5) // not all the nodes will be connected to A and B
 				continue;
 
-			Motion mB = i%2==0?graph.connect(viewB,viewI):graph.connect(viewI,viewB);
-			mB.countF = 100-i*2;
+			Motion mB = i % 2 == 0 ? graph.connect(viewB, viewI) : graph.connect(viewI, viewB);
+			mB.countF = 100 - i * 2;
 			mB.countH = 80;
 			mB.is3D = true;
 		}
 
 		var alg = new ChildProjectiveExpandByOneView();
-		Motion found = alg.findBestCommon(viewA,viewA.connections.get(0),connectionsA);
+		Motion found = alg.findBestCommon(viewA, viewA.connections.get(0), connectionsA);
 
 		assertSame(found, viewA.connections.get(1));
 	}
@@ -151,8 +151,8 @@ class TestExpandByOneView {
 		graph.connect(viewA, viewB);
 
 		View viewI = graph.createNode("0");
-		Motion mA = graph.connect(viewA,viewI);
-		Motion mB = graph.connect(viewB,viewI);
+		Motion mA = graph.connect(viewA, viewI);
+		Motion mB = graph.connect(viewB, viewI);
 
 		List<Motion> connectionsA = new ArrayList<>();
 		connectionsA.add(mA);
@@ -163,13 +163,11 @@ class TestExpandByOneView {
 
 		// Not 3D so it will fail
 		var alg = new ChildProjectiveExpandByOneView();
-		assertNull(alg.findBestCommon(viewA,viewA.connections.get(0),connectionsA));
+		assertNull(alg.findBestCommon(viewA, viewA.connections.get(0), connectionsA));
 		// Should work now
 		mB.is3D = true;
-		assertSame(mA,alg.findBestCommon(viewA,viewA.connections.get(0),connectionsA));
+		assertSame(mA, alg.findBestCommon(viewA, viewA.connections.get(0), connectionsA));
 	}
 
-	private static class ChildProjectiveExpandByOneView extends ExpandByOneView {
-
-	}
+	private static class ChildProjectiveExpandByOneView extends ExpandByOneView {}
 }

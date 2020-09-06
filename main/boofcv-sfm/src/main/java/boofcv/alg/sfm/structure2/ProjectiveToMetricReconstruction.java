@@ -98,10 +98,9 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	/**
 	 * Specifies which implementations of internal classes to use as well as settings
 	 */
-	public ProjectiveToMetricReconstruction(ConfigProjectiveToMetric config,
-											BundleAdjustment<SceneStructureMetric> bundleAdjustment,
-											TriangulateNViewsMetric triangulator)
-	{
+	public ProjectiveToMetricReconstruction( ConfigProjectiveToMetric config,
+											 BundleAdjustment<SceneStructureMetric> bundleAdjustment,
+											 TriangulateNViewsMetric triangulator ) {
 		this.config = config;
 		this.bundleAdjustment = bundleAdjustment;
 		this.triangulator = triangulator;
@@ -117,11 +116,10 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	 *
 	 * @param db Image database
 	 * @param sceneGraph (Input/Output) Scene graph with a projective estimate for camera matrices.
-	 *                   Output will have the metric scene (views and points)
+	 * Output will have the metric scene (views and points)
 	 * @return true if successful.
 	 */
-	public boolean process( LookupSimilarImages db , SceneWorkingGraph sceneGraph )
-	{
+	public boolean process( LookupSimilarImages db, SceneWorkingGraph sceneGraph ) {
 		initialize(db, sceneGraph);
 
 		// Self calibration and upgrade views
@@ -139,7 +137,7 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 			return false;
 
 		// Refine the estimated using using bundle adjustment
-		if( config.sbaConverge.maxIterations > 0 ) {
+		if (config.sbaConverge.maxIterations > 0) {
 			if (refineWithBundleAdjustment()) {
 				copyBundleAdjustmentResults();
 			}
@@ -151,14 +149,14 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	/**
 	 * Initialize internal data structures
 	 */
-	void initialize(LookupSimilarImages db, SceneWorkingGraph sceneGraph) {
+	void initialize( LookupSimilarImages db, SceneWorkingGraph sceneGraph ) {
 		this.db = db;
 		this.graph = sceneGraph;
 
 		// Save the shape of each image
 		for (int viewCnt = 0; viewCnt < sceneGraph.viewList.size(); viewCnt++) {
 			SceneWorkingGraph.View v = sceneGraph.viewList.get(viewCnt);
-			db.lookupShape(v.pview.id,v.imageDimension);
+			db.lookupShape(v.pview.id, v.imageDimension);
 		}
 	}
 
@@ -173,8 +171,8 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 		// all observation and camera matrices over by 1/2 the width and height
 		// C = [1 0 -w/2; 0 1 -h/2; 0 0 1]
 //		var C = CommonOps_DDRM.identity(3);
-		var P = new DMatrixRMaj(3,4);
-		graph.viewList.forEach(o->{
+//		var P = new DMatrixRMaj(3, 4);
+		graph.viewList.forEach(o -> {
 			// Create a matrix which will make the projective camera matrix centered at the image's origin
 			// C*x = C*P*X
 //			C.set(0,2,-o.pinhole.width/2);
@@ -186,44 +184,44 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 		});
 
 		GeometricResult result = selfCalib.solve();
-		if( result != GeometricResult.SUCCESS ) {
-			if( verbose != null ) {
-				verbose.println("Self calibration failed. "+result+" used views.size="+graph.viewList.size());
+		if (result != GeometricResult.SUCCESS) {
+			if (verbose != null) {
+				verbose.println("Self calibration failed. " + result + " used views.size=" + graph.viewList.size());
 				// Print out singular values to see if there was a clear null space
 				double[] sv = selfCalib.getSvd().getSingularValues();
 				for (int i = 0; i < sv.length; i++) {
-					verbose.println("  sv["+i+"] = "+sv[i]);
+					verbose.println("  sv[" + i + "] = " + sv[i]);
 				}
 			}
 			return false;
 		}
 		// homography to go from projective to metric
-		DMatrixRMaj H = new DMatrixRMaj(4,4);
+		DMatrixRMaj H = new DMatrixRMaj(4, 4);
 		// convert camera matrix from projective to metric
-		if( !MultiViewOps.absoluteQuadraticToH(selfCalib.getQ(),H) ) {
-			if( verbose != null ) verbose.println("Projective to metric failed to compute H");
+		if (!MultiViewOps.absoluteQuadraticToH(selfCalib.getQ(), H)) {
+			if (verbose != null) verbose.println("Projective to metric failed to compute H");
 			return false;
 		}
 
 		// Save the upgraded metric calibration for each camera
-		DMatrixRMaj K = new DMatrixRMaj(3,3);
+		DMatrixRMaj K = new DMatrixRMaj(3, 3);
 		FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions = selfCalib.getSolutions();
 		for (int viewIdx = 0; viewIdx < graph.viewList.size(); viewIdx++) {
 			SelfCalibrationLinearDualQuadratic.Intrinsic intrinsic = solutions.get(viewIdx);
 			SceneWorkingGraph.View wv = graph.viewList.get(viewIdx);
 			// the image shape was already set
 			wv.intrinsic.reset();
-			wv.intrinsic.f = (intrinsic.fx+intrinsic.fy)/2.0;
+			wv.intrinsic.f = (intrinsic.fx + intrinsic.fy)/2.0;
 
 			// ignore K since we already have that
-			MultiViewOps.projectiveToMetric(wv.projective,H,wv.world_to_view,K);
+			MultiViewOps.projectiveToMetric(wv.projective, H, wv.world_to_view, K);
 		}
 
 		// scale is arbitrary. Set max translation to 1. This should be better numerically
 		double maxT = 0;
 		for (int viewIdx = 0; viewIdx < graph.viewList.size(); viewIdx++) {
 			SceneWorkingGraph.View wv = graph.viewList.get(viewIdx);
-			maxT = Math.max(maxT,wv.world_to_view.T.norm());
+			maxT = Math.max(maxT, wv.world_to_view.T.norm());
 		}
 		for (int viewIdx = 0; viewIdx < graph.viewList.size(); viewIdx++) {
 			SceneWorkingGraph.View wv = graph.viewList.get(viewIdx);
@@ -238,18 +236,18 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	 * observations and results should be sanity checked.
 	 */
 	public void createFeaturesFromInliers() {
-		if( verbose != null ) verbose.println("ENTER create features");
+		if (verbose != null) verbose.println("ENTER create features");
 		graph.features.clear();
 
 		// Storage for triangulated point
 		var triangulatedPt = new Point3D_F64();
 
-		for( SceneWorkingGraph.View target_v : graph.views.values() ) {
+		for (SceneWorkingGraph.View target_v : graph.views.values()) {
 			// if there are no inliers saved with this view skip it.
-			if( target_v.inliers.isEmpty() )
+			if (target_v.inliers.isEmpty())
 				continue;
 			// quick sanity check to see if the data structure fulfills its contract
-			assertBoof(target_v.inliers.views.get(0)==target_v.pview);
+			assertBoof(target_v.inliers.views.get(0) == target_v.pview);
 
 			// grab inlier information for this view. local variables are just short cuts
 			final SceneWorkingGraph.InlierInfo inliers = target_v.inliers;
@@ -257,7 +255,8 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 			final int numViews = inliers.views.size;
 			final int numInliers = inliers.observations.get(0).size;
 
-			if( verbose != null ) verbose.println(" view["+target_v.pview.id+"] inliers="+numInliers+" views="+numViews);
+			if (verbose != null)
+				verbose.println(" view[" + target_v.pview.id + "] inliers=" + numInliers + " views=" + numViews);
 
 			// Look up the observations for all views in the inlier set. This is used for triangulation
 			loadInlierObservations(inliers);
@@ -268,72 +267,71 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 				// See if any of the other views have this observation assigned to a feature
 				SceneWorkingGraph.Feature feature = null;
 				for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
-					SceneWorkingGraph.View wview = graph.views.get( inliers.views.get(viewCnt).id );
+					SceneWorkingGraph.View wview = graph.views.get(inliers.views.get(viewCnt).id);
 					// index of the observation in this view
 					int observationIdx = inliers.observations.get(viewCnt).get(inlierCnt);
 					SceneWorkingGraph.Feature found = wview.getFeatureFromObs(observationIdx);
-					if( found == null || found == feature)
+					if (found == null || found == feature)
 						continue;
-					if( feature != null ) {
+					if (feature != null) {
 						// The same object has been assigned two different features.
-						mergeFeatures(found,feature);
+						mergeFeatures(found, feature);
 					} else {
 						feature = found;
 					}
 				}
 
-				if( feature == null ) {
+				if (feature == null) {
 					// Create a new feature since none exist for any of these observation
 					feature = graph.createFeature();
-					if( !triangulateFeature(inliers,inlierCnt,triangulatedPt) ) {
+					if (!triangulateFeature(inliers, inlierCnt, triangulatedPt)) {
 						// skip feature if triangulation fails
-						graph.features.remove(graph.features.size()-1);
+						graph.features.remove(graph.features.size() - 1);
 						continue;
 					}
-					feature.location.set(triangulatedPt.x,triangulatedPt.y,triangulatedPt.z,1.0);
+					feature.location.set(triangulatedPt.x, triangulatedPt.y, triangulatedPt.z, 1.0);
 					for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
-						SceneWorkingGraph.View wview = graph.views.get( inliers.views.get(viewCnt).id );
+						SceneWorkingGraph.View wview = graph.views.get(inliers.views.get(viewCnt).id);
 						createNewObservation(inliers, inlierCnt, feature, viewCnt, wview);
 					}
 				}
 
 				// Assign the Feature to any views where it wasn't already assigned
 				for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
-					SceneWorkingGraph.View wview = graph.views.get( inliers.views.get(viewCnt).id );
+					SceneWorkingGraph.View wview = graph.views.get(inliers.views.get(viewCnt).id);
 					int observationIdx = inliers.observations.get(viewCnt).get(inlierCnt);
-					if( wview.getFeatureFromObs(observationIdx) != null )
+					if (wview.getFeatureFromObs(observationIdx) != null)
 						continue;
 					createNewObservation(inliers, inlierCnt, feature, viewCnt, wview);
 				}
 			}
 		}
-		if( verbose != null ) verbose.println("EXIT create features");
+		if (verbose != null) verbose.println("EXIT create features");
 	}
 
 	/**
 	 * Loads observations for this set of inliers
 	 */
-	void loadInlierObservations(SceneWorkingGraph.InlierInfo inliers) {
+	void loadInlierObservations( SceneWorkingGraph.InlierInfo inliers ) {
 		final int numViews = inliers.views.size;
 		final int numInliers = inliers.observations.get(0).size;
 		listInfo.reset();
 		for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
 			// sanity check that the list of inlier observations are all the same size
-			assertBoof(numInliers==inliers.observations.get(viewCnt).size);
+			assertBoof(numInliers == inliers.observations.get(viewCnt).size);
 			// Load the actual pixel observations from each view
 			PairwiseImageGraph2.View v = inliers.views.get(viewCnt);
-			db.lookupPixelFeats(v.id,listInfo.grow().pixels);
+			db.lookupPixelFeats(v.id, listInfo.grow().pixels);
 		}
 	}
 
 	/**
 	 * Creates a new observation from the inlier set to a feature and a view
 	 */
-	void createNewObservation(SceneWorkingGraph.InlierInfo inliers, int inlierIndex,
-							  SceneWorkingGraph.Feature feature,
-							  int viewIndex,
-							  SceneWorkingGraph.View wview)
-	{
+	void createNewObservation( SceneWorkingGraph.InlierInfo inliers, int inlierIndex,
+							   SceneWorkingGraph.Feature feature,
+							   int viewIndex,
+							   SceneWorkingGraph.View wview ) {
 		SceneWorkingGraph.Observation o = new SceneWorkingGraph.Observation();
 		o.view = wview;
 		o.observationIdx = inliers.observations.get(viewIndex).get(inlierIndex);
@@ -345,11 +343,11 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	/**
 	 * Merges 'src' into 'dst' feature so that there is only one
 	 */
-	void mergeFeatures(SceneWorkingGraph.Feature src , SceneWorkingGraph.Feature dst ) {
+	void mergeFeatures( SceneWorkingGraph.Feature src, SceneWorkingGraph.Feature dst ) {
 		// Re-map the Feature each view points to dst
 		for (int obsCnt = 0; obsCnt < src.observations.size(); obsCnt++) {
 			SceneWorkingGraph.Observation o = src.observations.get(obsCnt);
-			o.view.obs_to_feat.put(o.observationIdx,dst);
+			o.view.obs_to_feat.put(o.observationIdx, dst);
 		}
 		// Add all Feature observations to dst
 		dst.observations.addAll(src.observations);
@@ -367,9 +365,8 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	 * @param X (output) storage for the triangulated feature in world coordinates
 	 * @return true if successful
 	 */
-	boolean triangulateFeature(SceneWorkingGraph.InlierInfo info, int featureIdx, Point3D_F64 X)
-	{
-		assertBoof(info.observations.size==info.views.size);
+	boolean triangulateFeature( SceneWorkingGraph.InlierInfo info, int featureIdx, Point3D_F64 X ) {
+		assertBoof(info.observations.size == info.views.size);
 		int numViews = info.views.size;
 
 		// For numerical reasons, triangulate in the reference frame of the first view
@@ -393,18 +390,18 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 
 			// Go from pixels to normalized image coordinates
 			wview.intrinsic.convertTo(pinhole);
-			PerspectiveOps.convertPixelToNorm(pinhole,pixelX,pixelY,triangulateObs.grow());
+			PerspectiveOps.convertPixelToNorm(pinhole, pixelX, pixelY, triangulateObs.grow());
 
 			// compute origin_to_viewI in view0's reference frame
-			origin_to_world.concat(wview.world_to_view,triangulateViews.grow());
+			origin_to_world.concat(wview.world_to_view, triangulateViews.grow());
 		}
 
 		// Compute the 3D location
-		if( !triangulator.triangulate(triangulateObs.toList(), triangulateViews.toList(),X) )
+		if (!triangulator.triangulate(triangulateObs.toList(), triangulateViews.toList(), X))
 			return false;
 
 		// convert it back into the world frame
-		SePointOps_F64.transform(origin_to_world,X,X);
+		SePointOps_F64.transform(origin_to_world, X, X);
 
 		return true;
 	}
@@ -416,22 +413,22 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	void pruneObservationsBehindCamera() {
 		// storage for point in camera view
 		Point3D_F64 cameraPt = new Point3D_F64();
-		for (int featureCnt = graph.features.size()-1; featureCnt >= 0; featureCnt--) {
+		for (int featureCnt = graph.features.size() - 1; featureCnt >= 0; featureCnt--) {
 			SceneWorkingGraph.Feature f = graph.features.get(featureCnt);
 
-			for (int observationCnt = f.observations.size()-1; observationCnt >= 0; observationCnt--) {
+			for (int observationCnt = f.observations.size() - 1; observationCnt >= 0; observationCnt--) {
 				SceneWorkingGraph.Observation o = f.observations.get(observationCnt);
 
 				SePointOps_F64.transform(o.view.world_to_view, f.location, cameraPt);
 				// if the feature is behind the camera assume it's incorrect and remove it
-				if( cameraPt.z < 0 ) {
+				if (cameraPt.z < 0) {
 					o.view.obs_to_feat.remove(o.observationIdx);
 					f.observations.remove(observationCnt);
 				}
 			}
 
 			// remove features which are no longer valid. This is also a weird situation that shouldn't happen
-			if( f.observations.size() < 2 ) {
+			if (f.observations.size() < 2) {
 				graph.features.remove(featureCnt);
 			}
 		}
@@ -441,16 +438,16 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 		final int numViews = graph.viewList.size();
 
 		// Construct bundle adjustment data structure
-		structure.initialize(numViews,numViews, graph.features.size());
+		structure.initialize(numViews, numViews, graph.features.size());
 		observations.initialize(numViews);
 
 		for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
 			SceneWorkingGraph.View wview = graph.viewList.get(viewCnt);
 			wview.index = viewCnt;
 
-			structure.setCamera(viewCnt,false,wview.intrinsic);
-			structure.setView(viewCnt,viewCnt==0,wview.world_to_view);
-			structure.connectViewToCamera(viewCnt,viewCnt);
+			structure.setCamera(viewCnt, false, wview.intrinsic);
+			structure.setView(viewCnt, viewCnt == 0, wview.world_to_view);
+			structure.connectViewToCamera(viewCnt, viewCnt);
 		}
 		for (int featureCnt = 0; featureCnt < graph.features.size(); featureCnt++) {
 			SceneWorkingGraph.Feature f = graph.features.get(featureCnt);
@@ -459,7 +456,7 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 
 			for (int obsCnt = 0; obsCnt < f.observations.size(); obsCnt++) {
 				SceneWorkingGraph.Observation o = f.observations.get(obsCnt);
-				structure.connectPointToView(featureCnt,o.view.index);
+				structure.connectPointToView(featureCnt, o.view.index);
 				// the camera model assumes the optical center is (0,0)
 				ImageDimension cp = o.view.imageDimension;
 				final double recentered_x = o.pixel.x - cp.width/2;
@@ -472,9 +469,9 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 
 	boolean refineWithBundleAdjustment() {
 		bundleAdjustment.configure(config.sbaConverge.ftol, config.sbaConverge.gtol, config.sbaConverge.maxIterations);
-		bundleAdjustment.setParameters(structure,observations);
-		if( !bundleAdjustment.optimize(structure) ) {
-			if( verbose != null ) verbose.println("Bundle adjustment failed!");
+		bundleAdjustment.setParameters(structure, observations);
+		if (!bundleAdjustment.optimize(structure)) {
+			if (verbose != null) verbose.println("Bundle adjustment failed!");
 			return false;
 		}
 		return true;
@@ -497,19 +494,18 @@ public class ProjectiveToMetricReconstruction implements VerbosePrint {
 	/**
 	 * Returns the bundle adjustment camera model.
 	 */
-	public <C extends BundleAdjustmentCamera>C getRefinedCamera( String viewID ) {
+	public <C extends BundleAdjustmentCamera> C getRefinedCamera( String viewID ) {
 		int index = graph.views.get(viewID).index;
 		return (C)structure.getCameras().get(index).model;
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
 	}
 
-	static class ImageInfo
-	{
-		final public FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64::new,p->p.set(-1,-1));
+	static class ImageInfo {
+		final public FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64::new, p -> p.set(-1, -1));
 
 		public void reset() {
 			pixels.reset();

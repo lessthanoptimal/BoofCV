@@ -66,7 +66,7 @@ public class PairwiseGraphUtils {
 
 	//-------------------------------- Configurations. Must call fixate() if modified
 	/** Converge tolerance for SBA */
-	public ConfigConverge configConvergeSBA = new ConfigConverge(1e-8,1e-8,50);
+	public ConfigConverge configConvergeSBA = new ConfigConverge(1e-8, 1e-8, 50);
 	/** Toggles scaling inputs for SBA */
 	public boolean configScaleSBA = false;
 
@@ -92,9 +92,9 @@ public class PairwiseGraphUtils {
 	public List<AssociatedTriple> inliersThreeView;
 
 	/** Projective camera matrices for 3-View reconstruction. P1 is always identity */
-	public final DMatrixRMaj P1 = new DMatrixRMaj(3,4);
-	public final DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-	public final DMatrixRMaj P3 = new DMatrixRMaj(3,4);
+	public final DMatrixRMaj P1 = new DMatrixRMaj(3, 4);
+	public final DMatrixRMaj P2 = new DMatrixRMaj(3, 4);
+	public final DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
 
 	// Location of features in the image. Pixels
 	public final FastQueue<Point2D_F64> featsA = new FastQueue<>(Point2D_F64::new);
@@ -114,25 +114,25 @@ public class PairwiseGraphUtils {
 
 	protected final ImageDimension shape = new ImageDimension();
 
-	public PairwiseGraphUtils(TriangulateNViewsProjective triangulator,
-							  ModelMatcher<TrifocalTensor, AssociatedTriple> ransac,
-							  BundleAdjustment<SceneStructureProjective> sba ) {
+	public PairwiseGraphUtils( TriangulateNViewsProjective triangulator,
+							   ModelMatcher<TrifocalTensor, AssociatedTriple> ransac,
+							   BundleAdjustment<SceneStructureProjective> sba ) {
 		this.triangulator = triangulator;
 		this.ransac = ransac;
 		this.sba = sba;
 	}
 
-	public PairwiseGraphUtils(ConfigProjectiveReconstruction config) {
+	public PairwiseGraphUtils( ConfigProjectiveReconstruction config ) {
 		config.checkValidity();
 		triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC());
 		ransac = FactoryMultiViewRobust.trifocalRansac(
-				config.ransacTrifocal,config.ransacError,config.ransac);
+				config.ransacTrifocal, config.ransacError, config.ransac);
 		sba = FactoryMultiView.bundleSparseProjective(config.sba);
 		configConvergeSBA.setTo(config.sbaConverge);
 		configScaleSBA = config.sbaScale;
 	}
 
-	protected PairwiseGraphUtils(){}
+	protected PairwiseGraphUtils() {}
 
 	/**
 	 * Finds the indexes of tracks which are common to all views
@@ -141,8 +141,8 @@ public class PairwiseGraphUtils {
 	 * @param connectIdx (Input) Indexes of connections in the seed view that will be searched for common connections
 	 * @return indexes of common tracks. Indexes are indexes in the seed View
 	 */
-	public GrowQueue_I32 findCommonFeatures(View seed , GrowQueue_I32 connectIdx ) {
-		if( connectIdx.size < 1 )
+	public GrowQueue_I32 findCommonFeatures( View seed, GrowQueue_I32 connectIdx ) {
+		if (connectIdx.size < 1)
 			throw new RuntimeException("Called when there are no connections");
 		// if true then it is visible in all tracks
 		visibleAll.resize(seed.totalObservations);
@@ -153,14 +153,14 @@ public class PairwiseGraphUtils {
 		for (int idxMotion = 0; idxMotion < connectIdx.size; idxMotion++) {
 			// Mark features which are inside the inlier set connecting these two views
 			Motion m = seed.connections.get(connectIdx.get(idxMotion));
-			boolean seedIsSrc = m.src==seed;
+			boolean seedIsSrc = m.src == seed;
 			visibleMotion.fill(false);
 			for (int i = 0; i < m.inliers.size; i++) {
 				AssociatedIndex a = m.inliers.get(i);
-				visibleMotion.data[seedIsSrc?a.src:a.dst] = true;
+				visibleMotion.data[seedIsSrc ? a.src : a.dst] = true;
 			}
 			// Update the table visible in all views
-			if( idxMotion == 0 ) {
+			if (idxMotion == 0) {
 				visibleAll.setTo(visibleMotion);
 				continue;
 			}
@@ -170,7 +170,7 @@ public class PairwiseGraphUtils {
 		}
 		GrowQueue_I32 common = new GrowQueue_I32(visibleAll.count(true));
 		for (int i = 0; i < seed.totalObservations; i++) {
-			if( visibleAll.data[i] ) {
+			if (visibleAll.data[i]) {
 				common.add(i);
 			}
 		}
@@ -185,10 +185,10 @@ public class PairwiseGraphUtils {
 		Motion connAC = seed.findMotion(viewC);
 		Motion connBC = viewB.findMotion(viewC);
 
-		PairwiseGraphUtils.createTableViewAtoB(seed,connAB,table_A_to_B);
-		PairwiseGraphUtils.createTableViewAtoB(seed,connAC,table_A_to_C);
-		PairwiseGraphUtils.createTableViewAtoB(viewB,connBC,table_B_to_C);
-		PairwiseGraphUtils.createTableViewAtoB(viewC,connAC,table_C_to_A);
+		PairwiseGraphUtils.createTableViewAtoB(seed, connAB, table_A_to_B);
+		PairwiseGraphUtils.createTableViewAtoB(seed, connAC, table_A_to_C);
+		PairwiseGraphUtils.createTableViewAtoB(viewB, connBC, table_B_to_C);
+		PairwiseGraphUtils.createTableViewAtoB(viewC, connAC, table_C_to_A);
 	}
 
 	/**
@@ -200,12 +200,12 @@ public class PairwiseGraphUtils {
 		commonIdx.reset();
 		for (int featureIdxA = 0; featureIdxA < N; featureIdxA++) {
 			// this feature must be visible in all 3 views
-			if( table_A_to_B.data[featureIdxA] < 0 || table_A_to_C.data[featureIdxA] < 0 )
+			if (table_A_to_B.data[featureIdxA] < 0 || table_A_to_C.data[featureIdxA] < 0)
 				continue;
 			// There also must be a connection from B to C for this feature
 			int featureIdxB = table_A_to_B.data[featureIdxA];
 			int featureIdxC = table_B_to_C.data[featureIdxB];
-			if( featureIdxC < 0 || table_C_to_A.data[featureIdxC] != featureIdxA )
+			if (featureIdxC < 0 || table_C_to_A.data[featureIdxC] != featureIdxA)
 				continue;
 			commonIdx.add(featureIdxA);
 		}
@@ -213,6 +213,7 @@ public class PairwiseGraphUtils {
 
 	/**
 	 * Same as {@link #findCommonFeatures()} but with a list that specified a subset of features in {@link #seed}.
+	 *
 	 * @param selectedIdxA List of feature indexes in A to consider
 	 */
 	public void findCommonFeatures( GrowQueue_I32 selectedIdxA ) {
@@ -223,7 +224,7 @@ public class PairwiseGraphUtils {
 			// There also must be a connection from B to C for this feature
 			int featureIdxB = table_A_to_B.data[featureIdxA];
 			int featureIdxC = table_B_to_C.data[featureIdxB];
-			if( featureIdxC < 0 || table_C_to_A.data[featureIdxC] != featureIdxA )
+			if (featureIdxC < 0 || table_C_to_A.data[featureIdxC] != featureIdxA)
 				continue;
 			commonIdx.add(featureIdxA);
 		}
@@ -235,18 +236,18 @@ public class PairwiseGraphUtils {
 	public void createTripleFromCommon() {
 		// Shape of each input image
 		db.lookupShape(seed.id, dimenA);
-		db.lookupShape(viewB.id,dimenB);
-		db.lookupShape(viewC.id,dimenC);
+		db.lookupShape(viewB.id, dimenB);
+		db.lookupShape(viewC.id, dimenC);
 
 		// Get coordinates of features in each view
-		db.lookupPixelFeats(seed.id,featsA);
-		db.lookupPixelFeats(viewB.id,featsB);
-		db.lookupPixelFeats(viewC.id,featsC);
+		db.lookupPixelFeats(seed.id, featsA);
+		db.lookupPixelFeats(viewB.id, featsB);
+		db.lookupPixelFeats(viewC.id, featsC);
 
 		// Make the pixels zero centered
-		BoofMiscOps.offsetPixels(featsA.toList(),-dimenA.width/2, -dimenA.height/2);
-		BoofMiscOps.offsetPixels(featsB.toList(),-dimenB.width/2, -dimenB.height/2);
-		BoofMiscOps.offsetPixels(featsC.toList(),-dimenC.width/2, -dimenC.height/2);
+		BoofMiscOps.offsetPixels(featsA.toList(), -dimenA.width/2, -dimenA.height/2);
+		BoofMiscOps.offsetPixels(featsB.toList(), -dimenB.width/2, -dimenB.height/2);
+		BoofMiscOps.offsetPixels(featsC.toList(), -dimenC.width/2, -dimenC.height/2);
 
 		// pre-declare memory
 		matchesTriple.reset();
@@ -258,23 +259,22 @@ public class PairwiseGraphUtils {
 			int indexB = table_A_to_B.data[indexA];
 			int indexC = table_A_to_C.data[indexA];
 
-			matchesTriple.get(i).set(featsA.get(indexA),featsB.get(indexB),featsC.get(indexC));
+			matchesTriple.get(i).set(featsA.get(indexA), featsB.get(indexB), featsC.get(indexC));
 		}
 	}
-
 
 	/**
 	 * Robustly estimates the trifocal tensor and extracts canonical camera matrices
 	 */
 	public boolean estimateProjectiveCamerasRobustly() {
 		// Robustly fit trifocal tensor to 3-view
-		if( !ransac.process(matchesTriple.toList()) )
+		if (!ransac.process(matchesTriple.toList()))
 			return false;
 
 		// Extract camera matrices
 		TrifocalTensor model = ransac.getModelParameters();
 		CommonOps_DDRM.setIdentity(P1);
-		MultiViewOps.trifocalCameraMatrices(model,P2,P3);
+		MultiViewOps.trifocalCameraMatrices(model, P2, P3);
 
 		inliersThreeView = ransac.getMatchSet();
 
@@ -286,19 +286,19 @@ public class PairwiseGraphUtils {
 	 *
 	 * @param view Which view should be the first view in the list and have its inliers updated.
 	 */
-	public void saveRansacInliers(SceneWorkingGraph.View view ) {
+	public void saveRansacInliers( SceneWorkingGraph.View view ) {
 		int viewIdx = seed == view.pview ? 0 : viewB == view.pview ? 1 : viewC == view.pview ? 2 : -1;
 
-		int[] order = switch(viewIdx) {
-			case 0 -> new int[]{0,1,2};
-			case 1 -> new int[]{1,0,2};
-			case 2 -> new int[]{2,1,0};
+		int[] order = switch (viewIdx) {
+			case 0 -> new int[]{0, 1, 2};
+			case 1 -> new int[]{1, 0, 2};
+			case 2 -> new int[]{2, 1, 0};
 			default -> throw new RuntimeException("Passed in view is not any of the three expected");
 		};
 
 		int numInliers = inliersThreeView.size();
 		final InlierInfo info = view.inliers;
-		assertBoof(info.views.size==0,"Inliers should not have already been set for this view");
+		assertBoof(info.views.size == 0, "Inliers should not have already been set for this view");
 
 		info.observations.reset();
 		info.observations.resize(3);
@@ -309,9 +309,9 @@ public class PairwiseGraphUtils {
 		for (int inlierCnt = 0; inlierCnt < numInliers; inlierCnt++) {
 			int inputIdx = ransac.getInputIndex(inlierCnt);
 			int indexA = commonIdx.get(inputIdx);
-			indexesA.add( indexA );
-			indexesB.add( table_A_to_B.data[indexA] );
-			indexesC.add( table_A_to_C.data[indexA] );
+			indexesA.add(indexA);
+			indexesB.add(table_A_to_B.data[indexA]);
+			indexesC.add(table_A_to_C.data[indexA]);
 		}
 
 		info.views.resize(3);
@@ -322,7 +322,7 @@ public class PairwiseGraphUtils {
 				case 2 -> viewC;
 				default -> throw new RuntimeException("BUG");
 			};
-			info.views.set(order[i],v);
+			info.views.set(order[i], v);
 		}
 	}
 
@@ -335,18 +335,18 @@ public class PairwiseGraphUtils {
 	 *
 	 * @param fixedSeed if true the seed is fixed and other views are not. If false then the inverse happens.
 	 */
-	public void initializeSbaSceneThreeView(boolean fixedSeed) {
+	public void initializeSbaSceneThreeView( boolean fixedSeed ) {
 		// Initialize the 3D scene structure, stored in a format understood by bundle adjustment
-		structure.initialize(3,inliersThreeView.size());
+		structure.initialize(3, inliersThreeView.size());
 
 		// specify the found projective camera matrices
-		db.lookupShape(seed.id,shape);
+		db.lookupShape(seed.id, shape);
 		// The first view is assumed to be the coordinate system's origin and is identity by definition
-		structure.setView(0,fixedSeed, P1,shape.width,shape.height);
-		db.lookupShape(viewB.id,shape);
-		structure.setView(1,!fixedSeed,P2,shape.width,shape.height);
-		db.lookupShape(viewC.id,shape);
-		structure.setView(2,!fixedSeed,P3,shape.width,shape.height);
+		structure.setView(0, fixedSeed, P1, shape.width, shape.height);
+		db.lookupShape(viewB.id, shape);
+		structure.setView(1, !fixedSeed, P2, shape.width, shape.height);
+		db.lookupShape(viewC.id, shape);
+		structure.setView(2, !fixedSeed, P3, shape.width, shape.height);
 
 		// triangulate homogenous coordinates for each point in the inlier set
 		triangulateFeatures();
@@ -356,8 +356,8 @@ public class PairwiseGraphUtils {
 	 * Triangulates the location of each features in homogenous space and save to bundle adjustment scene
 	 */
 	protected void triangulateFeatures() {
-		assertBoof(structure.views.size>0,"Must initialize the structure first");
-		assertBoof(structure.points.size==inliersThreeView.size(),
+		assertBoof(structure.views.size > 0, "Must initialize the structure first");
+		assertBoof(structure.points.size == inliersThreeView.size(),
 				"Number of inliers must match the number of points in the scene");
 
 		// TODO Normalize camera matrices for better numerics?
@@ -376,14 +376,14 @@ public class PairwiseGraphUtils {
 		for (int i = 0; i < inliersThreeView.size(); i++) {
 			AssociatedTriple t = inliersThreeView.get(i);
 
-			triangObs.set(0,t.p1);
-			triangObs.set(1,t.p2);
-			triangObs.set(2,t.p3);
+			triangObs.set(0, t.p1);
+			triangObs.set(1, t.p2);
+			triangObs.set(2, t.p3);
 
 			// triangulation can fail if all 3 views have the same pixel value. This has been observed in
 			// simulated 3D scenes
-			if( triangulator.triangulate(triangObs,cameraMatrices,X)) {
-				structure.points.data[i].set(X.x,X.y,X.z,X.w);
+			if (triangulator.triangulate(triangObs, cameraMatrices, X)) {
+				structure.points.data[i].set(X.x, X.y, X.z, X.w);
 			} else {
 				throw new RuntimeException("Failed to triangulate a point in the inlier set?! Handle if this is common");
 			}
@@ -404,9 +404,9 @@ public class PairwiseGraphUtils {
 		for (int i = 0; i < inliersThreeView.size(); i++) {
 			AssociatedTriple t = inliersThreeView.get(i);
 
-			view1.add(i,(float)t.p1.x,(float)t.p1.y);
-			view2.add(i,(float)t.p2.x,(float)t.p2.y);
-			view3.add(i,(float)t.p3.x,(float)t.p3.y);
+			view1.add(i, (float)t.p1.x, (float)t.p1.y);
+			view2.add(i, (float)t.p2.x, (float)t.p2.y);
+			view3.add(i, (float)t.p3.x, (float)t.p3.y);
 		}
 	}
 
@@ -414,22 +414,22 @@ public class PairwiseGraphUtils {
 	 * Last step is to refine the current initial estimate with bundle adjustment
 	 */
 	public boolean refineWithBundleAdjustment() {
-		if( configConvergeSBA.maxIterations <= 0 )
+		if (configConvergeSBA.maxIterations <= 0)
 			return true;
 
-		if(configScaleSBA) {
-			scaler.applyScale(structure,observations);
+		if (configScaleSBA) {
+			scaler.applyScale(structure, observations);
 		}
 
-		sba.setParameters(structure,observations);
+		sba.setParameters(structure, observations);
 		sba.configure(configConvergeSBA.ftol, configConvergeSBA.gtol, configConvergeSBA.maxIterations);
 
-		if( !sba.optimize(structure) ) {
+		if (!sba.optimize(structure)) {
 			return false;
 		}
 
-		if(configScaleSBA) {
-			scaler.undoScale(structure,observations);
+		if (configScaleSBA) {
+			scaler.undoScale(structure, observations);
 		}
 		return true;
 	}
@@ -441,15 +441,14 @@ public class PairwiseGraphUtils {
 	 * @param edge (input) Edge connect view A to B, this contains the dst in the table
 	 * @param table_a_to_b (output) The resulting lookup table
 	 */
-	public static void createTableViewAtoB(View viewA,
-										   Motion edge,
-										   GrowQueue_I32 table_a_to_b)
-	{
-		table_a_to_b.resize(viewA.totalObservations,-1);
+	public static void createTableViewAtoB( View viewA,
+											Motion edge,
+											GrowQueue_I32 table_a_to_b ) {
+		table_a_to_b.resize(viewA.totalObservations, -1);
 		boolean src_is_A = edge.src == viewA;
 		for (int i = 0; i < edge.inliers.size; i++) {
 			AssociatedIndex assoc = edge.inliers.get(i);
-			table_a_to_b.data[src_is_A?assoc.src:assoc.dst] = src_is_A?assoc.dst:assoc.src;
+			table_a_to_b.data[src_is_A ? assoc.src : assoc.dst] = src_is_A ? assoc.dst : assoc.src;
 		}
 	}
 
@@ -469,7 +468,7 @@ public class PairwiseGraphUtils {
 			// Prefer a scene more features from a fundamental matrix than a homography.
 			// This can be sign that the scene has a rich 3D structure and is poorly represented by
 			// a plane or rotational motion
-			double score = Math.min(5,m.countF/(double)(m.countH+1));
+			double score = Math.min(5, m.countF/(double)(m.countH + 1));
 			// Also prefer more features from the original image to be matched
 			score *= m.countF;
 

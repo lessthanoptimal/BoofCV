@@ -31,7 +31,7 @@ class TestSceneWorkingGraph {
 		var alg = new SceneWorkingGraph();
 		var viewA = new PairwiseImageGraph2.View();
 		viewA.id = "moo";
-		var  viewB = new PairwiseImageGraph2.View();
+		var viewB = new PairwiseImageGraph2.View();
 		viewB.id = "boo";
 
 		assertFalse(alg.isKnown(viewA));
@@ -50,8 +50,8 @@ class TestSceneWorkingGraph {
 		var pview = new PairwiseImageGraph2.View();
 		pview.id = "moo";
 		SceneWorkingGraph.View found = alg.addView(pview);
-		assertSame(found.pview,pview);
-		assertSame(found,alg.views.get(pview.id));
+		assertSame(found.pview, pview);
+		assertSame(found, alg.views.get(pview.id));
 	}
 
 	@Test

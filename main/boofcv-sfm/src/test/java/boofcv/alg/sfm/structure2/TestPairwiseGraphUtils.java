@@ -57,7 +57,7 @@ class TestPairwiseGraphUtils {
 			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
 
 			for (int j = 0; j < 100; j++) {
-				motion.inliers.grow().setAssociation(j,j,0);
+				motion.inliers.grow().setAssociation(j, j, 0);
 			}
 			seed.connections.add(motion);
 		}
@@ -67,7 +67,7 @@ class TestPairwiseGraphUtils {
 		motionBC.src = seed.connections.get(0).dst;
 		motionBC.dst = seed.connections.get(1).dst;
 		for (int i = 0; i < seed.totalObservations; i++) {
-			motionBC.inliers.grow().setAssociation(i,i,0);
+			motionBC.inliers.grow().setAssociation(i, i, 0);
 		}
 		motionBC.src.connections.add(motionBC);
 		motionBC.dst.connections.add(motionBC);
@@ -80,9 +80,9 @@ class TestPairwiseGraphUtils {
 		alg.createThreeViewLookUpTables();
 		alg.findCommonFeatures();
 
-		assertEquals(seed.totalObservations,alg.commonIdx.size);
+		assertEquals(seed.totalObservations, alg.commonIdx.size);
 		for (int i = 0; i < alg.commonIdx.size; i++) {
-			assertEquals(i,alg.commonIdx.get(i));
+			assertEquals(i, alg.commonIdx.get(i));
 		}
 	}
 
@@ -92,7 +92,7 @@ class TestPairwiseGraphUtils {
 		seed.totalObservations = 100;
 		GrowQueue_I32 seedFeatsIdx = new GrowQueue_I32();
 
-		for (int i = 0; i < seed.totalObservations /2; i++) {
+		for (int i = 0; i < seed.totalObservations / 2; i++) {
 			seedFeatsIdx.add(i);
 		}
 
@@ -103,7 +103,7 @@ class TestPairwiseGraphUtils {
 			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
 
 			for (int j = 0; j < 100; j++) {
-				motion.inliers.grow().setAssociation(j,j,0);
+				motion.inliers.grow().setAssociation(j, j, 0);
 			}
 			seed.connections.add(motion);
 		}
@@ -113,7 +113,7 @@ class TestPairwiseGraphUtils {
 		motionBC.src = seed.connections.get(0).dst;
 		motionBC.dst = seed.connections.get(1).dst;
 		for (int i = 0; i < seed.totalObservations; i++) {
-			motionBC.inliers.grow().setAssociation(i,i,0);
+			motionBC.inliers.grow().setAssociation(i, i, 0);
 		}
 		motionBC.src.connections.add(motionBC);
 		motionBC.dst.connections.add(motionBC);
@@ -126,16 +126,16 @@ class TestPairwiseGraphUtils {
 		alg.createThreeViewLookUpTables();
 		alg.findCommonFeatures(seedFeatsIdx);
 
-		assertEquals(seed.totalObservations /2,alg.commonIdx.size);
+		assertEquals(seed.totalObservations / 2, alg.commonIdx.size);
 		for (int i = 0; i < alg.commonIdx.size; i++) {
-			assertEquals(i,alg.commonIdx.get(i));
+			assertEquals(i, alg.commonIdx.get(i));
 		}
 	}
 
 	@Test
 	void createThreeViewLookUpTables() {
 		var alg = new PairwiseGraphUtils();
-		var db = new MockLookupSimilarImages(4,0xDEADBEEF);
+		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		alg.db = db;
 		alg.seed = db.graph.nodes.get(0);
 		alg.viewB = db.graph.nodes.get(1);
@@ -145,16 +145,16 @@ class TestPairwiseGraphUtils {
 		alg.createThreeViewLookUpTables();
 
 		final int N = db.feats3D.size();
-		assertEquals(N,alg.table_A_to_B.size);
-		assertEquals(N,alg.table_A_to_C.size);
-		assertEquals(N,alg.table_B_to_C.size);
+		assertEquals(N, alg.table_A_to_B.size);
+		assertEquals(N, alg.table_A_to_C.size);
+		assertEquals(N, alg.table_B_to_C.size);
 
 		// compare to ground truth tables
 		for (int i = 0; i < N; i++) {
-			assertEquals(db.featToView.get(1)[i],alg.table_A_to_B.data[i]);
-			assertEquals(db.featToView.get(3)[i],alg.table_A_to_C.data[i]);
+			assertEquals(db.featToView.get(1)[i], alg.table_A_to_B.data[i]);
+			assertEquals(db.featToView.get(3)[i], alg.table_A_to_C.data[i]);
 			int b_to_c = db.featToView.get(3)[db.viewToFeat.get(1)[i]];
-			assertEquals(b_to_c,alg.table_B_to_C.data[i]);
+			assertEquals(b_to_c, alg.table_B_to_C.data[i]);
 		}
 	}
 
@@ -162,7 +162,7 @@ class TestPairwiseGraphUtils {
 	@Test
 	void createTripleFromCommon() {
 		var alg = new PairwiseGraphUtils();
-		var db = new MockLookupSimilarImages(4,0xDEADBEEF);
+		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		alg.db = db;
 		alg.seed = db.graph.nodes.get(0);
 		alg.viewB = db.graph.nodes.get(1);
@@ -170,34 +170,34 @@ class TestPairwiseGraphUtils {
 
 		// common is empty
 		alg.createTripleFromCommon();
-		assertEquals(0,alg.matchesTriple.size);
+		assertEquals(0, alg.matchesTriple.size);
 
 		// one element
 		alg.table_A_to_B.add(1);
 		alg.table_A_to_C.add(5);
 		alg.commonIdx.add(0);
 		alg.createTripleFromCommon();
-		assertEquals(1,alg.matchesTriple.size);
+		assertEquals(1, alg.matchesTriple.size);
 		// undo the shift in pixel coordinates
 		for (int i = 0; i < 3; i++) {
-			alg.matchesTriple.get(0).get(i).x += db.intrinsic.width/2;
-			alg.matchesTriple.get(0).get(i).y += db.intrinsic.height/2;
+			alg.matchesTriple.get(0).get(i).x += db.intrinsic.width / 2;
+			alg.matchesTriple.get(0).get(i).y += db.intrinsic.height / 2;
 		}
-		assertEquals(0.0,alg.matchesTriple.get(0).p1.distance(db.viewObs.get(0).get(0)));
-		assertEquals(0.0,alg.matchesTriple.get(0).p2.distance(db.viewObs.get(1).get(1)));
-		assertEquals(0.0,alg.matchesTriple.get(0).p3.distance(db.viewObs.get(3).get(5)));
+		assertEquals(0.0, alg.matchesTriple.get(0).p1.distance(db.viewObs.get(0).get(0)));
+		assertEquals(0.0, alg.matchesTriple.get(0).p2.distance(db.viewObs.get(1).get(1)));
+		assertEquals(0.0, alg.matchesTriple.get(0).p3.distance(db.viewObs.get(3).get(5)));
 
 		// Add one more
 		alg.table_A_to_B.add(2);
 		alg.table_A_to_C.add(2);
 		alg.commonIdx.add(1);
 		alg.createTripleFromCommon();
-		assertEquals(2,alg.matchesTriple.size);
+		assertEquals(2, alg.matchesTriple.size);
 	}
 
 	@Test
 	void initializeSbaSceneThreeView() {
-		var db = new MockLookupSimilarImages(4,0xDEADBEEF);
+		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		var alg = new PairwiseGraphUtils() {
 			boolean called = false;
 
@@ -216,25 +216,25 @@ class TestPairwiseGraphUtils {
 		alg.P2.set(db.listCameraMatrices.get(1));
 		alg.P3.set(db.listCameraMatrices.get(3));
 
-		alg.inliersThreeView.add( new AssociatedTriple() );
+		alg.inliersThreeView.add(new AssociatedTriple());
 
 		alg.initializeSbaSceneThreeView(true);
 
-		assertEquals(1,alg.structure.points.size);
+		assertEquals(1, alg.structure.points.size);
 
 		// triangulate is tested elsewhere for accuracy
 		assertTrue(alg.called);
 
 		// See if the results were copied
-		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P1,alg.structure.views.get(0).worldToView,1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P2,alg.structure.views.get(1).worldToView,1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P3,alg.structure.views.get(2).worldToView,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P1, alg.structure.views.get(0).worldToView, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P2, alg.structure.views.get(1).worldToView, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P3, alg.structure.views.get(2).worldToView, 1e-8));
 	}
 
 	@Test
 	void estimateProjectiveCamerasRobustly() {
 		var alg = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
-		var db = new MockLookupSimilarImages(4,0xDEADBEEF);
+		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		alg.db = db;
 		alg.seed = db.graph.nodes.get(0);
 		alg.viewB = db.graph.nodes.get(1);
@@ -247,23 +247,23 @@ class TestPairwiseGraphUtils {
 
 		// Simple test where we see how many inliers there are
 		assertTrue(alg.estimateProjectiveCamerasRobustly());
-		assertEquals(db.feats3D.size(),alg.ransac.getMatchSet().size());
+		assertEquals(db.feats3D.size(), alg.ransac.getMatchSet().size());
 
 		// Change one of the edges to see if it handles src/dst swap correctly
 		alg.viewB = db.graph.nodes.get(2);
 		// Everything should be an inlier since there's no noise
-		assertEquals(db.feats3D.size(),alg.ransac.getMatchSet().size());
+		assertEquals(db.feats3D.size(), alg.ransac.getMatchSet().size());
 
 		// Crude test to see if it saved some reasonable results
-		assertTrue(MatrixFeatures_DDRM.isIdentity(alg.P1,1e-8));
-		assertFalse(MatrixFeatures_DDRM.isIdentity(alg.P2,1e-8));
-		assertFalse(MatrixFeatures_DDRM.isIdentity(alg.P3,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentity(alg.P1, 1e-8));
+		assertFalse(MatrixFeatures_DDRM.isIdentity(alg.P2, 1e-8));
+		assertFalse(MatrixFeatures_DDRM.isIdentity(alg.P3, 1e-8));
 	}
 
 	@Test
 	void triangulateFeatures() {
 		var alg = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
-		var db = new MockLookupSimilarImages(4,0xDEADBEEF);
+		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 
 		int offset = 5;
 		alg.db = db;
@@ -286,7 +286,7 @@ class TestPairwiseGraphUtils {
 			alg.inliersThreeView.add(t);
 		}
 
-		alg.structure.initialize(3,alg.inliersThreeView.size());
+		alg.structure.initialize(3, alg.inliersThreeView.size());
 		alg.triangulateFeatures();
 
 		// start with 3D triangulation
@@ -296,7 +296,7 @@ class TestPairwiseGraphUtils {
 	/**
 	 * Verifies that triangulation was done correctly by comparing the distance to ground truth
 	 */
-	private void checkTriangulatedFeatures(PairwiseGraphUtils alg) {
+	private void checkTriangulatedFeatures( PairwiseGraphUtils alg ) {
 		// Project the points back into the image and see if it gets the observations back
 		// the input should be noise free so this should work to a high level of precision
 		Point4D_F64 X = new Point4D_F64();
@@ -304,11 +304,11 @@ class TestPairwiseGraphUtils {
 		for (int i = 0; i < alg.inliersThreeView.size(); i++) {
 			alg.structure.getPoints().get(i).get(X);
 
-			PerspectiveOps.renderPixel(alg.P1,X,expected);
+			PerspectiveOps.renderPixel(alg.P1, X, expected);
 			assertEquals(0.0, expected.distance(alg.inliersThreeView.get(i).p1), UtilEjml.TEST_F64);
-			PerspectiveOps.renderPixel(alg.P2,X,expected);
+			PerspectiveOps.renderPixel(alg.P2, X, expected);
 			assertEquals(0.0, expected.distance(alg.inliersThreeView.get(i).p2), UtilEjml.TEST_F64);
-			PerspectiveOps.renderPixel(alg.P3,X,expected);
+			PerspectiveOps.renderPixel(alg.P3, X, expected);
 			assertEquals(0.0, expected.distance(alg.inliersThreeView.get(i).p3), UtilEjml.TEST_F64);
 		}
 	}
@@ -316,9 +316,9 @@ class TestPairwiseGraphUtils {
 	@Test
 	void initializeSbaObservationsThreeView() {
 		var alg = new PairwiseGraphUtils();
-		var db = new MockLookupSimilarImages(4,0xDEADBEEF);
+		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
 
-		int[] views = new int[]{0,1,3};
+		int[] views = new int[]{0, 1, 3};
 		alg.db = db;
 		alg.P1.set(db.listCameraMatrices.get(views[0]));
 		alg.P2.set(db.listCameraMatrices.get(views[1]));
@@ -328,20 +328,20 @@ class TestPairwiseGraphUtils {
 			Point2D_F64 o1 = db.viewObs.get(views[0]).get(i);
 			Point2D_F64 o2 = db.viewObs.get(views[1]).get(i);
 			Point2D_F64 o3 = db.viewObs.get(views[2]).get(i);
-			alg.inliersThreeView.add( new AssociatedTriple(o1,o2,o3));
+			alg.inliersThreeView.add(new AssociatedTriple(o1, o2, o3));
 		}
 
 		alg.initializeSbaObservationsThreeView();
 
 		Point2D_F64 found = new Point2D_F64();
 		for (int viewIdx = 0; viewIdx < 3; viewIdx++) {
-			assertEquals(db.feats3D.size(),alg.observations.views.get(viewIdx).point.size());
+			assertEquals(db.feats3D.size(), alg.observations.views.get(viewIdx).point.size());
 
 			for (int i = 0; i < db.feats3D.size(); i++) {
 				Point2D_F64 expected = db.viewObs.get(views[viewIdx]).get(i);
-				alg.observations.views.get(viewIdx).get(i,found);
+				alg.observations.views.get(viewIdx).get(i, found);
 
-				assertEquals(0.0,expected.distance(found), UtilEjml.TEST_F32);
+				assertEquals(0.0, expected.distance(found), UtilEjml.TEST_F32);
 			}
 		}
 	}
@@ -349,8 +349,8 @@ class TestPairwiseGraphUtils {
 	@Test
 	void createTableViewAtoB() {
 		// Create a randomized table showing how features are matched between the two views
-		GrowQueue_I32 table_src_to_dst = GrowQueue_I32.range(0,50);
-		PrimitiveArrays.shuffle(table_src_to_dst.data,0,table_src_to_dst.size,rand);
+		GrowQueue_I32 table_src_to_dst = GrowQueue_I32.range(0, 50);
+		PrimitiveArrays.shuffle(table_src_to_dst.data, 0, table_src_to_dst.size, rand);
 
 		// Create the list of associated pairs
 		PairwiseImageGraph2.Motion motion = new PairwiseImageGraph2.Motion();
@@ -367,7 +367,7 @@ class TestPairwiseGraphUtils {
 
 		GrowQueue_I32 found_src_to_dst = new GrowQueue_I32(table_src_to_dst.size);
 		// Reconstruct the look up table
-		PairwiseGraphUtils.createTableViewAtoB(motion.src,motion,found_src_to_dst);
+		PairwiseGraphUtils.createTableViewAtoB(motion.src, motion, found_src_to_dst);
 		for (int i = 0; i < table_src_to_dst.size; i++) {
 			assertEquals(table_src_to_dst.data[i], found_src_to_dst.data[i]);
 		}
@@ -384,7 +384,7 @@ class TestPairwiseGraphUtils {
 			associated.src = associated.dst;
 			associated.dst = tmp;
 		}
-		PairwiseGraphUtils.createTableViewAtoB(motion.dst,motion,found_src_to_dst);
+		PairwiseGraphUtils.createTableViewAtoB(motion.dst, motion, found_src_to_dst);
 		for (int i = 0; i < table_src_to_dst.size; i++) {
 			assertEquals(table_src_to_dst.data[i], found_src_to_dst.data[i]);
 		}
@@ -404,12 +404,12 @@ class TestPairwiseGraphUtils {
 		alg.viewC = new PairwiseImageGraph2.View();
 
 		// tables need to cover every observation in A
-		alg.table_A_to_B.setTo(GrowQueue_I32.range(0,viewA.pview.totalObservations));
-		alg.table_A_to_C.setTo(GrowQueue_I32.range(0,viewA.pview.totalObservations));
-		PrimitiveArrays.shuffle(alg.table_A_to_B.data,0,alg.table_A_to_B.size, rand);
-		PrimitiveArrays.shuffle(alg.table_A_to_C.data,0,alg.table_A_to_C.size, rand);
+		alg.table_A_to_B.setTo(GrowQueue_I32.range(0, viewA.pview.totalObservations));
+		alg.table_A_to_C.setTo(GrowQueue_I32.range(0, viewA.pview.totalObservations));
+		PrimitiveArrays.shuffle(alg.table_A_to_B.data, 0, alg.table_A_to_B.size, rand);
+		PrimitiveArrays.shuffle(alg.table_A_to_C.data, 0, alg.table_A_to_C.size, rand);
 
-		alg.commonIdx.setTo(GrowQueue_I32.range(0,numInliers*2));
+		alg.commonIdx.setTo(GrowQueue_I32.range(0, numInliers * 2));
 
 		// just add elements until it hits the desired size
 		alg.inliersThreeView = new ArrayList<>();
@@ -423,7 +423,7 @@ class TestPairwiseGraphUtils {
 		// Go through all 3 possible views as the first view in the inliers
 		for (int firstView = 0; firstView < 3; firstView++) {
 			SceneWorkingGraph.View view0 = new SceneWorkingGraph.View();
-			view0.pview = switch(firstView) {
+			view0.pview = switch (firstView) {
 				case 0 -> alg.seed;
 				case 1 -> alg.viewB;
 				case 2 -> alg.viewC;
@@ -442,26 +442,25 @@ class TestPairwiseGraphUtils {
 			for (int checkView = 0; checkView < 3; checkView++) {
 				PairwiseImageGraph2.View v = inliers.views.get(checkView);
 				GrowQueue_I32 indexes = inliers.observations.get(checkView);
-				assertEquals(numInliers,indexes.size);
+				assertEquals(numInliers, indexes.size);
 
-				if( alg.seed == v) {
+				if (alg.seed == v) {
 					for (int j = 0; j < numInliers; j++) {
-						assertEquals(j*2, indexes.get(j));
+						assertEquals(j * 2, indexes.get(j));
 					}
-				} else if( alg.viewB == v) {
+				} else if (alg.viewB == v) {
 					for (int j = 0; j < numInliers; j++) {
-						assertEquals(alg.table_A_to_B.get(j*2), indexes.get(j));
+						assertEquals(alg.table_A_to_B.get(j * 2), indexes.get(j));
 					}
-				} else if( alg.viewC == v ){
+				} else if (alg.viewC == v) {
 					for (int j = 0; j < numInliers; j++) {
-						assertEquals(alg.table_A_to_C.get(j*2), indexes.get(j));
+						assertEquals(alg.table_A_to_C.get(j * 2), indexes.get(j));
 					}
 				} else {
 					fail("BUG");
 				}
 			}
 		}
-
 	}
 
 	@Nested
@@ -487,12 +486,11 @@ class TestPairwiseGraphUtils {
 		}
 	}
 
-	private static class MockRansac implements ModelMatcher<TrifocalTensor, AssociatedTriple>
-	{
-		@Override public boolean process(List<AssociatedTriple> dataSet) { return false; }
+	private static class MockRansac implements ModelMatcher<TrifocalTensor, AssociatedTriple> {
+		@Override public boolean process( List<AssociatedTriple> dataSet ) { return false; }
 		@Override public TrifocalTensor getModelParameters() { return null; }
 		@Override public List<AssociatedTriple> getMatchSet() { return null; }
-		@Override public int getInputIndex(int matchIndex) { return matchIndex*2; }
+		@Override public int getInputIndex( int matchIndex ) { return matchIndex * 2; }
 		@Override public double getFitQuality() { return 0; }
 		@Override public int getMinimumSize() { return 0; }
 		@Override public void reset() {}
