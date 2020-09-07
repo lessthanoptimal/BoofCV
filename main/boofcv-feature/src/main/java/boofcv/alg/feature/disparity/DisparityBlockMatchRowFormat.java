@@ -73,7 +73,7 @@ public abstract class DisparityBlockMatchRowFormat
 	 * @param regionRadiusX Radius of the rectangular region along x-axis.
 	 * @param regionRadiusY Radius of the rectangular region along y-axis.
 	 */
-	public DisparityBlockMatchRowFormat(int regionRadiusX, int regionRadiusY , ImageType<Input> imageType ) {
+	protected DisparityBlockMatchRowFormat(int regionRadiusX, int regionRadiusY , ImageType<Input> imageType ) {
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
 

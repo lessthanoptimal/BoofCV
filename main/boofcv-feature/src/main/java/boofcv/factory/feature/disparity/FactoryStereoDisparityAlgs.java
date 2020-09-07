@@ -48,8 +48,8 @@ public class FactoryStereoDisparityAlgs {
 	/**
 	 * Creates SGM stereo using HMI.
 	 */
-	public static SgmStereoDisparity createSgm(@Nullable ConfigDisparitySGM config ) {
-		if( config == null )
+	public static SgmStereoDisparity createSgm( @Nullable ConfigDisparitySGM config ) {
+		if (config == null)
 			config = new ConfigDisparitySGM();
 
 		int maxError = config.maxError < 0 ? Integer.MAX_VALUE : config.maxError;
@@ -63,7 +63,7 @@ public class FactoryStereoDisparityAlgs {
 		SgmStereoDisparity sgm;
 
 		// There's currently no block variant of MI
-		if( !config.useBlocks )
+		if (!config.useBlocks)
 			sgm = createSgmNativeCost(config, selector);
 		else
 			sgm = createSgmBlockCost(config, selector, GrayU8.class);
@@ -77,19 +77,21 @@ public class FactoryStereoDisparityAlgs {
 		return sgm;
 	}
 
-	private static SgmStereoDisparity createSgmNativeCost( ConfigDisparitySGM config, SgmDisparitySelector selector) {
+	private static SgmStereoDisparity createSgmNativeCost( ConfigDisparitySGM config, SgmDisparitySelector selector ) {
 		SgmStereoDisparity sgm;
 
-		switch( config.errorType) {
+		switch (config.errorType) {
 			case MUTUAL_INFORMATION: {
 				StereoMutualInformation stereoMI = createStereoMutualInformation(config);
-				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers,stereoMI,selector);
+				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers, stereoMI, selector);
 				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
-			} break;
+			}
+			break;
 
 			case ABSOLUTE_DIFFERENCE: {
-				sgm = new SgmStereoDisparityError(new SgmCostAbsoluteDifference.U8(),selector);
-			} break;
+				sgm = new SgmStereoDisparityError(new SgmCostAbsoluteDifference.U8(), selector);
+			}
+			break;
 
 			case CENSUS: {
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, GrayU8.class);
@@ -104,18 +106,18 @@ public class FactoryStereoDisparityAlgs {
 				} else {
 					throw new IllegalArgumentException("Unsupported image type");
 				}
-				sgm = new SgmStereoDisparityCensus(censusTran,cost,selector);
-			} break;
+				sgm = new SgmStereoDisparityCensus(censusTran, cost, selector);
+			}
+			break;
 
 			default:
-				throw new IllegalArgumentException("Unknown error type "+config.errorType);
+				throw new IllegalArgumentException("Unknown error type " + config.errorType);
 		}
 		return sgm;
 	}
 
 	private static <T extends ImageGray<T>>
-	SgmStereoDisparity createSgmBlockCost(ConfigDisparitySGM config, SgmDisparitySelector selector, Class<T> imageType)
-	{
+	SgmStereoDisparity createSgmBlockCost( ConfigDisparitySGM config, SgmDisparitySelector selector, Class<T> imageType ) {
 		SgmStereoDisparity sgm;
 		ConfigDisparityBM configBM = new ConfigDisparityBM();
 		configBM.regionRadiusX = config.configBlockMatch.radiusX;
@@ -127,51 +129,54 @@ public class FactoryStereoDisparityAlgs {
 		SgmCostFromBlocks<T> blockCost = new SgmCostFromBlocks<T>();
 		DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
 
-		switch( config.errorType) {
+		switch (config.errorType) {
 			case MUTUAL_INFORMATION: {
 				if (imageType != GrayU8.class) {
 					throw new IllegalArgumentException("Only GrayU8 supported at this time for Mutual Information");
 				}
 				StereoMutualInformation stereoMI = createStereoMutualInformation(config);
 				BlockRowScore rowScore = new BlockRowScoreMutualInformation.U8(stereoMI);
-				rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
+				rowScore.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				blockScore = createSgmBlockMatch(config, imageType, configBM, blockCost, rowScore);
-				blockScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
-				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers,stereoMI,selector,(SgmCostFromBlocks)blockCost);
+				blockScore.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers, stereoMI, selector, (SgmCostFromBlocks)blockCost);
 				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
-			} break;
+			}
+			break;
 
 			case ABSOLUTE_DIFFERENCE: {
-				BlockRowScore rowScore = createScoreRowSad(configBM,imageType);
-				blockScore = createSgmBlockMatch(config, (Class<T>) imageType, configBM, (SgmCostFromBlocks<T>) blockCost, rowScore);
-				blockScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
-				sgm = new SgmStereoDisparityError(blockCost,selector);
-			} break;
+				BlockRowScore rowScore = createScoreRowSad(configBM, imageType);
+				blockScore = createSgmBlockMatch(config, (Class<T>)imageType, configBM, (SgmCostFromBlocks<T>)blockCost, rowScore);
+				blockScore.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+				sgm = new SgmStereoDisparityError(blockCost, selector);
+			}
+			break;
 
 			case CENSUS: {
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
 				BlockRowScore rowScore = createCensusRowScore(configBM, censusTran);
 				blockScore = createSgmBlockMatch(config, censusTran.getOutputType().getImageClass(),
 						configBM, blockCost, rowScore);
-				blockScore.setBorder(FactoryImageBorder.generic(config.border,censusTran.getOutputType()));
-				sgm = new SgmStereoDisparityCensus(censusTran,blockCost,selector);
-			} break;
+				blockScore.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
+				sgm = new SgmStereoDisparityCensus(censusTran, blockCost, selector);
+			}
+			break;
 
 			default:
-				throw new IllegalArgumentException("Unknown error type "+config.errorType);
+				throw new IllegalArgumentException("Unknown error type " + config.errorType);
 		}
 		blockCost.setBlockScore(blockScore);
 		return sgm;
 	}
 
-	private static StereoMutualInformation createStereoMutualInformation(ConfigDisparitySGM config) {
+	private static StereoMutualInformation createStereoMutualInformation( ConfigDisparitySGM config ) {
 		StereoMutualInformation stereoMI = new StereoMutualInformation();
 		stereoMI.configureSmoothing(config.configHMI.smoothingRadius);
 		stereoMI.configureHistogram(config.configHMI.totalGrayLevels);
 		return stereoMI;
 	}
 
-	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat<T, GrayU8> createSgmBlockMatch(ConfigDisparitySGM config, Class<T> imageType, ConfigDisparityBM configBM, SgmCostFromBlocks<T> blockCost, BlockRowScore rowScore) {
+	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat<T, GrayU8> createSgmBlockMatch( ConfigDisparitySGM config, Class<T> imageType, ConfigDisparityBM configBM, SgmCostFromBlocks<T> blockCost, BlockRowScore rowScore ) {
 		DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
 		switch (config.configBlockMatch.approach) {
 			case BASIC:
@@ -188,62 +193,62 @@ public class FactoryStereoDisparityAlgs {
 		return blockScore;
 	}
 
-	public static DisparitySelect<int[],GrayU8> selectDisparity_S32(int maxError , int tolR2L , double texture) {
-		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
+	public static DisparitySelect<int[], GrayU8> selectDisparity_S32( int maxError, int tolR2L, double texture ) {
+		if (maxError < 0 && tolR2L < 0 && texture <= 0)
 			return new SelectErrorBasicWta_S32_U8();
 		else
-			return new SelectErrorWithChecks_S32.DispU8(maxError,tolR2L,texture);
+			return new SelectErrorWithChecks_S32.DispU8(maxError, tolR2L, texture);
 	}
 
-	public static DisparitySelect<float[],GrayU8> selectDisparity_F32(int maxError , int tolR2L , double texture) {
-		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
+	public static DisparitySelect<float[], GrayU8> selectDisparity_F32( int maxError, int tolR2L, double texture ) {
+		if (maxError < 0 && tolR2L < 0 && texture <= 0)
 			return new SelectErrorBasicWta_F32_U8();
 		else
-			return new SelectErrorWithChecks_F32.DispU8(maxError,tolR2L,texture);
+			return new SelectErrorWithChecks_F32.DispU8(maxError, tolR2L, texture);
 	}
 
-	public static <D extends ImageGray<D>> DisparitySelect<float[],D> selectCorrelation_F32(int tolR2L , double texture, boolean subpixel) {
-		if( !subpixel &&  tolR2L < 0 && texture <= 0 )
+	public static <D extends ImageGray<D>> DisparitySelect<float[], D> selectCorrelation_F32( int tolR2L, double texture, boolean subpixel ) {
+		if (!subpixel && tolR2L < 0 && texture <= 0)
 			return (DisparitySelect)new SelectCorrelationWta_F32_U8();
-		else if( !subpixel )
+		else if (!subpixel)
 			return (DisparitySelect)new SelectCorrelationWithChecks_F32.DispU8(tolR2L, texture);
 		else
-			return (DisparitySelect)new SelectCorrelationSubpixel.F32_F32(tolR2L,texture);
+			return (DisparitySelect)new SelectCorrelationSubpixel.F32_F32(tolR2L, texture);
 	}
 
-	public static DisparitySelect<int[],GrayF32>
-	selectDisparitySubpixel_S32( int maxError , int tolR2L , double texture) {
-		return new SelectErrorSubpixel.S32_F32(maxError,tolR2L,texture);
+	public static DisparitySelect<int[], GrayF32>
+	selectDisparitySubpixel_S32( int maxError, int tolR2L, double texture ) {
+		return new SelectErrorSubpixel.S32_F32(maxError, tolR2L, texture);
 	}
 
-	public static DisparitySelect<float[],GrayF32>
-	selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
-		return new SelectErrorSubpixel.F32_F32(maxError,tolR2L,texture);
+	public static DisparitySelect<float[], GrayF32>
+	selectDisparitySubpixel_F32( int maxError, int tolR2L, double texture ) {
+		return new SelectErrorSubpixel.F32_F32(maxError, tolR2L, texture);
 	}
 
 	public static DisparitySparseSelect<int[]>
-	selectDisparitySparse_S32( int maxError , double texture, int tolRightToLeft) {
-		if( maxError < 0 && texture <= 0 )
+	selectDisparitySparse_S32( int maxError, double texture, int tolRightToLeft ) {
+		if (maxError < 0 && texture <= 0)
 			return new SelectSparseErrorBasicWta_S32();
 		else
-			return new SelectSparseErrorWithChecksWta_S32(maxError,texture,tolRightToLeft);
+			return new SelectSparseErrorWithChecksWta_S32(maxError, texture, tolRightToLeft);
 	}
 
 	public static DisparitySparseSelect<float[]>
-	selectDisparitySparse_F32( int maxError , double texture, int tolRightToLeft) {
-		if( maxError < 0 && texture <= 0 )
+	selectDisparitySparse_F32( int maxError, double texture, int tolRightToLeft ) {
+		if (maxError < 0 && texture <= 0)
 			return new SelectSparseErrorBasicWta_F32();
 		else
-			return new SelectSparseErrorWithChecksWta_F32(maxError,texture,tolRightToLeft);
+			return new SelectSparseErrorWithChecksWta_F32(maxError, texture, tolRightToLeft);
 	}
 
 	public static DisparitySparseSelect<int[]>
-	selectDisparitySparseSubpixel_S32( int maxError , double texture, int tolRightToLeft) {
-		return new SelectSparseErrorSubpixel.S32(maxError,texture,tolRightToLeft);
+	selectDisparitySparseSubpixel_S32( int maxError, double texture, int tolRightToLeft ) {
+		return new SelectSparseErrorSubpixel.S32(maxError, texture, tolRightToLeft);
 	}
 
 	public static DisparitySparseSelect<float[]>
-	selectDisparitySparseSubpixel_F32( int maxError , double texture, int tolRightToLeft) {
-		return new SelectSparseErrorSubpixel.F32(maxError,texture,tolRightToLeft);
+	selectDisparitySparseSubpixel_F32( int maxError, double texture, int tolRightToLeft ) {
+		return new SelectSparseErrorSubpixel.F32(maxError, texture, tolRightToLeft);
 	}
 }

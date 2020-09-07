@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,6 @@
 
 package boofcv.concurrency;
 
-import org.ddogleg.struct.FastQueue;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.IntConsumer;
@@ -32,6 +30,7 @@ import java.util.stream.IntStream;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"CatchAndPrintStackTrace"})
 public class BoofConcurrency {
 	/**
 	 * If an image has fewer pixels than this it will not run a concurrent algorithm. The overhead makes it slower.
@@ -50,6 +49,7 @@ public class BoofConcurrency {
 	 * the number of threads is less than 2 then USE_CONCURRENT will be set to false and the single thread
 	 * version of code will be called. Otherwise USE_CONCURRENT will be true and the max threads in the pool
 	 * set to the specified number.
+	 *
 	 * @param maxThreads Maximum number of threads. &le 1 means it will not be threaded.
 	 */
 	public static void setMaxThreads( int maxThreads ) {
@@ -92,12 +92,16 @@ public class BoofConcurrency {
 	 *
 	 * @param start starting value, inclusive
 	 * @param endExclusive ending value, exclusive
+	 * @param step fixed sized step for each iteration
 	 * @param consumer The consumer
 	 */
 	public static void loopFor(int start , int endExclusive , int step , IntConsumer consumer ) {
+		if( step <= 0 )
+			throw new IllegalArgumentException("Step must be a positive number.");
 		try {
 			int range = endExclusive-start;
-			pool.submit(() ->IntStream.range(0, range/step).parallel().forEach(i-> consumer.accept(start+i*step))).get();
+			int iterations = range/step + ((range%step==0) ? 0 : 1);
+			pool.submit(() ->IntStream.range(0, iterations).parallel().forEach(i-> consumer.accept(start+i*step))).get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -178,13 +182,13 @@ public class BoofConcurrency {
 
 	/**
 	 * Splits the range of values up into blocks. For each block workspace data will be declared using a
-	 * {@link FastQueue} and passed on. This workspace can be used to collect results and combine later on
+	 * {@link GrowArray} and passed on. This workspace can be used to collect results and combine later on
 	 *
 	 * @param start First index, inclusive
 	 * @param endExclusive Last index, exclusive
 	 * @param consumer The consumer
 	 */
-	public static <T>void loopBlocks(int start , int endExclusive , FastQueue<T> workspace, IntRangeObjectConsumer<T> consumer ) {
+	public static <T>void loopBlocks(int start , int endExclusive , GrowArray<T> workspace, IntRangeObjectConsumer<T> consumer ) {
 		final ForkJoinPool pool = BoofConcurrency.pool;
 		int numThreads = pool.getParallelism();
 
@@ -207,7 +211,7 @@ public class BoofConcurrency {
 
 	/**
 	 * Splits the range of values up into blocks. For each block workspace data will be declared using a
-	 * {@link FastQueue} and passed on. This workspace can be used to collect results and combine later on
+	 * {@link GrowArray} and passed on. This workspace can be used to collect results and combine later on
 	 *
 	 * @param start First index, inclusive
 	 * @param endExclusive Last index, exclusive
@@ -215,7 +219,7 @@ public class BoofConcurrency {
 	 * @param consumer The consumer
 	 */
 	public static <T>void loopBlocks(int start , int endExclusive , int minBlock ,
-									 FastQueue<T> workspace, IntRangeObjectConsumer<T> consumer ) {
+									 GrowArray<T> workspace, IntRangeObjectConsumer<T> consumer ) {
 		final ForkJoinPool pool = BoofConcurrency.pool;
 		int numThreads = pool.getParallelism();
 
@@ -285,4 +289,11 @@ public class BoofConcurrency {
 		}
 	}
 
+	public interface NewInstance<D> {
+		D newInstance();
+	}
+
+	public interface Reset<D> {
+		void reset(D data);
+	}
 }

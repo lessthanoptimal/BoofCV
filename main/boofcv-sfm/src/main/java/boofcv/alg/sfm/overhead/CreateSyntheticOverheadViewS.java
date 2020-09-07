@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,6 +51,7 @@ public class CreateSyntheticOverheadViewS<T extends ImageGray<T>> extends Create
 	 * @param input (Input) Camera image.
 	 * @param output (Output) Image containing overhead view.
 	 */
+	@Override
 	public void process(T input, T output) {
 
 		this.output = FactoryGImageGray.wrap(output,this.output);

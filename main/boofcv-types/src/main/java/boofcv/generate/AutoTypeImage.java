@@ -19,21 +19,22 @@
 package boofcv.generate;
 
 import boofcv.struct.image.*;
+import lombok.Getter;
 
 import java.lang.reflect.InvocationTargetException;
-
 
 /**
  * Image information for auto generated code
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"ImmutableEnumChecker","UnnecessaryParentheses"})
 public enum AutoTypeImage {
-	I("GrayI","int",true,0),
-	I8("GrayI8","byte",true,8),
+	I("GrayI", "int", true, 0),
+	I8("GrayI8", "byte", true, 8),
 	U8(GrayU8.class),
 	S8(GrayS8.class),
-	I16("GrayI16","short",true,16),
+	I16("GrayI16", "short", true, 16),
 	U16(GrayU16.class),
 	S16(GrayS16.class),
 	S32(GrayS32.class),
@@ -42,18 +43,18 @@ public enum AutoTypeImage {
 	F64(GrayF64.class);
 
 	private String imageSingleName;
-	private String dataType;
-	private String bitWise;
-	private String sumType;
-	private String largeSumType;
-	private boolean isInteger;
+	private @Getter String dataType;
+	private @Getter String bitWise;
+	private @Getter String sumType;
+	private @Getter String largeSumType;
+	private @Getter boolean isInteger;
 	private boolean isSigned;
-	private int numBits;
+	private @Getter int numBits;
 	private String abbreviatedType;
 
 	private Class<?> primitiveType;
 
-	AutoTypeImage(Class<?> imageType ) throws RuntimeException {
+	AutoTypeImage( Class<?> imageType ) throws RuntimeException {
 
 		imageSingleName = imageType.getSimpleName();
 		bitWise = "";
@@ -61,20 +62,18 @@ public enum AutoTypeImage {
 			ImageGray img = (ImageGray)imageType.getConstructor().newInstance();
 			setByDataType(img.getDataType());
 			dataType = primitiveType.getSimpleName();
-
-
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	AutoTypeImage(String imageSingleName, String dataType, boolean isInteger , int numBits ) {
+	AutoTypeImage( String imageSingleName, String dataType, boolean isInteger, int numBits ) {
 		this.imageSingleName = imageSingleName;
 		this.dataType = dataType;
 		this.isInteger = isInteger;
 		this.numBits = numBits;
 
-		if( isInteger ) {
+		if (isInteger) {
 			this.abbreviatedType = "I";
 			this.sumType = "int";
 		} else {
@@ -88,32 +87,31 @@ public enum AutoTypeImage {
 		numBits = type.getNumBits();
 		abbreviatedType = type.toString();
 
-		if( type.isInteger() ) {
+		if (type.isInteger()) {
 			isInteger = true;
-			if( numBits <= 32 )
+			if (numBits <= 32)
 				sumType = "int";
 			else
 				sumType = "long";
-			if( numBits <= 16 )
+			if (numBits <= 16)
 				largeSumType = "int";
 			else
 				largeSumType = "long";
 
-			if( !type.isSigned() ) {
+			if (!type.isSigned()) {
 				isSigned = false;
-				if( byte.class == primitiveType) {
+				if (byte.class == primitiveType) {
 					bitWise = "& 0xFF";
-				} else if( short.class == primitiveType) {
+				} else if (short.class == primitiveType) {
 					bitWise = "& 0xFFFF";
 				}
 			} else {
 				isSigned = true;
 			}
-
 		} else {
 			isSigned = true;
 			isInteger = false;
-			if( type.getNumBits() == 32 ) {
+			if (type.getNumBits() == 32) {
 				sumType = "float";
 			} else {
 				sumType = "double";
@@ -123,35 +121,35 @@ public enum AutoTypeImage {
 	}
 
 	public static AutoTypeImage[] getIntegerTypes() {
-		return new AutoTypeImage[]{U8,S8,U16,S16,S32,S64};
+		return new AutoTypeImage[]{U8, S8, U16, S16, S32, S64};
 	}
 
 	public static AutoTypeImage[] getFloatingTypes() {
-		return new AutoTypeImage[]{F32,F64};
+		return new AutoTypeImage[]{F32, F64};
 	}
 
 	public static AutoTypeImage[] getGenericTypes() {
-		return new AutoTypeImage[]{I8,I16,S32,S64,F32,F64};
+		return new AutoTypeImage[]{I8, I16, S32, S64, F32, F64};
 	}
 
 	public static AutoTypeImage[] getReallyGenericTypes() {
-		return new AutoTypeImage[]{I,S64,F32,F64};
+		return new AutoTypeImage[]{I, S64, F32, F64};
 	}
 
 	public static AutoTypeImage[] getSpecificTypes() {
-		return new AutoTypeImage[]{U8,S8,U16,S16,S32,S64,F32,F64};
+		return new AutoTypeImage[]{U8, S8, U16, S16, S32, S64, F32, F64};
 	}
 
 	public static AutoTypeImage[] getSigned() {
-		return new AutoTypeImage[]{S8,S16,S32,S64,F32,F64};
+		return new AutoTypeImage[]{S8, S16, S32, S64, F32, F64};
 	}
 
 	public static AutoTypeImage[] getUnsigned() {
-		return new AutoTypeImage[]{U8,U16};
+		return new AutoTypeImage[]{U8, U16};
 	}
 
 	public String getImageName( ImageType.Family family ) {
-		if( family == ImageType.Family.INTERLEAVED)
+		if (family == ImageType.Family.INTERLEAVED)
 			return getInterleavedName();
 		else {
 			return getSingleBandName();
@@ -159,57 +157,57 @@ public enum AutoTypeImage {
 	}
 
 	public String getBorderNameSB() {
-		String name = "ImageBorder_"+getKernelType();
-		if( isInteger() && getNumBits() <= 32 ) {
-			name += "<"+getSingleBandName()+">";
+		String name = "ImageBorder_" + getKernelType();
+		if (isInteger() && getNumBits() <= 32) {
+			name += "<" + getSingleBandName() + ">";
 		}
 		return name;
 	}
 
 	public String getKernelType() {
-		return isInteger() ? getNumBits()==64 ? "S64":"S32" : getNumBits()==64 ? "F64" : "F32";
+		return isInteger() ? getNumBits() == 64 ? "S64" : "S32" : getNumBits() == 64 ? "F64" : "F32";
 	}
 
 	public String getKernelDataType() {
-		return isInteger() ? "int" : getNumBits()==64 ? "double" : "float";
+		return isInteger() ? "int" : getNumBits() == 64 ? "double" : "float";
 	}
 
 	public String getInterleavedName() {
-		return "Interleaved"+toString();
+		return "Interleaved" + toString();
 	}
 
 	public String getLetter() {
-		if( isInteger ) {
-			switch( getNumBits() ) {
-				case 64: return "L";
-				case 32: return "I";
-				case 16: return "S";
-				case 8: return "B";
-			}
+		if (isInteger) {
+			return switch (getNumBits()) {
+				case 64 -> "L";
+				case 32 -> "I";
+				case 16 -> "S";
+				case 8 -> "B";
+				default -> throw new RuntimeException("Unknown type");
+			};
 		} else {
-			switch( getNumBits() ) {
-				case 64: return "D";
-				case 32: return "F";
-			}
+			return switch (getNumBits()) {
+				case 64 -> "D";
+				case 32 -> "F";
+				default -> throw new RuntimeException("Unknown type");
+			};
 		}
-		throw new RuntimeException("Unknown type");
 	}
 
 	public String getLetterSum() {
-		if( isInteger ) {
-			switch( getNumBits() ) {
-				case 64: return "L";
-				case 32:
-				case 16:
-				case 8: return "I";
-			}
+		if (isInteger) {
+			return switch (getNumBits()) {
+				case 64 -> "L";
+				case 32, 16, 8 -> "I";
+				default -> throw new RuntimeException("Unknown type");
+			};
 		} else {
-			switch( getNumBits() ) {
-				case 64: return "D";
-				case 32: return "F";
-			}
+			return switch (getNumBits()) {
+				case 64 -> "D";
+				case 32 -> "F";
+				default -> throw new RuntimeException("Unknown type");
+			};
 		}
-		throw new RuntimeException("Unknown type");
 	}
 
 	public String getSingleBandName() {
@@ -217,71 +215,40 @@ public enum AutoTypeImage {
 	}
 
 	public String getName( ImageType.Family family ) {
-		switch( family ) {
-			case GRAY:
-				return getSingleBandName();
-			case INTERLEAVED:
-				return getInterleavedName();
-			default:
-				throw new IllegalArgumentException("Not supported");
-		}
-	}
-
-	public String getDataType() {
-		return dataType;
-	}
-
-	public String getBitWise() {
-		return bitWise;
-	}
-
-	public String getSumType() {
-		return sumType;
+		return switch (family) {
+			case GRAY -> getSingleBandName();
+			case INTERLEAVED -> getInterleavedName();
+			default -> throw new IllegalArgumentException("Not supported");
+		};
 	}
 
 	public String getMaxForSumType() {
-		switch( sumType ) {
-			case "int": return "Integer.MAX_VALUE";
-			case "long": return "Long.MAX_VALUE";
-			case "float": return "Float.MAX_VALUE";
-			case "double": return "Double.MAX_VALUE";
-		}
-		throw new RuntimeException("Unknown sum type");
+		return switch (sumType) {
+			case "int" -> "Integer.MAX_VALUE";
+			case "long" -> "Long.MAX_VALUE";
+			case "float" -> "Float.MAX_VALUE";
+			case "double" -> "Double.MAX_VALUE";
+			default -> throw new RuntimeException("Unknown sum type");
+		};
 	}
 
 	public String getSumNumberToType() {
-		switch( sumType ) {
-			case "int": return "intValue()";
-			case "long": return "longValue()";
-			case "float": return "floatValue()";
-			case "double": return "doubleValue()";
-		}
-		throw new RuntimeException("Unknown sum type");
-	}
-
-	public String getLargeSumType() {
-		return largeSumType;
-	}
-
-	public boolean isInteger() {
-		return isInteger;
+		return switch (sumType) {
+			case "int" -> "intValue()";
+			case "long" -> "longValue()";
+			case "float" -> "floatValue()";
+			case "double" -> "doubleValue()";
+			default -> throw new RuntimeException("Unknown sum type");
+		};
 	}
 
 	public boolean isSigned() {
 		return isSigned;
 	}
 
-	public int getNumBits() {
-		return numBits;
-	}
-
-	public Class<?> getPrimitiveType() {
-		return primitiveType;
-	}
-
 	public String getTypeCastFromSum() {
-		if( sumType.compareTo(dataType) != 0 )
-			return "("+dataType+")";
+		if (sumType.compareTo(dataType) != 0)
+			return "(" + dataType + ")";
 		else
 			return "";
 	}
@@ -290,20 +257,30 @@ public enum AutoTypeImage {
 		return abbreviatedType;
 	}
 
+	public String getGenericAbbreviated() {
+		if( isInteger ) {
+			if( numBits < 32 )
+				return "I"+numBits;
+			else
+				return "S"+numBits;
+		}
+		return "F"+numBits;
+	}
+
 	public String getRandType() {
 		return primitiveType == float.class ? "Float" : "Double";
 	}
 
 	public Number getMax() {
-		if( isInteger ) {
-			if( byte.class == primitiveType) {
-				if( isSigned ) {
+		if (isInteger) {
+			if (byte.class == primitiveType) {
+				if (isSigned) {
 					return Byte.MAX_VALUE;
 				} else {
 					return 0xFF;
 				}
-			} else if( short.class == primitiveType) {
-				if( isSigned ) {
+			} else if (short.class == primitiveType) {
+				if (isSigned) {
 					return Short.MAX_VALUE;
 				} else {
 					return 0xFFFF;
@@ -311,7 +288,7 @@ public enum AutoTypeImage {
 			} else {
 				return Integer.MAX_VALUE;
 			}
-		} else if( float.class == primitiveType) {
+		} else if (float.class == primitiveType) {
 			return Float.MAX_VALUE;
 		} else {
 			return Double.MAX_VALUE;
@@ -319,15 +296,15 @@ public enum AutoTypeImage {
 	}
 
 	public Number getMin() {
-		if( isInteger ) {
-			if( byte.class == primitiveType) {
-				if( isSigned ) {
+		if (isInteger) {
+			if (byte.class == primitiveType) {
+				if (isSigned) {
 					return Byte.MIN_VALUE;
 				} else {
 					return 0;
 				}
-			} else if( short.class == primitiveType) {
-				if( isSigned ) {
+			} else if (short.class == primitiveType) {
+				if (isSigned) {
 					return Short.MIN_VALUE;
 				} else {
 					return 0;
@@ -335,7 +312,7 @@ public enum AutoTypeImage {
 			} else {
 				return Integer.MIN_VALUE;
 			}
-		} else if( float.class == primitiveType) {
+		} else if (float.class == primitiveType) {
 			return Float.MIN_VALUE;
 		} else {
 			return Double.MIN_VALUE;

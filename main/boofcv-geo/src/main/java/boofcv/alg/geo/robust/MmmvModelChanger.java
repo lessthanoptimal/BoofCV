@@ -27,16 +27,15 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class MmmvModelChanger<ModelA,ModelB,Point> implements ModelMatcherMultiview<ModelB,Point> {
+public abstract class MmmvModelChanger<ModelA, ModelB, Point> implements ModelMatcherMultiview<ModelB, Point> {
 
-	protected ModelMatcherMultiview<ModelA,Point> mmmv;
+	protected ModelMatcherMultiview<ModelA, Point> mmmv;
 
-	public MmmvModelChanger(ModelMatcherMultiview<ModelA, Point> mmmv) {
+	protected MmmvModelChanger( ModelMatcherMultiview<ModelA, Point> mmmv ) {
 		this.mmmv = mmmv;
 	}
 
-	public MmmvModelChanger() {
-	}
+	protected MmmvModelChanger() {}
 
 	@Override
 	public void reset() {
@@ -44,8 +43,8 @@ public abstract class MmmvModelChanger<ModelA,ModelB,Point> implements ModelMatc
 	}
 
 	@Override
-	public void setIntrinsic(int view, CameraPinhole intrinsic) {
-		mmmv.setIntrinsic(view,intrinsic);
+	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
+		mmmv.setIntrinsic(view, intrinsic);
 	}
 
 	@Override
@@ -54,7 +53,7 @@ public abstract class MmmvModelChanger<ModelA,ModelB,Point> implements ModelMatc
 	}
 
 	@Override
-	public boolean process(List<Point> dataSet) {
+	public boolean process( List<Point> dataSet ) {
 		return mmmv.process(dataSet);
 	}
 
@@ -64,7 +63,7 @@ public abstract class MmmvModelChanger<ModelA,ModelB,Point> implements ModelMatc
 	}
 
 	@Override
-	public int getInputIndex(int matchIndex) {
+	public int getInputIndex( int matchIndex ) {
 		return mmmv.getInputIndex(matchIndex);
 	}
 

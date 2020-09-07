@@ -19,12 +19,28 @@
 package boofcv.alg.sfm.structure2;
 
 import boofcv.misc.ConfigConverge;
+import boofcv.struct.Configuration;
+
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
+ * Configuration for {@link ProjectiveToMetricReconstruction}
+ *
  * @author Peter Abeles
  */
-public class ConfigProjectiveToMetric {
+public class ConfigProjectiveToMetric implements Configuration {
+	/** Known aspect ratio of the pixels. Pixels are 99.999% square these days so this should be 1.0 */
 	public double aspectRatio = 1.0;
 	/** Converge tolerance for SBA */
 	public ConfigConverge sbaConverge = new ConfigConverge(1e-8, 1e-8, 50);
+
+	@Override public void checkValidity() {
+		assertBoof(aspectRatio > 0.0);
+		sbaConverge.checkValidity();
+	}
+
+	public void setTo( ConfigProjectiveToMetric src ) {
+		this.aspectRatio = src.aspectRatio;
+		this.sbaConverge.setTo(src.sbaConverge);
+	}
 }

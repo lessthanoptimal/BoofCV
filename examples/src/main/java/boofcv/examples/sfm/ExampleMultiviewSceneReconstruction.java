@@ -19,6 +19,7 @@
 package boofcv.examples.sfm;
 
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.scene.PointTrackerToSimilarImages;
@@ -54,13 +55,13 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleMultiviewSceneReconstruction {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
 		boolean forceRecompute = false;
 
 		PairwiseImageGraph2 pairwise = null;
-		LookupSimilarImages similarImages = null; // TODO save and load similar images too
+		LookupSimilarImages similarImages; // TODO save and load similar images too
 		SceneWorkingGraph working = null;
 
 		int radius = 10;
@@ -101,46 +102,46 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 		similarImages = trackerSimilar;
 
-		if( !forceRecompute )
-			try {pairwise = MultiViewIO.load("pairwise.yaml",null);} catch(UncheckedIOException ignore){}
+		if (!forceRecompute)
+			try {pairwise = MultiViewIO.load("pairwise.yaml", null);} catch (UncheckedIOException ignore) {}
 
-		if( pairwise == null ) {
+		if (pairwise == null) {
 			System.out.println("----------------------------------------------------------------------------");
 			System.out.println("### Creating Pairwise");
 			var generatePairwise = new GeneratePairwiseImageGraph();
 			generatePairwise.setVerbose(System.out, null);
 			generatePairwise.process(similarImages);
 			pairwise = generatePairwise.getGraph();
-			MultiViewIO.save(pairwise,"pairwise.yaml");
+			MultiViewIO.save(pairwise, "pairwise.yaml");
 		}
 
-		System.out.println("  nodes.size="+pairwise.nodes.size);
-		System.out.println("  edges.size="+pairwise.edges.size);
+		System.out.println("  nodes.size=" + pairwise.nodes.size);
+		System.out.println("  edges.size=" + pairwise.edges.size);
 		int nodesWithNo3D = 0;
 		for (int i = 0; i < pairwise.nodes.size; i++) {
 			PairwiseImageGraph2.View n = pairwise.nodes.get(i);
 			boolean found = false;
 			for (int j = 0; j < n.connections.size; j++) {
-				if( n.connections.get(j).is3D ) {
+				if (n.connections.get(j).is3D) {
 					found = true;
 					break;
 				}
 			}
-			if( !found ) {
-				System.out.println("   no 3D in "+n.id);
+			if (!found) {
+				System.out.println("   no 3D in " + n.id);
 				nodesWithNo3D++;
 			}
 		}
-		System.out.println("  nodes with no 3D "+nodesWithNo3D);
+		System.out.println("  nodes with no 3D " + nodesWithNo3D);
 
 		// TODO save / load SceneWorkingGraph
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Metric Reconstruction");
 
-		if( !forceRecompute )
-			try {working = MultiViewIO.load("working.yaml",pairwise,null);} catch(UncheckedIOException ignore){}
+		if (!forceRecompute)
+			try {working = MultiViewIO.load("working.yaml", pairwise, null);} catch (UncheckedIOException ignore) {}
 
-		if( working == null ) {
+		if (working == null) {
 			var metric = new MetricFromUncalibratedPairwiseGraph();
 			metric.setVerbose(System.out, null);
 			metric.getInitProjective().setVerbose(System.out, null);
@@ -151,15 +152,15 @@ public class ExampleMultiviewSceneReconstruction {
 				System.exit(0);
 			}
 			working = metric.getWorkGraph();
-			MultiViewIO.save(working,"working.yaml");
+			MultiViewIO.save(working, "working.yaml");
 		}
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Refining the scene");
 		var refine = new RefineMetricWorkingGraph();
 		refine.bundleAdjustment.keepFraction = 0.95;
-		refine.bundleAdjustment.getSba().setVerbose(System.out,null);
-		if( !refine.process(similarImages,working) ) {
+		refine.bundleAdjustment.getSba().setVerbose(System.out, null);
+		if (!refine.process(similarImages, working)) {
 			System.out.println("REFINE FAILED");
 		}
 
@@ -168,37 +169,37 @@ public class ExampleMultiviewSceneReconstruction {
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Printing view info");
-		for( PairwiseImageGraph2.View pv : pairwise.nodes.toList() ) {
+		for (PairwiseImageGraph2.View pv : pairwise.nodes.toList()) {
 			var wv = working.lookupView(pv.id);
-			if(wv == null )
+			if (wv == null)
 				continue;
 			int order = working.viewList.indexOf(wv);
 
-			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f}\n",order,wv.pview.id,
-					wv.intrinsic.f,wv.intrinsic.k1,wv.intrinsic.k2,
-					wv.world_to_view.T.x,wv.world_to_view.T.y,wv.world_to_view.T.z);
+			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f}\n", order, wv.pview.id,
+					wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
+					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z);
 		}
 
 		// TODO visualize
 		System.out.println("done");
 	}
 
-	public static void visualizeInPointCloud(SceneStructureMetric structure ) {
+	public static void visualizeInPointCloud( SceneStructureMetric structure ) {
 
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
 		Point3D_F64 world = new Point3D_F64();
 		Point3D_F64 camera = new Point3D_F64();
 
-		for( int i = 0; i < structure.points.size; i++ ) {
+		for (int i = 0; i < structure.points.size; i++) {
 			// Get 3D location
-			SceneStructureMetric.Point p = structure.points.get(i);
+			SceneStructureCommon.Point p = structure.points.get(i);
 			p.get(world);
 
 			// Project point into an arbitrary view
 			for (int j = 0; j < p.views.size; j++) {
-				int viewIdx  = p.views.get(j);
-				SePointOps_F64.transform(structure.views.data[viewIdx].worldToView,world,camera);
-				cloudXyz.add( world.copy() );
+				int viewIdx = p.views.get(j);
+				SePointOps_F64.transform(structure.views.data[viewIdx].worldToView, world, camera);
+				cloudXyz.add(world.copy());
 				break;
 			}
 		}
@@ -211,8 +212,8 @@ public class ExampleMultiviewSceneReconstruction {
 		viewer.addCloud(cloudXyz);
 		viewer.setCameraHFov(UtilAngle.radian(60));
 
-		SwingUtilities.invokeLater(()->{
-			viewer.getComponent().setPreferredSize(new Dimension(600,600));
+		SwingUtilities.invokeLater(() -> {
+			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
 			ShowImages.showWindow(viewer.getComponent(), "Refined Scene", true);
 		});
 	}

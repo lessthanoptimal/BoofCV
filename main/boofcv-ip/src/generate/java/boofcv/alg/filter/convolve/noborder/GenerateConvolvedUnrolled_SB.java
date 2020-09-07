@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -206,7 +206,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
 				"\n");
 		for (int i = 0; i < num; i++) {
-			out.printf("\t\tfinal " + dataKernel + " k%d = kernel.data[%d];\n", (i + 1), i);
+			out.printf("\t\tfinal " + dataKernel + " k%d = kernel.data[%d];\n", i + 1, i);
 		}
 		out.print(
 				"\n"+
@@ -223,16 +223,16 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\t\t\t\tint indexSrc = j;\n" +
 				"\t\t\t\t" + sumType + " total = (dataSrc[indexSrc++]" + bitWise + ")*k1;\n";
 		for (int i = 1; i < num - 1; i++) {
-			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc++]" + bitWise + ")*k%d;\n", (i + 1));
+			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc++]" + bitWise + ")*k%d;\n", i + 1);
 		}
 		body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", num);
-		body += String.format("\n");
+		body += "\n";
 		if( hasDivisor ) {
-			body += String.format("\t\t\t\tdataDst[indexDst++] = " + typeCast + "("+divide+");\n");
+			body += "\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n";
 		} else {
-			body += String.format("\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n");
+			body += "\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n";
 		}
-		body += String.format("\t\t\t}\n");
+		body += "\t\t\t}\n";
 
 		printParallel("i","0","image.height",body);
 
@@ -254,7 +254,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
 				"\n");
 		for (int i = 0; i < num; i++) {
-			out.printf("\t\tfinal " + dataKernel + " k%d = kernel.data[%d];\n", (i + 1), i);
+			out.printf("\t\tfinal " + dataKernel + " k%d = kernel.data[%d];\n", i + 1, i);
 		}
 
 		out.print("\n" +
@@ -275,14 +275,14 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\t" + sumType + " total = (dataSrc[indexSrc]"+bitWise+") * k1;\n";
 		for (int i = 1; i < num; i++) {
-			body += String.format("\t\t\t\tindexSrc += image.stride;\n");
-			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", (i + 1));
+			body += "\t\t\t\tindexSrc += image.stride;\n";
+			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWise + ")*k%d;\n", i + 1);
 		}
-		body += String.format("\n");
+		body += "\n";
 		if( hasDivisor )
-			body += String.format("\t\t\t\tdataDst[indexDst++] = " + typeCast + "("+divide+");\n");
+			body += "\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n";
 		else
-			body += String.format("\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n");
+			body += "\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n";
 		body += "\t\t\t}\n";
 
 		printParallel("y","radius","yEnd",body);
@@ -308,45 +308,45 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		String body ="\n" +
 					 "\t\t\t// first time through the value needs to be set\n";
 		for( int i = 0; i < num; i++ ) {
-			body += String.format("\t\t\t"+sumType+" k"+(i+1)+" = kernel.data["+i+"];\n");
+			body += "\t\t\t" + sumType + " k" + (i + 1) + " = kernel.data[" + i + "];\n";
 		}
 
-		body += String.format("\n" +
+		body += "\n" +
 				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
 				"\t\t\tint indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;\n" +
 				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
 				"\t\t\t\tint indexSrc = indexSrcRow + x;\n" +
 				"\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n");
+				"\t\t\t\t" + sumType + " total = 0;\n";
 		for( int i = 0; i < num-1; i++ ) {
-			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+			body += "\t\t\t\ttotal += (dataSrc[indexSrc++] " + bitWise + ")* k" + (i + 1) + ";\n";
 		}
-		body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+num+";\n");
-		body += String.format("\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"total;\n" +
+		body += "\t\t\t\ttotal += (dataSrc[indexSrc] " + bitWise + ")* k" + num + ";\n";
+		body += "\n" +
+				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\t// rest of the convolution rows are an addition\n" +
-				"\t\t\tfor( int i = 1; i < "+num+"; i++ ) {\n" +
+				"\t\t\tfor( int i = 1; i < " + num + "; i++ ) {\n" +
 				"\t\t\t\tindexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
 				"\t\t\t\tindexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;\n" +
-				"\t\t\t\t\n");
+				"\t\t\t\t\n";
 		for( int i = 0; i < num; i++ ) {
-			body += String.format("\t\t\t\tk"+(i+1)+" = kernel.data[i*"+num+" + "+i+"];\n");
+			body += "\t\t\t\tk" + (i + 1) + " = kernel.data[i*" + num + " + " + i + "];\n";
 		}
-		body += String.format("\n" +
+		body += "\n" +
 				"\t\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
 				"\t\t\t\t\tint indexSrc = indexSrcRow+x;\n" +
 				"\n" +
-				"\t\t\t\t\t"+sumType+" total = 0;\n");
+				"\t\t\t\t\t" + sumType + " total = 0;\n";
 		for( int i = 0; i < num-1; i++ ) {
-			body += String.format("\t\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+			body += "\t\t\t\t\ttotal += (dataSrc[indexSrc++] " + bitWise + ")* k" + (i + 1) + ";\n";
 		}
-		body += String.format("\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+(num)+";\n");
-		body += String.format("\n" +
-				"\t\t\t\t\tdataDst[indexDst++] += "+typeCast+"total;\n" +
+		body += "\t\t\t\t\ttotal += (dataSrc[indexSrc] " + bitWise + ")* k" + num + ";\n";
+		body += "\n" +
+				"\t\t\t\t\tdataDst[indexDst++] += " + typeCast + "total;\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t}\n");
+				"\t\t\t}\n";
 
 		printParallel("y","kernelRadius","height-kernelRadius",body);
 
@@ -378,8 +378,8 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		String body = "";
 		body += "\t\t"+sumType+" totalRow[] = _work.pop();\n";
 		body += "\t\tfor( int y = y0; y < y1; y++ ) {\n";
-		body += String.format("\n" +
-				"\t\t\t// first time through the value needs to be set\n");
+		body += "\n" +
+				"\t\t\t// first time through the value needs to be set\n";
 		for( int i = 0; i < num; i++ ) {
 			body += "\t\t\t"+sumType+" k"+(i+1)+" = kernel.data["+i+"];\n";
 		}
@@ -389,39 +389,39 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t\t"+sumType+" total = 0;\n";
 		for( int i = 0; i < num-1; i++ ) {
-			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+			body += "\t\t\t\ttotal += (dataSrc[indexSrc++] " + bitWise + ")* k" + (i + 1) + ";\n";
 		}
-		body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+num+";\n");
-		body += String.format("\n" +
+		body += "\t\t\t\ttotal += (dataSrc[indexSrc] " + bitWise + ")* k" + num + ";\n";
+		body += "\n" +
 				"\t\t\t\ttotalRow[x] = total;\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\t// rest of the convolution rows are an addition\n" +
-				"\t\t\tfor( int i = 1; i < "+num+"; i++ ) {\n" +
+				"\t\t\tfor( int i = 1; i < " + num + "; i++ ) {\n" +
 				"\t\t\t\tindexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;\n" +
-				"\t\t\t\t\n");
+				"\t\t\t\t\n";
 		for( int i = 0; i < num; i++ ) {
-			body += String.format("\t\t\t\tk"+(i+1)+" = kernel.data[i*"+num+" + "+i+"];\n");
+			body += "\t\t\t\tk" + (i + 1) + " = kernel.data[i*" + num + " + " + i + "];\n";
 		}
-		body += String.format("\n" +
+		body += "\n" +
 				"\t\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
 				"\t\t\t\t\tint indexSrc = indexSrcRow+x;\n" +
 				"\n" +
-				"\t\t\t\t\t"+sumType+" total = 0;\n");
+				"\t\t\t\t\t" + sumType + " total = 0;\n";
 		for( int i = 0; i < num-1; i++ ) {
-			body += String.format("\t\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
+			body += "\t\t\t\t\ttotal += (dataSrc[indexSrc++] " + bitWise + ")* k" + (i + 1) + ";\n";
 		}
-		body += String.format("\t\t\t\t\ttotal += (dataSrc[indexSrc] "+bitWise+")* k"+(num)+";\n");
-		body += String.format("\n" +
+		body += "\t\t\t\t\ttotal += (dataSrc[indexSrc] " + bitWise + ")* k" + num + ";\n";
+		body += "\n" +
 				"\t\t\t\t\ttotalRow[x] += total;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
 				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
-				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"((totalRow[x]+halfDivisor)/ divisor);\n" +
-				"\t\t\t}\n"+
-				"\t\t}\n"+
-				"\t\t_work.recycle(totalRow);\n");
+				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "((totalRow[x]+halfDivisor)/ divisor);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t_work.recycle(totalRow);\n";
 
 		printParallelBlock("y0","y1","kernelRadius","height-kernelRadius","kernelWidth", body);
 

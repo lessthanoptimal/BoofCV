@@ -227,7 +227,7 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 		Ellipse2D.Double c = new Ellipse2D.Double();
 
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected synchronized void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			if( !showLines )
 				return;
 			if (view == 0) {

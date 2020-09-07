@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class TestConvolveImageStandardSparse {
 
 	static Kernel1D_F32 kernelF32;
 	static Kernel1D_S32 kernelI32;
-	static int sumKernel;
+	static int sumKernelI32;
 	static float expectedOutput;
 
 	/**
@@ -69,8 +69,8 @@ public class TestConvolveImageStandardSparse {
 			if (paramTypes.length < 3)
 				continue;
 
-			checkMethod(m, width, height, kernelRadius,kernelRadius*2+1, rand);
-			checkMethod(m, width, height, 0,kernelRadius*2+1, rand);
+			checkMethod(m, width, height, kernelRadius, kernelRadius*2 + 1, rand);
+			checkMethod(m, width, height, 0, kernelRadius*2 + 1, rand);
 
 			numFound++;
 		}
@@ -79,75 +79,74 @@ public class TestConvolveImageStandardSparse {
 		assertEquals(5, numFound);
 	}
 
-	private void checkMethod(Method method, int width, int height, int kernelOffset , int kernelWidth, Random rand) {
-		GrayU8 seedImage = new GrayU8(width,height);
-		ImageMiscOps.fillUniform(seedImage,rand,0,255);
+	private void checkMethod( Method method, int width, int height, int kernelOffset, int kernelWidth, Random rand ) {
+		GrayU8 seedImage = new GrayU8(width, height);
+		ImageMiscOps.fillUniform(seedImage, rand, 0, 255);
 
 		// creates a floating point image with integer elements
-		GrayF32 floatImage = new GrayF32(width,height);
-		ConvertImage.convert(seedImage,floatImage);
+		GrayF32 floatImage = new GrayF32(width, height);
+		ConvertImage.convert(seedImage, floatImage);
 
-		sumKernel = 0;
-		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,-1,kernelWidth/2);
+		sumKernelI32 = 0;
+		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, -1, kernelWidth/2);
 		kernelF32 = new Kernel1D_F32(kernelI32.width);
-		for( int i = 0; i < kernelI32.width; i++ ) {
-			sumKernel += kernelF32.data[i] = kernelI32.data[i];
+		for (int i = 0; i < kernelI32.width; i++) {
+			kernelF32.data[i] = kernelI32.data[i];
+			sumKernelI32 += kernelI32.data[i];
 		}
 
 		kernelI32.offset = kernelOffset;
 		kernelF32.offset = kernelOffset;
 
-
 		boolean isFloatingKernel = method.getParameterTypes()[0] == Kernel1D_F32.class;
 		boolean isDivisor = method.getParameterTypes().length != 6;
 
-		expectedOutput = computeExpected(seedImage,!isFloatingKernel,isDivisor);
+		expectedOutput = computeExpected(seedImage, !isFloatingKernel, isDivisor);
 
-		ImageGray inputImage = GConvertImage.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
+		ImageGray inputImage = GConvertImage.convert(floatImage, null, (Class)method.getParameterTypes()[2]);
 		Object inputKernel = isFloatingKernel ? kernelF32 : kernelI32;
-		Object inputStorage = isFloatingKernel ? new float[kernelI32.width] : new int[ kernelI32.width];
+		Object inputStorage = isFloatingKernel ? new float[kernelI32.width] : new int[kernelI32.width];
 
-		checkResults(method,inputKernel,inputImage,inputStorage);
+		checkResults(method, inputKernel, inputImage, inputStorage);
 	}
 
-	private void checkResults(Method method, Object inputKernel, ImageGray<?> inputImage, Object inputStorage) {
+	private void checkResults( Method method, Object inputKernel, ImageGray<?> inputImage, Object inputStorage ) {
 		try {
 			Number result;
-			if( method.getParameterTypes().length == 6 )
-				result = (Number)method.invoke(null,inputKernel,inputKernel,inputImage,targetX,targetY,inputStorage);
+			if (method.getParameterTypes().length == 6)
+				result = (Number)method.invoke(null, inputKernel, inputKernel, inputImage, targetX, targetY, inputStorage);
 			else
-				result = (Number)method.invoke(null,inputKernel,inputKernel,inputImage,targetX,targetY,inputStorage,sumKernel,sumKernel);
+				result = (Number)method.invoke(null, inputKernel, inputKernel, inputImage, targetX, targetY, inputStorage, sumKernelI32, sumKernelI32);
 
-			String description = method.getName()+" "+inputImage.getClass().getSimpleName()+" "+method.getParameterTypes().length;
+			String description = method.getName() + " " + inputImage.getClass().getSimpleName() + " " + method.getParameterTypes().length;
 
-			assertEquals((int)expectedOutput,result.intValue(),description);
+			assertEquals((int)expectedOutput, result.intValue(), description);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private float computeExpected(GrayU8 image , boolean isInteger , boolean isDivisor ) {
+	private float computeExpected( GrayU8 image, boolean isInteger, boolean isDivisor ) {
 
-		if( isInteger && isDivisor  ) {
-			GrayU8 temp = new GrayU8(image.width,image.height);
-			GrayU8 temp2 = new GrayU8(image.width,image.height);
+		if (isInteger && isDivisor) {
+			GrayU8 temp = new GrayU8(image.width, image.height);
+			GrayU8 temp2 = new GrayU8(image.width, image.height);
 
-			ConvolveImageNoBorder.horizontal(kernelI32,image,temp,sumKernel);
-			ConvolveImageNoBorder.vertical(kernelI32,temp,temp2,sumKernel);
+			ConvolveImageNoBorder.horizontal(kernelI32, image, temp, sumKernelI32);
+			ConvolveImageNoBorder.vertical(kernelI32, temp, temp2, sumKernelI32);
 
-			return temp2.get(targetX,targetY);
+			return temp2.get(targetX, targetY);
 		} else {
-			GrayF32 imageF = new GrayF32(image.width,image.height);
-			GrayF32 temp = new GrayF32(image.width,image.height);
-			GrayF32 temp2 = new GrayF32(image.width,image.height);
+			GrayF32 imageF = new GrayF32(image.width, image.height);
+			GrayF32 temp = new GrayF32(image.width, image.height);
+			GrayF32 temp2 = new GrayF32(image.width, image.height);
 
-			ConvertImage.convert(image,imageF);
+			ConvertImage.convert(image, imageF);
 
-			ConvolveImageNoBorder.horizontal(kernelF32,imageF,temp);
-			ConvolveImageNoBorder.vertical(kernelF32,temp,temp2);
+			ConvolveImageNoBorder.horizontal(kernelF32, imageF, temp);
+			ConvolveImageNoBorder.vertical(kernelF32, temp, temp2);
 
-			return temp2.get(targetX,targetY);
+			return temp2.get(targetX, targetY);
 		}
-
 	}
 }

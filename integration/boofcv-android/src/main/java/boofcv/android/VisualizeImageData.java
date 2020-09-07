@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-
 /**
  * Visualizes different types of image data into a color image which can be understood by humans.
  *
@@ -50,36 +49,36 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void binaryToBitmap( GrayU8 binary , boolean invert , Bitmap output , @Nullable GrowQueue_I8 _storage ) {
+	public static void binaryToBitmap( GrayU8 binary, boolean invert, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(binary, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
 		int indexDst = 0;
 
-		if( invert ) {
+		if (invert) {
 			for (int y = 0; y < binary.height; y++) {
-				int indexSrc = binary.startIndex + y * binary.stride;
+				int indexSrc = binary.startIndex + y*binary.stride;
 				for (int x = 0; x < binary.width; x++) {
-					int value = binary.data[indexSrc++]==0?255:0;
+					int value = binary.data[indexSrc++] == 0 ? 255 : 0;
 
-					storage[indexDst++] = (byte) value;
-					storage[indexDst++] = (byte) value;
-					storage[indexDst++] = (byte) value;
-					storage[indexDst++] = (byte) 0xFF;
+					storage[indexDst++] = (byte)value;
+					storage[indexDst++] = (byte)value;
+					storage[indexDst++] = (byte)value;
+					storage[indexDst++] = (byte)0xFF;
 				}
 			}
 		} else {
 			for (int y = 0; y < binary.height; y++) {
-				int indexSrc = binary.startIndex + y * binary.stride;
+				int indexSrc = binary.startIndex + y*binary.stride;
 				for (int x = 0; x < binary.width; x++) {
-					int value = binary.data[indexSrc++]==0?0:255;
+					int value = binary.data[indexSrc++] == 0 ? 0 : 255;
 
-					storage[indexDst++] = (byte) value;
-					storage[indexDst++] = (byte) value;
-					storage[indexDst++] = (byte) value;
-					storage[indexDst++] = (byte) 0xFF;
+					storage[indexDst++] = (byte)value;
+					storage[indexDst++] = (byte)value;
+					storage[indexDst++] = (byte)value;
+					storage[indexDst++] = (byte)0xFF;
 				}
 			}
 		}
@@ -91,35 +90,35 @@ public class VisualizeImageData {
 	 * Renders positive and negative values as two different colors.
 	 *
 	 * @param input (Input) Image with positive and negative values.
-	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeSign( GrayS16 input , int maxAbsValue , Bitmap output , @Nullable GrowQueue_I8 _storage ) {
+	public static void colorizeSign( GrayS16 input, int maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(input, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
-		if( maxAbsValue < 0 )
+		if (maxAbsValue < 0)
 			maxAbsValue = ImageStatistics.maxAbs(input);
 
 		int indexDst = 0;
 
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + y*input.stride;
-			for( int x = 0; x < input.width; x++ ) {
-				int value = input.data[ indexSrc++ ];
-				if( value > 0 ) {
-					storage[indexDst++] = (byte) (255*value/maxAbsValue);
+			for (int x = 0; x < input.width; x++) {
+				int value = input.data[indexSrc++];
+				if (value > 0) {
+					storage[indexDst++] = (byte)(255*value/maxAbsValue);
 					storage[indexDst++] = 0;
 					storage[indexDst++] = 0;
 				} else {
 					storage[indexDst++] = 0;
-					storage[indexDst++] = (byte) (-255*value/maxAbsValue);
+					storage[indexDst++] = (byte)(-255*value/maxAbsValue);
 					storage[indexDst++] = 0;
 				}
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -130,35 +129,35 @@ public class VisualizeImageData {
 	 * Renders positive and negative values as two different colors.
 	 *
 	 * @param input (Input) Image with positive and negative values.
-	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeSign( GrayF32 input , float maxAbsValue , Bitmap output , @Nullable GrowQueue_I8 _storage ) {
+	public static void colorizeSign( GrayF32 input, float maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(input, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
-		if( maxAbsValue < 0 )
+		if (maxAbsValue < 0)
 			maxAbsValue = ImageStatistics.maxAbs(input);
 
 		int indexDst = 0;
 
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + y*input.stride;
-			for( int x = 0; x < input.width; x++ ) {
-				float value = input.data[ indexSrc++ ];
-				if( value > 0 ) {
-					storage[indexDst++] = (byte) (255f*value/maxAbsValue);
+			for (int x = 0; x < input.width; x++) {
+				float value = input.data[indexSrc++];
+				if (value > 0) {
+					storage[indexDst++] = (byte)(255f*value/maxAbsValue);
 					storage[indexDst++] = 0;
 					storage[indexDst++] = 0;
 				} else {
 					storage[indexDst++] = 0;
-					storage[indexDst++] = (byte) (-255f*value/maxAbsValue);
+					storage[indexDst++] = (byte)(-255f*value/maxAbsValue);
 					storage[indexDst++] = 0;
 				}
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -173,25 +172,25 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void grayMagnitude(GrayS32 input , int maxAbsValue , Bitmap output , @Nullable GrowQueue_I8 _storage) {
+	public static void grayMagnitude( GrayS32 input, int maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(input, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
-		if( maxAbsValue < 0 )
+		if (maxAbsValue < 0)
 			maxAbsValue = ImageStatistics.maxAbs(input);
 
 		int indexDst = 0;
 
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + y*input.stride;
-			for( int x = 0; x < input.width; x++ ) {
-				byte gray = (byte)(255*Math.abs(input.data[ indexSrc++ ])/maxAbsValue);
+			for (int x = 0; x < input.width; x++) {
+				byte gray = (byte)(255*Math.abs(input.data[indexSrc++])/maxAbsValue);
 				storage[indexDst++] = gray;
 				storage[indexDst++] = gray;
 				storage[indexDst++] = gray;
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -206,25 +205,25 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void grayMagnitude(GrayF32 input , float maxAbsValue , Bitmap output , @Nullable GrowQueue_I8 _storage) {
+	public static void grayMagnitude( GrayF32 input, float maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(input, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
-		if( maxAbsValue < 0 )
+		if (maxAbsValue < 0)
 			maxAbsValue = ImageStatistics.maxAbs(input);
 
 		int indexDst = 0;
 
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + y*input.stride;
-			for( int x = 0; x < input.width; x++ ) {
-				byte gray = (byte)(255f*Math.abs(input.data[ indexSrc++ ])/maxAbsValue);
+			for (int x = 0; x < input.width; x++) {
+				byte gray = (byte)(255f*Math.abs(input.data[indexSrc++])/maxAbsValue);
 				storage[indexDst++] = gray;
 				storage[indexDst++] = gray;
 				storage[indexDst++] = gray;
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -236,54 +235,54 @@ public class VisualizeImageData {
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
-	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeGradient( GrayS16 derivX , GrayS16 derivY ,
-										 int maxAbsValue , Bitmap output , @Nullable GrowQueue_I8 _storage ) {
+	public static void colorizeGradient( GrayS16 derivX, GrayS16 derivY,
+										 int maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(derivX, derivY, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
-		if( maxAbsValue < 0 ) {
+		if (maxAbsValue < 0) {
 			maxAbsValue = ImageStatistics.maxAbs(derivX);
 			maxAbsValue = Math.max(maxAbsValue, ImageStatistics.maxAbs(derivY));
 		}
-		if( maxAbsValue == 0 )
+		if (maxAbsValue == 0)
 			return;
 
 		int indexDst = 0;
 
-		for( int y = 0; y < derivX.height; y++ ) {
+		for (int y = 0; y < derivX.height; y++) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 
-			for( int x = 0; x < derivX.width; x++ ) {
-				int valueX = derivX.data[ indexX++ ];
-				int valueY = derivY.data[ indexY++ ];
+			for (int x = 0; x < derivX.width; x++) {
+				int valueX = derivX.data[indexX++];
+				int valueY = derivY.data[indexY++];
 
-				int r=0,g=0,b=0;
+				int r = 0, g = 0, b = 0;
 
-				if( valueX > 0 ) {
+				if (valueX > 0) {
 					r = 255*valueX/maxAbsValue;
 				} else {
 					g = -255*valueX/maxAbsValue;
 				}
-				if( valueY > 0 ) {
+				if (valueY > 0) {
 					b = 255*valueY/maxAbsValue;
 				} else {
 					int v = -255*valueY/maxAbsValue;
 					r += v;
 					g += v;
-					if( r > 255 ) r = 255;
-					if( g > 255 ) g = 255;
+					if (r > 255) r = 255;
+					if (g > 255) g = 255;
 				}
-				storage[indexDst++] = (byte) r;
-				storage[indexDst++] = (byte) g;
-				storage[indexDst++] = (byte) b;
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)r;
+				storage[indexDst++] = (byte)g;
+				storage[indexDst++] = (byte)b;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -295,54 +294,54 @@ public class VisualizeImageData {
 	 *
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
-	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param maxAbsValue The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeGradient( GrayF32 derivX , GrayF32 derivY ,
-										 float maxAbsValue , Bitmap output , @Nullable GrowQueue_I8 _storage ) {
+	public static void colorizeGradient( GrayF32 derivX, GrayF32 derivY,
+										 float maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(derivX, derivY, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
-		if( maxAbsValue < 0 ) {
+		if (maxAbsValue < 0) {
 			maxAbsValue = ImageStatistics.maxAbs(derivX);
 			maxAbsValue = Math.max(maxAbsValue, ImageStatistics.maxAbs(derivY));
 		}
-		if( maxAbsValue == 0 )
+		if (maxAbsValue == 0)
 			return;
 
 		int indexDst = 0;
 
-		for( int y = 0; y < derivX.height; y++ ) {
+		for (int y = 0; y < derivX.height; y++) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 
-			for( int x = 0; x < derivX.width; x++ ) {
-				float valueX = derivX.data[ indexX++ ];
-				float valueY = derivY.data[ indexY++ ];
+			for (int x = 0; x < derivX.width; x++) {
+				float valueX = derivX.data[indexX++];
+				float valueY = derivY.data[indexY++];
 
-				int r=0,g=0,b=0;
+				int r = 0, g = 0, b = 0;
 
-				if( valueX > 0 ) {
+				if (valueX > 0) {
 					r = (int)(255f*valueX/maxAbsValue);
 				} else {
 					g = (int)(-255f*valueX/maxAbsValue);
 				}
-				if( valueY > 0 ) {
+				if (valueY > 0) {
 					b = (int)(255f*valueY/maxAbsValue);
 				} else {
 					int v = (int)(-255f*valueY/maxAbsValue);
 					r += v;
 					g += v;
-					if( r > 255 ) r = 255;
-					if( g > 255 ) g = 255;
+					if (r > 255) r = 255;
+					if (g > 255) g = 255;
 				}
-				storage[indexDst++] = (byte) r;
-				storage[indexDst++] = (byte) g;
-				storage[indexDst++] = (byte) b;
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)r;
+				storage[indexDst++] = (byte)g;
+				storage[indexDst++] = (byte)b;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -359,10 +358,10 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
 	public static void disparity( GrayI disparity, int disparityRange,
-								  int invalidColor, Bitmap output , @Nullable GrowQueue_I8 _storage ) {
+								  int invalidColor, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(disparity, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
 		int indexDst = 0;
@@ -370,26 +369,26 @@ public class VisualizeImageData {
 		for (int y = 0; y < disparity.height; y++) {
 			for (int x = 0; x < disparity.width; x++) {
 				int v = disparity.unsafe_get(x, y);
-				int r,g,b;
+				int r, g, b;
 
 				if (v >= disparityRange) {
-					r = (invalidColor >> 16) & 0xFF;
-					g = (invalidColor >> 8) & 0xFF;
-					b = (invalidColor) & 0xFF;
+					r = invalidColor >> 16 & 0xFF;
+					g = invalidColor >> 8 & 0xFF;
+					b = invalidColor & 0xFF;
 				} else {
 					g = 0;
 					if (v == 0) {
 						r = b = 0;
 					} else {
-						r = 255 * v / disparityRange;
-						b = 255 * (disparityRange - v - 1) / disparityRange;
+						r = 255*v/disparityRange;
+						b = 255*(disparityRange - v - 1)/disparityRange;
 					}
 				}
 
-				storage[indexDst++] = (byte) r;
-				storage[indexDst++] = (byte) g;
-				storage[indexDst++] = (byte) b;
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)r;
+				storage[indexDst++] = (byte)g;
+				storage[indexDst++] = (byte)b;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -406,10 +405,10 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
 	public static void disparity( GrayF32 disparity, int disparityRange,
-								  int invalidColor, Bitmap output , @Nullable GrowQueue_I8 _storage ) {
+								  int invalidColor, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 		shapeShape(disparity, output);
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
 		int indexDst = 0;
@@ -417,26 +416,26 @@ public class VisualizeImageData {
 		for (int y = 0; y < disparity.height; y++) {
 			for (int x = 0; x < disparity.width; x++) {
 				float v = disparity.unsafe_get(x, y);
-				int r,g,b;
+				int r, g, b;
 
 				if (v >= disparityRange) {
-					r = (invalidColor >> 16) & 0xFF;
-					g = (invalidColor >> 8) & 0xFF;
-					b = (invalidColor) & 0xFF;
+					r = invalidColor >> 16 & 0xFF;
+					g = invalidColor >> 8 & 0xFF;
+					b = invalidColor & 0xFF;
 				} else {
 					g = 0;
 					if (v == 0) {
 						r = b = 0;
 					} else {
-						r = (int)(255 * v / disparityRange);
-						b = (int)(255 * (disparityRange - v - 1) / disparityRange);
+						r = (int)(255*v/disparityRange);
+						b = (int)(255*(disparityRange - v - 1)/disparityRange);
 					}
 				}
 
-				storage[indexDst++] = (byte) r;
-				storage[indexDst++] = (byte) g;
-				storage[indexDst++] = (byte) b;
-				storage[indexDst++] = (byte) 0xFF;
+				storage[indexDst++] = (byte)r;
+				storage[indexDst++] = (byte)g;
+				storage[indexDst++] = (byte)b;
+				storage[indexDst++] = (byte)0xFF;
 			}
 		}
 
@@ -451,23 +450,23 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void drawEdgeContours( List<EdgeContour> contours , int[] colors , Bitmap output , @Nullable GrowQueue_I8 _storage ) {
-		if( output.getConfig() != Bitmap.Config.ARGB_8888 )
+	public static void drawEdgeContours( List<EdgeContour> contours, int[] colors, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+		if (output.getConfig() != Bitmap.Config.ARGB_8888)
 			throw new IllegalArgumentException("Only ARGB_8888 is supported");
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
-		Arrays.fill(storage,(byte)0);
+		Arrays.fill(storage, (byte)0);
 
-		for( int i = 0; i < contours.size(); i++ ) {
+		for (int i = 0; i < contours.size(); i++) {
 			EdgeContour e = contours.get(i);
 
 			int c = colors[i];
 
-			for( int j = 0; j < e.segments.size(); j++ ) {
+			for (int j = 0; j < e.segments.size(); j++) {
 				EdgeSegment s = e.segments.get(j);
 
-				for( int k = 0; k < s.points.size(); k++ ) {
+				for (int k = 0; k < s.points.size(); k++) {
 					Point2D_I32 p = s.points.get(k);
 
 					int index = p.y*4*output.getWidth() + p.x*4;
@@ -475,7 +474,7 @@ public class VisualizeImageData {
 					storage[index++] = (byte)(c >> 16);
 					storage[index++] = (byte)(c >> 8);
 					storage[index++] = (byte)c;
-					storage[index]   = (byte)0xFF;
+					storage[index] = (byte)0xFF;
 				}
 			}
 		}
@@ -491,26 +490,25 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void drawEdgeContours( List<EdgeContour> contours , int color , Bitmap output , @Nullable GrowQueue_I8 _storage ) {
-		if( output.getConfig() != Bitmap.Config.ARGB_8888 )
+	public static void drawEdgeContours( List<EdgeContour> contours, int color, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+		if (output.getConfig() != Bitmap.Config.ARGB_8888)
 			throw new IllegalArgumentException("Only ARGB_8888 is supported");
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
-		Arrays.fill(storage,(byte)0);
+		Arrays.fill(storage, (byte)0);
 
-		byte r = (byte)((color >> 16) & 0xFF);
-		byte g = (byte)((color >> 8) & 0xFF);
-		byte b = (byte)( color );
+		byte r = (byte)(color >> 16 & 0xFF);
+		byte g = (byte)(color >> 8 & 0xFF);
+		byte b = (byte)color;
 
-
-		for( int i = 0; i < contours.size(); i++ ) {
+		for (int i = 0; i < contours.size(); i++) {
 			EdgeContour e = contours.get(i);
 
-			for( int j = 0; j < e.segments.size(); j++ ) {
+			for (int j = 0; j < e.segments.size(); j++) {
 				EdgeSegment s = e.segments.get(j);
 
-				for( int k = 0; k < s.points.size(); k++ ) {
+				for (int k = 0; k < s.points.size(); k++) {
 					Point2D_I32 p = s.points.get(k);
 
 					int index = p.y*4*output.getWidth() + p.x*4;
@@ -518,7 +516,7 @@ public class VisualizeImageData {
 					storage[index++] = b;
 					storage[index++] = g;
 					storage[index++] = r;
-					storage[index]   = (byte)0xFF;
+					storage[index] = (byte)0xFF;
 				}
 			}
 		}
@@ -534,15 +532,15 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 **/
-	public static void renderLabeled(GrayS32 labelImage, int numRegions, Bitmap output , @Nullable GrowQueue_I8 _storage) {
+	public static void renderLabeled( GrayS32 labelImage, int numRegions, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
 
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
 		int[] colors = new int[numRegions];
 
 		Random rand = new Random(123);
-		for( int i = 0; i < colors.length; i++ ) {
+		for (int i = 0; i < colors.length; i++) {
 			colors[i] = rand.nextInt();
 		}
 
@@ -550,14 +548,14 @@ public class VisualizeImageData {
 		int h = labelImage.getHeight();
 
 		int indexOut = 0;
-		for( int y = 0; y < h; y++ ) {
+		for (int y = 0; y < h; y++) {
 			int indexSrc = labelImage.startIndex + y*labelImage.stride;
-			for( int x = 0; x < w; x++ ) {
+			for (int x = 0; x < w; x++) {
 				int rgb = colors[labelImage.data[indexSrc++]];
 
 				storage[indexOut++] = (byte)(rgb & 0xFF);
-				storage[indexOut++] = (byte)((rgb >> 8) & 0xFF);
-				storage[indexOut++] = (byte)((rgb >> 16) & 0xFF);
+				storage[indexOut++] = (byte)(rgb >> 8 & 0xFF);
+				storage[indexOut++] = (byte)(rgb >> 16 & 0xFF);
 				storage[indexOut++] = (byte)0xFF;
 			}
 		}
@@ -573,20 +571,20 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void regionBorders( GrayS32 pixelToRegion , int borderColor ,
-									  Bitmap output , @Nullable GrowQueue_I8 _storage) {
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+	public static void regionBorders( GrayS32 pixelToRegion, int borderColor,
+									  Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
-		GrayU8 binary = new GrayU8(pixelToRegion.width,pixelToRegion.height);
+		GrayU8 binary = new GrayU8(pixelToRegion.width, pixelToRegion.height);
 		ImageSegmentationOps.markRegionBorders(pixelToRegion, binary);
 		int indexOut = 0;
-		for( int y = 0; y < binary.height; y++ ) {
-			for( int x = 0; x < binary.width; x++ ) {
-				if( binary.unsafe_get(x,y) != 0 )  {
+		for (int y = 0; y < binary.height; y++) {
+			for (int x = 0; x < binary.width; x++) {
+				if (binary.unsafe_get(x, y) != 0) {
 					storage[indexOut++] = (byte)(borderColor & 0xFF);
-					storage[indexOut++] = (byte)((borderColor >> 8) & 0xFF);
-					storage[indexOut++] = (byte)((borderColor >> 16) & 0xFF);
+					storage[indexOut++] = (byte)(borderColor >> 8 & 0xFF);
+					storage[indexOut++] = (byte)(borderColor >> 16 & 0xFF);
 					storage[indexOut++] = (byte)0xFF;
 				} else {
 					indexOut += 4;
@@ -599,26 +597,27 @@ public class VisualizeImageData {
 
 	/**
 	 * Draws each region using the provided color
+	 *
 	 * @param pixelToRegion Conversion from pixel to region
 	 * @param segmentColor Color of each region
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void regionsColor( GrayS32 pixelToRegion ,
-									 FastQueue<float[]> segmentColor ,
-									 Bitmap output , @Nullable GrowQueue_I8 _storage ) {
-		_storage = ConvertBitmap.resizeStorage(output,_storage);
+	public static void regionsColor( GrayS32 pixelToRegion,
+									 FastQueue<float[]> segmentColor,
+									 Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
 		int indexOut = 0;
-		for( int y = 0; y < pixelToRegion.height; y++ ) {
-			for( int x = 0; x < pixelToRegion.width; x++ ) {
-				int index = pixelToRegion.unsafe_get(x,y);
-				float []cv = segmentColor.get(index);
+		for (int y = 0; y < pixelToRegion.height; y++) {
+			for (int x = 0; x < pixelToRegion.width; x++) {
+				int index = pixelToRegion.unsafe_get(x, y);
+				float[] cv = segmentColor.get(index);
 
-				int r,g,b;
+				int r, g, b;
 
-				if( cv.length == 3 ) {
+				if (cv.length == 3) {
 					r = (int)cv[0];
 					g = (int)cv[1];
 					b = (int)cv[2];
@@ -636,18 +635,19 @@ public class VisualizeImageData {
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
 	}
 
-	private static void shapeShape(ImageBase input, Bitmap output) {
-		if( output.getConfig() != Bitmap.Config.ARGB_8888 )
+	private static void shapeShape( ImageBase input, Bitmap output ) {
+		if (output.getConfig() != Bitmap.Config.ARGB_8888)
 			throw new IllegalArgumentException("Only ARGB_8888 is supported");
-		if( input.width != output.getWidth() || input.height != output.getHeight() )
+		if (input.width != output.getWidth() || input.height != output.getHeight())
 			throw new IllegalArgumentException("Input and output must have the same shape");
 	}
-	private static void shapeShape(ImageBase input0, ImageBase input1, Bitmap output) {
-		if( output.getConfig() != Bitmap.Config.ARGB_8888 )
+
+	private static void shapeShape( ImageBase input0, ImageBase input1, Bitmap output ) {
+		if (output.getConfig() != Bitmap.Config.ARGB_8888)
 			throw new IllegalArgumentException("Only ARGB_8888 is supported");
-		if( input0.width != output.getWidth() || input0.height != output.getHeight() )
+		if (input0.width != output.getWidth() || input0.height != output.getHeight())
 			throw new IllegalArgumentException("Input and output must have the same shape");
-		if( input1.width != output.getWidth() || input1.height != output.getHeight() )
+		if (input1.width != output.getWidth() || input1.height != output.getHeight())
 			throw new IllegalArgumentException("Input and output must have the same shape");
 	}
 }

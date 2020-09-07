@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public abstract class CommonGradientMultiThreadToSingle {
 	Class targetClass,testClass;
 	int totalExpected;
 
-	public CommonGradientMultiThreadToSingle(Class targetClass, Class testClass, int totalExpected) {
+	protected CommonGradientMultiThreadToSingle(Class targetClass, Class testClass, int totalExpected) {
 		this.targetClass = targetClass;
 		this.testClass = testClass;
 		this.totalExpected = totalExpected;

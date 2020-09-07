@@ -22,6 +22,7 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastArray;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,22 +42,29 @@ class TestFeatureSelectNBest extends ChecksFeatureSelectLimitIntensity.I16 {
 	 */
 	@Test
 	public void tooFewFeatures() {
-		GrayF32 intensity = new GrayF32(10,20);
-		intensity.set(5,10,-3);
-		intensity.set(4,10,-3.5f);
-		intensity.set(5,11,0);
-		intensity.set(8,8,10);
+		GrayF32 intensity = new GrayF32(10, 20);
+		intensity.set(5, 10, -3);
+		intensity.set(4, 10, -3.5f);
+		intensity.set(5, 11, 0);
+		intensity.set(8, 8, 10);
 
 		QueueCorner detected = new QueueCorner();
-		detected.append(5,10);
-		detected.append(4,10);
-		detected.append(5,11);
-		detected.append(8,8);
+		detected.append(5, 10);
+		detected.append(4, 10);
+		detected.append(5, 11);
+		detected.append(8, 8);
 
 		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectNBest<Point2D_I16> alg = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
-		alg.select(intensity, -1, -1, true,null,detected,20, found);
+		alg.select(intensity, -1, -1, true, null, detected, 20, found);
 
-		assertEquals(4,found.size);
+		assertEquals(4, found.size);
+	}
+
+	@Nested
+	public class CheckNoImage extends NoImage {
+		@Override public FeatureSelectLimitIntensity<IntensityPoint> createAlgorithm() {
+			return new FeatureSelectNBest<>(new SampleIntensityPoint());
+		}
 	}
 }

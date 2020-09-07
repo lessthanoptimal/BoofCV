@@ -53,10 +53,7 @@ public class ScaleSpacePointPanel extends JPanel {
 		final int width = background.getWidth();
 		final int height = background.getHeight();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				setPreferredSize(new Dimension(width,height));
-			}});
+		SwingUtilities.invokeLater(() -> setPreferredSize(new Dimension(width,height)));
 	}
 
 	public synchronized void setPoints( List<ScalePoint> points ) {

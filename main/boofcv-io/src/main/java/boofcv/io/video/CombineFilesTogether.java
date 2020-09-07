@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,8 @@ import java.io.*;
 import java.util.Collections;
 import java.util.List;
 
+import static boofcv.misc.BoofMiscOps.assertEq;
+
 /**
  * Combines a sequence of files together using a simple format.  At the beginning of each segment/file [0xff,0xff,0xff]
  * is written, followed by the 4-byte integer in big endian order specifying the file size.  After that the file
@@ -33,12 +35,12 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CombineFilesTogether {
-	public static void combine( List<String> fileNames , String outputName ) throws IOException {
+	public static void combine( List<String> fileNames, String outputName ) throws IOException {
 		FileOutputStream fos = new FileOutputStream(outputName);
 
 		GrowQueue_I8 buffer = new GrowQueue_I8();
 
-		for( String s : fileNames ) {
+		for (String s : fileNames) {
 			File f = new File(s);
 			FileInputStream fis = new FileInputStream(f);
 
@@ -52,34 +54,36 @@ public class CombineFilesTogether {
 			fos.write((byte)(length >> 24));
 			fos.write((byte)(length >> 16));
 			fos.write((byte)(length >> 8));
-			fos.write((byte)(length));
+			fos.write((byte)length);
 
-			fis.read(buffer.data, 0, (int) length);
-			fos.write(buffer.data,0,(int)length);
-
+			int readLength = fis.read(buffer.data, 0, (int)length);
+			assertEq(readLength, (int)length);
+			fos.write(buffer.data, 0, (int)length);
 		}
 	}
 
-	public static boolean readNext( DataInputStream fis , GrowQueue_I8 output ) throws IOException {
+	@SuppressWarnings({"IdentityBinaryExpression"})
+	public static boolean readNext( DataInputStream fis, GrowQueue_I8 output ) throws IOException {
 		int r;
-		if( (r =fis.read()) != 0xFF || (r = fis.read()) != 0xFF || (r=fis.read()) != 0xFF )
-			if( r == -1 )
+		if ((r = fis.read()) != 0xFF || (r = fis.read()) != 0xFF || (r = fis.read()) != 0xFF)
+			if (r == -1)
 				return false;
 			else
-				throw new IllegalArgumentException("Bad header byte: "+r);
+				throw new IllegalArgumentException("Bad header byte: " + r);
 
-		int length = ((fis.read() & 0xFF) << 24) |  ((fis.read() & 0xFF) << 16) |
-				((fis.read() & 0xFF) << 8)  | (fis.read() & 0xFF);
+		int length = ((fis.read() & 0xFF) << 24 | (fis.read() & 0xFF) << 16 |
+				(fis.read() & 0xFF) << 8 | fis.read()) & 0xFF;
 
 		output.resize(length);
-		fis.read(output.data,0,length);
+		int readLength = fis.read(output.data, 0, length);
+		assertEq(readLength, length);
 
 		return true;
 	}
 
-	public static void main( String args[] ) throws IOException {
+	public static void main( String[] args ) throws IOException {
 		List<String> fileNames = UtilIO.listByPrefix("log", "depth", null);
 		Collections.sort(fileNames);
-		CombineFilesTogether.combine(fileNames,"combined.mpng");
+		CombineFilesTogether.combine(fileNames, "combined.mpng");
 	}
 }

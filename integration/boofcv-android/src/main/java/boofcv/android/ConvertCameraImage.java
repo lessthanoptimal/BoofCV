@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,18 +31,18 @@ import java.nio.ByteBuffer;
  * Converts the android {@link Image} into a boofcv format.
  */
 public class ConvertCameraImage {
-	public static byte[] declareWork(Image yuv , byte[] work ) {
-		return ConvertYuv420_888.declareWork(yuv.getPlanes()[0].getRowStride(),yuv.getPlanes()[1].getRowStride(), work);
+	public static byte[] declareWork( Image yuv, byte[] work ) {
+		return ConvertYuv420_888.declareWork(yuv.getPlanes()[0].getRowStride(), yuv.getPlanes()[1].getRowStride(), work);
 	}
 
-	public static void imageToBoof(Image yuv, ColorFormat colorOutput, ImageBase output, BWorkArrays work) {
-		if( BOverrideConvertAndroid.invokeYuv420ToBoof(yuv,colorOutput,output))
+	public static void imageToBoof( Image yuv, ColorFormat colorOutput, ImageBase output, BWorkArrays work ) {
+		if (BOverrideConvertAndroid.invokeYuv420ToBoof(yuv, colorOutput, output))
 			return;
 
-		if(ImageFormat.YUV_420_888 != yuv.getFormat() )
+		if (ImageFormat.YUV_420_888 != yuv.getFormat())
 			throw new RuntimeException("Unexpected format");
 
-		Image.Plane planes[] = yuv.getPlanes();
+		Image.Plane[] planes = yuv.getPlanes();
 
 		ByteBuffer bufferY = planes[0].getBuffer();
 		ByteBuffer bufferU = planes[2].getBuffer();
@@ -56,8 +56,8 @@ public class ConvertCameraImage {
 		int stridePixelUV = planes[1].getPixelStride();
 
 		ConvertYuv420_888.yuvToBoof(
-				bufferY,bufferU,bufferV,
-				width,height,strideY,strideUV,stridePixelUV,
-				colorOutput,output,work);
+				bufferY, bufferU, bufferV,
+				width, height, strideY, strideUV, stridePixelUV,
+				colorOutput, output, work);
 	}
 }

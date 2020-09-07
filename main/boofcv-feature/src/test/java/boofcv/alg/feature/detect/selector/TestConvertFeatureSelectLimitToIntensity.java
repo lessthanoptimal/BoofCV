@@ -24,6 +24,7 @@ import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,28 +37,37 @@ class TestConvertFeatureSelectLimitToIntensity {
 	void callTheFunction() {
 		Dummy<Point2D_I16> dummy = new Dummy<>();
 
-		var intensity = new GrayF32(30,40);
+		var intensity = new GrayF32(30, 40);
 
 		FeatureSelectLimitIntensity<Point2D_I16> wrapped = new ConvertLimitToIntensity<>(dummy);
 
 		var detected = new FastQueue<>(Point2D_I16::new);
 		var selected = new FastArray<>(Point2D_I16.class);
 
+		wrapped.select(intensity, -1, -1, true, null, detected, 100, selected);
 
-		wrapped.select(intensity, -1, -1, true,null,detected,100,selected);
+		assertEquals(intensity.width, dummy.width);
+		assertEquals(intensity.height, dummy.height);
+		assertEquals(100, dummy.limit);
+	}
 
-		assertEquals(intensity.width,dummy.width);
-		assertEquals(intensity.height,dummy.height);
-		assertEquals(100,dummy.limit);
+	@Nested
+	public class CheckNoImage extends ChecksFeatureSelectLimitIntensity.NoImage {
+		@Override public FeatureSelectLimitIntensity<IntensityPoint> createAlgorithm() {
+			var selector = new FeatureSelectN<IntensityPoint>();
+			var alg = new ConvertLimitToIntensity<>(selector);
+			alg.setSampler(new SampleIntensityPoint());
+			return alg;
+		}
 	}
 
 	private static class Dummy<Point> implements FeatureSelectLimit<Point> {
 
-		int width,height,limit;
+		int width, height, limit;
 
 		@Override
-		public void select(int imageWidth, int imageHeight, @Nullable FastAccess<Point> prior,
-						   FastAccess<Point> detected, int limit, FastArray<Point> selected) {
+		public void select( int imageWidth, int imageHeight, @Nullable FastAccess<Point> prior,
+							FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
 			this.width = imageWidth;
 			this.height = imageHeight;
 			this.limit = limit;

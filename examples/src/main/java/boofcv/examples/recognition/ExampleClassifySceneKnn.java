@@ -25,7 +25,9 @@ import boofcv.alg.scene.ClassifierKNearestNeighborsBow;
 import boofcv.alg.scene.FeatureToWordHistogram_F64;
 import boofcv.alg.scene.HistogramScene;
 import boofcv.alg.scene.KdTreeHistogramScene_F64;
-import boofcv.factory.feature.dense.*;
+import boofcv.factory.feature.dense.ConfigDenseSurfFast;
+import boofcv.factory.feature.dense.DenseSampling;
+import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.learning.ConfusionMatrixPanel;
 import boofcv.io.UtilIO;
@@ -234,11 +236,11 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	public static void main(String[] args) {
 
 		ConfigDenseSurfFast surfFast = new ConfigDenseSurfFast(new DenseSampling(8,8));
-		ConfigDenseSurfStable surfStable = new ConfigDenseSurfStable(new DenseSampling(8,8));
-		ConfigDenseSift sift = new ConfigDenseSift(new DenseSampling(6,6));
-		ConfigDenseHoG hog = new ConfigDenseHoG();
+//		ConfigDenseSurfStable surfStable = new ConfigDenseSurfStable(new DenseSampling(8,8));
+//		ConfigDenseSift sift = new ConfigDenseSift(new DenseSampling(6,6));
+//		ConfigDenseHoG hog = new ConfigDenseHoG();
 
-		DescribeImageDense<GrayU8,TupleDesc_F64> desc = (DescribeImageDense)
+		DescribeImageDense<GrayU8,TupleDesc_F64> desc =
 				FactoryDescribeImageDense.surfFast(surfFast, GrayU8.class);
 //				FactoryDescribeImageDense.surfStable(surfStable, GrayU8.class);
 //				FactoryDescribeImageDense.sift(sift, GrayU8.class);

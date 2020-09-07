@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,36 +25,36 @@ import java.util.Random;
 
 public class MockImage_420_888 extends Image {
 
-	int width,height;
+	int width, height;
 	int pixelStrideUV;
 	int periodUV;
 
-	byte gray[];
-	byte bandUV[];
+	byte[] gray;
+	byte[] bandUV;
 
 	Plane[] planes = new Plane[3];
 
-	public MockImage_420_888(Random rand , int width , int height , int pixelStrideUV , int periodUV, int extra ) {
+	public MockImage_420_888( Random rand, int width, int height, int pixelStrideUV, int periodUV, int extra ) {
 		this();
 		this.pixelStrideUV = pixelStrideUV;
 		this.periodUV = periodUV;
 		this.width = width;
 		this.height = height;
 
-		gray = new byte[(width+extra)*height];
-		int rowStrideUV = pixelStrideUV*(width/periodUV + (width%periodUV))+extra;
+		gray = new byte[(width + extra)*height];
+		int rowStrideUV = pixelStrideUV*(width/periodUV + (width%periodUV)) + extra;
 
 		bandUV = new byte[2*rowStrideUV*(height/periodUV)];
 
-		planes[0] = new DummyPlane(1,width+extra,0,gray.length,gray);
-		planes[1] = new DummyPlane(pixelStrideUV,rowStrideUV,0,bandUV.length,bandUV);
-		planes[2] = new DummyPlane(pixelStrideUV,rowStrideUV,1,bandUV.length-1,bandUV);
+		planes[0] = new DummyPlane(1, width + extra, 0, gray.length, gray);
+		planes[1] = new DummyPlane(pixelStrideUV, rowStrideUV, 0, bandUV.length, bandUV);
+		planes[2] = new DummyPlane(pixelStrideUV, rowStrideUV, 1, bandUV.length - 1, bandUV);
 
 		rand.nextBytes(gray);
 		rand.nextBytes(bandUV);
 	}
 
-	protected MockImage_420_888(){}
+	protected MockImage_420_888() {}
 
 	@Override
 	public int getFormat() {
@@ -82,17 +82,14 @@ public class MockImage_420_888 extends Image {
 	}
 
 	@Override
-	public void close() {
+	public void close() {}
 
-	}
-
-	public class DummyPlane extends Plane {
-
-		int pixelStride,rowStride;
-		int offset,length;
+	public static class DummyPlane extends Plane {
+		int pixelStride, rowStride;
+		int offset, length;
 		byte[] data;
 
-		public DummyPlane(int pixelStride, int rowStride, int offset, int length, byte[] data) {
+		public DummyPlane( int pixelStride, int rowStride, int offset, int length, byte[] data ) {
 			this.pixelStride = pixelStride;
 			this.rowStride = rowStride;
 			this.offset = offset;
@@ -112,7 +109,7 @@ public class MockImage_420_888 extends Image {
 
 		@Override
 		public ByteBuffer getBuffer() {
-			return ByteBuffer.wrap(data,offset,length);
+			return ByteBuffer.wrap(data, offset, length);
 		}
 	}
 }

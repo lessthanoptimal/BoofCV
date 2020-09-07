@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.struct;
 
+import lombok.Getter;
+
 /**
  * List of connectivity rules.
  *
@@ -33,13 +35,9 @@ public enum ConnectRule {
 	 */
 	EIGHT("8");
 
-	String shortName;
+	private @Getter final String shortName;
 
-	private ConnectRule(String shortName) {
+	ConnectRule(String shortName) {
 		this.shortName = shortName;
-	}
-
-	public String getShortName() {
-		return shortName;
 	}
 }

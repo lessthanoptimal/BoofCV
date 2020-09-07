@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,28 +29,28 @@ package boofcv.struct.convolve;
  */
 public class Kernel1D_F64 extends Kernel1D {
 
-	public double data[];
+	public double[] data;
 
 	/**
-	 * Creates a new kernel whose initial values are specified by "data" and length is "width". 
+	 * Creates a new kernel whose initial values are specified by "data" and length is "width".
 	 * The offset will be set to width/2
 	 *
-	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
+	 * @param data The value of the kernel. Not modified.  Reference is not saved.
 	 * @param width The kernels width.
 	 */
-	public Kernel1D_F64(double data[], int width) {
-		this(data,width,width/2);
+	public Kernel1D_F64( double[] data, int width ) {
+		this(data, width, width/2);
 	}
 
 	/**
 	 * Creates a kernel with elements equal to 'data' and with the specified 'width' plus 'offset'
 	 *
-	 * @param data  The value of the kernel. Not modified.  Reference is not saved.
+	 * @param data The value of the kernel. Not modified.  Reference is not saved.
 	 * @param width The kernels width.
 	 * @param offset Location of the origin in the array
 	 */
-	public Kernel1D_F64(double data[], int width , int offset) {
-		super(width,offset);
+	public Kernel1D_F64( double[] data, int width, int offset ) {
+		super(width, offset);
 
 		this.data = new double[width];
 		System.arraycopy(data, 0, this.data, 0, width);
@@ -60,10 +60,10 @@ public class Kernel1D_F64 extends Kernel1D {
 	 * Create a kernel with elements initialized to zero.  Offset is automatically
 	 * set to width/2.
 	 *
-	 * @param width How wide the kernel is. 
+	 * @param width How wide the kernel is.
 	 */
-	public Kernel1D_F64(int width) {
-		this(width,width/2);
+	public Kernel1D_F64( int width ) {
+		this(width, width/2);
 	}
 
 	/**
@@ -72,8 +72,8 @@ public class Kernel1D_F64 extends Kernel1D {
 	 * @param width How wide the kernel is.
 	 * @param offset Location of the origin in the array
 	 */
-	public Kernel1D_F64(int width , int offset) {
-		super(width,offset);
+	public Kernel1D_F64( int width, int offset ) {
+		super(width, offset);
 		data = new double[width];
 	}
 
@@ -81,26 +81,25 @@ public class Kernel1D_F64 extends Kernel1D {
 	}
 
 	@Override
-	public double getDouble(int index) {
+	public /**/double /**/getDouble( int index ) {
 		return data[index];
 	}
 
 	@Override
-	public void setD(int index, double value) {
-		data[index] = value;
+	public void setD( int index, /**/double value ) {
+		data[index] = (double) value;
 	}
-
 
 	/**
 	 * Creates a kernel whose elements are the specified data array and has
 	 * the specified width.
 	 *
-	 * @param data  The array who will be the kernel's data.  Reference is saved.
+	 * @param data The array who will be the kernel's data.  Reference is saved.
 	 * @param width The kernel's width.
 	 * @param offset Location of the origin in the array
 	 * @return A new kernel.
 	 */
-	public static Kernel1D_F64 wrap(double data[], int width, int offset ) {
+	public static Kernel1D_F64 wrap( double[] data, int width, int offset ) {
 		Kernel1D_F64 ret = new Kernel1D_F64();
 		ret.data = data;
 		ret.width = width;
@@ -111,8 +110,8 @@ public class Kernel1D_F64 extends Kernel1D {
 
 	@Override
 	public Kernel1D_F64 copy() {
-		Kernel1D_F64 ret = new Kernel1D_F64(width,offset);
-		System.arraycopy(data,0,ret.data,0,ret.width);
+		Kernel1D_F64 ret = new Kernel1D_F64(width, offset);
+		System.arraycopy(data, 0, ret.data, 0, ret.width);
 		return ret;
 	}
 
@@ -121,13 +120,13 @@ public class Kernel1D_F64 extends Kernel1D {
 		return false;
 	}
 
-	public double get(int i) {
+	public double get( int i ) {
 		return data[i];
 	}
 
 	public double computeSum() {
 		double sum = 0;
-		for( int i = 0; i < data.length; i++ ) {
+		for (int i = 0; i < data.length; i++) {
 			sum += data[i];
 		}
 

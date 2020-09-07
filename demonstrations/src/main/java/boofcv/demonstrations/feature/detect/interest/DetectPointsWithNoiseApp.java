@@ -34,6 +34,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -55,7 +56,7 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;
-	static int maxScaleFeatures = maxFeatures / 3;
+	static int maxScaleFeatures = maxFeatures/3;
 
 	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 12};
 	int radius = 2;
@@ -71,26 +72,26 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 	ImagePanel panel;
 	ImageCorruptPanel corruptPanel;
 
-	public DetectPointsWithNoiseApp(Class<T> imageType, Class<D> derivType) {
+	public DetectPointsWithNoiseApp( Class<T> imageType, Class<D> derivType ) {
 		super(1);
 		this.imageType = imageType;
 
 
 		GeneralFeatureDetector<T, D> alg;
-		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(maxFeatures,radius,thresh);
+		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(maxFeatures, radius, thresh);
 
 
 		alg = FactoryDetectPoint.createHarris(configExtract, null, derivType);
 		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createHarris(configExtract, new ConfigHarrisCorner(true,radius), derivType);
+		alg = FactoryDetectPoint.createHarris(configExtract, new ConfigHarrisCorner(true, radius), derivType);
 		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createShiTomasi(configExtract, null, derivType);
 		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, new ConfigShiTomasi(true,radius), derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, new ConfigShiTomasi(true, radius), derivType);
 		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		configExtract.detectMinimums = true;
 		configExtract.threshold = 10;
-		alg = FactoryDetectPoint.createFast(configExtract, new ConfigFastCorner(10,9), imageType);
+		alg = FactoryDetectPoint.createFast(configExtract, new ConfigFastCorner(10, 9), imageType);
 		configExtract.detectMinimums = false;
 		configExtract.threshold = thresh;
 		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
@@ -114,73 +115,69 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		setMainGUI(viewArea);
 	}
 
-	public void process(BufferedImage input) {
+	public void process( BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		corruptImage = (T) grayImage.createNew(grayImage.width, grayImage.height);
+		corruptImage = (T)grayImage.createNew(grayImage.width, grayImage.height);
 		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_BGR);
 		panel.setImage(workImage);
 		panel.setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));
 		doRefreshAll();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				revalidate();
-				processImage = true;
-			}
+		SwingUtilities.invokeLater(() -> {
+			revalidate();
+			processImage = true;
 		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {
+	public void loadConfigurationFile( String fileName ) {
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	public void refreshAll( Object[] cookies ) {
 		setActiveAlgorithm(0, null, cookies[0]);
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+	public synchronized void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
 		if (input == null)
 			return;
 
 		// corrupt the input image
 		corruptPanel.corruptImage(grayImage, corruptImage);
 
-		final EasyGeneralFeatureDetector<T,D> det = (EasyGeneralFeatureDetector<T,D>) cookie;
-		det.detect(corruptImage,null);
+		final EasyGeneralFeatureDetector<T, D> det = (EasyGeneralFeatureDetector<T, D>)cookie;
+		det.detect(corruptImage, null);
 
 		render.reset();
-		if( det.getDetector().isDetectMinimums() ) {
+		if (det.getDetector().isDetectMinimums()) {
 			QueueCorner l = det.getMinimums();
-			for( int i = 0; i < l.size; i++ ) {
+			for (int i = 0; i < l.size; i++) {
 				Point2D_I16 p = l.get(i);
 				render.addPoint(p.x, p.y, 3, Color.BLUE);
 			}
 		}
-		if( det.getDetector().isDetectMaximums() ) {
+		if (det.getDetector().isDetectMaximums()) {
 			QueueCorner l = det.getMaximums();
-			for( int i = 0; i < l.size; i++ ) {
+			for (int i = 0; i < l.size; i++) {
 				Point2D_I16 p = l.get(i);
 				render.addPoint(p.x, p.y, 3, Color.RED);
 			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				ConvertBufferedImage.convertTo(corruptImage, workImage,true);
-				Graphics2D g2 = workImage.createGraphics();
-				g2.setStroke(new BasicStroke(3));
-				render.draw(g2);
-				panel.repaint();
-			}
+		SwingUtilities.invokeLater(() -> {
+			ConvertBufferedImage.convertTo(corruptImage, workImage, true);
+			Graphics2D g2 = workImage.createGraphics();
+			g2.setStroke(new BasicStroke(3));
+			render.draw(g2);
+			panel.repaint();
 		});
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
 		if (image != null) {
@@ -198,14 +195,14 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		doRefreshAll();
 	}
 
-	public static void main(String args[]) {
+	public static void main( String args[] ) {
 		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayF32.class, GrayF32.class);
 //		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayU8.class,GrayS16.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
+		inputs.add(new PathLabel("Square Grid", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
-		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
+		inputs.add(new PathLabel("amoeba", UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
@@ -213,10 +210,10 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while (!app.getHasProcessedImage()) {
-			Thread.yield();
+			BoofMiscOps.sleep(10);
 		}
 
 		ShowImages.showWindow(app, "Detect Scale Point" +
-				" with Noise",true);
+				" with Noise", true);
 	}
 }

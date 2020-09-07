@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -179,14 +179,14 @@ public class BenchmarkStabilityFundamental {
 			// normalize the scale of F
 			CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F),F);
 
-			double totalScore = 0;
+//			double totalScore = 0;
 			// score against all observations
 			for( AssociatedPair p : observations ) {
 				double score = Math.abs(GeometryMath_F64.innerProd(p.p2, F, p.p1));
 				if( Double.isNaN(score))
 					System.out.println("Score is NaN");
 				scores.add(score);
-				totalScore += score;
+//				totalScore += score;
 			}
 //			System.out.println("  score["+i+"] = "+totalScore);
 		}

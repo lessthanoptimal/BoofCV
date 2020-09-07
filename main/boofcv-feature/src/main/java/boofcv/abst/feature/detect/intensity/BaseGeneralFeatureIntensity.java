@@ -35,7 +35,7 @@ public abstract class BaseGeneralFeatureIntensity <I extends ImageGray<I>, D ext
 	Class<I> imageType;
 	Class<D> derivType;
 
-	public BaseGeneralFeatureIntensity(Class<I> imageType, Class<D> derivType) {
+	protected BaseGeneralFeatureIntensity(Class<I> imageType, Class<D> derivType) {
 		this.imageType = imageType;
 		this.derivType = derivType;
 	}

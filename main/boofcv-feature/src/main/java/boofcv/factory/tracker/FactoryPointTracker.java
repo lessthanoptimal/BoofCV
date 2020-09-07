@@ -105,8 +105,8 @@ public class FactoryPointTracker {
 			case DDA: return FactoryPointTracker.dda(detDesc, associate, config.dda);
 			case HYBRID: return FactoryPointTracker.hybrid(
 					detDesc,associate,config.detDesc.findNonMaxRadius(),config.klt,config.hybrid,imageType);
+			default: throw new RuntimeException("BUG! KLT all trackers should have been handled already");
 		}
-		throw new RuntimeException("BUG! KLT all trackers should have been handled already");
 	}
 
 	/**

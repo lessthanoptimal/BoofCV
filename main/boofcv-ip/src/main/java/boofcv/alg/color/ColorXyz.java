@@ -61,6 +61,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"MutablePublicArray"})
 public class ColorXyz {
 	// Look up tables for inverse gamma function. Should be faster than computing invGamma
 	public final static float[] table_invgamma_f = new float[256];
@@ -69,29 +70,29 @@ public class ColorXyz {
 	static {
 		for (int i = 0; i < table_invgamma_f.length; i++) {
 			table_invgamma_d[i] = invGamma(i/255.0);
-			table_invgamma_f[i] = (float) table_invgamma_d[i];
+			table_invgamma_f[i] = (float)table_invgamma_d[i];
 		}
 	}
 
 	/**
 	 * Conversion from 8-bit RGB into XYZ. 8-bit = range of 0 to 255.
 	 */
-	public static void rgbToXyz( int r , int g , int b , double []xyz ) {
-		linearRgbToXyz(invGamma(r/255.0),invGamma(g/255.0),invGamma(b/255.0),xyz);
+	public static void rgbToXyz( int r, int g, int b, double[] xyz ) {
+		linearRgbToXyz(invGamma(r/255.0), invGamma(g/255.0), invGamma(b/255.0), xyz);
 	}
 
 	/**
 	 * Conversion from 8-bit RGB into XYZ. 8-bit = range of 0 to 255.
 	 */
-	public static void rgbToXyz( int r , int g , int b , float []xyz ) {
-		linearRgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
+	public static void rgbToXyz( int r, int g, int b, float[] xyz ) {
+		linearRgbToXyz((float)invGamma(r/255.0f), (float)invGamma(g/255.0f), (float)invGamma(b/255.0f), xyz);
 	}
 
 	/**
 	 * Conversion from 8-bit RGB into XYZ. 8-bit = range of 0 to 255.
 	 */
-	public static void rgbToXyz( double r , double g , double b , float []xyz ) {
-		linearRgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
+	public static void rgbToXyz( double r, double g, double b, float[] xyz ) {
+		linearRgbToXyz((float)invGamma(r/255.0f), (float)invGamma(g/255.0f), (float)invGamma(b/255.0f), xyz);
 	}
 
 	/**
@@ -100,11 +101,11 @@ public class ColorXyz {
 	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
 	 */
-	public static void xyzToRgb( double x , double y , double z, double[]linearRgb , int[]rgb ) {
-		xyzToLinearRgb(x,y,z,linearRgb);
-		rgb[0] = (int)(255.0*gamma(linearRgb[0])+0.5) & 0xFF;
-		rgb[1] = (int)(255.0*gamma(linearRgb[1])+0.5) & 0xFF;
-		rgb[2] = (int)(255.0*gamma(linearRgb[2])+0.5) & 0xFF;
+	public static void xyzToRgb( double x, double y, double z, double[] linearRgb, int[] rgb ) {
+		xyzToLinearRgb(x, y, z, linearRgb);
+		rgb[0] = (int)(255.0*gamma(linearRgb[0]) + 0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(linearRgb[1]) + 0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(linearRgb[2]) + 0.5) & 0xFF;
 	}
 
 	/**
@@ -113,11 +114,11 @@ public class ColorXyz {
 	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
 	 */
-	public static void xyzToRgb( float x , float y , float z, float[]linearRgb , int[]rgb ) {
-		xyzToLinearRgb(x,y,z,linearRgb);
-		rgb[0] = (int)(255.0*gamma(linearRgb[0])+0.5) & 0xFF;
-		rgb[1] = (int)(255.0*gamma(linearRgb[1])+0.5) & 0xFF;
-		rgb[2] = (int)(255.0*gamma(linearRgb[2])+0.5) & 0xFF;
+	public static void xyzToRgb( float x, float y, float z, float[] linearRgb, int[] rgb ) {
+		xyzToLinearRgb(x, y, z, linearRgb);
+		rgb[0] = (int)(255.0*gamma(linearRgb[0]) + 0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(linearRgb[1]) + 0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(linearRgb[2]) + 0.5) & 0xFF;
 	}
 
 	/**
@@ -126,8 +127,8 @@ public class ColorXyz {
 	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color.
 	 */
-	public static void xyzToRgb( float x , float y , float z, float[]linearRgb , float[]rgb ) {
-		xyzToLinearRgb(x,y,z,linearRgb);
+	public static void xyzToRgb( float x, float y, float z, float[] linearRgb, float[] rgb ) {
+		xyzToLinearRgb(x, y, z, linearRgb);
 		rgb[0] = (float)(255.0*gamma(linearRgb[0]));
 		rgb[1] = (float)(255.0*gamma(linearRgb[1]));
 		rgb[2] = (float)(255.0*gamma(linearRgb[2]));
@@ -137,56 +138,56 @@ public class ColorXyz {
 	 * Inverse gamma correction function
 	 */
 	public static double invGamma( double v ) {
-		if (v<=0.04045) {
-			return(v / 12.92);
+		if (v <= 0.04045) {
+			return (v/12.92);
 		}
-		return(Math.pow((v + 0.055) / 1.055,2.4));
+		return (Math.pow((v + 0.055)/1.055, 2.4));
 	}
 
 	/**
 	 * Forward gamma correction function
 	 */
 	public static double gamma( double v ) {
-		if (v<=0.0031308) {
+		if (v <= 0.0031308) {
 			return (323.0/25.0)*v;
 		}
-		return (211.0/200.0)*Math.pow(v,5.0/12.0)-(11.0/200.0);
+		return (211.0/200.0)*Math.pow(v, 5.0/12.0) - (11.0/200.0);
 	}
 
 	/**
 	 * Conversion from gamma corrected Linear RGB into CEI XYZ. Normalized RGB values have a range of 0:1
 	 */
-	public static void linearRgbToXyz( double r , double g , double b , double []xyz ) {
-		xyz[0] = 0.412453*r + 0.35758 *g + 0.180423*b;
-		xyz[1] = 0.212671*r + 0.71516 *g + 0.072169*b;
+	public static void linearRgbToXyz( double r, double g, double b, double[] xyz ) {
+		xyz[0] = 0.412453*r + 0.35758*g + 0.180423*b;
+		xyz[1] = 0.212671*r + 0.71516*g + 0.072169*b;
 		xyz[2] = 0.019334*r + 0.119193*g + 0.950227*b;
 	}
 
 	/**
 	 * Conversion from gamma corrected Linear RGB into CEI XYZ. Normalized RGB values have a range of 0:1
 	 */
-	public static void linearRgbToXyz( float r , float g , float b , float []xyz ) {
-		xyz[0] = 0.412453f*r + 0.35758f *g + 0.180423f*b;
-		xyz[1] = 0.212671f*r + 0.71516f *g + 0.072169f*b;
+	public static void linearRgbToXyz( float r, float g, float b, float[] xyz ) {
+		xyz[0] = 0.412453f*r + 0.35758f*g + 0.180423f*b;
+		xyz[1] = 0.212671f*r + 0.71516f*g + 0.072169f*b;
 		xyz[2] = 0.019334f*r + 0.119193f*g + 0.950227f*b;
 	}
 
 	/**
 	 * Conversion from CEI XYZ to gamma corrected Linear RGB. Normalized RGB values have a range of 0:1
 	 */
-	public static void xyzToLinearRgb( float x , float y , float z , float []linearRgb ) {
-		linearRgb[0] =  3.240479f*x - 1.53715f*y  - 0.498535f*z;
+	public static void xyzToLinearRgb( float x, float y, float z, float[] linearRgb ) {
+		linearRgb[0] = 3.240479f*x - 1.53715f*y - 0.498535f*z;
 		linearRgb[1] = -0.969256f*x + 1.875991f*y + 0.041556f*z;
-		linearRgb[2] =  0.055648f*x - 0.204043f*y + 1.057311f*z;
+		linearRgb[2] = 0.055648f*x - 0.204043f*y + 1.057311f*z;
 	}
 
 	/**
 	 * Conversion from CEI XYZ to gamma corrected Linear RGB. Normalized RGB values have a range of 0:1
 	 */
-	public static void xyzToLinearRgb( double x , double y , double z , double []linearRgb ) {
-		linearRgb[0] =  3.240479*x - 1.53715*y  - 0.498535*z;
+	public static void xyzToLinearRgb( double x, double y, double z, double[] linearRgb ) {
+		linearRgb[0] = 3.240479*x - 1.53715*y - 0.498535*z;
 		linearRgb[1] = -0.969256*x + 1.875991*y + 0.041556*z;
-		linearRgb[2] =  0.055648*x - 0.204043*y + 1.057311*z;
+		linearRgb[2] = 0.055648*x - 0.204043*y + 1.057311*z;
 	}
 
 	/**
@@ -198,23 +199,23 @@ public class ColorXyz {
 	 * @param xyz (Output) 8-bit XYZ encoded image. X = channel 0, Y = channel 1, Z = channel 2
 	 */
 	public static <T extends ImageGray<T>>
-	void rgbToXyz(Planar<T> rgb , Planar<GrayF32> xyz ) {
-		xyz.reshape(rgb.width,rgb.height,3);
+	void rgbToXyz( Planar<T> rgb, Planar<GrayF32> xyz ) {
+		xyz.reshape(rgb.width, rgb.height, 3);
 
-		if( rgb.getBandType() == GrayU8.class ) {
+		if (rgb.getBandType() == GrayU8.class) {
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplColorXyz_MT.rgbToXyz_U8((Planar<GrayU8>) rgb, xyz);
+				ImplColorXyz_MT.rgbToXyz_U8((Planar<GrayU8>)rgb, xyz);
 			} else {
-				ImplColorXyz.rgbToXyz_U8((Planar<GrayU8>) rgb, xyz);
+				ImplColorXyz.rgbToXyz_U8((Planar<GrayU8>)rgb, xyz);
 			}
-		} else if( rgb.getBandType() == GrayF32.class ) {
-			if(BoofConcurrency.USE_CONCURRENT ) {
-				ImplColorXyz_MT.rgbToXyz_F32((Planar<GrayF32>)rgb,xyz);
+		} else if (rgb.getBandType() == GrayF32.class) {
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplColorXyz_MT.rgbToXyz_F32((Planar<GrayF32>)rgb, xyz);
 			} else {
-				ImplColorXyz.rgbToXyz_F32((Planar<GrayF32>)rgb,xyz);
+				ImplColorXyz.rgbToXyz_F32((Planar<GrayF32>)rgb, xyz);
 			}
 		} else {
-			throw new IllegalArgumentException("Unsupported band type "+rgb.getBandType().getSimpleName());
+			throw new IllegalArgumentException("Unsupported band type " + rgb.getBandType().getSimpleName());
 		}
 	}
 
@@ -227,23 +228,23 @@ public class ColorXyz {
 	 * @param rgb (Output) 8-bit RGB encoded image. R = channel 0, G = channel 1, B = channel 2
 	 */
 	public static <T extends ImageGray<T>>
-	void xyzToRgb(Planar<GrayF32> xyz, Planar<T> rgb ) {
-		xyz.reshape(rgb.width,rgb.height,3);
+	void xyzToRgb( Planar<GrayF32> xyz, Planar<T> rgb ) {
+		xyz.reshape(rgb.width, rgb.height, 3);
 
-		if( rgb.getBandType() == GrayU8.class ) {
+		if (rgb.getBandType() == GrayU8.class) {
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplColorXyz_MT.xyzToRgb_U8(xyz,(Planar<GrayU8>) rgb);
+				ImplColorXyz_MT.xyzToRgb_U8(xyz, (Planar<GrayU8>)rgb);
 			} else {
-				ImplColorXyz.xyzToRgb_U8(xyz,(Planar<GrayU8>) rgb);
+				ImplColorXyz.xyzToRgb_U8(xyz, (Planar<GrayU8>)rgb);
 			}
-		} else if( rgb.getBandType() == GrayF32.class ) {
-			if(BoofConcurrency.USE_CONCURRENT ) {
-				ImplColorXyz_MT.xyzToRgb_F32(xyz,(Planar<GrayF32>)rgb);
+		} else if (rgb.getBandType() == GrayF32.class) {
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplColorXyz_MT.xyzToRgb_F32(xyz, (Planar<GrayF32>)rgb);
 			} else {
-				ImplColorXyz.xyzToRgb_F32(xyz,(Planar<GrayF32>)rgb);
+				ImplColorXyz.xyzToRgb_F32(xyz, (Planar<GrayF32>)rgb);
 			}
 		} else {
-			throw new IllegalArgumentException("Unsupported band type "+rgb.getBandType().getSimpleName());
+			throw new IllegalArgumentException("Unsupported band type " + rgb.getBandType().getSimpleName());
 		}
 	}
 }

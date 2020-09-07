@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,6 +88,7 @@ import static org.bytedeco.javacpp.swscale.*;
  *
  * @author Samuel Audet
  */
+@SuppressWarnings({"UnsafeFinalization","MissingOverride","BadImport"})
 public class FFmpegFrameGrabber extends FrameGrabber {
     public static String[] getDeviceDescriptions() throws Exception {
         tryLoad();
@@ -691,6 +692,7 @@ public class FFmpegFrameGrabber extends FrameGrabber {
         release();
     }
 
+    @Override
     public void trigger() throws Exception {
         if (oc == null || oc.isNull()) {
             throw new Exception("Could not trigger: No AVFormatContext. (Has start() been called?)");
@@ -752,6 +754,7 @@ public class FFmpegFrameGrabber extends FrameGrabber {
         frame.imageChannels = frame.imageStride / frame.imageWidth;
     }
 
+    @Override
     public Frame grab() throws Exception {
         return grabFrame(true, true, true, false);
     }

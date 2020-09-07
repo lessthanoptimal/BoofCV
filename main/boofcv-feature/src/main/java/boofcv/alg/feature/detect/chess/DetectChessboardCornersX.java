@@ -428,9 +428,8 @@ public class DetectChessboardCornersX {
 
 		int width = radius*2+1;
 
-		int idx = 0;
 		for (int iy = 0; iy < width; iy++) {
-			for (int ix = 0; ix < width; ix++, idx++) {
+			for (int ix = 0; ix < width; ix++) {
 
 				int y = cy + iy - radius;
 				int x = cx + ix - radius;

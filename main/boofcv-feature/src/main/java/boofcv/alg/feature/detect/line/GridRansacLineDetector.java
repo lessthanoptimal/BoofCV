@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.detect.line;
 
-
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.struct.feature.MatrixOfList;
@@ -72,7 +71,7 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	protected int maxDetectLines;
 
 	// extracts lines
-	private ModelMatcher<LinePolar2D_F32,Edgel> robustMatcher;
+	private ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher;
 
 	// list of lines found in each
 	private MatrixOfList<LineSegment2D_F32> foundLines = new MatrixOfList<>(1, 1);
@@ -84,9 +83,8 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	 * @param maxDetectLines Maximum number of lines which can be detected in a region.  Try 10.
 	 * @param robustMatcher Robust model matcher for line detection.
 	 */
-	public GridRansacLineDetector(int regionSize, int maxDetectLines ,
-								  ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher)
-	{
+	protected GridRansacLineDetector( int regionSize, int maxDetectLines,
+									  ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher ) {
 		this.regionSize = regionSize;
 		this.maxDetectLines = maxDetectLines;
 		this.robustMatcher = robustMatcher;
@@ -101,29 +99,28 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	 * @param derivY Image derivative along x-axis. Not modified.
 	 * @param binaryEdges True values indicate that a pixel is an edge pixel. Not modified.
 	 */
-	public void process( D derivX , D derivY , GrayU8 binaryEdges )
-	{
-		InputSanityCheck.checkSameShape(derivX,derivY,binaryEdges);
+	public void process( D derivX, D derivY, GrayU8 binaryEdges ) {
+		InputSanityCheck.checkSameShape(derivX, derivY, binaryEdges);
 
-		int w = derivX.width-regionSize+1;
-		int h = derivY.height-regionSize+1;
+		int w = derivX.width - regionSize + 1;
+		int h = derivY.height - regionSize + 1;
 
-		foundLines.reshape(derivX.width / regionSize, derivX.height / regionSize);
+		foundLines.reshape(derivX.width/regionSize, derivX.height/regionSize);
 		foundLines.reset();
 
 		// avoid partial regions/other image edge conditions by being at least the region's radius away
-		for( int y = 0; y < h; y += regionSize) {
+		for (int y = 0; y < h; y += regionSize) {
 			int gridY = y/regionSize;
 			// index of the top left pixel in the region being considered
 			// possible over optimization
 			int index = binaryEdges.startIndex + y*binaryEdges.stride;
-			for( int x = 0; x < w; x+= regionSize , index += regionSize) {
+			for (int x = 0; x < w; x += regionSize, index += regionSize) {
 				int gridX = x/regionSize;
 				// detects edgels inside the region
-				detectEdgels(index,x,y,derivX,derivY,binaryEdges);
+				detectEdgels(index, x, y, derivX, derivY, binaryEdges);
 
 				// find lines inside the region using RANSAC
-				findLinesInRegion(foundLines.get(gridX,gridY));
+				findLinesInRegion(foundLines.get(gridX, gridY));
 			}
 		}
 	}
@@ -139,14 +136,14 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 
 	/**
 	 * Computes edgel information for pixels which have been flagged inside a region
-	 * @param index0
+	 *
 	 * @param x0 offset of region top left corner
 	 * @param y0 offset of region top left corner
 	 * @param derivX contains image derivative x-axis
 	 * @param derivY contains image derivative y-axis
 	 * @param binaryEdges Mark indicting which pixels are edges along a line
 	 */
-	protected abstract void detectEdgels( int index0 , int x0 , int y0 , D derivX , D derivY , GrayU8 binaryEdges);
+	protected abstract void detectEdgels( int index0, int x0, int y0, D derivX, D derivY, GrayU8 binaryEdges );
 
 	/**
 	 * Searches for lines inside inside the region..
@@ -160,18 +157,18 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 		int iterations = 0;
 
 		// exit if not enough points or max iterations exceeded
-		while( iterations++ < maxDetectLines) {
-			if( !robustMatcher.process(list) )
+		while (iterations++ < maxDetectLines) {
+			if (!robustMatcher.process(list))
 				break;
 
 			// remove the found edges from the main list
 			List<Edgel> matchSet = robustMatcher.getMatchSet();
 
 			// make sure the match set is large enough
-			if( matchSet.size() < minInlierSize )
+			if (matchSet.size() < minInlierSize)
 				break;
 
-			for( Edgel e : matchSet ) {
+			for (Edgel e : matchSet) {
 				list.remove(e);
 			}
 
@@ -187,31 +184,29 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	 * @param model Detected line.
 	 * @return Line segement.
 	 */
-	private LineSegment2D_F32 convertToLineSegment(List<Edgel> matchSet, LinePolar2D_F32 model) {
+	private LineSegment2D_F32 convertToLineSegment( List<Edgel> matchSet, LinePolar2D_F32 model ) {
 		float minT = Float.MAX_VALUE;
 		float maxT = -Float.MAX_VALUE;
 
-		LineParametric2D_F32 line = UtilLine2D_F32.convert(model,(LineParametric2D_F32)null);
+		LineParametric2D_F32 line = UtilLine2D_F32.convert(model, (LineParametric2D_F32)null);
 
 		Point2D_F32 p = new Point2D_F32();
-		for( Edgel e : matchSet ) {
-			p.set(e.x,e.y);
-			float t = ClosestPoint2D_F32.closestPointT(line,e);
-			if( minT > t )
+		for (Edgel e : matchSet) {
+			p.set(e.x, e.y);
+			float t = ClosestPoint2D_F32.closestPointT(line, e);
+			if (minT > t)
 				minT = t;
-			if( maxT < t )
+			if (maxT < t)
 				maxT = t;
 		}
 
 		LineSegment2D_F32 segment = new LineSegment2D_F32();
 
-		segment.a.x = line.p.x + line.slope.x * minT;
-		segment.a.y = line.p.y + line.slope.y * minT;
-		segment.b.x = line.p.x + line.slope.x * maxT;
-		segment.b.y = line.p.y + line.slope.y * maxT;
+		segment.a.x = line.p.x + line.slope.x*minT;
+		segment.a.y = line.p.y + line.slope.y*minT;
+		segment.b.x = line.p.x + line.slope.x*maxT;
+		segment.b.y = line.p.y + line.slope.y*maxT;
 
 		return segment;
 	}
-
-
 }

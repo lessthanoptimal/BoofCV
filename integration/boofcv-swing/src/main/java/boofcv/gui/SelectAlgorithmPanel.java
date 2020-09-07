@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Provides a pull down list form which the user can select which algorithm to run.  After
  * it has been selected the input should be processed and displayed.
@@ -33,18 +32,17 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class SelectAlgorithmPanel extends JPanel
-		implements ActionListener
-{
+		implements ActionListener {
 	JToolBar toolbar;
-	JComboBox algBox;
+	JComboBox<String> algBox;
 	List<Object> algCookies = new ArrayList<>();
 	Component gui;
 
-	public SelectAlgorithmPanel() {
+	protected SelectAlgorithmPanel() {
 		super(new BorderLayout());
 
 		toolbar = new JToolBar();
-		algBox = new JComboBox();
+		algBox = new JComboBox<>();
 		algBox.setMaximumSize(algBox.getPreferredSize());
 		toolbar.add(algBox);
 
@@ -62,18 +60,12 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	 */
 	public void setMainGUI( final Component gui ) {
 		this.gui = gui;
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				add(gui,BorderLayout.CENTER);
-			}});
+		SwingUtilities.invokeLater(() -> add(gui, BorderLayout.CENTER));
 	}
 
-	public void addAlgorithm( final String name , Object cookie ) {
+	public void addAlgorithm( final String name, Object cookie ) {
 		algCookies.add(cookie);
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				algBox.addItem(name);
-			}});
+		SwingUtilities.invokeLater(() -> algBox.addItem(name));
 	}
 
 	/**
@@ -87,31 +79,20 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == algBox ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == algBox) {
 			final Object cookie = algCookies.get(algBox.getSelectedIndex());
 			final String name = (String)algBox.getSelectedItem();
 
-			new Thread() {
-				public void run() {
-					performSetAlgorithm(name, cookie);
-				}
-			}.start();
+			new Thread(() -> performSetAlgorithm(name, cookie)).start();
 		}
 	}
 
-	private void performSetAlgorithm(String name, Object cookie) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				toolbar.setEnabled(false);
-				}});
-		setActiveAlgorithm( name , cookie );
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				toolbar.setEnabled(true);
-			}});
+	private void performSetAlgorithm( String name, Object cookie ) {
+		SwingUtilities.invokeLater(() -> toolbar.setEnabled(false));
+		setActiveAlgorithm(name, cookie);
+		SwingUtilities.invokeLater(() -> toolbar.setEnabled(true));
 	}
 
-	public abstract void setActiveAlgorithm( String name , Object cookie );
-
+	public abstract void setActiveAlgorithm( String name, Object cookie );
 }

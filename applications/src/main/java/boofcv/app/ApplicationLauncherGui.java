@@ -153,7 +153,7 @@ public class ApplicationLauncherGui extends JPanel {
 		return panel;
 	}
 
-	public class ListenQuit implements KeyListener {
+	public static class ListenQuit implements KeyListener {
 		@Override
 		public void keyTyped(KeyEvent e) {}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,54 +40,53 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestLinearContourLabelChang2004 {
 
 	public static GrayU8 TEST1 = new GrayU8(new byte[][]
-						  {{0,0,0,0,0,0,0,1,0,0,0,1,1},
-						   {0,0,0,0,0,0,0,1,0,0,0,1,1},
-						   {0,0,0,0,0,0,0,1,0,0,1,1,0},
-						   {0,0,0,0,0,0,0,0,1,1,1,1,0},
-						   {0,0,1,0,0,0,0,0,1,1,1,0,0},
-						   {0,0,1,0,0,0,1,1,1,1,1,0,0},
-						   {1,1,1,1,1,1,1,1,1,1,0,0,0},
-						   {0,0,0,1,1,1,1,1,0,0,0,0,0}});
+			{{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1},
+					{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1},
+					{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0},
+					{0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0},
+					{0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0},
+					{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+					{0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}});
 
 	public static GrayU8 TEST2 = new GrayU8(new byte[][]
-				   {{0,0,1,0,0,0,0,1,0,0,0,0,0},
-					{0,1,0,1,0,0,1,0,0,1,0,0,0},
-					{0,0,1,0,0,1,0,1,0,1,1,1,0},
-					{0,0,0,0,1,0,0,0,1,1,1,1,0},
-					{0,0,1,0,1,0,0,0,1,0,0,0,0},
-					{0,0,0,0,1,0,1,1,1,0,1,1,0},
-					{1,1,1,0,0,1,0,0,1,0,0,1,0},
-					{0,0,0,1,1,1,1,1,0,0,0,0,0}});
+			{{0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+					{0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0},
+					{0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0},
+					{0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0},
+					{0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0},
+					{0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0},
+					{1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0},
+					{0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}});
 
 	public static GrayU8 TEST3 = new GrayU8(new byte[][]
-					{{0,0,0,0,0},
-					 {0,1,1,1,0},
-					 {0,1,1,1,0},
-					 {0,1,0,1,0},
-					 {0,1,1,1,0},
-					 {0,0,0,0,0}});
+			{{0, 0, 0, 0, 0},
+					{0, 1, 1, 1, 0},
+					{0, 1, 1, 1, 0},
+					{0, 1, 0, 1, 0},
+					{0, 1, 1, 1, 0},
+					{0, 0, 0, 0, 0}});
 
 	public static GrayU8 TEST4 = new GrayU8(new byte[][]
-					{{0,0,0,0,0,0,0},
-					 {0,0,1,1,1,1,1},
-					 {0,1,0,1,1,1,1},
-					 {0,1,1,1,0,1,1},
-					 {0,1,1,1,1,1,1},
-					 {0,1,1,1,1,1,1},
-					 {0,1,1,1,1,1,1},
-					 {0,0,0,0,0,0,0}});
-
+			{{0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 1, 1, 1, 1, 1},
+					{0, 1, 0, 1, 1, 1, 1},
+					{0, 1, 1, 1, 0, 1, 1},
+					{0, 1, 1, 1, 1, 1, 1},
+					{0, 1, 1, 1, 1, 1, 1},
+					{0, 1, 1, 1, 1, 1, 1},
+					{0, 0, 0, 0, 0, 0, 0}});
 
 	List<Point2D_I32> local;
 
 	public TestLinearContourLabelChang2004() {
 		local = new ArrayList<>();
-		local.add(new Point2D_I32(-1,-1));
-		local.add(new Point2D_I32( 0,-1));
-		local.add(new Point2D_I32( 1,-1));
-		local.add(new Point2D_I32( 1, 0));
-		local.add(new Point2D_I32( 1, 1));
-		local.add(new Point2D_I32( 0, 1));
+		local.add(new Point2D_I32(-1, -1));
+		local.add(new Point2D_I32(0, -1));
+		local.add(new Point2D_I32(1, -1));
+		local.add(new Point2D_I32(1, 0));
+		local.add(new Point2D_I32(1, 1));
+		local.add(new Point2D_I32(0, 1));
 		local.add(new Point2D_I32(-1, 1));
 		local.add(new Point2D_I32(-1, 0));
 		local.add(new Point2D_I32(-1, -1));
@@ -97,7 +96,7 @@ public class TestLinearContourLabelChang2004 {
 	public void test1_4() {
 		GrayU8 input = TEST1.clone();
 
-		GrayS32 labeled = new GrayS32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width, input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 		alg.process(input, labeled);
 
@@ -109,60 +108,60 @@ public class TestLinearContourLabelChang2004 {
 	public void test1_8() {
 		GrayU8 input = TEST1.clone();
 
-		GrayS32 labeled = new GrayS32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width, input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input, labeled);
 
 		assertEquals(1, alg.getContours().size);
-		checkContour(alg, labeled,8);
+		checkContour(alg, labeled, 8);
 	}
 
 	@Test
 	public void test2_4() {
 		GrayU8 input = TEST2.clone();
 
-		GrayS32 labeled = new GrayS32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width, input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
-		alg.process(input,labeled);
+		alg.process(input, labeled);
 
-		assertEquals(14,alg.getContours().size);
-		checkContour(alg, labeled,4);
+		assertEquals(14, alg.getContours().size);
+		checkContour(alg, labeled, 4);
 	}
 
 	@Test
 	public void test2_8() {
 		GrayU8 input = TEST2.clone();
 
-		GrayS32 labeled = new GrayS32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width, input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
-		alg.process(input,labeled);
+		alg.process(input, labeled);
 
-		assertEquals(4,alg.getContours().size);
-		checkContour(alg, labeled,8);
+		assertEquals(4, alg.getContours().size);
+		checkContour(alg, labeled, 8);
 	}
 
 	@Test
 	public void test3_4() {
 		GrayU8 input = TEST4.clone();
 
-		GrayS32 labeled = new GrayS32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width, input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
-		alg.process(input,labeled);
+		alg.process(input, labeled);
 
 		assertEquals(1, alg.getContours().size);
-		checkContour(alg, labeled,4);
+		checkContour(alg, labeled, 4);
 	}
 
 	@Test
 	public void test3_8() {
 		GrayU8 input = TEST4.clone();
 
-		GrayS32 labeled = new GrayS32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width, input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input, labeled);
 
-		assertEquals(1,alg.getContours().size);
-		checkContour(alg, labeled,8);
+		assertEquals(1, alg.getContours().size);
+		checkContour(alg, labeled, 8);
 	}
 
 	/**
@@ -172,17 +171,17 @@ public class TestLinearContourLabelChang2004 {
 	public void checkInnerOuterContour() {
 		GrayU8 input = TEST3.clone();
 
-		GrayS32 labeled = new GrayS32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width, input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
-		alg.process(input,labeled);
+		alg.process(input, labeled);
 
-		assertEquals(1,alg.getContours().size);
-		checkContour(alg, labeled,8);
+		assertEquals(1, alg.getContours().size);
+		checkContour(alg, labeled, 8);
 
 		ContourPacked c = alg.getContours().get(0);
 		assertEquals(10, alg.packedPoints.sizeOfSet(c.externalIndex));
 		assertEquals(1, c.internalIndexes.size);
-		assertEquals(4, alg.packedPoints.sizeOfSet(c.externalIndex +1));
+		assertEquals(4, alg.packedPoints.sizeOfSet(c.externalIndex + 1));
 	}
 
 	/**
@@ -191,20 +190,20 @@ public class TestLinearContourLabelChang2004 {
 	 *
 	 * @param rule Which connectivity rule is being tested
 	 */
-	private void checkContour(LinearContourLabelChang2004 alg, GrayS32 labeled , int rule ) {
+	private void checkContour( LinearContourLabelChang2004 alg, GrayS32 labeled, int rule ) {
 
 		FastQueue<ContourPacked> contours = alg.getContours();
 
-		for( int i = 0; i < contours.size(); i++ ) {
+		for (int i = 0; i < contours.size(); i++) {
 //			System.out.println("=================== Contour "+i);
 			ContourPacked c = contours.get(i);
 
-			assertTrue(c.id > 0 );
+			assertTrue(c.id > 0);
 
 			List<Point2D_I32> found = new ArrayList<>();
-			addPointsToList(alg,c.externalIndex,found);
-			for(int j = 0; j < c.internalIndexes.size; j++ ) {
-				addPointsToList(alg,c.internalIndexes.get(j),found);
+			addPointsToList(alg, c.externalIndex, found);
+			for (int j = 0; j < c.internalIndexes.size; j++) {
+				addPointsToList(alg, c.internalIndexes.get(j), found);
 			}
 
 			// there can be duplicate points, remove them
@@ -218,12 +217,12 @@ public class TestLinearContourLabelChang2004 {
 //			print(found,labeled.width,labeled.height);
 //			print(expected,labeled.width,labeled.height);
 
-			assertEquals(expected.size(),found.size());
+			assertEquals(expected.size(), found.size());
 
-			for( Point2D_I32 f : found ) {
+			for (Point2D_I32 f : found) {
 				boolean match = false;
-				for( Point2D_I32 e : expected ) {
-					if( f.x == e.x && f.y == e.y ) {
+				for (Point2D_I32 e : expected) {
+					if (f.x == e.x && f.y == e.y) {
 						match = true;
 						break;
 					}
@@ -233,55 +232,55 @@ public class TestLinearContourLabelChang2004 {
 		}
 	}
 
-	private void addPointsToList( LinearContourLabelChang2004 alg , int set , List<Point2D_I32> list ) {
+	private void addPointsToList( LinearContourLabelChang2004 alg, int set, List<Point2D_I32> list ) {
 		PackedSetsPoint2D_I32.SetIterator iter = alg.packedPoints.createIterator();
 		iter.setup(set);
-		while( iter.hasNext() ) {
-			list.add( iter.next().copy() );
+		while (iter.hasNext()) {
+			list.add(iter.next().copy());
 		}
 	}
 
 	/**
 	 * Create an unordered list of all points in the internal and external contour
 	 */
-	private List<Point2D_I32> findContour8(GrayS32 labeled, int target) {
+	private List<Point2D_I32> findContour8( GrayS32 labeled, int target ) {
 		List<Point2D_I32> list = new ArrayList<>();
 
 		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(0, labeled);
 
-		for( int y = 0; y < labeled.height; y++ ) {
-			for( int x = 0; x < labeled.width; x++ ) {
-				if( target == labeled.get(x,y) ) {
+		for (int y = 0; y < labeled.height; y++) {
+			for (int x = 0; x < labeled.width; x++) {
+				if (target == labeled.get(x, y)) {
 
 					boolean isContour = false;
-					for( int i = 0; i < local.size()-1; i++ ) {
+					for (int i = 0; i < local.size() - 1; i++) {
 						Point2D_I32 a = local.get(i);
-						Point2D_I32 b = local.get(i+1);
+						Point2D_I32 b = local.get(i + 1);
 
-						if( get(border, x + a.x, y + a.y) != target && get(border, x + b.x, y + b.y) != target ) {
+						if (get(border, x + a.x, y + a.y) != target && get(border, x + b.x, y + b.y) != target) {
 							isContour = true;
 							break;
 						}
 					}
 
-					if( !isContour && get(border, x + 1, y) != target)
+					if (!isContour && get(border, x + 1, y) != target)
 						isContour = true;
-					if( !isContour && get(border, x - 1, y) != target)
+					if (!isContour && get(border, x - 1, y) != target)
 						isContour = true;
-					if( !isContour && get(border, x, y + 1) != target)
+					if (!isContour && get(border, x, y + 1) != target)
 						isContour = true;
-					if( !isContour && get(border, x, y - 1) != target)
+					if (!isContour && get(border, x, y - 1) != target)
 						isContour = true;
 
-					if( isContour )
-						list.add( new Point2D_I32(x,y));
+					if (isContour)
+						list.add(new Point2D_I32(x, y));
 				}
 			}
 		}
 		return list;
 	}
 
-	private float get(ImageBorder<GrayS32> border , int x , int y ) {
+	private float get( ImageBorder<GrayS32> border, int x, int y ) {
 		double tmp0[] = new double[1];
 		border.getGeneral(x, y, tmp0);
 		return (float)tmp0[0];
@@ -290,25 +289,25 @@ public class TestLinearContourLabelChang2004 {
 	/**
 	 * Create an unordered list of all points in the internal and external contour
 	 */
-	private List<Point2D_I32> findContour4(GrayS32 labeled, int target) {
+	private List<Point2D_I32> findContour4( GrayS32 labeled, int target ) {
 		List<Point2D_I32> list = new ArrayList<>();
 
 		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(0, labeled);
 
-		for( int y = 0; y < labeled.height; y++ ) {
-			for( int x = 0; x < labeled.width; x++ ) {
-				if( target == labeled.get(x,y) ) {
+		for (int y = 0; y < labeled.height; y++) {
+			for (int x = 0; x < labeled.width; x++) {
+				if (target == labeled.get(x, y)) {
 
 					boolean isContour = false;
-					for( int i = 0; i < local.size(); i++ ) {
+					for (int i = 0; i < local.size(); i++) {
 						Point2D_I32 a = local.get(i);
-						if( get(border, x + a.x, y + a.y) != target ) {
+						if (get(border, x + a.x, y + a.y) != target) {
 							isContour = true;
 						}
 					}
 
-					if( isContour )
-						list.add( new Point2D_I32(x,y));
+					if (isContour)
+						list.add(new Point2D_I32(x, y));
 				}
 			}
 		}
@@ -318,30 +317,30 @@ public class TestLinearContourLabelChang2004 {
 	private List<Point2D_I32> removeDuplicates( List<Point2D_I32> list ) {
 		List<Point2D_I32> ret = new ArrayList<>();
 
-		for( int i = 0; i < list.size(); i++ ) {
+		for (int i = 0; i < list.size(); i++) {
 			Point2D_I32 p = list.get(i);
 			boolean matched = false;
-			for( int j = i+1; j < list.size(); j++ ) {
+			for (int j = i + 1; j < list.size(); j++) {
 				Point2D_I32 c = list.get(j);
-				if( p.x == c.x && p.y == c.y ) {
+				if (p.x == c.x && p.y == c.y) {
 					matched = true;
 					break;
 				}
 			}
-			if( !matched ) {
+			if (!matched) {
 				ret.add(p);
 			}
 		}
 		return ret;
 	}
 
-	private void print( List<Point2D_I32> l , int w, int h ) {
-		GrayU8 img = new GrayU8(w,h);
-
-		for( Point2D_I32 p : l ) {
-			img.set(p.x,p.y,1);
-		}
-		img.print();
-		System.out.println("------------------");
-	}
+//	private void print( List<Point2D_I32> l , int w, int h ) {
+//		GrayU8 img = new GrayU8(w,h);
+//
+//		for( Point2D_I32 p : l ) {
+//			img.set(p.x,p.y,1);
+//		}
+//		img.print();
+//		System.out.println("------------------");
+//	}
 }

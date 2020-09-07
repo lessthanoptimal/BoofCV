@@ -34,6 +34,7 @@ public interface FiducialTracker<T extends ImageBase<T>> extends FiducialDetecto
 	 *
 	 * @param input Input image.  Not modified.
 	 */
+	@Override
 	void detect( T input );
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,7 @@ public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolateP
 	/**
 	 * Creates a new instance of this interpolation method
 	 */
+	@Override
 	InterpolatePixelMB<T> copy();
 
 }

@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -113,7 +114,7 @@ class TestBundleAdjustmentMetricResidualFunction {
 		obs.initialize(structure.views.size, structure.hasRigid());
 
 		for (int j = 0; j < structure.points.size; j++) {
-			SceneStructureMetric.Point p = structure.points.data[j];
+			SceneStructureCommon.Point p = structure.points.data[j];
 
 			for (int i = 0; i < p.views.size; i++) {
 				SceneObservations.View v = obs.getView(p.views.get(i));
@@ -127,7 +128,7 @@ class TestBundleAdjustmentMetricResidualFunction {
 			for (int indexRigid = 0; indexRigid < structure.rigids.size; indexRigid++) {
 				SceneStructureMetric.Rigid r = structure.rigids.data[indexRigid];
 				for (int i = 0; i < r.points.length; i++) {
-					SceneStructureMetric.Point p = r.points[i];
+					SceneStructureCommon.Point p = r.points[i];
 					int indexPoint = r.indexFirst + i;
 
 					for (int j = 0; j < p.views.size; j++) {

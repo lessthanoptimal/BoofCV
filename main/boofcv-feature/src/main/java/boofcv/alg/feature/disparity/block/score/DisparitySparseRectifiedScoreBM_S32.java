@@ -25,23 +25,24 @@ import lombok.Getter;
  * <p>
  * Implementation of {@link DisparitySparseRectifiedScoreBM} that processes integer typed images.
  * </p>
+ *
  * @author Peter Abeles
  */
+@SuppressWarnings({"MissingOverride"})
 public abstract class DisparitySparseRectifiedScoreBM_S32<T extends ImageGray<T>>
-		extends DisparitySparseRectifiedScoreBM<int[], T>
-{
+		extends DisparitySparseRectifiedScoreBM<int[], T> {
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin
 	@Getter protected int[] scoreLtoR; // left to right
 	@Getter protected int[] scoreRtoL; // right to left
 
-	public DisparitySparseRectifiedScoreBM_S32(int radiusX, int radiusY, Class<T> imageType ) {
+	protected DisparitySparseRectifiedScoreBM_S32( int radiusX, int radiusY, Class<T> imageType ) {
 		super(radiusX, radiusY, imageType);
 	}
 
 	@Override
-	public void configure(int disparityMin, int disparityRange) {
+	public void configure( int disparityMin, int disparityRange ) {
 		super.configure(disparityMin, disparityRange);
-		scoreLtoR = new int[ disparityRange ];
-		scoreRtoL = new int[ disparityRange ];
+		scoreLtoR = new int[disparityRange];
+		scoreRtoL = new int[disparityRange];
 	}
 }

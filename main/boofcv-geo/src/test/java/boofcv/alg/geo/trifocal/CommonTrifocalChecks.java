@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public abstract class CommonTrifocalChecks {
 
 	protected int numFeatures = 20;
 
-	public CommonTrifocalChecks() {
+	protected CommonTrifocalChecks() {
 		worldToCam1 = new Se3_F64();
 		worldToCam2 = eulerXyz(0.3,0,0.05,0.05, 0.05, -0.02,null);
 		worldToCam3 = eulerXyz(0.6, 0.2, -0.02,0.1,-0.2,0.05,null);

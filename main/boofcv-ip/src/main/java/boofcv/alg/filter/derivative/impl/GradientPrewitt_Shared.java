@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,22 +18,24 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+//CONCURRENT_INLINE import javax.annotation.Generated;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-
 
 /**
  * Prewitt implementation that shares values for horizontal and vertical gradients
  *
  * @author Peter Abeles
  */
+//CONCURRENT_INLINE @Generated("boofcv.alg.filter.derivative.impl.GradientPrewitt_Shared")
 @SuppressWarnings("Duplicates")
 public class GradientPrewitt_Shared {
-	public static void process(GrayU8 orig,
-							   GrayS16 derivX,
-							   GrayS16 derivY) {
+	public static void process( GrayU8 orig,
+								GrayS16 derivX,
+								GrayS16 derivY ) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -44,31 +46,31 @@ public class GradientPrewitt_Shared {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexSrc = orig.startIndex + orig.stride * y + 1;
+			int indexSrc = orig.startIndex + orig.stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
 			for (; indexSrc < endX; indexSrc++) {
 				// a33 - a11
-				int w = (data[indexSrc + strideSrc + 1] & 0xFF) -(data[indexSrc - strideSrc - 1] & 0xFF);
+				int w = (data[indexSrc + strideSrc + 1] & 0xFF) - (data[indexSrc - strideSrc - 1] & 0xFF);
 				// a31 - a13
-				int v = (data[indexSrc + strideSrc - 1] & 0xFF) -(data[indexSrc - strideSrc + 1] & 0xFF);
+				int v = (data[indexSrc + strideSrc - 1] & 0xFF) - (data[indexSrc - strideSrc + 1] & 0xFF);
 
 				//a32 + w + v - a12
-				imgY[indexY++] = (short) ((data[indexSrc + strideSrc ] & 0xFF)+w+v-(data[indexSrc - strideSrc ] & 0xFF));
+				imgY[indexY++] = (short)((data[indexSrc + strideSrc] & 0xFF) + w + v - (data[indexSrc - strideSrc] & 0xFF));
 
 				//a23 + w - v - a21
-				imgX[indexX++] = (short) ((data[indexSrc + 1] & 0xFF)+w-v-(data[indexSrc - 1] & 0xFF));
+				imgX[indexX++] = (short)((data[indexSrc + 1] & 0xFF) + w - v - (data[indexSrc - 1] & 0xFF));
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void process(GrayS16 orig,
-							   GrayS16 derivX,
-							   GrayS16 derivY) {
+	public static void process( GrayS16 orig,
+								GrayS16 derivX,
+								GrayS16 derivY ) {
 		final short[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -79,31 +81,31 @@ public class GradientPrewitt_Shared {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexSrc = orig.startIndex + orig.stride * y + 1;
+			int indexSrc = orig.startIndex + orig.stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
 			for (; indexSrc < endX; indexSrc++) {
 				// a33 - a11
-				int w = (data[indexSrc + strideSrc + 1] ) -(data[indexSrc - strideSrc - 1] );
+				int w = data[indexSrc + strideSrc + 1] - data[indexSrc - strideSrc - 1];
 				// a31 - a13
-				int v = (data[indexSrc + strideSrc - 1] ) -(data[indexSrc - strideSrc + 1] );
+				int v = data[indexSrc + strideSrc - 1] - data[indexSrc - strideSrc + 1];
 
 				//a32 + w + v - a12
-				imgY[indexY++] = (short) ((data[indexSrc + strideSrc ] )+w+v-(data[indexSrc - strideSrc ] ));
+				imgY[indexY++] = (short)(data[indexSrc + strideSrc] + w + v - data[indexSrc - strideSrc]);
 
 				//a23 + w - v - a21
-				imgX[indexX++] = (short) ((data[indexSrc + 1] )+w-v-(data[indexSrc - 1] ));
+				imgX[indexX++] = (short)(data[indexSrc + 1] + w - v - data[indexSrc - 1]);
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void process(GrayF32 orig,
-							   GrayF32 derivX,
-							   GrayF32 derivY) {
+	public static void process( GrayF32 orig,
+								GrayF32 derivX,
+								GrayF32 derivY ) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 		final float[] imgY = derivY.data;
@@ -114,11 +116,11 @@ public class GradientPrewitt_Shared {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexSrc = orig.startIndex + orig.stride * y + 1;
+			int indexSrc = orig.startIndex + orig.stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
 			for (; indexSrc < endX; indexSrc++) {
 				// a33 - a11
@@ -127,10 +129,10 @@ public class GradientPrewitt_Shared {
 				float v = data[indexSrc + strideSrc - 1] - data[indexSrc - strideSrc + 1];
 
 				//a32 + w + v - a12
-				imgY[indexY++] = data[indexSrc + strideSrc ]+w+v-data[indexSrc - strideSrc ];
+				imgY[indexY++] = data[indexSrc + strideSrc] + w + v - data[indexSrc - strideSrc];
 
 				//a23 + w - v - a21
-				imgX[indexX++] = data[indexSrc + 1]+w-v-data[indexSrc - 1];
+				imgX[indexX++] = data[indexSrc + 1] + w - v - data[indexSrc - 1];
 			}
 		}
 		//CONCURRENT_ABOVE });

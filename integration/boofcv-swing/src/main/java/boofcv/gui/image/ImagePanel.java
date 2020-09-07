@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-
 /**
  * Simple JPanel for displaying buffered images.
  *
@@ -39,8 +38,8 @@ public class ImagePanel extends JPanel {
 	protected ScaleOptions scaling = ScaleOptions.DOWN;
 
 	public double scale = 1;
-	public double offsetX=0;
-	public double offsetY=0;
+	public double offsetX = 0;
+	public double offsetY = 0;
 
 	//  this variable must only be touched inside the GUI thread
 	private ScaleOffset adjustmentGUI = new ScaleOffset();
@@ -50,20 +49,20 @@ public class ImagePanel extends JPanel {
 	protected AffineTransform transform = new AffineTransform();
 	private boolean center = false;
 
-	public ImagePanel(BufferedImage img) {
-		this(img,ScaleOptions.NONE);
+	public ImagePanel( BufferedImage img ) {
+		this(img, ScaleOptions.NONE);
 	}
 
-	public ImagePanel(final BufferedImage img , ScaleOptions scaling ) {
+	public ImagePanel( final BufferedImage img, ScaleOptions scaling ) {
 		this(true);
 		this.img = img;
 		this.scaling = scaling;
 		autoSetPreferredSize();
 	}
 
-	public ImagePanel( int width , int height ) {
+	public ImagePanel( int width, int height ) {
 		this(true);
-		setPreferredSize(new Dimension(width,height));
+		setPreferredSize(new Dimension(width, height));
 	}
 
 	/**
@@ -72,7 +71,7 @@ public class ImagePanel extends JPanel {
 	 */
 
 	public ImagePanel( boolean addMouseListener ) {
-		if( addMouseListener ) {
+		if (addMouseListener) {
 			addClickToSaveListener();
 		}
 	}
@@ -91,7 +90,7 @@ public class ImagePanel extends JPanel {
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 		AffineTransform original = g2.getTransform();
@@ -100,16 +99,16 @@ public class ImagePanel extends JPanel {
 		//draw the image
 		BufferedImage img = this.img;
 		if (img != null) {
-			computeOffsetAndScale(img,adjustmentGUI);
+			computeOffsetAndScale(img, adjustmentGUI);
 			scale = adjustmentGUI.scale;
 			offsetX = adjustmentGUI.offsetX;
 			offsetY = adjustmentGUI.offsetY;
 
-			if( scale == 1 ) {
+			if (scale == 1) {
 				g2.drawImage(img, (int)offsetX, (int)offsetY, this);
 			} else {
-				transform.setTransform(scale,0,0,scale,offsetX,offsetY);
-				g2.drawImage(img,transform,null);
+				transform.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+				g2.drawImage(img, transform, null);
 			}
 		}
 
@@ -118,35 +117,36 @@ public class ImagePanel extends JPanel {
 
 	protected void configureDrawImageGraphics( Graphics2D g2 ) {}
 
-	private void computeOffsetAndScale(BufferedImage img, ScaleOffset so ) {
-		if( scaling != ScaleOptions.NONE ) {
-			if( scaling == ScaleOptions.MANUAL ) {
+	@SuppressWarnings({"SelfAssignment"})
+	private void computeOffsetAndScale( BufferedImage img, ScaleOffset so ) {
+		if (scaling != ScaleOptions.NONE) {
+			if (scaling == ScaleOptions.MANUAL) {
 				so.scale = scale;
 			} else {
-				double ratioW = (double) getWidth() / (double) img.getWidth();
-				double ratioH = (double) getHeight() / (double) img.getHeight();
+				double ratioW = (double)getWidth()/(double)img.getWidth();
+				double ratioH = (double)getHeight()/(double)img.getHeight();
 
 				so.scale = Math.min(ratioW, ratioH);
 				if (scaling == ScaleOptions.DOWN && so.scale >= 1)
 					so.scale = 1;
 			}
 
-			if( center ) {
-				so.offsetX = (getWidth()-img.getWidth()*so.scale)/2;
-				so.offsetY = (getHeight()-img.getHeight()*so.scale)/2;
+			if (center) {
+				so.offsetX = (getWidth() - img.getWidth()*so.scale)/2;
+				so.offsetY = (getHeight() - img.getHeight()*so.scale)/2;
 			} else {
 				so.offsetX = 0;
 				so.offsetY = 0;
 			}
 
-			if( scale == 1 ) {
+			if (scale == 1) {
 				so.offsetX = (int)so.offsetX;
 				so.offsetY = (int)so.offsetY;
 			}
 		} else {
-			if( center ) {
-				so.offsetX = (getWidth()-img.getWidth())/2;
-				so.offsetY = (getHeight()-img.getHeight())/2;
+			if (center) {
+				so.offsetX = (getWidth() - img.getWidth())/2;
+				so.offsetY = (getHeight() - img.getHeight())/2;
 			} else {
 				so.offsetX = 0;
 				so.offsetY = 0;
@@ -162,25 +162,25 @@ public class ImagePanel extends JPanel {
 	 *
 	 * @param image The new image which will be displayed.
 	 */
-	public void setImage(BufferedImage image) {
+	public void setImage( BufferedImage image ) {
 		this.img = image;
 	}
 
 	/**
 	 * Changes the buffered image and calls repaint.  Does not need to be called in the UI thread.
 	 */
-	public void setImageRepaint(BufferedImage image) {
+	public void setImageRepaint( BufferedImage image ) {
 		// if image is larger before  than the new image then you need to make sure you repaint
 		// the entire image otherwise a ghost will be left
 		ScaleOffset workspace;
-		if( SwingUtilities.isEventDispatchThread() ) {
+		if (SwingUtilities.isEventDispatchThread()) {
 			workspace = adjustmentGUI;
 		} else {
 			workspace = new ScaleOffset();
 		}
-		repaintJustImage(img,workspace);
+		repaintJustImage(img, workspace);
 		this.img = image;
-		if( image != null ) {
+		if (image != null) {
 			repaintJustImage(img, workspace);
 		} else {
 			repaint();
@@ -193,11 +193,11 @@ public class ImagePanel extends JPanel {
 	 *
 	 * @param image The new image which will be displayed.
 	 */
-	public void setImageUI(final BufferedImage image) {
+	public void setImageUI( final BufferedImage image ) {
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			repaintJustImage(ImagePanel.this.img,adjustmentGUI);
+			repaintJustImage(ImagePanel.this.img, adjustmentGUI);
 			ImagePanel.this.img = image;
-			repaintJustImage(ImagePanel.this.img,adjustmentGUI);
+			repaintJustImage(ImagePanel.this.img, adjustmentGUI);
 		});
 	}
 
@@ -205,7 +205,7 @@ public class ImagePanel extends JPanel {
 		return center;
 	}
 
-	public void setCentering(boolean center) {
+	public void setCentering( boolean center ) {
 		this.center = center;
 	}
 
@@ -216,22 +216,22 @@ public class ImagePanel extends JPanel {
 		repaintJustImage(img, new ScaleOffset());
 	}
 
-	protected void repaintJustImage(BufferedImage img,ScaleOffset workspace ) {
-		if( img == null ) {
+	protected void repaintJustImage( BufferedImage img, ScaleOffset workspace ) {
+		if (img == null) {
 			repaint();
 			return;
 		}
-		computeOffsetAndScale(img,workspace);
+		computeOffsetAndScale(img, workspace);
 
-		repaint((int)Math.round(workspace.offsetX)-1,(int)Math.round(workspace.offsetY)-1,
-				(int)(img.getWidth()*workspace.scale+0.5)+2,(int)(img.getHeight()*workspace.scale+0.5)+2);
+		repaint((int)Math.round(workspace.offsetX) - 1, (int)Math.round(workspace.offsetY) - 1,
+				(int)(img.getWidth()*workspace.scale + 0.5) + 2, (int)(img.getHeight()*workspace.scale + 0.5) + 2);
 	}
 
 	public BufferedImage getImage() {
 		return img;
 	}
 
-	public void setScaling(ScaleOptions scaling) {
+	public void setScaling( ScaleOptions scaling ) {
 		this.scaling = scaling;
 	}
 
@@ -243,11 +243,11 @@ public class ImagePanel extends JPanel {
 		return mouseListener;
 	}
 
-	public void setScale(double scale) {
+	public void setScale( double scale ) {
 		this.scale = scale;
 	}
 
 	private static class ScaleOffset {
-		double scale,offsetX,offsetY;
+		double scale, offsetX, offsetY;
 	}
 }

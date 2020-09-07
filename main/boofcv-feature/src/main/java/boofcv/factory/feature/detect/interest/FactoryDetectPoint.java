@@ -58,15 +58,17 @@ public class FactoryDetectPoint {
 	 * Creates a point detector from the generic configuration
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> create( ConfigPointDetector config, @Nullable Class<T> imageType, @Nullable Class<D> derivType) {
-		if( derivType == null )
+	GeneralFeatureDetector<T, D> create( ConfigPointDetector config, @Nullable Class<T> imageType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		config.general.detectMaximums = true;
 		config.general.detectMinimums = false;
-		switch( config.type ) {
+		switch (config.type) {
 			case FAST:
-			case LAPLACIAN: config.general.detectMinimums = true; break;
+			case LAPLACIAN:
+				config.general.detectMinimums = true; break;
+			default: break;
 		}
 
 		return switch (config.type) {
@@ -87,23 +89,23 @@ public class FactoryDetectPoint {
 	 * Detects Harris corners.
 	 *
 	 * @param configDetector Configuration for feature detector.
-	 * @param configCorner   Configuration for corner intensity computation. If null radius will match detector radius
-	 * @param derivType       Type of derivative image.
+	 * @param configCorner Configuration for corner intensity computation. If null radius will match detector radius
+	 * @param derivType Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.HarrisCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createHarris( @Nullable ConfigGeneralDetector configDetector,
-											   @Nullable ConfigHarrisCorner configCorner, Class<D> derivType) {
-		if( configDetector == null)
+											   @Nullable ConfigHarrisCorner configCorner, Class<D> derivType ) {
+		if (configDetector == null)
 			configDetector = new ConfigGeneralDetector();
-		if( configCorner == null) {
+		if (configCorner == null) {
 			configCorner = new ConfigHarrisCorner();
 			configCorner.radius = configDetector.radius;
 		}
 
 		GradientCornerIntensity<D> cornerIntensity =
 				FactoryIntensityPointAlg.harris(
-						configCorner.radius,(float)configCorner.kappa,configCorner.weighted, derivType);
+						configCorner.radius, (float)configCorner.kappa, configCorner.weighted, derivType);
 		return createGeneral(cornerIntensity, configDetector);
 	}
 
@@ -111,18 +113,18 @@ public class FactoryDetectPoint {
 	 * Detects Shi-Tomasi corners.
 	 *
 	 * @param configDetector Configuration for feature extractor.
-	 * @param configCorner   Configuration for corner intensity computation. If null radius will match detector radius
-	 * @param derivType       Type of derivative image.
+	 * @param configCorner Configuration for corner intensity computation. If null radius will match detector radius
+	 * @param derivType Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createShiTomasi( @Nullable ConfigGeneralDetector configDetector,
 												  @Nullable ConfigShiTomasi configCorner,
-												  Class<D> derivType) {
-		if( configDetector == null)
+												  Class<D> derivType ) {
+		if (configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
-		if( configCorner == null ) {
+		if (configCorner == null) {
 			configCorner = new ConfigShiTomasi();
 			configCorner.radius = configDetector.radius;
 		}
@@ -136,12 +138,12 @@ public class FactoryDetectPoint {
 	 * Detects Kitchen and Rosenfeld corners.
 	 *
 	 * @param configDetector Configuration for feature detector.
-	 * @param derivType       Type of derivative image.
+	 * @param derivType Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.KitRosCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createKitRos(@Nullable ConfigGeneralDetector configDetector, Class<D> derivType) {
-		if( configDetector == null)
+	GeneralFeatureDetector<T, D> createKitRos( @Nullable ConfigGeneralDetector configDetector, Class<D> derivType ) {
+		if (configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
 		GeneralFeatureIntensity<T, D> intensity = new WrapperKitRosCornerIntensity<>(derivType);
@@ -158,10 +160,10 @@ public class FactoryDetectPoint {
 	 * @see FastCornerDetector
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createFast(ConfigGeneralDetector configDetector, @Nullable ConfigFastCorner configFast,
-											Class<T> imageType) {
+	GeneralFeatureDetector<T, D> createFast( ConfigGeneralDetector configDetector, @Nullable ConfigFastCorner configFast,
+											 Class<T> imageType ) {
 
-		if( configFast == null )
+		if (configFast == null)
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
 
@@ -174,13 +176,13 @@ public class FactoryDetectPoint {
 	 * Creates a median filter corner detector.
 	 *
 	 * @param configDetector Configuration for feature detector.
-	 * @param imageType       Type of input image.
+	 * @param imageType Type of input image.
 	 * @see boofcv.alg.feature.detect.intensity.MedianCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createMedian(@Nullable ConfigGeneralDetector configDetector, Class<T> imageType) {
+	GeneralFeatureDetector<T, D> createMedian( @Nullable ConfigGeneralDetector configDetector, Class<T> imageType ) {
 
-		if( configDetector == null)
+		if (configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
 		BlurStorageFilter<T> medianFilter = FactoryBlurFilter.median(ImageType.single(imageType), configDetector.radius);
@@ -192,14 +194,14 @@ public class FactoryDetectPoint {
 	 * Creates a Hessian based blob detector. Minimums and Maximums. Uses gradient images.
 	 *
 	 * @param configDetector Configuration for feature detector.
-	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
-	 * @param derivType       Type of derivative image.
+	 * @param type The type of Hessian based blob detector to use. DETERMINANT often works well.
+	 * @param derivType Type of derivative image.
 	 * @see HessianBlobIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createHessianDeriv(@Nullable ConfigGeneralDetector configDetector, HessianBlobIntensity.Type type,
-													Class<D> derivType) {
-		if( configDetector == null)
+	GeneralFeatureDetector<T, D> createHessianDeriv( @Nullable ConfigGeneralDetector configDetector, HessianBlobIntensity.Type type,
+													 Class<D> derivType ) {
+		if (configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
 		GeneralFeatureIntensity<T, D> intensity = FactoryIntensityPoint.hessian(type, derivType);
@@ -214,30 +216,30 @@ public class FactoryDetectPoint {
 	 * @see HessianBlobIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createHessianDirect(HessianBlobIntensity.Type type,
-													 @Nullable ConfigGeneralDetector configDetector,
-													 Class<T> imageType ) {
-		if( configDetector == null)
+	GeneralFeatureDetector<T, D> createHessianDirect( HessianBlobIntensity.Type type,
+													  @Nullable ConfigGeneralDetector configDetector,
+													  Class<T> imageType ) {
+		if (configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
 		GeneralFeatureIntensity<T, D> intensity = switch (type) {
 			case DETERMINANT -> FactoryIntensityPoint.hessianDet(imageType);
-			case TRACE -> (GeneralFeatureIntensity) FactoryIntensityPoint.laplacian(imageType);
+			case TRACE -> (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian(imageType);
 			default -> throw new IllegalArgumentException("Unknown type");
 		};
 		return createGeneral(intensity, configDetector);
 	}
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createGeneral(GradientCornerIntensity<D> cornerIntensity,
-											   ConfigGeneralDetector config) {
+	GeneralFeatureDetector<T, D> createGeneral( GradientCornerIntensity<D> cornerIntensity,
+												ConfigGeneralDetector config ) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(cornerIntensity);
 		return createGeneral(intensity, config);
 	}
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createGeneral(GeneralFeatureIntensity<T, D> intensity,
-											   ConfigGeneralDetector config ) {
+	GeneralFeatureDetector<T, D> createGeneral( GeneralFeatureIntensity<T, D> intensity,
+												ConfigGeneralDetector config ) {
 		ConfigGeneralDetector foo = new ConfigGeneralDetector();
 		foo.setTo(config);
 		config = foo;
@@ -245,12 +247,12 @@ public class FactoryDetectPoint {
 
 		NonMaxSuppression extractorMin = null;
 		NonMaxSuppression extractorMax = null;
-		if( intensity.localMinimums() ) {
+		if (intensity.localMinimums()) {
 			config.detectMinimums = true;
 			config.detectMaximums = false;
 			extractorMin = FactoryFeatureExtractor.nonmax(config);
 		}
-		if( intensity.localMaximums() ) {
+		if (intensity.localMaximums()) {
 			config.detectMinimums = false;
 			config.detectMaximums = true;
 			extractorMax = FactoryFeatureExtractor.nonmax(config);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		ImageBorder_S32<T> border;
 		ImageType<T> imageType;
 
-		public SB_I_S32(ImageType<T> imageType) {
+		protected SB_I_S32(ImageType<T> imageType) {
 			this.imageType = imageType;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,6 +52,7 @@ public class SgmStereoDisparityCensus<T extends ImageBase<T>,C extends ImageGray
 	 * @param left (Input) left rectified stereo image
 	 * @param right (Input) right rectified stereo image
 	 */
+	@Override
 	public void process( T left , T right ) {
 		InputSanityCheck.checkSameShape(left,right);
 

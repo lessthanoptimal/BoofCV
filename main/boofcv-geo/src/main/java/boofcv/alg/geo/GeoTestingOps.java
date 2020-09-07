@@ -133,17 +133,21 @@ public class GeoTestingOps {
 	 */
 	public static boolean isEqualsScale(Se3_F64 a , Se3_F64 b , double tolT , double tolRad ) {
 		double scaleA = a.T.norm();
-		double scale = scaleA / b.T.norm();
+		double scaleB = b.T.norm();
 
-		if(UtilEjml.isUncountable(scale))
-			scale = 1;
-
-
-		double dx = a.T.x - scale*b.T.x;
-		double dy = a.T.y - scale*b.T.y;
-		double dz = a.T.z - scale*b.T.z;
-		if( Math.sqrt(dx*dx + dy*dy + dz*dz) > scaleA*tolT )
-			return false;
+		double scale;
+		if( scaleA <= UtilEjml.TEST_F64 || scaleB <= UtilEjml.TEST_F64 ) {
+			// They are almost zero so scaling is going to be difficult
+			if( a.T.distance(b.T) >= tolT )
+				return false;
+		} else {
+			scale = scaleA / scaleB;
+			double dx = a.T.x - scale*b.T.x;
+			double dy = a.T.y - scale*b.T.y;
+			double dz = a.T.z - scale*b.T.z;
+			if( Math.sqrt(dx*dx + dy*dy + dz*dz) >= scaleA*tolT )
+				return false;
+		}
 
 		var R = new DMatrixRMaj(3,3);
 		CommonOps_DDRM.multTransB(a.R,b.R,R);

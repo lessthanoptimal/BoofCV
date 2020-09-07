@@ -28,9 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
@@ -75,11 +73,11 @@ public class QrCodeEncoder {
 	// version, store the segments here until fixate is called.
 	private List<MessageSegment> segments = new ArrayList<>();
 
-	Set<Character.UnicodeBlock> japaneseUnicodeBlocks = new HashSet<Character.UnicodeBlock>() {{
-		add(Character.UnicodeBlock.HIRAGANA);
-		add(Character.UnicodeBlock.KATAKANA);
-		add(Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS);
-	}};
+//	Set<Character.UnicodeBlock> japaneseUnicodeBlocks = new HashSet<>() {{
+//		add(Character.UnicodeBlock.HIRAGANA);
+//		add(Character.UnicodeBlock.KATAKANA);
+//		add(Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS);
+//	}};
 
 	CharsetEncoder asciiEncoder = Charset.forName("ISO-8859-1").newEncoder();
 
@@ -804,13 +802,13 @@ public class QrCodeEncoder {
 		}
 	}
 
-	private void print(String name, GrowQueue_I8 queue) {
-		PackedBits8 bits = new PackedBits8();
-		bits.size = queue.size * 8;
-		bits.data = queue.data;
-		System.out.print(name + "  ");
-		bits.print();
-	}
+//	private void print(String name, GrowQueue_I8 queue) {
+//		PackedBits8 bits = new PackedBits8();
+//		bits.size = queue.size * 8;
+//		bits.data = queue.data;
+//		System.out.print(name + "  ");
+//		bits.print();
+//	}
 
 	private void copyIntoRawData(GrowQueue_I8 message, GrowQueue_I8 ecc, int offset, int stride,
 								 int startEcc, byte[] output) {

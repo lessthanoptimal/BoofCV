@@ -171,7 +171,6 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 
 			float top = 0;
 			int imageSum = 0;
-			float imageMean = 0;
 			float imageSigma = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
@@ -182,7 +181,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				}
 			}
 
-			imageMean = imageSum / area;
+			float imageMean = imageSum / area;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
@@ -208,7 +207,6 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 
 			float top = 0;
 			int imageSum = 0;
-			float imageMean = 0;
 			float imageSigma = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
@@ -219,7 +217,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				}
 			}
 
-			imageMean = imageSum / area;
+			float imageMean = imageSum / area;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;

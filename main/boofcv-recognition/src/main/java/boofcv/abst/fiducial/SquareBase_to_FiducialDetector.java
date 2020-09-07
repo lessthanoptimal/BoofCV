@@ -43,27 +43,26 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Detector extends BaseDetectFiducialSquare<T>>
-	extends FiducialDetectorPnP<T>
-{
+public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Detector extends BaseDetectFiducialSquare<T>>
+		extends FiducialDetectorPnP<T> {
 	Detector alg;
 
 	// type of image it can process
 	ImageType<T> type;
 
 	// Used for finding the center of the square
-	private LineGeneral2D_F64 line02 = new LineGeneral2D_F64();
-	private LineGeneral2D_F64 line13 = new LineGeneral2D_F64();
+	private final LineGeneral2D_F64 line02 = new LineGeneral2D_F64();
+	private final LineGeneral2D_F64 line13 = new LineGeneral2D_F64();
 
 	// used to compute 3D pose of target
-	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
+	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6, 200);
 
 	Quadrilateral_F64 quad = new Quadrilateral_F64();
 	List<PointIndex2D_F64> listQuad = new ArrayList<>();
 
 	List<Point2D3D> points2D3D;
 
-	public SquareBase_to_FiducialDetector(Detector alg) {
+	protected SquareBase_to_FiducialDetector( Detector alg ) {
 		this.alg = alg;
 		this.type = ImageType.single(alg.getInputType());
 
@@ -74,44 +73,46 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 		points2D3D = poseEstimator.createCopyPoints2D3D();
 
 		for (int i = 0; i < 4; i++) {
-			listQuad.add( new PointIndex2D_F64());
+			listQuad.add(new PointIndex2D_F64());
 			listQuad.get(i).index = i;
 		}
 	}
 
 	@Override
-	public void detect(T input) {
+	public void detect( T input ) {
 		alg.process(input);
 	}
+
 	/**
 	 * Return the intersection of two lines defined by opposing corners.  This should also be the geometric center
+	 *
 	 * @param which Fiducial's index
 	 * @param location (output) Storage for the transform. modified.
 	 */
 	@Override
-	public void getCenter(int which, Point2D_F64 location) {
+	public void getCenter( int which, Point2D_F64 location ) {
 		Quadrilateral_F64 q = alg.getFound().get(which).distortedPixels;
 
 		// compute intersection in undistorted pixels so that the intersection is the true
 		// geometric center of the square. Since distorted pixels are being used this will only be approximate
-		UtilLine2D_F64.convert(q.a, q.c,line02);
-		UtilLine2D_F64.convert(q.b, q.d,line13);
+		UtilLine2D_F64.convert(q.a, q.c, line02);
+		UtilLine2D_F64.convert(q.b, q.d, line13);
 
-		Intersection2D_F64.intersection(line02,line13,location);
+		Intersection2D_F64.intersection(line02, line13, location);
 	}
 
 	@Override
-	protected boolean estimatePose( int which, List<Point2D3D> points , Se3_F64 fiducialToCamera ) {
-		quad.a.set( points.get(0).observation );
-		quad.b.set( points.get(1).observation );
-		quad.c.set( points.get(2).observation );
-		quad.d.set( points.get(3).observation );
+	protected boolean estimatePose( int which, List<Point2D3D> points, Se3_F64 fiducialToCamera ) {
+		quad.a.set(points.get(0).observation);
+		quad.b.set(points.get(1).observation);
+		quad.c.set(points.get(2).observation);
+		quad.d.set(points.get(3).observation);
 
-		if( !poseEstimator.process(quad,false) ) {
+		if (!poseEstimator.process(quad, false)) {
 			return false;
 		}
 
-		fiducialToCamera.set( poseEstimator.getWorldToCamera() );
+		fiducialToCamera.set(poseEstimator.getWorldToCamera());
 		double width = getWidth(which);
 		fiducialToCamera.T.x *= width;
 		fiducialToCamera.T.y *= width;
@@ -120,10 +121,10 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height ) {
-		super.setLensDistortion(distortion,width,height);
-		alg.configure(distortion,width,height,true);
-		if( distortion != null )
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+		super.setLensDistortion(distortion, width, height);
+		alg.configure(distortion, width, height, true);
+		if (distortion != null)
 			poseEstimator.setLensDistoriton(distortion);
 	}
 
@@ -138,7 +139,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	}
 
 	@Override
-	public String getMessage(int which) {return null;}
+	public String getMessage( int which ) {return null;}
 
 	@Override
 	public boolean hasID() {
@@ -160,24 +161,24 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 	}
 
 	@Override
-	public List<PointIndex2D_F64> getDetectedControl(int which) {
+	public List<PointIndex2D_F64> getDetectedControl( int which ) {
 		FoundFiducial found = getAlgorithm().getFound().get(which);
-		listQuad.get(0).set( found.distortedPixels.a );
-		listQuad.get(1).set( found.distortedPixels.b );
-		listQuad.get(2).set( found.distortedPixels.c );
-		listQuad.get(3).set( found.distortedPixels.d );
+		listQuad.get(0).set(found.distortedPixels.a);
+		listQuad.get(1).set(found.distortedPixels.b);
+		listQuad.get(2).set(found.distortedPixels.c);
+		listQuad.get(3).set(found.distortedPixels.d);
 
 		return listQuad;
 	}
 
 	@Override
-	protected List<Point2D3D> getControl3D(int which) {
+	protected List<Point2D3D> getControl3D( int which ) {
 		return points2D3D;
 	}
 
 	@Override
-	public Polygon2D_F64 getBounds(int which, @Nullable Polygon2D_F64 storage) {
-		if( storage == null )
+	public Polygon2D_F64 getBounds( int which, @Nullable Polygon2D_F64 storage ) {
+		if (storage == null)
 			storage = new Polygon2D_F64();
 		else
 			storage.vertexes.reset();
@@ -190,5 +191,4 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>,Dete
 
 		return storage;
 	}
-
 }

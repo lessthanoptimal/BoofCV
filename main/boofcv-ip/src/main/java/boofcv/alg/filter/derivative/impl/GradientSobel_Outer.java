@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,12 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+//CONCURRENT_INLINE import javax.annotation.Generated;
 
 /**
  * <p>
@@ -38,15 +39,14 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  * @see boofcv.alg.filter.derivative.GradientSobel
  */
+//CONCURRENT_INLINE @Generated("boofcv.alg.filter.derivative.impl.GradientSobel_Outer")
 @SuppressWarnings("Duplicates")
 public class GradientSobel_Outer {
 
 	/**
 	 * Computes derivative of GrayU8.  None of the images can be sub-images.
 	 */
-	public static void process(GrayU8 orig,
-							   GrayS16 derivX,
-							   GrayS16 derivY) {
+	public static void process( GrayU8 orig, GrayS16 derivX, GrayS16 derivY ) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -56,15 +56,15 @@ public class GradientSobel_Outer {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int endX = width * y + width - 1;
+			int endX = width*y + width - 1;
 
-			for (int index = width * y + 1; index < endX; index++) {
+			for (int index = width*y + 1; index < endX; index++) {
 				int v = (data[index + width + 1] & 0xFF) - (data[index - width - 1] & 0xFF);
 				int w = (data[index + width - 1] & 0xFF) - (data[index - width + 1] & 0xFF);
 
-				imgY[index] = (short) (((data[index + width] & 0xFF) - (data[index - width] & 0xFF)) * 2 + v + w);
+				imgY[index] = (short)(((data[index + width] & 0xFF) - (data[index - width] & 0xFF))*2 + v + w);
 
-				imgX[index] = (short) (((data[index + 1] & 0xFF) - (data[index - 1] & 0xFF)) * 2 + v - w);
+				imgX[index] = (short)(((data[index + 1] & 0xFF) - (data[index - 1] & 0xFF))*2 + v - w);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -73,9 +73,9 @@ public class GradientSobel_Outer {
 	/**
 	 * Computes derivative of GrayU8.  Inputs can be sub-images.
 	 */
-	public static void process_sub(GrayU8 orig,
-								   GrayS16 derivX,
-								   GrayS16 derivY) {
+	public static void process_sub( GrayU8 orig,
+									GrayS16 derivX,
+									GrayS16 derivY ) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -86,27 +86,27 @@ public class GradientSobel_Outer {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexSrc = orig.startIndex + orig.stride * y + 1;
+			int indexSrc = orig.startIndex + orig.stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
 			for (; indexSrc < endX; indexSrc++) {
 				int v = (data[indexSrc + strideSrc + 1] & 0xFF) - (data[indexSrc - strideSrc - 1] & 0xFF);
 				int w = (data[indexSrc + strideSrc - 1] & 0xFF) - (data[indexSrc - strideSrc + 1] & 0xFF);
 
-				imgY[indexY++] = (short) (((data[indexSrc + strideSrc] & 0xFF) - (data[indexSrc - strideSrc] & 0xFF)) * 2 + v + w);
+				imgY[indexY++] = (short)(((data[indexSrc + strideSrc] & 0xFF) - (data[indexSrc - strideSrc] & 0xFF))*2 + v + w);
 
-				imgX[indexX++] = (short) (((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF)) * 2 + v - w);
+				imgX[indexX++] = (short)(((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF))*2 + v - w);
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void process_sub(GrayS16 orig,
-								   GrayS16 derivX,
-								   GrayS16 derivY) {
+	public static void process_sub( GrayS16 orig,
+									GrayS16 derivX,
+									GrayS16 derivY ) {
 		final short[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -117,19 +117,19 @@ public class GradientSobel_Outer {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexSrc = orig.startIndex + orig.stride * y + 1;
+			int indexSrc = orig.startIndex + orig.stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
 
 			for (; indexSrc < endX; indexSrc++) {
-				int v = (data[indexSrc + strideSrc + 1] ) - (data[indexSrc - strideSrc - 1] );
-				int w = (data[indexSrc + strideSrc - 1] ) - (data[indexSrc - strideSrc + 1] );
+				int v = data[indexSrc + strideSrc + 1] - data[indexSrc - strideSrc - 1];
+				int w = data[indexSrc + strideSrc - 1] - data[indexSrc - strideSrc + 1];
 
-				imgY[indexY++] = (short) (((data[indexSrc + strideSrc] ) - (data[indexSrc - strideSrc] )) * 2 + v + w);
+				imgY[indexY++] = (short)((data[indexSrc + strideSrc] - data[indexSrc - strideSrc])*2 + v + w);
 
-				imgX[indexX++] = (short) (((data[indexSrc + 1] ) - (data[indexSrc - 1] )) * 2 + v - w);
+				imgX[indexX++] = (short)((data[indexSrc + 1] - data[indexSrc - 1])*2 + v - w);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -138,9 +138,9 @@ public class GradientSobel_Outer {
 	/**
 	 * Computes derivative of GrayF32.  None of the images can be sub-images.
 	 */
-	public static void process(GrayF32 orig,
-							   GrayF32 derivX,
-							   GrayF32 derivY) {
+	public static void process( GrayF32 orig,
+								GrayF32 derivX,
+								GrayF32 derivY ) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 		final float[] imgY = derivY.data;
@@ -150,14 +150,14 @@ public class GradientSobel_Outer {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int endX = width * y + width - 1;
+			int endX = width*y + width - 1;
 
-			for (int index = width * y + 1; index < endX; index++) {
-				float v = (data[index + width + 1] - data[index - width - 1]) * 0.25F;
-				float w = (data[index + width - 1] - data[index - width + 1]) * 0.25F;
+			for (int index = width*y + 1; index < endX; index++) {
+				float v = (data[index + width + 1] - data[index - width - 1])*0.25F;
+				float w = (data[index + width - 1] - data[index - width + 1])*0.25F;
 
-				imgY[index] = (data[index + width] - data[index - width]) * 0.5F + v + w;
-				imgX[index] = (data[index + 1] - data[index - 1]) * 0.5F + v - w;
+				imgY[index] = (data[index + width] - data[index - width])*0.5F + v + w;
+				imgX[index] = (data[index + 1] - data[index - 1])*0.5F + v - w;
 			}
 		}
 		//CONCURRENT_ABOVE });

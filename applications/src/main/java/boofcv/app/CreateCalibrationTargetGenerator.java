@@ -140,16 +140,16 @@ public class CreateCalibrationTargetGenerator {
 		float separationPointsW = centerDistancePoints;
 		float separationPointsH = 2.0f*centerDistancePoints*(float)Math.sin(radian(60));
 
-		patternWidth = ((cols-1)/2.0f)*separationPointsW + diameterPoints;
-		patternHeight = ((rows-1)/2.0f)*separationPointsH + diameterPoints;
+		patternWidth = (cols-1)/2.0f*separationPointsW + diameterPoints;
+		patternHeight = (rows-1)/2.0f*separationPointsH + diameterPoints;
 
 		printHeader("Hexagonal Circle "+rows+"x"+cols+", diameter "+diameter+", center distance "+centerDistance+" "+units.abbreviation);
 
 		pcs.setNonStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
-			float x = diameterPoints/2+(separationPointsW/2)*col;
+			float x = diameterPoints/2+ separationPointsW/2*col;
 			for (int row = col%2; row < rows; row+=2) {
-				float y = diameterPoints/2+(separationPointsH/2)*row;
+				float y = diameterPoints/2+ separationPointsH/2*row;
 				drawCircle(x,y,diameterPoints/2);
 			}
 		}
@@ -167,9 +167,9 @@ public class CreateCalibrationTargetGenerator {
 
 		pcs.setNonStrokingColor(Color.BLACK);
 		for (int col = 0; col < cols; col++) {
-			float x = diameterPoints/2+(separationPoints)*col;
+			float x = diameterPoints/2+ separationPoints*col;
 			for (int row = 0; row < rows; row++) {
-				float y = diameterPoints/2+(separationPoints)*row;
+				float y = diameterPoints/2+ separationPoints*row;
 				drawCircle(x,y,diameterPoints/2);
 			}
 		}

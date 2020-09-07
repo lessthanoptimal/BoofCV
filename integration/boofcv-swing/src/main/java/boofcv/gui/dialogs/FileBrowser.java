@@ -94,6 +94,7 @@ public class FileBrowser extends JSpringPanel {
 		fileList.setLayoutOrientation(JList.VERTICAL);
 		fileList.addListSelectionListener(new FileSelectionListener(this));
 		fileList.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent evt) {
 				if (evt.getClickCount() == 2) {
 					File selected = listModel.get(fileList.getSelectedIndex());

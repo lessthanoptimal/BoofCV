@@ -57,7 +57,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	// information related to each view being a potential seed
 	FastQueue<SeedInfo> seedScores = new FastQueue<>(SeedInfo::new, SeedInfo::reset);
 
-	public ReconstructionFromPairwiseGraph( PairwiseGraphUtils utils ) {
+	protected ReconstructionFromPairwiseGraph( PairwiseGraphUtils utils ) {
 		this.utils = utils;
 	}
 

@@ -62,11 +62,11 @@ public class ControlPanelPointCloud extends StandardAlgConfigPanel {
 	protected JCheckBox checkFog = checkbox("",fog,"Turn on/off fog");
 
 	// callback for when the background color has changed
-	protected @Setter BoofLambdas.Process callbackBackground = ()->{};
+	protected @Setter BoofLambdas.ProcessCall callbackBackground = ()->{};
 	// callback for when any other setting has changed
-	protected @Setter BoofLambdas.Process callbackModified = ()->{};
+	protected @Setter BoofLambdas.ProcessCall callbackModified = ()->{};
 
-	public ControlPanelPointCloud(BoofLambdas.Process callback ) {
+	public ControlPanelPointCloud( BoofLambdas.ProcessCall callback ) {
 		this();
 		callbackBackground = callback;
 		callbackModified = callback;

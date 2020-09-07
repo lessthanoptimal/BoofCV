@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,7 +94,6 @@ public class TestImplDescribePointPixelRegionNCC_F32 {
 	public void checkBorder(GrayF32 image , int c_x , int c_y , int w , int h ) {
 		ImplDescribePointPixelRegionNCC_F32 alg = new ImplDescribePointPixelRegionNCC_F32(w,h);
 
-		NccFeature desc = new NccFeature(alg.getDescriptorLength());
 		alg.setImage(image);
 		assertFalse( alg.isInBounds(c_x, c_y) );
 	}

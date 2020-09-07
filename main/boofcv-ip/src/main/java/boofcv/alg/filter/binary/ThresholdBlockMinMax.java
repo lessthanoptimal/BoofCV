@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public abstract class ThresholdBlockMinMax <T extends ImageGray<T>, I extends Im
 	 * @param minimumSpread If the difference between min max is less than or equal to this
 	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
 	 */
-	public ThresholdBlockMinMax(double minimumSpread , boolean down ) {
+	protected ThresholdBlockMinMax(double minimumSpread , boolean down ) {
 		this.minimumSpread = minimumSpread;
 		this.down = down;
 	}

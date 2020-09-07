@@ -51,33 +51,34 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 	double periodColumns;
 
 	// wrapper around gradient images so that multiple types are supported
-	GImageGray imageDerivX,imageDerivY;
+	GImageGray imageDerivX, imageDerivY;
 
 	// storage for descriptors
 	FastQueue<TupleDesc_F64> descriptors;
 
 	// storage for precomputed angle
-	GrayF64 savedAngle = new GrayF64(1,1);
-	GrayF32 savedMagnitude = new GrayF32(1,1);
+	GrayF64 savedAngle = new GrayF64(1, 1);
+	GrayF32 savedMagnitude = new GrayF32(1, 1);
 
 	// saved location of where in the image it sampled
 	FastQueue<Point2D_I32> sampleLocations = new FastQueue<>(Point2D_I32::new);
 
 	/**
 	 * Specifies SIFT descriptor structure and sampling frequency.
+	 *
 	 * @param widthSubregion Width of sub-region in samples.  Try 4
 	 * @param widthGrid Width of grid in subregions.  Try 4.
 	 * @param numHistogramBins Number of bins in histogram.  Try 8
 	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
 	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
 	 * @param periodColumns Number of pixels between samples along x-axis
-	 * @param periodRows  Number of pixels between samples along y-axis
+	 * @param periodRows Number of pixels between samples along y-axis
 	 * @param derivType Type of input derivative image
 	 */
-	public DescribeDenseSiftAlg(int widthSubregion, int widthGrid, int numHistogramBins,
-								double weightingSigmaFraction , double maxDescriptorElementValue,
-								double periodColumns, double periodRows , Class<D> derivType ) {
-		super(widthSubregion,widthGrid,numHistogramBins,weightingSigmaFraction,maxDescriptorElementValue);
+	public DescribeDenseSiftAlg( int widthSubregion, int widthGrid, int numHistogramBins,
+								 double weightingSigmaFraction, double maxDescriptorElementValue,
+								 double periodColumns, double periodRows, Class<D> derivType ) {
+		super(widthSubregion, widthGrid, numHistogramBins, weightingSigmaFraction, maxDescriptorElementValue);
 		this.periodRows = periodRows;
 		this.periodColumns = periodColumns;
 
@@ -86,7 +87,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		imageDerivX = FactoryGImageGray.create(derivType);
 		imageDerivY = FactoryGImageGray.create(derivType);
 
-		descriptors = new FastQueue<>(()->new TupleDesc_F64(DOF));
+		descriptors = new FastQueue<>(() -> new TupleDesc_F64(DOF));
 	}
 
 	/**
@@ -95,13 +96,13 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 	 * @param derivX image derivative x-axis
 	 * @param derivY image derivative y-axis
 	 */
-	public void setImageGradient(D derivX , D derivY ) {
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		if( derivX.stride != derivY.stride || derivX.startIndex != derivY.startIndex )
+	public void setImageGradient( D derivX, D derivY ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		if (derivX.stride != derivY.stride || derivX.startIndex != derivY.startIndex)
 			throw new IllegalArgumentException("stride and start index must be the same");
 
-		savedAngle.reshape(derivX.width,derivX.height);
-		savedMagnitude.reshape(derivX.width,derivX.height);
+		savedAngle.reshape(derivX.width, derivX.height);
+		savedMagnitude.reshape(derivX.width, derivX.height);
 
 		imageDerivX.wrap(derivX);
 		imageDerivY.wrap(derivY);
@@ -117,25 +118,25 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		int width = widthSubregion*widthGrid;
 		int radius = width/2;
 
-		int X0 = radius,X1 = savedAngle.width-radius;
-		int Y0 = radius,Y1 = savedAngle.height-radius;
+		int X0 = radius, X1 = savedAngle.width - radius;
+		int Y0 = radius, Y1 = savedAngle.height - radius;
 
-		int numX = (int)((X1-X0)/periodColumns);
-		int numY = (int)((Y1-Y0)/periodRows);
+		int numX = (int)((X1 - X0)/periodColumns);
+		int numY = (int)((Y1 - Y0)/periodRows);
 
 		descriptors.reset();
 		sampleLocations.reset();
 
 		for (int i = 0; i < numY; i++) {
-			int y = (Y1-Y0)*i/(numY-1) + Y0;
+			int y = (Y1 - Y0)*i/(numY - 1) + Y0;
 
 			for (int j = 0; j < numX; j++) {
-				int x = (X1-X0)*j/(numX-1) + X0;
+				int x = (X1 - X0)*j/(numX - 1) + X0;
 
 				TupleDesc_F64 desc = descriptors.grow();
 
-				computeDescriptor(x,y,desc);
-				sampleLocations.grow().set(x,y);
+				computeDescriptor(x, y, desc);
+				sampleLocations.grow().set(x, y);
 			}
 		}
 	}
@@ -143,16 +144,16 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 	/**
 	 * Computes the angle of each pixel and its gradient magnitude
 	 */
-	void precomputeAngles(D image) {
+	void precomputeAngles( D image ) {
 		int savecIndex = 0;
 		for (int y = 0; y < image.height; y++) {
 			int pixelIndex = y*image.stride + image.startIndex;
 
-			for (int x = 0; x < image.width; x++, pixelIndex++, savecIndex++ ) {
+			for (int x = 0; x < image.width; x++, pixelIndex++, savecIndex++) {
 				float spacialDX = imageDerivX.getF(pixelIndex);
 				float spacialDY = imageDerivY.getF(pixelIndex);
 
-				savedAngle.data[savecIndex] = UtilAngle.domain2PI(Math.atan2(spacialDY,spacialDX));
+				savedAngle.data[savecIndex] = UtilAngle.domain2PI(Math.atan2(spacialDY, spacialDX));
 				savedMagnitude.data[savecIndex] = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
 			}
 		}
@@ -160,11 +161,12 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 
 	/**
 	 * Computes the descriptor centered at the specified coordinate
+	 *
 	 * @param cx center of region x-axis
 	 * @param cy center of region y-axis
 	 * @param desc The descriptor
 	 */
-	public void computeDescriptor( int cx , int cy , TupleDesc_F64 desc  ) {
+	public void computeDescriptor( int cx, int cy, TupleDesc_F64 desc ) {
 
 		desc.fill(0);
 
@@ -172,31 +174,31 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		int radius = widthPixels/2;
 
 		for (int i = 0; i < widthPixels; i++) {
-			int angleIndex = (cy-radius+i)*savedAngle.width + (cx-radius);
+			int angleIndex = (cy - radius + i)*savedAngle.width + cx - radius;
 
 			float subY = i/(float)widthSubregion;
 
-			for (int j = 0; j < widthPixels; j++, angleIndex++ ) {
+			for (int j = 0; j < widthPixels; j++, angleIndex++) {
 				float subX = j/(float)widthSubregion;
 
 				double angle = savedAngle.data[angleIndex];
 
-				float weightGaussian = gaussianWeight[i*widthPixels+j];
+				float weightGaussian = gaussianWeight[i*widthPixels + j];
 				float weightGradient = savedMagnitude.data[angleIndex];
 
 				// trilinear interpolation intro descriptor
-				trilinearInterpolation(weightGaussian*weightGradient,subX,subY,angle,desc);
+				trilinearInterpolation(weightGaussian*weightGradient, subX, subY, angle, desc);
 			}
 		}
 
-		normalizeDescriptor(desc,maxDescriptorElementValue);
+		normalizeDescriptor(desc, maxDescriptorElementValue);
 	}
 
 	public double getPeriodRows() {
 		return periodRows;
 	}
 
-	public void setPeriodRows(double periodRows) {
+	public void setPeriodRows( double periodRows ) {
 		this.periodRows = periodRows;
 	}
 
@@ -204,7 +206,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		return periodColumns;
 	}
 
-	public void setPeriodColumns(double periodColumns) {
+	public void setPeriodColumns( double periodColumns ) {
 		this.periodColumns = periodColumns;
 	}
 
@@ -219,7 +221,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		return sampleLocations;
 	}
 
-	public Class<D> getDerivType () {
-		return (Class)(imageDerivX.getImageType());
+	public Class<D> getDerivType() {
+		return (Class)imageDerivX.getImageType();
 	}
 }

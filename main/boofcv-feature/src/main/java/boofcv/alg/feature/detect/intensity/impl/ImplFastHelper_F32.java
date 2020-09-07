@@ -28,25 +28,25 @@ public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32>
 	protected float tol;
 
 	// pixel index offsets for circle
-	protected int offsets[];
+	protected int[] offsets;
 	protected float[] data;
 
 	float centerValue;
 	float lower,upper;
 
-	public ImplFastHelper_F32(float pixelTol) {
+	protected ImplFastHelper_F32(float pixelTol) {
 		this.tol = pixelTol;
 	}
 
 	@Override
-	public void setImage(GrayF32 image , int offsets[] ) {
+	public void setImage( GrayF32 image , int[] offsets ) {
 		this.data = image.data;
 		this.offsets = offsets;
 	}
 
 	@Override
 	public float scoreLower( int index ) {
-		int total = 0;
+		float total = 0.0f;
 		int count = 0;
 		for( int i = 0; i < offsets.length; i++ ) {
 			float v = data[index+offsets[i]];
@@ -64,7 +64,7 @@ public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32>
 
 	@Override
 	public float scoreUpper( int index ) {
-		int total = 0;
+		float total = 0.0f;
 		int count = 0;
 		for( int i = 0; i < offsets.length; i++ ) {
 			float v = data[index+offsets[i]];

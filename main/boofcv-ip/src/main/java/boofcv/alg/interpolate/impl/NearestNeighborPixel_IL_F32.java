@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,11 +37,9 @@ import boofcv.struct.image.InterleavedF32;
  */
 public class NearestNeighborPixel_IL_F32 extends NearestNeighborPixelMB<InterleavedF32> {
 
-	public NearestNeighborPixel_IL_F32() {
-	}
+	public NearestNeighborPixel_IL_F32() {}
 
 	public NearestNeighborPixel_IL_F32(InterleavedF32 orig) {
-
 		setImage(orig);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.struct.image.Planar;
  * @author Peter Abeles
  */
 public class SgmDisparitySelector_MT extends SgmDisparitySelector {
+	@Override
 	public void select(Planar<GrayU16> costYXD, Planar<GrayU16> aggregatedYXD , GrayU8 disparity ) {
 		setup(aggregatedYXD);
 		disparity.reshape(lengthX,lengthY);

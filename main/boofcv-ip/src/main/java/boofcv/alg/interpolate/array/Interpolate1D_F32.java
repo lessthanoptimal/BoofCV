@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.alg.interpolate.array;
-
 
 /**
  * Provides much of the basic house keeping needed for interpolating 1D data.  Interpolation
@@ -55,17 +54,17 @@ public abstract class Interpolate1D_F32 {
 	/**
 	 * @param degree The number of points used in the interpolation minus one
 	 */
-	public Interpolate1D_F32(int degree) {
+	protected Interpolate1D_F32( int degree ) {
 		changeDegree(degree);
 	}
 
 	/**
 	 * @param degree The number of points used in the interpolation minus one
-	 * @param x	  Where the points are sample at. Not modifed. Reference saved.
-	 * @param y	  The value at the sample points. Not modifed. Reference saved.
-	 * @param size   The number of points used.
+	 * @param x Where the points are sample at. Not modifed. Reference saved.
+	 * @param y The value at the sample points. Not modifed. Reference saved.
+	 * @param size The number of points used.
 	 */
-	public Interpolate1D_F32(int degree, float x[], float y[], int size) {
+	protected Interpolate1D_F32( int degree, float x[], float y[], int size ) {
 		this(degree);
 		setInput(x, y, size);
 	}
@@ -73,11 +72,11 @@ public abstract class Interpolate1D_F32 {
 	/**
 	 * Sets the data that is being interpolated.
 	 *
-	 * @param x	Where the points are sample at. Not modifed. Reference saved.
-	 * @param y	The value at the sample points. Not modifed. Reference saved.
+	 * @param x Where the points are sample at. Not modifed. Reference saved.
+	 * @param y The value at the sample points. Not modifed. Reference saved.
 	 * @param size The number of points used.
 	 */
-	public void setInput(float x[], float y[], int size) {
+	public void setInput( float x[], float y[], int size ) {
 		if (x.length < size || y.length < size) {
 			throw new IllegalArgumentException("Arrays too small for size.");
 		}
@@ -88,7 +87,7 @@ public abstract class Interpolate1D_F32 {
 		this.x = x;
 		this.y = y;
 		this.size = size;
-		this.dj = Math.min(1, (int) Math.pow(size, 0.25));
+		this.dj = Math.min(1, (int)Math.pow(size, 0.25));
 		ascend = x[size - 1] >= x[0];
 	}
 
@@ -98,7 +97,7 @@ public abstract class Interpolate1D_F32 {
 	 * @param testX Where the interpolated value is done at.
 	 * @return The interpolated value at sampleX.
 	 */
-	public float process(float testX) {
+	public float process( float testX ) {
 		if (doHunt) {
 			hunt(testX);
 		} else {
@@ -114,10 +113,10 @@ public abstract class Interpolate1D_F32 {
 	 * using points from index0 to index0 + M - 1
 	 *
 	 * @param index0 first sample point used in the interpolation.
-	 * @param testX  Where the interpolated value is done at.
+	 * @param testX Where the interpolated value is done at.
 	 * @return The interpolated value at sampleX.
 	 */
-	public float process(int index0, float testX) {
+	public float process( int index0, float testX ) {
 		this.index0 = index0;
 		return compute(testX);
 	}
@@ -129,14 +128,14 @@ public abstract class Interpolate1D_F32 {
 	 * @param testX Where the interpolated value is done at.
 	 * @return The interpolated value at sampleX.
 	 */
-	protected abstract float compute(float testX);
+	protected abstract float compute( float testX );
 
 	/**
 	 * Changes the number of points used in the interpolation.
 	 *
 	 * @param degree Number of points used minus one.
 	 */
-	public void changeDegree(int degree) {
+	public void changeDegree( int degree ) {
 		this.M = degree + 1;
 		doHunt = false;
 	}
@@ -147,7 +146,7 @@ public abstract class Interpolate1D_F32 {
 	 *
 	 * @param val The value that is to be interpolated.
 	 */
-	protected void hunt(float val) {
+	protected void hunt( float val ) {
 		int lowerLimit = center;
 		int upperLimit;
 		int inc = 1;
@@ -193,13 +192,13 @@ public abstract class Interpolate1D_F32 {
 	 * x[center] &le; val &lt; x[center+1]
 	 * From that it selects index0 which is center - M/2.
 	 *
-	 * @param val		The value that is to be interpolated.
+	 * @param val The value that is to be interpolated.
 	 * @param lowerLimit Lower limit for x index.
 	 * @param upperLimit The largest possible index of x
 	 */
-	protected void bisectionSearch(float val, int lowerLimit, int upperLimit) {
+	protected void bisectionSearch( float val, int lowerLimit, int upperLimit ) {
 		while (upperLimit - lowerLimit > 1) {
-			int middle = (upperLimit + lowerLimit) / 2;
+			int middle = (upperLimit + lowerLimit)/2;
 			if (val >= x[middle] && ascend) {
 				lowerLimit = middle;
 			} else {
@@ -212,7 +211,7 @@ public abstract class Interpolate1D_F32 {
 
 		// make sure the points sampled for the polynomial are all within bounds
 		center = lowerLimit;
-		index0 = center - M / 2;
+		index0 = center - M/2;
 		if (index0 + M > size) {
 			index0 = size - M;
 		} else if (index0 < 0) {

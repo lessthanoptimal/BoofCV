@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,11 +48,11 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 		}
 
 		@Override
-		public BruteForceBlockMatch<GrayU8> createNaive(BorderType borderType, ImageType<GrayU8> imageType) {
-			BruteForceBlockMatch<GrayU8> naive = new BruteForceBlockMatch<GrayU8>(borderType,imageType) {
-				public double computeScore(ImageBorder<GrayU8> _left, ImageBorder<GrayU8> _right,
-										   int cx, int cy, int disparity)
-				{
+		public BruteForceBlockMatch<GrayU8> createNaive( BorderType borderType, ImageType<GrayU8> imageType ) {
+			BruteForceBlockMatch<GrayU8> naive = new BruteForceBlockMatch<GrayU8>(borderType, imageType) {
+				@Override
+				public double computeScore( ImageBorder<GrayU8> _left, ImageBorder<GrayU8> _right,
+											int cx, int cy, int disparity ) {
 					ImageBorder_S32<GrayU8> left = (ImageBorder_S32<GrayU8>)_left;
 					ImageBorder_S32<GrayU8> right = (ImageBorder_S32<GrayU8>)_right;
 
@@ -73,11 +73,11 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 		}
 
 		@Override
-		public StereoDisparity<GrayU8, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
+		public StereoDisparity<GrayU8, GrayU8> createAlg( int blockRadius, int minDisparity, int maxDisparity ) {
 			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
 			config.errorType = DisparityError.SAD;
 			config.border = BORDER_TYPE;
-			return FactoryStereoDisparity.blockMatch(config,GrayU8.class,GrayU8.class);
+			return FactoryStereoDisparity.blockMatch(config, GrayU8.class, GrayU8.class);
 		}
 	}
 
@@ -89,11 +89,11 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 		}
 
 		@Override
-		public BruteForceBlockMatch<GrayF32> createNaive(BorderType borderType, ImageType<GrayF32> imageType) {
-			BruteForceBlockMatch<GrayF32> naive = new BruteForceBlockMatch<GrayF32>(borderType,imageType) {
-				public double computeScore(ImageBorder<GrayF32> _left, ImageBorder<GrayF32> _right,
-										   int cx, int cy, int disparity)
-				{
+		public BruteForceBlockMatch<GrayF32> createNaive( BorderType borderType, ImageType<GrayF32> imageType ) {
+			BruteForceBlockMatch<GrayF32> naive = new BruteForceBlockMatch<GrayF32>(borderType, imageType) {
+				@Override
+				public double computeScore( ImageBorder<GrayF32> _left, ImageBorder<GrayF32> _right,
+											int cx, int cy, int disparity ) {
 					ImageBorder_F32 left = (ImageBorder_F32)_left;
 					ImageBorder_F32 right = (ImageBorder_F32)_right;
 
@@ -114,11 +114,11 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 		}
 
 		@Override
-		public StereoDisparity<GrayF32, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
+		public StereoDisparity<GrayF32, GrayU8> createAlg( int blockRadius, int minDisparity, int maxDisparity ) {
 			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
 			config.errorType = DisparityError.SAD;
 			config.border = BORDER_TYPE;
-			return FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
+			return FactoryStereoDisparity.blockMatch(config, GrayF32.class, GrayU8.class);
 		}
 	}
 }

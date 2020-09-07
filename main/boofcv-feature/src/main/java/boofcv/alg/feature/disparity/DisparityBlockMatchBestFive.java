@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ import boofcv.struct.image.ImageType;
 public abstract class DisparityBlockMatchBestFive<I extends ImageBase<I>, DI extends ImageGray<DI>>
 		extends DisparityBlockMatchRowFormat<I, DI>
 {
-	public DisparityBlockMatchBestFive(int regionRadiusX, int regionRadiusY, ImageType<I> imageType ) {
+	protected DisparityBlockMatchBestFive(int regionRadiusX, int regionRadiusY, ImageType<I> imageType ) {
 		super(regionRadiusX, regionRadiusY, imageType);
 	}
 

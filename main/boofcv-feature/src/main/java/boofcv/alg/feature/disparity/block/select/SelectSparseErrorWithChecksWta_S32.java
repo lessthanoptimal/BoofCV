@@ -39,8 +39,8 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 	protected int textureThreshold;
 	protected static final int discretizer = SelectDisparityWithChecksWta.DISCRETIZER;
 
-	public SelectSparseErrorWithChecksWta_S32(int maxError, double texture, int tolRightToLeft) {
-		super(maxError,texture,tolRightToLeft);
+	public SelectSparseErrorWithChecksWta_S32( int maxError, double texture, int tolRightToLeft ) {
+		super(maxError, texture, tolRightToLeft);
 	}
 
 	@Override
@@ -49,9 +49,9 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 	}
 
 	@Override
-	public boolean select(DisparitySparseRectifiedScoreBM<int[],?> scorer, int x, int y) {
+	public boolean select( DisparitySparseRectifiedScoreBM<int[], ?> scorer, int x, int y ) {
 		// First compute the error in the normal left to right direction
-		if( !scorer.processLeftToRight(x,y) )
+		if (!scorer.processLeftToRight(x, y))
 			return false;
 		int[] scores = scorer.getScoreLtoR();
 		int disparityRange = scorer.getLocalRangeLtoR();
@@ -60,53 +60,53 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 		int bestDisparity = 0;
 		int scoreBest = scores[0];
 
-		for(int i = 1; i < disparityRange; i++ ) {
-			if( scores[i] < scoreBest ) {
+		for (int i = 1; i < disparityRange; i++) {
+			if (scores[i] < scoreBest) {
 				scoreBest = scores[i];
 				bestDisparity = i;
 			}
 		}
 
 		// See if the best match is within tolerance
-		if( scoreBest > maxError ) {
+		if (scoreBest > maxError) {
 			return false;
 		}
 		// test to see if the region lacks sufficient texture if:
 		// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
-		if( textureThreshold > 0 && disparityRange >= 3 ) {
+		if (textureThreshold > 0 && disparityRange >= 3) {
 			// find the second best disparity value and exclude its neighbors
 			int secondBest = Integer.MAX_VALUE;
-			for( int i = 0; i < bestDisparity-1; i++ ) {
-				if( scores[i] < secondBest )
+			for (int i = 0; i < bestDisparity - 1; i++) {
+				if (scores[i] < secondBest)
 					secondBest = scores[i];
 			}
-			for(int i = bestDisparity+2; i < disparityRange; i++ ) {
-				if( scores[i] < secondBest )
+			for (int i = bestDisparity + 2; i < disparityRange; i++) {
+				if (scores[i] < secondBest)
 					secondBest = scores[i];
 			}
 
 			// similar scores indicate lack of texture
 			// C = (C2-C1)/C1
-			if( discretizer*(secondBest-scoreBest) <= textureThreshold*scoreBest )
+			if (discretizer*(secondBest - scoreBest) <= textureThreshold*scoreBest)
 				return false;
 		}
 
 		// if requested perform right to left validation. Ideally the two disparities will be identical
-		if( tolRightToLeft >= 0 ) {
-			if( !scorer.processRightToLeft(x-bestDisparity-scorer.getDisparityMin(),y) )
+		if (tolRightToLeft >= 0) {
+			if (!scorer.processRightToLeft(x - bestDisparity - scorer.getDisparityMin(), y))
 				return false;
 			final int[] scoresRtoL = scorer.getScoreRtoL();
 			final int localRangeRtoL = scorer.getLocalRangeRtoL();
 			int bestDisparityRtoL = 0;
 			int scoreBestRtoL = scoresRtoL[0];
 
-			for(int i = 1; i < localRangeRtoL; i++ ) {
-				if( scoresRtoL[i] < scoreBestRtoL ) {
+			for (int i = 1; i < localRangeRtoL; i++) {
+				if (scoresRtoL[i] < scoreBestRtoL) {
 					scoreBestRtoL = scoresRtoL[i];
 					bestDisparityRtoL = i;
 				}
 			}
-			if( Math.abs(bestDisparityRtoL-bestDisparity) > tolRightToLeft )
+			if (Math.abs(bestDisparityRtoL - bestDisparity) > tolRightToLeft)
 				return false;
 		}
 
@@ -114,5 +114,4 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 
 		return true;
 	}
-
 }

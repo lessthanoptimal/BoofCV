@@ -136,6 +136,7 @@ class TestBlurImageOps {
 					switch( type.getDataType() ) {
 						case U8: borderType = ImageBorder_S32.class; break;
 						case F32: borderType = ImageBorder_F32.class; break;
+						default: break;
 					}
 				}
 				try {

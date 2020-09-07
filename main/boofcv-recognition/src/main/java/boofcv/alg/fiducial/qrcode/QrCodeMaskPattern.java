@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"UnnecessaryParentheses"})
 public abstract class QrCodeMaskPattern {
 
 	public static final QrCodeMaskPattern M000 = new M000();
@@ -52,7 +53,7 @@ public abstract class QrCodeMaskPattern {
 		return values;
 	}
 
-	public QrCodeMaskPattern( int bits ) {
+	protected QrCodeMaskPattern( int bits ) {
 		this.bits = bits;
 	}
 
@@ -66,31 +67,31 @@ public abstract class QrCodeMaskPattern {
 	public abstract int apply( int row , int col , int bitValue );
 
 	public static QrCodeMaskPattern lookupMask( int maskPattern ) {
-		switch( maskPattern ) {
-			case 0b000: return M000;
-			case 0b001: return M001;
-			case 0b010: return M010;
-			case 0b011: return M011;
-			case 0b100: return M100;
-			case 0b101: return M101;
-			case 0b110: return M110;
-			case 0b111: return M111;
-			default: throw new RuntimeException("Unknown mask: "+maskPattern);
-		}
+		return switch (maskPattern) {
+			case 0b000 -> M000;
+			case 0b001 -> M001;
+			case 0b010 -> M010;
+			case 0b011 -> M011;
+			case 0b100 -> M100;
+			case 0b101 -> M101;
+			case 0b110 -> M110;
+			case 0b111 -> M111;
+			default -> throw new RuntimeException("Unknown mask: " + maskPattern);
+		};
 	}
 
 	public static QrCodeMaskPattern lookupMask( String maskPattern ) {
-		switch( maskPattern ) {
-			case "000": return M000;
-			case "001": return M001;
-			case "010": return M010;
-			case "011": return M011;
-			case "100": return M100;
-			case "101": return M101;
-			case "110": return M110;
-			case "111": return M111;
-			default: throw new RuntimeException("Unknown mask: "+maskPattern);
-		}
+		return switch (maskPattern) {
+			case "000" -> M000;
+			case "001" -> M001;
+			case "010" -> M010;
+			case "011" -> M011;
+			case "100" -> M100;
+			case "101" -> M101;
+			case "110" -> M110;
+			case "111" -> M111;
+			default -> throw new RuntimeException("Unknown mask: " + maskPattern);
+		};
 	}
 
 	static class NONE extends QrCodeMaskPattern {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> {
 	T left;
 	T right;
 
-	public ChecksSgmDisparityCost(double minValue, double maxValue, ImageType<T> imageType ) {
+	protected ChecksSgmDisparityCost(double minValue, double maxValue, ImageType<T> imageType ) {
 		this.minValue = minValue;
 		this.maxValue = maxValue;
 		this.imageType = imageType;

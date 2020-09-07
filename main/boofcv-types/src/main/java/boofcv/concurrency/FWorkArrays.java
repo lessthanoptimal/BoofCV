@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,7 @@ public class FWorkArrays implements WorkArrays {
 	 * arrays are purged
 	 * @param length Desired array length
 	 */
+	@Override
 	public synchronized void reset( int length ) {
 		if( this.length != length ) {
 			this.length = length;
@@ -74,6 +75,7 @@ public class FWorkArrays implements WorkArrays {
 	/**
 	 * Length of arrays returned
 	 */
+	@Override
 	public int length() {
 		return length;
 	}

@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * Randomly selects features up to the limit from the set of detected. This is actually not as bad of an approach
  * as it might seem. Could be viewed as a less effective version of {@link FeatureSelectUniformBest}.
@@ -39,20 +41,19 @@ public class FeatureSelectRandom<Point> implements FeatureSelectLimit<Point> {
 	// Work space
 	private GrowQueue_I32 indexes = new GrowQueue_I32();
 
-	public FeatureSelectRandom(long seed ) {
+	public FeatureSelectRandom( long seed ) {
 		rand = new Random(seed);
 	}
 
 	@Override
 	public void select( int imageWidth, int imageHeight,
 						@Nullable FastAccess<Point> prior,
-						FastAccess<Point> detected, int limit, FastArray<Point> selected)
-	{
-		assert(limit>0);
+						FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
+		assertBoof(limit > 0);
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!
-		if( detected.size <= limit ) {
+		if (detected.size <= limit) {
 			// make a copy of the results with no pruning since it already has the desired number, or less
 			selected.addAll(detected);
 			return;
@@ -67,10 +68,10 @@ public class FeatureSelectRandom<Point> implements FeatureSelectLimit<Point> {
 		// randomly select points up to the limit
 		selected.resize(limit);
 		for (int i = 0; i < limit; i++) {
-			int idx = rand.nextInt(indexes.size-i);
-			selected.set(i, detected.data[ indexes.data[idx] ]);
+			int idx = rand.nextInt(indexes.size - i);
+			selected.set(i, detected.data[indexes.data[idx]]);
 			// copy an unused value over the used value
-			indexes.data[idx] = indexes.data[indexes.size-i-1];
+			indexes.data[idx] = indexes.data[indexes.size - i - 1];
 		}
 	}
 }

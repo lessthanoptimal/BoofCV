@@ -160,6 +160,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Now that the metric upgrade is known add it to work graph
 		SceneWorkingGraph.View wtarget = workGraph.addView(utils.viewC);
+		db.lookupShape(wtarget.pview.id,wtarget.imageDimension);
 
 		// Find the metric upgrade of the target
 		upgradeToMetric(wtarget, projectiveHomography.getCalibrationHomography());

@@ -45,9 +45,8 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<DI>>
-		implements DisparitySelect<Array, DI>
-{
+public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<DI>>
+		implements DisparitySelect<Array, DI> {
 	// Number of unique values for texture
 	public static final int DISCRETIZER = 10000;
 
@@ -77,12 +76,12 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	 * Configures tolerances
 	 *
 	 * @param maxError The maximum allowed error.  Note this is sum error and not per pixel error.
-	 *                 Try (region width*height)*30.
+	 * Try (region width*height)*30.
 	 * @param rightToLeftTolerance Tolerance for how difference the left to right associated values can be.  Try 6
 	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value &le; 0.
-	 *                Closer to zero is more tolerant. Try 0.1
+	 * Closer to zero is more tolerant. Try 0.1
 	 */
-	public SelectDisparityWithChecksWta(int maxError, int rightToLeftTolerance, double texture,Class<DI> disparityType) {
+	protected SelectDisparityWithChecksWta( int maxError, int rightToLeftTolerance, double texture, Class<DI> disparityType ) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
 		this.rightToLeftTolerance = rightToLeftTolerance;
 		this.disparityType = disparityType;
@@ -92,18 +91,18 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	public abstract void setTexture( double threshold );
 
 	@Override
-	public void configure(DI imageDisparity, int disparityMin , int disparityMax , int radiusX ) {
+	public void configure( DI imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
 		this.imageDisparity = imageDisparity;
 		this.disparityMin = disparityMin;
 		this.disparityMax = disparityMax;
 		this.radiusX = radiusX;
 
-		disparityRange = disparityMax-disparityMin+1;
-		regionWidth = radiusX*2+1;
+		disparityRange = disparityMax - disparityMin + 1;
+		regionWidth = radiusX*2 + 1;
 		invalidDisparity = disparityRange;
 
-		if( invalidDisparity > (int)imageDisparity.getDataType().getMaxValue()-1 )
-			throw new IllegalArgumentException("Max range exceeds maximum value in disparity image. v="+invalidDisparity);
+		if (invalidDisparity > (int)imageDisparity.getDataType().getMaxValue() - 1)
+			throw new IllegalArgumentException("Max range exceeds maximum value in disparity image. v=" + invalidDisparity);
 	}
 
 	/**
@@ -112,7 +111,7 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	 * @param index Image pixel that is being set
 	 * @param disparityValue disparity value
 	 */
-	protected abstract void setDisparity( int index , int disparityValue );
+	protected abstract void setDisparity( int index, int disparityValue );
 
 	protected abstract void setDisparityInvalid( int index );
 
@@ -120,14 +119,14 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	 * Returns the maximum allowed disparity for a particular column in left to right direction,
 	 * as limited by the image border.
 	 */
-	protected int disparityMaxAtColumnL2R( int col) {
-		return Math.min(col,disparityMax);
+	protected int disparityMaxAtColumnL2R( int col ) {
+		return Math.min(col, disparityMax);
 	}
 
 	/**
 	 * For debugging purposes only
 	 */
-	public void setLocalDisparityMax(int value) {
+	public void setLocalDisparityMax( int value ) {
 		localRange = value;
 	}
 

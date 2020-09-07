@@ -28,16 +28,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 /**
  * Configures denoising algorithm and controls the GUI.
  *
  * @author Peter Abeles
  */
-public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeListener , ActionListener {
+public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
 
 	// selects which image to view
-	JComboBox images;
+	JComboBox<String> images;
 	// specifies amount of noise to add to the image
 	JSpinner noiseLevel;
 
@@ -63,10 +62,10 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 	Listener listener;
 
 	public DenoiseInfoPanel() {
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
-		images = new JComboBox();
+		images = new JComboBox<>();
 		images.addItem("Denoised");
 		images.addItem("Noisy");
 		images.addItem("Original");
@@ -76,19 +75,19 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 		waveletBox = new JComboBox();
 		waveletBox.addActionListener(this);
 		double h = waveletBox.getPreferredSize().getHeight();
-		waveletBox.setMaximumSize(new Dimension(175,(int)h));
+		waveletBox.setMaximumSize(new Dimension(175, (int)h));
 
-		noiseLevel = new JSpinner(new SpinnerNumberModel(20,0,100,5));
+		noiseLevel = new JSpinner(new SpinnerNumberModel(20, 0, 100, 5));
 		noiseLevel.addChangeListener(this);
 		noiseLevel.setMaximumSize(noiseLevel.getPreferredSize());
 
-		waveletLevel = new JSpinner(new SpinnerNumberModel(4,1,5,1));
+		waveletLevel = new JSpinner(new SpinnerNumberModel(4, 1, 5, 1));
 		waveletLevel.addChangeListener(this);
-		waveletLevel.setMaximumSize(new Dimension(75,(int)h));
+		waveletLevel.setMaximumSize(new Dimension(75, (int)h));
 
-		blurRadius = new JSpinner(new SpinnerNumberModel(1,1,12,1));
+		blurRadius = new JSpinner(new SpinnerNumberModel(1, 1, 12, 1));
 		blurRadius.addChangeListener(this);
-		blurRadius.setMaximumSize(new Dimension(75,(int)h));
+		blurRadius.setMaximumSize(new Dimension(75, (int)h));
 
 		algError = createErrorComponent();
 		algErrorEdge = createErrorComponent();
@@ -98,16 +97,16 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 		configHolder.add(createWaveletConfig());
 		createBlurConfig();
 
-		addLabeled(images,"View");
-		addLabeled(noiseLevel,"Noise");
+		addLabeled(images, "View");
+		addLabeled(noiseLevel, "Noise");
 		addSeparator(200);
 		addCenterLabel("Denoised");
-		addLabeled(algError,"Error");
-		addLabeled(algErrorEdge,"Edge Error");
+		addLabeled(algError, "Error");
+		addLabeled(algErrorEdge, "Edge Error");
 		addSeparator(200);
 		addCenterLabel("Noise Image");
-		addLabeled(noiseError,"Error");
-		addLabeled(noiseErrorEdge,"Edge Error");
+		addLabeled(noiseError, "Error");
+		addLabeled(noiseErrorEdge, "Edge Error");
 		addSeparator(200);
 		add(configHolder);
 		add(Box.createVerticalGlue());
@@ -115,23 +114,23 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 
 	private JPanel createWaveletConfig() {
 		waveletConfig = new JPanel();
-		waveletConfig.setLayout(new BoxLayout(waveletConfig,BoxLayout.Y_AXIS));
-		addCenterLabel("Wavelet Config",waveletConfig);
-		addLabeled(waveletBox,"Wavelet", null, waveletConfig);
-		addLabeled(waveletLevel,"Level", null, waveletConfig);
+		waveletConfig.setLayout(new BoxLayout(waveletConfig, BoxLayout.Y_AXIS));
+		addCenterLabel("Wavelet Config", waveletConfig);
+		addLabeled(waveletBox, "Wavelet", null, waveletConfig);
+		addLabeled(waveletLevel, "Level", null, waveletConfig);
 		return waveletConfig;
 	}
 
 	private JPanel createBlurConfig() {
 		blurConfig = new JPanel();
-		blurConfig.setLayout(new BoxLayout(blurConfig,BoxLayout.Y_AXIS));
-		addCenterLabel("Blur Config",blurConfig);
-		addLabeled(blurRadius,"Radius", null, blurConfig);
+		blurConfig.setLayout(new BoxLayout(blurConfig, BoxLayout.Y_AXIS));
+		addCenterLabel("Blur Config", blurConfig);
+		addLabeled(blurRadius, "Radius", null, blurConfig);
 		return blurConfig;
 	}
 
 	public void setWaveletActive( boolean active ) {
-		if( active ){
+		if (active) {
 			configHolder.remove(blurConfig);
 			configHolder.add(waveletConfig);
 		} else {
@@ -147,62 +146,61 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 	}
 
 	private JTextArea createErrorComponent() {
-		JTextArea comp = new JTextArea(1,6);
+		JTextArea comp = new JTextArea(1, 6);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
 		return comp;
 	}
 
 	public void reset() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				images.setSelectedIndex(0);
-				noiseLevel.setValue(20);
-			}});
+		SwingUtilities.invokeLater(() -> {
+			images.setSelectedIndex(0);
+			noiseLevel.setValue(20);
+		});
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( listener == null )
+	public void stateChanged( ChangeEvent e ) {
+		if (listener == null)
 			return;
 
-		if( e.getSource() == noiseLevel ) {
+		if (e.getSource() == noiseLevel) {
 			listener.noiseChange(getNoiseSigma());
-		} else if( e.getSource() == blurRadius ) {
+		} else if (e.getSource() == blurRadius) {
 			listener.noiseChange(getBlurRadius());
-		} else if( e.getSource() == waveletLevel ) {
-			listener.waveletChange(waveletBox.getSelectedIndex(),getWaveletLevel());
+		} else if (e.getSource() == waveletLevel) {
+			listener.waveletChange(waveletBox.getSelectedIndex(), getWaveletLevel());
 		}
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( listener == null )
+	public void actionPerformed( ActionEvent e ) {
+		if (listener == null)
 			return;
 
-		if( e.getSource() == images ) {
+		if (e.getSource() == images) {
 			listener.imageChange(images.getSelectedIndex());
 		} else {
-			listener.waveletChange(waveletBox.getSelectedIndex(),getWaveletLevel());
+			listener.waveletChange(waveletBox.getSelectedIndex(), getWaveletLevel());
 		}
 	}
 
-	public void setError(double algError, double algErrorEdge, double noiseError , double noiseErrorEdge) {
-		this.algError.setText(String.format("%5.1f",algError));
-		this.algErrorEdge.setText(String.format("%5.1f",algErrorEdge));
-		this.noiseError.setText(String.format("%5.1f",noiseError));
-		this.noiseErrorEdge.setText(String.format("%5.1f",noiseErrorEdge));
+	public void setError( double algError, double algErrorEdge, double noiseError, double noiseErrorEdge ) {
+		this.algError.setText(String.format("%5.1f", algError));
+		this.algErrorEdge.setText(String.format("%5.1f", algErrorEdge));
+		this.noiseError.setText(String.format("%5.1f", noiseError));
+		this.noiseErrorEdge.setText(String.format("%5.1f", noiseErrorEdge));
 	}
 
 	/**
 	 * Returns the number of levels in the wavelet transform.
 	 */
 	public int getWaveletLevel() {
-		return((Number)waveletLevel.getValue()).intValue();
+		return ((Number)waveletLevel.getValue()).intValue();
 	}
 
 	/**
@@ -216,14 +214,13 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 		return ((Number)noiseLevel.getValue()).floatValue();
 	}
 
-	public static interface Listener
-	{
-		public void noiseChange( int radius );
+	public interface Listener {
+		void noiseChange( int radius );
 
-		public void waveletChange( int which , int level );
+		void waveletChange( int which, int level );
 
-		public void noiseChange( float sigma );
+		void noiseChange( float sigma );
 
-		public void imageChange( int which );
+		void imageChange( int which );
 	}
 }

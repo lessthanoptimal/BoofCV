@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,11 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth extends ImageGray<Depth>>
-	extends VideoSequenceSimulator<I>
-{
-	CameraPinholeBrown param = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
-	DepthVisualOdometry<I,Depth> algorithm;
+public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>, Depth extends ImageGray<Depth>>
+		extends VideoSequenceSimulator<I> {
+	CameraPinholeBrown param = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0, 0);
+	DepthVisualOdometry<I, Depth> algorithm;
 
 	I left;
 	Depth depth;
@@ -48,25 +47,25 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 	double depthUnits = 0.002;
 	double tolerance = 0.02;
 
-	public CheckVisualOdometryDepthSim(Class<I> inputType, Class<Depth> depthType) {
+	protected CheckVisualOdometryDepthSim( Class<I> inputType, Class<Depth> depthType ) {
 		super(320, 240, inputType);
 
 		// Turn off threads to make results repeatable
 		BoofConcurrency.USE_CONCURRENT = false;
 
-		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
-		depth = GeneralizedImageOps.createSingleBand(depthType,width,height);
+		left = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		depth = GeneralizedImageOps.createSingleBand(depthType, width, height);
 
 		setIntrinsic(param);
-		createSquares(numSquares,1,2);
+		createSquares(numSquares, 1, 2);
 	}
 
-	public CheckVisualOdometryDepthSim(Class<I> inputType, Class<Depth> depthType, double tolerance) {
-		this(inputType,depthType);
+	protected CheckVisualOdometryDepthSim( Class<I> inputType, Class<Depth> depthType, double tolerance ) {
+		this(inputType, depthType);
 		this.tolerance = tolerance;
 	}
 
-	public void setAlgorithm(DepthVisualOdometry<I,Depth>  algorithm) {
+	public void setAlgorithm( DepthVisualOdometry<I, Depth> algorithm ) {
 		this.algorithm = algorithm;
 	}
 
@@ -77,20 +76,20 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 
 		Se3_F64 worldToLeft = new Se3_F64();
 
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 //			System.out.println("------------------------- Sim tick = "+i);
 			worldToLeft.getT().z = i*0.05;
 
 			// render the images
 			setIntrinsic(param);
 			left.setTo(render(worldToLeft));
-			renderDepth(worldToLeft,depth,depthUnits);
+			renderDepth(worldToLeft, depth, depthUnits);
 
 //			ShowImages.showWindow(left,"Rendered Left", true);
 //			BoofMiscOps.sleep(5000);
 
 			// process the images
-			assertTrue(algorithm.process(left,depth));
+			assertTrue(algorithm.process(left, depth));
 
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
@@ -98,8 +97,8 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 //			worldToLeft.getT().print();
 //			foundWorldToLeft.getT().print();
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
-			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );
+			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(), worldToLeft.getR(), 0.1));
+			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance);
 		}
 	}
 }

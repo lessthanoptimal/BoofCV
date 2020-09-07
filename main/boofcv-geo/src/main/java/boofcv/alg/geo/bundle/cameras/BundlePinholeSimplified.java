@@ -186,6 +186,7 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 	public void convertTo(CameraPinholeBrown out) {
 		this.convertTo((CameraPinhole)out);
 		out.fsetRadial(this.k1, this.k2);
+		out.t1 = out.t2 = 0.0;
 	}
 
 	public BundlePinholeSimplified copy() {

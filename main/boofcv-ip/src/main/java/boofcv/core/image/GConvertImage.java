@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,6 @@ public class GConvertImage {
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
-	 * @return Converted image.
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
 

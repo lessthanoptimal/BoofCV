@@ -97,6 +97,7 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 		}
 	}
 
+	@Override
 	public void setLoop(boolean loop) {
 		this.loop = loop;
 	}
@@ -176,7 +177,7 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 	public void close() {
 	}
 
-	private class Filter implements FilenameFilter {
+	private static class Filter implements FilenameFilter {
 
 		String suffix;
 

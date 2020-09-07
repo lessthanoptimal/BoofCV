@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.GrowQueue_I8;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -97,13 +97,13 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	// that can be used for handling threading. See BitmapMode for a description
 	protected final ReentrantLock bitmapLock = new ReentrantLock();
 	protected BitmapMode bitmapMode = BitmapMode.DOUBLE_BUFFER;
-	protected Bitmap bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
-	protected Bitmap bitmapWork = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
-	protected GrowQueue_I8 bitmapTmp =  new GrowQueue_I8();
+	protected Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+	protected Bitmap bitmapWork = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+	protected GrowQueue_I8 bitmapTmp = new GrowQueue_I8();
 	//---- END LOCK BITMAP
 
 	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
-	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50,
+	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 1, 50,
 			TimeUnit.MILLISECONDS, threadQueue);
 
 	/**
@@ -130,8 +130,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected final MovingAverage periodConvert = new MovingAverage(0.8); // milliseconds
 	//END
 
-	public VisualizeCamera2Activity() {
-	}
+	protected VisualizeCamera2Activity() {}
 
 	/**
 	 * Configures how it visualizes. By default it will render a bitmap to the main view. This can be disabled by
@@ -139,19 +138,19 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 *
 	 * @param bitmapMode How the memory
 	 */
-	public VisualizeCamera2Activity( BitmapMode bitmapMode ) {
+	protected VisualizeCamera2Activity( BitmapMode bitmapMode ) {
 		this.bitmapMode = bitmapMode;
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate( Bundle savedInstanceState ) {
 		super.onCreate(savedInstanceState);
-		if( verbose )
-			Log.i(TAG,"onCreate()");
+		if (verbose)
+			Log.i(TAG, "onCreate()");
 
 		// Free up more screen space
 		android.app.ActionBar actionBar = getActionBar();
-		if( actionBar != null ) {
+		if (actionBar != null) {
 			actionBar.hide();
 		}
 	}
@@ -161,28 +160,27 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 * one you better know how to write concurrent code or else you're going to have a bad time.
 	 */
 	public void setThreadPoolSize( int threads ) {
-		if( threads <= 0 )
+		if (threads <= 0)
 			throw new IllegalArgumentException("Number of threads must be greater than 0");
-		if( verbose )
-			Log.i(TAG,"setThreadPoolSize("+threads+")");
+		if (verbose)
+			Log.i(TAG, "setThreadPoolSize(" + threads + ")");
 
 		threadPool.setCorePoolSize(threads);
 		threadPool.setMaximumPoolSize(threads);
 	}
 
 	/**
-	 *
 	 * @param layout Where the visualization overlay will be placed inside of
 	 * @param view If not null then this will be used to display the camera preview.
 	 */
-	protected void startCamera(@NonNull ViewGroup layout, @Nullable TextureView view ) {
-		if( verbose )
-			Log.i(TAG,"startCamera(layout , view="+(view!=null)+")");
+	protected void startCamera( @NonNull ViewGroup layout, @Nullable TextureView view ) {
+		if (verbose)
+			Log.i(TAG, "startCamera(layout , view=" + (view != null) + ")");
 		displayView = new DisplayView(this);
-		layout.addView(displayView,layout.getChildCount(),
+		layout.addView(displayView, layout.getChildCount(),
 				new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-		if( view == null ) {
+		if (view == null) {
 			super.startCameraView(displayView);
 		} else {
 			this.textureView = view;
@@ -194,10 +192,12 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected void startCameraTexture( @Nullable TextureView view ) {
 		throw new RuntimeException("Call the other start camera function");
 	}
+
 	@Override
 	protected void startCameraView( @Nullable View view ) {
 		throw new RuntimeException("Call the other start camera function");
 	}
+
 	@Override
 	protected void startCamera() {
 		throw new RuntimeException("Call the other start camera function");
@@ -207,7 +207,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 * Selects a resolution which has the number of pixels closest to the requested value
 	 */
 	@Override
-	protected int selectResolution( int widthTexture, int heightTexture, Size[] resolutions  ) {
+	protected int selectResolution( int widthTexture, int heightTexture, Size[] resolutions ) {
 		// just wanted to make sure this has been cleaned up
 		timeOfLastUpdated = 0;
 
@@ -216,21 +216,21 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		double bestAspect = Double.MAX_VALUE;
 		double bestArea = 0;
 
-		for( int i = 0; i < resolutions.length; i++ ) {
+		for (int i = 0; i < resolutions.length; i++) {
 			Size s = resolutions[i];
 			int width = s.getWidth();
 			int height = s.getHeight();
 
-			double aspectScore = Math.abs(width*height-targetResolution);
+			double aspectScore = Math.abs(width*height - targetResolution);
 
-			if( aspectScore < bestAspect ) {
+			if (aspectScore < bestAspect) {
 				bestIndex = i;
 				bestAspect = aspectScore;
 				bestArea = width*height;
-			} else if( Math.abs(aspectScore-bestArea) <= 1e-8 ) {
+			} else if (Math.abs(aspectScore - bestArea) <= 1e-8) {
 				bestIndex = i;
 				double area = width*height;
-				if( area > bestArea ) {
+				if (area > bestArea) {
 					bestArea = area;
 				}
 			}
@@ -240,14 +240,14 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	}
 
 	@Override
-	protected void onCameraResolutionChange(int cameraWidth, int cameraHeight, int sensorOrientation ) {
+	protected void onCameraResolutionChange( int cameraWidth, int cameraHeight, int sensorOrientation ) {
 		// pre-declare bitmap image used for display
-		if( bitmapMode != BitmapMode.NONE) {
+		if (bitmapMode != BitmapMode.NONE) {
 			bitmapLock.lock();
 			try {
 				if (bitmap.getWidth() != cameraWidth || bitmap.getHeight() != cameraHeight) {
 					bitmap = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
-					if( bitmapMode == BitmapMode.DOUBLE_BUFFER ) {
+					if (bitmapMode == BitmapMode.DOUBLE_BUFFER) {
 						bitmapWork = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
 					}
 				}
@@ -256,26 +256,24 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			}
 		}
 		int rotation = getWindowManager().getDefaultDisplay().getRotation();
-		if( verbose )
-			Log.i(TAG,"camera rotation = "+sensorOrientation+" display rotation = "+rotation);
+		if (verbose)
+			Log.i(TAG, "camera rotation = " + sensorOrientation + " display rotation = " + rotation);
 
-		videoToDisplayMatrix(cameraWidth, cameraHeight,sensorOrientation,
-				viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
-		if( !imageToView.invert(viewToImage) ) {
+		videoToDisplayMatrix(cameraWidth, cameraHeight, sensorOrientation,
+				viewWidth, viewHeight, rotation*90, stretchToFill, imageToView);
+		if (!imageToView.invert(viewToImage)) {
 			throw new RuntimeException("WTF can't invert the matrix?");
 		}
-
 	}
 
-	protected static void videoToDisplayMatrix(int cameraWidth, int cameraHeight , int cameraRotation,
-											   int displayWidth , int displayHeight, int displayRotation ,
-											   boolean stretchToFill, Matrix imageToView )
-	{
+	protected static void videoToDisplayMatrix( int cameraWidth, int cameraHeight, int cameraRotation,
+												int displayWidth, int displayHeight, int displayRotation,
+												boolean stretchToFill, Matrix imageToView ) {
 		// Compute transform from bitmap to view coordinates
 		int rotatedWidth = cameraWidth;
 		int rotatedHeight = cameraHeight;
 
-		int offsetX=0,offsetY=0;
+		int offsetX = 0, offsetY = 0;
 
 		boolean needToRotateView = (0 == displayRotation || 180 == displayRotation) !=
 				(cameraRotation == 0 || cameraRotation == 180);
@@ -283,48 +281,49 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		if (needToRotateView) {
 			rotatedWidth = cameraHeight;
 			rotatedHeight = cameraWidth;
-			offsetX = (rotatedWidth-rotatedHeight)/2;
-			offsetY = (rotatedHeight-rotatedWidth)/2;
+			offsetX = (rotatedWidth - rotatedHeight)/2;
+			offsetY = (rotatedHeight - rotatedWidth)/2;
 		}
 
 		imageToView.reset();
 		float scale = Math.min(
 				(float)displayWidth/rotatedWidth,
 				(float)displayHeight/rotatedHeight);
-		if( scale == 0 ) {
-			Log.e(TAG,"displayView has zero width and height");
+		if (scale == 0) {
+			Log.e(TAG, "displayView has zero width and height");
 			return;
 		}
 
 		imageToView.postRotate(-displayRotation + cameraRotation, cameraWidth/2, cameraHeight/2);
-		imageToView.postTranslate(offsetX,offsetY);
-		imageToView.postScale(scale,scale);
-		if( stretchToFill ) {
+		imageToView.postTranslate(offsetX, offsetY);
+		imageToView.postScale(scale, scale);
+		if (stretchToFill) {
 			imageToView.postScale(
 					displayWidth/(rotatedWidth*scale),
 					displayHeight/(rotatedHeight*scale));
 		} else {
 			imageToView.postTranslate(
-					(displayWidth - rotatedWidth*scale) / 2,
-					(displayHeight - rotatedHeight*scale) / 2);
+					(displayWidth - rotatedWidth*scale)/2,
+					(displayHeight - rotatedHeight*scale)/2);
 		}
 	}
 
 	/**
 	 * Same as {@link #setImageType(ImageType, ColorFormat)} but defaults to {@link ColorFormat#RGB RGB}.
+	 *
 	 * @param type type of image you wish th convert the into to
 	 */
 	protected void setImageType( ImageType type ) {
-		this.setImageType(type,ColorFormat.RGB);
+		this.setImageType(type, ColorFormat.RGB);
 	}
 
 	/**
 	 * Changes the type of image the camera frame is converted to
 	 */
-	protected void setImageType( ImageType type , ColorFormat colorFormat ) {
-		synchronized (boofImage.imageLock){
+	protected void setImageType( ImageType type, ColorFormat colorFormat ) {
+		synchronized (boofImage.imageLock) {
 			boofImage.colorFormat = colorFormat;
-			if( !boofImage.imageType.isSameType( type ) ) {
+			if (!boofImage.imageType.isSameType(type)) {
 				boofImage.imageType = type;
 				boofImage.stackImages.clear();
 			}
@@ -337,16 +336,16 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	}
 
 	@Override
-	protected void processFrame(Image image) {
+	protected void processFrame( Image image ) {
 		// If there's a thread pending to go into the pool wait until it has been cleared out
-		if( threadQueue.size() > 0 )
+		if (threadQueue.size() > 0)
 			return;
 
 		ImageBase converted;
 
 		// When the image is removed from the stack it's no longer controlled by this class
 		synchronized (boofImage.imageLock) {
-			if (boofImage.stackImages.empty()) {
+			if (boofImage.stackImages.isEmpty()) {
 				converted = boofImage.imageType.createImage(1, 1);
 			} else {
 				converted = boofImage.stackImages.pop();
@@ -364,12 +363,12 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		// record how long it took to convert the image for diagnostic reasons
 		synchronized (lockTiming) {
 			totalConverted++;
-			if( totalConverted >= TIMING_WARM_UP ) {
-				periodConvert.update((after - before) * 1e-6);
+			if (totalConverted >= TIMING_WARM_UP) {
+				periodConvert.update((after - before)*1e-6);
 			}
 		}
 
-		threadPool.execute(()->processImageOuter(converted));
+		threadPool.execute(() -> processImageOuter(converted));
 	}
 
 	/**
@@ -379,8 +378,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 * WARNING: If the image type can change this must be before processing it.
 	 *
 	 * @param image The image which is to be processed. The image is owned by this function until
-	 *              it returns. After that the image and all it's data will be recycled. DO NOT
-	 *              SAVE A REFERENCE TO IT.
+	 * it returns. After that the image and all it's data will be recycled. DO NOT
+	 * SAVE A REFERENCE TO IT.
 	 */
 	protected abstract void processImage( ImageBase image );
 
@@ -395,11 +394,11 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		processImage(image);
 
 		// If an old image finished being processes after a more recent one it won't be visualized
-		if( !visualizeOnlyMostRecent || startTime > timeOfLastUpdated ) {
+		if (!visualizeOnlyMostRecent || startTime > timeOfLastUpdated) {
 			timeOfLastUpdated = startTime;
 
 			// Copy this frame
-			renderBitmapImage(bitmapMode,image);
+			renderBitmapImage(bitmapMode, image);
 
 			// Update the visualization
 			runOnUiThread(() -> displayView.invalidate());
@@ -407,7 +406,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 		// Put the image into the stack if the image type has not changed
 		synchronized (boofImage.imageLock) {
-			if( boofImage.imageType.isSameType(image.getImageType()))
+			if (boofImage.imageType.isSameType(image.getImageType()))
 				boofImage.stackImages.add(image);
 		}
 	}
@@ -416,8 +415,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 * Renders the bitmap image to output. If you don't wish to have this behavior then override this function.
 	 * Jsut make sure you respect the bitmap mode or the image might not render as desired or you could crash the app.
 	 */
-	protected void renderBitmapImage( BitmapMode mode , ImageBase image ) {
-		switch( mode ) {
+	protected void renderBitmapImage( BitmapMode mode, ImageBase image ) {
+		switch (mode) {
 			case UNSAFE: {
 				if (image.getWidth() == bitmap.getWidth() && image.getHeight() == bitmap.getHeight())
 					ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
@@ -432,7 +431,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 				// swap the two buffers. If it's locked don't swap. This will skip a frame but will not cause
 				// a significant slow down
-				if( bitmapLock.tryLock() ) {
+				if (bitmapLock.tryLock()) {
 					try {
 						Bitmap tmp = bitmapWork;
 						bitmapWork = bitmap;
@@ -442,13 +441,15 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 					}
 				}
 			} break;
+
+			case NONE: throw new RuntimeException("Unsupported: " + bitmapMode);
 		}
 	}
 
 	/**
 	 * Renders the visualizations. Override and invoke super to add your own
 	 */
-	protected void onDrawFrame( SurfaceView view , Canvas canvas ) {
+	protected void onDrawFrame( SurfaceView view, Canvas canvas ) {
 
 		// Code below is usefull when debugging display issues
 //		Paint paintFill = new Paint();
@@ -462,19 +463,21 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 //		Rect r = new Rect(0,0,view.getWidth(),view.getHeight());
 //		canvas.drawRect(r,paintFill);
 //		canvas.drawRect(r,paintBorder);
-		switch( bitmapMode) {
+		switch (bitmapMode) {
 			case UNSAFE:
 				canvas.drawBitmap(this.bitmap, imageToView, null);
 				break;
 
 			case DOUBLE_BUFFER:
 				bitmapLock.lock();
-				try{
+				try {
 					canvas.drawBitmap(this.bitmap, imageToView, null);
 				} finally {
 					bitmapLock.unlock();
 				}
 				break;
+
+			case NONE: throw new RuntimeException("Unsupported: " + bitmapMode);
 		}
 	}
 
@@ -485,7 +488,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 		SurfaceHolder mHolder;
 
-		public DisplayView(Context context) {
+		public DisplayView( Context context ) {
 			super(context);
 			mHolder = getHolder();
 
@@ -497,20 +500,10 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			setWillNotDraw(false);
 		}
 
-
-		@Override
-		public void onDraw(Canvas canvas) {
-			onDrawFrame(this,canvas);
-		}
-
-		@Override
-		public void surfaceCreated(SurfaceHolder surfaceHolder) {}
-
-		@Override
-		public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {}
-
-		@Override
-		public void surfaceDestroyed(SurfaceHolder surfaceHolder) {}
+		@Override public void onDraw( Canvas canvas ) { onDrawFrame(this, canvas); }
+		@Override public void surfaceCreated( SurfaceHolder surfaceHolder ) {}
+		@Override public void surfaceChanged( SurfaceHolder surfaceHolder, int i, int i1, int i2 ) {}
+		@Override public void surfaceDestroyed( SurfaceHolder surfaceHolder ) {}
 	}
 
 	/**
@@ -526,7 +519,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		 * Images available for use, When inside the stack they must not be referenced anywhere else.
 		 * When removed they are owned by the thread in which they were removed.
 		 */
-		protected Stack<ImageBase> stackImages = new Stack<>();
+		protected ArrayDeque<ImageBase> stackImages = new ArrayDeque<>();
 		protected BWorkArrays convertWork = new BWorkArrays();
 	}
 

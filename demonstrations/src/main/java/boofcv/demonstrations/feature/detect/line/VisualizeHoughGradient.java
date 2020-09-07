@@ -260,7 +260,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		Point2D_F64 coordinate = new Point2D_F64();
 
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected synchronized void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			if( !showLines )
 				return;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 /**
  * Most basic implementation of {@link ImageDistort} for {@link ImageGray}. Computes the distortion from the
@@ -37,7 +37,7 @@ public class ImageDistortBasic_SB_MT<Input extends ImageGray<Input>,Output exten
 		extends ImageDistortBasic<Input,Output,InterpolatePixelS<Input>> {
 
 	private AssignPixelValue_SB<Output> assigner;
-	private final Stack<BlockDistort> queue = new Stack<>();
+	private final ArrayDeque<BlockDistort> queue = new ArrayDeque<>();
 
 	/**
 	 * Specifies configuration parameters

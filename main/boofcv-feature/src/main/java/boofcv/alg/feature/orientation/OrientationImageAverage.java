@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,6 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageGray;
-
 
 /**
  * Computes the orientation of a region by computing a weighted sum of each pixel's intensity
@@ -53,7 +52,7 @@ public abstract class OrientationImageAverage<T extends ImageGray<T>> implements
 	// sine values for each pixel
 	protected Kernel2D_F32 kerSine;
 
-	public OrientationImageAverage(double objectToSample,int defaultRadius) {
+	protected OrientationImageAverage( double objectToSample, int defaultRadius ) {
 		this.objectToSample = objectToSample;
 		setObjectRadius(defaultRadius);
 	}
@@ -64,44 +63,44 @@ public abstract class OrientationImageAverage<T extends ImageGray<T>> implements
 	}
 
 	@Override
-	public void setObjectRadius(double objectRadius) {
+	public void setObjectRadius( double objectRadius ) {
 		this.objectRadius = objectRadius;
-		sampleRadius = (int)Math.ceil(objectRadius* objectToSample);
+		sampleRadius = (int)Math.ceil(objectRadius*objectToSample);
 
-		int w = sampleRadius*2+1;
+		int w = sampleRadius*2 + 1;
 		kerCosine = new Kernel2D_F32(w);
 		kerSine = new Kernel2D_F32(w);
 
-		for(int y = -sampleRadius; y <= sampleRadius; y++ ) {
-			int pixelY = y+ sampleRadius;
-			for(int x = -sampleRadius; x <= sampleRadius; x++ ) {
-				int pixelX = x+ sampleRadius;
-				float r = (float)Math.sqrt(x*x+y*y);
-				kerCosine.set(pixelX,pixelY,(float)x/r);
-				kerSine.set(pixelX,pixelY,(float)y/r);
+		for (int y = -sampleRadius; y <= sampleRadius; y++) {
+			int pixelY = y + sampleRadius;
+			for (int x = -sampleRadius; x <= sampleRadius; x++) {
+				int pixelX = x + sampleRadius;
+				float r = (float)Math.sqrt(x*x + y*y);
+				kerCosine.set(pixelX, pixelY, (float)x/r);
+				kerSine.set(pixelX, pixelY, (float)y/r);
 			}
 		}
-		kerCosine.set(sampleRadius, sampleRadius,0);
-		kerSine.set(sampleRadius, sampleRadius,0);
+		kerCosine.set(sampleRadius, sampleRadius, 0);
+		kerSine.set(sampleRadius, sampleRadius, 0);
 	}
 
 	@Override
-	public double compute(double X, double Y) {
+	public double compute( double X, double Y ) {
 
-		int c_x = (int)(X+0.5);
-		int c_y = (int)(Y+0.5);
+		int c_x = (int)(X + 0.5);
+		int c_y = (int)(Y + 0.5);
 
 		// compute the visible region while taking in account
 		// the image borders
-		rect.x0 = c_x- sampleRadius;
-		rect.y0 = c_y- sampleRadius;
-		rect.x1 = c_x+ sampleRadius +1;
-		rect.y1 = c_y+ sampleRadius +1;
+		rect.x0 = c_x - sampleRadius;
+		rect.y0 = c_y - sampleRadius;
+		rect.x1 = c_x + sampleRadius + 1;
+		rect.y1 = c_y + sampleRadius + 1;
 
-		BoofMiscOps.boundRectangleInside(image,rect);
+		BoofMiscOps.boundRectangleInside(image, rect);
 
-		return computeAngle(c_x,c_y);
+		return computeAngle(c_x, c_y);
 	}
 
-	protected abstract double computeAngle( int c_x , int c_y );
+	protected abstract double computeAngle( int c_x, int c_y );
 }

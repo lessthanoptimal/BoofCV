@@ -233,7 +233,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		listener.userCanceled();
 	}
 
-	private JPanel createPathPanel(String name, JTextField text , BoofLambdas.Process callback ) {
+	private JPanel createPathPanel(String name, JTextField text , BoofLambdas.ProcessCall callback ) {
 		JLabel label = new JLabel(name);
 		label.setPreferredSize(new Dimension(100,30));
 		JButton bOpen = new JButton();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,14 +21,13 @@ package boofcv.struct.pyramid;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-
 /**
  * <p>
  * An image pyramid where each level can be an arbitrary scale.  Higher levels in the pyramid
  * are sub-sampled from lower levels in the pyramid allowing fractions of a pixel change.  This
  * added flexibility comes at the cost of some performance relative to {@link PyramidDiscrete}.
  * </p>
- * 
+ *
  * <p>
  * An {@link ImagePyramid} where the scale factor between each level is specified using a floating point number.
  * </p>
@@ -48,15 +47,15 @@ public abstract class PyramidFloat<T extends ImageBase<T>> extends ImagePyramidB
 	 * @param scaleFactors (optional) Specifies the scale of each layer in the pyramid.  See restrictions
 	 * on scaleFactor in {@link #setScaleFactors(double...)}.
 	 */
-	public PyramidFloat(ImageType<T> imageType , double ...scaleFactors ) {
-		super(imageType,false);
-		if( scaleFactors.length > 0 )
+	protected PyramidFloat( ImageType<T> imageType, double... scaleFactors ) {
+		super(imageType, false);
+		if (scaleFactors.length > 0)
 			setScaleFactors(scaleFactors);
 	}
 
 	protected PyramidFloat( PyramidFloat<T> orig ) {
 		super(orig);
-		if( orig.scale != null )
+		if (orig.scale != null)
 			this.scale = orig.scale.clone();
 	}
 
@@ -65,20 +64,19 @@ public abstract class PyramidFloat<T extends ImageBase<T>> extends ImagePyramidB
 	 *
 	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
 	 */
-	public void setScaleFactors( double ...scaleFactors ) {
+	public void setScaleFactors( double... scaleFactors ) {
 		// see if the scale factors have not changed
-		if( scale != null && scale.length == scaleFactors.length ) {
+		if (scale != null && scale.length == scaleFactors.length) {
 			boolean theSame = true;
-			for( int i = 0; i < scale.length; i++ ) {
-				if( scale[i] != scaleFactors[i] ) {
+			for (int i = 0; i < scale.length; i++) {
+				if (scale[i] != scaleFactors[i]) {
 					theSame = false;
 					break;
 				}
 			}
 			// no changes needed
-			if( theSame )
+			if (theSame)
 				return;
-
 		}
 		// set width/height to zero to force the image to be redeclared
 		bottomWidth = bottomHeight = 0;
@@ -87,7 +85,7 @@ public abstract class PyramidFloat<T extends ImageBase<T>> extends ImagePyramidB
 	}
 
 	@Override
-	public double getScale(int layer) {
+	public double getScale( int layer ) {
 		return scale[layer];
 	}
 

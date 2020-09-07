@@ -48,13 +48,13 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 
 	private T image;
 
-	public GeneralInterestPointDetectorChecks(InterestPointDetector<T> detector,
+	protected GeneralInterestPointDetectorChecks(InterestPointDetector<T> detector,
 											  boolean hasOrientation, boolean hasRadius,
 											  Class<T> imageType ) {
 		configure(detector,hasOrientation, hasRadius,imageType);
 	}
 
-	public GeneralInterestPointDetectorChecks() {}
+	protected GeneralInterestPointDetectorChecks() {}
 
 	public void configure(InterestPointDetector<T> detector,
 						  boolean hasOrientation, boolean hasRadius,

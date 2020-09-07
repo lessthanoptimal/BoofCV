@@ -25,7 +25,7 @@ import georegression.struct.point.Point3D_F64;
 
 import java.util.List;
 
-import static boofcv.alg.cloud.PointCloudUtils.convert;
+import static georegression.struct.ConvertFloatType.convert;
 
 /**
  * Interface for reading a point cloud

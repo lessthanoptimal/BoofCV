@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public abstract class CompareCornerIntensity<D extends ImageGray<D>> {
 	protected D derivX,derivY;
 	protected double tol = UtilEjml.TEST_F64_SQ; // not sure why it isn't exact
 
-	public CompareCornerIntensity(Class<D> imageType ) {
+	protected CompareCornerIntensity(Class<D> imageType ) {
 		derivX = GeneralizedImageOps.createSingleBand(imageType,50,60);
 		derivY = derivX.createSameShape();
 

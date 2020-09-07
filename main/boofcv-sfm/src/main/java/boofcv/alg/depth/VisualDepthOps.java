@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.depth;
 
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU16;
@@ -79,7 +78,7 @@ public class VisualDepthOps {
 	 * @param cloudColor Output color for each point in the cloud
 	 */
 	public static void depthTo3D(CameraPinholeBrown param , Planar<GrayU8> rgb , GrayU16 depth ,
-								 FastQueue<Point3D_F64> cloud , FastQueueArray_I32 cloudColor ) {
+								 FastQueue<Point3D_F64> cloud , FastQueue<int[]> cloudColor ) {
 		cloud.reset();
 		cloudColor.reset();
 

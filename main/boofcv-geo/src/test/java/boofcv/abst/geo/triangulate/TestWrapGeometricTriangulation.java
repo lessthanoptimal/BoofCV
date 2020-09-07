@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.abst.geo.Triangulate2ViewsMetric;
  */
 public class TestWrapGeometricTriangulation extends GeneralTestTriangulate2ViewsMetric {
 
+	@Override
 	public Triangulate2ViewsMetric createAlg() {
 		return new Wrap2ViewsTriangulateGeometric();
 	}

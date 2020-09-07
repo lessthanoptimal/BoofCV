@@ -283,7 +283,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 				structure.connectPointToView(indexPoint,viewIndex);
 
 				Point2D_F64 pixel = viewsAdded.get(viewIndex).observationPixels.get(f.obsIdx.get(j));
-				observations.getView(viewIndex).add(indexPoint,(float)(pixel.x),(float)(pixel.y));
+				observations.getView(viewIndex).add(indexPoint,(float)pixel.x,(float)pixel.y);
 			}
 		}
 

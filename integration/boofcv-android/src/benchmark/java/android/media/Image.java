@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,6 @@ public abstract class Image implements AutoCloseable {
 	}
 
 	public abstract Image.Plane[] getPlanes();
-
-	public abstract void close();
 
 	public abstract static class Plane {
 

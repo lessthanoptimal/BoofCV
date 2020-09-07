@@ -37,14 +37,18 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"JdkObsolete"})
 public class UtilIO {
 	public static final String UTF8 = "UTF-8";
 
 	/**
 	 * Returns an absolute path to the file that is relative to the example directory
+	 *
 	 * @param path File path relative to root directory
 	 * @return Absolute path to file
 	 */
@@ -55,7 +59,7 @@ public class UtilIO {
 				return fpath.toURI().toURL();
 			// Assume we are running inside of the project come
 			String pathToBase = getPathToBase();
-			if( pathToBase != null ) {
+			if (pathToBase != null) {
 				File pathExample = new File(pathToBase, "data/example/");
 				if (pathExample.exists()) {
 					return new File(pathExample.getPath(), path).getAbsoluteFile().toURL();
@@ -94,36 +98,36 @@ public class UtilIO {
 	 */
 	public static CameraPinholeBrown loadExampleIntrinsic( MediaManager media, File exampleFile ) {
 		CameraPinholeBrown intrinsic = null;
-		String specialName = FilenameUtils.getBaseName(exampleFile.getName())+"_intrinsic.yaml";
-		File specialIntrinsic = new File(exampleFile.getParent(),specialName);
+		String specialName = FilenameUtils.getBaseName(exampleFile.getName()) + "_intrinsic.yaml";
+		File specialIntrinsic = new File(exampleFile.getParent(), specialName);
 		Reader reader = media.openFile(specialIntrinsic.getPath());
-		if( reader != null ) {
+		if (reader != null) {
 			intrinsic = CalibrationIO.load(reader);
 		} else {
 			reader = media.openFile(new File(exampleFile.getParent(), "intrinsic.yaml").getPath());
-			if ( reader != null ) {
+			if (reader != null) {
 				intrinsic = CalibrationIO.load(reader);
 			}
 		}
 		return intrinsic;
 	}
 
-	public static BufferedReader openBufferedReader(String fileName) throws FileNotFoundException {
+	public static BufferedReader openBufferedReader( String fileName ) throws FileNotFoundException {
 		InputStream stream = UtilIO.openStream(fileName);
-		if( stream == null )
-			throw new FileNotFoundException("Can't open "+fileName);
+		if (stream == null)
+			throw new FileNotFoundException("Can't open " + fileName);
 		return new BufferedReader(new InputStreamReader(stream, Charset.forName(UTF8)));
 	}
 
 	/**
 	 * Given a path which may or may not be a URL return a URL
 	 */
-	public static URL ensureURL(String path ) {
+	public static URL ensureURL( String path ) {
 		path = systemToUnix(path);
 		URL url;
 		try {
 			url = new URL(path);
-			if( url.getProtocol().equals("jar")) {
+			if (url.getProtocol().equals("jar")) {
 				return simplifyJarPath(url);
 			}
 		} catch (MalformedURLException e) {
@@ -137,9 +141,9 @@ public class UtilIO {
 		return url;
 	}
 
-	public static String ensureFilePath(String path ) {
+	public static String ensureFilePath( String path ) {
 		URL url = ensureURL(path);
-		if( url == null )
+		if (url == null)
 			return null;
 		try {
 			return URLDecoder.decode(url.getPath(), UTF8);
@@ -155,15 +159,15 @@ public class UtilIO {
 		try {
 			String[] segments = url.toString().split(".jar!/");
 			String path = simplifyJarPath(segments[1]);
-			return new URL(segments[0]+".jar!/"+path);
+			return new URL(segments[0] + ".jar!/" + path);
 		} catch (IOException e) {
 			return url;
 		}
 	}
 
-	public static String systemToUnix(String path) {
-		if (path==null) return null;
-		if (File.separatorChar=='\\') {
+	public static String systemToUnix( String path ) {
+		if (path == null) return null;
+		if (File.separatorChar == '\\') {
 			return path.replace('\\', '/');
 		} else {
 			return path;
@@ -176,23 +180,23 @@ public class UtilIO {
 
 		boolean skip = false;
 		do {
-			if( !skip ) {
-				if( f.getName().equals("..")) {
+			if (!skip) {
+				if (f.getName().equals("..")) {
 					skip = true;
 				} else {
 					elements.add(f.getName());
 				}
- 			} else {
+			} else {
 				skip = false;
 			}
 			f = f.getParentFile();
-		}while( f != null );
+		} while (f != null);
 
 		path = "";
-		for (int i = elements.size()-1; i >=0; i--) {
+		for (int i = elements.size() - 1; i >= 0; i--) {
 			path += elements.get(i);
-			if( i > 0 )
-				path+='/';
+			if (i > 0)
+				path += '/';
 		}
 		return path;
 	}
@@ -200,23 +204,24 @@ public class UtilIO {
 	public static InputStream openStream( String path ) {
 		try {
 			URL url = ensureURL(path);
-			if( url == null ) {
-				System.err.println("Unable to open "+path);
+			if (url == null) {
+				System.err.println("Unable to open " + path);
 			} else {
 				return url.openStream();
 			}
-		} catch (IOException ignore) {}
+		} catch (IOException ignore) {
+		}
 		return null;
 	}
 
 	/**
 	 * Reads a line from an input stream.
 	 */
-	public static String readLine( InputStream input, StringBuffer buffer ) throws IOException {
+	public static String readLine( InputStream input, StringBuilder buffer ) throws IOException {
 		buffer.setLength(0);
-		while( true ) {
+		while (true) {
 			int v = input.read();
-			if( v == -1 || v == '\n' )
+			if (v == -1 || v == '\n')
 				return buffer.toString();
 			buffer.append((char)v);
 		}
@@ -228,7 +233,7 @@ public class UtilIO {
 			return path;
 		// Assume we are running inside of the project come
 		String pathToBase = getPathToBase();
-		if( pathToBase != null ) {
+		if (pathToBase != null) {
 			File pathExample = new File(pathToBase, "data/example/");
 			if (pathExample.exists()) {
 				return new File(pathExample.getPath(), path).getAbsolutePath();
@@ -244,14 +249,15 @@ public class UtilIO {
 
 	/**
 	 * Searches for the root BoofCV directory and returns an absolute path from it.
+	 *
 	 * @param path File path relative to root directory
 	 * @return Absolute path to file
 	 */
 	public static String path( String path ) {
 		String pathToBase = getPathToBase();
-		if( pathToBase == null )
+		if (pathToBase == null)
 			return path;
-		return new File(pathToBase,path).getAbsolutePath();
+		return new File(pathToBase, path).getAbsolutePath();
 	}
 
 	public static File getFileToBase() {
@@ -266,13 +272,13 @@ public class UtilIO {
 	public static String getPathToBase() {
 		String path = new File(".").getAbsoluteFile().getParent();
 
-		while( path != null )  {
+		while (path != null) {
 			File f = new File(path);
-			if( !f.exists() )
+			if (!f.exists())
 				break;
 
 			String[] files = f.list();
-			if( files == null )
+			if (files == null)
 				break;
 
 			boolean foundReadme = false;
@@ -280,18 +286,18 @@ public class UtilIO {
 			boolean foundExamples = false;
 			boolean foundIntegration = false;
 
-			for( String s : files ) {
-				if( s.compareToIgnoreCase("README.md") == 0 )
+			for (String s : files) {
+				if (s.compareToIgnoreCase("README.md") == 0)
 					foundReadme = true;
-				else if( s.compareToIgnoreCase("main") == 0 )
+				else if (s.compareToIgnoreCase("main") == 0)
 					foundMain = true;
-				else if( s.compareToIgnoreCase("examples") == 0 )
+				else if (s.compareToIgnoreCase("examples") == 0)
 					foundExamples = true;
-				else if( s.compareToIgnoreCase("integration") == 0 )
+				else if (s.compareToIgnoreCase("integration") == 0)
 					foundIntegration = true;
 			}
 
-			if( foundMain && foundExamples && foundIntegration && foundReadme)
+			if (foundMain && foundExamples && foundIntegration && foundReadme)
 				return path;
 
 			path = f.getParent();
@@ -306,7 +312,7 @@ public class UtilIO {
 	 * @param exitOnCancel If it should quit on cancel or not.
 	 * @return Name of the selected file or null if nothing was selected.
 	 */
-	public static String selectFile(boolean exitOnCancel) {
+	public static String selectFile( boolean exitOnCancel ) {
 		String fileName = null;
 		JFileChooser fc = new JFileChooser();
 
@@ -321,7 +327,7 @@ public class UtilIO {
 		return fileName;
 	}
 
-	public static void loadLibrarySmart(String libraryName) {
+	public static void loadLibrarySmart( String libraryName ) {
 
 		// see if it works the first try
 		if (loadLibrary(libraryName))
@@ -345,13 +351,12 @@ public class UtilIO {
 					throw new RuntimeException("Shouldn't have failed to load this time");
 				return;
 			}
-
 		}
 
 		System.out.println("classPath");
 	}
 
-	public static boolean loadLibrary(String libraryName) {
+	public static boolean loadLibrary( String libraryName ) {
 		try {
 			System.out.println("tring to load: " + libraryName);
 			System.loadLibrary(libraryName);
@@ -361,14 +366,14 @@ public class UtilIO {
 		}
 	}
 
-	public static void save( Object o , String fileName ) {
+	public static void save( Object o, String fileName ) {
 		try {
 			FileOutputStream fileOut = new FileOutputStream(fileName);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(o);
 			out.close();
 			fileOut.close();
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
@@ -381,7 +386,7 @@ public class UtilIO {
 			in.close();
 			fileIn.close();
 			return obj;
-		} catch(IOException | ClassNotFoundException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -403,8 +408,8 @@ public class UtilIO {
 	 */
 	public static String readAsString( String path ) {
 		InputStream stream = openStream(path);
-		if( stream == null ) {
-			System.err.println("Failed to open "+path);
+		if (stream == null) {
+			System.err.println("Failed to open " + path);
 			return null;
 		}
 		return readAsString(stream);
@@ -416,7 +421,7 @@ public class UtilIO {
 	public static String readAsString( InputStream stream ) {
 		StringBuilder code = new StringBuilder();
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream,UTF_8));
 			String line;
 			while ((line = reader.readLine()) != null)
 				code.append(line).append(System.lineSeparator());
@@ -429,8 +434,8 @@ public class UtilIO {
 
 		// make windows strings appear the same as linux strings
 		String nl = System.getProperty("line.separator");
-		if( nl.compareTo("\n") != 0 ) {
-			output = output.replaceAll(nl,"\n");
+		if (nl.compareTo("\n") != 0) {
+			output = output.replaceAll(nl, "\n");
 		}
 
 		return output;
@@ -440,54 +445,55 @@ public class UtilIO {
 	 * Constructs the path for a source code file residing in the examples or demonstrations directory
 	 * In the case of the file not being in either directory, an empty string is returned
 	 * The expected parameters are class.getPackage().getName(), class.getSimpleName()
+	 *
 	 * @param pkg package containing the class
 	 * @param app simple class name
 	 */
-	public static String getSourcePath(String pkg, String app) {
+	public static String getSourcePath( String pkg, String app ) {
 		String path = "";
-		if(pkg == null || app == null)
+		if (pkg == null || app == null)
 			return path;
 
 
 		String pathToBase = getPathToBase();
-		if( pathToBase != null ) {
-			if(pkg.contains("examples"))
-				path =  new File(pathToBase,"examples/src/main/java/").getAbsolutePath();
-			else if(pkg.contains("demonstrations"))
-				path =  new File(pathToBase,"demonstrations/src/main/java/").getAbsolutePath();
+		if (pathToBase != null) {
+			if (pkg.contains("examples"))
+				path = new File(pathToBase, "examples/src/main/java/").getAbsolutePath();
+			else if (pkg.contains("demonstrations"))
+				path = new File(pathToBase, "demonstrations/src/main/java/").getAbsolutePath();
 			else {
 				System.err.println("pkg must be to examples or demonstrations. " + pkg);
 				return path;
 			}
-			String pathToCode = pkg.replace('.','/') + "/" + app + ".java";
-			return new File(path,pathToCode).getPath();
+			String pathToCode = pkg.replace('.', '/') + "/" + app + ".java";
+			return new File(path, pathToCode).getPath();
 		} else {
 			// probably running inside a jar
-			String pathToCode = pkg.replace('.','/') + "/" + app + ".java";
+			String pathToCode = pkg.replace('.', '/') + "/" + app + ".java";
 			URL url = UtilIO.class.getClassLoader().getResource(pathToCode);
-			if( url != null )
+			if (url != null)
 				return url.toString();
 			else
 				return pathToCode;
 		}
 	}
 
-	public static String getGithubURL(String pkg, String app) {
-		if(pkg == null || app == null)
+	public static String getGithubURL( String pkg, String app ) {
+		if (pkg == null || app == null)
 			return "";
 
 		String base;
-		if( BoofVersion.VERSION.contains("SNAPSHOT")) {
+		if (BoofVersion.VERSION.contains("SNAPSHOT")) {
 			base = "https://github.com/lessthanoptimal/BoofCV/blob/" + BoofVersion.GIT_SHA + "/";
 		} else {
 			base = "https://github.com/lessthanoptimal/BoofCV/blob/v" + BoofVersion.VERSION + "/";
 		}
-		pkg = pkg.replace('.','/') + "/";
+		pkg = pkg.replace('.', '/') + "/";
 
 		String dir;
-		if(pkg.contains("demonstrations"))
+		if (pkg.contains("demonstrations"))
 			dir = "demonstrations/";
-		else if(pkg.contains("examples"))
+		else if (pkg.contains("examples"))
 			dir = "examples/";
 		else
 			return "";
@@ -512,20 +518,20 @@ public class UtilIO {
 		for (int i = 0; i < code.length(); i++) {
 			char c = code.charAt(i);
 
-			if( state == 1 ) {
-				if( justEntered ) {
+			if (state == 1) {
+				if (justEntered) {
 					justEntered = false;
-					if( c == '*' ) {
+					if (c == '*') {
 						return indexLineStart;
 					}
 				}
-				if( previous == '*' && c == '/') {
+				if (previous == '*' && c == '/') {
 					state = 0;
 				}
-			} else if( state == 0 ){
-				if( previous == '/' && c == '/' ) {
+			} else if (state == 0) {
+				if (previous == '/' && c == '/') {
 					state = 2;
-				} else if( previous == '/' && c == '*') {
+				} else if (previous == '/' && c == '*') {
 					state = 1;
 					justEntered = true;
 				} else {
@@ -533,22 +539,22 @@ public class UtilIO {
 				}
 			}
 
-			if( c == '\n' ) {
-				if( buffer.toString().contains("class")) {
+			if (c == '\n') {
+				if (buffer.toString().contains("class")) {
 					return indexLineStart;
 				}
-				buffer.delete(0,buffer.length());
-				indexLineStart = i+1;
-				if( state == 2 ) {
+				buffer.delete(0, buffer.length());
+				indexLineStart = i + 1;
+				if (state == 2) {
 					state = 0;
 				}
 			}
 
 			previous = c;
 		}
-		if( buffer.toString().contains("class")) {
+		if (buffer.toString().contains("class")) {
 			return indexLineStart;
-		} else{
+		} else {
 			return 0;
 		}
 	}
@@ -558,35 +564,35 @@ public class UtilIO {
 	 *
 	 * @param directory Directory it looks inside of
 	 * @param prefix Prefix that the file must have
-	 * @param suffix
 	 * @return List of files that are in the directory and match the prefix.
 	 */
-	public static List<String> listByPrefix(String directory, String prefix, String suffix) {
+	public static List<String> listByPrefix( String directory, String prefix, String suffix ) {
 		List<String> ret = new ArrayList<>();
 
 		File d = new File(directory);
 
-		if( !d.isDirectory() ) {
+		if (!d.isDirectory()) {
 			try {
 				URL url = new URL(directory);
-				if( url.getProtocol().equals("file")) {
+				if (url.getProtocol().equals("file")) {
 					d = new File(url.getFile());
-				} else if( url.getProtocol().equals("jar")){
-					return listJarPrefix(url,prefix,suffix);
+				} else if (url.getProtocol().equals("jar")) {
+					return listJarPrefix(url, prefix, suffix);
 				}
-			} catch( MalformedURLException ignore){}
+			} catch (MalformedURLException ignore) {
+			}
 		}
-		if( !d.isDirectory() )
-			throw new IllegalArgumentException("Must specify an directory. "+directory);
+		if (!d.isDirectory())
+			throw new IllegalArgumentException("Must specify an directory. " + directory);
 
 		File[] files = d.listFiles();
 
-		for( File f : files ) {
-			if( f.isDirectory() || f.isHidden() )
+		for (File f : files) {
+			if (f.isDirectory() || f.isHidden())
 				continue;
 
-			if( prefix == null || f.getName().startsWith(prefix )) {
-				if( suffix ==null || f.getName().endsWith(suffix)) {
+			if (prefix == null || f.getName().startsWith(prefix)) {
+				if (suffix == null || f.getName().endsWith(suffix)) {
 					ret.add(f.getAbsolutePath());
 				}
 			}
@@ -595,31 +601,32 @@ public class UtilIO {
 		return ret;
 	}
 
-	public static List<String> listByRegex(String directory, String regex ) {
+	public static List<String> listByRegex( String directory, String regex ) {
 		List<String> ret = new ArrayList<>();
 
 		File d = new File(directory);
 
-		if( !d.isDirectory() ) {
+		if (!d.isDirectory()) {
 			try {
 				URL url = new URL(directory);
-				if( url.getProtocol().equals("file")) {
+				if (url.getProtocol().equals("file")) {
 					d = new File(url.getFile());
-				} else if( url.getProtocol().equals("jar")){
-					return listJarRegex(url,regex);
+				} else if (url.getProtocol().equals("jar")) {
+					return listJarRegex(url, regex);
 				}
-			} catch( MalformedURLException ignore){}
+			} catch (MalformedURLException ignore) {
+			}
 		}
-		if( !d.isDirectory() )
-			throw new IllegalArgumentException("Must specify an directory. "+directory);
+		if (!d.isDirectory())
+			throw new IllegalArgumentException("Must specify an directory. " + directory);
 
 		File[] files = d.listFiles();
 
-		for( File f : files ) {
-			if( f.isDirectory() || f.isHidden() )
+		for (File f : files) {
+			if (f.isDirectory() || f.isHidden())
 				continue;
 
-			if( f.getName().matches(regex) ) {
+			if (f.getName().matches(regex)) {
 				ret.add(f.getAbsolutePath());
 			}
 		}
@@ -627,31 +634,31 @@ public class UtilIO {
 		return ret;
 	}
 
-	public static List<String> listAll(String directory ) {
+	public static List<String> listAll( String directory ) {
 		List<String> ret = new ArrayList<>();
 
 		try {
 			// see if it's a URL or not
 			URL url = new URL(directory);
-			if( url.getProtocol().equals("file") ) {
+			if (url.getProtocol().equals("file")) {
 				directory = url.getFile();
-			} else if( url.getProtocol().equals("jar") ) {
-				return listJarPrefix(url,null,null);
+			} else if (url.getProtocol().equals("jar")) {
+				return listJarPrefix(url, null, null);
 			} else {
-				throw new RuntimeException("Not sure what to do with this url. "+url.toString());
+				throw new RuntimeException("Not sure what to do with this url. " + url.toString());
 			}
 		} catch (MalformedURLException ignore) {
 		}
 
 		File d = new File(directory);
 
-		if( !d.isDirectory() )
+		if (!d.isDirectory())
 			throw new IllegalArgumentException("Must specify an directory");
 
 		File[] files = d.listFiles();
 
-		for( File f : files ) {
-			if( f.isDirectory() || f.isHidden() )
+		for (File f : files) {
+			if (f.isDirectory() || f.isHidden())
 				continue;
 
 			ret.add(f.getAbsolutePath());
@@ -663,47 +670,48 @@ public class UtilIO {
 	/**
 	 * Lists all files in the directory with an MIME type that contains the string "type"
 	 */
-	public static List<String> listAllMime( String directory , String type ) {
+	public static List<String> listAllMime( String directory, String type ) {
 		List<String> ret = new ArrayList<>();
 
 		try {
 			// see if it's a URL or not
 			URL url = new URL(directory);
-			if( url.getProtocol().equals("file") ) {
+			if (url.getProtocol().equals("file")) {
 				directory = url.getFile();
-			} else if( url.getProtocol().equals("jar") ) {
-				return listJarMime(url,null,null);
+			} else if (url.getProtocol().equals("jar")) {
+				return listJarMime(url, null, null);
 			} else {
-				throw new RuntimeException("Not sure what to do with this url. "+url.toString());
+				throw new RuntimeException("Not sure what to do with this url. " + url.toString());
 			}
 		} catch (MalformedURLException ignore) {
 		}
 
 		File d = new File(directory);
 
-		if( !d.isDirectory() )
+		if (!d.isDirectory())
 			throw new IllegalArgumentException("Must specify an directory");
 
-		File []files = d.listFiles();
-		if( files == null )
+		File[] files = d.listFiles();
+		if (files == null)
 			return ret;
 
-		for( File f : files ) {
-			if( f.isDirectory() )
+		for (File f : files) {
+			if (f.isDirectory())
 				continue;
 			try {
 				String mimeType = Files.probeContentType(f.toPath());
 
-				if( mimeType.contains(type))
+				if (mimeType.contains(type))
 					ret.add(f.getAbsolutePath());
-			} catch (IOException ignore) {}
+			} catch (IOException ignore) {
+			}
 		}
 
 		Collections.sort(ret);
 		return ret;
 	}
 
-	private static List<String> listJarPrefix(URL url , String prefix , String suffix ) {
+	private static List<String> listJarPrefix( URL url, String prefix, String suffix ) {
 		List<String> output = new ArrayList<>();
 
 		JarFile jarfile;
@@ -711,19 +719,19 @@ public class UtilIO {
 			JarURLConnection connection = (JarURLConnection)url.openConnection();
 			jarfile = connection.getJarFile();
 
-			String targetPath = connection.getEntryName()+"/";
-			if( prefix != null ) {
+			String targetPath = connection.getEntryName() + "/";
+			if (prefix != null) {
 				targetPath += prefix;
 			}
 
 			final Enumeration<JarEntry> e = jarfile.entries();
-			while( e.hasMoreElements() ) {
-				final ZipEntry ze = (ZipEntry) e.nextElement();
+			while (e.hasMoreElements()) {
+				final ZipEntry ze = (ZipEntry)e.nextElement();
 //				System.out.println("  ze.anme="+ze.getName());
-				if( ze.getName().startsWith(targetPath) &&
+				if (ze.getName().startsWith(targetPath) &&
 						ze.getName().length() != targetPath.length()) {
-					if( suffix == null || ze.getName().endsWith(suffix))  {
-						output.add("jar:file:"+jarfile.getName()+"!/"+ze.getName());
+					if (suffix == null || ze.getName().endsWith(suffix)) {
+						output.add("jar:file:" + jarfile.getName() + "!/" + ze.getName());
 					}
 				}
 			}
@@ -735,7 +743,7 @@ public class UtilIO {
 		}
 	}
 
-	private static List<String> listJarMime(URL url , String prefix , String type ) {
+	private static List<String> listJarMime( URL url, String prefix, String type ) {
 		List<String> output = new ArrayList<>();
 
 		FileNameMap fileNameMap = URLConnection.getFileNameMap();
@@ -745,22 +753,22 @@ public class UtilIO {
 			JarURLConnection connection = (JarURLConnection)url.openConnection();
 			jarfile = connection.getJarFile();
 
-			String targetPath = connection.getEntryName()+"/";
-			if( prefix != null ) {
+			String targetPath = connection.getEntryName() + "/";
+			if (prefix != null) {
 				targetPath += prefix;
 			}
 
 			final Enumeration e = jarfile.entries();
-			while( e.hasMoreElements() ) {
-				final ZipEntry ze = (ZipEntry) e.nextElement();
+			while (e.hasMoreElements()) {
+				final ZipEntry ze = (ZipEntry)e.nextElement();
 //				System.out.println("  ze.anme="+ze.getName());
 
-				if( ze.getName().startsWith(targetPath) &&
+				if (ze.getName().startsWith(targetPath) &&
 						ze.getName().length() != targetPath.length()) {
 					// TODO no idea if this will work and is fast
-					String path = "jar:file:"+jarfile.getName()+"!/"+ze.getName();
+					String path = "jar:file:" + jarfile.getName() + "!/" + ze.getName();
 					String mimeType = fileNameMap.getContentTypeFor(path);
-					if( mimeType.contains(type))  {
+					if (mimeType.contains(type)) {
 						output.add(path);
 					}
 				}
@@ -773,7 +781,7 @@ public class UtilIO {
 		}
 	}
 
-	private static List<String> listJarRegex(URL url , String regex ) {
+	private static List<String> listJarRegex( URL url, String regex ) {
 		List<String> output = new ArrayList<>();
 
 		JarFile jarfile;
@@ -781,17 +789,17 @@ public class UtilIO {
 			JarURLConnection connection = (JarURLConnection)url.openConnection();
 			jarfile = connection.getJarFile();
 
-			String targetPath = connection.getEntryName()+"/";
+			String targetPath = connection.getEntryName() + "/";
 
 			final Enumeration<JarEntry> e = jarfile.entries();
-			while( e.hasMoreElements() ) {
-				final ZipEntry ze = (ZipEntry) e.nextElement();
+			while (e.hasMoreElements()) {
+				final ZipEntry ze = (ZipEntry)e.nextElement();
 //				System.out.println("  ze.anme="+ze.getName());
-				if( ze.getName().startsWith(targetPath) &&
+				if (ze.getName().startsWith(targetPath) &&
 						ze.getName().length() != targetPath.length()) {
 					String shortName = ze.getName().substring(targetPath.length());
-					if( shortName.matches(regex)) {
-						output.add("jar:file:"+jarfile.getName()+"!/"+ze.getName());
+					if (shortName.matches(regex)) {
+						output.add("jar:file:" + jarfile.getName() + "!/" + ze.getName());
 					}
 				}
 			}
@@ -816,62 +824,63 @@ public class UtilIO {
 	 * @param regex file name regex
 	 * @return array of matching files
 	 */
-	public static File[] findMatches( File directory , String regex ) {
+	public static File[] findMatches( File directory, String regex ) {
 		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
 		return directory.listFiles(file -> p.matcher(file.getName()).matches());
 	}
 
 	public static boolean validURL( URL url ) {
 		try {
-			URLConnection c = url.openConnection();
+			url.openConnection();
 			return true;
-		} catch( IOException e ) {
+		} catch (IOException e) {
 			return false;
 		}
 	}
 
-	public static void copyToFile( InputStream in , File file ) {
+	public static void copyToFile( InputStream in, File file ) {
 		try {
-			if( in == null ) throw new RuntimeException("Input is null");
+			if (in == null) throw new RuntimeException("Input is null");
 			FileOutputStream out = new FileOutputStream(file);
 			byte[] buffer = new byte[1024*1024];
-			while( in.available() > 0 ) {
-				int amount = in.read(buffer,0,buffer.length);
-				out.write(buffer,0,amount);
+			while (in.available() > 0) {
+				int amount = in.read(buffer, 0, buffer.length);
+				out.write(buffer, 0, amount);
 			}
 			out.close();
 			in.close();
-		} catch( IOException e ) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
 	/**
 	 * Recursively deletes all files in path which pass the test.
+	 *
 	 * @param f base directory or file
 	 * @param test The test
 	 * @throws IOException Exception if fails to delete a file
 	 */
-	public static void delete( File f , FileTest test ) throws IOException {
-		if ( f.isDirectory() ) {
+	public static void delete( File f, FileTest test ) throws IOException {
+		if (f.isDirectory()) {
 			File[] files = f.listFiles();
-			if( files != null ) {
+			if (files != null) {
 				for (File c : files) {
-					delete(c,test);
+					delete(c, test);
 				}
 			}
 		}
-		if ( test.isTarget(f) && !f.delete())
+		if (test.isTarget(f) && !f.delete())
 			throw new IOException("Failed to delete file: " + f);
 	}
 
-	public static String checkIfJarAndCopyToTemp(String filename ) {
+	public static String checkIfJarAndCopyToTemp( String filename ) {
 		// InputStream can't be seeked. This is a problem. Hack around it is to write the file
 		// to a temporary file or see if it's a file  pass that in
 		URL url = ensureURL(filename);
-		if( url == null )
-			throw new RuntimeException("Invalid: "+filename);
-		switch( url.getProtocol() ) {
+		if (url == null)
+			throw new RuntimeException("Invalid: " + filename);
+		switch (url.getProtocol()) {
 			case "file":
 				filename = url.getPath();
 				// the filename will include an extra / in windows, this is fine
@@ -886,12 +895,12 @@ public class UtilIO {
 				// copy the resource into a temporary file
 				try {
 					InputStream in = openStream(filename);
-					if( in == null ) throw new RuntimeException("Failed to open "+filename);
+					if (in == null) throw new RuntimeException("Failed to open " + filename);
 					final File tempFile = File.createTempFile("boofcv_jar_hack_", suffix);
 					tempFile.deleteOnExit();
-					copyToFile(in,tempFile);
+					copyToFile(in, tempFile);
 					filename = tempFile.getAbsolutePath();
-				} catch( IOException e ) {
+				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
 				break;

@@ -98,7 +98,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	// TODO Specify tracker and motion model in info panel
 
-	public VideoStitchBaseApp(List<?> exampleInputs , Motion2DPanel gui, boolean color , Class imageType ) {
+	protected VideoStitchBaseApp(List<?> exampleInputs , Motion2DPanel gui, boolean color , Class imageType ) {
 		super(true,true,exampleInputs,
 				color ? ImageType.pl(3, imageType) : ImageType.single(imageType));
 

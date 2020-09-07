@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,8 +89,6 @@ public class DiscretizedCircle {
 		double angleStep = PI2 / num;
 
 		int width = (int)Math.ceil(radius)*2+1;
-
-		int i = 0;
 
 		int prev = 0;
 

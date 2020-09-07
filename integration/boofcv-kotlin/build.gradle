@@ -4,8 +4,18 @@ plugins {
 
 configurations.all {
     resolutionStrategy {
+        force 'org.jetbrains:annotations:20.0.0'
         force 'org.jetbrains.kotlin:kotlin-stdlib:1.4.0'
         force 'org.jetbrains.kotlin:kotlin-stdlib-common:1.4.0'
+    }
+}
+
+configurations {
+    [annotationProcessor, testAnnotationProcessor].each {
+        it.resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.2'
+        it.resolutionStrategy.force "com.google.errorprone:error_prone_annotations:2.4.0"
+        it.resolutionStrategy.force "com.google.guava:guava:27.0.1-jre"
+        it.resolutionStrategy.force "org.checkerframework:checker-qual:2.10.0"
     }
 }
 

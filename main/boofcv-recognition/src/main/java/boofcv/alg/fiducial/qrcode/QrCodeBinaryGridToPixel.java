@@ -236,8 +236,8 @@ public class QrCodeBinaryGridToPixel {
 
 			Point2D_F64 adj = adjustments.get(closest);
 
-			pixel.x += adj.x;
-			pixel.y += adj.y;
+			pixel.x += (float)adj.x;
+			pixel.y += (float)adj.y;
 		}
 	}
 

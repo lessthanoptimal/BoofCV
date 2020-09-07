@@ -38,8 +38,8 @@ public class PruneStructureFromSceneProjective {
 	SceneStructureProjective structure;
 	SceneObservations observations;
 
-	public PruneStructureFromSceneProjective(SceneStructureProjective structure,
-											 SceneObservations observations) {
+	public PruneStructureFromSceneProjective( SceneStructureProjective structure,
+											  SceneObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;
 	}
@@ -51,7 +51,7 @@ public class PruneStructureFromSceneProjective {
 	 *
 	 * @param inlierFraction Fraction of observations to keep. 0 to 1. 1 = no change. 0 = everything is pruned.
 	 */
-	public void pruneObservationsByErrorRank(double inlierFraction) {
+	public void pruneObservationsByErrorRank( double inlierFraction ) {
 
 		Point2D_F64 observation = new Point2D_F64();
 		Point2D_F64 predicted = new Point2D_F64();
@@ -66,18 +66,18 @@ public class PruneStructureFromSceneProjective {
 
 			for (int indexInView = 0; indexInView < v.point.size; indexInView++) {
 				int pointID = v.point.data[indexInView];
-				SceneStructureMetric.Point f = structure.points.data[pointID];
+				SceneStructureCommon.Point f = structure.points.data[pointID];
 
 				// Get observation in image pixels
 				v.get(indexInView, observation);
 
 				// Get feature location in world and predict the pixel observation
-				if( structure.homogenous ) {
+				if (structure.homogenous) {
 					f.get(X4);
-					PerspectiveOps.renderPixel(view.worldToView,X4,predicted);
+					PerspectiveOps.renderPixel(view.worldToView, X4, predicted);
 				} else {
 					f.get(X3);
-					PerspectiveOps.renderPixel(view.worldToView,X3,predicted);
+					PerspectiveOps.renderPixel(view.worldToView, X3, predicted);
 				}
 
 				Errors e = new Errors();
@@ -91,7 +91,7 @@ public class PruneStructureFromSceneProjective {
 		errors.sort(Comparator.comparingDouble(a -> a.error));
 
 		// Mark observations which are to be removed. Can't remove yet since the indexes will change
-		int index0 = (int) (errors.size() * inlierFraction+0.5);
+		int index0 = (int)(errors.size()*inlierFraction + 0.5);
 		for (int i = index0; i < errors.size(); i++) {
 			Errors e = errors.get(i);
 
@@ -110,24 +110,24 @@ public class PruneStructureFromSceneProjective {
 	 *
 	 * @param count Minimum number of observations
 	 */
-	public boolean prunePoints(int count) {
+	public boolean prunePoints( int count ) {
 		// create a lookup table from old to new point indexes
-		int oldToNew[] = new int[ structure.points.size ];
+		int oldToNew[] = new int[structure.points.size];
 
 		// list of remaining points
 		GrowQueue_I32 removeIdx = new GrowQueue_I32();
 //		List<SceneStructureProjective.Point> remainingP = new ArrayList<>();
 		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
-			SceneStructureProjective.Point sp = structure.points.data[pointIdx];
+			SceneStructureCommon.Point sp = structure.points.data[pointIdx];
 
-			if( sp.views.size < count) {
+			if (sp.views.size < count) {
 				removeIdx.add(pointIdx);
 				// remove observations of this point from each view
 				for (int i = 0; i < sp.views.size; i++) {
 					int viewIdx = sp.views.data[i];
 					SceneObservations.View ov = observations.views.get(viewIdx);
 					int localIdx = ov.point.indexOf(pointIdx);
-					if( localIdx == -1 )
+					if (localIdx == -1)
 						throw new RuntimeException("Point not in view's observation!?");
 					ov.remove(localIdx);
 				}
@@ -137,7 +137,7 @@ public class PruneStructureFromSceneProjective {
 		}
 
 		// if all of them are still remaining nothing changed
-		if( removeIdx.size == 0 )
+		if (removeIdx.size == 0)
 			return false;
 
 		// update point references
@@ -145,7 +145,7 @@ public class PruneStructureFromSceneProjective {
 			SceneObservations.View so = observations.views.get(viewIdx);
 
 			for (int i = 0; i < so.point.size; i++) {
-				so.point.data[i] = oldToNew[ so.point.data[i]];
+				so.point.data[i] = oldToNew[so.point.data[i]];
 			}
 		}
 
@@ -161,7 +161,7 @@ public class PruneStructureFromSceneProjective {
 	 * @param count Prune if it has this number of views or less
 	 * @return true if views were pruned or false if not
 	 */
-	public boolean pruneViews(int count) {
+	public boolean pruneViews( int count ) {
 		GrowQueue_I32 pruneIdx = new GrowQueue_I32();
 
 		// count number of observations in each view
@@ -176,7 +176,7 @@ public class PruneStructureFromSceneProjective {
 		// TODO Add a list of points to each view reducing number of iterations through all the points
 		// mark views with too few points for removal
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
-			if( counts[viewIdx] <= count) {
+			if (counts[viewIdx] <= count) {
 				pruneIdx.add(viewIdx);
 				structure.views.data[viewIdx].width = -2;
 			}
@@ -185,21 +185,21 @@ public class PruneStructureFromSceneProjective {
 		// remove the view from points
 		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
 			GrowQueue_I32 viewsIn = structure.points.data[pointIdx].views;
-			for (int i = viewsIn.size-1; i >= 0; i--) {
+			for (int i = viewsIn.size - 1; i >= 0; i--) {
 				SceneStructureProjective.View v = structure.views.data[viewsIn.get(i)];
-				if( v.width == -2 ) {
+				if (v.width == -2) {
 					viewsIn.remove(i);
 				}
 			}
 		}
 
-		if( pruneIdx.size() == 0 ) {
+		if (pruneIdx.size() == 0) {
 			return false;
 		}
 
 		// Create new arrays with the views that were not pruned
-		structure.views.remove(pruneIdx.data,0,pruneIdx.size,null);
-		observations.views.remove(pruneIdx.data,0,pruneIdx.size,null);
+		structure.views.remove(pruneIdx.data, 0, pruneIdx.size, null);
+		observations.views.remove(pruneIdx.data, 0, pruneIdx.size, null);
 		return true;
 	}
 
@@ -212,13 +212,13 @@ public class PruneStructureFromSceneProjective {
 		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
 //			System.out.println("ViewIndex="+viewIndex);
 			SceneObservations.View v = observations.views.data[viewIndex];
-			for(int indexInView = v.point.size-1; indexInView >= 0; indexInView-- ) {
+			for (int indexInView = v.point.size - 1; indexInView >= 0; indexInView--) {
 				int pointID = v.getPointId(indexInView);
-				SceneStructureProjective.Point f = structure.points.data[pointID];
+				SceneStructureCommon.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
 				v.get(indexInView, observation);
 
-				if( !Double.isNaN(observation.x))
+				if (!Double.isNaN(observation.x))
 					continue;
 
 				// Tell the feature it is no longer visible in this view

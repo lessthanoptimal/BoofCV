@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,6 @@ import java.util.List;
 public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 	extends DemonstrationBase implements ItemListener, ComponentListener
 {
-	private final ImageType<T> imageType;
 	private final T latestImage;
 	private final T scaledImage;
 
@@ -59,7 +58,6 @@ public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 
 	public DemonstrationInterpolateScaleApp(List<String> examples , ImageType<T> imageType ) {
 		super(examples, imageType);
-		this.imageType = imageType;
 
 		panel.setScaling(ScaleOptions.NONE);
 

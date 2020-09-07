@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,26 +38,25 @@ import java.util.List;
 public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 
 	// converts to and from rodrigues coordinates
-	private ModelCodec<Se3_F64> motionCodec = new PnPRodriguesCodec();
+	private final ModelCodec<Se3_F64> motionCodec = new PnPRodriguesCodec();
 	// computes residual and Jacobian for optimization
-	private ResidualsCodecToMatrix<StereoPose,Stereo2D3D> func;
-	private PnPStereoJacobianRodrigues jacobian = new PnPStereoJacobianRodrigues();
+	private final ResidualsCodecToMatrix<StereoPose, Stereo2D3D> func;
+	private final PnPStereoJacobianRodrigues jacobian = new PnPStereoJacobianRodrigues();
 
 	// parameters that specify the stereo camera and location of left camera
-	private StereoPose stereoPose = new StereoPose();
+	private final StereoPose stereoPose = new StereoPose();
 
 	// encoded model that is optimized
-	private double param[];
+	private final double[] param;
 	// optimizer and settings
 	protected UnconstrainedLeastSquares minimizer;
-	private int maxIterations;
-	private double convergenceTol;
+	private final int maxIterations;
+	private final double convergenceTol;
 
-	public PnPStereoRefineRodrigues(double convergenceTol, int maxIterations)
-	{
+	public PnPStereoRefineRodrigues( double convergenceTol, int maxIterations ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		this.minimizer = FactoryOptimization.levenbergMarquardt(null,false);
+		this.minimizer = FactoryOptimization.levenbergMarquardt(null, false);
 
 		// decodes StereoPose
 		ModelCodec<StereoPose> paramModel = new Se3ToStereoPoseCodec(motionCodec);
@@ -70,6 +69,7 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 		param = new double[paramModel.getParamLength()];
 	}
 
+	@Override
 	public void setLeftToRight( Se3_F64 leftToRight ) {
 		// cam0toCam1 is not modified during optimization since it is assumed to be known/constant
 		stereoPose.cam0ToCam1 = leftToRight;
@@ -77,7 +77,7 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 	}
 
 	@Override
-	public boolean fitModel(List<Stereo2D3D> obs, Se3_F64 worldToLeft, Se3_F64 refinedWorldToLeft) {
+	public boolean fitModel( List<Stereo2D3D> obs, Se3_F64 worldToLeft, Se3_F64 refinedWorldToLeft ) {
 
 		// put into a parameterized format
 		motionCodec.encode(worldToLeft, param);
@@ -86,17 +86,17 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 		func.setObservations(obs);
 		jacobian.setObservations(obs);
 
-		minimizer.setFunction(func,jacobian);
-		minimizer.initialize(param,0,convergenceTol*obs.size());
+		minimizer.setFunction(func, jacobian);
+		minimizer.initialize(param, 0, convergenceTol*obs.size());
 
 		// iterate until it converges
-		for( int i = 0; i < maxIterations; i++ ) {
-			if( minimizer.iterate() )
+		for (int i = 0; i < maxIterations; i++) {
+			if (minimizer.iterate())
 				break;
 		}
 
 		// decode the solution
-		motionCodec.decode(minimizer.getParameters(),refinedWorldToLeft);
+		motionCodec.decode(minimizer.getParameters(), refinedWorldToLeft);
 
 		return true;
 	}

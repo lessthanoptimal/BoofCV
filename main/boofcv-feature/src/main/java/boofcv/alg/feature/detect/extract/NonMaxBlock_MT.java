@@ -19,9 +19,9 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
-import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -35,9 +35,9 @@ import org.jetbrains.annotations.Nullable;
 public class NonMaxBlock_MT extends NonMaxBlock {
 
 	// lock for variables below - which are lists used to store work space for individual threads
-	final FastQueue<SearchData> searches = new FastQueue<>(this::createSearchData);
+	final GrowArray<SearchData> searches = new GrowArray<>(this::createSearchData);
 
-	public NonMaxBlock_MT(Search search) {
+	public NonMaxBlock_MT( Search search ) {
 		super(search);
 	}
 
@@ -49,60 +49,60 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 	 * @param localMax (Output) storage for found local maximums.
 	 */
 	@Override
-	public void process(GrayF32 intensityImage, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax) {
+	public void process( GrayF32 intensityImage, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax ) {
 
-		if( localMin != null )
+		if (localMin != null)
 			localMin.reset();
-		if( localMax != null )
+		if (localMax != null)
 			localMax.reset();
 
 		// the defines the region that can be processed
 		int endX = intensityImage.width - border;
 		int endY = intensityImage.height - border;
 
-		int step = configuration.radius+1;
+		int step = configuration.radius + 1;
 
-		search.initialize(configuration,intensityImage,localMin,localMax);
+		search.initialize(configuration, intensityImage, localMin, localMax);
 
 		// Compute number of y iterations
-		int range = endY-border;
+		int range = endY - border;
 		int N = range/step;
-		if( range > N*step )
+		if (range > N*step)
 			N += 1;
 
 		// The previous version required locks. In a benchmark in Java 11 this lock free version and the previous
 		// had identical performance.
-		BoofConcurrency.loopBlocks(0,N,searches, (blockInfo,iter0,iter1) -> {
+		BoofConcurrency.loopBlocks(0, N, searches, ( blockInfo, iter0, iter1 ) -> {
 			final Search search = blockInfo.search;
 			blockInfo.cornersMin.reset();
 			blockInfo.cornersMax.reset();
-			QueueCorner threadMin=localMin!=null?blockInfo.cornersMin:null;
-			QueueCorner threadMax=localMax!=null?blockInfo.cornersMax:null;
+			QueueCorner threadMin = localMin != null ? blockInfo.cornersMin : null;
+			QueueCorner threadMax = localMax != null ? blockInfo.cornersMax : null;
 
-			search.initialize(configuration,intensityImage,threadMin,threadMax);
+			search.initialize(configuration, intensityImage, threadMin, threadMax);
 
 			for (int iterY = iter0; iterY < iter1; iterY++) {
 				// search for local peaks along this block row
 				int y = border + iterY*step;
 				int y1 = y + step;
-				if( y1 > endY) y1 = endY;
+				if (y1 > endY) y1 = endY;
 
-				for(int x = border; x < endX; x += step ) {
+				for (int x = border; x < endX; x += step) {
 					int x1 = x + step;
-					if( x1 > endX) x1 = endX;
-					search.searchBlock(x,y,x1,y1);
+					if (x1 > endX) x1 = endX;
+					search.searchBlock(x, y, x1, y1);
 				}
 			}
 		});
 
 		// Save results outside of the thread. This ensures the order is not randomized. That was wrecking havoc
 		// on results that needed to be deterministic
-		for (int i = 0; i < searches.size; i++) {
+		for (int i = 0; i < searches.size(); i++) {
 			SearchData data = searches.get(i);
 
-			if( localMin != null )
+			if (localMin != null)
 				localMin.appendAll(data.cornersMin);
-			if( localMax != null )
+			if (localMax != null)
 				localMax.appendAll(data.cornersMax);
 		}
 	}
@@ -116,7 +116,7 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 		public final QueueCorner cornersMin = new QueueCorner();
 		public final QueueCorner cornersMax = new QueueCorner();
 
-		public SearchData(Search search) {
+		public SearchData( Search search ) {
 			this.search = search;
 		}
 	}

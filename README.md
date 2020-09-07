@@ -43,6 +43,7 @@ Know what you're doing and you just want to see something running?  Then run the
 
 ```bash
 cd boofcv
+./gradlew autogenerate
 ./gradlew examples
 java -jar examples/examples.jar
 ./gradlew demonstrations
@@ -93,7 +94,7 @@ There are also several integration modules which help BoofCV interact with exter
 Building and installing BoofCV into your local Maven repository is easy[1] using the [gradlew](https://docs.gradle.org/current/userguide/gradle_wrapper.html) script:
 ```bash
 cd boofcv
-./gradlew assemble                # Creates auto generated files
+./gradlew autogenerate            # Creates auto generated files
 ./gradlew install                 # Installs it into the local maven repository 
 ```
 If you wish to have jars instead, the following commands are provided.

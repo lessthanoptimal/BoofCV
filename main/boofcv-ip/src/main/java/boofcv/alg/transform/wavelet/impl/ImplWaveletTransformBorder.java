@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.struct.wavelet.WlCoef;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
 
+import javax.annotation.Generated;
 
 /**
  * <p>
@@ -48,7 +49,8 @@ import boofcv.struct.wavelet.WlCoef_I32;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
+@Generated("boofcv.alg.transform.wavelet.impl.GenerateImplWaveletTransformBorder")
+@SuppressWarnings({"ForLoopReplaceableByForEach","NarrowingCompoundAssignment"})
 public class ImplWaveletTransformBorder {
 
 	public static void horizontal(BorderIndex1D border , WlCoef_F32 coefficients , GrayF32 input , GrayF32 output )

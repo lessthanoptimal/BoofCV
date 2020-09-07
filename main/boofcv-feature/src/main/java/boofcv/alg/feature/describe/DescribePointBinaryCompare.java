@@ -51,7 +51,7 @@ public abstract class DescribePointBinaryCompare<T extends ImageGray<T>> {
 	protected int offsetsA[] = new int[0];
 	protected int offsetsB[] = new int[0];
 
-	public DescribePointBinaryCompare(BinaryCompareDefinition_I32 definition) {
+	protected DescribePointBinaryCompare(BinaryCompareDefinition_I32 definition) {
 		this.definition = definition;
 
 		offsets = new int[ definition.samplePoints.length ];

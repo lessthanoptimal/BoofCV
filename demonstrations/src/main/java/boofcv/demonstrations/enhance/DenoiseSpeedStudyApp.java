@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,6 @@ import java.util.Random;
 
 import static boofcv.demonstrations.enhance.DenoiseAccuracyStudyApp.TestItem;
 
-
 /**
  * Benchmarks how fast each denoising technique is
  *
@@ -43,20 +42,19 @@ public class DenoiseSpeedStudyApp {
 	int height = 480;
 
 	Random rand = new Random(2234);
-	GrayF32 image = new GrayF32(width,height);
-	GrayF32 imageDenoised = new GrayF32(width,height);
+	GrayF32 image = new GrayF32(width, height);
+	GrayF32 imageDenoised = new GrayF32(width, height);
 
-	public class RunFilter implements Performer
-	{
+	public class RunFilter implements Performer {
 		public TestItem item;
 
-		public RunFilter(TestItem item ) {
+		public RunFilter( TestItem item ) {
 			this.item = item;
 		}
 
 		@Override
 		public void process() {
-			item.filter.process(image,imageDenoised);
+			item.filter.process(image, imageDenoised);
 		}
 
 		@Override
@@ -67,40 +65,30 @@ public class DenoiseSpeedStudyApp {
 
 	public void process( List<TestItem> filters ) {
 
-		ImageMiscOps.fillUniform(image,rand,0,20);
+		ImageMiscOps.fillUniform(image, rand, 0, 20);
 
-		for( TestItem i : filters ) {
+
+		for (int i = 0; i < filters.size(); i++) {
 			System.out.print("-");
 		}
 		System.out.println();
 
-		for( TestItem i : filters ) {
+		for (TestItem i : filters) {
 			System.out.print("*");
-			i.opsPerSecond = ProfileOperation.profileOpsPerSec(new RunFilter(i),TEST_TIME, false);
+			i.opsPerSecond = ProfileOperation.profileOpsPerSec(new RunFilter(i), TEST_TIME, false);
 		}
 		System.out.println();
 
-		Collections.sort(filters,new Comparator<TestItem>(){
-			@Override
-			public int compare(TestItem o1, TestItem o2) {
-				if( o1.opsPerSecond < o2.opsPerSecond )
-					return -1;
-				else if( o1.opsPerSecond > o2.opsPerSecond )
-					return 1;
-				else
-					return 0;
-			}
-		});
+		Collections.sort(filters, Comparator.comparingDouble(o -> o.opsPerSecond));
 
-		for( TestItem i : filters ) {
-			System.out.printf("%30s  ops/sec = %6.2f\n",i.name,i.opsPerSecond);
+		for (TestItem i : filters) {
+			System.out.printf("%30s  ops/sec = %6.2f\n", i.name, i.opsPerSecond);
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DenoiseSpeedStudyApp app = new DenoiseSpeedStudyApp();
 
-		app.process(DenoiseAccuracyStudyApp.createStandard(2,4));
+		app.process(DenoiseAccuracyStudyApp.createStandard(2, 4));
 	}
-
 }

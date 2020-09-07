@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,23 +33,23 @@ public class FiducialSquareGenerator {
 	FiducialRenderEngine renderer;
 
 	// length of the white border surrounding the fiducial
-	double whiteBorderDoc =0;
+	double whiteBorderDoc = 0;
 	// length of the black border
-	double blackBorder=0.25;
+	double blackBorder = 0.25;
 
 	// size of marker in document units
-	double markerWidth=0;
+	double markerWidth = 0;
 
-	public FiducialSquareGenerator(FiducialRenderEngine renderer) {
+	public FiducialSquareGenerator( FiducialRenderEngine renderer ) {
 		this.renderer = renderer;
 	}
 
-	public void generate(GrayU8 image ) {
+	public void generate( GrayU8 image ) {
 		renderer.init();
 
 		// make sure the image is square and divisible by 8
 		int s = image.width - (image.width%8);
-		if( image.width != s || image.height != s ) {
+		if (image.width != s || image.height != s) {
 			GrayU8 tmp = new GrayU8(s, s);
 			new FDistort(image, tmp).scaleExt().apply();
 			image = tmp;
@@ -57,30 +57,30 @@ public class FiducialSquareGenerator {
 
 		GrayU8 binary = ThresholdImageOps.threshold(image, null, 125, false);
 
-		PixelMath.multiply(binary,255,binary);
+		PixelMath.multiply(binary, 255, binary);
 
-		double whiteBorder = whiteBorderDoc /markerWidth;
-		double X0 = whiteBorder+blackBorder;
-		double Y0 = whiteBorder+blackBorder;
+		double whiteBorder = whiteBorderDoc/markerWidth;
+		double X0 = whiteBorder + blackBorder;
+		double Y0 = whiteBorder + blackBorder;
 
 		drawBorder();
 
 		// Draw the image inside
-		draw(image,X0,Y0,1.0-X0,1.0-Y0);
+		draw(image, X0, Y0, 1.0 - X0, 1.0 - Y0);
 	}
 
 	void drawBorder() {
-		double whiteBorder = whiteBorderDoc /markerWidth;
-		double X0 = whiteBorder+blackBorder;
-		double Y0 = whiteBorder+blackBorder;
+		double whiteBorder = whiteBorderDoc/markerWidth;
+		double X0 = whiteBorder + blackBorder;
+		double Y0 = whiteBorder + blackBorder;
 
 		// top and bottom
-		rectangle(whiteBorder,whiteBorder,1.0-whiteBorder,Y0);
-		rectangle(whiteBorder,1.0-Y0,1.0-whiteBorder,1.0-whiteBorder);
+		rectangle(whiteBorder, whiteBorder, 1.0 - whiteBorder, Y0);
+		rectangle(whiteBorder, 1.0 - Y0, 1.0 - whiteBorder, 1.0 - whiteBorder);
 
 		// left and right sides
-		rectangle(whiteBorder,Y0,X0,1.0-Y0);
-		rectangle(1.0-X0,Y0,1.0-whiteBorder,1.0-Y0);
+		rectangle(whiteBorder, Y0, X0, 1.0 - Y0);
+		rectangle(1.0 - X0, Y0, 1.0 - whiteBorder, 1.0 - Y0);
 	}
 
 	/**
@@ -89,24 +89,24 @@ public class FiducialSquareGenerator {
 	 * @param value Value encoded in the fiducial
 	 * @param gridWidth number of cells wide the grid is
 	 */
-	public void generate( long value , int gridWidth ) {
+	public void generate( long value, int gridWidth ) {
 		renderer.init();
 
 		drawBorder();
 
-		double whiteBorder = whiteBorderDoc /markerWidth;
-		double X0 = whiteBorder+blackBorder;
-		double Y0 = whiteBorder+blackBorder;
+		double whiteBorder = whiteBorderDoc/markerWidth;
+		double X0 = whiteBorder + blackBorder;
+//		double Y0 = whiteBorder+blackBorder;
 
-		double bw = (1.0-2*X0)/gridWidth;
+		double bw = (1.0 - 2*X0)/gridWidth;
 
 		// Draw the black corner used to ID the orientation
-		square(X0,1.0-whiteBorder-blackBorder-bw,bw);
+		square(X0, 1.0 - whiteBorder - blackBorder - bw, bw);
 
 		final int bitCount = gridWidth*gridWidth - 4;
 		for (int j = 0; j < bitCount; j++) {
-			if( (value & (1L<<j)) != 0 ) {
-				box(bw,j,gridWidth);
+			if ((value & (1L << j)) != 0) {
+				box(bw, j, gridWidth);
 			}
 		}
 
@@ -132,41 +132,41 @@ public class FiducialSquareGenerator {
 //		ImageMiscOps.fillRectangle(ret,0xFF,s5,s2,square,square);
 	}
 
-	private void box( double boxWidth , final int bit , int gridWidth) {
+	private void box( double boxWidth, final int bit, int gridWidth ) {
 
-		double whiteBorder = whiteBorderDoc /markerWidth;
-		double X0 = whiteBorder+blackBorder;
-		double Y0 = whiteBorder+blackBorder;
+		double whiteBorder = whiteBorderDoc/markerWidth;
+		double X0 = whiteBorder + blackBorder;
+		double Y0 = whiteBorder + blackBorder;
 
-		int transitionBit0 = gridWidth-3;
-		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
-		int transitionBit2 = transitionBit1 + gridWidth-2;
+		int transitionBit0 = gridWidth - 3;
+		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth - 2);
+		int transitionBit2 = transitionBit1 + gridWidth - 2;
 
 		final int adjustedBit;
-		if( bit <= transitionBit0 )
+		if (bit <= transitionBit0)
 			adjustedBit = bit + 1;
-		else if( bit <= transitionBit1 )
+		else if (bit <= transitionBit1)
 			adjustedBit = bit + 2;
-		else if( bit <= transitionBit2 )
+		else if (bit <= transitionBit2)
 			adjustedBit = bit + 3;
 		else
 			throw new RuntimeException("Bit must be between 0 and " + transitionBit2);
 
-		int x = adjustedBit % gridWidth;
-		int y = gridWidth - (adjustedBit / gridWidth)-1;
-		square(X0+x*boxWidth,Y0+y*boxWidth,boxWidth);
+		int x = adjustedBit%gridWidth;
+		int y = gridWidth - (adjustedBit/gridWidth) - 1;
+		square(X0 + x*boxWidth, Y0 + y*boxWidth, boxWidth);
 	}
 
-	private void draw(GrayU8 image , double x0 , double y0 , double x1 , double y1) {
-		renderer.draw(image,U(x0),U(y0),U(x1),U(y1));
+	private void draw( GrayU8 image, double x0, double y0, double x1, double y1 ) {
+		renderer.draw(image, U(x0), U(y0), U(x1), U(y1));
 	}
 
-	private void rectangle(double x0 , double y0 , double x1 , double y1) {
-		renderer.rectangle(U(x0),U(y0),U(x1),U(y1));
+	private void rectangle( double x0, double y0, double x1, double y1 ) {
+		renderer.rectangle(U(x0), U(y0), U(x1), U(y1));
 	}
 
-	private void square(double x0 , double y0 , double width ) {
-		renderer.square(U(x0),U(y0),U(width));
+	private void square( double x0, double y0, double width ) {
+		renderer.square(U(x0), U(y0), U(width));
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class FiducialSquareGenerator {
 	/**
 	 * Specify white border in pixels
 	 */
-	public void setWhiteBorderDoc(double whiteBorder) {
+	public void setWhiteBorderDoc( double whiteBorder ) {
 		this.whiteBorderDoc = whiteBorder;
 	}
 
@@ -191,17 +191,15 @@ public class FiducialSquareGenerator {
 		return blackBorder;
 	}
 
-	public void setBlackBorder(double blackBorder) {
+	public void setBlackBorder( double blackBorder ) {
 		this.blackBorder = blackBorder;
 	}
 
-	public void setMarkerWidth(double markerWidth) {
+	public void setMarkerWidth( double markerWidth ) {
 		this.markerWidth = markerWidth;
 	}
 
 	public double getMarkerWidth() {
 		return markerWidth;
 	}
-
-
 }

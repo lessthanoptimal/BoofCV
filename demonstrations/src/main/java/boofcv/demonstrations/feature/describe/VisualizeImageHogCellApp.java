@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 
 	BufferedImage work;
 
-	Object lock = new Object();
+	final Object lock = new Object();
 
 	ControlHogCellPanel control = new ControlHogCellPanel(this);
 

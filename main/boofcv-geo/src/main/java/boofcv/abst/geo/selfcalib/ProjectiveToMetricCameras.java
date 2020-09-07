@@ -38,7 +38,7 @@ public interface ProjectiveToMetricCameras {
 	 * @param views (Input) List of projective camera matrices. First view is P=[I|0] implicitly and is not included
 	 * @param observations (Input) Observations of common features among all the views. Observations are in pixels.
 	 *                     some implementations might require the pixel observations be offset by the principle point.
-	 * @param results (Output) Storage for found metric upgrade
+	 * @param results (Output) Storage for found metric upgrade. Translations are scaled automatically to be close to 1.0.
 	 * @return true if successful or false if it failed
 	 */
 	boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views, List<AssociatedTuple> observations,

@@ -31,8 +31,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>>
-{
+public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>> {
 	Random rand = BoofTesting.createRandom(0);
 	int width = 25;
 	int height = 20;
@@ -43,16 +42,15 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 	ImageType<T> imageType;
 	DisparityError errorType;
 
-
-	public CompareSparseToDenseDisparityChecks(DisparityError errorType , ImageType<T> imageType ) {
+	protected CompareSparseToDenseDisparityChecks( DisparityError errorType, ImageType<T> imageType ) {
 		this.errorType = errorType;
 		this.imageType = imageType;
 
-		left = imageType.createImage(width,height);
-		right = imageType.createImage(width,height);
+		left = imageType.createImage(width, height);
+		right = imageType.createImage(width, height);
 
-		GImageMiscOps.fillUniform(left,rand,0,200);
-		GImageMiscOps.fillUniform(right,rand,0,200);
+		GImageMiscOps.fillUniform(left, rand, 0, 200);
+		GImageMiscOps.fillUniform(right, rand, 0, 200);
 	}
 
 	private ConfigDisparityBM createConfig() {
@@ -65,12 +63,12 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		return config;
 	}
 
-	public <D extends ImageGray<D>> StereoDisparity<T,D> createDense( ConfigDisparityBM config ) {
-		return FactoryStereoDisparity.blockMatch(config,imageType.getImageClass(),(Class)(config.subpixel? GrayF32.class : GrayU8.class));
+	public <D extends ImageGray<D>> StereoDisparity<T, D> createDense( ConfigDisparityBM config ) {
+		return FactoryStereoDisparity.blockMatch(config, imageType.getImageClass(), (Class)(config.subpixel ? GrayF32.class : GrayU8.class));
 	}
 
 	public StereoDisparitySparse<T> createSparse( ConfigDisparityBM config ) {
-		return FactoryStereoDisparity.sparseRectifiedBM(config,imageType.getImageClass());
+		return FactoryStereoDisparity.sparseRectifiedBM(config, imageType.getImageClass());
 	}
 
 	@Test
@@ -98,7 +96,7 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		config.disparityRange = 12;
 
 		// go through several different tolerances for this validation
-		for( int tol : new int[]{-1,0,1,5} ) {
+		for (int tol : new int[]{-1, 0, 1, 5}) {
 			config.validateRtoL = tol;
 			config.subpixel = true;
 			compareResults(config);
@@ -131,20 +129,20 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 
 	public <D extends ImageGray<D>>
 	void compareResults( ConfigDisparityBM config ) {
-		StereoDisparity<T,D> dense = createDense(config);
+		StereoDisparity<T, D> dense = createDense(config);
 		StereoDisparitySparse<T> sparse = createSparse(config);
 
-		dense.process(left,right);
+		dense.process(left, right);
 		D expected = dense.getDisparity();
 
-		sparse.setImages(left,right);
-		var found = new GrayF64(left.width,left.height);
+		sparse.setImages(left, right);
+		var found = new GrayF64(left.width, left.height);
 		for (int y = 0; y < left.height; y++) {
 			for (int x = 0; x < left.width; x++) {
-				if( sparse.process(x,y) ) {
-					found.set(x,y,sparse.getDisparity()-config.disparityMin);
+				if (sparse.process(x, y)) {
+					found.set(x, y, sparse.getDisparity() - config.disparityMin);
 				} else {
-					found.set(x,y,config.disparityRange);
+					found.set(x, y, config.disparityRange);
 				}
 			}
 		}
@@ -154,8 +152,6 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 //		System.out.println("--------------- Found");
 //		found.print();
 
-		BoofTesting.assertEquals(expected,found,1e-4);
+		BoofTesting.assertEquals(expected, found, 1e-4);
 	}
-
-
 }

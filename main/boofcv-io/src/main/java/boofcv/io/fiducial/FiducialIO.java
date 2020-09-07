@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import static boofcv.io.calibration.CalibrationIO.createYmlObject;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * File IO for fiducials. Typically these functions are used to read definition files.
@@ -44,7 +45,7 @@ public class FiducialIO {
 	 */
 	public static void saveRandomDotYaml(RandomDotDefinition definition, File file ) {
 		try {
-			Writer writer = new FileWriter(file);
+			Writer writer = new OutputStreamWriter(new FileOutputStream(file), UTF_8);
 			saveRandomDotYaml(definition,writer);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -94,7 +95,7 @@ public class FiducialIO {
 
 	public static RandomDotDefinition loadRandomDotYaml(URL url) {
 		try {
-			InputStreamReader reader = new InputStreamReader(url.openStream());
+			InputStreamReader reader = new InputStreamReader(url.openStream(),UTF_8);
 			RandomDotDefinition ret = loadRandomDotYaml(reader);
 			reader.close();
 			return ret;

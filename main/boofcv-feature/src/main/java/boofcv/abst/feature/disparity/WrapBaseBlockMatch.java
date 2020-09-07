@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 
 	DI disparity;
 
-	public WrapBaseBlockMatch(DisparityBlockMatchRowFormat<T,DI> alg) {
+	protected WrapBaseBlockMatch(DisparityBlockMatchRowFormat<T,DI> alg) {
 		this.alg = alg;
 	}
 

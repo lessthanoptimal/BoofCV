@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.alg.interpolate;
-
 
 import boofcv.alg.interpolate.array.PolynomialNevilleFixed_F32;
 import boofcv.struct.border.ImageBorder;
@@ -48,8 +47,8 @@ public abstract class PolynomialPixel<T extends ImageGray<T>> implements Interpo
 	protected int offM;
 
 	// temporary arrays used in the interpolation
-	protected float horiz[];
-	protected float vert[];
+	protected float[] horiz;
+	protected float[] vert;
 
 	// the minimum and maximum pixel intensity values allowed
 	protected float min;
@@ -57,14 +56,14 @@ public abstract class PolynomialPixel<T extends ImageGray<T>> implements Interpo
 
 	protected PolynomialNevilleFixed_F32 interp1D;
 
-	public PolynomialPixel(int maxDegree, float min, float max) {
+	protected PolynomialPixel( int maxDegree, float min, float max ) {
 		this.M = maxDegree;
 		this.min = min;
 		this.max = max;
 		horiz = new float[maxDegree];
 		vert = new float[maxDegree];
 
-		if( maxDegree % 2 == 0 ) {
+		if (maxDegree%2 == 0) {
 			offM = 1;
 		} else {
 			offM = 0;
@@ -74,13 +73,13 @@ public abstract class PolynomialPixel<T extends ImageGray<T>> implements Interpo
 	}
 
 	@Override
-	public void setBorder(ImageBorder<T> border) {
+	public void setBorder( ImageBorder<T> border ) {
 		this.border = border;
 	}
 
 	@Override
-	public void setImage(T image) {
-		if( border != null )
+	public void setImage( T image ) {
+		if (border != null)
 			border.setImage(image);
 		this.image = image;
 	}
@@ -91,13 +90,13 @@ public abstract class PolynomialPixel<T extends ImageGray<T>> implements Interpo
 	}
 
 	@Override
-	public boolean isInFastBounds(float x, float y) {
+	public boolean isInFastBounds( float x, float y ) {
 		float x0 = x - M/2 + offM;
 		float x1 = x0 + M;
 		float y0 = y - M/2 + offM;
 		float y1 = y0 + M;
 
-		return (x0 >= 0 && y0 >= 0 && x1 <= image.width-1 && y1 <= image.height-1 );
+		return (x0 >= 0 && y0 >= 0 && x1 <= image.width - 1 && y1 <= image.height - 1);
 	}
 
 	@Override

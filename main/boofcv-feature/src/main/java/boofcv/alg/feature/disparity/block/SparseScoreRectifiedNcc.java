@@ -37,6 +37,7 @@ import org.ejml.UtilEjml;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"MissingOverride"})
 public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySparseRectifiedScoreBM<float[],T>
 {
 	// Storage for temporary images used to compute local mean and stdev

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,19 +34,18 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 
 	private double tol = GrlConstants.DCONV_TOL_A;
 
-	public RemoveBrownNtoN_F64() {
-	}
+	public RemoveBrownNtoN_F64() {}
 
-	public RemoveBrownNtoN_F64(double tol) {
+	public RemoveBrownNtoN_F64( double tol ) {
 		this.tol = tol;
 	}
 
-	public void setTolerance(double tol) {
+	public void setTolerance( double tol ) {
 		this.tol = tol;
 	}
 
 	public RemoveBrownNtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
-		params = new RadialTangential_F64(radial,t1,t2);
+		params = new RadialTangential_F64(radial, t1, t2);
 		return this;
 	}
 
@@ -58,9 +57,8 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 	 * @param out Undistorted normalized coordinate.
 	 */
 	@Override
-	public void compute(double x, double y, Point2D_F64 out)
-	{
-		removeRadial(x, y, params.radial, params.t1, params.t2, out, tol );
+	public void compute( double x, double y, Point2D_F64 out ) {
+		removeRadial(x, y, params.radial, params.t1, params.t2, out, tol);
 	}
 
 	@Override
@@ -82,21 +80,21 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 	 * @param out Undistorted normalized image coordinate
 	 * @param tol convergence tolerance
 	 */
-	public static void removeRadial(double x, double y, double[] radial, double t1, double t2,
-									Point2D_F64 out, double tol ) {
+	public static void removeRadial( double x, double y, double[] radial, double t1, double t2,
+									 Point2D_F64 out, double tol ) {
 		double origX = x;
 		double origY = y;
 
 		double prevSum = 0;
 
-		for( int iter = 0; iter < 500; iter++ ) {
+		for (int iter = 0; iter < 500; iter++) {
 
 			// estimate the radial distance
 			double r2 = x*x + y*y;
 			double ri2 = r2;
 
 			double sum = 0;
-			for( int i = 0; i < radial.length; i++ ) {
+			for (int i = 0; i < radial.length; i++) {
 				sum += radial[i]*ri2;
 				ri2 *= r2;
 			}
@@ -107,12 +105,12 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 			x = (origX - tx)/(1.0 + sum);
 			y = (origY - ty)/(1.0 + sum);
 
-			if( Math.abs(prevSum-sum) <= tol ) {
+			if (Math.abs(prevSum - sum) <= tol) {
 				break;
 			} else {
 				prevSum = sum;
 			}
 		}
-		out.set(x,y);
+		out.set(x, y);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,6 +87,7 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 	 * @param input Input image
 	 * @param output Output binary image
 	 */
+	@Override
 	public void process(T input , GrayU8 output ) {
 		output.reshape(input.width,input.height);
 

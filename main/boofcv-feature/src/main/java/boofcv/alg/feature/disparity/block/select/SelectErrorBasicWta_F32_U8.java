@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,9 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class SelectErrorBasicWta_F32_U8 extends SelectDisparityBasicWta<float[],GrayU8> implements Compare_F32
-{
+public class SelectErrorBasicWta_F32_U8 extends SelectDisparityBasicWta<float[], GrayU8> implements Compare_F32 {
 	@Override
-	public void process(int row, float[] scores) {
+	public void process( int row, float[] scores ) {
 
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
@@ -43,17 +42,17 @@ public class SelectErrorBasicWta_F32_U8 extends SelectDisparityBasicWta<float[],
 		}
 
 		// Select the best disparity from all the rest
-		for( int col = disparityMin; col < imageWidth; col++ ) {
-			int localRange = disparityMaxAtColumnL2R(col)-disparityMin+1;
-			int indexScore = col-disparityMin;
+		for (int col = disparityMin; col < imageWidth; col++) {
+			int localRange = disparityMaxAtColumnL2R(col) - disparityMin + 1;
+			int indexScore = col - disparityMin;
 
 			int bestDisparity = 0;
 			float scoreBest = scores[indexScore];
 			indexScore += imageWidth;
 
-			for( int disparity = 1; disparity < localRange; disparity++ ,indexScore += imageWidth) {
+			for (int disparity = 1; disparity < localRange; disparity++, indexScore += imageWidth) {
 				float s = scores[indexScore];
-				if( s < scoreBest ) {
+				if (s < scoreBest) {
 					scoreBest = s;
 					bestDisparity = disparity;
 				}
@@ -74,7 +73,7 @@ public class SelectErrorBasicWta_F32_U8 extends SelectDisparityBasicWta<float[],
 	}
 
 	@Override
-	public int compare(float scoreA, float scoreB) {
-		return Float.compare(-scoreA,-scoreB);
+	public int compare( float scoreA, float scoreB ) {
+		return Float.compare(-scoreA, -scoreB);
 	}
 }

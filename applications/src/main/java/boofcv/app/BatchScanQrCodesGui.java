@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,23 +31,22 @@ import java.util.prefs.Preferences;
  * @author Peter Abeles
  */
 public class BatchScanQrCodesGui extends BatchProcessControlPanel
-	implements BatchControlPanel.Listener
-{
+		implements BatchControlPanel.Listener {
 	Preferences prefs = Preferences.userRoot().node(BatchScanQrCodesGui.class.getSimpleName());
 
 	JLabel labelStatus = new JLabel();
 	int count = 0;
 
 	public BatchScanQrCodesGui() {
-		labelStatus.setPreferredSize(new Dimension(300,20));
+		labelStatus.setPreferredSize(new Dimension(300, 20));
 
 		textOutputFile.setText("qrcode.txt");
 		addStandardControls(prefs);
 		addAlignCenter(labelStatus);
 
-		setPreferredSize(new Dimension(350,200));
+		setPreferredSize(new Dimension(350, 200));
 
-		ShowImages.showWindow(this,"Batch Scan QR",true);
+		ShowImages.showWindow(this, "Batch Scan QR", true);
 	}
 
 	@Override
@@ -64,18 +63,18 @@ public class BatchScanQrCodesGui extends BatchProcessControlPanel
 
 		bAction.setEnabled(false);
 
-		prefs.put(KEY_INPUT,batch.pathInput);
-		prefs.put(KEY_OUTPUT,batch.pathOutput);
-		prefs.put(KEY_RECURSIVE,batch.recursive+"");
+		prefs.put(KEY_INPUT, batch.pathInput);
+		prefs.put(KEY_OUTPUT, batch.pathOutput);
+		prefs.put(KEY_RECURSIVE, batch.recursive + "");
 
-		new Thread(()->{
+		new Thread(() -> {
 			try {
 				batch.process();
-			} catch( Exception e ) {
-				BoofSwingUtil.warningDialog(this,e);
+			} catch (Exception e) {
+				BoofSwingUtil.warningDialog(this, e);
 			} finally {
-				SwingUtilities.invokeLater(()->{
-					labelStatus.setText("Total "+count);
+				SwingUtilities.invokeLater(() -> {
+					labelStatus.setText("Total " + count);
 					bAction.setEnabled(true);
 				});
 			}
@@ -83,13 +82,14 @@ public class BatchScanQrCodesGui extends BatchProcessControlPanel
 	}
 
 	@Override
-	public void batchUpdate(String fileName) {
-		SwingUtilities.invokeLater(()->{labelStatus.setText((count++)+"  "+fileName);labelStatus.repaint();});
+	public void batchUpdate( String fileName ) {
+		SwingUtilities.invokeLater(() -> {
+			labelStatus.setText(count++ + "  " + fileName);
+			labelStatus.repaint();
+		});
 	}
 
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(()->{
-			new BatchScanQrCodesGui();
-		});
+	public static void main( String[] args ) {
+		SwingUtilities.invokeLater(BatchScanQrCodesGui::new);
 	}
 }

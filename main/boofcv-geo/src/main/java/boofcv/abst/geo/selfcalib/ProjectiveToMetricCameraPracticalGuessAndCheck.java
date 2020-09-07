@@ -73,11 +73,18 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 		PerspectiveOps.matrixToPinhole(K,-1,-1,metricViews.intrinsics.grow());
 
 		// Get the solution for the remaining cameras / views
+		double largestT = 0.0;
 		for (int viewIdx = 0; viewIdx < views.size(); viewIdx++) {
 			DMatrixRMaj P = views.get(viewIdx);
 			if( !MultiViewOps.projectiveToMetric(P,H,metricViews.motion_1_to_k.grow(),K) )
 				return false;
 			PerspectiveOps.matrixToPinhole(K,-1,-1,metricViews.intrinsics.grow());
+			largestT = Math.max(largestT,metricViews.motion_1_to_k.getTail().T.norm());
+		}
+
+		// Ensure the found motion has a scale around 1.0
+		for (int i = 0; i < metricViews.motion_1_to_k.size; i++) {
+			metricViews.motion_1_to_k.get(i).T.divide(largestT);
 		}
 
 		resolveSign.process(observations, metricViews);

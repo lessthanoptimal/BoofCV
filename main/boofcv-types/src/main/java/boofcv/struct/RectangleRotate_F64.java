@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ package boofcv.struct;
  */
 public class RectangleRotate_F64 {
 	/** Center point of rectangle */
-	public double cx,cy;
+	public double cx, cy;
 	/** Width of rectangle */
 	public double width;
 	/** height of rectangle */
@@ -42,7 +42,7 @@ public class RectangleRotate_F64 {
 	/** Angle of rotation about rectangle's center */
 	public double theta;
 
-	public RectangleRotate_F64(double cx, double cy, double width, double height, double theta) {
+	public RectangleRotate_F64( double cx, double cy, double width, double height, double theta ) {
 		this.cx = cx;
 		this.cy = cy;
 		this.width = width;
@@ -50,8 +50,7 @@ public class RectangleRotate_F64 {
 		this.theta = theta;
 	}
 
-	public RectangleRotate_F64() {
-	}
+	public RectangleRotate_F64() {}
 
 	public void set( RectangleRotate_F64 r ) {
 		this.cx = r.cx;
@@ -61,7 +60,8 @@ public class RectangleRotate_F64 {
 		this.theta = r.theta;
 	}
 
+	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"( cx = "+cx+" cy = "+cy+" width = "+width+" height = "+height+" theta = "+theta+" )";
+		return getClass().getSimpleName() + "( cx = " + cx + " cy = " + cy + " width = " + width + " height = " + height + " theta = " + theta + " )";
 	}
 }

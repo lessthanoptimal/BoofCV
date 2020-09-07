@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,19 +27,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class MmModelChanger<ModelA,ModelB,Point> implements ModelMatcher<ModelB,Point> {
+public abstract class MmModelChanger<ModelA, ModelB, Point> implements ModelMatcher<ModelB, Point> {
 
-	protected ModelMatcher<ModelA,Point> mm;
+	protected ModelMatcher<ModelA, Point> mm;
 
-	public MmModelChanger(ModelMatcher<ModelA, Point> mm) {
+	protected MmModelChanger( ModelMatcher<ModelA, Point> mm ) {
 		this.mm = mm;
 	}
 
-	public MmModelChanger() {
-	}
+	protected MmModelChanger() {}
 
 	@Override
-	public boolean process(List<Point> dataSet) {
+	public boolean process( List<Point> dataSet ) {
 		return mm.process(dataSet);
 	}
 
@@ -49,7 +48,7 @@ public abstract class MmModelChanger<ModelA,ModelB,Point> implements ModelMatche
 	}
 
 	@Override
-	public int getInputIndex(int matchIndex) {
+	public int getInputIndex( int matchIndex ) {
 		return mm.getInputIndex(matchIndex);
 	}
 

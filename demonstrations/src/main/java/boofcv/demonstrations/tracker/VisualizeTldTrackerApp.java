@@ -30,6 +30,7 @@ import boofcv.gui.tracker.TldVisualizationPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -78,7 +79,7 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 		paused = true;
 
 		while( paused ) {
-			Thread.yield();
+			BoofMiscOps.sleep(10);
 		}
 
 		int totalFrames = 0;
@@ -95,7 +96,7 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 			long after = System.nanoTime();
 
 			totalTime += after-before;
-			System.out.println("FPS = "+(totalFrames)/(totalTime/2e9));
+			System.out.println("FPS = "+ totalFrames/(totalTime/2e9));
 
 			gui.update(tracker,success);
 
@@ -108,7 +109,7 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 			gui.repaint();
 
 			while( paused ) {
-				Thread.yield();
+				BoofMiscOps.sleep(10);
 			}
 		}
 		System.out.println("DONE");

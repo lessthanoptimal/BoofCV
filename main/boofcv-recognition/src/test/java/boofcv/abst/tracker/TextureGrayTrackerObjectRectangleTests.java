@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import java.util.Random;
  */
 public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrackerObjectRectangleTests<GrayU8> {
 
-	public TextureGrayTrackerObjectRectangleTests() {
+	protected TextureGrayTrackerObjectRectangleTests() {
 		super(new ImageType<GrayU8>(ImageType.Family.GRAY, ImageDataType.U8,1));
 
 		input = new GrayU8(width,height);

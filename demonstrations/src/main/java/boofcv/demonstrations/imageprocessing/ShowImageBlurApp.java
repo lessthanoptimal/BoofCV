@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,7 +128,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 		});
 	}
 
-	private class MyMonitor extends ProgressMonitorThread {
+	private static class MyMonitor extends ProgressMonitorThread {
 
 		protected MyMonitor( Component comp , String message ) {
 			super( new ProgressMonitor(comp,

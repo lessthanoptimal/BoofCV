@@ -41,6 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestRefineMetricWorkingGraph {
+	public CameraPinhole intrinsic = new CameraPinhole(400, 400, 0, 400, 350, 800, 700);
+	public CameraPinhole intrinsicZ = new CameraPinhole(400, 400, 0, 0, 0, 800, 700);
+
 	/**
 	 * Run everything together with and without noise
 	 */
@@ -53,11 +56,12 @@ class TestRefineMetricWorkingGraph {
 	void process_perfect( boolean addNoise ) {
 		var db = new MockLookupSimilarImagesRealistic().
 				setFeatures(500).
-				setIntrinsic(new CameraPinhole(400, 400, 0, 0, 0, 800, 800)).
+				setIntrinsic(intrinsic).
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
 		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
 		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(0));
@@ -125,11 +129,12 @@ class TestRefineMetricWorkingGraph {
 	void process_CallMultipleTimes() {
 		var db = new MockLookupSimilarImagesRealistic().
 				setFeatures(500).
-				setIntrinsic(new CameraPinhole(400, 400, 0, 0, 0, 800, 800)).
+				setIntrinsic(intrinsic).
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
 		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
 		graph.viewList.get(0).inliers.views.add(pairwise.nodes.get(0));
@@ -162,6 +167,7 @@ class TestRefineMetricWorkingGraph {
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
 		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		// create an inlier set composed of observations from 3 views
 		var inliers = new SceneWorkingGraph.InlierInfo();
@@ -204,6 +210,7 @@ class TestRefineMetricWorkingGraph {
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
 		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		var alg = new RefineMetricWorkingGraph() {
 			// Override so that it can return an error for which all should be accepted or rejected
@@ -214,6 +221,7 @@ class TestRefineMetricWorkingGraph {
 				return error + (shouldReject ? 0.001 : -0.001);
 			}
 		};
+		alg.maxReprojectionErrorPixel = 10;
 		alg.initializeDataStructures(db, graph);
 		alg.bundleAdjustment.structure.points.resize(20);
 
@@ -282,6 +290,7 @@ class TestRefineMetricWorkingGraph {
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
 		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		var alg = new RefineMetricWorkingGraph();
 		alg.initializeDataStructures(db, graph);

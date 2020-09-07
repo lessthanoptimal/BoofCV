@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,6 +77,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	 * @param input Input image
 	 * @param output Output binary image
 	 */
+	@Override
 	public void process(GrayU8 input , GrayU8 output ) {
 		output.reshape(input.width,input.height);
 

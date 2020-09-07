@@ -3,3 +3,19 @@ dependencies {
     api group: 'commons-io', name: 'commons-io', version: COMMONS_IO_VERSION
 }
 
+createVersionFile.enabled = true
+
+gversion {
+    srcDir = "../boofcv-types/src/main/java"
+    classPackage = "boofcv"
+    className = "BoofVersion"
+    debug = true
+}
+
+task(autogenerate, dependsOn: 'classes', type: JavaExec) {
+    main = 'boofcv.AutocodeMasterApp'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+// Create the version file when autogenerate runs
+project.autogenerate.dependsOn(project.createVersionFile)

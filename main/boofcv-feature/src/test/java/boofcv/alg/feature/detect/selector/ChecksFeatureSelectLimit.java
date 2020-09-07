@@ -35,8 +35,8 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 
 	Random rand = BoofTesting.createRandom(0);
 
-	int width=30;
-	int height=20;
+	int width = 30;
+	int height = 20;
 
 	public abstract FeatureSelectLimit<Point> createAlgorithm();
 
@@ -53,7 +53,7 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
-			alg.select(width,height,null,detected,30,found);
+			alg.select(width, height, null, detected, 30, found);
 
 			// partial check to make sure the input wasn't modified
 			assertEquals(15, detected.size);
@@ -79,7 +79,7 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 
 		for (int count = 0; count < 2; count++) {
 			FastQueue<Point> detected = createRandom(30);
-			alg.select(width,height,prior,detected,22,found);
+			alg.select(width, height, prior, detected, 22, found);
 
 			// partial check to make sure the input wasn't modified
 			assertEquals(20, prior.size);
@@ -103,13 +103,13 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 		FeatureSelectLimit<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
 
-		alg.select(width,height,prior,createRandom(15),30,found);
-		alg.select(width,height,prior,createRandom(15),10,found);
-		alg.select(width,height,null,createRandom(15),30,found);
-		alg.select(width,height,null,createRandom(15),10,found);
+		alg.select(width, height, prior, createRandom(15), 30, found);
+		alg.select(width, height, prior, createRandom(15), 10, found);
+		alg.select(width, height, null, createRandom(15), 30, found);
+		alg.select(width, height, null, createRandom(15), 10, found);
 	}
 
-	protected abstract FastQueue<Point> createRandom(int i2);
+	protected abstract FastQueue<Point> createRandom( int i2 );
 
 	public static abstract class I16 extends ChecksFeatureSelectLimit<Point2D_I16> {
 		@Override
@@ -118,7 +118,7 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 		}
 
 		@Override
-		protected FastQueue<Point2D_I16> createRandom(int i2) {
+		protected FastQueue<Point2D_I16> createRandom( int i2 ) {
 			FastQueue<Point2D_I16> detected = new FastQueue<>(Point2D_I16::new);
 			for (int i = 0; i < i2; i++) {
 				detected.grow().set(rand.nextInt(width), rand.nextInt(height));
@@ -126,5 +126,4 @@ public abstract class ChecksFeatureSelectLimit<Point> {
 			return detected;
 		}
 	}
-
 }

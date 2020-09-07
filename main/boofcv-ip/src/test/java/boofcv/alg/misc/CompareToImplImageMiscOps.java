@@ -39,12 +39,13 @@ import java.util.Random;
  */
 public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunctions {
 
-	private Random rand = new Random(234);
+	private final Random rand = new Random(234);
 
-	private int width,height;
-	private int numBands = 3;
+	private final int width;
+	private final int height;
+//	private int numBands = 3;
 
-	protected CompareToImplImageMiscOps(Class testClass , int width , int height ) {
+	protected CompareToImplImageMiscOps( Class testClass, int width, int height ) {
 		super(testClass, ImplImageMiscOps.class);
 		this.width = width;
 		this.height = height;
@@ -56,21 +57,21 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 	}
 
 	@Override
-	protected boolean isTestMethod(Method m) {
-		if( !super.isTestMethod(m) )
+	protected boolean isTestMethod( Method m ) {
+		if (!super.isTestMethod(m))
 			return false;
 
 		return true;
 	}
 
 	@Override
-	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		Object[] ret = super.reformatForValidation(m,targetParam);
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
+		Object[] ret = super.reformatForValidation(m, targetParam);
 
-		for( int i = 0; i < targetParam.length; i++ ) {
-			if( ret[i] == null )
+		for (int i = 0; i < targetParam.length; i++) {
+			if (ret[i] == null)
 				continue;
-			if( Random.class.isAssignableFrom(targetParam[i].getClass()) ) {
+			if (Random.class.isAssignableFrom(targetParam[i].getClass())) {
 				ret[i] = new Random(345);
 			}
 		}
@@ -79,7 +80,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 
 //		System.out.println(candidate.getName()+" "+candidate.getParameterTypes().length);
 
@@ -89,13 +90,13 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 		Object[][] output = new Object[1][types.length];
 		ImageType imageType = null;
 		for (int i = 0; i < types.length; i++) {
-			if( ImageBase.class.isAssignableFrom(types[i])) {
-				output[0][i] = GeneralizedImageOps.createImage(types[i],width,height,2);
-				GImageMiscOps.fillUniform((ImageBase)output[0][i],rand,0,100);
+			if (ImageBase.class.isAssignableFrom(types[i])) {
+				output[0][i] = GeneralizedImageOps.createImage(types[i], width, height, 2);
+				GImageMiscOps.fillUniform((ImageBase)output[0][i], rand, 0, 100);
 				imageType = ((ImageBase)output[0][i]).getImageType();
-			} else if( ImageBorder.class.isAssignableFrom(types[i])) {
-				output[0][i] = FactoryImageBorder.generic(BorderType.EXTENDED,imageType);
-			} else if( Random.class.isAssignableFrom(types[i])) {
+			} else if (ImageBorder.class.isAssignableFrom(types[i])) {
+				output[0][i] = FactoryImageBorder.generic(BorderType.EXTENDED, imageType);
+			} else if (Random.class.isAssignableFrom(types[i])) {
 				output[0][i] = new Random(345);
 			}
 		}
@@ -104,17 +105,17 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 		switch( candidate.getName() ) {
 			case "copy":p[0] = 1;p[1] = 2;p[2] = 1;p[3] = 2;p[4] = width-1;p[5] = height-2; break;
 			case "fill":
-				if( !types[1].isArray() )
-					p[1] = BoofTesting.primitive(2,types[1]);
+				if (!types[1].isArray())
+					p[1] = BoofTesting.primitive(2, types[1]);
 				else
-					p[1] = BoofTesting.randomArray(types[1],2,rand);
+					p[1] = BoofTesting.randomArray(types[1], 2, rand);
 				break;
 			case "fillBand":p[1]=0;p[2]=BoofTesting.primitive(8,types[1]);break;
 			case "insertBand":p[1]=0;break;
 			case "extractBand":p[1]=0;break;
 			case "fillBorder":
-				p[1]=BoofTesting.primitive(2,types[1]);
-				if( types.length == 3 ) {
+				p[1] = BoofTesting.primitive(2, types[1]);
+				if (types.length == 3) {
 					p[2] = 4;
 				} else {
 					p[2] = 1;p[3] = 2;p[4] = 3;p[5] = 4;
@@ -130,10 +131,10 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 				break;
 			case "rotateCW":
 			case "rotateCCW":
-				if( p.length == 1 )
-					((ImageBase)p[0]).reshape(width,width);
+				if (p.length == 1)
+					((ImageBase)p[0]).reshape(width, width);
 				else
-					((ImageBase)p[1]).reshape(height,width);
+					((ImageBase)p[1]).reshape(height, width);
 				break;
 			case "growBorder":
 				((ImageBase)p[6]).reshape(width+4,height+6);
@@ -145,7 +146,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 				break;
 
 			default:
-				throw new RuntimeException("Implement "+candidate.getName());
+				throw new RuntimeException("Implement " + candidate.getName());
 		}
 		return output;
 	}

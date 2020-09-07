@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,71 +27,70 @@ package boofcv.struct.image;
  */
 public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 
-	public byte data[];
+	public byte[] data;
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
-	 * @param width  number of columns in the image.
+	 * @param width number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public GrayI8(int width, int height) {
+	protected GrayI8( int width, int height ) {
 		super(width, height);
 	}
 
-	public GrayI8() {
-	}
+	protected GrayI8() {}
 
 	/**
 	 * Create a copy from the two array. input[y][x]
 	 */
-	public GrayI8( byte[][] input ) {
+	protected GrayI8( byte[][] input ) {
 		this.height = input.length;
-		if( height == 0 ) {
+		if (height == 0) {
 			width = 0;
 		} else {
 			width = input[0].length;
 		}
 
-		initialize(width,height);
+		initialize(width, height);
 
 		for (int y = 0; y < height; y++) {
-			if( input[y].length != width )
+			if (input[y].length != width)
 				throw new IllegalArgumentException("rows must have constant length");
-			System.arraycopy(input[y],0,data,y*width,width);
+			System.arraycopy(input[y], 0, data, y*width, width);
 		}
 	}
 
 	/**
 	 * Sets the value of the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
 	@Override
-	public void set(int x, int y, int value) {
+	public void set( int x, int y, int value ) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
+			throw new ImageAccessException("Requested pixel is out of bounds: " + x + " " + y);
 
-		data[getIndex(x, y)] = (byte) value;
+		data[getIndex(x, y)] = (byte)value;
 	}
 
 	@Override
-	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		byte[] dst = (byte[])array;
 		int idxSrc = startIndex + stride*row0 + col;
 		int idxDst = offset;
-		int end = idxSrc + (row1-row0)*stride;
-		while( idxSrc < end ) {
+		int end = idxSrc + (row1 - row0)*stride;
+		while (idxSrc < end) {
 			dst[idxDst++] = data[idxSrc];
 			idxSrc += stride;
 		}
 	}
 
 	@Override
-	public void unsafe_set(int x, int y, int value) {
-		data[getIndex(x,y)] = (byte)value;
+	public void unsafe_set( int x, int y, int value ) {
+		data[getIndex(x, y)] = (byte)value;
 	}
 
 	@Override
@@ -100,8 +99,8 @@ public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 	}
 
 	@Override
-	protected void _setData(Object data) {
-		this.data = (byte[]) data;
+	protected void _setData( Object data ) {
+		this.data = (byte[])data;
 	}
 
 	@Override
@@ -113,7 +112,7 @@ public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 		return data;
 	}
 
-	public void setData(byte[] data) {
+	public void setData( byte[] data ) {
 		this.data = data;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
-import boofcv.struct.calib.CameraModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,9 +81,8 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 			return false;
 		}
 
-		CameraModel model;
 		try {
-			model = CalibrationIO.load(pathIntrinsic);
+			CalibrationIO.load(pathIntrinsic);
 		} catch( RuntimeException e ) {
 			e.printStackTrace();
 			BoofSwingUtil.warningDialog(this,e);
@@ -175,20 +173,12 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 				boolean rename = checkRename.isSelected();
 				boolean recursive = checkRecursive.isSelected();
 
-				AdjustmentType adjustment;
-				switch (comboResize.getSelectedIndex()) {
-					case 0:
-						adjustment = AdjustmentType.NONE;
-						break;
-					case 1:
-						adjustment = AdjustmentType.FULL_VIEW;
-						break;
-					case 2:
-						adjustment = AdjustmentType.EXPAND;
-						break;
-					default:
-						throw new RuntimeException("Unknown");
-				}
+				AdjustmentType adjustment = switch (comboResize.getSelectedIndex()) {
+					case 0 -> AdjustmentType.NONE;
+					case 1 -> AdjustmentType.FULL_VIEW;
+					case 2 -> AdjustmentType.EXPAND;
+					default -> throw new RuntimeException("Unknown");
+				};
 
 				System.out.println("before spawn");
 				spawn(pathIntrinsic, pathInput, pathOutput, regex, rename, recursive, adjustment);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,29 +26,27 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
-
 /**
  * Generic implementation which uses reflections to call derivative functions
  *
  * @author Peter Abeles
  */
 public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
-		implements ImageGradient<Input, Output>
-{
+		implements ImageGradient<Input, Output> {
 	// How the image border should be handled
 	BorderType borderType = BoofDefaults.DERIV_BORDER_TYPE;
 	ImageBorder<Input> border;
 	Class<Input> inputType;
 	Class<Output> derivType;
 
-	public ImageGradient_SB(Class<Input> inputType , Class<Output> derivType ) {
+	protected ImageGradient_SB( Class<Input> inputType, Class<Output> derivType ) {
 		this.inputType = inputType;
 		this.derivType = derivType;
 		setBorderType(borderType);
 	}
 
 	@Override
-	public void setBorderType(BorderType type) {
+	public void setBorderType( BorderType type ) {
 		this.borderType = type;
 		border = FactoryImageBorder.single(borderType, inputType);
 	}
@@ -60,7 +58,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 
 	@Override
 	public int getBorder() {
-		if( borderType != BorderType.SKIP)
+		if (borderType != BorderType.SKIP)
 			return 0;
 		else
 			return 1;
@@ -76,53 +74,48 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 		return ImageType.single(derivType);
 	}
 
-	public static class Sobel<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T,D>
-	{
-		public Sobel(Class<T> inputType, Class<D> derivType) { super(inputType, derivType); }
+	public static class Sobel<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
+		public Sobel( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
 
 		@Override
-		public void process(T inputImage, D derivX, D derivY) {
-			GradientSobel.process(inputImage,derivX,derivY,border);
+		public void process( T inputImage, D derivX, D derivY ) {
+			GradientSobel.process(inputImage, derivX, derivY, border);
 		}
 	}
 
-	public static class Prewitt<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T,D>
-	{
-		public Prewitt(Class<T> inputType, Class<D> derivType) { super(inputType, derivType); }
+	public static class Prewitt<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
+		public Prewitt( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
 
 		@Override
-		public void process(T inputImage, D derivX, D derivY) {
-			GradientPrewitt.process(inputImage,derivX,derivY,border);
+		public void process( T inputImage, D derivX, D derivY ) {
+			GradientPrewitt.process(inputImage, derivX, derivY, border);
 		}
 	}
 
-	public static class Three<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T,D>
-	{
-		public Three(Class<T> inputType, Class<D> derivType) { super(inputType, derivType); }
+	public static class Three<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
+		public Three( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
 
 		@Override
-		public void process(T inputImage, D derivX, D derivY) {
-			GradientThree.process(inputImage,derivX,derivY,border);
+		public void process( T inputImage, D derivX, D derivY ) {
+			GradientThree.process(inputImage, derivX, derivY, border);
 		}
 	}
 
-	public static class Two0<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T,D>
-	{
-		public Two0(Class<T> inputType, Class<D> derivType) { super(inputType, derivType); }
+	public static class Two0<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
+		public Two0( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
 
 		@Override
-		public void process(T inputImage, D derivX, D derivY) {
-			GradientTwo0.process(inputImage,derivX,derivY,border);
+		public void process( T inputImage, D derivX, D derivY ) {
+			GradientTwo0.process(inputImage, derivX, derivY, border);
 		}
 	}
 
-	public static class Two1<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T,D>
-	{
-		public Two1(Class<T> inputType, Class<D> derivType) { super(inputType, derivType); }
+	public static class Two1<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
+		public Two1( Class<T> inputType, Class<D> derivType ) { super(inputType, derivType); }
 
 		@Override
-		public void process(T inputImage, D derivX, D derivY) {
-			GradientTwo1.process(inputImage,derivX,derivY,border);
+		public void process( T inputImage, D derivX, D derivY ) {
+			GradientTwo1.process(inputImage, derivX, derivY, border);
 		}
 	}
 }

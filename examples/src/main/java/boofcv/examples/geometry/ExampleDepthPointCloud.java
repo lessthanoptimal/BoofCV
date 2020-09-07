@@ -27,7 +27,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
@@ -39,7 +38,6 @@ import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 /**
  * Example of how to create a point cloud from a RGB-D (Kinect) sensor.  Data is loaded from two files, one for the
@@ -49,7 +47,7 @@ import java.io.IOException;
  */
 public class ExampleDepthPointCloud {
 
-	public static void main( String args[] ) throws IOException {
+	public static void main( String[] args ) {
 		String nameRgb = UtilIO.pathExample("kinect/basket/basket_rgb.png");
 		String nameDepth = UtilIO.pathExample("kinect/basket/basket_depth.png");
 		String nameCalib = UtilIO.pathExample("kinect/basket/visualdepth.yaml");
@@ -58,11 +56,10 @@ public class ExampleDepthPointCloud {
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
 		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered,null,true,GrayU8.class);
-		GrayU16 depth =
-				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
+		GrayU16 depth = ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
 
-		FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64::new);
-		FastQueueArray_I32 cloudColor = new FastQueueArray_I32(3);
+		var cloud = new FastQueue<>(Point3D_F64::new);
+		var cloudColor = new FastQueue<>(() -> new int[3]);
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 

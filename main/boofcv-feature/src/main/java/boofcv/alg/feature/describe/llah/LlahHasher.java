@@ -64,7 +64,7 @@ public abstract class LlahHasher {
 	/**
 	 * Configures the hash function. See JavaDoc for info on variables
 	 */
-	public LlahHasher(long hashK, int hashSize) {
+	protected LlahHasher(long hashK, int hashSize) {
 		this.hashK = hashK;
 		this.hashSize = hashSize;
 	}

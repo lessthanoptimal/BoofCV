@@ -32,6 +32,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -51,9 +52,9 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;
-	static int maxScaleFeatures = maxFeatures / 3;
+	static int maxScaleFeatures = maxFeatures/3;
 
-	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 10,12,14,16,18};
+	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 10, 12, 14, 16, 18};
 	int radius = 2;
 	float thresh = 1;
 	T grayImage;
@@ -67,17 +68,17 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 	ImagePanel panel;
 	ImageCorruptPanel corruptPanel;
 
-	public DetectPointScaleOriWithNoiseApp(Class<T> imageType, Class<D> derivType) {
+	public DetectPointScaleOriWithNoiseApp( Class<T> imageType, Class<D> derivType ) {
 		super(1);
 		this.imageType = imageType;
 
 		FeatureLaplacePyramid<T, D> flss = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
 		addAlgorithm(0, "Hess Lap SS", FactoryInterestPoint.wrapDetector(flss, scales, false, imageType));
 		FeatureLaplacePyramid<T, D> flp = FactoryInterestPointAlgs.hessianLaplace(radius, thresh, maxScaleFeatures, imageType, derivType);
-		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, true,imageType));
+		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, true, imageType));
 		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(
-				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4),imageType));
-		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null,new ConfigSiftDetector(2*maxScaleFeatures),imageType));
+				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4), imageType));
+		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null, new ConfigSiftDetector(2*maxScaleFeatures), imageType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
@@ -89,64 +90,60 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 		setMainGUI(viewArea);
 	}
 
-	public void process(BufferedImage input) {
+	public void process( BufferedImage input ) {
 		setInputImage(input);
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		corruptImage = (T) grayImage.createNew(grayImage.width, grayImage.height);
+		corruptImage = (T)grayImage.createNew(grayImage.width, grayImage.height);
 		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_BGR);
 		panel.setImage(workImage);
 		panel.setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));
 		doRefreshAll();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				revalidate();
-				processImage = true;
-			}
+		SwingUtilities.invokeLater(() -> {
+			revalidate();
+			processImage = true;
 		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {
+	public void loadConfigurationFile( String fileName ) {
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	public void refreshAll( Object[] cookies ) {
 		setActiveAlgorithm(0, null, cookies[0]);
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+	public synchronized void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
 		if (input == null)
 			return;
 
 		// corrupt the input image
 		corruptPanel.corruptImage(grayImage, corruptImage);
 
-		final InterestPointDetector<T> det = (InterestPointDetector<T>) cookie;
+		final InterestPointDetector<T> det = (InterestPointDetector<T>)cookie;
 		det.detect(corruptImage);
 
 		render.reset();
 		for (int i = 0; i < det.getNumberOfFeatures(); i++) {
 			Point2D_F64 p = det.getLocation(i);
-			int radius = (int) Math.ceil(det.getRadius(i));
-			render.addCircle((int) p.x, (int) p.y, radius);
+			int radius = (int)Math.ceil(det.getRadius(i));
+			render.addCircle((int)p.x, (int)p.y, radius);
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				ConvertBufferedImage.convertTo(corruptImage, workImage, true);
-				Graphics2D g2 = workImage.createGraphics();
-				g2.setStroke(new BasicStroke(3));
-				render.draw(g2);
-				panel.repaint();
-			}
+		SwingUtilities.invokeLater(() -> {
+			ConvertBufferedImage.convertTo(corruptImage, workImage, true);
+			Graphics2D g2 = workImage.createGraphics();
+			g2.setStroke(new BasicStroke(3));
+			render.draw(g2);
+			panel.repaint();
 		});
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
 		if (image != null) {
@@ -164,14 +161,14 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 		doRefreshAll();
 	}
 
-	public static void main(String args[]) {
+	public static void main( String args[] ) {
 		DetectPointScaleOriWithNoiseApp app = new DetectPointScaleOriWithNoiseApp(GrayF32.class, GrayF32.class);
 //		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayU8.class,GrayS16.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
+		inputs.add(new PathLabel("Square Grid", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
-		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
+		inputs.add(new PathLabel("amoeba", UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
@@ -179,7 +176,7 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while (!app.getHasProcessedImage()) {
-			Thread.yield();
+			BoofMiscOps.sleep(10);
 		}
 
 		ShowImages.showWindow(app, "Point Feature", true);

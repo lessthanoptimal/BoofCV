@@ -258,7 +258,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		double fractionA = inliersEpipolar/(double)viewA.descriptions.size;
 		double fractionB = inliersEpipolar/(double)viewB.descriptions.size;
 
-		if( fractionA < MIN_ASSOCIATE_FRACTION | fractionB < MIN_ASSOCIATE_FRACTION )
+		if( fractionA < MIN_ASSOCIATE_FRACTION || fractionB < MIN_ASSOCIATE_FRACTION )
 			return false;
 
 		// If the geometry is good for triangulation this number will be lower

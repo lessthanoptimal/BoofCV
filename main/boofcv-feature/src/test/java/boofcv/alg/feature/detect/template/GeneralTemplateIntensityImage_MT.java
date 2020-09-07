@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ abstract class GeneralTemplateIntensityImage_MT <T extends ImageGray<T>> {
 	TemplateIntensityImage<T> alg_ST;
 	TemplateIntensityImage_MT<T> alg_MT;
 
-	public GeneralTemplateIntensityImage_MT(TemplateIntensityImage.EvaluatorMethod<T> method, Class<T> imageType) {
+	protected GeneralTemplateIntensityImage_MT(TemplateIntensityImage.EvaluatorMethod<T> method, Class<T> imageType) {
 		this.alg_ST = new TemplateIntensityImage<>(method);
 		this.alg_MT = new TemplateIntensityImage_MT<>(method);
 

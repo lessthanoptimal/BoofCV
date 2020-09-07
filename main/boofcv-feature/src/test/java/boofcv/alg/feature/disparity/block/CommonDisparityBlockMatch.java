@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 
 	DisparityError errorType;
 
-	public CommonDisparityBlockMatch(DisparityError errorType ) {
+	protected CommonDisparityBlockMatch(DisparityError errorType ) {
 		this.errorType = errorType;
 	}
 

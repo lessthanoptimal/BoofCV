@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,21 +72,18 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"import boofcv.alg.interpolate.InterpolatePixelS;\n" +
 				"import boofcv.struct.border.ImageBorder_"+borderType+";\n" +
 				"import boofcv.struct.image.ImageType;\n" +
-				"import boofcv.struct.image." + image.getSingleBandName() + ";\n");
+				"import boofcv.struct.image." + image.getSingleBandName() + ";\n"+
+				"\n"+
+				"import javax.annotation.Generated;\n");
 		out.println();
 		out.print("/**\n" +
 				" * <p>\n" +
 				" * Implementation of {@link BilinearPixelS} for a specific image type.\n" +
 				" * </p>\n" +
-				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"public class "+className+" extends BilinearPixelS<"+image.getSingleBandName()+"> {\n" +
 				"\n" +
-				"\tpublic "+className+"() {\n" +
-				"\t}\n" +
+				"\tpublic "+className+"() {}\n" +
 				"\n" +
 				"\tpublic "+className+"("+image.getSingleBandName()+" orig) {\n" +
 				"\n" +

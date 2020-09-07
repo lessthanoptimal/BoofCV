@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,23 +86,20 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 				"import boofcv.alg.interpolate.InterpolatePixelMB;\n" +
 				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.struct.image." + image.getInterleavedName() + ";\n" +
-				"import boofcv.struct.border.ImageBorder_IL_" + borderType + ";\n");
-		out.println();
+				"import boofcv.struct.border.ImageBorder_IL_" + borderType + ";\n"+
+				"\n"+
+				"import javax.annotation.Generated;\n");
 		out.println();
 		out.print("/**\n" +
 				" * <p>\n" +
 				" * Implementation of {@link BilinearPixelMB} for a specific image type.\n" +
 				" * </p>\n" +
-				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"public class " + className + " extends BilinearPixelMB<" + imageName + "> {\n" +
-				"\t"+sumType+" temp0[];\n" +
-				"\t"+sumType+" temp1[];\n" +
-				"\t"+sumType+" temp2[];\n" +
-				"\t"+sumType+" temp3[];\n" +
+				"\t"+sumType+"[] temp0;\n" +
+				"\t"+sumType+"[] temp1;\n" +
+				"\t"+sumType+"[] temp2;\n" +
+				"\t"+sumType+"[] temp3;\n" +
 				"\n" +
 				"\tpublic " + className + "(int numBands) {\n" +
 				"\t\tthis.temp0 = new "+sumType+"[numBands];\n" +

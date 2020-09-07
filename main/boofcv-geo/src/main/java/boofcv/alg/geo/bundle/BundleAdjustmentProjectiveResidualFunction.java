@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,10 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.*;
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur;
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
+import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -42,7 +45,7 @@ import georegression.struct.point.Point4D_F64;
  * @author Peter Abeles
  */
 public class BundleAdjustmentProjectiveResidualFunction
-	implements BundleAdjustmentSchur_DSCC.FunctionResiduals<SceneStructureProjective>
+	implements BundleAdjustmentSchur.FunctionResiduals<SceneStructureProjective>
 {
 	private SceneStructureProjective structure;
 	private SceneObservations observations;
@@ -115,7 +118,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
-				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
+				SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p3);
 
 				// Apply projective camera to point in world coordinates
@@ -145,7 +148,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
-				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
+				SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p4);
 
 				// Apply projective camera to point in world coordinates

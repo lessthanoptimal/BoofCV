@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.testing.BoofTesting;
 
-
 /**
  * Handles the forward and inverse wavelet transform
  *
@@ -34,31 +33,30 @@ import boofcv.testing.BoofTesting;
 @SuppressWarnings({"unchecked"})
 public abstract class GenericWaveletDenoiseTests<T extends ImageGray<T>> extends GenericDenoiseTests<T> {
 
-
 	WaveletTransform transform;
 
-	public GenericWaveletDenoiseTests(Class imageType, int noiseSigma,
-									  WaveletDescription waveletDesc, int numLevels ) {
+	protected GenericWaveletDenoiseTests( Class imageType, int noiseSigma,
+										  WaveletDescription waveletDesc, int numLevels ) {
 		super(imageType, noiseSigma);
 
-		transform = FactoryWaveletTransform.create(imageType,waveletDesc,numLevels,0,255);
+		transform = FactoryWaveletTransform.create(imageType, waveletDesc, numLevels, 0, 255);
 	}
 
-	public abstract void denoiseWavelet(ImageGray transformedImg , int numLevels );
+	public abstract void denoiseWavelet( ImageGray transformedImg, int numLevels );
 
 	@Override
-	public void denoiseImage(T imageNoisy, T imageDenoised) {
+	public void denoiseImage( T imageNoisy, T imageDenoised ) {
 
-		ImageGray transformedImg = transform.transform(imageNoisy,null);
+		ImageGray transformedImg = transform.transform(imageNoisy, null);
 
 		// if the input is a subimage make the transform a subimage
 		// so this condition is also tested
-		if( imageNoisy.isSubimage() ) {
+		if (imageNoisy.isSubimage()) {
 			transformedImg = (T)BoofTesting.createSubImageOf(transformedImg);
 		}
 
-		denoiseWavelet(transformedImg,transform.getLevels());
+		denoiseWavelet(transformedImg, transform.getLevels());
 
-		transform.invert(transformedImg,imageDenoised);
+		transform.invert(transformedImg, imageDenoised);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,6 +172,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
+	@Override
 	protected void interpolateFlowScale(GrayF32 prev, GrayF32 curr) {
 		interp.setImage(prev);
 
@@ -192,6 +193,7 @@ public class HornSchunckPyramid<T extends ImageGray<T>>
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
+	@Override
 	protected void warpImageTaylor(GrayF32 before, GrayF32 flowX , GrayF32 flowY , GrayF32 after) {
 		interp.setImage(before);
 

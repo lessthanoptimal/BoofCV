@@ -45,15 +45,15 @@ class TestFeatureSelectRandom extends ChecksFeatureSelectLimit.I16 {
 
 		FeatureSelectRandom<Point2D_I16> alg = createAlgorithm();
 		var foundA = new FastArray<>(Point2D_I16.class);
-		alg.select(width,height,null,detected,10,foundA);
+		alg.select(width, height, null, detected, 10, foundA);
 		var foundB = new FastArray<>(Point2D_I16.class);
-		alg.select(width,height,null,detected,10,foundB);
+		alg.select(width, height, null, detected, 10, foundB);
 
-		assertEquals(10,foundA.size);
-		assertEquals(10,foundB.size);
+		assertEquals(10, foundA.size);
+		assertEquals(10, foundB.size);
 		boolean different = false;
 		for (int i = 0; i < foundA.size; i++) {
-			if( !foundA.get(i).equals(foundB.get(i))) {
+			if (!foundA.get(i).equals(foundB.get(i))) {
 				different = true;
 				break;
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,20 +75,20 @@ public class TestSquareGridTools {
 		assertTrue(grid.get(0,0).center.norm() < 1e-8);
 	}
 
-	private List<Point2D_F64> createPoints( int rows , int cols ) {
-		double x0 = 10;
-		double y0 = 20;
-
-		List<Point2D_F64> list = new ArrayList<>();
-
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				list.add( new Point2D_F64(x0+i,y0+j));
-			}
-		}
-
-		return list;
-	}
+//	private List<Point2D_F64> createPoints( int rows , int cols ) {
+//		double x0 = 10;
+//		double y0 = 20;
+//
+//		List<Point2D_F64> list = new ArrayList<>();
+//
+//		for (int i = 0; i < rows; i++) {
+//			for (int j = 0; j < cols; j++) {
+//				list.add( new Point2D_F64(x0+i,y0+j));
+//			}
+//		}
+//
+//		return list;
+//	}
 
 	@Test
 	public void checkFlip() {

@@ -56,10 +56,12 @@ public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends 
 		this.outputType = outputType;
 	}
 
+	@Override
 	public int getSkip() {
 		return skip;
 	}
 
+	@Override
 	public void setSkip(int skip) {
 		this.skip = skip;
 	}

@@ -40,6 +40,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -83,7 +84,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 
 	ImagePanel imagePanel;
 
-	public CompareFeatureExtractorApp(Class<T> imageType, Class<D> derivType) {
+	public CompareFeatureExtractorApp( Class<T> imageType, Class<D> derivType ) {
 		super(1);
 		this.imageType = imageType;
 
@@ -94,7 +95,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 		addAlgorithm(0, "Laplace Det", FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT, derivType));
 		addAlgorithm(0, "Laplace Trace", FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE, derivType));
 
-		deriv = GImageDerivativeOps.createAnyDerivatives(DerivativeType.SOBEL,imageType, derivType);
+		deriv = GImageDerivativeOps.createAnyDerivatives(DerivativeType.SOBEL, imageType, derivType);
 
 		JPanel gui = new JPanel();
 		gui.setLayout(new BorderLayout());
@@ -113,33 +114,29 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 		setMainGUI(gui);
 	}
 
-	public void process(BufferedImage input) {
+	public void process( BufferedImage input ) {
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_BGR);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				doRefreshAll();
-			}
-		});
+		SwingUtilities.invokeLater(() -> doRefreshAll());
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {
+	public void loadConfigurationFile( String fileName ) {
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	public void refreshAll( Object[] cookies ) {
 		setActiveAlgorithm(0, null, cookies[0]);
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+	public void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
 		if (input == null)
 			return;
 
-		intensityAlg = (GeneralFeatureIntensity<T, D>) cookie;
+		intensityAlg = (GeneralFeatureIntensity<T, D>)cookie;
 
 		doProcess();
 	}
@@ -162,13 +159,13 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 				intensityAlg.getIntensity(), null, ImageStatistics.maxAbs(intensity));
 
 		float max = ImageStatistics.maxAbs(intensity);
-		float threshold = max * thresholdFraction;
+		float threshold = max*thresholdFraction;
 
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 
 		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(minSeparation, threshold, radius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg,null, extractor, selector);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg, null, extractor, selector);
 		detector.setFeatureLimit(numFeatures);
 		detector.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		QueueCorner foundCorners = detector.getMaximums();
@@ -184,11 +181,10 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 		g2.drawImage(input, 0, 0, grayImage.width, grayImage.height, null);
 		render.draw(g2);
 		drawImage();
-
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
 		if (image != null) {
@@ -202,55 +198,45 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 	}
 
 	@Override
-	public void changeImage(int index) {
+	public void changeImage( int index ) {
 		this.viewImage = index;
 		drawImage();
 	}
 
 	private void drawImage() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				switch (viewImage) {
-					case 0:
-						imagePanel.setImage(input);
-						break;
-
-					case 1:
-						imagePanel.setImage(intensityImage);
-						break;
-
-					case 2:
-						imagePanel.setImage(workImage);
-						break;
-				}
-				BufferedImage b = imagePanel.getImage();
-				imagePanel.setPreferredSize(new Dimension(b.getWidth(), b.getHeight()));
-				imagePanel.repaint();
-
-				processImage = true;
+		SwingUtilities.invokeLater(() -> {
+			switch (viewImage) {
+				case 0 -> imagePanel.setImage(input);
+				case 1 -> imagePanel.setImage(intensityImage);
+				case 2 -> imagePanel.setImage(workImage);
 			}
+			BufferedImage b = imagePanel.getImage();
+			imagePanel.setPreferredSize(new Dimension(b.getWidth(), b.getHeight()));
+			imagePanel.repaint();
+
+			processImage = true;
 		});
 	}
 
 	@Override
-	public synchronized void changeFeatureSeparation(int radius) {
+	public synchronized void changeFeatureSeparation( int radius ) {
 		minSeparation = radius;
 		doProcess();
 	}
 
 	@Override
-	public synchronized void changeThreshold(double value) {
-		this.thresholdFraction = (float) value;
+	public synchronized void changeThreshold( double value ) {
+		this.thresholdFraction = (float)value;
 		doProcess();
 	}
 
 	@Override
-	public synchronized void changeNumFeatures(int total) {
+	public synchronized void changeNumFeatures( int total ) {
 		this.numFeatures = total;
 		doProcess();
 	}
 
-	public static void main(String args[]) {
+	public static void main( String args[] ) {
 		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(GrayF32.class, GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
@@ -262,7 +248,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while (!app.getHasProcessedImage()) {
-			Thread.yield();
+			BoofMiscOps.sleep(10);
 		}
 
 		ShowImages.showWindow(app, "Feature Extraction", true);

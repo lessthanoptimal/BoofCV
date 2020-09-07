@@ -371,7 +371,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		}
 	}
 
-	class ControlPanel extends StandardAlgConfigPanel implements ActionListener {
+	static class ControlPanel extends StandardAlgConfigPanel implements ActionListener {
 		private JCheckBox checkStability;
 		private JCheckBox check3D;
 		private JCheckBox checkBoundary;
@@ -415,7 +415,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		}
 	}
 
-	private class FiducialInfo {
+	private static class FiducialInfo {
 		int totalObserved;
 		long id;
 		int grid;

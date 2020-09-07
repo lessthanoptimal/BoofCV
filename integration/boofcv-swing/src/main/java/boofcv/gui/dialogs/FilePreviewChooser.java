@@ -38,7 +38,8 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Date;
+
+import static boofcv.misc.BoofMiscOps.timeStr;
 
 // TODO preview text documents
 // TODO show size of input images and other meta data
@@ -49,330 +50,331 @@ import java.util.Date;
  * @author Peter Abeles
  */
 public class FilePreviewChooser extends JPanel {
-    private static final int PREVIEW_PIXELS = 300;
+	private static final int PREVIEW_PIXELS = 300;
 
-    @Setter @Getter protected Listener listener;
+	@Setter @Getter protected Listener listener;
 
-    // GUI components
-    @Getter FileBrowser browser; // file browser
-    ImagePanel preview = new ImagePanel(); // shows preview of selected image
-    JTextArea metadataText = new JTextArea();
+	// GUI components
+	@Getter FileBrowser browser; // file browser
+	ImagePanel preview = new ImagePanel(); // shows preview of selected image
+	JTextArea metadataText = new JTextArea();
 
-    File selected;
+	File selected;
 
-    // Indicates if it's opening files (true) or saving files (false)
-    @Getter boolean openFile;
+	// Indicates if it's opening files (true) or saving files (false)
+	@Getter boolean openFile;
 
-    // Clicks this when a file has been selected
-    JButton bSelect;
+	// Clicks this when a file has been selected
+	JButton bSelect;
 
-    // handling the image preview
-    private final Object lockPreview = new Object();
-    PreviewThread previewThread;
-    String pendingPreview;
+	// handling the image preview
+	private final Object lockPreview = new Object();
+	PreviewThread previewThread;
+	String pendingPreview;
 
+	public FilePreviewChooser( boolean openFile ) {
+		setLayout(new BorderLayout());
+		this.openFile = openFile;
 
-    public FilePreviewChooser(boolean openFile ) {
-        setLayout(new BorderLayout());
-        this.openFile = openFile;
+		String buttonText = openFile ? "Select" : "Save";
 
-        String buttonText = openFile ? "Select" : "Save";
+		bSelect = BoofSwingUtil.button(buttonText, e -> handlePressedSelect());
+		bSelect.setEnabled(false);
+		bSelect.setDefaultCapable(true);
+		JButton bCancel = BoofSwingUtil.button("Cancel", e -> handlePressedCancel());
+		JPanel bottomPanel = JSpringPanel.createLockedSides(bCancel, bSelect, 35);
+		bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        bSelect = BoofSwingUtil.button(buttonText, e-> handlePressedSelect());
-        bSelect.setEnabled(false);
-        bSelect.setDefaultCapable(true);
-        JButton bCancel = BoofSwingUtil.button("Cancel",e-> handlePressedCancel());
-        JPanel bottomPanel = JSpringPanel.createLockedSides(bCancel, bSelect,35);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		// make so the user can copy but not edit the meta data text
+		metadataText.setEditable(false);
+		metadataText.setWrapStyleWord(true);
+		metadataText.setLineWrap(true);
 
-        // make so the user can copy but not edit the meta data text
-        metadataText.setEditable(false);
-        metadataText.setWrapStyleWord(true);
-        metadataText.setLineWrap(true);
+		// it will draw the image centered in the split pane
+		preview.setCentering(true);
+		// Need to specify a preferred size or the split pane does silly stuff
+		preview.setPreferredSize(new Dimension(PREVIEW_PIXELS + 30, PREVIEW_PIXELS + 30));
 
-        // it will draw the image centered in the split pane
-        preview.setCentering(true);
-        // Need to specify a preferred size or the split pane does silly stuff
-        preview.setPreferredSize(new Dimension(PREVIEW_PIXELS+30,PREVIEW_PIXELS+30));
-
-        JSplitPane splitPreview = new JSplitPane(JSplitPane.VERTICAL_SPLIT,preview,metadataText);
-        splitPreview.setDividerLocation(0.9);
+		JSplitPane splitPreview = new JSplitPane(JSplitPane.VERTICAL_SPLIT, preview, metadataText);
+		splitPreview.setDividerLocation(0.9);
 //        splitPreview.setResizeWeight(0.0);
-        splitPreview.setContinuousLayout(true);
+		splitPreview.setContinuousLayout(true);
 
-        browser = new FileBrowser(new File("."), null, new BrowserListener());
-        browser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		browser = new FileBrowser(new File("."), null, new BrowserListener());
+		browser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(BorderLayout.CENTER, browser);
-        leftPanel.add(BorderLayout.SOUTH, bottomPanel);
+		JPanel leftPanel = new JPanel(new BorderLayout());
+		leftPanel.add(BorderLayout.CENTER, browser);
+		leftPanel.add(BorderLayout.SOUTH, bottomPanel);
 
-        JSplitPane splitBrowserPreview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPanel,splitPreview);
-        splitBrowserPreview.setDividerLocation(300);
-        splitBrowserPreview.setResizeWeight(0.0);
-        splitBrowserPreview.setContinuousLayout(true);
+		JSplitPane splitBrowserPreview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, splitPreview);
+		splitBrowserPreview.setDividerLocation(300);
+		splitBrowserPreview.setResizeWeight(0.0);
+		splitBrowserPreview.setContinuousLayout(true);
 
-        add(splitBrowserPreview, BorderLayout.CENTER);
+		add(splitBrowserPreview, BorderLayout.CENTER);
 
-        setPreferredSize(new Dimension(600,400));
+		setPreferredSize(new Dimension(600, 400));
 
-        // If the selected file is set before the chooser is visible then this is needed to set the selected button
-        bSelect.addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                setSelectEnabled(bSelect.isEnabled());
-            }
-            @Override public void ancestorRemoved(AncestorEvent event) { }
-            @Override public void ancestorMoved(AncestorEvent event) {}
-        });
-    }
+		// If the selected file is set before the chooser is visible then this is needed to set the selected button
+		bSelect.addAncestorListener(new AncestorListener() {
+			@Override
+			public void ancestorAdded( AncestorEvent event ) {
+				setSelectEnabled(bSelect.isEnabled());
+			}
 
-    /**
-     * Select button pressed
-     */
-    void handlePressedSelect() {
-        if( listener == null )
-            System.err.println("You didn't set a listener!");
-        else
-            listener.selectedFile(selected);
-    }
+			@Override public void ancestorRemoved( AncestorEvent event ) { }
 
-    /**
-     * Cancel button pressed
-     */
-    protected void handlePressedCancel() {
-        if( listener == null ) {
-            System.err.println("You didn't set a listener!");
-        } else {
-            listener.userCanceled();
-        }
-    }
+			@Override public void ancestorMoved( AncestorEvent event ) {}
+		});
+	}
 
-    public void setDirectory( File directory ) {
-        BoofSwingUtil.checkGuiThread();
-        if( directory.isFile() )
-            directory = directory.getParentFile();
-        browser.setDirectory(directory);
-    }
+	/**
+	 * Select button pressed
+	 */
+	void handlePressedSelect() {
+		if (listener == null)
+			System.err.println("You didn't set a listener!");
+		else
+			listener.selectedFile(selected);
+	}
 
-    private class BrowserListener implements FileBrowser.Listener {
+	/**
+	 * Cancel button pressed
+	 */
+	protected void handlePressedCancel() {
+		if (listener == null) {
+			System.err.println("You didn't set a listener!");
+		} else {
+			listener.userCanceled();
+		}
+	}
 
-        @Override
-        public void handleSelectedFile(File file) {
-            // Do nothing if this file is already selected
-            if( selected == file )
-                return;
-            if( selected != null && file != null && file.getAbsolutePath().equals(selected.getAbsolutePath()) )
-                return;
+	public void setDirectory( File directory ) {
+		BoofSwingUtil.checkGuiThread();
+		if (directory.isFile())
+			directory = directory.getParentFile();
+		browser.setDirectory(directory);
+	}
 
-            // Update the preview
-            if( file == null ) {
-                selected = null;
-                showPreview(null);
-                setSelectEnabled(false);
-            } else {
-                if (file.isFile()) {
-                    selected = file;
-                    showPreview(file.getPath());
-                    setSelectEnabled(true);
-                } else {
-                    if( selected != null ) {
-                        selected = null;
-                        showPreview(null);
-                        setSelectEnabled(false);
-                    }
-                }
-            }
-        }
+	private class BrowserListener implements FileBrowser.Listener {
 
-        @Override
-        public void handleDoubleClickedFile(File file) {
-            selected = file;
-            handlePressedSelect();
-        }
-    }
+		@Override
+		public void handleSelectedFile( File file ) {
+			// Do nothing if this file is already selected
+			if (selected == file)
+				return;
+			if (selected != null && file != null && file.getAbsolutePath().equals(selected.getAbsolutePath()))
+				return;
 
-    private void setSelectEnabled( boolean enabled ) {
-        if( enabled ) {
-            bSelect.setEnabled(true);
-            JRootPane rootPane = SwingUtilities.getRootPane(FilePreviewChooser.this);
-            if( rootPane != null )
-                rootPane.setDefaultButton(bSelect);
-            // This only fails when the panel isn't visible. That's handled by setting the enabled flag
-            // when the panel first becomes visible
-        } else {
-            bSelect.setEnabled(false);
-        }
-    }
+			// Update the preview
+			if (file == null) {
+				selected = null;
+				showPreview(null);
+				setSelectEnabled(false);
+			} else {
+				if (file.isFile()) {
+					selected = file;
+					showPreview(file.getPath());
+					setSelectEnabled(true);
+				} else {
+					if (selected != null) {
+						selected = null;
+						showPreview(null);
+						setSelectEnabled(false);
+					}
+				}
+			}
+		}
 
-    /**
-     * Start a new preview thread if one isn't already running. Carefully manipulate variables due to threading
-     */
-    void showPreview( String path ) {
-        synchronized (lockPreview) {
-            if( path == null ) {
-                pendingPreview = null;
-            } else if( previewThread == null ) {
-                pendingPreview = path;
-                previewThread = new PreviewThread();
-                previewThread.start();
-            } else {
-                pendingPreview = path;
-            }
-        }
-    }
+		@Override
+		public void handleDoubleClickedFile( File file ) {
+			selected = file;
+			handlePressedSelect();
+		}
+	}
 
-    /**
-     * Loads a images, scales them down, and puts them in the image preview.
-     */
-    private class PreviewThread extends Thread {
-        public PreviewThread() {
-            super("Image Preview");
-        }
+	private void setSelectEnabled( boolean enabled ) {
+		if (enabled) {
+			bSelect.setEnabled(true);
+			JRootPane rootPane = SwingUtilities.getRootPane(FilePreviewChooser.this);
+			if (rootPane != null)
+				rootPane.setDefaultButton(bSelect);
+			// This only fails when the panel isn't visible. That's handled by setting the enabled flag
+			// when the panel first becomes visible
+		} else {
+			bSelect.setEnabled(false);
+		}
+	}
 
-        @Override
-        public void run() {
-            while( true ) {
-                // see if there are any pending preview requests. If not exit and mark the thread as dead
-                String path;
-                synchronized (lockPreview) {
-                    if( pendingPreview == null ) {
-                        previewThread = null;
-                        return;
-                    } else {
-                        path = pendingPreview;
-                        pendingPreview = null;
-                    }
-                }
+	/**
+	 * Start a new preview thread if one isn't already running. Carefully manipulate variables due to threading
+	 */
+	void showPreview( String path ) {
+		synchronized (lockPreview) {
+			if (path == null) {
+				pendingPreview = null;
+			} else if (previewThread == null) {
+				pendingPreview = path;
+				previewThread = new PreviewThread();
+				previewThread.start();
+			} else {
+				pendingPreview = path;
+			}
+		}
+	}
 
-                File file = new File(path);
-                if( !file.exists() || file.isDirectory() )
-                    continue;
+	/**
+	 * Loads a images, scales them down, and puts them in the image preview.
+	 */
+	private class PreviewThread extends Thread {
+		public PreviewThread() {
+			super("Image Preview");
+		}
 
-                BufferedImage full = null;
+		@Override
+		public void run() {
+			while (true) {
+				// see if there are any pending preview requests. If not exit and mark the thread as dead
+				String path;
+				synchronized (lockPreview) {
+					if (pendingPreview == null) {
+						previewThread = null;
+						return;
+					} else {
+						path = pendingPreview;
+						pendingPreview = null;
+					}
+				}
 
-                if( UtilImageIO.isImage(file) ) {
-                    full = UtilImageIO.loadImage(path);
-                }
-                if( full == null ) {
-                    // That failed, now assume that the file is a video sequence
-                    full = loadVideoPreview(path);
-                }
+				File file = new File(path);
+				if (!file.exists() || file.isDirectory())
+					continue;
 
-                String date = new Date(file.lastModified()).toString();
+				BufferedImage full = null;
 
-                if( full == null ) {
-                    preview.setImageRepaint(null);
-                    metadataText.setText("File Size: "+file.length()+" B\nModified: "+date);
-                } else {
-                    // shrink the image down to preview size
-                    int w=full.getWidth(),h=full.getHeight();
-                    double scale;
-                    if( w > h ) {
-                        scale = PREVIEW_PIXELS /(double)w;
-                        h = h* PREVIEW_PIXELS /w;
-                        w = PREVIEW_PIXELS;
-                    } else {
-                        scale = PREVIEW_PIXELS /(double)h;
-                        w = w* PREVIEW_PIXELS /h;
-                        h = PREVIEW_PIXELS;
-                    }
-                    BufferedImage small = new BufferedImage(w,h,full.getType());
-                    Graphics2D g2 = small.createGraphics();
-                    g2.setTransform(new AffineTransform(scale,0,0,scale,0,0));
-                    g2.drawImage(full,0,0,null);
+				if (UtilImageIO.isImage(file)) {
+					full = UtilImageIO.loadImage(path);
+				}
+				if (full == null) {
+					// That failed, now assume that the file is a video sequence
+					full = loadVideoPreview(path);
+				}
 
-                    // don't need to run in the UI thread
-                    preview.setImageRepaint(small);
-                    metadataText.setText(String.format("Shape: %d x %d\nModified: %s",
-                            full.getWidth(),full.getHeight(),date));
-                }
-            }
-        }
-    }
+				String date = timeStr(file.lastModified());
 
-    private BufferedImage loadVideoPreview(String path) {
-        BufferedImage full = null;
-        try {
-            SimpleImageSequence<InterleavedU8> sequence =
-                    DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8);
+				if (full == null) {
+					preview.setImageRepaint(null);
+					metadataText.setText("File Size: " + file.length() + " B\nModified: " + date);
+				} else {
+					// shrink the image down to preview size
+					int w = full.getWidth(), h = full.getHeight();
+					double scale;
+					if (w > h) {
+						scale = PREVIEW_PIXELS/(double)w;
+						h = h*PREVIEW_PIXELS/w;
+						w = PREVIEW_PIXELS;
+					} else {
+						scale = PREVIEW_PIXELS/(double)h;
+						w = w*PREVIEW_PIXELS/h;
+						h = PREVIEW_PIXELS;
+					}
+					BufferedImage small = new BufferedImage(w, h, full.getType());
+					Graphics2D g2 = small.createGraphics();
+					g2.setTransform(new AffineTransform(scale, 0, 0, scale, 0, 0));
+					g2.drawImage(full, 0, 0, null);
 
-            if( sequence.hasNext() ) {
-                InterleavedU8 frame = sequence.next();
-                full = ConvertBufferedImage.convertTo(frame,null,true);
-            }
-        } catch( RuntimeException ignore ) {}
-        return full;
-    }
+					// don't need to run in the UI thread
+					preview.setImageRepaint(small);
+					metadataText.setText(String.format("Shape: %d x %d\nModified: %s",
+							full.getWidth(), full.getHeight(), date));
+				}
+			}
+		}
+	}
 
-    /**
-     * Lets the listener know what the user has chosen to do.
-     */
-    public interface Listener {
-        void selectedFile(File file);
+	private BufferedImage loadVideoPreview( String path ) {
+		BufferedImage full = null;
+		try {
+			SimpleImageSequence<InterleavedU8> sequence =
+					DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8);
 
-        void userCanceled();
-    }
+			if (sequence.hasNext()) {
+				InterleavedU8 frame = sequence.next();
+				full = ConvertBufferedImage.convertTo(frame, null, true);
+			}
+		} catch (RuntimeException ignore) {
+		}
+		return full;
+	}
 
-    public static class DefaultListener implements Listener {
+	/**
+	 * Lets the listener know what the user has chosen to do.
+	 */
+	public interface Listener {
+		void selectedFile( File file );
 
-        JDialog dialog;
-        public File selectedFile;
-        public boolean canceled = false;
+		void userCanceled();
+	}
 
-        public DefaultListener(JDialog dialog) {
-            this.dialog = dialog;
-        }
+	public static class DefaultListener implements Listener {
 
-        @Override
-        public void selectedFile(File file) {
-            this.selectedFile = file;
-            this.dialog.setVisible(false);
-        }
+		JDialog dialog;
+		public File selectedFile;
+		public boolean canceled = false;
 
-        @Override
-        public void userCanceled() {
-            this.canceled = true;
-            this.dialog.setVisible(false);
-        }
-    }
+		public DefaultListener( JDialog dialog ) {
+			this.dialog = dialog;
+		}
 
-    public File showDialog( Component parent )
-    {
-        String title= openFile ? "Open File" : "Save File";
+		@Override
+		public void selectedFile( File file ) {
+			this.selectedFile = file;
+			this.dialog.setVisible(false);
+		}
 
-        JDialog dialog = new JDialog(null,title, Dialog.ModalityType.APPLICATION_MODAL);
-        DefaultListener listener = new DefaultListener(dialog);
-        this.listener = listener;
+		@Override
+		public void userCanceled() {
+			this.canceled = true;
+			this.dialog.setVisible(false);
+		}
+	}
 
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                handlePressedCancel();
-            }
-        });
-        dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        dialog.getContentPane().setLayout(new BorderLayout());
-        dialog.getContentPane().add(this, BorderLayout.CENTER);
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
-        // should block at this point
-        dialog.dispose();
+	public File showDialog( Component parent ) {
+		String title = openFile ? "Open File" : "Save File";
 
-        if( listener.canceled )
-            return null;
-        return listener.selectedFile;
-    }
+		JDialog dialog = new JDialog(null, title, Dialog.ModalityType.APPLICATION_MODAL);
+		DefaultListener listener = new DefaultListener(dialog);
+		this.listener = listener;
 
-    public static void main(String[] args) {
-        var chooser = new FilePreviewChooser(true);
-        File selected = chooser.showDialog(null);
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing( WindowEvent e ) {
+				handlePressedCancel();
+			}
+		});
+		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		dialog.getContentPane().setLayout(new BorderLayout());
+		dialog.getContentPane().add(this, BorderLayout.CENTER);
+		dialog.pack();
+		dialog.setLocationRelativeTo(parent);
+		dialog.setVisible(true);
+		// should block at this point
+		dialog.dispose();
 
-        if( selected == null )
-            System.out.println("Canceled");
-        else {
-            System.out.println(selected.getPath());
-        }
-    }
+		if (listener.canceled)
+			return null;
+		return listener.selectedFile;
+	}
+
+	public static void main( String[] args ) {
+		var chooser = new FilePreviewChooser(true);
+		File selected = chooser.showDialog(null);
+
+		if (selected == null)
+			System.out.println("Canceled");
+		else {
+			System.out.println(selected.getPath());
+		}
+	}
 }

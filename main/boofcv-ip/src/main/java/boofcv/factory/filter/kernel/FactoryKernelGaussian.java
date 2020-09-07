@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -370,7 +370,7 @@ public class FactoryKernelGaussian {
 				sum += UtilGaussian.computePDF(0, sigma, i);
 			}
 			for (int i = 0; i < gaussian.length; i++) {
-				gaussian[i] /= sum;
+				gaussian[i] /= (float)sum;
 			}
 		}
 		

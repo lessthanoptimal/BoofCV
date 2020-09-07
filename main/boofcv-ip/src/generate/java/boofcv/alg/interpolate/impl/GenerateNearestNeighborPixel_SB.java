@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,9 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 				"import boofcv.alg.interpolate.InterpolatePixelS;\n" +
 				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.struct.image." + image.getSingleBandName() + ";\n" +
-				"import boofcv.struct.border.ImageBorder_"+borderType+";\n");
+				"import boofcv.struct.border.ImageBorder_"+borderType+";\n" +
+				"\n"+
+				"import javax.annotation.Generated;\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +
@@ -80,22 +82,16 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 				" * Performs nearest neighbor interpolation to extract values between pixels in an image.\n" +
 				" * </p>\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"public class "+className+" extends NearestNeighborPixelS<"+image.getSingleBandName()+"> {\n" +
 				"\n" +
-				"\tprivate "+image.getDataType()+" data[];" +
+				"\tprivate "+image.getDataType()+"[] data;" +
 				"\n" +
-				"\tpublic "+className+"() {\n" +
-				"\t}\n" +
+				"\tpublic "+className+"() {}\n" +
 				"\n" +
 				"\tpublic "+className+"("+image.getSingleBandName()+" orig) {\n" +
-				"\n" +
 				"\t\tsetImage(orig);\n" +
 				"\t}\n");
-
 	}
 
 	private void printTheRest() {
@@ -136,10 +132,10 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic ImageType<"+image.getSingleBandName()+"> getImageType() {\n" +
 				"\t\treturn ImageType.single("+image.getSingleBandName()+".class);\n" +
-				"\t}\n\n");
+				"\t}\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateNearestNeighborPixel_SB gen = new GenerateNearestNeighborPixel_SB();
 		gen.parseArguments(args);
 		gen.generate();

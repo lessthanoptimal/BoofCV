@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,7 @@ public class DisparityBlockMatchBestFiveNaive<I extends ImageGray<I>>
 	 * @param centerY Y-axis center for both images
 	 * @return Fit score for both regions.
 	 */
+	@Override
 	protected double computeScore( int leftX , int rightX , int centerY ) {
 
 		// Ensure the rows have centers inside the image along Y axis

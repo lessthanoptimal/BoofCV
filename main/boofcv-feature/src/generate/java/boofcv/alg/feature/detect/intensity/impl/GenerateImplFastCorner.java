@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Generates a FAST corner detector. A heuristic is used to automatically select which pixels on the circle to sample
@@ -183,9 +183,9 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 		tabs = 2;
 
-		Stack<Action> actions = new Stack<>();
+		ArrayDeque<Action> actions = new ArrayDeque<>();
 		actions.add(selectNextSample());
-		while( !actions.empty() ) {
+		while( !actions.isEmpty() ) {
 			Action action = actions.peek();
 			System.out.println("Action bit="+action.bit+" up="+action.sampleUp+" n="+action.consider+" TOTAL="+actions.size());
 			debugSampleState();

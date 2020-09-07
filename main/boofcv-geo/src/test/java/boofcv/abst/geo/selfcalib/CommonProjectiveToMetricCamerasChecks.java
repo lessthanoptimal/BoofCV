@@ -26,6 +26,7 @@ import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.geo.AssociatedTupleN;
 import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofTesting;
+import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
@@ -117,6 +118,13 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 
 		BoofTesting.assertEqualsToScaleS(truthView_1_to_i(1), results.motion_1_to_k.get(0), rotationTol, translationTol);
 		BoofTesting.assertEqualsToScaleS(truthView_1_to_i(2), results.motion_1_to_k.get(1), rotationTol, translationTol);
+
+		// The largest translation should be close to 1.0
+		double largestTranslation = 0;
+		for(Se3_F64 m : results.motion_1_to_k.toList() ) {
+			largestTranslation = Math.max(largestTranslation,m.T.norm());
+		}
+		assertEquals(1.0, largestTranslation, 0.001);
 	}
 
 	/**
@@ -253,13 +261,5 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		assertEquals(expected.skew, found.skew, skewTol);
 		assertEquals(expected.cx, found.cx, princpleTol);
 		assertEquals(expected.cy, found.cy, princpleTol);
-	}
-
-	/**
-	 * Make sure the found translation has a scale around 1.0
-	 */
-	@Test
-	void scaleOfTranslation() {
-		fail("Implement");
 	}
 }

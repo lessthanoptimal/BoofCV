@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public interface SparseImageSample_F64<T extends ImageBase<T>>
-	extends SparseImageOperator<T>
-{
-	public double compute( int x , int y );
+		extends SparseImageOperator<T> {
+	double compute( int x, int y );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.wavelet;
 
-
 /**
  * Precomputed border coefficients up to the specified depth.
  *
@@ -34,12 +33,12 @@ public class WlBorderCoefFixed<T extends WlCoef> implements WlBorderCoef<T> {
 	public T[] upperCoef;
 	T innerCoef;
 
-	public WlBorderCoefFixed( int numLower , int numUpper ) {
-		lowerCoef = (T[])new WlCoef[ numLower ];
-		upperCoef = (T[])new WlCoef[ numUpper ];
+	public WlBorderCoefFixed( int numLower, int numUpper ) {
+		lowerCoef = (T[])new WlCoef[numLower];
+		upperCoef = (T[])new WlCoef[numUpper];
 	}
 
-	public void setInnerCoef(T innerCoef) {
+	public void setInnerCoef( T innerCoef ) {
 		this.innerCoef = innerCoef;
 	}
 
@@ -51,11 +50,11 @@ public class WlBorderCoefFixed<T extends WlCoef> implements WlBorderCoef<T> {
 		return upperCoef[index];
 	}
 
-	public void setLower( int index , T coef ) {
+	public void setLower( int index, T coef ) {
 		lowerCoef[index] = coef;
 	}
 
-	public void setUpper( int index , T coef ) {
+	public void setUpper( int index, T coef ) {
 		upperCoef[index] = coef;
 	}
 
@@ -70,16 +69,16 @@ public class WlBorderCoefFixed<T extends WlCoef> implements WlBorderCoef<T> {
 	}
 
 	@Override
-	public T getBorderCoefficients(int index) {
-		if( index >= 0 ) {
+	public T getBorderCoefficients( int index ) {
+		if (index >= 0) {
 			int i = index/2;
-			if( i < lowerCoef.length)
+			if (i < lowerCoef.length)
 				return lowerCoef[i];
 			else
 				return innerCoef;
 		} else {
-			index = (-index)/2-1;
-			if( index < upperCoef.length )
+			index = -index/2 - 1;
+			if (index < upperCoef.length)
 				return upperCoef[index];
 			else
 				return innerCoef;

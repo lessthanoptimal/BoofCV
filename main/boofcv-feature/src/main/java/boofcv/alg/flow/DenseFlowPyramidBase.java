@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	// Used to interpolate values between pixels
 	protected InterpolatePixelS<GrayF32> interp;// todo remove
 
-	public DenseFlowPyramidBase(double scale, double sigma, int maxLayers,
+	protected DenseFlowPyramidBase(double scale, double sigma, int maxLayers,
 								InterpolatePixelS<GrayF32> interp ) {
 		this.scale = scale;
 		this.sigma = sigma;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	 *
 	 * @param numBands Number of bands in the color image
 	 */
-	public ComputeRegionMeanColor(final int numBands) {
+	protected ComputeRegionMeanColor( final int numBands ) {
 		this.numBands = numBands;
 
 		regionSums = new ColorQueue_F32(numBands);
@@ -56,14 +56,14 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	 * @param pixelToRegion Conversion between pixel to region index
 	 * @param regionMemberCount List which stores the number of members for each region
 	 * @param regionColor (Output) Storage for mean color throughout the region.  Internal array must be fully
-	 *                    declared.
+	 * declared.
 	 */
-	public void process( T image , GrayS32 pixelToRegion ,
-						 GrowQueue_I32 regionMemberCount ,
-						 FastQueue<float[]> regionColor  )  {
+	public void process( T image, GrayS32 pixelToRegion,
+						 GrowQueue_I32 regionMemberCount,
+						 FastQueue<float[]> regionColor ) {
 
 		// See if the input image has the expected number of bands
-		if( image.getImageType().getFamily() != ImageType.Family.GRAY ) {
+		if (image.getImageType().getFamily() != ImageType.Family.GRAY) {
 			this.numBands = ((ImageMultiBand)image).getNumBands();
 			regionSums = new ColorQueue_F32(numBands);
 		}
@@ -72,33 +72,33 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 
 		// Initialize data structures
 		regionSums.resize(regionColor.size);
-		for( int i = 0; i < regionSums.size; i++ ) {
+		for (int i = 0; i < regionSums.size; i++) {
 			float v[] = regionSums.get(i);
-			for( int j = 0; j < v.length; j++ ) {
+			for (int j = 0; j < v.length; j++) {
 				v[j] = 0;
 			}
 		}
 
 		// Sum up the pixel values for each region
-		for( int y = 0; y < image.height; y++ ) {
+		for (int y = 0; y < image.height; y++) {
 			int indexImg = image.startIndex + y*image.stride;
 			int indexRgn = pixelToRegion.startIndex + y*pixelToRegion.stride;
 
-			for( int x = 0; x < image.width; x++ , indexRgn++, indexImg++ ) {
+			for (int x = 0; x < image.width; x++, indexRgn++, indexImg++) {
 				int region = pixelToRegion.data[indexRgn];
 				float[] sum = regionSums.get(region);
 
-				addPixelValue(indexImg,sum);
+				addPixelValue(indexImg, sum);
 			}
 		}
 
 		// Compute the average using the sum and update the region color
-		for( int i = 0; i < regionSums.size; i++ ) {
+		for (int i = 0; i < regionSums.size; i++) {
 			float N = regionMemberCount.get(i);
 			float[] sum = regionSums.get(i);
 			float[] average = regionColor.get(i);
 
-			for( int j = 0; j < numBands; j++ ) {
+			for (int j = 0; j < numBands; j++) {
 				average[j] = sum[j]/N;
 			}
 		}
@@ -106,10 +106,11 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 
 	/**
 	 * Image type specific implementation.  Adds the pixel value at the specified pixel to sum
+	 *
 	 * @param index Pixel index in the image which is being read
 	 * @param sum Where the pixel's value is added to
 	 */
-	protected abstract void addPixelValue(int index , float[] sum );
+	protected abstract void addPixelValue( int index, float[] sum );
 
 	/**
 	 * Implementation for {@link GrayU8}
@@ -118,7 +119,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 		public U8() {super(1);}
 
 		@Override
-		protected void addPixelValue(int index, float[] sum) {
+		protected void addPixelValue( int index, float[] sum ) {
 			sum[0] += image.data[index] & 0xFF;
 		}
 	}
@@ -130,7 +131,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 		public F32() {super(1);}
 
 		@Override
-		protected void addPixelValue(int index, float[] sum) {
+		protected void addPixelValue( int index, float[] sum ) {
 			sum[0] += image.data[index];
 		}
 	}
@@ -142,8 +143,8 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 		public PL_U8( int numBands ) {super(numBands);}
 
 		@Override
-		protected void addPixelValue(int index, float[] sum) {
-			for( int i = 0; i < numBands; i++ ) {
+		protected void addPixelValue( int index, float[] sum ) {
+			for (int i = 0; i < numBands; i++) {
 				sum[i] += image.bands[i].data[index] & 0xFF;
 			}
 		}
@@ -156,8 +157,8 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 		public PL_F32( int numBands ) {super(numBands);}
 
 		@Override
-		protected void addPixelValue(int index, float[] sum) {
-			for( int i = 0; i < numBands; i++ ) {
+		protected void addPixelValue( int index, float[] sum ) {
+			for (int i = 0; i < numBands; i++) {
 				sum[i] += image.bands[i].data[index];
 			}
 		}

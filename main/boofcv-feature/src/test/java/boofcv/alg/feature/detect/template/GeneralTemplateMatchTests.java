@@ -56,7 +56,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 	// if a perfect match is zero additional tests can be done
 	boolean isPerfectZero;
 
-	GeneralTemplateMatchTests(TemplateMatchingIntensity<T> alg, Class<T> imageType) {
+	protected GeneralTemplateMatchTests(TemplateMatchingIntensity<T> alg, Class<T> imageType) {
 		this.alg = alg;
 
 		image = GeneralizedImageOps.createSingleBand(imageType, 30, 40);
@@ -66,7 +66,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 		GImageMiscOps.fillUniform(template, rand, 50, 60);
 	}
 
-	public GeneralTemplateMatchTests(TemplateIntensityImage.EvaluatorMethod<T> method, Class<T> imageType) {
+	protected GeneralTemplateMatchTests(TemplateIntensityImage.EvaluatorMethod<T> method, Class<T> imageType) {
 		this(new TemplateIntensityImage<>(method),imageType);
 	}
 

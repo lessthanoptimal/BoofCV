@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -41,14 +41,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-
 /**
  * @author Peter Abeles
  */
 public class WaveletVisualizeApp
 		<T extends ImageGray<T>, W extends ImageGray<W>, C extends WlCoef>
-		extends SelectAlgorithmAndInputPanel
-{
+		extends SelectAlgorithmAndInputPanel {
 	int numLevels = 3;
 
 	T image;
@@ -59,76 +57,74 @@ public class WaveletVisualizeApp
 	ListDisplayPanel panel = new ListDisplayPanel();
 	boolean processedImage = false;
 
-	public WaveletVisualizeApp(Class<T> imageType ) {
+	public WaveletVisualizeApp( Class<T> imageType ) {
 		super(1);
 		this.imageType = imageType;
 
-		addWaveletDesc("Haar",GFactoryWavelet.haar(imageType));
-		addWaveletDesc("Daub 4", GFactoryWavelet.daubJ(imageType,4));
-		addWaveletDesc("Bi-orthogonal 5",GFactoryWavelet.biorthogoal(imageType,5, BorderType.REFLECT));
-		addWaveletDesc("Coiflet 6",GFactoryWavelet.coiflet(imageType,6));
+		addWaveletDesc("Haar", GFactoryWavelet.haar(imageType));
+		addWaveletDesc("Daub 4", GFactoryWavelet.daubJ(imageType, 4));
+		addWaveletDesc("Bi-orthogonal 5", GFactoryWavelet.biorthogoal(imageType, 5, BorderType.REFLECT));
+		addWaveletDesc("Coiflet 6", GFactoryWavelet.coiflet(imageType, 6));
 
 		setMainGUI(panel);
 	}
 
 	public void process( BufferedImage input ) {
 		setInputImage(input);
-		
-		image = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		imageInv = (T)image.createNew(image.width,image.height);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				setPreferredSize(new Dimension(image.width+50,image.height+20));
-				processedImage = true;
-			}});
+		image = ConvertBufferedImage.convertFromSingle(input, null, imageType);
+		imageInv = (T)image.createNew(image.width, image.height);
+
+		SwingUtilities.invokeLater(() -> {
+			setPreferredSize(new Dimension(image.width + 50, image.height + 20));
+			processedImage = true;
+		});
 
 		doRefreshAll();
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile( String fileName ) {}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+	public void refreshAll( Object[] cookies ) {
+		setActiveAlgorithm(0, null, cookies[0]);
 	}
 
-	private void addWaveletDesc( String name , WaveletDescription desc )
-	{
-		if( desc != null )
-			addAlgorithm(0, name,desc);
+	private void addWaveletDesc( String name, WaveletDescription desc ) {
+		if (desc != null)
+			addAlgorithm(0, name, desc);
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( image == null )
+	public void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
+		if (image == null)
 			return;
 
 		WaveletDescription<C> desc = (WaveletDescription<C>)cookie;
-		WaveletTransform<T,W,C> waveletTran =
-				FactoryWaveletTransform.create((Class)image.getClass(),desc,numLevels,0,255);
+		WaveletTransform<T, W, C> waveletTran =
+				FactoryWaveletTransform.create((Class)image.getClass(), desc, numLevels, 0, 255);
 
 		panel.reset();
 
-		W imageWavelet = waveletTran.transform(image,null);
+		W imageWavelet = waveletTran.transform(image, null);
 
-		waveletTran.invert(imageWavelet,imageInv);
+		waveletTran.invert(imageWavelet, imageInv);
 
 		// adjust the values inside the wavelet transform to make it easier to see
 		UtilWavelet.adjustForDisplay(imageWavelet, waveletTran.getLevels(), 255);
-		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet,null,255);
-		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv,null,true);
+		BufferedImage buffWavelet = VisualizeImageData.grayMagnitude(imageWavelet, null, 255);
+		BufferedImage buffInv = ConvertBufferedImage.convertTo(imageInv, null, true);
 
-		panel.addImage(buffWavelet,"Transform");
-		panel.addImage(buffInv,"Inverse");
+		panel.addImage(buffWavelet, "Transform");
+		panel.addImage(buffInv, "Inverse");
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -139,24 +135,24 @@ public class WaveletVisualizeApp
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage in = UtilImageIO.loadImage("data/standard/kodim17.bmp");
+//		BufferedImage in = UtilImageIO.loadImage("data/standard/kodim17.bmp");
 		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayF32.class);
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));
-		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
-		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
+		inputs.add(new PathLabel("fingerprint", UtilIO.pathExample("standard/fingerprint.jpg")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
+		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		while (!app.getHasProcessedImage()) {
+			BoofMiscOps.sleep(10);
 		}
 
-		ShowImages.showWindow(app,"Wavelet Transforms", true);
+		ShowImages.showWindow(app, "Wavelet Transforms", true);
 	}
 }

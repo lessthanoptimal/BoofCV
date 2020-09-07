@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,17 +45,21 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
  *
  * @author Samuel Audet
  */
+@SuppressWarnings({"UnsafeFinalization","MissingOverride","NarrowingCompoundAssignment","JavaLangClash"})
 public abstract class FrameGrabber implements Closeable {
 
-    public static final List<String> list = new LinkedList<String>(Arrays.asList(new String[] {
-            "DC1394", "FlyCapture", "FlyCapture2", "OpenKinect", "OpenKinect2", "RealSense", "PS3Eye", "VideoInput", "OpenCV", "FFmpeg", "IPCamera" }));
+    public static final ArrayDeque<String> list = new ArrayDeque<>(Arrays.asList(
+            "DC1394", "FlyCapture", "FlyCapture2", "OpenKinect", "OpenKinect2", "RealSense", "PS3Eye", "VideoInput", "OpenCV", "FFmpeg", "IPCamera"));
     public static void init() {
         for (String name : list) {
             try {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,18 +81,18 @@ public abstract class WatershedVincentSoille1991 {
 
 	// histogram for sorting the image.  8-bits so 256 possible values
 	// each element refers to a pixel in the input image
-	protected GrowQueue_I32 histogram[] = new GrowQueue_I32[256];
+	protected GrowQueue_I32[] histogram = new GrowQueue_I32[256];
 
 	// Output image.  This is im_o in the paper.
 	// The output image has a 1-pixel wide border which means that bound checks don't need
 	// to happen when examining a pixel's neighbor.
-	protected GrayS32 output = new GrayS32(1,1);
+	protected GrayS32 output = new GrayS32(1, 1);
 	// storage for sub-image output
 	protected GrayS32 outputSub = new GrayS32();
 
 	// work image of distances. im_d in the paper
 	// also has a 1 pixel border
-	protected GrayS32 distance = new GrayS32(1,1);
+	protected GrayS32 distance = new GrayS32(1, 1);
 	protected int currentDistance;
 
 	// label of the region being marked
@@ -105,8 +105,8 @@ public abstract class WatershedVincentSoille1991 {
 	protected RemoveWatersheds removeWatersheds = new RemoveWatersheds();
 	boolean removedWatersheds;
 
-	public WatershedVincentSoille1991() {
-		for( int i = 0; i < histogram.length; i++ ) {
+	protected WatershedVincentSoille1991() {
+		for (int i = 0; i < histogram.length; i++) {
 			histogram[i] = new GrowQueue_I32();
 		}
 	}
@@ -120,8 +120,8 @@ public abstract class WatershedVincentSoille1991 {
 		// input = im_0
 
 		removedWatersheds = false;
-		output.reshape(input.width+2,input.height+2);
-		distance.reshape(input.width+2,input.height+2);
+		output.reshape(input.width + 2, input.height + 2);
+		distance.reshape(input.width + 2, input.height + 2);
 
 		ImageMiscOps.fill(output, INIT);
 		ImageMiscOps.fill(distance, 0);
@@ -132,13 +132,13 @@ public abstract class WatershedVincentSoille1991 {
 
 		currentLabel = 0;
 
-		for( int i = 0; i < histogram.length; i++ ) {
+		for (int i = 0; i < histogram.length; i++) {
 			GrowQueue_I32 level = histogram[i];
-			if( level.size == 0 )
+			if (level.size == 0)
 				continue;
 
 			// Go through each pixel at this level and mark them according to their neighbors
-			for( int j = 0; j < level.size; j++ ) {
+			for (int j = 0; j < level.size; j++) {
 				int index = level.data[j];
 				output.data[index] = MASK;
 
@@ -149,12 +149,12 @@ public abstract class WatershedVincentSoille1991 {
 			currentDistance = 1;
 			fifo.add(MARKER_PIXEL);
 
-			while( true ) {
+			while (true) {
 				int p = fifo.popHead();
 
 				// end of a cycle.  Exit the loop if it is done or increase the distance and continue processing
-				if( p == MARKER_PIXEL) {
-					if( fifo.isEmpty() )
+				if (p == MARKER_PIXEL) {
+					if (fifo.isEmpty())
 						break;
 					else {
 						fifo.add(MARKER_PIXEL);
@@ -169,18 +169,18 @@ public abstract class WatershedVincentSoille1991 {
 			}
 
 			// see if new minima have been discovered
-			for( int j = 0; j < level.size; j++ ) {
+			for (int j = 0; j < level.size; j++) {
 				int index = level.get(j);
 				// distance associated with p is reset to 0
 				distance.data[index] = 0;
 
-				if( output.data[index] == MASK ) {
+				if (output.data[index] == MASK) {
 					currentLabel++;
 					fifo.add(index);
 					output.data[index] = currentLabel;
 
 					// grow the new region into the surrounding connected pixels
-					while( !fifo.isEmpty() ) {
+					while (!fifo.isEmpty()) {
 						checkNeighborsMasks(fifo.popHead());
 					}
 				}
@@ -202,26 +202,26 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param input (Input) Input image
 	 * @param seeds (Output) Segmented image containing seeds.  Note that all seeds should have a value &gt; 0 and have a
-	 *              value &le; numRegions.
+	 * value &le; numRegions.
 	 */
-	public void process(GrayU8 input , GrayS32 seeds ) {
-		InputSanityCheck.checkSameShape(input,seeds);
+	public void process( GrayU8 input, GrayS32 seeds ) {
+		InputSanityCheck.checkSameShape(input, seeds);
 
 		removedWatersheds = false;
-		output.reshape(input.width+2,input.height+2);
-		distance.reshape(input.width+2,input.height+2);
+		output.reshape(input.width + 2, input.height + 2);
+		distance.reshape(input.width + 2, input.height + 2);
 
 		ImageMiscOps.fill(output, INIT);
 		ImageMiscOps.fill(distance, 0);
 		fifo.reset();
 
 		// copy the seeds into the output directory
-		for( int y = 0; y < seeds.height; y++ ) {
+		for (int y = 0; y < seeds.height; y++) {
 			int indexSeeds = seeds.startIndex + y*seeds.stride;
-			int indexOut = (y+1)*output.stride + 1;
-			for( int x = 0; x < seeds.width; x++ , indexSeeds++, indexOut++ ) {
+			int indexOut = (y + 1)*output.stride + 1;
+			for (int x = 0; x < seeds.width; x++, indexSeeds++, indexOut++) {
 				int v = seeds.data[indexSeeds];
-				if( v > 0 ) {
+				if (v > 0) {
 					output.data[indexOut] = v;
 				}
 			}
@@ -231,18 +231,18 @@ public abstract class WatershedVincentSoille1991 {
 		sortPixels(input);
 
 		// perform watershed
-		for( int i = 0; i < histogram.length; i++ ) {
+		for (int i = 0; i < histogram.length; i++) {
 			GrowQueue_I32 level = histogram[i];
-			if( level.size == 0 )
+			if (level.size == 0)
 				continue;
 
 			// Go through each pixel at this level and mark them according to their neighbors
-			for( int j = 0; j < level.size; j++ ) {
+			for (int j = 0; j < level.size; j++) {
 				int index = level.data[j];
 
 				// If not has not already been labeled by a seed then try assigning it values
 				// from its neighbors
-				if( output.data[index] == INIT ) {
+				if (output.data[index] == INIT) {
 					output.data[index] = MASK;
 					assignNewToNeighbors(index);
 				}
@@ -251,12 +251,12 @@ public abstract class WatershedVincentSoille1991 {
 			currentDistance = 1;
 			fifo.add(MARKER_PIXEL);
 
-			while( true ) {
+			while (true) {
 				int p = fifo.popHead();
 
 				// end of a cycle.  Exit the loop if it is done or increase the distance and continue processing
-				if( p == MARKER_PIXEL) {
-					if( fifo.isEmpty() )
+				if (p == MARKER_PIXEL) {
+					if (fifo.isEmpty())
 						break;
 					else {
 						fifo.add(MARKER_PIXEL);
@@ -282,39 +282,40 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param index Pixel whose neighbors are being examined
 	 */
-	protected abstract void assignNewToNeighbors(int index);
+	protected abstract void assignNewToNeighbors( int index );
 
 	/**
 	 * Check the neighbors to see if it should become a member or a watershed
+	 *
 	 * @param index Index of the target pixel
 	 */
-	protected abstract void checkNeighborsAssign(int index);
+	protected abstract void checkNeighborsAssign( int index );
 
-	protected void handleNeighborAssign(int indexTarget, int indexNeighbor) {
+	protected void handleNeighborAssign( int indexTarget, int indexNeighbor ) {
 		int regionNeighbor = output.data[indexNeighbor];
 		int distanceNeighbor = distance.data[indexNeighbor];
 
 		// if neighbor has been assigned a region or is WSHED
-		if( regionNeighbor >= 0 && distanceNeighbor < currentDistance ) {
+		if (regionNeighbor >= 0 && distanceNeighbor < currentDistance) {
 			int regionTarget = output.data[indexTarget];
 
 			// see if the target belongs to an already labeled basin or watershed
-			if( regionNeighbor > 0 ) {
-				if( regionTarget < 0 ) {// if is MASK
+			if (regionNeighbor > 0) {
+				if (regionTarget < 0) {// if is MASK
 					output.data[indexTarget] = regionNeighbor;
-				} else if( regionTarget == 0 ) {
+				} else if (regionTarget == 0) {
 					// if it is a watershed only assign to the neighbor value if it would be closer
 					// this is a deviation from what's in the paper.  There might be a type-o there or I miss read it
-					if( distanceNeighbor+1 < currentDistance  ) {
+					if (distanceNeighbor + 1 < currentDistance) {
 						output.data[indexTarget] = regionNeighbor;
 					}
-				} else if( regionTarget != regionNeighbor ) {
+				} else if (regionTarget != regionNeighbor) {
 					output.data[indexTarget] = WSHED;
 				}
-			} else if( regionTarget == MASK ) {
+			} else if (regionTarget == MASK) {
 				output.data[indexTarget] = WSHED;
 			}
-		} else if( regionNeighbor == MASK && distanceNeighbor == 0) {
+		} else if (regionNeighbor == MASK && distanceNeighbor == 0) {
 			distance.data[indexNeighbor] = currentDistance + 1;
 			fifo.add(indexNeighbor);
 		}
@@ -326,10 +327,10 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param index Pixel whose neighbors are being examined.
 	 */
-	protected abstract void checkNeighborsMasks(int index);
+	protected abstract void checkNeighborsMasks( int index );
 
-	protected void checkMask(int index) {
-		if( output.data[index] == MASK ) {
+	protected void checkMask( int index ) {
+		if (output.data[index] == MASK) {
 			output.data[index] = currentLabel;
 			fifo.add(index);
 		}
@@ -338,16 +339,16 @@ public abstract class WatershedVincentSoille1991 {
 	/**
 	 * Very fast histogram based sorting.  Index of each pixel is placed inside a list for its intensity level.
 	 */
-	protected void sortPixels(GrayU8 input) {
+	protected void sortPixels( GrayU8 input ) {
 		// initialize histogram
-		for( int i = 0; i < histogram.length; i++ ) {
+		for (int i = 0; i < histogram.length; i++) {
 			histogram[i].reset();
 		}
 		// sort by creating a histogram
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int index = input.startIndex + y*input.stride;
-			int indexOut = (y+1)*output.stride + 1;
-			for (int x = 0; x < input.width; x++ , index++ , indexOut++) {
+			int indexOut = (y + 1)*output.stride + 1;
+			for (int x = 0; x < input.width; x++, index++, indexOut++) {
 				int value = input.data[index] & 0xFF;
 				histogram[value].add(indexOut);
 			}
@@ -359,7 +360,7 @@ public abstract class WatershedVincentSoille1991 {
 	 * the outside border of -1 valued pixels.
 	 */
 	public GrayS32 getOutput() {
-		output.subimage(1,1,output.width-1,output.height-1,outputSub);
+		output.subimage(1, 1, output.width - 1, output.height - 1, outputSub);
 		return outputSub;
 	}
 
@@ -397,24 +398,24 @@ public abstract class WatershedVincentSoille1991 {
 	public static class Connect4 extends WatershedVincentSoille1991 {
 
 		@Override
-		protected void assignNewToNeighbors(int index) {
-			if( output.data[index+1] >= 0 ) {                           // (x+1,y)
+		protected void assignNewToNeighbors( int index ) {
+			if (output.data[index + 1] >= 0) {                           // (x+1,y)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index-1] >= 0 ) {                    // (x-1,y)
+			} else if (output.data[index - 1] >= 0) {                    // (x-1,y)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index+output.stride] >= 0 ) {        // (x,y+1)
+			} else if (output.data[index + output.stride] >= 0) {        // (x,y+1)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index-output.stride] >= 0 ) {        // (x,y-1)
+			} else if (output.data[index - output.stride] >= 0) {        // (x,y-1)
 				distance.data[index] = 1;
 				fifo.add(index);
 			}
 		}
 
 		@Override
-		protected void checkNeighborsAssign(int index) {
+		protected void checkNeighborsAssign( int index ) {
 			handleNeighborAssign(index, index + 1);
 			handleNeighborAssign(index, index - 1);
 			handleNeighborAssign(index, index + output.stride);
@@ -422,7 +423,7 @@ public abstract class WatershedVincentSoille1991 {
 		}
 
 		@Override
-		protected void checkNeighborsMasks(int index) {
+		protected void checkNeighborsMasks( int index ) {
 			checkMask(index + 1);
 			checkMask(index - 1);
 			checkMask(index + output.stride);
@@ -436,36 +437,36 @@ public abstract class WatershedVincentSoille1991 {
 	public static class Connect8 extends WatershedVincentSoille1991 {
 
 		@Override
-		protected void assignNewToNeighbors(int index) {
-			if( output.data[index+1] >= 0 ) {                           // (x+1,y)
+		protected void assignNewToNeighbors( int index ) {
+			if (output.data[index + 1] >= 0) {                           // (x+1,y)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index-1] >= 0 ) {                    // (x-1,y)
+			} else if (output.data[index - 1] >= 0) {                    // (x-1,y)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index+output.stride] >= 0 ) {        // (x,y+1)
+			} else if (output.data[index + output.stride] >= 0) {        // (x,y+1)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index-output.stride] >= 0 ) {        // (x,y-1)
+			} else if (output.data[index - output.stride] >= 0) {        // (x,y-1)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index+1+output.stride] >= 0 ) {      // (x+1,y+1)
+			} else if (output.data[index + 1 + output.stride] >= 0) {      // (x+1,y+1)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index-1+output.stride] >= 0 ) {      // (x-1,y+1)
+			} else if (output.data[index - 1 + output.stride] >= 0) {      // (x-1,y+1)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index+1-output.stride] >= 0 ) {      // (x+1,y-1)
+			} else if (output.data[index + 1 - output.stride] >= 0) {      // (x+1,y-1)
 				distance.data[index] = 1;
 				fifo.add(index);
-			} else if( output.data[index-1-output.stride] >= 0 ) {      // (x-1,y-1)
+			} else if (output.data[index - 1 - output.stride] >= 0) {      // (x-1,y-1)
 				distance.data[index] = 1;
 				fifo.add(index);
 			}
 		}
 
 		@Override
-		protected void checkNeighborsAssign(int index) {
+		protected void checkNeighborsAssign( int index ) {
 			handleNeighborAssign(index, index + 1);
 			handleNeighborAssign(index, index - 1);
 			handleNeighborAssign(index, index + output.stride);
@@ -478,7 +479,7 @@ public abstract class WatershedVincentSoille1991 {
 		}
 
 		@Override
-		protected void checkNeighborsMasks(int index) {
+		protected void checkNeighborsMasks( int index ) {
 			checkMask(index + 1);
 			checkMask(index - 1);
 			checkMask(index + output.stride);

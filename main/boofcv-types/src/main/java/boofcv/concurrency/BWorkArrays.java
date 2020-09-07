@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,20 +30,21 @@ public class BWorkArrays implements WorkArrays {
 	List<byte[]> storage = new ArrayList<>();
 	int length;
 
-	public BWorkArrays(int length) {
+	public BWorkArrays( int length ) {
 		this.length = length;
 	}
 
-	public BWorkArrays() {
-	}
+	public BWorkArrays() {}
 
 	/**
 	 * Checks to see if the stored arrays have the specified length. If not the length is changed and old
 	 * arrays are purged
+	 *
 	 * @param length Desired array length
 	 */
+	@Override
 	public synchronized void reset( int length ) {
-		if( this.length != length ) {
+		if (this.length != length) {
 			this.length = length;
 			storage.clear();
 		}
@@ -53,20 +54,21 @@ public class BWorkArrays implements WorkArrays {
 	 * If there are arrays in storage one of them is returned, otherwise a new array is returned
 	 */
 	public synchronized byte[] pop() {
-		if( storage.isEmpty() ) {
+		if (storage.isEmpty()) {
 			return new byte[length];
 		} else {
-			return storage.remove(storage.size()-1);
+			return storage.remove(storage.size() - 1);
 		}
 	}
 
 	/**
 	 * Adds the array to storage. if the array length is unexpected an exception is thrown
+	 *
 	 * @param array array to be recycled.
 	 */
 	public synchronized void recycle( byte[] array ) {
-		if( array.length != length ) {
-			throw new IllegalArgumentException("Unexpected array length. Expected "+length+" found "+array.length);
+		if (array.length != length) {
+			throw new IllegalArgumentException("Unexpected array length. Expected " + length + " found " + array.length);
 		}
 		storage.add(array);
 	}
@@ -74,6 +76,7 @@ public class BWorkArrays implements WorkArrays {
 	/**
 	 * Length of arrays returned
 	 */
+	@Override
 	public int length() {
 		return length;
 	}

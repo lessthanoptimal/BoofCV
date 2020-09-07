@@ -1,5 +1,8 @@
+//import net.ltgt.gradle.errorprone.CheckSeverity
+
 plugins {
     id "com.peterabeles.gversion" version "1.8.3" apply false
+    id "net.ltgt.errorprone" version "1.2.1" apply false
 }
 
 ext.libpath = file('./').absolutePath
@@ -31,6 +34,7 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven'
     apply plugin: 'signing'
+    apply plugin: 'net.ltgt.errorprone'
 
     java {
         sourceCompatibility = JavaVersion.VERSION_14
@@ -46,17 +50,16 @@ subprojects {
     // To make ErrorProne and Kotlin plugins happy
     configurations.all {
         resolutionStrategy {
-            force 'com.google.code.findbugs:jsr305:3.0.2'
             force 'org.jetbrains:annotations:20.0.0'
+            force 'com.google.guava:guava:27.0.1-jre'
+            force 'com.google.errorprone:error_prone_annotations:2.4.0'
+            force 'com.google.code.findbugs:jsr305:3.0.2'
+            force 'org.checkerframework:checker-qual:2.10.0'
         }
     }
 
     // Fail on jar conflict
-    configurations.all {
-        resolutionStrategy {
-            failOnVersionConflict()
-        }
-    }
+    configurations.all { resolutionStrategy { failOnVersionConflict() } }
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) {
@@ -123,8 +126,9 @@ subprojects {
         benchmarkImplementation project.sourceSets.main.runtimeClasspath
         benchmarkImplementation project.sourceSets.main.compileClasspath
 
-        ['core','generator-annprocess'].each { String a->
-            benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19') // don't upgrade to 1.21! much slower
+        ['1.19'].each { String a->// don't upgrade to 1.21! much slower
+            benchmarkCompile('org.openjdk.jmh:jmh-core:'+a)
+            benchmarkAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:'+a
         }
 
         // needed to use Java 11+ syntax with Java 1.8 byte code
@@ -134,8 +138,47 @@ subprojects {
         }
         annotationProcessor("net.bytebuddy:byte-buddy:1.10.10")
         annotationProcessor("net.bytebuddy:byte-buddy-agent:1.10.10")
-        // @Getter @Setter
-        annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
+        annotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
+
+        errorprone( "com.google.errorprone:error_prone_core:2.4.0" )
+        errorproneJavac( "com.google.errorprone:javac:9+181-r4173-1" )
+
+//        // even if it's not used you still need to include the dependency
+//        annotationProcessor "com.uber.nullaway:nullaway:0.8.0"
+//        testAnnotationProcessor "com.uber.nullaway:nullaway:0.8.0"
+//        benchmarkAnnotationProcessor "com.uber.nullaway:nullaway:0.8.0"
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.errorprone.enabled = true
+        options.errorprone.disableWarningsInGeneratedCode = true
+        options.errorprone.disable("TypeParameterUnusedInFormals","StringSplitter","InconsistentCapitalization",
+                "HidingField", // this is sometimes done when the specific type is known by child. Clean up later.
+                "ClassNewInstance", // yes it's deprecated, but new version is more verbose with ignored errors
+                "FloatingPointLiteralPrecision", // too many false positives in test code
+                "EmptyCatch", // doesn't acknowledge "ignore". can't get the fix working. Should be an error
+                "ReferenceEquality", // This is done intentionally a TON. Good test but not here
+                "MutablePublicArray", // Done intentionally in every case
+                "CatchAndPrintStackTrace", // Should clean up, but done too often right now
+                "FallThrough", // JDK-14 Error Prone BUG
+                "MissingSummary","UnescapedEntity","EmptyBlockTag")
+        options.errorprone.error("MissingOverride","MissingCasesInEnumSwitch","BadInstanceof",
+                "PublicConstructorForAbstractClass","NarrowingCompoundAssignment","JdkObsolete")
+
+        if( name.startsWith("compileTest") ) {
+            options.errorprone.disable("IntLongMath","ClassCanBeStatic","UnnecessaryParentheses")
+        }
+
+        if( name.startsWith("compileBenchmark") ) {
+            options.errorprone.disable("StaticAssignmentInConstructor","UnusedVariable")
+        }
+
+//        options.errorprone {
+//            check("NullAway", CheckSeverity.ERROR)
+//            option("NullAway:TreatGeneratedAsUnannotated", true)
+//            option("NullAway:AnnotatedPackages", "boofcv")
+//        }
     }
 
     task javadocJar(type: Jar) {
@@ -161,14 +204,10 @@ subprojects {
 
     // if Maven central isn't setup in ~/.gradle/gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
-        signing {
-            sign configurations.archives
-        }
+        signing { sign configurations.archives }
 
         uploadArchives {
-            artifacts {
-                archives javadocJar
-            }
+            artifacts { archives javadocJar }
             repositories {
                 mavenDeployer {
                     beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -268,7 +307,6 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
         copy {
             from ext.boofJars
             into ext.fileName
-
         }
 
         println("\n\nSaved to directory "+ext.fileName)

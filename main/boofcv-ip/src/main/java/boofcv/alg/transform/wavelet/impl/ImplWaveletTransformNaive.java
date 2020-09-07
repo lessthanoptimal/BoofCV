@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
 
+import javax.annotation.Generated;
 
 /**
  * <p>
@@ -39,6 +40,7 @@ import boofcv.struct.wavelet.WlCoef_I32;
  *
  * @author Peter Abeles
  */
+@Generated("boofcv.alg.transform.wavelet.impl.GenerateImplWaveletTransformNaive")
 public class ImplWaveletTransformNaive {
 
 	/**

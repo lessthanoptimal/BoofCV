@@ -33,42 +33,41 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
-		extends SelectDisparityWithChecksWta<float[],DI> implements Compare_F32
-{
+		extends SelectDisparityWithChecksWta<float[], DI> implements Compare_F32 {
 	// scores organized for more efficient processing
-	float columnScore[] = new float[1];
+	float[] columnScore = new float[1];
 	int imageWidth;
 
 	// texture threshold, use an integer value for speed.
 	protected float textureThreshold;
 
-	public SelectErrorWithChecks_F32(int maxError,
-									 int rightToLeftTolerance,
-									 double texture,
-									 Class<DI> disparityType) {
-		super(maxError,rightToLeftTolerance,texture,disparityType);
+	protected SelectErrorWithChecks_F32( int maxError,
+										 int rightToLeftTolerance,
+										 double texture,
+										 Class<DI> disparityType ) {
+		super(maxError, rightToLeftTolerance, texture, disparityType);
 		this.disparityType = disparityType;
 	}
 
-	public SelectErrorWithChecks_F32(SelectErrorWithChecks_F32<DI> original ) {
-		this(original.maxError,original.rightToLeftTolerance,original.textureThreshold,original.disparityType);
+	protected SelectErrorWithChecks_F32( SelectErrorWithChecks_F32<DI> original ) {
+		this(original.maxError, original.rightToLeftTolerance, original.textureThreshold, original.disparityType);
 	}
 
 	@Override
-	public void setTexture(double threshold) {
+	public void setTexture( double threshold ) {
 		textureThreshold = (float)threshold;
 	}
 
 	@Override
-	public void configure(DI imageDisparity, int disparityMin, int disparityMax , int radiusX ) {
-		super.configure(imageDisparity,disparityMin,disparityMax,radiusX);
+	public void configure( DI imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
+		super.configure(imageDisparity, disparityMin, disparityMax, radiusX);
 
 		columnScore = new float[disparityRange];
 		imageWidth = imageDisparity.width;
 	}
 
 	@Override
-	public void process(int row, float[] scores ) {
+	public void process( int row, float[] scores ) {
 
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
@@ -78,9 +77,9 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 		}
 
 		// Select the best disparity from all the rest
-		for( int col = disparityMin; col < imageWidth; col++ ) {
+		for (int col = disparityMin; col < imageWidth; col++) {
 			// Determine the number of disparities that can be considered at this column
-			localRange = disparityMaxAtColumnL2R(col)-disparityMin+1;
+			localRange = disparityMaxAtColumnL2R(col) - disparityMin + 1;
 
 			// index of the element being examined in the score array
 			int indexScore = col - disparityMin;
@@ -90,71 +89,70 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 			float scoreBest = columnScore[0] = scores[indexScore];
 			indexScore += imageWidth;
 
-			for(int i = 1; i < localRange; i++ ,indexScore += imageWidth) {
+			for (int i = 1; i < localRange; i++, indexScore += imageWidth) {
 				float s = scores[indexScore];
 				columnScore[i] = s;
-				if( s < scoreBest ) {
+				if (s < scoreBest) {
 					scoreBest = s;
 					bestDisparity = i;
 				}
 			}
 
 			// detect bad matches
-			if( scoreBest > maxError ) {
+			if (scoreBest > maxError) {
 				// make sure the error isn't too large
 				bestDisparity = invalidDisparity;
-			} else if( rightToLeftTolerance >= 0 ) {
+			} else if (rightToLeftTolerance >= 0) {
 				// if the associate is different going the other direction it is probably noise
 
-				int disparityRtoL = selectRightToLeft(col-bestDisparity-disparityMin,scores);
+				int disparityRtoL = selectRightToLeft(col - bestDisparity - disparityMin, scores);
 
-				if( Math.abs(disparityRtoL-bestDisparity) > rightToLeftTolerance ) {
+				if (Math.abs(disparityRtoL - bestDisparity) > rightToLeftTolerance) {
 					bestDisparity = invalidDisparity;
 				}
 			}
 			// test to see if the region lacks sufficient texture if:
 			// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
-			if( textureThreshold > 0 && bestDisparity != invalidDisparity && localRange >= 3 ) {
+			if (textureThreshold > 0 && bestDisparity != invalidDisparity && localRange >= 3) {
 				// find the second best disparity value and exclude its neighbors
 				float secondBest = Float.MAX_VALUE;
-				for( int i = 0; i < bestDisparity-1; i++ ) {
-					if( columnScore[i] < secondBest ) {
+				for (int i = 0; i < bestDisparity - 1; i++) {
+					if (columnScore[i] < secondBest) {
 						secondBest = columnScore[i];
 					}
 				}
-				for(int i = bestDisparity+2; i < localRange; i++ ) {
-					if( columnScore[i] < secondBest ) {
+				for (int i = bestDisparity + 2; i < localRange; i++) {
+					if (columnScore[i] < secondBest) {
 						secondBest = columnScore[i];
 					}
 				}
 
 				// similar scores indicate lack of texture
 				// C = (C2-C1)/C1
-				if( secondBest-scoreBest <= textureThreshold*scoreBest )
+				if (secondBest - scoreBest <= textureThreshold*scoreBest)
 					bestDisparity = invalidDisparity;
 			}
 
-			setDisparity(indexDisparity++ , bestDisparity );
+			setDisparity(indexDisparity++, bestDisparity);
 		}
 	}
 
 	/**
 	 * Finds the best disparity going from right to left image.
-	 *
 	 */
-	private int selectRightToLeft( int col , float[] scores ) {
+	private int selectRightToLeft( int col, float[] scores ) {
 		// The range of disparities it can search
-		int maxLocalDisparity = Math.min(imageWidth, col+disparityMax+1)-col-disparityMin;
+		int maxLocalDisparity = Math.min(imageWidth, col + disparityMax + 1) - col - disparityMin;
 
 		int indexBest = 0;
 		int indexScore = col;
 		float scoreBest = scores[col];
-		indexScore += imageWidth+1;
+		indexScore += imageWidth + 1;
 
-		for( int i = 1; i < maxLocalDisparity; i++ ,indexScore += imageWidth+1) {
+		for (int i = 1; i < maxLocalDisparity; i++, indexScore += imageWidth + 1) {
 			float s = scores[indexScore];
 
-			if( s < scoreBest ) {
+			if (s < scoreBest) {
 				scoreBest = s;
 				indexBest = i;
 			}
@@ -164,20 +162,19 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 	}
 
 	@Override
-	public int compare(float scoreA, float scoreB) {
+	public int compare( float scoreA, float scoreB ) {
 		return Float.compare(-scoreA, -scoreB);
 	}
 
 	/**
 	 * Implementation for disparity images of type GrayU8
 	 */
-	public static class DispU8 extends SelectErrorWithChecks_F32<GrayU8>
-	{
-		public DispU8(int maxError, int rightToLeftTolerance, double texture) {
+	public static class DispU8 extends SelectErrorWithChecks_F32<GrayU8> {
+		public DispU8( int maxError, int rightToLeftTolerance, double texture ) {
 			super(maxError, rightToLeftTolerance, texture, GrayU8.class);
 		}
 
-		public DispU8(DispU8 original) {
+		public DispU8( DispU8 original ) {
 			super(original);
 		}
 
@@ -186,12 +183,13 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 			return new DispU8(this);
 		}
 
-		protected void setDisparity( int index , int value ) {
+		@Override
+		protected void setDisparity( int index, int value ) {
 			imageDisparity.data[index] = (byte)value;
 		}
 
 		@Override
-		protected void setDisparityInvalid(int index) {
+		protected void setDisparityInvalid( int index ) {
 			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 	}

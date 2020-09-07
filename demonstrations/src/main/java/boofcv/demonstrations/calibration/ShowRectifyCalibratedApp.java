@@ -31,6 +31,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
@@ -73,8 +74,7 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		setMainGUI(gui);
 	}
 
-	public void configure( final BufferedImage origLeft , final BufferedImage origRight , StereoParameters param )
-	{
+	public void configure( final BufferedImage origLeft, final BufferedImage origRight, StereoParameters param ) {
 		this.param = param;
 
 		// distorted images
@@ -83,9 +83,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 		// storage for undistorted + rectified images
 		rectLeft = new Planar<>(GrayF32.class,
-				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
+				distLeft.getWidth(), distLeft.getHeight(), distLeft.getNumBands());
 		rectRight = new Planar<>(GrayF32.class,
-				distRight.getWidth(),distRight.getHeight(),distRight.getNumBands());
+				distRight.getWidth(), distRight.getHeight(), distRight.getNumBands());
 
 		// Compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
@@ -93,9 +93,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 		// original camera calibration matrices
 		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(param.getLeft(), (DMatrixRMaj)null);
-		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(param.getRight(),(DMatrixRMaj) null);
+		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(param.getRight(), (DMatrixRMaj)null);
 
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
+		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
@@ -103,74 +103,69 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.reset();
-				gui.addItem(new RectifiedPairPanel(true, origLeft, origRight), "Original");
-			}
+		SwingUtilities.invokeLater(() -> {
+			gui.reset();
+			gui.addItem(new RectifiedPairPanel(true, origLeft, origRight), "Original");
 		});
 
 		// add different types of adjustments
-		addRectified("No Adjustment", rect1,rect2);
+		addRectified("No Adjustment", rect1, rect2);
 		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK, null);
-		addRectified("All Inside", rect1,rect2);
+		addRectified("All Inside", rect1, rect2);
 		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK, null);
-		addRectified("Full View", rect1,rect2);
+		addRectified("Full View", rect1, rect2);
 
 		hasProcessed = true;
 	}
 
-	private void addRectified( final String name , final DMatrixRMaj rect1 , final DMatrixRMaj rect2 ) {
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+	private void addRectified( final String name, final DMatrixRMaj rect1, final DMatrixRMaj rect2 ) {
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		// Will rectify the image
-		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
-		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> imageDistortLeft =
+		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3, GrayF32.class);
+		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> imageDistortLeft =
 				RectifyImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.ZERO, imageType);
-		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.ZERO, imageType);
+//		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> imageDistortRight =
+//				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.ZERO, imageType);
 
 		// Fill the image with all black
 		GImageMiscOps.fill(rectLeft, 0);
-		GImageMiscOps.fill(rectRight,0);
+		GImageMiscOps.fill(rectRight, 0);
 
 		// Render the rectified image
-		imageDistortLeft.apply(distLeft,rectLeft);
-		imageDistortLeft.apply(distRight,rectRight);
+		imageDistortLeft.apply(distLeft, rectLeft);
+		imageDistortLeft.apply(distRight, rectRight);
 
 		// convert for output
-		final BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft, null,true);
+		final BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft, null, true);
 		final BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null, true);
 
 		// Add this rectified image
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.addItem(new RectifiedPairPanel(true, outLeft, outRight), name);
-			}});
+		SwingUtilities.invokeLater(() -> gui.addItem(new RectifiedPairPanel(true, outLeft, outRight), name));
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {}
+	public void refreshAll( Object[] cookies ) {}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {}
+	public void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		PathLabel refs = inputRefs.get(index);
 
 		StereoParameters param = CalibrationIO.load(media.openFile(refs.getPath(0)));
 		BufferedImage origLeft = media.openImage(refs.getPath(1));
 		BufferedImage origRight = media.openImage(refs.getPath(2));
 
-		configure(origLeft,origRight,param);
+		configure(origLeft, origRight, param);
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile( String fileName ) {}
 
 	@Override
 	public boolean getHasProcessedImage() {
@@ -184,13 +179,13 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("BumbleBee",dir + "/stereo.yaml",dir + "/left05.jpg",dir + "/right05.jpg"));
+		inputs.add(new PathLabel("BumbleBee", dir + "/stereo.yaml", dir + "/left05.jpg", dir + "/right05.jpg"));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		while (!app.getHasProcessedImage()) {
+			BoofMiscOps.sleep(10);
 		}
 		ShowImages.showWindow(app, "Calibrated Camera Rectification", true);
 

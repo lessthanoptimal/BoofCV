@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 
 	boolean multiColor;
 
-	public ColorTrackerObjectRectangleTests( boolean multiColor ) {
+	protected ColorTrackerObjectRectangleTests( boolean multiColor ) {
 		super(new ImageType<Planar<GrayU8>>(ImageType.Family.PLANAR, ImageDataType.U8,3));
 
 		this.multiColor = multiColor;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 
 	private AutoTypeImage input;
 
+	@Override
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 		printAll();
@@ -45,20 +46,16 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 	private void printPreamble() throws FileNotFoundException {
 		out.print("import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
-				"import java.util.ArrayList;\n" +
 				"import java.util.Arrays;\n" +
-				"import java.util.List;\n" +
 				"\n" +
+				"//CONCURRENT_INLINE import java.util.ArrayList;\n" +
+				"//CONCURRENT_INLINE import java.util.List;\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"/**\n" +
 				" * Computes statistical properties of pixels inside an image.\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n"+
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"public class "+className+" {\n\n");
 	}
 
@@ -309,12 +306,13 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 		String conOp;
 		String conditional;
 
-		public InitValue(String name, String conOp, String conditional) {
+		protected InitValue(String name, String conOp, String conditional) {
 			this.name = name;
 			this.conOp = conOp;
 			this.conditional = conditional;
 		}
 
+		@Override
 		public void printLowLevel() {
 			String sumType = input.getSumType();
 			String name = this.name + (input.isSigned() ? "" : "U");

@@ -52,7 +52,7 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 	 *
 	 * @param type Type of descriptor
 	 */
-	public BaseAssociateSets(Associate associator, Class<Desc> type) {
+	protected BaseAssociateSets( Associate associator, Class<Desc> type ) {
 		this._associator = associator;
 		this.type = type;
 
@@ -69,8 +69,8 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 	 * Specifies the number of sets and resets all internal data structures. This must be called before any other
 	 * function.
 	 */
-	public void initialize(int numberOfSets ) {
-		assert(numberOfSets>0);
+	public void initialize( int numberOfSets ) {
+		assert (numberOfSets > 0);
 
 		countSrc = 0;
 		countDst = 0;
@@ -107,41 +107,47 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 	/**
 	 * After associating a set run association these processes and saves the results
 	 */
-	protected void saveSetAssociateResults(SetStruct set) {
+	protected void saveSetAssociateResults( SetStruct set ) {
 		// used to store the size of the structure from a previous iteration
 		int before = matches.size;
 		// Copy the results from being local to this set into the original input indexes
 		FastAccess<AssociatedIndex> setMatches = _associator.getMatches();
 
-		matches.resize(matches.size+setMatches.size);
+		matches.resize(matches.size + setMatches.size);
 		for (int assocIdx = 0; assocIdx < setMatches.size; assocIdx++) {
 			AssociatedIndex sa = setMatches.get(assocIdx);
 			int inputIdxSrc = set.indexSrc.data[sa.src];
 			int inputIdxDst = set.indexDst.data[sa.dst];
-			matches.data[before+assocIdx].setAssociation(inputIdxSrc,inputIdxDst,sa.fitScore);
+			matches.data[before + assocIdx].setAssociation(inputIdxSrc, inputIdxDst, sa.fitScore);
 		}
 
 		// Copy unassociated indexes over and updated indexes to input indexes
 		GrowQueue_I32 setUnassociatedSrc = _associator.getUnassociatedSource();
 		before = unassociatedSrc.size;
-		unassociatedSrc.extend(before+setUnassociatedSrc.size);
+		unassociatedSrc.extend(before + setUnassociatedSrc.size);
 		for (int i = 0; i < setUnassociatedSrc.size; i++) {
-			unassociatedSrc.data[before+i] = set.indexSrc.data[setUnassociatedSrc.get(i)];
+			unassociatedSrc.data[before + i] = set.indexSrc.data[setUnassociatedSrc.get(i)];
 		}
 		GrowQueue_I32 setUnassociatedDst = _associator.getUnassociatedDestination();
 		before = unassociatedDst.size;
-		unassociatedDst.extend(before+setUnassociatedDst.size);
+		unassociatedDst.extend(before + setUnassociatedDst.size);
 		for (int i = 0; i < setUnassociatedDst.size; i++) {
-			unassociatedDst.data[before+i] = set.indexDst.data[setUnassociatedDst.get(i)];
+			unassociatedDst.data[before + i] = set.indexDst.data[setUnassociatedDst.get(i)];
 		}
 	}
 
 	@Override public FastAccess<AssociatedIndex> getMatches() {return matches;}
+
 	@Override public GrowQueue_I32 getUnassociatedSource() {return unassociatedSrc;}
+
 	@Override public GrowQueue_I32 getUnassociatedDestination() {return unassociatedDst;}
-	@Override public void setMaxScoreThreshold(double score) {_associator.setMaxScoreThreshold(score);}
+
+	@Override public void setMaxScoreThreshold( double score ) {_associator.setMaxScoreThreshold(score);}
+
 	@Override public MatchScoreType getScoreType() {return _associator.getScoreType();}
+
 	@Override public boolean uniqueSource() {return _associator.uniqueSource();}
+
 	@Override public boolean uniqueDestination() {return _associator.uniqueDestination();}
 
 	/**

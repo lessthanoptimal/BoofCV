@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,20 +18,16 @@
 
 package boofcv.deepboof;
 
-import deepboof.Function;
 import deepboof.io.torch7.ConvertTorchToBoofForward;
 import deepboof.io.torch7.ParseBinaryTorch7;
-import deepboof.io.torch7.SequenceAndParameters;
 import deepboof.io.torch7.struct.TorchGeneric;
 import deepboof.io.torch7.struct.TorchObject;
-import deepboof.tensors.Tensor_F32;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 /**
- *
  * 1) Look at Torch source code
  *    a) Determine the shape of the input tensor.  That will be used to set imageSize
  *    b) Figure out how it normalizes the input.  Are normalization parameters stored in the network?
@@ -46,10 +42,6 @@ import java.util.List;
  * 7) An exception is thrown and it says something isn't support or it just crashes with a weird message
  *    MO**** F***** it's not supported.  Contact Peter and hope there's an easy fix or get ready to make a code contribution to DeepBoof
  * 8) You got lucky and no error messages!!!
- *
- *
- *
- *
  *
  * @author Peter Abeles
  */
@@ -74,8 +66,8 @@ public class ImageClassifierResNet extends BaseImageClassifier {
 //		mean = torchListToArray( (TorchList)torchNorm.get("mean"));
 //		stdev = torchListToArray( (TorchList)torchNorm.get("std"));
 
-		SequenceAndParameters<Tensor_F32, Function<Tensor_F32>> seqparam =
-				ConvertTorchToBoofForward.convert(torchSequence);
+//		SequenceAndParameters<Tensor_F32, Function<Tensor_F32>> seqparam =
+		ConvertTorchToBoofForward.convert(torchSequence);
 
 		System.out.println("Bread here");
 	}

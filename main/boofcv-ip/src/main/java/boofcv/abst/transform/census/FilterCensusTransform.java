@@ -40,7 +40,7 @@ public abstract class FilterCensusTransform<In extends ImageGray<In>, Out extend
 	int ignoreRadius;             // Size of the region along the image border which is ignored
 	int sampleRadius;             // Radius of the local region sampled along y-axis
 
-	public FilterCensusTransform(int radius, ImageBorder<In> border, Class<In> imageType , ImageType<Out> outType ) {
+	protected FilterCensusTransform(int radius, ImageBorder<In> border, Class<In> imageType , ImageType<Out> outType ) {
 		this.border = border;
 		this.inputType = ImageType.single(imageType);
 		this.outType = outType;

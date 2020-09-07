@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.background.stationary;
 
-import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,19 +33,19 @@ public abstract class GenericBackgroundStationaryGmmChecks extends GenericBackgr
 		initialVariance = 12;
 	}
 
+	// The two tests below should be implemented similar to how they are implemented with Gaussian
 	@Test
 	public void initialVariance() {
-		for( ImageType type : imageTypes ) {
+//		for (ImageType type : imageTypes) {
 //			initialVariance(type);
-		}
+//		}
 	}
-
 
 	@Test
 	public void learnRate() {
-		for( ImageType type : imageTypes ) {
+//		for (ImageType type : imageTypes) {
 //			checkLearnRate_slow(type);
 //			checkLearnRate_fast(type);
-		}
+//		}
 	}
 }

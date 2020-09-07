@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,6 +52,7 @@ class TestBlockMatchBasic_NCC<T extends ImageBase<T>> {
 		@Override
 		public BruteForceBlockMatch<GrayF32> createNaive(BorderType borderType, ImageType<GrayF32> imageType) {
 			BruteForceBlockMatch<GrayF32> naive = new BruteForceBlockMatch<GrayF32>(borderType,imageType) {
+				@Override
 				public double computeScore(ImageBorder<GrayF32> _left, ImageBorder<GrayF32> _right,
 										   int cx, int cy, int disparity)
 				{

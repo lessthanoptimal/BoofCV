@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,11 +31,11 @@ import boofcv.struct.image.*;
 public class FactoryGImageMultiBand {
 
 	public static GImageMultiBand wrap( ImageBase image ) {
-		if( image instanceof ImageGray)
+		if (image instanceof ImageGray)
 			return wrap((ImageGray)image);
-		else if( image instanceof Planar)
+		else if (image instanceof Planar)
 			return wrap((Planar)image);
-		else if( image instanceof ImageInterleaved )
+		else if (image instanceof ImageInterleaved)
 			return wrap((ImageInterleaved)image);
 		throw new RuntimeException("Unknown image type");
 	}
@@ -45,12 +45,13 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand create( ImageType imageType ) {
-		if( imageType.getFamily() == ImageType.Family.GRAY ) {
+		if (imageType.getFamily() == ImageType.Family.GRAY) {
 			return new GSingleToMB(FactoryGImageGray.create(imageType.getImageClass()));
-		} if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		}
+		if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			return new PL();
-		} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
-			switch( imageType.getDataType() ) {
+		} else if (imageType.getFamily() == ImageType.Family.INTERLEAVED) {
+			switch (imageType.getDataType()) {
 				case U8:
 					return new IL_U8();
 				case S8:
@@ -70,7 +71,7 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand wrap( ImageInterleaved image ) {
-		switch( image.getDataType() ) {
+		switch (image.getDataType()) {
 			case U8:
 				return new IL_U8((InterleavedU8)image);
 			case S8:
@@ -88,7 +89,7 @@ public class FactoryGImageMultiBand {
 			case F64:
 				return new IL_F64((InterleavedF64)image);
 			default:
-				throw new IllegalArgumentException("Need to support more data types: "+image.getDataType());
+				throw new IllegalArgumentException("Need to support more data types: " + image.getDataType());
 		}
 	}
 
@@ -96,7 +97,7 @@ public class FactoryGImageMultiBand {
 		Planar image;
 		GImageGray bandWrappers[];
 
-		public PL(Planar image) {
+		public PL( Planar image ) {
 			wrap(image);
 		}
 
@@ -104,16 +105,16 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public void wrap(ImageBase image) {
-			if( this.image == null ) {
-				this.image = (Planar) image;
+		public void wrap( ImageBase image ) {
+			if (this.image == null) {
+				this.image = (Planar)image;
 
 				bandWrappers = new GImageGray[this.image.getNumBands()];
 				for (int i = 0; i < bandWrappers.length; i++) {
 					bandWrappers[i] = FactoryGImageGray.wrap(this.image.getBand(i));
 				}
 			} else {
-				this.image = (Planar) image;
+				this.image = (Planar)image;
 				for (int i = 0; i < bandWrappers.length; i++) {
 					bandWrappers[i].wrap(this.image.getBand(i));
 				}
@@ -135,43 +136,43 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public int getIndex(int x, int y) {
-			return this.image.getIndex(x,y);
+		public int getIndex( int x, int y ) {
+			return this.image.getIndex(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			int index = this.image.getIndex(x,y);
-			setF(index,value);
+		public void set( int x, int y, float[] value ) {
+			int index = this.image.getIndex(x, y);
+			setF(index, value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			int index = this.image.getIndex(x,y);
+		public void get( int x, int y, float[] value ) {
+			int index = this.image.getIndex(x, y);
 			getF(index, value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return bandWrappers[band].get(x,y);
+		public Number get( int x, int y, int band ) {
+			return bandWrappers[band].get(x, y);
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				bandWrappers[i].set(index, value[i]);
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = bandWrappers[i].getF(index);
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			throw new RuntimeException("Not supported for Planar images.  Would be slow.");
 		}
 
@@ -185,13 +186,13 @@ public class FactoryGImageMultiBand {
 
 		GImageGray sb;
 
-		public GSingleToMB(GImageGray sb) {
+		public GSingleToMB( GImageGray sb ) {
 			this.sb = sb;
 		}
 
 		@Override
-		public void wrap(ImageBase image) {
-			if( this.sb == null ) {
+		public void wrap( ImageBase image ) {
+			if (this.sb == null) {
 				this.sb = FactoryGImageGray.wrap((ImageGray)image);
 			} else {
 				this.sb.wrap((ImageGray)image);
@@ -213,39 +214,39 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public int getIndex(int x, int y) {
-			return sb.getImage().getIndex(x,y);
+		public int getIndex( int x, int y ) {
+			return sb.getImage().getIndex(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			sb.set(x,y,value[0]);
+		public void set( int x, int y, float[] value ) {
+			sb.set(x, y, value[0]);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			value[0]=sb.unsafe_getF(x,y);
+		public void get( int x, int y, float[] value ) {
+			value[0] = sb.unsafe_getF(x, y);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			if( band != 0 )
+		public Number get( int x, int y, int band ) {
+			if (band != 0)
 				throw new IllegalArgumentException("Must be band 0");
-			return this.sb.get(x,y);
+			return this.sb.get(x, y);
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			sb.set(index,value[0]);
+		public void setF( int index, float[] value ) {
+			sb.set(index, value[0]);
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
+		public void getF( int index, float[] value ) {
 			value[0] = sb.getF(index);
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return sb.getF(index);
 		}
 
@@ -259,8 +260,8 @@ public class FactoryGImageMultiBand {
 		T image;
 
 		@Override
-		public void wrap(ImageBase image) {
-			this.image = (T) image;
+		public void wrap( ImageBase image ) {
+			this.image = (T)image;
 		}
 
 		@Override
@@ -278,359 +279,359 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public int getIndex(int x, int y) {
-			return image.getIndex(x,y);
+		public int getIndex( int x, int y ) {
+			return image.getIndex(x, y);
 		}
 
 		@Override
-		public <T extends ImageBase<T>> T getImage() {
-			return (T)image;
+		public <GT extends ImageBase<GT>> GT getImage() {
+			return (GT)image;
 		}
 	}
 
 	public static class IL_U8 extends IL<InterleavedU8> {
-		public IL_U8(InterleavedU8 image) {
+		public IL_U8( InterleavedU8 image ) {
 			wrap(image);
 		}
 
 		public IL_U8() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)]&0xFF;
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)] & 0xFF;
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = (byte)value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = image.data[index++] & 0xFF;
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index] & 0xFF;
 		}
 	}
 
 	public static class IL_S8 extends IL<InterleavedS8> {
-		public IL_S8(InterleavedS8 image) {
+		public IL_S8( InterleavedS8 image ) {
 			wrap(image);
 		}
 
 		public IL_S8() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)];
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)];
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = (byte)value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = image.data[index++];
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 	}
 
 	public static class IL_U16 extends IL<InterleavedU16> {
-		public IL_U16(InterleavedU16 image) {
+		public IL_U16( InterleavedU16 image ) {
 			wrap(image);
 		}
 
 		public IL_U16() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)]&0xFFFF;
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)] & 0xFFFF;
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = (short)value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = image.data[index++] & 0xFFFF;
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index] & 0xFF;
 		}
 	}
 
 	public static class IL_S16 extends IL<InterleavedS16> {
-		public IL_S16(InterleavedS16 image) {
+		public IL_S16( InterleavedS16 image ) {
 			wrap(image);
 		}
 
 		public IL_S16() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)];
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)];
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = (short)value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = image.data[index++];
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 	}
 
 	public static class IL_S32 extends IL<InterleavedS32> {
-		public IL_S32(InterleavedS32 image) {
+		public IL_S32( InterleavedS32 image ) {
 			wrap(image);
 		}
 
 		public IL_S32() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)];
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)];
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = (int)value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = image.data[index++];
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 	}
 
 	public static class IL_S64 extends IL<InterleavedS64> {
-		public IL_S64(InterleavedS64 image) {
+		public IL_S64( InterleavedS64 image ) {
 			wrap(image);
 		}
 
 		public IL_S64() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)];
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)];
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = (long)value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = image.data[index++];
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 	}
 
 	public static class IL_F32 extends IL<InterleavedF32> {
-		public IL_F32(InterleavedF32 image) {
+		public IL_F32( InterleavedF32 image ) {
 			wrap(image);
 		}
 
 		public IL_F32() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)];
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)];
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = image.data[index++];
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 	}
 
 	public static class IL_F64 extends IL<InterleavedF64> {
-		public IL_F64(InterleavedF64 image) {
+		public IL_F64( InterleavedF64 image ) {
 			wrap(image);
 		}
 
 		public IL_F64() {}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			setF(image.getIndex(x,y),value);
+		public void set( int x, int y, float[] value ) {
+			setF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			getF(image.getIndex(x,y), value);
+		public void get( int x, int y, float[] value ) {
+			getF(image.getIndex(x, y), value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
-			return image.data[image.getIndex(x,y,band)];
+		public Number get( int x, int y, int band ) {
+			return image.data[image.getIndex(x, y, band)];
 		}
 
 		@Override
-		public void setF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void setF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				image.data[index++] = value[i];
 			}
 		}
 
 		@Override
-		public void getF(int index, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
+		public void getF( int index, float[] value ) {
+			for (int i = 0; i < image.getNumBands(); i++) {
 				value[i] = (float)image.data[index++];
 			}
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return (float)image.data[index];
 		}
 	}
 
 	public static GImageMultiBand wrap( ImageBorder image ) {
-		if( image instanceof ImageBorder_IL_S32) {
-			return new Border_IL_S32((ImageBorder_IL_S32) image);
-		} else if( image instanceof ImageBorder_IL_F32) {
-			return new Border_IL_F32((ImageBorder_IL_F32) image);
-		} else if( image instanceof ImageBorder_IL_F64) {
-			return new Border_IL_F64((ImageBorder_IL_F64) image);
+		if (image instanceof ImageBorder_IL_S32) {
+			return new Border_IL_S32((ImageBorder_IL_S32)image);
+		} else if (image instanceof ImageBorder_IL_F32) {
+			return new Border_IL_F32((ImageBorder_IL_F32)image);
+		} else if (image instanceof ImageBorder_IL_F64) {
+			return new Border_IL_F64((ImageBorder_IL_F64)image);
 		} else {
 			throw new IllegalArgumentException("Not supported yet?");
 		}
@@ -638,7 +639,7 @@ public class FactoryGImageMultiBand {
 
 	public static class Border_IL_S32 extends GMultiBorder<ImageBorder_IL_S32> {
 
-		public Border_IL_S32(ImageBorder_IL_S32 image) {
+		public Border_IL_S32( ImageBorder_IL_S32 image ) {
 			super(image);
 		}
 
@@ -648,29 +649,29 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			int value_d[] = BoofMiscOps.convertArray(value,(int[])null);
-			image.set(x,y,value_d);
+		public void set( int x, int y, float[] value ) {
+			int value_d[] = BoofMiscOps.convertArray(value, (int[])null);
+			image.set(x, y, value_d);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
+		public void get( int x, int y, float[] value ) {
 			int value_d[] = new int[value.length];
-			image.get(x,y,value_d);
-			BoofMiscOps.convertArray(value_d,value);
+			image.get(x, y, value_d);
+			BoofMiscOps.convertArray(value_d, value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
+		public Number get( int x, int y, int band ) {
 			int value_d[] = new int[image.getImage().getImageType().numBands];
-			image.get(x,y,value_d);
+			image.get(x, y, value_d);
 			return value_d[band];
 		}
 	}
 
 	public static class Border_IL_F32 extends GMultiBorder<ImageBorder_IL_F32> {
 
-		public Border_IL_F32(ImageBorder_IL_F32 image) {
+		public Border_IL_F32( ImageBorder_IL_F32 image ) {
 			super(image);
 		}
 
@@ -680,28 +681,26 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			image.set(x,y,value);
+		public void set( int x, int y, float[] value ) {
+			image.set(x, y, value);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
-			image.get(x,y,value);
+		public void get( int x, int y, float[] value ) {
+			image.get(x, y, value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
+		public Number get( int x, int y, int band ) {
 			float value_d[] = new float[image.getImage().getImageType().numBands];
-			image.get(x,y,value_d);
+			image.get(x, y, value_d);
 			return value_d[band];
 		}
-
-
 	}
 
 	public static class Border_IL_F64 extends GMultiBorder<ImageBorder_IL_F64> {
 
-		public Border_IL_F64(ImageBorder_IL_F64 image) {
+		public Border_IL_F64( ImageBorder_IL_F64 image ) {
 			super(image);
 		}
 
@@ -711,22 +710,22 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public void set(int x, int y, float[] value) {
-			double value_d[] = BoofMiscOps.convertArray(value,(double[])null);
-			image.set(x,y,value_d);
+		public void set( int x, int y, float[] value ) {
+			double value_d[] = BoofMiscOps.convertArray(value, (double[])null);
+			image.set(x, y, value_d);
 		}
 
 		@Override
-		public void get(int x, int y, float[] value) {
+		public void get( int x, int y, float[] value ) {
 			double value_d[] = new double[value.length];
-			image.get(x,y,value_d);
-			BoofMiscOps.convertArray(value_d,value);
+			image.get(x, y, value_d);
+			BoofMiscOps.convertArray(value_d, value);
 		}
 
 		@Override
-		public Number get(int x, int y, int band) {
+		public Number get( int x, int y, int band ) {
 			double value_d[] = new double[image.getImage().getImageType().numBands];
-			image.get(x,y,value_d);
+			image.get(x, y, value_d);
 			return value_d[band];
 		}
 	}
@@ -735,12 +734,12 @@ public class FactoryGImageMultiBand {
 
 		protected T image;
 
-		public GMultiBorder(T image) {
+		protected GMultiBorder( T image ) {
 			this.image = image;
 		}
 
 		@Override
-		public void wrap(ImageBase image) {
+		public void wrap( ImageBase image ) {
 			this.image.setImage(image);
 		}
 
@@ -765,16 +764,17 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
-		public int getIndex(int x, int y) {
+		public int getIndex( int x, int y ) {
 			throw new RuntimeException("Not supported");
 		}
 
-		public void setF(int index, float[] value) {throw new RuntimeException("Not supported");}
+		@Override
+		public void setF( int index, float[] value ) {throw new RuntimeException("Not supported");}
 
 		@Override
-		public void getF(int index, float[] value) {throw new RuntimeException("Not supported");}
+		public void getF( int index, float[] value ) {throw new RuntimeException("Not supported");}
 
 		@Override
-		public float getF(int index) {throw new RuntimeException("Not supported");}
+		public float getF( int index ) {throw new RuntimeException("Not supported");}
 	}
 }

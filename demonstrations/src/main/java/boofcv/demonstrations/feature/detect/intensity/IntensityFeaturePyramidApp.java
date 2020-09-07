@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -51,8 +52,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends SelectAlgorithmAndInputPanel
-{
+		extends SelectAlgorithmAndInputPanel {
 	ListDisplayPanel gui = new ListDisplayPanel();
 
 	PyramidFloat<T> pyramid;
@@ -61,96 +61,92 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 	T workImage;
 	GrayF32 scaledIntensity;
 	Class<T> imageType;
-	AnyImageDerivative<T,D> anyDerivative;
+	AnyImageDerivative<T, D> anyDerivative;
 	boolean processedImage = false;
 
-	GeneralFeatureIntensity<T,D> intensity;
+	GeneralFeatureIntensity<T, D> intensity;
 
-	public IntensityFeaturePyramidApp(Class<T> imageType, Class<D> derivType ) {
+	public IntensityFeaturePyramidApp( Class<T> imageType, Class<D> derivType ) {
 		super(2);
 		this.imageType = imageType;
 
-		addAlgorithm(0, "Hessian Det", new WrapperHessianDerivBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
-		addAlgorithm(0, "Laplacian", new WrapperHessianDerivBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
-		addAlgorithm(0, "Harris",new WrapperGradientCornerIntensity<T,D>(FactoryIntensityPointAlg.harris(2, 0.4f, false, derivType)));
-		addAlgorithm(0, "Shi Tomasi",new WrapperGradientCornerIntensity<T,D>( FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
-		addAlgorithm(0, "FAST",new WrapperFastCornerIntensity<T,D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
-		addAlgorithm(0, "KitRos",new WrapperKitRosCornerIntensity<T,D>(derivType));
-		addAlgorithm(0, "Median",new WrapperMedianCornerIntensity<T,D>(FactoryBlurFilter.median(ImageType.single(imageType),2)));
+		addAlgorithm(0, "Hessian Det", new WrapperHessianDerivBlobIntensity<T, D>(HessianBlobIntensity.Type.DETERMINANT, derivType));
+		addAlgorithm(0, "Laplacian", new WrapperHessianDerivBlobIntensity<T, D>(HessianBlobIntensity.Type.TRACE, derivType));
+		addAlgorithm(0, "Harris", new WrapperGradientCornerIntensity<T, D>(FactoryIntensityPointAlg.harris(2, 0.4f, false, derivType)));
+		addAlgorithm(0, "Shi Tomasi", new WrapperGradientCornerIntensity<T, D>(FactoryIntensityPointAlg.shiTomasi(2, false, derivType)));
+		addAlgorithm(0, "FAST", new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.fast(5, 11, imageType)));
+		addAlgorithm(0, "KitRos", new WrapperKitRosCornerIntensity<T, D>(derivType));
+		addAlgorithm(0, "Median", new WrapperMedianCornerIntensity<T, D>(FactoryBlurFilter.median(ImageType.single(imageType), 2)));
 
-		addAlgorithm(1 , "Pyramid", 0);
-		addAlgorithm(1 , "Scale-Space", 1);
+		addAlgorithm(1, "Pyramid", 0);
+		addAlgorithm(1, "Scale-Space", 1);
 
 		setMainGUI(gui);
 
-		anyDerivative = GImageDerivativeOps.derivativeForScaleSpace(imageType,derivType);
+		anyDerivative = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( input == null ) {
+	public void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
+		if (input == null) {
 			return;
 		}
 
-		if( indexFamily == 0 ) {
-			intensity = (GeneralFeatureIntensity<T,D>)cookie;
-			if( pyramid == null )
+		if (indexFamily == 0) {
+			intensity = (GeneralFeatureIntensity<T, D>)cookie;
+			if (pyramid == null)
 				return;
-		} else if( indexFamily == 1 ) {
+		} else if (indexFamily == 1) {
 			// setup the pyramid
 			double scales[] = new double[25];
-			for( int i = 0; i < scales.length ; i++ ) {
-				scales[i] =  Math.exp(i*0.15);
+			for (int i = 0; i < scales.length; i++) {
+				scales[i] = Math.exp(i*0.15);
 			}
 
-			if( ((Number)cookie).intValue() == 0 ) {
+			if (((Number)cookie).intValue() == 0) {
 				pyramid = FactoryPyramid.scaleSpacePyramid(scales, imageType);
 			} else {
 				pyramid = FactoryPyramid.scaleSpace(scales, imageType);
 			}
-			if( workImage != null )
+			if (workImage != null)
 				pyramid.process(workImage);
 
-			if( intensity == null )
+			if (intensity == null)
 				return;
 		}
 
 		// setup the feature intensity
 		gui.reset();
-		BufferedImage b = VisualizeImageData.grayMagnitude(workImage,null, 255);
-		gui.addImage(b,"Gray Image");
+		BufferedImage b = VisualizeImageData.grayMagnitude(workImage, null, 255);
+		gui.addImage(b, "Gray Image");
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Computing Scale Space Pyramid Response",
 				"", 0, pyramid.getNumLayers());
 
-		for( int i = 0; i < pyramid.getNumLayers() && !progressMonitor.isCanceled(); i++ ) {
+		for (int i = 0; i < pyramid.getNumLayers() && !progressMonitor.isCanceled(); i++) {
 			double scale = pyramid.getSigma(i);
 			T scaledImage = pyramid.getLayer(i);
 
 			anyDerivative.setInput(scaledImage);
 			D derivX = anyDerivative.getDerivative(true);
 			D derivY = anyDerivative.getDerivative(false);
-			D derivXX = anyDerivative.getDerivative(true,true);
-			D derivYY = anyDerivative.getDerivative(false,false);
-			D derivXY = anyDerivative.getDerivative(true,false);
+			D derivXX = anyDerivative.getDerivative(true, true);
+			D derivYY = anyDerivative.getDerivative(false, false);
+			D derivXY = anyDerivative.getDerivative(true, false);
 
-			intensity.process(scaledImage,derivX,derivY,derivXX,derivYY,derivXY);
+			intensity.process(scaledImage, derivX, derivY, derivXX, derivYY, derivXY);
 
 			GrayF32 featureImg = intensity.getIntensity();
 
 			// scale it up to full resolution
-			new FDistort(featureImg,scaledIntensity).interpNN().scaleExt().apply();
+			new FDistort(featureImg, scaledIntensity).interpNN().scaleExt().apply();
 			// visualize the rescaled intensity
-			b = VisualizeImageData.colorizeSign(scaledIntensity,null, ImageStatistics.maxAbs(scaledIntensity));
-			gui.addImage(b,String.format("Scale %6.2f",scale));
+			b = VisualizeImageData.colorizeSign(scaledIntensity, null, ImageStatistics.maxAbs(scaledIntensity));
+			gui.addImage(b, String.format("Scale %6.2f", scale));
 
-			final int progressStatus = i+1;
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					progressMonitor.setProgress(progressStatus);
-				}
-			});
+			final int progressStatus = i + 1;
+			SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progressStatus));
 		}
 		gui.requestFocusInWindow();
 	}
@@ -159,33 +155,32 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 		setInputImage(input);
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		scaledIntensity = new GrayF32(workImage.width,workImage.height);
+		scaledIntensity = new GrayF32(workImage.width, workImage.height);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				setPreferredSize(new Dimension(input.getWidth(),input.getHeight()));
-				processedImage = true;
-			}});
+		SwingUtilities.invokeLater(() -> {
+			setPreferredSize(new Dimension(input.getWidth(), input.getHeight()));
+			processedImage = true;
+		});
 		doRefreshAll();
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile( String fileName ) {}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	public void refreshAll( Object[] cookies ) {
 		intensity = null;
 		pyramid = null;
 
-		setActiveAlgorithm(0,null,cookies[0]);
-		setActiveAlgorithm(1,null,cookies[1]);
+		setActiveAlgorithm(0, null, cookies[0]);
+		setActiveAlgorithm(1, null, cookies[1]);
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -197,7 +192,7 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 
 	public static void main( String args[] ) {
 
-		IntensityFeaturePyramidApp<GrayF32,GrayF32> app =
+		IntensityFeaturePyramidApp<GrayF32, GrayF32> app =
 				new IntensityFeaturePyramidApp<>(GrayF32.class, GrayF32.class);
 
 //		IntensityFeaturePyramidApp<GrayU8, GrayS16> app =
@@ -205,19 +200,18 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 
-		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
-		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
-		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("amoeba", UtilIO.pathExample("amoeba_shapes.jpg")));
+		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		while (!app.getHasProcessedImage()) {
+			BoofMiscOps.sleep(10);
 		}
 
-		ShowImages.showWindow(app,"Feature Scale Space Pyramid Intensity",true);
-
+		ShowImages.showWindow(app, "Feature Scale Space Pyramid Intensity", true);
 	}
 }

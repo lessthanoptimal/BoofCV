@@ -303,7 +303,7 @@ public class SiftDetector {
 		// find the peak then do bilinear interpolate between the two appropriate sigmas
 		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1
 		if( sigmaInterp < 0 ) {
-			p.scale = sigmaLower*(-sigmaInterp) + (1+sigmaInterp)*sigmaTarget;
+			p.scale = sigmaLower*-sigmaInterp + (1+sigmaInterp)*sigmaTarget;
 		} else {
 			p.scale = sigmaUpper*sigmaInterp + (1-sigmaInterp)*sigmaTarget;
 		}
@@ -345,7 +345,7 @@ public class SiftDetector {
 		else {
 			// In paper this is:
 			// Tr**2/Det < (r+1)**2/r
-			return( Tr*Tr >= edgeThreshold*det);
+			return Tr*Tr >= edgeThreshold*det;
 		}
 	}
 
@@ -353,6 +353,6 @@ public class SiftDetector {
 	 * All the found and selected detections across scale space
 	 */
 	public List<ScalePoint> getDetections() {
-		return( (maxFeaturesAll > 0 ? selectedAll : detectionsAll).toList() );
+		return (maxFeaturesAll > 0 ? selectedAll : detectionsAll).toList();
 	}
 }

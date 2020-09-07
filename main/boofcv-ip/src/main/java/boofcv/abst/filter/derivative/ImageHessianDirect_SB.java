@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public abstract class ImageHessianDirect_SB<Input extends ImageGray<Input>, Outp
 	Class<Input> inputType;
 	Class<Output> derivType;
 
-	public ImageHessianDirect_SB(Class<Input> inputType , Class<Output> derivType ) {
+	protected ImageHessianDirect_SB(Class<Input> inputType , Class<Output> derivType ) {
 		this.inputType = inputType;
 		this.derivType = derivType;
 		setBorderType(borderType);

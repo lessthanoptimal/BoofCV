@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.visualize;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * A point cloud colorizer where the color pattern repeats periodically. The pattern can be offset and scaled
  *
@@ -25,17 +28,16 @@ package boofcv.visualize;
  */
 public abstract class PeriodicColorizer implements PointCloudViewer.Colorizer {
 	// the period. This will be in the same units as the point
-	double period;
+	@Getter @Setter double period;
 	// offset scale. Scale relative to the period.
-	double offset;
+	@Getter @Setter double offset;
 
-	public PeriodicColorizer(double period, double offset) {
+	protected PeriodicColorizer(double period, double offset) {
 		this.period = period;
 		this.offset = offset;
 	}
 
-	public PeriodicColorizer() {
-	}
+	protected PeriodicColorizer() {}
 
 	final double triangleWave(double value ) {
 		return 2.0*Math.abs(offset+value/period - Math.floor(offset+value/period + 0.5));
@@ -52,21 +54,5 @@ public abstract class PeriodicColorizer implements PointCloudViewer.Colorizer {
 	public PeriodicColorizer foffset(double offset) {
 		this.offset = offset;
 		return this;
-	}
-
-	public double getPeriod() {
-		return period;
-	}
-
-	public void setPeriod(double period) {
-		this.period = period;
-	}
-
-	public double getOffset() {
-		return offset;
-	}
-
-	public void setOffset(double offset) {
-		this.offset = offset;
 	}
 }

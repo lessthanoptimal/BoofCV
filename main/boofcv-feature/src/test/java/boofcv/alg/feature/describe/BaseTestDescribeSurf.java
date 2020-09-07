@@ -48,7 +48,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends Ima
 	II ii;
 	I input;
 
-	public BaseTestDescribeSurf( Class<I> inputType , Class<II> integralType ) {
+	protected BaseTestDescribeSurf( Class<I> inputType , Class<II> integralType ) {
 		input = GeneralizedImageOps.createSingleBand(inputType,width,height);
 		ii = GeneralizedImageOps.createSingleBand(integralType,width,height);
 	}

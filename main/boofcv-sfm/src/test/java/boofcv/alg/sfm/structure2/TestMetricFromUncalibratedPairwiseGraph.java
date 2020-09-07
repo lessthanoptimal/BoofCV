@@ -22,12 +22,14 @@ import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofTesting;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,7 +55,9 @@ class TestMetricFromUncalibratedPairwiseGraph {
 
 		var alg = new MetricFromUncalibratedPairwiseGraph();
 //		alg.setVerbose(System.out, null);
+//		alg.getRefineWorking().setVerbose(System.out, null);
 		for (int numViews = 3; numViews <= 23; numViews += 5) {
+//			System.out.println("Number of views "+numViews);
 			// Need to increase the number of features to ensure everything is connected properly and that there is
 			// enough info for a good estimate
 			var db = new MockLookupSimilarImagesRealistic().setLoop(false).
@@ -103,16 +107,19 @@ class TestMetricFromUncalibratedPairwiseGraph {
 	void saveMetricSeed() {
 		var graph = new PairwiseImageGraph2();
 		List<String> viewIds = BoofMiscOps.asList("A", "B", "C");
+		List<ImageDimension> dimensions = new ArrayList<>();
 		var inlierToSeed = GrowQueue_I32.array(1, 3, 5, 7, 9);
 		var inlierToOther = new FastQueue<>(GrowQueue_I32::new, GrowQueue_I32::reset);
 
-		// create distintive sets of inlier indexes for each view
+		// create distinctive sets of inlier indexes for each view
 		for (int otherIdx = 0; otherIdx < viewIds.size() - 1; otherIdx++) {
 			GrowQueue_I32 inliers = inlierToOther.grow();
 			for (int i = 0; i < inlierToSeed.size; i++) {
 				inliers.add(inlierToSeed.get(i) + 1 + otherIdx);
 			}
+			dimensions.add( new ImageDimension(800,800));
 		}
+		dimensions.add( new ImageDimension(800,800));
 
 		// Create some arbitrary metric results that should be saved
 		var results = new MetricCameras();
@@ -126,7 +133,7 @@ class TestMetricFromUncalibratedPairwiseGraph {
 		}
 
 		var alg = new MetricFromUncalibratedPairwiseGraph();
-		alg.saveMetricSeed(graph, viewIds, inlierToSeed, inlierToOther, results);
+		alg.saveMetricSeed(graph, viewIds, dimensions, inlierToSeed, inlierToOther, results);
 		SceneWorkingGraph wgraph = alg.getWorkGraph();
 
 		// See metric view info got saved correctly

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -152,7 +152,6 @@ public class ImplBinaryNaiveOps {
 	 *
 	 * @param input  Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
-	 * @return Output image.
 	 */
 	public static void removePointNoise(GrayU8 input, GrayU8 output) {
 		for (int y = 0; y < input.height; y++) {

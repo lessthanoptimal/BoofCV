@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,35 +18,33 @@
 
 package boofcv.struct.feature;
 
-
 /**
  * Feature description storage in an array of bytes.
  *
  * @author Peter Abeles
  */
 public abstract class TupleDesc_I8<TD extends TupleDesc_I8> implements TupleDesc<TD> {
-	public byte value[];
+	public byte[] value;
 
-	public TupleDesc_I8(int numFeatures) {
-		this.value = new byte[ numFeatures ];
+	protected TupleDesc_I8( int numFeatures ) {
+		this.value = new byte[numFeatures];
 	}
 
-	public void set( byte ...value ) {
-		System.arraycopy(value,0,this.value,0,this.value.length);
+	public void set( byte... value ) {
+		System.arraycopy(value, 0, this.value, 0, this.value.length);
 	}
-
 
 	public byte[] getValue() {
 		return value;
 	}
 
-	public void setValue(byte[] value) {
+	public void setValue( byte[] value ) {
 		this.value = value;
 	}
 
 	@Override
-	public void setTo(TD source) {
-		System.arraycopy(source.value,0,value,0,value.length);
+	public void setTo( TD source ) {
+		System.arraycopy(source.value, 0, value, 0, value.length);
 	}
 
 	@Override

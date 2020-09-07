@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * Attempts to select features uniformly across the image. This is done by breaking the image up into a grid and
  * selecting a specific number randomly from each grid cell.
@@ -49,26 +51,25 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 	ImageGrid<Info<Point>> grid = new ImageGrid<>(Info::new, Info::reset);
 
 	@Override
-	public void select(int imageWidth, int imageHeight,
-					   @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
-					   FastArray<Point> selected)
-	{
-		assert(limit>0);
+	public void select( int imageWidth, int imageHeight,
+						@Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
+						FastArray<Point> selected ) {
+		assertBoof(limit > 0);
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!
-		if( (prior == null || prior.size==0) && detected.size <= limit ) {
+		if ((prior == null || prior.size == 0) && detected.size <= limit) {
 			// make a copy of the results with no pruning since it already has the desired number, or less
 			selected.addAll(detected);
 			return;
 		}
 
 		// Adjust the grid to the requested limit and image shape
-		int targetCellSize = configUniform.selectTargetCellSize(limit,imageWidth, imageHeight);
-		grid.initialize(targetCellSize,imageWidth, imageHeight);
+		int targetCellSize = configUniform.selectTargetCellSize(limit, imageWidth, imageHeight);
+		grid.initialize(targetCellSize, imageWidth, imageHeight);
 
 		// Note all the prior features
-		if( prior != null ) {
+		if (prior != null) {
 			for (int i = 0; i < prior.size; i++) {
 				Point p = prior.data[i];
 				getGridCell(p).priorCount++;
@@ -87,13 +88,13 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 		// predeclare the output list
 		selected.resize(limit);
 		selected.reset();
-		while( selected.size < limit ) {
+		while (selected.size < limit) {
 			boolean change = false;
 			for (int cellidx = 0; cellidx < cells.size && selected.size < limit; cellidx++) {
 				Info<Point> info = cells.get(cellidx);
 
 				// if there's a prior feature here, note it and move on
-				if( info.priorCount > 0 ) {
+				if (info.priorCount > 0) {
 					info.priorCount--;
 					change = true;
 					continue;
@@ -103,10 +104,10 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 					continue;
 
 				// Randomly select one and add it tot he grid
-				selected.add(info.detected.remove( rand.nextInt(info.detected.size())));
+				selected.add(info.detected.remove(rand.nextInt(info.detected.size())));
 				change = true;
 			}
-			if( !change )
+			if (!change)
 				break;
 		}
 	}
@@ -119,12 +120,12 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 	/**
 	 * Info for each cell
 	 */
-	public static class Info<Point>
-	{
+	public static class Info<Point> {
 		// Number of features in the cell from the prior list
 		int priorCount = 0;
 		// Sorted list of detected features by intensity
 		List<Point> detected = new ArrayList<>();
+
 		public void reset() {
 			priorCount = 0;
 			detected.clear();
@@ -136,8 +137,8 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 	 */
 	public static class I16 extends FeatureSelectUniform<Point2D_I16> {
 		@Override
-		protected Info<Point2D_I16> getGridCell(Point2D_I16 p) {
-			return grid.getCellAtPixel(p.x,p.y);
+		protected Info<Point2D_I16> getGridCell( Point2D_I16 p ) {
+			return grid.getCellAtPixel(p.x, p.y);
 		}
 	}
 
@@ -146,8 +147,8 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 	 */
 	public static class F32 extends FeatureSelectUniform<Point2D_F32> {
 		@Override
-		protected Info<Point2D_F32> getGridCell(Point2D_F32 p) {
-			return grid.getCellAtPixel((int)p.x,(int)p.y);
+		protected Info<Point2D_F32> getGridCell( Point2D_F32 p ) {
+			return grid.getCellAtPixel((int)p.x, (int)p.y);
 		}
 	}
 
@@ -156,8 +157,8 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 	 */
 	public static class F64 extends FeatureSelectUniform<Point2D_F64> {
 		@Override
-		protected Info<Point2D_F64> getGridCell(Point2D_F64 p) {
-			return grid.getCellAtPixel((int)p.x,(int)p.y);
+		protected Info<Point2D_F64> getGridCell( Point2D_F64 p ) {
+			return grid.getCellAtPixel((int)p.x, (int)p.y);
 		}
 	}
 }

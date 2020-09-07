@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class SelectErrorSubpixel {
 	 * For scores of type int[]
 	 */
 	public static class S32_F32 extends SelectErrorWithChecks_S32<GrayF32> {
-		public S32_F32(int maxError, int rightToLeftTolerance, double texture) {
+		public S32_F32( int maxError, int rightToLeftTolerance, double texture ) {
 			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
 		}
 
@@ -53,23 +53,23 @@ public class SelectErrorSubpixel {
 		}
 
 		@Override
-		protected void setDisparity(int index, int disparityValue) {
+		protected void setDisparity( int index, int disparityValue ) {
 
-			if( disparityValue <= 0 || disparityValue >= localRange -1) {
+			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
-				int c0 = columnScore[disparityValue-1];
+				int c0 = columnScore[disparityValue - 1];
 				int c1 = columnScore[disparityValue];
-				int c2 = columnScore[disparityValue+1];
+				int c2 = columnScore[disparityValue + 1];
 
-				float offset = (float)(c0-c2)/(float)(2*(c0-2*c1+c2));
+				float offset = (float)(c0 - c2)/(float)(2*(c0 - 2*c1 + c2));
 
 				imageDisparity.data[index] = disparityValue + offset;
 			}
 		}
 
 		@Override
-		protected void setDisparityInvalid(int index) {
+		protected void setDisparityInvalid( int index ) {
 			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 
@@ -83,7 +83,7 @@ public class SelectErrorSubpixel {
 	 * For scores of type float[]
 	 */
 	public static class F32_F32 extends SelectErrorWithChecks_F32<GrayF32> {
-		public F32_F32(int maxError, int rightToLeftTolerance, double texture) {
+		public F32_F32( int maxError, int rightToLeftTolerance, double texture ) {
 			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
 		}
 
@@ -92,23 +92,23 @@ public class SelectErrorSubpixel {
 		}
 
 		@Override
-		protected void setDisparity(int index, int disparityValue) {
+		protected void setDisparity( int index, int disparityValue ) {
 
-			if( disparityValue <= 0 || disparityValue >= localRange -1) {
+			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
-				float c0 = columnScore[disparityValue-1];
+				float c0 = columnScore[disparityValue - 1];
 				float c1 = columnScore[disparityValue];
-				float c2 = columnScore[disparityValue+1];
+				float c2 = columnScore[disparityValue + 1];
 
-				float offset = (c0-c2)/(2f*(c0-2f*c1+c2));
+				float offset = (c0 - c2)/(2f*(c0 - 2f*c1 + c2));
 
-				imageDisparity.data[index] = disparityValue +  offset;
+				imageDisparity.data[index] = disparityValue + offset;
 			}
 		}
 
 		@Override
-		protected void setDisparityInvalid(int index) {
+		protected void setDisparityInvalid( int index ) {
 			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 

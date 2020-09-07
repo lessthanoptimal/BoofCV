@@ -62,32 +62,31 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 
 	public CalibratePinholePlanarGuiApp() {
 		setLayout(new BorderLayout());
-		gui.mainView.setPreferredSize(new Dimension(500,480));
+		gui.mainView.setPreferredSize(new Dimension(500, 480));
 		this.owner = this;
 
-		add(gui,BorderLayout.CENTER);
+		add(gui, BorderLayout.CENTER);
 	}
 
-	public void configure( DetectorFiducialCalibration detector ,
-						   List<String> images  ,
-						   int numRadial, boolean includeTangential )
-	{
+	public void configure( DetectorFiducialCalibration detector,
+						   List<String> images,
+						   int numRadial, boolean includeTangential ) {
 		this.detector = detector;
-		if( images.size() == 0 )
+		if (images.size() == 0)
 			throw new IllegalArgumentException("No images!");
 		BoofMiscOps.sortFileNames(images);
 		calibrator = new CalibrateMonoPlanar(detector.getLayout());
-		calibrator.configurePinhole(true,numRadial,includeTangential);
+		calibrator.configurePinhole(true, numRadial, includeTangential);
 		this.images = images;
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {
+	public void loadConfigurationFile( String fileName ) {
 		ParseMonoCalibrationConfig parser = new ParseMonoCalibrationConfig(media);
 
-		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.images,
-					parser.numRadial,parser.includeTangential);
+		if (parser.parse(fileName)) {
+			configure(parser.detector, parser.images,
+					parser.numRadial, parser.includeTangential);
 		} else {
 			System.err.println("Configuration failed");
 		}
@@ -98,12 +97,12 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 		final ProcessThread monitor = new ProcessThread();
 		monitor.start();
 
-		for( int i = 0; i < images.size(); i++ ) {
+		for (int i = 0; i < images.size(); i++) {
 			final File file = new File(images.get(i));
 			final BufferedImage orig = media.openImage(images.get(i));
-			if( orig != null ) {
-				GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
-				if( detector.process(input)) {
+			if (orig != null) {
+				GrayF32 input = ConvertBufferedImage.convertFrom(orig, (GrayF32)null);
+				if (detector.process(input)) {
 					calibrator.addImage(detector.getDetectedPoints());
 					SwingUtilities.invokeLater(() -> {
 						gui.addImage(file);
@@ -111,26 +110,26 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 						monitor.setMessage(0, file.getName());
 					});
 				} else {
-					System.out.println("Failed to detect image.  "+file.getName());
+					System.out.println("Failed to detect image.  " + file.getName());
 				}
 			} else {
-				System.out.println("Failed to load "+images.get(i));
+				System.out.println("Failed to load " + images.get(i));
 			}
 		}
 
 		SwingUtilities.invokeLater(() -> gui.setObservations(calibrator.getObservations()));
 		gui.repaint();
 
-		SwingUtilities.invokeLater(() -> monitor.setMessage(1,"Estimating Parameters"));
+		SwingUtilities.invokeLater(() -> monitor.setMessage(1, "Estimating Parameters"));
 
 		final CameraPinholeBrown param = calibrator.process();
 		SwingUtilities.invokeLater(() -> {
 			gui.setResults(calibrator.getErrors());
-			gui.setCalibration(calibrator.getIntrinsic(),calibrator.getStructure());
+			gui.setCalibration(calibrator.getIntrinsic(), calibrator.getStructure());
 		});
 		monitor.stopThread();
 
-		if( outputFileName != null )
+		if (outputFileName != null)
 			CalibrationIO.save(param, outputFileName);
 
 		// tell it how to undistort the image
@@ -149,20 +148,19 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 	}
 
 	@Override
-	public void setMediaManager(MediaManager manager) {
+	public void setMediaManager( MediaManager manager ) {
 		media = manager;
 	}
 
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
-	public class ProcessThread extends ProgressMonitorThread
-	{
+	public class ProcessThread extends ProgressMonitorThread {
 		public ProcessThread() {
 			super(new ProgressMonitor(owner, "Computing Calibration", "", 0, 2));
 		}
 
-		public void setMessage( final int state , final String message ) {
+		public void setMessage( final int state, final String message ) {
 			SwingUtilities.invokeLater(() -> {
 				monitor.setProgress(state);
 				monitor.setNote(message);
@@ -175,12 +173,8 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 	}
 
 	@Override
-	public void loadInputData(String fileName) {
-		new Thread() {
-			public void run() {
-				process(null);
-			}
-		}.start();
+	public void loadInputData( String fileName ) {
+		new Thread(() -> process(null)).start();
 	}
 
 	@Override
@@ -188,7 +182,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 		return true;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DetectorFiducialCalibration detector =
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(8, 8, 0.5, 7.0 / 18.0));
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4,3,30,30));
@@ -197,12 +191,12 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 
 		List<String> images;
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");
-		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"),"frame", null);
+		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"), "frame", null);
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal"),"image");
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			CalibratePinholePlanarGuiApp app = new CalibratePinholePlanarGuiApp();
 			app.configure(detector, images, 2, false);
 

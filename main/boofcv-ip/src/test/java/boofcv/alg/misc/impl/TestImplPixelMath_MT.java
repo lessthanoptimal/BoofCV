@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,10 @@
 package boofcv.alg.misc.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.TestPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
+import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +32,12 @@ import java.util.Random;
 import static boofcv.testing.BoofTesting.primitive;
 import static boofcv.testing.BoofTesting.randomArray;
 
+@SuppressWarnings("rawtypes")
 class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 
-	private Random rand = new Random(234);
-	private int width = 105;
-	private int height = 100;
+	private final Random rand = new Random(234);
+	private final int width = 105;
+	private final int height = 100;
 
 	TestImplPixelMath_MT() {
 		super(ImplPixelMath_MT.class, ImplPixelMath.class);
@@ -42,12 +45,12 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 
 	@Test
 	void performTests() {
-		performTests(172);
+		performTests(184);
 	}
 
 	@Override
 	protected boolean isTestMethod(Method m) {
-		Class param[] = m.getParameterTypes();
+		Class[] param = m.getParameterTypes();
 
 		if( param.length < 3 )
 			return false;
@@ -69,12 +72,47 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 				case "abs": return abs(types);
 				case "log":
 				case "logSign": return log(types);
+				case "lambda1": return lambda1(types);
+				case "lambda2": return lambda2(types);
 				default:
 					throw new RuntimeException("Unknown function "+candidate.getName());
 			}
 		} else {
 			return inputs;
 		}
+	}
+
+	private Object[][] lambda1( Class[] inputTypes ) {
+		Object[] inputs = new Object[9];
+		inputs[0] = randomArray(inputTypes[0], 200, rand);
+		inputs[1] = 1;
+		inputs[2] = 10;
+		inputs[3] = randomArray(inputTypes[3], 200, rand);
+		inputs[4] = 2;
+		inputs[5] = 10;
+		inputs[6] = 12;
+		inputs[7] = 9;
+		inputs[8] = TestPixelMath.createLambda1_Plus5(BoofTesting.pritiveToImageDataType(inputTypes[0]));
+
+		return new Object[][]{inputs};
+	}
+
+	private Object[][] lambda2( Class[] inputTypes ) {
+		Object[] inputs = new Object[12];
+		inputs[0] = randomArray(inputTypes[0], 200, rand);
+		inputs[1] = 1;
+		inputs[2] = 10;
+		inputs[3] = randomArray(inputTypes[3], 200, rand);
+		inputs[4] = 2;
+		inputs[5] = 10;
+		inputs[6] = randomArray(inputTypes[3], 200, rand);;
+		inputs[7] = 3;
+		inputs[8] = 10;
+		inputs[9] = 12;
+		inputs[10] = 9;
+		inputs[11] = TestPixelMath.createLambda2_AddPlus5(BoofTesting.pritiveToImageDataType(inputTypes[0]));
+
+		return new Object[][]{inputs};
 	}
 
 	private Object[][] boundImage( Class[] inputTypes ) {
@@ -167,6 +205,8 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 	}
 
 	private Object[][] defaultInputs( Class[] inputTypes , String name ) {
+		if( name.contains("lambda"))
+			return null;
 		if( inputTypes.length == 3 ) {
 			boolean allImages = true;
 			for (int i = 0; i < 3; i++) {

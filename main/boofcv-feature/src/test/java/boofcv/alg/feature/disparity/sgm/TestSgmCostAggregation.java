@@ -332,7 +332,7 @@ class TestSgmCostAggregation {
 		// Find the number of non-zero elements
 		int length = alg.computePathLength(x0,y0,dx,dy);
 		int expected = 0;
-		for (int i = 0, x=x0,y=y0; i < length; i++,x+=dx,y+=dy) {
+		for (int i = 0, x=x0; i < length; i++,x+=dx) {
 			expected += alg.helper.localDisparityRangeLeft(x);
 		}
 		expected -= length; // at least one element will be zero for each element in the path
@@ -436,7 +436,7 @@ class TestSgmCostAggregation {
 		short[] workCostLr = new short[length*rangeD];
 
 		// fill in the work cost with a fixed known set of values
-		for (int i = 0,x=x0,y=y0; i < length; i++, x+=dx, y+=dy ) {
+		for (int i = 0,x=x0; i < length; i++, x+=dx ) {
 			int localRange = alg.helper.localDisparityRangeLeft(x+disparityMin);
 			for (int d = 0; d < localRange; d++) {
 				workCostLr[i*rangeD+d] = (short)(1+i+d);

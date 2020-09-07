@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,8 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 		System.out.println("=========  Profile numFeatures "+NUM_POINTS);
 		System.out.println();
 
-		double tol = 1e-16;
-		int MAX_ITER = 100;
+//		double tol = 1e-16;
+//		int MAX_ITER = 100;
 
 		init(NUM_POINTS,FUNDAMENTAL,false);
 

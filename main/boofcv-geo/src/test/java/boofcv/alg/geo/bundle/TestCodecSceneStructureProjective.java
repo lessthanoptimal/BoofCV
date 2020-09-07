@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.bundle.cameras.BundleCameraProjective;
 import boofcv.struct.calib.CameraPinhole;
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestCodecSceneStructureProjective {
 	Random rand = new Random(234);
 
-	final static int width=300,height=200;
+	final static int width = 300, height = 200;
 
 	@Test
 	void encode_decode() {
@@ -49,61 +49,61 @@ class TestCodecSceneStructureProjective {
 
 		int N = original.getUnknownViewCount()*12 + original.points.size*3 + original.getUnknownCameraParameterCount();
 		double[] param = new double[N];
-		codec.encode(original,param);
+		codec.encode(original, param);
 
 		SceneStructureProjective found = createScene3D(rand);
-		codec.decode(param,found);
+		codec.decode(param, found);
 
 		for (int i = 0; i < original.points.size; i++) {
-			assertTrue( original.points.data[i].distance(found.points.data[i]) < UtilEjml.TEST_F64);
+			assertTrue(original.points.data[i].distance(found.points.data[i]) < UtilEjml.TEST_F64);
 		}
 
 		for (int i = 0; i < original.cameras.size; i++) {
-			SceneStructureMetric.Camera o = original.cameras.data[i];
-			SceneStructureMetric.Camera f = found.cameras.data[i];
+			SceneStructureCommon.Camera o = original.cameras.data[i];
+			SceneStructureCommon.Camera f = found.cameras.data[i];
 
 			double[] po = new double[o.model.getIntrinsicCount()];
 			double[] pf = new double[f.model.getIntrinsicCount()];
 
-			o.model.getIntrinsic(po,0);
-			f.model.getIntrinsic(pf,0);
+			o.model.getIntrinsic(po, 0);
+			f.model.getIntrinsic(pf, 0);
 
-			assertArrayEquals(po,pf, UtilEjml.TEST_F64 );
+			assertArrayEquals(po, pf, UtilEjml.TEST_F64);
 		}
 
 		for (int i = 0; i < original.views.size; i++) {
 			SceneStructureProjective.View o = original.views.data[i];
 			SceneStructureProjective.View f = found.views.data[i];
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(o.worldToView,f.worldToView,UtilEjml.TEST_F64));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(o.worldToView, f.worldToView, UtilEjml.TEST_F64));
 		}
 	}
 
-	static SceneStructureProjective createScene3D(Random rand ) {
+	static SceneStructureProjective createScene3D( Random rand ) {
 		SceneStructureProjective out = new SceneStructureProjective(false);
 
-		out.initialize(2,4,5);
+		out.initialize(2, 4, 5);
 
-		out.setCamera(0,true,new BundleCameraProjective());
+		out.setCamera(0, true, new BundleCameraProjective());
 //		out.setCamera(1,true,new BundleCameraProjective());
-		out.setCamera(1,false,new CameraPinhole(100,110,
-				0.0001,rand.nextGaussian()/100,rand.nextGaussian()/100,1,1));
+		out.setCamera(1, false, new CameraPinhole(100, 110,
+				0.0001, rand.nextGaussian()/100, rand.nextGaussian()/100, 1, 1));
 
 		for (int i = 0; i < 5; i++) {
-			out.setPoint(i,i+1,i+2*rand.nextGaussian(),2*i-3*rand.nextGaussian());
+			out.setPoint(i, i + 1, i + 2*rand.nextGaussian(), 2*i - 3*rand.nextGaussian());
 		}
 
 		for (int i = 0; i < 4; i++) {
-			boolean fixed = i%2==0;
+			boolean fixed = i%2 == 0;
 
-			DMatrixRMaj P = new DMatrixRMaj(3,4);
-			if( fixed ) {
+			DMatrixRMaj P = new DMatrixRMaj(3, 4);
+			if (fixed) {
 				for (int j = 0; j < 12; j++) {
-					P.data[j] = 0.1+j*0.2;
+					P.data[j] = 0.1 + j*0.2;
 				}
 			} else
-				RandomMatrices_DDRM.fillUniform(P,rand);
-			out.setView(i,fixed,P,width,height);
+				RandomMatrices_DDRM.fillUniform(P, rand);
+			out.setView(i, fixed, P, width, height);
 			out.views.data[i].camera = i/2;
 		}
 
@@ -112,38 +112,38 @@ class TestCodecSceneStructureProjective {
 			out.points.data[0].views.add(i);
 		}
 		for (int i = 1; i < out.points.size; i++) {
-			out.points.data[i].views.add( i-1);
+			out.points.data[i].views.add(i - 1);
 		}
 
 		return out;
 	}
 
-	static SceneStructureProjective createSceneH(Random rand ) {
+	static SceneStructureProjective createSceneH( Random rand ) {
 		SceneStructureProjective out = new SceneStructureProjective(true);
 
-		out.initialize(2,4,5);
+		out.initialize(2, 4, 5);
 
-		out.setCamera(0,true,new BundleCameraProjective());
+		out.setCamera(0, true, new BundleCameraProjective());
 //		out.setCamera(1,true,new BundleCameraProjective());
-		out.setCamera(1,false,new CameraPinhole(100,110,
-				0.0001,rand.nextGaussian()/100,rand.nextGaussian()/100,1,1));
+		out.setCamera(1, false, new CameraPinhole(100, 110,
+				0.0001, rand.nextGaussian()/100, rand.nextGaussian()/100, 1, 1));
 
 		for (int i = 0; i < 5; i++) {
 			double w = rand.nextDouble()*0.1;
-			out.setPoint(i,i+1,i+2*rand.nextGaussian(),2*i-3*rand.nextGaussian(),0.9+w);
+			out.setPoint(i, i + 1, i + 2*rand.nextGaussian(), 2*i - 3*rand.nextGaussian(), 0.9 + w);
 		}
 
 		for (int i = 0; i < 4; i++) {
-			boolean fixed = i%2==0;
+			boolean fixed = i%2 == 0;
 
-			DMatrixRMaj P = new DMatrixRMaj(3,4);
-			if( fixed ) {
+			DMatrixRMaj P = new DMatrixRMaj(3, 4);
+			if (fixed) {
 				for (int j = 0; j < 12; j++) {
-					P.data[j] = 10.1+j*0.2;
+					P.data[j] = 10.1 + j*0.2;
 				}
 			} else
-				RandomMatrices_DDRM.fillUniform(P,rand);
-			out.setView(i,fixed,P,width,height);
+				RandomMatrices_DDRM.fillUniform(P, rand);
+			out.setView(i, fixed, P, width, height);
 			out.views.data[i].camera = i/2;
 		}
 
@@ -152,7 +152,7 @@ class TestCodecSceneStructureProjective {
 			out.points.data[0].views.add(i);
 		}
 		for (int i = 1; i < out.points.size; i++) {
-			out.points.data[i].views.add( i-1);
+			out.points.data[i].views.add(i - 1);
 		}
 
 		return out;

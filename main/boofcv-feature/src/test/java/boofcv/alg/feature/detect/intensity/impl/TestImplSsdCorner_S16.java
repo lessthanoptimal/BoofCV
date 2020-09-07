@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,7 +92,7 @@ public class TestImplSsdCorner_S16 {
 		int ret = 0;
 		
 		for( int i = -radius; i <= radius; i++ ) {
-			float hsum = 0;
+			int hsum = 0;
 			for( int j = -radius; j <= radius; j++ ) {
 				hsum += img.get(j+x,i+y);
 			}

@@ -126,7 +126,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 		}
 	}
 
-	public class Describe<D extends TupleDesc> implements Performer {
+	public class Describe<PD extends TupleDesc> implements Performer {
 
 		DescribeRegionPoint alg;
 		String name;
@@ -143,7 +143,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 			else
 				alg.setImage(colorMS);
 
-			D d = (D)alg.createDescription();
+			PD d = (PD)alg.createDescription();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
 				alg.process(p.x,p.y,yaws[i],scales[i],d);

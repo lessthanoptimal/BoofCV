@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,12 @@ public abstract class GenericImageBorder1DTests<T extends ImageBase<T>> extends 
 
 	BorderIndex1D_Wrap wrap = new BorderIndex1D_Wrap();
 
-	public GenericImageBorder1DTests(ImageType<T> imageType) {
+	protected GenericImageBorder1DTests( ImageType<T> imageType ) {
 		super(imageType);
 	}
 
 	@Override
-	public void checkBorderSet(int x, int y, double[] pixel, T image) {
+	public void checkBorderSet( int x, int y, double[] pixel, T image ) {
 
 		wrap.setLength(image.getWidth());
 		x = wrap.getIndex(x);
@@ -44,13 +44,13 @@ public abstract class GenericImageBorder1DTests<T extends ImageBase<T>> extends 
 		y = wrap.getIndex(y);
 
 		for (int i = 0; i < pixel.length; i++) {
-			double value = GeneralizedImageOps.get(image,x,y,i);
-			assertEquals(pixel[i],value,1e-4);
+			double value = GeneralizedImageOps.get(image, x, y, i);
+			assertEquals(pixel[i], value, 1e-4);
 		}
 	}
 
 	@Override
-	public void checkBorderGet(int x, int y, T image, double[] pixel) {
-		checkBorderSet(x,y,pixel,image);
+	public void checkBorderGet( int x, int y, T image, double[] pixel ) {
+		checkBorderSet(x, y, pixel, image);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class FourierTransformNaive_F32 {
 
 	public static float PI2 = (float)(2.0*Math.PI);
 
-	public static void forward( float inputR[] , float outputR[] , float outputI[] , int start , int length ) {
+	public static void forward( float[] inputR, float[] outputR, float[] outputI, int start , int length ) {
 		for( int k = 0; k < length; k++ ) {
 
 			float real = 0;
@@ -38,8 +38,8 @@ public class FourierTransformNaive_F32 {
 			for( int l = 0; l < length; l++ ) {
 				float theta = -PI2*l*k/(float)length;
 
-				real += inputR[start+l]*Math.cos(theta);
-				img += inputR[start+l]*Math.sin(theta);
+				real += (float)(inputR[start+l]*Math.cos(theta));
+				img += (float)(inputR[start+l]*Math.sin(theta));
 
 			}
 
@@ -48,7 +48,7 @@ public class FourierTransformNaive_F32 {
 		}
 	}
 
-	public static void inverse( float inputR[] , float inputI[] , float outputR[] , int start , int length ) {
+	public static void inverse( float[] inputR, float[] inputI, float[] outputR, int start , int length ) {
 		for( int k = 0; k < length; k++ ) {
 
 			float real = 0;
@@ -71,8 +71,8 @@ public class FourierTransformNaive_F32 {
 	}
 
 	public static void transform( boolean forward  ,
-								  float inputR[] , float inputI[],
-								  float outputR[] , float outputI[] ,
+								  float[] inputR, float[] inputI,
+								  float[] outputR, float[] outputI,
 								  int start , int length )
 	{
 
@@ -118,11 +118,11 @@ public class FourierTransformNaive_F32 {
 			forward( inputR.data , tempR.data , tempI.data , index , inputR.width);
 		}
 
-		float columnR0[] = new float[ inputR.height ];
-		float columnI0[] = new float[ inputR.height ];
+		float[] columnR0 = new float[ inputR.height ];
+		float[] columnI0 = new float[ inputR.height ];
 
-		float columnR1[] = new float[ inputR.height ];
-		float columnI1[] = new float[ inputR.height ];
+		float[] columnR1 = new float[ inputR.height ];
+		float[] columnI1 = new float[ inputR.height ];
 
 		for( int x = 0; x < inputR.width; x++ ) {
 			// copy the column
@@ -150,10 +150,10 @@ public class FourierTransformNaive_F32 {
 			transform(false,inputR.data , inputI.data, tempR.data , tempI.data,index,inputR.width);
 		}
 
-		float columnR0[] = new float[ inputR.height ];
-		float columnI0[] = new float[ inputR.height ];
+		float[] columnR0 = new float[ inputR.height ];
+		float[] columnI0 = new float[ inputR.height ];
 
-		float columnR1[] = new float[ inputR.height ];
+		float[] columnR1 = new float[ inputR.height ];
 
 		for( int x = 0; x < inputR.width; x++ ) {
 			// copy the column

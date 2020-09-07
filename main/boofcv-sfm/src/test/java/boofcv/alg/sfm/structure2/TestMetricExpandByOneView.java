@@ -96,6 +96,7 @@ class TestMetricExpandByOneView {
 
 		// force it to fail at these two different points
 		var alg1 = new MetricExpandByOneView() {
+			@Override
 			public boolean selectTwoConnections( PairwiseImageGraph2.View target,
 												 List<PairwiseImageGraph2.Motion> connections ) {
 				return false;
@@ -103,9 +104,10 @@ class TestMetricExpandByOneView {
 		};
 
 		var alg2 = new MetricExpandByOneView() {
-			boolean computeCalibratingHomography() { {
+			@Override
+			boolean computeCalibratingHomography() {
 				return false;
-			}}
+			}
 		};
 
 		fail_and_doNotAdd(db, alg1, 0);

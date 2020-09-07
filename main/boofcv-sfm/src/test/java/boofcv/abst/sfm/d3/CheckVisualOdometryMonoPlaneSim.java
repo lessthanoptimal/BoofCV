@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,9 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
-	extends VideoSequenceSimulator<I>
-{
-	CameraPinholeBrown param = new CameraPinholeBrown(150,155,0,width/2,height/2,width,height).fsetRadial(0,0);
+		extends VideoSequenceSimulator<I> {
+	CameraPinholeBrown param = new CameraPinholeBrown(150, 155, 0, width/2, height/2, width, height).fsetRadial(0, 0);
 	MonocularPlaneVisualOdometry<I> algorithm;
 
 	I left;
@@ -55,48 +54,48 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 	double tolerance = 0.02;
 	double cameraAngle = -0.75;
 
-	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType) {
+	protected CheckVisualOdometryMonoPlaneSim( Class<I> inputType ) {
 		super(320, 240, inputType);
 
 		// Turn off threads to make results repeatable
 		BoofConcurrency.USE_CONCURRENT = false;
 
-		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		left = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
-		createSquares(numSquares,-10,10);
+		createSquares(numSquares, -10, 10);
 	}
 
-	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType, double cameraAngle , double tolerance) {
+	protected CheckVisualOdometryMonoPlaneSim( Class<I> inputType, double cameraAngle, double tolerance ) {
 		this(inputType);
 		this.tolerance = tolerance;
 		this.cameraAngle = cameraAngle;
 	}
 
-	public void setAlgorithm(MonocularPlaneVisualOdometry<I>  algorithm) {
+	public void setAlgorithm( MonocularPlaneVisualOdometry<I> algorithm ) {
 		this.algorithm = algorithm;
 	}
 
 	@Override
-	protected void createSquares( int total , double minZ, double maxZ ) {
+	protected void createSquares( int total, double minZ, double maxZ ) {
 		squares.clear();
 
 		double t = 0.1;
 
 		// creates squares which are entirely on the ground plane
-		for( int i = 0; i < total; i++ ) {
+		for (int i = 0; i < total; i++) {
 
 			double theta = rand.nextDouble()*Math.PI*2.0;
-			double r = rand.nextDouble()*(maxZ-minZ)+minZ;
+			double r = rand.nextDouble()*(maxZ - minZ) + minZ;
 
 			double z = r*Math.cos(theta);
 			double x = r*Math.sin(theta);
 			double y = 0;
 
 			Square s = new Square();
-			s.a.set(x  ,y  ,z);
+			s.a.set(x, y, z);
 			s.b.set(x + t, y, z);
 			s.c.set(x + t, y, z + t);
-			s.d.set(x, y , z + t);
+			s.d.set(x, y, z + t);
 
 			s.gray = rand.nextInt(255);
 
@@ -105,20 +104,20 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 
 		// create points far away
 		t = 5.0;
-		for( int i = 0; i < total; i++ ) {
+		for (int i = 0; i < total; i++) {
 			double theta = rand.nextDouble()*Math.PI*2.0;
 
 			double r = 50;
 
 			double z = r*Math.cos(theta);
 			double x = r*Math.sin(theta);
-			double y = -rand.nextDouble()*2-5; // stick them a bit up in the
+			double y = -rand.nextDouble()*2 - 5; // stick them a bit up in the
 
 			Square s = new Square();
-			s.a.set(x , y  ,z);
+			s.a.set(x, y, z);
 			s.b.set(x + t, y, z);
 			s.c.set(x + t, y + t, z);
-			s.d.set(x , y + t, z);
+			s.d.set(x, y + t, z);
 
 			s.gray = rand.nextInt(255);
 
@@ -128,7 +127,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 		// sort by depth so that objects farther way are rendered first and obstructed by objects closer in view
 		Collections.sort(squares, new Comparator<Square>() {
 			@Override
-			public int compare(Square o1, Square o2) {
+			public int compare( Square o1, Square o2 ) {
 				if (o1.a.z < o2.a.z)
 					return -1;
 				if (o1.a.z > o2.a.z)
@@ -141,20 +140,20 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 
 	@Test
 	public void moveForward() {
-		motionCheck(0,0.1);
+		motionCheck(0, 0.1);
 	}
 
 	@Test
 	public void moveTurning() {
-		motionCheck(0.02,0.1);
+		motionCheck(0.02, 0.1);
 	}
 
-	public void motionCheck( double angleRate , double forwardRate ) {
+	public void motionCheck( double angleRate, double forwardRate ) {
 
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(cameraAngle), 0.1, 0.0, cameraToPlane.getR());
-		cameraToPlane.getT().set(0,-2,0);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(cameraAngle), 0.1, 0.0, cameraToPlane.getR());
+		cameraToPlane.getT().set(0, -2, 0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
@@ -162,14 +161,14 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 		Se3_F64 worldToCamera = new Se3_F64();
 
 		algorithm.reset();
-		algorithm.setCalibration(new MonoPlaneParameters(param,planeToCamera));
+		algorithm.setCalibration(new MonoPlaneParameters(param, planeToCamera));
 
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 //			System.out.println("-------- Real rotY = "+angleRate*i);
 			worldToCurr.getT().z = -i*forwardRate; // move forward
-			ConvertRotation3D_F64.rotY(angleRate*i,worldToCurr.getR());
+			ConvertRotation3D_F64.rotY(angleRate*i, worldToCurr.getR());
 
-			worldToCurr.concat(planeToCamera,worldToCamera);
+			worldToCurr.concat(planeToCamera, worldToCamera);
 
 			// render the images
 			setIntrinsic(param);
@@ -180,7 +179,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToCamera = algorithm.getCameraToWorld().invert(null);
-			Se3_F64 foundWorldToCurr =  foundWorldToCamera.concat(cameraToPlane,null);
+			Se3_F64 foundWorldToCurr = foundWorldToCamera.concat(cameraToPlane, null);
 
 //			worldToCurr.getT().print();
 //			foundWorldToCurr.getT().print();
@@ -189,7 +188,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 //			foundWorldToCurr.getR().print();
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToCurr.getR(), worldToCurr.getR(), 0.1));
-			assertTrue(foundWorldToCurr.getT().distance(worldToCurr.getT()) < tolerance );
+			assertTrue(foundWorldToCurr.getT().distance(worldToCurr.getT()) < tolerance);
 		}
 	}
 }

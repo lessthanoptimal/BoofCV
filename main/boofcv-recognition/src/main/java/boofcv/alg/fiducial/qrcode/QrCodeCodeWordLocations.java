@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,11 +72,11 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 			int row = alignment[i];
 
 			for (int j = 0; j < alignment.length; j++) {
-				if( i == 0 & j == 0 )
+				if( i == 0 && j == 0 )
 					continue;
-				if( i == alignment.length-1 & j == 0)
+				if( i == alignment.length-1 && j == 0)
 					continue;
-				if( i == 0 & j == alignment.length-1)
+				if( i == 0 && j == alignment.length-1)
 					continue;
 
 				int col = alignment[j];

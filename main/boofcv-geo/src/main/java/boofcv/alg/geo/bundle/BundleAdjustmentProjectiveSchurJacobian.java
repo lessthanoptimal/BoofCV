@@ -257,9 +257,9 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 									double pointGradX[], double pointGradY[] , double pointGradZ[],
 									@Nullable double camGradX[], @Nullable double camGradY[], @Nullable double camGradZ[] )
 	{
-		double P11 = P.data[0], P12 = P.data[1], P13 = P.data[2 ], P14 = P.data[3];
-		double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6 ], P24 = P.data[7];
-		double P31 = P.data[8], P32 = P.data[9], P33 = P.data[10], P34 = P.data[11];
+		double P11 = P.data[0], P12 = P.data[1], P13 = P.data[2 ];
+		double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6 ];
+		double P31 = P.data[8], P32 = P.data[9], P33 = P.data[10];
 
 //		double xx = P11*X +P12*Y + P13*Z + P14;
 //		double yy = P21*X +P22*Y + P23*Z + P24;

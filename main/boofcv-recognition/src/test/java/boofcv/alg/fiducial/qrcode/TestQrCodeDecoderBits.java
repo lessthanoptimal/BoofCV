@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,29 +33,29 @@ public class TestQrCodeDecoderBits {
 
 		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
 
-		byte original[] = new byte[qr.rawbits.length];
-		System.arraycopy(qr.rawbits,0,original,0,original.length);
+		byte[] original = new byte[qr.rawbits.length];
+		System.arraycopy(qr.rawbits, 0, original, 0, original.length);
 
 		// perfect message with no errors
 		assertTrue(alg.applyErrorCorrection(qr));
 
 		int dataSize = qr.getNumberOfDataBytes();
 		for (int i = 0; i < dataSize; i++) {
-			assertEquals(original[i],qr.corrected[i]);
+			assertEquals(original[i], qr.corrected[i]);
 		}
 
 		// add noise and try again
-		qr.rawbits[5] ^= 0b1101001011;
+		qr.rawbits[5] ^= (byte)0b1101001011;
 		qr.corrected = null;
 
 		assertTrue(alg.applyErrorCorrection(qr));
 
 		for (int i = 0; i < dataSize; i++) {
-			assertEquals(original[i],qr.corrected[i]);
+			assertEquals(original[i], qr.corrected[i]);
 		}
 		// add too much noise and it should fail
 		for (int i = 0; i < 10; i++) {
-			qr.rawbits[6+i] = (byte)(qr.rawbits[i]+234);
+			qr.rawbits[6 + i] = (byte)(qr.rawbits[i] + 234);
 		}
 		qr.corrected = null;
 
@@ -79,23 +79,23 @@ public class TestQrCodeDecoderBits {
 
 		qr.corrected = new byte[50];
 
-		assertFalse(alg.checkPaddingBytes(qr,2));
+		assertFalse(alg.checkPaddingBytes(qr, 2));
 
 		// fill it with the pattern
 		for (int i = 2; i < qr.corrected.length; i++) {
-			if( i%2 == 0 ) {
+			if (i%2 == 0) {
 				qr.corrected[i] = 0b00110111;
 			} else {
 				qr.corrected[i] = (byte)0b10001000;
 			}
 		}
 
-		assertTrue(alg.checkPaddingBytes(qr,2));
+		assertTrue(alg.checkPaddingBytes(qr, 2));
 
 		// Test failure conditions now
-		assertFalse(alg.checkPaddingBytes(qr,3));
-		qr.corrected[8] ^= 0x1101;
-		assertFalse(alg.checkPaddingBytes(qr,2));
+		assertFalse(alg.checkPaddingBytes(qr, 3));
+		qr.corrected[8] ^= (byte)0x1101;
+		assertFalse(alg.checkPaddingBytes(qr, 2));
 	}
 
 	/**
@@ -105,12 +105,12 @@ public class TestQrCodeDecoderBits {
 	public void decodeEci_IsoExample() {
 		PackedBits8 bits = new PackedBits8();
 		// ECI Assignment number
-		bits.append(0b00001001,8,false);
+		bits.append(0b00001001, 8, false);
 
 		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
 
-		int newBit = alg.decodeEci(bits,0);
-		assertEquals("ISO8859_7",alg.encodingEci);
-		assertEquals(8,newBit);
+		int newBit = alg.decodeEci(bits, 0);
+		assertEquals("ISO8859_7", alg.encodingEci);
+		assertEquals(8, newBit);
 	}
 }

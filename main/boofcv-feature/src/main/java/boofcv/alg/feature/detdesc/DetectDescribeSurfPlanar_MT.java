@@ -38,6 +38,7 @@ public class DetectDescribeSurfPlanar_MT<II extends ImageGray<II>> extends Detec
 		super(detector, orientation, describe);
 	}
 
+	@Override
 	protected void describe(II grayII, Planar<II> colorII) {
 		BoofConcurrency.loopBlocks(0,foundPoints.size(),(i0, i1)-> {
 			OrientationIntegral<II> orientation = (OrientationIntegral) this.orientation.copy();

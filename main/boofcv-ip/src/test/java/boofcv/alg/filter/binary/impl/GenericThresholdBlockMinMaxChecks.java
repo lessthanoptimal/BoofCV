@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,53 +36,52 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public abstract class GenericThresholdBlockMinMaxChecks
-		<T extends ImageGray<T>> extends GenericThresholdCommon<T>
-{
+		<T extends ImageGray<T>> extends GenericThresholdCommon<T> {
 
-	public GenericThresholdBlockMinMaxChecks(Class<T> imageType) {
+	protected GenericThresholdBlockMinMaxChecks( Class<T> imageType ) {
 		super(imageType);
 	}
 
-	public abstract ThresholdBlockMinMax<T,?> createProcessor(double textureThreshold, int requestedBlockWidth,
-															  double scale , boolean down );
+	public abstract ThresholdBlockMinMax<T, ?> createProcessor( double textureThreshold, int requestedBlockWidth,
+																double scale, boolean down );
 
-	public InputToBinary<T> createThresholder(double textureThreshold, int requestedBlockWidth,
-											  double scale , boolean down) {
+	public InputToBinary<T> createThresholder( double textureThreshold, int requestedBlockWidth,
+											   double scale, boolean down ) {
 		return new ThresholdBlock(createProcessor(textureThreshold, requestedBlockWidth, scale, down),
-				ConfigLength.fixed(requestedBlockWidth),true,imageType);
+				ConfigLength.fixed(requestedBlockWidth), true, imageType);
 	}
 
 	@Override
-	public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		BlockProcessor processor = createProcessor(1.0,requestedBlockWidth, scale, down);
+	public InputToBinary<T> createAlg( int requestedBlockWidth, double scale, boolean down ) {
+		BlockProcessor processor = createProcessor(1.0, requestedBlockWidth, scale, down);
 		return new ThresholdBlock(processor,
-				ConfigLength.fixed(requestedBlockWidth),true,imageType);
+				ConfigLength.fixed(requestedBlockWidth), true, imageType);
 	}
 
 	@Test
 	public void thresholdSquare() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
+		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
 
-		GImageMiscOps.fill(input,200);
-		GImageMiscOps.fillRectangle(input,20,40,45,30,32);
+		GImageMiscOps.fill(input, 200);
+		GImageMiscOps.fillRectangle(input, 20, 40, 45, 30, 32);
 
-		InputToBinary<T> alg = createThresholder(10,6,1.0,true);
+		InputToBinary<T> alg = createThresholder(10, 6, 1.0, true);
 
-		GrayU8 output = new GrayU8(input.width,input.height);
+		GrayU8 output = new GrayU8(input.width, input.height);
 
-		alg.process(input,output);
+		alg.process(input, output);
 
 		// the entire square should be 1
-		assertEquals(30*32, ImageStatistics.sum(output.subimage(40,45,70,77)));
+		assertEquals(30*32, ImageStatistics.sum(output.subimage(40, 45, 70, 77)));
 
 		// the border surrounding the square should be 0
 		for (int x = 39; x < 72; x++) {
-			assertEquals(0,output.get(x,44));
-			assertEquals(0,output.get(x,78));
+			assertEquals(0, output.get(x, 44));
+			assertEquals(0, output.get(x, 78));
 		}
 		for (int y = 45; y < 77; y++) {
-			assertEquals(0,output.get(39,y));
-			assertEquals(0,output.get(71,y));
+			assertEquals(0, output.get(39, y));
+			assertEquals(0, output.get(71, y));
 		}
 	}
 }

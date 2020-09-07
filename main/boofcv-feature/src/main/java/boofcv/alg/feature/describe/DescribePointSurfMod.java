@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,6 +118,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	 * @param scale The scale of the wavelets.
 	 * @param features Where the features are written to.  Must be 4*(widthLargeGrid*widthSubRegion)^2 large.
 	 */
+	@Override
 	public void features(double c_x, double c_y,
 						 double c , double s,
 						 double scale,  SparseImageGradient gradient , double[] features)
@@ -199,6 +200,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	/**
 	 * Creates a new instance with the same configuration
 	 */
+	@Override
 	public DescribePointSurf<II> copy() {
 		return new DescribePointSurfMod<>(widthLargeGrid,widthSubRegion,widthSample,
 				overLap,sigmaLargeGrid,sigmaSubRegion,useHaar,inputType);

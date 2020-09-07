@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,6 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 /**
  * @author Peter Abeles
  */
@@ -42,29 +41,29 @@ public class TestSteerableKernel_I32 {
 	 */
 	@Test
 	public void checkCombining() {
-		double c[] = new double[]{0.1,0.2,0.8};
+		double c[] = new double[]{0.1, 0.2, 0.8};
 		DummySteerableCoefficients coef = new DummySteerableCoefficients(c);
 		Kernel2D basis[] = new Kernel2D[3];
-		basis[0] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
-		basis[1] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
-		basis[2] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
+		basis[0] = FactoryKernel.random2D_I32(width, width/2, 0, 30, rand);
+		basis[1] = FactoryKernel.random2D_I32(width, width/2, 0, 30, rand);
+		basis[2] = FactoryKernel.random2D_I32(width, width/2, 0, 30, rand);
 
 		Kernel2D_S32 expected = new Kernel2D_S32(width);
 
-		for( int y = 0; y < width; y++ ) {
-			for( int x = 0; x < width; x++ ) {
+		for (int y = 0; y < width; y++) {
+			for (int x = 0; x < width; x++) {
 				int total = 0;
-				for( int i = 0; i < c.length;i++ ) {
-					total += c[i]*((Kernel2D_S32)basis[i]).get(x,y);
+				for (int i = 0; i < c.length; i++) {
+					total += (int)(c[i]*((Kernel2D_S32)basis[i]).get(x, y));
 				}
-				expected.set(x,y,total);
+				expected.set(x, y, total);
 			}
 		}
 
 		SteerableKernel_I32 alg = new SteerableKernel_I32();
-		alg.setBasis(coef,basis);
+		alg.setBasis(coef, basis);
 		Kernel2D_S32 found = alg.compute(60.0);
 
-		assertTrue(KernelMath.isEquals(expected.data,found.data,width*width));
+		assertTrue(KernelMath.isEquals(expected.data, found.data, width*width));
 	}
 }

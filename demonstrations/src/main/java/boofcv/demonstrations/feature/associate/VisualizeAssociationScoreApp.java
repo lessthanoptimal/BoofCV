@@ -53,7 +53,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Shows how tightly focused the score is around the best figure by showing the relative
  * size and number of features which have a similar score visually in the image.  For example,
@@ -82,8 +81,8 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	VisualizeScorePanel controls;
 	boolean configChanged = false;
 
-	public VisualizeAssociationScoreApp(java.util.List<PathLabel> examples , Class<T> imageType) {
-		super(true,false,examples, ImageType.single(imageType));
+	public VisualizeAssociationScoreApp( java.util.List<PathLabel> examples, Class<T> imageType ) {
+		super(true, false, examples, ImageType.single(imageType));
 		this.imageType = imageType;
 
 		imageLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
@@ -107,52 +106,52 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		detector = controls.createDetector(imageType);
 		descriptor = controls.createDescriptor(imageType);
 
-		SwingUtilities.invokeLater(()-> controls.setFeatureType(descriptor.getDescriptionType()));
+		SwingUtilities.invokeLater(() -> controls.setFeatureType(descriptor.getDescriptionType()));
 
 		// estimate orientation using this once since it is fast and accurate
 		Class integralType = GIntegralImageOps.getIntegralType(imageType);
 		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
-		orientation = FactoryOrientation.convertImage(orientationII,imageType);
+		orientation = FactoryOrientation.convertImage(orientationII, imageType);
 	}
 
 	@Override
 	protected void openFileMenuBar() {
-		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
-		if( files == null )
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY, 2);
+		if (files == null)
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
+		BoofSwingUtil.invokeNowOrLater(() -> openImageSet(false, files));
 	}
 
 	@Override
-	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
-		switch( source ) {
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
+		switch (source) {
 			case 0:
-				buffLeft = ConvertBufferedImage.checkDeclare(width,height,buffLeft,BufferedImage.TYPE_INT_RGB);
-				SwingUtilities.invokeLater(()->{
-					scorePanel.setPreferredSize(width,height,width,height);
-					controls.setImageSize(width,height);
+				buffLeft = ConvertBufferedImage.checkDeclare(width, height, buffLeft, BufferedImage.TYPE_INT_RGB);
+				SwingUtilities.invokeLater(() -> {
+					scorePanel.setPreferredSize(width, height, width, height);
+					controls.setImageSize(width, height);
 				});
 				break;
 
 			case 1:
-				buffRight = ConvertBufferedImage.checkDeclare(width,height,buffRight,BufferedImage.TYPE_INT_RGB);
+				buffRight = ConvertBufferedImage.checkDeclare(width, height, buffRight, BufferedImage.TYPE_INT_RGB);
 				break;
 		}
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
-		switch( sourceID ) {
+	public void processImage( int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input ) {
+		switch (sourceID) {
 			case 0:
 				imageLeft.setTo((T)input);
-				buffLeft.createGraphics().drawImage(bufferedIn,0,0,null);
+				buffLeft.createGraphics().drawImage(bufferedIn, 0, 0, null);
 				break;
 
 			case 1:
 				imageRight.setTo((T)input);
-				buffRight.createGraphics().drawImage(bufferedIn,0,0,null);
+				buffRight.createGraphics().drawImage(bufferedIn, 0, 0, null);
 
-				BoofSwingUtil.invokeNowOrLater((()-> scorePanel.setImages(buffLeft,buffRight)));
+				BoofSwingUtil.invokeNowOrLater(() -> scorePanel.setImages(buffLeft, buffRight));
 				processImage();
 				break;
 		}
@@ -186,10 +185,10 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	 * Detects the locations of the features in the image and extracts descriptions of each of
 	 * the features.
 	 */
-	private void extractImageFeatures(final ProgressMonitor progressMonitor, final int progress,
-									  T image,
-									  List<TupleDesc> descs, List<Point2D_F64> locs) {
-		if( configChanged ) {
+	private void extractImageFeatures( final ProgressMonitor progressMonitor, final int progress,
+									   T image,
+									   List<TupleDesc> descs, List<Point2D_F64> locs ) {
+		if (configChanged) {
 			configChanged = false;
 			declareAlgorithms();
 		}
@@ -216,7 +215,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 				}
 
 				TupleDesc d = descriptor.createDescription();
-				if ( descriptor.process(pt.x, pt.y, yaw, radius, d) ) {
+				if (descriptor.process(pt.x, pt.y, yaw, radius, d)) {
 					descs.add(d);
 					locs.add(pt.copy());
 				}
@@ -256,7 +255,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		ScoreAssociation selected;
 
 		public VisualizeScorePanel() {
-			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
 			// custom configurations for this demo
@@ -270,15 +269,15 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			scoreTypes.setMaximumSize(scoreTypes.getPreferredSize());
 
 			JTabbedPane tabbed = new JTabbedPane();
-			tabbed.addTab("Detect",panelDetector);
-			tabbed.addTab("Describe",panelDescriptor);
+			tabbed.addTab("Detect", panelDetector);
+			tabbed.addTab("Describe", panelDescriptor);
 
 			handleDetectorChanged();
 			handleDescriptorChanged();
 
 			add(labelSize);
-			addLabeled(comboDetect,"Detect");
-			addLabeled(comboDescribe,"Describe");
+			addLabeled(comboDetect, "Detect");
+			addLabeled(comboDescribe, "Describe");
 			addLabeled(scoreTypes, "Score");
 			add(tabbed);
 		}
@@ -303,36 +302,36 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			handleControlsUpdated();
 		}
 
-		public void setImageSize( int width , int height ) {
-			labelSize.setText(width+" x "+height);
+		public void setImageSize( int width, int height ) {
+			labelSize.setText(width + " x " + height);
 		}
 
 		public void setFeatureType( Class type ) {
-			if( this.type == type )
+			if (this.type == type)
 				return;
 
 			this.type = type;
 
 			scoreTypes.removeActionListener(this);
 			scoreTypes.removeAllItems();
-			if( type == TupleDesc_B.class ) {
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateHamming_B(),"Hamming"));
-			} else if( type == NccFeature.class ) {
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateNccFeature(),"NCC"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(),"Euclidean"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F64(),"Euclidean2"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F64(),"SAD"));
-			} else if( TupleDesc_F64.class.isAssignableFrom(type) ) {
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(),"Euclidean"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F64(),"Euclidean2"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F64(),"SAD"));
-			} else if( type == TupleDesc_F32.class ) {
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F32(),"Euclidean2"));
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F32(),"SAD"));
-			} else if( type == TupleDesc_U8.class ) {
-				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.U8(),"SAD"));
+			if (type == TupleDesc_B.class) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateHamming_B(), "Hamming"));
+			} else if (type == NccFeature.class) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateNccFeature(), "NCC"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(), "Euclidean"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F64(), "Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F64(), "SAD"));
+			} else if (TupleDesc_F64.class.isAssignableFrom(type)) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(), "Euclidean"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F64(), "Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F64(), "SAD"));
+			} else if (type == TupleDesc_F32.class) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq.F32(), "Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.F32(), "SAD"));
+			} else if (type == TupleDesc_U8.class) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad.U8(), "SAD"));
 			} else {
-				throw new RuntimeException("Unknown description type "+type.getSimpleName());
+				throw new RuntimeException("Unknown description type " + type.getSimpleName());
 			}
 			selected = ((ScoreItem)scoreTypes.getSelectedItem()).assoc;
 			scoreTypes.revalidate();
@@ -340,16 +339,16 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( comboDetect == e.getSource() ) {
+		public void actionPerformed( ActionEvent e ) {
+			if (comboDetect == e.getSource()) {
 				configDetDesc.typeDetector =
 						ConfigDetectInterestPoint.DetectorType.values()[comboDetect.getSelectedIndex()];
 				handleDetectorChanged();
-			} else if( comboDescribe == e.getSource() ){
+			} else if (comboDescribe == e.getSource()) {
 				configDetDesc.typeDescribe =
 						ConfigDescribeRegionPoint.DescriptorType.values()[comboDescribe.getSelectedIndex()];
 				handleDescriptorChanged();
-			} else if( scoreTypes == e.getSource() ) {
+			} else if (scoreTypes == e.getSource()) {
 				ScoreItem item = (ScoreItem)scoreTypes.getSelectedItem();
 				selected = item.assoc;
 				scorePanel.setScorer(controls.getSelected());
@@ -361,12 +360,11 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		}
 	}
 
-	private static class ScoreItem
-	{
+	private static class ScoreItem {
 		String name;
 		ScoreAssociation assoc;
 
-		private ScoreItem(ScoreAssociation assoc, String name) {
+		private ScoreItem( ScoreAssociation assoc, String name ) {
 			this.assoc = assoc;
 			this.name = name;
 		}
@@ -377,7 +375,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(new PathLabel("Cave",
@@ -391,8 +389,8 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		examples.add(new PathLabel("Trees Rotate",
 				UtilIO.pathExample("stitch/trees_rotate_01.jpg"), UtilIO.pathExample("stitch/trees_rotate_03.jpg")));
 
-		SwingUtilities.invokeLater(()->{
-			VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(examples,GrayF32.class);
+		SwingUtilities.invokeLater(() -> {
+			VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(examples, GrayF32.class);
 
 			// Processing time takes a bit so don't open right away
 			app.openExample(examples.get(0));

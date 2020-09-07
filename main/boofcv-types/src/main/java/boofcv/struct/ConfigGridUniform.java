@@ -29,35 +29,34 @@ public class ConfigGridUniform implements Configuration {
 	/** The smallest allowed cell size in pixels */
 	public int minCellLength = 5;
 
-	public ConfigGridUniform(double regionScaleFactor, int minCellLength) {
+	public ConfigGridUniform( double regionScaleFactor, int minCellLength ) {
 		this.regionScaleFactor = regionScaleFactor;
 		this.minCellLength = minCellLength;
 	}
 
-	public ConfigGridUniform() {
-	}
+	public ConfigGridUniform() {}
 
 	/**
 	 * Selects the desired length of a cell based on the input image size and maximum number of points returned
 	 *
 	 * @param maxSample The maximum number of points/features which can be returned.
 	 */
-	public int selectTargetCellSize( int maxSample, int imageWidth, int imageHeight) {
-		if( maxSample <= 0 )
+	public int selectTargetCellSize( int maxSample, int imageWidth, int imageHeight ) {
+		if (maxSample <= 0)
 			throw new IllegalArgumentException("maxSample must be a positive number");
-		int targetLength = (int)Math.ceil(regionScaleFactor *Math.sqrt(imageWidth*imageHeight)/
+		int targetLength = (int)Math.ceil(regionScaleFactor*Math.sqrt(imageWidth*imageHeight)/
 				Math.sqrt(maxSample));
-		targetLength = Math.max(minCellLength,targetLength);
+		targetLength = Math.max(minCellLength, targetLength);
 		return targetLength;
 	}
 
 	@Override
 	public void checkValidity() {
-		if( regionScaleFactor <= 0 )
+		if (regionScaleFactor <= 0)
 			throw new IllegalArgumentException("Must be greater than 0");
-		if( minCellLength <= 0 )
+		if (minCellLength <= 0)
 			throw new IllegalArgumentException("Must be greater than 0");
-		if( regionScaleFactor < 1.0 )
+		if (regionScaleFactor < 1.0)
 			throw new IllegalArgumentException("Scale factor must be greater than zero");
 	}
 

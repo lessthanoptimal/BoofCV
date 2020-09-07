@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,18 +35,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericThresholdCommon<T extends ImageGray<T>>
-{
+public abstract class GenericThresholdCommon<T extends ImageGray<T>> {
 
 	Class<T> imageType;
 	Random rand = new Random(234);
 
-	public GenericThresholdCommon(Class<T> imageType) {
+	protected GenericThresholdCommon( Class<T> imageType ) {
 		this.imageType = imageType;
 	}
 
-	public abstract InputToBinary<T> createAlg(int requestedBlockWidth,
-											   double scale , boolean down );
+	public abstract InputToBinary<T> createAlg( int requestedBlockWidth,
+												double scale, boolean down );
 
 	/**
 	 * Make sure it's doing something resembling a proper thresholding of a random image. About 1/2 the pixels should
@@ -54,35 +53,35 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 	 */
 	@Test
 	void sanityCheckThreshold() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
-		GImageMiscOps.fillUniform(input,rand,0,255);
+		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		GrayU8 down = new GrayU8(100,120);
-		GrayU8 up = new GrayU8(100,120);
+		GrayU8 down = new GrayU8(100, 120);
+		GrayU8 up = new GrayU8(100, 120);
 
 		// turn off texture so that the output's can be the inverse of each other
-		createAlg(6,1.0,true).process(input,down);
-		createAlg(6,1.0,false).process(input,up);
+		createAlg(6, 1.0, true).process(input, down);
+		createAlg(6, 1.0, false).process(input, up);
 
-		assertTrue(ImageStatistics.sum(down)>down.data.length/4);
-		assertTrue(ImageStatistics.sum(up)>down.data.length/4);
+		assertTrue(ImageStatistics.sum(down) > down.data.length/4);
+		assertTrue(ImageStatistics.sum(up) > down.data.length/4);
 	}
 
 	@Test
 	void toggleDown() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
-		GImageMiscOps.fillUniform(input,rand,0,255);
+		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		GrayU8 down = new GrayU8(100,120);
-		GrayU8 up = new GrayU8(100,120);
+		GrayU8 down = new GrayU8(100, 120);
+		GrayU8 up = new GrayU8(100, 120);
 
 		// turn off texture so that the output's can be the inverse of each other
-		createAlg(6,1.0,true).process(input,down);
-		createAlg(6,1.0,false).process(input,up);
+		createAlg(6, 1.0, true).process(input, down);
+		createAlg(6, 1.0, false).process(input, up);
 
 		for (int y = 0; y < down.height; y++) {
 			for (int x = 0; x < down.width; x++) {
-				assertTrue((down.get(x,y)==0) == !(up.get(x,y)==0),x+" "+y);
+				assertTrue((down.get(x, y) == 0) == !(up.get(x, y) == 0), x + " " + y);
 			}
 		}
 	}
@@ -92,44 +91,44 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 	 */
 	@Test
 	void widthLargerThanImage() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,10,12);
-		GImageMiscOps.fillUniform(input,rand,0,255);
-		GrayU8 output = new GrayU8(10,12);
+		T input = GeneralizedImageOps.createSingleBand(imageType, 10, 12);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
+		GrayU8 output = new GrayU8(10, 12);
 
-		InputToBinary<T> alg = createAlg(20,1.0,true);
-		alg.process(input,output);
+		InputToBinary<T> alg = createAlg(20, 1.0, true);
+		alg.process(input, output);
 
-		assertTrue(ImageStatistics.sum(output)>output.data.length/4);
+		assertTrue(ImageStatistics.sum(output) > output.data.length/4);
 	}
 
 	@Test
 	void subImage() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
-		GImageMiscOps.fillUniform(input,rand,0,255);
+		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		GrayU8 expected = new GrayU8(100,120);
+		GrayU8 expected = new GrayU8(100, 120);
 
 		T sub_input = BoofTesting.createSubImageOf(input);
 		GrayU8 sub_output = BoofTesting.createSubImageOf(expected);
 
-		InputToBinary<T> alg = createAlg(14,1.0,true);
+		InputToBinary<T> alg = createAlg(14, 1.0, true);
 
-		alg.process(input,expected);
-		alg.process(sub_input,sub_output);
+		alg.process(input, expected);
+		alg.process(sub_input, sub_output);
 
-		BoofTesting.assertEquals(expected,sub_output,0);
+		BoofTesting.assertEquals(expected, sub_output, 0);
 	}
 
 	@Test
 	void resize_output() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
-		GImageMiscOps.fillUniform(input,rand,0,255);
+		T input = GeneralizedImageOps.createSingleBand(imageType, 100, 120);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		GrayU8 output = new GrayU8(80,20);
+		GrayU8 output = new GrayU8(80, 20);
 
-		createAlg(6,1.0,true).process(input,output);
+		createAlg(6, 1.0, true).process(input, output);
 
-		assertEquals(input.width,output.width);
-		assertEquals(input.height,output.height);
+		assertEquals(input.width, output.width);
+		assertEquals(input.height, output.height);
 	}
 }

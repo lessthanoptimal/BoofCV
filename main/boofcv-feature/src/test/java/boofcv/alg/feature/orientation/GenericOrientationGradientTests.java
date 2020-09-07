@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public abstract class GenericOrientationGradientTests<D extends ImageGray<D>> ex
 	// data used to store image derivatives
 	D derivX,derivY;
 
-	public GenericOrientationGradientTests(double angleTolerance, int regionSize, Class imageType) {
+	protected GenericOrientationGradientTests(double angleTolerance, int regionSize, Class imageType) {
 		super(imageType);
 		this.angleTolerance = angleTolerance;
 		this.regionSize = regionSize;

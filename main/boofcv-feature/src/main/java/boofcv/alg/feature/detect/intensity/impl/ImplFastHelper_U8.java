@@ -34,7 +34,7 @@ public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 	int centerValue;
 	int lower,upper;
 
-	public ImplFastHelper_U8(int pixelTol  ) {
+	protected ImplFastHelper_U8(int pixelTol  ) {
 		this.tol = pixelTol;
 	}
 

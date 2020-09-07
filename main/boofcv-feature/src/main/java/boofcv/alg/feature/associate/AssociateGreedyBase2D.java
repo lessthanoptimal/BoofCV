@@ -19,11 +19,11 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * Base class for associating image features using descriptions and 2D distance cropping. Distance is computed
@@ -33,14 +33,14 @@ import org.ddogleg.struct.FastQueue;
  */
 public abstract class AssociateGreedyBase2D<D> extends AssociateGreedyBase<D> {
 	// used to compute the distance between two points
-	protected FastQueue<AssociateImageDistanceFunction> distances; // used for concurrency
+	protected GrowArray<AssociateImageDistanceFunction> distances; // used for concurrency
 	protected AssociateImageDistanceFunction distanceFunction;
 
 	/**
 	 * Maximum allowed distance between two points. If relative then it will be based on max(width,height).
 	 * Inclusive .
 	 */
-	public final @Getter ConfigLength maxDistanceLength = ConfigLength.relative(1.0,0.0);
+	public final @Getter ConfigLength maxDistanceLength = ConfigLength.relative(1.0, 0.0);
 	// Computed max distance in same units as `distance`
 	protected double maxDistanceUnits;
 
@@ -55,10 +55,10 @@ public abstract class AssociateGreedyBase2D<D> extends AssociateGreedyBase<D> {
 	 *
 	 * @param scoreAssociation How features are scored.
 	 */
-	protected AssociateGreedyBase2D(ScoreAssociation<D> scoreAssociation ,
-										  AssociateImageDistanceFunction distanceFunction) {
+	protected AssociateGreedyBase2D( ScoreAssociation<D> scoreAssociation,
+									 AssociateImageDistanceFunction distanceFunction ) {
 		super(scoreAssociation);
-		this.distances = new FastQueue<>(distanceFunction::copyConcurrent);
+		this.distances = new GrowArray<>(distanceFunction::copyConcurrent);
 		this.distanceFunction = distanceFunction;
 	}
 
@@ -68,34 +68,32 @@ public abstract class AssociateGreedyBase2D<D> extends AssociateGreedyBase<D> {
 	 * @param imageWidth Width of input image
 	 * @param imageHeight Height of input image
 	 */
-	public void init( int imageWidth , int imageHeight ) {
+	public void init( int imageWidth, int imageHeight ) {
 		// Compute max distance relative the the image size
 		maxDistanceUnits = maxDistanceLength.compute(Math.max(imageWidth, imageHeight));
 		// Adjust units so that it's the same as the distance function
 		maxDistanceUnits = distanceFunction.convertPixelsToDistance(maxDistanceUnits);
 	}
 
-	public void setSource(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
-		if( location.size() != descriptions.size() )
-			throw new IllegalArgumentException("The two lists must be the same size. "+location.size+" vs "+descriptions.size);
+	public void setSource( FastAccess<Point2D_F64> location, FastAccess<D> descriptions ) {
+		if (location.size() != descriptions.size())
+			throw new IllegalArgumentException("The two lists must be the same size. " + location.size + " vs " + descriptions.size);
 
 		this.locationSrc = location;
 		this.descSrc = descriptions;
 	}
 
-	public void setDestination(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
-		if( location.size() != descriptions.size() )
-			throw new IllegalArgumentException("The two lists must be the same size. "+location.size+" vs "+descriptions.size);
+	public void setDestination( FastAccess<Point2D_F64> location, FastAccess<D> descriptions ) {
+		if (location.size() != descriptions.size())
+			throw new IllegalArgumentException("The two lists must be the same size. " + location.size + " vs " + descriptions.size);
 
 		this.locationDst = location;
 		this.descDst = descriptions;
 	}
-
 
 	/**
 	 * Performs association by computing a 2D score matrix and discarding matches which fail max distance check.
 	 * See {@link AssociateGreedyBase} for a full description.
 	 */
 	public abstract void associate();
-
 }

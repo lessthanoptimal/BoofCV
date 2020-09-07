@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class TestQrCodeGenerator {
 	 * Compare against example from reference
 	 */
 	@Test
-	public void formatInformationBits() {
+	void formatInformationBits() {
 		QrCode qr = new QrCode();
 		qr.version = 1;
 		qr.error = QrCode.ErrorLevel.M;
@@ -40,11 +40,11 @@ public class TestQrCodeGenerator {
 		PackedBits32 found = QrCodeGenerator.formatInformationBits(qr);
 
 		int expected = 0b1000000_11001110;
-		assertEquals(expected,found.data[0]);
+		assertEquals(expected, found.data[0]);
 	}
 
 	@Test
-	public void alignmentPosition() {
+	void alignmentPosition() {
 		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("123345").fixate();
 
 		QrCodeGenerator alg = new QrCodeGenerator(1.0);
@@ -58,10 +58,9 @@ public class TestQrCodeGenerator {
 		QrCode.Alignment a = qr.alignment.get(0);
 		int N = qr.getNumberOfModules();
 
-		assertEquals(N-1-alignment[0],a.moduleX);
-		assertEquals(N-1-alignment[0],a.moduleY);
-		assertEquals((N-1-alignment[0]+0.5)/N,a.pixel.x, 1e-8);
-		assertEquals((N-1-alignment[0]+0.5)/N,a.pixel.y, 1e-8);
+		assertEquals(N - 1 - alignment[0], a.moduleX);
+		assertEquals(N - 1 - alignment[0], a.moduleY);
+		assertEquals((N - 1 - alignment[0] + 0.5)/N, a.pixel.x, 1e-8);
+		assertEquals((N - 1 - alignment[0] + 0.5)/N, a.pixel.y, 1e-8);
 	}
-
 }

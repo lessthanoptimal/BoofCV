@@ -75,11 +75,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				" * Convolves a mean filter across the image.  The mean value of all the pixels are computed inside the kernel.\n" +
 				" * </p>\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"public class "+className+" {\n\n");
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,9 @@ import boofcv.struct.image.ImageType;
 /**
  * <p>Implementation of {@link BackgroundAlgorithmBasic} for stationary images.</p>
  *
+ * @author Peter Abeles
  * @see BackgroundAlgorithmBasic
  * @see BackgroundModelStationary
- *
- * @author Peter Abeles
  */
 public abstract class BackgroundStationaryBasic<T extends ImageBase<T>>
 		extends BackgroundModelStationary<T> implements BackgroundAlgorithmBasic {
@@ -52,10 +51,10 @@ public abstract class BackgroundStationaryBasic<T extends ImageBase<T>>
 	 * @param threshold Euclidean distance threshold.  Background is &le; this value
 	 * @param imageType Type of input image
 	 */
-	public BackgroundStationaryBasic(float learnRate, float threshold, ImageType<T> imageType) {
+	protected BackgroundStationaryBasic( float learnRate, float threshold, ImageType<T> imageType ) {
 		super(imageType);
 
-		if( learnRate < 0 || learnRate > 1f )
+		if (learnRate < 0 || learnRate > 1f)
 			throw new IllegalArgumentException("LearnRate must be 0 <= rate <= 1.0f");
 
 		this.learnRate = learnRate;
@@ -68,7 +67,7 @@ public abstract class BackgroundStationaryBasic<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setLearnRate(float learnRate) {
+	public void setLearnRate( float learnRate ) {
 		this.learnRate = learnRate;
 	}
 
@@ -78,7 +77,7 @@ public abstract class BackgroundStationaryBasic<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setThreshold(float threshold) {
+	public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 }

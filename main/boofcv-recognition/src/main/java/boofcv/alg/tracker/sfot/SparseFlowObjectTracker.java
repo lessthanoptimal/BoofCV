@@ -50,8 +50,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative extends ImageGray<Derivative>>
-{
+public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative extends ImageGray<Derivative>> {
 	// for the current image
 	private ImagePyramid<Image> currentImage;
 	private Derivative[] currentDerivX;
@@ -63,33 +62,33 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	private Derivative[] previousDerivY;
 
 	// tracks features from frame-to-frame
-	private PyramidKltTracker<Image, Derivative> klt;
+	private final PyramidKltTracker<Image, Derivative> klt;
 	private PyramidKltFeature track;
 
-	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+	private final FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
 	// used for estimating motion from track locations
-	private LeastMedianOfSquares<ScaleTranslateRotate2D,AssociatedPair> estimateMotion;
+	private final LeastMedianOfSquares<ScaleTranslateRotate2D, AssociatedPair> estimateMotion;
 
 	// if true the object track has been last and can't be recovered
 	private boolean trackLost;
 
 	// configuration parameters
-	private SfotConfig config;
+	private final SfotConfig config;
 
 	// class used to compute the image derivative
-	private ImageGradient<Image, Derivative> gradient;
-	private Class<Image> imageType;
-	private Class<Derivative> derivType;
+	private final ImageGradient<Image, Derivative> gradient;
+	private final Class<Image> imageType;
+	private final Class<Derivative> derivType;
 
 	// maximum allowed forward-backwards error squared
-	private float maximumErrorFB;
+	private final float maximumErrorFB;
 
 	// location of the target in the current frame
 	RectangleRotate_F64 region = new RectangleRotate_F64();
 
-	public SparseFlowObjectTracker( SfotConfig config ,
-									Class<Image> imageType , Class<Derivative> derivType ,
+	public SparseFlowObjectTracker( SfotConfig config,
+									Class<Image> imageType, Class<Derivative> derivType,
 									ImageGradient<Image, Derivative> gradient ) {
 
 		this.config = config;
@@ -108,22 +107,21 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 				config.randSeed, config.robustCycles, Double.MAX_VALUE, 0, manager, generator, distance);
 	}
 
-	public void init( Image input , RectangleRotate_F64 region ) {
-		if( currentImage == null ||
+	public void init( Image input, RectangleRotate_F64 region ) {
+		if (currentImage == null ||
 				currentImage.getInputWidth() != input.width || currentImage.getInputHeight() != input.height) {
-			declarePyramid(input.width,input.height);
+			declarePyramid(input.width, input.height);
 		}
 
 		previousImage.process(input);
-		for( int i = 0; i < previousImage.getNumLayers(); i++ ) {
+		for (int i = 0; i < previousImage.getNumLayers(); i++) {
 			Image layer = previousImage.getLayer(i);
-			gradient.process(layer,previousDerivX[i],previousDerivY[i]);
+			gradient.process(layer, previousDerivX[i], previousDerivY[i]);
 		}
 
 		trackLost = false;
 
 		this.region.set(region);
-
 	}
 
 	/**
@@ -133,28 +131,28 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	 * @param output Storage for the output.
 	 * @return true if tracking is successful
 	 */
-	public boolean update( Image input , RectangleRotate_F64 output ) {
+	public boolean update( Image input, RectangleRotate_F64 output ) {
 
-		if( trackLost )
+		if (trackLost)
 			return false;
 
 		trackFeatures(input, region);
 
 		// See if there are enough points remaining.  use of config.numberOfSamples is some what arbitrary
-		if( pairs.size() < config.numberOfSamples ) {
+		if (pairs.size() < config.numberOfSamples) {
 			System.out.println("Lack of sample pairs");
 			trackLost = true;
 			return false;
 		}
 
 		// find the motion using tracked features
-		if( !estimateMotion.process(pairs.toList()) ) {
+		if (!estimateMotion.process(pairs.toList())) {
 			System.out.println("estimate motion failed");
 			trackLost = true;
 			return false;
 		}
 
-		if( estimateMotion.getFitQuality() > config.robustMaxError ) {
+		if (estimateMotion.getFitQuality() > config.robustMaxError) {
 			System.out.println("exceeded Max estimation error");
 			trackLost = true;
 			return false;
@@ -189,29 +187,29 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	 * Tracks features from the previous image into the current image. Tracks are created inside the specified
 	 * region in a grid pattern.
 	 */
-	private void trackFeatures(Image input, RectangleRotate_F64 region) {
+	private void trackFeatures( Image input, RectangleRotate_F64 region ) {
 		pairs.reset();
 
 		currentImage.process(input);
-		for( int i = 0; i < currentImage.getNumLayers(); i++ ) {
+		for (int i = 0; i < currentImage.getNumLayers(); i++) {
 			Image layer = currentImage.getLayer(i);
-			gradient.process(layer,currentDerivX[i],currentDerivY[i]);
+			gradient.process(layer, currentDerivX[i], currentDerivY[i]);
 		}
 
 		// convert to float to avoid excessive conversions from double to float
 		float cx = (float)region.cx;
 		float cy = (float)region.cy;
 
-		float height = (float)(region.height);
-		float width = (float)(region.width);
+		float height = (float)region.height;
+		float width = (float)region.width;
 
 		float c = (float)Math.cos(region.theta);
 		float s = (float)Math.sin(region.theta);
 
-		float p = 1.0f/(config.numberOfSamples-1);
-		for( int i = 0; i < config.numberOfSamples; i++ ) {
-			float y = (p*i-0.5f)*height;
-			for( int j = 0; j < config.numberOfSamples; j++ ) {
+		float p = 1.0f/(config.numberOfSamples - 1);
+		for (int i = 0; i < config.numberOfSamples; i++) {
+			float y = (p*i - 0.5f)*height;
+			for (int j = 0; j < config.numberOfSamples; j++) {
 				float x = (p*j - 0.5f)*width;
 				float xx = cx + x*c - y*s;
 				float yy = cy + x*s + y*c;
@@ -220,14 +218,14 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 				track.x = xx;
 				track.y = yy;
 
-				klt.setImage(previousImage,previousDerivX,previousDerivY);
-				if( !klt.setDescription(track) ) {
+				klt.setImage(previousImage, previousDerivX, previousDerivY);
+				if (!klt.setDescription(track)) {
 					continue;
 				}
 
-				klt.setImage(currentImage,currentDerivX,currentDerivY);
+				klt.setImage(currentImage, currentDerivX, currentDerivY);
 				KltTrackFault fault = klt.track(track);
-				if( fault != KltTrackFault.SUCCESS ) {
+				if (fault != KltTrackFault.SUCCESS) {
 					continue;
 				}
 
@@ -235,18 +233,18 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 				float yc = track.y;
 
 				// validate by tracking backwards
-				if( !klt.setDescription(track) ) {
+				if (!klt.setDescription(track)) {
 					continue;
 				}
-				klt.setImage(previousImage,previousDerivX,previousDerivY);
+				klt.setImage(previousImage, previousDerivX, previousDerivY);
 				fault = klt.track(track);
-				if( fault != KltTrackFault.SUCCESS ) {
+				if (fault != KltTrackFault.SUCCESS) {
 					continue;
 				}
 
 				float error = UtilPoint2D_F32.distanceSq(track.x, track.y, xx, yy);
 
-				if( error > maximumErrorFB ) {
+				if (error > maximumErrorFB) {
 					continue;
 				}
 
@@ -264,22 +262,22 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	/**
 	 * Declares internal data structures
 	 */
-	private void declarePyramid( int imageWidth , int imageHeight ) {
-		int minSize = (config.trackerFeatureRadius*2+1)*5;
+	private void declarePyramid( int imageWidth, int imageHeight ) {
+		int minSize = (config.trackerFeatureRadius*2 + 1)*5;
 		ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.minSize(minSize);
-		currentImage = FactoryPyramid.discreteGaussian(configLevels,-1,1,false, ImageType.single(imageType));
+		currentImage = FactoryPyramid.discreteGaussian(configLevels, -1, 1, false, ImageType.single(imageType));
 		currentImage.initialize(imageWidth, imageHeight);
-		previousImage = FactoryPyramid.discreteGaussian(configLevels, -1, 1, false,ImageType.single(imageType));
+		previousImage = FactoryPyramid.discreteGaussian(configLevels, -1, 1, false, ImageType.single(imageType));
 		previousImage.initialize(imageWidth, imageHeight);
 
 		int numPyramidLayers = currentImage.getNumLayers();
 
-		previousDerivX = (Derivative[]) Array.newInstance(derivType, numPyramidLayers);
-		previousDerivY = (Derivative[])Array.newInstance(derivType,numPyramidLayers);
-		currentDerivX = (Derivative[])Array.newInstance(derivType,numPyramidLayers);
-		currentDerivY = (Derivative[])Array.newInstance(derivType,numPyramidLayers);
+		previousDerivX = (Derivative[])Array.newInstance(derivType, numPyramidLayers);
+		previousDerivY = (Derivative[])Array.newInstance(derivType, numPyramidLayers);
+		currentDerivX = (Derivative[])Array.newInstance(derivType, numPyramidLayers);
+		currentDerivY = (Derivative[])Array.newInstance(derivType, numPyramidLayers);
 
-		for( int i = 0; i < numPyramidLayers; i++ ) {
+		for (int i = 0; i < numPyramidLayers; i++) {
 			int w = currentImage.getWidth(i);
 			int h = currentImage.getHeight(i);
 
@@ -289,7 +287,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 			currentDerivY[i] = GeneralizedImageOps.createSingleBand(derivType, w, h);
 		}
 
-		track = new PyramidKltFeature(numPyramidLayers,config.trackerFeatureRadius);
+		track = new PyramidKltFeature(numPyramidLayers, config.trackerFeatureRadius);
 	}
 
 	/**

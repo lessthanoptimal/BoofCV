@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -42,10 +43,9 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidFloatApp <T extends ImageGray<T>>
-	extends SelectInputPanel
-{
-	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
+public class VisualizePyramidFloatApp<T extends ImageGray<T>>
+		extends SelectInputPanel {
+	double[] scales = new double[]{1, 1.2, 2.4, 3.6, 4.8, 6.0, 12, 20};
 
 	Class<T> imageType;
 	InterpolatePixelS<T> interp;
@@ -67,25 +67,24 @@ public class VisualizePyramidFloatApp <T extends ImageGray<T>>
 
 		pyramid.process(gray);
 
-		gui.set(pyramid,true);
-		
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.render();
-				gui.repaint();
-				setPreferredSize(new Dimension(gray.width+50,gray.height+20));
-				processedImage = true;
-			}});
+		gui.set(pyramid, true);
+
+		SwingUtilities.invokeLater(() -> {
+			gui.render();
+			gui.repaint();
+			setPreferredSize(new Dimension(gray.width + 50, gray.height + 20));
+			processedImage = true;
+		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile( String fileName ) {}
 
 	@Override
-	public synchronized void changeInput(String name, int index) {
+	public synchronized void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -95,23 +94,23 @@ public class VisualizePyramidFloatApp <T extends ImageGray<T>>
 		return processedImage;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 //		VisualizePyramidFloatApp<GrayF32> app = new VisualizePyramidFloatApp<>(GrayF32.class);
 		VisualizePyramidFloatApp<GrayU8> app = new VisualizePyramidFloatApp<>(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
+		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		while (!app.getHasProcessedImage()) {
+			BoofMiscOps.sleep(10);
 		}
 
-		ShowImages.showWindow(app,"Image Float Pyramid", true);
+		ShowImages.showWindow(app, "Image Float Pyramid", true);
 	}
 }

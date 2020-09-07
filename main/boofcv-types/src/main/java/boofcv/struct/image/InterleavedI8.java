@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.struct.image;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * <p>
  * {@link ImageInterleaved} for data of type byte.
@@ -27,7 +29,7 @@ package boofcv.struct.image;
  */
 public abstract class InterleavedI8<T extends InterleavedI8<T>> extends InterleavedInteger<T> {
 
-	public byte data[];
+	public byte[] data;
 
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.
@@ -36,16 +38,15 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	 * @param height number of rows in the image.
 	 * @param numBands number of bands/colors in the image.
 	 */
-	public InterleavedI8(int width, int height, int numBands) {
+	protected InterleavedI8( int width, int height, int numBands ) {
 		super(width, height, numBands);
 	}
 
-	public InterleavedI8() {
-	}
+	protected InterleavedI8() {}
 
 	@Override
-	public String toString_element(int index) {
-		return String.format("%02x",data[index]&0xFF);
+	public String toString_element( int index ) {
+		return String.format("%02x", data[index] & 0xFF);
 	}
 
 	@Override
@@ -56,12 +57,12 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	/**
 	 * Returns the pixel's value for all the bands as an array.
 	 *
-	 * @param x	   pixel coordinate.
-	 * @param y	   pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param storage If not null then the pixel's value is written here.  If null a new array is created.
 	 * @return The pixel's value.
 	 */
-	public byte[] get(int x, int y, byte[] storage) {
+	public byte[] get( int x, int y, @Nullable byte[] storage ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
@@ -80,11 +81,11 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	/**
 	 * Sets the pixel's value for all the bands using an array.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value for each band.
 	 */
-	public void set(int x, int y, byte... value) {
+	public void set( int x, int y, byte... value ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
@@ -97,12 +98,12 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	/**
 	 * Returns the value of the specified band in the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
-	 * @param band  which color band in the pixel
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
+	 * @param band which color band in the pixel
 	 * @param value The new value of the element.
 	 */
-	public void setBand(int x, int y, int band, byte value) {
+	public void setBand( int x, int y, int band, byte value ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
 		if (band < 0 || band >= numBands)
@@ -112,7 +113,7 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	}
 
 	@Override
-	public void unsafe_set(int x, int y, int... value) {
+	public void unsafe_set( int x, int y, int... value ) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = (byte)value[i];
@@ -120,7 +121,7 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	}
 
 	@Override
-	public void setBand(int x, int y, int band, int value) {
+	public void setBand( int x, int y, int band, int value ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
 		if (band < 0 || band >= numBands)
@@ -130,14 +131,14 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	}
 
 	@Override
-	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		byte[] dst = (byte[])array;
 		int idxSrc = startIndex + stride*row0 + col*numBands;
 		int idxDst = offset;
-		int end = idxSrc + (row1-row0)*stride;
-		while( idxSrc < end ) {
+		int end = idxSrc + (row1 - row0)*stride;
+		while (idxSrc < end) {
 			for (int i = 0; i < numBands; i++) {
-				dst[idxDst++] = data[idxSrc+i];
+				dst[idxDst++] = data[idxSrc + i];
 			}
 			idxSrc += stride;
 		}
@@ -154,8 +155,7 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	}
 
 	@Override
-	protected void _setData(Object data) {
-		this.data = (byte[]) data;
+	protected void _setData( Object data ) {
+		this.data = (byte[])data;
 	}
-
 }

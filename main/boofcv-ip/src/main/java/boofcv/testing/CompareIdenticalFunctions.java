@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,6 +90,7 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		return ret;
 	}
 
+	@SuppressWarnings({"EmptyCatch"})
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 

@@ -68,7 +68,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	/**
 	 * Set of gray scale images
 	 */
-	public T bands[];
+	public T[] bands;
 
 	/**
 	 * Creates a Planar image with the specified properties.

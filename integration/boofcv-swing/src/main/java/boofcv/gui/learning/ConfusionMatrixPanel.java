@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 /**
  * Visualizes a confusion matrix.  Each element is assumed to have a value from 0 to 1.0
  *
@@ -37,8 +36,8 @@ import java.util.Random;
  */
 public class ConfusionMatrixPanel extends JPanel {
 
-	DMatrixRMaj temp = new DMatrixRMaj(1,1);
-	DMatrixRMaj confusion = new DMatrixRMaj(1,1);
+	DMatrixRMaj temp = new DMatrixRMaj(1, 1);
+	DMatrixRMaj confusion = new DMatrixRMaj(1, 1);
 	boolean dirty = false;
 
 	boolean gray = false;
@@ -61,12 +60,13 @@ public class ConfusionMatrixPanel extends JPanel {
 
 	/**
 	 * Constructor that specifies the confusion matrix and width/height
+	 *
 	 * @param labels Optional labels for the confusion matrix.
 	 * @param widthPixels preferred width and height of the panel in pixels
 	 * @param gray Render gray scale or color image
 	 */
-	public ConfusionMatrixPanel( DMatrixRMaj M , List<String> labels, int widthPixels , boolean gray ) {
-		this(widthPixels,labels!=null);
+	public ConfusionMatrixPanel( DMatrixRMaj M, List<String> labels, int widthPixels, boolean gray ) {
+		this(widthPixels, labels != null);
 
 		setLabels(labels);
 		setMatrix(M);
@@ -75,20 +75,21 @@ public class ConfusionMatrixPanel extends JPanel {
 
 	/**
 	 * Constructor in which the prefered width and height is specified in pixels
+	 *
 	 * @param widthPixels preferred width and height
 	 */
-	public ConfusionMatrixPanel(int widthPixels, boolean hasLabels ) {
+	public ConfusionMatrixPanel( int widthPixels, boolean hasLabels ) {
 
 		int heightPixels = widthPixels;
-		if( hasLabels ) {
-			heightPixels *= 1.0-labelViewFraction;
+		if (hasLabels) {
+			heightPixels = (int)(heightPixels*(1.0 - labelViewFraction));
 		}
 
-		setPreferredSize(new Dimension(widthPixels,heightPixels));
+		setPreferredSize(new Dimension(widthPixels, heightPixels));
 	}
 
 	public void setMatrix( DMatrixRMaj A ) {
-		synchronized ( this ) {
+		synchronized (this) {
 			temp.set(A);
 			dirty = true;
 		}
@@ -99,7 +100,7 @@ public class ConfusionMatrixPanel extends JPanel {
 		return gray;
 	}
 
-	public void setGray(boolean gray) {
+	public void setGray( boolean gray ) {
 		this.gray = gray;
 	}
 
@@ -107,7 +108,7 @@ public class ConfusionMatrixPanel extends JPanel {
 		return showNumbers;
 	}
 
-	public void setShowNumbers(boolean showNumbers) {
+	public void setShowNumbers( boolean showNumbers ) {
 		this.showNumbers = showNumbers;
 	}
 
@@ -115,7 +116,7 @@ public class ConfusionMatrixPanel extends JPanel {
 		return showZeros;
 	}
 
-	public void setShowZeros(boolean showZeros) {
+	public void setShowZeros( boolean showZeros ) {
 		this.showZeros = showZeros;
 	}
 
@@ -123,11 +124,11 @@ public class ConfusionMatrixPanel extends JPanel {
 		return showLabels;
 	}
 
-	public void setShowLabels(boolean showLabels) {
+	public void setShowLabels( boolean showLabels ) {
 		this.showLabels = showLabels;
 	}
 
-	public void setLabels(List<String> labels) {
+	public void setLabels( List<String> labels ) {
 		this.labels = new ArrayList<>(labels);
 	}
 
@@ -135,13 +136,13 @@ public class ConfusionMatrixPanel extends JPanel {
 		return highlightCategory;
 	}
 
-	public void setHighlightCategory(int highlightCategory) {
+	public void setHighlightCategory( int highlightCategory ) {
 		this.highlightCategory = highlightCategory;
 	}
 
 	@Override
 	public synchronized void paint( Graphics g ) {
-		synchronized ( this ) {
+		synchronized (this) {
 			if (dirty) {
 				confusion.set(temp);
 				dirty = false;
@@ -152,7 +153,7 @@ public class ConfusionMatrixPanel extends JPanel {
 
 		int numCategories = confusion.getNumRows();
 
-		synchronized ( this ) {
+		synchronized (this) {
 			viewHeight = getHeight();
 			viewWidth = getWidth();
 
@@ -162,48 +163,48 @@ public class ConfusionMatrixPanel extends JPanel {
 			renderLabels = this.showLabels && labels != null;
 			if (renderLabels) {
 //			gridHeight *= 1.0-labelViewFraction;
-				gridWidth *= 1.0 - labelViewFraction;
+				gridWidth = (int)(gridWidth*(1.0 - labelViewFraction));
 			}
 		}
 
-		double fontSize = Math.min(gridWidth/numCategories,gridHeight/numCategories);
+		double fontSize = Math.min(gridWidth/numCategories, gridHeight/numCategories);
 
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		if(renderLabels) {
+		if (renderLabels) {
 			renderLabels(g2, fontSize);
 		}
 
 		renderMatrix(g2, fontSize);
 
-		if( highlightCategory >= 0 && highlightCategory < numCategories ) {
-			g2.setColor(new Color(255,255,0,100));
+		if (highlightCategory >= 0 && highlightCategory < numCategories) {
+			g2.setColor(new Color(255, 255, 0, 100));
 
-			int ry = (int)(0.1*gridHeight / numCategories);
-			int rx = (int)(0.1*gridWidth / numCategories);
+			int ry = (int)(0.1*gridHeight/numCategories);
+			int rx = (int)(0.1*gridWidth/numCategories);
 
 
-			int y0 = highlightCategory * gridHeight / numCategories;
-			int y1 = (highlightCategory + 1) * gridHeight / numCategories;
+			int y0 = highlightCategory*gridHeight/numCategories;
+			int y1 = (highlightCategory + 1)*gridHeight/numCategories;
 
-			int x0 = highlightCategory * gridWidth / numCategories;
-			int x1 = (highlightCategory + 1) * gridWidth / numCategories;
+			int x0 = highlightCategory*gridWidth/numCategories;
+			int x1 = (highlightCategory + 1)*gridWidth/numCategories;
 
-			g2.fillRect(x0+rx,0,x1-x0-2*rx,gridHeight);
-			g2.fillRect(0,y0+ry,viewWidth,y1-y0-2*ry);
+			g2.fillRect(x0 + rx, 0, x1 - x0 - 2*rx, gridHeight);
+			g2.fillRect(0, y0 + ry, viewWidth, y1 - y0 - 2*ry);
 		}
 	}
 
 	/**
 	 * Renders the names on each category to the side of the confusion matrix
 	 */
-	private void renderLabels(Graphics2D g2, double fontSize) {
+	private void renderLabels( Graphics2D g2, double fontSize ) {
 		int numCategories = confusion.getNumRows();
 
 		int longestLabel = 0;
-		if(renderLabels) {
+		if (renderLabels) {
 			for (int i = 0; i < numCategories; i++) {
-				longestLabel = Math.max(longestLabel,labels.get(i).length());
+				longestLabel = Math.max(longestLabel, labels.get(i).length());
 			}
 		}
 
@@ -213,23 +214,23 @@ public class ConfusionMatrixPanel extends JPanel {
 
 		// clear the background
 		g2.setColor(Color.WHITE);
-		g2.fillRect(gridWidth,0,viewWidth-gridWidth,viewHeight);
+		g2.fillRect(gridWidth, 0, viewWidth - gridWidth, viewHeight);
 
 		// draw the text
 		g2.setColor(Color.BLACK);
 		for (int i = 0; i < numCategories; i++) {
 			String label = labels.get(i);
 
-			int y0 = i * gridHeight / numCategories;
-			int y1 = (i + 1) * gridHeight / numCategories;
+			int y0 = i*gridHeight/numCategories;
+			int y1 = (i + 1)*gridHeight/numCategories;
 
-			Rectangle2D r = metrics.getStringBounds(label,null);
+			Rectangle2D r = metrics.getStringBounds(label, null);
 
 			float adjX = (float)(r.getX()*2 + r.getWidth())/2.0f;
 			float adjY = (float)(r.getY()*2 + r.getHeight())/2.0f;
 
-			float x = ((viewWidth+gridWidth)/2f-adjX);
-			float y = ((y1+y0)/2f-adjY);
+			float x = ((viewWidth + gridWidth)/2f - adjX);
+			float y = ((y1 + y0)/2f - adjY);
 
 			g2.drawString(label, x, y);
 		}
@@ -238,7 +239,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	/**
 	 * Renders the confusion matrix and visualizes the value in each cell with a color and optionally a color.
 	 */
-	private void renderMatrix(Graphics2D g2, double fontSize) {
+	private void renderMatrix( Graphics2D g2, double fontSize ) {
 		int numCategories = confusion.getNumRows();
 
 		Font fontNumber = new Font("Serif", Font.BOLD, (int)(0.6*fontSize + 0.5));
@@ -246,44 +247,44 @@ public class ConfusionMatrixPanel extends JPanel {
 		FontMetrics metrics = g2.getFontMetrics(fontNumber);
 		for (int i = 0; i < numCategories; i++) {
 			int y0 = i*gridHeight/numCategories;
-			int y1 = (i+1)*gridHeight/numCategories;
+			int y1 = (i + 1)*gridHeight/numCategories;
 
 			for (int j = 0; j < numCategories; j++) {
 				int x0 = j*gridWidth/numCategories;
-				int x1 = (j+1)*gridWidth/numCategories;
+				int x1 = (j + 1)*gridWidth/numCategories;
 
-				double value = confusion.unsafe_get(i,j);
+				double value = confusion.unsafe_get(i, j);
 
-				int red,green,blue;
-				if( gray ) {
-					red = green = blue = (int)(255*(1.0-value));
+				int red, green, blue;
+				if (gray) {
+					red = green = blue = (int)(255*(1.0 - value));
 				} else {
 					green = 0;
 					red = (int)(255*value);
-					blue = (int)(255*(1.0-value));
+					blue = (int)(255*(1.0 - value));
 				}
 				g2.setColor(new Color(red, green, blue));
 
-				g2.fillRect(x0,y0,x1-x0,y1-y0);
+				g2.fillRect(x0, y0, x1 - x0, y1 - y0);
 
 				// Render numbers inside the squares.  Pick a color so that the number is visible no matter what
 				// the color of the square is
-				if( showNumbers && (showZeros || value != 0 )) {
-					int a = (red+green+blue)/3;
+				if (showNumbers && (showZeros || value != 0)) {
+					int a = (red + green + blue)/3;
 
-					String text = ""+(int)(value*100.0+0.5);
-					Rectangle2D r = metrics.getStringBounds(text,null);
+					String text = "" + (int)(value*100.0 + 0.5);
+					Rectangle2D r = metrics.getStringBounds(text, null);
 
 					float adjX = (float)(r.getX()*2 + r.getWidth())/2.0f;
 					float adjY = (float)(r.getY()*2 + r.getHeight())/2.0f;
 
-					float x = ((x1+x0)/2f-adjX);
-					float y = ((y1+y0)/2f-adjY);
+					float x = ((x1 + x0)/2f - adjX);
+					float y = ((y1 + y0)/2f - adjY);
 
 					int gray = a > 127 ? 0 : 255;
 
-					g2.setColor(new Color(gray,gray,gray));
-					g2.drawString(text,x,y);
+					g2.setColor(new Color(gray, gray, gray));
+					g2.drawString(text, x, y);
 				}
 			}
 		}
@@ -298,14 +299,14 @@ public class ConfusionMatrixPanel extends JPanel {
 	 * @param output (Optional) storage for output.
 	 * @return Information on what is at the specified location
 	 */
-	public LocationInfo whatIsAtPoint( int pixelX , int pixelY , LocationInfo output ) {
-		if( output == null )
+	public LocationInfo whatIsAtPoint( int pixelX, int pixelY, LocationInfo output ) {
+		if (output == null)
 			output = new LocationInfo();
 
 		int numCategories = confusion.getNumRows();
 
-		synchronized ( this ) {
-			if( pixelX >= gridWidth ) {
+		synchronized (this) {
+			if (pixelX >= gridWidth) {
 				output.insideMatrix = false;
 				output.col = output.row = pixelY*numCategories/gridHeight;
 			} else {
@@ -323,20 +324,19 @@ public class ConfusionMatrixPanel extends JPanel {
 	 */
 	public static class LocationInfo {
 		public boolean insideMatrix;
-		public int row,col;
+		public int row, col;
 	}
 
-	public static void main(String[] args) {
-		DMatrixRMaj m = RandomMatrices_DDRM.rectangle(5,5,0,1,new Random(234));
+	public static void main( String[] args ) {
+		DMatrixRMaj m = RandomMatrices_DDRM.rectangle(5, 5, 0, 1, new Random(234));
 
 		List<String> labels = new ArrayList<>();
 		for (int i = 0; i < m.numRows; i++) {
-			labels.add("Label "+i);
+			labels.add("Label " + i);
 		}
 
-		ConfusionMatrixPanel confusion = new ConfusionMatrixPanel(m,labels,300,false);
+		ConfusionMatrixPanel confusion = new ConfusionMatrixPanel(m, labels, 300, false);
 		confusion.setHighlightCategory(2);
-		ShowImages.showWindow(confusion,"Window",true);
+		ShowImages.showWindow(confusion, "Window", true);
 	}
-
 }

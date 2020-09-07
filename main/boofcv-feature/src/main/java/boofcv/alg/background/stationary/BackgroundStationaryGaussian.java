@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,14 +26,12 @@ import boofcv.struct.image.ImageType;
 /**
  * <p>Implementation of {@link BackgroundAlgorithmGaussian} for stationary images.</p>
  *
+ * @author Peter Abeles
  * @see BackgroundAlgorithmGaussian
  * @see BackgroundModelStationary
- *
- * @author Peter Abeles
  */
 public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
-		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGaussian
-{
+		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGaussian {
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
 	 */
@@ -55,14 +53,15 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 
 	/**
 	 * See class documentation for parameters definitions.
+	 *
 	 * @param learnRate Specifies how quickly the background is updated Try 0.05
 	 * @param threshold Threshold for background.  &ge; 0.  Try 10
 	 * @param imageType Type of input image
 	 */
-	public BackgroundStationaryGaussian(float learnRate, float threshold,ImageType<T> imageType) {
+	protected BackgroundStationaryGaussian( float learnRate, float threshold, ImageType<T> imageType ) {
 		super(imageType);
 
-		if( threshold < 0 )
+		if (threshold < 0)
 			throw new IllegalArgumentException("Threshold must be more than 0");
 
 		this.learnRate = learnRate;
@@ -75,7 +74,7 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setInitialVariance(float initialVariance) {
+	public void setInitialVariance( float initialVariance ) {
 		this.initialVariance = initialVariance;
 	}
 
@@ -85,7 +84,7 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setLearnRate(float learnRate) {
+	public void setLearnRate( float learnRate ) {
 		this.learnRate = learnRate;
 	}
 
@@ -95,7 +94,7 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setThreshold(float threshold) {
+	public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 
@@ -105,7 +104,7 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setMinimumDifference(float minimumDifference) {
+	public void setMinimumDifference( float minimumDifference ) {
 		this.minimumDifference = minimumDifference;
 	}
 }

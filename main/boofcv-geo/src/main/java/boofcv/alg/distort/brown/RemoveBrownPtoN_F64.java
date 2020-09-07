@@ -35,25 +35,24 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	// principle point / image center
 	protected double cx, cy;
 	// other intrinsic parameters
-	protected double fx,fy,skew;
+	protected double fx, fy, skew;
 
 	// distortion parameters
 	protected RadialTangential_F64 params;
 
 	// inverse of camera calibration matrix
 	// These are the upper triangular elements in a 3x3 matrix
-	private double a11,a12,a13,a22,a23;
+	private double a11, a12, a13, a22, a23;
 
 	private double tol = GrlConstants.DCONV_TOL_A;
 
-	public RemoveBrownPtoN_F64() {
-	}
+	public RemoveBrownPtoN_F64() {}
 
-	public RemoveBrownPtoN_F64(double tol ) {
+	public RemoveBrownPtoN_F64( double tol ) {
 		this.tol = tol;
 	}
 
-	public void setTolerance(double tol) {
+	public void setTolerance( double tol ) {
 		this.tol = tol;
 	}
 
@@ -85,21 +84,21 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	public RemoveBrownPtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
-		if( params != null && params.radial.length == radial.length ) {
-			System.arraycopy(radial,0,params.radial,0,radial.length);
+		if (params != null && params.radial.length == radial.length) {
+			System.arraycopy(radial, 0, params.radial, 0, radial.length);
 			return this;
 		}
-		params = new RadialTangential_F64(radial,t1,t2);
+		params = new RadialTangential_F64(radial, t1, t2);
 		return this;
 	}
 
 	public RemoveBrownPtoN_F64 setDistortion( /**/double radial1,  /**/double radial2 ) {
-		if( params != null && params.radial.length == 2 ) {
-			params.radial[0] = radial1;
-			params.radial[1] = radial2;
+		if (params != null && params.radial.length == 2) {
+			params.radial[0] = (double)radial1;
+			params.radial[1] = (double)radial2;
 			return this;
 		}
-		params = new RadialTangential_F64(new double[]{radial1,radial2},0.0,0.0);
+		params = new RadialTangential_F64(new /**/double[]{radial1, radial2}, 0.0, 0.0);
 		return this;
 	}
 
@@ -111,12 +110,12 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	 * @param out Undistorted normalized coordinate.
 	 */
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute( double x, double y, Point2D_F64 out ) {
 		// initial estimate of undistorted point
 		out.x = a11*x + a12*y + a13;
 		out.y = a22*y + a23;
 
-		removeRadial(out.x, out.y, params.radial, params.t1, params.t2, out, tol );
+		removeRadial(out.x, out.y, params.radial, params.t1, params.t2, out, tol);
 	}
 
 	@Override

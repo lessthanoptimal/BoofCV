@@ -32,6 +32,7 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -86,7 +87,7 @@ public abstract class DemonstrationBase extends JPanel {
 	private ProcessThread threadProcess; // controls by synchronized(inputStreams)
 	// threadpool is used mostly for profiling purposes. This way there isn't a million threads being created
 	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
-	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1,1,50, TimeUnit.MILLISECONDS,
+	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 1, 50, TimeUnit.MILLISECONDS,
 			threadQueue);
 
 	// lock to ensure it doesn't try to start multiple processes at the same time
@@ -104,7 +105,7 @@ public abstract class DemonstrationBase extends JPanel {
 	protected volatile boolean streamPaused = false;
 
 	// specifies how many frames it should move before pausing
-	protected volatile int streamStepCounter = 0;
+	protected int streamStepCounter = 0;
 
 	// minimum elapsed time between the each stream frame being processed, in milliseconds
 	protected volatile long streamPeriod = 30;
@@ -119,7 +120,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 			// smoother font
 			System.setProperty("apple.awt.textantialiasing", "true");
-		} catch( Exception ignore ) {
+		} catch (Exception ignore) {
 
 		}
 
@@ -133,7 +134,7 @@ public abstract class DemonstrationBase extends JPanel {
 		GlobalDemoSettings.SETTINGS.changeTheme();
 	}
 
-	public DemonstrationBase(boolean openFile , boolean openWebcam, List<?> exampleInputs, ImageType ...defaultTypes) {
+	protected DemonstrationBase( boolean openFile, boolean openWebcam, List<?> exampleInputs, ImageType... defaultTypes ) {
 		super(new BorderLayout());
 
 		createMenuBar(openFile, openWebcam, exampleInputs);
@@ -147,12 +148,12 @@ public abstract class DemonstrationBase extends JPanel {
 	 * @param exampleInputs List of paths to examples.  Either a String file path or {@link PathLabel}.
 	 * @param defaultTypes Type of image in each stream
 	 */
-	public DemonstrationBase(List<?> exampleInputs, ImageType ...defaultTypes) {
-		this(true,true,exampleInputs, defaultTypes);
+	protected DemonstrationBase( List<?> exampleInputs, ImageType... defaultTypes ) {
+		this(true, true, exampleInputs, defaultTypes);
 	}
 
-	public void setImageTypes( ImageType ...defaultTypes ) {
-		synchronized ( inputStreams ) {
+	public void setImageTypes( ImageType... defaultTypes ) {
+		synchronized (inputStreams) {
 			inputStreams.clear();
 			for (ImageType type : defaultTypes) {
 				inputStreams.add(new CacheSequenceStream(type));
@@ -164,12 +165,12 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Get input input type for a stream safely
 	 */
 	protected <T extends ImageBase> ImageType<T> getImageType( int which ) {
-		synchronized ( inputStreams ) {
+		synchronized (inputStreams) {
 			return inputStreams.get(which).imageType;
 		}
 	}
 
-	private void createMenuBar(boolean openFile , boolean openWebcam , List<?> exampleInputs) {
+	private void createMenuBar( boolean openFile, boolean openWebcam, List<?> exampleInputs ) {
 		menuBar = new JMenuBar();
 
 		JMenu menuFile = new JMenu("File");
@@ -178,19 +179,19 @@ public abstract class DemonstrationBase extends JPanel {
 
 		ActionListener listener = createActionListener();
 
-		if( openFile ) {
+		if (openFile) {
 			this.menuItemFile = new JMenuItem("Open File");
-			BoofSwingUtil.setMenuItemKeys(menuItemFile,KeyEvent.VK_O,KeyEvent.VK_O);
+			BoofSwingUtil.setMenuItemKeys(menuItemFile, KeyEvent.VK_O, KeyEvent.VK_O);
 			this.menuItemFile.addActionListener(listener);
 			menuFile.add(this.menuItemFile);
 
 			JMenuItem menuItemNext = new JMenuItem("Open Next File");
-			BoofSwingUtil.setMenuItemKeys(menuItemNext,KeyEvent.VK_N,KeyEvent.VK_I);
+			BoofSwingUtil.setMenuItemKeys(menuItemNext, KeyEvent.VK_N, KeyEvent.VK_I);
 			menuItemNext.addActionListener(e -> openNextFile());
 			menuFile.add(menuItemNext);
 
 			JMenuItem menuItemReopen = new JMenuItem("Reprocess");
-			BoofSwingUtil.setMenuItemKeys(menuItemReopen,KeyEvent.VK_R,KeyEvent.VK_R);
+			BoofSwingUtil.setMenuItemKeys(menuItemReopen, KeyEvent.VK_R, KeyEvent.VK_R);
 			menuItemReopen.addActionListener(e -> reprocessInput());
 			menuFile.add(menuItemReopen);
 
@@ -198,9 +199,9 @@ public abstract class DemonstrationBase extends JPanel {
 			menuFile.add(menuRecent);
 			updateRecentItems();
 		}
-		if( openWebcam ) {
+		if (openWebcam) {
 			menuItemWebcam = new JMenuItem("Open Webcam");
-			BoofSwingUtil.setMenuItemKeys(menuItemWebcam,KeyEvent.VK_W,KeyEvent.VK_W);
+			BoofSwingUtil.setMenuItemKeys(menuItemWebcam, KeyEvent.VK_W, KeyEvent.VK_W);
 			menuItemWebcam.addActionListener(listener);
 			menuFile.add(menuItemWebcam);
 		}
@@ -208,17 +209,17 @@ public abstract class DemonstrationBase extends JPanel {
 		customAddToFileMenu(menuFile);
 
 		JMenuItem menuSettings = new JMenuItem("Settings");
-		menuSettings.addActionListener(e->new GlobalSettingsControls().showDialog(window,this));
+		menuSettings.addActionListener(e -> new GlobalSettingsControls().showDialog(window, this));
 
 		menuItenQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuItenQuit.addActionListener(listener);
-		BoofSwingUtil.setMenuItemKeys(menuItenQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
+		BoofSwingUtil.setMenuItemKeys(menuItenQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
 
 		menuFile.addSeparator();
 		menuFile.add(menuSettings);
 		menuFile.add(menuItenQuit);
 
-		if( exampleInputs != null && exampleInputs.size() > 0 ) {
+		if (exampleInputs != null && exampleInputs.size() > 0) {
 			JMenu menuExamples = new JMenu("Examples");
 			menuExamples.setMnemonic(KeyEvent.VK_E);
 			menuBar.add(menuExamples);
@@ -227,9 +228,9 @@ public abstract class DemonstrationBase extends JPanel {
 				String name;
 
 				if (o instanceof PathLabel) {
-					name = ((PathLabel) o).getLabel();
+					name = ((PathLabel)o).getLabel();
 				} else if (o instanceof String) {
-					name = new File((String) o).getName();
+					name = new File((String)o).getName();
 				} else {
 					name = o.toString();
 				}
@@ -243,7 +244,7 @@ public abstract class DemonstrationBase extends JPanel {
 	/**
 	 * Override this method to add custom items to the file menu
 	 */
-	protected void customAddToFileMenu(JMenu menuFile){}
+	protected void customAddToFileMenu( JMenu menuFile ) {}
 
 	protected void setMenuBarEnabled( boolean enabled ) {
 
@@ -257,10 +258,10 @@ public abstract class DemonstrationBase extends JPanel {
 		for (int i = 0; i < menuBar.getMenuCount(); i++) {
 			//		menuBar.getMenu(i).setEnabled(enabled);
 			JMenu menu = menuBar.getMenu(i);
-			if( menu == null )
+			if (menu == null)
 				continue;
 			for (int j = 0; j < menu.getItemCount(); j++) {
-				if( menu.getItem(j) == null )
+				if (menu.getItem(j) == null)
 					continue;
 				menu.getItem(j).setEnabled(enabled);
 			}
@@ -271,34 +272,34 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Updates the list in recent menu
 	 */
 	protected void updateRecentItems() {
-		if( menuRecent == null )
+		if (menuRecent == null)
 			return;
 		menuRecent.removeAll();
 		List<BoofSwingUtil.RecentFiles> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
 
-		for( BoofSwingUtil.RecentFiles info : recentFiles ) {
+		for (BoofSwingUtil.RecentFiles info : recentFiles) {
 			JMenuItem recentItem = new JMenuItem(info.name);
 			recentItem.addActionListener(e -> {
-				if( useCustomOpenFiles ) {
+				if (useCustomOpenFiles) {
 					openFiles(BoofMiscOps.toFileList(info.files), true);
-				} else if( info.files.size() == 1 ) {
+				} else if (info.files.size() == 1) {
 					openFile(new File(info.files.get(0)), true);
 				} else {
-					openFiles(BoofMiscOps.toFileList(info.files),true);
+					openFiles(BoofMiscOps.toFileList(info.files), true);
 				}
 			});
 			menuRecent.add(recentItem);
 		}
 
 		// don't add clear option if there is nothing to clear
-		if( recentFiles.size() == 0 )
+		if (recentFiles.size() == 0)
 			return;
 
 		// Add the option to clear the list of recent files
 		JMenuItem clearItem = new JMenuItem("Clear Recent");
-		clearItem.addActionListener(e->{
+		clearItem.addActionListener(e -> {
 			menuRecent.removeAll();
-			BoofSwingUtil.saveRecentFiles(DemonstrationBase.this.getClass().getSimpleName(),new ArrayList<>());
+			BoofSwingUtil.saveRecentFiles(DemonstrationBase.this.getClass().getSimpleName(), new ArrayList<>());
 		});
 		menuRecent.addSeparator();
 		menuRecent.add(clearItem);
@@ -314,19 +315,19 @@ public abstract class DemonstrationBase extends JPanel {
 				p.path[i] = massageExampleFilePath(p.path[i]);
 			}
 
-			if(useCustomOpenFiles) {
+			if (useCustomOpenFiles) {
 				openFiles(p.getPathFiles(), false);
 				return;
 			}
 
-			if( p.path.length == 1 )
+			if (p.path.length == 1)
 				openFile(new File(p.path[0]), false);
 			else {
 //				openFile(new File(p.path[0]));
-				if( allowImages )
-					openImageSet(false,p.path);
+				if (allowImages)
+					openImageSet(false, p.path);
 				else
-					openVideo(false,p.path);
+					openVideo(false, p.path);
 			}
 		} else if (o instanceof String) {
 			String path = massageExampleFilePath((String)o);
@@ -343,8 +344,8 @@ public abstract class DemonstrationBase extends JPanel {
 		ProcessThread threadProcess;
 		synchronized (inputStreams) {
 			threadProcess = this.threadProcess;
-			if( threadProcess != null ) {
-				if( threadProcess.running ) {
+			if (threadProcess != null) {
+				if (threadProcess.running) {
 					threadProcess.requestStop = true;
 				} else {
 					threadProcess = this.threadProcess = null;
@@ -354,14 +355,14 @@ public abstract class DemonstrationBase extends JPanel {
 
 		inputSizeKnown = false;
 
-		if( threadProcess == null ) {
+		if (threadProcess == null) {
 			return;
 		}
 
-		long timeout = System.currentTimeMillis()+5000;
-		while( threadProcess.running && timeout >= System.currentTimeMillis() ) {
+		long timeout = System.currentTimeMillis() + 5000;
+		while (threadProcess.running && timeout >= System.currentTimeMillis()) {
 			synchronized (inputStreams) {
-				if( threadProcess != this.threadProcess ) {
+				if (threadProcess != this.threadProcess) {
 					throw new RuntimeException("BUG! the thread got modified by anotehr process");
 				}
 			}
@@ -369,7 +370,7 @@ public abstract class DemonstrationBase extends JPanel {
 			BoofMiscOps.sleep(100);
 		}
 
-		if( timeout < System.currentTimeMillis() )
+		if (timeout < System.currentTimeMillis())
 			throw new RuntimeException("Took too long to stop input processing thread");
 
 		this.threadProcess = null;
@@ -385,20 +386,19 @@ public abstract class DemonstrationBase extends JPanel {
 	 * @param width Width of input image
 	 * @param height Height of input image
 	 */
-	protected void handleInputChange( int source , InputMethod method , int width , int height ) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 
 	}
 
 	/**
 	 * Couldn't read an input source. This reports the failure
 	 */
-	protected void handleInputFailure( int source , String error ) {
+	protected void handleInputFailure( int source, String error ) {
 		System.err.println(error);
 	}
 
 	/**
 	 * A streaming source of images has closed.
-	 * @param source
 	 */
 	protected void handleInputClose( int source ) {
 
@@ -408,20 +408,20 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Process the image.  Will be called in its own thread, but doesn't need to be re-entrant.  If image
 	 * is null then reprocess the previous image.
 	 */
-	public abstract void processImage(int sourceID, long frameID, final BufferedImage buffered , final ImageBase input  );
+	public abstract void processImage( int sourceID, long frameID, final BufferedImage buffered, final ImageBase input );
 
 	/**
 	 * Called when the input is a set of files and not image based
 	 */
-	public void processFiles( String[] filePaths  ){}
+	public void processFiles( String[] filePaths ) {}
 
 	/**
 	 * Opens a file.  First it will attempt to open it as an image.  If that fails it will try opening it as a
 	 * video.  If all else fails tell the user it has failed.  If a streaming source was running before it will
 	 * be stopped.
 	 */
-	public void openFile(File file) {
-		openFile(file,true);
+	public void openFile( File file ) {
+		openFile(file, true);
 	}
 
 	/**
@@ -429,11 +429,11 @@ public abstract class DemonstrationBase extends JPanel {
 	 * video.  If all else fails tell the user it has failed.  If a streaming source was running before it will
 	 * be stopped.
 	 */
-	public void openFile(File file, boolean addToRecent) {
-		inputFilePath =  systemToUnix(file.getPath());;
+	public void openFile( File file, boolean addToRecent ) {
+		inputFilePath = systemToUnix(file.getPath());
 
 		// update recent items menu
-		if( addToRecent ) {
+		if (addToRecent) {
 			String path = inputFilePath;
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
@@ -443,28 +443,28 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 
 		BufferedImage buffered = inputFilePath.endsWith("mjpeg") || !allowImages ? null : UtilImageIO.loadImage(inputFilePath);
-		if( buffered == null ) {
-			if( allowVideos )
-				openVideo(false,inputFilePath);
-		} else if( allowImages ){
-			openImage(false,file.getName(), buffered);
+		if (buffered == null) {
+			if (allowVideos)
+				openVideo(false, inputFilePath);
+		} else if (allowImages) {
+			openImage(false, file.getName(), buffered);
 		}
 	}
 
-	public String massageExampleFilePath(final String path ) {
+	public @Nullable String massageExampleFilePath( final String path ) {
 		String modifiedPath = systemToUnix(path);
 //		System.out.println("demo.openFile() = "+path);
 		URL url = null;
 
 		try {
 			url = new URL(modifiedPath);
-			if( !UtilIO.validURL(url)) {
+			if (!UtilIO.validURL(url)) {
 //				System.out.println("  invalid URL");
 				url = null;
 			}
-		} catch( MalformedURLException ignore ) {}
+		} catch (MalformedURLException ignore) {}
 
-		if( url == null ) {
+		if (url == null) {
 //			System.out.println("Invalid URL");
 			try {
 				url = new File(UtilIO.pathExample(path)).toURI().toURL();
@@ -487,9 +487,9 @@ public abstract class DemonstrationBase extends JPanel {
 	/**
 	 * Opens a set of images
 	 */
-	public void openImageSet(boolean reopen, String ...files ) {
+	public void openImageSet( boolean reopen, String... files ) {
 		synchronized (lockStartingProcess) {
-			if( startingProcess ) {
+			if (startingProcess) {
 				System.out.println("Ignoring openImageSet() request.  Detected spamming");
 				return;
 			}
@@ -498,7 +498,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		stopAllInputProcessing();
 
-		if( inputAsFile ) {
+		if (inputAsFile) {
 			inputFileSet = files;
 			threadProcess = new ProcessFileSetThread(files);
 			imageSetSize = files.length;
@@ -519,7 +519,7 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Opens the next file in the directory by lexicographical order.
 	 */
 	public void openNextFile() {
-		if( inputFilePath == null || inputMethod != InputMethod.IMAGE )
+		if (inputFilePath == null || inputMethod != InputMethod.IMAGE)
 			return;
 
 		String path;
@@ -532,21 +532,21 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 		File current = new File(UtilIO.ensureURL(path).getFile());
 		File parent = current.getParentFile();
-		if( parent == null )
+		if (parent == null)
 			return;
 
 		File[] files = parent.listFiles();
-		if( files == null || files.length <= 1 )
+		if (files == null || files.length <= 1)
 			return;
 		File closest = null;
 
 		for (int i = 0; i < files.length; i++) {
 			File f = files[i];
 			String name = f.getName().toLowerCase();
-			if( inputMethod == InputMethod.IMAGE ) {
-				if( !f.isFile() )
+			if (inputMethod == InputMethod.IMAGE) {
+				if (!f.isFile())
 					continue;
-				if( !UtilImageIO.isImage(f) )
+				if (!UtilImageIO.isImage(f))
 					continue;
 			} else {
 				// filter out common non image/video files
@@ -554,32 +554,33 @@ public abstract class DemonstrationBase extends JPanel {
 					continue;
 			}
 
-			if( current.compareTo(f) < 0 ) {
-				if( closest == null || closest.compareTo(f) > 0 ) {
+			if (current.compareTo(f) < 0) {
+				if (closest == null || closest.compareTo(f) > 0) {
 					closest = f;
 				}
 			}
 		}
 
-		if( closest != null && closest.isFile() ) {
+		if (closest != null && closest.isFile()) {
 			openFile(closest, true);
 		} else {
-			if( closest != null ) {
-				System.err.println("Next file isn't a file. name="+closest.getName());
+			if (closest != null) {
+				System.err.println("Next file isn't a file. name=" + closest.getName());
 			} else {
 				System.err.println("No valid closest file found.");
 			}
 		}
 	}
 
-	protected void openFiles(List<File> filePaths) {
-		this.openFiles(filePaths,true);
+	protected void openFiles( List<File> filePaths ) {
+		this.openFiles(filePaths, true);
 	}
+
 	/**
 	 * Opens a set of files using a custom function to extract images and sequences
 	 */
-	protected void openFiles(List<File> filePaths, boolean addToRecent) {
-		if( filePaths.size() == 0 )
+	protected void openFiles( List<File> filePaths, boolean addToRecent ) {
+		if (filePaths.size() == 0)
 			return;
 
 		// Need to massage the file path to work inside of Jars
@@ -591,7 +592,7 @@ public abstract class DemonstrationBase extends JPanel {
 		String[] copyFileSet = inputFileSet.clone();
 
 		// update recent items menu
-		if( addToRecent ) {
+		if (addToRecent) {
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
 						selectRecentFileName(filePaths), BoofMiscOps.asList(inputFileSet));
@@ -604,16 +605,16 @@ public abstract class DemonstrationBase extends JPanel {
 		List<String> sequences = new ArrayList<>();
 		List<String> images = new ArrayList<>();
 
-		if( !openCustomFiles(inputFileSet,sequences,images) )
+		if (!openCustomFiles(inputFileSet, sequences, images))
 			return;
 
-		if( !sequences.isEmpty() && !images.isEmpty() )
+		if (!sequences.isEmpty() && !images.isEmpty())
 			throw new IllegalArgumentException("Only one of these can be not empty");
 
-		if( !sequences.isEmpty() ) {
-			openVideo(false,sequences.toArray(new String[0]));
+		if (!sequences.isEmpty()) {
+			openVideo(false, sequences.toArray(new String[0]));
 		} else {
-			openImageSet(false,images.toArray(new String[0]));
+			openImageSet(false, images.toArray(new String[0]));
 		}
 
 		// openVideo() and openImageSet() will mangle the inputFileSet and potentially remove files
@@ -621,38 +622,30 @@ public abstract class DemonstrationBase extends JPanel {
 	}
 
 	protected String selectRecentFileName( List<File> filePaths ) {
-		if( filePaths.size() == 1 )
+		if (filePaths.size() == 1)
 			return filePaths.get(0).getName();
 		else
 			return filePaths.get(0).getParentFile().getName();
 	}
 
-	private static String[] toPathArray( List<File> files ) {
-		String[] array = new String[files.size()];
-		for (int i = 0; i < files.size(); i++) {
-			array[i] = files.get(i).getAbsolutePath();
-		}
-		return array;
-	}
-
 	/**
 	 * Opens either image sequences of images given file paths. This also allows other information, such as calibration
 	 * to be opened and processed. Can only handle images OR sequences and not both.
+	 *
 	 * @return true if it was successful or false if it failed
 	 */
-	protected boolean openCustomFiles(String[] filePaths ,
-									  List<String> outSequence ,
-									  List<String> outImages )
-	{
+	protected boolean openCustomFiles( String[] filePaths,
+									   List<String> outSequence,
+									   List<String> outImages ) {
 		throw new RuntimeException("Override this function to implement custom file opening");
 	}
 
 	/**
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has been stopped
 	 */
-	protected void openVideo(boolean reopen , String ...filePaths) {
+	protected void openVideo( boolean reopen, String... filePaths ) {
 		synchronized (lockStartingProcess) {
-			if( startingProcess ) {
+			if (startingProcess) {
 				System.out.println("Ignoring video request.  Detected spamming");
 				return;
 			}
@@ -661,7 +654,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		synchronized (inputStreams) {
 			if (inputStreams.size() != filePaths.length)
-				throw new IllegalArgumentException("Input streams not equal to "+filePaths.length+".  Override openVideo()");
+				throw new IllegalArgumentException("Input streams not equal to " + filePaths.length + ".  Override openVideo()");
 		}
 		inputFileSet = filePaths;
 
@@ -670,16 +663,16 @@ public abstract class DemonstrationBase extends JPanel {
 		streamPaused = false;
 
 		boolean failed = false;
-		for( int which = 0; which < filePaths.length; which++ ) {
+		for (int which = 0; which < filePaths.length; which++) {
 			CacheSequenceStream cache = inputStreams.get(which);
 
 			SimpleImageSequence sequence = media.openVideo(filePaths[which], cache.getImageType());
-			if( sequence == null ) {
+			if (sequence == null) {
 				failed = true;
-				System.out.println("Can't find file. "+filePaths[which]);
+				System.out.println("Can't find file. " + filePaths[which]);
 				break;
 			}
-			configureVideo(which,sequence);
+			configureVideo(which, sequence);
 
 			synchronized (inputStreams) {
 				cache.reset();
@@ -692,7 +685,7 @@ public abstract class DemonstrationBase extends JPanel {
 			synchronized (inputStreams) {
 				inputMethod = InputMethod.VIDEO;
 				streamPeriod = 33; // default to 33 FPS for a video
-				if( threadProcess != null )
+				if (threadProcess != null)
 					throw new RuntimeException("There was still an active stream thread!");
 				threadProcess = new SynchronizedStreamsThread();
 			}
@@ -701,7 +694,7 @@ public abstract class DemonstrationBase extends JPanel {
 				// load the first image to get the size then reset
 				// so that it starts processing at the first image
 				int width = 0, height = 0;
-				if( stream.hasNext() ) {
+				if (stream.hasNext()) {
 					stream.cacheNext();
 					width = stream.getWidth();
 					height = stream.getHeight();
@@ -722,9 +715,9 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 	}
 
-	protected void openImage(boolean reopen , String name , BufferedImage buffered ) {
+	protected void openImage( boolean reopen, String name, BufferedImage buffered ) {
 		synchronized (lockStartingProcess) {
-			if( startingProcess ) {
+			if (startingProcess) {
 				System.out.println("Ignoring image request.  Detected spamming");
 				return;
 			}
@@ -749,11 +742,11 @@ public abstract class DemonstrationBase extends JPanel {
 			ConvertBufferedImage.convertFrom(buffered, boof, true);
 			cache.setBufferedImage(buffered);
 
-			if( threadProcess != null )
+			if (threadProcess != null)
 				throw new RuntimeException("There was still an active stream thread!");
 			threadProcess = new ProcessImageThread();
 		}
-		if( !reopen ) {
+		if (!reopen) {
 			setInputName(name);
 			handleInputChange(0, inputMethod, buffered.getWidth(), buffered.getHeight());
 		}
@@ -762,7 +755,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 	public void openWebcam() {
 		synchronized (lockStartingProcess) {
-			if( startingProcess ) {
+			if (startingProcess) {
 				System.out.println("Ignoring webcam request.  Detected spamming");
 				return;
 			}
@@ -778,7 +771,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		// Let he user select and configure the webcam. If canceled it will return null
 		OpenWebcamDialog.Selection s = OpenWebcamDialog.showDialog(window);
-		if( s == null ) {
+		if (s == null) {
 			synchronized (lockStartingProcess) {
 				startingProcess = false;
 			}
@@ -812,15 +805,14 @@ public abstract class DemonstrationBase extends JPanel {
 
 	/**
 	 * Provides access to an image sequence so that its configuration can be customized
-	 * @param sequence
 	 */
-	protected void configureVideo( int which , SimpleImageSequence sequence ) {
+	protected void configureVideo( int which, SimpleImageSequence sequence ) {
 
 	}
 
 	private void setInputName( String name ) {
-		if( window != null ) {
-			window.setTitle(appName+":  "+name);
+		if (window != null) {
+			window.setTitle(appName + ":  " + name);
 		}
 	}
 
@@ -828,23 +820,24 @@ public abstract class DemonstrationBase extends JPanel {
 	 * waits until the processing thread is done.
 	 */
 	public void waitUntilInputSizeIsKnown() {
-		while( !inputSizeKnown ) {
+		while (!inputSizeKnown) {
 			BoofMiscOps.sleep(5);
 		}
 	}
 
 	/**
 	 * Opens a window with this application inside of it
+	 *
 	 * @param appName Name of the application
 	 */
-	public void display(String appName ) {
+	public void display( String appName ) {
 		waitUntilInputSizeIsKnown();
 		displayImmediate(appName);
 	}
 
-	public void displayImmediate(String appName ) {
+	public void displayImmediate( String appName ) {
 		this.appName = appName;
-		window = ShowImages.showWindow(this,appName,true);
+		window = ShowImages.showWindow(this, appName, true);
 		window.setJMenuBar(menuBar);
 	}
 
@@ -871,24 +864,24 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Open file in the menu bar was invoked by the user
 	 */
 	protected void openFileMenuBar() {
-		if(useCustomOpenFiles) {
+		if (useCustomOpenFiles) {
 			throw new RuntimeException("If customFileInput you must overload and provide a custom function");
 		}
 
 		List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
-		if( allowImages )
+		if (allowImages)
 			types.add(BoofSwingUtil.FileTypes.IMAGES);
-		if( allowVideos )
+		if (allowVideos)
 			types.add(BoofSwingUtil.FileTypes.VIDEOS);
 		BoofSwingUtil.FileTypes[] array = types.toArray(new BoofSwingUtil.FileTypes[0]);
 
-		File file = BoofSwingUtil.openFileChooser(DemonstrationBase.this,array);
+		File file = BoofSwingUtil.openFileChooser(DemonstrationBase.this, array);
 		if (file != null) {
 			openFile(file, true);
 		}
 	}
 
-	abstract class ProcessThread implements Runnable {
+	abstract static class ProcessThread implements Runnable {
 		volatile boolean requestStop = false;
 		volatile boolean running = true;
 	}
@@ -897,7 +890,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		String[] files;
 
-		public ProcessFileSetThread(String[] files) {
+		public ProcessFileSetThread( String[] files ) {
 			this.files = files;
 		}
 
@@ -917,38 +910,38 @@ public abstract class DemonstrationBase extends JPanel {
 
 		String[] files;
 
-		public ProcessImageSetThread(String[] files) {
+		public ProcessImageSetThread( String[] files ) {
 			this.files = files;
 		}
 
 		@Override
 		public void run() {
-			ImageBase boof = getImageType(0).createImage(1,1);
+			ImageBase boof = getImageType(0).createImage(1, 1);
 
 			boolean first = true;
 			for (int i = 0; i < files.length && !requestStop; i++) {
 				String path = files[i];
 				inputFilePath = path;
-				if( path == null ) {
-					System.err.println("Error["+i+"] path "+files[i]);
+				if (path == null) {
+					System.err.println("Error[" + i + "] path " + files[i]);
 					continue;
 				}
 
 				BufferedImage buffered = UtilImageIO.loadImage(path);
-				if( buffered == null ) {
-					handleInputFailure(i,"Couldn't open "+path);
+				if (buffered == null) {
+					handleInputFailure(i, "Couldn't open " + path);
 					continue;
 				}
-				if( first ) {
+				if (first) {
 					setInputName(new File(files[i]).getName());
 				}
 				handleInputChange(i, inputMethod, buffered.getWidth(), buffered.getHeight());
 
-				ConvertBufferedImage.convertFrom(buffered,boof,true);
+				ConvertBufferedImage.convertFrom(buffered, boof, true);
 
-				processImage(i,0, buffered, boof);
+				processImage(i, 0, buffered, boof);
 
-				if( first ) {
+				if (first) {
 					first = false;
 					inputSizeKnown = true;
 					synchronized (lockStartingProcess) {
@@ -975,7 +968,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 					processImage(i, 0, buff, boof);
 				}
-			} catch( RuntimeException e ) {
+			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}
 
@@ -996,27 +989,27 @@ public abstract class DemonstrationBase extends JPanel {
 			boolean first = true;
 
 			long before = System.currentTimeMillis();
-			while( !requestStop ) {
+			while (!requestStop) {
 				// see if all the streams have more data available
 				boolean allNext = true;
-				for (int i = 0; i < inputStreams.size() ; i++) {
-					if( !inputStreams.get(i).hasNext() ) {
+				for (int i = 0; i < inputStreams.size(); i++) {
+					if (!inputStreams.get(i).hasNext()) {
 						allNext = false;
 						break;
 					}
 				}
 
 				// stop processing if they don't all have data available
-				if( !allNext ) {
+				if (!allNext) {
 					break;
 				}
 
 				// grab images from all the streams and save local copy
-				for (int i = 0; i < inputStreams.size() ; i++) {
+				for (int i = 0; i < inputStreams.size(); i++) {
 					inputStreams.get(i).cacheNext();
 				}
 
-				if( first ) { // process at least one image before letting it try to process another source
+				if (first) { // process at least one image before letting it try to process another source
 					first = false;
 					synchronized (lockStartingProcess) {
 						startingProcess = false;
@@ -1024,7 +1017,7 @@ public abstract class DemonstrationBase extends JPanel {
 				}
 
 				// feed images to client - They will own the image data until they are passed new image data
-				for (int i = 0; i < inputStreams.size() ; i++) {
+				for (int i = 0; i < inputStreams.size(); i++) {
 					CacheSequenceStream cache = inputStreams.get(i);
 					int frameID = cache.sequence.getFrameNumber();
 					ImageBase boof = cache.getBoofImage();
@@ -1032,40 +1025,52 @@ public abstract class DemonstrationBase extends JPanel {
 
 					try {
 						processImage(i, frameID, buff, boof);
-					} catch( RuntimeException e ) {
+					} catch (RuntimeException e) {
 						e.printStackTrace();
 					}
 				}
 
 				// Throttle speed if requested
-				if( streamPeriod > 0 ) {
-					long time = Math.max(0, streamPeriod -(System.currentTimeMillis()-before));
-					if( time > 0 ) {
-						try {Thread.sleep(time);} catch (InterruptedException ignore) {}
+				if (streamPeriod > 0) {
+					long time = Math.max(0, streamPeriod - (System.currentTimeMillis() - before));
+					if (time > 0) {
+						try {
+							Thread.sleep(time);
+						} catch (InterruptedException ignore) {
+						}
 					} else {
-						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
+						try {
+							Thread.sleep(5);
+						} catch (InterruptedException ignore) {
+						}
 					}
 				} else {
-					try {Thread.sleep(5);} catch (InterruptedException ignore) {}
+					try {
+						Thread.sleep(5);
+					} catch (InterruptedException ignore) {
+					}
 				}
 				before = System.currentTimeMillis();
 
-				if( streamStepCounter > 0 ) {
-					if( --streamStepCounter == 0 )
+				if (streamStepCounter > 0) {
+					if (--streamStepCounter == 0)
 						streamPaused = true;
 				}
 
 				// Check to see if paused and wait
-				if( streamPaused && inputMethod == InputMethod.VIDEO ) {
+				if (streamPaused && inputMethod == InputMethod.VIDEO) {
 					enterPausedState();
-					while( streamPaused && !requestStop ) {
-						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
+					while (streamPaused && !requestStop) {
+						try {
+							Thread.sleep(5);
+						} catch (InterruptedException ignore) {
+						}
 					}
 				}
 			}
 
 			// clean up
-			for (int i = 0; i < inputStreams.size() ; i++) {
+			for (int i = 0; i < inputStreams.size(); i++) {
 				inputStreams.get(i).sequence.close();
 				handleInputClose(i);
 			}
@@ -1081,20 +1086,20 @@ public abstract class DemonstrationBase extends JPanel {
 	 * there is no need to reprocess, the next image will be handled soon enough.
 	 */
 	public void reprocessInput() {
-		if(useCustomOpenFiles) {
+		if (useCustomOpenFiles) {
 			openFiles(BoofMiscOps.toFileList(inputFileSet), true);
 			return;
 		}
-		if ( inputMethod == InputMethod.VIDEO ) {
-			if( inputFilePath != null )
-				openVideo(true,inputFilePath);
+		if (inputMethod == InputMethod.VIDEO) {
+			if (inputFilePath != null)
+				openVideo(true, inputFilePath);
 			else
-				openVideo(true,inputFileSet);
-		} else if( inputMethod == InputMethod.IMAGE ) {
+				openVideo(true, inputFileSet);
+		} else if (inputMethod == InputMethod.IMAGE) {
 			BufferedImage buff = inputStreams.get(0).getBufferedImage();
-			openImage(true,new File(inputFilePath).getName(),buff);// TODO still does a pointless image conversion
-		} else if( inputMethod == InputMethod.IMAGE_SET ) {
-			openImageSet(true,inputFileSet);
+			openImage(true, new File(inputFilePath).getName(), buff);// TODO still does a pointless image conversion
+		} else if (inputMethod == InputMethod.IMAGE_SET) {
+			openImageSet(true, inputFileSet);
 		}
 	}
 
@@ -1104,13 +1109,12 @@ public abstract class DemonstrationBase extends JPanel {
 	 * TODO expand this to work with paused streams. Right now it re-opens the stream and starts again.
 	 */
 	public void reprocessImageOnly() {
-		if( inputMethod == InputMethod.IMAGE ) {
+		if (inputMethod == InputMethod.IMAGE) {
 			reprocessInput();
 		}
 	}
 
-	protected enum InputMethod
-	{
+	protected enum InputMethod {
 		NONE,
 		IMAGE,
 		VIDEO,

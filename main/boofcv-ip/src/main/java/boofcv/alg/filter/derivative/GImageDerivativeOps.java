@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,14 +78,15 @@ public class GImageDerivativeOps {
 			}
 			case INTERLEAVED:
 				int numBands = imageType.getNumBands();
-				switch ( imageType.getDataType() ) {
-					case F32: return (ImageType)ImageType.il(numBands, ImageDataType.F32);
-					case F64: return (ImageType)ImageType.il(numBands, ImageDataType.F64);
-					case U8: return (ImageType)ImageType.il(numBands, ImageDataType.S16);
-					case U16: return (ImageType)ImageType.il(numBands, ImageDataType.S32);
-				}
+				return switch (imageType.getDataType()) {
+					case F32 -> (ImageType)ImageType.il(numBands, ImageDataType.F32);
+					case F64 -> (ImageType)ImageType.il(numBands, ImageDataType.F64);
+					case U8 -> (ImageType)ImageType.il(numBands, ImageDataType.S16);
+					case U16 -> (ImageType)ImageType.il(numBands, ImageDataType.S32);
+					default -> throw new IllegalArgumentException("Unknown image type");
+				};
+			default: throw new IllegalArgumentException("Unknown image type");
 		}
-		throw new IllegalArgumentException("Unknown image type");
 	}
 
 	/**

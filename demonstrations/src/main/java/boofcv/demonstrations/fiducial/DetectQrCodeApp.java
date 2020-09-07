@@ -141,6 +141,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 								case WEBCAM:
 									DetectQrCodeApp.this.streamPaused = !DetectQrCodeApp.this.streamPaused;
 									break;
+								default: break;
 							}
 						}
 						return false;

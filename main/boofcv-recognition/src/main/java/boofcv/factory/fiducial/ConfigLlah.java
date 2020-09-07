@@ -30,9 +30,8 @@ import boofcv.struct.Configuration;
  *     International Workshop on Document Analysis Systems. Springer, Berlin, Heidelberg, 2006.</li>
  * </ol>
  *
- * @see boofcv.alg.feature.describe.llah.LlahOperations
- *
  * @author Peter Abeles
+ * @see boofcv.alg.feature.describe.llah.LlahOperations
  */
 public class ConfigLlah implements Configuration {
 	/** Number of nearest neighbors it will search for */
@@ -45,9 +44,9 @@ public class ConfigLlah implements Configuration {
 	public int quantizationK = 7;
 
 	/** Size of the hash table */
-	public int hashTableSize = (int)(1.28e8);
+	public int hashTableSize = (int)1.28e8;
 
-	/** Type of invariant used to compute the hash code*/
+	/** Type of invariant used to compute the hash code */
 	public HashType hashType = HashType.AFFINE;
 
 	public ConfigLlah() {
@@ -63,9 +62,9 @@ public class ConfigLlah implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( numberOfNeighborsN <= 0 )
+		if (numberOfNeighborsN <= 0)
 			throw new IllegalArgumentException("Must specify numberOfNeighborsN");
-		if( sizeOfCombinationM <= 0 )
+		if (sizeOfCombinationM <= 0)
 			throw new IllegalArgumentException("Must specify numberOfNeighborsN");
 	}
 

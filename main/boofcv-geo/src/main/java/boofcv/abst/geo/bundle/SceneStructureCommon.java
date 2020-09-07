@@ -43,65 +43,69 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	// number of elements in a point. Will be 3 or 4
 	protected int pointSize;
 
-	public SceneStructureCommon(boolean homogenous) {
+	protected SceneStructureCommon( boolean homogenous ) {
 		this.homogenous = homogenous;
 		pointSize = homogenous ? 4 : 3;
-		points = new FastQueue<>(()->new Point(pointSize),Point::reset);
+		points = new FastQueue<>(() -> new Point(pointSize), Point::reset);
 	}
 
 	/**
 	 * Specifies the location of a point in 3D space
+	 *
 	 * @param which Which point is being specified
 	 * @param x coordinate along x-axis
 	 * @param y coordinate along y-axis
 	 * @param z coordinate along z-axis
 	 */
-	public void setPoint( int which , double x , double y , double z ) {
-		points.data[which].set(x,y,z);
+	public void setPoint( int which, double x, double y, double z ) {
+		points.data[which].set(x, y, z);
 	}
 
 	/**
 	 * Specifies the location of a point as a 3D homogenous coordinate
+	 *
 	 * @param which Which point is being specified
 	 * @param x coordinate along x-axis
 	 * @param y coordinate along y-axis
 	 * @param z coordinate along z-axis
 	 * @param w w-coordinate
 	 */
-	public void setPoint( int which , double x , double y , double z , double w) {
-		points.data[which].set(x,y,z,w);
+	public void setPoint( int which, double x, double y, double z, double w ) {
+		points.data[which].set(x, y, z, w);
 	}
 
 	/**
 	 * Specifies the camera model being used.
+	 *
 	 * @param which Which camera is being specified
 	 * @param fixed If these parameters are constant or not
 	 * @param model The camera model
 	 */
-	public void setCamera(int which , boolean fixed , BundleAdjustmentCamera model  ) {
+	public void setCamera( int which, boolean fixed, BundleAdjustmentCamera model ) {
 		cameras.get(which).known = fixed;
 		cameras.get(which).model = model;
 	}
 
-	public void setCamera( int which , boolean fixed , CameraPinhole intrinsic ) {
-		setCamera(which,fixed,new BundlePinhole(intrinsic));
+	public void setCamera( int which, boolean fixed, CameraPinhole intrinsic ) {
+		setCamera(which, fixed, new BundlePinhole(intrinsic));
 	}
 
-	public void setCamera( int which , boolean fixed , CameraPinholeBrown intrinsic ) {
-		setCamera(which,fixed,new BundlePinholeBrown(intrinsic));
+	public void setCamera( int which, boolean fixed, CameraPinholeBrown intrinsic ) {
+		setCamera(which, fixed, new BundlePinholeBrown(intrinsic));
 	}
 
 	/**
 	 * Specifies that the point was observed in this view.
+	 *
 	 * @param pointIndex index of point
 	 * @param viewIndex index of view
 	 */
-	public void connectPointToView( int pointIndex , int viewIndex ) {
+	public void connectPointToView( int pointIndex, int viewIndex ) {
 		Point p = points.data[pointIndex];
 
 		for (int i = 0; i < p.views.size; i++) {
-			if( p.views.data[i] == viewIndex )
-				throw new IllegalArgumentException("Tried to add the same view twice. viewIndex="+viewIndex);
+			if (p.views.data[i] == viewIndex)
+				throw new IllegalArgumentException("Tried to add the same view twice. viewIndex=" + viewIndex);
 		}
 		p.views.add(viewIndex);
 	}
@@ -122,7 +126,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	public int getUnknownCameraParameterCount() {
 		int total = 0;
 		for (int i = 0; i < cameras.size; i++) {
-			if( !cameras.data[i].known) {
+			if (!cameras.data[i].known) {
 				total += cameras.data[i].model.getIntrinsicCount();
 			}
 		}
@@ -136,7 +140,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	 * @param which Ordered list of point indexes to remove
 	 */
 	public void removePoints( GrowQueue_I32 which ) {
-		points.remove(which.data,0,which.size,null);
+		points.remove(which.data, 0, which.size, null);
 	}
 
 	/**
@@ -149,7 +153,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		public boolean known = true;
 		public BundleAdjustmentCamera model;
 
-		public <T extends BundleAdjustmentCamera>T getModel() {
+		public <T extends BundleAdjustmentCamera> T getModel() {
 			return (T)model;
 		}
 
@@ -183,22 +187,23 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		/**
 		 * Removes the specified view from the list of views. If it's not contained in the list
 		 * an exception is thrown
+		 *
 		 * @param which Index of the view which is to be removed
 		 */
 		public void removeView( int which ) {
 			int index = views.indexOf(which);
-			if( index == -1 )
-				throw new RuntimeException("BUG. Could not find in list of views. which="+which);
+			if (index == -1)
+				throw new RuntimeException("BUG. Could not find in list of views. which=" + which);
 			views.remove(index);
 		}
 
-		public void set( double x , double y , double z ) {
+		public void set( double x, double y, double z ) {
 			coordinate[0] = x;
 			coordinate[1] = y;
 			coordinate[2] = z;
 		}
 
-		public void set( double x , double y , double z , double w ) {
+		public void set( double x, double y, double z, double w ) {
 			coordinate[0] = x;
 			coordinate[1] = y;
 			coordinate[2] = z;
@@ -228,17 +233,20 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		public double getX() {
 			return coordinate[0];
 		}
+
 		public double getY() {
 			return coordinate[1];
 		}
+
 		public double getZ() {
 			return coordinate[2];
 		}
+
 		public double getW() {
 			return coordinate[3];
 		}
 
-		public double distanceSq(Point3D_F64 p) {
+		public double distanceSq( Point3D_F64 p ) {
 			double dx = coordinate[0] - p.x;
 			double dy = coordinate[1] - p.y;
 			double dz = coordinate[2] - p.z;
@@ -264,11 +272,11 @@ public abstract class SceneStructureCommon implements SceneStructure {
 			coordinate[3] /= n;
 		}
 
-		public double distance(Point3D_F64 p) {
+		public double distance( Point3D_F64 p ) {
 			return Math.sqrt(distance(p));
 		}
 
-		public double distance(Point p) {
+		public double distance( Point p ) {
 			double dx = coordinate[0] - p.coordinate[0];
 			double dy = coordinate[1] - p.coordinate[1];
 			double dz = coordinate[2] - p.coordinate[2];

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,10 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> {
 
 	protected ImageType<T> imageType;
 	protected Random rand = new Random(234);
-	protected abstract DescribeRegionPoint<T,?> createAlg();
 
-	public GenericDescribeRegionPointChecks(ImageType<T> imageType) {
+	protected abstract DescribeRegionPoint<T, ?> createAlg();
+
+	protected GenericDescribeRegionPointChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
 	}
 
@@ -49,51 +50,51 @@ abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> {
 	 */
 	@Test
 	void radiusSize() {
-		T image = imageType.createImage(100,120);
+		T image = imageType.createImage(100, 120);
 
 		int cx = 45;
 		int cy = 48;
 		int radius = 20;
 		int extra = 3;
-		int aradius = radius+extra;
+		int aradius = radius + extra;
 
-		GImageMiscOps.fill(image,255);
-		GImageMiscOps.fill(image.subimage(cx-aradius,cy-aradius,cx+aradius+1,cy+aradius+1),50);
+		GImageMiscOps.fill(image, 255);
+		GImageMiscOps.fill(image.subimage(cx - aradius, cy - aradius, cx + aradius + 1, cy + aradius + 1), 50);
 //		image.set(cx,cy,100); // give it some texture so it doesn't amplify noise
 
-		DescribeRegionPoint<T,TupleDesc> describe = (DescribeRegionPoint)createAlg();
+		DescribeRegionPoint<T, TupleDesc> describe = (DescribeRegionPoint)createAlg();
 		describe.setImage(image);
 
 		TupleDesc t1 = describe.createDescription();
-		describe.process(cx,cy,0,radius,t1);
+		describe.process(cx, cy, 0, radius, t1);
 		TupleDesc t2 = describe.createDescription();
 
 		// Moving by 1 pixels should make no difference
-		describe.process(cx+1,cy,0,radius,t2);
-		checkEquals(t1,t2);
+		describe.process(cx + 1, cy, 0, radius, t2);
+		checkEquals(t1, t2);
 
 		// Move it so that the feature's edge goes past the edge
-		describe.process(cx+extra+2,cy,0,radius,t2);
-		checkNotEquals(t1,t2);
+		describe.process(cx + extra + 2, cy, 0, radius, t2);
+		checkNotEquals(t1, t2);
 	}
 
-	void checkEquals( TupleDesc a , TupleDesc b ) {
-		assertEquals(a.size(),b.size());
+	void checkEquals( TupleDesc a, TupleDesc b ) {
+		assertEquals(a.size(), b.size());
 
 		int totalMissMatches = 0;
 		for (int i = 0; i < a.size(); i++) {
-			if( Math.abs(a.getDouble(i)-b.getDouble(i)) > 0.1 ) {
+			if (Math.abs(a.getDouble(i) - b.getDouble(i)) > 0.1) {
 				totalMissMatches++;
 			}
 		}
 		assertTrue(totalMissMatches <= a.size()/32);
 	}
 
-	void checkNotEquals(TupleDesc a , TupleDesc b ) {
-		assertEquals(a.size(),b.size());
+	void checkNotEquals( TupleDesc a, TupleDesc b ) {
+		assertEquals(a.size(), b.size());
 		int totalMissMatches = 0;
 		for (int i = 0; i < a.size(); i++) {
-			if( Math.abs(a.getDouble(i)-b.getDouble(i)) > UtilEjml.EPS ) {
+			if (Math.abs(a.getDouble(i) - b.getDouble(i)) > UtilEjml.EPS) {
 				totalMissMatches++;
 			}
 		}

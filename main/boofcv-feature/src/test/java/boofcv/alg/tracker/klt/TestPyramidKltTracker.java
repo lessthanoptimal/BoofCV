@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,13 +33,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestPyramidKltTracker extends PyramidKltTestBase {
 
 	@BeforeEach
+	@Override
 	public void setup() {
 		super.setup();
 	}
 
 	private void setTargetLocation( int x , int y ) {
 		ImageMiscOps.fillUniform(image,rand,0,1);
-		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
+		ImageMiscOps.fillRectangle(image,100,x,y,20,20);
 		pyramid.process(image);
 
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {

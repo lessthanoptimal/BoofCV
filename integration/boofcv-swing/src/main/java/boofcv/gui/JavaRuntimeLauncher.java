@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+
+import static boofcv.misc.BoofMiscOps.timeStr;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Class for launching JVMs.  Monitors the status and kills frozen threads.  Keeps track of execution time and
@@ -116,8 +118,8 @@ public class JavaRuntimeLauncher {
             // so the work around is to sleep
             Thread.sleep(500);
 
-            BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-            BufferedReader error = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+            BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream(),UTF_8));
+            BufferedReader error = new BufferedReader(new InputStreamReader(pr.getErrorStream(),UTF_8));
 
             // print the output from the slave
             if( !monitorSlave(pr, input, error) ) {
@@ -195,7 +197,7 @@ public class JavaRuntimeLauncher {
 
                 // let everyone know its still alive
                 if( System.currentTimeMillis() - lastAliveMessage > 60000 ) {
-                    System.out.println("\nMaster is still alive: "+new Date()+"  Press 'q' and enter to quit.");
+                    System.out.println("\nMaster is still alive: "+timeStr()+"  Press 'q' and enter to quit.");
                     lastAliveMessage = System.currentTimeMillis();
                 }
             }

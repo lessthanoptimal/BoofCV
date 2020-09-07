@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 	String bitWiseOp;
 	String divide;
 
+	@Override
 	public void generate() {
 		printPreamble();
 
@@ -137,7 +138,7 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\t\t\t\tfor (int k = offsetL-j; k < kernelWidth; k++) {\n" +
-				"\t\t\t\t\tdouble w = kernel.data[k];\n" +
+				"\t\t\t\t\t"+sumType+" w = kernel.data[k];\n" +
 				"\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
 				"\t\t\t\t\t\ttotal[band] += (dataSrc[indexSrc++]"+bitWiseOp+") * w;\n" +
@@ -154,7 +155,7 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 				"\t\t\t\tArrays.fill(total,0);\n" +
 				"\t\t\t\t"+sumType+" weight = 0;\n" +
 				"\t\t\t\tfor (int k = 0; k <= offsetL+j; k++) {\n" +
-				"\t\t\t\t\tdouble w = kernel.data[k];\n" +
+				"\t\t\t\t\t"+sumType+" w = kernel.data[k];\n" +
 				"\t\t\t\t\tweight += w;\n" +
 				"\t\t\t\t\tfor (int band = 0; band < numBands; band++) {\n" +
 				"\t\t\t\t\t\ttotal[band] += (dataSrc[indexSrc++]"+bitWiseOp+") * w;\n" +

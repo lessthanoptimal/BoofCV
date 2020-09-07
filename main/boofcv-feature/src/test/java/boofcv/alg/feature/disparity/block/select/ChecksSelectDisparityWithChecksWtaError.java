@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class ChecksSelectDisparityWithChecksWtaError<ArrayData, D extends ImageGray<D>>
 		extends ChecksSelectDisparityWithChecksWta<ArrayData, D>
 {
-	public ChecksSelectDisparityWithChecksWtaError(Class<ArrayData> arrayType, Class<D> disparityType) {
+	protected ChecksSelectDisparityWithChecksWtaError(Class<ArrayData> arrayType, Class<D> disparityType) {
 		super(arrayType,disparityType);
 	}
 

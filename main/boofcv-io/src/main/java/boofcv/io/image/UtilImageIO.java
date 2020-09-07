@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static boofcv.io.UtilIO.UTF8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Class for loading and saving images.
@@ -493,7 +494,7 @@ public class UtilImageIO {
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
 
 		String header = String.format("P6\n%d %d\n255\n", rgb.width, rgb.height);
-		os.write(header.getBytes());
+		os.write(header.getBytes(UTF_8));
 
 		if( temp == null )
 			temp = new GrowQueue_I8();
@@ -531,7 +532,7 @@ public class UtilImageIO {
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
 
 		String header = String.format("P5\n%d %d\n255\n", gray.width, gray.height);
-		os.write(header.getBytes());
+		os.write(header.getBytes(UTF_8));
 
 		os.write(gray.data,0,gray.width*gray.height);
 

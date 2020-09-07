@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,13 +28,12 @@ import georegression.struct.InvertibleTransform;
 /**
  * <p>Implementation of {@link BackgroundAlgorithmBasic} for moving images.</p>
  *
+ * @author Peter Abeles
  * @see BackgroundAlgorithmBasic
  * @see BackgroundModelMoving
- *
- * @author Peter Abeles
  */
 public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundModelMoving<T,Motion> implements BackgroundAlgorithmBasic {
+		extends BackgroundModelMoving<T, Motion> implements BackgroundAlgorithmBasic {
 
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
@@ -55,11 +54,11 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 	 * @param transform Point transform
 	 * @param imageType Type of input image
 	 */
-	public BackgroundMovingBasic(float learnRate , float threshold,
-								 Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType) {
+	protected BackgroundMovingBasic( float learnRate, float threshold,
+									 Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
 		super(transform, imageType);
 
-		if( learnRate < 0 || learnRate > 1f )
+		if (learnRate < 0 || learnRate > 1f)
 			throw new IllegalArgumentException("LearnRate must be 0 <= rate <= 1.0f");
 
 		this.learnRate = learnRate;
@@ -72,7 +71,7 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 	}
 
 	@Override
-	public void setLearnRate(float learnRate) {
+	public void setLearnRate( float learnRate ) {
 		this.learnRate = learnRate;
 	}
 
@@ -82,7 +81,7 @@ public abstract class BackgroundMovingBasic<T extends ImageBase<T>, Motion exten
 	}
 
 	@Override
-	public void setThreshold(float threshold) {
+	public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 }

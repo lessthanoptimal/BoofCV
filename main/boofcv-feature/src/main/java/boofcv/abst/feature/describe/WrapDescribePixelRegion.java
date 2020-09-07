@@ -32,18 +32,18 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class WrapDescribePixelRegion<T extends ImageGray<T>, D extends TupleDesc>
-		implements DescribeRegionPoint<T,D>
-{
-	DescribePointPixelRegion<T,D> alg;
+		implements DescribeRegionPoint<T, D> {
+	DescribePointPixelRegion<T, D> alg;
 	ImageType<T> imageType;
 
-	public WrapDescribePixelRegion(DescribePointPixelRegion<T, D> alg , Class<T> imageType) {
+	public WrapDescribePixelRegion( DescribePointPixelRegion<T, D> alg, Class<T> imageType ) {
 		this.alg = alg;
 		this.imageType = ImageType.single(imageType);
 	}
 
+	@Override
 	public D createDescription() {
-		if( alg.getDescriptorType() == TupleDesc_F32.class ) {
+		if (alg.getDescriptorType() == TupleDesc_F32.class) {
 			return (D)new TupleDesc_F32(alg.getDescriptorLength());
 		} else {
 			return (D)new TupleDesc_U8(alg.getDescriptorLength());
@@ -51,14 +51,13 @@ public class WrapDescribePixelRegion<T extends ImageGray<T>, D extends TupleDesc
 	}
 
 	@Override
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		alg.setImage(image);
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double radius, D storage)
-	{
-		alg.process((int) x, (int) y, storage);
+	public boolean process( double x, double y, double orientation, double radius, D storage ) {
+		alg.process((int)x, (int)y, storage);
 
 		return true;
 	}
@@ -85,6 +84,6 @@ public class WrapDescribePixelRegion<T extends ImageGray<T>, D extends TupleDesc
 
 	@Override
 	public double getCanonicalWidth() {
-		return (alg.getRegionWidth()+alg.getRegionHeight())/2.0;
+		return (alg.getRegionWidth() + alg.getRegionHeight())/2.0;
 	}
 }

@@ -31,17 +31,17 @@ public class PointIndex_I32 extends Point2D_I32 {
 	/**
 	 * Index of point in an array/list
 	 */
-	@Getter	@Setter	public int index;
+	@Getter @Setter public int index;
 
-	public PointIndex_I32() {
-	}
+	public PointIndex_I32() {}
 
-	public PointIndex_I32(int x, int y, int index) {
+	public PointIndex_I32( int x, int y, int index ) {
 		super(x, y);
 		this.index = index;
 	}
 
+	@Override
 	public PointIndex_I32 copy() {
-		return new PointIndex_I32(x,y,index);
+		return new PointIndex_I32(x, y, index);
 	}
 }

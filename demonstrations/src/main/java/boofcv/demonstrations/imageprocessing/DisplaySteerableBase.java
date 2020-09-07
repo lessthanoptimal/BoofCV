@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,13 +35,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * @author Peter Abeles
  */
 public abstract class DisplaySteerableBase<T extends ImageGray<T>, K extends Kernel2D>
-		extends SelectAlgorithmPanel
-{
+		extends SelectAlgorithmPanel {
 	protected static int imageSize = 400;
 	protected static int radius = 100;
 
@@ -55,66 +53,64 @@ public abstract class DisplaySteerableBase<T extends ImageGray<T>, K extends Ker
 
 	List<DisplayGaussianKernelApp.DerivType> order = new ArrayList<>();
 
-	public DisplaySteerableBase(Class<T> imageType, Class<K> kernelType) {
-
+	protected DisplaySteerableBase( Class<T> imageType, Class<K> kernelType ) {
 		this.imageType = imageType;
 		this.kernelType = kernelType;
 
 		largeImg = GeneralizedImageOps.createSingleBand(imageType, imageSize, imageSize);
 
-		addAlgorithm("Deriv X",new DisplayGaussianKernelApp.DerivType(1,0));
-		addAlgorithm("Deriv XX",new DisplayGaussianKernelApp.DerivType(2,0));
-		addAlgorithm("Deriv XXX",new DisplayGaussianKernelApp.DerivType(3,0));
-		addAlgorithm("Deriv XXXX",new DisplayGaussianKernelApp.DerivType(4,0));
-		addAlgorithm("Deriv XY",new DisplayGaussianKernelApp.DerivType(1,1));
-		addAlgorithm("Deriv XXY",new DisplayGaussianKernelApp.DerivType(2,1));
-		addAlgorithm("Deriv XYY",new DisplayGaussianKernelApp.DerivType(1,2));
-		addAlgorithm("Deriv XXXY",new DisplayGaussianKernelApp.DerivType(3,1));
-		addAlgorithm("Deriv XXYY",new DisplayGaussianKernelApp.DerivType(2,2));
+		addAlgorithm("Deriv X", new DisplayGaussianKernelApp.DerivType(1, 0));
+		addAlgorithm("Deriv XX", new DisplayGaussianKernelApp.DerivType(2, 0));
+		addAlgorithm("Deriv XXX", new DisplayGaussianKernelApp.DerivType(3, 0));
+		addAlgorithm("Deriv XXXX", new DisplayGaussianKernelApp.DerivType(4, 0));
+		addAlgorithm("Deriv XY", new DisplayGaussianKernelApp.DerivType(1, 1));
+		addAlgorithm("Deriv XXY", new DisplayGaussianKernelApp.DerivType(2, 1));
+		addAlgorithm("Deriv XYY", new DisplayGaussianKernelApp.DerivType(1, 2));
+		addAlgorithm("Deriv XXXY", new DisplayGaussianKernelApp.DerivType(3, 1));
+		addAlgorithm("Deriv XXYY", new DisplayGaussianKernelApp.DerivType(2, 2));
 		addAlgorithm("Deriv XYYY", new DisplayGaussianKernelApp.DerivType(1, 3));
 
-		JPanel content = new JPanel(new GridLayout(0,2));
+		JPanel content = new JPanel(new GridLayout(0, 2));
 		content.add(basisPanel);
 		content.add(steerPanel);
 		setMainGUI(content);
 	}
 
-	protected abstract SteerableKernel<K> createKernel( int orderX , int orderY );
+	protected abstract SteerableKernel<K> createKernel( int orderX, int orderY );
 
 	@Override
-	public void setActiveAlgorithm(String name, Object cookie) {
+	public void setActiveAlgorithm( String name, Object cookie ) {
 		DisplayGaussianKernelApp.DerivType dt = (DisplayGaussianKernelApp.DerivType)cookie;
 
 		// add basis
-		SteerableKernel<K> steerable = createKernel(dt.orderX,dt.orderY);
+		SteerableKernel<K> steerable = createKernel(dt.orderX, dt.orderY);
 		basisPanel.reset();
 
-		for( int i = 0; i < steerable.getBasisSize(); i++ ) {
+		for (int i = 0; i < steerable.getBasisSize(); i++) {
 			T smallImg = GKernelMath.convertToImage(steerable.getBasis(i));
-			new FDistort(smallImg,largeImg).scaleExt().interpNN().apply();
+			new FDistort(smallImg, largeImg).scaleExt().interpNN().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
-			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
-			basisPanel.addImage(out,"Basis "+i);
+			BufferedImage out = VisualizeImageData.colorizeSign(largeImg, null, maxValue);
+			basisPanel.addImage(out, "Basis " + i);
 		}
 
 		// add steered kernels
 		steerPanel.reset();
 
-		for( int i = 0; i <= 20; i++  ) {
+		for (int i = 0; i <= 20; i++) {
 			double angle = Math.PI*i/20.0;
 
 			K kernel = steerable.compute(angle);
 
 			T smallImg = GKernelMath.convertToImage(kernel);
-			new FDistort(smallImg,largeImg).scaleExt().interpNN().apply();
+			new FDistort(smallImg, largeImg).scaleExt().interpNN().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
-			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
+			BufferedImage out = VisualizeImageData.colorizeSign(largeImg, null, maxValue);
 
-			steerPanel.addImage(out,String.format("%5d",(int)(180.0*angle/Math.PI)));
+			steerPanel.addImage(out, String.format("%5d", (int)(180.0*angle/Math.PI)));
 		}
 		repaint();
 	}
-
 }

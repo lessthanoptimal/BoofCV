@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ package boofcv.alg.background;
  * Performs background subtraction on an image using the very simple per-pixel "basic" model, as described in [1].
  * A simple image is used to represent the background.  Each pixel is updated individually using the formula below:<br>
  * <br>
- * {@code B(i+1) = (1-&alpha;)*B(i) + &alpha;I(i)}<br>
+ * B(i+1) = (1-&alpha;)*B(i) + &alpha;I(i)<br>
  * Where B is the background image, I is the current observed image, and &alpha; is the learning rate 0 to 1.
  * Where 0 is static and 1 is instant.
  * </p>
@@ -43,25 +43,29 @@ public interface BackgroundAlgorithmBasic {
 
 	/**
 	 * Returns the learning rate.
+	 *
 	 * @return 0 (slow) to 1 (fast)
 	 */
 	float getLearnRate();
 
 	/**
 	 * Specifies the learning rate
+	 *
 	 * @param learnRate 0 (slow) to 1 (fast)
 	 */
-	void setLearnRate(float learnRate);
+	void setLearnRate( float learnRate );
 
 	/**
 	 * Returns the threshold for background/moving object.
+	 *
 	 * @return background threshold
 	 */
 	float getThreshold();
 
 	/**
 	 * Sets the threshold for background/moving object
+	 *
 	 * @param threshold background threshold
 	 */
-	void setThreshold(float threshold);
+	void setThreshold( float threshold );
 }

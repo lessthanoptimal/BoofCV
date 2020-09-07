@@ -28,21 +28,20 @@ import georegression.struct.point.Point3D_F64;
 public class Point3dRgbI_F64 extends Point3D_F64 {
 	public int rgb;
 
-	public Point3dRgbI_F64( Point3D_F64 p , int rgb ) {
+	public Point3dRgbI_F64( Point3D_F64 p, int rgb ) {
 		this.set(p);
 		this.rgb = rgb;
 	}
 
-	public Point3dRgbI_F64( double x , double y , double z, int rgb ) {
-		this.set(x,y,z);
+	public Point3dRgbI_F64( double x, double y, double z, int rgb ) {
+		this.set(x, y, z);
 		this.rgb = rgb;
 	}
 
-	public Point3dRgbI_F64() {
-	}
+	public Point3dRgbI_F64() {}
 
-	public void set( double x , double y , double z, int rgb ) {
-		this.set(x,y,z);
+	public void set( double x, double y, double z, int rgb ) {
+		this.set(x, y, z);
 		this.rgb = rgb;
 	}
 
@@ -50,7 +49,7 @@ public class Point3dRgbI_F64 extends Point3D_F64 {
 		return rgb;
 	}
 
-	public void setRgb(int rgb) {
+	public void setRgb( int rgb ) {
 		this.rgb = rgb;
 	}
 }

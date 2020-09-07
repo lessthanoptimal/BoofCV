@@ -97,7 +97,7 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>>
 	@Test
 	public void computeError() {
 		int r = 2;
-		int w = r*2+1;
+//		int w = r*2+1;
 		DenseOpticalFlowBlockPyramid<T> alg = createAlg(1,r,10);
 
 		GImageMiscOps.fillUniform(image,rand,0,200);
@@ -113,10 +113,10 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>>
 				double v0 = GeneralizedImageOps.get(image,x,y);
 				double v1 = GeneralizedImageOps.get(alg.template,j+r,i+r);
 
-				expected += Math.abs(v0-v1);
+				expected += (float)Math.abs(v0-v1);
 			}
 		}
 
-		assertEquals(expected,found,1e-5);
+		assertEquals(expected,found,1e-5f);
 	}
 }

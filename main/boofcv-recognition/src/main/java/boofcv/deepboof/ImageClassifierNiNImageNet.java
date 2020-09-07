@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,51 +43,52 @@ import static deepboof.misc.TensorOps.WI;
  * [1] https://gist.github.com/szagoruyko/0f5b4c5e2d2b18472854<br>
  * [2] https://github.com/soumith/imagenet-multiGPU.torch/blob/master/models/ninbn.lua
  * </p>
+ *
  * @author Peter Abeles
  */
 public class ImageClassifierNiNImageNet extends BaseImageClassifier {
 
 	// normalization parameters
-	float mean[];
-	float stdev[];
+	float[] mean;
+	float[] stdev;
 
-//	int imageSize = 256;
+	//	int imageSize = 256;
 	static final int imageCrop = 224;
 
 	// Input image with the bands in the correct order
-	Planar<GrayF32> imageBgr = new Planar<>(GrayF32.class,imageCrop,imageCrop,3);
+	Planar<GrayF32> imageBgr = new Planar<>(GrayF32.class, imageCrop, imageCrop, 3);
 
 	public ImageClassifierNiNImageNet() {
 		super(imageCrop);
 	}
 
 	@Override
-	public void loadModel(File directory) throws IOException {
+	public void loadModel( File directory ) throws IOException {
 
-		List<TorchObject> list = new ParseBinaryTorch7().parse(new File(directory,"nin_bn_final.t7"));
+		List<TorchObject> list = new ParseBinaryTorch7().parse(new File(directory, "nin_bn_final.t7"));
 		TorchGeneric torchSequence = ((TorchGeneric)list.get(0)).get("model");
 
 		TorchGeneric torchNorm = torchSequence.get("transform");
 
-		mean = torchListToArray( (TorchList)torchNorm.get("mean"));
-		stdev = torchListToArray( (TorchList)torchNorm.get("std"));
+		mean = torchListToArray((TorchList)torchNorm.get("mean"));
+		stdev = torchListToArray((TorchList)torchNorm.get("std"));
 
 		SequenceAndParameters<Tensor_F32, Function<Tensor_F32>> seqparam =
 				ConvertTorchToBoofForward.convert(torchSequence);
 
-		network = seqparam.createForward(3,imageCrop,imageCrop);
-		tensorOutput = new Tensor_F32(WI(1,network.getOutputShape()));
+		network = seqparam.createForward(3, imageCrop, imageCrop);
+		tensorOutput = new Tensor_F32(WI(1, network.getOutputShape()));
 
-		TorchList torchCategories = (TorchList)new ParseAsciiTorch7().parse(new File(directory,"synset.t7")).get(0);
+		TorchList torchCategories = (TorchList)new ParseAsciiTorch7().parse(new File(directory, "synset.t7")).get(0);
 
 		categories.clear();
 		for (int i = 0; i < torchCategories.list.size(); i++) {
-			categories.add( ((TorchString)torchCategories.list.get(i)).message );
+			categories.add(((TorchString)torchCategories.list.get(i)).message);
 		}
 	}
 
 	private float[] torchListToArray( TorchList torch ) {
-		float []ret = new float[ torch.list.size()];
+		float[] ret = new float[torch.list.size()];
 
 		for (int i = 0; i < ret.length; i++) {
 			ret[i] = (float)((TorchNumber)torch.list.get(i)).value;
@@ -96,11 +97,11 @@ public class ImageClassifierNiNImageNet extends BaseImageClassifier {
 		return ret;
 	}
 
-
 	/**
 	 * Massage the input image into a format recognized by the network
 	 */
-	protected Planar<GrayF32> preprocess(Planar<GrayF32> image) {
+	@Override
+	protected Planar<GrayF32> preprocess( Planar<GrayF32> image ) {
 		super.preprocess(image);
 
 		// image net is BGR color order
@@ -109,11 +110,11 @@ public class ImageClassifierNiNImageNet extends BaseImageClassifier {
 		imageBgr.bands[2] = imageRgb.bands[0];
 
 		// image needs to be between 0 and 1
-		GPixelMath.divide(imageBgr,255,imageBgr);
+		GPixelMath.divide(imageBgr, 255, imageBgr);
 
 		// Normalize the image's statistics
 		for (int band = 0; band < 3; band++) {
-			DataManipulationOps.normalize(imageBgr.getBand(band),mean[band],stdev[band]);
+			DataManipulationOps.normalize(imageBgr.getBand(band), mean[band], stdev[band]);
 		}
 
 		return imageBgr;

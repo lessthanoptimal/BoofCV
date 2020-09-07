@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,12 +58,7 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				" * which is then written into the dst image. The dst image must be smaller than or equal to the src image.</p>\n" +
 				" *\n" +
 				" * <p>\n" +
-				generateDocString() +
-				" * </p>\n" +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"public class "+className+" {\n");
 	}
 

@@ -162,13 +162,14 @@ public class SquareRegularClustersIntoGrids {
 		grid.rows = 1;
 	}
 
+	List<SquareNode> column = new ArrayList<>();
+	List<SquareNode> ordered = new ArrayList<>();
 	/**
 	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes.  This assumes
 	 * the grid is 2 by 2 or larger.
+	 *
 	 * @param graph unordered nodes in a connected graph
 	 */
-	List<SquareNode> column = new ArrayList<>();
-	List<SquareNode> ordered = new ArrayList<>();
 	void orderIntoGrid(List<SquareNode> graph) {
 
 		// discard previous label information since its now being used to avoid cycles

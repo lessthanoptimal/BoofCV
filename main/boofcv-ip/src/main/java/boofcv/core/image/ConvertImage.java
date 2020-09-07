@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.impl.*;
 import boofcv.struct.image.*;
 
+import javax.annotation.Generated;
+
 /**
  * <p>
  * Functions for converting between different image types. Pixel values are converted by typecasting.
@@ -34,6 +36,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+@Generated("boofcv.core.image.GenerateConvertImage")
 @SuppressWarnings("Duplicates")
 public class ConvertImage {
 

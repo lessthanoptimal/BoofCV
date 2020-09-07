@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.concurrency;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 import java.util.concurrent.ForkJoinTask;
 
 /**
@@ -30,15 +33,11 @@ public class IntRangeTask extends ForkJoinTask<Void> {
 	final int stepLength;
 	final int step;
 	final IntRangeConsumer consumer;
-	IntRangeTask next;
+	@Nullable IntRangeTask next;
 
 	/**
 	 *
 	 * @param step which step is to be processed. the master task should have this set to -1
-	 * @param min
-	 * @param max
-	 * @param stepLength
-	 * @param consumer
 	 */
 	public IntRangeTask(int step, int min , int max , int stepLength , IntRangeConsumer consumer ) {
 		this.step = step;
@@ -72,6 +71,7 @@ public class IntRangeTask extends ForkJoinTask<Void> {
 				if( root == null ) {
 					root = previous = task;
 				} else {
+					Objects.requireNonNull(previous); // it can't be null, IntelliJ figured that out but NullAway...
 					previous.next = task;
 					previous = task;
 				}

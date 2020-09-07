@@ -45,7 +45,7 @@ public abstract class GenericFastCorner {
 
 	FastCornerDetector<GrayU8> alg;
 
-	public GenericFastCorner(FastCornerDetector<GrayU8> alg, int minContinuous, int detectDifference ) {
+	protected GenericFastCorner(FastCornerDetector<GrayU8> alg, int minContinuous, int detectDifference ) {
 		this.alg = alg;
 		this.minContinuous = minContinuous;
 		this.detectDifference = detectDifference;

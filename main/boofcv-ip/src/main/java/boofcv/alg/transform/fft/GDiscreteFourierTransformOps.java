@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,11 +40,11 @@ public class GDiscreteFourierTransformOps {
 	 */
 	public static <T extends GrayF<T>, W extends ImageInterleaved>
 	DiscreteFourierTransform<T,W> createTransform( ImageDataType type ) {
-		switch( type ) {
-			case F32: return (DiscreteFourierTransform)createTransformF32();
-			case F64: return (DiscreteFourierTransform)createTransformF64();
-		}
-		throw new IllegalArgumentException("Unsupported image type "+type);
+		return switch (type) {
+			case F32 -> (DiscreteFourierTransform)createTransformF32();
+			case F64 -> (DiscreteFourierTransform)createTransformF64();
+			default -> throw new IllegalArgumentException("Unsupported image type " + type);
+		};
 	}
 
 	/**

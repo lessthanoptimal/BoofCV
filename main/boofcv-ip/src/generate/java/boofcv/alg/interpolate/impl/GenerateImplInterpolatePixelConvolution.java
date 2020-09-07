@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,8 +54,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
 		printFuncs();
 
-		out.print("\n" +
-				"}\n");
+		out.print("}\n");
 	}
 
 	private void printPreamble( String fileName ) {
@@ -65,6 +64,8 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.struct.border.ImageBorder;\n" +
 				"import boofcv.struct.border.ImageBorder_"+borderType+";\n" +
+				"\n"+
+				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -72,21 +73,17 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				" * re-normalizing.  It is assumed that the kernel will sum up to one.  This is particularly\n" +
 				" * important for the unsafe_get() function which does not re-normalize.\n" +
 				" * </p>\n" +
-				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"public class "+fileName+" implements InterpolatePixelS<"+inputType.getSingleBandName()+">  {\n" +
 				"\n" +
 				"\t// used to read outside the image border\n" +
 				"\tprivate ImageBorder_"+borderType+" border;\n" +
 				"\t// kernel used to perform interpolation\n" +
-				"\tprivate KernelContinuous1D_F32 kernel;\n" +
+				"\tprivate final KernelContinuous1D_F32 kernel;\n" +
 				"\t// input image\n" +
 				"\tprivate "+inputType.getSingleBandName()+" image;\n" +
 				"\t// minimum and maximum allowed pixel values\n" +
-				"\tprivate float min,max;\n" +
+				"\tprivate final float min,max;\n" +
 				"\n" +
 				"\tpublic "+fileName+"(KernelContinuous1D_F32 kernel , float min , float max ) {\n" +
 				"\t\tthis.kernel = kernel;\n" +
@@ -250,11 +247,13 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t@Override\n" +
 				"\tpublic ImageBorder<"+inputType.getSingleBandName()+"> getBorder() {\n" +
 				"\t\treturn border;\n" +
-				"\t}" +
+				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic InterpolatePixelS<"+inputType.getSingleBandName()+"> newInstance() {\n" +
-				"\t\treturn new "+className+"(kernel,min,max);\n" +
+				"\tpublic InterpolatePixelS<"+inputType.getSingleBandName()+"> copy() {\n" +
+				"\t\tvar out = new "+className+"(kernel,min,max);\n" +
+				"\t\tout.setBorder(border);\n" +
+				"\t\treturn out;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +

@@ -20,6 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
@@ -1703,7 +1704,7 @@ public class MultiViewOps {
 		for (int i = 0; i < structure.points.size; i++) {
 			normObs.reset();
 			worldToViews.clear();
-			SceneStructureMetric.Point sp = structure.points.get(i);
+			SceneStructureCommon.Point sp = structure.points.get(i);
 			for (int j = 0; j < sp.views.size; j++) {
 				int viewIdx = sp.views.get(j);
 				SceneStructureMetric.View v = structure.views.data[viewIdx];

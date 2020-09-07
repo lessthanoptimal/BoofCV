@@ -20,11 +20,11 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * Concurrent version of {@link HoughTransformGradient}
@@ -32,53 +32,48 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class HoughTransformGradient_MT<D extends ImageGray<D>>
-	extends HoughTransformGradient<D>
-{
+		extends HoughTransformGradient<D> {
 
 	// storage for candidates in each thread's block
-	private final FastQueue<ListIntPoint2D> blockCandidates = new FastQueue<>(ListIntPoint2D::new);
+	private final GrowArray<ListIntPoint2D> blockCandidates = new GrowArray<>(ListIntPoint2D::new);
 
 	Point2D_I32 p = new Point2D_I32();
 
 	/**
 	 * Specifies parameters of transform.
 	 *
-	 * @param extractor  Extracts local maxima from transform space.  A set of candidates is provided, but can be ignored.
-	 * @param parameters
-	 * @param derivType
+	 * @param extractor Extracts local maxima from transform space.  A set of candidates is provided, but can be ignored.
 	 */
-	public HoughTransformGradient_MT(NonMaxSuppression extractor, HoughTransformParameters parameters, Class<D> derivType) {
+	public HoughTransformGradient_MT( NonMaxSuppression extractor, HoughTransformParameters parameters, Class<D> derivType ) {
 		super(extractor, parameters, derivType);
 	}
 
 	@Override
-	void transform(GrayU8 binary )
-	{
-		candidates.configure(transform.width,transform.height);
+	void transform( GrayU8 binary ) {
+		candidates.configure(transform.width, transform.height);
 		blockCandidates.reset();
-		BoofConcurrency.loopBlocks(0,binary.height,blockCandidates,(storage,y0,y1)->{
-			storage.configure(transform.width,transform.height);
+		BoofConcurrency.loopBlocks(0, binary.height, blockCandidates, ( storage, y0, y1 ) -> {
+			storage.configure(transform.width, transform.height);
 			for (int y = y0; y < y1; y++) {
 				int start = binary.startIndex + y*binary.stride;
 				int end = start + binary.width;
 
-				for( int index = start; index < end; index++ ) {
-					if( binary.data[index] != 0 ) {
-						int x = index-start;
-						parameterize(storage,x,y,_derivX.unsafe_getF(x,y),_derivY.unsafe_getF(x,y));
+				for (int index = start; index < end; index++) {
+					if (binary.data[index] != 0) {
+						int x = index - start;
+						parameterize(storage, x, y, _derivX.unsafe_getF(x, y), _derivY.unsafe_getF(x, y));
 					}
 				}
 			}
 		});
 
 		// Combine results found in each thread together
-		for (int i = 0; i < blockCandidates.size; i++) {
+		for (int i = 0; i < blockCandidates.size(); i++) {
 			ListIntPoint2D s = blockCandidates.get(i);
 			for (int j = 0; j < s.size(); j++) {
-				s.get(j,p);
-				candidates.add(p.x,p.y);
+				s.get(j, p);
+				candidates.add(p.x, p.y);
 			}
 		}
 	}
-
 }

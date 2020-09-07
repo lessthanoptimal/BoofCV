@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,38 +27,37 @@ import boofcv.struct.image.GrayI;
  */
 public abstract class ImageBorder_S32<T extends GrayI<T>> extends ImageBorder<T> {
 
-	public ImageBorder_S32(T image) {
+	protected ImageBorder_S32( T image ) {
 		super(image);
 	}
 
-	protected ImageBorder_S32() {
+	protected ImageBorder_S32() {}
+
+	public int get( int x, int y ) {
+		if (image.isInBounds(x, y))
+			return image.get(x, y);
+
+		return getOutside(x, y);
 	}
 
-	public int get( int x , int y ) {
-		if( image.isInBounds(x,y) )
-			return image.get(x,y);
+	public abstract int getOutside( int x, int y );
 
-		return getOutside( x , y );
-	}
+	public void set( int x, int y, int value ) {
+		if (image.isInBounds(x, y))
+			image.set(x, y, value);
 
-	public abstract int getOutside( int x , int y );
-
-	public void set( int x , int y , int value ) {
-		if( image.isInBounds(x,y) )
-			image.set(x,y,value);
-
-		setOutside( x , y , value);
+		setOutside(x, y, value);
 	}
 
 	@Override
-	public void getGeneral(int x, int y, double[] pixel ) {
+	public void getGeneral( int x, int y, double[] pixel ) {
 		pixel[0] = get(x, y);
 	}
 
 	@Override
-	public void setGeneral(int x, int y, double[] pixel ) {
+	public void setGeneral( int x, int y, double[] pixel ) {
 		set(x, y, (int)pixel[0]);
 	}
 
-	public abstract void setOutside( int x , int y , int value );
+	public abstract void setOutside( int x, int y, int value );
 }

@@ -606,14 +606,14 @@ public class BoofSwingUtil {
 		}
 	}
 
-	public static JMenuItem createMenuItem(String name  , int mnmonic , int accelerator, BoofLambdas.Process action ) {
+	public static JMenuItem createMenuItem(String name  , int mnmonic , int accelerator, BoofLambdas.ProcessCall action ) {
 		JMenuItem item = new JMenuItem(name);
 		BoofSwingUtil.setMenuItemKeys(item, mnmonic,accelerator);
 		item.addActionListener(e->action.process());
 		return item;
 	}
 
-	public static JMenuItem createMenuItem(String name ,BoofLambdas.Process action ) {
+	public static JMenuItem createMenuItem( String name , BoofLambdas.ProcessCall action ) {
 		JMenuItem item = new JMenuItem(name);
 		item.addActionListener(e->action.process());
 		return item;

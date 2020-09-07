@@ -56,6 +56,7 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 	/**
 	 * Sets the image which is going to be processed.
 	 */
+	@Override
 	public void setImage(T image) {
 		integralImage.wrap(image);
 		integral.setImage(integralImage);

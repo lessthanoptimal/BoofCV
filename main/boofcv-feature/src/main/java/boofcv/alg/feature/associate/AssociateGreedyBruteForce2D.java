@@ -37,8 +37,8 @@ public class AssociateGreedyBruteForce2D<D> extends AssociateGreedyBase2D<D> {
 	 *
 	 * @param scoreAssociation How features are scored.
 	 */
-	public AssociateGreedyBruteForce2D(ScoreAssociation<D> scoreAssociation ,
-									   AssociateImageDistanceFunction distanceFunction) {
+	public AssociateGreedyBruteForce2D( ScoreAssociation<D> scoreAssociation,
+										AssociateImageDistanceFunction distanceFunction ) {
 		super(scoreAssociation, distanceFunction);
 	}
 
@@ -46,64 +46,63 @@ public class AssociateGreedyBruteForce2D<D> extends AssociateGreedyBase2D<D> {
 	 * Performs association by computing a 2D score matrix. First the score matrix is computed while finding
 	 * the best fit relative to the source. Then additional sanity checks are done to see if it's a valid match/
 	 */
+	@Override
 	public void associate() {
-		setupForAssociate(descSrc.size,descDst.size);
+		setupForAssociate(descSrc.size, descDst.size);
 
 		final double ratioTest = this.ratioTest;
 
-
-
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0,descSrc.size,distances, (distanceFunction,idx0,idx1) -> {
-		int idx0 = 0, idx1 =  descSrc.size;
-		for( int idxSrc = idx0; idxSrc < idx1; idxSrc++ ) {
-			distanceFunction.setSource(idxSrc,locationSrc.get(idxSrc));
+		int idx0 = 0, idx1 = descSrc.size;
+		for (int idxSrc = idx0; idxSrc < idx1; idxSrc++) {
+			distanceFunction.setSource(idxSrc, locationSrc.get(idxSrc));
 			D a = descSrc.data[idxSrc];
 			double bestScore = maxFitError;
 			double secondBest = bestScore;
 			int bestIndex = -1;
 
 			final int workIdx = idxSrc*descDst.size;
-			for( int idxDst = 0; idxDst < descDst.size; idxDst++ ) {
+			for (int idxDst = 0; idxDst < descDst.size; idxDst++) {
 				D b = descDst.data[idxDst];
 
 				// compute distance between the two features and don't even consider if too far apart
-				double distance = distanceFunction.distance(idxDst,locationDst.get(idxDst));
-				if( distance > maxDistanceUnits) {
-					scoreMatrix.set(workIdx+idxDst,maxFitError);
+				double distance = distanceFunction.distance(idxDst, locationDst.get(idxDst));
+				if (distance > maxDistanceUnits) {
+					scoreMatrix.set(workIdx + idxDst, maxFitError);
 					continue;
 				}
 
-				double fit = score.score(a,b);
-				scoreMatrix.set(workIdx+idxDst,fit);
+				double fit = score.score(a, b);
+				scoreMatrix.set(workIdx + idxDst, fit);
 
-				if( fit <= bestScore ) {
+				if (fit <= bestScore) {
 					bestIndex = idxDst;
 					secondBest = bestScore;
 					bestScore = fit;
 				}
 			}
 
-			if( ratioTest < 1.0 && bestIndex != -1 && bestScore != 0.0 ) {
+			if (ratioTest < 1.0 && bestIndex != -1 && bestScore != 0.0) {
 				// the second best could lie after the best was seen
-				for (int j = bestIndex+1; j < descDst.size; j++) {
-					double fit = scoreMatrix.get(workIdx+j);
-					if( fit < secondBest ) {
+				for (int j = bestIndex + 1; j < descDst.size; j++) {
+					double fit = scoreMatrix.get(workIdx + j);
+					if (fit < secondBest) {
 						secondBest = fit;
 					}
 				}
-				pairs.set(idxSrc,secondBest*ratioTest >= bestScore ? bestIndex : -1);
+				pairs.set(idxSrc, secondBest*ratioTest >= bestScore ? bestIndex : -1);
 			} else {
-				pairs.set(idxSrc,bestIndex);
+				pairs.set(idxSrc, bestIndex);
 			}
 
-			fitQuality.set(idxSrc,bestScore);
+			fitQuality.set(idxSrc, bestScore);
 		}
 		//CONCURRENT_ABOVE }});
 
-		if( backwardsValidation ) {
+		if (backwardsValidation) {
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, descSrc.size, i -> {
-			for( int i = 0; i < descSrc.size; i++ ) {
-				forwardsBackwards(i,descSrc.size,descDst.size);
+			for (int i = 0; i < descSrc.size; i++) {
+				forwardsBackwards(i, descSrc.size, descDst.size);
 			}
 			//CONCURRENT_ABOVE });
 		}

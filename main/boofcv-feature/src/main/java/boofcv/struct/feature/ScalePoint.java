@@ -65,7 +65,7 @@ public class ScalePoint {
 		this.pixel.set(x,y);
 		this.scale = scale;
 		this.white = white;
-		this.intensity = this.intensity;
+		this.intensity = intensity;
 	}
 
 	public ScalePoint copy() {

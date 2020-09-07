@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.tld;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 /**
  * Lookup table for ferns. An array is used to look up each fern by value.  The recommend descriptor size in the
@@ -29,17 +29,17 @@ import java.util.Stack;
 public class TldFernManager {
 
 	// lookup table for ferns.  The value of the fern is an element in the table
-	TldFernFeature table[];
+	TldFernFeature[] table;
 
 	// storage for unused ferns which can be recycled
-	Stack<TldFernFeature> unusedFern = new Stack<>();
+	ArrayDeque<TldFernFeature> unusedFern = new ArrayDeque<>();
 
 	/**
 	 * Configures the manager
 	 *
 	 * @param descriptorSize Size of the fern's descriptor
 	 */
-	public TldFernManager(int descriptorSize) {
+	public TldFernManager( int descriptorSize ) {
 		int N = 1 << descriptorSize;
 
 		table = new TldFernFeature[N];
@@ -47,12 +47,13 @@ public class TldFernManager {
 
 	/**
 	 * Looks up the fern with the specified value.  If non exist a new one is created and returned.
+	 *
 	 * @param value The fern's value
 	 * @return The fern associated with that value
 	 */
 	public TldFernFeature lookupFern( int value ) {
 		TldFernFeature found = table[value];
-		if( found == null ) {
+		if (found == null) {
 			found = createFern();
 			found.init(value);
 			table[value] = found;
@@ -71,16 +72,16 @@ public class TldFernManager {
 	 */
 	public double lookupPosterior( int value ) {
 		TldFernFeature found = table[value];
-		if( found == null ) {
+		if (found == null) {
 			return 0;
 		}
 		return found.posterior;
 	}
 
 	public void reset() {
-		for( int i = 0; i < table.length; i++ ) {
+		for (int i = 0; i < table.length; i++) {
 			TldFernFeature f = table[i];
-			if( f != null ) {
+			if (f != null) {
 				unusedFern.add(f);
 				table[i] = null;
 			}
@@ -88,10 +89,9 @@ public class TldFernManager {
 	}
 
 	protected TldFernFeature createFern() {
-		if( unusedFern.size() > 0 ) {
+		if (unusedFern.size() > 0) {
 			return unusedFern.pop();
 		}
 		return new TldFernFeature();
 	}
-
 }

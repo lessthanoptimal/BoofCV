@@ -35,7 +35,6 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Provides pull a menubar for selecting the input source and which algorithm to use
  *
@@ -43,8 +42,7 @@ import java.util.List;
  */
 @SuppressWarnings("unchecked")
 public abstract class SelectAlgorithmAndInputPanel extends JPanel
-		implements ActionListener, VisualizeApp
-{
+		implements ActionListener, VisualizeApp {
 	JToolBar toolbar;
 	// each combo box is used to select different algorithms
 	JComboBox[] algBoxes;
@@ -55,7 +53,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	List<Object>[] algCookies;
 	// list of input names and where to get the inputs
 	protected List<PathLabel> inputRefs;
-	protected String baseDirectory="";
+	protected String baseDirectory = "";
 
 	// components which had been externally added
 	List<JComponent> addedComponents = new ArrayList<>();
@@ -72,7 +70,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	// abstract way of reading in media
 	protected MediaManager media = DefaultMediaManager.INSTANCE;
 
-	public SelectAlgorithmAndInputPanel(int numAlgFamilies) {
+	protected SelectAlgorithmAndInputPanel( int numAlgFamilies ) {
 		super(new BorderLayout());
 		toolbar = new JToolBar();
 
@@ -83,16 +81,16 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 
 		algBoxes = new JComboBox[numAlgFamilies];
 		algCookies = new List[numAlgFamilies];
-		for( int i = 0; i < numAlgFamilies; i++ ) {
+		for (int i = 0; i < numAlgFamilies; i++) {
 			var b = algBoxes[i] = new JComboBox<>();
-			toolbar.add( b);
+			toolbar.add(b);
 			b.addActionListener(this);
 			b.setMaximumSize(b.getPreferredSize());
 			algCookies[i] = new ArrayList<>();
 		}
 
 		toolbar.add(Box.createHorizontalGlue());
-		
+
 		originalCheck = new JCheckBox("Show Input");
 		toolbar.add(originalCheck);
 		originalCheck.addActionListener(this);
@@ -108,7 +106,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 * @param fileName path to config file
 	 */
 	@Override
-	public void loadInputData(String fileName) {
+	public void loadInputData( String fileName ) {
 		Reader r = media.openFile(fileName);
 
 		List<PathLabel> refs = new ArrayList<>();
@@ -116,19 +114,18 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 			BufferedReader reader = new BufferedReader(r);
 
 			String line;
-			while( (line = reader.readLine()) != null ) {
+			while ((line = reader.readLine()) != null) {
 
-				String[]z = line.split(":");
-				String[] names = new String[z.length-1];
-				for( int i = 1; i < z.length; i++ ) {
-					names[i-1] = baseDirectory+z[i];
+				String[] z = line.split(":");
+				String[] names = new String[z.length - 1];
+				for (int i = 1; i < z.length; i++) {
+					names[i - 1] = baseDirectory + z[i];
 				}
 
-				refs.add(new PathLabel(z[0],names));
+				refs.add(new PathLabel(z[0], names));
 			}
 
 			setInputList(refs);
-
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -137,7 +134,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	/**
 	 * Sets the directory that relative references are relative too
 	 */
-	public void setBaseDirectory(String baseDirectory) {
+	public void setBaseDirectory( String baseDirectory ) {
 		this.baseDirectory = baseDirectory;
 	}
 
@@ -147,7 +144,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 * @param comp The component being added
 	 */
 	public void addToToolbar( JComponent comp ) {
-		toolbar.add(comp,1+algBoxes.length);
+		toolbar.add(comp, 1 + algBoxes.length);
 		toolbar.revalidate();
 		addedComponents.add(comp);
 	}
@@ -167,7 +164,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public void setMainGUI( final Component gui ) {
 		postAlgorithmEvents = true;
 		this.gui = gui;
-		SwingUtilities.invokeLater(() -> add(gui,BorderLayout.CENTER));
+		SwingUtilities.invokeLater(() -> add(gui, BorderLayout.CENTER));
 	}
 
 	/**
@@ -180,12 +177,12 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public void setInputImage( BufferedImage image ) {
 		inputImage = image;
 		SwingUtilities.invokeLater(() -> {
-			if( inputImage == null ) {
+			if (inputImage == null) {
 				originalCheck.setEnabled(false);
 			} else {
 				originalCheck.setEnabled(true);
 				origPanel.setImage(inputImage);
-				origPanel.setPreferredSize(new Dimension(inputImage.getWidth(),inputImage.getHeight()));
+				origPanel.setPreferredSize(new Dimension(inputImage.getWidth(), inputImage.getHeight()));
 				origPanel.repaint();
 			}
 		});
@@ -196,18 +193,17 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 *
 	 * @param inputRefs Name of input and where to get it
 	 */
-	public void setInputList(final List<PathLabel> inputRefs) {
+	public void setInputList( final List<PathLabel> inputRefs ) {
 		this.inputRefs = inputRefs;
-		
+
 		SwingUtilities.invokeLater(() -> {
-			for( int i = 0; i < inputRefs.size(); i++ ) {
+			for (int i = 0; i < inputRefs.size(); i++) {
 				imageBox.addItem(inputRefs.get(i).getLabel());
 			}
 		});
 	}
 
-
-	public void addAlgorithm(final int indexFamily, final String name, Object cookie) {
+	public void addAlgorithm( final int indexFamily, final String name, Object cookie ) {
 		algCookies[indexFamily].add(cookie);
 		SwingUtilities.invokeLater(() -> algBoxes[indexFamily].addItem(name));
 	}
@@ -215,13 +211,12 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	/**
 	 * Grabs the currently selected algorithm, passes information to GUI for updating, toggles GUI
 	 * being active/not.  refreshAll() is called in a new thread.
-	 *
 	 */
 	public void doRefreshAll() {
 		SwingUtilities.invokeLater(() -> {
 			// collect the current state inside the GUI thread
-			final Object[] state = new Object[ algCookies.length ];
-			for( int i = 0; i < state.length; i++ ) {
+			final Object[] state = new Object[algCookies.length];
+			for (int i = 0; i < state.length; i++) {
 				state[i] = algCookies[i].get(algBoxes[i].getSelectedIndex());
 			}
 			// create a new thread to process this change
@@ -239,10 +234,10 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	private void setActiveGUI( final boolean isEnabled ) {
 		SwingUtilities.invokeLater(() -> {
 			toolbar.setEnabled(isEnabled);
-			for( JComboBox<?> b : algBoxes ) {
+			for (JComboBox<?> b : algBoxes) {
 				b.setEnabled(isEnabled);
 			}
-			for( JComponent b : addedComponents ) {
+			for (JComponent b : addedComponents) {
 				b.setEnabled(isEnabled);
 			}
 			imageBox.setEnabled(isEnabled);
@@ -253,15 +248,15 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 * Returns the cookie associated with the specified algorithm family.
 	 */
 	protected <T> T getAlgorithmCookie( int indexFamily ) {
-		return (T)algCookies[indexFamily].get( algBoxes[indexFamily].getSelectedIndex() );
+		return (T)algCookies[indexFamily].get(algBoxes[indexFamily].getSelectedIndex());
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		for( int i = 0; i < algBoxes.length; i++ ) {
-			if( algBoxes[i] == e.getSource() ) {
+	public void actionPerformed( ActionEvent e ) {
+		for (int i = 0; i < algBoxes.length; i++) {
+			if (algBoxes[i] == e.getSource()) {
 				// see if its ready to start posting these events
-				if( !postAlgorithmEvents )
+				if (!postAlgorithmEvents)
 					return;
 
 				// notify the main GUI to change the input algorithm
@@ -269,19 +264,19 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 				final String name = (String)algBoxes[i].getSelectedItem();
 				final int indexFamily = i;
 
-				new Thread(() -> performSetAlgorithm(indexFamily,name, cookie)).start();
+				new Thread(() -> performSetAlgorithm(indexFamily, name, cookie)).start();
 				return;
 			}
 		}
 
-		if( e.getSource() == imageBox ) {
+		if (e.getSource() == imageBox) {
 			// notify the main GUI to change the input image
 			final String name = (String)imageBox.getSelectedItem();
 			new Thread(() -> performChangeInput(name, imageBox.getSelectedIndex())).start();
-		} else if( e.getSource() == originalCheck ) {
-			origPanel.setSize(gui.getWidth(),gui.getHeight());
+		} else if (e.getSource() == originalCheck) {
+			origPanel.setSize(gui.getWidth(), gui.getHeight());
 			// swap the main GUI with a picture of the original input image
-			if( originalCheck.isSelected() ) {
+			if (originalCheck.isSelected()) {
 				remove(gui);
 				add(origPanel);
 			} else {
@@ -293,20 +288,20 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 		}
 	}
 
-	private void performSetAlgorithm( int indexFamily , String name, Object cookie) {
+	private void performSetAlgorithm( int indexFamily, String name, Object cookie ) {
 		setActiveGUI(false);
-		setActiveAlgorithm(indexFamily, name , cookie );
+		setActiveAlgorithm(indexFamily, name, cookie);
 		setActiveGUI(true);
 	}
 
-	private void performChangeInput(String name, int index) {
+	private void performChangeInput( String name, int index ) {
 		setActiveGUI(false);
 		changeInput(name, index);
 		setActiveGUI(true);
 	}
 
 	@Override
-	public void setMediaManager( MediaManager manager) {
+	public void setMediaManager( MediaManager manager ) {
 		this.media = manager;
 	}
 
@@ -323,7 +318,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 * @param name Display name of the algorithm.
 	 * @param cookie Reference to user defined data.
 	 */
-	public abstract void setActiveAlgorithm(int indexFamily, String name, Object cookie);
+	public abstract void setActiveAlgorithm( int indexFamily, String name, Object cookie );
 
 	/**
 	 * A request to change the input image has been made.  The input image's label and its index in the
@@ -332,5 +327,5 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	 * @param name Display name of the image.
 	 * @param index Which image in the list.
 	 */
-	public abstract void changeInput(String name, int index);
+	public abstract void changeInput( String name, int index );
 }

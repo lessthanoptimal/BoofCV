@@ -70,7 +70,7 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 		int diameter = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 
 		BinaryEllipseDetectorPixel contourFinder = ellipseDetector.getEllipseDetector();
-		contourFinder.setMaximumContour((int)(Math.PI*diameter)*2);
+		contourFinder.setMaximumContour(((int)(Math.PI*diameter))*2);
 		contourFinder.setInternalContour(false);
 	}
 

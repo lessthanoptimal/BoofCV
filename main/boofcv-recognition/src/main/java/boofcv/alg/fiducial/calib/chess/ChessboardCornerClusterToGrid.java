@@ -58,7 +58,7 @@ public class ChessboardCornerClusterToGrid {
 
 	// Indicates which corners have been added to the sparse grd
 	GrowQueue_B marked = new GrowQueue_B();
-	Queue<Node> open = new LinkedList<>(); // FIFO queue
+	Queue<Node> open = new ArrayDeque<>(); // FIFO queue
 
 	// Workspace for isCornerValidOrigin
 	List<Node> edgeList = new ArrayList<>();
@@ -67,7 +67,7 @@ public class ChessboardCornerClusterToGrid {
 	List<Node> cornerList = new ArrayList<>();
 
 	// See documentation above. if true then the requirement that the (0,0) grid element be a corner is removed.
-	boolean requireCornerSquares =false;
+	boolean requireCornerSquares = false;
 
 	// Used to optionally print extra debugging information
 	PrintStream verbose;
@@ -76,7 +76,7 @@ public class ChessboardCornerClusterToGrid {
 	CheckShape checkShape;
 
 	FastQueue<GridElement> sparseGrid = new FastQueue<>(GridElement::new);
-	int sparseCols,sparseRows;
+	int sparseCols, sparseRows;
 	GridElement[] denseGrid = new GridElement[0];
 
 	/**
@@ -87,28 +87,28 @@ public class ChessboardCornerClusterToGrid {
 	 * @param info (Output) Contains ordered nodes and the grid's size.
 	 * @return true if successful or false if it failed
 	 */
-	public boolean convert( ChessboardCornerGraph cluster , GridInfo info ) {
+	public boolean convert( ChessboardCornerGraph cluster, GridInfo info ) {
 		sparseGrid.reset();
 
 		// default to an invalid value to ensure a failure doesn't go unnoticed.
 		info.reset();
 
 		// Get the edges in a consistent order
-		if( !orderEdges(cluster) )
+		if (!orderEdges(cluster))
 			return false;
 
 		// Find the grid which defines a chessboard pattern
-		if(!createSparseGrid(cluster.corners) )
+		if (!createSparseGrid(cluster.corners))
 			return false;
 		sparseToDense();
-		if( !findLargestRectangle(info)) {
+		if (!findLargestRectangle(info)) {
 			return false;
 		}
 		// Put grid elements into a specific order
 		// select a valid corner to be (0,0). If there are multiple options select the one which is
 		int corner = selectCorner(info);
-		if( corner == -1 ) {
-			if( verbose != null) verbose.println("Failed to find valid corner.");
+		if (corner == -1) {
+			if (verbose != null) verbose.println("Failed to find valid corner.");
 			return false;
 		}
 		// rotate the grid until the select corner is at (0,0)
@@ -123,7 +123,7 @@ public class ChessboardCornerClusterToGrid {
 	 * Creates a grid where a sparse data structure is used to define it. The shape and which elements
 	 * are filled in are not known initially. This is used as an intermediate step to building the dense grid
 	 */
-	boolean createSparseGrid(FastQueue<Node> corners) {
+	boolean createSparseGrid( FastQueue<Node> corners ) {
 		marked.resize(corners.size);
 		marked.fill(false);
 
@@ -138,7 +138,7 @@ public class ChessboardCornerClusterToGrid {
 		Node n = corners.get(0);
 		g.node = n;
 		g.row = g.col = 0;
-		marked.set(0,true);
+		marked.set(0, true);
 		open.add(n);
 
 		int minCol = Integer.MAX_VALUE;
@@ -146,55 +146,63 @@ public class ChessboardCornerClusterToGrid {
 		sparseCols = -1;
 		sparseRows = -1;
 
-		while( !open.isEmpty() ) {
+		while (!open.isEmpty()) {
 			n = open.remove();
 			g = sparseGrid.get(n.index);
 
 			for (int idx = 0; idx < 4; idx++) {
 				Node e = n.edges[idx];
-				if( e == null )
+				if (e == null)
 					continue;
 
 				GridElement ge = sparseGrid.get(e.index);
-				int row = g.row,col = g.col;
+				int row = g.row, col = g.col;
 
-				switch( idx ) {
-					case 0: col += 1; break;
-					case 1: row += 1; break;
-					case 2: col -= 1; break;
-					case 3: row -= 1; break;
+				switch (idx) {
+					case 0:
+						col += 1;
+						break;
+					case 1:
+						row += 1;
+						break;
+					case 2:
+						col -= 1;
+						break;
+					case 3:
+						row -= 1;
+						break;
 				}
 
-				if( !ge.isAssigned() ) {
+				if (!ge.isAssigned()) {
 					ge.node = e;
 					ge.row = row;
 					ge.col = col;
-					if( row < minRow ) minRow = row;
-					if( col < minCol ) minCol = col;
-					if( row > sparseRows ) sparseRows = row;
-					if( col > sparseCols ) sparseCols = col;
-				} else if( ge.row != row || ge.col != col ) {
-					if( verbose != null )
+					if (row < minRow) minRow = row;
+					if (col < minCol) minCol = col;
+					if (row > sparseRows) sparseRows = row;
+					if (col > sparseCols) sparseCols = col;
+				} else if (ge.row != row || ge.col != col) {
+					if (verbose != null)
 						verbose.println("Contradiction in graph found.");
 					return false;
 				}
 
-				if( !marked.get(e.index) ) {
+				if (!marked.get(e.index)) {
 					open.add(e);
-					marked.set(e.index,true);
+					marked.set(e.index, true);
 				}
 			}
 		}
 
 		// make sure all cols and rows are >= 0
-		if( minCol < 0 || minRow < 0 ) {
-			if( minRow < 0 )
+		if (minCol < 0 || minRow < 0) {
+			if (minRow < 0)
 				sparseRows += -minRow;
-			if( minCol < 0 )
+			if (minCol < 0)
 				sparseCols += -minCol;
 			for (int i = 0; i < sparseGrid.size; i++) {
 				GridElement e = sparseGrid.get(i);
-				if( !e.isAssigned() )
+				if (!e.isAssigned())
 					throw new RuntimeException("BUG! grid element not assigned");
 				e.col -= minCol;
 				e.row -= minRow;
@@ -211,9 +219,9 @@ public class ChessboardCornerClusterToGrid {
 	 */
 	void sparseToDense() {
 		int N = sparseCols*sparseRows;
-		if( denseGrid.length < N )
+		if (denseGrid.length < N)
 			denseGrid = new GridElement[N];
-		Arrays.fill(denseGrid,null);
+		Arrays.fill(denseGrid, null);
 
 		for (int i = 0; i < sparseGrid.size; i++) {
 			GridElement g = sparseGrid.get(i);
@@ -234,47 +242,47 @@ public class ChessboardCornerClusterToGrid {
 		int[] colZeros = new int[sparseCols];
 
 		for (int i = 0; i < sparseRows; i++) {
-			rowZeros[i] = countZeros(i,i+1,0,sparseCols,0,1);
+			rowZeros[i] = countZeros(i, i + 1, 0, sparseCols, 0, 1);
 		}
 		for (int i = 0; i < sparseCols; i++) {
-			colZeros[i] = countZeros(0,sparseRows,i,i+1,1,0);
+			colZeros[i] = countZeros(0, sparseRows, i, i + 1, 1, 0);
 		}
 
 		boolean success = false;
-		while( row0 < row1 && col0 < col1 ) {
-			int rz = Math.max(rowZeros[row0],rowZeros[row1-1]);
-			int cz = Math.max(colZeros[col0],colZeros[col1-1]);
+		while (row0 < row1 && col0 < col1) {
+			int rz = Math.max(rowZeros[row0], rowZeros[row1 - 1]);
+			int cz = Math.max(colZeros[col0], colZeros[col1 - 1]);
 
-			if( rz == 0 && cz == 0 ) {
+			if (rz == 0 && cz == 0) {
 				success = true;
 				break;
 			}
 
 			// prune the outside edge with the most zeros
-			if( rz > cz ) {
-				if( rowZeros[row0] > rowZeros[row1-1]) {
+			if (rz > cz) {
+				if (rowZeros[row0] > rowZeros[row1 - 1]) {
 					for (int i = col0; i < col1; i++) {
-						if( grid(row0,i) == null )
+						if (grid(row0, i) == null)
 							colZeros[i] -= 1;
 					}
 					row0 += 1;
 				} else {
 					for (int i = col0; i < col1; i++) {
-						if( grid(row1-1,i) == null )
+						if (grid(row1 - 1, i) == null)
 							colZeros[i] -= 1;
 					}
 					row1 -= 1;
 				}
 			} else {
-				if( colZeros[col0] > colZeros[col1-1]) {
+				if (colZeros[col0] > colZeros[col1 - 1]) {
 					for (int i = row0; i < row1; i++) {
-						if( grid(i,col0) == null )
+						if (grid(i, col0) == null)
 							rowZeros[i] -= 1;
 					}
 					col0 += 1;
 				} else {
 					for (int i = row0; i < row1; i++) {
-						if( grid(i,col1-1) == null )
+						if (grid(i, col1 - 1) == null)
 							rowZeros[i] -= 1;
 					}
 					col1 -= 1;
@@ -282,16 +290,16 @@ public class ChessboardCornerClusterToGrid {
 			}
 		}
 
-		if( success ) {
+		if (success) {
 			info.nodes.clear();
-			info.rows = row1-row0;
-			info.cols = col1-col0;
+			info.rows = row1 - row0;
+			info.cols = col1 - col0;
 
 			for (int row = row0; row < row1; row++) {
 				for (int col = col0; col < col1; col++) {
-					GridElement g = grid(row,col);
-					if( g == null ) {
-						if( verbose != null )
+					GridElement g = grid(row, col);
+					if (g == null) {
+						if (verbose != null)
 							verbose.println("Failed due to hole inside of grid");
 						return false;
 					}
@@ -302,10 +310,10 @@ public class ChessboardCornerClusterToGrid {
 		return success;
 	}
 
-	int countZeros( int row0 , int row1 , int col0 , int col1 , int stepRow , int stepCol ) {
+	int countZeros( int row0, int row1, int col0, int col1, int stepRow, int stepCol ) {
 		int total = 0;
-		while( row0 != row1 && col0 != col1 ) {
-			if( grid(row0,col0)== null )
+		while (row0 != row1 && col0 != col1) {
+			if (grid(row0, col0) == null)
 				total++;
 
 			row0 += stepRow;
@@ -314,8 +322,8 @@ public class ChessboardCornerClusterToGrid {
 		return total;
 	}
 
-	final GridElement grid( int row , int col ) {
-		return denseGrid[row*sparseCols+col];
+	final GridElement grid( int row, int col ) {
+		return denseGrid[row*sparseCols + col];
 	}
 
 	/**
@@ -338,15 +346,15 @@ public class ChessboardCornerClusterToGrid {
 
 			// If there are no corner points which are valid corners, then any corner can be the origin if
 			// allowNoCorner is true
-			if( corner || ( !requireCornerSquares && !bestIsCornerSquare) ) {
+			if (corner || (!requireCornerSquares && !bestIsCornerSquare)) {
 				// sanity check the shape
-				if( checkShape != null ) {
-					if( i%2==0 ) {
-						if( !checkShape.isValidShape(info.rows,info.cols)) {
+				if (checkShape != null) {
+					if (i%2 == 0) {
+						if (!checkShape.isValidShape(info.rows, info.cols)) {
 							continue;
 						}
 					} else {
-						if( !checkShape.isValidShape(info.cols,info.rows)) {
+						if (!checkShape.isValidShape(info.cols, info.rows)) {
 							continue;
 						}
 					}
@@ -355,7 +363,7 @@ public class ChessboardCornerClusterToGrid {
 				// If the distance is to (0,0) pixel is smaller or this is a corner square and the other best
 				// is not a corner square
 				double distance = n.normSq();
-				if( distance < bestScore || (!bestIsCornerSquare && corner )) {
+				if (distance < bestScore || (!bestIsCornerSquare && corner)) {
 					bestIsCornerSquare |= corner;
 					bestScore = distance;
 					bestCorner = i;
@@ -372,7 +380,7 @@ public class ChessboardCornerClusterToGrid {
 	 */
 	boolean isCornerValidOrigin( Node candidate ) {
 		candidate.putEdgesIntoList(edgeList);
-		if( edgeList.size() != 2 ) {
+		if (edgeList.size() != 2) {
 			throw new RuntimeException("BUG! Should be a corner and have two edges");
 		}
 
@@ -380,13 +388,13 @@ public class ChessboardCornerClusterToGrid {
 		Node b = edgeList.get(1);
 
 		// Find the average angle from the two vectors defined by the two connected nodes
-		double dirA = Math.atan2(a.y-candidate.y, a.x-candidate.x);
-		double dirB = Math.atan2(b.y-candidate.y, b.x-candidate.x);
+		double dirA = Math.atan2(a.y - candidate.y, a.x - candidate.x);
+		double dirB = Math.atan2(b.y - candidate.y, b.x - candidate.x);
 
-		double dirAB = UtilAngle.boundHalf(dirA+UtilAngle.distanceCCW(dirA,dirB)/2.0);
+		double dirAB = UtilAngle.boundHalf(dirA + UtilAngle.distanceCCW(dirA, dirB)/2.0);
 
 		// Find the acute angle between the corner's orientation and the vector
-		double acute = UtilAngle.distHalf(dirAB,candidate.orientation);
+		double acute = UtilAngle.distHalf(dirAB, candidate.orientation);
 
 		return acute < Math.PI/4.0;
 	}
@@ -395,54 +403,54 @@ public class ChessboardCornerClusterToGrid {
 	 * Put corners into a proper grid. Make sure its a rectangular grid or else return false. Rows and columns
 	 * are selected to ensure right hand rule.
 	 */
-	boolean orderNodes( FastQueue<Node> corners , GridInfo info ) {
+	boolean orderNodes( FastQueue<Node> corners, GridInfo info ) {
 
 		// Find a node with just two edges. This is a corner and will be the arbitrary origin in our graph
 		Node seed = null;
 		for (int i = 0; i < corners.size; i++) {
 			Node n = corners.get(i);
-			if( n.countEdges() == 2 ) {
+			if (n.countEdges() == 2) {
 				seed = n;
 				break;
 			}
 		}
-		if( seed == null ) {
-			if( verbose != null ) verbose.println("Can't find a corner with just two edges. Aborting");
+		if (seed == null) {
+			if (verbose != null) verbose.println("Can't find a corner with just two edges. Aborting");
 			return false;
 		}
 
 		// find one edge and mark that as the row direction
 		int rowEdge = 0;
-		while( seed.edges[rowEdge] == null )
-			rowEdge = (rowEdge+1)%4;
-		int colEdge = (rowEdge+1)%4;
-		while( seed.edges[colEdge] == null )
-			colEdge = (colEdge+2)%4;
+		while (seed.edges[rowEdge] == null)
+			rowEdge = (rowEdge + 1)%4;
+		int colEdge = (rowEdge + 1)%4;
+		while (seed.edges[colEdge] == null)
+			colEdge = (colEdge + 2)%4;
 
 		// if it's left handed swap the row and column direction
-		if( !isRightHanded(seed,rowEdge,colEdge)) {
+		if (!isRightHanded(seed, rowEdge, colEdge)) {
 			int tmp = rowEdge;
 			rowEdge = colEdge;
 			colEdge = tmp;
 		}
 
 		// add the corns to list in a row major order
-		while( seed != null ) {
+		while (seed != null) {
 			int before = info.nodes.size();
 			Node n = seed;
 			do {
 				info.nodes.add(n);
 				n = n.edges[colEdge];
-			} while( n != null );
+			} while (n != null);
 
 			seed = seed.edges[rowEdge];
 
-			if( info.cols == -1 ) {
+			if (info.cols == -1) {
 				info.cols = info.nodes.size();
 			} else {
-				int columnsInRow = info.nodes.size()-before;
-				if( columnsInRow != info.cols ) {
-					if( verbose != null ) verbose.println("Number of columns in each row is variable");
+				int columnsInRow = info.nodes.size() - before;
+				if (columnsInRow != info.cols) {
+					if (verbose != null) verbose.println("Number of columns in each row is variable");
 					return false;
 				}
 			}
@@ -457,14 +465,14 @@ public class ChessboardCornerClusterToGrid {
 	 * @param idxRow Index for moving up a row
 	 * @param idxCol index for moving up a column
 	 */
-	static boolean isRightHanded( Node seed , int idxRow , int idxCol ) {
+	static boolean isRightHanded( Node seed, int idxRow, int idxCol ) {
 		Node r = seed.edges[idxRow];
 		Node c = seed.edges[idxCol];
 
-		double dirRow = Math.atan2(r.y-seed.y,r.x-seed.x);
-		double dirCol = Math.atan2(c.y-seed.y,c.x-seed.x);
+		double dirRow = Math.atan2(r.y - seed.y, r.x - seed.x);
+		double dirCol = Math.atan2(c.y - seed.y, c.x - seed.x);
 
-		return UtilAngle.distanceCW(dirRow,dirCol) < Math.PI;
+		return UtilAngle.distanceCW(dirRow, dirCol) < Math.PI;
 	}
 
 	/**
@@ -478,32 +486,33 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Enforces the rule that an edge in node A has an edge in node B that points back to A at index (i+2)%4.
 	 */
-	boolean alignEdges(FastQueue<Node> corners) {
+	boolean alignEdges( FastQueue<Node> corners ) {
 		open.clear();
-		open.add( corners.get(0) );
+		open.add(corners.get(0));
 
 		marked.resize(corners.size);
 		marked.fill(false);
 
-		marked.set(corners.get(0).index,true);
+		marked.set(corners.get(0).index, true);
 
-		while( !open.isEmpty() ) {
+		while (!open.isEmpty()) {
 			Node na = open.remove();
 
 			// examine each neighbor and see the neighbor is correctly aligned
 			for (int i = 0; i < 4; i++) {
-				if( na.edges[i] == null ) {
+				if (na.edges[i] == null) {
 					continue;
 				}
 				// Compute which index should be an edge pointing back at 'na'
-				int j = (i+2)%4;
+				int j = (i + 2)%4;
 
 				Node nb = na.edges[i];
 
 				// Sanity check. If it has been marked it should be correctly aligned
-				if( marked.get(nb.index) ) {
-					if( nb.edges[j] != na ) {
-						if( verbose != null ) verbose.println("BUG! node "+nb.index+" has been processed and edge "+j+" doesn't point to node "+na.index);
+				if (marked.get(nb.index)) {
+					if (nb.edges[j] != na) {
+						if (verbose != null)
+							verbose.println("BUG! node " + nb.index + " has been processed and edge " + j + " doesn't point to node " + na.index);
 						return false;
 					}
 					continue;
@@ -512,18 +521,18 @@ public class ChessboardCornerClusterToGrid {
 				// Rotate edges
 				boolean failed = true;
 				for (int attempt = 0; attempt < 4; attempt++) {
-					if( nb.edges[j] != na ) {
+					if (nb.edges[j] != na) {
 						nb.rotateEdgesDown();
 					} else {
 						failed = false;
 						break;
 					}
 				}
-				if( failed ) {
-					if( verbose != null ) verbose.println("BUG! Can't align edges");
+				if (failed) {
+					if (verbose != null) verbose.println("BUG! Can't align edges");
 					return false;
 				}
-				marked.set(nb.index,true);
+				marked.set(nb.index, true);
 				open.add(nb);
 			}
 		}
@@ -533,7 +542,7 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Sorts edges so that they point towards nodes in an increasing counter clockwise direction
 	 */
-	void sortEdgesCCW(FastQueue<Node> corners) {
+	void sortEdgesCCW( FastQueue<Node> corners ) {
 		for (int nodeIdx = 0; nodeIdx < corners.size; nodeIdx++) {
 			Node na = corners.get(nodeIdx);
 
@@ -543,53 +552,52 @@ public class ChessboardCornerClusterToGrid {
 			for (int i = 0; i < 4; i++) {
 				order[i] = i;
 				tmpEdges[i] = na.edges[i];
-				if( na.edges[i] == null ) {
+				if (na.edges[i] == null) {
 					directions[i] = Double.MAX_VALUE;
 				} else {
 					Node nb = na.edges[i];
-					double angleB = Math.atan2(nb.y-na.y,nb.x-na.x);
-					if( Double.isNaN(ref) ) {
+					double angleB = Math.atan2(nb.y - na.y, nb.x - na.x);
+					if (Double.isNaN(ref)) {
 						ref = angleB;
 						directions[i] = 0;
 					} else {
-						directions[i] = UtilAngle.distanceCCW(ref,angleB);
+						directions[i] = UtilAngle.distanceCCW(ref, angleB);
 					}
 					count++;
 				}
 			}
 
-			sorter.sort(directions,0,4,order);
+			sorter.sort(directions, 0, 4, order);
 			for (int i = 0; i < 4; i++) {
-				na.edges[i] = tmpEdges[ order[i] ];
+				na.edges[i] = tmpEdges[order[i]];
 			}
-			if( count == 2 ) {
+			if (count == 2) {
 				// If there are only two then we define the order to be defined by the one which minimizes
 				// CCW direction
-				if( directions[order[1]] > Math.PI ) {
-					na.edges[0] = tmpEdges[ order[1] ];
-					na.edges[1] = tmpEdges[ order[0] ];
+				if (directions[order[1]] > Math.PI) {
+					na.edges[0] = tmpEdges[order[1]];
+					na.edges[1] = tmpEdges[order[0]];
 				} else {
-					na.edges[0] = tmpEdges[ order[0] ];
-					na.edges[1] = tmpEdges[ order[1] ];
+					na.edges[0] = tmpEdges[order[0]];
+					na.edges[1] = tmpEdges[order[1]];
 				}
-			} else if( count == 3 ) {
+			} else if (count == 3) {
 				// Edges need to point along the 4 possible directions, in the case of 3 edges, there might
 				// need to be a gap at a different location than at the end
 				int selected = -1;
 				double largestAngle = 0;
-				for (int i = 0,j=2; i < 3; j=i,i++) {
-					double ccw = UtilAngle.distanceCCW(directions[order[j]],directions[order[i]]);
-					if( ccw > largestAngle ) {
+				for (int i = 0, j = 2; i < 3; j = i, i++) {
+					double ccw = UtilAngle.distanceCCW(directions[order[j]], directions[order[i]]);
+					if (ccw > largestAngle) {
 						largestAngle = ccw;
 						selected = j;
 					}
 				}
 
 				for (int i = 2; i > selected; i--) {
-					na.edges[i+1] = na.edges[i];
+					na.edges[i + 1] = na.edges[i];
 				}
-				na.edges[selected+1]=null;
-
+				na.edges[selected + 1] = null;
 			}
 		}
 	}
@@ -597,11 +605,11 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Rotates the grid in the CCW direction
 	 */
-	public void rotateCCW(GridInfo grid ) {
+	public void rotateCCW( GridInfo grid ) {
 		cornerList.clear();
 		for (int col = 0; col < grid.cols; col++) {
 			for (int row = 0; row < grid.rows; row++) {
-				cornerList.add(grid.get(row,grid.cols - col - 1));
+				cornerList.add(grid.get(row, grid.cols - col - 1));
 			}
 		}
 		int tmp = grid.rows;
@@ -612,11 +620,11 @@ public class ChessboardCornerClusterToGrid {
 		grid.nodes.addAll(cornerList);
 	}
 
-	public void setVerbose(PrintStream verbose) {
+	public void setVerbose( PrintStream verbose ) {
 		this.verbose = verbose;
 	}
 
-	public void setCheckShape(CheckShape checkShape) {
+	public void setCheckShape( CheckShape checkShape ) {
 		this.checkShape = checkShape;
 	}
 
@@ -624,14 +632,14 @@ public class ChessboardCornerClusterToGrid {
 		return requireCornerSquares;
 	}
 
-	public void setRequireCornerSquares(boolean requireCornerSquares) {
+	public void setRequireCornerSquares( boolean requireCornerSquares ) {
 		this.requireCornerSquares = requireCornerSquares;
 	}
 
 	public static class GridElement {
 		public Node node;
-		public int row,col;
-		public int rowLength,colLength;
+		public int row, col;
+		public int rowLength, colLength;
 
 		public boolean isAssigned() {
 			return row != Integer.MAX_VALUE;
@@ -640,15 +648,14 @@ public class ChessboardCornerClusterToGrid {
 		public void reset() {
 			node = null;
 			rowLength = colLength = -1;
-			row=Integer.MAX_VALUE;
-			col=Integer.MAX_VALUE;
+			row = Integer.MAX_VALUE;
+			col = Integer.MAX_VALUE;
 		}
 	}
 
-
 	public static class GridInfo {
 		public List<Node> nodes = new ArrayList<>();
-		public int rows,cols;
+		public int rows, cols;
 
 		/**
 		 * Indicates if there are no "corner" corner points. See class JavaDoc.
@@ -662,26 +669,25 @@ public class ChessboardCornerClusterToGrid {
 			nodes.clear();
 		}
 
-		public Node get( int row , int col ) {
-			return nodes.get( row*cols + col);
+		public Node get( int row, int col ) {
+			return nodes.get(row*cols + col);
 		}
 
 		public void lookupGridCorners( List<Node> corners ) {
 			corners.clear();
-			corners.add( this.nodes.get(0) );
-			corners.add( this.nodes.get(cols-1) );
-			corners.add( this.nodes.get(rows*cols-1) );
-			corners.add( this.nodes.get((rows-1)*cols) );
+			corners.add(this.nodes.get(0));
+			corners.add(this.nodes.get(cols - 1));
+			corners.add(this.nodes.get(rows*cols - 1));
+			corners.add(this.nodes.get((rows - 1)*cols));
 
-			for (int i = 3; i >= 0; i-- ) {
-				if( corners.get(i).countEdges() != 2 )
+			for (int i = 3; i >= 0; i--) {
+				if (corners.get(i).countEdges() != 2)
 					corners.remove(i);
 			}
 		}
 	}
 
-	public interface CheckShape
-	{
-		boolean isValidShape( int rows , int cols );
+	public interface CheckShape {
+		boolean isValidShape( int rows, int cols );
 	}
 }

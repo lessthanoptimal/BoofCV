@@ -63,7 +63,6 @@ import java.util.List;
 /**
  * Visualizes data from
  *
- *
  * @author Peter Abeles
  */
 
@@ -77,8 +76,7 @@ import java.util.List;
 // TODO Add log to file option for location and 3D cloud
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class VisualizeDepthVisualOdometryApp
-		extends DemonstrationBase implements VisualOdometryPanel2.Listener, ActionListener
-{
+		extends DemonstrationBase implements VisualOdometryPanel2.Listener, ActionListener {
 	VisualOdometryPanel2 statusPanel;
 	VisualOdometryAlgorithmPanel algorithmPanel;
 	VisualOdometryFeatureTrackerPanel featurePanel;
@@ -103,7 +101,7 @@ public class VisualizeDepthVisualOdometryApp
 	int numTracks;
 	int numInliers;
 	double fractionInBounds;
-	int whichAlg=-1;
+	int whichAlg = -1;
 
 	AlgType algType = AlgType.UNKNOWN;
 
@@ -118,15 +116,15 @@ public class VisualizeDepthVisualOdometryApp
 	protected VisualDepthParameters config;
 	JComboBox<String> selectAlgorithm;
 
-	public VisualizeDepthVisualOdometryApp(List<PathLabel> examples ) {
-		super(true,false,examples);
+	public VisualizeDepthVisualOdometryApp( List<PathLabel> examples ) {
+		super(true, false, examples);
 
 
 		selectAlgorithm = new JComboBox<>();
-		selectAlgorithm.addItem( "Single P3P : KLT" );
-		selectAlgorithm.addItem( "Single P3P : ST-BRIEF" );
-		selectAlgorithm.addItem( "Single P3P : ST-SURF-KLT" );
-		selectAlgorithm.addItem( "Direct" );
+		selectAlgorithm.addItem("Single P3P : KLT");
+		selectAlgorithm.addItem("Single P3P : ST-BRIEF");
+		selectAlgorithm.addItem("Single P3P : ST-SURF-KLT");
+		selectAlgorithm.addItem("Direct");
 
 		selectAlgorithm.addActionListener(this);
 		selectAlgorithm.setMaximumSize(selectAlgorithm.getPreferredSize());
@@ -158,7 +156,7 @@ public class VisualizeDepthVisualOdometryApp
 	}
 
 	@Override
-	public void openFile(File file) {
+	public void openFile( File file ) {
 		inputFilePath = file.getPath();
 
 		Reader r = media.openFile(file.getPath());
@@ -171,15 +169,15 @@ public class VisualizeDepthVisualOdometryApp
 			String line2 = in.readLine();
 
 			// adjust for relative paths
-			if( lineConfig.charAt(0) != '/' )
-				lineConfig = path+"/"+lineConfig;
-			if( line1.charAt(0) != '/' )
-				line1 = path+"/"+line1;
-			if( line2.charAt(0) != '/' )
-				line2 = path+"/"+line2;
+			if (lineConfig.charAt(0) != '/')
+				lineConfig = path + "/" + lineConfig;
+			if (line1.charAt(0) != '/')
+				line1 = path + "/" + line1;
+			if (line2.charAt(0) != '/')
+				line2 = path + "/" + line2;
 
 			config = CalibrationIO.load(media.openFile(lineConfig));
-			openVideo(false,line1,line2);
+			openVideo(false, line1, line2);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -191,15 +189,15 @@ public class VisualizeDepthVisualOdometryApp
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
-		if( source != 0 )
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
+		if (source != 0)
 			return;
 
 		fps = -1;
 		numFaults = 0;
 		frameNumber = 0;
 		alg.reset();
-		alg.setCalibration(config.visualParam,new DoNothing2Transform2_F32());
+		alg.setCalibration(config.visualParam, new DoNothing2Transform2_F32());
 
 		statusPanel.reset();
 
@@ -210,71 +208,71 @@ public class VisualizeDepthVisualOdometryApp
 		guiCam3D.setFocalLength(config.visualParam.fx);
 		guiCam3D.setPreferredSize(new Dimension(config.visualParam.width, config.visualParam.height));
 
-		viewPanel.setPreferredSize(new Dimension(width*2+20, height));
+		viewPanel.setPreferredSize(new Dimension(width*2 + 20, height));
 		viewPanel.setDividerLocation(width);
 		viewPanel.setMaximumSize(viewPanel.getPreferredSize());
 	}
 
 	@Override
-	protected void handleInputClose(int source) {
-		if( source != 0 )
+	protected void handleInputClose( int source ) {
+		if (source != 0)
 			return;
 		handleRunningStatus(Status.FINISHED);
 	}
 
-	private void drawFeatures(AccessPointTracks3D tracker , BufferedImage image )  {
+	private void drawFeatures( AccessPointTracks3D tracker, BufferedImage image ) {
 
-		numInliers=0;
+		numInliers = 0;
 
 		Graphics2D g2 = image.createGraphics();
 
 		List<Point2D_F64> points = tracker.getAllTracks(null);
 
-		if( points.size() == 0 )
+		if (points.size() == 0)
 			return;
 
-		double[] ranges = new double[points.size() ];
+		double[] ranges = new double[points.size()];
 
 		Point3D_F64 world = new Point3D_F64();
-		for( int i = 0; i < points.size(); i++ ) {
-			tracker.getTrackWorld3D(i,world);
+		for (int i = 0; i < points.size(); i++) {
+			tracker.getTrackWorld3D(i, world);
 			ranges[i] = world.z;
 		}
 		Arrays.sort(ranges);
 		double maxRange = ranges[(int)(ranges.length*0.8)];
 
 		// Attempt to set the step size dynamically based on the scale of the scene
-		if( points.size() > 0 && guiCam3D.getStepSize() == 0.0 ) {
+		if (points.size() > 0 && guiCam3D.getStepSize() == 0.0) {
 			guiCam3D.setStepSize(0.02*ranges[(int)(ranges.length*0.5)]);
 		}
 
 
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			Point2D_F64 pixel = points.get(i);
 
-			if( showTracks && tracker.isTrackNew(i) ) {
-				VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,Color.GREEN);
+			if (showTracks && tracker.isTrackNew(i)) {
+				VisualizeFeatures.drawPoint(g2, (int)pixel.x, (int)pixel.y, 3, Color.GREEN);
 				continue;
 			}
 
-			if( tracker.isTrackInlier(i) ) {
-				if( showInliers )
-					VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,7,Color.BLUE,false);
+			if (tracker.isTrackInlier(i)) {
+				if (showInliers)
+					VisualizeFeatures.drawPoint(g2, (int)pixel.x, (int)pixel.y, 7, Color.BLUE, false);
 				numInliers++;
 			}
 
-			if( !showTracks )
+			if (!showTracks)
 				continue;
 
-			tracker.getTrackWorld3D(i,world);
+			tracker.getTrackWorld3D(i, world);
 			double r = world.z/maxRange;
-			if( r < 0 ) r = 0;
-			else if( r > 1 ) r = 1;
+			if (r < 0) r = 0;
+			else if (r > 1) r = 1;
 
 			int color = (255 << 16) | ((int)(255*r) << 8);
 
 
-			VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,new Color(color));
+			VisualizeFeatures.drawPoint(g2, (int)pixel.x, (int)pixel.y, 3, new Color(color));
 		}
 
 		numTracks = points.size();
@@ -287,32 +285,32 @@ public class VisualizeDepthVisualOdometryApp
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-		if( sourceID == 0 ) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
+		if (sourceID == 0) {
 			imageRGB = input;
 			bufferedRGB = buffered;
-		} else if( sourceID == 1 ) {
+		} else if (sourceID == 1) {
 			imageDepth = (GrayU16)input;
 			frameNumber++;
 
 			long before = System.nanoTime();
-			noFault = alg.process(imageRGB,imageDepth);
+			noFault = alg.process(imageRGB, imageDepth);
 			long after = System.nanoTime();
-			double elapsed = (after-before)/1e9;
+			double elapsed = (after - before)/1e9;
 
-			if( fps < 0 ) {
+			if (fps < 0) {
 				fps = 1.0/elapsed;
 			} else {
 				double lambda = 0.95;
-				fps = lambda*fps + (1.0-lambda)*(1.0/elapsed);
+				fps = lambda*fps + (1.0 - lambda)*(1.0/elapsed);
 			}
 
-			if( !noFault ) {
+			if (!noFault) {
 				alg.reset();
 				guiCam3D.init();
 			}
 
-			if( frameNumber-1 == statusPanel.getStopFrame()) {
+			if (frameNumber - 1 == statusPanel.getStopFrame()) {
 				streamPaused = true;
 			}
 
@@ -321,7 +319,7 @@ public class VisualizeDepthVisualOdometryApp
 	}
 
 	protected void updateGUI() {
-		if( !noFault) {
+		if (!noFault) {
 			numFaults++;
 			return;
 		}
@@ -329,13 +327,14 @@ public class VisualizeDepthVisualOdometryApp
 		showTracks = statusPanel.isShowAll();
 		showInliers = statusPanel.isShowInliers();
 
-		if( renderedDepth == null ) {
-			renderedDepth = new BufferedImage(imageDepth.width,imageDepth.height,BufferedImage.TYPE_INT_RGB);
+		if (renderedDepth == null) {
+			renderedDepth = new BufferedImage(imageDepth.width, imageDepth.height, BufferedImage.TYPE_INT_RGB);
 		}
 
 		switch (algType) {
-			case FEATURE -> drawFeatures((AccessPointTracks3D) alg, bufferedRGB);
-			case DIRECT -> fractionInBounds = ((PyramidDirectColorDepth_to_DepthVisualOdometry) alg).getFractionInBounds();
+			case FEATURE -> drawFeatures((AccessPointTracks3D)alg, bufferedRGB);
+			case DIRECT -> fractionInBounds = ((PyramidDirectColorDepth_to_DepthVisualOdometry)alg).getFractionInBounds();
+			default -> {}
 		}
 
 		final Se3_F64 leftToWorld = ((Se3_F64)alg.getCameraToWorld()).copy();
@@ -343,53 +342,51 @@ public class VisualizeDepthVisualOdometryApp
 		// TODO magic value from kinect.  Add to config file?
 		VisualizeImageData.disparity(imageDepth, renderedDepth, 10000, 0);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				guiLeft.setImage(bufferedRGB);
-				guiDepth.setImage(renderedDepth);
-				guiLeft.autoSetPreferredSize();
-				guiDepth.autoSetPreferredSize();
-				guiLeft.repaint();
-				guiDepth.repaint();
+		SwingUtilities.invokeLater(() -> {
+			guiLeft.setImage(bufferedRGB);
+			guiDepth.setImage(renderedDepth);
+			guiLeft.autoSetPreferredSize();
+			guiDepth.autoSetPreferredSize();
+			guiLeft.repaint();
+			guiDepth.repaint();
 
-				statusPanel.setCameraToWorld(leftToWorld);
-				statusPanel.setNumFaults(numFaults);
+			statusPanel.setCameraToWorld(leftToWorld);
+			statusPanel.setNumFaults(numFaults);
 
-				statusPanel.setFps(fps);
-				statusPanel.setFrameNumber(frameNumber-1);
+			statusPanel.setFps(fps);
+			statusPanel.setFrameNumber(frameNumber - 1);
 
-				statusPanel.setPaused(streamPaused);
+			statusPanel.setPaused(streamPaused);
 
-				switch (algType) {
-					case FEATURE -> {
-						featurePanel.setNumTracks(numTracks);
-						featurePanel.setNumInliers(numInliers);
-					}
-					case DIRECT -> {
-						directPanel.setInBounds(fractionInBounds);
-					}
+			switch (algType) {
+				case FEATURE -> {
+					featurePanel.setNumTracks(numTracks);
+					featurePanel.setNumInliers(numInliers);
 				}
+				case DIRECT -> {
+					directPanel.setInBounds(fractionInBounds);
+				}
+				default -> {}
 			}
 		});
 
 		double r = 0.15;
 
-		Point3D_F64 p1 = new Point3D_F64(-r,-r,0);
-		Point3D_F64 p2 = new Point3D_F64(r,-r,0);
-		Point3D_F64 p3 = new Point3D_F64(r,r,0);
-		Point3D_F64 p4 = new Point3D_F64(-r,r,0);
+		Point3D_F64 p1 = new Point3D_F64(-r, -r, 0);
+		Point3D_F64 p2 = new Point3D_F64(r, -r, 0);
+		Point3D_F64 p3 = new Point3D_F64(r, r, 0);
+		Point3D_F64 p4 = new Point3D_F64(-r, r, 0);
 
-		SePointOps_F64.transform(leftToWorld,p1,p1);
-		SePointOps_F64.transform(leftToWorld,p2,p2);
-		SePointOps_F64.transform(leftToWorld,p3,p3);
-		SePointOps_F64.transform(leftToWorld,p4,p4);
+		SePointOps_F64.transform(leftToWorld, p1, p1);
+		SePointOps_F64.transform(leftToWorld, p2, p2);
+		SePointOps_F64.transform(leftToWorld, p3, p3);
+		SePointOps_F64.transform(leftToWorld, p4, p4);
 
-		guiCam3D.add(p1,p2,p3,p4);
+		guiCam3D.add(p1, p2, p3, p4);
 		guiCam3D.repaint();
 	}
 
-
-	private void changeSelectedAlgortihm(int whichAlg ) {
+	private void changeSelectedAlgortihm( int whichAlg ) {
 
 		this.whichAlg = whichAlg;
 		AlgType prevAlgType = this.algType;
@@ -429,7 +426,7 @@ public class VisualizeDepthVisualOdometryApp
 			configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 
-			PointTracker tracker = FactoryPointTracker.tracker(configTracker,imageType, derivType);
+			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
 //			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600, 3, 1);
@@ -444,7 +441,7 @@ public class VisualizeDepthVisualOdometryApp
 			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 			configTracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 
-			PointTracker tracker = FactoryPointTracker.tracker(configTracker,imageType, derivType);
+			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 
 			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
@@ -457,7 +454,7 @@ public class VisualizeDepthVisualOdometryApp
 			configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 			configTracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
 
-			PointTracker tracker = FactoryPointTracker.tracker(configTracker,imageType, derivType);
+			PointTracker tracker = FactoryPointTracker.tracker(configTracker, imageType, derivType);
 
 			alg = FactoryVisualOdometry.depthDepthPnP(configVO, sparseDepth, tracker, imageType, GrayU16.class);
 
@@ -472,7 +469,7 @@ public class VisualizeDepthVisualOdometryApp
 		} else if (whichAlg == 3) {
 			algType = AlgType.DIRECT;
 			alg = FactoryVisualOdometry.
-					depthDirect(sparseDepth, ImageType.pl(3,GrayF32.class), GrayU16.class);
+					depthDirect(sparseDepth, ImageType.pl(3, GrayF32.class), GrayU16.class);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
@@ -492,10 +489,10 @@ public class VisualizeDepthVisualOdometryApp
 			mainPanel.invalidate();
 		}
 
-		setImageTypes(alg.getVisualType(),ImageType.single(alg.getDepthType()));
+		setImageTypes(alg.getVisualType(), ImageType.single(alg.getDepthType()));
 	}
 
-	protected void handleRunningStatus(Status status) {
+	protected void handleRunningStatus( Status status ) {
 		final String text;
 		final Color color = switch (status) {
 			case RUNNING -> Color.BLACK;
@@ -516,17 +513,16 @@ public class VisualizeDepthVisualOdometryApp
 	}
 
 	@Override
-	public void eventVoPanel(final int view) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if( view == 0 ) {
-					viewPanel.setRightComponent(guiDepth);
-				} else {
-					viewPanel.setRightComponent(guiCam3D);
-				}
-				viewPanel.revalidate();
-				viewPanel.repaint();
-			}});
+	public void eventVoPanel( final int view ) {
+		SwingUtilities.invokeLater(() -> {
+			if (view == 0) {
+				viewPanel.setRightComponent(guiDepth);
+			} else {
+				viewPanel.setRightComponent(guiCam3D);
+			}
+			viewPanel.revalidate();
+			viewPanel.repaint();
+		});
 	}
 
 	@Override
@@ -536,7 +532,7 @@ public class VisualizeDepthVisualOdometryApp
 
 	@Override
 	public void handleStep() {
-		if( streamPaused ) {
+		if (streamPaused) {
 			streamPaused = false;
 		}
 		streamStepCounter = 1;
@@ -548,13 +544,13 @@ public class VisualizeDepthVisualOdometryApp
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() != selectAlgorithm )
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() != selectAlgorithm)
 			return;
 
 		int which = selectAlgorithm.getSelectedIndex();
 
-		if( which == whichAlg )
+		if (which == whichAlg)
 			return;
 
 		stopAllInputProcessing();
@@ -562,22 +558,20 @@ public class VisualizeDepthVisualOdometryApp
 		reprocessInput();
 	}
 
-	enum Status
-	{
+	enum Status {
 		RUNNING,
 		PAUSED,
 		FINISHED,
 		UNKNOWN
 	}
 
-	enum AlgType
-	{
+	enum AlgType {
 		UNKNOWN,
 		FEATURE,
 		DIRECT
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 
 //		List<PathLabel> inputs = new ArrayList<>();
 //		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));
@@ -594,7 +588,7 @@ public class VisualizeDepthVisualOdometryApp
 		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));
 		inputs.add(new PathLabel("Hallway", UtilIO.pathExample("kinect/straight/config.txt")));
 
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			var app = new VisualizeDepthVisualOdometryApp(inputs);
 
 			// Processing time takes a bit so don't open right away

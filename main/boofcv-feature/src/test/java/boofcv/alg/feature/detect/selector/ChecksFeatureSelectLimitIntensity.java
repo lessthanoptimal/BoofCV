@@ -24,6 +24,7 @@ import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +39,9 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 
 	Random rand = BoofTesting.createRandom(0);
 
+	// the width and height passed in to the algorithm will depend on intensity being null. If it is not null then
+	// -1 is passed in since it should be ignored and if it's not it should blow up. Otherwise the true values
+	// are passed in
 	int width=30;
 	int height=20;
 	GrayF32 intensity = new GrayF32(width,height);
@@ -62,7 +66,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
-			alg.select(intensity, -1, -1, count==0,null,detected,30,found);
+			alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, count==0,null,detected,30,found);
 
 			// partial check to make sure the input wasn't modified
 			assertEquals(15, detected.size);
@@ -87,7 +91,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 
 		for (int count = 0; count < 2; count++) {
 			FastQueue<Point> detected = createRandom(30);
-			alg.select(intensity, -1, -1, count==0,prior,detected,22,found);
+			alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, count==0,prior,detected,22,found);
 
 			// partial check to make sure the input wasn't modified
 			assertEquals(20, prior.size);
@@ -111,10 +115,10 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
 
-		alg.select(intensity, -1, -1, true,prior,createRandom(15),30,found);
-		alg.select(intensity, -1, -1, true,prior,createRandom(15),10,found);
-		alg.select(intensity, -1, -1, true,null,createRandom(15),30,found);
-		alg.select(intensity, -1, -1, true,null,createRandom(15),10,found);
+		alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, true,prior,createRandom(15),30,found);
+		alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, true,prior,createRandom(15),10,found);
+		alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, true,null,createRandom(15),30,found);
+		alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, true,null,createRandom(15),10,found);
 	}
 
 	protected abstract FastQueue<Point> createRandom(int i2);
@@ -133,6 +137,55 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> {
 			}
 			return detected;
 		}
+	}
+
+	/**
+	 * There is no input image any more. See if everything goes smoothly.
+	 */
+	public static abstract class NoImage extends ChecksFeatureSelectLimitIntensity<IntensityPoint> {
+		@BeforeEach
+		@Override
+		public void setup() {
+			intensity = null;
+		}
+
+		@Override
+		public FastArray<IntensityPoint> createArray() {
+			return new FastArray<>(IntensityPoint.class);
+		}
+
+		@Override
+		protected FastQueue<IntensityPoint> createRandom(int i2) {
+			FastQueue<IntensityPoint> detected = new FastQueue<>(IntensityPoint::new);
+			for (int i = 0; i < i2; i++) {
+				IntensityPoint p = detected.grow();
+				p.p.x = (short)rand.nextInt(width);
+				p.p.y = (short)rand.nextInt(height);
+				p.intensity = rand.nextFloat()*10;
+			}
+			return detected;
+		}
+	}
+
+	protected static class SampleIntensityPoint implements SampleIntensity<IntensityPoint> {
+
+		@Override public float sample( @Nullable GrayF32 intensity, int index, IntensityPoint p ) {
+			return p.intensity;
+		}
+
+		@Override public int getX( IntensityPoint p ) {
+			return p.p.x;
+		}
+
+		@Override public int getY( IntensityPoint p ) {
+			return p.p.y;
+		}
+	}
+
+	protected static class IntensityPoint
+	{
+		public Point2D_I16 p = new Point2D_I16();
+		public float intensity;
 	}
 
 }

@@ -42,11 +42,11 @@ public class FilterImageReflection<Input extends ImageGray<Input>, Output extend
 	int borderY;
 	boolean outsideZero;
 
-	public FilterImageReflection(Class owner, String methodName, int borderX, int borderY, Class<Input> inputType, Class<Output> outputType) {
+	public FilterImageReflection( Class owner, String methodName, int borderX, int borderY, Class<Input> inputType, Class<Output> outputType ) {
 		try {
 			this.m = BoofTesting.findMethod(owner, methodName, inputType, outputType);
-		} catch( RuntimeException e ) {
-			this.m = BoofTesting.findMethod(owner, methodName, inputType,int.class, outputType);
+		} catch (RuntimeException e) {
+			this.m = BoofTesting.findMethod(owner, methodName, inputType, int.class, outputType);
 		}
 		this.inputType = inputType;
 		this.outputType = outputType;
@@ -54,14 +54,14 @@ public class FilterImageReflection<Input extends ImageGray<Input>, Output extend
 		this.borderY = borderY;
 
 		// sanity check
-		Class param[] = m.getParameterTypes();
-		if (param.length != 2 && param.length != 3 )
+		Class[] param = m.getParameterTypes();
+		if (param.length != 2 && param.length != 3)
 			throw new IllegalArgumentException("Input method must have two or three inputs");
-		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[0]))
-			throw new IllegalArgumentException("TWo input parameters must be of type ImageGray");
+		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[param.length-1]))
+			throw new IllegalArgumentException("Two input parameters must be of type ImageGray");
 	}
 
-	public FilterImageReflection(Method m, int borderX, int borderY, Class<Input> inputType, Class<Output> outputType) {
+	public FilterImageReflection( Method m, int borderX, int borderY, Class<Input> inputType, Class<Output> outputType ) {
 		this.m = m;
 		this.inputType = inputType;
 		this.outputType = outputType;
@@ -69,23 +69,23 @@ public class FilterImageReflection<Input extends ImageGray<Input>, Output extend
 		this.borderY = borderY;
 
 		// sanity check
-		Class param[] = m.getParameterTypes();
-		if (param.length != 2 && param.length != 3 )
+		Class[] param = m.getParameterTypes();
+		if (param.length != 2 && param.length != 3)
 			throw new IllegalArgumentException("Input method must have two or three inputs");
-		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[0]))
-			throw new IllegalArgumentException("TWo input parameters must be of type ImageGray");
+		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[param.length-1]))
+			throw new IllegalArgumentException("Two input parameters must be of type ImageGray");
 	}
 
 	@Override
-	public void process(Input input, Output output) {
+	public void process( Input input, Output output ) {
 		if (input == null)
 			throw new IllegalArgumentException("Input parameter is null");
 		if (output == null)
 			throw new IllegalArgumentException("Output parameter is null");
 
 		try {
-			if( m.getParameterTypes().length == 3 ) {
-				m.invoke(null, input, 1 , output);
+			if (m.getParameterTypes().length == 3) {
+				m.invoke(null, input, 1, output);
 			} else {
 				m.invoke(null, input, output);
 			}

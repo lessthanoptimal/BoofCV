@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 
 /**
@@ -32,14 +31,14 @@ import boofcv.abst.geo.bundle.SceneStructureProjective;
  * </pre>
  * @author Peter Abeles
  */
-public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC.Codec<SceneStructureProjective>
+public class CodecSceneStructureProjective implements BundleAdjustmentSchur.Codec<SceneStructureProjective>
 {
 	@Override
 	public void decode(double[] input , SceneStructureProjective structure ) {
 		int index = 0;
 
 		for (int i = 0; i < structure.points.size; i++) {
-			SceneStructureMetric.Point p = structure.points.data[i];
+			SceneStructureCommon.Point p = structure.points.data[i];
 			p.coordinate[0] = input[index++];
 			p.coordinate[1] = input[index++];
 			p.coordinate[2] = input[index++];
@@ -71,7 +70,7 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC
 		int index = 0;
 
 		for (int i = 0; i < structure.points.size; i++) {
-			SceneStructureMetric.Point p = structure.points.data[i];
+			SceneStructureCommon.Point p = structure.points.data[i];
 			output[index++] = p.coordinate[0];
 			output[index++] = p.coordinate[1];
 			output[index++] = p.coordinate[2];

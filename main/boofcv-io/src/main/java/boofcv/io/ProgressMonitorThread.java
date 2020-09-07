@@ -24,23 +24,27 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 public abstract class ProgressMonitorThread extends Thread {
-	
+
 	volatile boolean active = true;
-	
+
 	public ProgressMonitor monitor;
 
-	protected ProgressMonitorThread(ProgressMonitor monitor) {
+	protected ProgressMonitorThread( ProgressMonitor monitor ) {
 		this.monitor = monitor;
 	}
 
+	@Override
 	public synchronized void run() {
-		while( active ) {
+		while (active) {
 			doRun();
-			try { wait(200); } catch (InterruptedException ignored) {}
+			try {
+				wait(200);
+			} catch (InterruptedException ignored) {
+			}
 		}
 		SwingUtilities.invokeLater(() -> monitor.close());
 	}
-	
+
 	public abstract void doRun();
 
 	public void stopThread() {

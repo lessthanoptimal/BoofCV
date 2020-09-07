@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,11 +48,7 @@ public class GenerateGrowBorderSB extends CodeGeneratorBase {
 				"/**\n" +
 				" * Implementations of {@link GrowBorder} for single band images.\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBorder<T,PixelArray>\n" +
 				"{\n" +
 				"\tabstract class SB_I_S32<T extends GrayI<T>,PixelArray> implements GrowBorderSB<T,PixelArray> {\n" +

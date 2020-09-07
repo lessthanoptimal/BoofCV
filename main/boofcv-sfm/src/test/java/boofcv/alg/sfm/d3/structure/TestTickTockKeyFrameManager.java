@@ -95,6 +95,7 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 	 * Tell it there are two new frames and see if it discard that many
 	 */
 	@Test
+	@Override
 	void discardMultipleNewFrames() {
 		var tracker = new DummyTracker();
 		VisOdomBundleAdjustment<BTrack> scene = createScene();

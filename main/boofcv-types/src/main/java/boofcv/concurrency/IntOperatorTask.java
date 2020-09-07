@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.concurrency;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 import java.util.concurrent.ForkJoinTask;
 
 /**
@@ -30,12 +33,12 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 	final IntProducerNumber consumer;
 
 	boolean master = true;
-	Number result;
+	Number result = Double.NaN;
 	Class primitiveType;
 
-	IntOperatorTask next = null;
+	@Nullable IntOperatorTask next = null;
 
-	public IntOperatorTask(int value , int max ,
+	protected IntOperatorTask(int value , int max ,
 						   Class primitiveType,
 						   IntProducerNumber consumer ) {
 		this.value = value;
@@ -68,6 +71,7 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 					root = child;
 					previous = child;
 				} else {
+					Objects.requireNonNull(previous); // it can't be null, IntelliJ figured that out but NullAway...
 					previous.next = child;
 					previous = child;
 				}

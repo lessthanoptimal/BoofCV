@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ abstract class GenericOrientationTests<T extends ImageGray<T>> {
 	protected Class<T> imageType;
 	private RegionOrientation alg;
 
-	public GenericOrientationTests(Class<T> imageType ) {
+	protected GenericOrientationTests( Class<T> imageType ) {
 		this.imageType = imageType;
 	}
 
@@ -46,27 +46,27 @@ abstract class GenericOrientationTests<T extends ImageGray<T>> {
 		this.alg = alg;
 	}
 
-	protected abstract void setImage( RegionOrientation alg , T image );
+	protected abstract void setImage( RegionOrientation alg, T image );
 
 	@Test
 	protected void copy() {
-		T input = GeneralizedImageOps.createSingleBand(imageType,50,60);
+		T input = GeneralizedImageOps.createSingleBand(imageType, 50, 60);
 		int min = input.getImageType().getDataType().isSigned() ? -50 : 0;
 		int max = 50;
-		GImageMiscOps.fillUniform(input,rand,min,max);
+		GImageMiscOps.fillUniform(input, rand, min, max);
 
 		RegionOrientation copy = alg.copy();
 
-		setImage(alg,input);
-		setImage(copy,input);
+		setImage(alg, input);
+		setImage(copy, input);
 
 		for (int i = 0; i < 4; i++) {
-			int x = 15 + i * 5;
+			int x = 15 + i*5;
 			for (int j = 0; j < 4; j++) {
-				int y = 17 + i * 5;
+				int y = 17 + i*5;
 
-				double expected = alg.compute(x,y);
-				double found = copy.compute(x,y);
+				double expected = alg.compute(x, y);
+				double found = copy.compute(x, y);
 
 				assertEquals(expected, found, UtilEjml.TEST_F64);
 			}

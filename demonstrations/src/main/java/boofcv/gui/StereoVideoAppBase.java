@@ -20,6 +20,7 @@ package boofcv.gui;
 
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -54,7 +55,7 @@ public abstract class StereoVideoAppBase <I extends ImageGray<I>>
 
 	protected Class<I> imageType;
 
-	public StereoVideoAppBase(int numAlgFamilies, Class<I> imageType) {
+	protected StereoVideoAppBase(int numAlgFamilies, Class<I> imageType) {
 		super(numAlgFamilies);
 
 		this.imageType = imageType;
@@ -121,7 +122,7 @@ public abstract class StereoVideoAppBase <I extends ImageGray<I>>
 	protected void stopWorker() {
 		requestStop = true;
 		while( isRunning ) {
-			Thread.yield();
+			BoofMiscOps.sleep(10);
 		}
 		requestStop = false;
 	}

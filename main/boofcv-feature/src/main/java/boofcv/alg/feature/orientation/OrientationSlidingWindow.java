@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * <p>
  * Estimates the orientation by sliding window across all angles.  All pixels which are pointing
@@ -42,8 +41,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
-		implements OrientationGradient<D>
-{
+		implements OrientationGradient<D> {
 	// The actual radius being sampled in pixels
 	protected int pixelRadius;
 	// The requested object radius
@@ -65,7 +63,7 @@ public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
 	// the size of the window it will consider
 	protected double windowSize;
 	// the angle each pixel is pointing
-	protected double angles[];
+	protected double[] angles;
 
 	// if it uses weights or not
 	protected boolean isWeighted;
@@ -80,7 +78,7 @@ public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
 	 * @param windowSize Number of radians in the window being considered.
 	 * @param isWeighted Should points be weighted using a Gaussian kernel.
 	 */
-	public OrientationSlidingWindow( double objectRadiusToScale, int numAngles , double windowSize , boolean isWeighted ) {
+	protected OrientationSlidingWindow( double objectRadiusToScale, int numAngles, double windowSize, boolean isWeighted ) {
 		this.objectRadiusToScale = objectRadiusToScale;
 		this.numAngles = numAngles;
 		this.windowSize = windowSize;
@@ -92,41 +90,41 @@ public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
 	}
 
 	@Override
-	public void setObjectRadius(double objRadius) {
+	public void setObjectRadius( double objRadius ) {
 		this.objRadius = objRadius;
 		pixelRadius = (int)Math.ceil(objRadius*objectRadiusToScale);
-		if( isWeighted ) {
-			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1, pixelRadius);
+		if (isWeighted) {
+			weights = FactoryKernelGaussian.gaussian(2, true, 32, -1, pixelRadius);
 		}
-		int w = pixelRadius*2+1;
-		angles = new double[ w*w ];
+		int w = pixelRadius*2 + 1;
+		angles = new double[w*w];
 	}
 
 	@Override
-	public void setImage( D derivX, D derivY) {
-		InputSanityCheck.checkSameShape(derivX,derivY);
+	public void setImage( D derivX, D derivY ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
 
 		this.derivX = derivX;
 		this.derivY = derivY;
 	}
 
 	@Override
-	public double compute(double X, double Y) {
+	public double compute( double X, double Y ) {
 
 		int c_x = (int)X;
 		int c_y = (int)Y;
 
 		// compute the visible region while taking in account
 		// the image borders
-		rect.x0 = c_x- pixelRadius;
-		rect.y0 = c_y- pixelRadius;
-		rect.x1 = c_x+ pixelRadius +1;
-		rect.y1 = c_y+ pixelRadius +1;
+		rect.x0 = c_x - pixelRadius;
+		rect.y0 = c_y - pixelRadius;
+		rect.x1 = c_x + pixelRadius + 1;
+		rect.y1 = c_y + pixelRadius + 1;
 
-		BoofMiscOps.boundRectangleInside(derivX,rect);
+		BoofMiscOps.boundRectangleInside(derivX, rect);
 
-		if( isWeighted )
-			return computeWeightedOrientation(c_x,c_y);
+		if (isWeighted)
+			return computeWeightedOrientation(c_x, c_y);
 		else
 			return computeOrientation();
 	}
@@ -139,5 +137,5 @@ public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
 	/**
 	 * Compute the angle using the weighting kernel.
 	 */
-	protected abstract double computeWeightedOrientation(int c_x , int c_y );
+	protected abstract double computeWeightedOrientation( int c_x, int c_y );
 }

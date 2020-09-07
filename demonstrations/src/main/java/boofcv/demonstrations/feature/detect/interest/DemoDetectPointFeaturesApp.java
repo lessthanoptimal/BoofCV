@@ -45,14 +45,11 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -80,29 +77,29 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	// filter the speed to make the numbers less erratic
 	MovingAverage period = new MovingAverage();
 
-	public DemoDetectPointFeaturesApp(List<?> exampleInputs, Class<T> imageClass ) {
-		super(true,true,exampleInputs, ImageType.single(imageClass));
+	public DemoDetectPointFeaturesApp( List<?> exampleInputs, Class<T> imageClass ) {
+		super(true, true, exampleInputs, ImageType.single(imageClass));
 		this.imageClass = imageClass;
 		this.derivClass = GImageDerivativeOps.getDerivativeType(imageClass);
 
-		imagePanel.setPreferredSize(new Dimension(800,800));
+		imagePanel.setPreferredSize(new Dimension(800, 800));
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, imagePanel);
 	}
 
 	@Override
-	protected void configureVideo(int which, SimpleImageSequence sequence) {
+	protected void configureVideo( int which, SimpleImageSequence sequence ) {
 		sequence.setLoop(true);
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
 		super.handleInputChange(source, method, width, height);
 
 		BoofSwingUtil.invokeNowOrLater(() -> {
 			period.reset();
-			double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+			double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel, width, height);
 			controls.setZoom(zoom);
 			imagePanel.getVerticalScrollBar().setValue(0);
 			imagePanel.getHorizontalScrollBar().setValue(0);
@@ -110,18 +107,18 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
-		if( detectorChanged ) {
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, ImageBase input ) {
+		if (detectorChanged) {
 			detectorChanged = false;
 			// this can be done safely outside of the GUI thread
-			controls.comboActions.get( controls.selectedAlgorithm ).run();
+			controls.comboActions.get(controls.selectedAlgorithm).run();
 		}
 
 		final double seconds;
 		long timeBefore = System.nanoTime();
 		detector.detect((T)input);
 		long timeAfter = System.nanoTime();
-		seconds = (timeAfter-timeBefore)*1e-9;
+		seconds = (timeAfter - timeBefore)*1e-9;
 
 		synchronized (featureLock) {
 			totalSets = detector.getNumberOfSets();
@@ -130,7 +127,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				featureLocs.get(i).set(detector.getLocation(i));
-				featureSets.set(i,detector.getSet(i));
+				featureSets.set(i, detector.getSet(i));
 			}
 		}
 
@@ -143,7 +140,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 	private void handleSettingsChanged() {
 		detectorChanged = true;
-		if( inputMethod == InputMethod.IMAGE ) {
+		if (inputMethod == InputMethod.IMAGE) {
 			reprocessInput();
 		}
 	}
@@ -155,8 +152,9 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 	class VisualizePanel extends ShapeVisualizePanel {
 		Ellipse2D.Double circle = new Ellipse2D.Double();
+
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			BoofSwingUtil.antialiasing(g2);
 
 			synchronized (featureLock) {
@@ -164,13 +162,13 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 				for (int i = 0; i < featureLocs.size; i++) {
 					Point2D_F64 c = featureLocs.get(i);
 					Color color = featureSets.get(i) == 0 ? Color.RED : Color.BLUE;
-					VisualizeFeatures.drawPoint(g2,c.x*scale,c.y*scale,r,color,true,circle);
+					VisualizeFeatures.drawPoint(g2, c.x*scale, c.y*scale, r, color, true, circle);
 				}
 			}
 		}
 
 		@Override
-		public synchronized void setScale(double scale) {
+		public synchronized void setScale( double scale ) {
 			controls.setZoom(scale);
 			super.setScale(controls.zoom);
 		}
@@ -180,8 +178,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 		protected JLabel processingTimeLabel = new JLabel();
 
-		Vector comboBoxItems = new Vector();
-		JComboBox comboAlgorithms = new JComboBox();
+		List<String> comboBoxItems = new ArrayList<>();
+		JComboBox<String> comboAlgorithms;
 		List<Runnable> comboActions = new ArrayList<>();
 
 		protected JSpinner selectZoom;
@@ -191,32 +189,28 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		JSpinner spinnerFastTol;
 		JCheckBox checkWeighted = new JCheckBox("Weighted");
 
-		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(-1,5,0);
+		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(-1, 5, 0);
 		boolean weighted = false;
-		int selectedAlgorithm=0;
+		int selectedAlgorithm = 0;
 		protected double zoom = 1;
 		protected int fastPixelTol = 20;
 
-
 		public ControlPanel() {
-			final DefaultComboBoxModel model = new DefaultComboBoxModel(comboBoxItems);
-			comboAlgorithms = new JComboBox(model);
-			comboAlgorithms.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent actionEvent) {
-					selectedAlgorithm = comboAlgorithms.getSelectedIndex();
-					handleSettingsChanged();
-				}
+			final DefaultComboBoxModel<String> model = new DefaultComboBoxModel(comboBoxItems.toArray());
+			comboAlgorithms = new JComboBox<>(model);
+			comboAlgorithms.addActionListener(actionEvent -> {
+				selectedAlgorithm = comboAlgorithms.getSelectedIndex();
+				handleSettingsChanged();
 			});
 			addAlgorithms();
 			comboAlgorithms.setSelectedIndex(0);
 			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
 
-			selectZoom = spinner(zoom,MIN_ZOOM,MAX_ZOOM,1);
-			spinnerRadius = spinner(configExtract.radius,1,200,1);
-			spinnerThreshold = spinner(configExtract.threshold,0,1000000,100f);
-			spinnerMaxFeatures = spinner(configExtract.maxFeatures,-1,1000000,10);
-			spinnerFastTol = spinner(fastPixelTol,1,255,1);
+			selectZoom = spinner(zoom, MIN_ZOOM, MAX_ZOOM, 1);
+			spinnerRadius = spinner(configExtract.radius, 1, 200, 1);
+			spinnerThreshold = spinner(configExtract.threshold, 0, 1000000, 100f);
+			spinnerMaxFeatures = spinner(configExtract.maxFeatures, -1, 1000000, 10);
+			spinnerFastTol = spinner(fastPixelTol, 1, 255, 1);
 
 			checkWeighted.setSelected(weighted);
 			checkWeighted.addActionListener(actionEvent -> {
@@ -225,14 +219,14 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			});
 			checkWeighted.setMaximumSize(checkWeighted.getPreferredSize());
 
-			addLabeled(processingTimeLabel,"Time (ms)");
+			addLabeled(processingTimeLabel, "Time (ms)");
 			add(comboAlgorithms);
-			addLabeled(selectZoom,"Zoom");
-			addLabeled(spinnerRadius,"Radius");
-			addLabeled(spinnerMaxFeatures,"Max Features");
-			addLabeled(spinnerThreshold,"Threshold");
+			addLabeled(selectZoom, "Zoom");
+			addLabeled(spinnerRadius, "Radius");
+			addLabeled(spinnerMaxFeatures, "Max Features");
+			addLabeled(spinnerThreshold, "Threshold");
 			addAlignLeft(checkWeighted);
-			addLabeled(spinnerFastTol,"Fast Pixel Tol");
+			addLabeled(spinnerFastTol, "Fast Pixel Tol");
 			addVerticalGlue();
 		}
 
@@ -247,7 +241,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			addAlgorithm("Laplace", () -> createLaplace());
 		}
 
-		public void adjustControls( final boolean usesWeighted , final boolean usesFastTol ) {
+		public void adjustControls( final boolean usesWeighted, final boolean usesFastTol ) {
 			BoofSwingUtil.invokeNowOrLater(new Runnable() {
 				@Override
 				public void run() {
@@ -257,14 +251,14 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			});
 		}
 
-		public void addAlgorithm( String name , Runnable action ) {
+		public void addAlgorithm( String name, Runnable action ) {
 			comboBoxItems.add(name);
 			comboActions.add(action);
 		}
 
 		public void setZoom( double zoom ) {
-			zoom = Math.max(MIN_ZOOM,zoom);
-			zoom = Math.min(MAX_ZOOM,zoom);
+			zoom = Math.max(MIN_ZOOM, zoom);
+			zoom = Math.min(MAX_ZOOM, zoom);
 			this.zoom = zoom;
 
 			BoofSwingUtil.invokeNowOrLater(new Runnable() {
@@ -276,23 +270,23 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		}
 
 		public void setProcessingTime( double seconds ) {
-			processingTimeLabel.setText(String.format("%7.1f",(seconds*1000)));
+			processingTimeLabel.setText(String.format("%7.1f", (seconds*1000)));
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == selectZoom ) {
-				zoom = ((Number) selectZoom.getValue()).doubleValue();
+		public void stateChanged( ChangeEvent e ) {
+			if (e.getSource() == selectZoom) {
+				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				handleVisualsUpdate();
 				return;
-			} else if( e.getSource() == spinnerRadius ) {
-				configExtract.radius = ((Number) spinnerRadius.getValue()).intValue();
-			} else if( e.getSource() == spinnerThreshold ) {
-				configExtract.threshold = ((Number) spinnerThreshold.getValue()).floatValue();
-			} else if( e.getSource() == spinnerMaxFeatures ) {
-				configExtract.maxFeatures = ((Number) spinnerMaxFeatures.getValue()).intValue();
-			} else if( e.getSource() == spinnerFastTol ) {
-				fastPixelTol = ((Number) spinnerFastTol.getValue()).intValue();
+			} else if (e.getSource() == spinnerRadius) {
+				configExtract.radius = ((Number)spinnerRadius.getValue()).intValue();
+			} else if (e.getSource() == spinnerThreshold) {
+				configExtract.threshold = ((Number)spinnerThreshold.getValue()).floatValue();
+			} else if (e.getSource() == spinnerMaxFeatures) {
+				configExtract.maxFeatures = ((Number)spinnerMaxFeatures.getValue()).intValue();
+			} else if (e.getSource() == spinnerFastTol) {
+				fastPixelTol = ((Number)spinnerFastTol.getValue()).intValue();
 			}
 			handleSettingsChanged();
 		}
@@ -300,25 +294,28 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 	private void createHarris() {
 		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(true,false);
+		controls.adjustControls(true, false);
 		changeDetector(FactoryDetectPoint.createHarris(controls.configExtract,
-				new ConfigHarrisCorner(controls.weighted,controls.configExtract.radius), derivClass));
+				new ConfigHarrisCorner(controls.weighted, controls.configExtract.radius), derivClass));
 	}
+
 	private void createShiTomasi() {
 		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(true,false);
+		controls.adjustControls(true, false);
 		changeDetector(FactoryDetectPoint.createShiTomasi(controls.configExtract,
-				new ConfigShiTomasi(controls.weighted,controls.configExtract.radius), derivClass));
+				new ConfigShiTomasi(controls.weighted, controls.configExtract.radius), derivClass));
 	}
+
 	private void createFastIntensity() {
 		controls.configExtract.detectMinimums = true;
-		controls.adjustControls(false,true);
+		controls.adjustControls(false, true);
 		changeDetector(FactoryDetectPoint.createFast(
-				controls.configExtract, new ConfigFastCorner(controls.fastPixelTol,9), imageClass));
+				controls.configExtract, new ConfigFastCorner(controls.fastPixelTol, 9), imageClass));
 	}
+
 	private void createFast() {
-		controls.adjustControls(false,true);
-		ConfigFastCorner configFast = new ConfigFastCorner(controls.fastPixelTol,9);
+		controls.adjustControls(false, true);
+		ConfigFastCorner configFast = new ConfigFastCorner(controls.fastPixelTol, 9);
 		detector = FactoryInterestPoint.createFast(configFast,
 				controls.configExtract.maxFeatures,
 				controls.configExtract.selector,
@@ -327,42 +324,45 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 	private void createKitRos() {
 		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(false,false);
+		controls.adjustControls(false, false);
 		changeDetector(FactoryDetectPoint.createKitRos(controls.configExtract, derivClass));
 	}
+
 	private void createMedian() {
 		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(false,false);
+		controls.adjustControls(false, false);
 		changeDetector(FactoryDetectPoint.createMedian(controls.configExtract, imageClass));
 	}
+
 	private void createHessian() {
 		controls.configExtract.detectMinimums = false;
-		controls.adjustControls(false,false);
+		controls.adjustControls(false, false);
 		changeDetector(FactoryDetectPoint.createHessianDeriv(controls.configExtract, HessianBlobIntensity.Type.DETERMINANT,
 				derivClass));
 	}
+
 	private void createLaplace() {
 		controls.configExtract.detectMinimums = true;
-		controls.adjustControls(false,false);
+		controls.adjustControls(false, false);
 		changeDetector(FactoryDetectPoint.createHessianDeriv(controls.configExtract, HessianBlobIntensity.Type.TRACE,
 				derivClass));
 	}
 
-	private void changeDetector(GeneralFeatureDetector fd) {
-		detector = new GeneralToInterestPoint(fd,-1,imageClass, derivClass);
+	private void changeDetector( GeneralFeatureDetector fd ) {
+		detector = new GeneralToInterestPoint(fd, -1, imageClass, derivClass);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Chessboard", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
-		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
-		examples.add(new PathLabel("Shapes 01",UtilIO.pathExample("shapes/shapes01.png")));
-		examples.add(new PathLabel("Amoeba Shapes",UtilIO.pathExample("amoeba_shapes.jpg")));
-		examples.add(new PathLabel("Sunflowers",UtilIO.pathExample("sunflowers.jpg")));
-		examples.add(new PathLabel("Beach",UtilIO.pathExample("scale/beach02.jpg")));
-		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
+		examples.add(new PathLabel("Square Grid", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
+		examples.add(new PathLabel("Shapes 01", UtilIO.pathExample("shapes/shapes01.png")));
+		examples.add(new PathLabel("Amoeba Shapes", UtilIO.pathExample("amoeba_shapes.jpg")));
+		examples.add(new PathLabel("Sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		examples.add(new PathLabel("Beach", UtilIO.pathExample("scale/beach02.jpg")));
+		examples.add(new PathLabel("Chessboard Movie", UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
-		DemoDetectPointFeaturesApp app = new DemoDetectPointFeaturesApp(examples,GrayF32.class);
+		DemoDetectPointFeaturesApp app = new DemoDetectPointFeaturesApp(examples, GrayF32.class);
 		app.openExample(examples.get(0));
 		app.waitUntilInputSizeIsKnown();
 		app.display("Point Feature Detectors");

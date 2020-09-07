@@ -45,7 +45,7 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 		QueueCorner detected = new QueueCorner();
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				detected.grow().set(x,y);
+				detected.grow().set(x, y);
 			}
 		}
 		int cellSize = 10;
@@ -55,24 +55,23 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 		alg.configUniform = new TestFeatureSelectUniform.HackedConfig(cellSize);
 
 		// it should spread out the detections evenly throughout the cells
-		checkSpread(detected, cellSize,1,found, alg);
-		checkSpread(detected, cellSize,2,found, alg);
+		checkSpread(detected, cellSize, 1, found, alg);
+		checkSpread(detected, cellSize, 2, found, alg);
 	}
 
-	private void checkSpread(QueueCorner detected, int cellSize,
-							 int cellCount, FastArray<Point2D_I16> found, FeatureSelectUniform<Point2D_I16> alg)
-	{
+	private void checkSpread( QueueCorner detected, int cellSize,
+							  int cellCount, FastArray<Point2D_I16> found, FeatureSelectUniform<Point2D_I16> alg ) {
 		int limit = cellCount*6;
-		alg.select(width,height,null,detected,limit,found);
+		alg.select(width, height, null, detected, limit, found);
 
-		assertEquals(limit,found.size);
+		assertEquals(limit, found.size);
 		int[] cells = new int[6];
-		for( var p : found.toList() ) {
+		for (var p : found.toList()) {
 			int index = (p.y/cellSize)*3 + (p.x/cellSize);
 			cells[index]++;
 		}
 		for (int i = 0; i < cells.length; i++) {
-			assertEquals(cellCount,cells[i]);
+			assertEquals(cellCount, cells[i]);
 		}
 	}
 
@@ -89,13 +88,13 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				detected.grow().set(x+2,y+2);
+				detected.grow().set(x + 2, y + 2);
 			}
 		}
 		// add two prior features to the top row
 		for (int x = 0; x < width; x += cellSize) {
-			prior.grow().set(x+2,2);
-			prior.grow().set(x+2,2);
+			prior.grow().set(x + 2, 2);
+			prior.grow().set(x + 2, 2);
 		}
 
 		var found = new FastArray<>(Point2D_I16.class);
@@ -105,16 +104,16 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 
 		// Since there is a prior feature in every cell and 6 features were requested nothing should be returned
 		// since the prior features already constributed to the spread
-		alg.select(width,height,prior,detected,3,found);
-		assertEquals(3,found.size);
+		alg.select(width, height, prior, detected, 3, found);
+		assertEquals(3, found.size);
 		// the found features should all be in the bottom row since it gives preference to cells without priors
-		for (int x = 0, idx=0; x < width; x += cellSize,idx++) {
-			assertEquals(x+2,found.get(idx).x);
-			assertEquals(12,found.get(idx).y);
+		for (int x = 0, idx = 0; x < width; x += cellSize, idx++) {
+			assertEquals(x + 2, found.get(idx).x);
+			assertEquals(12, found.get(idx).y);
 		}
 		// We now request two and 6 of the detected features should be returned
-		alg.select(width,height,prior,detected,6,found);
-		assertEquals(6,found.size);
+		alg.select(width, height, prior, detected, 6, found);
+		assertEquals(6, found.size);
 	}
 
 	/**
@@ -130,9 +129,9 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				detected.grow().set(x+2,y+2);
-				prior.grow().set(x+2,y+2);
-				prior.grow().set(x+1,y+1);
+				detected.grow().set(x + 2, y + 2);
+				prior.grow().set(x + 2, y + 2);
+				prior.grow().set(x + 1, y + 1);
 			}
 		}
 
@@ -142,19 +141,19 @@ class TestFeatureSelectUniform extends ChecksFeatureSelectLimit.I16 {
 		alg.configUniform = new HackedConfig(cellSize);
 
 		// a bug earlier aborted because the total count didn't change when every cell had a prior in it
-		alg.select(width,height,prior,detected,6,found);
-		assertEquals(6,found.size);
+		alg.select(width, height, prior, detected, 6, found);
+		assertEquals(6, found.size);
 	}
 
 	private static class HackedConfig extends ConfigGridUniform {
 		int cellSize;
 
-		public HackedConfig(int cellSize) {
+		public HackedConfig( int cellSize ) {
 			this.cellSize = cellSize;
 		}
 
 		@Override
-		public int selectTargetCellSize(int maxSample, int imageWidth, int imageHeight) {
+		public int selectTargetCellSize( int maxSample, int imageWidth, int imageHeight ) {
 			return cellSize;
 		}
 	}

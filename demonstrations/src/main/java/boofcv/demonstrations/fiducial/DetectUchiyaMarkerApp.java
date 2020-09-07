@@ -417,8 +417,8 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-				float x = (float)((getWidth())/8.0-transX);
-				float y = (float)((getHeight())/2.0-transY);
+				float x = (float)(getWidth()/8.0-transX);
+				float y = (float)(getHeight()/2.0-transY);
 				g2.setFont(largeFont);
 				g2.setColor(Color.ORANGE);
 				g2.drawString("Loading Definitions",x,y);

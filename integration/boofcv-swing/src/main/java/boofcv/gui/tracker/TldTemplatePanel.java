@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.struct.feature.NccFeature;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * @author Peter Abeles
@@ -38,25 +38,25 @@ public class TldTemplatePanel extends JPanel {
 
 	List<BufferedImage> templates = new ArrayList<>();
 
-	Stack<BufferedImage> unused = new Stack<>();
+	ArrayDeque<BufferedImage> unused = new ArrayDeque<>();
 
-	public TldTemplatePanel(int featureWidth) {
+	public TldTemplatePanel( int featureWidth ) {
 		this.featureWidth = featureWidth;
 		setAutoscrolls(true);
 
-		setPreferredSize(new Dimension(featureWidth*scale,30));
+		setPreferredSize(new Dimension(featureWidth*scale, 30));
 		setMinimumSize(getPreferredSize());
 	}
 
-	public synchronized void update( List<NccFeature> features , boolean gray ) {
+	public synchronized void update( List<NccFeature> features, boolean gray ) {
 
 		unused.addAll(templates);
 		templates.clear();
 
-		for( NccFeature f : features ) {
+		for (NccFeature f : features) {
 			BufferedImage img;
-			if( unused.isEmpty() ) {
-				img = new BufferedImage(featureWidth,featureWidth,BufferedImage.TYPE_INT_RGB);
+			if (unused.isEmpty()) {
+				img = new BufferedImage(featureWidth, featureWidth, BufferedImage.TYPE_INT_RGB);
 			} else {
 				img = unused.pop();
 			}
@@ -65,53 +65,53 @@ public class TldTemplatePanel extends JPanel {
 			int index = 0;
 			int rgb;
 
-			if( gray ) {
-				for( int y = 0; y < featureWidth; y++ ) {
-					for( int x = 0; x < featureWidth; x++ ) {
-						int v = (int)(f.value[ index++ ] + f.mean);
+			if (gray) {
+				for (int y = 0; y < featureWidth; y++) {
+					for (int x = 0; x < featureWidth; x++) {
+						int v = (int)(f.value[index++] + f.mean);
 						rgb = v << 16 | v << 8 | v;
 
-						img.setRGB(x,y,rgb);
+						img.setRGB(x, y, rgb);
 					}
 				}
 			} else {
 				double maxAbs = 0;
-				for( int i = 0; i < f.value.length; i++ ) {
+				for (int i = 0; i < f.value.length; i++) {
 					double v = Math.abs(f.value[i]);
-					if( v > maxAbs )
+					if (v > maxAbs)
 						maxAbs = v;
 				}
-				if( maxAbs == 0 )
+				if (maxAbs == 0)
 					continue;
-				for( int y = 0; y < featureWidth; y++ ) {
-					for( int x = 0; x < featureWidth; x++ ) {
-						int v = (int)(255.0*f.value[ index++ ]/maxAbs);
-						if( v < 0 )
+				for (int y = 0; y < featureWidth; y++) {
+					for (int x = 0; x < featureWidth; x++) {
+						int v = (int)(255.0*f.value[index++]/maxAbs);
+						if (v < 0)
 							rgb = -v;
 						else
 							rgb = v << 16;
 
-						img.setRGB(x,y,rgb);
+						img.setRGB(x, y, rgb);
 					}
 				}
 			}
 		}
 
-		setPreferredSize(new Dimension(featureWidth*scale,featureWidth*features.size()*scale));
+		setPreferredSize(new Dimension(featureWidth*scale, featureWidth*features.size()*scale));
 		setMinimumSize(getPreferredSize());
 		revalidate();
 	}
 
 	@Override
-	protected synchronized void paintComponent(Graphics g) {
+	protected synchronized void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 
-		g2.scale(scale,scale);
+		g2.scale(scale, scale);
 
-		for( int i = 0; i < templates.size(); i++ ) {
-			int y = i * featureWidth;
-			g2.drawImage(templates.get(i),0,y,featureWidth,featureWidth,null);
+		for (int i = 0; i < templates.size(); i++) {
+			int y = i*featureWidth;
+			g2.drawImage(templates.get(i), 0, y, featureWidth, featureWidth, null);
 		}
 	}
 }

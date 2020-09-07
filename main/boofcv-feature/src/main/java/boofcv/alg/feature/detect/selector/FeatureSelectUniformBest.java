@@ -31,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * Attempts to select features uniformly across the image with a preference for locally more intense features. This
  * is done by breaking the image up into a grid. Then features are added by selecting the most intense feature from
@@ -45,25 +47,25 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 	public ConfigGridUniform configUniform = new ConfigGridUniform();
 
 	// Grid for storing a set of objects
-	ImageGrid<Info<Point>> grid = new ImageGrid<>(Info::new,Info::reset);
+	final ImageGrid<Info<Point>> grid = new ImageGrid<>(Info::new, Info::reset);
 
 	SampleIntensity<Point> sampler;
 
 	// Workspace variables for sorting the cells
-	GrowQueue_F32 pointIntensity = new GrowQueue_F32();
-	QuickSort_F32 sorter = new QuickSort_F32();
-	GrowQueue_I32 indexes = new GrowQueue_I32();
+	final GrowQueue_F32 pointIntensity = new GrowQueue_F32();
+	final QuickSort_F32 sorter = new QuickSort_F32();
+	final GrowQueue_I32 indexes = new GrowQueue_I32();
 	List<Point> workList = new ArrayList<>();
 
-	public FeatureSelectUniformBest(SampleIntensity<Point> sampler) {this.sampler = sampler;}
+	public FeatureSelectUniformBest( SampleIntensity<Point> sampler ) {this.sampler = sampler;}
+
 	public FeatureSelectUniformBest() {}
 
 	@Override
 	public void select( @Nullable GrayF32 intensity, int width, int height, boolean positive,
-					   @Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
-					   FastArray<Point> selected)
-	{
-		assert(limit>0);
+						@Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
+						FastArray<Point> selected ) {
+		assertBoof(limit > 0);
 		selected.reset();
 
 		// Get the image shape from whatever source is available
@@ -71,18 +73,18 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 		height = intensity == null ? height : intensity.height;
 
 		// the limit is more than the total number of features. Return them all!
-		if( (prior == null || prior.size==0) && detected.size <= limit ) {
+		if ((prior == null || prior.size == 0) && detected.size <= limit) {
 			// make a copy of the results with no pruning since it already has the desired number, or less
 			selected.addAll(detected);
 			return;
 		}
 
 		// Adjust the grid to the requested limit and image shape
-		int targetCellSize = configUniform.selectTargetCellSize(limit,width,height);
-		grid.initialize(targetCellSize,width,height);
+		int targetCellSize = configUniform.selectTargetCellSize(limit, width, height);
+		grid.initialize(targetCellSize, width, height);
 
 		// Note all the prior features
-		if( prior != null ) {
+		if (prior != null) {
 			for (int i = 0; i < prior.size; i++) {
 				Point p = prior.data[i];
 				getGridCell(p).priorCount++;
@@ -104,13 +106,13 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 		// predeclare the output list
 		selected.resize(limit);
 		selected.reset();
-		while( selected.size < limit ) {
+		while (selected.size < limit) {
 			boolean change = false;
 			for (int cellidx = 0; cellidx < cells.size && selected.size < limit; cellidx++) {
 				Info<Point> info = cells.get(cellidx);
 
 				// if there's a prior feature here, note it and move on
-				if( info.priorCount > 0 ) {
+				if (info.priorCount > 0) {
 					info.priorCount--;
 					change = true;
 					continue;
@@ -118,28 +120,28 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 				// Are there any detected features remaining?
 				if (info.detected.isEmpty())
 					continue;
-				selected.add( info.detected.remove( info.detected.size()-1) );
+				selected.add(info.detected.remove(info.detected.size() - 1));
 				change = true;
 			}
-			if( !change )
+			if (!change)
 				break;
 		}
 	}
 
 	@Override
-	public void setSampler(SampleIntensity<Point> sampler) {
+	public void setSampler( SampleIntensity<Point> sampler ) {
 		this.sampler = sampler;
 	}
 
 	/**
 	 * Sort points in cells based on their intensity
 	 */
-	private void sortCellLists(GrayF32 intensity, boolean positive) {
+	private void sortCellLists( GrayF32 intensity, boolean positive ) {
 		// Add points to the grid elements and sort them based feature intensity
 		final FastAccess<Info<Point>> cells = grid.cells;
 		for (int cellidx = 0; cellidx < cells.size; cellidx++) {
 			final List<Point> cellPoints = cells.get(cellidx).detected;
-			if( cellPoints.isEmpty() )
+			if (cellPoints.isEmpty())
 				continue;
 			final int N = cellPoints.size();
 			pointIntensity.resize(N);
@@ -147,23 +149,23 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 
 			// select the score's sign so that the most desirable is at the end of the list
 			// That way elements can be removed from the top of the list, which is less expensive.
-			if( positive ) {
+			if (positive) {
 				for (int pointIdx = 0; pointIdx < N; pointIdx++) {
 					Point p = cellPoints.get(pointIdx);
-					pointIntensity.data[pointIdx] = sampler.sample(intensity,pointIdx,p);
+					pointIntensity.data[pointIdx] = sampler.sample(intensity, pointIdx, p);
 				}
 			} else {
 				for (int pointIdx = 0; pointIdx < N; pointIdx++) {
 					Point p = cellPoints.get(pointIdx);
-					pointIntensity.data[pointIdx] = -sampler.sample(intensity,pointIdx,p);
+					pointIntensity.data[pointIdx] = -sampler.sample(intensity, pointIdx, p);
 				}
 			}
-			sorter.sort(pointIntensity.data,0,N,indexes.data);
+			sorter.sort(pointIntensity.data, 0, N, indexes.data);
 
 			// Extract an ordered list of points based on intensity and swap out the cell list to avoid a copy
 			workList.clear();
 			for (int i = 0; i < N; i++) {
-				workList.add( cellPoints.get(indexes.data[i]));
+				workList.add(cellPoints.get(indexes.data[i]));
 			}
 			List<Point> tmp = cells.data[cellidx].detected;
 			cells.data[cellidx].detected = workList;
@@ -181,12 +183,12 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 	/**
 	 * Info for each cell
 	 */
-	public static class Info<Point>
-	{
+	public static class Info<Point> {
 		// Number of features in the cell from the prior list
 		int priorCount = 0;
 		// Sorted list of detected features by intensity
 		List<Point> detected = new ArrayList<>();
+
 		public void reset() {
 			priorCount = 0;
 			detected.clear();

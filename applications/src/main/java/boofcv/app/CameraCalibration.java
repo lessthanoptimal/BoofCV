@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,204 +137,205 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println();
 	}
 
-	public void parse( String []args ) {
-		if( args.length < 1 ) {
+	public void parse( String[] args ) {
+		if (args.length < 1) {
 			throw new RuntimeException("Must specify some arguments");
 		}
 
 		cameraId = -1; // override default value of zero so that its easy to tell if a camera was slected
-		for( int i = 0; i < args.length; i++ ) {
+		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
-			if( arg.startsWith("--") ) {
-				if( arg.compareToIgnoreCase("--GUI") == 0 ) {
+			if (arg.startsWith("--")) {
+				if (arg.compareToIgnoreCase("--GUI") == 0) {
 					GUI = true;
 				} else if (!checkCameraFlag(arg)) {
 					splitFlag(arg);
-					if( flagName.compareToIgnoreCase("Directory") == 0 ) {
+					if (flagName.compareToIgnoreCase("Directory") == 0) {
 						inputDirectory = parameters;
 						inputType = InputType.IMAGE;
-					} else if( flagName.compareToIgnoreCase("Visualize") == 0 ) {
+					} else if (flagName.compareToIgnoreCase("Visualize") == 0) {
 						visualize = Boolean.parseBoolean(parameters);
-					} else if( flagName.compareToIgnoreCase("Model") == 0 ) {
-						if( parameters.compareToIgnoreCase("pinhole") == 0 ) {
+					} else if (flagName.compareToIgnoreCase("Model") == 0) {
+						if (parameters.compareToIgnoreCase("pinhole") == 0) {
 							modeType = ModelType.PINHOLE;
-						} else if( parameters.compareToIgnoreCase("universal") == 0 ) {
+						} else if (parameters.compareToIgnoreCase("universal") == 0) {
 							modeType = ModelType.UNIVERSAL;
 						} else {
 							throw new RuntimeException("Unknown model type " + parameters);
 						}
-					} else if( flagName.compareToIgnoreCase("Format") == 0 ) {
-						if( parameters.compareToIgnoreCase("boofcv") == 0 ) {
+					} else if (flagName.compareToIgnoreCase("Format") == 0) {
+						if (parameters.compareToIgnoreCase("boofcv") == 0) {
 							formatType = FormatType.BOOFCV;
-						} else if( parameters.compareToIgnoreCase("opencv") == 0 ) {
+						} else if (parameters.compareToIgnoreCase("opencv") == 0) {
 							formatType = FormatType.OPENCV;
 						} else {
 							throw new RuntimeException("Unknown model type " + parameters);
 						}
-					} else if( flagName.compareToIgnoreCase("ZeroSkew") == 0 ) {
+					} else if (flagName.compareToIgnoreCase("ZeroSkew") == 0) {
 						zeroSkew = Boolean.parseBoolean(parameters);
-					} else if( flagName.compareToIgnoreCase("NumRadial") == 0 ) {
+					} else if (flagName.compareToIgnoreCase("NumRadial") == 0) {
 						numRadial = Integer.parseInt(parameters);
-					} else if( flagName.compareToIgnoreCase("Tangential") == 0 ) {
+					} else if (flagName.compareToIgnoreCase("Tangential") == 0) {
 						tangential = Boolean.parseBoolean(parameters);
-					} else  {
+					} else {
 						throw new RuntimeException("Unknown input option " + flagName);
 					}
 				}
-			} else if( arg.compareToIgnoreCase("CHESSBOARD") == 0 ) {
-				parseChessboard(i + 1,args);
+			} else if (arg.compareToIgnoreCase("CHESSBOARD") == 0) {
+				parseChessboard(i + 1, args);
 				break;
-			} else if( arg.compareToIgnoreCase("SQUAREGRID") == 0 ) {
+			} else if (arg.compareToIgnoreCase("SQUAREGRID") == 0) {
 				parseSquareGrid(i + 1, args);
 				break;
-			} else if( arg.compareToIgnoreCase("CIRCLE_HEX") == 0 ) {
+			} else if (arg.compareToIgnoreCase("CIRCLE_HEX") == 0) {
 				parseCircle(i + 1, args, true);
 				break;
-			} else if( arg.compareToIgnoreCase("CIRCLE_REG") == 0 ) {
+			} else if (arg.compareToIgnoreCase("CIRCLE_REG") == 0) {
 				parseCircle(i + 1, args, false);
 				break;
-			} else if( i == 0 ) {
+			} else if (i == 0) {
 				outputFileName = arg;
 			} else {
-				throw new RuntimeException("Unknown fiducial type "+arg);
+				throw new RuntimeException("Unknown fiducial type " + arg);
 			}
 		}
 
-		if( formatType == FormatType.OPENCV && modeType != ModelType.PINHOLE ) {
+		if (formatType == FormatType.OPENCV && modeType != ModelType.PINHOLE) {
 			throw new RuntimeException("Can only save calibration in OpenCV format if pinhole model");
 		}
 	}
 
-	protected void parseChessboard( int index , String []args ) {
-		int numRows=0,numColumns=0;
+	protected void parseChessboard( int index, String[] args ) {
+		int numRows = 0, numColumns = 0;
 
-		for(; index < args.length; index++ ) {
+		for (; index < args.length; index++) {
 			String arg = args[index];
 
-			if( !arg.startsWith("--") ) {
-				throw new  RuntimeException("Expected flags for chessboard.  Should start with '--'");
+			if (!arg.startsWith("--")) {
+				throw new RuntimeException("Expected flags for chessboard.  Should start with '--'");
 			}
 
 			splitFlag(arg);
-			if( flagName.compareToIgnoreCase("Grid") == 0 ) {
+			if (flagName.compareToIgnoreCase("Grid") == 0) {
 				String words[] = parameters.split(":");
-				if( words.length != 2 )throw new RuntimeException("Expected two values for rows and columns");
+				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
 				numRows = Integer.parseInt(words[0]);
 				numColumns = Integer.parseInt(words[1]);
 			} else {
-				throw new RuntimeException("Unknown image option "+flagName);
+				throw new RuntimeException("Unknown image option " + flagName);
 			}
 		}
 
-		if( numRows <= 0 || numColumns <= 0) {
+		if (numRows <= 0 || numColumns <= 0) {
 			throw new RuntimeException("Rows and columns must be specified and > 0");
 		}
 
-		System.out.println("chessboard: "+numRows+" x "+numColumns);
+		System.out.println("chessboard: " + numRows + " x " + numColumns);
 
 		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, 1);
 
-		detector = FactoryFiducialCalibration.chessboardX(null,config);
+		detector = FactoryFiducialCalibration.chessboardX(null, config);
 	}
 
-	protected void parseSquareGrid( int index , String []args ) {
-		int numRows=0,numColumns=0;
-		double square=1,space=1;
+	protected void parseSquareGrid( int index, String[] args ) {
+		int numRows = 0, numColumns = 0;
+		double square = 1, space = 1;
 
-		for(; index < args.length; index++ ) {
+		for (; index < args.length; index++) {
 			String arg = args[index];
 
-			if( !arg.startsWith("--") ) {
-				throw new  RuntimeException("Expected flags for square grid. Should start with '--'");
+			if (!arg.startsWith("--")) {
+				throw new RuntimeException("Expected flags for square grid. Should start with '--'");
 			}
 
 			splitFlag(arg);
-			if( flagName.compareToIgnoreCase("Grid") == 0 ) {
+			if (flagName.compareToIgnoreCase("Grid") == 0) {
 				String words[] = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
 				numRows = Integer.parseInt(words[0]);
 				numColumns = Integer.parseInt(words[1]);
-			} else if( flagName.compareToIgnoreCase("SquareSpace") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("SquareSpace") == 0) {
 				String words[] = parameters.split(":");
-				if( words.length != 2 )throw new RuntimeException("Expected two values for square and space");
+				if (words.length != 2) throw new RuntimeException("Expected two values for square and space");
 				square = Double.parseDouble(words[0]);
 				space = Double.parseDouble(words[1]);
 			} else {
-				throw new RuntimeException("Unknown image option "+flagName);
+				throw new RuntimeException("Unknown image option " + flagName);
 			}
 		}
 
-		if( numRows <= 0 || numColumns <= 0) {
+		if (numRows <= 0 || numColumns <= 0) {
 			throw new RuntimeException("Rows and columns must be specified and > 0");
 		}
-		if( square <= 0 || space <= 0) {
+		if (square <= 0 || space <= 0) {
 			throw new RuntimeException("square and space width must be specified and > 0");
 		}
 
-		System.out.println("squaregrid: "+numRows+" x "+numColumns+" square/space = "+(square/space));
+		System.out.println("squaregrid: " + numRows + " x " + numColumns + " square/space = " + (square/space));
 
-		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, square,space);
+		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, square, space);
 
-		detector = FactoryFiducialCalibration.squareGrid(null,config);
+		detector = FactoryFiducialCalibration.squareGrid(null, config);
 	}
 
-	protected void parseCircle( int index , String []args , boolean hexagonal) {
-		int numRows=0,numColumns=0;
-		double diameter=-1,centerDistance=-1;
+	protected void parseCircle( int index, String[] args, boolean hexagonal ) {
+		int numRows = 0, numColumns = 0;
+		double diameter = -1, centerDistance = -1;
 
-		for(; index < args.length; index++ ) {
+		for (; index < args.length; index++) {
 			String arg = args[index];
 
-			if( !arg.startsWith("--") ) {
-				throw new  RuntimeException("Expected flags for radius grid. Should start with '--'");
+			if (!arg.startsWith("--")) {
+				throw new RuntimeException("Expected flags for radius grid. Should start with '--'");
 			}
 
 			splitFlag(arg);
-			if( flagName.compareToIgnoreCase("Grid") == 0 ) {
+			if (flagName.compareToIgnoreCase("Grid") == 0) {
 				String words[] = parameters.split(":");
 				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
 				numRows = Integer.parseInt(words[0]);
 				numColumns = Integer.parseInt(words[1]);
-			} else if( flagName.compareToIgnoreCase("CenterDistance") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("CenterDistance") == 0) {
 				centerDistance = Double.parseDouble(parameters);
-			} else if( flagName.compareToIgnoreCase("Diameter") == 0 ) {
+			} else if (flagName.compareToIgnoreCase("Diameter") == 0) {
 				diameter = Double.parseDouble(parameters);
 			} else {
-				throw new RuntimeException("Unknown image option "+flagName);
+				throw new RuntimeException("Unknown image option " + flagName);
 			}
 		}
 
-		if( numRows <= 0 || numColumns <= 0) {
+		if (numRows <= 0 || numColumns <= 0) {
 			throw new RuntimeException("Rows and columns must be specified and > 0");
 		}
-		if( diameter <= 0 || centerDistance <= 0) {
+		if (diameter <= 0 || centerDistance <= 0) {
 			throw new RuntimeException("diameter and center distance must be specified and > 0");
 		}
 
-		if( hexagonal ) {
-			System.out.println("circle hexagonal: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
+		if (hexagonal) {
+			System.out.println("circle hexagonal: " + numRows + " x " + numColumns + " diameter = " + diameter + " center distance = " + centerDistance);
 			ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, diameter, centerDistance);
 
-			detector = FactoryFiducialCalibration.circleHexagonalGrid(null,config);
+			detector = FactoryFiducialCalibration.circleHexagonalGrid(null, config);
 		} else {
-			System.out.println("circle regular: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
+			System.out.println("circle regular: " + numRows + " x " + numColumns + " diameter = " + diameter + " center distance = " + centerDistance);
 			ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, diameter, centerDistance);
 
-			detector = FactoryFiducialCalibration.circleRegularGrid(null,config);
+			detector = FactoryFiducialCalibration.circleRegularGrid(null, config);
 		}
 	}
 
 	public void process() {
-		if( detector == null ) {
+		if (detector == null) {
 			printHelp();
 			System.out.println();
 			System.err.println("Must specify the type of fiducial to use for calibration!");
 			System.exit(0);
 		}
 
-		switch( inputType ) {
-			case VIDEO: throw new RuntimeException("Calibration from video not supported");
+		switch (inputType) {
+			case VIDEO:
+				throw new RuntimeException("Calibration from video not supported");
 			case IMAGE:
 				handleDirectory();
 				break;
@@ -357,20 +358,20 @@ public class CameraCalibration extends BaseStandardInputApp {
 		final CalibratedPlanarPanel gui;
 		ProcessThread monitor = null;
 
-		switch( modeType ) {
+		switch (modeType) {
 			case PINHOLE:
-				calibrationAlg.configurePinhole( zeroSkew, numRadial, tangential);
+				calibrationAlg.configurePinhole(zeroSkew, numRadial, tangential);
 				break;
 
 			case UNIVERSAL:
-				calibrationAlg.configureUniversalOmni( zeroSkew, numRadial, tangential);
+				calibrationAlg.configureUniversalOmni(zeroSkew, numRadial, tangential);
 				break;
 
 			default:
-				throw new RuntimeException("Unknown model type: "+modeType);
+				throw new RuntimeException("Unknown model type: " + modeType);
 		}
 
-		if( visualize ) {
+		if (visualize) {
 			switch( modeType ) {
 				case PINHOLE: gui = new MonoPlanarPanel(); break;
 				case UNIVERSAL: gui = new FisheyePlanarPanel(); break;
@@ -383,50 +384,50 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 
 		File directory = new File(inputDirectory);
-		if( !directory.exists() ) {
+		if (!directory.exists()) {
 			System.err.println("Input directory doesn't exist!");
-			System.err.println("  "+inputDirectory);
+			System.err.println("  " + inputDirectory);
 			System.exit(0);
 		}
 		List<File> files = Arrays.asList(directory.listFiles());
 		BoofMiscOps.sortFilesByName(files);
 
-		if( files.isEmpty() ) {
+		if (files.isEmpty()) {
 			System.err.println("No image files found!");
 			System.err.println(inputDirectory);
 			System.exit(0);
 		}
 
-		if( visualize ) {
-			monitor.setMessage(0,"Loading images");
+		if (visualize) {
+			monitor.setMessage(0, "Loading images");
 		}
 
 		final List<File> imagesSuccess = new ArrayList<>();
 		final List<File> imagesFailed = new ArrayList<>();
 
 		boolean first = true;
-		for( File f : files ){
-			if( f.isDirectory() || f.isHidden())
+		for (File f : files) {
+			if (f.isDirectory() || f.isHidden())
 				continue;
 
 			final BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if( buffered == null )
+			if (buffered == null)
 				continue;
 
-			GrayF32 image = ConvertBufferedImage.convertFrom(buffered,(GrayF32)null);
+			GrayF32 image = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
-			if( visualize ) {
-				monitor.setMessage(0,f.getName());
+			if (visualize) {
+				monitor.setMessage(0, f.getName());
 
-				if( first ) {
+				if (first) {
 					first = false;
 					// should do this more intelligently based on image resolution
-					int width = Math.min(1000,image.getWidth());
-					int height = Math.min(width*image.height/image.width,image.getHeight());
+					int width = Math.min(1000, image.getWidth());
+					int height = Math.min(width*image.height/image.width, image.getHeight());
 
-					gui.mainView.setPreferredSize(new Dimension(width,height));
+					gui.mainView.setPreferredSize(new Dimension(width, height));
 					gui.showImageProcessed(buffered);
-					ShowImages.showWindow(gui,"Monocular Calibration",true);
+					ShowImages.showWindow(gui, "Monocular Calibration", true);
 				} else {
 					BoofSwingUtil.invokeNowOrLater(new Runnable() {
 						@Override
@@ -437,7 +438,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 				}
 			}
 
-			if( !detector.process(image)) {
+			if (!detector.process(image)) {
 				imagesFailed.add(f);
 				System.err.println("Failed to detect target in " + f.getName());
 			} else {
@@ -446,19 +447,19 @@ public class CameraCalibration extends BaseStandardInputApp {
 			}
 		}
 
-		if( visualize ) {
-			monitor.setMessage(1,"Computing intrinsics");
+		if (visualize) {
+			monitor.setMessage(1, "Computing intrinsics");
 		}
 
 		// process and compute intrinsic parameters
 		try {
 			final CameraModel intrinsic = calibrationAlg.process();
 
-			if( visualize ) {
+			if (visualize) {
 				monitor.stopThread();
 
-				if( imagesFailed.size() > 0 ) {
-					JOptionPane.showMessageDialog(gui,"Failed to detect in "+imagesFailed.size()+" images");
+				if (imagesFailed.size() > 0) {
+					JOptionPane.showMessageDialog(gui, "Failed to detect in " + imagesFailed.size() + " images");
 				}
 
 				SwingUtilities.invokeLater(() -> {
@@ -466,7 +467,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 					gui.setImagesFailed(imagesFailed);
 					gui.setObservations(calibrationAlg.getObservations());
 					gui.setResults(calibrationAlg.getErrors());
-					gui.setCalibration(calibrationAlg.getIntrinsic(),calibrationAlg.getStructure());
+					gui.setCalibration(calibrationAlg.getIntrinsic(), calibrationAlg.getStructure());
 					gui.setCorrection(intrinsic);
 					gui.repaint();
 				});
@@ -474,34 +475,36 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			calibrationAlg.printStatistics();
 			System.out.println();
-			System.out.println("--- "+modeType+" Parameters ---");
+			System.out.println("--- " + modeType + " Parameters ---");
 			System.out.println();
 
-			switch( modeType ) {
+			switch (modeType) {
 				case PINHOLE: {
 					CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
 					switch (formatType) {
 						case BOOFCV: CalibrationIO.save(m, outputFileName); break;
 						case OPENCV: UtilOpenCV.save(m, outputFileName); break;
+						default: break;
 					}
 					m.print();
-				}break;
+				}
+				break;
 
 				case UNIVERSAL: {
 					CameraUniversalOmni m = (CameraUniversalOmni)intrinsic;
 					CalibrationIO.save(m, outputFileName);
 					m.print();
-				}break;
+				}
+				break;
 
-				default:
-					throw new RuntimeException("Unknown model type. "+modeType);
+				default: throw new RuntimeException("Unknown model type. " + modeType);
 			}
 			System.out.println();
-			System.out.println("Save file format "+formatType);
+			System.out.println("Save file format " + formatType);
 			System.out.println();
-		} catch( RuntimeException e ) {
-			if( visualize )
-				BoofSwingUtil.warningDialog(gui,e);
+		} catch (RuntimeException e) {
+			if (visualize)
+				BoofSwingUtil.warningDialog(gui, e);
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -510,18 +513,16 @@ public class CameraCalibration extends BaseStandardInputApp {
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
-	public class ProcessThread extends ProgressMonitorThread
-	{
-		public ProcessThread(Component parent ) {
+	public static class ProcessThread extends ProgressMonitorThread {
+		public ProcessThread( Component parent ) {
 			super(new ProgressMonitor(parent, "Computing Calibration", "", 0, 2));
 		}
 
-		public void setMessage( final int state , final String message ) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					monitor.setProgress(state);
-					monitor.setNote(message);
-				}});
+		public void setMessage( final int state, final String message ) {
+			SwingUtilities.invokeLater(() -> {
+				monitor.setProgress(state);
+				monitor.setNote(message);
+			});
 		}
 
 		@Override
@@ -534,44 +535,48 @@ public class CameraCalibration extends BaseStandardInputApp {
 	 */
 	public void handleWebcam() {
 		final Webcam webcam = openSelectedCamera();
-		if( desiredWidth > 0 && desiredHeight > 0 )
+		if (desiredWidth > 0 && desiredHeight > 0)
 			UtilWebcamCapture.adjustResolution(webcam, desiredWidth, desiredHeight);
 
 		webcam.open();
 
 		// close the webcam gracefully on exit
-		Runtime.getRuntime().addShutdownHook(new Thread(){public void run(){
-			if(webcam.isOpen()){System.out.println("Closing webcam");webcam.close();}}});
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			if (webcam.isOpen()) {
+				System.out.println("Closing webcam");
+				webcam.close();
+			}
+		}));
 
-		ComputeGeometryScore quality = new ComputeGeometryScore(zeroSkew,detector.getLayout());
+		ComputeGeometryScore quality = new ComputeGeometryScore(zeroSkew, detector.getLayout());
 		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
 		JFrame frame = ShowImages.showWindow(gui, "Webcam Calibration", true);
 
-		GrayF32 gray = new GrayF32(webcam.getViewSize().width,webcam.getViewSize().height);
+		GrayF32 gray = new GrayF32(webcam.getViewSize().width, webcam.getViewSize().height);
 
-		if( desiredWidth > 0 && desiredHeight > 0 ) {
-			if (gray.width != desiredWidth || gray.height != desiredHeight )
-				System.err.println("Actual camera resolution does not match desired.  Actual: "+gray.width+" "+gray.height+
-				"  Desired: "+desiredWidth+" "+desiredHeight);
+		if (desiredWidth > 0 && desiredHeight > 0) {
+			if (gray.width != desiredWidth || gray.height != desiredHeight)
+				System.err.println("Actual camera resolution does not match desired.  Actual: " + gray.width + " " + gray.height +
+						"  Desired: " + desiredWidth + " " + desiredHeight);
 		}
 
-		AssistedCalibration assisted = new AssistedCalibration(detector,quality,gui,OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
-		assisted.init(gray.width,gray.height);
+		AssistedCalibration assisted = new AssistedCalibration(detector, quality, gui, OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
+		assisted.init(gray.width, gray.height);
 
 		BufferedImage image;
-		while( (image = webcam.getImage()) != null && !assisted.isFinished()) {
+		while ((image = webcam.getImage()) != null && !assisted.isFinished()) {
 			ConvertBufferedImage.convertFrom(image, gray);
 
 			try {
-				assisted.process(gray,image);
-			} catch( RuntimeException e ) {
+				assisted.process(gray, image);
+			} catch (RuntimeException e) {
 				System.err.println("BUG!!! saving image to crash_image.png");
 				UtilImageIO.saveImage(image, "crash_image.png");
 				throw e;
 			}
 		}
 		webcam.close();
-		if( assisted.isFinished() ) {
+		if (assisted.isFinished()) {
 			frame.setVisible(false);
 
 			inputDirectory = new File(OUTPUT_DIRECTORY, IMAGE_DIRECTORY).getPath();
@@ -590,28 +595,27 @@ public class CameraCalibration extends BaseStandardInputApp {
 		OPENCV
 	}
 
-	public static void main(String[] args) {
-			CameraCalibration app = new CameraCalibration();
-			boolean failed = true;
-			try {
-				if( args.length > 0 ) {
-					app.parse(args);
-					if( app.GUI ) {
-						new CameraCalibrationGui();
-					} else {
-						app.process();
-					}
-					failed = false;
+	public static void main( String[] args ) {
+		CameraCalibration app = new CameraCalibration();
+		boolean failed = true;
+		try {
+			if (args.length > 0) {
+				app.parse(args);
+				if (app.GUI) {
+					new CameraCalibrationGui();
+				} else {
+					app.process();
 				}
-			} catch (RuntimeException e) {
-				System.out.println();
-				System.out.println(e.getMessage());
-			} finally {
-				if( failed ) {
-					app.printHelp();
-					System.exit(0);
-				}
+				failed = false;
 			}
-
+		} catch (RuntimeException e) {
+			System.out.println();
+			System.out.println(e.getMessage());
+		} finally {
+			if (failed) {
+				app.printHelp();
+				System.exit(0);
+			}
+		}
 	}
 }

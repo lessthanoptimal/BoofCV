@@ -86,6 +86,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		findImages();
 	}
 
+	@Override
 	public void setLoop(boolean loop) {
 		this.loop = loop;
 	}
@@ -132,6 +133,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	/**
 	 * True if there is another image to read and false if there are no more.
 	 */
+	@Override
 	public boolean hasNext() {
 		if( loop )
 			return true;
@@ -144,6 +146,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	 * or a new instance of a BufferedImage might be returned each time.  Don't rely
 	 * on either behavior being consistent.
 	 */
+	@Override
 	public T next() {
 		if( loop ) {
 			if( forwards ) {

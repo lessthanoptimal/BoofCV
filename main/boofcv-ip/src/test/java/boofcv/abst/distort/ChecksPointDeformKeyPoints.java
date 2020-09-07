@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,21 +44,21 @@ public abstract class ChecksPointDeformKeyPoints {
 
 		PointDeformKeyPoints alg = createAlgorithm();
 
-		alg.setImageShape(80,100);
+		alg.setImageShape(80, 100);
 		alg.setSource(src);
 		alg.setSource(dst);
 
 		Point2D_F32 expected = new Point2D_F32();
-		alg.compute(12,19.5f, expected);
+		alg.compute(12, 19.5f, expected);
 
 		for (int i = 0; i < src.size(); i++) {
-			src.get(i).x += 2.5;
-			dst.get(i).x += 2.5;
+			src.get(i).x += 2.5f;
+			dst.get(i).x += 2.5f;
 		}
 
 		// see if the results change after modifying the input points
 		Point2D_F32 found = new Point2D_F32();
-		alg.compute(12,19.5f, found);
+		alg.compute(12, 19.5f, found);
 
 		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
 		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);
@@ -66,10 +66,10 @@ public abstract class ChecksPointDeformKeyPoints {
 
 	private List<Point2D_F32> createTestPoints() {
 		List<Point2D_F32> src = new ArrayList<>();
-		src.add( new Point2D_F32(10,20));
-		src.add( new Point2D_F32(15,10));
-		src.add( new Point2D_F32(20,30));
-		src.add( new Point2D_F32(25,60));
+		src.add(new Point2D_F32(10, 20));
+		src.add(new Point2D_F32(15, 10));
+		src.add(new Point2D_F32(20, 30));
+		src.add(new Point2D_F32(25, 60));
 		return src;
 	}
 
@@ -82,17 +82,17 @@ public abstract class ChecksPointDeformKeyPoints {
 		List<Point2D_F32> dst = createTestPoints();
 
 		PointDeformKeyPoints alg = createAlgorithm();
-		alg.setImageShape(80,100);
+		alg.setImageShape(80, 100);
 		alg.setSource(src);
 		alg.setSource(dst);
 
-		alg.setSource(1,20,25);
+		alg.setSource(1, 20, 25);
 		Point2D_F32 expected = new Point2D_F32();
-		alg.compute(12,19.5f, expected);
+		alg.compute(12, 19.5f, expected);
 
-		src.get(1).set(20,25);
+		src.get(1).set(20, 25);
 		Point2D_F32 found = new Point2D_F32();
-		alg.compute(12,19.5f, found);
+		alg.compute(12, 19.5f, found);
 
 		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
 		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);
@@ -107,20 +107,19 @@ public abstract class ChecksPointDeformKeyPoints {
 		List<Point2D_F32> dst = createTestPoints();
 
 		PointDeformKeyPoints alg = createAlgorithm();
-		alg.setImageShape(80,100);
+		alg.setImageShape(80, 100);
 		alg.setSource(src);
 		alg.setSource(dst);
 
-		alg.setDestination(1,20,25);
+		alg.setDestination(1, 20, 25);
 		Point2D_F32 expected = new Point2D_F32();
-		alg.compute(12,19.5f, expected);
+		alg.compute(12, 19.5f, expected);
 
-		dst.get(1).set(20,25);
+		dst.get(1).set(20, 25);
 		Point2D_F32 found = new Point2D_F32();
-		alg.compute(12,19.5f, found);
+		alg.compute(12, 19.5f, found);
 
 		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
 		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,8 @@
 
 package boofcv.demonstrations.feature.detect.line;
 
-
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
-import boofcv.alg.feature.detect.line.ConnectLinesGrid;
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
@@ -39,7 +37,6 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.MatrixOfList;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
@@ -63,22 +60,22 @@ public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>>
 	Class<I> imageType;
 	Class<D> derivType;
 
-	public VisualizeLineRansac(Class<I> imageType, Class<D> derivType) {
+	public VisualizeLineRansac( Class<I> imageType, Class<D> derivType ) {
 		this.imageType = imageType;
 		this.derivType = derivType;
 	}
 
 	public void process( BufferedImage image ) {
-		int regionSize = 40;
+//		int regionSize = 40;
 
 		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, image.getWidth(), image.getHeight());
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, image.getWidth(), image.getHeight());
-		GrayF32 edgeIntensity =  new GrayF32(input.width,input.height);
-		GrayF32 suppressed =  new GrayF32(input.width,input.height);
-		GrayF32 orientation =  new GrayF32(input.width,input.height);
-		GrayS8 direction = new GrayS8(input.width,input.height);
-		GrayU8 detected = new GrayU8(input.width,input.height);
+		GrayF32 edgeIntensity = new GrayF32(input.width, input.height);
+//		GrayF32 suppressed =  new GrayF32(input.width,input.height);
+//		GrayF32 orientation =  new GrayF32(input.width,input.height);
+//		GrayS8 direction = new GrayS8(input.width,input.height);
+		GrayU8 detected = new GrayU8(input.width, input.height);
 
 		ModelManager<LinePolar2D_F32> manager = new ModelManagerLinePolar2D_F32();
 		GridLineModelDistance distance = new GridLineModelDistance((float)(Math.PI*0.75));
@@ -87,9 +84,9 @@ public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>>
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
 				new Ransac<>(123123, manager, fitter, distance, 25, 1);
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
+		ImageGradient<I, D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
-		System.out.println("Image width "+input.width+" height "+input.height);
+		System.out.println("Image width " + input.width + " height " + input.height);
 
 		ConvertBufferedImage.convertFromSingle(image, input, imageType);
 		gradient.process(input, derivX, derivY);
@@ -100,36 +97,36 @@ public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>>
 //		GradientToEdgeFeatures.discretizeDirection4(orientation,direction);
 //		GradientToEdgeFeatures.nonMaxSuppression4(edgeIntensity,direction,suppressed);
 
-		GThresholdImageOps.threshold(edgeIntensity,detected,30,false);
+		GThresholdImageOps.threshold(edgeIntensity, detected, 30, false);
 
-		GridRansacLineDetector<GrayF32> alg = new ImplGridRansacLineDetector_F32(40,10,matcher);
+		GridRansacLineDetector<GrayF32> alg = new ImplGridRansacLineDetector_F32(40, 10, matcher);
 
-		alg.process((GrayF32) derivX, (GrayF32) derivY, detected);
+		alg.process((GrayF32)derivX, (GrayF32)derivY, detected);
 
 		MatrixOfList<LineSegment2D_F32> gridLine = alg.getFoundLines();
 
-		ConnectLinesGrid connect = new ConnectLinesGrid(Math.PI*0.01,1,8);
+//		ConnectLinesGrid connect = new ConnectLinesGrid(Math.PI*0.01,1,8);
 //		connect.process(gridLine);
 //		LineImageOps.pruneClutteredGrids(gridLine,3);
 		List<LineSegment2D_F32> found = gridLine.createSingleList();
-		System.out.println("size = "+found.size());
-		LineImageOps.mergeSimilar(found, (float) (Math.PI * 0.03), 5f);
+		System.out.println("size = " + found.size());
+		LineImageOps.mergeSimilar(found, (float)(Math.PI*0.03), 5f);
 //		LineImageOps.pruneSmall(found,40);
-		System.out.println("after size = "+found.size());
+		System.out.println("after size = " + found.size());
 
 		ImageLinePanel gui = new ImageLinePanel();
 		gui.setImage(image);
 		gui.setLineSegments(found);
-		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+		gui.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 
 		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(detected, false, null);
 
-		ShowImages.showWindow(renderedBinary,"Detected Edges");
-		ShowImages.showWindow(gui,"Detected Lines");
+		ShowImages.showWindow(renderedBinary, "Detected Edges");
+		ShowImages.showWindow(gui, "Detected Lines");
 	}
 
 	public static void main( String args[] ) {
-		VisualizeLineRansac<GrayF32,GrayF32> app =
+		VisualizeLineRansac<GrayF32, GrayF32> app =
 				new VisualizeLineRansac<>(GrayF32.class, GrayF32.class);
 
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,9 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class CheckGrowBodersSB<T extends ImageGray<T>> {
 	Random rand = new Random(345);
-	int width=30,height=20;
+	int width = 30, height = 20;
 
-	double minPixel,maxPixel;
+	double minPixel, maxPixel;
 
 	int borderLower = 2;
 	int borderUpper = 3;
@@ -47,35 +47,35 @@ public abstract class CheckGrowBodersSB<T extends ImageGray<T>> {
 
 	ImageBorder<T> border;
 
-	public CheckGrowBodersSB(double minPixel, double maxPixel, ImageType<T> imageType) {
+	protected CheckGrowBodersSB( double minPixel, double maxPixel, ImageType<T> imageType ) {
 		this.minPixel = minPixel;
 		this.maxPixel = maxPixel;
-		image = imageType.createImage(width,height);
-		GImageMiscOps.fillUniform(image,rand,minPixel,maxPixel);
+		image = imageType.createImage(width, height);
+		GImageMiscOps.fillUniform(image, rand, minPixel, maxPixel);
 
-		border = FactoryImageBorder.generic(BorderType.REFLECT,imageType);
+		border = FactoryImageBorder.generic(BorderType.REFLECT, imageType);
 	}
 
-	protected abstract GrowBorderSB<T,?> createAlg();
+	protected abstract GrowBorderSB<T, ?> createAlg();
 
 	@Test
 	public void rows() {
 		GrowBorderSB alg = createAlg();
-		int length = width+borderLower+borderUpper;
+		int length = width + borderLower + borderUpper;
 		Object data = image.getDataType().newArray(length);
 
 		boolean signed = image.getDataType().isSigned();
 
 		alg.setBorder(border);
 		alg.setImage(image);
-		for( int y : new int[]{-2,0,2,3,height-1,height+1}) {
-			alg.growRow(y,borderLower,borderUpper,data,0);
+		for (int y : new int[]{-2, 0, 2, 3, height - 1, height + 1}) {
+			alg.growRow(y, borderLower, borderUpper, data, 0);
 
 			for (int x = 0; x < length; x++) {
-				double expected = GeneralizedImageOps.get(border,x-borderLower,y);
-				double found = GeneralizedImageOps.arrayElement(data,x,signed);
+				double expected = GeneralizedImageOps.get(border, x - borderLower, y);
+				double found = GeneralizedImageOps.arrayElement(data, x, signed);
 
-				assertEquals(expected,found, 1e-8,"x = "+x);
+				assertEquals(expected, found, 1e-8, "x = " + x);
 			}
 		}
 	}
@@ -83,20 +83,20 @@ public abstract class CheckGrowBodersSB<T extends ImageGray<T>> {
 	@Test
 	public void columns() {
 		GrowBorderSB alg = createAlg();
-		int length = height+borderLower+borderUpper;
+		int length = height + borderLower + borderUpper;
 		Object data = image.getDataType().newArray(length);
 
 		boolean signed = image.getDataType().isSigned();
 
 		alg.setBorder(border);
 		alg.setImage(image);
-		for( int x : new int[]{-2,0,2,3,width-1,width+1}) {
-			alg.growCol(x,borderLower,borderUpper,data,0);
+		for (int x : new int[]{-2, 0, 2, 3, width - 1, width + 1}) {
+			alg.growCol(x, borderLower, borderUpper, data, 0);
 
 			for (int y = 0; y < length; y++) {
-				double expected = GeneralizedImageOps.get(border,x,y-borderLower);
-				double found = GeneralizedImageOps.arrayElement(data,y,signed);
-				assertEquals(expected,found, 1e-8, x+" y = "+y);
+				double expected = GeneralizedImageOps.get(border, x, y - borderLower);
+				double found = GeneralizedImageOps.arrayElement(data, y, signed);
+				assertEquals(expected, found, 1e-8, x + " y = " + y);
 			}
 		}
 	}

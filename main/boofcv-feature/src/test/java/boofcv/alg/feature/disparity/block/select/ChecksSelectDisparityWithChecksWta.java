@@ -55,6 +55,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData , D extends I
 
 	public abstract SelectDisparityWithChecksWta<ArrayData,D> createSelector(int rightToLeftTolerance, double texture );
 
+	@Override
 	public DisparitySelect<ArrayData, D> createAlg() {
 		return createSelector(-1, -1);
 	}

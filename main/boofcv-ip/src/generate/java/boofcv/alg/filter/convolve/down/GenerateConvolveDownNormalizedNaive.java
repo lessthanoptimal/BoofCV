@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ public class GenerateConvolveDownNormalizedNaive extends CodeGeneratorBase {
 		setOutputFile(className);
 	}
 
+	@Override
 	public void generate() {
 		printPreamble();
 		printAllOps("F32", "GrayF32","GrayF32","float","float");

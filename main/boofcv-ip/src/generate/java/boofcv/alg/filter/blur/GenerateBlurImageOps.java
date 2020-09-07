@@ -72,10 +72,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				" * Catch all class for function which \"blur\" an image, typically used to \"reduce\" the amount\n" +
 				" * of noise in the image.\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n");
 	}
@@ -83,7 +80,6 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 	private void generateMeanWeighted(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
 		String letter = type.isInteger() ? "I" : type.getNumBits()==32?"F":"D";
-		String suffix = type.getKernelType();
 		out.print("\t/**\n" +
 				"\t * Applies a mean box filter with re-weighted image borders.\n" +
 				"\t *\n" +

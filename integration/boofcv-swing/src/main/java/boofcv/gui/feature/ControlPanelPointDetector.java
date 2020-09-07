@@ -48,38 +48,36 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 
 	Listener listener;
 
-	public ControlPanelPointDetector( ConfigPointDetector config , Listener listener )
-	{
+	public ControlPanelPointDetector( ConfigPointDetector config, Listener listener ) {
 		this.config = config;
 		this.listener = listener;
 
-		spinnerScaleRadius = spinner(config.scaleRadius,1.0,500.0,1.0);
-		comboType = combo(config.type.ordinal(),(Object[]) PointDetectorTypes.FIRST_ONLY);
-		controlGeneralCorner = new ControlPanelGeneralCorner(config.general,listener::handleChangePointDetector);
+		spinnerScaleRadius = spinner(config.scaleRadius, 1.0, 500.0, 1.0);
+		comboType = combo(config.type.ordinal(), (Object[])PointDetectorTypes.FIRST_ONLY);
+		controlGeneralCorner = new ControlPanelGeneralCorner(config.general, listener::handleChangePointDetector);
 
 		controlsDefault = new DefaultControls();
-		controlsFastCorner = new ControlPanelFastCorner(config.fast,listener::handleChangePointDetector);
+		controlsFastCorner = new ControlPanelFastCorner(config.fast, listener::handleChangePointDetector);
 		controlsFastCorner.setBorder(BorderFactory.createEmptyBorder());
 
 		controlGeneralCorner.setBorder(BorderFactory.createEmptyBorder());
 
 		handleTypeChange();
 
-		addLabeled(comboType,"Type","Type of corner or blob detector");
-		addLabeled(spinnerScaleRadius,"Scale-Radius","How large it tells a scale invariant descriptor to be. Radius in pixels");
+		addLabeled(comboType, "Type", "Type of corner or blob detector");
+		addLabeled(spinnerScaleRadius, "Scale-Radius", "How large it tells a scale invariant descriptor to be. Radius in pixels");
 		add(controlGeneralCorner);
 		add(panelSpecific);
 	}
 
-
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T,D> create( Class<T> imageType ) {
-		return FactoryDetectPoint.create(config,imageType,null);
+	GeneralFeatureDetector<T, D> create( Class<T> imageType ) {
+		return FactoryDetectPoint.create(config, imageType, null);
 	}
 
 	void handleTypeChange() {
 		panelSpecific.removeAll();
-		if( config.type == PointDetectorTypes.FAST ) {
+		if (config.type == PointDetectorTypes.FAST) {
 			panelSpecific.add(controlsFastCorner);
 		} else {
 			panelSpecific.add(controlsDefault);
@@ -91,7 +89,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		if (source == comboType) {
 			config.type = PointDetectorTypes.FIRST_ONLY[comboType.getSelectedIndex()];
 			handleTypeChange();
@@ -107,13 +105,13 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 
 		public DefaultControls() {
 			setBorder(BorderFactory.createEmptyBorder());
-			spinnerKernel = spinner(1,1,1000,1);
-			checkWeighted = checkbox("Weighted",false,"Gaussian weighted or block");
+			spinnerKernel = spinner(1, 1, 1000, 1);
+			checkWeighted = checkbox("Weighted", false, "Gaussian weighted or block");
 
 			setKernelSize();
 			setWeighted();
 
-			addLabeled(spinnerKernel,"Kernel","Radius of convolutional kernel when computing feature intensity");
+			addLabeled(spinnerKernel, "Kernel", "Radius of convolutional kernel when computing feature intensity");
 			addAlignCenter(checkWeighted);
 		}
 
@@ -124,7 +122,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 				default -> -1;
 			};
 			spinnerKernel.removeChangeListener(this);
-			if( radius == -1 ) {
+			if (radius == -1) {
 				spinnerKernel.setEnabled(false);
 			} else {
 				spinnerKernel.setEnabled(true);
@@ -150,18 +148,20 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		}
 
 		@Override
-		public void controlChanged(final Object source) {
-			if( source == spinnerScaleRadius) {
-				config.scaleRadius = ((Number) spinnerScaleRadius.getValue()).doubleValue();
-			} else if( source == spinnerKernel ) {
+		public void controlChanged( final Object source ) {
+			if (source == spinnerScaleRadius) {
+				config.scaleRadius = ((Number)spinnerScaleRadius.getValue()).doubleValue();
+			} else if (source == spinnerKernel) {
 				switch (config.type) {
-					case SHI_TOMASI -> config.shiTomasi.radius = ((Number) spinnerKernel.getValue()).intValue();
-					case HARRIS -> config.harris.radius = ((Number) spinnerKernel.getValue()).intValue();
+					case SHI_TOMASI -> config.shiTomasi.radius = ((Number)spinnerKernel.getValue()).intValue();
+					case HARRIS -> config.harris.radius = ((Number)spinnerKernel.getValue()).intValue();
+					default -> {}
 				}
-			} else if( source == checkWeighted ) {
+			} else if (source == checkWeighted) {
 				switch (config.type) {
 					case SHI_TOMASI -> config.shiTomasi.weighted = checkWeighted.isSelected();
 					case HARRIS -> config.harris.weighted = checkWeighted.isSelected();
+					default -> {}
 				}
 			} else {
 				throw new RuntimeException("Unknown source");

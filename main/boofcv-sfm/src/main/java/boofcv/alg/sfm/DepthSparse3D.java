@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,24 +49,24 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	private Point2Transform2_F64 p2n;
 
 	// location of point in visual camera coordinate system
-	private Point3D_F64 worldPt = new Point3D_F64();
+	private final Point3D_F64 worldPt = new Point3D_F64();
 
 	// pixel in normalized image coordinates
-	private Point2D_F64 norm = new Point2D_F64();
+	private final Point2D_F64 norm = new Point2D_F64();
 
 	// transform from visual image coordinate system to depth image coordinate system
 	private PixelTransform<Point2D_F32> visualToDepth;
-	private Point2D_F32 distorted = new Point2D_F32();
+	private final Point2D_F32 distorted = new Point2D_F32();
 
 	// scales the values from the depth image
-	private double depthScale;
+	private final double depthScale;
 
 	/**
 	 * Configures parameters
 	 *
 	 * @param depthScale Used to change units found in the depth image.
 	 */
-	public DepthSparse3D(double depthScale) {
+	protected DepthSparse3D( double depthScale ) {
 		this.depthScale = depthScale;
 	}
 
@@ -76,18 +76,17 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	 * @param model Model for narrow FOV cameras
 	 * @param visualToDepth Transform from visual to depth camera pixel coordinate systems.
 	 */
-	public void configure(LensDistortionNarrowFOV model , PixelTransform<Point2D_F32> visualToDepth ) {
+	public void configure( LensDistortionNarrowFOV model, PixelTransform<Point2D_F32> visualToDepth ) {
 		this.visualToDepth = visualToDepth;
-		this.p2n = model.undistort_F64(true,false);
+		this.p2n = model.undistort_F64(true, false);
 	}
-
 
 	/**
 	 * Sets the depth image.  A reference is saved internally.
 	 *
 	 * @param depthImage Image containing depth information.
 	 */
-	public void setDepthImage(T depthImage) {
+	public void setDepthImage( T depthImage ) {
 		this.depthImage = depthImage;
 	}
 
@@ -98,22 +97,22 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	 * @param y y-coordinate of point in visual camera
 	 * @return true if a 3D point could be computed and false if not
 	 */
-	public boolean process( int x , int y ) {
-		visualToDepth.compute(x, y,distorted);
+	public boolean process( int x, int y ) {
+		visualToDepth.compute(x, y, distorted);
 
 		int depthX = (int)distorted.x;
 		int depthY = (int)distorted.y;
 
-		if( depthImage.isInBounds(depthX,depthY) ) {
+		if (depthImage.isInBounds(depthX, depthY)) {
 			// get the depth at the specified location
 			double value = lookupDepth(depthX, depthY);
 
 			// see if its an invalid value
-			if( value == 0 )
+			if (value == 0)
 				return false;
 
 			// convert visual pixel into normalized image coordinate
-			p2n.compute(x,y,norm);
+			p2n.compute(x, y, norm);
 
 			// project into 3D space
 			worldPt.z = value*depthScale;
@@ -144,20 +143,20 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	 * @param depthY y-coordinate of pixel in depth camera
 	 * @return depth at the specified coordinate
 	 */
-	protected abstract double lookupDepth(int depthX, int depthY);
+	protected abstract double lookupDepth( int depthX, int depthY );
 
 	/**
 	 * Implementation for {@link GrayI}.
 	 */
 	public static class I<T extends GrayI<T>> extends DepthSparse3D<T> {
 
-		public I(double depthScale) {
+		public I( double depthScale ) {
 			super(depthScale);
 		}
 
 		@Override
-		protected double lookupDepth(int depthX, int depthY) {
-			return depthImage.unsafe_get(depthX,depthY);
+		protected double lookupDepth( int depthX, int depthY ) {
+			return depthImage.unsafe_get(depthX, depthY);
 		}
 	}
 
@@ -166,13 +165,13 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	 */
 	public static class F32 extends DepthSparse3D<GrayF32> {
 
-		public F32(double depthScale) {
+		public F32( double depthScale ) {
 			super(depthScale);
 		}
 
 		@Override
-		protected double lookupDepth(int depthX, int depthY) {
-			return depthImage.unsafe_get(depthX,depthY);
+		protected double lookupDepth( int depthX, int depthY ) {
+			return depthImage.unsafe_get(depthX, depthY);
 		}
 	}
 }

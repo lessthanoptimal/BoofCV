@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,10 +71,7 @@ public class GenerateFhEdgeWeights_PL extends CodeGeneratorBase {
 				" * <p>Computes edge weight as the F-norm different in pixel value for {@link Planar} images.\n" +
 				" * A "+ruleName+"-connect neighborhood is considered.</p>\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"public class "+className+" implements FhEdgeWeights<Planar<"+imageName+">> {\n\n");
 	}
 

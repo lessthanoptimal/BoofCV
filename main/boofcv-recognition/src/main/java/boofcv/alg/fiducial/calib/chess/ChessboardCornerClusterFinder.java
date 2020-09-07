@@ -84,35 +84,35 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
-	private int maxNeighbors=14; // 8 is minimum number given perfect data.
-	private double maxNeighborDistance=Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
+	private int maxNeighbors = 14; // 8 is minimum number given perfect data.
+	private double maxNeighborDistance = Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
 
 	// Computes the intensity of the line which connects two corners
-	private ChessboardCornerEdgeIntensity<T> computeConnInten;
+	private final ChessboardCornerEdgeIntensity<T> computeConnInten;
 	// Threshold relative to corner intensity used to prune. If <= 0 then this test is disabled
 	private double thresholdEdgeIntensity = 0.05;
 
 	// Data structures for the crude graph
-	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex::new);
-	private FastQueue<Edge> edges = new FastQueue<>(Edge::new);
-	private FastQueue<LineInfo> lines = new FastQueue<>(LineInfo::new);
+	private final FastQueue<Vertex> vertexes = new FastQueue<>(Vertex::new);
+	private final FastQueue<Edge> edges = new FastQueue<>(Edge::new);
+	private final FastQueue<LineInfo> lines = new FastQueue<>(LineInfo::new);
 
 	// data structures for nearest neighbor search
-	private NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
-	private NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
-	private FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData::new);
+	private final NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
+	private final NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
+	private final FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData::new);
 
 	// Output. Contains a graph of connected corners
-	private FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph::new);
+	private final FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph::new);
 
 	// predeclared storage for results
-	private SearchResults results = new SearchResults();
-	private TupleI32 tuple3 = new TupleI32();
+//	private SearchResults results = new SearchResults();
+//	private TupleI32 tuple3 = new TupleI32();
 
 	// Used to convert the internal graph into the output clusters
-	private GrowQueue_I32 c2n = new GrowQueue_I32(); // corner index to output node index
-	private GrowQueue_I32 n2c = new GrowQueue_I32(); // output node index to corner index
-	private GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
+	private final GrowQueue_I32 c2n = new GrowQueue_I32(); // corner index to output node index
+	private final GrowQueue_I32 n2c = new GrowQueue_I32(); // output node index to corner index
+	private final GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
 
 	// Work space to store distances from NN searched to find median distance
 //	private GrowQueue_F64 distanceTmp = new GrowQueue_F64();
@@ -122,20 +122,20 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	private List<ChessboardCorner> corners;
 
 	// Workspace for pruning invalid
-	private List<Vertex> openVertexes = new ArrayList<>();
-	private List<Vertex> dirtyVertexes = new ArrayList<>();
+	private final List<Vertex> openVertexes = new ArrayList<>();
+	private final List<Vertex> dirtyVertexes = new ArrayList<>();
 
 	// Workspace for connecting vertices
-	private List<Edge> bestSolution = new ArrayList<>();
-	private List<Edge> solution = new ArrayList<>();
-	private FastQueue<PairIdx> pairs = new FastQueue<>(PairIdx.class, PairIdx::new);
-	private GrowQueue_B matched = new GrowQueue_B();
+	private final List<Edge> bestSolution = new ArrayList<>();
+	private final List<Edge> solution = new ArrayList<>();
+	private final FastQueue<PairIdx> pairs = new FastQueue<>(PairIdx.class, PairIdx::new);
+	private final GrowQueue_B matched = new GrowQueue_B();
 
 	public ChessboardCornerClusterFinder( Class<T> imageType ) {
 		this(new ChessboardCornerEdgeIntensity<>(imageType));
 	}
 
-	public ChessboardCornerClusterFinder(ChessboardCornerEdgeIntensity<T> computeConnInten) {
+	public ChessboardCornerClusterFinder( ChessboardCornerEdgeIntensity<T> computeConnInten ) {
 		this.computeConnInten = computeConnInten;
 		setDirectionTol(directionTol);
 	}
@@ -145,7 +145,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 *
 	 * @param corners Detected chessboard patterns. Not modified.
 	 */
-	public void process( T image , List<ChessboardCorner> corners , int numLevels ) {
+	public void process( T image, List<ChessboardCorner> corners, int numLevels ) {
 		this.corners = corners;
 
 		List<GrowQueue_I32> cornersInLevel = new ArrayList<>();
@@ -164,7 +164,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 //		printDualGraph();
 
 		// use edge intensity to prune connections
-		if( thresholdEdgeIntensity > 0 ) {
+		if (thresholdEdgeIntensity > 0) {
 			pruneConnectionsByIntensity(corners);
 		}
 //		printDualGraph();
@@ -191,7 +191,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			Vertex v = vertexes.get(i);
 			int before = v.connections.size();
 			v.pruneNonMutal(EdgeType.CONNECTION);
-			if( before != v.connections.size() ) {
+			if (before != v.connections.size()) {
 				dirtyVertexes.add(v);
 				v.marked = true;
 			}
@@ -221,15 +221,15 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	private void pruneSingleConnections() {
 		for (int i = 0; i < vertexes.size; i++) {
 			Vertex va = vertexes.get(i);
-			if( va.perpendicular.size() == 1 ) {
-				removeReferences(va, EdgeType.PERPENDICULAR,true);
+			if (va.perpendicular.size() == 1) {
+				removeReferences(va, EdgeType.PERPENDICULAR, true);
 			}
 		}
 	}
 
-	private void pyramidalFindNeighbors(List<ChessboardCorner> corners, int numLevels, List<GrowQueue_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel, GrowQueue_I32 indexesUpToLevel) {
+	private void pyramidalFindNeighbors( List<ChessboardCorner> corners, int numLevels, List<GrowQueue_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel, GrowQueue_I32 indexesUpToLevel ) {
 		// start from top of the pyramid, which is the lowest resolution
-		for (int level = numLevels-1; level >= 0; level--) {
+		for (int level = numLevels - 1; level >= 0; level--) {
 			GrowQueue_I32 levelCornerIdx = cornersInLevel.get(level);
 			for (int i = 0; i < levelCornerIdx.size; i++) {
 				cornersUpToLevel.add(corners.get(levelCornerIdx.get(i)));
@@ -238,19 +238,19 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 //			System.out.println("level = "+level+" count "+levelCornerIdx.size+" total "+indexesUpToLevel.size);
 
 			// Initialize nearest-neighbor search.
-			nn.setPoints(cornersUpToLevel,true);
+			nn.setPoints(cornersUpToLevel, true);
 
 			// Connect corners to each other based on relative distance on orientation
 			for (int i = 0; i < levelCornerIdx.size(); i++) {
 				Vertex v = vertexes.get(levelCornerIdx.get(i));
-				findVertexNeighbors(v,indexesUpToLevel,corners);
+				findVertexNeighbors(v, indexesUpToLevel, corners);
 				// Order edges by angle to simplify later processing
 				v.perpendicular.sortByAngle();
 			}
 		}
 	}
 
-	private void initalizeStructures(T image, List<ChessboardCorner> corners, int numLevels, List<GrowQueue_I32> cornersInLevel) {
+	private void initalizeStructures( T image, List<ChessboardCorner> corners, int numLevels, List<GrowQueue_I32> cornersInLevel ) {
 		// reset internal data structures
 		vertexes.reset();
 		edges.reset();
@@ -268,7 +268,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		// declare queues to store the corner index that appears in each level
 		for (int level = 0; level < numLevels; level++) {
-			cornersInLevel.add( new GrowQueue_I32());
+			cornersInLevel.add(new GrowQueue_I32());
 		}
 
 		// Add corners to the pyramid at the lowest resolution level they appear at
@@ -280,14 +280,13 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	/**
 	 * Computes edge intensity and prunes connections if it's too low relative
-	 *
 	 */
-	protected void pruneConnectionsByIntensity(List<ChessboardCorner> corners) {
+	protected void pruneConnectionsByIntensity( List<ChessboardCorner> corners ) {
 
 		for (int i = 0; i < lines.size; i++) {
 			LineInfo line = lines.get(i);
 
-			if( line.isDisconnected() || line.parallel )
+			if (line.isDisconnected() || line.parallel)
 				continue;
 
 			Vertex va = line.endA.dst;
@@ -301,16 +300,15 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			line.intensityRaw = computeConnInten.process(ca, cb, line.endA.direction);
 			line.intensity = line.intensityRaw/contrast;
 
-			if( line.intensity < thresholdEdgeIntensity ) {
-				if( !va.perpendicular.remove(line) )
+			if (line.intensity < thresholdEdgeIntensity) {
+				if (!va.perpendicular.remove(line))
 					throw new RuntimeException("BUG");
-				if( !vb.perpendicular.remove(line) )
+				if (!vb.perpendicular.remove(line))
 					throw new RuntimeException("BUG");
 				line.disconnect();
 			}
 		}
 	}
-
 
 	/**
 	 * Prints the graph. Used for debugging the code.
@@ -318,14 +316,14 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	public void printDualGraph() {
 		System.out.println("============= Dual");
 		int l = BoofMiscOps.numDigits(vertexes.size);
-		String format = "%"+l+"d";
+		String format = "%" + l + "d";
 
-		for( Vertex n : vertexes.toList() ) {
+		for (Vertex n : vertexes.toList()) {
 			ChessboardCorner c = corners.get(n.index);
-			System.out.printf("["+format+"] {%3.0f, %3.0f} ->  90[ ",n.index,c.x,c.y);
+			System.out.printf("[" + format + "] {%3.0f, %3.0f} ->  90[ ", n.index, c.x, c.y);
 			for (int i = 0; i < n.perpendicular.size(); i++) {
 				Edge e = n.perpendicular.get(i);
-				System.out.printf(format+" ",e.dst.index);
+				System.out.printf(format + " ", e.dst.index);
 			}
 			System.out.println("]");
 		}
@@ -334,14 +332,14 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	public void printConnectionGraph() {
 		System.out.println("============= Connection");
 		int l = BoofMiscOps.numDigits(vertexes.size);
-		String format = "%"+l+"d";
+		String format = "%" + l + "d";
 
-		for( Vertex n : vertexes.toList() ) {
+		for (Vertex n : vertexes.toList()) {
 			ChessboardCorner c = corners.get(n.index);
-			System.out.printf("["+format+"] {%3.0f, %3.0f} -> [ ",n.index,c.x,c.y);
+			System.out.printf("[" + format + "] {%3.0f, %3.0f} -> [ ", n.index, c.x, c.y);
 			for (int i = 0; i < n.connections.size(); i++) {
 				Edge e = n.connections.get(i);
-				System.out.printf(format+" ",e.dst.index);
+				System.out.printf(format + " ", e.dst.index);
 			}
 			System.out.println("]");
 		}
@@ -351,32 +349,32 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * Use nearest neighbor search to find closest corners. Split those into two groups, parallel and
 	 * perpendicular.
 	 */
-	void findVertexNeighbors(Vertex va  , GrowQueue_I32 indexesUpToLevel, List<ChessboardCorner> corners ) {
+	void findVertexNeighbors( Vertex va, GrowQueue_I32 indexesUpToLevel, List<ChessboardCorner> corners ) {
 		ChessboardCorner targetCorner = corners.get(va.index);
 		// distance is Euclidean squared
-		double maxDist = Double.MAX_VALUE==maxNeighborDistance?maxNeighborDistance:maxNeighborDistance*maxNeighborDistance;
-		nnSearch.findNearest(corners.get(va.index),maxDist,maxNeighbors,nnResults);
+		double maxDist = Double.MAX_VALUE == maxNeighborDistance ? maxNeighborDistance : maxNeighborDistance*maxNeighborDistance;
+		nnSearch.findNearest(corners.get(va.index), maxDist, maxNeighbors, nnResults);
 
 		for (int i = 0; i < nnResults.size; i++) {
 			NnData<ChessboardCorner> rb = nnResults.get(i);
 			int cindex = indexesUpToLevel.get(rb.index);
-			if( cindex == va.index) continue;
+			if (cindex == va.index) continue;
 
-			Vertex vb = vertexes.get( cindex );
+			Vertex vb = vertexes.get(cindex);
 
-			double oriDiff = UtilAngle.distHalf( targetCorner.orientation , rb.point.orientation );
+			double oriDiff = UtilAngle.distHalf(targetCorner.orientation, rb.point.orientation);
 			boolean parallel = oriDiff <= Math.PI/4.0;
 			double orientationError;
-			if( parallel ) {
+			if (parallel) {
 				continue;
 			} else {
-				orientationError = Math.abs(oriDiff-Math.PI/2.0);
-				if( vb.perpendicular.find(va) != -1 )
+				orientationError = Math.abs(oriDiff - Math.PI/2.0);
+				if (vb.perpendicular.find(va) != -1)
 					continue;
 			}
 
 			// if it's off from the ideal by too much then it's neither parallel or perpendicular
-			if( orientationError > orientationTol ) {
+			if (orientationError > orientationTol) {
 				continue;
 			}
 
@@ -394,12 +392,12 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 			ea.reset();
 			ea.dst = vb;
-			ea.direction = Math.atan2(dy,dx);
+			ea.direction = Math.atan2(dy, dx);
 			ea.line = line;
 
 			eb.reset();
 			eb.dst = va;
-			eb.direction = Math.atan2(-dy,-dx);
+			eb.direction = Math.atan2(-dy, -dx);
 			eb.line = line;
 
 			// need to save a reference back the line's end points
@@ -415,11 +413,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * Identify ambiguous vertexes which are too close to each other. Select the corner with the highest intensity
 	 * score and remove the rest
 	 */
-	void handleAmbiguousVertexes(List<ChessboardCorner> corners) {
+	void handleAmbiguousVertexes( List<ChessboardCorner> corners ) {
 		List<Vertex> candidates = new ArrayList<>();
 		for (int idx = 0; idx < vertexes.size(); idx++) {
 			Vertex target = vertexes.get(idx);
-			if( target.perpendicular.size() == 0 )
+			if (target.perpendicular.size() == 0)
 				continue;
 
 			ChessboardCorner tc = corners.get(target.index);
@@ -438,19 +436,19 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					Edge e = a.perpendicular.get(j);
 					Vertex b = e.dst;
 					ChessboardCorner tb = corners.get(b.index);
-					if( b == target )
+					if (b == target)
 						continue;
 
 					// We define too close and possibly confusing as pointing in a similar direction
 					// and being at a distance not far relative to the line's length
-					double acute = UtilAngle.dist(e.direction,targetDir);
+					double acute = UtilAngle.dist(e.direction, targetDir);
 					double foo = tc.distance(tb)/e.line.distance;
-					if( acute < Math.PI/3 && foo < ambiguousTol && !candidates.contains(b)) {
+					if (acute < Math.PI/3 && foo < ambiguousTol && !candidates.contains(b)) {
 						candidates.add(b);
 					}
 				}
 			}
-			if( candidates.size() == 0 )
+			if (candidates.size() == 0)
 				continue;
 			candidates.add(target);
 
@@ -466,17 +464,17 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					Edge e = v.perpendicular.get(j);
 					LineInfo line = v.perpendicular.get(j).line;
 					ChessboardCorner b = corners.get(e.dst.index);
-					double errorA = UtilAngle.distHalf(a.orientation,e.direction);
-					double errorB = UtilAngle.distHalf(b.orientation,e.direction);
+					double errorA = UtilAngle.distHalf(a.orientation, e.direction);
+					double errorB = UtilAngle.distHalf(b.orientation, e.direction);
 
-					angleError += line.intensityRaw/(1+Math.abs(errorA+errorB-Math.PI/2.0));
+					angleError += line.intensityRaw/(1 + Math.abs(errorA + errorB - Math.PI/2.0));
 				}
 //				angleError /= v.perpendicular.size();
 				// TODO take in account line angles. prefer stuff that involve parallel lines and close to 90
 				//      see large shadow
 
 //					System.out.println("   candidate = "+v.index);
-				if( angleError > bestError ) {
+				if (angleError > bestError) {
 					bestError = angleError;
 					bestIndex = i;
 				}
@@ -484,9 +482,9 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 //				System.out.println("==== Resolved ambiguity. Selected "+candidates.get(bestIndex).index);
 
 			for (int i = 0; i < candidates.size(); i++) {
-				if( i == bestIndex )
+				if (i == bestIndex)
 					continue;
-				removeReferences(candidates.get(i),EdgeType.PERPENDICULAR,true);
+				removeReferences(candidates.get(i), EdgeType.PERPENDICULAR, true);
 			}
 		}
 	}
@@ -500,20 +498,20 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		openVertexes.clear();
 		for (int idxVert = 0; idxVert < vertexes.size; idxVert++) {
 			Vertex n = vertexes.get(idxVert);
-			if( n.connections.size() == 1 || n.connections.size()==2) {
+			if (n.connections.size() == 1 || n.connections.size() == 2) {
 				openVertexes.add(n);
 			}
 		}
 
 		// continue until there are no changes
-		while( !openVertexes.isEmpty() ) {
+		while (!openVertexes.isEmpty()) {
 			dirtyVertexes.clear();
 			for (int idxVert = 0; idxVert < openVertexes.size(); idxVert++) {
 				boolean remove = false;
 				Vertex n = openVertexes.get(idxVert);
-				if( n.connections.size() == 1 ) {
+				if (n.connections.size() == 1) {
 					remove = true;
-				} else if( n.connections.size() == 2 ) {
+				} else if (n.connections.size() == 2) {
 					Edge ea = n.connections.get(0);
 					Edge eb = n.connections.get(1);
 
@@ -521,11 +519,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					remove = true;
 					for (int i = 0; i < ea.dst.connections.size(); i++) {
 						Vertex va = ea.dst.connections.get(i).dst;
-						if( va == n )
+						if (va == n)
 							continue;
 						for (int j = 0; j < eb.dst.connections.size(); j++) {
 							Vertex vb = ea.dst.connections.get(j).dst;
-							if( va == vb ) {
+							if (va == vb) {
 								remove = false;
 								break;
 							}
@@ -533,36 +531,35 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					}
 				}
 
-				if( remove ) {
+				if (remove) {
 					// only go through the subset referenced the disconnected. Yes there could be duplicates
 					// not worth the time to fix that
 					for (int i = 0; i < n.connections.size(); i++) {
-						dirtyVertexes.add( n.connections.get(i).dst );
+						dirtyVertexes.add(n.connections.get(i).dst);
 					}
-					removeReferences(n,EdgeType.CONNECTION,false);
+					removeReferences(n, EdgeType.CONNECTION, false);
 				}
 			}
 			openVertexes.clear();
 			openVertexes.addAll(dirtyVertexes);
 		}
-
 	}
 
 	/**
 	 * Go through all the vertexes that 'remove' is connected to and remove that link. if it is
 	 * in the connected list swap it with 'replaceWith'.
 	 */
-	void removeReferences( Vertex remove , EdgeType type , boolean disconnectLines ) {
+	void removeReferences( Vertex remove, EdgeType type, boolean disconnectLines ) {
 		EdgeSet removeSet = remove.getEdgeSet(type);
-		for (int i = removeSet.size()-1; i >= 0; i--) {
+		for (int i = removeSet.size() - 1; i >= 0; i--) {
 			Vertex v = removeSet.get(i).dst;
 
-			if( disconnectLines )
+			if (disconnectLines)
 				removeSet.get(i).line.disconnect();
 			EdgeSet setV = v.getEdgeSet(type);
 			// remove the connection from v to 'remove'.
 			int ridx = setV.find(remove);
-			if( ridx != -1 )
+			if (ridx != -1)
 				setV.edges.remove(ridx);
 			else
 				throw new RuntimeException("EGads");
@@ -572,18 +569,18 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	// TODO Comment
 	// TODO check if lines are parallel if > 2 connections
-	void selectConnections(Vertex target ) {
+	void selectConnections( Vertex target ) {
 		// TODO prefer sets of lines with similar length
 		// TODO of on other side prefer that the lines be parallel
 
 		// There needs to be at least two corners
-		if( target.perpendicular.size() <= 1 )
+		if (target.perpendicular.size() <= 1)
 			return;
 
 		// go through each connection and select the one which should come after it
 		pairs.reset();
 		for (int i = 0; i < target.perpendicular.size(); i++) {
-			selectNext(target,i,target.perpendicular,pairs.grow());
+			selectNext(target, i, target.perpendicular, pairs.grow());
 		}
 
 		// Select the sequence which the largest score
@@ -596,37 +593,37 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			double score = 0;
 			int count = 1;
 			PairIdx a = pairs.get(i);
-			if( a.score <= 0 )
+			if (a.score <= 0)
 				continue;
 			do {
 				count++;
-				matched.set(a.idx0,true);
+				matched.set(a.idx0, true);
 				score += a.score;
 				a = pairs.get(a.idx1);
-			} while( a.idx1 >= 0 && !matched.get(a.idx1) && count < 4);
+			} while (a.idx1 >= 0 && !matched.get(a.idx1) && count < 4);
 
-			if( score > bestScore ) {
+			if (score > bestScore) {
 				bestScore = score;
 				bestStart = i;
 			}
 		}
 
 		// Set the connections at this vertex to be the selected connections
-		if( bestStart >= 0 ) {
+		if (bestStart >= 0) {
 			matched.fill(false);
 			PairIdx a = pairs.get(bestStart);
 			target.connections.add(target.perpendicular.edges.get(a.idx0));
-			matched.set(a.idx0,true);
+			matched.set(a.idx0, true);
 			do {
-				matched.set(a.idx1,true);
+				matched.set(a.idx1, true);
 				target.connections.add(target.perpendicular.edges.get(a.idx1));
 				a = pairs.get(a.idx1);
 				// iterate until there is no next or it loops or it has the max number of connections
-			} while( a.idx1 >= 0 && !matched.get(a.idx1) && target.connections.size() < 4 );
+			} while (a.idx1 >= 0 && !matched.get(a.idx1) && target.connections.size() < 4);
 		}
 	}
 
-	boolean selectNext(Vertex target, int idx0 , EdgeSet connections , PairIdx output ) {
+	boolean selectNext( Vertex target, int idx0, EdgeSet connections, PairIdx output ) {
 
 		output.idx0 = idx0;
 		output.idx1 = -1;
@@ -634,21 +631,21 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		Edge edge0 = connections.get(idx0);
 		for (int i = 1; i < connections.size(); i++) {
-			int idx1 = (idx0+i)%connections.size();
+			int idx1 = (idx0 + i)%connections.size();
 			Edge edge1 = connections.get(idx1);
 
 			// Find all the common nodes between these two edges
 			for (int idxA = 0; idxA < edge0.dst.perpendicular.size(); idxA++) {
 				Vertex da = edge0.dst.perpendicular.get(idxA).dst;
-				if( da == target )
+				if (da == target)
 					continue;
 				for (int idxB = 0; idxB < edge1.dst.perpendicular.size(); idxB++) {
 					Vertex db = edge1.dst.perpendicular.get(idxB).dst;
 
 					// found a common, compute the score and see if it's better than the previous best
-					if( da == db ) {
-						double score = score(target,idx0,idx1,da);
-						if( score > output.score ) {
+					if (da == db) {
+						double score = score(target, idx0, idx1, da);
+						if (score > output.score) {
 							output.score = score;
 							output.idx1 = idx1;
 						}
@@ -660,7 +657,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		return output.score > 0;
 	}
 
-	private double score( Vertex tgt, int idxA , int idxB , Vertex common ) {
+	private double score( Vertex tgt, int idxA, int idxB, Vertex common ) {
 		// TODO comment
 
 		double angleA = tgt.perpendicular.get(idxA).direction;
@@ -671,27 +668,27 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		ChessboardCorner targetCorner = corners.get(tgt.index);
 		ChessboardCorner commonCorner = corners.get(common.index);
 
-		double angleC = Math.atan2(commonCorner.y-targetCorner.y,commonCorner.x-targetCorner.x);
+		double angleC = Math.atan2(commonCorner.y - targetCorner.y, commonCorner.x - targetCorner.x);
 		double distC = targetCorner.distance(commonCorner);
 
 		// Perpendicular edges are ordered by increasing direction
-		double angDistAB = UtilAngle.distanceCCW(angleB,angleA);
-		double angDistAC = UtilAngle.distanceCCW(angleC,angleA);
+		double angDistAB = UtilAngle.distanceCCW(angleB, angleA);
+		double angDistAC = UtilAngle.distanceCCW(angleC, angleA);
 
 		// See if C comes after B. If it's "before" the circle wraps around and it will appear to be after
-		if( angDistAC > angDistAB )
+		if (angDistAC > angDistAB)
 			return -Double.MAX_VALUE;
 
 		// it should be about perpendicular
-		if( angDistAB > Math.PI*0.95 )
+		if (angDistAB > Math.PI*0.95)
 			return -Double.MAX_VALUE;
 
 		// Prefer a wider angle
-		double angleScore = Math.min(angDistAC,angDistAB-angDistAC);
+		double angleScore = Math.min(angDistAC, angDistAB - angDistAC);
 
 		// distA and distB should be the same length
 		// prefer a distC which is closer
-		double distScore = 0.1+(Math.abs(distA-distB)+distC)/(distA+distB);
+		double distScore = 0.1 + (Math.abs(distA - distB) + distC)/(distA + distB);
 //		double distScore = Math.abs(1.0-(distB+distC*0.707)/(2*distA));
 
 		return angleScore/distScore;
@@ -705,7 +702,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * 2) Can't modify an existing edge
 	 * 3) Parallel lines must be parallel
 	 * 4) If current graph can't predict direction no decision is made
-	 *
 	 */
 	private void repairVertexes() {
 //		System.out.println("######## Repair");
@@ -724,7 +720,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 				Edge e = v.perpendicular.get(idxE);
 
 				// only can connect new modified vertexes or ones already connected too
-				if( !(e.dst.marked || -1 != v.connections.find(e.dst)) ) {
+				if (!(e.dst.marked || -1 != v.connections.find(e.dst))) {
 					continue;
 				}
 
@@ -736,11 +732,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 				// search for connections until there's no more to be found
 				for (int count = 0; count < 3; count++) {
 					// Find the an edge which is about to 90 degrees CCW of the previous edge 'v'
-					Vertex va=null;
-					double dir90 = UtilAngle.bound(e.direction+Math.PI/2.0);
+					Vertex va = null;
+					double dir90 = UtilAngle.bound(e.direction + Math.PI/2.0);
 					for (int i = 0; i < e.dst.connections.size(); i++) {
 						Edge ei = e.dst.connections.get(i);
-						if( UtilAngle.dist(ei.direction,dir90) < Math.PI/3 ) {
+						if (UtilAngle.dist(ei.direction, dir90) < Math.PI/3) {
 							va = ei.dst;
 							break;
 						}
@@ -751,20 +747,20 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					for (int i = 0; i < v.perpendicular.size(); i++) {
 						Edge ei = v.perpendicular.get(i);
 
-						if( e == ei )
+						if (e == ei)
 							continue;
 
 						// angle test
-						double ccw = UtilAngle.distanceCCW(e.direction,ei.direction);
-						if( ccw > Math.PI*0.9 )
+						double ccw = UtilAngle.distanceCCW(e.direction, ei.direction);
+						if (ccw > Math.PI*0.9)
 							continue;
 
-						if( !(ei.dst.marked || -1 != v.connections.find(ei.dst)) ) {
+						if (!(ei.dst.marked || -1 != v.connections.find(ei.dst))) {
 							continue;
 						}
 
 						// connection test
-						if( ei.dst.connections.find(va) != -1 ) {
+						if (ei.dst.connections.find(va) != -1) {
 //							System.out.println("   e[i].dst = "+ei.dst.index+" va="+va.index);
 							e = ei;
 							solution.add(ei);
@@ -773,23 +769,23 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 						}
 					}
 
-					if( !matched )
+					if (!matched)
 						break;
 				}
 
-				if( solution.size() > bestSolution.size() ) {
+				if (solution.size() > bestSolution.size()) {
 					bestSolution.clear();
 					bestSolution.addAll(solution);
 				}
 			}
 
-			if( bestSolution.size() > 1 ) {
+			if (bestSolution.size() > 1) {
 				// See if any connection that was there before is now gone. If that's the case the destination
 				// will need to be checked for mutual matches
 				for (int i = 0; i < v.connections.edges.size(); i++) {
-					if( !bestSolution.contains(v.connections.edges.get(i)) ){
+					if (!bestSolution.contains(v.connections.edges.get(i))) {
 						Vertex ve = v.connections.edges.get(i).dst;
-						if( !ve.marked ) {
+						if (!ve.marked) {
 							ve.marked = true;
 							dirtyVertexes.add(ve);
 						}
@@ -806,7 +802,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	/**
 	 * Converts the internal graphs into unordered chessboard grids.
 	 */
-	private void convertToOutput(List<ChessboardCorner> corners) {
+	private void convertToOutput( List<ChessboardCorner> corners ) {
 
 		c2n.resize(corners.size());
 		n2c.resize(vertexes.size());
@@ -816,7 +812,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		for (int seedIdx = 0; seedIdx < vertexes.size; seedIdx++) {
 			Vertex seedN = vertexes.get(seedIdx);
-			if( seedN.marked)
+			if (seedN.marked)
 				continue;
 			ChessboardCornerGraph graph = clusters.grow();
 			graph.reset();
@@ -827,13 +823,13 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			// Connect the nodes together in the output graph
 			for (int i = 0; i < graph.corners.size; i++) {
 				ChessboardCornerGraph.Node gn = graph.corners.get(i);
-				Vertex n = vertexes.get( n2c.get(i) );
+				Vertex n = vertexes.get(n2c.get(i));
 
 				for (int j = 0; j < n.connections.size(); j++) {
 					int edgeCornerIdx = n.connections.get(j).dst.index;
-					int outputIdx = c2n.get( edgeCornerIdx );
-					if( outputIdx == -1 ) {
-						throw new IllegalArgumentException("Edge to node not in the graph. n.idx="+n.index+" conn.idx="+edgeCornerIdx);
+					int outputIdx = c2n.get(edgeCornerIdx);
+					if (outputIdx == -1) {
+						throw new IllegalArgumentException("Edge to node not in the graph. n.idx=" + n.index + " conn.idx=" + edgeCornerIdx);
 					}
 					gn.edges[j] = graph.corners.get(outputIdx);
 				}
@@ -847,7 +843,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 				n2c.data[gn.index] = -1;
 			}
 
-			if( graph.corners.size <= 1 )
+			if (graph.corners.size <= 1)
 				clusters.removeTail();
 		}
 	}
@@ -856,11 +852,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * Given the initial seed, add all connected nodes to the output cluster while keeping track of how to
 	 * convert one node index into another one, between the two graphs
 	 */
-	private void growCluster(List<ChessboardCorner> corners, int seedIdx, ChessboardCornerGraph graph) {
+	private void growCluster( List<ChessboardCorner> corners, int seedIdx, ChessboardCornerGraph graph ) {
 		// open contains corner list indexes
 		open.add(seedIdx);
 		vertexes.get(seedIdx).marked = true;
-		while( open.size > 0 ) {
+		while (open.size > 0) {
 			int cornerIdx = open.pop();
 			Vertex v = vertexes.get(cornerIdx);
 
@@ -873,10 +869,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			// Add to the open list all the edges which haven't been processed yet;
 			for (int i = 0; i < v.connections.size(); i++) {
 				Vertex dst = v.connections.get(i).dst;
-				if( dst.marked )
+				if (dst.marked)
 					continue;
 				dst.marked = true;
-				open.add( dst.index );
+				open.add(dst.index);
 			}
 		}
 	}
@@ -889,7 +885,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		return directionTol;
 	}
 
-	public void setDirectionTol(double directionTol) {
+	public void setDirectionTol( double directionTol ) {
 		this.directionTol = directionTol;
 	}
 
@@ -897,7 +893,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		return maxNeighbors;
 	}
 
-	public void setMaxNeighbors(int maxNeighbors) {
+	public void setMaxNeighbors( int maxNeighbors ) {
 		this.maxNeighbors = maxNeighbors;
 	}
 
@@ -905,7 +901,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		return orientationTol;
 	}
 
-	public void setOrientationTol(double orientationTol) {
+	public void setOrientationTol( double orientationTol ) {
 		this.orientationTol = orientationTol;
 	}
 
@@ -913,7 +909,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		return ambiguousTol;
 	}
 
-	public void setAmbiguousTol(double ambiguousTol) {
+	public void setAmbiguousTol( double ambiguousTol ) {
 		this.ambiguousTol = ambiguousTol;
 	}
 
@@ -921,7 +917,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		return maxNeighborDistance;
 	}
 
-	public void setMaxNeighborDistance(double maxNeighborDistance) {
+	public void setMaxNeighborDistance( double maxNeighborDistance ) {
 		this.maxNeighborDistance = maxNeighborDistance;
 	}
 
@@ -929,7 +925,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		return thresholdEdgeIntensity;
 	}
 
-	public void setThresholdEdgeIntensity(double thresholdEdgeIntensity) {
+	public void setThresholdEdgeIntensity( double thresholdEdgeIntensity ) {
 		this.thresholdEdgeIntensity = thresholdEdgeIntensity;
 	}
 
@@ -955,7 +951,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	}
 
 	public static class TupleI32 {
-		public int a,b,c;
+		public int a, b, c;
 	}
 
 	/**
@@ -998,20 +994,22 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		public void pruneNonMutal( EdgeType which ) {
 			EdgeSet set = getEdgeSet(which);
 
-			for (int i = set.edges.size()-1; i >= 0; i-- ) {
+			for (int i = set.edges.size() - 1; i >= 0; i--) {
 				Vertex dst = set.edges.get(i).dst;
 				EdgeSet dstSet = dst.getEdgeSet(which);
 
-				if( -1 == dstSet.find(this) ) {
+				if (-1 == dstSet.find(this)) {
 					set.edges.remove(i);
 				}
 			}
 		}
 
 		public EdgeSet getEdgeSet( EdgeType which ) {
-			switch( which ) {
-				case PERPENDICULAR: return perpendicular;
-				case CONNECTION: return connections;
+			switch (which) {
+				case PERPENDICULAR:
+					return perpendicular;
+				case CONNECTION:
+					return connections;
 			}
 			throw new RuntimeException("BUG!");
 		}
@@ -1035,8 +1033,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			return edges.get(i);
 		}
 
-		public void set( int i , Edge e ) {
-			edges.set(i,e);
+		public void set( int i, Edge e ) {
+			edges.set(i, e);
 		}
 
 		public int size() {
@@ -1045,7 +1043,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		public int find( Vertex v ) {
 			for (int i = 0; i < edges.size(); i++) {
-				if( edges.get(i).dst == v )
+				if (edges.get(i).dst == v)
 					return i;
 			}
 			return -1;
@@ -1057,7 +1055,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 			for (int i = 0; i < edges.size(); i++) {
 				Edge e = edges.get(i);
-				if( e.dst == va || e.dst == vb ) {
+				if (e.dst == va || e.dst == vb) {
 					return i;
 				}
 			}
@@ -1067,7 +1065,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		public boolean remove( LineInfo line ) {
 			int idx = find(line);
-			if( idx == -1 )
+			if (idx == -1)
 				return false;
 			edges.remove(idx);
 			return true;
@@ -1075,7 +1073,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		public void sortByAngle() {
 			// Use Collections and not edges.sort() for compatibility with Android 23 or earlier
-			Collections.sort(edges, (o1, o2) -> Double.compare(o1.direction, o2.direction));
+			Collections.sort(edges, ( o1, o2 ) -> Double.compare(o1.direction, o2.direction));
 		}
 	}
 
@@ -1129,6 +1127,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		public boolean isIntensityInvalid() {
 			return intensity == -Double.MAX_VALUE;
 		}
+
 		public void invalidateIntensity() {
 			intensity = -Double.MAX_VALUE;
 			intensityRaw = -Double.MAX_VALUE;
@@ -1144,7 +1143,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	}
 
 	private enum EdgeType {
-		PERPENDICULAR,CONNECTION
+		PERPENDICULAR, CONNECTION
 	}
 
 	private static class PairIdx {

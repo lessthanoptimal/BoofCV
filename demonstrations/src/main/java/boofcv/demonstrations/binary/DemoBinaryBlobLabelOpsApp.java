@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
@@ -73,22 +74,22 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 	SelectHistogramThresholdPanel selectThresh;
 	ImagePanel gui = new ImagePanel();
 
-	public DemoBinaryBlobLabelOpsApp(Class<T> imageType) {
+	public DemoBinaryBlobLabelOpsApp( Class<T> imageType ) {
 		super(3);
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"Erode-4", FactoryBinaryImageOps.erode4(1));
-		addAlgorithm(0,"Erode-8", FactoryBinaryImageOps.erode8(1));
-		addAlgorithm(0,"Dilate-4", FactoryBinaryImageOps.dilate4(1));
-		addAlgorithm(0,"Dilate-8", FactoryBinaryImageOps.dilate8(1));
-		addAlgorithm(0,"Remove Noise", FactoryBinaryImageOps.removePointNoise());
+		addAlgorithm(0, "Erode-4", FactoryBinaryImageOps.erode4(1));
+		addAlgorithm(0, "Erode-8", FactoryBinaryImageOps.erode8(1));
+		addAlgorithm(0, "Dilate-4", FactoryBinaryImageOps.dilate4(1));
+		addAlgorithm(0, "Dilate-8", FactoryBinaryImageOps.dilate8(1));
+		addAlgorithm(0, "Remove Noise", FactoryBinaryImageOps.removePointNoise());
 
-		addAlgorithm(1,"Erode-4", FactoryBinaryImageOps.erode4(1));
-		addAlgorithm(1,"Erode-8", FactoryBinaryImageOps.erode8(1));
-		addAlgorithm(1,"Dilate-4", FactoryBinaryImageOps.dilate4(1));
-		addAlgorithm(1,"Dilate-8", FactoryBinaryImageOps.dilate8(1));
-		addAlgorithm(1,"Remove Noise", FactoryBinaryImageOps.removePointNoise());
+		addAlgorithm(1, "Erode-4", FactoryBinaryImageOps.erode4(1));
+		addAlgorithm(1, "Erode-8", FactoryBinaryImageOps.erode8(1));
+		addAlgorithm(1, "Dilate-4", FactoryBinaryImageOps.dilate4(1));
+		addAlgorithm(1, "Dilate-8", FactoryBinaryImageOps.dilate8(1));
+		addAlgorithm(1, "Remove Noise", FactoryBinaryImageOps.removePointNoise());
 
 		addAlgorithm(2, "Label-4", 4);
 		addAlgorithm(2, "Label-8", 8);
@@ -96,14 +97,14 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 		JPanel body = new JPanel();
 		body.setLayout(new BorderLayout());
 
-		body.add(createControlPanel(),BorderLayout.NORTH);
-		body.add(gui,BorderLayout.CENTER);
+		body.add(createControlPanel(), BorderLayout.NORTH);
+		body.add(gui, BorderLayout.CENTER);
 
 		imageInput = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		imageBinary = new GrayU8(1,1);
-		imageOutput1 = new GrayU8(1,1);
-		imageOutput2 = new GrayU8(1,1);
-		imageLabeled = new GrayS32(1,1);
+		imageBinary = new GrayU8(1, 1);
+		imageOutput1 = new GrayU8(1, 1);
+		imageOutput2 = new GrayU8(1, 1);
+		imageLabeled = new GrayS32(1, 1);
 
 		selectedVisualize = imageLabeled;
 
@@ -123,7 +124,7 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 		imagesCombo.setSelectedIndex(3);
 		imagesCombo.setMaximumSize(imagesCombo.getPreferredSize());
 
-		selectThresh = new SelectHistogramThresholdPanel(20,true);
+		selectThresh = new SelectHistogramThresholdPanel(20, true);
 		selectThresh.setListener(this);
 
 		left.add(imagesCombo);
@@ -134,27 +135,26 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 	}
 
 	public void process( final BufferedImage image ) {
-		imageInput.reshape(image.getWidth(),image.getHeight());
-		imageBinary.reshape(image.getWidth(),image.getHeight());
-		imageOutput1.reshape(image.getWidth(),image.getHeight());
-		imageOutput2.reshape(image.getWidth(),image.getHeight());
-		imageLabeled.reshape(image.getWidth(),image.getHeight());
+		imageInput.reshape(image.getWidth(), image.getHeight());
+		imageBinary.reshape(image.getWidth(), image.getHeight());
+		imageOutput1.reshape(image.getWidth(), image.getHeight());
+		imageOutput2.reshape(image.getWidth(), image.getHeight());
+		imageLabeled.reshape(image.getWidth(), image.getHeight());
 
 		ConvertBufferedImage.convertFromSingle(image, imageInput, imageType);
 
-		final double threshold = GThresholdImageOps.computeOtsu(imageInput,0,255);
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				selectThresh.setThreshold((int) threshold);
-				setInputImage(image);
-				selectThresh.getHistogramPanel().update(imageInput);
-				selectThresh.repaint();
-			}});
+		final double threshold = GThresholdImageOps.computeOtsu(imageInput, 0, 255);
+		SwingUtilities.invokeLater(() -> {
+			selectThresh.setThreshold((int)threshold);
+			setInputImage(image);
+			selectThresh.getHistogramPanel().update(imageInput);
+			selectThresh.repaint();
+		});
 		doRefreshAll();
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile( String fileName ) {}
 
 	@Override
 	public boolean getHasProcessedImage() {
@@ -162,7 +162,7 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	public void refreshAll( Object[] cookies ) {
 		filter1 = (FilterImageInterface<GrayU8, GrayU8>)cookies[0];
 		filter2 = (FilterImageInterface<GrayU8, GrayU8>)cookies[1];
 		connectRule = (Integer)cookies[2] == 4 ? ConnectRule.FOUR : ConnectRule.EIGHT;
@@ -170,8 +170,8 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		switch( indexFamily ) {
+	public void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
+		switch (indexFamily) {
 			case 0:
 				filter1 = (FilterImageInterface<GrayU8, GrayU8>)cookie;
 				break;
@@ -187,61 +187,58 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 	}
 
 	private synchronized void performWork() {
-		if( filter1 == null || filter2 == null )
+		if (filter1 == null || filter2 == null)
 			return;
 		GThresholdImageOps.threshold(imageInput, imageBinary, selectThresh.getThreshold(), selectThresh.isDown());
-		filter1.process(imageBinary,imageOutput1);
-		filter2.process(imageOutput1,imageOutput2);
+		filter1.process(imageBinary, imageOutput1);
+		filter2.process(imageOutput1, imageOutput2);
 		List<Contour> found = BinaryImageOps.contour(imageOutput2, connectRule, imageLabeled);
-		if( colors == null || colors.length <= found.size() )
-			colors = BinaryImageOps.selectRandomColors(found.size(),rand);
+		if (colors == null || colors.length <= found.size())
+			colors = BinaryImageOps.selectRandomColors(found.size(), rand);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if (work == null || work.getWidth() != imageInput.width || work.getHeight() != imageInput.height) {
-					work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
-				}
-				renderVisualizeImage();
-				gui.setImage(work);
-				gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
-				processedImage = true;
-				gui.repaint();
+		SwingUtilities.invokeLater(() -> {
+			if (work == null || work.getWidth() != imageInput.width || work.getHeight() != imageInput.height) {
+				work = new BufferedImage(imageInput.width, imageInput.height, BufferedImage.TYPE_INT_BGR);
 			}
+			renderVisualizeImage();
+			gui.setImage(work);
+			gui.setPreferredSize(new Dimension(imageInput.width, imageInput.height));
+			processedImage = true;
+			gui.repaint();
 		});
 	}
 
 	private synchronized void renderVisualizeImage() {
-		if( selectedVisualize instanceof GrayU8)
-			VisualizeBinaryData.renderBinary((GrayU8) selectedVisualize, false, work);
+		if (selectedVisualize instanceof GrayU8)
+			VisualizeBinaryData.renderBinary((GrayU8)selectedVisualize, false, work);
 		else {
-			VisualizeBinaryData.renderLabeled((GrayS32) selectedVisualize, colors, work);
+			VisualizeBinaryData.renderLabeled((GrayS32)selectedVisualize, colors, work);
 		}
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
 
-
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imagesCombo ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == imagesCombo) {
 			int index = imagesCombo.getSelectedIndex();
-			if( index == 0 ) {
+			if (index == 0) {
 				selectedVisualize = imageBinary;
-			} else if( index == 1 ) {
+			} else if (index == 1) {
 				selectedVisualize = imageOutput1;
-			} else if( index == 2 ) {
+			} else if (index == 2) {
 				selectedVisualize = imageOutput2;
-			} else if( index == 3 ) {
+			} else if (index == 3) {
 				selectedVisualize = imageLabeled;
 			}
-			if( work != null ) {
+			if (work != null) {
 				renderVisualizeImage();
 				gui.repaint();
 			}
@@ -260,13 +257,13 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		while (!app.getHasProcessedImage()) {
+			BoofMiscOps.sleep(10);
 		}
 
 		ShowImages.showWindow(app, "Label Binary Blobs", true);

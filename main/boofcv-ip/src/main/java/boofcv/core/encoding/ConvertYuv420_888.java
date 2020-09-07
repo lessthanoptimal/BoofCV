@@ -43,6 +43,7 @@ public class ConvertYuv420_888
 		return work;
 	}
 
+	@SuppressWarnings({"MissingCasesInEnumSwitch"})
 	public static void yuvToBoof(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 								 int width, int height, int strideY , int strideUV , int stridePixelUV,
 								 ColorFormat colorOutput, ImageBase output, BWorkArrays workArrays)
@@ -174,6 +175,7 @@ public class ConvertYuv420_888
 
 	abstract static class ProcessorYuvRgb implements ProcessorYuv
 	{
+		@Override
 		final public void processYUV(final int y , final int u ,final int v ) {
 			int Y = 1191*(y - 16);
 			int CR = u - 128;

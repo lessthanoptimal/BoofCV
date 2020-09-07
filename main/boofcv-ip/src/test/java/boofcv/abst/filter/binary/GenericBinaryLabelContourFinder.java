@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBinaryLabelContourFinder extends GenericBinaryContourInterface{
+public abstract class GenericBinaryLabelContourFinder extends GenericBinaryContourInterface {
 
+	@Override
 	protected abstract BinaryLabelContourFinder create();
 
 	@Test
@@ -40,9 +41,9 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 
 		BinaryLabelContourFinder alg = create();
 
-		alg.process(input,labeled);
+		alg.process(input, labeled);
 
-		assertEquals(0,ImageStatistics.meanDiffSq(TEST2,input),1e-8);
+		assertEquals(0, ImageStatistics.meanDiffSq(TEST2, input), 1e-8);
 	}
 
 	@Test
@@ -53,9 +54,9 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		BinaryLabelContourFinder alg = create();
 
 		alg.setMinContour(1000);
-		alg.process(input,labeled);
-		assertEquals(1,alg.getContours().size());
-		checkExternalSize(alg,0,0);
+		alg.process(input, labeled);
+		assertEquals(1, alg.getContours().size());
+		checkExternalSize(alg, 0, 0);
 	}
 
 	@Test
@@ -66,10 +67,10 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		BinaryLabelContourFinder alg = create();
 
 		alg.setMaxContour(1);
-		alg.process(input,labeled);
+		alg.process(input, labeled);
 
-		assertEquals(1,alg.getContours().size());
-		checkExternalSize(alg,0,0);
+		assertEquals(1, alg.getContours().size());
+		checkExternalSize(alg, 0, 0);
 	}
 
 	@Test
@@ -79,12 +80,12 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 
 		BinaryLabelContourFinder alg = create();
 
-		alg.process(input,labeled);
-		checkExternalSize(alg,0,10);
+		alg.process(input, labeled);
+		checkExternalSize(alg, 0, 10);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(input,labeled);
-		checkExternalSize(alg,0,8);
+		alg.process(input, labeled);
+		checkExternalSize(alg, 0, 8);
 	}
 
 	@Test
@@ -94,12 +95,12 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 
 		BinaryLabelContourFinder alg = create();
 
-		alg.process(input,labeled);
-		checkInternalSize(alg,0,0,8);
+		alg.process(input, labeled);
+		checkInternalSize(alg, 0, 0, 8);
 
 		alg.setSaveInnerContour(false);
-		alg.process(input,labeled);
-		checkInternalSize(alg,0,0,0);
+		alg.process(input, labeled);
+		checkInternalSize(alg, 0, 0, 0);
 	}
 
 	@Test
@@ -110,12 +111,12 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		BinaryLabelContourFinder alg = create();
 
 		alg.setConnectRule(ConnectRule.FOUR);
-		alg.process(input,labeled);
-		checkExpectedExternal(new int[]{4,42},alg);
+		alg.process(input, labeled);
+		checkExpectedExternal(new int[]{4, 42}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(input,labeled);
-		checkExpectedExternal(new int[]{37},alg);
+		alg.process(input, labeled);
+		checkExpectedExternal(new int[]{37}, alg);
 	}
 
 	@Test
@@ -126,12 +127,12 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		BinaryLabelContourFinder alg = create();
 
 		alg.setConnectRule(ConnectRule.FOUR);
-		alg.process(input,labeled);
-		checkExpectedExternal(new int[]{1,1,1,1,1,1,1,1,1,4,4,4,10,20},alg);
+		alg.process(input, labeled);
+		checkExpectedExternal(new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 10, 20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(input,labeled);
-		checkExpectedExternal(new int[]{1,3,4,32},alg);
+		alg.process(input, labeled);
+		checkExpectedExternal(new int[]{1, 3, 4, 32}, alg);
 	}
 
 	@Test
@@ -142,12 +143,12 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		BinaryLabelContourFinder alg = create();
 
 		alg.setConnectRule(ConnectRule.FOUR);
-		alg.process(input,labeled);
-		checkExpectedExternal(new int[]{24},alg);
+		alg.process(input, labeled);
+		checkExpectedExternal(new int[]{24}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(input,labeled);
-		checkExpectedExternal(new int[]{19},alg);
+		alg.process(input, labeled);
+		checkExpectedExternal(new int[]{19}, alg);
 	}
 
 	@Test
@@ -156,12 +157,12 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
 
 		alg.setConnectRule(ConnectRule.FOUR);
-		alg.process(TEST5.clone(),labeled);
-		checkExpectedExternal(new int[]{20},alg);
+		alg.process(TEST5.clone(), labeled);
+		checkExpectedExternal(new int[]{20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(TEST5.clone(),labeled);
-		checkExpectedExternal(new int[]{20},alg);
+		alg.process(TEST5.clone(), labeled);
+		checkExpectedExternal(new int[]{20}, alg);
 	}
 
 	@Test
@@ -170,12 +171,12 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
 
 		alg.setConnectRule(ConnectRule.FOUR);
-		alg.process(TEST6.clone(),labeled);
-		checkExpectedExternal(new int[]{20},alg);
+		alg.process(TEST6.clone(), labeled);
+		checkExpectedExternal(new int[]{20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(TEST6.clone(),labeled);
-		checkExpectedExternal(new int[]{20},alg);
+		alg.process(TEST6.clone(), labeled);
+		checkExpectedExternal(new int[]{20}, alg);
 	}
 
 	@Test
@@ -184,11 +185,11 @@ public abstract class GenericBinaryLabelContourFinder extends GenericBinaryConto
 		GrayS32 labeled = TEST7.createSameShape(GrayS32.class);
 
 		alg.setConnectRule(ConnectRule.FOUR);
-		alg.process(TEST7.clone(),labeled);
-		checkExpectedExternal(new int[]{4,20},alg);
+		alg.process(TEST7.clone(), labeled);
+		checkExpectedExternal(new int[]{4, 20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
-		alg.process(TEST7.clone(),labeled);
-		checkExpectedExternal(new int[]{20},alg);
+		alg.process(TEST7.clone(), labeled);
+		checkExpectedExternal(new int[]{20}, alg);
 	}
 }

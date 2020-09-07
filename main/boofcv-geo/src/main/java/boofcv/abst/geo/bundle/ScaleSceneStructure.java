@@ -34,13 +34,13 @@ import org.ejml.dense.row.CommonOps_DDRM;
  * depending on the points being homogenous or not, metric or projective.
  *
  * <p>
- *     Homogenous:<br>
- *     Each point is normalized such that the F-norm is equal to 1. Same goes for translation if metric.
+ * Homogenous:<br>
+ * Each point is normalized such that the F-norm is equal to 1. Same goes for translation if metric.
  * </p>
  * <p>
- *     Regular:<br>
- *     If points are 3D then their mean and standard deviation are computed. The points are transformed such that
- *     the set will have a mean of zero and a standard deviation of 1.
+ * Regular:<br>
+ * If points are 3D then their mean and standard deviation are computed. The points are transformed such that
+ * the set will have a mean of zero and a standard deviation of 1.
  * </p>
  *
  * How to use this class.
@@ -71,7 +71,7 @@ public class ScaleSceneStructure {
 	 * If true pixels will be scaled using mean and standard deviation. otherwise the known width/height
 	 * are used with the image center
 	 */
-	boolean scalePixelsUsingStats=true;
+	boolean scalePixelsUsingStats = true;
 
 	/**
 	 * Pixel scaling for each view
@@ -80,9 +80,10 @@ public class ScaleSceneStructure {
 
 	/**
 	 * Configures how scaling is applied
+	 *
 	 * @param desiredDistancePoint desired scale for points to have
 	 */
-	public ScaleSceneStructure(double desiredDistancePoint) {
+	public ScaleSceneStructure( double desiredDistancePoint ) {
 		this.desiredDistancePoint = desiredDistancePoint;
 	}
 
@@ -91,13 +92,14 @@ public class ScaleSceneStructure {
 
 	/**
 	 * Applies the scale transform to the input scene structure. Metric.
+	 *
 	 * @param structure 3D scene
 	 * @param observations Observations of the scene
 	 */
-	public void applyScale( SceneStructureMetric structure ,
+	public void applyScale( SceneStructureMetric structure,
 							SceneObservations observations ) {
 
-		if( structure.homogenous ) {
+		if (structure.homogenous) {
 			applyScaleToPointsHomogenous(structure);
 		} else {
 			computePointStatistics(structure.points);
@@ -107,14 +109,16 @@ public class ScaleSceneStructure {
 		// NOTE: Observations can't be centered/scaled here because that changes the camera model.
 		//       That requires knowledge this class can't have access to and must be done externally
 	}
+
 	/**
 	 * Applies the scale transform to the input scene structure. Metric.
+	 *
 	 * @param structure 3D scene
 	 * @param observations Observations of the scene
 	 */
-	public void applyScale( SceneStructureProjective structure ,
+	public void applyScale( SceneStructureProjective structure,
 							SceneObservations observations ) {
-		if( structure.homogenous ) {
+		if (structure.homogenous) {
 			applyScaleToPointsHomogenous(structure);
 		} else {
 			computePointStatistics(structure.points);
@@ -129,42 +133,43 @@ public class ScaleSceneStructure {
 		applyScaleToPixelsAndCameraMatrix(structure, observations);
 	}
 
-	void computePixelScaling(SceneStructureProjective structure, SceneObservations observations) {
+	void computePixelScaling( SceneStructureProjective structure, SceneObservations observations ) {
 		pixelScaling.reset();
-		if( scalePixelsUsingStats ) {
+		if (scalePixelsUsingStats) {
 			for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 				SceneObservations.View so = observations.views.get(viewIdx);
 				int N = so.size();
-				double meanX=0,meanY=0;
-				for (int i = 0,idx=0; i < N; i++) {
+				double meanX = 0, meanY = 0;
+				for (int i = 0, idx = 0; i < N; i++) {
 					meanX += so.observations.data[idx++];
 					meanY += so.observations.data[idx++];
 				}
-				meanX /= N;meanY /= N;
-				double stdX=0,stdY=0;
-				for (int i = 0,idx=0; i < N; i++) {
+				meanX /= N;
+				meanY /= N;
+				double stdX = 0, stdY = 0;
+				for (int i = 0, idx = 0; i < N; i++) {
 					double dx = meanX - so.observations.data[idx++];
 					double dy = meanY - so.observations.data[idx++];
 					stdX += dx*dx;
 					stdY += dy*dy;
 				}
-				stdX = Math.sqrt(stdX/N);stdY = Math.sqrt(stdY/N);
-				pixelScaling.grow().set(meanX,meanY,stdX,stdY);
+				stdX = Math.sqrt(stdX/N);
+				stdY = Math.sqrt(stdY/N);
+				pixelScaling.grow().set(meanX, stdX, meanY, stdY);
 			}
 		} else {
 			for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 				SceneStructureProjective.View sv = structure.views.data[viewIdx];
-				if( sv.width <= 0 || sv.height <= 0 ) {
+				if (sv.width <= 0 || sv.height <= 0) {
 					throw new IllegalArgumentException("View width and height is unknown. Scale with statistics instead");
 				}
-				pixelScaling.grow().set(sv.width/2,sv.height/2,sv.width/2,sv.height/2);
+				pixelScaling.grow().set(sv.width/2, sv.width/2, sv.height/2, sv.height/2);
 			}
 		}
 	}
 
-	public void applyScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
-												  SceneObservations observations )
-	{
+	public void applyScaleToPixelsAndCameraMatrix( SceneStructureProjective structure,
+												   SceneObservations observations ) {
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			NormalizationPoint2D n = pixelScaling.get(viewIdx);
 
@@ -178,17 +183,16 @@ public class ScaleSceneStructure {
 			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
 				int i = pixelIdx*2;
 				float x = ov.observations.data[i];
-				float y = ov.observations.data[i+1];
-				ov.observations.data[i  ] = (x - cx)/ stdX;
-				ov.observations.data[i+1] = (y - cy)/ stdY;
+				float y = ov.observations.data[i + 1];
+				ov.observations.data[i  ] = (x - cx)/stdX;
+				ov.observations.data[i+1] = (y - cy)/stdY;
 			}
-			n.apply(v.worldToView,v.worldToView);
+			n.apply(v.worldToView, v.worldToView);
 		}
 	}
 
-	public void undoScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
-												 SceneObservations observations )
-	{
+	public void undoScaleToPixelsAndCameraMatrix( SceneStructureProjective structure,
+												  SceneObservations observations ) {
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			NormalizationPoint2D n = pixelScaling.get(viewIdx);
 
@@ -202,19 +206,19 @@ public class ScaleSceneStructure {
 			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
 				int i = pixelIdx*2;
 				float x = ov.observations.data[i];
-				float y = ov.observations.data[i+1];
+				float y = ov.observations.data[i + 1];
 				ov.observations.data[i  ] = x*stdX + cx;
 				ov.observations.data[i+1] = y*stdY + cy;
 			}
 
-			n.remove(v.worldToView,v.worldToView);
+			n.remove(v.worldToView, v.worldToView);
 		}
 	}
 
 	/**
 	 * For 3D points, computes the median value and variance along each dimension.
 	 */
-	void computePointStatistics(FastQueue<Point> points ) {
+	void computePointStatistics( FastQueue<Point> points ) {
 		final int length = points.size;
 		double v[] = new double[length];
 
@@ -222,33 +226,32 @@ public class ScaleSceneStructure {
 			double maxAbs = 0;
 			for (int i = 0; i < length; i++) {
 				v[i] = points.get(i).coordinate[axis];
-				maxAbs = Math.max( maxAbs , Math.abs(v[i]));
+				maxAbs = Math.max(maxAbs, Math.abs(v[i]));
 			}
 
-			double median = QuickSelect.select(v,length/2,length);
-			switch( axis ) {
-				case 0: medianPoint.x = median; break;
-				case 1: medianPoint.y = median; break;
-				case 2: medianPoint.z = median; break;
+			double median = QuickSelect.select(v, length/2, length);
+			switch (axis) {
+				case 0 -> medianPoint.x = median;
+				case 1 -> medianPoint.y = median;
+				case 2 -> medianPoint.z = median;
 			}
 		}
 
 		for (int i = 0; i < length; i++) {
 			v[i] = points.get(i).distanceSq(medianPoint);
 		}
-		medianDistancePoint = Math.sqrt(QuickSelect.select(v,length/2,length));
+		medianDistancePoint = Math.sqrt(QuickSelect.select(v, length/2, length));
 
 //		System.out.println("Median P ="+ medianPoint);
 //		System.out.println("Median R ="+ medianDistancePoint);
 //		System.out.println("Scale    ="+ (desiredDistancePoint / medianDistancePoint));
 	}
 
+	private void applyScaleTranslation3D( SceneStructureProjective structure ) {
+		double scale = desiredDistancePoint/medianDistancePoint;
 
-	private void applyScaleTranslation3D(SceneStructureProjective structure) {
-		double scale = desiredDistancePoint / medianDistancePoint;
-
-		DMatrixRMaj A = new DMatrixRMaj(3,3);
-		DMatrixRMaj A_inv = new DMatrixRMaj(3,3);
+		DMatrixRMaj A = new DMatrixRMaj(3, 3);
+		DMatrixRMaj A_inv = new DMatrixRMaj(3, 3);
 		Point3D_F64 a = new Point3D_F64();
 		Point3D_F64 c = new Point3D_F64();
 
@@ -256,10 +259,10 @@ public class ScaleSceneStructure {
 			SceneStructureProjective.View view = structure.views.data[i];
 
 			// X_w = inv(A)*(X_c - T) let X_c = 0 then X_w = -inv(A)*T is center of camera in world
-			CommonOps_DDRM.extract(view.worldToView,0,0,A);
-			PerspectiveOps.extractColumn(view.worldToView,3,a);
-			CommonOps_DDRM.invert(A,A_inv);
-			GeometryMath_F64.mult(A_inv,a,c);
+			CommonOps_DDRM.extract(view.worldToView, 0, 0, A);
+			PerspectiveOps.extractColumn(view.worldToView, 3, a);
+			CommonOps_DDRM.invert(A, A_inv);
+			GeometryMath_F64.mult(A_inv, a, c);
 
 			// Apply transform
 			c.x = -scale*(c.x + medianPoint.x);
@@ -267,9 +270,9 @@ public class ScaleSceneStructure {
 			c.z = -scale*(c.z + medianPoint.z);
 
 			// -A*T
-			GeometryMath_F64.mult(A,c,a);
+			GeometryMath_F64.mult(A, c, a);
 			a.scale(-1);
-			PerspectiveOps.insertColumn(view.worldToView,3,a);
+			PerspectiveOps.insertColumn(view.worldToView, 3, a);
 		}
 	}
 
@@ -279,13 +282,13 @@ public class ScaleSceneStructure {
 	 * @param structure scene's structure
 	 * @param observations observations of the scene
 	 */
-	public void undoScale( SceneStructureMetric structure ,
+	public void undoScale( SceneStructureMetric structure,
 						   SceneObservations observations ) {
 
-		if( structure.homogenous )
+		if (structure.homogenous)
 			return;
 
-		double scale = desiredDistancePoint / medianDistancePoint;
+		double scale = desiredDistancePoint/medianDistancePoint;
 
 		undoNormPoints3D(structure, scale);
 
@@ -294,15 +297,15 @@ public class ScaleSceneStructure {
 			SceneStructureMetric.View view = structure.views.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);
+			GeometryMath_F64.multTran(view.worldToView.R, view.worldToView.T, c);
 
 			// Apply transform
-			c.x = (-c.x/scale + medianPoint.x);
-			c.y = (-c.y/scale + medianPoint.y);
-			c.z = (-c.z/scale + medianPoint.z);
+			c.x = -c.x/scale + medianPoint.x;
+			c.y = -c.y/scale + medianPoint.y;
+			c.z = -c.z/scale + medianPoint.z;
 
 			// -R*T
-			GeometryMath_F64.mult(view.worldToView.R,c,view.worldToView.T);
+			GeometryMath_F64.mult(view.worldToView.R, c, view.worldToView.T);
 			view.worldToView.T.scale(-1);
 		}
 	}
@@ -313,12 +316,12 @@ public class ScaleSceneStructure {
 	 * @param structure scene's structure
 	 * @param observations observations of the scene
 	 */
-	public void undoScale( SceneStructureProjective structure ,
+	public void undoScale( SceneStructureProjective structure,
 						   SceneObservations observations ) {
 
-		if( !structure.homogenous ) {
+		if (!structure.homogenous) {
 
-			double scale = desiredDistancePoint / medianDistancePoint;
+			double scale = desiredDistancePoint/medianDistancePoint;
 
 			undoNormPoints3D(structure, scale);
 
@@ -338,9 +341,9 @@ public class ScaleSceneStructure {
 
 
 				// Apply transform
-				c.x = (-c.x / scale + medianPoint.x);
-				c.y = (-c.y / scale + medianPoint.y);
-				c.z = (-c.z / scale + medianPoint.z);
+				c.x = -c.x/scale + medianPoint.x;
+				c.y = -c.y/scale + medianPoint.y;
+				c.z = -c.z/scale + medianPoint.z;
 
 				// -A*T
 				GeometryMath_F64.mult(A, c, a);
@@ -351,7 +354,7 @@ public class ScaleSceneStructure {
 		undoScaleToPixelsAndCameraMatrix(structure, observations);
 	}
 
-	private void undoNormPoints3D(SceneStructureCommon structure, double scale) {
+	private void undoNormPoints3D( SceneStructureCommon structure, double scale ) {
 		for (int i = 0; i < structure.points.size; i++) {
 			Point p = structure.points.data[i];
 			p.coordinate[0] = p.coordinate[0]/scale + medianPoint.x;
@@ -360,15 +363,15 @@ public class ScaleSceneStructure {
 		}
 	}
 
-	private void applyScaleTranslation3D(SceneStructureMetric structure) {
-		double scale = desiredDistancePoint / medianDistancePoint;
+	private void applyScaleTranslation3D( SceneStructureMetric structure ) {
+		double scale = desiredDistancePoint/medianDistancePoint;
 
 		Point3D_F64 c = new Point3D_F64();
 		for (int i = 0; i < structure.views.size; i++) {
 			SceneStructureMetric.View view = structure.views.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);
+			GeometryMath_F64.multTran(view.worldToView.R, view.worldToView.T, c);
 
 			// Apply transform
 			c.x = -scale*(c.x + medianPoint.x);
@@ -376,13 +379,13 @@ public class ScaleSceneStructure {
 			c.z = -scale*(c.z + medianPoint.z);
 
 			// -R*T
-			GeometryMath_F64.mult(view.worldToView.R,c,view.worldToView.T);
+			GeometryMath_F64.mult(view.worldToView.R, c, view.worldToView.T);
 			view.worldToView.T.scale(-1);
 		}
 	}
 
-	void applyScaleToPoints3D(SceneStructureCommon structure) {
-		double scale = desiredDistancePoint / medianDistancePoint;
+	void applyScaleToPoints3D( SceneStructureCommon structure ) {
+		double scale = desiredDistancePoint/medianDistancePoint;
 
 		for (int i = 0; i < structure.points.size; i++) {
 			Point p = structure.points.data[i];
@@ -392,13 +395,13 @@ public class ScaleSceneStructure {
 		}
 	}
 
-	void applyScaleToPointsHomogenous(SceneStructureCommon structure) {
+	void applyScaleToPointsHomogenous( SceneStructureCommon structure ) {
 
 		Point4D_F64 p = new Point4D_F64();
 		for (int i = 0; i < structure.points.size; i++) {
 			structure.points.data[i].get(p);
 			p.normalize();
-			structure.points.data[i].set(p.x,p.y,p.z,p.w);
+			structure.points.data[i].set(p.x, p.y, p.z, p.w);
 		}
 	}
 
@@ -406,7 +409,7 @@ public class ScaleSceneStructure {
 		return scalePixelsUsingStats;
 	}
 
-	public void setScalePixelsUsingStats(boolean scalePixelsUsingStats) {
+	public void setScalePixelsUsingStats( boolean scalePixelsUsingStats ) {
 		this.scalePixelsUsingStats = scalePixelsUsingStats;
 	}
 }

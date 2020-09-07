@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -600,7 +600,7 @@ public class FactoryGImageGray {
 
 	public static abstract class GSingleBaseInt<T extends ImageGray<T>> extends GSingleBase<T>
 	{
-		public GSingleBaseInt(T image) {
+		protected GSingleBaseInt(T image) {
 			super(image);
 		}
 
@@ -614,7 +614,7 @@ public class FactoryGImageGray {
 
 		protected T image;
 
-		public GSingleBase(T image) {
+		protected GSingleBase(T image) {
 			this.image = image;
 		}
 
@@ -643,7 +643,7 @@ public class FactoryGImageGray {
 
 		protected T image;
 
-		public GSingleBorder(T image) {
+		protected GSingleBorder(T image) {
 			this.image = image;
 		}
 

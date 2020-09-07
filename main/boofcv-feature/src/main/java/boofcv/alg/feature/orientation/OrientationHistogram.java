@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public abstract class OrientationHistogram <D extends ImageGray<D>>
 	 * @param objectToSample Converts the size of the object to the sample region size
 	 * @param numAngles Number of discrete angles that the orientation is estimated inside of
 	 */
-	public OrientationHistogram( double objectToSample, int numAngles , boolean isWeighted ) {
+	protected OrientationHistogram( double objectToSample, int numAngles , boolean isWeighted ) {
 		this.numAngles = numAngles;
 		this.objectToSample = objectToSample;
 		sumDerivX = new double[ numAngles ];
@@ -92,8 +92,6 @@ public abstract class OrientationHistogram <D extends ImageGray<D>>
 
 	/**
 	 * Specify the size of the region that is considered.
-	 *
-	 * @param objectToSample
 	 */
 	public void setObjectToSample(double objectToSample) {
 		this.objectToSample = objectToSample;
@@ -147,7 +145,6 @@ public abstract class OrientationHistogram <D extends ImageGray<D>>
 
 		// find the angle with the best score
 		double bestScore = -1;
-		int bestIndex = -1;
 		double bestX=-1;
 		double bestY=-1;
 		for( int i = 0; i < numAngles; i++ ) {
@@ -156,7 +153,6 @@ public abstract class OrientationHistogram <D extends ImageGray<D>>
 			double score = x*x + y*y;
 			if( score > bestScore ) {
 				bestScore = score;
-				bestIndex = i;
 				bestX = x;
 				bestY = y;
 			}

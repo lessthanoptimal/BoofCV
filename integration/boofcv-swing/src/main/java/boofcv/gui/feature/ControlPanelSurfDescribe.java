@@ -31,44 +31,44 @@ import javax.swing.*;
 public abstract class ControlPanelSurfDescribe extends StandardAlgConfigPanel {
 	public final ConfigSurfDescribe config;
 	// should it use the color or gray variant
-	public boolean color=false;
+	public boolean color = false;
 
 	private final JSpinner spinnerLargeGrid;
 	private final JSpinner spinnerSubRegion;
 	private final JSpinner spinnerWidthKernel; // kernel instead of sample since I think people will understand better
 	private final JCheckBox checkHaar;
-	private final JCheckBox checkColor = checkbox("Color",color,
+	private final JCheckBox checkColor = checkbox("Color", color,
 			"False use the standard gray scale variant if true then the color variant is used");
 
 	Listener listener;
 
-	public ControlPanelSurfDescribe(ConfigSurfDescribe config, Listener listener) {
+	protected ControlPanelSurfDescribe( ConfigSurfDescribe config, Listener listener ) {
 		this.config = config;
 		this.listener = listener;
 
-		spinnerLargeGrid = spinner(config.widthLargeGrid,1,100,1);
-		spinnerSubRegion = spinner(config.widthSubRegion,1,100,1);
-		spinnerWidthKernel = spinner(config.widthSample,1,100,1);
-		checkHaar = checkbox("Use Haar",config.useHaar,"Use Haar instead of gradient. Haar is used in paper");
+		spinnerLargeGrid = spinner(config.widthLargeGrid, 1, 100, 1);
+		spinnerSubRegion = spinner(config.widthSubRegion, 1, 100, 1);
+		spinnerWidthKernel = spinner(config.widthSample, 1, 100, 1);
+		checkHaar = checkbox("Use Haar", config.useHaar, "Use Haar instead of gradient. Haar is used in paper");
 
-		addLabeled(spinnerLargeGrid,"Large Grid","Width of large grid in sub-regions");
-		addLabeled(spinnerSubRegion,"Sub Regions","Points in a sub-region");
-		addLabeled(spinnerWidthKernel,"Kernel Width","Width of sample point");
+		addLabeled(spinnerLargeGrid, "Large Grid", "Width of large grid in sub-regions");
+		addLabeled(spinnerSubRegion, "Sub Regions", "Points in a sub-region");
+		addLabeled(spinnerWidthKernel, "Kernel Width", "Width of sample point");
 		addAlignLeft(checkHaar);
 		addAlignLeft(checkColor);
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		if (source == spinnerLargeGrid) {
-			config.widthLargeGrid = ((Number) spinnerLargeGrid.getValue()).intValue();
-		} else if( source == spinnerSubRegion ) {
-			config.widthSubRegion = ((Number) spinnerSubRegion.getValue()).intValue();
-		} else if( source == spinnerWidthKernel ) {
-			config.widthSample = ((Number) spinnerWidthKernel.getValue()).intValue();
-		} else if( source == checkHaar ) {
+			config.widthLargeGrid = ((Number)spinnerLargeGrid.getValue()).intValue();
+		} else if (source == spinnerSubRegion) {
+			config.widthSubRegion = ((Number)spinnerSubRegion.getValue()).intValue();
+		} else if (source == spinnerWidthKernel) {
+			config.widthSample = ((Number)spinnerWidthKernel.getValue()).intValue();
+		} else if (source == checkHaar) {
 			config.useHaar = checkHaar.isSelected();
-		} else if( source == checkColor ) {
+		} else if (source == checkColor) {
 			color = checkColor.isSelected();
 		} else {
 			throw new RuntimeException("Unknown source");
@@ -81,18 +81,19 @@ public abstract class ControlPanelSurfDescribe extends StandardAlgConfigPanel {
 
 		private final JSpinner spinnerWeightSigma;
 
-		public Speed(ConfigSurfDescribe.Fast config_, Listener listener) {
-			super(config_==null?new ConfigSurfDescribe.Fast():config_, listener);
+		public Speed( ConfigSurfDescribe.Fast config_, Listener listener ) {
+			super(config_ == null ? new ConfigSurfDescribe.Fast() : config_, listener);
 			this.config = (ConfigSurfDescribe.Fast)super.config;
 
-			spinnerWeightSigma = spinner(config.weightSigma,0.5,100.0,0.5);
+			spinnerWeightSigma = spinner(config.weightSigma, 0.5, 100.0, 0.5);
 
-			addLabeled(spinnerWeightSigma,"Weight Sigma");
+			addLabeled(spinnerWeightSigma, "Weight Sigma");
 		}
+
 		@Override
-		public void controlChanged(final Object source) {
+		public void controlChanged( final Object source ) {
 			if (source == spinnerWeightSigma) {
-				config.weightSigma = ((Number) spinnerWeightSigma.getValue()).doubleValue();
+				config.weightSigma = ((Number)spinnerWeightSigma.getValue()).doubleValue();
 			} else {
 				super.controlChanged(source);
 				return;
@@ -108,26 +109,27 @@ public abstract class ControlPanelSurfDescribe extends StandardAlgConfigPanel {
 		private final JSpinner spinnerLargeGrid;
 		private final JSpinner spinnerSubRegion;
 
-		public Stability(ConfigSurfDescribe.Stability config_, Listener listener) {
-			super(config_==null?new ConfigSurfDescribe.Stability():config_, listener);
+		public Stability( ConfigSurfDescribe.Stability config_, Listener listener ) {
+			super(config_ == null ? new ConfigSurfDescribe.Stability() : config_, listener);
 			this.config = (ConfigSurfDescribe.Stability)super.config;
 
-			spinnerOverlap = spinner(config.overLap,1,20,1);
-			spinnerLargeGrid = spinner(config.sigmaLargeGrid,1,20,1);
-			spinnerSubRegion = spinner(config.sigmaSubRegion,1,20,1);
+			spinnerOverlap = spinner(config.overLap, 1, 20, 1);
+			spinnerLargeGrid = spinner(config.sigmaLargeGrid, 1, 20, 1);
+			spinnerSubRegion = spinner(config.sigmaSubRegion, 1, 20, 1);
 
-			addLabeled(spinnerOverlap,"Overlap","Number of sample points sub-regions overlap");
-			addLabeled(spinnerLargeGrid,"Sigma-Grid","Sigma used to weight points in sub-region grid");
-			addLabeled(spinnerSubRegion,"Sigma-Sub","Sigma used to weight points in large grid");
+			addLabeled(spinnerOverlap, "Overlap", "Number of sample points sub-regions overlap");
+			addLabeled(spinnerLargeGrid, "Sigma-Grid", "Sigma used to weight points in sub-region grid");
+			addLabeled(spinnerSubRegion, "Sigma-Sub", "Sigma used to weight points in large grid");
 		}
+
 		@Override
-		public void controlChanged(final Object source) {
+		public void controlChanged( final Object source ) {
 			if (source == spinnerOverlap) {
-				config.overLap = ((Number) spinnerOverlap.getValue()).intValue();
+				config.overLap = ((Number)spinnerOverlap.getValue()).intValue();
 			} else if (source == spinnerLargeGrid) {
-				config.sigmaLargeGrid = ((Number) spinnerLargeGrid.getValue()).doubleValue();
+				config.sigmaLargeGrid = ((Number)spinnerLargeGrid.getValue()).doubleValue();
 			} else if (source == spinnerSubRegion) {
-				config.sigmaSubRegion = ((Number) spinnerSubRegion.getValue()).doubleValue();
+				config.sigmaSubRegion = ((Number)spinnerSubRegion.getValue()).doubleValue();
 			} else {
 				super.controlChanged(source);
 				return;

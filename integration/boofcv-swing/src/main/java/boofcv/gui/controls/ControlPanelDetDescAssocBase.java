@@ -72,38 +72,36 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	// Control panel for associating with 2d pixels
 	public StandardAlgConfigPanel panelAssociate2D = new StandardAlgConfigPanel();
 
-	public ControlPanelDetDescAssocBase() {
-	}
+	protected ControlPanelDetDescAssocBase() {}
 
-	public ControlPanelDetDescAssocBase(ConfigDetectDescribe configDetDesc,
-										ConfigAssociate configAssociate)
-	{
+	protected ControlPanelDetDescAssocBase( ConfigDetectDescribe configDetDesc,
+											ConfigAssociate configAssociate ) {
 		this.configDetDesc = configDetDesc;
 		this.configAssociate = configAssociate;
 	}
 
 	public void initializeControlsGUI() {
-		comboDetect    = combo(configDetDesc.typeDetector.ordinal(),(Object[]) ConfigDetectInterestPoint.DetectorType.values() );
-		comboDescribe  = combo(configDetDesc.typeDescribe.ordinal(),(Object[]) ConfigDescribeRegionPoint.DescriptorType.values() );
-		if( associateWithPixels ) {
+		comboDetect = combo(configDetDesc.typeDetector.ordinal(), (Object[])ConfigDetectInterestPoint.DetectorType.values());
+		comboDescribe = combo(configDetDesc.typeDescribe.ordinal(), (Object[])ConfigDescribeRegionPoint.DescriptorType.values());
+		if (associateWithPixels) {
 			comboAssociate = combo(configAssociate.type.ordinal(), ConfigAssociate.AssociationType.GREEDY);
 		} else {
-			comboAssociate = combo(configAssociate.type.ordinal(), (Object[]) ConfigAssociate.AssociationType.values());
+			comboAssociate = combo(configAssociate.type.ordinal(), (Object[])ConfigAssociate.AssociationType.values());
 		}
 
-		controlDetectSift = new ControlPanelSiftDetector(configDetDesc.scaleSpaceSift, configDetDesc.detectSift,this::handleControlsUpdated);
-		controlDetectFastHessian = new ControlPanelFastHessian(configDetDesc.detectFastHessian,this::handleControlsUpdated);
-		controlDetectPoint = new ControlPanelPointDetector(configDetDesc.detectPoint,this::handleControlsUpdated);
-		controlDescSurfFast = new ControlPanelSurfDescribe.Speed(configDetDesc.describeSurfFast,this::handleControlsUpdated);
-		controlDescSurfStable = new ControlPanelSurfDescribe.Stability(configDetDesc.describeSurfStability,this::handleControlsUpdated);
-		controlDescSift = new ControlPanelDescribeSift(configDetDesc.describeSift,this::handleControlsUpdated);
-		controlDescBrief = new ControlPanelDescribeBrief(configDetDesc.describeBrief,this::handleControlsUpdated);
-		controlDescTemplate = new ControlPanelDescribeTemplate(configDetDesc.describeTemplate,this::handleControlsUpdated);
-		controlAssocGreedy = new ControlPanelAssociateGreedy(configAssociate.greedy,this::handleControlsUpdated);
-		controlAssocNN = new ControlPanelAssociateNearestNeighbor(configAssociate.nearestNeighbor,this::handleControlsUpdated);
-		controlAssocMaxDistance = configLength(configAssociate.maximumDistancePixels,0,2000,this::handleControlsUpdated);
+		controlDetectSift = new ControlPanelSiftDetector(configDetDesc.scaleSpaceSift, configDetDesc.detectSift, this::handleControlsUpdated);
+		controlDetectFastHessian = new ControlPanelFastHessian(configDetDesc.detectFastHessian, this::handleControlsUpdated);
+		controlDetectPoint = new ControlPanelPointDetector(configDetDesc.detectPoint, this::handleControlsUpdated);
+		controlDescSurfFast = new ControlPanelSurfDescribe.Speed(configDetDesc.describeSurfFast, this::handleControlsUpdated);
+		controlDescSurfStable = new ControlPanelSurfDescribe.Stability(configDetDesc.describeSurfStability, this::handleControlsUpdated);
+		controlDescSift = new ControlPanelDescribeSift(configDetDesc.describeSift, this::handleControlsUpdated);
+		controlDescBrief = new ControlPanelDescribeBrief(configDetDesc.describeBrief, this::handleControlsUpdated);
+		controlDescTemplate = new ControlPanelDescribeTemplate(configDetDesc.describeTemplate, this::handleControlsUpdated);
+		controlAssocGreedy = new ControlPanelAssociateGreedy(configAssociate.greedy, this::handleControlsUpdated);
+		controlAssocNN = new ControlPanelAssociateNearestNeighbor(configAssociate.nearestNeighbor, this::handleControlsUpdated);
+		controlAssocMaxDistance = configLength(configAssociate.maximumDistancePixels, 0, 2000, this::handleControlsUpdated);
 
-		panelAssociate2D.addLabeled(controlAssocMaxDistance,"Max Dist","Maximum distance two features can be to be associated");
+		panelAssociate2D.addLabeled(controlAssocMaxDistance, "Max Dist", "Maximum distance two features can be to be associated");
 		panelAssociate2D.add(controlAssocGreedy);
 
 		controlDetectSift.setBorder(BorderFactory.createEmptyBorder());
@@ -146,7 +144,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	}
 
 	public JPanel getAssociatePanel() {
-		if( associateWithPixels ) {
+		if (associateWithPixels) {
 			return panelAssociate2D;
 		} else {
 			return switch (configAssociate.type) {
@@ -161,9 +159,8 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 	 * Creates an implementation of {@link DetectDescribePoint}. if possible a specialized implementation is created
 	 */
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
-	DetectDescribePoint<T,?> createDetectDescribe( Class<T> imageType )
-	{
-		return FactoryDetectDescribe.generic(configDetDesc,imageType);
+	DetectDescribePoint<T, ?> createDetectDescribe( Class<T> imageType ) {
+		return FactoryDetectDescribe.generic(configDetDesc, imageType);
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
@@ -175,11 +172,11 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		c.scaleSpaceSift = configDetDesc.scaleSpaceSift;
 		c.sift = configDetDesc.detectSift;
 
-		return FactoryInterestPoint.generic(c,imageType, null);
+		return FactoryInterestPoint.generic(c, imageType, null);
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
-	DescribeRegionPoint<T,?> createDescriptor(Class<T> imageType ) {
+	DescribeRegionPoint<T, ?> createDescriptor( Class<T> imageType ) {
 		ConfigDescribeRegionPoint c = new ConfigDescribeRegionPoint();
 		c.type = configDetDesc.typeDescribe;
 		c.brief = configDetDesc.describeBrief;
@@ -188,12 +185,12 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		c.scaleSpaceSift = configDetDesc.scaleSpaceSift;
 		c.template = configDetDesc.describeTemplate;
 
-		return FactoryDescribeRegionPoint.generic(c,imageType);
+		return FactoryDescribeRegionPoint.generic(c, imageType);
 	}
 
 	public AssociateDescription createAssociate( DescriptorInfo descriptor ) {
 
-		if( configAssociate.type != ConfigAssociate.AssociationType.GREEDY ) {
+		if (configAssociate.type != ConfigAssociate.AssociationType.GREEDY) {
 			// The best way to handle this situation is to make it so the user can't select this combination of options
 			if (!TupleDesc_F64.class.isAssignableFrom(descriptor.getDescriptionType())) {
 				JOptionPane.showMessageDialog(this, "Requires TupleDesc_F64 description type");
@@ -202,14 +199,14 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 			}
 		}
 
-		return FactoryAssociation.generic(configAssociate,descriptor);
+		return FactoryAssociation.generic(configAssociate, descriptor);
 	}
 
-	public AssociateDescription2D createAssociate2(DescriptorInfo descriptor ) {
+	public AssociateDescription2D createAssociate2( DescriptorInfo descriptor ) {
 
 		configAssociate.maximumDistancePixels.setTo(controlAssocMaxDistance.getValue());
 
-		if( configAssociate.type != ConfigAssociate.AssociationType.GREEDY ) {
+		if (configAssociate.type != ConfigAssociate.AssociationType.GREEDY) {
 			// The best way to handle this situation is to make it so the user can't select this combination of options
 			if (!TupleDesc_F64.class.isAssignableFrom(descriptor.getDescriptionType())) {
 				JOptionPane.showMessageDialog(this, "Requires TupleDesc_F64 description type");
@@ -218,6 +215,6 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 			}
 		}
 
-		return FactoryAssociation.generic2(configAssociate,descriptor);
+		return FactoryAssociation.generic2(configAssociate, descriptor);
 	}
 }

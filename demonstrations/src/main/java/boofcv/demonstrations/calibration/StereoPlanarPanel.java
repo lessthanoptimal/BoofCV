@@ -40,7 +40,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Panel for displaying information on observed calibration grids during the calibration process.
@@ -48,8 +47,7 @@ import java.util.Vector;
  * @author Peter Abeles
  */
 public class StereoPlanarPanel extends JPanel
-	implements ListSelectionListener, ItemListener, ChangeListener, MouseListener
-{
+		implements ListSelectionListener, ItemListener, ChangeListener, MouseListener {
 	// display for calibration information on individual cameras
 	DisplayPinholeCalibrationPanel leftView = new DisplayPinholeCalibrationPanel();
 	DisplayPinholeCalibrationPanel rightView = new DisplayPinholeCalibrationPanel();
@@ -76,7 +74,7 @@ public class StereoPlanarPanel extends JPanel
 	JTextArea meanErrorRight;
 	JTextArea maxErrorRight;
 
-	JList imageList;
+	JList<String> imageList;
 	List<String> names = new ArrayList<>();
 
 	int selectedImage;
@@ -107,7 +105,7 @@ public class StereoPlanarPanel extends JPanel
 		JToolBar toolBar = createToolBar();
 
 		JPanel center = new JPanel();
-		center.setLayout(new GridLayout(1,2));
+		center.setLayout(new GridLayout(1, 2));
 		center.add(leftView);
 		center.add(rightView);
 
@@ -117,7 +115,7 @@ public class StereoPlanarPanel extends JPanel
 	}
 
 	private JTextArea createTextComponent() {
-		JTextArea comp = new JTextArea(1,6);
+		JTextArea comp = new JTextArea(1, 6);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
 		return comp;
@@ -161,24 +159,23 @@ public class StereoPlanarPanel extends JPanel
 		return toolBar;
 	}
 
-	public void setRectification(CameraPinholeBrown leftParam , DMatrixRMaj leftRect ,
-								 CameraPinholeBrown rightParam , DMatrixRMaj rightRect ) {
-		leftView.setCalibration(leftParam,leftRect);
-		rightView.setCalibration(rightParam,rightRect);
+	public void setRectification( CameraPinholeBrown leftParam, DMatrixRMaj leftRect,
+								  CameraPinholeBrown rightParam, DMatrixRMaj rightRect ) {
+		leftView.setCalibration(leftParam, leftRect);
+		rightView.setCalibration(rightParam, rightRect);
 		checkUndistorted.setEnabled(true);
 		setSelected(selectedImage); // this will cause it to render the rectified image
 	}
 
-	public void addPair( String name , File imageLeft , File imageRight )
-	{
+	public void addPair( String name, File imageLeft, File imageRight ) {
 		listLeft.add(imageLeft);
 		listRight.add(imageRight);
 		names.add(name);
 
 		imageList.removeListSelectionListener(this);
-		imageList.setListData(new Vector<Object>(names));
+		imageList.setListData(names.toArray(new String[0]));
 		imageList.addListSelectionListener(this);
-		if( names.size() == 1 ) {
+		if (names.size() == 1) {
 //			leftView.setPreferredSize(new Dimension(imageLeft.getWidth(), imageLeft.getHeight()));
 //			rightView.setPreferredSize(new Dimension(imageRight.getWidth(), imageRight.getHeight()));
 			imageList.setSelectedIndex(0);
@@ -186,8 +183,8 @@ public class StereoPlanarPanel extends JPanel
 		validate();
 	}
 
-	public synchronized void setObservations( List<CalibrationObservation> leftObservations , List<ImageResults> leftResults ,
-											  List<CalibrationObservation> rightObservations , List<ImageResults> rightResults ) {
+	public synchronized void setObservations( List<CalibrationObservation> leftObservations, List<ImageResults> leftResults,
+											  List<CalibrationObservation> rightObservations, List<ImageResults> rightResults ) {
 //		if( leftObservations == null || leftResults == null || rightObservations == null || rightResults == null )
 //			return;
 
@@ -197,8 +194,8 @@ public class StereoPlanarPanel extends JPanel
 		this.rightResults = rightResults;
 
 		// synchronize configurations
-		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
-		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		leftView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
+		rightView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
 
 		setSelected(selectedImage);
 
@@ -214,55 +211,55 @@ public class StereoPlanarPanel extends JPanel
 		leftView.setImage(imageLeft);
 		rightView.setImage(imageRight);
 
-		if( leftObservations == null )
+		if (leftObservations == null)
 			return;
-		leftView.setResults(leftObservations.get(selected),leftResults.get(selected),leftObservations);
-		rightView.setResults(rightObservations.get(selected),rightResults.get(selected),rightObservations);
+		leftView.setResults(leftObservations.get(selected), leftResults.get(selected), leftObservations);
+		rightView.setResults(rightObservations.get(selected), rightResults.get(selected), rightObservations);
 
 		updateResultsGUI();
 	}
 
 	private synchronized void updateResultsGUI() {
-		if( leftResults != null && rightResults != null && selectedImage < leftResults.size() ) {
+		if (leftResults != null && rightResults != null && selectedImage < leftResults.size()) {
 			ImageResults r = leftResults.get(selectedImage);
 			String textMean = String.format("%5.1e", r.meanError);
-			String textMax = String.format("%5.1e",r.maxError);
+			String textMax = String.format("%5.1e", r.maxError);
 			meanErrorLeft.setText(textMean);
 			maxErrorLeft.setText(textMax);
 
 			r = rightResults.get(selectedImage);
 			textMean = String.format("%5.1e", r.meanError);
-			textMax = String.format("%5.1e",r.maxError);
+			textMax = String.format("%5.1e", r.maxError);
 			meanErrorRight.setText(textMean);
 			maxErrorRight.setText(textMax);
 		}
 	}
 
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( e.getSource() == checkPoints ) {
+	public void itemStateChanged( ItemEvent e ) {
+		if (e.getSource() == checkPoints) {
 			showPoints = checkPoints.isSelected();
-		} else if( e.getSource() == checkErrors ) {
+		} else if (e.getSource() == checkErrors) {
 			showErrors = checkErrors.isSelected();
-		} else if( e.getSource() == checkAll ) {
+		} else if (e.getSource() == checkAll) {
 			showAll = checkAll.isSelected();
-		} else if( e.getSource() == checkUndistorted ) {
+		} else if (e.getSource() == checkUndistorted) {
 			showUndistorted = checkUndistorted.isSelected();
-		} else if( e.getSource() == checkNumbers ) {
+		} else if (e.getSource() == checkNumbers) {
 			showNumbers = checkNumbers.isSelected();
 		}
-		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
-		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		leftView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
+		rightView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
 		leftView.repaint();
 		rightView.repaint();
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		if( e.getValueIsAdjusting() || e.getFirstIndex() == -1)
+	public void valueChanged( ListSelectionEvent e ) {
+		if (e.getValueIsAdjusting() || e.getFirstIndex() == -1)
 			return;
 
-		if( imageList.getSelectedIndex() >= 0 ) {
+		if (imageList.getSelectedIndex() >= 0) {
 			setSelected(imageList.getSelectedIndex());
 			leftView.repaint();
 			rightView.repaint();
@@ -270,19 +267,19 @@ public class StereoPlanarPanel extends JPanel
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectErrorScale) {
-			errorScale = ((Number) selectErrorScale.getValue()).intValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == selectErrorScale) {
+			errorScale = ((Number)selectErrorScale.getValue()).intValue();
 		}
 
-		leftView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
-		rightView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		leftView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
+		rightView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
 		leftView.repaint();
 		rightView.repaint();
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked( MouseEvent e ) {
 		leftView.setLine(e.getY());
 		rightView.setLine(e.getY());
 		leftView.repaint();
@@ -290,33 +287,30 @@ public class StereoPlanarPanel extends JPanel
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed( MouseEvent e ) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased( MouseEvent e ) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered( MouseEvent e ) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited( MouseEvent e ) {}
 
-	private class SideBar extends StandardAlgConfigPanel
-	{
+	private class SideBar extends StandardAlgConfigPanel {
 		public SideBar() {
 			JScrollPane scroll = new JScrollPane(imageList);
 
 			addCenterLabel("Left");
-			addLabeled(meanErrorLeft,"Mean Error");
+			addLabeled(meanErrorLeft, "Mean Error");
 			addLabeled(maxErrorLeft, "Max Error");
 			addSeparator(200);
 			addCenterLabel("Right");
-			addLabeled(meanErrorRight,"Mean Error");
+			addLabeled(meanErrorRight, "Mean Error");
 			addLabeled(maxErrorRight, "Max Error");
 			addSeparator(200);
 			add(scroll);
 		}
 	}
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,7 +172,7 @@ public class DerivativeIntegralImage {
 
 		for( int y = radiusH+1; y < endY; y++ ) {
 			int indexTop = input.startIndex + (y-radiusH-1)*input.stride;
-			int indexBottom = indexTop + (blockH)*input.stride;
+			int indexBottom = indexTop + blockH*input.stride;
 			int indexDst = output.startIndex + y*output.stride+radiusW+1;
 
 			for( int x = radiusW+1; x < endX; x++ , indexTop++,indexBottom++,indexDst++) {

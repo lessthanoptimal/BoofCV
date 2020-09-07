@@ -32,7 +32,6 @@ import georegression.struct.se.Se2_F32;
 import georegression.transform.ConvertTransform_F32;
 import georegression.transform.InvertibleTransformSequence;
 
-
 /**
  * Provides low level functions that {@link boofcv.alg.distort.DistortImageOps} can call.
  *
@@ -44,17 +43,16 @@ public class DistortSupport {
 	 * directly from the size of the two input images and independently scales
 	 * the x and y axises.
 	 */
-	public static PixelTransformAffine_F32 transformScale(ImageBase from, ImageBase to,
-														  PixelTransformAffine_F32 distort)
-	{
-		if( distort == null )
+	public static PixelTransformAffine_F32 transformScale( ImageBase from, ImageBase to,
+														   PixelTransformAffine_F32 distort ) {
+		if (distort == null)
 			distort = new PixelTransformAffine_F32();
 
-		float scaleX = (float)(to.width)/(float)(from.width);
-		float scaleY = (float)(to.height)/(float)(from.height);
+		float scaleX = (float)to.width/(float)from.width;
+		float scaleY = (float)to.height/(float)from.height;
 
 		Affine2D_F32 affine = distort.getModel();
-		affine.set(scaleX,0,0,scaleY,0,0);
+		affine.set(scaleX, 0, 0, scaleY, 0, 0);
 
 		return distort;
 	}
@@ -68,8 +66,7 @@ public class DistortSupport {
 	 * @param y1 Center of rotation in output image coordinates.
 	 * @param angle Angle of rotation.
 	 */
-	public static PixelTransformAffine_F32 transformRotate( float x0 , float y0 , float x1 , float y1 , float angle )
-	{
+	public static PixelTransformAffine_F32 transformRotate( float x0, float y0, float x1, float y1, float angle ) {
 		Affine2D_F32 affine = rotateCenterAffine(x0, y0, x1, y1, angle);
 		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
 		distort.set(affine);
@@ -86,22 +83,22 @@ public class DistortSupport {
 	 * @param y1 Center of rotation in output image coordinates.
 	 * @param angle Angle of rotation.
 	 */
-	public static Affine2D_F32 rotateCenterAffine( float x0 , float y0 , float x1 , float y1 , float angle ) {
+	public static Affine2D_F32 rotateCenterAffine( float x0, float y0, float x1, float y1, float angle ) {
 		// make the coordinate system's origin the image center
-		Se2_F32 imageToCenter = new Se2_F32(-x0,-y0,0);
-		Se2_F32 rotate = new Se2_F32(0,0,angle);
-		Se2_F32 centerToImage = new Se2_F32(x1,y1,0);
+		Se2_F32 imageToCenter = new Se2_F32(-x0, -y0, 0);
+		Se2_F32 rotate = new Se2_F32(0, 0, angle);
+		Se2_F32 centerToImage = new Se2_F32(x1, y1, 0);
 
-		InvertibleTransformSequence sequence = new InvertibleTransformSequence();
-		sequence.addTransform(true,imageToCenter);
-		sequence.addTransform(true,rotate);
-		sequence.addTransform(true,centerToImage);
+		InvertibleTransformSequence<Se2_F32> sequence = new InvertibleTransformSequence<>();
+		sequence.addTransform(true, imageToCenter);
+		sequence.addTransform(true, rotate);
+		sequence.addTransform(true, centerToImage);
 
 		Se2_F32 total = new Se2_F32();
 		sequence.computeTransform(total);
 		Se2_F32 inv = total.invert(null);
 
-		return ConvertTransform_F32.convert(inv,(Affine2D_F32)null);
+		return ConvertTransform_F32.convert(inv, (Affine2D_F32)null);
 	}
 
 	/**
@@ -111,12 +108,11 @@ public class DistortSupport {
 	 * @param dstToSrc Transform from dst to src image.
 	 * @param interp Which interpolation algorithm should be used.
 	 */
-	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
-	ImageDistort<Planar<Input>,Planar<Output>>
-	createDistortPL(Class<Output> outputType, PixelTransform<Point2D_F32> dstToSrc,
-					InterpolatePixelS<Input> interp, boolean cached )
-	{
-		ImageDistort<Input,Output> bandDistort = FactoryDistort.distortSB(cached, interp, outputType);
+	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
+	ImageDistort<Planar<Input>, Planar<Output>>
+	createDistortPL( Class<Output> outputType, PixelTransform<Point2D_F32> dstToSrc,
+					 InterpolatePixelS<Input> interp, boolean cached ) {
+		ImageDistort<Input, Output> bandDistort = FactoryDistort.distortSB(cached, interp, outputType);
 		bandDistort.setModel(dstToSrc);
 		return new ImplImageDistort_PL<>(bandDistort);
 	}

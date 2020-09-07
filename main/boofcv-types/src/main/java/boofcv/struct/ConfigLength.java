@@ -31,27 +31,26 @@ public class ConfigLength implements Configuration {
 	/**
 	 * If in fixed mode this is the length or it's the minimum length of a relative length is being specified
 	 */
-	public double length =-1;
+	public double length = -1;
 	/**
 	 * If &ge; 0 the length is relative to the total size and the 'fixed' number is treated
 	 * as a minium size.
 	 */
-	public double fraction=-1;
+	public double fraction = -1;
 
-	public ConfigLength(double length, double fraction) {
+	public ConfigLength( double length, double fraction ) {
 		this.length = length;
 		this.fraction = fraction;
 	}
 
-	public ConfigLength() {
+	public ConfigLength() {}
+
+	public static ConfigLength fixed( double length ) {
+		return new ConfigLength(length, -1);
 	}
 
-	public static ConfigLength fixed(double length ) {
-		return new ConfigLength(length,-1);
-	}
-
-	public static ConfigLength relative(double fraction , double minimum ) {
-		return new ConfigLength(minimum,fraction);
+	public static ConfigLength relative( double fraction, double minimum ) {
+		return new ConfigLength(minimum, fraction);
 	}
 
 	public void setFixed( double length ) {
@@ -70,7 +69,7 @@ public class ConfigLength implements Configuration {
 	 * @param totalLength What a relative value is relative to
 	 * @return The length
 	 */
-	public double compute(double totalLength) {
+	public double compute( double totalLength ) {
 
 		double size;
 		if (fraction >= 0) {
@@ -95,7 +94,7 @@ public class ConfigLength implements Configuration {
 
 	public int computeI( double totalLength ) {
 		double size = compute(totalLength);
-		if( size >= 0 )
+		if (size >= 0)
 			return (int)Math.round(size);
 		else
 			return -1;
@@ -110,10 +109,10 @@ public class ConfigLength implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( length < 0 && fraction < 0 )
+		if (length < 0 && fraction < 0)
 			throw new IllegalArgumentException("length and/or fraction must be >= 0");
-		if( isRelative() )
-			if( fraction < 0 || fraction > 1.0 )
+		if (isRelative())
+			if (fraction < 0 || fraction > 1.0)
 				throw new IllegalArgumentException("Fractional value must be from 0.0maxFeatures to 1.0, inclusive");
 	}
 
@@ -131,10 +130,10 @@ public class ConfigLength implements Configuration {
 	@Override
 	public String toString() {
 		String out = "ConfigLength{";
-		if( fraction >= 0)
-				out += "fraction=" + fraction+", minimum="+ length;
+		if (fraction >= 0)
+			out += "fraction=" + fraction + ", minimum=" + length;
 		else
-			out +=", length=" + length;
+			out += ", length=" + length;
 		out += '}';
 		return out;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,12 +93,12 @@ public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 			kernelType = "F"+imageIn.getNumBits();
 		}
 
-		printHorizontal(imageIn);
-		printVertical(imageIn);
-		printConvolve(imageIn);
+		printHorizontal();
+		printVertical();
+		printConvolve();
 	}
 
-	private void printHorizontal( AutoTypeImage imageIn ) {
+	private void printHorizontal() {
 		out.print("\tpublic static "+sumType+" horizontal( Kernel1D_"+kernelType+" kernel, ImageBorder_"+kernelType+" input , int x , int y ) {\n" +
 				"\t\tfinal int r = kernel.getRadius();\n" +
 				"\t\tfinal int w = kernel.getWidth();\n" +
@@ -113,7 +113,7 @@ public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printVertical( AutoTypeImage imageIn ) {
+	private void printVertical() {
 		out.print("\tpublic static "+sumType+" vertical( Kernel1D_"+kernelType+" kernel, ImageBorder_"+kernelType+" input , int x , int y ) {\n" +
 				"\t\tfinal int r = kernel.getRadius();\n" +
 				"\t\tfinal int w = kernel.getWidth();\n" +
@@ -128,7 +128,7 @@ public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printConvolve( AutoTypeImage imageIn ) {
+	private void printConvolve() {
 		out.print("\tpublic static "+sumType+" convolve( Kernel2D_"+kernelType+" kernel, ImageBorder_"+kernelType+" input , int x , int y ) {\n" +
 				"\t\tfinal int r = kernel.getRadius();\n" +
 				"\t\tfinal int w = kernel.getWidth();\n" +

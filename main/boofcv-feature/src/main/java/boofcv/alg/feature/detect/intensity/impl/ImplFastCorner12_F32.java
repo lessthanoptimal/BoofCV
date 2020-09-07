@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import javax.annotation.Generated;
 
 /**
  * <p>
@@ -31,6 +32,7 @@ package boofcv.alg.feature.detect.intensity.impl;
  *
  * @author Peter Abeles
  */
+@Generated("boofcv.alg.feature.detect.intensity.impl.GenerateImplFastCorner")
 public class ImplFastCorner12_F32 extends ImplFastHelper_F32
 {
 

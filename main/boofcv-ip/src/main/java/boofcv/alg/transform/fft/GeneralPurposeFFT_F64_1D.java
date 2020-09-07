@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ import java.util.Arrays;
  * @author Peter Abeles
  *
  */
+@SuppressWarnings({"OperatorPrecedence"})
 public class GeneralPurposeFFT_F64_1D {
 
 	private static enum Plans {
@@ -106,12 +107,12 @@ public class GeneralPurposeFFT_F64_1D {
 				this.w = new double[nBluestein];
 				int twon = 2 * nBluestein;
 				nw = ip[0];
-				if (twon > (nw << 2)) {
+				if (twon > nw << 2) {
 					nw = twon >> 2;
 					makewt(nw);
 				}
 				nc = ip[1];
-				if (nBluestein > (nc << 2)) {
+				if (nBluestein > nc << 2) {
 					nc = nBluestein >> 2;
 					makect(nc, w, nw);
 				}
@@ -130,12 +131,12 @@ public class GeneralPurposeFFT_F64_1D {
 			this.w = new double[n];
 			int twon = 2 * n;
 			nw = ip[0];
-			if (twon > (nw << 2)) {
+			if (twon > nw << 2) {
 				nw = twon >> 2;
 				makewt(nw);
 			}
 			nc = ip[1];
-			if (n > (nc << 2)) {
+			if (n > nc << 2) {
 				nc = n >> 2;
 				makect(nc, w, nw);
 			}
@@ -391,7 +392,7 @@ public class GeneralPurposeFFT_F64_1D {
 				int idx1, idx2;
 				for (int k = 0; k < n / 2; k++) {
 					idx1 = 2 * k;
-					idx2 = offa + ((twon - idx1) % twon);
+					idx2 = offa + (twon - idx1) % twon;
 					a[idx2] = a[offa + idx1];
 					a[idx2 + 1] = -a[offa + idx1 + 1];
 				}
@@ -572,7 +573,7 @@ public class GeneralPurposeFFT_F64_1D {
 				int idx1, idx2;
 				for (int k = 0; k < n / 2; k++) {
 					idx1 = 2 * k;
-					idx2 = offa + ((twon - idx1) % twon);
+					idx2 = offa + (twon - idx1) % twon;
 					a[idx2] = a[offa + idx1];
 					a[idx2 + 1] = -a[offa + idx1 + 1];
 				}
@@ -678,7 +679,7 @@ public class GeneralPurposeFFT_F64_1D {
 
 		for (int i = 0; i < factors.length && reminder != 1; i++) {
 			int factor = factors[i];
-			while ((reminder % factor) == 0) {
+			while (reminder % factor == 0) {
 				reminder /= factor;
 			}
 		}
@@ -817,7 +818,7 @@ public class GeneralPurposeFFT_F64_1D {
 		}
 		wtable_r[twon] = n;
 		wtable_r[1 + twon] = nf;
-		argh = TWO_PI / (double) (n);
+		argh = TWO_PI / (double)n;
 		is = 0;
 		nfm1 = nf - 1;
 		l1 = 1;
@@ -6015,7 +6016,7 @@ public class GeneralPurposeFFT_F64_1D {
 	}
 
 	private void scale(final double m, final double[] a, int offa, boolean complex) {
-		final double norm = (1.0 / m);
+		final double norm = 1.0 / m;
 		int n2;
 		if (complex) {
 			n2 = 2 * n;

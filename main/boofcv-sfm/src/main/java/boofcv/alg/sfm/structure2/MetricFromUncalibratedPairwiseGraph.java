@@ -71,12 +71,12 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	/** Used elevate the projective scene into a metric scene */
 	private @Getter @Setter ProjectiveToMetricCameras projectiveToMetric =
-			FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic) null);
+			FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
 
 	// Uses known metric views to expand the metric reconstruction by one view
 	private final @Getter MetricExpandByOneView expandMetric = new MetricExpandByOneView();
 
-	private final RefineMetricWorkingGraph refineWorking = new RefineMetricWorkingGraph();
+	private final @Getter RefineMetricWorkingGraph refineWorking = new RefineMetricWorkingGraph();
 
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
 		super(utils);
@@ -187,13 +187,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Pass the projective scene and elevate into a metric scene
 		MetricCameras results = new MetricCameras();
-		if (!projectiveToMetric.process(dimensions.toList(), views.toList(), (List) observations.toList(), results)) {
+		if (!projectiveToMetric.process(dimensions.toList(), views.toList(), (List)observations.toList(), results)) {
 			if (verbose != null) verbose.println("Failed to elevate initial seed to metric");
 			return false;
 		}
 
 		// Save the results to the working grpah
-		saveMetricSeed(graph, viewIds, initProjective.getInlierToSeed(), initProjective.getInlierIndexes(), results);
+		saveMetricSeed(graph, viewIds, dimensions.toList(),
+				initProjective.getInlierToSeed(), initProjective.getInlierIndexes(), results);
 
 		return true;
 	}
@@ -204,7 +205,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * @param inlierToSeed Indexes of observations which are part of the inlier set
 	 * @param inlierToOther Indexes of observations for all the other views which are part of the inlier set.
 	 */
-	void saveMetricSeed( PairwiseImageGraph2 graph, List<String> viewIds,
+	void saveMetricSeed( PairwiseImageGraph2 graph, List<String> viewIds, List<ImageDimension> dimensions,
 						 GrowQueue_I32 inlierToSeed,
 						 FastQueue<GrowQueue_I32> inlierToOther,
 						 MetricCameras results ) {
@@ -217,6 +218,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			if (i > 0)
 				wview.world_to_view.set(results.motion_1_to_k.get(i - 1));
 			wview.intrinsic.set(results.intrinsics.get(i));
+			wview.imageDimension.setTo(dimensions.get(i));
 		}
 
 		// Save the inliers used to construct the metric scene
@@ -272,7 +274,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 			// TODO Refining at this point is essential for long term stability but optimizing everything is not scalable
 			// maybe identify views with large residuals and optimizing up to N views surrounding them to fix the issue?
-			refineWorking.process(db, workGraph);
+//			refineWorking.process(db, workGraph);
 
 			// Add neighboring views which have yet to be added to the open list
 			addOpenForView(wview.pview, open);

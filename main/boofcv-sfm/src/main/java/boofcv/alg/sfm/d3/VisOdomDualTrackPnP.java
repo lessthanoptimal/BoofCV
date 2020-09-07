@@ -209,6 +209,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	/**
 	 * Resets the algorithm into its original state
 	 */
+	@Override
 	public void reset() {
 		super.reset();
 		trackerLeft.reset();
@@ -634,6 +635,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		// the last frame it was seen in
 		public long lastSeenRightFrame;
 
+		@Override
 		public void reset() {
 			super.reset();
 			visualRight = null;

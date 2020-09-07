@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,7 +94,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// step away from the corner points. This is only really important with small chessboard where the samples
 		// will put it next to the corner
-		double l = offsetA+offsetB;
+		float l = offsetA+offsetB;
 		cx += nx*offsetA;
 		cy += ny*offsetA;
 		dx -= l * nx;

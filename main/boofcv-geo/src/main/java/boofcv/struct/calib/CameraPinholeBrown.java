@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.calib;
 
 import org.ejml.FancyPrint;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -41,7 +42,7 @@ import java.io.Serializable;
 public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 
 	/** radial distortion parameters */
-	public double radial[];
+	public @Nullable double[] radial;
 	/** tangential distortion parameters */
 	public double t1, t2;
 
@@ -66,6 +67,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
+	@Override
 	public CameraPinholeBrown fsetK(double fx, double fy,
 									double skew,
 									double cx, double cy,
@@ -73,8 +75,16 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return (CameraPinholeBrown)super.fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public CameraPinholeBrown fsetRadial(double ...radial ) {
-		this.radial = radial.clone();
+	public CameraPinholeBrown fsetRadial(@Nullable double ...radial ) {
+		if( radial == null ) {
+			this.radial = null;
+		} else if( this.radial == null || this.radial.length != radial.length )
+			this.radial = radial.clone();
+		else {
+			for (int i = 0; i < radial.length; i++) {
+				this.radial[i] = radial[i];
+			}
+		}
 		return this;
 	}
 
@@ -89,6 +99,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		if( param instanceof CameraPinholeBrown) {
 			CameraPinholeBrown p = (CameraPinholeBrown)param;
 
+			p.fsetRadial(p.radial);
 			if( p.radial != null )
 				radial = p.radial.clone();
 			else
@@ -127,7 +138,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return Math.abs(t1) > tol || Math.abs(t2) > tol;
 	}
 
-	public double[] getRadial() {
+	public @Nullable double[] getRadial() {
 		return radial;
 	}
 
@@ -151,6 +162,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		this.t2 = t2;
 	}
 
+	@Override
 	public void print() {
 		super.print();
 		if( radial != null ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,35 +32,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestImageDistortBasic_SB extends CommonImageDistort_SB {
 
 	@Override
-	protected ImageDistortHelper createAlg(BilinearPixelS<GrayF32> interp) {
+	protected ImageDistortHelper createAlg( BilinearPixelS<GrayF32> interp ) {
 		return new Helper(interp);
 	}
-
 
 	private static class Helper extends ImageDistortBasic_SB implements ImageDistortHelper {
 
 		int total = 0;
 
-		public Helper(InterpolatePixelS interp) {
-			super(null,interp);
+		public Helper( InterpolatePixelS interp ) {
+			super(null, interp);
 			this.assigner = new AssignPixelValue_SB.F32() {
-				public void assign(int indexDst, float value) {
+				@Override
+				public void assign( int indexDst, float value ) {
 					total++;
 					int x = (indexDst - dstImg.startIndex)%dstImg.stride;
 					int y = (indexDst - dstImg.startIndex)/dstImg.stride;
-					assertTrue(dstImg.isInBounds(x,y));
-					GeneralizedImageOps.set((ImageGray)dstImg,x,y,value);
+					assertTrue(dstImg.isInBounds(x, y));
+					GeneralizedImageOps.set((ImageGray)dstImg, x, y, value);
 				}
 			};
 		}
 
+		@Override
 		public void reset() {
 			total = 0;
 		}
 
+		@Override
 		public int getTotal() {
 			return total;
 		}
 	}
-
 }

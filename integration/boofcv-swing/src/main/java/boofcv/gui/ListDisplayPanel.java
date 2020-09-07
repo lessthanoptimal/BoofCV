@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
+public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 
 	final List<JComponent> panels = new ArrayList<>();
 	private JPanel bodyPanel;
@@ -47,7 +47,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	JScrollPane scroll;
 
 	// stores the size the center element of body should be to contain all the images without resizing
-	private int bodyWidth,bodyHeight;
+	private int bodyWidth, bodyHeight;
 
 	public ListDisplayPanel() {
 		setLayout(new BorderLayout());
@@ -63,14 +63,14 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
 		bodyPanel = new JPanel();
 		bodyPanel.setLayout(new BorderLayout());
-		bodyPanel.add(scroll,BorderLayout.WEST);
+		bodyPanel.add(scroll, BorderLayout.WEST);
 
 		add(bodyPanel);
 	}
 
-	public ListDisplayPanel( String ... names ) {
+	public ListDisplayPanel( String... names ) {
 		this();
-		for( String n : names ) {
+		for (String n : names) {
 			addItem(new JPanel(), n);
 		}
 	}
@@ -78,23 +78,19 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	public synchronized void reset() {
 		panels.clear();
 
-		if( SwingUtilities.isEventDispatchThread() ) {
+		if (SwingUtilities.isEventDispatchThread()) {
 			listModel.removeAllElements();
 		} else {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					listModel.removeAllElements();
-				}
-			});
+			SwingUtilities.invokeLater(() -> listModel.removeAllElements());
 		}
 //		bodyPanel.requestFocus();
 	}
 
-	public int getListWidth(){
+	public int getListWidth() {
 		return (int)listPanel.getPreferredSize().getWidth();
 	}
 
-	public void addImage( ImageBase image , String name ) {
+	public void addImage( ImageBase image, String name ) {
 		BufferedImage buff = ConvertBufferedImage.convertTo(image, null, true);
 		addImage(buff, name, ScaleOptions.DOWN);
 	}
@@ -105,11 +101,11 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param image The image being displayed
 	 * @param name Name of the image.  Shown in the list.
 	 */
-	public void addImage( BufferedImage image , String name) {
+	public void addImage( BufferedImage image, String name ) {
 		addImage(image, name, ScaleOptions.DOWN);
 	}
 
-	public void addImage( BufferedImage image , String name , ScaleOptions scaling) {
+	public void addImage( BufferedImage image, String name, ScaleOptions scaling ) {
 		addItem(new ImagePanel(image, scaling), name);
 	}
 
@@ -119,7 +115,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param panel The panel being displayed
 	 * @param name Name of the image.  Shown in the list.
 	 */
-	public synchronized void addItem( final JComponent panel , final String name ) {
+	public synchronized void addItem( final JComponent panel, final String name ) {
 
 		Dimension panelD = panel.getPreferredSize();
 
@@ -127,7 +123,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
 		// make the preferred size large enough to hold all the images
 		bodyWidth = (int)Math.max(bodyWidth, panelD.getWidth());
-		bodyHeight = (int)Math.max(bodyHeight,panelD.getHeight());
+		bodyHeight = (int)Math.max(bodyHeight, panelD.getHeight());
 
 		panels.add(panel);
 		SwingUtilities.invokeLater(() -> {
@@ -140,8 +136,8 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 			listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
 
 			// make sure it's preferred size is up to date
-			if( sizeChanged ) {
-				Component old = ((BorderLayout) bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+			if (sizeChanged) {
+				Component old = ((BorderLayout)bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
 				if (old != null) {
 					old.setPreferredSize(new Dimension(bodyWidth, bodyHeight));
 				}
@@ -153,15 +149,15 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	/**
 	 * Changes the item at the specified index
 	 */
-	public void setItem( int index , final JComponent panel ) {
-		BoofSwingUtil.invokeNowOrLater(()->{
-			panels.set(index,panel);
+	public void setItem( int index, final JComponent panel ) {
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			panels.set(index, panel);
 
-			int w=0,h=0;
+			int w = 0, h = 0;
 			for (int i = 0; i < panels.size(); i++) {
 				JComponent p = panels.get(i);
-				w = Math.max(w,p.getWidth());
-				h = Math.max(h,p.getWidth());
+				w = Math.max(w, p.getWidth());
+				h = Math.max(h, p.getWidth());
 			}
 
 			final boolean sizeChanged = bodyWidth != w || bodyHeight != h;
@@ -172,8 +168,8 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 			listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
 
 			// make sure it's preferred size is up to date
-			if( sizeChanged ) {
-				Component old = ((BorderLayout) bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+			if (sizeChanged) {
+				Component old = ((BorderLayout)bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
 				if (old != null) {
 					old.setPreferredSize(new Dimension(bodyWidth, bodyHeight));
 				}
@@ -181,27 +177,27 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 			validate();
 
 			// If the selected item is the item being set change it
-			if( listPanel.getSelectedIndex() == index ) {
+			if (listPanel.getSelectedIndex() == index) {
 				changeBodyPanel(index);
 			}
 		});
 	}
 
 	@Override
-	public synchronized void valueChanged(ListSelectionEvent e) {
-		if( e.getValueIsAdjusting() )
+	public synchronized void valueChanged( ListSelectionEvent e ) {
+		if (e.getValueIsAdjusting())
 			return;
 
 		final int index = listPanel.getSelectedIndex();
-		if( index >= 0 ) {
+		if (index >= 0) {
 			changeBodyPanel(index);
 		}
 	}
 
-	protected void changeBodyPanel(int index) {
+	protected void changeBodyPanel( int index ) {
 		removeCenterBody();
 		JComponent p = panels.get(index);
-		p.setPreferredSize(new Dimension(bodyWidth,bodyHeight));
+		p.setPreferredSize(new Dimension(bodyWidth, bodyHeight));
 		bodyPanel.add(p, BorderLayout.CENTER);
 		bodyPanel.validate();
 		bodyPanel.repaint();
@@ -209,7 +205,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
 	private void removeCenterBody() {
 		Component old = ((BorderLayout)bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
-		if( old != null ) {
+		if (old != null) {
 			bodyPanel.remove(old);
 		}
 	}

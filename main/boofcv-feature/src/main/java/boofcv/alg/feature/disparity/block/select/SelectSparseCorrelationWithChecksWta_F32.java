@@ -31,8 +31,8 @@ public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStanda
 	// texture threshold
 	protected float textureThreshold;
 
-	public SelectSparseCorrelationWithChecksWta_F32( double texture, int tolRightToLeft) {
-		super(0,texture,tolRightToLeft);
+	public SelectSparseCorrelationWithChecksWta_F32( double texture, int tolRightToLeft ) {
+		super(0, texture, tolRightToLeft);
 	}
 
 	@Override
@@ -41,9 +41,9 @@ public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStanda
 	}
 
 	@Override
-	public boolean select(DisparitySparseRectifiedScoreBM<float[],?> scorer, int x, int y) {
+	public boolean select( DisparitySparseRectifiedScoreBM<float[], ?> scorer, int x, int y ) {
 		// First compute the error in the normal left to right direction
-		if( !scorer.processLeftToRight(x,y) )
+		if (!scorer.processLeftToRight(x, y))
 			return false;
 		float[] scores = scorer.getScoreLtoR();
 		int disparityRange = scorer.getLocalRangeLtoR();
@@ -53,27 +53,27 @@ public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStanda
 		float scoreBest = scores[0];
 		float scoreWorst = scoreBest;
 
-		for(int i = 1; i < disparityRange; i++ ) {
+		for (int i = 1; i < disparityRange; i++) {
 			float s = scores[i];
-			if( s > scoreBest ) {
+			if (s > scoreBest) {
 				scoreBest = scores[i];
 				bestDisparity = i;
-			} else if( s < scoreWorst ) {
+			} else if (s < scoreWorst) {
 				scoreWorst = s;
 			}
 		}
 
 		// test to see if the region lacks sufficient texture if:
 		// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
-		if( textureThreshold > 0 && disparityRange >= 3 ) {
+		if (textureThreshold > 0 && disparityRange >= 3) {
 			// find the second best disparity value and exclude its neighbors
 			float secondBest = scoreWorst;
-			for( int i = 0; i < bestDisparity-1; i++ ) {
-				if( scores[i] > secondBest )
+			for (int i = 0; i < bestDisparity - 1; i++) {
+				if (scores[i] > secondBest)
 					secondBest = scores[i];
 			}
-			for(int i = bestDisparity+2; i < disparityRange; i++ ) {
-				if( scores[i] > secondBest )
+			for (int i = bestDisparity + 2; i < disparityRange; i++) {
+				if (scores[i] > secondBest)
 					secondBest = scores[i];
 			}
 
@@ -83,32 +83,31 @@ public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStanda
 
 			// similar scores indicate lack of texture
 			// C = (C2-C1)/C1
-			if( scoreBest-secondBest <= textureThreshold*secondBest )
+			if (scoreBest - secondBest <= textureThreshold*secondBest)
 				return false;
 		}
 
 		// if requested perform right to left validation. Ideally the two disparities will be identical
-		if( tolRightToLeft >= 0 ) {
-			if( !scorer.processRightToLeft(x-bestDisparity-scorer.getDisparityMin(),y) )
+		if (tolRightToLeft >= 0) {
+			if (!scorer.processRightToLeft(x - bestDisparity - scorer.getDisparityMin(), y))
 				return false;
 			final float[] scoresRtoL = scorer.getScoreRtoL();
 			final int localRangeRtoL = scorer.getLocalRangeRtoL();
 			int bestDisparityRtoL = 0;
 			float scoreBestRtoL = scoresRtoL[0];
 
-			for(int i = 1; i < localRangeRtoL; i++ ) {
+			for (int i = 1; i < localRangeRtoL; i++) {
 				float s = scoresRtoL[i];
-				if( s > scoreBestRtoL ) {
+				if (s > scoreBestRtoL) {
 					scoreBestRtoL = s;
 					bestDisparityRtoL = i;
 				}
 			}
-			if( Math.abs(bestDisparityRtoL-bestDisparity) > tolRightToLeft )
+			if (Math.abs(bestDisparityRtoL - bestDisparity) > tolRightToLeft)
 				return false;
 		}
 
 		this.disparity = bestDisparity;
 		return true;
 	}
-
 }

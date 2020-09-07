@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,11 +90,11 @@ public class RectifiedPairPanel extends JPanel implements MouseListener {
 		// draw a vertical line to make it easy to see how
 		if( mouseY >= 0 ) {
 			int x = mouseX >= image1.getWidth() ? mouseX-image1.getWidth() : mouseX;
-			x *= scale;
+			x = (int)(x*scale);
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
 			g2.drawLine(x,0,x,getHeight());
-			x += scale*image1.getWidth();
+			x = (int)(x*scale*image1.getWidth());
 			g2.drawLine(x,0,x,getHeight());
 		}
 

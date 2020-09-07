@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.misc;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.Planar;
 import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import static boofcv.alg.misc.TestPixelMath.createLambda1_Plus5;
+import static boofcv.alg.misc.TestPixelMath.createLambda2_AddPlus5;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,7 +46,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 	@Test
 	void compareToPixelMath() {
-		performTests(23);
+		performTests(25);
 	}
 
 	@Override
@@ -179,6 +182,18 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 			ret[0][2] = output;
+		} else if( name.equals("lambda1") ) {
+			output = createImage(param[2],null);
+			ret[0][0] = inputA;
+			ret[0][1] = createLambda1_Plus5(inputA.imageType.getDataType());
+			ret[0][2] = output;
+		} else if( name.equals("lambda2") ) {
+			inputB = createImage(param[2],null);
+			output = createImage(param[3],null);
+			ret[0][0] = inputA;
+			ret[0][1] = createLambda2_AddPlus5(inputA.imageType.getDataType());
+			ret[0][2] = inputB;
+			ret[0][3] = output;
 		}
 
 		fillRandom(inputA);
@@ -280,6 +295,10 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 				inputs[2] = 8;
 			} else if( name.equals("log") || name.equals("logSign")) {
 				inputs[1] = BoofTesting.primitive(0.5,param[1]);
+			} else if( name.equals("lambda1") ) {
+				inputs[1] = createLambda1_Plus5(ImageDataType.F32);
+			} else if( name.equals("lambda2") ) {
+				inputs[1] = createLambda2_AddPlus5(ImageDataType.F32);
 			} else if( name.equals("averageBand")) {
 				continue;
 			}
@@ -305,7 +324,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 				throw new RuntimeException(e);
 			}
 		}
-		assertEquals(23,total);
+		assertEquals(25,total);
 	}
 
 	private Object[] copy( Object inputs[] ) {

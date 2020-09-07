@@ -79,7 +79,7 @@ public class FactoryIntensityPoint {
 	 *
 	 * @param windowRadius Size of the feature it detects, Try 2.
 	 * @param weighted Should the it be weighted by a Gaussian kernel?  Unweighted is much faster.
-	 * @param derivType Image derivative type it is computed from.	 * @param derivType Image derivative type it is computed from.  @return Harris corner
+	 * @param derivType Image derivative type it is computed from.
 	 * @param <I> Input image type.
 	 * @param <D> Derivative type.
 	 * @return KLT feature intensity

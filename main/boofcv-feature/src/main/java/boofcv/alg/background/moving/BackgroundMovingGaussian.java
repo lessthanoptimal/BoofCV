@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,14 +28,12 @@ import georegression.struct.InvertibleTransform;
 /**
  * <p>Implementation of {@link BackgroundAlgorithmGaussian} for moving images.</p>
  *
+ * @author Peter Abeles
  * @see BackgroundAlgorithmGaussian
  * @see BackgroundModelMoving
- *
- * @author Peter Abeles
  */
 public abstract class BackgroundMovingGaussian<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundModelMoving<T,Motion> implements BackgroundAlgorithmGaussian
-{
+		extends BackgroundModelMoving<T, Motion> implements BackgroundAlgorithmGaussian {
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
 	 */
@@ -57,16 +55,17 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase<T>, Motion ex
 
 	/**
 	 * See class documentation for parameters definitions.
+	 *
 	 * @param learnRate Specifies how quickly the background is updated Try 0.05
 	 * @param threshold Threshold for background.  &ge; 0.  Try 10
 	 * @param transform Used to convert pixel coordinates
 	 * @param imageType Type of input image
 	 */
-	public BackgroundMovingGaussian(float learnRate, float threshold,
-									Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType) {
+	protected BackgroundMovingGaussian( float learnRate, float threshold,
+										Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
 		super(transform, imageType);
 
-		if( threshold < 0 )
+		if (threshold < 0)
 			throw new IllegalArgumentException("Threshold must be more than 0");
 
 		this.learnRate = learnRate;
@@ -79,7 +78,7 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase<T>, Motion ex
 	}
 
 	@Override
-	public void setInitialVariance(float initialVariance) {
+	public void setInitialVariance( float initialVariance ) {
 		this.initialVariance = initialVariance;
 	}
 
@@ -89,7 +88,7 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase<T>, Motion ex
 	}
 
 	@Override
-	public void setLearnRate(float learnRate) {
+	public void setLearnRate( float learnRate ) {
 		this.learnRate = learnRate;
 	}
 
@@ -99,7 +98,7 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase<T>, Motion ex
 	}
 
 	@Override
-	public void setThreshold(float threshold) {
+	public void setThreshold( float threshold ) {
 		this.threshold = threshold;
 	}
 
@@ -109,7 +108,7 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase<T>, Motion ex
 	}
 
 	@Override
-	public void setMinimumDifference(float minimumDifference) {
+	public void setMinimumDifference( float minimumDifference ) {
 		this.minimumDifference = minimumDifference;
 	}
 }

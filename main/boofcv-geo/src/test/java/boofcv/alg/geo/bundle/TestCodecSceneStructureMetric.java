@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -67,8 +68,8 @@ class TestCodecSceneStructureMetric {
 		}
 
 		for (int i = 0; i < original.cameras.size; i++) {
-			SceneStructureMetric.Camera o = original.cameras.data[i];
-			SceneStructureMetric.Camera f = found.cameras.data[i];
+			SceneStructureCommon.Camera o = original.cameras.data[i];
+			SceneStructureCommon.Camera f = found.cameras.data[i];
 
 			double[] po = new double[o.model.getIntrinsicCount()];
 			double[] pf = new double[f.model.getIntrinsicCount()];

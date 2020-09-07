@@ -52,7 +52,7 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 
 	String defaultSaveName;
 
-	public CreateSquareFiducialGui(String defaultSaveName) {
+	protected CreateSquareFiducialGui(String defaultSaveName) {
 		super(new BorderLayout());
 		this.defaultSaveName = defaultSaveName;
 	}

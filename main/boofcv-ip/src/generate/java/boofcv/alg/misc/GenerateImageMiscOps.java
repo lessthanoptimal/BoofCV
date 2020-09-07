@@ -35,8 +35,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	private AutoTypeImage imageType;
 	private String imageName;
 	private String imageNameI;
-	private String dataType;
-	private String bitWise;
+//	private String dataType;
+//	private String bitWise;
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -63,11 +63,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"/**\n" +
 				" * Basic image operations which have no place better to go.\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"public class " + className + " {\n" +
 				"\t/**\n" +
 				"\t * If the image has fewer than this elements do not run the concurrent version of the function since it could\n" +
@@ -90,7 +86,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			imageType = t;
 			imageName = t.getSingleBandName();
 			imageNameI = t.getInterleavedName();
-			dataType = t.getDataType();
+//			dataType = t.getDataType();
 			printCopyBorder();
 			printCopy();
 			printCopy_Interleaved();
@@ -126,8 +122,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		for( AutoTypeImage t : types ) {
 			imageType = t;
 			imageName = t.getSingleBandName();
-			dataType = t.getDataType();
-			bitWise = t.getBitWise();
+//			dataType = t.getDataType();
+//			bitWise = t.getBitWise();
 			printAddUniformSB();
 			printAddUniformIL();
 			printAddGaussianSB();

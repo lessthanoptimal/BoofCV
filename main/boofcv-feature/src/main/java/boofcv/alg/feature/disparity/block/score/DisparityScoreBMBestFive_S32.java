@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.feature.disparity.DisparityBlockMatchBestFive;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.misc.Compare_S32;
 import boofcv.struct.border.ImageBorder;
@@ -30,7 +31,6 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * <p>
@@ -56,7 +56,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 	T left, right;
 	DI disparity;
 
-	FastQueue workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
+	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
 	public DisparityScoreBMBestFive_S32(int regionRadiusX, int regionRadiusY,

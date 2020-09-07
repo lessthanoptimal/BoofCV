@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public abstract class ThresholdBlockMean<T extends ImageGray<T>>
 	// defines 0 or 1 when thresholding
 	protected byte a,b;
 
-	public ThresholdBlockMean( boolean down ) {
+	protected ThresholdBlockMean( boolean down ) {
 		if( down ) {
 			a = 1; b = 0;
 		} else {

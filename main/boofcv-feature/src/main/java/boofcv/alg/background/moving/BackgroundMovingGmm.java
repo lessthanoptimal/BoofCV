@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,20 +29,18 @@ import georegression.struct.InvertibleTransform;
 /**
  * <p>Implementation of {@link BackgroundAlgorithmGmm} for moving images.</p>
  *
- * @see BackgroundModelMoving
- *
  * @author Peter Abeles
+ * @see BackgroundModelMoving
  */
 public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundModelMoving<T,Motion> implements BackgroundAlgorithmGmm
-{
+		extends BackgroundModelMoving<T, Motion> implements BackgroundAlgorithmGmm {
 	BackgroundGmmCommon common;
 
-	public BackgroundMovingGmm(float learningPeriod, float decayCoef, int maxGaussians,
-							   Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType) {
-		super(transformImageType,imageType);
+	protected BackgroundMovingGmm( float learningPeriod, float decayCoef, int maxGaussians,
+								   Point2Transform2Model_F32<Motion> transformImageType, ImageType<T> imageType ) {
+		super(transformImageType, imageType);
 
-		common = new BackgroundGmmCommon(learningPeriod,decayCoef,maxGaussians,imageType);
+		common = new BackgroundGmmCommon(learningPeriod, decayCoef, maxGaussians, imageType);
 	}
 
 	@Override
@@ -51,8 +49,8 @@ public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends
 	}
 
 	@Override
-	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
-		common.model.reshape(backgroundHeight,backgroundWidth*common.modelStride);
+	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+		common.model.reshape(backgroundHeight, backgroundWidth*common.modelStride);
 		common.model.zero();
 
 		this.homeToWorld.set(homeToWorld);
@@ -62,29 +60,28 @@ public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends
 		this.backgroundHeight = backgroundHeight;
 	}
 
-
 	@Override
 	public float getInitialVariance() {
 		return common.initialVariance;
 	}
 
 	@Override
-	public void setInitialVariance(float initialVariance) {
+	public void setInitialVariance( float initialVariance ) {
 		common.initialVariance = initialVariance;
 	}
 
 	@Override
 	public float getLearningPeriod() {
-		return 1.0f / common.learningRate;
+		return 1.0f/common.learningRate;
 	}
 
 	@Override
-	public void setLearningPeriod(float period) {
-		common.learningRate = 1.0f / period;
+	public void setLearningPeriod( float period ) {
+		common.learningRate = 1.0f/period;
 	}
 
 	@Override
-	public void setSignificantWeight(float value) {
+	public void setSignificantWeight( float value ) {
 		common.significantWeight = value;
 	}
 
@@ -92,7 +89,7 @@ public abstract class BackgroundMovingGmm<T extends ImageBase<T>, Motion extends
 		return common.maxDistance;
 	}
 
-	public void setMaxDistance(float maxDistance) {
+	public void setMaxDistance( float maxDistance ) {
 		common.maxDistance = maxDistance;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.disparity.sgm;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.Planar;
@@ -35,11 +36,11 @@ import org.ddogleg.struct.FastQueue;
  *
  * <p>
  * See [1] for details, but the cost for each element along a path is specified as follows:<br>
- *     a = Lr(p-r,d  )<br>
- *     b = Lr(p-r,d-1) + penalty1<br>
- *     c = Lr(p-r,d+1) + penalty1<br>
- *     <br>
- *     cost = min(penalty2,b,c) + a<br>
+ * a = Lr(p-r,d  )<br>
+ * b = Lr(p-r,d-1) + penalty1<br>
+ * c = Lr(p-r,d+1) + penalty1<br>
+ * <br>
+ * cost = min(penalty2,b,c) + a<br>
  * </p>
  * <p></p>Lr(p,d) is the cost along the path at 'p' and disparity 'd'. penalty1 in the penalty associated with
  * a small change in disparity and penalty2 is a large change in disparity</p>
@@ -51,11 +52,10 @@ import org.ddogleg.struct.FastQueue;
  * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
  * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
  *
+ * @author Peter Abeles
  * @see SgmDisparityCost
  * @see SgmDisparitySelector
  * @see SgmStereoDisparity
- *
- * @author Peter Abeles
  */
 public class SgmCostAggregation {
 
@@ -70,11 +70,11 @@ public class SgmCostAggregation {
 
 	// Contains aggregated cost. The image is being used to store a tensor.
 	// band = y-axis, x=x-axis, y=depth
-	Planar<GrayU16> aggregated = new Planar<>(GrayU16.class,1,1,2);
+	Planar<GrayU16> aggregated = new Planar<>(GrayU16.class, 1, 1, 2);
 
 	Planar<GrayU16> costYXD;
 	// Length of original image. x = col, y = rows, d = disparity range
-	int lengthX,lengthY,lengthD;
+	int lengthX, lengthY, lengthD;
 	// If disparityMin > 0 then the first disparityMin x elements have no score and are skipped
 	int effectiveLengthX;
 	// The minimum disparity that will be considered.
@@ -86,15 +86,16 @@ public class SgmCostAggregation {
 	int pathsConsidered = 8;
 
 	// Cost applied to small and large changes in the neighborhood
-	int penalty1 =200, penalty2 =2000;
+	int penalty1 = 200, penalty2 = 2000;
 
 	// Book keeping for concurrency
-	FastQueue<Trajectory> trajectories = new FastQueue<>(Trajectory.class,Trajectory::new);
-	FastQueue<WorkSpace> workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
+	FastQueue<Trajectory> trajectories = new FastQueue<>(Trajectory.class, Trajectory::new);
+	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
 	/**
 	 * Configures the minimum disparity. The range is specified implicitly by the cost tensor.
+	 *
 	 * @param disparityMin The minimum disparity that will be considered
 	 */
 	public void configure( int disparityMin ) {
@@ -111,23 +112,23 @@ public class SgmCostAggregation {
 	public void process( Planar<GrayU16> costYXD ) {
 		init(costYXD);
 
-		if( pathsConsidered >= 1 ) {
+		if (pathsConsidered >= 1) {
 			scoreDirection(1, 0);
 		}
-		if( pathsConsidered >= 2 ) {
+		if (pathsConsidered >= 2) {
 			scoreDirection(-1, 0);
 		}
-		if( pathsConsidered >= 4 ) {
+		if (pathsConsidered >= 4) {
 			scoreDirection(0, 1);
 			scoreDirection(0, -1);
 		}
-		if( pathsConsidered >= 8 ) {
+		if (pathsConsidered >= 8) {
 			scoreDirection(1, 1);
 			scoreDirection(-1, -1);
 			scoreDirection(-1, 1);
 			scoreDirection(1, -1);
 		}
-		if( pathsConsidered >= 16 ) {
+		if (pathsConsidered >= 16) {
 			scoreDirection(1, 2);
 			scoreDirection(2, 1);
 			scoreDirection(2, -1);
@@ -142,19 +143,19 @@ public class SgmCostAggregation {
 	/**
 	 * Initializes data structures
 	 */
-	void init(Planar<GrayU16> costYXD) {
-		if( pathsConsidered < 1 || pathsConsidered > 16 )
-			throw new IllegalArgumentException("Number of paths must be 1 to 16, inclusive. Not "+ pathsConsidered);
+	void init( Planar<GrayU16> costYXD ) {
+		if (pathsConsidered < 1 || pathsConsidered > 16)
+			throw new IllegalArgumentException("Number of paths must be 1 to 16, inclusive. Not " + pathsConsidered);
 		this.costYXD = costYXD;
 		aggregated.reshape(costYXD);
-		GImageMiscOps.fill(aggregated,0);
+		GImageMiscOps.fill(aggregated, 0);
 
 		this.lengthX = costYXD.getHeight();
 		this.lengthD = costYXD.getWidth();
 		this.lengthY = costYXD.getNumBands();
-		this.effectiveLengthX = this.lengthX-disparityMin;
+		this.effectiveLengthX = this.lengthX - disparityMin;
 
-		helper.configure(lengthX, disparityMin,lengthD);
+		helper.configure(lengthX, disparityMin, lengthD);
 		workspace.resize(1);
 	}
 
@@ -164,39 +165,39 @@ public class SgmCostAggregation {
 	 * Concurrency note: It's safe to write to the aggregated score without synchronization since only one
 	 * path in the block below will touch a pixel.
 	 */
-	void scoreDirection(int dx , int dy ) {
+	void scoreDirection( int dx, int dy ) {
 
 		// Create a list of paths it will score
 		trajectories.reset();
-		if( dx > 0 ) {
+		if (dx > 0) {
 			for (int y = 0; y < lengthY; y++) {
-				trajectories.grow().set(0,y,dx,dy);
+				trajectories.grow().set(0, y, dx, dy);
 			}
-		} else if( dx < 0 ) {
+		} else if (dx < 0) {
 			for (int y = 0; y < lengthY; y++) {
-				trajectories.grow().set(effectiveLengthX-1,y,dx,dy);
+				trajectories.grow().set(effectiveLengthX - 1, y, dx, dy);
 			}
 		}
-		if( dy > 0 ) {
+		if (dy > 0) {
 			int x0 = 0, x1 = effectiveLengthX;
-			if( dx > 0) x0 += 1;
-			if( dx < 0) x1 -= 1;
+			if (dx > 0) x0 += 1;
+			if (dx < 0) x1 -= 1;
 			for (int x = x0; x < x1; x++) {
-				trajectories.grow().set(x,0,dx,dy);
+				trajectories.grow().set(x, 0, dx, dy);
 			}
-		} else if( dy < 0 ) {
+		} else if (dy < 0) {
 			int x0 = 0, x1 = effectiveLengthX;
-			if( dx > 0) x0 += 1;
-			if( dx < 0) x1 -= 1;
+			if (dx > 0) x0 += 1;
+			if (dx < 0) x1 -= 1;
 			for (int x = x0; x < x1; x++) {
-				trajectories.grow().set(x,lengthY-1,dx,dy);
+				trajectories.grow().set(x, lengthY - 1, dx, dy);
 			}
 		}
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			BoofConcurrency.loopBlocks(0,trajectories.size,1,workspace,computeBlock);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			BoofConcurrency.loopBlocks(0, trajectories.size, 1, workspace, computeBlock);
 		} else {
-			WorkSpace w= workspace.get(0);
+			WorkSpace w = workspace.get(0);
 			w.checkSize();
 			for (int i = 0; i < trajectories.size; i++) {
 				Trajectory t = trajectories.get(i);
@@ -207,12 +208,12 @@ public class SgmCostAggregation {
 
 	private class ComputeBlock implements IntRangeObjectConsumer<WorkSpace> {
 		@Override
-		public void accept(WorkSpace workspace, int minInclusive, int maxExclusive) {
+		public void accept( WorkSpace workspace, int minInclusive, int maxExclusive ) {
 			workspace.checkSize();
 
 			for (int i = minInclusive; i < maxExclusive; i++) {
 				Trajectory t = trajectories.get(i);
-				scorePath(t.x0,t.y0,t.dx,t.dy,workspace.workCostLr);
+				scorePath(t.x0, t.y0, t.dx, t.dy, workspace.workCostLr);
 			}
 		}
 	}
@@ -233,29 +234,29 @@ public class SgmCostAggregation {
 	 * @param dx step x-axis
 	 * @param dy step y-axis
 	 */
-	void scorePath(int x0 , int y0 , int dx , int dy , short[] workCostLr) {
+	void scorePath( int x0, int y0, int dx, int dy, short[] workCostLr ) {
 
 		// there is no previous disparity score so simply fill the cost for d=0
 		{
 			int minCost = Integer.MAX_VALUE;
 			final GrayU16 costXD = costYXD.getBand(y0);
-			final int idxCost = costXD.getIndex(0,x0);   // C(0,0)
-			final int localRangeD = helper.localDisparityRangeLeft(x0+disparityMin);
+			final int idxCost = costXD.getIndex(0, x0);   // C(0,0)
+			final int localRangeD = helper.localDisparityRangeLeft(x0 + disparityMin);
 			for (int d = 0; d < localRangeD; d++) {
-				int v = costXD.data[idxCost + d]&0xFFFF; // Lr(0,d) = C(0,d)
+				int v = costXD.data[idxCost + d] & 0xFFFF; // Lr(0,d) = C(0,d)
 				workCostLr[d] = (short)v;
-				minCost = Math.min(minCost,v);
+				minCost = Math.min(minCost, v);
 			}
 			// The modified equation 13. Cost Equation 12 - min[k] Lr(p,k)
 			for (int d = 0; d < localRangeD; d++) {
-				workCostLr[d] = (short)((workCostLr[d]&0xFFFF)-minCost);
+				workCostLr[d] = (short)((workCostLr[d] & 0xFFFF) - minCost);
 			}
 			// In the for loop below it needs the previous cost at index localRangeD[i]-1.
 			// If we are on the left side of the image then localRangeD[i] < localRangeD[i+1]!
 			// That's a problem because if we read localRangeD[i+1]-1 it will be unassigned and have
 			// an unknown value! We get around that by just copying the cost at the end.
-			if( localRangeD != helper.disparityRange) {
-				workCostLr[localRangeD] = workCostLr[localRangeD-1];
+			if (localRangeD != helper.disparityRange) {
+				workCostLr[localRangeD] = workCostLr[localRangeD - 1];
 			}
 		}
 
@@ -264,53 +265,53 @@ public class SgmCostAggregation {
 		for (int i = 1, x = x0 + dx, y = y0 + dy; i < lengthPath; i++, x += dx, y += dy) {
 			// Index of cost for C(y,p0+i,0)
 			final GrayU16 costXD = costYXD.getBand(y);
-			final int idxCost = costXD.getIndex(0,x);
+			final int idxCost = costXD.getIndex(0, x);
 			// remember x=0 is really x+disparityMin because the first elements are skipped
-			final int localRangeD = helper.localDisparityRangeLeft(x+disparityMin);
+			final int localRangeD = helper.localDisparityRangeLeft(x + disparityMin);
 
 			// Index for the previous cost in this path
-			int idxLrPrev = (i-1)*lengthD;
+			int idxLrPrev = (i - 1)*lengthD;
 
 			// Score the inner portion of disparity first to avoid bounds checks
 			computeCostInnerD(costXD.data, idxCost, idxLrPrev, localRangeD, workCostLr);
 
 			// Now handle the borders at d=0 and d=N-1
-			computeCostBorderD(idxCost,idxLrPrev,0,costXD, localRangeD, workCostLr);
-			computeCostBorderD(idxCost,idxLrPrev,localRangeD-1,costXD, localRangeD, workCostLr);
+			computeCostBorderD(idxCost, idxLrPrev, 0, costXD, localRangeD, workCostLr);
+			computeCostBorderD(idxCost, idxLrPrev, localRangeD - 1, costXD, localRangeD, workCostLr);
 
 			// see comments above for what's going on here
-			if( localRangeD != helper.disparityRange) {
-				workCostLr[idxLrPrev+lengthD+localRangeD] = workCostLr[idxLrPrev+lengthD+localRangeD-1];
+			if (localRangeD != helper.disparityRange) {
+				workCostLr[idxLrPrev + lengthD + localRangeD] = workCostLr[idxLrPrev + lengthD + localRangeD - 1];
 			}
 
 			// The modified equation 13. Cost Equation 12 - min[k] Lr(p,k)
 			int minCost = Integer.MAX_VALUE;
 			int idxLr = i*lengthD;
 			for (int d = 0; d < localRangeD; d++) {
-				minCost = Math.min(minCost,workCostLr[idxLr+d]&0xFFFF);
+				minCost = Math.min(minCost, workCostLr[idxLr + d] & 0xFFFF);
 			}
 			for (int d = 0; d < localRangeD; d++) {
-				workCostLr[idxLr+d] = (short)((workCostLr[idxLr+d]&0xFFFF)- minCost);
+				workCostLr[idxLr + d] = (short)((workCostLr[idxLr + d] & 0xFFFF) - minCost);
 			}
 		}
 
-		saveWorkToAggregated(x0,y0,dx,dy,lengthPath, workCostLr);
+		saveWorkToAggregated(x0, y0, dx, dy, lengthPath, workCostLr);
 	}
 
 	/**
 	 * Adds the work LR onto the aggregated cost Tensor, which is the sum of all paths
 	 */
-	void saveWorkToAggregated( int x0 , int y0 , int dx , int dy , int length , short[] workCostLr) {
-		for (int i = 0, x=x0, y=y0; i < length; i++, x += dx, y += dy) {
-			final int localLengthD = helper.localDisparityRangeLeft(x+disparityMin);
+	void saveWorkToAggregated( int x0, int y0, int dx, int dy, int length, short[] workCostLr ) {
+		for (int i = 0, x = x0, y = y0; i < length; i++, x += dx, y += dy) {
+			final int localLengthD = helper.localDisparityRangeLeft(x + disparityMin);
 			GrayU16 aggrXD = aggregated.getBand(y);
 
 			int idxWork = i*lengthD;                // Lr(i,0)
-			int idxAggr = aggrXD.getIndex(0,x);  // A(d=0,x)
+			int idxAggr = aggrXD.getIndex(0, x);  // A(d=0,x)
 			for (int d = 0; d < localLengthD; d++, idxAggr++, idxWork++) {
 //				if( (aggrXD.data[idxAggr]&0xFFFF) + (workCostLr[idxWork]&0xFFFF) > 2*Short.MAX_VALUE )
 //					throw new RuntimeException("Overflowed!");
-				aggrXD.data[idxAggr] = (short)((aggrXD.data[idxAggr]&0xFFFF) + (workCostLr[idxWork]&0xFFFF));
+				aggrXD.data[idxAggr] = (short)((aggrXD.data[idxAggr] & 0xFFFF) + (workCostLr[idxWork] & 0xFFFF));
 			}
 		}
 	}
@@ -323,25 +324,25 @@ public class SgmCostAggregation {
 	 *
 	 * @param idxLrPrev index of work at the previous location in the path, i.e. Lr(p-r,0)
 	 */
-	void computeCostInnerD( final short[] costXD, final int idxCost, int idxLrPrev, final int lengthLocalD , final short[] workCostLr) {
-		final int nextRow  = this.lengthD-1; // idxLrPrev is +1
+	void computeCostInnerD( final short[] costXD, final int idxCost, int idxLrPrev, final int lengthLocalD, final short[] workCostLr ) {
+		final int nextRow = this.lengthD - 1; // idxLrPrev is +1
 		final int penalty1 = this.penalty1;
 		final int penalty2 = this.penalty2;
 
 		idxLrPrev += 1; // start at d=1
 
 		// initialize the sampling at d=1. elements will be exchanged inside the loop
-		int c1 = workCostLr[idxLrPrev-1]&0xFFFF;  // Lr(p-r,d-1)
-		int c2 = workCostLr[idxLrPrev  ]&0xFFFF;  // Lr(p-r,d  )
+		int c1 = workCostLr[idxLrPrev - 1] & 0xFFFF;  // Lr(p-r,d-1)
+		int c2 = workCostLr[idxLrPrev] & 0xFFFF;  // Lr(p-r,d  )
 		idxLrPrev += 1; // avoid extra addition later on
 
-		for (int d = 1; d < lengthLocalD-1; d++, idxLrPrev++) {
-			int cost = costXD[idxCost+d] & 0xFFFF; // C(p,d)
+		for (int d = 1; d < lengthLocalD - 1; d++, idxLrPrev++) {
+			int cost = costXD[idxCost + d] & 0xFFFF; // C(p,d)
 
-			int c0=c1; // workCostLr[idxLrPrev-1]&0xFFFF; // Lr(p-r,d-1)
-			c1=c2;     // workCostLr[idxLrPrev  ]&0xFFFF; // Lr(p-r,d  )
-			           // workCostLr[idxLrPrev+1]&0xFFFF; // Lr(p-r,d+1)
-			c2 = workCostLr[idxLrPrev]&0xFFFF;            // Lr(p-r,d+1)
+			int c0 = c1; // workCostLr[idxLrPrev-1]&0xFFFF; // Lr(p-r,d-1)
+			c1 = c2;     // workCostLr[idxLrPrev  ]&0xFFFF; // Lr(p-r,d  )
+			// workCostLr[idxLrPrev+1]&0xFFFF; // Lr(p-r,d+1)
+			c2 = workCostLr[idxLrPrev] & 0xFFFF;            // Lr(p-r,d+1)
 
 			// Add penalty terms
 			int a = c1;
@@ -349,18 +350,18 @@ public class SgmCostAggregation {
 			int c = c2 + penalty1;
 
 			// Find the minimum of the three scores
-			if( b < a )
+			if (b < a)
 				a = b;
-			if( c < a )
+			if (c < a)
 				a = c;
-			if( penalty2 < a )
+			if (penalty2 < a)
 				a = penalty2;
 
 //			if( cost + a > Short.MAX_VALUE )
 //				throw new RuntimeException("Overflowed!");
 
 			// minCostPrev is done to reduce the rate at which the cost increases
-			workCostLr[idxLrPrev+nextRow] = (short)(cost + a);
+			workCostLr[idxLrPrev + nextRow] = (short)(cost + a);
 			// Lr(p,d) = above
 		}
 	}
@@ -368,18 +369,19 @@ public class SgmCostAggregation {
 	/**
 	 * Computes the aggregate cost but with bounds checks to ensure it doesn't sample outside of the
 	 * disparity change.
+	 *
 	 * @param idxCost Index of value in costXD
 	 * @param idxLrPrev Index of value in workCostLr
 	 * @param d disparity value being considered
 	 * @param costXD cost in X-D plane
 	 */
-	void computeCostBorderD(int idxCost , int idxLrPrev , int d , GrayU16 costXD , int localRangeD , short[] workCostLr) {
-		int cost = costXD.data[idxCost+d] & 0xFFFF;  // C(p,d)
+	void computeCostBorderD( int idxCost, int idxLrPrev, int d, GrayU16 costXD, int localRangeD, short[] workCostLr ) {
+		int cost = costXD.data[idxCost + d] & 0xFFFF;  // C(p,d)
 
 		// Sample previously computed aggregate costs with bounds checking
-		int a = workCostLr[idxLrPrev+d]&0xFFFF; // Lr(p-r,d)
-		int b = d > 0 ? workCostLr[idxLrPrev+d-1]&0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d-1)
-		int c = d < localRangeD-1 ? workCostLr[idxLrPrev+d+1]&0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d+1)
+		int a = workCostLr[idxLrPrev + d] & 0xFFFF; // Lr(p-r,d)
+		int b = d > 0 ? workCostLr[idxLrPrev + d - 1] & 0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d-1)
+		int c = d < localRangeD - 1 ? workCostLr[idxLrPrev + d + 1] & 0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d+1)
 
 		// NOTE: See comments in scorePath() for why 'a' doesn't have problems with 'idxLrPrev+d' going outside
 		// the disparity range of the previous step with d = localRangeD-1. In the previous step localRangeD
@@ -390,18 +392,18 @@ public class SgmCostAggregation {
 		c += penalty1;
 
 		// Find the minimum of the three scores
-		if( b < a )
+		if (b < a)
 			a = b;
-		if( c < a )
+		if (c < a)
 			a = c;
-		if( penalty2 < a )
+		if (penalty2 < a)
 			a = penalty2;
 
 //		if( cost + a > Short.MAX_VALUE )
 //			throw new RuntimeException("Overflowed!");
 
 		// minCostPrev is done to reduce the rate at which the cost increases. It has potential for overflow otherwise
-		workCostLr[idxLrPrev+this.lengthD+d] = (short)(cost + a);
+		workCostLr[idxLrPrev + this.lengthD + d] = (short)(cost + a);
 	}
 
 	/**
@@ -410,20 +412,20 @@ public class SgmCostAggregation {
 	 *
 	 * If (x0,y0) is at the right or bottom border then it should be x0=width and/or y0=height,
 	 */
-	int computePathLength(int x0, int y0, int dx, int dy) {
-		int pathX = pathLength(x0,dx,effectiveLengthX);
-		int pathY = pathLength(y0,dy,lengthY);
-		return Math.min(pathX,pathY);
+	int computePathLength( int x0, int y0, int dx, int dy ) {
+		int pathX = pathLength(x0, dx, effectiveLengthX);
+		int pathY = pathLength(y0, dy, lengthY);
+		return Math.min(pathX, pathY);
 	}
 
 	/**
 	 * Returns number of steps it takes to reach the end of the path
 	 */
-	private int pathLength( int t0 , int step , int length ) {
-		if( step > 0 )
-			return (length-t0+step/2)/step;
-		else if( step < 0 )
-			return (t0+1-step/2)/(-step);
+	private int pathLength( int t0, int step, int length ) {
+		if (step > 0)
+			return (length - t0 + step/2)/step;
+		else if (step < 0)
+			return (t0 + 1 - step/2)/-step;
 		else
 			return Integer.MAX_VALUE;
 	}
@@ -436,9 +438,9 @@ public class SgmCostAggregation {
 		short[] workCostLr = new short[0];
 
 		public void checkSize() {
-			int N = Math.max(lengthX,lengthY)*lengthD;
-			if( workCostLr.length != N )
-				this.workCostLr = new short[ N ];
+			int N = Math.max(lengthX, lengthY)*lengthD;
+			if (workCostLr.length != N)
+				this.workCostLr = new short[N];
 			// Uncomment the line below to make sure no invalid values are being written over. When the unit tests
 			// are run they will fail if everything isn't problem handled correctly
 //			Arrays.fill(workCostLr,(short)5000);
@@ -451,9 +453,9 @@ public class SgmCostAggregation {
 	 * (dx,dy) is the direction
 	 */
 	private static class Trajectory {
-		public int x0,y0,dx,dy;
+		public int x0, y0, dx, dy;
 
-		public void set(int x0, int y0, int dx , int dy ) {
+		public void set( int x0, int y0, int dx, int dy ) {
 			this.x0 = x0;
 			this.y0 = y0;
 			this.dx = dx;
@@ -469,7 +471,7 @@ public class SgmCostAggregation {
 		return penalty1;
 	}
 
-	public void setPenalty1(int penalty1) {
+	public void setPenalty1( int penalty1 ) {
 		this.penalty1 = penalty1;
 	}
 
@@ -477,7 +479,7 @@ public class SgmCostAggregation {
 		return penalty2;
 	}
 
-	public void setPenalty2(int penalty2) {
+	public void setPenalty2( int penalty2 ) {
 		this.penalty2 = penalty2;
 	}
 
@@ -485,7 +487,7 @@ public class SgmCostAggregation {
 		return pathsConsidered;
 	}
 
-	public void setPathsConsidered(int pathsConsidered) {
+	public void setPathsConsidered( int pathsConsidered ) {
 		this.pathsConsidered = pathsConsidered;
 	}
 }

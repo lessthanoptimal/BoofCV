@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,6 +17,8 @@
  */
 
 package boofcv.struct.image;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 
@@ -74,11 +76,11 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 * @param y0 y-coordinate of top-left corner of the sub-image.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image.
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image.
-	 * @param subimage
+	 * @param subimage Optional storage for the subimage. Nullable.
 	 * @return A sub-image of this image.
 	 */
 	@Override
-	public T subimage(int x0, int y0, int x1, int y1, T subimage) {
+	public T subimage(int x0, int y0, int x1, int y1, @Nullable T subimage) {
 		T ret = createNew(-1, -1);
 		ret._setData(_getData());
 		ret.stride = Math.max(width * numBands, stride); // ok why is this done?!?!  Shouldn't it always be stride?

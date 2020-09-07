@@ -136,7 +136,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			Motion m = seed.pview.connections.get(connIdx);
 			View o = working.lookupView(m.other(seed.pview).id);
 			// No corresponding working view
-			if( o == null )
+			if (o == null)
 				continue;
 
 			addCandidateView(o);
@@ -152,7 +152,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 				Motion m = c.pview.connections.get(connIdx);
 				View o = working.lookupView(m.other(c.pview).id);
 				// No corresponding working view
-				if( o == null )
+				if (o == null)
 					continue;
 				// don't add if it's already in there
 				if (lookup.containsKey(o.pview.id))
@@ -182,7 +182,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			Motion m = c.pview.connections.get(connIdx);
 			View o = working.lookupView(m.other(c.pview).id);
 			// No corresponding working view
-			if( o == null )
+			if (o == null)
 				continue;
 			// If it's not pointing too a candidate or the target, do not add this edge
 			if (!lookup.containsKey(o.pview.id))
@@ -304,12 +304,14 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 		for (int connIdx = 0; connIdx < v.pview.connections.size; connIdx++) {
 			Motion m = v.pview.connections.get(connIdx);
 			View o = lookup.get(m.other(v.pview).id);
+			if (o == null)
+				continue;
 
 			// If by removing the target one of it's connections is now an orphan remove that note
 			// TODO see comment about graph splits. This should be handled by that logic and this removed
 			if (isOrphan(o)) {
 				if (verbose != null) verbose.println("Removing orphaned view='" + o.pview.id + "'");
-				assertBoof(null != lookup.remove(o.pview.id),"Not in lookup list");
+				assertBoof(null != lookup.remove(o.pview.id), "Not in lookup list");
 				assertBoof(candidates.remove(o), "Can't remove. Not in candidate list");
 			}
 
@@ -363,7 +365,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			for (int connIdx = 0; connIdx < origView.pview.connections.size; connIdx++) {
 				Motion m = origView.pview.connections.get(connIdx);
 				View v = working.lookupView(m.other(origView.pview).id);
-				if( v == null )
+				if (v == null)
 					continue;
 
 				if (v.inliers.isEmpty())

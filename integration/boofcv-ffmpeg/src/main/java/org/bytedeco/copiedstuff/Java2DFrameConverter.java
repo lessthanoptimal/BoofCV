@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,17 +52,18 @@ import java.nio.*;
  *
  * @author Samuel Audet
  */
+@SuppressWarnings({"UnsafeFinalization", "MissingOverride", "NarrowingCompoundAssignment"})
 public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 
-	@Override public Frame convert(BufferedImage img) {
+	@Override public Frame convert( BufferedImage img ) {
 		return getFrame(img);
 	}
 
-	@Override public BufferedImage convert(Frame frame) {
+	@Override public BufferedImage convert( Frame frame ) {
 		return getBufferedImage(frame);
 	}
 
-	public static BufferedImage cloneBufferedImage(BufferedImage bufferedImage) {
+	public static BufferedImage cloneBufferedImage( BufferedImage bufferedImage ) {
 		if (bufferedImage == null) {
 			return null;
 		}
@@ -77,22 +78,26 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 	}
 
 	public static final byte[]
-			gamma22    = new byte[256],
+			gamma22 = new byte[256],
 			gamma22inv = new byte[256];
+
 	static {
 		for (int i = 0; i < 256; i++) {
-			gamma22[i]    = (byte)Math.round(Math.pow(i/255.0,   2.2)*255.0);
+			gamma22[i] = (byte)Math.round(Math.pow(i/255.0, 2.2)*255.0);
 			gamma22inv[i] = (byte)Math.round(Math.pow(i/255.0, 1/2.2)*255.0);
 		}
 	}
-	public static int decodeGamma22(int value) {
+
+	public static int decodeGamma22( int value ) {
 		return gamma22[value & 0xFF] & 0xFF;
 	}
-	public static int encodeGamma22(int value) {
+
+	public static int encodeGamma22( int value ) {
 		return gamma22inv[value & 0xFF] & 0xFF;
 	}
-	public static void flipCopyWithGamma(ByteBuffer srcBuf, int srcStep,
-										 ByteBuffer dstBuf, int dstStep, boolean signed, double gamma, boolean flip, int channels) {
+
+	public static void flipCopyWithGamma( ByteBuffer srcBuf, int srcStep,
+										  ByteBuffer dstBuf, int dstStep, boolean signed, double gamma, boolean flip, int channels ) {
 		assert srcBuf != dstBuf;
 		int w = Math.min(srcStep, dstStep);
 		int srcLine = srcBuf.position(), dstLine = dstBuf.position();
@@ -107,7 +112,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			w = Math.min(Math.min(w, srcBuf.remaining()), dstBuf.remaining());
 			if (signed) {
 				if (channels > 1) {
-					for (int x = 0; x < w; x+=channels) {
+					for (int x = 0; x < w; x += channels) {
 						for (int z = 0; z < channels; z++) {
 							int in = srcBuf.get();
 							byte out;
@@ -118,7 +123,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 							}
 							buffer[z] = out;
 						}
-						for (int z = channels-1; z >= 0; z--) {
+						for (int z = channels - 1; z >= 0; z--) {
 							dstBuf.put(buffer[z]);
 						}
 					}
@@ -136,7 +141,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 				}
 			} else {
 				if (channels > 1) {
-					for (int x = 0; x < w; x+=channels) {
+					for (int x = 0; x < w; x += channels) {
 						for (int z = 0; z < channels; z++) {
 							byte out;
 							int in = srcBuf.get() & 0xFF;
@@ -151,7 +156,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 							}
 							buffer[z] = out;
 						}
-						for (int z = channels-1; z >= 0; z--) {
+						for (int z = channels - 1; z >= 0; z--) {
 							dstBuf.put(buffer[z]);
 						}
 					}
@@ -176,8 +181,9 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			dstLine += dstStep;
 		}
 	}
-	public static void flipCopyWithGamma(ShortBuffer srcBuf, int srcStep,
-										 ShortBuffer dstBuf, int dstStep, boolean signed, double gamma, boolean flip, int channels) {
+
+	public static void flipCopyWithGamma( ShortBuffer srcBuf, int srcStep,
+										  ShortBuffer dstBuf, int dstStep, boolean signed, double gamma, boolean flip, int channels ) {
 		assert srcBuf != dstBuf;
 		int w = Math.min(srcStep, dstStep);
 		int srcLine = srcBuf.position(), dstLine = dstBuf.position();
@@ -192,7 +198,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			w = Math.min(Math.min(w, srcBuf.remaining()), dstBuf.remaining());
 			if (signed) {
 				if (channels > 1) {
-					for (int x = 0; x < w; x+=channels) {
+					for (int x = 0; x < w; x += channels) {
 						for (int z = 0; z < channels; z++) {
 							int in = srcBuf.get();
 							short out;
@@ -203,7 +209,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 							}
 							buffer[z] = out;
 						}
-						for (int z = channels-1; z >= 0; z--) {
+						for (int z = channels - 1; z >= 0; z--) {
 							dstBuf.put(buffer[z]);
 						}
 					}
@@ -221,7 +227,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 				}
 			} else {
 				if (channels > 1) {
-					for (int x = 0; x < w; x+=channels) {
+					for (int x = 0; x < w; x += channels) {
 						for (int z = 0; z < channels; z++) {
 							int in = srcBuf.get();
 							short out;
@@ -232,7 +238,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 							}
 							buffer[z] = out;
 						}
-						for (int z = channels-1; z >= 0; z--) {
+						for (int z = channels - 1; z >= 0; z--) {
 							dstBuf.put(buffer[z]);
 						}
 					}
@@ -253,8 +259,9 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			dstLine += dstStep;
 		}
 	}
-	public static void flipCopyWithGamma(IntBuffer srcBuf, int srcStep,
-										 IntBuffer dstBuf, int dstStep, double gamma, boolean flip, int channels) {
+
+	public static void flipCopyWithGamma( IntBuffer srcBuf, int srcStep,
+										  IntBuffer dstBuf, int dstStep, double gamma, boolean flip, int channels ) {
 		assert srcBuf != dstBuf;
 		int w = Math.min(srcStep, dstStep);
 		int srcLine = srcBuf.position(), dstLine = dstBuf.position();
@@ -268,7 +275,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			dstBuf.position(dstLine);
 			w = Math.min(Math.min(w, srcBuf.remaining()), dstBuf.remaining());
 			if (channels > 1) {
-				for (int x = 0; x < w; x+=channels) {
+				for (int x = 0; x < w; x += channels) {
 					for (int z = 0; z < channels; z++) {
 						int in = srcBuf.get();
 						int out;
@@ -279,7 +286,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 						}
 						buffer[z] = out;
 					}
-					for (int z = channels-1; z >= 0; z--) {
+					for (int z = channels - 1; z >= 0; z--) {
 						dstBuf.put(buffer[z]);
 					}
 				}
@@ -299,8 +306,9 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			dstLine += dstStep;
 		}
 	}
-	public static void flipCopyWithGamma(FloatBuffer srcBuf, int srcStep,
-										 FloatBuffer dstBuf, int dstStep, double gamma, boolean flip, int channels) {
+
+	public static void flipCopyWithGamma( FloatBuffer srcBuf, int srcStep,
+										  FloatBuffer dstBuf, int dstStep, double gamma, boolean flip, int channels ) {
 		assert srcBuf != dstBuf;
 		int w = Math.min(srcStep, dstStep);
 		int srcLine = srcBuf.position(), dstLine = dstBuf.position();
@@ -314,7 +322,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			dstBuf.position(dstLine);
 			w = Math.min(Math.min(w, srcBuf.remaining()), dstBuf.remaining());
 			if (channels > 1) {
-				for (int x = 0; x < w; x+=channels) {
+				for (int x = 0; x < w; x += channels) {
 					for (int z = 0; z < channels; z++) {
 						float in = srcBuf.get();
 						float out;
@@ -325,7 +333,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 						}
 						buffer[z] = out;
 					}
-					for (int z = channels-1; z >= 0; z--) {
+					for (int z = channels - 1; z >= 0; z--) {
 						dstBuf.put(buffer[z]);
 					}
 				}
@@ -345,8 +353,9 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			dstLine += dstStep;
 		}
 	}
-	public static void flipCopyWithGamma(DoubleBuffer srcBuf, int srcStep,
-										 DoubleBuffer dstBuf, int dstStep, double gamma, boolean flip, int channels) {
+
+	public static void flipCopyWithGamma( DoubleBuffer srcBuf, int srcStep,
+										  DoubleBuffer dstBuf, int dstStep, double gamma, boolean flip, int channels ) {
 		assert srcBuf != dstBuf;
 		int w = Math.min(srcStep, dstStep);
 		int srcLine = srcBuf.position(), dstLine = dstBuf.position();
@@ -360,7 +369,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 			dstBuf.position(dstLine);
 			w = Math.min(Math.min(w, srcBuf.remaining()), dstBuf.remaining());
 			if (channels > 1) {
-				for (int x = 0; x < w; x+=channels) {
+				for (int x = 0; x < w; x += channels) {
 					for (int z = 0; z < channels; z++) {
 						double in = srcBuf.get();
 						double out;
@@ -371,7 +380,7 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 						}
 						buffer[z] = out;
 					}
-					for (int z = channels-1; z >= 0; z--) {
+					for (int z = channels - 1; z >= 0; z--) {
 						dstBuf.put(buffer[z]);
 					}
 				}
@@ -392,10 +401,11 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 		}
 	}
 
-	public static void applyGamma(Frame frame, double gamma) {
+	public static void applyGamma( Frame frame, double gamma ) {
 		applyGamma(frame.image[0].position(0), frame.imageDepth, frame.imageStride, gamma);
 	}
-	public static void applyGamma(Buffer buffer, int depth, int stride, double gamma) {
+
+	public static void applyGamma( Buffer buffer, int depth, int stride, double gamma ) {
 		if (gamma == 1.0) {
 			return;
 		}
@@ -426,16 +436,18 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 		}
 	}
 
-	public static void copy(Frame frame, BufferedImage bufferedImage) {
+	public static void copy( Frame frame, BufferedImage bufferedImage ) {
 		copy(frame, bufferedImage, 1.0);
 	}
-	public static void copy(Frame frame, BufferedImage bufferedImage, double gamma) {
+
+	public static void copy( Frame frame, BufferedImage bufferedImage, double gamma ) {
 		copy(frame, bufferedImage, gamma, false, null);
 	}
-	public static void copy(Frame frame, BufferedImage bufferedImage, double gamma, boolean flipChannels, Rectangle roi) {
+
+	public static void copy( Frame frame, BufferedImage bufferedImage, double gamma, boolean flipChannels, Rectangle roi ) {
 		Buffer in = frame.image[0].position(roi == null ? 0 : roi.y*frame.imageStride + roi.x*frame.imageChannels);
 		SampleModel sm = bufferedImage.getSampleModel();
-		Raster r       = bufferedImage.getRaster();
+		Raster r = bufferedImage.getRaster();
 		DataBuffer out = r.getDataBuffer();
 		int x = -r.getSampleModelTranslateX();
 		int y = -r.getSampleModelTranslateY();
@@ -481,17 +493,19 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 		}
 	}
 
-	public static void copy(BufferedImage image, Frame frame) {
+	public static void copy( BufferedImage image, Frame frame ) {
 		copy(image, frame, 1.0);
 	}
-	public static void copy(BufferedImage image, Frame frame, double gamma) {
+
+	public static void copy( BufferedImage image, Frame frame, double gamma ) {
 		copy(image, frame, gamma, false, null);
 	}
-	public static void copy(BufferedImage image, Frame frame, double gamma, boolean flipChannels, Rectangle roi) {
+
+	public static void copy( BufferedImage image, Frame frame, double gamma, boolean flipChannels, Rectangle roi ) {
 		Buffer out = frame.image[0].position(roi == null ? 0 : roi.y*frame.imageStride + roi.x*frame.imageChannels);
 		SampleModel sm = image.getSampleModel();
-		Raster r       = image.getRaster();
-		DataBuffer in  = r.getDataBuffer();
+		Raster r = image.getRaster();
+		DataBuffer in = r.getDataBuffer();
 		int x = -r.getSampleModelTranslateX();
 		int y = -r.getSampleModelTranslateY();
 		int step = sm.getWidth()*sm.getNumBands();
@@ -537,7 +551,8 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 	}
 
 	protected BufferedImage bufferedImage = null;
-	public static int getBufferedImageType(Frame frame) {
+
+	public static int getBufferedImageType( Frame frame ) {
 		// precanned BufferedImage types are confusing... in practice though,
 		// they all use the sRGB color model when blitting:
 		//     http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5051418
@@ -565,13 +580,16 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 		}
 		return type;
 	}
-	public BufferedImage getBufferedImage(Frame frame) {
+
+	public BufferedImage getBufferedImage( Frame frame ) {
 		return getBufferedImage(frame, 1.0);
 	}
-	public BufferedImage getBufferedImage(Frame frame, double gamma) {
+
+	public BufferedImage getBufferedImage( Frame frame, double gamma ) {
 		return getBufferedImage(frame, gamma, false, null);
 	}
-	public BufferedImage getBufferedImage(Frame frame, double gamma, boolean flipChannels, ColorSpace cs) {
+
+	public BufferedImage getBufferedImage( Frame frame, double gamma, boolean flipChannels, ColorSpace cs ) {
 		if (frame == null || frame.image == null) {
 			return null;
 		}
@@ -591,21 +609,21 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 				if (cs == null) {
 					cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
 				}
-				offsets = new int[] {0};
+				offsets = new int[]{0};
 			} else if (frame.imageChannels == 3) {
 				alpha = false;
 				if (cs == null) {
 					cs = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
 				}
 				// raster in "BGR" order like OpenCV..
-				offsets = new int[] {2, 1, 0};
+				offsets = new int[]{2, 1, 0};
 			} else if (frame.imageChannels == 4) {
 				alpha = true;
 				if (cs == null) {
 					cs = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
 				}
 				// raster in "RGBA" order for OpenCL.. alpha needs to be last
-				offsets = new int[] {0, 1, 2, 3};
+				offsets = new int[]{0, 1, 2, 3};
 			} else {
 				assert false;
 			}
@@ -665,19 +683,21 @@ public class Java2DFrameConverter extends FrameConverter<BufferedImage> {
 	/**
 	 * Returns a Frame based on a BufferedImage.
 	 */
-	public Frame getFrame(BufferedImage image) {
+	public Frame getFrame( BufferedImage image ) {
 		return getFrame(image, 1.0);
 	}
+
 	/**
 	 * Returns a Frame based on a BufferedImage, and given gamma.
 	 */
-	public Frame getFrame(BufferedImage image, double gamma) {
+	public Frame getFrame( BufferedImage image, double gamma ) {
 		return getFrame(image, gamma, false);
 	}
+
 	/**
 	 * Returns a Frame based on a BufferedImage, given gamma, and inverted channels flag.
 	 */
-	public Frame getFrame(BufferedImage image, double gamma, boolean flipChannels) {
+	public Frame getFrame( BufferedImage image, double gamma, boolean flipChannels ) {
 		if (image == null) {
 			return null;
 		}

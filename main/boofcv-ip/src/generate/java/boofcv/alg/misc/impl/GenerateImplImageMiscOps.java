@@ -63,11 +63,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 				"/**\n" +
 				" * Implementations of functions for {@link ImageMiscOps}\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"public class " + className + " {\n\n");
 	}
 
@@ -455,7 +451,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 		String sumType = imageType.getSumType();
 		String typeCast = imageType.getTypeCastFromSum();
-		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
+//		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
 
 		out.print(
 				"\tpublic static void fillUniform("+imageName+" image, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
@@ -489,7 +485,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String imageName = imageType.getInterleavedName();
 		String sumType = imageType.getSumType();
 		String typeCast = imageType.getTypeCastFromSum();
-		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
+//		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
 
 		out.print(
 				"\tpublic static void fillUniform("+imageName+" image, Random rand , "+sumType+" min , "+sumType+" max) {\n" +

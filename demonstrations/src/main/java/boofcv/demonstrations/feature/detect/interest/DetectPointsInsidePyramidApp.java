@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -41,8 +42,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends SelectAlgorithmAndInputPanel
-{
+		extends SelectAlgorithmAndInputPanel {
 	static int NUM_FEATURES = 100;
 
 	PyramidFloat<T> ss;
@@ -53,11 +53,11 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 	T workImage;
 	InterestPointScaleSpacePyramid<T> det = null;
 
-	public DetectPointsInsidePyramidApp(Class<T> imageType , Class<D> derivType ) {
+	public DetectPointsInsidePyramidApp( Class<T> imageType, Class<D> derivType ) {
 		super(2);
 		this.imageType = imageType;
 
-		workImage = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		workImage = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		int r = 2;
 		addAlgorithm(0, "Hessian Laplace", FactoryInterestPointAlgs.hessianLaplace(r, 0, NUM_FEATURES, imageType, derivType));
@@ -65,8 +65,8 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 		addAlgorithm(0, "Hessian", FactoryInterestPointAlgs.hessianPyramid(r, 0, NUM_FEATURES, imageType, derivType));
 		addAlgorithm(0, "Harris", FactoryInterestPointAlgs.harrisPyramid(r, 0, NUM_FEATURES, imageType, derivType));
 
-		addAlgorithm(1 , "Pyramid", 0);
-		addAlgorithm(1 , "Scale-Space", 1);
+		addAlgorithm(1, "Pyramid", 0);
+		addAlgorithm(1, "Scale-Space", 1);
 
 
 		panel = new ScaleSpacePyramidPointPanel(2.5);
@@ -76,7 +76,7 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 
 	public synchronized void process( BufferedImage input ) {
 		setInputImage(input);
-		workImage.reshape(input.getWidth(),input.getHeight());
+		workImage.reshape(input.getWidth(), input.getHeight());
 		ConvertBufferedImage.convertFromSingle(input, workImage, imageType);
 
 		panel.setBackground(input);
@@ -85,39 +85,39 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile( String fileName ) {}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	public void refreshAll( Object[] cookies ) {
 		det = null;
 		ss = null;
 
-		setActiveAlgorithm(0,null,cookies[0]);
-		setActiveAlgorithm(1,null,cookies[1]);
+		setActiveAlgorithm(0, null, cookies[0]);
+		setActiveAlgorithm(1, null, cookies[1]);
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( !hasImage )
+	public synchronized void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
+		if (!hasImage)
 			return;
 
-		if( indexFamily == 0 ) {
+		if (indexFamily == 0) {
 			det = (InterestPointScaleSpacePyramid<T>)cookie;
 
-			if( ss == null )
+			if (ss == null)
 				return;
 		} else {
-			double scales[] = new double[]{1,1.5,2,3,4,8,12,16,24};
-			if( ((Number)cookie).intValue() == 0 )
+			double scales[] = new double[]{1, 1.5, 2, 3, 4, 8, 12, 16, 24};
+			if (((Number)cookie).intValue() == 0)
 				ss = FactoryPyramid.scaleSpacePyramid(scales, imageType);
 			else
 				ss = FactoryPyramid.scaleSpace(scales, imageType);
 
-			if( workImage != null )
+			if (workImage != null)
 				ss.process(workImage);
 
 			panel.setSs(ss);
-			if( det == null )
+			if (det == null)
 				return;
 		}
 
@@ -128,10 +128,10 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 	}
 
 	@Override
-	public synchronized void changeInput(String name, int index) {
+	public synchronized void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -143,21 +143,21 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 
 	public static void main( String args[] ) {
 
-		DetectPointsInsidePyramidApp app = new DetectPointsInsidePyramidApp(GrayF32.class,GrayF32.class);
+		DetectPointsInsidePyramidApp app = new DetectPointsInsidePyramidApp(GrayF32.class, GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 
-		inputs.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
+		inputs.add(new PathLabel("Square Grid", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
-		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
+		inputs.add(new PathLabel("amoeba", UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		while (!app.getHasProcessedImage()) {
+			BoofMiscOps.sleep(10);
 		}
 
 		ShowImages.showWindow(app, "Pyramid Point Detection", true);

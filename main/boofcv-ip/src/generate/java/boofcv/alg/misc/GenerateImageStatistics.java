@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Generates functions inside of ImageStatistics.
  *
@@ -36,6 +35,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 	private AutoTypeImage input;
 
+	@Override
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 		printAll();
@@ -54,35 +54,31 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"/**\n" +
 				" * Computes statistical properties of pixels inside an image.\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n"+
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
-				"public class "+className+" {\n\n");
+				generateDocString("Peter Abeles") +
+				"public class " + className + " {\n\n");
 	}
 
 	public void printAll() {
-		AutoTypeImage types[] = AutoTypeImage.getSpecificTypes();
+		AutoTypeImage[] types = AutoTypeImage.getSpecificTypes();
 
-		ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};
+		ImageType.Family[] families = new ImageType.Family[]{ImageType.Family.GRAY, ImageType.Family.INTERLEAVED};
 
 		List<CodeGenerator> functions = new ArrayList<>();
-		functions.add( new GenerateMin());
-		functions.add( new GenerateMax());
-		functions.add( new GenerateMaxAbs());
-		functions.add( new GenerateMeanDiffSq() );
-		functions.add( new GenerateMeanDiffAbs() );
+		functions.add(new GenerateMin());
+		functions.add(new GenerateMax());
+		functions.add(new GenerateMaxAbs());
+		functions.add(new GenerateMeanDiffSq());
+		functions.add(new GenerateMeanDiffAbs());
 
-		for( AutoTypeImage t : types ) {
+		for (AutoTypeImage t : types) {
 			input = t;
 
-			for( CodeGenerator generator : functions ) {
-				for( ImageType.Family f : families ) {
+			for (CodeGenerator generator : functions) {
+				for (ImageType.Family f : families) {
 					generator.printHighLevel(f);
 				}
 			}
-			for( ImageType.Family f : families ) {
+			for (ImageType.Family f : families) {
 				printSum(f);
 				printSumAbs(f);
 				printMean(f);
@@ -104,9 +100,9 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param minValue (input) Minimum possible intensity value   \n" +
 				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 				"\t */\n" +
-				"\tpublic static void histogram( "+input.getSingleBandName()+" input , "+sumType+" minValue , int histogram[] ) {\n" +
+				"\tpublic static void histogram( " + input.getSingleBandName() + " input, " + sumType + " minValue, int[] histogram ) {\n" +
 				"\t\tint N = input.width*input.height;\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
 				"\t\t\tImplImageStatistics_MT.histogram(input,minValue,histogram);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageStatistics.histogram(input,minValue,histogram);\n" +
@@ -124,9 +120,9 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param minValue (input) Minimum possible intensity value   \n" +
 				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 				"\t */\n" +
-				"\tpublic static void histogramScaled( "+input.getSingleBandName()+" input , "+sumType+" minValue , "+sumType+" maxValue , int histogram[] ) {\n" +
+				"\tpublic static void histogramScaled( " + input.getSingleBandName() + " input, " + sumType + " minValue, " + sumType + " maxValue, int[] histogram ) {\n" +
 				"\t\tint N = input.width*input.height;\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
 				"\t\t\tImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);\n" +
@@ -145,10 +141,10 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * \n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
-				"\tpublic static "+sumType+" sum( "+input.getImageName(family)+" input ) {\n" +
+				"\tpublic static " + sumType + " sum( " + input.getImageName(family) + " input ) {\n" +
 				"\n" +
 				"\t\tint N = input.width*input.height;\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
 				"\t\t\treturn ImplImageStatistics_MT.sum(input);\n" +
 				"\t\t} else {\n" +
 				"\t\t\treturn ImplImageStatistics.sum(input);\n" +
@@ -167,10 +163,10 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * \n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
-				"\tpublic static "+sumType+" sumAbs( "+input.getImageName(family)+" input ) {\n");
-		if( input.isSigned() ) {
+				"\tpublic static " + sumType + " sumAbs( " + input.getImageName(family) + " input ) {\n");
+		if (input.isSigned()) {
 			out.print("\n\t\tint N = input.width*input.height;\n" +
-					"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+					"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
 					"\t\t\treturn ImplImageStatistics_MT.sumAbs(input);\n" +
 					"\t\t} else {\n" +
 					"\t\t\treturn ImplImageStatistics.sumAbs(input);\n" +
@@ -181,7 +177,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		out.print("\t}\n\n");
 	}
 
-	public void printMean( ImageType.Family family  ) {
+	public void printMean( ImageType.Family family ) {
 		String columns = family == ImageType.Family.INTERLEAVED ? "*img.numBands" : "";
 		String sumType = input.isInteger() ? "double" : input.getSumType();
 
@@ -191,8 +187,8 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param img Input image.  Not modified.\n" +
 				"\t * @return Mean pixel intensity value\n" +
 				"\t */\n" +
-				"\tpublic static "+sumType+" mean( "+input.getImageName(family)+" img ) {\n" +
-				"\t\treturn sum(img)/("+sumType+")(img.width*img.height"+columns+");\n" +
+				"\tpublic static " + sumType + " mean( " + input.getImageName(family) + " img ) {\n" +
+				"\t\treturn sum(img)/(" + sumType + ")(img.width*img.height" + columns + ");\n" +
 				"\t}\n\n");
 	}
 
@@ -207,10 +203,10 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param mean Mean pixel intensity value.   \n" +
 				"\t * @return Pixel variance   \n" +
 				"\t */\n" +
-				"\tpublic static "+sumType+" variance( "+input.getSingleBandName()+" img , "+sumType+" mean ) {\n" +
+				"\tpublic static " + sumType + " variance( " + input.getSingleBandName() + " img, " + sumType + " mean ) {\n" +
 				"\n" +
 				"\t\tint N = img.width*img.height;\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
 				"\t\t\treturn ImplImageStatistics_MT.variance(img,mean);\n" +
 				"\t\t} else {\n" +
 				"\t\t\treturn ImplImageStatistics.variance(img,mean);\n" +
@@ -223,23 +219,23 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		public GenerateMin() {
 			super("min", "v < output",
 					"\t/**\n" +
-					"\t * Returns the minimum element value.\n" +
-					"\t * \n" +
-					"\t * @param input Input image. Not modified.\n" +
-					"\t * @return Minimum pixel value.\n" +
-					"\t */"
-					);
+							"\t * Returns the minimum element value.\n" +
+							"\t * \n" +
+							"\t * @param input Input image. Not modified.\n" +
+							"\t * @return Minimum pixel value.\n" +
+							"\t */"
+			);
 		}
 
 		@Override
-		public String getValueMassage() { return "array[index] "+input.getBitWise(); }
+		public String getValueMassage() { return "array[index] " + input.getBitWise(); }
 	}
 
 	private class GenerateMax extends InitValue {
 
 		public GenerateMax() {
 			super("max", "v > output",
-							"\t/**\n" +
+					"\t/**\n" +
 							"\t * Returns the maximum element value.\n" +
 							"\t * \n" +
 							"\t * @param input Input image. Not modified.\n" +
@@ -249,14 +245,14 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		}
 
 		@Override
-		public String getValueMassage() { return "array[index] "+input.getBitWise(); }
+		public String getValueMassage() { return "array[index] " + input.getBitWise(); }
 	}
 
 	private class GenerateMaxAbs extends InitValue {
 
 		public GenerateMaxAbs() {
 			super("maxAbs", "v > output",
-							"\t/**\n" +
+					"\t/**\n" +
 							"\t * Returns the maximum element value.\n" +
 							"\t * \n" +
 							"\t * @param input Input image. Not modified.\n" +
@@ -267,17 +263,17 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 		@Override
 		public String getValueMassage() {
-			if( input.isSigned() )
+			if (input.isSigned())
 				return "Math.abs(array[index])";
 			else
-				return "array[index] "+input.getBitWise();
+				return "array[index] " + input.getBitWise();
 		}
 	}
 
 	private class GenerateMeanDiffSq extends GenerateDifference {
 		public GenerateMeanDiffSq() {
 			super("meanDiffSq", "difference*difference",
-							"\t/**\n" +
+					"\t/**\n" +
 							"\t * <p>Computes the mean squared error (MSE) between the two images.</p>\n" +
 							"\t *\n" +
 							"\t * @param imgA first image. Not modified.\n" +
@@ -306,12 +302,13 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		String conditional;
 		String javaDoc;
 
-		public InitValue(String name, String conditional, String javaDoc) {
+		protected InitValue( String name, String conditional, String javaDoc ) {
 			this.name = name;
 			this.conditional = conditional;
 			this.javaDoc = javaDoc;
 		}
 
+		@Override
 		public void printHighLevel( ImageType.Family family ) {
 
 			String sumType = input.getSumType();
@@ -320,15 +317,16 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 			out.println(javaDoc);
 			out.print(
-					"\tpublic static "+sumType+" "+name+"( "+input.getImageName(family)+" input ) {\n" +
-					"\t\tint N = input.width*input.height;\n" +
-					"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
-					"\t\t\treturn ImplImageStatistics_MT."+nameUn+"(input.data, input.startIndex, input.height, "+columns+" , input.stride);\n" +
-					"\t\t} else {\n" +
-					"\t\t\treturn ImplImageStatistics."+nameUn+"(input.data, input.startIndex, input.height, "+columns+" , input.stride);\n" +
-					"\t\t}\n" +
-					"\t}\n\n");
+					"\tpublic static " + sumType + " " + name + "( " + input.getImageName(family) + " input ) {\n" +
+							"\t\tint N = input.width*input.height;\n" +
+							"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
+							"\t\t\treturn ImplImageStatistics_MT." + nameUn + "(input.data, input.startIndex, input.height, " + columns + ", input.stride);\n" +
+							"\t\t} else {\n" +
+							"\t\t\treturn ImplImageStatistics." + nameUn + "(input.data, input.startIndex, input.height, " + columns + ", input.stride);\n" +
+							"\t\t}\n" +
+							"\t}\n\n");
 		}
+
 		public abstract String getValueMassage();
 	}
 
@@ -337,27 +335,27 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		String operation;
 		String javaDoc;
 
-		public GenerateDifference(String name, String operation, String javaDoc) {
+		public GenerateDifference( String name, String operation, String javaDoc ) {
 			this.name = name;
 			this.operation = operation;
 			this.javaDoc = javaDoc;
 		}
 
 		@Override
-		public void printHighLevel(ImageType.Family family) {
+		public void printHighLevel( ImageType.Family family ) {
 
 			String columns = family == ImageType.Family.INTERLEAVED ? "imgA.width*imgA.numBands" : "imgA.width";
 			String nameUn = this.name + (input.isSigned() ? "" : "U");
 			String imageName = input.getImageName(family);
 
 			out.println(javaDoc);
-			out.print("\tpublic static double "+name+"("+imageName+" imgA, "+imageName+" imgB ) {\n" +
+			out.print("\tpublic static double " + name + "(" + imageName + " imgA, " + imageName + " imgB ) {\n" +
 					"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 					"\t\tint N = imgA.width*imgA.height;\n" +
-					"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
-					"\t\t\treturn ImplImageStatistics_MT."+nameUn+"(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, "+columns+");\n" +
+					"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
+					"\t\t\treturn ImplImageStatistics_MT." + nameUn + "(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, " + columns + ");\n" +
 					"\t\t} else {\n" +
-					"\t\t\treturn ImplImageStatistics."+nameUn+"(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, "+columns+");\n" +
+					"\t\t\treturn ImplImageStatistics." + nameUn + "(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, " + columns + ");\n" +
 					"\t\t}\n" +
 					"\t}\n\n");
 		}
@@ -367,7 +365,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		void printHighLevel( ImageType.Family family );
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImageStatistics gen = new GenerateImageStatistics();
 		gen.generate();
 	}

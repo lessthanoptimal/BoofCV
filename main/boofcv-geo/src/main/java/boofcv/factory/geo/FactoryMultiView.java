@@ -331,9 +331,8 @@ public class FactoryMultiView {
 	 */
 	public static Estimate1ofEpipolar fundamental_1(EnumFundamental which, int numRemoveAmbiguity)
 	{
-		switch( which ) {
-			case LINEAR_8:
-				return new WrapFundamentalLinear8(true);
+		if (which == EnumFundamental.LINEAR_8) {
+			return new WrapFundamentalLinear8(true);
 		}
 
 		if( numRemoveAmbiguity <= 0 )
@@ -347,9 +346,8 @@ public class FactoryMultiView {
 
 	public static Estimate1ofEpipolar essential_1(EnumEssential which, int numRemoveAmbiguity)
 	{
-		switch( which ) {
-			case LINEAR_8:
-				return new WrapFundamentalLinear8(false);
+		if (which == EnumEssential.LINEAR_8) {
+			return new WrapFundamentalLinear8(false);
 		}
 
 		if( numRemoveAmbiguity <= 0 )
@@ -567,8 +565,8 @@ public class FactoryMultiView {
 			case GEOMETRIC:
 				return new Wrap2ViewsTriangulateGeometric();
 
+			default: throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 		}
-		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**
@@ -586,8 +584,8 @@ public class FactoryMultiView {
 			case DLT:
 				return new Wrap2ViewsTriangulateProjectiveDLT();
 
+			default: throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 		}
-		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**
@@ -611,8 +609,8 @@ public class FactoryMultiView {
 				return new TriangulateThenRefineMetric(estimator,refiner);
 			}
 
+			default: throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 		}
-		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**

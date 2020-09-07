@@ -22,15 +22,14 @@ import boofcv.struct.image.GrayF64;
 
 import java.lang.reflect.InvocationTargetException;
 
-
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D  {
+public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
-	public ImageBorder1D_F64(Class<?> type ) {
+	public ImageBorder1D_F64( Class<?> type ) {
 		try {
 			this.rowWrap = (BorderIndex1D)type.getConstructor().newInstance();
 			this.colWrap = (BorderIndex1D)type.getConstructor().newInstance();
@@ -39,7 +38,7 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D 
 		}
 	}
 
-	public ImageBorder1D_F64(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+	public ImageBorder1D_F64( BorderIndex1D rowWrap, BorderIndex1D colWrap ) {
 		this.rowWrap = rowWrap;
 		this.colWrap = colWrap;
 	}
@@ -63,16 +62,16 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D 
 
 	@Override
 	public ImageBorder1D_F64 copy() {
-		return new ImageBorder1D_F64(this.rowWrap.copy() ,this.colWrap.copy());
+		return new ImageBorder1D_F64(this.rowWrap.copy(), this.colWrap.copy());
 	}
 
 	@Override
-	public double getOutside(int x, int y) {
-		return image.get( colWrap.getIndex(x) , rowWrap.getIndex(y) );
+	public double getOutside( int x, int y ) {
+		return image.get(colWrap.getIndex(x), rowWrap.getIndex(y));
 	}
 
 	@Override
-	public void setOutside(int x, int y, double val) {
-		image.set(colWrap.getIndex(x) , rowWrap.getIndex(y),val);
+	public void setOutside( int x, int y, double val ) {
+		image.set(colWrap.getIndex(x), rowWrap.getIndex(y), val);
 	}
 }

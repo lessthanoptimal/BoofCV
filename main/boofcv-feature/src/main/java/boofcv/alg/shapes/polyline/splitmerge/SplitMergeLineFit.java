@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import java.util.List;
  * is specified in units of pixels because a simple ratio doesn't work well for small objects.
  *
  * Split and merge is repeated until there is no more change or the maximum number of iterations has been reached.
-
+ *
  * @author Peter Abeles
  */
 public abstract class SplitMergeLineFit {
@@ -78,15 +78,15 @@ public abstract class SplitMergeLineFit {
 
 	/**
 	 * Configures algorithm
+	 *
 	 * @param splitFraction A line will be split if a point is more than this fraction of its
-	 *                     length away from the line. Try 0.05
+	 * length away from the line. Try 0.05
 	 * @param minimumSideLength The minimum length of a side as a function of contour length
-	 * @param maxIterations  Maximum number of split and merge refinements. Set to zero to disable refinement. Try 20
+	 * @param maxIterations Maximum number of split and merge refinements. Set to zero to disable refinement. Try 20
 	 */
-	public SplitMergeLineFit(double splitFraction,
-							 ConfigLength minimumSideLength,
-							 int maxIterations)
-	{
+	protected SplitMergeLineFit( double splitFraction,
+								 ConfigLength minimumSideLength,
+								 int maxIterations ) {
 		setSplitFraction(splitFraction);
 		this.minimumSideLength = minimumSideLength;
 		setMaxIterations(maxIterations);
@@ -99,7 +99,7 @@ public abstract class SplitMergeLineFit {
 	 * @param vertexes (Output) Indexes in the input list which are corners in the polyline
 	 * @return true if it could fit a polygon to the points or false if not
 	 */
-	public boolean process( List<Point2D_I32> list , GrowQueue_I32 vertexes ) {
+	public boolean process( List<Point2D_I32> list, GrowQueue_I32 vertexes ) {
 		this.contour = list;
 		this.minimumSideLengthPixel = minimumSideLength.computeI(contour.size());
 		splits.reset();
@@ -117,15 +117,15 @@ public abstract class SplitMergeLineFit {
 	/**
 	 * Computes the split threshold from the end point of two lines
 	 */
-	protected double splitThresholdSq( Point2D_I32 a , Point2D_I32 b ) {
-		return Math.max(2,a.distance2(b)* toleranceFractionSq);
+	protected double splitThresholdSq( Point2D_I32 a, Point2D_I32 b ) {
+		return Math.max(2, a.distance2(b)*toleranceFractionSq);
 	}
 
-	public void setMaxIterations(int maxIterations) {
+	public void setMaxIterations( int maxIterations ) {
 		this.maxIterations = maxIterations;
 	}
 
-	public void setSplitFraction(double toleranceSplit) {
+	public void setSplitFraction( double toleranceSplit ) {
 		this.toleranceFractionSq = toleranceSplit*toleranceSplit;
 	}
 
@@ -133,7 +133,7 @@ public abstract class SplitMergeLineFit {
 		return abortSplits;
 	}
 
-	public void setAbortSplits(int abortSplits) {
+	public void setAbortSplits( int abortSplits ) {
 		this.abortSplits = abortSplits;
 	}
 }

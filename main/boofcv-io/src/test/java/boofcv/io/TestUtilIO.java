@@ -23,13 +23,15 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -82,7 +84,7 @@ class TestUtilIO {
 		String expected = "This is\na string\n";
 		File tmp = File.createTempFile("readAsString",null);
 
-		FileWriter writer = new FileWriter(tmp);
+		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp),UTF_8);
 		writer.write(expected);
 		writer.close();
 

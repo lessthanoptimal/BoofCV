@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.util.List;
 
-
 /**
  * Displays relative association scores for different features.  When a feature is clicked on in
  * an image the best fit scores are show in the other image.
@@ -33,7 +32,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class AssociationScorePanel<D>
-		extends CompareTwoImagePanel implements MouseListener  {
+		extends CompareTwoImagePanel implements MouseListener {
 	// adjusts how close to the optimal answer a point needs to be before it is plotted
 	double containmentFraction;
 
@@ -41,8 +40,8 @@ public class AssociationScorePanel<D>
 	int maxCircleRadius = 15;
 
 	// left and right window information
-	List<D> leftDesc,rightDesc;
-	double associationScore[];
+	List<D> leftDesc, rightDesc;
+	double[] associationScore;
 
 	// computes association score
 	ScoreAssociation<D> scorer;
@@ -53,81 +52,79 @@ public class AssociationScorePanel<D>
 	double best;
 
 	public AssociationScorePanel( double containmentFraction ) {
-		super(20,false);
-		if( containmentFraction <= 0  )
+		super(20, false);
+		if (containmentFraction <= 0)
 			throw new IllegalArgumentException("containmentFraction must be more than zero");
 		this.containmentFraction = containmentFraction;
 	}
 
-
-	public void setScorer(ScoreAssociation<D> scorer) {
+	public void setScorer( ScoreAssociation<D> scorer ) {
 		this.scorer = scorer;
 	}
 
-	public void setLocation(List<Point2D_F64> leftPts , List<Point2D_F64> rightPts ,
-							List<D> leftDesc, List<D> rightDesc ) {
-		setLocation(leftPts,rightPts);
+	public void setLocation( List<Point2D_F64> leftPts, List<Point2D_F64> rightPts,
+							 List<D> leftDesc, List<D> rightDesc ) {
+		setLocation(leftPts, rightPts);
 		this.leftDesc = leftDesc;
 		this.rightDesc = rightDesc;
 	}
 
-	protected void computeScore( boolean isTargetLeft , int targetIndex ) {
-		int N = Math.max(leftPts.size(),rightPts.size());
-		if( associationScore == null || associationScore.length < N ) {
-			associationScore = new double[ N ];
+	protected void computeScore( boolean isTargetLeft, int targetIndex ) {
+		int N = Math.max(leftPts.size(), rightPts.size());
+		if (associationScore == null || associationScore.length < N) {
+			associationScore = new double[N];
 		}
-		if( isTargetLeft ) {
+		if (isTargetLeft) {
 			D t = leftDesc.get(targetIndex);
-			for( int i = 0; i < rightDesc.size(); i++ ) {
+			for (int i = 0; i < rightDesc.size(); i++) {
 				D d = rightDesc.get(i);
-				associationScore[i] = scorer.score(t,d);
+				associationScore[i] = scorer.score(t, d);
 			}
 		} else {
 			D t = rightDesc.get(targetIndex);
-			for( int i = 0; i < leftDesc.size(); i++ ) {
+			for (int i = 0; i < leftDesc.size(); i++) {
 				D d = leftDesc.get(i);
-				associationScore[i] = scorer.score(t,d);
+				associationScore[i] = scorer.score(t, d);
 			}
 		}
 	}
-	
+
 	@Override
-	protected void drawFeatures(Graphics2D g2,
-							 double scaleLeft, int leftX, int leftY,
-							 double scaleRight, int rightX, int rightY)
-	{
-		if( leftPts == null || rightPts == null ) {
+	protected void drawFeatures( Graphics2D g2,
+								 double scaleLeft, int leftX, int leftY,
+								 double scaleRight, int rightX, int rightY ) {
+		if (leftPts == null || rightPts == null) {
 			System.out.println("is null");
 			return;
 		}
 
 		// draw all the found features in both images since nothing has been selected yet
-		if( selected.isEmpty() ) {
-			drawPoints(g2,leftPts,leftX,leftY,scaleLeft);
-			drawPoints(g2,rightPts,rightX,rightY,scaleRight);
+		if (selected.isEmpty()) {
+			drawPoints(g2, leftPts, leftX, leftY, scaleLeft);
+			drawPoints(g2, rightPts, rightX, rightY, scaleRight);
 			return;
-		} else if( selected.size() != 1 ) {
+		} else if (selected.size() != 1) {
 			System.err.println("Selected more than one feature!");
 			return;
 		}
-		
+
 		int selectedIndex = selected.get(0);
-		
+
 		// compute association score
-		computeScore(selectedIsLeft,selectedIndex);
+		computeScore(selectedIsLeft, selectedIndex);
 
 		// a feature has been selected.  In the image it was selected draw an X
-		if( selectedIsLeft ) {
-			drawCrossHair(g2,leftPts.get(selectedIndex),leftX,leftY,scaleLeft);
+		if (selectedIsLeft) {
+			drawCrossHair(g2, leftPts.get(selectedIndex), leftX, leftY, scaleLeft);
 		} else {
-			drawCrossHair(g2,rightPts.get(selectedIndex),rightX,rightY,scaleRight);
+			drawCrossHair(g2, rightPts.get(selectedIndex), rightX, rightY, scaleRight);
 		}
 
 		// draw circles of based on how similar a feature is to the selected one
-		if( selectedIsLeft ) {
-	   		drawDistribution(g2,rightPts,rightX,rightY,scaleRight);
+		if (selectedIsLeft) {
+			drawDistribution(g2, rightPts, rightX, rightY, scaleRight);
 		} else {
-			drawDistribution(g2,leftPts,leftX,leftY,scaleLeft);
+			drawDistribution(g2, leftPts, leftX, leftY, scaleLeft);
 		}
 	}
 
@@ -135,8 +132,8 @@ public class AssociationScorePanel<D>
 	 * Visualizes score distribution.  Larger circles mean its closer to the best
 	 * fit score.
 	 */
-	private void drawDistribution( Graphics2D g2 , List<Point2D_F64> candidates ,
-					  int offX, int offY , double scale) {
+	private void drawDistribution( Graphics2D g2, List<Point2D_F64> candidates,
+								   int offX, int offY, double scale ) {
 		findStatistics();
 
 		// draw all the features, adjusting their size based on the first score
@@ -144,51 +141,51 @@ public class AssociationScorePanel<D>
 		g2.setStroke(new BasicStroke(3));
 
 		double normalizer;
-		if( scorer.getScoreType().isZeroBest() )
+		if (scorer.getScoreType().isZeroBest())
 			normalizer = best*containmentFraction;
 		else
-			normalizer = Math.abs(best)*(Math.exp(-1.0/containmentFraction));
+			normalizer = Math.abs(best)*Math.exp(-1.0/containmentFraction);
 
-		for( int i = 0; i < candidates.size(); i++ ) {
+		for (int i = 0; i < candidates.size(); i++) {
 			Point2D_F64 p = candidates.get(i);
 
 			double s = associationScore[i];
 
 			// scale the circle based on how bad it is
-			double ratio = 1-Math.abs(s-best)/normalizer;
-			if( ratio < 0 )
+			double ratio = 1 - Math.abs(s - best)/normalizer;
+			if (ratio < 0)
 				continue;
 
 			int r = maxCircleRadius - (int)(maxCircleRadius*ratio);
-			if( r > 0 ) {
-				int x = (int)(p.x*scale+offX);
-				int y = (int)(p.y*scale+offY);
-				g2.drawOval(x-r,y-r,r*2+1,r*2+1);
+			if (r > 0) {
+				int x = (int)(p.x*scale + offX);
+				int y = (int)(p.y*scale + offY);
+				g2.drawOval(x - r, y - r, r*2 + 1, r*2 + 1);
 			}
 		}
 
 		// draw the best feature
 		g2.setColor(Color.GREEN);
 		g2.setStroke(new BasicStroke(10));
-		int w = maxCircleRadius*2+1;
+		int w = maxCircleRadius*2 + 1;
 		Point2D_F64 p = candidates.get(indexBest);
-		int x = (int)(p.x*scale+offX);
-		int y = (int)(p.y*scale+offY);
-		g2.drawOval(x-maxCircleRadius,y-maxCircleRadius,w,w);
+		int x = (int)(p.x*scale + offX);
+		int y = (int)(p.y*scale + offY);
+		g2.drawOval(x - maxCircleRadius, y - maxCircleRadius, w, w);
 	}
 
-	private void drawPoints( Graphics2D g2 , List<Point2D_F64> points ,
-							 int startX , int startY , double scale ) {
-		for( Point2D_F64 p : points ) {
-			int x1 = (int)(scale*p.x)+startX;
-			int y1 = (int)(scale*p.y)+startY;
+	private void drawPoints( Graphics2D g2, List<Point2D_F64> points,
+							 int startX, int startY, double scale ) {
+		for (Point2D_F64 p : points) {
+			int x1 = (int)(scale*p.x) + startX;
+			int y1 = (int)(scale*p.y) + startY;
 
-			VisualizeFeatures.drawPoint(g2,x1,y1,Color.BLUE);
+			VisualizeFeatures.drawPoint(g2, x1, y1, Color.BLUE);
 		}
 	}
 
-	private void drawCrossHair( Graphics2D g2 , Point2D_F64 target ,
-								int startX , int startY , double scale) {
+	private void drawCrossHair( Graphics2D g2, Point2D_F64 target,
+								int startX, int startY, double scale ) {
 
 		int x = startX + (int)(target.x*scale);
 		int y = startY + (int)(target.y*scale);
@@ -196,30 +193,30 @@ public class AssociationScorePanel<D>
 		int r = 10;
 		g2.setColor(Color.BLACK);
 		g2.setStroke(new BasicStroke(11));
-		g2.drawLine(x-r,y,x+r,y);
-		g2.drawLine(x,y-r,x,y+r);
+		g2.drawLine(x - r, y, x + r, y);
+		g2.drawLine(x, y - r, x, y + r);
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(5));
-		g2.drawLine(x-r,y,x+r,y);
-		g2.drawLine(x,y-r,x,y+r);
+		g2.drawLine(x - r, y, x + r, y);
+		g2.drawLine(x, y - r, x, y + r);
 	}
 
 	@Override
-	protected boolean isValidPoint(int index) {
+	protected boolean isValidPoint( int index ) {
 		return true;
 	}
 
-	private void findStatistics( ) {
+	private void findStatistics() {
 		final int N = selectedIsLeft ? rightPts.size() : leftPts.size();
 
 		indexBest = -1;
 		worst = -Double.MAX_VALUE;
 		best = Double.MAX_VALUE;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			double s = associationScore[i];
-			if( s > worst )
+			if (s > worst)
 				worst = s;
-			if( s < best ) {
+			if (s < best) {
 				best = s;
 				indexBest = i;
 			}

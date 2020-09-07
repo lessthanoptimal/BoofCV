@@ -37,14 +37,14 @@ public abstract class StandardConfigurationChecks {
 	protected Random rand = new Random(234);
 	Class<Configuration> type;
 
-	public StandardConfigurationChecks(Class type ) {
+	protected StandardConfigurationChecks( Class type ) {
 		this.type = type;
 	}
 
-	public StandardConfigurationChecks() {
-		String name = getClass().getName().replaceFirst("Test","");
+	protected StandardConfigurationChecks() {
+		String name = getClass().getName().replaceFirst("Test", "");
 		try {
-			type = (Class<Configuration>) Class.forName(name);
+			type = (Class<Configuration>)Class.forName(name);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(
 					"No class found after removing Test from name. Try using the manual constructor");
@@ -54,7 +54,7 @@ public abstract class StandardConfigurationChecks {
 	/**
 	 * Selects non-default values public primitive fields.
 	 */
-	public Configuration createNotDefault(Random rand ) {
+	public Configuration createNotDefault( Random rand ) {
 		try {
 			Configuration config = type.getConstructor().newInstance();
 			Field[] fields = type.getFields();
@@ -64,55 +64,55 @@ public abstract class StandardConfigurationChecks {
 					Object[] values = f.getType().getEnumConstants();
 					Object o = f.get(config);
 					for (int i = 0; i < values.length; i++) {
-						if( values[i] != o ) {
+						if (values[i] != o) {
 							o = values[i];
 							break;
 						}
 					}
-					f.set(config,o);
-				} else if ( f.getType().isPrimitive()) {
+					f.set(config, o);
+				} else if (f.getType().isPrimitive()) {
 					// just add one to all primitive types to make them difference
 					Object o = f.get(config);
-					if( boolean.class == f.getType() ) {
+					if (boolean.class == f.getType()) {
 						o = !((boolean)o);
-					} else if( byte.class == f.getType() ) {
-						o = (byte)(((byte)o)+1);
-					} else if( char.class == f.getType() ) {
-						o = (char)(((char)o)+1);
-					} else if( short.class == f.getType() ) {
-						o = (short)(((short)o)+1);
-					} else if( int.class == f.getType() ) {
+					} else if (byte.class == f.getType()) {
+						o = (byte)(((byte)o) + 1);
+					} else if (char.class == f.getType()) {
+						o = (char)(((char)o) + 1);
+					} else if (short.class == f.getType()) {
+						o = (short)(((short)o) + 1);
+					} else if (int.class == f.getType()) {
 						int before = (int)o;
 						int value = rand.nextInt();
-						while( value == before )
+						while (value == before)
 							value = rand.nextInt();
 						o = value;
-					} else if( long.class == f.getType() ) {
+					} else if (long.class == f.getType()) {
 						long before = (long)o;
 						long value = rand.nextLong();
-						while( value == before )
+						while (value == before)
 							value = rand.nextLong();
 						o = value;
-					} else if( float.class == f.getType() ) {
+					} else if (float.class == f.getType()) {
 						float before = (float)o;
 						float value = rand.nextFloat();
-						while( value == before )
+						while (value == before)
 							value = rand.nextFloat();
 						o = value;
-					} else if( double.class == f.getType() ) {
+					} else if (double.class == f.getType()) {
 						double before = (double)o;
 						double value = rand.nextDouble();
-						while( value == before )
+						while (value == before)
 							value = rand.nextDouble();
 						o = value;
 					} else {
-						throw new RuntimeException("BUG "+f.getType().getSimpleName());
+						throw new RuntimeException("BUG " + f.getType().getSimpleName());
 					}
-					f.set(config,o);
+					f.set(config, o);
 				}
 			}
 			return config;
-		} catch( Exception e ) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -131,32 +131,31 @@ public abstract class StandardConfigurationChecks {
 				boolean onlyOneOption = false;
 
 				// If it's an enum with only one value then it can't be not equals
-				if( f.getType().isEnum() ) {
-					if( f.getType().getEnumConstants().length == 1 )
+				if (f.getType().isEnum()) {
+					if (f.getType().getEnumConstants().length == 1)
 						onlyOneOption = true;
 				}
 				// if it's null it should stay null
-				if( f.get(src) == null )
+				if (f.get(src) == null)
 					onlyOneOption = true;
 
-				if( onlyOneOption )
-					assertEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
+				if (onlyOneOption)
+					assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 				else
-					assertNotEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
+					assertNotEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 			}
 
 			m.invoke(dst, src);
 
 			// after setTo() they should be the same
 			for (Field f : fields) {
-				if (f.getType().isEnum() || f.getType().isPrimitive() || f.get(src) == null )
-					assertEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
+				if (f.getType().isEnum() || f.getType().isPrimitive() || f.get(src) == null)
+					assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 				else
-					assertNotEquals(f.get(src), f.get(dst), "Field Name: '"+f.getName()+"'");
+					assertNotEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 				// if they are equal that means it copied the reference
 			}
-
-		} catch( NoSuchMethodException e ) {
+		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 			fail("setTo() isn't implemented yet");
 		} catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
@@ -167,13 +166,11 @@ public abstract class StandardConfigurationChecks {
 
 	private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
 
-	public static boolean isWrapperType(Class<?> clazz)
-	{
+	public static boolean isWrapperType( Class<?> clazz ) {
 		return WRAPPER_TYPES.contains(clazz);
 	}
 
-	private static Set<Class<?>> getWrapperTypes()
-	{
+	private static Set<Class<?>> getWrapperTypes() {
 		Set<Class<?>> ret = new HashSet<Class<?>>();
 		ret.add(Boolean.class);
 		ret.add(Character.class);

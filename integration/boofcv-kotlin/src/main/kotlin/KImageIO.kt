@@ -31,6 +31,7 @@ fun Planar<*>.asBufferedImage(): BufferedImage {
 fun <T : ImageGray<T>>BufferedImage.asGray( type : Class<T> , weighted : Boolean = false ): T {
     // cast to GrayU8 is a hack to get around Kotlin's strict implementation of Generics
     val dataType = ImageDataType.classToType(type)
+            ?:throw RuntimeException("Invalid image type ${type.javaClass.simpleName}")
     return this.asGray<GrayU8>(dataType, weighted) as T
 }
 

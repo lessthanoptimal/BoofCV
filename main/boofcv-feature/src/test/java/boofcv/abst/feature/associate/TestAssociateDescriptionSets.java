@@ -53,7 +53,6 @@ class TestAssociateDescriptionSets {
 		alg.associate();
 
 		assertEquals(5,alg.getMatches().size);
-		FastAccess<AssociatedIndex> matches = alg.getMatches();
 
 		assertTrue(checkForMatch(0,1,alg.getMatches()));
 		assertTrue(checkForMatch(1,0,alg.getMatches()));

@@ -70,6 +70,7 @@ import java.util.List;
 import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
 import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_DIRECTORY;
 import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Computes and displays disparity from still disparity images.  The disparity can be viewed
@@ -328,7 +329,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	private void swapVisualizationPanel( Component target , Component other ) {
 		if( panel != target.getParent() ) {
-			panel.removeAll();
+			assertBoof(other.getParent()==panel);
+			panel.remove(other);
 			panel.add(target,BorderLayout.CENTER);
 			panel.revalidate();
 		}
@@ -625,7 +627,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
-	public class ProcessThread extends ProgressMonitorThread
+	public static class ProcessThread extends ProgressMonitorThread
 	{
 		int state = 0;
 

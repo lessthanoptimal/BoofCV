@@ -87,8 +87,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		for (int i = 0; i < observations.views.size; i++) {
 			SceneObservations.View v = observations.views.data[i];
 			for (int j = 0; j < v.point.size; j++) {
-				v.observations.data[j*2+0] += rand.nextGaussian()*0.1;
-				v.observations.data[j*2+1] += rand.nextGaussian()*0.1;
+				v.observations.data[j*2+0] += (float) rand.nextGaussian()*0.1f;
+				v.observations.data[j*2+1] += (float) rand.nextGaussian()*0.1f;
 			}
 		}
 
@@ -123,7 +123,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 	private void addNoiseToPoint3D(Tuple2<SceneStructureMetric, SceneObservations> a) {
 		SceneStructureMetric structure = a.d0;
 		for (int i = 0; i < structure.points.size; i++) {
-			SceneStructureMetric.Point p = structure.points.data[i];
+			SceneStructureCommon.Point p = structure.points.data[i];
 			p.coordinate[0] += rand.nextGaussian()*0.1;
 			p.coordinate[1] += rand.nextGaussian()*0.1;
 			p.coordinate[2] += rand.nextGaussian()*0.1;
@@ -213,8 +213,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		Assertions.assertEquals(a.homogenous, b.homogenous);
 
 		if( a.homogenous ) {
-			Point4D_F64 pa = new Point4D_F64();
-			Point4D_F64 pb = new Point4D_F64();
+//			Point4D_F64 pa = new Point4D_F64();
+//			Point4D_F64 pb = new Point4D_F64();
 
 			for (int i = 0; i < a.points.size; i++) {
 				// need to normalize the points first otherwise they can't be computed

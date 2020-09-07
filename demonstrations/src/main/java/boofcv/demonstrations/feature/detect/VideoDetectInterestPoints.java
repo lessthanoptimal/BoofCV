@@ -52,44 +52,43 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 
 	ImagePanel panel;
 
-	public VideoDetectInterestPoints(SimpleImageSequence<T> sequence,
-									 InterestPointDetector<T> detector ,
-									 OrientationImageAverage<T> orientation ) {
+	public VideoDetectInterestPoints( SimpleImageSequence<T> sequence,
+									  InterestPointDetector<T> detector,
+									  OrientationImageAverage<T> orientation ) {
 		super(sequence);
 
 		this.detector = detector;
 		this.orientation = orientation;
 	}
 
-
 	@Override
-	public void processFrame(T image) {
+	public void processFrame( T image ) {
 		detector.detect(image);
 	}
 
 	@Override
-	public void updateGUI(BufferedImage guiImage, T origImage) {
+	public void updateGUI( BufferedImage guiImage, T origImage ) {
 		Graphics2D g2 = guiImage.createGraphics();
 
-		if( orientation != null )
+		if (orientation != null)
 			orientation.setImage(origImage);
 
 		render.reset();
-		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+		for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 			Point2D_F64 pt = detector.getLocation(i);
 
-			int radius = (int)Math.round( detector.getRadius(i));
+			int radius = (int)Math.round(detector.getRadius(i));
 
-			if( orientation != null ) {
+			if (orientation != null) {
 				orientation.setObjectRadius(radius);
-				double angle = orientation.compute(pt.x,pt.y);
-				render.addCircle((int)pt.x,(int)pt.y,radius,Color.red,angle);
+				double angle = orientation.compute(pt.x, pt.y);
+				render.addCircle((int)pt.x, (int)pt.y, radius, Color.red, angle);
 			} else {
-				render.addCircle((int)pt.x,(int)pt.y,radius);
+				render.addCircle((int)pt.x, (int)pt.y, radius);
 			}
 		}
 		render.draw(g2);
-		
+
 		if (panel == null) {
 			panel = ShowImages.showWindow(guiImage, "Image Sequence", true);
 			addComponent(panel);
@@ -100,20 +99,19 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 	}
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	void perform( String fileName , Class<T> imageType , Class<D> derivType )
-	{
+	void perform( String fileName, Class<T> imageType, Class<D> derivType ) {
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
 
-		int maxCorners = 200;
+//		int maxCorners = 200;
 		int radius = 2;
 
 		// if null then no orientation will be computed
 		OrientationImageAverage<T> orientation = null;
-		orientation = FactoryOrientationAlgs.nogradient(1.0/2.0,radius,imageType);
+		orientation = FactoryOrientationAlgs.nogradient(1.0/2.0, radius, imageType);
 
 		InterestPointDetector<T> detector;
 
-		detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 100, 2, 9, 4, 4),imageType);
+		detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 100, 2, 9, 4, 4), imageType);
 //		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,defaultType,derivType);
 //		detector = FactoryInterestPoint.wrapDetector(feature,new double[]{1,2,4,6,8,12},defaultType);
 
@@ -122,7 +120,7 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 		display.process();
 	}
 
-	public static void main(String args[]) {
+	public static void main( String args[] ) {
 		String fileName;
 
 		if (args.length == 0) {
@@ -132,6 +130,6 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 		}
 
 //		perform(fileName,GrayU8.class,GrayS16.class);
-		perform(fileName, GrayF32.class,GrayF32.class);
+		perform(fileName, GrayF32.class, GrayF32.class);
 	}
 }

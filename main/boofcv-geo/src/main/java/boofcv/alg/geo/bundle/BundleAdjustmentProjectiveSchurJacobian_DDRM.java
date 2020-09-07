@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import org.ejml.data.DMatrixRMaj;
 public class BundleAdjustmentProjectiveSchurJacobian_DDRM
 		extends BundleAdjustmentProjectiveSchurJacobian<DMatrixRMaj>
 {
+	@Override
 	public void process(double[] input, DMatrixRMaj left, DMatrixRMaj right) {
 		processInternal(input,left,right);
 	}

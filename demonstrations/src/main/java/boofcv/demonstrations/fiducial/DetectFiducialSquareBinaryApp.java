@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,8 +63,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectFiducialSquareBinaryApp
-		extends DemonstrationBase implements ShapeGuiListener
-{
+		extends DemonstrationBase implements ShapeGuiListener {
 	Detector detector;
 	VisualizePanel guiImage;
 
@@ -75,10 +74,10 @@ public class DetectFiducialSquareBinaryApp
 
 	final Object lockProcessing = new Object();
 
-	public DetectFiducialSquareBinaryApp(List<String> examples ) {
-		super(examples, ImageType.single(GrayF32.class) );
+	public DetectFiducialSquareBinaryApp( List<String> examples ) {
+		super(examples, ImageType.single(GrayF32.class));
 		setupGui();
-		setPreferredSize(new Dimension(800,800));
+		setPreferredSize(new Dimension(800, 800));
 	}
 
 	protected void setupGui() {
@@ -87,13 +86,13 @@ public class DetectFiducialSquareBinaryApp
 
 		guiImage.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed( MouseEvent e ) {
 				double scale = guiImage.getScale();
-				System.out.printf("click %5.1f %5.1f\n",e.getX()/scale,e.getY()/scale);
+				System.out.printf("click %5.1f %5.1f\n", e.getX()/scale, e.getY()/scale);
 			}
 		});
 
-		guiImage.setPreferredSize(new Dimension(800,800));
+		guiImage.setPreferredSize(new Dimension(800, 800));
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
@@ -102,8 +101,8 @@ public class DetectFiducialSquareBinaryApp
 
 		guiImage.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
-				if( SwingUtilities.isLeftMouseButton(e)) {
+			public void mousePressed( MouseEvent e ) {
+				if (SwingUtilities.isLeftMouseButton(e)) {
 					if (inputMethod == InputMethod.VIDEO) {
 						streamPaused = !streamPaused;
 					}
@@ -113,12 +112,12 @@ public class DetectFiducialSquareBinaryApp
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		super.handleInputChange(source, method, width, height);
 	}
 
-	protected void createDetector(boolean initializing) {
-		if( !initializing)
+	protected void createDetector( boolean initializing ) {
+		if (!initializing)
 			BoofSwingUtil.checkGuiThread();
 
 		synchronized (lockProcessing) {
@@ -127,12 +126,11 @@ public class DetectFiducialSquareBinaryApp
 
 			final InputToBinary<GrayF32> binary = FactoryThresholdBinary.threshold(configThresh, GrayF32.class);
 			final DetectPolygonBinaryGrayRefine<GrayF32> squareDetector = FactoryShapeDetector.
-					polygon(configFid.squareDetector,GrayF32.class);
+					polygon(configFid.squareDetector, GrayF32.class);
 
-			detector = new Detector(configFid,binary,squareDetector);
+			detector = new Detector(configFid, binary, squareDetector);
 		}
 	}
-
 
 	@Override
 	public void configUpdate() {
@@ -147,18 +145,18 @@ public class DetectFiducialSquareBinaryApp
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, ImageBase input ) {
 		System.out.flush();
 
-		original = ConvertBufferedImage.checkCopy(buffered,original);
-		work = ConvertBufferedImage.checkDeclare(buffered,work);
+		original = ConvertBufferedImage.checkCopy(buffered, original);
+		work = ConvertBufferedImage.checkDeclare(buffered, work);
 
 		final double timeInSeconds;
 		synchronized (lockProcessing) {
 			long before = System.nanoTime();
 			detector.process((GrayF32)input);
 			long after = System.nanoTime();
-			timeInSeconds = (after-before)*1e-9;
+			timeInSeconds = (after - before)*1e-9;
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -173,11 +171,12 @@ public class DetectFiducialSquareBinaryApp
 	/**
 	 * Called when how the data is visualized has changed
 	 */
+	@Override
 	public void viewUpdated() {
 		BufferedImage active = null;
-		if( controls.selectedView == 0 ) {
+		if (controls.selectedView == 0) {
 			active = original;
-		} else if( controls.selectedView == 1 ) {
+		} else if (controls.selectedView == 1) {
 			synchronized (lockProcessing) {
 				VisualizeBinaryData.renderBinary(detector.getBinary(), false, work);
 			}
@@ -186,7 +185,7 @@ public class DetectFiducialSquareBinaryApp
 		} else {
 			Graphics2D g2 = work.createGraphics();
 			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
+			g2.fillRect(0, 0, work.getWidth(), work.getHeight());
 			active = work;
 		}
 
@@ -199,19 +198,18 @@ public class DetectFiducialSquareBinaryApp
 	class VisualizePanel extends ShapeVisualizePanel {
 
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			synchronized ( lockProcessing ) {
+			synchronized (lockProcessing) {
 
-				if (controls.bShowContour)
-				{
+				if (controls.bShowContour) {
 					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contours, null,Color.CYAN, 1.0,scale, g2);
+					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 				}
 
 				FastQueue<FoundFiducial> detected = detector.getFound();
@@ -222,7 +220,7 @@ public class DetectFiducialSquareBinaryApp
 //					VisualizeShapes.drawQuad(fid.distortedPixels,g2,scale,true,Color.RED,Color.BLACK);
 //				}
 				if (controls.bShowSquares) {
-					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null,null);
+					List<Polygon2D_F64> polygons = detector.getSquareDetector().getPolygons(null, null);
 
 					g2.setColor(Color.GREEN);
 					g2.setStroke(new BasicStroke(3));
@@ -234,7 +232,7 @@ public class DetectFiducialSquareBinaryApp
 				if (controls.bShowOrienation) {
 					g2.setStroke(new BasicStroke(2));
 					for (int i = 0; i < detected.size; i++) {
-						VisualizeShapes.drawArrowSubPixel(detected.get(i).distortedPixels,3, scale, g2);
+						VisualizeShapes.drawArrowSubPixel(detected.get(i).distortedPixels, 3, scale, g2);
 					}
 				}
 
@@ -243,17 +241,17 @@ public class DetectFiducialSquareBinaryApp
 					g2.setStroke(new BasicStroke(2));
 					for (int i = 0; i < detected.size; i++) {
 						FoundFiducial f = detected.get(i);
-						UtilPolygons2D_F64.center(f.distortedPixels,center);
+						UtilPolygons2D_F64.center(f.distortedPixels, center);
 						center.x *= scale;
 						center.y *= scale;
-						VisualizeFiducial.drawLabel(center,""+f.id,g2);
+						VisualizeFiducial.drawLabel(center, "" + f.id, g2);
 					}
 				}
 			}
 		}
 
 		@Override
-		public synchronized void setScale(double scale) {
+		public synchronized void setScale( double scale ) {
 			controls.setZoom(scale);
 			super.setScale(controls.zoom);
 		}
@@ -264,18 +262,18 @@ public class DetectFiducialSquareBinaryApp
 		public List<GrayU8> squares = new ArrayList<>();
 		public List<GrayF32> squaresGray = new ArrayList<>();
 
-		protected Detector(ConfigFiducialBinary config, InputToBinary<GrayF32> inputToBinary ,
-						   DetectPolygonBinaryGrayRefine<GrayF32> quadDetector ) {
-			super(config.gridWidth,config.borderWidthFraction,config.minimumBlackBorderFraction,inputToBinary,
+		protected Detector( ConfigFiducialBinary config, InputToBinary<GrayF32> inputToBinary,
+							DetectPolygonBinaryGrayRefine<GrayF32> quadDetector ) {
+			super(config.gridWidth, config.borderWidthFraction, config.minimumBlackBorderFraction, inputToBinary,
 					quadDetector, GrayF32.class);
 		}
 
 		@Override
-		protected boolean processSquare(GrayF32 square, Result result, double a , double b) {
+		protected boolean processSquare( GrayF32 square, Result result, double a, double b ) {
 			squares.clear();
 			squaresGray.clear();
 
-			if( super.processSquare(square,result,a,b)) {
+			if (super.processSquare(square, result, a, b)) {
 				squares.add(super.getBinaryInner().clone());
 				squaresGray.add(super.getGrayNoBorder().clone());
 				return true;
@@ -285,7 +283,7 @@ public class DetectFiducialSquareBinaryApp
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("fiducial/binary/image0000.jpg"));
@@ -293,13 +291,10 @@ public class DetectFiducialSquareBinaryApp
 		examples.add(UtilIO.pathExample("fiducial/binary/image0002.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/binary/movie.mjpeg"));
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			DetectFiducialSquareBinaryApp app = new DetectFiducialSquareBinaryApp(examples);
 			app.openFile(new File(examples.get(0)));
 			app.display("Fiducial Square Binary Detector");
 		});
 	}
-
-
-
 }

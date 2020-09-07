@@ -53,6 +53,7 @@ public class FactoryImageBorder {
 					}
 				}
 			} break;
+			default: break;
 		}
 		throw new IllegalArgumentException("image type not yet supported. "+imageType.getFamily());
 	}

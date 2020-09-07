@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayI8;
 import boofcv.struct.image.GrayU8;
 
+import javax.annotation.Generated;
+
 /**
  * <p>
  * Unrolls the convolution kernel to improve runtime performance by reducing array accesses.
@@ -34,6 +36,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
+@Generated({"boofcv.alg.filter.convolve.down.GenerateConvolveDownNoBorderUnrolled"})
 public class ConvolveDownNoBorderUnrolled_U8_I8_Div {
 	public static boolean horizontal(Kernel1D_S32 kernel ,
 									 GrayU8 image, GrayI8 dest , int skip, int divisor) {

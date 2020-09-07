@@ -63,7 +63,7 @@ class TestWrapAssociateGreedy {
 
 	private static abstract class StandardTests extends StandardAssociateDescriptionChecks<TupleDesc_F64>
 	{
-		public StandardTests() {
+		protected StandardTests() {
 			super(TupleDesc_F64.class);
 			distanceIsSquared = false;
 		}

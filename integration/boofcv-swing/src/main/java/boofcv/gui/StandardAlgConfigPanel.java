@@ -86,7 +86,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return control;
 	}
 
-	protected JConfigLength configLength(ConfigLength initial , double min , double max , BoofLambdas.Process listener ) {
+	protected JConfigLength configLength(ConfigLength initial , double min , double max , BoofLambdas.ProcessCall listener ) {
 		JConfigLength.Listener cl = (source, fraction, length) -> listener.process();
 
 		JConfigLength control = new JConfigLength(cl,true);

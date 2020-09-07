@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,34 +50,34 @@ public class BinaryThinning {
 	//  0 means it is expected to be zero
 	//  1 means it is expected to be one
 
-	public static byte mask0[]=new byte[]{ 0, 0, 0,
+	public static byte[] mask0=new byte[]{ 0, 0, 0,
 										  -1, 1,-1,
 										   1, 1, 1};
-	public static byte mask1[]=new byte[]{-1, 0, 0,
+	public static byte[] mask1=new byte[]{-1, 0, 0,
 										   1, 1, 0,
 										  -1, 1,-1};
-	public static byte mask2[]=new byte[]{ 1,-1, 0,
+	public static byte[] mask2=new byte[]{ 1,-1, 0,
 										   1, 1, 0,
 										   1,-1, 0};
-	public static byte mask3[]=new byte[]{-1, 1,-1,
+	public static byte[] mask3=new byte[]{-1, 1,-1,
 										   1, 1, 0,
 										  -1, 0, 0};
-	public static byte mask4[]=new byte[]{ 1, 1, 1,
+	public static byte[] mask4=new byte[]{ 1, 1, 1,
 										  -1, 1,-1,
 										   0, 0, 0};
-	public static byte mask5[]=new byte[]{-1, 1,-1,
+	public static byte[] mask5=new byte[]{-1, 1,-1,
 										   0, 1, 1,
 										   0, 0,-1};
-	public static byte mask6[]=new byte[]{ 0,-1, 1,
+	public static byte[] mask6=new byte[]{ 0,-1, 1,
 										   0, 1, 1,
 										   0,-1, 1};
-	public static byte mask7[]=new byte[]{ 0, 0,-1,
+	public static byte[] mask7=new byte[]{ 0, 0,-1,
 										   0, 1, 1,
 										  -1, 1,-1};
 
-	Mask masks[] = new Mask[]{
+	Mask[] masks = new Mask[]{
 			new Mask0(), new Mask1(), new Mask2(), new Mask3(),
-			new Mask4(), new Mask5(), new Mask6(), new Mask7() };
+			new Mask4(), new Mask5(), new Mask6(), new Mask7()};
 
 	// reference to input image
 	GrayU8 binary;
@@ -96,7 +96,7 @@ public class BinaryThinning {
 	 * @param binary Input binary image which is to be thinned.  This is modified
 	 * @param maxLoops Maximum number of thinning loops.  Set to -1 to run until the image is no longer modified.
 	 */
-	public void apply(GrayU8 binary , int maxLoops) {
+	public void apply( GrayU8 binary, int maxLoops ) {
 		this.binary = binary;
 		inputBorder.setImage(binary);
 
@@ -120,7 +120,7 @@ public class BinaryThinning {
 
 				// mark all the pixels that need to be set to 0 as 0
 				for (int j = 0; j < zerosOut.size(); j++) {
-					binary.data[ zerosOut.get(j)] = 0;
+					binary.data[zerosOut.get(j)] = 0;
 				}
 
 				// swap the lists
@@ -129,20 +129,19 @@ public class BinaryThinning {
 				ones1 = tmp;
 			}
 
-			if( !changed )
+			if (!changed)
 				break;
 		}
-
 	}
 
 	/**
 	 * Scans through the image and record the array index of all marked pixels
 	 */
-	protected void findOnePixels(GrowQueue_I32 ones) {
+	protected void findOnePixels( GrowQueue_I32 ones ) {
 		for (int y = 0; y < binary.height; y++) {
-			int index = binary.startIndex + y* binary.stride;
+			int index = binary.startIndex + y*binary.stride;
 			for (int x = 0; x < binary.width; x++, index++) {
-				if( binary.data[index] != 0 ) {
+				if (binary.data[index] != 0) {
 					ones.add(index);
 				}
 			}
@@ -155,34 +154,33 @@ public class BinaryThinning {
 	 */
 	protected abstract class Mask {
 
-		byte mask[];
+		byte[] mask;
 
-		public Mask(byte[] mask) {
+		protected Mask( byte[] mask ) {
 			this.mask = mask;
 		}
 
 		/**
-		 *
 		 * @param onesIn (input) Indexes of pixels with a value of 1
 		 * @param onesOut (output) Indexes of pixels with a value of 1 after the mask is applied
 		 * @param zerosOut (output) Indexes of pixels whose values have changed form 1 to 0
 		 */
-		public void apply( GrowQueue_I32 onesIn , GrowQueue_I32 onesOut, GrowQueue_I32 zerosOut ) {
-			int w = binary.width-1;
-			int h = binary.height-1;
+		public void apply( GrowQueue_I32 onesIn, GrowQueue_I32 onesOut, GrowQueue_I32 zerosOut ) {
+			int w = binary.width - 1;
+			int h = binary.height - 1;
 
 			for (int i = 0; i < onesIn.size; i++) {
 				int indexIn = onesIn.get(i);
-				int x = (indexIn - binary.startIndex)% binary.stride;
-				int y = (indexIn - binary.startIndex)/ binary.stride;
+				int x = (indexIn - binary.startIndex)%binary.stride;
+				int y = (indexIn - binary.startIndex)/binary.stride;
 
 				boolean staysAsOne;
-				if( x == 0 || x == w || y == 0 || y == h ) {
-					staysAsOne = borderMask( x, y);
+				if (x == 0 || x == w || y == 0 || y == h) {
+					staysAsOne = borderMask(x, y);
 				} else {
 					staysAsOne = innerMask(indexIn);
 				}
-				if( staysAsOne ) {
+				if (staysAsOne) {
 					onesOut.add(indexIn);
 				} else {
 					zerosOut.add(indexIn);
@@ -197,18 +195,18 @@ public class BinaryThinning {
 		 * @param cy y-coordinate of center pixels, always 1
 		 * @return true means the pixels keeps the value of one, otherwise it is set to zero
 		 */
-		protected boolean borderMask( int cx , int cy ) {
+		protected boolean borderMask( int cx, int cy ) {
 
 			int maskIndex = 0;
 			for (int i = -1; i <= 1; i++) {
 				for (int j = -1; j <= 1; j++) {
 					int m = mask[maskIndex++];
-					if( m == -1 ) continue;
-					int pixel = inputBorder.get(cx+j,cy+i);
-					if( m == 0 ) {
-						if( pixel != 0 )
+					if (m == -1) continue;
+					int pixel = inputBorder.get(cx + j, cy + i);
+					if (m == 0) {
+						if (pixel != 0)
 							return true;
-					} else if( pixel != 1 )
+					} else if (pixel != 1)
 						return true;
 				}
 			}
@@ -223,7 +221,6 @@ public class BinaryThinning {
 		 * @return true means the pixels keeps the value of one, otherwise it is set to zero
 		 */
 		protected abstract boolean innerMask( int indexIn );
-
 	}
 
 	public class Mask0 extends Mask {
@@ -233,13 +230,13 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			if( binary.data[rowTop-1] != 0 || binary.data[rowTop] != 0  || binary.data[rowTop+1] != 0 ) {
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			if (binary.data[rowTop - 1] != 0 || binary.data[rowTop] != 0 || binary.data[rowTop + 1] != 0) {
 				return true;
 			}
-			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom-1] != 1 || binary.data[rowBottom] != 1  || binary.data[rowBottom+1] != 1 ) {
+			int rowBottom = indexIn + binary.stride;
+			if (binary.data[rowBottom - 1] != 1 || binary.data[rowBottom] != 1 || binary.data[rowBottom + 1] != 1) {
 				return true;
 			}
 			return false;
@@ -253,15 +250,15 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			int rowBottom = indexIn+ binary.stride;
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			int rowBottom = indexIn + binary.stride;
 
-			if( binary.data[indexIn-1] != 1 || binary.data[rowBottom] != 1  ) {
+			if (binary.data[indexIn - 1] != 1 || binary.data[rowBottom] != 1) {
 				return true;
 			}
 
-			if( binary.data[rowTop] != 0 || binary.data[rowTop+1] != 0  || binary.data[indexIn+1] != 0 ) {
+			if (binary.data[rowTop] != 0 || binary.data[rowTop + 1] != 0 || binary.data[indexIn + 1] != 0) {
 				return true;
 			}
 
@@ -276,15 +273,15 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 1 || binary.data[indexIn+1] != 0 ||
-					binary.data[rowTop-1] != 1  || binary.data[rowTop+1] != 0 ) {
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			if (binary.data[indexIn - 1] != 1 || binary.data[indexIn + 1] != 0 ||
+					binary.data[rowTop - 1] != 1 || binary.data[rowTop + 1] != 0) {
 				return true;
 			}
 
-			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom-1] != 1 || binary.data[rowBottom+1] != 0 ) {
+			int rowBottom = indexIn + binary.stride;
+			if (binary.data[rowBottom - 1] != 1 || binary.data[rowBottom + 1] != 0) {
 				return true;
 			}
 
@@ -299,14 +296,14 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 1 || binary.data[indexIn+1] != 0 || binary.data[rowTop] != 1 ) {
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			if (binary.data[indexIn - 1] != 1 || binary.data[indexIn + 1] != 0 || binary.data[rowTop] != 1) {
 				return true;
 			}
 
-			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom] != 0 || binary.data[rowBottom+1] != 0 ) {
+			int rowBottom = indexIn + binary.stride;
+			if (binary.data[rowBottom] != 0 || binary.data[rowBottom + 1] != 0) {
 				return true;
 			}
 
@@ -321,14 +318,14 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			if( binary.data[rowTop-1] != 1 || binary.data[rowTop] != 1 || binary.data[rowTop+1] != 1 ) {
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			if (binary.data[rowTop - 1] != 1 || binary.data[rowTop] != 1 || binary.data[rowTop + 1] != 1) {
 				return true;
 			}
 
-			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom-1] != 0  || binary.data[rowBottom] != 0 || binary.data[rowBottom+1] != 0 ) {
+			int rowBottom = indexIn + binary.stride;
+			if (binary.data[rowBottom - 1] != 0 || binary.data[rowBottom] != 0 || binary.data[rowBottom + 1] != 0) {
 				return true;
 			}
 
@@ -343,14 +340,14 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1 || binary.data[rowTop] != 1 ) {
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			if (binary.data[indexIn - 1] != 0 || binary.data[indexIn + 1] != 1 || binary.data[rowTop] != 1) {
 				return true;
 			}
 
-			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom-1] != 0  || binary.data[rowBottom] != 0 ) {
+			int rowBottom = indexIn + binary.stride;
+			if (binary.data[rowBottom - 1] != 0 || binary.data[rowBottom] != 0) {
 				return true;
 			}
 
@@ -365,15 +362,15 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1  ||
-					binary.data[rowTop-1] != 0 ||  binary.data[rowTop+1] != 1 ) {
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			if (binary.data[indexIn - 1] != 0 || binary.data[indexIn + 1] != 1 ||
+					binary.data[rowTop - 1] != 0 || binary.data[rowTop + 1] != 1) {
 				return true;
 			}
 
-			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom-1] != 0  || binary.data[rowBottom+1] != 1 ) {
+			int rowBottom = indexIn + binary.stride;
+			if (binary.data[rowBottom - 1] != 0 || binary.data[rowBottom + 1] != 1) {
 				return true;
 			}
 
@@ -388,15 +385,15 @@ public class BinaryThinning {
 		}
 
 		@Override
-		protected boolean innerMask(int indexIn) {
-			int rowTop = indexIn- binary.stride;
-			if( binary.data[rowTop-1] != 0 || binary.data[rowTop] != 0 ||
-					binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1 ) {
+		protected boolean innerMask( int indexIn ) {
+			int rowTop = indexIn - binary.stride;
+			if (binary.data[rowTop - 1] != 0 || binary.data[rowTop] != 0 ||
+					binary.data[indexIn - 1] != 0 || binary.data[indexIn + 1] != 1) {
 				return true;
 			}
 
-			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom] != 1 ) {
+			int rowBottom = indexIn + binary.stride;
+			if (binary.data[rowBottom] != 1) {
 				return true;
 			}
 

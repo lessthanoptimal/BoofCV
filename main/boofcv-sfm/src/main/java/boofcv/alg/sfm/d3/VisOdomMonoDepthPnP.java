@@ -121,6 +121,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	/**
 	 * Resets the algorithm into its original state
 	 */
+	@Override
 	public void reset() {
 		super.reset();
 		tracker.reset();

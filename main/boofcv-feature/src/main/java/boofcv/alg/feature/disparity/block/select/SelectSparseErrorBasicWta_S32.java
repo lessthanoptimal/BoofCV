@@ -36,16 +36,16 @@ public class SelectSparseErrorBasicWta_S32 implements DisparitySparseSelect<int[
 	int disparity;
 
 	@Override
-	public boolean select(DisparitySparseRectifiedScoreBM<int[],?> scorer, int x, int y) {
-		if( !scorer.processLeftToRight(x,y) )
+	public boolean select( DisparitySparseRectifiedScoreBM<int[], ?> scorer, int x, int y ) {
+		if (!scorer.processLeftToRight(x, y))
 			return false;
 		int[] scores = scorer.getScoreLtoR();
 		int disparityRange = scorer.getLocalRangeLtoR();
 		disparity = 0;
 		int best = scores[0];
 
-		for(int i = 1; i < disparityRange; i++ ) {
-			if( scores[i] < best ) {
+		for (int i = 1; i < disparityRange; i++) {
+			if (scores[i] < best) {
 				best = scores[i];
 				disparity = i;
 			}

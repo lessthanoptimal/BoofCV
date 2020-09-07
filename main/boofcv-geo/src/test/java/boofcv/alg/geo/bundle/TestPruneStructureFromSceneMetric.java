@@ -18,11 +18,8 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
-import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
-import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.*;
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -418,7 +415,7 @@ class TestPruneStructureFromSceneMetric {
 		for (int viewId = 0; viewId < structure.views.size; viewId++) {
 			SceneObservations.View v = observations.views.data[viewId];
 			for(int pointIdx = v.point.size-1; pointIdx >= 0; pointIdx-- ) {
-				SceneStructureMetric.Point structP = structure.points.data[ v.getPointId(pointIdx) ];
+				SceneStructureCommon.Point structP = structure.points.data[ v.getPointId(pointIdx) ];
 				if( !structP.views.contains(viewId))
 					throw new RuntimeException("Miss match");
 			}

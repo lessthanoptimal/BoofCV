@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestDetectCircleHexagonalGrid {
 
-	private static final double hexY = Math.sqrt(3.0/4.0);
+//	private static final double hexY = Math.sqrt(3.0/4.0);
 
 	@Test
 	public void process_easy() {

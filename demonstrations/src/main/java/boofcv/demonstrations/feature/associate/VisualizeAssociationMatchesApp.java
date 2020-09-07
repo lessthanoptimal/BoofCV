@@ -76,7 +76,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	AssociateControls controls = new AssociateControls();
 
 	// tells the progress monitor how far along it is
-	volatile int progress;
+	int progress;
 
 	public VisualizeAssociationMatchesApp(java.util.List<PathLabel> examples , Class<T> imageType) {
 		super(true,false,examples,ImageType.pl(3,imageType));
@@ -150,9 +150,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 				colorRight.setTo((Planar<T>)input);
 				GConvertImage.average(colorRight,grayRight);
 
-				BoofSwingUtil.invokeNowOrLater((()->{
-					panel.setImages(buffLeft,buffRight);
-				}));
+				BoofSwingUtil.invokeNowOrLater(()-> panel.setImages(buffLeft,buffRight));
 				processImage();
 				break;
 		}
@@ -193,13 +191,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		// the window will pop up
 		progress = 0;
 		new Thread() {
-			public synchronized void run() {
+			@Override
+			public void run() {
 				while (progress < 3) {
 					SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progress));
 					try {
 						wait(100);
-					} catch (InterruptedException e) {
-					}
+					} catch (InterruptedException ignore) {}
 				}
 				progressMonitor.close();
 			}

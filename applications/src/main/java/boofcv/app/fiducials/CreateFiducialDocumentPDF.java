@@ -62,20 +62,20 @@ public abstract class CreateFiducialDocumentPDF {
 	public float UNIT_TO_POINTS;
 	public static final float CM_TO_POINTS = 72.0f/2.54f;
 
-	float pageWidth,pageHeight;
+	float pageWidth, pageHeight;
 
 	protected int totalMarkers;
 
 	// name of each pattern
 	protected java.util.List<String> names;
 
-	public CreateFiducialDocumentPDF(String documentName , PaperSize paper, Unit units ) {
+	protected CreateFiducialDocumentPDF( String documentName, PaperSize paper, Unit units ) {
 		this.paper = paper;
 		this.units = units;
 		this.documentName = documentName;
 
 		// ensure that it has the correct suffix
-		if( !documentName.toLowerCase().endsWith(".pdf")) {
+		if (!documentName.toLowerCase().endsWith(".pdf")) {
 			this.documentName += ".pdf";
 		}
 
@@ -91,34 +91,34 @@ public abstract class CreateFiducialDocumentPDF {
 	}
 
 	public void render() throws IOException {
-		if( markerWidth <= 0 || spaceBetween <= 0)
+		if (markerWidth <= 0 || spaceBetween <= 0)
 			throw new RuntimeException("Must specify the marker's dimensions. Width and spacing");
 
 		float markerHeight = this.markerHeight > 0 ? this.markerHeight : this.markerWidth;
 
-		float sizeBoxX = (markerWidth+spaceBetween)*UNIT_TO_POINTS;
-		float sizeBoxY = (markerHeight+spaceBetween)*UNIT_TO_POINTS;
+		float sizeBoxX = (markerWidth + spaceBetween)*UNIT_TO_POINTS;
+		float sizeBoxY = (markerHeight + spaceBetween)*UNIT_TO_POINTS;
 
 		int numRows = (int)Math.floor(pageHeight/sizeBoxY);
 		int numCols = (int)Math.floor(pageWidth/sizeBoxX);
 
-		if( numRows == 0 || numCols == 0) {
+		if (numRows == 0 || numCols == 0) {
 			throw new IOException("Marker too big to fit on a single page.");
 		}
 
 		// center the marker better if it doesn't fill the entire page
-		if( !gridFill && totalMarkers < numCols*numRows) {
+		if (!gridFill && totalMarkers < numCols*numRows) {
 			int minRows = totalMarkers/numCols;
-			if( totalMarkers%numCols>0)
+			if (totalMarkers%numCols > 0)
 				minRows++;
 
-			numCols = Math.min(totalMarkers,numCols);
-			numRows = Math.min(minRows,numRows);
+			numCols = Math.min(totalMarkers, numCols);
+			numRows = Math.min(minRows, numRows);
 		}
 
 		// offset used to center
-		float centerX = (pageHeight-sizeBoxY*numRows)/2f;
-		float centerY = (pageWidth-sizeBoxX*numCols)/2f;
+		float centerX = (pageHeight - sizeBoxY*numRows)/2f;
+		float centerY = (pageWidth - sizeBoxX*numCols)/2f;
 
 		// see if multiple pages are required
 		int markersPerPage = numRows*numCols;
@@ -130,19 +130,19 @@ public abstract class CreateFiducialDocumentPDF {
 			PDRectangle rectangle = new PDRectangle(pageWidth, pageHeight);
 			PDPage page = new PDPage(rectangle);
 			document.addPage(page);
-			PDPageContentStream pcs = new PDPageContentStream(document , page);
-			PdfFiducialEngine r = new PdfFiducialEngine(document,pcs,
-					markerWidth*UNIT_TO_POINTS,markerHeight*UNIT_TO_POINTS);
+			PDPageContentStream pcs = new PDPageContentStream(document, page);
+			PdfFiducialEngine r = new PdfFiducialEngine(document, pcs,
+					markerWidth*UNIT_TO_POINTS, markerHeight*UNIT_TO_POINTS);
 			configureRenderer(r);
 
-			if( showInfo ) {
-				float offX = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
-				float offY = Math.min(CM_TO_POINTS,spaceBetween*CM_TO_POINTS/2);
+			if (showInfo) {
+				float offX = Math.min(CM_TO_POINTS, spaceBetween*CM_TO_POINTS/2);
+				float offY = Math.min(CM_TO_POINTS, spaceBetween*CM_TO_POINTS/2);
 
 				pcs.beginText();
-				pcs.setFont(PDType1Font.TIMES_ROMAN,7);
-				pcs.newLineAtOffset( offX, offY );
-				pcs.showText(String.format("%sCreated by BoofCV",getMarkerType()));
+				pcs.setFont(PDType1Font.TIMES_ROMAN, 7);
+				pcs.newLineAtOffset(offX, offY);
+				pcs.showText(String.format("%sCreated by BoofCV", getMarkerType()));
 				pcs.endText();
 			}
 
@@ -150,36 +150,36 @@ public abstract class CreateFiducialDocumentPDF {
 				r.offsetY = centerX + row*sizeBoxY + UNIT_TO_POINTS*spaceBetween/2f;
 
 				for (int col = 0; col < numCols; col++, markerIndex++) {
-					if( !gridFill && markerIndex >= totalMarkers )
+					if (!gridFill && markerIndex >= totalMarkers)
 						break;
 					r.offsetX = centerY + col*sizeBoxX + UNIT_TO_POINTS*spaceBetween/2f;
 					render(markerIndex%totalMarkers);
 
-					if( showInfo ) {
+					if (showInfo) {
 						float offset = 12;
 
 						int maxLength = (int)(markerWidth*UNIT_TO_POINTS)/4;
 						String message = names.get(markerIndex%totalMarkers);
-						if( message.length() > maxLength ) {
-							message = message.substring(0,maxLength);
+						if (message.length() > maxLength) {
+							message = message.substring(0, maxLength);
 						}
 
 						pcs.beginText();
 						pcs.setNonStrokingColor(Color.GRAY);
-						pcs.setFont(PDType1Font.TIMES_ROMAN,7);
-						pcs.newLineAtOffset( (float)r.offsetX, (float)r.offsetY-offset);
+						pcs.setFont(PDType1Font.TIMES_ROMAN, 7);
+						pcs.newLineAtOffset((float)r.offsetX, (float)r.offsetY - offset);
 						pcs.showText(message);
 						pcs.endText();
 						pcs.beginText();
-						pcs.newLineAtOffset( (float)r.offsetX, (float)r.offsetY+markerHeight*UNIT_TO_POINTS+offset-7);
+						pcs.newLineAtOffset((float)r.offsetX, (float)r.offsetY + markerHeight*UNIT_TO_POINTS + offset - 7);
 						pcs.showText(createMarkerSizeString());
 						pcs.endText();
 					}
 				}
 			}
 
-			if( drawGrid ) {
-				printGrid(pcs,centerY,centerX,numRows,numCols,sizeBoxX,sizeBoxY);
+			if (drawGrid) {
+				printGrid(pcs, centerY, centerX, numRows, numCols, sizeBoxX, sizeBoxY);
 			}
 
 			pcs.close();
@@ -189,11 +189,10 @@ public abstract class CreateFiducialDocumentPDF {
 	protected abstract String getMarkerType();
 
 	protected String createMarkerSizeString() {
-		if( this.markerHeight <= 0 ) {
-			return String.format("%4.1f %2s",markerWidth,units.getAbbreviation());
+		if (this.markerHeight <= 0) {
+			return String.format("%4.1f %2s", markerWidth, units.getAbbreviation());
 		} else {
-			return String.format("%4.1f x %4.1f %2s",markerWidth,markerHeight,units.getAbbreviation());
-
+			return String.format("%4.1f x %4.1f %2s", markerWidth, markerHeight, units.getAbbreviation());
 		}
 	}
 
@@ -204,8 +203,8 @@ public abstract class CreateFiducialDocumentPDF {
 	/**
 	 * Draws the grid in light grey on the document
 	 */
-	private void printGrid(PDPageContentStream pcs, float offsetX , float offsetY,
-						   int numRows, int numCols , float sizeBoxX, float sizeBoxY ) throws IOException {
+	private void printGrid( PDPageContentStream pcs, float offsetX, float offsetY,
+							int numRows, int numCols, float sizeBoxX, float sizeBoxY ) throws IOException {
 		float pageWidth = (float)paper.convertWidth(units)*UNIT_TO_POINTS;
 		float pageHeight = (float)paper.convertHeight(units)*UNIT_TO_POINTS;
 
@@ -214,13 +213,13 @@ public abstract class CreateFiducialDocumentPDF {
 
 		for (int i = 0; i <= numCols; i++) {
 			float x = offsetX + i*sizeBoxX;
-			pcs.moveTo(x,0);
-			pcs.lineTo(x,pageHeight);
+			pcs.moveTo(x, 0);
+			pcs.lineTo(x, pageHeight);
 		}
 		for (int i = 0; i <= numRows; i++) {
 			float y = offsetY + i*sizeBoxY;
-			pcs.moveTo(0,y);
-			pcs.lineTo(pageWidth,y);
+			pcs.moveTo(0, y);
+			pcs.lineTo(pageWidth, y);
 		}
 		pcs.closeAndStroke();
 	}
@@ -239,7 +238,7 @@ public abstract class CreateFiducialDocumentPDF {
 		document.close();
 	}
 
-	public void setShowInfo(boolean showInfo) {
+	public void setShowInfo( boolean showInfo ) {
 		this.showInfo = showInfo;
 	}
 }

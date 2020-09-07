@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.image;
 
 import boofcv.core.image.GeneralizedImageOps;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 
@@ -108,7 +109,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * @return A sub-image of 'this' image.
 	 */
 	@Override
-	public T subimage(int x0, int y0, int x1, int y1, T subimage) {
+	public T subimage(int x0, int y0, int x1, int y1, @Nullable T subimage) {
 		if (x0 < 0 || y0 < 0)
 			throw new IllegalArgumentException("x0 or y0 is less than zero");
 		if (x1 < x0 || y1 < y0)

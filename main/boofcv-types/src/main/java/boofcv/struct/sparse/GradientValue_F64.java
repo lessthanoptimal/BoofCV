@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.sparse;
 
-
 /**
  * @author Peter Abeles
  */
@@ -28,18 +27,18 @@ public class GradientValue_F64 implements GradientValue {
 	public double y;
 
 	@Override
-	public void set(double dx, double dy) {
-		this.x = dx;
-		this.y = dy;
+	public void set( /**/double dx, /**/double dy ) {
+		this.x = (double) dx;
+		this.y = (double) dy;
 	}
 
 	@Override
-	public double getX() {
+	public /**/double getX() {
 		return x;
 	}
 
 	@Override
-	public double getY() {
+	public /**/double getY() {
 		return y;
 	}
 }

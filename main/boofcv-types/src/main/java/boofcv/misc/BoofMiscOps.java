@@ -29,6 +29,9 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.io.*;
 import java.lang.reflect.Method;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -42,23 +45,37 @@ import java.util.Map;
 @SuppressWarnings("rawtypes")
 public class BoofMiscOps {
 
-	public static float bound( float value , float min , float max ) {
-		if( value <= min )
+	public static String timeStr() {
+		return Instant.now()
+				.atOffset( ZoneOffset.UTC )
+				.format( DateTimeFormatter.ISO_LOCAL_DATE_TIME )
+				.replace( "T" , " " );
+	}
+
+	public static String timeStr( long systemTimeMS ) {
+		return Instant.ofEpochMilli(systemTimeMS)
+				.atOffset( ZoneOffset.UTC )
+				.format( DateTimeFormatter.ISO_LOCAL_DATE_TIME )
+				.replace( "T" , " " );
+	}
+
+	public static float bound( float value, float min, float max ) {
+		if (value <= min)
 			return min;
-		if( value >= max )
+		if (value >= max)
 			return max;
 		return value;
 	}
 
-	public static double bound( double value , double min , double max ) {
-		if( value <= min )
+	public static double bound( double value, double min, double max ) {
+		if (value <= min)
 			return min;
-		if( value >= max )
+		if (value >= max)
 			return max;
 		return value;
 	}
 
-	public static void offsetPixels(final List<Point2D_F64> list , final double dx, final double dy ) {
+	public static void offsetPixels( final List<Point2D_F64> list, final double dx, final double dy ) {
 		for (int i = 0; i < list.size(); i++) {
 			Point2D_F64 p = list.get(i);
 			p.x += dx;
@@ -77,9 +94,9 @@ public class BoofMiscOps {
 	/**
 	 * Copies all of src into dst by appended it onto it
 	 */
-	public static<Point extends GeoTuple<Point>>
-	void copyAll(FastAccess<Point> src, FastQueue<Point> dst ) {
-		dst.growArray(dst.size+src.size);
+	public static <Point extends GeoTuple<Point>>
+	void copyAll( FastAccess<Point> src, FastQueue<Point> dst ) {
+		dst.growArray(dst.size + src.size);
 		for (int i = 0; i < src.size; i++) {
 			dst.grow().setTo(src.get(i));
 		}
@@ -87,14 +104,14 @@ public class BoofMiscOps {
 
 	public static List<File> toFileList( String[] files ) {
 		List<File> output = new ArrayList<>();
-		for( String s : files ) {
-			output.add( new File(s));
+		for (String s : files) {
+			output.add(new File(s));
 		}
 		return output;
 	}
 
 	// Remove when Minimum Java version is 11
-	public static <T>List<T> asList(T ...objects) {
+	public static <T> List<T> asList( T... objects ) {
 		List<T> list = new ArrayList<>();
 		for (int i = 0; i < objects.length; i++) {
 			list.add(objects[i]);
@@ -102,20 +119,20 @@ public class BoofMiscOps {
 		return list;
 	}
 
-	public static List<File> toFileList(List<String> files) {
+	public static List<File> toFileList( List<String> files ) {
 		List<File> output = new ArrayList<>();
-		for( String s : files ) {
-			output.add( new File(s));
+		for (String s : files) {
+			output.add(new File(s));
 		}
 		return output;
 	}
 
-	public static int bitsToWords( int bits , int wordBits ) {
-		return (bits/wordBits) + (bits%wordBits==0?0:1);
+	public static int bitsToWords( int bits, int wordBits ) {
+		return (bits/wordBits) + (bits%wordBits == 0 ? 0 : 1);
 	}
 
 	public static int numBands( ImageBase img ) {
-		if( img instanceof ImageMultiBand ) {
+		if (img instanceof ImageMultiBand) {
 			return ((ImageMultiBand)img).getNumBands();
 		} else {
 			return 1;
@@ -123,30 +140,30 @@ public class BoofMiscOps {
 	}
 
 	public static String milliToHuman( long milliseconds ) {
-		long second = (milliseconds / 1000) % 60;
-		long minute = (milliseconds / (1000 * 60)) % 60;
-		long hour = (milliseconds / (1000 * 60 * 60)) % 24;
-		long days = milliseconds / (1000 * 60 * 60 * 24);
+		long second = (milliseconds/1000)%60;
+		long minute = (milliseconds/(1000*60))%60;
+		long hour = (milliseconds/(1000*60*60))%24;
+		long days = milliseconds/(1000*60*60*24);
 
 		return String.format("%03d:%02d:%02d:%02d (days:hrs:min:sec)", days, hour, minute, second);
 	}
 
-	public static double diffRatio(double a , double b ) {
-		return Math.abs(a-b)/Math.max(a,b);
+	public static double diffRatio( double a, double b ) {
+		return Math.abs(a - b)/Math.max(a, b);
 	}
 
 	/**
 	 * Returns the number of digits in a number. E.g. 345 = 3, -345 = 4, 0 = 1
 	 */
-	public static int numDigits(int number) {
-		if( number == 0 )
+	public static int numDigits( int number ) {
+		if (number == 0)
 			return 1;
 		int adjustment = 0;
-		if( number < 0 ) {
+		if (number < 0) {
 			adjustment = 1;
 			number = -number;
 		}
-		return adjustment + (int)Math.log10(number)+1;
+		return adjustment + (int)Math.log10(number) + 1;
 	}
 
 	public static double pow2( double v ) {
@@ -157,20 +174,20 @@ public class BoofMiscOps {
 		return v*v;
 	}
 
-	public static void sortFileNames(List<String> images ) {
+	public static void sortFileNames( List<String> images ) {
 		images.sort(new CompareStringNames());
 	}
 
-	public static void sortFilesByName(List<File> images ) {
+	public static void sortFilesByName( List<File> images ) {
 		images.sort(Comparator.comparing(File::getName));
 	}
 
-	public static void printMethodInfo(Method target, PrintStream out) {
+	public static void printMethodInfo( Method target, PrintStream out ) {
 		Class[] types = target.getParameterTypes();
-		out.println("Method: "+target.getName()+" param.length = "+types.length);
+		out.println("Method: " + target.getName() + " param.length = " + types.length);
 		out.print("    { ");
 		for (int i = 0; i < types.length; i++) {
-			out.print(types[i].getSimpleName()+" ");
+			out.print(types[i].getSimpleName() + " ");
 		}
 		out.println("}");
 	}
@@ -178,10 +195,10 @@ public class BoofMiscOps {
 	private static class CompareStringNames implements Comparator<String> {
 
 		@Override
-		public int compare(String a, String b) {
-			if( a.length() < b.length() ) {
+		public int compare( String a, String b ) {
+			if (a.length() < b.length()) {
 				return -1;
-			} else if( a.length() > b.length() ) {
+			} else if (a.length() > b.length()) {
 				return 1;
 			} else {
 				return a.compareTo(b);
@@ -194,9 +211,9 @@ public class BoofMiscOps {
 
 		StringBuilder string = new StringBuilder();
 		try {
-			while(true) {
+			while (true) {
 				int size = r.read(buff);
-				if( size < 0 )
+				if (size < 0)
 					break;
 				string.append(buff, 0, size);
 			}
@@ -206,68 +223,66 @@ public class BoofMiscOps {
 		}
 	}
 
-	public static int countNotZero(int[] a, int size ) {
+	public static int countNotZero( int[] a, int size ) {
 		int ret = 0;
-		for( int i = 0; i < size; i++ ) {
-			if( a[i] != 0 )
+		for (int i = 0; i < size; i++) {
+			if (a[i] != 0)
 				ret++;
 		}
 		return ret;
 	}
 
-	public static double[] convertTo_F64(int[] a) {
-		double[] ret = new double[ a.length ];
-		for( int i = 0; i < a.length; i++ ) {
+	public static double[] convertTo_F64( int[] a ) {
+		double[] ret = new double[a.length];
+		for (int i = 0; i < a.length; i++) {
 			ret[i] = a[i];
 		}
 		return ret;
 	}
 
-	public static float[] convertTo_F32(double[] a, float[] ret) {
-		if( ret == null )
-			ret = new float[ a.length ];
-		for( int i = 0; i < a.length; i++ ) {
+	public static float[] convertTo_F32( double[] a, float[] ret ) {
+		if (ret == null)
+			ret = new float[a.length];
+		for (int i = 0; i < a.length; i++) {
 			ret[i] = (float)a[i];
 		}
 		return ret;
 	}
 
-	public static int[] convertTo_I32(double[] a, int[] ret) {
-		if( ret == null )
-			ret = new int[ a.length ];
-		for( int i = 0; i < a.length; i++ ) {
+	public static int[] convertTo_I32( double[] a, int[] ret ) {
+		if (ret == null)
+			ret = new int[a.length];
+		for (int i = 0; i < a.length; i++) {
 			ret[i] = (int)a[i];
 		}
 		return ret;
 	}
 
-
 	/**
-	 * Bounds the provided rectangle to be inside the image.  
+	 * Bounds the provided rectangle to be inside the image.
 	 *
 	 * @param b An image.
 	 * @param r Rectangle
 	 */
-	public static void boundRectangleInside( ImageBase b , ImageRectangle r )
-	{
-		if( r.x0 < 0 )
+	public static void boundRectangleInside( ImageBase b, ImageRectangle r ) {
+		if (r.x0 < 0)
 			r.x0 = 0;
-		if( r.x1 > b.width )
+		if (r.x1 > b.width)
 			r.x1 = b.width;
 
-		if( r.y0 < 0 )
+		if (r.y0 < 0)
 			r.y0 = 0;
-		if( r.y1 > b.height )
+		if (r.y1 > b.height)
 			r.y1 = b.height;
 	}
 
-	public static boolean isInside(ImageBase b, ImageRectangle r) {
-		if( r.x0 < 0 )
+	public static boolean isInside( ImageBase b, ImageRectangle r ) {
+		if (r.x0 < 0)
 			return false;
-		if( r.x1 > b.width )
+		if (r.x1 > b.width)
 			return false;
 
-		if( r.y0 < 0 )
+		if (r.y0 < 0)
 			return false;
 		return r.y1 <= b.height;
 	}
@@ -281,13 +296,13 @@ public class BoofMiscOps {
 	 * @param radius How many pixels away from the border it needs to be to be considered inside
 	 * @return true if the point is inside and false if it is outside
 	 */
-	public static boolean isInside(ImageBase b, int x , int y , int radius ) {
-		if( x-radius < 0 )
+	public static boolean isInside( ImageBase b, int x, int y, int radius ) {
+		if (x - radius < 0)
 			return false;
-		if( x+radius >= b.width )
+		if (x + radius >= b.width)
 			return false;
 
-		if( y-radius < 0 )
+		if (y - radius < 0)
 			return false;
 		return y + radius < b.height;
 	}
@@ -301,13 +316,13 @@ public class BoofMiscOps {
 	 * @param radius How many pixels away from the border it needs to be to be considered inside
 	 * @return true if the point is inside and false if it is outside
 	 */
-	public static boolean isInside(ImageBase b, float x , float y , float radius ) {
-		if( x-radius < 0 )
+	public static boolean isInside( ImageBase b, float x, float y, float radius ) {
+		if (x - radius < 0)
 			return false;
-		if( x+radius > b.width-1 )
+		if (x + radius > b.width - 1)
 			return false;
 
-		if( y-radius < 0 )
+		if (y - radius < 0)
 			return false;
 		return !(y + radius > b.height - 1);
 	}
@@ -321,79 +336,80 @@ public class BoofMiscOps {
 	 * @param radius How many pixels away from the border it needs to be to be considered inside
 	 * @return true if the point is inside and false if it is outside
 	 */
-	public static boolean isInside(ImageBase b, double x , double y , double radius ) {
-		if( x-radius < 0 )
+	public static boolean isInside( ImageBase b, double x, double y, double radius ) {
+		if (x - radius < 0)
 			return false;
-		if( x+radius > b.width-1 )
+		if (x + radius > b.width - 1)
 			return false;
 
-		if( y-radius < 0 )
+		if (y - radius < 0)
 			return false;
 		return !(y + radius > b.height - 1);
 	}
 
-	public static boolean isInside(ImageBase b, int x , int y , int radiusWidth , int radiusHeight ) {
-		if( x-radiusWidth < 0 )
+	public static boolean isInside( ImageBase b, int x, int y, int radiusWidth, int radiusHeight ) {
+		if (x - radiusWidth < 0)
 			return false;
-		if( x+radiusWidth >= b.width )
+		if (x + radiusWidth >= b.width)
 			return false;
 
-		if( y-radiusHeight < 0 )
+		if (y - radiusHeight < 0)
 			return false;
 		return y + radiusHeight < b.height;
 	}
 
-	public static boolean isInside(ImageBase b, int c_x , int c_y , int radius , double theta ) {
+	public static boolean isInside( ImageBase b, int c_x, int c_y, int radius, double theta ) {
 		int r = radius;
 		float c = (float)Math.cos(theta);
 		float s = (float)Math.sin(theta);
 
 		// make sure the region is inside the image
-		if( !checkInBounds(b,c_x,c_y,-r,-r,c,s))
+		if (!checkInBounds(b, c_x, c_y, -r, -r, c, s))
 			return false;
-		else if( !checkInBounds(b,c_x,c_y,-r,r,c,s))
+		else if (!checkInBounds(b, c_x, c_y, -r, r, c, s))
 			return false;
-		else if( !checkInBounds(b,c_x,c_y,r,r,c,s))
+		else if (!checkInBounds(b, c_x, c_y, r, r, c, s))
 			return false;
 		else return checkInBounds(b, c_x, c_y, r, -r, c, s);
 	}
 
-	private static boolean checkInBounds( ImageBase b , int c_x , int c_y , int dx , int dy , float c , float s )
-	{
+	private static boolean checkInBounds( ImageBase b, int c_x, int c_y, int dx, int dy, float c, float s ) {
 		float x = c_x + c*dx - s*dy;
 		float y = c_y + s*dx + c*dy;
 
-		return b.isInBounds((int) x, (int) y);
+		return b.isInBounds((int)x, (int)y);
 	}
 
-	public static boolean isInside(ImageBase b , float x , float y ) {
+	public static boolean isInside( ImageBase b, float x, float y ) {
 		return x >= 0 && x < b.width && y >= 0 && y < b.height;
 	}
 
-	public static boolean isInside(ImageBase b , double x , double y ) {
+	public static boolean isInside( ImageBase b, double x, double y ) {
 		return x >= 0 && x < b.width && y >= 0 && y < b.height;
 	}
 
-	public static boolean isInside(int width , int height , float x , float y ) {
+	public static boolean isInside( int width, int height, float x, float y ) {
 		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
-	public static boolean isInside(int width , int height , double x , double y ) {
+	public static boolean isInside( int width, int height, double x, double y ) {
 		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
 	/**
 	 * Invokes wait until the elapsed time has passed.  In the thread is interrupted, the interrupt is ignored.
+	 *
 	 * @param milli Length of desired pause in milliseconds.
 	 */
-	public static void pause(long milli) {
+	@SuppressWarnings({"EmptyCatch"})
+	public static void pause( long milli ) {
 		final Thread t = Thread.currentThread();
 		long start = System.currentTimeMillis();
-		while( System.currentTimeMillis() - start < milli ) {
-			synchronized( t )  {
+		while (System.currentTimeMillis() - start < milli) {
+			synchronized (t) {
 				try {
 					long target = milli - (System.currentTimeMillis() - start);
-					if( target > 0 )
+					if (target > 0)
 						t.wait(target);
 				} catch (InterruptedException ignore) {
 				}
@@ -401,18 +417,18 @@ public class BoofMiscOps {
 		}
 	}
 
-	public static void print(ImageGray a) {
+	public static void print( ImageGray a ) {
 
-		if( a.getDataType().isInteger() ) {
+		if (a.getDataType().isInteger()) {
 			print((GrayI)a);
-		} else if( a instanceof GrayF32) {
+		} else if (a instanceof GrayF32) {
 			print((GrayF32)a);
 		} else {
 			print((GrayF64)a);
 		}
 	}
 
-	public static void print(GrayF64 a) {
+	public static void print( GrayF64 a ) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
 				System.out.printf("%6.2f ", a.get(x, y));
@@ -422,7 +438,7 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static void print(GrayF32 a) {
+	public static void print( GrayF32 a ) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
 				System.out.printf("%6.2f ", a.get(x, y));
@@ -432,22 +448,21 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static void print(InterleavedF32 a) {
+	public static void print( InterleavedF32 a ) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
 				System.out.print("|");
-				for( int band = 0; band < a.numBands; band++ ) {
-					System.out.printf(" %6.2f", a.getBand(x, y,band));
+				for (int band = 0; band < a.numBands; band++) {
+					System.out.printf(" %6.2f", a.getBand(x, y, band));
 				}
 				System.out.print(" |");
-
 			}
 			System.out.println();
 		}
 		System.out.println();
 	}
 
-	public static void print(GrayI a) {
+	public static void print( GrayI a ) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
 				System.out.printf("%4d ", a.get(x, y));
@@ -457,8 +472,8 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static int[] convertArray(double[] input, int[] output) {
-		if( output == null )
+	public static int[] convertArray( double[] input, int[] output ) {
+		if (output == null)
 			output = new int[input.length];
 
 		for (int i = 0; i < input.length; i++) {
@@ -468,8 +483,8 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static long[] convertArray(double[] input, long[] output) {
-		if( output == null )
+	public static long[] convertArray( double[] input, long[] output ) {
+		if (output == null)
 			output = new long[input.length];
 
 		for (int i = 0; i < input.length; i++) {
@@ -479,8 +494,8 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray(double[] input, float[] output) {
-		if( output == null )
+	public static float[] convertArray( double[] input, float[] output ) {
+		if (output == null)
 			output = new float[input.length];
 
 		for (int i = 0; i < input.length; i++) {
@@ -490,8 +505,8 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static double[] convertArray(float[] input, double[] output) {
-		if( output == null )
+	public static double[] convertArray( float[] input, double[] output ) {
+		if (output == null)
 			output = new double[input.length];
 
 		for (int i = 0; i < input.length; i++) {
@@ -501,8 +516,8 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static int[] convertArray(float[] input, int[] output) {
-		if( output == null )
+	public static int[] convertArray( float[] input, int[] output ) {
+		if (output == null)
 			output = new int[input.length];
 
 		for (int i = 0; i < input.length; i++) {
@@ -512,8 +527,8 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray(int[] input, float[] output) {
-		if( output == null )
+	public static float[] convertArray( int[] input, float[] output ) {
+		if (output == null)
 			output = new float[input.length];
 
 		for (int i = 0; i < input.length; i++) {
@@ -532,54 +547,54 @@ public class BoofMiscOps {
 	}
 
 	public static void assertBoof( boolean result ) {
-		assertBoof(result,"Assert failed.");
+		assertBoof(result, "Assert failed.");
 	}
 
-	public static void assertBoof( boolean result , String message ) {
-		if( !result )
+	public static void assertBoof( boolean result, String message ) {
+		if (!result)
 			throw new BoofAssertFailure(message);
 	}
 
-	public static void assertEq( int valA, int valB) {
-		assertEq(valA, valB,"not equals");
+	public static void assertEq( int valA, int valB ) {
+		assertEq(valA, valB, "not equals");
 	}
 
 	public static void assertEq( int valA, int valB, String message ) {
-		if( valA != valB )
-			throw new BoofAssertFailure(valA+" != "+valB+" "+message);
+		if (valA != valB)
+			throw new BoofAssertFailure(valA + " != " + valB + " " + message);
 	}
 
-	public static <T> void forIdx( List<T> list, BoofLambdas.ProcessIndex<T> func )
-	{
+	public static <T> void forIdx( List<T> list, BoofLambdas.ProcessIndex<T> func ) {
 		for (int i = 0; i < list.size(); i++) {
-			func.process(i,list.get(i));
+			func.process(i, list.get(i));
 		}
 	}
 
 	/**
 	 * Extracts elements from a list and returns a list
 	 */
-	public static <In,Out> List<Out> collectList( List<In> list , BoofLambdas.Extract<In,Out> func ) {
+	public static <In, Out> List<Out> collectList( List<In> list, BoofLambdas.Extract<In, Out> func ) {
 		List<Out> out = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
 			In input = list.get(i);
-			out.add( func.process(input) );
+			out.add(func.process(input));
 		}
 		return out;
 	}
 
 	/**
 	 * Finds the row at the specified column with the maximum absolute value
+	 *
 	 * @param A (input) matrix
 	 * @param column column to inspect
 	 * @return The row index
 	 */
-	public static int columnMaxAbsRow(DMatrixRMaj A , int column ) {
+	public static int columnMaxAbsRow( DMatrixRMaj A, int column ) {
 		int selected = -1;
 		double largestValue = -1;
 		for (int row = 0; row < A.numRows; row++) {
-			double v = Math.abs(A.unsafe_get(row,column));
-			if( v > largestValue ) {
+			double v = Math.abs(A.unsafe_get(row, column));
+			if (v > largestValue) {
 				largestValue = v;
 				selected = row;
 			}
@@ -587,7 +602,7 @@ public class BoofMiscOps {
 		return selected;
 	}
 
-	public static <T>List<T> createListFilled(int total , BoofLambdas.Factory<T> factory ) {
+	public static <T> List<T> createListFilled( int total, BoofLambdas.Factory<T> factory ) {
 		List<T> out = new ArrayList<>();
 		for (int i = 0; i < total; i++) {
 			out.add(factory.newInstance());
@@ -595,10 +610,10 @@ public class BoofMiscOps {
 		return out;
 	}
 
-	public static <V>V getOrThrow(Map map, Object key) {
+	public static <V> V getOrThrow( Map map, Object key ) {
 		V value = (V)map.get(key);
-		if( value == null )
-			throw new IllegalArgumentException("Key not found in map. key="+key);
+		if (value == null)
+			throw new IllegalArgumentException("Key not found in map. key=" + key);
 		return value;
 	}
 }

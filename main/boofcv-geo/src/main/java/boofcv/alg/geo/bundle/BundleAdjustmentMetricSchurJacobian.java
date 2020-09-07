@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur;
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.jacobians.JacobianSo3;
 import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues;
@@ -169,7 +170,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 	private int computeGeneralPoints(DMatrix leftPoint, DMatrix rightView,
 									 double[] input, int observationIndex, int viewIndex,
-									 SceneStructureMetric.View view, SceneStructureMetric.Camera camera,
+									 SceneStructureMetric.View view, SceneStructureCommon.Camera camera,
 									 int cameraParamStartIndex) {
 		SceneObservations.View obsView = observations.views.get(viewIndex);
 
@@ -251,7 +252,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		// first decode the transformation
 		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
 			SceneStructureMetric.View view = structure.views.data[viewIndex];
-			SceneStructureMetric.Camera camera = structure.cameras.data[view.camera];
+			SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
 
 			if( !view.known ) {
 				int paramIndex = viewParameterIndexes[viewIndex]+indexFirstView;
@@ -280,7 +281,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	private int computeRigidPoints(DMatrix leftPoint, DMatrix rightView,
 								   int observationIndex, int viewIndex,
 								   SceneStructureMetric.View view,
-								   SceneStructureMetric.Camera camera,
+								   SceneStructureCommon.Camera camera,
 								   int cameraParamStartIndex)
 	{
 		SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);

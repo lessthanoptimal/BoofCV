@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public abstract class StandardScoreAssociationChecks<T> {
 
 	MatchScoreType expectedType;
 
-	public StandardScoreAssociationChecks(MatchScoreType expectedType) {
+	protected StandardScoreAssociationChecks( MatchScoreType expectedType ) {
 		this.expectedType = expectedType;
 	}
 
@@ -54,7 +54,6 @@ public abstract class StandardScoreAssociationChecks<T> {
 	 */
 	public abstract T createDescription();
 
-
 	@Test
 	public void empiricalCheckOnType() {
 		ScoreAssociation<T> alg = createScore();
@@ -62,12 +61,12 @@ public abstract class StandardScoreAssociationChecks<T> {
 		T descA = createDescription();
 		T descB = createDescription();
 
-		double scorePerfect = alg.score(descA,descA);
-		double scoreNoise = alg.score(descA,descB);
+		double scorePerfect = alg.score(descA, descA);
+		double scoreNoise = alg.score(descA, descB);
 
 		assertTrue(scorePerfect < scoreNoise);
 
-		if( alg.getScoreType().isZeroBest() ) {
+		if (alg.getScoreType().isZeroBest()) {
 			assertTrue(scorePerfect == 0);
 		} else {
 			assertTrue(scorePerfect != 0);

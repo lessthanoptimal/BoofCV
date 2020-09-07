@@ -51,7 +51,7 @@ public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleD
 	 *
 	 * @param describers A descriptor for each band in the image.
 	 */
-	public DescribePlanar(DescribeRegionPoint<T, Desc> describers[]) {
+	protected DescribePlanar(DescribeRegionPoint<T, Desc> describers[]) {
 		this.describers = describers;
 
 		descType = describers[0].getDescriptionType();

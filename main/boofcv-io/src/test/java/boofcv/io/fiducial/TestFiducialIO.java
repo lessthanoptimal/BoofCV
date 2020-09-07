@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.List;
 import java.util.Random;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -53,7 +54,7 @@ class TestFiducialIO {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		FiducialIO.saveRandomDotYaml(expected,new OutputStreamWriter(stream));
 
-		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()));
+		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()),UTF_8);
 		RandomDotDefinition found = FiducialIO.loadRandomDotYaml(reader);
 
 		assertEquals(expected.randomSeed, found.randomSeed);

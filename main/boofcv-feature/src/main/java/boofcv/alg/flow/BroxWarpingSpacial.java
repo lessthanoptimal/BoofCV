@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -142,6 +142,7 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	 * @param image1 Pyramid of first image
 	 * @param image2 Pyramid of second image
 	 */
+	@Override
 	public void process(ImagePyramid<GrayF32> image1 , ImagePyramid<GrayF32> image2 )
 	{
 		// Process the pyramid from low resolution to high resolution

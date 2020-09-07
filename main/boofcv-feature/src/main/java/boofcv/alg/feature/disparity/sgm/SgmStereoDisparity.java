@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends Image
 	// Storage for found disparity
 	protected GrayU8 disparity = new GrayU8(1,1);
 
-	public SgmStereoDisparity(SgmDisparityCost<C> sgmCost, SgmDisparitySelector selector) {
+	protected SgmStereoDisparity(SgmDisparityCost<C> sgmCost, SgmDisparitySelector selector) {
 		this.sgmCost = sgmCost;
 		this.selector = selector;
 	}

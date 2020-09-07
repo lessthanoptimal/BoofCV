@@ -37,8 +37,8 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	ImageGradient<I, GrayF32> gradient;
 
 	// gradient of each pixel
-	protected GrayF32 derivX = new GrayF32(1,1);
-	protected GrayF32 derivY = new GrayF32(1,1);
+	protected GrayF32 derivX = new GrayF32(1, 1);
+	protected GrayF32 derivY = new GrayF32(1, 1);
 
 	// Storage for descriptors
 	FastQueue<TupleDesc_F64> descriptions;
@@ -64,12 +64,11 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	 * @param cellsPerBlockY Number of cells's wide a block is. x-axis 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
 	 */
-	public BaseDenseHog(int orientationBins , int pixelsPerCell ,
-						int cellsPerBlockX , int cellsPerBlockY,
-						int stepBlock ,
-						ImageType<I> imageType )
-	{
-		if( stepBlock <= 0 )
+	protected BaseDenseHog( int orientationBins, int pixelsPerCell,
+							int cellsPerBlockX, int cellsPerBlockY,
+							int stepBlock,
+							ImageType<I> imageType ) {
+		if (stepBlock <= 0)
 			throw new IllegalArgumentException("stepBlock must be >= 1");
 
 		this.imageType = imageType;
@@ -84,7 +83,7 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 
 		final int descriptorLength = orientationBins*cellsPerBlockX*cellsPerBlockY;
 
-		descriptions = new FastQueue<>(()-> new TupleDesc_F64(descriptorLength));
+		descriptions = new FastQueue<>(() -> new TupleDesc_F64(descriptorLength));
 	}
 
 	/**
@@ -92,22 +91,22 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	 * actualy calulcation is always done using {@link DerivativeType#THREE}
 	 */
 	static <Input extends ImageBase<Input>>
-	ImageGradient<Input,GrayF32> createGradient( ImageType<Input> imageType ) {
-		ImageGradient<Input,GrayF32> gradient;
+	ImageGradient<Input, GrayF32> createGradient( ImageType<Input> imageType ) {
+		ImageGradient<Input, GrayF32> gradient;
 		ImageType<GrayF32> typeF32 = ImageType.SB_F32;
 
-		if( imageType.getDataType() != ImageDataType.F32 )
+		if (imageType.getDataType() != ImageDataType.F32)
 			throw new IllegalArgumentException("Input image type must be F32");
 
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-			gradient = FactoryDerivative.gradient(DerivativeType.THREE,imageType, typeF32);
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR ) {
-			ImageType<Planar<GrayF32>> typePF32 = ImageType.pl(imageType.getNumBands(),GrayF32.class);
-			ImageGradient<Planar<GrayF32>,Planar<GrayF32>> gradientMB =
-					FactoryDerivative.gradient(DerivativeType.THREE,typePF32, typePF32);
+		if (imageType.getFamily() == ImageType.Family.GRAY) {
+			gradient = FactoryDerivative.gradient(DerivativeType.THREE, imageType, typeF32);
+		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
+			ImageType<Planar<GrayF32>> typePF32 = ImageType.pl(imageType.getNumBands(), GrayF32.class);
+			ImageGradient<Planar<GrayF32>, Planar<GrayF32>> gradientMB =
+					FactoryDerivative.gradient(DerivativeType.THREE, typePF32, typePF32);
 			gradient = (ImageGradient)FactoryDerivative.gradientReduce(gradientMB, DerivativeReduceType.MAX_F, GrayF32.class);
 		} else {
-			throw new IllegalArgumentException("Unsupported image type "+imageType);
+			throw new IllegalArgumentException("Unsupported image type " + imageType);
 		}
 
 		return gradient;
@@ -115,14 +114,15 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 
 	/**
 	 * Specifies input image.  Gradient is computed immediately
+	 *
 	 * @param input input image
 	 */
 	public void setInput( I input ) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
+		derivX.reshape(input.width, input.height);
+		derivY.reshape(input.width, input.height);
 
 		// pixel gradient
-		gradient.process(input,derivX,derivY);
+		gradient.process(input, derivX, derivY);
 	}
 
 	public abstract void process();
@@ -151,14 +151,15 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 
 	/**
 	 * Returns the number of pixel's wide the square region is that a descriptor was computed from
+	 *
 	 * @return number of pixels wide
 	 */
 	public int getRegionWidthPixelX() {
-		return pixelsPerCell * cellsPerBlockX;
+		return pixelsPerCell*cellsPerBlockX;
 	}
 
 	public int getRegionWidthPixelY() {
-		return pixelsPerCell * cellsPerBlockY;
+		return pixelsPerCell*cellsPerBlockY;
 	}
 
 	public int getPixelsPerCell() {
@@ -186,6 +187,6 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	}
 
 	public TupleDesc_F64 createDescription() {
-		return new TupleDesc_F64(orientationBins* cellsPerBlockX * cellsPerBlockY);
+		return new TupleDesc_F64(orientationBins*cellsPerBlockX*cellsPerBlockY);
 	}
 }

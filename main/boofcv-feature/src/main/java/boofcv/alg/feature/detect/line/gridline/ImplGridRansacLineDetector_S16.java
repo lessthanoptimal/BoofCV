@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ public class ImplGridRansacLineDetector_S16 extends GridRansacLineDetector<GrayS
 		super(regionSize, maxDetectLines, robustMatcher);
 	}
 
+	@Override
 	protected void detectEdgels(int index0 , int x0 , int y0 ,
 								GrayS16 derivX , GrayS16 derivY ,
 								GrayU8 binaryEdges) {

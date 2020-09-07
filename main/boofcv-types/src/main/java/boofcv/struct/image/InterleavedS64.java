@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,6 +17,8 @@
  */
 
 package boofcv.struct.image;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -61,7 +63,7 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 	 * @param storage If not null then the pixel's value is written here.  If null a new array is created.
 	 * @return The pixel's value.
 	 */
-	public long[] get(int x, int y, long[] storage) {
+	public long[] get(int x, int y, @Nullable long[] storage) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 

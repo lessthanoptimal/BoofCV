@@ -20,6 +20,7 @@ package boofcv.examples.sfm;
 
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.ScaleSceneStructure;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
@@ -60,7 +61,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleBundleAdjustment {
-	public static void main(String[] args) throws IOException {
+	public static void main( String[] args ) throws IOException {
 
 		// Because the Bundle Adjustment in the Large data set is popular, a file reader and writer is included
 		// with BoofCV.  BoofCV uses two data types to describe the parameters in a bundle adjustment problem
@@ -73,8 +74,8 @@ public class ExampleBundleAdjustment {
 		parser.parse(new File(UtilIO.pathExample("sfm/problem-16-22106-pre.txt")));
 
 		// Print information which gives you an idea of the problem's scale
-		System.out.println("Optimizing "+parser.scene.getParameterCount()+
-				" parameters with "+parser.observations.getObservationCount()+" observations\n\n");
+		System.out.println("Optimizing " + parser.scene.getParameterCount() +
+				" parameters with " + parser.observations.getObservationCount() + " observations\n\n");
 
 		// Configure the sparse Levenberg-Marquardt solver
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
@@ -91,7 +92,7 @@ public class ExampleBundleAdjustment {
 		// Create and configure the bundle adjustment solver
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		// prints out useful debugging information that lets you know how well it's converging
-		bundleAdjustment.setVerbose(System.out,null);
+		bundleAdjustment.setVerbose(System.out, null);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-6, 1e-6, 50);
 
@@ -104,14 +105,14 @@ public class ExampleBundleAdjustment {
 		// Runs the solver. This will take a few minutes. 7 iterations takes about 3 minutes on my computer
 		long startTime = System.currentTimeMillis();
 		double errorBefore = bundleAdjustment.getFitScore();
-		if( !bundleAdjustment.optimize(parser.scene) ) {
+		if (!bundleAdjustment.optimize(parser.scene)) {
 			throw new RuntimeException("Bundle adjustment failed?!?");
 		}
 
 		// Print out how much it improved the model
 		System.out.println();
-		System.out.printf("Error reduced by %.1f%%\n",(100.0*(errorBefore/bundleAdjustment.getFitScore()-1.0)));
-		System.out.println(BoofMiscOps.milliToHuman(System.currentTimeMillis()-startTime));
+		System.out.printf("Error reduced by %.1f%%\n", (100.0*(errorBefore/bundleAdjustment.getFitScore() - 1.0)));
+		System.out.println(BoofMiscOps.milliToHuman(System.currentTimeMillis() - startTime));
 
 		// Return parameters to their original scaling. Can probably skip this step.
 		bundleScale.undoScale(parser.scene, parser.observations);
@@ -120,22 +121,22 @@ public class ExampleBundleAdjustment {
 		visualizeInPointCloud(parser.scene);
 	}
 
-	private static void visualizeInPointCloud(SceneStructureMetric structure ) {
+	private static void visualizeInPointCloud( SceneStructureMetric structure ) {
 
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
 		Point3D_F64 world = new Point3D_F64();
 		Point3D_F64 camera = new Point3D_F64();
 
-		for( int i = 0; i < structure.points.size; i++ ) {
+		for (int i = 0; i < structure.points.size; i++) {
 			// Get 3D location
-			SceneStructureMetric.Point p = structure.points.get(i);
+			SceneStructureCommon.Point p = structure.points.get(i);
 			p.get(world);
 
 			// Project point into an arbitrary view
 			for (int j = 0; j < p.views.size; j++) {
-				int viewIdx  = p.views.get(j);
-				SePointOps_F64.transform(structure.views.data[viewIdx].worldToView,world,camera);
-				cloudXyz.add( world.copy() );
+				int viewIdx = p.views.get(j);
+				SePointOps_F64.transform(structure.views.data[viewIdx].worldToView, world, camera);
+				cloudXyz.add(world.copy());
 				break;
 			}
 		}
@@ -152,13 +153,12 @@ public class ExampleBundleAdjustment {
 		// Give it a good initial pose. This was determined through trial and error
 		Se3_F64 cameraToWorld = new Se3_F64();
 		cameraToWorld.T.set(-10.848385, -6.957626, 2.9747992);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,-2.734419,-0.27446,-0.24310,cameraToWorld.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -2.734419, -0.27446, -0.24310, cameraToWorld.R);
 		viewer.setCameraToWorld(cameraToWorld);
 
-		SwingUtilities.invokeLater(()->{
-			viewer.getComponent().setPreferredSize(new Dimension(600,600));
+		SwingUtilities.invokeLater(() -> {
+			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
 			ShowImages.showWindow(viewer.getComponent(), "Refined Scene", true);
 		});
-
 	}
 }

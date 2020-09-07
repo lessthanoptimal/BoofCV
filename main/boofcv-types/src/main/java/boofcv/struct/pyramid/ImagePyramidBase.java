@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ import boofcv.struct.image.ImageType;
  */
 @SuppressWarnings({"unchecked"})
 public abstract class ImagePyramidBase<T extends ImageBase<T>>
-	implements ImagePyramid<T>
-{
+		implements ImagePyramid<T> {
 	// shape of full resolution input image
 	protected int bottomWidth;
 	protected int bottomHeight;
@@ -58,7 +57,7 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	 * @param imageType Type of image which is processed
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
 	 */
-	public ImagePyramidBase( ImageType<T> imageType , boolean saveOriginalReference ) {
+	protected ImagePyramidBase( ImageType<T> imageType, boolean saveOriginalReference ) {
 		this.imageType = imageType;
 		this.saveOriginalReference = saveOriginalReference;
 	}
@@ -67,10 +66,10 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 		this.imageType = orig.imageType;
 		this.saveOriginalReference = orig.saveOriginalReference;
 
-		if( orig.layers != null ) {
+		if (orig.layers != null) {
 			layers = imageType.createArray(orig.layers.length);
 			for (int i = 0; i < layers.length; i++) {
-				if( orig.layers[i] != null ) {
+				if (orig.layers[i] != null) {
 					this.layers[i] = orig.layers[i].createSameShape();
 				}
 			}
@@ -80,13 +79,14 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	/**
 	 * Initializes internal data structures based on the input image's size.  Should be called each time a new image
 	 * is processed.
+	 *
 	 * @param width Image width
 	 * @param height Image height
 	 */
 	@Override
-	public void initialize(int width, int height) {
+	public void initialize( int width, int height ) {
 		// see if it has already been initialized
-		if( bottomWidth == width && bottomHeight == height )
+		if (bottomWidth == width && bottomHeight == height)
 			return;
 
 		this.bottomWidth = width;
@@ -99,12 +99,12 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 				layers[0] = imageType.createImage(bottomWidth, bottomHeight);
 			}
 		} else {
-			layers[0] = imageType.createImage((int)Math.ceil(bottomWidth / scaleFactor), (int)Math.ceil(bottomHeight / scaleFactor));
+			layers[0] = imageType.createImage((int)Math.ceil(bottomWidth/scaleFactor), (int)Math.ceil(bottomHeight/scaleFactor));
 		}
 
 		for (int i = 1; i < layers.length; i++) {
 			scaleFactor = getScale(i);
-			layers[i] = imageType.createImage((int)Math.ceil(bottomWidth / scaleFactor), (int)Math.ceil(bottomHeight / scaleFactor));
+			layers[i] = imageType.createImage((int)Math.ceil(bottomWidth/scaleFactor), (int)Math.ceil(bottomHeight/scaleFactor));
 		}
 	}
 
@@ -117,33 +117,33 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	 * Used to internally check that the provided scales are valid.
 	 */
 	protected void checkScales() {
-		if( getScale(0) < 0 ) {
+		if (getScale(0) < 0) {
 			throw new IllegalArgumentException("The first layer must be more than zero.");
 		}
 
 		double prevScale = 0;
-		for( int i = 0; i < getNumLayers(); i++ ) {
+		for (int i = 0; i < getNumLayers(); i++) {
 			double s = getScale(i);
-			if( s < prevScale )
+			if (s < prevScale)
 				throw new IllegalArgumentException("Higher layers must be the same size or larger than previous layers.");
 			prevScale = s;
 		}
 	}
 
 	@Override
-	public void setTo(ImagePyramid<T> input) {
-		for( int i = 0; i < layers.length; i++ ) {
+	public void setTo( ImagePyramid<T> input ) {
+		for (int i = 0; i < layers.length; i++) {
 			getLayer(i).setTo(input.getLayer(i));
 		}
 	}
 
 	@Override
-	public T getLayer(int layerNum) {
+	public T getLayer( int layerNum ) {
 		return layers[layerNum];
 	}
 
-	public void setFirstLayer(T image) {
-		if( saveOriginalReference ) {
+	public void setFirstLayer( T image ) {
+		if (saveOriginalReference) {
 			layers[0] = image;
 		} else {
 			throw new IllegalArgumentException("Attempting to set the first layer when saveOriginalReference is false");
@@ -151,12 +151,12 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	}
 
 	@Override
-	public int getWidth(int layer) {
+	public int getWidth( int layer ) {
 		return layers[layer].width;
 	}
 
 	@Override
-	public int getHeight(int layer) {
+	public int getHeight( int layer ) {
 		return layers[layer].height;
 	}
 

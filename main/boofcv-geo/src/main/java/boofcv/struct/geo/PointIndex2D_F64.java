@@ -70,6 +70,7 @@ public class PointIndex2D_F64 extends Point2D_F64 {
 		this.index = index;
 	}
 
+	@Override
 	public PointIndex2D_F64 copy() {
 		return new PointIndex2D_F64(x,y,index);
 	}

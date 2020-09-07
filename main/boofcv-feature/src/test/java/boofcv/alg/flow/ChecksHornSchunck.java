@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,7 +177,7 @@ public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageG
 					}
 				}
 
-				total *= 0.25;
+				total *= 0.25f;
 				ret.set(x,y,total);
 			}
 		}

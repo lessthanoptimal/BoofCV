@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,7 +108,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		String docName = name.equals("convolve") ? "" : " "+name;
 
 		String suffice = singleBand ? "SB" : "IL";
-		String suffice2 = singleBand ? "" : "B";
+//		String suffice2 = singleBand ? "" : "B";
 
 		String kernelTypeName = "Kernel"+dimen+"_"+kernelType;
 

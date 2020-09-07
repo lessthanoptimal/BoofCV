@@ -29,19 +29,17 @@ import org.jetbrains.annotations.Nullable;
 /**
  * <p>Implementation of {@link BackgroundAlgorithmGmm} for stationary images.</p>
  *
- * @see BackgroundModelStationary
- *
  * @author Peter Abeles
+ * @see BackgroundModelStationary
  */
-public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
-		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGmm
-{
+public abstract class BackgroundStationaryGmm<T extends ImageBase<T>>
+		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGmm {
 	BackgroundGmmCommon common;
 
-	public BackgroundStationaryGmm(float learningPeriod, float decayCoef,
-								   int maxGaussians, ImageType<T> imageType) {
+	protected BackgroundStationaryGmm( float learningPeriod, float decayCoef,
+									   int maxGaussians, ImageType<T> imageType ) {
 		super(imageType);
-		common = new BackgroundGmmCommon(learningPeriod,decayCoef,maxGaussians,imageType);
+		common = new BackgroundGmmCommon(learningPeriod, decayCoef, maxGaussians, imageType);
 	}
 
 	@Override
@@ -52,18 +50,17 @@ public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
 
 	@Override
 	public void updateBackground( T frame ) {
-		updateBackground(frame,null);
+		updateBackground(frame, null);
 	}
 
 	/**
-	 *
 	 * @param mask If null then the background mask is ignored
 	 */
 	@Override
-	public void updateBackground( T frame , @Nullable GrayU8 mask ) {
+	public void updateBackground( T frame, @Nullable GrayU8 mask ) {
 
 		// if the image size has changed it's safe to assume it needs to be re-initialized
-		if( common.imageWidth != frame.width || common.imageHeight != frame.height ) {
+		if (common.imageWidth != frame.width || common.imageHeight != frame.height) {
 			common.imageWidth = frame.width;
 			common.imageHeight = frame.height;
 
@@ -71,8 +68,8 @@ public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
 			common.model.zero();
 		}
 
-		if( mask != null ) {
-			mask.reshape(frame.width,frame.height);
+		if (mask != null) {
+			mask.reshape(frame.width, frame.height);
 		}
 	}
 
@@ -82,22 +79,22 @@ public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
 	}
 
 	@Override
-	public void setInitialVariance(float initialVariance) {
+	public void setInitialVariance( float initialVariance ) {
 		common.initialVariance = initialVariance;
 	}
 
 	@Override
 	public float getLearningPeriod() {
-		return 1.0f / common.learningRate;
+		return 1.0f/common.learningRate;
 	}
 
 	@Override
-	public void setLearningPeriod(float period) {
-		common.learningRate = 1.0f / period;
+	public void setLearningPeriod( float period ) {
+		common.learningRate = 1.0f/period;
 	}
 
 	@Override
-	public void setSignificantWeight(float value) {
+	public void setSignificantWeight( float value ) {
 		common.significantWeight = value;
 	}
 
@@ -105,7 +102,7 @@ public abstract class BackgroundStationaryGmm< T extends ImageBase<T>>
 		return common.maxDistance;
 	}
 
-	public void setMaxDistance(float maxDistance) {
+	public void setMaxDistance( float maxDistance ) {
 		common.maxDistance = maxDistance;
 	}
 }

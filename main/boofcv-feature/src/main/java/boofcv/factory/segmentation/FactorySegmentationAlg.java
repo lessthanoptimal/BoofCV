@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"MissingCasesInEnumSwitch"})
 public class FactorySegmentationAlg {
 
 	/**
@@ -49,21 +50,17 @@ public class FactorySegmentationAlg {
 	 * @return ComputeRegionMeanColor
 	 */
 	public static <T extends ImageBase<T>>
-	ComputeRegionMeanColor<T> regionMeanColor(ImageType<T> imageType) {
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.U8();
-				case F32:
-					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.F32();
+	ComputeRegionMeanColor<T> regionMeanColor( ImageType<T> imageType ) {
+		if (imageType.getFamily() == ImageType.Family.GRAY) {
+			switch (imageType.getDataType()) {
+				case U8: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.U8();
+				case F32: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.F32();
 			}
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
-			switch( imageType.getDataType() ) {
-				case U8:
-					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_U8(N);
-				case F32:
-					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_F32(N);
+			switch (imageType.getDataType()) {
+				case U8: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_U8(N);
+				case F32: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_F32(N);
 			}
 		}
 
@@ -78,10 +75,9 @@ public class FactorySegmentationAlg {
 	 * @param imageType Type of input image
 	 * @return SegmentMeanShift
 	 */
-	public static<T extends ImageBase<T>>
-	SegmentMeanShift<T> meanShift(@Nullable ConfigSegmentMeanShift config, ImageType<T> imageType )
-	{
-		if( config == null )
+	public static <T extends ImageBase<T>>
+	SegmentMeanShift<T> meanShift( @Nullable ConfigSegmentMeanShift config, ImageType<T> imageType ) {
+		if (config == null)
 			config = new ConfigSegmentMeanShift();
 
 		int spacialRadius = config.spacialRadius;
@@ -92,19 +88,19 @@ public class FactorySegmentationAlg {
 
 		SegmentMeanShiftSearch<T> search;
 
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
+		if (imageType.getFamily() == ImageType.Family.GRAY) {
 			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass(), BorderType.EXTENDED);
-			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,
-					spacialRadius,spacialRadius,colorRadius,config.fast);
+			search = new SegmentMeanShiftSearchGray(maxIterations, convergenceTol, interp,
+					spacialRadius, spacialRadius, colorRadius, config.fast);
 		} else {
-			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0,255,
-					InterpolationType.BILINEAR, BorderType.EXTENDED,(ImageType)imageType);
-			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,
-					spacialRadius,spacialRadius,colorRadius,config.fast,imageType);
+			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0, 255,
+					InterpolationType.BILINEAR, BorderType.EXTENDED, (ImageType)imageType);
+			search = new SegmentMeanShiftSearchColor(maxIterations, convergenceTol, interp,
+					spacialRadius, spacialRadius, colorRadius, config.fast, imageType);
 		}
 
 		ComputeRegionMeanColor<T> regionColor = regionMeanColor(imageType);
-		MergeRegionMeanShift merge = new MergeRegionMeanShift(spacialRadius/2+1,Math.max(1,colorRadius/2));
+		MergeRegionMeanShift merge = new MergeRegionMeanShift(spacialRadius/2 + 1, Math.max(1, colorRadius/2));
 
 		MergeSmallRegions<T> prune = config.minimumRegionSize >= 2 ?
 				new MergeSmallRegions<>(config.minimumRegionSize, config.connectRule, regionColor) : null;
@@ -113,37 +109,29 @@ public class FactorySegmentationAlg {
 	}
 
 	public static <T extends ImageBase<T>>
-	FhEdgeWeights<T> weightsFelzenszwalb04( ConnectRule rule , ImageType<T> imageType) {
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-			if( rule == ConnectRule.FOUR ) {
-				switch( imageType.getDataType() ) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights4_U8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights4_F32();
+	FhEdgeWeights<T> weightsFelzenszwalb04( ConnectRule rule, ImageType<T> imageType ) {
+		if (imageType.getFamily() == ImageType.Family.GRAY) {
+			if (rule == ConnectRule.FOUR) {
+				switch (imageType.getDataType()) {
+					case U8: return (FhEdgeWeights)new FhEdgeWeights4_U8();
+					case F32: return (FhEdgeWeights)new FhEdgeWeights4_F32();
 				}
-			} else if( rule == ConnectRule.EIGHT ) {
-				switch( imageType.getDataType() ) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights8_U8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights8_F32();
+			} else if (rule == ConnectRule.EIGHT) {
+				switch (imageType.getDataType()) {
+					case U8: return (FhEdgeWeights)new FhEdgeWeights8_U8();
+					case F32: return (FhEdgeWeights)new FhEdgeWeights8_F32();
 				}
 			}
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
-			if( rule == ConnectRule.FOUR ) {
-				switch( imageType.getDataType() ) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights4_PLU8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights4_PLF32();
+		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
+			if (rule == ConnectRule.FOUR) {
+				switch (imageType.getDataType()) {
+					case U8: return (FhEdgeWeights)new FhEdgeWeights4_PLU8();
+					case F32: return (FhEdgeWeights)new FhEdgeWeights4_PLF32();
 				}
-			} else if( rule == ConnectRule.EIGHT ) {
-				switch( imageType.getDataType() ) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights8_PLU8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights8_PLF32();
+			} else if (rule == ConnectRule.EIGHT) {
+				switch (imageType.getDataType()) {
+					case U8: return (FhEdgeWeights)new FhEdgeWeights8_PLU8();
+					case F32: return (FhEdgeWeights)new FhEdgeWeights8_PLF32();
 				}
 			}
 		}
@@ -151,58 +139,52 @@ public class FactorySegmentationAlg {
 		throw new IllegalArgumentException("Unknown imageType or connect rule");
 	}
 
-	public static<T extends ImageBase<T>>
-	SegmentFelzenszwalbHuttenlocher04<T> fh04(@Nullable ConfigFh04 config, ImageType<T> imageType)
-	{
+	public static <T extends ImageBase<T>>
+	SegmentFelzenszwalbHuttenlocher04<T> fh04( @Nullable ConfigFh04 config, ImageType<T> imageType ) {
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigFh04();
 
-		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(config.connectRule,imageType);
+		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(config.connectRule, imageType);
 
 		SegmentFelzenszwalbHuttenlocher04<T> alg =
 				new SegmentFelzenszwalbHuttenlocher04<>(config.K, config.minimumRegionSize, edgeWeights);
 
-		if( config.approximateSortBins > 0 ) {
+		if (config.approximateSortBins > 0) {
 			alg.configureApproximateSort(config.approximateSortBins);
 		}
 
 		return alg;
 	}
 
-	public static<T extends ImageBase<T>>
-	SegmentSlic<T> slic(ConfigSlic config , ImageType<T> imageType )
-	{
-		if( config == null )
+	public static <T extends ImageBase<T>>
+	SegmentSlic<T> slic( ConfigSlic config, ImageType<T> imageType ) {
+		if (config == null)
 			throw new IllegalArgumentException("No default configuration since the number of segments must be specified.");
 
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-				switch( imageType.getDataType() ) {
-					case U8:
-						return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.connectRule);
-					case F32:
-						return (SegmentSlic)new SegmentSlic_F32(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.connectRule);
-				}
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
+		if (imageType.getFamily() == ImageType.Family.GRAY) {
+			switch (imageType.getDataType()) {
+				case U8: return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
+							config.spacialWeight, config.totalIterations, config.connectRule);
+				case F32: return (SegmentSlic)new SegmentSlic_F32(config.numberOfRegions,
+							config.spacialWeight, config.totalIterations, config.connectRule);
+			}
+		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
-				switch( imageType.getDataType() ) {
-					case U8:
-						return (SegmentSlic)new SegmentSlic_PlU8(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.connectRule,N);
-					case F32:
-						return (SegmentSlic)new SegmentSlic_PlF32(config.numberOfRegions,
-								config.spacialWeight,config.totalIterations,config.connectRule,N);
-				}
+			switch (imageType.getDataType()) {
+				case U8: return (SegmentSlic)new SegmentSlic_PlU8(config.numberOfRegions,
+							config.spacialWeight, config.totalIterations, config.connectRule, N);
+				case F32: return (SegmentSlic)new SegmentSlic_PlF32(config.numberOfRegions,
+							config.spacialWeight, config.totalIterations, config.connectRule, N);
+			}
 		}
 		throw new IllegalArgumentException("Unknown imageType or connect rule");
 	}
 
 	public static WatershedVincentSoille1991 watershed( ConnectRule rule ) {
-		if( rule == ConnectRule.FOUR )
+		if (rule == ConnectRule.FOUR)
 			return new WatershedVincentSoille1991.Connect4();
-		else if( rule == ConnectRule.EIGHT )
+		else if (rule == ConnectRule.EIGHT)
 			return new WatershedVincentSoille1991.Connect8();
 		else
 			throw new IllegalArgumentException("Unknown connectivity rule");

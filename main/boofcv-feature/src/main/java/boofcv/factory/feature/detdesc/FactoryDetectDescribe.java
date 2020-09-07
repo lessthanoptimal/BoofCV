@@ -58,6 +58,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"MissingCasesInEnumSwitch"})
 public class FactoryDetectDescribe {
 
 	/**

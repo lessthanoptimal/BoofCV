@@ -37,21 +37,21 @@ public class CreateRandomDotDocumentImage extends CreateFiducialDocumentImage {
 
 	public double dotDiameter;
 
-	public CreateRandomDotDocumentImage(String documentName ) {
+	public CreateRandomDotDocumentImage( String documentName ) {
 		super(documentName);
 	}
 
 	public void render( List<List<Point2D_F64>> markers ) {
 		int numDigits = BoofMiscOps.numDigits(markers.size());
 		int markerHeight = this.markerHeight > 0 ? this.markerHeight : this.markerWidth;
-		g.configure(markerWidth,markerHeight,(int)(dotDiameter));
+		g.configure(markerWidth, markerHeight, (int)dotDiameter);
 		g.setRadius(dotDiameter/2.0);
-		if( markers.size() > 1 ) {
+		if (markers.size() > 1) {
 			for (int i = 0; i < markers.size(); i++) {
 				g.render(markers.get(i), markerWidth, markerHeight);
 				save(g.getImage(), String.format("%0" + numDigits + "d", i));
 			}
-		} else if( markers.size() == 1 ) {
+		} else if (markers.size() == 1) {
 			// Don't append a number if only one image is created
 			g.render(markers.get(0), markerWidth, markerHeight);
 			save(g.getImage(), "");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<
 
 	public ImageGradient_Gaussian(double sigma, int radius,
 								  Class<I> inputType , Class<D> derivType ) {
-		this.imageType = imageType;
+		this.imageType = inputType;
 		this.derivType = derivType;
 
 		// need to do this here to make sure the blur and derivative functions have the same paramters.

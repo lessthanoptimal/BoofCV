@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				float weight = 0;
 				for (int k = offsetL-j; k < kernelWidth; k++) {
-					double w = kernel.data[k];
+					float w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]) * w;
@@ -77,7 +77,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				float weight = 0;
 				for (int k = 0; k <= offsetL+j; k++) {
-					double w = kernel.data[k];
+					float w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]) * w;
@@ -560,7 +560,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = offsetL-j; k < kernelWidth; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]& 0xFF) * w;
@@ -577,7 +577,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = 0; k <= offsetL+j; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]& 0xFF) * w;
@@ -810,7 +810,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = offsetL-j; k < kernelWidth; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]) * w;
@@ -827,7 +827,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = 0; k <= offsetL+j; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]) * w;
@@ -1060,7 +1060,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = offsetL-j; k < kernelWidth; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
@@ -1077,7 +1077,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = 0; k <= offsetL+j; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
@@ -1310,7 +1310,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = offsetL-j; k < kernelWidth; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]) * w;
@@ -1327,7 +1327,7 @@ public class ConvolveNormalized_JustBorder_IL {
 				Arrays.fill(total,0);
 				int weight = 0;
 				for (int k = 0; k <= offsetL+j; k++) {
-					double w = kernel.data[k];
+					int w = kernel.data[k];
 					weight += w;
 					for (int band = 0; band < numBands; band++) {
 						total[band] += (dataSrc[indexSrc++]) * w;

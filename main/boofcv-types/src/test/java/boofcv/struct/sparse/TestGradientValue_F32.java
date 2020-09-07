@@ -21,16 +21,19 @@ package boofcv.struct.sparse;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Generated;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
+@Generated("boofcv.struct.sparse.TestGradientValue_F64")
 class TestGradientValue_F32 {
 	@Test
 	void set_get() {
 		var alg = new GradientValue_F32();
-		alg.set(2.3,4.5);
+		alg.set(2.3f,4.5f);
 		assertEquals(2.3f, alg.getX(), UtilEjml.TEST_F32);
 		assertEquals(4.5f, alg.getY(), UtilEjml.TEST_F32);
 	}

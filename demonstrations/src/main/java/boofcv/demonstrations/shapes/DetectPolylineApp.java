@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,19 +53,18 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectPolylineApp<T extends ImageGray<T>>
-		extends DetectBlackShapeAppBase implements ShapeGuiListener
-{
+		extends DetectBlackShapeAppBase implements ShapeGuiListener {
 	PolylineAppControlPanel controlPanel = new PolylineAppControlPanel(this);
 
 	BinaryLabelContourFinder binaryToContour = FactoryBinaryContourFinder.linearChang2004();
 	PointsToPolyline contourToPolyline;
 
 	List<List<Point2D_I32>> polylines = new ArrayList<>();
-	GrayS32 labeled = new GrayS32(1,1);
+	GrayS32 labeled = new GrayS32(1, 1);
 	List<Contour> contours;
 	ConfigLength minimumContourSize;
 
-	public DetectPolylineApp(List<String> examples , Class<T> imageType) {
+	public DetectPolylineApp( List<String> examples, Class<T> imageType ) {
 		super(examples, imageType);
 
 		controlPanel.threshold.addHistogramGraph();
@@ -73,8 +72,8 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 	}
 
 	@Override
-	protected void createDetector(boolean initializing) {
-		if( !initializing)
+	protected void createDetector( boolean initializing ) {
+		if (!initializing)
 			BoofSwingUtil.checkGuiThread();
 
 		PolylineAppControlPanel controls = (PolylineAppControlPanel)DetectPolylineApp.this.controls;
@@ -85,16 +84,18 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		binaryToContour.setConnectRule(controls.connectRule);
 
 		synchronized (this) {
-			switch( polyControls.whichAlgorithm ) {
-				case 0:{
+			switch (polyControls.whichAlgorithm) {
+				case 0: {
 					ConfigPolylineSplitMerge config = polyControls.getConfigSplitMerge();
 					contourToPolyline = FactoryPointsToPolyline.splitMerge(config);
-				}break;
+				}
+				break;
 
-				case 1:{
+				case 1: {
 					ConfigSplitMergeLineFit config = polyControls.getConfigSplitMergeOld();
 					contourToPolyline = FactoryPointsToPolyline.splitMerge(config);
-				}break;
+				}
+				break;
 
 				default:
 					throw new RuntimeException("Egads");
@@ -106,7 +107,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		imageThresholdUpdated();
 	}
 
-
+	@Override
 	public void configUpdate() {
 		createDetector(false);
 		// does process and render too
@@ -125,25 +126,26 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 	}
 
 	int count = 0;
+
 	@Override
-	protected void detectorProcess(ImageGray input, GrayU8 binary) {
+	protected void detectorProcess( ImageGray input, GrayU8 binary ) {
 //		System.out.println("processing image "+count++);
-		binaryToContour.process(binary,labeled);
+		binaryToContour.process(binary, labeled);
 
 		contours = BinaryImageOps.convertContours(binaryToContour);
 
-		int minContourPixels = minimumContourSize.computeI(Math.min(input.width,input.height));
+		int minContourPixels = minimumContourSize.computeI(Math.min(input.width, input.height));
 
 		polylines.clear();
 		GrowQueue_I32 indices = new GrowQueue_I32();
 		for (int i = 0; i < contours.size(); i++) {
 			List<Point2D_I32> contour = contours.get(i).external;
-			if( contour.size() < minContourPixels )
+			if (contour.size() < minContourPixels)
 				continue;
-			if( contourToPolyline.process(contour,indices) ) {
+			if (contourToPolyline.process(contour, indices)) {
 				List<Point2D_I32> l = new ArrayList<>();
 				for (int j = 0; j < indices.size; j++) {
-					l.add( contour.get( indices.get(j)));
+					l.add(contour.get(indices.get(j)));
 				}
 				polylines.add(l);
 			}
@@ -155,27 +157,27 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 
 	class VisualizePanel extends ShapeVisualizePanel {
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 
 			PolylineAppControlPanel controls = (PolylineAppControlPanel)DetectPolylineApp.this.controls;
 
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			synchronized ( DetectPolylineApp.this ) {
+			synchronized (DetectPolylineApp.this) {
 
-				if (controls.bShowContour && contours != null ) {
+				if (controls.bShowContour && contours != null) {
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contours, null,Color.CYAN, 1.0,scale, g2);
+					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 				}
 
 				if (controls.bShowLines) {
 					g2.setColor(Color.RED);
 					g2.setStroke(new BasicStroke(3));
 					for (List<Point2D_I32> p : polylines) {
-						int red = 255 * ((p.size() - 3) % 4) / 3;
-						int green = 255 * ((p.size()) % 5) / 4;
-						int blue = 255 * ((p.size() + 2) % 6) / 5;
+						int red = 255*((p.size() - 3)%4)/3;
+						int green = 255*(p.size()%5)/4;
+						int blue = 255*((p.size() + 2)%6)/5;
 
 						g2.setColor(new Color(red, green, blue));
 
@@ -189,7 +191,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 					for (List<Point2D_I32> p : polylines) {
 						for (int i = 0; i < p.size(); i++) {
 							Point2D_I32 c = p.get(i);
-							VisualizeFeatures.drawCircle(g2, scale * c.x, scale * c.y, 5);
+							VisualizeFeatures.drawCircle(g2, scale*c.x, scale*c.y, 5);
 						}
 					}
 				}
@@ -197,7 +199,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("shapes/polygons01.jpg"));
@@ -209,14 +211,11 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square/left10.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/square_grid/movie.mp4"));
 
-		DetectPolylineApp app = new DetectPolylineApp(examples,GrayF32.class);
+		DetectPolylineApp app = new DetectPolylineApp(examples, GrayF32.class);
 
 		app.openFile(new File(examples.get(0)));
 
 		app.waitUntilInputSizeIsKnown();
 		app.display("Detect Polylines");
 	}
-
-
-
 }

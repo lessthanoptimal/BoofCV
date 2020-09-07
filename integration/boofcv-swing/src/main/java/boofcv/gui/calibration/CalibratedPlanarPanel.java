@@ -38,14 +38,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * @author Peter Abeles
  */
 public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPanel
-	implements ListSelectionListener, ItemListener, ChangeListener
-{
+		implements ListSelectionListener, ItemListener, ChangeListener {
 	JCheckBox checkPoints;
 	JCheckBox checkErrors;
 	JCheckBox checkUndistorted;
@@ -68,7 +66,7 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();
 	public DisplayCalibrationPanel<CM> mainView;
 
-	JList imageList;
+	JList<String> imageList;
 
 	protected List<String> imagePaths = new ArrayList<>();
 	protected List<CalibrationObservation> features = new ArrayList<>();
@@ -76,68 +74,62 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	protected int selectedImage;
 
 	// names of images as shown in the UI
-	Vector<String> imageNames = new Vector<>();
+	List<String> imageNames = new ArrayList<>();
 
-	public CalibratedPlanarPanel() {
+	protected CalibratedPlanarPanel() {
 		super(new BorderLayout());
 
 		meanError = createErrorComponent(1);
 		maxError = createErrorComponent(1);
 	}
 
-	public void setObservations(List<CalibrationObservation> features  ) {
+	public void setObservations( List<CalibrationObservation> features ) {
 		this.features = features;
 	}
 
-	public void setResults(List<ImageResults> results) {
+	public void setResults( List<ImageResults> results ) {
 		this.results = results;
 		setSelected(selectedImage);
 	}
 
 	public void showImageProcessed( final BufferedImage image ) {
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				mainView.setImage(image);
-				double zoom = BoofSwingUtil.selectZoomToShowAll(mainView,image.getWidth(),image.getHeight());
-				mainView.setScale(zoom);
-				mainView.repaint();
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			mainView.setImage(image);
+			double zoom = BoofSwingUtil.selectZoomToShowAll(mainView, image.getWidth(), image.getHeight());
+			mainView.setScale(zoom);
+			mainView.repaint();
 		});
 	}
 
-	public void addImage( File filePath )
-	{
+	public void addImage( File filePath ) {
 		imagePaths.add(filePath.getPath());
-		imageNames.add( filePath.getName() );
+		imageNames.add(filePath.getName());
 
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				imageList.removeListSelectionListener(CalibratedPlanarPanel.this);
-				imageList.setListData(imageNames);
-				if( imageNames.size() == 1 ) {
-					imageList.addListSelectionListener(CalibratedPlanarPanel.this);
-					imageList.setSelectedIndex(0);
-					validate();
-				} else {
-					// each time an image is added it resets the selected value
-					imageList.setSelectedIndex(selectedImage);
-					imageList.addListSelectionListener(CalibratedPlanarPanel.this);
-				}
+		String[] names = imageNames.toArray(new String[0]);
+
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			imageList.removeListSelectionListener(CalibratedPlanarPanel.this);
+			imageList.setListData(names);
+			if (names.length == 1) {
+				imageList.addListSelectionListener(CalibratedPlanarPanel.this);
+				imageList.setSelectedIndex(0);
+				validate();
+			} else {
+				// each time an image is added it resets the selected value
+				imageList.setSelectedIndex(selectedImage);
+				imageList.addListSelectionListener(CalibratedPlanarPanel.this);
 			}
 		});
-
 	}
 
 	public void setImages( List<File> imageFiles ) {
-		for( File f : imageFiles ) {
+		for (File f : imageFiles) {
 			addImage(f);
 		}
 	}
 
 	public void setImagesFailed( List<File> imageFiles ) {
-		for( File f : imageFiles ) {
+		for (File f : imageFiles) {
 //			addImage(f);
 		}
 	}
@@ -145,30 +137,30 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	protected void setSelected( int selected ) {
 		BoofSwingUtil.checkGuiThread();
 
-		long start = System.currentTimeMillis();;
+		long start = System.currentTimeMillis();
+		;
 		BufferedImage image = UtilImageIO.loadImage(imagePaths.get(selected));
-		if( image == null )
+		if (image == null)
 			throw new RuntimeException("Couldn't load image!");
 		long stop = System.currentTimeMillis();
 
-		System.out.println("Time to load image "+(stop-start)+" (ms)");
+		System.out.println("Time to load image " + (stop - start) + " (ms)");
 
-		if( selected < features.size() )
-			mainView.setResults(features.get(selected),results.get(selected), features);
+		if (selected < features.size())
+			mainView.setResults(features.get(selected), results.get(selected), features);
 
 		mainView.setImage(image);
-		double zoom = BoofSwingUtil.selectZoomToShowAll(mainView,image.getWidth(),image.getHeight());
+		double zoom = BoofSwingUtil.selectZoomToShowAll(mainView, image.getWidth(), image.getHeight());
 		mainView.setScale(zoom);
 		mainView.repaint();
 
 		selectedImage = selected;
 
-		viewInfo.setImageSize(image.getWidth(),image.getHeight());
+		viewInfo.setImageSize(image.getWidth(), image.getHeight());
 
-		if( results != null ) {
+		if (results != null) {
 			updateResultsGUI();
 		}
-
 	}
 
 	protected abstract void updateResultsGUI();
@@ -178,44 +170,43 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	public abstract void setCorrection( CM param );
 
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( e.getSource() == checkPoints ) {
+	public void itemStateChanged( ItemEvent e ) {
+		if (e.getSource() == checkPoints) {
 			showPoints = checkPoints.isSelected();
-		} else if( e.getSource() == checkErrors ) {
+		} else if (e.getSource() == checkErrors) {
 			showErrors = checkErrors.isSelected();
-		} else if( e.getSource() == checkAll ) {
+		} else if (e.getSource() == checkAll) {
 			showAll = checkAll.isSelected();
-		} else if( e.getSource() == checkUndistorted ) {
+		} else if (e.getSource() == checkUndistorted) {
 			showUndistorted = checkUndistorted.isSelected();
-		} else if( e.getSource() == checkNumbers ) {
+		} else if (e.getSource() == checkNumbers) {
 			showNumbers = checkNumbers.isSelected();
-		} else if( e.getSource() == checkOrder ) {
+		} else if (e.getSource() == checkOrder) {
 			showOrder = checkOrder.isSelected();
 		}
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		mainView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
 		mainView.repaint();
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectErrorScale) {
-			errorScale = ((Number) selectErrorScale.getValue()).intValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == selectErrorScale) {
+			errorScale = ((Number)selectErrorScale.getValue()).intValue();
 		}
 
-		mainView.setDisplay(showPoints,showErrors,showUndistorted,showAll,showNumbers,showOrder,errorScale);
+		mainView.setDisplay(showPoints, showErrors, showUndistorted, showAll, showNumbers, showOrder, errorScale);
 		mainView.repaint();
 	}
 
-	JTextArea createErrorComponent(int numRows) {
-		JTextArea comp = new JTextArea(numRows,6);
+	JTextArea createErrorComponent( int numRows ) {
+		JTextArea comp = new JTextArea(numRows, 6);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
-		comp.setBorder(BorderFactory.createEmptyBorder(0,0,4,0));
+		comp.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
 		return comp;
 	}
 
-	class RightPanel extends StandardAlgConfigPanel
-	{
+	class RightPanel extends StandardAlgConfigPanel {
 		public RightPanel() {
 			checkPoints = new JCheckBox("Show Points");
 			checkPoints.setSelected(showPoints);
@@ -253,8 +244,7 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 			addAlignLeft(checkUndistorted);
 			addAlignLeft(checkNumbers);
 			addAlignLeft(checkOrder);
-			addLabeled(selectErrorScale,"Error Scale");
+			addLabeled(selectErrorScale, "Error Scale");
 		}
 	}
-
 }

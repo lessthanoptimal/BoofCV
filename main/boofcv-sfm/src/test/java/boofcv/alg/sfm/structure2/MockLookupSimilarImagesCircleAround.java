@@ -57,6 +57,8 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 
 	public FastArray<Se3_F64> listOriginToView = new FastArray<>(Se3_F64.class);
 	public FastArray<DMatrixRMaj> listCameraMatrices = new FastArray<>(DMatrixRMaj.class);
+	// camera matrices with the (cx,cy) = (0,0)
+	public FastArray<DMatrixRMaj> listCameraMatricesZeroPrinciple = new FastArray<>(DMatrixRMaj.class);
 
 	public PairwiseImageGraph2 graph = new PairwiseImageGraph2();
 
@@ -89,6 +91,9 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 		}
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj) null);
+		DMatrixRMaj K_zero = K.copy();
+		K_zero.set(0,2,0.0);
+		K_zero.set(1,2,0.0);
 
 		// Randomly add points around the coordinate system's origin
 		feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -0.5, 0.5, numFeatures, rand);
@@ -115,10 +120,12 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 
 			// Create the camera matrix P
 			DMatrixRMaj P = PerspectiveOps.createCameraMatrix(world_to_camera.R, world_to_camera.T, K, null);
+			DMatrixRMaj P_zero = PerspectiveOps.createCameraMatrix(world_to_camera.R, world_to_camera.T, K_zero, null);
 
 			// save information on the view
 			listOriginToView.add(world_to_camera);
 			listCameraMatrices.add(P);
+			listCameraMatricesZeroPrinciple.add(P_zero);
 
 			// Observed features in the view
 			List<Point2D_F64> viewPixels = new ArrayList<>();
@@ -186,11 +193,19 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 	}
 
 	public SceneWorkingGraph createWorkingGraph() {
+		return createWorkingGraph(false);
+	}
+
+	public SceneWorkingGraph createWorkingGraph(boolean zeroCP) {
 		var working = new SceneWorkingGraph();
 		for (int viewCnt = 0; viewCnt < graph.nodes.size; viewCnt++) {
 			PairwiseImageGraph2.View pv = graph.nodes.get(viewCnt);
 			SceneWorkingGraph.View wv = working.addView(pv);
-			wv.projective.set(listCameraMatrices.get(viewCnt));
+			if( zeroCP ) {
+				wv.projective.set(listCameraMatricesZeroPrinciple.get(viewCnt));
+			} else {
+				wv.projective.set(listCameraMatrices.get(viewCnt));
+			}
 
 			wv.inliers.views.add(pv);
 			wv.inliers.observations.grow().addAll(featToView.get(viewCnt), 0, numFeatures);

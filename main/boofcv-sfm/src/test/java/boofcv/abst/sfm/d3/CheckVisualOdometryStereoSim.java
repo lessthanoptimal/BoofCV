@@ -39,8 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
-	extends VideoSequenceSimulator<I>
-{
+		extends VideoSequenceSimulator<I> {
 	StereoParameters param = createStereoParam();
 
 	I left;
@@ -50,20 +49,20 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 
 	double tolerance = 0.02;
 
-	public CheckVisualOdometryStereoSim(Class<I> inputType) {
+	protected CheckVisualOdometryStereoSim( Class<I> inputType ) {
 		super(320, 240, inputType);
 
 		// Turn off threads to make results repeatable
 		BoofConcurrency.USE_CONCURRENT = false;
 
-		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
-		right = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		left = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		right = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
 		setIntrinsic(param.getLeft());
-		createSquares(numSquares,1,2);
+		createSquares(numSquares, 1, 2);
 	}
 
-	public CheckVisualOdometryStereoSim(Class<I> inputType , double tolerance ) {
+	protected CheckVisualOdometryStereoSim( Class<I> inputType, double tolerance ) {
 		this(inputType);
 		this.tolerance = tolerance;
 	}
@@ -74,17 +73,17 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 	void changeInputSize() {
 		StereoVisualOdometry<I> algorithm = createAlgorithm();
 
-		I leftSmall = GeneralizedImageOps.createSingleBand(inputType,width/2,height/2);
-		I rightSmall = GeneralizedImageOps.createSingleBand(inputType,width/2,height/2);
+		I leftSmall = GeneralizedImageOps.createSingleBand(inputType, width/2, height/2);
+		I rightSmall = GeneralizedImageOps.createSingleBand(inputType, width/2, height/2);
 
-		I leftLarge = GeneralizedImageOps.createSingleBand(inputType,width,height);
-		I rightLarge = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		I leftLarge = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		I rightLarge = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
-		GImageMiscOps.fillUniform(leftSmall,rand,0,100);
-		GImageMiscOps.fillUniform(leftSmall,rand,0,100);
+		GImageMiscOps.fillUniform(leftSmall, rand, 0, 100);
+		GImageMiscOps.fillUniform(leftSmall, rand, 0, 100);
 
-		GImageMiscOps.fillUniform(leftLarge,rand,0,100);
-		GImageMiscOps.fillUniform(rightLarge,rand,0,100);
+		GImageMiscOps.fillUniform(leftLarge, rand, 0, 100);
+		GImageMiscOps.fillUniform(rightLarge, rand, 0, 100);
 
 		StereoParameters paramSmall = createStereoParam();
 		paramSmall.left.width = paramSmall.right.width = leftSmall.width;
@@ -92,7 +91,7 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 
 		algorithm.reset();
 		algorithm.setCalibration(paramSmall);
-		assertTrue(algorithm.process(leftSmall,rightSmall));
+		assertTrue(algorithm.process(leftSmall, rightSmall));
 
 		StereoParameters paramLarge = createStereoParam();
 		paramLarge.left.width = paramLarge.right.width = leftLarge.width;
@@ -100,7 +99,7 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 
 		algorithm.reset();
 		algorithm.setCalibration(paramLarge);
-		assertTrue(algorithm.process(leftLarge,rightSmall));
+		assertTrue(algorithm.process(leftLarge, rightSmall));
 	}
 
 	@Test
@@ -114,11 +113,11 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 		Se3_F64 worldToRight = new Se3_F64();
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 //			System.out.println("Step i = "+i);
 			worldToLeft.getT().z = i*0.05;
 
-			worldToLeft.concat(leftToRight,worldToRight);
+			worldToLeft.concat(leftToRight, worldToRight);
 
 			// render the images
 			setIntrinsic(param.getLeft());
@@ -127,7 +126,7 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 			right.setTo(render(worldToRight));
 
 			// process the images
-			assertTrue(algorithm.process(left,right));
+			assertTrue(algorithm.process(left, right));
 
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
@@ -135,8 +134,8 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 //			worldToLeft.getT().print();
 //			foundWorldToLeft.getT().print();
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
-			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );
+			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(), worldToLeft.getR(), 0.1));
+			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance);
 		}
 	}
 
@@ -157,14 +156,14 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
 
 		int traveled = 0;
-		for( int i = 0; i < 5; i++ ) {
+		for (int i = 0; i < 5; i++) {
 			boolean badFrame = false;
-			if( i == 3 ) {
+			if (i == 3) {
 				badFrame = true;
-				GImageMiscOps.fill(left,0);
-				GImageMiscOps.fill(right,0);
+				GImageMiscOps.fill(left, 0);
+				GImageMiscOps.fill(right, 0);
 			} else {
-				worldToLeft.getT().z = traveled++ * 0.05;
+				worldToLeft.getT().z = traveled++*0.05;
 				worldToLeft.concat(leftToRight, worldToRight);
 
 				// render the images
@@ -174,16 +173,16 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 				right.setTo(render(worldToRight));
 			}
 			// process the images
-			assertEquals(!badFrame,algorithm.process(left,right));
+			assertEquals(!badFrame, algorithm.process(left, right));
 
-			if( badFrame )
+			if (badFrame)
 				continue;
 
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
-			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );
+			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(), worldToLeft.getR(), 0.1));
+			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance);
 		}
 	}
 
@@ -192,10 +191,10 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 
 		ret.setRightToLeft(new Se3_F64());
 		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
-		ret.right = new CameraPinholeBrown(199,200,0,width/2+2,height/2-6,width,height).fsetRadial(0,0);
+		ret.left = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0, 0);
+		ret.right = new CameraPinholeBrown(199, 200, 0, width/2 + 2, height/2 - 6, width, height).fsetRadial(0, 0);
 
 		return ret;
 	}

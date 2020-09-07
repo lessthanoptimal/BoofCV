@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,11 +54,7 @@ public class GenerateConvertInterleavedToSingle extends CodeGeneratorBase {
 				" * <li>Average computes the average value of each pixel across the bands.\n" +
 				" * </ul>\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n\n");
 	}

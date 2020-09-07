@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -145,6 +145,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	/**
 	 * Pick a corner but avoid the pointy edges at the other end
 	 */
+	@Override
 	NodeInfo selectSeedCorner() {
 		NodeInfo best = null;
 		double bestScore = 0;

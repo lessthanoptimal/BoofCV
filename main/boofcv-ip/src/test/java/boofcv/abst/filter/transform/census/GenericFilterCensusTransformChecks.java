@@ -45,28 +45,28 @@ public abstract class GenericFilterCensusTransformChecks<In extends ImageGray<In
 	// The radius of the sample region. Must be set
 	protected int radius;
 
-	public GenericFilterCensusTransformChecks( Class<In> imageType ) {
+	protected GenericFilterCensusTransformChecks( Class<In> imageType ) {
 		border = FactoryImageBorder.generic(BorderType.REFLECT, ImageType.single(imageType));
 	}
 
-	public abstract FilterCensusTransform<In,Out> createAlg(ImageBorder<In> border);
+	public abstract FilterCensusTransform<In, Out> createAlg( ImageBorder<In> border );
 
 	/**
 	 * Make sure the border radius is set correctly. If the border is null it should have a non-zero value
 	 */
 	@Test
 	public void checkBorderRadius() {
-		FilterCensusTransform<In,Out> alg = createAlg(border);
-		assertEquals(radius,alg.getRadiusX());
-		assertEquals(radius,alg.getRadiusY());
-		assertEquals(0,alg.getBorderX());
-		assertEquals(0,alg.getBorderY());
+		FilterCensusTransform<In, Out> alg = createAlg(border);
+		assertEquals(radius, alg.getRadiusX());
+		assertEquals(radius, alg.getRadiusY());
+		assertEquals(0, alg.getBorderX());
+		assertEquals(0, alg.getBorderY());
 
 		alg = createAlg(null);
-		assertEquals(radius,alg.getRadiusX());
-		assertEquals(radius,alg.getRadiusY());
-		assertEquals(radius,alg.getBorderX());
-		assertEquals(radius,alg.getBorderY());
+		assertEquals(radius, alg.getRadiusX());
+		assertEquals(radius, alg.getRadiusY());
+		assertEquals(radius, alg.getBorderX());
+		assertEquals(radius, alg.getBorderY());
 	}
 
 	/**
@@ -74,18 +74,18 @@ public abstract class GenericFilterCensusTransformChecks<In extends ImageGray<In
 	 */
 	@Test
 	public void compareToFunction() {
-		FilterCensusTransform<In,Out> alg = createAlg(border);
+		FilterCensusTransform<In, Out> alg = createAlg(border);
 
-		In input = alg.getInputType().createImage(width,height);
-		Out found = alg.getOutputType().createImage(width,height);
+		In input = alg.getInputType().createImage(width, height);
+		Out found = alg.getOutputType().createImage(width, height);
 		Out expected = found.createSameShape();
 
-		GImageMiscOps.fillUniform(input,rand,0,250);
-		alg.process(input,found);
-		callFunction(input,expected);
+		GImageMiscOps.fillUniform(input, rand, 0, 250);
+		alg.process(input, found);
+		callFunction(input, expected);
 
-		BoofTesting.assertEquals(expected,found,1e-8);
+		BoofTesting.assertEquals(expected, found, 1e-8);
 	}
 
-	public abstract void callFunction( In input , Out output );
+	public abstract void callFunction( In input, Out output );
 }

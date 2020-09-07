@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,14 +28,13 @@ import boofcv.struct.image.InterleavedS64;
  */
 public abstract class ImageBorder_IL_S64 extends ImageBorder<InterleavedS64> {
 
-	public ImageBorder_IL_S64(InterleavedS64 image) {
+	protected ImageBorder_IL_S64( InterleavedS64 image ) {
 		super(image);
 	}
 
-	protected ImageBorder_IL_S64() {
-	}
+	protected ImageBorder_IL_S64() {}
 
-	public void set( int x , int y , long[] pixel ) {
+	public void set( int x, int y, long[] pixel ) {
 		if (image.isInBounds(x, y)) {
 			image.unsafe_set(x, y, pixel);
 		} else {
@@ -43,29 +42,29 @@ public abstract class ImageBorder_IL_S64 extends ImageBorder<InterleavedS64> {
 		}
 	}
 
-	public void get( int x , int y , long[] pixel ) {
-		if( image.isInBounds(x,y) ) {
+	public void get( int x, int y, long[] pixel ) {
+		if (image.isInBounds(x, y)) {
 			image.unsafe_get(x, y, pixel);
 		} else {
 			getOutside(x, y, pixel);
 		}
 	}
 
-	public abstract void getOutside( int x , int y , long[] pixel);
+	public abstract void getOutside( int x, int y, long[] pixel );
 
-	public abstract void setOutside( int x , int y , long[] pixel);
+	public abstract void setOutside( int x, int y, long[] pixel );
 
 	@Override
-	public void getGeneral(int x, int y, double[] pixel ) {
+	public void getGeneral( int x, int y, double[] pixel ) {
 		long[] tmp = new long[pixel.length];
-		get(x,y,tmp);
+		get(x, y, tmp);
 		for (int i = 0; i < pixel.length; i++) {
 			pixel[i] = tmp[i];
 		}
 	}
 
 	@Override
-	public void setGeneral(int x, int y, double[] pixel ) {
+	public void setGeneral( int x, int y, double[] pixel ) {
 		long[] tmp = new long[pixel.length];
 		for (int i = 0; i < pixel.length; i++) {
 			tmp[i] = (long)pixel[i];

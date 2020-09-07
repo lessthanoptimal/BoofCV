@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
@@ -50,14 +51,14 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 
 	protected ImageType<I> imageType;
 
-	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageClass) {
+	protected VideoProcessAppBase(int numAlgFamilies, Class<I> imageClass) {
 		super(numAlgFamilies);
 
 		this.imageType = new ImageType<>(ImageType.Family.GRAY, ImageDataType.classToType(imageClass), 1);
 		addToToolbar(createSelectDelay());
 	}
 
-	public VideoProcessAppBase(int numAlgFamilies, ImageType<I> imageType) {
+	protected VideoProcessAppBase(int numAlgFamilies, ImageType<I> imageType) {
 		super(numAlgFamilies);
 
 		this.imageType = imageType;
@@ -98,7 +99,7 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 	protected void stopWorker() {
 		requestStop = true;
 		while( isRunning ) {
-			Thread.yield();
+			BoofMiscOps.sleep(10);
 		}
 		requestStop = false;
 	}

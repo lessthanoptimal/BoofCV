@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -242,8 +242,8 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 			float valA = interpolate.get_fast(c_x + p_a.x * rectWidth, c_y + p_a.y * rectHeight);
 			float valB = interpolate.get_fast(c_x + p_b.x * rectWidth, c_y + p_b.y * rectHeight);
 
-			valA += rand.nextGaussian()*fernLearnNoise;
-			valB += rand.nextGaussian()*fernLearnNoise;
+			valA += (float)rand.nextGaussian()*fernLearnNoise;
+			valB += (float)rand.nextGaussian()*fernLearnNoise;
 
 			desc *= 2;
 

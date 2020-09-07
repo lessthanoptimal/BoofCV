@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.gui.feature;
-
 
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.gui.image.ImagePanel;
@@ -45,25 +44,25 @@ public class ImageLinePanel extends ImagePanel {
 		setScaling(ScaleOptions.DOWN);
 	}
 
-	public synchronized void setLines(List<LineParametric2D_F32> lines) {
+	public synchronized void setLines( List<LineParametric2D_F32> lines ) {
 		this.lines.clear();
-		for( LineParametric2D_F32 p : lines ) {
+		for (LineParametric2D_F32 p : lines) {
 			LineSegment2D_F32 s = LineImageOps.convert(p, img.getWidth(), img.getHeight());
-			if( s != null )
+			if (s != null)
 				this.lines.add(s);
 		}
 	}
 
-	public synchronized void setLineSegments(List<LineSegment2D_F32> lines) {
+	public synchronized void setLineSegments( List<LineSegment2D_F32> lines ) {
 		this.lines.clear();
 		this.lines.addAll(lines);
 	}
 
 	@Override
-	public synchronized void paintComponent(Graphics g) {
+	public synchronized void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
-		if( img == null )
+		if (img == null)
 			return;
 
 		Graphics2D g2 = (Graphics2D)g;
@@ -71,19 +70,17 @@ public class ImageLinePanel extends ImagePanel {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(3));
 
-		for( LineSegment2D_F32 s : lines ) {
-			line.x1 = scale*s.a.x+offsetX;
-			line.y1 = scale*s.a.y+offsetY;
-			line.x2 = scale*s.b.x+offsetX;
-			line.y2 = scale*s.b.y+offsetY;
-
+		for (LineSegment2D_F32 s : lines) {
+			line.x1 = scale*s.a.x + offsetX;
+			line.y1 = scale*s.a.y + offsetY;
+			line.x2 = scale*s.b.x + offsetX;
+			line.y2 = scale*s.b.y + offsetY;
 
 			g2.setColor(Color.RED);
 			g2.draw(line);
 			g2.setColor(Color.BLUE);
-			g2.fillOval((int)(line.x1)-1,(int)(line.y1)-1,3,3);
-			g2.fillOval((int)(line.x2)-1,(int)(line.y2)-1,3,3);
+			g2.fillOval((int)line.x1 - 1, (int)line.y1 - 1, 3, 3);
+			g2.fillOval((int)line.x2 - 1, (int)line.y2 - 1, 3, 3);
 		}
 	}
-
 }

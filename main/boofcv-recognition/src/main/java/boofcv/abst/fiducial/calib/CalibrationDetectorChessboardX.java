@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,14 +110,17 @@ public class CalibrationDetectorChessboardX
 		}
 	}
 
-	public DetectChessboardCornersXPyramid getDetector() {
+	@Override
+	public DetectChessboardCornersXPyramid<GrayF32> getDetector() {
 		return detector;
 	}
 
-	public ChessboardCornerClusterFinder getClusterFinder() {
+	@Override
+	public ChessboardCornerClusterFinder<GrayF32> getClusterFinder() {
 		return clusterFinder;
 	}
 
+	@Override
 	public ChessboardCornerClusterToGrid getClusterToGrid() {
 		return clusterToGrid;
 	}

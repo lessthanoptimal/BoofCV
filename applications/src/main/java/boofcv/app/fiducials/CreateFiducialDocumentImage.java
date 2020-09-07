@@ -37,26 +37,26 @@ public abstract class CreateFiducialDocumentImage {
 
 	public int markerWidth;
 	// If > 0 then it specifies the height, otherwise a square marker is assumed.
-	public int markerHeight=-1;
+	public int markerHeight = -1;
 
-	public CreateFiducialDocumentImage(String documentName ) {
+	protected CreateFiducialDocumentImage( String documentName ) {
 		this.documentName = documentName;
 	}
 
-	protected void save( GrayU8 fiducial , String name ) {
+	protected void save( GrayU8 fiducial, String name ) {
 		String fileName;
 		String ext = FilenameUtils.getExtension(documentName);
-		if( ext.length() == 0 ) {
-			fileName = documentName+".png";
+		if (ext.length() == 0) {
+			fileName = documentName + ".png";
 		} else {
 			File f = new File(documentName);
 			String n = f.getName();
 			fileName = new File(f.getParentFile(), n.substring(0, n.length() - ext.length() - 1) + name + "." + ext).getPath();
 		}
-		BufferedImage output = new BufferedImage(fiducial.width,fiducial.height,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(fiducial,output);
+		BufferedImage output = new BufferedImage(fiducial.width, fiducial.height, BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.convertTo(fiducial, output);
 
-		System.out.println("Saving "+fileName);
-		UtilImageIO.saveImage(output,fileName);
+		System.out.println("Saving " + fileName);
+		UtilImageIO.saveImage(output, fileName);
 	}
 }

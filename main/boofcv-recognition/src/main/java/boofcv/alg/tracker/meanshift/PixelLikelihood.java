@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,15 +30,10 @@ import georegression.struct.shapes.RectangleLength2D_I32;
 public interface PixelLikelihood<T extends ImageBase<T>> extends SparseImageSample_F32<T> {
 
 	/**
-	 * Sets the input image
-	 */
-	public void setImage( T image );
-
-	/**
 	 * Specifies where the initial location of the target is in the image and computes the model using pixels
 	 * inside the rectangle
+	 *
 	 * @param target Location of target inside the image
 	 */
-	public void createModel( RectangleLength2D_I32 target );
-
+	void createModel( RectangleLength2D_I32 target );
 }

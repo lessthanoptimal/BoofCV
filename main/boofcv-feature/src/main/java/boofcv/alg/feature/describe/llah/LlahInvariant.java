@@ -27,12 +27,12 @@ public enum LlahInvariant {
 	AFFINE(4),
 	CROSS_RATIO(5);
 
-	LlahInvariant(int size) {
+	LlahInvariant( int size ) {
 		this.size = size;
 	}
 
 	// The number of points required to compute invariant
-	int size;
+	final int size;
 
 	public int getSize() {
 		return size;

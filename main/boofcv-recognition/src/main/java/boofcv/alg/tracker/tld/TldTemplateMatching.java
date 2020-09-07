@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageGray;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Created {@link NccFeature NCC} templates to describe the target region.  Each template is composed of a 15x15
@@ -48,7 +48,7 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	private InterpolatePixelS<T> interpolate;
 
 	// storage for descriptors which can be recycled
-	protected Stack<NccFeature> unused = new Stack<>();
+	protected ArrayDeque<NccFeature> unused = new ArrayDeque<>();
 
 	public TldTemplateMatching( InterpolatePixelS<T> interpolate ) {
 		this.interpolate = interpolate;
@@ -81,15 +81,15 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	 *
 	 * @param positive if it is a positive or negative example
 	 */
-	public void addDescriptor( boolean positive , ImageRectangle rect ) {
+	public void addDescriptor( boolean positive, ImageRectangle rect ) {
 
 		addDescriptor(positive, rect.x0, rect.y0, rect.x1, rect.y1);
 	}
 
-	public void addDescriptor( boolean positive , float x0 , float y0 , float x1 , float y1 ) {
+	public void addDescriptor( boolean positive, float x0, float y0, float x1, float y1 ) {
 
 		NccFeature f = createDescriptor();
-		computeNccDescriptor(f,x0,y0,x1,y1);
+		computeNccDescriptor(f, x0, y0, x1, y1);
 		addDescriptor(positive, f);
 	}
 
@@ -100,24 +100,24 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	 * @param positive true for positive list and false for negative list
 	 * @param f The feature which is to be added
 	 */
-	private void addDescriptor(boolean positive, NccFeature f) {
+	private void addDescriptor( boolean positive, NccFeature f ) {
 		// avoid adding the same descriptor twice or adding contradicting results
-		if( positive)
-			if( distance(f,templatePositive) < 0.05 ) {
+		if (positive)
+			if (distance(f, templatePositive) < 0.05) {
 				return;
 			}
-		if( !positive) {
-			if( distance(f,templateNegative) < 0.05 ) {
+		if (!positive) {
+			if (distance(f, templateNegative) < 0.05) {
 				return;
 			}
 			// a positive positive can have very bad affects on tracking, try to avoid learning a positive
 			// example as a negative one
-			if( distance(f,templatePositive) < 0.05 ) {
+			if (distance(f, templatePositive) < 0.05) {
 				return;
 			}
 		}
 
-		if( positive )
+		if (positive)
 			templatePositive.add(f);
 		else
 			templateNegative.add(f);
@@ -126,17 +126,17 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	/**
 	 * Computes the NCC descriptor by sample points at evenly spaced distances inside the rectangle
 	 */
-	public void computeNccDescriptor( NccFeature f , float x0 , float y0 , float x1 , float y1 ) {
+	public void computeNccDescriptor( NccFeature f, float x0, float y0, float x1, float y1 ) {
 		double mean = 0;
-		float widthStep = (x1-x0)/15.0f;
-		float heightStep = (y1-y0)/15.0f;
+		float widthStep = (x1 - x0)/15.0f;
+		float heightStep = (y1 - y0)/15.0f;
 
 		// compute the mean value
 		int index = 0;
-		for( int y = 0; y < 15; y++ ) {
+		for (int y = 0; y < 15; y++) {
 			float sampleY = y0 + y*heightStep;
-			for( int x = 0; x < 15; x++ ) {
-				mean += f.value[index++] = interpolate.get_fast(x0 + x * widthStep, sampleY);
+			for (int x = 0; x < 15; x++) {
+				mean += f.value[index++] = interpolate.get_fast(x0 + x*widthStep, sampleY);
 			}
 		}
 		mean /= 15*15;
@@ -144,8 +144,8 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 		// compute the variance and save the difference from the mean
 		double variance = 0;
 		index = 0;
-		for( int y = 0; y < 15; y++ ) {
-			for( int x = 0; x < 15; x++ ) {
+		for (int y = 0; y < 15; y++) {
+			for (int x = 0; x < 15; x++) {
 				double v = f.value[index++] -= mean;
 				variance += v*v;
 			}
@@ -160,7 +160,7 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	 */
 	public NccFeature createDescriptor() {
 		NccFeature f;
-		if( unused.isEmpty() )
+		if (unused.isEmpty())
 			f = new NccFeature(15*15);
 		else
 			f = unused.pop();
@@ -176,20 +176,20 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	 *
 	 * @return value from 0 to 1, where higher values are more confident
 	 */
-	public double computeConfidence( int x0 , int y0 , int x1 , int y1 ) {
+	public double computeConfidence( int x0, int y0, int x1, int y1 ) {
 
-		computeNccDescriptor(observed,x0,y0,x1,y1);
+		computeNccDescriptor(observed, x0, y0, x1, y1);
 
 		// distance from each set of templates
-		if( templateNegative.size() > 0 && templatePositive.size() > 0 ) {
-			double distancePositive = distance(observed,templatePositive);
-			double distanceNegative = distance(observed,templateNegative);
+		if (templateNegative.size() > 0 && templatePositive.size() > 0) {
+			double distancePositive = distance(observed, templatePositive);
+			double distanceNegative = distance(observed, templateNegative);
 
 			return distanceNegative/(distanceNegative + distancePositive);
-		} else if( templatePositive.size() > 0 ) {
-			return 1.0-distance(observed,templatePositive);
+		} else if (templatePositive.size() > 0) {
+			return 1.0 - distance(observed, templatePositive);
 		} else {
-			return distance(observed,templateNegative);
+			return distance(observed, templateNegative);
 		}
 	}
 
@@ -197,27 +197,28 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 	 * see the other function with the same name
 	 */
 	public double computeConfidence( ImageRectangle r ) {
-		return computeConfidence(r.x0,r.y0,r.x1,r.y1);
+		return computeConfidence(r.x0, r.y0, r.x1, r.y1);
 	}
 
 	/**
 	 * Computes the best distance to 'observed' from the candidate list.
+	 *
 	 * @param observed Feature being matched
 	 * @param candidates Set of candidate matches
 	 * @return score from 0 to 1, where lower is closer
 	 */
-	public double distance( NccFeature observed , List<NccFeature> candidates ) {
+	public double distance( NccFeature observed, List<NccFeature> candidates ) {
 
 		double maximum = -Double.MAX_VALUE;
 
 		// The feature which has the best fit will maximize the score
-		for( NccFeature f : candidates ) {
+		for (NccFeature f : candidates) {
 			double score = DescriptorDistance.ncc(observed, f);
-			if( score > maximum )
+			if (score > maximum)
 				maximum = score;
 		}
 
-		return 1-0.5*(maximum + 1);
+		return 1 - 0.5*(maximum + 1);
 	}
 
 	public List<NccFeature> getTemplatePositive() {

@@ -33,12 +33,14 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
+@Disabled
 public class TestDetectDescribeAssociateTwoPass extends GenericChecksPointTrackerTwoPass<GrayF32> {
 
 	public TestDetectDescribeAssociateTwoPass() {

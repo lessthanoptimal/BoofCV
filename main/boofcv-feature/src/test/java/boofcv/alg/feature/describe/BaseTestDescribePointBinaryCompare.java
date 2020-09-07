@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 
 	BinaryCompareDefinition_I32 def = FactoryBriefDefinition.gaussian2(rand, 5, 20);
 
-	public BaseTestDescribePointBinaryCompare(Class<T> imageType) {
+	protected BaseTestDescribePointBinaryCompare(Class<T> imageType) {
 		this.imageType = imageType;
 	}
 

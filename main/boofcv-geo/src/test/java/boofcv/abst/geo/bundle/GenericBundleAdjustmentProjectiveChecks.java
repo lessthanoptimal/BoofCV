@@ -86,8 +86,8 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		for (int i = 0; i < observations.views.size; i++) {
 			SceneObservations.View v = observations.views.data[i];
 			for (int j = 0; j < v.point.size; j++) {
-				v.observations.data[j*2+0] += rand.nextGaussian()*0.1;
-				v.observations.data[j*2+1] += rand.nextGaussian()*0.1;
+				v.observations.data[j*2+0] += (float) (rand.nextGaussian()*0.1);
+				v.observations.data[j*2+1] += (float) (rand.nextGaussian()*0.1);
 			}
 		}
 
@@ -120,9 +120,9 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 	}
 
 	private void addNoiseToPoint3D(Tuple2<SceneStructureProjective, SceneObservations> a) {
-		SceneStructureProjective structure = a.d0;
+		SceneStructureCommon structure = a.d0;
 		for (int i = 0; i < structure.points.size; i++) {
-			SceneStructureProjective.Point p = structure.points.data[i];
+			SceneStructureCommon.Point p = structure.points.data[i];
 			p.coordinate[0] += rand.nextGaussian()*0.1;
 			p.coordinate[1] += rand.nextGaussian()*0.1;
 			p.coordinate[2] += rand.nextGaussian()*0.1;
@@ -204,8 +204,8 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		Assertions.assertEquals(a.homogenous, b.homogenous);
 
 		if( a.homogenous ) {
-			Point4D_F64 pa = new Point4D_F64();
-			Point4D_F64 pb = new Point4D_F64();
+//			Point4D_F64 pa = new Point4D_F64();
+//			Point4D_F64 pb = new Point4D_F64();
 
 			for (int i = 0; i < a.points.size; i++) {
 				// need to normalize the points first otherwise they can't be computed
@@ -224,8 +224,7 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		// don't compare camera matrices because there are infinite equivalent solutions
 	}
 
-	Tuple2<SceneStructureProjective, SceneObservations>
-	createHorizontalMotion( long seed )
+	Tuple2<SceneStructureProjective, SceneObservations> createHorizontalMotion( long seed )
 	{
 		Random rand = new Random(seed);
 

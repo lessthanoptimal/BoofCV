@@ -26,21 +26,19 @@ import java.util.List;
 
 /**
  * Current location of feature in a {@link PointTracker}.
- * 
+ *
  * @author Peter Abeles
  */
 public class PointTrack {
 	/** Location of the track in the image */
 	public final Point2D_F64 pixel = new Point2D_F64();
-	/**
-	 * The type of feature it belongs to
-	 */
+
+	/**  The type of feature it belongs to */
 	public int detectorSetId;
-	/**
-	 * Unique ID associated with this feature
-	 */
+
+	/** Unique ID associated with this feature */
 	public long featureId;
-	
+
 	/** User specified data */
 	public Object cookie;
 
@@ -53,18 +51,16 @@ public class PointTrack {
 	/** Description of this feature that is used internally.  Don't mess with this */
 	private Object description;
 
-	public PointTrack(double x, double y, long featureId) {
-		this.pixel.set(x,y);
+	public PointTrack( double x, double y, long featureId ) {
+		this.pixel.set(x, y);
 		this.featureId = featureId;
 	}
 
-	public PointTrack() {
-	}
+	public PointTrack() {}
 
-	public static List<Point2D_F64> extractTrackPixels(@Nullable List<Point2D_F64> storage,
-													   List<PointTrack> tracks)
-	{
-		if( storage == null )
+	public static List<Point2D_F64> extractTrackPixels( @Nullable List<Point2D_F64> storage,
+														List<PointTrack> tracks ) {
+		if (storage == null)
 			storage = new ArrayList<>();
 		else
 			storage.clear();
@@ -84,7 +80,7 @@ public class PointTrack {
 		cookie = t.cookie;
 		description = t.description;
 	}
-	
+
 	public void reset() {
 		lastSeenFrameID = -1;
 		spawnFrameID = -1;
@@ -94,23 +90,18 @@ public class PointTrack {
 	}
 
 	public <T> T getCookie() {
-		return (T) cookie;
+		return (T)cookie;
 	}
 
 	public <T> T getDescription() {
-		return (T) description;
+		return (T)description;
 	}
 
 	public void setDescription( Object description ) {
 		this.description = description;
 	}
 
-	public void setCookie(Object cookie) {
+	public void setCookie( Object cookie ) {
 		this.cookie = cookie;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return this == obj;
 	}
 }

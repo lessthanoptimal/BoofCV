@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,9 +54,8 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class BackgroundModelMoving<T extends ImageBase<T>,MotionModel extends InvertibleTransform<MotionModel>>
-	extends BackgroundModel<T>
-{
+public abstract class BackgroundModelMoving<T extends ImageBase<T>, MotionModel extends InvertibleTransform<MotionModel>>
+		extends BackgroundModel<T> {
 
 	// Convert the motion model into a usable format
 	protected Point2Transform2Model_F32<MotionModel> transform;
@@ -79,10 +78,11 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>,MotionModel e
 
 	/**
 	 * Constructor which provides the motion model and image type
+	 *
 	 * @param transform Point transform which can be used to apply the motion model
 	 * @param imageType Type of input image
 	 */
-	public BackgroundModelMoving(Point2Transform2Model_F32<MotionModel> transform, ImageType<T> imageType) {
+	protected BackgroundModelMoving( Point2Transform2Model_F32<MotionModel> transform, ImageType<T> imageType ) {
 		super(imageType);
 		this.transform = transform;
 
@@ -104,7 +104,7 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>,MotionModel e
 	 * @param backgroundHeight Height of background
 	 * @param homeToWorld Transform from home to world.
 	 */
-	public abstract void initialize( int backgroundWidth , int backgroundHeight , MotionModel homeToWorld );
+	public abstract void initialize( int backgroundWidth, int backgroundHeight, MotionModel homeToWorld );
 
 	/**
 	 * Updates the background with new image information.
@@ -112,16 +112,16 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>,MotionModel e
 	 * @param homeToCurrent Transform from home image to the current image
 	 * @param frame The current image in the sequence
 	 */
-	public void updateBackground(MotionModel homeToCurrent, T frame) {
+	public void updateBackground( MotionModel homeToCurrent, T frame ) {
 		worldToHome.concat(homeToCurrent, worldToCurrent);
 		worldToCurrent.invert(currentToWorld);
 
 		// find the distorted polygon of the current image in the "home" background reference frame
 		transform.setModel(currentToWorld);
 		transform.compute(0, 0, corners[0]);
-		transform.compute(frame.width-1,0,corners[1]);
-		transform.compute(frame.width-1,frame.height-1,corners[2]);
-		transform.compute(0, frame.height-1, corners[3]);
+		transform.compute(frame.width - 1, 0, corners[1]);
+		transform.compute(frame.width - 1, frame.height - 1, corners[2]);
+		transform.compute(0, frame.height - 1, corners[3]);
 
 		// find the bounding box
 		int x0 = Integer.MAX_VALUE;
@@ -134,42 +134,43 @@ public abstract class BackgroundModelMoving<T extends ImageBase<T>,MotionModel e
 			int x = (int)p.x;
 			int y = (int)p.y;
 
-			if( x0 > x ) x0 = x;
-			if( y0 > y ) y0 = y;
-			if( x1 < x ) x1 = x;
-			if( y1 < y ) y1 = y;
+			if (x0 > x) x0 = x;
+			if (y0 > y) y0 = y;
+			if (x1 < x) x1 = x;
+			if (y1 < y) y1 = y;
 		}
-		x1++;y1++;
+		x1++;
+		y1++;
 
-		if( x0 < 0 ) x0 = 0;
-		if( x1 > backgroundWidth ) x1 = backgroundWidth;
-		if( y0 < 0 ) y0 = 0;
-		if( y1 > backgroundHeight ) y1 = backgroundHeight;
+		if (x0 < 0) x0 = 0;
+		if (x1 > backgroundWidth) x1 = backgroundWidth;
+		if (y0 < 0) y0 = 0;
+		if (y1 > backgroundHeight) y1 = backgroundHeight;
 
-		updateBackground(x0,y0,x1,y1,frame);
+		updateBackground(x0, y0, x1, y1, frame);
 	}
 
 	/**
 	 * Call to update the background with the frame inside the bounding box.  Implementing class needs to
 	 * make sure the rectangle is inside the background.
 	 */
-	protected abstract void updateBackground( int x0 , int y0 , int x1 , int y1 , T frame );
+	protected abstract void updateBackground( int x0, int y0, int x1, int y1, T frame );
 
 	/**
 	 * Invoke to use the background image to segment the current frame into background and foreground pixels
 	 *
-	 * @param homeToCurrent  Transform from home image to the current image
+	 * @param homeToCurrent Transform from home image to the current image
 	 * @param frame current image
 	 * @param segmented Segmented image. 0 = background, 1 = foreground/moving
 	 */
-	public void segment( MotionModel homeToCurrent , T frame , GrayU8 segmented ) {
-		InputSanityCheck.checkSameShape(frame,segmented);
+	public void segment( MotionModel homeToCurrent, T frame, GrayU8 segmented ) {
+		InputSanityCheck.checkSameShape(frame, segmented);
 
 		worldToHome.concat(homeToCurrent, worldToCurrent);
 		worldToCurrent.invert(currentToWorld);
 
-		_segment(currentToWorld,frame,segmented);
+		_segment(currentToWorld, frame, segmented);
 	}
 
-	protected abstract void _segment( MotionModel currentToWorld , T frame , GrayU8 segmented );
+	protected abstract void _segment( MotionModel currentToWorld, T frame, GrayU8 segmented );
 }

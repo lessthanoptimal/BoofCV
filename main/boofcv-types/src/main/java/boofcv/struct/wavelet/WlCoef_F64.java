@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,18 @@ package boofcv.struct.wavelet;
 public class WlCoef_F64 extends WlCoef {
 
 	// scaling numbers
-	public double scaling[];
+	public double[] scaling;
 	// wavelet numbers
-	public double wavelet[];
+	public double[] wavelet;
+
+	public WlCoef_F64() {}
+
+	public WlCoef_F64(double[] scaling, int offsetScaling , double[] wavelet , int offsetWavelet ) {
+		this.scaling = scaling;
+		this.wavelet = wavelet;
+		this.offsetScaling = offsetScaling;
+		this.offsetWavelet = offsetWavelet;
+	}
 
 	@Override
 	public Class<?> getType() {

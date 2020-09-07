@@ -74,7 +74,7 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 	protected void configureContourDetector(T gray) {
 		// overestimate for multiple reasons. Doesn't take in account space and distance between touching circles
 		// isn't correct
-		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows));
+		int diameter = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 
 		BinaryEllipseDetectorPixel binaryDetector = ellipseDetector.getEllipseDetector();
 		binaryDetector.setMaximumContour((int)(Math.PI*diameter*3)+1);
@@ -83,7 +83,7 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 
 	@Override
 	public int totalEllipses( int numRows , int numCols ) {
-		return (numRows/2)*(numCols/2) + ((numRows+1)/2)*((numCols+1)/2);
+		return numRows/2*(numCols/2) + (numRows+1)/2*((numCols+1)/2);
 	}
 
 	/**

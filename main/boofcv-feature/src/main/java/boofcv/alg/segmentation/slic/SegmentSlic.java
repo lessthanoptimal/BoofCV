@@ -113,8 +113,8 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 
 	private volatile boolean stopRequested=false;
 
-	public SegmentSlic( int numberOfRegions , float m , int totalIterations ,
-						ConnectRule connectRule , ImageType<T> imageType ) {
+	protected SegmentSlic( int numberOfRegions , float m , int totalIterations ,
+						   ConnectRule connectRule , ImageType<T> imageType ) {
 		this.numberOfRegions = numberOfRegions;
 		this.m = m;
 		this.totalIterations = totalIterations;

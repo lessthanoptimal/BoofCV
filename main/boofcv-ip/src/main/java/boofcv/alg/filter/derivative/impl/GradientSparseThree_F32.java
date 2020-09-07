@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,6 +83,6 @@ public class GradientSparseThree_F32 implements SparseImageGradient<GrayF32,Grad
 
 	@Override
 	public boolean isInBounds(int x, int y) {
-		return border != null || x >= 1 && y >= 1 && x < input.width - 1 && y < input.height - 1;
+		return border != null || (x >= 1 && y >= 1 && (x < input.width - 1) && (y < input.height - 1));
 	}
 }

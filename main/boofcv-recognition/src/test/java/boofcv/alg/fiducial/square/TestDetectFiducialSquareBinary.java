@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TestDetectFiducialSquareBinary {
 
 	private Random rand = new Random(234);
 	private DetectPolygonBinaryGrayRefine<GrayU8> squareDetector = FactoryShapeDetector.polygon(
-			new ConfigPolygonDetector(false, 4,4),GrayU8.class);
+			new ConfigPolygonDetector(false, 4, 4), GrayU8.class);
 	private InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);
 
 	/**
@@ -59,14 +59,14 @@ public class TestDetectFiducialSquareBinary {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
 			DetectFiducialSquareBinary alg =
-					new DetectFiducialSquareBinary<>(gridWidth,borderWidth,blackBorderFraction,
-							inputToBinary,squareDetector,GrayU8.class);
+					new DetectFiducialSquareBinary<>(gridWidth, borderWidth, blackBorderFraction,
+							inputToBinary, squareDetector, GrayU8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-			assertTrue(alg.processSquare(input, result,0,0));
+			assertTrue(alg.processSquare(input, result, 0, 0));
 
 			assertEquals(314, result.which);
-			assertEquals(Math.max(0,i-1), result.rotation);
+			assertEquals(Math.max(0, i - 1), result.rotation);
 		}
 	}
 
@@ -76,31 +76,31 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void processSquare_negative() {
 		GrayF32 input = create(DetectFiducialSquareBinary.w, 314);
-		ImageMiscOps.fillUniform(input,rand,0,255);
+		ImageMiscOps.fillUniform(input, rand, 0, 255);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<>(gridWidth,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,GrayU8.class);
+				new DetectFiducialSquareBinary<>(gridWidth, borderWidth, blackBorderFraction,
+						inputToBinary, squareDetector, GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-		assertFalse(alg.processSquare(input, result,0,0));
+		assertFalse(alg.processSquare(input, result, 0, 0));
 	}
 
 	@Test
 	public void getNumberOfDistinctFiducials() {
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<>(3,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,GrayU8.class);
-		assertEquals(32,alg.getNumberOfDistinctFiducials());
+				new DetectFiducialSquareBinary<>(3, borderWidth, blackBorderFraction,
+						inputToBinary, squareDetector, GrayU8.class);
+		assertEquals(32, alg.getNumberOfDistinctFiducials());
 
-		alg = new DetectFiducialSquareBinary<>(4,borderWidth,blackBorderFraction,
-				inputToBinary,squareDetector,GrayU8.class);
-		assertEquals(4096,alg.getNumberOfDistinctFiducials());
-		alg = new DetectFiducialSquareBinary<>(5,borderWidth,blackBorderFraction,
-				inputToBinary,squareDetector,GrayU8.class);
-		assertEquals(2097152,alg.getNumberOfDistinctFiducials());
-		alg = new DetectFiducialSquareBinary<>(6,borderWidth,blackBorderFraction,
-				inputToBinary,squareDetector,GrayU8.class);
+		alg = new DetectFiducialSquareBinary<>(4, borderWidth, blackBorderFraction,
+				inputToBinary, squareDetector, GrayU8.class);
+		assertEquals(4096, alg.getNumberOfDistinctFiducials());
+		alg = new DetectFiducialSquareBinary<>(5, borderWidth, blackBorderFraction,
+				inputToBinary, squareDetector, GrayU8.class);
+		assertEquals(2097152, alg.getNumberOfDistinctFiducials());
+		alg = new DetectFiducialSquareBinary<>(6, borderWidth, blackBorderFraction,
+				inputToBinary, squareDetector, GrayU8.class);
 		assertEquals(4294967296L, alg.getNumberOfDistinctFiducials());
 	}
 
@@ -110,14 +110,14 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void checkGrid3x3() {
 		int number = 9;
-		GrayF32 input = create(DetectFiducialSquareBinary.w, number,3, borderWidth);
+		GrayF32 input = create(DetectFiducialSquareBinary.w, number, 3, borderWidth);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<>(3,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,GrayU8.class);
+				new DetectFiducialSquareBinary<>(3, borderWidth, blackBorderFraction,
+						inputToBinary, squareDetector, GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-		assertTrue(alg.processSquare(input, result,0,0));
+		assertTrue(alg.processSquare(input, result, 0, 0));
 
 		assertEquals(number, result.which);
 	}
@@ -128,14 +128,14 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void checkGrid5x5() {
 		int number = 299382;
-		GrayF32 input = create(DetectFiducialSquareBinary.w, number,5, borderWidth);
+		GrayF32 input = create(DetectFiducialSquareBinary.w, number, 5, borderWidth);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<>(5,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,GrayU8.class);
+				new DetectFiducialSquareBinary<>(5, borderWidth, blackBorderFraction,
+						inputToBinary, squareDetector, GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-		assertTrue(alg.processSquare(input, result,0,0));
+		assertTrue(alg.processSquare(input, result, 0, 0));
 
 		assertEquals(number, result.which);
 	}
@@ -147,37 +147,38 @@ public class TestDetectFiducialSquareBinary {
 	public void differentBorderSizes() {
 
 		int number = 128;
-		double borders[] = new double[]{0.1,0.15,0.3};
+		double[] borders = new double[]{0.1, 0.15, 0.3};
 
-		for( double border : borders ) {
+		for (double border : borders) {
 
-			GrayF32 input = create(DetectFiducialSquareBinary.w, number,4, border);
+			GrayF32 input = create(DetectFiducialSquareBinary.w, number, 4, border);
 
 			DetectFiducialSquareBinary alg =
-					new DetectFiducialSquareBinary<>(gridWidth,border,blackBorderFraction,
-							inputToBinary,squareDetector,GrayU8.class);
+					new DetectFiducialSquareBinary<>(gridWidth, border, blackBorderFraction,
+							inputToBinary, squareDetector, GrayU8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-			assertTrue(alg.processSquare(input, result,0,0));
+			assertTrue(alg.processSquare(input, result, 0, 0));
 
 			assertEquals(number, result.which);
 		}
 	}
-	public static GrayF32 create(int square, int value ) {
-		return create(square,value,gridWidth,borderWidth);
+
+	public static GrayF32 create( int square, int value ) {
+		return create(square, value, gridWidth, borderWidth);
 	}
 
-	public static GrayF32 create(int square, int value, int gridWidth , double borderFraction) {
+	public static GrayF32 create( int square, int value, int gridWidth, double borderFraction ) {
 
-		int width = (int)Math.round((square*gridWidth)/(1-2.0*borderFraction));
+		int width = (int)Math.round((square*gridWidth)/(1 - 2.0*borderFraction));
 
 		FiducialImageEngine render = new FiducialImageEngine();
-		render.configure(0,width);
+		render.configure(0, width);
 
 		FiducialSquareGenerator generator = new FiducialSquareGenerator(render);
 		generator.setMarkerWidth(width);
 		generator.setBlackBorder(borderFraction);
-		generator.generate(value,gridWidth);
+		generator.generate(value, gridWidth);
 
 		return render.getGrayF32();
 	}
@@ -210,20 +211,20 @@ public class TestDetectFiducialSquareBinary {
 //		ShowImages.showWindow(ret,"OLD");
 //	}
 
-	private static int index( int bit , int gridWidth ) {
-		int transitionBit0 = gridWidth-3;
-		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
-		int transitionBit2 = transitionBit1 + gridWidth-2;
-
-		if( bit <= transitionBit0 )
-			bit++;
-		else if( bit <= transitionBit1 )
-			bit += 2;
-		else if( bit <= transitionBit2 )
-			bit += 3;
-		else
-			throw new RuntimeException("Bit out of range");
-
-		return bit;
-	}
+//	private static int index( int bit , int gridWidth ) {
+//		int transitionBit0 = gridWidth-3;
+//		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
+//		int transitionBit2 = transitionBit1 + gridWidth-2;
+//
+//		if( bit <= transitionBit0 )
+//			bit++;
+//		else if( bit <= transitionBit1 )
+//			bit += 2;
+//		else if( bit <= transitionBit2 )
+//			bit += 3;
+//		else
+//			throw new RuntimeException("Bit out of range");
+//
+//		return bit;
+//	}
 }

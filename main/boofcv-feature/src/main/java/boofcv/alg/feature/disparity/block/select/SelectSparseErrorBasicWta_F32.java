@@ -36,8 +36,8 @@ public class SelectSparseErrorBasicWta_F32 implements DisparitySparseSelect<floa
 	int disparity;
 
 	@Override
-	public boolean select(DisparitySparseRectifiedScoreBM<float[],?> scorer, int x, int y) {
-		if( !scorer.processLeftToRight(x,y) )
+	public boolean select( DisparitySparseRectifiedScoreBM<float[], ?> scorer, int x, int y ) {
+		if (!scorer.processLeftToRight(x, y))
 			return false;
 		float[] scores = scorer.getScoreLtoR();
 		int disparityRange = scorer.getLocalRangeLtoR();
@@ -45,8 +45,8 @@ public class SelectSparseErrorBasicWta_F32 implements DisparitySparseSelect<floa
 		disparity = 0;
 		float best = scores[0];
 
-		for(int i = 1; i < disparityRange; i++ ) {
-			if( scores[i] < best ) {
+		for (int i = 1; i < disparityRange; i++) {
+			if (scores[i] < best) {
 				best = scores[i];
 				disparity = i;
 			}

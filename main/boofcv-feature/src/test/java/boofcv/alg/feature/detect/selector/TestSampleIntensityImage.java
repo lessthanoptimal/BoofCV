@@ -18,16 +18,85 @@
 
 package boofcv.alg.feature.detect.selector;
 
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I16;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 class TestSampleIntensityImage {
-	@Test
-	void foo() {
-		fail("Implement");
+
+	Random rand = BoofTesting.createRandom(34);
+	GrayF32 image = new GrayF32(30, 40);
+
+	public TestSampleIntensityImage() {
+		ImageMiscOps.fillUniform(image, rand, -1, 1);
+	}
+
+	@Nested
+	public class I16 {
+		@Test
+		void sample() {
+			var sampler = new SampleIntensityImage.I16();
+			float expected = image.get(3, 5);
+			float found = sampler.sample(image, -1, new Point2D_I16((short)3, (short)5));
+			assertEquals(expected, found, 1e-8f);
+		}
+
+		@Test
+		void get() {
+			var sampler = new SampleIntensityImage.I16();
+			var p = new Point2D_I16((short)3, (short)5);
+			assertEquals(3, sampler.getX(p));
+			assertEquals(5, sampler.getY(p));
+		}
+	}
+
+	@Nested
+	public class F32 {
+		@Test
+		void sample() {
+			var sampler = new SampleIntensityImage.F32();
+			float expected = image.get(3, 5);
+			float found = sampler.sample(image, -1, new Point2D_F32(3.2f, 5.6f));
+			assertEquals(expected, found, 1e-8f);
+		}
+
+		@Test
+		void get() {
+			var sampler = new SampleIntensityImage.F32();
+			var p = new Point2D_F32(3.2f, 5.6f);
+			assertEquals(3, sampler.getX(p));
+			assertEquals(5, sampler.getY(p));
+		}
+	}
+
+	@Nested
+	public class F64 {
+		@Test
+		void sample() {
+			var sampler = new SampleIntensityImage.F64();
+			float expected = image.get(3, 5);
+			float found = sampler.sample(image, -1, new Point2D_F64(3.2, 5.6));
+			assertEquals(expected, found, 1e-8f);
+		}
+
+		@Test
+		void get() {
+			var sampler = new SampleIntensityImage.F64();
+			var p = new Point2D_F64(3.2, 5.6);
+			assertEquals(3, sampler.getX(p));
+			assertEquals(5, sampler.getY(p));
+		}
 	}
 }

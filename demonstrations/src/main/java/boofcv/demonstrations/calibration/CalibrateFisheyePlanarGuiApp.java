@@ -60,17 +60,16 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 
 	public CalibrateFisheyePlanarGuiApp() {
 		setLayout(new BorderLayout());
-		gui.mainView.setPreferredSize(new Dimension(600,720));
+		gui.mainView.setPreferredSize(new Dimension(600, 720));
 		this.owner = this;
 
-		add(gui,BorderLayout.CENTER);
+		add(gui, BorderLayout.CENTER);
 	}
 
-	public CalibrateMonoPlanar configure( DetectorFiducialCalibration detector ,
-										  List<String> images  )
-	{
+	public CalibrateMonoPlanar configure( DetectorFiducialCalibration detector,
+										  List<String> images ) {
 		this.detector = detector;
-		if( images.size() == 0 )
+		if (images.size() == 0)
 			throw new IllegalArgumentException("No images!");
 		BoofMiscOps.sortFileNames(images);
 		calibrator = new CalibrateMonoPlanar(detector.getLayout());
@@ -83,12 +82,12 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		final ProcessThread monitor = new ProcessThread();
 		monitor.start();
 
-		for( int i = 0; i < images.size(); i++ ) {
+		for (int i = 0; i < images.size(); i++) {
 			final File file = new File(images.get(i));
 			final BufferedImage orig = media.openImage(images.get(i));
-			if( orig != null ) {
-				GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
-				if( detector.process(input)) {
+			if (orig != null) {
+				GrayF32 input = ConvertBufferedImage.convertFrom(orig, (GrayF32)null);
+				if (detector.process(input)) {
 					calibrator.addImage(detector.getDetectedPoints());
 					SwingUtilities.invokeLater(() -> {
 						gui.addImage(file);
@@ -96,42 +95,34 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 						monitor.setMessage(0, file.getName());
 					});
 				} else {
-					System.out.println("Failed to detect image.  "+file.getName());
+					System.out.println("Failed to detect image.  " + file.getName());
 				}
 			} else {
-				System.out.println("Failed to load "+images.get(i));
+				System.out.println("Failed to load " + images.get(i));
 			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setObservations(calibrator.getObservations());
-			}});
+		SwingUtilities.invokeLater(() -> gui.setObservations(calibrator.getObservations()));
 		gui.repaint();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				monitor.setMessage(1,"Estimating Parameters");
-			}});
+		SwingUtilities.invokeLater(() -> monitor.setMessage(1, "Estimating Parameters"));
 
 		final CameraUniversalOmni param = calibrator.process();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setResults(calibrator.getErrors());
-				gui.setCalibration(calibrator.getIntrinsic(),calibrator.getStructure());
-			}});
+		SwingUtilities.invokeLater(() -> {
+			gui.setResults(calibrator.getErrors());
+			gui.setCalibration(calibrator.getIntrinsic(), calibrator.getStructure());
+		});
 		monitor.stopThread();
 
-		if( outputFileName != null )
+		if (outputFileName != null)
 			CalibrationIO.save(param, outputFileName);
 
 		// tell it how to undistort the image
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setCorrection(param);
+		SwingUtilities.invokeLater(() -> {
+			gui.setCorrection(param);
 
-				gui.repaint();
-			}});
+			gui.repaint();
+		});
 
 		// print the output
 		calibrator.printStatistics();
@@ -144,18 +135,16 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
-	public class ProcessThread extends ProgressMonitorThread
-	{
+	public class ProcessThread extends ProgressMonitorThread {
 		public ProcessThread() {
 			super(new ProgressMonitor(owner, "Computing Calibration", "", 0, 2));
 		}
 
-		public void setMessage( final int state , final String message ) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					monitor.setProgress(state);
-					monitor.setNote(message);
-				}});
+		public void setMessage( final int state, final String message ) {
+			SwingUtilities.invokeLater(() -> {
+				monitor.setProgress(state);
+				monitor.setNote(message);
+			});
 		}
 
 		@Override
@@ -163,18 +152,18 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DetectorFiducialCalibration detector =
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(8, 8, 0.5, 7.0 / 18.0));
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4,3,30,30));
-				FactoryFiducialCalibration.chessboardX(null,new ConfigGridDimen(7, 5, 30));
+				FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
 //				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6));
 
 		List<String> images;
 		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 //		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			CalibrateFisheyePlanarGuiApp app = new CalibrateFisheyePlanarGuiApp();
 			app.configure(detector, images).configureUniversalOmni(true, 2, false);
 

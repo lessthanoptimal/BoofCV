@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,19 +41,19 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 	protected int width = 30;
 	protected int height = 40;
 
-	protected int borderX0=0,borderY0=0;
-	protected int borderX1=0,borderY1=0;
+	protected int borderX0 = 0, borderY0 = 0;
+	protected int borderX1 = 0, borderY1 = 0;
 
-	public CompareImageBorder(Class<?> targetClass ) {
+	protected CompareImageBorder( Class<?> targetClass ) {
 		super(targetClass, ConvolveImageStandard_SB.class, ConvolveImageStandard_IL.class);
 	}
 
-	protected void computeBorder( KernelBase kernel , String functionName ) {
-		borderX0=borderY0=0;
-		borderX1=borderY1=0;
+	protected void computeBorder( KernelBase kernel, String functionName ) {
+		borderX0 = borderY0 = 0;
+		borderX1 = borderY1 = 0;
 
-		if( kernel instanceof Kernel1D) {
-			if( functionName.contains("horizontal")) {
+		if (kernel instanceof Kernel1D) {
+			if (functionName.contains("horizontal")) {
 				borderX0 = kernel.getOffset();
 				borderX1 = kernel.getWidth() - kernel.getOffset() - 1;
 			} else {
@@ -62,17 +62,17 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 			}
 		} else {
 			borderX0 = borderY0 = kernel.getOffset();
-			borderX1 = borderY1 = kernel.getWidth()-kernel.getOffset()-1;
+			borderX1 = borderY1 = kernel.getWidth() - kernel.getOffset() - 1;
 		}
 	}
 
-	protected <T extends ImageBase<T>>T stripBorder(T a ,
-												 int borderX0 , int borderY0,
-												 int borderX1 , int borderY1 ) {
-		return a.subimage(borderX0,borderY0,a.width-borderX1,a.height-borderY1, null);
+	protected <T extends ImageBase<T>> T stripBorder( T a,
+													  int borderX0, int borderY0,
+													  int borderX1, int borderY1 ) {
+		return a.subimage(borderX0, borderY0, a.width - borderX1, a.height - borderY1, null);
 	}
 
-	protected KernelBase createKernel(Class kernelType, int kernelWidth, int kernelOffset) {
+	protected KernelBase createKernel( Class kernelType, int kernelWidth, int kernelOffset ) {
 		KernelBase k = FactoryKernel.random(kernelType, kernelWidth, kernelOffset, -12, 10, rand);
 		return k;
 	}

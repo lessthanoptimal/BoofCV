@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public abstract class GenericOrientationImageTests<T extends ImageGray<T>> exten
 	// integral image
 	T image;
 
-	public GenericOrientationImageTests(double angleTolerance, int regionSize , Class<T> imageType) {
+	protected GenericOrientationImageTests(double angleTolerance, int regionSize , Class<T> imageType) {
 		super(imageType);
 		this.angleTolerance = angleTolerance;
 		this.regionSize = regionSize;

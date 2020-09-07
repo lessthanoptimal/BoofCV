@@ -40,71 +40,69 @@ public interface SparseScoreRectifiedCensus {
 	 * Applies a census transform to the input image and creates a new transformed image patch for later processing
 	 */
 	abstract class Census<In extends ImageGray<In>, Out extends ImageGray<Out>>
-			extends DisparitySparseRectifiedScoreBM_S32<In>
-	{
+			extends DisparitySparseRectifiedScoreBM_S32<In> {
 		// Applies census transform to input iamges
-		FilterCensusTransform<In,Out> censusTran;
+		FilterCensusTransform<In, Out> censusTran;
 
 		// census transform applied to left and right image patches
 		Out censusLeft, censusRight;
 
-		public Census(int radiusX, int radiusY, FilterCensusTransform<In,Out> censusTran, Class<In> imageType ) {
+		protected Census( int radiusX, int radiusY, FilterCensusTransform<In, Out> censusTran, Class<In> imageType ) {
 			super(radiusX, radiusY, imageType);
 			this.censusTran = censusTran;
 			setSampleRegion(censusTran.getRadiusX(), censusTran.getRadiusY());
 
-			censusLeft = censusTran.getOutputType().createImage(1,1);
-			censusRight = censusTran.getOutputType().createImage(1,1);
+			censusLeft = censusTran.getOutputType().createImage(1, 1);
+			censusRight = censusTran.getOutputType().createImage(1, 1);
 		}
 
 		@Override
-		public void configure( int disparityMin , int disparityRange ) {
-			super.configure(disparityMin,disparityRange);
+		public void configure( int disparityMin, int disparityRange ) {
+			super.configure(disparityMin, disparityRange);
 			censusLeft.reshape(patchTemplate);
 		}
 
 		@Override
-		protected void scoreDisparity(int disparityRange, final boolean leftToRight) {
+		protected void scoreDisparity( int disparityRange, final boolean leftToRight ) {
 			censusRight.reshape(patchCompare);
 
 			// NOTE: the borders do not need to be processed
-			censusTran.process(patchTemplate,censusLeft);
-			censusTran.process(patchCompare,censusRight);
+			censusTran.process(patchTemplate, censusLeft);
+			censusTran.process(patchCompare, censusRight);
 
-			scoreCensus(disparityRange,leftToRight);
+			scoreCensus(disparityRange, leftToRight);
 		}
 
-		protected abstract void scoreCensus( int disparityRange, final boolean leftToRight);
+		protected abstract void scoreCensus( int disparityRange, final boolean leftToRight );
 	}
 
 	/**
 	 * Computes census score for transformed images of type U8
 	 */
-	class U8<T extends GrayI<T>> extends Census<T,GrayU8> {
-		public U8(int radiusX, int radiusY,
-				  FilterCensusTransform<T, GrayU8> censusTran,
-				  Class<T> imageType)
-		{
+	class U8<T extends GrayI<T>> extends Census<T, GrayU8> {
+		public U8( int radiusX, int radiusY,
+				   FilterCensusTransform<T, GrayU8> censusTran,
+				   Class<T> imageType ) {
 			super(radiusX, radiusY, censusTran, imageType);
 		}
 
 		@Override
-		protected void scoreCensus(int disparityRange, final boolean leftToRight) {
+		protected void scoreCensus( int disparityRange, final boolean leftToRight ) {
 			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
-			final byte[] dataLeft  = censusLeft.data;
+			final byte[] dataLeft = censusLeft.data;
 			final byte[] dataRight = censusRight.data;
 			for (int d = 0; d < disparityRange; d++) {
 				int total = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxLeft  = (y+sampleRadiusY)*censusLeft.stride + sampleRadiusX;
-					int idxRight = (y+sampleRadiusY)*censusRight.stride + sampleRadiusX + d;
+					int idxLeft = (y + sampleRadiusY)*censusLeft.stride + sampleRadiusX;
+					int idxRight = (y + sampleRadiusY)*censusRight.stride + sampleRadiusX + d;
 					for (int x = 0; x < blockWidth; x++) {
-						final int a = dataLeft[ idxLeft++ ]& 0xFF;
-						final int b = dataRight[ idxRight++ ]& 0xFF;
-						total += DescriptorDistance.hamming(a^b);
+						final int a = dataLeft[idxLeft++] & 0xFF;
+						final int b = dataRight[idxRight++] & 0xFF;
+						total += DescriptorDistance.hamming(a ^ b);
 					}
 				}
-				int index = leftToRight ? disparityRange-d-1 : d;
+				int index = leftToRight ? disparityRange - d - 1 : d;
 				scores[index] = total;
 			}
 		}
@@ -113,31 +111,30 @@ public interface SparseScoreRectifiedCensus {
 	/**
 	 * Computes census score for transformed images of type S32
 	 */
-	class S32<T extends GrayI<T>> extends Census<T,GrayS32> {
-		public S32(int radiusX, int radiusY,
-				   FilterCensusTransform<T, GrayS32> censusTran,
-				  Class<T> imageType)
-		{
+	class S32<T extends GrayI<T>> extends Census<T, GrayS32> {
+		public S32( int radiusX, int radiusY,
+					FilterCensusTransform<T, GrayS32> censusTran,
+					Class<T> imageType ) {
 			super(radiusX, radiusY, censusTran, imageType);
 		}
 
 		@Override
-		protected void scoreCensus(int disparityRange, final boolean leftToRight) {
+		protected void scoreCensus( int disparityRange, final boolean leftToRight ) {
 			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
-			final int[] dataLeft  = censusLeft.data;
+			final int[] dataLeft = censusLeft.data;
 			final int[] dataRight = censusRight.data;
 			for (int d = 0; d < disparityRange; d++) {
 				int total = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxLeft  = (y+sampleRadiusY)*censusLeft.stride + sampleRadiusX;
-					int idxRight = (y+sampleRadiusY)*censusRight.stride + sampleRadiusX + d;
+					int idxLeft = (y + sampleRadiusY)*censusLeft.stride + sampleRadiusX;
+					int idxRight = (y + sampleRadiusY)*censusRight.stride + sampleRadiusX + d;
 					for (int x = 0; x < blockWidth; x++) {
-						final int a = dataLeft[ idxLeft++ ];
-						final int b = dataRight[ idxRight++ ];
-						total += DescriptorDistance.hamming(a^b);
+						final int a = dataLeft[idxLeft++];
+						final int b = dataRight[idxRight++];
+						total += DescriptorDistance.hamming(a ^ b);
 					}
 				}
-				int index = leftToRight ? disparityRange-d-1 : d;
+				int index = leftToRight ? disparityRange - d - 1 : d;
 				scores[index] = total;
 			}
 		}
@@ -146,31 +143,30 @@ public interface SparseScoreRectifiedCensus {
 	/**
 	 * Computes census score for transformed images of type S64
 	 */
-	class S64<T extends GrayI<T>> extends Census<T,GrayS64> {
-		public S64(int radiusX, int radiusY,
-				   FilterCensusTransform<T, GrayS64> censusTran,
-				   Class<T> imageType)
-		{
+	class S64<T extends GrayI<T>> extends Census<T, GrayS64> {
+		public S64( int radiusX, int radiusY,
+					FilterCensusTransform<T, GrayS64> censusTran,
+					Class<T> imageType ) {
 			super(radiusX, radiusY, censusTran, imageType);
 		}
 
 		@Override
-		protected void scoreCensus(int disparityRange, final boolean leftToRight) {
+		protected void scoreCensus( int disparityRange, final boolean leftToRight ) {
 			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
-			final long[] dataLeft  = censusLeft.data;
+			final long[] dataLeft = censusLeft.data;
 			final long[] dataRight = censusRight.data;
 			for (int d = 0; d < disparityRange; d++) {
 				int total = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxLeft  = (y+sampleRadiusY)*censusLeft.stride + sampleRadiusX;
-					int idxRight = (y+sampleRadiusY)*censusRight.stride + sampleRadiusX + d;
+					int idxLeft = (y + sampleRadiusY)*censusLeft.stride + sampleRadiusX;
+					int idxRight = (y + sampleRadiusY)*censusRight.stride + sampleRadiusX + d;
 					for (int x = 0; x < blockWidth; x++) {
-						final long a = dataLeft[ idxLeft++ ];
-						final long b = dataRight[ idxRight++ ];
-						total += DescriptorDistance.hamming(a^b);
+						final long a = dataLeft[idxLeft++];
+						final long b = dataRight[idxRight++];
+						total += DescriptorDistance.hamming(a ^ b);
 					}
 				}
-				int index = leftToRight ? disparityRange-d-1 : d;
+				int index = leftToRight ? disparityRange - d - 1 : d;
 				scores[index] = total;
 			}
 		}

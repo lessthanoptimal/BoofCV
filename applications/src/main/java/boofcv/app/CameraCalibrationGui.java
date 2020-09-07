@@ -187,11 +187,7 @@ public class CameraCalibrationGui extends JPanel
 			createDetector();
 			frame.setVisible(false);
 
-			new Thread() {
-				public void run() {
-					app.process();
-				}
-			}.start();
+			new Thread(() -> app.process()).start();
 		}
 	}
 
@@ -213,15 +209,13 @@ public class CameraCalibrationGui extends JPanel
 			createDetector();
 			frame.setVisible(false);
 
-			new Thread() {
-				public void run() {
-					try {
-						app.process();
-					} catch( RuntimeException e ) {
-						BoofSwingUtil.warningDialog(frame,e);
-					}
+			new Thread(() -> {
+				try {
+					app.process();
+				} catch( RuntimeException e ) {
+					BoofSwingUtil.warningDialog(frame,e);
 				}
-			}.start();
+			}).start();
 		}
 	}
 

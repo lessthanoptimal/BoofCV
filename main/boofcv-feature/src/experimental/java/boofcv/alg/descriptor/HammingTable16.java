@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ package boofcv.alg.descriptor;
 public class HammingTable16 {
 
 	// about 10% faster if int[] is used instead of byte[]
-	public int score[] = new int[65536];
+	public int[] score = new int[65536];
 
 	public HammingTable16() {
 		int index = 0;

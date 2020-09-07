@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,13 +33,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class GeoModelEstimatorNto1<Model,Point> implements GeoModelEstimator1<Model,Point> {
+public abstract class GeoModelEstimatorNto1<Model, Point> implements GeoModelEstimator1<Model, Point> {
 
 	// Algorithm which generates multiple hypotheses
-	private GeoModelEstimatorN<Model,Point> alg;
+	private GeoModelEstimatorN<Model, Point> alg;
 
 	// measures how close of a fit the observation is to the model
-	private DistanceFromModel<Model,Point> distance;
+	private DistanceFromModel<Model, Point> distance;
 
 	// number of sample points used to evaluate hypotheses
 	private int numTest;
@@ -50,10 +50,10 @@ public abstract class GeoModelEstimatorNto1<Model,Point> implements GeoModelEsti
 	// storage for initial set of solutions
 	private FastQueue<Model> solutions;
 
-	public GeoModelEstimatorNto1(GeoModelEstimatorN<Model, Point> alg,
-								 DistanceFromModel<Model,Point> distance ,
-								 FastQueue<Model> solutions ,
-								 int numTest) {
+	protected GeoModelEstimatorNto1( GeoModelEstimatorN<Model, Point> alg,
+									 DistanceFromModel<Model, Point> distance,
+									 FastQueue<Model> solutions,
+									 int numTest ) {
 		this.alg = alg;
 		this.numTest = numTest;
 		this.distance = distance;
@@ -61,7 +61,7 @@ public abstract class GeoModelEstimatorNto1<Model,Point> implements GeoModelEsti
 	}
 
 	@Override
-	public boolean process(List<Point> points , Model estimatedModel ) {
+	public boolean process( List<Point> points, Model estimatedModel ) {
 
 		// only pass in the required number of points
 		list.clear();
@@ -77,7 +77,7 @@ public abstract class GeoModelEstimatorNto1<Model,Point> implements GeoModelEsti
 		int N = solutions.size();
 		if (N == 1) {
 			best = solutions.get(0);
-		} else if( N > 1 ) {
+		} else if (N > 1) {
 			double bestScore = Double.MAX_VALUE;
 			for (int i = 0; i < N; i++) {
 				Model m = solutions.get(i);
@@ -97,7 +97,7 @@ public abstract class GeoModelEstimatorNto1<Model,Point> implements GeoModelEsti
 			}
 		}
 
-		if( best != null ) {
+		if (best != null) {
 			copy(best, estimatedModel);
 			return true;
 		}

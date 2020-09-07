@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public abstract class StandardTupleDescribeTests {
 
 	GrayF32 image = new GrayF32(width,height);
 
-	public StandardTupleDescribeTests() {
+	protected StandardTupleDescribeTests() {
 		GImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
 

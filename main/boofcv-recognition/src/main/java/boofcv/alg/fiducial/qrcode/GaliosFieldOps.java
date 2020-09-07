@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,18 +25,18 @@ package boofcv.alg.fiducial.qrcode;
  *
  * <p>Code and code comments based on the tutorial at [1].</p>
  *
- *  <p>[1] <a href="https://en.wikiversity.org/wiki/Reed–Solomon_codes_for_coders">Reed-Solomon Codes for Coders</a>
- *  Viewed on September 28, 2017</p>
+ * <p>[1] <a href="https://en.wikiversity.org/wiki/Reed–Solomon_codes_for_coders">Reed-Solomon Codes for Coders</a>
+ * Viewed on September 28, 2017</p>
  *
  * @author Peter Abeles
  */
 public class GaliosFieldOps {
 
-	public static int add( int a , int b ) {
+	public static int add( int a, int b ) {
 		return a ^ b;
 	}
 
-	public static int subtract( int a , int b ) {
+	public static int subtract( int a, int b ) {
 		return a ^ b;
 	}
 
@@ -50,11 +50,11 @@ public class GaliosFieldOps {
 	 * @param b polynomial
 	 * @return result polynomial
 	 */
-	public static int multiply( int a , int b ) {
+	public static int multiply( int a, int b ) {
 		int z = 0;
 
-		for (int i = 0; (b>>i) > 0; i++) {
-			if( (b & (1 << i)) != 0 ) {
+		for (int i = 0; (b >> i) > 0; i++) {
+			if ((b & (1 << i)) != 0) {
 				z ^= a << i;
 			}
 		}
@@ -73,16 +73,16 @@ public class GaliosFieldOps {
 	 * @param domain Value of a the largest possible value plus 1. E.g. GF(2**8) would be 256
 	 * @return result polynomial
 	 */
-	public static int multiply( int x , int y , int primitive , int domain ) {
+	public static int multiply( int x, int y, int primitive, int domain ) {
 		int r = 0;
-		while( y > 0 ) {
-			if( (y&1) != 0 ) {
+		while (y > 0) {
+			if ((y & 1) != 0) {
 				r = r ^ x;
 			}
 			y = y >> 1;
 			x = x << 1;
 
-			if( x >= domain) {
+			if (x >= domain) {
 				x ^= primitive;
 			}
 		}
@@ -94,20 +94,20 @@ public class GaliosFieldOps {
 	 *
 	 * result = dividend mod divisor.
 	 */
-	public static int modulus( int dividend , int divisor ) {
+	public static int modulus( int dividend, int divisor ) {
 		// Compute the position of the most significant bit for each integers
 		int length_end = length(dividend);
 		int length_sor = length(divisor);
-        // If the dividend is smaller than the divisor then nothing needs to be done
-		if( length_end < length_sor )
+		// If the dividend is smaller than the divisor then nothing needs to be done
+		if (length_end < length_sor)
 			return dividend;
 
 		// Align the most significant 1 of the divisor to the most significant 1
 		// of the dividend (by shifting the divisor)
-		for( int i = length_end-length_sor; i >= 0; i-- ) {
+		for (int i = length_end - length_sor; i >= 0; i--) {
 			// Check that the dividend is divisible (useless for the first iteration but
 			// important for the next ones)
-			if((dividend & (1 << i + length_sor - 1)) != 0 ) {
+			if ((dividend & (1 << (i + length_sor - 1))) != 0) {
 				// if divisible, then shift the divisor to align the most significant bits and subtract.
 				dividend ^= divisor << i;
 			}
@@ -124,17 +124,17 @@ public class GaliosFieldOps {
 	 * @param divisor number on bottom
 	 * @return number of times divisor goes into dividend.
 	 */
-	public static int divide( int dividend , int divisor ) {
+	public static int divide( int dividend, int divisor ) {
 		int length_end = length(dividend);
 		int length_sor = length(divisor);
 
-		if( length_end < length_sor )
+		if (length_end < length_sor)
 			return 0;
 
 		int result = 0;
 
-		for( int i = length_end-length_sor; i >= 0; i-- ) {
-			if((dividend & (1 << i + length_sor - 1)) != 0 ) {
+		for (int i = length_end - length_sor; i >= 0; i--) {
+			if ((dividend & (1 << (i + length_sor - 1))) != 0) {
 				dividend ^= divisor << i;
 				result |= 1 << i;
 			}
@@ -142,13 +142,12 @@ public class GaliosFieldOps {
 		return result;
 	}
 
-
 	/**
 	 * The bit in which the most significant non-zero bit is stored
 	 */
 	public static int length( int value ) {
 		int length = 0;
-		while( (value>>length) != 0 ) {
+		while ((value >> length) != 0) {
 			length++;
 		}
 		return length;

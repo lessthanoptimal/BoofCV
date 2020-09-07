@@ -75,7 +75,7 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 //			return false;
 		final DMatrixRMaj H = selfCalib.rectifyingHomography;
 
-		// it solved directoy for the focal lengths in the first two views
+		// solved for the focal lengths in the first two views
 		metricViews.intrinsics.grow().fsetK(selfCalib.focalLengthA,selfCalib.focalLengthA,0,0,0,-1,-1);
 		metricViews.intrinsics.grow().fsetK(selfCalib.focalLengthB,selfCalib.focalLengthB,0,0,0,-1,-1);
 		// extract camera motion for view 2 using found

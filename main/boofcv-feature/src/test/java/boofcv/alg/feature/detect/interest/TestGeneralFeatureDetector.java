@@ -49,7 +49,7 @@ class TestGeneralFeatureDetector {
 	@Test
 	void basics() {
 		// use a real extractor
-		NonMaxSuppression extractorMin=null,extractorMax=null;
+		NonMaxSuppression extractorMin,extractorMax;
 
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 

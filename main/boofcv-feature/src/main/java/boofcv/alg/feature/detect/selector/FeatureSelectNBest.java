@@ -24,6 +24,7 @@ import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.jetbrains.annotations.Nullable;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Selects and sorts up to the N best features based on their intensity.
@@ -38,13 +39,14 @@ public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Po
 
 	SampleIntensity<Point> sampler;
 
-	public FeatureSelectNBest(SampleIntensity<Point> sampler) {this.sampler = sampler;}
+	public FeatureSelectNBest( SampleIntensity<Point> sampler ) {this.sampler = sampler;}
+
 	public FeatureSelectNBest() {}
 
 	@Override
-	public void select(GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
-					   FastAccess<Point> detected, int limit, FastArray<Point> selected) {
-		assert(limit>0);
+	public void select( GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
+						FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
+		assertBoof(limit > 0);
 		selected.reset();
 
 		if (detected.size <= limit) {
@@ -54,7 +56,7 @@ public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Po
 		}
 
 		// grow internal data structures
-		if( detected.size > indexes.length ) {
+		if (detected.size > indexes.length) {
 			indexes = new int[detected.size];
 			indexIntensity = new float[detected.size];
 		}
@@ -62,21 +64,21 @@ public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Po
 		// extract the intensities for each corner
 		Point[] points = detected.data;
 
-		if( positive ) {
+		if (positive) {
 			for (int i = 0; i < detected.size; i++) {
 				Point pt = points[i];
 				// quick select selects the k smallest
 				// I want the k-biggest so the negative is used
-				indexIntensity[i] = -sampler.sample(intensity,i,pt);
+				indexIntensity[i] = -sampler.sample(intensity, i, pt);
 			}
 		} else {
 			for (int i = 0; i < detected.size; i++) {
 				Point pt = points[i];
-				indexIntensity[i] = sampler.sample(intensity,i,pt);
+				indexIntensity[i] = sampler.sample(intensity, i, pt);
 			}
 		}
 
-		QuickSelect.selectIndex(indexIntensity,limit,detected.size,indexes);
+		QuickSelect.selectIndex(indexIntensity, limit, detected.size, indexes);
 
 		selected.resize(limit);
 		for (int i = 0; i < limit; i++) {
@@ -85,7 +87,7 @@ public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Po
 	}
 
 	@Override
-	public void setSampler(SampleIntensity<Point> sampler) {
+	public void setSampler( SampleIntensity<Point> sampler ) {
 		this.sampler = sampler;
 	}
 }

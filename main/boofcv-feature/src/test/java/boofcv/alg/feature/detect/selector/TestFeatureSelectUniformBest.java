@@ -23,6 +23,7 @@ import boofcv.struct.QueueCorner;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,26 +48,26 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		checkAllCells(false);
 	}
 
-	private void checkAllCells(boolean positive) {
+	private void checkAllCells( boolean positive ) {
 		float largeValue = positive ? 5 : -5;
 		// every pixel is a corner
 		QueueCorner detected = new QueueCorner();
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				detected.grow().set(x,y);
+				detected.grow().set(x, y);
 			}
 		}
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				intensity.set(x+2,y+2,largeValue);
+				intensity.set(x + 2, y + 2, largeValue);
 			}
 		}
 
 		// this one corner will by far have the most intense features
 		for (int y = 0; y < cellSize; y++) {
 			for (int x = 0; x < cellSize; x++) {
-				intensity.set(x,y, intensity.get(x,y)+largeValue*4);
+				intensity.set(x, y, intensity.get(x, y) + largeValue*4);
 			}
 		}
 
@@ -76,44 +77,43 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		alg.configUniform = new HackedConfig(cellSize);
 
 		// it should spread out the detections evenly throughout the cells
-		checkSpread(positive,detected, cellSize,1,found, alg);
+		checkSpread(positive, detected, cellSize, 1, found, alg);
 		// The ones it selects should be the ones with the large values
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				checkInside(x+2,y+2,found);
+				checkInside(x + 2, y + 2, found);
 			}
 		}
-		checkSpread(positive,detected, cellSize,2,found, alg);
+		checkSpread(positive, detected, cellSize, 2, found, alg);
 		// The ones it selects should be the ones with the large values
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				checkInside(x+2,y+2,found);
+				checkInside(x + 2, y + 2, found);
 			}
 		}
 	}
 
-	private void checkInside(int x, int y, FastAccess<Point2D_I16> found) {
+	private void checkInside( int x, int y, FastAccess<Point2D_I16> found ) {
 		for (int i = 0; i < found.size; i++) {
-			if( found.get(i).isIdentical(x,y) )
+			if (found.get(i).isIdentical(x, y))
 				return;
 		}
-		fail("not found inside "+x+" "+y);
+		fail("not found inside " + x + " " + y);
 	}
 
-	private void checkSpread(boolean positive, QueueCorner detected, int cellSize,
-							 int cellCount, FastArray<Point2D_I16> found, FeatureSelectUniformBest<Point2D_I16> alg)
-	{
+	private void checkSpread( boolean positive, QueueCorner detected, int cellSize,
+							  int cellCount, FastArray<Point2D_I16> found, FeatureSelectUniformBest<Point2D_I16> alg ) {
 		int limit = cellCount*6;
-		alg.select(intensity, -1, -1, positive,null,detected,limit,found);
+		alg.select(intensity, -1, -1, positive, null, detected, limit, found);
 
-		assertEquals(limit,found.size);
+		assertEquals(limit, found.size);
 		int[] cells = new int[6];
-		for( var p : found.toList() ) {
- 			int index = (p.y/cellSize)*3 + (p.x/cellSize);
- 			cells[index]++;
+		for (var p : found.toList()) {
+			int index = (p.y/cellSize)*3 + (p.x/cellSize);
+			cells[index]++;
 		}
 		for (int i = 0; i < cells.length; i++) {
-			assertEquals(cellCount,cells[i]);
+			assertEquals(cellCount, cells[i]);
 		}
 	}
 
@@ -126,7 +126,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		checkAcknowledgePrior(false);
 	}
 
-	void checkAcknowledgePrior(boolean positive) {
+	void checkAcknowledgePrior( boolean positive ) {
 		int width = 30;
 		int height = 20;
 		// One detected feature in each cell
@@ -135,13 +135,13 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				detected.grow().set(x+2,y+2);
+				detected.grow().set(x + 2, y + 2);
 			}
 		}
 		// add two prior features to the top row
 		for (int x = 0; x < width; x += cellSize) {
-			prior.grow().set(x+2,2);
-			prior.grow().set(x+2,2);
+			prior.grow().set(x + 2, 2);
+			prior.grow().set(x + 2, 2);
 		}
 
 		var found = new FastArray<>(Point2D_I16.class);
@@ -151,16 +151,16 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 
 		// Since there is a prior feature in every cell and 6 features were requested nothing should be returned
 		// since the prior features already constributed to the spread
-		alg.select(intensity, -1, -1, positive,prior,detected,3,found);
-		assertEquals(3,found.size);
+		alg.select(intensity, -1, -1, positive, prior, detected, 3, found);
+		assertEquals(3, found.size);
 		// the found features should all be in the bottom row since it gives preference to cells without priors
-		for (int x = 0, idx=0; x < width; x += cellSize,idx++) {
-			assertEquals(x+2,found.get(idx).x);
-			assertEquals(12,found.get(idx).y);
+		for (int x = 0, idx = 0; x < width; x += cellSize, idx++) {
+			assertEquals(x + 2, found.get(idx).x);
+			assertEquals(12, found.get(idx).y);
 		}
 		// We now request two and 6 of the detected features should be returned
-		alg.select(intensity, -1, -1, positive,prior,detected,6,found);
-		assertEquals(6,found.size);
+		alg.select(intensity, -1, -1, positive, prior, detected, 6, found);
+		assertEquals(6, found.size);
 	}
 
 	/**
@@ -172,7 +172,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		everyCellHasPrior(false);
 	}
 
-	void everyCellHasPrior(boolean positive) {
+	void everyCellHasPrior( boolean positive ) {
 		int width = 30;
 		int height = 20;
 		// One detected feature in each cell and two priors
@@ -181,9 +181,9 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				detected.grow().set(x+2,y+2);
-				prior.grow().set(x+2,y+2);
-				prior.grow().set(x+1,y+1);
+				detected.grow().set(x + 2, y + 2);
+				prior.grow().set(x + 2, y + 2);
+				prior.grow().set(x + 1, y + 1);
 			}
 		}
 
@@ -193,24 +193,26 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		alg.configUniform = new HackedConfig(cellSize);
 
 		// a bug earlier aborted because the total count didn't change when every cell had a prior in it
-		alg.select(intensity, -1, -1, positive,prior,detected,6,found);
-		assertEquals(6,found.size);
+		alg.select(intensity, -1, -1, positive, prior, detected, 6, found);
+		assertEquals(6, found.size);
 	}
 
-	@Test
-	void inputImageisNull() {
-		fail("Implement");
+	@Nested
+	public class CheckNoImage extends NoImage {
+		@Override public FeatureSelectLimitIntensity<IntensityPoint> createAlgorithm() {
+			return new FeatureSelectUniformBest<>(new SampleIntensityPoint());
+		}
 	}
 
 	private static class HackedConfig extends ConfigGridUniform {
 		int cellSize;
 
-		public HackedConfig(int cellSize) {
+		public HackedConfig( int cellSize ) {
 			this.cellSize = cellSize;
 		}
 
 		@Override
-		public int selectTargetCellSize(int maxSample, int imageWidth, int imageHeight) {
+		public int selectTargetCellSize( int maxSample, int imageWidth, int imageHeight ) {
 			return cellSize;
 		}
 	}

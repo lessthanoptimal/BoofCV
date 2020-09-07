@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,16 +26,15 @@ package boofcv.struct.convolve;
  */
 public abstract class Kernel1D extends KernelBase {
 
-	public Kernel1D(int width) {
+	protected Kernel1D( int width ) {
 		super(width);
 	}
 
-	public Kernel1D(int width, int offset) {
+	protected Kernel1D( int width, int offset ) {
 		super(width, offset);
 	}
 
-	public Kernel1D() {
-	}
+	protected Kernel1D() {}
 
 	@Override
 	public int getDimension() {
@@ -44,5 +43,5 @@ public abstract class Kernel1D extends KernelBase {
 
 	public abstract double getDouble( int index );
 
-	public abstract void setD( int index , double value );
+	public abstract void setD( int index, double value );
 }

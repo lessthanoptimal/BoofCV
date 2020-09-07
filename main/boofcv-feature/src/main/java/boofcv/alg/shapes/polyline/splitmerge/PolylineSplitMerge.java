@@ -216,31 +216,31 @@ public class PolylineSplitMerge {
 		fatalError = false;
 	}
 
-	private void printCurrent( List<Point2D_I32> contour ) {
-		System.out.print(list.size()+"  Indexes[");
-		Element<Corner> e = list.getHead();
-		while( e != null ) {
-			System.out.print(" "+e.object.index);
-			e = e.next;
-		}
-		System.out.println(" ]");
-		System.out.print("   Errors[");
-		e = list.getHead();
-		while( e != null ) {
-			String split = e.object.splitable ? "T" : "F";
-			System.out.print(String.format(" %6.1f %1s",e.object.sideError,split));
-			e = e.next;
-		}
-		System.out.println(" ]");
-		System.out.print("      Pos[");
-		e = list.getHead();
-		while( e != null ) {
-			Point2D_I32 p = contour.get(e.object.index);
-			System.out.print(String.format(" %3d %3d,",p.x,p.y));
-			e = e.next;
-		}
-		System.out.println(" ]");
-	}
+//	private void printCurrent( List<Point2D_I32> contour ) {
+//		System.out.print(list.size() + "  Indexes[");
+//		Element<Corner> e = list.getHead();
+//		while (e != null) {
+//			System.out.print(" " + e.object.index);
+//			e = e.next;
+//		}
+//		System.out.println(" ]");
+//		System.out.print("   Errors[");
+//		e = list.getHead();
+//		while (e != null) {
+//			String split = e.object.splitable ? "T" : "F";
+//			System.out.print(String.format(" %6.1f %1s", e.object.sideError, split));
+//			e = e.next;
+//		}
+//		System.out.println(" ]");
+//		System.out.print("      Pos[");
+//		e = list.getHead();
+//		while (e != null) {
+//			Point2D_I32 p = contour.get(e.object.index);
+//			System.out.print(String.format(" %3d %3d,", p.x, p.y));
+//			e = e.next;
+//		}
+//		System.out.println(" ]");
+//	}
 
 	/**
 	 * Saves the current polyline
@@ -677,7 +677,7 @@ public class PolylineSplitMerge {
 	 */
 	void setSplitVariables(List<Point2D_I32> contour, Element<Corner> e0, Element<Corner> e1) {
 
-		int distance0 = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
+//		int distance0 = CircularIndex.distanceP(e0.object.index, e1.object.index, contour.size());
 
 		int index0 = CircularIndex.plusPOffset(e0.object.index,minimumSideLength,contour.size());
 		int index1 = CircularIndex.minusPOffset(e1.object.index,minimumSideLength,contour.size());

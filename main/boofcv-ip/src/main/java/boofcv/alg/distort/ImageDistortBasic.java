@@ -52,7 +52,7 @@ public abstract class ImageDistortBasic
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortBasic( Interpolate interp ) {
+	protected ImageDistortBasic( Interpolate interp ) {
 		this.interp = interp;
 	}
 

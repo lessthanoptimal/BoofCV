@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -183,7 +183,6 @@ public class VisualizeImageData {
 	 * @param src       Input single band image.
 	 * @param dst       Where the image is rendered into.  If null a new BufferedImage will be created and return.
 	 * @param normalize Used to normalize the input image.
-	 * @return Rendered image.
 	 */
 	public static void grayMagnitudeTemp(ImageGray src, BufferedImage dst, double normalize) {
 		if (normalize < 0)
@@ -211,7 +210,7 @@ public class VisualizeImageData {
 	}
 
 	private static void grayMagnitudeTemp(GrayI src, BufferedImage dst, int maxValue) {
-		int halfValue = maxValue / 2 + maxValue % 2;
+//		int halfValue = maxValue / 2 + maxValue % 2;
 
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {

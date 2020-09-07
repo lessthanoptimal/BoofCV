@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public abstract class BackgroundModel<T extends ImageBase<T>> {
 	// value assigned to pixels outside the image.  Default to 0, which is background
 	protected byte unknownValue = 0;
 
-	public BackgroundModel(ImageType<T> imageType) {
+	protected BackgroundModel(ImageType<T> imageType) {
 		this.imageType = imageType;
 	}
 

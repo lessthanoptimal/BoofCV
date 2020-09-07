@@ -96,6 +96,7 @@ public abstract class GenericFiducialDetectorChecks {
 				GConvertImage.convert(rendered,output);
 				return output;
 			}
+			default: break;
 		}
 
 		throw new RuntimeException("Currently only gray scale images supported");

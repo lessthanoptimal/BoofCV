@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	// current position of the mouse while being dragged
 	protected Point2D_I32 mousePosition = new Point2D_I32();
 	
-	public CompareTwoImagePanel(int borderSize , boolean canSelectRegion) {
+	protected CompareTwoImagePanel(int borderSize , boolean canSelectRegion) {
 		this.borderSize = borderSize;
 		this.selectRegion = canSelectRegion;
 		addMouseListener(this);
@@ -224,9 +224,9 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 			}
 		}
 
-		if( bestIndexes.size() > 0 ) {
-			int indexRight = bestIndexes.get(0);
-		}
+//		if( bestIndexes.size() > 0 ) {
+//			int indexRight = bestIndexes.get(0);
+//		}
 
 		for (int i = 0; i < bestIndexes.size(); i++) {
 			selected.add(bestIndexes.get(i));
@@ -260,14 +260,14 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		double scale = selectedIsLeft ? scaleLeft : scaleRight;
 		
 		if( selectedIsLeft) {
-			x0 /= scale;
-			x1 /= scale;
+			x0 = (int)(x0/scale);
+			x1 = (int)(x1/scale);
 		} else {
 			x0 = (int)((x0 - rightBeginX)/scale);
 			x1 = (int)((x1 - rightBeginX)/scale);
 		}
-		y0 /= scale;
-		y1 /= scale;
+		y0 = (int)(y0/scale);
+		y1 = (int)(y1/scale);
 		
 		// find all the points in the region
 		if( selectedIsLeft ) {

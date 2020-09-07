@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -36,8 +37,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
-	implements CirculantVisualizationPanel.Listener
-{
+		implements CirculantVisualizationPanel.Listener {
 
 	CirculantTracker<T> tracker;
 
@@ -50,31 +50,31 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 	public VisualizeCirculantTrackerApp( Class<T> imageType ) {
 
 		ConfigCirculantTracker config = new ConfigCirculantTracker();
-		tracker = FactoryTrackerObjectAlgs.circulant(config,imageType);
+		tracker = FactoryTrackerObjectAlgs.circulant(config, imageType);
 		gui = new CirculantVisualizationPanel(this);
 	}
 
 	public void process( final SimpleImageSequence<T> sequence ) {
 
-		if( !sequence.hasNext() )
+		if (!sequence.hasNext())
 			throw new IllegalArgumentException("Empty sequence");
 
 		image = sequence.next();
-		gui.setFrame((BufferedImage) sequence.getGuiImage());
+		gui.setFrame((BufferedImage)sequence.getGuiImage());
 		ShowImages.showWindow(gui, "Circulant Tracker", true);
 
 //		tracker.initialize(image,273,156,358-273,293-156);
 
 		paused = true;
 
-		while( paused ) {
-			Thread.yield();
+		while (paused) {
+			BoofMiscOps.sleep(5);
 		}
 
 		int totalFrames = 0;
 		long totalTime = 0;
 
-		while( sequence.hasNext() ) {
+		while (sequence.hasNext()) {
 			totalFrames++;
 
 			image = sequence.next();
@@ -84,8 +84,8 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 			tracker.performTracking(image);
 			long after = System.nanoTime();
 
-			totalTime += after-before;
-			System.out.println("FPS = "+(totalFrames)/(totalTime/2e9));
+			totalTime += after - before;
+			System.out.println("FPS = " + totalFrames/(totalTime/2e9));
 
 			gui.update(tracker);
 
@@ -93,17 +93,17 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 			System.out.println("Target: " + r);
 			gui.repaint();
 
-			while( paused ) {
-				Thread.yield();
+			while (paused) {
+				BoofMiscOps.sleep(10);
 			}
 		}
 		System.out.println("DONE");
 	}
 
 	@Override
-	public void startTracking(int x0, int y0, int x1, int y1) {
-		System.out.println(x0+","+y0+","+x1+","+y1);
-		tracker.initialize(image,x0,y0,x1-x0,y1-y0);
+	public void startTracking( int x0, int y0, int x1, int y1 ) {
+		System.out.println(x0 + "," + y0 + "," + x1 + "," + y1);
+		tracker.initialize(image, x0, y0, x1 - x0, y1 - y0);
 		paused = false;
 	}
 
@@ -111,7 +111,6 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 	public void togglePause() {
 		paused = !paused;
 	}
-
 
 	public static void main( String args[] ) {
 		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<>(GrayU8.class);

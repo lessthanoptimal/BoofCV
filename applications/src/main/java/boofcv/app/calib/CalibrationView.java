@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,6 +66,7 @@ public interface CalibrationView {
 		int numRows,numCols;
 		int pointRows,pointCols;
 
+		@Override
 		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorChessboardX chessboard = (CalibrationDetectorChessboardX)detector;
 			this.numRows = chessboard.getCornerRows()+1;
@@ -104,6 +105,7 @@ public interface CalibrationView {
 		int gridCols;
 		int pointRows,pointCols;
 
+		@Override
 		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorSquareGrid target = (CalibrationDetectorSquareGrid)detector;
 			pointRows = target.getPointRows();
@@ -144,8 +146,9 @@ public interface CalibrationView {
 		double spaceToDiameter;
 
 		// indexes of corners in convex hull
-		int indexes[];
+		int[] indexes;
 
+		@Override
 		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorCircleHexagonalGrid target = (CalibrationDetectorCircleHexagonalGrid)detector;
 			gridRows = target.getRows();
@@ -228,8 +231,9 @@ public interface CalibrationView {
 		double spaceToDiameter;
 
 		// indexes of corners in convex hull
-		int indexes[];
+		int[] indexes;
 
+		@Override
 		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorCircleRegularGrid target = (CalibrationDetectorCircleRegularGrid)detector;
 			gridRows = target.getRows();

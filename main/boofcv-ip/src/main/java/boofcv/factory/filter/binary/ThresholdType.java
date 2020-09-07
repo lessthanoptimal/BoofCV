@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,8 +108,8 @@ public enum ThresholdType {
 	 */
 	LOCAL_NICK(true,false);
 
-	boolean adaptive;
-	boolean global;
+	final boolean adaptive;
+	final boolean global;
 
 	ThresholdType(boolean adaptive, boolean global) {
 		this.adaptive = adaptive;

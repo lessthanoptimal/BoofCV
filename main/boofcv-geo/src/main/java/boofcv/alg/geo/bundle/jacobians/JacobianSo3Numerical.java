@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public abstract class JacobianSo3Numerical implements JacobianSo3 {
 
 	private DMatrixRMaj R = new DMatrixRMaj(3,3);
 
-	public JacobianSo3Numerical() {
+	protected JacobianSo3Numerical() {
 		init();
 	}
 

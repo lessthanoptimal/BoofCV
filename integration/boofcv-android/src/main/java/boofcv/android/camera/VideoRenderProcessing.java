@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import android.hardware.Camera;
 import android.view.View;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.encoding.ConvertNV21;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
 
@@ -77,7 +78,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 
 	// scale and translation applied to the canvas
 	protected double scale;
-	protected double tranX,tranY;
+	protected double tranX, tranY;
 
 	// if true the input image is flipped horizontally
 	boolean flipHorizontal;
@@ -85,12 +86,12 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	// number of degrees the camera preview needs to be rotated
 	int previewRotation;
 
-	protected VideoRenderProcessing(ImageType<T> imageType) {
+	protected VideoRenderProcessing( ImageType<T> imageType ) {
 		this.imageType = imageType;
 	}
 
 	@Override
-	public void init(View view, Camera camera , Camera.CameraInfo info , int previewRotation ) {
+	public void init( View view, Camera camera, Camera.CameraInfo info, int previewRotation ) {
 		synchronized (lockGui) {
 			this.view = view;
 
@@ -100,7 +101,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 			Camera.Size size = camera.getParameters().getPreviewSize();
 			outputWidth = size.width;
 			outputHeight = size.height;
-			declareImages(size.width,size.height);
+			declareImages(size.width, size.height);
 		}
 
 		// start the thread for processing
@@ -109,10 +110,10 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	}
 
 	@Override
-	public void onDraw(Canvas canvas) {
+	public void onDraw( Canvas canvas ) {
 		synchronized (lockGui) {
 			// the process class could have been swapped
-			if( image == null )
+			if (image == null)
 				return;
 
 			int w = view.getWidth();
@@ -122,12 +123,12 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 			double scaleX = w/(double)outputWidth;
 			double scaleY = h/(double)outputHeight;
 
-			scale = Math.min(scaleX,scaleY);
-			tranX = (w-scale*outputWidth)/2;
-			tranY = (h-scale*outputHeight)/2;
+			scale = Math.min(scaleX, scaleY);
+			tranX = (w - scale*outputWidth)/2;
+			tranY = (h - scale*outputHeight)/2;
 
-			canvas.translate((float)tranX,(float)tranY);
-			canvas.scale((float)scale,(float)scale);
+			canvas.translate((float)tranX, (float)tranY);
+			canvas.scale((float)scale, (float)scale);
 
 			render(canvas, scale);
 		}
@@ -136,7 +137,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	/**
 	 * Converts a coordinate from pixel to the output image coordinates
 	 */
-	protected void imageToOutput( double x , double y , Point2D_F64 pt ) {
+	protected void imageToOutput( double x, double y, Point2D_F64 pt ) {
 		pt.x = x/scale - tranX/scale;
 		pt.y = y/scale - tranY/scale;
 	}
@@ -144,46 +145,45 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	/**
 	 * Converts a coordinate from output image coordinates to input image
 	 */
-	protected void outputToImage( double x , double y , Point2D_F64 pt ) {
+	protected void outputToImage( double x, double y, Point2D_F64 pt ) {
 		pt.x = x*scale + tranX;
 		pt.y = y*scale + tranY;
 	}
 
-
 	@Override
-	public void convertPreview(byte[] bytes, Camera camera) {
-		if( thread == null )
+	public void convertPreview( byte[] bytes, Camera camera ) {
+		if (thread == null)
 			return;
 
-		synchronized ( lockConvert ) {
-			if( imageType.getFamily() == ImageType.Family.GRAY )
-				ConvertNV21.nv21ToGray(bytes, image.width, image.height, (ImageGray) image,(Class) image.getClass());
-			else if( imageType.getFamily() == ImageType.Family.PLANAR ) {
+		synchronized (lockConvert) {
+			if (imageType.getFamily() == ImageType.Family.GRAY)
+				ConvertNV21.nv21ToGray(bytes, image.width, image.height, (ImageGray)image, (Class)image.getClass());
+			else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 				if (imageType.getDataType() == ImageDataType.U8)
-					ConvertNV21.nv21TPlanarRgb_U8(bytes, image.width, image.height, (Planar) image);
+					ConvertNV21.nv21TPlanarRgb_U8(bytes, image.width, image.height, (Planar)image);
 				else if (imageType.getDataType() == ImageDataType.F32)
-					ConvertNV21.nv21ToPlanarRgb_F32(bytes, image.width, image.height, (Planar) image);
+					ConvertNV21.nv21ToPlanarRgb_F32(bytes, image.width, image.height, (Planar)image);
 				else
 					throw new RuntimeException("Oh Crap");
-			} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
-				if( imageType.getDataType() == ImageDataType.U8)
-					ConvertNV21.nv21ToInterleaved(bytes, image.width, image.height, (InterleavedU8) image);
-				else if( imageType.getDataType() == ImageDataType.F32)
-					ConvertNV21.nv21ToInterleaved(bytes, image.width, image.height, (InterleavedF32) image);
+			} else if (imageType.getFamily() == ImageType.Family.INTERLEAVED) {
+				if (imageType.getDataType() == ImageDataType.U8)
+					ConvertNV21.nv21ToInterleaved(bytes, image.width, image.height, (InterleavedU8)image);
+				else if (imageType.getDataType() == ImageDataType.F32)
+					ConvertNV21.nv21ToInterleaved(bytes, image.width, image.height, (InterleavedF32)image);
 				else
 					throw new RuntimeException("Oh Crap");
 			} else {
-				throw new RuntimeException("Unexpected image type: "+imageType);
+				throw new RuntimeException("Unexpected image type: " + imageType);
 			}
 
-			if( previewRotation == 180 ) {
-				if( flipHorizontal ) {
+			if (previewRotation == 180) {
+				if (flipHorizontal) {
 					GImageMiscOps.flipVertical(image);
 				} else {
 					GImageMiscOps.flipVertical(image);
 					GImageMiscOps.flipHorizontal(image);
 				}
-			} else if( flipHorizontal )
+			} else if (flipHorizontal)
 				GImageMiscOps.flipHorizontal(image);
 		}
 		// wake up the thread and tell it to do some processing
@@ -192,33 +192,31 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 
 	@Override
 	public void stopProcessing() {
-		if( thread == null )
+		if (thread == null)
 			return;
 
 		requestStop = true;
-		while( running ) {
+		while (running) {
 			// wake the thread up if needed
 			thread.interrupt();
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {}
+			BoofMiscOps.sleep(10);
 		}
 	}
 
 	@Override
 	public void run() {
 		thread = Thread.currentThread();
-		while( !requestStop ) {
-			synchronized ( thread ) {
+		while (!requestStop) {
+			synchronized (thread) {
 				try {
 					wait();
-					if( requestStop )
+					if (requestStop)
 						break;
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException ignore) {}
 			}
 
 			// swap gray buffers so that convertPreview is modifying the copy which is not in use
-			synchronized ( lockConvert ) {
+			synchronized (lockConvert) {
 				T tmp = image;
 				image = image2;
 				image2 = tmp;
@@ -257,7 +255,6 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	 * When modifying data structures that are read inside of {@link #render} be sure to use synchronize with
 	 * {@link #lockGui} to avoid crashes or weird visual artifacts.  Use of lockGui should be minimized to
 	 * ensure a fast and responsive GUI</p>
-	 *
 	 */
 	protected abstract void process( T gray );
 
@@ -269,9 +266,9 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 	 * @param canvas Canvas which is to be displayed.
 	 * @param imageToOutput Scale factor from input image to output display.  Can also be accessed via {@link #getScale}
 	 */
-	protected abstract void render(  Canvas canvas , double imageToOutput );
+	protected abstract void render( Canvas canvas, double imageToOutput );
 
-	protected void declareImages( int width , int height ) {
+	protected void declareImages( int width, int height ) {
 		image = imageType.createImage(width, height);
 		image2 = imageType.createImage(width, height);
 	}

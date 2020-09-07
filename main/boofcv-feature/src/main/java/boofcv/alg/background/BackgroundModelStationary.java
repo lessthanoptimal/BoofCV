@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageType;
  */
 public abstract class BackgroundModelStationary<T extends ImageBase<T>> extends BackgroundModel<T> {
 
-	public BackgroundModelStationary(ImageType<T> imageType) {
+	protected BackgroundModelStationary(ImageType<T> imageType) {
 		super(imageType);
 	}
 

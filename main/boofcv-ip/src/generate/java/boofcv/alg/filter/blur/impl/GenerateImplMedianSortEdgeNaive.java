@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,6 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 
 	private void printFunction( AutoTypeImage image ) {
 
-		String primitiveType = image.getDataType();
 		String sumType = image.getSumType();
 
 		out.print("\tpublic static void process("+image.getSingleBandName()+" input, "+image.getSingleBandName()+" output, int radius , "+sumType+" storage[] )\n" +

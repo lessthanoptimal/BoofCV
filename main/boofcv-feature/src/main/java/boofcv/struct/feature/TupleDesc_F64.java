@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.feature;
 
-
 import java.util.Arrays;
 
 /**
@@ -27,53 +26,53 @@ import java.util.Arrays;
  * @author Peter Abeles
  */
 public class TupleDesc_F64 implements TupleDesc<TupleDesc_F64> {
-	public double value[];
+	public double[] value;
 
 	public TupleDesc_F64( int numFeatures ) {
-		this.value = new double[ numFeatures ];
+		this.value = new double[numFeatures];
 	}
 
-	public TupleDesc_F64( double values[] ) {
+	public TupleDesc_F64( double[] values ) {
 		this.value = new double[values.length];
-		System.arraycopy(values,0,this.value,0,values.length);
+		System.arraycopy(values, 0, this.value, 0, values.length);
 	}
 
-	protected TupleDesc_F64() {
+	protected TupleDesc_F64() { }
+
+	public void set( double... value ) {
+		System.arraycopy(value, 0, this.value, 0, this.value.length);
 	}
 
-	public void set( double ...value ) {
-		System.arraycopy(value,0,this.value,0,this.value.length);
-	}
-
+	@Override
 	public TupleDesc_F64 copy() {
-		TupleDesc_F64 ret = new TupleDesc_F64( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
+		TupleDesc_F64 ret = new TupleDesc_F64(value.length);
+		System.arraycopy(value, 0, ret.value, 0, value.length);
 		return ret;
 	}
 
 	public void set( TupleDesc_F64 src ) {
-		System.arraycopy(src.value,0,this.value,0,this.value.length);
+		System.arraycopy(src.value, 0, this.value, 0, this.value.length);
 	}
 
 	public double[] getValue() {
 		return value;
 	}
 
-	public void setValue(double[] value) {
+	public void setValue( double[] value ) {
 		this.value = value;
 	}
 
 	public void fill( double value ) {
-		Arrays.fill(this.value,value);
+		Arrays.fill(this.value, value);
 	}
 
 	@Override
-	public void setTo(TupleDesc_F64 source) {
-		System.arraycopy(source.value,0,value,0,value.length);
+	public void setTo( TupleDesc_F64 source ) {
+		System.arraycopy(source.value, 0, value, 0, value.length);
 	}
 
 	@Override
-	public double getDouble(int index) {
+	public double getDouble( int index ) {
 		return value[index];
 	}
 

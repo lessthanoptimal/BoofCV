@@ -48,7 +48,7 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>
 
 	Class<D> derivType;
 
-	public CommonGridRansacLineDetectorChecks( Class<D> derivType) {
+	protected CommonGridRansacLineDetectorChecks( Class<D> derivType) {
 		this.derivType = derivType;
 	}
 

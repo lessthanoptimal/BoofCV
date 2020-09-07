@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,16 +31,15 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[],GrayU8>
-		implements Compare_F32
-{
+public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[], GrayU8>
+		implements Compare_F32 {
 	@Override
-	public void configure(GrayU8 imageDisparity, int disparityMin, int disparityMax, int radiusX) {
+	public void configure( GrayU8 imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
 		super.configure(imageDisparity, disparityMin, disparityMax, radiusX);
 	}
 
 	@Override
-	public void process(int row, float[] blockOfScores) {
+	public void process( int row, float[] blockOfScores ) {
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
 		// Mark all pixels as invalid which can't be estimate due to disparityMin
@@ -49,18 +48,18 @@ public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[]
 		}
 
 		// Select the best disparity from all the rest
-		for( int col = disparityMin; col < imageWidth; col++ ) {
+		for (int col = disparityMin; col < imageWidth; col++) {
 			// make sure the disparity search doesn't go outside the image border
-			int localMaxRange = disparityMaxAtColumnL2R(col)-disparityMin+1;
+			int localMaxRange = disparityMaxAtColumnL2R(col) - disparityMin + 1;
 
 			// Find the disparity with the best score, which is the largest score for correlation
-			int indexScore = col-disparityMin;
+			int indexScore = col - disparityMin;
 			int maxIndex = 0;
 			float maxValue = blockOfScores[indexScore];
 			indexScore += imageWidth;
-			for( int i = 1; i < localMaxRange; i++ ,indexScore += imageWidth) {
+			for (int i = 1; i < localMaxRange; i++, indexScore += imageWidth) {
 				float v = blockOfScores[indexScore];
-				if( v > maxValue ) {
+				if (v > maxValue) {
 					maxValue = v;
 					maxIndex = i;
 				}
@@ -81,7 +80,7 @@ public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[]
 	}
 
 	@Override
-	public int compare(float scoreA, float scoreB) {
-		return Float.compare(scoreA,scoreB);
+	public int compare( float scoreA, float scoreB ) {
+		return Float.compare(scoreA, scoreB);
 	}
 }

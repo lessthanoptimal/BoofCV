@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseScaleGradient;
 
-
 /**
  * <p>
  * Common base class for integral image region orientation algorithms.
@@ -34,14 +33,13 @@ import boofcv.struct.sparse.SparseScaleGradient;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationIntegralBase<II extends ImageGray<II>,G extends GradientValue>
-		implements OrientationIntegral<II>
-{
+public abstract class OrientationIntegralBase<II extends ImageGray<II>, G extends GradientValue>
+		implements OrientationIntegral<II> {
 	// integral image transform of input image
 	protected II ii;
 
 	// the scale at which the feature was detected
-	protected double scale=1;
+	protected double scale = 1;
 
 	// size of the area being considered in wavelets samples
 	protected int sampleRadius;
@@ -60,44 +58,46 @@ public abstract class OrientationIntegralBase<II extends ImageGray<II>,G extends
 	protected double objectRadiusToScale;
 
 	// used to sample the image when it's on the image's border
-	protected SparseScaleGradient<II,G> g;
+	protected SparseScaleGradient<II, G> g;
 
 	Class<II> integralType;
+
 	/**
 	 * Configure orientation estimation.
-	 *  @param sampleRadius The radius of samples that it will do.  Typically 6.
+	 *
+	 * @param sampleRadius The radius of samples that it will do.  Typically 6.
 	 * @param period How often the image is sampled in pixels at canonical size. Internally, this value
-	 *               is scaled by scaledPeriod = period*objectRadius/sampleRadius.  Typically 1.
+	 * is scaled by scaledPeriod = period*objectRadius/sampleRadius.  Typically 1.
 	 * @param kernelWidth How wide of a kernel should be used to sample. Try 4
 	 * @param weightSigma Sigma for weighting.  Set to zero for unweighted, negative to use sampleRadius.
 	 * @param assignDefaultRadius If true it will set the object's radius to a scale of 1
 	 */
-	public OrientationIntegralBase(double objectRadiusToScale, int sampleRadius, double period,
-								   int kernelWidth, double weightSigma,
-								   boolean assignDefaultRadius, Class<II> integralType) {
+	protected OrientationIntegralBase( double objectRadiusToScale, int sampleRadius, double period,
+									   int kernelWidth, double weightSigma,
+									   boolean assignDefaultRadius, Class<II> integralType ) {
 		this.objectRadiusToScale = objectRadiusToScale;
 		this.sampleRadius = sampleRadius;
 		this.period = period;
 		this.kernelWidth = kernelWidth;
-		this.sampleWidth = sampleRadius *2+1;
+		this.sampleWidth = sampleRadius*2 + 1;
 		this.integralType = integralType;
 		this.weightSigma = weightSigma;
-		if( weightSigma != 0 )
-			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma, sampleRadius);
+		if (weightSigma != 0)
+			this.weights = FactoryKernelGaussian.gaussian(2, true, 64, weightSigma, sampleRadius);
 
-		g = (SparseScaleGradient<II,G>)SurfDescribeOps.createGradient(false, integralType);
-		if( assignDefaultRadius )
+		g = (SparseScaleGradient<II, G>)SurfDescribeOps.createGradient(false, integralType);
+		if (assignDefaultRadius)
 			setObjectRadius(1.0/objectRadiusToScale);
 	}
-	
+
 	@Override
-	public void setObjectRadius(double radius) {
-		this.scale = radius* objectRadiusToScale;
-		g.setWidth(scale * kernelWidth);
+	public void setObjectRadius( double radius ) {
+		this.scale = radius*objectRadiusToScale;
+		g.setWidth(scale*kernelWidth);
 	}
 
 	@Override
-	public void setImage(II integralImage) {
+	public void setImage( II integralImage ) {
 		this.ii = integralImage;
 		g.setImage(ii);
 	}

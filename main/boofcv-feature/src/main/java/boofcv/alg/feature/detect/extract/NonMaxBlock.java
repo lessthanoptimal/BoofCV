@@ -65,29 +65,29 @@ public class NonMaxBlock {
 	 * @param localMin (Output) storage for found local minimums.
 	 * @param localMax (Output) storage for found local maximums.
 	 */
-	public void process(GrayF32 intensityImage, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax) {
+	public void process( GrayF32 intensityImage, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax ) {
 
-		if( localMin != null )
+		if (localMin != null)
 			localMin.reset();
-		if( localMax != null )
+		if (localMax != null)
 			localMax.reset();
 
 		// the defines the region that can be processed
 		int endX = intensityImage.width - border;
 		int endY = intensityImage.height - border;
 
-		int step = configuration.radius+1;
+		int step = configuration.radius + 1;
 
-		search.initialize(configuration,intensityImage,localMin,localMax);
+		search.initialize(configuration, intensityImage, localMin, localMax);
 
-		for(int y = border; y < endY; y += step ) {
+		for (int y = border; y < endY; y += step) {
 			int y1 = y + step;
-			if( y1 > endY) y1 = endY;
+			if (y1 > endY) y1 = endY;
 
-			for(int x = border; x < endX; x += step ) {
+			for (int x = border; x < endX; x += step) {
 				int x1 = x + step;
-				if( x1 > endX) x1 = endX;
-				search.searchBlock(x,y,x1,y1);
+				if (x1 > endX) x1 = endX;
+				search.searchBlock(x, y, x1, y1);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class NonMaxBlock {
 		return search;
 	}
 
-	public void setSearchRadius(int radius) {
+	public void setSearchRadius( int radius ) {
 		configuration.radius = radius;
 	}
 
@@ -104,7 +104,7 @@ public class NonMaxBlock {
 		return border;
 	}
 
-	public void setBorder(int border) {
+	public void setBorder( int border ) {
 		this.border = border;
 	}
 
@@ -116,7 +116,7 @@ public class NonMaxBlock {
 		return configuration.thresholdMin;
 	}
 
-	public void setThresholdMin(float thresholdMin) {
+	public void setThresholdMin( float thresholdMin ) {
 		configuration.thresholdMin = thresholdMin;
 	}
 
@@ -124,7 +124,7 @@ public class NonMaxBlock {
 		return configuration.thresholdMax;
 	}
 
-	public void setThresholdMax(float thresholdMax) {
+	public void setThresholdMax( float thresholdMax ) {
 		configuration.thresholdMax = thresholdMax;
 	}
 
@@ -138,16 +138,17 @@ public class NonMaxBlock {
 		 * @param localMax Storage for local maximums
 		 */
 		void initialize( Configuration configuration,
-						 GrayF32 image , QueueCorner localMin , QueueCorner localMax );
+						 GrayF32 image, QueueCorner localMin, QueueCorner localMax );
 
 		/**
 		 * Search the image for local max/min inside the specified region
+		 *
 		 * @param x0 lower extent X (inclusive)
 		 * @param y0 lower extent Y (inclusive)
 		 * @param x1 upper extent X (exclusive)
 		 * @param y1 upper extent Y (exclusive)
 		 */
-		void searchBlock( int x0 , int y0 , int x1 , int y1 );
+		void searchBlock( int x0, int y0, int x1, int y1 );
 
 		boolean isDetectMinimums();
 
@@ -159,7 +160,7 @@ public class NonMaxBlock {
 		Search newInstance();
 	}
 
-	class Configuration {
+	static class Configuration {
 		// threshold for intensity values when detecting minimums and maximums
 		public float thresholdMin;
 		public float thresholdMax;

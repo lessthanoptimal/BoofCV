@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class TestAddRadialPtoN_F64 {
 		double sum = 0;
 		for( int i = 0; i < radial.length; i++ ) {
 			ri2 *= r2;
-			sum += radial[i]*ri2;
+			sum += (double) radial[i]*ri2;
 		}
 
 		// distorted normalized image coordinates

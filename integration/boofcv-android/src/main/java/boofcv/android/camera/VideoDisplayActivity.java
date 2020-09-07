@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,9 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import boofcv.misc.BoofMiscOps;
 
 /**
- *
  * <p>
  * Activity for processing and displaying video results.  Use of this class can save you a considerable amount of
  * effort if you wish to display processed video frames as an image.  The actual processing of image data is
@@ -75,10 +75,9 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	// number of degrees the preview image neesd to be rotated
 	protected int previewRotation;
 
-	public VideoDisplayActivity() {
-	}
+	protected VideoDisplayActivity() {}
 
-	public VideoDisplayActivity(boolean hidePreview) {
+	protected VideoDisplayActivity( boolean hidePreview ) {
 		this.hidePreview = hidePreview;
 	}
 
@@ -86,7 +85,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	 * Changes the CV algorithm running.  Should only be called from a GUI thread.
 	 */
 	public void setProcessing( VideoProcessing processing ) {
-		if( this.processing != null ) {
+		if (this.processing != null) {
 			// kill the old process
 			this.processing.stopProcessing();
 		}
@@ -97,8 +96,8 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 
 		this.processing = processing;
 		// if the camera is null then it will be initialized when the camera is initialized
-		if( processing != null && mCamera != null ) {
-			processing.init(mDraw,mCamera,mCameraInfo,previewRotation);
+		if (processing != null && mCamera != null) {
+			processing.init(mDraw, mCamera, mCameraInfo, previewRotation);
 		}
 	}
 
@@ -117,7 +116,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate( Bundle savedInstanceState ) {
 		super.onCreate(savedInstanceState);
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -128,13 +127,13 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 		LayoutParams contentParam = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
 		preview = new FrameLayout(this);
-		LayoutParams frameLayoutParam = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT,1);
+		LayoutParams frameLayoutParam = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1);
 		contentView.addView(preview, frameLayoutParam);
 
 		mDraw = new Visualization(this);
 
 		// Create our Preview view and set it as the content of our activity.
-		mPreview = new CameraPreview(this,this,hidePreview);
+		mPreview = new CameraPreview(this, this, hidePreview);
 
 		preview.addView(mPreview);
 		preview.addView(mDraw);
@@ -146,7 +145,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	protected void onResume() {
 		super.onResume();
 
-		if( mCamera != null )
+		if (mCamera != null)
 			throw new RuntimeException("Bug, camera should not be initialized already");
 
 		setUpAndConfigureCamera();
@@ -158,13 +157,13 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 
 		hideProgressDialog();
 
-		if( processing != null ) {
+		if (processing != null) {
 			VideoProcessing p = processing;
 			processing = null;
 			p.stopProcessing();
 		}
 
-		if (mCamera != null){
+		if (mCamera != null) {
 			mPreview.setCamera(null);
 			mCamera.setPreviewCallback(null);
 			mCamera.stopPreview();
@@ -179,13 +178,13 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	private void setUpAndConfigureCamera() {
 		// Open and configure the camera
 		mCamera = openConfigureCamera(mCameraInfo);
-		setCameraDisplayOrientation(mCameraInfo,mCamera);
+		setCameraDisplayOrientation(mCameraInfo, mCamera);
 
 		// Create an instance of Camera
 		mPreview.setCamera(mCamera);
 
-		if( processing != null ) {
-			processing.init(mDraw,mCamera,mCameraInfo,previewRotation);
+		if (processing != null) {
+			processing.init(mDraw, mCamera, mCameraInfo, previewRotation);
 		}
 	}
 
@@ -194,10 +193,10 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	 *
 	 * @return camera
 	 */
-	protected abstract Camera openConfigureCamera( Camera.CameraInfo cameraInfo);
+	protected abstract Camera openConfigureCamera( Camera.CameraInfo cameraInfo );
 
-	public void setCameraDisplayOrientation(Camera.CameraInfo info,
-											Camera camera) {
+	public void setCameraDisplayOrientation( Camera.CameraInfo info,
+											 Camera camera ) {
 
 		int rotation = this.getWindowManager().getDefaultDisplay()
 				.getRotation();
@@ -211,10 +210,10 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 
 		int result;
 		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-			result = (info.orientation + degrees) % 360;
-			result = (360 - result) % 360;  // compensate the mirror
+			result = (info.orientation + degrees)%360;
+			result = (360 - result)%360;  // compensate the mirror
 		} else {  // back-facing
-			result = (info.orientation - degrees + 360) % 360;
+			result = (info.orientation - degrees + 360)%360;
 		}
 		camera.setDisplayOrientation(result);
 
@@ -222,9 +221,9 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	}
 
 	@Override
-	public void onPreviewFrame(byte[] bytes, Camera camera) {
-		if( processing != null )
-			processing.convertPreview(bytes,camera);
+	public void onPreviewFrame( byte[] bytes, Camera camera ) {
+		if (processing != null)
+			processing.convertPreview(bytes, camera);
 	}
 
 	/**
@@ -241,7 +240,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 
 		long previous = 0;
 
-		public Visualization(Activity context ) {
+		public Visualization( Activity context ) {
 			super(context);
 			this.activity = context;
 
@@ -254,10 +253,10 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 		}
 
 		@Override
-		protected void onDraw(Canvas canvas){
+		protected void onDraw( Canvas canvas ) {
 
 			canvas.save();
-			if( processing != null )
+			if (processing != null)
 				processing.onDraw(canvas);
 
 			// Draw how fast it is running
@@ -268,7 +267,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 			historyNum %= history.length;
 
 			double meanFps = 0;
-			for( int i = 0; i < history.length; i++ ) {
+			for (int i = 0; i < history.length; i++) {
 				meanFps += history[i];
 			}
 			meanFps /= history.length;
@@ -276,12 +275,12 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 			// work around an issue in marshmallow
 			try {
 				canvas.restore();
-			} catch( IllegalStateException e ) {
-				if( !e.getMessage().contains("Underflow in restore - more restores than saves"))
+			} catch (IllegalStateException e) {
+				if (!e.getMessage().contains("Underflow in restore - more restores than saves"))
 					throw e;
 			}
-			if( showFPS )
-				canvas.drawText(String.format("FPS = %5.2f",meanFps), 50, 50, textPaint);
+			if (showFPS)
+				canvas.drawText(String.format("FPS = %5.2f", meanFps), 50, 50, textPaint);
 		}
 	}
 
@@ -291,36 +290,35 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	 *
 	 * @param message Text shown in dialog
 	 */
-	protected void setProgressMessage(final String message) {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				synchronized ( lockProgress ) {
-					if( progressDialog != null ) {
-						// a dialog is already open, change the message
-						progressDialog.setMessage(message);
-						return;
-					}
-					progressDialog = new ProgressDialog(VideoDisplayActivity.this);
+	protected void setProgressMessage( final String message ) {
+		runOnUiThread(() -> {
+			synchronized (lockProgress) {
+				if (progressDialog != null) {
+					// a dialog is already open, change the message
 					progressDialog.setMessage(message);
-					progressDialog.setIndeterminate(true);
-					progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					return;
 				}
+				progressDialog = new ProgressDialog(VideoDisplayActivity.this);
+				progressDialog.setMessage(message);
+				progressDialog.setIndeterminate(true);
+				progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			}
 
-				// don't show the dialog until 1 second has passed
-				long showTime = System.currentTimeMillis()+1000;
-				while( showTime > System.currentTimeMillis() ) {
-					Thread.yield();
-				}
-				// if it hasn't been dismissed, show the dialog
-				synchronized ( lockProgress ) {
-					if( progressDialog != null )
-						progressDialog.show();
-				}
-			}});
+			// don't show the dialog until 1 second has passed
+			long showTime = System.currentTimeMillis() + 1000;
+			while (showTime > System.currentTimeMillis()) {
+				BoofMiscOps.sleep(5);
+			}
+			// if it hasn't been dismissed, show the dialog
+			synchronized (lockProgress) {
+				if (progressDialog != null)
+					progressDialog.show();
+			}
+		});
 
 		// block until the GUI thread has been called
-		while( progressDialog == null  ) {
-			Thread.yield();
+		while (progressDialog == null) {
+			BoofMiscOps.sleep(5);
 		}
 	}
 
@@ -329,29 +327,28 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	 */
 	protected void hideProgressDialog() {
 		// do nothing if the dialog is already being displayed
-		synchronized ( lockProgress ) {
-			if( progressDialog == null )
+		synchronized (lockProgress) {
+			if (progressDialog == null)
 				return;
 		}
 
 		if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
 			// if inside the UI thread just dismiss the dialog and avoid a potential locking condition
-			synchronized ( lockProgress ) {
+			synchronized (lockProgress) {
 				progressDialog.dismiss();
 				progressDialog = null;
 			}
 		} else {
-			runOnUiThread(new Runnable() {
-				public void run() {
-					synchronized ( lockProgress ) {
-						progressDialog.dismiss();
-						progressDialog = null;
-					}
-				}});
+			runOnUiThread(() -> {
+				synchronized (lockProgress) {
+					progressDialog.dismiss();
+					progressDialog = null;
+				}
+			});
 
 			// block until dialog has been dismissed
-			while( progressDialog != null  ) {
-				Thread.yield();
+			while (progressDialog != null) {
+				BoofMiscOps.sleep(10);
 			}
 		}
 	}
@@ -360,7 +357,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 		return showFPS;
 	}
 
-	public void setShowFPS(boolean showFPS) {
+	public void setShowFPS( boolean showFPS ) {
 		this.showFPS = showFPS;
 	}
 }

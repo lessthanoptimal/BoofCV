@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayDeque;
 
 /**
  * Scans all images in a directory for QR codes and outputs the results
@@ -45,23 +44,23 @@ import java.util.Queue;
  */
 public class BatchScanQrCodes {
 
-	@Option(name = "-i", aliases = {"--Input"}, usage="Path to input directory or file")
+	@Option(name = "-i", aliases = {"--Input"}, usage = "Path to input directory or file")
 	String pathInput;
 
-	@Option(name = "-o", aliases = {"--Output"}, usage="Path to output file.")
+	@Option(name = "-o", aliases = {"--Output"}, usage = "Path to output file.")
 	String pathOutput = "qrcodes.txt";
 
-	@Option(name = "--Regex", usage="Optional regex to filter files by name")
+	@Option(name = "--Regex", usage = "Optional regex to filter files by name")
 	String regex = "";
 
-	@Option(name = "--Recursive", usage="Should input directory be recursively searched")
+	@Option(name = "--Recursive", usage = "Should input directory be recursively searched")
 	boolean recursive = false;
 
-	@Option(name="--GUI", usage="Ignore all other command line arguments and switch to GUI mode")
+	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	private boolean guiMode = false;
 
-	QrCodeDetector<GrayU8> scanner = FactoryFiducial.qrcode(null,GrayU8.class);
-	GrayU8 gray = new GrayU8(1,1);
+	QrCodeDetector<GrayU8> scanner = FactoryFiducial.qrcode(null, GrayU8.class);
+	GrayU8 gray = new GrayU8(1, 1);
 
 	PrintStream output;
 
@@ -77,13 +76,13 @@ public class BatchScanQrCodes {
 		total = 0;
 		output = new PrintStream(pathOutput);
 		output.println("# Found QR Codes inside of images");
-		output.println("# "+new File(pathInput).getPath());
+		output.println("# " + new File(pathInput).getPath());
 		output.println("# Format:");
 		output.println("# <File Name> <Total Found>");
 		output.println("# message encoded with URLEncoder");
 
 		try {
-			Queue<File> files = new LinkedList<>();
+			ArrayDeque<File> files = new ArrayDeque<>();
 			files.add(new File(pathInput));
 
 			while (!files.isEmpty()) {
@@ -110,38 +109,38 @@ public class BatchScanQrCodes {
 		} finally {
 			output.close();
 		}
-		System.out.println("\n\nDone! Images Count = "+total);
+		System.out.println("\n\nDone! Images Count = " + total);
 	}
 
-	private void processFile(File f) throws UnsupportedEncodingException {
-		if( regex.length() > 0 && !f.getName().matches(regex))
+	private void processFile( File f ) throws UnsupportedEncodingException {
+		if (regex.length() > 0 && !f.getName().matches(regex))
 			return;
 
 		BufferedImage buffered = UtilImageIO.loadImage(f.getAbsolutePath());
-		if( buffered == null ) {
-			System.err.println("Can't open "+f.getPath());
+		if (buffered == null) {
+			System.err.println("Can't open " + f.getPath());
 			return;
 		}
-		if( listener != null ) {
+		if (listener != null) {
 			listener.batchUpdate(f.getName());
 		}
 
-		ConvertBufferedImage.convertFrom(buffered,gray);
+		ConvertBufferedImage.convertFrom(buffered, gray);
 
 		scanner.process(gray);
-		output.printf("%d %s\n",scanner.getDetections().size(),f.getPath());
+		output.printf("%d %s\n", scanner.getDetections().size(), f.getPath());
 
 		for (QrCode qr : scanner.getDetections()) {
-			output.println(URLEncoder.encode(qr.message,"UTF-8"));
+			output.println(URLEncoder.encode(qr.message, "UTF-8"));
 		}
 
 		total++;
-		if( total%50 == 0 ) {
-			System.out.println("processed "+total);
+		if (total%50 == 0) {
+			System.out.println("processed " + total);
 		}
 	}
 
-	private static void printHelpExit(CmdLineParser parser ) {
+	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
 		parser.printUsage(System.out);
 
@@ -154,23 +153,23 @@ public class BatchScanQrCodes {
 		System.exit(1);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BatchScanQrCodes generator = new BatchScanQrCodes();
 		CmdLineParser parser = new CmdLineParser(generator);
 
-		if( args.length == 0 ) {
+		if (args.length == 0) {
 			printHelpExit(parser);
 		}
 
 		try {
 			parser.parseArgument(args);
-			if( generator.guiMode ) {
+			if (generator.guiMode) {
 				new BatchScanQrCodesGui();
 			} else {
 				generator.finishParsing();
 				try {
 					generator.process();
-				} catch( Exception e ) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println();
 					System.out.println("Failed! See exception above");

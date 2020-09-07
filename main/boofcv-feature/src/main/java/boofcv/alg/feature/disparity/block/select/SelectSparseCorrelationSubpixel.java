@@ -31,34 +31,32 @@ import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
 public class SelectSparseCorrelationSubpixel {
 
 	public static class F32 extends SelectSparseCorrelationWithChecksWta_F32 {
-		public F32( double texture, int tolRightToLeft) {
-			super(texture,tolRightToLeft);
+		public F32( double texture, int tolRightToLeft ) {
+			super(texture, tolRightToLeft);
 		}
 
 		@Override
-		public boolean select(DisparitySparseRectifiedScoreBM<float[],?> scorer, int x, int y) {
-			if( super.select(scorer, x, y) ) {
+		public boolean select( DisparitySparseRectifiedScoreBM<float[], ?> scorer, int x, int y ) {
+			if (super.select(scorer, x, y)) {
 				int disparityRange = scorer.getLocalRangeLtoR();
 				float[] scores = scorer.getScoreLtoR();
 				int disparityValue = (int)disparity;
 
-				if( disparityValue == 0 || disparityValue == disparityRange -1) {
+				if (disparityValue == 0 || disparityValue == disparityRange - 1) {
 					return true;
 				} else {
-					float c0 = scores[disparityValue-1];
+					float c0 = scores[disparityValue - 1];
 					float c1 = scores[disparityValue];
-					float c2 = scores[disparityValue+1];
+					float c2 = scores[disparityValue + 1];
 
-					float offset = (c0-c2)/(2f*(c0-2*c1+c2));
+					float offset = (c0 - c2)/(2f*(c0 - 2*c1 + c2));
 
 					disparity += offset;
 					return true;
 				}
-
 			} else {
 				return false;
 			}
 		}
-
 	}
 }

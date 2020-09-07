@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,27 +71,23 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 				"import boofcv.alg.interpolate.InterpolatePixelMB;\n" +
 				"import boofcv.alg.interpolate.NearestNeighborPixelMB;\n" +
 				"import boofcv.struct.image." + image.getInterleavedName() + ";\n" +
-				"import boofcv.struct.border.ImageBorder_" + borderType + ";\n");
+				"import boofcv.struct.border.ImageBorder_" + borderType + ";\n" +
+				"\n"+
+				"import javax.annotation.Generated;\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +
 				" * <p>\n" +
 				" * Performs nearest neighbor interpolation to extract values between pixels in an image.\n" +
 				" * </p>\n" +
-				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"public class "+className+" extends NearestNeighborPixelMB<"+image.getInterleavedName()+"> {\n" +
 				"\n" +
-				"\tprivate "+image.getSumType()+" pixel[] = new "+image.getSumType()+"[3];" +
+				"\tprivate "+image.getSumType()+"[] pixel = new "+image.getSumType()+"[3];" +
 				"\n" +
-				"\tpublic "+className+"() {\n" +
-				"\t}\n" +
+				"\tpublic "+className+"() {}\n" +
 				"\n" +
 				"\tpublic "+className+"("+image.getInterleavedName()+" orig) {\n" +
-				"\n" +
 				"\t\tsetImage(orig);\n" +
 				"\t}\n");
 
@@ -137,7 +133,7 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 				"\t\t"+className+" out = new "+className+"();\n" +
 				"\t\tout.setBorder(border);\n" +
 				"\t\treturn out;\n" +
-				"\t}\n\n");
+				"\t}\n");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {

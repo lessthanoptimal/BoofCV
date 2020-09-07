@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,8 +81,8 @@ public class ConnectLinesGrid {
 	 */
 	public ConnectLinesGrid(double lineSlopeAngleTol, double tangentTol, double parallelTol ) {
 		this.lineSlopeAngleTol = (float)lineSlopeAngleTol;
-		this.tangentTol = (float)(tangentTol);
-		this.parallelTol = (float)(parallelTol);
+		this.tangentTol = (float)tangentTol;
+		this.parallelTol = (float)parallelTol;
 	}
 
 	public void process( MatrixOfList<LineSegment2D_F32> grid ) {
@@ -158,7 +158,7 @@ public class ConnectLinesGrid {
 
 		// join the two lines by connecting the farthest points from each other
 		Point2D_F32 pt0 = farthestIndex < 2 ? target.a : target.b;
-		Point2D_F32 pt1 = (farthestIndex %2) == 0 ? b.a : b.b;
+		Point2D_F32 pt1 = farthestIndex %2 == 0 ? b.a : b.b;
 
 		target.a.set(pt0);
 		target.b.set(pt1);
@@ -188,7 +188,7 @@ public class ConnectLinesGrid {
 
 			// join the two lines by connecting the farthest points from each other
 			Point2D_F32 pt0 = farthestIndex < 2 ? a.a : a.b;
-			Point2D_F32 pt1 = (farthestIndex %2) == 0 ? b.a : b.b;
+			Point2D_F32 pt1 = farthestIndex %2 == 0 ? b.a : b.b;
 
 			a.a.set(pt0);
 			a.b.set(pt1);
@@ -230,7 +230,7 @@ public class ConnectLinesGrid {
 
 			// two closest end points
 			Point2D_F32 pt0 = closestIndex < 2 ? target.a : target.b;
-			Point2D_F32 pt1 = (closestIndex %2) == 0 ? c.a : c.b;
+			Point2D_F32 pt1 = closestIndex %2 == 0 ? c.a : c.b;
 
 			float xx = pt1.x-pt0.x;
 			float yy = pt1.y-pt0.y;
@@ -244,7 +244,7 @@ public class ConnectLinesGrid {
 
 			// check the angle of the combined line
 			pt0 = farthestIndex < 2 ? target.a : target.b;
-			pt1 = (farthestIndex %2) == 0 ? c.a : c.b;
+			pt1 = farthestIndex %2 == 0 ? c.a : c.b;
 
 			float angleCombined = UtilAngle.atanSafe(pt1.y-pt0.y,pt1.x-pt0.x);
 

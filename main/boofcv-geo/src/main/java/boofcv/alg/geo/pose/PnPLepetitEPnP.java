@@ -104,49 +104,49 @@ import java.util.List;
 public class PnPLepetitEPnP {
 
 	// used to solve various linear problems
-	private SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
-	DMatrixRMaj nullspace = new DMatrixRMaj(1,1);
-	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(12, 12, false, true, false);
-	private LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(6, 4);
-	private LinearSolverDense<DMatrixRMaj> solverPinv = LinearSolverFactory_DDRM.pseudoInverse(true);
+	private final SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
+	DMatrixRMaj nullspace = new DMatrixRMaj(1, 1);
+	private final SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(12, 12, false, true, false);
+	private final LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(6, 4);
+	private final LinearSolverDense<DMatrixRMaj> solverPinv = LinearSolverFactory_DDRM.pseudoInverse(true);
 
 	// weighting factor to go from control point into world coordinate
-	protected DMatrixRMaj alphas = new DMatrixRMaj(1,1);
-	private DMatrixRMaj M = new DMatrixRMaj(12,12);
-	private DMatrixRMaj MM = new DMatrixRMaj(12,12);
+	protected DMatrixRMaj alphas = new DMatrixRMaj(1, 1);
+	private final DMatrixRMaj M = new DMatrixRMaj(12, 12);
+	private final DMatrixRMaj MM = new DMatrixRMaj(12, 12);
 
 	// linear constraint matrix
-	protected DMatrixRMaj L_full = new DMatrixRMaj(6,10);
-	private DMatrixRMaj L = new DMatrixRMaj(6,6);
+	protected DMatrixRMaj L_full = new DMatrixRMaj(6, 10);
+	private final DMatrixRMaj L = new DMatrixRMaj(6, 6);
 	// distance of world control points from each other
-	protected DMatrixRMaj y = new DMatrixRMaj(6,1);
+	protected DMatrixRMaj y = new DMatrixRMaj(6, 1);
 	// solution for betas
-	private DMatrixRMaj x = new DMatrixRMaj(6,1);
+	private final DMatrixRMaj x = new DMatrixRMaj(6, 1);
 
 	// how many controls points 4 for general case and 3 for planar
 	protected int numControl;
 
 	// control points extracted from the null space of M'M
-	protected List<Point3D_F64> nullPts[] = new ArrayList[4];
+	protected List<Point3D_F64>[] nullPts = new ArrayList[4];
 
 	// control points in world coordinate frame
 	protected FastQueue<Point3D_F64> controlWorldPts = new FastQueue<>(4, Point3D_F64::new);
 
 	// list of found solutions
-	private List<double []> solutions = new ArrayList<>();
+	private final List<double[]> solutions = new ArrayList<>();
 	protected FastQueue<Point3D_F64> solutionPts = new FastQueue<>(4, Point3D_F64::new);
 
 	// estimates rigid body motion between two associated sets of points
-	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
+	private final MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
 
 	// mean location of world points
-	private Point3D_F64 meanWorldPts = new Point3D_F64();
+	private final Point3D_F64 meanWorldPts = new Point3D_F64();
 
 	// number of iterations it will perform
 	private int numIterations;
 
 	// adjusts world control point distribution
-	private double magicNumber;
+	private final double magicNumber;
 
 	// handles the hard case #4
 	Relinearlize relinearizeBeta = new Relinearlize();
@@ -154,10 +154,10 @@ public class PnPLepetitEPnP {
 	// declaring data for local use inside a function
 	// in general its good to avoid declaring and destroying massive amounts of data in Java
 	// this is probably going too far though
-	private List<Point3D_F64> tempPts0 = new ArrayList<>(); // 4 points stored in it
-	DMatrixRMaj A_temp = new DMatrixRMaj(1,1);
-	DMatrixRMaj v_temp = new DMatrixRMaj(3,1);
-	DMatrixRMaj w_temp = new DMatrixRMaj(1,1);
+	private final List<Point3D_F64> tempPts0 = new ArrayList<>(); // 4 points stored in it
+	DMatrixRMaj A_temp = new DMatrixRMaj(1, 1);
+	DMatrixRMaj v_temp = new DMatrixRMaj(3, 1);
+	DMatrixRMaj w_temp = new DMatrixRMaj(1, 1);
 
 	/**
 	 * Constructor which uses the default magic number
@@ -170,22 +170,22 @@ public class PnPLepetitEPnP {
 	 * Constructor which allows configuration of the magic number.
 	 *
 	 * @param magicNumber Magic number changes distribution of world control points.
-	 *                    Values less than one seem to work best. Try 0.1
+	 * Values less than one seem to work best. Try 0.1
 	 */
 	public PnPLepetitEPnP( double magicNumber ) {
 
 		this.magicNumber = magicNumber;
 
 		// just a sanity check
-		if( motionFit.getMinimumPoints() > 4 )
+		if (motionFit.getMinimumPoints() > 4)
 			throw new IllegalArgumentException("Crap");
 
-		for( int i = 0; i < 4; i++ ) {
-			tempPts0.add( new Point3D_F64());
+		for (int i = 0; i < 4; i++) {
+			tempPts0.add(new Point3D_F64());
 			nullPts[i] = new ArrayList<>();
-			solutions.add( new double[4]);
-			for( int j = 0; j < 4; j++ ) {
-				nullPts[i].add( new Point3D_F64());
+			solutions.add(new double[4]);
+			for (int j = 0; j < 4; j++) {
+				nullPts[i].add(new Point3D_F64());
 			}
 		}
 	}
@@ -194,9 +194,9 @@ public class PnPLepetitEPnP {
 	 * Used to turn on and off non-linear optimization.  To turn on set to a positive number.
 	 * See warning in class description about setting the number of iterations too high.
 	 *
-	 * @param numIterations  Number of iterations.  Try 10.
+	 * @param numIterations Number of iterations.  Try 10.
 	 */
-	public void setNumIterations(int numIterations) {
+	public void setNumIterations( int numIterations ) {
 		this.numIterations = numIterations;
 	}
 
@@ -207,27 +207,26 @@ public class PnPLepetitEPnP {
 	 * @param observed Observed location of features in normalized camera coordinates
 	 * @param solutionModel Output: Storage for the found solution.
 	 */
-	public void process( List<Point3D_F64> worldPts , List<Point2D_F64> observed , Se3_F64 solutionModel )
-	{
-		if( worldPts.size() < 4 )
+	public void process( List<Point3D_F64> worldPts, List<Point2D_F64> observed, Se3_F64 solutionModel ) {
+		if (worldPts.size() < 4)
 			throw new IllegalArgumentException("Must provide at least 4 points");
-		if( worldPts.size() != observed.size() )
+		if (worldPts.size() != observed.size())
 			throw new IllegalArgumentException("Must have the same number of observations and world points");
 
 		// select world control points using the points statistics
 		selectWorldControlPoints(worldPts, controlWorldPts);
 		// compute barycentric coordinates for the world control points
-		computeBarycentricCoordinates(controlWorldPts, alphas, worldPts );
+		computeBarycentricCoordinates(controlWorldPts, alphas, worldPts);
 		// create the linear system whose null space will contain the camera control points
 		constructM(observed, alphas, M);
 		// the camera points are a linear combination of these null points
 		extractNullPoints(M);
 
 		// compute the full constraint matrix, the others are extracted from this
-		if( numControl == 4 ) {
+		if (numControl == 4) {
 			L_full.reshape(6, 10);
-			y.reshape(6,1);
-			UtilLepetitEPnP.constraintMatrix6x10(L_full,y,controlWorldPts,nullPts);
+			y.reshape(6, 1);
+			UtilLepetitEPnP.constraintMatrix6x10(L_full, y, controlWorldPts, nullPts);
 
 			// compute 4 solutions using the null points
 			estimateCase1(solutions.get(0));
@@ -235,16 +234,16 @@ public class PnPLepetitEPnP {
 			estimateCase3(solutions.get(2));
 			// results are bad in general, so skip unless needed
 			// always considering this case seems to hurt runtime speed a little bit
-			if( worldPts.size() == 4 )
+			if (worldPts.size() == 4)
 				estimateCase4(solutions.get(3));
 		} else {
 			L_full.reshape(3, 6);
-			y.reshape(3,1);
+			y.reshape(3, 1);
 			UtilLepetitEPnP.constraintMatrix3x6(L_full, y, controlWorldPts, nullPts);
 
 			estimateCase1(solutions.get(0));
 			estimateCase2(solutions.get(1));
-			if( worldPts.size() == 3 )
+			if (worldPts.size() == 3)
 				estimateCase3_planar(solutions.get(2));
 		}
 
@@ -257,22 +256,22 @@ public class PnPLepetitEPnP {
 	 */
 	private void computeResultFromBest( Se3_F64 solutionModel ) {
 		double bestScore = Double.MAX_VALUE;
-		int bestSolution=-1;
-		for( int i = 0; i < numControl; i++ ) {
+		int bestSolution = -1;
+		for (int i = 0; i < numControl; i++) {
 			double score = score(solutions.get(i));
-			if( score < bestScore ) {
+			if (score < bestScore) {
 				bestScore = score;
 				bestSolution = i;
 			}
 //			System.out.println(i+" score "+score);
 		}
 
-		double []solution = solutions.get(bestSolution);
-		if( numIterations > 0 ) {
+		double[] solution = solutions.get(bestSolution);
+		if (numIterations > 0) {
 			gaussNewton(solution);
 		}
 
-		UtilLepetitEPnP.computeCameraControl(solution,nullPts,solutionPts,numControl);
+		UtilLepetitEPnP.computeCameraControl(solution, nullPts, solutionPts, numControl);
 		motionFit.process(controlWorldPts.toList(), solutionPts.toList());
 
 		solutionModel.set(motionFit.getTransformSrcToDst());
@@ -284,25 +283,23 @@ public class PnPLepetitEPnP {
 	 * similar to how optimization score works and not the way recommended in the original
 	 * paper.
 	 */
-	private double score(double betas[]) {
-		UtilLepetitEPnP.computeCameraControl(betas,nullPts, solutionPts,numControl);
+	private double score( double[] betas ) {
+		UtilLepetitEPnP.computeCameraControl(betas, nullPts, solutionPts, numControl);
 
-		int index = 0;
 		double score = 0;
-		for( int i = 0; i < numControl; i++ ) {
+		for (int i = 0; i < numControl; i++) {
 			Point3D_F64 si = solutionPts.get(i);
 			Point3D_F64 wi = controlWorldPts.get(i);
 
-			for( int j = i+1; j < numControl; j++ , index++) {
+			for (int j = i + 1; j < numControl; j++) {
 				double ds = si.distance(solutionPts.get(j));
 				double dw = wi.distance(controlWorldPts.get(j));
 
-				score += (ds-dw)*(ds-dw);
+				score += (ds - dw)*(ds - dw);
 			}
 		}
 		return score;
 	}
-
 
 	/**
 	 * Selects control points along the data's axis and the data's centroid.  If the data is determined
@@ -311,20 +308,20 @@ public class PnPLepetitEPnP {
 	 * The data's axis is determined by computing the covariance matrix then performing SVD.  The axis
 	 * is contained along the
 	 */
-	public void selectWorldControlPoints(List<Point3D_F64> worldPts, FastQueue<Point3D_F64> controlWorldPts) {
+	public void selectWorldControlPoints( List<Point3D_F64> worldPts, FastQueue<Point3D_F64> controlWorldPts ) {
 
-		UtilPoint3D_F64.mean(worldPts,meanWorldPts);
+		UtilPoint3D_F64.mean(worldPts, meanWorldPts);
 
 		// covariance matrix elements, summed up here for speed
-		double c11=0,c12=0,c13=0,c22=0,c23=0,c33=0;
+		double c11 = 0, c12 = 0, c13 = 0, c22 = 0, c23 = 0, c33 = 0;
 
 		final int N = worldPts.size();
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			Point3D_F64 p = worldPts.get(i);
 
-			double dx = p.x- meanWorldPts.x;
-			double dy = p.y- meanWorldPts.y;
-			double dz = p.z- meanWorldPts.z;
+			double dx = p.x - meanWorldPts.x;
+			double dy = p.y - meanWorldPts.y;
+			double dz = p.z - meanWorldPts.z;
 
 			c11 += dx*dx;c12 += dx*dy;c13 += dx*dz;
 			c22 += dy*dy;c23 += dy*dz;
@@ -332,17 +329,17 @@ public class PnPLepetitEPnP {
 		}
 		c11/=N;c12/=N;c13/=N;c22/=N;c23/=N;c33/=N;
 
-		DMatrixRMaj covar = new DMatrixRMaj(3,3,true,c11,c12,c13,c12,c22,c23,c13,c23,c33);
+		DMatrixRMaj covar = new DMatrixRMaj(3, 3, true, c11, c12, c13, c12, c22, c23, c13, c23, c33);
 
 		// find the data's orientation and check to see if it is planar
 		svd.decompose(covar);
-		double []singularValues = svd.getSingularValues();
-		DMatrixRMaj V = svd.getV(null,false);
+		double[] singularValues = svd.getSingularValues();
+		DMatrixRMaj V = svd.getV(null, false);
 
-		SingularOps_DDRM.descendingOrder(null,false,singularValues,3,V,false);
+		SingularOps_DDRM.descendingOrder(null, false, singularValues, 3, V, false);
 
 		// planar check
-		if( singularValues[0]<singularValues[2]*1e13 ) {
+		if (singularValues[0] < singularValues[2]*1e13) {
 			numControl = 4;
 		} else {
 			numControl = 3;
@@ -350,7 +347,7 @@ public class PnPLepetitEPnP {
 
 		// put control points along the data's major axises
 		controlWorldPts.reset();
-		for( int i = 0; i < numControl-1; i++ ) {
+		for (int i = 0; i < numControl - 1; i++) {
 			double m = Math.sqrt(singularValues[1])*magicNumber;
 
 			double vx = V.unsafe_get(0, i)*m;
@@ -375,15 +372,14 @@ public class PnPLepetitEPnP {
 	 * X = [ cameraPts' ; ones(1,N) ]
 	 * </p>
 	 */
-	protected void computeBarycentricCoordinates(FastQueue<Point3D_F64> controlWorldPts,
-												 DMatrixRMaj alphas,
-												 List<Point3D_F64> worldPts )
-	{
-		alphas.reshape(worldPts.size(),numControl,false);
-		v_temp.reshape(3,1);
+	protected void computeBarycentricCoordinates( FastQueue<Point3D_F64> controlWorldPts,
+												  DMatrixRMaj alphas,
+												  List<Point3D_F64> worldPts ) {
+		alphas.reshape(worldPts.size(), numControl, false);
+		v_temp.reshape(3, 1);
 		A_temp.reshape(3, numControl - 1);
 
-		for( int i = 0; i < numControl-1; i++ ) {
+		for (int i = 0; i < numControl - 1; i++) {
 			Point3D_F64 c = controlWorldPts.get(i);
 			A_temp.set(0, i, c.x - meanWorldPts.x);
 			A_temp.set(1, i, c.y - meanWorldPts.y);
@@ -397,19 +393,19 @@ public class PnPLepetitEPnP {
 
 		w_temp.reshape(numControl - 1, 1);
 
-		for( int i = 0; i < worldPts.size(); i++ ) {
+		for (int i = 0; i < worldPts.size(); i++) {
 			Point3D_F64 p = worldPts.get(i);
-			v_temp.data[0] = p.x- meanWorldPts.x;
-			v_temp.data[1] = p.y- meanWorldPts.y;
-			v_temp.data[2] = p.z- meanWorldPts.z;
+			v_temp.data[0] = p.x - meanWorldPts.x;
+			v_temp.data[1] = p.y - meanWorldPts.y;
+			v_temp.data[2] = p.z - meanWorldPts.z;
 
 			MatrixVectorMult_DDRM.mult(A_temp, v_temp, w_temp);
 
 			int rowIndex = alphas.numCols*i;
-			for( int j = 0; j < numControl-1; j++ )
+			for (int j = 0; j < numControl - 1; j++)
 				alphas.data[rowIndex++] = w_temp.data[j];
 
-			if( numControl == 4 )
+			if (numControl == 4)
 				alphas.data[rowIndex] = 1 - w_temp.data[0] - w_temp.data[1] - w_temp.data[2];
 			else
 				alphas.data[rowIndex] = 1 - w_temp.data[0] - w_temp.data[1];
@@ -423,30 +419,29 @@ public class PnPLepetitEPnP {
 	 * sum a_ij*y_j - a_ij*v_i*z_j = 0
 	 *
 	 * where (x,y,z) is the control point to be solved for.
-	 *       (u,v) is the observed normalized point
-	 *
+	 * (u,v) is the observed normalized point
 	 */
-	protected static void constructM(List<Point2D_F64> obsPts,
-									 DMatrixRMaj alphas, DMatrixRMaj M)
-	{
+	protected static void constructM( List<Point2D_F64> obsPts,
+									  DMatrixRMaj alphas, DMatrixRMaj M ) {
 		int N = obsPts.size();
-		M.reshape(3*alphas.numCols,2*N,false);
+		M.reshape(3*alphas.numCols, 2*N, false);
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			Point2D_F64 p2 = obsPts.get(i);
 
 			int row = i*2;
 
-			for( int j = 0; j < alphas.numCols; j++ ) {
+			for (int j = 0; j < alphas.numCols; j++) {
 				int col = j*3;
 
 				double alpha = alphas.unsafe_get(i, j);
+				// TODO Investigate rows and columns being swapped here. Explain or fix
 				M.unsafe_set(col, row, alpha);
 				M.unsafe_set(col + 1, row, 0);
-				M.unsafe_set(col + 2, row, -alpha * p2.x);
-				M.unsafe_set(col    , row + 1, 0);
+				M.unsafe_set(col + 2, row, -alpha*p2.x);
+				M.unsafe_set(col, row + 1, 0);
 				M.unsafe_set(col + 1, row + 1, alpha);
-				M.unsafe_set(col + 2, row + 1, -alpha * p2.y);
+				M.unsafe_set(col + 2, row + 1, -alpha*p2.y);
 			}
 		}
 	}
@@ -455,23 +450,22 @@ public class PnPLepetitEPnP {
 	 * Computes M'*M and finds the null space.  The 4 eigenvectors with the smallest eigenvalues are found
 	 * and the null points extracted from them.
 	 */
-	protected void extractNullPoints( DMatrixRMaj M )
-	{
+	protected void extractNullPoints( DMatrixRMaj M ) {
 		// compute MM and find its null space
-		MM.reshape(M.numRows,M.numRows,false);
+		MM.reshape(M.numRows, M.numRows, false);
 		CommonOps_DDRM.multTransB(M, M, MM);
 
-		if( !solverNull.process(MM,numControl, nullspace))
+		if (!solverNull.process(MM, numControl, nullspace))
 			throw new IllegalArgumentException("SVD failed?!?!");
 
 		// extract null points from the null space
-		for( int i = 0; i < numControl; i++ ) {
-			int column = numControl-i-1;
-			for( int j = 0; j < numControl; j++ ) {
+		for (int i = 0; i < numControl; i++) {
+			int column = numControl - i - 1;
+			for (int j = 0; j < numControl; j++) {
 				Point3D_F64 p = nullPts[i].get(j);
-				p.x = nullspace.get(j*3+0,column);
-				p.y = nullspace.get(j*3+1,column);
-				p.z = nullspace.get(j*3+2,column);
+				p.x = nullspace.get(j*3 + 0, column);
+				p.y = nullspace.get(j*3 + 1, column);
+				p.z = nullspace.get(j*3 + 2, column);
 			}
 		}
 	}
@@ -480,27 +474,27 @@ public class PnPLepetitEPnP {
 	 * Examines the distance each point is from the centroid to determine the scaling difference
 	 * between world control points and the null points.
 	 */
-	protected double matchScale( List<Point3D_F64> nullPts ,
+	protected double matchScale( List<Point3D_F64> nullPts,
 								 FastQueue<Point3D_F64> controlWorldPts ) {
 
-		Point3D_F64 meanNull = UtilPoint3D_F64.mean(nullPts,numControl,null);
-		Point3D_F64 meanWorld = UtilPoint3D_F64.mean(controlWorldPts.toList(),numControl,null);
+		Point3D_F64 meanNull = UtilPoint3D_F64.mean(nullPts, numControl, null);
+		Point3D_F64 meanWorld = UtilPoint3D_F64.mean(controlWorldPts.toList(), numControl, null);
 
 		// compute the ratio of distance between world and null points from the centroid
 		double top = 0;
 		double bottom = 0;
 
-		for( int i = 0; i < numControl; i++ ) {
+		for (int i = 0; i < numControl; i++) {
 			Point3D_F64 wi = controlWorldPts.get(i);
 			Point3D_F64 ni = nullPts.get(i);
 
-			double dwx = wi.x-meanWorld.x;
-			double dwy = wi.y-meanWorld.y;
-			double dwz = wi.z-meanWorld.z;
+			double dwx = wi.x - meanWorld.x;
+			double dwy = wi.y - meanWorld.y;
+			double dwz = wi.z - meanWorld.z;
 
-			double dnx = ni.x-meanNull.x;
-			double dny = ni.y-meanNull.y;
-			double dnz = ni.z-meanNull.z;
+			double dnx = ni.x - meanNull.x;
+			double dny = ni.y - meanNull.y;
+			double dnz = ni.z - meanNull.z;
 
 			double n2 = dnx*dnx + dny*dny + dnz*dnz;
 			double w2 = dwx*dwx + dwy*dwy + dwz*dwz;
@@ -516,26 +510,26 @@ public class PnPLepetitEPnP {
 	/**
 	 * Use the positive depth constraint to determine the sign of beta
 	 */
-	private double adjustBetaSign( double beta , List<Point3D_F64> nullPts ) {
-		if( beta == 0 )
+	private double adjustBetaSign( double beta, List<Point3D_F64> nullPts ) {
+		if (beta == 0)
 			return 0;
 
 		int N = alphas.numRows;
 
 		int positiveCount = 0;
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			double z = 0;
-			for( int j = 0; j < numControl; j++ ) {
+			for (int j = 0; j < numControl; j++) {
 				Point3D_F64 c = nullPts.get(j);
-				z += alphas.get(i,j)*c.z;
+				z += alphas.get(i, j)*c.z;
 			}
 
-			if( z > 0 )
+			if (z > 0)
 				positiveCount++;
 		}
 
-		if( positiveCount < N/2 )
+		if (positiveCount < N/2)
 			beta *= -1;
 
 		return beta;
@@ -543,26 +537,26 @@ public class PnPLepetitEPnP {
 
 	/**
 	 * Given the set of betas it computes a new set of control points and adjust sthe scale
-	 * using the {@llin #matchScale} function.
+	 * using the {@link ##matchScale} function.
 	 */
-	private void refine( double betas[] ) {
-		for( int i = 0; i < numControl; i++ ) {
-			double x=0,y=0,z=0;
+	private void refine( double[] betas ) {
+		for (int i = 0; i < numControl; i++) {
+			double x = 0, y = 0, z = 0;
 
-			for( int j = 0; j < numControl; j++ ) {
+			for (int j = 0; j < numControl; j++) {
 				Point3D_F64 p = nullPts[j].get(i);
 				x += betas[j]*p.x;
 				y += betas[j]*p.y;
 				z += betas[j]*p.z;
 			}
 
-			tempPts0.get(i).set(x,y,z);
+			tempPts0.get(i).set(x, y, z);
 		}
 
-		double adj = matchScale(tempPts0,controlWorldPts);
-		adj = adjustBetaSign(adj,tempPts0);
+		double adj = matchScale(tempPts0, controlWorldPts);
+		adj = adjustBetaSign(adj, tempPts0);
 
-		for( int i = 0; i < 4; i++ ) {
+		for (int i = 0; i < 4; i++) {
 			betas[i] *= adj;
 		}
 	}
@@ -571,27 +565,27 @@ public class PnPLepetitEPnP {
 	 * Simple analytical solution.  Just need to solve for the scale difference in one set
 	 * of potential control points.
 	 */
-	protected void estimateCase1( double betas[] ) {
+	protected void estimateCase1( double[] betas ) {
 		betas[0] = matchScale(nullPts[0], controlWorldPts);
 		betas[0] = adjustBetaSign(betas[0],nullPts[0]);
 		betas[1] = 0; betas[2] = 0; betas[3] = 0;
 	}
 
-	protected void estimateCase2( double betas[] ) {
+	protected void estimateCase2( double[] betas ) {
 
-		x.reshape(3,1,false);
-		if( numControl == 4 ) {
-			L.reshape(6,3,false);
-			UtilLepetitEPnP.constraintMatrix6x3(L_full,L);
+		x.reshape(3, 1, false);
+		if (numControl == 4) {
+			L.reshape(6, 3, false);
+			UtilLepetitEPnP.constraintMatrix6x3(L_full, L);
 		} else {
-			L.reshape(3,3,false);
-			UtilLepetitEPnP.constraintMatrix3x3(L_full,L);
+			L.reshape(3, 3, false);
+			UtilLepetitEPnP.constraintMatrix3x3(L_full, L);
 		}
 
-		if( !solver.setA(L) )
+		if (!solver.setA(L))
 			throw new RuntimeException("Oh crap");
 
-		solver.solve(y,x);
+		solver.solve(y, x);
 
 		betas[0] = Math.sqrt(Math.abs(x.get(0)));
 		betas[1] = Math.sqrt(Math.abs(x.get(2)));
@@ -601,17 +595,17 @@ public class PnPLepetitEPnP {
 		refine(betas);
 	}
 
-	protected void estimateCase3( double betas[] ) {
+	protected void estimateCase3( double[] betas ) {
 		Arrays.fill(betas, 0);
 
-		x.reshape(6,1,false);
-		L.reshape(6,6,false);
+		x.reshape(6, 1, false);
+		L.reshape(6, 6, false);
 		UtilLepetitEPnP.constraintMatrix6x6(L_full, L);
 
-		if( !solver.setA(L) )
+		if (!solver.setA(L))
 			throw new RuntimeException("Oh crap");
 
-		solver.solve(y,x);
+		solver.solve(y, x);
 
 		betas[0] = Math.sqrt(Math.abs(x.get(0)));
 		betas[1] = Math.sqrt(Math.abs(x.get(3)));
@@ -626,17 +620,16 @@ public class PnPLepetitEPnP {
 	/**
 	 * If the data is planar use relinearize to estimate betas
 	 */
-	protected void estimateCase3_planar( double betas[] ) {
+	protected void estimateCase3_planar( double[] betas ) {
 		relinearizeBeta.setNumberControl(3);
-		relinearizeBeta.process(L_full,y,betas);
+		relinearizeBeta.process(L_full, y, betas);
 
 		refine(betas);
 	}
 
-	protected void estimateCase4( double betas[] ) {
-
+	protected void estimateCase4( double[] betas ) {
 		relinearizeBeta.setNumberControl(4);
-		relinearizeBeta.process(L_full,y,betas);
+		relinearizeBeta.process(L_full, y, betas);
 
 		refine(betas);
 	}
@@ -646,38 +639,37 @@ public class PnPLepetitEPnP {
 	 *
 	 * @param betas Beta values being optimized.
 	 */
-	private void gaussNewton( double betas[] ) {
-
+	private void gaussNewton( double[] betas ) {
 		A_temp.reshape(L_full.numRows, numControl);
 		v_temp.reshape(L_full.numRows, 1);
-		x.reshape(numControl,1,false);
+		x.reshape(numControl, 1, false);
 
 		// don't check numControl inside in hope that the JVM can optimize the code better
-		if( numControl == 4 ) {
-			for( int i = 0; i < numIterations; i++ ) {
-				UtilLepetitEPnP.jacobian_Control4(L_full,betas, A_temp);
-				UtilLepetitEPnP.residuals_Control4(L_full,y,betas,v_temp.data);
+		if (numControl == 4) {
+			for (int i = 0; i < numIterations; i++) {
+				UtilLepetitEPnP.jacobian_Control4(L_full, betas, A_temp);
+				UtilLepetitEPnP.residuals_Control4(L_full, y, betas, v_temp.data);
 
-				if( !solver.setA(A_temp) )
+				if (!solver.setA(A_temp))
 					return;
 
-				solver.solve(v_temp,x);
+				solver.solve(v_temp, x);
 
-				for( int j = 0; j < numControl; j++ ) {
+				for (int j = 0; j < numControl; j++) {
 					betas[j] -= x.data[j];
 				}
 			}
 		} else {
-			for( int i = 0; i < numIterations; i++ ) {
-				UtilLepetitEPnP.jacobian_Control3(L_full,betas, A_temp);
-				UtilLepetitEPnP.residuals_Control3(L_full,y,betas,v_temp.data);
+			for (int i = 0; i < numIterations; i++) {
+				UtilLepetitEPnP.jacobian_Control3(L_full, betas, A_temp);
+				UtilLepetitEPnP.residuals_Control3(L_full, y, betas, v_temp.data);
 
-				if( !solver.setA(A_temp) )
+				if (!solver.setA(A_temp))
 					return;
 
-				solver.solve(v_temp,x);
+				solver.solve(v_temp, x);
 
-				for( int j = 0; j < numControl; j++ ) {
+				for (int j = 0; j < numControl; j++) {
 					betas[j] -= x.data[j];
 				}
 			}
@@ -691,7 +683,7 @@ public class PnPLepetitEPnP {
 	 *
 	 * @return minimum number of points
 	 */
-	public int getMinPoints () {
+	public int getMinPoints() {
 		return 5;
 	}
 }

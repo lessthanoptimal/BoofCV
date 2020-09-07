@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBinaryContourFinder extends GenericBinaryContourInterface{
+public abstract class GenericBinaryContourFinder extends GenericBinaryContourInterface {
 
-
+	@Override
 	protected abstract BinaryContourFinder create();
 
 	@Test
@@ -41,7 +41,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.process(input);
 
-		assertEquals(0,ImageStatistics.meanDiffSq(TEST2,input),1e-8);
+		assertEquals(0, ImageStatistics.meanDiffSq(TEST2, input), 1e-8);
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.setMinContour(1000);
 		alg.process(input);
-		assertEquals(0,alg.getContours().size());
+		assertEquals(0, alg.getContours().size());
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		alg.setMaxContour(1);
 		alg.process(input);
 
-		assertEquals(0,alg.getContours().size());
+		assertEquals(0, alg.getContours().size());
 	}
 
 	@Test
@@ -74,16 +74,16 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		BinaryContourFinder alg = create();
 
 		alg.process(input);
-		checkExternalSize(alg,0,10);
+		checkExternalSize(alg, 0, 10);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
 		alg.process(input);
-		checkExternalSize(alg,0,8);
+		checkExternalSize(alg, 0, 8);
 	}
 
 	@Test
 	public void saveInternal() {
-		if( !supportsInternalContour )
+		if (!supportsInternalContour)
 			return;
 
 		GrayU8 input = TEST3.clone();
@@ -91,11 +91,11 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 		BinaryContourFinder alg = create();
 
 		alg.process(input);
-		checkInternalSize(alg,0,0,8);
+		checkInternalSize(alg, 0, 0, 8);
 
 		alg.setSaveInnerContour(false);
 		alg.process(input);
-		checkInternalSize(alg,0,0,0);
+		checkInternalSize(alg, 0, 0, 0);
 	}
 
 	@Test
@@ -106,11 +106,11 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.setConnectRule(ConnectRule.FOUR);
 		alg.process(input);
-		checkExpectedExternal(new int[]{4,42},alg);
+		checkExpectedExternal(new int[]{4, 42}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
 		alg.process(input);
-		checkExpectedExternal(new int[]{37},alg);
+		checkExpectedExternal(new int[]{37}, alg);
 	}
 
 	@Test
@@ -121,11 +121,11 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.setConnectRule(ConnectRule.FOUR);
 		alg.process(input);
-		checkExpectedExternal(new int[]{1,1,1,1,1,1,1,1,1,4,4,4,10,20},alg);
+		checkExpectedExternal(new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 10, 20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
 		alg.process(input);
-		checkExpectedExternal(new int[]{1,3,4,32},alg);
+		checkExpectedExternal(new int[]{1, 3, 4, 32}, alg);
 	}
 
 	@Test
@@ -135,11 +135,11 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.setConnectRule(ConnectRule.FOUR);
 		alg.process(input);
-		checkExpectedExternal(new int[]{24},alg);
+		checkExpectedExternal(new int[]{24}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
 		alg.process(input);
-		checkExpectedExternal(new int[]{19},alg);
+		checkExpectedExternal(new int[]{19}, alg);
 	}
 
 	@Test
@@ -148,11 +148,11 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.setConnectRule(ConnectRule.FOUR);
 		alg.process(TEST5.clone());
-		checkExpectedExternal(new int[]{20},alg);
+		checkExpectedExternal(new int[]{20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
 		alg.process(TEST5.clone());
-		checkExpectedExternal(new int[]{20},alg);
+		checkExpectedExternal(new int[]{20}, alg);
 	}
 
 	@Test
@@ -161,11 +161,11 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.setConnectRule(ConnectRule.FOUR);
 		alg.process(TEST6.clone());
-		checkExpectedExternal(new int[]{20},alg);
+		checkExpectedExternal(new int[]{20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
 		alg.process(TEST6.clone());
-		checkExpectedExternal(new int[]{20},alg);
+		checkExpectedExternal(new int[]{20}, alg);
 	}
 
 	@Test
@@ -174,10 +174,10 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		alg.setConnectRule(ConnectRule.FOUR);
 		alg.process(TEST7.clone());
-		checkExpectedExternal(new int[]{4,20},alg);
+		checkExpectedExternal(new int[]{4, 20}, alg);
 
 		alg.setConnectRule(ConnectRule.EIGHT);
 		alg.process(TEST7.clone());
-		checkExpectedExternal(new int[]{20},alg);
+		checkExpectedExternal(new int[]{20}, alg);
 	}
 }

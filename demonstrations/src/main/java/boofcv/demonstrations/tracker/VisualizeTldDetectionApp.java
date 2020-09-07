@@ -38,7 +38,6 @@ import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,7 +60,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 	int numClicks = 0;
 	ImageRectangle target = new ImageRectangle();
 
-	private FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion::new);
+//	private FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion::new);
 
 
 	public VisualizeTldDetectionApp( BufferedImage input , Class<T> imageType ) {
@@ -108,9 +107,9 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 
 		drawRectangle(g2,target,Color.GREEN,3);
 
-		if( detected.size() != 0 ) {
+//		if( detected.size() != 0 ) {
 //			drawRectangle(g2,target,Color.RED,3);
-		}
+//		}
 	}
 
 	private void drawDetections(Graphics2D g2, FastQueue<TldRegion> detected , int shift ) {
@@ -136,34 +135,34 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 		}
 	}
 
-	private void drawFerns(Graphics2D g2 , int shift ) {
-		double max = 0;
-		double min = Double.MAX_VALUE;
-
-		GrowQueue_F64 value = tracker.getDetection().getStorageMetric();
-		java.util.List<ImageRectangle> rects = tracker.getDetection().getStorageRect();
-
-		for( int i = 0; i < value.size; i++ ) {
-			double r = -value.get(i);
-
-			if( r > max ) {
-				max = r;
-			}
-			if( r < min ) {
-				min = r;
-			}
-		}
-		double range = max-min;
-
-		for( int i = 0; i < value.size; i++ ) {
-			double r = value.get(i);
-			ImageRectangle rect = rects.get(i);
-
-			int v = (int)(255*(r-min)/range);
-			int rgb = v << shift;
-			drawRectangle(g2,rect,new Color(rgb),3);
-		}
-	}
+//	private void drawFerns(Graphics2D g2 , int shift ) {
+//		double max = 0;
+//		double min = Double.MAX_VALUE;
+//
+//		GrowQueue_F64 value = tracker.getDetection().getStorageMetric();
+//		java.util.List<ImageRectangle> rects = tracker.getDetection().getStorageRect();
+//
+//		for( int i = 0; i < value.size; i++ ) {
+//			double r = -value.get(i);
+//
+//			if( r > max ) {
+//				max = r;
+//			}
+//			if( r < min ) {
+//				min = r;
+//			}
+//		}
+//		double range = max-min;
+//
+//		for( int i = 0; i < value.size; i++ ) {
+//			double r = value.get(i);
+//			ImageRectangle rect = rects.get(i);
+//
+//			int v = (int)(255*(r-min)/range);
+//			int rgb = v << shift;
+//			drawRectangle(g2,rect,new Color(rgb),3);
+//		}
+//	}
 
 	private void drawDetections(Graphics2D g2, FastQueue<TldRegion> detected , Color c ) {
 

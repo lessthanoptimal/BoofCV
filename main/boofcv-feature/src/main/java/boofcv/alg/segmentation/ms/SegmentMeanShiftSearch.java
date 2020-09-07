@@ -73,24 +73,23 @@ import org.ddogleg.struct.Stoppable;
  * @author Peter Abeles
  */
 public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
-		implements Stoppable
-{
+		implements Stoppable {
 	// used to detect convergence of mean-shift
 	protected int maxIterations;
 	protected float convergenceTol;
 
 	// specifies the size of the mean-shift kernel in spacial pixels
-	protected int radiusX,radiusY;
-	protected int widthX,widthY;
+	protected int radiusX, radiusY;
+	protected int widthX, widthY;
 	// specifies the maximum Euclidean distance squared for the color components
 	protected float maxColorDistanceSq;
 
 	// converts a pixel location into the index of the mode that mean-shift converged to
-	protected GrayS32 pixelToMode = new GrayS32(1,1);
+	protected GrayS32 pixelToMode = new GrayS32(1, 1);
 
 	// Quick look up for the index of a mode from an image pixel.  It is possible for a pixel that is a mode
 	// to have mean-shift converge to a different pixel
-	protected GrayS32 quickMode = new GrayS32(1,1);
+	protected GrayS32 quickMode = new GrayS32(1, 1);
 
 	// location of each peak in image pixel indexes
 	protected FastQueue<Point2D_I32> modeLocation = new FastQueue<>(Point2D_I32::new);
@@ -129,17 +128,17 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	 * @param maxColorDistance Maximum allowed Euclidean distance squared for the color component
 	 * @param fast Improve runtime by approximating running mean-shift on each pixel. Try true.
 	 */
-	public SegmentMeanShiftSearch(int maxIterations, float convergenceTol,
-								  int radiusX , int radiusY , float maxColorDistance ,
-								  boolean fast ) {
+	protected SegmentMeanShiftSearch( int maxIterations, float convergenceTol,
+									  int radiusX, int radiusY, float maxColorDistance,
+									  boolean fast ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.fast = fast;
 
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
-		this.widthX = radiusX*2+1;
-		this.widthY = radiusY*2+1;
+		this.widthX = radiusX*2 + 1;
+		this.widthY = radiusY*2 + 1;
 
 		this.maxColorDistanceSq = maxColorDistance*maxColorDistance;
 
@@ -148,15 +147,15 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 		spacialTable = new float[widthX*widthY];
 		int indexKernel = 0;
 		float maxRadius = radiusX*radiusX + radiusY*radiusY;
-		for( int y = -radiusY; y <= radiusY; y++ ) {
-			for( int x = -radiusX; x <= radiusX; x++ ) {
+		for (int y = -radiusY; y <= radiusY; y++) {
+			for (int x = -radiusX; x <= radiusX; x++) {
 				spacialTable[indexKernel++] = (x*x + y*y)/maxRadius;
 			}
 		}
 
 		// precompute the weight table for inputs from 0 to 1, inclusive
-		for( int i = 0; i < weightTable.length; i++ ) {
-			weightTable[i] = (float)Math.exp(-i/(float)(weightTable.length-1));
+		for (int i = 0; i < weightTable.length; i++) {
+			weightTable[i] = (float)Math.exp(-i/(float)(weightTable.length - 1));
 		}
 	}
 
@@ -170,9 +169,9 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	/**
 	 * Returns the Euclidean distance squared between the two vectors
 	 */
-	public static float distanceSq( float[] a , float[]b ) {
+	public static float distanceSq( float[] a, float[] b ) {
 		float ret = 0;
-		for( int i = 0; i < a.length; i++ ) {
+		for (int i = 0; i < a.length; i++) {
 			float d = a[i] - b[i];
 			ret += d*d;
 		}
@@ -190,14 +189,14 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 		float findex = distance*100f;
 		int index = (int)findex;
 
-		if( index >= 99 )
+		if (index >= 99)
 			return weightTable[99];
 
 		float sample0 = weightTable[index];
-		float sample1 = weightTable[index+1];
+		float sample1 = weightTable[index + 1];
 
-		float w = findex-index;
-		return sample0*(1f-w) + sample1*w;
+		float w = findex - index;
+		return sample0*(1f - w) + sample1*w;
 	}
 
 	/**

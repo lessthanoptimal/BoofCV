@@ -18,28 +18,28 @@
 
 package boofcv.struct.image;
 
-
 /**
+ * Specifies the width and height of an image
+ *
  * @author Peter Abeles
  */
 public class ImageDimension {
 	public int width;
 	public int height;
 
-	public ImageDimension(int width, int height) {
+	public ImageDimension( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}
 
-	public ImageDimension() {
-	}
+	public ImageDimension() {}
 
 	public void setTo( ImageDimension src ) {
 		this.width = src.width;
 		this.height = src.height;
 	}
 
-	public void set( int width , int height ) {
+	public void set( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}
@@ -56,6 +56,6 @@ public class ImageDimension {
 	 * Returns the value of largest side. I.e. max(width,height)
 	 */
 	public int getMaxLength() {
-		return Math.max(width,height);
+		return Math.max(width, height);
 	}
 }

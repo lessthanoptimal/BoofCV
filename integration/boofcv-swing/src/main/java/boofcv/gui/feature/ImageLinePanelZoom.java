@@ -18,7 +18,6 @@
 
 package boofcv.gui.feature;
 
-
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.gui.image.ImageZoomPanel;
 import georegression.metric.Distance2D_F32;
@@ -44,12 +43,11 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 
 	protected int selectedLine = -1;
 
-
-	public synchronized void setLines(List<LineParametric2D_F32> lines, int width , int height ) {
+	public synchronized void setLines( List<LineParametric2D_F32> lines, int width, int height ) {
 		this.lines.clear();
-		for( LineParametric2D_F32 p : lines ) {
+		for (LineParametric2D_F32 p : lines) {
 			LineSegment2D_F32 l = LineImageOps.convert(p, width, height);
-			if( l == null )
+			if (l == null)
 				continue;
 //				throw new RuntimeException("null line?!");
 			this.lines.add(l);
@@ -57,19 +55,19 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 		selectedLine = -1;
 	}
 
-	public synchronized void setLineSegments(List<LineSegment2D_F32> lines) {
+	public synchronized void setLineSegments( List<LineSegment2D_F32> lines ) {
 		this.lines.clear();
 		this.lines.addAll(lines);
 		selectedLine = -1;
 	}
 
-	public synchronized int findLine( double x , double y , float tolerance ) {
+	public synchronized int findLine( double x, double y, float tolerance ) {
 		int bestLine = -1;
 		float bestDistance = tolerance;
 
 		for (int i = 0; i < lines.size(); i++) {
-			float d = Distance2D_F32.distance(lines.get(i),(float)x,(float)y);
-			if( d < bestDistance ) {
+			float d = Distance2D_F32.distance(lines.get(i), (float)x, (float)y);
+			if (d < bestDistance) {
 				bestDistance = d;
 				bestLine = i;
 			}
@@ -87,28 +85,27 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 	}
 
 	@Override
-	protected synchronized void paintInPanel(AffineTransform tran, Graphics2D g2) {
+	protected synchronized void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(3));
 
-		for( int i =0; i < lines.size(); i++ ) {
+		for (int i = 0; i < lines.size(); i++) {
 			LineSegment2D_F32 s = lines.get(i);
 			line.x1 = scale*s.a.x;
 			line.y1 = scale*s.a.y;
 			line.x2 = scale*s.b.x;
 			line.y2 = scale*s.b.y;
 
-			if( i == selectedLine ) {
+			if (i == selectedLine) {
 				g2.setColor(Color.GREEN);
 			} else {
 				g2.setColor(Color.RED);
 			}
 			g2.draw(line);
 			g2.setColor(Color.BLUE);
-			g2.fillOval((int)(line.x1)-1,(int)(line.y1)-1,3,3);
-			g2.fillOval((int)(line.x2)-1,(int)(line.y2)-1,3,3);
+			g2.fillOval((int)line.x1 - 1, (int)line.y1 - 1, 3, 3);
+			g2.fillOval((int)line.x2 - 1, (int)line.y2 - 1, 3, 3);
 		}
 	}
-
 }

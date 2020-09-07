@@ -63,11 +63,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				" * Operations for thresholding images and converting them into a binary image.\n" +
 				" * </p>\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
-				generatedAnnotation() +
+				generateDocString("Peter Abeles") +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n\n");
 
@@ -118,7 +114,6 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 	public void printLocalMean(AutoTypeImage imageIn) {
 
 		String imageName = imageIn.getSingleBandName();
-		String sumType = imageIn.getSumType();
 		String bitwise = imageIn.getBitWise();
 
 		String workType = imageIn.getLetterSum()+"WorkArrays";

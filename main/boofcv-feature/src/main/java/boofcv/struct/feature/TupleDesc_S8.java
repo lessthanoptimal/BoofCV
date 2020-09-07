@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.feature;
 
-
 /**
  * Feature description storage in an array of signed bytes.
  *
@@ -26,18 +25,19 @@ package boofcv.struct.feature;
  */
 public class TupleDesc_S8 extends TupleDesc_I8<TupleDesc_S8> {
 
-	public TupleDesc_S8(int numFeatures) {
+	public TupleDesc_S8( int numFeatures ) {
 		super(numFeatures);
 	}
 
+	@Override
 	public TupleDesc_S8 copy() {
-		TupleDesc_S8 ret = new TupleDesc_S8( value.length );
-		System.arraycopy(value,0,ret.value,0,value.length);
+		TupleDesc_S8 ret = new TupleDesc_S8(value.length);
+		System.arraycopy(value, 0, ret.value, 0, value.length);
 		return ret;
 	}
 
 	@Override
-	public double getDouble(int index) {
+	public double getDouble( int index ) {
 		return value[index];
 	}
 }

@@ -44,9 +44,9 @@ class TestFeatureSelectN extends ChecksFeatureSelectLimit.I16 {
 
 		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectN<Point2D_I16> alg = createAlgorithm();
-		alg.select(width,height,null,detected,10,found);
+		alg.select(width, height, null, detected, 10, found);
 
-		assertEquals(10,found.size);
+		assertEquals(10, found.size);
 		for (int i = 0; i < found.size; i++) {
 			int matchIdx = detected.indexOf(found.get(i));
 			assertSame(found.get(i), detected.get(matchIdx));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public abstract class DescribePointRectangleRegion<T extends ImageGray<T>>
 	// offset in terms of pixel index from the center pixel
 	protected int offset[];
 
-	public DescribePointRectangleRegion(int regionWidth, int regionHeight) {
+	protected DescribePointRectangleRegion(int regionWidth, int regionHeight) {
 		this.regionWidth = regionWidth;
 		this.regionHeight = regionHeight;
 

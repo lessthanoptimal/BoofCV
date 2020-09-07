@@ -28,13 +28,14 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"MissingOverride"})
 public abstract class DisparitySparseRectifiedScoreBM_F32 extends DisparitySparseRectifiedScoreBM<float[],GrayF32> {
 
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin
 	@Getter protected float[] scoreLtoR; // left to right
 	@Getter protected float[] scoreRtoL; // right to left
 
-	public DisparitySparseRectifiedScoreBM_F32(int radiusX, int radiusY) {
+	protected DisparitySparseRectifiedScoreBM_F32(int radiusX, int radiusY) {
 		super(radiusX, radiusY, GrayF32.class);
 	}
 

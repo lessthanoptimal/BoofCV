@@ -151,8 +151,9 @@ public class GlobalDemoSettings implements Cloneable {
 			this.name = name;
 		}
 
-		String name;
+		final String name;
 
+		@Override
 		public String toString() {
 			return name;
 		}

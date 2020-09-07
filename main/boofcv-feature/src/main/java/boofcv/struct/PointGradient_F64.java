@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,19 +25,19 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class PointGradient_F64 extends Point2D_F64{
+public class PointGradient_F64 extends Point2D_F64 {
 	/**
 	 * Image gradient at this location
 	 */
-	public double dx,dy;
+	public double dx, dy;
 
-	public PointGradient_F64(double x, double y, double dx, double dy) {
+	public PointGradient_F64( double x, double y, double dx, double dy ) {
 		super(x, y);
 		this.dx = dx;
 		this.dy = dy;
 	}
 
-	public PointGradient_F64(PointGradient_F64 orig) {
+	public PointGradient_F64( PointGradient_F64 orig ) {
 		set(orig);
 	}
 
@@ -51,18 +51,18 @@ public class PointGradient_F64 extends Point2D_F64{
 		this.dy = orig.dy;
 	}
 
-	public void set( double x , double y , double dx , double dy ) {
+	public void set( double x, double y, double dx, double dy ) {
 		this.x = x;
 		this.y = y;
 		this.dx = dx;
 		this.dy = dy;
 	}
 
-	public void setDx(double dx) {
+	public void setDx( double dx ) {
 		this.dx = dx;
 	}
 
-	public void setDy(double dy) {
+	public void setDy( double dy ) {
 		this.dy = dy;
 	}
 
@@ -74,6 +74,7 @@ public class PointGradient_F64 extends Point2D_F64{
 		return dy;
 	}
 
+	@Override
 	public PointGradient_F64 copy() {
 		return new PointGradient_F64(this);
 	}

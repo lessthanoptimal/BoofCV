@@ -76,15 +76,15 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 	/**
 	 * Create a feature detector.
 	 *
-	 * @param detector          Point feature detector which is used to find candidates in each scale level
-	 * @param sparseLaplace     Used to compute the Laplacian at each candidates
+	 * @param detector Point feature detector which is used to find candidates in each scale level
+	 * @param sparseLaplace Used to compute the Laplacian at each candidates
 	 * @param computeDerivative Used to compute image derivatives
-	 * @param scalePower        Used to normalize features intensity across scale space.  For many features this value should be one.
+	 * @param scalePower Used to normalize features intensity across scale space.  For many features this value should be one.
 	 */
-	public FeatureLaplacePyramid(GeneralFeatureDetector<T, D> detector,
-								 ImageFunctionSparse<T> sparseLaplace,
-								 AnyImageDerivative<T, D> computeDerivative,
-								 double scalePower) {
+	public FeatureLaplacePyramid( GeneralFeatureDetector<T, D> detector,
+								  ImageFunctionSparse<T> sparseLaplace,
+								  AnyImageDerivative<T, D> computeDerivative,
+								  double scalePower ) {
 		this.detector = detector;
 		this.baseThreshold = detector.getThreshold();
 		this.computeDerivative = computeDerivative;
@@ -98,12 +98,12 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 	 * @param ss Scale space of an image
 	 */
 	@Override
-	public void detect(PyramidFloat<T> ss) {
+	public void detect( PyramidFloat<T> ss ) {
 		spaceIndex = 0;
 		foundPoints.clear();
 
 		// compute feature intensity in each level
-		for (int i = 1; i < ss.getNumLayers()-1; i++) {
+		for (int i = 1; i < ss.getNumLayers() - 1; i++) {
 			// detect features in 2D space.  Don't need to compute features at the tail ends of scale-space
 //			if (i > 0 && i < ss.getNumLayers() - 1)
 //				detectCandidateFeatures(ss.getLayer(i), ss.getSigma(i));
@@ -125,14 +125,13 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 		}
 	}
 
-
 	/**
 	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
 	 */
-	private void detectCandidateFeatures(T image, double sigma ) {
+	private void detectCandidateFeatures( T image, double sigma ) {
 
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float) (baseThreshold / Math.pow(sigma, scalePower));
+		float scaleThreshold = (float)(baseThreshold/Math.pow(sigma, scalePower));
 		detector.setThreshold(scaleThreshold);
 		computeDerivative.setInput(image);
 
@@ -153,13 +152,13 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 
 		List<Point2D_I16> m = maximums;
 		m.clear();
-		if( detector.isDetectMaximums() ) {
+		if (detector.isDetectMaximums()) {
 			QueueCorner q = detector.getMaximums();
 			for (int i = 0; i < q.size; i++) {
 				m.add(q.get(i).copy());
 			}
 		}
-		if( detector.isDetectMinimums() ) {
+		if (detector.isDetectMinimums()) {
 			QueueCorner q = detector.getMinimums();
 			for (int i = 0; i < q.size; i++) {
 				m.add(q.get(i).copy());
@@ -170,28 +169,28 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 	/**
 	 * See if each feature is a maximum in its local scale-space.
 	 */
-	protected void findLocalScaleSpaceMax(PyramidFloat<T> ss, int layerID) {
+	protected void findLocalScaleSpaceMax( PyramidFloat<T> ss, int layerID ) {
 		List<Point2D_I16> candidates = maximums;
 
-		float scale0 = (float) ss.scale[layerID - 1];
-		float scale1 = (float) ss.scale[layerID];
-		float scale2 = (float) ss.scale[layerID + 1];
+		float scale0 = (float)ss.scale[layerID - 1];
+		float scale1 = (float)ss.scale[layerID];
+		float scale2 = (float)ss.scale[layerID + 1];
 
-		float sigma0 = (float) ss.getSigma(layerID - 1);
-		float sigma1 = (float) ss.getSigma(layerID);
-		float sigma2 = (float) ss.getSigma(layerID + 1);
+		float sigma0 = (float)ss.getSigma(layerID - 1);
+		float sigma1 = (float)ss.getSigma(layerID);
+		float sigma2 = (float)ss.getSigma(layerID + 1);
 
 		// For laplacian its t^(2*gamma) where gamma = 3/4
-		float ss0 = (float) (Math.pow(sigma0, 2.0 * 0.75)/scale0);// Is this divide by scale correct?
-		float ss1 = (float) (Math.pow(sigma1, 2.0 * 0.75)/scale1);
-		float ss2 = (float) (Math.pow(sigma2, 2.0 * 0.75)/scale2);
+		float ss0 = (float)(Math.pow(sigma0, 2.0*0.75)/scale0);// Is this divide by scale correct?
+		float ss1 = (float)(Math.pow(sigma1, 2.0*0.75)/scale1);
+		float ss2 = (float)(Math.pow(sigma2, 2.0*0.75)/scale2);
 
 		for (Point2D_I16 c : candidates) {
 
 			GrayF32 intensity = detector.getIntensity();
 
-			float target = intensity.unsafe_get(c.x,c.y);
-			float fx,fy;
+			float target = intensity.unsafe_get(c.x, c.y);
+			float fx, fy;
 			{
 				float x0 = intensity.unsafe_get(c.x - 1, c.y);
 				float x2 = intensity.unsafe_get(c.x + 1, c.y);
@@ -204,35 +203,35 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 //			fx=c.x;fy=c.y;
 
 			sparseLaplace.setImage(ss.getLayer(layerID));
-			float val = ss1 * (float) sparseLaplace.compute(c.x,c.y);
+			float val = ss1*(float)sparseLaplace.compute(c.x, c.y);
 			// search for local maximum or local minimum
 			float adj = Math.signum(val);
 			val *= adj;
 
 
 			// find pixel location in each image's local coordinate
-			int x0 = (int) (fx * scale1 / scale0 + 0.5);
-			int y0 = (int) (fy * scale1 / scale0 + 0.5);
+			int x0 = (int)(fx*scale1/scale0 + 0.5);
+			int y0 = (int)(fy*scale1/scale0 + 0.5);
 
-			int x2 = (int) (fx * scale1 / scale2 + 0.5);
-			int y2 = (int) (fy * scale1 / scale2 + 0.5);
+			int x2 = (int)(fx*scale1/scale2 + 0.5);
+			int y2 = (int)(fy*scale1/scale2 + 0.5);
 
-			if (checkMax(ss.getLayer(layerID - 1), adj*ss0,val, x0, y0) && checkMax(ss.getLayer(layerID + 1), adj*ss2,val, x2, y2)) {
-				sparseLaplace.setImage(ss.getLayer(layerID-1));
-				float s0 = ss0 * (float) sparseLaplace.compute(x0,y0)*adj;
-				sparseLaplace.setImage(ss.getLayer(layerID+1));
-				float s2 = ss2 * (float) sparseLaplace.compute(x2,y2)*adj;
+			if (checkMax(ss.getLayer(layerID - 1), adj*ss0, val, x0, y0) && checkMax(ss.getLayer(layerID + 1), adj*ss2, val, x2, y2)) {
+				sparseLaplace.setImage(ss.getLayer(layerID - 1));
+				float s0 = ss0*(float)sparseLaplace.compute(x0, y0)*adj;
+				sparseLaplace.setImage(ss.getLayer(layerID + 1));
+				float s2 = ss2*(float)sparseLaplace.compute(x2, y2)*adj;
 
 				double adjSigma;
 				double sigmaInterp = polyPeak(s0, val, s2); // scaled from -1 to 1
-				if( sigmaInterp < 0 ) {
-					adjSigma = sigma0*(-sigmaInterp) + (1+sigmaInterp)*sigma1;
+				if (sigmaInterp < 0) {
+					adjSigma = sigma0*-sigmaInterp + (1 + sigmaInterp)*sigma1;
 				} else {
-					adjSigma = sigma2*sigmaInterp + (1-sigmaInterp)*sigma1;
+					adjSigma = sigma2*sigmaInterp + (1 - sigmaInterp)*sigma1;
 				}
 
 				// put features into the scale of the upper image
-				foundPoints.add(new ScalePoint(fx * scale1, fy * scale1, adjSigma));
+				foundPoints.add(new ScalePoint(fx*scale1, fy*scale1, adjSigma));
 			}
 		}
 	}
@@ -240,7 +239,7 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 	/**
 	 * See if the best score is better than the local adjusted scores at this scale
 	 */
-	private boolean checkMax(T image, double adj, double bestScore, int c_x, int c_y) {
+	private boolean checkMax( T image, double adj, double bestScore, int c_x, int c_y ) {
 		sparseLaplace.setImage(image);
 		boolean isMax = true;
 		beginLoop:

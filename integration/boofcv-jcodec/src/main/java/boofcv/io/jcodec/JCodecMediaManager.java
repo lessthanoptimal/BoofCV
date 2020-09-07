@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,11 +31,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author Peter Abeles
@@ -49,7 +51,7 @@ public class JCodecMediaManager implements MediaManager {
 	@Override
 	public Reader openFile(String fileName) {
 		try {
-			return new FileReader(fileName);
+			return new InputStreamReader(new FileInputStream(fileName),UTF_8);
 		} catch (FileNotFoundException e) {
 			return null;
 		}

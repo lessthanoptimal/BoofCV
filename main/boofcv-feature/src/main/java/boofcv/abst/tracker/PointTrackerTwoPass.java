@@ -59,24 +59,26 @@ public interface PointTrackerTwoPass<T extends ImageBase<T>> extends PointTracke
 	 *
 	 * @param image Next image in the sequence
 	 */
-	public void process(T image);
+	@Override
+	void process( T image );
 
 	/**
 	 * Updates spacial information for each track and active list.  Does not change the track description or any other
 	 * lists.  Can be called multiple times.
 	 */
-	public void performSecondPass();
+	void performSecondPass();
 
 	/**
 	 * Finishes tracking and updates the track's description, updates inactive and drop track lists.
 	 */
-	public void finishTracking();
+	void finishTracking();
 
 	/**
 	 * Provides a hint for where the
+	 *
 	 * @param pixelX x-coordinate hint for where the track is in the image
 	 * @param pixelY y-coordinate hint for where the track is in the image
 	 * @param track The track for which the hint is being provided for
 	 */
-	public void setHint( double pixelX , double pixelY , PointTrack track );
+	void setHint( double pixelX, double pixelY, PointTrack track );
 }

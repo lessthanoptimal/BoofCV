@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,10 +50,7 @@ public class GenerateImplPyramidOps extends CodeGeneratorBase {
 				" * Image type specific implementations of functions in {@link boofcv.alg.transform.pyramid.PyramidOps}.\n" +
 				" * </p>\n" +
 				" *\n" +
-				generateDocString() +
-				" *\n" +
-				" * @author Peter Abeles\n" +
-				" */\n" +
+				generateDocString("Peter Abeles") +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n\n");
 

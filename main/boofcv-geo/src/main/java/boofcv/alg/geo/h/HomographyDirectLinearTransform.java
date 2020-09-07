@@ -18,14 +18,12 @@
 
 package boofcv.alg.geo.h;
 
-
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedPair3D;
 import boofcv.struct.geo.AssociatedPairConic;
 import georegression.geometry.UtilCurves_F64;
-import georegression.struct.curve.ConicGeneral_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrix3x3;
@@ -234,15 +232,15 @@ public class HomographyDirectLinearTransform {
 		}
 	}
 
-	private void adjustConic(AssociatedPairConic pair , ConicGeneral_F64 a1 , ConicGeneral_F64 a2 ) {
-		if( shouldNormalize ) {
-			N1.apply(pair.p1, a1);
-			N2.apply(pair.p2, a2);
-		} else {
-			a1.set(pair.p1);
-			a2.set(pair.p2);
-		}
-	}
+//	private void adjustConic(AssociatedPairConic pair , ConicGeneral_F64 a1 , ConicGeneral_F64 a2 ) {
+//		if( shouldNormalize ) {
+//			N1.apply(pair.p1, a1);
+//			N2.apply(pair.p2, a2);
+//		} else {
+//			a1.set(pair.p1);
+//			a2.set(pair.p2);
+//		}
+//	}
 
 	protected int addPoints2D( List<AssociatedPair> points , DMatrixRMaj A, int rows ) {
 		Point2D_F64 f = new Point2D_F64();

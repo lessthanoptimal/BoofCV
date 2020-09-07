@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.struct.image.*;
 import javax.annotation.Generated;
 import java.util.Arrays;
 
+//CONCURRENT_INLINE import java.util.ArrayList;
+//CONCURRENT_INLINE import java.util.List;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**

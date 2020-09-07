@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,7 +147,7 @@ class TestTemplateMatching {
 		for (Match f : found) {
 			boolean matched = false;
 			for (Match e : expected) {
-				if (e.x - offsetX == f.x & e.y - offsetY == f.y) {
+				if (e.x - offsetX == f.x && e.y - offsetY == f.y) {
 					assertFalse(matched);
 					assertEquals(e.score, f.score, 1e-8);
 					matched = true;

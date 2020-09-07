@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import java.util.List;
 public abstract class FundamentalLinear {
 
 	// contains the set of equations that are solved
-	protected DMatrixRMaj A = new DMatrixRMaj(1,9);
+	protected DMatrixRMaj A = new DMatrixRMaj(1, 9);
 	// svd used to extract the null space
 	protected SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceSvd_DDRM();
 	// svd used to enforce constraings on 3x3 matrix
@@ -58,7 +58,7 @@ public abstract class FundamentalLinear {
 	protected DMatrixRMaj svdS;
 	protected DMatrixRMaj svdV;
 
-	protected DMatrixRMaj temp0 = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj temp0 = new DMatrixRMaj(3, 3);
 
 	// matrix used to normalize results
 	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
@@ -72,7 +72,7 @@ public abstract class FundamentalLinear {
 	 *
 	 * @param computeFundamental true it computes a fundamental matrix and false for essential
 	 */
-	public FundamentalLinear( boolean computeFundamental ) {
+	protected FundamentalLinear( boolean computeFundamental ) {
 		this.computeFundamental = computeFundamental;
 	}
 
@@ -82,11 +82,11 @@ public abstract class FundamentalLinear {
 	 * @return true if svd returned true.
 	 */
 	protected boolean projectOntoEssential( DMatrixRMaj E ) {
-		if( !svdConstraints.decompose(E) ) {
+		if (!svdConstraints.decompose(E)) {
 			return false;
 		}
-		svdV = svdConstraints.getV(svdV,false);
-		svdU = svdConstraints.getU(svdU,false);
+		svdV = svdConstraints.getV(svdV, false);
+		svdU = svdConstraints.getU(svdU, false);
 		svdS = svdConstraints.getW(svdS);
 
 		SingularOps_DDRM.descendingOrder(svdU, false, svdS, svdV, false);
@@ -100,7 +100,7 @@ public abstract class FundamentalLinear {
 
 		// recompute F
 		CommonOps_DDRM.mult(svdU, svdS, temp0);
-		CommonOps_DDRM.multTransB(temp0,svdV, E);
+		CommonOps_DDRM.multTransB(temp0, svdV, E);
 
 		return true;
 	}
@@ -111,11 +111,11 @@ public abstract class FundamentalLinear {
 	 * @return true if svd returned true.
 	 */
 	protected boolean projectOntoFundamentalSpace( DMatrixRMaj F ) {
-		if( !svdConstraints.decompose(F) ) {
+		if (!svdConstraints.decompose(F)) {
 			return false;
 		}
-		svdV = svdConstraints.getV(svdV,false);
-		svdU = svdConstraints.getU(svdU,false);
+		svdV = svdConstraints.getV(svdV, false);
+		svdU = svdConstraints.getU(svdU, false);
 		svdS = svdConstraints.getW(svdS);
 
 		SingularOps_DDRM.descendingOrder(svdU, false, svdS, svdV, false);
@@ -125,7 +125,7 @@ public abstract class FundamentalLinear {
 
 		// recompute F
 		CommonOps_DDRM.mult(svdU, svdS, temp0);
-		CommonOps_DDRM.multTransB(temp0,svdV, F);
+		CommonOps_DDRM.multTransB(temp0, svdV, F);
 
 		return true;
 	}
@@ -138,15 +138,15 @@ public abstract class FundamentalLinear {
 	 * @param points Set of associated points in left and right images.
 	 * @param A Matrix where the reformatted points are written to.
 	 */
-	protected void createA(List<AssociatedPair> points, DMatrixRMaj A ) {
-		A.reshape(points.size(),9, false);
+	protected void createA( List<AssociatedPair> points, DMatrixRMaj A ) {
+		A.reshape(points.size(), 9, false);
 		A.zero();
 
 		Point2D_F64 f_norm = new Point2D_F64();
 		Point2D_F64 s_norm = new Point2D_F64();
 
 		final int size = points.size();
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			AssociatedPair p = points.get(i);
 
 			Point2D_F64 f = p.p1;
@@ -158,15 +158,15 @@ public abstract class FundamentalLinear {
 
 			// perform the Kronecker product with the two points being in
 			// homogeneous coordinates (z=1)
-			A.unsafe_set(i,0,s_norm.x*f_norm.x);
-			A.unsafe_set(i,1,s_norm.x*f_norm.y);
-			A.unsafe_set(i,2,s_norm.x);
-			A.unsafe_set(i,3,s_norm.y*f_norm.x);
-			A.unsafe_set(i,4,s_norm.y*f_norm.y);
-			A.unsafe_set(i,5,s_norm.y);
-			A.unsafe_set(i,6,f_norm.x);
-			A.unsafe_set(i,7,f_norm.y);
-			A.unsafe_set(i,8,1);
+			A.unsafe_set(i, 0, s_norm.x*f_norm.x);
+			A.unsafe_set(i, 1, s_norm.x*f_norm.y);
+			A.unsafe_set(i, 2, s_norm.x);
+			A.unsafe_set(i, 3, s_norm.y*f_norm.x);
+			A.unsafe_set(i, 4, s_norm.y*f_norm.y);
+			A.unsafe_set(i, 5, s_norm.y);
+			A.unsafe_set(i, 6, f_norm.x);
+			A.unsafe_set(i, 7, f_norm.y);
+			A.unsafe_set(i, 8, 1);
 		}
 	}
 
@@ -199,10 +199,10 @@ public abstract class FundamentalLinear {
 
 	/**
 	 * Returns true if it is computing a fundamental matrix or false if it is an essential matrix.
+	 *
 	 * @return true for fundamental and false for essential
 	 */
 	public boolean isComputeFundamental() {
 		return computeFundamental;
 	}
-
 }

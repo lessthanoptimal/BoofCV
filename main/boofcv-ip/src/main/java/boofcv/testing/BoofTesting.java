@@ -129,7 +129,7 @@ public class BoofTesting {
 		double normFound = found.T.norm();
 		double normExpected = expected.T.norm();
 
-		if( normExpected == 0.0 || normExpected == 0.0 ) {
+		if( normFound == 0.0 || normExpected == 0.0 ) {
 			assertEquals(0.0, normFound, tolT);
 			return;
 		}
@@ -1047,6 +1047,24 @@ public class BoofTesting {
 		}
 
 		return ret;
+	}
+
+	public static ImageDataType pritiveToImageDataType( Class type ) {
+		if (type == byte[].class || type == byte.class) {
+			return ImageDataType.I8;
+		} else if (type == short[].class || type == short.class) {
+			return ImageDataType.I16;
+		} else if (type == int[].class || type == int.class) {
+			return ImageDataType.S32;
+		} else if (type == long[].class || type == long.class) {
+			return ImageDataType.S64;
+		} else if (type == float[].class || type == float.class) {
+			return ImageDataType.F32;
+		} else if (type == double[].class || type == double.class) {
+			return ImageDataType.F64;
+		} else {
+			throw new RuntimeException("UNknown type");
+		}
 	}
 
 	public static Object primitive( Object v , Class type ) {

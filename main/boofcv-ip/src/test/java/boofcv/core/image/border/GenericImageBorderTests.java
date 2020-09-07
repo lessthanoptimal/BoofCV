@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,6 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 /**
  * Common tests for implementers of {@link ImageBorder}.
  *
@@ -45,27 +44,26 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 	int width = 20;
 	int height = 25;
 
-	double tmp0[];
-	double tmp1[];
+	double[] tmp0;
+	double[] tmp1;
 
-	public GenericImageBorderTests(ImageType<T> ...imageTypes) {
-		for( int i = 0; i < imageTypes.length; i++ ) {
-			this.imageTypes.add( imageTypes[i]);
+	protected GenericImageBorderTests( ImageType<T>... imageTypes ) {
+		for (int i = 0; i < imageTypes.length; i++) {
+			this.imageTypes.add(imageTypes[i]);
 		}
 	}
-
 
 	public abstract ImageBorder<T> wrap( T image );
 
 	/**
 	 * Checks to see if the image at the specified coordinate has the specified pixel value.
 	 */
-	public abstract void checkBorderSet( int x , int y , double[] pixel , T image );
+	public abstract void checkBorderSet( int x, int y, double[] pixel, T image );
 
 	/**
 	 * Check to see if the provided pixel is the value it should be at the specified coordinate
 	 */
-	public abstract void checkBorderGet(int x, int y, T image, double[] pixel);
+	public abstract void checkBorderGet( int x, int y, T image, double[] pixel );
 
 	protected void init( ImageType<T> imageType ) {
 		tmp0 = new double[imageType.getNumBands()];
@@ -74,7 +72,7 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 
 	@Test
 	public void get() {
-		for( ImageType<T> imageType : imageTypes ) {
+		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 
 			T img = imageType.createImage(width, height);
@@ -86,17 +84,17 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 		}
 	}
 
-	private void checkGet(T image, ImageBorder<T> border) {
+	private void checkGet( T image, ImageBorder<T> border ) {
 		// test the image's inside where there is no border condition
 
 		checkEquals(1, 1, image, border);
 		checkEquals(0, 0, image, border);
 		checkEquals(width - 1, height - 1, image, border);
 
-		checkEquals(-1,0,image,border);
-		checkEquals(-2,0,image,border);
-		checkEquals(0,-1,image,border);
-		checkEquals(0,-2,image,border);
+		checkEquals(-1, 0, image, border);
+		checkEquals(-2, 0, image, border);
+		checkEquals(0, -1, image, border);
+		checkEquals(0, -2, image, border);
 
 		checkEquals(width, height - 1, image, border);
 		checkEquals(width + 1, height - 1, image, border);
@@ -104,14 +102,14 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 		checkEquals(width - 1, height + 1, image, border);
 	}
 
-	private void checkEquals( int x , int y , T orig, ImageBorder<T> border ) {
+	private void checkEquals( int x, int y, T orig, ImageBorder<T> border ) {
 		border.getGeneral(x, y, tmp0);
-		checkBorderGet(x,y,orig,tmp0);
+		checkBorderGet(x, y, orig, tmp0);
 	}
 
 	@Test
 	public void set() {
-		for( ImageType<T> imageType : imageTypes ) {
+		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 			T img = imageType.createImage(width, height);
 			GImageMiscOps.fillUniform(img, rand, 0, 100);
@@ -124,7 +122,7 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 
 	@Test
 	public void copy() {
-		for( ImageType<T> imageType : imageTypes ) {
+		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 			T img = imageType.createImage(width, height);
 			GImageMiscOps.fillUniform(img, rand, 0, 100);
@@ -137,10 +135,10 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 			checkEquals(0, 0, borderA, borderB);
 			checkEquals(width - 1, height - 1, borderA, borderB);
 
-			checkEquals(-1,0,borderA,borderB);
-			checkEquals(-2,0,borderA,borderB);
-			checkEquals(0,-1,borderA,borderB);
-			checkEquals(0,-2,borderA,borderB);
+			checkEquals(-1, 0, borderA, borderB);
+			checkEquals(-2, 0, borderA, borderB);
+			checkEquals(0, -1, borderA, borderB);
+			checkEquals(0, -2, borderA, borderB);
 
 			checkEquals(width, height - 1, borderA, borderB);
 			checkEquals(width + 1, height - 1, borderA, borderB);
@@ -148,24 +146,25 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 			checkEquals(width - 1, height + 1, borderA, borderB);
 		}
 	}
-	private void checkEquals( int x , int y , ImageBorder<T> borderA, ImageBorder<T> borderB ) {
+
+	private void checkEquals( int x, int y, ImageBorder<T> borderA, ImageBorder<T> borderB ) {
 		borderA.getGeneral(x, y, tmp0);
 		borderB.getGeneral(x, y, tmp1);
 		for (int i = 0; i < tmp0.length; i++) {
-			assertEquals(tmp0[i],tmp1[i], UtilEjml.TEST_F64);
+			assertEquals(tmp0[i], tmp1[i], UtilEjml.TEST_F64);
 		}
 	}
 
-	private void checkSet(T image, ImageBorder<T> border) {
+	private void checkSet( T image, ImageBorder<T> border ) {
 		// test the image's inside where there is no border condition
 		checkSet(0, 0, 1, image, border);
 		checkSet(width - 1, height - 1, 2, image, border);
 
 		// test border conditions
-		checkSet(-1,0,2,image,border);
-		checkSet(-2,0,3,image,border);
-		checkSet(0,-1,4,image,border);
-		checkSet(0,-2,5,image,border);
+		checkSet(-1, 0, 2, image, border);
+		checkSet(-2, 0, 3, image, border);
+		checkSet(0, -1, 4, image, border);
+		checkSet(0, -2, 5, image, border);
 
 		checkSet(width, height - 1, 6, image, border);
 		checkSet(width + 1, height - 1, 7, image, border);
@@ -174,13 +173,12 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 		checkSet(width - 1, height + 1, 9, image, border);
 	}
 
-	private void checkSet( int x , int y , double value, T orig, ImageBorder<T> border ) {
+	private void checkSet( int x, int y, double value, T orig, ImageBorder<T> border ) {
 		for (int i = 0; i < tmp0.length; i++) {
 			tmp0[i] = value;
 		}
 
 		border.setGeneral(x, y, tmp0);
-		checkBorderSet(x,y, tmp0,orig);
+		checkBorderSet(x, y, tmp0, orig);
 	}
-
 }

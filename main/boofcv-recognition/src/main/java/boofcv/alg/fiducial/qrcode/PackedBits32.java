@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class PackedBits32 implements PackedBits {
 	/**
 	 * Integer array used to store bits
 	 */
-	public int data[] = new int[1];
+	public int[] data = new int[1];
 	/**
 	 * Number of bits stored
 	 */
@@ -39,9 +39,9 @@ public class PackedBits32 implements PackedBits {
 		resize(totalBits);
 	}
 
-	public PackedBits32() {
-	}
+	public PackedBits32() {}
 
+	@Override
 	public int get( int which ) {
 		int index = which/32;
 		int offset = which%32;
@@ -49,6 +49,7 @@ public class PackedBits32 implements PackedBits {
 		return (data[index] & (1 << offset)) >> offset;
 	}
 
+	@Override
 	public void set( int which , int value ) {
 		int index = which/32;
 		int offset = which%32;
@@ -56,6 +57,7 @@ public class PackedBits32 implements PackedBits {
 		data[index] ^= (-value ^ data[index]) & (1 << offset);
 	}
 
+	@Override
 	public void resize(int totalBits ) {
 		this.size = totalBits;
 		int N = totalBits/32 + (totalBits%32 > 0 ? 1 : 0);
@@ -64,6 +66,7 @@ public class PackedBits32 implements PackedBits {
 		}
 	}
 
+	@Override
 	public void zero() {
 		int N = size/32;
 		Arrays.fill(data,0,N,0);

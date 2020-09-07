@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Factory for creating high level implementations of {@link DetectLine} and {@Link DetectLineSegment}. For more access
+ * Factory for creating high level implementations of {@link DetectLine} and {@link DetectLineSegment}. For more access
  * to internal data structures see {@link FactoryDetectLineAlgs}.
  *
  * @author Peter Abeles

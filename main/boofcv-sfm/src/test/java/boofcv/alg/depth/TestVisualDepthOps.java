@@ -20,7 +20,6 @@ package boofcv.alg.depth;
 
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
@@ -73,7 +72,7 @@ public class TestVisualDepthOps {
 		GImageMiscOps.fillUniform(rgb, rand, 0, 200);
 
 		FastQueue<Point3D_F64> pts = new FastQueue<>(Point3D_F64::new);
-		FastQueueArray_I32 color = new FastQueueArray_I32(3);
+		FastQueue<int[]> color = new FastQueue<>(() -> new int[3]);
 
 		VisualDepthOps.depthTo3D(param,rgb,depth,pts,color);
 

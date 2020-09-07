@@ -89,12 +89,11 @@ public abstract class BaseFiducialSquare {
 	// specifies the file type
 	public String fileType;
 
-
 	public Unit getUnit() {
 		return unit;
 	}
 
-	public void setUnit(Unit unit) {
+	public void setUnit( Unit unit ) {
 		this.unit = unit;
 	}
 
@@ -102,7 +101,7 @@ public abstract class BaseFiducialSquare {
 
 		getFileTypeFromFileName();
 
-		System.out.println("   File Name    : "+fileName);
+		System.out.println("   File Name    : " + fileName);
 		if (fileType.equals("pdf")) {
 			printPdfInfo();
 		} else {
@@ -129,7 +128,7 @@ public abstract class BaseFiducialSquare {
 			}
 		} else {
 			CreateFiducialDocumentImage renderer = createRendererImage(fileName);
-			renderer.markerWidth = (int) markerWidth;
+			renderer.markerWidth = (int)markerWidth;
 			callRenderImage(renderer);
 		}
 	}
@@ -143,18 +142,18 @@ public abstract class BaseFiducialSquare {
 	protected void printPdfInfo() {
 		System.out.println("   Document      : PDF");
 		System.out.println("   paper         : " + paperSize);
-		System.out.println("   info          : " + (!disablePrintInfo));
+		System.out.println("   info          : " + !disablePrintInfo);
 		System.out.println("   units         : " + unit);
 		System.out.println("   marker width  : " + markerWidth + " (" + unit.abbreviation + ")");
 	}
 
-	protected abstract CreateFiducialDocumentImage createRendererImage(String filename );
+	protected abstract CreateFiducialDocumentImage createRendererImage( String filename );
 
-	protected abstract CreateFiducialDocumentPDF createRendererPdf(String documentName, PaperSize paper, Unit units);
+	protected abstract CreateFiducialDocumentPDF createRendererPdf( String documentName, PaperSize paper, Unit units );
 
-	protected abstract void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException;
+	protected abstract void callRenderPdf( CreateFiducialDocumentPDF renderer ) throws IOException;
 
-	protected abstract void callRenderImage(CreateFiducialDocumentImage renderer);
+	protected abstract void callRenderImage( CreateFiducialDocumentImage renderer );
 
 	private void getFileTypeFromFileName() {
 		fileType = FilenameUtils.getExtension(fileName);
@@ -165,7 +164,7 @@ public abstract class BaseFiducialSquare {
 		fileType = fileType.toLowerCase();
 	}
 
-	private static void failExit(String message) {
+	private static void failExit( String message ) {
 		System.err.println(message);
 		System.exit(1);
 	}
@@ -178,7 +177,7 @@ public abstract class BaseFiducialSquare {
 		}
 
 		if (fileType.equals("pdf")) {
-			if( spaceBetween == 0 )
+			if (spaceBetween == 0)
 				spaceBetween = markerWidth/4;
 
 			unit = unit == null ? Unit.lookup(_unit) : unit;
@@ -197,7 +196,7 @@ public abstract class BaseFiducialSquare {
 		}
 	}
 
-	protected void printHelp(CmdLineParser parser) {
+	protected void printHelp( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
 		parser.printUsage(System.out);
 		System.out.println();

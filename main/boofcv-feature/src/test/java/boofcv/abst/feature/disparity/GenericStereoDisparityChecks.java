@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>>
-{
+public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>> {
 	Random rand = new Random(234);
 
 	int width = 80;
@@ -46,9 +45,9 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 	ImageType<Image> inputType;
 	ImageType<Disparity> disparityType;
 
-	Image left,right;
+	Image left, right;
 
-	public GenericStereoDisparityChecks( ImageType<Image> inputType , ImageType<Disparity> disparityType ) {
+	protected GenericStereoDisparityChecks( ImageType<Image> inputType, ImageType<Disparity> disparityType ) {
 		this.inputType = inputType;
 		this.disparityType = disparityType;
 
@@ -60,55 +59,55 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 			}
 		} else {
 			minPixelValue = -1;
-			maxPixelValue =  1;
+			maxPixelValue = 1;
 		}
 
-		left = inputType.createImage(width,height);
-		right = inputType.createImage(width,height);
+		left = inputType.createImage(width, height);
+		right = inputType.createImage(width, height);
 
 		// Randomly fill images, but the right should have a constant offset of 8
-		GImageMiscOps.fillUniform(left,rand,minPixelValue,maxPixelValue);
-		GImageMiscOps.copy(8,0,0,0,width-8,height,left,right);
+		GImageMiscOps.fillUniform(left, rand, minPixelValue, maxPixelValue);
+		GImageMiscOps.copy(8, 0, 0, 0, width - 8, height, left, right);
 	}
 
-	public abstract StereoDisparity<Image,Disparity> createAlg( int disparityMin , int disparityRange );
+	public abstract StereoDisparity<Image, Disparity> createAlg( int disparityMin, int disparityRange );
 
 	/**
 	 * Checks to see if it blows up, sets invalid as invalid, and marks at least some pixels as valid
 	 */
 	@Test
 	void minimalSanityCheck() {
-		for( int disparityMin : new int[]{0,1,5}) {
-			for( int range : new int[]{1,20}) {
-				StereoDisparity<Image,Disparity> alg = createAlg(disparityMin,range);
-				alg.process(left,right);
-				checkDisparity(disparityMin,range,alg.getDisparity());
+		for (int disparityMin : new int[]{0, 1, 5}) {
+			for (int range : new int[]{1, 20}) {
+				StereoDisparity<Image, Disparity> alg = createAlg(disparityMin, range);
+				alg.process(left, right);
+				checkDisparity(disparityMin, range, alg.getDisparity());
 			}
 		}
 	}
 
 	@Test
 	void runTwiceSameResult() {
-		StereoDisparity<Image,Disparity> alg = createAlg(0,20);
-		alg.process(left,right);
+		StereoDisparity<Image, Disparity> alg = createAlg(0, 20);
+		alg.process(left, right);
 
 		Disparity expected = alg.getDisparity().clone();
-		alg.process(left,right);
+		alg.process(left, right);
 
 		BoofTesting.assertEquals(expected, alg.getDisparity(), 1e-4);
 	}
 
-	private void checkDisparity( int min , int range , Disparity disparity ) {
+	private void checkDisparity( int min, int range, Disparity disparity ) {
 		int totalValid = 0;
-		int total = height*(width-min);
+		int total = height*(width - min);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < min; x++) {
-				double v = GeneralizedImageOps.get(disparity,x,y);
-				assertEquals(range,v,1e-4);
+				double v = GeneralizedImageOps.get(disparity, x, y);
+				assertEquals(range, v, 1e-4);
 			}
 			for (int x = min; x < width; x++) {
-				double v = GeneralizedImageOps.get(disparity,x,y);
-				if( v < range ) {
+				double v = GeneralizedImageOps.get(disparity, x, y);
+				if (v < range) {
 					totalValid++;
 				}
 			}
@@ -116,5 +115,4 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 
 		assertTrue(totalValid/(double)total >= 0.4);
 	}
-
 }

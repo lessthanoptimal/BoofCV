@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,12 @@ package boofcv.struct;
 
 
 /**
+ * Specifies an axis aligned rectangle inside an image using lower and upper extents.
+ *
  * @author Peter Abeles
  */
 public class ImageRectangle_F64 {
+	/** Inclusive lower extent (x0,y) and exclusive upper extent (x1,y1) */
 	public double x0,y0,x1,y1;
 
 	public ImageRectangle_F64(double x0, double y0, double x1, double y1) {
@@ -39,9 +42,11 @@ public class ImageRectangle_F64 {
 		this.y1 = orig.y1;
 	}
 
-	public ImageRectangle_F64() {
-	}
+	public ImageRectangle_F64() {}
 
+	/**
+	 * Returns the area of the rectangle
+	 */
 	public double area() {
 		return (y1-y0)*(x1-x0);
 	}

@@ -20,12 +20,14 @@ package boofcv.alg.sfm.structure2;
 
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -43,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
 import static boofcv.misc.BoofMiscOps.assertEq;
 
 /**
@@ -57,9 +60,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/**
 	 * If the reprojection error is greater than this then the observation will not be assigned to the feature.
 	 * Units are in pixels.
-	 * WARNING: This feature
+	 * WARNING: Based on test results it seems like this feature makes things worse and is turned off by default.
 	 */
-	public double maxReprojectionErrorPixel = 1e6;
+	public double maxReprojectionErrorPixel = 1e100;
 
 	/** Bundle Adjustment functions and configurations */
 	public final MetricBundleAdjustmentUtils bundleAdjustment = new MetricBundleAdjustmentUtils();
@@ -79,7 +82,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	protected final FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64::new);
 
 	// Used for triangulation
-	protected final FastQueue<Point2D_F64> pixelNorms = new FastQueue<>(Point2D_F64::new);
+	protected final FastQueue<Point2D_F64> pixelNormalized = new FastQueue<>(Point2D_F64::new);
 	// Poses from local view[0] to view[i]. This is done to reduce numerical issues
 	protected final FastQueue<Se3_F64> listPoses = new FastQueue<>(Se3_F64::new);
 	protected final Se3_F64 view0_to_world = new Se3_F64();
@@ -146,10 +149,17 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			db.lookupPixelFeats(wview.pview.id, pixels);
 			assertEq(pixels.size, wview.pview.totalObservations);
 
+			// The camera model assumes the principle point is (0,0) and this is done by assuming it's the image center
+			ImageDimension dimension = wview.imageDimension;
+			assertBoof(dimension.width > 0,
+					"You must assign width and height so that pixels can be re-centered");
+			float cx = (float)(dimension.width/2);
+			float cy = (float)(dimension.height/2);
+
 			// specify the observation pixel coordinates but not which 3D feature is matched to the observation
 			for (int obsIdx = 0; obsIdx < pixels.size; obsIdx++) {
 				Point2D_F64 p = pixels.get(obsIdx);
-				oview.setPixel(obsIdx, (float)p.x, (float)p.y);
+				oview.setPixel(obsIdx, (float)(p.x - cx), (float)(p.y - cy));
 			}
 
 			// Add the view pose and intrinsics
@@ -176,10 +186,23 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			initLookUpTablesForInlierSet(graph, inlierViews);
 
 			int numInliers = wview.inliers.getInlierCount();
+
+			if (verbose != null) verbose.println("Inlier view='" + wview.pview.id + "' inliers=" + numInliers);
+
+			int countMatched = 0;
+			int countMixed = 0;
+			int tooFew = 0;
+
 			for (int inlierIdx = 0; inlierIdx < numInliers; inlierIdx++) {
 				// Create a list of views which have not yet been assigned an observation and also create a list
 				// of 3D features which have been assigned an observation from this set
-				findUnassignedObsAndKnown3D(wview.inliers, inlierIdx);
+				findUnassignedObsAndKnown3D(inliers, inlierIdx);
+
+				if (unassigned.size != 0 && featureIdx3D.size != 0) {
+					countMixed++;
+				} else if (featureIdx3D.size != 0) {
+					countMatched++;
+				}
 
 				// For each observations which is unassigned, assign it to the 3D feature which has the smallest
 				// reprojection error
@@ -187,14 +210,20 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 					assignKnown3DToUnassignedObs(graph, inliers, inlierIdx);
 
 				// If there is 2 or more unassigned observations remaining triangulate and create a new 3D feature
-				if (unassigned.size < 2)
+				if (unassigned.size < 2) {
+					tooFew++;
 					continue;
+				}
 
 				// Create a new feature and save the unassigned observations to it
 				triangulateAndSave(inliers, inlierIdx);
 
 				// NOTE: it is possible that 2+ features are created for one physical feature with this greedy approach
 			}
+
+			if (verbose != null)
+				verbose.println("   unmatched=" + (numInliers - countMatched) + "  matched=" + countMatched + " mixed=" +
+						countMixed + " tooFew=" + tooFew);
 		}
 	}
 
@@ -202,7 +231,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 * Creates a look up table to go from a view's inlier index to it's int ID and SE3
 	 */
 	void initLookUpTablesForInlierSet( SceneWorkingGraph graph, FastArray<PairwiseImageGraph2.View> inlierViews ) {
-		pixelNorms.resize(inlierViews.size);
+		pixelNormalized.resize(inlierViews.size);
 		viewIntIds.reset();
 		listPoses.resize(inlierViews.size);
 
@@ -330,14 +359,14 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			int viewID = viewIntIds.get(inlierViewIdx);
 			int obsIdx = inliers.observations.get(inlierViewIdx).get(inlierIdx);
 			observations.getView(viewID).get(obsIdx, pixelObserved);
-			listPixelToNorm.get(viewID).compute(pixelObserved.x, pixelObserved.y, pixelNorms.get(inlierViewIdx));
+			listPixelToNorm.get(viewID).compute(pixelObserved.x, pixelObserved.y, pixelNormalized.get(inlierViewIdx));
 		}
 
 		// Triangulate 3D feature's location in the coordinate system of view[0]
 		// All features are being used to triangulate because they are part of the inlier set, all though it's possible
 		// that one or more them has already been assigned to a different 3D feature. Basically there might have been
 		// a mistake
-		if (!triangulator.triangulate(pixelNorms.toList(), listPoses.toList(), triangulated))
+		if (!triangulator.triangulate(pixelNormalized.toList(), listPoses.toList(), triangulated))
 			return;
 
 		// Verify it's not behind the camera. Unclear if it should give up here or try to optimize it
@@ -349,17 +378,17 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		// listPoses is relative to view0. Bring it into global reference frame
 		SePointOps_F64.transform(view0_to_world, triangulated, triangulated);
 		// Add the new 3D point to the scene
-		int featureID = structure.points.size;
-		SceneStructureMetric.Point point3D = structure.points.grow();
+		int pointID = structure.points.size;
+		SceneStructureCommon.Point point3D = structure.points.grow();
 		point3D.set(triangulated.x, triangulated.y, triangulated.z, 1.0);
 
-		// Assign observations in the inlier set to this 3D point
+		// Only assigned this 3D point to views which are unassigned.
 		for (int i = 0; i < unassigned.size; i++) {
 			int inlierViewIdx = unassigned.get(i);
 			int obsIdx = inliers.observations.get(inlierViewIdx).get(inlierIdx);
 			int viewID = viewIntIds.get(inlierViewIdx);
-			observations.getView(viewID).point.set(obsIdx, featureID);
-			structure.connectPointToView(featureID, viewID);
+			observations.getView(viewID).point.set(obsIdx, pointID);
+			point3D.views.add(viewID);
 		}
 	}
 

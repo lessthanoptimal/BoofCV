@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,26 +26,26 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public abstract class SparseScaleSample_F64<T extends ImageGray<T>>
-		implements SparseImageSample_F64<T>
-{
+		implements SparseImageSample_F64<T> {
 	protected T input;
 
 	// defines the kernel's bounds
-	protected int x0,y0,x1,y1;
+	protected int x0, y0, x1, y1;
 
 	/**
 	 * Width of the sampled region in pixels
+	 *
 	 * @param width pixels
 	 */
 	public abstract void setWidth( double width );
 
 	@Override
-	public void setImage(T input ) {
+	public void setImage( T input ) {
 		this.input = input;
 	}
 
 	@Override
-	public boolean isInBounds( int x , int y ) {
-		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 < input.width && y+y1 < input.height );
+	public boolean isInBounds( int x, int y ) {
+		return (x + x0 >= 0 && y + y0 >= 0 && x + x1 < input.width && y + y1 < input.height);
 	}
 }

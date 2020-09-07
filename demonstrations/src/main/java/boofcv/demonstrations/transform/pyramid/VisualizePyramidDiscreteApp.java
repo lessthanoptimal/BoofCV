@@ -26,6 +26,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -42,21 +43,20 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidDiscreteApp <T extends ImageGray<T>>
-	extends SelectInputPanel implements VisualizeApp
-{
+public class VisualizePyramidDiscreteApp<T extends ImageGray<T>>
+		extends SelectInputPanel implements VisualizeApp {
 	Class<T> imageType;
-	DiscretePyramidPanel gui = new DiscretePyramidPanel();
+	DiscretePyramidPanel<T> gui;
 	PyramidDiscrete<T> pyramid;
 
 	boolean processedImage = false;
 
-	public VisualizePyramidDiscreteApp(Class<T> imageType) {
+	public VisualizePyramidDiscreteApp( Class<T> imageType ) {
 		this.imageType = imageType;
 		ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(5);
 
-		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,true, ImageType.single(imageType));
-		gui = new DiscretePyramidPanel();
+		pyramid = FactoryPyramid.discreteGaussian(configLevels, -1, 2, true, ImageType.single(imageType));
+		gui = new DiscretePyramidPanel<>();
 
 		setMainGUI(gui);
 	}
@@ -69,24 +69,23 @@ public class VisualizePyramidDiscreteApp <T extends ImageGray<T>>
 		pyramid.process(gray);
 
 		// render the pyramid
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setPyramid(pyramid);
-				gui.render();
-				gui.repaint();
+		SwingUtilities.invokeLater(() -> {
+			gui.setPyramid(pyramid);
+			gui.render();
+			gui.repaint();
 //				setPreferredSize(new Dimension(gray.width,gray.height));
-				processedImage = true;
-			}});
+			processedImage = true;
+		});
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void loadConfigurationFile( String fileName ) {}
 
 	@Override
-	public synchronized void changeInput(String name, int index) {
+	public synchronized void changeInput( String name, int index ) {
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 
-		if( image != null ) {
+		if (image != null) {
 			process(image);
 		}
 	}
@@ -101,16 +100,16 @@ public class VisualizePyramidDiscreteApp <T extends ImageGray<T>>
 
 		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));
-		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
-		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
+		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
+		inputs.add(new PathLabel("fingerprint", UtilIO.pathExample("standard/fingerprint.jpg")));
 
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+		while (!app.getHasProcessedImage()) {
+			BoofMiscOps.sleep(10);
 		}
 
-		ShowImages.showWindow(app,"Image Discrete Pyramid", true);
+		ShowImages.showWindow(app, "Image Discrete Pyramid", true);
 	}
 }

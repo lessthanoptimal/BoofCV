@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,9 @@
 
 package boofcv.concurrency;
 
-import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.ForkJoinTask;
 
 /**
@@ -32,19 +33,15 @@ public class IntRangeObjectTask<T> extends ForkJoinTask<Void> {
 	final int stepLength;
 	final int step;
 	final IntRangeObjectConsumer<T> consumer;
-	final FastQueue<T> workspace;
-	IntRangeObjectTask next;
+	final GrowArray<T> workspace;
+	@Nullable IntRangeObjectTask<T> next;
 
 	/**
 	 *
 	 * @param step which step is to be processed. the master task should have this set to -1
-	 * @param min
-	 * @param max
-	 * @param stepLength
-	 * @param consumer
 	 */
 	public IntRangeObjectTask(int step, int min , int max , int stepLength ,
-							  FastQueue<T> workspace,
+							  GrowArray<T> workspace,
 							  IntRangeObjectConsumer<T> consumer ) {
 		this.step = step;
 		this.min = min;
@@ -55,7 +52,7 @@ public class IntRangeObjectTask<T> extends ForkJoinTask<Void> {
 	}
 
 	public IntRangeObjectTask(int min , int max , int stepLength ,
-							  FastQueue<T> workspace,
+							  GrowArray<T> workspace,
 							  IntRangeObjectConsumer<T> consumer ) {
 		this(-1,min,max,stepLength,workspace,consumer);
 	}
@@ -75,15 +72,15 @@ public class IntRangeObjectTask<T> extends ForkJoinTask<Void> {
 			workspace.resize(N);
 
 			// this is the first task, spawn all the others
-			IntRangeObjectTask root=null;
-			IntRangeObjectTask previous=null;
+			IntRangeObjectTask<T> root=null;
+			IntRangeObjectTask<T> previous=null;
 			int step;
 			for ( step = 0; step < N - 1; step++) {
 				IntRangeObjectTask<T> task = new IntRangeObjectTask<>(step,min,max,stepLength,workspace, consumer);
 				if( root == null ) {
 					root = previous = task;
 				} else {
-					previous.next = task;
+					Objects.requireNonNull(previous).next = task;
 					previous = task;
 				}
 				task.fork();

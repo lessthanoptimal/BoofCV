@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
+import javax.annotation.Generated;
 
 /**
  * <p>
@@ -38,6 +39,7 @@ import boofcv.struct.image.*;
  * 
  * @author Peter Abeles
  */
+@Generated({"boofcv.alg.filter.convolve.down.GenerateConvolveDownNoBorderStandard"})
 public class ConvolveDownNoBorderStandard {
 
 	public static void horizontal(Kernel1D_F32 kernel ,

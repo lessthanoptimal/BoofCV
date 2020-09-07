@@ -72,7 +72,7 @@ public class MetricBundleAdjustmentUtils {
 			if (verbose != null) verbose.println("SBA PRUNED-BEFORE average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 			if (!sba.optimize(structure))
 				return false;
-			if( verbose != null ) verbose.println("SBA PRUNED-AFTER average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+			if( verbose != null ) verbose.println("SBA PRUNED-AFTER  average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 		}
 
 		if (configScale)

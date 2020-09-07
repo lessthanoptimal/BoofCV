@@ -22,41 +22,40 @@ import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * <p>
  * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreSadRect} for processing
  * input images of type {@link GrayU8}.
  * </p>
- * 
+ *
  * @author Peter Abeles
  */
-public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI>>
-	extends DisparityBlockMatch<T,DI>
-{
+public class DisparityScoreBM_S32<T extends ImageBase<T>, DI extends ImageGray<DI>>
+		extends DisparityBlockMatch<T, DI> {
 	// Computes disparity from scores. Concurrent code copies this
 	DisparitySelect<int[], DI> disparitySelect0;
 
-	BlockRowScore<T,int[],Object> scoreRows;
+	BlockRowScore<T, int[], Object> scoreRows;
 
 	// reference to input images;
 	T left, right;
 	DI disparity;
 
-	FastQueue workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
+	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
-	public DisparityScoreBM_S32(int regionRadiusX, int regionRadiusY,
-								BlockRowScore<T,int[],Object> scoreRows,
-								DisparitySelect<int[], DI> computeDisparity, ImageType<T> imageType) {
-		super(regionRadiusX,regionRadiusY, imageType);
+	public DisparityScoreBM_S32( int regionRadiusX, int regionRadiusY,
+								 BlockRowScore<T, int[], Object> scoreRows,
+								 DisparitySelect<int[], DI> computeDisparity, ImageType<T> imageType ) {
+		super(regionRadiusX, regionRadiusY, imageType);
 
 		this.scoreRows = scoreRows;
 		this.disparitySelect0 = computeDisparity;
@@ -70,7 +69,7 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 	}
 
 	@Override
-	public void _process(T left , T right , DI disparity ) {
+	public void _process( T left, T right, DI disparity ) {
 		this.left = left;
 		this.right = right;
 		this.disparity = disparity;
@@ -78,12 +77,12 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 		growBorderL.setImage(left);
 		growBorderR.setImage(right);
 
-		scoreRows.setInput(left,right);
+		scoreRows.setInput(left, right);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			BoofConcurrency.loopBlocks(0,left.height,regionHeight,workspace,computeBlock);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			BoofConcurrency.loopBlocks(0, left.height, regionHeight, workspace, computeBlock);
 		} else {
-			computeBlock.accept((WorkSpace)workspace.get(0),0,left.height);
+			computeBlock.accept((WorkSpace)workspace.get(0), 0, left.height);
 		}
 	}
 
@@ -101,40 +100,40 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 		// storage for scores after normalization
 		int[] verticalScoreNorm = new int[0];
 		// Used to store a copy of the image's row, plus outside border pixels
-		Object leftRow,rightRow;
+		Object leftRow, rightRow;
 
 		DisparitySelect<int[], DI> computeDisparity;
 
 		public void checkSize() {
-			if( horizontalScore.length != regionHeight || horizontalScore[0].length != widthDisparityBlock) {
+			if (horizontalScore.length != regionHeight || horizontalScore[0].length != widthDisparityBlock) {
 				horizontalScore = new int[regionHeight][widthDisparityBlock];
 				verticalScore = new int[widthDisparityBlock];
-				if( scoreRows.isRequireNormalize() )
+				if (scoreRows.isRequireNormalize())
 					verticalScoreNorm = new int[widthDisparityBlock];
-				elementScore = new int[left.width+2*radiusX];
+				elementScore = new int[left.width + 2*radiusX];
 				leftRow = left.getImageType().getDataType().newArray(elementScore.length);
 				rightRow = right.getImageType().getDataType().newArray(elementScore.length);
 			}
-			if( computeDisparity == null ) {
+			if (computeDisparity == null) {
 				computeDisparity = disparitySelect0.concurrentCopy();
 			}
-			computeDisparity.configure(disparity, disparityMin, disparityMax,radiusX);
+			computeDisparity.configure(disparity, disparityMin, disparityMax, radiusX);
 		}
 	}
 
 	private class ComputeBlock implements IntRangeObjectConsumer<WorkSpace> {
 		@Override
-		public void accept(WorkSpace workspace, int minInclusive, int maxExclusive) {
+		public void accept( WorkSpace workspace, int minInclusive, int maxExclusive ) {
 
 			workspace.checkSize();
-			int row0 = minInclusive-radiusY;
-			int row1 = maxExclusive+radiusY;
+			int row0 = minInclusive - radiusY;
+			int row1 = maxExclusive + radiusY;
 
 			// initialize computation
 			computeFirstRow(row0, workspace);
 
 			// efficiently compute rest of the rows using previous results to avoid repeat computations
-			computeRemainingRows(row0,row1, workspace);
+			computeRemainingRows(row0, row1, workspace);
 		}
 	}
 
@@ -142,26 +141,26 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
 	 * rows.
 	 */
-	private void computeFirstRow(int row0 , WorkSpace ws) {
+	private void computeFirstRow( int row0, WorkSpace ws ) {
 		// compute horizontal scores for first row block
-		for( int row = 0; row < regionHeight; row++ ) {
-			growBorderL.growRow(row0+row,radiusX,radiusX,ws.leftRow,0);
-			growBorderR.growRow(row0+row,radiusX,radiusX,ws.rightRow,0);
+		for (int row = 0; row < regionHeight; row++) {
+			growBorderL.growRow(row0 + row, radiusX, radiusX, ws.leftRow, 0);
+			growBorderR.growRow(row0 + row, radiusX, radiusX, ws.rightRow, 0);
 			final int[] scores = ws.horizontalScore[row];
-			scoreRows.scoreRow(row0+row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax,regionWidth,ws.elementScore);
+			scoreRows.scoreRow(row0 + row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 		}
 
 		// compute score for the top most row
-		for(int i = 0; i < widthDisparityBlock; i++ ) {
+		for (int i = 0; i < widthDisparityBlock; i++) {
 			int sum = 0;
-			for( int row = 0; row < regionHeight; row++ ) {
+			for (int row = 0; row < regionHeight; row++) {
 				sum += ws.horizontalScore[row][i];
 			}
 			ws.verticalScore[i] = sum;
 		}
 
 		// compute disparity
-		if( scoreRows.isRequireNormalize() ) {
+		if (scoreRows.isRequireNormalize()) {
 			scoreRows.normalizeRegionScores(row0 + radiusY, ws.verticalScore, disparityMin, disparityMax, regionWidth, regionHeight, ws.verticalScoreNorm);
 			ws.computeDisparity.process(row0 + radiusY, ws.verticalScoreNorm);
 		} else {
@@ -174,31 +173,30 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 	 * When a new block is processes the last row/column is subtracted and the new row/column is
 	 * added.
 	 */
-	private void computeRemainingRows(int row0 , int row1, WorkSpace ws  )
-	{
-		final T left = this.left, right = this.right;
-		for( int row = row0+regionHeight; row < row1; row++ ) {
-			int oldRow = (row-row0)%regionHeight;
+	private void computeRemainingRows( int row0, int row1, WorkSpace ws ) {
+
+		for (int row = row0 + regionHeight; row < row1; row++) {
+			int oldRow = (row - row0)%regionHeight;
 
 			// subtract first row from vertical score
 			final int[] scores = ws.horizontalScore[oldRow];
-			for(int i = 0; i < widthDisparityBlock; i++ ) {
+			for (int i = 0; i < widthDisparityBlock; i++) {
 				ws.verticalScore[i] -= scores[i];
 			}
 
-			growBorderL.growRow(row,radiusX,radiusX,ws.leftRow,0);
-			growBorderR.growRow(row,radiusX,radiusX,ws.rightRow,0);
-			scoreRows.scoreRow(row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax,regionWidth,ws.elementScore);
+			growBorderL.growRow(row, radiusX, radiusX, ws.leftRow, 0);
+			growBorderR.growRow(row, radiusX, radiusX, ws.rightRow, 0);
+			scoreRows.scoreRow(row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 
 			// add the new score
-			for(int i = 0; i < widthDisparityBlock; i++ ) {
+			for (int i = 0; i < widthDisparityBlock; i++) {
 				ws.verticalScore[i] += scores[i];
 			}
 
 			// compute disparity
-			if( scoreRows.isRequireNormalize() ) {
+			if (scoreRows.isRequireNormalize()) {
 				scoreRows.normalizeRegionScores(row - regionHeight + 1 + radiusY,
-						ws.verticalScore, disparityMin, disparityMax,regionWidth,regionHeight,ws.verticalScoreNorm);
+						ws.verticalScore, disparityMin, disparityMax, regionWidth, regionHeight, ws.verticalScoreNorm);
 				ws.computeDisparity.process(row - regionHeight + 1 + radiusY, ws.verticalScoreNorm);
 			} else {
 				ws.computeDisparity.process(row - regionHeight + 1 + radiusY, ws.verticalScore);
@@ -221,7 +219,7 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 		return scoreRows.getMaxPerPixelError();
 	}
 
-	public void setDisparitySelect0(DisparitySelect<int[], DI> disparitySelect0) {
+	public void setDisparitySelect0( DisparitySelect<int[], DI> disparitySelect0 ) {
 		this.disparitySelect0 = disparitySelect0;
 	}
 }

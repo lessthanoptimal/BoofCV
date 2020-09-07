@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 	public int[] data;
 	public int numBits;
 
-	public TupleDesc_B(int numBits) {
+	public TupleDesc_B( int numBits ) {
 		int numInts = numBits/32;
-		if( numBits % 32 != 0 ) {
+		if (numBits%32 != 0) {
 			numInts++;
 		}
 
@@ -37,7 +37,7 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 		data = new int[numInts];
 	}
 
-	public TupleDesc_B(int numBits, int numInts) {
+	public TupleDesc_B( int numBits, int numInts ) {
 		this.numBits = numBits;
 		data = new int[numInts];
 	}
@@ -47,24 +47,25 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 		return ((data[index] >> (bit%32)) & 0x01) == 1;
 	}
 
+	@Override
 	public TupleDesc_B copy() {
 		TupleDesc_B ret = new TupleDesc_B(numBits);
-		System.arraycopy(data,0,ret.data,0,data.length);
+		System.arraycopy(data, 0, ret.data, 0, data.length);
 		return ret;
 	}
 
 	@Override
-	public void setTo(TupleDesc_B source) {
-		if( data.length < source.data.length )
+	public void setTo( TupleDesc_B source ) {
+		if (data.length < source.data.length)
 			throw new IllegalArgumentException("Data array is too small to store the source array.");
 
 		this.numBits = source.numBits;
-		System.arraycopy(source.data,0,data,0,source.data.length);
+		System.arraycopy(source.data, 0, data, 0, source.data.length);
 	}
 
 	@Override
-	public double getDouble(int index) {
-		if( isBitTrue(index) )
+	public double getDouble( int index ) {
+		if (isBitTrue(index))
 			return 1;
 		else
 			return -1;

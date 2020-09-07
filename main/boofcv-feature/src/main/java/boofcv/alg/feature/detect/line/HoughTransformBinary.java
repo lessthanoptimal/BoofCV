@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.detect.line;
 
-
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConfigLength;
@@ -70,7 +69,7 @@ public class HoughTransformBinary {
 	List<LineParametric2D_F32> linesMerged = new ArrayList<>();
 	// contains a set of counts for detected lines in each pixel
 	// floating point image used because that's what FeatureExtractor's take as input
-	GrayF32 transform = new GrayF32(1,1);
+	GrayF32 transform = new GrayF32(1, 1);
 	// found lines in transform space
 	QueueCorner foundPeaks = new QueueCorner(10);
 	// line intensities for later pruning
@@ -87,7 +86,7 @@ public class HoughTransformBinary {
 	int maxLines = 0;
 
 	// threshold for number of counts. relative is relative to total area of transform. fixed is number of counts
-	ConfigLength thresholdCounts = ConfigLength.relative(0.001,1);
+	ConfigLength thresholdCounts = ConfigLength.relative(0.001, 1);
 
 	/**
 	 * Specifies parameters of transform.  The minimum number of points specified in the extractor
@@ -95,7 +94,7 @@ public class HoughTransformBinary {
 	 *
 	 * @param extractor Extracts local maxima from transform space.
 	 */
-	public HoughTransformBinary(NonMaxSuppression extractor , HoughTransformParameters parameters) {
+	public HoughTransformBinary( NonMaxSuppression extractor, HoughTransformParameters parameters ) {
 		this.extractor = extractor;
 		this.parameters = parameters;
 	}
@@ -105,30 +104,29 @@ public class HoughTransformBinary {
 	 *
 	 * @param binary Binary image that indicates which pixels lie on edges.
 	 */
-	public void transform( GrayU8 binary )
-	{
-		parameters.initialize(binary.width,binary.height,transform);
+	public void transform( GrayU8 binary ) {
+		parameters.initialize(binary.width, binary.height, transform);
 		ImageMiscOps.fill(transform, 0);
 
 		computeParameters(binary);
 
 		extractLines();
-		if( maxLines <= 0 ) {
+		if (maxLines <= 0) {
 			linesMerged.clear();
 			linesMerged.addAll(linesAll.toList());
 		} else {
-			mergeLines(binary.width,binary.height);
+			mergeLines(binary.width, binary.height);
 		}
 	}
 
-	void computeParameters(GrayU8 binary) {
-		for( int y = 0; y < binary.height; y++ ) {
+	void computeParameters( GrayU8 binary ) {
+		for (int y = 0; y < binary.height; y++) {
 			int start = binary.startIndex + y*binary.stride;
 			int stop = start + binary.width;
 
-			for( int index = start; index < stop; index++ ) {
-				if( binary.data[index] != 0 ) {
-					parameters.parameterize(index-start,y,transform);
+			for (int index = start; index < stop; index++) {
+				if (binary.data[index] != 0) {
+					parameters.parameterize(index - start, y, transform);
 				}
 			}
 		}
@@ -136,45 +134,43 @@ public class HoughTransformBinary {
 
 	/**
 	 * Searches for local maximals and converts into lines.
-	 *
-	 * @return Found lines in the image.
 	 */
 	protected void extractLines() {
 		linesAll.reset();
 		foundPeaks.reset();
 		foundIntensity.reset();
 
-		extractor.setThresholdMaximum((float) thresholdCounts.compute(transform.width*transform.height));
-		extractor.process(transform, null,null,null, foundPeaks);
+		extractor.setThresholdMaximum((float)thresholdCounts.compute(transform.width*transform.height));
+		extractor.process(transform, null, null, null, foundPeaks);
 
-		for(int i = 0; i < foundPeaks.size(); i++ ) {
+		for (int i = 0; i < foundPeaks.size(); i++) {
 			Point2D_I16 p = foundPeaks.get(i);
 
-			if( !parameters.isTransformValid(p.x,p.y))
+			if (!parameters.isTransformValid(p.x, p.y))
 				continue;
 
-			parameters.transformToLine(p.x,p.y, linesAll.grow());
-			foundIntensity.push( transform.get(p.x,p.y));
+			parameters.transformToLine(p.x, p.y, linesAll.grow());
+			foundIntensity.push(transform.get(p.x, p.y));
 		}
 	}
 
-	protected void mergeLines( int width , int height ) {
+	protected void mergeLines( int width, int height ) {
 		post.reset();
-		for( int i = 0; i < linesAll.size(); i++ ) {
-			post.add(linesAll.get(i),foundIntensity.get(i));
+		for (int i = 0; i < linesAll.size(); i++) {
+			post.add(linesAll.get(i), foundIntensity.get(i));
 		}
 
 		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
 		// function uses a constant value for range accuracy.  A custom algorithm should really
 		// be used here.
-		post.pruneSimilar((float) mergeAngle, (float)mergeDistance, width, height);
+		post.pruneSimilar((float)mergeAngle, (float)mergeDistance, width, height);
 		post.pruneNBest(maxLines);
 
 		post.createList(linesMerged);
 	}
 
 	/**
-	 //	 * Returns the Hough transform image.
+	 * //	 * Returns the Hough transform image.
 	 *
 	 * @return Transform image.
 	 */
@@ -204,7 +200,7 @@ public class HoughTransformBinary {
 		return mergeAngle;
 	}
 
-	public void setMergeAngle(double mergeAngle) {
+	public void setMergeAngle( double mergeAngle ) {
 		this.mergeAngle = mergeAngle;
 	}
 
@@ -212,7 +208,7 @@ public class HoughTransformBinary {
 		return mergeDistance;
 	}
 
-	public void setMergeDistance(double mergeDistance) {
+	public void setMergeDistance( double mergeDistance ) {
 		this.mergeDistance = mergeDistance;
 	}
 
@@ -220,7 +216,7 @@ public class HoughTransformBinary {
 		return maxLines;
 	}
 
-	public void setMaxLines(int maxLines) {
+	public void setMaxLines( int maxLines ) {
 		this.maxLines = maxLines;
 	}
 

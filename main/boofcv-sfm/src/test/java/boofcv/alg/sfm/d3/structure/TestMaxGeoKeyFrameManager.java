@@ -50,6 +50,7 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 	}
 
 	@Test
+	@Override
 	void discardMultipleNewFrames() {
 		simpleSequence(2);
 	}

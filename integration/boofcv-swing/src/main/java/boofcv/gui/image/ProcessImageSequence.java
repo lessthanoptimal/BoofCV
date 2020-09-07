@@ -20,6 +20,7 @@ package boofcv.gui.image;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
@@ -28,7 +29,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-
 
 /**
  * An abstract class that takes case of basic GUI and loading of images when processing a sequence.
@@ -49,7 +49,7 @@ public abstract class ProcessImageSequence<T extends ImageGray<T>> implements Mo
 	// how many images have been saved
 	protected int savedIndex;
 
-	public ProcessImageSequence(SimpleImageSequence<T> sequence) {
+	protected ProcessImageSequence( SimpleImageSequence<T> sequence ) {
 		this.sequence = sequence;
 		if (sequence.hasNext()) {
 			image = sequence.next();
@@ -67,10 +67,8 @@ public abstract class ProcessImageSequence<T extends ImageGray<T>> implements Mo
 	/**
 	 * If a component is added here then keyboard and mouse events will be used to control the
 	 * image processing.
-	 *
-	 * @param comp
 	 */
-	public void addComponent(JComponent comp) {
+	public void addComponent( JComponent comp ) {
 		comp.addMouseListener(this);
 		comp.addKeyListener(this);
 	}
@@ -108,7 +106,7 @@ public abstract class ProcessImageSequence<T extends ImageGray<T>> implements Mo
 					step = false;
 					break;
 				}
-				Thread.yield();
+				BoofMiscOps.sleep(5);
 			}
 
 //            if( stabilizer.getKeyFrameChanged() && numFrames > 2 ) {
@@ -131,29 +129,28 @@ public abstract class ProcessImageSequence<T extends ImageGray<T>> implements Mo
 		sequence.close();
 	}
 
-	private void printFPS(long totalTime, int numFrames, long startNano) {
-		double seconds = totalTime / 1e9;
-		double allSeconds = (System.nanoTime() - startNano) / 1e9;
-		double fps = numFrames / seconds;
-		double tfps = numFrames / allSeconds;
+	private void printFPS( long totalTime, int numFrames, long startNano ) {
+		double seconds = totalTime/1e9;
+		double allSeconds = (System.nanoTime() - startNano)/1e9;
+		double fps = numFrames/seconds;
+		double tfps = numFrames/allSeconds;
 		System.out.printf("Frame # = %5d FPS = %6.2f TFPS = %6.2f ET = %7.1f\n", numFrames, fps, tfps, allSeconds);
 	}
 
-	public abstract void processFrame(T image);
+	public abstract void processFrame( T image );
 
-	public abstract void updateGUI(BufferedImage guiImage, T origImage);
+	public abstract void updateGUI( BufferedImage guiImage, T origImage );
 
 	/**
 	 * Called after all the frames in the sequence have been processed.
 	 */
-	public void finishedSequence(){}
-
+	public void finishedSequence() {}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked( MouseEvent e ) {
 		// thsi is needed so that key events are processed
 		if (e.getSource() instanceof JComponent) {
-			JComponent jc = (JComponent) e.getSource();
+			JComponent jc = (JComponent)e.getSource();
 
 			jc.requestFocusInWindow();
 		}
@@ -163,23 +160,7 @@ public abstract class ProcessImageSequence<T extends ImageGray<T>> implements Mo
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
+	public void keyTyped( KeyEvent e ) {
 		if (e.getKeyChar() == 'p') {
 			paused = false;
 		} else if (e.getKeyChar() == 's') {
@@ -193,11 +174,10 @@ public abstract class ProcessImageSequence<T extends ImageGray<T>> implements Mo
 		}
 	}
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-	}
+	@Override public void mousePressed( MouseEvent e ) {}
+	@Override public void mouseReleased( MouseEvent e ) {}
+	@Override public void mouseEntered( MouseEvent e ) {}
+	@Override public void mouseExited( MouseEvent e ) {}
+	@Override public void keyPressed( KeyEvent e ) {}
+	@Override public void keyReleased( KeyEvent e ) {}
 }

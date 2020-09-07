@@ -31,66 +31,62 @@ import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
 public class SelectSparseErrorSubpixel {
 
 	public static class S32 extends SelectSparseErrorWithChecksWta_S32 {
-		public S32(int maxError, double texture, int tolRightToLeft) {
+		public S32( int maxError, double texture, int tolRightToLeft ) {
 			super(maxError, texture, tolRightToLeft);
 		}
 
 		@Override
-		public boolean select(DisparitySparseRectifiedScoreBM<int[],?> scorer, int x, int y) {
-			if( super.select(scorer,x,y) ) {
+		public boolean select( DisparitySparseRectifiedScoreBM<int[], ?> scorer, int x, int y ) {
+			if (super.select(scorer, x, y)) {
 				int disparityRange = scorer.getLocalRangeLtoR();
 				int[] scores = scorer.getScoreLtoR();
 				int disparityValue = (int)disparity;
 
-				if( disparityValue == 0 || disparityValue == disparityRange -1) {
+				if (disparityValue == 0 || disparityValue == disparityRange - 1) {
 					return true;
 				} else {
-					int c0 = scores[disparityValue-1];
+					int c0 = scores[disparityValue - 1];
 					int c1 = scores[disparityValue];
-					int c2 = scores[disparityValue+1];
+					int c2 = scores[disparityValue + 1];
 
-					double offset = (double)(c0-c2)/(double)(2*(c0-2*c1+c2));
+					double offset = (double)(c0 - c2)/(double)(2*(c0 - 2*c1 + c2));
 
 					disparity += offset;
 					return true;
 				}
-
 			} else {
 				return false;
 			}
 		}
-
 	}
 
 	public static class F32 extends SelectSparseErrorWithChecksWta_F32 {
-		public F32(int maxError, double texture, int tolRightToLeft) {
+		public F32( int maxError, double texture, int tolRightToLeft ) {
 			super(maxError, texture, tolRightToLeft);
 		}
 
 		@Override
-		public boolean select(DisparitySparseRectifiedScoreBM<float[],?> scorer, int x, int y) {
-			if( super.select(scorer,x,y) ) {
+		public boolean select( DisparitySparseRectifiedScoreBM<float[], ?> scorer, int x, int y ) {
+			if (super.select(scorer, x, y)) {
 				int disparityRange = scorer.getLocalRangeLtoR();
 				float[] scores = scorer.getScoreLtoR();
 				int disparityValue = (int)disparity;
 
-				if( disparityValue == 0 || disparityValue == disparityRange -1) {
+				if (disparityValue == 0 || disparityValue == disparityRange - 1) {
 					return true;
 				} else {
-					float c0 = scores[disparityValue-1];
+					float c0 = scores[disparityValue - 1];
 					float c1 = scores[disparityValue];
-					float c2 = scores[disparityValue+1];
+					float c2 = scores[disparityValue + 1];
 
-					float offset = (c0-c2)/(2f*(c0-2*c1+c2));
+					float offset = (c0 - c2)/(2f*(c0 - 2*c1 + c2));
 
 					disparity += offset;
 					return true;
 				}
-
 			} else {
 				return false;
 			}
 		}
-
 	}
 }

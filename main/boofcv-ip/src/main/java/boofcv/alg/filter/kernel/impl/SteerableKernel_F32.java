@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,11 @@
 
 package boofcv.alg.filter.kernel.impl;
 
-
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.alg.filter.kernel.SteerableCoefficients;
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
-
 
 /**
  * <p>
@@ -43,9 +41,7 @@ public class SteerableKernel_F32 implements SteerableKernel<Kernel2D_F32> {
 	private Kernel2D basis[];
 
 	@Override
-	public void setBasis( SteerableCoefficients coef ,
-						  Kernel2D... basis )
-	{
+	public void setBasis( SteerableCoefficients coef, Kernel2D... basis ) {
 		this.coef = coef;
 		this.basis = basis;
 
@@ -56,17 +52,17 @@ public class SteerableKernel_F32 implements SteerableKernel<Kernel2D_F32> {
 	@Override
 	public Kernel2D_F32 compute( double angle ) {
 		// set the output to zero
-		KernelMath.fill(output,0);
+		KernelMath.fill(output, 0);
 
 		int N = output.width*output.width;
 
-		for( int i = 0; i < basis.length; i++ ) {
-			double c = coef.compute(angle,i);
+		for (int i = 0; i < basis.length; i++) {
+			float c = (float)coef.compute(angle, i);
 
 			Kernel2D_F32 k = (Kernel2D_F32)basis[i];
 
-			for( int j = 0; j < N; j++ ) {
-				output.data[j] += (k.data[j])*c;
+			for (int j = 0; j < N; j++) {
+				output.data[j] += k.data[j]*c;
 			}
 		}
 

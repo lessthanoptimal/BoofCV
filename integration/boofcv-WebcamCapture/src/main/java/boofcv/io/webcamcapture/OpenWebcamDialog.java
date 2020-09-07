@@ -24,14 +24,11 @@ import com.github.sarxos.webcam.Webcam;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -44,11 +41,11 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 
 	JDialog dialog;
 
-	JComboBox comboCameras;
+	JComboBox<String> comboCameras;
 	Webcam selectedCamera;
 
-	JFormattedTextField fieldWidth,fieldHeight;
-	int width,height;
+	JFormattedTextField fieldWidth, fieldHeight;
+	int width, height;
 
 	DefaultComboBoxModel modelSizes = new DefaultComboBoxModel();
 	JComboBox comboSizes = new JComboBox(modelSizes);
@@ -65,67 +62,47 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 
 	public OpenWebcamDialog( JDialog dialog ) {
 		this.dialog = dialog;
-		setBorder(BorderFactory.createEmptyBorder(6,6,6,6));
+		setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
 		final List<Webcam> cameras = Webcam.getWebcams();
-		Vector<String> names = new Vector<>();
+		List<String> names = new ArrayList<>();
 
-		for( Webcam w : cameras ) {
-			names.add( w.getName() );
+		for (Webcam w : cameras) {
+			names.add(w.getName());
 		}
 
-		bOK.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				actionOK();
-			}
-		});
-		bCancel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				actionCancel();
-			}
-		});
+		bOK.addActionListener(e -> actionOK());
+		bCancel.addActionListener(e -> actionCancel());
 
 		cSave.setSelected(true);
 
-		fieldWidth = BoofSwingUtil.createTextField(0,0,20000);
-		fieldHeight = BoofSwingUtil.createTextField(0,0,20000);
+		fieldWidth = BoofSwingUtil.createTextField(0, 0, 20000);
+		fieldHeight = BoofSwingUtil.createTextField(0, 0, 20000);
 
-		fieldWidth.setPreferredSize(new Dimension(150,30));
-		fieldHeight.setPreferredSize(new Dimension(150,30));
+		fieldWidth.setPreferredSize(new Dimension(150, 30));
+		fieldHeight.setPreferredSize(new Dimension(150, 30));
 		fieldWidth.setMaximumSize(fieldWidth.getPreferredSize());
 		fieldHeight.setMaximumSize(fieldHeight.getPreferredSize());
 
-		fieldWidth.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				width = (Integer)fieldWidth.getValue();
-			}
-		});
-		fieldHeight.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				height = (Integer)fieldHeight.getValue();
-			}
-		});
+		fieldWidth.addPropertyChangeListener(evt -> width = (Integer)fieldWidth.getValue());
+		fieldHeight.addPropertyChangeListener(evt -> height = (Integer)fieldHeight.getValue());
 
-		comboSizes.setPreferredSize(new Dimension(200,30));
+		comboSizes.setPreferredSize(new Dimension(200, 30));
 		comboSizes.setMaximumSize(comboSizes.getPreferredSize());
 
-		comboCameras = new JComboBox(names);
-		comboCameras.setPreferredSize(new Dimension(200,30));
+		comboCameras = new JComboBox(names.toArray());
+		comboCameras.setPreferredSize(new Dimension(200, 30));
 		comboCameras.setMaximumSize(comboCameras.getPreferredSize());
 		cameraListener = e -> {
 			Webcam w = cameras.get(comboCameras.getSelectedIndex());
 			selectedCamera = w;
 			Dimension s = w.getViewSize();
-			setCameraSize(s.width,s.height);
+			setCameraSize(s.width, s.height);
 
 			comboSizes.removeActionListener(sizeListener);
 			modelSizes.removeAllElements();
-			for( Dimension d : w.getViewSizes() ) {
-				modelSizes.addElement(d.width+" x "+d.height);
+			for (Dimension d : w.getViewSizes()) {
+				modelSizes.addElement(d.width + " x " + d.height);
 			}
 			comboSizes.addActionListener(sizeListener);
 		};
@@ -135,39 +112,39 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 			Webcam w = cameras.get(comboCameras.getSelectedIndex());
 			selectedCamera = w;
 			String text = (String)comboSizes.getSelectedItem();
-			if( text == null )
+			if (text == null)
 				return;
 			String words[] = text.split(" x ");
 			int width = Integer.parseInt(words[0]);
 			int height = Integer.parseInt(words[1]);
-			setCameraSize(width,height);
+			setCameraSize(width, height);
 		};
 		comboSizes.addActionListener(sizeListener);
 
 		final JPanel sizePanel = new JPanel();
 		sizePanel.setLayout(new BoxLayout(sizePanel, BoxLayout.X_AXIS));
-		sizePanel.add( fieldWidth );
-		sizePanel.add( Box.createHorizontalStrut(10));
-		sizePanel.add( fieldHeight );
+		sizePanel.add(fieldWidth);
+		sizePanel.add(Box.createHorizontalStrut(10));
+		sizePanel.add(fieldHeight);
 		sizePanel.setMaximumSize(sizePanel.getPreferredSize());
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-		buttonPanel.add( bCancel );
-		buttonPanel.add( Box.createHorizontalGlue());
-		buttonPanel.add( bOK );
+		buttonPanel.add(bCancel);
+		buttonPanel.add(Box.createHorizontalGlue());
+		buttonPanel.add(bOK);
 //		buttonPanel.setMaximumSize(buttonPanel.getPreferredSize());
 		dialog.getRootPane().setDefaultButton(bOK);
 
 		final JPanel checkPanel = new JPanel();
 		checkPanel.setLayout(new BoxLayout(checkPanel, BoxLayout.X_AXIS));
-		checkPanel.add( cSave );
-		checkPanel.add( Box.createHorizontalGlue());
+		checkPanel.add(cSave);
+		checkPanel.add(Box.createHorizontalGlue());
 //		checkPanel.setMaximumSize(checkPanel.getPreferredSize());
 
-		addLabeled(comboCameras,"Webcam");
-		addLabeled(sizePanel,"Size");
-		addAlignRight(comboSizes,this);
+		addLabeled(comboCameras, "Webcam");
+		addLabeled(sizePanel, "Size");
+		addAlignRight(comboSizes, this);
 		add(checkPanel);
 		add(buttonPanel);
 
@@ -178,50 +155,51 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 	public boolean loadPreferences() {
 		Preferences prefs = Preferences.userRoot().node(getClass().getSimpleName());
 
-		String cameraName = prefs.get("camera","");
-		final int width = prefs.getInt("width",-1);
-		final int height = prefs.getInt("height",-1);
+		String cameraName = prefs.get("camera", "");
+		final int width = prefs.getInt("width", -1);
+		final int height = prefs.getInt("height", -1);
 
-		if( cameraName.length() <= 0 )
+		if (cameraName.length() <= 0)
 			return false;
 
 		List<Webcam> cameras = Webcam.getWebcams();
 		int match = -1;
-		for( int i = 0; i < cameras.size(); i++ ) {
+		for (int i = 0; i < cameras.size(); i++) {
 			Webcam w = cameras.get(i);
-			if( w.getName().equals(cameraName)) {
+			if (w.getName().equals(cameraName)) {
 				match = i;
 				break;
 			}
 		}
 
-		if( match == -1 )
+		if (match == -1)
 			return false;
 
 		comboCameras.removeActionListener(cameraListener);
 		comboCameras.setSelectedIndex(match);
-		if( width > 0 && height > 0 ) {
-			setCameraSize(width,height);
+		if (width > 0 && height > 0) {
+			setCameraSize(width, height);
 		}
 		comboCameras.addActionListener(cameraListener);
 		return true;
 	}
 
 	public void savePreferences() {
-		if( selectedCamera == null )
+		if (selectedCamera == null)
 			return;
 		Preferences prefs = Preferences.userRoot().node(getClass().getSimpleName());
 
-		prefs.put("camera",selectedCamera.getName());
-		prefs.putInt("width",width);
-		prefs.putInt("height",height);
+		prefs.put("camera", selectedCamera.getName());
+		prefs.putInt("width", width);
+		prefs.putInt("height", height);
 
 		try {
 			prefs.flush();
-		} catch (BackingStoreException ignore) {}
+		} catch (BackingStoreException ignore) {
+		}
 	}
 
-	private void setCameraSize( final int width , final int height ) {
+	private void setCameraSize( final int width, final int height ) {
 //		BoofSwingUtil.checkGuiThread();
 		this.width = width;
 		this.height = height;
@@ -238,35 +216,34 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 //		});
 	}
 
-	public static Selection showDialog( Window owner )
-	{
-		if( Webcam.getWebcams().size() == 0 ) {
+	public static Selection showDialog( Window owner ) {
+		if (Webcam.getWebcams().size() == 0) {
 			JOptionPane.showMessageDialog(owner, "No webcams found!");
 			return null;
 		}
 
-		JDialog dialog = new JDialog(owner,"Select Webcam",Dialog.ModalityType.APPLICATION_MODAL);
+		JDialog dialog = new JDialog(owner, "Select Webcam", Dialog.ModalityType.APPLICATION_MODAL);
 		final OpenWebcamDialog panel = new OpenWebcamDialog(dialog);
 
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosing( WindowEvent e ) {
 				panel.actionCancel();
 			}
 		});
 		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		dialog.getContentPane().setLayout(new BorderLayout());
-		dialog.getContentPane().add(panel,BorderLayout.CENTER);
-		dialog.setSize(new Dimension(400,200));
+		dialog.getContentPane().add(panel, BorderLayout.CENTER);
+		dialog.setSize(new Dimension(400, 200));
 //		dialog.pack();
-		if( owner != null )
+		if (owner != null)
 			dialog.setLocationRelativeTo(owner);
 		dialog.setVisible(true);
 		// should block at this point
 		dialog.dispose();
 
-		if( panel.selectedCamera != null ) {
+		if (panel.selectedCamera != null) {
 			Selection s = new Selection();
 			s.camera = panel.selectedCamera;
 			s.width = panel.getSelectedWidth();
@@ -278,7 +255,7 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 	}
 
 	public void actionOK() {
-		if( cSave.isSelected()) {
+		if (cSave.isSelected()) {
 			savePreferences();
 		}
 		dialog.setVisible(false);
@@ -305,13 +282,13 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 
 	public static class Selection {
 		public Webcam camera;
-		public int width,height;
+		public int width, height;
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		Selection s = OpenWebcamDialog.showDialog(null);
-		if( s != null )
-			System.out.println("Selected camera. "+s.width+" "+s.height);
+		if (s != null)
+			System.out.println("Selected camera. " + s.width + " " + s.height);
 		else
 			System.out.println("Didn't select camera");
 		System.exit(0);

@@ -38,7 +38,7 @@ public interface BoofLambdas {
 	}
 
 	@FunctionalInterface
-	interface Process {
+	interface ProcessCall {
 		void process();
 	}
 

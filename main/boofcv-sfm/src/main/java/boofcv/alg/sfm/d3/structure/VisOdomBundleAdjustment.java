@@ -20,6 +20,7 @@ package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
@@ -158,7 +159,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			if (!bt.selected) {
 				continue;
 			}
-			SceneStructureMetric.Point sp = structure.points.get(featureIdx);
+			SceneStructureCommon.Point sp = structure.points.get(featureIdx);
 			sp.get(bt.worldLoc);
 			featureIdx++;
 		}
@@ -365,11 +366,6 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 				}
 			}
 			return false;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			return this == obj;
 		}
 	}
 

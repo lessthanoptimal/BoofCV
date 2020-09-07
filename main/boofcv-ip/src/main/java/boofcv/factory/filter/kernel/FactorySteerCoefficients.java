@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,7 +132,7 @@ public class FactorySteerCoefficients {
 					middle += inc;
 				}
 			}
-			middle *= Math.pow(-1,basis);
+			middle *= (float)Math.pow(-1,basis);
 
 //			if( order == 2 ) {
 //				if( basis == 0 )

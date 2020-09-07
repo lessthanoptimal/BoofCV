@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.image;
 
 import georegression.struct.point.Point2D_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -27,6 +28,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ImageBase<T extends ImageBase> implements Serializable, Cloneable {
 	/**
 	 * Index of the first pixel in the data array
@@ -76,7 +78,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param subimage Optional output for sub-image.  If not null the subimage will be written into this image.
 	 * @return A sub-image of 'this' image.
 	 */
-	public abstract T subimage(int x0, int y0, int x1, int y1, T subimage);
+	public abstract T subimage(int x0, int y0, int x1, int y1, @Nullable T subimage);
 
 	/**
 	 * Same as {@link #subimage(int, int, int, int, ImageBase)}, but sets the storage for the input subimage

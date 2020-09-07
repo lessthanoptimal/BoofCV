@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,24 +39,24 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 	BundleAdjustmentCamera model;
 
 	// set of parameters to test
-	double parameters[][];
+	double[][] parameters;
 
 	double tol = 1e-4;
 
-	public boolean print=false;
+	public boolean print = false;
 
-	protected double test_X[][] = new double[][]{{0.2,0.6,2},{-0.2,0.6,2},{0.2,-0.6,2},{0.2,-0.6,-2},{1.2,-1.3,2}};
+	protected double[][] test_X = new double[][]{{0.2, 0.6, 2}, {-0.2, 0.6, 2}, {0.2, -0.6, 2}, {0.2, -0.6, -2}, {1.2, -1.3, 2}};
 
-	protected GenericChecksBundleAdjustmentCamera(BundleAdjustmentCamera model) {
+	protected GenericChecksBundleAdjustmentCamera( BundleAdjustmentCamera model ) {
 		this.model = model;
 	}
 
-	public GenericChecksBundleAdjustmentCamera(BundleAdjustmentCamera model, double tol) {
+	protected GenericChecksBundleAdjustmentCamera( BundleAdjustmentCamera model, double tol ) {
 		this.model = model;
 		this.tol = tol;
 	}
 
-	public GenericChecksBundleAdjustmentCamera setParameters(double[][] parameters) {
+	public GenericChecksBundleAdjustmentCamera setParameters( double[][] parameters ) {
 		this.parameters = parameters;
 		return this;
 	}
@@ -78,8 +78,8 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 	public void jacobians() {
 
 		// pick a point which would be in front of the camera
-		for( double X[] : test_X ) {
-			for (double p[] : parameters) {
+		for (double[] X : test_X) {
+			for (double[] p : parameters) {
 				if (print) {
 					System.out.println("param[] " + Arrays.toString(p));
 					System.out.println("Point");
@@ -99,14 +99,14 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 	 */
 	@Test
 	public void compare_input_jacobians() {
-		for( double X[] : test_X ) {
-			double found0[] = new double[3];
-			double found1[] = new double[3];
-			double found2[] = new double[3];
-			double found3[] = new double[3];
+		for (double[] X : test_X) {
+			double[] found0 = new double[3];
+			double[] found1 = new double[3];
+			double[] found2 = new double[3];
+			double[] found3 = new double[3];
 
 			int N = model.getIntrinsicCount();
-			for (double p[] : parameters) {
+			for (double[] p : parameters) {
 				model.setIntrinsic(p, 0);
 				model.jacobian(X[0], X[1], X[2], found0, found1, true, new double[N], new double[N]);
 				model.jacobian(X[0], X[1], X[2], found2, found3, false, null, null);
@@ -123,13 +123,13 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		Point2D_F64 p = new Point2D_F64();
 
-		public FunctionOfPoint( double []parameters ) {
-			model.setIntrinsic(parameters,0);
+		public FunctionOfPoint( double[] parameters ) {
+			model.setIntrinsic(parameters, 0);
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
-			model.project(input[0],input[1],input[2],p);
+		public void process( double[] input, double[] output ) {
+			model.project(input[0], input[1], input[2], p);
 			output[0] = p.x;
 			output[1] = p.y;
 		}
@@ -145,22 +145,23 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 		}
 	}
 
-	private class JacobianOfPoint implements FunctionNtoMxN<DMatrixRMaj>  {
+	private class JacobianOfPoint implements FunctionNtoMxN<DMatrixRMaj> {
 
-		double gradX[],gradY[];
+		double[] gradX;
+		double[] gradY;
 
-		public JacobianOfPoint( double []parameters ) {
-			model.setIntrinsic(parameters,0);
+		public JacobianOfPoint( double[] parameters ) {
+			model.setIntrinsic(parameters, 0);
 			gradX = new double[3];
 			gradY = new double[3];
 		}
 
 		@Override
-		public void process(double[] input, DMatrixRMaj output) {
-			model.jacobian(input[0],input[1],input[2],gradX,gradY,false,null,null);
+		public void process( double[] input, DMatrixRMaj output ) {
+			model.jacobian(input[0], input[1], input[2], gradX, gradY, false, null, null);
 			for (int i = 0; i < 3; i++) {
 				output.data[i] = gradX[i];
-				output.data[3+i] = gradY[i];
+				output.data[3 + i] = gradY[i];
 			}
 		}
 
@@ -176,23 +177,22 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		@Override
 		public DMatrixRMaj declareMatrixMxN() {
-			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
+			return new DMatrixRMaj(getNumOfOutputsM(), getNumOfInputsN());
 		}
 	}
 
-	private class FunctionOfParameters implements FunctionNtoM
-	{
+	private class FunctionOfParameters implements FunctionNtoM {
 		Point2D_F64 p = new Point2D_F64();
 		double[] X;
 
-		public FunctionOfParameters( double X[]) {
+		public FunctionOfParameters( double[] X ) {
 			this.X = X;
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
-			model.setIntrinsic(input,0);
-			model.project(X[0],X[1],X[2],p);
+		public void process( double[] input, double[] output ) {
+			model.setIntrinsic(input, 0);
+			model.project(X[0], X[1], X[2], p);
 			output[0] = p.x;
 			output[1] = p.y;
 		}
@@ -208,10 +208,10 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 		}
 	}
 
-	private class JacobianOfParameters implements FunctionNtoMxN<DMatrixRMaj>
-	{
+	private class JacobianOfParameters implements FunctionNtoMxN<DMatrixRMaj> {
 		double[] X;
-		double gradX[],gradY[];
+		double[] gradX;
+		double[] gradY;
 
 		public JacobianOfParameters( double[] X ) {
 			this.X = X;
@@ -220,13 +220,13 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 		}
 
 		@Override
-		public void process(double[] input, DMatrixRMaj output) {
-			model.setIntrinsic(input,0);
-			model.jacobian(X[0],X[1],X[2],new double[3],new double[3],true,gradX,gradY);
+		public void process( double[] input, DMatrixRMaj output ) {
+			model.setIntrinsic(input, 0);
+			model.jacobian(X[0], X[1], X[2], new double[3], new double[3], true, gradX, gradY);
 			int N = gradX.length;
 			for (int i = 0; i < N; i++) {
 				output.data[i] = gradX[i];
-				output.data[N+i] = gradY[i];
+				output.data[N + i] = gradY[i];
 			}
 		}
 
@@ -242,8 +242,7 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 		@Override
 		public DMatrixRMaj declareMatrixMxN() {
-			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
+			return new DMatrixRMaj(getNumOfOutputsM(), getNumOfInputsN());
 		}
 	}
-
 }

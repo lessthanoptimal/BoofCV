@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestDescribeImageDenseSift {
 
 	int width = 120;
@@ -46,12 +47,12 @@ public class TestDescribeImageDenseSift {
 
 	Random rand = new Random(234);
 
-	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
+	Class[] imageTypes = new Class[]{GrayU8.class, GrayF32.class};
 
 	int widthScaleOne;
 
 	public TestDescribeImageDenseSift() {
-		DescribeImageDenseSift alg = createAlg(GrayU8.class,5,5);
+		DescribeImageDenseSift alg = createAlg(GrayU8.class, 5, 5);
 		widthScaleOne = alg.getAlg().getCanonicalRadius()*2;
 	}
 
@@ -60,24 +61,24 @@ public class TestDescribeImageDenseSift {
 	 */
 	@Test
 	public void checkSampleLocations() {
-		for( Class type : imageTypes ) {
-			ImageGray image = GeneralizedImageOps.createSingleBand(type,width,height);
-			GImageMiscOps.fillUniform(image,rand,0,200);
+		for (Class type : imageTypes) {
+			ImageGray image = GeneralizedImageOps.createSingleBand(type, width, height);
+			GImageMiscOps.fillUniform(image, rand, 0, 200);
 
-			DescribeImageDense alg = createAlg(type,8,9);
+			DescribeImageDense alg = createAlg(type, 8, 9);
 
 			alg.process(image);
 
 			List<Point2D_I32> locations = alg.getLocations();
 
-			for( int i = 0; i < locations.size(); i++ ) {
+			for (int i = 0; i < locations.size(); i++) {
 				Point2D_I32 p = locations.get(i);
 
-				TupleDesc_F64 expected = describe(p.x,p.y,image,alg);
+				TupleDesc_F64 expected = describe(p.x, p.y, alg);
 				TupleDesc_F64 found = (TupleDesc_F64)alg.getDescriptions().get(i);
 
 				for (int j = 0; j < expected.size(); j++) {
-					assertEquals(expected.value[j],found.value[j],1e-8);
+					assertEquals(expected.value[j], found.value[j], 1e-8);
 				}
 			}
 		}
@@ -88,11 +89,11 @@ public class TestDescribeImageDenseSift {
 	 */
 	@Test
 	public void checkBorder() {
-		for( Class type : imageTypes ) {
-			ImageGray image = GeneralizedImageOps.createSingleBand(type,width,height);
-			GImageMiscOps.fillUniform(image,rand,0,200);
+		for (Class type : imageTypes) {
+			ImageGray image = GeneralizedImageOps.createSingleBand(type, width, height);
+			GImageMiscOps.fillUniform(image, rand, 0, 200);
 
-			DescribeImageDense alg = createAlg(type,8,9);
+			DescribeImageDense alg = createAlg(type, 8, 9);
 
 			alg.process(image);
 
@@ -101,29 +102,29 @@ public class TestDescribeImageDenseSift {
 			int w = getWidthScaleOfOne();
 			int r = w/2;
 
-			int numCols = (image.width-w)/8;
-			int numRows = (image.height-w)/9;
-			assertEquals(numCols*numRows,locations.size());
+			int numCols = (image.width - w)/8;
+			int numRows = (image.height - w)/9;
+			assertEquals(numCols*numRows, locations.size());
 
-			for( Point2D_I32 p : locations ) {
-				assertTrue(p.x >= r && p.x <= width-r );
-				assertTrue( p.y >= r && p.y <= height-r );
+			for (Point2D_I32 p : locations) {
+				assertTrue(p.x >= r && p.x <= width - r);
+				assertTrue(p.y >= r && p.y <= height - r);
 			}
 		}
 	}
 
-	private <T extends DescribeImageDense> T createAlg( Class imageType , double periodX , double periodY  ) {
+	private <T extends DescribeImageDense> T createAlg( Class imageType, double periodX, double periodY ) {
 
-		ConfigDenseSift config = new ConfigDenseSift(new DenseSampling(periodX,periodY));
+		ConfigDenseSift config = new ConfigDenseSift(new DenseSampling(periodX, periodY));
 
-		return (T)FactoryDescribeImageDense.sift(config,imageType);
+		return (T)FactoryDescribeImageDense.sift(config, imageType);
 	}
 
-	private TupleDesc_F64 describe(int x , int y , ImageGray image , DescribeImageDense alg ) {
+	private TupleDesc_F64 describe( int x, int y, DescribeImageDense alg ) {
 		DescribeImageDenseSift sift = (DescribeImageDenseSift)alg;
 
 		TupleDesc_F64 output = sift.createDescription();
-		sift.alg.computeDescriptor(x,y,output);
+		sift.alg.computeDescriptor(x, y, output);
 
 		return output;
 	}

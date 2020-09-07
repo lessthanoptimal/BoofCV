@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class FourPointSyntheticStability {
 	protected Point2Transform2_F64 normToPixel;
 
 	// Used to estimate target to camera pose
-	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE,-1,-1);
+	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE, -1, -1);
 
 	Se3_F64 referenceCameraToTarget = new Se3_F64();
 	Se3_F64 targetToCameraSample = new Se3_F64();
@@ -69,46 +69,44 @@ public class FourPointSyntheticStability {
 
 	public FourPointSyntheticStability() {
 		for (int i = 0; i < 4; i++) {
-			points2D3D.add( new Point2D3D() );
-			refPixels.add( new Point2D_F64() );
-			refNorm.add( new Point2D_F64() );
+			points2D3D.add(new Point2D3D());
+			refPixels.add(new Point2D_F64());
+			refNorm.add(new Point2D_F64());
 		}
 	}
 
 	/**
 	 * Specifies how to convert to and from pixels
-	 * @param pixelToNorm
-	 * @param normToPixel
 	 */
-	public void setTransforms( Point2Transform2_F64 pixelToNorm ,
-							   Point2Transform2_F64 normToPixel )
-	{
+	public void setTransforms( Point2Transform2_F64 pixelToNorm,
+							   Point2Transform2_F64 normToPixel ) {
 		this.pixelToNorm = pixelToNorm;
 		this.normToPixel = normToPixel;
 	}
 
 	/**
 	 * Specifes how big the fiducial is along two axises
+	 *
 	 * @param width Length along x-axis
 	 * @param height Length along y-axis
 	 */
-	public void setShape(double width , double height ) {
-		points2D3D.get(0).location.set(-width/2,-height/2,0);
-		points2D3D.get(1).location.set(-width/2, height/2,0);
-		points2D3D.get(2).location.set( width/2, height/2,0);
-		points2D3D.get(3).location.set( width/2,-height/2,0);
+	public void setShape( double width, double height ) {
+		points2D3D.get(0).location.set(-width/2, -height/2, 0);
+		points2D3D.get(1).location.set(-width/2, height/2, 0);
+		points2D3D.get(2).location.set(width/2, height/2, 0);
+		points2D3D.get(3).location.set(width/2, -height/2, 0);
 	}
 
 	/**
 	 * Estimate how sensitive this observation is to pixel noise
+	 *
 	 * @param targetToCamera Observed target to camera pose estimate
 	 * @param disturbance How much the observation should be noised up, in pixels
 	 * @param results description how how sensitive the stability estimate is
-	 * @return true if stability could be computed
 	 */
-	public void computeStability(Se3_F64 targetToCamera ,
-								 double disturbance,
-								 FiducialStability results) {
+	public void computeStability( Se3_F64 targetToCamera,
+								  double disturbance,
+								  FiducialStability results ) {
 
 		targetToCamera.invert(referenceCameraToTarget);
 
@@ -119,18 +117,18 @@ public class FourPointSyntheticStability {
 		for (int i = 0; i < points2D3D.size(); i++) {
 			Point2D3D p23 = points2D3D.get(i);
 
-			targetToCamera.transform(p23.location,cameraPt);
+			targetToCamera.transform(p23.location, cameraPt);
 			p23.observation.x = cameraPt.x/cameraPt.z;
 			p23.observation.y = cameraPt.y/cameraPt.z;
 
 			refNorm.get(i).set(p23.observation);
 
-			normToPixel.compute(p23.observation.x,p23.observation.y,refPixels.get(i));
+			normToPixel.compute(p23.observation.x, p23.observation.y, refPixels.get(i));
 		}
 
 		for (int i = 0; i < points2D3D.size(); i++) {
 			// see what happens if you tweak this observation a little bit
-			perturb( disturbance, refPixels.get(i), points2D3D.get(i));
+			perturb(disturbance, refPixels.get(i), points2D3D.get(i));
 			// set it back to the nominal value
 			points2D3D.get(i).observation.set(refNorm.get(i));
 		}
@@ -146,24 +144,24 @@ public class FourPointSyntheticStability {
 	 * @param pixel observed pixel
 	 * @param p23 observation plugged into PnP
 	 */
-	private void perturb(double disturbance , Point2D_F64 pixel , Point2D3D p23 ) {
+	private void perturb( double disturbance, Point2D_F64 pixel, Point2D3D p23 ) {
 		double x;
 		double y = pixel.y;
 
 		x = pixel.x + disturbance;
-		computeDisturbance( x,y, p23);
+		computeDisturbance(x, y, p23);
 		x = pixel.x - disturbance;
-		computeDisturbance( x,y, p23);
+		computeDisturbance(x, y, p23);
 		x = pixel.x;
 		y = pixel.y + disturbance;
-		computeDisturbance( x,y, p23);
+		computeDisturbance(x, y, p23);
 		y = pixel.y - disturbance;
-		computeDisturbance( x,y, p23);
+		computeDisturbance(x, y, p23);
 	}
 
-	private void computeDisturbance( double x ,double y, Point2D3D p23) {
-		pixelToNorm.compute(x,y,p23.observation);
-		if( estimatePnP.process(points2D3D,targetToCameraSample) ) {
+	private void computeDisturbance( double x, double y, Point2D3D p23 ) {
+		pixelToNorm.compute(x, y, p23.observation);
+		if (estimatePnP.process(points2D3D, targetToCameraSample)) {
 			referenceCameraToTarget.concat(targetToCameraSample, difference);
 
 			double d = difference.getT().norm();

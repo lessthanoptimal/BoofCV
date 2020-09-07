@@ -59,7 +59,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	protected int saveCounter = 0;
 	protected boolean saveRequested = false;
 
-	public DetectBlackShapeAppBase(List<String> examples , Class<T> imageType) {
+	protected DetectBlackShapeAppBase(List<String> examples , Class<T> imageType) {
 		super(examples, ImageType.single(imageType));
 		this.imageClass = imageType;
 
@@ -183,6 +183,8 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 					saveRequested = true;
 				}
 				break;
+
+			default: break;
 		}
 	}
 

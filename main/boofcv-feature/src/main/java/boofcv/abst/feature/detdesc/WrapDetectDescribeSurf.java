@@ -36,9 +36,9 @@ import java.util.List;
 /**
  * Wrapper around SURF algorithms for {@link DetectDescribePoint}.
  *
- * @link FastHessianFeatureDetector
- * @link OrientationIntegral
- * @link DescribePointSurf
+ * @see FastHessianFeatureDetector
+ * @see OrientationIntegral
+ * @see DescribePointSurf
  *
  * @param <T> Input image type
  * @param <II> Integral image type

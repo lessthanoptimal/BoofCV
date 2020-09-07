@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.calib;
 
+import boofcv.struct.image.ImageDimension;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 
 /**
@@ -27,13 +30,13 @@ import java.io.Serializable;
  */
 public abstract class CameraModel implements Serializable {
 	/** image shape (units: pixels) */
-	public int width,height;
+	public int width, height;
 
 	public int getWidth() {
 		return width;
 	}
 
-	public void setWidth(int width) {
+	public void setWidth( int width ) {
 		this.width = width;
 	}
 
@@ -41,12 +44,19 @@ public abstract class CameraModel implements Serializable {
 		return height;
 	}
 
-	public void setHeight(int height) {
+	public void setHeight( int height ) {
 		this.height = height;
+	}
+
+	public ImageDimension getDimension( @Nullable ImageDimension dimension ) {
+		if (dimension == null)
+			dimension = new ImageDimension();
+		dimension.set(width, height);
+		return dimension;
 	}
 
 	/**
 	 * Creates a new camera model with zero values of the same type os this one
 	 */
-	public abstract <T extends CameraModel>T createLike();
+	public abstract <T extends CameraModel> T createLike();
 }

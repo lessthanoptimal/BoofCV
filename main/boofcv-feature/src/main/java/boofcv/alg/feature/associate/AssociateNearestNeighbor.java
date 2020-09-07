@@ -47,8 +47,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class AssociateNearestNeighbor<D>
-		implements AssociateDescription<D>
-{
+		implements AssociateDescription<D> {
 	// Nearest Neighbor algorithm and storage for the results
 	NearestNeighbor<D> alg;
 
@@ -58,10 +57,10 @@ public abstract class AssociateNearestNeighbor<D>
 	int sizeSrc;
 
 	// should the square root of the distance be used instead of the actual distance
-	boolean ratioUsesSqrt =true;
+	boolean ratioUsesSqrt = true;
 
 	// A match is only accepted if the score of the second match over the best match is less than this value
-	double scoreRatioThreshold =1.0;
+	double scoreRatioThreshold = 1.0;
 
 	// List of final associated points
 	protected final FastQueue<AssociatedIndex> matchesAll = new FastQueue<>(100, AssociatedIndex::new);
@@ -72,18 +71,18 @@ public abstract class AssociateNearestNeighbor<D>
 	// maximum distance away two points can be
 	double maxDistance = -1;
 
-	public AssociateNearestNeighbor(NearestNeighbor<D> alg) {
+	protected AssociateNearestNeighbor( NearestNeighbor<D> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public void setSource(FastAccess<D> listSrc) {
+	public void setSource( FastAccess<D> listSrc ) {
 		this.sizeSrc = listSrc.size;
-		alg.setPoints((List)listSrc.toList(),true);
+		alg.setPoints((List)listSrc.toList(), true);
 	}
 
 	@Override
-	public void setDestination(FastAccess<D> listDst) {
+	public void setDestination( FastAccess<D> listDst ) {
 		this.listDst = listDst;
 	}
 
@@ -94,16 +93,16 @@ public abstract class AssociateNearestNeighbor<D>
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return unassociated.checkSource(matchesAll,sizeSrc);
+		return unassociated.checkSource(matchesAll, sizeSrc);
 	}
 
 	@Override
 	public GrowQueue_I32 getUnassociatedDestination() {
-		return unassociated.checkDestination(matchesAll,listDst.size());
+		return unassociated.checkDestination(matchesAll, listDst.size());
 	}
 
 	@Override
-	public void setMaxScoreThreshold(double score) {
+	public void setMaxScoreThreshold( double score ) {
 		this.maxDistance = score;
 	}
 
@@ -126,7 +125,7 @@ public abstract class AssociateNearestNeighbor<D>
 		return ratioUsesSqrt;
 	}
 
-	public void setRatioUsesSqrt(boolean ratioUsesSqrt) {
+	public void setRatioUsesSqrt( boolean ratioUsesSqrt ) {
 		this.ratioUsesSqrt = ratioUsesSqrt;
 	}
 
@@ -134,7 +133,7 @@ public abstract class AssociateNearestNeighbor<D>
 		return scoreRatioThreshold;
 	}
 
-	public void setScoreRatioThreshold(double scoreRatioThreshold) {
+	public void setScoreRatioThreshold( double scoreRatioThreshold ) {
 		this.scoreRatioThreshold = scoreRatioThreshold;
 	}
 }

@@ -39,15 +39,15 @@ import java.util.List;
  */
 public abstract class BaseImageClassifier implements ImageClassifier<Planar<GrayF32>> {
 
-	protected FunctionSequence<Tensor_F32,Function<Tensor_F32>> network;
+	protected FunctionSequence<Tensor_F32, Function<Tensor_F32>> network;
 
 	// List of all the categories
 	protected List<String> categories = new ArrayList<>();
 
-	protected ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
+	protected ImageType<Planar<GrayF32>> imageType = ImageType.pl(3, GrayF32.class);
 
 	// Resizes input image for the network
-	protected ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(true,imageType);
+	protected ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(true, imageType);
 
 	// size of square image
 	protected int imageSize;
@@ -63,22 +63,19 @@ public abstract class BaseImageClassifier implements ImageClassifier<Planar<Gray
 	protected FastQueue<Score> categoryScores = new FastQueue<>(Score::new);
 	protected int categoryBest;
 
-	Comparator<Score> comparator = new Comparator<Score>() {
-		@Override
-		public int compare(Score o1, Score o2) {
-			if( o1.score < o2.score )
-				return 1;
-			else if( o1.score > o2.score )
-				return -1;
-			else
-				return 0;
-		}
+	Comparator<Score> comparator = ( o1, o2 ) -> {
+		if (o1.score < o2.score)
+			return 1;
+		else if (o1.score > o2.score)
+			return -1;
+		else
+			return 0;
 	};
 
-	public BaseImageClassifier( int imageSize ) {
+	protected BaseImageClassifier( int imageSize ) {
 		this.imageSize = imageSize;
-		imageRgb = new Planar<>(GrayF32.class,imageSize,imageSize,3);
-		tensorInput = new Tensor_F32(1,3,imageSize,imageSize);
+		imageRgb = new Planar<>(GrayF32.class, imageSize, imageSize, 3);
+		tensorInput = new Tensor_F32(1, 3, imageSize, imageSize);
 	}
 
 	@Override
@@ -93,46 +90,45 @@ public abstract class BaseImageClassifier implements ImageClassifier<Planar<Gray
 	 * @param image Image being processed.  Must be RGB image.  Pixel values must have values from 0 to 255.
 	 */
 	@Override
-	public void classify(Planar<GrayF32> image) {
-		DataManipulationOps.imageToTensor(preprocess(image),tensorInput,0);
+	public void classify( Planar<GrayF32> image ) {
+		DataManipulationOps.imageToTensor(preprocess(image), tensorInput, 0);
 		innerProcess(tensorInput);
 	}
 
 	/**
 	 * Massage the input image into a format recognized by the network
 	 */
-	protected Planar<GrayF32> preprocess(Planar<GrayF32> image) {
+	protected Planar<GrayF32> preprocess( Planar<GrayF32> image ) {
 		// Shrink the image to input size
-		if( image.width == imageSize && image.height == imageSize ) {
+		if (image.width == imageSize && image.height == imageSize) {
 			this.imageRgb.setTo(image);
-		} else if( image.width < imageSize || image.height < imageSize ) {
+		} else if (image.width < imageSize || image.height < imageSize) {
 			throw new IllegalArgumentException("Image width or height is too small");
 		} else {
-			massage.massage(image,imageRgb);
+			massage.massage(image, imageRgb);
 		}
 		return imageRgb;
 	}
 
-
 	protected void innerProcess( Tensor_F32 tensorInput ) {
 		// process the tensor
-		network.process(tensorInput,tensorOutput);
+		network.process(tensorInput, tensorOutput);
 
 		// now find the best score and sort them
 		categoryScores.reset();
 		double scoreBest = -Double.MAX_VALUE;
 		categoryBest = -1;
 		for (int category = 0; category < tensorOutput.length(1); category++) {
-			double score = tensorOutput.get(0,category);
-			categoryScores.grow().set(score,category);
-			if( score > scoreBest ) {
+			double score = tensorOutput.get(0, category);
+			categoryScores.grow().set(score, category);
+			if (score > scoreBest) {
 				scoreBest = score;
 				categoryBest = category;
 			}
 		}
 
 		// order the categories by most to least likely
-		Collections.sort(categoryScores.toList(),comparator);
+		Collections.sort(categoryScores.toList(), comparator);
 	}
 
 	@Override

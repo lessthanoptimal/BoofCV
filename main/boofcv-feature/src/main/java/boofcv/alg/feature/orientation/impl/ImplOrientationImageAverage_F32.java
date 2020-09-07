@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,7 @@ public class ImplOrientationImageAverage_F32 extends OrientationImageAverage<Gra
 		return Math.atan2(sumY,sumX);
 	}
 
+	@Override
 	public Class<GrayF32> getImageType() {
 		return GrayF32.class;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardBinary;
-import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -46,7 +45,7 @@ class TestDetectChessboardBinaryPattern {
 		@Override
 		public List<Point2D_F64> findCorners(int numRows, int numCols, GrayF32 image) {
 			ConfigChessboardBinary configDet = new ConfigChessboardBinary();
-			ConfigGridDimen configChess = new ConfigGridDimen(5, 5, 1);
+//			ConfigGridDimen configChess = new ConfigGridDimen(5, 5, 1);
 
 			DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
 					FactoryShapeDetector.polygon(configDet.square, GrayF32.class);

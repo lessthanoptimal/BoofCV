@@ -44,7 +44,7 @@ public abstract class SelectSparseStandardWta<ArrayType>
 	 * @param maxError Maximum allowed error.  See comments above.
 	 * @param texture Texture threshold.  See comments above.
 	 */
-	public SelectSparseStandardWta(int maxError, double texture, int tolRightToLeft) {
+	protected SelectSparseStandardWta(int maxError, double texture, int tolRightToLeft) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
 		this.tolRightToLeft = tolRightToLeft;
 		setTexture(texture);

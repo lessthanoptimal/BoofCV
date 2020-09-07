@@ -73,9 +73,7 @@ public class P3PFinsterwalder implements P3PLineDistance {
 		this.rootFinder = rootFinder;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+	@Override
 	public boolean process( Point2D_F64 obs1 , Point2D_F64 obs2, Point2D_F64 obs3,
 							double length23 , double length13 , double length12 ) {
 
@@ -173,9 +171,7 @@ public class P3PFinsterwalder implements P3PLineDistance {
 		}
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+	@Override
 	public FastQueue<PointDistance3> getSolutions() {
 		return solutions;
 	}

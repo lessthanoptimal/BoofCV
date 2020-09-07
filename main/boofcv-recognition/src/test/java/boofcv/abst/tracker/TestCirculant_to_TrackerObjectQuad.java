@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,11 +41,13 @@ public class TestCirculant_to_TrackerObjectQuad extends TextureGrayTrackerObject
 	}
 
 	@Test
+	@Override
 	public void zooming_in() {
 		// not supported
 	}
 
 	@Test
+	@Override
 	public void zooming_out() {
 		// not supported
 	}

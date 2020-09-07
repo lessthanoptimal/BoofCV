@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,15 +29,14 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericThresholdBlock<T extends ImageGray<T>>
-{
+public abstract class GenericThresholdBlock<T extends ImageGray<T>> {
 	Class<T> imageType;
 
-	public GenericThresholdBlock(Class<T> imageType) {
+	protected GenericThresholdBlock( Class<T> imageType ) {
 		this.imageType = imageType;
 	}
 
-	public abstract BlockProcessor<T,?> createBlockProcessor( double scale , boolean down );
+	public abstract BlockProcessor<T, ?> createBlockProcessor( double scale, boolean down );
 
 	@Nested
 	class Regular extends GenericThresholdCommon<T> {
@@ -46,10 +45,10 @@ public abstract class GenericThresholdBlock<T extends ImageGray<T>>
 		}
 
 		@Override
-		public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
-			BlockProcessor<T,?> processor = createBlockProcessor(scale,down);
+		public InputToBinary<T> createAlg( int requestedBlockWidth, double scale, boolean down ) {
+			BlockProcessor<T, ?> processor = createBlockProcessor(scale, down);
 			return new ThresholdBlock<>(processor,
-					ConfigLength.fixed(requestedBlockWidth),true,imageType);
+					ConfigLength.fixed(requestedBlockWidth), true, imageType);
 		}
 	}
 
@@ -60,10 +59,10 @@ public abstract class GenericThresholdBlock<T extends ImageGray<T>>
 		}
 
 		@Override
-		public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
-			BlockProcessor<T,?> processor = createBlockProcessor(scale,down);
+		public InputToBinary<T> createAlg( int requestedBlockWidth, double scale, boolean down ) {
+			BlockProcessor<T, ?> processor = createBlockProcessor(scale, down);
 			return new ThresholdBlock_MT<>(processor,
-					ConfigLength.fixed(requestedBlockWidth),true,imageType);
+					ConfigLength.fixed(requestedBlockWidth), true, imageType);
 		}
 	}
 }

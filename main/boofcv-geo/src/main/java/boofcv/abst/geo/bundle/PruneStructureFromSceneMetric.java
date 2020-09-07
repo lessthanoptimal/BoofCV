@@ -71,7 +71,7 @@ public class PruneStructureFromSceneMetric {
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				int pointID = v.point.data[pointIndex];
-				SceneStructureMetric.Point f = structure.points.data[pointID];
+				SceneStructureCommon.Point f = structure.points.data[pointID];
 
 				// Get feature location in world
 				f.get(X);
@@ -82,7 +82,7 @@ public class PruneStructureFromSceneMetric {
 				view.worldToView.transform(X, X);
 
 				// predicted pixel
-				SceneStructureMetric.Camera camera = structure.cameras.data[view.camera];
+				SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
 				camera.model.project(X.x, X.y, X.z, predicted);
 
 				Errors e = new Errors();
@@ -118,7 +118,7 @@ public class PruneStructureFromSceneMetric {
 			SceneObservations.View v = observations.views.data[viewIndex];
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
 				int pointID = v.getPointId(pointIndex);
-				SceneStructureMetric.Point f = structure.points.data[pointID];
+				SceneStructureCommon.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
 				v.get(pointIndex, observation);
 
@@ -148,7 +148,7 @@ public class PruneStructureFromSceneMetric {
 			SceneStructureMetric.View view = structure.views.get(viewIndex);
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
-				SceneStructureMetric.Point f = structure.points.get(v.getPointId(pointIndex));
+				SceneStructureCommon.Point f = structure.points.get(v.getPointId(pointIndex));
 
 				// Get feature location in world
 				f.get(X);
@@ -182,7 +182,7 @@ public class PruneStructureFromSceneMetric {
 			SceneObservations.View v = observations.views.data[viewIndex];
 
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
-				SceneStructureMetric.Point p = structure.points.data[v.getPointId(pointIndex)];
+				SceneStructureCommon.Point p = structure.points.data[v.getPointId(pointIndex)];
 
 				if( p.views.size < count ) {
 					v.remove(pointIndex);
@@ -238,7 +238,7 @@ public class PruneStructureFromSceneMetric {
 		Point3D_F64 worldX = new Point3D_F64();
 		List<Point3D_F64> cloud = new ArrayList<>();
 		for (int i = 0; i < structure.points.size; i++) {
-			SceneStructureMetric.Point structureP = structure.points.data[i];
+			SceneStructureCommon.Point structureP = structure.points.data[i];
 			structureP.get(worldX);
 			cloud.add(worldX.copy());
 		}
@@ -256,7 +256,7 @@ public class PruneStructureFromSceneMetric {
 
 		// identify points which need to be pruned
 		for (int pointId = 0; pointId < structure.points.size; pointId++) {
-			SceneStructureMetric.Point structureP = structure.points.data[pointId];
+			SceneStructureCommon.Point structureP = structure.points.data[pointId];
 			structureP.get(worldX);
 
 			// distance is squared

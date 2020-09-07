@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public abstract class GenericPlanarCalibrationDetectorChecks {
 
-
 	List<ConfigGridDimen> targetConfigs = new ArrayList<>();
 
 	double fisheyeMatchTol = 3.0; // how close a pixel needs to come to be considered a match
@@ -66,50 +65,51 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	// list of posses for fisheye test
 	protected List<Se3_F64> fisheye_poses = new ArrayList<>();
 
-	public GenericPlanarCalibrationDetectorChecks() {
+	protected GenericPlanarCalibrationDetectorChecks() {
 		createFisheyePoses();
 	}
 
 	protected void createFisheyePoses() {
 		Se3_F64 markerToWorld = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+0.2,0,markerToWorld.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI + 0.2, 0, markerToWorld.R);
 
 		// up close exploding - center
-		markerToWorld.T.set(0,0,0.12);
+		markerToWorld.T.set(0, 0, 0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
 		// up close exploding - left
-		markerToWorld.T.set(0.1,0,0.12);
+		markerToWorld.T.set(0.1, 0, 0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
-		markerToWorld.T.set(0.25,0,0.2);
+		markerToWorld.T.set(0.25, 0, 0.2);
 		fisheye_poses.add(markerToWorld.copy());
 
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-0.2,0,markerToWorld.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 0.2, 0, markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
-		markerToWorld.T.set(0.3,0,0.2);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+.5,0,markerToWorld.getR());
+		markerToWorld.T.set(0.3, 0, 0.2);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI + .5, 0, markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+.5,0.5,markerToWorld.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI + .5, 0.5, markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI+.5,0.7,markerToWorld.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI + .5, 0.7, markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 	}
 
 	/**
 	 * Renders an image of the calibration target.
+	 *
 	 * @param config (Optional)
 	 * @param image Storage for rendered calibration target This should be just the calibration target
 	 */
-	public abstract void renderTarget( ConfigGridDimen config ,
-									   double targetWidth ,
-									   GrayF32 image ,
+	public abstract void renderTarget( ConfigGridDimen config,
+									   double targetWidth,
+									   GrayF32 image,
 									   List<Point2D_F64> points2D );
 
-	public abstract DetectorFiducialCalibration createDetector(ConfigGridDimen layout);
+	public abstract DetectorFiducialCalibration createDetector( ConfigGridDimen layout );
 
 	/**
 	 * See if it can detect targets distorted by fisheye lens. Entire target is always seen
@@ -121,44 +121,43 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		simulator.setCamera(model);
 
 		List<Point2D_F64> locations2D = new ArrayList<>();
-		GrayF32 pattern = new GrayF32(1,1);
+		GrayF32 pattern = new GrayF32(1, 1);
 		for (int i = 0; i < targetConfigs.size(); i++) {
 			DetectorFiducialCalibration detector = createDetector(targetConfigs.get(i));
-			renderTarget(targetConfigs.get(i), simulatedTargetWidth,pattern,locations2D);
+			renderTarget(targetConfigs.get(i), simulatedTargetWidth, pattern, locations2D);
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
-			simulator.addSurface(markerToWorld, simulatedTargetWidth,pattern);
+			simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 
 			failedToDetect = 0;
-			for( int j = 0; j < fisheye_poses.size(); j++ ) {
+			for (int j = 0; j < fisheye_poses.size(); j++) {
 //				System.out.println("fisheye pose = "+j);
 				markerToWorld.set(fisheye_poses.get(j));
-				checkRenderedResults(detector,simulator,locations2D);
+				checkRenderedResults(detector, simulator, locations2D);
 			}
 		}
-		assertTrue(failedToDetect<=fisheyeAllowedFails);
+		assertTrue(failedToDetect <= fisheyeAllowedFails);
 	}
 
-	private void checkRenderedResults(DetectorFiducialCalibration detector,
-									  SimulatePlanarWorld simulator ,
-									  List<Point2D_F64> locations2D )
-	{
+	private void checkRenderedResults( DetectorFiducialCalibration detector,
+									   SimulatePlanarWorld simulator,
+									   List<Point2D_F64> locations2D ) {
 //		System.out.println("checkRendered");
 		simulator.render();
 
 //		visualize(simulator, locations2D, null);
-		if( !detector.process(simulator.getOutput())) {
+		if (!detector.process(simulator.getOutput())) {
 			visualize(simulator, locations2D, null);
 			failedToDetect++;
 			return;
 		}
 
-		checkResults(simulator,detector.getDetectedPoints(), locations2D);
+		checkResults(simulator, detector.getDetectedPoints(), locations2D);
 	}
 
-	protected void checkResults(SimulatePlanarWorld simulator, CalibrationObservation found, List<Point2D_F64> locations2D) {
-		if( locations2D.size() != found.size() ) {
+	protected void checkResults( SimulatePlanarWorld simulator, CalibrationObservation found, List<Point2D_F64> locations2D ) {
+		if (locations2D.size() != found.size()) {
 			visualize(simulator, locations2D, found);
 			fail("Number of detected points miss match");
 		}
@@ -167,35 +166,35 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		for (int i = 0; i < locations2D.size(); i++) {
 			Point2D_F64 p = locations2D.get(i);
-			simulator.computePixel( 0, p.x , p.y , truth);
+			simulator.computePixel(0, p.x, p.y, truth);
 
 			// TODO ensure that the order is correct. Kinda a pain since some targets have symmetry...
 			double bestDistance = Double.MAX_VALUE;
 			for (int j = 0; j < found.size(); j++) {
 				double distance = found.get(j).distance(truth);
-				if( distance < bestDistance ) {
+				if (distance < bestDistance) {
 					bestDistance = distance;
 				}
 			}
-			if( bestDistance > fisheyeMatchTol ) {
+			if (bestDistance > fisheyeMatchTol) {
 				visualize(simulator, locations2D, found);
-				fail("Didn't find a match: best distance "+bestDistance);
+				fail("Didn't find a match: best distance " + bestDistance);
 			}
 		}
 	}
 
-	protected void visualize(SimulatePlanarWorld simulator, List<Point2D_F64> locations2D, CalibrationObservation found) {
-		if( !visualizeFailures )
+	protected void visualize( SimulatePlanarWorld simulator, List<Point2D_F64> locations2D, CalibrationObservation found ) {
+		if (!visualizeFailures)
 			return;
 		GrayF32 output = simulator.getOutput();
-		BufferedImage buff = new BufferedImage(output.width,output.height,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(simulator.getOutput(),buff,true);
+		BufferedImage buff = new BufferedImage(output.width, output.height, BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.convertTo(simulator.getOutput(), buff, true);
 
-		UtilImageIO.saveImage(buff,"failed.png");
+		UtilImageIO.saveImage(buff, "failed.png");
 
 		Graphics2D g2 = buff.createGraphics();
-		Point2D_F64 p,f;
-		if( found != null ) {
+		Point2D_F64 p, f;
+		if (found != null) {
 			for (int j = 0; j < found.size(); j++) {
 				f = found.get(j);
 				VisualizeFeatures.drawPoint(g2, f.x, f.y, 2, Color.RED, false);
@@ -210,15 +209,15 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		g2.setStroke(new BasicStroke(2));
 		for (int j = 0; j < locations2D.size(); j++) {
 			p = locations2D.get(j);
-			simulator.computePixel( 0, p.x , p.y , truth);
-			VisualizeFeatures.drawCircle(g2,truth.x,truth.y,4);
+			simulator.computePixel(0, p.x, p.y, truth);
+			VisualizeFeatures.drawCircle(g2, truth.x, truth.y, 4);
 		}
 		p = locations2D.get(0);
 		g2.setStroke(new BasicStroke(5));
-		simulator.computePixel( 0, p.x , p.y , truth);
-		VisualizeFeatures.drawCircle(g2,truth.x,truth.y,4);
+		simulator.computePixel(0, p.x, p.y, truth);
+		VisualizeFeatures.drawCircle(g2, truth.x, truth.y, 4);
 
-		ShowImages.showWindow(buff,"Foo",true);
+		ShowImages.showWindow(buff, "Foo", true);
 		BoofMiscOps.sleep(visualizeTime);
 	}
 
@@ -233,7 +232,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		simulator.setCamera(model);
 
 		List<Point2D_F64> locations2D = new ArrayList<>();
-		GrayF32 pattern = new GrayF32(1,1);
+		GrayF32 pattern = new GrayF32(1, 1);
 		for (int i = 0; i < targetConfigs.size(); i++) {
 //			System.out.println("*---------- Configuration "+i);
 			failedToDetect = 0;
@@ -242,7 +241,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 			simulator.resetScene();
 			Se3_F64 markerToWorld = new Se3_F64();
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld.R);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI, 0, markerToWorld.R);
 			simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 
 			// up close exploding - center
@@ -256,43 +255,42 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			markerToWorld.T.set(-0.33, 0, 1);
 			checkRenderedResults(detector, simulator, locations2D);
 
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-1,0,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 1, 0, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-1,0.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 1, 0.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
 			markerToWorld.T.set(-0.33, 0.33, 1);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-1,0.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 1, 0.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
 			markerToWorld.T.set(0, -0.20, 1);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8,Math.PI,0.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.8, Math.PI, 0.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8,Math.PI,1.8,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.8, Math.PI, 1.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
 			markerToWorld.T.set(0, -0.15, 1);
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2,Math.PI,2.4,markerToWorld.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.2, Math.PI, 2.4, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 		}
-		assertEquals(0,failedToDetect);
-
+		assertEquals(0, failedToDetect);
 	}
 
-	protected GrayF32 renderEasy( ConfigGridDimen layout , List<Point2D_F64> locations2D ) {
+	protected GrayF32 renderEasy( ConfigGridDimen layout, List<Point2D_F64> locations2D ) {
 		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
 
-		if( locations2D == null )
+		if (locations2D == null)
 			locations2D = new ArrayList<>();
-		GrayF32 pattern = new GrayF32(1,1);
+		GrayF32 pattern = new GrayF32(1, 1);
 		renderTarget(layout, simulatedTargetWidth, pattern, locations2D);
 
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
-		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXyz(0, 0, 0.5,0,Math.PI,0,null);
+		Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXyz(0, 0, 0.5, 0, Math.PI, 0, null);
 		simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 		simulator.render();
 
@@ -304,10 +302,10 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void checkDetectionsNonnull() {
-		for( ConfigGridDimen layout : targetConfigs) {
+		for (ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
-			detector.process(new GrayF32(300,400));
+			detector.process(new GrayF32(300, 400));
 
 			assertNotNull(detector.getDetectedPoints());
 			assertEquals(0, detector.getDetectedPoints().size());
@@ -321,15 +319,15 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	public void checkDetectionsResetOnFailure() {
 		DetectorFiducialCalibration detector = createDetector(targetConfigs.get(0));
 
-		GrayF32 original = renderEasy(targetConfigs.get(0),null);
+		GrayF32 original = renderEasy(targetConfigs.get(0), null);
 
 		detector.process(original);
-		assertTrue( detector.getDetectedPoints().size() > 0 );
+		assertTrue(detector.getDetectedPoints().size() > 0);
 
-		detector.process(new GrayF32(300,400));
+		detector.process(new GrayF32(300, 400));
 
-		assertTrue( detector.getDetectedPoints() != null );
-		assertTrue( detector.getDetectedPoints().size() == 0 );
+		assertNotNull(detector.getDetectedPoints());
+		assertEquals(detector.getDetectedPoints().size(), 0);
 	}
 
 	/**
@@ -343,17 +341,17 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	public void targetIsCentered() {
 		List<Point2D_F64> layout = createDetector(targetConfigs.get(0)).getLayout();
 
-		double minX=Double.MAX_VALUE,maxX=-Double.MAX_VALUE;
-		double minY=Double.MAX_VALUE,maxY=-Double.MAX_VALUE;
+		double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
+		double minY = Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
 
-		for( Point2D_F64 p : layout ) {
-			if( p.x < minX )
+		for (Point2D_F64 p : layout) {
+			if (p.x < minX)
 				minX = p.x;
-			if( p.x > maxX )
+			if (p.x > maxX)
 				maxX = p.x;
-			if( p.y < minY )
+			if (p.y < minY)
 				minY = p.y;
-			if( p.y > maxY )
+			if (p.y > maxY)
 				maxY = p.y;
 		}
 
@@ -366,10 +364,10 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void dataNotRecycled() {
-		for( ConfigGridDimen layout : targetConfigs) {
+		for (ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
-			GrayF32 original = renderEasy(layout,null);
+			GrayF32 original = renderEasy(layout, null);
 			assertTrue(detector.process(original));
 			CalibrationObservation found0 = detector.getDetectedPoints();
 
@@ -377,28 +375,27 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			CalibrationObservation found1 = detector.getDetectedPoints();
 
 			assertEquals(found0.size(), found1.size());
-			assertTrue(found0 != found1);
+			assertNotSame(found0, found1);
 			for (int i = 0; i < found0.size(); i++) {
 				PointIndex2D_F64 p0 = found0.get(i);
 
 				for (int j = 0; j < found1.size(); j++) {
 					PointIndex2D_F64 p1 = found1.get(j);
-					assertFalse(p0==p1);
+					assertNotSame(p0, p1);
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * Observations points should always be in increasing order
 	 */
 	@Test
 	public void checkPointIndexIncreasingOrder() {
-		for( ConfigGridDimen layout : targetConfigs) {
+		for (ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
-			GrayF32 original = renderEasy(layout,null);
+			GrayF32 original = renderEasy(layout, null);
 			assertTrue(detector.process(original));
 			CalibrationObservation found = detector.getDetectedPoints();
 

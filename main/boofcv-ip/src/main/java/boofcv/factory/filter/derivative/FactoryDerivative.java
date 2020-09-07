@@ -51,35 +51,28 @@ public class FactoryDerivative {
 	 * @return Gradient
 	 */
 	public static <I extends ImageMultiBand<I>, M extends ImageMultiBand<M>, D extends ImageGray<D>>
-	ImageGradient<I,D> gradientReduce( ImageGradient<I,M> gradient ,
-									   DerivativeReduceType type,
-									   Class<D> outputType )
-	{
+	ImageGradient<I, D> gradientReduce( ImageGradient<I, M> gradient,
+										DerivativeReduceType type,
+										Class<D> outputType ) {
 
 		String name;
 
-		switch( type ) {
-			case MAX_F: name = "maxf"; break;
-			default:
-				throw new RuntimeException("Unknown reduce type "+type);
-		}
-
-		Class middleType;
-		switch( gradient.getDerivativeType().getFamily()) {
-			case PLANAR:
-				middleType = Planar.class;
+		switch (type) {
+			case MAX_F:
+				name = "maxf";
 				break;
-
-			case GRAY:
-				throw new IllegalArgumentException("Can't have gradient output be single band");
-
 			default:
-				middleType = gradient.getDerivativeType().getImageClass();
+				throw new RuntimeException("Unknown reduce type " + type);
 		}
 
+		Class middleType = switch (gradient.getDerivativeType().getFamily()) {
+			case PLANAR -> Planar.class;
+			case GRAY -> throw new IllegalArgumentException("Can't have gradient output be single band");
+			default -> gradient.getDerivativeType().getImageClass();
+		};
 
-		Method m = findReduce(name,middleType, outputType);
-		GradientMultiToSingleBand_Reflection<M,D> reducer =
+		Method m = findReduce(name, middleType, outputType);
+		GradientMultiToSingleBand_Reflection<M, D> reducer =
 				new GradientMultiToSingleBand_Reflection<>(m, gradient.getDerivativeType(), outputType);
 
 		return new ImageGradientThenReduce<>(gradient, reducer);
@@ -97,30 +90,18 @@ public class FactoryDerivative {
 	 * @return gradient filter
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I,D> gradientSB( DerivativeType type , Class<I> inputType , Class<D> derivType )
-	{
-		if( derivType == null )
+	ImageGradient<I, D> gradientSB( DerivativeType type, Class<I> inputType, Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		switch( type ) {
-			case PREWITT:
-				return new ImageGradient_SB.Prewitt<>(inputType, derivType);
-
-			case SOBEL:
-				return new ImageGradient_SB.Sobel<>(inputType, derivType);
-
-			case THREE:
-				return new ImageGradient_SB.Three<>(inputType, derivType);
-
-			case TWO_0:
-				return new ImageGradient_SB.Two0<>(inputType, derivType);
-
-			case TWO_1:
-				return new ImageGradient_SB.Two1<>(inputType, derivType);
-
-			default:
-				throw new IllegalArgumentException("Unknown derivative type "+type);
-		}
+		return switch (type) {
+			case PREWITT -> new ImageGradient_SB.Prewitt<>(inputType, derivType);
+			case SOBEL -> new ImageGradient_SB.Sobel<>(inputType, derivType);
+			case THREE -> new ImageGradient_SB.Three<>(inputType, derivType);
+			case TWO_0 -> new ImageGradient_SB.Two0<>(inputType, derivType);
+			case TWO_1 -> new ImageGradient_SB.Two1<>(inputType, derivType);
+			default -> throw new IllegalArgumentException("Unknown derivative type " + type);
+		};
 	}
 
 	/**
@@ -136,13 +117,11 @@ public class FactoryDerivative {
 	 * @return the filter
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<Planar<I>,Planar<D>>
-	gradientPL(DerivativeType type , int numBands , Class<I> inputType , @Nullable Class<D> derivType )
-	{
-		ImageGradient<I,D> g = gradientSB(type,inputType,derivType);
+	ImageGradient<Planar<I>, Planar<D>>
+	gradientPL( DerivativeType type, int numBands, Class<I> inputType, @Nullable Class<D> derivType ) {
+		ImageGradient<I, D> g = gradientSB(type, inputType, derivType);
 		return new ImageGradient_PL<>(g, numBands);
 	}
-
 
 	/**
 	 * Creates a {@link ImageGradient} for an arbitrary image type. The border will be handled
@@ -155,11 +134,10 @@ public class FactoryDerivative {
 	 * @param <D> Derivative type
 	 */
 	public static <I extends ImageBase<I>, D extends ImageBase<D>>
-	ImageGradient<I,D>
-	gradient(DerivativeType type , ImageType<I> inputType , @Nullable ImageType<D> derivType )
-	{
-		if( derivType != null ) {
-			if( inputType.getFamily() != derivType.getFamily() )
+	ImageGradient<I, D>
+	gradient( DerivativeType type, ImageType<I> inputType, @Nullable ImageType<D> derivType ) {
+		if (derivType != null) {
+			if (inputType.getFamily() != derivType.getFamily())
 				throw new IllegalArgumentException("input and output must be of the same family");
 		}
 
@@ -179,145 +157,107 @@ public class FactoryDerivative {
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I,D> prewitt( Class<I> inputType , @Nullable Class<D> derivType)
-	{
-		if( derivType == null )
+	ImageGradient<I, D> prewitt( Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		return new ImageGradient_SB.Prewitt<>(inputType,derivType);
+		return new ImageGradient_SB.Prewitt<>(inputType, derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I,D> sobel( Class<I> inputType , @Nullable Class<D> derivType)
-	{
-		if( derivType == null )
+	ImageGradient<I, D> sobel( Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		return new ImageGradient_SB.Sobel<>(inputType,derivType);
+		return new ImageGradient_SB.Sobel<>(inputType, derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I,D> three( Class<I> inputType , @Nullable Class<D> derivType)
-	{
-		if( derivType == null )
+	ImageGradient<I, D> three( Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		return new ImageGradient_SB.Three<>(inputType,derivType);
+		return new ImageGradient_SB.Three<>(inputType, derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I,D> two0(Class<I> inputType, @Nullable Class<D> derivType)
-	{
-		if( derivType == null )
+	ImageGradient<I, D> two0( Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		return new ImageGradient_SB.Two0<>(inputType,derivType);
+		return new ImageGradient_SB.Two0<>(inputType, derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I,D> two1(Class<I> inputType, @Nullable Class<D> derivType)
-	{
-		if( derivType == null )
+	ImageGradient<I, D> two1( Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		return new ImageGradient_SB.Two1<>(inputType,derivType);
+		return new ImageGradient_SB.Two1<>(inputType, derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageHessianDirect<I,D> hessianDirectThree( Class<I> inputType , @Nullable Class<D> derivType)
-	{
-		if( derivType == null )
+	ImageHessianDirect<I, D> hessianDirectThree( Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		return new ImageHessianDirect_SB.Three<>(inputType,derivType);
-	}
-
-	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageHessianDirect<I,D> hessianDirectSobel( Class<I> inputType , @Nullable Class<D> derivType)
-	{
-		if( derivType == null )
-			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		return new ImageHessianDirect_SB.Sobel<>(inputType,derivType);
+		return new ImageHessianDirect_SB.Three<>(inputType, derivType);
 	}
 
 	public static <D extends ImageGray<D>>
-	ImageHessian<D> hessian( Class<?> gradientType , @Nullable Class<D> derivType ) {
-		Method m = findHessianFromGradient(gradientType,derivType);
+	ImageHessian<D> hessian( Class<?> gradientType, @Nullable Class<D> derivType ) {
+		Method m = findHessianFromGradient(gradientType, derivType);
 		return new ImageHessian_Reflection<>(m);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	ImageGradient<I,D> gaussian( double sigma , int radius , Class<I> inputType , @Nullable Class<D> derivType) {
-		if( derivType == null )
+	ImageGradient<I, D> gaussian( double sigma, int radius, Class<I> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		return new ImageGradient_Gaussian<>(sigma, radius, inputType, derivType);
 	}
 
-	public static <D extends ImageGray<D>> ImageHessian<D> hessianSobel(Class<D> derivType ) {
-		if( derivType == GrayF32.class )
-			return (ImageHessian<D>)hessian(GradientSobel.class,GrayF32.class);
-		else if( derivType == GrayS16.class )
-			return (ImageHessian<D>)hessian(GradientSobel.class,GrayS16.class);
+	public static <D extends ImageGray<D>> ImageHessian<D> hessianSobel( Class<D> derivType ) {
+		if (derivType == GrayF32.class)
+			return (ImageHessian<D>)hessian(GradientSobel.class, GrayF32.class);
+		else if (derivType == GrayS16.class)
+			return (ImageHessian<D>)hessian(GradientSobel.class, GrayS16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageGray<D>> ImageHessian<D> hessianPrewitt(Class<D> derivType ) {
-		if( derivType == GrayF32.class )
-			return (ImageHessian<D>)hessian(GradientPrewitt.class,GrayF32.class);
-		else if( derivType == GrayS16.class )
-			return (ImageHessian<D>)hessian(GradientPrewitt.class,GrayS16.class);
+	public static <D extends ImageGray<D>> ImageHessian<D> hessianPrewitt( Class<D> derivType ) {
+		if (derivType == GrayF32.class)
+			return (ImageHessian<D>)hessian(GradientPrewitt.class, GrayF32.class);
+		else if (derivType == GrayS16.class)
+			return (ImageHessian<D>)hessian(GradientPrewitt.class, GrayS16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageGray<D>> ImageHessian<D> hessianThree(Class<D> derivType ) {
-		if( derivType == GrayF32.class )
-			return (ImageHessian<D>)hessian(GradientThree.class,GrayF32.class);
-		else if( derivType == GrayS16.class )
-			return (ImageHessian<D>)hessian(GradientThree.class,GrayS16.class);
+	public static <D extends ImageGray<D>> ImageHessian<D> hessianThree( Class<D> derivType ) {
+		if (derivType == GrayF32.class)
+			return (ImageHessian<D>)hessian(GradientThree.class, GrayF32.class);
+		else if (derivType == GrayS16.class)
+			return (ImageHessian<D>)hessian(GradientThree.class, GrayS16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	private static Method findReduce( String name , Class<?> inputType , @Nullable Class<?> derivType  ) {
+	private static Method findReduce( String name, Class<?> inputType, @Nullable Class<?> derivType ) {
 		Method m;
 		try {
-			m = GradientReduceToSingle.class.getDeclaredMethod(name, inputType,inputType,derivType,derivType);
+			m = GradientReduceToSingle.class.getDeclaredMethod(name, inputType, inputType, derivType, derivType);
 		} catch (NoSuchMethodException e) {
-			throw new RuntimeException("Input and derivative types are probably not compatible",e);
+			throw new RuntimeException("Input and derivative types are probably not compatible", e);
 		}
 		return m;
 	}
 
-	private static Method findDerivative(Class<?> derivativeClass,
-										 Class<?> inputType , @Nullable Class<?> derivType ) {
-		Method m;
-		try {
-			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_S32.class;
-			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,borderType);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException("Input and derivative types are probably not compatible",e);
-		}
-		return m;
-	}
-
-	private static Method findHessian(Class<?> derivativeClass,
-										Class<?> inputType , @Nullable Class<?> derivType ) {
-		Method m;
-		try {
-			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_S32.class;
-			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,derivType,borderType);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException("Input and derivative types are probably not compatible",e);
-		}
-		return m;
-	}
-
-	private static Method findHessianFromGradient(Class<?> derivativeClass, Class<?> imageType ) {
+	private static Method findHessianFromGradient( Class<?> derivativeClass, Class<?> imageType ) {
 		String name = derivativeClass.getSimpleName().substring(8);
 		Method m;
 		try {
 			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(imageType) ? ImageBorder_F32.class : ImageBorder_S32.class;
-			m = HessianFromGradient.class.getDeclaredMethod("hessian"+name, imageType,imageType,imageType,imageType,imageType,borderType);
+			m = HessianFromGradient.class.getDeclaredMethod("hessian" + name, imageType, imageType, imageType, imageType, imageType, borderType);
 		} catch (NoSuchMethodException e) {
-			throw new RuntimeException("Input and derivative types are probably not compatible",e);
+			throw new RuntimeException("Input and derivative types are probably not compatible", e);
 		}
 		return m;
 	}
