@@ -42,11 +42,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceTrifocalReprojectionSq implements DistanceFromModel<TrifocalTensor, AssociatedTriple>
-{
-	DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
-	DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-	DMatrixRMaj P3 = new DMatrixRMaj(3,4);
+public class DistanceTrifocalReprojectionSq implements DistanceFromModel<TrifocalTensor, AssociatedTriple> {
+	DMatrixRMaj P1 = CommonOps_DDRM.identity(3, 4);
+	DMatrixRMaj P2 = new DMatrixRMaj(3, 4);
+	DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
 
 	List<DMatrixRMaj> cameraMatrices = new ArrayList<>();
 	List<Point2D_F64> observations = new ArrayList<>();
@@ -56,18 +55,18 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 
 	TriangulateRefineProjectiveLS refiner;
 
-
 	Point4D_F64 X = new Point4D_F64();
 	Point2D_F64 pixel = new Point2D_F64();
 
 	/**
 	 * Call this constructor if you wish to apply non-linear refinement.
+	 *
 	 * @param gtol convergence tolerance. Try 1e-8
 	 * @param maxIterations Max iterations. Try 50
 	 */
-	public DistanceTrifocalReprojectionSq( double gtol , int maxIterations ) {
+	public DistanceTrifocalReprojectionSq( double gtol, int maxIterations ) {
 		this();
-		refiner = new TriangulateRefineProjectiveLS(gtol,maxIterations);
+		refiner = new TriangulateRefineProjectiveLS(gtol, maxIterations);
 	}
 
 	public DistanceTrifocalReprojectionSq() {
@@ -81,38 +80,38 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 	}
 
 	@Override
-	public void setModel(TrifocalTensor trifocalTensor) {
+	public void setModel( TrifocalTensor trifocalTensor ) {
 		extractor.setTensor(trifocalTensor);
 		extractor.extractCamera(P2, P3);
 	}
 
 	@Override
-	public double computeDistance(AssociatedTriple pt) {
-		observations.set(0,pt.p1);
-		observations.set(1,pt.p2);
-		observations.set(2,pt.p3);
+	public double distance( AssociatedTriple pt ) {
+		observations.set(0, pt.p1);
+		observations.set(1, pt.p2);
+		observations.set(2, pt.p3);
 
-		if( !triangulator.triangulate(observations,cameraMatrices,X) )
+		if (!triangulator.triangulate(observations, cameraMatrices, X))
 			return 1e200; // not returning max value out of fear of overflow
 
-		if( refiner != null )
-			refiner.process(observations,cameraMatrices,X,X);
+		if (refiner != null)
+			refiner.process(observations, cameraMatrices, X, X);
 
 		double error = 0;
-		GeometryMath_F64.mult(P1,X,pixel);
+		GeometryMath_F64.mult(P1, X, pixel);
 		error += pixel.distance2(pt.p1);
-		GeometryMath_F64.mult(P2,X,pixel);
+		GeometryMath_F64.mult(P2, X, pixel);
 		error += pixel.distance2(pt.p2);
-		GeometryMath_F64.mult(P3,X,pixel);
+		GeometryMath_F64.mult(P3, X, pixel);
 		error += pixel.distance2(pt.p3);
 
 		return error;
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedTriple> observations, double[] distance) {
+	public void distances( List<AssociatedTriple> observations, double[] distance ) {
 		for (int i = 0; i < observations.size(); i++) {
-			distance[i] = computeDistance(observations.get(i));
+			distance[i] = distance(observations.get(i));
 		}
 	}
 

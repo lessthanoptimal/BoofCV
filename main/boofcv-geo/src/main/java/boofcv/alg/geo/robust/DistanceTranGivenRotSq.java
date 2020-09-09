@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 	}
 
 	@Override
-	public double computeDistance(Point2D3D pt) {
+	public double distance(Point2D3D pt) {
 		Point3D_F64 X = pt.location;
 		Point2D_F64 obs = pt.observation;
 
@@ -61,9 +61,9 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 	}
 
 	@Override
-	public void computeDistance(List<Point2D3D> data, double[] distance) {
+	public void distances(List<Point2D3D> data, double[] distance) {
 		for( int i = 0; i < data.size(); i++ ) {
-			distance[i] = computeDistance(data.get(i));
+			distance[i] = distance(data.get(i));
 		}
 	}
 

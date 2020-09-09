@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,13 +45,13 @@ public class TestPnPDistanceReprojectionSq {
 	 */
 	@Test
 	public void checkErrorSingle() {
-		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		worldToCamera.getT().set(0.1,-0.1,0.2);
+		worldToCamera.getT().set(0.1, -0.1, 0.2);
 
 		// Point location in world frame
-		Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
+		Point3D_F64 X = new Point3D_F64(0.1, -0.04, 2.3);
 
 		double deltaX = 0.1;
 		double deltaY = -0.2;
@@ -63,16 +63,16 @@ public class TestPnPDistanceReprojectionSq {
 		observed.y += deltaY;
 
 		// convert to normalized image coordinates
-		PerspectiveOps.convertPixelToNorm(K,observed,observed);
+		PerspectiveOps.convertPixelToNorm(K, observed, observed);
 
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
-		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K,0,0,null));
+		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K, 0, 0, null));
 		alg.setModel(worldToCamera);
 
-		double found = alg.computeDistance(new Point2D3D(observed,X));
+		double found = alg.distance(new Point2D3D(observed, X));
 		double expected = deltaX*deltaX + deltaY*deltaY;
 
-		assertEquals(expected,found,1e-8);
+		assertEquals(expected, found, 1e-8);
 	}
 
 	/**
@@ -80,23 +80,23 @@ public class TestPnPDistanceReprojectionSq {
 	 */
 	@Test
 	public void checkBehindCamera() {
-		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		worldToCamera.getT().set(0.1,-0.1,-2.5);
+		worldToCamera.getT().set(0.1, -0.1, -2.5);
 
 		// Point location in world frame
-		Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
+		Point3D_F64 X = new Point3D_F64(0.1, -0.04, 2.3);
 
 		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X, null);
 
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
-		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K,0,0,null));
+		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K, 0, 0, null));
 		alg.setModel(worldToCamera);
 
-		double found = alg.computeDistance(new Point2D3D(observed,X));
+		double found = alg.distance(new Point2D3D(observed, X));
 
-		assertTrue(Double.MAX_VALUE == found );
+		assertTrue(Double.MAX_VALUE == found);
 	}
 
 	/**
@@ -104,17 +104,17 @@ public class TestPnPDistanceReprojectionSq {
 	 */
 	@Test
 	public void checkErrorArray() {
-		double expected[] = new double[5];
+		double[] expected = new double[5];
 
-		DMatrixRMaj K = new DMatrixRMaj(3,3,true,100,0.01,200,0,150,200,0,0,1);
+		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		worldToCamera.getT().set(0.1,-0.1,0.2);
+		worldToCamera.getT().set(0.1, -0.1, 0.2);
 
 		List<Point2D3D> obs = new ArrayList<>();
-		for( int i = 0; i < expected.length; i++ ) {
+		for (int i = 0; i < expected.length; i++) {
 			Point3D_F64 X =
-					new Point3D_F64(rand.nextGaussian()*0.2,rand.nextGaussian()*0.2,2.3+rand.nextGaussian()*0.2);
+					new Point3D_F64(rand.nextGaussian()*0.2, rand.nextGaussian()*0.2, 2.3 + rand.nextGaussian()*0.2);
 
 			// create a noisy observed
 			Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X, null);
@@ -126,22 +126,21 @@ public class TestPnPDistanceReprojectionSq {
 			observed.y += deltaY;
 
 			// convert to normalized image coordinates
-			PerspectiveOps.convertPixelToNorm(K,observed,observed);
+			PerspectiveOps.convertPixelToNorm(K, observed, observed);
 
-			obs.add( new Point2D3D(observed,X));
+			obs.add(new Point2D3D(observed, X));
 
 			expected[i] = deltaX*deltaX + deltaY*deltaY;
 		}
 
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
-		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K,0,0,null));
+		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K, 0, 0, null));
 		alg.setModel(worldToCamera);
-		double found[] = new double[5];
-		alg.computeDistance(obs,found);
+		double[] found = new double[5];
+		alg.distances(obs, found);
 
-		for( int i = 0; i < found.length; i++ ) {
-			assertEquals(expected[i],found[i],1e-8);
+		for (int i = 0; i < found.length; i++) {
+			assertEquals(expected[i], found[i], 1e-8);
 		}
 	}
-
 }

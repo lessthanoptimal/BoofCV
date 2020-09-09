@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ImmutableEnumChecker", "UnnecessaryParentheses", "NullAway.Init"})
+@SuppressWarnings({"ImmutableEnumChecker", "UnnecessaryParentheses", "NullAway.Init", "rawtypes"})
 // UnnecessaryParentheses is probably a bug
 public enum ImageDataType {
 	/** Unsigned 8-bit image */

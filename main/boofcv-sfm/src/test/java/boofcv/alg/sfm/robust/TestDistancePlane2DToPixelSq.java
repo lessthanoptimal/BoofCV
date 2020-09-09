@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestDistancePlane2DToPixelSq {
 
-	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200,210,0,320,240,640,480).fsetRadial(0,0);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200, 210, 0, 320, 240, 640, 480).fsetRadial(0, 0);
 
 	DistancePlane2DToPixelSq alg = new DistancePlane2DToPixelSq();
 	Se3_F64 planeToCamera;
@@ -48,20 +48,20 @@ public class TestDistancePlane2DToPixelSq {
 	Point2D_F64 planePtA = new Point2D_F64();
 	Point2D_F64 planePtB = new Point2D_F64();
 
-	Point2D_F64 pixelPtA = new Point2D_F64(150,75);
+	Point2D_F64 pixelPtA = new Point2D_F64(150, 75);
 	Point2D_F64 pixelPtB = new Point2D_F64();
 
-	Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
+	Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true, false);
 	Point2D_F64 normPt = new Point2D_F64();
 
 	public TestDistancePlane2DToPixelSq() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(-75), 0.1, 0.0, cameraToPlane.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(-75), 0.1, 0.0, cameraToPlane.getR());
 		cameraToPlane.getT().set(0, -2, 0);
 
 		planeToCamera = cameraToPlane.invert(null);
-		motion2D = new Se2_F64(0.5,-0.05,0.15);
+		motion2D = new Se2_F64(0.5, -0.05, 0.15);
 
 		alg.setExtrinsic(planeToCamera);
 		alg.setIntrinsic(intrinsic.fx, intrinsic.fy, intrinsic.skew);
@@ -73,16 +73,16 @@ public class TestDistancePlane2DToPixelSq {
 		planeProjection.pixelToPlane(pixelPtA.x, pixelPtA.y, planePtA);
 
 		// move the point on the plane and compute pixel observation
-		SePointOps_F64.transform(motion2D,planePtA,planePtB);
+		SePointOps_F64.transform(motion2D, planePtA, planePtB);
 		planeProjection.planeToPixel(planePtB.x, planePtB.y, pixelPtB);
 	}
 
 	@Test
 	public void perfect() {
 
-		pixelToNorm.compute(pixelPtB.x,pixelPtB.y,normPt);
+		pixelToNorm.compute(pixelPtB.x, pixelPtB.y, normPt);
 
-		double error = alg.computeDistance(new PlanePtPixel(planePtA,normPt));
+		double error = alg.distance(new PlanePtPixel(planePtA, normPt));
 
 		assertEquals(0, error, 1e-8);
 	}
@@ -90,11 +90,10 @@ public class TestDistancePlane2DToPixelSq {
 	@Test
 	public void noisy() {
 
-		pixelToNorm.compute(pixelPtB.x+2,pixelPtB.y,normPt);
+		pixelToNorm.compute(pixelPtB.x + 2, pixelPtB.y, normPt);
 
-		double error = alg.computeDistance(new PlanePtPixel(planePtA,normPt));
+		double error = alg.distance(new PlanePtPixel(planePtA, normPt));
 
 		assertEquals(4, error, 1e-8);
 	}
-
 }

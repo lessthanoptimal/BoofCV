@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,13 @@ public class DistanceFromModelResidual<Model, Point>
 	}
 
 	@Override
-	public double computeDistance(Point pt) {
+	public double distance(Point pt) {
 		double r = function.computeResidual(pt);
 		return r*r;
 	}
 
 	@Override
-	public void computeDistance(List<Point> associatedPairs, double[] distance) {
+	public void distances(List<Point> associatedPairs, double[] distance) {
 		for( int i = 0; i < associatedPairs.size(); i++ ) {
 			Point p = associatedPairs.get(i);
 			

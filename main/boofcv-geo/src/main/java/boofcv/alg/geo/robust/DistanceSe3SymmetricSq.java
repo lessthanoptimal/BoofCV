@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F64,AssociatedPair> {
+public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F64, AssociatedPair> {
 
 	// transform from key frame to current frame
 	private Se3_F64 keyToCurr;
@@ -75,12 +75,12 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	 *
 	 * @param triangulate Triangulates the intersection of two observations
 	 */
-	public DistanceSe3SymmetricSq(Triangulate2ViewsMetric triangulate ) {
+	public DistanceSe3SymmetricSq( Triangulate2ViewsMetric triangulate ) {
 		this.triangulate = triangulate;
 	}
 
 	@Override
-	public void setModel(Se3_F64 keyToCurr) {
+	public void setModel( Se3_F64 keyToCurr ) {
 		this.keyToCurr = keyToCurr;
 	}
 
@@ -91,31 +91,31 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	 * @return observation error
 	 */
 	@Override
-	public double computeDistance(AssociatedPair obs) {
+	public double distance( AssociatedPair obs ) {
 
 		// triangulate the point in 3D space
-		triangulate.triangulate(obs.p1,obs.p2,keyToCurr,p);
+		triangulate.triangulate(obs.p1, obs.p2, keyToCurr, p);
 
-		if( p.z < 0 )
+		if (p.z < 0)
 			return Double.MAX_VALUE;
 
 		// compute observational error in each view
-		double error = errorCam1.errorSq(obs.p1.x,obs.p1.y,p.x/p.z,p.y/p.z);
+		double error = errorCam1.errorSq(obs.p1.x, obs.p1.y, p.x/p.z, p.y/p.z);
 
-		SePointOps_F64.transform(keyToCurr,p,p);
-		if( p.z < 0 )
+		SePointOps_F64.transform(keyToCurr, p, p);
+		if (p.z < 0)
 			return Double.MAX_VALUE;
 
-		error += errorCam2.errorSq(obs.p2.x,obs.p2.y, p.x/p.z , p.y/p.z);
+		error += errorCam2.errorSq(obs.p2.x, obs.p2.y, p.x/p.z, p.y/p.z);
 
 		return error;
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedPair> associatedPairs, double[] distance) {
-		for( int i = 0; i < associatedPairs.size(); i++ ) {
+	public void distances( List<AssociatedPair> associatedPairs, double[] distance ) {
+		for (int i = 0; i < associatedPairs.size(); i++) {
 			AssociatedPair obs = associatedPairs.get(i);
-			distance[i] = computeDistance(obs);
+			distance[i] = distance(obs);
 		}
 	}
 
@@ -130,11 +130,11 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	}
 
 	@Override
-	public void setIntrinsic( int view, CameraPinhole intrinsic) {
-		if( view == 0 )
-			errorCam1.set(intrinsic.fx,intrinsic.fy,intrinsic.skew);
-		else if( view == 1 )
-			errorCam2.set(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
+		if (view == 0)
+			errorCam1.set(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+		else if (view == 1)
+			errorCam2.set(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 		else
 			throw new IllegalArgumentException("View must be 0 or 1");
 	}
@@ -143,5 +143,4 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	public int getNumberOfViews() {
 		return 2;
 	}
-
 }

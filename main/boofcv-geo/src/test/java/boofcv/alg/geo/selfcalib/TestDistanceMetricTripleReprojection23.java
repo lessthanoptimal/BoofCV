@@ -48,15 +48,15 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 
 		alg.setModel(model);
 
-		for( AssociatedTriple a : observations3) {
-			assertEquals(0.0, alg.computeDistance(a) , UtilEjml.TEST_F64);
+		for (AssociatedTriple a : observations3) {
+			assertEquals(0.0, alg.distance(a), UtilEjml.TEST_F64);
 		}
 
-		var set = observations3.subList(4,11);
-		var distances = new double[ set.size() ];
-		alg.computeDistance(set,distances);
+		var set = observations3.subList(4, 11);
+		var distances = new double[set.size()];
+		alg.distances(set, distances);
 		for (int i = 0; i < distances.length; i++) {
-			assertEquals(0.0, distances[i], UtilEjml.TEST_F64 );
+			assertEquals(0.0, distances[i], UtilEjml.TEST_F64);
 		}
 	}
 
@@ -81,12 +81,12 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 
 		alg.setModel(model);
 
-		var set = observations3.subList(0,20);
-		var distances = new double[ set.size() ];
-		alg.computeDistance(set,distances);
+		var set = observations3.subList(0, 20);
+		var distances = new double[set.size()];
+		alg.distances(set, distances);
 		for (int i = 0; i < distances.length; i++) {
-			assertTrue(distances[i] > 0.1 );
-			assertEquals(distances[i], alg.computeDistance(set.get(i)), UtilEjml.TEST_F64 );
+			assertTrue(distances[i] > 0.1);
+			assertEquals(distances[i], alg.distance(set.get(i)), UtilEjml.TEST_F64);
 		}
 	}
 }

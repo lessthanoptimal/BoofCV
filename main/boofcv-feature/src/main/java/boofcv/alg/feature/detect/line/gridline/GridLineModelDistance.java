@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.detect.line.gridline;
 
-
 import georegression.geometry.UtilLine2D_F32;
 import georegression.metric.Distance2D_F32;
 import georegression.metric.UtilAngle;
@@ -33,7 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GridLineModelDistance implements DistanceFromModel<LinePolar2D_F32,Edgel> {
+public class GridLineModelDistance implements DistanceFromModel<LinePolar2D_F32, Edgel> {
 
 	LineParametric2D_F32 line = new LineParametric2D_F32();
 	float theta;
@@ -41,28 +40,28 @@ public class GridLineModelDistance implements DistanceFromModel<LinePolar2D_F32,
 	// maximum distance between line slope and point gradient
 	float angleTolerance;
 
-	public GridLineModelDistance(float angleTolerance) {
+	public GridLineModelDistance( float angleTolerance ) {
 		this.angleTolerance = angleTolerance;
 	}
 
 	@Override
-	public void setModel(LinePolar2D_F32 lineParam) {
-		UtilLine2D_F32.convert(lineParam,line);
+	public void setModel( LinePolar2D_F32 lineParam ) {
+		UtilLine2D_F32.convert(lineParam, line);
 		theta = lineParam.angle;
 	}
 
 	@Override
-	public double computeDistance(Edgel pt) {
-		if(UtilAngle.distHalf(pt.theta, theta) > angleTolerance )
+	public double distance( Edgel pt ) {
+		if (UtilAngle.distHalf(pt.theta, theta) > angleTolerance)
 			return Double.MAX_VALUE;
 
-		return Distance2D_F32.distance(line,pt);
+		return Distance2D_F32.distance(line, pt);
 	}
 
 	@Override
-	public void computeDistance(List<Edgel> edgels, double[] distance) {
-		for( int i = 0; i < edgels.size(); i++ ) {
-			distance[i] = computeDistance(edgels.get(i));
+	public void distances( List<Edgel> edgels, double[] distance ) {
+		for (int i = 0; i < edgels.size(); i++) {
+			distance[i] = distance(edgels.get(i));
 		}
 	}
 

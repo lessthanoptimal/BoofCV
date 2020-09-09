@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,57 +26,56 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 /**
  * Standard tests to apply to implementors of {@link DistanceFromModel}.
  *
  * @author Peter Abeles
  */
-public abstract class StandardDistanceTest<Model,Data> {
-	
-	public abstract DistanceFromModel<Model,Data> create();
+public abstract class StandardDistanceTest<Model, Data> {
+
+	public abstract DistanceFromModel<Model, Data> create();
 
 	public abstract Model createRandomModel();
 
 	public abstract Data createRandomData();
 
-	public abstract double distance( Model model , Data data );
+	public abstract double distance( Model model, Data data );
 
 	@Test
 	public void testSingle() {
-		DistanceFromModel<Model,Data> alg = create();
+		DistanceFromModel<Model, Data> alg = create();
 
 		Model m = createRandomModel();
 		alg.setModel(m);
 
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 			Data d = createRandomData();
 
-			assertEquals(distance(m,d),alg.computeDistance(d),1e-4);
+			assertEquals(distance(m, d), alg.distance(d), 1e-4);
 		}
 	}
 
 	@Test
 	public void testMultiple() {
-		DistanceFromModel<Model,Data> alg = create();
+		DistanceFromModel<Model, Data> alg = create();
 
 		Model m = createRandomModel();
 		alg.setModel(m);
 
 		List<Data> obs = new ArrayList<>();
-		double expected[] = new double[10];
-		double found[] = new double[10];
+		double[] expected = new double[10];
+		double[] found = new double[10];
 
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 			Data d = createRandomData();
 			obs.add(d);
-			expected[i] = distance(m,d);
+			expected[i] = distance(m, d);
 		}
 
-		alg.computeDistance(obs,found);
+		alg.distances(obs, found);
 
-		for( int i = 0; i < 10; i++ ) {
-			assertEquals(expected[i],found[i],1e-4);
+		for (int i = 0; i < 10; i++) {
+			assertEquals(expected[i], found[i], 1e-4);
 		}
 	}
 }

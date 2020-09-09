@@ -35,33 +35,32 @@ class TestDistanceFromModelIntoViews {
 	void mock() {
 		var orig = new DistanceFromModel() {
 			@Override
-			public void computeDistance(List list, double[] distance) {
+			public void distances( List list, double[] distance ) {
 				for (int i = 0; i < list.size(); i++) {
 					distance[i] = 6;
 				}
 			}
 
-			@Override public void setModel(Object o) {}
-			@Override public double computeDistance(Object pt) { return 2; }
+			@Override public void setModel( Object o ) {}
+			@Override public double distance( Object pt ) { return 2; }
 			@Override public Class getPointType() { return Double.class; }
 			@Override public Class getModelType() { return Integer.class; }
 		};
 
-		var alg = new DistanceFromModelIntoViews(orig,3);
+		var alg = new DistanceFromModelIntoViews(orig, 3);
 
-		assertEquals(3,alg.getNumberOfViews());
-		assertEquals(2.0,alg.computeDistance(null),1e-8);
+		assertEquals(3, alg.getNumberOfViews());
+		assertEquals(2.0, alg.distance(null), 1e-8);
 		List list = new ArrayList();
 		double[] distances = new double[5];
 		for (int i = 0; i < distances.length; i++) {
 			list.add(new Object());
 		}
-		alg.computeDistance(list,distances);
+		alg.distances(list, distances);
 		for (int i = 0; i < distances.length; i++) {
-			assertEquals(6,distances[i], 1e-8);
+			assertEquals(6, distances[i], 1e-8);
 		}
-		assertEquals(Double.class,alg.getPointType());
-		assertEquals(Integer.class,alg.getModelType());
-
+		assertEquals(Double.class, alg.getPointType());
+		assertEquals(Integer.class, alg.getModelType());
 	}
 }

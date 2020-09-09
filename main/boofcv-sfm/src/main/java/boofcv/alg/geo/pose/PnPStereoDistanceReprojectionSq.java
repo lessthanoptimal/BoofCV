@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64,Stereo2D3D> {
+public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64, Stereo2D3D> {
 
 	// transform from world to left camera
 	private Se3_F64 worldToLeft;
@@ -61,40 +61,40 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 	}
 
 	@Override
-	public void setModel(Se3_F64 worldToLeft) {
+	public void setModel( Se3_F64 worldToLeft ) {
 		this.worldToLeft = worldToLeft;
 	}
 
 	@Override
-	public double computeDistance(Stereo2D3D pt) {
+	public double distance( Stereo2D3D pt ) {
 		// Compute error in left camera first.
 		// Project observation into the image plane
 		SePointOps_F64.transform(worldToLeft, pt.location, X);
 
 		// very large error if behind the camera
-		if( X.z <= 0 )
+		if (X.z <= 0)
 			return Double.MAX_VALUE;
 
 		Point2D_F64 p = pt.leftObs;
-		double errorLeft =  leftPixelError.errorSq(X.x/X.z,X.y/X.z,p.x,p.y);
+		double errorLeft = leftPixelError.errorSq(X.x/X.z, X.y/X.z, p.x, p.y);
 
 		// point from left camera to right camera reference frame
 		SePointOps_F64.transform(leftToRight, X, X);
 
 		// now the right error
-		if( X.z <= 0 )
+		if (X.z <= 0)
 			return Double.MAX_VALUE;
 
 		p = pt.rightObs;
-		double errorRight = rightPixelError.errorSq(X.x/X.z,X.y/X.z,p.x,p.y);
+		double errorRight = rightPixelError.errorSq(X.x/X.z, X.y/X.z, p.x, p.y);
 
 		return errorLeft + errorRight;
 	}
 
 	@Override
-	public void computeDistance(List<Stereo2D3D> observations, double[] distance) {
-		for( int i = 0; i < observations.size(); i++ )
-			distance[i] = computeDistance(observations.get(i));
+	public void distances( List<Stereo2D3D> observations, double[] distance ) {
+		for (int i = 0; i < observations.size(); i++)
+			distance[i] = distance(observations.get(i));
 	}
 
 	@Override
@@ -108,11 +108,11 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 	}
 
 	@Override
-	public void setIntrinsic(int view, CameraPinhole intrinsic) {
-		if( view == 0 )
-			leftPixelError = new NormalizedToPixelError(intrinsic.fx,intrinsic.fy,intrinsic.skew);
-		else if( view == 1 )
-			rightPixelError = new NormalizedToPixelError(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
+		if (view == 0)
+			leftPixelError = new NormalizedToPixelError(intrinsic.fx, intrinsic.fy, intrinsic.skew);
+		else if (view == 1)
+			rightPixelError = new NormalizedToPixelError(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 		else
 			throw new IllegalArgumentException("View must be 0 or 1");
 	}
@@ -122,9 +122,9 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 		return 2;
 	}
 
-	public void setStereoParameters(StereoParameters param) {
+	public void setStereoParameters( StereoParameters param ) {
 		setLeftToRight(param.rightToLeft.invert(null));
-		setIntrinsic(0,param.left);
-		setIntrinsic(1,param.right);
+		setIntrinsic(0, param.left);
+		setIntrinsic(1, param.right);
 	}
 }

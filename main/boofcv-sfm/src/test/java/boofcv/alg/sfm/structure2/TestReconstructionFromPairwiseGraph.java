@@ -66,7 +66,7 @@ class TestReconstructionFromPairwiseGraph {
 		removeLastConnection(graph);
 
 		open.addAll(graph.nodes);
-		open.forEach(( i, o ) -> alg.workGraph.addView(o));
+		open.forIdx(( i, o ) -> alg.workGraph.addView(o));
 		PairwiseImageGraph2.View expected = open.get(4); // make #4 only have a slightly better score, and a valid set of connections
 		PairwiseImageGraph2.View expectedConnA = expected.connections.get(0).other(expected);
 		PairwiseImageGraph2.View expectedConnB = expected.connections.get(1).other(expected);
@@ -93,7 +93,7 @@ class TestReconstructionFromPairwiseGraph {
 
 		open.addAll(graph.nodes);
 		// Only #7 will have a full set of known connections
-		open.forEach(5, 8, ( i, o ) -> alg.workGraph.addView(o));
+		open.forIdx(5, 8, ( i, o ) -> alg.workGraph.addView(o));
 		PairwiseImageGraph2.View expected = open.get(7);
 		PairwiseImageGraph2.View selected = alg.selectNextToProcess(open);
 
@@ -120,7 +120,7 @@ class TestReconstructionFromPairwiseGraph {
 		PairwiseImageGraph2 graph = createLinearGraph(8, 1);
 
 		open.addAll(graph.nodes);
-		open.forEach(( i, o ) -> alg.workGraph.addView(o));
+		open.forIdx(( i, o ) -> alg.workGraph.addView(o));
 
 		PairwiseImageGraph2.View selected = alg.selectNextToProcess(open);
 		assertSame(null, selected);
@@ -154,7 +154,7 @@ class TestReconstructionFromPairwiseGraph {
 			for (int targetIdx = 1; targetIdx < 4; targetIdx++) {
 				PairwiseImageGraph2 graph = createLinearGraph(9, 1);
 				PairwiseImageGraph2.View target = graph.nodes.get(targetIdx);
-				target.connections.forEach(( i, o ) -> o.countH = 20);
+				target.connections.forIdx(( i, o ) -> o.countH = 20);
 
 				Map<String, SeedInfo> mapScores = alg.scoreNodesAsSeeds(graph);
 				List<SeedInfo> seeds = alg.selectSeeds(alg.seedScores, mapScores);

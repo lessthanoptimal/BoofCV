@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 /**
  * @author Peter Abeles
  */
@@ -38,17 +37,17 @@ public class TestGridLineModelDistance {
 	 */
 	@Test
 	public void maxAngle() {
-		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)),(float)(Math.PI/4.0));
+		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)), (float)(Math.PI/4.0));
 
 		GridLineModelDistance alg = new GridLineModelDistance(0.2f);
 		alg.setModel(l);
 
 		// standard out of bounds
-		assertEquals(Double.MAX_VALUE,alg.computeDistance(new Edgel(5,5,(float)(Math.PI/4.0)+0.3f)),1e-4);
+		assertEquals(Double.MAX_VALUE, alg.distance(new Edgel(5, 5, (float)(Math.PI/4.0) + 0.3f)), 1e-4);
 		// standard in bounds
-		assertEquals(0,alg.computeDistance(new Edgel(5,5,(float)(Math.PI/4.0)+0.1f)),1e-4);
+		assertEquals(0, alg.distance(new Edgel(5, 5, (float)(Math.PI/4.0) + 0.1f)), 1e-4);
 		// see if it respects half angle
-		assertEquals(0,alg.computeDistance(new Edgel(5,5, (float)UtilAngle.bound(Math.PI/4.0+Math.PI))),1e-4);
+		assertEquals(0, alg.distance(new Edgel(5, 5, (float)UtilAngle.bound(Math.PI/4.0 + Math.PI))), 1e-4);
 	}
 
 	/**
@@ -57,32 +56,32 @@ public class TestGridLineModelDistance {
 	@Test
 	public void distance() {
 		float theta = (float)(Math.PI/4.0);
-		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)),theta);
+		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)), theta);
 
 		GridLineModelDistance alg = new GridLineModelDistance(0.2f);
 		alg.setModel(l);
 
-		assertEquals(0,alg.computeDistance(new Edgel(5,5, theta)),1e-4);
-		assertEquals(7.0711, alg.computeDistance(new Edgel(0, 0, theta)), 0.1);
+		assertEquals(0, alg.distance(new Edgel(5, 5, theta)), 1e-4);
+		assertEquals(7.0711, alg.distance(new Edgel(0, 0, theta)), 0.1);
 	}
 
 	@Test
 	public void computeDistance_list() {
 		float theta = (float)(Math.PI/4.0);
-		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)),theta);
+		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)), theta);
 
 		GridLineModelDistance alg = new GridLineModelDistance(0.2f);
 		alg.setModel(l);
 
-		double distance[] = new double[2];
+		double[] distance = new double[2];
 		List<Edgel> points = new ArrayList<>();
 
-		points.add(new Edgel(5,5, theta));
-		points.add(new Edgel(0,0, theta));
+		points.add(new Edgel(5, 5, theta));
+		points.add(new Edgel(0, 0, theta));
 
-		alg.computeDistance(points,distance);
+		alg.distances(points, distance);
 
-		assertEquals(0,distance[0],1e-4);
-		assertEquals(7.0711,distance[1],1e-4);
+		assertEquals(0, distance[0], 1e-4);
+		assertEquals(7.0711, distance[1], 1e-4);
 	}
 }

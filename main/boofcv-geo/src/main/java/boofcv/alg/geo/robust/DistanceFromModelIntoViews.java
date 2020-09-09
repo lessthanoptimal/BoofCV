@@ -27,21 +27,21 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceFromModelIntoViews<Model,Point,Camera> implements DistanceFromModelViews<Model,Point,Camera> {
+public class DistanceFromModelIntoViews<Model, Point, Camera> implements DistanceFromModelViews<Model, Point, Camera> {
 
-	DistanceFromModel<Model,Point> alg;
+	DistanceFromModel<Model, Point> alg;
 	int numberOfViews;
 
-	public DistanceFromModelIntoViews(DistanceFromModel<Model, Point> alg, int numberOfViews) {
+	public DistanceFromModelIntoViews( DistanceFromModel<Model, Point> alg, int numberOfViews ) {
 		this.alg = alg;
 		this.numberOfViews = numberOfViews;
 	}
 
-	@Override public double computeDistance(Point pt) {return alg.computeDistance(pt); }
-	@Override public void computeDistance(List<Point> points, double[] distance) {alg.computeDistance(points,distance);}
+	@Override public double distance( Point pt ) {return alg.distance(pt); }
+	@Override public void distances( List<Point> points, double[] results ) {alg.distances(points, results);}
 	@Override public int getNumberOfViews() { return numberOfViews; }
-	@Override public void setView(int view, Camera viewInfo) {}
-	@Override public void setModel(Model model) {alg.setModel(model);}
+	@Override public void setView( int view, Camera viewInfo ) {}
+	@Override public void setModel( Model model ) {alg.setModel(model);}
 	@Override public Class<Point> getPointType() {return alg.getPointType();}
 	@Override public Class<Model> getModelType() {return alg.getModelType();}
 }

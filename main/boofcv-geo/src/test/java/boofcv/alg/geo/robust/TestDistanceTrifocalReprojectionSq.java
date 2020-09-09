@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ class TestDistanceTrifocalReprojectionSq extends CommonTrifocalChecks {
 		alg.setModel(tensorPixels);
 
 		for (int i = 0; i < observationsPixels.size(); i++) {
-			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), UtilEjml.TEST_F64);
+			assertEquals(0, alg.distance(observationsPixels.get(i)), UtilEjml.TEST_F64);
 		}
 	}
 
@@ -48,32 +48,31 @@ class TestDistanceTrifocalReprojectionSq extends CommonTrifocalChecks {
 		for (int i = 0; i < observationsPixels.size(); i++) {
 			AssociatedTriple a = observationsPixels.get(i);
 			a.p1.x += 0.5;
-			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 1.5*0.5*0.5);
+			assertEquals(0, alg.distance(observationsPixels.get(i)), 1.5*0.5*0.5);
 			a.p1.x -= 0.5;
 			a.p2.x += 0.5;
-			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 1.5*0.5*0.5);
+			assertEquals(0, alg.distance(observationsPixels.get(i)), 1.5*0.5*0.5);
 			a.p2.x -= 0.5;
 			a.p3.x += 0.5;
-			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 1.5*0.5*0.5);
+			assertEquals(0, alg.distance(observationsPixels.get(i)), 1.5*0.5*0.5);
 		}
 	}
 
 	@Test
 	public void noise_refine() {
-		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq(1e-8,100);
+		DistanceTrifocalReprojectionSq alg = new DistanceTrifocalReprojectionSq(1e-8, 100);
 		alg.setModel(tensorPixels);
 
 		for (int i = 0; i < observationsPixels.size(); i++) {
 			AssociatedTriple a = observationsPixels.get(i);
 			a.p1.x += 0.5;
-			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 0.5*0.5);
+			assertEquals(0, alg.distance(observationsPixels.get(i)), 0.5*0.5);
 			a.p1.x -= 0.5;
 			a.p2.x += 0.5;
-			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 0.5*0.5);
+			assertEquals(0, alg.distance(observationsPixels.get(i)), 0.5*0.5);
 			a.p2.x -= 0.5;
 			a.p3.x += 0.5;
-			assertEquals(0,alg.computeDistance(observationsPixels.get(i)), 0.5*0.5);
+			assertEquals(0, alg.distance(observationsPixels.get(i)), 0.5*0.5);
 		}
 	}
-
 }

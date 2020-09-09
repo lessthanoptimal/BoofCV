@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,8 @@ import java.util.List;
  * Computes geometric error in an uncalibrated stereo pair. This error is equivalent to
  * computing the optimal 3D triangulation, reprojecting the point, and computing the symmetric error.
  *
- * @see EpipolarMinimizeGeometricError
- *
  * @author Peter Abeles
+ * @see EpipolarMinimizeGeometricError
  */
 public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRMaj, AssociatedPair> {
 
@@ -41,14 +40,14 @@ public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRM
 	DMatrixRMaj F21;
 
 	@Override
-	public void setModel(DMatrixRMaj model) {
+	public void setModel( DMatrixRMaj model ) {
 		this.F21 = model;
 	}
 
 	@Override
-	public double computeDistance(AssociatedPair original) {
-		if( !adjuster.process(F21,original.p1.x,original.p1.y,original.p2.x,original.p2.y,
-				adjusted.p1,adjusted.p2) ) {
+	public double distance( AssociatedPair original ) {
+		if (!adjuster.process(F21, original.p1.x, original.p1.y, original.p2.x, original.p2.y,
+				adjusted.p1, adjusted.p2)) {
 			return Double.MAX_VALUE;
 		}
 
@@ -58,19 +57,12 @@ public class DistanceFundamentalGeometric implements DistanceFromModel<DMatrixRM
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedPair> associatedPairs, double[] distance) {
+	public void distances( List<AssociatedPair> associatedPairs, double[] distance ) {
 		for (int i = 0; i < associatedPairs.size(); i++) {
-			distance[i] = computeDistance(associatedPairs.get(i));
+			distance[i] = distance(associatedPairs.get(i));
 		}
 	}
 
-	@Override
-	public Class<AssociatedPair> getPointType() {
-		return AssociatedPair.class;
-	}
-
-	@Override
-	public Class<DMatrixRMaj> getModelType() {
-		return DMatrixRMaj.class;
-	}
+	@Override public Class<AssociatedPair> getPointType() { return AssociatedPair.class; }
+	@Override public Class<DMatrixRMaj> getModelType() { return DMatrixRMaj.class; }
 }

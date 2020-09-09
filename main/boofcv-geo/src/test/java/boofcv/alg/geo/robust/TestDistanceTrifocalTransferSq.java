@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,13 +38,13 @@ public class TestDistanceTrifocalTransferSq extends CommonTrifocalChecks {
 		// estimate the tensors to ensure it's in pixels
 		ConfigTrifocal config = new ConfigTrifocal();
 		config.which = EnumTrifocal.LINEAR_7;
-		FactoryMultiView.trifocal_1(config).process(observationsPixels,found);
+		FactoryMultiView.trifocal_1(config).process(observationsPixels, found);
 
 		DistanceTrifocalTransferSq alg = new DistanceTrifocalTransferSq();
 		alg.setModel(found);
 
-		for(AssociatedTriple a : observationsPixels) {
-			assertEquals(0,alg.computeDistance(a), UtilEjml.TEST_F64);
+		for (AssociatedTriple a : observationsPixels) {
+			assertEquals(0, alg.distance(a), UtilEjml.TEST_F64);
 		}
 	}
 
@@ -53,14 +53,14 @@ public class TestDistanceTrifocalTransferSq extends CommonTrifocalChecks {
 		// estimate the tensors to ensure it's in pixels
 		ConfigTrifocal config = new ConfigTrifocal();
 		config.which = EnumTrifocal.LINEAR_7;
-		FactoryMultiView.trifocal_1(config).process(observationsPixels,found);
+		FactoryMultiView.trifocal_1(config).process(observationsPixels, found);
 
 		DistanceTrifocalTransferSq alg = new DistanceTrifocalTransferSq();
 		alg.setModel(found);
 
 		double error = 0.5;
 		AssociatedTriple tmp = new AssociatedTriple();
-		for(AssociatedTriple a : observationsPixels) {
+		for (AssociatedTriple a : observationsPixels) {
 			tmp.set(a);
 			tmp.p3.x += error;
 
@@ -68,8 +68,8 @@ public class TestDistanceTrifocalTransferSq extends CommonTrifocalChecks {
 			double min = error*error;
 			double max = 1.5*min;
 
-			double found = alg.computeDistance(tmp);
-			assertTrue( found >= min && found <= max );
+			double found = alg.distance(tmp);
+			assertTrue(found >= min && found <= max);
 		}
 	}
 }

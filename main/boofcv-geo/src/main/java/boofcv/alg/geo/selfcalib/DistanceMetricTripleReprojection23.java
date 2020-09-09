@@ -75,7 +75,7 @@ public class DistanceMetricTripleReprojection23 implements DistanceFromModel<Met
 	}
 
 	@Override
-	public void setModel(MetricCameraTriple model) {
+	public void setModel( MetricCameraTriple model ) {
 		this.model = model;
 
 		pixelToNorm1.set(model.view1);
@@ -89,37 +89,37 @@ public class DistanceMetricTripleReprojection23 implements DistanceFromModel<Met
 	}
 
 	@Override
-	public double computeDistance(AssociatedTriple obs) {
+	public double distance( AssociatedTriple obs ) {
 
 		// normalized image coordinates for each view
-		pixelToNorm1.compute(obs.p1.x,obs.p1.y,norm1);
-		pixelToNorm2.compute(obs.p2.x,obs.p2.y,norm2);
-		pixelToNorm3.compute(obs.p3.x,obs.p3.y,norm3);
+		pixelToNorm1.compute(obs.p1.x, obs.p1.y, norm1);
+		pixelToNorm2.compute(obs.p2.x, obs.p2.y, norm2);
+		pixelToNorm3.compute(obs.p3.x, obs.p3.y, norm3);
 
- 		// Find the feature's location and compute the reprojection error in view 3. If behind camera treat that
+		// Find the feature's location and compute the reprojection error in view 3. If behind camera treat that
 		// as a failure since it couldn't be possibly seen
-		if( !triangulate.triangulate(observations, locations, X) || X.z < 0 )
+		if (!triangulate.triangulate(observations, locations, X) || X.z < 0)
 			return Double.MAX_VALUE;
 
 		// Error in view-3
-		SePointOps_F64.transform(model.view_1_to_3,X,Xcam);
-		if( Xcam.z < 0 )
+		SePointOps_F64.transform(model.view_1_to_3, X, Xcam);
+		if (Xcam.z < 0)
 			return Double.MAX_VALUE;
-		PerspectiveOps.renderPixel(model.view3,Xcam,pixel);
+		PerspectiveOps.renderPixel(model.view3, Xcam, pixel);
 		double error = pixel.distance2(obs.p3);
 
 		// Error in view-2
-		SePointOps_F64.transform(model.view_1_to_2,X,Xcam);
-		if( X.z < 0 )
+		SePointOps_F64.transform(model.view_1_to_2, X, Xcam);
+		if (X.z < 0)
 			return Double.MAX_VALUE;
-		PerspectiveOps.renderPixel(model.view2,Xcam,pixel);
+		PerspectiveOps.renderPixel(model.view2, Xcam, pixel);
 		return error + pixel.distance2(obs.p2);
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedTriple> observations, double[] distance) {
+	public void distances( List<AssociatedTriple> observations, double[] distance ) {
 		for (int i = 0; i < observations.size(); i++) {
-			distance[i] = computeDistance(observations.get(i));
+			distance[i] = distance(observations.get(i));
 		}
 	}
 

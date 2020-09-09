@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,18 +31,17 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceScaleTranslate2DSq implements DistanceFromModel<ScaleTranslate2D,AssociatedPair> {
+public class DistanceScaleTranslate2DSq implements DistanceFromModel<ScaleTranslate2D, AssociatedPair> {
 
 	ScaleTranslate2D model;
 
 	@Override
-	public void setModel(ScaleTranslate2D model) {
+	public void setModel( ScaleTranslate2D model ) {
 		this.model = model;
 	}
 
 	@Override
-	public double computeDistance(AssociatedPair pt)
-	{
+	public double distance( AssociatedPair pt ) {
 		double dx = pt.p2.x - pt.p1.x*model.scale - model.transX;
 		double dy = pt.p2.y - pt.p1.y*model.scale - model.transY;
 
@@ -50,10 +49,10 @@ public class DistanceScaleTranslate2DSq implements DistanceFromModel<ScaleTransl
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedPair> obs, double[] distance) {
+	public void distances( List<AssociatedPair> obs, double[] distance ) {
 		final int N = obs.size();
-		for( int i = 0; i < N; i++ ) {
-			distance[i] = computeDistance(obs.get(i));
+		for (int i = 0; i < N; i++) {
+			distance[i] = distance(obs.get(i));
 		}
 	}
 

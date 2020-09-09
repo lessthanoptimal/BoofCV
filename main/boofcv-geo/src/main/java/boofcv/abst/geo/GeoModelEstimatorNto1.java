@@ -87,7 +87,7 @@ public abstract class GeoModelEstimatorNto1<Model, Point> implements GeoModelEst
 				// select the best solution
 				double score = 0;
 				for (int j = list.size(); j < points.size(); j++) {
-					score += distance.computeDistance(points.get(j));
+					score += distance.distance(points.get(j));
 				}
 
 				if (score < bestScore) {

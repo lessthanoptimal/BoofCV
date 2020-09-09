@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,36 +33,36 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestDistanceScaleTranslate2DSq {
 	@Test
 	public void perfect() {
-		ScaleTranslate2D model = new ScaleTranslate2D(1.5,-2,3);
+		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
-		AssociatedPair a = apply(-5,4,model);
+		AssociatedPair a = apply(-5, 4, model);
 
 		DistanceScaleTranslate2DSq alg = new DistanceScaleTranslate2DSq();
 		alg.setModel(model);
 
-		assertEquals(0,alg.computeDistance(a),1e-8);
+		assertEquals(0, alg.distance(a), 1e-8);
 	}
 
 	@Test
 	public void noisy() {
-		ScaleTranslate2D model = new ScaleTranslate2D(1.5,-2,3);
+		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
-		AssociatedPair a = apply(-5,4,model);
+		AssociatedPair a = apply(-5, 4, model);
 		a.p2.x += 3.5;
 
 		DistanceScaleTranslate2DSq alg = new DistanceScaleTranslate2DSq();
 		alg.setModel(model);
 
-		assertEquals(3.5*3.5,alg.computeDistance(a),1e-8);
+		assertEquals(3.5*3.5, alg.distance(a), 1e-8);
 	}
 
 	@Test
 	public void multiple() {
-		ScaleTranslate2D model = new ScaleTranslate2D(1.5,-2,3);
+		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
-		AssociatedPair a = apply(-5,4,model);
+		AssociatedPair a = apply(-5, 4, model);
 		a.p2.x += 3.5;
-		AssociatedPair b = apply(2.15,2,model);
+		AssociatedPair b = apply(2.15, 2, model);
 
 		List<AssociatedPair> obs = new ArrayList<>();
 		obs.add(a);
@@ -70,17 +70,17 @@ public class TestDistanceScaleTranslate2DSq {
 
 		DistanceScaleTranslate2DSq alg = new DistanceScaleTranslate2DSq();
 		alg.setModel(model);
-		double found[] = new double[2];
-		alg.computeDistance(obs,found);
+		double[] found = new double[2];
+		alg.distances(obs, found);
 
 
-		assertEquals(3.5*3.5,found[0],1e-8);
-		assertEquals(0,found[1],1e-8);
+		assertEquals(3.5*3.5, found[0], 1e-8);
+		assertEquals(0, found[1], 1e-8);
 	}
 
-	public static AssociatedPair apply( double x , double y , ScaleTranslate2D model ) {
+	public static AssociatedPair apply( double x, double y, ScaleTranslate2D model ) {
 		AssociatedPair p = new AssociatedPair();
-		p.p1.set(x,y);
+		p.p1.set(x, y);
 		p.p2.x = x*model.scale + model.transX;
 		p.p2.y = y*model.scale + model.transY;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,32 +32,31 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceTrifocalTransferSq implements DistanceFromModel<TrifocalTensor,AssociatedTriple>
-{
+public class DistanceTrifocalTransferSq implements DistanceFromModel<TrifocalTensor, AssociatedTriple> {
 	TrifocalTransfer transfer = new TrifocalTransfer();
 
 	// transferred point in homogenous coordinates
 	Point3D_F64 c = new Point3D_F64();
 
 	@Override
-	public void setModel(TrifocalTensor trifocalTensor) {
+	public void setModel( TrifocalTensor trifocalTensor ) {
 		transfer.setTrifocal(trifocalTensor);
 	}
 
 	@Override
-	public double computeDistance(AssociatedTriple pt) {
-		transfer.transfer_1_to_3(pt.p1.x,pt.p1.y,pt.p2.x,pt.p2.y,c);
+	public double distance( AssociatedTriple pt ) {
+		transfer.transfer_1_to_3(pt.p1.x, pt.p1.y, pt.p2.x, pt.p2.y, c);
 		double error = UtilPoint2D_F64.distanceSq(c.x/c.z, c.y/c.z, pt.p3.x, pt.p3.y);
 
-		transfer.transfer_1_to_2(pt.p1.x,pt.p1.y,pt.p3.x,pt.p3.y,c);
+		transfer.transfer_1_to_2(pt.p1.x, pt.p1.y, pt.p3.x, pt.p3.y, c);
 		error += UtilPoint2D_F64.distanceSq(c.x/c.z, c.y/c.z, pt.p2.x, pt.p2.y);
 		return error;
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedTriple> list, double[] distance) {
+	public void distances( List<AssociatedTriple> list, double[] distance ) {
 		for (int i = 0; i < list.size(); i++) {
-			distance[i] = computeDistance(list.get(i));
+			distance[i] = distance(list.get(i));
 		}
 	}
 

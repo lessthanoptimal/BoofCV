@@ -175,7 +175,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		}
 
 		// sanity check for bugs
-		viewsByStructureIndex.forEach(( i, o ) -> assertBoof(o != null));
+		viewsByStructureIndex.forIdx(( i, o ) -> assertBoof(o != null));
 
 		// create observation data structure for SBA
 		createObservationsForBundleAdjustment(seedConnIdx);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,28 +29,27 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DistanceFromModelResidualN<Model, Point>
-		implements DistanceFromModel<Model,Point>
-{
-	ModelObservationResidualN<Model,Point> function;
+		implements DistanceFromModel<Model, Point> {
+	ModelObservationResidualN<Model, Point> function;
 
-	double residuals[];
-	
-	public DistanceFromModelResidualN(ModelObservationResidualN<Model, Point> function) {
+	double[] residuals;
+
+	public DistanceFromModelResidualN( ModelObservationResidualN<Model, Point> function ) {
 		this.function = function;
-		residuals = new double[ function.getN() ];
+		residuals = new double[function.getN()];
 	}
 
 	@Override
-	public void setModel(Model F) {
+	public void setModel( Model F ) {
 		function.setModel(F);
 	}
 
 	@Override
-	public double computeDistance(Point pt) {
-		function.computeResiduals(pt,residuals,0);
-		
+	public double distance( Point pt ) {
+		function.computeResiduals(pt, residuals, 0);
+
 		double dist = 0;
-		for( int i = 0; i < residuals.length; i++ ) {
+		for (int i = 0; i < residuals.length; i++) {
 			double r = residuals[i];
 			dist += r*r;
 		}
@@ -58,14 +57,14 @@ public class DistanceFromModelResidualN<Model, Point>
 	}
 
 	@Override
-	public void computeDistance(List<Point> associatedPairs, double[] distance) {
-		for( int i = 0; i < associatedPairs.size(); i++ ) {
+	public void distances( List<Point> associatedPairs, double[] distance ) {
+		for (int i = 0; i < associatedPairs.size(); i++) {
 			Point p = associatedPairs.get(i);
 
-			function.computeResiduals(p,residuals,0);
+			function.computeResiduals(p, residuals, 0);
 
 			double dist = 0;
-			for( int j = 0; j < residuals.length; j++ ) {
+			for (int j = 0; j < residuals.length; j++) {
 				double r = residuals[j];
 				dist += r*r;
 			}

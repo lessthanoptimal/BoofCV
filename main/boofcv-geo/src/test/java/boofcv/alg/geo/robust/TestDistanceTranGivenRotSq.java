@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,10 +43,10 @@ public class TestDistanceTranGivenRotSq {
 	@Test
 	public void testPerfect() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
-		keyToCurr.getT().set(0.1,-0.1,0.01);
+		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		keyToCurr.getT().set(0.1, -0.1, 0.01);
 
-		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
+		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
 		Point2D3D obs = new Point2D3D();
 		obs.location = X.copy();
@@ -58,27 +58,27 @@ public class TestDistanceTranGivenRotSq {
 
 		alg.setRotation(keyToCurr.getR());
 		alg.setModel(keyToCurr.getT());
-		assertEquals(0, alg.computeDistance(obs), 1e-8);
+		assertEquals(0, alg.distance(obs), 1e-8);
 	}
 
 	@Test
 	public void testNoisy() {
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
-		keyToCurr.getT().set(0.1,-0.1,0.01);
+		keyToCurr.getT().set(0.1, -0.1, 0.01);
 
-		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
+		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
 		Point2D3D obs = new Point2D3D();
 		obs.location = X.copy();
 
 		SePointOps_F64.transform(keyToCurr, X, X);
 
-		obs.observation.x = X.x/X.z+1;
-		obs.observation.y = X.y/X.z+1;
+		obs.observation.x = X.x/X.z + 1;
+		obs.observation.y = X.y/X.z + 1;
 
 		alg.setRotation(keyToCurr.getR());
 		alg.setModel(keyToCurr.getT());
-		assertTrue(alg.computeDistance(obs) > 1e-8);
+		assertTrue(alg.distance(obs) > 1e-8);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64,Point2D3D> {
+public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64, Point2D3D> {
 
 	// transform from world to camera
 	private Se3_F64 worldToCamera;
@@ -50,31 +50,31 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 	private Point3D_F64 X = new Point3D_F64();
 
 	// computes the error in units of pixels
-	private NormalizedToPixelError pixelError = new NormalizedToPixelError(1,1,0);
+	private NormalizedToPixelError pixelError = new NormalizedToPixelError(1, 1, 0);
 
 	@Override
-	public void setModel(Se3_F64 worldToCamera) {
+	public void setModel( Se3_F64 worldToCamera ) {
 		this.worldToCamera = worldToCamera;
 	}
 
 	@Override
-	public double computeDistance(Point2D3D pt) {
+	public double distance( Point2D3D pt ) {
 		// compute point location in camera frame
-		SePointOps_F64.transform(worldToCamera,pt.location,X);
+		SePointOps_F64.transform(worldToCamera, pt.location, X);
 
 		// very large error if behind the camera
-		if( X.z <= 0 )
+		if (X.z <= 0)
 			return Double.MAX_VALUE;
 
 		Point2D_F64 p = pt.getObservation();
 
-		return pixelError.errorSq(X.x/X.z,X.y/X.z,p.x,p.y);
+		return pixelError.errorSq(X.x/X.z, X.y/X.z, p.x, p.y);
 	}
 
 	@Override
-	public void computeDistance(List<Point2D3D> observations, double[] distance) {
-		for( int i = 0; i < observations.size(); i++ )
-			distance[i] = computeDistance(observations.get(i));
+	public void distances( List<Point2D3D> observations, double[] distance ) {
+		for (int i = 0; i < observations.size(); i++)
+			distance[i] = distance(observations.get(i));
 	}
 
 	@Override
@@ -88,8 +88,8 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 	}
 
 	@Override
-	public void setIntrinsic(int view, CameraPinhole intrinsic) {
-		pixelError.set(intrinsic.fx,intrinsic.fy,intrinsic.skew);
+	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
+		pixelError.set(intrinsic.fx, intrinsic.fy, intrinsic.skew);
 	}
 
 	@Override

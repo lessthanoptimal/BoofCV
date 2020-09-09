@@ -93,7 +93,7 @@ public class MultiViewIO {
 			PairwiseImageGraph2.View pview = graph.nodes.get(viewIdx);
 
 			List<Integer> connections = new ArrayList<>();
-			pview.connections.forEach(( i, v ) -> connections.add(v.index));
+			pview.connections.forIdx(( i, v ) -> connections.add(v.index));
 
 			Map<String, Object> element = new HashMap<>();
 			views.add(element);
@@ -313,7 +313,7 @@ public class MultiViewIO {
 		Map<String, Object> map = new HashMap<>();
 
 		List<String> views = new ArrayList<>();
-		inliers.views.forEach(( i, v ) -> views.add(v.id));
+		inliers.views.forIdx(( i, v ) -> views.add(v.id));
 
 		List<List<Integer>> observations = new ArrayList<>();
 		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64,PlanePtPixel> {
+public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64, PlanePtPixel> {
 
 	// motion from key frame to current frame in plane 2D reference frame
 	private Se2_F64 keyToCurr;
@@ -54,14 +54,16 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64,Plane
 
 	/**
 	 * Specify extrinsic camera properties
+	 *
 	 * @param planeToCamera Transform from plane to camera reference frame
 	 */
-	public void setExtrinsic(Se3_F64 planeToCamera) {
+	public void setExtrinsic( Se3_F64 planeToCamera ) {
 		planeProjection.setPlaneToCamera(planeToCamera, false);
 	}
 
 	/**
 	 * Specify intrinsic camera properties
+	 *
 	 * @param fx focal length x
 	 * @param fy focal length y
 	 * @param skew camera skew
@@ -71,18 +73,18 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64,Plane
 	}
 
 	@Override
-	public void setModel(Se2_F64 keyToCurr) {
+	public void setModel( Se2_F64 keyToCurr ) {
 		this.keyToCurr = keyToCurr;
 	}
 
 	@Override
-	public double computeDistance(PlanePtPixel sample ) {
+	public double distance( PlanePtPixel sample ) {
 
 		// apply transform from key frame to current frame
 		SePointOps_F64.transform(keyToCurr, sample.planeKey, curr2D);
 
 		// project plane to normalized
-		if( !planeProjection.planeToNormalized(curr2D.x, curr2D.y, normalizedPred) )
+		if (!planeProjection.planeToNormalized(curr2D.x, curr2D.y, normalizedPred))
 			return Double.MAX_VALUE;
 
 		// Euclidean pixel error squared error
@@ -90,9 +92,9 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64,Plane
 	}
 
 	@Override
-	public void computeDistance(List<PlanePtPixel> samples, double[] distance) {
-		for( int i = 0; i < samples.size(); i++ ) {
-			distance[i] = computeDistance(samples.get(i));
+	public void distances( List<PlanePtPixel> samples, double[] distance ) {
+		for (int i = 0; i < samples.size(); i++) {
+			distance[i] = distance(samples.get(i));
 		}
 	}
 

@@ -195,7 +195,7 @@ class TestMultiViewIO {
 	private SceneWorkingGraph createWorkingGraph(PairwiseImageGraph2 pairwise) {
 		var ret = new SceneWorkingGraph();
 
-		pairwise.nodes.forEach((i,v)->ret.addView(v));
+		pairwise.nodes.forIdx((i,v)->ret.addView(v));
 
 		var candidates = GrowQueue_I32.range(0,pairwise.nodes.size);
 

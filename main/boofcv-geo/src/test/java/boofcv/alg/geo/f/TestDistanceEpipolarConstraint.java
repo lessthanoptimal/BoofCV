@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,12 +65,12 @@ public class TestDistanceEpipolarConstraint {
 		DistanceEpipolarConstraint alg = new DistanceEpipolarConstraint();
 		alg.setModel(F);
 
-		double perfect = alg.computeDistance(new AssociatedPair(p1,p2));
+		double perfect = alg.distance(new AssociatedPair(p1,p2));
 
 		p1.x += 0.2;
 		p1.y += 0.2;
 
-		double noisy = alg.computeDistance(new AssociatedPair(p1,p2));
+		double noisy = alg.distance(new AssociatedPair(p1,p2));
 
 		assertTrue( perfect < noisy*0.1 );
 	}
@@ -86,13 +86,13 @@ public class TestDistanceEpipolarConstraint {
 		p1.x += 0.2;
 		p1.y += 0.2;
 
-		double orig = alg.computeDistance(new AssociatedPair(p1,p2));
+		double orig = alg.distance(new AssociatedPair(p1,p2));
 
 		// rescale the matrix and see if that changes the results
 		CommonOps_DDRM.scale(5,F);
 		alg.setModel(F);
 
-		double after = alg.computeDistance(new AssociatedPair(p1,p2));
+		double after = alg.distance(new AssociatedPair(p1,p2));
 
 		assertEquals(orig,after,1e-8);
 	}

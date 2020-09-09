@@ -37,51 +37,48 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64,Stereo2D3D> {
+public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3D> {
 	// PnP pose estimator
-	private GeoModelEstimatorN<Se3_F64,Point2D3D> alg;
+	private final GeoModelEstimatorN<Se3_F64, Point2D3D> alg;
 	// Used to resolve ambiguous solutions
-	private DistanceFromModel<Se3_F64,Point2D3D> distance;
+	private final DistanceFromModel<Se3_F64, Point2D3D> distance;
 
 	// Stereo observations converted into a monocular observation
-	private FastQueue<Point2D3D> monoPoints = new FastQueue<>(10, Point2D3D::new);
+	private final FastQueue<Point2D3D> monoPoints = new FastQueue<>(10, Point2D3D::new);
 
 	// known transform from left camera view into the right camera view
 	private Se3_F64 leftToRight = new Se3_F64();
 
 	// computed transform from worldToRight
-	private Se3_F64 worldToRight = new Se3_F64();
+	private final Se3_F64 worldToRight = new Se3_F64();
 
-	private FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64::new);
+	private final FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64::new);
 
 	// extra observation used for testing solutions
 	int extraForTest;
 
 	/**
-	 *
-	 * @param alg
-	 * @param distance
 	 * @param extraForTest Right camera is used so zero is the minimum number
 	 */
-	public PnPStereoEstimator(GeoModelEstimatorN<Se3_F64, Point2D3D> alg,
-							  DistanceFromModel<Se3_F64,Point2D3D> distance ,
-							  int extraForTest ) {
+	public PnPStereoEstimator( GeoModelEstimatorN<Se3_F64, Point2D3D> alg,
+							   DistanceFromModel<Se3_F64, Point2D3D> distance,
+							   int extraForTest ) {
 		this.alg = alg;
 		this.distance = distance;
 		this.extraForTest = extraForTest;
 	}
 
-	public void setLeftToRight(Se3_F64 leftToRight) {
+	public void setLeftToRight( Se3_F64 leftToRight ) {
 		this.leftToRight = leftToRight;
 	}
 
 	@Override
-	public boolean process(List<Stereo2D3D> points, Se3_F64 estimatedModel) {
+	public boolean process( List<Stereo2D3D> points, Se3_F64 estimatedModel ) {
 		int N = alg.getMinimumPoints();
 
 		// create a list of observation from the left camera
 		monoPoints.reset();
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			Stereo2D3D s = points.get(i);
 			Point2D3D p = monoPoints.grow();
 			p.observation = s.leftObs;
@@ -90,45 +87,45 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64,Stereo2D3D
 
 		// compute solutions
 		solutions.reset();
-		alg.process(monoPoints.toList(),solutions);
+		alg.process(monoPoints.toList(), solutions);
 
 		// use one for temporary storage when computing distance
 		Point2D3D p = monoPoints.get(0);
-		
+
 		// use observations from the left and right cameras to select the best solution
 		Se3_F64 bestMotion = null;
 		double bestError = Double.MAX_VALUE;
-		for( int i = 0; i < solutions.size; i++ ) {
+		for (int i = 0; i < solutions.size; i++) {
 			Se3_F64 worldToLeft = solutions.data[i];
 
 			double totalError = 0;
 
 			// use extra observations from the left camera
 			distance.setModel(worldToLeft);
-			for( int j = N; j < points.size(); j++ ) {
+			for (int j = N; j < points.size(); j++) {
 				Stereo2D3D s = points.get(i);
 				p.observation = s.leftObs;
 				p.location = s.location;
-				totalError += distance.computeDistance(p);
+				totalError += distance.distance(p);
 			}
 
 			// Use all observations from the right camera
-			worldToLeft.concat(leftToRight,worldToRight);
+			worldToLeft.concat(leftToRight, worldToRight);
 			distance.setModel(worldToRight);
-			for( int j = 0; j < points.size(); j++ ) {
+			for (int j = 0; j < points.size(); j++) {
 				Stereo2D3D s = points.get(j);
 				p.observation = s.rightObs;
 				p.location = s.location;
-				totalError += distance.computeDistance(p);
+				totalError += distance.distance(p);
 			}
 
-			if( totalError < bestError ) {
+			if (totalError < bestError) {
 				bestError = totalError;
 				bestMotion = worldToLeft;
 			}
 		}
 
-		if( bestMotion == null )
+		if (bestMotion == null)
 			return false;
 
 		estimatedModel.set(bestMotion);

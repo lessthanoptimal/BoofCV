@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 		alg.setStereoParameters(param);
 		alg.setModel(worldToLeft);
 
-		double found = alg.computeDistance(new Stereo2D3D(obsLeft,obsRight,X));
+		double found = alg.distance(new Stereo2D3D(obsLeft,obsRight,X));
 		double expected = deltaX0*deltaX0 + deltaY0*deltaY0 + deltaX1*deltaX1 + deltaY1*deltaY1;
 
 		assertEquals(expected,found,1e-8);
@@ -112,7 +112,7 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 			alg.setStereoParameters(param);
 			alg.setModel(new Se3_F64());
 
-			double found = alg.computeDistance(new Stereo2D3D(obsLeft,obsRight,X));
+			double found = alg.distance(new Stereo2D3D(obsLeft,obsRight,X));
 
 			assertTrue(Double.MAX_VALUE == found);
 	}
@@ -127,7 +127,7 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 		alg.setModel(worldToLeft);
 
 		int N = 10;
-		double expected[] = new double[N*4];
+		double[] expected = new double[N*4];
 		List<Stereo2D3D> obs = new ArrayList<>();
 
 		for( int i = 0; i < N; i++ ) {
@@ -148,14 +148,14 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 
 			Stereo2D3D p = new Stereo2D3D(obsLeft,obsRight,X);
 
-			expected[i] = alg.computeDistance(p);
+			expected[i] = alg.distance(p);
 			obs.add( p );
 		}
 
 
 
-		double found[] = new double[ N ];
-		alg.computeDistance(obs,found);
+		double[] found = new double[ N ];
+		alg.distances(obs,found);
 
 		for( int i = 0; i < N; i++ )
 			assertEquals(expected[i],found[i],1e-8);

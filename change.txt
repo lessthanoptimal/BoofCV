@@ -90,10 +90,8 @@ Projective Exploration
 - Normalize before trying to upgrade scene to metric?
 
 TODO Move projective to metric and similar from multiview to perspective
-TODO Refactor DistanceFromModel.computeDistance() to distance() and distances() just before release
 TODO rename RansacMultiView to RansacCalibrated
 TODO rename FactoryMultiView.triangulateNViewCalibrated to metric
-TODO DDogleg make forEach and forIdx consistent
 
 TODO Multi-View Stereo
   - Use existing two view stereo to cludge something together

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,20 +28,20 @@ import java.util.List;
 
 /**
  * <p>
- *     Wrapper around {@link EssentialResidualSampson} for {@link DistanceFromModelMultiView}/
+ * Wrapper around {@link EssentialResidualSampson} for {@link DistanceFromModelMultiView}/
  * </p>
  *
  * @author Peter Abeles
  */
-public class DistanceMultiView_EssentialSampson implements DistanceFromModelMultiView<DMatrixRMaj,AssociatedPair> {
+public class DistanceMultiView_EssentialSampson implements DistanceFromModelMultiView<DMatrixRMaj, AssociatedPair> {
 
 	EssentialResidualSampson alg = new EssentialResidualSampson();
 
 	@Override
-	public void setIntrinsic(int view, CameraPinhole intrinsic) {
-		if( view == 0 )
+	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
+		if (view == 0)
 			alg.setCalibration1(intrinsic);
-		else if( view == 1 )
+		else if (view == 1)
 			alg.setCalibration2(intrinsic);
 		else
 			throw new RuntimeException("Unknown view");
@@ -53,17 +53,17 @@ public class DistanceMultiView_EssentialSampson implements DistanceFromModelMult
 	}
 
 	@Override
-	public void setModel(DMatrixRMaj E) {
+	public void setModel( DMatrixRMaj E ) {
 		alg.setModel(E);
 	}
 
 	@Override
-	public double computeDistance(AssociatedPair pt) {
+	public double distance( AssociatedPair pt ) {
 		return Math.abs(alg.computeResidual(pt));
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedPair> pairs, double[] distance) {
+	public void distances( List<AssociatedPair> pairs, double[] distance ) {
 		for (int i = 0; i < pairs.size(); i++) {
 			distance[i] = Math.abs(alg.computeResidual(pairs.get(i)));
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class DistanceSe2Sq implements DistanceFromModel<Se2_F64,AssociatedPair> 
 	}
 
 	@Override
-	public double computeDistance(AssociatedPair sample ) {
+	public double distance(AssociatedPair sample ) {
 
 		// apply transform from key frame to current frame
 		SePointOps_F64.transform(keyToCurr, sample.p1, curr2D);
@@ -59,9 +59,9 @@ public class DistanceSe2Sq implements DistanceFromModel<Se2_F64,AssociatedPair> 
 	}
 
 	@Override
-	public void computeDistance(List<AssociatedPair> samples, double[] distance) {
+	public void distances(List<AssociatedPair> samples, double[] distance) {
 		for( int i = 0; i < samples.size(); i++ ) {
-			distance[i] = computeDistance(samples.get(i));
+			distance[i] = distance(samples.get(i));
 		}
 	}
 
