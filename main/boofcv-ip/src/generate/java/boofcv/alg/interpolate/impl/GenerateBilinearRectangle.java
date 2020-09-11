@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.generate.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -39,7 +38,7 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 	AutoTypeImage image;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.U8);
 		createType(AutoTypeImage.S16);
@@ -60,7 +59,7 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
+		out.print(CodeGeneratorBase.copyright);
 		out.print("package boofcv.alg.interpolate.impl;\n");
 		out.println();
 		out.print("import boofcv.alg.interpolate.InterpolateRectangle;\n" +
@@ -226,6 +225,6 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateBilinearRectangle gen = new GenerateBilinearRectangle();
-		gen.generate();
+		gen.generateCode();
 	}
 }

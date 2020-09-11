@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 /**
  * @author Peter Abeles
  */
-public class GenerateImplSsdCorner extends CodeGeneratorBase  {
+public class GenerateImplSsdCorner extends CodeGeneratorBase {
 	String typeInput;
 	String typeOutput;
 	String dataInput;
@@ -36,26 +36,26 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 	String cornerInten;
 
 	public GenerateImplSsdCorner() {
-		super(false);
+		super.className = "off";
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
-		createFile(AutoTypeImage.F32,AutoTypeImage.F32);
-		createFile(AutoTypeImage.S16,AutoTypeImage.S32);
+	public void generateCode() throws FileNotFoundException {
+		createFile(AutoTypeImage.F32, AutoTypeImage.F32);
+		createFile(AutoTypeImage.S16, AutoTypeImage.S32);
 	}
 
-	public void createFile( AutoTypeImage input , AutoTypeImage output ) throws FileNotFoundException {
+	public void createFile( AutoTypeImage input, AutoTypeImage output ) throws FileNotFoundException {
 		className = null;
-		setOutputFile("ImplSsdCorner_"+input.getAbbreviatedType());
+		setOutputFile("ImplSsdCorner_" + input.getAbbreviatedType());
 
 		typeInput = input.getSingleBandName();
 		typeOutput = output.getSingleBandName();
 		dataInput = input.getDataType();
 		dataOutput = output.getDataType();
 		sumType = input.getSumType();
-		workArrays = input.getLetterSum()+"WorkArrays";
-		cornerInten = "CornerIntensity_"+input.getKernelType();
+		workArrays = input.getLetterSum() + "WorkArrays";
+		cornerInten = "CornerIntensity_" + input.getKernelType();
 
 		printPreamble();
 		printHorizontal();
@@ -66,11 +66,11 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 
 	private void printPreamble() throws FileNotFoundException {
 		out.print("import boofcv.struct.image." + typeInput + ";\n");
-		out.print("import boofcv.concurrency."+workArrays+";\n");
+		out.print("import boofcv.concurrency." + workArrays + ";\n");
 
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import boofcv.struct.image." + typeOutput + ";\n");
-		if( typeInput.compareTo("GrayF32") != 0 && typeOutput.compareTo("GrayF32") != 0 ) {
+		if (typeInput.compareTo("GrayF32") != 0 && typeOutput.compareTo("GrayF32") != 0) {
 			out.print("import boofcv.struct.image.GrayF32;\n");
 		}
 		out.print("import javax.annotation.Generated;\n\n");
@@ -78,17 +78,17 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 
 		out.print("/**\n" +
 				" * <p>\n" +
-				" * Implementation of {@link ImplSsdCornerBase} for {@link "+typeInput+"}.\n" +
+				" * Implementation of {@link ImplSsdCornerBase} for {@link " + typeInput + "}.\n" +
 				" * </p>\n" +
 				" * \n" +
 				generateDocString("Peter Abeles") +
-				"public class "+className+" extends ImplSsdCornerBox<"+typeInput+","+typeOutput+"> {\n" +
+				"public class " + className + " extends ImplSsdCornerBox<" + typeInput + "," + typeOutput + "> {\n" +
 				"\n" +
-				"\tprivate "+workArrays+" work = new "+workArrays+"();\n" +
-				"\tprivate "+cornerInten+" intensity;\n" +
+				"\tprivate " + workArrays + " work = new " + workArrays + "();\n" +
+				"\tprivate " + cornerInten + " intensity;\n" +
 				"\n" +
-				"\tpublic "+className+"( int windowRadius, "+cornerInten+" intensity) {\n" +
-				"\t\tsuper(windowRadius,"+typeOutput+".class);\n" +
+				"\tpublic " + className + "( int windowRadius, " + cornerInten + " intensity) {\n" +
+				"\t\tsuper(windowRadius," + typeOutput + ".class);\n" +
 				"\t\tthis.intensity = intensity;\n" +
 				"\t}\n" +
 				"\n" +
@@ -134,8 +134,8 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t\t\tint indexY = derivY.startIndex + row * derivY.stride;\n" +
 				"\n" +
 				"\t\t\tfor (; pix < end; pix++) {\n" +
-				"\t\t\t\t"+dataInput+" dx = dataX[indexX++];\n" +
-				"\t\t\t\t"+dataInput+" dy = dataY[indexY++];\n" +
+				"\t\t\t\t" + dataInput + " dx = dataX[indexX++];\n" +
+				"\t\t\t\t" + dataInput + " dy = dataY[indexY++];\n" +
 				"\n" +
 				"\t\t\t\ttotalXX += dx * dx;\n" +
 				"\t\t\t\ttotalXY += dx * dy;\n" +
@@ -149,8 +149,8 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t\t\tend = row * imgWidth + imgWidth;\n" +
 				"\t\t\tfor (; pix < end; pix++, indexX++, indexY++) {\n" +
 				"\n" +
-				"\t\t\t\t"+dataInput+" dx = dataX[indexX - windowWidth];\n" +
-				"\t\t\t\t"+dataInput+" dy = dataY[indexY - windowWidth];\n" +
+				"\t\t\t\t" + dataInput + " dx = dataX[indexX - windowWidth];\n" +
+				"\t\t\t\t" + dataInput + " dy = dataY[indexY - windowWidth];\n" +
 				"\n" +
 				"\t\t\t\t// saving these multiplications in an array to avoid recalculating them made\n" +
 				"\t\t\t\t// the algorithm about 50% slower\n" +
@@ -181,9 +181,9 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t */\n" +
 				"\t@Override\n" +
 				"\tprotected void vertical( GrayF32 intensity ) {\n" +
-				"\t\t"+sumType+"[] hXX = horizXX.data;\n" +
-				"\t\t"+sumType+"[] hXY = horizXY.data;\n" +
-				"\t\t"+sumType+"[] hYY = horizYY.data;\n" +
+				"\t\t" + sumType + "[] hXX = horizXX.data;\n" +
+				"\t\t" + sumType + "[] hXY = horizXY.data;\n" +
+				"\t\t" + sumType + "[] hYY = horizYY.data;\n" +
 				"\t\tfinal float[] inten = intensity.data;\n" +
 				"\n" +
 				"\t\tfinal int imgHeight = horizXX.getHeight();\n" +
@@ -198,14 +198,14 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius,imgHeight-radius,(y0,y1)->{\n" +
 				"\t\tint y0 = radius, y1 = imgHeight-radius;\n" +
-				"\t\tfinal "+dataOutput+"[] tempXX = work.pop();\n" +
-				"\t\tfinal "+dataOutput+"[] tempXY = work.pop();\n" +
-				"\t\tfinal "+dataOutput+"[] tempYY = work.pop();\n" +
+				"\t\tfinal " + dataOutput + "[] tempXX = work.pop();\n" +
+				"\t\tfinal " + dataOutput + "[] tempXY = work.pop();\n" +
+				"\t\tfinal " + dataOutput + "[] tempYY = work.pop();\n" +
 				"\t\tfor (int x = startX; x < endX; x++) {\n" +
 				"\t\t\t// defines the A matrix, from which the eigenvalues are computed\n" +
 				"\t\t\tint srcIndex = x + (y0-radius)*imgWidth;\n" +
 				"\t\t\tint destIndex = imgWidth * y0 + x;\n" +
-				"\t\t\t"+sumType+" totalXX = 0, totalXY = 0, totalYY = 0;\n" +
+				"\t\t\t" + sumType + " totalXX = 0, totalXY = 0, totalYY = 0;\n" +
 				"\n" +
 				"\t\t\tint indexEnd = srcIndex + imgWidth * kernelWidth;\n" +
 				"\t\t\tfor (; srcIndex < indexEnd; srcIndex += imgWidth) {\n" +
@@ -229,11 +229,11 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t\t\tint destIndex = y * imgWidth + startX;\n" +
 				"\n" +
 				"\t\t\tfor (int x = startX; x < endX; x++, srcIndex++, destIndex++) {\n" +
-				"\t\t\t\t"+sumType+" totalXX = tempXX[x] - hXX[srcIndex - backStep];\n" +
+				"\t\t\t\t" + sumType + " totalXX = tempXX[x] - hXX[srcIndex - backStep];\n" +
 				"\t\t\t\ttempXX[x] = totalXX += hXX[srcIndex];\n" +
-				"\t\t\t\t"+sumType+" totalXY = tempXY[x] - hXY[srcIndex - backStep];\n" +
+				"\t\t\t\t" + sumType + " totalXY = tempXY[x] - hXY[srcIndex - backStep];\n" +
 				"\t\t\t\ttempXY[x] = totalXY += hXY[srcIndex];\n" +
-				"\t\t\t\t"+sumType+" totalYY = tempYY[x] - hYY[srcIndex - backStep];\n" +
+				"\t\t\t\t" + sumType + " totalYY = tempYY[x] - hYY[srcIndex - backStep];\n" +
 				"\t\t\t\ttempYY[x] = totalYY += hYY[srcIndex];\n" +
 				"\n" +
 				"\t\t\t\tinten[destIndex] = this.intensity.compute(totalXX,totalXY,totalYY);\n" +
@@ -249,6 +249,6 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplSsdCorner gen = new GenerateImplSsdCorner();
 
-		gen.generate();
+		gen.generateCode();
 	}
 }

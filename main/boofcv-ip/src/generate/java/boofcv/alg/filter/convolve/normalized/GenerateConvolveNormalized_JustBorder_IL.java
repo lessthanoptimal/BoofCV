@@ -40,7 +40,7 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 	String divide;
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 
 		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32);
@@ -526,6 +526,6 @@ public class GenerateConvolveNormalized_JustBorder_IL extends CodeGeneratorBase 
 
 	public static void main(String args[]) throws FileNotFoundException {
 		GenerateConvolveNormalized_JustBorder_IL gen = new GenerateConvolveNormalized_JustBorder_IL();
-		gen.generate();
+		gen.generateCode();
 	}
 }

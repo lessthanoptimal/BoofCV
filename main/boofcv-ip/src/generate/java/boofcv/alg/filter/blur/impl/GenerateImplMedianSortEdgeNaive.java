@@ -20,7 +20,6 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.generate.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -41,7 +40,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printFunction(AutoTypeImage.F32);
@@ -52,7 +51,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
+		out.print(CodeGeneratorBase.copyright);
 		out.print("package boofcv.alg.filter.blur.impl;\n" +
 				"\n" +
 				"import boofcv.struct.image.GrayF32;\n" +
@@ -201,6 +200,6 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplMedianSortEdgeNaive app = new GenerateImplMedianSortEdgeNaive();
-		app.generate();
+		app.generateCode();
 	}
 }

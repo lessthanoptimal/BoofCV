@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 	AutoTypeImage derivType;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printFuncs(AutoTypeImage.F32);
@@ -131,6 +131,6 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplHessianBlobIntensity gen = new GenerateImplHessianBlobIntensity();
-		gen.generate();
+		gen.generateCode();
 	}
 }

@@ -28,7 +28,7 @@ import java.io.FileNotFoundException;
  */
 public class GenerateGrowBorderSB extends CodeGeneratorBase {
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 		createImage(AutoTypeImage.I8);
 		createImage(AutoTypeImage.I16);
@@ -172,6 +172,6 @@ public class GenerateGrowBorderSB extends CodeGeneratorBase {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
-		new GenerateGrowBorderSB().generate();
+		new GenerateGrowBorderSB().generateCode();
 	}
 }

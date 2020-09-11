@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
-import boofcv.generate.CodeGeneratorUtil;
+import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -45,7 +45,7 @@ public class GenerateConvolveNormalizedStandardSparse {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
+		out.print(CodeGeneratorBase.copyright);
 		out.print("package boofcv.alg.filter.convolve.normalized;\n" +
 				"\n" +
 				"import boofcv.struct.convolve.Kernel1D_F32;\n" +

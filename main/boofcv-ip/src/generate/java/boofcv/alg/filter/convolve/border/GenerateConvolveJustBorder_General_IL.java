@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class GenerateConvolveJustBorder_General_IL extends CodeGeneratorBase {
 	String sumType;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 
 		printPreamble();
 
@@ -280,6 +280,6 @@ public class GenerateConvolveJustBorder_General_IL extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateConvolveJustBorder_General_IL generator = new GenerateConvolveJustBorder_General_IL();
-		generator.generate();
+		generator.generateCode();
 	}
 }

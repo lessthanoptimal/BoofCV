@@ -39,7 +39,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 	private String bitWise;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 		printAllGeneric();
 		printAllSpecific();
@@ -933,6 +933,6 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplImageMiscOps gen = new GenerateImplImageMiscOps();
-		gen.generate();
+		gen.generateCode();
 	}
 }

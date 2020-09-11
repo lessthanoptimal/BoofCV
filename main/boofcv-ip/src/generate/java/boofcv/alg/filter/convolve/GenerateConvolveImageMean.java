@@ -32,7 +32,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 	AutoTypeImage dst;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 		addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
 		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
@@ -215,6 +215,6 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		GenerateConvolveImageMean gen = new GenerateConvolveImageMean();
-		gen.generate();
+		gen.generateCode();
 	}
 }

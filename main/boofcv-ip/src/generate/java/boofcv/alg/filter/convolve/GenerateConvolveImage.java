@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class GenerateConvolveImage extends CodeGeneratorBase {
 	int totalFunctions = 0;
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
 //		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
@@ -153,6 +153,6 @@ public class GenerateConvolveImage extends CodeGeneratorBase {
 
 	public static void main(String[] args) {
 		GenerateConvolveImage gen = new GenerateConvolveImage();
-		gen.generate();
+		gen.generateCode();
 	}
 }

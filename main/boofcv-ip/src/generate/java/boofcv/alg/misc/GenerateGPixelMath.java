@@ -41,7 +41,7 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 //	private AutoTypeImage[] signedOutputTypes = new AutoTypeImage[]{U8,U16,S32,S64,F32,F64};
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printFunction(lambda1(), AutoTypeImage.getGenericTypes());
@@ -940,6 +940,6 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateGPixelMath gen = new GenerateGPixelMath();
 		gen.parseArguments(args);
-		gen.generate();
+		gen.generateCode();
 	}
 }

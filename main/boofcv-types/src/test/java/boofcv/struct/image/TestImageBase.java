@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.image;
 
-import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,10 +50,10 @@ class TestImageBase {
 		a.width = 4;
 		a.height = 11;
 
-		Point2D_I32 p = a.indexToPixel(7+6*5+2);
-		
-		assertEquals(2,p.x);
-		assertEquals(6,p.y);
+		int index = 7+6*5+2;
+
+		assertEquals(2,a.indexToPixelX(index));
+		assertEquals(6,a.indexToPixelY(index));
 	}
 
 	@Test

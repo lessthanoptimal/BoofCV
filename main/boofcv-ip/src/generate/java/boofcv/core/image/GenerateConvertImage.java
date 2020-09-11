@@ -30,7 +30,7 @@ import java.io.FileNotFoundException;
 public class GenerateConvertImage extends CodeGeneratorBase {
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		for( AutoTypeImage in : AutoTypeImage.getSpecificTypes()) {
@@ -349,6 +349,6 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateConvertImage app = new GenerateConvertImage();
 
-		app.generate();
+		app.generateCode();
 	}
 }

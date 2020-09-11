@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 	AutoTypeImage imageType;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printClass(AutoTypeImage.F32);
 		printClass(AutoTypeImage.S16);
 		printClass(AutoTypeImage.S32);
@@ -174,6 +174,6 @@ public class GenerateImplOrientationSlidingWindow extends CodeGeneratorBase {
 
 	public static void main( String argsp[] ) throws FileNotFoundException {
 		GenerateImplOrientationSlidingWindow app = new GenerateImplOrientationSlidingWindow();
-		app.generate();
+		app.generateCode();
 	}
 }

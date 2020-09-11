@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.filter.basic.impl;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.generate.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -44,7 +43,7 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printAll(AutoTypeImage.F32);
@@ -58,7 +57,7 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
+		out.print(CodeGeneratorBase.copyright);
 		out.print("package boofcv.alg.filter.basic.impl;\n" +
 				"\n" +
 				"import boofcv.struct.image.*;\n" +
@@ -136,6 +135,6 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplGrayImageOps app = new GenerateImplGrayImageOps();
-		app.generate();
+		app.generateCode();
 	}
 }

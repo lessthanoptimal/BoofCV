@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.generate.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -45,7 +44,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printFuncs(AutoTypeImage.F32, AutoTypeImage.F32);
@@ -56,7 +55,7 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
+		out.print(CodeGeneratorBase.copyright);
 		out.print("package boofcv.alg.wavelet.impl;\n" +
 				"\n" +
 				"import boofcv.alg.wavelet.UtilWavelet;\n" +
@@ -386,6 +385,6 @@ public class GenerateImplWaveletTransformNaive extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplWaveletTransformNaive app = new GenerateImplWaveletTransformNaive();
-		app.generate();
+		app.generateCode();
 	}
 }

@@ -29,7 +29,7 @@ import java.io.FileNotFoundException;
 public class GenerateImplAverageDownSampleN extends CodeGeneratorBase {
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		down(AutoTypeImage.U8,AutoTypeImage.I8);
@@ -177,7 +177,7 @@ public class GenerateImplAverageDownSampleN extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplAverageDownSampleN app = new GenerateImplAverageDownSampleN();
-		app.generate();
+		app.generateCode();
 	}
 }
 

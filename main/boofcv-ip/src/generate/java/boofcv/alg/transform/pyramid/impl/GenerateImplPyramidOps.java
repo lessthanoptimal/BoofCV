@@ -28,7 +28,7 @@ import java.io.FileNotFoundException;
  */
 public class GenerateImplPyramidOps extends CodeGeneratorBase {
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printAll(AutoTypeImage.F32);
@@ -117,6 +117,6 @@ public class GenerateImplPyramidOps extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplPyramidOps app = new GenerateImplPyramidOps();
-		app.generate();
+		app.generateCode();
 	}
 }

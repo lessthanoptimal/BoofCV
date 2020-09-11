@@ -37,7 +37,7 @@ public class GenerateConvolveDownNormalizedNaive extends CodeGeneratorBase {
 	}
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 		printAllOps("F32", "GrayF32","GrayF32","float","float");
 		printAllOps("I32", "GrayU8","ImageInt8","int","int");
@@ -183,6 +183,6 @@ public class GenerateConvolveDownNormalizedNaive extends CodeGeneratorBase {
 
 	public static void main(String args[]) throws FileNotFoundException {
 		GenerateConvolveDownNormalizedNaive gen = new GenerateConvolveDownNormalizedNaive();
-		gen.generate();
+		gen.generateCode();
 	}
 }

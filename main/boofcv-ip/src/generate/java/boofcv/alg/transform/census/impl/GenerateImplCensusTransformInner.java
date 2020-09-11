@@ -28,7 +28,7 @@ import java.io.FileNotFoundException;
  */
 public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		for( AutoTypeImage type : new AutoTypeImage[]{AutoTypeImage.U8,AutoTypeImage.U16,AutoTypeImage.F32}) {
@@ -335,6 +335,6 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplCensusTransformInner app = new GenerateImplCensusTransformInner();
-		app.generate();
+		app.generateCode();
 	}
 }

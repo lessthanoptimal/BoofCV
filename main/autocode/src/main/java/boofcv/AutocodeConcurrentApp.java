@@ -61,7 +61,7 @@ public class AutocodeConcurrentApp {
 	public static void convertFile( File original ) throws IOException {
 		File outputFile = determineClassName(original);
 
-		System.out.println("Writing to "+outputFile);
+		System.out.println("Writing to " + outputFile);
 
 		String classNameOld = className(original);
 		String classNameNew = className(outputFile);
@@ -139,15 +139,15 @@ public class AutocodeConcurrentApp {
 
 	public static File findPathToProjectRoot() {
 		String path = "./";
-		while( true ) {
+		while (true) {
 			File d = new File(path);
-			if( new File(d,"main").exists() )
+			if (new File(d, "main").exists() && new File(d, "gradle.properties").exists())
 				break;
-			path = "../"+path;
+			path = "../" + path;
 		}
 
 		// normalize().toFile() messes up in this situation and makes it relative to "/"
-		if( path.equals("./") )
+		if (path.equals("./"))
 			return new File(path);
 
 		return Paths.get(path).normalize().toFile();
@@ -263,7 +263,7 @@ public class AutocodeConcurrentApp {
 //			}
 //			return new File(original.getParent(), name + ".java");
 			String name = className(original);
-			return new File(original.getParent(),name+"_MT.java");
+			return new File(original.getParent(), name + "_MT.java");
 		}
 
 		String name = readUntilEndOfLine(text, where + pattern.length());
@@ -364,17 +364,17 @@ public class AutocodeConcurrentApp {
 		};
 
 		File rootDir = findPathToProjectRoot();
-		System.out.println("Autocode Concurrent: current="+new File(".").getAbsolutePath());
-		System.out.println("                     root="+rootDir.getAbsolutePath());
+		System.out.println("Autocode Concurrent: current=" + new File(".").getAbsolutePath());
+		System.out.println("                     root=" + rootDir.getAbsolutePath());
 
 		for (String f : directories) {
 			System.out.println("directory " + f);
-			convertDir(new File(rootDir,f), "\\S+\\.java", "\\S+MT\\S+");
+			convertDir(new File(rootDir, f), "\\S+\\.java", "\\S+MT\\S+");
 		}
 
 		for (String f : files) {
 			System.out.println("File " + f);
-			convertFile(new File(rootDir,f));
+			convertFile(new File(rootDir, f));
 		}
 	}
 }

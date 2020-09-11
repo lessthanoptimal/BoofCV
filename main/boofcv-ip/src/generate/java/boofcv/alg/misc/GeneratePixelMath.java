@@ -41,7 +41,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	ImageType.Family[] families = new ImageType.Family[]{ImageType.Family.GRAY, ImageType.Family.INTERLEAVED};
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printLambda1();
@@ -804,6 +804,6 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	public static void main( String[] args ) throws FileNotFoundException {
 		GeneratePixelMath gen = new GeneratePixelMath();
 		gen.parseArguments(args);
-		gen.generate();
+		gen.generateCode();
 	}
 }

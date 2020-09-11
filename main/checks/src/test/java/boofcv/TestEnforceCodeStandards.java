@@ -18,7 +18,7 @@
 
 package boofcv;
 
-import boofcv.generate.CodeGeneratorUtil;
+import boofcv.generate.CodeGeneratorBase;
 import boofcv.io.UtilIO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -136,7 +136,7 @@ public class TestEnforceCodeStandards {
 			assertTrue(file.getParentFile().mkdirs());
 		assertTrue( file.createNewFile());
 		var out = new PrintStream(new FileOutputStream(file, false),true,"UTF-8");
-		out.println(CodeGeneratorUtil.copyright);
+		out.println(CodeGeneratorBase.copyright);
 		out.println();
 		out.println("package "+path+";");
 		out.println();

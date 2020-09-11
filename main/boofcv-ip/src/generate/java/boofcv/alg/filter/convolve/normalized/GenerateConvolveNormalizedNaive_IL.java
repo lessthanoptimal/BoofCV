@@ -32,7 +32,7 @@ public class GenerateConvolveNormalizedNaive_IL extends CodeGeneratorBase {
 	String divide;
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32);
 		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64);
@@ -287,6 +287,6 @@ public class GenerateConvolveNormalizedNaive_IL extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateConvolveNormalizedNaive_IL gen = new GenerateConvolveNormalizedNaive_IL();
-		gen.generate();
+		gen.generateCode();
 	}
 }

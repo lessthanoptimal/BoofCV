@@ -35,11 +35,11 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	String borderType;
 
 	public GenerateImplBilinearPixel() {
-		super(false);
+		super.className = "off";
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		createType(AutoTypeImage.F64);
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.U8);
@@ -156,6 +156,6 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplBilinearPixel app = new GenerateImplBilinearPixel();
 		app.parseArguments(args);
-		app.generate();
+		app.generateCode();
 	}
 }

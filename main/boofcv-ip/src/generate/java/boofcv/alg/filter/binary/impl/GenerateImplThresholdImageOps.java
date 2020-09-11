@@ -29,7 +29,7 @@ import java.io.FileNotFoundException;
  */
 public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printAll(AutoTypeImage.F32);
@@ -231,6 +231,6 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplThresholdImageOps app = new GenerateImplThresholdImageOps();
 		app.parseArguments(args);
-		app.generate();
+		app.generateCode();
 	}
 }

@@ -29,7 +29,7 @@ import java.io.FileNotFoundException;
 public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		sharpen4(AutoTypeImage.U8);
@@ -328,6 +328,6 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplEnhanceFilter app = new GenerateImplEnhanceFilter();
-		app.generate();
+		app.generateCode();
 	}
 }

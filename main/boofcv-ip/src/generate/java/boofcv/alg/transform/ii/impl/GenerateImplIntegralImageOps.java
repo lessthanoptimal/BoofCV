@@ -30,7 +30,7 @@ import java.io.FileNotFoundException;
 public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printTwoInput(AutoTypeImage.F32, AutoTypeImage.F32);
@@ -167,6 +167,6 @@ public class GenerateImplIntegralImageOps extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplIntegralImageOps app = new GenerateImplIntegralImageOps();
-		app.generate();
+		app.generateCode();
 	}
 }

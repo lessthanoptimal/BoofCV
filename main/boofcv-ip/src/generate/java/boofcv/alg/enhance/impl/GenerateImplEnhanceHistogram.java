@@ -29,7 +29,7 @@ import java.io.FileNotFoundException;
 public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		applyTransform_U(AutoTypeImage.U8);
@@ -450,6 +450,6 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplEnhanceHistogram app = new GenerateImplEnhanceHistogram();
-		app.generate();
+		app.generateCode();
 	}
 }

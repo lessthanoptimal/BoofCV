@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ public class GenerateConvolveNormalizedNaive_SB extends CodeGeneratorBase {
 	String divide;
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32,AutoTypeImage.F32);
 		printAllOps(AutoTypeImage.F64,AutoTypeImage.F64);
@@ -335,6 +335,6 @@ public class GenerateConvolveNormalizedNaive_SB extends CodeGeneratorBase {
 	}
 
 	public static void main(String[] args) {
-		new GenerateConvolveNormalizedNaive_SB().generate();
+		new GenerateConvolveNormalizedNaive_SB().generateCode();
 	}
 }

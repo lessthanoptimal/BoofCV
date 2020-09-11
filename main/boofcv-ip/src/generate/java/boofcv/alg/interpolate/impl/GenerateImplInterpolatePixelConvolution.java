@@ -33,11 +33,11 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 	String borderType;
 
 	public GenerateImplInterpolatePixelConvolution() {
-		super(false);
+		super.className = "off";
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		createFile(AutoTypeImage.F32);
 		createFile(AutoTypeImage.S16);
 		createFile(AutoTypeImage.U8);
@@ -265,6 +265,6 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplInterpolatePixelConvolution app = new GenerateImplInterpolatePixelConvolution();
 		app.parseArguments(args);
-		app.generate();
+		app.generateCode();
 	}
 }

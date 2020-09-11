@@ -46,11 +46,11 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	String divide;
 
 	public GenerateConvolvedUnrolled_SB() {
-		super(false);
+		className = null;
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		create(AutoTypeImage.F32,AutoTypeImage.F32,false);
 		create(AutoTypeImage.F64,AutoTypeImage.F64,false);
 		create(AutoTypeImage.U8,AutoTypeImage.I8,true);
@@ -435,6 +435,6 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	public static void main(String args[]) throws FileNotFoundException {
 		GenerateConvolvedUnrolled_SB a = new GenerateConvolvedUnrolled_SB();
 
-		a.generate();
+		a.generateCode();
 	}
 }

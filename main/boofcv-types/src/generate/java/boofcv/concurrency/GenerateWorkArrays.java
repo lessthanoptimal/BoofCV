@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,11 @@ import java.io.FileNotFoundException;
  */
 public class GenerateWorkArrays extends CodeGeneratorBase {
 	public GenerateWorkArrays() {
-		super(false);
+		super.className = "off";
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		create("I","int");
 		create("L","long");
 		create("D","double");
@@ -109,6 +109,6 @@ public class GenerateWorkArrays extends CodeGeneratorBase {
 	public static void main(String args[]) throws FileNotFoundException {
 		GenerateWorkArrays a = new GenerateWorkArrays();
 
-		a.generate();
+		a.generateCode();
 	}
 }

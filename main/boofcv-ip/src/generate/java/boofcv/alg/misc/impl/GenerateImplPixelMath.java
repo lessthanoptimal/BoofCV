@@ -27,7 +27,6 @@ import java.util.List;
 
 import static boofcv.generate.AutoTypeImage.*;
 
-
 /**
  * Generates functions for ImplPixelMath.
  *
@@ -39,7 +38,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	private AutoTypeImage output;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printLambda1(AutoTypeImage.getGenericTypes());
@@ -48,15 +47,15 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		printNegative();
 
 		List<TwoTemplate> listTwo = new ArrayList<>();
-		listTwo.add( new Multiple());
-		listTwo.add( new Divide());
-		listTwo.add( new Plus());
-		listTwo.add( new Minus(true));
-		listTwo.add( new Minus(false));
+		listTwo.add(new Multiple());
+		listTwo.add(new Divide());
+		listTwo.add(new Plus());
+		listTwo.add(new Minus(true));
+		listTwo.add(new Minus(false));
 
-		for( TwoTemplate t : listTwo ) {
-			print_img_scalar(t,false);
-			print_img_scalar(t,true);
+		for (TwoTemplate t : listTwo) {
+			print_img_scalar(t, false);
+			print_img_scalar(t, true);
 			print_img_scalar_Int_to_Float(t);
 		}
 
@@ -83,70 +82,70 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 		AutoTypeImage[] types = AutoTypeImage.getSpecificTypes();
 
-		for( AutoTypeImage t : types ) {
+		for (AutoTypeImage t : types) {
 			input = t;
 
 			printBoundImage();
 			printDiffAbs();
 		}
 
-		AutoTypeImage[] outputsAdd = new AutoTypeImage[]{U16,S16,S32,S32,S32,S64,F32,F64};
-		AutoTypeImage[] outputsSub = new AutoTypeImage[]{I16,S16,S32,S32,S32,S64,F32,F64};
+		AutoTypeImage[] outputsAdd = new AutoTypeImage[]{U16, S16, S32, S32, S32, S64, F32, F64};
+		AutoTypeImage[] outputsSub = new AutoTypeImage[]{I16, S16, S32, S32, S32, S64, F32, F64};
 
-		for( int i = 0; i < types.length; i++ ) {
-			printAddTwoImages(types[i],outputsAdd[i]);
-			printSubtractTwoImages(types[i],outputsSub[i]);
+		for (int i = 0; i < types.length; i++) {
+			printAddTwoImages(types[i], outputsAdd[i]);
+			printSubtractTwoImages(types[i], outputsSub[i]);
 
-			if( !types[i].isInteger() ) {
-				printMultTwoImages(types[i],types[i]);
-				printDivTwoImages(types[i],types[i]);
+			if (!types[i].isInteger()) {
+				printMultTwoImages(types[i], types[i]);
+				printDivTwoImages(types[i], types[i]);
 //				printLog(types[i],types[i]);
 //				printLogSign(types[i], types[i]);
 //				printSqrt(types[i], types[i]);
 			}
 		}
 
-		printVal("log",(in,out)-> "\t\t\t\toutput[indexDst] = ("+in.getDataType()+")Math.log(val + input[indexSrc]);",
-				AutoTypeImage.getFloatingTypes(),AutoTypeImage.getFloatingTypes());
-		printVal("logSign",(in,out)-> {
-			String type = in.getDataType();
-			return "\t\t\t\t"+type+" value = input[indexSrc];\n" +
-					"\t\t\t\tif( value < 0 ) {\n" +
-					"\t\t\t\t\toutput[indexDst] = ("+type+")-Math.log(val - value);\n" +
-					"\t\t\t\t} else {\n" +
-					"\t\t\t\t\toutput[indexDst] = ("+type+")Math.log(val + value);\n" +
-					"\t\t\t\t}";
+		printVal("log", ( in, out ) -> "\t\t\t\toutput[indexDst] = (" + in.getDataType() + ")Math.log(val + input[indexSrc]);",
+				AutoTypeImage.getFloatingTypes(), AutoTypeImage.getFloatingTypes());
+		printVal("logSign", ( in, out ) -> {
+					String type = in.getDataType();
+					return "\t\t\t\t" + type + " value = input[indexSrc];\n" +
+							"\t\t\t\tif( value < 0 ) {\n" +
+							"\t\t\t\t\toutput[indexDst] = (" + type + ")-Math.log(val - value);\n" +
+							"\t\t\t\t} else {\n" +
+							"\t\t\t\t\toutput[indexDst] = (" + type + ")Math.log(val + value);\n" +
+							"\t\t\t\t}";
 				},
-				AutoTypeImage.getFloatingTypes(),AutoTypeImage.getFloatingTypes());
+				AutoTypeImage.getFloatingTypes(), AutoTypeImage.getFloatingTypes());
 
-		print("sqrt","Math.sqrt(input[indexSrc])",AutoTypeImage.getFloatingTypes());
+		print("sqrt", "Math.sqrt(input[indexSrc])", AutoTypeImage.getFloatingTypes());
 
-		increaseBits(new AutoTypeImage[]{U8,U16,F32,F64},new AutoTypeImage[]{U16,S32,F32,F64});
+		increaseBits(new AutoTypeImage[]{U8, U16, F32, F64}, new AutoTypeImage[]{U16, S32, F32, F64});
 	}
 
 	private void increaseBits( AutoTypeImage[] typesSrc, AutoTypeImage[] typesDst ) {
 
-		print("pow2",(in,out)->{
+		print("pow2", ( in, out ) -> {
 			String bitwise = in.getBitWise();
-			return "\t\t\t\t"+in.getSumType()+" v = input[indexSrc]"+bitwise+";\n" +
-					"\t\t\t\toutput[indexDst] = ("+out.getDataType()+")(v*v);\n";
-		},typesSrc,typesDst);
+			return "\t\t\t\t" + in.getSumType() + " v = input[indexSrc]" + bitwise + ";\n" +
+					"\t\t\t\toutput[indexDst] = (" + out.getDataType() + ")(v*v);\n";
+		}, typesSrc, typesDst);
 
 		for (int i = 0; i < typesSrc.length; i++) {
-			printStdev(typesSrc[i],typesDst[i]);
+			printStdev(typesSrc[i], typesDst[i]);
 		}
 	}
 
 	private void printLambda1( AutoTypeImage[] types ) {
-		for( AutoTypeImage input : types ) {
+		for (AutoTypeImage input : types) {
 			String lambdaType = input.getAbbreviatedType();
 
 			String arrayType = input.getDataType();
 			out.println(
-					"\tpublic static void lambda1( "+arrayType+"[] input, int inputStart, int inputStride,\n" +
-							"\t\t\t\t\t\t\t   "+arrayType+"[] output, int outputStart, int outputStride,\n" +
+					"\tpublic static void lambda1( " + arrayType + "[] input, int inputStart, int inputStride,\n" +
+							"\t\t\t\t\t\t\t   " + arrayType + "[] output, int outputStart, int outputStride,\n" +
 							"\t\t\t\t\t\t\t   int rows, int cols,\n" +
-							"\t\t\t\t\t\t\t   Function1_"+lambdaType+" function ) {\n" +
+							"\t\t\t\t\t\t\t   Function1_" + lambdaType + " function ) {\n" +
 							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor (int y = 0; y < rows; y++) {\n" +
 							"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
@@ -163,16 +162,16 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	}
 
 	private void printLambda2( AutoTypeImage[] types ) {
-		for( AutoTypeImage input : types ) {
+		for (AutoTypeImage input : types) {
 			String lambdaType = input.getAbbreviatedType();
 			String arrayType = input.getDataType();
 
 			out.println(
-					"\tpublic static void lambda2( "+arrayType+"[] inputA, int inputStartA, int inputStrideA,\n" +
-							"\t\t\t\t\t\t\t   "+arrayType+"[] inputB, int inputStartB, int inputStrideB,\n" +
-							"\t\t\t\t\t\t\t   "+arrayType+"[] output, int outputStart, int outputStride,\n" +
+					"\tpublic static void lambda2( " + arrayType + "[] inputA, int inputStartA, int inputStrideA,\n" +
+							"\t\t\t\t\t\t\t   " + arrayType + "[] inputB, int inputStartB, int inputStrideB,\n" +
+							"\t\t\t\t\t\t\t   " + arrayType + "[] output, int outputStart, int outputStride,\n" +
 							"\t\t\t\t\t\t\t   int rows, int cols,\n" +
-							"\t\t\t\t\t\t\t   Function2_"+lambdaType+" function ) {\n" +
+							"\t\t\t\t\t\t\t   Function2_" + lambdaType + " function ) {\n" +
 							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor (int y = 0; y < rows; y++) {\n" +
 							"\t\t\tint indexA = inputStartA + y*inputStrideA;\n" +
@@ -190,11 +189,11 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	}
 
 	private void print( String funcName, String operation, AutoTypeImage[] types ) {
-		for( AutoTypeImage input : types ) {
+		for (AutoTypeImage input : types) {
 			String arrayType = input.getDataType();
 			out.println(
-					"\tpublic static void "+funcName+"( "+arrayType+"[] input, int inputStart, int inputStride,\n" +
-							"\t\t\t\t\t\t\t   "+arrayType+"[] output, int outputStart, int outputStride,\n" +
+					"\tpublic static void " + funcName + "( " + arrayType + "[] input, int inputStart, int inputStride,\n" +
+							"\t\t\t\t\t\t\t   " + arrayType + "[] output, int outputStart, int outputStride,\n" +
 							"\t\t\t\t\t\t\t   int rows, int cols ) {\n" +
 							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor (int y = 0; y < rows; y++) {\n" +
@@ -203,7 +202,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 							"\t\t\tint end = indexSrc + cols;\n" +
 							"\n" +
 							"\t\t\tfor (; indexSrc < end; indexSrc++, indexDst++) {\n" +
-							"\t\t\t\toutput[indexDst] = ("+input.getDataType()+")"+operation +";\n" +
+							"\t\t\t\toutput[indexDst] = (" + input.getDataType() + ")" + operation + ";\n" +
 							"\t\t\t}\n" +
 							"\t\t}\n" +
 							"\t\t//CONCURRENT_ABOVE });\n" +
@@ -211,7 +210,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	private void print( String funcName, PrintString2 operation ,
+	private void print( String funcName, PrintString2 operation,
 						AutoTypeImage[] typesSrc, AutoTypeImage[] typesDst ) {
 		for (int idxType = 0; idxType < typesSrc.length; idxType++) {
 			AutoTypeImage input = typesSrc[idxType];
@@ -221,8 +220,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 			String arrayTypeOut = output.getDataType();
 
 			out.println(
-					"\tpublic static void "+funcName+"( "+arrayTypeIn+"[] input, int inputStart, int inputStride,\n" +
-							"\t\t\t\t\t\t\t   "+arrayTypeOut+"[] output, int outputStart, int outputStride,\n" +
+					"\tpublic static void " + funcName + "( " + arrayTypeIn + "[] input, int inputStart, int inputStride,\n" +
+							"\t\t\t\t\t\t\t   " + arrayTypeOut + "[] output, int outputStart, int outputStride,\n" +
 							"\t\t\t\t\t\t\t   int rows, int cols ) {\n" +
 							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor (int y = 0; y < rows; y++ ) {\n" +
@@ -231,7 +230,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 							"\t\t\tint end = indexSrc + cols;\n" +
 							"\n" +
 							"\t\t\tfor (; indexSrc < end; indexSrc++, indexDst++) {\n" +
-							operation.print(input,output)+"\n"+
+							operation.print(input, output) + "\n" +
 							"\t\t\t}\n" +
 							"\t\t}\n" +
 							"\t\t//CONCURRENT_ABOVE });\n" +
@@ -239,7 +238,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	private void printVal( String funcName, PrintString2 operation ,
+	private void printVal( String funcName, PrintString2 operation,
 						   AutoTypeImage[] typesSrc, AutoTypeImage[] typesDst ) {
 		for (int idxType = 0; idxType < typesSrc.length; idxType++) {
 			AutoTypeImage input = typesSrc[idxType];
@@ -248,9 +247,9 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 			String arrayType = input.getDataType();
 			String sumType = input.getSumType();
 			out.println(
-					"\tpublic static void "+funcName+"( "+arrayType+"[] input, int inputStart, int inputStride,\n" +
-							"\t\t\t\t\t\t\t   "+sumType+" val,\n"+
-							"\t\t\t\t\t\t\t   "+arrayType+"[] output, int outputStart, int outputStride,\n" +
+					"\tpublic static void " + funcName + "( " + arrayType + "[] input, int inputStart, int inputStride,\n" +
+							"\t\t\t\t\t\t\t   " + sumType + " val,\n" +
+							"\t\t\t\t\t\t\t   " + arrayType + "[] output, int outputStart, int outputStride,\n" +
 							"\t\t\t\t\t\t\t   int rows, int cols ) {\n" +
 							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor (int y = 0; y < rows; y++) {\n" +
@@ -259,7 +258,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 							"\t\t\tint end = indexSrc + cols;\n" +
 							"\n" +
 							"\t\t\tfor (; indexSrc < end; indexSrc++, indexDst++) {\n" +
-							operation.print(input,output) +
+							operation.print(input, output) +
 							"\t\t\t}\n" +
 							"\t\t}\n" +
 							"\t\t//CONCURRENT_ABOVE });\n" +
@@ -267,21 +266,19 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	public void printAbs()
-	{
-		print("abs","Math.abs(input[indexSrc])",AutoTypeImage.getSigned());
+	public void printAbs() {
+		print("abs", "Math.abs(input[indexSrc])", AutoTypeImage.getSigned());
 	}
 
-	public void printNegative()
-	{
-		print("negative","-input[indexSrc]",AutoTypeImage.getSigned());
+	public void printNegative() {
+		print("negative", "-input[indexSrc]", AutoTypeImage.getSigned());
 	}
 
 	private void print_img_scalar( TwoTemplate template, boolean bounded ) {
 		String funcName = template.getName();
 		String varName = template.getVariableName();
 
-		for( AutoTypeImage t : template.getTypes() ) {
+		for (AutoTypeImage t : template.getTypes()) {
 			input = t;
 			output = t;
 			print_img_scalar(template, bounded, funcName, varName);
@@ -292,9 +289,9 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		String funcName = template.getName();
 		String varName = template.getVariableName();
 
-		for( AutoTypeImage t : template.getTypes() ) {
+		for (AutoTypeImage t : template.getTypes()) {
 			// float to float is already covered
-			if( !t.isInteger() )
+			if (!t.isInteger())
 				continue;
 			input = t;
 			output = F32;
@@ -303,7 +300,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	private void print_img_scalar(TwoTemplate template, boolean bounded, String funcName, String varName) {
+	private void print_img_scalar( TwoTemplate template, boolean bounded, String funcName, String varName ) {
 		String variableType;
 		if (template.isScaleOp())
 			variableType = output.isInteger() ? "double" : output.getSumType();
@@ -320,17 +317,15 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	public void print_array_scalar(String funcName, String varType, String varName, String operation  )
-	{
+	public void print_array_scalar( String funcName, String varType, String varName, String operation ) {
 		String arrayTypeSrc = input.getDataType();
 		String arrayTypeDst = output.getDataType();
 
-		String typeCast = varType.equals(output.getDataType()) ? "" : "("+output.getDataType()+")";
+		String typeCast = varType.equals(output.getDataType()) ? "" : "(" + output.getDataType() + ")";
 
-		out.println(
-				"\tpublic static void "+funcName+"( "+arrayTypeSrc+"[] input, int inputStart, int inputStride, \n" +
-				"\t\t\t\t\t\t\t   "+varType+" "+varName+",\n" +
-				"\t\t\t\t\t\t\t   "+arrayTypeDst+"[] output, int outputStart, int outputStride,\n" +
+		out.println("\tpublic static void " + funcName + "( " + arrayTypeSrc + "[] input, int inputStart, int inputStride, \n" +
+				"\t\t\t\t\t\t\t   " + varType + " " + varName + ",\n" +
+				"\t\t\t\t\t\t\t   " + arrayTypeDst + "[] output, int outputStart, int outputStride,\n" +
 				"\t\t\t\t\t\t\t   int rows, int cols ) {\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 				"\t\tfor (int y = 0; y < rows; y++) {\n" +
@@ -339,24 +334,22 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tint end = indexSrc + cols;\n" +
 				"\n" +
 				"\t\t\tfor (; indexSrc < end; indexSrc++, indexDst++) {\n" +
-				"\t\t\t\toutput[indexDst] = "+typeCast+operation +";\n" +
+				"\t\t\t\toutput[indexDst] = " + typeCast + operation + ";\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n");
 	}
 
-	public void print_array_scalar_bounded(String funcName, String varType, String varName, String operation  )
-	{
+	public void print_array_scalar_bounded( String funcName, String varType, String varName, String operation ) {
 		String arrayType = input.getDataType();
 
 		String sumType = input.getSumType();
-		String typeCast = varType.equals(sumType) ? "" : "("+sumType+")";
+		String typeCast = varType.equals(sumType) ? "" : "(" + sumType + ")";
 
-		out.println(
-				"\tpublic static void "+funcName+"( "+arrayType+"[] input, int inputStart, int inputStride,\n" +
-				"\t\t\t\t\t\t\t   "+varType+" "+varName+", "+sumType+" lower, "+sumType+" upper,\n" +
-				"\t\t\t\t\t\t\t   "+arrayType+"[] output, int outputStart, int outputStride,\n" +
+		out.println("\tpublic static void " + funcName + "( " + arrayType + "[] input, int inputStart, int inputStride,\n" +
+				"\t\t\t\t\t\t\t   " + varType + " " + varName + ", " + sumType + " lower, " + sumType + " upper,\n" +
+				"\t\t\t\t\t\t\t   " + arrayType + "[] output, int outputStart, int outputStride,\n" +
 				"\t\t\t\t\t\t\t   int rows, int cols ) {\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 				"\t\tfor (int y = 0; y < rows; y++) {\n" +
@@ -365,10 +358,10 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tint end = indexSrc + cols;\n" +
 				"\n" +
 				"\t\t\tfor (; indexSrc < end; indexSrc++, indexDst++) {\n" +
-				"\t\t\t\t"+sumType+" val = "+typeCast+operation+";\n" +
+				"\t\t\t\t" + sumType + " val = " + typeCast + operation + ";\n" +
 				"\t\t\t\tif( val < lower ) val = lower;\n" +
 				"\t\t\t\tif( val > upper ) val = upper;\n" +
-				"\t\t\t\toutput[indexDst] = "+input.getTypeCastFromSum()+"val;\n"+
+				"\t\t\t\toutput[indexDst] = " + input.getTypeCastFromSum() + "val;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
@@ -380,12 +373,11 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		String bitWise = input.getBitWise();
 		String sumType = input.getSumType();
 
-		out.print(
-				"\tpublic static void boundImage( "+input.getSingleBandName()+" img, "+sumType+" min, "+sumType+" max ) {\n" +
+		out.print("\tpublic static void boundImage( " + input.getSingleBandName() + " img, " + sumType + " min, " + sumType + " max ) {\n" +
 				"\t\tfinal int h = img.getHeight();\n" +
 				"\t\tfinal int w = img.getWidth();\n" +
 				"\n" +
-				"\t\t"+input.getDataType()+"[] data = img.data;\n" +
+				"\t\t" + input.getDataType() + "[] data = img.data;\n" +
 				"\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
@@ -393,11 +385,11 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tint indexEnd = index+w;\n" +
 				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
 				"\t\t\tfor (; index < indexEnd; index++) {\n" +
-				"\t\t\t\t"+sumType+" value = data[index]"+bitWise+";\n" +
+				"\t\t\t\t" + sumType + " value = data[index]" + bitWise + ";\n" +
 				"\t\t\t\tif( value < min )\n" +
-				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"min;\n" +
+				"\t\t\t\t\tdata[index] = " + input.getTypeCastFromSum() + "min;\n" +
 				"\t\t\t\telse if( value > max )\n" +
-				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"max;\n" +
+				"\t\t\t\t\tdata[index] = " + input.getTypeCastFromSum() + "max;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
@@ -406,10 +398,9 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 	public void printDiffAbs() {
 		String bitWise = input.getBitWise();
-		String typeCast = input.isInteger() ? "("+input.getDataType()+")" : "";
+		String typeCast = input.isInteger() ? "(" + input.getDataType() + ")" : "";
 
-		out.print(
-				"\tpublic static void diffAbs( "+input.getSingleBandName()+" imgA, "+input.getSingleBandName()+" imgB, "+input.getSingleBandName()+" output ) {\n" +
+		out.print("\tpublic static void diffAbs( " + input.getSingleBandName() + " imgA, " + input.getSingleBandName() + " imgB, " + input.getSingleBandName() + " output ) {\n" +
 				"\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
@@ -423,54 +414,53 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tint indexEnd = indexA+w;\n" +
 				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
 				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {\n" +
-				"\t\t\t\toutput.data[indexDiff] = "+typeCast+"Math.abs((imgA.data[indexA] "+bitWise+") - (imgB.data[indexB] "+bitWise+"));\n" +
+				"\t\t\t\toutput.data[indexDiff] = " + typeCast + "Math.abs((imgA.data[indexA] " + bitWise + ") - (imgB.data[indexB] " + bitWise + "));\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 
-	public void printAddTwoImages( AutoTypeImage typeIn, AutoTypeImage typeOut  ) {
-		printTwoImageOperation("add",typeIn,typeOut,"+");
+	public void printAddTwoImages( AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+		printTwoImageOperation("add", typeIn, typeOut, "+");
 	}
 
 	public void printSubtractTwoImages( AutoTypeImage typeIn, AutoTypeImage typeOut ) {
-		printTwoImageOperation("subtract",typeIn,typeOut,"-");
+		printTwoImageOperation("subtract", typeIn, typeOut, "-");
 	}
 
-	public void printMultTwoImages( AutoTypeImage typeIn, AutoTypeImage typeOut  ) {
-		printTwoImageOperation("multiply",typeIn,typeOut,"*");
+	public void printMultTwoImages( AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+		printTwoImageOperation("multiply", typeIn, typeOut, "*");
 	}
 
-	public void printDivTwoImages( AutoTypeImage typeIn, AutoTypeImage typeOut  ) {
-		printTwoImageOperation("divide",typeIn,typeOut,"/");
+	public void printDivTwoImages( AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+		printTwoImageOperation("divide", typeIn, typeOut, "/");
 	}
 
 	public void printTwoImageOperation( String name, AutoTypeImage typeIn, AutoTypeImage typeOut, String op ) {
 
 		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut.isInteger() ? "("+typeOut.getDataType()+")" : "";
+		String typeCast = typeOut.isInteger() ? "(" + typeOut.getDataType() + ")" : "";
 
-		out.print(
-				"\tpublic static void "+name+"( "+typeIn.getSingleBandName()+" imgA, "+typeIn.getSingleBandName()+" imgB, "+typeOut.getSingleBandName()+" output ) {\n" +
-						"\n" +
-						"\t\tfinal int h = imgA.getHeight();\n" +
-						"\t\tfinal int w = imgA.getWidth();\n" +
-						"\n" +
-						"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
-						"\t\tfor (int y = 0; y < h; y++) {\n" +
-						"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
-						"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
-						"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
-						"\t\t\t\n" +
-						"\t\t\tint indexEnd = indexA+w;\n" +
-						"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-						"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
-						"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") "+op+" (imgB.data[indexB] "+bitWise+"));\n" +
-						"\t\t\t}\n" +
-						"\t\t}\n" +
-						"\t\t//CONCURRENT_ABOVE });\n" +
-						"\t}\n\n");
+		out.print("\tpublic static void " + name + "( " + typeIn.getSingleBandName() + " imgA, " + typeIn.getSingleBandName() + " imgB, " + typeOut.getSingleBandName() + " output ) {\n" +
+				"\n" +
+				"\t\tfinal int h = imgA.getHeight();\n" +
+				"\t\tfinal int w = imgA.getWidth();\n" +
+				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
+				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
+				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
+				"\t\t\t\n" +
+				"\t\t\tint indexEnd = indexA+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
+				"\t\t\t\toutput.data[indexOut] = " + typeCast + "((imgA.data[indexA] " + bitWise + ") " + op + " (imgB.data[indexB] " + bitWise + "));\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\t}\n\n");
 	}
 
 //	public void printLog( AutoTypeImage typeIn, AutoTypeImage typeOut ) {
@@ -570,7 +560,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		String typeCast = typeMean.getDataType();
 		String sumType = typeMean.getSumType();
 
-		out.print("\tpublic static void stdev( "+typeMean.getSingleBandName()+" mean, "+typePow2.getSingleBandName()+" pow2, "+typeMean.getSingleBandName()+" stdev ) {\n" +
+		out.print("\tpublic static void stdev( " + typeMean.getSingleBandName() + " mean, " + typePow2.getSingleBandName() + " pow2, " + typeMean.getSingleBandName() + " stdev ) {\n" +
 				"\n" +
 				"\t\tfinal int h = mean.getHeight();\n" +
 				"\t\tfinal int w = mean.getWidth();\n" +
@@ -584,10 +574,10 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tint indexEnd = indexMean+w;\n" +
 				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
 				"\t\t\tfor (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {\n" +
-				"\t\t\t\t"+sumType+" mu = mean.data[indexMean]"+bitWiseMean+";\n" +
-				"\t\t\t\t"+sumType+" p2 = pow2.data[indexPow]"+bitWisePow+";\n" +
+				"\t\t\t\t" + sumType + " mu = mean.data[indexMean]" + bitWiseMean + ";\n" +
+				"\t\t\t\t" + sumType + " p2 = pow2.data[indexPow]" + bitWisePow + ";\n" +
 				"\n" +
-				"\t\t\t\tstdev.data[indexStdev] = ("+typeCast+")Math.sqrt(Math.max(0,p2-mu*mu));\n" +
+				"\t\t\t\tstdev.data[indexStdev] = (" + typeCast + ")Math.sqrt(Math.max(0,p2-mu*mu));\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
@@ -615,7 +605,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		public String getOperation() {
 			String round = output.isInteger() ? "Math.round" : "";
 
-			return round+"((input[indexSrc] "+input.getBitWise()+") * value)";
+			return round + "((input[indexSrc] " + input.getBitWise() + ") * value)";
 		}
 	}
 
@@ -636,7 +626,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		public String getOperation() {
 			String round = output.isInteger() ? "Math.round" : "";
 
-			return round+"((input[indexSrc] "+input.getBitWise()+") / denominator)";
+			return round + "((input[indexSrc] " + input.getBitWise() + ") / denominator)";
 		}
 	}
 
@@ -655,7 +645,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 		@Override
 		public String getOperation() {
-			return "((input[indexSrc] "+input.getBitWise()+") + value)";
+			return "((input[indexSrc] " + input.getBitWise() + ") + value)";
 		}
 	}
 
@@ -663,7 +653,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 		boolean imageFirst;
 
-		public Minus(boolean imageFirst) {
+		public Minus( boolean imageFirst ) {
 			this.imageFirst = imageFirst;
 		}
 
@@ -680,10 +670,10 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 		@Override
 		public String getOperation() {
-			if( imageFirst )
-				return "((input[indexSrc] "+input.getBitWise()+") - value)";
+			if (imageFirst)
+				return "((input[indexSrc] " + input.getBitWise() + ") - value)";
 			else
-				return "(value - (input[indexSrc] "+input.getBitWise()+"))";
+				return "(value - (input[indexSrc] " + input.getBitWise() + "))";
 		}
 	}
 
@@ -706,6 +696,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	interface PrintString {
 		String print( AutoTypeImage type );
 	}
+
 	interface PrintString2 {
 		String print( AutoTypeImage typeSrc, AutoTypeImage typeDst );
 	}
@@ -713,6 +704,6 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplPixelMath gen = new GenerateImplPixelMath();
 		gen.parseArguments(args);
-		gen.generate();
+		gen.generateCode();
 	}
 }

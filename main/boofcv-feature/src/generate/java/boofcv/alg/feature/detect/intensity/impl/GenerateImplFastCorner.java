@@ -59,13 +59,13 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	List<Sample>[] samples = new ArrayList[TOTAL_CIRCLE];
 
 	// used to compute the score. For each possible corner given the current samples incremenet by one
-	int possibleUp[] = new int[TOTAL_CIRCLE];
-	int possibleDown[] = new int[TOTAL_CIRCLE];
+	int[] possibleUp = new int[TOTAL_CIRCLE];
+	int[] possibleDown = new int[TOTAL_CIRCLE];
 
 	int tabs;
 
 	public GenerateImplFastCorner() {
-		super(false);
+		super.className = "off";
 
 		for (int i = 0; i < samples.length; i++) {
 			samples[i] = new ArrayList<>();
@@ -73,22 +73,22 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
-		int n[] = {9,10,11,12};
-		AutoTypeImage d[] = {AutoTypeImage.U8,AutoTypeImage.F32};
+	public void generateCode() throws FileNotFoundException {
+		int[] n = {9, 10, 11, 12};
+		AutoTypeImage[] d = {AutoTypeImage.U8, AutoTypeImage.F32};
 
 //		int n[] = {9};
 //		AutoTypeImage d[] = {AutoTypeImage.U8};
 
-		for( int minContinuous : n ) {
-			for( AutoTypeImage imageType : d ) {
-				createFile(imageType,minContinuous);
+		for (int minContinuous : n) {
+			for (AutoTypeImage imageType : d) {
+				createFile(imageType, minContinuous);
 			}
 		}
 	}
 
-	public void createFile( AutoTypeImage imageType , int minContinuous ) throws FileNotFoundException {
-		className = "ImplFastCorner"+minContinuous+"_"+imageType.getAbbreviatedType();
+	public void createFile( AutoTypeImage imageType, int minContinuous ) throws FileNotFoundException {
+		className = "ImplFastCorner" + minContinuous + "_" + imageType.getAbbreviatedType();
 
 		this.imageType = imageType;
 		this.sumType = imageType.getSumType();
@@ -103,13 +103,13 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 			samples[i].clear();
 		}
 
-		List<String> codes  = new ArrayList<>();
+		List<String> codes = new ArrayList<>();
 		List<String> names = new ArrayList<>();
 
 		// Need to split the code into smaller function to help the JVM optize the code
 		codes.add(generateSamples());
 		names.add("DUMMY");
-		splitIntoFunctions(codes,names,0,0);
+		splitIntoFunctions(codes, names, 0, 0);
 
 		out.print(
 				"\t/**\n" +
@@ -118,14 +118,14 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 						"\t@Override\n" +
 						"\tpublic final int checkPixel( int index )\n" +
 						"\t{\n" +
-						"\t\tsetThreshold(index);\n"+
+						"\t\tsetThreshold(index);\n" +
 						"\n");
 		out.println(codes.get(0));
 		out.println("\t}\n");
 
 		for (int i = 1; i < codes.size(); i++) {
 			String inside = codes.get(i);
-			inside = "\tpublic final int "+names.get(i)+"( int index ) {\n" + inside + "\n\t}\n";
+			inside = "\tpublic final int " + names.get(i) + "( int index ) {\n" + inside + "\n\t}\n";
 			out.println(inside);
 		}
 
@@ -133,45 +133,47 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		System.out.println("Done");
 	}
 
-	private void splitIntoFunctions( List<String> codes , List<String> names, int depth , int which ) {
+	private void splitIntoFunctions( List<String> codes, List<String> names, int depth, int which ) {
 
-		if( depth >= MAX_FUNCTION_DEPTH ) {
+		if (depth >= MAX_FUNCTION_DEPTH) {
 			return;
 		}
 
 		int N = codes.size();
 		String code = codes.get(which);
 
-		String functionNameA = "function"+(N+1);
-		String functionNameB = "function"+(N+2);
+		String functionNameA = "function" + (N + 1);
+		String functionNameB = "function" + (N + 2);
 
-		int index0 = code.indexOf(") {\n")+4;
+		int index0 = code.indexOf(") {\n") + 4;
 		int index1 = code.indexOf("\n\t\t} else {");
 		int index2 = index1 + 12;
-		int index3 = code.length()-4;
+		int index3 = code.length() - 4;
 
-		String mainFunction = code.substring(0,index0);
-		mainFunction += "\t\t\treturn "+functionNameA+"( index );";
-		mainFunction += code.substring(index1,index2);
-		mainFunction += "\t\t\treturn "+functionNameB+"( index );\n";
+		String mainFunction = code.substring(0, index0);
+		mainFunction += "\t\t\treturn " + functionNameA + "( index );";
+		mainFunction += code.substring(index1, index2);
+		mainFunction += "\t\t\treturn " + functionNameB + "( index );\n";
 		mainFunction += "\t\t}\n";
 
-		codes.set(which,mainFunction);
+		codes.set(which, mainFunction);
 
-		String inside0 = code.substring(index0,index1);
-		String inside1 = code.substring(index2,index3);
+		String inside0 = code.substring(index0, index1);
+		String inside1 = code.substring(index2, index3);
 
-		inside0 = inside0.replaceAll("^\\t\\t\\t","\t\t");
-		inside0 = inside0.replaceAll("\\n\\t\\t\\t","\n\t\t");
-		inside1 = inside1.replaceAll("^\\t\\t\\t","\t\t");
-		inside1 = inside1.replaceAll("\\n\\t\\t\\t","\n\t\t");
+		inside0 = inside0.replaceAll("^\\t\\t\\t", "\t\t");
+		inside0 = inside0.replaceAll("\\n\\t\\t\\t", "\n\t\t");
+		inside1 = inside1.replaceAll("^\\t\\t\\t", "\t\t");
+		inside1 = inside1.replaceAll("\\n\\t\\t\\t", "\n\t\t");
 
 		int indexA = names.size();
-		int indexB = indexA+1;
-		names.add( functionNameA); codes.add(inside0);
-		names.add( functionNameB); codes.add(inside1);
-		splitIntoFunctions(codes,names,depth+1,indexA);
-		splitIntoFunctions(codes,names,depth+1,indexB);
+		int indexB = indexA + 1;
+		names.add(functionNameA);
+		codes.add(inside0);
+		names.add(functionNameB);
+		codes.add(inside1);
+		splitIntoFunctions(codes, names, depth + 1, indexA);
+		splitIntoFunctions(codes, names, depth + 1, indexB);
 	}
 
 	// TODO in each branch exhaust all
@@ -185,21 +187,21 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 		ArrayDeque<Action> actions = new ArrayDeque<>();
 		actions.add(selectNextSample());
-		while( !actions.isEmpty() ) {
+		while (!actions.isEmpty()) {
 			Action action = actions.peek();
-			System.out.println("Action bit="+action.bit+" up="+action.sampleUp+" n="+action.consider+" TOTAL="+actions.size());
+			System.out.println("Action bit=" + action.bit + " up=" + action.sampleUp + " n=" + action.consider + " TOTAL=" + actions.size());
 			debugSampleState();
 
-			if( action.consider == 0 ) {
+			if (action.consider == 0) {
 				// First time this action is considered assume it's outcome is true
-				output += strSample(tabs++,action);
+				output += strSample(tabs++, action);
 				action.consider++;
-				if( action.sampleUp ) {
+				if (action.sampleUp) {
 					samples[action.bit].add(Sample.UP);
 				} else {
 					samples[action.bit].add(Sample.DOWN);
 				}
-			} else if( action.consider == 1 ){
+			} else if (action.consider == 1) {
 				// Second time consider what to do if it's outcome is false
 				output += strElse(tabs++);
 				action.consider++;
@@ -217,17 +219,17 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 			// See if a solution has been found.
 			Solution solution = checkSoluton();
-			if( solution != null ) {
+			if (solution != null) {
 				// If a solution hsa been found return and mark the first bit as being found so that
 				// it won't detect the same corner twice
-				output += strReturn(tabs--,solution.up?1:-1);
+				output += strReturn(tabs--, solution.up ? 1 : -1);
 				// Don't add a new action. Instead consider other outcomes from previous action
 			} else {
 				// Wasn't able to find a solution. Sample another bit
 				action = selectNextSample();
-				if( action == null ) {
+				if (action == null) {
 					// No need to sample since it has proven that there is no pixel
-					output += strReturn(tabs--,0);
+					output += strReturn(tabs--, 0);
 				} else {
 					actions.add(action);
 				}
@@ -245,8 +247,8 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		System.out.println();
 	}
 
-	private void updateSamples(Action action) {
-		if( action.sampleUp ) {
+	private void updateSamples( Action action ) {
+		if (action.sampleUp) {
 			switch (sampleAt(action.bit)) {
 				case UNKNOWN:
 					samples[action.bit].add(Sample.NOT_UP);
@@ -279,56 +281,56 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		for (int i = 0; i < TOTAL_CIRCLE; ) {
 			boolean success = true;
 			for (int j = 0; j < minContinuous; j++) {
-				int index = (i+j)%TOTAL_CIRCLE;
-				if( sampleAt(index) != Sample.UP) {
-					i += j+1;
+				int index = (i + j)%TOTAL_CIRCLE;
+				if (sampleAt(index) != Sample.UP) {
+					i += j + 1;
 					success = false;
 				}
 			}
-			if( success ) {
-				return new Solution(i,true);
+			if (success) {
+				return new Solution(i, true);
 			}
 		}
 		for (int i = 0; i < TOTAL_CIRCLE; ) {
 			boolean success = true;
 			for (int j = 0; j < minContinuous; j++) {
-				int index = (i+j)%TOTAL_CIRCLE;
-				if( sampleAt(index) != Sample.DOWN) {
-					i += j+1;
+				int index = (i + j)%TOTAL_CIRCLE;
+				if (sampleAt(index) != Sample.DOWN) {
+					i += j + 1;
 					success = false;
 				}
 			}
-			if( success )
-				return new Solution(i,false);
+			if (success)
+				return new Solution(i, false);
 		}
 		return null;
 	}
 
-	private String strCloseIf(int numTabs ) {
-		return tabs(numTabs)+"}\n";
-	}
-	private String strElse(int numTabs ) {
-		return tabs(numTabs)+"} else {\n";
+	private String strCloseIf( int numTabs ) {
+		return tabs(numTabs) + "}\n";
 	}
 
-	private String strSample(int numTabs , Action action ) {
-		String comparison =  action.sampleUp ? "> upper" : "< lower";
-		String strElse = action.consider==1 ? "} else " : "";
-		return tabs(numTabs)+strElse+"if( "+readBit(action.bit)+" "+comparison+" ) {\n";
+	private String strElse( int numTabs ) {
+		return tabs(numTabs) + "} else {\n";
 	}
 
-	private String strReturn(int numTabs , int value ) {
+	private String strSample( int numTabs, Action action ) {
+		String comparison = action.sampleUp ? "> upper" : "< lower";
+		String strElse = action.consider == 1 ? "} else " : "";
+		return tabs(numTabs) + strElse + "if( " + readBit(action.bit) + " " + comparison + " ) {\n";
+	}
+
+	private String strReturn( int numTabs, int value ) {
 		return tabs(numTabs) + "return " + value + ";\n";
 	}
 
 	private String readBit( int bit ) {
-		return "(data[index+offsets["+bit+"]]"+bitwise+")";
+		return "(data[index+offsets[" + bit + "]]" + bitwise + ")";
 	}
-
 
 	private String tabs( int depth ) {
 		String ret = "";
-		for( int i = 0; i < depth; i++ ) {
+		for (int i = 0; i < depth; i++) {
 			ret += "\t";
 		}
 		return ret;
@@ -336,8 +338,8 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 	private Action selectNextSample() {
 		// compute number of possible corners that go through each pixel
-		updatePossible(possibleUp,true);
-		updatePossible(possibleDown,false);
+		updatePossible(possibleUp, true);
+		updatePossible(possibleDown, false);
 
 		int max = 0;
 		int secondary = 0;
@@ -351,24 +353,24 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 			boolean canSampleUp = sampleAt(i) == Sample.UNKNOWN || sampleAt(i) == Sample.NOT_DOWN;
 			boolean canSampleDn = sampleAt(i) == Sample.UNKNOWN || sampleAt(i) == Sample.NOT_UP;
 
-			if( canSampleUp ) {
-				if( max == up && secondary < down ) {
+			if (canSampleUp) {
+				if (max == up && secondary < down) {
 					secondary = down;
 					which = i;
 					sampleUp = true;
-				} else if( max < up ) {
+				} else if (max < up) {
 					max = up;
 					secondary = down;
 					which = i;
 					sampleUp = true;
 				}
 			}
-			if( canSampleDn ) {
-				if( max == down && secondary < up ) {
+			if (canSampleDn) {
+				if (max == down && secondary < up) {
 					secondary = up;
 					which = i;
 					sampleUp = false;
-				} else if( max < down ) {
+				} else if (max < down) {
 					max = down;
 					secondary = up;
 					which = i;
@@ -377,32 +379,32 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 			}
 		}
 
-		if( which != -1 ) {
-			return new Action(which,sampleUp);
+		if (which != -1) {
+			return new Action(which, sampleUp);
 		} else {
 			return null;
 		}
 	}
 
-	private void updatePossible( int possibles[], boolean up ) {
-		Arrays.fill(possibles,0);
+	private void updatePossible( int[] possibles, boolean up ) {
+		Arrays.fill(possibles, 0);
 		for (int i = 0; i < TOTAL_CIRCLE; i++) {
 			boolean possible = true;
 			for (int j = 0; j < minContinuous; j++) {
-				int index = (i+j)%TOTAL_CIRCLE;
+				int index = (i + j)%TOTAL_CIRCLE;
 				Sample s = sampleAt(index);
-				if( up ) {
-					if( s == Sample.NOT_UP || s == Sample.DOWN || s == Sample.NEITHER ) {
+				if (up) {
+					if (s == Sample.NOT_UP || s == Sample.DOWN || s == Sample.NEITHER) {
 						possible = false;
 					}
 				} else {
-					if( s == Sample.NOT_DOWN || s == Sample.UP || s == Sample.NEITHER ) {
+					if (s == Sample.NOT_DOWN || s == Sample.UP || s == Sample.NEITHER) {
 						possible = false;
 					}
 				}
 			}
-			for (int j = 0; possible && j < minContinuous; j++){
-				int index = (i + j) % TOTAL_CIRCLE;
+			for (int j = 0; possible && j < minContinuous; j++) {
+				int index = (i + j)%TOTAL_CIRCLE;
 				possibles[index]++;
 			}
 		}
@@ -410,7 +412,7 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(
-				"\n"+
+				"\n" +
 						"/**\n" +
 						" * <p>\n" +
 						" * Contains logic for detecting fast corners. Pixels are sampled such that they can eliminate the most\n" +
@@ -418,59 +420,56 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 						" * </p>\n" +
 						" *\n" +
 						" * <p>\n" +
-						" * DO NOT MODIFY. Generated by "+getClass().getSimpleName()+".\n" +
+						" * DO NOT MODIFY. Generated by " + getClass().getSimpleName() + ".\n" +
 						" * </p>\n" +
 						" *\n" +
 						" * @author Peter Abeles\n" +
 						" */\n" +
-						"public class "+className+" extends ImplFastHelper_"+imageType.getAbbreviatedType()+"\n" +
+						"public class " + className + " extends ImplFastHelper_" + imageType.getAbbreviatedType() + "\n" +
 						"{\n" +
 						"\n" +
-						"\tpublic "+className+"("+sumType+" pixelTol) {\n" +
+						"\tpublic " + className + "(" + sumType + " pixelTol) {\n" +
 						"\t\tsuper(pixelTol);\n" +
 						"\t}\n\n");
 	}
 
 	public Sample sampleAt( int bit ) {
 		List<Sample> s = samples[bit];
-		if( s.isEmpty() )
+		if (s.isEmpty())
 			return Sample.UNKNOWN;
 		else
-			return s.get(s.size()-1);
+			return s.get(s.size() - 1);
 	}
 
 	public void removeSample( int bit ) {
 		List<Sample> s = samples[bit];
-		if( s.isEmpty() )
+		if (s.isEmpty())
 			throw new RuntimeException("BUG!");
-		s.remove(s.size()-1);
+		s.remove(s.size() - 1);
 	}
 
-	static class Solution
-	{
+	static class Solution {
 		int firstBit;
 		boolean up;
 
-		public Solution(int firstBit, boolean up) {
+		public Solution( int firstBit, boolean up ) {
 			this.firstBit = firstBit;
 			this.up = up;
 		}
 	}
 
-	static class Action
-	{
+	static class Action {
 		int bit;
 		boolean sampleUp;
 		int consider = 0;
 
-		public Action(int bit, boolean sampleUp) {
+		public Action( int bit, boolean sampleUp ) {
 			this.bit = bit;
 			this.sampleUp = sampleUp;
 		}
 	}
 
-	enum Sample
-	{
+	enum Sample {
 		UNKNOWN,
 		UP,
 		DOWN,
@@ -479,9 +478,8 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		NEITHER
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplFastCorner gen = new GenerateImplFastCorner();
-		gen.generate();
+		gen.generateCode();
 	}
-
 }

@@ -35,11 +35,11 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 	String borderType;
 
 	public GenerateNearestNeighborPixel_SB() {
-		super(false);
+		super.className = "off";
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.S16);
 		createType(AutoTypeImage.S32);
@@ -138,6 +138,6 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateNearestNeighborPixel_SB gen = new GenerateNearestNeighborPixel_SB();
 		gen.parseArguments(args);
-		gen.generate();
+		gen.generateCode();
 	}
 }

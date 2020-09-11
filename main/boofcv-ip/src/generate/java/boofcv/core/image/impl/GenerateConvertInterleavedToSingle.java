@@ -29,7 +29,7 @@ import java.io.FileNotFoundException;
 public class GenerateConvertInterleavedToSingle extends CodeGeneratorBase {
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		for( AutoTypeImage in : AutoTypeImage.getSpecificTypes()) {
@@ -130,6 +130,6 @@ public class GenerateConvertInterleavedToSingle extends CodeGeneratorBase {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateConvertInterleavedToSingle app = new GenerateConvertInterleavedToSingle();
 
-		app.generate();
+		app.generateCode();
 	}
 }

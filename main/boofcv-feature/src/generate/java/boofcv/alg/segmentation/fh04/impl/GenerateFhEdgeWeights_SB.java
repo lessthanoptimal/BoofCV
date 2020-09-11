@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		create(AutoTypeImage.F32, ConnectRule.EIGHT);
 		create(AutoTypeImage.U8, ConnectRule.EIGHT);
 		create(AutoTypeImage.F32, ConnectRule.FOUR);
@@ -219,6 +219,6 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		GenerateFhEdgeWeights_SB generator = new GenerateFhEdgeWeights_SB();
-		generator.generate();
+		generator.generateCode();
 	}
 }

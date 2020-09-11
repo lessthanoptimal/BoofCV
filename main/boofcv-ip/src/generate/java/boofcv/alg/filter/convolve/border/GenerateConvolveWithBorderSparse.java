@@ -20,7 +20,6 @@ package boofcv.alg.filter.convolve.border;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.generate.CodeGeneratorUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -44,7 +43,7 @@ public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		printFuncs(AutoTypeImage.F32);
@@ -55,7 +54,7 @@ public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
+		out.print(CodeGeneratorBase.copyright);
 		out.print("package boofcv.alg.filter.convolve;\n" +
 				"\n" +
 				"import boofcv.core.image.border.ImageBorder_F32;\n" +
@@ -147,6 +146,6 @@ public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateConvolveWithBorderSparse app = new GenerateConvolveWithBorderSparse();
-		app.generate();
+		app.generateCode();
 	}
 }

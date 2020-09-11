@@ -37,7 +37,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 	int totalFunctions = 0;
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32);
 		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64);
@@ -183,6 +183,6 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 
 	public static void main(String[] args) {
 		GenerateConvolveImageNormalized gen = new GenerateConvolveImageNormalized();
-		gen.generate();
+		gen.generateCode();
 	}
 }

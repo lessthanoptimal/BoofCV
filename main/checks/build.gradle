@@ -1,3 +1,4 @@
 dependencies {
     api project(':main:boofcv-core')
+    api project(':main:autocode')
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class GenerateImplPolynomialPixel extends CodeGeneratorBase {
 	String borderType;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.I);
 	}
@@ -188,6 +188,6 @@ public class GenerateImplPolynomialPixel extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplPolynomialPixel gen = new GenerateImplPolynomialPixel();
-		gen.generate();
+		gen.generateCode();
 	}
 }

@@ -31,7 +31,7 @@ import java.io.FileNotFoundException;
 @SuppressWarnings("Duplicates")
 public class GenerateImageBandMath extends CodeGeneratorBase {
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 		printCheckInput();
 
@@ -171,7 +171,7 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 	public static void main(String[] args) throws FileNotFoundException {
 		GenerateImageBandMath gen = new GenerateImageBandMath();
 		gen.parseArguments(args);
-		gen.generate();
+		gen.generateCode();
 	}
 
 

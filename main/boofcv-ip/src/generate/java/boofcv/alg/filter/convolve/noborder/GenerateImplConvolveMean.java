@@ -33,7 +33,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 	AutoTypeImage imageOut;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 		addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
 		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
@@ -177,6 +177,6 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		new GenerateImplConvolveMean().generate();
+		new GenerateImplConvolveMean().generateCode();
 	}
 }

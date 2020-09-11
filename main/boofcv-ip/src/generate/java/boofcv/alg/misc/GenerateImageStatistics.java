@@ -36,7 +36,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 	private AutoTypeImage input;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 		printAll();
 		out.println("}");
@@ -367,6 +367,6 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImageStatistics gen = new GenerateImageStatistics();
-		gen.generate();
+		gen.generateCode();
 	}
 }

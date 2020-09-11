@@ -46,7 +46,7 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 	String divide;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		createF32();
 		createU8_I8_Div();
 		createU8_I16();
@@ -441,6 +441,6 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateConvolveDownNoBorderUnrolled a = new GenerateConvolveDownNoBorderUnrolled();
 
-		a.generate();
+		a.generateCode();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 	AutoTypeImage imageType;
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printClass(AutoTypeImage.F32);
 		printClass(AutoTypeImage.S16);
 		printClass(AutoTypeImage.S32);
@@ -134,6 +134,6 @@ public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplOrientationAverage app = new GenerateImplOrientationAverage();
-		app.generate();
+		app.generateCode();
 	}
 }

@@ -37,7 +37,7 @@ public class GenerateConvolveDownNormalized_JustBorder extends CodeGeneratorBase
 	}
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 		printAllOps("F32", "GrayF32","GrayF32","float","float","float","float","");
 		printAllOps("I32", "GrayU8","ImageInt8","int","byte","byte","int"," & 0xFF");
@@ -323,6 +323,6 @@ public class GenerateConvolveDownNormalized_JustBorder extends CodeGeneratorBase
 
 	public static void main(String args[]) throws FileNotFoundException {
 		GenerateConvolveDownNormalized_JustBorder gen = new GenerateConvolveDownNormalized_JustBorder();
-		gen.generate();
+		gen.generateCode();
 	}
 }

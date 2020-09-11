@@ -30,7 +30,7 @@ import static boofcv.generate.AutoTypeImage.*;
  */
 public class GenerateBlurImageOps  extends CodeGeneratorBase {
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		for( AutoTypeImage type : new AutoTypeImage[]{U8,U16,F32,F64}) {
@@ -419,6 +419,6 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateBlurImageOps app = new GenerateBlurImageOps();
-		app.generate();
+		app.generateCode();
 	}
 }

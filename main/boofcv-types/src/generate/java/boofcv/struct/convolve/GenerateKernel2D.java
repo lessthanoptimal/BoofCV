@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import java.io.FileNotFoundException;
  */
 public class GenerateKernel2D extends CodeGeneratorBase {
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		createFile(AutoTypeImage.F32);
 		createFile(AutoTypeImage.F64);
 		createFile(AutoTypeImage.S32);
@@ -177,6 +177,6 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateKernel2D app = new GenerateKernel2D();
-		app.generate();
+		app.generateCode();
 	}
 }

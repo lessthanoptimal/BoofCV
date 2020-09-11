@@ -29,11 +29,11 @@ import java.io.FileNotFoundException;
  */
 public class GenerateFhEdgeWeights_PL extends CodeGeneratorBase {
 	GenerateFhEdgeWeights_PL() {
-		super(false);
+		super.className = "off";
 	}
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		create(AutoTypeImage.F32,ConnectRule.EIGHT);
 		create(AutoTypeImage.U8,ConnectRule.EIGHT);
 		create(AutoTypeImage.F32,ConnectRule.FOUR);
@@ -263,6 +263,6 @@ public class GenerateFhEdgeWeights_PL extends CodeGeneratorBase {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		GenerateFhEdgeWeights_PL generator = new GenerateFhEdgeWeights_PL();
-		generator.generate();
+		generator.generateCode();
 	}
 }

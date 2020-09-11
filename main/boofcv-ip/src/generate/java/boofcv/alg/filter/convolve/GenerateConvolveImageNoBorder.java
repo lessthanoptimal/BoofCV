@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 	int totalFunctions = 0;
 
 	@Override
-	public void generate() {
+	public void generateCode() {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, false);
 		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false, false);
@@ -162,6 +162,6 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 
 	public static void main(String[] args) {
 		GenerateConvolveImageNoBorder gen = new GenerateConvolveImageNoBorder();
-		gen.generate();
+		gen.generateCode();
 	}
 }

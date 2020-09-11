@@ -29,7 +29,7 @@ import java.io.FileNotFoundException;
 public class GenerateImplConvertPlanarToGray extends CodeGeneratorBase {
 
 	@Override
-	public void generate() throws FileNotFoundException {
+	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
 		for( AutoTypeImage in : AutoTypeImage.getSpecificTypes()) {
@@ -112,6 +112,6 @@ public class GenerateImplConvertPlanarToGray extends CodeGeneratorBase {
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateImplConvertPlanarToGray app = new GenerateImplConvertPlanarToGray();
 
-		app.generate();
+		app.generateCode();
 	}
 }
