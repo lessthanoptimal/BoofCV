@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.examples.imageprocessing;
 import boofcv.abst.distort.ConfigDeformPointMLS;
 import boofcv.abst.distort.PointDeformKeyPoints;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.gui.image.ImagePanel;
@@ -31,6 +30,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
+import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;

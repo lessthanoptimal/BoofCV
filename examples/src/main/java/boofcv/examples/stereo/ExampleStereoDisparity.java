@@ -18,14 +18,15 @@
 
 package boofcv.examples.stereo;
 
-import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.abst.disparity.StereoDisparity;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
-import boofcv.factory.feature.disparity.DisparityError;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.DisparityError;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -157,9 +158,9 @@ public class ExampleStereoDisparity {
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		ImageDistort<GrayU8,GrayU8> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.SKIP, origLeft.getImageType());
+				RectifyDistortImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.SKIP, origLeft.getImageType());
 		ImageDistort<GrayU8,GrayU8> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, origRight.getImageType());
+				RectifyDistortImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, origRight.getImageType());
 
 		imageDistortLeft.apply(origLeft, rectLeft);
 		imageDistortRight.apply(origRight, rectRight);

@@ -20,6 +20,7 @@ package boofcv.examples.stereo;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.gui.ListDisplayPanel;
@@ -108,9 +109,9 @@ public class ExampleRectifyCalibratedStereo {
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		ImageDistort rectifyImageLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.SKIP, distLeft.getImageType());
+				RectifyDistortImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.SKIP, distLeft.getImageType());
 		ImageDistort rectifyImageRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, distRight.getImageType());
+				RectifyDistortImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, distRight.getImageType());
 
 		rectifyImageLeft.apply(distLeft,rectLeft);
 		rectifyImageRight.apply(distRight,rectRight);

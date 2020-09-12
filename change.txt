@@ -12,6 +12,9 @@ Version : 0.37
   * Can now generate code from some Generate*.java files with a gradle command.
     - Generated source is still in repo to make submitting PR's easier but stale files will now be caught quickly
   * Uses Error Prone and Null Away
+  * Modified sub-projects to stream line build process and to be more logical
+  * Moved `calibration` into `geo`
+  * Created `ip-multiview` and moved disparity code and a few classes in `geo` in to it
 - Random Dot Markers
   * Created GUI for generating markers. Print or save to disk
   * Fully integrated into Applications
@@ -89,7 +92,7 @@ Version : 0.37
 - MultiViewOps
   * Fixed decomposeMetricCamera() so that it doesn't change the scale of T. This messed up common frames
 
-TODO Verify that noauto is included in JavaDoc
+TODO Verify that noauto is included in published jars
 TODO Move projective to metric and similar from multiview to perspective
 TODO rename RansacMultiView to RansacCalibrated
 TODO rename FactoryMultiView.triangulateNViewCalibrated to metric

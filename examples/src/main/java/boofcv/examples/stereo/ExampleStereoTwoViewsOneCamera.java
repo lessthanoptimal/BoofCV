@@ -18,18 +18,19 @@
 
 package boofcv.examples.stereo;
 
-import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.abst.disparity.StereoDisparity;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
+import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.DisparityError;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
-import boofcv.factory.feature.disparity.DisparityError;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
@@ -252,9 +253,9 @@ public class ExampleStereoTwoViewsOneCamera {
 		// Extending the image prevents a harsh edge reducing false matches at the image border
 		// SKIP is another option, possibly a tinny bit faster, but has a harsh edge which will need to be filtered
 		ImageDistort<T,T> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsicLeft, rect1_F32, BorderType.EXTENDED, distortedLeft.getImageType());
+				RectifyDistortImageOps.rectifyImage(intrinsicLeft, rect1_F32, BorderType.EXTENDED, distortedLeft.getImageType());
 		ImageDistort<T,T> distortRight =
-				RectifyImageOps.rectifyImage(intrinsicRight, rect2_F32, BorderType.EXTENDED, distortedRight.getImageType());
+				RectifyDistortImageOps.rectifyImage(intrinsicRight, rect2_F32, BorderType.EXTENDED, distortedRight.getImageType());
 
 		distortLeft.apply(distortedLeft, rectifiedLeft,rectifiedMask);
 		distortRight.apply(distortedRight, rectifiedRight);

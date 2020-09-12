@@ -1,10 +1,10 @@
 include 'examples','demonstrations','applications',
 
         'main:boofcv-types',
-        'main:boofcv-ip','main:boofcv-io','main:boofcv-feature','main:boofcv-geo','main:boofcv-calibration',
+        'main:boofcv-ip','main:boofcv-io','main:boofcv-feature','main:boofcv-geo',
         'main:boofcv-sfm','main:boofcv-recognition','main:boofcv-simulation',
         'main:checks','main:autocode','main:boofcv-learning',
-        'integration:boofcv-all','main:boofcv-core',
+        'integration:boofcv-all','main:boofcv-core','main:boofcv-ip-multiview',
 
         'integration:boofcv-javacv',"integration:boofcv-WebcamCapture",
         'integration:boofcv-jcodec','integration:boofcv-swing',

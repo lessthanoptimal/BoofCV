@@ -1,8 +1,7 @@
 dependencies {
-    api project(':main:boofcv-ip')
+    api project(':main:boofcv-ip-multiview')
     api project(':main:boofcv-feature')
     api project(':main:boofcv-geo')
-    api project(':main:boofcv-calibration')
 
     testImplementation project(':main:boofcv-geo').sourceSets.test.output
     testImplementation project(':main:boofcv-types').sourceSets.test.output

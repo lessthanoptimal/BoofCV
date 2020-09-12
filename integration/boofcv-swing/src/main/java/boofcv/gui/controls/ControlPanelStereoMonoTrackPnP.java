@@ -18,7 +18,7 @@
 
 package boofcv.gui.controls;
 
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
+import boofcv.abst.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.factory.sfm.ConfigStereoMonoTrackPnP;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class TestAddRadialNtoN_F64 {
 	 */
 	@Test
 	public void againstManual() {
-		/**/double radial[]= new /**/double[]{0.01,-0.03};
+		/**/double[] radial= new /**/double[]{0.01,-0.03};
 		double t1 = 0.1, t2 = -0.05;
 
 		Point2D_F64 orig = new Point2D_F64(0.1,-0.2);

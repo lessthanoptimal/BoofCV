@@ -2,7 +2,6 @@ dependencies {
     api project(':main:boofcv-types')
     api project(':main:boofcv-io')
     api project(':main:boofcv-feature')
-    api project(':main:boofcv-calibration')
     api project(':main:boofcv-geo')
     api project(':main:boofcv-sfm')
     api project(':main:boofcv-recognition')

@@ -20,7 +20,6 @@ package boofcv.alg.fiducial.qrcode;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.interpolate.InterpolatePixelDistortS;
@@ -32,6 +31,7 @@ import boofcv.misc.MovingAverage;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;

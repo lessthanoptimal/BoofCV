@@ -95,7 +95,7 @@ Building and installing BoofCV into your local Maven repository is easy[1] using
 ```bash
 cd boofcv
 ./gradlew autogenerate            # Creates auto generated files
-./gradlew install                 # Installs it into the local maven repository 
+./gradlew PublishToMavenLocal     # Installs it into the local maven repository 
 ```
 If you wish to have jars instead, the following commands are provided.
 ```bash

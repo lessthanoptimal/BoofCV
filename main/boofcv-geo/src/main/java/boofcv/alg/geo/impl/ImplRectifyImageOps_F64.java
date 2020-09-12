@@ -20,11 +20,11 @@ package boofcv.alg.geo.impl;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.LensDistortionOps_F64;
-import boofcv.alg.distort.PointToPixelTransform_F64;
 import boofcv.alg.distort.PointTransformHomography_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.distort.PointToPixelTransform_F64;
 import boofcv.struct.distort.SequencePoint2Transform2_F64;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;

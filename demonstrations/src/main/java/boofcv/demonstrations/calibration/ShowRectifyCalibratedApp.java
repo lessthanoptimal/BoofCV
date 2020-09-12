@@ -20,6 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.misc.GImageMiscOps;
@@ -127,9 +128,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		// Will rectify the image
 		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3, GrayF32.class);
 		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.ZERO, imageType);
+				RectifyDistortImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.ZERO, imageType);
 //		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> imageDistortRight =
-//				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.ZERO, imageType);
+//				RectifyDistortImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.ZERO, imageType);
 
 		// Fill the image with all black
 		GImageMiscOps.fill(rectLeft, 0);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionWideFOV;
-import boofcv.alg.distort.spherical.MultiCameraToEquirectangular;
+import boofcv.alg.distort.MultiCameraToEquirectangular;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;

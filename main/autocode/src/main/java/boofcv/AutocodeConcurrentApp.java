@@ -158,7 +158,8 @@ public class AutocodeConcurrentApp {
 	 */
 	private static void createTestIfNotThere( File file ) {
 		String fileName = "Test" + file.getName();
-		String parent = file.getParent().replaceAll("src/main/java", "src/test/java");
+		String sep = File.separator;
+		String parent = file.getParent().replace("src"+sep+"main"+sep+"java", "src"+sep+"test"+sep+"java");
 
 //		List<String> packagePath = new ArrayList<>();
 //		while( true ) {

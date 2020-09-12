@@ -18,12 +18,12 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
+import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.ConfigDisparitySGM;
+import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
-import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
-import boofcv.factory.feature.disparity.ConfigDisparitySGM;
-import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.controls.ControlPanelDdaComboTabs;

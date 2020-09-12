@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.sfm;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
@@ -124,8 +125,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		ConvertMatrixData.convert(rect2,rect2_F32);
 
 		ImageType<T> imageType = imageLeftRect.getImageType();
-		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1_F32, BorderType.SKIP, imageType);
-		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2_F32, BorderType.SKIP, imageType);
+		distortLeftRect = RectifyDistortImageOps.rectifyImage(stereoParam.left, rect1_F32, BorderType.SKIP, imageType);
+		distortRightRect = RectifyDistortImageOps.rectifyImage(stereoParam.right, rect2_F32, BorderType.SKIP, imageType);
 
 		// Compute parameters that are needed when converting to 3D
 		baseline = stereoParam.getBaseline();

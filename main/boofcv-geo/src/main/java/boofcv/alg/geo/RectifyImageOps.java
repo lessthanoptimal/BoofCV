@@ -18,26 +18,18 @@
 
 package boofcv.alg.geo;
 
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.geo.impl.ImplRectifyImageOps_F32;
 import boofcv.alg.geo.impl.ImplRectifyImageOps_F64;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.rectify.RectifyFundamental;
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolationType;
-import boofcv.factory.distort.FactoryDistort;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageDimension;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
-import org.ejml.dense.row.CommonOps_FDRM;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -83,10 +75,10 @@ public class RectifyImageOps {
 	 * to be known very accurately.  See comments in {@link RectifyFundamental} for more details.
 	 * </p>
 	 *
-	 <p>
+	 * <p>
 	 * After the rectification has been found it might still need to be adjusted
-	 * for maximum viewing area.  See {@link #fullViewLeft(int, int, org.ejml.data.DMatrixRMaj, org.ejml.data.DMatrixRMaj)}
-	 * and {@link #allInsideLeft(int, int, org.ejml.data.DMatrixRMaj, org.ejml.data.DMatrixRMaj)}.
+	 * for maximum viewing area.  See {@link #fullViewLeft(int, int, DMatrixRMaj, DMatrixRMaj)}
+	 * and {@link #allInsideLeft(int, int, DMatrixRMaj, DMatrixRMaj)}.
 	 * </p>
 	 *
 	 * @return {@link RectifyFundamental}
@@ -115,14 +107,13 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
-	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									DMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize)
-	{
-		if( rectifiedSize == null )
+	public static void fullViewLeft( CameraPinholeBrown paramLeft,
+									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									 DMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize ) {
+		if (rectifiedSize == null)
 			rectifiedSize = new ImageDimension();
 
-		ImplRectifyImageOps_F64.fullViewLeft(paramLeft,rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
+		ImplRectifyImageOps_F64.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
 	}
 
 	/**
@@ -144,14 +135,13 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
-	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
-									FMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize)
-	{
-		if( rectifiedSize == null )
+	public static void fullViewLeft( CameraPinholeBrown paramLeft,
+									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
+									 FMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize ) {
+		if (rectifiedSize == null)
 			rectifiedSize = new ImageDimension();
 
-		ImplRectifyImageOps_F32.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
+		ImplRectifyImageOps_F32.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
 	}
 
 	/**
@@ -170,9 +160,8 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
-	public static void fullViewLeft(int imageWidth,int imageHeight,
-									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight )
-	{
+	public static void fullViewLeft( int imageWidth, int imageHeight,
+									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight ) {
 		ImplRectifyImageOps_F64.fullViewLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
 
@@ -192,9 +181,8 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
-	public static void fullViewLeft(int imageWidth,int imageHeight,
-									FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight )
-	{
+	public static void fullViewLeft( int imageWidth, int imageHeight,
+									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight ) {
 		ImplRectifyImageOps_F32.fullViewLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
 
@@ -212,12 +200,11 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
-	public static void allInsideLeft(CameraPinholeBrown paramLeft,
-									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									 DMatrixRMaj rectifyK,
-									 @Nullable ImageDimension rectifiedSize)
-	{
-		if( rectifiedSize == null )
+	public static void allInsideLeft( CameraPinholeBrown paramLeft,
+									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									  DMatrixRMaj rectifyK,
+									  @Nullable ImageDimension rectifiedSize ) {
+		if (rectifiedSize == null)
 			rectifiedSize = new ImageDimension();
 
 		ImplRectifyImageOps_F64.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
@@ -236,12 +223,11 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
-	public static void allInsideLeft(CameraPinholeBrown paramLeft,
-									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
-									 FMatrixRMaj rectifyK,
-									 @Nullable ImageDimension rectifiedSize)
-	{
-		if( rectifiedSize == null )
+	public static void allInsideLeft( CameraPinholeBrown paramLeft,
+									  FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
+									  FMatrixRMaj rectifyK,
+									  @Nullable ImageDimension rectifiedSize ) {
+		if (rectifiedSize == null)
 			rectifiedSize = new ImageDimension();
 		ImplRectifyImageOps_F32.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
 	}
@@ -259,9 +245,8 @@ public class RectifyImageOps {
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 */
-	public static void allInsideLeft( int imageWidth,int imageHeight,
-									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight )
-	{
+	public static void allInsideLeft( int imageWidth, int imageHeight,
+									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight ) {
 		ImplRectifyImageOps_F64.allInsideLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
 
@@ -278,9 +263,8 @@ public class RectifyImageOps {
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 */
-	public static void allInsideLeft( int imageWidth,int imageHeight,
-									  FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight )
-	{
+	public static void allInsideLeft( int imageWidth, int imageHeight,
+									  FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight ) {
 		ImplRectifyImageOps_F32.allInsideLeft(imageWidth, imageHeight, rectifyLeft, rectifyRight);
 	}
 
@@ -294,9 +278,8 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static Point2Transform2_F64 transformRectToPixel(CameraPinholeBrown param,
-															DMatrixRMaj rectify)
-	{
+	public static Point2Transform2_F64 transformRectToPixel( CameraPinholeBrown param,
+															 DMatrixRMaj rectify ) {
 		return ImplRectifyImageOps_F64.transformRectToPixel(param, rectify);
 	}
 
@@ -310,9 +293,8 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static Point2Transform2_F32 transformRectToPixel(CameraPinholeBrown param,
-															FMatrixRMaj rectify)
-	{
+	public static Point2Transform2_F32 transformRectToPixel( CameraPinholeBrown param,
+															 FMatrixRMaj rectify ) {
 		return ImplRectifyImageOps_F32.transformRectToPixel(param, rectify);
 	}
 
@@ -325,9 +307,8 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
-	public static Point2Transform2_F64 transformPixelToRect(CameraPinholeBrown param,
-															DMatrixRMaj rectify)
-	{
+	public static Point2Transform2_F64 transformPixelToRect( CameraPinholeBrown param,
+															 DMatrixRMaj rectify ) {
 		return ImplRectifyImageOps_F64.transformPixelToRect(param, rectify);
 	}
 
@@ -340,9 +321,8 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
-	public static Point2Transform2_F32 transformPixelToRect(CameraPinholeBrown param,
-															FMatrixRMaj rectify)
-	{
+	public static Point2Transform2_F32 transformPixelToRect( CameraPinholeBrown param,
+															 FMatrixRMaj rectify ) {
 		return ImplRectifyImageOps_F32.transformPixelToRect(param, rectify);
 	}
 
@@ -357,9 +337,9 @@ public class RectifyImageOps {
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
-	public static Point2Transform2_F64 transformPixelToRectNorm(CameraPinholeBrown param,
-																DMatrixRMaj rectify,
-																DMatrixRMaj rectifyK) {
+	public static Point2Transform2_F64 transformPixelToRectNorm( CameraPinholeBrown param,
+																 DMatrixRMaj rectify,
+																 DMatrixRMaj rectifyK ) {
 		return ImplRectifyImageOps_F64.transformPixelToRectNorm(param, rectify, rectifyK);
 	}
 
@@ -374,71 +354,10 @@ public class RectifyImageOps {
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
-	public static Point2Transform2_F32 transformPixelToRectNorm(CameraPinholeBrown param,
-																FMatrixRMaj rectify,
-																FMatrixRMaj rectifyK) {
+	public static Point2Transform2_F32 transformPixelToRectNorm( CameraPinholeBrown param,
+																 FMatrixRMaj rectify,
+																 FMatrixRMaj rectifyK ) {
 		return ImplRectifyImageOps_F32.transformPixelToRectNorm(param, rectify, rectifyK);
-	}
-
-
-	/**
-	 * Creates an {@link ImageDistort} for rectifying an image given its rectification matrix.
-	 * Lens distortion is assumed to have been previously removed.
-	 *
-	 * @param rectify Transform for rectifying the image.
-	 * @param imageType Type of single band image the transform is to be applied to.
-	 * @return ImageDistort for rectifying the image.
-	 */
-	public static <T extends ImageGray<T>> ImageDistort<T,T>
-	rectifyImage( FMatrixRMaj rectify , BorderType borderType, Class<T> imageType)
-	{
-		boolean skip = borderType == BorderType.SKIP;
-		if( skip ) {
-			borderType = BorderType.EXTENDED;
-		}
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, borderType);
-
-		FMatrixRMaj rectifyInv = new FMatrixRMaj(3,3);
-		CommonOps_FDRM.invert(rectify,rectifyInv);
-		PointTransformHomography_F32 rectifyTran = new PointTransformHomography_F32(rectifyInv);
-
-		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
-		ImageDistort<T,T> ret = FactoryDistort.distortSB(false, interp, imageType);
-		ret.setRenderAll(!skip);
-
-		ret.setModel(new PointToPixelTransform_F32(rectifyTran));
-
-		return ret;
-	}
-
-	/**
-	 * Creates an {@link ImageDistort} for rectifying an image given its radial distortion and
-	 * rectification matrix.
-	 *
-	 * @param param Intrinsic parameters.
-	 * @param rectify Transform for rectifying the image.
-	 * @param imageType Type of single band image the transform is to be applied to.
-	 * @return ImageDistort for rectifying the image.
-	 */
-	public static <T extends ImageBase<T>> ImageDistort<T,T>
-	rectifyImage(CameraPinholeBrown param, FMatrixRMaj rectify , BorderType borderType, ImageType<T> imageType)
-	{
-		boolean skip = borderType == BorderType.SKIP;
-		if( skip ) {
-			borderType = BorderType.EXTENDED;
-		}
-		InterpolatePixel<T> interp =
-				FactoryInterpolation.createPixel(0,255, InterpolationType.BILINEAR,borderType,imageType);
-
-		// only compute the transform once
-		ImageDistort<T,T> ret = FactoryDistort.distort(true, interp, imageType);
-		ret.setRenderAll(!skip);
-
-		Point2Transform2_F32 transform = transformRectToPixel(param, rectify);
-
-		ret.setModel(new PointToPixelTransform_F32(transform));
-
-		return ret;
 	}
 
 	/**
@@ -450,35 +369,35 @@ public class RectifyImageOps {
 	 * @param mask (Input) mask. 1 = mapping to unrectified. 0 = no mapping
 	 * @param radius How much the border is extended by
 	 */
-	public static void applyMask(GrayF32 disparity , GrayU8 mask , int radius ) {
-		if( disparity.isSubimage() || mask.isSubimage() )
+	public static void applyMask( GrayF32 disparity, GrayU8 mask, int radius ) {
+		if (disparity.isSubimage() || mask.isSubimage())
 			throw new RuntimeException("Input is subimage. Currently not support but no reason why it can't be. Ask for it");
 
 		int N = disparity.width*disparity.height;
 		for (int i = 0; i < N; i++) {
-			if( mask.data[i] == 0 ) {
+			if (mask.data[i] == 0) {
 				disparity.data[i] = 255;
 			}
 		}
 
 		// TODO make this more efficient and correct. Update unit test
-		if( radius > 0 ) {
+		if (radius > 0) {
 			int r = radius;
-			for (int y = r; y < mask.height - r-1; y++) {
-				int indexMsk = y * mask.stride + r;
-				for (int x = r; x < mask.width - r-1; x++, indexMsk++) {
+			for (int y = r; y < mask.height - r - 1; y++) {
+				int indexMsk = y*mask.stride + r;
+				for (int x = r; x < mask.width - r - 1; x++, indexMsk++) {
 					int deltaX = mask.data[indexMsk] - mask.data[indexMsk + 1];
 					int deltaY = mask.data[indexMsk] - mask.data[indexMsk + mask.stride];
 
-					if ( deltaX != 0 || deltaY != 0) {
+					if (deltaX != 0 || deltaY != 0) {
 						// because of how the border is detected it has a bias when going from up to down
-						if( deltaX < 0 )
+						if (deltaX < 0)
 							deltaX = 0;
-						if( deltaY < 0 )
+						if (deltaY < 0)
 							deltaY = 0;
 						for (int i = -r; i <= r; i++) {
 							for (int j = -r; j <= r; j++) {
-								disparity.set(deltaX+x + j, deltaY+y + i, 255);
+								disparity.set(deltaX + x + j, deltaY + y + i, 255);
 							}
 						}
 					}
@@ -496,35 +415,35 @@ public class RectifyImageOps {
 	 * @param mask (Input) mask. 1 = mapping to unrectified. 0 = no mapping
 	 * @param radius How much the border is extended by
 	 */
-	public static void applyMask(GrayU8 disparity , GrayU8 mask , int radius ) {
-		if( disparity.isSubimage() || mask.isSubimage() )
+	public static void applyMask( GrayU8 disparity, GrayU8 mask, int radius ) {
+		if (disparity.isSubimage() || mask.isSubimage())
 			throw new RuntimeException("Input is subimage. Currently not support but no reason why it can't be. Ask for it");
 
 		int N = disparity.width*disparity.height;
 		for (int i = 0; i < N; i++) {
-			if( mask.data[i] == 0 ) {
+			if (mask.data[i] == 0) {
 				disparity.data[i] = (byte)255;
 			}
 		}
 
 		// TODO make this more efficient and correct. Update unit test
-		if( radius > 0 ) {
+		if (radius > 0) {
 			int r = radius;
-			for (int y = r; y < mask.height - r-1; y++) {
-				int indexMsk = y * mask.stride + r;
-				for (int x = r; x < mask.width - r-1; x++, indexMsk++) {
+			for (int y = r; y < mask.height - r - 1; y++) {
+				int indexMsk = y*mask.stride + r;
+				for (int x = r; x < mask.width - r - 1; x++, indexMsk++) {
 					int deltaX = mask.data[indexMsk] - mask.data[indexMsk + 1];
 					int deltaY = mask.data[indexMsk] - mask.data[indexMsk + mask.stride];
 
-					if ( deltaX != 0 || deltaY != 0) {
+					if (deltaX != 0 || deltaY != 0) {
 						// because of how the border is detected it has a bias when going from up to down
-						if( deltaX < 0 )
+						if (deltaX < 0)
 							deltaX = 0;
-						if( deltaY < 0 )
+						if (deltaY < 0)
 							deltaY = 0;
 						for (int i = -r; i <= r; i++) {
 							for (int j = -r; j <= r; j++) {
-								disparity.set(deltaX+x + j, deltaY+y + i, 255);
+								disparity.set(deltaX + x + j, deltaY + y + i, 255);
 							}
 						}
 					}
@@ -532,5 +451,4 @@ public class RectifyImageOps {
 			}
 		}
 	}
-
 }

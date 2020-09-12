@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class BenchmarkPixelTransform {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		benchmark(new PixelTransformHomography_F32(homography), "Homography");
+//		benchmark(new PixelTransformHomography_F32(homography), "Homography");
 		benchmark(new PixelTransformAffine_F32(affine), "Affine");
 
 	}

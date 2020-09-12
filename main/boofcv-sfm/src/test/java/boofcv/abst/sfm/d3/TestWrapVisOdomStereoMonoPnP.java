@@ -18,14 +18,14 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.abst.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.disparity.ConfigDisparityBM;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.sfm.ConfigVisOdomTrackPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.ConfigPointTracker;

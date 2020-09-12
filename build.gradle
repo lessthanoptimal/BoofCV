@@ -33,13 +33,15 @@ if( project.hasProperty("native_arch")) {
 
 subprojects {
     apply plugin: 'java-library'
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     apply plugin: 'signing'
     apply plugin: 'net.ltgt.errorprone'
 
     java {
         sourceCompatibility = JavaVersion.VERSION_14
         targetCompatibility = JavaVersion.VERSION_14
+        withJavadocJar()
+        withSourcesJar()
     }
 
     // Creates Java 8 byte code
@@ -191,21 +193,8 @@ subprojects {
 //        }
     }
 
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
     javadoc.failOnError = false
     javadoc.enabled = !project.version.contains("SNAPSHOT") // disable to stop it from spamming stdout
-    artifacts {
-        archives sourcesJar
-    }
 
     // Force the release build to fail if it depends on a SNAPSHOT
     jar.dependsOn checkDependsOnSNAPSHOT
@@ -215,48 +204,43 @@ subprojects {
     // if Maven central isn't setup in ~/.gradle/gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
         signing { sign configurations.archives }
-
-        uploadArchives {
-            artifacts { archives javadocJar }
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name 'BoofCV'
-                        packaging 'pom'
-                        // optionally artifactId can be defined here
-                        description 'BoofCV is an open source Java library for real-time computer vision and robotics applications.'
-                        url 'http://boofcv.org'
-
-                        scm {
-                            connection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
-                            developerConnection 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
-                            url 'https://github.com/lessthanoptimal/BoofCV'
-                        }
-
+        publishing {
+            publications {
+                maven(MavenPublication) {
+                    pom {
+                        name = 'BoofCV'
+                        description = 'BoofCV is an open source Java library for real-time computer vision and robotics applications.'
+                        url = 'https://boofcv.org'
                         licenses {
                             license {
-                                name 'The Apache Software License, Version 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                                name = 'The Apache License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                             }
                         }
-
                         developers {
                             developer {
-                                id 'pabeles'
-                                name 'Peter Abeles'
-                                email 'peter.abeles@gmail.com'
+                                id = 'pabeles'
+                                name = 'Peter Abeles'
+                                email = 'peter.abeles@gmail.com'
                             }
                         }
+                        scm {
+                            connection = 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
+                            developerConnection = 'scm:git:git://github.com/lessthanoptimal/BoofCV.git'
+                            url = 'https://github.com/lessthanoptimal/BoofCV'
+                        }
+                    }
+                }
+            }
+            repositories {
+                maven {
+                    def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                    url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    credentials {
+                        username ossrhUsername
+                        password ossrhPassword
                     }
                 }
             }
@@ -277,16 +261,24 @@ subprojects {
         generateImplementation project(':main:autocode')
         generateImplementation project(':main:boofcv-types').sourceSets.noauto.output
     }
+
+    if( project.path.contains('boofcv-types') )
+        return
+
+    project.dependencies {
+        // needed for testing Config*
+        testImplementation project(':main:boofcv-types').sourceSets.test.output
+    }
 }
 
 // list of projects for creating javadoc and jars
 def mainProjects = [
         ':main:boofcv-types',
         ':main:boofcv-ip',
+        ':main:boofcv-ip-multiview',
         ':main:boofcv-io',
         ':main:boofcv-feature',
         ':main:boofcv-geo',
-        ':main:boofcv-calibration',
         ':main:boofcv-sfm',
         ':main:boofcv-recognition',
         ':main:boofcv-learning',
@@ -347,23 +339,27 @@ task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJav
     }
 }
 
-task alljavadoc(type: Javadoc) {
+task alljavadoc(type: Javadoc,  group: "Documentation") {
+    description = 'Generates a global javadoc from all the modules'
+
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
-    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
-    classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
+    source = javadocProjects.collect { project(it).sourceSets.main.allJava } +
+            javadocProjects.collect { project(it).sourceSets.noauto.allJava }
+    classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath }) +
+            files(javadocProjects.collect { project(it).sourceSets.noauto.compileClasspath })
 
     destinationDir = file("docs/api")
 
     // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
     options.addBooleanOption("-allow-script-in-comments", true)
-    options.addBooleanOption("-no-module-directories", true)
+//    options.addBooleanOption("-no-module-directories", true) // removed from javadoc?
 
     // Add a list of uses of a class to javadoc
     options.use = true
 
     configure(options) {
         failOnError = false
-        docTitle = "BoofCV JavaDoc ($project.version)"
+        title = "BoofCV JavaDoc ($project.version)"
         links = [ 'http://docs.oracle.com/javase/8/docs/api/',
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
@@ -408,7 +404,7 @@ wrapper {
         sourcesJar.enabled = false
         javadocJar.enabled = false
         jar.enabled = false
-        install.enabled = false
+        uploadArchives.enabled = false
     }
 }
 

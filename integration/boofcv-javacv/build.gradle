@@ -8,7 +8,6 @@ dependencies {
     api project(':main:boofcv-ip')
     api project(':main:boofcv-io')
     api project(':main:boofcv-geo')
-    api project(':main:boofcv-calibration')
 
     api project(':integration:boofcv-swing')
 

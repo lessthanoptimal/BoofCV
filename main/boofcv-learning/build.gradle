@@ -7,7 +7,6 @@ dependencies {
 
     testImplementation project(':main:boofcv-io')
     testImplementation project(':integration:boofcv-swing')
-    testImplementation project(':main:boofcv-types').sourceSets.test.output
 }
 
 

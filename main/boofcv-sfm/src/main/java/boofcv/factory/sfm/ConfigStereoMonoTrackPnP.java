@@ -20,9 +20,9 @@ package boofcv.factory.sfm;
 
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
+import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.struct.Configuration;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;

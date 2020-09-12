@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.LensDistortionOps_F32;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -259,7 +260,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		FMatrixRMaj rect_f32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(rect,rect_f32);
 
-		this.undoRadial = RectifyImageOps.rectifyImage(
+		this.undoRadial = RectifyDistortImageOps.rectifyImage(
 				param, rect_f32, BorderType.ZERO, ImageType.single(GrayF32.class));
 		this.remove_p_to_p = RectifyImageOps.transformPixelToRect(param, rect_f32);
 	}

@@ -20,13 +20,13 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.tracker.PointTrack;
-import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomMonoDepthPnP;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;

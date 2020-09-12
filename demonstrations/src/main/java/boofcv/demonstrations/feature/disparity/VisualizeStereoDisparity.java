@@ -18,11 +18,12 @@
 
 package boofcv.demonstrations.feature.disparity;
 
-import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.abst.disparity.StereoDisparity;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
@@ -381,9 +382,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
-		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(
+		ImageDistort<T,T> distortRect1 = RectifyDistortImageOps.rectifyImage(
 				calib.left, rect1_F32, BorderType.EXTENDED,imageType);
-		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(
+		ImageDistort<T,T> distortRect2 = RectifyDistortImageOps.rectifyImage(
 				calib.right, rect2_F32, BorderType.EXTENDED, imageType);
 
 		// rectify and undo distortion

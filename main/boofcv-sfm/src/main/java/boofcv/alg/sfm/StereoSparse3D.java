@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm;
 
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
+import boofcv.abst.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;

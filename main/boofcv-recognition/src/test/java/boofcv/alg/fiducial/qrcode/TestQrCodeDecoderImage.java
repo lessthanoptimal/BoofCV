@@ -34,50 +34,50 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestQrCodeDecoderImage {
 
 	@Test
-	public void withLensDistortion() {
+	void withLensDistortion() {
 		// render a distorted image
 		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
 
 		helper.render();
 
-		// find location of postion patterns and create graph
+		// find location of position patterns and create graph
 		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode::new);
 
 		pps.grow().square = new Polygon2D_F64(4);
 		pps.grow().square = new Polygon2D_F64(4);
 		pps.grow().square = new Polygon2D_F64(4);
 
-		helper.setLocation(pps.get(0).square,pps.get(1).square,pps.get(2).square);
+		helper.setLocation(pps.get(0).square, pps.get(1).square, pps.get(2).square);
 		for (int i = 0; i < pps.size; i++) {
 			pps.get(i).grayThreshold = 125;
 		}
 		// these numbers were found by sketching the QR code
-		connect(pps.get(2),pps.get(1),3,1);
-		connect(pps.get(0),pps.get(1),0,2);
+		connect(pps.get(2), pps.get(1), 3, 1);
+		connect(pps.get(0), pps.get(1), 0, 2);
 
 		// Should fail when run on distorted image
-		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(null,GrayF32.class);
-		decoder.process(pps,helper.image);
+		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(null, GrayF32.class);
+		decoder.process(pps, helper.image);
 
 		assertEquals(0, decoder.successes.size());
 
 		// now tell it how to undistort the image
-		decoder.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);
+		decoder.setLensDistortion(helper.image.width, helper.image.height, helper.distortion);
 		for (int i = 0; i < pps.size; i++) {
 			helper.distToUndist(pps.get(i).square);
 		}
-		decoder.process(pps,helper.image);
+		decoder.process(pps, helper.image);
 
-		assertEquals(1,decoder.successes.size());
+		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
-		assertTrue(found.message.equals("123"));
+		assertEquals(found.message, "123");
 	}
 
 	/**
 	 * Run the entire algorithm on a rendered image but just care about the message
 	 */
 	@Test
-	public void message_numeric() {
+	void message_numeric() {
 		String message = "";
 		for (int i = 0; i < 20; i++) {
 			QrCode expected = new QrCodeEncoder().setVersion(1).
@@ -92,25 +92,25 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
-			decoder.process(pps,generator.getGray());
+			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+			decoder.process(pps, generator.getGray());
 
-			assertEquals(1,decoder.successes.size());
+			assertEquals(1, decoder.successes.size());
 			QrCode found = decoder.getFound().get(0);
 
-			assertEquals(expected.version,found.version);
-			assertEquals(expected.error,found.error);
-			assertEquals(expected.mode,found.mode);
-			assertEquals(message,new String(found.message));
-			message += (i%10)+"";
+			assertEquals(expected.version, found.version);
+			assertEquals(expected.error, found.error);
+			assertEquals(expected.mode, found.mode);
+			assertEquals(message, found.message);
+			message += (i%10) + "";
 		}
 	}
 
 	@Test
-	public void message_alphanumeric() {
-		String messages[] = new String[]{"","0","12","123","1234","12345","01234567ABCD%*+-./:"};
+	void message_alphanumeric() {
+		String[] messages = new String[]{"", "0", "12", "123", "1234", "12345", "01234567ABCD%*+-./:"};
 
-		for( String message : messages ) {
+		for (String message : messages) {
 			QrCode expected = new QrCodeEncoder().setVersion(2).
 					setError(QrCode.ErrorLevel.M).
 					setMask(QrCodeMaskPattern.M011).
@@ -123,7 +123,7 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
+			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 			decoder.process(pps, generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
@@ -132,16 +132,16 @@ public class TestQrCodeDecoderImage {
 			assertEquals(expected.version, found.version);
 			assertEquals(expected.error, found.error);
 			assertEquals(expected.mode, found.mode);
-			assertEquals(message, new String(found.message));
+			assertEquals(message, found.message);
 		}
 	}
 
 	@Test
-	public void message_byte() {
+	void message_byte() {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
-				addBytes(new byte[]{0x50,0x70,0x34,0x2F}).fixate();
+				addBytes(new byte[]{0x50, 0x70, 0x34, 0x2F}).fixate();
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
@@ -150,20 +150,20 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
-		decoder.process(pps,generator.getGray());
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		decoder.process(pps, generator.getGray());
 
-		assertEquals(1,decoder.successes.size());
+		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
 
-		assertEquals(expected.version,found.version);
-		assertEquals(expected.error,found.error);
-		assertEquals(expected.mode,found.mode);
-		assertEquals("Pp4/",new String(found.message));
+		assertEquals(expected.version, found.version);
+		assertEquals(expected.error, found.error);
+		assertEquals(expected.mode, found.mode);
+		assertEquals("Pp4/", found.message);
 	}
 
 	@Test
-	public void message_kanji() {
+	void message_kanji() {
 		QrCode expected = new QrCodeEncoder().setVersion(2).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -176,21 +176,20 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
-		decoder.process(pps,generator.getGray());
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		decoder.process(pps, generator.getGray());
 
-		assertEquals(1,decoder.successes.size());
+		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
 
-		assertEquals(expected.version,found.version);
-		assertEquals(expected.error,found.error);
-		assertEquals(expected.mode,found.mode);
-		assertEquals("阿ん鞠ぷへ≦Ｋ",new String(found.message));
+		assertEquals(expected.version, found.version);
+		assertEquals(expected.error, found.error);
+		assertEquals(expected.mode, found.mode);
+		assertEquals("阿ん鞠ぷへ≦Ｋ", found.message);
 	}
 
-
 	@Test
-	public void message_multiple() {
+	void message_multiple() {
 		QrCode expected = new QrCodeEncoder().setVersion(3).
 				setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
@@ -203,36 +202,37 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
-		decoder.process(pps,generator.getGray());
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		decoder.process(pps, generator.getGray());
 
-		assertEquals(1,decoder.successes.size());
+		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
 
-		assertEquals(expected.version,found.version);
-		assertEquals(expected.error,found.error);
-		assertEquals(QrCode.Mode.MIXED,found.mode);
-		assertEquals("阿ん鞠ぷへ≦Ｋ1235AFefg",new String(found.message));
+		assertEquals(expected.version, found.version);
+		assertEquals(expected.error, found.error);
+		assertEquals(QrCode.Mode.MIXED, found.mode);
+		assertEquals("阿ん鞠ぷへ≦Ｋ1235AFefg", found.message);
 	}
+
 	/**
 	 * Runs through the entire algorithm using a rendered image
 	 */
 	@Test
-	public void full_simple() {
+	void full_simple() {
 //		full_simple(7, QrCode.ErrorLevel.M, QrCodeMaskPattern.M010);
 
-		for( QrCode.ErrorLevel error : QrCode.ErrorLevel.values() ) {
-			for( QrCodeMaskPattern mask : QrCodeMaskPattern.values() ) {
-				full_simple(1,error, mask);
-				full_simple(2,error, mask);
+		for (QrCode.ErrorLevel error : QrCode.ErrorLevel.values()) {
+			for (QrCodeMaskPattern mask : QrCodeMaskPattern.values()) {
+				full_simple(1, error, mask);
+				full_simple(2, error, mask);
 				full_simple(7, error, mask);
-				full_simple(20,error, mask);
-				full_simple(40,error, mask);
+				full_simple(20, error, mask);
+				full_simple(40, error, mask);
 			}
 		}
 	}
 
-	public void full_simple(int version, QrCode.ErrorLevel error , QrCodeMaskPattern mask ) {
+	public void full_simple( int version, QrCode.ErrorLevel error, QrCodeMaskPattern mask ) {
 //		System.out.println("version "+version+" error "+error+" mask "+mask);
 		QrCode expected = new QrCodeEncoder().setVersion(version).
 				setError(error).
@@ -246,47 +246,46 @@ public class TestQrCodeDecoderImage {
 
 		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code");
 //		BoofMiscOps.sleep(100000);
 
-		decoder.process(pps,generator.getGray());
+		decoder.process(pps, generator.getGray());
 
-		assertEquals(1,decoder.successes.size());
+		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
 
 		// Check format info
-		assertEquals(expected.error,found.error);
-		assertTrue(expected.mask==found.mask);
+		assertEquals(expected.error, found.error);
+		assertSame(expected.mask, found.mask);
 
 		// check version info
-		assertEquals(version,found.version);
+		assertEquals(version, found.version);
 
 		int numModules = QrCode.totalModules(version);
 
 		// sanity check the position patterns
 		for (int i = 0; i < 4; i++) {
-			assertEquals(7*4,found.ppCorner.getSideLength(i),0.01);
-			assertEquals(7*4,found.ppRight.getSideLength(i),0.01);
-			assertEquals(7*4,found.ppDown.getSideLength(i),0.01);
+			assertEquals(7*4, found.ppCorner.getSideLength(i), 0.01);
+			assertEquals(7*4, found.ppRight.getSideLength(i), 0.01);
+			assertEquals(7*4, found.ppDown.getSideLength(i), 0.01);
 		}
-		assertTrue(found.ppCorner.get(0).distance(border,border) < 1e-4);
-		assertTrue(found.ppRight.get(0).distance(border+(numModules-7)*4,border) < 1e-4);
-		assertTrue(found.ppDown.get(0).distance(border,border+(numModules-7)*4) < 1e-4);
+		assertTrue(found.ppCorner.get(0).distance(border, border) < 1e-4);
+		assertTrue(found.ppRight.get(0).distance(border + (numModules - 7)*4, border) < 1e-4);
+		assertTrue(found.ppDown.get(0).distance(border, border + (numModules - 7)*4) < 1e-4);
 
 		// Check alignment patterns
-		int alignment[] =  QrCode.VERSION_INFO[version].alignment;
-		if( alignment.length == 0 ) {
-			assertEquals(0,found.alignment.size);
+		int[] alignment = QrCode.VERSION_INFO[version].alignment;
+		if (alignment.length == 0) {
+			assertEquals(0, found.alignment.size);
 		} else {
-			assertEquals(found.alignment.size, alignment.length * alignment.length - 3);
+			assertEquals(found.alignment.size, alignment.length*alignment.length - 3);
 			// TODO Check alignment pattern locations
 		}
-
 	}
 
-	private FastQueue<PositionPatternNode> createPositionPatterns(QrCodeGeneratorImage generator) {
+	private FastQueue<PositionPatternNode> createPositionPatterns( QrCodeGeneratorImage generator ) {
 		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode::new);
 
 		pps.grow().square = generator.qr.ppCorner;
@@ -297,16 +296,16 @@ public class TestQrCodeDecoderImage {
 			pps.get(i).grayThreshold = 125;
 		}
 
-		connect(pps.get(1),pps.get(0),3,1);
-		connect(pps.get(2),pps.get(0),0,2);
+		connect(pps.get(1), pps.get(0), 3, 1);
+		connect(pps.get(2), pps.get(0), 0, 2);
 		return pps;
 	}
 
 	@Test
-	public void setPositionPatterns() {
-		Polygon2D_F64 corner = new Polygon2D_F64(0,0, 2,0, 2,2, 0,2);
-		Polygon2D_F64 right = new Polygon2D_F64(5,0, 7,0, 7,2, 5,2);
-		Polygon2D_F64 bottom = new Polygon2D_F64(0,5, 2,5, 2,7, 0,7);
+	void setPositionPatterns() {
+		Polygon2D_F64 corner = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
+		Polygon2D_F64 right = new Polygon2D_F64(5, 0, 7, 0, 7, 2, 5, 2);
+		Polygon2D_F64 bottom = new Polygon2D_F64(0, 5, 2, 5, 2, 7, 0, 7);
 
 		PositionPatternNode n_corner = new PositionPatternNode();
 		PositionPatternNode n_right = new PositionPatternNode();
@@ -315,62 +314,62 @@ public class TestQrCodeDecoderImage {
 		n_corner.square = corner;
 		n_right.square = right;
 		n_bottom.square = bottom;
-		connect(n_right,n_corner,3,1);
-		connect(n_bottom,n_corner,0,2);
+		connect(n_right, n_corner, 3, 1);
+		connect(n_bottom, n_corner, 0, 2);
 
 		QrCode qr = new QrCode();
-		QrCodeDecoderImage.setPositionPatterns(n_corner,1,2,qr);
+		QrCodeDecoderImage.setPositionPatterns(n_corner, 1, 2, qr);
 
-		assertTrue(qr.ppCorner.get(0).distance(0,0) < UtilEjml.TEST_F64);
-		assertTrue(qr.ppRight.get(0).distance(5,0)  < UtilEjml.TEST_F64);
-		assertTrue(qr.ppDown.get(0).distance(0,5) < UtilEjml.TEST_F64);
+		assertTrue(qr.ppCorner.get(0).distance(0, 0) < UtilEjml.TEST_F64);
+		assertTrue(qr.ppRight.get(0).distance(5, 0) < UtilEjml.TEST_F64);
+		assertTrue(qr.ppDown.get(0).distance(0, 5) < UtilEjml.TEST_F64);
 	}
 
-	private static void connect( PositionPatternNode a , PositionPatternNode b , int sideA , int sideB ) {
-		SquareEdge e = new SquareEdge(a,b,3,1);
+	private static void connect( PositionPatternNode a, PositionPatternNode b, int sideA, int sideB ) {
+		SquareEdge e = new SquareEdge(a, b, 3, 1);
 		a.edges[sideA] = b.edges[sideB] = e;
 	}
 
 	@Test
-	public void rotateUntilAt() {
-		Polygon2D_F64 square = new Polygon2D_F64(0,0, 2,0, 2,2, 0,2);
+	void rotateUntilAt() {
+		Polygon2D_F64 square = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
 		assertTrue(square.isCCW());
 		Polygon2D_F64 original = square.copy();
 
-		QrCodeDecoderImage.rotateUntilAt(square,0,0);
+		QrCodeDecoderImage.rotateUntilAt(square, 0, 0);
 		assertTrue(square.isIdentical(original, UtilEjml.TEST_F64));
 
-		QrCodeDecoderImage.rotateUntilAt(square,1,0);
+		QrCodeDecoderImage.rotateUntilAt(square, 1, 0);
 		assertTrue(square.isCCW());
-		assertTrue(square.get(0).distance(2,0) < UtilEjml.TEST_F64);
+		assertTrue(square.get(0).distance(2, 0) < UtilEjml.TEST_F64);
 
-		QrCodeDecoderImage.rotateUntilAt(square,0,1);
+		QrCodeDecoderImage.rotateUntilAt(square, 0, 1);
 		assertTrue(square.isIdentical(original, UtilEjml.TEST_F64));
 	}
 
 	@Test
-	public void computeBoundingBox() {
+	void computeBoundingBox() {
 		QrCode qr = new QrCode();
-		qr.ppCorner = new Polygon2D_F64(0,0, 1,0, 1,1, 0,1);
-		qr.ppRight = new Polygon2D_F64(2,0, 3,0, 3,1, 2,1);
-		qr.ppDown = new Polygon2D_F64(0,2, 1,2, 1,3, 0,3);
+		qr.ppCorner = new Polygon2D_F64(0, 0, 1, 0, 1, 1, 0, 1);
+		qr.ppRight = new Polygon2D_F64(2, 0, 3, 0, 3, 1, 2, 1);
+		qr.ppDown = new Polygon2D_F64(0, 2, 1, 2, 1, 3, 0, 3);
 
 		QrCodeDecoderImage.computeBoundingBox(qr);
 
-		assertTrue(qr.bounds.get(0).distance(0,0) < UtilEjml.TEST_F64);
-		assertTrue(qr.bounds.get(1).distance(3,0) < UtilEjml.TEST_F64);
-		assertTrue(qr.bounds.get(2).distance(3,3) < UtilEjml.TEST_F64);
-		assertTrue(qr.bounds.get(3).distance(0,3) < UtilEjml.TEST_F64);
+		assertTrue(qr.bounds.get(0).distance(0, 0) < UtilEjml.TEST_F64);
+		assertTrue(qr.bounds.get(1).distance(3, 0) < UtilEjml.TEST_F64);
+		assertTrue(qr.bounds.get(2).distance(3, 3) < UtilEjml.TEST_F64);
+		assertTrue(qr.bounds.get(3).distance(0, 3) < UtilEjml.TEST_F64);
 	}
 
 	/**
 	 * There was a bug where version 0 QR code was returned
 	 */
 	@Test
-	public void extractVersionInfo_version0() {
-		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage(EciEncoding.UTF8,GrayU8.class){
+	void extractVersionInfo_version0() {
+		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class) {
 			@Override
-			int estimateVersionBySize(QrCode qr) {
+			int estimateVersionBySize( QrCode qr ) {
 				return 0;
 			}
 
@@ -383,6 +382,6 @@ public class TestQrCodeDecoderImage {
 		QrCode qr = new QrCode();
 		qr.version = 8;
 		assertFalse(mock.extractVersionInfo(qr));
-		assertEquals(-1,qr.version);
+		assertEquals(-1, qr.version);
 	}
 }

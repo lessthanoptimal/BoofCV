@@ -36,12 +36,14 @@ task unzipJar(type: Copy) {
     exclude "**/Unmodifiable.class"
 }
 
+if( Integer.parseInt(ext.ANDROID_VERSION) >= 29 ) {
+    println("WARNING!!! javadoc will fail with this version of Android")
+}
+
 dependencies {
     api project(':main:boofcv-ip')
     api project(':main:boofcv-feature')
-    api project(':main:boofcv-calibration')
     api project(':main:boofcv-geo')
-
 
     // Google doesn't provide access to an android.jar
     // A proper android library could be built but that seems to make

@@ -18,9 +18,9 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
+import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.cloud.PointCloudWriter;
@@ -29,6 +29,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -791,9 +792,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		ImageDistort<C,C> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic1, rect1_F32, BorderType.EXTENDED, distorted1.getImageType());
+				RectifyDistortImageOps.rectifyImage(intrinsic1, rect1_F32, BorderType.EXTENDED, distorted1.getImageType());
 		ImageDistort<C,C> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.EXTENDED, distorted2.getImageType());
+				RectifyDistortImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.EXTENDED, distorted2.getImageType());
 
 		rectifiedMask.reshape(rectifiedShape.width,rectifiedShape.height);
 		rectified1.reshape(rectifiedShape.width,rectifiedShape.height);

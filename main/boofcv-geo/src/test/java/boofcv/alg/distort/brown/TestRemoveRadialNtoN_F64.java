@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class TestRemoveRadialNtoN_F64 {
 
 	public void checkManual(double t1, double t2) {
 
-		/**/double radial[]= new /**/double[]{0.12,-0.13};
+		/**/double[] radial= new /**/double[]{0.12,-0.13};
 
 		// undisorted normalized image coordinate
 		Point2D_F64 undistorted = new Point2D_F64(0.1,-0.2);

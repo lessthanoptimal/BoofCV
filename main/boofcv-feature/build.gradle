@@ -6,7 +6,6 @@ dependencies {
     benchmarkImplementation project(':main:boofcv-ip')
     benchmarkImplementation project(':integration:boofcv-ffmpeg')
 
-    testImplementation project(':main:boofcv-types').sourceSets.test.output
     testImplementation project(':main:boofcv-io')
     testImplementation project(':integration:boofcv-swing')
 }

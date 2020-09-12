@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import georegression.struct.homography.Homography2D_F32;
+import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
 import org.openjdk.jmh.annotations.*;
 
@@ -68,11 +68,10 @@ public class BenchmarkImageDistort {
 
 		GImageMiscOps.fillUniform(inputF32,rand,0,200);
 
-		Homography2D_F32 affine = new Homography2D_F32(
+		Affine2D_F32 affine = new Affine2D_F32(
 				0.9f,0.1f,0.0f,
-				0.05f,1.1f,02f,
-				0.01f,-0.1f,1.05f);
-		PixelTransform<Point2D_F32> tran = new PixelTransformHomography_F32(affine);
+				0.05f,1.1f,02f);
+		PixelTransform<Point2D_F32> tran = new PixelTransformAffine_F32(affine);
 
 
 		nearest_sb = FactoryDistort.distort(false, InterpolationType.NEAREST_NEIGHBOR, BorderType.EXTENDED,

@@ -18,10 +18,10 @@
 
 package boofcv.gui.controls;
 
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.feature.disparity.DisparityError;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.abst.disparity.StereoDisparitySparse;
+import boofcv.factory.disparity.ConfigDisparityBM;
+import boofcv.factory.disparity.DisparityError;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ShowImages;
