@@ -143,12 +143,7 @@ subprojects {
         }
 
         // needed to use Java 11+ syntax with Java 1.8 byte code
-        annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'){
-            exclude group: 'net.bytebuddy', module: 'byte-buddy'
-            exclude group: 'net.bytebuddy', module: 'byte-buddy-agent'
-        }
-        annotationProcessor("net.bytebuddy:byte-buddy:1.10.10")
-        annotationProcessor("net.bytebuddy:byte-buddy-agent:1.10.10")
+        annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
 
         annotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
         noautoAnnotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
