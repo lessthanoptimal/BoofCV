@@ -29,15 +29,15 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class SceneStructureProjective extends SceneStructureCommon
-{
-	public final FastQueue<View> views = new FastQueue<>(View::new,View::reset);
+public class SceneStructureProjective extends SceneStructureCommon {
+	public final FastQueue<View> views = new FastQueue<>(View::new, View::reset);
 
 	/**
 	 * Configure bundle adjustment
+	 *
 	 * @param homogenous if true then homogeneous coordinates are used
 	 */
-	public SceneStructureProjective(boolean homogenous) {
+	public SceneStructureProjective( boolean homogenous ) {
 		super(homogenous);
 	}
 
@@ -48,11 +48,11 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 * @param totalViews Number of views
 	 * @param totalPoints Number of points
 	 */
-	public void initialize( int totalViews , int totalPoints ) {
-		this.initialize(1,totalViews,totalPoints);
-		setCamera(0,true,new BundleCameraProjective());
+	public void initialize( int totalViews, int totalPoints ) {
+		this.initialize(1, totalViews, totalPoints);
+		setCamera(0, true, new BundleCameraProjective());
 		for (int viewIdx = 0; viewIdx < views.size; viewIdx++) {
-			connectViewToCamera(viewIdx,0);
+			connectViewToCamera(viewIdx, 0);
 		}
 	}
 
@@ -63,7 +63,7 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 * @param totalViews Number of views
 	 * @param totalPoints Number of points
 	 */
-	public void initialize( int totalCameras , int totalViews , int totalPoints ) {
+	public void initialize( int totalCameras, int totalViews, int totalPoints ) {
 		cameras.reset();
 		views.reset();
 		points.reset();
@@ -74,14 +74,15 @@ public class SceneStructureProjective extends SceneStructureCommon
 
 	/**
 	 * Specifies the spacial transform for a view.
+	 *
 	 * @param which Which view is being specified/
 	 * @param fixed If these parameters are fixed or not
 	 * @param worldToView The 3x4 projective camera matrix that converts a point in world to view pixels
 	 * @param width Image's width
 	 * @param height Image's height
 	 */
-	public void setView(int which , boolean fixed , DMatrixRMaj worldToView ,
-						int width , int height ) {
+	public void setView( int which, boolean fixed, DMatrixRMaj worldToView,
+						 int width, int height ) {
 		views.data[which].known = fixed;
 		views.data[which].worldToView.set(worldToView);
 		views.data[which].width = width;
@@ -90,23 +91,25 @@ public class SceneStructureProjective extends SceneStructureCommon
 
 	/**
 	 * Specifies that the view uses the specified camera
+	 *
 	 * @param viewIndex index of view
 	 * @param cameraIndex index of camera
 	 */
-	public void connectViewToCamera( int viewIndex , int cameraIndex ) {
-		if( views.get(viewIndex).camera != -1 )
+	public void connectViewToCamera( int viewIndex, int cameraIndex ) {
+		if (views.get(viewIndex).camera != -1)
 			throw new RuntimeException("View has already been assigned a camera");
 		views.get(viewIndex).camera = cameraIndex;
 	}
 
 	/**
 	 * Returns the number of view with parameters that are not fixed
+	 *
 	 * @return non-fixed view count
 	 */
 	public int getUnknownViewCount() {
 		int total = 0;
 		for (int i = 0; i < views.size; i++) {
-			if( !views.data[i].known) {
+			if (!views.data[i].known) {
 				total++;
 			}
 		}
@@ -115,6 +118,7 @@ public class SceneStructureProjective extends SceneStructureCommon
 
 	/**
 	 * Returns the total number of parameters which will be optimised
+	 *
 	 * @return number of parameters
 	 */
 	@Override
@@ -127,24 +131,19 @@ public class SceneStructureProjective extends SceneStructureCommon
 	}
 
 	public static class View {
-		/**
-		 * If the parameters are assumed to be known and should not be optimised.
-		 */
+		/** If the parameters are assumed to be known and should not be optimised. */
 		public boolean known = true;
 
-		/**
-		 * Images shape. Used to normalize points
-		 */
-		public int width,height;
+		/** Images shape. Used to normalize points */
+		public int width, height;
 
 		/**
 		 * Projective camera matrix. x' = P*X. P is the projective matrix, x' are
 		 * pixel observations, and X is the 3D feature.
 		 */
-		public DMatrixRMaj worldToView = new DMatrixRMaj(3,4);
-		/**
-		 * The camera associated with this view
-		 */
+		public DMatrixRMaj worldToView = new DMatrixRMaj(3, 4);
+
+		/** The camera associated with this view */
 		public int camera = -1;
 
 		public void reset() {
@@ -154,6 +153,5 @@ public class SceneStructureProjective extends SceneStructureCommon
 			camera = -1;
 		}
 	}
-
 }
 

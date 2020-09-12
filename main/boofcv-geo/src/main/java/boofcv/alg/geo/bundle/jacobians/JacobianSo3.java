@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,18 +29,18 @@ public interface JacobianSo3 {
 
 	/**
 	 * Converts the 3x3 rotation matrix into encoded parameters
+	 *
 	 * @param R 3x3 (Input) rotation matrix
 	 * @param parameters (Output) storage for encoded rotation matrix
 	 * @param offset index in parameters array
 	 */
-	void getParameters( DMatrixRMaj R , double parameters[] , int offset );
+	void getParameters( DMatrixRMaj R, double[] parameters, int offset );
 
-	void setParameters( double parameters[] , int offset );
+	void setParameters( double[] parameters, int offset );
 
 	int getParameterLength();
 
 	DMatrixRMaj getRotationMatrix();
 
 	DMatrixRMaj getPartial( int param );
-
 }

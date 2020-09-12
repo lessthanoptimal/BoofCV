@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,20 +32,20 @@ public class TestSceneStructureMetric {
 	public void assignIDsToRigidPoints() {
 		SceneStructureMetric scene = new SceneStructureMetric(false);
 
-		scene.initialize(1,2,3,2);
-		scene.setRigid(0,false,new Se3_F64(),2);
-		scene.setRigid(1,true,new Se3_F64(),3);
+		scene.initialize(1, 2, 3, 2);
+		scene.setRigid(0, false, new Se3_F64(), 2);
+		scene.setRigid(1, true, new Se3_F64(), 3);
 
 		scene.assignIDsToRigidPoints();
 
 		for (int i = 0; i < 2; i++) {
-			assertEquals(0,scene.lookupRigid[i]);
+			assertEquals(0, scene.lookupRigid[i]);
 		}
 		for (int i = 0; i < 3; i++) {
-			assertEquals(1,scene.lookupRigid[i+2]);
+			assertEquals(1, scene.lookupRigid[i + 2]);
 		}
 
-		assertEquals(0,scene.rigids.data[0].indexFirst);
-		assertEquals(2,scene.rigids.data[1].indexFirst);
+		assertEquals(0, scene.rigids.data[0].indexFirst);
+		assertEquals(2, scene.rigids.data[1].indexFirst);
 	}
 }

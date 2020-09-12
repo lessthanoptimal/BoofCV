@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.bundle.cameras.BundleCameraProjective;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofTesting;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 class TestCodecSceneStructureProjective {
-	Random rand = new Random(234);
+	private final Random rand = BoofTesting.createRandom(234);
 
 	final static int width = 300, height = 200;
 

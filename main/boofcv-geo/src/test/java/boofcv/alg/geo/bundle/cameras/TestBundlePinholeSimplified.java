@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,9 @@ package boofcv.alg.geo.bundle.cameras;
 /**
  * @author Peter Abeles
  */
-public class TestBundlePinholeSimplified extends GenericChecksBundleAdjustmentCamera
-{
+public class TestBundlePinholeSimplified extends GenericChecksBundleAdjustmentCamera {
 	public TestBundlePinholeSimplified() {
 		super(new BundlePinholeSimplified());
-		setParameters(new double[][]{{300,0,0},{300,1e-1,1e-2}});
+		setParameters(new double[][]{{300, 0, 0}, {300, 1e-1, 1e-2}});
 	}
 }

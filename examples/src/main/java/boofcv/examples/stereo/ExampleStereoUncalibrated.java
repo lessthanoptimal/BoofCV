@@ -227,7 +227,7 @@ public class ExampleStereoUncalibrated {
 		}
 		System.out.println("\n\nworldToView");
 		for (int i = 0; i < structure.views.size; i++) {
-			System.out.println(structure.views.data[i].worldToView.toString());
+			System.out.println(structure.views.data[i].parent_to_view.toString());
 		}
 
 		// display the inlier matches found using the robust estimator
@@ -237,7 +237,7 @@ public class ExampleStereoUncalibrated {
 		intrinsic.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic.fsetRadial(cp.k1,cp.k2);
 
-		Se3_F64 leftToRight = structure.views.data[1].worldToView;
+		Se3_F64 leftToRight = structure.views.data[1].parent_to_view;
 
 		computeStereoCloud(image01,image02,color01,color02,intrinsic,intrinsic,leftToRight,0,250);
 	}

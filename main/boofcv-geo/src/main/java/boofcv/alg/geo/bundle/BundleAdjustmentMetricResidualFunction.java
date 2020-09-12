@@ -26,7 +26,13 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import org.ddogleg.struct.FastQueue;
+
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * <p>
@@ -49,7 +55,7 @@ public class BundleAdjustmentMetricResidualFunction
 	private SceneObservations observations;
 
 	// feature location in world coordinates
-	private Point3D_F64 worldPt = new Point3D_F64();
+	private final Point3D_F64 worldPt = new Point3D_F64();
 
 	// number of parameters being optimised
 	private int numParameters;
@@ -57,17 +63,23 @@ public class BundleAdjustmentMetricResidualFunction
 	private int numObservations;
 
 	// local variable which stores the predicted location of the feature in the camera frame
-	private Point3D_F64 cameraPt = new Point3D_F64();
+	private final Point3D_F64 cameraPt = new Point3D_F64();
 
 	// Storage for rendered output
-	private Point2D_F64 predictedPixel = new Point2D_F64();
-	private PointIndex2D_F64 observedPixel = new PointIndex2D_F64();
+	private final Point2D_F64 predictedPixel = new Point2D_F64();
+	private final PointIndex2D_F64 observedPixel = new PointIndex2D_F64();
 
-	// Used to write the "unknown" paramters into the scene
-	CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
+	// Used to write the "unknown" parameters into the scene
+	private final CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
-	Point3D_F64 p3 = new Point3D_F64();
-	Point4D_F64 p4 = new Point4D_F64();
+	// Recycled world to view transforms
+	private final FastQueue<Se3_F64> storageSe3 = new FastQueue<>(Se3_F64::new);
+	// Look up workspace by view ID when relative view
+	private final TIntObjectMap<Se3_F64> mapWorldToView = new TIntObjectHashMap<>();
+
+	// Storage for 3D points in Cartesian and homogenous coordinates
+	private final Point3D_F64 p3 = new Point3D_F64();
+	private final Point4D_F64 p4 = new Point4D_F64();
 
 	/**
 	 * Specifies the scenes structure and observed feature locations
@@ -81,6 +93,18 @@ public class BundleAdjustmentMetricResidualFunction
 		numObservations = observations.getObservationCount();
 		numParameters = structure.getParameterCount();
 		structure.assignIDsToRigidPoints();
+
+		// declare storage and create a look up table for world to view for all relative views
+		mapWorldToView.clear();
+		storageSe3.reset();
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
+			SceneStructureMetric.View v = structure.views.get(viewIdx);
+			if (v.parent == -1)
+				continue;
+			assertBoof(v.parent < viewIdx);
+			Se3_F64 world_to_view = storageSe3.grow();
+			mapWorldToView.put(viewIdx, world_to_view);
+		}
 	}
 
 	@Override
@@ -115,6 +139,8 @@ public class BundleAdjustmentMetricResidualFunction
 			SceneStructureMetric.View view = structure.views.get(viewIndex);
 			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
 
+			Se3_F64 world_to_view = lookupWorldToView(view, viewIndex);
+
 			//=========== Project General Points in this View
 			{
 				SceneObservations.View obsView = observations.views.get(viewIndex);
@@ -123,7 +149,7 @@ public class BundleAdjustmentMetricResidualFunction
 					SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 					worldPt.get(p3);
 
-					SePointOps_F64.transform(view.worldToView, p3, cameraPt);
+					SePointOps_F64.transform(world_to_view, p3, cameraPt);
 
 					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 
@@ -150,9 +176,9 @@ public class BundleAdjustmentMetricResidualFunction
 					SceneStructureCommon.Point objectPt = rigid.points[pointIndex];
 					objectPt.get(p3);
 
-					// Tranform to world frame and from world to camera
-					SePointOps_F64.transform(rigid.objectToWorld, p3, worldPt);
-					SePointOps_F64.transform(view.worldToView, worldPt, cameraPt);
+					// Transform to world frame and from world to camera
+					SePointOps_F64.transform(rigid.object_to_world, p3, worldPt);
+					SePointOps_F64.transform(world_to_view, worldPt, cameraPt);
 
 					// Project and compute residual
 					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
@@ -175,6 +201,8 @@ public class BundleAdjustmentMetricResidualFunction
 			SceneStructureMetric.View view = structure.views.get(viewIndex);
 			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
 
+			Se3_F64 world_to_view = lookupWorldToView(view, viewIndex);
+
 			//=========== Project General Points in this View
 			{
 				SceneObservations.View obsView = observations.views.get(viewIndex);
@@ -184,8 +212,8 @@ public class BundleAdjustmentMetricResidualFunction
 					SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 					worldPt.get(p4);
 
-					// TODO Explain why this is correct. The last row is omited when converted to 3D
-					SePointOps_F64.transformV(view.worldToView, p4, cameraPt);
+					// TODO Explain why this is correct. The last row is omitted when converted to 3D
+					SePointOps_F64.transformV(world_to_view, p4, cameraPt);
 
 					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 
@@ -213,9 +241,9 @@ public class BundleAdjustmentMetricResidualFunction
 					SceneStructureCommon.Point objectPt = rigid.points[pointIndex];
 					objectPt.get(p4);
 
-					// Tranform to world frame and from world to camera
-					SePointOps_F64.transformV(rigid.objectToWorld, p4, worldPt);
-					SePointOps_F64.transform(view.worldToView, worldPt, cameraPt);
+					// Transform to world frame and from world to camera
+					SePointOps_F64.transformV(rigid.object_to_world, p4, worldPt);
+					SePointOps_F64.transform(world_to_view, worldPt, cameraPt);
 
 					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 
@@ -226,5 +254,25 @@ public class BundleAdjustmentMetricResidualFunction
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns a transform from the world_to_view. If relative then the parent's world to view is look up and used
+	 * to compute this view's transform and the results are saved.
+	 */
+	protected Se3_F64 lookupWorldToView( SceneStructureMetric.View v, int viewIndex ) {
+		if (v.parent == -1)
+			return v.parent_to_view;
+		Se3_F64 world_to_view = mapWorldToView.get(viewIndex);
+		SceneStructureMetric.View parentView = structure.views.get(v.parent);
+
+		if (parentView.parent == -1) {
+			parentView.parent_to_view.concat(v.parent_to_view, world_to_view);
+		} else {
+			// Since the parent must have a lower index it's transform is already known
+			Se3_F64 world_to_parent = mapWorldToView.get(v.parent);
+			world_to_parent.concat(v.parent_to_view, world_to_view);
+		}
+		return world_to_view;
 	}
 }

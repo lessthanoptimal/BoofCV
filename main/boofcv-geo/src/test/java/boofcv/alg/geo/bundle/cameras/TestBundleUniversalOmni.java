@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,55 +35,52 @@ public class TestBundleUniversalOmni {
 	@Test
 	void compareForward() {
 		CameraUniversalOmni cam = new CameraUniversalOmni(2);
-		cam.fx = 300;cam.fy = 200;
+		cam.fx = 300; cam.fy = 200;
 		cam.cx = cam.cy = 400;
 		cam.radial[0] = 0.01;
 		cam.radial[1] = -0.02;
 		cam.skew = 0.001;
 		cam.t1 = 0.01;
 		cam.t2 = -0.01;
-		cam.mirrorOffset=1;
+		cam.mirrorOffset = 1;
 
 		BundleUniversalOmni alg = new BundleUniversalOmni(cam);
 		Point3Transform2_F64 n2p = LensDistortionFactory.wide(cam).distortStoP_F64();
 
 		Point2D_F64 found = new Point2D_F64();
 
-		double X = 0.1,Y = -0.2,Z=2;
-		alg.project(X,Y,Z,found);
+		double X = 0.1, Y = -0.2, Z = 2;
+		alg.project(X, Y, Z, found);
 
 		Point2D_F64 expected = new Point2D_F64();
 		// convert to unit sphere
 		double n = Math.sqrt(X*X + Y*Y + Z*Z);
-		n2p.compute(X/n,Y/n,Z/n, expected);
+		n2p.compute(X/n, Y/n, Z/n, expected);
 
-		assertTrue(found.distance(expected) < UtilEjml.TEST_F64 );
+		assertTrue(found.distance(expected) < UtilEjml.TEST_F64);
 	}
 
 	@Test
 	void withAllParameters() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.015,-0.001,0.002,0.1,0.9},{400,600,1000,1000,0.01,0.015,-0.001,0.002,2,0.9}};
-		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false,2,true,false),0.02){}
+		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.015, -0.001, 0.002, 0.1, 0.9}, {400, 600, 1000, 1000, 0.01, 0.015, -0.001, 0.002, 2, 0.9}};
+		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false, 2, true, false), 0.02) {}
 				.setParameters(parameters)
-//				.setPrint(true)
 				.checkAll();
 	}
 
 	@Test
 	void withFixedMirror() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.015,-0.001,0.002,0.1},{400,600,1000,1000,0.01,0.015,-0.001,0.002,2}};
-		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false,2,true,0.9),0.02){}
+		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.015, -0.001, 0.002, 0.1}, {400, 600, 1000, 1000, 0.01, 0.015, -0.001, 0.002, 2}};
+		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false, 2, true, 0.9), 0.02) {}
 				.setParameters(parameters)
-//				.setPrint(true)
 				.checkAll();
 	}
 
 	@Test
 	void withoutSkew() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.02,-0.001,0.002,0.9},{400,600,1000,1000,0.01,0.02,-0.001,0.002,0.9}};
-		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(true,2,true,false),0.02){}
+		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.9}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 0.9}};
+		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(true, 2, true, false), 0.02) {}
 				.setParameters(parameters)
-//				.setPrint(true)
 				.checkAll();
 	}
 
@@ -91,21 +88,21 @@ public class TestBundleUniversalOmni {
 	void variousRadialLengths() {
 		for (int i = 0; i <= 3; i++) {
 			CameraUniversalOmni cam = new CameraUniversalOmni(i);
-			cam.fx = 300;cam.fy = 200;
+			cam.fx = 300; cam.fy = 200;
 			cam.cx = cam.cy = 400;
 			cam.skew = 0.01;
 			for (int j = 0; j < i; j++) {
 				cam.radial[j] = 0.01 - j*0.001;
 			}
-			cam.t1 = -0.001;cam.t2 = 0.002;
+			cam.t1 = -0.001;
+			cam.t2 = 0.002;
 			cam.mirrorOffset = 0.05;
 
 			BundleUniversalOmni alg = new BundleUniversalOmni(cam);
-			double parameters[][] = new double[1][alg.getIntrinsicCount()];
-			alg.getIntrinsic(parameters[0],0);
-			new GenericChecksBundleAdjustmentCamera(alg,0.02){}
+			double[][] parameters = new double[1][alg.getIntrinsicCount()];
+			alg.getIntrinsic(parameters[0], 0);
+			new GenericChecksBundleAdjustmentCamera(alg, 0.02) {}
 					.setParameters(parameters)
-//					.setPrint(true)
 					.checkAll();
 		}
 	}
@@ -113,7 +110,7 @@ public class TestBundleUniversalOmni {
 	@Test
 	void zeroTangential() {
 		CameraUniversalOmni cam = new CameraUniversalOmni(1);
-		cam.fx = 300;cam.fy = 200;
+		cam.fx = 300; cam.fy = 200;
 		cam.cx = cam.cy = 400;
 		cam.skew = 0.01;
 		cam.radial[0] = 0.01;
@@ -121,11 +118,10 @@ public class TestBundleUniversalOmni {
 		// since t1 and t2 are zero it will automatically turn off tangential
 
 		BundleUniversalOmni alg = new BundleUniversalOmni(cam);
-		double parameters[][] = new double[1][alg.getIntrinsicCount()];
-		alg.getIntrinsic(parameters[0],0);
-		new GenericChecksBundleAdjustmentCamera(alg,0.02){}
+		double[][] parameters = new double[1][alg.getIntrinsicCount()];
+		alg.getIntrinsic(parameters[0], 0);
+		new GenericChecksBundleAdjustmentCamera(alg, 0.02) {}
 				.setParameters(parameters)
-//					.setPrint(true)
 				.checkAll();
 	}
 }

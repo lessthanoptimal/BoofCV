@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,15 +29,14 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 public class BundleAdjustmentMetricSchurJacobian_DDRM
-		extends BundleAdjustmentMetricSchurJacobian<DMatrixRMaj>
-{
+		extends BundleAdjustmentMetricSchurJacobian<DMatrixRMaj> {
 	@Override
-	public void process(double[] input, DMatrixRMaj left, DMatrixRMaj right) {
-		internalProcess(input,left,right);
+	public void process( double[] input, DMatrixRMaj left, DMatrixRMaj right ) {
+		internalProcess(input, left, right);
 	}
 
 	@Override
-	protected void set(DMatrix matrix, int row, int col, double value) {
-		matrix.unsafe_set(row,col,value);
+	protected void set( DMatrix matrix, int row, int col, double value ) {
+		matrix.unsafe_set(row, col, value);
 	}
 }

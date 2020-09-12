@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,53 +18,21 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
-import org.ddogleg.optimization.DerivativeChecker;
-import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
-import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixSparseCSC;
-import org.junit.jupiter.api.Test;
-
-import java.util.Random;
-
-import static boofcv.alg.geo.bundle.TestBundleAdjustmentMetricResidualFunction.createObservations;
-import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentMetricSchurJacobian_DSCC {
-	Random rand = new Random(48854);
+public class TestBundleAdjustmentMetricSchurJacobian_DSCC
+		extends CommonBundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> {
 
-	@Test
-	public void compareToNumerical() {
-		compareToNumerical(true,false);
-		compareToNumerical(false,false);
-		compareToNumerical(true,true);
-		compareToNumerical(false,true);
+	@Override protected BundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> createAlg() {
+		return new BundleAdjustmentMetricSchurJacobian_DSCC();
 	}
-	public void compareToNumerical(boolean homogenous , boolean hasRigid) {
-		SceneStructureMetric structure = createScene(rand,homogenous, hasRigid);
-		SceneObservations observations = createObservations(rand,structure);
 
-		double param[] = new double[structure.getParameterCount()];
-		new CodecSceneStructureMetric().encode(structure,param);
-
-		BundleAdjustmentMetricSchurJacobian_DSCC alg = new BundleAdjustmentMetricSchurJacobian_DSCC();
-
-		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN.DSCC(alg);
-		BundleAdjustmentMetricResidualFunction func = new BundleAdjustmentMetricResidualFunction();
-
-		alg.configure(structure,observations);
-		func.configure(structure,observations);
-
-		// TODO I think the Rodrigues jacobian is computed in a numerically unstable way.
-		//      multiplying tolerance by 100 is ridiculous
-
-//		DerivativeChecker.jacobianPrint(func, jac, param, 100*UtilEjml.TEST_F64_SQ );
-		assertTrue(DerivativeChecker.jacobian(func, jac, param, 100*UtilEjml.TEST_F64_SQ ));
+	@Override protected SchurJacobian_to_NtoMxN<DMatrixSparseCSC>
+	createJacobian( BundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> alg ) {
+		return new SchurJacobian_to_NtoMxN.DSCC(alg);
 	}
 }

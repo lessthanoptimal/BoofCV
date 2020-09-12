@@ -420,6 +420,38 @@ class TestPerspectiveOps {
 	}
 
 	@Test
+	void renderPixel_SE3_homogenous() {
+		var X3 = new Point3D_F64(0.1,-0.05,3);
+		var X4 = new Point4D_F64(0.1,-0.05,3,1);
+		X4.scale(1.2);
+
+		Se3_F64 worldToCamera = SpecialEuclideanOps_F64.eulerXyz(0.2,0.01,-0.03,0.1,-0.05,0.03,null);
+
+		CameraPinhole intrinsic = new CameraPinhole(100,150,0.1,120,209,500,600);
+
+		{
+			Point2D_F64 expected = PerspectiveOps.renderPixel(worldToCamera, intrinsic, X3, null);
+			Point2D_F64 found = PerspectiveOps.renderPixel(worldToCamera, intrinsic, X4, null);
+
+			assertEquals(expected.x, found.x, 1e-8);
+			assertEquals(expected.y, found.y, 1e-8);
+		}
+
+		// test to see if it can handle points at infinity. Translational component shouldn't matter
+		Se3_F64 noTranslate = worldToCamera.copy();
+		noTranslate.T.set(0,0,0);
+
+		{
+			X4.w = 0.0;
+			Point2D_F64 expected = PerspectiveOps.renderPixel(noTranslate, intrinsic, X3, null);
+			Point2D_F64 found = PerspectiveOps.renderPixel(worldToCamera, intrinsic, X4, null);
+
+			assertEquals(expected.x, found.x, 1e-8);
+			assertEquals(expected.y, found.y, 1e-8);
+		}
+	}
+
+	@Test
 	void renderPixel_cameramatrix() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 

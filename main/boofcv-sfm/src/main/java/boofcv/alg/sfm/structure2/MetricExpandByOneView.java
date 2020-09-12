@@ -301,8 +301,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// copy results for output
 		wview3.intrinsic.set((BundlePinholeSimplified) structure.cameras.get(2).model);
-		view1_to_view2H.set(structure.views.get(1).worldToView);
-		view1_to_target.set(structure.views.get(2).worldToView);
+		view1_to_view2H.set(structure.views.get(1).parent_to_view);
+		view1_to_target.set(structure.views.get(2).parent_to_view);
 
 		if (verbose != null) {
 			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f)\n",

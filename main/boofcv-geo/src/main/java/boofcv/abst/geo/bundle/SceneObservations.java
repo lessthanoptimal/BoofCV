@@ -31,32 +31,31 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 public class SceneObservations {
-	/**
-	 * Views of general points.
-	 */
-	public final FastQueue<View> views = new FastQueue<>(View::new,View::reset);
-	/**
-	 * Views of points on rigid objects
-	 */
-	public final FastQueue<View> viewsRigid = new FastQueue<>(View::new,View::reset);
+	/** Views of general points. */
+	public final FastQueue<View> views = new FastQueue<>(View::new, View::reset);
+
+	/** Views of points on rigid objects */
+	public final FastQueue<View> viewsRigid = new FastQueue<>(View::new, View::reset);
 
 	/**
 	 * Initialize the data structures for this number of views. Rigid is set to be false.
+	 *
 	 * @param numViews Number of views
 	 */
-	public void initialize(int numViews) {
-		this.initialize(numViews,false);
+	public void initialize( int numViews ) {
+		this.initialize(numViews, false);
 	}
 
 	/**
 	 * Initialize the data structures for this number of views
+	 *
 	 * @param numViews Number of views
 	 * @param rigidObjects If true then there are rigid objects that can be observed
 	 */
-	public void initialize(int numViews , boolean rigidObjects ) {
+	public void initialize( int numViews, boolean rigidObjects ) {
 		views.reset();
 		views.resize(numViews);
-		if( rigidObjects ) {
+		if (rigidObjects) {
 			viewsRigid.reset();
 			viewsRigid.resize(numViews);
 		}
@@ -64,6 +63,7 @@ public class SceneObservations {
 
 	/**
 	 * Returns the total number of observations across all views. general and rigid points
+	 *
 	 * @return number of observations
 	 */
 	public int getObservationCount() {
@@ -71,7 +71,7 @@ public class SceneObservations {
 	}
 
 	private int countObservations( FastQueue<View> views ) {
-		if( views == null )
+		if (views == null)
 			return 0;
 		int total = 0;
 		for (int i = 0; i < views.size; i++) {
@@ -84,7 +84,7 @@ public class SceneObservations {
 	 * True if there are rigid views
 	 */
 	public boolean hasRigid() {
-		return views.size != 0 && views.size==viewsRigid.size;
+		return views.size != 0 && views.size == viewsRigid.size;
 	}
 
 	public View getView( int which ) {
@@ -108,10 +108,10 @@ public class SceneObservations {
 		/**
 		 * Removes the feature and observation at the specified element
 		 */
-		public void remove(int index ) {
+		public void remove( int index ) {
 			point.remove(index);
 			index *= 2;
-			observations.remove(index,index+1);
+			observations.remove(index, index + 1);
 		}
 
 		/**
@@ -122,46 +122,47 @@ public class SceneObservations {
 		 * @param x observation x-axis
 		 * @param y observation y-axis
 		 */
-		public void set(int index, int featureIdx, float x , float y ) {
-			point.set(index,featureIdx);
+		public void set( int index, int featureIdx, float x, float y ) {
+			point.set(index, featureIdx);
 			index *= 2;
 			observations.data[index] = x;
-			observations.data[index+1] = y;
+			observations.data[index + 1] = y;
 		}
 
-		public void setPixel(int index, float x , float y ) {
+		public void setPixel( int index, float x, float y ) {
 			index *= 2;
 			observations.data[index] = x;
-			observations.data[index+1] = y;
+			observations.data[index + 1] = y;
 		}
 
 		public int getPointId( int index ) {
 			return point.get(index);
 		}
 
-		public void get(int index , Point2D_F64 p ) {
-			if( index >= point.size )
-				throw new IndexOutOfBoundsException(index+" >= "+point.size);
+		public void get( int index, Point2D_F64 p ) {
+			if (index >= point.size)
+				throw new IndexOutOfBoundsException(index + " >= " + point.size);
 			index *= 2;
 			p.x = observations.data[index];
-			p.y = observations.data[index+1];
+			p.y = observations.data[index + 1];
 		}
 
-		public void get(int index , PointIndex2D_F64 observation ) {
-			if( index >= point.size )
-				throw new IndexOutOfBoundsException(index+" >= "+point.size);
+		public void get( int index, PointIndex2D_F64 observation ) {
+			if (index >= point.size)
+				throw new IndexOutOfBoundsException(index + " >= " + point.size);
 			observation.index = point.data[index];
 			index *= 2;
-			observation.set( observations.data[index], observations.data[index+1]);
+			observation.set(observations.data[index], observations.data[index + 1]);
 		}
 
 		/**
 		 * Adds an observation of the specified feature.
+		 *
 		 * @param featureIndex Feature index
 		 * @param x pixel x-coordinate
 		 * @param y pixel y-coordinate
 		 */
-		public void add( int featureIndex , float x , float y ) {
+		public void add( int featureIndex, float x, float y ) {
 			point.add(featureIndex);
 			observations.add(x);
 			observations.add(y);
@@ -170,8 +171,8 @@ public class SceneObservations {
 		public void checkDuplicatePoints() {
 			for (int i = 0; i < point.size; i++) {
 				int pa = point.get(i);
-				for (int j = i+1; j < point.size; j++) {
-					if( pa == point.get(j))
+				for (int j = i + 1; j < point.size; j++) {
+					if (pa == point.get(j))
 						throw new RuntimeException("Duplicates");
 				}
 			}
@@ -186,8 +187,8 @@ public class SceneObservations {
 		}
 
 		public void resize( int numPoints ) {
-			point.resize(numPoints,-1);
-			observations.resize(numPoints*2,-1);
+			point.resize(numPoints, -1);
+			observations.resize(numPoints*2, -1);
 		}
 	}
 
@@ -200,8 +201,8 @@ public class SceneObservations {
 
 			for (int obsIdx = 0; obsIdx < v.size(); obsIdx++) {
 				int a = v.point.get(obsIdx);
-				for (int i = obsIdx+1; i < v.size(); i++) {
-					if( a == v.point.get(i)) {
+				for (int i = obsIdx + 1; i < v.size(); i++) {
+					if (a == v.point.get(i)) {
 						throw new RuntimeException("Same point is viewed more than once in the same view");
 					}
 				}

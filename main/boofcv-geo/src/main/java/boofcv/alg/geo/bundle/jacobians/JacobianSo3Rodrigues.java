@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,53 +27,45 @@ import org.ejml.data.DMatrixRMaj;
  * Jacobian for 3-tuple encoded Rodrigues. The rotation magnitude is the F-norm of (X,Y,Z) and the axis of
  * rotation is the normalized X,Y,Z.
  *
- * @see RodriguesRotationJacobian_F64
- *
  * @author Peter Abeles
+ * @see RodriguesRotationJacobian_F64
  */
 public class JacobianSo3Rodrigues implements JacobianSo3 {
-	private RodriguesRotationJacobian_F64 jac = new RodriguesRotationJacobian_F64();
+	private final RodriguesRotationJacobian_F64 jac = new RodriguesRotationJacobian_F64();
 
-	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
-	private DMatrixRMaj R = new DMatrixRMaj(3,3);
+	private final Rodrigues_F64 rodrigues = new Rodrigues_F64();
+	private final DMatrixRMaj R = new DMatrixRMaj(3, 3);
 
 	@Override
-	public void getParameters(DMatrixRMaj R, double[] parameters, int offset) {
-		ConvertRotation3D_F64.matrixToRodrigues(R,rodrigues);
-		parameters[offset  ] = rodrigues.unitAxisRotation.x*rodrigues.theta;
-		parameters[offset+1] = rodrigues.unitAxisRotation.y*rodrigues.theta;
-		parameters[offset+2] = rodrigues.unitAxisRotation.z*rodrigues.theta;
+	public void getParameters( DMatrixRMaj R, double[] parameters, int offset ) {
+		ConvertRotation3D_F64.matrixToRodrigues(R, rodrigues);
+		parameters[offset] = rodrigues.unitAxisRotation.x*rodrigues.theta;
+		parameters[offset + 1] = rodrigues.unitAxisRotation.y*rodrigues.theta;
+		parameters[offset + 2] = rodrigues.unitAxisRotation.z*rodrigues.theta;
 	}
 
 	@Override
-	public void setParameters(double[] parameters, int offset) {
+	public void setParameters( double[] parameters, int offset ) {
 		double x = parameters[offset];
-		double y = parameters[offset+1];
-		double z = parameters[offset+2];
+		double y = parameters[offset + 1];
+		double z = parameters[offset + 2];
 
-		jac.process(x,y,z);
-		rodrigues.setParamVector(x,y,z);
-		ConvertRotation3D_F64.rodriguesToMatrix(rodrigues,R);
+		jac.process(x, y, z);
+		rodrigues.setParamVector(x, y, z);
+		ConvertRotation3D_F64.rodriguesToMatrix(rodrigues, R);
 	}
 
 	@Override
-	public int getParameterLength() {
-		return 3;
+	public DMatrixRMaj getPartial( int param ) {
+		return switch (param) {
+			case 0 -> jac.Rx;
+			case 1 -> jac.Ry;
+			case 2 -> jac.Rz;
+			default -> throw new RuntimeException("Out of bounds parameter!");
+		};
 	}
 
-	@Override
-	public DMatrixRMaj getRotationMatrix() {
-		return R;
-	}
+	@Override public int getParameterLength() { return 3; }
 
-	@Override
-	public DMatrixRMaj getPartial(int param) {
-		switch (param) {
-			case 0: return jac.Rx;
-			case 1: return jac.Ry;
-			case 2: return jac.Rz;
-		}
-		throw new RuntimeException("Out of bounds parameter!");
-	}
-
+	@Override public DMatrixRMaj getRotationMatrix() { return R; }
 }

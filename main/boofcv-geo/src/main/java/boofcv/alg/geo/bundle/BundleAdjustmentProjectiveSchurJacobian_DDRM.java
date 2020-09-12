@@ -29,15 +29,14 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 public class BundleAdjustmentProjectiveSchurJacobian_DDRM
-		extends BundleAdjustmentProjectiveSchurJacobian<DMatrixRMaj>
-{
+		extends BundleAdjustmentProjectiveSchurJacobian<DMatrixRMaj> {
 	@Override
-	public void process(double[] input, DMatrixRMaj left, DMatrixRMaj right) {
-		processInternal(input,left,right);
+	public void process( double[] input, DMatrixRMaj left, DMatrixRMaj right ) {
+		processInternal(input, left, right);
 	}
 
 	@Override
-	protected void set(DMatrix matrix, int row, int col, double value) {
-		matrix.unsafe_set(row,col,value);
+	protected void set( DMatrix matrix, int row, int col, double value ) {
+		matrix.unsafe_set(row, col, value);
 	}
 }

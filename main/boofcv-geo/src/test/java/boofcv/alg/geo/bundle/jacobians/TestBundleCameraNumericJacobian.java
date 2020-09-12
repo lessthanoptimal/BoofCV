@@ -33,44 +33,44 @@ public class TestBundleCameraNumericJacobian {
 	@Test
 	public void jacobianIntrinsics() {
 		BundleCameraNumericJacobian alg = new BundleCameraNumericJacobian();
-		double params[] = new double[]{2.1,3.1};
+		double[] params = new double[]{2.1, 3.1};
 		SimpleCamera camera = new SimpleCamera();
-		camera.setIntrinsic(params,0);
+		camera.setIntrinsic(params, 0);
 
-		double X = 1.5,Y=2.0,Z=2.5;
-		double calibX[] = new double[2];
-		double calibY[] = new double[2];
+		double X = 1.5, Y = 2.0, Z = 2.5;
+		double[] calibX = new double[2];
+		double[] calibY = new double[2];
 
 		alg.setModel(camera);
-		alg.jacobianIntrinsics(X,Y,Z,calibX,calibY);
+		alg.jacobianIntrinsics(X, Y, Z, calibX, calibY);
 
-		double expectedX[] = new double[2];
-		double expectedY[] = new double[2];
-		camera.jacobian(X,Y,Z,new double[3],new double[3],true,expectedX,expectedY);
+		double[] expectedX = new double[2];
+		double[] expectedY = new double[2];
+		camera.jacobian(X, Y, Z, new double[3], new double[3], true, expectedX, expectedY);
 
 		for (int i = 0; i < 2; i++) {
-			assertEquals(expectedX[i],calibX[i], UtilEjml.TEST_F64);
-			assertEquals(expectedY[i],calibY[i], UtilEjml.TEST_F64);
+			assertEquals(expectedX[i], calibX[i], UtilEjml.TEST_F64);
+			assertEquals(expectedY[i], calibY[i], UtilEjml.TEST_F64);
 		}
 	}
 
 	@Test
 	public void jacobianPoint() {
 		BundleCameraNumericJacobian alg = new BundleCameraNumericJacobian();
-		double params[] = new double[]{2.1,3.1};
+		double[] params = new double[]{2.1, 3.1};
 		SimpleCamera camera = new SimpleCamera();
-		camera.setIntrinsic(params,0);
+		camera.setIntrinsic(params, 0);
 
-		double X = 1.5,Y=2.0,Z=2.5;
-		double pointX[] = new double[3];
-		double pointY[] = new double[3];
+		double X = 1.5, Y = 2.0, Z = 2.5;
+		double[] pointX = new double[3];
+		double[] pointY = new double[3];
 
 		alg.setModel(camera);
-		alg.jacobianPoint(X,Y,Z,pointX,pointY);
+		alg.jacobianPoint(X, Y, Z, pointX, pointY);
 
-		double expectedX[] = new double[3];
-		double expectedY[] = new double[3];
-		camera.jacobian(X,Y,Z,expectedX,expectedY,false,null,null);
+		double[] expectedX = new double[3];
+		double[] expectedY = new double[3];
+		camera.jacobian(X, Y, Z, expectedX, expectedY, false, null, null);
 
 		for (int i = 0; i < 3; i++) {
 			assertEquals(expectedX[i], pointX[i], 10*UtilEjml.TEST_F64);
@@ -78,41 +78,40 @@ public class TestBundleCameraNumericJacobian {
 		}
 	}
 
-	public class SimpleCamera implements BundleAdjustmentCamera {
+	public static class SimpleCamera implements BundleAdjustmentCamera {
 
-		double a,b;
+		double a, b;
 
 		@Override
-		public void setIntrinsic(double[] parameters, int offset) {
+		public void setIntrinsic( double[] parameters, int offset ) {
 			a = parameters[offset];
-			b = parameters[offset+1];
+			b = parameters[offset + 1];
 		}
 
 		@Override
-		public void getIntrinsic(double[] parameters, int offset) {
-			parameters[offset  ] = a;
-			parameters[offset+1] = b;
+		public void getIntrinsic( double[] parameters, int offset ) {
+			parameters[offset] = a;
+			parameters[offset + 1] = b;
 		}
 
 		@Override
-		public void project(double camX, double camY, double camZ, Point2D_F64 output) {
-			output.x = (camX+a)/camZ;
-			output.y = (camY+b)/camZ;
+		public void project( double camX, double camY, double camZ, Point2D_F64 output ) {
+			output.x = (camX + a)/camZ;
+			output.y = (camY + b)/camZ;
 		}
 
 		@Override
-		public void jacobian(double camX, double camY, double camZ,
-							 double[] pointX, double[] pointY, boolean computeIntrinsic,
-							 @Nullable double[] calibX, @Nullable double[] calibY)
-		{
+		public void jacobian( double camX, double camY, double camZ,
+							  double[] pointX, double[] pointY, boolean computeIntrinsic,
+							  @Nullable double[] calibX, @Nullable double[] calibY ) {
 			pointX[0] = 1.0/camZ;
 			pointX[1] = 0;
-			pointX[2] = -(camX+a)/(camZ*camZ);
+			pointX[2] = -(camX + a)/(camZ*camZ);
 			pointY[0] = 0;
 			pointY[1] = 1.0/camZ;
-			pointY[2] = -(camY+b)/(camZ*camZ);
+			pointY[2] = -(camY + b)/(camZ*camZ);
 
-			if( !computeIntrinsic )
+			if (!computeIntrinsic)
 				return;
 
 			calibX[0] = 1.0/camZ;

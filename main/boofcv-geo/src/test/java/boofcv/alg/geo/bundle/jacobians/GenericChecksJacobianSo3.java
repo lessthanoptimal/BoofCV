@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.bundle.jacobians;
 
+import boofcv.testing.BoofTesting;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import org.ddogleg.optimization.DerivativeChecker;
@@ -37,9 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public abstract class GenericChecksJacobianSo3 {
-
+	Random rand = BoofTesting.createRandom(34);
 	boolean skipJacobianAtIdentity = false;
-	boolean printJacobian=false;
+	boolean printJacobian = false;
 
 	abstract JacobianSo3 createAlgorithm();
 
@@ -47,96 +48,81 @@ public abstract class GenericChecksJacobianSo3 {
 	void encode_then_decode() {
 		JacobianSo3 alg = createAlgorithm();
 
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,0.2,-0.3,null);
-		double p[] = new double[alg.getParameterLength()+1];
-		alg.getParameters(R,p,1); // offset to ensure it isn't hard coded at 0
-		alg.setParameters(p,1);
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 0.2, -0.3, null);
+		double[] p = new double[alg.getParameterLength() + 1];
+		alg.getParameters(R, p, 1); // offset to ensure it isn't hard coded at 0
+		alg.setParameters(p, 1);
 
 		DMatrixRMaj found = alg.getRotationMatrix();
-		assertTrue(MatrixFeatures_DDRM.isIdentical(R,found, UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(R, found, UtilEjml.TEST_F64));
 	}
 
 	@Test
 	void compareToNumeric() {
-		Random rand = new Random(234);
 		JacobianSo3 alg = createAlgorithm();
-		double p[] = new double[alg.getParameterLength()];
+		double[] p = new double[alg.getParameterLength()];
 
 		RodToMatrix f = new RodToMatrix(alg);
 		RodToGradient g = new RodToGradient(alg);
 
-		DMatrixRMaj R=CommonOps_DDRM.identity(3);
-		for( int i = 0; i < 100; i++ ) {
+		DMatrixRMaj R = CommonOps_DDRM.identity(3);
+		for (int i = 0; i < 100; i++) {
 //			System.out.println("I = "+i);
 			// the first time it will be no rotation. test this edgecase
-			if( skipJacobianAtIdentity || i > 0 )
+			if (skipJacobianAtIdentity || i > 0)
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 						(double)rand.nextGaussian(), (double)rand.nextGaussian(), (double)rand.nextGaussian(), R);
-			alg.getParameters(R,p,0);
+			alg.getParameters(R, p, 0);
 
 //			for (int j = 0; j < 3; j++) {
 //				System.out.print(param[j]+" ");
 //			}
 //			System.out.println();
 
-			if( printJacobian )
+			if (printJacobian)
 				DerivativeChecker.jacobianPrint(f, g, p, UtilEjml.TEST_F64_SQ);
 			assertTrue(DerivativeChecker.jacobian(f, g, p, UtilEjml.TEST_F64_SQ));
 		}
 	}
 
-	public static class RodToMatrix implements FunctionNtoM
-	{
+	public static class RodToMatrix implements FunctionNtoM {
 		JacobianSo3 alg;
 
-		public RodToMatrix(JacobianSo3 alg) {
+		public RodToMatrix( JacobianSo3 alg ) {
 			this.alg = alg;
 		}
 
-		@Override
-		public int getNumOfInputsN() {
-			return alg.getParameterLength();
-		}
+		@Override public int getNumOfInputsN() { return alg.getParameterLength(); }
+
+		@Override public int getNumOfOutputsM() { return 9; }
 
 		@Override
-		public int getNumOfOutputsM() {
-			return 9;
-		}
-
-		@Override
-		public void process( /**/double[] input, /**/double[] output) {
-			alg.setParameters(input,0);
-			DMatrixRMaj M = DMatrixRMaj.wrap(3,3,output);
+		public void process( /**/double[] input, /**/double[] output ) {
+			alg.setParameters(input, 0);
+			DMatrixRMaj M = DMatrixRMaj.wrap(3, 3, output);
 			M.set(alg.getRotationMatrix());
 		}
 	}
 
-	public static class RodToGradient implements FunctionNtoMxN<DMatrixRMaj>
-	{
+	public static class RodToGradient implements FunctionNtoMxN<DMatrixRMaj> {
 		JacobianSo3 alg;
 
-		public RodToGradient(JacobianSo3 alg) {
+		public RodToGradient( JacobianSo3 alg ) {
 			this.alg = alg;
 		}
 
-		@Override
-		public int getNumOfInputsN() {
-			return alg.getParameterLength();
-		}
+		@Override public int getNumOfInputsN() { return alg.getParameterLength(); }
+
+		@Override public int getNumOfOutputsM() { return 9; }
 
 		@Override
-		public int getNumOfOutputsM() {
-			return 9;
-		}
+		public void process( /**/double[] input, DMatrixRMaj J ) {
+			alg.setParameters(input, 0);
 
-		@Override
-		public void process( /**/double[] input, DMatrixRMaj J) {
-			alg.setParameters(input,0);
-
-			double output[] = J.data;
+			double[] output = J.data;
 			int index = 0;
 			for (int i = 0; i < alg.getParameterLength(); i++) {
-				System.arraycopy(alg.getPartial(i).data, 0,output,index,9);
+				System.arraycopy(alg.getPartial(i).data, 0, output, index, 9);
 				index += 9;
 			}
 
@@ -147,7 +133,7 @@ public abstract class GenericChecksJacobianSo3 {
 
 		@Override
 		public /**/DMatrixRMaj declareMatrixMxN() {
-			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
+			return new DMatrixRMaj(getNumOfOutputsM(), getNumOfInputsN());
 		}
 	}
 }

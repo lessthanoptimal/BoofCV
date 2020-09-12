@@ -141,9 +141,9 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		SceneStructureMetric structure = a.d0;
 		for (int i = 1; i < structure.views.size; i++) {
 			SceneStructureMetric.View v = structure.views.data[i];
-			v.worldToView.T.x += rand.nextGaussian()*0.1;
-			v.worldToView.T.y += rand.nextGaussian()*0.1;
-			v.worldToView.T.z += rand.nextGaussian()*0.1;
+			v.parent_to_view.T.x += rand.nextGaussian()*0.1;
+			v.parent_to_view.T.y += rand.nextGaussian()*0.1;
+			v.parent_to_view.T.z += rand.nextGaussian()*0.1;
 		}
 
 		alg.setParameters(a.d0,a.d1);
@@ -176,7 +176,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			for (int indexView = 0; indexView < observations.views.size; indexView++) {
 				SceneObservations.View v = observations.views.data[indexView];
 
-				wcp.configure(intrinsic, structure.views.data[indexView].worldToView);
+				wcp.configure(intrinsic, structure.views.data[indexView].parent_to_view);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points.data[o.index].get(p4);
@@ -194,7 +194,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			for (int indexView = 0; indexView < observations.views.size; indexView++) {
 				SceneObservations.View v = observations.views.data[indexView];
 
-				wcp.configure(intrinsic, structure.views.data[indexView].worldToView);
+				wcp.configure(intrinsic, structure.views.data[indexView].parent_to_view);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points.data[o.index].get(p3);
@@ -231,10 +231,10 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		}
 
 		for (int i = 0; i < a.views.size; i++) {
-			double error = a.views.data[i].worldToView.T.distance(b.views.data[i].worldToView.T);
+			double error = a.views.data[i].parent_to_view.T.distance(b.views.data[i].parent_to_view.T);
 			assertTrue( error < tolDistance );
-			assertTrue(MatrixFeatures_DDRM.isIdentical(a.views.data[i].worldToView.R,
-					b.views.data[i].worldToView.R,tolRotation));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(a.views.data[i].parent_to_view.R,
+					b.views.data[i].parent_to_view.R,tolRotation));
 		}
 
 	}
@@ -283,7 +283,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				int count = 0;
 				for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
 					SceneStructureMetric.View v = structure.views.data[viewIndex];
-					wcp.configure(intrinsic, v.worldToView);
+					wcp.configure(intrinsic, v.parent_to_view);
 					wcp.transform(P, pixel);
 					if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 						count++;
@@ -292,7 +292,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				if (count >= 2) {
 					for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
 						SceneStructureMetric.View v = structure.views.data[viewIndex];
-						wcp.configure(intrinsic, v.worldToView);
+						wcp.configure(intrinsic, v.parent_to_view);
 						wcp.transform(P, pixel);
 						if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 							observations.getView(viewIndex).add(featureIndex, (float) pixel.x, (float) pixel.y);

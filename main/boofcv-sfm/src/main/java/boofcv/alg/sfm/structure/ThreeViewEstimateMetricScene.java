@@ -242,7 +242,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			verbose.println("\nworldToView");
 			for (int i = 0; i < structure.views.size; i++) {
 				if( verbose != null ) {
-					Se3_F64 se = structure.views.data[i].worldToView;
+					Se3_F64 se = structure.views.data[i].parent_to_view;
 					Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(se.R,null);
 					verbose.println("  T="+se.T+"  R="+rod);
 				}
@@ -275,7 +275,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		List<BundlePinholeSimplified> bestCameras = new ArrayList<>();
 		for (int i = 0; i < structure.views.size; i++) {
 			BundlePinholeSimplified c = structure.cameras.data[i].getModel();
-			bestPose.add(structure.views.data[i].worldToView.copy());
+			bestPose.add(structure.views.data[i].parent_to_view.copy());
 			bestCameras.add( c.copy());
 		}
 
@@ -286,7 +286,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		}
 		// flip rotation assuming that it was done wrong
 		for (int i = 1; i < structure.views.size; i++) {
-			CommonOps_DDRM.transpose(structure.views.data[i].worldToView.R);
+			CommonOps_DDRM.transpose(structure.views.data[i].parent_to_view.R);
 		}
 		triangulatePoints(structure,observations);
 
@@ -310,7 +310,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			for (int i = 0; i < structure.cameras.size; i++) {
 				BundlePinholeSimplified c = structure.cameras.data[i].getModel();
 				c.set(bestCameras.get(i));
-				structure.views.data[i].worldToView.set(bestPose.get(i));
+				structure.views.data[i].parent_to_view.set(bestPose.get(i));
 			}
 			triangulatePoints(structure,observations);
 			bundleAdjustment.setParameters(structure,observations);
@@ -497,7 +497,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	private static void flipAround(SceneStructureMetric structure, SceneObservations observations) {
 		// The first view will be identity
 		for (int i = 1; i < structure.views.size; i++) {
-			Se3_F64 w2v = structure.views.data[i].worldToView;
+			Se3_F64 w2v = structure.views.data[i].parent_to_view;
 			w2v.set(w2v.invert(null));
 		}
 		triangulatePoints(structure,observations);

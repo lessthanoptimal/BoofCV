@@ -88,7 +88,7 @@ Version : 0.37
   * TODO Create validation tests for at least 3 scenarios with known constant motion along one axis
 - Sparse Bundle Adjustment
   * Fixed bug in how pixels are scaled in ScaleSceneStructure.
-  * TODO Add rigid relationships between views. Can be fixed or not.
+  * A view's pose can now be specified relative to other views. This can be a known or estimated parameter
 - MultiViewOps
   * Fixed decomposeMetricCamera() so that it doesn't change the scale of T. This messed up common frames
 

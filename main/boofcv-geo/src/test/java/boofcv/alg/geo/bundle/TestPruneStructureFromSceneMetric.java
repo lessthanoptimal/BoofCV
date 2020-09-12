@@ -21,6 +21,7 @@ package boofcv.alg.geo.bundle;
 import boofcv.abst.geo.bundle.*;
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -39,12 +40,13 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestPruneStructureFromSceneMetric {
+	private final Random rand = BoofTesting.createRandom(234);
+
 	SceneStructureMetric structure;
 	SceneObservations observations;
 
-	Random rand = new Random(234);
-	CameraPinholeBrown intrinsic = new CameraPinholeBrown(300,300,0,250,200,500,400);
-	Point3D_F64 center = new Point3D_F64(0,0,4);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(300, 300, 0, 250, 200, 500, 400);
+	Point3D_F64 center = new Point3D_F64(0, 0, 4);
 
 	@Test
 	void pruneObservationsByErrorRank() {
@@ -52,13 +54,13 @@ class TestPruneStructureFromSceneMetric {
 		int N = observations.getObservationCount();
 		addCorruptObservations((int)(N*0.05));
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// 5% of the observations are bad. This should remove them all
 		alg.pruneObservationsByErrorRank(0.95);
 
 		// first see if the expected number of observations were prune
-		assertEquals(N*95/100,observations.getObservationCount());
+		assertEquals(N*95/100, observations.getObservationCount());
 
 		// All bad observations should have been removed
 		checkAllObservationsArePerfect();
@@ -71,19 +73,19 @@ class TestPruneStructureFromSceneMetric {
 		List<ObsId> list = new ArrayList<>();
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			for (int i = 0; i < observations.views.data[viewIdx].size(); i++) {
-				list.add( new ObsId(viewIdx,i));
+				list.add(new ObsId(viewIdx, i));
 			}
 		}
 
 		for (int i = 0; i < count; i++) {
-			int selected = rand.nextInt(list.size()-i);
+			int selected = rand.nextInt(list.size() - i);
 			ObsId o = list.get(selected);
 
 			// swap the last element with the select one. The last element will be unselectable in future iterations
-			list.set(selected,list.get(list.size()-i-1));
-			list.set(list.size()-i-1,o);
+			list.set(selected, list.get(list.size() - i - 1));
+			list.set(list.size() - i - 1, o);
 
-			observations.views.data[o.view].setPixel(o.point,1000f,1000f);
+			observations.views.data[o.view].setPixel(o.point, 1000f, 1000f);
 		}
 		observations.checkOneObservationPerView();
 	}
@@ -94,13 +96,13 @@ class TestPruneStructureFromSceneMetric {
 		int N = observations.getObservationCount();
 		movePointBehindCameras((int)(N*0.1));
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// 5% of the observations are bad. This should remove them all
 		alg.pruneObservationsBehindCamera();
 
 		// A bunch of observations should have been pruned because 10% of the points are now behind the camera
-		assertTrue( observations.getObservationCount() < N*0.901);
+		assertTrue(observations.getObservationCount() < N*0.901);
 
 		// All bad observations should have been removed
 		checkAllObservationsArePerfect();
@@ -119,18 +121,18 @@ class TestPruneStructureFromSceneMetric {
 
 		Point3D_F64 world = new Point3D_F64();
 		for (int i = 0; i < count; i++) {
-			int selected = rand.nextInt(points.size()-i);
+			int selected = rand.nextInt(points.size() - i);
 			Point p = points.get(indexes[selected]);
 
 			// swap the last element with the select one. The last element will be unselectable in future iterations
 			int tmp = indexes[selected];
-			indexes[selected] = indexes[points.size()-i-1];
-			indexes[points.size()-i-1] = tmp;
+			indexes[selected] = indexes[points.size() - i - 1];
+			indexes[points.size() - i - 1] = tmp;
 
 			// all cameras lie along a line. This will move it behind all cameras
 			p.get(world);
 			world.z = -world.z;
-			p.set(world.x,world.y,world.z);
+			p.set(world.x, world.y, world.z);
 		}
 	}
 
@@ -140,21 +142,21 @@ class TestPruneStructureFromSceneMetric {
 		int countPoints = structure.points.size;
 		int countObservations = observations.getObservationCount();
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change expected
 		alg.prunePoints(1);
-		assertEquals(countPoints,structure.points.size);
-		assertEquals(countObservations,observations.getObservationCount());
+		assertEquals(countPoints, structure.points.size);
+		assertEquals(countObservations, observations.getObservationCount());
 
 		// this should prune a bunch
-		int threshold = structure.views.size-2;
+		int threshold = structure.views.size - 2;
 		alg.prunePoints(threshold);
-		assertTrue(countPoints>structure.points.size);
-		assertTrue(countObservations>observations.getObservationCount());
+		assertTrue(countPoints > structure.points.size);
+		assertTrue(countObservations > observations.getObservationCount());
 
 		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
-			if( structure.points.data[pointIdx].views.size < threshold )
+			if (structure.points.data[pointIdx].views.size < threshold)
 				fail("point with not enough views");
 		}
 		checkAllObservationsArePerfect();
@@ -169,20 +171,20 @@ class TestPruneStructureFromSceneMetric {
 		int countPoints0 = structure.points.size;
 		int countObservations0 = observations.getObservationCount();
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// This should just prune the outliers far from the center
-		alg.prunePoints(2,0.5);
+		alg.prunePoints(2, 0.5);
 
 		int countPoints1 = structure.points.size;
 		int countObservations1 = observations.getObservationCount();
-		assertTrue(countPoints0>countPoints1 && countPoints1>0.95*countPoints0);
-		assertTrue(countObservations0>countObservations1 && countObservations1>0.95*countObservations0);
+		assertTrue(countPoints0 > countPoints1 && countPoints1 > 0.95*countPoints0);
+		assertTrue(countObservations0 > countObservations1 && countObservations1 > 0.95*countObservations0);
 
 		// If run a second time it should have very similar results
-		alg.prunePoints(2,0.5);
-		assertEquals(countPoints1, structure.points.size,5);
-		assertEquals(countObservations1, observations.getObservationCount(),countObservations1*0.005);
+		alg.prunePoints(2, 0.5);
+		assertEquals(countPoints1, structure.points.size, 5);
+		assertEquals(countObservations1, observations.getObservationCount(), countObservations1*0.005);
 
 		// sanity check the modifications
 		checkAllObservationsArePerfect();
@@ -193,25 +195,24 @@ class TestPruneStructureFromSceneMetric {
 	 */
 	@Test
 	void prunePoints_neighbors_exact() {
-		createPerfectScene(2,5);
+		createPerfectScene(2, 5);
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no pruning should occur
-		alg.prunePoints(1,5.01);
+		alg.prunePoints(1, 5.01);
 		assertEquals(4, structure.points.size);
 
 		// everything should be pruned
-		alg.prunePoints(1,4.99);
+		alg.prunePoints(1, 4.99);
 		assertEquals(0, structure.points.size);
 		assertEquals(0, observations.getObservationCount());
 
 		// Corners should get pruned but interior ones saved
-		createPerfectScene(3,5);
-		alg = new PruneStructureFromSceneMetric(structure,observations);
-		alg.prunePoints(3,5.01);
+		createPerfectScene(3, 5);
+		alg = new PruneStructureFromSceneMetric(structure, observations);
+		alg.prunePoints(3, 5.01);
 		assertEquals(5, structure.points.size);
-
 	}
 
 	@Test
@@ -226,7 +227,7 @@ class TestPruneStructureFromSceneMetric {
 		int viewWithLeast = -1;
 		int leastCount = Integer.MAX_VALUE;
 		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
-			if( leastCount > observations.views.data[viewIdx].size()) {
+			if (leastCount > observations.views.data[viewIdx].size()) {
 				leastCount = observations.views.data[viewIdx].size();
 				viewWithLeast = viewIdx;
 			}
@@ -236,23 +237,23 @@ class TestPruneStructureFromSceneMetric {
 		observations.views.data[viewWithLeast].remove(8);
 		leastCount -= 1;
 
-		assertEquals(10,observations.views.size);
+		assertEquals(10, observations.views.size);
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change
-		alg.pruneViews(leastCount-1);
-		assertEquals(10,observations.views.size);
-		assertEquals(structure.views.size,observations.views.size);
+		alg.pruneViews(leastCount - 1);
+		assertEquals(10, observations.views.size);
+		assertEquals(structure.views.size, observations.views.size);
 
 		// Now prune views. Only one should be removed
 		alg.pruneViews(leastCount);
-		assertEquals(9,observations.views.size);
-		assertEquals(structure.views.size,observations.views.size);
+		assertEquals(9, observations.views.size);
+		assertEquals(structure.views.size, observations.views.size);
 		// Points are not removed even if there is no view that can see them now
-		assertEquals(structure.points.size,pointCount);
+		assertEquals(structure.points.size, pointCount);
 		// However the number of observations will be decreased
-		assertTrue( observations.getObservationCount() < observationCount);
+		assertTrue(observations.getObservationCount() < observationCount);
 
 		// sanity check the modifications
 		checkAllObservationsArePerfect();
@@ -262,11 +263,11 @@ class TestPruneStructureFromSceneMetric {
 	void pruneUnusedCameras() {
 		createPerfectScene();
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
+		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change
 		alg.pruneUnusedCameras();
-		assertEquals(2,structure.cameras.size);
+		assertEquals(2, structure.cameras.size);
 
 		// remove all references to the first camera
 		for (int i = 0; i < structure.views.size; i++) {
@@ -276,34 +277,35 @@ class TestPruneStructureFromSceneMetric {
 
 		// First camera is removed
 		alg.pruneUnusedCameras();
-		assertEquals(1,structure.cameras.size);
+		assertEquals(1, structure.cameras.size);
 		// make sure references are updated
 		for (int i = 0; i < structure.views.size; i++) {
 			SceneStructureMetric.View v = structure.views.data[i];
-			assertEquals(0,v.camera);
+			assertEquals(0, v.camera);
 		}
 	}
 
 	/**
 	 * Creates a scene with points in a grid pattern. Useful when testing spacial filters
+	 *
 	 * @param grid Number of points wide the pattern is
 	 * @param space Spacing between the points
 	 */
-	private void createPerfectScene( int grid , double space ) {
+	private void createPerfectScene( int grid, double space ) {
 		structure = new SceneStructureMetric(false);
-		structure.initialize(1,1,grid*grid);
+		structure.initialize(1, 1, grid*grid);
 
-		structure.setCamera(0,true,intrinsic);
+		structure.setCamera(0, true, intrinsic);
 
 		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < grid; i++) {
 			for (int j = 0; j < grid; j++) {
-				double x = (i-grid/2)*space;
-				double y = (j-grid/2)*space;
+				double x = (i - grid/2)*space;
+				double y = (j - grid/2)*space;
 
-				Point3D_F64 p = new Point3D_F64(center.x+x,center.y+y,center.z);
+				Point3D_F64 p = new Point3D_F64(center.x + x, center.y + y, center.z);
 				points.add(p);
-				structure.points.data[i*grid+j].set(p.x,p.y,p.z);
+				structure.points.data[i*grid + j].set(p.x, p.y, p.z);
 			}
 		}
 
@@ -312,26 +314,26 @@ class TestPruneStructureFromSceneMetric {
 
 	private void createPerfectScene() {
 		structure = new SceneStructureMetric(false);
-		structure.initialize(2,10,500);
+		structure.initialize(2, 10, 500);
 
-		structure.setCamera(0,true,intrinsic);
-		structure.setCamera(1,false,intrinsic);
+		structure.setCamera(0, true, intrinsic);
+		structure.setCamera(1, false, intrinsic);
 
 		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < structure.points.size; i++) {
-			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center,0.5,0.5,1,rand,null);
+			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center, 0.5, 0.5, 0.5, rand, null);
 			points.add(p);
-			structure.points.data[i].set(p.x,p.y,p.z);
+			structure.points.data[i].set(p.x, p.y, p.z);
 		}
 
 		createRestOfTheScene(points, true);
 	}
 
-	private void createRestOfTheScene(List<Point3D_F64> points , boolean sanityCheck ) {
+	private void createRestOfTheScene( List<Point3D_F64> points, boolean sanityCheck ) {
 		for (int i = 0; i < structure.views.size; i++) {
-			double x = -1.5 + 3*i/Math.max(1,(structure.views.size-1));
-			structure.setView(i,false,SpecialEuclideanOps_F64.eulerXyz(x,0,0,0,0,0,null));
-			structure.connectViewToCamera(i,i%2);
+			double x = -1.5 + 3*i/Math.max(1, (structure.views.size - 1));
+			structure.setView(i, false, SpecialEuclideanOps_F64.eulerXyz(x, 0, 0, 0, 0, 0, null));
+			structure.connectViewToCamera(i, i%2);
 		}
 
 		observations = new SceneObservations();
@@ -343,46 +345,45 @@ class TestPruneStructureFromSceneMetric {
 		Point2D_F64 pixel = new Point2D_F64();
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			BundleAdjustmentCamera camera = structure.cameras.get(structure.views.data[viewIdx].camera).model;
-			Se3_F64 worldToView = structure.views.data[viewIdx].worldToView;
+			Se3_F64 worldToView = structure.views.data[viewIdx].parent_to_view;
 
 			for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
 				Point3D_F64 p = points.get(pointIdx);
 
-				worldToView.transform(p,cameraX);
+				worldToView.transform(p, cameraX);
 
-				if( cameraX.z <= 0)
+				if (cameraX.z <= 0)
 					continue;
 
-				camera.project(cameraX.x,cameraX.y,cameraX.z, pixel);
+				camera.project(cameraX.x, cameraX.y, cameraX.z, pixel);
 
-				if( !intrinsic.isInside(pixel.x,pixel.y) )
+				if (!intrinsic.isInside(pixel.x, pixel.y))
 					continue;
 
-				observations.views.data[viewIdx].add(pointIdx,(float)pixel.x,(float)pixel.y);
-				structure.connectPointToView(pointIdx,viewIdx);
+				observations.views.data[viewIdx].add(pointIdx, (float)pixel.x, (float)pixel.y);
+				structure.connectPointToView(pointIdx, viewIdx);
 			}
 		}
 
-		if( !sanityCheck )
+		if (!sanityCheck)
 			return;
 
 		// sanity checks
 		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
-			if( structure.points.data[pointIdx].views.size == 0 ) {
+			if (structure.points.data[pointIdx].views.size == 0) {
 				Point3D_F64 p = new Point3D_F64();
 				structure.points.data[pointIdx].get(p);
-				throw new RuntimeException("Point with no views. "+p);
+				throw new RuntimeException("Point with no views. " + p);
 			}
 		}
 
 		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
-			if( observations.views.data[viewIdx].size() == 0 )
+			if (observations.views.data[viewIdx].size() == 0)
 				throw new RuntimeException("View with no observations");
 		}
 
 		checkObservationAndStructureSync();
 	}
-
 
 	/**
 	 * See if all the observations are perfect. This acts as a sanity check on the scenes structure after modification
@@ -396,17 +397,17 @@ class TestPruneStructureFromSceneMetric {
 		Point2D_F64 found = new Point2D_F64();
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			BundleAdjustmentCamera camera = structure.cameras.get(structure.views.data[viewIdx].camera).model;
-			Se3_F64 worldToView = structure.views.data[viewIdx].worldToView;
+			Se3_F64 worldToView = structure.views.data[viewIdx].parent_to_view;
 
 			for (int obsIdx = 0; obsIdx < observations.views.data[viewIdx].size(); obsIdx++) {
 				Point f = structure.points.data[observations.views.data[viewIdx].point.get(obsIdx)];
 				f.get(worldX);
-				worldToView.transform(worldX,cameraX);
+				worldToView.transform(worldX, cameraX);
 
-				assertTrue( cameraX.z > 0);
-				camera.project(cameraX.x,cameraX.y,cameraX.z,predicted);
-				observations.views.data[viewIdx].get(obsIdx,found);
-				assertTrue( predicted.distance(found) < 1e-4 );
+				assertTrue(cameraX.z > 0);
+				camera.project(cameraX.x, cameraX.y, cameraX.z, predicted);
+				observations.views.data[viewIdx].get(obsIdx, found);
+				assertTrue(predicted.distance(found) < 1e-4);
 			}
 		}
 	}
@@ -414,9 +415,9 @@ class TestPruneStructureFromSceneMetric {
 	private void checkObservationAndStructureSync() {
 		for (int viewId = 0; viewId < structure.views.size; viewId++) {
 			SceneObservations.View v = observations.views.data[viewId];
-			for(int pointIdx = v.point.size-1; pointIdx >= 0; pointIdx-- ) {
-				SceneStructureCommon.Point structP = structure.points.data[ v.getPointId(pointIdx) ];
-				if( !structP.views.contains(viewId))
+			for (int pointIdx = v.point.size - 1; pointIdx >= 0; pointIdx--) {
+				SceneStructureCommon.Point structP = structure.points.data[v.getPointId(pointIdx)];
+				if (!structP.views.contains(viewId))
 					throw new RuntimeException("Miss match");
 			}
 		}
@@ -426,7 +427,7 @@ class TestPruneStructureFromSceneMetric {
 		int view;
 		int point;
 
-		ObsId(int view, int point) {
+		ObsId( int view, int point ) {
 			this.view = view;
 			this.point = point;
 		}

@@ -636,8 +636,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view1].width, dimensions[view1].height);
 			intrinsic02.fsetRadial(cp.k1, cp.k2);
 
-			Se3_F64 w_to_0 = structure.views.data[view0].worldToView;
-			Se3_F64 w_to_1 = structure.views.data[view1].worldToView;
+			Se3_F64 w_to_0 = structure.views.data[view0].parent_to_view;
+			Se3_F64 w_to_1 = structure.views.data[view1].parent_to_view;
 
 			leftToRight = w_to_0.invert(null).concat(w_to_1, null);
 
@@ -704,9 +704,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	 * z-axis
 	 */
 	private int[] selectBestPair( SceneStructureMetric structure ) {
-		Se3_F64 w_to_0 = structure.views.data[0].worldToView;
-		Se3_F64 w_to_1 = structure.views.data[1].worldToView;
-		Se3_F64 w_to_2 = structure.views.data[2].worldToView;
+		Se3_F64 w_to_0 = structure.views.data[0].parent_to_view;
+		Se3_F64 w_to_1 = structure.views.data[1].parent_to_view;
+		Se3_F64 w_to_2 = structure.views.data[2].parent_to_view;
 
 		Se3_F64 view0_to_1 = w_to_0.invert(null).concat(w_to_1,null);
 		Se3_F64 view0_to_2 = w_to_0.invert(null).concat(w_to_2,null);

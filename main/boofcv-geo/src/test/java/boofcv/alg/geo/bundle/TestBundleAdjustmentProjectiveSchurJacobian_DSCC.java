@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.testing.BoofTesting;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
@@ -37,45 +38,45 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 class TestBundleAdjustmentProjectiveSchurJacobian_DSCC {
-	Random rand = new Random(48854);
+	private final Random rand = BoofTesting.createRandom(234);
 
 	@Test
 	void compareToNumerical_3D() {
 		SceneStructureProjective structure = createScene3D(rand);
-		SceneObservations observations = createObservations(rand,structure);
+		SceneObservations observations = createObservations(rand, structure);
 
-		double param[] = new double[structure.getParameterCount()];
-		new CodecSceneStructureProjective().encode(structure,param);
+		double[] param = new double[structure.getParameterCount()];
+		new CodecSceneStructureProjective().encode(structure, param);
 
 		BundleAdjustmentProjectiveSchurJacobian_DSCC alg = new BundleAdjustmentProjectiveSchurJacobian_DSCC();
 
 		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN.DSCC(alg);
 		BundleAdjustmentProjectiveResidualFunction func = new BundleAdjustmentProjectiveResidualFunction();
 
-		alg.configure(structure,observations);
-		func.configure(structure,observations);
+		alg.configure(structure, observations);
+		func.configure(structure, observations);
 
 //		DerivativeChecker.jacobianPrint(func, jac, param, 0.1 );
-		assertTrue(DerivativeChecker.jacobian(func, jac, param, 0.1 ));
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, 0.1));
 	}
 
 	@Test
 	void compareToNumerical_Homogenous() {
 		SceneStructureProjective structure = createSceneH(rand);
-		SceneObservations observations = createObservations(rand,structure);
+		SceneObservations observations = createObservations(rand, structure);
 
-		double param[] = new double[structure.getParameterCount()];
-		new CodecSceneStructureProjective().encode(structure,param);
+		double[] param = new double[structure.getParameterCount()];
+		new CodecSceneStructureProjective().encode(structure, param);
 
 		BundleAdjustmentProjectiveSchurJacobian_DSCC alg = new BundleAdjustmentProjectiveSchurJacobian_DSCC();
 
 		FunctionNtoMxN<DMatrixSparseCSC> jac = new SchurJacobian_to_NtoMxN.DSCC(alg);
 		BundleAdjustmentProjectiveResidualFunction func = new BundleAdjustmentProjectiveResidualFunction();
 
-		alg.configure(structure,observations);
-		func.configure(structure,observations);
+		alg.configure(structure, observations);
+		func.configure(structure, observations);
 
 //		DerivativeChecker.jacobianPrint(func, jac, param, 0.1 );
-		assertTrue(DerivativeChecker.jacobian(func, jac, param, 0.1 ));
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, 0.1));
 	}
 }

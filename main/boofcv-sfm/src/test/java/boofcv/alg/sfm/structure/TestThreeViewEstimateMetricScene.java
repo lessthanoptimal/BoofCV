@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,8 +84,8 @@ public class TestThreeViewEstimateMetricScene {
 			assertEquals(0,c.k2, 1e-5);
 		}
 
-		Se3_F64 found1 = structure.getViews().data[1].worldToView;
-		Se3_F64 found2 = structure.getViews().data[2].worldToView;
+		Se3_F64 found1 = structure.getViews().data[1].parent_to_view;
+		Se3_F64 found2 = structure.getViews().data[2].parent_to_view;
 
 		view0_to_view1.T.normalize();
 		found1.T.normalize();

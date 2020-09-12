@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,22 +31,21 @@ import org.ejml.ops.ConvertDMatrixStruct;
  * @author Peter Abeles
  */
 public class BundleAdjustmentProjectiveSchurJacobian_DSCC
-		extends BundleAdjustmentProjectiveSchurJacobian<DMatrixSparseCSC>
-{
+		extends BundleAdjustmentProjectiveSchurJacobian<DMatrixSparseCSC> {
 	// reference to output Jacobian matrix
-	private DMatrixSparseTriplet leftTriplet = new DMatrixSparseTriplet();
-	private DMatrixSparseTriplet rightTriplet = new DMatrixSparseTriplet();
+	private final DMatrixSparseTriplet leftTriplet = new DMatrixSparseTriplet();
+	private final DMatrixSparseTriplet rightTriplet = new DMatrixSparseTriplet();
 
 	@Override
-	public void process(double[] input, DMatrixSparseCSC left, DMatrixSparseCSC right) {
-		processInternal(input,leftTriplet,rightTriplet);
+	public void process( double[] input, DMatrixSparseCSC left, DMatrixSparseCSC right ) {
+		processInternal(input, leftTriplet, rightTriplet);
 
-		ConvertDMatrixStruct.convert(leftTriplet,left);
-		ConvertDMatrixStruct.convert(rightTriplet,right);
+		ConvertDMatrixStruct.convert(leftTriplet, left);
+		ConvertDMatrixStruct.convert(rightTriplet, right);
 	}
 
 	@Override
-	protected void set(DMatrix matrix, int row, int col, double value) {
-		((DMatrixSparseTriplet)matrix).addItem(row,col,value);
+	protected void set( DMatrix matrix, int row, int col, double value ) {
+		((DMatrixSparseTriplet)matrix).addItem(row, col, value);
 	}
 }

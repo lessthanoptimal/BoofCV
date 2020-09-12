@@ -31,26 +31,29 @@ public interface BundleAdjustmentCamera {
 
 	/**
 	 * Specifies the intrinsic camera parameters.
+	 *
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
-	void setIntrinsic(double[] parameters, int offset);
+	void setIntrinsic( double[] parameters, int offset );
 
 	/**
 	 * Copies the intrinsic camera into the array.
+	 *
 	 * @param parameters Array containing the parameters
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
-	void getIntrinsic(double[] parameters, int offset);
+	void getIntrinsic( double[] parameters, int offset );
 
 	/**
 	 * Project the 3D point in the camera reference frame onto the camera's image plane.
+	 *
 	 * @param camX 3D point in camera reference frame
 	 * @param camY 3D point in camera reference frame
 	 * @param camZ 3D point in camera reference frame
 	 * @param output Storage for projected point.
 	 */
-	void project(double camX, double camY, double camZ, Point2D_F64 output);
+	void project( double camX, double camY, double camZ, Point2D_F64 output );
 
 	/**
 	 * Computes the gradient for the projected pixel coordinate with partials for the input 3D point in camera
@@ -66,14 +69,15 @@ public interface BundleAdjustmentCamera {
 	 * @param calibX (Output) Partial of projected x' relative to calibration parameters. length N
 	 * @param calibY (Output) Partial of projected y' relative to calibration parameters. length N
 	 */
-	void jacobian(double camX, double camY, double camZ,
-				  double[] pointX, double[] pointY,
-				  boolean computeIntrinsic,
-				  @Nullable double[] calibX, @Nullable double[] calibY);
+	void jacobian( double camX, double camY, double camZ,
+				   double[] pointX, double[] pointY,
+				   boolean computeIntrinsic,
+				   @Nullable double[] calibX, @Nullable double[] calibY );
 
 	/**
 	 * Returns the number of intrinsic parameters for this model. If the camera is known then the number of parameters
 	 * is zero
+	 *
 	 * @return number of intrinsic parameters.
 	 */
 	int getIntrinsicCount();

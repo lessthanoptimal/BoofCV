@@ -43,9 +43,8 @@ public class PruneStructureFromSceneMetric {
 	SceneStructureMetric structure;
 	SceneObservations observations;
 
-	public PruneStructureFromSceneMetric(SceneStructureMetric structure,
-										 SceneObservations observations)
-	{
+	public PruneStructureFromSceneMetric( SceneStructureMetric structure,
+										  SceneObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;
 	}
@@ -79,7 +78,7 @@ public class PruneStructureFromSceneMetric {
 				v.get(pointIndex, observation);
 
 				// World to View
-				view.worldToView.transform(X, X);
+				view.parent_to_view.transform(X, X);
 
 				// predicted pixel
 				SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
@@ -96,11 +95,11 @@ public class PruneStructureFromSceneMetric {
 		errors.sort(Comparator.comparingDouble(a -> a.error));
 
 		// Mark observations which are to be removed. Can't remove yet since the indexes will change
-		for (int i = (int) (errors.size() * inlierFraction); i < errors.size(); i++) {
+		for (int i = (int)(errors.size()*inlierFraction); i < errors.size(); i++) {
 			Errors e = errors.get(i);
 
 			SceneObservations.View v = observations.views.get(e.view);
-			v.setPixel(e.pointIndexInView,Float.NaN, Float.NaN);
+			v.setPixel(e.pointIndexInView, Float.NaN, Float.NaN);
 		}
 
 		// Remove all marked features
@@ -116,16 +115,16 @@ public class PruneStructureFromSceneMetric {
 		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
 //			System.out.println("ViewIndex="+viewIndex);
 			SceneObservations.View v = observations.views.data[viewIndex];
-			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
+			for (int pointIndex = v.point.size - 1; pointIndex >= 0; pointIndex--) {
 				int pointID = v.getPointId(pointIndex);
 				SceneStructureCommon.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
 				v.get(pointIndex, observation);
 
-				if( !Double.isNaN(observation.x))
+				if (!Double.isNaN(observation.x))
 					continue;
 
-				if( !f.views.contains(viewIndex))
+				if (!f.views.contains(viewIndex))
 					throw new RuntimeException("BUG!");
 
 				// Tell the feature it is no longer visible in this view
@@ -153,14 +152,14 @@ public class PruneStructureFromSceneMetric {
 				// Get feature location in world
 				f.get(X);
 
-				if( !f.views.contains(viewIndex))
+				if (!f.views.contains(viewIndex))
 					throw new RuntimeException("BUG!");
 
 				// World to View
-				view.worldToView.transform(X, X);
+				view.parent_to_view.transform(X, X);
 
 				// Is the feature behind this view and can't be seen?
-				if( X.z <= 0 ) {
+				if (X.z <= 0) {
 					v.setPixel(pointIndex, Float.NaN, Float.NaN);
 				}
 			}
@@ -176,48 +175,47 @@ public class PruneStructureFromSceneMetric {
 	 *
 	 * @param count Minimum number of observations
 	 */
-	public void prunePoints(int count ) {
+	public void prunePoints( int count ) {
 		// Remove all observations of the Points which are going to be removed
-		for (int viewIndex = observations.views.size-1; viewIndex >= 0; viewIndex--) {
+		for (int viewIndex = observations.views.size - 1; viewIndex >= 0; viewIndex--) {
 			SceneObservations.View v = observations.views.data[viewIndex];
 
-			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
+			for (int pointIndex = v.point.size - 1; pointIndex >= 0; pointIndex--) {
 				SceneStructureCommon.Point p = structure.points.data[v.getPointId(pointIndex)];
 
-				if( p.views.size < count ) {
+				if (p.views.size < count) {
 					v.remove(pointIndex);
 				}
 			}
 		}
 
 		// Create a look up table containing from old to new indexes for each point
-		int[] oldToNew = new int[ structure.points.size ];
-		Arrays.fill(oldToNew,-1); // crash is bug
+		int[] oldToNew = new int[structure.points.size];
+		Arrays.fill(oldToNew, -1); // crash is bug
 
 		GrowQueue_I32 prune = new GrowQueue_I32(); // List of point ID's which are to be removed.
 		for (int i = 0; i < structure.points.size; i++) {
-			if( structure.points.data[i].views.size < count ) {
+			if (structure.points.data[i].views.size < count) {
 				prune.add(i);
 			} else {
-				oldToNew[i] = i-prune.size;
+				oldToNew[i] = i - prune.size;
 			}
-
 		}
 		pruneUpdatePointID(oldToNew, prune);
 	}
 
-	private void pruneUpdatePointID(int[] oldToNew, GrowQueue_I32 prune) {
-		if( prune.size == 0)
+	private void pruneUpdatePointID( int[] oldToNew, GrowQueue_I32 prune ) {
+		if (prune.size == 0)
 			return;
 
 		// Remove the points from the structure
 		structure.removePoints(prune);
 
 		// Update the references from observation to features
-		for (int viewIndex = observations.views.size-1; viewIndex >= 0; viewIndex--) {
+		for (int viewIndex = observations.views.size - 1; viewIndex >= 0; viewIndex--) {
 			SceneObservations.View v = observations.views.data[viewIndex];
 
-			for(int featureIndex = v.point.size-1; featureIndex >= 0; featureIndex-- ) {
+			for (int featureIndex = v.point.size - 1; featureIndex >= 0; featureIndex--) {
 				v.point.data[featureIndex] = oldToNew[v.point.data[featureIndex]];
 			}
 		}
@@ -232,7 +230,7 @@ public class PruneStructureFromSceneMetric {
 	 * @param neighbors Number of other features which need to be near by
 	 * @param distance Maximum distance a point can be to be considered a feature
 	 */
-	public void prunePoints(int neighbors , double distance ) {
+	public void prunePoints( int neighbors, double distance ) {
 
 		// Use a nearest neighbor search to find near by points
 		Point3D_F64 worldX = new Point3D_F64();
@@ -245,12 +243,12 @@ public class PruneStructureFromSceneMetric {
 
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
-		nn.setPoints(cloud,false);
+		nn.setPoints(cloud, false);
 		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue(NnData::new);
 
 		// Create a look up table containing from old to new indexes for each point
-		int[] oldToNew = new int[ structure.points.size ];
-		Arrays.fill(oldToNew,-1); // crash is bug
+		int[] oldToNew = new int[structure.points.size];
+		Arrays.fill(oldToNew, -1); // crash is bug
 		// List of point ID's which are to be removed.
 		GrowQueue_I32 prunePointID = new GrowQueue_I32();
 
@@ -260,11 +258,11 @@ public class PruneStructureFromSceneMetric {
 			structureP.get(worldX);
 
 			// distance is squared
-			search.findNearest(cloud.get(pointId),distance*distance,neighbors+1,resultsNN);
+			search.findNearest(cloud.get(pointId), distance*distance, neighbors + 1, resultsNN);
 
 			// Don't prune if it has enough neighbors. Remember that it will always find itself.
-			if( resultsNN.size() > neighbors ) {
-				oldToNew[pointId] = pointId-prunePointID.size;
+			if (resultsNN.size() > neighbors) {
+				oldToNew[pointId] = pointId - prunePointID.size;
 				continue;
 			}
 
@@ -275,7 +273,7 @@ public class PruneStructureFromSceneMetric {
 				SceneObservations.View v = observations.getView(structureP.views.data[viewIdx]);
 
 				int pointIdx = v.point.indexOf(pointId);
-				if( pointIdx < 0 )
+				if (pointIdx < 0)
 					throw new RuntimeException("Bad structure. Point not found in view's observation " +
 							"which was in its structure");
 				v.remove(pointIdx);
@@ -299,7 +297,7 @@ public class PruneStructureFromSceneMetric {
 		for (int viewId = 0; viewId < structure.views.size; viewId++) {
 			SceneObservations.View view = observations.views.data[viewId];
 			// See if has enough observations to not prune
-			if( view.size() > count ) {
+			if (view.size() > count) {
 				continue;
 			}
 			removeIdx.add(viewId);
@@ -309,15 +307,15 @@ public class PruneStructureFromSceneMetric {
 				int pointId = view.getPointId(pointIdx);
 
 				int viewIdx = structure.points.data[pointId].views.indexOf(viewId);
-				if( viewIdx < 0 )
+				if (viewIdx < 0)
 					throw new RuntimeException("Bug in structure. view has point but point doesn't have view");
 				structure.points.data[pointId].views.remove(viewIdx);
 			}
 		}
 
 		// Remove the views
-		structure.views.remove(removeIdx.data,0,removeIdx.size,null);
-		observations.views.remove(removeIdx.data,0,removeIdx.size,null);
+		structure.views.remove(removeIdx.data, 0, removeIdx.size, null);
+		observations.views.remove(removeIdx.data, 0, removeIdx.size, null);
 	}
 
 	/**
@@ -335,15 +333,15 @@ public class PruneStructureFromSceneMetric {
 		int[] oldToNew = new int[structure.cameras.size];
 		GrowQueue_I32 removeIdx = new GrowQueue_I32();
 		for (int i = 0; i < structure.cameras.size; i++) {
-			if( histogram[i] > 0 ) {
-				oldToNew[i] = i-removeIdx.size();
+			if (histogram[i] > 0) {
+				oldToNew[i] = i - removeIdx.size();
 			} else {
 				removeIdx.add(i);
 			}
 		}
 
 		// Create the new camera array without the unused cameras
-		structure.cameras.remove(removeIdx.data,0,removeIdx.size,null);
+		structure.cameras.remove(removeIdx.data, 0, removeIdx.size, null);
 
 		// Update the references to the cameras
 		for (int i = 0; i < structure.views.size; i++) {

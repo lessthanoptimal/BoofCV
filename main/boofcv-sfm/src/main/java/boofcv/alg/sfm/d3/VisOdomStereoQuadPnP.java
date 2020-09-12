@@ -671,7 +671,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		}
 
 		// Reminder: World here refers to key left view
-		key_to_curr.set(bundleScene.views.get(2).worldToView);
+		key_to_curr.set(bundleScene.views.get(2).parent_to_view);
 	}
 
 	public Se3_F64 getLeftToWorld() {return left_to_world; }

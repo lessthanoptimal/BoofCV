@@ -34,7 +34,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 public abstract class SceneStructureCommon implements SceneStructure {
-	public FastQueue<Camera> cameras = new FastQueue<>(Camera::new, Camera::reset);
+	public final FastQueue<Camera> cameras = new FastQueue<>(Camera::new, Camera::reset);
 	public final FastQueue<Point> points;
 	/**
 	 * True if homogenous coordinates are being used

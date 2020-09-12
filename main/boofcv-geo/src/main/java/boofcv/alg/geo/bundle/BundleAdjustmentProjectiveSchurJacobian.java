@@ -36,13 +36,12 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
-		implements BundleAdjustmentSchur.Jacobian<SceneStructureProjective,M>
-{
+		implements BundleAdjustmentSchur.Jacobian<SceneStructureProjective, M> {
 	private SceneStructureProjective structure;
 	private SceneObservations observations;
 
 	// work space for jacobian
-	private DMatrixRMaj worldToView = new DMatrixRMaj(3,4);
+	private final DMatrixRMaj worldToView = new DMatrixRMaj(3, 4);
 
 	// number of views with parameters that are going to be adjusted
 	private int numViewsUnknown;
@@ -54,42 +53,42 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 	private int lengthPoint;
 
 	// feature location in world coordinates
-	private Point4D_F64 worldPt = new Point4D_F64();
+	private final Point4D_F64 worldPt = new Point4D_F64();
 
 	// Observed pixel in homogenous coordinates. X'=P*X
-	private Point3D_F64 pixelH = new Point3D_F64();
+	private final Point3D_F64 pixelH = new Point3D_F64();
 
 	// index in parameters of the first point
 	private int indexFirstView;
 	private int indexLastView;
 	// view to parameter index
-	private int viewParameterIndexes[];
+	private int[] viewParameterIndexes;
 	// first index in input/parameters vector for each camera. Right side
-	private int cameraParameterIndexes[];
+	private int[] cameraParameterIndexes;
 
 	// Jacobian matrix index of x and y partial
-	private int jacRowX,jacRowY;
+	private int jacRowX, jacRowY;
 
 	// Storage for gradients
-	private double worldGradX[] = new double[4];  // pixel homogeneous partial to world point homogeneous
-	private double worldGradY[] = new double[4];
-	private double worldGradZ[] = new double[4];
-	private double camGradX[] = new double[12];   // pixel homogeneous partial to camera matrix
-	private double camGradY[] = new double[12];
-	private double camGradZ[] = new double[12];
-	private double pixelhGradX[] = new double[3]; // 2D pixel partial to pixel homogeneous
-	private double pixelhGradY[] = new double[3];
-	private double intrGradX[] = null;            // 2D pixel partial to intrinsic camera parameters
-	private double intrGradY[] = null;
-	private double chainRuleX[] = new double[12]; // Storage for partial computed using chain rule
-	private double chainRuleY[] = new double[12];
+	private final double[] worldGradX = new double[4];  // pixel homogeneous partial to world point homogeneous
+	private final double[] worldGradY = new double[4];
+	private final double[] worldGradZ = new double[4];
+	private final double[] camGradX = new double[12];   // pixel homogeneous partial to camera matrix
+	private final double[] camGradY = new double[12];
+	private final double[] camGradZ = new double[12];
+	private final double[] pixelhGradX = new double[3]; // 2D pixel partial to pixel homogeneous
+	private final double[] pixelhGradY = new double[3];
+	private double[] intrGradX;                         // 2D pixel partial to intrinsic camera parameters
+	private double[] intrGradY;
+	private final double[] chainRuleX = new double[12]; // Storage for partial computed using chain rule
+	private final double[] chainRuleY = new double[12];
 
 	@Override
-	public void configure(SceneStructureProjective structure , SceneObservations observations ) {
+	public void configure( SceneStructureProjective structure, SceneObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;
 
-		if( !structure.isHomogenous() ) {
+		if (!structure.isHomogenous()) {
 			worldPt.w = 1;
 			lengthPoint = 3;
 		} else {
@@ -106,7 +105,7 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		viewParameterIndexes = new int[structure.views.size];
 		for (int i = 0, index = 0; i < structure.views.size; i++) {
 			viewParameterIndexes[i] = index;
-			if( !structure.views.data[i].known ) {
+			if (!structure.views.data[i].known) {
 				index += 12;
 			}
 		}
@@ -115,10 +114,10 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		cameraParameterIndexes = new int[structure.cameras.size];
 		int largestCameraSize = 0;
 		for (int i = 0, index = 0; i < structure.cameras.size; i++) {
-			if( !structure.cameras.get(i).known ) {
+			if (!structure.cameras.get(i).known) {
 				cameraParameterIndexes[i] = index;
 				int count = structure.cameras.data[i].model.getIntrinsicCount();
-				largestCameraSize = Math.max(largestCameraSize,count);
+				largestCameraSize = Math.max(largestCameraSize, count);
 				index += count;
 			}
 		}
@@ -139,29 +138,30 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 
 	/**
 	 * Internal matrix type agnostic process function.
+	 *
 	 * @param input Input parameters describing the current state of the optimization
 	 * @param leftPoint Storage for left Jacobian
 	 * @param rightView Storage for right Jacobian
 	 */
-	public void processInternal( double[] input, DMatrix leftPoint, DMatrix rightView) {
+	public void processInternal( double[] input, DMatrix leftPoint, DMatrix rightView ) {
 		int numRows = getNumOfOutputsM();
 		int numPointParam = structure.points.size*lengthPoint;
-		int numViewParam = numParameters-numPointParam; // view + camera
+		int numViewParam = numParameters - numPointParam; // view + camera
 
-		((ReshapeMatrix)leftPoint).reshape(numRows,numPointParam);
-		((ReshapeMatrix)rightView).reshape(numRows,numViewParam);
+		((ReshapeMatrix)leftPoint).reshape(numRows, numPointParam);
+		((ReshapeMatrix)rightView).reshape(numRows, numViewParam);
 		leftPoint.zero();
 		rightView.zero();
 
 		int observationIndex = 0;
 		// first decode the transformation
-		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
 			int cameraParamStartIndex = cameraParameterIndexes[view.camera];
 
-			if( !view.known ) {
-				int paramIndex = viewParameterIndexes[viewIndex]+indexFirstView;
+			if (!view.known) {
+				int paramIndex = viewParameterIndexes[viewIndex] + indexFirstView;
 				for (int i = 0; i < 12; i++) {
 					worldToView.data[i] = input[paramIndex++];
 				}
@@ -176,46 +176,46 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 				int columnOfPointInJac = featureIndex*lengthPoint;
 
 				worldPt.x = input[columnOfPointInJac];
-				worldPt.y = input[columnOfPointInJac+1];
-				worldPt.z = input[columnOfPointInJac+2];
-				if( structure.isHomogenous() ) {
-					worldPt.w = input[columnOfPointInJac+3];
+				worldPt.y = input[columnOfPointInJac + 1];
+				worldPt.z = input[columnOfPointInJac + 2];
+				if (structure.isHomogenous()) {
+					worldPt.w = input[columnOfPointInJac + 3];
 				}
 
 				// X' = P*X
-				PerspectiveOps.renderPixel(worldToView,worldPt, pixelH);
+				PerspectiveOps.renderPixel(worldToView, worldPt, pixelH);
 
 				if (view.known) {
-					if( structure.isHomogenous())
+					if (structure.isHomogenous())
 						partialCameraMatrixH(worldPt.x, worldPt.y, worldPt.z, worldPt.w,
-								worldToView, worldGradX, worldGradY, worldGradZ,null, null,null);
+								worldToView, worldGradX, worldGradY, worldGradZ, null, null, null);
 					else
 						partialCameraMatrix(worldPt.x, worldPt.y, worldPt.z,
-								worldToView, worldGradX, worldGradY, worldGradZ,null, null,null);
+								worldToView, worldGradX, worldGradY, worldGradZ, null, null, null);
 				} else {
-					if( structure.isHomogenous())
+					if (structure.isHomogenous())
 						partialCameraMatrixH(worldPt.x, worldPt.y, worldPt.z, worldPt.w,
 								worldToView, worldGradX, worldGradY, worldGradZ, camGradX, camGradY, camGradZ);
 					else
 						partialCameraMatrix(worldPt.x, worldPt.y, worldPt.z,
-								worldToView, worldGradX, worldGradY, worldGradZ,camGradX, camGradY, camGradZ);
+								worldToView, worldGradX, worldGradY, worldGradZ, camGradX, camGradY, camGradZ);
 				}
 
 				jacRowX = observationIndex*2;
-				jacRowY = jacRowX+1;
+				jacRowY = jacRowX + 1;
 
 				//============ Partial of camera parameters
-				if( !camera.known ) {
+				if (!camera.known) {
 					int N = camera.model.getIntrinsicCount();
 					camera.model.jacobian(pixelH.x, pixelH.y, pixelH.z,
 							pixelhGradX, pixelhGradY, true, intrGradX, intrGradY);
 
-					int location = indexLastView-indexFirstView+cameraParamStartIndex;
+					int location = indexLastView - indexFirstView + cameraParamStartIndex;
 
 					// partial of residual (pixel) w.r.t. intrinsic camera parameters
 					for (int j = 0; j < N; j++) {
-						set(rightView,jacRowX,location+j, intrGradX[j]);
-						set(rightView,jacRowY,location+j, intrGradY[j]);
+						set(rightView, jacRowX, location + j, intrGradX[j]);
+						set(rightView, jacRowY, location + j, intrGradY[j]);
 					}
 				} else {
 					camera.model.jacobian(pixelH.x, pixelH.y, pixelH.z, pixelhGradX, pixelhGradY,
@@ -228,37 +228,31 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 					chainRuleX[j] = pixelhGradX[0]*worldGradX[j] + pixelhGradX[1]*worldGradY[j] + pixelhGradX[2]*worldGradZ[j];
 					chainRuleY[j] = pixelhGradY[0]*worldGradX[j] + pixelhGradY[1]*worldGradY[j] + pixelhGradY[2]*worldGradZ[j];
 				}
-				addToJacobian(leftPoint,columnOfPointInJac,lengthPoint, chainRuleX, chainRuleY);
+				addToJacobian(leftPoint, columnOfPointInJac, lengthPoint, chainRuleX, chainRuleY);
 
-				if( !view.known ) {
+				if (!view.known) {
 					// partial of residual (pixel) w.r.t. camera matrix P
 					for (int j = 0; j < 12; j++) {
-						chainRuleX[j] = pixelhGradX[0]*camGradX[j] +  pixelhGradX[1]*camGradY[j] + pixelhGradX[2]*camGradZ[j];
-						chainRuleY[j] = pixelhGradY[0]*camGradX[j] +  pixelhGradY[1]*camGradY[j] + pixelhGradY[2]*camGradZ[j];
+						chainRuleX[j] = pixelhGradX[0]*camGradX[j] + pixelhGradX[1]*camGradY[j] + pixelhGradX[2]*camGradZ[j];
+						chainRuleY[j] = pixelhGradY[0]*camGradX[j] + pixelhGradY[1]*camGradY[j] + pixelhGradY[2]*camGradZ[j];
 					}
 
 					// partial of x' = (1/z)*P*X with respect to P is a 2 by 12 matrix
 					int col = viewParameterIndexes[viewIndex];
-					addToJacobian(rightView,col,12,chainRuleX,chainRuleY);
+					addToJacobian(rightView, col, 12, chainRuleX, chainRuleY);
 				}
 
 				observationIndex++;
 			}
 		}
-
-//		left.print();
-//		right.print();
-//		System.out.println("Asdads");
 	}
 
-
-	static void partialCameraMatrix(double X , double Y , double Z ,
-									DMatrixRMaj P ,
-									double pointGradX[], double pointGradY[] , double pointGradZ[],
-									@Nullable double camGradX[], @Nullable double camGradY[], @Nullable double camGradZ[] )
-	{
-		double P11 = P.data[0], P12 = P.data[1], P13 = P.data[2 ];
-		double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6 ];
+	static void partialCameraMatrix( double X, double Y, double Z,
+									 DMatrixRMaj P,
+									 double[] pointGradX, double[] pointGradY, double[] pointGradZ,
+									 @Nullable double[] camGradX, @Nullable double[] camGradY, @Nullable double[] camGradZ ) {
+		double P11 = P.data[0], P12 = P.data[1], P13 = P.data[2];
+		double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6];
 		double P31 = P.data[8], P32 = P.data[9], P33 = P.data[10];
 
 //		double xx = P11*X +P12*Y + P13*Z + P14;
@@ -277,7 +271,7 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		pointGradZ[1] = P32;
 		pointGradZ[2] = P33;
 
-		if( camGradX == null || camGradY == null || camGradZ == null )
+		if (camGradX == null || camGradY == null || camGradZ == null)
 			return;
 
 		camGradX[0] = X; camGradX[1] = Y; camGradX[2 ] = Z; camGradX[3 ] = 1;
@@ -293,11 +287,10 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		camGradZ[8] = X; camGradZ[9] = Y; camGradZ[10] = Z; camGradZ[11] = 1;
 	}
 
-	static void partialCameraMatrixH(double X , double Y , double Z , double W,
-									 DMatrixRMaj P ,
-									 double pointGradX[], double pointGradY[] , double pointGradZ[],
-									 @Nullable double camGradX[], @Nullable double camGradY[], @Nullable double camGradZ[] )
-	{
+	static void partialCameraMatrixH( double X, double Y, double Z, double W,
+									  DMatrixRMaj P,
+									  double[] pointGradX, double[] pointGradY, double[] pointGradZ,
+									  @Nullable double[] camGradX, @Nullable double[] camGradY, @Nullable double[] camGradZ ) {
 		double P11 = P.data[0], P12 = P.data[1], P13 = P.data[2 ], P14 = P.data[3];
 		double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6 ], P24 = P.data[7];
 		double P31 = P.data[8], P32 = P.data[9], P33 = P.data[10], P34 = P.data[11];
@@ -321,7 +314,7 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		pointGradZ[2] = P33;
 		pointGradZ[3] = P34;
 
-		if( camGradX == null || camGradY == null || camGradZ == null )
+		if (camGradX == null || camGradY == null || camGradZ == null)
 			return;
 
 		camGradX[0] = X; camGradX[1] = Y; camGradX[2 ] = Z; camGradX[3 ] = W;
@@ -337,16 +330,15 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		camGradZ[8] = X; camGradZ[9] = Y; camGradZ[10] = Z; camGradZ[11] = W;
 	}
 
-	private void addToJacobian(DMatrix tripplet, int col , int length, double a[], double b[]) {
+	private void addToJacobian( DMatrix triplet, int col, int length, double[] a, double[] b ) {
 		for (int i = 0; i < length; i++) {
-			set(tripplet,jacRowX,col+i,a[i]);
-			set(tripplet,jacRowY,col+i,b[i]);
+			set(triplet, jacRowX, col + i, a[i]);
+			set(triplet, jacRowY, col + i, b[i]);
 		}
 	}
 
 	/**
 	 * Abstract interface for settings the value of a matrix without knowing the type of matrix
 	 */
-	protected abstract void set( DMatrix matrix, int row , int col , double value );
-
+	protected abstract void set( DMatrix matrix, int row, int col, double value );
 }

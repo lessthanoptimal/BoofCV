@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,36 +29,36 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class JacobianSo3Quaternions implements JacobianSo3 {
 
-	private Quaternion_F64 quat = new Quaternion_F64();
+	private final Quaternion_F64 quat = new Quaternion_F64();
 
-	DMatrixRMaj R = new DMatrixRMaj(3,3);
-	DMatrixRMaj jacR[] = new DMatrixRMaj[4];
+	private final DMatrixRMaj R = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj[] jacR = new DMatrixRMaj[4];
 
 	public JacobianSo3Quaternions() {
 		for (int i = 0; i < jacR.length; i++) {
-			jacR[i] = new DMatrixRMaj(3,3);
+			jacR[i] = new DMatrixRMaj(3, 3);
 		}
 	}
 
 	@Override
-	public void getParameters(DMatrixRMaj R, double[] parameters, int offset) {
-		ConvertRotation3D_F64.matrixToQuaternion(R,quat);
-		parameters[offset  ] = quat.w;
-		parameters[offset+1] = quat.x;
-		parameters[offset+2] = quat.y;
-		parameters[offset+3] = quat.z;
+	public void getParameters( DMatrixRMaj R, double[] parameters, int offset ) {
+		ConvertRotation3D_F64.matrixToQuaternion(R, quat);
+		parameters[offset] = quat.w;
+		parameters[offset + 1] = quat.x;
+		parameters[offset + 2] = quat.y;
+		parameters[offset + 3] = quat.z;
 	}
 
 	@Override
-	public void setParameters(double[] parameters, int offset) {
-		quat.w = parameters[offset  ];
-		quat.x = parameters[offset+1];
-		quat.y = parameters[offset+2];
-		quat.z = parameters[offset+3];
+	public void setParameters( double[] parameters, int offset ) {
+		quat.w = parameters[offset];
+		quat.x = parameters[offset + 1];
+		quat.y = parameters[offset + 2];
+		quat.z = parameters[offset + 3];
 
 		// has to be the unit quaternion and there is nothing restricting the values of each parameter
 		quat.normalize();
-		ConvertRotation3D_F64.quaternionToMatrix(quat,R);
+		ConvertRotation3D_F64.quaternionToMatrix(quat, R);
 
 		computeJacobians();
 	}
@@ -150,7 +150,7 @@ public class JacobianSo3Quaternions implements JacobianSo3 {
 	}
 
 	@Override
-	public DMatrixRMaj getPartial(int param) {
+	public DMatrixRMaj getPartial( int param ) {
 		return jacR[param];
 	}
 }

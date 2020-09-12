@@ -6,6 +6,7 @@
 **/*.ipr
 .DS_Store
 BoofVersion.java
+Project.xml
 
 ### Gradle ###
 **/build/

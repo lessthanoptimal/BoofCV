@@ -29,12 +29,12 @@ import boofcv.abst.geo.bundle.SceneStructureProjective;
  * [ (X Y Z)*M ][ P11 P12 P13 P14 P21 P22 ... ]
  * [ features  ][         projective          ]
  * </pre>
+ *
  * @author Peter Abeles
  */
-public class CodecSceneStructureProjective implements BundleAdjustmentSchur.Codec<SceneStructureProjective>
-{
+public class CodecSceneStructureProjective implements BundleAdjustmentSchur.Codec<SceneStructureProjective> {
 	@Override
-	public void decode(double[] input , SceneStructureProjective structure ) {
+	public void decode( double[] input, SceneStructureProjective structure ) {
 		int index = 0;
 
 		for (int i = 0; i < structure.points.size; i++) {
@@ -42,14 +42,14 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur.Code
 			p.coordinate[0] = input[index++];
 			p.coordinate[1] = input[index++];
 			p.coordinate[2] = input[index++];
-			if( structure.isHomogenous() )
+			if (structure.isHomogenous())
 				p.coordinate[3] = input[index++];
 		}
 
-		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			// Decode the rigid body transform from world to view
-			if( !view.known ) {
+			if (!view.known) {
 				for (int i = 0; i < 12; i++) {
 					view.worldToView.data[i] = input[index++];
 				}
@@ -58,15 +58,15 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur.Code
 
 		for (int i = 0; i < structure.cameras.size; i++) {
 			SceneStructureCommon.Camera camera = structure.cameras.data[i];
-			if( !camera.known ) {
-				camera.model.setIntrinsic(input,index);
+			if (!camera.known) {
+				camera.model.setIntrinsic(input, index);
 				index += camera.model.getIntrinsicCount();
 			}
 		}
 	}
 
 	@Override
-	public void encode(SceneStructureProjective structure , double[] output ) {
+	public void encode( SceneStructureProjective structure, double[] output ) {
 		int index = 0;
 
 		for (int i = 0; i < structure.points.size; i++) {
@@ -74,14 +74,14 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur.Code
 			output[index++] = p.coordinate[0];
 			output[index++] = p.coordinate[1];
 			output[index++] = p.coordinate[2];
-			if( structure.isHomogenous() )
+			if (structure.isHomogenous())
 				output[index++] = p.coordinate[3];
 		}
 
-		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			// Decode the rigid body transform from world to view
-			if( !view.known ) {
+			if (!view.known) {
 				for (int i = 0; i < 12; i++) {
 					output[index++] = view.worldToView.data[i];
 				}
@@ -90,8 +90,8 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur.Code
 
 		for (int i = 0; i < structure.cameras.size; i++) {
 			SceneStructureCommon.Camera camera = structure.cameras.data[i];
-			if( !camera.known ) {
-				camera.model.getIntrinsic(output,index);
+			if (!camera.known) {
+				camera.model.getIntrinsic(output, index);
 				index += camera.model.getIntrinsicCount();
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,22 +23,20 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Peter Abeles
  */
-public class TestBundlePinhole
-{
+public class TestBundlePinhole {
 	@Test
 	public void withSkew() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.1},{400,600,1000,1000,2}};
-		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(false)){}
+		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.1}, {400, 600, 1000, 1000, 2}};
+		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(false)) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
 	@Test
 	public void withoutSkew() {
-		double[][]parameters = new double[][]{{300,200,400,400},{400,600,1000,1000}};
-		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(true)){}
+		double[][] parameters = new double[][]{{300, 200, 400, 400}, {400, 600, 1000, 1000}};
+		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(true)) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle.cameras;
 
-class TestBundleCameraProjective extends GenericChecksBundleAdjustmentCamera{
+class TestBundleCameraProjective extends GenericChecksBundleAdjustmentCamera {
 	TestBundleCameraProjective() {
 		super(new BundleCameraProjective());
 		setParameters(new double[][]{{}});

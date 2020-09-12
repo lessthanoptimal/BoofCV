@@ -77,7 +77,7 @@ class TestScaleSceneStructure {
 
 			// Make sure it was changed
 			for (int i = 0; i < expected.views.size; i++) {
-				assertNotEquals( expected.views.data[i].worldToView.T.distance(found.views.data[i].worldToView.T) , UtilEjml.TEST_F64);
+				assertNotEquals( expected.views.data[i].parent_to_view.T.distance(found.views.data[i].parent_to_view.T) , UtilEjml.TEST_F64);
 			}
 
 			// Must still have perfect observations if scaling was correctly applied. Otherwise solution will be changed when optimizing
@@ -204,7 +204,7 @@ class TestScaleSceneStructure {
 			}
 			// Connect the point to views if it's visible inside of
 			for (int j = 0; j < scene.views.size; j++) {
-				w2p.configure(camera0,scene.views.data[j].worldToView); // approximate by using the same camera
+				w2p.configure(camera0,scene.views.data[j].parent_to_view); // approximate by using the same camera
 
 				Point2D_F64 pixel = w2p.transform(X);
 				if( pixel != null && pixel.x >= 0 && pixel.y >= 0 && pixel.x < camera0.width && pixel.y < camera0.height ) {

@@ -150,7 +150,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		// skip the first frame since it's fixed
 		for (int frameIdx = 1; frameIdx < frames.size; frameIdx++) {
 			BFrame bf = frames.get(frameIdx);
-			structure.views.get(frameIdx).worldToView.invert(bf.frame_to_world);
+			structure.views.get(frameIdx).parent_to_view.invert(bf.frame_to_world);
 		}
 
 		int featureIdx = 0;

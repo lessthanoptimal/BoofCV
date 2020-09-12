@@ -53,18 +53,13 @@ import org.ejml.dense.row.CommonOps_DDRM;
  */
 public class ScaleSceneStructure {
 
-	/**
-	 * This sets the order of magnitude for point coordinates
-	 */
+	/** This sets the order of magnitude for point coordinates */
 	double desiredDistancePoint = 100;
 
-	/**
-	 * Median of all the points. They are offset by this amount so that they are zero mean
-	 */
+	/** Median of all the points. They are offset by this amount so that they are zero mean */
 	Point3D_F64 medianPoint = new Point3D_F64();
-	/**
-	 * The median distance from median point
-	 */
+
+	/** The median distance from median point */
 	double medianDistancePoint;
 
 	/**
@@ -73,9 +68,7 @@ public class ScaleSceneStructure {
 	 */
 	boolean scalePixelsUsingStats = true;
 
-	/**
-	 * Pixel scaling for each view
-	 */
+	/** Pixel scaling for each view */
 	public FastQueue<NormalizationPoint2D> pixelScaling = new FastQueue<>(NormalizationPoint2D::new);
 
 	/**
@@ -184,8 +177,8 @@ public class ScaleSceneStructure {
 				int i = pixelIdx*2;
 				float x = ov.observations.data[i];
 				float y = ov.observations.data[i + 1];
-				ov.observations.data[i  ] = (x - cx)/stdX;
-				ov.observations.data[i+1] = (y - cy)/stdY;
+				ov.observations.data[i] = (x - cx)/stdX;
+				ov.observations.data[i + 1] = (y - cy)/stdY;
 			}
 			n.apply(v.worldToView, v.worldToView);
 		}
@@ -207,8 +200,8 @@ public class ScaleSceneStructure {
 				int i = pixelIdx*2;
 				float x = ov.observations.data[i];
 				float y = ov.observations.data[i + 1];
-				ov.observations.data[i  ] = x*stdX + cx;
-				ov.observations.data[i+1] = y*stdY + cy;
+				ov.observations.data[i] = x*stdX + cx;
+				ov.observations.data[i + 1] = y*stdY + cy;
 			}
 
 			n.remove(v.worldToView, v.worldToView);
@@ -297,7 +290,7 @@ public class ScaleSceneStructure {
 			SceneStructureMetric.View view = structure.views.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(view.worldToView.R, view.worldToView.T, c);
+			GeometryMath_F64.multTran(view.parent_to_view.R, view.parent_to_view.T, c);
 
 			// Apply transform
 			c.x = -c.x/scale + medianPoint.x;
@@ -305,8 +298,8 @@ public class ScaleSceneStructure {
 			c.z = -c.z/scale + medianPoint.z;
 
 			// -R*T
-			GeometryMath_F64.mult(view.worldToView.R, c, view.worldToView.T);
-			view.worldToView.T.scale(-1);
+			GeometryMath_F64.mult(view.parent_to_view.R, c, view.parent_to_view.T);
+			view.parent_to_view.T.scale(-1);
 		}
 	}
 
@@ -371,7 +364,7 @@ public class ScaleSceneStructure {
 			SceneStructureMetric.View view = structure.views.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(view.worldToView.R, view.worldToView.T, c);
+			GeometryMath_F64.multTran(view.parent_to_view.R, view.parent_to_view.T, c);
 
 			// Apply transform
 			c.x = -scale*(c.x + medianPoint.x);
@@ -379,8 +372,8 @@ public class ScaleSceneStructure {
 			c.z = -scale*(c.z + medianPoint.z);
 
 			// -R*T
-			GeometryMath_F64.mult(view.worldToView.R, c, view.worldToView.T);
-			view.worldToView.T.scale(-1);
+			GeometryMath_F64.mult(view.parent_to_view.R, c, view.parent_to_view.T);
+			view.parent_to_view.T.scale(-1);
 		}
 	}
 

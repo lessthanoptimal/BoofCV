@@ -67,12 +67,12 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			// Decode the rigid body transform from object to world
 			if (!rigid.known) {
 				rotation.setParameters(input, index);
-				rigid.objectToWorld.R.set(rotation.getRotationMatrix());
+				rigid.object_to_world.R.set(rotation.getRotationMatrix());
 				index += rotation.getParameterLength();
 
-				rigid.objectToWorld.T.x = input[index++];
-				rigid.objectToWorld.T.y = input[index++];
-				rigid.objectToWorld.T.z = input[index++];
+				rigid.object_to_world.T.x = input[index++];
+				rigid.object_to_world.T.y = input[index++];
+				rigid.object_to_world.T.z = input[index++];
 			}
 		}
 
@@ -81,12 +81,12 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			// Decode the rigid body transform from world to view
 			if (!view.known) {
 				rotation.setParameters(input, index);
-				view.worldToView.R.set(rotation.getRotationMatrix());
+				view.parent_to_view.R.set(rotation.getRotationMatrix());
 				index += rotation.getParameterLength();
 
-				view.worldToView.T.x = input[index++];
-				view.worldToView.T.y = input[index++];
-				view.worldToView.T.z = input[index++];
+				view.parent_to_view.T.x = input[index++];
+				view.parent_to_view.T.y = input[index++];
+				view.parent_to_view.T.z = input[index++];
 			}
 		}
 
@@ -116,12 +116,12 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			SceneStructureMetric.Rigid rigid = structure.rigids.data[rigidIndex];
 			// Decode the rigid body transform from object to world
 			if (!rigid.known) {
-				rotation.getParameters(rigid.objectToWorld.R, output, index);
+				rotation.getParameters(rigid.object_to_world.R, output, index);
 				index += rotation.getParameterLength();
 
-				output[index++] = rigid.objectToWorld.T.x;
-				output[index++] = rigid.objectToWorld.T.y;
-				output[index++] = rigid.objectToWorld.T.z;
+				output[index++] = rigid.object_to_world.T.x;
+				output[index++] = rigid.object_to_world.T.y;
+				output[index++] = rigid.object_to_world.T.z;
 			}
 		}
 
@@ -129,12 +129,12 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			SceneStructureMetric.View view = structure.views.data[viewIndex];
 			// Decode the rigid body transform from world to view
 			if (!view.known) {
-				rotation.getParameters(view.worldToView.R, output, index);
+				rotation.getParameters(view.parent_to_view.R, output, index);
 				index += rotation.getParameterLength();
 
-				output[index++] = view.worldToView.T.x;
-				output[index++] = view.worldToView.T.y;
-				output[index++] = view.worldToView.T.z;
+				output[index++] = view.parent_to_view.T.x;
+				output[index++] = view.parent_to_view.T.y;
+				output[index++] = view.parent_to_view.T.z;
 			}
 		}
 

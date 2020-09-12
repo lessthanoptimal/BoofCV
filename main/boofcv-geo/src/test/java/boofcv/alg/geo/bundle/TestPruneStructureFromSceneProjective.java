@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofTesting;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPoint4D_F64;
@@ -45,10 +46,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestPruneStructureFromSceneProjective {
+	private final Random rand = BoofTesting.createRandom(234);
+
 	SceneStructureProjective structure;
 	SceneObservations observations;
 
-	Random rand = new Random(234);
 	Point3D_F64 center = new Point3D_F64(0, 0, 4);
 
 	@Test
@@ -149,7 +151,7 @@ class TestPruneStructureFromSceneProjective {
 
 				// increased rotation variance until a few of the points weren't always visible
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
-						rand.nextGaussian()*0.85, rand.nextGaussian()*0.1, rand.nextGaussian()*0.1,
+						rand.nextGaussian()*0.5, rand.nextGaussian()*0.1, rand.nextGaussian()*0.1,
 						worldToView.R);
 			}
 
@@ -157,7 +159,7 @@ class TestPruneStructureFromSceneProjective {
 			structure.setView(viewIdx, viewIdx == 0, cameraMatrix, intrinsic.width, intrinsic.height);
 		}
 
-		List<Point4D_F64> points = UtilPoint4D_F64.randomN(center, 0.97, 0.5, structure.points.size, rand);
+		List<Point4D_F64> points = UtilPoint4D_F64.randomN(center, 1.0, 0.5, structure.points.size, rand);
 		for (int i = 0; i < points.size(); i++) {
 			Point4D_F64 p = points.get(i);
 			double s = rand.nextGaussian();

@@ -186,18 +186,22 @@ public class ImplPerspectiveOps_F64 {
 
 
 	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X, @Nullable Point2D_F64 pixel) {
-		Point3D_F64 X_cam = new Point3D_F64();
+		DMatrixRMaj R = worldToCamera.R;
+		Vector3D_F64 T = worldToCamera.T;
 
-		SePointOps_F64.transform(worldToCamera, X, X_cam);
+		// [R T]*X
+		double x = R.data[0]*X.x + R.data[1]*X.y + R.data[2]*X.z + T.x;
+		double y = R.data[3]*X.x + R.data[4]*X.y + R.data[5]*X.z + T.y;
+		double z = R.data[6]*X.x + R.data[7]*X.y + R.data[8]*X.z + T.z;
 
 		// see if it's behind the camera
-		if( X_cam.z <= 0 )
+		if( z <= 0 )
 			return null;
 
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		pixel.set(X_cam.x/X_cam.z,X_cam.y/X_cam.z);
+		pixel.set(x/z, y/z);
 
 		if( K == null )
 			return pixel;
@@ -234,19 +238,23 @@ public class ImplPerspectiveOps_F64 {
 													double fx, double skew, double cx, double fy, double cy,
 													Point4D_F64 X, @Nullable Point2D_F64 pixel) {
 
-		Point3D_F64 X_cam = new Point3D_F64();
+		DMatrixRMaj R = worldToCamera.R;
+		Vector3D_F64 T = worldToCamera.T;
 
-		SePointOps_F64.transform(worldToCamera, X, X_cam);
+		// [R T]*X
+		double x = R.data[0]*X.x + R.data[1]*X.y + R.data[2]*X.z + T.x*X.w;
+		double y = R.data[3]*X.x + R.data[4]*X.y + R.data[5]*X.z + T.y*X.w;
+		double z = R.data[6]*X.x + R.data[7]*X.y + R.data[8]*X.z + T.z*X.w;
 
 		// see if it's behind the camera
-		if( X_cam.z <= 0 )
+		if( z <= 0 )
 			return null;
 
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		double xx = X_cam.x/X_cam.z;
-		double yy = X_cam.y/X_cam.z;
+		double xx = x/z;
+		double yy = y/z;
 
 		pixel.x = fx*xx + skew*yy + cx;
 		pixel.y = fy*yy + cy;
@@ -273,7 +281,7 @@ public class ImplPerspectiveOps_F64 {
 		pixel.y = y/z;
 	}
 
-	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point3D_F64 pixelH) {
+	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , Point3D_F64 pixelH) {
 		DMatrixRMaj P = cameraMatrix;
 
 		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;
@@ -281,7 +289,7 @@ public class ImplPerspectiveOps_F64 {
 		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11]*X.w;
 	}
 
-	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point2D_F64 pixel) {
+	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , Point2D_F64 pixel) {
 		DMatrixRMaj P = cameraMatrix;
 
 		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;

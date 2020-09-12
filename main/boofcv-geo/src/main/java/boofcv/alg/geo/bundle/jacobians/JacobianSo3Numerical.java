@@ -35,9 +35,9 @@ public abstract class JacobianSo3Numerical implements JacobianSo3 {
 	private DMatrixRMaj[] jacR; // storage for the partials by parameter
 	private DMatrixRMaj jacobian; // storage for the numerical Jacobian
 	private int N; // number of parameters
-	private FunctionOfPoint function = new FunctionOfPoint(); // used to compute numerical jacobian
+	private final FunctionOfPoint function = new FunctionOfPoint(); // used to compute numerical jacobian
 
-	private DMatrixRMaj R = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj R = new DMatrixRMaj(3, 3);
 
 	protected JacobianSo3Numerical() {
 		init();
@@ -50,9 +50,9 @@ public abstract class JacobianSo3Numerical implements JacobianSo3 {
 		N = getParameterLength();
 		jacR = new DMatrixRMaj[N];
 		for (int i = 0; i < N; i++) {
-			jacR[i] = new DMatrixRMaj(3,3);
+			jacR[i] = new DMatrixRMaj(3, 3);
 		}
-		jacobian = new DMatrixRMaj(N,9);
+		jacobian = new DMatrixRMaj(N, 9);
 		paramInternal = new double[N];
 		numericalJac = createNumericalAlgorithm(function);
 	}
@@ -65,14 +65,14 @@ public abstract class JacobianSo3Numerical implements JacobianSo3 {
 	}
 
 	@Override
-	public void setParameters(double[] parameters, int offset) {
-		computeRotationMatrix(parameters,offset,R);
+	public void setParameters( double[] parameters, int offset ) {
+		computeRotationMatrix(parameters, offset, R);
 		// copy it because numerical jacobian requires the index to start at 0
-		System.arraycopy(parameters,offset,paramInternal,0,N);
+		System.arraycopy(parameters, offset, paramInternal, 0, N);
 
-		numericalJac.process(paramInternal,jacobian);
-		for (int i = 0,idx=0; i < 9; i++) {
-			for (int j = 0; j < N; j++,idx++) {
+		numericalJac.process(paramInternal, jacobian);
+		for (int i = 0, idx = 0; i < 9; i++) {
+			for (int j = 0; j < N; j++, idx++) {
 				jacR[j].data[i] = jacobian.data[idx];
 			}
 		}
@@ -81,10 +81,10 @@ public abstract class JacobianSo3Numerical implements JacobianSo3 {
 	/**
 	 * Computes rotation matrix given the parameters
 	 */
-	public abstract void computeRotationMatrix(double[] parameters , int offset , DMatrixRMaj R );
+	public abstract void computeRotationMatrix( double[] parameters, int offset, DMatrixRMaj R );
 
 	@Override
-	public DMatrixRMaj getPartial(int param) {
+	public DMatrixRMaj getPartial( int param ) {
 		return jacR[param];
 	}
 
@@ -96,9 +96,9 @@ public abstract class JacobianSo3Numerical implements JacobianSo3 {
 	private class FunctionOfPoint implements FunctionNtoM {
 
 		@Override
-		public void process(double[] input, double[] output) {
-			computeRotationMatrix(input,0,R);
-			System.arraycopy(R.data,0,output,0,9);
+		public void process( double[] input, double[] output ) {
+			computeRotationMatrix(input, 0, R);
+			System.arraycopy(R.data, 0, output, 0, 9);
 		}
 
 		@Override

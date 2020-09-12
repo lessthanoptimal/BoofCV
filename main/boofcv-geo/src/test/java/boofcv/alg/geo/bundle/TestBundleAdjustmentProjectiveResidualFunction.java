@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.testing.BoofTesting;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @author Peter Abeles
  */
 class TestBundleAdjustmentProjectiveResidualFunction {
-	Random rand = new Random(234);
+	private final Random rand = BoofTesting.createRandom(234);
 
 	/**
 	 * Makes sure that when given the same input it produces the same output
@@ -46,23 +47,23 @@ class TestBundleAdjustmentProjectiveResidualFunction {
 	}
 
 	void multipleCalls( boolean homogenous ) {
-		SceneStructureProjective structure = homogenous?createSceneH(rand) : createScene3D(rand);
-		SceneObservations obs = createObservations(rand,structure);
+		SceneStructureProjective structure = homogenous ? createSceneH(rand) : createScene3D(rand);
+		SceneObservations obs = createObservations(rand, structure);
 
 		double[] param = new double[structure.getParameterCount()];
 
-		new CodecSceneStructureProjective().encode(structure,param);
+		new CodecSceneStructureProjective().encode(structure, param);
 
 		BundleAdjustmentProjectiveResidualFunction alg = new BundleAdjustmentProjectiveResidualFunction();
-		alg.configure(structure,obs);
+		alg.configure(structure, obs);
 
-		double []expected = new double[alg.getNumOfOutputsM()];
-		double []found = new double[alg.getNumOfOutputsM()];
+		double[] expected = new double[alg.getNumOfOutputsM()];
+		double[] found = new double[alg.getNumOfOutputsM()];
 
-		alg.process(param,expected);
-		alg.process(param,found);
+		alg.process(param, expected);
+		alg.process(param, found);
 
-		assertArrayEquals(expected,found,UtilEjml.TEST_F64);
+		assertArrayEquals(expected, found, UtilEjml.TEST_F64);
 	}
 
 	/**
@@ -75,29 +76,29 @@ class TestBundleAdjustmentProjectiveResidualFunction {
 	}
 
 	void changeInParamChangesOutput( boolean homogenous ) {
-		SceneStructureProjective structure = homogenous?createSceneH(rand) : createScene3D(rand);
+		SceneStructureProjective structure = homogenous ? createSceneH(rand) : createScene3D(rand);
 		double[] param = new double[structure.getParameterCount()];
 
-		new CodecSceneStructureProjective().encode(structure,param);
+		new CodecSceneStructureProjective().encode(structure, param);
 
 		// Create random observations
-		SceneObservations obs = createObservations(rand,structure);
+		SceneObservations obs = createObservations(rand, structure);
 
 		BundleAdjustmentProjectiveResidualFunction alg = new BundleAdjustmentProjectiveResidualFunction();
-		alg.configure(structure,obs);
+		alg.configure(structure, obs);
 
-		double []original = new double[alg.getNumOfOutputsM()];
-		double []found = new double[alg.getNumOfOutputsM()];
-		alg.process(param,original);
+		double[] original = new double[alg.getNumOfOutputsM()];
+		double[] found = new double[alg.getNumOfOutputsM()];
+		alg.process(param, original);
 
 		for (int paramIndex = 0; paramIndex < original.length; paramIndex++) {
 			double v = param[paramIndex];
 			param[paramIndex] += 0.001;
-			alg.process(param,found);
+			alg.process(param, found);
 
 			boolean identical = true;
 			for (int i = 0; i < found.length; i++) {
-				if( Math.abs(original[i]-found[i]) > UtilEjml.TEST_F64 ) {
+				if (Math.abs(original[i] - found[i]) > UtilEjml.TEST_F64) {
 					identical = false;
 					break;
 				}
@@ -108,7 +109,7 @@ class TestBundleAdjustmentProjectiveResidualFunction {
 		}
 	}
 
-	static SceneObservations createObservations(Random rand , SceneStructureProjective structure) {
+	static SceneObservations createObservations( Random rand, SceneStructureProjective structure ) {
 		SceneObservations obs = new SceneObservations();
 		obs.initialize(structure.views.size);
 
@@ -117,9 +118,9 @@ class TestBundleAdjustmentProjectiveResidualFunction {
 
 			for (int i = 0; i < p.views.size; i++) {
 				SceneObservations.View v = obs.getView(p.views.get(i));
-				v.point.add( j );
-				v.observations.add( rand.nextInt(300)+20);
-				v.observations.add( rand.nextInt(300)+20);
+				v.point.add(j);
+				v.observations.add(rand.nextInt(300) + 20);
+				v.observations.add(rand.nextInt(300) + 20);
 			}
 		}
 		return obs;

@@ -23,6 +23,8 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * Specifies a metric (calibrated) scene for optimizing using {@link BundleAdjustment}.
  * It specifies the relationships between cameras, views, and points. A camera projects a 3D point onto the image plane.
@@ -36,18 +38,19 @@ import org.ddogleg.struct.FastQueue;
  */
 public class SceneStructureMetric extends SceneStructureCommon {
 
-	public FastQueue<View> views = new FastQueue<>(View::new, View::reset);
+	public final FastQueue<View> views = new FastQueue<>(View::new, View::reset);
 
 	// data structures for rigid objects.
-	public FastQueue<Rigid> rigids = new FastQueue<>(Rigid::new, Rigid::reset);
+	public final FastQueue<Rigid> rigids = new FastQueue<>(Rigid::new, Rigid::reset);
 	// Lookup table from rigid point to rigid object
 	public int[] lookupRigid;
 
 	/**
 	 * Configure bundle adjustment
+	 *
 	 * @param homogenous if true then homogeneous coordinates are used
 	 */
-	public SceneStructureMetric(boolean homogenous) {
+	public SceneStructureMetric( boolean homogenous ) {
 		super(homogenous);
 	}
 
@@ -58,8 +61,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalViews Number of views
 	 * @param totalPoints Number of points
 	 */
-	public void initialize( int totalCameras , int totalViews , int totalPoints ) {
-		initialize(totalCameras,totalViews,totalPoints,0);
+	public void initialize( int totalCameras, int totalViews, int totalPoints ) {
+		initialize(totalCameras, totalViews, totalPoints, 0);
 	}
 
 	/**
@@ -70,7 +73,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalPoints Number of points
 	 * @param totalRigid Number of rigid objects
 	 */
-	public void initialize( int totalCameras , int totalViews , int totalPoints , int totalRigid ) {
+	public void initialize( int totalCameras, int totalViews, int totalPoints, int totalRigid ) {
 		// Reset first so that when it resizes it will call reset() on each object
 		cameras.reset();
 		views.reset();
@@ -92,11 +95,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public void assignIDsToRigidPoints() {
 		// return if it has already been assigned
-		if( lookupRigid != null )
+		if (lookupRigid != null)
 			return;
 		// Assign a unique ID to each point belonging to a rigid object
 		// at the same time create a look up table that allows for the object that a point belongs to be quickly found
-		lookupRigid = new int[ getTotalRigidPoints() ];
+		lookupRigid = new int[getTotalRigidPoints()];
 		int pointID = 0;
 		for (int i = 0; i < rigids.size; i++) {
 			Rigid r = rigids.data[i];
@@ -105,7 +108,6 @@ public class SceneStructureMetric extends SceneStructureCommon {
 				lookupRigid[pointID] = i;
 			}
 		}
-
 	}
 
 	/**
@@ -116,14 +118,30 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
-	 * Specifies the spacial transform for a view.
+	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
+	 *
 	 * @param which Which view is being specified/
 	 * @param fixed If these parameters are fixed or not
-	 * @param worldToView The transform from world to view reference frames. Internal copy is saved.
+	 * @param world_to_view The transform from world to view reference frames. Internal copy is saved.
 	 */
-	public void setView(int which , boolean fixed , Se3_F64 worldToView ) {
+	public void setView( int which, boolean fixed, Se3_F64 world_to_view ) {
 		views.get(which).known = fixed;
-		views.get(which).worldToView.set(worldToView);
+		views.get(which).parent_to_view.set(world_to_view);
+	}
+
+	/**
+	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
+	 *
+	 * @param which Which view is being specified/
+	 * @param fixed If these parameters are fixed or not
+	 * @param parent_to_view The transform from parent to view reference frames. Internal copy is saved.
+	 * @param parent ID / index of the parent this this view is relatiev to
+	 */
+	public void setView( int which, boolean fixed, Se3_F64 parent_to_view, int parent ) {
+		assertBoof(parent < which, "Parent must be less than which");
+		views.get(which).known = fixed;
+		views.get(which).parent = parent;
+		views.get(which).parent_to_view.set(parent_to_view);
 	}
 
 	/**
@@ -135,10 +153,10 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param worldToObject Initial estimated location of rigid object
 	 * @param totalPoints Total number of points attached to this rigid object
 	 */
-	public void setRigid( int which , boolean fixed , Se3_F64 worldToObject , int totalPoints ) {
+	public void setRigid( int which, boolean fixed, Se3_F64 worldToObject, int totalPoints ) {
 		Rigid r = rigids.data[which] = new Rigid();
 		r.known = fixed;
-		r.objectToWorld.set(worldToObject);
+		r.object_to_world.set(worldToObject);
 		r.points = new Point[totalPoints];
 		for (int i = 0; i < totalPoints; i++) {
 			r.points[i] = new Point(pointSize);
@@ -147,23 +165,25 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Specifies that the view uses the specified camera
+	 *
 	 * @param viewIndex index of view
 	 * @param cameraIndex index of camera
 	 */
-	public void connectViewToCamera( int viewIndex , int cameraIndex ) {
-		if( views.get(viewIndex).camera != -1 )
+	public void connectViewToCamera( int viewIndex, int cameraIndex ) {
+		if (views.get(viewIndex).camera != -1)
 			throw new RuntimeException("View has already been assigned a camera");
 		views.get(viewIndex).camera = cameraIndex;
 	}
 
 	/**
 	 * Returns the number of cameras with parameters that are not fixed
+	 *
 	 * @return non-fixed camera count
 	 */
 	public int getUnknownCameraCount() {
 		int total = 0;
 		for (int i = 0; i < cameras.size; i++) {
-			if( !cameras.data[i].known) {
+			if (!cameras.data[i].known) {
 				total++;
 			}
 		}
@@ -172,12 +192,13 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Returns the number of view with parameters that are not fixed
+	 *
 	 * @return non-fixed view count
 	 */
 	public int getUnknownViewCount() {
 		int total = 0;
 		for (int i = 0; i < views.size; i++) {
-			if( !views.get(i).known) {
+			if (!views.get(i).known) {
 				total++;
 			}
 		}
@@ -186,12 +207,13 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Returns the number of view with parameters that are not fixed
+	 *
 	 * @return non-fixed view count
 	 */
 	public int getUnknownRigidCount() {
 		int total = 0;
 		for (int i = 0; i < rigids.size; i++) {
-			if( !rigids.data[i].known) {
+			if (!rigids.data[i].known) {
 				total++;
 			}
 		}
@@ -202,7 +224,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * Returns total number of points associated with rigid objects.
 	 */
 	public int getTotalRigidPoints() {
-		if( rigids == null )
+		if (rigids == null)
 			return 0;
 
 		int total = 0;
@@ -214,6 +236,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Returns the total number of parameters which will be optimised
+	 *
 	 * @return number of parameters
 	 */
 	@Override
@@ -231,23 +254,20 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * Observations from a camera of points.
 	 */
 	public static class View {
-		/**
-		 * If the parameters are assumed to be known and should not be optimised.
-		 */
+		/** If the parameters are assumed to be known and should not be optimised. */
 		public boolean known = true;
-		/**
-		 * Transform from world into this view
-		 */
-		public Se3_F64 worldToView = new Se3_F64();
-		/**
-		 * The camera associated with this view
-		 */
+		/** Transform from parent view into this view */
+		public Se3_F64 parent_to_view = new Se3_F64();
+		/** The camera associated with this view */
 		public int camera = -1;
+		/** Specifies parent's view ID. World frame = -1. Parent must be less than this view's ID. */
+		public int parent = -1;
 
 		public void reset() {
 			known = true;
-			worldToView.reset();
+			parent_to_view.reset();
 			camera = -1;
+			parent = -1;
 		}
 	}
 
@@ -258,41 +278,35 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	public static class Rigid {
 		public boolean known = false;
 
-		/**
-		 * Transform from world into the rigid object's frame
-		 */
-		public Se3_F64 objectToWorld = new Se3_F64();
+		/** Transform from world into the rigid object's frame */
+		public Se3_F64 object_to_world = new Se3_F64();
 
-		/**
-		 * Location of points in object's reference frame. The coordinate is always fixed.
-		 */
+		/** Location of points in object's reference frame. The coordinate is always fixed. */
 		public Point[] points;
 
-		/**
-		 * Index of the first point in the list
-		 */
+		/** Index of the first point in the list */
 		public int indexFirst;
 
 		public void reset() {
 			known = false;
-			objectToWorld.reset();
+			object_to_world.reset();
 			points = null;
 			indexFirst = -1;
 		}
 
-		public void setPoint( int which , double x , double y , double z ) {
-			points[which].set(x,y,z);
+		public void setPoint( int which, double x, double y, double z ) {
+			points[which].set(x, y, z);
 		}
 
-		public void setPoint( int which , double x , double y , double z , double w ) {
-			points[which].set(x,y,z,w);
+		public void setPoint( int which, double x, double y, double z, double w ) {
+			points[which].set(x, y, z, w);
 		}
 
-		public void getPoint(int which , Point3D_F64 p ) {
+		public void getPoint( int which, Point3D_F64 p ) {
 			points[which].get(p);
 		}
 
-		public void getPoint(int which , Point4D_F64 p ) {
+		public void getPoint( int which, Point4D_F64 p ) {
 			points[which].get(p);
 		}
 

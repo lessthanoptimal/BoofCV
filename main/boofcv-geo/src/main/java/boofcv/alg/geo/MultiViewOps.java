@@ -1708,7 +1708,7 @@ public class MultiViewOps {
 			for (int j = 0; j < sp.views.size; j++) {
 				int viewIdx = sp.views.get(j);
 				SceneStructureMetric.View v = structure.views.data[viewIdx];
-				worldToViews.add(v.worldToView);
+				worldToViews.add(v.parent_to_view);
 
 				// get the observation in pixels
 				Point2D_F64 n = normObs.grow();

@@ -35,19 +35,19 @@ import java.util.Set;
 public class BundleAdjustmentSchur<Structure extends SceneStructure, M extends DMatrix>
 		implements BundleAdjustment<Structure> {
 	// minimization algorithm
-	private UnconstrainedLeastSquaresSchur<M> minimizer;
+	private final UnconstrainedLeastSquaresSchur<M> minimizer;
 
-	private FunctionResiduals<Structure> function;
-	private Jacobian<Structure, M> jacobian;
+	private final FunctionResiduals<Structure> function;
+	private final Jacobian<Structure, M> jacobian;
 
 	private int maxIterations;
-	private double parameters[] = new double[0];
+	private double[] parameters = new double[0];
 
 	private volatile boolean stopRequested = false;
 
 	private double ftol, gtol;
 
-	private Codec<Structure> codec;
+	private final Codec<Structure> codec;
 
 	public BundleAdjustmentSchur( UnconstrainedLeastSquaresSchur<M> minimizer,
 								  FunctionResiduals<Structure> function,
