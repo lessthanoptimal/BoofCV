@@ -160,7 +160,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Now that the metric upgrade is known add it to work graph
 		SceneWorkingGraph.View wtarget = workGraph.addView(utils.viewC);
-		db.lookupShape(wtarget.pview.id,wtarget.imageDimension);
+		db.lookupShape(wtarget.pview.id, wtarget.imageDimension);
 
 		// Find the metric upgrade of the target
 		upgradeToMetric(wtarget, projectiveHomography.getCalibrationHomography());
@@ -277,9 +277,9 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		Point3D_F64 foundX = new Point3D_F64();
 		for (int featIdx = 0; featIdx < numFeatures; featIdx++) {
 			AssociatedTriple a = triples.get(featIdx);
-			viewObs1.set(featIdx, featIdx, (float) a.p1.x, (float) a.p1.y);
-			viewObs2.set(featIdx, featIdx, (float) a.p2.x, (float) a.p2.y);
-			viewObs3.set(featIdx, featIdx, (float) a.p3.x, (float) a.p3.y);
+			viewObs1.set(featIdx, featIdx, (float)a.p1.x, (float)a.p1.y);
+			viewObs2.set(featIdx, featIdx, (float)a.p2.x, (float)a.p2.y);
+			viewObs3.set(featIdx, featIdx, (float)a.p3.x, (float)a.p3.y);
 
 			normalize1.compute(a.p1.x, a.p1.y, pixelNorms.get(0));
 			normalize2.compute(a.p2.x, a.p2.y, pixelNorms.get(1));
@@ -300,9 +300,9 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			throw new RuntimeException("Handle this");
 
 		// copy results for output
-		wview3.intrinsic.set((BundlePinholeSimplified) structure.cameras.get(2).model);
-		view1_to_view2H.set(structure.views.get(1).parent_to_view);
-		view1_to_target.set(structure.views.get(2).parent_to_view);
+		wview3.intrinsic.set((BundlePinholeSimplified)structure.cameras.get(2).model);
+		view1_to_view2H.set(structure.getParentToView(1));
+		view1_to_target.set(structure.getParentToView(2));
 
 		if (verbose != null) {
 			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f)\n",

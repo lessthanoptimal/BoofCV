@@ -20,6 +20,8 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestSceneStructureMetric {
 	@Test
-	public void assignIDsToRigidPoints() {
-		SceneStructureMetric scene = new SceneStructureMetric(false);
+	void assignIDsToRigidPoints() {
+		var scene = new SceneStructureMetric(false);
 
-		scene.initialize(1, 2, 3, 2);
+		scene.initialize(1, 2, 2, 3, 2);
 		scene.setRigid(0, false, new Se3_F64(), 2);
 		scene.setRigid(1, true, new Se3_F64(), 3);
 
@@ -47,5 +49,40 @@ public class TestSceneStructureMetric {
 
 		assertEquals(0, scene.rigids.data[0].indexFirst);
 		assertEquals(2, scene.rigids.data[1].indexFirst);
+	}
+
+	@Test
+	void getParentToView() {
+		var scene = new SceneStructureMetric(false);
+
+		scene.initialize(1, 3, 4);
+		// add a motion to make the index off by one
+		scene.addMotion(false, new Se3_F64());
+		for (int i = 0; i < scene.views.size; i++) {
+			scene.setView(i, true, SpecialEuclideanOps_F64.eulerXyz(i, 0, 0, 0, 0, 0, null));
+		}
+		for (int i = 0; i < scene.views.size; i++) {
+			assertEquals(i, scene.getParentToView(i).T.x, UtilEjml.TEST_F64);
+		}
+	}
+
+	@Test
+	void getWorldToView() {
+		var scene = new SceneStructureMetric(false);
+
+		scene.initialize(1, 4, 4);
+
+		// Create a chained scene
+		for (int i = 0; i < scene.views.size; i++) {
+			scene.setView(i, true, SpecialEuclideanOps_F64.eulerXyz(i + 1, 0, 0, 0, 0, 0, null), i - 1);
+		}
+
+		// See if the views properly concatenate
+		int location = 1;
+		for (int viewIdx = 0; viewIdx < scene.views.size; viewIdx++) {
+			SceneStructureMetric.View v = scene.views.data[viewIdx];
+			assertEquals(location, scene.getWorldToView(v, null, null).T.x, UtilEjml.TEST_F64);
+			location += viewIdx + 2;
+		}
 	}
 }

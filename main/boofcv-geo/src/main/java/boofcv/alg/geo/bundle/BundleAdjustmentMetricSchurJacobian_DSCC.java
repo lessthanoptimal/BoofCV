@@ -22,7 +22,9 @@ import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DMatrixSparseTriplet;
+import org.ejml.data.IGrowArray;
 import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.sparse.csc.CommonOps_DSCC;
 
 /**
  * Computes the Jacobian for {@link BundleAdjustmentSchur_DSCC} using sparse matrices
@@ -34,17 +36,32 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		extends BundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> {
 	DMatrixSparseTriplet leftTriplet = new DMatrixSparseTriplet(1, 1, 1);
 	DMatrixSparseTriplet rightTriplet = new DMatrixSparseTriplet(1, 1, 1);
+	IGrowArray work = new IGrowArray();
 
 	@Override
 	public void process( double[] input, DMatrixSparseCSC left, DMatrixSparseCSC right ) {
 		internalProcess(input, leftTriplet, rightTriplet);
 
-		ConvertDMatrixStruct.convert(leftTriplet, left);
-		ConvertDMatrixStruct.convert(rightTriplet, right);
+		ConvertDMatrixStruct.convert(leftTriplet, left, work);
+		ConvertDMatrixStruct.convert(rightTriplet, right, work);
+
+		// There is no good way to do an element-wise add in these sparse data structures. What it does here is
+		// allow you to construct an invalid matrix with too many elements with the same coordinate. Then below
+		// it will find those duplicates and add them all together. This situation is actually not common and requires
+		// the same motion to be referenced by multiple elements in a chain of relative views.
+		// NOTE: If profiling shows this to be a bottleneck it's possible to detect this rare situation and skip this
+		//       step entirely.
+		CommonOps_DSCC.duplicatesAdd(left, work);
+		CommonOps_DSCC.duplicatesAdd(right, work);
 	}
 
 	@Override
 	protected void set( DMatrix matrix, int row, int col, double value ) {
+		((DMatrixSparseTriplet)matrix).addItem(row, col, value);
+	}
+
+	@Override
+	protected void add( DMatrix matrix, int row, int col, double value ) {
 		((DMatrixSparseTriplet)matrix).addItem(row, col, value);
 	}
 }

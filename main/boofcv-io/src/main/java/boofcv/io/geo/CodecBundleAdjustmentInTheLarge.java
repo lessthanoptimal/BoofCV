@@ -153,15 +153,16 @@ public class CodecBundleAdjustmentInTheLarge {
 		for (int viewIdx = 0; viewIdx < scene.views.size; viewIdx++) {
 			SceneStructureMetric.View view = scene.views.data[viewIdx];
 			BundlePinholeSnavely camera = scene.cameras.get(view.camera).getModel();
+			Se3_F64 parent_to_view = scene.getParentToView(viewIdx);
 
-			ConvertRotation3D_F64.matrixToRodrigues(view.parent_to_view.R, axisAngle);
+			ConvertRotation3D_F64.matrixToRodrigues(parent_to_view.R, axisAngle);
 
 			double axisX = axisAngle.unitAxisRotation.x*axisAngle.theta;
 			double axisY = axisAngle.unitAxisRotation.y*axisAngle.theta;
 			double axisZ = axisAngle.unitAxisRotation.z*axisAngle.theta;
 
 			writer.printf("%.10f\n%.10f\n%.10f\n", axisX, axisY, axisZ);
-			writer.printf("%.10f\n%.10f\n%.10f\n", view.parent_to_view.T.x, view.parent_to_view.T.y, view.parent_to_view.T.z);
+			writer.printf("%.10f\n%.10f\n%.10f\n", parent_to_view.T.x, parent_to_view.T.y, parent_to_view.T.z);
 			writer.printf("%.10f\n%.10f\n%.10f\n", camera.f, camera.k1, camera.k2);
 		}
 

@@ -22,6 +22,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
 
@@ -38,9 +39,13 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  */
 public class SceneStructureMetric extends SceneStructureCommon {
 
+	/** List of views. A view is composed of a camera model and it's pose. */
 	public final FastQueue<View> views = new FastQueue<>(View::new, View::reset);
 
-	// data structures for rigid objects.
+	/** List of motions for the views that specifies their spatial relationship */
+	public final FastQueue<Motion> motions = new FastQueue<>(Motion::new, Motion::reset);
+
+	/** List of rigid objects. A rigid object is a group of 3D points that have a known relationship with each other. */
 	public final FastQueue<Rigid> rigids = new FastQueue<>(Rigid::new, Rigid::reset);
 	// Lookup table from rigid point to rigid object
 	public int[] lookupRigid;
@@ -62,7 +67,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalPoints Number of points
 	 */
 	public void initialize( int totalCameras, int totalViews, int totalPoints ) {
-		initialize(totalCameras, totalViews, totalPoints, 0);
+		initialize(totalCameras, totalViews, totalViews, totalPoints, 0);
 	}
 
 	/**
@@ -70,13 +75,18 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 *
 	 * @param totalCameras Number of cameras
 	 * @param totalViews Number of views
+	 * @param totalMotions Number of motions
 	 * @param totalPoints Number of points
 	 * @param totalRigid Number of rigid objects
 	 */
-	public void initialize( int totalCameras, int totalViews, int totalPoints, int totalRigid ) {
+	public void initialize( int totalCameras, int totalViews, int totalMotions, int totalPoints, int totalRigid ) {
+		// Declare enough memory to store all the motions, but the way motions are constructed they are grown
+		motions.resize(totalMotions);
+
 		// Reset first so that when it resizes it will call reset() on each object
 		cameras.reset();
 		views.reset();
+		motions.reset();
 		points.reset();
 		rigids.reset();
 
@@ -111,6 +121,53 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
+	 * Returns SE3 relationship to the specified view from it's parent.
+	 *
+	 * @param view The target view
+	 * @return SE3 transform from parent to view.
+	 */
+	public Se3_F64 getParentToView( View view ) {
+		return motions.get(view.parent_to_view).motion;
+	}
+
+	public Se3_F64 getParentToView( int viewIdx ) {
+		View v = views.get(viewIdx);
+		return motions.get(v.parent_to_view).motion;
+	}
+
+	/**
+	 * Computes and returns the transform from world to view. If the view is relative then the chain
+	 * is followed
+	 *
+	 * @param view The target view
+	 * @param world_to_view Storage for the found transform. Can be null.
+	 * @param tmp Optional workspace to avoid creating new memory. Can be null;
+	 * @return SE3 transform from parent to view.
+	 */
+	public Se3_F64 getWorldToView( View view,
+								   @Nullable Se3_F64 world_to_view,
+								   @Nullable Se3_F64 tmp ) {
+		if (world_to_view == null)
+			world_to_view = new Se3_F64();
+
+		if (tmp == null)
+			tmp = new Se3_F64();
+
+		world_to_view.set(getParentToView(view));
+
+		while (view.parent != null) {
+			view = view.parent;
+			Se3_F64 parent_to_view = getParentToView(view);
+
+			// world_to_view is really view_to_child
+			parent_to_view.concat(world_to_view, tmp);
+			world_to_view.set(tmp);
+		}
+
+		return world_to_view;
+	}
+
+	/**
 	 * Returns true if the scene contains rigid objects
 	 */
 	public boolean hasRigid() {
@@ -120,28 +177,54 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	/**
 	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
 	 *
-	 * @param which Which view is being specified/
-	 * @param fixed If these parameters are fixed or not
+	 * @param viewIndex Which view is being specified.
+	 * @param known If these parameters are fixed or not
 	 * @param world_to_view The transform from world to view reference frames. Internal copy is saved.
 	 */
-	public void setView( int which, boolean fixed, Se3_F64 world_to_view ) {
-		views.get(which).known = fixed;
-		views.get(which).parent_to_view.set(world_to_view);
+	public void setView( int viewIndex, boolean known, Se3_F64 world_to_view ) {
+		views.get(viewIndex).parent_to_view = addMotion(known, world_to_view);
 	}
 
 	/**
 	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
 	 *
-	 * @param which Which view is being specified/
-	 * @param fixed If these parameters are fixed or not
+	 * @param viewIndex Which view is being specified.
+	 * @param known If the parameters are known and not optimized or unknown and optimized
 	 * @param parent_to_view The transform from parent to view reference frames. Internal copy is saved.
-	 * @param parent ID / index of the parent this this view is relatiev to
+	 * @param parent ID / index of the parent this this view is relative to
 	 */
-	public void setView( int which, boolean fixed, Se3_F64 parent_to_view, int parent ) {
-		assertBoof(parent < which, "Parent must be less than which");
-		views.get(which).known = fixed;
-		views.get(which).parent = parent;
-		views.get(which).parent_to_view.set(parent_to_view);
+	public void setView( int viewIndex, boolean known, Se3_F64 parent_to_view, int parent ) {
+		assertBoof(parent < viewIndex, "Parent must be less than viewIndex");
+		views.get(viewIndex).parent_to_view = addMotion(known, parent_to_view);
+		views.get(viewIndex).parent = parent >= 0 ? views.get(parent) : null;
+	}
+
+	/**
+	 * Specifies which motion is attached to a view
+	 *
+	 * @param viewIndex Which view is being specified.
+	 * @param motionIndex The motion that describes the parent_to_view relationship
+	 * @param parent ID / index of the parent this this view is relative to
+	 */
+	public void connectViewToMotion( int viewIndex, int motionIndex, int parent ) {
+		assertBoof(parent < viewIndex, "Parent must be less than viewIndex");
+		views.get(viewIndex).parent_to_view = motionIndex;
+		views.get(viewIndex).parent = parent >= 0 ? views.get(parent) : null;
+	}
+
+	/**
+	 * Specifies a new motion.
+	 *
+	 * @param known If the parameters are known and not optimized or unknown and optimized
+	 * @param motion The value of the motion
+	 * @return Index or ID for the created motion
+	 */
+	public int addMotion( boolean known, Se3_F64 motion ) {
+		int index = motions.size;
+		Motion m = motions.grow();
+		m.known = known;
+		m.motion.set(motion);
+		return index;
 	}
 
 	/**
@@ -149,13 +232,13 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * Rigid objects are useful in known scenes with calibration targets.
 	 *
 	 * @param which Index of rigid object
-	 * @param fixed If the pose is known or not
+	 * @param known If the parameters are known and not optimized or unknown and optimized
 	 * @param worldToObject Initial estimated location of rigid object
 	 * @param totalPoints Total number of points attached to this rigid object
 	 */
-	public void setRigid( int which, boolean fixed, Se3_F64 worldToObject, int totalPoints ) {
+	public void setRigid( int which, boolean known, Se3_F64 worldToObject, int totalPoints ) {
 		Rigid r = rigids.data[which] = new Rigid();
-		r.known = fixed;
+		r.known = known;
 		r.object_to_world.set(worldToObject);
 		r.points = new Point[totalPoints];
 		for (int i = 0; i < totalPoints; i++) {
@@ -191,14 +274,14 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
-	 * Returns the number of view with parameters that are not fixed
+	 * Returns the number of motions with parameters that are not fixed
 	 *
 	 * @return non-fixed view count
 	 */
-	public int getUnknownViewCount() {
+	public int getUnknownMotionCount() {
 		int total = 0;
-		for (int i = 0; i < views.size; i++) {
-			if (!views.get(i).known) {
+		for (int i = 0; i < motions.size; i++) {
+			if (!motions.get(i).known) {
 				total++;
 			}
 		}
@@ -224,9 +307,6 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * Returns total number of points associated with rigid objects.
 	 */
 	public int getTotalRigidPoints() {
-		if (rigids == null)
-			return 0;
-
 		int total = 0;
 		for (int i = 0; i < rigids.size; i++) {
 			total += rigids.data[i].points.length;
@@ -241,7 +321,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	@Override
 	public int getParameterCount() {
-		return getUnknownViewCount()*6 + getUnknownRigidCount()*6 + points.size*pointSize + getUnknownCameraParameterCount();
+		return getUnknownMotionCount()*6 + getUnknownRigidCount()*6 + points.size*pointSize + getUnknownCameraParameterCount();
 	}
 
 	public FastQueue<View> getViews() {
@@ -251,23 +331,38 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	public FastQueue<Rigid> getRigids() { return rigids; }
 
 	/**
-	 * Observations from a camera of points.
+	 * Describes a view from a camera at a particular point. References are provided to the data structures which
+	 * provide the intrinsic and extrinsic parameters. A view contains no parameters that are optimized directly
+	 * but instead describes the graph's structure.
 	 */
 	public static class View {
-		/** If the parameters are assumed to be known and should not be optimised. */
-		public boolean known = true;
-		/** Transform from parent view into this view */
-		public Se3_F64 parent_to_view = new Se3_F64();
+		/** Which motion specifies the transform from parent to this view's reference frame */
+		public int parent_to_view = -1;
 		/** The camera associated with this view */
 		public int camera = -1;
-		/** Specifies parent's view ID. World frame = -1. Parent must be less than this view's ID. */
-		public int parent = -1;
+		/** Points to the parent view or null if world is parent. Parent must be less than this view's ID. */
+		public @Nullable View parent;
+
+		public void reset() {
+			parent_to_view = -1;
+			camera = -1;
+			parent = null;
+		}
+	}
+
+	/**
+	 * Describes the relationship between two views. Multiple pairs of views can reference the same motion. This
+	 * is useful if a set of cameras are rigidly mounted, e.g. stereo cameras.
+	 */
+	public static class Motion {
+		/** If the parameters are assumed to be known and should not be optimised. */
+		public boolean known;
+		/** Transform from parent view into this view */
+		public final Se3_F64 motion = new Se3_F64();
 
 		public void reset() {
 			known = true;
-			parent_to_view.reset();
-			camera = -1;
-			parent = -1;
+			motion.reset();
 		}
 	}
 
@@ -276,10 +371,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * in the rigid body's reference frame is constant.
 	 */
 	public static class Rigid {
-		public boolean known = false;
+		/** If the parameters are assumed to be known and should not be optimised. */
+		public boolean known;
 
 		/** Transform from world into the rigid object's frame */
-		public Se3_F64 object_to_world = new Se3_F64();
+		public final Se3_F64 object_to_world = new Se3_F64();
 
 		/** Location of points in object's reference frame. The coordinate is always fixed. */
 		public Point[] points;

@@ -124,7 +124,7 @@ class TestBundleAdjustmentMetricResidualFunction {
 	void chainedRelativeViews( boolean homogenous ) {
 		SceneStructureMetric structure = createScene(rand, homogenous, false, false);
 		// Make each view be relative to the previous view
-		structure.views.forIdx(( i, v ) -> v.parent = i - 1);
+		structure.views.forIdx(( i, v ) -> v.parent = i > 0 ? structure.views.data[i - 1] : null);
 
 		double[] param = new double[structure.getParameterCount()];
 
@@ -141,8 +141,8 @@ class TestBundleAdjustmentMetricResidualFunction {
 		alg.process(param, original);
 
 		// Now change view[1]. This should change residuals in 1,2,3 but not 0
-		structure.views.get(1).parent_to_view.T.x += 0.2;
-		structure.views.get(1).parent_to_view.T.y += 0.2;
+		structure.getParentToView(1).T.x += 0.2;
+		structure.getParentToView(1).T.y += 0.2;
 
 		new CodecSceneStructureMetric().encode(structure, param);
 		alg.process(param, found);

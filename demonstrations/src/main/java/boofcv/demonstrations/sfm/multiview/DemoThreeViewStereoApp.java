@@ -91,7 +91,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	JPanel gui = new JPanel();
 	AssociatedTriplePanel guiMatches = new AssociatedTriplePanel();
-	AssociatedTriplePanel guiInliers= new AssociatedTriplePanel();
+	AssociatedTriplePanel guiInliers = new AssociatedTriplePanel();
 	ImagePanel guiImage = new ImagePanel();
 	ImagePanel guiDisparity = new ImagePanel();
 	RectifiedPairPanel rectifiedPanel = new RectifiedPairPanel(true);
@@ -127,13 +127,13 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	ImageGray disparity;
 
 	// Visualized Disparity
-	BufferedImage visualDisparity = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
-	BufferedImage visualRect1     = new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB);
-	BufferedImage visualRect2     = new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage visualDisparity = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage visualRect1 = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage visualRect2 = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 
-	Planar<GrayU8> rectColor1 = new Planar<>(GrayU8.class, 1,1, 3);
-	Planar<GrayU8> rectColor2 = new Planar<>(GrayU8.class, 1,1, 3);
-	GrayU8 rectMask = new GrayU8(1,1);
+	Planar<GrayU8> rectColor1 = new Planar<>(GrayU8.class, 1, 1, 3);
+	Planar<GrayU8> rectColor2 = new Planar<>(GrayU8.class, 1, 1, 3);
+	GrayU8 rectMask = new GrayU8(1, 1);
 
 	final Object lockProcessing = new Object();
 	boolean processing = false;
@@ -143,7 +143,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	// after that you might be tweaking a setting and don't want the view to change
 	boolean automaticChangeViews = false;
 
-	public DemoThreeViewStereoApp(List<PathLabel> examples) {
+	public DemoThreeViewStereoApp( List<PathLabel> examples ) {
 		super(true, false, examples, ImageType.single(GrayU8.class));
 		useCustomOpenFiles = true;
 
@@ -157,7 +157,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			featureSets[i] = new GrowQueue_I32();
 		}
 
-		rectifiedPanel.setImages(visualRect1,visualRect2);
+		rectifiedPanel.setImages(visualRect1, visualRect2);
 		guiDisparity.setImage(visualDisparity);
 
 		gui.setLayout(new BorderLayout());
@@ -166,27 +166,27 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, gui);
 
-		setPreferredSize(new Dimension(900,700));
-		structureEstimator.setVerbose(System.out,null);
+		setPreferredSize(new Dimension(900, 700));
+		structureEstimator.setVerbose(System.out, null);
 	}
 
 	@Override
-	protected String selectRecentFileName(List<File> filePaths) {
+	protected String selectRecentFileName( List<File> filePaths ) {
 		File f = filePaths.get(0);
-		File path = new File(f.getParentFile().getName(),f.getName());
+		File path = new File(f.getParentFile().getName(), f.getName());
 		return path.getPath();
 	}
 
 	@Override
 	protected void openFileMenuBar() {
-		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,3);
-		if( files == null )
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY, 3);
+		if (files == null)
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openFiles(BoofMiscOps.toFileList(files),true));
+		BoofSwingUtil.invokeNowOrLater(() -> openFiles(BoofMiscOps.toFileList(files), true));
 	}
 
 	@Override
-	protected void customAddToFileMenu(JMenu menuFile) {
+	protected void customAddToFileMenu( JMenu menuFile ) {
 		menuFile.addSeparator();
 
 		JMenuItem itemSaveCalibration = new JMenuItem("Save Calibration");
@@ -211,29 +211,29 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		CameraPinholeBrown intrinsic02 = this.intrinsic02;
 		Se3_F64 leftToRight = this.leftToRight;
 
-		if( intrinsic01 == null || intrinsic02 == null || leftToRight == null ) {
+		if (intrinsic01 == null || intrinsic02 == null || leftToRight == null) {
 			JOptionPane.showMessageDialog(this, "No calibration to save");
 			return;
 		}
 
 		String home = BoofSwingUtil.getDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY);
-		File f = BoofSwingUtil.fileChooser(null,this,false,home,null, BoofSwingUtil.FileTypes.YAML);
-		if( f == null )
+		File f = BoofSwingUtil.fileChooser(null, this, false, home, null, BoofSwingUtil.FileTypes.YAML);
+		if (f == null)
 			return;
-		BoofSwingUtil.saveDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,f);
+		BoofSwingUtil.saveDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY, f);
 
-		f = BoofSwingUtil.ensureSuffix(f,".yaml");
+		f = BoofSwingUtil.ensureSuffix(f, ".yaml");
 
 		StereoParameters stereo = new StereoParameters();
 		stereo.left = intrinsic01;
 		stereo.right = intrinsic02;
 		stereo.rightToLeft = leftToRight.invert(null);
 
-		CalibrationIO.save(stereo,f.getAbsolutePath());
+		CalibrationIO.save(stereo, f.getAbsolutePath());
 	}
 
 	private void saveRectified() {
-		if( rectColor1.width == 1 ) {
+		if (rectColor1.width == 1) {
 			JOptionPane.showMessageDialog(this, "Not yet rectified");
 			return;
 		}
@@ -248,32 +248,32 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 
 		File parent = fileChooser.getSelectedFile();
-		BoofSwingUtil.saveDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,parent);
+		BoofSwingUtil.saveDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY, parent);
 
-		UtilImageIO.saveImage(visualRect1,new File(parent,"rectified_left.png").getAbsolutePath());
-		UtilImageIO.saveImage(visualRect2,new File(parent,"rectified_right.png").getAbsolutePath());
+		UtilImageIO.saveImage(visualRect1, new File(parent, "rectified_left.png").getAbsolutePath());
+		UtilImageIO.saveImage(visualRect2, new File(parent, "rectified_right.png").getAbsolutePath());
 	}
 
 	private void saveDisparity() {
 		ImageGray disparity = this.disparity;
-		if( disparity == null )
+		if (disparity == null)
 			return;
-		BoofSwingUtil.saveDisparityDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,disparity);
+		BoofSwingUtil.saveDisparityDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY, disparity);
 	}
 
 	private void savePointCloud() {
-		BoofSwingUtil.savePointCloudDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,guiPointCloud);
+		BoofSwingUtil.savePointCloudDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY, guiPointCloud);
 	}
 
 	@Override
-	protected boolean openCustomFiles(String[] filePaths, List<String> outSequence, List<String> outImages) {
-		assertBoof(filePaths.length==3,"Expected 3 images to be selected");
+	protected boolean openCustomFiles( String[] filePaths, List<String> outSequence, List<String> outImages ) {
+		assertBoof(filePaths.length == 3, "Expected 3 images to be selected");
 		outImages.addAll(Arrays.asList(filePaths));
 		return true;
 	}
 
 	void updateVisibleGui() {
-		if( gui.getComponentCount() > 0 )
+		if (gui.getComponentCount() > 0)
 			gui.remove(0);
 
 		switch (controls.view) {
@@ -304,27 +304,27 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	 * Prevent the user from tring to process more than one image at once
 	 */
 	@Override
-	public void openImageSet(boolean reopen, String ...files ) {
+	public void openImageSet( boolean reopen, String... files ) {
 		// Make sure it recomputes everything when a new image set is opened
-		if(!reopen) {
+		if (!reopen) {
 			automaticChangeViews = true;
 			controls.scaleChanged = true;
 			controls.assocChanged = true;
 			controls.stereoChanged = true;
 		}
 		synchronized (lockProcessing) {
-			if( processing ) {
+			if (processing) {
 				JOptionPane.showMessageDialog(this, "Still processing");
 				return;
 			}
 		}
 		// disable the menu until it finish processing the images
 		setMenuBarEnabled(false);
-		super.openImageSet(reopen,files);
+		super.openImageSet(reopen, files);
 	}
 
 	void handleComputePressed() {
-		if( isProcessing() ) {
+		if (isProcessing()) {
 			System.err.println("Not finished with previous computation");
 			return;
 		}
@@ -333,15 +333,15 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// scaled upon input
 		// if features changed the input doesn't need to be reloaded but the features need to be computed again
 		// this could be done slightly more efficiently by skipping loading
-		if( controls.scaleChanged || controls.featuresChanged ) {
+		if (controls.scaleChanged || controls.featuresChanged) {
 			reprocessInput();
 		} else {
 			exceptionOccurred = false;
 			boolean skipAssociate = false;
 			boolean skipSparseStructure = false;
-			if( !controls.assocChanged ) {
+			if (!controls.assocChanged) {
 				skipAssociate = true;
-				if( controls.stereoChanged ) {
+				if (controls.stereoChanged) {
 					skipSparseStructure = true;
 				}
 			}
@@ -353,32 +353,32 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			boolean _assoc = skipAssociate;
 			boolean _struct = skipSparseStructure;
 
-			new Thread(()-> safeProcessImages(_assoc, _struct)).start();
+			new Thread(() -> safeProcessImages(_assoc, _struct)).start();
 		}
 	}
 
 	@Override
-	protected void handleInputFailure(int source, String error) {
+	protected void handleInputFailure( int source, String error ) {
 		JOptionPane.showMessageDialog(this, error);
 		System.err.println(error);
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input ) {
 		synchronized (lockProcessing) {
 			hasAllImages = false;
 		}
 
 		BufferedImage buffered = scaleBuffered(bufferedIn);
 
-		if( sourceID == 0 ) {
+		if (sourceID == 0) {
 			exceptionOccurred = false;
-			BoofSwingUtil.invokeNowOrLater(()->{
+			BoofSwingUtil.invokeNowOrLater(() -> {
 				guiImage.setImage(buffered);
-				if( automaticChangeViews )
+				if (automaticChangeViews)
 					controls.setViews(0);
 			});
-		} else if( exceptionOccurred ) {
+		} else if (exceptionOccurred) {
 			// abort if something went wrong on a prior image
 			return;
 		}
@@ -392,15 +392,15 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			buff[sourceID] = buffered;
 
 			// assume the image center is the principle point
-			double cx = input.width / 2;
-			double cy = input.height / 2;
+			double cx = input.width/2;
+			double cy = input.height/2;
 
 			// detect features
 			if (controls.featuresChanged) {
 				controls.featuresChanged = false;
 				declareFeatureMatching();
 			}
-			detDesc.detect((GrayU8) input);
+			detDesc.detect((GrayU8)input);
 			locations[sourceID].resize(detDesc.getNumberOfFeatures());
 			features[sourceID].resize(detDesc.getNumberOfFeatures());
 			featureSets[sourceID].resize(detDesc.getNumberOfFeatures());
@@ -413,19 +413,19 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				featureSets[sourceID].data[i] = detDesc.getSet(i);
 			}
 			System.out.println("   found features " + features[sourceID].size);
-		} catch( RuntimeException e ) {
+		} catch (RuntimeException e) {
 			// Mark the problem, log the error, notify the user
 			exceptionOccurred = true;
 			e.printStackTrace();
-			BoofSwingUtil.invokeNowOrLater(()-> {
+			BoofSwingUtil.invokeNowOrLater(() -> {
 				controls.clearText();
 				controls.addText("Failed computing features!\n" + e.getMessage() + "\n");
 			});
-			BoofSwingUtil.warningDialog(this,e);
+			BoofSwingUtil.warningDialog(this, e);
 			return;
 		}
 
-		if( sourceID < 2 && !exceptionOccurred )
+		if (sourceID < 2 && !exceptionOccurred)
 			return;
 
 		synchronized (lockProcessing) {
@@ -435,16 +435,16 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		controls.scaleChanged = false;
 		controls.assocChanged = false;
 		controls.stereoChanged = false;
-		safeProcessImages(false,false);
+		safeProcessImages(false, false);
 	}
 
 	private void declareFeatureMatching() {
 		detDesc = (DetectDescribePoint)controls.controlsDetDescAssoc.createDetectDescribe(GrayU8.class);
 		associate = controls.controlsDetDescAssoc.createAssociate(detDesc);
 		associate = FactoryAssociation.ensureUnique(associate);
-		associateThree = new AssociateThreeByPairs<>(associate,detDesc.getDescriptionType());
+		associateThree = new AssociateThreeByPairs<>(associate, detDesc.getDescriptionType());
 		for (int i = 0; i < 3; i++) {
-			features[i] = UtilFeature.createQueue(detDesc,100);
+			features[i] = UtilFeature.createQueue(detDesc, 100);
 		}
 	}
 
@@ -458,52 +458,52 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	 * Scale buffered image so that it meets the image size restrictions
 	 */
 	private BufferedImage scaleBuffered( BufferedImage input ) {
-		int m = Math.max(input.getWidth(),input.getHeight());
-		if( m <= controls.maxImageSize )
+		int m = Math.max(input.getWidth(), input.getHeight());
+		if (m <= controls.maxImageSize)
 			return input;
 		else {
 			double scale = controls.maxImageSize/(double)m;
-			int w = (int)(scale*input.getWidth()+0.5);
-			int h = (int)(scale*input.getHeight()+0.5);
+			int w = (int)(scale*input.getWidth() + 0.5);
+			int h = (int)(scale*input.getHeight() + 0.5);
 
 			// Use BoofCV to down sample since Graphics2D introduced too many aliasing artifacts
 			int numBands = ConvertBufferedImage.numChannels(input);
 
-			Planar<GrayU8> a = new Planar<>(GrayU8.class,input.getWidth(),input.getHeight(),numBands);
-			Planar<GrayU8> b = new Planar<>(GrayU8.class,w,h,numBands);
-			ConvertBufferedImage.convertFrom(input,a,true);
-			AverageDownSampleOps.down(a,b);
-			BufferedImage output = new BufferedImage(w,h,input.getType());
-			ConvertBufferedImage.convertTo(b,output,true);
+			Planar<GrayU8> a = new Planar<>(GrayU8.class, input.getWidth(), input.getHeight(), numBands);
+			Planar<GrayU8> b = new Planar<>(GrayU8.class, w, h, numBands);
+			ConvertBufferedImage.convertFrom(input, a, true);
+			AverageDownSampleOps.down(a, b);
+			BufferedImage output = new BufferedImage(w, h, input.getType());
+			ConvertBufferedImage.convertTo(b, output, true);
 			return output;
 		}
 	}
 
-	private void safeProcessImages( boolean skipAssociate , boolean skipSparseStructure ) {
+	private void safeProcessImages( boolean skipAssociate, boolean skipSparseStructure ) {
 		// bad stuff happens if processing is called twice at once
 		synchronized (lockProcessing) {
-			if( processing )
+			if (processing)
 				throw new RuntimeException("Called processing while processing!");
-			if( !hasAllImages )
+			if (!hasAllImages)
 				throw new RuntimeException("Called when not ready");
 			processing = true;
 		}
 
 		// prevent user from opening another image at the same time
-		SwingUtilities.invokeLater(()->setMenuBarEnabled(false));
+		SwingUtilities.invokeLater(() -> setMenuBarEnabled(false));
 
 		// Display a dialog that shows it's processing
 		ProcessThread progress = new ProcessThread(this);
 		progress.start();
 
 		try {
-			processImages(skipAssociate,skipSparseStructure);
-		} catch (RuntimeException e ) {
+			processImages(skipAssociate, skipSparseStructure);
+		} catch (RuntimeException e) {
 			e.printStackTrace();
-			controls.addText("Failed! "+e.getMessage());
-			BoofSwingUtil.warningDialog(this,e);
+			controls.addText("Failed! " + e.getMessage());
+			BoofSwingUtil.warningDialog(this, e);
 		} finally {
-			SwingUtilities.invokeLater(()->setMenuBarEnabled(true));
+			SwingUtilities.invokeLater(() -> setMenuBarEnabled(true));
 			progress.stopThread();
 
 			synchronized (lockProcessing) {
@@ -512,25 +512,25 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 	}
 
-	private void processImages( boolean skipAssociate , boolean skipStructure ) {
+	private void processImages( boolean skipAssociate, boolean skipStructure ) {
 		boolean _automaticChangeViews = this.automaticChangeViews;
 		this.automaticChangeViews = false;
 
 		int width = buff[0].getWidth();
 		int height = buff[0].getHeight();
 
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			controls.disableComputeButton();
 			controls.clearText();
-			controls.addText(width+" x "+height+"\n");
+			controls.addText(width + " x " + height + "\n");
 		});
 
 		long time0 = System.currentTimeMillis();
 
-		double cx = width/2;
-		double cy = height/2;
+		final double cx = (double)(width/2);
+		final double cy = (double)(height/2);
 
-		if( !skipAssociate ) {
+		if (!skipAssociate) {
 			System.out.println("Associating three views");
 			associateThree.initialize(detDesc.getNumberOfSets());
 			associateThree.setFeaturesA(features[0], featureSets[0]);
@@ -548,26 +548,26 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			// Show work in progress and items are computed
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				for (int i = 0; i < 3; i++) {
-					controls.addText(String.format("Feats[%d] %d\n",i,features[i].size));
+					controls.addText(String.format("Feats[%d] %d\n", i, features[i].size));
 				}
-				controls.addText("Associated "+associated.size+"\n");
+				controls.addText("Associated " + associated.size + "\n");
 				guiMatches.setPixelOffset(cx, cy);
 				guiMatches.setImages(buff[0], buff[1], buff[2]);
 				guiMatches.setAssociation(associated.toList());
-				guiInliers.setPixelOffset(cx,cy);
+				guiInliers.setPixelOffset(cx, cy);
 				guiInliers.setImages(buff[0], buff[1], buff[2]);
 				guiInliers.setAssociation(new ArrayList<>());
-				if( _automaticChangeViews )
+				if (_automaticChangeViews)
 					controls.setViews(1);
 			});
 		} else {
-			SwingUtilities.invokeLater(()-> controls.addText("Skipping Associate\n"));
+			SwingUtilities.invokeLater(() -> controls.addText("Skipping Associate\n"));
 		}
 
-		if( !skipStructure ) {
+		if (!skipStructure) {
 			structureEstimator.configRansac.inlierThreshold = controls.inliers;
-			structureEstimator.pruneFraction = (100-controls.prune)/100.0;
-			if( controls.autoFocal ) {
+			structureEstimator.pruneFraction = (100 - controls.prune)/100.0;
+			if (controls.autoFocal) {
 				structureEstimator.manualFocalLength = -1;
 			} else {
 				structureEstimator.manualFocalLength = controls.focal;
@@ -576,32 +576,32 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			//structureEstimator.setVerbose(System.out,0);
 			System.out.println("Computing 3D structure. triplets " + associated.size);
 			if (!structureEstimator.process(associated.toList(), width, height)) {
-				SwingUtilities.invokeLater(()-> controls.addText("SBA Failed!\n"));
+				SwingUtilities.invokeLater(() -> controls.addText("SBA Failed!\n"));
 				return;
 			}
 
-			SwingUtilities.invokeLater(()->{
+			SwingUtilities.invokeLater(() -> {
 				guiInliers.setAssociation(structureEstimator.ransac.getMatchSet());
-				if( _automaticChangeViews )
+				if (_automaticChangeViews)
 					controls.setViews(2);
 				int n = structureEstimator.ransac.getMatchSet().size();
 				double score = structureEstimator.bundleAdjustment.getFitScore();
 				int numObs = structureEstimator.observations.getObservationCount();
 				int numPoints = structureEstimator.structure.points.size;
-				controls.addText(String.format("Inliers %d\n",n));
+				controls.addText(String.format("Inliers %d\n", n));
 				controls.addText("Initial Intrinsic\n");
 				for (int i = 0; i < 3; i++) {
 					CameraPinhole c = structureEstimator.listPinhole.get(i);
-					controls.addText(String.format("  fx=%6.1f fy=%6.1f sk=%.2f\n",c.fx,c.fy,c.skew));
+					controls.addText(String.format("  fx=%6.1f fy=%6.1f sk=%.2f\n", c.fx, c.fy, c.skew));
 				}
 
 				controls.addText("SBA Intrinsic\n");
 				for (int i = 0; i < 3; i++) {
 					BundlePinholeSimplified c = structureEstimator.structure.cameras.get(i).getModel();
-					controls.addText(String.format("  f=%.1f k1=%.2f k2=%.2f\n",c.f,c.k1,c.k2));
+					controls.addText(String.format("  f=%.1f k1=%.2f k2=%.2f\n", c.f, c.k1, c.k2));
 				}
-				controls.addText(String.format("SBA Obs %4d Pts %d\n",numObs,numPoints));
-				controls.addText(String.format("SBA fit score %.3f\n",score));
+				controls.addText(String.format("SBA Obs %4d Pts %d\n", numObs, numPoints));
+				controls.addText(String.format("SBA fit score %.3f\n", score));
 			});
 		} else {
 			SwingUtilities.invokeLater(() -> controls.addText("Skipping Structure\n"));
@@ -610,19 +610,19 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// Pick the two best views to compute stereo from
 		int[] selected = selectBestPair(structureEstimator.structure);
 
-		if ( !computeStereoCloud(selected[0],selected[1], cx, cy,skipStructure,_automaticChangeViews) )
+		if (!computeStereoCloud(selected[0], selected[1], cx, cy, skipStructure, _automaticChangeViews))
 			return;
 
 		long time1 = System.currentTimeMillis();
-		SwingUtilities.invokeLater(()->{
-			controls.addText(String.format("ET %d (ms)",time1-time0));
+		SwingUtilities.invokeLater(() -> {
+			controls.addText(String.format("ET %d (ms)", time1 - time0));
 		});
 		System.out.println("Success!");
 	}
 
-	private boolean computeStereoCloud( int view0 , int view1, double cx, double cy, boolean skipRectify,
-										boolean _automaticChangeViews) {
-		if( !skipRectify ) {
+	private boolean computeStereoCloud( int view0, int view1, double cx, double cy, boolean skipRectify,
+										boolean _automaticChangeViews ) {
+		if (!skipRectify) {
 			System.out.println("Computing rectification: views " + view0 + " " + view1);
 			SceneStructureMetric structure = structureEstimator.getStructure();
 
@@ -636,8 +636,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view1].width, dimensions[view1].height);
 			intrinsic02.fsetRadial(cp.k1, cp.k2);
 
-			Se3_F64 w_to_0 = structure.views.data[view0].parent_to_view;
-			Se3_F64 w_to_1 = structure.views.data[view1].parent_to_view;
+			Se3_F64 w_to_0 = structure.getParentToView(view0);
+			Se3_F64 w_to_1 = structure.getParentToView(view1);
 
 			leftToRight = w_to_0.invert(null).concat(w_to_1, null);
 
@@ -650,7 +650,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			rectifyImages(color1, color2, leftToRight, intrinsic01, intrinsic02,
 					rectColor1, rectColor2, rectMask, rectifiedK, rectifiedR);
 
-			SwingUtilities.invokeLater(() -> controls.addText("Rectified Image: "+rectColor1.width+" x "+rectColor1.height+"\n"));
+			SwingUtilities.invokeLater(() -> controls.addText("Rectified Image: " + rectColor1.width + " x " + rectColor1.height + "\n"));
 
 			visualRect1 = ConvertBufferedImage.checkDeclare(
 					rectColor1.width, rectColor1.height, visualRect1, visualRect1.getType());
@@ -660,7 +660,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			ConvertBufferedImage.convertTo(rectColor2, visualRect2, true);
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				rectifiedPanel.setImages(visualRect1, visualRect2);
-				if( _automaticChangeViews )
+				if (_automaticChangeViews)
 					controls.setViews(3);
 			});
 		} else {
@@ -668,33 +668,33 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 
 		if (rectifiedK.get(0, 0) < 0) {
-			SwingUtilities.invokeLater(()-> controls.addText("Rectification Failed!\n"));
+			SwingUtilities.invokeLater(() -> controls.addText("Rectification Failed!\n"));
 			return false;
 		}
 
 		int disparityRange = controls.controlDisparity.getDisparityRange();
-		System.out.println("Computing disparity. range="+disparityRange);
-		disparity = computeDisparity(rectColor1,rectColor2);
+		System.out.println("Computing disparity. range=" + disparityRange);
+		disparity = computeDisparity(rectColor1, rectColor2);
 
 		// remove annoying false points
-		if( disparity instanceof GrayU8)
-			RectifyImageOps.applyMask((GrayU8)disparity,rectMask,0);
+		if (disparity instanceof GrayU8)
+			RectifyImageOps.applyMask((GrayU8)disparity, rectMask, 0);
 		else
-			RectifyImageOps.applyMask((GrayF32)disparity,rectMask,0);
+			RectifyImageOps.applyMask((GrayF32)disparity, rectMask, 0);
 
 		visualDisparity = ConvertBufferedImage.checkDeclare(
-				disparity.width,disparity.height,visualDisparity,visualDisparity.getType());
+				disparity.width, disparity.height, visualDisparity, visualDisparity.getType());
 
-		BoofSwingUtil.invokeNowOrLater(()-> {
-			controls.addText("Associated "+associated.size+"\n");
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			controls.addText("Associated " + associated.size + "\n");
 			VisualizeImageData.disparity(disparity, visualDisparity, disparityRange, 0);
 			guiDisparity.setImageRepaint(visualDisparity);
-			if( _automaticChangeViews )
+			if (_automaticChangeViews)
 				controls.setViews(4);
 		});
 
 		System.out.println("Computing Point Cloud");
-		showPointCloud(disparity,visualRect1,leftToRight,rectifiedK,rectifiedR,_automaticChangeViews);
+		showPointCloud(disparity, visualRect1, leftToRight, rectifiedK, rectifiedR, _automaticChangeViews);
 
 		return true;
 	}
@@ -704,33 +704,33 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	 * z-axis
 	 */
 	private int[] selectBestPair( SceneStructureMetric structure ) {
-		Se3_F64 w_to_0 = structure.views.data[0].parent_to_view;
-		Se3_F64 w_to_1 = structure.views.data[1].parent_to_view;
-		Se3_F64 w_to_2 = structure.views.data[2].parent_to_view;
+		Se3_F64 w_to_0 = structure.getParentToView(0);
+		Se3_F64 w_to_1 = structure.getParentToView(1);
+		Se3_F64 w_to_2 = structure.getParentToView(2);
 
-		Se3_F64 view0_to_1 = w_to_0.invert(null).concat(w_to_1,null);
-		Se3_F64 view0_to_2 = w_to_0.invert(null).concat(w_to_2,null);
-		Se3_F64 view1_to_2 = w_to_1.invert(null).concat(w_to_2,null);
+		Se3_F64 view0_to_1 = w_to_0.invert(null).concat(w_to_1, null);
+		Se3_F64 view0_to_2 = w_to_0.invert(null).concat(w_to_2, null);
+		Se3_F64 view1_to_2 = w_to_1.invert(null).concat(w_to_2, null);
 
-		Se3_F64 candidates[] = new Se3_F64[]{view0_to_1,view0_to_2,view1_to_2};
+		Se3_F64[] candidates = new Se3_F64[]{view0_to_1, view0_to_2, view1_to_2};
 
 		int best = -1;
 		double bestScore = Double.MAX_VALUE;
 		for (int i = 0; i < candidates.length; i++) {
 			double s = score(candidates[i]);
-			System.out.println("stereo score["+i+"] = "+s);
-			if( s < bestScore ) {
+			System.out.println("stereo score[" + i + "] = " + s);
+			if (s < bestScore) {
 				bestScore = s;
 				best = i;
 			}
 		}
 
-		switch (best) {
-			case 0: return new int[]{0,1};
-			case 1: return new int[]{0,2};
-			case 2: return new int[]{1,2};
-		}
-		throw new RuntimeException("BUG!");
+		return switch (best) {
+			case 0 -> new int[]{0, 1};
+			case 1 -> new int[]{0, 2};
+			case 2 -> new int[]{1, 2};
+			default -> throw new RuntimeException("BUG!");
+		};
 	}
 
 	/**
@@ -742,9 +742,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		double x = Math.abs(se.T.x);
 		double y = Math.abs(se.T.y);
-		double z = Math.abs(se.T.z)+1e-8;
+		double z = Math.abs(se.T.z) + 1e-8;
 
-		double r = Math.max(x/(y+z),y/(x+z));
+		double r = Math.max(x/(y + z), y/(x + z));
 
 //		System.out.println(se.T+"  angle="+rod.theta);
 
@@ -752,18 +752,17 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		return 1.0/r; // ignoring rotation seems to work better <shrug>
 	}
 
-
-	public <C extends ImageBase<C> >
-	void rectifyImages(C distorted1,
-					   C distorted2,
-					   Se3_F64 leftToRight,
-					   CameraPinholeBrown intrinsic1,
-					   CameraPinholeBrown intrinsic2,
-					   C rectified1,
-					   C rectified2,
-					   GrayU8 rectifiedMask,
-					   DMatrixRMaj rectifiedK,
-					   DMatrixRMaj rectifiedR) {
+	public <C extends ImageBase<C>>
+	void rectifyImages( C distorted1,
+						C distorted2,
+						Se3_F64 leftToRight,
+						CameraPinholeBrown intrinsic1,
+						CameraPinholeBrown intrinsic2,
+						C rectified1,
+						C rectified2,
+						GrayU8 rectifiedMask,
+						DMatrixRMaj rectifiedK,
+						DMatrixRMaj rectifiedR ) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
@@ -782,34 +781,33 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		// Maximize the view of the left image and adjust the size of the rectified image
 		ImageDimension rectifiedShape = new ImageDimension();
-		RectifyImageOps.fullViewLeft(intrinsic1, rect1, rect2, rectifiedK,rectifiedShape);
+		RectifyImageOps.fullViewLeft(intrinsic1, rect1, rect2, rectifiedK, rectifiedShape);
 //		RectifyImageOps.allInsideLeft(intrinsic1, rect1, rect2, rectifiedK,rectifiedShape);
 
 		// undistorted and rectify images
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3);
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
-		ImageDistort<C,C> distortLeft =
+		ImageDistort<C, C> distortLeft =
 				RectifyDistortImageOps.rectifyImage(intrinsic1, rect1_F32, BorderType.EXTENDED, distorted1.getImageType());
-		ImageDistort<C,C> distortRight =
+		ImageDistort<C, C> distortRight =
 				RectifyDistortImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.EXTENDED, distorted2.getImageType());
 
-		rectifiedMask.reshape(rectifiedShape.width,rectifiedShape.height);
-		rectified1.reshape(rectifiedShape.width,rectifiedShape.height);
-		rectified2.reshape(rectifiedShape.width,rectifiedShape.height);
+		rectifiedMask.reshape(rectifiedShape.width, rectifiedShape.height);
+		rectified1.reshape(rectifiedShape.width, rectifiedShape.height);
+		rectified2.reshape(rectifiedShape.width, rectifiedShape.height);
 
 		distortLeft.apply(distorted1, rectified1, rectifiedMask);
 		distortRight.apply(distorted2, rectified2);
 	}
 
-	public ImageGray computeDisparity( Planar<GrayU8> rectColor1 , Planar<GrayU8> rectColor2 )
-	{
-		GrayU8 rectifiedLeft = new GrayU8(rectColor1.width,rectColor1.height);
-		GrayU8 rectifiedRight = new GrayU8(rectColor2.width,rectColor2.height);
-		ConvertImage.average(rectColor1,rectifiedLeft);
-		ConvertImage.average(rectColor2,rectifiedRight);
+	public ImageGray computeDisparity( Planar<GrayU8> rectColor1, Planar<GrayU8> rectColor2 ) {
+		GrayU8 rectifiedLeft = new GrayU8(rectColor1.width, rectColor1.height);
+		GrayU8 rectifiedRight = new GrayU8(rectColor2.width, rectColor2.height);
+		ConvertImage.average(rectColor1, rectifiedLeft);
+		ConvertImage.average(rectColor2, rectifiedRight);
 
 		// compute disparity
 		StereoDisparity disparityAlg = controls.controlDisparity.createAlgorithm();
@@ -821,10 +819,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	/**
 	 * Show results as a point cloud
 	 */
-	public void showPointCloud(ImageGray disparity, BufferedImage left,
-							   Se3_F64 motion, DMatrixRMaj rectifiedK , DMatrixRMaj rectifiedR,
-							   boolean _automaticChangeViews )
-	{
+	public void showPointCloud( ImageGray disparity, BufferedImage left,
+								Se3_F64 motion, DMatrixRMaj rectifiedK, DMatrixRMaj rectifiedR,
+								boolean _automaticChangeViews ) {
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
 		double baseline = motion.getT().norm();
@@ -832,22 +829,22 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		int disparityRange = controls.controlDisparity.getDisparityRange();
 
 		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);
-		d2c.process(disparity, UtilDisparitySwing.wrap(left),cloud);
+		d2c.process(disparity, UtilDisparitySwing.wrap(left), cloud);
 
-		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
+		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK, disparity.width, disparity.height, null);
 
 		PointCloudViewer pcv = guiPointCloud;
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
-		if( _automaticChangeViews ) // snape back to home position
+		if (_automaticChangeViews) // snape back to home position
 			pcv.setCameraToWorld(new Se3_F64());
 		pcv.clearPoints();
-		pcv.addCloud(cloud.cloudXyz,cloud.cloudRgb);
+		pcv.addCloud(cloud.cloudXyz, cloud.cloudRgb);
 		pcv.setDotSize(1);
 		pcv.setTranslationStep(baseline/10);
 
 		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
 
-		if( _automaticChangeViews ) {
+		if (_automaticChangeViews) {
 			BoofSwingUtil.invokeNowOrLater(() -> controls.setViews(5));
 		}
 	}
@@ -855,8 +852,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
-	private static class ProcessThread extends ProgressMonitorThread
-	{
+	private static class ProcessThread extends ProgressMonitorThread {
 		int state = 0;
 
 		public ProcessThread( JComponent owner ) {
@@ -867,20 +863,20 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		public void doRun() {
 			SwingUtilities.invokeLater(() -> {
 				monitor.setProgress(state);
-				state = (++state % 100);
+				state = (++state%100);
 			});
 		}
 	}
 
 	private static PathLabel createExample( String name ) {
-		String path0 = UtilIO.pathExample("triple/"+name+"_01.jpg");
-		String path1 = UtilIO.pathExample("triple/"+name+"_02.jpg");
-		String path2 = UtilIO.pathExample("triple/"+name+"_03.jpg");
+		String path0 = UtilIO.pathExample("triple/" + name + "_01.jpg");
+		String path1 = UtilIO.pathExample("triple/" + name + "_02.jpg");
+		String path2 = UtilIO.pathExample("triple/" + name + "_03.jpg");
 
-		return new PathLabel(name,path0,path1,path2);
+		return new PathLabel(name, path0, path1, path2);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(createExample("rock_leaves"));
@@ -895,7 +891,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		examples.add(createExample("triflowers"));
 		examples.add(createExample("turkey"));
 
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			DemoThreeViewStereoApp app = new DemoThreeViewStereoApp(examples);
 
 			// Processing time takes a bit so don't open right away

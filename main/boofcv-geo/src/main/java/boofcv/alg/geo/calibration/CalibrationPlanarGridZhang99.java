@@ -214,7 +214,7 @@ public class CalibrationPlanarGridZhang99 {
 										   List<CalibrationObservation> obs ) {
 
 		structure = new SceneStructureMetric(false);
-		structure.initialize(1,motions.size(),layout.size(),1);
+		structure.initialize(1,motions.size(), -1, layout.size(),1);
 
 		observations = new SceneObservations();
 		observations.initialize(motions.size(),true);

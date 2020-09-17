@@ -57,10 +57,10 @@ import static boofcv.examples.stereo.ExampleTrifocalStereoUncalibrated.computeSt
  * </p>
  *
  * <p>
- *     A summary of the algorithm is provided below. There are many ways in which it can be improved upon, but would
- *     increase the complexity. There is also no agreed upon best solution found in the literature and the solution
- *     presented below is "impractical" because of its sensitivity to tuning parameters. If you got a solution
- *     which does a better job let us know!
+ * A summary of the algorithm is provided below. There are many ways in which it can be improved upon, but would
+ * increase the complexity. There is also no agreed upon best solution found in the literature and the solution
+ * presented below is "impractical" because of its sensitivity to tuning parameters. If you got a solution
+ * which does a better job let us know!
  * </p>
  *
  * <ol>
@@ -82,7 +82,7 @@ import static boofcv.examples.stereo.ExampleTrifocalStereoUncalibrated.computeSt
  */
 public class ExampleStereoUncalibrated {
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		// Solution below is unstable. Turning concurrency off so that it always produces a valid solution
 		// The two view case is very challenging and I've not seen a stable algorithm yet
 		BoofConcurrency.USE_CONCURRENT = false;
@@ -105,14 +105,14 @@ public class ExampleStereoUncalibrated {
 //		String name = "skull_";
 //		String name = "turkey_";
 
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"01.jpg"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"02.jpg"));
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "01.jpg"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "02.jpg"));
 
-		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true, ImageType.pl(3,GrayU8.class));
-		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true, ImageType.pl(3,GrayU8.class));
+		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01, true, ImageType.pl(3, GrayU8.class));
+		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02, true, ImageType.pl(3, GrayU8.class));
 
-		GrayU8 image01 = ConvertImage.average(color01,null);
-		GrayU8 image02 = ConvertImage.average(color02,null);
+		GrayU8 image01 = ConvertImage.average(color01, null);
+		GrayU8 image02 = ConvertImage.average(color02, null);
 
 		// Find a set of point feature matches
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(buff01, buff02);
@@ -133,22 +133,22 @@ public class ExampleStereoUncalibrated {
 
 		// Compute a transform from projective to metric by assuming we know the camera's calibration
 		var estimateV = new EstimatePlaneAtInfinityGivenK();
-		estimateV.setCamera1(fx,fy,0,cx,cy);
-		estimateV.setCamera2(fx,fy,0,cx,cy);
+		estimateV.setCamera1(fx, fy, 0, cx, cy);
+		estimateV.setCamera2(fx, fy, 0, cx, cy);
 
 		var v = new Vector3D_F64(); // plane at infinity
-		if( !estimateV.estimatePlaneAtInfinity(P2,v))
+		if (!estimateV.estimatePlaneAtInfinity(P2, v))
 			throw new RuntimeException("Failed!");
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(fx,fy,0,cx,cy);
-		DMatrixRMaj H = MultiViewOps.createProjectiveToMetric(K,v.x,v.y,v.z,1,null);
-		DMatrixRMaj P2m = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.mult(P2,H,P2m);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(fx, fy, 0, cx, cy);
+		DMatrixRMaj H = MultiViewOps.createProjectiveToMetric(K, v.x, v.y, v.z, 1, null);
+		DMatrixRMaj P2m = new DMatrixRMaj(3, 4);
+		CommonOps_DDRM.mult(P2, H, P2m);
 
 		// Decompose and get the initial estimate for translation
-		var tmp = new DMatrixRMaj(3,3);
+		var tmp = new DMatrixRMaj(3, 3);
 		var view1_to_view2 = new Se3_F64();
-		MultiViewOps.decomposeMetricCamera(P2m,tmp,view1_to_view2);
+		MultiViewOps.decomposeMetricCamera(P2m, tmp, view1_to_view2);
 
 		//------------------------- Setting up bundle adjustment
 		// bundle adjustment will provide a more refined and accurate estimate of these parameters
@@ -159,35 +159,35 @@ public class ExampleStereoUncalibrated {
 		var observations = new SceneObservations();
 
 		// We will assume that the camera has fixed intrinsic parameters
-		structure.initialize(1,2,inliers.size());
+		structure.initialize(1, 2, inliers.size());
 		observations.initialize(2);
 
 		var bp = new BundlePinholeSimplified();
 		bp.f = fx;
-		structure.setCamera(0,false,bp);
+		structure.setCamera(0, false, bp);
 
 		// The first view is the world coordinate system
-		structure.setView(0,true,new Se3_F64());
-		structure.connectViewToCamera(0,0);
+		structure.setView(0, true, new Se3_F64());
+		structure.connectViewToCamera(0, 0);
 		// Second view was estimated previously
-		structure.setView(1,false,view1_to_view2);
-		structure.connectViewToCamera(1,0);
+		structure.setView(1, false, view1_to_view2);
+		structure.connectViewToCamera(1, 0);
 
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedPair t = inliers.get(i);
 
 			// substract out the camera center from points. This allows a simple camera model to be used and
 			// errors in the this coordinate tend to be non-fatal
-			observations.getView(0).add(i,(float)(t.p1.x-cx),(float)(t.p1.y-cy));
-			observations.getView(1).add(i,(float)(t.p2.x-cx),(float)(t.p2.y-cy));
+			observations.getView(0).add(i, (float)(t.p1.x - cx), (float)(t.p1.y - cy));
+			observations.getView(1).add(i, (float)(t.p2.x - cx), (float)(t.p2.y - cy));
 
 			// each point is visible in both of the views
-			structure.connectPointToView(i,0);
-			structure.connectPointToView(i,1);
+			structure.connectPointToView(i, 0);
+			structure.connectPointToView(i, 1);
 		}
 
 		// initial location of points is found through triangulation
-		MultiViewOps.triangulatePoints(structure,observations);
+		MultiViewOps.triangulatePoints(structure, observations);
 
 		//------------------ Running Bundle Adjustment
 		System.out.println("Performing bundle adjustment");
@@ -200,26 +200,26 @@ public class ExampleStereoUncalibrated {
 		// Create and configure the bundle adjustment solver
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		// prints out useful debugging information that lets you know how well it's converging
-		bundleAdjustment.setVerbose(System.out,null);
+		bundleAdjustment.setVerbose(System.out, null);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-6, 1e-6, 100);
 
 		// Scaling improve accuracy of numerical calculations
 		var bundleScale = new ScaleSceneStructure();
-		bundleScale.applyScale(structure,observations);
+		bundleScale.applyScale(structure, observations);
 
-		bundleAdjustment.setParameters(structure,observations);
+		bundleAdjustment.setParameters(structure, observations);
 		bundleAdjustment.optimize(structure);
 
 		// Sometimes pruning outliers help improve the solution. In the stereo case the errors are likely
 		// to already fatal
-		var pruner = new PruneStructureFromSceneMetric(structure,observations);
+		var pruner = new PruneStructureFromSceneMetric(structure, observations);
 		pruner.pruneObservationsByErrorRank(0.85);
 		pruner.prunePoints(1);
-		bundleAdjustment.setParameters(structure,observations);
+		bundleAdjustment.setParameters(structure, observations);
 		bundleAdjustment.optimize(structure);
 
-		bundleScale.undoScale(structure,observations);
+		bundleScale.undoScale(structure, observations);
 
 		System.out.println("\nCamera");
 		for (int i = 0; i < structure.cameras.size; i++) {
@@ -227,18 +227,18 @@ public class ExampleStereoUncalibrated {
 		}
 		System.out.println("\n\nworldToView");
 		for (int i = 0; i < structure.views.size; i++) {
-			System.out.println(structure.views.data[i].parent_to_view.toString());
+			System.out.println(structure.getParentToView(i).toString());
 		}
 
 		// display the inlier matches found using the robust estimator
 		System.out.println("\n\nComputing Stereo Disparity");
 		BundlePinholeSimplified cp = structure.getCameras().get(0).getModel();
 		var intrinsic = new CameraPinholeBrown();
-		intrinsic.fsetK(cp.f,cp.f,0,cx,cy,width,height);
-		intrinsic.fsetRadial(cp.k1,cp.k2);
+		intrinsic.fsetK(cp.f, cp.f, 0, cx, cy, width, height);
+		intrinsic.fsetRadial(cp.k1, cp.k2);
 
-		Se3_F64 leftToRight = structure.views.data[1].parent_to_view;
+		Se3_F64 leftToRight = structure.getParentToView(1);
 
-		computeStereoCloud(image01,image02,color01,color02,intrinsic,intrinsic,leftToRight,0,250);
+		computeStereoCloud(image01, image02, color01, color02, intrinsic, intrinsic, leftToRight, 0, 250);
 	}
 }

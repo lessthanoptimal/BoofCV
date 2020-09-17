@@ -60,19 +60,23 @@ public class MetricBundleAdjustmentUtils {
 		sba.configure(configConverge.ftol, configConverge.gtol, configConverge.maxIterations);
 
 		sba.setParameters(structure, observations);
-		if( verbose != null ) verbose.println("SBA BEFORE        average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
-		if( !sba.optimize(structure) )
+		if (verbose != null)
+			verbose.println("SBA BEFORE        average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+		if (!sba.optimize(structure))
 			return false;
-		if( verbose != null ) verbose.println("SBA AFTER         average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+		if (verbose != null)
+			verbose.println("SBA AFTER         average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 
 		if (keepFraction < 1.0) {
 			// don't prune views since they might be required
 			prune(keepFraction, -1, 1);
 			sba.setParameters(structure, observations);
-			if (verbose != null) verbose.println("SBA PRUNED-BEFORE average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+			if (verbose != null)
+				verbose.println("SBA PRUNED-BEFORE average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 			if (!sba.optimize(structure))
 				return false;
-			if( verbose != null ) verbose.println("SBA PRUNED-AFTER  average error="+(Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
+			if (verbose != null)
+				verbose.println("SBA PRUNED-AFTER  average error=" + (Math.sqrt(sba.getFitScore())/observations.getObservationCount()));
 		}
 
 		if (configScale)
@@ -88,8 +92,10 @@ public class MetricBundleAdjustmentUtils {
 
 		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure, observations);
 		pruner.pruneObservationsByErrorRank(keepFraction);
-		if (pruneViews > 0)
+		if (pruneViews > 0) {
 			pruner.pruneViews(pruneViews);
+			pruner.pruneUnusedMotions();
+		}
 		pruner.prunePoints(prunePoints);
 	}
 

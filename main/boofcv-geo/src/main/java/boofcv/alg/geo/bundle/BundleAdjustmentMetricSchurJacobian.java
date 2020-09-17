@@ -39,7 +39,8 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.ReshapeMatrix;
 import org.ejml.dense.row.CommonOps_DDRM;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Computes the Jacobian for bundle adjustment with a Schur implementation. This is the base class
@@ -53,7 +54,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	private SceneObservations observations;
 
 	// number of views with parameters that are going to be adjusted
-	private int numViewsUnknown;
+	private int numMotionsUnknown;
 	private int numRigidUnknown;
 
 	// total number of parameters being optimized
@@ -69,8 +70,9 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	private final FastQueue<Se3_F64> storageSe3 = new FastQueue<>(Se3_F64::new);
 	private final FastQueue<DMatrixRMaj[]> storageSO3Jac = new FastQueue<>(this::declareRotJacStorage);
 	// Look up workspace by view ID when relative view. Only filled in when a relative view is encountered
-	private final TIntObjectMap<Se3_F64> mapWorldToView = new TIntObjectHashMap<>();
+	private final Map<SceneStructureMetric.View, Se3_F64> mapWorldToView = new HashMap<>();
 	private final TIntObjectMap<DMatrixRMaj[]> mapSO3Jac = new TIntObjectHashMap<>();
+	// If only one view will use a particular motion then we don't want to store the Jacobian for future use
 
 	// Workspace for world to view transform
 	private final Se3_F64 world_to_view = new Se3_F64();
@@ -92,12 +94,12 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	// first index for rigid body parameters
 	private int indexFirstRigid;
 	// index in parameters of the first point
-	private int indexFirstView;
-	private int indexLastView;
+	private int indexFirstMotion;
+	private int indexLastMotion;
 	// rigid to parameter index. Left side
 	private int[] rigidParameterIndexes;
 	// view to parameter index. Right side
-	private int[] viewParameterIndexes;
+	private int[] motionParameterIndexes;
 	// first index in input/parameters vector for each camera. Right side
 	private int[] cameraParameterIndexes;
 
@@ -115,7 +117,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 	// Storage for current view's partials of SO3
 	private DMatrixRMaj[] arraySO3 = new DMatrixRMaj[0];
-	private DMatrixRMaj accumulatedR = new DMatrixRMaj(3, 3);
+	private final DMatrixRMaj accumulatedR = new DMatrixRMaj(3, 3);
 	private final Point4D_F64 worldX = new Point4D_F64();
 	private final Point3D_F64 pt3 = new Point3D_F64();
 	private final DMatrixRMaj tmp3x3 = new DMatrixRMaj(3, 3);
@@ -136,13 +138,13 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 		//----- Precompute location of parameters for different structures
 		numRigidUnknown = structure.getUnknownRigidCount();
-		numViewsUnknown = structure.getUnknownViewCount();
+		numMotionsUnknown = structure.getUnknownMotionCount();
 		int numCameraParameters = structure.getUnknownCameraParameterCount();
 
 		indexFirstRigid = structure.points.size*lengthPoint;
-		indexFirstView = indexFirstRigid + numRigidUnknown*lengthSE3;
-		indexLastView = indexFirstView + numViewsUnknown*lengthSE3;
-		numParameters = indexLastView + numCameraParameters;
+		indexFirstMotion = indexFirstRigid + numRigidUnknown*lengthSE3;
+		indexLastMotion = indexFirstMotion + numMotionsUnknown*lengthSE3;
+		numParameters = indexLastMotion + numCameraParameters;
 
 		// precompute index of first parameter in each unknown rigid object. Left side
 		jacRigidS03 = new JacobianSo3[structure.rigids.size];
@@ -156,10 +158,10 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		}
 
 		// precompute index of first parameter for each unknown view. Right side
-		viewParameterIndexes = new int[structure.views.size];
-		for (int i = 0, index = 0; i < structure.views.size; i++) {
-			viewParameterIndexes[i] = index;
-			if (!structure.views.data[i].known) {
+		motionParameterIndexes = new int[structure.motions.size];
+		for (int i = 0, index = 0; i < structure.motions.size; i++) {
+			motionParameterIndexes[i] = index;
+			if (!structure.motions.data[i].known) {
 				index += lengthSE3;
 			}
 		}
@@ -192,11 +194,10 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		storageSe3.reset();
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			SceneStructureMetric.View v = structure.views.get(viewIdx);
-			if (v.parent == -1)
+			if (v.parent == null)
 				continue;
-			assertBoof(v.parent < viewIdx);
 			Se3_F64 world_to_view = storageSe3.grow();
-			mapWorldToView.put(viewIdx, world_to_view);
+			mapWorldToView.put(v, world_to_view);
 		}
 	}
 
@@ -219,17 +220,18 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		arraySO3 = arraySO3.length != lengthParam ? new DMatrixRMaj[lengthParam] : arraySO3;
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			SceneStructureMetric.View v = structure.views.get(viewIdx);
-			if (v.parent == -1)
+			if (v.parent == null)
 				continue;
 
 			// if this view is relative to another we don't need to store the Jacobian since we already have it
 			// However, the parent it refers to needs to be stored. We do not need to traverse back any more due
 			// since all potential ancestors have already been processed
-			SceneStructureMetric.View vp = structure.views.get(v.parent);
-			if (vp.known || mapSO3Jac.containsKey(v.parent))
+			SceneStructureMetric.View vp = v.parent;
+			SceneStructureMetric.Motion mp = structure.motions.get(vp.parent_to_view);
+			if (mp.known || mapSO3Jac.containsKey(vp.parent_to_view))
 				continue;
 
-			mapSO3Jac.put(v.parent, storageSO3Jac.grow());
+			mapSO3Jac.put(vp.parent_to_view, storageSO3Jac.grow());
 		}
 	}
 
@@ -245,9 +247,10 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 	private int computeGeneralPoints( DMatrix leftPoint, DMatrix rightView,
 									  double[] input, int observationIndex, int viewIndex,
-									  SceneStructureMetric.View view, SceneStructureCommon.Camera camera,
+									  SceneStructureCommon.Camera camera,
 									  int cameraParamStartIndex ) {
 		SceneObservations.View obsView = observations.views.get(viewIndex);
+		SceneStructureMetric.View strView = structure.views.get(viewIndex);
 
 		for (int i = 0; i < obsView.size(); i++) {
 			int featureIndex = obsView.point.get(i);
@@ -277,7 +280,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z,
 						pointGradX, pointGradY, true, calibGradX, calibGradY);
 
-				int location = indexLastView - indexFirstView + cameraParamStartIndex;
+				int location = indexLastMotion - indexFirstMotion + cameraParamStartIndex;
 				for (int j = 0; j < N; j++) {
 					set(rightView, jacRowX, location + j, calibGradX[j]);
 					set(rightView, jacRowY, location + j, calibGradY[j]);
@@ -288,9 +291,9 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 			}
 			//============ Partial of worldPt
 			if (structure.isHomogenous()) {
-				partialPointH(leftPoint, rightView, viewIndex, columnOfPointInJac);
+				partialPointH(leftPoint, rightView, strView, columnOfPointInJac);
 			} else {
-				partialPoint3(leftPoint, rightView, viewIndex, columnOfPointInJac);
+				partialPoint3(leftPoint, rightView, strView, columnOfPointInJac);
 			}
 
 			observationIndex++;
@@ -329,20 +332,21 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
 			SceneStructureMetric.View view = structure.views.data[viewIndex];
 			SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
+			SceneStructureMetric.Motion motion = structure.motions.data[view.parent_to_view];
 
-			if (!view.known) {
-				int paramIndex = viewParameterIndexes[viewIndex] + indexFirstView;
+			if (!motion.known) {
+				int paramIndex = motionParameterIndexes[view.parent_to_view] + indexFirstMotion;
 				jacSO3.setParameters(input, paramIndex);
 				paramIndex += jacSO3.getParameterLength();
 
-				view.parent_to_view.T.x = input[paramIndex];
-				view.parent_to_view.T.y = input[paramIndex + 1];
-				view.parent_to_view.T.z = input[paramIndex + 2];
+				motion.motion.T.x = input[paramIndex];
+				motion.motion.T.y = input[paramIndex + 1];
+				motion.motion.T.z = input[paramIndex + 2];
 
-				view.parent_to_view.getR().set(jacSO3.getRotationMatrix());
+				motion.motion.getR().set(jacSO3.getRotationMatrix());
 
 				// save the Jacobian if we need to
-				DMatrixRMaj[] savedJac = mapSO3Jac.get(viewIndex);
+				DMatrixRMaj[] savedJac = mapSO3Jac.get(view.parent_to_view);
 				if (savedJac != null) {
 					for (int i = 0; i < savedJac.length; i++) {
 						savedJac[i].set(jacSO3.getPartial(i));
@@ -350,25 +354,25 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				}
 			}
 
-			lookupWorldToView(view, view.parent_to_view, viewIndex, world_to_view);
+			lookupWorldToView(view, world_to_view);
 
 			int cameraParamStartIndex = cameraParameterIndexes[view.camera];
 			if (!camera.known) {
-				camera.model.setIntrinsic(input, indexLastView + cameraParamStartIndex);
+				camera.model.setIntrinsic(input, indexLastMotion + cameraParamStartIndex);
 			}
 
-			observationIndex = computeGeneralPoints(leftPoint, rightView, input, observationIndex, viewIndex, view, camera, cameraParamStartIndex);
+			observationIndex = computeGeneralPoints(leftPoint, rightView, input, observationIndex, viewIndex, camera, cameraParamStartIndex);
 			if (observations.hasRigid())
-				observationIndex = computeRigidPoints(leftPoint, rightView, observationIndex, viewIndex, view, camera, cameraParamStartIndex);
+				observationIndex = computeRigidPoints(leftPoint, rightView, observationIndex, viewIndex, camera, cameraParamStartIndex);
 		}
 	}
 
 	private int computeRigidPoints( DMatrix leftPoint, DMatrix rightView,
 									int observationIndex, int viewIndex,
-									SceneStructureMetric.View view,
 									SceneStructureCommon.Camera camera,
 									int cameraParamStartIndex ) {
 		SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
+		SceneStructureMetric.View view = structure.views.data[viewIndex];
 
 		for (int i = 0; i < obsView.size(); i++) {
 			int featureIndex = obsView.point.get(i);
@@ -394,7 +398,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z,
 						pointGradX, pointGradY, true, calibGradX, calibGradY);
 
-				int location = indexLastView - indexFirstView + cameraParamStartIndex;
+				int location = indexLastMotion - indexFirstMotion + cameraParamStartIndex;
 				for (int j = 0; j < N; j++) {
 					set(rightView, jacRowX, location + j, calibGradX[j]);
 					set(rightView, jacRowY, location + j, calibGradY[j]);
@@ -405,7 +409,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 			}
 
 			//============ Partial of world to view
-			partialViewSE3(rightView, viewIndex, worldPt3.x, worldPt3.y, worldPt3.z, 1);
+			partialViewSE3(rightView, view, worldPt3.x, worldPt3.y, worldPt3.z, 1);
 
 			//============ Partial of body to world
 			// R2*(R1*X+T1)+T2
@@ -427,24 +431,24 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	}
 
 	private void partialPoint3( DMatrix leftPoint, DMatrix rightView,
-								int viewIndex, int columnOfPointInJac ) {
+								SceneStructureMetric.View view, int columnOfPointInJac ) {
 		// partial of (R*X + T) with respect to X is a 3 by 3 matrix
 		// This turns out to be just R
 		// grad F(G(X)) = 2 x 3 matrix which is then multiplied by R
 		addToJacobian(leftPoint, columnOfPointInJac, pointGradX, pointGradY, world_to_view.R);
 
-		partialViewSE3(rightView, viewIndex, worldPt3.x, worldPt3.y, worldPt3.z, 1);
+		partialViewSE3(rightView, view, worldPt3.x, worldPt3.y, worldPt3.z, 1);
 	}
 
 	private void partialPointH( DMatrix leftPoint, DMatrix rightView,
-								int viewIndex, int columnOfPointInJac ) {
+								SceneStructureMetric.View view, int columnOfPointInJac ) {
 		// partial of (R*[x,y,z]' + T*w) with respect to X=[x,y,z,w] is a 3 by 4 matrix, [R|T]
 		//
 		// grad F(G(X)) = 2 x 4 matrix which is then multiplied by R
 		addToJacobian(leftPoint, columnOfPointInJac, pointGradX, pointGradY, world_to_view.R);
 		addToJacobian(leftPoint, columnOfPointInJac + 3, pointGradX, pointGradY, world_to_view.T);
 
-		partialViewSE3(rightView, viewIndex, worldPt4.x, worldPt4.y, worldPt4.z, worldPt4.w);
+		partialViewSE3(rightView, view, worldPt4.x, worldPt4.y, worldPt4.z, worldPt4.w);
 	}
 
 	/**
@@ -460,6 +464,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	 *
 	 * Current transform from view[i] to world (view[0]) can be written as:
 	 *      Tr(i,0) = Tr(i,i-1)*Tr(i-1,0)
+	 * where Tr = [R|T]
 	 * The Jacobian for R[i] is written as dot(R[i])*Tr(i-1,0)*X. When Generalized for any 'i' in the chain you get
 	 *      R[i]*R[i-1]*...*dot(R[j])*Tr(j-1,0)
 	 * For T[i] it's similar
@@ -468,11 +473,11 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	 * The chained view can be writen as a recursive formula where a rotation matrix is updated each iteration.
 	 */
 	private void partialViewSE3( DMatrix rightView,
-								 int viewIndex,
+								 SceneStructureMetric.View view,
 								 double X, double Y, double Z, double W ) {
 		{ // Abort if there is no partial derivative to compute
-			SceneStructureMetric.View view = structure.views.get(viewIndex);
-			if (view.known && view.parent == -1)
+			SceneStructureMetric.Motion motion = structure.motions.get(view.parent_to_view);
+			if (motion.known && view.parent == null)
 				return;
 		}
 
@@ -484,16 +489,16 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 		while (true) {
 			// Column in output matrix for this view
-			int col = viewParameterIndexes[viewIndex];
-			SceneStructureMetric.View view = structure.views.get(viewIndex);
+			SceneStructureMetric.Motion motion = structure.motions.get(view.parent_to_view);
+			int col = motionParameterIndexes[view.parent_to_view];
 
-			if (view.known) {
+			if (motion.known) {
 				// Since this view is known there will be no partial derivative. However, one of it's parents
 				// might not be known and will have a Jacobian
-				viewIndex = view.parent;
-				if (viewIndex == -1)
+				view = view.parent;
+				if (view == null)
 					break;
-				CommonOps_DDRM.mult(accumulatedR, view.parent_to_view.R, tmp3x3);
+				CommonOps_DDRM.mult(accumulatedR, motion.motion.R, tmp3x3);
 				accumulatedR.set(tmp3x3);
 				continue;
 			}
@@ -507,12 +512,12 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				}
 				jacobianSO3 = arraySO3;
 			} else {
-				jacobianSO3 = mapSO3Jac.get(viewIndex);
+				jacobianSO3 = mapSO3Jac.get(view.parent_to_view);
 			}
 
 			//============== Partial of view rotation parameters
 			final int paramLength = jacSO3.getParameterLength();
-			if (view.parent == -1) {
+			if (view.parent == null) {
 				for (int i = 0; i < paramLength; i++) {
 					CommonOps_DDRM.mult(accumulatedR, jacobianSO3[i], tmp3x3);
 					addToJacobian(rightView, col + i, pointGradX, pointGradY, tmp3x3, X, Y, Z);
@@ -535,17 +540,17 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 					sumX += r_ji*pointGradX[j];
 					sumY += r_ji*pointGradY[j];
 				}
-				set(rightView, jacRowX, col + paramLength + i, sumX*W);
-				set(rightView, jacRowY, col + paramLength + i, sumY*W);
+				add(rightView, jacRowX, col + paramLength + i, sumX*W);
+				add(rightView, jacRowY, col + paramLength + i, sumY*W);
 			}
 
 			// If there is a parent then traverse to it next
-			viewIndex = view.parent;
-			if (viewIndex == -1)
+			view = view.parent;
+			if (view == null)
 				break;
 
 			// accumulatedR = R[i,j]*R[j-1]
-			CommonOps_DDRM.mult(accumulatedR, view.parent_to_view.R, tmp3x3);
+			CommonOps_DDRM.mult(accumulatedR, motion.motion.R, tmp3x3);
 			accumulatedR.set(tmp3x3);
 		}
 	}
@@ -553,13 +558,12 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	/**
 	 * Finds the transform from world to view for the specified view by index
 	 */
-	private Se3_F64 getWorldToView( int viewIndex ) {
-		SceneStructureMetric.View view = structure.views.get(viewIndex);
+	private Se3_F64 getWorldToView( SceneStructureMetric.View view ) {
 		Se3_F64 world_to_view;
-		if (view.parent != -1) {
-			world_to_view = mapWorldToView.get(viewIndex);
+		if (view.parent != null) {
+			world_to_view = mapWorldToView.get(view);
 		} else {
-			world_to_view = view.parent_to_view;
+			world_to_view = structure.motions.get(view.parent_to_view).motion;
 		}
 		return world_to_view;
 	}
@@ -599,30 +603,30 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	/**
 	 * J[rows,col:(col+3)] =  [a;b]*R
 	 */
-	private void addToJacobian( DMatrix triplet, int col, double[] a, double[] b, DMatrixRMaj R ) {
-		set(triplet, jacRowX, col + 0, a[0]*R.data[0] + a[1]*R.data[3] + a[2]*R.data[6]);
-		set(triplet, jacRowX, col + 1, a[0]*R.data[1] + a[1]*R.data[4] + a[2]*R.data[7]);
-		set(triplet, jacRowX, col + 2, a[0]*R.data[2] + a[1]*R.data[5] + a[2]*R.data[8]);
+	private void addToJacobian( DMatrix matrix, int col, double[] a, double[] b, DMatrixRMaj R ) {
+		set(matrix, jacRowX, col + 0, a[0]*R.data[0] + a[1]*R.data[3] + a[2]*R.data[6]);
+		set(matrix, jacRowX, col + 1, a[0]*R.data[1] + a[1]*R.data[4] + a[2]*R.data[7]);
+		set(matrix, jacRowX, col + 2, a[0]*R.data[2] + a[1]*R.data[5] + a[2]*R.data[8]);
 
-		set(triplet, jacRowY, col + 0, b[0]*R.data[0] + b[1]*R.data[3] + b[2]*R.data[6]);
-		set(triplet, jacRowY, col + 1, b[0]*R.data[1] + b[1]*R.data[4] + b[2]*R.data[7]);
-		set(triplet, jacRowY, col + 2, b[0]*R.data[2] + b[1]*R.data[5] + b[2]*R.data[8]);
+		set(matrix, jacRowY, col + 0, b[0]*R.data[0] + b[1]*R.data[3] + b[2]*R.data[6]);
+		set(matrix, jacRowY, col + 1, b[0]*R.data[1] + b[1]*R.data[4] + b[2]*R.data[7]);
+		set(matrix, jacRowY, col + 2, b[0]*R.data[2] + b[1]*R.data[5] + b[2]*R.data[8]);
 	}
 
-	private void addToJacobian( DMatrix triplet, int col, double[] a, double[] b,
+	private void addToJacobian( DMatrix matrix, int col, double[] a, double[] b,
 								DMatrixRMaj R, double X, double Y, double Z ) {
 
 		double x = R.data[0]*X + R.data[1]*Y + R.data[2]*Z;
 		double y = R.data[3]*X + R.data[4]*Y + R.data[5]*Z;
 		double z = R.data[6]*X + R.data[7]*Y + R.data[8]*Z;
 
-		set(triplet, jacRowX, col, a[0]*x + a[1]*y + a[2]*z);
-		set(triplet, jacRowY, col, b[0]*x + b[1]*y + b[2]*z);
+		add(matrix, jacRowX, col, a[0]*x + a[1]*y + a[2]*z);
+		add(matrix, jacRowY, col, b[0]*x + b[1]*y + b[2]*z);
 	}
 
-	private void addToJacobian( DMatrix triplet, int col, double[] a, double[] b, Vector3D_F64 X ) {
-		set(triplet, jacRowX, col, a[0]*X.x + a[1]*X.y + a[2]*X.z);
-		set(triplet, jacRowY, col, b[0]*X.x + b[1]*X.y + b[2]*X.z);
+	private void addToJacobian( DMatrix matrix, int col, double[] a, double[] b, Vector3D_F64 X ) {
+		set(matrix, jacRowX, col, a[0]*X.x + a[1]*X.y + a[2]*X.z);
+		set(matrix, jacRowY, col, b[0]*X.x + b[1]*X.y + b[2]*X.z);
 	}
 
 	/**
@@ -631,25 +635,32 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	protected abstract void set( DMatrix matrix, int row, int col, double value );
 
 	/**
+	 * Abstract interface for adding the value of a matrix without knowing the type of matrix. The matrix
+	 * is assumed to have been initialized to zero.
+	 */
+	protected abstract void add( DMatrix matrix, int row, int col, double value );
+
+	/**
 	 * Returns a transform from the world_to_view. If relative then the parent's world to view is look up and used
 	 * to compute this view's transform and the results are saved.
 	 */
-	protected void lookupWorldToView( SceneStructureMetric.View v, Se3_F64 parent_to_view,
-									  int viewIndex, Se3_F64 world_to_view ) {
-		if (v.parent == -1) {
+	protected void lookupWorldToView( SceneStructureMetric.View v, Se3_F64 world_to_view ) {
+		Se3_F64 parent_to_view = structure.getParentToView(v);
+		if (v.parent == null) {
 			world_to_view.set(parent_to_view);
 			return;
 		}
-		Se3_F64 saved_world_to_view = mapWorldToView.get(viewIndex);
-		SceneStructureMetric.View parentView = structure.views.get(v.parent);
+		Se3_F64 saved_world_to_view = mapWorldToView.get(v);
+		SceneStructureMetric.View parentView = v.parent;
 
-		if (parentView.parent == -1) {
-			// world_to_parent * parent_to_view
-			parentView.parent_to_view.concat(parent_to_view, saved_world_to_view);
+		if (parentView.parent == null) {
+			// Parent is in reference to the world
+			Se3_F64 world_to_parent = structure.getParentToView(v.parent);
+			world_to_parent.concat(parent_to_view, saved_world_to_view);
 		} else {
 			// Since the parent must have a lower index it's transform is already known
 			Se3_F64 world_to_parent = mapWorldToView.get(v.parent);
-			world_to_parent.concat(v.parent_to_view, saved_world_to_view);
+			world_to_parent.concat(parent_to_view, saved_world_to_view);
 		}
 		world_to_view.set(saved_world_to_view);
 	}

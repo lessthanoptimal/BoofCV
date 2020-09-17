@@ -27,11 +27,13 @@ import org.ejml.data.DMatrixSparseCSC;
 public class TestBundleAdjustmentMetricSchurJacobian_DSCC
 		extends CommonBundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> {
 
-	@Override protected BundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> createAlg() {
+	@Override
+	protected BundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> createAlg() {
 		return new BundleAdjustmentMetricSchurJacobian_DSCC();
 	}
 
-	@Override protected SchurJacobian_to_NtoMxN<DMatrixSparseCSC>
+	@Override
+	protected SchurJacobian_to_NtoMxN<DMatrixSparseCSC>
 	createJacobian( BundleAdjustmentMetricSchurJacobian<DMatrixSparseCSC> alg ) {
 		return new SchurJacobian_to_NtoMxN.DSCC(alg);
 	}

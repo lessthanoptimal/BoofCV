@@ -140,10 +140,10 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		// errors if that's unmolested
 		SceneStructureMetric structure = a.d0;
 		for (int i = 1; i < structure.views.size; i++) {
-			SceneStructureMetric.View v = structure.views.data[i];
-			v.parent_to_view.T.x += rand.nextGaussian()*0.1;
-			v.parent_to_view.T.y += rand.nextGaussian()*0.1;
-			v.parent_to_view.T.z += rand.nextGaussian()*0.1;
+			Se3_F64 parent_to_view = structure.getParentToView(i);
+			parent_to_view.T.x += rand.nextGaussian()*0.1;
+			parent_to_view.T.y += rand.nextGaussian()*0.1;
+			parent_to_view.T.z += rand.nextGaussian()*0.1;
 		}
 
 		alg.setParameters(a.d0,a.d1);
@@ -173,10 +173,11 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		if( structure.homogenous ) {
 			Point4D_F64 p4 = new Point4D_F64();
 			Point3D_F64 p3 = new Point3D_F64();
-			for (int indexView = 0; indexView < observations.views.size; indexView++) {
-				SceneObservations.View v = observations.views.data[indexView];
+			for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
+				SceneObservations.View v = observations.views.data[viewIndex];
+				Se3_F64 parent_to_view = structure.getParentToView(viewIndex);
 
-				wcp.configure(intrinsic, structure.views.data[indexView].parent_to_view);
+				wcp.configure(intrinsic, parent_to_view);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points.data[o.index].get(p4);
@@ -191,10 +192,11 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			}
 		} else {
 			Point3D_F64 p3 = new Point3D_F64();
-			for (int indexView = 0; indexView < observations.views.size; indexView++) {
-				SceneObservations.View v = observations.views.data[indexView];
+			for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
+				SceneObservations.View v = observations.views.data[viewIndex];
+				Se3_F64 parent_to_view = structure.getParentToView(viewIndex);
 
-				wcp.configure(intrinsic, structure.views.data[indexView].parent_to_view);
+				wcp.configure(intrinsic, parent_to_view);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points.data[o.index].get(p3);
@@ -230,11 +232,11 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			}
 		}
 
-		for (int i = 0; i < a.views.size; i++) {
-			double error = a.views.data[i].parent_to_view.T.distance(b.views.data[i].parent_to_view.T);
+		for (int i = 0; i < a.motions.size; i++) {
+			double error = a.motions.data[i].motion.T.distance(b.motions.data[i].motion.T);
 			assertTrue( error < tolDistance );
-			assertTrue(MatrixFeatures_DDRM.isIdentical(a.views.data[i].parent_to_view.R,
-					b.views.data[i].parent_to_view.R,tolRotation));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(a.motions.data[i].motion.R,
+					b.motions.data[i].motion.R,tolRotation));
 		}
 
 	}
@@ -282,8 +284,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				// see which views it's visible in
 				int count = 0;
 				for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-					SceneStructureMetric.View v = structure.views.data[viewIndex];
-					wcp.configure(intrinsic, v.parent_to_view);
+					Se3_F64 parent_to_view = structure.getParentToView(viewIndex);
+					wcp.configure(intrinsic, parent_to_view);
 					wcp.transform(P, pixel);
 					if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 						count++;
@@ -291,8 +293,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				}
 				if (count >= 2) {
 					for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-						SceneStructureMetric.View v = structure.views.data[viewIndex];
-						wcp.configure(intrinsic, v.parent_to_view);
+						Se3_F64 parent_to_view = structure.getParentToView(viewIndex);
+						wcp.configure(intrinsic, parent_to_view);
 						wcp.transform(P, pixel);
 						if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 							observations.getView(viewIndex).add(featureIndex, (float) pixel.x, (float) pixel.y);

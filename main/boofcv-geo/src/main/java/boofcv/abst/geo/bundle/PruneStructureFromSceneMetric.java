@@ -21,16 +21,14 @@ package boofcv.abst.geo.bundle;
 import boofcv.alg.nn.KdTreePoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * makes it easy to removing elements from the scene's structure. Different criteria can be specified for each
@@ -58,15 +56,18 @@ public class PruneStructureFromSceneMetric {
 	 */
 	public void pruneObservationsByErrorRank( double inlierFraction ) {
 
-		Point2D_F64 observation = new Point2D_F64();
-		Point2D_F64 predicted = new Point2D_F64();
-		Point3D_F64 X = new Point3D_F64();
+		var observation = new Point2D_F64();
+		var predicted = new Point2D_F64();
+		var X = new Point3D_F64();
+		var world_to_view = new Se3_F64();
+		var tmp = new Se3_F64();
 
 		// Create a list of observation errors
 		List<Errors> errors = new ArrayList<>();
 		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
 			SceneObservations.View v = observations.views.data[viewIndex];
 			SceneStructureMetric.View view = structure.views.data[viewIndex];
+			structure.getWorldToView(view, world_to_view, tmp);
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				int pointID = v.point.data[pointIndex];
@@ -77,8 +78,8 @@ public class PruneStructureFromSceneMetric {
 				// Get observation in image pixels
 				v.get(pointIndex, observation);
 
-				// World to View
-				view.parent_to_view.transform(X, X);
+				// Find the point in this view
+				world_to_view.transform(X, X);
 
 				// predicted pixel
 				SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
@@ -140,11 +141,14 @@ public class PruneStructureFromSceneMetric {
 	 * since it can't possibly be observed.
 	 */
 	public void pruneObservationsBehindCamera() {
-		Point3D_F64 X = new Point3D_F64();
+		var X = new Point3D_F64();
+		var world_to_view = new Se3_F64();
+		var tmp = new Se3_F64();
 
 		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
 			SceneObservations.View v = observations.views.get(viewIndex);
 			SceneStructureMetric.View view = structure.views.get(viewIndex);
+			structure.getWorldToView(view, world_to_view, tmp);
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				SceneStructureCommon.Point f = structure.points.get(v.getPointId(pointIndex));
@@ -156,7 +160,7 @@ public class PruneStructureFromSceneMetric {
 					throw new RuntimeException("BUG!");
 
 				// World to View
-				view.parent_to_view.transform(X, X);
+				world_to_view.transform(X, X);
 
 				// Is the feature behind this view and can't be seen?
 				if (X.z <= 0) {
@@ -284,27 +288,34 @@ public class PruneStructureFromSceneMetric {
 	}
 
 	/**
-	 * Removes views with less than 'count' features visible. Observations of features in removed views are also
-	 * removed.
+	 * Removes views with less than or equal to 'count' features visible. Observations of features
+	 * in removed views are also removed. Views which are parents (after children than can be removed have been
+	 * removed) will remain since they are needed for the correct transform.
 	 *
-	 * @param count Prune if it has this number of views or less
+	 * @param count Prune if less than or equal to this many features
 	 */
 	public void pruneViews( int count ) {
-
 		GrowQueue_I32 removeIdx = new GrowQueue_I32();
+		Set<SceneStructureMetric.View> parents = new HashSet<>();
 
+		// Traverse in reverse order since parents always have an index less than the child. This way if an entire
+		// chain of views needs to be removed they will be removed
+		for (int viewId = structure.views.size - 1; viewId >= 0; viewId--) {
+			SceneObservations.View oview = observations.views.data[viewId];
+			SceneStructureMetric.View sview = structure.views.data[viewId];
 
-		for (int viewId = 0; viewId < structure.views.size; viewId++) {
-			SceneObservations.View view = observations.views.data[viewId];
-			// See if has enough observations to not prune
-			if (view.size() > count) {
+			// See if has enough observations to not prune or is a parent and can't be pruned
+			if (oview.size() > count || parents.contains(sview)) {
+				// mark it's parent as a parent
+				if (sview.parent != null)
+					parents.add(sview.parent);
 				continue;
 			}
 			removeIdx.add(viewId);
 
 			// Go through list of points and remove this view from them
-			for (int pointIdx = 0; pointIdx < view.point.size; pointIdx++) {
-				int pointId = view.getPointId(pointIdx);
+			for (int pointIdx = 0; pointIdx < oview.point.size; pointIdx++) {
+				int pointId = oview.getPointId(pointIdx);
 
 				int viewIdx = structure.points.data[pointId].views.indexOf(viewId);
 				if (viewIdx < 0)
@@ -331,7 +342,7 @@ public class PruneStructureFromSceneMetric {
 
 		// See which cameras need to be removed and create a look up table from old to new camera IDs
 		int[] oldToNew = new int[structure.cameras.size];
-		GrowQueue_I32 removeIdx = new GrowQueue_I32();
+		var removeIdx = new GrowQueue_I32();
 		for (int i = 0; i < structure.cameras.size; i++) {
 			if (histogram[i] > 0) {
 				oldToNew[i] = i - removeIdx.size();
@@ -347,6 +358,38 @@ public class PruneStructureFromSceneMetric {
 		for (int i = 0; i < structure.views.size; i++) {
 			SceneStructureMetric.View v = structure.views.data[i];
 			v.camera = oldToNew[v.camera];
+		}
+	}
+
+	/**
+	 * Prunes Motions that are not referenced by any views.
+	 */
+	public void pruneUnusedMotions() {
+		// Count how many views are used by each camera
+		int[] histogram = new int[structure.motions.size];
+
+		for (int i = 0; i < structure.views.size; i++) {
+			histogram[structure.views.data[i].parent_to_view]++;
+		}
+
+		// See which cameras need to be removed and create a look up table from old to new camera IDs
+		int[] oldToNew = new int[structure.motions.size];
+		var removeIdx = new GrowQueue_I32();
+		for (int i = 0; i < structure.motions.size; i++) {
+			if (histogram[i] > 0) {
+				oldToNew[i] = i - removeIdx.size();
+			} else {
+				removeIdx.add(i);
+			}
+		}
+
+		// Create the new camera array without the unused cameras
+		structure.motions.remove(removeIdx.data, 0, removeIdx.size, null);
+
+		// Update the references to the cameras
+		for (int i = 0; i < structure.views.size; i++) {
+			SceneStructureMetric.View v = structure.views.data[i];
+			v.parent_to_view = oldToNew[v.parent_to_view];
 		}
 	}
 

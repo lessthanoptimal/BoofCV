@@ -137,8 +137,8 @@ public class CalibrateStereoPlanar {
 
 		SceneStructureMetric structure = calib.getStructure();
 
-		for (int i = 0; i < structure.getViews().size; i++) {
-			location.add( structure.getViews().data[i].parent_to_view);
+		for (int i = 0; i < structure.motions.size; i++) {
+			location.add( structure.motions.data[i].motion);
 		}
 
 		return intrinsic;

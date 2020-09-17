@@ -99,21 +99,21 @@ public class MultiViewOps {
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
-	public static TrifocalTensor createTrifocal( DMatrixRMaj P2 , DMatrixRMaj P3 ,
+	public static TrifocalTensor createTrifocal( DMatrixRMaj P2, DMatrixRMaj P3,
 												 @Nullable TrifocalTensor ret ) {
-		if( ret == null )
+		if (ret == null)
 			ret = new TrifocalTensor();
 
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			DMatrixRMaj T = ret.getT(i);
 
 			int index = 0;
-			for( int j = 0; j < 3; j++ ) {
-				double a_left = P2.get(j,i);
-				double a_right = P2.get(j,3);
+			for (int j = 0; j < 3; j++) {
+				double a_left = P2.get(j, i);
+				double a_right = P2.get(j, 3);
 
-				for( int k = 0; k < 3; k++ ) {
-					T.data[index++] = a_left*P3.get(k,3) - a_right*P3.get(k,i);
+				for (int k = 0; k < 3; k++) {
+					T.data[index++] = a_left*P3.get(k, 3) - a_right*P3.get(k, i);
 				}
 			}
 		}
@@ -141,48 +141,48 @@ public class MultiViewOps {
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
-	public static TrifocalTensor createTrifocal( DMatrixRMaj P1 , DMatrixRMaj P2 , DMatrixRMaj P3 ,
+	public static TrifocalTensor createTrifocal( DMatrixRMaj P1, DMatrixRMaj P2, DMatrixRMaj P3,
 												 @Nullable TrifocalTensor ret ) {
-		if( ret == null )
+		if (ret == null)
 			ret = new TrifocalTensor();
 
 		// invariant to scale. So pick something more reasonable and maybe reduce overflow
 		double scale = 1;
-		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P1));
-		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P2));
-		scale = Math.max(scale,CommonOps_DDRM.elementMaxAbs(P3));
+		scale = Math.max(scale, CommonOps_DDRM.elementMaxAbs(P1));
+		scale = Math.max(scale, CommonOps_DDRM.elementMaxAbs(P2));
+		scale = Math.max(scale, CommonOps_DDRM.elementMaxAbs(P3));
 
-		DMatrixRMaj A = new DMatrixRMaj(4,4);
+		DMatrixRMaj A = new DMatrixRMaj(4, 4);
 
 		double sign = 1;
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			DMatrixRMaj T = ret.getT(i);
 
-			for (int row = 0,cnt=0; row < 3; row++) {
-				if( row != i ) {
+			for (int row = 0, cnt = 0; row < 3; row++) {
+				if (row != i) {
 					CommonOps_DDRM.extract(P1, row, row + 1, 0, 4, A, cnt, 0);
 					for (int col = 0; col < 4; col++) {
-						A.data[cnt*4+col] /= scale;
+						A.data[cnt*4 + col] /= scale;
 					}
 					cnt++;
 				}
 			}
 
 			for (int q = 0; q < 3; q++) {
-				CommonOps_DDRM.extract(P2,q,q+1,0,4,A,2,0);
+				CommonOps_DDRM.extract(P2, q, q + 1, 0, 4, A, 2, 0);
 
 				for (int col = 0; col < 4; col++) {
-					A.data[2*4+col] /= scale;
+					A.data[2*4 + col] /= scale;
 				}
 
 				for (int r = 0; r < 3; r++) {
-					CommonOps_DDRM.extract(P3,r,r+1,0,4,A,3,0);
+					CommonOps_DDRM.extract(P3, r, r + 1, 0, 4, A, 3, 0);
 					for (int col = 0; col < 4; col++) {
-						A.data[3*4+col] /= scale;
+						A.data[3*4 + col] /= scale;
 					}
 
 					double v = CommonOps_DDRM.det(A);
-					T.set(q,r,sign*v*scale);  // scale is to the power of 2, hence the *scale here
+					T.set(q, r, sign*v*scale);  // scale is to the power of 2, hence the *scale here
 				}
 			}
 
@@ -191,7 +191,6 @@ public class MultiViewOps {
 
 		return ret;
 	}
-
 
 	/**
 	 * <p>
@@ -207,9 +206,9 @@ public class MultiViewOps {
 	 * @param ret Storage for trifocal tensor.  If null a new instance will be created.
 	 * @return The trifocal tensor
 	 */
-	public static TrifocalTensor createTrifocal( Se3_F64 P2 , Se3_F64 P3 ,
+	public static TrifocalTensor createTrifocal( Se3_F64 P2, Se3_F64 P3,
 												 @Nullable TrifocalTensor ret ) {
-		if( ret == null )
+		if (ret == null)
 			ret = new TrifocalTensor();
 
 		DMatrixRMaj R2 = P2.getR();
@@ -217,16 +216,16 @@ public class MultiViewOps {
 		Vector3D_F64 T2 = P2.getT();
 		Vector3D_F64 T3 = P3.getT();
 
-		for( int col = 0; col < 3; col++ ) {
+		for (int col = 0; col < 3; col++) {
 			DMatrixRMaj T = ret.getT(col);
 
 			int index = 0;
-			for( int i = 0; i < 3; i++ ) {
-				double a_left = R2.unsafe_get(i,col);
+			for (int i = 0; i < 3; i++) {
+				double a_left = R2.unsafe_get(i, col);
 				double a_right = T2.getIdx(i);
 
-				for( int j = 0; j < 3; j++ ) {
-					T.data[index++] = a_left*T3.getIdx(j) - a_right*R3.unsafe_get(j,col);
+				for (int j = 0; j < 3; j++) {
+					T.data[index++] = a_left*T3.getIdx(j) - a_right*R3.unsafe_get(j, col);
 				}
 			}
 		}
@@ -247,11 +246,10 @@ public class MultiViewOps {
 	 * @param ret Storage for output.  If null a new instance will be declared.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static Vector3D_F64 constraint(TrifocalTensor tensor,
-										  Vector3D_F64 l1, Vector3D_F64 l2, Vector3D_F64 l3,
-										  @Nullable Vector3D_F64 ret)
-	{
-		if( ret == null )
+	public static Vector3D_F64 constraint( TrifocalTensor tensor,
+										   Vector3D_F64 l1, Vector3D_F64 l2, Vector3D_F64 l3,
+										   @Nullable Vector3D_F64 ret ) {
+		if (ret == null)
 			ret = new Vector3D_F64();
 
 		double x = GeometryMath_F64.innerProd(l2, tensor.T1, l3);
@@ -275,16 +273,15 @@ public class MultiViewOps {
 	 * @param l3 A line in the third view.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static double constraint(TrifocalTensor tensor,
-									Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3)
-	{
-		DMatrixRMaj sum = new DMatrixRMaj(3,3);
+	public static double constraint( TrifocalTensor tensor,
+									 Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3 ) {
+		DMatrixRMaj sum = new DMatrixRMaj(3, 3);
 
-		CommonOps_DDRM.add(p1.x,tensor.T1,sum,sum);
-		CommonOps_DDRM.add(p1.y,tensor.T2,sum,sum);
+		CommonOps_DDRM.add(p1.x, tensor.T1, sum, sum);
+		CommonOps_DDRM.add(p1.y, tensor.T2, sum, sum);
 		CommonOps_DDRM.add(tensor.T3, sum, sum);
 
-		return GeometryMath_F64.innerProd(l2,sum,l3);
+		return GeometryMath_F64.innerProd(l2, sum, l3);
 	}
 
 	/**
@@ -299,18 +296,17 @@ public class MultiViewOps {
 	 * @param p3 A point in the third view.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static Vector3D_F64 constraint(TrifocalTensor tensor,
-										  Point2D_F64 p1, Vector3D_F64 l2, Point2D_F64 p3,
-										  Vector3D_F64 ret)
-	{
-		if( ret == null )
+	public static Vector3D_F64 constraint( TrifocalTensor tensor,
+										   Point2D_F64 p1, Vector3D_F64 l2, Point2D_F64 p3,
+										   Vector3D_F64 ret ) {
+		if (ret == null)
 			ret = new Vector3D_F64();
 
-		DMatrixRMaj sum = new DMatrixRMaj(3,3);
+		DMatrixRMaj sum = new DMatrixRMaj(3, 3);
 
-		CommonOps_DDRM.add(p1.x,tensor.T1,sum,sum);
-		CommonOps_DDRM.add(p1.y,tensor.T2,sum,sum);
-		CommonOps_DDRM.add(tensor.T3,sum,sum);
+		CommonOps_DDRM.add(p1.x, tensor.T1, sum, sum);
+		CommonOps_DDRM.add(p1.y, tensor.T2, sum, sum);
+		CommonOps_DDRM.add(tensor.T3, sum, sum);
 
 		Vector3D_F64 tempV = new Vector3D_F64();
 		GeometryMath_F64.multTran(sum, l2, tempV);
@@ -332,24 +328,23 @@ public class MultiViewOps {
 	 * @param l3 A line in the third view.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static Vector3D_F64 constraint(TrifocalTensor tensor,
-										  Point2D_F64 p1, Point2D_F64 p2, Vector3D_F64 l3,
-										  Vector3D_F64 ret)
-	{
-		if( ret == null )
+	public static Vector3D_F64 constraint( TrifocalTensor tensor,
+										   Point2D_F64 p1, Point2D_F64 p2, Vector3D_F64 l3,
+										   Vector3D_F64 ret ) {
+		if (ret == null)
 			ret = new Vector3D_F64();
 
-		DMatrixRMaj sum = new DMatrixRMaj(3,3);
+		DMatrixRMaj sum = new DMatrixRMaj(3, 3);
 
-		CommonOps_DDRM.add(p1.x,tensor.T1,sum,sum);
-		CommonOps_DDRM.add(p1.y,tensor.T2,sum,sum);
-		CommonOps_DDRM.add(tensor.T3,sum,sum);
+		CommonOps_DDRM.add(p1.x, tensor.T1, sum, sum);
+		CommonOps_DDRM.add(p1.y, tensor.T2, sum, sum);
+		CommonOps_DDRM.add(tensor.T3, sum, sum);
 
-		DMatrixRMaj cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
+		DMatrixRMaj cross2 = GeometryMath_F64.crossMatrix(p2.x, p2.y, 1, null);
 
-		DMatrixRMaj temp = new DMatrixRMaj(3,3);
+		DMatrixRMaj temp = new DMatrixRMaj(3, 3);
 
-		CommonOps_DDRM.mult(cross2,sum,temp);
+		CommonOps_DDRM.mult(cross2, sum, temp);
 		GeometryMath_F64.mult(temp, l3, ret);
 
 		return ret;
@@ -368,24 +363,23 @@ public class MultiViewOps {
 	 * @param ret Optional storage for output. 3x3 matrix.  Modified.
 	 * @return Result of applying the constraint.  With perfect inputs will be zero.
 	 */
-	public static DMatrixRMaj constraint(TrifocalTensor tensor,
-											Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
-											DMatrixRMaj ret)
-	{
-		if( ret == null )
-			ret = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj constraint( TrifocalTensor tensor,
+										  Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
+										  DMatrixRMaj ret ) {
+		if (ret == null)
+			ret = new DMatrixRMaj(3, 3);
 
-		DMatrixRMaj sum = new DMatrixRMaj(3,3);
+		DMatrixRMaj sum = new DMatrixRMaj(3, 3);
 
-		CommonOps_DDRM.add(p1.x,tensor.T1,p1.y,tensor.T2,sum);
-		CommonOps_DDRM.add(sum,tensor.T3,sum);
+		CommonOps_DDRM.add(p1.x, tensor.T1, p1.y, tensor.T2, sum);
+		CommonOps_DDRM.add(sum, tensor.T3, sum);
 
-		DMatrixRMaj cross2 = GeometryMath_F64.crossMatrix(p2.x,p2.y,1,null);
-		DMatrixRMaj cross3 = GeometryMath_F64.crossMatrix(p3.x,p3.y,1,null);
+		DMatrixRMaj cross2 = GeometryMath_F64.crossMatrix(p2.x, p2.y, 1, null);
+		DMatrixRMaj cross3 = GeometryMath_F64.crossMatrix(p3.x, p3.y, 1, null);
 
-		DMatrixRMaj temp = new DMatrixRMaj(3,3);
+		DMatrixRMaj temp = new DMatrixRMaj(3, 3);
 
-		CommonOps_DDRM.mult(cross2,sum,temp);
+		CommonOps_DDRM.mult(cross2, sum, temp);
 		CommonOps_DDRM.mult(temp, cross3, ret);
 
 		return ret;
@@ -402,10 +396,10 @@ public class MultiViewOps {
 	 * @param F 3x3 essential or fundamental matrix.
 	 * @param p1 Point in view 1.
 	 * @param p2 Point in view 2.
-	 * @return  Constraint value.
+	 * @return Constraint value.
 	 */
-	public static double constraint( DMatrixRMaj F , Point2D_F64 p1, Point2D_F64 p2 ) {
-		return GeometryMath_F64.innerProd(p2,F,p1);
+	public static double constraint( DMatrixRMaj F, Point2D_F64 p1, Point2D_F64 p2 ) {
+		return GeometryMath_F64.innerProd(p2, F, p1);
 	}
 
 	/**
@@ -421,15 +415,14 @@ public class MultiViewOps {
 	 * @param outputP2 Output: storage for point in view 2.
 	 * @return Predicted point in view 2
 	 */
-	public static Point2D_F64 constraintHomography( DMatrixRMaj H , Point2D_F64 p1 , Point2D_F64 outputP2 ) {
-		if( outputP2 == null )
+	public static Point2D_F64 constraintHomography( DMatrixRMaj H, Point2D_F64 p1, Point2D_F64 outputP2 ) {
+		if (outputP2 == null)
 			outputP2 = new Point2D_F64();
 
-		GeometryMath_F64.mult(H,p1,outputP2);
+		GeometryMath_F64.mult(H, p1, outputP2);
 
 		return outputP2;
 	}
-
 
 	/**
 	 * Computes the homography induced from view 1 to 3 by a line in view 2.  The provided line in
@@ -442,11 +435,11 @@ public class MultiViewOps {
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 3
 	 */
-	public static DMatrixRMaj inducedHomography13( TrifocalTensor tensor ,
-													  Vector3D_F64 line2 ,
-													  DMatrixRMaj output ) {
-		if( output == null )
-			output = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj inducedHomography13( TrifocalTensor tensor,
+												   Vector3D_F64 line2,
+												   DMatrixRMaj output ) {
+		if (output == null)
+			output = new DMatrixRMaj(3, 3);
 
 		DMatrixRMaj T = tensor.T1;
 
@@ -490,11 +483,11 @@ public class MultiViewOps {
 	 * @param output Output: Optional storage for homography. 3x3 matrix
 	 * @return Homography from view 1 to 2
 	 */
-	public static DMatrixRMaj inducedHomography12( TrifocalTensor tensor ,
-													  Vector3D_F64 line3 ,
-													  DMatrixRMaj output ) {
-		if( output == null )
-			output = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj inducedHomography12( TrifocalTensor tensor,
+												   Vector3D_F64 line3,
+												   DMatrixRMaj output ) {
+		if (output == null)
+			output = new DMatrixRMaj(3, 3);
 
 		// H(:,0) = T1*line
 		DMatrixRMaj T = tensor.T1;
@@ -530,19 +523,18 @@ public class MultiViewOps {
 	 * Computes the homography induced from a planar surface when viewed from two views using correspondences
 	 * of three points. Observations must be on the planar surface.
 	 *
-	 * @see boofcv.alg.geo.h.HomographyInducedStereo3Pts
-	 *
 	 * @param F Fundamental matrix
 	 * @param p1 Associated point observation
 	 * @param p2 Associated point observation
 	 * @param p3 Associated point observation
 	 * @return The homography from view 1 to view 2 or null if it fails
+	 * @see boofcv.alg.geo.h.HomographyInducedStereo3Pts
 	 */
-	public static DMatrixRMaj homographyStereo3Pts( DMatrixRMaj F , AssociatedPair p1, AssociatedPair p2, AssociatedPair p3) {
+	public static DMatrixRMaj homographyStereo3Pts( DMatrixRMaj F, AssociatedPair p1, AssociatedPair p2, AssociatedPair p3 ) {
 		HomographyInducedStereo3Pts alg = new HomographyInducedStereo3Pts();
 
-		alg.setFundamental(F,null);
-		if( !alg.process(p1,p2,p3) )
+		alg.setFundamental(F, null);
+		if (!alg.process(p1, p2, p3))
 			return null;
 		return alg.getHomography();
 	}
@@ -551,18 +543,17 @@ public class MultiViewOps {
 	 * Computes the homography induced from a planar surface when viewed from two views using correspondences
 	 * of a line and a point. Observations must be on the planar surface.
 	 *
-	 * @see HomographyInducedStereoLinePt
-	 *
 	 * @param F Fundamental matrix
 	 * @param line Line on the plane
 	 * @param point Point on the plane
 	 * @return The homography from view 1 to view 2 or null if it fails
+	 * @see HomographyInducedStereoLinePt
 	 */
-	public static DMatrixRMaj homographyStereoLinePt( DMatrixRMaj F , PairLineNorm line, AssociatedPair point) {
+	public static DMatrixRMaj homographyStereoLinePt( DMatrixRMaj F, PairLineNorm line, AssociatedPair point ) {
 		HomographyInducedStereoLinePt alg = new HomographyInducedStereoLinePt();
 
-		alg.setFundamental(F,null);
-		alg.process(line,point);
+		alg.setFundamental(F, null);
+		alg.process(line, point);
 		return alg.getHomography();
 	}
 
@@ -570,18 +561,17 @@ public class MultiViewOps {
 	 * Computes the homography induced from a planar surface when viewed from two views using correspondences
 	 * of two lines. Observations must be on the planar surface.
 	 *
-	 * @see HomographyInducedStereo2Line
-	 *
 	 * @param F Fundamental matrix
 	 * @param line0 Line on the plane
 	 * @param line1 Line on the plane
 	 * @return The homography from view 1 to view 2 or null if it fails
+	 * @see HomographyInducedStereo2Line
 	 */
-	public static DMatrixRMaj homographyStereo2Lines( DMatrixRMaj F , PairLineNorm line0, PairLineNorm line1) {
+	public static DMatrixRMaj homographyStereo2Lines( DMatrixRMaj F, PairLineNorm line0, PairLineNorm line1 ) {
 		HomographyInducedStereo2Line alg = new HomographyInducedStereo2Line();
 
-		alg.setFundamental(F,null);
-		if( !alg.process(line0,line1) )
+		alg.setFundamental(F, null);
+		if (!alg.process(line0, line1))
 			return null;
 		return alg.getHomography();
 	}
@@ -601,16 +591,15 @@ public class MultiViewOps {
 	 * where F1i is a fundamental matrix from image 1 to i.
 	 * </p>
 	 *
-	 * @see TrifocalExtractGeometries
-	 *
 	 * @param tensor Trifocal tensor.  Not Modified
-	 * @param e2  Output: Epipole in image 2. Homogeneous coordinates. Modified
-	 * @param e3  Output: Epipole in image 3. Homogeneous coordinates. Modified
+	 * @param e2 Output: Epipole in image 2. Homogeneous coordinates. Modified
+	 * @param e3 Output: Epipole in image 3. Homogeneous coordinates. Modified
+	 * @see TrifocalExtractGeometries
 	 */
-	public static void extractEpipoles( TrifocalTensor tensor , Point3D_F64 e2 , Point3D_F64 e3 ) {
+	public static void extractEpipoles( TrifocalTensor tensor, Point3D_F64 e2, Point3D_F64 e3 ) {
 		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
 		e.setTensor(tensor);
-		e.extractEpipoles(e2,e3);
+		e.extractEpipoles(e2, e3);
 	}
 
 	/**
@@ -624,16 +613,15 @@ public class MultiViewOps {
 	 * the first camera will not meet the epipolar constraint when applied to the returned fundamental matrices.
 	 * </p>
 	 *
-	 * @see TrifocalExtractGeometries
-	 *
 	 * @param tensor Trifocal tensor.  Not modified.
 	 * @param F21 Output: Fundamental matrix for views 1 and 2. Modified.
 	 * @param F31 Output: Fundamental matrix for views 1 and 3. Modified.
+	 * @see TrifocalExtractGeometries
 	 */
-	public static void trifocalFundamental(TrifocalTensor tensor , DMatrixRMaj F21 , DMatrixRMaj F31 ) {
+	public static void trifocalFundamental( TrifocalTensor tensor, DMatrixRMaj F21, DMatrixRMaj F31 ) {
 		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
 		e.setTensor(tensor);
-		e.extractFundmental(F21,F31);
+		e.extractFundmental(F21, F31);
 	}
 
 	/**
@@ -645,16 +633,15 @@ public class MultiViewOps {
 	 * NOTE: The camera matrix for the first view is assumed to be P1 = [I|0].
 	 * </p>
 	 *
-	 * @see TrifocalExtractGeometries
-	 *
 	 * @param tensor Trifocal tensor.  Not modified.
 	 * @param P2 Output: 3x4 camera matrix for views 1 to 2. Modified.
 	 * @param P3 Output: 3x4 camera matrix for views 1 to 3. Modified.
+	 * @see TrifocalExtractGeometries
 	 */
-	public static void trifocalCameraMatrices(TrifocalTensor tensor , DMatrixRMaj P2 , DMatrixRMaj P3 ) {
+	public static void trifocalCameraMatrices( TrifocalTensor tensor, DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		TrifocalExtractGeometries e = new TrifocalExtractGeometries();
 		e.setTensor(tensor);
-		e.extractCamera(P2,P3);
+		e.extractCamera(P2, P3);
 	}
 
 	/**
@@ -671,10 +658,9 @@ public class MultiViewOps {
 	 * @param E (Output) Storage for essential matrix. 3x3 matrix
 	 * @return Essential matrix
 	 */
-	public static DMatrixRMaj createEssential(DMatrixRMaj R, Vector3D_F64 T, @Nullable DMatrixRMaj E)
-	{
-		if( E == null )
-			E = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj createEssential( DMatrixRMaj R, Vector3D_F64 T, @Nullable DMatrixRMaj E ) {
+		if (E == null)
+			E = new DMatrixRMaj(3, 3);
 
 		DMatrixRMaj T_hat = GeometryMath_F64.crossMatrix(T, null);
 		CommonOps_DDRM.mult(T_hat, R, E);
@@ -691,12 +677,12 @@ public class MultiViewOps {
 	 * @param K Intrinsic camera calibration matrix
 	 * @return Fundamental matrix
 	 */
-	public static DMatrixRMaj createFundamental(DMatrixRMaj E, DMatrixRMaj K) {
-		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(K,K_inv);
+	public static DMatrixRMaj createFundamental( DMatrixRMaj E, DMatrixRMaj K ) {
+		DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.invert(K, K_inv);
 
-		DMatrixRMaj F = new DMatrixRMaj(3,3);
-		PerspectiveOps.multTranA(K_inv,E,K_inv,F);
+		DMatrixRMaj F = new DMatrixRMaj(3, 3);
+		PerspectiveOps.multTranA(K_inv, E, K_inv, F);
 
 		return F;
 	}
@@ -705,15 +691,14 @@ public class MultiViewOps {
 	 * Computes a Fundamental matrix given an Essential matrix and the camera's intrinsic
 	 * parameters.
 	 *
-	 * @see #createFundamental(DMatrixRMaj, DMatrixRMaj)
-	 *
 	 * @param E Essential matrix
 	 * @param intrinsic Intrinsic camera calibration
 	 * @return Fundamental matrix
+	 * @see #createFundamental(DMatrixRMaj, DMatrixRMaj)
 	 */
-	public static DMatrixRMaj createFundamental(DMatrixRMaj E, CameraPinhole intrinsic ) {
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
-		return createFundamental(E,K);
+	public static DMatrixRMaj createFundamental( DMatrixRMaj E, CameraPinhole intrinsic ) {
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
+		return createFundamental(E, K);
 	}
 
 	/**
@@ -726,18 +711,18 @@ public class MultiViewOps {
 	 * @param K2 Intrinsic camera calibration matrix for camera 2
 	 * @return Fundamental matrix
 	 */
-	public static DMatrixRMaj createFundamental(DMatrixRMaj E,
-												DMatrixRMaj K1,  DMatrixRMaj K2) {
-		DMatrixRMaj K1_inv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(K1,K1_inv);
-		DMatrixRMaj K2_inv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(K2,K2_inv);
+	public static DMatrixRMaj createFundamental( DMatrixRMaj E,
+												 DMatrixRMaj K1, DMatrixRMaj K2 ) {
+		DMatrixRMaj K1_inv = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.invert(K1, K1_inv);
+		DMatrixRMaj K2_inv = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.invert(K2, K2_inv);
 
-		DMatrixRMaj F = new DMatrixRMaj(3,3);
-		DMatrixRMaj temp = new DMatrixRMaj(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3, 3);
+		DMatrixRMaj temp = new DMatrixRMaj(3, 3);
 
-		CommonOps_DDRM.multTransA(K2_inv,E,temp);
-		CommonOps_DDRM.mult(temp,K1_inv,F);
+		CommonOps_DDRM.multTransA(K2_inv, E, temp);
+		CommonOps_DDRM.mult(temp, K1_inv, F);
 
 		return F;
 	}
@@ -755,16 +740,15 @@ public class MultiViewOps {
 	 * @param F (Output) Storage for essential matrix. 3x3 matrix
 	 * @return Essential matrix
 	 */
-	public static DMatrixRMaj createFundamental(DMatrixRMaj R, Vector3D_F64 T,
-												DMatrixRMaj K1,  DMatrixRMaj K2, @Nullable DMatrixRMaj F )
-	{
-		if( F == null )
-			F = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj createFundamental( DMatrixRMaj R, Vector3D_F64 T,
+												 DMatrixRMaj K1, DMatrixRMaj K2, @Nullable DMatrixRMaj F ) {
+		if (F == null)
+			F = new DMatrixRMaj(3, 3);
 		else
-			F.reshape(3,3);
+			F.reshape(3, 3);
 
-		createEssential(R,T,F);
-		F.set(createFundamental(F,K1,K2));
+		createEssential(R, T, F);
+		F.set(createFundamental(F, K1, K2));
 		return F;
 	}
 
@@ -783,13 +767,12 @@ public class MultiViewOps {
 	 * @param N Normal of plane with respect to the first camera.
 	 * @return Calibrated homography matrix
 	 */
-	public static DMatrixRMaj createHomography(DMatrixRMaj R, Vector3D_F64 T,
-												  double d, Vector3D_F64 N)
-	{
-		DMatrixRMaj H = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj createHomography( DMatrixRMaj R, Vector3D_F64 T,
+												double d, Vector3D_F64 N ) {
+		DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
-		GeometryMath_F64.outerProd(T,N,H);
-		CommonOps_DDRM.divide(H,d);
+		GeometryMath_F64.outerProd(T, N, H);
+		CommonOps_DDRM.divide(H, d);
 		CommonOps_DDRM.addEquals(H, R);
 
 		return H;
@@ -812,20 +795,19 @@ public class MultiViewOps {
 	 * @param K Intrinsic calibration matrix
 	 * @return Uncalibrated homography matrix
 	 */
-	public static DMatrixRMaj createHomography(DMatrixRMaj R, Vector3D_F64 T,
-											   double d, Vector3D_F64 N,
-											   DMatrixRMaj K)
-	{
-		DMatrixRMaj temp = new DMatrixRMaj(3,3);
-		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj createHomography( DMatrixRMaj R, Vector3D_F64 T,
+												double d, Vector3D_F64 N,
+												DMatrixRMaj K ) {
+		DMatrixRMaj temp = new DMatrixRMaj(3, 3);
+		DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 
 		DMatrixRMaj H = createHomography(R, T, d, N);
 
 		// apply calibration matrix to R
-		CommonOps_DDRM.mult(K,H,temp);
+		CommonOps_DDRM.mult(K, H, temp);
 
-		CommonOps_DDRM.invert(K,K_inv);
-		CommonOps_DDRM.mult(temp,K_inv,H);
+		CommonOps_DDRM.invert(K, K_inv);
+		CommonOps_DDRM.mult(temp, K_inv, H);
 
 		return H;
 	}
@@ -846,9 +828,9 @@ public class MultiViewOps {
 	 * @param e1 Output: Right epipole in homogeneous coordinates. Can be null. Modified.
 	 * @param e2 Output: Left epipole in homogeneous coordinates. Can be null. Modified.
 	 */
-	public static void extractEpipoles( DMatrixRMaj F , Point3D_F64 e1 , Point3D_F64 e2 ) {
+	public static void extractEpipoles( DMatrixRMaj F, Point3D_F64 e1, Point3D_F64 e2 ) {
 		FundamentalExtractEpipoles alg = new FundamentalExtractEpipoles();
-		alg.process(F,e1,e2);
+		alg.process(F, e1, e2);
 	}
 
 	/**
@@ -865,26 +847,25 @@ public class MultiViewOps {
 	 * </p>
 	 *
 	 * <p>
-	 *     NOTE: Additional information is needed to upgrade this projective transform into a metric transform.
+	 * NOTE: Additional information is needed to upgrade this projective transform into a metric transform.
 	 * </p>
 	 * <p>
 	 * Page 256 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
 	 * </p>
-	 *
-	 * @see #extractEpipoles
-	 * @see FundamentalToProjective
 	 *
 	 * @param F (Input) A fundamental matrix
 	 * @param e2 (Input) Left epipole of fundamental matrix, F<sup>T</sup>*e2 = 0.
 	 * @param v (Input) Arbitrary 3-vector.  Just pick some value, say (0,0,0).
 	 * @param lambda (Input) A non zero scalar.  Try one.
 	 * @return The canonical camera (projection) matrix P' (3 by 4) Known up to a projective transform.
+	 * @see #extractEpipoles
+	 * @see FundamentalToProjective
 	 */
-	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F , Point3D_F64 e2, Vector3D_F64 v , double lambda ) {
+	public static DMatrixRMaj fundamentalToProjective( DMatrixRMaj F, Point3D_F64 e2, Vector3D_F64 v, double lambda ) {
 
 		FundamentalToProjective f2p = new FundamentalToProjective();
-		DMatrixRMaj P = new DMatrixRMaj(3,4);
-		f2p.twoView(F,e2,v,lambda,P);
+		DMatrixRMaj P = new DMatrixRMaj(3, 4);
+		f2p.twoView(F, e2, v, lambda, P);
 		return P;
 	}
 
@@ -898,26 +879,25 @@ public class MultiViewOps {
 	 * @param F21 (Output) Fundamental matrix from view 1 to 2
 	 * @return Fundamental matrix.
 	 */
-	public static DMatrixRMaj projectiveToFundamental( DMatrixRMaj P1 , DMatrixRMaj P2 , @Nullable DMatrixRMaj F21 )
-	{
-		if( F21 == null )
-			F21 = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj projectiveToFundamental( DMatrixRMaj P1, DMatrixRMaj P2, @Nullable DMatrixRMaj F21 ) {
+		if (F21 == null)
+			F21 = new DMatrixRMaj(3, 3);
 
 		ProjectiveToIdentity p2i = new ProjectiveToIdentity();
-		if( !p2i.process(P1) )
+		if (!p2i.process(P1))
 			throw new RuntimeException("Failed!");
 
 		DMatrixRMaj P1inv = p2i.getPseudoInvP();
 		DMatrixRMaj U = p2i.getU();
 
-		DMatrixRMaj e = new DMatrixRMaj(3,1);
-		CommonOps_DDRM.mult(P2,U,e);
+		DMatrixRMaj e = new DMatrixRMaj(3, 1);
+		CommonOps_DDRM.mult(P2, U, e);
 
-		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
-		DMatrixRMaj e_skew = new DMatrixRMaj(3,3);
-		GeometryMath_F64.crossMatrix(e.data[0],e.data[1],e.data[2],e_skew);
-		CommonOps_DDRM.mult(e_skew,P2,tmp);
-		CommonOps_DDRM.mult(tmp,P1inv,F21);
+		DMatrixRMaj tmp = new DMatrixRMaj(3, 4);
+		DMatrixRMaj e_skew = new DMatrixRMaj(3, 3);
+		GeometryMath_F64.crossMatrix(e.data[0], e.data[1], e.data[2], e_skew);
+		CommonOps_DDRM.mult(e_skew, P2, tmp);
+		CommonOps_DDRM.mult(tmp, P1inv, F21);
 
 		return F21;
 	}
@@ -931,19 +911,18 @@ public class MultiViewOps {
 	 * @param F21 (Output) Fundamental matrix from view 1 to 2
 	 * @return Fundamental matrix.
 	 */
-	public static DMatrixRMaj projectiveToFundamental( DMatrixRMaj P2 , @Nullable DMatrixRMaj F21 )
-	{
-		if( F21 == null )
-			F21 = new DMatrixRMaj(3,3);
+	public static DMatrixRMaj projectiveToFundamental( DMatrixRMaj P2, @Nullable DMatrixRMaj F21 ) {
+		if (F21 == null)
+			F21 = new DMatrixRMaj(3, 3);
 
 		// P2 = [A|b]
 		// Since P1 = [I|0] F then becomes cross(b)*A
 
 		// Extract sub matrices from P2
 		// Do all the math by hand to avoid memory creation. This is relatively simple
-		double b1 = P2.unsafe_get(0,3);
-		double b2 = P2.unsafe_get(1,3);
-		double b3 = P2.unsafe_get(2,3);
+		double b1 = P2.unsafe_get(0, 3);
+		double b2 = P2.unsafe_get(1, 3);
+		double b3 = P2.unsafe_get(2, 3);
 
 		double a11 = P2.data[0], a12 = P2.data[1], a13 = P2.data[2];
 		double a21 = P2.data[4], a22 = P2.data[5], a23 = P2.data[6];
@@ -953,9 +932,9 @@ public class MultiViewOps {
 		F21.data[0] = -b3*a21 + b2*a31;
 		F21.data[1] = -b3*a22 + b2*a32;
 		F21.data[2] = -b3*a23 + b2*a33;
-		F21.data[3] =  b3*a11 - b1*a31;
-		F21.data[4] =  b3*a12 - b1*a32;
-		F21.data[5] =  b3*a13 - b1*a33;
+		F21.data[3] = b3*a11 - b1*a31;
+		F21.data[4] = b3*a12 - b1*a32;
+		F21.data[5] = b3*a13 - b1*a33;
 		F21.data[6] = -b2*a11 + b1*a21;
 		F21.data[7] = -b2*a12 + b1*a22;
 		F21.data[8] = -b2*a13 + b1*a23;
@@ -970,15 +949,14 @@ public class MultiViewOps {
 	 * for all variables filled in for you.
 	 * </p>
 	 *
-	 * @see FundamentalToProjective
-	 *
 	 * @param F (Input) Fundamental Matrix
 	 * @return The canonical camera (projection) matrix P' (3 by 4) Known up to a projective transform.
+	 * @see FundamentalToProjective
 	 */
-	public static DMatrixRMaj fundamentalToProjective(DMatrixRMaj F ) {
+	public static DMatrixRMaj fundamentalToProjective( DMatrixRMaj F ) {
 		FundamentalToProjective f2p = new FundamentalToProjective();
-		DMatrixRMaj P = new DMatrixRMaj(3,4);
-		f2p.twoView(F,P);
+		DMatrixRMaj P = new DMatrixRMaj(3, 4);
+		f2p.twoView(F, P);
 		return P;
 	}
 
@@ -991,8 +969,8 @@ public class MultiViewOps {
 	 * @param outputE (Output) Found essential matrix
 	 * @return Essential matrix
 	 */
-	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F , DMatrixRMaj K , @Nullable DMatrixRMaj outputE ) {
-		return fundamentalToEssential(F,K,K,outputE);
+	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F, DMatrixRMaj K, @Nullable DMatrixRMaj outputE ) {
+		return fundamentalToEssential(F, K, K, outputE);
 	}
 
 	/**
@@ -1005,29 +983,29 @@ public class MultiViewOps {
 	 * @param outputE (Output) Found essential matrix
 	 * @return Essential matrix
 	 */
-	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F , DMatrixRMaj K1 , DMatrixRMaj K2,
+	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F, DMatrixRMaj K1, DMatrixRMaj K2,
 													  @Nullable DMatrixRMaj outputE ) {
-		if( outputE == null )
-			outputE = new DMatrixRMaj(3,3);
+		if (outputE == null)
+			outputE = new DMatrixRMaj(3, 3);
 
-		PerspectiveOps.multTranA(K2,F,K1,outputE);
+		PerspectiveOps.multTranA(K2, F, K1, outputE);
 
 		// this is unlikely to be a perfect essential matrix. reduce the error by enforcing essential constraints
-		SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true,true,false);
+		SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true, true, false);
 
 		svd.decompose(outputE);
-		DMatrixRMaj U = svd.getU(null,false);
+		DMatrixRMaj U = svd.getU(null, false);
 		DMatrixRMaj W = svd.getW(null);
-		DMatrixRMaj V = svd.getV(null,false);
+		DMatrixRMaj V = svd.getV(null, false);
 
 		// settings value of singular values to be [1,1,0].  The first two singular values just need to be equal
 		// for it to be an essential matrix
-		SingularOps_DDRM.descendingOrder(U,false,W,V,false);
-		W.set(0,0,1);
-		W.set(1,1,1);
-		W.set(2,2,0);
+		SingularOps_DDRM.descendingOrder(U, false, W, V, false);
+		W.set(0, 0, 1);
+		W.set(1, 1, 1);
+		W.set(2, 2, 0);
 
-		PerspectiveOps.multTranC(U,W,V,outputE);
+		PerspectiveOps.multTranC(U, W, V, outputE);
 
 		return outputE;
 	}
@@ -1045,31 +1023,31 @@ public class MultiViewOps {
 	 * Springer-Verlad, 2004</li>
 	 * </ol>
 	 *
-	 * @see #fundamentalCompatible3
-	 * @see FundamentalToProjective#threeView
-	 *
 	 * @param F21 (Input) Fundamental matrix between view 1 and 2
 	 * @param F31 (Input) Fundamental matrix between view 1 and 3
 	 * @param F32 (Input) Fundamental matrix between view 2 and 3
 	 * @param P2 (Output) Camera matrix for view 2
 	 * @param P3 (Output) Camera matrix for view 3
+	 * @see #fundamentalCompatible3
+	 * @see FundamentalToProjective#threeView
 	 */
-	public static void fundamentalToProjective( DMatrixRMaj F21 , DMatrixRMaj F31 , DMatrixRMaj F32 ,
-												DMatrixRMaj P2 , DMatrixRMaj P3) {
+	public static void fundamentalToProjective( DMatrixRMaj F21, DMatrixRMaj F31, DMatrixRMaj F32,
+												DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		FundamentalToProjective alg = new FundamentalToProjective();
-		alg.threeView(F21,F31,F32,P2,P3);
+		alg.threeView(F21, F31, F32, P2, P3);
 	}
 
 	/**
 	 * Finds the transform such that P*H = [I|0] where P is a 3x4 projective camera matrix and H is a 4x4 matrix
+	 *
 	 * @param P (Input) camera matrix 3x4
 	 * @param H (Output) 4x4 matrix
 	 */
-	public static DMatrixRMaj projectiveToIdentityH(DMatrixRMaj P , @Nullable DMatrixRMaj H ) {
-		if( H == null )
-			H = new DMatrixRMaj(4,4);
+	public static DMatrixRMaj projectiveToIdentityH( DMatrixRMaj P, @Nullable DMatrixRMaj H ) {
+		if (H == null)
+			H = new DMatrixRMaj(4, 4);
 		ProjectiveToIdentity alg = new ProjectiveToIdentity();
-		if( !alg.process(P))
+		if (!alg.process(P))
 			throw new RuntimeException("WTF this failed?? Probably NaN in P");
 		alg.computeH(H);
 		return H;
@@ -1078,17 +1056,17 @@ public class MultiViewOps {
 	/**
 	 * Computes a homography transform which will make the first camera in the list identity and modifies
 	 * the camera matrices using that homography
+	 *
 	 * @param cameraMatrices (input/output) Converts
 	 * @param H (output + Optional) storage for homography
 	 */
-	public static void projectiveMakeFirstIdentity(List<DMatrixRMaj> cameraMatrices, @Nullable DMatrixRMaj H)
-	{
-		BoofMiscOps.assertBoof(cameraMatrices.size()>=1);
-		H = projectiveToIdentityH(cameraMatrices.get(0),H);
-		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
+	public static void projectiveMakeFirstIdentity( List<DMatrixRMaj> cameraMatrices, @Nullable DMatrixRMaj H ) {
+		BoofMiscOps.assertBoof(cameraMatrices.size() >= 1);
+		H = projectiveToIdentityH(cameraMatrices.get(0), H);
+		DMatrixRMaj tmp = new DMatrixRMaj(3, 4);
 		for (int i = 0; i < cameraMatrices.size(); i++) {
 			DMatrixRMaj P = cameraMatrices.get(i);
-			CommonOps_DDRM.mult(P,H,tmp);
+			CommonOps_DDRM.mult(P, H, tmp);
 			P.set(tmp);
 		}
 	}
@@ -1111,8 +1089,7 @@ public class MultiViewOps {
 	 * @param F31 (Input) Fundamental matrix between view 1 and 3
 	 * @param F32 (Input) Fundamental matrix between view 2 and 3
 	 */
-	public static boolean fundamentalCompatible3( DMatrixRMaj F21 , DMatrixRMaj F31 , DMatrixRMaj F32 , double tol )
-	{
+	public static boolean fundamentalCompatible3( DMatrixRMaj F21, DMatrixRMaj F31, DMatrixRMaj F32, double tol ) {
 		FundamentalExtractEpipoles extractEpi = new FundamentalExtractEpipoles();
 
 		Point3D_F64 e21 = new Point3D_F64();
@@ -1122,17 +1099,17 @@ public class MultiViewOps {
 		Point3D_F64 e32 = new Point3D_F64();
 		Point3D_F64 e23 = new Point3D_F64();
 
-		extractEpi.process(F21,e21,e12);
-		extractEpi.process(F31,e31,e13);
-		extractEpi.process(F32,e32,e23);
+		extractEpi.process(F21, e21, e12);
+		extractEpi.process(F31, e31, e13);
+		extractEpi.process(F32, e32, e23);
 
 		// GeometryMath_F64.innerProd(e12,F21,e21)
 		// GeometryMath_F64.innerProd(e13,F31,e31)
 
 		double score = 0;
-		score += Math.abs(GeometryMath_F64.innerProd(e23,F21,e13));
-		score += Math.abs(GeometryMath_F64.innerProd(e31,F31,e21));
-		score += Math.abs(GeometryMath_F64.innerProd(e32,F32,e12));
+		score += Math.abs(GeometryMath_F64.innerProd(e23, F21, e13));
+		score += Math.abs(GeometryMath_F64.innerProd(e31, F31, e21));
+		score += Math.abs(GeometryMath_F64.innerProd(e32, F32, e12));
 
 		score /= 3;
 
@@ -1156,8 +1133,8 @@ public class MultiViewOps {
 	 * @param worldToView Output: The rotation and translation.
 	 * @return true if decompose was successful
 	 */
-	public static boolean decomposeMetricCamera(DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView) {
-		return new DecomposeProjectiveToMetric().decomposeMetricCamera(cameraMatrix,K,worldToView);
+	public static boolean decomposeMetricCamera( DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView ) {
+		return new DecomposeProjectiveToMetric().decomposeMetricCamera(cameraMatrix, K, worldToView);
 	}
 
 	/**
@@ -1166,10 +1143,9 @@ public class MultiViewOps {
 	 * be found using triangulation and the positive depth constraint, e.g. the objects must be in front of the camera
 	 * to be seen.  Also note that the scale of the translation is lost, even with perfect data.
 	 *
-	 * @see DecomposeEssential
-	 *
 	 * @param E21 An essential matrix.
 	 * @return Four possible motions. From view 1 to view 2.
+	 * @see DecomposeEssential
 	 */
 	public static List<Se3_F64> decomposeEssential( DMatrixRMaj E21 ) {
 		DecomposeEssential d = new DecomposeEssential();
@@ -1186,12 +1162,11 @@ public class MultiViewOps {
 	 * the homography is from view 'a' to 'b' then transform (R,T) will be from reference 'a' to 'b'.  Note that the
 	 * returned 'T' is divided by 'd'.
 	 *
-	 * @see DecomposeHomography
-	 *
 	 * @param H Homography in Euclidean space
 	 * @return The set of four possible solutions. First param: motion (R,T).  Second param: plane normal vector.
+	 * @see DecomposeHomography
 	 */
-	public static List<Tuple2<Se3_F64,Vector3D_F64>> decomposeHomography( DMatrixRMaj H ) {
+	public static List<Tuple2<Se3_F64, Vector3D_F64>> decomposeHomography( DMatrixRMaj H ) {
 		DecomposeHomography d = new DecomposeHomography();
 
 		d.decompose(H);
@@ -1199,8 +1174,8 @@ public class MultiViewOps {
 		List<Vector3D_F64> solutionsN = d.getSolutionsN();
 		List<Se3_F64> solutionsSe = d.getSolutionsSE();
 
-		List<Tuple2<Se3_F64,Vector3D_F64>> ret = new ArrayList<>();
-		for( int i = 0; i < 4; i++ ) {
+		List<Tuple2<Se3_F64, Vector3D_F64>> ret = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
 			ret.add(new Tuple2<>(solutionsSe.get(i), solutionsN.get(i)));
 		}
 
@@ -1219,33 +1194,32 @@ public class MultiViewOps {
 	 * @param H_inv (Input) Inverse of homography. if null it will be computed internally
 	 * @param storage (Output) storage for found errors
 	 */
-	public static void errorsHomographySymm(List<AssociatedPair> observations ,
-											DMatrixRMaj H ,
-											@Nullable DMatrixRMaj H_inv ,
-											GrowQueue_F64 storage )
-	{
+	public static void errorsHomographySymm( List<AssociatedPair> observations,
+											 DMatrixRMaj H,
+											 @Nullable DMatrixRMaj H_inv,
+											 GrowQueue_F64 storage ) {
 		storage.reset();
-		if( H_inv == null )
-			H_inv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(H,H_inv);
+		if (H_inv == null)
+			H_inv = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.invert(H, H_inv);
 
 		Point3D_F64 tmp = new Point3D_F64();
 
 		for (int i = 0; i < observations.size(); i++) {
 			AssociatedPair p = observations.get(i);
 
-			double dx,dy;
+			double dx, dy;
 			double error = 0;
 
-			GeometryMath_F64.mult(H,p.p1,tmp);
-			if( Math.abs(tmp.z) <= UtilEjml.EPS )
+			GeometryMath_F64.mult(H, p.p1, tmp);
+			if (Math.abs(tmp.z) <= UtilEjml.EPS)
 				continue;
 			dx = p.p2.x - tmp.x/tmp.z;
 			dy = p.p2.y - tmp.y/tmp.z;
 			error += dx*dx + dy*dy;
 
-			GeometryMath_F64.mult(H_inv,p.p2,tmp);
-			if( Math.abs(tmp.z) <= UtilEjml.EPS )
+			GeometryMath_F64.mult(H_inv, p.p2, tmp);
+			if (Math.abs(tmp.z) <= UtilEjml.EPS)
 				continue;
 			dx = p.p1.x - tmp.x/tmp.z;
 			dy = p.p1.y - tmp.y/tmp.z;
@@ -1258,28 +1232,28 @@ public class MultiViewOps {
 	/**
 	 * Transfers a point from the first view to the third view using a plane induced by
 	 * a line in the second view.
+	 *
 	 * @param x1 (Input) point (pixel) in first view
 	 * @param l2 (Input) line in second view
 	 * @param T (Input) Trifocal tensor
 	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer_1_to_3(TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l2 ,
-											  @Nullable Point3D_F64 x3 )
-	{
-		if( x3 == null )
+	public static Point3D_F64 transfer_1_to_3( TrifocalTensor T, Point2D_F64 x1, Vector3D_F64 l2,
+											   @Nullable Point3D_F64 x3 ) {
+		if (x3 == null)
 			x3 = new Point3D_F64();
 
-		GeometryMath_F64.multTran(T.T1,l2,x3);
+		GeometryMath_F64.multTran(T.T1, l2, x3);
 		// storage solution here to avoid the need to declare a temporary variable
-		double xx = x3.x * x1.x;
-		double yy = x3.y * x1.x;
-		double zz = x3.z * x1.x;
-		GeometryMath_F64.multTran(T.T2,l2,x3);
-		xx += x3.x * x1.y;
-		yy += x3.y * x1.y;
-		zz += x3.z * x1.y;
-		GeometryMath_F64.multTran(T.T3,l2,x3);
+		double xx = x3.x*x1.x;
+		double yy = x3.y*x1.x;
+		double zz = x3.z*x1.x;
+		GeometryMath_F64.multTran(T.T2, l2, x3);
+		xx += x3.x*x1.y;
+		yy += x3.y*x1.y;
+		zz += x3.z*x1.y;
+		GeometryMath_F64.multTran(T.T3, l2, x3);
 		x3.x = xx + x3.x;
 		x3.y = yy + x3.y;
 		x3.z = zz + x3.z;
@@ -1305,21 +1279,21 @@ public class MultiViewOps {
 
 	/**
 	 * Transfers a point from the first view to the second view using the observed location in the third view
+	 *
 	 * @param x1 (Input) point (pixel) in first view
 	 * @param x2 (Input) point (pixel) in second view
 	 * @param T (Input) Trifocal tensor
 	 * @param x3 (Output) Induced point (pixel) in third view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer_1_to_3(TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x3 ,
-											  @Nullable Point3D_F64 x2 )
-	{
-		if( x2 == null )
+	public static Point3D_F64 transfer_1_to_3( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x3,
+											   @Nullable Point3D_F64 x2 ) {
+		if (x2 == null)
 			x2 = new Point3D_F64();
 
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer_1_to_2(x1.x,x1.y,x3.x,x3.y,x2);
+		transfer.transfer_1_to_2(x1.x, x1.y, x3.x, x3.y, x2);
 
 		return x2;
 	}
@@ -1327,26 +1301,27 @@ public class MultiViewOps {
 	/**
 	 * Transfers a point from the first view to the second view using a plane induced by
 	 * a line in the third view.
+	 *
 	 * @param x1 (Input) point (pixel) in first view
 	 * @param l3 (Input) line in third view
 	 * @param T (Input) Trifocal tensor
 	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer_1_to_2(TrifocalTensor T , Point2D_F64 x1 , Vector3D_F64 l3 ,
-											  @Nullable Point3D_F64 x2 ) {
+	public static Point3D_F64 transfer_1_to_2( TrifocalTensor T, Point2D_F64 x1, Vector3D_F64 l3,
+											   @Nullable Point3D_F64 x2 ) {
 		if (x2 == null)
 			x2 = new Point3D_F64();
 
 		GeometryMath_F64.mult(T.T1, l3, x2);
 		// storage solution here to avoid the need to declare a temporary variable
-		double xx = x2.x * x1.x;
-		double yy = x2.y * x1.x;
-		double zz = x2.z * x1.x;
+		double xx = x2.x*x1.x;
+		double yy = x2.y*x1.x;
+		double zz = x2.z*x1.x;
 		GeometryMath_F64.mult(T.T2, l3, x2);
-		xx += x2.x * x1.y;
-		yy += x2.y * x1.y;
-		zz += x2.z * x1.y;
+		xx += x2.x*x1.y;
+		yy += x2.y*x1.y;
+		zz += x2.z*x1.y;
 		GeometryMath_F64.mult(T.T3, l3, x2);
 		x2.x = xx + x2.x;
 		x2.y = yy + x2.y;
@@ -1357,21 +1332,21 @@ public class MultiViewOps {
 
 	/**
 	 * Transfers a point from the first view to the second view using the observed location in the third view
+	 *
 	 * @param x1 (Input) point (pixel) in first view
 	 * @param x3 (Input) point (pixel) in third view
 	 * @param T (Input) Trifocal tensor
 	 * @param x2 (Output) Induced point (pixel) in second view. Homogenous coordinates.
 	 * @return induced point.
 	 */
-	public static Point3D_F64 transfer_1_to_2(TrifocalTensor T , Point2D_F64 x1 , Point2D_F64 x2 ,
-											  @Nullable Point3D_F64 x3 )
-	{
-		if( x3 == null )
+	public static Point3D_F64 transfer_1_to_2( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x2,
+											   @Nullable Point3D_F64 x3 ) {
+		if (x3 == null)
 			x3 = new Point3D_F64();
 
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(T);
-		transfer.transfer_1_to_3(x1.x,x1.y,x2.x,x2.y,x3);
+		transfer.transfer_1_to_3(x1.x, x1.y, x2.x, x2.y, x3);
 
 		return x3;
 	}
@@ -1387,17 +1362,15 @@ public class MultiViewOps {
 	 * where P is the camera matrix, H is the homography, (K,R,t) are the intrinsic calibration matrix, rotation,
 	 * and translation
 	 *
-	 * @see MultiViewOps#absoluteQuadraticToH
-	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
-	 *
 	 * @param cameraMatrix (Input) camera matrix. 3x4
 	 * @param H (Input) Rectifying homography. 4x4
 	 * @param worldToView (Output) Transform from world to camera view
 	 * @param K (Output) Camera calibration matrix
+	 * @see MultiViewOps#absoluteQuadraticToH
+	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
 	 */
-	public static boolean projectiveToMetric( DMatrixRMaj cameraMatrix , DMatrixRMaj H ,
-										   Se3_F64 worldToView , DMatrixRMaj K )
-	{
+	public static boolean projectiveToMetric( DMatrixRMaj cameraMatrix, DMatrixRMaj H,
+											  Se3_F64 worldToView, DMatrixRMaj K ) {
 		return new DecomposeProjectiveToMetric().projectiveToMetric(cameraMatrix, H, worldToView, K);
 	}
 
@@ -1414,11 +1387,10 @@ public class MultiViewOps {
 	 * @param K (Input) Known calibration matrix
 	 * @param worldToView (Output) transform from world to camera view
 	 */
-	public static boolean projectiveToMetricKnownK( DMatrixRMaj cameraMatrix ,
-												 DMatrixRMaj H , DMatrixRMaj K,
-												 Se3_F64 worldToView )
-	{
-		return new DecomposeProjectiveToMetric().projectiveToMetricKnownK(cameraMatrix,H,K,worldToView);
+	public static boolean projectiveToMetricKnownK( DMatrixRMaj cameraMatrix,
+													DMatrixRMaj H, DMatrixRMaj K,
+													Se3_F64 worldToView ) {
+		return new DecomposeProjectiveToMetric().projectiveToMetricKnownK(cameraMatrix, H, K, worldToView);
 	}
 
 	/**
@@ -1436,28 +1408,27 @@ public class MultiViewOps {
 	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
 	 * </ol>
 	 *
-	 * @see DecomposeAbsoluteDualQuadratic
-	 *
 	 * @param Q Approximate solution to absolute quadratic
+	 * @see DecomposeAbsoluteDualQuadratic
 	 */
-	public static boolean enforceAbsoluteQuadraticConstraints( DMatrix4x4 Q , boolean zeroCenter, boolean zeroSkew ) {
+	public static boolean enforceAbsoluteQuadraticConstraints( DMatrix4x4 Q, boolean zeroCenter, boolean zeroSkew ) {
 
 		// see if it's potentially just off by a sign
-		if( Q.a33 < 0 )
-			CommonOps_DDF4.scale(-1,Q);
+		if (Q.a33 < 0)
+			CommonOps_DDF4.scale(-1, Q);
 
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
-		if( !alg.decompose(Q) )
+		if (!alg.decompose(Q))
 			return false;
 
 		// force positive definite
 		DMatrix3x3 k = alg.getK();
 
-		if( zeroCenter ) {
+		if (zeroCenter) {
 			k.a13 = k.a23 = 0;
 		}
 
-		if( zeroSkew ) {
+		if (zeroSkew) {
 			k.a12 = 0;
 		}
 
@@ -1476,14 +1447,13 @@ public class MultiViewOps {
 	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
 	 * </ol>
 	 *
-	 * @see DecomposeAbsoluteDualQuadratic
-	 *
 	 * @param Q (Input) Absolute quadratic. Typically found in auto calibration. Not modified.
 	 * @param H (Output) 4x4 rectifying homography.
+	 * @see DecomposeAbsoluteDualQuadratic
 	 */
-	public static boolean absoluteQuadraticToH(DMatrix4x4 Q , DMatrixRMaj H ) {
+	public static boolean absoluteQuadraticToH( DMatrix4x4 Q, DMatrixRMaj H ) {
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
-		if( !alg.decompose(Q) )
+		if (!alg.decompose(Q))
 			return false;
 
 		return alg.computeRectifyingHomography(H);
@@ -1498,7 +1468,7 @@ public class MultiViewOps {
 	 * @param H (Input) 4x4 rectifying homography.
 	 * @param Q (Output) Absolute quadratic. Typically found in auto calibration. Not modified.
 	 */
-	public static void rectifyHToAbsoluteQuadratic(DMatrixRMaj H , DMatrixRMaj Q ) {
+	public static void rectifyHToAbsoluteQuadratic( DMatrixRMaj H, DMatrixRMaj Q ) {
 		int indexQ = 0;
 		for (int rowA = 0; rowA < 4; rowA++) {
 			for (int colB = 0; colB < 4; colB++) {
@@ -1526,14 +1496,13 @@ public class MultiViewOps {
 	 * @param P (Input) Camera matrix for a view
 	 * @param intrinsic (Output) found intrinsic parameters
 	 */
-	public static void intrinsicFromAbsoluteQuadratic( DMatrixRMaj Q , DMatrixRMaj P , CameraPinhole intrinsic )
-	{
-		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
-		DMatrixRMaj tmp2 = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.mult(P,Q,tmp);
-		CommonOps_DDRM.multTransB(tmp,P,tmp2);
+	public static void intrinsicFromAbsoluteQuadratic( DMatrixRMaj Q, DMatrixRMaj P, CameraPinhole intrinsic ) {
+		DMatrixRMaj tmp = new DMatrixRMaj(3, 4);
+		DMatrixRMaj tmp2 = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.mult(P, Q, tmp);
+		CommonOps_DDRM.multTransB(tmp, P, tmp2);
 
-		decomposeDiac(tmp2,intrinsic);
+		decomposeDiac(tmp2, intrinsic);
 	}
 
 	/**
@@ -1544,15 +1513,14 @@ public class MultiViewOps {
 	 *
 	 * @param intrinsic (output) K extracted from w
 	 */
-	public static void decomposeDiac( double w11 , double w12 , double w13 , double w22 , double w23 , double w33,
-									  CameraPinhole intrinsic )
-	{
+	public static void decomposeDiac( double w11, double w12, double w13, double w22, double w23, double w33,
+									  CameraPinhole intrinsic ) {
 		// divide by w33 to ensure that it is equal to one
 		double cx = w13/w33;
 		double cy = w23/w33;
-		double fy = Math.sqrt(Math.abs(w22/w33-cy*cy));
+		double fy = Math.sqrt(Math.abs(w22/w33 - cy*cy));
 		double skew = (w12/w33 - cx*cy)/fy;
-		double fx = Math.sqrt(Math.abs(w11/w33-skew*skew - cx*cx));
+		double fx = Math.sqrt(Math.abs(w11/w33 - skew*skew - cx*cx));
 
 		intrinsic.cx = cx;
 		intrinsic.cy = cy;
@@ -1568,8 +1536,8 @@ public class MultiViewOps {
 	 * @param w (input) DIAC 3x3
 	 * @param intrinsic (output) K extracted from w
 	 */
-	public static void decomposeDiac( DMatrixRMaj w , CameraPinhole intrinsic ) {
-		decomposeDiac(w.data[0],w.data[1],w.data[2],w.data[4],w.data[5],w.data[8],intrinsic);
+	public static void decomposeDiac( DMatrixRMaj w, CameraPinhole intrinsic ) {
+		decomposeDiac(w.data[0], w.data[1], w.data[2], w.data[4], w.data[5], w.data[8], intrinsic);
 	}
 
 	/**
@@ -1586,24 +1554,23 @@ public class MultiViewOps {
 	 * @param H (Optional) Storage for 4x4 matrix
 	 * @return The homography
 	 */
-	public static DMatrixRMaj createProjectiveToMetric( DMatrixRMaj K ,
-														double v1 , double v2 , double v3 ,
+	public static DMatrixRMaj createProjectiveToMetric( DMatrixRMaj K,
+														double v1, double v2, double v3,
 														double lambda,
-														@Nullable DMatrixRMaj H )
-	{
-		if( H == null )
-			H = new DMatrixRMaj(4,4);
+														@Nullable DMatrixRMaj H ) {
+		if (H == null)
+			H = new DMatrixRMaj(4, 4);
 		else
-			H.reshape(4,4);
+			H.reshape(4, 4);
 
-		CommonOps_DDRM.insert(K,H,0,0);
-		H.set(0,3,0);
-		H.set(1,3,0);
-		H.set(2,3,0);
-		H.set(3,0,v1);
-		H.set(3,1,v2);
-		H.set(3,2,v3);
-		H.set(3,3,lambda);
+		CommonOps_DDRM.insert(K, H, 0, 0);
+		H.set(0, 3, 0);
+		H.set(1, 3, 0);
+		H.set(2, 3, 0);
+		H.set(3, 0, v1);
+		H.set(3, 1, v2);
+		H.set(3, 2, v3);
+		H.set(3, 3, lambda);
 
 		return H;
 	}
@@ -1611,16 +1578,15 @@ public class MultiViewOps {
 	/**
 	 * Decomposes the absolute dual quadratic into the following submatrices: Q=[w -w*p;-p'*w p'*w*p]
 	 *
-	 * @see DecomposeAbsoluteDualQuadratic
-	 *
 	 * @param Q (Input) Absolute quadratic. Typically found in auto calibration. Not modified.
 	 * @param w (Output) 3x3 symmetric matrix
 	 * @param p (Output) 3x1 vector
 	 * @return true if successful or false if it failed
+	 * @see DecomposeAbsoluteDualQuadratic
 	 */
-	public static boolean decomposeAbsDualQuadratic( DMatrix4x4 Q , DMatrix3x3 w , DMatrix3 p ) {
+	public static boolean decomposeAbsDualQuadratic( DMatrix4x4 Q, DMatrix3x3 w, DMatrix3 p ) {
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
-		if( !alg.decompose(Q) )
+		if (!alg.decompose(Q))
 			return false;
 		w.set(alg.getW());
 		p.set(alg.getP());
@@ -1629,40 +1595,40 @@ public class MultiViewOps {
 
 	/**
 	 * Splits the associated pairs into two lists
+	 *
 	 * @param input List of associated features
 	 * @return two lists containing each set of features
 	 */
-	public static Tuple2<List<Point2D_F64>,List<Point2D_F64>> split2( List<AssociatedPair> input )
-	{
+	public static Tuple2<List<Point2D_F64>, List<Point2D_F64>> split2( List<AssociatedPair> input ) {
 		List<Point2D_F64> list1 = new ArrayList<>();
 		List<Point2D_F64> list2 = new ArrayList<>();
 
 		for (int i = 0; i < input.size(); i++) {
-			list1.add( input.get(i).p1 );
-			list2.add( input.get(i).p2 );
+			list1.add(input.get(i).p1);
+			list2.add(input.get(i).p2);
 		}
 
-		return new Tuple2<>(list1,list2);
+		return new Tuple2<>(list1, list2);
 	}
 
 	/**
 	 * Splits the associated triple into three lists
+	 *
 	 * @param input List of associated features
 	 * @return three lists containing each set of features
 	 */
-	public static Tuple3<List<Point2D_F64>,List<Point2D_F64>,List<Point2D_F64>> split3(List<AssociatedTriple> input )
-	{
+	public static Tuple3<List<Point2D_F64>, List<Point2D_F64>, List<Point2D_F64>> split3( List<AssociatedTriple> input ) {
 		List<Point2D_F64> list1 = new ArrayList<>();
 		List<Point2D_F64> list2 = new ArrayList<>();
 		List<Point2D_F64> list3 = new ArrayList<>();
 
 		for (int i = 0; i < input.size(); i++) {
-			list1.add( input.get(i).p1 );
-			list2.add( input.get(i).p2 );
-			list3.add( input.get(i).p3 );
+			list1.add(input.get(i).p1);
+			list2.add(input.get(i).p2);
+			list3.add(input.get(i).p3);
 		}
 
-		return new Tuple3<>(list1,list2,list3);
+		return new Tuple3<>(list1, list2, list3);
 	}
 
 	/**
@@ -1672,22 +1638,21 @@ public class MultiViewOps {
 	 * @param structure camera locations
 	 * @param observations observations of features in the images
 	 */
-	public static void triangulatePoints(SceneStructureMetric structure , SceneObservations observations )
-	{
+	public static void triangulatePoints( SceneStructureMetric structure, SceneObservations observations ) {
 		TriangulateNViewsMetric triangulation = FactoryMultiView.
 				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC());
 
 		List<RemoveBrownPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.size; i++) {
 			RemoveBrownPtoN_F64 p2n = new RemoveBrownPtoN_F64();
-			if( structure.cameras.data[i].model instanceof BundlePinholeSimplified ) {
-				BundlePinholeSimplified cam = (BundlePinholeSimplified) structure.cameras.data[i].model;
+			if (structure.cameras.data[i].model instanceof BundlePinholeSimplified) {
+				BundlePinholeSimplified cam = (BundlePinholeSimplified)structure.cameras.data[i].model;
 				p2n.setK(cam.f, cam.f, 0, 0, 0).setDistortion(new double[]{cam.k1, cam.k2}, 0, 0);
-			} else if( structure.cameras.data[i].model instanceof BundlePinhole) {
-				BundlePinhole cam = (BundlePinhole) structure.cameras.data[i].model;
-				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{0,0}, 0,0);
-			} else if( structure.cameras.data[i].model instanceof BundlePinholeBrown) {
-				BundlePinholeBrown cam = (BundlePinholeBrown) structure.cameras.data[i].model;
+			} else if (structure.cameras.data[i].model instanceof BundlePinhole) {
+				BundlePinhole cam = (BundlePinhole)structure.cameras.data[i].model;
+				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{0, 0}, 0, 0);
+			} else if (structure.cameras.data[i].model instanceof BundlePinholeBrown) {
+				BundlePinholeBrown cam = (BundlePinholeBrown)structure.cameras.data[i].model;
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(cam.radial, cam.t1, cam.t2);
 			} else {
 				throw new RuntimeException("Unknown camera model!");
@@ -1708,30 +1673,31 @@ public class MultiViewOps {
 			for (int j = 0; j < sp.views.size; j++) {
 				int viewIdx = sp.views.get(j);
 				SceneStructureMetric.View v = structure.views.data[viewIdx];
-				worldToViews.add(v.parent_to_view);
+				worldToViews.add(structure.getParentToView(v));
 
 				// get the observation in pixels
 				Point2D_F64 n = normObs.grow();
 				int pointidx = observations.views.get(viewIdx).point.indexOf(i);
-				observations.views.get(viewIdx).get(pointidx,n);
+				observations.views.get(viewIdx).get(pointidx, n);
 				// convert to normalized image coordinates
-				list_p_to_n.get(v.camera).compute(n.x,n.y,n);
+				list_p_to_n.get(v.camera).compute(n.x, n.y, n);
 			}
 
-			triangulation.triangulate(normObs.toList(),worldToViews,X);
-			sp.set(X.x,X.y,X.z);
+			triangulation.triangulate(normObs.toList(), worldToViews, X);
+			sp.set(X.x, X.y, X.z);
 		}
 	}
 
 	/**
 	 * Finds this scale which minimizes the difference between `a` and `b`. ||scale*a-b||
+	 *
 	 * @param a (Input) matrix
 	 * @param b (Input) matrix
 	 * @return scale factor
 	 */
-	public static double findScale( DMatrixRMaj a , DMatrixRMaj b ) {
-		assertBoof(a.numRows==b.numRows);
-		assertBoof(a.numCols==b.numCols);
+	public static double findScale( DMatrixRMaj a, DMatrixRMaj b ) {
+		assertBoof(a.numRows == b.numRows);
+		assertBoof(a.numCols == b.numCols);
 
 		final int N = a.getNumElements();
 		double sum = 0.0;
@@ -1739,7 +1705,7 @@ public class MultiViewOps {
 		for (int i = 0; i < N; i++) {
 			double valA = a.data[i];
 			double valB = b.data[i];
-			if( valA == 0.0 )
+			if (valA == 0.0)
 				continue;
 			double weight = Math.abs(valB);
 			sum += weight*(valB/valA);
@@ -1751,35 +1717,36 @@ public class MultiViewOps {
 
 	/**
 	 * Finds the scale which minimizes the difference between `a` and `b`. ||scale*a-b||
+	 *
 	 * @param a (Input) 3D coordinate
 	 * @param b (Input) 3D coordinate
 	 * @return scale factor
 	 */
-	public static double findScale(GeoTuple3D_F64<?> a , GeoTuple3D_F64<?> b ) {
+	public static double findScale( GeoTuple3D_F64<?> a, GeoTuple3D_F64<?> b ) {
 		int which = UtilPoint3D_F64.axisLargestAbs(a);
 		double bottom = a.getIdx(which);
-		if( bottom == 0.0 )
+		if (bottom == 0.0)
 			return 0.0;
-		return b.getIdx(which) / bottom;
+		return b.getIdx(which)/bottom;
 	}
-
 
 	/**
 	 * Lists a list of {@link AssociatedTriple} into a list of observations for each camera independently.
+	 *
 	 * @param src (Input) list of {@link AssociatedTriple}
 	 * @param dst (Output) list of lists. Can be null.
 	 * @return list of lists.
 	 */
 	public static List<List<Point2D_F64>>
-	splits3Lists(List<AssociatedTriple> src , @Nullable List<List<Point2D_F64>> dst ) {
+	splits3Lists( List<AssociatedTriple> src, @Nullable List<List<Point2D_F64>> dst ) {
 		// Ensure dst is a list that contains 3 empty lists
-		if( dst == null ) {
+		if (dst == null) {
 			dst = new ArrayList<>();
 		}
-		if( dst.size() != 3 ) {
+		if (dst.size() != 3) {
 			dst.clear();
 			for (int i = 0; i < 3; i++) {
-				dst.add( new ArrayList<>() );
+				dst.add(new ArrayList<>());
 			}
 		} else {
 			for (int i = 0; i < 3; i++) {
@@ -1797,31 +1764,31 @@ public class MultiViewOps {
 		return dst;
 	}
 
-	public static void convert(List<AssociatedTriple> src , FastQueue<AssociatedTuple> dst ) {
+	public static void convert( List<AssociatedTriple> src, FastQueue<AssociatedTuple> dst ) {
 		dst.resize(src.size());
-		if(src.size()==0)
+		if (src.size() == 0)
 			return;
-		assertBoof(dst.get(0).size()==3);
+		assertBoof(dst.get(0).size() == 3);
 
 		for (int i = 0; i < src.size(); i++) {
 			AssociatedTriple a = src.get(i);
 			AssociatedTuple b = dst.get(i);
-			b.set(0,a.p1);
-			b.set(1,a.p2);
-			b.set(2,a.p3);
+			b.set(0, a.p1);
+			b.set(1, a.p2);
+			b.set(2, a.p3);
 		}
 	}
 
-	public static void convert(List<AssociatedTuple> src , int idx0 , int idx1,
-							   FastQueue<AssociatedPair> dst ) {
+	public static void convert( List<AssociatedTuple> src, int idx0, int idx1,
+								FastQueue<AssociatedPair> dst ) {
 		dst.resize(src.size());
-		if(src.size()==0)
+		if (src.size() == 0)
 			return;
-		assertBoof(src.get(0).size()==3);
+		assertBoof(src.get(0).size() == 3);
 
 		for (int i = 0; i < src.size(); i++) {
 			AssociatedTuple a = src.get(i);
-			dst.get(i).set(a.get(idx0),a.get(idx1));
+			dst.get(i).set(a.get(idx0), a.get(idx1));
 		}
 	}
 }

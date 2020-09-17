@@ -284,9 +284,11 @@ public class ImplPerspectiveOps_F64 {
 	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , Point3D_F64 pixelH) {
 		DMatrixRMaj P = cameraMatrix;
 
-		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;
-		pixelH.y = P.data[4]*X.x + P.data[5]*X.y + P.data[6]*X.z + P.data[7]*X.w;
+		// @formatter:off
+		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2 ]*X.z + P.data[3 ]*X.w;
+		pixelH.y = P.data[4]*X.x + P.data[5]*X.y + P.data[6 ]*X.z + P.data[7 ]*X.w;
 		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11]*X.w;
+		// @formatter:on
 	}
 
 	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , Point2D_F64 pixel) {

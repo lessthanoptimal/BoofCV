@@ -39,4 +39,10 @@ public class BundleAdjustmentMetricSchurJacobian_DDRM
 	protected void set( DMatrix matrix, int row, int col, double value ) {
 		matrix.unsafe_set(row, col, value);
 	}
+
+	@Override
+	protected void add( DMatrix matrix, int row, int col, double value ) {
+		DMatrixRMaj m = (DMatrixRMaj)matrix;
+		m.data[row*m.numCols + col] += value;
+	}
 }

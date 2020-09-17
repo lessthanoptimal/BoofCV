@@ -366,6 +366,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure,observations);
 		pruner.pruneObservationsByErrorRank(0.7);
 		pruner.pruneViews(10);
+		pruner.pruneUnusedMotions();
 		pruner.prunePoints(1);
 		bundleAdjustment.setParameters(structure,observations);
 		bundleAdjustment.optimize(structure);
@@ -373,7 +374,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		System.out.println("Final Views");
 		for (int i = 0; i < 3; i++) {
 			BundlePinholeSimplified cp = structure.getCameras().get(i).getModel();
-			Vector3D_F64 T = structure.getViews().data[i].parent_to_view.T;
+			Vector3D_F64 T = structure.getParentToView(i).T;
 			System.out.printf("[ %d ] f = %5.1f T=%s\n",i,cp.f,T.toString());
 		}
 
@@ -388,7 +389,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		intrinsic02.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic02.fsetRadial(cp.k1,cp.k2);
 
-		Se3_F64 leftToRight = structure.views.data[1].parent_to_view;
+		Se3_F64 leftToRight = structure.getParentToView(1);
 
 		// TODO dynamic max disparity
 		computeStereoCloud(image01,image02,color01,color02,intrinsic01,intrinsic02,leftToRight,0,250);
@@ -415,11 +416,11 @@ public class ExampleTrifocalStereoUncalibrated {
 			if( X.z < 0 )
 				totalBehind++;
 		}
-		structure.views.data[1].parent_to_view.T.print();
+		structure.getParentToView(1).T.print();
 		if( totalBehind > structure.points.size/2 ) {
 			System.out.println("Flipping because it's reversed. score = "+bundleAdjustment.getFitScore());
 			for (int i = 1; i < structure.views.size; i++) {
-				Se3_F64 w2v = structure.views.data[i].parent_to_view;
+				Se3_F64 w2v = structure.getParentToView(i);
 				w2v.set(w2v.invert(null));
 			}
 			triangulatePoints(structure,observations);

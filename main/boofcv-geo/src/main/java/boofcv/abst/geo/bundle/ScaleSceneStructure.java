@@ -286,11 +286,11 @@ public class ScaleSceneStructure {
 		undoNormPoints3D(structure, scale);
 
 		Point3D_F64 c = new Point3D_F64();
-		for (int i = 0; i < structure.views.size; i++) {
-			SceneStructureMetric.View view = structure.views.data[i];
+		for (int i = 0; i < structure.motions.size; i++) {
+			SceneStructureMetric.Motion motion = structure.motions.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(view.parent_to_view.R, view.parent_to_view.T, c);
+			GeometryMath_F64.multTran(motion.motion.R, motion.motion.T, c);
 
 			// Apply transform
 			c.x = -c.x/scale + medianPoint.x;
@@ -298,8 +298,8 @@ public class ScaleSceneStructure {
 			c.z = -c.z/scale + medianPoint.z;
 
 			// -R*T
-			GeometryMath_F64.mult(view.parent_to_view.R, c, view.parent_to_view.T);
-			view.parent_to_view.T.scale(-1);
+			GeometryMath_F64.mult(motion.motion.R, c, motion.motion.T);
+			motion.motion.T.scale(-1);
 		}
 	}
 
@@ -360,11 +360,11 @@ public class ScaleSceneStructure {
 		double scale = desiredDistancePoint/medianDistancePoint;
 
 		Point3D_F64 c = new Point3D_F64();
-		for (int i = 0; i < structure.views.size; i++) {
-			SceneStructureMetric.View view = structure.views.data[i];
+		for (int i = 0; i < structure.motions.size; i++) {
+			SceneStructureMetric.Motion motion = structure.motions.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(view.parent_to_view.R, view.parent_to_view.T, c);
+			GeometryMath_F64.multTran(motion.motion.R, motion.motion.T, c);
 
 			// Apply transform
 			c.x = -scale*(c.x + medianPoint.x);
@@ -372,8 +372,8 @@ public class ScaleSceneStructure {
 			c.z = -scale*(c.z + medianPoint.z);
 
 			// -R*T
-			GeometryMath_F64.mult(view.parent_to_view.R, c, view.parent_to_view.T);
-			view.parent_to_view.T.scale(-1);
+			GeometryMath_F64.mult(motion.motion.R, c, motion.motion.T);
+			motion.motion.T.scale(-1);
 		}
 	}
 

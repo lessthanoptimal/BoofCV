@@ -45,26 +45,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestThreeViewEstimateMetricScene {
 	Random rand = new Random(234);
-	CameraPinhole intrinsic = new CameraPinhole(400,400,0,0,0,900,900);
+	CameraPinhole intrinsic = new CameraPinhole(400, 400, 0, 0, 0, 900, 900);
 
 	List<Point3D_F64> features;
-	Se3_F64 view0_to_view1 = SpecialEuclideanOps_F64.eulerXyz(0.2,0.02,-0.2,-0.05,0,0.1,null);
-	Se3_F64 view0_to_view2 = SpecialEuclideanOps_F64.eulerXyz(-0.2,0.1,0.01,0.1,0.05,0.01,null);
+	Se3_F64 view0_to_view1 = SpecialEuclideanOps_F64.eulerXyz(0.2, 0.02, -0.2, -0.05, 0, 0.1, null);
+	Se3_F64 view0_to_view2 = SpecialEuclideanOps_F64.eulerXyz(-0.2, 0.1, 0.01, 0.1, 0.05, 0.01, null);
 
 	List<AssociatedTriple> views = new ArrayList<>();
 
-
 	@BeforeEach
 	void before() {
-		features = UtilPoint3D_F64.random(new Point3D_F64(0,0,2),-1,1,100,rand);
+		features = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2), -1, 1, 100, rand);
 		for (int i = 0; i < features.size(); i++) {
 			Point3D_F64 X = features.get(i);
 
-			Point2D_F64 x0 = PerspectiveOps.renderPixel(intrinsic,X, null);
-			Point2D_F64 x1 = PerspectiveOps.renderPixel(view0_to_view1,intrinsic,X, null);
-			Point2D_F64 x2 = PerspectiveOps.renderPixel(view0_to_view2,intrinsic,X, null);
+			Point2D_F64 x0 = PerspectiveOps.renderPixel(intrinsic, X, null);
+			Point2D_F64 x1 = PerspectiveOps.renderPixel(view0_to_view1, intrinsic, X, null);
+			Point2D_F64 x2 = PerspectiveOps.renderPixel(view0_to_view2, intrinsic, X, null);
 
-			views.add(new AssociatedTriple(x0,x1,x2));
+			views.add(new AssociatedTriple(x0, x1, x2));
 		}
 	}
 
@@ -73,19 +72,19 @@ public class TestThreeViewEstimateMetricScene {
 
 		ThreeViewEstimateMetricScene alg = new ThreeViewEstimateMetricScene();
 
-		assertTrue(alg.process(views,900,900));
+		assertTrue(alg.process(views, 900, 900));
 
 		// See if the reconstructed seen matches the original to within a high level of precision
 		SceneStructureMetric structure = alg.getStructure();
 		for (int i = 0; i < 3; i++) {
 			BundlePinholeSimplified c = structure.getCameras().get(i).getModel();
-			assertEquals(intrinsic.fx,c.f, 1e-4);
-			assertEquals(0,c.k1, 1e-5);
-			assertEquals(0,c.k2, 1e-5);
+			assertEquals(intrinsic.fx, c.f, 1e-4);
+			assertEquals(0, c.k1, 1e-5);
+			assertEquals(0, c.k2, 1e-5);
 		}
 
-		Se3_F64 found1 = structure.getViews().data[1].parent_to_view;
-		Se3_F64 found2 = structure.getViews().data[2].parent_to_view;
+		Se3_F64 found1 = structure.getParentToView(1);
+		Se3_F64 found2 = structure.getParentToView(2);
 
 		view0_to_view1.T.normalize();
 		found1.T.normalize();
@@ -94,17 +93,17 @@ public class TestThreeViewEstimateMetricScene {
 		found2.T.normalize();
 		assertEquals(0, found2.T.distance(view0_to_view2.T), 1e-4);
 
-		double []found_xyz = ConvertRotation3D_F64.matrixToEuler(found1.R, EulerType.XYZ,null);
-		double []expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view1.R, EulerType.XYZ,null);
+		double[] found_xyz = ConvertRotation3D_F64.matrixToEuler(found1.R, EulerType.XYZ, null);
+		double[] expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view1.R, EulerType.XYZ, null);
 
 		for (int i = 0; i < 3; i++) {
-			assertEquals(expec_xyz[i],found_xyz[i], 1e-4);
+			assertEquals(expec_xyz[i], found_xyz[i], 1e-4);
 		}
-		found_xyz = ConvertRotation3D_F64.matrixToEuler(found2.R, EulerType.XYZ,null);
-		expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view2.R, EulerType.XYZ,null);
+		found_xyz = ConvertRotation3D_F64.matrixToEuler(found2.R, EulerType.XYZ, null);
+		expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view2.R, EulerType.XYZ, null);
 
 		for (int i = 0; i < 3; i++) {
-			assertEquals(expec_xyz[i],found_xyz[i], 1e-4);
+			assertEquals(expec_xyz[i], found_xyz[i], 1e-4);
 		}
 	}
 }

@@ -65,37 +65,37 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 		for (int rigidIndex = 0; rigidIndex < structure.rigids.size; rigidIndex++) {
 			SceneStructureMetric.Rigid rigid = structure.rigids.data[rigidIndex];
 			// Decode the rigid body transform from object to world
-			if (!rigid.known) {
-				rotation.setParameters(input, index);
-				rigid.object_to_world.R.set(rotation.getRotationMatrix());
-				index += rotation.getParameterLength();
+			if (rigid.known)
+				continue;
+			rotation.setParameters(input, index);
+			rigid.object_to_world.R.set(rotation.getRotationMatrix());
+			index += rotation.getParameterLength();
 
-				rigid.object_to_world.T.x = input[index++];
-				rigid.object_to_world.T.y = input[index++];
-				rigid.object_to_world.T.z = input[index++];
-			}
+			rigid.object_to_world.T.x = input[index++];
+			rigid.object_to_world.T.y = input[index++];
+			rigid.object_to_world.T.z = input[index++];
 		}
 
-		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
-			SceneStructureMetric.View view = structure.views.data[viewIndex];
+		for (int motionIndex = 0; motionIndex < structure.motions.size; motionIndex++) {
+			SceneStructureMetric.Motion motion = structure.motions.data[motionIndex];
 			// Decode the rigid body transform from world to view
-			if (!view.known) {
-				rotation.setParameters(input, index);
-				view.parent_to_view.R.set(rotation.getRotationMatrix());
-				index += rotation.getParameterLength();
+			if (motion.known)
+				continue;
+			rotation.setParameters(input, index);
+			motion.motion.R.set(rotation.getRotationMatrix());
+			index += rotation.getParameterLength();
 
-				view.parent_to_view.T.x = input[index++];
-				view.parent_to_view.T.y = input[index++];
-				view.parent_to_view.T.z = input[index++];
-			}
+			motion.motion.T.x = input[index++];
+			motion.motion.T.y = input[index++];
+			motion.motion.T.z = input[index++];
 		}
 
 		for (int i = 0; i < structure.cameras.size; i++) {
 			SceneStructureCommon.Camera camera = structure.cameras.data[i];
-			if (!camera.known) {
-				camera.model.setIntrinsic(input, index);
-				index += camera.model.getIntrinsicCount();
-			}
+			if (camera.known)
+				continue;
+			camera.model.setIntrinsic(input, index);
+			index += camera.model.getIntrinsicCount();
 		}
 	}
 
@@ -115,35 +115,35 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 		for (int rigidIndex = 0; rigidIndex < structure.rigids.size; rigidIndex++) {
 			SceneStructureMetric.Rigid rigid = structure.rigids.data[rigidIndex];
 			// Decode the rigid body transform from object to world
-			if (!rigid.known) {
-				rotation.getParameters(rigid.object_to_world.R, output, index);
-				index += rotation.getParameterLength();
+			if (rigid.known)
+				continue;
+			rotation.getParameters(rigid.object_to_world.R, output, index);
+			index += rotation.getParameterLength();
 
-				output[index++] = rigid.object_to_world.T.x;
-				output[index++] = rigid.object_to_world.T.y;
-				output[index++] = rigid.object_to_world.T.z;
-			}
+			output[index++] = rigid.object_to_world.T.x;
+			output[index++] = rigid.object_to_world.T.y;
+			output[index++] = rigid.object_to_world.T.z;
 		}
 
-		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
-			SceneStructureMetric.View view = structure.views.data[viewIndex];
+		for (int motionIndex = 0; motionIndex < structure.motions.size; motionIndex++) {
+			SceneStructureMetric.Motion motion = structure.motions.data[motionIndex];
 			// Decode the rigid body transform from world to view
-			if (!view.known) {
-				rotation.getParameters(view.parent_to_view.R, output, index);
-				index += rotation.getParameterLength();
+			if (motion.known)
+				continue;
+			rotation.getParameters(motion.motion.R, output, index);
+			index += rotation.getParameterLength();
 
-				output[index++] = view.parent_to_view.T.x;
-				output[index++] = view.parent_to_view.T.y;
-				output[index++] = view.parent_to_view.T.z;
-			}
+			output[index++] = motion.motion.T.x;
+			output[index++] = motion.motion.T.y;
+			output[index++] = motion.motion.T.z;
 		}
 
 		for (int i = 0; i < structure.cameras.size; i++) {
 			SceneStructureCommon.Camera camera = structure.cameras.data[i];
-			if (!camera.known) {
-				camera.model.getIntrinsic(output, index);
-				index += camera.model.getIntrinsicCount();
-			}
+			if (camera.known)
+				continue;
+			camera.model.getIntrinsic(output, index);
+			index += camera.model.getIntrinsicCount();
 		}
 	}
 }

@@ -54,7 +54,7 @@ class TestCodecSceneStructureMetric {
 		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
 		int pointLength = homogenous ? 4 : 3;
-		int N = original.getUnknownViewCount()*6 + original.getUnknownRigidCount()*6 +
+		int N = original.getUnknownMotionCount()*6 + original.getUnknownRigidCount()*6 +
 				original.points.size*pointLength + original.getUnknownCameraParameterCount();
 		assertEquals(N, original.getParameterCount());
 		double[] param = new double[N];
@@ -81,15 +81,15 @@ class TestCodecSceneStructureMetric {
 			assertArrayEquals(po, pf, UtilEjml.TEST_F64);
 		}
 
-		for (int i = 0; i < original.views.size; i++) {
-			SceneStructureMetric.View o = original.views.data[i];
-			SceneStructureMetric.View f = found.views.data[i];
+		for (int i = 0; i < original.motions.size; i++) {
+			SceneStructureMetric.Motion o = original.motions.data[i];
+			SceneStructureMetric.Motion f = found.motions.data[i];
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(o.parent_to_view.R,
-					f.parent_to_view.R, UtilEjml.TEST_F64));
-			assertEquals(o.parent_to_view.T.x, f.parent_to_view.T.x, UtilEjml.TEST_F64);
-			assertEquals(o.parent_to_view.T.y, f.parent_to_view.T.y, UtilEjml.TEST_F64);
-			assertEquals(o.parent_to_view.T.z, f.parent_to_view.T.z, UtilEjml.TEST_F64);
+			assertTrue(MatrixFeatures_DDRM.isIdentical(o.motion.R,
+					f.motion.R, UtilEjml.TEST_F64));
+			assertEquals(o.motion.T.x, f.motion.T.x, UtilEjml.TEST_F64);
+			assertEquals(o.motion.T.y, f.motion.T.y, UtilEjml.TEST_F64);
+			assertEquals(o.motion.T.z, f.motion.T.z, UtilEjml.TEST_F64);
 		}
 
 		for (int i = 0; i < original.rigids.size; i++) {
@@ -109,7 +109,7 @@ class TestCodecSceneStructureMetric {
 
 		int numRigid = hasRigid ? 2 : 0;
 
-		out.initialize(2, 4, 5, numRigid);
+		out.initialize(2, 4, 4, 5, numRigid);
 
 		out.setCamera(0, true, new CameraPinhole(200, 300,
 				0.1, 400, 500, 1, 1));
@@ -180,7 +180,7 @@ class TestCodecSceneStructureMetric {
 
 			// Create a chain of relative views
 			if (hasRelative)
-				out.views.data[i].parent = i - 1;
+				out.views.data[i].parent = i > 0 ? out.views.data[i - 1] : null;
 		}
 
 		// Assign first point to all views then the other points to just one view
@@ -191,6 +191,62 @@ class TestCodecSceneStructureMetric {
 			out.points.data[i].views.add(i - 1);
 		}
 
+		return out;
+	}
+
+	/**
+	 * Create a scene where a "stereo" camera is created that moves. The right to left transform is fixed and common
+	 * across all views
+	 */
+	static SceneStructureMetric createSceneStereo( Random rand, boolean homogenous ) {
+		SceneStructureMetric out = new SceneStructureMetric(homogenous);
+
+		int numSteps = 2;
+		out.initialize(2, 2*numSteps, 5);
+
+		// Left camera
+		out.setCamera(0, true, new CameraPinhole(200, 300,
+				0.1, 400, 500, 1, 1));
+
+		// Right camera
+		out.setCamera(1, false, new CameraPinhole(201 + rand.nextGaussian(), 200,
+				0.01, 401 + rand.nextGaussian(), 50 + rand.nextGaussian(), 1, 1));
+
+		// Create a fixed transform for left to right camera
+		int leftToRightIdx = out.addMotion(true, SpecialEuclideanOps_F64.eulerXyz(0.25, 0.01, -0.05, 0.01, 0.02, -0.1, null));
+
+		if (homogenous) {
+			for (int i = 0; i < out.points.size; i++) {
+				double w = rand.nextDouble()*0.5 + 0.5;
+				out.setPoint(i, w*(i + 1), w*(i + 2*rand.nextGaussian()), w*(2*i - 3*rand.nextGaussian()), w);
+			}
+		} else {
+			for (int i = 0; i < out.points.size; i++) {
+				out.setPoint(i, i + 1, i + 2*rand.nextGaussian(), 2*i - 3*rand.nextGaussian());
+			}
+		}
+
+		for (int step = 0; step < numSteps; step++) {
+			Se3_F64 world_to_left = SpecialEuclideanOps_F64.eulerXyz(0.1, -0.15, -0.05 + step*0.2,
+					rand.nextGaussian()*0.05, rand.nextGaussian()*0.05, rand.nextGaussian()*0.05, null);
+			out.setView(step*2, false, world_to_left);
+			out.connectViewToCamera(step*2, 0);
+
+			out.connectViewToMotion(step*2 + 1, leftToRightIdx, step*2);
+			out.connectViewToCamera(step*2 + 1, 1);
+		}
+
+		// Assign first point to all views then the other points to just one view
+		for (int i = 0; i < out.views.size; i++) {
+			out.points.data[0].views.add(i);
+		}
+		for (int i = 1; i < out.points.size; i++) {
+			out.points.data[i].views.add((i - 1)%out.views.size);
+		}
+
+		// Sanity check
+		assertEquals(numSteps + 1, out.motions.size);
+		assertEquals(numSteps*2, out.views.size);
 		return out;
 	}
 }

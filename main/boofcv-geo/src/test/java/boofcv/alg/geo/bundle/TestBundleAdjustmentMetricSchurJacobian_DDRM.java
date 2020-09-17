@@ -27,11 +27,13 @@ import org.ejml.data.DMatrixRMaj;
 public class TestBundleAdjustmentMetricSchurJacobian_DDRM
 		extends CommonBundleAdjustmentMetricSchurJacobian<DMatrixRMaj> {
 
-	@Override protected BundleAdjustmentMetricSchurJacobian<DMatrixRMaj> createAlg() {
+	@Override
+	protected BundleAdjustmentMetricSchurJacobian<DMatrixRMaj> createAlg() {
 		return new BundleAdjustmentMetricSchurJacobian_DDRM();
 	}
 
-	@Override protected SchurJacobian_to_NtoMxN<DMatrixRMaj>
+	@Override
+	protected SchurJacobian_to_NtoMxN<DMatrixRMaj>
 	createJacobian( BundleAdjustmentMetricSchurJacobian<DMatrixRMaj> alg ) {
 		return new SchurJacobian_to_NtoMxN.DDRM(alg);
 	}

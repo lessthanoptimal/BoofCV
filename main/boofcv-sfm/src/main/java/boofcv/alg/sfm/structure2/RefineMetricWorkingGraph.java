@@ -429,7 +429,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		// save the results
 		for (int viewIdx = 0; viewIdx < graph.viewList.size(); viewIdx++) {
 			SceneWorkingGraph.View wview = graph.viewList.get(viewIdx);
-			wview.world_to_view.set(structure.views.get(viewIdx).parent_to_view);
+			wview.world_to_view.set(structure.getParentToView(viewIdx));
 			wview.intrinsic.set((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
 		}
 		return true;

@@ -26,7 +26,6 @@ import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
@@ -34,11 +33,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("RedundantCast")
 class TestPruneStructureFromSceneMetric {
 	private final Random rand = BoofTesting.createRandom(234);
 
@@ -239,7 +240,7 @@ class TestPruneStructureFromSceneMetric {
 
 		assertEquals(10, observations.views.size);
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change
 		alg.pruneViews(leastCount - 1);
@@ -263,7 +264,7 @@ class TestPruneStructureFromSceneMetric {
 	void pruneUnusedCameras() {
 		createPerfectScene();
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change
 		alg.pruneUnusedCameras();
@@ -286,6 +287,101 @@ class TestPruneStructureFromSceneMetric {
 	}
 
 	/**
+	 * If nothing points to a motion then prune it
+	 */
+	@Test
+	void pruneUnusedMotions() {
+		createPerfectScene();
+
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
+
+		// no change
+		alg.pruneUnusedMotions();
+		assertEquals(10, structure.motions.size);
+
+		// remove all references to the first motion
+		for (int i = 0; i < structure.views.size; i++) {
+			SceneStructureMetric.View v = structure.views.data[i];
+			v.parent_to_view = v.parent_to_view == 1 ? 2 : v.parent_to_view;
+		}
+
+		// First camera is removed
+		alg.pruneUnusedMotions();
+		assertEquals(9, structure.motions.size);
+		structure.views.forIdx(( i, v ) -> assertEquals(i == 0 ? 0 : i == 1 ? 1 : i - 1, v.parent_to_view));
+	}
+
+	/**
+	 * Make sure that if there are relative views in a chain those are handled currently when pruning
+	 */
+	@Test
+	void handleRelativeViews_pruneObservationsBehindCamera() {
+		structure = new SceneStructureMetric(false);
+		structure.initialize(1, 2, 1);
+
+		structure.setCamera(0, true, intrinsic);
+
+		// If view[1] was absolute then the point would not be pruned since it would be infront of both cameras
+		structure.setView(0, true, eulerXyz(0, 0, -1, 0, 0, 0, null));
+		structure.setView(1, true, eulerXyz(0, 0, -1, 0, 0, 0, null), 0);
+		structure.connectViewToCamera(0, 0);
+		structure.connectViewToCamera(1, 0);
+
+		structure.setPoint(0, 0, 0, 1.5);
+
+		createObservationForAll();
+
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
+
+		alg.pruneObservationsBehindCamera();
+		assertEquals(1, observations.getView(0).size());
+		assertEquals(0, observations.getView(1).size());
+	}
+
+	private void createObservationForAll() {
+		observations = new SceneObservations();
+		observations.initialize(structure.views.size);
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
+			observations.getView(viewIdx).resize(structure.points.size);
+			for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
+				observations.getView(viewIdx).set(pointIdx, pointIdx, 20, 20);
+				structure.connectPointToView(pointIdx, viewIdx);
+			}
+		}
+	}
+
+	@Test
+	void handleRelativeViews_pruneViews() {
+		structure = new SceneStructureMetric(false);
+		structure.initialize(1, 3, 3);
+
+		structure.setCamera(0, true, intrinsic);
+
+		structure.setView(0, true, eulerXyz(0, 0, -1, 0, 0, 0, null));
+		structure.setView(1, false, eulerXyz(0, 0, -1, 0, 0, 0, null), 0);
+		structure.setView(2, true, eulerXyz(0, 0, -1, 0, 0, 0, null), 1);
+		for (int i = 0; i < 3; i++) {
+			structure.connectViewToCamera(i, 0);
+		}
+		createObservationForAll();
+
+		// View[1] should not be dropped since another is dependent on it
+		observations.getView(1).resize(0);
+		structure.getPoints().forIdx(( i, p ) -> p.removeView(1));
+
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
+		alg.pruneViews(2);
+		assertEquals(3, structure.views.size);
+
+		// Now make the view[2] prune able, this should cause view[1] to be pruned also
+		// View[1] should not be dropped since another is dependent on it
+		observations.getView(2).resize(0);
+		structure.getPoints().forIdx(( i, p ) -> p.removeView(2));
+		alg.pruneViews(2);
+		assertEquals(1, structure.views.size);
+	}
+
+	/**
 	 * Creates a scene with points in a grid pattern. Useful when testing spacial filters
 	 *
 	 * @param grid Number of points wide the pattern is
@@ -300,8 +396,8 @@ class TestPruneStructureFromSceneMetric {
 		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < grid; i++) {
 			for (int j = 0; j < grid; j++) {
-				double x = (i - grid/2)*space;
-				double y = (j - grid/2)*space;
+				double x = (i - (int)(grid/2))*space;
+				double y = (j - (int)(grid/2))*space;
 
 				Point3D_F64 p = new Point3D_F64(center.x + x, center.y + y, center.z);
 				points.add(p);
@@ -331,26 +427,30 @@ class TestPruneStructureFromSceneMetric {
 
 	private void createRestOfTheScene( List<Point3D_F64> points, boolean sanityCheck ) {
 		for (int i = 0; i < structure.views.size; i++) {
-			double x = -1.5 + 3*i/Math.max(1, (structure.views.size - 1));
-			structure.setView(i, false, SpecialEuclideanOps_F64.eulerXyz(x, 0, 0, 0, 0, 0, null));
+			double x = -1.5 + (int)(3*i/Math.max(1, (structure.views.size - 1)));
+			structure.setView(i, false, eulerXyz(x, 0, 0, 0, 0, 0, null));
 			structure.connectViewToCamera(i, i%2);
 		}
 
 		observations = new SceneObservations();
 		observations.initialize(structure.views.size);
 
+		Se3_F64 world_to_view = new Se3_F64();
+		Se3_F64 tmp = new Se3_F64();
+
 		// 3D point in camera coordinate system
 		Point3D_F64 cameraX = new Point3D_F64();
 		// observed pixel coordinate of 3D point
 		Point2D_F64 pixel = new Point2D_F64();
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
-			BundleAdjustmentCamera camera = structure.cameras.get(structure.views.data[viewIdx].camera).model;
-			Se3_F64 worldToView = structure.views.data[viewIdx].parent_to_view;
+			SceneStructureMetric.View v = structure.views.data[viewIdx];
+			BundleAdjustmentCamera camera = structure.cameras.get(v.camera).model;
+			structure.getWorldToView(v, world_to_view, tmp);
 
 			for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
 				Point3D_F64 p = points.get(pointIdx);
 
-				worldToView.transform(p, cameraX);
+				world_to_view.transform(p, cameraX);
 
 				if (cameraX.z <= 0)
 					continue;
@@ -389,6 +489,9 @@ class TestPruneStructureFromSceneMetric {
 	 * See if all the observations are perfect. This acts as a sanity check on the scenes structure after modification
 	 */
 	private void checkAllObservationsArePerfect() {
+		Se3_F64 world_to_view = new Se3_F64();
+		Se3_F64 tmp = new Se3_F64();
+
 		Point3D_F64 worldX = new Point3D_F64();
 		// 3D point in camera coordinate system
 		Point3D_F64 cameraX = new Point3D_F64();
@@ -396,13 +499,14 @@ class TestPruneStructureFromSceneMetric {
 		Point2D_F64 predicted = new Point2D_F64();
 		Point2D_F64 found = new Point2D_F64();
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
-			BundleAdjustmentCamera camera = structure.cameras.get(structure.views.data[viewIdx].camera).model;
-			Se3_F64 worldToView = structure.views.data[viewIdx].parent_to_view;
+			SceneStructureMetric.View v = structure.views.data[viewIdx];
+			BundleAdjustmentCamera camera = structure.cameras.get(v.camera).model;
+			structure.getWorldToView(v, world_to_view, tmp);
 
 			for (int obsIdx = 0; obsIdx < observations.views.data[viewIdx].size(); obsIdx++) {
 				Point f = structure.points.data[observations.views.data[viewIdx].point.get(obsIdx)];
 				f.get(worldX);
-				worldToView.transform(worldX, cameraX);
+				world_to_view.transform(worldX, cameraX);
 
 				assertTrue(cameraX.z > 0);
 				camera.project(cameraX.x, cameraX.y, cameraX.z, predicted);
