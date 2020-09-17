@@ -59,7 +59,7 @@ public class TestSceneStructureMetric {
 		// add a motion to make the index off by one
 		scene.addMotion(false, new Se3_F64());
 		for (int i = 0; i < scene.views.size; i++) {
-			scene.setView(i, true, SpecialEuclideanOps_F64.eulerXyz(i, 0, 0, 0, 0, 0, null));
+			scene.setView(i, -1, true, SpecialEuclideanOps_F64.eulerXyz(i, 0, 0, 0, 0, 0, null));
 		}
 		for (int i = 0; i < scene.views.size; i++) {
 			assertEquals(i, scene.getParentToView(i).T.x, UtilEjml.TEST_F64);
@@ -74,7 +74,7 @@ public class TestSceneStructureMetric {
 
 		// Create a chained scene
 		for (int i = 0; i < scene.views.size; i++) {
-			scene.setView(i, true, SpecialEuclideanOps_F64.eulerXyz(i + 1, 0, 0, 0, 0, 0, null), i - 1);
+			scene.setView(i, -1, true, SpecialEuclideanOps_F64.eulerXyz(i + 1, 0, 0, 0, 0, 0, null), i - 1);
 		}
 
 		// See if the views properly concatenate

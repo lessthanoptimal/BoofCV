@@ -114,8 +114,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
 			BFrame bf = frames.get(frameIdx);
 			bf.frame_to_world.invert(world_to_view);
-			structure.setView(frameIdx, frameIdx == 0, world_to_view);
-			structure.connectViewToCamera(frameIdx, bf.camera.index);
+			structure.setView(frameIdx, bf.camera.index, frameIdx == 0, world_to_view);
 			frames.get(frameIdx).listIndex = frameIdx; // save the index since it's needed in the next loop
 		}
 

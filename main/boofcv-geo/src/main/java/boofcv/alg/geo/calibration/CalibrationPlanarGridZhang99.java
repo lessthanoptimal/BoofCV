@@ -231,9 +231,8 @@ public class CalibrationPlanarGridZhang99 {
 
 		// Add the initial estimate of each view's location and the points observed
 		for (int viewIdx = 0; viewIdx < motions.size(); viewIdx++) {
-			structure.setView(viewIdx,false,motions.get(viewIdx));
+			structure.setView(viewIdx, 0, false,motions.get(viewIdx));
 			SceneObservations.View v = observations.getViewRigid(viewIdx);
-			structure.connectViewToCamera(viewIdx,0);
 			CalibrationObservation ca = obs.get(viewIdx);
 			for (int j = 0; j < ca.size(); j++) {
 				PointIndex2D_F64 p = ca.get(j);

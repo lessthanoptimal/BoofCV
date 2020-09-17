@@ -167,11 +167,9 @@ public class ExampleStereoUncalibrated {
 		structure.setCamera(0, false, bp);
 
 		// The first view is the world coordinate system
-		structure.setView(0, true, new Se3_F64());
-		structure.connectViewToCamera(0, 0);
+		structure.setView(0, 0, true, new Se3_F64());
 		// Second view was estimated previously
-		structure.setView(1, false, view1_to_view2);
-		structure.connectViewToCamera(1, 0);
+		structure.setView(1, 0, false, view1_to_view2);
 
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedPair t = inliers.get(i);

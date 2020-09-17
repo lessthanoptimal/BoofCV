@@ -62,15 +62,14 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
-public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStructureMetric>
-{
+public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStructureMetric> {
 	// Used to pre-maturely stop the scene estimation process
 	private volatile boolean stopRequested = false;
 
 	private double TRIANGULATE_MIN_ANGLE = Math.PI/20.0;
 
 	// camera name to index
-	Map<String,Integer> cameraToIndex = new HashMap<>();
+	Map<String, Integer> cameraToIndex = new HashMap<>();
 
 	ModelMatcherMultiview<Se3_F64, Point2D3D> ransacPnP;
 	// TODO add back refine epipolar?
@@ -98,7 +97,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 	double maxPixelError = 2.5;
 
-	ConfigRansac configRansac = new ConfigRansac(4000,maxPixelError);
+	ConfigRansac configRansac = new ConfigRansac(4000, maxPixelError);
 
 	/**
 	 * Processes the paired up scene features and computes an initial estimate for the scene's
@@ -108,7 +107,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * @return true if successful
 	 */
 	@Override
-	public boolean process(PairwiseImageGraph pairwiseGraph ) {
+	public boolean process( PairwiseImageGraph pairwiseGraph ) {
 		this.graph = new MetricSceneGraph(pairwiseGraph);
 		for (int i = 0; i < graph.edges.size(); i++) {
 			decomposeEssential(graph.edges.get(i));
@@ -121,46 +120,46 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			e.triangulationAngle = medianTriangulationAngle(e);
 		}
 
-		if( verbose != null )
+		if (verbose != null)
 			verbose.println("Selecting root");
 		// Select the view which will act as the origin
 		View origin = selectOriginNode();
 		// Select the motion which will define the coordinate system
-		Motion baseMotion = selectCoordinateBase( origin );
+		Motion baseMotion = selectCoordinateBase(origin);
 
 		this.graph.sanityCheck();
 
-		if( verbose != null )
+		if (verbose != null)
 			verbose.println("Stereo triangulation");
 		// Triangulate features in all motions which exceed a certain angle
-		for (int i = 0; i < graph.edges.size() && !stopRequested ; i++) {
+		for (int i = 0; i < graph.edges.size() && !stopRequested; i++) {
 			Motion e = graph.edges.get(i);
-			if( e.triangulationAngle > Math.PI/10 || e == baseMotion) {
+			if (e.triangulationAngle > Math.PI/10 || e == baseMotion) {
 				triangulateStereoEdges(e);
-				if( verbose != null ) {
+				if (verbose != null) {
 					int a = e.viewSrc.index;
 					int b = e.viewDst.index;
-					verbose.println("   Edge[" + i + "] "+a+"->"+b+"  feat3D="+e.stereoTriangulations.size());
+					verbose.println("   Edge[" + i + "] " + a + "->" + b + "  feat3D=" + e.stereoTriangulations.size());
 				}
 			}
 		}
-		if( stopRequested )
+		if (stopRequested)
 			return false;
 
-		if( verbose != null )
+		if (verbose != null)
 			verbose.println("Defining the coordinate system");
 
 		// Using the selecting coordinate frames and triangulated points define the coordinate system
 		defineCoordinateSystem(origin, baseMotion);
-		if( stopRequested )
+		if (stopRequested)
 			return false;
 
-		if( verbose != null )
+		if (verbose != null)
 			verbose.println("Estimate all features");
 
 		// Now estimate all the other view locations and 3D features
 		estimateAllFeatures(origin, baseMotion.destination(origin));
-		if( stopRequested )
+		if (stopRequested)
 			return false;
 
 		// Convert the graph into the output format
@@ -188,17 +187,17 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 				Point2D_F64 p0 = motion.viewSrc.observationNorm.get(a.src);
 				Point2D_F64 p1 = motion.viewDst.observationNorm.get(a.dst);
 
-				if( check.checkConstraint(p0,p1,a_to_b)) {
+				if (check.checkConstraint(p0, p1, a_to_b)) {
 					count++;
 				}
 			}
-			if( count > bestScore ) {
+			if (count > bestScore) {
 				bestScore = count;
 				best = a_to_b;
 			}
 		}
 
-		if( best == null )
+		if (best == null)
 			throw new RuntimeException("Problem!");
 
 		motion.a_to_b.set(best);
@@ -207,6 +206,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Compares the angle that different observations form when their lines intersect. Returns
 	 * the median angle. Used to determine if this edge is good for triangulation
+	 *
 	 * @param edge edge
 	 * @return median angle between observations in radians
 	 */
@@ -217,10 +217,10 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 		for (int i = 0; i < edge.associated.size(); i++) {
 			AssociatedIndex a = edge.associated.get(i);
-			Point2D_F64 normA = edge.viewSrc.observationNorm.get( a.src );
-			Point2D_F64 normB = edge.viewDst.observationNorm.get( a.dst );
+			Point2D_F64 normA = edge.viewSrc.observationNorm.get(a.src);
+			Point2D_F64 normB = edge.viewDst.observationNorm.get(a.dst);
 
-			double acute = triangulationAngle(normA,normB,edge.a_to_b);
+			double acute = triangulationAngle(normA, normB, edge.a_to_b);
 			angles.data[i] = acute;
 		}
 
@@ -229,12 +229,13 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	}
 
 	protected void declareModelFitting() {
-		ransacPnP = FactoryMultiViewRobust.pnpRansac(null,configRansac);
+		ransacPnP = FactoryMultiViewRobust.pnpRansac(null, configRansac);
 	}
 
 	/**
 	 * Converts the internal data structures into the output format for bundle adjustment. Camera models are omitted
 	 * since they are not available
+	 *
 	 * @param origin The origin of the coordinate system
 	 */
 	private void convertToOutput( View origin ) {
@@ -244,49 +245,47 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 		// TODO can this be simplified?
 		int idx = 0;
-		for( String key : graph.cameras.keySet() ) {
-			cameraToIndex.put(key,idx++);
+		for (String key : graph.cameras.keySet()) {
+			cameraToIndex.put(key, idx++);
 		}
 
-		structure.initialize(cameraToIndex.size(),viewsAdded.size(), graph.features3D.size());
+		structure.initialize(cameraToIndex.size(), viewsAdded.size(), graph.features3D.size());
 
-		for ( String key : graph.cameras.keySet() ) {
+		for (String key : graph.cameras.keySet()) {
 			int i = cameraToIndex.get(key);
-			structure.setCamera(i,true,graph.cameras.get(key).pinhole);
+			structure.setCamera(i, true, graph.cameras.get(key).pinhole);
 		}
 
 		// look up table from old index to new index
-		int viewOldToView[] = new int[ graph.nodes.size() ];
-		Arrays.fill(viewOldToView,-1);
+		int[] viewOldToView = new int[graph.nodes.size()];
+		Arrays.fill(viewOldToView, -1);
 		for (int i = 0; i < viewsAdded.size(); i++) {
-			viewOldToView[ graph.nodes.indexOf(viewsAdded.get(i))] = i;
+			viewOldToView[graph.nodes.indexOf(viewsAdded.get(i))] = i;
 		}
 
-		for( int i = 0; i < viewsAdded.size(); i++ ) {
+		for (int i = 0; i < viewsAdded.size(); i++) {
 			View v = viewsAdded.get(i);
 			int cameraIndex = cameraToIndex.get(v.camera.camera);
-			structure.setView(i,v==origin,v.viewToWorld.invert(null));
-			structure.connectViewToCamera(i,cameraIndex);
+			structure.setView(i, cameraIndex, v == origin, v.viewToWorld.invert(null));
 		}
 
 		for (int indexPoint = 0; indexPoint < graph.features3D.size(); indexPoint++) {
 			Feature3D f = graph.features3D.get(indexPoint);
 
-			structure.setPoint(indexPoint,f.worldPt.x,f.worldPt.y,f.worldPt.z);
+			structure.setPoint(indexPoint, f.worldPt.x, f.worldPt.y, f.worldPt.z);
 
-			if( f.views.size() != f.obsIdx.size )
+			if (f.views.size() != f.obsIdx.size)
 				throw new RuntimeException("BUG!");
 
 			for (int j = 0; j < f.views.size(); j++) {
 				View view = f.views.get(j);
 				int viewIndex = viewOldToView[view.index];
-				structure.connectPointToView(indexPoint,viewIndex);
+				structure.connectPointToView(indexPoint, viewIndex);
 
 				Point2D_F64 pixel = viewsAdded.get(viewIndex).observationPixels.get(f.obsIdx.get(j));
-				observations.getView(viewIndex).add(indexPoint,(float)pixel.x,(float)pixel.y);
+				observations.getView(viewIndex).add(indexPoint, (float)pixel.x, (float)pixel.y);
 			}
 		}
-
 	}
 
 	/**
@@ -294,7 +293,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * Don't mark the other view as being processed. It's 3D pose will be estimated later on using PNP with the
 	 * new features and features determined later on
 	 */
-	void addTriangulatedStereoFeatures(View base , Motion edge , double scale ) {
+	void addTriangulatedStereoFeatures( View base, Motion edge, double scale ) {
 		View viewA = edge.viewSrc;
 		View viewB = edge.viewDst;
 
@@ -317,7 +316,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 			// find the 3D location of the point in world frame
 			edge3D.worldPt.scale(scale);
-			if( baseIsA ) {
+			if (baseIsA) {
 				viewA.viewToWorld.transform(edge3D.worldPt, edge3D.worldPt);
 			} else {
 				edge.a_to_b.transform(edge3D.worldPt, edge3D.worldPt);
@@ -325,16 +324,16 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			}
 
 			// See if the feature is already known
-			if( world3D != null ) {
+			if (world3D != null) {
 				// Add the other view if another feature in the other view was not already associated with this feature
-				if( !world3D.views.contains(other) ) {
+				if (!world3D.views.contains(other)) {
 					world3D.views.add(other);
-					world3D.obsIdx.add( baseIsA ? indexDst : indexSrc );
+					world3D.obsIdx.add(baseIsA ? indexDst : indexSrc);
 				}
 
 				// Retriangulate the point if it appears that this stereo pair is better than the one which originally
 				// computed it
-				if( world3D.triangulationAngle >= edge3D.triangulationAngle ) {
+				if (world3D.triangulationAngle >= edge3D.triangulationAngle) {
 					continue;
 				}
 				world3D.worldPt.set(edge3D.worldPt);
@@ -354,9 +353,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Determine scale factor difference between edge triangulation and world
 	 */
-	static double determineScale(View base , Motion edge )
-		throws Exception
-	{
+	static double determineScale( View base, Motion edge )
+			throws Exception {
 		View viewA = edge.viewSrc;
 		View viewB = edge.viewDst;
 
@@ -374,22 +372,22 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			int indexDst = edge3D.obsIdx.get(1);
 
 			Feature3D world3D = baseIsA ? viewA.features3D[indexSrc] : viewB.features3D[indexDst];
-			if( world3D == null )
+			if (world3D == null)
 				continue;
 			// Find the world point in the local coordinate system
-			SePointOps_F64.transformReverse(base.viewToWorld,world3D.worldPt,worldInBase3D);
+			SePointOps_F64.transformReverse(base.viewToWorld, world3D.worldPt, worldInBase3D);
 
 			// put this point into the base frame
-			if( !baseIsA ) {
-				SePointOps_F64.transform(edge.a_to_b,edge3D.worldPt,localInBase3D);
+			if (!baseIsA) {
+				SePointOps_F64.transform(edge.a_to_b, edge3D.worldPt, localInBase3D);
 			} else {
 				localInBase3D.set(edge3D.worldPt);
 			}
 
-			scales.add(worldInBase3D.z / localInBase3D.z);
+			scales.add(worldInBase3D.z/localInBase3D.z);
 		}
 
-		if( scales.size < 20 ) {
+		if (scales.size < 20) {
 			throw new Exception("Not enough matches with known points");
 		}
 		// Get the scale offset as the median value to make it robust to noise
@@ -400,7 +398,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Perform a breath first search to find the structure of all the remaining camrea views
 	 */
-	private void estimateAllFeatures(View seedA, View seedB ) {
+	private void estimateAllFeatures( View seedA, View seedB ) {
 		List<View> open = new ArrayList<>();
 
 		// Add features for all the other views connected to the root view and determine the translation scale factor
@@ -408,11 +406,11 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		addUnvistedToStack(seedB, open);
 
 		// Do a breath first search. The queue is first in first out
-		while( !open.isEmpty() ) {
-			if( stopRequested )
+		while (!open.isEmpty()) {
+			if (stopRequested)
 				return;
-			if( verbose != null )
-				verbose.println("### open.size="+open.size());
+			if (verbose != null)
+				verbose.println("### open.size=" + open.size());
 
 			// select the view with the 3D features. This view can be estimated which the highest degree of confience
 			int bestCount = countFeaturesWith3D(open.get(0));
@@ -420,19 +418,19 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 			for (int i = 1; i < open.size(); i++) {
 				int count = countFeaturesWith3D(open.get(i));
-				if( count > bestCount ) {
+				if (count > bestCount) {
 					bestCount = count;
 					bestIndex = i;
 				}
 			}
 
 			View v = open.remove(bestIndex);
-			if( verbose != null )
-				verbose.println("   processing view="+v.index+" | 3D Features="+bestCount);
+			if (verbose != null)
+				verbose.println("   processing view=" + v.index + " | 3D Features=" + bestCount);
 
 			// Determine the view's location in the 3D view. This might have been previously estimated using
 			// stereo and the estimated scale factor. That will be ignored and the new estimate used instead
-			if( !determinePose(v) ) {
+			if (!determinePose(v)) {
 //				// The pose could not be determined, so remove it from the graph
 //				if( verbose != null )
 //					verbose.println("   Removing connection");
@@ -462,14 +460,15 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		}
 	}
 
-	void addTriangulatedFeaturesForAllEdges(View v) {
+	void addTriangulatedFeaturesForAllEdges( View v ) {
 		for (int i = 0; i < v.connections.size(); i++) {
 			Motion e = v.connections.get(i);
-			if( !e.stereoTriangulations.isEmpty() ) {
+			if (!e.stereoTriangulations.isEmpty()) {
 				try {
 					double scale = determineScale(v, e);
 					addTriangulatedStereoFeatures(v, e, scale);
-				} catch (Exception ignore) {} // exception is thrown if it can't determine the scale
+				} catch (Exception ignore) {
+				} // exception is thrown if it can't determine the scale
 			}
 		}
 	}
@@ -477,7 +476,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Count how many 3D features are in view.
 	 */
-	int countFeaturesWith3D(View v ) {
+	int countFeaturesWith3D( View v ) {
 
 		int count = 0;
 
@@ -489,7 +488,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			for (int j = 0; j < m.associated.size(); j++) {
 				AssociatedIndex a = m.associated.get(j);
 
-				if( isSrc ) {
+				if (isSrc) {
 					count += m.viewDst.features3D[a.dst] != null ? 1 : 0;
 				} else {
 					count += m.viewSrc.features3D[a.src] != null ? 1 : 0;
@@ -508,7 +507,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 *
 	 * A known feature has the current view added to its list of views.
 	 */
-	boolean determinePose(View target ) {
+	boolean determinePose( View target ) {
 
 		// Find all Features which are visible in this view and have a known 3D location
 		List<Point2D3D> list = new ArrayList<>();
@@ -517,22 +516,22 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 		// TODO mark need to handle casees where the target's index has changed due to node removal
 		// Find all the known 3D features which are visible in this view
-		for( Motion c : target.connections ) {
+		for (Motion c : target.connections) {
 			boolean isSrc = c.viewSrc == target;
 			View other = c.destination(target);
-			if( other.state != ViewState.PROCESSED )
+			if (other.state != ViewState.PROCESSED)
 				continue;
 
 			for (int i = 0; i < c.associated.size(); i++) {
 				AssociatedIndex a = c.associated.get(i);
 
-				Feature3D f = other.features3D[isSrc?a.dst:a.src];
-				if( f == null || f.mark == target.index)
+				Feature3D f = other.features3D[isSrc ? a.dst : a.src];
+				if (f == null || f.mark == target.index)
 					continue;
 				f.mark = target.index;
 				features.add(f);
-				featureIndexes.add( isSrc?a.src:a.dst);
-				Point2D_F64 norm = target.observationNorm.get( isSrc?a.src:a.dst);
+				featureIndexes.add(isSrc ? a.src : a.dst);
+				Point2D_F64 norm = target.observationNorm.get(isSrc ? a.src : a.dst);
 
 				Point2D3D p = new Point2D3D();
 				p.location.set(f.worldPt);
@@ -542,10 +541,10 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		}
 
 		// Estimate the target's location using robust PNP
-		ransacPnP.setIntrinsic(0,target.camera.pinhole);
-		if( list.size() < 20 || !ransacPnP.process(list) ) {
-			if( verbose != null )
-				verbose.println("   View="+target.index+" RANSAC failed. list.size="+list.size());
+		ransacPnP.setIntrinsic(0, target.camera.pinhole);
+		if (list.size() < 20 || !ransacPnP.process(list)) {
+			if (verbose != null)
+				verbose.println("   View=" + target.index + " RANSAC failed. list.size=" + list.size());
 			return false;
 		}
 
@@ -553,23 +552,23 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 		// add inliers to the features
 		int N = ransacPnP.getMatchSet().size();
-		if( verbose != null )
-			verbose.println("   View="+target.index+" PNP RANSAC "+N+"/"+list.size());
+		if (verbose != null)
+			verbose.println("   View=" + target.index + " PNP RANSAC " + N + "/" + list.size());
 		for (int i = 0; i < N; i++) {
 			int which = ransacPnP.getInputIndex(i);
 			Feature3D f = features.get(which);
-			if( f.views.contains(target))
+			if (f.views.contains(target))
 				continue;
 			f.views.add(target);
 			f.obsIdx.add(featureIndexes.get(which));
 			target.features3D[featureIndexes.get(which)] = f;
 
-			if( f.views.size() != f.obsIdx.size )
+			if (f.views.size() != f.obsIdx.size)
 				throw new RuntimeException("BUG!");
 		}
 
 		Se3_F64 worldToView = ransacPnP.getModelParameters();
-		target.viewToWorld.set( worldToView.invert(null) );
+		target.viewToWorld.set(worldToView.invert(null));
 
 		return true;
 	}
@@ -584,49 +583,49 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 		Se3_F64 worldToTarget = target.viewToWorld.invert(null);
 
-		for( Motion c : target.connections ) {
+		for (Motion c : target.connections) {
 			boolean isSrc = c.viewSrc == target;
 			View other = c.destination(target);
-			if( other.state != ViewState.PROCESSED )
+			if (other.state != ViewState.PROCESSED)
 				continue;
 
-			other.viewToWorld.concat(worldToTarget,otherToTarget);
+			other.viewToWorld.concat(worldToTarget, otherToTarget);
 
-			triangulationError.configure(target.camera.pinhole,other.camera.pinhole);
+			triangulationError.configure(target.camera.pinhole, other.camera.pinhole);
 
 			for (int i = 0; i < c.associated.size(); i++) {
 				AssociatedIndex a = c.associated.get(i);
 
 				int indexTarget = isSrc ? a.src : a.dst;
 				int indexOther = isSrc ? a.dst : a.src;
-				if( target.features3D[indexTarget] != null || other.features3D[indexOther] != null )
+				if (target.features3D[indexTarget] != null || other.features3D[indexOther] != null)
 					continue;
 
-				Point2D_F64 normOther = other.observationNorm.get( indexOther );
-				Point2D_F64 normTarget = target.observationNorm.get( indexTarget );
+				Point2D_F64 normOther = other.observationNorm.get(indexOther);
+				Point2D_F64 normTarget = target.observationNorm.get(indexTarget);
 
 				// Skip points with poor geometry
-				double angle = triangulationAngle(normOther,normTarget,otherToTarget);
-				if( angle < TRIANGULATE_MIN_ANGLE )
+				double angle = triangulationAngle(normOther, normTarget, otherToTarget);
+				if (angle < TRIANGULATE_MIN_ANGLE)
 					continue;
 
 				Feature3D f = new Feature3D();
-				if( !triangulate.triangulate(normOther,normTarget,otherToTarget,f.worldPt))
+				if (!triangulate.triangulate(normOther, normTarget, otherToTarget, f.worldPt))
 					continue;
 
 				// must be in front of the camera
-				if( f.worldPt.z <= 0 )
+				if (f.worldPt.z <= 0)
 					continue;
 
-				double error = triangulationError.process(normOther,normTarget,otherToTarget,f.worldPt);
-				if( error > maxPixelError*maxPixelError )
+				double error = triangulationError.process(normOther, normTarget, otherToTarget, f.worldPt);
+				if (error > maxPixelError*maxPixelError)
 					continue;
 
-				other.viewToWorld.transform(f.worldPt,f.worldPt);
-				f.views.add( target );
-				f.views.add( other );
-				f.obsIdx.add( indexTarget );
-				f.obsIdx.add( indexOther );
+				other.viewToWorld.transform(f.worldPt, f.worldPt);
+				f.views.add(target);
+				f.views.add(other);
+				f.obsIdx.add(indexTarget);
+				f.obsIdx.add(indexOther);
 
 				graph.features3D.add(f);
 				target.features3D[indexTarget] = f;
@@ -639,26 +638,26 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * Computes the acture angle between two vectors. Larger this angle is the better the triangulation
 	 * of the features 3D location is in general
 	 */
-	double triangulationAngle( Point2D_F64 normA , Point2D_F64 normB , Se3_F64 a_to_b ) {
+	double triangulationAngle( Point2D_F64 normA, Point2D_F64 normB, Se3_F64 a_to_b ) {
 		// the more parallel a line is worse the triangulation. Get rid of bad ideas early here
-		arrowA.set(normA.x,normA.y,1);
-		arrowB.set(normB.x,normB.y,1);
-		GeometryMath_F64.mult(a_to_b.R,arrowA,arrowA); // put them into the same reference frame
+		arrowA.set(normA.x, normA.y, 1);
+		arrowB.set(normB.x, normB.y, 1);
+		GeometryMath_F64.mult(a_to_b.R, arrowA, arrowA); // put them into the same reference frame
 
-		return UtilVector3D_F64.acute(arrowA,arrowB);
+		return UtilVector3D_F64.acute(arrowA, arrowB);
 	}
 
 	/**
 	 * Looks to see which connections have yet to be visited and adds them to the open list
 	 */
-	void addUnvistedToStack(View viewed, List<View> open) {
+	void addUnvistedToStack( View viewed, List<View> open ) {
 		for (int i = 0; i < viewed.connections.size(); i++) {
 			View other = viewed.connections.get(i).destination(viewed);
-			if( other.state == ViewState.UNPROCESSED) {
+			if (other.state == ViewState.UNPROCESSED) {
 				other.state = ViewState.PENDING;
 				open.add(other);
-				if( verbose != null )
-					verbose.println("  adding to open "+viewed.index+"->"+other.index);
+				if (verbose != null)
+					verbose.println("  adding to open " + viewed.index + "->" + other.index);
 			}
 		}
 	}
@@ -669,7 +668,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * @param viewA The origin of the coordinate system
 	 * @param motion Motion which will define the coordinate system's scale
 	 */
-	void defineCoordinateSystem(View viewA, Motion motion) {
+	void defineCoordinateSystem( View viewA, Motion motion ) {
 
 		View viewB = motion.destination(viewA);
 		viewA.viewToWorld.reset(); // identity since it's the origin
@@ -689,7 +688,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		for (int i = 0; i < motion.stereoTriangulations.size(); i++) {
 			Feature3D f = motion.stereoTriangulations.get(i);
 
-			if( f.obsIdx.size != 2 )
+			if (f.obsIdx.size != 2)
 				throw new RuntimeException("BUG");
 
 			int indexSrc = f.obsIdx.get(0);
@@ -698,8 +697,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			motion.viewSrc.features3D[indexSrc] = f;
 			motion.viewDst.features3D[indexDst] = f;
 
-			if( originIsDst ) {
-				SePointOps_F64.transform(motion.a_to_b,f.worldPt,f.worldPt);
+			if (originIsDst) {
+				SePointOps_F64.transform(motion.a_to_b, f.worldPt, f.worldPt);
 			}
 
 			f.worldPt.scale(1.0/scale);
@@ -713,7 +712,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		addTriangulatedFeaturesForAllEdges(viewA);
 		addTriangulatedFeaturesForAllEdges(viewB);
 
-		if( verbose != null ) {
+		if (verbose != null) {
 			verbose.println("root  = " + viewA.index);
 			verbose.println("other = " + viewB.index);
 			verbose.println("-------------");
@@ -723,32 +722,33 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Select the view which will be coordinate system's origin. This should be a well connected node which have
 	 * favorable geometry to the other views it's connected to.
+	 *
 	 * @return The selected view
 	 */
 	View selectOriginNode() {
 		double bestScore = 0;
 		View best = null;
 
-		if( verbose != null )
+		if (verbose != null)
 			verbose.println("selectOriginNode");
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			double score = scoreNodeAsOrigin(graph.nodes.get(i));
 
-			if( score > bestScore ) {
+			if (score > bestScore) {
 				bestScore = score;
 				best = graph.nodes.get(i);
 			}
 
-			if( verbose != null )
-				verbose.printf("  [%2d] score = %s\n",i,score);
+			if (verbose != null)
+				verbose.printf("  [%2d] score = %s\n", i, score);
 		}
-		if( verbose != null && best != null )
-			verbose.println("     selected = "+best.index);
+		if (verbose != null && best != null)
+			verbose.println("     selected = " + best.index);
 
 		return best;
 	}
 
-	double scoreNodeAsOrigin(View node ) {
+	double scoreNodeAsOrigin( View node ) {
 		double score = 0;
 
 		List<Motion> edges = node.connections;
@@ -763,19 +763,19 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	/**
 	 * Select motion which will define the coordinate system.
 	 */
-	Motion selectCoordinateBase(View view ) {
+	Motion selectCoordinateBase( View view ) {
 		double bestScore = 0;
 		Motion best = null;
 
-		if( verbose != null )
+		if (verbose != null)
 			verbose.println("selectCoordinateBase");
 		for (int i = 0; i < view.connections.size(); i++) {
 			Motion e = view.connections.get(i);
 
 			double s = e.scoreTriangulation();
-			if( verbose != null )
-				verbose.printf("  [%2d] score = %s\n",i,s);
-			if( s > bestScore ) {
+			if (verbose != null)
+				verbose.printf("  [%2d] score = %s\n", i, s);
+			if (s > bestScore) {
 				bestScore = s;
 				best = e;
 			}
@@ -787,11 +787,11 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 * An edge has been declared as defining a good stereo pair. All associated feature will now be
 	 * triangulated. It is assumed that there is no global coordinate system at this point.
 	 */
-	void triangulateStereoEdges(Motion edge ) {
+	void triangulateStereoEdges( Motion edge ) {
 		View viewA = edge.viewSrc;
 		View viewB = edge.viewDst;
 
-		triangulationError.configure(viewA.camera.pinhole,viewB.camera.pinhole);
+		triangulationError.configure(viewA.camera.pinhole, viewB.camera.pinhole);
 
 		for (int i = 0; i < edge.associated.size(); i++) {
 			AssociatedIndex f = edge.associated.get(i);
@@ -799,23 +799,23 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			Point2D_F64 normA = viewA.observationNorm.get(f.src);
 			Point2D_F64 normB = viewB.observationNorm.get(f.dst);
 
-			double angle = triangulationAngle(normA,normB,edge.a_to_b);
-			if( angle < TRIANGULATE_MIN_ANGLE )
+			double angle = triangulationAngle(normA, normB, edge.a_to_b);
+			if (angle < TRIANGULATE_MIN_ANGLE)
 				continue;
 
 			Feature3D feature3D = new Feature3D();
 
-			if( !triangulate.triangulate(normA,normB,edge.a_to_b,feature3D.worldPt) ) {
+			if (!triangulate.triangulate(normA, normB, edge.a_to_b, feature3D.worldPt)) {
 				continue;
 			}
 
 			// must be in front of the camera
-			if( feature3D.worldPt.z <= 0 )
+			if (feature3D.worldPt.z <= 0)
 				continue;
 
 			// can't have an excessively large reprojection error either
-			double error = triangulationError.process(normA,normB,edge.a_to_b,feature3D.worldPt);
-			if( error > maxPixelError*maxPixelError )
+			double error = triangulationError.process(normA, normB, edge.a_to_b, feature3D.worldPt);
+			if (error > maxPixelError*maxPixelError)
 				continue;
 
 			feature3D.views.add(viewA);
@@ -853,7 +853,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		return stopRequested;
 	}
 
-	public void setVerbose(PrintStream verbose, int level ) {
+	public void setVerbose( PrintStream verbose, int level ) {
 		this.verbose = verbose;
 	}
 }

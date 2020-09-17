@@ -215,7 +215,7 @@ public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatri
 		}
 
 		for (int step = 0; step < numSteps; step++) {
-			out.connectViewToMotion(step, motionIdx, step - 1);
+			out.setView(step, -1, motionIdx, step - 1);
 			out.connectViewToCamera(step, 0);
 		}
 

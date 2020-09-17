@@ -176,38 +176,42 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
-	 *
 	 * @param viewIndex Which view is being specified.
+	 * @param cameraIndex Index of camera model
 	 * @param known If these parameters are fixed or not
 	 * @param world_to_view The transform from world to view reference frames. Internal copy is saved.
 	 */
-	public void setView( int viewIndex, boolean known, Se3_F64 world_to_view ) {
+	public void setView( int viewIndex, int cameraIndex, boolean known, Se3_F64 world_to_view ) {
+		views.get(viewIndex).camera = cameraIndex;
 		views.get(viewIndex).parent_to_view = addMotion(known, world_to_view);
+		views.get(viewIndex).parent = null;
 	}
 
 	/**
 	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
-	 *
 	 * @param viewIndex Which view is being specified.
+	 * @param cameraIndex Index of camera model
 	 * @param known If the parameters are known and not optimized or unknown and optimized
 	 * @param parent_to_view The transform from parent to view reference frames. Internal copy is saved.
 	 * @param parent ID / index of the parent this this view is relative to
 	 */
-	public void setView( int viewIndex, boolean known, Se3_F64 parent_to_view, int parent ) {
+	public void setView( int viewIndex, int cameraIndex, boolean known, Se3_F64 parent_to_view, int parent ) {
 		assertBoof(parent < viewIndex, "Parent must be less than viewIndex");
+		views.get(viewIndex).camera = cameraIndex;
 		views.get(viewIndex).parent_to_view = addMotion(known, parent_to_view);
 		views.get(viewIndex).parent = parent >= 0 ? views.get(parent) : null;
 	}
 
 	/**
 	 * Specifies which motion is attached to a view
-	 *
 	 * @param viewIndex Which view is being specified.
+	 * @param cameraIndex Index of camera model
 	 * @param motionIndex The motion that describes the parent_to_view relationship
 	 * @param parent ID / index of the parent this this view is relative to
 	 */
-	public void connectViewToMotion( int viewIndex, int motionIndex, int parent ) {
+	public void setView( int viewIndex, int cameraIndex, int motionIndex, int parent ) {
 		assertBoof(parent < viewIndex, "Parent must be less than viewIndex");
+		views.get(viewIndex).camera = cameraIndex;
 		views.get(viewIndex).parent_to_view = motionIndex;
 		views.get(viewIndex).parent = parent >= 0 ? views.get(parent) : null;
 	}

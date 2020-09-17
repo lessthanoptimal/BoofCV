@@ -359,8 +359,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			bp.f = cp.fx;
 
 			structure.setCamera(i, false, bp);
-			structure.setView(i, i == 0, worldToView.get(i));
-			structure.connectViewToCamera(i, i);
+			structure.setView(i, i, i == 0, worldToView.get(i));
 		}
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedTriple t = inliers.get(i);

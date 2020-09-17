@@ -632,16 +632,15 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		// Copy the scene into a data structure bundle adjustment understands
 		bundleObservations.initialize(4);
 		bundleScene.initialize(2,4,inliers.size());
+		// known relative view relating left to right cameras
+		int baseline = bundleScene.addMotion(true,left_to_right);
 		bundleScene.setCamera(0,true,stereoParameters.left);
 		bundleScene.setCamera(1,true,stereoParameters.right);
-		bundleScene.setView(0,true,listWorldToView.get(0));
-		bundleScene.setView(1,true,listWorldToView.get(1));
-		bundleScene.setView(2,false,listWorldToView.get(2));
-		bundleScene.setView(3,false,listWorldToView.get(3)); // TODO make fixed relative to 2 in future
-		bundleScene.connectViewToCamera(0,0);
-		bundleScene.connectViewToCamera(1,1);
-		bundleScene.connectViewToCamera(2,0);
-		bundleScene.connectViewToCamera(3,1);
+		bundleScene.setView(0, 0, true,listWorldToView.get(0)); // view[0].left
+		bundleScene.setView(1, 1, baseline,0);  // view[0].right
+		bundleScene.setView(2, 0, false,listWorldToView.get(2)); // view[1].left
+		bundleScene.setView(3, 1, baseline,2);  // view[1].right
+
 
 		for (int trackIdx = 0; trackIdx < inliers.size(); trackIdx++) {
 			TrackQuad t = inliers.get(trackIdx);

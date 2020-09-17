@@ -322,10 +322,8 @@ class TestPruneStructureFromSceneMetric {
 		structure.setCamera(0, true, intrinsic);
 
 		// If view[1] was absolute then the point would not be pruned since it would be infront of both cameras
-		structure.setView(0, true, eulerXyz(0, 0, -1, 0, 0, 0, null));
-		structure.setView(1, true, eulerXyz(0, 0, -1, 0, 0, 0, null), 0);
-		structure.connectViewToCamera(0, 0);
-		structure.connectViewToCamera(1, 0);
+		structure.setView(0, 0, true, eulerXyz(0, 0, -1, 0, 0, 0, null));
+		structure.setView(1, 0, true, eulerXyz(0, 0, -1, 0, 0, 0, null), 0);
 
 		structure.setPoint(0, 0, 0, 1.5);
 
@@ -357,12 +355,9 @@ class TestPruneStructureFromSceneMetric {
 
 		structure.setCamera(0, true, intrinsic);
 
-		structure.setView(0, true, eulerXyz(0, 0, -1, 0, 0, 0, null));
-		structure.setView(1, false, eulerXyz(0, 0, -1, 0, 0, 0, null), 0);
-		structure.setView(2, true, eulerXyz(0, 0, -1, 0, 0, 0, null), 1);
-		for (int i = 0; i < 3; i++) {
-			structure.connectViewToCamera(i, 0);
-		}
+		structure.setView(0, 0, true, eulerXyz(0, 0, -1, 0, 0, 0, null));
+		structure.setView(1, 0, false, eulerXyz(0, 0, -1, 0, 0, 0, null), 0);
+		structure.setView(2, 0, true, eulerXyz(0, 0, -1, 0, 0, 0, null), 1);
 		createObservationForAll();
 
 		// View[1] should not be dropped since another is dependent on it
@@ -428,8 +423,7 @@ class TestPruneStructureFromSceneMetric {
 	private void createRestOfTheScene( List<Point3D_F64> points, boolean sanityCheck ) {
 		for (int i = 0; i < structure.views.size; i++) {
 			double x = -1.5 + (int)(3*i/Math.max(1, (structure.views.size - 1)));
-			structure.setView(i, false, eulerXyz(x, 0, 0, 0, 0, 0, null));
-			structure.connectViewToCamera(i, i%2);
+			structure.setView(i, i%2, false, eulerXyz(x, 0, 0, 0, 0, 0, null));
 		}
 
 		observations = new SceneObservations();

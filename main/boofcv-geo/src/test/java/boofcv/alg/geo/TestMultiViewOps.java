@@ -1306,10 +1306,8 @@ class TestMultiViewOps {
 		structure.initialize(1, 2, points.size());
 
 		structure.setCamera(0, true, intrinsic);
-		structure.setView(0, true, new Se3_F64());
-		structure.setView(1, false, view0_to_view1);
-		structure.connectViewToCamera(0, 0);
-		structure.connectViewToCamera(1, 0);
+		structure.setView(0, 0, true, new Se3_F64());
+		structure.setView(1, 0, false, view0_to_view1);
 
 		SceneObservations.View v0 = observations.getView(0);
 		SceneObservations.View v1 = observations.getView(1);

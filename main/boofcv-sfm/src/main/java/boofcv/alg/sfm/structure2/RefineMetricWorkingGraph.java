@@ -163,9 +163,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			}
 
 			// Add the view pose and intrinsics
-			structure.setView(viewIdx, viewIdx == 0, wview.world_to_view);
 			structure.setCamera(viewIdx, false, wview.intrinsic);
-			structure.connectViewToCamera(viewIdx, viewIdx);
+			structure.setView(viewIdx, viewIdx, viewIdx == 0, wview.world_to_view);
 		}
 	}
 

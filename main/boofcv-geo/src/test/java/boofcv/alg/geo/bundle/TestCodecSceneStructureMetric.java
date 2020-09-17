@@ -175,8 +175,7 @@ class TestCodecSceneStructureMetric {
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, 0.2*i + 0.1, rand.nextGaussian()*0.1, 0, a.R);
 				a.T.set(rand.nextGaussian()*0.2, 3*rand.nextGaussian()*0.2, i*7.3 + 5);
 			}
-			out.setView(i, fixed, a);
-			out.views.data[i].camera = i/2;
+			out.setView(i, i/2, fixed, a);
 
 			// Create a chain of relative views
 			if (hasRelative)
@@ -229,10 +228,9 @@ class TestCodecSceneStructureMetric {
 		for (int step = 0; step < numSteps; step++) {
 			Se3_F64 world_to_left = SpecialEuclideanOps_F64.eulerXyz(0.1, -0.15, -0.05 + step*0.2,
 					rand.nextGaussian()*0.05, rand.nextGaussian()*0.05, rand.nextGaussian()*0.05, null);
-			out.setView(step*2, false, world_to_left);
-			out.connectViewToCamera(step*2, 0);
+			out.setView(step*2, 0, false, world_to_left);
 
-			out.connectViewToMotion(step*2 + 1, leftToRightIdx, step*2);
+			out.setView(step*2 + 1, -1, leftToRightIdx, step*2);
 			out.connectViewToCamera(step*2 + 1, 1);
 		}
 

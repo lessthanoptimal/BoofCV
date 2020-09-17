@@ -45,9 +45,9 @@ public class CodecBundleAdjustmentInTheLarge {
 
 	public void parse( File file ) throws IOException {
 		InputStream stream = UtilIO.openStream(file.getPath());
-		if( stream == null ) throw new IOException("Can't open file: "+file.getPath());
+		if (stream == null) throw new IOException("Can't open file: " + file.getPath());
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream,UTF_8));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stream, UTF_8));
 
 		String[] words = reader.readLine().split("\\s+");
 
@@ -107,8 +107,7 @@ public class CodecBundleAdjustmentInTheLarge {
 			camera.k2 = Double.parseDouble(reader.readLine());
 
 			scene.setCamera(i, false, camera);
-			scene.setView(i, false, worldToCameraGL);
-			scene.connectViewToCamera(i, i);
+			scene.setView(i, i, false, worldToCameraGL);
 		}
 
 		Point3D_F64 P = new Point3D_F64();

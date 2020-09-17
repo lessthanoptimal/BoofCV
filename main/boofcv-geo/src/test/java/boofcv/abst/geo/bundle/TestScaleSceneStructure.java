@@ -187,9 +187,7 @@ class TestScaleSceneStructure {
 
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, rotX, rotY, rotZ, worldToView.R);
 
-			scene.setView(i, false, worldToView);
-
-			scene.connectViewToCamera(i, 0);
+			scene.setView(i, 0, false, worldToView);
 		}
 
 		WorldToCameraToPixel w2p = new WorldToCameraToPixel();

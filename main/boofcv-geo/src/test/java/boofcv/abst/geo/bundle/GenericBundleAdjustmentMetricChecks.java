@@ -264,8 +264,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		for (int i = 0; i < numViews; i++) {
 			Se3_F64 worldToView = new Se3_F64();
 			worldToView.T.x = -((maxX-minX)*i/(numViews-1) + minX);
-			structure.setView(i,i==0,worldToView);
-			structure.connectViewToCamera(i,0);
+			structure.setView(i, 0, i==0,worldToView);
 		}
 
 		WorldToCameraToPixel wcp = new WorldToCameraToPixel();

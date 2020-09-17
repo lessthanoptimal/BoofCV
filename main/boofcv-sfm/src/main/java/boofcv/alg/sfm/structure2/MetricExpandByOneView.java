@@ -257,12 +257,9 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		structure.setCamera(0, true, wview1.intrinsic);
 		structure.setCamera(1, true, wview2.intrinsic);
 		structure.setCamera(2, false, wview3.intrinsic);
-		structure.setView(0, true, view1_to_view1);
-		structure.setView(1, false, view1_to_view2H);
-		structure.setView(2, false, view1_to_target);
-		structure.connectViewToCamera(0, 0);
-		structure.connectViewToCamera(1, 1);
-		structure.connectViewToCamera(2, 2);
+		structure.setView(0, 0, true, view1_to_view1);
+		structure.setView(1, 1, false, view1_to_view2H);
+		structure.setView(2, 2, false, view1_to_target);
 
 		// Add observations and 3D feature locations
 		normalize1.setK(wview1.intrinsic.f, wview1.intrinsic.f, 0, 0, 0).setDistortion(wview1.intrinsic.k1, wview1.intrinsic.k2);
