@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.structure2;
+package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.TriangulateNViewsMetric;
-import boofcv.abst.geo.bundle.*;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.ConfigConverge;
 import lombok.Getter;
@@ -43,14 +42,16 @@ public class MetricBundleAdjustmentUtils {
 	public double keepFraction = 1.0;
 
 	/** The estimated scene structure. This the final estimated scene state */
-	protected final @Getter SceneStructureMetric structure = new SceneStructureMetric(true);
-	protected final @Getter SceneObservations observations = new SceneObservations();
-	protected @Getter @Setter BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
-	protected @Getter @Setter TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated(null);
-	protected @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
+	public final @Getter SceneStructureMetric structure = new SceneStructureMetric(true);
+	public final @Getter SceneObservations observations = new SceneObservations();
+	public @Getter @Setter BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
+	public @Getter @Setter TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated(null);
+	public @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
 
 	/**
 	 * Uses the already configured structure and observations to perform bundle adjustment
+	 *
+	 * @return true if successful
 	 */
 	public boolean process( @Nullable PrintStream verbose ) {
 		if (configConverge.maxIterations == 0)
@@ -93,8 +94,8 @@ public class MetricBundleAdjustmentUtils {
 		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure, observations);
 		pruner.pruneObservationsByErrorRank(keepFraction);
 		if (pruneViews > 0) {
-			pruner.pruneViews(pruneViews);
-			pruner.pruneUnusedMotions();
+			if (pruner.pruneViews(pruneViews))
+				pruner.pruneUnusedMotions();
 		}
 		pruner.prunePoints(prunePoints);
 	}

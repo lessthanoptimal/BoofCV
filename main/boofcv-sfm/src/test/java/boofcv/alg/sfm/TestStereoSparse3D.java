@@ -50,8 +50,8 @@ public class TestStereoSparse3D {
 		K1 = new DMatrixRMaj(3,3,true,150,0,310,0,180,245,0,0,1);
 		K2 = new DMatrixRMaj(3,3,true,120,0,330,0,160,220,0,0,1);
 
-		param.rightToLeft = new Se3_F64();
-		param.rightToLeft.getT().set(0.2, 0, 0.1);
+		param.right_to_left = new Se3_F64();
+		param.right_to_left.getT().set(0.2, 0, 0.1);
 //		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02,0.01,-0.03,param.rightToLeft.getR());
 
 		param.left = PerspectiveOps.matrixToPinhole(K1,640,480,new CameraPinholeBrown());
@@ -74,7 +74,7 @@ public class TestStereoSparse3D {
 
 		// original pixel coordinates
 		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),K1,X, null);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(param.rightToLeft.invert(null),K2,X, null);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(param.right_to_left.invert(null),K2,X, null);
 
 		Point2Transform2_F64 pixelToRect1 = RectifyImageOps.transformPixelToRect(param.left, alg.rect1);
 		Point2Transform2_F64 pixelToRect2 = RectifyImageOps.transformPixelToRect(param.right, alg.rect2);

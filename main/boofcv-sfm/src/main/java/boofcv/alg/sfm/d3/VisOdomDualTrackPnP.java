@@ -191,8 +191,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	 * since there's no generic way to handle that.
 	 */
 	public void setCalibration(StereoParameters param) {
-		right_to_left.set(param.rightToLeft);
-		param.rightToLeft.invert(left_to_right);
+		right_to_left.set(param.right_to_left);
+		param.right_to_left.invert(left_to_right);
 
 		CameraModel left = new CameraModel();
 		left.pixelToNorm = LensDistortionFactory.narrow(param.left).undistort_F64(true,false);

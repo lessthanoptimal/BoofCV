@@ -197,7 +197,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	public void setCalibration(StereoParameters param)
 	{
 		this.stereoParameters.set(param);
-		right_to_left.set(param.rightToLeft);
+		right_to_left.set(param.right_to_left);
 		right_to_left.invert(left_to_right);
 		leftPixelToNorm = LensDistortionFactory.narrow(param.left).undistort_F64(true,false);
 		rightPixelToNorm = LensDistortionFactory.narrow(param.right).undistort_F64(true,false);

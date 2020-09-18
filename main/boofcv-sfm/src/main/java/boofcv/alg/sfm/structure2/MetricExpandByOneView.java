@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.structure2;
 
 import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;

@@ -123,7 +123,7 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 	}
 
 	public void setStereoParameters( StereoParameters param ) {
-		setLeftToRight(param.rightToLeft.invert(null));
+		setLeftToRight(param.right_to_left.invert(null));
 		setIntrinsic(0, param.left);
 		setIntrinsic(1, param.right);
 	}

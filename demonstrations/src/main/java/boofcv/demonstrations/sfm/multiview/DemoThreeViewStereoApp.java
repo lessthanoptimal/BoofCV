@@ -227,7 +227,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		StereoParameters stereo = new StereoParameters();
 		stereo.left = intrinsic01;
 		stereo.right = intrinsic02;
-		stereo.rightToLeft = leftToRight.invert(null);
+		stereo.right_to_left = leftToRight.invert(null);
 
 		CalibrationIO.save(stereo, f.getAbsolutePath());
 	}

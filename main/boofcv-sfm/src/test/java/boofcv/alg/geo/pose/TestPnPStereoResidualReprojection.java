@@ -89,7 +89,7 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 
 		PnPStereoDistanceReprojectionSq validation = new PnPStereoDistanceReprojectionSq();
 		StereoParameters param = new StereoParameters();
-		param.rightToLeft = this.param.rightToLeft;
+		param.right_to_left = this.param.right_to_left;
 		// intrinsic parameters are configured to be identical to normalized image coordinates
 		param.left = new CameraPinholeBrown(1, 1, 0, 0, 0, 0, 0).fsetRadial(0, 0);
 		param.right = new CameraPinholeBrown(1, 1, 0, 0, 0, 0, 0).fsetRadial(0, 0);

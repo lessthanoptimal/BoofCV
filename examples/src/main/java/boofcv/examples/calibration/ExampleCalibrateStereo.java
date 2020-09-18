@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,8 +91,10 @@ public class ExampleCalibrateStereo {
 	 */
 	public void process() {
 		// Declare and setup the calibration algorithm
-		CalibrateStereoPlanar calibratorAlg = new CalibrateStereoPlanar(detector.getLayout());
+		var calibratorAlg = new CalibrateStereoPlanar(detector.getLayout());
 		calibratorAlg.configure(true, 2, false);
+		// Uncomment to print more information to stdout
+//		calibratorAlg.setVerbose(System.out,null);
 
 		// ensure the lists are in the same order
 		Collections.sort(left);

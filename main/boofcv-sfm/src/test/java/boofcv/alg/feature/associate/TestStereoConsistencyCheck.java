@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class TestStereoConsistencyCheck {
 		leftToRight.getT().set(-0.1,0,0);
 
 		StereoParameters param = new StereoParameters();
-		param.rightToLeft = leftToRight.invert(null);
+		param.right_to_left = leftToRight.invert(null);
 
 		param.left = new CameraPinholeBrown(400,500,0.1,160,120,320,240).fsetRadial(0,0);
 		param.right = new CameraPinholeBrown(380,505,0.05,165,115,320,240).fsetRadial(0,0);

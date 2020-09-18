@@ -123,7 +123,7 @@ public class CalibrationIO {
 		map.put(VERSION, 0);
 		map.put("left", putModelRadial(parameters.left, null));
 		map.put("right", putModelRadial(parameters.right, null));
-		map.put("rightToLeft", putSe3(parameters.rightToLeft));
+		map.put("rightToLeft", putSe3(parameters.right_to_left));
 
 		PrintWriter out = new PrintWriter(outputWriter);
 		out.println("# Intrinsic and extrinsic parameters for a stereo camera pair");
@@ -313,7 +313,7 @@ public class CalibrationIO {
 			StereoParameters parameters = new StereoParameters();
 			parameters.left = load((Map<String, Object>)getOrThrow(data, "left"));
 			parameters.right = load((Map<String, Object>)getOrThrow(data, "right"));
-			parameters.rightToLeft = loadSe3(getOrThrow(data, "rightToLeft"), null);
+			parameters.right_to_left = loadSe3(getOrThrow(data, "rightToLeft"), null);
 			return (T)parameters;
 		} else if (model.equals(MODEL_VISUAL_DEPTH)) {
 			VisualDepthParameters parameters = new VisualDepthParameters();

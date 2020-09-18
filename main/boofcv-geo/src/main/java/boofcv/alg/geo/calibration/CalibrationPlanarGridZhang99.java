@@ -32,11 +32,14 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -64,15 +67,15 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrationPlanarGridZhang99 {
+public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 	Zhang99Camera cameraGenerator;
 
 	// estimation algorithms
-	private Zhang99ComputeTargetHomography computeHomography;
-	private Zhang99CalibrationMatrixFromHomographies computeK;
-	private RadialDistortionEstimateLinear computeRadial;
-	private Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
+	private final Zhang99ComputeTargetHomography computeHomography;
+	private final Zhang99CalibrationMatrixFromHomographies computeK;
+	private final RadialDistortionEstimateLinear computeRadial;
+	private final Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 
 	// contains found parameters
 	public SceneStructureMetric structure;
@@ -82,10 +85,10 @@ public class CalibrationPlanarGridZhang99 {
 	private Listener listener;
 
 	// where calibration points are layout on the target.
-	private List<Point2D_F64> layout;
+	private final List<Point2D_F64> layout;
 
 	// Use a robust non-linear solver. This can run significantly slower
-	private boolean robust=false;
+	private boolean robust = false;
 
 	private PrintStream verbose = null;
 
@@ -94,13 +97,12 @@ public class CalibrationPlanarGridZhang99 {
 	 *
 	 * @param layout Layout of calibration points on the target
 	 */
-	public CalibrationPlanarGridZhang99(List<Point2D_F64> layout, Zhang99Camera cameraGenerator)
-	{
+	public CalibrationPlanarGridZhang99( List<Point2D_F64> layout, Zhang99Camera cameraGenerator ) {
 		this.cameraGenerator = cameraGenerator;
 		this.layout = layout;
 		computeHomography = new Zhang99ComputeTargetHomography(layout);
 		computeK = new Zhang99CalibrationMatrixFromHomographies(cameraGenerator.isZeroSkew());
-		computeRadial = new RadialDistortionEstimateLinear(layout,cameraGenerator.numRadial());
+		computeRadial = new RadialDistortionEstimateLinear(layout, cameraGenerator.numRadial());
 	}
 
 	/**
@@ -108,7 +110,7 @@ public class CalibrationPlanarGridZhang99 {
 	 *
 	 * @param listener The listener
 	 */
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
@@ -122,12 +124,12 @@ public class CalibrationPlanarGridZhang99 {
 	public boolean process( List<CalibrationObservation> observations ) {
 
 		// compute initial parameter estimates using linear algebra
-		if( !linearEstimate(observations) )
+		if (!linearEstimate(observations))
 			return false;
 
 		status("Non-linear refinement");
 		// perform non-linear optimization to improve results
-		if( !performBundleAdjustment())
+		if (!performBundleAdjustment())
 			return false;
 
 		return true;
@@ -136,14 +138,13 @@ public class CalibrationPlanarGridZhang99 {
 	/**
 	 * Find an initial estimate for calibration parameters using linear techniques.
 	 */
-	protected boolean linearEstimate(List<CalibrationObservation> observations  )
-	{
+	protected boolean linearEstimate( List<CalibrationObservation> observations ) {
 		status("Estimating Homographies");
 		List<DMatrixRMaj> homographies = new ArrayList<>();
 		List<Se3_F64> motions = new ArrayList<>();
 
-		for( CalibrationObservation obs : observations ) {
-			if( !computeHomography.computeHomography(obs) )
+		for (CalibrationObservation obs : observations) {
+			if (!computeHomography.computeHomography(obs))
 				return false;
 
 			DMatrixRMaj H = computeHomography.getHomography();
@@ -157,22 +158,22 @@ public class CalibrationPlanarGridZhang99 {
 		DMatrixRMaj K = computeK.getCalibrationMatrix();
 
 		decomposeH.setCalibrationMatrix(K);
-		for( DMatrixRMaj H : homographies ) {
+		for (DMatrixRMaj H : homographies) {
 			motions.add(decomposeH.decompose(H));
 		}
 
 		status("Estimating Radial Distortion");
 		computeRadial.process(K, homographies, observations);
 
-		double distort[] = computeRadial.getParameters();
+		double[] distort = computeRadial.getParameters();
 
-		convertIntoBundleStructure(motions, K,distort,observations);
+		convertIntoBundleStructure(motions, K, distort, observations);
 		return true;
 	}
 
 	private void status( String message ) {
-		if( listener != null ) {
-			if( !listener.zhangUpdate(message) )
+		if (listener != null) {
+			if (!listener.zhangUpdate(message))
 				throw new RuntimeException("User requested termination of calibration");
 		}
 	}
@@ -180,8 +181,7 @@ public class CalibrationPlanarGridZhang99 {
 	/**
 	 * Use non-linear optimization to improve the parameter estimates
 	 */
-	public boolean performBundleAdjustment()
-	{
+	public boolean performBundleAdjustment() {
 		// Configure the sparse Levenberg-Marquardt solver
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 		configLM.hessianScaling = false;
@@ -190,54 +190,54 @@ public class CalibrationPlanarGridZhang99 {
 		configSBA.configOptimizer = configLM;
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment;
-		if( robust ) {
+		if (robust) {
 			configLM.mixture = 0;
-			bundleAdjustment = FactoryMultiView.bundleDenseMetric(true,configSBA);
+			bundleAdjustment = FactoryMultiView.bundleDenseMetric(true, configSBA);
 		} else {
 			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		}
 
-		bundleAdjustment.setVerbose(verbose,null);
+		bundleAdjustment.setVerbose(verbose, null);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-20, 1e-20, 200);
 
-		bundleAdjustment.setParameters(structure,observations);
+		bundleAdjustment.setParameters(structure, observations);
 		return bundleAdjustment.optimize(structure);
 	}
 
 	/**
 	 * Convert it into a data structure understood by {@link BundleAdjustment}
 	 */
-	public void convertIntoBundleStructure(List<Se3_F64> motions,
-										   DMatrixRMaj K,
-										   double[] distort,
-										   List<CalibrationObservation> obs ) {
+	public void convertIntoBundleStructure( List<Se3_F64> motions,
+											DMatrixRMaj K,
+											double[] distort,
+											List<CalibrationObservation> obs ) {
 
 		structure = new SceneStructureMetric(false);
-		structure.initialize(1,motions.size(), -1, layout.size(),1);
+		structure.initialize(1, motions.size(), -1, layout.size(), 1);
 
 		observations = new SceneObservations();
-		observations.initialize(motions.size(),true);
+		observations.initialize(motions.size(), true);
 
 		// A single camera is assumed, that's what is being calibrated!
-		structure.setCamera(0,false,cameraGenerator.initalizeCamera(K,distort));
+		structure.setCamera(0, false, cameraGenerator.initalizeCamera(K, distort));
 		// A single rigid planar target is being viewed. It is assumed to be centered at the origin
-		structure.setRigid(0,true,new Se3_F64(),layout.size());
+		structure.setRigid(0, true, new Se3_F64(), layout.size());
 		// Where the points are on the calibration target
 		SceneStructureMetric.Rigid rigid = structure.rigids.data[0];
 		for (int i = 0; i < layout.size(); i++) {
-			rigid.setPoint(i,layout.get(i).x,layout.get(i).y,0);
+			rigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
 		}
 
 		// Add the initial estimate of each view's location and the points observed
 		for (int viewIdx = 0; viewIdx < motions.size(); viewIdx++) {
-			structure.setView(viewIdx, 0, false,motions.get(viewIdx));
+			structure.setView(viewIdx, 0, false, motions.get(viewIdx));
 			SceneObservations.View v = observations.getViewRigid(viewIdx);
 			CalibrationObservation ca = obs.get(viewIdx);
 			for (int j = 0; j < ca.size(); j++) {
 				PointIndex2D_F64 p = ca.get(j);
 				v.add(p.index, (float)p.x, (float)p.y);
-				structure.connectPointToView(p.index,viewIdx);
+				structure.connectPointToView(p.index, viewIdx);
 			}
 		}
 	}
@@ -248,11 +248,11 @@ public class CalibrationPlanarGridZhang99 {
 		double[] parameters = new double[structure.getParameterCount()];
 		double[] residuals = new double[observations.getObservationCount()*2];
 		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
-		codec.encode(structure,parameters);
+		codec.encode(structure, parameters);
 
 		BundleAdjustmentMetricResidualFunction function = new BundleAdjustmentMetricResidualFunction();
-		function.configure(structure,observations);
-		function.process(parameters,residuals);
+		function.configure(structure, observations);
+		function.process(parameters, residuals);
 
 		int idx = 0;
 		for (int i = 0; i < observations.viewsRigid.size; i++) {
@@ -270,22 +270,21 @@ public class CalibrationPlanarGridZhang99 {
 				double nerr = r.pointError[j] = Math.sqrt(x*x + y*y);
 
 				meanErrorMag += nerr;
-				maxError = Math.max(maxError,nerr);
+				maxError = Math.max(maxError, nerr);
 
 				sumX += x;
 				sumY += y;
 			}
 
-			r.biasX = sumX / v.size();
-			r.biasY = sumY / v.size();
-			r.meanError = meanErrorMag / v.size();
+			r.biasX = sumX/v.size();
+			r.biasY = sumY/v.size();
+			r.meanError = meanErrorMag/v.size();
 			r.maxError = maxError;
 
 			errors.add(r);
 		}
 
 		return errors;
-
 	}
 
 	public CameraModel getCameraModel() {
@@ -300,15 +299,14 @@ public class CalibrationPlanarGridZhang99 {
 	 * @param t1 tangential parameter
 	 * @param t2 tangential parameter
 	 */
-	public static void applyDistortion(Point2D_F64 normPt, double[] radial, double t1 , double t2 )
-	{
+	public static void applyDistortion( Point2D_F64 normPt, double[] radial, double t1, double t2 ) {
 		final double x = normPt.x;
 		final double y = normPt.y;
 
 		double a = 0;
 		double r2 = x*x + y*y;
 		double r2i = r2;
-		for( int i = 0; i < radial.length; i++ ) {
+		for (int i = 0; i < radial.length; i++) {
 			a += radial[i]*r2i;
 			r2i *= r2;
 		}
@@ -319,10 +317,6 @@ public class CalibrationPlanarGridZhang99 {
 
 	public SceneStructureMetric getStructure() {
 		return structure;
-	}
-
-	public void setVerbose( PrintStream out , int level ) {
-		this.verbose = out;
 	}
 
 	public void setRobust( boolean robust ) {
@@ -337,8 +331,12 @@ public class CalibrationPlanarGridZhang99 {
 		return total;
 	}
 
-	public interface Listener
-	{
+	@Override
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = out;
+	}
+
+	public interface Listener {
 		/**
 		 * Updated to update the status and request that processing be stopped
 		 *

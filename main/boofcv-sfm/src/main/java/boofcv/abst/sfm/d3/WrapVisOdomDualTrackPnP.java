@@ -120,7 +120,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 
 		CameraPinholeBrown left = parameters.left;
 		distanceMono.setIntrinsic(0,left);
-		distanceStereo.setLeftToRight(parameters.rightToLeft.invert(null));
+		distanceStereo.setLeftToRight(parameters.right_to_left.invert(null));
 		distanceStereo.setIntrinsic(0,parameters.left);
 		distanceStereo.setIntrinsic(1,parameters.right);
 		assoc.setCalibration(parameters);

@@ -26,10 +26,14 @@ import boofcv.alg.geo.calibration.cameras.Zhang99CameraBrown;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraUniversalOmni;
 import boofcv.struct.calib.CameraModel;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -37,12 +41,12 @@ import java.util.List;
  * directory is specified that the images are read in from.  Calibration points are detected
  * inside the image and feed into the Zhang99 algorithm for parameter estimation.
  * </p>
- * 
+ *
  * <p>
  * Internally it supports status updates for a GUI and skips over bad images. Invoke functions
  * in the following order:
  * <ol>
- * <li>{@link #configure}</li> 
+ * <li>{@link #configure}</li>
  * <li>{@link #reset}</li>
  * <li>{@link #addImage}</li>
  * <li>{@link #process}</li>
@@ -59,14 +63,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrateMonoPlanar {
+public class CalibrateMonoPlanar implements VerbosePrint {
 
 	// detects calibration points inside of images
 	protected DetectorFiducialCalibration detector;
 
 	// how the points are laid out
 	protected List<Point2D_F64> layout;
-	
+
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
 
@@ -75,15 +79,14 @@ public class CalibrateMonoPlanar {
 	protected CameraModel foundIntrinsic;
 
 	// Information on calibration targets and results
-	protected List<CalibrationObservation> observations = new ArrayList<>();
-	protected List<ImageResults> errors;
+	protected @Getter List<CalibrationObservation> observations = new ArrayList<>();
+	protected @Getter List<ImageResults> errors;
 
 	public PrintStream verbose = null;
 
 	// shape of the image
 	private int imageWidth;
 	private int imageHeight;
-
 
 	public CalibrateMonoPlanar( List<Point2D_F64> layout ) {
 		this.layout = layout;
@@ -92,35 +95,31 @@ public class CalibrateMonoPlanar {
 	/**
 	 * Specifies the calibration model.
 	 */
-	public void configure( Zhang99Camera camera )
-	{
-		zhang99 = new CalibrationPlanarGridZhang99(layout,camera);
+	public void configure( Zhang99Camera camera ) {
+		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
 	}
 
-	public void configurePinhole(boolean assumeZeroSkew ,
-								 int numRadialParam ,
-								 boolean includeTangential )
-	{
+	public void configurePinhole( boolean assumeZeroSkew,
+								  int numRadialParam,
+								  boolean includeTangential ) {
 		Zhang99CameraBrown camera =
-				new Zhang99CameraBrown(assumeZeroSkew,includeTangential,numRadialParam);
-		zhang99 = new CalibrationPlanarGridZhang99(layout,camera);
+				new Zhang99CameraBrown(assumeZeroSkew, includeTangential, numRadialParam);
+		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
 	}
 
-	public void configureUniversalOmni(boolean assumeZeroSkew ,
-									   int numRadialParam ,
-									   boolean includeTangential )
-	{
+	public void configureUniversalOmni( boolean assumeZeroSkew,
+										int numRadialParam,
+										boolean includeTangential ) {
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new Zhang99CameraUniversalOmni(assumeZeroSkew,includeTangential,numRadialParam));
+				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam));
 	}
 
-	public void configureUniversalOmni(boolean assumeZeroSkew ,
-									   int numRadialParam ,
-									   boolean includeTangential ,
-									   double mirrorOffset )
-	{
+	public void configureUniversalOmni( boolean assumeZeroSkew,
+										int numRadialParam,
+										boolean includeTangential,
+										double mirrorOffset ) {
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new Zhang99CameraUniversalOmni(assumeZeroSkew,includeTangential,numRadialParam,mirrorOffset));
+				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam, mirrorOffset));
 	}
 
 	/**
@@ -134,34 +133,35 @@ public class CalibrateMonoPlanar {
 
 	/**
 	 * Adds the observations from a calibration target detector
+	 *
 	 * @param observation Detected calibration points
 	 */
 	public void addImage( CalibrationObservation observation ) {
-		if( imageWidth == 0 ) {
+		if (imageWidth == 0) {
 			this.imageWidth = observation.getWidth();
 			this.imageHeight = observation.getHeight();
-		} else if( observation.getWidth() != this.imageWidth || observation.getHeight() != this.imageHeight) {
+		} else if (observation.getWidth() != this.imageWidth || observation.getHeight() != this.imageHeight) {
 			throw new IllegalArgumentException("Image shape miss match");
 		}
-		observations.add( observation );
+		observations.add(observation);
 	}
 
 	/**
 	 * Removes the most recently added image
 	 */
 	public void removeLatestImage() {
-		observations.remove( observations.size() - 1 );
+		observations.remove(observations.size() - 1);
 	}
 
 	/**
 	 * After calibration points have been found this invokes the Zhang99 algorithm to
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
-	public <T extends CameraModel>T process() {
-		if( zhang99 == null )
+	public <T extends CameraModel> T process() {
+		if (zhang99 == null)
 			throw new IllegalArgumentException("Please call configure first.");
-		zhang99.setVerbose(verbose,0);
-		if( !zhang99.process(observations) ) {
+		zhang99.setVerbose(verbose, null);
+		if (!zhang99.process(observations)) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
@@ -180,21 +180,18 @@ public class CalibrateMonoPlanar {
 		printErrors(errors);
 	}
 
-	public void setVerbose( PrintStream out , int level ) {
-		this.verbose = out;
-	}
 	/**
 	 * Prints out error information to standard out
 	 */
 	public static void printErrors( List<ImageResults> results ) {
 		double totalError = 0;
-		for( int i = 0; i < results.size(); i++ ) {
+		for (int i = 0; i < results.size(); i++) {
 			ImageResults r = results.get(i);
 			totalError += r.meanError;
 
-			System.out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n",i,r.meanError,r.maxError,r.biasX,r.biasY);
+			System.out.printf("image %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n", i, r.meanError, r.maxError, r.biasX, r.biasY);
 		}
-		System.out.println("Average Mean Error = "+(totalError/results.size()));
+		System.out.println("Average Mean Error = " + (totalError/results.size()));
 	}
 
 	public void setRobust( boolean robust ) {
@@ -205,19 +202,16 @@ public class CalibrateMonoPlanar {
 		return structure;
 	}
 
-	public List<CalibrationObservation> getObservations() {
-		return observations;
-	}
-
-	public List<ImageResults> getErrors() {
-		return errors;
-	}
-
-	public <T extends CameraModel>T getIntrinsic() {
+	public <T extends CameraModel> T getIntrinsic() {
 		return (T)foundIntrinsic;
 	}
 
 	public CalibrationPlanarGridZhang99 getZhang99() {
 		return zhang99;
+	}
+
+	@Override
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = out;
 	}
 }

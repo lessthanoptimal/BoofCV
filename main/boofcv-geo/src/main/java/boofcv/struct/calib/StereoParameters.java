@@ -48,7 +48,7 @@ public class StereoParameters implements Serializable {
 	/** intrinsic camera parameters of right camera */
 	public CameraPinholeBrown right;
 	/** transform from left camera to right camera */
-	public Se3_F64 rightToLeft;
+	public Se3_F64 right_to_left;
 
 	public StereoParameters(StereoParameters param ) {
 		this(param.left,param.right,param.getRightToLeft());
@@ -56,9 +56,9 @@ public class StereoParameters implements Serializable {
 
 	public StereoParameters(CameraPinholeBrown left,
 							CameraPinholeBrown right,
-							Se3_F64 rightToLeft ) {
+							Se3_F64 right_to_left ) {
 		this.left = new CameraPinholeBrown(left);
-		this.rightToLeft = rightToLeft.copy();
+		this.right_to_left = right_to_left.copy();
 		this.right = new CameraPinholeBrown(right);
 	}
 
@@ -74,11 +74,11 @@ public class StereoParameters implements Serializable {
 	}
 
 	public Se3_F64 getRightToLeft() {
-		return rightToLeft;
+		return right_to_left;
 	}
 
-	public void setRightToLeft(Se3_F64 rightToLeft) {
-		this.rightToLeft = rightToLeft;
+	public void setRightToLeft(Se3_F64 right_to_left ) {
+		this.right_to_left = right_to_left;
 	}
 
 	public CameraPinholeBrown getRight() {
@@ -93,7 +93,7 @@ public class StereoParameters implements Serializable {
 	 * Returns the distance between the optical center of each camera
 	 */
 	public double getBaseline() {
-		return rightToLeft.getT().norm();
+		return right_to_left.getT().norm();
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class StereoParameters implements Serializable {
 	 */
 	public boolean isRectified( double tol ) {
 		if( !left.isDistorted() && !right.isDistorted() ) {
-			double angle = ConvertRotation3D_F64.matrixToRodrigues(rightToLeft.R,null).theta;
+			double angle = ConvertRotation3D_F64.matrixToRodrigues(right_to_left.R,null).theta;
 			if( Math.abs(angle) < tol ) {
 				return true;
 			}
@@ -125,15 +125,15 @@ public class StereoParameters implements Serializable {
 		else
 			this.right.set(src.right);
 
-		if( this.rightToLeft == null )
-			this.rightToLeft = src.rightToLeft.copy();
+		if( this.right_to_left == null )
+			this.right_to_left = src.right_to_left.copy();
 		else
-			this.rightToLeft.set(src.rightToLeft);
+			this.right_to_left.set(src.right_to_left);
 	}
 
 	public void print() {
-		double[] euler = ConvertRotation3D_F64.matrixToEuler(rightToLeft.getR(), EulerType.XYZ,(double[])null);
-		Vector3D_F64 t = rightToLeft.getT();
+		double[] euler = ConvertRotation3D_F64.matrixToEuler(right_to_left.getR(), EulerType.XYZ,(double[])null);
+		Vector3D_F64 t = right_to_left.getT();
 		System.out.println();
 		System.out.println("Left Camera");
 		left.print();

@@ -216,8 +216,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			// Guess something "reasonable"
 			// baseline of 1 and distortion free cameras with a 90 HFOV
 			origCalib = new StereoParameters();
-			origCalib.rightToLeft = new Se3_F64();
-			origCalib.rightToLeft.T.x = 1;
+			origCalib.right_to_left = new Se3_F64();
+			origCalib.right_to_left.T.x = 1;
 			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(),origLeft.getHeight(), 90);
 			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(),origRight.getHeight(), 90);
 		} else {

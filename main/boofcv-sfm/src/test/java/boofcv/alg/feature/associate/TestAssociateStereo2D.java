@@ -62,7 +62,7 @@ public class TestAssociateStereo2D {
 		leftToRight.getT().set(-0.1,0,0);
 
 		param = new StereoParameters();
-		param.rightToLeft = leftToRight.invert(null);
+		param.right_to_left = leftToRight.invert(null);
 
 		param.left = new CameraPinholeBrown(400,500,0.1,160,120,320,240).fsetRadial(0,0);
 		param.right = new CameraPinholeBrown(380,505,0.05,165,115,320,240).fsetRadial(0,0);
@@ -107,7 +107,7 @@ public class TestAssociateStereo2D {
 	@Test
 	public void constraintX() {
 		// zap the rotation so that no adjustment should need to be done
-		CommonOps_DDRM.setIdentity(param.rightToLeft.getR());
+		CommonOps_DDRM.setIdentity(param.right_to_left.getR());
 		Point3D_F64 X = new Point3D_F64(0.02,-0.5,3);
 
 		SfmTestHelper.renderPointPixel(param,X,leftP,rightP);

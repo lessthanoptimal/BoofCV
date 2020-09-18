@@ -248,7 +248,7 @@ public class PruneStructureFromSceneMetric {
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 		nn.setPoints(cloud, false);
-		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue(NnData::new);
+		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue<>(NnData::new);
 
 		// Create a look up table containing from old to new indexes for each point
 		int[] oldToNew = new int[structure.points.size];
@@ -293,8 +293,9 @@ public class PruneStructureFromSceneMetric {
 	 * removed) will remain since they are needed for the correct transform.
 	 *
 	 * @param count Prune if less than or equal to this many features
+	 * @return true if the graph has been modified
 	 */
-	public void pruneViews( int count ) {
+	public boolean pruneViews( int count ) {
 		GrowQueue_I32 removeIdx = new GrowQueue_I32();
 		Set<SceneStructureMetric.View> parents = new HashSet<>();
 
@@ -324,15 +325,22 @@ public class PruneStructureFromSceneMetric {
 			}
 		}
 
+		if (removeIdx.isEmpty())
+			return false;
+
 		// Remove the views
 		structure.views.remove(removeIdx.data, 0, removeIdx.size, null);
 		observations.views.remove(removeIdx.data, 0, removeIdx.size, null);
+
+		return true;
 	}
 
 	/**
 	 * Prunes cameras that are not referenced by any views.
+	 *
+	 * @return true if the graph has been modified
 	 */
-	public void pruneUnusedCameras() {
+	public boolean pruneUnusedCameras() {
 		// Count how many views are used by each camera
 		int[] histogram = new int[structure.cameras.size];
 
@@ -351,6 +359,9 @@ public class PruneStructureFromSceneMetric {
 			}
 		}
 
+		if (removeIdx.isEmpty())
+			return false;
+
 		// Create the new camera array without the unused cameras
 		structure.cameras.remove(removeIdx.data, 0, removeIdx.size, null);
 
@@ -359,12 +370,16 @@ public class PruneStructureFromSceneMetric {
 			SceneStructureMetric.View v = structure.views.data[i];
 			v.camera = oldToNew[v.camera];
 		}
+
+		return true;
 	}
 
 	/**
 	 * Prunes Motions that are not referenced by any views.
+	 *
+	 * @return true if the graph has been modified
 	 */
-	public void pruneUnusedMotions() {
+	public boolean pruneUnusedMotions() {
 		// Count how many views are used by each camera
 		int[] histogram = new int[structure.motions.size];
 
@@ -383,6 +398,9 @@ public class PruneStructureFromSceneMetric {
 			}
 		}
 
+		if (removeIdx.isEmpty())
+			return false;
+
 		// Create the new camera array without the unused cameras
 		structure.motions.remove(removeIdx.data, 0, removeIdx.size, null);
 
@@ -391,6 +409,8 @@ public class PruneStructureFromSceneMetric {
 			SceneStructureMetric.View v = structure.views.data[i];
 			v.parent_to_view = oldToNew[v.parent_to_view];
 		}
+
+		return true;
 	}
 
 	private static class Errors {

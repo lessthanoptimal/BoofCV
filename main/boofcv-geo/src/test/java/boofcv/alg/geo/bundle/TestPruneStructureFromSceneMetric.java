@@ -243,12 +243,12 @@ class TestPruneStructureFromSceneMetric {
 		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change
-		alg.pruneViews(leastCount - 1);
+		assertFalse(alg.pruneViews(leastCount - 1));
 		assertEquals(10, observations.views.size);
 		assertEquals(structure.views.size, observations.views.size);
 
 		// Now prune views. Only one should be removed
-		alg.pruneViews(leastCount);
+		assertTrue(alg.pruneViews(leastCount));
 		assertEquals(9, observations.views.size);
 		assertEquals(structure.views.size, observations.views.size);
 		// Points are not removed even if there is no view that can see them now
@@ -267,7 +267,7 @@ class TestPruneStructureFromSceneMetric {
 		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change
-		alg.pruneUnusedCameras();
+		assertFalse(alg.pruneUnusedCameras());
 		assertEquals(2, structure.cameras.size);
 
 		// remove all references to the first camera
@@ -277,7 +277,7 @@ class TestPruneStructureFromSceneMetric {
 		}
 
 		// First camera is removed
-		alg.pruneUnusedCameras();
+		assertTrue(alg.pruneUnusedCameras());
 		assertEquals(1, structure.cameras.size);
 		// make sure references are updated
 		for (int i = 0; i < structure.views.size; i++) {
@@ -296,7 +296,7 @@ class TestPruneStructureFromSceneMetric {
 		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change
-		alg.pruneUnusedMotions();
+		assertFalse(alg.pruneUnusedMotions());
 		assertEquals(10, structure.motions.size);
 
 		// remove all references to the first motion
@@ -306,7 +306,7 @@ class TestPruneStructureFromSceneMetric {
 		}
 
 		// First camera is removed
-		alg.pruneUnusedMotions();
+		assertTrue(alg.pruneUnusedMotions());
 		assertEquals(9, structure.motions.size);
 		structure.views.forIdx(( i, v ) -> assertEquals(i == 0 ? 0 : i == 1 ? 1 : i - 1, v.parent_to_view));
 	}
@@ -365,14 +365,14 @@ class TestPruneStructureFromSceneMetric {
 		structure.getPoints().forIdx(( i, p ) -> p.removeView(1));
 
 		var alg = new PruneStructureFromSceneMetric(structure, observations);
-		alg.pruneViews(2);
+		assertFalse(alg.pruneViews(2));
 		assertEquals(3, structure.views.size);
 
 		// Now make the view[2] prune able, this should cause view[1] to be pruned also
 		// View[1] should not be dropped since another is dependent on it
 		observations.getView(2).resize(0);
 		structure.getPoints().forIdx(( i, p ) -> p.removeView(2));
-		alg.pruneViews(2);
+		assertTrue(alg.pruneViews(2));
 		assertEquals(1, structure.views.size);
 	}
 
