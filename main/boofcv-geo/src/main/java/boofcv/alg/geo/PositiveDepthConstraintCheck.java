@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class PositiveDepthConstraintCheck {
 	// location of triangulated point in 3D space
 	Point3D_F64 P = new Point3D_F64();
 
-	public PositiveDepthConstraintCheck(Triangulate2ViewsMetric triangulate) {
+	public PositiveDepthConstraintCheck( Triangulate2ViewsMetric triangulate ) {
 		this.triangulate = triangulate;
 	}
 
@@ -64,12 +64,12 @@ public class PositiveDepthConstraintCheck {
 	 * @param fromAtoB Transform from the B to A camera frame.
 	 * @return If the triangulated point appears in front of both cameras.
 	 */
-	public boolean checkConstraint( Point2D_F64 viewA , Point2D_F64 viewB , Se3_F64 fromAtoB ) {
+	public boolean checkConstraint( Point2D_F64 viewA, Point2D_F64 viewB, Se3_F64 fromAtoB ) {
 
-		triangulate.triangulate(viewA,viewB,fromAtoB,P);
+		triangulate.triangulate(viewA, viewB, fromAtoB, P);
 
-		if( P.z > 0 ) {
-			SePointOps_F64.transform(fromAtoB,P,P);
+		if (P.z > 0) {
+			SePointOps_F64.transform(fromAtoB, P, P);
 			return P.z > 0;
 		}
 		return false;

@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 	TestGPixelMath() {
@@ -50,146 +51,146 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
-		Class<?> param[] = validation.getParameterTypes();
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
+		Class<?>[] param = validation.getParameterTypes();
 		String name = candidate.getName();
 
-		ImageBase inputA = createImage(param[0],null);
-		ImageBase inputB=null,output=null;
+		ImageBase inputA = createImage(param[0], null);
+		ImageBase inputB = null, output = null;
 
 		Object[][] ret = new Object[1][param.length];
 
-		if( name.equals("abs")) {
-			output = createImage(param[1],null);
+		if (name.equals("abs")) {
+			output = createImage(param[1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = output;
-		} else if( name.equals("negative")) {
-			output = createImage(param[1],null);
+		} else if (name.equals("negative")) {
+			output = createImage(param[1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = output;
-		} else if( name.equals("divide") && param.length == 3) {
-			output = createImage(param[param.length-1],null);
-			if( ImageBase.class.isAssignableFrom(param[1]) )  {
+		} else if (name.equals("divide") && param.length == 3) {
+			output = createImage(param[param.length - 1], null);
+			if (ImageBase.class.isAssignableFrom(param[1])) {
 				ret[0][0] = inputA;
-				ret[0][1] = inputB = createImage(param[1],null);
+				ret[0][1] = inputB = createImage(param[1], null);
 				ret[0][2] = output;
 			} else {
 				ret[0][0] = inputA;
 				ret[0][1] = 3;
 				ret[0][2] = output;
 			}
-		} else if( name.equals("divide") && param.length == 5) {
-			output = createImage(param[param.length - 1],null);
+		} else if (name.equals("divide") && param.length == 5) {
+			output = createImage(param[param.length - 1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
 			ret[0][2] = -1;
 			ret[0][3] = 5;
 			ret[0][4] = output;
-		} else if( name.equals("multiply") && param.length == 3) {
-			output = createImage(param[param.length-1],null);
-			if( ImageBase.class.isAssignableFrom(param[1]) )  {
+		} else if (name.equals("multiply") && param.length == 3) {
+			output = createImage(param[param.length - 1], null);
+			if (ImageBase.class.isAssignableFrom(param[1])) {
 				ret[0][0] = inputA;
-				ret[0][1] = inputB = createImage(param[1],null);
+				ret[0][1] = inputB = createImage(param[1], null);
 				ret[0][2] = output;
 			} else {
 				ret[0][0] = inputA;
 				ret[0][1] = 3;
 				ret[0][2] = output;
 			}
-		} else if( name.equals("multiply") && param.length == 5) {
-			output = createImage(param[param.length - 1],null);
+		} else if (name.equals("multiply") && param.length == 5) {
+			output = createImage(param[param.length - 1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
 			ret[0][2] = -20;
 			ret[0][3] = 12;
 			ret[0][4] = output;
-		} else if( name.equals("plus") && param.length == 3) {
-			output = createImage(param[param.length - 1],null);
+		} else if (name.equals("plus") && param.length == 3) {
+			output = createImage(param[param.length - 1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
 			ret[0][2] = output;
-		} else if( name.equals("plus") && param.length == 5) {
-			output = createImage(param[param.length-1],null);
+		} else if (name.equals("plus") && param.length == 5) {
+			output = createImage(param[param.length - 1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
 			ret[0][2] = -10;
 			ret[0][3] = 12;
 			ret[0][4] = output;
-		} else if( name.equals("minus") && param.length == 3) {
-			output = createImage(param[param.length - 1],null);
+		} else if (name.equals("minus") && param.length == 3) {
+			output = createImage(param[param.length - 1], null);
 			boolean first = ImageBase.class.isAssignableFrom(param[0]);
-			if( inputA == null ) inputA = createImage(param[1],null);
+			if (inputA == null) inputA = createImage(param[1], null);
 			ret[0][0] = first ? inputA : 3;
 			ret[0][1] = first ? 3 : inputA;
 			ret[0][2] = output;
-		} else if( name.equals("minus") && param.length == 5) {
-			output = createImage(param[param.length-1],null);
+		} else if (name.equals("minus") && param.length == 5) {
+			output = createImage(param[param.length - 1], null);
 			boolean first = ImageBase.class.isAssignableFrom(param[0]);
-			if( inputA == null ) inputA = createImage(param[1],null);
+			if (inputA == null) inputA = createImage(param[1], null);
 			ret[0][0] = first ? inputA : 3;
 			ret[0][1] = first ? 3 : inputA;
 			ret[0][2] = -10;
 			ret[0][3] = 12;
 			ret[0][4] = output;
-		} else if( name.equals("log") ) {
-			inputB = createImage(param[0],null);
+		} else if (name.equals("log")) {
+			inputB = createImage(param[0], null);
 			ret[0][0] = inputA;
-			ret[0][1] = BoofTesting.primitive(0.5,param[1]);
+			ret[0][1] = BoofTesting.primitive(0.5, param[1]);
 			ret[0][2] = inputB;
-		} else if( name.equals("logSign") ) {
-			inputB = createImage(param[0],null);
+		} else if (name.equals("logSign")) {
+			inputB = createImage(param[0], null);
 			ret[0][0] = inputA;
-			ret[0][1] = BoofTesting.primitive(0.5,param[1]);
+			ret[0][1] = BoofTesting.primitive(0.5, param[1]);
 			ret[0][2] = inputB;
-		} else if( name.equals("pow2") ) {
-			inputB = createImage(param[1],null);
+		} else if (name.equals("pow2")) {
+			inputB = createImage(param[1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
-		} else if( name.equals("sqrt") ) {
-			inputB = createImage(param[1],null);
+		} else if (name.equals("sqrt")) {
+			inputB = createImage(param[1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
-		} else if( name.equals("add") ) {
-			inputB = createImage(param[1],null);
-			output = createImage(param[2],null);
+		} else if (name.equals("add")) {
+			inputB = createImage(param[1], null);
+			output = createImage(param[2], null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 			ret[0][2] = output;
-		} else if( name.equals("subtract") ) {
-			inputB = createImage(param[1],null);
-			output = createImage(param[2],null);
+		} else if (name.equals("subtract")) {
+			inputB = createImage(param[1], null);
+			output = createImage(param[2], null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 			ret[0][2] = output;
-		} else if( name.equals("boundImage") ) {
+		} else if (name.equals("boundImage")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 2;
 			ret[0][2] = 8;
-		} else if( name.equals("diffAbs") ) {
-			inputB = createImage(param[1],null);
-			output = createImage(param[2],null);
+		} else if (name.equals("diffAbs")) {
+			inputB = createImage(param[1], null);
+			output = createImage(param[2], null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 			ret[0][2] = output;
-		} else if( name.equals("averageBand") ) {
-			inputA = createImage(param[0],param[1]);
-			output = createImage(param[1],null);
+		} else if (name.equals("averageBand")) {
+			inputA = createImage(param[0], param[1]);
+			output = createImage(param[1], null);
 			ret[0][0] = inputA;
 			ret[0][1] = output;
-		} else if( name.equals("stdev") ) {
-			inputB = createImage(param[1],null);
-			output = createImage(param[2],null);
+		} else if (name.equals("stdev")) {
+			inputB = createImage(param[1], null);
+			output = createImage(param[2], null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 			ret[0][2] = output;
-		} else if( name.equals("lambda1") ) {
-			output = createImage(param[2],null);
+		} else if (name.equals("lambda1")) {
+			output = createImage(param[2], null);
 			ret[0][0] = inputA;
 			ret[0][1] = createLambda1_Plus5(inputA.imageType.getDataType());
 			ret[0][2] = output;
-		} else if( name.equals("lambda2") ) {
-			inputB = createImage(param[2],null);
-			output = createImage(param[3],null);
+		} else if (name.equals("lambda2")) {
+			inputB = createImage(param[2], null);
+			output = createImage(param[3], null);
 			ret[0][0] = inputA;
 			ret[0][1] = createLambda2_AddPlus5(inputA.imageType.getDataType());
 			ret[0][2] = inputB;
@@ -204,12 +205,12 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 	}
 
 	@Override
-	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
 
 		int which;
 
-		if( targetParam[targetParam.length-1] instanceof ImageBase ) {
-			which = targetParam.length-1;
+		if (targetParam[targetParam.length - 1] instanceof ImageBase) {
+			which = targetParam.length - 1;
 		} else {
 			which = 0;
 		}
@@ -221,7 +222,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		boolean foundNotZero = false;
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				if( GeneralizedImageOps.get(t,j,i,0) != 0 ) {
+				if (GeneralizedImageOps.get(t, j, i, 0) != 0) {
 					foundNotZero = true;
 					break;
 				}
@@ -241,65 +242,65 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		int total = 0;
 		Method[] methods = GPixelMath.class.getMethods();
 
-		for( Method m : methods ) {
-			if(!Modifier.isStatic(m.getModifiers()))
+		for (Method m : methods) {
+			if (!Modifier.isStatic(m.getModifiers()))
 				continue;
 			Class[] param = m.getParameterTypes();
-			if( param.length < 1 )
+			if (param.length < 1)
 				continue;
 
 			// create input arguments
-			Object[] inputs = new Object[ param.length ];
+			Object[] inputs = new Object[param.length];
 
 			for (int i = 0; i < inputs.length; i++) {
-				if( param[i] == ImageBase.class) {
-					inputs[i] = new Planar(GrayF32.class,width,height,2);
-					GImageMiscOps.fillUniform((ImageBase)inputs[i],rand,-100,100);
+				if (param[i] == ImageBase.class) {
+					inputs[i] = new Planar(GrayF32.class, width, height, 2);
+					GImageMiscOps.fillUniform((ImageBase)inputs[i], rand, -100, 100);
 				}
 			}
 
 			// specialized inputs for individual functions
 			String name = m.getName();
-			if( name.equals("divide") && param.length == 3) {
-				if( !ImageBase.class.isAssignableFrom(param[1]) )  {
+			if (name.equals("divide") && param.length == 3) {
+				if (!ImageBase.class.isAssignableFrom(param[1])) {
 					inputs[1] = 3;
 				}
-			} else if( name.equals("divide") && param.length == 5) {
+			} else if (name.equals("divide") && param.length == 5) {
 				inputs[1] = 3;
 				inputs[2] = -1;
 				inputs[3] = 5;
-			} else if( name.equals("multiply") && param.length == 3) {
-				if( !ImageBase.class.isAssignableFrom(param[1]) )  {
+			} else if (name.equals("multiply") && param.length == 3) {
+				if (!ImageBase.class.isAssignableFrom(param[1])) {
 					inputs[1] = 3;
 				}
-			} else if( name.equals("multiply") && param.length == 5) {
+			} else if (name.equals("multiply") && param.length == 5) {
 				inputs[1] = 3;
 				inputs[2] = -20;
 				inputs[3] = 12;
-			} else if( name.equals("plus") && param.length == 3) {
+			} else if (name.equals("plus") && param.length == 3) {
 				inputs[1] = 3;
-			} else if( name.equals("plus") && param.length == 5) {
+			} else if (name.equals("plus") && param.length == 5) {
 				inputs[1] = 3;
 				inputs[2] = -10;
 				inputs[3] = 12;
-			} else if( name.equals("minus") && param.length == 3) {
+			} else if (name.equals("minus") && param.length == 3) {
 				boolean first = ImageBase.class.isAssignableFrom(param[0]);
-				inputs[first?1:0] = 3;
-			} else if( name.equals("minus") && param.length == 5) {
+				inputs[first ? 1 : 0] = 3;
+			} else if (name.equals("minus") && param.length == 5) {
 				boolean first = ImageBase.class.isAssignableFrom(param[0]);
-				inputs[first?1:0] = 3;
+				inputs[first ? 1 : 0] = 3;
 				inputs[2] = -10;
 				inputs[3] = 12;
-			} else if( name.equals("boundImage") ) {
+			} else if (name.equals("boundImage")) {
 				inputs[1] = 2;
 				inputs[2] = 8;
-			} else if( name.equals("log") || name.equals("logSign")) {
-				inputs[1] = BoofTesting.primitive(0.5,param[1]);
-			} else if( name.equals("lambda1") ) {
+			} else if (name.equals("log") || name.equals("logSign")) {
+				inputs[1] = BoofTesting.primitive(0.5, param[1]);
+			} else if (name.equals("lambda1")) {
 				inputs[1] = createLambda1_Plus5(ImageDataType.F32);
-			} else if( name.equals("lambda2") ) {
+			} else if (name.equals("lambda2")) {
 				inputs[1] = createLambda2_AddPlus5(ImageDataType.F32);
-			} else if( name.equals("averageBand")) {
+			} else if (name.equals("averageBand")) {
 				continue;
 			}
 
@@ -308,15 +309,15 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			try {
 				// create the expected results
 				Object[] inputsByBand = copy(inputs);
-				invokeByBand(m,inputsByBand);
+				invokeByBand(m, inputsByBand);
 
 				// invoke this function
-				m.invoke(null,inputs );
+				m.invoke(null, inputs);
 
 				// compare against each other
 				for (int i = 0; i < inputs.length; i++) {
 					if (Planar.class == inputs[i].getClass()) {
-						BoofTesting.assertEquals((ImageBase)inputs[i],(ImageBase)inputsByBand[i], 1e-4);
+						BoofTesting.assertEquals((ImageBase)inputs[i], (ImageBase)inputsByBand[i], 1e-4);
 					}
 				}
 				total++;
@@ -324,14 +325,14 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 				throw new RuntimeException(e);
 			}
 		}
-		assertEquals(25,total);
+		assertEquals(25, total);
 	}
 
-	private Object[] copy( Object inputs[] ) {
-		Object copy[] = new Object[inputs.length];
+	private Object[] copy( Object[] inputs ) {
+		Object[] copy = new Object[inputs.length];
 
 		for (int i = 0; i < inputs.length; i++) {
-			if( Planar.class == inputs[i].getClass() ) {
+			if (Planar.class == inputs[i].getClass()) {
 				copy[i] = ((Planar)inputs[i]).createSameShape();
 				((Planar)copy[i]).setTo((Planar)inputs[i]);
 			} else {
@@ -341,12 +342,12 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		return copy;
 	}
 
-	private void invokeByBand( Method m , Object inputs[] ) {
-		Object modified[] = new Object[inputs.length];
+	private void invokeByBand( Method m, Object[] inputs ) {
+		Object[] modified = new Object[inputs.length];
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < inputs.length; j++) {
-				if( Planar.class == inputs[j].getClass() ) {
+				if (Planar.class == inputs[j].getClass()) {
 					modified[j] = ((Planar)inputs[j]).getBand(i);
 				} else {
 					modified[j] = inputs[j];
@@ -360,41 +361,40 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		}
 	}
 
-
 	@Test
 	void divide_planar_by_gray_3() {
-		Planar<GrayF32> numerator = new Planar<>(GrayF32.class,width,height,2);
-		GrayF32 denominator = new GrayF32(width,height);
-		GImageMiscOps.fillUniform(numerator,rand,-10,10);
-		GImageMiscOps.fillUniform(denominator,rand,1,2);
+		Planar<GrayF32> numerator = new Planar<>(GrayF32.class, width, height, 2);
+		GrayF32 denominator = new GrayF32(width, height);
+		GImageMiscOps.fillUniform(numerator, rand, -10, 10);
+		GImageMiscOps.fillUniform(denominator, rand, 1, 2);
 
-		Planar<GrayF32> output = new Planar<>(GrayF32.class,width,height,2);
+		Planar<GrayF32> output = new Planar<>(GrayF32.class, width, height, 2);
 
-		GPixelMath.divide(numerator,denominator,output);
+		GPixelMath.divide(numerator, denominator, output);
 
 		GrayF32 expected = denominator.createSameShape();
 
 		for (int i = 0; i < numerator.getNumBands(); i++) {
-			GPixelMath.divide(numerator.getBand(i),denominator, expected);
-			BoofTesting.assertEquals(output.getBand(i),expected, 1e-4);
+			GPixelMath.divide(numerator.getBand(i), denominator, expected);
+			BoofTesting.assertEquals(output.getBand(i), expected, 1e-4);
 		}
 	}
 
 	@Test
 	void multiply_planar_by_gray_3() {
-		Planar<GrayF32> numerator = new Planar<>(GrayF32.class,width,height,2);
-		GrayF32 denominator = new GrayF32(width,height);
-		GImageMiscOps.fillUniform(numerator,rand,-10,10);
-		GImageMiscOps.fillUniform(denominator,rand,1,2);
+		Planar<GrayF32> numerator = new Planar<>(GrayF32.class, width, height, 2);
+		GrayF32 denominator = new GrayF32(width, height);
+		GImageMiscOps.fillUniform(numerator, rand, -10, 10);
+		GImageMiscOps.fillUniform(denominator, rand, 1, 2);
 
-		Planar<GrayF32> output = new Planar<>(GrayF32.class,width,height,2);
+		Planar<GrayF32> output = new Planar<>(GrayF32.class, width, height, 2);
 
-		GPixelMath.multiply(numerator,denominator,output);
+		GPixelMath.multiply(numerator, denominator, output);
 		GrayF32 expected = denominator.createSameShape();
 
 		for (int i = 0; i < numerator.getNumBands(); i++) {
-			GPixelMath.multiply(numerator.getBand(i),denominator, expected);
-			BoofTesting.assertEquals(output.getBand(i),expected, 1e-4);
+			GPixelMath.multiply(numerator.getBand(i), denominator, expected);
+			BoofTesting.assertEquals(output.getBand(i), expected, 1e-4);
 		}
 	}
 }

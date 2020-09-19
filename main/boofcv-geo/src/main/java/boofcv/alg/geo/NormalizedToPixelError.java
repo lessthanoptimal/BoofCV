@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,11 @@ public class NormalizedToPixelError {
 	private double fy; // focal length y
 	private double skew; // pixel skew
 
-	public NormalizedToPixelError(double fx, double fy, double skew) {
-		set(fx,fy,skew);
+	public NormalizedToPixelError( double fx, double fy, double skew ) {
+		set(fx, fy, skew);
 	}
 
-	public NormalizedToPixelError()
-	{}
+	public NormalizedToPixelError() {}
 
 	/**
 	 * Specify camera intrinsic parameters
@@ -45,13 +44,13 @@ public class NormalizedToPixelError {
 	 * @param fy focal length y
 	 * @param skew camera skew
 	 */
-	public void set(double fx, double fy, double skew) {
+	public void set( double fx, double fy, double skew ) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
 	}
 
-	public double errorSq( Point2D_F64 a , Point2D_F64 b ) {
+	public double errorSq( Point2D_F64 a, Point2D_F64 b ) {
 		double dy = (b.y - a.y);
 		double dx = (b.x - a.x)*fx + dy*skew;
 		dy *= fy;
@@ -59,7 +58,7 @@ public class NormalizedToPixelError {
 		return dx*dx + dy*dy;
 	}
 
-	public double errorSq( double a_x , double a_y , double b_x , double b_y ) {
+	public double errorSq( double a_x, double a_y, double b_x, double b_y ) {
 		double dy = (b_y - a_y);
 		double dx = (b_x - a_x)*fx + dy*skew;
 		dy *= fy;

@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	long randomSeed = 2345;
@@ -51,7 +52,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
-		Class<?> param[] = validation.getParameterTypes();
+		Class<?>[] param = validation.getParameterTypes();
 		String name = candidate.getName();
 
 		ImageBase inputA = null;
@@ -225,7 +226,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 	 */
 	@Test
 	public void fillUniform_Int_Inclusive() {
-		Class types[] = new Class[]{GrayU8.class,GrayS8.class,GrayU16.class,GrayS32.class,GrayS16.class,GrayS64.class};
+		Class[] types = new Class[]{GrayU8.class,GrayS8.class,GrayU16.class,GrayS32.class,GrayS16.class,GrayS64.class};
 
 		for( Class type : types ) {
 			ImageGray image = GeneralizedImageOps.createSingleBand(type, width, height);

@@ -51,38 +51,39 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 public class PerspectiveOps {
 
 	/**
 	 * Approximates a pinhole camera using the distoriton model
+	 *
 	 * @param p2n Distorted pixel to undistorted normalized image coordinates
 	 */
-	public static CameraPinhole approximatePinhole( Point2Transform2_F64 p2n , int width , int height )
-	{
+	public static CameraPinhole approximatePinhole( Point2Transform2_F64 p2n, int width, int height ) {
 		Point2D_F64 na = new Point2D_F64();
 		Point2D_F64 nb = new Point2D_F64();
 
 		// determine horizontal FOV using dot product of (na.x, na.y, 1 ) and (nb.x, nb.y, 1)
-		p2n.compute(0,height/2,na);
-		p2n.compute(width-1,height/2,nb);
+		p2n.compute(0, height/2, na);
+		p2n.compute(width - 1, height/2, nb);
 
 		double abdot = na.x*nb.x + na.y*nb.y + 1;
 		double normA = Math.sqrt(na.x*na.x + na.y*na.y + 1);
 		double normB = Math.sqrt(nb.x*nb.x + nb.y*nb.y + 1);
 
-		double hfov = Math.acos( abdot/(normA*normB));
+		double hfov = Math.acos(abdot/(normA*normB));
 
 		// vertical FOV
-		p2n.compute(width/2,0,na);
-		p2n.compute(width/2,height-1,nb);
+		p2n.compute(width/2, 0, na);
+		p2n.compute(width/2, height - 1, nb);
 
 		abdot = na.x*nb.x + na.y*nb.y + 1;
 		normA = Math.sqrt(na.x*na.x + na.y*na.y + 1);
 		normB = Math.sqrt(nb.x*nb.x + nb.y*nb.y + 1);
 
-		double vfov = Math.acos( abdot/(normA*normB));
+		double vfov = Math.acos(abdot/(normA*normB));
 
-		return createIntrinsic(width,height, UtilAngle.degree(hfov), UtilAngle.degree(vfov));
+		return createIntrinsic(width, height, UtilAngle.degree(hfov), UtilAngle.degree(vfov));
 	}
 
 	/**
@@ -94,14 +95,14 @@ public class PerspectiveOps {
 	 * @param vfov Vertical FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static CameraPinhole createIntrinsic(int width, int height, double hfov, double vfov) {
+	public static CameraPinhole createIntrinsic( int width, int height, double hfov, double vfov ) {
 		CameraPinhole intrinsic = new CameraPinhole();
 		intrinsic.width = width;
 		intrinsic.height = height;
-		intrinsic.cx = width / 2;
-		intrinsic.cy = height / 2;
-		intrinsic.fx = intrinsic.cx / Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
-		intrinsic.fy = intrinsic.cy / Math.tan(UtilAngle.degreeToRadian(vfov/2.0));
+		intrinsic.cx = width/2;
+		intrinsic.cy = height/2;
+		intrinsic.fx = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
+		intrinsic.fy = intrinsic.cy/Math.tan(UtilAngle.degreeToRadian(vfov/2.0));
 
 		return intrinsic;
 	}
@@ -115,13 +116,13 @@ public class PerspectiveOps {
 	 * @param hfov Horizontal FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static CameraPinholeBrown createIntrinsic(int width, int height, double hfov) {
+	public static CameraPinholeBrown createIntrinsic( int width, int height, double hfov ) {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown();
 		intrinsic.width = width;
 		intrinsic.height = height;
-		intrinsic.cx = width / 2;
-		intrinsic.cy = height / 2;
-		intrinsic.fx = intrinsic.cx / Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
+		intrinsic.cx = width/2;
+		intrinsic.cy = height/2;
+		intrinsic.fx = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
 		intrinsic.fy = intrinsic.fx;
 
 		return intrinsic;
@@ -134,7 +135,7 @@ public class PerspectiveOps {
 	 * @param param Intrinsic parameters
 	 * @param scale Scale factor that input image is being scaled by.
 	 */
-	public static void scaleIntrinsic(CameraPinhole param , double scale ) {
+	public static void scaleIntrinsic( CameraPinhole param, double scale ) {
 		param.width = (int)(param.width*scale);
 		param.height = (int)(param.height*scale);
 		param.cx *= scale;
@@ -145,7 +146,6 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 *
 	 * <p>Recomputes the {@link CameraPinholeBrown} given an adjustment matrix.</p>
 	 * K<sub>A</sub> = A*K<br>
 	 * Where K<sub>A</sub> is the returned adjusted intrinsic matrix, A is the adjustment matrix and K is the
@@ -160,15 +160,13 @@ public class PerspectiveOps {
 	 * @param adjustedParam (Output) Optional storage for adjusted intrinsic parameters. Can be null.
 	 * @return Adjusted intrinsic parameters.
 	 */
-	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 DMatrixRMaj adjustMatrix,
-															 C adjustedParam)
-	{
+	public static <C extends CameraPinhole> C adjustIntrinsic( C parameters,
+															   DMatrixRMaj adjustMatrix,
+															   C adjustedParam ) {
 		return ImplPerspectiveOps_F64.adjustIntrinsic(parameters, adjustMatrix, adjustedParam);
 	}
 
 	/**
-	 *
 	 * <p>Recomputes the {@link CameraPinholeBrown} given an adjustment matrix.</p>
 	 * K<sub>A</sub> = A*K<br>
 	 * Where K<sub>A</sub> is the returned adjusted intrinsic matrix, A is the adjustment matrix and K is the
@@ -183,10 +181,9 @@ public class PerspectiveOps {
 	 * @param adjustedParam (Output) Optional storage for adjusted intrinsic parameters. Can be null.
 	 * @return Adjusted intrinsic parameters.
 	 */
-	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 FMatrixRMaj adjustMatrix,
-															 C adjustedParam)
-	{
+	public static <C extends CameraPinhole> C adjustIntrinsic( C parameters,
+															   FMatrixRMaj adjustMatrix,
+															   C adjustedParam ) {
 		return ImplPerspectiveOps_F32.adjustIntrinsic(parameters, adjustMatrix, adjustedParam);
 	}
 
@@ -200,15 +197,18 @@ public class PerspectiveOps {
 	 * @param cy center center y-axis in pixels
 	 * @return Calibration matrix 3x3
 	 */
-	public static DMatrixRMaj pinholeToMatrix(double fx, double fy, double skew,
-											  double cx, double cy) {
-		return ImplPerspectiveOps_F64.pinholeToMatrix(fx, fy, skew, cx, cy,null);
+	public static DMatrixRMaj pinholeToMatrix( double fx, double fy, double skew,
+											   double cx, double cy ) {
+		return ImplPerspectiveOps_F64.pinholeToMatrix(fx, fy, skew, cx, cy, null);
 	}
 
-	public static void pinholeToMatrix(double fx, double fy, double skew,
-									   double cx, double cy , DMatrix3x3 K ) {
-		K.a11 = fx; K.a12 = skew; K.a13 = cx;
-		K.a22 = fy; K.a23 = cy;
+	public static void pinholeToMatrix( double fx, double fy, double skew,
+										double cx, double cy, DMatrix3x3 K ) {
+		K.a11 = fx;
+		K.a12 = skew;
+		K.a13 = cx;
+		K.a22 = fy;
+		K.a23 = cy;
 		K.a33 = 1;
 		K.a21 = K.a31 = K.a32 = 0;
 	}
@@ -220,7 +220,7 @@ public class PerspectiveOps {
 	 * @param K (Input) Calibration matrix
 	 * @param Kinv (Output) inverse.
 	 */
-	public static void invertPinhole( DMatrix3x3 K , DMatrix3x3 Kinv) {
+	public static void invertPinhole( DMatrix3x3 K, DMatrix3x3 Kinv ) {
 		double fx = K.a11;
 		double skew = K.a12;
 		double cx = K.a13;
@@ -244,8 +244,8 @@ public class PerspectiveOps {
 	 * @param yc center center y-axis in pixels
 	 * @return Calibration matrix 3x3
 	 */
-	public static FMatrixRMaj pinholeToMatrix(float fx, float fy, float skew,
-											  float xc, float yc) {
+	public static FMatrixRMaj pinholeToMatrix( float fx, float fy, float skew,
+											   float xc, float yc ) {
 		return ImplPerspectiveOps_F32.pinholeToMatrix(fx, fy, skew, xc, yc, null);
 	}
 
@@ -256,8 +256,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , DMatrixRMaj K )
-	{
+	public static DMatrixRMaj pinholeToMatrix( CameraPinhole param, DMatrixRMaj K ) {
 		return ImplPerspectiveOps_F64.pinholeToMatrix(param, K);
 	}
 
@@ -268,8 +267,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , FMatrixRMaj K )
-	{
+	public static FMatrixRMaj pinholeToMatrix( CameraPinhole param, FMatrixRMaj K ) {
 		return ImplPerspectiveOps_F32.pinholeToMatrix(param, K);
 	}
 
@@ -280,8 +278,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DMatrix3x3 pinholeToMatrix(CameraPinhole param , DMatrix3x3 K )
-	{
+	public static DMatrix3x3 pinholeToMatrix( CameraPinhole param, DMatrix3x3 K ) {
 		return ImplPerspectiveOps_F64.pinholeToMatrix(param, K);
 	}
 
@@ -294,8 +291,8 @@ public class PerspectiveOps {
 	 * @param output (Output) Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return camera parameters
 	 */
-	public static <C extends CameraPinhole>C matrixToPinhole(DMatrixRMaj K , int width , int height , C output )
-	{
+	@SuppressWarnings("unchecked")
+	public static <C extends CameraPinhole> C matrixToPinhole( DMatrixRMaj K, int width, int height, C output ) {
 		return (C)ImplPerspectiveOps_F64.matrixToPinhole(K, width, height, output);
 	}
 
@@ -308,8 +305,8 @@ public class PerspectiveOps {
 	 * @param output (Output) Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return camera parameters
 	 */
-	public static <C extends CameraPinhole>C matrixToPinhole(FMatrixRMaj K , int width , int height , C output )
-	{
+	@SuppressWarnings("unchecked")
+	public static <C extends CameraPinhole> C matrixToPinhole( FMatrixRMaj K, int width, int height, C output ) {
 		return (C)ImplPerspectiveOps_F32.matrixToPinhole(K, width, height, output);
 	}
 
@@ -322,24 +319,24 @@ public class PerspectiveOps {
 	 * @param height Input image's height
 	 * @return Approximate pinhole camera
 	 */
-	public static CameraPinhole estimatePinhole(Point2Transform2_F64 pixelToNorm , int width , int height ) {
+	public static CameraPinhole estimatePinhole( Point2Transform2_F64 pixelToNorm, int width, int height ) {
 
 		Point2D_F64 normA = new Point2D_F64();
 		Point2D_F64 normB = new Point2D_F64();
 		Vector3D_F64 vectorA = new Vector3D_F64();
 		Vector3D_F64 vectorB = new Vector3D_F64();
 
-		pixelToNorm.compute(0,height/2,normA);
-		pixelToNorm.compute(width,height/2,normB);
-		vectorA.set(normA.x,normA.y,1);
-		vectorB.set(normB.x,normB.y,1);
-		double hfov = UtilVector3D_F64.acute(vectorA,vectorB);
+		pixelToNorm.compute(0, height/2, normA);
+		pixelToNorm.compute(width, height/2, normB);
+		vectorA.set(normA.x, normA.y, 1);
+		vectorB.set(normB.x, normB.y, 1);
+		double hfov = UtilVector3D_F64.acute(vectorA, vectorB);
 
-		pixelToNorm.compute(width/2,0,normA);
-		pixelToNorm.compute(width/2,height,normB);
-		vectorA.set(normA.x,normA.y,1);
-		vectorB.set(normB.x,normB.y,1);
-		double vfov = UtilVector3D_F64.acute(vectorA,vectorB);
+		pixelToNorm.compute(width/2, 0, normA);
+		pixelToNorm.compute(width/2, height, normB);
+		vectorA.set(normA.x, normA.y, 1);
+		vectorB.set(normB.x, normB.y, 1);
+		double vfov = UtilVector3D_F64.acute(vectorA, vectorB);
 
 		CameraPinhole intrinsic = new CameraPinhole();
 		intrinsic.width = width;
@@ -365,15 +362,15 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel(CameraModel param , double x , double y , @Nullable Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( CameraModel param, double x, double y, @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.convertNormToPixel(param, x, y, pixel);
 	}
 
-	public static Point2D_F64 convertNormToPixel( CameraPinhole param , double x , double y , @Nullable Point2D_F64 pixel ) {
-		if( pixel == null )
+	public static Point2D_F64 convertNormToPixel( CameraPinhole param, double x, double y, @Nullable Point2D_F64 pixel ) {
+		if (pixel == null)
 			pixel = new Point2D_F64();
-		pixel.x = param.fx * x + param.skew * y + param.cx;
-		pixel.y = param.fy * y + param.cy;
+		pixel.x = param.fx*x + param.skew*y + param.cx;
+		pixel.y = param.fy*y + param.cy;
 
 		return pixel;
 	}
@@ -390,7 +387,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F32 convertNormToPixel(CameraModel param , float x , float y , @Nullable Point2D_F32 pixel ) {
+	public static Point2D_F32 convertNormToPixel( CameraModel param, float x, float y, @Nullable Point2D_F32 pixel ) {
 		return ImplPerspectiveOps_F32.convertNormToPixel(param, x, y, pixel);
 	}
 
@@ -407,8 +404,8 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel(CameraModel param , Point2D_F64 norm , @Nullable Point2D_F64 pixel ) {
-		return convertNormToPixel(param,norm.x,norm.y,pixel);
+	public static Point2D_F64 convertNormToPixel( CameraModel param, Point2D_F64 norm, @Nullable Point2D_F64 pixel ) {
+		return convertNormToPixel(param, norm.x, norm.y, pixel);
 	}
 
 	/**
@@ -424,8 +421,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm , @Nullable Point2D_F64 pixel )
-	{
+	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm, @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.convertNormToPixel(K, norm, pixel);
 	}
 
@@ -442,7 +438,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm(CameraModel param , Point2D_F64 pixel , @Nullable Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( CameraModel param, Point2D_F64 pixel, @Nullable Point2D_F64 norm ) {
 		return ImplPerspectiveOps_F64.convertPixelToNorm(param, pixel, norm);
 	}
 
@@ -459,7 +455,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F32 convertPixelToNorm(CameraModel param , Point2D_F32 pixel , @Nullable Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm( CameraModel param, Point2D_F32 pixel, @Nullable Point2D_F32 norm ) {
 		return ImplPerspectiveOps_F32.convertPixelToNorm(param, pixel, norm);
 	}
 
@@ -476,7 +472,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K , Point2D_F64 pixel , @Nullable Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K, Point2D_F64 pixel, @Nullable Point2D_F64 norm ) {
 		return ImplPerspectiveOps_F64.convertPixelToNorm(K, pixel, norm);
 	}
 
@@ -493,15 +489,14 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F32 convertPixelToNorm( FMatrixRMaj K , Point2D_F32 pixel , @Nullable Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm( FMatrixRMaj K, Point2D_F32 pixel, @Nullable Point2D_F32 norm ) {
 		return ImplPerspectiveOps_F32.convertPixelToNorm(K, pixel, norm);
 	}
 
-	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic ,
-												  double x , double y,
-												  @Nullable Point2D_F64 norm )
-	{
-		return ImplPerspectiveOps_F64.convertPixelToNorm(intrinsic, x,y, norm);
+	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic,
+												  double x, double y,
+												  @Nullable Point2D_F64 norm ) {
+		return ImplPerspectiveOps_F64.convertPixelToNorm(intrinsic, x, y, norm);
 	}
 
 	/**
@@ -514,23 +509,23 @@ public class PerspectiveOps {
 	 * @param pixel (Output) storage for the rendered pixel
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
-										  @Nullable Point2D_F64 pixel) {
-		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,K,X, pixel);
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
+													 @Nullable Point2D_F64 pixel ) {
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K, X, pixel);
 	}
 
-	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point3D_F64 X,
-										  @Nullable Point2D_F64 pixel) {
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, CameraPinhole K, Point3D_F64 X,
+													 @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K.fx, K.skew, K.cx, K.fy, K.cy, X, pixel);
 	}
 
-	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point4D_F64 X,
-										  @Nullable Point2D_F64 pixel) {
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, CameraPinhole K, Point4D_F64 X,
+													 @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K.fx, K.skew, K.cx, K.fy, K.cy, X, pixel);
 	}
 
-	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera, Point3D_F64 X,
-										  @Nullable Point2D_F64 pixel) {
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, Point3D_F64 X,
+													 @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, 1, 0, 0, 1, 0, X, pixel);
 	}
 
@@ -543,10 +538,10 @@ public class PerspectiveOps {
 	 * @param pixel (Output) Storage for output pixel. Can be null
 	 * @return 2D Render point on image plane
 	 */
-	public static Point2D_F64 renderPixel(CameraPinhole intrinsic, Point3D_F64 X, @Nullable Point2D_F64 pixel) {
-		if( pixel == null )
+	public static Point2D_F64 renderPixel( CameraPinhole intrinsic, Point3D_F64 X, @Nullable Point2D_F64 pixel ) {
+		if (pixel == null)
 			pixel = new Point2D_F64();
-		pixel.set(X.x/X.z,X.y/X.z);
+		pixel.set(X.x/X.z, X.y/X.z);
 		return convertNormToPixel(intrinsic, pixel, pixel);
 	}
 
@@ -557,19 +552,19 @@ public class PerspectiveOps {
 	 * @param X 3D Point in world reference frame..
 	 * @return 2D Render point on image plane.
 	 */
-	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X ) {
-		return renderPixel(worldToCamera,X,(Point2D_F64)null);
+	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera, Point3D_F64 X ) {
+		return renderPixel(worldToCamera, X, (Point2D_F64)null);
 	}
 
-	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , @Nullable Point2D_F64 pixel ) {
-		if( pixel == null )
+	public static Point2D_F64 renderPixel( DMatrixRMaj worldToCamera, Point3D_F64 X, @Nullable Point2D_F64 pixel ) {
+		if (pixel == null)
 			pixel = new Point2D_F64();
 		ImplPerspectiveOps_F64.renderPixel(worldToCamera, X, pixel);
 		return pixel;
 	}
 
-	public static Point3D_F64 renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , @Nullable Point3D_F64 pixel ) {
-		if( pixel == null )
+	public static Point3D_F64 renderPixel( DMatrixRMaj worldToCamera, Point3D_F64 X, @Nullable Point3D_F64 pixel ) {
+		if (pixel == null)
 			pixel = new Point3D_F64();
 		ImplPerspectiveOps_F64.renderPixel(worldToCamera, X, pixel);
 		return pixel;
@@ -577,13 +572,14 @@ public class PerspectiveOps {
 
 	/**
 	 * Render a pixel in homogeneous coordinates from a 3x4 camera matrix and a 3D homogeneous point.
+	 *
 	 * @param cameraMatrix (Input) 3x4 camera matrix
 	 * @param X (Input) 3D point in homogeneous coordinates
 	 * @param x (Output) Rendered 2D point in homogeneous coordinates
 	 * @return Rendered 2D point in homogeneous coordinates
 	 */
-	public static Point3D_F64 renderPixel( DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point3D_F64 x) {
-		if( x == null )
+	public static Point3D_F64 renderPixel( DMatrixRMaj cameraMatrix, Point4D_F64 X, @Nullable Point3D_F64 x ) {
+		if (x == null)
 			x = new Point3D_F64();
 		ImplPerspectiveOps_F64.renderPixel(cameraMatrix, X, x);
 		return x;
@@ -591,13 +587,14 @@ public class PerspectiveOps {
 
 	/**
 	 * Render a pixel in homogeneous coordinates from a 3x4 camera matrix and a 2D point.
+	 *
 	 * @param cameraMatrix (Input) 3x4 camera matrix
 	 * @param X (Input) 3D point in homogeneous coordinates
 	 * @param x (Output) Rendered 2D point coordinates
 	 * @return Rendered 2D point coordinates
 	 */
-	public static Point2D_F64 renderPixel( DMatrixRMaj cameraMatrix , Point4D_F64 X , @Nullable Point2D_F64 x) {
-		if( x == null )
+	public static Point2D_F64 renderPixel( DMatrixRMaj cameraMatrix, Point4D_F64 X, @Nullable Point2D_F64 x ) {
+		if (x == null)
 			x = new Point2D_F64();
 		ImplPerspectiveOps_F64.renderPixel(cameraMatrix, X, x);
 		return x;
@@ -610,9 +607,9 @@ public class PerspectiveOps {
 	 * @param view1 Output: List of observations from view 1
 	 * @param view2 Output: List of observations from view 2
 	 */
-	public static void splitAssociated( List<AssociatedPair> pairs ,
-										List<Point2D_F64> view1 , List<Point2D_F64> view2 ) {
-		for( AssociatedPair p : pairs ) {
+	public static void splitAssociated( List<AssociatedPair> pairs,
+										List<Point2D_F64> view1, List<Point2D_F64> view2 ) {
+		for (AssociatedPair p : pairs) {
 			view1.add(p.p1);
 			view2.add(p.p2);
 		}
@@ -626,9 +623,9 @@ public class PerspectiveOps {
 	 * @param view2 Output: List of observations from view 2
 	 * @param view3 Output: List of observations from view 3
 	 */
-	public static void splitAssociated( List<AssociatedTriple> pairs ,
-										List<Point2D_F64> view1 , List<Point2D_F64> view2 , List<Point2D_F64> view3 ) {
-		for( AssociatedTriple p : pairs ) {
+	public static void splitAssociated( List<AssociatedTriple> pairs,
+										List<Point2D_F64> view1, List<Point2D_F64> view2, List<Point2D_F64> view3 ) {
+		for (AssociatedTriple p : pairs) {
 			view1.add(p.p1);
 			view2.add(p.p2);
 			view3.add(p.p3);
@@ -644,8 +641,8 @@ public class PerspectiveOps {
 	 * @param ret Storage for camera calibration matrix. If null a new instance will be created.
 	 * @return Camera calibration matrix.
 	 */
-	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T ,
-												  @Nullable DMatrixRMaj K ,
+	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R, Vector3D_F64 T,
+												  @Nullable DMatrixRMaj K,
 												  @Nullable DMatrixRMaj ret ) {
 		return ImplPerspectiveOps_F64.createCameraMatrix(R, T, K, ret);
 	}
@@ -657,11 +654,11 @@ public class PerspectiveOps {
 	 * @param M (Output) M = P(:,0:2)
 	 * @param T (Output) T = P(:,3)
 	 */
-	public static void projectionSplit( DMatrixRMaj P , DMatrixRMaj M , Vector3D_F64 T ) {
-		CommonOps_DDRM.extract(P,0,3,0,3,M,0,0);
-		T.x = P.get(0,3);
-		T.y = P.get(1,3);
-		T.z = P.get(2,3);
+	public static void projectionSplit( DMatrixRMaj P, DMatrixRMaj M, Vector3D_F64 T ) {
+		CommonOps_DDRM.extract(P, 0, 3, 0, 3, M, 0, 0);
+		T.x = P.get(0, 3);
+		T.y = P.get(1, 3);
+		T.z = P.get(2, 3);
 	}
 
 	/**
@@ -671,10 +668,19 @@ public class PerspectiveOps {
 	 * @param M (Output) M = P(:,0:2)
 	 * @param T (Output) T = P(:,3)
 	 */
-	public static void projectionSplit( DMatrixRMaj P , DMatrix3x3 M , DMatrix3 T ) {
-		M.a11 = P.data[0]; M.a12 = P.data[1]; M.a13 = P.data[2 ]; T.a1 = P.data[3 ];
-		M.a21 = P.data[4]; M.a22 = P.data[5]; M.a23 = P.data[6 ]; T.a2 = P.data[7 ];
-		M.a31 = P.data[8]; M.a32 = P.data[9]; M.a33 = P.data[10]; T.a3 = P.data[11];
+	public static void projectionSplit( DMatrixRMaj P, DMatrix3x3 M, DMatrix3 T ) {
+		M.a11 = P.data[0];
+		M.a12 = P.data[1];
+		M.a13 = P.data[2];
+		T.a1 = P.data[3];
+		M.a21 = P.data[4];
+		M.a22 = P.data[5];
+		M.a23 = P.data[6];
+		T.a2 = P.data[7];
+		M.a31 = P.data[8];
+		M.a32 = P.data[9];
+		M.a33 = P.data[10];
+		T.a3 = P.data[11];
 	}
 
 	/**
@@ -684,8 +690,8 @@ public class PerspectiveOps {
 	 * @param T (Input) 3x1 vector
 	 * @param P (Output) [M,T]
 	 */
-	public static void projectionCombine( DMatrixRMaj M , Vector3D_F64 T , DMatrixRMaj P ) {
-		CommonOps_DDRM.insert(M,P,0,0);
+	public static void projectionCombine( DMatrixRMaj M, Vector3D_F64 T, DMatrixRMaj P ) {
+		CommonOps_DDRM.insert(M, P, 0, 0);
 		P.data[3] = T.x;
 		P.data[7] = T.y;
 		P.data[11] = T.z;
@@ -694,41 +700,41 @@ public class PerspectiveOps {
 	/**
 	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
 	 */
-	public static WorldToCameraToPixel createWorldToPixel(CameraPinholeBrown intrinsic , Se3_F64 worldToCamera )
-	{
+	public static WorldToCameraToPixel createWorldToPixel( CameraPinholeBrown intrinsic, Se3_F64 worldToCamera ) {
 		WorldToCameraToPixel alg = new WorldToCameraToPixel();
-		alg.configure(intrinsic,worldToCamera);
+		alg.configure(intrinsic, worldToCamera);
 		return alg;
 	}
 
 	/**
 	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
 	 */
-	public static WorldToCameraToPixel createWorldToPixel(LensDistortionNarrowFOV distortion , Se3_F64 worldToCamera )
-	{
+	public static WorldToCameraToPixel createWorldToPixel( LensDistortionNarrowFOV distortion, Se3_F64 worldToCamera ) {
 		WorldToCameraToPixel alg = new WorldToCameraToPixel();
-		alg.configure(distortion,worldToCamera);
+		alg.configure(distortion, worldToCamera);
 		return alg;
 	}
 
-	public static double computeHFov(CameraPinhole intrinsic) {
+	public static double computeHFov( CameraPinhole intrinsic ) {
 		return 2*Math.atan((intrinsic.width/2)/intrinsic.fx);
 	}
 
-	public static double computeVFov(CameraPinhole intrinsic) {
+	public static double computeVFov( CameraPinhole intrinsic ) {
 		return 2*Math.atan((intrinsic.height/2)/intrinsic.fy);
 	}
+
 	/**
 	 * Converts the SE3 into  a 3x4 matrix. [R|T]
+	 *
 	 * @param m (Input) transform
 	 * @param A (Output) equivalent 3x4 matrix represenation
 	 */
-	public static DMatrixRMaj convertToMatrix( Se3_F64 m , DMatrixRMaj A ) {
-		if( A == null )
-			A = new DMatrixRMaj(3,4);
+	public static DMatrixRMaj convertToMatrix( Se3_F64 m, DMatrixRMaj A ) {
+		if (A == null)
+			A = new DMatrixRMaj(3, 4);
 		else
-			A.reshape(3,4);
-		CommonOps_DDRM.insert(m.R,A,0,0);
+			A.reshape(3, 4);
+		CommonOps_DDRM.insert(m.R, A, 0, 0);
 		A.data[3] = m.T.x;
 		A.data[7] = m.T.y;
 		A.data[11] = m.T.z;
@@ -738,19 +744,19 @@ public class PerspectiveOps {
 	/**
 	 * Extracts a column from the camera matrix and puts it into the geometric 3-tuple.
 	 */
-	public static void extractColumn(DMatrixRMaj P, int col, GeoTuple3D_F64 a) {
-		a.x = P.unsafe_get(0,col);
-		a.y = P.unsafe_get(1,col);
-		a.z = P.unsafe_get(2,col);
+	public static void extractColumn( DMatrixRMaj P, int col, GeoTuple3D_F64<?> a ) {
+		a.x = P.unsafe_get(0, col);
+		a.y = P.unsafe_get(1, col);
+		a.z = P.unsafe_get(2, col);
 	}
 
 	/**
 	 * Inserts 3-tuple into the camera matrix's columns
 	 */
-	public static void insertColumn(DMatrixRMaj P, int col, GeoTuple3D_F64 a) {
-		P.unsafe_set(0,col,a.x);
-		P.unsafe_set(1,col,a.y);
-		P.unsafe_set(2,col,a.z);
+	public static void insertColumn( DMatrixRMaj P, int col, GeoTuple3D_F64<?> a ) {
+		P.unsafe_set(0, col, a.x);
+		P.unsafe_set(1, col, a.y);
+		P.unsafe_set(2, col, a.z);
 	}
 
 	/**
@@ -761,8 +767,7 @@ public class PerspectiveOps {
 	 * @param C (Input) 3x3 matrix
 	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
 	 */
-	public static void multTranA( DMatrixRMaj A , DMatrixRMaj B , DMatrixRMaj C , DMatrixRMaj output )
-	{
+	public static void multTranA( DMatrixRMaj A, DMatrixRMaj B, DMatrixRMaj C, DMatrixRMaj output ) {
 		double t11 = A.data[0]*B.data[0] + A.data[3]*B.data[3] + A.data[6]*B.data[6];
 		double t12 = A.data[0]*B.data[1] + A.data[3]*B.data[4] + A.data[6]*B.data[7];
 		double t13 = A.data[0]*B.data[2] + A.data[3]*B.data[5] + A.data[6]*B.data[8];
@@ -796,8 +801,7 @@ public class PerspectiveOps {
 	 * @param C (Input) 3x3 matrix
 	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
 	 */
-	public static void multTranC( DMatrixRMaj A , DMatrixRMaj B , DMatrixRMaj C , DMatrixRMaj output )
-	{
+	public static void multTranC( DMatrixRMaj A, DMatrixRMaj B, DMatrixRMaj C, DMatrixRMaj output ) {
 		double t11 = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
 		double t12 = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
 		double t13 = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
@@ -831,8 +835,7 @@ public class PerspectiveOps {
 	 * @param C (Input) 3x3 matrix
 	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
 	 */
-	public static void multTranA( DMatrix3x3 A , DMatrix3x3 B , DMatrix3x3 C , DMatrix3x3 output )
-	{
+	public static void multTranA( DMatrix3x3 A, DMatrix3x3 B, DMatrix3x3 C, DMatrix3x3 output ) {
 		double t11 = A.a11*B.a11 + A.a21*B.a21 + A.a31*B.a31;
 		double t12 = A.a11*B.a12 + A.a21*B.a22 + A.a31*B.a32;
 		double t13 = A.a11*B.a13 + A.a21*B.a23 + A.a31*B.a33;
@@ -866,8 +869,7 @@ public class PerspectiveOps {
 	 * @param C (Input) 3x3 matrix
 	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
 	 */
-	public static void multTranC( DMatrix3x3 A , DMatrix3x3 B , DMatrix3x3 C , DMatrix3x3 output )
-	{
+	public static void multTranC( DMatrix3x3 A, DMatrix3x3 B, DMatrix3x3 C, DMatrix3x3 output ) {
 		double t11 = A.a11*B.a11 + A.a12*B.a21 + A.a13*B.a31;
 		double t12 = A.a11*B.a12 + A.a12*B.a22 + A.a13*B.a32;
 		double t13 = A.a11*B.a13 + A.a12*B.a23 + A.a13*B.a33;
@@ -893,11 +895,10 @@ public class PerspectiveOps {
 		output.a33 = t31*C.a31 + t32*C.a32 + t33*C.a33;
 	}
 
-
 	/**
 	 * Multiplies A*P, where A = [sx 0 tx; 0 sy ty; 0 0 1]
 	 */
-	public static void inplaceAdjustCameraMatrix( double sx , double sy , double tx , double ty , DMatrixRMaj P ) {
+	public static void inplaceAdjustCameraMatrix( double sx, double sy, double tx, double ty, DMatrixRMaj P ) {
 		// multiply each column one at a time. Because of the zeros everything is decoupled
 		for (int col = 0; col < 4; col++) {
 			int row0 = col;
@@ -910,13 +911,14 @@ public class PerspectiveOps {
 
 	/**
 	 * Computes the cross-ratio between 4 points that lie along a line. This is an invariant under projective geometry.
+	 *
 	 * @param a0 Unique point on a line
 	 * @param a1 Unique point on a line
 	 * @param a2 Unique point on a line
 	 * @param a3 Unique point on a line
 	 * @return cross ratio
 	 */
-	public static double invariantCrossLine( Point3D_F64 a0 , Point3D_F64 a1 , Point3D_F64 a2 , Point3D_F64 a3) {
+	public static double invariantCrossLine( Point3D_F64 a0, Point3D_F64 a1, Point3D_F64 a2, Point3D_F64 a3 ) {
 		double d01 = a0.distance(a1);
 		double d23 = a2.distance(a3);
 		double d02 = a0.distance(a2);
@@ -927,13 +929,14 @@ public class PerspectiveOps {
 
 	/**
 	 * Computes the cross-ratio between 4 points that lie along a line. This is an invariant under projective geometry.
+	 *
 	 * @param a0 Unique point on a line
 	 * @param a1 Unique point on a line
 	 * @param a2 Unique point on a line
 	 * @param a3 Unique point on a line
 	 * @return cross ratio
 	 */
-	public static double invariantCrossLine( Point2D_F64 a0 , Point2D_F64 a1 , Point2D_F64 a2 , Point2D_F64 a3) {
+	public static double invariantCrossLine( Point2D_F64 a0, Point2D_F64 a1, Point2D_F64 a2, Point2D_F64 a3 ) {
 		double d01 = a0.distance(a1);
 		double d23 = a2.distance(a3);
 		double d02 = a0.distance(a2);
@@ -941,7 +944,6 @@ public class PerspectiveOps {
 
 		return (d01*d23)/(d02*d13);
 	}
-
 
 	/**
 	 * <p>Computes the cross-ratio (invariant for projective transform) using 5 coplanar points.</p>
@@ -955,12 +957,11 @@ public class PerspectiveOps {
 	 * "Hashing with local combinations of feature points and its application to camera-based document
 	 * image retrieval." Proc. CBDAR05 (2005): 87-94.</p>
 	 */
-	public static double invariantCrossRatio(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4, Point2D_F64 p5 )
-	{
-		double a = Area2D_F64.triangle(p1,p2,p3);
-		double b = Area2D_F64.triangle(p1,p4,p5);
-		double c = Area2D_F64.triangle(p1,p2,p4);
-		double d = Area2D_F64.triangle(p1,p3,p5);
+	public static double invariantCrossRatio( Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4, Point2D_F64 p5 ) {
+		double a = Area2D_F64.triangle(p1, p2, p3);
+		double b = Area2D_F64.triangle(p1, p4, p5);
+		double c = Area2D_F64.triangle(p1, p2, p4);
+		double d = Area2D_F64.triangle(p1, p3, p5);
 
 		return (a*b)/(c*d);
 	}
@@ -971,10 +972,9 @@ public class PerspectiveOps {
 	 * <p>invariant = P(1,3,4)/P(1,2,3)<br>
 	 * where P() is the area of a triangle defined by the 3 points.</p>
 	 */
-	public static double invariantAffine(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4)
-	{
-		double a = Area2D_F64.triangle(p1,p3,p4);
-		double b = Area2D_F64.triangle(p1,p2,p3);
+	public static double invariantAffine( Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4 ) {
+		double a = Area2D_F64.triangle(p1, p3, p4);
+		double b = Area2D_F64.triangle(p1, p2, p3);
 
 		return a/b;
 	}
@@ -988,18 +988,17 @@ public class PerspectiveOps {
 	 * @param p4 (Input) Homogenous coordinate.
 	 * @param farAway (Input) How far away points at infinity should be put. Application dependent. Try 1e9
 	 * @param tol (Input) Tolerance for defining a point at infinity. If p4 has a norm of 1 then 1e-7 is
-	 *            probably reasonable.
+	 * probably reasonable.
 	 * @param p3 (output) Cartesian coordinate.
 	 */
-	public static void homogenousTo3dPositiveZ(Point4D_F64 p4 , double farAway, double tol , Point3D_F64 p3 )
-	{
+	public static void homogenousTo3dPositiveZ( Point4D_F64 p4, double farAway, double tol, Point3D_F64 p3 ) {
 		double norm = p4.norm();
 		double w = p4.w;
-		if( Math.abs(w) <= tol*norm ) {
+		if (Math.abs(w) <= tol*norm) {
 			// the object is off at infinity. The code below can't handle that situation so we will hack it
-			double scale = farAway/(UtilEjml.EPS+norm);
+			double scale = farAway/(UtilEjml.EPS + norm);
 			// it was observed so it has to be in front of the camera
-			if( p4.z < 0 )
+			if (p4.z < 0)
 				scale *= -1;
 			p3.set(scale*p4.x, scale*p4.y, scale*p4.z);
 		} else {

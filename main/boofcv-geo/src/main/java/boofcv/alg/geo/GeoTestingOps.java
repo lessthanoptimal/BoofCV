@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo;
 
-
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -41,77 +40,73 @@ public class GeoTestingOps {
 
 	public static List<Point3D_F64> createList3_F64( int N ) {
 		List<Point3D_F64> ret = new ArrayList<>();
-		for( int i = 0; i < N; i++ ) {
-			ret.add( new Point3D_F64());
+		for (int i = 0; i < N; i++) {
+			ret.add(new Point3D_F64());
 		}
 		return ret;
 	}
 
-	public static List<Point4D_F64> randomPointsH_F64(double min, double max,
-													  int num, Random rand)
-	{
+	public static List<Point4D_F64> randomPointsH_F64( double min, double max,
+													   int num, Random rand ) {
 		List<Point4D_F64> ret = new ArrayList<>();
 
-		for( int i = 0; i < num; i++ ) {
-			double x = rand.nextDouble()*(max-min)+min;
-			double y = rand.nextDouble()*(max-min)+min;
-			double z = rand.nextDouble()*(max-min)+min;
+		for (int i = 0; i < num; i++) {
+			double x = rand.nextDouble()*(max - min) + min;
+			double y = rand.nextDouble()*(max - min) + min;
+			double z = rand.nextDouble()*(max - min) + min;
 			double w = rand.nextDouble()*0.01 + 1.0;
 
-			ret.add(new Point4D_F64(x,y,z,w));
+			ret.add(new Point4D_F64(x, y, z, w));
 		}
 
 		return ret;
 	}
 
-	public static List<Point4D_F64> randomPointsH_F64(double minX, double maxX,
+	public static List<Point4D_F64> randomPointsH_F64( double minX, double maxX,
+													   double minY, double maxY,
+													   double minZ, double maxZ,
+													   int num, Random rand ) {
+		List<Point4D_F64> ret = new ArrayList<>();
+
+		for (int i = 0; i < num; i++) {
+			double x = rand.nextDouble()*(maxX - minX) + minX;
+			double y = rand.nextDouble()*(maxY - minY) + minY;
+			double z = rand.nextDouble()*(maxZ - minZ) + minZ;
+			double w = rand.nextDouble()*0.01 + 1.0;
+
+			ret.add(new Point4D_F64(x, y, z, w));
+		}
+
+		return ret;
+	}
+
+	public static List<Point3D_F64> randomPoints_F64( double minX, double maxX,
 													  double minY, double maxY,
 													  double minZ, double maxZ,
-													  int num, Random rand)
-	{
-		List<Point4D_F64> ret = new ArrayList<>();
-
-		for( int i = 0; i < num; i++ ) {
-			double x = rand.nextDouble()*(maxX-minX)+minX;
-			double y = rand.nextDouble()*(maxY-minY)+minY;
-			double z = rand.nextDouble()*(maxZ-minZ)+minZ;
-			double w = rand.nextDouble()*0.01 + 1.0;
-
-			ret.add(new Point4D_F64(x,y,z,w));
-		}
-
-		return ret;
-	}
-
-	public static List<Point3D_F64> randomPoints_F64(double minX, double maxX,
-													 double minY, double maxY,
-													 double minZ, double maxZ,
-													 int num, Random rand)
-	{
+													  int num, Random rand ) {
 		List<Point3D_F64> ret = new ArrayList<>();
 
-		for( int i = 0; i < num; i++ ) {
-			double x = rand.nextDouble()*(maxX-minX)+minX;
-			double y = rand.nextDouble()*(maxY-minY)+minY;
-			double z = rand.nextDouble()*(maxZ-minZ)+minZ;
+		for (int i = 0; i < num; i++) {
+			double x = rand.nextDouble()*(maxX - minX) + minX;
+			double y = rand.nextDouble()*(maxY - minY) + minY;
+			double z = rand.nextDouble()*(maxZ - minZ) + minZ;
 
-			ret.add(new Point3D_F64(x,y,z));
+			ret.add(new Point3D_F64(x, y, z));
 		}
 
 		return ret;
 	}
 
-	public static List<Point2D_F64> randomPoints_F64(double minX, double maxX,
-													 double minY, double maxY,
-													 int num, Random rand)
-	{
+	public static List<Point2D_F64> randomPoints_F64( double minX, double maxX,
+													  double minY, double maxY,
+													  int num, Random rand ) {
 		List<Point2D_F64> ret = new ArrayList<>();
 
-		for( int i = 0; i < num; i++ ) {
-			double x = rand.nextDouble()*(maxX-minX)+minX;
-			double y = rand.nextDouble()*(maxY-minY)+minY;
+		for (int i = 0; i < num; i++) {
+			double x = rand.nextDouble()*(maxX - minX) + minX;
+			double y = rand.nextDouble()*(maxY - minY) + minY;
 
-			ret.add(new Point2D_F64(x,y));
+			ret.add(new Point2D_F64(x, y));
 		}
 
 		return ret;
@@ -119,7 +114,7 @@ public class GeoTestingOps {
 
 	public static double residualError( double[] residuals ) {
 		double total = 0;
-		for( double d : residuals ) {
+		for (double d : residuals) {
 			total += d*d;
 		}
 		return total*0.5;
@@ -127,42 +122,43 @@ public class GeoTestingOps {
 
 	/**
 	 * Checks to see if the two SE3 are equal up to a scale factor
+	 *
 	 * @param tolT Translational tolerance
 	 * @param tolRad Rotational tolerance in radians
 	 * @return true if within tolerance
 	 */
-	public static boolean isEqualsScale(Se3_F64 a , Se3_F64 b , double tolT , double tolRad ) {
+	public static boolean isEqualsScale( Se3_F64 a, Se3_F64 b, double tolT, double tolRad ) {
 		double scaleA = a.T.norm();
 		double scaleB = b.T.norm();
 
 		double scale;
-		if( scaleA <= UtilEjml.TEST_F64 || scaleB <= UtilEjml.TEST_F64 ) {
+		if (scaleA <= UtilEjml.TEST_F64 || scaleB <= UtilEjml.TEST_F64) {
 			// They are almost zero so scaling is going to be difficult
-			if( a.T.distance(b.T) >= tolT )
+			if (a.T.distance(b.T) >= tolT)
 				return false;
 		} else {
-			scale = scaleA / scaleB;
+			scale = scaleA/scaleB;
 			double dx = a.T.x - scale*b.T.x;
 			double dy = a.T.y - scale*b.T.y;
 			double dz = a.T.z - scale*b.T.z;
-			if( Math.sqrt(dx*dx + dy*dy + dz*dz) >= scaleA*tolT )
+			if (Math.sqrt(dx*dx + dy*dy + dz*dz) >= scaleA*tolT)
 				return false;
 		}
 
-		var R = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.multTransB(a.R,b.R,R);
-		double errorRad = ConvertRotation3D_F64.matrixToRodrigues(R,null).theta;
+		var R = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.multTransB(a.R, b.R, R);
+		double errorRad = ConvertRotation3D_F64.matrixToRodrigues(R, null).theta;
 		return Math.abs(errorRad) <= tolRad;
 	}
 
-	public static boolean isEquals( Point3D_F64 a , Point4D_F64 b , double tol ) {
-		if( b.w == 0.0 )
+	public static boolean isEquals( Point3D_F64 a, Point4D_F64 b, double tol ) {
+		if (b.w == 0.0)
 			return false;
 
-		if( Math.abs(a.x-(b.x/b.w)) > tol )
+		if (Math.abs(a.x - (b.x/b.w)) > tol)
 			return false;
-		if( Math.abs(a.y-(b.y/b.w)) > tol )
+		if (Math.abs(a.y - (b.y/b.w)) > tol)
 			return false;
-		return !(Math.abs(a.z - (b.z / b.w)) > tol);
+		return !(Math.abs(a.z - (b.z/b.w)) > tol);
 	}
 }

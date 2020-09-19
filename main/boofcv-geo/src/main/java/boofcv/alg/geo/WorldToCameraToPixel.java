@@ -38,62 +38,65 @@ import lombok.Getter;
  */
 public class WorldToCameraToPixel {
 
-	// transform from world to camera reference frames
+	/** transform from world to camera reference frames */
 	@Getter private Se3_F64 worldToCamera;
 
-	// storage for point in camera frame
-	@Getter	private Point3D_F64 cameraPt = new Point3D_F64();
+	/** storage for point in camera frame */
+	@Getter private Point3D_F64 cameraPt = new Point3D_F64();
 
-	// transform from normalized image coordinates into pixels
+	/** transform from normalized image coordinates into pixels */
 	@Getter private Point2Transform2_F64 normToPixel;
 
 	/**
 	 * Specifies intrinsic camera parameters and  the transform from world to camera.
+	 *
 	 * @param intrinsic camera parameters
 	 * @param worldToCamera transform from world to camera
 	 */
-	public void configure(CameraPinholeBrown intrinsic , Se3_F64 worldToCamera ) {
-		configure( new LensDistortionBrown(intrinsic), worldToCamera);
+	public void configure( CameraPinholeBrown intrinsic, Se3_F64 worldToCamera ) {
+		configure(new LensDistortionBrown(intrinsic), worldToCamera);
 	}
 
-	public void configure(CameraPinhole intrinsic , Se3_F64 worldToCamera ) {
-		configure( new LensDistortionPinhole(intrinsic), worldToCamera);
+	public void configure( CameraPinhole intrinsic, Se3_F64 worldToCamera ) {
+		configure(new LensDistortionPinhole(intrinsic), worldToCamera);
 	}
 
 	/**
 	 * Specifies intrinsic camera parameters and  the transform from world to camera.
+	 *
 	 * @param distortion camera parameters
 	 * @param worldToCamera transform from world to camera
 	 */
-	public void configure(LensDistortionNarrowFOV distortion , Se3_F64 worldToCamera ) {
+	public void configure( LensDistortionNarrowFOV distortion, Se3_F64 worldToCamera ) {
 		this.worldToCamera = worldToCamera;
 
-		normToPixel = distortion.distort_F64(false,true);
+		normToPixel = distortion.distort_F64(false, true);
 	}
 
 	/**
 	 * Computes the observed location of the specified point in world coordinates in the camera pixel.  If
 	 * the object can't be viewed because it is behind the camera then false is returned.
+	 *
 	 * @param worldPt Location of point in world frame
 	 * @param pixelPt Pixel observation of point.
 	 * @return True if visible (+z) or false if not visible (-z)
 	 */
-	public boolean transform( Point3D_F64 worldPt , Point2D_F64 pixelPt ) {
-		SePointOps_F64.transform(worldToCamera,worldPt,cameraPt);
+	public boolean transform( Point3D_F64 worldPt, Point2D_F64 pixelPt ) {
+		SePointOps_F64.transform(worldToCamera, worldPt, cameraPt);
 
 		// can't see the point
-		if( cameraPt.z <= 0 )
+		if (cameraPt.z <= 0)
 			return false;
 
 		normToPixel.compute(cameraPt.x/cameraPt.z, cameraPt.y/cameraPt.z, pixelPt);
 		return true;
 	}
 
-	public boolean transform( Point3D_F64 worldPt , Point2D_F64 pixelPt , Point2D_F64 normPt ) {
-		SePointOps_F64.transform(worldToCamera,worldPt,cameraPt);
+	public boolean transform( Point3D_F64 worldPt, Point2D_F64 pixelPt, Point2D_F64 normPt ) {
+		SePointOps_F64.transform(worldToCamera, worldPt, cameraPt);
 
 		// can't see the point
-		if( cameraPt.z <= 0 )
+		if (cameraPt.z <= 0)
 			return false;
 
 		normPt.x = cameraPt.x/cameraPt.z;
@@ -112,7 +115,7 @@ public class WorldToCameraToPixel {
 	 */
 	public Point2D_F64 transform( Point3D_F64 worldPt ) {
 		Point2D_F64 out = new Point2D_F64();
-		if( transform(worldPt,out))
+		if (transform(worldPt, out))
 			return out;
 		else
 			return null;

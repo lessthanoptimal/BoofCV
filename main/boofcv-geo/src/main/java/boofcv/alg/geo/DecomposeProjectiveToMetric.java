@@ -39,20 +39,20 @@ public class DecomposeProjectiveToMetric {
 	// by permuting the rows in KR we can get the desired result
 	protected QRDecomposition<DMatrixRMaj> qr = DecompositionFactory_DDRM.qr(3, 3);
 	// Pivot matrix
-	protected DMatrixRMaj Pv = SpecializedOps_DDRM.pivotMatrix(null,new int[]{2,1,0},3,false);
+	protected DMatrixRMaj Pv = SpecializedOps_DDRM.pivotMatrix(null, new int[]{2, 1, 0}, 3, false);
 	// Storage for A after pivots have been applied to it
-	protected DMatrixRMaj A_p = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj A_p = new DMatrixRMaj(3, 3);
 
 	// P = [A|a]  The left side 3x3 sub matrix in camera matrix P
-	protected DMatrixRMaj A = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj A = new DMatrixRMaj(3, 3);
 
-	protected SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true,true,true);
+	protected SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true, true, true);
 	// P_metric = P*H
-	protected DMatrixRMaj P_metric = new DMatrixRMaj(3,4);
+	protected DMatrixRMaj P_metric = new DMatrixRMaj(3, 4);
 	// metric camera after being multiplied by inv(K)
-	protected DMatrixRMaj P_rt = new DMatrixRMaj(3,4);
+	protected DMatrixRMaj P_rt = new DMatrixRMaj(3, 4);
 	// Storage for the inverse of the intrinic matrix K
-	protected DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 
 	/** Indicates how far the singular values deviated from their expected value. zero means perfect match */
 	public @Getter double singularError;
@@ -73,49 +73,48 @@ public class DecomposeProjectiveToMetric {
 	 * @param worldToView (Output) transform from world to camera view
 	 * @return true if the decomposition was successful
 	 */
-	public boolean projectiveToMetricKnownK( DMatrixRMaj cameraMatrix ,
-											 DMatrixRMaj H , DMatrixRMaj K,
-											 Se3_F64 worldToView )
-	{
+	public boolean projectiveToMetricKnownK( DMatrixRMaj cameraMatrix,
+											 DMatrixRMaj H, DMatrixRMaj K,
+											 Se3_F64 worldToView ) {
 		// Reset internal data structures
 		singularError = 0;
 
 		// Elevate the projective camera into a metric camera matrix
-		CommonOps_DDRM.mult(cameraMatrix,H, P_metric);
+		CommonOps_DDRM.mult(cameraMatrix, H, P_metric);
 		// "Remove" K from the metric camera, e.g. P= [K*R | K*T] then inv(K)P = [R | T]
-		CommonOps_DDRM.invert(K,K_inv);
+		CommonOps_DDRM.invert(K, K_inv);
 		CommonOps_DDRM.mult(K_inv, P_metric, P_rt);
 
 		// Remove R and T
-		CommonOps_DDRM.extract(P_rt,0,0,worldToView.R);
-		worldToView.T.x = P_rt.get(0,3);
-		worldToView.T.y = P_rt.get(1,3);
-		worldToView.T.z = P_rt.get(2,3);
+		CommonOps_DDRM.extract(P_rt, 0, 0, worldToView.R);
+		worldToView.T.x = P_rt.get(0, 3);
+		worldToView.T.y = P_rt.get(1, 3);
+		worldToView.T.z = P_rt.get(2, 3);
 
 		// Turn R into a true rotation matrix which is orthogonal and has a determinant of +1
 		DMatrixRMaj R = worldToView.R;
-		if( !svd.decompose(R))
+		if (!svd.decompose(R))
 			return false;
 
-		CommonOps_DDRM.multTransB(svd.getU(null,false),svd.getV(null,false),R);
+		CommonOps_DDRM.multTransB(svd.getU(null, false), svd.getV(null, false), R);
 
 		// determinant should be +1
 		double det = CommonOps_DDRM.det(R);
-		if( det < 0 ) {
-			CommonOps_DDRM.scale(-1,R);
+		if (det < 0) {
+			CommonOps_DDRM.scale(-1, R);
 			worldToView.T.scale(-1);
 		}
 
 		// recover the scale of T. This is important when trying to construct a common metric frame from a common
 		// projective frame
 		double[] sv = svd.getSingularValues();
-		double sv_mag = (sv[0]+sv[1]+sv[2])/3.0;
+		double sv_mag = (sv[0] + sv[1] + sv[2])/3.0;
 		worldToView.T.divideIP(sv_mag);
 
 		// if the input preconditions are false and K was not a good fit to this metric transform then the singular
 		// values will not all be identical
 		for (int i = 0; i < 3; i++) {
-			singularError += Math.abs(sv[i]-sv_mag);
+			singularError += Math.abs(sv[i] - sv_mag);
 		}
 
 		return true;
@@ -132,18 +131,16 @@ public class DecomposeProjectiveToMetric {
 	 * where P is the camera matrix, H is the homography, (K,R,t) are the intrinsic calibration matrix, rotation,
 	 * and translation
 	 *
-	 * @see MultiViewOps#absoluteQuadraticToH
-	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
-	 *
 	 * @param cameraMatrix (Input) camera matrix. 3x4
 	 * @param H (Input) Rectifying homography. 4x4
 	 * @param worldToView (Output) Transform from world to camera view
 	 * @param K (Output) Camera calibration matrix
+	 * @see MultiViewOps#absoluteQuadraticToH
+	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
 	 */
-	public boolean projectiveToMetric( DMatrixRMaj cameraMatrix , DMatrixRMaj H , Se3_F64 worldToView , DMatrixRMaj K )
-	{
-		CommonOps_DDRM.mult(cameraMatrix,H,P_metric);
-		return decomposeMetricCamera(P_metric,K,worldToView);
+	public boolean projectiveToMetric( DMatrixRMaj cameraMatrix, DMatrixRMaj H, Se3_F64 worldToView, DMatrixRMaj K ) {
+		CommonOps_DDRM.mult(cameraMatrix, H, P_metric);
+		return decomposeMetricCamera(P_metric, K, worldToView);
 	}
 
 	/**
@@ -163,47 +160,47 @@ public class DecomposeProjectiveToMetric {
 	 * @param worldToView Output: The rotation and translation.
 	 * @return true if decompose was successful
 	 */
-	public boolean decomposeMetricCamera(DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView) {
+	public boolean decomposeMetricCamera( DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView ) {
 		CommonOps_DDRM.extract(cameraMatrix, 0, 3, 0, 3, A, 0, 0);
-		worldToView.T.set(cameraMatrix.get(0,3),cameraMatrix.get(1,3),cameraMatrix.get(2,3));
+		worldToView.T.set(cameraMatrix.get(0, 3), cameraMatrix.get(1, 3), cameraMatrix.get(2, 3));
 
-		CommonOps_DDRM.mult(Pv,A,A_p);
+		CommonOps_DDRM.mult(Pv, A, A_p);
 		CommonOps_DDRM.transpose(A_p);
-		if( !qr.decompose(A_p) )
+		if (!qr.decompose(A_p))
 			return false;
 
 		// extract the rotation using RQ decomposition (via a pivoted QR)
-		qr.getQ(A,false);
-		CommonOps_DDRM.multTransB(Pv,A,worldToView.R);
+		qr.getQ(A, false);
+		CommonOps_DDRM.multTransB(Pv, A, worldToView.R);
 
 		// extract the calibration matrix
-		qr.getR(K,false);
-		CommonOps_DDRM.multTransB(Pv,K,A);
-		CommonOps_DDRM.mult(A,Pv,K);
+		qr.getR(K, false);
+		CommonOps_DDRM.multTransB(Pv, K, A);
+		CommonOps_DDRM.mult(A, Pv, K);
 
 		// there are four solutions, massage it so that it's the correct one.
 		// each of these row/column negations produces the same camera matrix
 		for (int i = 0; i < 3; i++) {
-			if( K.get(i,i) < 0) {
-				CommonOps_DDRM.scaleCol(-1,K,i);
-				CommonOps_DDRM.scaleRow(-1,worldToView.R,i);
+			if (K.get(i, i) < 0) {
+				CommonOps_DDRM.scaleCol(-1, K, i);
+				CommonOps_DDRM.scaleRow(-1, worldToView.R, i);
 			}
 		}
 
 		// rotation matrices have det() == 1
-		if( CommonOps_DDRM.det(worldToView.R) < 0 ) {
-			CommonOps_DDRM.scale(-1,worldToView.R);
+		if (CommonOps_DDRM.det(worldToView.R) < 0) {
+			CommonOps_DDRM.scale(-1, worldToView.R);
 			worldToView.T.scale(-1);
 		}
 
 		// save the scale so that T is scaled correctly. This is important when upgrading common projective cameras
-		double scale = K.get(2,2);
+		double scale = K.get(2, 2);
 
 		// make sure it's a proper camera matrix and this is more numerically stable to invert
-		CommonOps_DDRM.divide(K,scale);
+		CommonOps_DDRM.divide(K, scale);
 
 		// could do a very fast triangulate inverse. EJML doesn't have one for upper triangle, yet.
-		if( !CommonOps_DDRM.invert(K,A) )
+		if (!CommonOps_DDRM.invert(K, A))
 			return false;
 
 		GeometryMath_F64.mult(A, worldToView.T, worldToView.T);

@@ -30,7 +30,6 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * <p>
  * Decomposed the essential matrix into a rigid body motion; rotation and translation.  This is the rigid body
@@ -53,17 +52,17 @@ public class DecomposeEssential {
 	private final SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
 	// storage for SVD
-	DMatrixRMaj U,S,V;
+	DMatrixRMaj U, S, V;
 
 	// storage for the four possible solutions
 	List<Se3_F64> solutions = new ArrayList<>();
 
 	// working copy of E
-	DMatrixRMaj E_copy = new DMatrixRMaj(3,3);
+	DMatrixRMaj E_copy = new DMatrixRMaj(3, 3);
 
 	// local storage used when computing a hypothesis
-	DMatrixRMaj temp = new DMatrixRMaj(3,3);
-	DMatrixRMaj W = new DMatrixRMaj(3,3);
+	DMatrixRMaj temp = new DMatrixRMaj(3, 3);
+	DMatrixRMaj W = new DMatrixRMaj(3, 3);
 
 	/**
 	 * Essential matrix can be viewed as a homogenous quantity (scale invariant) or not. If Viewed as the former then
@@ -72,14 +71,14 @@ public class DecomposeEssential {
 	@Getter double translationLength;
 
 	public DecomposeEssential() {
-		solutions.add( new Se3_F64());
-		solutions.add( new Se3_F64());
-		solutions.add( new Se3_F64());
-		solutions.add( new Se3_F64());
+		solutions.add(new Se3_F64());
+		solutions.add(new Se3_F64());
+		solutions.add(new Se3_F64());
+		solutions.add(new Se3_F64());
 
-		W.set(0,1,-1);
-		W.set(1,0,1);
-		W.set(2,2,1);
+		W.set(0, 1, -1);
+		W.set(1, 0, 1);
+		W.set(2, 2, 1);
 	}
 
 	/**
@@ -88,21 +87,21 @@ public class DecomposeEssential {
 	 * @param E essential matrix
 	 */
 	public void decompose( DMatrixRMaj E ) {
-		if( svd.inputModified() ) {
+		if (svd.inputModified()) {
 			E_copy.set(E);
 			E = E_copy;
 		}
 
-		if( !svd.decompose(E))
+		if (!svd.decompose(E))
 			throw new RuntimeException("Svd some how failed");
 
-		U = svd.getU(U,false);
-		V = svd.getV(V,false);
+		U = svd.getU(U, false);
+		V = svd.getV(V, false);
 		S = svd.getW(S);
 
-		SingularOps_DDRM.descendingOrder(U,false,S,V,false);
+		SingularOps_DDRM.descendingOrder(U, false, S, V, false);
 
-		translationLength = Math.abs(S.get(0,0) + S.get(1,1))/2;
+		translationLength = Math.abs(S.get(0, 0) + S.get(1, 1))/2;
 
 		decompose(U, V);
 	}
@@ -113,20 +112,20 @@ public class DecomposeEssential {
 	 * @param U Orthogonal matrix from SVD.
 	 * @param V Orthogonal matrix from SVD.
 	 */
-	public void decompose( DMatrixRMaj U , DMatrixRMaj V ) {
+	public void decompose( DMatrixRMaj U, DMatrixRMaj V ) {
 		// this ensures the resulting rotation matrix will have a determinant of +1 and thus be a real rotation matrix
-		if( CommonOps_DDRM.det(U) < 0 ) {
-			CommonOps_DDRM.scale(-1,U);
+		if (CommonOps_DDRM.det(U) < 0) {
+			CommonOps_DDRM.scale(-1, U);
 		}
 
-		if( CommonOps_DDRM.det(V) < 0 ) {
-			CommonOps_DDRM.scale(-1,V);
+		if (CommonOps_DDRM.det(V) < 0) {
+			CommonOps_DDRM.scale(-1, V);
 		}
 
 		// for possible solutions due to ambiguity in the sign of T and rotation
 		extractTransform(U, V, solutions.get(0), true, true);
 		extractTransform(U, V, solutions.get(1), true, false);
-		extractTransform(U, V, solutions.get(2) , false,false);
+		extractTransform(U, V, solutions.get(2), false, false);
 		extractTransform(U, V, solutions.get(3), false, true);
 	}
 
@@ -151,26 +150,24 @@ public class DecomposeEssential {
 	 * There are four possible reconstructions from an essential matrix.  This function will compute different
 	 * permutations depending on optionA and optionB being true or false.
 	 */
-	private void extractTransform( DMatrixRMaj U , DMatrixRMaj V ,
-								   Se3_F64 se , boolean optionA , boolean optionB )
-	{
+	private void extractTransform( DMatrixRMaj U, DMatrixRMaj V,
+								   Se3_F64 se, boolean optionA, boolean optionB ) {
 		DMatrixRMaj R = se.getR();
 		Vector3D_F64 T = se.getT();
 
 		// extract rotation
-		if( optionA )
-			CommonOps_DDRM.multTransB(U, W,temp);
+		if (optionA)
+			CommonOps_DDRM.multTransB(U, W, temp);
 		else
-			CommonOps_DDRM.mult(U, W,temp);
+			CommonOps_DDRM.mult(U, W, temp);
 
-		CommonOps_DDRM.multTransB(temp,V,R);
+		CommonOps_DDRM.multTransB(temp, V, R);
 
-		T.x = U.get(0,2);
-		T.y = U.get(1,2);
-		T.z = U.get(2,2);
+		T.x = U.get(0, 2);
+		T.y = U.get(1, 2);
+		T.z = U.get(2, 2);
 
-		if( optionB )
+		if (optionB)
 			T.scale(-1);
 	}
-
 }

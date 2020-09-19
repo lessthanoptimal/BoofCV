@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestGImageStatistics extends BaseGClassChecksInMisc {
 
 	Class[] bandTypes = new Class[]{GrayU8.class, GrayS8.class, GrayU16.class, GrayF32.class};
@@ -55,40 +56,41 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 
 		Object[][] ret = new Object[1][param.length];
 
-		if (name.equals("maxAbs")) {
-			ret[0][0] = inputA;
-		} else if (name.equals("max")) {
-			ret[0][0] = inputA;
-		} else if (name.equals("min")) {
-			ret[0][0] = inputA;
-		} else if (name.equals("sum")) {
-			ret[0][0] = inputA;
-		} else if (name.equals("mean")) {
-			ret[0][0] = inputA;
-		} else if (name.equals("variance")) {
-			ret[0][0] = inputA;
-			ret[0][1] = 3;
-		} else if (name.equals("meanDiffSq")) {
-			inputB = GeneralizedImageOps.createImage((Class)param[1], width, height, numBands);
-			ret[0][0] = inputA;
-			ret[0][1] = inputB;
-		} else if (name.equals("meanDiffAbs")) {
-			inputB = GeneralizedImageOps.createImage((Class)param[1], width, height, numBands);
-			ret[0][0] = inputA;
-			ret[0][1] = inputB;
-		} else if (name.equals("histogram")) {
-			int histogramSize = 10;
-			if (inputA.getImageType().getDataType().isSigned())
-				histogramSize += 11;
-			ret[0][0] = inputA;
-			ret[0][1] = -10;
-			ret[0][2] = new int[histogramSize];
-		} else if (name.equals("histogramScaled")) {
-			int histogramSize = 6;
-			ret[0][0] = inputA;
-			ret[0][1] = -10;
-			ret[0][2] = 10;
-			ret[0][3] = new int[histogramSize];
+		switch (name) {
+			case "maxAbs" -> ret[0][0] = inputA;
+			case "max" -> ret[0][0] = inputA;
+			case "min" -> ret[0][0] = inputA;
+			case "sum" -> ret[0][0] = inputA;
+			case "mean" -> ret[0][0] = inputA;
+			case "variance" -> {
+				ret[0][0] = inputA;
+				ret[0][1] = 3;
+			}
+			case "meanDiffSq" -> {
+				inputB = GeneralizedImageOps.createImage((Class)param[1], width, height, numBands);
+				ret[0][0] = inputA;
+				ret[0][1] = inputB;
+			}
+			case "meanDiffAbs" -> {
+				inputB = GeneralizedImageOps.createImage((Class)param[1], width, height, numBands);
+				ret[0][0] = inputA;
+				ret[0][1] = inputB;
+			}
+			case "histogram" -> {
+				int histogramSize = 10;
+				if (inputA.getImageType().getDataType().isSigned())
+					histogramSize += 11;
+				ret[0][0] = inputA;
+				ret[0][1] = -10;
+				ret[0][2] = new int[histogramSize];
+			}
+			case "histogramScaled" -> {
+				int histogramSize = 6;
+				ret[0][0] = inputA;
+				ret[0][1] = -10;
+				ret[0][2] = 10;
+				ret[0][3] = new int[histogramSize];
+			}
 		}
 
 		fillRandom(inputA);

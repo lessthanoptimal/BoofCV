@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,36 +57,36 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DecomposeHomography {
-	private SingularValueDecomposition<DMatrixRMaj> svd;
+	private final SingularValueDecomposition<DMatrixRMaj> svd;
 
 	// storage for the four possible solutions
 	// Camera motion part of the solution
-	List<Se3_F64> solutionsSE = new ArrayList<>();
+	final List<Se3_F64> solutionsSE = new ArrayList<>();
 	// normal of the plane
-	List<Vector3D_F64> solutionsN = new ArrayList<>();
+	final List<Vector3D_F64> solutionsN = new ArrayList<>();
 
 	// used for internal house keeping during decomposition
-	Vector3D_F64 u1 = new Vector3D_F64();
-	Vector3D_F64 u2 = new Vector3D_F64();
-	Vector3D_F64 v2 = new Vector3D_F64();
+	final Vector3D_F64 u1 = new Vector3D_F64();
+	final Vector3D_F64 u2 = new Vector3D_F64();
+	final Vector3D_F64 v2 = new Vector3D_F64();
 
-	Vector3D_F64 tempV = new Vector3D_F64();
+	final Vector3D_F64 tempV = new Vector3D_F64();
 
-	DMatrixRMaj W1 = new DMatrixRMaj(3,3);
-	DMatrixRMaj W2 = new DMatrixRMaj(3,3);
-	DMatrixRMaj U1 = new DMatrixRMaj(3,3);
-	DMatrixRMaj U2 = new DMatrixRMaj(3,3);
+	final DMatrixRMaj W1 = new DMatrixRMaj(3, 3);
+	final DMatrixRMaj W2 = new DMatrixRMaj(3, 3);
+	final DMatrixRMaj U1 = new DMatrixRMaj(3, 3);
+	final DMatrixRMaj U2 = new DMatrixRMaj(3, 3);
 
-	DMatrixRMaj Hv2 = new DMatrixRMaj(3,3);
-	DMatrixRMaj tempM = new DMatrixRMaj(3,3);
+	final DMatrixRMaj Hv2 = new DMatrixRMaj(3, 3);
+	final DMatrixRMaj tempM = new DMatrixRMaj(3, 3);
 
 	// workspace for H
-	DMatrixRMaj H = new DMatrixRMaj(3,3);
+	final DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
 	public DecomposeHomography() {
-		for( int i = 0; i < 4; i++ ) {
-			solutionsN.add( new Vector3D_F64() );
-			solutionsSE.add( new Se3_F64() );
+		for (int i = 0; i < 4; i++) {
+			solutionsN.add(new Vector3D_F64());
+			solutionsSE.add(new Se3_F64());
 		}
 
 		// insure that the inputs are not modified
@@ -101,51 +101,51 @@ public class DecomposeHomography {
 	 * @param homography Homography matrix.  Not modified.
 	 */
 	public void decompose( DMatrixRMaj homography ) {
-		if( !svd.decompose(homography) )
+		if (!svd.decompose(homography))
 			throw new RuntimeException("SVD failed somehow");
 
-		DMatrixRMaj V = svd.getV(null,false);
+		DMatrixRMaj V = svd.getV(null, false);
 		DMatrixRMaj S = svd.getW(null);
 
-		SingularOps_DDRM.descendingOrder(null,false,S, V,false);
+		SingularOps_DDRM.descendingOrder(null, false, S, V, false);
 
-		double s0 = S.get(0,0);
-		double s1 = S.get(1,1); // This is the scale. If normalize it will be one
-		double s2 = S.get(2,2);
+		double s0 = S.get(0, 0);
+		double s1 = S.get(1, 1); // This is the scale. If normalize it will be one
+		double s2 = S.get(2, 2);
 
 		// force s1 to be 1
 		s0 /= s1;
 		s2 /= s1;
-		CommonOps_DDRM.scale(1.0/s1,homography,this.H);
+		CommonOps_DDRM.scale(1.0/s1, homography, this.H);
 
 		// square s0 and s1 for other parts of the calculations
 		s0 *= s0;
 		s2 *= s2;
 
-		v2.set(V.get(0,1),V.get(1,1),V.get(2,1));
+		v2.set(V.get(0, 1), V.get(1, 1), V.get(2, 1));
 
-		double a = Math.sqrt(1-s2);
-		double b = Math.sqrt(s0-1);
-		double div = Math.sqrt(s0-s2);
+		double a = Math.sqrt(1 - s2);
+		double b = Math.sqrt(s0 - 1);
+		double div = Math.sqrt(s0 - s2);
 
-		for( int i = 0; i < 3; i++ ) {
-			double e1 = (a*V.get(i,0) + b*V.get(i,2))/div;
-			double e2 = (a*V.get(i,0) - b*V.get(i,2))/div;
+		for (int i = 0; i < 3; i++) {
+			double e1 = (a*V.get(i, 0) + b*V.get(i, 2))/div;
+			double e2 = (a*V.get(i, 0) - b*V.get(i, 2))/div;
 
-			u1.setIdx(i,e1);
-			u2.setIdx(i,e2);
+			u1.setIdx(i, e1);
+			u2.setIdx(i, e2);
 		}
 
 		setU(U1, v2, u1);
 		setU(U2, v2, u2);
-		setW(W1, H , v2, u1);
-		setW(W2, H , v2, u2);
+		setW(W1, H, v2, u1);
+		setW(W2, H, v2, u2);
 
 		// create the four solutions
-		createSolution(W1, U1, u1,H,solutionsSE.get(0), solutionsN.get(0));
-		createSolution(W2, U2, u2,H,solutionsSE.get(1), solutionsN.get(1));
-		createMirrorSolution(0,2);
-		createMirrorSolution(1,3);
+		createSolution(W1, U1, u1, H, solutionsSE.get(0), solutionsN.get(0));
+		createSolution(W2, U2, u2, H, solutionsSE.get(1), solutionsN.get(1));
+		createMirrorSolution(0, 2);
+		createMirrorSolution(1, 3);
 	}
 
 	/**
@@ -155,6 +155,7 @@ public class DecomposeHomography {
 	 * <p>
 	 * WARNING: Data is reused each time decompose is called.
 	 * </p>
+	 *
 	 * @return Set of rigid body camera motions
 	 */
 	public List<Se3_F64> getSolutionsSE() {
@@ -168,6 +169,7 @@ public class DecomposeHomography {
 	 * <p>
 	 * WARNING: Data is reused each time decompose is called.
 	 * </p>
+	 *
 	 * @return Set of plane normals
 	 */
 	public List<Vector3D_F64> getSolutionsN() {
@@ -177,7 +179,7 @@ public class DecomposeHomography {
 	/**
 	 * U=[a,b,hat(a)*b]
 	 */
-	private void setU( DMatrixRMaj U, Vector3D_F64 a , Vector3D_F64 b ) {
+	private void setU( DMatrixRMaj U, Vector3D_F64 a, Vector3D_F64 b ) {
 		setColumn(U, 0, a);
 		setColumn(U, 1, b);
 
@@ -188,20 +190,20 @@ public class DecomposeHomography {
 	/**
 	 * W=[H*a,H*b,hat(H*a)*H*b]
 	 */
-	private void setW( DMatrixRMaj W, DMatrixRMaj H , Vector3D_F64 a , Vector3D_F64 b ) {
-		GeometryMath_F64.mult(H,b, tempV);
-		setColumn(W,1, tempV);
+	private void setW( DMatrixRMaj W, DMatrixRMaj H, Vector3D_F64 a, Vector3D_F64 b ) {
+		GeometryMath_F64.mult(H, b, tempV);
+		setColumn(W, 1, tempV);
 
-		GeometryMath_F64.mult(H,a, tempV);
-		setColumn(W,0, tempV);
+		GeometryMath_F64.mult(H, a, tempV);
+		setColumn(W, 0, tempV);
 
-		GeometryMath_F64.crossMatrix(tempV,Hv2);
-		CommonOps_DDRM.mult(Hv2,H,tempM);
-		GeometryMath_F64.mult(tempM,b, tempV);
-		setColumn(W,2, tempV);
+		GeometryMath_F64.crossMatrix(tempV, Hv2);
+		CommonOps_DDRM.mult(Hv2, H, tempM);
+		GeometryMath_F64.mult(tempM, b, tempV);
+		setColumn(W, 2, tempV);
 	}
 
-	private void setColumn( DMatrixRMaj U , int column , Vector3D_F64 a ) {
+	private void setColumn( DMatrixRMaj U, int column, Vector3D_F64 a ) {
 		U.set(0, column, a.x);
 		U.set(1, column, a.y);
 		U.set(2, column, a.z);
@@ -212,19 +214,17 @@ public class DecomposeHomography {
 	 * N = v2 cross u
 	 * (1/d)*T = (H-R)*N
 	 */
-	private void createSolution( DMatrixRMaj W , DMatrixRMaj U , Vector3D_F64 u ,
-								 DMatrixRMaj H ,
-								 Se3_F64 se , Vector3D_F64 N )
-	{
-		CommonOps_DDRM.multTransB(W,U,se.getR());
-		GeometryMath_F64.cross(v2,u,N);
+	private void createSolution( DMatrixRMaj W, DMatrixRMaj U, Vector3D_F64 u,
+								 DMatrixRMaj H,
+								 Se3_F64 se, Vector3D_F64 N ) {
+		CommonOps_DDRM.multTransB(W, U, se.getR());
+		GeometryMath_F64.cross(v2, u, N);
 
 		CommonOps_DDRM.subtract(H, se.getR(), tempM);
-		GeometryMath_F64.mult(tempM,N,se.getT());
+		GeometryMath_F64.mult(tempM, N, se.getT());
 	}
 
-	private void createMirrorSolution( int origIndex , int index  )
-	{
+	private void createMirrorSolution( int origIndex, int index ) {
 		Se3_F64 origSE = solutionsSE.get(origIndex);
 		Vector3D_F64 origN = solutionsN.get(origIndex);
 
