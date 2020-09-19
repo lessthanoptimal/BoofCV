@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.structure2;
 
-import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
@@ -30,7 +30,6 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -103,7 +102,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	// 3D feature in camera coordinates
 	private final Point4D_F64 camera3D = new Point4D_F64();
 	// Storage for triangulated point
-	private final Point3D_F64 triangulated = new Point3D_F64();
+	private final Point4D_F64 found3D = new Point4D_F64();
 
 	/**
 	 * Use the `graph` to define a 3D scene which can be optimized.
@@ -352,7 +351,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	void triangulateAndSave( SceneWorkingGraph.InlierInfo inliers, int inlierIdx ) {
 		final SceneStructureMetric structure = bundleAdjustment.structure;
 		final SceneObservations observations = bundleAdjustment.observations;
-		final TriangulateNViewsMetric triangulator = bundleAdjustment.triangulator;
+		final TriangulateNViewsMetricH triangulator = bundleAdjustment.triangulator;
 
 		// Get a list of observations in normalized image coordinates
 		for (int inlierViewIdx = 0; inlierViewIdx < viewIntIds.size; inlierViewIdx++) {
@@ -366,21 +365,25 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		// All features are being used to triangulate because they are part of the inlier set, all though it's possible
 		// that one or more them has already been assigned to a different 3D feature. Basically there might have been
 		// a mistake
-		if (!triangulator.triangulate(pixelNormalized.toList(), listPoses.toList(), triangulated))
+		if (!triangulator.triangulate(pixelNormalized.toList(), listPoses.toList(), found3D))
 			return;
 
 		// Verify it's not behind the camera. Unclear if it should give up here or try to optimize it
-//		if( triangulated.z < 0 ) {
+//		if( triangulated.z*triangulated.w < 0 ) {
 //			if( verbose != null ) verbose.println("Triangulated point behind the camera");
 //			return;
 //		}
 
 		// listPoses is relative to view0. Bring it into global reference frame
-		SePointOps_F64.transform(view0_to_world, triangulated, triangulated);
+		SePointOps_F64.transform(view0_to_world, found3D, found3D);
 		// Add the new 3D point to the scene
 		int pointID = structure.points.size;
 		SceneStructureCommon.Point point3D = structure.points.grow();
-		point3D.set(triangulated.x, triangulated.y, triangulated.z, 1.0);
+
+		if (structure.homogenous)
+			point3D.set(found3D.x, found3D.y, found3D.z, found3D.w);
+		else
+			point3D.set(found3D.x/found3D.w, found3D.y/found3D.w, found3D.z/found3D.w);
 
 		// Only assigned this 3D point to views which are unassigned.
 		for (int i = 0; i < unassigned.size; i++) {

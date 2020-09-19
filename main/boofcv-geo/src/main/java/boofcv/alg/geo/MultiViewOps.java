@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
@@ -46,6 +46,7 @@ import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
@@ -1639,7 +1640,7 @@ public class MultiViewOps {
 	 * @param observations observations of features in the images
 	 */
 	public static void triangulatePoints( SceneStructureMetric structure, SceneObservations observations ) {
-		TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewMetric(ConfigTriangulation.GEOMETRIC());
+		TriangulateNViewsMetricH triangulator = FactoryMultiView.triangulateNViewMetricH(ConfigTriangulation.GEOMETRIC());
 
 		List<RemoveBrownPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.size; i++) {
@@ -1662,7 +1663,8 @@ public class MultiViewOps {
 		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64::new);
 		normObs.resize(3);
 
-		Point3D_F64 X = new Point3D_F64();
+		final boolean homogenous = structure.homogenous;
+		Point4D_F64 X = new Point4D_F64();
 
 		List<Se3_F64> worldToViews = new ArrayList<>();
 		for (int i = 0; i < structure.points.size; i++) {
@@ -1682,8 +1684,14 @@ public class MultiViewOps {
 				list_p_to_n.get(v.camera).compute(n.x, n.y, n);
 			}
 
-			triangulator.triangulate(normObs.toList(), worldToViews, X);
-			sp.set(X.x, X.y, X.z);
+			if (!triangulator.triangulate(normObs.toList(), worldToViews, X)) {
+				// this should work unless the input is bad
+				throw new RuntimeException("Triangulation failed. Bad input?");
+			}
+			if (homogenous)
+				sp.set(X.x, X.y, X.z, X.w);
+			else
+				sp.set(X.x/X.w, X.y/X.w, X.z/X.w);
 		}
 	}
 

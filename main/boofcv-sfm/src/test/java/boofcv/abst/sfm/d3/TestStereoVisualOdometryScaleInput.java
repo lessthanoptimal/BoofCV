@@ -31,8 +31,7 @@ import org.junit.jupiter.api.Test;
 import java.io.PrintStream;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -49,19 +48,18 @@ public class TestStereoVisualOdometryScaleInput {
 	boolean result;
 	boolean resetCalled = false;
 
-
 	@Test
 	public void setCalibration() {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy, 0.5);
 		alg.setCalibration(p);
 
 		assertEquals(320, parameters.left.width);
-		assertEquals(320,parameters.right.width);
-		assertEquals(160,parameters.left.height);
-		assertEquals(160,parameters.right.height);
+		assertEquals(320, parameters.right.width);
+		assertEquals(160, parameters.left.height);
+		assertEquals(160, parameters.right.height);
 	}
 
 	@Test
@@ -69,56 +67,55 @@ public class TestStereoVisualOdometryScaleInput {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy, 0.5);
 		alg.setCalibration(p);
 
-		GrayF32 left = new GrayF32(width,height);
-		GrayF32 right = new GrayF32(width,height);
+		GrayF32 left = new GrayF32(width, height);
+		GrayF32 right = new GrayF32(width, height);
 
-		alg.process(left,right);
+		alg.process(left, right);
 
-		assertTrue(left != leftImage);
-		assertTrue(right != rightImage);
+		assertNotSame(left, leftImage);
+		assertNotSame(right, rightImage);
 
-		assertEquals(320,leftImage.width);
-		assertEquals(320,rightImage.width);
-		assertEquals(160,leftImage.height);
-		assertEquals(160,rightImage.height);
+		assertEquals(320, leftImage.width);
+		assertEquals(320, rightImage.width);
+		assertEquals(160, leftImage.height);
+		assertEquals(160, rightImage.height);
 	}
 
 	@Test
 	public void getImageType() {
-
-		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy, 0.5);
 
-		assertTrue(type == alg.getImageType());
+		assertSame(type, alg.getImageType());
 	}
 
 	public StereoParameters createStereoParam() {
 		StereoParameters ret = new StereoParameters();
 
 		ret.setRightToLeft(new Se3_F64());
-		ret.getRightToLeft().getT().set(-0.2,0.001,-0.012);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
+		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
-		ret.right = new CameraPinholeBrown(199,200,0,width/2+2,height/2-6,width,height).fsetRadial(0,0);
+		ret.left = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0, 0);
+		ret.right = new CameraPinholeBrown(199, 200, 0, width/2 + 2, height/2 - 6, width, height).fsetRadial(0, 0);
 
 		return ret;
 	}
 
 	protected class Dummy implements StereoVisualOdometry<GrayF32> {
 		long frameID = -1;
+
 		@Override
-		public void setCalibration(StereoParameters p) {
+		public void setCalibration( StereoParameters p ) {
 			parameters = p;
 		}
 
 		@Override
-		public boolean process(GrayF32 l, GrayF32 r) {
+		public boolean process( GrayF32 l, GrayF32 r ) {
 			frameID++;
 			leftImage = l;
 			rightImage = r;
@@ -131,7 +128,10 @@ public class TestStereoVisualOdometryScaleInput {
 		}
 
 		@Override
-		public void reset() {resetCalled = true;frameID=-1;}
+		public void reset() {
+			resetCalled = true;
+			frameID = -1;
+		}
 
 		@Override
 		public boolean isFault() {
@@ -147,7 +147,6 @@ public class TestStereoVisualOdometryScaleInput {
 		public long getFrameID() { return frameID; }
 
 		@Override
-		public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {}
+		public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {}
 	}
-
 }

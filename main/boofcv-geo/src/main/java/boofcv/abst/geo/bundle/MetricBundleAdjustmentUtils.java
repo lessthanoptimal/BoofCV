@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.ConfigConverge;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class MetricBundleAdjustmentUtils {
 	public final @Getter SceneStructureMetric structure = new SceneStructureMetric(true);
 	public final @Getter SceneObservations observations = new SceneObservations();
 	public @Getter @Setter BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
-	public @Getter @Setter TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewMetric(null);
+	public @Getter @Setter TriangulateNViewsMetricH triangulator = FactoryMultiView.triangulateNViewMetricH(null);
 	public @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
 
 	/**

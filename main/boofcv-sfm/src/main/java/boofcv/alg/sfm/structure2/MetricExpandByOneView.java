@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.structure2;
 
-import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.TriangulateNViewsMetricH;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
@@ -33,7 +33,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
@@ -271,8 +271,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		SceneObservations.View viewObs2 = observations.getView(1);
 		SceneObservations.View viewObs3 = observations.getView(2);
 
-		final TriangulateNViewsMetric triangulator = bundleAdjustment.triangulator;
-		Point3D_F64 foundX = new Point3D_F64();
+		final TriangulateNViewsMetricH triangulator = bundleAdjustment.triangulator;
+		var foundX = new Point4D_F64();
 		for (int featIdx = 0; featIdx < numFeatures; featIdx++) {
 			AssociatedTriple a = triples.get(featIdx);
 			viewObs1.set(featIdx, featIdx, (float)a.p1.x, (float)a.p1.y);
@@ -284,10 +284,14 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			normalize3.compute(a.p3.x, a.p3.y, pixelNorms.get(2));
 
 			if (!triangulator.triangulate(pixelNorms, listMotion, foundX)) {
-				throw new RuntimeException("This should be handled");
+				throw new RuntimeException("Triangulation failed. Possibly bad input. Handle this problem");
 			}
 
-			structure.setPoint(featIdx, foundX.x, foundX.y, foundX.z, 1.0);
+			if (structure.homogenous)
+				structure.setPoint(featIdx, foundX.x, foundX.y, foundX.z, foundX.w);
+			else
+				structure.setPoint(featIdx, foundX.x/foundX.w, foundX.y/foundX.w, foundX.z/foundX.w);
+
 			structure.connectPointToView(featIdx, 0);
 			structure.connectPointToView(featIdx, 1);
 			structure.connectPointToView(featIdx, 2);
@@ -295,7 +299,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Refine using bundle adjustment
 		if (!bundleAdjustment.process(null))
-			throw new RuntimeException("Handle this");
+			throw new RuntimeException("Bundle adjustment failed. Handle this");
 
 		// copy results for output
 		wview3.intrinsic.set((BundlePinholeSimplified)structure.cameras.get(2).model);
