@@ -125,7 +125,7 @@ public class GenerateImplAverageDownSample2 extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplAverageDownSample2 app = new GenerateImplAverageDownSample2();
 		app.generateCode();
 	}

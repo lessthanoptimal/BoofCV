@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleDetectCalibrationPoints {
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		// load the test image
 //		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");

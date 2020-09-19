@@ -132,7 +132,7 @@ public class GenerateImplOrientationAverage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplOrientationAverage app = new GenerateImplOrientationAverage();
 		app.generateCode();
 	}

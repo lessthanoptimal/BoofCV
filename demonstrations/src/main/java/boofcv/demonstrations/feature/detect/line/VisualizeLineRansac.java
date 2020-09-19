@@ -125,7 +125,7 @@ public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>>
 		ShowImages.showWindow(gui, "Detected Lines");
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		VisualizeLineRansac<GrayF32, GrayF32> app =
 				new VisualizeLineRansac<>(GrayF32.class, GrayF32.class);
 

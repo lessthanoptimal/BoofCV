@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class BenchmarkConvolveAbstracted {
 	}
 
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		imgInt8 = new GrayU8(imgWidth,imgHeight);
 		imgInt16 = new GrayS16(imgWidth,imgHeight);
 		out_I32 = new GrayS32(imgWidth,imgHeight);

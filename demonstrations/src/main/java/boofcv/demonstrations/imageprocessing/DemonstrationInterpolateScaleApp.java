@@ -122,7 +122,7 @@ public class DemonstrationInterpolateScaleApp<T extends ImageBase<T>>
 	@Override
 	public void componentHidden(ComponentEvent e) {}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		ImageType type = ImageType.pl(3,GrayF32.class);
 //		ImageType type = ImageType.pl(3,GrayU8.class);

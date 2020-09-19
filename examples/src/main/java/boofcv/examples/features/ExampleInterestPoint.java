@@ -88,7 +88,7 @@ public class ExampleInterestPoint {
 		ShowImages.showWindow(image, "Detected Features", true);
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 		detect(image, GrayF32.class);
 	}

@@ -195,7 +195,7 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		doRefreshAll();
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayF32.class, GrayF32.class);
 //		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayU8.class,GrayS16.class);
 

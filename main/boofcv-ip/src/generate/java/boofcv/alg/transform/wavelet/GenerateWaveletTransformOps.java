@@ -336,7 +336,7 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateWaveletTransformOps app = new GenerateWaveletTransformOps();
 		app.generateCode();
 	}

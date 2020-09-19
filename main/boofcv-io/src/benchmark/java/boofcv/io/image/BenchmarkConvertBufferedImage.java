@@ -108,7 +108,7 @@ public class BenchmarkConvertBufferedImage {
 
 	}
 	
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		imgInt8 = new GrayU8(imgWidth,imgHeight);
 		multiInt8 = new Planar<>(GrayU8.class,imgWidth,imgHeight,3);
 		

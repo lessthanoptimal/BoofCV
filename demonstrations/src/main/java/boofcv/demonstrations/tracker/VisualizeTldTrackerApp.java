@@ -127,7 +127,7 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 	}
 
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		VisualizeTldTrackerApp app = new VisualizeTldTrackerApp(GrayU8.class);
 
 		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");

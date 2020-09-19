@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -209,7 +209,7 @@ public class EdgeIntensitiesApp<T extends ImageGray<T>> {
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		EdgeIntensitiesApp app = new EdgeIntensitiesApp(GrayF32.class);
 		app.init();
 

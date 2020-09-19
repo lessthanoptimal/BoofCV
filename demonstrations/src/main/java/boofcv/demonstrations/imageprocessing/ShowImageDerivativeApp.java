@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -184,7 +184,7 @@ public class ShowImageDerivativeApp<T extends ImageGray<T>, D extends ImageGray<
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
 		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));

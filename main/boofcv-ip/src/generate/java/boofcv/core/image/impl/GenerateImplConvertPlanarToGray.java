@@ -109,7 +109,7 @@ public class GenerateImplConvertPlanarToGray extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplConvertPlanarToGray app = new GenerateImplConvertPlanarToGray();
 
 		app.generateCode();

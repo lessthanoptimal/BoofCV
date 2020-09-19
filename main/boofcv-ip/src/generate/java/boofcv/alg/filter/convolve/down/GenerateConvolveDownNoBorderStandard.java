@@ -287,7 +287,7 @@ public class GenerateConvolveDownNoBorderStandard extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateConvolveDownNoBorderStandard gen = new GenerateConvolveDownNoBorderStandard();
 
 		gen.generateCode();

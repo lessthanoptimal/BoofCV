@@ -117,7 +117,7 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		Class imageType = GrayF32.class;
 //		Class imageType = GrayU8.class;

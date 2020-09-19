@@ -157,7 +157,7 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 		tracker = FactoryPointTracker.dda_FH_SURF_Fast(configDetector, null, null, imageType);
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 
 		Class imageType = GrayF32.class;
 

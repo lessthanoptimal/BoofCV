@@ -494,7 +494,7 @@ public class GenerateImplWaveletTransformBorder extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplWaveletTransformBorder app = new GenerateImplWaveletTransformBorder();
 		app.generateCode();
 	}

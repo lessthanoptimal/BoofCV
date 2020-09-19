@@ -411,7 +411,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		POLAR
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		java.util.List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(new PathLabel("Simple Objects",UtilIO.pathExample("simple_objects.jpg")));

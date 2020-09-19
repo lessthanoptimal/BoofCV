@@ -168,7 +168,7 @@ public class ExampleStereoDisparity {
 		return rectifyAlg;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		String calibDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 		String imageDir = UtilIO.pathExample("stereo/");
 

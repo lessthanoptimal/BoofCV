@@ -448,7 +448,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplEnhanceHistogram app = new GenerateImplEnhanceHistogram();
 		app.generateCode();
 	}

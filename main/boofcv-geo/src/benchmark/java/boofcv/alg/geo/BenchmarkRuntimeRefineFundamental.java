@@ -79,7 +79,7 @@ public class BenchmarkRuntimeRefineFundamental extends ArtificialStereoScene{
 //		System.out.println("Done");
 	}
 	
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BenchmarkRuntimeRefineFundamental alg = new BenchmarkRuntimeRefineFundamental();
 
 		alg.runAll();

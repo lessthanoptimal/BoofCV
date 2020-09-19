@@ -204,7 +204,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 				"\t}");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplEdgeNonMaxSuppressionCrude app = new GenerateImplEdgeNonMaxSuppressionCrude();
 		app.parseArguments(args);
 		app.generateCode();

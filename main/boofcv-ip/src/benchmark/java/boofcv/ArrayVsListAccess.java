@@ -146,7 +146,7 @@ public class ArrayVsListAccess {
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		Random rand = new Random(2342);
 		double data[] = new double[5000];
 		for( int i = 0; i < data.length; i++ ) {

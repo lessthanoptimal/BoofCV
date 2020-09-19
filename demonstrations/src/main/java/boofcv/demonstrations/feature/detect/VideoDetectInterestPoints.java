@@ -120,7 +120,7 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 		display.process();
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		String fileName;
 
 		if (args.length == 0) {

@@ -326,7 +326,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t}\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplEnhanceFilter app = new GenerateImplEnhanceFilter();
 		app.generateCode();
 	}

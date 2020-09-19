@@ -186,7 +186,7 @@ public class GenerateImplPolynomialPixel extends CodeGeneratorBase {
 		);
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplPolynomialPixel gen = new GenerateImplPolynomialPixel();
 		gen.generateCode();
 	}

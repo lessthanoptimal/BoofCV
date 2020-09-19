@@ -141,7 +141,7 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 		return hasImage;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		DetectPointsInsidePyramidApp app = new DetectPointsInsidePyramidApp(GrayF32.class, GrayF32.class);
 

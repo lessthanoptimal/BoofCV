@@ -95,7 +95,7 @@ public class VisualizePyramidDiscreteApp<T extends ImageGray<T>>
 		return processedImage;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		VisualizePyramidDiscreteApp<GrayF32> app = new VisualizePyramidDiscreteApp<>(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<>();

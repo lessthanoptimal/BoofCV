@@ -246,7 +246,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase {
 				"\t}\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplSsdCorner gen = new GenerateImplSsdCorner();
 
 		gen.generateCode();

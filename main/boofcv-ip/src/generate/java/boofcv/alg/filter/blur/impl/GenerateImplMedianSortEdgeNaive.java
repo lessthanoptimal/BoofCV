@@ -198,7 +198,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplMedianSortEdgeNaive app = new GenerateImplMedianSortEdgeNaive();
 		app.generateCode();
 	}

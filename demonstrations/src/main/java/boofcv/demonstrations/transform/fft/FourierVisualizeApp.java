@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -158,7 +158,7 @@ public class FourierVisualizeApp
 		Original
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));

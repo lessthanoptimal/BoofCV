@@ -133,7 +133,7 @@ public class GenerateImplGrayImageOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplGrayImageOps app = new GenerateImplGrayImageOps();
 		app.generateCode();
 	}

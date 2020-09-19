@@ -346,7 +346,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateConvertImage app = new GenerateConvertImage();
 
 		app.generateCode();

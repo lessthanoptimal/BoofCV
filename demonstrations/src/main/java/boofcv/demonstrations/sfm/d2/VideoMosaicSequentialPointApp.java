@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends Ima
 		return( pt.x >= stitchWidth - borderTolerance || pt.y >= stitchHeight - borderTolerance);
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		Class type = GrayF32.class;
 
 		List<PathLabel> examples = new ArrayList<>();

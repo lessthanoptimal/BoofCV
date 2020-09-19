@@ -128,7 +128,7 @@ public class GenerateDisparitySparseScoreSadRect extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateDisparitySparseScoreSadRect gen = new GenerateDisparitySparseScoreSadRect();
 
 		gen.generateCode();

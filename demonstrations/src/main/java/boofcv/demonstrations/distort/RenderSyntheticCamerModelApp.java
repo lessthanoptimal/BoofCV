@@ -173,7 +173,7 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 	}
 
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> inputs = new ArrayList<>();

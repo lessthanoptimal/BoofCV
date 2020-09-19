@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,7 +107,7 @@ public class BenchmarkWaveletTransform {
 	}
 
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(orig_F32, rand, 0, 100);

@@ -226,7 +226,7 @@ public class ShowColorModelApp
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		ShowColorModelApp app = new ShowColorModelApp();
 

@@ -77,7 +77,7 @@ public class BenchmarkImagePyramids {
 
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(input, rand, 0, 100);

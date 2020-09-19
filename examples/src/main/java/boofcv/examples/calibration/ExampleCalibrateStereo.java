@@ -136,7 +136,7 @@ public class ExampleCalibrateStereo {
 		// Which is in millimeters (mm) in this example.
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		ExampleCalibrateStereo alg = new ExampleCalibrateStereo();
 
 		// Select which set of targets to use

@@ -91,7 +91,7 @@ public class VisualizeScaleSpacePyramidApp<T extends ImageGray<T>>
 		return processedImage;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 //		VisualizePyramidFloatApp<GrayF32> app = new VisualizePyramidFloatApp<>(GrayF32.class);
 		VisualizeScaleSpacePyramidApp<GrayU8> app = new VisualizeScaleSpacePyramidApp<>(GrayU8.class);

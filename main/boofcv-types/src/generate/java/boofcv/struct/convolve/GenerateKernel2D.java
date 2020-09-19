@@ -175,7 +175,7 @@ public class GenerateKernel2D extends CodeGeneratorBase {
 
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateKernel2D app = new GenerateKernel2D();
 		app.generateCode();
 	}

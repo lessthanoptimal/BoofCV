@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public class ExampleTemplateMatching {
 		ShowImages.showWindow(output, "Match Intensity", true);
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 
 		// Load image and templates
 		String directory = UtilIO.pathExample("template");

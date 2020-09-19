@@ -255,7 +255,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplIntegralImageFeatureIntensity app = new GenerateImplIntegralImageFeatureIntensity();
 		app.generateCode();
 	}

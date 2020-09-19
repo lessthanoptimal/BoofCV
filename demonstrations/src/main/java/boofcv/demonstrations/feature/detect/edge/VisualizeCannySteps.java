@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class VisualizeCannySteps {
 //	static String fileName = UtilIO.pathExample("indoors01.jpg");
 //	static String fileName = UtilIO.pathExample("shapes01.png)";
 
-	public static void main( String args[] ){
+	public static void main( String[] args ){
 
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 		GrayF32 inputF32 = ConvertBufferedImage.convertFrom(input,(GrayF32)null);

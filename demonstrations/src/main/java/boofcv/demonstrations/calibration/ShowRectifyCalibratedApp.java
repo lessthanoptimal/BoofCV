@@ -173,7 +173,7 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		return hasProcessed;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		ShowRectifyCalibratedApp app = new ShowRectifyCalibratedApp();
 
 		// camera config, image left, image right

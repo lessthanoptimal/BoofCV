@@ -184,7 +184,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		java.util.List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
 		examples.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));

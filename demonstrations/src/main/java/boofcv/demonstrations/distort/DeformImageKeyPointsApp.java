@@ -369,7 +369,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		public void mouseMoved(MouseEvent e) {}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> inputs = new ArrayList<>();

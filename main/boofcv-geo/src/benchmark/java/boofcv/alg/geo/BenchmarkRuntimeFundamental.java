@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 
 	}
 	
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BenchmarkRuntimeFundamental alg = new BenchmarkRuntimeFundamental();
 
 		alg.runAll();

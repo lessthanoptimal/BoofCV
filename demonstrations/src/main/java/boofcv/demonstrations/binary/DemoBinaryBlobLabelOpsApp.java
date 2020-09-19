@@ -252,7 +252,7 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 		performWork();
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DemoBinaryBlobLabelOpsApp app = new DemoBinaryBlobLabelOpsApp(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<>();

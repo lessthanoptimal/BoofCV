@@ -236,7 +236,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 		doProcess();
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(GrayF32.class, GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();

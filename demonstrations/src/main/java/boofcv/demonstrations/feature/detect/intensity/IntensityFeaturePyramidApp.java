@@ -190,7 +190,7 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 		return processedImage;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		IntensityFeaturePyramidApp<GrayF32, GrayF32> app =
 				new IntensityFeaturePyramidApp<>(GrayF32.class, GrayF32.class);

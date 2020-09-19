@@ -134,7 +134,7 @@ public class WaveletVisualizeApp
 		return processedImage;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 //		BufferedImage in = UtilImageIO.loadImage("data/standard/kodim17.bmp");
 		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayF32.class);
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayU8.class);

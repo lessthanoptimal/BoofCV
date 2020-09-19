@@ -235,7 +235,7 @@ public class BenchmarkConvolve  {
 		return 0;
 	}
 
-//	public static void main( String args[] ) {
+//	public static void main( String[] args ) {
 //		System.out.println("=========  Profile Image Size "+ width +" x "+ height +" ==========");
 //
 //		Runner.main(BenchmarkConvolve.class, args);

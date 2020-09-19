@@ -115,7 +115,7 @@ public class CompareConvertedDescriptionsApp {
 		return list;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		String file1 = UtilIO.pathExample("stitch/kayak_01.jpg");
 		String file2 = UtilIO.pathExample("stitch/kayak_02.jpg");
 

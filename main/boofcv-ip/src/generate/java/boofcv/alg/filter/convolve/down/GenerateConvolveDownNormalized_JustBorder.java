@@ -321,7 +321,7 @@ public class GenerateConvolveDownNormalized_JustBorder extends CodeGeneratorBase
 				"\t}\n\n");
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 		GenerateConvolveDownNormalized_JustBorder gen = new GenerateConvolveDownNormalized_JustBorder();
 		gen.generateCode();
 	}

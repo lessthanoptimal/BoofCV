@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,7 +122,7 @@ public class BenchmarkConvolveNormalizeEdge {
 		return 0;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight +" ==========");
 
 //		Runner.main(BenchmarkConvolveMean.class, args);

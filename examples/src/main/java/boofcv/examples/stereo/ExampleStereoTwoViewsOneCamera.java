@@ -78,7 +78,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	private static final int minDisparity = 15;
 	private static final int rangeDisparity = 85;
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		// specify location of images and calibration
 		String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
 		String imageDir = UtilIO.pathExample("stereo/");

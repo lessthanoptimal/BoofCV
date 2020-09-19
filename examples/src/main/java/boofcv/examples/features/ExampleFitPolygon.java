@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -173,7 +173,7 @@ public class ExampleFitPolygon {
 		gui.addImage(displayImage, "Canny Contour");
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		// load and convert the image into a usable format
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("shapes/shapes02.png"));
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);

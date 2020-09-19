@@ -137,7 +137,7 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 		SwingUtilities.invokeLater(() -> gui.addItem(new ImagePanel(out), name));
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();

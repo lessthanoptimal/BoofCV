@@ -139,7 +139,7 @@ public class GenerateImplDescribeBinaryCompare extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplDescribeBinaryCompare app = new GenerateImplDescribeBinaryCompare();
 		app.generateCode();
 	}

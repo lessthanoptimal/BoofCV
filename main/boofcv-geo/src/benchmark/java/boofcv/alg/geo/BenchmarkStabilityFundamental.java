@@ -226,7 +226,7 @@ public class BenchmarkStabilityFundamental {
 		System.out.printf(" Failures %3d  Score:  50%% = %6.3e  95%% = %6.3e\n", failed, scores.get(scores.size() / 2), scores.get((int) (scores.size() * 0.95)));
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BenchmarkStabilityFundamental app = new BenchmarkStabilityFundamental();
 
 		app.createSceneCube();

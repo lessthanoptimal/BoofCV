@@ -432,7 +432,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		return sumType.compareTo(dataOutput) == 0 ? "" : "( " + dataOutput + " )";
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 		GenerateConvolvedUnrolled_SB a = new GenerateConvolvedUnrolled_SB();
 
 		a.generateCode();

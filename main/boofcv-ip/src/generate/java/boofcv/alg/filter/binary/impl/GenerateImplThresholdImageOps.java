@@ -228,7 +228,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplThresholdImageOps app = new GenerateImplThresholdImageOps();
 		app.parseArguments(args);
 		app.generateCode();

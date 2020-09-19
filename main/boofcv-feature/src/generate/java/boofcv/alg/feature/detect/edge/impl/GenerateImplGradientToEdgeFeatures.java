@@ -185,7 +185,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplGradientToEdgeFeatures app = new GenerateImplGradientToEdgeFeatures();
 		app.parseArguments(args);
 		app.generateCode();

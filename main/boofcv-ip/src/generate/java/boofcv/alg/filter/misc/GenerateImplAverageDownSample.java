@@ -210,7 +210,7 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplAverageDownSample app = new GenerateImplAverageDownSample();
 		app.generateCode();
 	}

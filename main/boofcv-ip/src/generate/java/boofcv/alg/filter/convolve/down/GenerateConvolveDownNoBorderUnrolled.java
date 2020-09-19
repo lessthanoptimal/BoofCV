@@ -438,7 +438,7 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 		return sumType.compareTo(dataOutput) == 0 ? "" : "( " + dataOutput + " )";
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateConvolveDownNoBorderUnrolled a = new GenerateConvolveDownNoBorderUnrolled();
 
 		a.generateCode();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -189,7 +189,7 @@ public class DenoiseAccuracyStudyApp {
 	}
 
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DenoiseAccuracyStudyApp app = new DenoiseAccuracyStudyApp();
 
 		String path = UtilIO.pathExample("standard")+ File.separator;

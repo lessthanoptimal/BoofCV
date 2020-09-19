@@ -130,7 +130,7 @@ public class ExampleFeatureSurf {
 		System.out.println("First descriptor's first value: "+descriptions.get(0).value[0]);
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		// Need to turn off concurrency since the order in which feature are returned
 		// is not determininistic if turned on

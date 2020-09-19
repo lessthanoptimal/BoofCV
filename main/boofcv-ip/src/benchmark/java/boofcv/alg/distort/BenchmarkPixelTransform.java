@@ -66,7 +66,7 @@ public class BenchmarkPixelTransform {
 		ProfileOperation.printOpsPerSec(new TestPixelTransform_F32(alg,name), TEST_TIME);
 	}
 	
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		Random rand = new Random(234);
 
 		Affine2D_F32 affine = new Affine2D_F32((float)rand.nextGaussian(),(float)rand.nextGaussian(),

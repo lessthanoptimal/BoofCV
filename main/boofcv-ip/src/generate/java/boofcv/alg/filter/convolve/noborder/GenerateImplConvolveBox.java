@@ -162,7 +162,7 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 		out.print("\t}\n\n");
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 		GenerateImplConvolveBox generator = new GenerateImplConvolveBox();
 
 		generator.generateCode();

@@ -156,7 +156,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 		display.process();
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		String fileName;
 
 		if (args.length == 0) {

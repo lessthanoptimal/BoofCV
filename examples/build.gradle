@@ -10,21 +10,6 @@ dependencies {
     api 'org.reflections:reflections:0.9.10'
 }
 
-// Only add javafx as a dependency if it exists. The code will run just fine without it,
-// but some visualizations look better
-try {
-    project.project(':integration:boofcv-javafx')
-    dependencies {
-        compile project(':integration:boofcv-javafx')
-    }
-} catch( UnknownProjectException ignore ) {}
-
-idea {
-    module {
-        name = "BoofCV Examples"
-    }
-}
-
 // Create a jar which contains all the applications
 task examples(type: Jar) {
     manifest {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class BenchmarkEdgeNonMaxSupression {
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
 		ImageMiscOps.fillUniform(direction4, rand, -1, 3);
 		ImageMiscOps.fillUniform(direction8, rand, -3, 5);

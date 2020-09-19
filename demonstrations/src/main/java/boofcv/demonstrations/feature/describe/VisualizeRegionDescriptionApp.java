@@ -173,7 +173,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Cave", UtilIO.pathExample("stitch/cave_01.jpg")));
 		inputs.add(new PathLabel("Kayak",UtilIO.pathExample("stitch/kayak_02.jpg")));

@@ -262,7 +262,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\t}\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplInterpolatePixelConvolution app = new GenerateImplInterpolatePixelConvolution();
 		app.parseArguments(args);
 		app.generateCode();

@@ -314,7 +314,7 @@ public class DenoiseVisualizeApp<T extends ImageGray<T>, D extends ImageGray<D>,
 		return total/totalWeight;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DenoiseVisualizeApp app = new DenoiseVisualizeApp(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<>();

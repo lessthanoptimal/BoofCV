@@ -112,7 +112,7 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 		paused = !paused;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<>(GrayU8.class);
 
 		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");

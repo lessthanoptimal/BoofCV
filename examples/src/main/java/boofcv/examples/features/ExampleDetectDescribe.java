@@ -86,7 +86,7 @@ public class ExampleDetectDescribe {
 		return FactoryDetectDescribe.fuseTogether(detector, null, describe);
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		Class imageType = GrayF32.class;
 

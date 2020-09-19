@@ -161,7 +161,7 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 		doRefreshAll();
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DetectPointScaleOriWithNoiseApp app = new DetectPointScaleOriWithNoiseApp(GrayF32.class, GrayF32.class);
 //		DetectPointsWithNoiseApp app = new DetectPointsWithNoiseApp(GrayU8.class,GrayS16.class);
 

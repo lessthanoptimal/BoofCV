@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -129,7 +129,7 @@ public class ExamplePlanarImages {
 		gui.addImage(outputBand0,"Band 0");
 	}
 	
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("apartment_building_02.jpg"));
 
 		// Uncomment lines below to run each example

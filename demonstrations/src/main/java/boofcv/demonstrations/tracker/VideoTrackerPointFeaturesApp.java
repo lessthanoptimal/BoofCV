@@ -382,7 +382,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		//		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 

@@ -136,7 +136,7 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 				"\t}\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateNearestNeighborPixel_IL gen = new GenerateNearestNeighborPixel_IL();
 		gen.parseArguments(args);
 		gen.generateCode();

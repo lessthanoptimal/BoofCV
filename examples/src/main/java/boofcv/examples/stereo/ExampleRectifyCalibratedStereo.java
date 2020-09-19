@@ -62,7 +62,7 @@ import java.io.File;
  */
 public class ExampleRectifyCalibratedStereo {
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
 		StereoParameters param = CalibrationIO.load(new File(dir , "stereo.yaml"));

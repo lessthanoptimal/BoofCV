@@ -681,7 +681,7 @@ public class DetectCalibrationChessboardXCornerApp
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(new PathLabel("Chessboard 1",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));

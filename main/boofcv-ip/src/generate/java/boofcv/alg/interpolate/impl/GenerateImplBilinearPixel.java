@@ -153,7 +153,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplBilinearPixel app = new GenerateImplBilinearPixel();
 		app.parseArguments(args);
 		app.generateCode();

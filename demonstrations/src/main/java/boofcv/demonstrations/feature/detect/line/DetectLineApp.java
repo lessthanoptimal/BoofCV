@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -212,7 +212,7 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		Class imageType = GrayF32.class;
 		Class derivType = GrayF32.class;
 

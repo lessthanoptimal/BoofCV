@@ -115,7 +115,7 @@ public class GenerateImplPyramidOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplPyramidOps app = new GenerateImplPyramidOps();
 		app.generateCode();
 	}

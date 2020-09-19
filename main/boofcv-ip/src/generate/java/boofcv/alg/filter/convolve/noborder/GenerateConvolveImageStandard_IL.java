@@ -243,7 +243,7 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 		out.print("\t}\n\n");
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 		GenerateConvolveImageStandard_IL gen = new GenerateConvolveImageStandard_IL();
 		gen.generateCode();
 	}

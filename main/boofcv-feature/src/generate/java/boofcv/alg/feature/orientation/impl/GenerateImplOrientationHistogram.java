@@ -145,7 +145,7 @@ public class GenerateImplOrientationHistogram extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplOrientationHistogram app = new GenerateImplOrientationHistogram();
 		app.generateCode();
 	}

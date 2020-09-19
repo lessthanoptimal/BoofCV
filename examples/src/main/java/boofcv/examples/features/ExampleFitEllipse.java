@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ import java.util.List;
  */
 public class ExampleFitEllipse {
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		// load and convert the image into a usable format
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);

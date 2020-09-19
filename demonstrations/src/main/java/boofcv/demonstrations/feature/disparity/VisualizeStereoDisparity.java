@@ -645,7 +645,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		String stereoCalib = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/stereo.yaml");
 
 		List<PathLabel> examples = new ArrayList<>();

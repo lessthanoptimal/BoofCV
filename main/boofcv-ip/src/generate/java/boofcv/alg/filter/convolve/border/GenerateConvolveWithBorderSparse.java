@@ -144,7 +144,7 @@ public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateConvolveWithBorderSparse app = new GenerateConvolveWithBorderSparse();
 		app.generateCode();
 	}

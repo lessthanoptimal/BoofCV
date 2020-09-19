@@ -425,7 +425,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		java.util.List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));

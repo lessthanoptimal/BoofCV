@@ -86,11 +86,14 @@ Version : 0.37
       - TODO Add a smart mode where it will skip over frames with little change
   * TODO MetricFromUncalibratedPairwiseGraph needs to identify mistakes and fix them
   * TODO Create validation tests for at least 3 scenarios with known constant motion along one axis
+- Multi-View Stereo
+  - TODO Use existing two view stereo to kludge something together
 - Sparse Bundle Adjustment
   * Fixed bug in how pixels are scaled in ScaleSceneStructure.
   * A view's pose can now be specified relative to other views. This can be a known or estimated parameter
 - MultiViewOps
   * Fixed decomposeMetricCamera() so that it doesn't change the scale of T. This messed up common frames
+  * TODO triangulate N-points using calibrated homogenous coordinates
 - Calibration
   * Stereo calibration now performs a join bundle adjustment after estimating the stereo baseline
 
@@ -99,15 +102,13 @@ TODO Move projective to metric and similar from multiview to perspective
 TODO rename RansacMultiView to RansacCalibrated
 TODO rename FactoryMultiView.triangulateNViewCalibrated to metric
 
-TODO Multi-View Stereo
-  - Use existing two view stereo to cludge something together
-
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint
     * Could this be done by adding two functions: hint(motion) and undo() to undo the last association
   - Update Visual Odometry to use this new API when it makes sense
     * This would be similar to the old two-pass VO approach which got removed
 
+TODO Sparse Disparity Undistort using camera model
 TODO Stereo Feature Association
    - Formalize with a factory
    - Do everything that greedy does now
@@ -115,11 +116,9 @@ TODO Stereo Feature Association
    - Verify that it doesn't allow impossible associations either
 
 - Scene Reconstruction
+  * TODO Loop closure / some generic methods for detecting the same image from a slightly different perspective
   * TODO when associating objects split into feature types, e.g. white and black blobs
   * TODO try improving 3-view by estimating lens distortion in projective camera
-  * TODO triangulate N-points using calibrated homogenous coordinates
-
-TODO Sparse Disparity Undistort using camera model
 
 
 ---------------------------------------------

@@ -106,7 +106,7 @@ public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 		GenerateConvolveStandardSparse gen = new GenerateConvolveStandardSparse();
 		gen.generateCode();
 	}

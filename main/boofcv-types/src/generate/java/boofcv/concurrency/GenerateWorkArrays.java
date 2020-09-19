@@ -106,7 +106,7 @@ public class GenerateWorkArrays extends CodeGeneratorBase {
 				"}\n");
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 		GenerateWorkArrays a = new GenerateWorkArrays();
 
 		a.generateCode();

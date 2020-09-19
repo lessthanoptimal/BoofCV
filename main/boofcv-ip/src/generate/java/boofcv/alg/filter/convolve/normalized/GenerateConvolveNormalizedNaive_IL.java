@@ -285,7 +285,7 @@ public class GenerateConvolveNormalizedNaive_IL extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateConvolveNormalizedNaive_IL gen = new GenerateConvolveNormalizedNaive_IL();
 		gen.generateCode();
 	}

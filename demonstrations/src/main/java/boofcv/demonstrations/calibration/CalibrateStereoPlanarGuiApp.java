@@ -205,7 +205,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DetectorFiducialCalibration detector =
 				FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
 //				FactoryCalibrationTarget.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));

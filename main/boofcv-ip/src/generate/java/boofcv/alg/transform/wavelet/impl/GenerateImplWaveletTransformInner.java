@@ -353,7 +353,7 @@ public class GenerateImplWaveletTransformInner extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplWaveletTransformInner app = new GenerateImplWaveletTransformInner();
 		app.generateCode();
 	}

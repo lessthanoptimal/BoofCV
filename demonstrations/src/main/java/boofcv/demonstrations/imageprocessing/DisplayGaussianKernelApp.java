@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,7 +106,7 @@ public class DisplayGaussianKernelApp<T extends ImageGray<T>> extends SelectAlgo
 		}
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		DisplayGaussianKernelApp<GrayF32> panel = new DisplayGaussianKernelApp<>(GrayF32.class);
 //		DisplayGaussianKernelApp<GrayS32> panel = new DisplayGaussianKernelApp<GrayS32>(GrayS32.class);
 

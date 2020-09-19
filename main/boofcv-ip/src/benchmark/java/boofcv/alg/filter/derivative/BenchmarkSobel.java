@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -129,7 +129,7 @@ public class BenchmarkSobel extends BenchmarkDerivativeBase{
 		ProfileOperation.printOpsPerSec(new SobelUnrolledOuter_F32_Sub(),TEST_TIME);
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BenchmarkSobel benchmark = new BenchmarkSobel();
 
 		BenchmarkSobel.border = true;

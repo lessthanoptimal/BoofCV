@@ -138,7 +138,7 @@ public class GenerateImplIntegralImageConvolve extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplIntegralImageConvolve app = new GenerateImplIntegralImageConvolve();
 		app.generateCode();
 	}

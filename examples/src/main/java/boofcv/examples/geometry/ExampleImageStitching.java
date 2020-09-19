@@ -234,7 +234,7 @@ public class ExampleImageStitching {
 		return new Point2D_I32((int)result.x,(int)result.y);
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		BufferedImage imageA,imageB;
 		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_01.jpg"));
 		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_03.jpg"));

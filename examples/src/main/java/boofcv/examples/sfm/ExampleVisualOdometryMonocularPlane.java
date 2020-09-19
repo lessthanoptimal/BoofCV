@@ -50,7 +50,7 @@ import java.io.File;
  */
 public class ExampleVisualOdometryMonocularPlane {
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 

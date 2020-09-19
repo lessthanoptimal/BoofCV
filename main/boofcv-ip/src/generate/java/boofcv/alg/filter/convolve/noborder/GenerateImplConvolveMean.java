@@ -176,7 +176,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		out.print("\t}\n");
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException {
 		new GenerateImplConvolveMean().generateCode();
 	}
 }

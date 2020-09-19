@@ -49,7 +49,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleVideoStabilization {
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 
 		// Configure the feature detector
 		ConfigPointDetector configDetector = new ConfigPointDetector();

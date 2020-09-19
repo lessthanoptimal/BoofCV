@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,7 +93,7 @@ public class BenchmarkGradientToEdge {
 		}
 	}
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		ImageMiscOps.fillUniform(derivX_F32, rand, 0, 255);
 		ImageMiscOps.fillUniform(derivY_F32, rand, 0, 255);
 		ImageMiscOps.fillUniform(orientation_F32, rand, (float)(-Math.PI/2.0), (float)(Math.PI/2.0));

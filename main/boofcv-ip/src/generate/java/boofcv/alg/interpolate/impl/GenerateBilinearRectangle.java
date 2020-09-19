@@ -223,7 +223,7 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 				"\t}\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateBilinearRectangle gen = new GenerateBilinearRectangle();
 		gen.generateCode();
 	}

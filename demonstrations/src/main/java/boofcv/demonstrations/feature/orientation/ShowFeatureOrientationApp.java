@@ -184,7 +184,7 @@ public class ShowFeatureOrientationApp<T extends ImageGray<T>, D extends ImageGr
 		return hasProcessed;
 	}
 
-	public static void main( String args[] ) {
+	public static void main( String[] args ) {
 		ShowFeatureOrientationApp<GrayF32, GrayF32> app =
 				new ShowFeatureOrientationApp<>(GrayF32.class, GrayF32.class);
 
