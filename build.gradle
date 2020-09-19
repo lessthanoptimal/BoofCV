@@ -216,11 +216,12 @@ subprojects {
 
     // if Maven central isn't setup in ~/.gradle/gradle.properties fill in these variables to make it happy
     if( !project.hasProperty('ossrhUsername') ) {
-        ossrhUsername = "dummy"
-        ossrhPassword = "dummy"
+        ext.ossrhUsername = "dummy"
+        ext.ossrhPassword = "dummy"
+    } else {
+        signing { sign configurations.archives }
     }
 
-    signing { sign configurations.archives }
     publishing {
         publications {
             mavenJava(MavenPublication) {

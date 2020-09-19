@@ -1,3 +1,2 @@
 dependencies {
-    api project.sourceSets.noauto.output
 }
