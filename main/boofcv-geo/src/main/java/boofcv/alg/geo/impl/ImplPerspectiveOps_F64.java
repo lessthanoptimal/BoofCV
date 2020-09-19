@@ -45,16 +45,15 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ImplPerspectiveOps_F64 {
 
-	public static <C extends CameraPinhole>C adjustIntrinsic(C parameters,
-															 DMatrixRMaj adjustMatrix,
-															 C adjustedParam)
-	{
-		if( adjustedParam == null )
+	public static <C extends CameraPinhole> C adjustIntrinsic( C parameters,
+															   DMatrixRMaj adjustMatrix,
+															   C adjustedParam ) {
+		if (adjustedParam == null)
 			adjustedParam = parameters.createLike();
 		adjustedParam.set(parameters);
 
 		DMatrixRMaj K = ImplPerspectiveOps_F64.pinholeToMatrix(parameters, (DMatrixRMaj)null);
-		DMatrixRMaj K_adj = new DMatrixRMaj(3,3);
+		DMatrixRMaj K_adj = new DMatrixRMaj(3, 3);
 		CommonOps_DDRM.mult(adjustMatrix, K, K_adj);
 
 		ImplPerspectiveOps_F64.matrixToPinhole(K_adj, parameters.width, parameters.height, adjustedParam);
@@ -63,11 +62,11 @@ public class ImplPerspectiveOps_F64 {
 	}
 
 	public static DMatrixRMaj pinholeToMatrix( double fx, double fy, double skew,
-											   double cx, double cy , @Nullable DMatrixRMaj K ) {
-		if( K == null ) {
-			K = new DMatrixRMaj(3,3);
+											   double cx, double cy, @Nullable DMatrixRMaj K ) {
+		if (K == null) {
+			K = new DMatrixRMaj(3, 3);
 		} else {
-			K.reshape(3,3);
+			K.reshape(3, 3);
 		}
 
 		CommonOps_DDRM.fill(K, 0);
@@ -82,38 +81,38 @@ public class ImplPerspectiveOps_F64 {
 		return K;
 	}
 
-	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , @Nullable DMatrixRMaj K ) {
-		return pinholeToMatrix( (double)param.fx, (double)param.fy, (double)param.skew, (double)param.cx, (double)param.cy,K);
+	public static DMatrixRMaj pinholeToMatrix( CameraPinhole param, @Nullable DMatrixRMaj K ) {
+		return pinholeToMatrix((double)param.fx, (double)param.fy, (double)param.skew, (double)param.cx, (double)param.cy, K);
 	}
 
-	public static DMatrix3x3 pinholeToMatrix(CameraPinhole param , DMatrix3x3 K ) {
+	public static DMatrix3x3 pinholeToMatrix( CameraPinhole param, DMatrix3x3 K ) {
 
-		if( K == null ) {
+		if (K == null) {
 			K = new DMatrix3x3();
 		} else {
-			CommonOps_DDF3.fill(K,0);
+			CommonOps_DDF3.fill(K, 0);
 		}
 
-		K.a11 = (double) param.fx;
-		K.a12 = (double) param.skew;
-		K.a13 = (double) param.cx;
-		K.a22 = (double) param.fy;
-		K.a23 = (double) param.cy;
+		K.a11 = (double)param.fx;
+		K.a12 = (double)param.skew;
+		K.a13 = (double)param.cx;
+		K.a22 = (double)param.fy;
+		K.a23 = (double)param.cy;
 		K.a33 = 1;
 
 		return K;
 	}
 
-	public static CameraPinhole matrixToPinhole(DMatrixRMaj K , int width , int height , CameraPinhole output ) {
+	public static CameraPinhole matrixToPinhole( DMatrixRMaj K, int width, int height, CameraPinhole output ) {
 
-		if( output == null )
+		if (output == null)
 			output = new CameraPinhole();
 
-		output.fx = K.get(0,0);
-		output.fy = K.get(1,1);
-		output.skew = K.get(0,1);
-		output.cx = K.get(0,2);
-		output.cy = K.get(1,2);
+		output.fx = K.get(0, 0);
+		output.fy = K.get(1, 1);
+		output.skew = K.get(0, 1);
+		output.cx = K.get(0, 2);
+		output.cy = K.get(1, 2);
 
 		output.width = width;
 		output.height = height;
@@ -121,58 +120,58 @@ public class ImplPerspectiveOps_F64 {
 		return output;
 	}
 
-	public static Point2D_F64 convertNormToPixel(CameraModel param , double x , double y , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel( CameraModel param, double x, double y, Point2D_F64 pixel ) {
 
-		if( pixel == null )
+		if (pixel == null)
 			pixel = new Point2D_F64();
 
-		Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(param).distort_F64(false,true);
+		Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(param).distort_F64(false, true);
 
-		normToPixel.compute(x,y,pixel);
+		normToPixel.compute(x, y, pixel);
 
 		return pixel;
 	}
 
-	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm , Point2D_F64 pixel ) {
-		if( pixel == null )
+	public static Point2D_F64 convertNormToPixel( DMatrixRMaj K, Point2D_F64 norm, Point2D_F64 pixel ) {
+		if (pixel == null)
 			pixel = new Point2D_F64();
 
 		PinholeNtoP_F64 alg = new PinholeNtoP_F64();
-		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
+		alg.set(K.get(0, 0), K.get(1, 1), K.get(0, 1), K.get(0, 2), K.get(1, 2));
 
-		alg.compute(norm.x,norm.y,pixel);
+		alg.compute(norm.x, norm.y, pixel);
 
 		return pixel;
 	}
 
-	public static Point2D_F64 convertPixelToNorm(CameraModel param , Point2D_F64 pixel , Point2D_F64 norm ) {
-		if( norm == null )
+	public static Point2D_F64 convertPixelToNorm( CameraModel param, Point2D_F64 pixel, Point2D_F64 norm ) {
+		if (norm == null)
 			norm = new Point2D_F64();
 
 		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(param).undistort_F64(true, false);
 
-		pixelToNorm.compute(pixel.x,pixel.y,norm);
+		pixelToNorm.compute(pixel.x, pixel.y, norm);
 
 		return norm;
 	}
 
-	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K , Point2D_F64 pixel , Point2D_F64 norm ) {
-		if( norm == null )
+	public static Point2D_F64 convertPixelToNorm( DMatrixRMaj K, Point2D_F64 pixel, Point2D_F64 norm ) {
+		if (norm == null)
 			norm = new Point2D_F64();
 
 		PinholePtoN_F64 alg = new PinholePtoN_F64();
-		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
+		alg.set(K.get(0, 0), K.get(1, 1), K.get(0, 1), K.get(0, 2), K.get(1, 2));
 
-		alg.compute(pixel.x,pixel.y,norm);
+		alg.compute(pixel.x, pixel.y, norm);
 
 		return norm;
 	}
 
-	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic , double pixelX, double pixelY, Point2D_F64 norm ) {
-		if( norm == null )
+	public static Point2D_F64 convertPixelToNorm( CameraPinhole intrinsic, double pixelX, double pixelY, Point2D_F64 norm ) {
+		if (norm == null)
 			norm = new Point2D_F64();
 
-		double a11 = (double)( 1.0/intrinsic.fx);
+		double a11 = (double)(1.0/intrinsic.fx);
 		double a12 = (double)(-intrinsic.skew/(intrinsic.fx*intrinsic.fy));
 		double a13 = (double)((intrinsic.skew*intrinsic.cy - intrinsic.cx*intrinsic.fy)/(intrinsic.fx*intrinsic.fy));
 		double a22 = (double)(1.0/intrinsic.fy);
@@ -184,8 +183,7 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
-
-	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X, @Nullable Point2D_F64 pixel) {
+	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X, @Nullable Point2D_F64 pixel ) {
 		DMatrixRMaj R = worldToCamera.R;
 		Vector3D_F64 T = worldToCamera.T;
 
@@ -195,34 +193,34 @@ public class ImplPerspectiveOps_F64 {
 		double z = R.data[6]*X.x + R.data[7]*X.y + R.data[8]*X.z + T.z;
 
 		// see if it's behind the camera
-		if( z <= 0 )
+		if (z <= 0)
 			return null;
 
-		if( pixel == null )
+		if (pixel == null)
 			pixel = new Point2D_F64();
 
 		pixel.set(x/z, y/z);
 
-		if( K == null )
+		if (K == null)
 			return pixel;
 
 		// convert into pixel coordinates
 		return GeometryMath_F64.mult(K, pixel, pixel);
 	}
 
-	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera,
-										  double fx, double skew, double cx, double fy, double cy,
-										  Point3D_F64 X, @Nullable Point2D_F64 pixel) {
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera,
+													 double fx, double skew, double cx, double fy, double cy,
+													 Point3D_F64 X, @Nullable Point2D_F64 pixel ) {
 
 		Point3D_F64 X_cam = new Point3D_F64();
 
 		SePointOps_F64.transform(worldToCamera, X, X_cam);
 
 		// see if it's behind the camera
-		if( X_cam.z <= 0 )
+		if (X_cam.z <= 0)
 			return null;
 
-		if( pixel == null )
+		if (pixel == null)
 			pixel = new Point2D_F64();
 
 		double xx = X_cam.x/X_cam.z;
@@ -234,9 +232,9 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static @Nullable Point2D_F64 renderPixel(Se3_F64 worldToCamera,
-													double fx, double skew, double cx, double fy, double cy,
-													Point4D_F64 X, @Nullable Point2D_F64 pixel) {
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera,
+													 double fx, double skew, double cx, double fy, double cy,
+													 Point4D_F64 X, @Nullable Point2D_F64 pixel ) {
 
 		DMatrixRMaj R = worldToCamera.R;
 		Vector3D_F64 T = worldToCamera.T;
@@ -247,10 +245,10 @@ public class ImplPerspectiveOps_F64 {
 		double z = R.data[6]*X.x + R.data[7]*X.y + R.data[8]*X.z + T.z*X.w;
 
 		// see if it's behind the camera
-		if( z <= 0 )
+		if (z <= 0)
 			return null;
 
-		if( pixel == null )
+		if (pixel == null)
 			pixel = new Point2D_F64();
 
 		double xx = x/z;
@@ -262,7 +260,7 @@ public class ImplPerspectiveOps_F64 {
 		return pixel;
 	}
 
-	public static void renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , Point3D_F64 pixelH ) {
+	public static void renderPixel( DMatrixRMaj worldToCamera, Point3D_F64 X, Point3D_F64 pixelH ) {
 		DMatrixRMaj P = worldToCamera;
 
 		pixelH.x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
@@ -270,7 +268,7 @@ public class ImplPerspectiveOps_F64 {
 		pixelH.z = P.data[8]*X.x + P.data[9]*X.y + P.data[10]*X.z + P.data[11];
 	}
 
-	public static void renderPixel( DMatrixRMaj worldToCamera , Point3D_F64 X , Point2D_F64 pixel ) {
+	public static void renderPixel( DMatrixRMaj worldToCamera, Point3D_F64 X, Point2D_F64 pixel ) {
 		DMatrixRMaj P = worldToCamera;
 
 		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3];
@@ -281,7 +279,7 @@ public class ImplPerspectiveOps_F64 {
 		pixel.y = y/z;
 	}
 
-	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , Point3D_F64 pixelH) {
+	public static void renderPixel( DMatrixRMaj cameraMatrix, Point4D_F64 X, Point3D_F64 pixelH ) {
 		DMatrixRMaj P = cameraMatrix;
 
 		// @formatter:off
@@ -291,7 +289,7 @@ public class ImplPerspectiveOps_F64 {
 		// @formatter:on
 	}
 
-	public static void renderPixel(DMatrixRMaj cameraMatrix , Point4D_F64 X , Point2D_F64 pixel) {
+	public static void renderPixel( DMatrixRMaj cameraMatrix, Point4D_F64 X, Point2D_F64 pixel ) {
 		DMatrixRMaj P = cameraMatrix;
 
 		double x = P.data[0]*X.x + P.data[1]*X.y + P.data[2]*X.z + P.data[3]*X.w;
@@ -302,24 +300,54 @@ public class ImplPerspectiveOps_F64 {
 		pixel.y = y/z;
 	}
 
+	public static double distance( Point4D_F64 a, Point4D_F64 b ) {
 
-	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R , Vector3D_F64 T ,
-												  @Nullable DMatrixRMaj K ,
+		double na = a.norm();
+		double nb = b.norm();
+
+		if (na == 0.0 || nb == 0.0)
+			return a.distance(b);
+
+		// take in account sign ambiguity
+		return Math.sqrt(Math.min(distance(a, b, na, nb), distance(a, b, -na, nb)));
+	}
+
+	public static double distance( Point4D_F64 a, Point4D_F64 b, double na, double nb ) {
+		double xa = a.x/na;
+		double ya = a.y/na;
+		double za = a.z/na;
+		double wa = a.w/na;
+
+		double xb = b.x/nb;
+		double yb = b.y/nb;
+		double zb = b.z/nb;
+		double wb = b.w/nb;
+
+		double dx = xa - xb;
+		double dy = ya - yb;
+		double dz = za - zb;
+		double dw = wa - wb;
+
+		return dx*dx + dy*dy + dz*dz + dw*dw;
+	}
+
+	public static DMatrixRMaj createCameraMatrix( DMatrixRMaj R, Vector3D_F64 T,
+												  @Nullable DMatrixRMaj K,
 												  @Nullable DMatrixRMaj ret ) {
-		if( ret == null )
-			ret = new DMatrixRMaj(3,4);
+		if (ret == null)
+			ret = new DMatrixRMaj(3, 4);
 
-		CommonOps_DDRM.insert(R,ret,0,0);
+		CommonOps_DDRM.insert(R, ret, 0, 0);
 
 		ret.data[3] = T.x;
 		ret.data[7] = T.y;
 		ret.data[11] = T.z;
 
-		if( K == null )
+		if (K == null)
 			return ret;
 
-		DMatrixRMaj temp = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.mult(K,ret,temp);
+		DMatrixRMaj temp = new DMatrixRMaj(3, 4);
+		CommonOps_DDRM.mult(K, ret, temp);
 
 		ret.set(temp);
 

@@ -42,7 +42,7 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  */
 public class ResolveSignAmbiguityPositiveDepth {
 	/** Triangulation for n-view case */
-	public TriangulateNViewsMetric triangulateN = FactoryMultiView.triangulateNViewCalibrated(null);
+	public TriangulateNViewsMetric triangulateN = FactoryMultiView.triangulateNViewMetric(null);
 
 	/** Indicates if the sign was changed */
 	public boolean signChanged;

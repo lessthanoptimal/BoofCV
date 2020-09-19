@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.alg.geo.NormalizationPoint2D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 
@@ -47,15 +49,15 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class TriangulateProjectiveLinearDLT {
-	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
-	private DMatrixRMaj nullspace = new DMatrixRMaj(4,1);
-	private DMatrixRMaj A = new DMatrixRMaj(4,4);
+	private final SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
+	private final DMatrixRMaj nullspace = new DMatrixRMaj(4, 1);
+	private final DMatrixRMaj A = new DMatrixRMaj(4, 4);
 
-	// used in geometry test
-	public double singularThreshold = 1;
+	/** used in geometry test */
+	public @Getter @Setter double singularThreshold = 1;
 
 	// used for normalizing pixel coordinates and improving linear solution
-	NormalizationPoint2D stats = new NormalizationPoint2D();
+	final NormalizationPoint2D stats = new NormalizationPoint2D();
 
 	/**
 	 * <p>
@@ -68,35 +70,35 @@ public class TriangulateProjectiveLinearDLT {
 	 * @param found Output, found 3D point in homogenous coordinates.  Modified.
 	 * @return true if triangulation was successful or false if it failed
 	 */
-	public GeometricResult triangulate( List<Point2D_F64> observations ,
+	public GeometricResult triangulate( List<Point2D_F64> observations,
 										List<DMatrixRMaj> cameraMatrices,
 										Point4D_F64 found ) {
-		if( observations.size() != cameraMatrices.size() )
+		if (observations.size() != cameraMatrices.size())
 			throw new IllegalArgumentException("Number of observations must match the number of motions");
 
-		LowLevelMultiViewOps.computeNormalization(observations,stats);
+		LowLevelMultiViewOps.computeNormalization(observations, stats);
 
 		final int N = cameraMatrices.size();
 
-		A.reshape(2*N,4);
+		A.reshape(2*N, 4);
 
 		int index = 0;
 
-		for( int i = 0; i < N; i++ ) {
-			index = addView(cameraMatrices.get(i),observations.get(i),index);
+		for (int i = 0; i < N; i++) {
+			index = addView(cameraMatrices.get(i), observations.get(i), index);
 		}
 
-		if( !solverNull.process(A,1, nullspace) )
+		if (!solverNull.process(A, 1, nullspace))
 			return GeometricResult.SOLVE_FAILED;
 
 		// if the second smallest singular value is the same size as the smallest there's problem
-		double sv[] = solverNull.getSingularValues();
+		double[] sv = solverNull.getSingularValues();
 		Arrays.sort(sv);
-		if( sv[1]*singularThreshold <= sv[0] ) {
+		if (sv[1]*singularThreshold <= sv[0]) {
 			return GeometricResult.GEOMETRY_POOR;
 		}
 
-		double ns[] = nullspace.data;
+		double[] ns = nullspace.data;
 		found.x = ns[0];
 		found.y = ns[1];
 		found.z = ns[2];
@@ -108,16 +110,17 @@ public class TriangulateProjectiveLinearDLT {
 	/**
 	 * Adds a view to the A matrix. Computed using cross product.
 	 */
-	private int addView( DMatrixRMaj P , Point2D_F64 a , int index ) {
+	private int addView( DMatrixRMaj P, Point2D_F64 a, int index ) {
 
 		final double sx = stats.stdX, sy = stats.stdY;
 //		final double cx = stats.meanX, cy = stats.meanY;
 
-
 		// Easier to read the code when P is broken up this way
+		// @formatter:off
 		double r11 = P.data[0], r12 = P.data[1], r13 = P.data[2],  r14=P.data[3];
 		double r21 = P.data[4], r22 = P.data[5], r23 = P.data[6],  r24=P.data[7];
 		double r31 = P.data[8], r32 = P.data[9], r33 = P.data[10], r34=P.data[11];
+		// @formatter:on
 
 		// These rows are derived by applying the scaling matrix to pixels and camera matrix
 		// px = (a.x/sx - cx/sx)
@@ -125,25 +128,17 @@ public class TriangulateProjectiveLinearDLT {
 		// A[0,0] = px*r31 - (r11-cx*r31)/sx (after normalization)
 
 		// first row
-		A.data[index++] = (a.x*r31-r11)/sx;
-		A.data[index++] = (a.x*r32-r12)/sx;
-		A.data[index++] = (a.x*r33-r13)/sx;
-		A.data[index++] = (a.x*r34-r14)/sx;
+		A.data[index++] = (a.x*r31 - r11)/sx;
+		A.data[index++] = (a.x*r32 - r12)/sx;
+		A.data[index++] = (a.x*r33 - r13)/sx;
+		A.data[index++] = (a.x*r34 - r14)/sx;
 
 		// second row
-		A.data[index++] = (a.y*r31-r21)/sy;
-		A.data[index++] = (a.y*r32-r22)/sy;
-		A.data[index++] = (a.y*r33-r23)/sy;
-		A.data[index++] = (a.y*r34-r24)/sy;
+		A.data[index++] = (a.y*r31 - r21)/sy;
+		A.data[index++] = (a.y*r32 - r22)/sy;
+		A.data[index++] = (a.y*r33 - r23)/sy;
+		A.data[index++] = (a.y*r34 - r24)/sy;
 
 		return index;
-	}
-
-	public double getSingularThreshold() {
-		return singularThreshold;
-	}
-
-	public void setSingularThreshold(double singularThreshold) {
-		this.singularThreshold = singularThreshold;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,21 +23,22 @@ import boofcv.alg.geo.triangulate.Triangulate2ViewsGeometricMetric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 
 /**
  * Wrapper around {@link Triangulate2ViewsGeometricMetric} for {@link Triangulate2ViewsMetric}.
- * 
+ *
  * @author Peter Abeles
  */
 public class Wrap2ViewsTriangulateGeometric implements Triangulate2ViewsMetric {
 
-	Triangulate2ViewsGeometricMetric alg = new Triangulate2ViewsGeometricMetric();
+	final @Getter Triangulate2ViewsGeometricMetric alg = new Triangulate2ViewsGeometricMetric();
 
 	@Override
-	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
-							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
+	public boolean triangulate( Point2D_F64 obsA, Point2D_F64 obsB,
+								Se3_F64 fromAtoB, Point3D_F64 foundInA ) {
 
-		alg.triangulate(obsA,obsB, fromAtoB, foundInA);
+		alg.triangulate(obsA, obsB, fromAtoB, foundInA);
 		return true;
 	}
 }

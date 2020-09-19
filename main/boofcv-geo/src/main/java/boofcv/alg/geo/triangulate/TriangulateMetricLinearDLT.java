@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 
@@ -45,15 +47,15 @@ import java.util.List;
  */
 public class TriangulateMetricLinearDLT {
 
-	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
-	private DMatrixRMaj nullspace = new DMatrixRMaj(4,1);
-	private DMatrixRMaj A = new DMatrixRMaj(4,4);
+	private final SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
+	private final DMatrixRMaj nullspace = new DMatrixRMaj(4, 1);
+	private final DMatrixRMaj A = new DMatrixRMaj(4, 4);
 
-	// used in geometry test
-	public double singularThreshold = 1;
+	/** used in geometry test */
+	public @Getter @Setter double singularThreshold = 1;
 
 	// used for normalizing pixel coordinates and improving linear solution
-	NormalizationPoint2D stats = new NormalizationPoint2D();
+	final NormalizationPoint2D stats = new NormalizationPoint2D();
 
 	/**
 	 * <p>
@@ -68,25 +70,25 @@ public class TriangulateMetricLinearDLT {
 	 * @param worldToView Transformations from world to the view.  Not modified.
 	 * @param found (Output) 3D point in homogenous coordinates.  Modified.
 	 */
-	public GeometricResult triangulate( List<Point2D_F64> observations ,
-										List<Se3_F64> worldToView ,
+	public GeometricResult triangulate( List<Point2D_F64> observations,
+										List<Se3_F64> worldToView,
 										Point4D_F64 found ) {
-		if( observations.size() != worldToView.size() )
+		if (observations.size() != worldToView.size())
 			throw new IllegalArgumentException("Number of observations must match the number of motions");
-		
+
 		final int N = worldToView.size();
-		
-		A.reshape(2*N,4,false);
-		
+
+		A.reshape(2*N, 4, false);
+
 		int index = 0;
-		
-		for( int i = 0; i < N; i++ ) {
-			index = addView(worldToView.get(i),observations.get(i),index);
+
+		for (int i = 0; i < N; i++) {
+			index = addView(worldToView.get(i), observations.get(i), index);
 		}
 
 		return finishSolving(found);
 	}
-	
+
 	/**
 	 * <p>
 	 * Given two observations of the same point from two views and a known motion between the
@@ -101,36 +103,36 @@ public class TriangulateMetricLinearDLT {
 	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
 	 * @param foundInA Output, the found 3D position of the point.  Modified.
 	 */
-	public GeometricResult triangulate( Point2D_F64 a , Point2D_F64 b ,
-										Se3_F64 fromAtoB ,
+	public GeometricResult triangulate( Point2D_F64 a, Point2D_F64 b,
+										Se3_F64 fromAtoB,
 										Point4D_F64 foundInA ) {
 		A.reshape(4, 4);
 
-		int index = addView(fromAtoB,b,0);
+		int index = addView(fromAtoB, b, 0);
 
 		// third row
 		A.data[index++] = -1;
 		A.data[index++] = 0;
 		A.data[index++] = a.x;
 		A.data[index++] = 0;
-		
+
 		// fourth row
 		A.data[index++] = 0;
 		A.data[index++] = -1;
 		A.data[index++] = a.y;
-		A.data[index  ] = 0;
+		A.data[index] = 0;
 
 		return finishSolving(foundInA);
 	}
 
-	private GeometricResult finishSolving(Point4D_F64 foundInA) {
+	private GeometricResult finishSolving( Point4D_F64 foundInA ) {
 		if (!solverNull.process(A, 1, nullspace))
 			return GeometricResult.SOLVE_FAILED;
 
 		// if the second smallest singular value is the same size as the smallest there's problem
-		double sv[] = solverNull.getSingularValues();
+		double[] sv = solverNull.getSingularValues();
 		Arrays.sort(sv);
-		if (sv[1] * singularThreshold <= sv[0]) {
+		if (sv[1]*singularThreshold <= sv[0]) {
 			return GeometricResult.GEOMETRY_POOR;
 		}
 
@@ -142,14 +144,14 @@ public class TriangulateMetricLinearDLT {
 		return GeometricResult.SUCCESS;
 	}
 
-	private int addView( Se3_F64 motion , Point2D_F64 a , int index ) {
+	private int addView( Se3_F64 motion, Point2D_F64 a, int index ) {
 
 		final double sx = stats.stdX, sy = stats.stdY;
 //		final double cx = stats.meanX, cy = stats.meanY;
 
 		DMatrixRMaj R = motion.getR();
 		Vector3D_F64 T = motion.getT();
-		
+
 		double r11 = R.data[0], r12 = R.data[1], r13 = R.data[2];
 		double r21 = R.data[3], r22 = R.data[4], r23 = R.data[5];
 		double r31 = R.data[6], r32 = R.data[7], r33 = R.data[8];
@@ -158,25 +160,17 @@ public class TriangulateMetricLinearDLT {
 		// more comments are in the projective code
 
 		// first row
-		A.data[index++] = (a.x*r31-r11)/sx;
-		A.data[index++] = (a.x*r32-r12)/sx;
-		A.data[index++] = (a.x*r33-r13)/sx;
-		A.data[index++] = (a.x*T.z-T.x)/sx;
+		A.data[index++] = (a.x*r31 - r11)/sx;
+		A.data[index++] = (a.x*r32 - r12)/sx;
+		A.data[index++] = (a.x*r33 - r13)/sx;
+		A.data[index++] = (a.x*T.z - T.x)/sx;
 
 		// second row
-		A.data[index++] = (a.y*r31-r21)/sy;
-		A.data[index++] = (a.y*r32-r22)/sy;
-		A.data[index++] = (a.y*r33-r23)/sy;
-		A.data[index++] = (a.y*T.z-T.y)/sy;
-		
+		A.data[index++] = (a.y*r31 - r21)/sy;
+		A.data[index++] = (a.y*r32 - r22)/sy;
+		A.data[index++] = (a.y*r33 - r23)/sy;
+		A.data[index++] = (a.y*T.z - T.y)/sy;
+
 		return index;
-	}
-
-	public double getSingularThreshold() {
-		return singularThreshold;
-	}
-
-	public void setSingularThreshold(double singularThreshold) {
-		this.singularThreshold = singularThreshold;
 	}
 }

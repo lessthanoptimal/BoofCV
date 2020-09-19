@@ -1639,8 +1639,7 @@ public class MultiViewOps {
 	 * @param observations observations of features in the images
 	 */
 	public static void triangulatePoints( SceneStructureMetric structure, SceneObservations observations ) {
-		TriangulateNViewsMetric triangulation = FactoryMultiView.
-				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC());
+		TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewMetric(ConfigTriangulation.GEOMETRIC());
 
 		List<RemoveBrownPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.size; i++) {
@@ -1683,7 +1682,7 @@ public class MultiViewOps {
 				list_p_to_n.get(v.camera).compute(n.x, n.y, n);
 			}
 
-			triangulation.triangulate(normObs.toList(), worldToViews, X);
+			triangulator.triangulate(normObs.toList(), worldToViews, X);
 			sp.set(X.x, X.y, X.z);
 		}
 	}

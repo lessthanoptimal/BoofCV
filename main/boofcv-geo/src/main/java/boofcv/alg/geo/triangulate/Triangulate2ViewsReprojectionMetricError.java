@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,19 +29,18 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class Triangulate2ViewReprojectionMetricError {
+public class Triangulate2ViewsReprojectionMetricError {
 
 	CameraPinhole intrinsicA;
 	CameraPinhole intrinsicB;
 
-	Point3D_F64 Xb = new Point3D_F64();
+	final Point3D_F64 Xb = new Point3D_F64();
 
-	Point2D_F64 pixelN = new Point2D_F64();
-	Point2D_F64 pixelX = new Point2D_F64();
+	final Point2D_F64 pixelN = new Point2D_F64();
+	final Point2D_F64 pixelX = new Point2D_F64();
 
 	public void configure( CameraPinhole parametersA,
-						   CameraPinhole parametersB )
-	{
+						   CameraPinhole parametersB ) {
 		this.intrinsicA = parametersA;
 		this.intrinsicB = parametersB;
 	}
@@ -54,17 +53,16 @@ public class Triangulate2ViewReprojectionMetricError {
 	 * @param a_to_b transform from view A to view B
 	 * @param Xa 3D location in image A
 	 */
-	public double process(Point2D_F64 a , Point2D_F64 b , Se3_F64 a_to_b ,
-						  Point3D_F64 Xa )
-	{
-		PerspectiveOps.convertNormToPixel(intrinsicA,a.x,a.y,pixelN);
-		PerspectiveOps.convertNormToPixel(intrinsicA,Xa.x/Xa.z, Xa.y/Xa.z,pixelX);
+	public double process( Point2D_F64 a, Point2D_F64 b, Se3_F64 a_to_b,
+						   Point3D_F64 Xa ) {
+		PerspectiveOps.convertNormToPixel(intrinsicA, a.x, a.y, pixelN);
+		PerspectiveOps.convertNormToPixel(intrinsicA, Xa.x/Xa.z, Xa.y/Xa.z, pixelX);
 
 		double error = pixelN.distance2(pixelX);
 
-		a_to_b.transform(Xa,Xb);
-		PerspectiveOps.convertNormToPixel(intrinsicB,b.x,b.y,pixelN);
-		PerspectiveOps.convertNormToPixel(intrinsicB,Xb.x/Xb.z, Xb.y/Xb.z,pixelX);
+		a_to_b.transform(Xa, Xb);
+		PerspectiveOps.convertNormToPixel(intrinsicB, b.x, b.y, pixelN);
+		PerspectiveOps.convertNormToPixel(intrinsicB, Xb.x/Xb.z, Xb.y/Xb.z, pixelX);
 
 
 		return (error + pixelN.distance2(pixelX))/2;

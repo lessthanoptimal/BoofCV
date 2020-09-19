@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,25 +18,16 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.GeneralTestRefineTriangulateMetric;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
-import org.ejml.data.DMatrixRMaj;
-
-import java.util.List;
+import boofcv.abst.geo.GeneralCheckTriangulate2ViewsProjective;
+import boofcv.abst.geo.Triangulate2ViewsProjective;
 
 /**
  * @author Peter Abeles
  */
-public class TestRefineTriangulateEpipolarLS extends GeneralTestRefineTriangulateMetric {
-
-	TriangulateRefineEpipolarLS alg = new TriangulateRefineEpipolarLS(1e-8,200);
+public class TestWrap2ViewsTriangulateProjectiveDLT extends GeneralCheckTriangulate2ViewsProjective {
 
 	@Override
-	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,
-							List<DMatrixRMaj> essential,
-							Point3D_F64 initial, Point3D_F64 found) {
-		alg.process(obsPts,essential,initial,found);
+	public Triangulate2ViewsProjective createAlg() {
+		return new Wrap2ViewsTriangulateProjectiveDLT();
 	}
 }

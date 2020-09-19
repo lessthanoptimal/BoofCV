@@ -124,7 +124,7 @@ public class PairwiseGraphUtils {
 
 	public PairwiseGraphUtils( ConfigProjectiveReconstruction config ) {
 		config.checkValidity();
-		triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC());
+		triangulator = FactoryMultiView.triangulateNViewProj(ConfigTriangulation.GEOMETRIC());
 		ransac = FactoryMultiViewRobust.trifocalRansac(
 				config.ransacTrifocal, config.ransacError, config.ransac);
 		sba = FactoryMultiView.bundleSparseProjective(config.sba);

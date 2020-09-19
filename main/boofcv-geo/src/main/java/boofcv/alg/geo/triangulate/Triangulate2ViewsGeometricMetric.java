@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import georegression.struct.se.Se3_F64;
 public class Triangulate2ViewsGeometricMetric {
 
 	// ray going from principle point to observation point
-	LineParametric3D_F64 rayA = new LineParametric3D_F64();
-	LineParametric3D_F64 rayB = new LineParametric3D_F64();
+	final LineParametric3D_F64 rayA = new LineParametric3D_F64();
+	final LineParametric3D_F64 rayB = new LineParametric3D_F64();
 
 	/**
 	 * <p>
@@ -49,10 +49,9 @@ public class Triangulate2ViewsGeometricMetric {
 	 * @param a_to_b Transformation from camera view 'a' to 'b'  Not modified.
 	 * @param foundInA (Output) Found 3D position of the point in reference frame 'a'.  Modified.
 	 */
-	public void triangulate( Point2D_F64 a , Point2D_F64 b ,
-							 Se3_F64 a_to_b ,
-							 Point3D_F64 foundInA )
-	{
+	public void triangulate( Point2D_F64 a, Point2D_F64 b,
+							 Se3_F64 a_to_b,
+							 Point3D_F64 foundInA ) {
 		// b_to_a = R'*(X_b-T)=X_a
 		// rayB should start at origin of B so X_b = 0
 		// Thus, rayB.p = -R'*T
@@ -62,11 +61,11 @@ public class Triangulate2ViewsGeometricMetric {
 		rayB.p.set(-t.x, -t.y, -t.z);
 
 		// rotate observation in B into camera A's view
-		GeometryMath_F64.multTran(a_to_b.getR(),rayB.p,rayB.p);
-		GeometryMath_F64.multTran(a_to_b.getR(),b,rayB.slope);
+		GeometryMath_F64.multTran(a_to_b.getR(), rayB.p, rayB.p);
+		GeometryMath_F64.multTran(a_to_b.getR(), b, rayB.slope);
 
-		rayA.slope.set(a.x,a.y,1);
+		rayA.slope.set(a.x, a.y, 1);
 
-		ClosestPoint3D_F64.closestPoint(rayA,rayB,foundInA);
+		ClosestPoint3D_F64.closestPoint(rayA, rayB, foundInA);
 	}
 }

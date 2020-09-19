@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,15 @@ import boofcv.abst.geo.RefineTriangulateProjective;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateProjective;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
+
+import static boofcv.misc.BoofMiscOps.assertEq;
 
 /**
  * Nonlinear least-squares triangulation for projective geometry in homogenous coordinates.
@@ -35,41 +39,40 @@ import java.util.List;
  */
 public class TriangulateRefineProjectiveLS implements RefineTriangulateProjective {
 
-	ResidualsTriangulateProjective func = new ResidualsTriangulateProjective();
+	final @Getter ResidualsTriangulateProjective func = new ResidualsTriangulateProjective();
 
-	UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
+	final @Getter UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
-	double param[] = new double[4];
-	int maxIterations;
-	double convergenceTol;
+	final double[] param = new double[4];
+	@Getter @Setter int maxIterations;
+	@Getter @Setter double convergenceTol;
 
-	public TriangulateRefineProjectiveLS(double convergenceTol,
-										 int maxIterations)
-	{
+	public TriangulateRefineProjectiveLS( double convergenceTol, int maxIterations ) {
 		this.convergenceTol = convergenceTol;
 		this.maxIterations = maxIterations;
-		minimizer = FactoryOptimization.levenbergMarquardt(null,false);
+		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+		assertEq(4,func.getNumOfInputsN());
 	}
 
 	@Override
-	public boolean process(List<Point2D_F64> observations, List<DMatrixRMaj> cameraMatrices,
-						   Point4D_F64 worldPt, Point4D_F64 refinedPt) {
+	public boolean process( List<Point2D_F64> observations, List<DMatrixRMaj> cameraMatrices,
+							Point4D_F64 worldPt, Point4D_F64 refinedPt ) {
 		func.setObservations(observations, cameraMatrices);
-		minimizer.setFunction(func,null);
+		minimizer.setFunction(func, null);
 
 		param[0] = worldPt.x;
 		param[1] = worldPt.y;
 		param[2] = worldPt.z;
 		param[3] = worldPt.w;
 
-		minimizer.initialize(param,0,convergenceTol*observations.size());
+		minimizer.initialize(param, 0, convergenceTol*observations.size());
 
-		for( int i = 0; i < maxIterations; i++ ) {
-			if( minimizer.iterate() )
+		for (int i = 0; i < maxIterations; i++) {
+			if (minimizer.iterate())
 				break;
 		}
 
-		double found[] = minimizer.getParameters();
+		double[] found = minimizer.getParameters();
 		refinedPt.x = found[0];
 		refinedPt.y = found[1];
 		refinedPt.z = found[2];

@@ -73,7 +73,7 @@ public class RefineThreeViewProjectiveGeometric {
 	 * Creates a constructor using default triangulation and SBA configuration
 	 */
 	public RefineThreeViewProjectiveGeometric() {
-		triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC());
+		triangulator = FactoryMultiView.triangulateNViewProj(ConfigTriangulation.GEOMETRIC());
 
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 		configLM.hessianScaling = false; // seems to do better without this. Reconsider later on

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,17 +40,17 @@ public abstract class ResidualTriangulateProjectiveChecks extends CommonTriangul
 	 */
 	@Test
 	public void perfect() {
-		createProjectiveScene();
-		FunctionNtoM alg = createAlg(obsPts, cameraMatrices);
+		createScene();
+		FunctionNtoM alg = createAlg(obsPixels, cameraMatrices);
 
-		double input[] = new double[]{worldPoint.x,worldPoint.y,worldPoint.z,1};
-		double output[] = new double[ alg.getNumOfOutputsM() ];
-		
-		alg.process(input,output);
+		double input[] = new double[]{worldPoint.x, worldPoint.y, worldPoint.z, 1};
+		double output[] = new double[alg.getNumOfOutputsM()];
+
+		alg.process(input, output);
 
 		// there should be no errors
 		double error = computeCost(output);
-		assertEquals(0,error,1e-8);
+		assertEquals(0, error, 1e-8);
 
 		// corrupt the parameter, which should cause errors in the residuals
 		input[0] += 1;

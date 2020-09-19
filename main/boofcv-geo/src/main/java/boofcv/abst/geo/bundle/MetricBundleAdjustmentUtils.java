@@ -45,7 +45,7 @@ public class MetricBundleAdjustmentUtils {
 	public final @Getter SceneStructureMetric structure = new SceneStructureMetric(true);
 	public final @Getter SceneObservations observations = new SceneObservations();
 	public @Getter @Setter BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
-	public @Getter @Setter TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated(null);
+	public @Getter @Setter TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewMetric(null);
 	public @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,9 +56,9 @@ import java.util.List;
 public class PixelDepthLinearMetric {
 
 	// local variables used for temporary storage
-	private DMatrixRMaj temp0 = new DMatrixRMaj(3,3);
-	private Vector3D_F64 temp1 = new Vector3D_F64();
-	private Vector3D_F64 temp2 = new Vector3D_F64();
+	private final DMatrixRMaj temp0 = new DMatrixRMaj(3, 3);
+	private final Vector3D_F64 temp1 = new Vector3D_F64();
+	private final Vector3D_F64 temp2 = new Vector3D_F64();
 
 	/**
 	 * Computes the pixel depth from N views of the same object.  Pixel depth in the first frame.
@@ -67,24 +67,23 @@ public class PixelDepthLinearMetric {
 	 * @param motion List of camera motions.  Each index 'i' is the motion from view 0 to view i+1.
 	 * @return depth of the pixels
 	 */
-	public double depthNView( List<Point2D_F64> obs ,
-							  List<Se3_F64> motion )
-	{
+	public double depthNView( List<Point2D_F64> obs,
+							  List<Se3_F64> motion ) {
 
 		double top = 0, bottom = 0;
 
 		Point2D_F64 a = obs.get(0);
-		for( int i = 1; i < obs.size(); i++ ) {
-			Se3_F64 se = motion.get(i-1);
+		for (int i = 1; i < obs.size(); i++) {
+			Se3_F64 se = motion.get(i - 1);
 			Point2D_F64 b = obs.get(i);
 
 			GeometryMath_F64.multCrossA(b, se.getR(), temp0);
-			GeometryMath_F64.mult(temp0,a,temp1);
+			GeometryMath_F64.mult(temp0, a, temp1);
 
 			GeometryMath_F64.cross(b, se.getT(), temp2);
 
-			top += temp2.x+temp2.y+temp2.z;
-			bottom += temp1.x+temp1.y+temp1.z;
+			top += temp2.x + temp2.y + temp2.z;
+			bottom += temp1.x + temp1.y + temp1.z;
 		}
 
 		return -top/bottom;
@@ -98,17 +97,15 @@ public class PixelDepthLinearMetric {
 	 * @param fromAtoB Transform from frame a to frame b.
 	 * @return Pixel depth in first frame. In same units as T inside of fromAtoB.
 	 */
-	public double depth2View( Point2D_F64 a , Point2D_F64 b , Se3_F64 fromAtoB )
-	{
+	public double depth2View( Point2D_F64 a, Point2D_F64 b, Se3_F64 fromAtoB ) {
 		DMatrixRMaj R = fromAtoB.getR();
 		Vector3D_F64 T = fromAtoB.getT();
 
 		GeometryMath_F64.multCrossA(b, R, temp0);
-		GeometryMath_F64.mult(temp0,a,temp1);
+		GeometryMath_F64.mult(temp0, a, temp1);
 
 		GeometryMath_F64.cross(b, T, temp2);
 
-		return -(temp2.x+temp2.y+temp2.z)/(temp1.x+temp1.y+temp1.z);
+		return -(temp2.x + temp2.y + temp2.z)/(temp1.x + temp1.y + temp1.z);
 	}
-
 }

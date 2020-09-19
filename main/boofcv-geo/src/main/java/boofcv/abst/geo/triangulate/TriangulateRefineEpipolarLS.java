@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,15 @@ import boofcv.abst.geo.RefineTriangulateEpipolar;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateEpipolarSampson;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
+
+import static boofcv.misc.BoofMiscOps.assertEq;
 
 /**
  * Nonlinear least squares triangulation.
@@ -35,42 +39,41 @@ import java.util.List;
  */
 public class TriangulateRefineEpipolarLS implements RefineTriangulateEpipolar {
 
-	ResidualsTriangulateEpipolarSampson func = new ResidualsTriangulateEpipolarSampson();
+	final @Getter ResidualsTriangulateEpipolarSampson func = new ResidualsTriangulateEpipolarSampson();
 
-	UnconstrainedLeastSquares minimizer;
+	final @Getter UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
-	double param[] = new double[3];
-	int maxIterations;
-	double convergenceTol;
+	final double[] param = new double[3];
+	@Getter @Setter int maxIterations;
+	@Getter @Setter double convergenceTol;
 
-	public TriangulateRefineEpipolarLS(double convergenceTol, int maxIterations)
-	{
+	public TriangulateRefineEpipolarLS( double convergenceTol, int maxIterations ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		minimizer = FactoryOptimization.levenbergMarquardt( null,false);
+		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+		assertEq(3,func.getNumOfInputsN());
 	}
 
 	@Override
-	public boolean process(List<Point2D_F64> observations,
-						   List<DMatrixRMaj> fundamentalWorldToCam,
-						   Point3D_F64 worldPt, Point3D_F64 refinedPt)
-	{
+	public boolean process( List<Point2D_F64> observations,
+							List<DMatrixRMaj> fundamentalWorldToCam,
+							Point3D_F64 worldPt, Point3D_F64 refinedPt ) {
 		func.setObservations(observations, fundamentalWorldToCam);
-		minimizer.setFunction(func,null);
+		minimizer.setFunction(func, null);
 
 		// the parameter being optimized is the world point location
 		param[0] = worldPt.x;
 		param[1] = worldPt.y;
 		param[2] = worldPt.z;
 
-		minimizer.initialize(param,0,convergenceTol*observations.size());
+		minimizer.initialize(param, 0, convergenceTol*observations.size());
 
-		for( int i = 0; i < maxIterations; i++ ) {
-			if( minimizer.iterate() )
+		for (int i = 0; i < maxIterations; i++) {
+			if (minimizer.iterate())
 				break;
 		}
 
-		double found[] = minimizer.getParameters();
+		double[] found = minimizer.getParameters();
 		refinedPt.x = found[0];
 		refinedPt.y = found[1];
 		refinedPt.z = found[2];

@@ -178,7 +178,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		this.modelRefiner = modelRefiner;
 		this.bundleAdjustment = bundleAdjustment;
 
-		this.triangulateN = FactoryMultiView.triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC());
+		this.triangulateN = FactoryMultiView.triangulateNViewMetric(ConfigTriangulation.GEOMETRIC());
 
 		featsLeft0 = new ImageInfo();
 		featsLeft1 = new ImageInfo();

@@ -81,13 +81,13 @@ public class FactoryMultiView {
 	 * @param config (Optional) configuration
 	 * @return bundle adjustment
 	 */
-	public static BundleAdjustment<SceneStructureMetric> bundleSparseMetric(@Nullable ConfigBundleAdjustment config ) {
-		if( config == null )
+	public static BundleAdjustment<SceneStructureMetric> bundleSparseMetric( @Nullable ConfigBundleAdjustment config ) {
+		if (config == null)
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
 
-		if( config.configOptimizer instanceof ConfigTrustRegion )
+		if (config.configOptimizer instanceof ConfigTrustRegion)
 			minimizer = FactoryOptimizationSparse.doglegSchur((ConfigTrustRegion)config.configOptimizer);
 		else
 			minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer);
@@ -105,13 +105,13 @@ public class FactoryMultiView {
 	 * @param config (Optional) configuration
 	 * @return bundle adjustment
 	 */
-	public static BundleAdjustment<SceneStructureProjective> bundleSparseProjective(@Nullable ConfigBundleAdjustment config ) {
-		if( config == null )
+	public static BundleAdjustment<SceneStructureProjective> bundleSparseProjective( @Nullable ConfigBundleAdjustment config ) {
+		if (config == null)
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
 
-		if( config.configOptimizer instanceof ConfigTrustRegion )
+		if (config.configOptimizer instanceof ConfigTrustRegion)
 			minimizer = FactoryOptimizationSparse.doglegSchur((ConfigTrustRegion)config.configOptimizer);
 		else
 			minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer);
@@ -130,17 +130,17 @@ public class FactoryMultiView {
 	 * @param config (Optional) configuration
 	 * @return bundle adjustment
 	 */
-	public static BundleAdjustment<SceneStructureMetric> bundleDenseMetric(boolean robust,
-																		   @Nullable ConfigBundleAdjustment config ) {
-		if( config == null )
+	public static BundleAdjustment<SceneStructureMetric> bundleDenseMetric( boolean robust,
+																			@Nullable ConfigBundleAdjustment config ) {
+		if (config == null)
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
 
-		if( config.configOptimizer instanceof ConfigTrustRegion )
-			minimizer = FactoryOptimization.doglegSchur(robust,(ConfigTrustRegion)config.configOptimizer);
+		if (config.configOptimizer instanceof ConfigTrustRegion)
+			minimizer = FactoryOptimization.doglegSchur(robust, (ConfigTrustRegion)config.configOptimizer);
 		else
-			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust,(ConfigLevenbergMarquardt)config.configOptimizer);
+			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust, (ConfigLevenbergMarquardt)config.configOptimizer);
 
 		return new BundleAdjustmentSchur_DDRM<>(minimizer,
 				new BundleAdjustmentMetricResidualFunction(),
@@ -156,18 +156,17 @@ public class FactoryMultiView {
 	 * @param config (Optional) configuration
 	 * @return bundle adjustment
 	 */
-	public static BundleAdjustment<SceneStructureProjective> bundleDenseProjective(boolean robust,
-																				   @Nullable ConfigBundleAdjustment config ) {
-		if( config == null )
+	public static BundleAdjustment<SceneStructureProjective> bundleDenseProjective( boolean robust,
+																					@Nullable ConfigBundleAdjustment config ) {
+		if (config == null)
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
 
-		if( config.configOptimizer instanceof ConfigTrustRegion )
-			minimizer = FactoryOptimization.doglegSchur(robust,(ConfigTrustRegion)config.configOptimizer);
+		if (config.configOptimizer instanceof ConfigTrustRegion)
+			minimizer = FactoryOptimization.doglegSchur(robust, (ConfigTrustRegion)config.configOptimizer);
 		else
-			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust,(ConfigLevenbergMarquardt)config.configOptimizer);
-
+			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust, (ConfigLevenbergMarquardt)config.configOptimizer);
 
 		return new BundleAdjustmentSchur_DDRM<>(minimizer,
 				new BundleAdjustmentProjectiveResidualFunction(),
@@ -175,16 +174,14 @@ public class FactoryMultiView {
 				new CodecSceneStructureProjective());
 	}
 
-
 	/**
 	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.
 	 *
-	 * @see HomographyDirectLinearTransform
-	 *
 	 * @param normalizeInput If input is in pixel coordinates set to true.  False if in normalized image coordinates.
 	 * @return Homography estimator.
+	 * @see HomographyDirectLinearTransform
 	 */
-	public static Estimate1ofEpipolar homographyDLT(boolean normalizeInput ) {
+	public static Estimate1ofEpipolar homographyDLT( boolean normalizeInput ) {
 		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(normalizeInput);
 		return new HomographyDLT_to_Epipolar(alg);
 	}
@@ -192,42 +189,31 @@ public class FactoryMultiView {
 	/**
 	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.
 	 *
-	 * @see HomographyTotalLeastSquares
-	 *
 	 * @return Homography estimator.
+	 * @see HomographyTotalLeastSquares
 	 */
 	public static Estimate1ofEpipolar homographyTLS() {
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
 		return new HomographyTLS_to_Epipolar(alg);
 	}
 
-
 	/**
 	 * Creates a non-linear optimizer for refining estimates of homography matrices.
-	 *
-	 * @see HomographyResidualSampson
-	 * @see HomographyResidualTransfer
 	 *
 	 * @param tol Tolerance for convergence.  Try 1e-8
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return Homography refinement
+	 * @see HomographyResidualSampson
+	 * @see HomographyResidualTransfer
 	 */
-	public static RefineEpipolar homographyRefine(double tol , int maxIterations , EpipolarError type ) {
-		ModelObservationResidualN residuals;
-		switch( type ) {
-			case SIMPLE:
-				residuals = new HomographyResidualTransfer();
-				break;
+	public static RefineEpipolar homographyRefine( double tol, int maxIterations, EpipolarError type ) {
+		ModelObservationResidualN residuals = switch (type) {
+			case SIMPLE -> new HomographyResidualTransfer();
+			case SAMPSON -> new HomographyResidualSampson();
+			default -> throw new IllegalArgumentException("Type not supported: " + type);
+		};
 
-			case SAMPSON:
-				residuals = new HomographyResidualSampson();
-				break;
-
-			default:
-				throw new IllegalArgumentException("Type not supported: "+type);
-		}
-
-		return new LeastSquaresHomography(tol,maxIterations,residuals);
+		return new LeastSquaresHomography(tol, maxIterations, residuals);
 	}
 
 	/**
@@ -261,16 +247,14 @@ public class FactoryMultiView {
 	 * the 5-point algorithm is only for the calibrated (essential) case.
 	 * </p>
 	 *
+	 * @param which Specifies which algorithm is to be created
+	 * @return Fundamental or essential estimation algorithm that returns multiple hypotheses.
 	 * @see boofcv.alg.geo.f.EssentialNister5
 	 * @see boofcv.alg.geo.f.FundamentalLinear7
 	 * @see boofcv.alg.geo.f.FundamentalLinear8
-	 *
-	 * @param which Specifies which algorithm is to be created
-	 * @return Fundamental or essential estimation algorithm that returns multiple hypotheses.
 	 */
-	public static EstimateNofEpipolar fundamental_N(EnumFundamental which )
-	{
-		switch( which ) {
+	public static EstimateNofEpipolar fundamental_N( EnumFundamental which ) {
+		switch (which) {
 			case LINEAR_8:
 				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(true));
 
@@ -278,12 +262,11 @@ public class FactoryMultiView {
 				return new WrapFundamentalLinear7(true);
 		}
 
-		throw new IllegalArgumentException("Unknown algorithm "+which);
+		throw new IllegalArgumentException("Unknown algorithm " + which);
 	}
 
-	public static EstimateNofEpipolar essential_N(EnumEssential which )
-	{
-		switch( which ) {
+	public static EstimateNofEpipolar essential_N( EnumEssential which ) {
+		switch (which) {
 			case LINEAR_8:
 				return new Estimate1toNofEpipolar(new WrapFundamentalLinear8(false));
 
@@ -294,7 +277,7 @@ public class FactoryMultiView {
 				return new WrapEssentialNister5();
 		}
 
-		throw new IllegalArgumentException("Unknown algorithm "+which);
+		throw new IllegalArgumentException("Unknown algorithm " + which);
 	}
 
 	/**
@@ -323,62 +306,57 @@ public class FactoryMultiView {
 	 * inlier set,
 	 * </p>
 	 *
-	 * @see GeoModelEstimatorNto1
-	 *
 	 * @param which Specifies which algorithm is to be created
 	 * @param numRemoveAmbiguity Number of sample points used to prune hypotheses. Ignored if only a single solution.
 	 * @return Fundamental or essential estimation algorithm that returns a single hypothesis.
+	 * @see GeoModelEstimatorNto1
 	 */
-	public static Estimate1ofEpipolar fundamental_1(EnumFundamental which, int numRemoveAmbiguity)
-	{
+	public static Estimate1ofEpipolar fundamental_1( EnumFundamental which, int numRemoveAmbiguity ) {
 		if (which == EnumFundamental.LINEAR_8) {
 			return new WrapFundamentalLinear8(true);
 		}
 
-		if( numRemoveAmbiguity <= 0 )
+		if (numRemoveAmbiguity <= 0)
 			throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
 
 		EstimateNofEpipolar alg = fundamental_N(which);
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
-		return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);
+		return new EstimateNto1ofEpipolar(alg, distance, numRemoveAmbiguity);
 	}
 
-	public static Estimate1ofEpipolar essential_1(EnumEssential which, int numRemoveAmbiguity)
-	{
+	public static Estimate1ofEpipolar essential_1( EnumEssential which, int numRemoveAmbiguity ) {
 		if (which == EnumEssential.LINEAR_8) {
 			return new WrapFundamentalLinear8(false);
 		}
 
-		if( numRemoveAmbiguity <= 0 )
+		if (numRemoveAmbiguity <= 0)
 			throw new IllegalArgumentException("numRemoveAmbiguity must be greater than zero");
 
 		EstimateNofEpipolar alg = essential_N(which);
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
-		return new EstimateNto1ofEpipolar(alg,distance,numRemoveAmbiguity);
+		return new EstimateNto1ofEpipolar(alg, distance, numRemoveAmbiguity);
 	}
 
 	/**
 	 * Creates a non-linear optimizer for refining estimates of fundamental or essential matrices.
 	 *
-	 * @see boofcv.alg.geo.f.FundamentalResidualSampson
-	 * @see boofcv.alg.geo.f.FundamentalResidualSimple
-	 *
 	 * @param tol Tolerance for convergence.  Try 1e-8
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 100 or more.
 	 * @return RefineEpipolar
+	 * @see boofcv.alg.geo.f.FundamentalResidualSampson
+	 * @see boofcv.alg.geo.f.FundamentalResidualSimple
 	 */
-	public static RefineEpipolar fundamentalRefine(double tol , int maxIterations , EpipolarError type )
-	{
-		switch( type ) {
+	public static RefineEpipolar fundamentalRefine( double tol, int maxIterations, EpipolarError type ) {
+		switch (type) {
 			case SAMPSON:
-				return new LeastSquaresFundamental(tol,maxIterations,true);
+				return new LeastSquaresFundamental(tol, maxIterations, true);
 			case SIMPLE:
-				return new LeastSquaresFundamental(tol,maxIterations,false);
+				return new LeastSquaresFundamental(tol, maxIterations, false);
 		}
 
-		throw new IllegalArgumentException("Type not supported: "+type);
+		throw new IllegalArgumentException("Type not supported: " + type);
 	}
 
 	/**
@@ -388,11 +366,11 @@ public class FactoryMultiView {
 	 * @return Trifocal tensor estimator
 	 */
 	public static Estimate1ofTrifocalTensor trifocal_1( @Nullable ConfigTrifocal config ) {
-		if( config == null ) {
+		if (config == null) {
 			config = new ConfigTrifocal();
 		}
 
-		switch( config.which ) {
+		switch (config.which) {
 			case LINEAR_7:
 				return new WrapTrifocalLinearPoint7();
 
@@ -400,12 +378,12 @@ public class FactoryMultiView {
 				ConfigConverge cc = config.converge;
 				UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null, false);
 				TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,
-						cc.maxIterations,cc.ftol,cc.gtol);
+						cc.maxIterations, cc.ftol, cc.gtol);
 
 				return new WrapTrifocalAlgebraicPoint7(alg);
 		}
 
-		throw new IllegalArgumentException("Unknown type "+config.which);
+		throw new IllegalArgumentException("Unknown type " + config.which);
 	}
 
 	/**
@@ -414,10 +392,10 @@ public class FactoryMultiView {
 	 * @return RefineThreeViewProjective
 	 */
 	public static RefineThreeViewProjective threeViewRefine( @Nullable ConfigThreeViewRefine config ) {
-		if( config == null )
+		if (config == null)
 			config = new ConfigThreeViewRefine();
 
-		switch( config.which) {
+		switch (config.which) {
 			case GEOMETRIC:
 				RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
 				alg.getConverge().setTo(config.converge);
@@ -425,7 +403,7 @@ public class FactoryMultiView {
 				return new WrapRefineThreeViewProjectiveGeometric(alg);
 		}
 
-		throw new IllegalArgumentException("Unknown algorithm "+config.which);
+		throw new IllegalArgumentException("Unknown algorithm " + config.which);
 	}
 
 	/**
@@ -436,24 +414,24 @@ public class FactoryMultiView {
 	 *
 	 * @param which The algorithm which is to be returned.
 	 * @param numIterations Number of iterations. Only used by some algorithms and recommended number varies
-	 *                      significantly by algorithm.
+	 * significantly by algorithm.
 	 * @return An estimator which can return multiple estimates.
 	 */
-	public static EstimateNofPnP pnp_N(EnumPNP which , int numIterations ) {
+	public static EstimateNofPnP pnp_N( EnumPNP which, int numIterations ) {
 
 		MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
 
-		switch( which ) {
+		switch (which) {
 			case P3P_GRUNERT:
 				P3PGrunert grunert = new P3PGrunert(PolynomialOps.createRootFinder(5, RootFinderType.STURM));
-				return new WrapP3PLineDistance(grunert,motionFit);
+				return new WrapP3PLineDistance(grunert, motionFit);
 
 			case P3P_FINSTERWALDER:
-				P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4,RootFinderType.STURM));
-				return new WrapP3PLineDistance(finster,motionFit);
+				P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, RootFinderType.STURM));
+				return new WrapP3PLineDistance(finster, motionFit);
 
 			case EPNP:
-				Estimate1ofPnP epnp = pnp_1(which,numIterations,0);
+				Estimate1ofPnP epnp = pnp_1(which, numIterations, 0);
 				return new Estimate1toNofPnP(epnp);
 
 			case IPPE:
@@ -461,7 +439,7 @@ public class FactoryMultiView {
 				return new Estimate1toNofPnP(new IPPE_to_EstimatePnP(H));
 		}
 
-		throw new IllegalArgumentException("Type "+which+" not known");
+		throw new IllegalArgumentException("Type " + which + " not known");
 	}
 
 	/**
@@ -477,33 +455,33 @@ public class FactoryMultiView {
 	 *
 	 * @param which The algorithm which is to be returned.
 	 * @param numIterations Number of iterations. Only used by some algorithms and recommended number varies
-	 *                      significantly by algorithm.
+	 * significantly by algorithm.
 	 * @param numTest How many additional sample points are used to remove ambiguity in the solutions.  Not used
-	 *                if only a single solution is found.
+	 * if only a single solution is found.
 	 * @return An estimator which returns a single estimate.
 	 */
-	public static Estimate1ofPnP pnp_1(EnumPNP which, int numIterations , int numTest) {
+	public static Estimate1ofPnP pnp_1( EnumPNP which, int numIterations, int numTest ) {
 
-		if( which == EnumPNP.EPNP ) {
+		if (which == EnumPNP.EPNP) {
 			PnPLepetitEPnP alg = new PnPLepetitEPnP(0.1);
 			alg.setNumIterations(numIterations);
 			return new WrapPnPLepetitEPnP(alg);
-		} else if( which == EnumPNP.IPPE ) {
+		} else if (which == EnumPNP.IPPE) {
 			Estimate1ofEpipolar H = FactoryMultiView.homographyTLS();
 			return new IPPE_to_EstimatePnP(H);
 		}
 
 		FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64::new);
 
-		return new EstimateNto1ofPnP(pnp_N(which,-1),solutions,numTest);
+		return new EstimateNto1ofPnP(pnp_N(which, -1), solutions, numTest);
 	}
 
 	/**
 	 * Projective N Point. This is PnP for uncalibrated cameras. Please read algorithms documentation for
 	 * limitations
 	 *
-	 * @see PRnPDirectLinearTransform
 	 * @return Estimator
+	 * @see PRnPDirectLinearTransform
 	 */
 	public static Estimate1ofPrNP prnp_1() {
 		return new WrapPRnPDirectLinearTransform(new PRnPDirectLinearTransform());
@@ -515,13 +493,12 @@ public class FactoryMultiView {
 	 *
 	 * <p>NOTE: Observations are in normalized image coordinates NOT pixels.</p>
 	 *
-	 * @see PnPLepetitEPnP
-	 *
 	 * @param numIterations If more then zero then non-linear optimization is done.  More is not always better.  Try 10
 	 * @param magicNumber Affects how the problem is linearized.  See comments in {@link PnPLepetitEPnP}.  Try 0.1
-	 * @return  Estimate1ofPnP
+	 * @return Estimate1ofPnP
+	 * @see PnPLepetitEPnP
 	 */
-	public static Estimate1ofPnP computePnPwithEPnP(int numIterations, double magicNumber) {
+	public static Estimate1ofPnP computePnPwithEPnP( int numIterations, double magicNumber ) {
 		PnPLepetitEPnP alg = new PnPLepetitEPnP(magicNumber);
 		alg.setNumIterations(numIterations);
 		return new WrapPnPLepetitEPnP(alg);
@@ -533,8 +510,8 @@ public class FactoryMultiView {
 	 * @param tol Convergence tolerance. Try 1e-8
 	 * @param maxIterations Maximum number of iterations.  Try 200
 	 */
-	public static RefinePnP pnpRefine(double tol , int maxIterations ) {
-		return new PnPRefineRodrigues(tol,maxIterations);
+	public static RefinePnP pnpRefine( double tol, int maxIterations ) {
+		return new PnPRefineRodrigues(tol, maxIterations);
 	}
 
 	/**
@@ -549,130 +526,157 @@ public class FactoryMultiView {
 	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT) with a calibrated camera.
 	 *
+	 * @return Two view triangulation algorithm
 	 * @see Wrap2ViewPixelDepthLinear
 	 * @see TriangulateMetricLinearDLT
-	 *
-	 * @return Two view triangulation algorithm
 	 */
-	public static Triangulate2ViewsMetric triangulate2ViewMetric(@Nullable ConfigTriangulation config ) {
-		if( config == null )
+	public static Triangulate2ViewsMetric triangulate2ViewMetric( @Nullable ConfigTriangulation config ) {
+		if (config == null)
 			config = new ConfigTriangulation();
 
-		switch ( config.type ) {
-			case DLT:
-				return new Wrap2ViewPixelDepthLinear();
-
-			case GEOMETRIC:
-				return new Wrap2ViewsTriangulateGeometric();
-
-			default: throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
-		}
+		return switch (config.type) {
+			case DLT -> new Wrap2ViewPixelDepthLinear();
+			case GEOMETRIC -> new Wrap2ViewsTriangulateGeometric();
+			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		};
 	}
 
 	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT) with an uncalibrated camera.
 	 *
-	 * @see TriangulateProjectiveLinearDLT
-	 *
 	 * @return Two view triangulation algorithm
+	 * @see TriangulateProjectiveLinearDLT
 	 */
-	public static Triangulate2ViewsProjective triangulate2ViewProjective(@Nullable ConfigTriangulation config ) {
-		if( config == null )
+	public static Triangulate2ViewsProjective triangulate2ViewProjective( @Nullable ConfigTriangulation config ) {
+		if (config == null)
 			config = new ConfigTriangulation();
 
-		switch( config.type ) {
-			case DLT:
-				return new Wrap2ViewsTriangulateProjectiveDLT();
-
-			default: throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
+		if (config.type == ConfigTriangulation.Type.DLT) {
+			return new Wrap2ViewsTriangulateProjectiveDLT();
 		}
+		throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
 	}
 
 	/**
 	 * Triangulate N views using the Discrete Linear Transform (DLT) with a calibrated camera
 	 *
-	 * @see TriangulateMetricLinearDLT
-	 *
 	 * @return N-view triangulation algorithm
+	 * @see TriangulateMetricLinearDLT
 	 */
-	public static TriangulateNViewsMetric triangulateNViewCalibrated(@Nullable ConfigTriangulation config ) {
-		if( config == null )
+	public static TriangulateNViewsMetric triangulateNViewMetric( @Nullable ConfigTriangulation config ) {
+		if (config == null)
 			config = new ConfigTriangulation();
 
-		switch ( config.type ) {
+		switch (config.type) {
 			case DLT:
 				return new WrapNViewsTriangulateMetricDLT();
 
 			case GEOMETRIC: {
 				TriangulateNViewsMetric estimator = new WrapNViewsTriangulateMetricDLT();
-				TriangulateRefineMetricLS refiner = new TriangulateRefineMetricLS(config.converge.gtol,config.converge.maxIterations);
-				return new TriangulateThenRefineMetric(estimator,refiner);
+				TriangulateRefineMetricLS refiner = new TriangulateRefineMetricLS(config.converge.gtol, config.converge.maxIterations);
+				return new TriangulateThenRefineMetric(estimator, refiner);
 			}
 
-			default: throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
+			default:
+				throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		}
+	}
+
+	/**
+	 * Triangulate N views using the Discrete Linear Transform (DLT) with a calibrated camera in homogenous coordinates
+	 *
+	 * @return N-view triangulation algorithm
+	 * @see TriangulateMetricLinearDLT
+	 */
+	public static TriangulateNViewsMetricH triangulateNViewMetricH( @Nullable ConfigTriangulation config ) {
+		if (config == null)
+			config = new ConfigTriangulation();
+
+		switch (config.type) {
+			case DLT:
+				return new WrapNViewsTriangulateMetricHgDLT();
+
+			case GEOMETRIC: {
+				var estimator = new WrapNViewsTriangulateMetricHgDLT();
+				var refiner = new TriangulateRefineMetricHgLS(config.converge.gtol, config.converge.maxIterations);
+				return new TriangulateThenRefineMetricH(estimator, refiner);
+			}
+
+			default:
+				throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
 		}
 	}
 
 	/**
 	 * Triangulate N views using the Discrete Linear Transform (DLT) with an uncalibrated camera
 	 *
-	 * @see TriangulateProjectiveLinearDLT
-	 *
 	 * @return N-view triangulation algorithm
+	 * @see TriangulateProjectiveLinearDLT
 	 */
-	public static TriangulateNViewsProjective triangulateNView( @Nullable ConfigTriangulation config ) {
-		if( config == null )
+	public static TriangulateNViewsProjective triangulateNViewProj( @Nullable ConfigTriangulation config ) {
+		if (config == null)
 			config = new ConfigTriangulation();
 
-		switch( config.type) {
+		switch (config.type) {
 			case DLT:
 				return new WrapNViewsTriangulateProjectiveDLT();
 
 			case ALGEBRAIC:
 			case GEOMETRIC: {
 				TriangulateNViewsProjective estimator = new WrapNViewsTriangulateProjectiveDLT();
-				TriangulateRefineProjectiveLS refiner = new TriangulateRefineProjectiveLS(config.converge.gtol,config.converge.maxIterations);
-				return new TriangulateThenRefineProjective(estimator,refiner);
+				TriangulateRefineProjectiveLS refiner = new TriangulateRefineProjectiveLS(config.converge.gtol, config.converge.maxIterations);
+				return new TriangulateThenRefineProjective(estimator, refiner);
 			}
+
+			default:
+				throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
 		}
-		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**
 	 * Refine the triangulation using Sampson error.  Approximately takes in account epipolar constraints.
 	 *
-	 * @see ResidualsTriangulateEpipolarSampson
-	 *
 	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
+	 * @see ResidualsTriangulateEpipolarSampson
 	 */
-	public static RefineTriangulateEpipolar triangulateRefineEpipolar(ConfigConverge config ) {
-		return new TriangulateRefineEpipolarLS(config.gtol,config.maxIterations);
+	public static RefineTriangulateEpipolar triangulateRefineEpipolar( ConfigConverge config ) {
+		return new TriangulateRefineEpipolarLS(config.gtol, config.maxIterations);
 	}
 
 	/**
 	 * Refine the triangulation by computing the difference between predicted and actual pixel location.
 	 * Does not take in account epipolar constraints.
 	 *
+	 * @param config Convergence criteria
+	 * @return Triangulation refinement algorithm.
 	 * @see ResidualsTriangulateMetricSimple
+	 */
+	public static RefineTriangulateMetric triangulateRefineMetric( ConfigConverge config ) {
+		return new TriangulateRefineMetricLS(config.gtol, config.maxIterations);
+	}
+
+	/**
+	 * Refine the triangulation by computing the difference between predicted and actual pixel location.
+	 * Does not take in account epipolar constraints.
 	 *
 	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
+	 * @see TriangulateRefineMetricHgLS
 	 */
-	public static RefineTriangulateMetric triangulateRefineMetric(ConfigConverge config ) {
-		return new TriangulateRefineMetricLS(config.gtol,config.maxIterations);
+	public static RefineTriangulateMetricH triangulateRefineMetricH( ConfigConverge config ) {
+		return new TriangulateRefineMetricHgLS(config.gtol, config.maxIterations);
 	}
 
 	/**
 	 * Refines a projective triangulation
 	 *
-	 * @see ResidualsTriangulateProjective
-	 *
 	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
+	 * @see ResidualsTriangulateProjective
 	 */
-	public static RefineTriangulateProjective triangulateRefineProj(ConfigConverge config ) {
-		return new TriangulateRefineProjectiveLS(config.gtol,config.maxIterations);
+	public static RefineTriangulateProjective triangulateRefineProj( ConfigConverge config ) {
+		return new TriangulateRefineProjectiveLS(config.gtol, config.maxIterations);
 	}
 
 	/**
@@ -684,19 +688,19 @@ public class FactoryMultiView {
 	 */
 	public static ModelGeneratorViews<MetricCameraTriple, AssociatedTriple, ImageDimension>
 	selfCalibThree( @Nullable ConfigPixelsToMetric config ) {
-		if( config == null )
+		if (config == null)
 			config = new ConfigPixelsToMetric();
 		config.checkValidity();
 
 		Estimate1ofTrifocalTensor trifocal = trifocal_1(config.trifocal);
 		ProjectiveToMetricCameras selfcalib =
-				switch( config.type ) {
+				switch (config.type) {
 					case DUAL_QUADRATIC -> projectiveToMetric(config.dualQuadratic);
 					case ESSENTIAL_GUESS -> projectiveToMetric(config.essentialGuess);
 					case PRACTICAL_GUESS -> projectiveToMetric(config.practicalGuess);
 				};
 
-		return new GenerateMetricTripleFromProjective(trifocal,selfcalib);
+		return new GenerateMetricTripleFromProjective(trifocal, selfcalib);
 	}
 
 	/**
@@ -707,7 +711,7 @@ public class FactoryMultiView {
 	 */
 	public static ProjectiveToMetricCameras
 	projectiveToMetric( @Nullable ConfigSelfCalibDualQuadratic config ) {
-		if( config == null )
+		if (config == null)
 			config = new ConfigSelfCalibDualQuadratic();
 		config.checkValidity();
 
@@ -727,7 +731,7 @@ public class FactoryMultiView {
 	 */
 	public static ProjectiveToMetricCameras
 	projectiveToMetric( @Nullable ConfigSelfCalibEssentialGuess config ) {
-		if( config == null )
+		if (config == null)
 			config = new ConfigSelfCalibEssentialGuess();
 		config.checkValidity();
 
@@ -749,13 +753,13 @@ public class FactoryMultiView {
 	 */
 	public static ProjectiveToMetricCameras
 	projectiveToMetric( @Nullable ConfigSelfCalibPracticalGuess config ) {
-		if( config == null )
+		if (config == null)
 			config = new ConfigSelfCalibPracticalGuess();
 		config.checkValidity();
 
 		final ConfigSelfCalibPracticalGuess c = config;
 		var selfCalib = new SelfCalibrationPraticalGuessAndCheckFocus();
-		selfCalib.setSampling( c.sampleMin, c.sampleMax, c.numberOfSamples);
+		selfCalib.setSampling(c.sampleMin, c.sampleMax, c.numberOfSamples);
 		selfCalib.setSingleCamera(c.fixedFocus);
 		return new ProjectiveToMetricCameraPracticalGuessAndCheck(selfCalib);
 	}

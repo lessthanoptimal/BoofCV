@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,21 +40,21 @@ public abstract class ResidualTriangulateMetricChecks extends CommonTriangulatio
 	 */
 	@Test
 	public void perfect() {
-		createMetricScene();
-		FunctionNtoM alg = createAlg(obsPts, motionWorldToCamera);
+		createScene();
+		FunctionNtoM alg = createAlg(obsNorm, motionWorldToCamera);
 
-		double input[] = new double[]{worldPoint.x,worldPoint.y,worldPoint.z};
-		double output[] = new double[ alg.getNumOfOutputsM() ];
-		
-		alg.process(input,output);
+		double[] input = new double[]{worldPoint.x, worldPoint.y, worldPoint.z};
+		double[] output = new double[alg.getNumOfOutputsM()];
+
+		alg.process(input, output);
 
 		// there should be no errors
 		double error = computeCost(output);
-		assertEquals(0,error,1e-8);
+		assertEquals(0, error, 1e-8);
 
 		// corrupt the parameter, which should cause errors in the residuals
 		input[0] += 1;
-		alg.process(input,output);
+		alg.process(input, output);
 
 		error = computeCost(output);
 		assertTrue( error > 0.1);

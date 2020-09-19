@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,18 +29,18 @@ import java.util.List;
 /**
  * Basic error function for triangulation which only computes the residual between predicted and
  * actual observed point location.  Does not take in account the epipolar constraints.
- * 
+ *
  * @author Peter Abeles
  */
-public class ResidualsTriangulateMetricSimple implements FunctionNtoM  {
+public class ResidualsTriangulateMetricSimple implements FunctionNtoM {
 
 	// observations of the same feature in normalized coordinates
 	private List<Point2D_F64> observations;
 	// Known camera motion
 	private List<Se3_F64> motionGtoC;
 
-	private Point3D_F64 point = new Point3D_F64();
-	private Point3D_F64 transformed = new Point3D_F64();
+	private final Point3D_F64 point = new Point3D_F64();
+	private final Point3D_F64 transformed = new Point3D_F64();
 
 	/**
 	 * Configures inputs.
@@ -48,14 +48,14 @@ public class ResidualsTriangulateMetricSimple implements FunctionNtoM  {
 	 * @param observations Observations of the feature at different locations. Normalized image coordinates.
 	 * @param motionGtoC Camera motion from global to camera frame..
 	 */
-	public void setObservations( List<Point2D_F64> observations , List<Se3_F64> motionGtoC ) {
-		if( observations.size() != motionGtoC.size() )
+	public void setObservations( List<Point2D_F64> observations, List<Se3_F64> motionGtoC ) {
+		if (observations.size() != motionGtoC.size())
 			throw new IllegalArgumentException("Different size lists");
 
 		this.observations = observations;
 		this.motionGtoC = motionGtoC;
 	}
-	
+
 	@Override
 	public int getNumOfInputsN() {
 		return 3;
@@ -67,18 +67,18 @@ public class ResidualsTriangulateMetricSimple implements FunctionNtoM  {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process( double[] input, double[] output ) {
 
 		point.x = input[0];
 		point.y = input[1];
 		point.z = input[2];
 
 		int indexOut = 0;
-		for( int i = 0; i < observations.size(); i++ ) {
+		for (int i = 0; i < observations.size(); i++) {
 			Point2D_F64 p = observations.get(i);
 			Se3_F64 m = motionGtoC.get(i);
 
-			SePointOps_F64.transform(m,point,transformed);
+			SePointOps_F64.transform(m, point, transformed);
 
 			output[indexOut++] = transformed.x/transformed.z - p.x;
 			output[indexOut++] = transformed.y/transformed.z - p.y;

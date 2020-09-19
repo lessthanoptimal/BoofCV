@@ -44,7 +44,7 @@ public class DistanceMetricTripleReprojection23 implements DistanceFromModel<Met
 	protected MetricCameraTriple model;
 
 	/** algorithm used to triangulate feature in 3D space */
-	protected @Getter @Setter TriangulateNViewsMetric triangulate = FactoryMultiView.triangulateNViewCalibrated(null);
+	protected @Getter @Setter TriangulateNViewsMetric triangulate = FactoryMultiView.triangulateNViewMetric(null);
 
 	// storage for normalized image coordinate
 	private final Point2D_F64 norm1 = new Point2D_F64();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,15 +36,15 @@ import java.util.List;
  */
 public class Wrap2ViewsTriangulateProjectiveDLT implements Triangulate2ViewsProjective {
 
-	TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
+	final TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
 	// pixel observations
-	List<Point2D_F64> pixels = new ArrayList<>();
+	final List<Point2D_F64> pixels = new ArrayList<>();
 	// camera matrices
-	List<DMatrixRMaj> cameras = new ArrayList<>();
+	final List<DMatrixRMaj> cameras = new ArrayList<>();
 
 	@Override
-	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB, DMatrixRMaj projectionA, DMatrixRMaj projectionB, Point4D_F64 foundInA) {
+	public boolean triangulate( Point2D_F64 obsA, Point2D_F64 obsB, DMatrixRMaj projectionA, DMatrixRMaj projectionB, Point4D_F64 foundInA ) {
 
 		pixels.clear();
 		cameras.clear();
@@ -54,14 +54,6 @@ public class Wrap2ViewsTriangulateProjectiveDLT implements Triangulate2ViewsProj
 		cameras.add(projectionA);
 		cameras.add(projectionB);
 
-		if(GeometricResult.SUCCESS == alg.triangulate(pixels,cameras,foundInA) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public TriangulateProjectiveLinearDLT getAlgorithm() {
-		return alg;
+		return GeometricResult.SUCCESS == alg.triangulate(pixels, cameras, foundInA);
 	}
 }

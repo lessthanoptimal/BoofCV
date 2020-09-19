@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,10 @@ import java.util.List;
 /**
  * Residuals for a projective triangulation where the difference between predicted and observed pixels
  * are minimized. The optimized point is in homogenous coordinates.
- * 
+ *
  * @author Peter Abeles
  */
-public class ResidualsTriangulateProjective implements FunctionNtoM  {
+public class ResidualsTriangulateProjective implements FunctionNtoM {
 
 	// observations of the same feature in normalized coordinates
 	private List<Point2D_F64> observations;
@@ -40,22 +40,23 @@ public class ResidualsTriangulateProjective implements FunctionNtoM  {
 	private List<DMatrixRMaj> cameraMatrices;
 
 	// 3D point in homogenous coordinates
-	private Point4D_F64 point = new Point4D_F64();
-	private Point2D_F64 predicted = new Point2D_F64();
+	private final Point4D_F64 point = new Point4D_F64();
+	private final Point2D_F64 predicted = new Point2D_F64();
+
 	/**
 	 * Configures inputs.
 	 *
 	 * @param observations Observations of the feature at different locations. Pixels.
 	 * @param cameraMatrices Camera matrices
 	 */
-	public void setObservations( List<Point2D_F64> observations , List<DMatrixRMaj> cameraMatrices ) {
-		if( observations.size() != cameraMatrices.size() )
+	public void setObservations( List<Point2D_F64> observations, List<DMatrixRMaj> cameraMatrices ) {
+		if (observations.size() != cameraMatrices.size())
 			throw new IllegalArgumentException("Different size lists");
 
 		this.observations = observations;
 		this.cameraMatrices = cameraMatrices;
 	}
-	
+
 	@Override
 	public int getNumOfInputsN() {
 		return 4;
@@ -67,7 +68,7 @@ public class ResidualsTriangulateProjective implements FunctionNtoM  {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process( double[] input, double[] output ) {
 
 		point.x = input[0];
 		point.y = input[1];
@@ -75,14 +76,14 @@ public class ResidualsTriangulateProjective implements FunctionNtoM  {
 		point.w = input[3];
 
 		int outputIdx = 0;
-		for( int i = 0; i < observations.size(); i++ ) {
+		for (int i = 0; i < observations.size(); i++) {
 			Point2D_F64 p = observations.get(i);
 			DMatrixRMaj m = cameraMatrices.get(i);
 
-			PerspectiveOps.renderPixel(m,point,predicted);
+			PerspectiveOps.renderPixel(m, point, predicted);
 
-			output[outputIdx++] = predicted.x-p.x;
-			output[outputIdx++] = predicted.y-p.y;
+			output[outputIdx++] = predicted.x - p.x;
+			output[outputIdx++] = predicted.y - p.y;
 		}
 	}
 }

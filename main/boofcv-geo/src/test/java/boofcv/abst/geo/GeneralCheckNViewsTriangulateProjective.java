@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,11 @@
 
 package boofcv.abst.geo;
 
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.triangulate.CommonTriangulationChecks;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
+import georegression.struct.point.Point4D_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
@@ -33,38 +34,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralTestRefineTriangulateMetric extends CommonTriangulationChecks {
+public abstract class GeneralCheckNViewsTriangulateProjective extends CommonTriangulationChecks {
 
-	public abstract void triangulate( List<Point2D_F64> obsPts, List<Se3_F64> motion,
-									  List<DMatrixRMaj> essential ,
-									  Point3D_F64 initial , Point3D_F64 found );
+	public abstract boolean triangulate( List<Point2D_F64> obsPts, List<DMatrixRMaj> motion,
+										 List<DMatrixRMaj> essential,
+										 Point4D_F64 found );
 
 	@Test
 	public void perfectInput() {
-		createMetricScene();
+		createScene();
 
-		Point3D_F64 initial = worldPoint.copy();
-		Point3D_F64 found = new Point3D_F64();
-		triangulate(obsPts, motionWorldToCamera,essential,initial,found);
+		Point4D_F64 found = new Point4D_F64();
+		assertTrue(triangulate(obsPixels, cameraMatrices, essential, found));
 
-		assertEquals(worldPoint.x, found.x, 1e-8);
+		assertEquals(0.0, worldPoint.distance(convertH(found)), UtilEjml.TEST_F64_SQ);
 	}
 
 	@Test
-	public void incorrectInput() {
-		createMetricScene();
+	public void pointAtInfinity() {
+		this.createScene(new Point4D_F64(0.1, -0.2, 4.0, 0.0));
 
-		Point3D_F64 initial = worldPoint.copy();
-		initial.x += 0.01;
-		initial.y += 0.1;
-		initial.z += -0.05;
-
-		Point3D_F64 found = new Point3D_F64();
-		triangulate(obsPts, motionWorldToCamera,essential,initial,found);
-
-		double error2 = worldPoint.distance(initial);
-		double error = worldPoint.distance(found);
-
-		assertTrue(error < error2 * 0.5);
+		Point4D_F64 found = new Point4D_F64();
+		assertTrue(triangulate(obsPixels, cameraMatrices, essential, found));
+		assertEquals(0.0, PerspectiveOps.distance(worldPointH, found), UtilEjml.TEST_F64);
 	}
 }

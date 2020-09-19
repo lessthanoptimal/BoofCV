@@ -18,13 +18,13 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.GeneralTestTriangulate2ViewsMetric;
+import boofcv.abst.geo.GeneralCheckTriangulate2ViewsMetric;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrap2ViewsTriangulateMetricDLT extends GeneralTestTriangulate2ViewsMetric {
+public class TestWrap2ViewsTriangulateMetricDLT extends GeneralCheckTriangulate2ViewsMetric {
 
 	@Override
 	public Triangulate2ViewsMetric createAlg() {

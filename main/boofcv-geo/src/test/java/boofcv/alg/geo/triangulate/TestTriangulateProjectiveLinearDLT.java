@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,21 +38,21 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 	 */
 	@Test
 	public void triangulate_metric_N() {
-		createMetricScene();
+		createScene();
 
 		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
 		Point4D_F64 found = new Point4D_F64();
 
-		alg.triangulate(obsPts, cameraMatrices,found);
+		alg.triangulate(obsPixels, cameraMatrices, found);
 
 		found.x /= found.w;
 		found.y /= found.w;
 		found.z /= found.w;
 
-		assertEquals(worldPoint.x,found.x,1e-8);
-		assertEquals(worldPoint.y,found.y,1e-8);
-		assertEquals(worldPoint.z,found.z,1e-8);
+		assertEquals(worldPoint.x, found.x, 1e-8);
+		assertEquals(worldPoint.y, found.y, 1e-8);
+		assertEquals(worldPoint.z, found.z, 1e-8);
 	}
 
 	/**
@@ -60,23 +60,23 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 	 */
 	@Test
 	public void triangulate_projective() {
-		createProjectiveScene();
+		createScene();
 
 		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
 		Point4D_F64 foundX = new Point4D_F64();
 
-		alg.triangulate(obsPts, cameraMatrices,foundX);
+		alg.triangulate(obsPixels, cameraMatrices, foundX);
 
 		// project the found coordinate back on to each image
 		Point2D_F64 foundPixel = new Point2D_F64();
 		for (int i = 0; i < cameraMatrices.size(); i++) {
 			DMatrixRMaj P = cameraMatrices.get(i);
-			Point2D_F64 expected = obsPts.get(i);
+			Point2D_F64 expected = obsPixels.get(i);
 
-			GeometryMath_F64.mult(P,foundX,foundPixel);
+			GeometryMath_F64.mult(P, foundX, foundPixel);
 
-			assertEquals(0,expected.distance(foundPixel), UtilEjml.TEST_F64);
+			assertEquals(0, expected.distance(foundPixel), UtilEjml.TEST_F64);
 		}
 	}
 
@@ -85,26 +85,26 @@ public class TestTriangulateProjectiveLinearDLT extends CommonTriangulationCheck
 	 */
 	@Test
 	public void triangulate_projective_noise() {
-		createProjectiveScene();
+		createScene();
 
 		TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
 		Point4D_F64 foundX = new Point4D_F64();
 
-		obsPts.get(0).x += 0.01;
-		obsPts.get(0).y -= 0.01;
+		obsPixels.get(0).x += 0.01;
+		obsPixels.get(0).y -= 0.01;
 
-		alg.triangulate(obsPts, cameraMatrices,foundX);
+		alg.triangulate(obsPixels, cameraMatrices, foundX);
 
 		// project the found coordinate back on to each image
 		Point2D_F64 foundPixel = new Point2D_F64();
 		for (int i = 0; i < cameraMatrices.size(); i++) {
 			DMatrixRMaj P = cameraMatrices.get(i);
-			Point2D_F64 expected = obsPts.get(i);
+			Point2D_F64 expected = obsPixels.get(i);
 
-			GeometryMath_F64.mult(P,foundX,foundPixel);
+			GeometryMath_F64.mult(P, foundX, foundPixel);
 
-			assertEquals(0,expected.distance(foundPixel), 0.03);
+			assertEquals(0, expected.distance(foundPixel), 0.03);
 		}
 	}
 }

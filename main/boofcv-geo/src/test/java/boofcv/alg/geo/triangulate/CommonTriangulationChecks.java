@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -39,78 +39,79 @@ import java.util.Random;
 public class CommonTriangulationChecks {
 
 	protected Random rand = new Random(234);
-	
+
 	int N = 30;
 
-	protected CameraPinhole intrinsic = new CameraPinhole(400,410,0,500,505,1000,1100);
-	protected DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
+	protected CameraPinhole intrinsic = new CameraPinhole(400, 410, 0, 500, 505, 1000, 1100);
+	protected DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
-	protected Point3D_F64 worldPoint;
-	protected List<Point2D_F64> obsPts;
+	protected Point3D_F64 worldPoint = new Point3D_F64();
+	protected Point4D_F64 worldPointH;
+	protected List<Point2D_F64> obsPixels;
+	protected List<Point2D_F64> obsNorm;
 	protected List<Se3_F64> motionWorldToCamera;
 	protected List<DMatrixRMaj> essential;
+	protected List<DMatrixRMaj> fundamental;
 	protected List<DMatrixRMaj> cameraMatrices;
-	
-	public void createMetricScene() {
-		worldPoint = new Point3D_F64(0.1,-0.2,4);
+
+	public void createScene() {
+		createScene(new Point3D_F64(0.1, -0.2, 4));
+	}
+
+	public void createScene( Point3D_F64 worldPoint ) {
+		Point4D_F64 X = new Point4D_F64(worldPoint.x, worldPoint.y, worldPoint.z, 1.0);
+		createScene(X);
+	}
+
+	public void createScene( Point4D_F64 point ) {
+		worldPointH = point.copy();
+		PerspectiveOps.homogenousTo3dPositiveZ(point, Double.MAX_VALUE, 1e-16, worldPoint);
 		motionWorldToCamera = new ArrayList<>();
-		obsPts = new ArrayList<>();
+		obsNorm = new ArrayList<>();
+		obsPixels = new ArrayList<>();
 		essential = new ArrayList<>();
+		fundamental = new ArrayList<>();
 		cameraMatrices = new ArrayList<>();
-		
-		Point3D_F64 cameraPoint = new Point3D_F64();
-		
-		for( int i = 0; i < N; i++ ) {
+
+		CameraPinhole dummyIntrinsic = new CameraPinhole(1.0, 1.0, 0.0, 0.0, 0.0, 0, 0);
+
+		for (int i = 0; i < N; i++) {
 			// random motion from world to frame 'i'
-			Se3_F64 tranWtoI = new Se3_F64();
-			if( i > 0 ) {
-				tranWtoI.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
-						rand.nextGaussian()*0.01, rand.nextGaussian()*0.05, rand.nextGaussian()*0.1,null ));
-				tranWtoI.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
+			Se3_F64 world_to_view = new Se3_F64();
+			if (i > 0) {
+				world_to_view.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
+						rand.nextGaussian()*0.01, rand.nextGaussian()*0.05, rand.nextGaussian()*0.1, null));
+				world_to_view.getT().set(0.2 + rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
 			}
 
-			DMatrixRMaj E = MultiViewOps.createEssential(tranWtoI.getR(), tranWtoI.getT(), null);
+			DMatrixRMaj E = MultiViewOps.createEssential(world_to_view.getR(), world_to_view.getT(), null);
+			DMatrixRMaj F = MultiViewOps.createFundamental(E, intrinsic);
 
-			SePointOps_F64.transform(tranWtoI, worldPoint,cameraPoint);
-			
-			Point2D_F64 o = new Point2D_F64(cameraPoint.x/cameraPoint.z,cameraPoint.y/cameraPoint.z);
+			Point2D_F64 norm = PerspectiveOps.renderPixel(world_to_view, dummyIntrinsic, worldPointH, null);
+			Point2D_F64 pixel = PerspectiveOps.renderPixel(world_to_view, intrinsic, worldPointH, null);
 
-			obsPts.add(o);
-			motionWorldToCamera.add(tranWtoI);
+			obsNorm.add(norm);
+			obsPixels.add(pixel);
+			motionWorldToCamera.add(world_to_view);
 			essential.add(E);
-			cameraMatrices.add(PerspectiveOps.createCameraMatrix(tranWtoI.R,tranWtoI.T,null,null));
+			fundamental.add(F);
+			cameraMatrices.add(PerspectiveOps.createCameraMatrix(world_to_view.R, world_to_view.T, K, null));
 		}
 	}
 
-	public void createProjectiveScene() {
-		worldPoint = new Point3D_F64(0.1,-0.2,4);
-		motionWorldToCamera = new ArrayList<>();
-		obsPts = new ArrayList<>();
-		essential = new ArrayList<>();
-		cameraMatrices = new ArrayList<>();
+	protected Point3D_F64 convertH( Point4D_F64 X ) {
+		return new Point3D_F64(X.x/X.w, X.y/X.w, X.z/X.w);
+	}
 
-		Point3D_F64 cameraPoint = new Point3D_F64();
-
-		for( int i = 0; i < N; i++ ) {
-			// random motion from world to frame 'i'
-			Se3_F64 tranWtoI = new Se3_F64();
-			if( i > 0 ) {
-				tranWtoI.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
-						rand.nextGaussian()*0.01, rand.nextGaussian()*0.05, rand.nextGaussian()*0.1,null ));
-				tranWtoI.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
-			}
-
-			DMatrixRMaj E = MultiViewOps.createEssential(tranWtoI.getR(), tranWtoI.getT(), null);
-			DMatrixRMaj F = MultiViewOps.createFundamental(E,intrinsic);
-
-			SePointOps_F64.transform(tranWtoI, worldPoint,cameraPoint);
-
-			Point2D_F64 pixel = PerspectiveOps.renderPixel(intrinsic,cameraPoint, null);
-
-			obsPts.add(pixel);
-			motionWorldToCamera.add(tranWtoI);
-			essential.add(F);
-			cameraMatrices.add(PerspectiveOps.createCameraMatrix(tranWtoI.R,tranWtoI.T,K,null));
-		}
+	protected Point4D_F64 convertH( Point3D_F64 X ) {
+		double scale = rand.nextGaussian();
+		if (Math.abs(scale) < 1e-5)
+			scale = 0.001;
+		Point4D_F64 P = new Point4D_F64();
+		P.x = X.x*scale;
+		P.y = X.y*scale;
+		P.z = X.z*scale;
+		P.w = scale;
+		return P;
 	}
 }

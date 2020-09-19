@@ -95,9 +95,9 @@ class TestVisOdomBundlePnPBase {
 		public int count  = 0;
 
 		@Override
-		public boolean triangulate(List<Point2D_F64> observations, List<Se3_F64> worldToView, Point3D_F64 location) {
+		public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView, Point3D_F64 location) {
 			assertEquals(3,observations.size());
-			assertEquals(3,worldToView.size());
+			assertEquals(3, listWorldToView.size());
 			count++;
 			return true;
 		}

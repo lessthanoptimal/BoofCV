@@ -19,29 +19,29 @@
 package boofcv.abst.geo;
 
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.util.List;
 
 /**
- * Refines the location of a triangulated point using non-linear optimization.  A calibrated
+ * Refines a triangulated point's (homogenous coordinate) location using non-linear optimization.  A calibrated
  * camera is assumed.  All observations are in normalized image coordinates.
  *
  * @author Peter Abeles
  */
-public interface RefineTriangulateMetric {
+public interface RefineTriangulateMetricH {
 
 	/**
 	 * Refines the triangulated point.
 	 *
 	 * @param observations Observations of feature in N views. Normalized image coordinates.
 	 * @param listWorldToView Coordinate transforms for each view.  World to View.
-	 * @param worldPt Initial estimate of point in world coordinates.
-	 * @param refinedPt The refined estimated point position.
+	 * @param worldPt Initial estimate of point in world coordinates. Homogenous.
+	 * @param refinedPt The refined estimated point position. Homogenous.
 	 * @return if successful or not
 	 */
 	boolean process( List<Point2D_F64> observations ,
 					 List<Se3_F64> listWorldToView ,
-					 Point3D_F64 worldPt , Point3D_F64 refinedPt );
+					 Point4D_F64 worldPt , Point4D_F64 refinedPt );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.geo.RefineTriangulateProjective;
 import boofcv.abst.geo.TriangulateNViewsProjective;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
+import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -33,32 +34,23 @@ import java.util.List;
  */
 public class TriangulateThenRefineProjective implements TriangulateNViewsProjective {
 
-	TriangulateNViewsProjective estimator;
-	RefineTriangulateProjective refiner;
+	final @Getter TriangulateNViewsProjective estimator;
+	final @Getter RefineTriangulateProjective refiner;
 
-	public TriangulateThenRefineProjective(TriangulateNViewsProjective estimator,
-										   RefineTriangulateProjective refiner)
-	{
+	public TriangulateThenRefineProjective( TriangulateNViewsProjective estimator,
+											RefineTriangulateProjective refiner ) {
 		this.estimator = estimator;
 		this.refiner = refiner;
 	}
 
 	@Override
-	public boolean triangulate(List<Point2D_F64> observations,
-							   List<DMatrixRMaj> worldToView,
-							   Point4D_F64 location) {
+	public boolean triangulate( List<Point2D_F64> observations,
+								List<DMatrixRMaj> worldToView,
+								Point4D_F64 location ) {
 
-		if( !estimator.triangulate(observations,worldToView,location))
+		if (!estimator.triangulate(observations, worldToView, location))
 			return false;
 
-		return refiner.process(observations,worldToView,location,location);
-	}
-
-	public TriangulateNViewsProjective getEstimator() {
-		return estimator;
-	}
-
-	public RefineTriangulateProjective getRefiner() {
-		return refiner;
+		return refiner.process(observations, worldToView, location, location);
 	}
 }

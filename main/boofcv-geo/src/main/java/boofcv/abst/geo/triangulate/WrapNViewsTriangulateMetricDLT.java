@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -36,17 +37,17 @@ import java.util.List;
  */
 public class WrapNViewsTriangulateMetricDLT implements TriangulateNViewsMetric {
 
-	TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
+	final @Getter TriangulateMetricLinearDLT algorithm = new TriangulateMetricLinearDLT();
 
-	Point4D_F64 pointH = new Point4D_F64();
+	final @Getter Point4D_F64 pointH = new Point4D_F64();
 
 	@Override
-	public boolean triangulate(List<Point2D_F64> observations, List<Se3_F64> worldToView ,
-							   Point3D_F64 location ) {
+	public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView,
+								Point3D_F64 location ) {
 
-		if(GeometricResult.SUCCESS == alg.triangulate(observations,worldToView,pointH) ) {
+		if (GeometricResult.SUCCESS == algorithm.triangulate(observations, listWorldToView, pointH)) {
 			// can't handle points at infinity with this interface
-			if( pointH.w == 0 )
+			if (pointH.w == 0)
 				return false;
 			location.x = pointH.x/pointH.w;
 			location.y = pointH.y/pointH.w;
@@ -55,9 +56,5 @@ public class WrapNViewsTriangulateMetricDLT implements TriangulateNViewsMetric {
 		}
 
 		return false;
-	}
-
-	public TriangulateMetricLinearDLT getAlgorithm() {
-		return alg;
 	}
 }

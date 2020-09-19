@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.util.List;
  * <p>
  * [1] Page 315 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
  * </p>
- * 
+ *
  * @author Peter Abeles
  */
 public class ResidualsTriangulateEpipolarSampson implements FunctionNtoM {
@@ -46,10 +46,10 @@ public class ResidualsTriangulateEpipolarSampson implements FunctionNtoM {
 	// Essential matrix associated with motion
 	private List<DMatrixRMaj> essential;
 
-	private Point3D_F64 point = new Point3D_F64();
+	private final Point3D_F64 point = new Point3D_F64();
 
-	private Point3D_F64 left = new Point3D_F64();
-	private Point3D_F64 right = new Point3D_F64();
+	private final Point3D_F64 left = new Point3D_F64();
+	private final Point3D_F64 right = new Point3D_F64();
 
 	/**
 	 * Configures inputs.
@@ -57,8 +57,7 @@ public class ResidualsTriangulateEpipolarSampson implements FunctionNtoM {
 	 * @param observations Observations of the feature at different locations. Normalized image coordinates.
 	 * @param essential Essential matrices associated with camera motion (world to camera)
 	 */
-	public void setObservations( List<Point2D_F64> observations,
-								 List<DMatrixRMaj> essential ) {
+	public void setObservations( List<Point2D_F64> observations, List<DMatrixRMaj> essential ) {
 		this.observations = observations;
 		this.essential = essential;
 	}
@@ -74,14 +73,14 @@ public class ResidualsTriangulateEpipolarSampson implements FunctionNtoM {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process( double[] input, double[] output ) {
 
 		point.x = input[0];
 		point.y = input[1];
 		point.z = input[2];
 
 		int index = 0;
-		for( int i = 0; i < observations.size(); i++ ) {
+		for (int i = 0; i < observations.size(); i++) {
 			Point2D_F64 p = observations.get(i);
 			DMatrixRMaj F = essential.get(i);
 
@@ -91,15 +90,15 @@ public class ResidualsTriangulateEpipolarSampson implements FunctionNtoM {
 			GeometryMath_F64.mult(F, point, right);
 
 			// Jacobian
-			double j1=left.x,j2=left.y,j3=right.x,j4=right.y;
+			double j1 = left.x, j2 = left.y, j3 = right.x, j4 = right.y;
 
 			// J*J
 			double JJ = j1*j1 + j2*j2 + j3*j3 + j4*j4;
 
 			// e=x'*F*x
-			double epipolarError = UtilTrig_F64.dot(left,point);
+			double epipolarError = UtilTrig_F64.dot(left, point);
 
-			if( JJ == 0 ) {
+			if (JJ == 0) {
 				// handle pathological situation
 				output[index++] = 0;
 				output[index++] = 0;

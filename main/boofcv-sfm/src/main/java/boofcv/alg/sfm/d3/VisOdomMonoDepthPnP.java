@@ -115,7 +115,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		ConfigTriangulation config = new ConfigTriangulation();
 		config.type = ConfigTriangulation.Type.GEOMETRIC;
 		config.converge.maxIterations = 10;
-		triangulateN = FactoryMultiView.triangulateNViewCalibrated(config);
+		triangulateN = FactoryMultiView.triangulateNViewMetric(config);
 	}
 
 	/**

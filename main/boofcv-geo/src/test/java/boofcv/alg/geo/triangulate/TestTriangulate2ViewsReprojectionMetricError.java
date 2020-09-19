@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestTriangulate2ViewReprojectionMetricError {
+public class TestTriangulate2ViewsReprojectionMetricError {
 	// pick two very different cameras to make sure the error is being indpendently computed in image each image correctly
 	CameraPinhole cameraA = new CameraPinhole(400,400,0,500,500,1000,1000);
 	CameraPinhole cameraB = new CameraPinhole(600,400,0,200,250,600,700);
@@ -56,7 +56,7 @@ public class TestTriangulate2ViewReprojectionMetricError {
 
 	@Test
 	public void perfect() {
-		Triangulate2ViewReprojectionMetricError alg = new Triangulate2ViewReprojectionMetricError();
+		var alg = new Triangulate2ViewsReprojectionMetricError();
 		alg.configure(cameraA,cameraB);
 
 		assertEquals(0,alg.process(na,nb,a_to_b,Xa), UtilEjml.TEST_F64);
@@ -64,7 +64,7 @@ public class TestTriangulate2ViewReprojectionMetricError {
 
 	@Test
 	public void errorInA() {
-		Triangulate2ViewReprojectionMetricError alg = new Triangulate2ViewReprojectionMetricError();
+		var alg = new Triangulate2ViewsReprojectionMetricError();
 		alg.configure(cameraA,cameraB);
 
 		Point2D_F64 pa = new Point2D_F64();
@@ -77,7 +77,7 @@ public class TestTriangulate2ViewReprojectionMetricError {
 
 	@Test
 	public void errorInB() {
-		Triangulate2ViewReprojectionMetricError alg = new Triangulate2ViewReprojectionMetricError();
+		var alg = new Triangulate2ViewsReprojectionMetricError();
 		alg.configure(cameraA,cameraB);
 
 		Point2D_F64 pb = new Point2D_F64();

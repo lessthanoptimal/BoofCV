@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,21 +25,19 @@ import georegression.struct.se.Se3_F64;
 import java.util.List;
 
 /**
- * Triangulate the location of a point from N views of a feature given a calibrated
- * camera and known camera motion.
+ * Triangulate the location of a point from N views a calibrated camera and known poses.
  *
  * @author Peter Abeles
  */
 public interface TriangulateNViewsMetric {
 
 	/**
-	 * Triangulate the points location.
+	 * Triangulates the point's location.
 	 *
-	 * @param observations Observations of the 3D point in normalized image coordinates from different camera views..
-	 * @param worldToView Transform from world to each of the different camera views
+	 * @param observations Observations of the 3D point in normalized image coordinates from different camera views.
+	 * @param listWorldToView Transform from world to each of the different camera views
 	 * @param location Computed location of feature in world coordinates.
 	 * @return true if successful, false otherwise.
 	 */
-	public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> worldToView ,
-								Point3D_F64 location );
+	boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView, Point3D_F64 location );
 }

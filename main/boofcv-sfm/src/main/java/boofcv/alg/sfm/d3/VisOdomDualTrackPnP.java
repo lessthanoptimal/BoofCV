@@ -182,7 +182,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		ConfigTriangulation config = new ConfigTriangulation();
 		config.type = ConfigTriangulation.Type.GEOMETRIC;
 		config.converge.maxIterations = 10;
-		triangulateN = FactoryMultiView.triangulateNViewCalibrated(config);
+		triangulateN = FactoryMultiView.triangulateNViewMetric(config);
 	}
 
 	/**

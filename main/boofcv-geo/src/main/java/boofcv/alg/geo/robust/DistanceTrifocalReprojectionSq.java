@@ -51,7 +51,7 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 	List<Point2D_F64> observations = new ArrayList<>();
 
 	TrifocalExtractGeometries extractor = new TrifocalExtractGeometries();
-	TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.DLT());
+	TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNViewProj(ConfigTriangulation.DLT());
 
 	TriangulateRefineProjectiveLS refiner;
 

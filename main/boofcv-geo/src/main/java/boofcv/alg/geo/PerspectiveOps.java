@@ -1005,4 +1005,18 @@ public class PerspectiveOps {
 			p3.set(p4.x/w, p4.y/w, p4.z/w);
 		}
 	}
+
+	/**
+	 * Returns a distance measure between two 3D homogenous points. There is no well defined way to measure distance
+	 * in homogenous space.
+	 *
+	 * <p>distance = norm( a/norm(a) - b/norm(b) )</p>
+	 *
+	 * @param a 3D homogneous point
+	 * @param b 3D homogneous point
+	 * @return A distance measure
+	 */
+	public static double distance( Point4D_F64 a, Point4D_F64 b ) {
+		return ImplPerspectiveOps_F64.distance(a, b);
+	}
 }

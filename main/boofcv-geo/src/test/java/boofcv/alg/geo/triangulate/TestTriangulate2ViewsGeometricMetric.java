@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,24 +26,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestTriangulate2ViewGeometricMetric extends CommonTriangulationChecks {
+public class TestTriangulate2ViewsGeometricMetric extends CommonTriangulationChecks {
 
 	/**
 	 * Create 2 perfect observations and solve for the position
 	 */
 	@Test
 	public void triangulate_two() {
-		createMetricScene();
+		createScene();
 
 		Triangulate2ViewsGeometricMetric alg = new Triangulate2ViewsGeometricMetric();
 
 		Point3D_F64 found = new Point3D_F64();
 		for (int i = 1; i < N; i++) {
-			alg.triangulate(obsPts.get(0),obsPts.get(i), motionWorldToCamera.get(i),found);
+			alg.triangulate(obsNorm.get(0), obsNorm.get(i), motionWorldToCamera.get(i), found);
 
-			assertEquals(worldPoint.x,found.x,1e-8);
-			assertEquals(worldPoint.y,found.y,1e-8);
-			assertEquals(worldPoint.z,found.z,1e-8);
+			assertEquals(worldPoint.x, found.x, 1e-8);
+			assertEquals(worldPoint.y, found.y, 1e-8);
+			assertEquals(worldPoint.z, found.z, 1e-8);
 		}
 	}
 }

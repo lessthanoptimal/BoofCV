@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,17 +34,17 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	 */
 	@Test
 	public void triangulate_N() {
-		createMetricScene();
+		createScene();
 
 		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 
 		Point4D_F64 found = new Point4D_F64();
 
-		alg.triangulate(obsPts, motionWorldToCamera,found);
+		alg.triangulate(obsNorm, motionWorldToCamera, found);
 
-		assertEquals(worldPoint.x,found.x/found.w,UtilEjml.TEST_F64);
-		assertEquals(worldPoint.y,found.y/found.w,UtilEjml.TEST_F64);
-		assertEquals(worldPoint.z,found.z/found.w,UtilEjml.TEST_F64);
+		assertEquals(worldPoint.x, found.x/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.y, found.y/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.z, found.z/found.w, UtilEjml.TEST_F64);
 	}
 
 	/**
@@ -52,16 +52,16 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	 */
 	@Test
 	public void triangulate_two() {
-		createMetricScene();
+		createScene();
 
 		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 
 		Point4D_F64 found = new Point4D_F64();
-		
-		alg.triangulate(obsPts.get(0),obsPts.get(1), motionWorldToCamera.get(1),found);
 
-		assertEquals(worldPoint.x,found.x/found.w,UtilEjml.TEST_F64);
-		assertEquals(worldPoint.y,found.y/found.w,UtilEjml.TEST_F64);
-		assertEquals(worldPoint.z,found.z/found.w,UtilEjml.TEST_F64);
+		alg.triangulate(obsNorm.get(0), obsNorm.get(1), motionWorldToCamera.get(1), found);
+
+		assertEquals(worldPoint.x, found.x/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.y, found.y/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.z, found.z/found.w, UtilEjml.TEST_F64);
 	}
 }

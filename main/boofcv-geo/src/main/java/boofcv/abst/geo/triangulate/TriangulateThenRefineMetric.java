@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.geo.TriangulateNViewsMetric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -33,32 +34,23 @@ import java.util.List;
  */
 public class TriangulateThenRefineMetric implements TriangulateNViewsMetric {
 
-	TriangulateNViewsMetric estimator;
-	RefineTriangulateMetric refiner;
+	final @Getter TriangulateNViewsMetric estimator;
+	final @Getter RefineTriangulateMetric refiner;
 
-	public TriangulateThenRefineMetric(TriangulateNViewsMetric estimator,
-									   RefineTriangulateMetric refiner)
-	{
+	public TriangulateThenRefineMetric( TriangulateNViewsMetric estimator,
+										RefineTriangulateMetric refiner ) {
 		this.estimator = estimator;
 		this.refiner = refiner;
 	}
 
 	@Override
-	public boolean triangulate(List<Point2D_F64> observations,
-							   List<Se3_F64> worldToView,
-							   Point3D_F64 location) {
+	public boolean triangulate( List<Point2D_F64> observations,
+								List<Se3_F64> listWorldToView,
+								Point3D_F64 location ) {
 
-		if( !estimator.triangulate(observations,worldToView,location))
+		if (!estimator.triangulate(observations, listWorldToView, location))
 			return false;
 
-		return refiner.process(observations,worldToView,location,location);
-	}
-
-	public TriangulateNViewsMetric getEstimator() {
-		return estimator;
-	}
-
-	public RefineTriangulateMetric getRefiner() {
-		return refiner;
+		return refiner.process(observations, listWorldToView, location, location);
 	}
 }
