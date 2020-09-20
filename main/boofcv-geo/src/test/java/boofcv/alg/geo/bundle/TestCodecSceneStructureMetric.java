@@ -63,7 +63,7 @@ class TestCodecSceneStructureMetric {
 		SceneStructureMetric found = createScene(rand, homogenous, hasRigid, false);
 		codec.decode(param, found);
 
-		assertEquals(homogenous, found.homogenous);
+		assertEquals(homogenous, found.isHomogenous());
 		for (int i = 0; i < original.points.size; i++) {
 			assertTrue(original.points.data[i].distance(found.points.data[i]) < UtilEjml.TEST_F64);
 		}

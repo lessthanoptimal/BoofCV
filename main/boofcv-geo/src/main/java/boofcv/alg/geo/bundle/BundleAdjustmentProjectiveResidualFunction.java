@@ -39,14 +39,12 @@ import georegression.struct.point.Point4D_F64;
  * cost(P) = (1/(m*n))*&sum;<sub>i</sub> &sum;<sub>j</sub> ||x<sub>j</sub> - (1/z)*P<sub>i</sub>*X<sub>j</sub>||<sup>2</sup>
  * </p>
  *
+ * @author Peter Abeles
  * @see SceneStructureProjective
  * @see SceneObservations
- *
- * @author Peter Abeles
  */
 public class BundleAdjustmentProjectiveResidualFunction
-	implements BundleAdjustmentSchur.FunctionResiduals<SceneStructureProjective>
-{
+		implements BundleAdjustmentSchur.FunctionResiduals<SceneStructureProjective> {
 	private SceneStructureProjective structure;
 	private SceneObservations observations;
 
@@ -55,28 +53,26 @@ public class BundleAdjustmentProjectiveResidualFunction
 	// number of observations.  2 for each point in each view
 	private int numObservations;
 
-
 	// Storage for rendered output
-	private Point2D_F64 predictedPixel = new Point2D_F64();
-	private PointIndex2D_F64 observedPixel = new PointIndex2D_F64();
+	private final Point2D_F64 predictedPixel = new Point2D_F64();
+	private final PointIndex2D_F64 observedPixel = new PointIndex2D_F64();
 
 	// Used to write the "unknown" paramters into the scene
-	private CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
+	private final CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
 
 	// Point in world frame
-	private Point3D_F64 p3 = new Point3D_F64();
-	private Point4D_F64 p4 = new Point4D_F64();
+	private final Point3D_F64 p3 = new Point3D_F64();
+	private final Point4D_F64 p4 = new Point4D_F64();
 
 	// Pixel in homogenous image coordinate
-	private Point3D_F64 pix = new Point3D_F64();
+	private final Point3D_F64 pix = new Point3D_F64();
 
 	/**
 	 * Specifies the scenes structure and observed feature locations
 	 */
 	@Override
-	public void configure(SceneStructureProjective structure ,
-						  SceneObservations observations )
-	{
+	public void configure( SceneStructureProjective structure,
+						   SceneObservations observations ) {
 		this.structure = structure;
 		this.observations = observations;
 
@@ -95,12 +91,12 @@ public class BundleAdjustmentProjectiveResidualFunction
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process( double[] input, double[] output ) {
 
 		// write the current parameters into the scene's structure
-		codec.decode(input,structure);
+		codec.decode(input, structure);
 
-		if( structure.homogenous )
+		if (structure.isHomogenous())
 			project4(output);
 		else
 			project3(output);
@@ -109,28 +105,28 @@ public class BundleAdjustmentProjectiveResidualFunction
 	/**
 	 * projection from 3D coordinates
 	 */
-	private void project3(double[] output) {
+	private void project3( double[] output ) {
 		int observationIndex = 0;
-		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			SceneObservations.View obsView = observations.views.data[viewIndex];
 			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
 
 			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i,observedPixel);
+				obsView.get(i, observedPixel);
 				SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p3);
 
 				// Apply projective camera to point in world coordinates
-				PerspectiveOps.renderPixel(view.worldToView,p3,pix);
+				PerspectiveOps.renderPixel(view.worldToView, p3, pix);
 
 				// Apply camera model to pixel in homogenous coordinates
-				camera.model.project(pix.x,pix.y,pix.z,predictedPixel);
+				camera.model.project(pix.x, pix.y, pix.z, predictedPixel);
 
 				// Save results
 				int outputIndex = observationIndex*2;
-				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
-				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
+				output[outputIndex] = predictedPixel.x - observedPixel.x;
+				output[outputIndex + 1] = predictedPixel.y - observedPixel.y;
 				observationIndex++;
 			}
 		}
@@ -139,28 +135,28 @@ public class BundleAdjustmentProjectiveResidualFunction
 	/**
 	 * projection from homogenous coordinates
 	 */
-	private void project4(double[] output) {
+	private void project4( double[] output ) {
 		int observationIndex = 0;
-		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+		for (int viewIndex = 0; viewIndex < structure.views.size; viewIndex++) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			SceneObservations.View obsView = observations.views.data[viewIndex];
 			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
 
 			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i,observedPixel);
+				obsView.get(i, observedPixel);
 				SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p4);
 
 				// Apply projective camera to point in world coordinates
-				PerspectiveOps.renderPixel(view.worldToView,p4,pix);
+				PerspectiveOps.renderPixel(view.worldToView, p4, pix);
 
 				// Apply camera model to pixel in homogenous coordinates
-				camera.model.project(pix.x,pix.y,pix.z,predictedPixel);
+				camera.model.project(pix.x, pix.y, pix.z, predictedPixel);
 
 				// Save results
 				int outputIndex = observationIndex*2;
-				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
-				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
+				output[outputIndex] = predictedPixel.x - observedPixel.x;
+				output[outputIndex + 1] = predictedPixel.y - observedPixel.y;
 				observationIndex++;
 			}
 		}

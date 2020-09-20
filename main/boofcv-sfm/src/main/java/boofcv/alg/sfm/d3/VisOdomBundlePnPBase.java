@@ -70,7 +70,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 
 	//----- Data structures for Bundle Adjustment and Track Information
 	/** Describes the entire 3D scene's structure and optimizes with bundle adjustment */
-	protected @Getter VisOdomBundleAdjustment<Track> scene;
+	protected @Getter VisOdomBundleAdjustment<Track> bundleViso;
 	/** Decides when to create a new keyframe and discard them */
 	protected @Getter @Setter VisOdomKeyFrameManager frameManager = new MaxGeoKeyFrameManager();
 
@@ -127,7 +127,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		current_to_world.reset();
 		current_to_previous.reset();
 		cameraModels.clear();
-		scene.reset();
+		bundleViso.reset();
 		first = true;
 	}
 
@@ -150,8 +150,8 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	protected void triangulateNotSelectedBundleTracks() {
 		final int minObservationsTriangulate = this.minObservationsTriangulate;
 
-		for (int trackIdx = 0; trackIdx < scene.tracks.size; trackIdx++) {
-			final BTrack bt = scene.tracks.data[trackIdx];
+		for (int trackIdx = 0; trackIdx < bundleViso.tracks.size; trackIdx++) {
+			final BTrack bt = bundleViso.tracks.data[trackIdx];
 			// skip selected since they have already been optimized or only too few observations since
 			// results will be unstable
 			if (bt.selected || bt.observations.size < minObservationsTriangulate)
@@ -185,10 +185,10 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 * @return true if current frame
 	 */
 	protected boolean performKeyFrameMaintenance(PointTracker<?> tracker, int newFrames) {
-		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene);
+		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, bundleViso);
 		boolean droppedCurrentFrame = false;
 		if (dropFrameIndexes.size != 0) {
-			droppedCurrentFrame = dropFrameIndexes.getTail(0) == scene.frames.size - 1;
+			droppedCurrentFrame = dropFrameIndexes.getTail(0) == bundleViso.frames.size - 1;
 			dropFramesFromScene(dropFrameIndexes);
 		}
 		dropTracksNotVisibleAndTooFewObservations();
@@ -206,11 +206,11 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		for (int i = dropFrameIndexes.size - 1; i >= 0; i--) {
 			// indexes are ordered from lowest to highest, so you can remove frames without
 			// changing the index in the list
-			BFrame frameToDrop = scene.frames.get(dropFrameIndexes.get(i));
+			BFrame frameToDrop = bundleViso.frames.get(dropFrameIndexes.get(i));
 //			System.out.println("Dropping frame ID "+frameToDrop.id);
 
 			// update data structures
-			scene.removeFrame(frameToDrop, removedBundleTracks);
+			bundleViso.removeFrame(frameToDrop, removedBundleTracks);
 
 			// These tracks were visually being tracked and were removed. So drop them from the visual tracker
 			for (int removeIdx = 0; removeIdx < removedBundleTracks.size(); removeIdx++) {
@@ -227,18 +227,18 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		final int minObservationsNotVisible = this.minObservationsNotVisible;
 
 		// iteration through track lists in reverse order because of removeSwap()
-		for (int tidx = scene.tracks.size - 1; tidx >= 0; tidx--) {
-			BTrack bt = scene.tracks.get(tidx);
+		for (int tidx = bundleViso.tracks.size - 1; tidx >= 0; tidx--) {
+			BTrack bt = bundleViso.tracks.get(tidx);
 			if (bt.visualTrack == null && bt.observations.size < minObservationsNotVisible) {
 				bt.observations.reset(); // Mark it as dropped. Formally remove it in the next loop
-				scene.tracks.removeSwap(tidx);
+				bundleViso.tracks.removeSwap(tidx);
 //				System.out.println("drop old bt="+bt.id+" vt=NONE");
 			}
 		}
 
 		// Need to remove the dropped tracks from each frame that saw them.
-		for (int fidx = 0; fidx < scene.frames.size; fidx++) {
-			BFrame bf = scene.frames.get(fidx);
+		for (int fidx = 0; fidx < bundleViso.frames.size; fidx++) {
+			BFrame bf = bundleViso.frames.get(fidx);
 			for (int tidx = bf.tracks.size - 1; tidx >= 0; tidx--) {
 				BTrack bt = bf.tracks.get(tidx);
 				if (bt.observations.size == 0) {
@@ -254,8 +254,8 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 */
 	void dropBadBundleTracks() {
 		// Go through each frame and look for tracks which are bad
-		for (int fidx = 0; fidx < scene.frames.size; fidx++) {
-			BFrame bf = scene.frames.get(fidx);
+		for (int fidx = 0; fidx < bundleViso.frames.size; fidx++) {
+			BFrame bf = bundleViso.frames.get(fidx);
 			bf.frame_to_world.invert(world_to_frame);
 
 			for (int tidx = bf.tracks.size - 1; tidx >= 0; tidx--) {
@@ -280,22 +280,22 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		}
 
 		// Remove it from the master tracks list
-		totalDroppedTracksBadBundle = scene.tracks.size;
-		for (int tidx = scene.tracks.size - 1; tidx >= 0; tidx--) {
-			BTrack bt = scene.tracks.get(tidx);
+		totalDroppedTracksBadBundle = bundleViso.tracks.size;
+		for (int tidx = bundleViso.tracks.size - 1; tidx >= 0; tidx--) {
+			BTrack bt = bundleViso.tracks.get(tidx);
 			if (bt.observations.size == 0) {
 				if (bt.id == -1) {
 					throw new RuntimeException("BUG! Dropping a track that was never initialized");
 				}
-				scene.tracks.removeSwap(tidx);
+				bundleViso.tracks.removeSwap(tidx);
 			}
 		}
-		totalDroppedTracksBadBundle -= scene.tracks.size; // the delta is the number of dropped tracks
+		totalDroppedTracksBadBundle -= bundleViso.tracks.size; // the delta is the number of dropped tracks
 
 		// Do a second pass since if it was removed in the first pass it might not be removed from all the frames
 		// if it was good in an earlier one
-		for (int fidx = 0; fidx < scene.frames.size; fidx++) {
-			BFrame bf = scene.frames.get(fidx);
+		for (int fidx = 0; fidx < bundleViso.frames.size; fidx++) {
+			BFrame bf = bundleViso.frames.get(fidx);
 			for (int tidx = bf.tracks.size - 1; tidx >= 0; tidx--) {
 				BTrack bt = bf.tracks.get(tidx);
 				if (bt.observations.size == 0) {

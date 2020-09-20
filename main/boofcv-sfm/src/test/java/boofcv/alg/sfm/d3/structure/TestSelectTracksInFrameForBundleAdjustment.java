@@ -18,12 +18,9 @@
 
 package boofcv.alg.sfm.d3.structure;
 
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.sfm.d3.structure.SelectTracksInFrameForBundleAdjustment.Info;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.junit.jupiter.api.Test;
 
@@ -40,20 +37,19 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class TestSelectTracksInFrameForBundleAdjustment {
 	final int width = 100;
 	final int height = 200;
-	BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
 
 	/**
 	 * Basic test. Each track is visible in every frame at the same location.
 	 */
 	@Test
 	void minimal_all() {
-		var scene = new VisOdomBundleAdjustment<>(sba, BTrack::new);
+		var scene = new VisOdomBundleAdjustment<>(BTrack::new);
 		var alg = new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 		alg.configUniform.regionScaleFactor = 1.0; // makes the math easier
 		alg.maxFeaturesPerFrame = 200;
 		var selected = new ArrayList<BTrack>();
 
-		scene.addCamera(new CameraPinholeBrown(0,0,0,0,0,width,height));
+		scene.addCamera(new CameraPinholeBrown(0, 0, 0, 0, 0, width, height));
 		for (int i = 0; i < 5; i++) {
 			scene.addFrame(i);
 		}
@@ -70,26 +66,26 @@ class TestSelectTracksInFrameForBundleAdjustment {
 				int y = 10*((i*10)/width);
 				VisOdomBundleAdjustment.BObservation o = track.observations.grow();
 				o.frame = frame;
-				o.pixel.set(x,y);
+				o.pixel.set(x, y);
 			}
 		}
-		alg.selectTracks(scene,selected);
-		assertEquals(200,selected.size());
+		alg.selectTracks(scene, selected);
+		assertEquals(200, selected.size());
 	}
 
 	@Test
 	void initializeGrid() {
-		var scene = new VisOdomBundleAdjustment<>(sba, BTrack::new);
+		var scene = new VisOdomBundleAdjustment<>(BTrack::new);
 		var alg = new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 		alg.minTrackObservations = 1;
 
-		scene.addCamera(new CameraPinholeBrown(0,0,0,0,0,width,height));
+		scene.addCamera(new CameraPinholeBrown(0, 0, 0, 0, 0, width, height));
 		for (int i = 0; i < 3; i++) {
 			scene.addFrame(i);
 		}
 		BFrame targetFrame = scene.frames.get(2);
 		// create enough tracks for there to be one in each cell
-		connectFrames(1,2,200,scene);
+		connectFrames(1, 2, 200, scene);
 		for (int i = 0; i < scene.tracks.size; i++) {
 			BTrack track = scene.tracks.get(i);
 			// pixel coordinates
@@ -97,25 +93,25 @@ class TestSelectTracksInFrameForBundleAdjustment {
 			int y = 10*((i*10)/width);
 			// make sure it's false. should be already
 			track.selected = false;
-			track.findObservationBy(targetFrame).pixel.set(x,y);
+			track.findObservationBy(targetFrame).pixel.set(x, y);
 		}
 
 		// mark this one as active so that it isn't added to a cell. There should only be one empty cell
 		scene.tracks.get(2).selected = true;
 
 		// run it
-		alg.initializeGrid(targetFrame,width,height,10);
+		alg.initializeGrid(targetFrame, width, height, 10);
 
 		// There should be one track in all but one cell
 		for (int i = 0; i < alg.grid.cells.size; i++) {
 			Info cell = alg.grid.cells.get(i);
-			if( i != 2 ) {
-				assertEquals(0,cell.alreadySelected);
-				assertEquals(1,cell.unselected.size());
-				assertSame(scene.tracks.get(i),cell.unselected.get(0));
+			if (i != 2) {
+				assertEquals(0, cell.alreadySelected);
+				assertEquals(1, cell.unselected.size());
+				assertSame(scene.tracks.get(i), cell.unselected.get(0));
 			} else {
-				assertEquals(1,cell.alreadySelected);
-				assertEquals(0,cell.unselected.size());
+				assertEquals(1, cell.alreadySelected);
+				assertEquals(0, cell.unselected.size());
 			}
 		}
 	}
@@ -126,28 +122,28 @@ class TestSelectTracksInFrameForBundleAdjustment {
 	 */
 	@Test
 	void selectNewTracks() {
-		var scene = new VisOdomBundleAdjustment<>(sba, BTrack::new);
+		var scene = new VisOdomBundleAdjustment<>(BTrack::new);
 		var alg = new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 		alg.maxFeaturesPerFrame = 200; // one less than the total number of tracks
-		alg.grid.initialize(10,width,height);
+		alg.grid.initialize(10, width, height);
 		// populate the grid with one track each
 		for (int row = 0; row < 20; row++) {
 			for (int col = 0; col < 10; col++) {
-				alg.grid.get(row,col).unselected.add(scene.tracks.grow());
+				alg.grid.get(row, col).unselected.add(scene.tracks.grow());
 			}
 		}
-		alg.grid.get(1,1).alreadySelected = 1;
+		alg.grid.get(1, 1).alreadySelected = 1;
 
 		List<BTrack> selected = new ArrayList<>();
 		alg.selectNewTracks(selected);
-		assertEquals(199,selected.size());
+		assertEquals(199, selected.size());
 		for (int row = 0; row < 20; row++) {
 			for (int col = 0; col < 10; col++) {
-				assertEquals(0,alg.grid.get(row,col).alreadySelected);
-				if( row == 1 && col == 1 )
-					assertEquals(1,alg.grid.get(row,col).unselected.size());
+				assertEquals(0, alg.grid.get(row, col).alreadySelected);
+				if (row == 1 && col == 1)
+					assertEquals(1, alg.grid.get(row, col).unselected.size());
 				else
-					assertEquals(0,alg.grid.get(row,col).unselected.size());
+					assertEquals(0, alg.grid.get(row, col).unselected.size());
 			}
 		}
 	}

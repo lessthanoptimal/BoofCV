@@ -430,9 +430,9 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		FastAccess<BTrack> tracks = null;
 		int bundleTracks;
 		if( alg instanceof WrapVisOdomMonoStereoDepthPnP) {
-			tracks = ((WrapVisOdomMonoStereoDepthPnP)alg).getAlgorithm().getScene().tracks;
+			tracks = ((WrapVisOdomMonoStereoDepthPnP)alg).getAlgorithm().getBundleViso().tracks;
 		} else if( alg instanceof WrapVisOdomDualTrackPnP) {
-			tracks = ((WrapVisOdomDualTrackPnP)alg).getAlgorithm().getScene().tracks;
+			tracks = ((WrapVisOdomDualTrackPnP)alg).getAlgorithm().getBundleViso().tracks;
 		}
 
 		if( tracks != null ) {

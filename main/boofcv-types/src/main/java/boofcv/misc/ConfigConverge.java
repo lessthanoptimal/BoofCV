@@ -31,7 +31,7 @@ public class ConfigConverge implements Configuration {
 	public double gtol;
 	public int maxIterations;
 
-	public ConfigConverge(double ftol, double gtol, int maxIterations) {
+	public ConfigConverge( double ftol, double gtol, int maxIterations ) {
 		this.ftol = ftol;
 		this.gtol = gtol;
 		this.maxIterations = maxIterations;
@@ -41,10 +41,15 @@ public class ConfigConverge implements Configuration {
 		setTo(src);
 	}
 
-	public ConfigConverge() {
+	public ConfigConverge() {}
+
+	public void set( double ftol, double gtol, int maxIterations ) {
+		this.ftol = ftol;
+		this.gtol = gtol;
+		this.maxIterations = maxIterations;
 	}
 
-	public void setTo(ConfigConverge src ) {
+	public void setTo( ConfigConverge src ) {
 		this.ftol = src.ftol;
 		this.gtol = src.gtol;
 		this.maxIterations = src.maxIterations;

@@ -122,7 +122,7 @@ public class BundleAdjustmentMetricResidualFunction
 		codec.decode(input, structure);
 
 		// Project the general scene now
-		if (structure.homogenous)
+		if (structure.isHomogenous())
 			project4(output);
 		else
 			project3(output);

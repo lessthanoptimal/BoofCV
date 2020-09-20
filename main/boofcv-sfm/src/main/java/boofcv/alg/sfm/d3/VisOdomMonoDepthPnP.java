@@ -19,8 +19,6 @@
 package boofcv.alg.sfm.d3;
 
 import boofcv.abst.geo.RefinePnP;
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
@@ -98,17 +96,15 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	 * @param refine Optional algorithm for refining the pose estimate.  Can be null.
 	 * @param tracker Point feature tracker.
 	 */
-	public VisOdomMonoDepthPnP(ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
-							   ImagePixelTo3D pixelTo3D,
-							   RefinePnP refine ,
-							   PointTracker<T> tracker ,
-							   BundleAdjustment<SceneStructureMetric> bundleAdjustment )
-	{
+	public VisOdomMonoDepthPnP( ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
+								ImagePixelTo3D pixelTo3D,
+								RefinePnP refine,
+								PointTracker<T> tracker ) {
 		this.motionEstimator = motionEstimator;
 		this.pixelTo3D = pixelTo3D;
 		this.refine = refine;
 		this.tracker = tracker;
-		this.scene = new VisOdomBundleAdjustment<>(bundleAdjustment,Track::new);
+		this.bundleViso = new VisOdomBundleAdjustment<>(Track::new);
 
 		// TODO would be best if this reduced pixel error and not geometric error
 		// TODO remove and replace with calibrated homogenous coordinates when it exists
@@ -154,9 +150,9 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		if( first ) {
 			first = false;
 			spawnNewTracksForNewKeyFrame(visibleTracks);
-			frameManager.initialize(scene.cameras);
-			frameManager.handleSpawnedTracks(tracker, scene.cameras.getTail());
-			if( verbose != null ) verbose.println("VO: First Frame. Spawned="+visibleTracks.size());
+			frameManager.initialize(bundleViso.cameras);
+			frameManager.handleSpawnedTracks(tracker, bundleViso.cameras.getTail());
+			if (verbose != null) verbose.println("VO: First Frame. Spawned=" + visibleTracks.size());
 			return true;
 		}
 
@@ -169,9 +165,9 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		// Estimate motion
 		List<PointTrack> activeVisualTracks = tracker.getActiveTracks(null);
 		if( !estimateMotion(activeVisualTracks) ) {
-			if( verbose != null ) verbose.println("VO: estimate motion failed");
+			if (verbose != null) verbose.println("VO: estimate motion failed");
 			// discard the current frame and attempt to jump over it
-			scene.removeFrame(frameCurrent, removedBundleTracks);
+			bundleViso.removeFrame(frameCurrent, removedBundleTracks);
 			dropRemovedBundleTracks();
 			updateListOfVisibleTracksForOutput();
 			return false;
@@ -199,7 +195,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		if( !droppedCurrentFrame ) {
 			// it decided to keep the current track. Spawn new tracks in the current frame
 			spawnNewTracksForNewKeyFrame(visibleTracks);
-			frameManager.handleSpawnedTracks(tracker, scene.cameras.getTail());
+			frameManager.handleSpawnedTracks(tracker, bundleViso.cameras.getTail());
 		}
 		long time6 = System.nanoTime();
 		if( verbose != null )
@@ -231,17 +227,17 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		initialVisible.clear();
 
 		// Previous key frame is the most recently added one, which is the last
-		framePrevious = first ? null : scene.getLastFrame();
+		framePrevious = first ? null : bundleViso.getLastFrame();
 		// Create a new frame for the current image
-		frameCurrent = scene.addFrame(tracker.getFrameID());
+		frameCurrent = bundleViso.addFrame(tracker.getFrameID());
 	}
 
 	private void verbosePrintTrackerSummary() {
 		if( verbose != null ) {
 			verbose.println("-----------------------------------------------------------------------------------------");
 			verbose.println("Input Frame Count   " + tracker.getFrameID());
-			verbose.println("   Bundle Frames    " + scene.frames.size);
-			verbose.println("   Bundle tracks    " + scene.tracks.size);
+			verbose.println("   Bundle Frames    " + bundleViso.frames.size);
+			verbose.println("   Bundle tracks    " + bundleViso.tracks.size);
 			verbose.println("   Tracker active   " + tracker.getTotalActive());
 			verbose.println("   Tracker inactive " + tracker.getTotalInactive());
 		}
@@ -252,8 +248,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	 */
 	private void optimizeTheScene() {
 		// Update the state estimate
-		if( scene.isOptimizeActive() ) {
-			scene.optimize();
+		if (bundleViso.isOptimizeActive()) {
+			bundleViso.optimize(verbose);
 			triangulateNotSelectedBundleTracks();
 		}
 		// Save the output
@@ -286,13 +282,13 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	 * Sets the known fixed camera parameters
 	 */
 	public void setCamera( CameraPinholeBrown camera ) {
-		scene.cameras.reset();
-		scene.addCamera(camera);
+		bundleViso.cameras.reset();
+		bundleViso.addCamera(camera);
 		LensDistortionNarrowFOV factory = LensDistortionFactory.narrow(camera);
 
 		CameraModel cm = new CameraModel();
-		cm.pixelToNorm = factory.undistort_F64(true,false);
-		cm.normToPixel = factory.distort_F64(false,true);
+		cm.pixelToNorm = factory.undistort_F64(true, false);
+		cm.normToPixel = factory.distort_F64(false, true);
 		cameraModels.clear();
 		cameraModels.add(cm);
 	}
@@ -307,8 +303,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			Track bt = pt.getCookie();
 			bt.lastUsed = frameID;
 			bt.hasBeenInlier = true;
-			scene.addObservation(frameCurrent, bt, pt.pixel.x, pt.pixel.y);
-			inlierTracks.add( bt );
+			bundleViso.addObservation(frameCurrent, bt, pt.pixel.x, pt.pixel.y);
+			inlierTracks.add(bt);
 		}
 	}
 
@@ -366,13 +362,13 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 				totalRejected++;
 				tracker.dropTrack(pt);
 			} else {
-				if( scene.findByTrackerTrack(pt) != null ) {
+				if (bundleViso.findByTrackerTrack(pt) != null) {
 //					Track btrack = scene.findByTrackerTrack(pt);
 //					System.out.println("BUG! Tracker recycled... bt="+btrack.id+" tt="+t.featureId);
-					throw new RuntimeException("BUG! Recycled tracker track too early tt="+pt.featureId);
+					throw new RuntimeException("BUG! Recycled tracker track too early tt=" + pt.featureId);
 				}
 				// Save the track's 3D location and add it to the current frame
-				Track btrack = scene.addTrack(pixelTo3D.getX(),pixelTo3D.getY(),pixelTo3D.getZ(),pixelTo3D.getW());
+				Track btrack = bundleViso.addTrack(pixelTo3D.getX(), pixelTo3D.getY(), pixelTo3D.getZ(), pixelTo3D.getW());
 				btrack.lastUsed = frameID;
 				btrack.visualTrack = pt;
 				btrack.id = pt.featureId;
@@ -381,12 +377,12 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 //				System.out.println("new track bt="+btrack.id+" tt.id="+t.featureId);
 
 				// Convert the location from local coordinate system to world coordinates
-				SePointOps_F64.transform(frameCurrent.frame_to_world,btrack.worldLoc,btrack.worldLoc);
+				SePointOps_F64.transform(frameCurrent.frame_to_world, btrack.worldLoc, btrack.worldLoc);
 				// keep the scale of floats manageable and normalize the vector to have a norm of 1
 				// Homogeneous coordinates so the distance is determined by the ratio of w and other elements
 				btrack.worldLoc.normalize();
 
-				scene.addObservation(frameCurrent, btrack, pt.pixel.x , pt.pixel.y);
+				bundleViso.addObservation(frameCurrent, btrack, pt.pixel.x, pt.pixel.y);
 
 //				for (int i = 0; i < visibleTracks.size(); i++) {
 //					if( visibleTracks.get(i).visualTrack == t )

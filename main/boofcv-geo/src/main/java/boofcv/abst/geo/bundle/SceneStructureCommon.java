@@ -24,6 +24,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import lombok.Getter;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -35,15 +36,23 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public abstract class SceneStructureCommon implements SceneStructure {
 	public final FastQueue<Camera> cameras = new FastQueue<>(Camera::new, Camera::reset);
-	public final FastQueue<Point> points;
-	/**
-	 * True if homogenous coordinates are being used
-	 */
-	public boolean homogenous;
-	// number of elements in a point. Will be 3 or 4
-	protected int pointSize;
+	public FastQueue<Point> points;
+	/** True if homogenous coordinates are being used */
+	protected boolean homogenous;
+	/** number of elements in a point. Will be 3 or 4 */
+	protected @Getter int pointSize;
 
 	protected SceneStructureCommon( boolean homogenous ) {
+		setHomogenous(homogenous);
+	}
+
+	/**
+	 * Used to change if homogenous coordinates are used or not. All past points are discarded when this function is
+	 * called
+	 *
+	 * @param homogenous true for homogenous coordinates or false for 3D cartesian
+	 */
+	public void setHomogenous( boolean homogenous ) {
 		this.homogenous = homogenous;
 		pointSize = homogenous ? 4 : 3;
 		points = new FastQueue<>(() -> new Point(pointSize), Point::reset);

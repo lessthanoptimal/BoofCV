@@ -18,12 +18,13 @@
 
 package boofcv.alg.sfm.d3.structure;
 
-import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -33,7 +34,9 @@ import lombok.Getter;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,10 +54,9 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	/** List of all the cameras */
 	public final FastQueue<BCamera> cameras = new FastQueue<>(BCamera::new, BCamera::reset);
 
-	public SceneStructureMetric structure = new SceneStructureMetric(true);
-	public SceneObservations observations = new SceneObservations();
+	/** Configurations and implementation of bundle adjustment */
+	public final MetricBundleAdjustmentUtils bundle = new MetricBundleAdjustmentUtils();
 
-	public BundleAdjustment<SceneStructureMetric> bundleAdjustment;
 	public List<BTrack> selectedTracks = new ArrayList<>();
 
 	// Reduce the number of tracks feed into bundle adjustment to make it run at a reasonable speed
@@ -62,27 +64,28 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 	final Se3_F64 world_to_view = new Se3_F64();
 
-	public VisOdomBundleAdjustment( BundleAdjustment<SceneStructureMetric> bundleAdjustment, Factory<T> factoryTracks ) {
+	public VisOdomBundleAdjustment( Factory<T> factoryTracks ) {
 		this.tracks = new FastQueue<>(factoryTracks, BTrack::reset);
-		this.bundleAdjustment = bundleAdjustment;
+		bundle.configConverge.setTo(new ConfigConverge(1e-3, 1e-3, 3));
 	}
 
 	/**
 	 * Performs bundle adjustment on the scene and updates parameters
 	 */
-	public void optimize() {
+	public void optimize( @Nullable PrintStream verbose ) {
 		selectTracks.selectTracks(this, selectedTracks);
 		setupBundleStructure();
 
-		bundleAdjustment.setParameters(structure, observations);
-		bundleAdjustment.optimize(structure);
+		if (!bundle.process(verbose)) {
+			if (verbose != null) verbose.println("Bundle adjustment failed!");
+		}
 
 		copyResults();
 	}
 
 	/** Returns true if it is configured to be optimized */
 	public boolean isOptimizeActive() {
-		return bundleAdjustment != null;
+		return bundle.configConverge.maxIterations > 0;
 	}
 
 	/**
@@ -104,6 +107,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		int totalBundleTracks = selectedTracks.size();
 
 		// Initialize data structures
+		final SceneStructureMetric structure = bundle.getStructure();
+		final SceneObservations observations = bundle.getObservations();
 		observations.initialize(frames.size);
 		structure.initialize(cameras.size, frames.size, totalBundleTracks);
 		for (int cameraIdx = 0; cameraIdx < cameras.size; cameraIdx++) {
@@ -146,6 +151,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * Copies results back on to the local data structures
 	 */
 	private void copyResults() {
+		final SceneStructureMetric structure = bundle.getStructure();
 		// skip the first frame since it's fixed
 		for (int frameIdx = 1; frameIdx < frames.size; frameIdx++) {
 			BFrame bf = frames.get(frameIdx);

@@ -22,8 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
-import boofcv.abst.geo.TriangulateNViewsMetric;
-import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.sfm.d3.VisualOdometry;
@@ -40,6 +39,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
@@ -80,27 +80,21 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
-		implements VerbosePrint
-{
+public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
+		implements VerbosePrint {
 	// used to estimate each feature's 3D location using a stereo pair
 	private final Triangulate2ViewsMetric triangulate;
-	private final TriangulateNViewsMetric triangulateN;
-	// computes camera motion
+	/** computes camera motion */
 	private final @Getter ModelMatcher<Se3_F64, Stereo2D3D> matcher;
 	private final ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
 	private final FastQueue<Stereo2D3D> modelFitData = new FastQueue<>(10, Stereo2D3D::new);
 
-	// Bundle Adjustment related data structures. Performing metric bundle adjustment with 3D points
-	// To turn off bundle adjustment set the max number of iterations to 0 or less
-	private final BundleAdjustment<SceneStructureMetric> bundleAdjustment;
-	private final SceneStructureMetric bundleScene = new SceneStructureMetric(false);
-	private final SceneObservations bundleObservations = new SceneObservations();
-	private final @Getter ConfigConverge bundleConverge = new ConfigConverge(1e-5,1e-5,4);
+	/** Configures and performs bundle adjustment */
+	private final @Getter MetricBundleAdjustmentUtils bundle = new MetricBundleAdjustmentUtils();
 
 	// Detects feature inside the image
-	private final DetectDescribePoint<T,TD> detector;
+	private final DetectDescribePoint<T, TD> detector;
 	// Associates feature between the same camera
 	private final AssociateDescriptionSets2D<TD> assocF2F;
 	// Associates features from left to right camera
@@ -110,8 +104,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	private final @Getter FastQueue<TrackQuad> trackQuads = new FastQueue<>(TrackQuad::new, TrackQuad::reset);
 
 	// features info extracted from the stereo pairs. 0 = previous 1 = current
-	private ImageInfo featsLeft0,featsLeft1;
-	private ImageInfo featsRight0,featsRight1;
+	private ImageInfo featsLeft0, featsLeft1;
+	private ImageInfo featsRight0, featsRight1;
 	// Matched features between all four images
 	private final QuadMatches matches = new QuadMatches();
 
@@ -145,12 +139,18 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	private final Se3_F64 prevLeft_to_world = new Se3_F64();
 	private final Point2D_F64 normLeft = new Point2D_F64();
 	private final Point2D_F64 normRight = new Point2D_F64();
-	private final Point3D_F64 X = new Point3D_F64();
+	private final Point4D_F64 X4 = new Point4D_F64();
 	private final FastQueue<Point2D_F64> listNorm = new FastQueue<>(Point2D_F64::new);
 	private final FastQueue<Se3_F64> listWorldToView = new FastQueue<>(Se3_F64::new);
 	private final List<TrackQuad> inliers = new ArrayList<>();
 	private final List<TrackQuad> consistentTracks = new ArrayList<>();
 	private final Se3_F64 found = new Se3_F64();
+
+	{
+		bundle.structure.setHomogenous(false);
+		bundle.configConverge.setTo(new ConfigConverge(1e-5, 1e-5, 4));
+		bundle.triangulator = FactoryMultiView.triangulateNViewMetricH(ConfigTriangulation.GEOMETRIC());
+	}
 
 	/**
 	 * Specifies internal algorithms
@@ -162,23 +162,18 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 * @param matcher Robust model estimation.  Often RANSAC
 	 * @param modelRefiner Non-linear refinement of motion estimation
 	 */
-	public VisOdomStereoQuadPnP(DetectDescribePoint<T,TD> detector,
-								AssociateDescription2D<TD> assocF2F,
-								AssociateDescription2D<TD> assocL2R ,
-								Triangulate2ViewsMetric triangulate,
-								ModelMatcher<Se3_F64, Stereo2D3D> matcher,
-								ModelFitter<Se3_F64, Stereo2D3D> modelRefiner,
-								BundleAdjustment<SceneStructureMetric> bundleAdjustment )
-	{
+	public VisOdomStereoQuadPnP( DetectDescribePoint<T, TD> detector,
+								 AssociateDescription2D<TD> assocF2F,
+								 AssociateDescription2D<TD> assocL2R,
+								 Triangulate2ViewsMetric triangulate,
+								 ModelMatcher<Se3_F64, Stereo2D3D> matcher,
+								 ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
 		this.detector = detector;
-		this.assocF2F = new AssociateDescriptionSets2D<>(assocF2F,detector.getDescriptionType());
+		this.assocF2F = new AssociateDescriptionSets2D<>(assocF2F, detector.getDescriptionType());
 		this.assocL2R = assocL2R;
 		this.triangulate = triangulate;
 		this.matcher = matcher;
 		this.modelRefiner = modelRefiner;
-		this.bundleAdjustment = bundleAdjustment;
-
-		this.triangulateN = FactoryMultiView.triangulateNViewMetric(ConfigTriangulation.GEOMETRIC());
 
 		featsLeft0 = new ImageInfo();
 		featsLeft1 = new ImageInfo();
@@ -194,13 +189,12 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Sets and saves the stereo camera's calibration
 	 */
-	public void setCalibration(StereoParameters param)
-	{
+	public void setCalibration( StereoParameters param ) {
 		this.stereoParameters.set(param);
 		right_to_left.set(param.right_to_left);
 		right_to_left.invert(left_to_right);
-		leftPixelToNorm = LensDistortionFactory.narrow(param.left).undistort_F64(true,false);
-		rightPixelToNorm = LensDistortionFactory.narrow(param.right).undistort_F64(true,false);
+		leftPixelToNorm = LensDistortionFactory.narrow(param.left).undistort_F64(true, false);
+		rightPixelToNorm = LensDistortionFactory.narrow(param.right).undistort_F64(true, false);
 	}
 
 	/**
@@ -221,22 +215,23 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 	/**
 	 * Estimates camera egomotion from the stereo pair
+	 *
 	 * @param left Image from left camera
 	 * @param right Image from right camera
 	 * @return true if motion was estimated and false if not
 	 */
-	public boolean process( T left , T right ) {
-		if( frameID == -1 ) {
-			assocF2F.initialize(left.width,left.height);
+	public boolean process( T left, T right ) {
+		if (frameID == -1) {
+			assocF2F.initialize(left.width, left.height);
 		}
 		frameID++;
 		long time0 = System.nanoTime();
-		detectFeatures(left,right);
+		detectFeatures(left, right);
 		long time1 = System.nanoTime();
 		associateL2R();
 
-		if( frameID==0 ) {
-			if( verbose != null ) verbose.println("first frame");
+		if (frameID == 0) {
+			if (verbose != null) verbose.println("first frame");
 			// mark all features as having no track
 			keyToTrackIdx.resize(featsLeft1.locationPixels.size);
 			keyToTrackIdx.fill(-1);
@@ -249,8 +244,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 
 			// Estimate the motion robustly
 			long time4 = System.nanoTime();
-			if ( !robustMotionEstimate()) {
-				if( verbose != null ) verbose.println("Failed to estimate motion");
+			if (!robustMotionEstimate()) {
+				if (verbose != null) verbose.println("Failed to estimate motion");
 				// odds are that it's totally hosed and you should reset
 				// this will undo the most recent tracking results and if the features are still in view it might
 				// be able to recover
@@ -276,26 +271,26 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 			curr_to_key.concat(prevLeft_to_world, left_to_world);
 			long time7 = System.nanoTime();
 
-			if( profileOut != null ) {
-				double milliDet = (time1-time0)*1e-6;
-				double milliL2R = (time2-time1)*1e-6;
-				double milliF2F = (time3-time2)*1e-6;
-				double milliCyc = (time4-time3)*1e-6;
-				double milliEst = (time5-time4)*1e-6;
-				double milliBun = (time6-time5)*1e-6;
-				double milliMnt = (time7-time6)*1e-6;
+			if (profileOut != null) {
+				double milliDet = (time1 - time0)*1e-6;
+				double milliL2R = (time2 - time1)*1e-6;
+				double milliF2F = (time3 - time2)*1e-6;
+				double milliCyc = (time4 - time3)*1e-6;
+				double milliEst = (time5 - time4)*1e-6;
+				double milliBun = (time6 - time5)*1e-6;
+				double milliMnt = (time7 - time6)*1e-6;
 
 				profileOut.printf("TIME: Det %5.1f L2R %5.1f F2F %5.1f Cyc %5.1f Est %5.1f Bun %5.1f Mnt %5.1f Total: %5.1f\n",
-						milliDet,milliL2R,milliF2F,milliCyc,milliEst,milliBun,milliMnt,(time7-time0)*1e-6);
+						milliDet, milliL2R, milliF2F, milliCyc, milliEst, milliBun, milliMnt, (time7 - time0)*1e-6);
 			}
 		}
 
-		if( verbose != null ) {
+		if (verbose != null) {
 			int leftDetections = featsLeft1.locationPixels.size;
 			int inliers = matcher.getMatchSet().size();
 			int matchesL2R = assocL2R.getMatches().size;
 			verbose.printf("Viso: Det: %4d L2R: %4d, Quad: %4d Inliers: %d\n",
-					leftDetections,matchesL2R, trackQuads.size,inliers);
+					leftDetections, matchesL2R, trackQuads.size, inliers);
 		}
 
 		return true;
@@ -315,7 +310,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	private void putConsistentTracksIntoList() {
 		consistentTracks.clear();
 		for (int i = 0; i < trackQuads.size; i++) {
-			if( trackQuads.get(i).leftCurrIndex != -1 ) {
+			if (trackQuads.get(i).leftCurrIndex != -1) {
 				consistentTracks.add(trackQuads.get(i));
 			}
 		}
@@ -325,7 +320,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 * Re-triangulates tracks using observations from all four cameras. Note that geometric error is being minimized
 	 * here and not re-projection error
 	 */
-	private void triangulateWithFourCameras(Se3_F64 key_to_curr) {
+	private void triangulateWithFourCameras( Se3_F64 key_to_curr ) {
 		// key left is origin and never changes
 		listWorldToView.get(0).reset();
 		// key right to key left is also constant and assumed known
@@ -333,30 +328,38 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		// This was just estimated
 		listWorldToView.get(2).set(key_to_curr);
 		// (left key -> left curr) -> (left curr -> right curr)
-		key_to_curr.concat(left_to_right,listWorldToView.get(3));
+		key_to_curr.concat(left_to_right, listWorldToView.get(3));
 
 		for (int quadIdx = 0; quadIdx < consistentTracks.size(); quadIdx++) {
 			TrackQuad q = consistentTracks.get(quadIdx);
 
 			// This could be cached but isn't a bottle neck so it's being left like this since the code is simpler
-			leftPixelToNorm.compute(q.v0.x,q.v0.y, listNorm.get(0));
-			rightPixelToNorm.compute(q.v1.x,q.v1.y, listNorm.get(1));
-			leftPixelToNorm.compute(q.v2.x,q.v2.y, listNorm.get(2));
-			rightPixelToNorm.compute(q.v3.x,q.v3.y, listNorm.get(3));
+			leftPixelToNorm.compute(q.v0.x, q.v0.y, listNorm.get(0));
+			rightPixelToNorm.compute(q.v1.x, q.v1.y, listNorm.get(1));
+			leftPixelToNorm.compute(q.v2.x, q.v2.y, listNorm.get(2));
+			rightPixelToNorm.compute(q.v3.x, q.v3.y, listNorm.get(3));
 
-			if( !triangulateN.triangulate(listNorm.toList(), listWorldToView.toList(),X) ) {
+			if (!bundle.triangulator.triangulate(listNorm.toList(), listWorldToView.toList(), X4)) {
+				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
+				continue;
+			}
+			if (X4.w == 0.0) {
 				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
 				continue;
 			}
 
+			double x = X4.x/X4.w;
+			double y = X4.y/X4.w;
+			double z = X4.z/X4.w;
+
 			// something is really messed up if it thinks it's behind the camera
-			if( X.z <= 0.0 ) {
+			if (z <= 0.0) {
 				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
 				continue;
 			}
 
 			// save the results
-			q.X.set(X);
+			q.X.set(x, y, z);
 		}
 	}
 
@@ -364,19 +367,19 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 * Makes the current frame into the key frame. This involves updating the coordinate system of all tracks and
 	 * creating a look up table.
 	 */
-	private void performTrackMaintenance(Se3_F64 key_to_curr) {
+	private void performTrackMaintenance( Se3_F64 key_to_curr ) {
 		// Drop tracks which do not have known locations in the new frame
-		for (int quadIdx = trackQuads.size-1; quadIdx >= 0; quadIdx--) {
+		for (int quadIdx = trackQuads.size - 1; quadIdx >= 0; quadIdx--) {
 			TrackQuad quad = trackQuads.get(quadIdx);
-			if( quad.leftCurrIndex == -1 ) {
+			if (quad.leftCurrIndex == -1) {
 				trackQuads.removeSwap(quadIdx);
 				continue;
 			}
 			// Convert the coordinate system from the old left to the new left camera
-			SePointOps_F64.transform(key_to_curr,quad.X,quad.X);
+			SePointOps_F64.transform(key_to_curr, quad.X, quad.X);
 
 			// If it's now behind the camera and can't be seen drop the track
-			if( quad.X.z <= 0.0 ) {
+			if (quad.X.z <= 0.0) {
 				trackQuads.removeSwap(quadIdx);
 			}
 		}
@@ -390,7 +393,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		}
 	}
 
-	private void detectFeatures( T left , T right ) {
+	private void detectFeatures( T left, T right ) {
 		// make the previous new observations into the new old ones
 		swapFeatureFrames();
 
@@ -398,8 +401,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		featsLeft1.reset();
 		featsRight1.reset();
 
-		describeImage(left,featsLeft1);
-		describeImage(right,featsRight1);
+		describeImage(left, featsLeft1);
+		describeImage(right, featsRight1);
 	}
 
 	/**
@@ -425,7 +428,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		FastQueue<Point2D_F64> leftLoc = featsLeft1.locationPixels;
 		FastQueue<Point2D_F64> rightLoc = featsRight1.locationPixels;
 
-		assocL2R.setSource(leftLoc,featsLeft1.description);
+		assocL2R.setSource(leftLoc, featsLeft1.description);
 		assocL2R.setDestination(rightLoc, featsRight1.description);
 		assocL2R.associate();
 
@@ -437,18 +440,17 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Associates images between left and left and right and right images
 	 */
-	private void associateF2F()
-	{
+	private void associateF2F() {
 		// old left to new left
-		UtilFeature.setSource(featsLeft0.description,featsLeft0.sets,featsLeft0.locationPixels,assocF2F);
-		UtilFeature.setDestination(featsLeft1.description,featsLeft1.sets,featsLeft1.locationPixels,assocF2F);
+		UtilFeature.setSource(featsLeft0.description, featsLeft0.sets, featsLeft0.locationPixels, assocF2F);
+		UtilFeature.setDestination(featsLeft1.description, featsLeft1.sets, featsLeft1.locationPixels, assocF2F);
 		assocF2F.associate();
 
 		setMatches(matches.match0to2, assocF2F.getMatches(), featsLeft0.locationPixels.size);
 
 		// old right to new right
-		UtilFeature.setSource(featsRight0.description,featsRight0.sets,featsRight0.locationPixels,assocF2F);
-		UtilFeature.setDestination(featsRight1.description,featsRight1.sets,featsRight1.locationPixels,assocF2F);
+		UtilFeature.setSource(featsRight0.description, featsRight0.sets, featsRight0.locationPixels, assocF2F);
+		UtilFeature.setDestination(featsRight1.description, featsRight1.sets, featsRight1.locationPixels, assocF2F);
 		assocF2F.associate();
 
 		setMatches(matches.match1to3, assocF2F.getMatches(), featsRight0.locationPixels.size);
@@ -471,29 +473,29 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		FastQueue<Point2D_F64> obs3 = featsRight1.locationPixels;
 
 
-		if( matches.match0to1.size != matches.match0to2.size )
+		if (matches.match0to1.size != matches.match0to2.size)
 			throw new RuntimeException("Failed sanity check");
 
-		for( int indexIn0 = 0; indexIn0 < matches.match0to1.size; indexIn0++ ) {
+		for (int indexIn0 = 0; indexIn0 < matches.match0to1.size; indexIn0++) {
 			int indexIn1 = matches.match0to1.data[indexIn0];
 			int indexIn2 = matches.match0to2.data[indexIn0];
 
-			if( indexIn1 < 0 || indexIn2 < 0 )
+			if (indexIn1 < 0 || indexIn2 < 0)
 				continue;
 
 			int indexIn3a = matches.match1to3.data[indexIn1];
 			int indexIn3b = matches.match2to3.data[indexIn2];
 
-			if( indexIn3a < 0 || indexIn3b < 0 )
+			if (indexIn3a < 0 || indexIn3b < 0)
 				continue;
 
-			if( indexIn3a != indexIn3b )
+			if (indexIn3a != indexIn3b)
 				continue;
 
 			// passed the consistency test! Now see if the feature is already matched to a track
 			TrackQuad quad;
 			int trackIdx = keyToTrackIdx.get(indexIn0);
-			if( trackIdx == -1 ) {
+			if (trackIdx == -1) {
 				quad = trackQuads.grow();
 				quad.id = totalTracks++;
 				quad.firstSceneFrameID = frameID;
@@ -507,7 +509,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 			quad.v3 = obs3.get(indexIn3a);
 
 			// if the feature did't have a track it's location needs to tbe triangulated
-			if( trackIdx == -1 ) {
+			if (trackIdx == -1) {
 				if (!triangulateTrackTwoViews(quad))
 					continue;
 			}
@@ -519,7 +521,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Estimate's the 3D location of a track using the key frame stereo
 	 */
-	private boolean triangulateTrackTwoViews(TrackQuad quad) {
+	private boolean triangulateTrackTwoViews( TrackQuad quad ) {
 		// convert key frame stereo view to normalized coordinates
 		leftPixelToNorm.compute(quad.v0.x, quad.v0.y, normLeft);
 		rightPixelToNorm.compute(quad.v1.x, quad.v1.y, normRight);
@@ -530,7 +532,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		success &= quad.X.z > 0.0;
 
 		// Discard this track if it can't be triangulated, discard and abort
-		if( !success ) {
+		if (!success) {
 			trackQuads.removeTail();
 			return false;
 		}
@@ -540,12 +542,12 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Creates a look up table from src image feature index to dst image feature index
 	 */
-	private void setMatches(GrowQueue_I32 matches, FastAccess<AssociatedIndex> found, int sizeSrc ) {
+	private void setMatches( GrowQueue_I32 matches, FastAccess<AssociatedIndex> found, int sizeSrc ) {
 		matches.resize(sizeSrc);
-		for( int j = 0; j < sizeSrc; j++ ) {
+		for (int j = 0; j < sizeSrc; j++) {
 			matches.data[j] = -1;
 		}
-		for( int j = 0; j < found.size; j++ ) {
+		for (int j = 0; j < found.size; j++) {
 			AssociatedIndex a = found.get(j);
 			matches.data[a.src] = a.dst;
 		}
@@ -554,7 +556,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Computes image features and stores the results in info
 	 */
-	private void describeImage(T image , ImageInfo info ) {
+	private void describeImage( T image, ImageInfo info ) {
 		detector.detect(image);
 		FastQueue<Point2D_F64> l = info.locationPixels;
 		FastQueue<TD> d = info.description;
@@ -562,8 +564,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		d.resize(detector.getNumberOfFeatures());
 		info.sets.resize(detector.getNumberOfFeatures());
 		for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
-			l.data[i].set( detector.getLocation(i) );
-			d.data[i].setTo( detector.getDescription(i) );
+			l.data[i].set(detector.getLocation(i));
+			d.data[i].setTo(detector.getDescription(i));
 			info.sets.data[i] = detector.getSet(i);
 		}
 	}
@@ -576,16 +578,16 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		modelFitData.reset();
 
 		// use 0 -> 1 stereo associations to estimate each feature's 3D position
-		for(int i = 0; i < consistentTracks.size(); i++ ) {
+		for (int i = 0; i < consistentTracks.size(); i++) {
 			TrackQuad quad = consistentTracks.get(i);
 			Stereo2D3D data = modelFitData.grow();
-			leftPixelToNorm.compute(quad.v2.x,quad.v2.y,data.leftObs);
-			rightPixelToNorm.compute(quad.v3.x,quad.v3.y,data.rightObs);
+			leftPixelToNorm.compute(quad.v2.x, quad.v2.y, data.leftObs);
+			rightPixelToNorm.compute(quad.v3.x, quad.v3.y, data.rightObs);
 			data.location.set(quad.X);
 		}
 
 		// robustly match the data
-		if( !matcher.process(modelFitData.toList()) ) {
+		if (!matcher.process(modelFitData.toList())) {
 			return false;
 		}
 
@@ -603,10 +605,10 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	 *
 	 * @param key_to_curr Initial estimate and refined on output
 	 */
-	private void refineMotionEstimate(Se3_F64 key_to_curr ) {
+	private void refineMotionEstimate( Se3_F64 key_to_curr ) {
 		// optionally refine the results
-		if( modelRefiner != null ) {
-			if( modelRefiner.fitModel(matcher.getMatchSet(), key_to_curr, found) ) {
+		if (modelRefiner != null) {
+			if (modelRefiner.fitModel(matcher.getMatchSet(), key_to_curr, found)) {
 				key_to_curr.set(found);
 			}
 		}
@@ -617,60 +619,55 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Optimize cameras and feature locations at the same time
 	 */
-	private void performBundleAdjustment(Se3_F64 key_to_curr ) {
-		if( bundleConverge.maxIterations <= 0 )
+	private void performBundleAdjustment( Se3_F64 key_to_curr ) {
+		if (bundle.configConverge.maxIterations <= 0)
 			return;
 
 		// Must only process inlier tracks here
 		inliers.clear();
 		for (int trackIdx = 0; trackIdx < consistentTracks.size(); trackIdx++) {
 			TrackQuad t = consistentTracks.get(trackIdx);
-			if( t.leftCurrIndex != -1 && t.inlier )
+			if (t.leftCurrIndex != -1 && t.inlier)
 				inliers.add(t);
 		}
 
 		// Copy the scene into a data structure bundle adjustment understands
-		bundleObservations.initialize(4);
-		bundleScene.initialize(2,4,inliers.size());
+		SceneStructureMetric structure = bundle.getStructure();
+		SceneObservations observations = bundle.getObservations();
+		observations.initialize(4);
+		structure.initialize(2, 4, inliers.size());
 		// known relative view relating left to right cameras
-		int baseline = bundleScene.addMotion(true,left_to_right);
-		bundleScene.setCamera(0,true,stereoParameters.left);
-		bundleScene.setCamera(1,true,stereoParameters.right);
-		bundleScene.setView(0, 0, true,listWorldToView.get(0)); // view[0].left
-		bundleScene.setView(1, 1, baseline,0);  // view[0].right
-		bundleScene.setView(2, 0, false,listWorldToView.get(2)); // view[1].left
-		bundleScene.setView(3, 1, baseline,2);  // view[1].right
+		int baseline = structure.addMotion(true, left_to_right);
+		structure.setCamera(0, true, stereoParameters.left);
+		structure.setCamera(1, true, stereoParameters.right);
+		structure.setView(0, 0, true, listWorldToView.get(0)); // view[0].left
+		structure.setView(1, 1, baseline, 0);  // view[0].right
+		structure.setView(2, 0, false, listWorldToView.get(2)); // view[1].left
+		structure.setView(3, 1, baseline, 2);  // view[1].right
 
 
 		for (int trackIdx = 0; trackIdx < inliers.size(); trackIdx++) {
 			TrackQuad t = inliers.get(trackIdx);
 			Point3D_F64 X = t.X;
-			bundleScene.setPoint(trackIdx,X.x,X.y,X.z);
+			structure.setPoint(trackIdx, X.x, X.y, X.z);
 
-			bundleObservations.getView(0).add(trackIdx,(float)t.v0.x,(float)t.v0.y);
-			bundleObservations.getView(1).add(trackIdx,(float)t.v1.x,(float)t.v1.y);
-			bundleObservations.getView(2).add(trackIdx,(float)t.v2.x,(float)t.v2.y);
-			bundleObservations.getView(3).add(trackIdx,(float)t.v3.x,(float)t.v3.y);
+			observations.getView(0).add(trackIdx, (float)t.v0.x, (float)t.v0.y);
+			observations.getView(1).add(trackIdx, (float)t.v1.x, (float)t.v1.y);
+			observations.getView(2).add(trackIdx, (float)t.v2.x, (float)t.v2.y);
+			observations.getView(3).add(trackIdx, (float)t.v3.x, (float)t.v3.y);
 		}
 
-		bundleAdjustment.setParameters(bundleScene, bundleObservations);
-		double scoreBefore = bundleAdjustment.getFitScore();
-		bundleAdjustment.configure(bundleConverge.ftol,bundleConverge.gtol,bundleConverge.maxIterations);
-		if( !bundleAdjustment.optimize(bundleScene) )
+		if (!bundle.process(verbose))
 			return;
-
-		if( verbose != null )
-			verbose.printf("Bundle: Reduced score by %.2f with tracks %d\n",
-					scoreBefore/(1e-16+bundleAdjustment.getFitScore()),bundleScene.points.size);
 
 		// Update the state of tracks and the current views
 		for (int trackIdx = 0; trackIdx < inliers.size(); trackIdx++) {
 			TrackQuad t = inliers.get(trackIdx);
-			bundleScene.points.get(trackIdx).get(t.X);
+			structure.points.get(trackIdx).get(t.X);
 		}
 
 		// Reminder: World here refers to key left view
-		key_to_curr.set(bundleScene.getParentToView(2));
+		key_to_curr.set(structure.getParentToView(2));
 	}
 
 	public Se3_F64 getLeftToWorld() {return left_to_world; }
@@ -678,8 +675,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * Storage for detected features inside an image
 	 */
-	public class ImageInfo
-	{
+	public class ImageInfo {
 		// Descriptor of each feature
 		FastQueue<TD> description = new FastQueue<>(detector::createDescription);
 		// The set each feature belongs in
@@ -726,8 +722,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	/**
 	 * 3D coordinate of the feature and its observed location in each image
 	 */
-	public static class TrackQuad
-	{
+	public static class TrackQuad {
 		// Unique ID for this feature
 		public long id;
 		// Index of the feature in the current left frame
@@ -739,13 +734,13 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 		public Point3D_F64 X = new Point3D_F64();
 		// pixel observation in each camera view
 		// left key, right key, left curr, right curr
-		public Point2D_F64 v0,v1,v2,v3;
+		public Point2D_F64 v0, v1, v2, v3;
 		// If it was an inlier in this frame
 		public boolean inlier;
 
 		public void reset() {
-			X.set(0,0,0);
-			v0=v1=v2=v3=null;
+			X.set(0, 0, 0);
+			v0 = v1 = v2 = v3 = null;
 			inlier = false;
 			id = -1;
 			leftCurrIndex = -1;
@@ -754,20 +749,20 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		// Default to no verbose messages
 		this.verbose = null;
 		this.profileOut = null;
 
 		// Update the level of verbosity based on the request
-		if( configuration == null ) {
+		if (configuration == null) {
 			this.verbose = out;
 			return;
 		}
 
-		if( configuration.contains(VisualOdometry.VERBOSE_RUNTIME))
+		if (configuration.contains(VisualOdometry.VERBOSE_RUNTIME))
 			this.profileOut = out;
-		if( configuration.contains(VisualOdometry.VERBOSE_TRACKING))
+		if (configuration.contains(VisualOdometry.VERBOSE_TRACKING))
 			this.verbose = out;
 	}
 }

@@ -18,10 +18,7 @@
 
 package boofcv.alg.sfm.d3.structure;
 
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -35,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class ChecksVisOdomKeyFrameManager {
 	int width = 100;
 	int height = 200;
-	BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
 
 	public abstract VisOdomKeyFrameManager createFrameManager();
 
@@ -71,8 +67,8 @@ public abstract class ChecksVisOdomKeyFrameManager {
 	abstract void discardMultipleNewFrames();
 
 	public VisOdomBundleAdjustment<BTrack> createScene() {
-		VisOdomBundleAdjustment<BTrack> scene = new VisOdomBundleAdjustment<>(sba, BTrack::new);
-		scene.addCamera(new CameraPinholeBrown(0,0,0,0,0,width,height));
+		VisOdomBundleAdjustment<BTrack> scene = new VisOdomBundleAdjustment<>(BTrack::new);
+		scene.addCamera(new CameraPinholeBrown(0, 0, 0, 0, 0, width, height));
 		return scene;
 	}
 }

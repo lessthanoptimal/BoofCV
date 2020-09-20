@@ -24,7 +24,6 @@ import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -65,24 +64,24 @@ class TestVisOdomBundlePnPBase {
 	void triangulateNotSelectedBundleTracks_filter() {
 		var mock = new MockTriangulate();
 		var alg = new BundleBase();
-		alg.scene.addCamera(pinhole);
+		alg.bundleViso.addCamera(pinhole);
 		alg.triangulateN = mock;
 
 		VisOdomBundlePnPBase.CameraModel cmodel = new VisOdomBundlePnPBase.CameraModel();
-		cmodel.pixelToNorm = LensDistortionFactory.narrow(pinhole).undistort_F64(true,false);
+		cmodel.pixelToNorm = LensDistortionFactory.narrow(pinhole).undistort_F64(true, false);
 		alg.cameraModels.add(cmodel);
 
 		for (int fidx = 0; fidx < 3; fidx++) {
-			alg.scene.addFrame(fidx);
+			alg.bundleViso.addFrame(fidx);
 		}
 
 		for (int tidx = 0; tidx < 20; tidx++) {
-			BTrack bt = alg.scene.addTrack(0,0,1,1.0);
+			BTrack bt = alg.bundleViso.addTrack(0, 0, 1, 1.0);
 			int N = tidx < 10 ? 2 : 3;
 			for (int fidx = 0; fidx < N; fidx++) {
-				alg.scene.addObservation(alg.scene.frames.get(fidx),bt,0,0);
+				alg.bundleViso.addObservation(alg.bundleViso.frames.get(fidx), bt, 0, 0);
 			}
-			bt.selected = tidx%2==0;
+			bt.selected = tidx%2 == 0;
 		}
 
 		alg.triangulateNotSelectedBundleTracks();
@@ -106,30 +105,32 @@ class TestVisOdomBundlePnPBase {
 	@Test
 	void dropFramesFromScene() {
 		var alg = new BundleBase();
-		alg.scene.addCamera(pinhole);
+		alg.bundleViso.addCamera(pinhole);
 
 		for (int fidx = 0; fidx < 10; fidx++) {
-			alg.scene.addFrame(fidx);
+			alg.bundleViso.addFrame(fidx);
 		}
 
 		for (int tidx = 0; tidx < 20; tidx++) {
-			BTrack bt = alg.scene.addTrack(0,0,1,1.0);
+			BTrack bt = alg.bundleViso.addTrack(0, 0, 1, 1.0);
 			// put each track into one frame
-			alg.scene.addObservation(alg.scene.frames.get(tidx/2),bt,0,0);
+			alg.bundleViso.addObservation(alg.bundleViso.frames.get(tidx/2), bt, 0, 0);
 
 			// with the exception of these tracks
-			switch( tidx ) {
+			switch (tidx) {
 				case 3:
 				case 8:
-				case 18: alg.scene.addObservation(alg.scene.frames.get(6),bt,0,0); break;
+				case 18:
+					alg.bundleViso.addObservation(alg.bundleViso.frames.get(6), bt, 0, 0);
+					break;
 			}
 		}
 
 		// let's make two tracks visual tracks
-		alg.scene.tracks.get(10).visualTrack = new PointTrack();
-		alg.scene.tracks.get(10).visualTrack.cookie = alg.scene.tracks.get(10);
-		alg.scene.tracks.get(11).visualTrack = new PointTrack();
-		alg.scene.tracks.get(11).visualTrack.cookie = alg.scene.tracks.get(11);
+		alg.bundleViso.tracks.get(10).visualTrack = new PointTrack();
+		alg.bundleViso.tracks.get(10).visualTrack.cookie = alg.bundleViso.tracks.get(10);
+		alg.bundleViso.tracks.get(11).visualTrack = new PointTrack();
+		alg.bundleViso.tracks.get(11).visualTrack.cookie = alg.bundleViso.tracks.get(11);
 
 		// pick a few frames to drop
 		GrowQueue_I32 drop = new GrowQueue_I32();
@@ -139,9 +140,9 @@ class TestVisOdomBundlePnPBase {
 
 		// run the function being tested and see if we get the expected results
 		alg.dropFramesFromScene(drop);
-		assertEquals(7,alg.scene.frames.size);
+		assertEquals(7, alg.bundleViso.frames.size);
 		// all tracks from frame 0 and 5 (4 total) should be removed. Only 1 from from 4
-		assertEquals(15,alg.scene.tracks.size);
+		assertEquals(15, alg.bundleViso.tracks.size);
 		// only two of the tracks were visual tracks that got removed
 		assertEquals(2, alg.countDropVisual);
 	}
@@ -149,41 +150,41 @@ class TestVisOdomBundlePnPBase {
 	@Test
 	void dropTracksNotVisibleAndTooFewObservations() {
 		var alg = new BundleBase();
-		alg.scene.addCamera(pinhole);
+		alg.bundleViso.addCamera(pinhole);
 		alg.countDropVisual = 3; // we should discard a track if it has less than this observations
 
 		// Create a set of frames that can view the tracks
 		for (int fidx = 0; fidx < 5; fidx++) {
-			alg.scene.addFrame(fidx);
+			alg.bundleViso.addFrame(fidx);
 		}
 
 		// create 1/2 visible tracks with varying number of observations
 		for (int tidx = 0; tidx < 10; tidx++) {
-			BTrack bt = alg.scene.addTrack(0,0,tidx-1.5,1.0);
-			bt.visualTrack = tidx%2==0 ? new PointTrack() : null;
+			BTrack bt = alg.bundleViso.addTrack(0, 0, tidx - 1.5, 1.0);
+			bt.visualTrack = tidx%2 == 0 ? new PointTrack() : null;
 			bt.id = tidx;
-			int N = Math.min(tidx/2,alg.scene.frames.size);
+			int N = Math.min(tidx/2, alg.bundleViso.frames.size);
 			for (int fidx = 0; fidx < N; fidx++) {
-				BFrame bf = alg.scene.frames.get(fidx);
-				alg.scene.addObservation(bf,bt,0,0);
+				BFrame bf = alg.bundleViso.frames.get(fidx);
+				alg.bundleViso.addObservation(bf, bt, 0, 0);
 			}
 		}
 
 		alg.dropTracksNotVisibleAndTooFewObservations();
-		alg.scene.sanityCheck();
-		assertEquals(7,alg.scene.tracks.size);
+		alg.bundleViso.sanityCheck();
+		assertEquals(7, alg.bundleViso.tracks.size);
 		// all visible tracks should still be there
 		int countVisible = 0;
-		for (int i = 0; i < alg.scene.tracks.size; i++) {
-			if( alg.scene.tracks.get(i).visualTrack != null )
+		for (int i = 0; i < alg.bundleViso.tracks.size; i++) {
+			if (alg.bundleViso.tracks.get(i).visualTrack != null)
 				countVisible++;
 		}
-		assertEquals(5,countVisible);
+		assertEquals(5, countVisible);
 		// Tracks which are not visible should be dropped
-		for (int i = 0; i < alg.scene.tracks.size; i++) {
-			BTrack bt = alg.scene.tracks.get(i);
-			if( bt.visualTrack == null ) {
-				assertTrue(bt.id>=6);
+		for (int i = 0; i < alg.bundleViso.tracks.size; i++) {
+			BTrack bt = alg.bundleViso.tracks.get(i);
+			if (bt.visualTrack == null) {
+				assertTrue(bt.id >= 6);
 			}
 		}
 	}
@@ -194,33 +195,33 @@ class TestVisOdomBundlePnPBase {
 	@Test
 	void dropBadBundleTracks_Behind() {
 		var alg = new BundleBase();
-		alg.scene.addCamera(pinhole);
+		alg.bundleViso.addCamera(pinhole);
 
 		// Create frames at regular intervals along the z-axis
 		for (int fidx = 0; fidx < 3; fidx++) {
-			BFrame bf = alg.scene.addFrame(fidx);
-			bf.frame_to_world.T.set(0,0,fidx);
+			BFrame bf = alg.bundleViso.addFrame(fidx);
+			bf.frame_to_world.T.set(0, 0, fidx);
 		}
 
 		// Create tracks at regular intervals along the z-axis and make each one visible by all frames
 		for (int tidx = 0; tidx < 10; tidx++) {
-			BTrack bt = alg.scene.addTrack(0,0,tidx-1.5,1.0);
-			if( tidx%2 == 1 ) {
+			BTrack bt = alg.bundleViso.addTrack(0, 0, tidx - 1.5, 1.0);
+			if (tidx%2 == 1) {
 				// flip the sign to make sure that's handled correctly in the range check
 				bt.worldLoc.scale(-1);
 			}
 			bt.id = tidx;
-			for (int fidx = 0; fidx < alg.scene.frames.size ; fidx++) {
-				BFrame bf = alg.scene.frames.get(fidx);
-				alg.scene.addObservation(bf,bt,0,0);
+			for (int fidx = 0; fidx < alg.bundleViso.frames.size; fidx++) {
+				BFrame bf = alg.bundleViso.frames.get(fidx);
+				alg.bundleViso.addObservation(bf, bt, 0, 0);
 			}
 		}
 
 		// Run the function being tested and examine the results
 		alg.dropBadBundleTracks();
-		alg.scene.sanityCheck();
+		alg.bundleViso.sanityCheck();
 		// A track must be in front of every camera to not be dropped
-		assertEquals(6,alg.scene.tracks.size);
+		assertEquals(6, alg.bundleViso.tracks.size);
 	}
 
 	static class BundleBase extends VisOdomBundlePnPBase<BTrack> {
@@ -228,8 +229,7 @@ class TestVisOdomBundlePnPBase {
 		public int countDropVisual = 0;
 
 		public BundleBase() {
-			var bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
-			scene = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+			bundleViso = new VisOdomBundleAdjustment<>(BTrack::new);
 		}
 
 		@Override

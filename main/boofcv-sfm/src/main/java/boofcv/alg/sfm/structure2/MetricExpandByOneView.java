@@ -287,7 +287,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 				throw new RuntimeException("Triangulation failed. Possibly bad input. Handle this problem");
 			}
 
-			if (structure.homogenous)
+			if (structure.isHomogenous())
 				structure.setPoint(featIdx, foundX.x, foundX.y, foundX.z, foundX.w);
 			else
 				structure.setPoint(featIdx, foundX.x/foundX.w, foundX.y/foundX.w, foundX.z/foundX.w);

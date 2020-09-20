@@ -1663,7 +1663,7 @@ public class MultiViewOps {
 		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64::new);
 		normObs.resize(3);
 
-		final boolean homogenous = structure.homogenous;
+		final boolean homogenous = structure.isHomogenous();
 		Point4D_F64 X = new Point4D_F64();
 
 		List<Se3_F64> worldToViews = new ArrayList<>();

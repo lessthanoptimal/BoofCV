@@ -380,7 +380,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		int pointID = structure.points.size;
 		SceneStructureCommon.Point point3D = structure.points.grow();
 
-		if (structure.homogenous)
+		if (structure.isHomogenous())
 			point3D.set(found3D.x, found3D.y, found3D.z, found3D.w);
 		else
 			point3D.set(found3D.x/found3D.w, found3D.y/found3D.w, found3D.z/found3D.w);
