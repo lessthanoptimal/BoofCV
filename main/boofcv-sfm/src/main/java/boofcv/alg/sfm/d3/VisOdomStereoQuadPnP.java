@@ -22,6 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
@@ -84,6 +85,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		implements VerbosePrint {
 	// used to estimate each feature's 3D location using a stereo pair
 	private final Triangulate2ViewsMetric triangulate;
+	private final TriangulateNViewsMetric triangulateN;
 	/** computes camera motion */
 	private final @Getter ModelMatcher<Se3_F64, Stereo2D3D> matcher;
 	private final ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
@@ -139,6 +141,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	private final Se3_F64 prevLeft_to_world = new Se3_F64();
 	private final Point2D_F64 normLeft = new Point2D_F64();
 	private final Point2D_F64 normRight = new Point2D_F64();
+	private final Point3D_F64 X3 = new Point3D_F64();
 	private final Point4D_F64 X4 = new Point4D_F64();
 	private final FastQueue<Point2D_F64> listNorm = new FastQueue<>(Point2D_F64::new);
 	private final FastQueue<Se3_F64> listWorldToView = new FastQueue<>(Se3_F64::new);
@@ -149,7 +152,6 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	{
 		bundle.structure.setHomogenous(false);
 		bundle.configConverge.setTo(new ConfigConverge(1e-5, 1e-5, 4));
-		bundle.triangulator = FactoryMultiView.triangulateNViewMetricH(ConfigTriangulation.GEOMETRIC());
 	}
 
 	/**
@@ -180,6 +182,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		featsRight0 = new ImageInfo();
 		featsRight1 = new ImageInfo();
 
+		this.triangulateN = FactoryMultiView.triangulateNViewMetric(ConfigTriangulation.GEOMETRIC());
 		this.assocF2F.initialize(detector.getNumberOfSets());
 
 		listNorm.resize(4);
@@ -339,27 +342,19 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 			leftPixelToNorm.compute(q.v2.x, q.v2.y, listNorm.get(2));
 			rightPixelToNorm.compute(q.v3.x, q.v3.y, listNorm.get(3));
 
-			if (!bundle.triangulator.triangulate(listNorm.toList(), listWorldToView.toList(), X4)) {
+			if (!triangulateN.triangulate(listNorm.toList(), listWorldToView.toList(), X3)) {
 				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
 				continue;
 			}
-			if (X4.w == 0.0) {
-				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
-				continue;
-			}
-
-			double x = X4.x/X4.w;
-			double y = X4.y/X4.w;
-			double z = X4.z/X4.w;
 
 			// something is really messed up if it thinks it's behind the camera
-			if (z <= 0.0) {
+			if (X3.z <= 0.0) {
 				q.leftCurrIndex = -1; // mark it so that it will be remove during maintenance
 				continue;
 			}
 
 			// save the results
-			q.X.set(x, y, z);
+			q.X.set(X3);
 		}
 	}
 

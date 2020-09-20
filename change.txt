@@ -43,6 +43,7 @@ Version : 0.37
   * Updated to take advantage of new 'sets' API in PointTracker
   * DDA and Hybrid have been updated to use the new 2D association API
   * Updated code to take advantage of better data structure/functions since they were first created
+  * Uses common SBA code now. Supports more configurations than before.
 - Examples
   * Updated ExampleImageEnhance to include color images
 - Demonstration Applications
@@ -86,20 +87,20 @@ Version : 0.37
       - TODO Add a smart mode where it will skip over frames with little change
   * TODO MetricFromUncalibratedPairwiseGraph needs to identify mistakes and fix them
   * TODO Create validation tests for at least 3 scenarios with known constant motion along one axis
+  * TODO replace structure with structure2
 - Multi-View Stereo
   - TODO Use existing two view stereo to kludge something together
 - Sparse Bundle Adjustment
   * Fixed bug in how pixels are scaled in ScaleSceneStructure.
-  * A view's pose can now be specified relative to other views. This can be a known or estimated parameter
+  * A view's pose can now be specified relative to other views. Can be a known or estimated parameter
 - MultiViewOps
   * Fixed decomposeMetricCamera() so that it doesn't change the scale of T. This messed up common frames
-  * TODO triangulate N-points using calibrated homogenous coordinates
+  * Triangulate N-points using calibrated homogenous coordinates
 - Calibration
   * Stereo calibration now performs a join bundle adjustment after estimating the stereo baseline
 
 TODO Move projective to metric and similar from multiview to perspective
 TODO rename RansacMultiView to RansacCalibrated
-TODO rename FactoryMultiView.triangulateNViewCalibrated to metric
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint
