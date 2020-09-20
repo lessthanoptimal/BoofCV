@@ -66,8 +66,8 @@ class TestProjectiveReconstructionFromPairwiseGraph {
 
 		// Undo apply and undo the shift in pixel coordinates
 		DMatrixRMaj M_inv = CommonOps_DDRM.identity(3);
-		M_inv.set(0, 2, (double)(db.intrinsic.width/2));
-		M_inv.set(1, 2, (double)(db.intrinsic.height/2));
+		M_inv.set(0, 2, db.intrinsic.width/2);
+		M_inv.set(1, 2, db.intrinsic.height/2);
 
 		var tmp = new DMatrixRMaj(3, 4);
 

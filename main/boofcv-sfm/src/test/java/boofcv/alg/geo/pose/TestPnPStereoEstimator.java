@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,17 +43,17 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 		perfectData(2);
 	}
 
-	private void perfectData(int numExtra) {
+	private void perfectData( int numExtra ) {
 		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
-		DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
+		DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono = new PnPDistanceReprojectionSq();
 
-		PnPStereoEstimator alg = new PnPStereoEstimator(pnp,distanceMono,numExtra);
+		PnPStereoEstimator alg = new PnPStereoEstimator(pnp, distanceMono, numExtra);
 
 		Se3_F64 expected = new Se3_F64();
-		expected.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
-		expected.getT().set(0.2,-0.1,0.01);
+		expected.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		expected.getT().set(0.2, -0.1, 0.01);
 
-		generateScene(alg.getMinimumPoints(),expected,false);
+		generateScene(alg.getMinimumPoints(), expected, false);
 
 		Se3_F64 found = new Se3_F64();
 

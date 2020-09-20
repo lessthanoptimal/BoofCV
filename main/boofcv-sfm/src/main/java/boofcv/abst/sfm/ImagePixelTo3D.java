@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public interface ImagePixelTo3D {
 	 * @param y y-coordinate of the pixel
 	 * @return true if a position could be estimated and false if not.
 	 */
-	boolean process( double x , double y );
+	boolean process( double x, double y );
 
 	/**
 	 * Found x-coordinate of point in camera coordinate system.
@@ -59,6 +59,7 @@ public interface ImagePixelTo3D {
 	 * @return y-coordinate
 	 */
 	double getY();
+
 	/**
 	 * Found z-coordinate of point in camera coordinate system.
 	 *

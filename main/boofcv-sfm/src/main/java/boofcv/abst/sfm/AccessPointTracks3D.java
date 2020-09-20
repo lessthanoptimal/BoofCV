@@ -34,5 +34,5 @@ public interface AccessPointTracks3D extends AccessPointTracks {
 	 * @param world The world coordinate of the track
 	 * @return true if there's a location estimate or false if there isn't
 	 */
-	boolean getTrackWorld3D(int index , Point3D_F64 world );
+	boolean getTrackWorld3D( int index, Point3D_F64 world );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class ModelManagerScaleTranslateRotate2D implements ModelManager<ScaleTra
 	}
 
 	@Override
-	public void copyModel(ScaleTranslateRotate2D src, ScaleTranslateRotate2D dst) {
-		dst.set(src);
+	public void copyModel( ScaleTranslateRotate2D src, ScaleTranslateRotate2D dst ) {
+		dst.setTo(src);
 	}
 }

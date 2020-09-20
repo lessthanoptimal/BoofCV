@@ -92,7 +92,7 @@ class TestPairwiseGraphUtils {
 		seed.totalObservations = 100;
 		GrowQueue_I32 seedFeatsIdx = new GrowQueue_I32();
 
-		for (int i = 0; i < seed.totalObservations / 2; i++) {
+		for (int i = 0; i < seed.totalObservations/2; i++) {
 			seedFeatsIdx.add(i);
 		}
 
@@ -126,7 +126,7 @@ class TestPairwiseGraphUtils {
 		alg.createThreeViewLookUpTables();
 		alg.findCommonFeatures(seedFeatsIdx);
 
-		assertEquals(seed.totalObservations / 2, alg.commonIdx.size);
+		assertEquals(seed.totalObservations/2, alg.commonIdx.size);
 		for (int i = 0; i < alg.commonIdx.size; i++) {
 			assertEquals(i, alg.commonIdx.get(i));
 		}
@@ -180,8 +180,8 @@ class TestPairwiseGraphUtils {
 		assertEquals(1, alg.matchesTriple.size);
 		// undo the shift in pixel coordinates
 		for (int i = 0; i < 3; i++) {
-			alg.matchesTriple.get(0).get(i).x += db.intrinsic.width / 2;
-			alg.matchesTriple.get(0).get(i).y += db.intrinsic.height / 2;
+			alg.matchesTriple.get(0).get(i).x += db.intrinsic.width/2;
+			alg.matchesTriple.get(0).get(i).y += db.intrinsic.height/2;
 		}
 		assertEquals(0.0, alg.matchesTriple.get(0).p1.distance(db.viewObs.get(0).get(0)));
 		assertEquals(0.0, alg.matchesTriple.get(0).p2.distance(db.viewObs.get(1).get(1)));
@@ -409,7 +409,7 @@ class TestPairwiseGraphUtils {
 		PrimitiveArrays.shuffle(alg.table_A_to_B.data, 0, alg.table_A_to_B.size, rand);
 		PrimitiveArrays.shuffle(alg.table_A_to_C.data, 0, alg.table_A_to_C.size, rand);
 
-		alg.commonIdx.setTo(GrowQueue_I32.range(0, numInliers * 2));
+		alg.commonIdx.setTo(GrowQueue_I32.range(0, numInliers*2));
 
 		// just add elements until it hits the desired size
 		alg.inliersThreeView = new ArrayList<>();
@@ -446,15 +446,15 @@ class TestPairwiseGraphUtils {
 
 				if (alg.seed == v) {
 					for (int j = 0; j < numInliers; j++) {
-						assertEquals(j * 2, indexes.get(j));
+						assertEquals(j*2, indexes.get(j));
 					}
 				} else if (alg.viewB == v) {
 					for (int j = 0; j < numInliers; j++) {
-						assertEquals(alg.table_A_to_B.get(j * 2), indexes.get(j));
+						assertEquals(alg.table_A_to_B.get(j*2), indexes.get(j));
 					}
 				} else if (alg.viewC == v) {
 					for (int j = 0; j < numInliers; j++) {
-						assertEquals(alg.table_A_to_C.get(j * 2), indexes.get(j));
+						assertEquals(alg.table_A_to_C.get(j*2), indexes.get(j));
 					}
 				} else {
 					fail("BUG");
@@ -488,13 +488,21 @@ class TestPairwiseGraphUtils {
 
 	private static class MockRansac implements ModelMatcher<TrifocalTensor, AssociatedTriple> {
 		@Override public boolean process( List<AssociatedTriple> dataSet ) { return false; }
+
 		@Override public TrifocalTensor getModelParameters() { return null; }
+
 		@Override public List<AssociatedTriple> getMatchSet() { return null; }
-		@Override public int getInputIndex( int matchIndex ) { return matchIndex * 2; }
+
+		@Override public int getInputIndex( int matchIndex ) { return matchIndex*2; }
+
 		@Override public double getFitQuality() { return 0; }
+
 		@Override public int getMinimumSize() { return 0; }
+
 		@Override public void reset() {}
+
 		@Override public Class<AssociatedTriple> getPointType() { return null; }
+
 		@Override public Class<TrifocalTensor> getModelType() { return null; }
 	}
 }

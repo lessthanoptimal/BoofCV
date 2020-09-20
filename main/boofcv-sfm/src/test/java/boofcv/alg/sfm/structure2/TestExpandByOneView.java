@@ -45,7 +45,7 @@ class TestExpandByOneView {
 			View viewI = graph.createNode("" + i);
 
 			// make sure src/dst is handled correctly
-			Motion mA = i % 2 == 0 ? graph.connect(seed, viewI) : graph.connect(viewI, seed);
+			Motion mA = i%2 == 0 ? graph.connect(seed, viewI) : graph.connect(viewI, seed);
 			// All have the same score so that the connections between the other two is what decides the winner
 			mA.countF = 100;
 			mA.countH = 80;
@@ -87,8 +87,8 @@ class TestExpandByOneView {
 			Motion mA = graph.connect(seed, viewI);
 
 			// is3D and being known are at different frequencies and will only intersect twice
-			mA.is3D = i % 2 == 0;
-			if (i % 3 == 0)
+			mA.is3D = i%2 == 0;
+			if (i%3 == 0)
 				working.addView(viewI);
 		}
 
@@ -118,7 +118,7 @@ class TestExpandByOneView {
 			View viewI = graph.createNode("" + i);
 
 			// make sure src/dst is handled correctly
-			Motion mA = i % 2 == 0 ? graph.connect(viewA, viewI) : graph.connect(viewI, viewA);
+			Motion mA = i%2 == 0 ? graph.connect(viewA, viewI) : graph.connect(viewI, viewA);
 			mA.countF = 100 + i;
 			mA.countH = 80;
 			mA.is3D = true;
@@ -128,8 +128,8 @@ class TestExpandByOneView {
 			if (i >= 5) // not all the nodes will be connected to A and B
 				continue;
 
-			Motion mB = i % 2 == 0 ? graph.connect(viewB, viewI) : graph.connect(viewI, viewB);
-			mB.countF = 100 - i * 2;
+			Motion mB = i%2 == 0 ? graph.connect(viewB, viewI) : graph.connect(viewI, viewB);
+			mB.countF = 100 - i*2;
 			mB.countH = 80;
 			mB.is3D = true;
 		}

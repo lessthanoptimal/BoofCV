@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.sfm;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Motion model for scale, translation, and rotation:
  *
@@ -28,67 +31,26 @@ package boofcv.struct.sfm;
  * @author Peter Abeles
  */
 public class ScaleTranslateRotate2D {
-	/**
-	 * Scaling
-	 */
-	public double scale;
-	/**
-	 * Translation along x and y axis
-	 */
-	public double transX,transY;
+	/** Scaling */
+	public @Getter @Setter double scale;
+	/** Translation along x and y axis */
+	public @Getter @Setter double transX, transY;
+	/** Angle of rotation */
+	public @Getter @Setter double theta;
 
-	/**
-	 * Angle of rotation
-	 */
-	public double theta;
-
-
-	public ScaleTranslateRotate2D(double theta,double scale, double transX, double transY) {
+	public ScaleTranslateRotate2D( double theta, double scale, double transX, double transY ) {
 		this.theta = theta;
 		this.scale = scale;
 		this.transX = transX;
 		this.transY = transY;
 	}
 
-	public ScaleTranslateRotate2D() {
-	}
+	public ScaleTranslateRotate2D() {}
 
-	public void set( ScaleTranslateRotate2D src ) {
+	public void setTo( ScaleTranslateRotate2D src ) {
 		this.theta = src.theta;
 		this.scale = src.scale;
 		this.transX = src.transX;
 		this.transY = src.transY;
-	}
-
-	public double getTheta() {
-		return theta;
-	}
-
-	public void setTheta(double theta) {
-		this.theta = theta;
-	}
-
-	public double getScale() {
-		return scale;
-	}
-
-	public void setScale(double scale) {
-		this.scale = scale;
-	}
-
-	public double getTransX() {
-		return transX;
-	}
-
-	public void setTransX(double transX) {
-		this.transX = transX;
-	}
-
-	public double getTransY() {
-		return transY;
-	}
-
-	public void setTransY(double transY) {
-		this.transY = transY;
 	}
 }

@@ -63,11 +63,11 @@ import java.util.List;
  * Estimated motion is relative to left camera.
  *
  * FUTURE WORK: Save visual tracks without stereo matches and do monocular tracking on them. This is useful for stereo
- *              systems with only a little bit of overlap.
+ * systems with only a little bit of overlap.
  *
  * @author Peter Abeles
  */
-public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
+public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 		extends VisOdomBundlePnPBase<VisOdomDualTrackPnP.TrackInfo> {
 
 	// TODO must modify so that tracks can exist in only one camera after the initial spawn. Requiring tracks always
@@ -91,9 +91,9 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	private final PointTracker<T> trackerLeft;
 	private final PointTracker<T> trackerRight;
 	/** Used to describe tracks so that they can be matches between the two cameras */
-	private final DescribeRegionPoint<T,Desc> describe;
+	private final DescribeRegionPoint<T, Desc> describe;
 	/** Radius of a descriptor's region */
-	private @Getter @Setter double describeRadius=11.0;
+	private @Getter @Setter double describeRadius = 11.0;
 
 	// Data structures used when associating left and right cameras
 	private final FastArray<Point2D_F64> pointsLeft = new FastArray<>(Point2D_F64.class);
@@ -120,7 +120,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	private @Getter final List<PointTrack> candidates = new ArrayList<>();
 
 	// Internal profiling
-	private @Getter double timeTracking,timeEstimate,timeBundle,timeDropUnused, timeSceneMaintenance,timeSpawn;
+	private @Getter double timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance, timeSpawn;
 
 	//---------------------------------------------------------------------------------------------------
 	//----------- Internal Work Space
@@ -154,9 +154,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 								AssociateDescription2D<Desc> assocL2R,
 								Triangulate2ViewsMetric triangulate2,
 								ModelMatcher<Se3_F64, Stereo2D3D> matcher,
-								ModelFitter<Se3_F64, Stereo2D3D> modelRefiner )
-	{
-		if( !assocL2R.uniqueSource() || !assocL2R.uniqueDestination() )
+								ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
+		if (!assocL2R.uniqueSource() || !assocL2R.uniqueDestination())
 			throw new IllegalArgumentException("Both unique source and destination must be ensure by association");
 
 		this.describe = describe;
@@ -187,7 +186,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	 * Example, the RANSAC distance model might need to have stereo parameters passed to it externally
 	 * since there's no generic way to handle that.
 	 */
-	public void setCalibration(StereoParameters param) {
+	public void setCalibration( StereoParameters param ) {
 		right_to_left.set(param.right_to_left);
 		param.right_to_left.invert(left_to_right);
 
@@ -220,8 +219,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	 * @param right Image from right camera
 	 * @return true if motion estimate was updated and false if not
 	 */
-	public boolean process( T left , T right ) {
-		if( verbose != null ) {
+	public boolean process( T left, T right ) {
+		if (verbose != null) {
 			verbose.println("----------- Process --------------");
 			verbose.println("Scene: Frames=" + bundleViso.frames.size + " Tracks=" + bundleViso.tracks.size);
 			for (int frameIdx = 0; frameIdx < bundleViso.frames.size; frameIdx++) {
@@ -292,10 +291,10 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		dropBadBundleTracks();
 
 		long time4 = System.nanoTime();
-		boolean droppedCurrentFrame = performKeyFrameMaintenance(trackerLeft,2);
+		boolean droppedCurrentFrame = performKeyFrameMaintenance(trackerLeft, 2);
 		long time5 = System.nanoTime();
-		if( !droppedCurrentFrame ) {
-			if( verbose != null ) verbose.println("Saving new key frames");
+		if (!droppedCurrentFrame) {
+			if (verbose != null) verbose.println("Saving new key frames");
 			// We are keeping the current frame! Spawn new tracks inside of it
 			addNewTracks();
 		}
@@ -303,17 +302,17 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 		//=============================================================================================
 		//========== Summarize profiling results
-		timeTracking = (time1-time0)*1e-6;
-		timeEstimate = (time2-time1)*1e-6;
-		timeBundle = (time3-time2)*1e-6;
-		timeDropUnused = (time4-time3)*1e-6;
-		timeSceneMaintenance = (time5-time4)*1e-6;
-		timeSpawn = (time6-time5)*1e-6;
+		timeTracking = (time1 - time0)*1e-6;
+		timeEstimate = (time2 - time1)*1e-6;
+		timeBundle = (time3 - time2)*1e-6;
+		timeDropUnused = (time4 - time3)*1e-6;
+		timeSceneMaintenance = (time5 - time4)*1e-6;
+		timeSpawn = (time6 - time5)*1e-6;
 
-		if( profileOut != null ) {
-			double timeTotal = (time6-time0)*1e-6;
+		if (profileOut != null) {
+			double timeTotal = (time6 - time0)*1e-6;
 			profileOut.printf("TIME: TRK %5.1f Est %5.1f Bun %5.1f DU %5.1f Scene %5.1f Spn  %5.1f TOTAL %5.1f\n",
-					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance,timeSpawn,timeTotal);
+					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance, timeSpawn, timeTotal);
 		}
 
 		return true;
@@ -334,6 +333,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 	/**
 	 * Given the set of active tracks, estimate the cameras motion robustly
+	 *
 	 * @return true if successful
 	 */
 	private boolean estimateMotion() {
@@ -346,7 +346,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		// Put observation and prior knowledge into a format the model matcher will understand
 		listStereo2D3D.growArray(candidates.size());
 		listStereo2D3D.reset();
-		for( PointTrack l : candidates ) {
+		for (PointTrack l : candidates) {
 			Stereo2D3D stereo = listStereo2D3D.grow();
 
 			// Get the track location
@@ -354,20 +354,20 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 			PointTrack r = bt.visualRight;
 
 			// Get the 3D coordinate of the point in the 'previous' frame
-			SePointOps_F64.transform(world_to_prev,bt.worldLoc,prevLoc4);
-			PerspectiveOps.homogenousTo3dPositiveZ(prevLoc4,1e8,1e-8,stereo.location);
+			SePointOps_F64.transform(world_to_prev, bt.worldLoc, prevLoc4);
+			PerspectiveOps.homogenousTo3dPositiveZ(prevLoc4, 1e8, 1e-8, stereo.location);
 
 			// compute normalized image coordinate for track in left and right image
-			leftCM.pixelToNorm.compute(l.pixel.x,l.pixel.y,stereo.leftObs);
-			rightCM.pixelToNorm.compute(r.pixel.x,r.pixel.y,stereo.rightObs);
+			leftCM.pixelToNorm.compute(l.pixel.x, l.pixel.y, stereo.leftObs);
+			rightCM.pixelToNorm.compute(r.pixel.x, r.pixel.y, stereo.rightObs);
 			// TODO Could this transform be done just once?
 		}
 
 		// Robustly estimate left camera motion
-		if( !matcher.process(listStereo2D3D.toList()) )
+		if (!matcher.process(listStereo2D3D.toList()))
 			return false;
 
-		if( modelRefiner != null ) {
+		if (modelRefiner != null) {
 			modelRefiner.fitModel(matcher.getMatchSet(), matcher.getModelParameters(), previous_to_current);
 		} else {
 			previous_to_current.set(matcher.getModelParameters());
@@ -375,8 +375,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 		// Convert the found transforms back to world
 		previous_to_current.invert(current_to_previous);
-		current_to_previous.concat(previousLeft.frame_to_world,currentLeft.frame_to_world);
-		right_to_left.concat(currentLeft.frame_to_world,currentRight.frame_to_world);
+		current_to_previous.concat(previousLeft.frame_to_world, currentLeft.frame_to_world);
+		right_to_left.concat(currentLeft.frame_to_world, currentRight.frame_to_world);
 
 		return true;
 	}
@@ -384,8 +384,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	private void addInlierObservationsToScene() {
 		// mark tracks that are in the inlier set and add their observations to the scene
 		int N = matcher.getMatchSet().size();
-		if( verbose != null ) verbose.println("Total Inliers "+N+" / "+candidates.size());
-		for( int i = 0; i < N; i++ ) {
+		if (verbose != null) verbose.println("Total Inliers " + N + " / " + candidates.size());
+		for (int i = 0; i < N; i++) {
 			int index = matcher.getInputIndex(i);
 			TrackInfo bt = candidates.get(index).getCookie();
 			if (bt.visualTrack == null) throw new RuntimeException("BUG!");
@@ -407,21 +407,21 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	 */
 	private void mutualTrackDrop() {
 		int total = 0;
-		for( PointTrack t : trackerLeft.getDroppedTracks(null) ) {
+		for (PointTrack t : trackerLeft.getDroppedTracks(null)) {
 			TrackInfo bt = t.getCookie();
 			trackerRight.dropTrack(bt.visualRight);
 			bt.visualTrack = null; // This tells the scene that it is no longer in the visual tracker
 			total++;
 		}
-		for( PointTrack t : trackerRight.getDroppedTracks(null) ) {
+		for (PointTrack t : trackerRight.getDroppedTracks(null)) {
 			TrackInfo bt = t.getCookie();
-			if( bt.visualTrack != null ) {
+			if (bt.visualTrack != null) {
 				trackerLeft.dropTrack(bt.visualTrack);
 				bt.visualTrack = null;
 				total++;
 			}
 		}
-		if( verbose != null ) verbose.println("Dropped Tracks Mutual: "+total);
+		if (verbose != null) verbose.println("Dropped Tracks Mutual: " + total);
 	}
 
 	/**
@@ -431,10 +431,10 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		final long frameID = getFrameID();
 		// mark tracks in right frame that are active
 		List<PointTrack> activeRight = trackerRight.getActiveTracks(null);
-		for( PointTrack t : activeRight ) {
+		for (PointTrack t : activeRight) {
 			TrackInfo bt = t.getCookie();
 			// If the visual track is null then it got dropped earlier
-			if( bt.visualTrack == null )
+			if (bt.visualTrack == null)
 				continue;
 			bt.lastSeenRightFrame = frameID;
 			initialVisible.add(bt);
@@ -442,25 +442,25 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 		List<PointTrack> activeLeft = trackerLeft.getActiveTracks(null);
 		candidates.clear();
-		for( PointTrack left : activeLeft ) {
+		for (PointTrack left : activeLeft) {
 			TrackInfo bt = left.getCookie();
 
-			if( bt.lastSeenRightFrame != frameID ) {
+			if (bt.lastSeenRightFrame != frameID) {
 				continue;
 			}
 
-			if( bt.visualTrack == null )
+			if (bt.visualTrack == null)
 				throw new RuntimeException("BUG!!! Should have been skipped over in the right camera");
 
 			// check epipolar constraint and see if it is still valid
-			if( stereoCheck.checkPixel(bt.visualTrack.pixel, bt.visualRight.pixel) ) {
+			if (stereoCheck.checkPixel(bt.visualTrack.pixel, bt.visualRight.pixel)) {
 				bt.lastStereoFrame = frameID;
 				candidates.add(left);
 			}
 		}
 
-		if( verbose != null )
-			verbose.println("Visual Tracks: Left: "+activeLeft.size()+" Right: "+activeRight.size()+" Candidates: "+candidates.size());
+		if (verbose != null)
+			verbose.println("Visual Tracks: Left: " + activeLeft.size() + " Right: " + activeRight.size() + " Candidates: " + candidates.size());
 	}
 
 	/**
@@ -472,8 +472,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		// Drop unused tracks from the left camera
 		trackerLeft.dropTracks(track -> {
 			TrackInfo bt = track.getCookie();
-			if( bt == null ) throw new RuntimeException("BUG!");
-			if( currentFrameID - bt.lastInlier >= thresholdRetireTracks) {
+			if (bt == null) throw new RuntimeException("BUG!");
+			if (currentFrameID - bt.lastInlier >= thresholdRetireTracks) {
 //				System.out.println("Removing visible track due to lack of inlier");
 				bt.visualTrack = null;
 				return true;
@@ -485,10 +485,10 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 		// there should be no surprised here
 		trackerRight.dropTracks(track -> {
 			TrackInfo bt = track.getCookie();
-			if( bt == null ) throw new RuntimeException("BUG!");
-			if( bt.visualTrack == null )
+			if (bt == null) throw new RuntimeException("BUG!");
+			if (bt.visualTrack == null)
 				return true;
-			if( currentFrameID - bt.lastInlier >= thresholdRetireTracks ) {
+			if (currentFrameID - bt.lastInlier >= thresholdRetireTracks) {
 				throw new RuntimeException("BUG! Should have already been dropped by left camera");
 			}
 			return false;
@@ -511,16 +511,16 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 		// get a list of new tracks and their descriptions
 		describeSpawnedTracks(inputLeft, spawnedLeft, pointsLeft, descLeft);
-		describeSpawnedTracks(inputRight,spawnedRight,pointsRight,descRight);
+		describeSpawnedTracks(inputRight, spawnedRight, pointsRight, descRight);
 
 		// associate using L2R
-		assocL2R.setSource(pointsLeft,descLeft);
+		assocL2R.setSource(pointsLeft, descLeft);
 		assocL2R.setDestination(pointsRight, descRight);
 		assocL2R.associate();
 		FastAccess<AssociatedIndex> matches = assocL2R.getMatches();
 
 		int total = 0;
-		for( int i = 0; i < matches.size; i++ ) {
+		for (int i = 0; i < matches.size; i++) {
 			AssociatedIndex m = matches.get(i);
 
 			PointTrack trackL = spawnedLeft.get(m.src);
@@ -558,11 +558,12 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 				bundleViso.tracks.removeTail();
 			}
 		}
-		if( verbose != null ) verbose.println("New Tracks: left="+spawnedLeft.size()+" right="+spawnedRight.size()+" stereo="+total);
+		if (verbose != null)
+			verbose.println("New Tracks: left=" + spawnedLeft.size() + " right=" + spawnedRight.size() + " stereo=" + total);
 
 		// drop visual tracks that were not associated
 		GrowQueue_I32 unassignedRight = assocL2R.getUnassociatedDestination();
-		for( int i = 0; i < unassignedRight.size; i++ ) {
+		for (int i = 0; i < unassignedRight.size; i++) {
 			int index = unassignedRight.get(i);
 			trackerRight.dropTrack(spawnedRight.get(index));
 		}
@@ -580,19 +581,18 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	/**
 	 * Given list of new visual tracks, describe the region around each track using a descriptor
 	 */
-	private void describeSpawnedTracks(T image,  List<PointTrack> tracks ,
-									   FastArray<Point2D_F64> points , FastQueue<Desc> descs )
-	{
+	private void describeSpawnedTracks( T image, List<PointTrack> tracks,
+										FastArray<Point2D_F64> points, FastQueue<Desc> descs ) {
 		describe.setImage(image);
 		points.reset();
 		descs.reset();
 
-		for( int i = 0; i < tracks.size(); i++ ) {
+		for (int i = 0; i < tracks.size(); i++) {
 			PointTrack t = tracks.get(i);
 			// ignoring the return value.  most descriptors never return false and the ones that due will rarely do so
-			describe.process(t.pixel.x,t.pixel.y,0,describeRadius,descs.grow());
+			describe.process(t.pixel.x, t.pixel.y, 0, describeRadius, descs.grow());
 
-			points.add( t.pixel );
+			points.add(t.pixel);
 		}
 	}
 
@@ -603,6 +603,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 
 	/**
 	 * If there are no candidates then a fault happened.
+	 *
 	 * @return true if fault.  false is no fault
 	 */
 	public boolean isFault() {
@@ -610,7 +611,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	}
 
 	@Override
-	protected void dropVisualTrack(PointTrack left) {
+	protected void dropVisualTrack( PointTrack left ) {
 		TrackInfo info = left.getCookie();
 		PointTrack right = info.visualRight;
 		trackerLeft.dropTrack(left);
@@ -620,8 +621,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc>
 	/**
 	 * A coupled track between the left and right cameras.
 	 */
-	public static class TrackInfo extends BTrack
-	{
+	public static class TrackInfo extends BTrack {
 		// Image based tracks in left and right camera
 		public PointTrack visualRight;
 		public long lastStereoFrame;

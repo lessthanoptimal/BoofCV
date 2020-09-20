@@ -37,28 +37,29 @@ import org.ddogleg.struct.FastQueue;
 public class VisualDepthOps {
 	/**
 	 * Creates a point cloud from a depth image.
+	 *
 	 * @param param Intrinsic camera parameters for depth image
 	 * @param depth depth image.  each value is in millimeters.
 	 * @param cloud Output point cloud
 	 */
-	public static void depthTo3D(CameraPinholeBrown param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
+	public static void depthTo3D( CameraPinholeBrown param, GrayU16 depth, FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
-		Point2Transform2_F64 p2n = LensDistortionFactory.narrow(param).undistort_F64(true,false);
+		Point2Transform2_F64 p2n = LensDistortionFactory.narrow(param).undistort_F64(true, false);
 
 		Point2D_F64 n = new Point2D_F64();
 
-		for( int y = 0; y < depth.height; y++ ) {
+		for (int y = 0; y < depth.height; y++) {
 			int index = depth.startIndex + y*depth.stride;
-			for( int x = 0; x < depth.width; x++ ) {
+			for (int x = 0; x < depth.width; x++) {
 				int mm = depth.data[index++] & 0xFFFF;
 
 				// skip pixels with no depth information
-				if( mm == 0 )
+				if (mm == 0)
 					continue;
 
 				// this could all be precomputed to speed it up
-				p2n.compute(x,y,n);
+				p2n.compute(x, y, n);
 
 				Point3D_F64 p = cloud.grow();
 				p.z = mm;
@@ -71,19 +72,20 @@ public class VisualDepthOps {
 	/**
 	 * Creates a point cloud from a depth image and saves the color information.  The depth and color images are
 	 * assumed to be aligned.
+	 *
 	 * @param param Intrinsic camera parameters for depth image
 	 * @param depth depth image.  each value is in millimeters.
 	 * @param rgb Color image that's aligned to the depth.
 	 * @param cloud Output point cloud
 	 * @param cloudColor Output color for each point in the cloud
 	 */
-	public static void depthTo3D(CameraPinholeBrown param , Planar<GrayU8> rgb , GrayU16 depth ,
-								 FastQueue<Point3D_F64> cloud , FastQueue<int[]> cloudColor ) {
+	public static void depthTo3D( CameraPinholeBrown param, Planar<GrayU8> rgb, GrayU16 depth,
+								  FastQueue<Point3D_F64> cloud, FastQueue<int[]> cloudColor ) {
 		cloud.reset();
 		cloudColor.reset();
 
 		RemoveBrownPtoN_F64 p2n = new RemoveBrownPtoN_F64();
-		p2n.setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
+		p2n.setK(param.fx, param.fy, param.skew, param.cx, param.cy).setDistortion(param.radial, param.t1, param.t2);
 
 		Point2D_F64 n = new Point2D_F64();
 
@@ -91,17 +93,17 @@ public class VisualDepthOps {
 		GrayU8 colorG = rgb.getBand(1);
 		GrayU8 colorB = rgb.getBand(2);
 
-		for( int y = 0; y < depth.height; y++ ) {
+		for (int y = 0; y < depth.height; y++) {
 			int index = depth.startIndex + y*depth.stride;
-			for( int x = 0; x < depth.width; x++ ) {
+			for (int x = 0; x < depth.width; x++) {
 				int mm = depth.data[index++] & 0xFFFF;
 
 				// skip pixels with no depth information
-				if( mm == 0 )
+				if (mm == 0)
 					continue;
 
 				// this could all be precomputed to speed it up
-				p2n.compute(x,y,n);
+				p2n.compute(x, y, n);
 
 				Point3D_F64 p = cloud.grow();
 				p.z = mm;
@@ -110,9 +112,9 @@ public class VisualDepthOps {
 
 				int color[] = cloudColor.grow();
 
-				color[0] = colorR.unsafe_get(x,y);
-				color[1] = colorG.unsafe_get(x,y);
-				color[2] = colorB.unsafe_get(x,y);
+				color[0] = colorR.unsafe_get(x, y);
+				color[1] = colorG.unsafe_get(x, y);
+				color[2] = colorB.unsafe_get(x, y);
 			}
 		}
 	}

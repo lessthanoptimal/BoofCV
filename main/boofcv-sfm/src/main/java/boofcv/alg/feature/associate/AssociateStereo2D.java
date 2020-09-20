@@ -37,62 +37,58 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public class AssociateStereo2D<Desc extends TupleDesc>
 		extends StereoConsistencyCheck
-		implements AssociateDescription2D<Desc>
-{
+		implements AssociateDescription2D<Desc> {
 	// computes match score between two descriptions
-	private ScoreAssociation<Desc> scorer;
+	private final ScoreAssociation<Desc> scorer;
 	// storage for associated features
-	private FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
+	private final FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 	// stores indexes of unassociated source features
-	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
+	private final GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 	// creates a list of unassociated features from the list of matches
-	private FindUnassociated unassociated = new FindUnassociated();
+	private final FindUnassociated unassociated = new FindUnassociated();
 
 	// maximum allowed score when matching descriptors
 	private double scoreThreshold = Double.MAX_VALUE;
 
-
 	// stores rectified coordinates of observations in left and right images
-	private FastQueue<Point2D_F64> locationLeft = new FastQueue<>(Point2D_F64::new);
-	private FastQueue<Point2D_F64> locationRight = new FastQueue<>(Point2D_F64::new);
+	private final FastQueue<Point2D_F64> locationLeft = new FastQueue<>(Point2D_F64::new);
+	private final FastQueue<Point2D_F64> locationRight = new FastQueue<>(Point2D_F64::new);
 	// stores reference to descriptions in left and right images
 	private FastAccess<Desc> descriptionsLeft;
 	private FastAccess<Desc> descriptionsRight;
 
-	public AssociateStereo2D( ScoreAssociation<Desc> scorer , double locationTolerance , Class<Desc> descType )
-	{
-		super(locationTolerance,locationTolerance);
+	public AssociateStereo2D( ScoreAssociation<Desc> scorer, double locationTolerance, Class<Desc> descType ) {
+		super(locationTolerance, locationTolerance);
 		this.scorer = scorer;
 	}
 
 	@Override
-	public void initialize(int imageWidth, int imageHeight) {}
+	public void initialize( int imageWidth, int imageHeight ) {}
 
 	/**
 	 * Converts location into rectified coordinates and saved a reference to the description.
 	 */
 	@Override
-	public void setSource(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {
+	public void setSource( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions ) {
 		locationLeft.reset();
-		for( int i = 0; i < location.size; i++ ) {
+		for (int i = 0; i < location.size; i++) {
 			Point2D_F64 orig = location.get(i);
 			Point2D_F64 rectified = locationLeft.grow();
-			leftImageToRect.compute(orig.x,orig.y,rectified);
+			leftImageToRect.compute(orig.x, orig.y, rectified);
 		}
 		this.descriptionsLeft = descriptions;
 	}
 
-
 	/**
 	 * Converts location into rectified coordinates and saved a reference to the description.
 	 */
 	@Override
-	public void setDestination(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {
+	public void setDestination( FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions ) {
 		locationRight.reset();
-		for( int i = 0; i < location.size; i++ ) {
+		for (int i = 0; i < location.size; i++) {
 			Point2D_F64 orig = location.get(i);
 			Point2D_F64 rectified = locationRight.grow();
-			rightImageToRect.compute(orig.x,orig.y,rectified);
+			rightImageToRect.compute(orig.x, orig.y, rectified);
 		}
 		this.descriptionsRight = descriptions;
 	}
@@ -103,27 +99,27 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 		matches.reset();
 		unassociatedSrc.reset();
 
-		for( int i = 0; i < locationLeft.size; i++ ) {
+		for (int i = 0; i < locationLeft.size; i++) {
 			Point2D_F64 left = locationLeft.get(i);
 			Desc descLeft = descriptionsLeft.get(i);
 
 			int bestIndex = -1;
 			double bestScore = scoreThreshold;
 
-			for( int j = 0; j < locationRight.size; j++ ) {
+			for (int j = 0; j < locationRight.size; j++) {
 				Point2D_F64 right = locationRight.get(j);
 
-				if( checkRectified(left,right) ) {
+				if (checkRectified(left, right)) {
 					double dist = scorer.score(descLeft, descriptionsRight.get(j));
-					if( dist < bestScore ) {
+					if (dist < bestScore) {
 						bestScore = dist;
 						bestIndex = j;
 					}
 				}
 			}
 
-			if( bestIndex >= 0 ) {
-				matches.grow().setAssociation(i,bestIndex,bestScore);
+			if (bestIndex >= 0) {
+				matches.grow().setAssociation(i, bestIndex, bestScore);
 			} else {
 				unassociatedSrc.push(i);
 			}
@@ -142,11 +138,11 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 
 	@Override
 	public GrowQueue_I32 getUnassociatedDestination() {
-		return unassociated.checkDestination(matches,locationRight.size);
+		return unassociated.checkDestination(matches, locationRight.size);
 	}
 
 	@Override
-	public void setMaxScoreThreshold(double score) {
+	public void setMaxScoreThreshold( double score ) {
 		this.scoreThreshold = score < 0.0 ? Double.MAX_VALUE : score;
 	}
 

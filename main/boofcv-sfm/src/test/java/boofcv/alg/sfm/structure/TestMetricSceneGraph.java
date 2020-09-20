@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestMetricSceneGraph {
 
-	private Random rand = new Random(234);
+	private final Random rand = new Random(234);
 
 	@Test
 	void consturctor() {
@@ -48,9 +48,9 @@ class TestMetricSceneGraph {
 
 		MetricSceneGraph graph = new MetricSceneGraph(pairwise);
 
-		assertEquals(2,graph.cameras.size());
-		assertEquals(5,graph.nodes.size());
-		assertEquals(10,graph.edges.size());
+		assertEquals(2, graph.cameras.size());
+		assertEquals(5, graph.nodes.size());
+		assertEquals(10, graph.edges.size());
 
 		Camera camMoo = graph.cameras.get("moo");
 		Camera camNoo = graph.cameras.get("noo");
@@ -60,21 +60,21 @@ class TestMetricSceneGraph {
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			MetricSceneGraph.View v = graph.nodes.get(i);
-			assertEquals(i,v.index);
-			assertEquals(ViewState.UNPROCESSED,v.state);
-			assertTrue(v.observationNorm.size>0);
-			assertEquals(v.observationNorm.size,v.features3D.length);
+			assertEquals(i, v.index);
+			assertEquals(ViewState.UNPROCESSED, v.state);
+			assertTrue(v.observationNorm.size > 0);
+			assertEquals(v.observationNorm.size, v.features3D.length);
 		}
 
 		for (int i = 0; i < graph.edges.size(); i++) {
 			MetricSceneGraph.Motion v = graph.edges.get(i);
-			assertEquals(i,v.index);
+			assertEquals(i, v.index);
 			assertTrue(0 != v.associated.size());
-			assertSame(graph.nodes.get(i/2),v.viewSrc);
-			assertSame(graph.nodes.get((i/2+1)%5),v.viewDst);
+			assertSame(graph.nodes.get(i/2), v.viewSrc);
+			assertSame(graph.nodes.get((i/2 + 1)%5), v.viewDst);
 
-			assertSame(v.viewDst,v.destination(v.viewSrc));
-			assertSame(v.viewSrc,v.destination(v.viewDst));
+			assertSame(v.viewDst, v.destination(v.viewSrc));
+			assertSame(v.viewSrc, v.destination(v.viewDst));
 		}
 	}
 
@@ -85,45 +85,45 @@ class TestMetricSceneGraph {
 		pairwise.addCamera(createCamera("noo"));
 
 		for (int i = 0; i < 5; i++) {
-			FastQueue<TupleDesc> descs =(FastQueue) UtilFeature.createQueueF64(8);
-			pairwise.nodes.add( new PairwiseImageGraph.View(i,descs) );
+			FastQueue<TupleDesc> descs = (FastQueue)UtilFeature.createQueueF64(8);
+			pairwise.nodes.add(new PairwiseImageGraph.View(i, descs));
 
 			PairwiseImageGraph.View v = pairwise.nodes.get(i);
 			v.index = i;
 
-			if( i%2 == 0 )
+			if (i%2 == 0)
 				v.camera = pairwise.cameras.get("moo");
 			else
 				v.camera = pairwise.cameras.get("noo");
 
-			int N = rand.nextInt(20)+5;
+			int N = rand.nextInt(20) + 5;
 			for (int j = 0; j < N; j++) {
 				v.descriptions.grow();
-				v.observationNorm.grow().set(rand.nextGaussian(),rand.nextGaussian());
-				v.observationPixels.grow().set(rand.nextDouble(),rand.nextDouble());
+				v.observationNorm.grow().set(rand.nextGaussian(), rand.nextGaussian());
+				v.observationPixels.grow().set(rand.nextDouble(), rand.nextDouble());
 			}
 		}
 
 		for (int i = 0; i < 10; i++) {
 			PairwiseImageGraph.Motion e = new PairwiseImageGraph.Motion();
-			pairwise.edges.add( e );
+			pairwise.edges.add(e);
 
 			e.index = i;
 			e.viewSrc = pairwise.nodes.get(i/2);
-			e.viewDst = pairwise.nodes.get((i/2+1)%5);
+			e.viewDst = pairwise.nodes.get((i/2 + 1)%5);
 			e.metric = true;
-			e.associated.add( new AssociatedIndex(0,1,0.1));
-			e.associated.add( new AssociatedIndex(3,3,0.1));
-			e.F = new DMatrixRMaj(3,3);
+			e.associated.add(new AssociatedIndex(0, 1, 0.1));
+			e.associated.add(new AssociatedIndex(3, 3, 0.1));
+			e.F = new DMatrixRMaj(3, 3);
 		}
 		return pairwise;
 	}
 
 	private static Camera createCamera( String name ) {
 		CameraPinhole model = new CameraPinhole();
-		Point2Transform2_F64 p2n = new LensDistortionPinhole(model).distort_F64(true,false);
+		Point2Transform2_F64 p2n = new LensDistortionPinhole(model).distort_F64(true, false);
 
-		return new Camera(name,p2n,model);
+		return new Camera(name, p2n, model);
 	}
 
 	@Test
@@ -131,7 +131,7 @@ class TestMetricSceneGraph {
 		MetricSceneGraph.Motion m = new MetricSceneGraph.Motion();
 		m.viewSrc = new MetricSceneGraph.View();
 		m.viewDst = new MetricSceneGraph.View();
-		m.a_to_b = SpecialEuclideanOps_F64.eulerXyz(0,0,1,0,0,0,null);
+		m.a_to_b = SpecialEuclideanOps_F64.eulerXyz(0, 0, 1, 0, 0, 0, null);
 	}
 
 	@Test
@@ -140,13 +140,14 @@ class TestMetricSceneGraph {
 		m.viewSrc = new MetricSceneGraph.View();
 		m.viewDst = new MetricSceneGraph.View();
 
-		assertSame(m.viewDst,m.destination(m.viewSrc));
-		assertSame(m.viewSrc,m.destination(m.viewDst));
+		assertSame(m.viewDst, m.destination(m.viewSrc));
+		assertSame(m.viewSrc, m.destination(m.viewDst));
 
 		try {
 			MetricSceneGraph.View v = new MetricSceneGraph.View();
 			m.destination(v);
 			fail("exception should have been thrown");
-		} catch( RuntimeException ignore){}
+		} catch (RuntimeException ignore) {
+		}
 	}
 }

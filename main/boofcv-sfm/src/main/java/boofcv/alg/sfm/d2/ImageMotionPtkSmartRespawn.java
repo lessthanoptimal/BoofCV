@@ -41,26 +41,26 @@ import java.util.List;
 public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends InvertibleTransform> {
 
 	// estimate image motion
-	private ImageMotionPointTrackerKey<I,IT> motion;
+	private final ImageMotionPointTrackerKey<I, IT> motion;
 
 	// used to prune feature tracks which are too close together
 	protected PruneCloseTracks<PointTrack> pruneClose = PruneCloseTracks.prunePointTrack(3);
 
 	// stores list of tracks to prune
-	private List<PointTrack> prune = new ArrayList<>();
+	private final List<PointTrack> prune = new ArrayList<>();
 
 	// change the keyframe is the number of inliers drops below this number
-	private int absoluteMinimumTracks;
+	private final int absoluteMinimumTracks;
 	// change the keyframe if the number of inliers has dropped this fraction from the original number
-	private double relativeInlierFraction;
+	private final double relativeInlierFraction;
 	// change the keyframe if the area covered has dropped this fraction from the original number
-	private double respawnCoverageFraction;
+	private final double respawnCoverageFraction;
 
 	// if true, the previous image processed was a key-frame
 	protected boolean previousWasKeyFrame = false;
 
 	// computes the fraction of the screen which contains inlier points
-	private ImageRectangle_F64 contRect = new ImageRectangle_F64();
+	private final ImageRectangle_F64 contRect = new ImageRectangle_F64();
 	// fraction of area covered by containment rectangle
 	protected double containment;
 	// containment after a new keyframe.
@@ -76,9 +76,9 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 	 * @param relativeInlierFraction Create new key-frame if ratio of inliers to the original count drops below this number
 	 * @param respawnCoverageFraction Create new key-frame if ratio point area coverage below this number
 	 */
-	public ImageMotionPtkSmartRespawn(ImageMotionPointTrackerKey<I, IT> motion,
-									  int absoluteMinimumTracks, double relativeInlierFraction,
-									  double respawnCoverageFraction) {
+	public ImageMotionPtkSmartRespawn( ImageMotionPointTrackerKey<I, IT> motion,
+									   int absoluteMinimumTracks, double relativeInlierFraction,
+									   double respawnCoverageFraction ) {
 		this.motion = motion;
 
 		this.absoluteMinimumTracks = absoluteMinimumTracks;
@@ -86,8 +86,8 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 		this.respawnCoverageFraction = respawnCoverageFraction;
 	}
 
-	public boolean process(I input) {
-		if( !motion.process(input) )
+	public boolean process( I input ) {
+		if (!motion.process(input))
 			return false;
 
 		boolean setKeyFrame = false;
@@ -100,9 +100,9 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 		computeContainment(input.width*input.height);
 
 		// check an absolute threshold
-		if( inlierSetSize < absoluteMinimumTracks ) {
+		if (inlierSetSize < absoluteMinimumTracks) {
 			setKeyFrame = true;
-		} else if( previousWasKeyFrame ) {
+		} else if (previousWasKeyFrame) {
 			// Make the containment threshold relative to take in account cases with large textureless regions
 			// do it after processing one frame since non-informative tracks are more likely to be dropped
 			previousWasKeyFrame = false;
@@ -110,17 +110,17 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 			maxInliers = inliers.size();
 		} else {
 			// look at relative thresholds here
-			if( inlierSetSize < maxInliers * relativeInlierFraction ) {
+			if (inlierSetSize < maxInliers*relativeInlierFraction) {
 				setKeyFrame = true;
 			}
 
 			// change the keyframe is not enough of the screen is covered by freatures
-			if( containment < respawnCoverageFraction * maxContainment) {
+			if (containment < respawnCoverageFraction*maxContainment) {
 				setKeyFrame = true;
 			}
 		}
 
-		if(setKeyFrame) {
+		if (setKeyFrame) {
 			// use the new keyframe as an opportunity to discard points that are too close.  commonly occurs
 			// when zooming out and points cluster together
 			pruneClosePoints(tracker, input.width, input.height);
@@ -131,12 +131,12 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 		return true;
 	}
 
-	private void pruneClosePoints(PointTracker<I> tracker, int width, int height) {
-		pruneClose.init(width,height);
+	private void pruneClosePoints( PointTracker<I> tracker, int width, int height ) {
+		pruneClose.init(width, height);
 		// prune some of the ones which are too close
 		prune.clear();
-		pruneClose.process(tracker.getActiveTracks(null),prune);
-		for( PointTrack t : prune ) {
+		pruneClose.process(tracker.getActiveTracks(null), prune);
+		for (PointTrack t : prune) {
 			tracker.dropTrack(t);
 		}
 	}
@@ -151,15 +151,15 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 		// mark that the track is in the inlier set and compute the containment rectangle
 		contRect.x0 = contRect.y0 = Double.MAX_VALUE;
 		contRect.x1 = contRect.y1 = -Double.MAX_VALUE;
-		for( AssociatedPair p : motion.getModelMatcher().getMatchSet() ) {
+		for (AssociatedPair p : motion.getModelMatcher().getMatchSet()) {
 			Point2D_F64 t = p.p2;
-			if( t.x > contRect.x1 )
+			if (t.x > contRect.x1)
 				contRect.x1 = t.x;
-			if( t.y > contRect.y1 )
+			if (t.y > contRect.y1)
 				contRect.y1 = t.y;
-			if( t.x < contRect.x0 )
+			if (t.x < contRect.x0)
 				contRect.x0 = t.x;
-			if( t.y < contRect.y0 )
+			if (t.y < contRect.y0)
 				contRect.y0 = t.y;
 		}
 		containment = contRect.area()/imageArea;

@@ -31,12 +31,12 @@ import java.io.PrintStream;
 import java.util.Set;
 
 /**
- *  * Wrapper around {@link MonocularPlaneVisualOdometry} which scales the input images.
+ * * Wrapper around {@link MonocularPlaneVisualOdometry} which scales the input images.
  *
  * @author Peter Abeles
  */
 // TODO more efficient scaling algorithm
-public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase<T>> implements MonocularPlaneVisualOdometry<T>{
+public class MonocularPlaneVisualOdometryScaleInput<T extends ImageBase<T>> implements MonocularPlaneVisualOdometry<T> {
 
 	double scaleFactor;
 
@@ -46,7 +46,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase<T>> imp
 
 	MonocularPlaneVisualOdometry<T> alg;
 
-	public MonocularPlaneVisualOdometryScaleInput( MonocularPlaneVisualOdometry<T> alg , double scaleFactor ) {
+	public MonocularPlaneVisualOdometryScaleInput( MonocularPlaneVisualOdometry<T> alg, double scaleFactor ) {
 		this.alg = alg;
 		this.scaleFactor = scaleFactor;
 		scaled = alg.getImageType().createImage(1, 1);
@@ -59,15 +59,15 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase<T>> imp
 
 		PerspectiveOps.scaleIntrinsic(scaleParameter.intrinsic, scaleFactor);
 
-		scaled.reshape(scaleParameter.intrinsic.width,scaleParameter.intrinsic.height);
+		scaled.reshape(scaleParameter.intrinsic.width, scaleParameter.intrinsic.height);
 
 		alg.setCalibration(scaleParameter);
 	}
 
 	@Override
-	public boolean process(T leftImage) {
+	public boolean process( T leftImage ) {
 
-		new FDistort(leftImage,scaled).scaleExt().apply();
+		new FDistort(leftImage, scaled).scaleExt().apply();
 
 		return alg.process(scaled);
 	}
@@ -98,7 +98,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase<T>> imp
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 
 	}
 }

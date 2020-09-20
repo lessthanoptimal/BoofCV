@@ -399,14 +399,18 @@ class TestProjectiveInitializeAllCommon {
 		View viewC = new View();
 
 		Motion motionAB = new Motion();
-		motionAB.src = seedA; motionAB.dst = viewB;
+		motionAB.src = seedA;
+		motionAB.dst = viewB;
 		motionAB.countF = 1000; // give it an excellent 3D score
 		Motion motionAC = new Motion();
-		motionAC.src = viewC; motionAC.dst = seedA; // src/dst shouldn't matter. bonus check
+		motionAC.src = viewC;
+		motionAC.dst = seedA; // src/dst shouldn't matter. bonus check
 		motionAC.countF = 1000; // give it an excellent 3D score
 
-		seedA.connections.add(motionAB); viewB.connections.add(motionAB);
-		seedA.connections.add(motionAC); viewC.connections.add(motionAC);
+		seedA.connections.add(motionAB);
+		viewB.connections.add(motionAB);
+		seedA.connections.add(motionAC);
+		viewC.connections.add(motionAC);
 		// No connection B to C is made
 
 		assertEquals(0.0, alg.scoreTripleView(seedA, viewB, viewC), UtilEjml.TEST_F64);
@@ -424,18 +428,27 @@ class TestProjectiveInitializeAllCommon {
 		View viewC = new View();
 
 		Motion motionAB = new Motion();
-		motionAB.src = seedA; motionAB.dst = viewB;
-		motionAB.countF = 10; motionAB.countH = 5;
+		motionAB.src = seedA;
+		motionAB.dst = viewB;
+		motionAB.countF = 10;
+		motionAB.countH = 5;
 		Motion motionAC = new Motion();
-		motionAC.src = viewC; motionAC.dst = seedA;
-		motionAC.countF = 12; motionAB.countH = 0;
+		motionAC.src = viewC;
+		motionAC.dst = seedA;
+		motionAC.countF = 12;
+		motionAB.countH = 0;
 		Motion motionBC = new Motion();
-		motionBC.src = viewC; motionBC.dst = viewB;
-		motionBC.countF = 12; motionBC.countH = 1;
+		motionBC.src = viewC;
+		motionBC.dst = viewB;
+		motionBC.countF = 12;
+		motionBC.countH = 1;
 
-		seedA.connections.add(motionAB); viewB.connections.add(motionAB);
-		seedA.connections.add(motionAC); viewC.connections.add(motionAC);
-		viewB.connections.add(motionBC); viewC.connections.add(motionBC);
+		seedA.connections.add(motionAB);
+		viewB.connections.add(motionAB);
+		seedA.connections.add(motionAC);
+		viewC.connections.add(motionAC);
+		viewB.connections.add(motionBC);
+		viewC.connections.add(motionBC);
 
 		double score0 = alg.scoreTripleView(seedA, viewB, viewC);
 
@@ -543,11 +556,17 @@ class TestProjectiveInitializeAllCommon {
 		}
 
 		@Override public boolean process( List<AssociatedTriple> dataSet ) {return false;}
+
 		@Override public TrifocalTensor getModelParameters() {return null;}
+
 		@Override public double getFitQuality() {return 0;}
+
 		@Override public int getMinimumSize() {return 0;}
+
 		@Override public void reset() {}
+
 		@Override public Class<AssociatedTriple> getPointType() {return null;}
+
 		@Override public Class<TrifocalTensor> getModelType() {return null;}
 	}
 }

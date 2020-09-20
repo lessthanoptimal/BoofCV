@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,24 +42,24 @@ public class MetricSceneGraph {
 	public List<Motion> edges = new ArrayList<>();
 	public List<Feature3D> features3D = new ArrayList<>();
 	public Map<String, Camera> cameras;
+
 	/**
 	 * Uses the pairwise graph to initialize the metric graph. Whenever possible
-	 * data is referenced directly insteado f being copied.
-	 * @param pairwise
+	 * data is referenced directly instead of being copied.
 	 */
 	public MetricSceneGraph( PairwiseImageGraph pairwise ) {
 		cameras = pairwise.cameras;
 
-		for ( String key : cameras.keySet() ) {
-			if( cameras.get(key).pixelToNorm == null )
+		for (String key : cameras.keySet()) {
+			if (cameras.get(key).pixelToNorm == null)
 				throw new IllegalArgumentException("All cameras must be calibrated");
 		}
 
 		for (int i = 0; i < pairwise.nodes.size(); i++) {
-			nodes.add( new View());
+			nodes.add(new View());
 		}
 		for (int i = 0; i < pairwise.edges.size(); i++) {
-			edges.add( new Motion() );
+			edges.add(new Motion());
 		}
 
 		for (int i = 0; i < pairwise.nodes.size(); i++) {
@@ -74,9 +74,9 @@ public class MetricSceneGraph {
 
 			for (int j = 0; j < pv.connections.size(); j++) {
 				PairwiseImageGraph.Motion pm = pv.connections.get(j);
-				if( pm.viewDst.index != v.index && pm.viewSrc.index != v.index )
+				if (pm.viewDst.index != v.index && pm.viewSrc.index != v.index)
 					throw new RuntimeException("Invalid input");
-				v.connections.add( edges.get( pm.index) );
+				v.connections.add(edges.get(pm.index));
 			}
 		}
 
@@ -86,8 +86,8 @@ public class MetricSceneGraph {
 
 			m.index = pm.index;
 			m.associated = pm.associated;
-			m.viewSrc = nodes.get( pm.viewSrc.index );
-			m.viewDst = nodes.get( pm.viewDst.index );
+			m.viewSrc = nodes.get(pm.viewSrc.index);
+			m.viewDst = nodes.get(pm.viewDst.index);
 			m.F = pm.F;
 		}
 	}
@@ -96,17 +96,16 @@ public class MetricSceneGraph {
 	 * Performs simple checks to see if the data structure is avlid
 	 */
 	public void sanityCheck() {
-		for( View v : nodes ) {
-			for( Motion m : v.connections ) {
-				if( m.viewDst != v && m.viewSrc != v )
+		for (View v : nodes) {
+			for (Motion m : v.connections) {
+				if (m.viewDst != v && m.viewSrc != v)
 					throw new RuntimeException("Not member of connection");
 			}
 		}
-		for( Motion m : edges ) {
-			if( m.viewDst != m.destination(m.viewSrc) )
+		for (Motion m : edges) {
+			if (m.viewDst != m.destination(m.viewSrc))
 				throw new RuntimeException("Unexpected result");
 		}
-
 	}
 
 	public static class View {
@@ -155,6 +154,7 @@ public class MetricSceneGraph {
 		 * Score how well this motion can be used to provide an initial set of triangulated feature points.
 		 * More features the better but you want the epipolar estimate to be a better model than homography
 		 * since the epipolar includes translation.
+		 *
 		 * @return the score
 		 */
 		public double scoreTriangulation() {
@@ -162,19 +162,19 @@ public class MetricSceneGraph {
 		}
 
 		public Se3_F64 motionSrcToDst( View src ) {
-			if( src == viewSrc) {
+			if (src == viewSrc) {
 				return a_to_b.copy();
-			} else if( src == viewDst){
+			} else if (src == viewDst) {
 				return a_to_b.invert(null);
 			} else {
 				throw new RuntimeException("BUG!");
 			}
 		}
 
-		public View destination(View src ) {
-			if( src == viewSrc) {
+		public View destination( View src ) {
+			if (src == viewSrc) {
 				return viewDst;
-			} else if( src == viewDst){
+			} else if (src == viewDst) {
 				return viewSrc;
 			} else {
 				throw new RuntimeException("BUG!");

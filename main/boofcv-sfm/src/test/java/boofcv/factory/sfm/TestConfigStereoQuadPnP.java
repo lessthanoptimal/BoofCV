@@ -29,7 +29,7 @@ import java.util.Random;
  */
 class TestConfigStereoQuadPnP extends StandardConfigurationChecks {
 	@Override
-	public Configuration createNotDefault(Random rand) {
+	public Configuration createNotDefault( Random rand ) {
 		var config = new ConfigStereoQuadPnP();
 
 		config.refineIterations = 9;

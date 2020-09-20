@@ -53,21 +53,20 @@ import static boofcv.factory.distort.LensDistortionFactory.narrow;
 // TODO WARNING! active list has been modified by dropping and adding tracks
 // this is probably true of other SFM algorithms
 public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<Vis>, Depth extends ImageGray<Depth>>
-	implements DepthVisualOdometry<Vis,Depth> , AccessPointTracks3D
-{
+		implements DepthVisualOdometry<Vis, Depth>, AccessPointTracks3D {
 	// low level algorithm
 	DepthSparse3D<Depth> sparse3D;
 	VisOdomMonoDepthPnP<Vis> alg;
-	DistanceFromModelMultiView<Se3_F64,Point2D3D> distance;
+	DistanceFromModelMultiView<Se3_F64, Point2D3D> distance;
 	ImageType<Vis> visualType;
 	Class<Depth> depthType;
 	boolean success;
 
 	List<PointTrack> active = new ArrayList<>();
 
-	public VisOdomPixelDepthPnP_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D, VisOdomMonoDepthPnP<Vis> alg,
-													   DistanceFromModelMultiView<Se3_F64, Point2D3D> distance,
-													   ImageType<Vis> visualType, Class<Depth> depthType) {
+	public VisOdomPixelDepthPnP_to_DepthVisualOdometry( DepthSparse3D<Depth> sparse3D, VisOdomMonoDepthPnP<Vis> alg,
+														DistanceFromModelMultiView<Se3_F64, Point2D3D> distance,
+														ImageType<Vis> visualType, Class<Depth> depthType ) {
 		this.sparse3D = sparse3D;
 		this.alg = alg;
 		this.distance = distance;
@@ -76,12 +75,13 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	}
 
 	@Override
-	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
+	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		try {
 			Point4D_F64 p = ((VisOdomBundleAdjustment.BTrack)active.get(index).getCookie()).worldLoc;
-			world.set( p.x/p.w, p.y/p.w, p.z/p.w);
+			world.set(p.x/p.w, p.y/p.w, p.z/p.w);
 			return true;
-		} catch( RuntimeException ignore){}
+		} catch (RuntimeException ignore) {
+		}
 		world.set(((Point2D3D)active.get(index).getCookie()).getLocation());
 		return true;
 	}
@@ -92,46 +92,47 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	}
 
 	@Override
-	public long getTrackId(int index) {
+	public long getTrackId( int index ) {
 		return active.get(index).featureId;
 	}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		pixel.set(active.get(index).pixel);
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
 		return PointTrack.extractTrackPixels(storage, active);
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
+	public boolean isTrackInlier( int index ) {
 		try {
 			Point2D3DTrack t = active.get(index).getCookie();
 			return t.lastInlier == alg.getFrameID();
-		} catch( RuntimeException ignore){}
+		} catch (RuntimeException ignore) {
+		}
 		VisOdomMonoDepthPnP.Track t = active.get(index).getCookie();
 		return t.lastUsed == alg.getFrameID();
 	}
 
 	@Override
-	public boolean isTrackNew(int index) {
+	public boolean isTrackNew( int index ) {
 		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
 		return alg.getTracker().getNewTracks(null).contains(t);
 	}
 
 	@Override
-	public void setCalibration(CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth) {
+	public void setCalibration( CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth ) {
 		PointToPixelTransform_F32 visToDepth_pixel = new PointToPixelTransform_F32(visToDepth);
-		sparse3D.configure(narrow(paramVisual),visToDepth_pixel);
+		sparse3D.configure(narrow(paramVisual), visToDepth_pixel);
 		alg.setCamera(paramVisual);
-		distance.setIntrinsic(0,paramVisual);
+		distance.setIntrinsic(0, paramVisual);
 	}
 
 	@Override
-	public boolean process(Vis visual, Depth depth) {
+	public boolean process( Vis visual, Depth depth ) {
 		sparse3D.setDepthImage(depth);
 		success = alg.process(visual);
 
@@ -172,7 +173,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-		alg.setVerbose(out,configuration);
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		alg.setVerbose(out, configuration);
 	}
 }

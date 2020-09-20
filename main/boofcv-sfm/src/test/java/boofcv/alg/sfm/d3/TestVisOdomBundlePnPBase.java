@@ -41,20 +41,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TestVisOdomBundlePnPBase {
 
-	CameraPinholeBrown pinhole = new CameraPinholeBrown(400,400,0,500,500,1000,1000);
+	CameraPinholeBrown pinhole = new CameraPinholeBrown(400, 400, 0, 500, 500, 1000, 1000);
 
 	@Test
 	void reset() {
 		var alg = new BundleBase();
 		alg.first = false;
 		alg.current_to_world.T.z = 10;
-		alg.cameraModels.add( new VisOdomBundlePnPBase.CameraModel());
+		alg.cameraModels.add(new VisOdomBundlePnPBase.CameraModel());
 
 		alg.reset();
 
 		assertTrue(alg.first);
-		assertEquals(0,alg.current_to_world.T.z);
-		assertEquals(0,alg.cameraModels.size());
+		assertEquals(0, alg.current_to_world.T.z);
+		assertEquals(0, alg.cameraModels.size());
 	}
 
 	/**
@@ -86,16 +86,16 @@ class TestVisOdomBundlePnPBase {
 
 		alg.triangulateNotSelectedBundleTracks();
 		// only half will have enough observations and out of that half, half will be selected
-		assertEquals(5,mock.count);
+		assertEquals(5, mock.count);
 	}
 
 	private static class MockTriangulate implements TriangulateNViewsMetric {
 
-		public int count  = 0;
+		public int count = 0;
 
 		@Override
-		public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView, Point3D_F64 location) {
-			assertEquals(3,observations.size());
+		public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView, Point3D_F64 location ) {
+			assertEquals(3, observations.size());
 			assertEquals(3, listWorldToView.size());
 			count++;
 			return true;
@@ -233,7 +233,7 @@ class TestVisOdomBundlePnPBase {
 		}
 
 		@Override
-		protected void dropVisualTrack(PointTrack track) {
+		protected void dropVisualTrack( PointTrack track ) {
 			countDropVisual++;
 		}
 

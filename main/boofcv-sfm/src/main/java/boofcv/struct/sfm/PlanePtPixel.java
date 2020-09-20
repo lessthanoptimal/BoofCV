@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class PlanePtPixel {
 	 */
 	public Point2D_F64 normalizedCurr = new Point2D_F64();
 
-	public PlanePtPixel(Point2D_F64 planeKey, Point2D_F64 normalizedCurr) {
+	public PlanePtPixel( Point2D_F64 planeKey, Point2D_F64 normalizedCurr ) {
 		this.planeKey = planeKey;
 		this.normalizedCurr = normalizedCurr;
 	}

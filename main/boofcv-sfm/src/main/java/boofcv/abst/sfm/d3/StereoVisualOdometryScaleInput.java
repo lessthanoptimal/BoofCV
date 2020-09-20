@@ -35,7 +35,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 // TODO more efficient scaling algorithm
-public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements StereoVisualOdometry<T>{
+public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements StereoVisualOdometry<T> {
 
 	double scaleFactor;
 
@@ -46,62 +46,47 @@ public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements S
 
 	StereoVisualOdometry<T> alg;
 
-	public StereoVisualOdometryScaleInput( StereoVisualOdometry<T> alg , double scaleFactor ) {
+	public StereoVisualOdometryScaleInput( StereoVisualOdometry<T> alg, double scaleFactor ) {
 		this.alg = alg;
-      this.scaleFactor = scaleFactor;
+		this.scaleFactor = scaleFactor;
 		scaleLeft = alg.getImageType().createImage(1, 1);
 		scaleRight = alg.getImageType().createImage(1, 1);
 	}
 
 	@Override
-	public void setCalibration(StereoParameters parameters) {
+	public void setCalibration( StereoParameters parameters ) {
 		scaleParameter = new StereoParameters(parameters);
 
-		PerspectiveOps.scaleIntrinsic(scaleParameter.left,scaleFactor);
-		PerspectiveOps.scaleIntrinsic(scaleParameter.right,scaleFactor);
+		PerspectiveOps.scaleIntrinsic(scaleParameter.left, scaleFactor);
+		PerspectiveOps.scaleIntrinsic(scaleParameter.right, scaleFactor);
 
-		scaleLeft.reshape(scaleParameter.left.width,scaleParameter.left.height);
-		scaleRight.reshape(scaleParameter.right.width,scaleParameter.right.height);
+		scaleLeft.reshape(scaleParameter.left.width, scaleParameter.left.height);
+		scaleRight.reshape(scaleParameter.right.width, scaleParameter.right.height);
 
-      alg.setCalibration(scaleParameter);
+		alg.setCalibration(scaleParameter);
 	}
 
 	@Override
-	public boolean process(T leftImage, T rightImage) {
+	public boolean process( T leftImage, T rightImage ) {
 
-		new FDistort(leftImage,scaleLeft).scaleExt().apply();
-		new FDistort(rightImage,scaleRight).scaleExt().apply();
+		new FDistort(leftImage, scaleLeft).scaleExt().apply();
+		new FDistort(rightImage, scaleRight).scaleExt().apply();
 
-		return alg.process(scaleLeft,scaleRight);
+		return alg.process(scaleLeft, scaleRight);
 	}
 
-	@Override
-	public ImageType<T> getImageType() {
-		return alg.getImageType();
-	}
+	@Override public ImageType<T> getImageType() { return alg.getImageType(); }
+
+	@Override public void reset() { alg.reset(); }
+
+	@Override public boolean isFault() { return alg.isFault(); }
+
+	@Override public Se3_F64 getCameraToWorld() { return alg.getCameraToWorld(); }
+
+	@Override public long getFrameID() { return alg.getFrameID(); }
 
 	@Override
-	public void reset() {
-		alg.reset();
-	}
-
-	@Override
-	public boolean isFault() {
-		return alg.isFault();
-	}
-
-	@Override
-	public Se3_F64 getCameraToWorld() {
-		return alg.getCameraToWorld();
-	}
-
-	@Override
-	public long getFrameID() {
-		return alg.getFrameID();
-	}
-
-	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		alg.setVerbose(out, configuration);
 	}
 }

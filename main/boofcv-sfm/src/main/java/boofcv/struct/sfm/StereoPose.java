@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class StereoPose {
 	public Se3_F64 worldToCam0;
 	public Se3_F64 cam0ToCam1;
 
-	public StereoPose(Se3_F64 worldToCam0, Se3_F64 cam0ToCam1) {
+	public StereoPose( Se3_F64 worldToCam0, Se3_F64 cam0ToCam1 ) {
 		this.worldToCam0 = worldToCam0;
 		this.cam0ToCam1 = cam0ToCam1;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,15 +41,15 @@ public class TestDepthSparse3D {
 
 	@Test
 	public void basicTest() {
-		GrayU16 depth = new GrayU16(w,h);
-		depth.set(5,6,1000);
+		GrayU16 depth = new GrayU16(w, h);
+		depth.set(5, 6, 1000);
 
-		CameraPinholeBrown param = new CameraPinholeBrown(1,1,0,5,10,w,h).fsetRadial(0,0);
+		CameraPinholeBrown param = new CameraPinholeBrown(1, 1, 0, 5, 10, w, h).fsetRadial(0, 0);
 
 		PixelTransform<Point2D_F32> v2d = new PixelTransform<Point2D_F32>() {
 
 			@Override
-			public void compute(int x, int y, Point2D_F32 output ) {
+			public void compute( int x, int y, Point2D_F32 output ) {
 				output.x = x + 1;
 				output.y = y + 2;
 			}
@@ -61,7 +61,7 @@ public class TestDepthSparse3D {
 		};
 
 		DepthSparse3D<GrayU16> alg = new DepthSparse3D.I<>(2.1);
-		alg.configure(LensDistortionFactory.narrow(param),v2d);
+		alg.configure(LensDistortionFactory.narrow(param), v2d);
 
 		alg.setDepthImage(depth);
 
@@ -70,11 +70,11 @@ public class TestDepthSparse3D {
 		Point3D_F64 found = alg.getWorldPt();
 
 		Point2D_F64 norm = new Point2D_F64();
-		PerspectiveOps.convertPixelToNorm(param,new Point2D_F64(4,4),norm);
+		PerspectiveOps.convertPixelToNorm(param, new Point2D_F64(4, 4), norm);
 		double z = 1000*2.1;
 
-		assertEquals(z,found.z,1e-8);
-		assertEquals(norm.x*z,found.x,1e-8);
-		assertEquals(norm.y*z,found.y,1e-8);
+		assertEquals(z, found.z, 1e-8);
+		assertEquals(norm.x*z, found.x, 1e-8);
+		assertEquals(norm.y*z, found.y, 1e-8);
 	}
 }

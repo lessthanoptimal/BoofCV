@@ -46,25 +46,23 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
-		implements StereoVisualOdometry<T>, AccessPointTracks3D
-{
-	VisOdomStereoQuadPnP<T,TD> alg;
+public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
+		implements StereoVisualOdometry<T>, AccessPointTracks3D {
+	VisOdomStereoQuadPnP<T, TD> alg;
 	RefinePnPStereo refine;
 	AssociateStereo2D<TD> associateStereo;
 	PnPStereoDistanceReprojectionSq distance;
-	DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono;
+	DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono;
 	Class<T> imageType;
 	// Doesn't really have tracks. So it's hacked by given every feature a new ID
 	long totalFeatures;
 
-	public WrapVisOdomQuadPnP(VisOdomStereoQuadPnP<T, TD> alg,
-							  RefinePnPStereo refine,
-							  AssociateStereo2D<TD> associateStereo,
-							  PnPStereoDistanceReprojectionSq distance,
-							  DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono,
-							  Class<T> imageType)
-	{
+	public WrapVisOdomQuadPnP( VisOdomStereoQuadPnP<T, TD> alg,
+							   RefinePnPStereo refine,
+							   AssociateStereo2D<TD> associateStereo,
+							   PnPStereoDistanceReprojectionSq distance,
+							   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono,
+							   Class<T> imageType ) {
 		this.alg = alg;
 		this.refine = refine;
 		this.associateStereo = associateStereo;
@@ -74,10 +72,10 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
-	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
+	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		Se3_F64 left_to_world = alg.getLeftToWorld();
-		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features =  alg.getTrackQuads();
-		SePointOps_F64.transform(left_to_world,features.get(index).X,world);
+		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features = alg.getTrackQuads();
+		SePointOps_F64.transform(left_to_world, features.get(index).X, world);
 		return true;
 	}
 
@@ -85,52 +83,52 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	public int getTotalTracks() {return alg.getTrackQuads().size;}
 
 	@Override
-	public long getTrackId(int index) {return alg.getTrackQuads().get(index).id;}
+	public long getTrackId( int index ) {return alg.getTrackQuads().get(index).id;}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		pixel.set(alg.getTrackQuads().get(index).v2);
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
-		if( storage == null )
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
+		if (storage == null)
 			storage = new ArrayList<>();
 		else
 			storage.clear();
 
-		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features =  alg.getTrackQuads();
+		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features = alg.getTrackQuads();
 
-		for( VisOdomStereoQuadPnP.TrackQuad v : features.toList() )
+		for (VisOdomStereoQuadPnP.TrackQuad v : features.toList())
 			storage.add(v.v2); // new left camera
 
 		return storage;
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
+	public boolean isTrackInlier( int index ) {
 		return alg.getTrackQuads().get(index).inlier;
 	}
 
 	@Override
-	public boolean isTrackNew(int index) {
+	public boolean isTrackNew( int index ) {
 		long frameId = alg.getFrameID();
 		return alg.getTrackQuads().get(index).firstSceneFrameID == frameId;
 	}
 
 	@Override
-	public void setCalibration(StereoParameters parameters) {
+	public void setCalibration( StereoParameters parameters ) {
 		Se3_F64 leftToRight = parameters.getRightToLeft().invert(null);
 
 		alg.setCalibration(parameters);
 		associateStereo.setCalibration(parameters);
 		distance.setLeftToRight(leftToRight);
-		distance.setIntrinsic(0,parameters.left);
-		distance.setIntrinsic(1,parameters.right);
+		distance.setIntrinsic(0, parameters.left);
+		distance.setIntrinsic(1, parameters.right);
 
-		distanceMono.setIntrinsic(0,parameters.left);
+		distanceMono.setIntrinsic(0, parameters.left);
 
-		if( refine != null )
+		if (refine != null)
 			refine.setLeftToRight(leftToRight);
 	}
 
@@ -150,7 +148,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
-	public boolean process(T leftImage, T rightImage) {
+	public boolean process( T leftImage, T rightImage ) {
 		totalFeatures += alg.getTrackQuads().size;
 		return alg.process(leftImage, rightImage);
 	}
@@ -166,7 +164,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-		alg.setVerbose(out,configuration);
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		alg.setVerbose(out, configuration);
 	}
 }

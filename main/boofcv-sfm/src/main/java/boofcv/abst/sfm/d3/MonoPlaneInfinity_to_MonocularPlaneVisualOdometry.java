@@ -42,8 +42,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>>
-		implements MonocularPlaneVisualOdometry<T> , AccessPointTracks3D
-{
+		implements MonocularPlaneVisualOdometry<T>, AccessPointTracks3D {
 	VisOdomMonoPlaneInfinity<T> alg;
 	DistancePlane2DToPixelSq distance;
 	GenerateSe2_PlanePtPixel generator;
@@ -56,10 +55,10 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	// list of active tracks
 	List<PointTrack> active = null;
 
-	public MonoPlaneInfinity_to_MonocularPlaneVisualOdometry(VisOdomMonoPlaneInfinity<T> alg,
-															 DistancePlane2DToPixelSq distance,
-															 GenerateSe2_PlanePtPixel generator,
-															 ImageType<T> imageType) {
+	public MonoPlaneInfinity_to_MonocularPlaneVisualOdometry( VisOdomMonoPlaneInfinity<T> alg,
+															  DistancePlane2DToPixelSq distance,
+															  GenerateSe2_PlanePtPixel generator,
+															  ImageType<T> imageType ) {
 		this.alg = alg;
 		this.distance = distance;
 		this.generator = generator;
@@ -69,7 +68,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	@Override
 	public void setCalibration( MonoPlaneParameters param ) {
 		alg.setIntrinsic(param.intrinsic);
-		distance.setIntrinsic(param.intrinsic.fx,param.intrinsic.fy,param.intrinsic.skew);
+		distance.setIntrinsic(param.intrinsic.fx, param.intrinsic.fy, param.intrinsic.skew);
 
 		alg.setExtrinsic(param.planeToCamera);
 		generator.setExtrinsic(param.planeToCamera);
@@ -77,7 +76,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public boolean process(T input) {
+	public boolean process( T input ) {
 
 		active = null;
 		fault = alg.process(input);
@@ -116,16 +115,15 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
-		if( active == null )
+	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
+		if (active == null)
 			active = alg.getTracker().getActiveTracks(null);
 		VisOdomMonoPlaneInfinity.VoTrack track = active.get(index).getCookie();
 
-		if( track.onPlane ) {
+		if (track.onPlane) {
 			world.x = -track.ground.y;
 			world.z = track.ground.x;
 			world.y = 0;
-
 		} else {
 			// just put it some place far away
 			world.x = -track.ground.y*1000;
@@ -140,14 +138,14 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 
 	@Override
 	public int getTotalTracks() {
-		if( active == null )
+		if (active == null)
 			active = alg.getTracker().getActiveTracks(null);
 		return active.size();
 	}
 
 	@Override
-	public long getTrackId(int index) {
-		if( active == null )
+	public long getTrackId( int index ) {
+		if (active == null)
 			active = alg.getTracker().getActiveTracks(null);
 
 		PointTrack t = active.get(index);
@@ -155,18 +153,18 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
-		pixel.set( active.get(index).pixel );
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
+		pixel.set(active.get(index).pixel);
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
-		if( storage == null )
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
+		if (storage == null)
 			storage = new ArrayList<>();
 		else
 			storage.clear();
 
-		if( active == null )
+		if (active == null)
 			active = alg.getTracker().getActiveTracks(null);
 
 		for (int i = 0; i < active.size(); i++) {
@@ -177,8 +175,8 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
-		if( active == null )
+	public boolean isTrackInlier( int index ) {
+		if (active == null)
 			active = alg.getTracker().getActiveTracks(null);
 
 		PointTrack t = active.get(index);
@@ -188,13 +186,13 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public boolean isTrackNew(int index) {
+	public boolean isTrackNew( int index ) {
 		// need to figure out a way to efficiently implement this
 		return false;
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 
 	}
 }

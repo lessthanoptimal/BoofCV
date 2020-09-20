@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,20 +38,20 @@ public class TestCreateSyntheticOverheadView {
 
 	int width = 800;
 	int height = 850;
-	CameraPinholeBrown param = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial( 0.002,0);
+	CameraPinholeBrown param = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0.002, 0);
 
 	@Test
 	public void checkPrecomputedTransform() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
-		cameraToPlane.getT().set(0,-5,0);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
+		cameraToPlane.getT().set(0, -5, 0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
 		CreateSyntheticOverheadView alg = new CreateSyntheticOverheadView() {
 			@Override
-			public void process(ImageBase input, ImageBase output) {
+			public void process( ImageBase input, ImageBase output ) {
 			}
 		};
 
@@ -61,19 +61,19 @@ public class TestCreateSyntheticOverheadView {
 		double centerX = 1;
 		double centerY = overheadH*cellSize/2.0;
 
-		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
+		alg.configure(param, planeToCamera, centerX, centerY, cellSize, overheadW, overheadH);
 
 		//  directly below camera, should not be in view
 		assertTrue(null == alg.getOverheadToPixel(0, 300));
 
 		//  point at the end of the map should be in view
-		assertTrue(null!=alg.getOverheadToPixel(overheadW-1,300));
+		assertTrue(null != alg.getOverheadToPixel(overheadW - 1, 300));
 
 		// check the value at one point by doing the reverse transform
-		Point2D_F32 found = alg.getOverheadToPixel(400,320);
+		Point2D_F32 found = alg.getOverheadToPixel(400, 320);
 
 		CameraPlaneProjection proj = new CameraPlaneProjection();
-		proj.setPlaneToCamera(planeToCamera,true);
+		proj.setPlaneToCamera(planeToCamera, true);
 		proj.setIntrinsic(param);
 
 
@@ -81,10 +81,10 @@ public class TestCreateSyntheticOverheadView {
 		proj.pixelToPlane(found.x, found.y, expected);
 
 		// put into overhead pixels
-		expected.x = (expected.x+centerX)/cellSize;
-		expected.y = (expected.y+centerY)/cellSize;
+		expected.x = (expected.x + centerX)/cellSize;
+		expected.y = (expected.y + centerY)/cellSize;
 
-		assertEquals(400,expected.x,1e-4);
-		assertEquals(320,expected.y,1e-4);
+		assertEquals(400, expected.x, 1e-4);
+		assertEquals(320, expected.y, 1e-4);
 	}
 }

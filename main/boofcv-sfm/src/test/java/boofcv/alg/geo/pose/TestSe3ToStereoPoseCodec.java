@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -37,9 +38,9 @@ public class TestSe3ToStereoPoseCodec {
 		Helper helper = new Helper();
 		Se3ToStereoPoseCodec alg = new Se3ToStereoPoseCodec(helper);
 
-		alg.decode(null,model);
+		alg.decode(null, model);
 		assertTrue(helper.calledDecode);
-		alg.encode(model,null);
+		alg.encode(model, null);
 		assertTrue(helper.calledEncode);
 	}
 
@@ -49,15 +50,15 @@ public class TestSe3ToStereoPoseCodec {
 		boolean calledEncode = false;
 
 		@Override
-		public void decode(double[] input, Se3_F64 outputModel) {
+		public void decode( double[] input, Se3_F64 outputModel ) {
 			calledDecode = true;
-			assertTrue(model.worldToCam0 == outputModel);
+			assertSame(model.worldToCam0, outputModel);
 		}
 
 		@Override
-		public void encode(Se3_F64 inputModel, double[] output) {
+		public void encode( Se3_F64 inputModel, double[] output ) {
 			calledEncode = true;
-			assertTrue(model.worldToCam0 == inputModel);
+			assertSame(model.worldToCam0, inputModel);
 		}
 
 		@Override

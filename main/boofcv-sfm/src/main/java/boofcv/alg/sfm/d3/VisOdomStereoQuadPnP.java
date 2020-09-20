@@ -100,7 +100,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	// Associates features from left to right camera
 	private final AssociateDescription2D<TD> assocL2R;
 
-	// Set of associated features across all views
+	/** Set of associated features across all views */
 	private final @Getter FastQueue<TrackQuad> trackQuads = new FastQueue<>(TrackQuad::new, TrackQuad::reset);
 
 	// features info extracted from the stereo pairs. 0 = previous 1 = current

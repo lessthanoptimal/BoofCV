@@ -31,20 +31,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Peter Abeles
  */
-public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoint{
+public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoint {
 
 	@Test
 	public void checkErrorSingle() {
 		// Point location in world frame
-		Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
+		Point3D_F64 X = new Point3D_F64(0.1, -0.04, 2.3);
 
-		DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left,(DMatrixRMaj)null);
-		DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right,(DMatrixRMaj)null);
+		DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
+		DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right, (DMatrixRMaj)null);
 
 		// errors
 		double deltaX0 = 0.1;
@@ -54,24 +54,26 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 
 		// create a noisy observed
 		Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X, null);
+		assertNotNull(obsLeft);
 		obsLeft.x += deltaX0;
 		obsLeft.y += deltaY0;
 		Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X, null);
+		assertNotNull(obsRight);
 		obsRight.x += deltaX1;
 		obsRight.y += deltaY1;
 
 		// convert to normalized image coordinates
-		PerspectiveOps.convertPixelToNorm(K_left,obsLeft,obsLeft);
-		PerspectiveOps.convertPixelToNorm(K_right,obsRight,obsRight);
+		PerspectiveOps.convertPixelToNorm(K_left, obsLeft, obsLeft);
+		PerspectiveOps.convertPixelToNorm(K_right, obsRight, obsRight);
 
 		PnPStereoDistanceReprojectionSq alg = new PnPStereoDistanceReprojectionSq();
 		alg.setStereoParameters(param);
 		alg.setModel(worldToLeft);
 
-		double found = alg.distance(new Stereo2D3D(obsLeft,obsRight,X));
+		double found = alg.distance(new Stereo2D3D(obsLeft, obsRight, X));
 		double expected = deltaX0*deltaX0 + deltaY0*deltaY0 + deltaX1*deltaX1 + deltaY1*deltaY1;
 
-		assertEquals(expected,found,1e-8);
+		assertEquals(expected, found, 1e-8);
 	}
 
 	/**
@@ -79,7 +81,7 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 	 */
 	@Test
 	public void checkBehindCamera_Left() {
-		checkBehind(-0.1,-0.05);
+		checkBehind(-0.1, -0.05);
 	}
 
 	/**
@@ -87,34 +89,34 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 	 */
 	@Test
 	public void checkBehindCamera_Right() {
-		checkBehind(0.1,0.05);
+		checkBehind(0.1, 0.05);
 	}
 
-	public void checkBehind( double Tz , double Pz ) {
-			// Point location in world frame
-			Point3D_F64 X = new Point3D_F64(0.1,-0.04,Pz);
+	public void checkBehind( double Tz, double Pz ) {
+		// Point location in world frame
+		Point3D_F64 X = new Point3D_F64(0.1, -0.04, Pz);
 
-			DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
-			DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right, (DMatrixRMaj)null);
+		DMatrixRMaj K_left = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
+		DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right, (DMatrixRMaj)null);
 
-			// create a noisy observed
-			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X, null);
-			Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X, null);
+		// create a noisy observed
+		Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X, null);
+		Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X, null);
 
-			// convert to normalized image coordinates
-			PerspectiveOps.convertPixelToNorm(K_left,obsLeft,obsLeft);
-			PerspectiveOps.convertPixelToNorm(K_right,obsRight,obsRight);
+		// convert to normalized image coordinates
+		PerspectiveOps.convertPixelToNorm(K_left, obsLeft, obsLeft);
+		PerspectiveOps.convertPixelToNorm(K_right, obsRight, obsRight);
 
-			PnPStereoDistanceReprojectionSq alg = new PnPStereoDistanceReprojectionSq();
-			StereoParameters param = new StereoParameters(this.param.left,this.param.right,new Se3_F64());
-			param.right_to_left.getT().set(0.1,0,Tz);
+		PnPStereoDistanceReprojectionSq alg = new PnPStereoDistanceReprojectionSq();
+		StereoParameters param = new StereoParameters(this.param.left, this.param.right, new Se3_F64());
+		param.right_to_left.getT().set(0.1, 0, Tz);
 
-			alg.setStereoParameters(param);
-			alg.setModel(new Se3_F64());
+		alg.setStereoParameters(param);
+		alg.setModel(new Se3_F64());
 
-			double found = alg.distance(new Stereo2D3D(obsLeft,obsRight,X));
+		double found = alg.distance(new Stereo2D3D(obsLeft, obsRight, X));
 
-			assertTrue(Double.MAX_VALUE == found);
+		assertEquals(found, Double.MAX_VALUE);
 	}
 
 	@Test
@@ -130,34 +132,35 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 		double[] expected = new double[N*4];
 		List<Stereo2D3D> obs = new ArrayList<>();
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			// Point location in world frame
-			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(),rand.nextGaussian(),2.3);
+			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(), rand.nextGaussian(), 2.3);
 
 			// create a noisy observed
 			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X, null);
+			assertNotNull(obsLeft);
 			obsLeft.x += rand.nextGaussian()*0.05;
 			obsLeft.y += rand.nextGaussian()*0.05;
 			Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X, null);
+			assertNotNull(obsRight);
 			obsRight.x += rand.nextGaussian()*0.05;
 			obsRight.y += rand.nextGaussian()*0.05;
 
 			// convert to normalized image coordinates
-			PerspectiveOps.convertPixelToNorm(K_left,obsLeft,obsLeft);
-			PerspectiveOps.convertPixelToNorm(K_right,obsRight,obsRight);
+			PerspectiveOps.convertPixelToNorm(K_left, obsLeft, obsLeft);
+			PerspectiveOps.convertPixelToNorm(K_right, obsRight, obsRight);
 
-			Stereo2D3D p = new Stereo2D3D(obsLeft,obsRight,X);
+			Stereo2D3D p = new Stereo2D3D(obsLeft, obsRight, X);
 
 			expected[i] = alg.distance(p);
-			obs.add( p );
+			obs.add(p);
 		}
 
 
+		double[] found = new double[N];
+		alg.distances(obs, found);
 
-		double[] found = new double[ N ];
-		alg.distances(obs,found);
-
-		for( int i = 0; i < N; i++ )
-			assertEquals(expected[i],found[i],1e-8);
+		for (int i = 0; i < N; i++)
+			assertEquals(expected[i], found[i], 1e-8);
 	}
 }

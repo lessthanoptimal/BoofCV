@@ -48,9 +48,9 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<T>, Depth extends ImageGray<Depth>>
-	implements DepthVisualOdometry<T,Depth>
-{
+		implements DepthVisualOdometry<T, Depth> {
 	ImageType<T> inputType;
 	Class<Depth> depthType;
 	ImageType<Planar> algType;
@@ -62,7 +62,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 
 	PyramidDirectColorDepth alg;
 
-	ImageDistort<Planar,Planar> adjustImage;
+	ImageDistort<Planar, Planar> adjustImage;
 	Planar undistorted;
 
 	CameraPinhole paramAdjusted = new CameraPinhole();
@@ -70,32 +70,32 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 	Se3_F32 worldToCurrent = new Se3_F32();
 	Se3_F64 w2c_64 = new Se3_F64();
 
-	public PyramidDirectColorDepth_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D,
-														  PyramidDirectColorDepth alg,
-														  Class<Depth> depthType ) {
+	public PyramidDirectColorDepth_to_DepthVisualOdometry( DepthSparse3D<Depth> sparse3D,
+														   PyramidDirectColorDepth alg,
+														   Class<Depth> depthType ) {
 		this.sparse3D = sparse3D;
 		this.alg = alg;
 		this.inputType = alg.getInputType();
 		this.depthType = depthType;
 		this.algType = alg.getInputType();
 
-		undistorted = algType.createImage(1,1);
+		undistorted = algType.createImage(1, 1);
 		wrapSparse3D = new DepthSparse3D_to_PixelTo3D<>(sparse3D);
 	}
 
-	public PyramidDirectColorDepth_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D,
-														  ConvertImageFilter<T,?> convertImage,
-														  PyramidDirectColorDepth alg,
-														  Class<Depth> depthType ) {
+	public PyramidDirectColorDepth_to_DepthVisualOdometry( DepthSparse3D<Depth> sparse3D,
+														   ConvertImageFilter<T, ?> convertImage,
+														   PyramidDirectColorDepth alg,
+														   Class<Depth> depthType ) {
 		this.sparse3D = sparse3D;
 		this.alg = alg;
 		this.inputType = convertImage.getInputType();
-		this.algType = (ImageType<Planar>) convertImage.getOutputType();
+		this.algType = (ImageType<Planar>)convertImage.getOutputType();
 		this.depthType = depthType;
 		this.convertInput = convertImage;
 
-		inputConverted = algType.createImage(1,1);
-		undistorted = algType.createImage(1,1);
+		inputConverted = algType.createImage(1, 1);
+		undistorted = algType.createImage(1, 1);
 		wrapSparse3D = new DepthSparse3D_to_PixelTo3D<>(sparse3D);
 	}
 
@@ -122,30 +122,30 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 	}
 
 	@Override
-	public void setCalibration(CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth) {
+	public void setCalibration( CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth ) {
 
 		// the algorithms camera model assumes no lens distortion and that skew = 0
 		CameraPinhole desired = new CameraPinhole(paramVisual);
 		desired.skew = 0;
 
 		adjustImage = LensDistortionOps.changeCameraModel(
-				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual,desired,paramAdjusted, algType);
+				AdjustmentType.EXPAND, BorderType.ZERO, paramVisual, desired, paramAdjusted, algType);
 
 		Point2Transform2_F32 desiredToOriginal = LensDistortionOps_F32.transformChangeModel(
 				AdjustmentType.EXPAND, paramVisual, desired, false, null);
 
 		// the adjusted undistorted image pixel to the depth image transform
-		Point2Transform2_F32 adjustedToDepth = new SequencePoint2Transform2_F32(desiredToOriginal,visToDepth);
+		Point2Transform2_F32 adjustedToDepth = new SequencePoint2Transform2_F32(desiredToOriginal, visToDepth);
 
 		// Create a lookup table to make the math much faster
 		PixelTransform<Point2D_F32> pixelAdjToDepth = new PixelTransformCached_F32(
-				paramAdjusted.width, paramAdjusted.height,adjustedToDepth);
+				paramAdjusted.width, paramAdjusted.height, adjustedToDepth);
 
 		// adjusted pixels to normalized image coordinates in RGB frame
 		sparse3D.configure(LensDistortionFactory.narrow(paramAdjusted), pixelAdjToDepth);
 
 		undistorted.reshape(paramAdjusted.width, paramAdjusted.height);
-		if( convertInput != null ) {
+		if (convertInput != null) {
 			inputConverted.reshape(paramAdjusted.width, paramAdjusted.height);
 		}
 
@@ -156,11 +156,10 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 	}
 
 	@Override
-	public boolean process(T visual, Depth depth) {
-		if( convertInput != null ) {
-			convertInput.process(visual,inputConverted);
+	public boolean process( T visual, Depth depth ) {
+		if (convertInput != null) {
+			convertInput.process(visual, inputConverted);
 			adjustImage.apply(inputConverted, undistorted);
-
 		} else {
 			adjustImage.apply((Planar)visual, undistorted);
 		}
@@ -188,7 +187,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 
 	}
 }

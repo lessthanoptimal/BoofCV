@@ -80,7 +80,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	private final FastQueue<Point2D3D> observationsPnP = new FastQueue<>(Point2D3D::new);
 
 	// Internal profiling
-	private @Getter double timeTracking,timeEstimate,timeBundle,timeDropUnused, timeSceneMaintenance,timeSpawn;
+	private @Getter double timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance, timeSpawn;
 
 	//=================================================================
 	//======== Workspace Variables
@@ -147,7 +147,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		//=============================================================================================
 		//========== Initialize VO from the first image and return
-		if( first ) {
+		if (first) {
 			first = false;
 			spawnNewTracksForNewKeyFrame(visibleTracks);
 			frameManager.initialize(bundleViso.cameras);
@@ -164,7 +164,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		// Estimate motion
 		List<PointTrack> activeVisualTracks = tracker.getActiveTracks(null);
-		if( !estimateMotion(activeVisualTracks) ) {
+		if (!estimateMotion(activeVisualTracks)) {
 			if (verbose != null) verbose.println("VO: estimate motion failed");
 			// discard the current frame and attempt to jump over it
 			bundleViso.removeFrame(frameCurrent, removedBundleTracks);
@@ -172,7 +172,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			updateListOfVisibleTracksForOutput();
 			return false;
 		}
-		if( verbose != null ) verbose.println("   Inliers          "+motionEstimator.getMatchSet().size());
+		if (verbose != null) verbose.println("   Inliers          " + motionEstimator.getMatchSet().size());
 
 		// what the name says and also marks the inliers as inliers
 		addObservationsOfInliersToScene(activeVisualTracks);
@@ -188,32 +188,32 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		//=============================================================================================
 		//========== Perform maintenance by dropping elements from the scene
 		dropBadBundleTracks();
-		if( verbose != null ) verbose.println("   Bad Bundle Trk   "+ totalDroppedTracksBadBundle);
+		if (verbose != null) verbose.println("   Bad Bundle Trk   " + totalDroppedTracksBadBundle);
 		long time4 = System.nanoTime();
-		boolean droppedCurrentFrame = performKeyFrameMaintenance(tracker,1);
+		boolean droppedCurrentFrame = performKeyFrameMaintenance(tracker, 1);
 		long time5 = System.nanoTime();
-		if( !droppedCurrentFrame ) {
+		if (!droppedCurrentFrame) {
 			// it decided to keep the current track. Spawn new tracks in the current frame
 			spawnNewTracksForNewKeyFrame(visibleTracks);
 			frameManager.handleSpawnedTracks(tracker, bundleViso.cameras.getTail());
 		}
 		long time6 = System.nanoTime();
-		if( verbose != null )
-			verbose.println("   Visible All      "+ (tracker.getTotalInactive()+tracker.getTotalActive()));
+		if (verbose != null)
+			verbose.println("   Visible All      " + (tracker.getTotalInactive() + tracker.getTotalActive()));
 
 		//=============================================================================================
 		//========== Summarize profiling results
-		timeTracking = (time1-time0)*1e-6;
-		timeEstimate = (time2-time1)*1e-6;
-		timeBundle = (time3-time2)*1e-6;
-		timeDropUnused = (time4-time3)*1e-6;
-		timeSceneMaintenance = (time5-time4)*1e-6;
-		timeSpawn = (time6-time5)*1e-6;
+		timeTracking = (time1 - time0)*1e-6;
+		timeEstimate = (time2 - time1)*1e-6;
+		timeBundle = (time3 - time2)*1e-6;
+		timeDropUnused = (time4 - time3)*1e-6;
+		timeSceneMaintenance = (time5 - time4)*1e-6;
+		timeSpawn = (time6 - time5)*1e-6;
 
-		if( profileOut != null ) {
-			double timeTotal = (time6-time0)*1e-6;
+		if (profileOut != null) {
+			double timeTotal = (time6 - time0)*1e-6;
 			profileOut.printf("TIME: TRK %5.1f Est %5.1f Bun %5.1f DU %5.1f Scene %5.1f Spn  %5.1f TOTAL %5.1f\n",
-					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance,timeSpawn,timeTotal);
+					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance, timeSpawn, timeTotal);
 		}
 
 //		bundle.sanityCheck();
@@ -233,7 +233,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	}
 
 	private void verbosePrintTrackerSummary() {
-		if( verbose != null ) {
+		if (verbose != null) {
 			verbose.println("-----------------------------------------------------------------------------------------");
 			verbose.println("Input Frame Count   " + tracker.getFrameID());
 			verbose.println("   Bundle Frames    " + bundleViso.frames.size);
@@ -274,7 +274,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	}
 
 	@Override
-	protected void dropVisualTrack(PointTrack track) {
+	protected void dropVisualTrack( PointTrack track ) {
 		tracker.dropTrack(track);
 	}
 
@@ -293,11 +293,11 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		cameraModels.add(cm);
 	}
 
-	private void addObservationsOfInliersToScene(List<PointTrack> active) {
+	private void addObservationsOfInliersToScene( List<PointTrack> active ) {
 		// mark tracks as being inliers and add to inlier list
 		int N = motionEstimator.getMatchSet().size();
 		long frameID = getFrameID();
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			int index = motionEstimator.getInputIndex(i);
 			PointTrack pt = active.get(index);
 			Track bt = pt.getCookie();
@@ -320,8 +320,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		// This will go through all tracks, active and inactive
 		tracker.dropTracks(track -> {
 			Track bt = track.getCookie();
-			if( bt == null ) throw new RuntimeException("BUG!");
-			if( trackerFrame - bt.lastUsed >= thresholdRetireTracks) {
+			if (bt == null) throw new RuntimeException("BUG!");
+			if (trackerFrame - bt.lastUsed >= thresholdRetireTracks) {
 				bt.visualTrack = null;
 				return true;
 			}
@@ -329,7 +329,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		});
 
 		int afterCount = tracker.getTotalActive() + tracker.getTotalInactive();
-		if( verbose != null ) verbose.println("   Dropped Unused   "+(beforeCount-afterCount));
+		if (verbose != null) verbose.println("   Dropped Unused   " + (beforeCount - afterCount));
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	 *
 	 * @param visibleTracks newly spawned tracks are added to this list
 	 */
-	private void spawnNewTracksForNewKeyFrame(List<Track> visibleTracks ) {
+	private void spawnNewTracksForNewKeyFrame( List<Track> visibleTracks ) {
 //		System.out.println("addNewTracks() current frame="+frameCurrent.id);
 
 		long frameID = tracker.getFrameID();
@@ -349,7 +349,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		// TODO make this optionally concurrent
 		// estimate 3D coordinate using stereo vision
-		for( PointTrack pt : spawned ) {
+		for (PointTrack pt : spawned) {
 //			for (int i = 0; i < visibleTracks.size(); i++) {
 //				if( visibleTracks.get(i).visualTrack == t ) {
 //					throw new RuntimeException("Bug. Adding duplicate track: " + visibleTracks.get(i).id + " " + t.featureId);
@@ -357,7 +357,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 //			}
 
 			// discard point if it can't localized
-			if( !pixelTo3D.process(pt.pixel.x,pt.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
+			if (!pixelTo3D.process(pt.pixel.x, pt.pixel.y) || pixelTo3D.getW() == 0) { // TODO don't drop infinity
 //				System.out.println("Dropped pixelTo3D  tt="+pt.featureId);
 				totalRejected++;
 				tracker.dropTrack(pt);
@@ -392,7 +392,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 				visibleTracks.add(btrack);
 			}
 		}
-		if( verbose != null ) verbose.println("   Rejected spawned "+totalRejected);
+		if (verbose != null) verbose.println("   Rejected spawned " + totalRejected);
 	}
 
 	/**
@@ -408,29 +408,29 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		// Create a list of observations for PnP
 		// normalized image coordinates and 3D in the previous keyframe's reference frame
 		observationsPnP.reset();
-		for( PointTrack pt : active ) {
+		for (PointTrack pt : active) {
 			// Build the list of tracks which are currently visible
 			initialVisible.add((Track)pt.cookie);
 
 			// Extract info needed to estimate motion
 			Point2D3D p = observationsPnP.grow();
-			pixelToNorm.compute( pt.pixel.x , pt.pixel.y , p.observation );
+			pixelToNorm.compute(pt.pixel.x, pt.pixel.y, p.observation);
 			Track bt = pt.getCookie();
 
 			// Go from world coordinates to the previous frame
-			SePointOps_F64.transform(world_to_prev,bt.worldLoc,prevLoc4);
+			SePointOps_F64.transform(world_to_prev, bt.worldLoc, prevLoc4);
 
 			// Go from homogenous coordinates into 3D coordinates
-			PerspectiveOps.homogenousTo3dPositiveZ(prevLoc4,1e8,1e-7,p.location);
+			PerspectiveOps.homogenousTo3dPositiveZ(prevLoc4, 1e8, 1e-7, p.location);
 		}
 
 		// estimate the motion up to a scale factor in translation
-		if( !motionEstimator.process( observationsPnP.toList() ) )
+		if (!motionEstimator.process(observationsPnP.toList()))
 			return false;
 
 		Se3_F64 previous_to_current;
 
-		if( refine != null ) {
+		if (refine != null) {
 			previous_to_current = new Se3_F64();
 			refine.fitModel(motionEstimator.getMatchSet(), motionEstimator.getModelParameters(), previous_to_current);
 		} else {
@@ -439,7 +439,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		// Change everything back to the world frame
 		previous_to_current.invert(current_to_previous);
-		current_to_previous.concat(framePrevious.frame_to_world,frameCurrent.frame_to_world);
+		current_to_previous.concat(framePrevious.frame_to_world, frameCurrent.frame_to_world);
 
 		return true;
 	}

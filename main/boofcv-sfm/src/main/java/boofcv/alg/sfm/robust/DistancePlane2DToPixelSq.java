@@ -41,16 +41,16 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64, Plan
 	private Se2_F64 keyToCurr;
 
 	// predicted location of point on plane in current ref frame in 2D
-	private Point2D_F64 curr2D = new Point2D_F64();
+	private final Point2D_F64 curr2D = new Point2D_F64();
 
 	// normalized image coordinates of predicted position
-	private Point2D_F64 normalizedPred = new Point2D_F64();
+	private final Point2D_F64 normalizedPred = new Point2D_F64();
 
 	// code for projection to/from plane
-	private CameraPlaneProjection planeProjection = new CameraPlaneProjection();
+	private final CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	// given observations in normalized image coordinates, compute the error in pixels
-	private NormalizedToPixelError errorCamera = new NormalizedToPixelError();
+	private final NormalizedToPixelError errorCamera = new NormalizedToPixelError();
 
 	/**
 	 * Specify extrinsic camera properties

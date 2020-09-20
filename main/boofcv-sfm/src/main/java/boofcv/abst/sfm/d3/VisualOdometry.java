@@ -64,16 +64,16 @@ public interface VisualOdometry<M> extends VerbosePrint {
 	// The idea with the origin frame is that only information back to that frame is considered when estimating the
 	// current pose.
 
-	/**
-	 * returns the ID of the origin frame that motion is estimated relative to
-	 */
+//	/**
+//	 * returns the ID of the origin frame that motion is estimated relative to
+//	 */
 //	long getOriginFrameID();
 
-	/**
-	 * Relationship between the current frame and the origin frame.
-	 *
-	 * @param storage Where the transform is written to
-	 * @return true if it is known or false if it is not
-	 */
+//	/**
+//	 * Relationship between the current frame and the origin frame.
+//	 *
+//	 * @param storage Where the transform is written to
+//	 * @return true if it is known or false if it is not
+//	 */
 //	boolean getCurrentToOrigin( M storage );
 }

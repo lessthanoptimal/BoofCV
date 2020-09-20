@@ -44,14 +44,14 @@ public class TestImageMotionPointTrackerKey {
 	@Test
 	public void process() {
 		// what the initial transform should be
-		Se2_F32 computed = new Se2_F32(4,5,6);
+		Se2_F32 computed = new Se2_F32(4, 5, 6);
 		Se2_F32 model = new Se2_F32();
 		DummyTracker tracker = new DummyTracker();
 		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<>(computed, 5);
 
-		GrayU8 input = new GrayU8(20,30);
+		GrayU8 input = new GrayU8(20, 30);
 
-		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg =
+		ImageMotionPointTrackerKey<GrayU8, Se2_F32> alg =
 				new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 1000);
 		// it calls reset in the constructor. This ensures reset() and the initial state are the same
 		assertEquals(1, tracker.numReset);
@@ -83,7 +83,7 @@ public class TestImageMotionPointTrackerKey {
 		alg.reset();
 		assertEquals(0, tracker.numDropAll);
 		assertEquals(2, tracker.numReset);
-		assertEquals(-1, alg.getFrameID() );
+		assertEquals(-1, alg.getFrameID());
 		assertEquals(0, alg.getKeyToCurr().getX(), 1e-8);
 		assertEquals(0, alg.getWorldToCurr().getX(), 1e-8);
 	}
@@ -93,14 +93,14 @@ public class TestImageMotionPointTrackerKey {
 	 */
 	@Test
 	public void changeKeyFrame() {
-		Se2_F32 computed = new Se2_F32(4,5,6);
+		Se2_F32 computed = new Se2_F32(4, 5, 6);
 		Se2_F32 model = new Se2_F32();
 		DummyTracker tracker = new DummyTracker();
 		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<>(computed, 5);
 
-		GrayU8 input = new GrayU8(20,30);
+		GrayU8 input = new GrayU8(20, 30);
 
-		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg = new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 100);
+		ImageMotionPointTrackerKey<GrayU8, Se2_F32> alg = new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 100);
 
 		// process twice to change the transforms
 		alg.process(input);
@@ -128,18 +128,18 @@ public class TestImageMotionPointTrackerKey {
 	 */
 	@Test
 	public void testPrune() {
-		Se2_F32 computed = new Se2_F32(4,5,6);
+		Se2_F32 computed = new Se2_F32(4, 5, 6);
 		Se2_F32 model = new Se2_F32();
 		DummyTracker tracker = new DummyTracker();
 		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<>(computed, 5);
 
-		GrayU8 input = new GrayU8(20,30);
+		GrayU8 input = new GrayU8(20, 30);
 
-		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg = new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 5);
+		ImageMotionPointTrackerKey<GrayU8, Se2_F32> alg = new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 5);
 
 		// create tracks such that only some of them will be dropped
 		tracker.frameID = 9;
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 			PointTrack t = new PointTrack();
 			AssociatedPairTrack a = new AssociatedPairTrack();
 			a.lastUsed = i;
@@ -152,11 +152,10 @@ public class TestImageMotionPointTrackerKey {
 		alg.process(input);
 
 		// check to see how many were dropped
-		assertEquals(6,tracker.numDropped);
+		assertEquals(6, tracker.numDropped);
 	}
 
-	public static class DummyTracker implements PointTracker<GrayU8>
-	{
+	public static class DummyTracker implements PointTracker<GrayU8> {
 		public int numSpawn = 0;
 		public int numDropped = 0;
 		public int numDropAll = 0;
@@ -167,7 +166,10 @@ public class TestImageMotionPointTrackerKey {
 		List<PointTrack> listSpawned = new ArrayList<>();
 
 		@Override
-		public void reset() {numReset++;frameID=-1;}
+		public void reset() {
+			numReset++;
+			frameID = -1;
+		}
 
 		@Override
 		public long getFrameID() { return frameID; }
@@ -179,13 +181,13 @@ public class TestImageMotionPointTrackerKey {
 		public int getTotalInactive() { return 0; }
 
 		@Override
-		public void process(GrayU8 image) {frameID++;}
+		public void process( GrayU8 image ) {frameID++;}
 
 		@Override
 		public void spawnTracks() {
 			numSpawn++;
 			listSpawned.clear();
-			for( int i = 0; i < 5; i++ ){
+			for (int i = 0; i < 5; i++) {
 				PointTrack t = new PointTrack();
 				listSpawned.add(t);
 				list.add(t);
@@ -199,12 +201,15 @@ public class TestImageMotionPointTrackerKey {
 		public int getMaxSpawn() {return 0;}
 
 		@Override
-		public boolean dropTrack(PointTrack track) {numDropped++;return true;}
+		public boolean dropTrack( PointTrack track ) {
+			numDropped++;
+			return true;
+		}
 
 		@Override
-		public void dropTracks(Dropper dropper) {
-			for( PointTrack t : list ) {
-				if( dropper.shouldDropTrack(t) ) {
+		public void dropTracks( Dropper dropper ) {
+			for (PointTrack t : list) {
+				if (dropper.shouldDropTrack(t)) {
 					numDropped++;
 				}
 			}
@@ -212,48 +217,48 @@ public class TestImageMotionPointTrackerKey {
 
 		@Override
 		public List<PointTrack> getAllTracks( List<PointTrack> list ) {
-			if( list == null ) list = new ArrayList<>();
+			if (list == null) list = new ArrayList<>();
 			list.addAll(this.list);
 			return list;
 		}
 
 		@Override
-		public List<PointTrack> getActiveTracks(List<PointTrack> list) {
+		public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 			return getAllTracks(list);
 		}
 
 		@Override
-		public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
-			if( list == null )
+		public List<PointTrack> getInactiveTracks( List<PointTrack> list ) {
+			if (list == null)
 				list = new ArrayList<>();
 			return list;
 		}
 
 		@Override
-		public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
+		public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<PointTrack> getNewTracks(List<PointTrack> list) {
-			if( list == null ) list = new ArrayList<>();
+		public List<PointTrack> getNewTracks( List<PointTrack> list ) {
+			if (list == null) list = new ArrayList<>();
 			list.addAll(this.listSpawned);
 			return list;
 		}
 	}
 
-	public static class DummyModelMatcher<T extends InvertibleTransform> implements ModelMatcher<T,AssociatedPair> {
+	public static class DummyModelMatcher<T extends InvertibleTransform> implements ModelMatcher<T, AssociatedPair> {
 
 		T found;
 		int matchSetSize;
 
-		public DummyModelMatcher(T found, int matchSetSize) {
+		public DummyModelMatcher( T found, int matchSetSize ) {
 			this.found = found;
 			this.matchSetSize = matchSetSize;
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> dataSet) {
+		public boolean process( List<AssociatedPair> dataSet ) {
 			return true;
 		}
 
@@ -265,14 +270,14 @@ public class TestImageMotionPointTrackerKey {
 		@Override
 		public List<AssociatedPair> getMatchSet() {
 			List<AssociatedPair> ret = new ArrayList<>();
-			for( int i = 0; i < matchSetSize; i++ ) {
-				ret.add( new AssociatedPairTrack());
+			for (int i = 0; i < matchSetSize; i++) {
+				ret.add(new AssociatedPairTrack());
 			}
 			return ret;
 		}
 
 		@Override
-		public int getInputIndex(int matchIndex) {
+		public int getInputIndex( int matchIndex ) {
 			return matchIndex;
 		}
 
@@ -299,7 +304,7 @@ public class TestImageMotionPointTrackerKey {
 			return null;
 		}
 
-		public void setMotion(T se) {
+		public void setMotion( T se ) {
 			found = se;
 		}
 	}

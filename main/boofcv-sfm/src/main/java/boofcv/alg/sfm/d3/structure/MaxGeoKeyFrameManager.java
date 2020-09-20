@@ -53,7 +53,7 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	protected final GrowQueue_I32 discardKeyIndices = new GrowQueue_I32();
 
 	// Information of each camera and is used to compute the coverage
-	protected FastQueue<CameraInfo> cameras = new FastQueue<>(CameraInfo::new,CameraInfo::reset);
+	protected FastQueue<CameraInfo> cameras = new FastQueue<>(CameraInfo::new, CameraInfo::reset);
 
 	// used to compute the feature coverage on the image
 	ImageCoverage coverage = new ImageCoverage();
@@ -70,12 +70,11 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	public MaxGeoKeyFrameManager() {
 	}
 
-	public MaxGeoKeyFrameManager(double minimumCoverage) {
+	public MaxGeoKeyFrameManager( double minimumCoverage ) {
 		this.minimumCoverage = minimumCoverage;
 	}
 
-	protected static class CameraInfo
-	{
+	protected static class CameraInfo {
 		// Camera's shape in pixels
 		public int imageWidth, imageHeight;
 		// the maximum number (known or inferred) of features visible in a frame
@@ -89,7 +88,7 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	}
 
 	@Override
-	public void initialize(FastAccess<BCamera> bundleCameras) {
+	public void initialize( FastAccess<BCamera> bundleCameras ) {
 		cameras.reset();
 		for (int i = 0; i < bundleCameras.size; i++) {
 			BCamera bc = bundleCameras.get(i);
@@ -102,10 +101,10 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int maxKeyFrames, int newFrames,  VisOdomBundleAdjustment<?> sba) {
+	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba ) {
 		// always add a new keyframe until it hits the max
 		discardKeyIndices.reset();
-		if( sba.frames.size <= maxKeyFrames )
+		if (sba.frames.size <= maxKeyFrames)
 			return discardKeyIndices;
 
 		// Initialize data structures
@@ -113,16 +112,16 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 		tracker.getActiveTracks(activeTracks.toList());
 
 		boolean keepCurrent = keepCurrentFrame(sba);
-		if( !keepCurrent) {
+		if (!keepCurrent) {
 			// The current frame is too similar to the a previous key frame
 			for (int i = 0; i < newFrames; i++) {
-				discardKeyIndices.add( sba.frames.size-i-1 );
+				discardKeyIndices.add(sba.frames.size - i - 1);
 			}
 		}
-		if( verbose != null) verbose.println("keep_current="+keepCurrent+" coverage="+coverage.getFraction());
+		if (verbose != null) verbose.println("keep_current=" + keepCurrent + " coverage=" + coverage.getFraction());
 
 		// Discard enough older frames to be at the desired number
-		selectOldToDiscard(sba,sba.frames.size-maxKeyFrames- discardKeyIndices.size);
+		selectOldToDiscard(sba, sba.frames.size - maxKeyFrames - discardKeyIndices.size);
 
 		// Ensure the post condition is true
 		sorter.sort(discardKeyIndices.data, discardKeyIndices.size);
@@ -133,6 +132,7 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	/**
 	 * Perform different checks that attempt to see if too much has changed. If too much has changed then the
 	 * current keyframe should be kept so that new features can be spawned and starvation avoided.
+	 *
 	 * @return true if it should keep the current frame
 	 */
 	protected boolean keepCurrentFrame( VisOdomBundleAdjustment<?> sba ) {
@@ -140,10 +140,10 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 		CameraInfo camera = cameras.get(current.camera.index);
 
 		// Compute fraction of the image covered by tracks
-		coverage.reset(camera.maxFeaturesPerFrame,camera.imageWidth,camera.imageHeight);
+		coverage.reset(camera.maxFeaturesPerFrame, camera.imageWidth, camera.imageHeight);
 		for (int i = 0; i < activeTracks.size; i++) {
 			Point2D_F64 p = activeTracks.get(i).pixel;
-			coverage.markPixel((int)p.x,(int)p.y);
+			coverage.markPixel((int)p.x, (int)p.y);
 		}
 		coverage.process();
 
@@ -157,42 +157,42 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	 *
 	 * @param totalDiscard How many need to be discarded
 	 */
-	protected void selectOldToDiscard(VisOdomBundleAdjustment<?> sba, int totalDiscard) {
-		if( totalDiscard <= 0 || sba.frames.size < 2 )
+	protected void selectOldToDiscard( VisOdomBundleAdjustment<?> sba, int totalDiscard ) {
+		if (totalDiscard <= 0 || sba.frames.size < 2)
 			return;
 
 		frameToIndex.clear();
 		for (int i = 0; i < sba.frames.size; i++) {
-			frameToIndex.put(sba.frames.get(i).id,i);
+			frameToIndex.put(sba.frames.get(i).id, i);
 		}
 
 		// Create a histogram showing how observations connect the frames
 		final int N = sba.frames.size;
-		histogram.reshape(N,N);
+		histogram.reshape(N, N);
 		histogram.zero();
 		// Skip the last row since it's not needed
-		for (int frameIdxA = 0; frameIdxA < N-1; frameIdxA++) {
+		for (int frameIdxA = 0; frameIdxA < N - 1; frameIdxA++) {
 			BFrame frame = sba.frames.get(frameIdxA);
 			for (int trackIdx = 0; trackIdx < frame.tracks.size; trackIdx++) {
 				BTrack track = frame.tracks.get(trackIdx);
 				for (int obsIdx = 0; obsIdx < track.observations.size; obsIdx++) {
 					BObservation o = track.observations.get(obsIdx);
 					int frameIdxB = frameToIndex.get(o.frame.id);
-					if( frameIdxA == frameIdxB )
+					if (frameIdxA == frameIdxB)
 						continue;
-					histogram.increment(frameIdxA,frameIdxB);
+					histogram.increment(frameIdxA, frameIdxB);
 				}
 			}
 		}
 
-		if( verbose != null) histogram.print("%4d");
+		if (verbose != null) histogram.print("%4d");
 
 		// See which keyframe the current frame has the best connection with
 		// Most of the time it will be the previous frame, but if that was experienced a lot of motion blur it might
 		// not be...
-		int bestFrame = histogram.maximumRowIdx(N-1);
-		if( verbose != null) verbose.println("Frame with best connection to current "+bestFrame);
-		histogram.set(bestFrame,bestFrame,Integer.MAX_VALUE); // mark it so that it's skipped
+		int bestFrame = histogram.maximumRowIdx(N - 1);
+		if (verbose != null) verbose.println("Frame with best connection to current " + bestFrame);
+		histogram.set(bestFrame, bestFrame, Integer.MAX_VALUE); // mark it so that it's skipped
 
 		for (int i = 0; i < totalDiscard; i++) {
 			// Select the frame with the worst connection to the bestFrame. The reason the bestFrame is used and not
@@ -201,45 +201,45 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 			int worstIdx = -1;
 			// N-1 to avoid the current frame
 			for (int frameIdx = 0; frameIdx < N - 1; frameIdx++) {
-				int connection = histogram.get(frameIdx,bestFrame);
-				if( connection==Integer.MAX_VALUE )
+				int connection = histogram.get(frameIdx, bestFrame);
+				if (connection == Integer.MAX_VALUE)
 					continue;
 
 				// if a node has no connection to the frame with bestFrame drop it since it's unlikely to have much
 				// influence over the current frame's state and have no direct influence over bestFrame's state
-				if( connection == 0 ) {
-					if( verbose != null) verbose.println("No connection index "+frameIdx);
+				if (connection == 0) {
+					if (verbose != null) verbose.println("No connection index " + frameIdx);
 					lowestCount = 0;
 					worstIdx = frameIdx;
 					break;
 				}
 
-				if( connection < lowestCount ) {
+				if (connection < lowestCount) {
 					lowestCount = connection;
 					worstIdx = frameIdx;
 				}
 			}
-			if( verbose != null) verbose.println("Worst index "+worstIdx+"  count "+lowestCount);
+			if (verbose != null) verbose.println("Worst index " + worstIdx + "  count " + lowestCount);
 
 			discardKeyIndices.add(worstIdx);
 			// Mark the worst keyframe so it won't be selected again
-			histogram.set(worstIdx,bestFrame,Integer.MAX_VALUE);
+			histogram.set(worstIdx, bestFrame, Integer.MAX_VALUE);
 		}
 	}
 
 	@Override
-	public void handleSpawnedTracks(PointTracker<?> tracker, BCamera camera) {
+	public void handleSpawnedTracks( PointTracker<?> tracker, BCamera camera ) {
 		CameraInfo info = cameras.get(camera.index);
 		// If the max spawn is known use it, otherwise keep track of the max seen
-		if( tracker.getMaxSpawn() <= 0 ) {
-			info.maxFeaturesPerFrame = Math.max(tracker.getTotalActive(),info.maxFeaturesPerFrame);
+		if (tracker.getMaxSpawn() <= 0) {
+			info.maxFeaturesPerFrame = Math.max(tracker.getTotalActive(), info.maxFeaturesPerFrame);
 		} else {
 			info.maxFeaturesPerFrame = tracker.getMaxSpawn();
 		}
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
 	}
 }

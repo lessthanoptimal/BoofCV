@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  * @author Peter Abeles
  */
 
-public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform>
-{
+public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform> {
 	// REFERENCE FRAME NOTES:
 	//
 	// World references to the stitched image
@@ -56,11 +55,11 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	// Current is the current video frame in video coordinates
 
 	// estimates image motion
-	private ImageMotion2D<I,IT> motion;
+	private final ImageMotion2D<I, IT> motion;
 	// renders the distorted image according to results from motion
-	private ImageDistort<I,I> distorter;
+	private final ImageDistort<I, I> distorter;
 	// converts different types of motion models into other formats
-	private StitchingTransform<IT> converter;
+	private final StitchingTransform<IT> converter;
 
 	// Transform from first video frame to the initial location in the stitched image
 	private IT worldToInit;
@@ -68,18 +67,18 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	private int widthStitch, heightStitch;
 
 	// Largest allowed fractional change in area
-	private double maxJumpFraction;
+	private final double maxJumpFraction;
 	// image corners are used to detect large motions
-	private Corners corners = new Corners();
+	private final Corners corners = new Corners();
 	// size of view area in previous update
 	private double previousArea;
 
 	// storage for the transform from current frame to the initial frame
-	private IT worldToCurr;
+	private final IT worldToCurr;
 
 	private PixelTransform<Point2D_F32> tranWorldToCurr;
 	private PixelTransform<Point2D_F32> tranCurrToWorld;
-	private Point2D_F32 work = new Point2D_F32();
+	private final Point2D_F32 work = new Point2D_F32();
 
 	// storage for the stitched image
 	private I stitchedImage;
@@ -96,11 +95,10 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 * @param converter Converts internal model into a homogenous transformation
 	 * @param maxJumpFraction If the view area changes by more than this fraction a fault is declared
 	 */
-	public StitchingFromMotion2D(ImageMotion2D<I, IT> motion,
-								 ImageDistort<I,I> distorter,
-								 StitchingTransform<IT> converter ,
-								 double maxJumpFraction )
-	{
+	public StitchingFromMotion2D( ImageMotion2D<I, IT> motion,
+								  ImageDistort<I, I> distorter,
+								  StitchingTransform<IT> converter,
+								  double maxJumpFraction ) {
 		this.motion = motion;
 		this.distorter = distorter;
 		this.converter = converter;
@@ -115,11 +113,11 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 * @param widthStitch Width of the image being stitched into
 	 * @param heightStitch Height of the image being stitched into
 	 * @param worldToInit (Option) Used to change the location of the initial frame in stitched image.
-	 *                    null means no transform.
+	 * null means no transform.
 	 */
-	public void configure( int widthStitch, int heightStitch , IT worldToInit ) {
+	public void configure( int widthStitch, int heightStitch, IT worldToInit ) {
 		this.worldToInit = (IT)worldToCurr.createInstance();
-		if( worldToInit != null )
+		if (worldToInit != null)
 			this.worldToInit.set(worldToInit);
 		this.widthStitch = widthStitch;
 		this.heightStitch = heightStitch;
@@ -134,12 +132,12 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 * @return True if the stitched image is updated and false if it failed and was not
 	 */
 	public boolean process( I image ) {
-		if( stitchedImage == null ) {
-			stitchedImage = (I)image.createNew(widthStitch, heightStitch);
-			workImage = (I)image.createNew(widthStitch, heightStitch);
+		if (stitchedImage == null) {
+			stitchedImage = image.createNew(widthStitch, heightStitch);
+			workImage = image.createNew(widthStitch, heightStitch);
 		}
 
-		if( motion.process(image) ) {
+		if (motion.process(image)) {
 			update(image);
 
 			// check to see if an unstable and improbably solution was generated
@@ -153,7 +151,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 * Throws away current results and starts over again
 	 */
 	public void reset() {
-		if( stitchedImage != null )
+		if (stitchedImage != null)
 			GImageMiscOps.fill(stitchedImage, 0);
 		motion.reset();
 		worldToCurr.reset();
@@ -162,47 +160,45 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 
 	/**
 	 * Looks for sudden large changes in corner location to detect motion estimation faults.
+	 *
 	 * @param width image width
 	 * @param height image height
 	 * @return true for fault
 	 */
-	private boolean checkLargeMotion( int width , int height ) {
-		if( first ) {
-			getImageCorners(width,height,corners);
+	private boolean checkLargeMotion( int width, int height ) {
+		if (first) {
+			getImageCorners(width, height, corners);
 			previousArea = computeArea(corners);
 			first = false;
 		} else {
-			getImageCorners(width,height,corners);
+			getImageCorners(width, height, corners);
 
 			double area = computeArea(corners);
 
-			double change = Math.max(area/previousArea,previousArea/area)-1;
-			if( change > maxJumpFraction ) {
+			double change = Math.max(area/previousArea, previousArea/area) - 1;
+			if (change > maxJumpFraction) {
 				return true;
 			}
 			previousArea = area;
 		}
 
 		return false;
-
 	}
 
 	private double computeArea( Corners c ) {
-		return Area2D_F64.triangle(c.p0,c.p1,c.p2) +
-				Area2D_F64.triangle(c.p0,c.p2,c.p3);
+		return Area2D_F64.triangle(c.p0, c.p1, c.p2) +
+				Area2D_F64.triangle(c.p0, c.p2, c.p3);
 	}
 
 	/**
 	 * Adds the latest image into the stitched image
-	 *
-	 * @param image
 	 */
-	private void update(I image) {
+	private void update( I image ) {
 		computeCurrToInit_PixelTran();
 
 		// only process a cropped portion to speed up processing
 		RectangleLength2D_I32 box = DistortImageOps.boundBox(image.width, image.height,
-				stitchedImage.width, stitchedImage.height,work, tranCurrToWorld);
+				stitchedImage.width, stitchedImage.height, work, tranCurrToWorld);
 
 		int x0 = box.x0;
 		int y0 = box.y0;
@@ -210,16 +206,16 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		int y1 = box.y0 + box.height;
 
 		distorter.setModel(tranWorldToCurr);
-		distorter.apply(image, stitchedImage,x0,y0,x1,y1);
+		distorter.apply(image, stitchedImage, x0, y0, x1, y1);
 	}
 
 	private void computeCurrToInit_PixelTran() {
 		IT initToCurr = motion.getFirstToCurrent();
 		worldToInit.concat(initToCurr, worldToCurr);
 
-		tranWorldToCurr = converter.convertPixel(worldToCurr,tranWorldToCurr);
+		tranWorldToCurr = converter.convertPixel(worldToCurr, tranWorldToCurr);
 
-		IT currToWorld = (IT) this.worldToCurr.invert(null);
+		IT currToWorld = (IT)this.worldToCurr.invert(null);
 
 		tranCurrToWorld = converter.convertPixel(currToWorld, tranCurrToWorld);
 	}
@@ -231,9 +227,9 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 */
 	public void setOriginToCurrent() {
 		IT currToWorld = (IT)worldToCurr.invert(null);
-		IT oldWorldToNewWorld = (IT) worldToInit.concat(currToWorld,null);
+		IT oldWorldToNewWorld = (IT)worldToInit.concat(currToWorld, null);
 
-		PixelTransform<Point2D_F32> newToOld = converter.convertPixel(oldWorldToNewWorld,null);
+		PixelTransform<Point2D_F32> newToOld = converter.convertPixel(oldWorldToNewWorld, null);
 
 		// fill in the background color
 		GImageMiscOps.fill(workImage, 0);
@@ -261,13 +257,13 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 * @param heightStitch The new height of the stitch image.
 	 * @param newToOldStitch (Optional) Transform from new stitch image pixels to old stick pixels.  Can be null.
 	 */
-	public void resizeStitchImage( int widthStitch, int heightStitch , IT newToOldStitch ) {
+	public void resizeStitchImage( int widthStitch, int heightStitch, IT newToOldStitch ) {
 
 		// copy the old image into the new one
-		workImage.reshape(widthStitch,heightStitch);
+		workImage.reshape(widthStitch, heightStitch);
 		GImageMiscOps.fill(workImage, 0);
-		if( newToOldStitch != null ) {
-			PixelTransform<Point2D_F32> newToOld = converter.convertPixel(newToOldStitch,null);
+		if (newToOldStitch != null) {
+			PixelTransform<Point2D_F32> newToOld = converter.convertPixel(newToOldStitch, null);
 			distorter.setModel(newToOld);
 			distorter.apply(stitchedImage, workImage);
 
@@ -278,11 +274,11 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 
 			computeCurrToInit_PixelTran();
 		} else {
-			int overlapWidth = Math.min(widthStitch,stitchedImage.width);
-			int overlapHeight = Math.min(heightStitch,stitchedImage.height);
-			GImageMiscOps.copy(0,0,0,0,overlapWidth,overlapHeight,stitchedImage,workImage);
+			int overlapWidth = Math.min(widthStitch, stitchedImage.width);
+			int overlapHeight = Math.min(heightStitch, stitchedImage.height);
+			GImageMiscOps.copy(0, 0, 0, 0, overlapWidth, overlapHeight, stitchedImage, workImage);
 		}
-		stitchedImage.reshape(widthStitch,heightStitch);
+		stitchedImage.reshape(widthStitch, heightStitch);
 		I tmp = stitchedImage;
 		stitchedImage = workImage;
 		workImage = tmp;
@@ -296,18 +292,22 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 *
 	 * @return image corners
 	 */
-	public Corners getImageCorners( int width , int height , Corners corners ) {
+	public Corners getImageCorners( int width, int height, Corners corners ) {
 
-		if( corners == null )
+		if (corners == null)
 			corners = new Corners();
 
 		int w = width;
 		int h = height;
 
-		tranCurrToWorld.compute(0,0,work); corners.p0.set(work.x, work.y);
-		tranCurrToWorld.compute(w,0,work);    corners.p1.set(work.x, work.y);
-		tranCurrToWorld.compute(w,h,work);       corners.p2.set(work.x, work.y);
-		tranCurrToWorld.compute(0,h,work);    corners.p3.set(work.x, work.y);
+		tranCurrToWorld.compute(0, 0, work);
+		corners.p0.set(work.x, work.y);
+		tranCurrToWorld.compute(w, 0, work);
+		corners.p1.set(work.x, work.y);
+		tranCurrToWorld.compute(w, h, work);
+		corners.p2.set(work.x, work.y);
+		tranCurrToWorld.compute(0, h, work);
+		corners.p3.set(work.x, work.y);
 
 		return corners;
 	}
@@ -318,7 +318,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 * @return Transformation
 	 */
 	public Homography2D_F64 getWorldToCurr( Homography2D_F64 storage ) {
-		return converter.convertH(worldToCurr,storage);
+		return converter.convertH(worldToCurr, storage);
 	}
 
 	public IT getWorldToCurr() {
@@ -339,5 +339,4 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		public Point2D_F64 p2 = new Point2D_F64();
 		public Point2D_F64 p3 = new Point2D_F64();
 	}
-
 }

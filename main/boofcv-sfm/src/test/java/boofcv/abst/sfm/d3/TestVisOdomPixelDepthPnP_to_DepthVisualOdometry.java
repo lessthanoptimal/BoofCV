@@ -32,20 +32,20 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 /**
  * @author Peter Abeles
  */
-public class TestVisOdomPixelDepthPnP_to_DepthVisualOdometry extends CheckVisualOdometryDepthSim<GrayU8,GrayU16> {
+public class TestVisOdomPixelDepthPnP_to_DepthVisualOdometry extends CheckVisualOdometryDepthSim<GrayU8, GrayU16> {
 
 	public TestVisOdomPixelDepthPnP_to_DepthVisualOdometry() {
-		super(GrayU8.class,GrayU16.class);
+		super(GrayU8.class, GrayU16.class);
 
 		setAlgorithm(createAlgorithm());
 	}
 
-	protected DepthVisualOdometry<GrayU8,GrayU16> createAlgorithm() {
+	protected DepthVisualOdometry<GrayU8, GrayU16> createAlgorithm() {
 
 		ConfigPKlt config = new ConfigPKlt();
-		config.pyramidLevels =  ConfigDiscreteLevels.levels(4);
+		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		config.templateRadius = 3;
-		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600, 3, 1);
 
 		PointTrackerTwoPass<GrayU8> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector,
 				GrayU8.class, GrayS16.class);
@@ -54,6 +54,5 @@ public class TestVisOdomPixelDepthPnP_to_DepthVisualOdometry extends CheckVisual
 
 		return FactoryVisualOdometry.
 				depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, GrayU8.class, GrayU16.class);
-
 	}
 }

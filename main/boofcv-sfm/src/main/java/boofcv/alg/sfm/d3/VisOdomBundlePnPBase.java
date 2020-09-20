@@ -131,7 +131,6 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 		first = true;
 	}
 
-
 	/**
 	 * Goes through the list of initially visible tracks and see which ones have not been dropped
 	 */
@@ -180,11 +179,11 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/**
 	 * Drops specified keyframes from the scene. Returns true if the current frame was dropped
 	 *
-	 * @param tracker   tracker
+	 * @param tracker tracker
 	 * @param newFrames Number of new frames added to the scene
 	 * @return true if current frame
 	 */
-	protected boolean performKeyFrameMaintenance(PointTracker<?> tracker, int newFrames) {
+	protected boolean performKeyFrameMaintenance( PointTracker<?> tracker, int newFrames ) {
 		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, bundleViso);
 		boolean droppedCurrentFrame = false;
 		if (dropFrameIndexes.size != 0) {
@@ -202,7 +201,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 *
 	 * @param dropFrameIndexes List of indexes to drop. Sorted from lowest to highest
 	 */
-	protected void dropFramesFromScene(GrowQueue_I32 dropFrameIndexes) {
+	protected void dropFramesFromScene( GrowQueue_I32 dropFrameIndexes ) {
 		for (int i = dropFrameIndexes.size - 1; i >= 0; i--) {
 			// indexes are ordered from lowest to highest, so you can remove frames without
 			// changing the index in the list
@@ -268,7 +267,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 				// test to see if the feature is behind the camera while avoiding divided by zero errors
 				SePointOps_F64.transform(world_to_frame, bt.worldLoc, cameraLoc);
 
-				if (Math.signum(cameraLoc.z) * Math.signum(cameraLoc.w) < 0) {
+				if (Math.signum(cameraLoc.z)*Math.signum(cameraLoc.w) < 0) {
 					// this marks it for removal later on
 					bt.observations.reset();
 //					System.out.println("Dropping bad track. id="+bt.id+" z="+(cameraLoc.z/cameraLoc.w));
@@ -313,10 +312,10 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/**
 	 * Given the BTrack drop all visual tracks which belong to it.
 	 */
-	protected abstract void dropVisualTrack(PointTrack track);
+	protected abstract void dropVisualTrack( PointTrack track );
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		// Default to no verbosity
 		this.profileOut = null;
 		this.verbose = null;

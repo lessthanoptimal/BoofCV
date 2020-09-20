@@ -34,27 +34,26 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PlToGrayMotion2D<T extends ImageGray<T>,IT extends InvertibleTransform>
-	implements ImageMotion2D<Planar<T>,IT>, AccessPointTracks
-{
+public class PlToGrayMotion2D<T extends ImageGray<T>, IT extends InvertibleTransform>
+		implements ImageMotion2D<Planar<T>, IT>, AccessPointTracks {
 	// motion estimation algorithm for a single band image
-	ImageMotion2D<T,IT> motion;
+	ImageMotion2D<T, IT> motion;
 	// if supposed, provides access to track points
 	AccessPointTracks access;
 	// storage for gray scale image
 	T gray;
 
-	public PlToGrayMotion2D(ImageMotion2D<T,IT> motion , Class<T> imageType ) {
+	public PlToGrayMotion2D( ImageMotion2D<T, IT> motion, Class<T> imageType ) {
 		this.motion = motion;
-		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
-		if( motion instanceof AccessPointTracks ) {
+		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		if (motion instanceof AccessPointTracks) {
 			access = (AccessPointTracks)motion;
 		}
 	}
 
 	@Override
-	public boolean process(Planar<T> input) {
-		gray.reshape(input.width,input.height);
+	public boolean process( Planar<T> input ) {
+		gray.reshape(input.width, input.height);
 		GConvertImage.average(input, gray);
 		return motion.process(gray);
 	}
@@ -90,27 +89,27 @@ public class PlToGrayMotion2D<T extends ImageGray<T>,IT extends InvertibleTransf
 	}
 
 	@Override
-	public long getTrackId(int index) {
+	public long getTrackId( int index ) {
 		return access.getTrackId(index);
 	}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
-		access.getTrackPixel(index,pixel);
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
+		access.getTrackPixel(index, pixel);
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
 		return access.getAllTracks(storage);
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
+	public boolean isTrackInlier( int index ) {
 		return access.isTrackInlier(index);
 	}
 
 	@Override
-	public boolean isTrackNew(int index) {
+	public boolean isTrackNew( int index ) {
 		return access.isTrackNew(index);
 	}
 }

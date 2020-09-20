@@ -29,7 +29,7 @@ import java.util.Random;
  */
 class TestConfigVisOdomTrackPnP extends StandardConfigurationChecks {
 	@Override
-	public Configuration createNotDefault(Random rand) {
+	public Configuration createNotDefault( Random rand ) {
 		var config = new ConfigVisOdomTrackPnP();
 		config.bundleMaxFeaturesPerFrame = 5;
 		config.bundleMinObservations = 8;

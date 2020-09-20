@@ -35,7 +35,7 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisualOdometryMonoPlaneSim<GrayU8> {
 
 	public TestMonoOverhead_to_MonocularPlaneVisualOdometry() {
-		super(GrayU8.class,-20,0.04);
+		super(GrayU8.class, -20, 0.04);
 
 		setAlgorithm(createAlgorithm());
 	}
@@ -52,14 +52,12 @@ public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisua
 		configDetector.general.threshold = 1;
 
 		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(config, configDetector,
-				GrayU8.class,GrayS16.class);
+				GrayU8.class, GrayS16.class);
 
 		double cellSize = 0.015;
 		double ransacTol = 0.2;
 
 		return FactoryVisualOdometry.monoPlaneOverhead(
-				cellSize, 25,0.5, ransacTol,300,2,30,0.5,0.3, tracker, ImageType.single(GrayU8.class));
-
+				cellSize, 25, 0.5, ransacTol, 300, 2, 30, 0.5, 0.3, tracker, ImageType.single(GrayU8.class));
 	}
-
 }

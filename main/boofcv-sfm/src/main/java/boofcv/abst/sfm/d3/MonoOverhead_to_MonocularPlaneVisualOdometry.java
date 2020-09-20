@@ -45,8 +45,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>>
-		implements MonocularPlaneVisualOdometry<T> , AccessPointTracks3D
-{
+		implements MonocularPlaneVisualOdometry<T>, AccessPointTracks3D {
 	// motion estimation algorithm
 	VisOdomMonoOverheadMotion2D<T> alg;
 
@@ -62,7 +61,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	Se3_F64 planeToCamera;
 	Point2Transform2_F64 normToPixel;
 
-	public MonoOverhead_to_MonocularPlaneVisualOdometry(VisOdomMonoOverheadMotion2D<T> alg, ImageType<T> imageType) {
+	public MonoOverhead_to_MonocularPlaneVisualOdometry( VisOdomMonoOverheadMotion2D<T> alg, ImageType<T> imageType ) {
 		this.alg = alg;
 		this.imageType = imageType;
 	}
@@ -71,11 +70,11 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	public void setCalibration( MonoPlaneParameters param ) {
 		this.planeToCamera = param.planeToCamera;
 		alg.configureCamera(param.intrinsic, param.planeToCamera);
-		normToPixel = LensDistortionFactory.narrow(param.intrinsic).distort_F64(false,true);
+		normToPixel = LensDistortionFactory.narrow(param.intrinsic).distort_F64(false, true);
 	}
 
 	@Override
-	public boolean process(T input) {
+	public boolean process( T input ) {
 		computed = false;
 		fault = alg.process(input);
 		return fault;
@@ -111,9 +110,9 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
-	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
+	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		computeTracks();
-		world.set( points3D.get(index) );
+		world.set(points3D.get(index));
 		return true;
 	}
 
@@ -124,20 +123,20 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
-	public long getTrackId(int index) {
+	public long getTrackId( int index ) {
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
 
 		return accessPlane.getTrackId(index);
 	}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
-		pixel.set( this.pixels.get(index));
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
+		pixel.set(this.pixels.get(index));
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
-		if( storage == null )
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
+		if (storage == null)
 			storage = new ArrayList<>();
 		else
 			storage.clear();
@@ -149,24 +148,24 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
+	public boolean isTrackInlier( int index ) {
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
 
 		return accessPlane.isTrackInlier(index);
 	}
 
 	@Override
-	public boolean isTrackNew(int index) {
+	public boolean isTrackNew( int index ) {
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
 
 		return accessPlane.isTrackNew(index);
 	}
 
 	private void computeTracks() {
-		if( computed )
+		if (computed)
 			return;
 
-		if( !(alg.getMotion2D() instanceof AccessPointTracks))
+		if (!(alg.getMotion2D() instanceof AccessPointTracks))
 			return;
 
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
@@ -177,25 +176,25 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 		points3D.reset();
 		pixels.reset();
 
-		for( Point2D_F64 worldPt : tracksPlane ) {
+		for (Point2D_F64 worldPt : tracksPlane) {
 			// 2D to 3D
 			Point3D_F64 p = points3D.grow();
-			p.z = worldPt.x*map.cellSize-map.centerX;
-			p.x = -(worldPt.y*map.cellSize-map.centerY);
+			p.z = worldPt.x*map.cellSize - map.centerX;
+			p.x = -(worldPt.y*map.cellSize - map.centerY);
 			p.y = 0;
 
 			// 3D world to camera
-			SePointOps_F64.transform(planeToCamera,p,p);
+			SePointOps_F64.transform(planeToCamera, p, p);
 
 			// normalized image coordinates
-			normToPixel.compute(p.x/p.z,p.y/p.z,pixels.grow());
+			normToPixel.compute(p.x/p.z, p.y/p.z, pixels.grow());
 		}
 
 		computed = true;
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 
 	}
 }

@@ -61,59 +61,59 @@ public class FactoryMotion2D {
 	 * @param outlierPrune If a feature is an outlier for this many turns in a row it is dropped. Try 2
 	 * @param absoluteMinimumTracks New features will be respawned if the number of inliers drop below this number.
 	 * @param respawnTrackFraction If the fraction of current inliers to the original number of inliers drops below
-	 *                             this fraction then new features are spawned.  Try 0.3
+	 * this fraction then new features are spawned.  Try 0.3
 	 * @param respawnCoverageFraction If the area covered drops by this fraction then spawn more features.  Try 0.8
 	 * @param refineEstimate Should it refine the model estimate using all inliers.
 	 * @param tracker Point feature tracker.
 	 * @param motionModel Instance of the model model used. Affine2D_F64 or Homography2D_F64
 	 * @param <I> Image input type.
 	 * @param <IT> Model model
-	 * @return  ImageMotion2D
+	 * @return ImageMotion2D
 	 */
 	public static <I extends ImageBase<I>, IT extends InvertibleTransform>
-	ImageMotion2D<I,IT> createMotion2D( int ransacIterations , double inlierThreshold,int outlierPrune,
-										int absoluteMinimumTracks, double respawnTrackFraction,
-										double respawnCoverageFraction,
-										boolean refineEstimate ,
-										PointTracker<I> tracker , IT motionModel ) {
+	ImageMotion2D<I, IT> createMotion2D( int ransacIterations, double inlierThreshold, int outlierPrune,
+										 int absoluteMinimumTracks, double respawnTrackFraction,
+										 double respawnCoverageFraction,
+										 boolean refineEstimate,
+										 PointTracker<I> tracker, IT motionModel ) {
 
 		ModelManager<IT> manager;
-		ModelGenerator<IT,AssociatedPair> fitter;
-		DistanceFromModel<IT,AssociatedPair> distance;
-		ModelFitter<IT,AssociatedPair> modelRefiner = null;
+		ModelGenerator<IT, AssociatedPair> fitter;
+		DistanceFromModel<IT, AssociatedPair> distance;
+		ModelFitter<IT, AssociatedPair> modelRefiner = null;
 
-		if( motionModel instanceof Homography2D_F64) {
+		if (motionModel instanceof Homography2D_F64) {
 			GenerateHomographyLinear mf = new GenerateHomographyLinear(true);
 			manager = (ModelManager)new ModelManagerHomography2D_F64();
 			fitter = (ModelGenerator)mf;
-			if( refineEstimate )
+			if (refineEstimate)
 				modelRefiner = (ModelFitter)mf;
 			distance = (DistanceFromModel)new DistanceHomographySq();
-		} else if( motionModel instanceof Affine2D_F64) {
+		} else if (motionModel instanceof Affine2D_F64) {
 			manager = (ModelManager)new ModelManagerAffine2D_F64();
 			GenerateAffine2D mf = new GenerateAffine2D();
 			fitter = (ModelGenerator)mf;
-			if( refineEstimate )
+			if (refineEstimate)
 				modelRefiner = (ModelFitter)mf;
-			distance =  (DistanceFromModel)new DistanceAffine2DSq();
-		} else if( motionModel instanceof Se2_F64) {
+			distance = (DistanceFromModel)new DistanceAffine2DSq();
+		} else if (motionModel instanceof Se2_F64) {
 			manager = (ModelManager)new ModelManagerSe2_F64();
 			MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
 			GenerateSe2_AssociatedPair mf = new GenerateSe2_AssociatedPair(alg);
 			fitter = (ModelGenerator)mf;
-			distance =  (DistanceFromModel)new DistanceSe2Sq();
+			distance = (DistanceFromModel)new DistanceSe2Sq();
 			// no refine, already optimal
 		} else {
-			throw new RuntimeException("Unknown model type: "+motionModel.getClass().getSimpleName());
+			throw new RuntimeException("Unknown model type: " + motionModel.getClass().getSimpleName());
 		}
 
-		ModelMatcher<IT,AssociatedPair>  modelMatcher =
-				new Ransac(123123,manager,fitter,distance,ransacIterations,inlierThreshold);
+		ModelMatcher<IT, AssociatedPair> modelMatcher =
+				new Ransac(123123, manager, fitter, distance, ransacIterations, inlierThreshold);
 
-		ImageMotionPointTrackerKey<I,IT> lowlevel =
+		ImageMotionPointTrackerKey<I, IT> lowlevel =
 				new ImageMotionPointTrackerKey<>(tracker, modelMatcher, modelRefiner, motionModel, outlierPrune);
 
-		ImageMotionPtkSmartRespawn<I,IT> smartRespawn =
+		ImageMotionPtkSmartRespawn<I, IT> smartRespawn =
 				new ImageMotionPtkSmartRespawn<>(lowlevel,
 						absoluteMinimumTracks, respawnTrackFraction, respawnCoverageFraction);
 
@@ -124,7 +124,7 @@ public class FactoryMotion2D {
 	 * Estimates the image motion then combines images together.  Typically used for mosaics and stabilization.
 	 *
 	 * @param maxJumpFraction If the area changes by this much between two consecuative frames then the transform
-	 *                        is reset.
+	 * is reset.
 	 * @param motion2D Estimates the image motion.
 	 * @param imageType Type of image processed
 	 * @param <I> Image input type.
@@ -134,10 +134,10 @@ public class FactoryMotion2D {
 	@SuppressWarnings("unchecked")
 	public static <I extends ImageBase<I>, IT extends InvertibleTransform>
 	StitchingFromMotion2D<I, IT>
-	createVideoStitch( double maxJumpFraction , ImageMotion2D<I,IT> motion2D , ImageType<I> imageType ) {
+	createVideoStitch( double maxJumpFraction, ImageMotion2D<I, IT> motion2D, ImageType<I> imageType ) {
 		StitchingTransform<IT> transform;
 
-		if( motion2D.getTransformType() == Affine2D_F64.class ) {
+		if (motion2D.getTransformType() == Affine2D_F64.class) {
 			transform = (StitchingTransform)FactoryStitchingTransform.createAffine_F64();
 		} else {
 			transform = (StitchingTransform)FactoryStitchingTransform.createHomography_F64();
@@ -145,14 +145,14 @@ public class FactoryMotion2D {
 
 		InterpolatePixel<I> interp;
 
-		if( imageType.getFamily() == ImageType.Family.GRAY || imageType.getFamily() == ImageType.Family.PLANAR ) {
+		if (imageType.getFamily() == ImageType.Family.GRAY || imageType.getFamily() == ImageType.Family.PLANAR) {
 			interp = FactoryInterpolation.createPixelS(0, 255, InterpolationType.BILINEAR, BorderType.EXTENDED,
 					imageType.getImageClass());
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
 
-		ImageDistort<I,I> distorter = FactoryDistort.distort(false, interp, imageType);
+		ImageDistort<I, I> distorter = FactoryDistort.distort(false, interp, imageType);
 		distorter.setRenderAll(false);
 
 		return new StitchingFromMotion2D<>(motion2D, distorter, transform, maxJumpFraction);

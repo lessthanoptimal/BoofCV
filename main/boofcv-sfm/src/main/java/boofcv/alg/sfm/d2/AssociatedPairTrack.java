@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,6 @@ import boofcv.struct.geo.AssociatedPair;
  * @author Peter Abeles
  */
 public class AssociatedPairTrack extends AssociatedPair {
-	/**
-	 * The tick at which the track was last inside the inlier list
-	 */
+	/** The tick at which the track was last inside the inlier list */
 	public long lastUsed;
 }

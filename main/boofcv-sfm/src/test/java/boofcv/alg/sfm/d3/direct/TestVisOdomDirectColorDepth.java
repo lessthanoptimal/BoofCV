@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,46 +57,46 @@ public class TestVisOdomDirectColorDepth {
 	public void singleStepArtificialTranslation() {
 		// it wants to declares the color of each pixel, the gradient says it increases to the right
 		// so it will move in the negative x direction
-		Se3_F32 a = computeMotion(10,20,6,0);
+		Se3_F32 a = computeMotion(10, 20, 6, 0);
 		assertTrue(a.T.x < -0.02);
-		assertEquals( 0 , a.T.y , 1e-2f);
-		assertEquals( 0 , a.T.z , 1e-2f);
+		assertEquals(0, a.T.y, 1e-2f);
+		assertEquals(0, a.T.z, 1e-2f);
 		assertTrue(rotationMag(a) < GrlConstants.TEST_SQ_F64);
 
 		// reverse the direction
-		Se3_F32 b = computeMotion(20,10,6,0);
+		Se3_F32 b = computeMotion(20, 10, 6, 0);
 		assertTrue(b.T.x > 0.02);
-		assertEquals( 0 , b.T.y , 1e-2f);
-		assertEquals( 0 , b.T.z , 1e-2f);
+		assertEquals(0, b.T.y, 1e-2f);
+		assertEquals(0, b.T.z, 1e-2f);
 		assertTrue(rotationMag(b) < GrlConstants.TEST_SQ_F64);
 
-		assertEquals( a.T.x , -b.T.x , 1e-4f);
+		assertEquals(a.T.x, -b.T.x, 1e-4f);
 
 		// make it move along the y-axis
-		Se3_F32 c = computeMotion(10,20,0,6);
-		assertEquals( 0 , c.T.x , 1e-2f);
+		Se3_F32 c = computeMotion(10, 20, 0, 6);
+		assertEquals(0, c.T.x, 1e-2f);
 		assertTrue(c.T.y < -0.02);
-		assertEquals( 0 , c.T.z , 1e-2f);
+		assertEquals(0, c.T.z, 1e-2f);
 		assertTrue(rotationMag(c) < GrlConstants.TEST_SQ_F64);
-		assertEquals( a.T.x , c.T.y , 0.01);
+		assertEquals(a.T.x, c.T.y, 0.01);
 
 		// increase the magnitude of the motion by making the gradient smaller
-		Se3_F32 d = computeMotion(10,20,3,0);
-		assertTrue( 1.5f*Math.abs(a.T.x) < Math.abs(d.T.x) );
+		Se3_F32 d = computeMotion(10, 20, 3, 0);
+		assertTrue(1.5f*Math.abs(a.T.x) < Math.abs(d.T.x));
 	}
 
-	public Se3_F32 computeMotion( float colorBefore , float colorAfter , float dx , float dy ) {
-		VisOdomDirectColorDepth<GrayF32,GrayF32> alg = new VisOdomDirectColorDepth<>(numBands,imageType,imageType);
-		alg.setCameraParameters(fx,fy,cx,cy,width,height);
+	public Se3_F32 computeMotion( float colorBefore, float colorAfter, float dx, float dy ) {
+		VisOdomDirectColorDepth<GrayF32, GrayF32> alg = new VisOdomDirectColorDepth<>(numBands, imageType, imageType);
+		alg.setCameraParameters(fx, fy, cx, cy, width, height);
 
-		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,numBands);
-		GImageMiscOps.fill(input,colorAfter);
+		Planar<GrayF32> input = new Planar<>(GrayF32.class, width, height, numBands);
+		GImageMiscOps.fill(input, colorAfter);
 		alg.initMotion(input);
-		GImageMiscOps.fill(alg.derivX,dx);
-		GImageMiscOps.fill(alg.derivY,dy);
+		GImageMiscOps.fill(alg.derivX, dx);
+		GImageMiscOps.fill(alg.derivY, dy);
 		// need to add noise to avoid pathological stuff
-		GImageMiscOps.addUniform(alg.derivX, rand, 0f,0.1f);
-		GImageMiscOps.addUniform(alg.derivY, rand, 0f,0.1f);
+		GImageMiscOps.addUniform(alg.derivX, rand, 0f, 0.1f);
+		GImageMiscOps.addUniform(alg.derivY, rand, 0f, 0.1f);
 
 		// generate some synthetic data.  This will be composed of random points in front of the camera
 		for (int i = 0; i < 100; i++) {
@@ -108,8 +108,8 @@ public class TestVisOdomDirectColorDepth {
 			p.x = rand.nextInt(width);
 			p.y = rand.nextInt(height);
 
-			float nx = (p.x-cx)/fx;
-			float ny = (p.y-cy)/fy;
+			float nx = (p.x - cx)/fx;
+			float ny = (p.y - cy)/fy;
 			// z needs to fixed value for it to generate a purely translational motion given fixed  gradient and
 			// and fixed delta in color
 			float z = 2;
@@ -122,14 +122,14 @@ public class TestVisOdomDirectColorDepth {
 		alg.constructLinearSystem(input, new Se3_F32());
 		assertTrue(alg.solveSystem());
 
-		assertEquals(Math.abs(colorAfter-colorBefore), alg.getErrorOptical(), 1e-4f);
-		assertTrue(alg.getInboundsPixels() > 95 ); // counting error can cause a drop
+		assertEquals(Math.abs(colorAfter - colorBefore), alg.getErrorOptical(), 1e-4f);
+		assertTrue(alg.getInboundsPixels() > 95); // counting error can cause a drop
 
 		return alg.motionTwist;
 	}
 
-	public float rotationMag(Se3_F32 motion ) {
-		Rodrigues_F32 rod = ConvertRotation3D_F32.matrixToRodrigues(motion.R,null);
+	public float rotationMag( Se3_F32 motion ) {
+		Rodrigues_F32 rod = ConvertRotation3D_F32.matrixToRodrigues(motion.R, null);
 		return rod.theta;
 	}
 }

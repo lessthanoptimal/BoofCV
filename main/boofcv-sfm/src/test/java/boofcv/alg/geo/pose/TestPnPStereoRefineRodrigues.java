@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 	 */
 	@Test
 	public void perfect() {
-		generateScene(10,null,false);
+		generateScene(10, null, false);
 
-		PnPStereoRefineRodrigues alg = new PnPStereoRefineRodrigues(1e-12,200);
+		PnPStereoRefineRodrigues alg = new PnPStereoRefineRodrigues(1e-12, 200);
 		alg.setLeftToRight(leftToRight);
 
 
@@ -57,23 +57,23 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 	 */
 	@Test
 	public void noisy() {
-		generateScene(30,null,false);
+		generateScene(30, null, false);
 
-		PnPStereoRefineRodrigues alg = new PnPStereoRefineRodrigues(1e-12,200);
+		PnPStereoRefineRodrigues alg = new PnPStereoRefineRodrigues(1e-12, 200);
 		alg.setLeftToRight(leftToRight);
 
 
 		Se3_F64 input = worldToLeft.copy();
 		// noise up the initial guess
-		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, -0.2, null);
-		CommonOps_DDRM.mult(R,input.getR().copy(),input.getR());
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.04, -0.2, null);
+		CommonOps_DDRM.mult(R, input.getR().copy(), input.getR());
 		input.T.x += 0.2;
 		input.T.x -= 0.05;
 		input.T.z += 0.03;
 
 		Se3_F64 found = new Se3_F64();
 		assertTrue(alg.fitModel(pointPose, input, found));
-		assertTrue(alg.minimizer.getFunctionValue()<1e-12);
+		assertTrue(alg.minimizer.getFunctionValue() < 1e-12);
 
 		assertTrue(MatrixFeatures_DDRM.isIdentical(worldToLeft.getR(), found.getR(), 1e-8));
 		assertTrue(found.getT().isIdentical(worldToLeft.getT(), 1e-8));

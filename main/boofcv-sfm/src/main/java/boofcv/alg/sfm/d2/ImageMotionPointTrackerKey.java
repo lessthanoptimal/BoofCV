@@ -34,19 +34,18 @@ import java.util.List;
  * Whenever a new keyframe is selected by the user all tracks are dropped and new ones spawned.  No logic is
  * contained for selecting key frames and relies on the user for selecting them.
  *
- * @author Peter Abeles
  * @param <I> Input image type
  * @param <IT> Motion model data type
+ * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform>
-{
+public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform> {
 	// feature tracker
 	protected PointTracker<I> tracker;
 	// Fits a model to the tracked features
-	protected ModelMatcher<IT,AssociatedPair> modelMatcher;
+	protected ModelMatcher<IT, AssociatedPair> modelMatcher;
 	// Refines the model using the complete inlier set
-	protected ModelFitter<IT,AssociatedPair> modelRefiner;
+	protected ModelFitter<IT, AssociatedPair> modelRefiner;
 
 	// transform from the world frame to the key frame
 	protected IT worldToKey;
@@ -71,12 +70,11 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 * @param model Motion model data structure
 	 * @param thresholdOutlierPrune If a track is an outlier for this many frames in a row they are pruned
 	 */
-	public ImageMotionPointTrackerKey(PointTracker<I> tracker,
-									  ModelMatcher<IT, AssociatedPair> modelMatcher,
-									  ModelFitter<IT, AssociatedPair> modelRefiner,
-									  IT model,
-									  int thresholdOutlierPrune)
-	{
+	public ImageMotionPointTrackerKey( PointTracker<I> tracker,
+									   ModelMatcher<IT, AssociatedPair> modelMatcher,
+									   ModelFitter<IT, AssociatedPair> modelRefiner,
+									   IT model,
+									   int thresholdOutlierPrune ) {
 		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
 		this.modelRefiner = modelRefiner;
@@ -114,21 +112,21 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		List<PointTrack> tracks = tracker.getActiveTracks(null);
 
-		if( tracks.size() == 0 )
+		if (tracks.size() == 0)
 			return false;
 
 		List<AssociatedPair> pairs = new ArrayList<>();
-		for( PointTrack t : tracks ) {
-			pairs.add((AssociatedPair)t.getCookie());
+		for (PointTrack t : tracks) {
+			pairs.add(t.getCookie());
 		}
 
 		// fit the motion model to the feature tracks
-		if( !modelMatcher.process((List)pairs) ) {
+		if (!modelMatcher.process(pairs)) {
 			return false;
 		}
 
-		if( modelRefiner != null ) {
-			if( !modelRefiner.fitModel(modelMatcher.getMatchSet(),modelMatcher.getModelParameters(),keyToCurr) )
+		if (modelRefiner != null) {
+			if (!modelRefiner.fitModel(modelMatcher.getMatchSet(), modelMatcher.getModelParameters(), keyToCurr))
 				return false;
 		} else {
 			keyToCurr.set(modelMatcher.getModelParameters());
@@ -136,7 +134,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		// mark that the track is in the inlier set
 		final long frameID = tracker.getFrameID();
-		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
+		for (AssociatedPair p : modelMatcher.getMatchSet()) {
 			((AssociatedPairTrack)p).lastUsed = frameID;
 		}
 
@@ -166,13 +164,13 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		// drop all inactive tracks since their location is unknown in the current frame
 		List<PointTrack> inactive = tracker.getInactiveTracks(null);
-		for( PointTrack l : inactive ) {
+		for (PointTrack l : inactive) {
 			tracker.dropTrack(l);
 		}
 
 		// set the keyframe for active tracks as their current location
 		List<PointTrack> active = tracker.getActiveTracks(null);
-		for( PointTrack l : active ) {
+		for (PointTrack l : active) {
 			AssociatedPairTrack p = l.getCookie();
 			p.p1.set(l.pixel);
 			p.lastUsed = frameID;
@@ -180,9 +178,9 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		tracker.spawnTracks();
 		List<PointTrack> spawned = tracker.getNewTracks(null);
-		for( PointTrack l : spawned ) {
+		for (PointTrack l : spawned) {
 			AssociatedPairTrack p = l.getCookie();
-			if( p == null ) {
+			if (p == null) {
 				l.cookie = p = new AssociatedPairTrack();
 				// little bit of trickery here.  Save the reference so that the point
 				// in the current frame is updated for free as PointTrack is

@@ -35,7 +35,7 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisualOdometryMonoPlaneSim<GrayU8> {
 
 	public TestMonoMotion2D_to_MonocularPlaneVisualOdometry() {
-		super(GrayU8.class,-20,0.04);   // angle selected to include ground points and points far away
+		super(GrayU8.class, -20, 0.04);   // angle selected to include ground points and points far away
 
 		setAlgorithm(createAlgorithm());
 	}
@@ -43,7 +43,7 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 	protected MonocularPlaneVisualOdometry<GrayU8> createAlgorithm() {
 
 		ConfigPKlt config = new ConfigPKlt();
-		config.pyramidLevels =  ConfigDiscreteLevels.levels(4);
+		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		config.templateRadius = 3;
 		ConfigPointDetector configDetector = new ConfigPointDetector();
 		configDetector.type = PointDetectorTypes.SHI_TOMASI;
@@ -56,5 +56,4 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 
 		return FactoryVisualOdometry.monoPlaneInfinity(50, 2, 1.5, 300, tracker, ImageType.single(GrayU8.class));
 	}
-
 }

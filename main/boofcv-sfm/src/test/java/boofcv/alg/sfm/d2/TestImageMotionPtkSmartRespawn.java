@@ -39,7 +39,7 @@ public class TestImageMotionPtkSmartRespawn {
 
 	Random rand = new Random(234);
 
-	GrayF32 input = new GrayF32(50,60);
+	GrayF32 input = new GrayF32(50, 60);
 
 	// the found feature match set
 	List<AssociatedPair> matchSet = new ArrayList<>();
@@ -51,32 +51,32 @@ public class TestImageMotionPtkSmartRespawn {
 	public void nominal() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =
 				new ImageMotionPtkSmartRespawn<>(motion, 10, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
 		assertTrue(alg.previousWasKeyFrame);
-		assertEquals(0,motion.numReset);
-		assertEquals(0,motion.numResetTransform);
-		assertEquals(1,motion.numChangeKeyFrame);
-		assertEquals(1,motion.numProcess);
+		assertEquals(0, motion.numReset);
+		assertEquals(0, motion.numResetTransform);
+		assertEquals(1, motion.numChangeKeyFrame);
+		assertEquals(1, motion.numProcess);
 		// add a set of features that won't trigger any faults
 		matchSet = createGoodFeatureList(100);
 		// nothing should go wrong here
 		assertTrue(alg.process(input));
 		assertFalse(alg.previousWasKeyFrame);
-		assertEquals(0,motion.numReset);
-		assertEquals(0,motion.numResetTransform);
-		assertEquals(1,motion.numChangeKeyFrame);
-		assertEquals(2,motion.numProcess);
+		assertEquals(0, motion.numReset);
+		assertEquals(0, motion.numResetTransform);
+		assertEquals(1, motion.numChangeKeyFrame);
+		assertEquals(2, motion.numProcess);
 		// one last one of nothing should go wrong
 		assertTrue(alg.process(input));
 		assertFalse(alg.previousWasKeyFrame);
-		assertEquals(0,motion.numReset);
-		assertEquals(0,motion.numResetTransform);
-		assertEquals(1,motion.numChangeKeyFrame);
-		assertEquals(3,motion.numProcess);
+		assertEquals(0, motion.numReset);
+		assertEquals(0, motion.numResetTransform);
+		assertEquals(1, motion.numChangeKeyFrame);
+		assertEquals(3, motion.numProcess);
 	}
 
 	/**
@@ -86,27 +86,27 @@ public class TestImageMotionPtkSmartRespawn {
 	public void absoluteMinimumTracks() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =
 				new ImageMotionPtkSmartRespawn<>(motion, 20, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
-		assertEquals(1,motion.numChangeKeyFrame);
+		assertEquals(1, motion.numChangeKeyFrame);
 		// give it too few tracks
 		matchSet = createGoodFeatureList(10);
 		assertTrue(alg.process(input));
-		assertEquals(2,motion.numChangeKeyFrame);
+		assertEquals(2, motion.numChangeKeyFrame);
 		// give it a good number of tracks, no new keyframe
 		matchSet = createGoodFeatureList(100);
 		assertTrue(alg.process(input));
-		assertEquals(2,motion.numChangeKeyFrame);
+		assertEquals(2, motion.numChangeKeyFrame);
 		// process once to set relative thresholds
 		assertTrue(alg.process(input));
-		assertEquals(2,motion.numChangeKeyFrame);
+		assertEquals(2, motion.numChangeKeyFrame);
 		// decrease the number of features
 		matchSet = createGoodFeatureList(10);
 		assertTrue(alg.process(input));
-		assertEquals(3,motion.numChangeKeyFrame);
+		assertEquals(3, motion.numChangeKeyFrame);
 	}
 
 	/**
@@ -116,12 +116,12 @@ public class TestImageMotionPtkSmartRespawn {
 	public void relativeMinimumTracks() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =
 				new ImageMotionPtkSmartRespawn<>(motion, 20, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
-		assertEquals(1,motion.numChangeKeyFrame);
+		assertEquals(1, motion.numChangeKeyFrame);
 		// give a good number of tracks
 		matchSet = createGoodFeatureList(100);
 		assertTrue(alg.process(input));
@@ -143,12 +143,12 @@ public class TestImageMotionPtkSmartRespawn {
 	public void relativeCoverageArea() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+		ImageMotionPtkSmartRespawn<GrayF32, Affine2D_F64> alg =
 				new ImageMotionPtkSmartRespawn<>(motion, 20, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
-		assertEquals(1,motion.numChangeKeyFrame);
+		assertEquals(1, motion.numChangeKeyFrame);
 		// give a good number of tracks with good coverage
 		matchSet = createGoodFeatureList(100);
 		assertTrue(alg.process(input));
@@ -163,15 +163,15 @@ public class TestImageMotionPtkSmartRespawn {
 		List<AssociatedPair> ret = new ArrayList<>();
 
 		// maximize the area
-		ret.add( createPair(0,0));
-		ret.add( createPair(input.width,0));
-		ret.add( createPair(input.width,input.height));
-		ret.add( createPair(0,input.height));
+		ret.add(createPair(0, 0));
+		ret.add(createPair(input.width, 0));
+		ret.add(createPair(input.width, input.height));
+		ret.add(createPair(0, input.height));
 
-		for( int i = 4; i < num; i++ ) {
+		for (int i = 4; i < num; i++) {
 			int x = rand.nextInt(input.width);
 			int y = rand.nextInt(input.height);
-			ret.add( createPair(x,y));
+			ret.add(createPair(x, y));
 		}
 
 		return ret;
@@ -181,25 +181,24 @@ public class TestImageMotionPtkSmartRespawn {
 		List<AssociatedPair> ret = new ArrayList<>();
 
 		// maximize the area
-		ret.add( createPair(0,0));
+		ret.add(createPair(0, 0));
 
-		for( int i = 4; i < num; i++ ) {
-			ret.add( createPair(1,1));
+		for (int i = 4; i < num; i++) {
+			ret.add(createPair(1, 1));
 		}
 
 		return ret;
 	}
 
-	private AssociatedPair createPair( int x , int y ) {
+	private AssociatedPair createPair( int x, int y ) {
 		AssociatedPair p = new AssociatedPairTrack();
-		p.p1.set(x,y);
-		p.p2.set(x,y);
+		p.p1.set(x, y);
+		p.p2.set(x, y);
 
 		return p;
 	}
 
-	private class DummyMotion extends ImageMotionPointTrackerKey<GrayF32,Affine2D_F64>
-	{
+	private class DummyMotion extends ImageMotionPointTrackerKey<GrayF32, Affine2D_F64> {
 		int numReset = 0;
 		int numProcess = 0;
 		int numChangeKeyFrame = 0;
@@ -214,7 +213,7 @@ public class TestImageMotionPtkSmartRespawn {
 		}
 
 		@Override
-		public boolean process(GrayF32 frame) {
+		public boolean process( GrayF32 frame ) {
 			numProcess++;
 			return true;
 		}
@@ -250,10 +249,9 @@ public class TestImageMotionPtkSmartRespawn {
 		}
 	}
 
-	private class Matcher implements ModelMatcher<Affine2D_F64, AssociatedPair>
-	{
+	private class Matcher implements ModelMatcher<Affine2D_F64, AssociatedPair> {
 		@Override
-		public boolean process(List<AssociatedPair> dataSet) {return false;}
+		public boolean process( List<AssociatedPair> dataSet ) {return false;}
 
 		@Override
 		public Affine2D_F64 getModelParameters() {return null;}
@@ -264,7 +262,7 @@ public class TestImageMotionPtkSmartRespawn {
 		}
 
 		@Override
-		public int getInputIndex(int matchIndex) {return 0;}
+		public int getInputIndex( int matchIndex ) {return 0;}
 
 		@Override
 		public double getFitQuality() {return 0;}
@@ -286,10 +284,9 @@ public class TestImageMotionPtkSmartRespawn {
 		}
 	}
 
-	private static class Tracker implements PointTracker<GrayF32>
-	{
+	private static class Tracker implements PointTracker<GrayF32> {
 		@Override
-		public void process(GrayF32 image) {}
+		public void process( GrayF32 image ) {}
 
 		@Override
 		public void reset() {}
@@ -310,40 +307,39 @@ public class TestImageMotionPtkSmartRespawn {
 		public int getMaxSpawn() {return 0;}
 
 		@Override
-		public boolean dropTrack(PointTrack track) {return false;}
+		public boolean dropTrack( PointTrack track ) {return false;}
 
 		@Override
-		public void dropTracks(Dropper dropper) {
+		public void dropTracks( Dropper dropper ) {
 			throw new RuntimeException("HMM");
 		}
 
 		@Override
-		public List<PointTrack> getAllTracks(List<PointTrack> list) {
+		public List<PointTrack> getAllTracks( List<PointTrack> list ) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<PointTrack> getActiveTracks(List<PointTrack> list) {
+		public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
+		public List<PointTrack> getInactiveTracks( List<PointTrack> list ) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
+		public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
 			return new ArrayList<>();
 		}
 
 		@Override
-		public List<PointTrack> getNewTracks(List<PointTrack> list) {
+		public List<PointTrack> getNewTracks( List<PointTrack> list ) {
 			return new ArrayList<>();
 		}
 
 		@Override
 		public void spawnTracks() {}
 	}
-
 }

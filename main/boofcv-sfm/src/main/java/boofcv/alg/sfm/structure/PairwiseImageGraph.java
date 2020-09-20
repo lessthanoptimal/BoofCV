@@ -41,10 +41,10 @@ public class PairwiseImageGraph {
 
 	public List<View> nodes = new ArrayList<>();
 	public List<Motion> edges = new ArrayList<>();
-	public Map<String,Camera> cameras = new HashMap<>();
+	public Map<String, Camera> cameras = new HashMap<>();
 
 	public void addCamera( Camera camera ) {
-		cameras.put(camera.camera,camera);
+		cameras.put(camera.camera, camera);
 	}
 
 	static class Camera {
@@ -52,7 +52,7 @@ public class PairwiseImageGraph {
 		public Point2Transform2_F64 pixelToNorm;
 		public CameraPinhole pinhole;
 
-		public Camera(String camera,Point2Transform2_F64 pixelToNorm,CameraPinhole pinhole) {
+		public Camera( String camera, Point2Transform2_F64 pixelToNorm, CameraPinhole pinhole ) {
 			this.camera = camera;
 			this.pixelToNorm = pixelToNorm;
 			this.pinhole = pinhole;
@@ -61,17 +61,17 @@ public class PairwiseImageGraph {
 
 	/**
 	 * Finds all motions which are observations of the specified camera entirely, src and dst
+	 *
 	 * @param target (Input) Camera being searched for
 	 * @param storage (Output) Optional storage for found camera motions
-	 * @return
 	 */
-	public List<Motion> findCameraMotions(Camera target , @Nullable List<Motion> storage ) {
-		if( storage == null )
+	public List<Motion> findCameraMotions( Camera target, @Nullable List<Motion> storage ) {
+		if (storage == null)
 			storage = new ArrayList<>();
 
 		for (int i = 0; i < edges.size(); i++) {
 			Motion m = edges.get(i);
-			if( m.viewSrc.camera == target && m.viewDst.camera == target ) {
+			if (m.viewSrc.camera == target && m.viewDst.camera == target) {
 				storage.add(m);
 			}
 		}
@@ -85,29 +85,26 @@ public class PairwiseImageGraph {
 
 		public List<Motion> connections = new ArrayList<>();
 
-		// feature descriptor of all features in this image
+		/** feature descriptor of all features in this image */
 		public FastQueue<TupleDesc> descriptions;
-		// observed location of all features in pixels
+		/** observed location of all features in pixels */
 		public FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64::new);
 		public FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64::new);
 
-		public View(int index, FastQueue<TupleDesc> descriptions ) {
+		public View( int index, FastQueue<TupleDesc> descriptions ) {
 			this.index = index;
 			this.descriptions = descriptions;
 		}
-
 	}
 
 	static class Motion {
-		/**
-		 * 3x3 matrix describing epipolar geometry. Fundamental or Essential
-		 */
-		public DMatrixRMaj F = new DMatrixRMaj(3,3);
+		/** 3x3 matrix describing epipolar geometry. Fundamental or Essential  */
+		public DMatrixRMaj F = new DMatrixRMaj(3, 3);
 
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean metric;
 
-		// Which features are associated with each other and in the inlier set
+		/** Which features are associated with each other and in the inlier set */
 		public List<AssociatedIndex> associated = new ArrayList<>();
 
 		public View viewSrc;
@@ -115,10 +112,10 @@ public class PairwiseImageGraph {
 
 		public int index;
 
-		public View destination(View src ) {
-			if( src == viewSrc) {
+		public View destination( View src ) {
+			if (src == viewSrc) {
 				return viewDst;
-			} else if( src == viewDst){
+			} else if (src == viewDst) {
 				return viewSrc;
 			} else {
 				throw new RuntimeException("BUG!");

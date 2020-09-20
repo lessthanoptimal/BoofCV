@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSelectOverheadParameters {
 
-	protected int width=320,height=240;
-	CameraPinholeBrown param = new CameraPinholeBrown(150,150,0,width/2,height/2,width,height).fsetRadial(0,0);
+	protected int width = 320, height = 240;
+	CameraPinholeBrown param = new CameraPinholeBrown(150, 150, 0, width/2, height/2, width, height).fsetRadial(0, 0);
 	Se3_F64 cameraToPlane = new Se3_F64();
 	Se3_F64 planeToCamera;
 
@@ -41,11 +41,11 @@ public class TestSelectOverheadParameters {
 
 	@Test
 	public void pointedStraightDown() {
-		createExtrinsic(-2,-Math.PI/2,0);
+		createExtrinsic(-2, -Math.PI/2, 0);
 
-		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize,5,1);
+		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize, 5, 1);
 
-		assertTrue(alg.process(param,planeToCamera));
+		assertTrue(alg.process(param, planeToCamera));
 
 		double mapWidth = alg.getOverheadWidth()*cellSize;
 		double mapHeight = alg.getOverheadHeight()*cellSize;
@@ -56,32 +56,32 @@ public class TestSelectOverheadParameters {
 		double tanHeight = mapHeight/4.0;
 
 		// crude check to see if the suggested map has about the save FOV as the camera
-		assertEquals(tanCameraX,tanHeight,0.05);
-		assertEquals(tanCameraY,tanWidth,0.05);
+		assertEquals(tanCameraX, tanHeight, 0.05);
+		assertEquals(tanCameraY, tanWidth, 0.05);
 
 		// won't be perfectly symmetric since the image doesn't project perfectly symmetric
-		assertEquals(alg.getCenterX(),mapWidth/2.0,cellSize);
-		assertEquals(alg.getCenterY(),mapHeight/2.0,cellSize);
+		assertEquals(alg.getCenterX(), mapWidth/2.0, cellSize);
+		assertEquals(alg.getCenterY(), mapHeight/2.0, cellSize);
 	}
 
 	@Test
 	public void checkFailure() {
-		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize,5,1);
+		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize, 5, 1);
 
 		// look up away from the map, should fail
-		createExtrinsic(-2,Math.PI/2,0);
+		createExtrinsic(-2, Math.PI/2, 0);
 		assertFalse(alg.process(param, planeToCamera));
 
 		// try from below the plane, it should see it now
-		createExtrinsic(2,Math.PI/2,0);
+		createExtrinsic(2, Math.PI/2, 0);
 		assertTrue(alg.process(param, planeToCamera));
 	}
 
 	@Test
 	public void pointedAngle() {
-		createExtrinsic(-2,UtilAngle.degreeToRadian(-45),0);
+		createExtrinsic(-2, UtilAngle.degreeToRadian(-45), 0);
 
-		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize,5,1);
+		SelectOverheadParameters alg = new SelectOverheadParameters(cellSize, 5, 1);
 
 		assertTrue(alg.process(param, planeToCamera));
 
@@ -90,13 +90,12 @@ public class TestSelectOverheadParameters {
 		// center X should be farther down the camera's pointing direction
 		assertTrue(alg.getCenterX() < 0);
 		// still symmetric
-		assertEquals(alg.getCenterY(),mapHeight/2,cellSize);
+		assertEquals(alg.getCenterY(), mapHeight/2, cellSize);
 	}
 
-	private void createExtrinsic( double y , double rotX , double rotZ ) {
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX, 0, rotZ, cameraToPlane.getR());
-		cameraToPlane.getT().set(0,y,0);
+	private void createExtrinsic( double y, double rotX, double rotZ ) {
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, rotX, 0, rotZ, cameraToPlane.getR());
+		cameraToPlane.getT().set(0, y, 0);
 		planeToCamera = cameraToPlane.invert(null);
 	}
-
 }

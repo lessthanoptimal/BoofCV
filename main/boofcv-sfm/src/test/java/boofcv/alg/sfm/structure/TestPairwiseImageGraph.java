@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,22 +34,22 @@ public class TestPairwiseImageGraph {
 	@Test
 	public void findCameraMotions() {
 		PairwiseImageGraph graph = new PairwiseImageGraph();
-		graph.cameras.put("cameraA",new PairwiseImageGraph.Camera("cameraA",null,new CameraPinhole()));
-		graph.cameras.put("cameraB",new PairwiseImageGraph.Camera("cameraB",null,new CameraPinhole()));
+		graph.cameras.put("cameraA", new PairwiseImageGraph.Camera("cameraA", null, new CameraPinhole()));
+		graph.cameras.put("cameraB", new PairwiseImageGraph.Camera("cameraB", null, new CameraPinhole()));
 
-		graph.nodes.add( new View(0,null));
-		graph.nodes.add( new View(0,null));
-		graph.nodes.add( new View(0,null));
-		graph.nodes.add( new View(0,null));
+		graph.nodes.add(new View(0, null));
+		graph.nodes.add(new View(0, null));
+		graph.nodes.add(new View(0, null));
+		graph.nodes.add(new View(0, null));
 
 		graph.nodes.get(0).camera = graph.cameras.get("cameraA");
 		graph.nodes.get(1).camera = graph.cameras.get("cameraA");
 		graph.nodes.get(2).camera = graph.cameras.get("cameraB");
 		graph.nodes.get(3).camera = graph.cameras.get("cameraB");
 
-		graph.edges.add( new Motion());
-		graph.edges.add( new Motion());
-		graph.edges.add( new Motion());
+		graph.edges.add(new Motion());
+		graph.edges.add(new Motion());
+		graph.edges.add(new Motion());
 
 		graph.edges.get(0).viewSrc = graph.nodes.get(0);
 		graph.edges.get(0).viewDst = graph.nodes.get(2);
@@ -58,21 +58,20 @@ public class TestPairwiseImageGraph {
 		graph.edges.get(2).viewSrc = graph.nodes.get(3);
 		graph.edges.get(2).viewDst = graph.nodes.get(0);
 
-		List<Motion> found =  graph.findCameraMotions(graph.cameras.get("cameraA"),null);
-		assertEquals(1,found.size());
-		assertTrue(graph.edges.get(1)==found.get(0));
+		List<Motion> found = graph.findCameraMotions(graph.cameras.get("cameraA"), null);
+		assertEquals(1, found.size());
+		assertTrue(graph.edges.get(1) == found.get(0));
 
-		found =  graph.findCameraMotions(graph.cameras.get("cameraB"),null);
-		assertEquals(0,found.size());
-
+		found = graph.findCameraMotions(graph.cameras.get("cameraB"), null);
+		assertEquals(0, found.size());
 	}
 
 	@Test
 	public void CameraMotion_destination() {
 		Motion motion = new Motion();
-		View viewA = new View(0,null);
-		View viewB = new View(0,null);
-		View viewC = new View(0,null);
+		View viewA = new View(0, null);
+		View viewB = new View(0, null);
+		View viewC = new View(0, null);
 
 		motion.viewSrc = viewA;
 		motion.viewDst = viewB;
@@ -83,6 +82,7 @@ public class TestPairwiseImageGraph {
 		try {
 			motion.destination(viewC);
 			fail("Exception should have been thrown");
-		} catch( RuntimeException ignore ) {}
+		} catch (RuntimeException ignore) {
+		}
 	}
 }

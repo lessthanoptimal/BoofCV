@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public interface MonocularPlaneVisualOdometry<T extends ImageBase<T>> extends Vi
 	 *
 	 * @param param Camera calibration parameters
 	 */
-	public void setCalibration( MonoPlaneParameters param );
+	void setCalibration( MonoPlaneParameters param );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
@@ -48,13 +48,12 @@ public interface MonocularPlaneVisualOdometry<T extends ImageBase<T>> extends Vi
 	 * @param input Next image in the sequence.
 	 * @return If the motion estimate has been updated or not
 	 */
-	public boolean process( T input );
+	boolean process( T input );
 
 	/**
 	 * Type of input images it can process.
 	 *
 	 * @return The image type
 	 */
-	public ImageType<T> getImageType();
-
+	ImageType<T> getImageType();
 }

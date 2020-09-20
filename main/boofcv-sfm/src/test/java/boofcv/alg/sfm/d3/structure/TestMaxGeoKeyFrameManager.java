@@ -62,12 +62,12 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		alg.cameras.grow().maxFeaturesPerFrame = 234; // give it a garbage value that should be reset
 		alg.minimumCoverage = 0.7;
 		alg.initialize(cameras);
-		assertEquals(width,alg.cameras.get(0).imageWidth);
-		assertEquals(height,alg.cameras.get(0).imageHeight);
-		assertEquals(0,alg.cameras.get(0).maxFeaturesPerFrame);
+		assertEquals(width, alg.cameras.get(0).imageWidth);
+		assertEquals(height, alg.cameras.get(0).imageHeight);
+		assertEquals(0, alg.cameras.get(0).maxFeaturesPerFrame);
 
 		// make sure these are not accidentally reset
-		assertEquals(0.7,alg.minimumCoverage);
+		assertEquals(0.7, alg.minimumCoverage);
 	}
 
 	@Test
@@ -101,19 +101,19 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		}
 		// connect all the frames to each other
 		for (int i = 0; i < scene.frames.size; i++) {
-			for (int j = i+1; j < scene.frames.size; j++) {
-				if( i == 1 && j == bestConnect ) // no connection to best connect
+			for (int j = i + 1; j < scene.frames.size; j++) {
+				if (i == 1 && j == bestConnect) // no connection to best connect
 					continue;
-				connectFrames(i,j,10+i,scene);
+				connectFrames(i, j, 10 + i, scene);
 			}
 		}
 		// make best connect to current be frame 2
-		connectFrames(4,bestConnect,20,scene);
+		connectFrames(4, bestConnect, 20, scene);
 
 		var alg = new MaxGeoKeyFrameManager();
-		alg.selectOldToDiscard(scene,1);
-		assertEquals(1,alg.discardKeyIndices.size);
-		assertEquals(1,alg.discardKeyIndices.get(0));
+		alg.selectOldToDiscard(scene, 1);
+		assertEquals(1, alg.discardKeyIndices.size);
+		assertEquals(1, alg.discardKeyIndices.get(0));
 	}
 
 	/**
@@ -128,26 +128,26 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		}
 		// connect all the frames to each other
 		for (int i = 0; i < scene.frames.size; i++) {
-			for (int j = i+1; j < scene.frames.size; j++) {
-				connectFrames(i,j,10+i,scene);
+			for (int j = i + 1; j < scene.frames.size; j++) {
+				connectFrames(i, j, 10 + i, scene);
 			}
 		}
 		// make best connect to current be frame 2
-		connectFrames(4,2,20,scene);
+		connectFrames(4, 2, 20, scene);
 
 		var alg = new MaxGeoKeyFrameManager();
-		alg.selectOldToDiscard(scene,1);
-		assertEquals(1,alg.discardKeyIndices.size);
-		assertEquals(0,alg.discardKeyIndices.get(0));
+		alg.selectOldToDiscard(scene, 1);
+		assertEquals(1, alg.discardKeyIndices.size);
+		assertEquals(0, alg.discardKeyIndices.get(0));
 		// add to the oldest track to make it no longer the worst
-		connectFrames(0,2,3,scene);
+		connectFrames(0, 2, 3, scene);
 		alg.discardKeyIndices.reset();
-		alg.selectOldToDiscard(scene,1);
-		assertEquals(1,alg.discardKeyIndices.size);
-		assertEquals(1,alg.discardKeyIndices.get(0));
+		alg.selectOldToDiscard(scene, 1);
+		assertEquals(1, alg.discardKeyIndices.size);
+		assertEquals(1, alg.discardKeyIndices.get(0));
 	}
 
-	public static void connectFrames( int a , int b , int count , VisOdomBundleAdjustment<BTrack> scene ) {
+	public static void connectFrames( int a, int b, int count, VisOdomBundleAdjustment<BTrack> scene ) {
 		BFrame frameA = scene.frames.get(a);
 		BFrame frameB = scene.frames.get(b);
 
@@ -175,21 +175,21 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		tracker.activeTracks = 210; // should be ignored
 		tracker.maxSpawn = 200;
 
-		alg.handleSpawnedTracks(tracker,bcam);
+		alg.handleSpawnedTracks(tracker, bcam);
 		assertEquals(200, alg.cameras.get(0).maxFeaturesPerFrame);
 
 		tracker.activeTracks = 220;
 		tracker.maxSpawn = 0;
 
-		alg.handleSpawnedTracks(tracker,bcam);
+		alg.handleSpawnedTracks(tracker, bcam);
 		assertEquals(220, alg.cameras.get(0).maxFeaturesPerFrame);
 
 		tracker.activeTracks = 230;
-		alg.handleSpawnedTracks(tracker,bcam);
+		alg.handleSpawnedTracks(tracker, bcam);
 		assertEquals(230, alg.cameras.get(0).maxFeaturesPerFrame);
 	}
 
-	private void simpleSequence(int newFrames) {
+	private void simpleSequence( int newFrames ) {
 		var coverage = new DummyCoverage();
 		coverage.fraction = 0.5;
 		VisOdomBundleAdjustment<BTrack> scene = createScene();
@@ -206,21 +206,21 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		// Always add new key frames as it has not hit the max yet
 		alg.initialize(scene.cameras);
 		for (int i = 0; i < 3; i++) {
-			alg.handleSpawnedTracks(tracker,scene.getCamera(0));
+			alg.handleSpawnedTracks(tracker, scene.getCamera(0));
 			for (int indexNew = 0; indexNew < newFrames; indexNew++) {
 				scene.addFrame(frameID++);
 			}
-			assertEquals(0,alg.selectFramesToDiscard(tracker,maxKeyFrames,newFrames,scene).size);
+			assertEquals(0, alg.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene).size);
 		}
 
 		// there will now be an extra frame. The coverage threshold is high so it will not keep the current frame
 		for (int indexNew = 0; indexNew < newFrames; indexNew++) {
 			scene.addFrame(frameID++);
 		}
-		if( newFrames == 2 )
-			checkDiscard(alg.selectFramesToDiscard(tracker,maxKeyFrames,newFrames,scene), frameID-2,frameID-1);
+		if (newFrames == 2)
+			checkDiscard(alg.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene), frameID - 2, frameID - 1);
 		else
-			checkDiscard(alg.selectFramesToDiscard(tracker,maxKeyFrames,newFrames,scene), frameID-1);
+			checkDiscard(alg.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene), frameID - 1);
 
 		for (int indexNew = 0; indexNew < newFrames; indexNew++) {
 			scene.removeFrame(scene.getLastFrame(), new ArrayList<>());
@@ -232,27 +232,26 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		}
 		// connect all the frames to each other
 		for (int i = 0; i < scene.frames.size; i++) {
-			for (int j = i+1; j < scene.frames.size; j++) {
-				connectFrames(i,j,10+i,scene);
+			for (int j = i + 1; j < scene.frames.size; j++) {
+				connectFrames(i, j, 10 + i, scene);
 			}
 		}
 		// make best connect to current be frame 0
-		connectFrames(0,maxKeyFrames+newFrames-1,20,scene);
-		if( newFrames == 2 )
-			checkDiscard(alg.selectFramesToDiscard(tracker,maxKeyFrames,newFrames,scene), 1,2);
+		connectFrames(0, maxKeyFrames + newFrames - 1, 20, scene);
+		if (newFrames == 2)
+			checkDiscard(alg.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene), 1, 2);
 		else
-			checkDiscard(alg.selectFramesToDiscard(tracker,maxKeyFrames,newFrames,scene), 1);
+			checkDiscard(alg.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene), 1);
 	}
 
-	private void checkDiscard(GrowQueue_I32 discarded , int ...expected ) {
+	private void checkDiscard( GrowQueue_I32 discarded, int... expected ) {
 		assertEquals(expected.length, discarded.size);
 		for (int i = 0; i < expected.length; i++) {
 			assertEquals(expected[i], discarded.get(i));
 		}
 	}
 
-	static class DummyTracker extends PointTrackerDefault
-	{
+	static class DummyTracker extends PointTrackerDefault {
 		public int maxSpawn;
 		public int activeTracks;
 

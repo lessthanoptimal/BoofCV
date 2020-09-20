@@ -29,20 +29,14 @@ import boofcv.struct.Configuration;
  */
 public class ConfigKeyFrameManager implements Configuration {
 
-	/**
-	 * Specifies the specific algorithm.
-	 */
+	/** Specifies the specific algorithm. */
 	public Type type = Type.MAX_GEO;
 
-	/**
-	 * For MaxGeoKeyFrameManager only. When coverage drops below this number a new keyframe is created. 0.0 to 1.0
-	 */
+	/** For MaxGeoKeyFrameManager only. When coverage drops below this number a new keyframe is created. 0.0 to 1.0 */
 	public double geoMinCoverage = 0.4;
 
-	/**
-	 * For TickTockKeyFrameManager only. Period at which new keyframes are created.
-	 */
-	public int tickPeriod=2;
+	/** For TickTockKeyFrameManager only. Period at which new keyframes are created. */
+	public int tickPeriod = 2;
 
 	public enum Type {
 		/** @see MaxGeoKeyFrameManager */
@@ -53,9 +47,9 @@ public class ConfigKeyFrameManager implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( geoMinCoverage < 0 || geoMinCoverage > 1.0 )
+		if (geoMinCoverage < 0 || geoMinCoverage > 1.0)
 			throw new IllegalArgumentException("geoMinCoverage must be 0 to 1.0");
-		if( tickPeriod <= 0 )
+		if (tickPeriod <= 0)
 			throw new IllegalArgumentException("tickPeriod must be greater than zero");
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,17 +27,16 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class DepthSparse3D_to_PixelTo3D<T extends ImageGray<T>>
-	implements ImagePixelTo3D
-{
+		implements ImagePixelTo3D {
 	DepthSparse3D<T> alg;
 
-	public DepthSparse3D_to_PixelTo3D(DepthSparse3D<T> alg) {
+	public DepthSparse3D_to_PixelTo3D( DepthSparse3D<T> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(double x, double y) {
-		return alg.process((int)x,(int)y);
+	public boolean process( double x, double y ) {
+		return alg.process((int)x, (int)y);
 	}
 
 	@Override

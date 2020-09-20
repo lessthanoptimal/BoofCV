@@ -28,7 +28,7 @@ import java.util.Random;
  */
 class TestConfigKeyFrameManager extends StandardConfigurationChecks {
 	@Override
-	public Configuration createNotDefault(Random rand) {
+	public Configuration createNotDefault( Random rand ) {
 		var out = new ConfigKeyFrameManager();
 		out.tickPeriod = 99;
 		out.geoMinCoverage = 0.001;

@@ -50,7 +50,7 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 	private Se3_F64 leftToRight;
 
 	// storage for point in camera frame
-	private Point3D_F64 X = new Point3D_F64();
+	private final Point3D_F64 X = new Point3D_F64();
 
 	// computes the error in units of pixels
 	private NormalizedToPixelError leftPixelError;

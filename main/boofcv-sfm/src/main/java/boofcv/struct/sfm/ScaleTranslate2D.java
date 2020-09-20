@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.sfm;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Motion model for scale and translation:
  *
@@ -26,51 +29,22 @@ package boofcv.struct.sfm;
  * @author Peter Abeles
  */
 public class ScaleTranslate2D {
-	/**
-	 * Scaling
-	 */
-	public double scale;
-	/**
-	 * Translation along x and y axis
-	 */
-	public double transX,transY;
+	/** Scaling */
+	public @Getter @Setter double scale;
+	/** Translation along x and y axis */
+	public @Getter @Setter double transX, transY;
 
-	public ScaleTranslate2D(double scale, double transX, double transY) {
+	public ScaleTranslate2D( double scale, double transX, double transY ) {
 		this.scale = scale;
 		this.transX = transX;
 		this.transY = transY;
 	}
 
-	public ScaleTranslate2D() {
-	}
+	public ScaleTranslate2D() {}
 
-	public void set( ScaleTranslate2D src ) {
+	public void setTo( ScaleTranslate2D src ) {
 		this.scale = src.scale;
 		this.transX = src.transX;
 		this.transY = src.transY;
-	}
-
-	public double getScale() {
-		return scale;
-	}
-
-	public void setScale(double scale) {
-		this.scale = scale;
-	}
-
-	public double getTransX() {
-		return transX;
-	}
-
-	public void setTransX(double transX) {
-		this.transX = transX;
-	}
-
-	public double getTransY() {
-		return transY;
-	}
-
-	public void setTransY(double transY) {
-		this.transY = transY;
 	}
 }

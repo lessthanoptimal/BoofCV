@@ -37,9 +37,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends InvertibleTransform>
-		implements ImageMotion2D<T,IT>, AccessPointTracks
-{
-	ImageMotionPtkSmartRespawn<T,IT> alg;
+		implements ImageMotion2D<T, IT>, AccessPointTracks {
+	ImageMotionPtkSmartRespawn<T, IT> alg;
 	boolean first = true;
 
 	List<Point2D_F64> allTracks = new ArrayList<>();
@@ -47,16 +46,16 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	boolean inliersMarked = false;
 	GrowQueue_B inliers = new GrowQueue_B(10);
 
-	public WrapImageMotionPtkSmartRespawn(ImageMotionPtkSmartRespawn<T, IT> alg) {
+	public WrapImageMotionPtkSmartRespawn( ImageMotionPtkSmartRespawn<T, IT> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(T input) {
+	public boolean process( T input ) {
 		inliersMarked = false;
 
 		boolean ret = alg.process(input);
-		if( first ) {
+		if (first) {
 			alg.getMotion().changeKeyFrame();
 			alg.getMotion().resetTransforms();
 			first = false;
@@ -99,17 +98,17 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
-	public long getTrackId(int index) {
+	public long getTrackId( int index ) {
 		return 0;
 	}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		pixel.set(allTracks.get(index));
 	}
 
 	private void checkInitialize() {
-		if( !inliersMarked ) {
+		if (!inliersMarked) {
 			inliersMarked = true;
 
 			List<PointTrack> active = alg.getMotion().getTracker().getActiveTracks(null);
@@ -119,7 +118,7 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 			long tick = getFrameID();
 			inliers.resize(active.size());
 
-			for( int i = 0; i < active.size(); i++ ) {
+			for (int i = 0; i < active.size(); i++) {
 				PointTrack t = active.get(i);
 				AssociatedPairTrack info = t.getCookie();
 				allTracks.add(t.pixel);
@@ -130,8 +129,8 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
-		if( storage == null )
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
+		if (storage == null)
 			storage = new ArrayList<>();
 		else
 			storage.clear();
@@ -143,14 +142,14 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
+	public boolean isTrackInlier( int index ) {
 		checkInitialize();
 
-		return inliers.data[ index ];
+		return inliers.data[index];
 	}
 
 	@Override
-	public boolean isTrackNew(int index) {
+	public boolean isTrackNew( int index ) {
 		return false;
 	}
 }

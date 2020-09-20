@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,16 +40,14 @@ public class TestModelManagerScaleTranslateRotate2D {
 	public void copyModel() {
 		ModelManagerScaleTranslateRotate2D alg = new ModelManagerScaleTranslateRotate2D();
 
-		ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(1,2,3,4);
+		ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(1, 2, 3, 4);
 		ScaleTranslateRotate2D found = new ScaleTranslateRotate2D();
 
-		alg.copyModel(model,found);
+		alg.copyModel(model, found);
 
-		assertEquals(model.theta,found.theta,1e-8);
-		assertEquals(model.scale,found.scale,1e-8);
-		assertEquals(model.transX,found.transX,1e-8);
-		assertEquals(model.transY,found.transY,1e-8);
-
+		assertEquals(model.theta, found.theta, 1e-8);
+		assertEquals(model.scale, found.scale, 1e-8);
+		assertEquals(model.transX, found.transX, 1e-8);
+		assertEquals(model.transY, found.transY, 1e-8);
 	}
-
 }

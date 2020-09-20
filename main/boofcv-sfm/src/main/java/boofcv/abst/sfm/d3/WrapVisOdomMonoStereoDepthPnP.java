@@ -49,16 +49,16 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	// low level algorithm
 	VisOdomMonoDepthPnP<T> alg;
 	StereoSparse3D<T> stereo;
-	DistanceFromModelMultiView<Se3_F64,Point2D3D> distance;
+	DistanceFromModelMultiView<Se3_F64, Point2D3D> distance;
 	Class<T> imageType;
 	boolean success;
 
 	List<PointTrack> active = new ArrayList<>();
 
-	public WrapVisOdomMonoStereoDepthPnP(VisOdomMonoDepthPnP<T> alg,
-										 StereoSparse3D<T> stereo,
-										 DistanceFromModelMultiView<Se3_F64,Point2D3D> distance,
-										 Class<T> imageType) {
+	public WrapVisOdomMonoStereoDepthPnP( VisOdomMonoDepthPnP<T> alg,
+										  StereoSparse3D<T> stereo,
+										  DistanceFromModelMultiView<Se3_F64, Point2D3D> distance,
+										  Class<T> imageType ) {
 		this.alg = alg;
 		this.stereo = stereo;
 		this.distance = distance;
@@ -66,7 +66,7 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	}
 
 	@Override
-	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
+	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		Point4D_F64 p = alg.getVisibleTracks().get(index).worldLoc;
 		world.set(p.x/p.w, p.y/p.w, p.z/p.w);
 		return true;
@@ -78,29 +78,29 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	}
 
 	@Override
-	public long getTrackId(int index) {
+	public long getTrackId( int index ) {
 		return alg.getVisibleTracks().get(index).id;
 	}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
 		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
-		pixel.setTo( alg.getVisibleTracks().get(index).visualTrack.pixel );
+		pixel.setTo(alg.getVisibleTracks().get(index).visualTrack.pixel);
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
 		throw new RuntimeException("Not supported any more");
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
+	public boolean isTrackInlier( int index ) {
 		return alg.getInlierTracks().contains(alg.getVisibleTracks().get(index));
 	}
 
 	@Override
-	public boolean isTrackNew(int index) {
+	public boolean isTrackNew( int index ) {
 		VisOdomMonoDepthPnP.Track track = alg.getVisibleTracks().get(index);
 		return track.visualTrack.spawnFrameID == alg.getFrameID();
 	}
@@ -109,12 +109,12 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	public void setCalibration( StereoParameters parameters ) {
 		stereo.setCalibration(parameters);
 		alg.setCamera(parameters.left);
-		distance.setIntrinsic(0,parameters.left);
+		distance.setIntrinsic(0, parameters.left);
 	}
 
 	@Override
-	public boolean process(T leftImage, T rightImage) {
-		stereo.setImages(leftImage,rightImage);
+	public boolean process( T leftImage, T rightImage ) {
+		stereo.setImages(leftImage, rightImage);
 		success = alg.process(leftImage);
 
 		active.clear();
@@ -153,7 +153,7 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-		alg.setVerbose(out,configuration);
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		alg.setVerbose(out, configuration);
 	}
 }

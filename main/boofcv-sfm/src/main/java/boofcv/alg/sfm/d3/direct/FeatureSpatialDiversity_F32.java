@@ -31,7 +31,7 @@ import org.ejml.dense.fixed.CommonOps_FDF2;
 public class FeatureSpatialDiversity_F32 {
 
 	FMatrix2x2 var = new FMatrix2x2();
-	float meanX,meanY;
+	float meanX, meanY;
 
 	FastQueue<Point2D_F32> norm = new FastQueue<>(Point2D_F32::new);
 
@@ -47,7 +47,7 @@ public class FeatureSpatialDiversity_F32 {
 	/**
 	 * Adds the estimated 3D location of a feature.
 	 */
-	public void addPoint( float x , float y , float z ) {
+	public void addPoint( float x, float y, float z ) {
 		norm.grow().set(x/z, y/z);
 	}
 
@@ -65,15 +65,15 @@ public class FeatureSpatialDiversity_F32 {
 
 		// approximate the spread in by doing it along the x-axis.
 		// Really should be along the smallest singular axis
-		double angle0 = Math.atan2(1.0,sigmas*(meanX-stdev));
-		double angle1 = Math.atan2(1.0,sigmas*(meanX+stdev));
+		double angle0 = Math.atan2(1.0, sigmas*(meanX - stdev));
+		double angle1 = Math.atan2(1.0, sigmas*(meanX + stdev));
 
-		spread = Math.abs(angle1-angle0);
+		spread = Math.abs(angle1 - angle0);
 	}
 
 	private void computeCovarince() {
-		meanX=0;
-		meanY=0;
+		meanX = 0;
+		meanY = 0;
 
 		for (int i = 0; i < norm.size; i++) {
 			Point2D_F32 p = norm.get(i);
@@ -89,15 +89,15 @@ public class FeatureSpatialDiversity_F32 {
 		for (int i = 0; i < norm.size; i++) {
 			Point2D_F32 p = norm.get(i);
 
-			float dx = p.x-meanX;
-			float dy = p.y-meanY;
+			float dx = p.x - meanX;
+			float dy = p.y - meanY;
 
 			var.a11 += dx*dx;
 			var.a12 += dx*dy;
 			var.a22 += dy*dy;
 		}
 
-		CommonOps_FDF2.divide(var, norm.size-1);
+		CommonOps_FDF2.divide(var, norm.size - 1);
 
 //		System.out.printf("  covar  %5.2f %5.2f %5.4f\n",var.a11,var.a22, var.a12);
 	}
@@ -111,13 +111,12 @@ public class FeatureSpatialDiversity_F32 {
 
 	private float smallestEigenvalue() {
 		// compute the smallest eigenvalue
-		float left = (var.a11 + var.a22) * 0.5f;
-		float b = (var.a11 - var.a22) * 0.5f;
-		float right = (float)Math.sqrt(b * b + var.a12 * var.a12);
+		float left = (var.a11 + var.a22)*0.5f;
+		float b = (var.a11 - var.a22)*0.5f;
+		float right = (float)Math.sqrt(b*b + var.a12*var.a12);
 
 		// the smallest eigenvalue will be minus the right side
 		return left - right;
 	}
-
 }
 

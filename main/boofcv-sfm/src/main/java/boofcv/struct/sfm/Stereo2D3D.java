@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,12 +34,11 @@ public class Stereo2D3D {
 	// 3D coordinate of the point
 	public Point3D_F64 location = new Point3D_F64();
 
-	public Stereo2D3D(Point2D_F64 leftObs, Point2D_F64 rightObs, Point3D_F64 location) {
+	public Stereo2D3D( Point2D_F64 leftObs, Point2D_F64 rightObs, Point3D_F64 location ) {
 		this.leftObs = leftObs;
 		this.rightObs = rightObs;
 		this.location = location;
 	}
 
-	public Stereo2D3D() {
-	}
+	public Stereo2D3D() {}
 }

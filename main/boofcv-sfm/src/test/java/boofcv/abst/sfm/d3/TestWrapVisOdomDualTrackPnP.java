@@ -30,8 +30,7 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomDualTrackPnP
-{
+public class TestWrapVisOdomDualTrackPnP {
 	@Nested
 	public class TrackerKlt extends CheckVisualOdometryStereoSim<GrayF32> {
 
@@ -58,7 +57,7 @@ public class TestWrapVisOdomDualTrackPnP
 			config.tracker.detDesc.detectPoint.shiTomasi.radius = 3;
 			config.tracker.detDesc.detectPoint.general.radius = 3;
 
-			return FactoryVisualOdometry.stereoDualTrackerPnP(config,GrayF32.class);
+			return FactoryVisualOdometry.stereoDualTrackerPnP(config, GrayF32.class);
 		}
 	}
 
@@ -87,7 +86,7 @@ public class TestWrapVisOdomDualTrackPnP
 			config.tracker.detDesc.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.BRIEF;
 			config.tracker.detDesc.describeBrief.fixed = true;
 
-			return FactoryVisualOdometry.stereoDualTrackerPnP(config,GrayF32.class);
+			return FactoryVisualOdometry.stereoDualTrackerPnP(config, GrayF32.class);
 		}
 	}
 }

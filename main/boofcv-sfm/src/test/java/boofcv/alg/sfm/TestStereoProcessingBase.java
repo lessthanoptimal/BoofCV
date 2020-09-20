@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,28 +50,28 @@ public class TestStereoProcessingBase {
 	@Test
 	public void checkRectification() {
 		// point being viewed
-		Point3D_F64 X = new Point3D_F64(-0.01,0.1,3);
+		Point3D_F64 X = new Point3D_F64(-0.01, 0.1, 3);
 
-		StereoParameters param = createStereoParam(width,height);
+		StereoParameters param = createStereoParam(width, height);
 
 		// create input images by rendering the point in both
-		GrayU8 left = new GrayU8(width,height);
-		GrayU8 right = new GrayU8(width,height);
+		GrayU8 left = new GrayU8(width, height);
+		GrayU8 right = new GrayU8(width, height);
 
 		// compute the view in pixels of the point in the left and right cameras
 		Point2D_F64 lensLeft = new Point2D_F64();
 		Point2D_F64 lensRight = new Point2D_F64();
-		SfmTestHelper.renderPointPixel(param,X,lensLeft,lensRight);
+		SfmTestHelper.renderPointPixel(param, X, lensLeft, lensRight);
 
 		// render the pixel in the image
-		left.set((int)lensLeft.x,(int)lensLeft.y,200);
-		right.set((int)lensRight.x,(int)lensRight.y,200);
+		left.set((int)lensLeft.x, (int)lensLeft.y, 200);
+		right.set((int)lensRight.x, (int)lensRight.y, 200);
 
 		// test the algorithm
 		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<>(GrayU8.class);
 		alg.setCalibration(param);
 
-		alg.setImages(left,right);
+		alg.setImages(left, right);
 		alg.initialize();
 
 		// Test tolerances are set to one pixel due to discretization errors in the image
@@ -89,32 +89,32 @@ public class TestStereoProcessingBase {
 	@Test
 	public void compute3D() {
 		// point being viewed
-		Point3D_F64 X = new Point3D_F64(-0.01,0.1,3);
+		Point3D_F64 X = new Point3D_F64(-0.01, 0.1, 3);
 
-		StereoParameters param = createStereoParam(width,height);
+		StereoParameters param = createStereoParam(width, height);
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(param.left,(DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(param.left, (DMatrixRMaj)null);
 
 		// compute the view in pixels of the point in the left and right cameras
 		Point2D_F64 lensLeft = new Point2D_F64();
 		Point2D_F64 lensRight = new Point2D_F64();
-		SfmTestHelper.renderPointPixel(param,X,lensLeft,lensRight);
+		SfmTestHelper.renderPointPixel(param, X, lensLeft, lensRight);
 
 		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<>(GrayU8.class);
 		alg.setCalibration(param);
 
 		// Rectify the points
-		Point2Transform2_F64 rectLeft = RectifyImageOps.transformPixelToRect(param.left,alg.getRect1());
-		Point2Transform2_F64 rectRight = RectifyImageOps.transformPixelToRect(param.right,alg.getRect2());
+		Point2Transform2_F64 rectLeft = RectifyImageOps.transformPixelToRect(param.left, alg.getRect1());
+		Point2Transform2_F64 rectRight = RectifyImageOps.transformPixelToRect(param.right, alg.getRect2());
 
 		Point2D_F64 l = new Point2D_F64();
 		Point2D_F64 r = new Point2D_F64();
 
-		rectLeft.compute(lensLeft.x,lensLeft.y,l);
-		rectRight.compute(lensRight.x,lensRight.y,r);
+		rectLeft.compute(lensLeft.x, lensLeft.y, l);
+		rectRight.compute(lensRight.x, lensRight.y, r);
 
 		// make sure I rectified it correctly
-		assertEquals(l.y,r.y,1);
+		assertEquals(l.y, r.y, 1);
 
 		// find point in homogeneous coordinates
 		Point3D_F64 found = new Point3D_F64();
@@ -127,7 +127,7 @@ public class TestStereoProcessingBase {
 		found.y /= disparity;
 		found.z /= disparity;
 
-		assertTrue(found.isIdentical(X,0.01));
+		assertTrue(found.isIdentical(X, 0.01));
 	}
 
 	/**
@@ -138,30 +138,29 @@ public class TestStereoProcessingBase {
 		double meanY = 0;
 		double totalPixel = ImageStatistics.sum(image);
 
-		for( int i = 0; i < image.height; i++ ) {
-			for( int j = 0; j < image.width; j++ ) {
-				meanX += image.get(j,i)*j;
-				meanY += image.get(j,i)*i;
+		for (int i = 0; i < image.height; i++) {
+			for (int j = 0; j < image.width; j++) {
+				meanX += image.get(j, i)*j;
+				meanY += image.get(j, i)*i;
 			}
 		}
 
 		meanX /= totalPixel;
 		meanY /= totalPixel;
 
-		return new Point2D_F64(meanX,meanY);
+		return new Point2D_F64(meanX, meanY);
 	}
 
-	public static StereoParameters createStereoParam( int width , int height ) {
+	public static StereoParameters createStereoParam( int width, int height ) {
 		StereoParameters ret = new StereoParameters();
 
 		ret.setRightToLeft(new Se3_F64());
 		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new CameraPinholeBrown().fsetK(300, 320, 0, width / 2, height / 2, width, height).fsetRadial(0.1,1e-4);
-		ret.right = new CameraPinholeBrown().fsetK(290, 310, 0, width / 2 + 2, height / 2 - 6, width, height).fsetRadial(0.05, -2e-4);
+		ret.left = new CameraPinholeBrown().fsetK(300, 320, 0, width/2, height/2, width, height).fsetRadial(0.1, 1e-4);
+		ret.right = new CameraPinholeBrown().fsetK(290, 310, 0, width/2 + 2, height/2 - 6, width, height).fsetRadial(0.05, -2e-4);
 
 		return ret;
 	}
-
 }

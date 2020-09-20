@@ -322,7 +322,8 @@ public class TestSelectNeighborsAroundView {
 		try {
 			alg.createLocalGraph(seed, working);
 			fail("Should have failed");
-		} catch (RuntimeException ignore) {}
+		} catch (RuntimeException ignore) {
+		}
 
 		// Create an inlier set for all views in the local graph
 		// put ever view into this inlier set, except for 10. For that it will need to go outside

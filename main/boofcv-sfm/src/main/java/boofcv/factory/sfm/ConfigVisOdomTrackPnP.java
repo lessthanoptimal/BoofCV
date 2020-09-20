@@ -34,7 +34,7 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 	/** Configuration for Bundle Adjustment */
 	public ConfigBundleAdjustment bundle = new ConfigBundleAdjustment();
 	/** Convergence criteria for bundle adjustment. Set max iterations to &le; 0 to disable */
-	public ConfigConverge bundleConverge = new ConfigConverge(1e-3,1e-3,1);
+	public ConfigConverge bundleConverge = new ConfigConverge(1e-3, 1e-3, 1);
 	/**
 	 * Maximum number of features optimized in bundle adjustment per key frame. This is a very good way to limit
 	 * the amount of CPU used. If not positive then unlimited. &le; 0 to disable.
@@ -49,10 +49,10 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 	public int bundleMinObservations = 3;
 	/** Drop tracks if they have been outliers for this many frames in a row */
 	public int dropOutlierTracks = 2;
-	/** Maximum number of key frames it will save. Must be at least 4*/
+	/** Maximum number of key frames it will save. Must be at least 4 */
 	public int maxKeyFrames = 5;
 	/** Configuration for RANSAC. Used to robustly estimate frame-to-frame motion */
-	public ConfigRansac ransac = new ConfigRansac(500,1.5);
+	public ConfigRansac ransac = new ConfigRansac(500, 1.5);
 	/** Number of iterations to perform when refining the initial frame-to-frame motion estimate. Disable &le; 0 */
 	public int refineIterations = 25;
 	/** Which PNP solution to use */
@@ -65,7 +65,7 @@ public class ConfigVisOdomTrackPnP implements Configuration {
 		bundleConverge.checkValidity();
 		keyframes.checkValidity();
 
-		if( bundleMinObservations < 2 )
+		if (bundleMinObservations < 2)
 			throw new IllegalArgumentException("bundleMinObservations must be >= 2");
 	}
 

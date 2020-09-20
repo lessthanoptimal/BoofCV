@@ -28,7 +28,7 @@ import boofcv.struct.image.GrayF32;
 public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<GrayF32> {
 
 	public TestWrapVisOdomQuadPnP() {
-		super(GrayF32.class,0.3);
+		super(GrayF32.class, 0.3);
 	}
 
 	@Override

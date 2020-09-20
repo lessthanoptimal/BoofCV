@@ -28,7 +28,7 @@ import java.util.Random;
  */
 class TestConfigStereoMonoTrackPnP extends StandardConfigurationChecks {
 	@Override
-	public Configuration createNotDefault(Random rand) {
+	public Configuration createNotDefault( Random rand ) {
 		return new ConfigStereoMonoTrackPnP();
 	}
 }

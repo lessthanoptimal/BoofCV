@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,22 +41,21 @@ public class UtilImageMotion {
 	 * @param transform Motion transform
 	 * @return PixelTransform_F32 used to distort the image
 	 */
-	public static PixelTransform<Point2D_F32> createPixelTransform(InvertibleTransform transform) {
+	public static PixelTransform<Point2D_F32> createPixelTransform( InvertibleTransform transform ) {
 		PixelTransform<Point2D_F32> pixelTran;
-		if( transform instanceof Homography2D_F64) {
-			Homography2D_F32 t = ConvertFloatType.convert((Homography2D_F64) transform, null);
+		if (transform instanceof Homography2D_F64) {
+			Homography2D_F32 t = ConvertFloatType.convert((Homography2D_F64)transform, null);
 			pixelTran = new PixelTransformHomography_F32(t);
-		} else if( transform instanceof Homography2D_F32) {
-				pixelTran = new PixelTransformHomography_F32((Homography2D_F32)transform);
-		} else if( transform instanceof Affine2D_F64) {
-			Affine2D_F32 t = UtilAffine.convert((Affine2D_F64) transform, null);
+		} else if (transform instanceof Homography2D_F32) {
+			pixelTran = new PixelTransformHomography_F32((Homography2D_F32)transform);
+		} else if (transform instanceof Affine2D_F64) {
+			Affine2D_F32 t = UtilAffine.convert((Affine2D_F64)transform, null);
 			pixelTran = new PixelTransformAffine_F32(t);
-		} else if( transform instanceof Affine2D_F32) {
+		} else if (transform instanceof Affine2D_F32) {
 			pixelTran = new PixelTransformAffine_F32((Affine2D_F32)transform);
 		} else {
 			throw new RuntimeException("Unknown model type");
 		}
 		return pixelTran;
 	}
-
 }

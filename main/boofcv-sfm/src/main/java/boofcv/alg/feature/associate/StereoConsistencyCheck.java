@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,12 +49,12 @@ public class StereoConsistencyCheck {
 	double toleranceY;
 	double toleranceX;
 
-	public StereoConsistencyCheck(double toleranceX, double toleranceY) {
+	public StereoConsistencyCheck( double toleranceX, double toleranceY ) {
 		this.toleranceX = toleranceX;
 		this.toleranceY = toleranceY;
 	}
 
-	public void setCalibration(StereoParameters param) {
+	public void setCalibration( StereoParameters param ) {
 		CameraPinholeBrown left = param.getLeft();
 		CameraPinholeBrown right = param.getRight();
 
@@ -66,7 +66,7 @@ public class StereoConsistencyCheck {
 		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(left, (DMatrixRMaj)null);
 		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(right, (DMatrixRMaj)null);
 
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
+		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
@@ -84,11 +84,11 @@ public class StereoConsistencyCheck {
 	 * @param right Right camera observation in original pixels
 	 * @return true for consistent
 	 */
-	public boolean checkPixel( Point2D_F64 left , Point2D_F64 right ) {
-		leftImageToRect.compute(left.x,left.y,rectLeft);
+	public boolean checkPixel( Point2D_F64 left, Point2D_F64 right ) {
+		leftImageToRect.compute(left.x, left.y, rectLeft);
 		rightImageToRect.compute(right.x, right.y, rectRight);
 
-		return checkRectified(rectLeft,rectRight);
+		return checkRectified(rectLeft, rectRight);
 	}
 
 	/**
@@ -99,9 +99,9 @@ public class StereoConsistencyCheck {
 	 * @param right Right camera observation in rectified pixels
 	 * @return true for consistent
 	 */
-	public boolean checkRectified( Point2D_F64 left , Point2D_F64 right ) {
+	public boolean checkRectified( Point2D_F64 left, Point2D_F64 right ) {
 		// rectifications should make them appear along the same y-coordinate/epipolar line
-		if( Math.abs(left.y - right.y) > toleranceY )
+		if (Math.abs(left.y - right.y) > toleranceY)
 			return false;
 
 		// features in the right camera should appear left of features in the image image

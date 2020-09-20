@@ -30,11 +30,9 @@ import georegression.struct.homography.Homography2D_F64;
  *
  * @param <I> Input image type
  * @param <IT> Internally used image motion model
- *
  * @author Peter Abeles
  */
-public interface ImageMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform>
-{
+public interface ImageMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform> {
 	/**
 	 * Processes and updates the image transform.  The very first image processed will always return
 	 * true and have a transform of no motion.

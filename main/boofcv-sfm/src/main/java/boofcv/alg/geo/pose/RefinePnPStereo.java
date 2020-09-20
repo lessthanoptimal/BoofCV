@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.ddogleg.fitting.modelset.ModelFitter;
  *
  * @author Peter Abeles
  */
-public interface RefinePnPStereo extends ModelFitter<Se3_F64,Stereo2D3D> {
+public interface RefinePnPStereo extends ModelFitter<Se3_F64, Stereo2D3D> {
 
-	public void setLeftToRight( Se3_F64 leftToRight );
+	void setLeftToRight( Se3_F64 leftToRight );
 }

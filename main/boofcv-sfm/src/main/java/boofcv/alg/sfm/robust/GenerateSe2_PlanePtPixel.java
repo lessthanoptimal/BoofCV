@@ -38,18 +38,17 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class GenerateSe2_PlanePtPixel implements
-		ModelGenerator<Se2_F64,PlanePtPixel>
-{
+		ModelGenerator<Se2_F64, PlanePtPixel> {
 	// estimates rigid body motion from two sets of associated points
 	MotionTransformPoint<Se2_F64, Point2D_F64> estimator;
 
 	// code for projection to/from plane
-	private CameraPlaneProjection planeProjection = new CameraPlaneProjection();
+	private final CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	List<Point2D_F64> from = new ArrayList<>();
 	FastQueue<Point2D_F64> to = new FastQueue<>(Point2D_F64::new);
 
-	public GenerateSe2_PlanePtPixel(MotionTransformPoint<Se2_F64, Point2D_F64> estimator) {
+	public GenerateSe2_PlanePtPixel( MotionTransformPoint<Se2_F64, Point2D_F64> estimator ) {
 		this.estimator = estimator;
 	}
 
@@ -59,31 +58,32 @@ public class GenerateSe2_PlanePtPixel implements
 
 	/**
 	 * Specify extrinsic camera properties
+	 *
 	 * @param planeToCamera Transform from plane to camera reference frame
 	 */
-	public void setExtrinsic(Se3_F64 planeToCamera) {
+	public void setExtrinsic( Se3_F64 planeToCamera ) {
 		planeProjection.setPlaneToCamera(planeToCamera, true);
 	}
 
 	@Override
-	public boolean generate(List<PlanePtPixel> dataSet, Se2_F64 keyToCurr) {
+	public boolean generate( List<PlanePtPixel> dataSet, Se2_F64 keyToCurr ) {
 		from.clear();
 		to.reset();
 
-		for( int i = 0; i < dataSet.size(); i++ ) {
+		for (int i = 0; i < dataSet.size(); i++) {
 			PlanePtPixel p = dataSet.get(i);
 
 			Point2D_F64 planeCurr = to.grow();
 
 			// project current observation onto the plane
-			if( planeProjection.normalToPlane(p.normalizedCurr.x, p.normalizedCurr.y, planeCurr) ) {
+			if (planeProjection.normalToPlane(p.normalizedCurr.x, p.normalizedCurr.y, planeCurr)) {
 				from.add(p.getPlaneKey());
 			} else {
 				to.removeTail();
 			}
 		}
 
-		if( !estimator.process(from,to.toList()) )
+		if (!estimator.process(from, to.toList()))
 			return false;
 
 		keyToCurr.set(estimator.getTransformSrcToDst());

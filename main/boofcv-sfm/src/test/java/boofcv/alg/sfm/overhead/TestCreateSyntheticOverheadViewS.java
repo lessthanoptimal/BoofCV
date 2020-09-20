@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestCreateSyntheticOverheadViewS {
 
 	int width = 800;
 	int height = 850;
-	CameraPinholeBrown param = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0.002,0);
+	CameraPinholeBrown param = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0.002, 0);
 
 	int overheadW = 500;
 	int overheadH = 600;
@@ -51,30 +51,29 @@ public class TestCreateSyntheticOverheadViewS {
 	public void checkRender() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
-		cameraToPlane.getT().set(0,-5,0);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
+		cameraToPlane.getT().set(0, -5, 0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		CreateSyntheticOverheadViewS<GrayF32> alg = new CreateSyntheticOverheadViewS<>(interp);
 
-		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
+		alg.configure(param, planeToCamera, centerX, centerY, cellSize, overheadW, overheadH);
 
-		GrayF32 input = new GrayF32(width,height);
-		ImageMiscOps.fill(input,10);
+		GrayF32 input = new GrayF32(width, height);
+		ImageMiscOps.fill(input, 10);
 
-		GrayF32 output = new GrayF32(overheadW,overheadH);
+		GrayF32 output = new GrayF32(overheadW, overheadH);
 
-		alg.process(input,output);
+		alg.process(input, output);
 
 		// check parts that shouldn't be in view
-		assertEquals(0,output.get(0,300),1e-8);
-		assertEquals(0,output.get(5,0),1e-8);
-		assertEquals(0,output.get(5,599),1e-8);
+		assertEquals(0, output.get(0, 300), 1e-8);
+		assertEquals(0, output.get(5, 0), 1e-8);
+		assertEquals(0, output.get(5, 599), 1e-8);
 
 		// check areas that should be in view
-		assertEquals(10,output.get(499,300),1e-8);
+		assertEquals(10, output.get(499, 300), 1e-8);
 	}
-
 }

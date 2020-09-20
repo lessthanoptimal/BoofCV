@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,21 +40,20 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class GenerateScaleTranslateRotate2D
-		implements ModelGenerator<ScaleTranslateRotate2D,AssociatedPair>
-{
-	private Affine2D_F64 affine = new Affine2D_F64();
-	private GenerateAffine2D generateAffine = new GenerateAffine2D();
+		implements ModelGenerator<ScaleTranslateRotate2D, AssociatedPair> {
+	private final Affine2D_F64 affine = new Affine2D_F64();
+	private final GenerateAffine2D generateAffine = new GenerateAffine2D();
 
-	private DMatrixRMaj R = new DMatrixRMaj(2,2);
-	private DMatrixRMaj U = new DMatrixRMaj(2,2);
-	private DMatrixRMaj V = new DMatrixRMaj(2,2);
+	private final DMatrixRMaj R = new DMatrixRMaj(2, 2);
+	private final DMatrixRMaj U = new DMatrixRMaj(2, 2);
+	private final DMatrixRMaj V = new DMatrixRMaj(2, 2);
 
-	private SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(2,2,true,true,true);
+	private final SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(2, 2, true, true, true);
 
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, ScaleTranslateRotate2D output) {
+	public boolean generate( List<AssociatedPair> dataSet, ScaleTranslateRotate2D output ) {
 
-		if( !generateAffine.generate(dataSet,affine) )
+		if (!generateAffine.generate(dataSet, affine))
 			return false;
 
 		R.data[0] = affine.a11;
@@ -62,15 +61,14 @@ public class GenerateScaleTranslateRotate2D
 		R.data[2] = affine.a21;
 		R.data[3] = affine.a22;
 
-
-		if( !svd.decompose(R) )
+		if (!svd.decompose(R))
 			return false;
 
 		// determinant of a rotation matrix is 1.  Assume that scale makes it not one
-		double sv[] = svd.getSingularValues();
-		output.scale = (sv[0]+sv[1])/2.0;
+		double[] sv = svd.getSingularValues();
+		output.scale = (sv[0] + sv[1])/2.0;
 
-		if( output.scale < 0 )
+		if (output.scale < 0)
 			throw new RuntimeException("Handle this case");
 
 		svd.getU(U, false);
@@ -78,22 +76,21 @@ public class GenerateScaleTranslateRotate2D
 
 		CommonOps_DDRM.multTransB(U, V, R);
 
-		if( CommonOps_DDRM.det(R) < 0 ) {
+		if (CommonOps_DDRM.det(R) < 0) {
 			// There are situations where R might not have a determinant of one and is instead
 			// a reflection is returned
-			for( int i = 0; i < 2; i++ )
-				V.set( i, 1, -V.get( i, 1 ) );
+			for (int i = 0; i < 2; i++)
+				V.set(i, 1, -V.get(i, 1));
 			CommonOps_DDRM.mult(U, V, R);
 		}
 
 		// theta = atan2( sin(theta) , cos(theta) )
-		output.theta = Math.atan2( -R.data[1], R.data[0] );
+		output.theta = Math.atan2(-R.data[1], R.data[0]);
 		output.transX = affine.tx;
 		output.transY = affine.ty;
 
 		return true;
 	}
-
 
 	@Override
 	public int getMinimumPoints() {

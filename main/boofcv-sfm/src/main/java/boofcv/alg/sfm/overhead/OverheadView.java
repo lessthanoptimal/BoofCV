@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,6 @@ import boofcv.struct.image.ImageBase;
  * is +y being counter-clock-wise of +x.</li>
  * </ul>
  * </p>
-
  *
  * @author Peter Abeles
  */
@@ -75,7 +74,7 @@ public class OverheadView<T extends ImageBase<T>> {
 	public OverheadView() {
 	}
 
-	public OverheadView(T image, double centerX, double centerY, double cellSize) {
+	public OverheadView( T image, double centerX, double centerY, double cellSize ) {
 		this.image = image;
 		this.centerX = centerX;
 		this.centerY = centerY;
@@ -86,7 +85,7 @@ public class OverheadView<T extends ImageBase<T>> {
 		return image;
 	}
 
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		this.image = image;
 	}
 
@@ -94,7 +93,7 @@ public class OverheadView<T extends ImageBase<T>> {
 		return centerX;
 	}
 
-	public void setCenterX(double centerX) {
+	public void setCenterX( double centerX ) {
 		this.centerX = centerX;
 	}
 
@@ -102,7 +101,7 @@ public class OverheadView<T extends ImageBase<T>> {
 		return centerY;
 	}
 
-	public void setCenterY(double centerY) {
+	public void setCenterY( double centerY ) {
 		this.centerY = centerY;
 	}
 
@@ -110,7 +109,7 @@ public class OverheadView<T extends ImageBase<T>> {
 		return cellSize;
 	}
 
-	public void setCellSize(double cellSize) {
+	public void setCellSize( double cellSize ) {
 		this.cellSize = cellSize;
 	}
 }

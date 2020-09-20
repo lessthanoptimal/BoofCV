@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,16 +36,15 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGenerateSe2_AssociatedPair implements ModelTestingInterface<Se2_F64,AssociatedPair>
-{
+public class TestGenerateSe2_AssociatedPair implements ModelTestingInterface<Se2_F64, AssociatedPair> {
 	Random rand = new Random(234);
 
 	@Test
 	public void modelGenerator() {
-		StandardModelGeneratorTests<Se2_F64,AssociatedPair> alg =
-				new StandardModelGeneratorTests<Se2_F64,AssociatedPair>(this,3) {
+		StandardModelGeneratorTests<Se2_F64, AssociatedPair> alg =
+				new StandardModelGeneratorTests<Se2_F64, AssociatedPair>(this, 3) {
 					@Override
-					public ModelGenerator<Se2_F64,AssociatedPair> createAlg() {
+					public ModelGenerator<Se2_F64, AssociatedPair> createAlg() {
 						MotionTransformPoint<Se2_F64, Point2D_F64> alg = new MotionSe2PointSVD_F64();
 						return new GenerateSe2_AssociatedPair(alg);
 					}
@@ -67,32 +66,31 @@ public class TestGenerateSe2_AssociatedPair implements ModelTestingInterface<Se2
 		double y = rand.nextDouble()*5;
 		double yaw = 2*rand.nextDouble()*Math.PI;
 
-		return new Se2_F64(x,y,yaw);
+		return new Se2_F64(x, y, yaw);
 	}
 
 	@Override
-	public AssociatedPair createRandomPointFromModel(Se2_F64 motion) {
-		Point2D_F64 location = new Point2D_F64(rand.nextGaussian(),rand.nextGaussian());
+	public AssociatedPair createRandomPointFromModel( Se2_F64 motion ) {
+		Point2D_F64 location = new Point2D_F64(rand.nextGaussian(), rand.nextGaussian());
 		Point2D_F64 observation = new Point2D_F64();
 
 		SePointOps_F64.transform(motion, location, observation);
 
-		return new AssociatedPair(location,observation);
+		return new AssociatedPair(location, observation);
 	}
 
 	@Override
-	public boolean doPointsFitModel(Se2_F64 motion, List<AssociatedPair> dataSet) {
+	public boolean doPointsFitModel( Se2_F64 motion, List<AssociatedPair> dataSet ) {
 
 		Point2D_F64 expected = new Point2D_F64();
 
-		for( AssociatedPair p : dataSet ) {
+		for (AssociatedPair p : dataSet) {
 			SePointOps_F64.transform(motion, p.p1, expected);
 
-			if( expected.distance(p.p2) > 0.01 )
+			if (expected.distance(p.p2) > 0.01)
 				return false;
 		}
 
 		return true;
 	}
-
 }

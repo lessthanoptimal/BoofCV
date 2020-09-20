@@ -67,18 +67,11 @@ public class PairwiseImageGraph2 {
 	}
 
 	public static class View {
-		/**
-		 * Unique identifier for this view
-		 */
+		/** Unique identifier for this view */
 		public String id;
-		/**
-		 * Total number of features observations in this view
-		 */
+		/** Total number of features observations in this view */
 		public int totalObservations;
-
-		/**
-		 * List of motions associated with this view. It can be either the src or dst
-		 */
+		/** List of motions associated with this view. It can be either the src or dst */
 		public FastArray<Motion> connections = new FastArray<>(Motion.class);
 
 		void init( String id ) {
@@ -128,15 +121,12 @@ public class PairwiseImageGraph2 {
 	public static class Motion {
 		/** 3x3 matrix describing epipolar geometry. Fundamental, Essential, or Homography */
 		public final DMatrixRMaj F = new DMatrixRMaj(3, 3);
-
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean is3D;
-
 		/** Number of inliers when an 3D model (Fundamental/Essential) was fit to observations. */
 		public int countF;
 		/** Number of inliers when a homography was fit to observations. */
 		public int countH;
-
 		/** Indexes of features in 'src' and 'dst' views which are inliers to the model {@link #F} */
 		public final FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex::new);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,32 +43,32 @@ public class SfmTestHelper {
 	 * @param left location in pixels in left camera
 	 * @param right location in pixels in right camera
 	 */
-	public static void renderPointPixel( StereoParameters param , Point3D_F64 X ,
-										 Point2D_F64 left , Point2D_F64 right ) {
+	public static void renderPointPixel( StereoParameters param, Point3D_F64 X,
+										 Point2D_F64 left, Point2D_F64 right ) {
 		// compute the location of X in the right camera's reference frame
 		Point3D_F64 rightX = new Point3D_F64();
 		SePointOps_F64.transform(param.getRightToLeft().invert(null), X, rightX);
 
 		// location of object in normalized image coordinates
-		Point2D_F64 normLeft = new Point2D_F64(X.x/X.z,X.y/X.z);
-		Point2D_F64 normRight = new Point2D_F64(rightX.x/rightX.z,rightX.y/rightX.z);
+		Point2D_F64 normLeft = new Point2D_F64(X.x/X.z, X.y/X.z);
+		Point2D_F64 normRight = new Point2D_F64(rightX.x/rightX.z, rightX.y/rightX.z);
 
 		// convert into pixel coordinates
-		Point2D_F64 pixelLeft =  PerspectiveOps.convertNormToPixel(param.left, normLeft.x, normLeft.y, null);
-		Point2D_F64 pixelRight =  PerspectiveOps.convertNormToPixel(param.right, normRight.x, normRight.y, null);
+		Point2D_F64 pixelLeft = PerspectiveOps.convertNormToPixel(param.left, normLeft.x, normLeft.y, null);
+		Point2D_F64 pixelRight = PerspectiveOps.convertNormToPixel(param.right, normRight.x, normRight.y, null);
 
 		// take in account lens distortion
-		Point2Transform2_F32 distLeft = LensDistortionFactory.narrow(param.left).distort_F32(true,true);
-		Point2Transform2_F32 distRight = LensDistortionFactory.narrow(param.right).distort_F32(true,true);
+		Point2Transform2_F32 distLeft = LensDistortionFactory.narrow(param.left).distort_F32(true, true);
+		Point2Transform2_F32 distRight = LensDistortionFactory.narrow(param.right).distort_F32(true, true);
 
 		Point2D_F32 lensLeft = new Point2D_F32();
 		Point2D_F32 lensRight = new Point2D_F32();
 
-		distLeft.compute((float)pixelLeft.x,(float)pixelLeft.y,lensLeft);
-		distRight.compute((float)pixelRight.x,(float)pixelRight.y,lensRight);
+		distLeft.compute((float)pixelLeft.x, (float)pixelLeft.y, lensLeft);
+		distRight.compute((float)pixelRight.x, (float)pixelRight.y, lensRight);
 
 		// output solution
-		left.set(lensLeft.x,lensLeft.y);
-		right.set(lensRight.x,lensRight.y);
+		left.set(lensLeft.x, lensLeft.y);
+		right.set(lensRight.x, lensRight.y);
 	}
 }

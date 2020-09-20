@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,15 +49,14 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public interface StereoVisualOdometry<T extends ImageBase<T>> extends VisualOdometry<Se3_F64>
-{
+public interface StereoVisualOdometry<T extends ImageBase<T>> extends VisualOdometry<Se3_F64> {
 	/**
 	 * Specifies intrinsic and extrinsic parameters for the stereo camera system. Can be called
 	 * at any time, but must be called at least once before {@link #process} can be called.
 	 *
 	 * @param parameters stereo calibration
 	 */
-	public void setCalibration( StereoParameters parameters );
+	void setCalibration( StereoParameters parameters );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
@@ -66,13 +65,12 @@ public interface StereoVisualOdometry<T extends ImageBase<T>> extends VisualOdom
 	 *
 	 * @return true if the motion estimate has been updated and false if not
 	 */
-	public boolean process(T leftImage , T rightImage );
+	boolean process( T leftImage, T rightImage );
 
 	/**
 	 * Type of input images it can process.
 	 *
 	 * @return The image type
 	 */
-	public ImageType<T> getImageType();
-
+	ImageType<T> getImageType();
 }

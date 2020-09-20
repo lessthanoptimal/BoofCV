@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,13 +37,13 @@ public class TestDepthSparse3D_to_PixelTo3D {
 
 		assertTrue(alg.process(10, 11));
 
-		assertEquals(10,depthSparse.requestX);
-		assertEquals(11,depthSparse.requestY);
+		assertEquals(10, depthSparse.requestX);
+		assertEquals(11, depthSparse.requestY);
 
-		assertEquals(1,alg.getX(),1e-8);
-		assertEquals(2,alg.getY(),1e-8);
-		assertEquals(3,alg.getZ(),1e-8);
-		assertEquals(1,alg.getW(),1e-8);
+		assertEquals(1, alg.getX(), 1e-8);
+		assertEquals(2, alg.getY(), 1e-8);
+		assertEquals(3, alg.getZ(), 1e-8);
+		assertEquals(1, alg.getW(), 1e-8);
 	}
 
 	public class Dummy extends DepthSparse3D {
@@ -55,7 +55,7 @@ public class TestDepthSparse3D_to_PixelTo3D {
 		}
 
 		@Override
-		public boolean process(int x, int y) {
+		public boolean process( int x, int y ) {
 			this.requestX = x;
 			this.requestY = y;
 
@@ -64,11 +64,11 @@ public class TestDepthSparse3D_to_PixelTo3D {
 
 		@Override
 		public Point3D_F64 getWorldPt() {
-			return new Point3D_F64(1,2,3);
+			return new Point3D_F64(1, 2, 3);
 		}
 
 		@Override
-		protected double lookupDepth(int depthX, int depthY) {
+		protected double lookupDepth( int depthX, int depthY ) {
 			return 0;
 		}
 	}

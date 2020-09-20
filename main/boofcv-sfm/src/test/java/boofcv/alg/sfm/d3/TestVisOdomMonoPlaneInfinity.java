@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class TestVisOdomMonoPlaneInfinity {
 	@Test
 	public void maximizeCountInSpread_nominal() {
 
-		double data[] = new double[23];
+		double[] data = new double[23];
 
 		data[0] = 1;
 		data[1] = 1.1;
@@ -54,14 +54,14 @@ public class TestVisOdomMonoPlaneInfinity {
 		data[12] = 0.01;
 		data[13] = 0.02;
 
-		double found = VisOdomMonoPlaneInfinity.maximizeCountInSpread(data,15,0.5);
-		assertEquals(1.3,found,1e-8);
+		double found = VisOdomMonoPlaneInfinity.maximizeCountInSpread(data, 15, 0.5);
+		assertEquals(1.3, found, 1e-8);
 
-		for( int i = 0; i < data.length; i++ )
+		for (int i = 0; i < data.length; i++)
 			data[i] = -data[i];
 
-		found = VisOdomMonoPlaneInfinity.maximizeCountInSpread(data,15,0.5);
-		assertEquals(-1.3,found,1e-8);
+		found = VisOdomMonoPlaneInfinity.maximizeCountInSpread(data, 15, 0.5);
+		assertEquals(-1.3, found, 1e-8);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class TestVisOdomMonoPlaneInfinity {
 	 */
 	@Test
 	public void maximizeCountInSpread_edge() {
-		double data[] = new double[23];
+		double[] data = new double[23];
 
 		data[0] = 1;
 		data[1] = 1.1;
@@ -82,21 +82,20 @@ public class TestVisOdomMonoPlaneInfinity {
 		data[9] = 2;
 		data[10] = 2.2;
 		data[11] = 2.3;
-		data[12] = -(Math.PI-0.01);
-		data[13] = -(Math.PI-0.02);
-		data[14] = -(Math.PI-0.03);
-		data[15] = -(Math.PI-0.04);
-		data[16] = -(Math.PI-0.05);
-		data[17] = Math.PI-0.01;
-		data[18] = Math.PI-0.02;
-		data[19] = Math.PI-0.03;
-		data[20] = Math.PI-0.04;
-		data[21] = Math.PI-0.05;
+		data[12] = -(Math.PI - 0.01);
+		data[13] = -(Math.PI - 0.02);
+		data[14] = -(Math.PI - 0.03);
+		data[15] = -(Math.PI - 0.04);
+		data[16] = -(Math.PI - 0.05);
+		data[17] = Math.PI - 0.01;
+		data[18] = Math.PI - 0.02;
+		data[19] = Math.PI - 0.03;
+		data[20] = Math.PI - 0.04;
+		data[21] = Math.PI - 0.05;
 		data[22] = Math.PI;
 
 
-
-		double found = VisOdomMonoPlaneInfinity.maximizeCountInSpread(data,23,0.5);
-		assertEquals(Math.PI,found,1e-8);
+		double found = VisOdomMonoPlaneInfinity.maximizeCountInSpread(data, 23, 0.5);
+		assertEquals(Math.PI, found, 1e-8);
 	}
 }

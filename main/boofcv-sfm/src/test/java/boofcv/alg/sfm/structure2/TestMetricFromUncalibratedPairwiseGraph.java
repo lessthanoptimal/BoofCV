@@ -62,7 +62,7 @@ class TestMetricFromUncalibratedPairwiseGraph {
 			// enough info for a good estimate
 			var db = new MockLookupSimilarImagesRealistic().setLoop(false).
 					setIntrinsic(new CameraPinhole(410, 410, 0, 400, 400, 800, 800)).
-					setSeed(numViews).setFeatures(Math.max(400, 50 * numViews)).pathLine(numViews, 0.30, 6.0, 2);
+					setSeed(numViews).setFeatures(Math.max(400, 50*numViews)).pathLine(numViews, 0.30, 6.0, 2);
 			PairwiseImageGraph2 graph = db.createPairwise();
 			assertTrue(alg.process(db, graph));
 			checkReconstruction(alg, db);
@@ -117,9 +117,9 @@ class TestMetricFromUncalibratedPairwiseGraph {
 			for (int i = 0; i < inlierToSeed.size; i++) {
 				inliers.add(inlierToSeed.get(i) + 1 + otherIdx);
 			}
-			dimensions.add( new ImageDimension(800,800));
+			dimensions.add(new ImageDimension(800, 800));
 		}
-		dimensions.add( new ImageDimension(800,800));
+		dimensions.add(new ImageDimension(800, 800));
 
 		// Create some arbitrary metric results that should be saved
 		var results = new MetricCameras();
@@ -164,7 +164,7 @@ class TestMetricFromUncalibratedPairwiseGraph {
 			for (int checkIdx = 0; checkIdx < viewIds.size(); checkIdx++) {
 				final int c = checkIdx;
 				GrowQueue_I32 obs = wview.inliers.observations.get(checkIdx);
-				obs.forIdx(( i, value ) -> assertEquals(i * 2 + 1 + c, value));
+				obs.forIdx(( i, value ) -> assertEquals(i*2 + 1 + c, value));
 			}
 		});
 	}

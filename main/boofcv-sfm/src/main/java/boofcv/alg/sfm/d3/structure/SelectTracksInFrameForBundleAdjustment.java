@@ -42,25 +42,25 @@ public class SelectTracksInFrameForBundleAdjustment {
 	public final ConfigGridUniform configUniform = new ConfigGridUniform();
 
 	/** maximum number of features per frame that can be used */
-	public int maxFeaturesPerFrame=1; // give it a horrible initial value
+	public int maxFeaturesPerFrame = 1; // give it a horrible initial value
 
 	/** The minimum number of observations to process */
 	public int minTrackObservations = 3;
 
 	// grid cells. Stored in row major format
-	ImageGrid<Info> grid = new ImageGrid<>(Info::new,Info::reset);
+	ImageGrid<Info> grid = new ImageGrid<>(Info::new, Info::reset);
 
-	public SelectTracksInFrameForBundleAdjustment(long randSeed ) {
+	public SelectTracksInFrameForBundleAdjustment( long randSeed ) {
 		rand = new Random(randSeed);
 	}
 
 	/**
 	 * Selects tracks to include in bundle adjustment
+	 *
 	 * @param sba The scene graph
 	 * @param selected (Output) list of selected tracks
 	 */
-	public void selectTracks(VisOdomBundleAdjustment<?> sba, List<BTrack> selected )
-	{
+	public void selectTracks( VisOdomBundleAdjustment<?> sba, List<BTrack> selected ) {
 		// Initialize data structures
 		selected.clear();
 
@@ -71,14 +71,14 @@ public class SelectTracksInFrameForBundleAdjustment {
 
 		// skip degenerate situation
 		FastQueue<BFrame> frames = sba.frames;
-		if( frames.size < 1 )
+		if (frames.size < 1)
 			return;
 
-		if( maxFeaturesPerFrame <= 0 ) {
+		if (maxFeaturesPerFrame <= 0) {
 			// handle the case where it's unlimited differently
 			for (int trackIdx = 0; trackIdx < sba.tracks.size; trackIdx++) {
 				BTrack track = sba.tracks.get(trackIdx);
-				if( track.observations.size >= minTrackObservations ) {
+				if (track.observations.size >= minTrackObservations) {
 					track.selected = true;
 					selected.add(track);
 				}
@@ -95,15 +95,14 @@ public class SelectTracksInFrameForBundleAdjustment {
 	 * Select tracks inside a single frame. All tracks which have previously been selected are automatically selected
 	 * again and count towards the max per frame
 	 */
-	protected void selectTracksInFrame(BFrame frame, List<BTrack> selected)
-	{
+	protected void selectTracksInFrame( BFrame frame, List<BTrack> selected ) {
 		// Get the size of an image from the camera
 		int imageWidth = frame.camera.original.width;
 		int imageHeight = frame.camera.original.height;
 
 		// This is the length of a side in the square grid that's to be selected
 		// designed to avoid divide by zero error and have larger cells when fewer features are requested
-		int targetSize = configUniform.selectTargetCellSize(maxFeaturesPerFrame,imageWidth, imageHeight);
+		int targetSize = configUniform.selectTargetCellSize(maxFeaturesPerFrame, imageWidth, imageHeight);
 
 		// Fill each grid cell with tracks that are inside of it
 		initializeGrid(frame, imageWidth, imageHeight, targetSize);
@@ -118,18 +117,18 @@ public class SelectTracksInFrameForBundleAdjustment {
 	 *
 	 * @param targetLength See {@link ImageGrid#initialize(int, int, int)}
 	 */
-	void initializeGrid(BFrame frame, int imageWidth, int imageHeight, int targetLength) {
-		grid.initialize(targetLength,imageWidth, imageHeight);
+	void initializeGrid( BFrame frame, int imageWidth, int imageHeight, int targetLength ) {
+		grid.initialize(targetLength, imageWidth, imageHeight);
 		final FastArray<BTrack> tracks = frame.tracks;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack bt = tracks.get(trackIdx);
 			VisOdomBundleAdjustment.BObservation o = bt.findObservationBy(frame);
-			if( o == null ) // TODO Running mono-klt generated this exception with r=1
+			if (o == null) // TODO Running mono-klt generated this exception with r=1
 				throw new RuntimeException("BUG! track in frame not observed by frame");
 			Info cell = grid.getCellAtPixel((int)o.pixel.x, (int)o.pixel.y);
-			if( bt.selected )
+			if (bt.selected)
 				cell.alreadySelected++;
-			else if( bt.observations.size >= minTrackObservations )
+			else if (bt.observations.size >= minTrackObservations)
 				cell.unselected.add(bt);
 		}
 	}
@@ -138,25 +137,25 @@ public class SelectTracksInFrameForBundleAdjustment {
 	 * Selects new tracks such that it is uniform across the image. This takes in account the location of already
 	 * selected tracks.
 	 */
-	void selectNewTracks(List<BTrack> selected) {
+	void selectNewTracks( List<BTrack> selected ) {
 		int total = 0;
 
 		// Go through each grid cell one at a time and add a feature if there are any remaining
 		// this will result in a more even distribution.
-		while( true ) {
+		while (true) {
 			int before = total;
 			for (int cellIdx = 0; cellIdx < grid.cells.size && total < maxFeaturesPerFrame; cellIdx++) {
 				Info cell = grid.cells.data[cellIdx];
 
 				// See if there are remaining points that have already been selected. If so count that as a selection
 				// and move on
-				if( cell.alreadySelected > 0 ) {
+				if (cell.alreadySelected > 0) {
 					cell.alreadySelected--;
 					total++;
 					continue;
 				}
 				// nothing to select
-				if( cell.unselected.isEmpty() )
+				if (cell.unselected.isEmpty())
 					continue;
 
 				// Randomly select one of the available. Could probably do better but this is reasonable and "unbiased"
@@ -167,7 +166,7 @@ public class SelectTracksInFrameForBundleAdjustment {
 				total++;
 			}
 			// See if exit condition has been meet
-			if( before == total || total >= maxFeaturesPerFrame)
+			if (before == total || total >= maxFeaturesPerFrame)
 				break;
 		}
 	}
@@ -175,8 +174,7 @@ public class SelectTracksInFrameForBundleAdjustment {
 	/**
 	 * Info for each cell
 	 */
-	static class Info
-	{
+	static class Info {
 		// counter for tracks which were selected in a previous frame
 		public int alreadySelected = 0;
 		// list of tracks which have not been selected yet

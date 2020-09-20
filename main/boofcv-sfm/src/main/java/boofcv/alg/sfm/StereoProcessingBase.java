@@ -45,8 +45,8 @@ import org.ejml.ops.ConvertMatrixData;
 public class StereoProcessingBase<T extends ImageGray<T>> {
 
 	// applied rectification to input images
-	private ImageDistort<T,T> distortLeftRect;
-	private ImageDistort<T,T> distortRightRect;
+	private ImageDistort<T, T> distortLeftRect;
+	private ImageDistort<T, T> distortRightRect;
 
 	// references to input images
 	private T imageLeftInput;
@@ -74,7 +74,7 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	protected double baseline;
 	// intrinsic parameters for rectified camera
 	// skew is always set to zero in rectified camera
-	protected double cx,cy,fx,fy;
+	protected double cx, cy, fx, fy;
 
 	/**
 	 * Declares internal data structures
@@ -84,8 +84,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	public StereoProcessingBase( Class<T> imageType ) {
 
 		// pre-declare input images
-		imageLeftRect = GeneralizedImageOps.createSingleBand(imageType, 1,1);
-		imageRightRect = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		imageLeftRect = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		imageRightRect = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	 *
 	 * @param stereoParam stereo parameters
 	 */
-	public void setCalibration(StereoParameters stereoParam) {
+	public void setCalibration( StereoParameters stereoParam ) {
 		CameraPinholeBrown left = stereoParam.getLeft();
 		CameraPinholeBrown right = stereoParam.getRight();
 
@@ -109,7 +109,7 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(left, (DMatrixRMaj)null);
 		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(right, (DMatrixRMaj)null);
 
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
+		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
 		rect1 = rectifyAlg.getRect1();
@@ -118,11 +118,11 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();
 
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3);
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
 
-		ConvertMatrixData.convert(rect1,rect1_F32);
-		ConvertMatrixData.convert(rect2,rect2_F32);
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		ImageType<T> imageType = imageLeftRect.getImageType();
 		distortLeftRect = RectifyDistortImageOps.rectifyImage(stereoParam.left, rect1_F32, BorderType.SKIP, imageType);
@@ -130,10 +130,10 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 
 		// Compute parameters that are needed when converting to 3D
 		baseline = stereoParam.getBaseline();
-		fx = rectK.get(0,0);
-		fy = rectK.get(1,1);
-		cx = rectK.get(0,2);
-		cy = rectK.get(1,2);
+		fx = rectK.get(0, 0);
+		fy = rectK.get(1, 1);
+		cx = rectK.get(0, 2);
+		cy = rectK.get(1, 2);
 	}
 
 	/**
@@ -145,14 +145,14 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	 * @param y y-coordinate of pixel in rectified left image
 	 * @param pointLeft Storage for 3D coordinate of point in homogeneous coordinates.  w = disparity
 	 */
-	public void computeHomo3D(double x, double y, Point3D_F64 pointLeft) {
+	public void computeHomo3D( double x, double y, Point3D_F64 pointLeft ) {
 		// Coordinate in rectified camera frame
 		pointRect.z = baseline*fx;
 		pointRect.x = pointRect.z*(x - cx)/fx;
 		pointRect.y = pointRect.z*(y - cy)/fy;
 
 		// rotate into the original left camera frame
-		GeometryMath_F64.multTran(rectR,pointRect,pointLeft);
+		GeometryMath_F64.multTran(rectR, pointRect, pointLeft);
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	 * @param leftImage Left image
 	 * @param rightImage Right image
 	 */
-	public void setImages( T leftImage , T rightImage ) {
+	public void setImages( T leftImage, T rightImage ) {
 		this.imageLeftInput = leftImage;
 		this.imageRightInput = rightImage;
 

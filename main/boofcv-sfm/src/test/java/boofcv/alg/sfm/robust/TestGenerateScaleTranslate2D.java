@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestGenerateScaleTranslate2D {
 	@Test
 	public void perfect() {
-		ScaleTranslate2D model = new ScaleTranslate2D(1.5,-2,3);
+		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
 		AssociatedPair a = TestDistanceScaleTranslate2DSq.apply(-5, 4, model);
-		AssociatedPair b = TestDistanceScaleTranslate2DSq.apply(2,3,model);
+		AssociatedPair b = TestDistanceScaleTranslate2DSq.apply(2, 3, model);
 
 		List<AssociatedPair> obs = new ArrayList<>();
 		obs.add(a);
@@ -44,7 +44,7 @@ public class TestGenerateScaleTranslate2D {
 
 		ScaleTranslate2D found = new ScaleTranslate2D();
 		GenerateScaleTranslate2D alg = new GenerateScaleTranslate2D();
-		assertTrue(alg.generate(obs,found));
+		assertTrue(alg.generate(obs, found));
 
 		assertEquals(model.transX, found.transX, 1e-8);
 		assertEquals(model.transY, found.transY, 1e-8);
@@ -56,10 +56,10 @@ public class TestGenerateScaleTranslate2D {
 	 */
 	@Test
 	public void pathological_noscale() {
-		ScaleTranslate2D model = new ScaleTranslate2D(1.5,-2,3);
+		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
 		AssociatedPair a = TestDistanceScaleTranslate2DSq.apply(0, 0, model);
-		AssociatedPair b = TestDistanceScaleTranslate2DSq.apply(0,0,model);
+		AssociatedPair b = TestDistanceScaleTranslate2DSq.apply(0, 0, model);
 
 		List<AssociatedPair> obs = new ArrayList<>();
 		obs.add(a);
@@ -75,10 +75,10 @@ public class TestGenerateScaleTranslate2D {
 	 */
 	@Test
 	public void onePointAtZero_a() {
-		ScaleTranslate2D model = new ScaleTranslate2D(1.5,-2,3);
+		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);
 
 		AssociatedPair a = TestDistanceScaleTranslate2DSq.apply(0, 0, model);
-		AssociatedPair b = TestDistanceScaleTranslate2DSq.apply(2,3,model);
+		AssociatedPair b = TestDistanceScaleTranslate2DSq.apply(2, 3, model);
 
 		List<AssociatedPair> obs = new ArrayList<>();
 		obs.add(a);
@@ -86,7 +86,7 @@ public class TestGenerateScaleTranslate2D {
 
 		ScaleTranslate2D found = new ScaleTranslate2D();
 		GenerateScaleTranslate2D alg = new GenerateScaleTranslate2D();
-		assertTrue(alg.generate(obs,found));
+		assertTrue(alg.generate(obs, found));
 
 		assertEquals(model.transX, found.transX, 1e-8);
 		assertEquals(model.transY, found.transY, 1e-8);
@@ -96,6 +96,6 @@ public class TestGenerateScaleTranslate2D {
 	@Test
 	public void getMinimumPoints() {
 		GenerateScaleTranslate2D alg = new GenerateScaleTranslate2D();
-		assertEquals(2,alg.getMinimumPoints());
+		assertEquals(2, alg.getMinimumPoints());
 	}
 }

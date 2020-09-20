@@ -46,11 +46,11 @@ public interface VisOdomKeyFrameManager extends VerbosePrint {
 	 * @param sba scene graph
 	 * @return Returns a list of frames to discard. They are in sequential order from least to greatest.
 	 */
-	GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int limit, int newFrames,
-										 VisOdomBundleAdjustment<?> sba);
+	GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker, int limit, int newFrames,
+										 VisOdomBundleAdjustment<?> sba );
 
 	/**
 	 * After the current frame becomes a keyframe new tracks are spawned from it. This passes in that new information
 	 */
-	void handleSpawnedTracks( PointTracker<?> tracker , BCamera camera  );
+	void handleSpawnedTracks( PointTracker<?> tracker, BCamera camera );
 }

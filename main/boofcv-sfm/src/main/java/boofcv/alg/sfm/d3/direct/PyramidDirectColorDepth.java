@@ -41,10 +41,10 @@ import lombok.Getter;
  */
 public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
-	private ImageType<Planar<T>> imageType;
+	private final ImageType<Planar<T>> imageType;
 
-	private ImagePyramid<Planar<T>> pyramid;
-	private VisOdomDirectColorDepth<T,?>[] layersOdom;
+	private final ImagePyramid<Planar<T>> pyramid;
+	private VisOdomDirectColorDepth<T, ?>[] layersOdom;
 
 	// When the diversity of the image drops below this fraction of the key frame create a new keyframe
 	private double diversityThreshold = 0.75;
@@ -54,32 +54,31 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 	// number of pixels which were valid in the last layer processed
 	private double fractionInBounds = 0;
 
-	private LayerTo3D layerTo3D;
+	private final LayerTo3D layerTo3D;
 
-	private Se3_F32 worldToKey = new Se3_F32();
-	private Se3_F32 keyToCurrent = new Se3_F32();
-	private Se3_F32 work = new Se3_F32();
-	private Se3_F32 worldToCurrent = new Se3_F32();
+	private final Se3_F32 worldToKey = new Se3_F32();
+	private final Se3_F32 keyToCurrent = new Se3_F32();
+	private final Se3_F32 work = new Se3_F32();
+	private final Se3_F32 worldToCurrent = new Se3_F32();
 
 	/** Unique ID for each frame in the sequence it has processed */
-	private @Getter long frameID=-1;
+	private @Getter long frameID = -1;
 
-	public PyramidDirectColorDepth(ImagePyramid<Planar<T>> pyramid ) {
+	public PyramidDirectColorDepth( ImagePyramid<Planar<T>> pyramid ) {
 		this.pyramid = pyramid;
 		imageType = this.pyramid.getImageType();
 
 		layerTo3D = new LayerTo3D();
 	}
 
-	public void setCameraParameters(float fx , float fy ,
-									float cx , float cy ,
-									int width , int height )
-	{
+	public void setCameraParameters( float fx, float fy,
+									 float cx, float cy,
+									 int width, int height ) {
 		pyramid.initialize(width, height);
 		layersOdom = new VisOdomDirectColorDepth[pyramid.getNumLayers()];
 		for (int i = 0; i < layersOdom.length; i++) {
-			ImageType derivType = GImageDerivativeOps.getDerivativeType( imageType );
-			layersOdom[i] = new VisOdomDirectColorDepth(imageType.getNumBands(),imageType.getImageClass(), derivType.getImageClass());
+			ImageType derivType = GImageDerivativeOps.getDerivativeType(imageType);
+			layersOdom[i] = new VisOdomDirectColorDepth(imageType.getNumBands(), imageType.getImageClass(), derivType.getImageClass());
 		}
 		for (int layer = 0; layer < layersOdom.length; layer++) {
 			VisOdomDirectColorDepth o = layersOdom[layer];
@@ -89,37 +88,37 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
 			float scale = (float)pyramid.getScale(layer);
 
-			o.setCameraParameters(fx/scale,fy/scale,cx/scale,cy/scale,
+			o.setCameraParameters(fx/scale, fy/scale, cx/scale, cy/scale,
 					layerWidth, layerHeight);
 		}
 	}
 
-	public boolean process( Planar<T> input , ImagePixelTo3D inputDepth ) {
+	public boolean process( Planar<T> input, ImagePixelTo3D inputDepth ) {
 		pyramid.process(input);
 
 		frameID++;
-		if( fractionInBounds == 0 ) {
-			setKeyFrame( inputDepth );
+		if (fractionInBounds == 0) {
+			setKeyFrame(inputDepth);
 			fractionInBounds = 1.0;
 		} else {
-			if( estimateMotion() ) {
+			if (estimateMotion()) {
 				boolean keyframeTriggered = false;
 
 //				System.out.printf("   d %6.2f  f %6.2f\n",UtilAngle.degree(diversity),fractionInBounds);
 
 //				System.out.println("  spartial density "+(diversity*fractionInBounds));
-				if( diversity < keyframeDiversity*diversityThreshold) {
+				if (diversity < keyframeDiversity*diversityThreshold) {
 //					System.out.println("  triggerd by diversity "+ UtilAngle.degree(diversity)+" deg");
 					keyframeTriggered = true;
 				}
 
-				if( fractionInBounds < 0.5 ) {
+				if (fractionInBounds < 0.5) {
 //					System.out.println("  triggerd by fraction "+ fractionInBounds);
 					keyframeTriggered = true;
 				}
 
-				if( keyframeTriggered ) {
-					setKeyFrame( inputDepth );
+				if (keyframeTriggered) {
+					setKeyFrame(inputDepth);
 				}
 			} else {
 				return false;
@@ -129,32 +128,32 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		return true;
 	}
 
-	protected void setKeyFrame( ImagePixelTo3D inputDepth) {
+	protected void setKeyFrame( ImagePixelTo3D inputDepth ) {
 		layerTo3D.wrap(inputDepth);
 
 		for (int layer = 0; layer < layersOdom.length; layer++) {
 			Planar<T> layerImage = pyramid.getLayer(layer);
 			layerTo3D.scale = pyramid.getScale(layer);
-			layersOdom[layer].setKeyFrame(layerImage,layerTo3D);
+			layersOdom[layer].setKeyFrame(layerImage, layerTo3D);
 		}
-		worldToKey.concat(keyToCurrent,work);
+		worldToKey.concat(keyToCurrent, work);
 		worldToKey.set(work);
 		keyToCurrent.reset();
 
-		keyframeDiversity = layersOdom[layersOdom.length-1].computeFeatureDiversity(keyToCurrent);
+		keyframeDiversity = layersOdom[layersOdom.length - 1].computeFeatureDiversity(keyToCurrent);
 	}
 
 	protected boolean estimateMotion() {
 		work.set(keyToCurrent);
 
 		boolean oneLayerWorked = false;
-		for (int layer = layersOdom.length-1; layer >= 0; layer--) {
+		for (int layer = layersOdom.length - 1; layer >= 0; layer--) {
 //			System.out.println("Layer   "+layer);
 			Planar<T> layerImage = pyramid.getLayer(layer);
-			VisOdomDirectColorDepth<T,?> o = layersOdom[layer];
-			if( o.estimateMotion(layerImage, work) ) {
+			VisOdomDirectColorDepth<T, ?> o = layersOdom[layer];
+			if (o.estimateMotion(layerImage, work)) {
 				oneLayerWorked = true;
-				work.set( o.getKeyToCurrent() );
+				work.set(o.getKeyToCurrent());
 //				work.print();
 
 				fractionInBounds = o.getInboundsPixels()/(double)o.getKeyframePixels();
@@ -165,12 +164,12 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			}
 		}
 
-		if( oneLayerWorked ) {
+		if (oneLayerWorked) {
 			keyToCurrent.set(work);
-			worldToKey.concat(keyToCurrent,worldToCurrent);
+			worldToKey.concat(keyToCurrent, worldToCurrent);
 
 			// compute diversity in the smallest image.  Should be about the same in all the layers
-			diversity = layersOdom[layersOdom.length-1].computeFeatureDiversity(keyToCurrent);
+			diversity = layersOdom[layersOdom.length - 1].computeFeatureDiversity(keyToCurrent);
 		}
 
 		return oneLayerWorked;
@@ -194,7 +193,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		worldToCurrent.reset();
 	}
 
-	public void setDiversityThreshold(double diversityThreshold) {
+	public void setDiversityThreshold( double diversityThreshold ) {
 		this.diversityThreshold = diversityThreshold;
 	}
 
@@ -207,13 +206,13 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
 		public double scale;
 
-		public void wrap(ImagePixelTo3D orig) {
+		public void wrap( ImagePixelTo3D orig ) {
 			this.orig = orig;
 		}
 
 		@Override
-		public boolean process(double x, double y) {
-			return orig.process((x+0.5)*scale, (y+0.5)*scale);
+		public boolean process( double x, double y ) {
+			return orig.process((x + 0.5)*scale, (y + 0.5)*scale);
 		}
 
 		@Override
@@ -236,5 +235,4 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			return orig.getW();
 		}
 	}
-
 }

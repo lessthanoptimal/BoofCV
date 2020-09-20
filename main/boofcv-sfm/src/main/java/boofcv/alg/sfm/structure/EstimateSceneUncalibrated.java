@@ -50,8 +50,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class EstimateSceneUncalibrated
-	implements EstimateSceneStructure<SceneStructureProjective>
-{
+		implements EstimateSceneStructure<SceneStructureProjective> {
 
 	BundleAdjustment<SceneStructureProjective> sba =
 			FactoryMultiView.bundleSparseProjective(null);
@@ -65,7 +64,7 @@ public class EstimateSceneUncalibrated
 	PairwiseImageGraph graph;
 
 	Estimate1ofEpipolar computeH = FactoryMultiView.homographyDLT(true);
-	RefineEpipolar refineH = FactoryMultiView.homographyRefine(1e-6,5, EpipolarError.SAMPSON);
+	RefineEpipolar refineH = FactoryMultiView.homographyRefine(1e-6, 5, EpipolarError.SAMPSON);
 	FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 	GrowQueue_F64 errors = new GrowQueue_F64();
 
@@ -77,7 +76,7 @@ public class EstimateSceneUncalibrated
 	boolean stopRequested;
 
 	@Override
-	public boolean process(PairwiseImageGraph graph ) {
+	public boolean process( PairwiseImageGraph graph ) {
 		this.graph = graph;
 		this.stopRequested = false;
 
@@ -89,32 +88,32 @@ public class EstimateSceneUncalibrated
 			views.grow().initialize(v);
 		}
 
-		for( String cameraName : graph.cameras.keySet() ) {
+		for (String cameraName : graph.cameras.keySet()) {
 
 			Camera camera = graph.cameras.get(cameraName);
 
 			// List all motions which belong to this camera and only this camera
-			List<Motion> open = graph.findCameraMotions(camera,null);
+			List<Motion> open = graph.findCameraMotions(camera, null);
 
-			if( open.isEmpty() )
+			if (open.isEmpty())
 				continue;
 
 			// Compute how good each view is for triangulation
 			scores.resize(open.size());
 			for (int i = 0; i < open.size(); i++) {
-				scores.data[i] = scoreForTriangulation( open.get(i) );
+				scores.data[i] = scoreForTriangulation(open.get(i));
 			}
 
 			// Select the edge with the best geometry and initialize structure
 			int bestIndex = scores.indexOfGreatest();
-			if( !initializeStructure(open.get(bestIndex)))
+			if (!initializeStructure(open.get(bestIndex)))
 				throw new RuntimeException("Failed?!?");
 			scores.data[bestIndex] = -1; // mark it so that it isn't selected again
 
 			// Add all the other connected views
-			while( open.size() > 0 ) {
+			while (open.size() > 0) {
 				Motion next = selectNextMotion(open);
-				if( next == null )
+				if (next == null)
 					break;
 
 				// mark so that it isn't selected again
@@ -144,22 +143,22 @@ public class EstimateSceneUncalibrated
 
 	}
 
-	Motion selectNextMotion(List<Motion> motions ) {
+	Motion selectNextMotion( List<Motion> motions ) {
 		double best = 0;
 		Motion selected = null;
 
 		for (int i = 0; i < motions.size(); i++) {
-			if( scores.data[i] <= 0 )
+			if (scores.data[i] <= 0)
 				continue;
 
 			Motion v = motions.get(i);
-			ProjectiveView viewA = views.get( v.viewSrc.index );
-			ProjectiveView viewB = views.get( v.viewDst.index );
+			ProjectiveView viewA = views.get(v.viewSrc.index);
+			ProjectiveView viewB = views.get(v.viewDst.index);
 
 			// TODO consider the number of already triangulated features?
 
-			if( viewA.estimated || viewB.estimated ) {
-				if( scores.data[i] > best ) {
+			if (viewA.estimated || viewB.estimated) {
+				if (scores.data[i] > best) {
 					best = scores.data[i];
 					selected = v;
 				}
@@ -169,9 +168,7 @@ public class EstimateSceneUncalibrated
 		return selected;
 	}
 
-
-	boolean initializeStructure( Motion selected )
-	{
+	boolean initializeStructure( Motion selected ) {
 		ProjectiveView viewA = views.get(selected.viewSrc.index);
 		ProjectiveView viewB = views.get(selected.viewDst.index);
 
@@ -189,16 +186,16 @@ public class EstimateSceneUncalibrated
 		for (int i = 0; i < selected.associated.size(); i++) {
 			AssociatedIndex ai = selected.associated.get(i);
 
-			if( !triangulator.triangulate(
+			if (!triangulator.triangulate(
 					viewA.view.observationPixels.get(ai.src),
-					viewB.view.observationPixels.get(ai.dst),viewA.P,viewB.P,
-					X) ) {
+					viewB.view.observationPixels.get(ai.dst), viewA.P, viewB.P,
+					X)) {
 				continue;
 			}
 
 			Feature3D f3 = new Feature3D();
-			f3.obsIdx.add( ai.src );
-			f3.obsIdx.add( ai.dst );
+			f3.obsIdx.add(ai.src);
+			f3.obsIdx.add(ai.dst);
 			f3.views.add(viewA);
 			f3.views.add(viewB);
 			f3.worldPt.set(X);
@@ -212,11 +209,12 @@ public class EstimateSceneUncalibrated
 	 * Compute score to decide which motion to initialize structure from. A homography is fit to the
 	 * observations and the error compute. The homography should be a poor fit if the scene had 3D structure.
 	 * The 50% homography error is then scaled by the number of pairs to bias the score good matches
+	 *
 	 * @param motion input
 	 * @return fit score. Larger is better.
 	 */
 	double scoreForTriangulation( Motion motion ) {
-		DMatrixRMaj H = new DMatrixRMaj(3,3);
+		DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
 		View viewA = motion.viewSrc;
 		View viewB = motion.viewDst;
@@ -230,19 +228,19 @@ public class EstimateSceneUncalibrated
 					viewB.observationPixels.get(ai.dst));
 		}
 
-		if(!computeH.process(pairs.toList(),H))
+		if (!computeH.process(pairs.toList(), H))
 			return -1;
 
 		// remove bias from linear model
-		if( !refineH.fitModel(pairs.toList(),H,H) )
+		if (!refineH.fitModel(pairs.toList(), H, H))
 			return -1;
 
 
 		// Compute 50% errors to avoid bias from outliers
-		MultiViewOps.errorsHomographySymm(pairs.toList(),H,null,errors);
+		MultiViewOps.errorsHomographySymm(pairs.toList(), H, null, errors);
 		errors.sort();
 
-		return errors.getFraction(0.5)*Math.max(5,pairs.size-20);
+		return errors.getFraction(0.5)*Math.max(5, pairs.size - 20);
 	}
 
 	@Override
@@ -255,7 +253,7 @@ public class EstimateSceneUncalibrated
 		return stopRequested;
 	}
 
-	public void setVerbose(PrintStream verbose) {
+	public void setVerbose( PrintStream verbose ) {
 		this.verbose = verbose;
 	}
 
@@ -264,8 +262,7 @@ public class EstimateSceneUncalibrated
 		public View view;
 		public boolean estimated;
 
-		public void initialize( View view )
-		{
+		public void initialize( View view ) {
 			CommonOps_DDRM.setIdentity(P);
 			this.view = view;
 			this.estimated = false;

@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestAssociateStereo2D {
 
-
 	Se3_F64 leftToRight;
 	StereoParameters param;
 
@@ -49,26 +48,24 @@ public class TestAssociateStereo2D {
 	Point2D_F64 rightP = new Point2D_F64();
 	FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64::new);
 	FastQueue<Point2D_F64> pointsRight = new FastQueue<>(Point2D_F64::new);
-	FastQueue<TupleDesc_F64> descLeft,descRight;
-
+	FastQueue<TupleDesc_F64> descLeft, descRight;
 
 	ScoreAssociateEuclidean_F64 scorer = new ScoreAssociateEuclidean_F64();
-
 
 	@BeforeEach
 	public void setup() {
 		leftToRight = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01, -0.001, 0.005, leftToRight.getR());
-		leftToRight.getT().set(-0.1,0,0);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, -0.001, 0.005, leftToRight.getR());
+		leftToRight.getT().set(-0.1, 0, 0);
 
 		param = new StereoParameters();
 		param.right_to_left = leftToRight.invert(null);
 
-		param.left = new CameraPinholeBrown(400,500,0.1,160,120,320,240).fsetRadial(0,0);
-		param.right = new CameraPinholeBrown(380,505,0.05,165,115,320,240).fsetRadial(0,0);
+		param.left = new CameraPinholeBrown(400, 500, 0.1, 160, 120, 320, 240).fsetRadial(0, 0);
+		param.right = new CameraPinholeBrown(380, 505, 0.05, 165, 115, 320, 240).fsetRadial(0, 0);
 
-		descLeft = new FastQueue<>(()->new TupleDesc_F64(10));
-		descRight = new FastQueue<>(()->new TupleDesc_F64(10));
+		descLeft = new FastQueue<>(() -> new TupleDesc_F64(10));
+		descRight = new FastQueue<>(() -> new TupleDesc_F64(10));
 
 		pointsLeft.reset();
 		pointsRight.reset();
@@ -79,24 +76,25 @@ public class TestAssociateStereo2D {
 	 */
 	@Test
 	public void positive() {
-		Point3D_F64 X = new Point3D_F64(0.02,-0.5,3);
+		Point3D_F64 X = new Point3D_F64(0.02, -0.5, 3);
 
 		SfmTestHelper.renderPointPixel(param, X, leftP, rightP);
 		pointsLeft.grow().set(leftP);
 		pointsRight.grow().set(rightP);
 
-		descLeft.grow();descRight.grow();
+		descLeft.grow();
+		descRight.grow();
 
 		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
 
 		alg.setCalibration(param);
 
-		alg.setSource(pointsLeft,descLeft);
+		alg.setSource(pointsLeft, descLeft);
 		alg.setDestination(pointsRight, descRight);
 
 		alg.associate();
 
-		FastQueue<AssociatedIndex> matches =  alg.getMatches();
+		FastQueue<AssociatedIndex> matches = alg.getMatches();
 
 		assertEquals(1, matches.size);
 	}
@@ -108,9 +106,9 @@ public class TestAssociateStereo2D {
 	public void constraintX() {
 		// zap the rotation so that no adjustment should need to be done
 		CommonOps_DDRM.setIdentity(param.right_to_left.getR());
-		Point3D_F64 X = new Point3D_F64(0.02,-0.5,3);
+		Point3D_F64 X = new Point3D_F64(0.02, -0.5, 3);
 
-		SfmTestHelper.renderPointPixel(param,X,leftP,rightP);
+		SfmTestHelper.renderPointPixel(param, X, leftP, rightP);
 
 		// mangle the x-axis
 		leftP.x = rightP.x - 0.25;
@@ -118,27 +116,28 @@ public class TestAssociateStereo2D {
 		pointsLeft.grow().set(leftP);
 		pointsRight.grow().set(rightP);
 
-		descLeft.grow();descRight.grow();
+		descLeft.grow();
+		descRight.grow();
 
 		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
 
 		alg.setCalibration(param);
 
-		alg.setSource(pointsLeft,descLeft);
+		alg.setSource(pointsLeft, descLeft);
 		alg.setDestination(pointsRight, descRight);
 
 		alg.associate();
 
 		// at the current tolerance they should still match
-		assertEquals(1,alg.getMatches().size);
+		assertEquals(1, alg.getMatches().size);
 
 		// make the tolerance tighter
 		alg = new AssociateStereo2D<>(scorer, 0.01, TupleDesc_F64.class);
 		alg.setCalibration(param);
-		alg.setSource(pointsLeft,descLeft);
+		alg.setSource(pointsLeft, descLeft);
 		alg.setDestination(pointsRight, descRight);
 		alg.associate();
-		assertEquals(0,alg.getMatches().size);
+		assertEquals(0, alg.getMatches().size);
 	}
 
 	/**
@@ -147,9 +146,9 @@ public class TestAssociateStereo2D {
 	@Test
 	public void constraintY() {
 		// zap the rotation so that no adjustment should need to be done
-		Point3D_F64 X = new Point3D_F64(0.02,-0.5,3);
+		Point3D_F64 X = new Point3D_F64(0.02, -0.5, 3);
 
-		SfmTestHelper.renderPointPixel(param,X,leftP,rightP);
+		SfmTestHelper.renderPointPixel(param, X, leftP, rightP);
 
 		// mangle the y-axis
 		leftP.y += 0.25;
@@ -157,26 +156,27 @@ public class TestAssociateStereo2D {
 		pointsLeft.grow().set(leftP);
 		pointsRight.grow().set(rightP);
 
-		descLeft.grow();descRight.grow();
+		descLeft.grow();
+		descRight.grow();
 
 		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
 
 		alg.setCalibration(param);
 
-		alg.setSource(pointsLeft,descLeft);
+		alg.setSource(pointsLeft, descLeft);
 		alg.setDestination(pointsRight, descRight);
 
 		alg.associate();
 
 		// at the current tolerance they should still match
-		assertEquals(1,alg.getMatches().size);
+		assertEquals(1, alg.getMatches().size);
 
 		// make the tolerance tighter
 		alg = new AssociateStereo2D<>(scorer, 0.01, TupleDesc_F64.class);
 		alg.setCalibration(param);
-		alg.setSource(pointsLeft,descLeft);
+		alg.setSource(pointsLeft, descLeft);
 		alg.setDestination(pointsRight, descRight);
 		alg.associate();
-		assertEquals(0,alg.getMatches().size);
+		assertEquals(0, alg.getMatches().size);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,32 +30,31 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
-public class PnPStereoResidualReprojection implements ModelObservationResidualN<StereoPose,Stereo2D3D>
-{
+public class PnPStereoResidualReprojection implements ModelObservationResidualN<StereoPose, Stereo2D3D> {
 	StereoPose motion;
 
 	Point3D_F64 temp = new Point3D_F64();
 
 	@Override
-	public void setModel(StereoPose model) {
+	public void setModel( StereoPose model ) {
 		this.motion = model;
 	}
 
 	@Override
-	public int computeResiduals(Stereo2D3D data, double[] residuals, int index) {
+	public int computeResiduals( Stereo2D3D data, double[] residuals, int index ) {
 
 		SePointOps_F64.transform(motion.worldToCam0, data.location, temp);
 
-		double expectedX = temp.x / temp.z;
-		double expectedY = temp.y / temp.z;
+		double expectedX = temp.x/temp.z;
+		double expectedY = temp.y/temp.z;
 
 		residuals[index++] = expectedX - data.leftObs.x;
 		residuals[index++] = expectedY - data.leftObs.y;
 
 		SePointOps_F64.transform(motion.cam0ToCam1, temp, temp);
 
-		expectedX = temp.x / temp.z;
-		expectedY = temp.y / temp.z;
+		expectedX = temp.x/temp.z;
+		expectedY = temp.y/temp.z;
 
 		residuals[index++] = expectedX - data.rightObs.x;
 		residuals[index++] = expectedY - data.rightObs.y;

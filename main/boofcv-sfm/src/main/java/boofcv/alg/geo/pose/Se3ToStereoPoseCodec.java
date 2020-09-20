@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,17 +33,17 @@ public class Se3ToStereoPoseCodec implements ModelCodec<StereoPose> {
 	// converts to and from parameterization
 	private ModelCodec<Se3_F64> codec;
 
-	public Se3ToStereoPoseCodec(ModelCodec<Se3_F64> codec) {
+	public Se3ToStereoPoseCodec( ModelCodec<Se3_F64> codec ) {
 		this.codec = codec;
 	}
 
 	@Override
-	public void decode(double[] input, StereoPose outputModel) {
-		codec.decode(input,outputModel.worldToCam0);
+	public void decode( double[] input, StereoPose outputModel ) {
+		codec.decode(input, outputModel.worldToCam0);
 	}
 
 	@Override
-	public void encode(StereoPose model, double[] param) {
+	public void encode( StereoPose model, double[] param ) {
 		codec.encode(model.worldToCam0, param);
 	}
 

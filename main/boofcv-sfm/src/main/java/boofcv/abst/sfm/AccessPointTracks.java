@@ -49,9 +49,8 @@ public interface AccessPointTracks {
 	 *
 	 * @param index Which point in the list
 	 * @param pixel Where the coordinate will be writen to.
-	 *
 	 */
-	void getTrackPixel(int index , Point2D_F64 pixel );
+	void getTrackPixel( int index, Point2D_F64 pixel );
 
 	/**
 	 * All the points being actively tracked in pixel coordinates.
@@ -67,7 +66,7 @@ public interface AccessPointTracks {
 	 * @param index The index in all
 	 * @return if it is an inlier or not
 	 */
-	boolean isTrackInlier(int index );
+	boolean isTrackInlier( int index );
 
 	/**
 	 * True if the specified track was just spawned
@@ -75,6 +74,5 @@ public interface AccessPointTracks {
 	 * @param index The index in all
 	 * @return if it is new or not
 	 */
-	boolean isTrackNew(int index );
-
+	boolean isTrackNew( int index );
 }

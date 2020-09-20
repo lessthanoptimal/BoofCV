@@ -90,10 +90,10 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 			viewIds.add("View_" + viewCnt);
 		}
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj) null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 		DMatrixRMaj K_zero = K.copy();
-		K_zero.set(0,2,0.0);
-		K_zero.set(1,2,0.0);
+		K_zero.set(0, 2, 0.0);
+		K_zero.set(1, 2, 0.0);
 
 		// Randomly add points around the coordinate system's origin
 		feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -0.5, 0.5, numFeatures, rand);
@@ -105,17 +105,17 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 		for (int viewCnt = 0; viewCnt < numViews; viewCnt++) {
 			Se3_F64 camera_to_world = new Se3_F64();
 			Se3_F64 world_to_camera = new Se3_F64();
-			double yaw = 2.0 * Math.PI * viewCnt / numViews;
+			double yaw = 2.0*Math.PI*viewCnt/numViews;
 
 			// camera lie on the (X,Z) plane with +y pointed down.
 			// This is done to make the camera coordinate system and the world coordinate system have a more close
 			// relationship
-			camera_to_world.T.x = Math.cos(yaw) * pathRadius;
-			camera_to_world.T.y = rand.nextGaussian() * pathRadius * 0.1; // geometric diversity for self calibration
-			camera_to_world.T.z = Math.sin(yaw) * pathRadius;
+			camera_to_world.T.x = Math.cos(yaw)*pathRadius;
+			camera_to_world.T.y = rand.nextGaussian()*pathRadius*0.1; // geometric diversity for self calibration
+			camera_to_world.T.z = Math.sin(yaw)*pathRadius;
 
 			// camera is pointing in the opposite direction of it's world location
-			ConvertRotation3D_F64.rodriguesToMatrix(new Rodrigues_F64(yaw + Math.PI / 2, 0, -1, 0), camera_to_world.R);
+			ConvertRotation3D_F64.rodriguesToMatrix(new Rodrigues_F64(yaw + Math.PI/2, 0, -1, 0), camera_to_world.R);
 			camera_to_world.invert(world_to_camera);
 
 			// Create the camera matrix P
@@ -170,9 +170,9 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 				// next view while wrapping around
 				View vj = graph.nodes.get(viewIdxJ);
 				// mix of the src/dst to exercise more code during testing
-				boolean standardOrder = (viewIdxI + neighborOffset) % 2 == 0;
+				boolean standardOrder = (viewIdxI + neighborOffset)%2 == 0;
 				PairwiseImageGraph2.Motion m = standardOrder ? graph.connect(vi, vj) : graph.connect(vj, vi);
-				m.countH = numFeatures * 5 / 7;
+				m.countH = numFeatures*5/7;
 				m.countF = numFeatures;
 				m.is3D = true;
 
@@ -196,12 +196,12 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 		return createWorkingGraph(false);
 	}
 
-	public SceneWorkingGraph createWorkingGraph(boolean zeroCP) {
+	public SceneWorkingGraph createWorkingGraph( boolean zeroCP ) {
 		var working = new SceneWorkingGraph();
 		for (int viewCnt = 0; viewCnt < graph.nodes.size; viewCnt++) {
 			PairwiseImageGraph2.View pv = graph.nodes.get(viewCnt);
 			SceneWorkingGraph.View wv = working.addView(pv);
-			if( zeroCP ) {
+			if (zeroCP) {
 				wv.projective.set(listCameraMatricesZeroPrinciple.get(viewCnt));
 			} else {
 				wv.projective.set(listCameraMatrices.get(viewCnt));

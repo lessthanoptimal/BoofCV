@@ -41,7 +41,7 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	// list of frames to discard
 	private final GrowQueue_I32 keyframeIndexes = new GrowQueue_I32();
 
-	public TickTockKeyFrameManager(int keyframePeriod) {
+	public TickTockKeyFrameManager( int keyframePeriod ) {
 		this.keyframePeriod = keyframePeriod;
 	}
 
@@ -52,13 +52,13 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	 * No need to configure or initialize anything
 	 */
 	@Override
-	public void initialize(FastAccess<BCamera> cameras) {}
+	public void initialize( FastAccess<BCamera> cameras ) {}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard(PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba) {
+	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba ) {
 		keyframeIndexes.reset();
 		// Add key frames until it hits the max
-		if( sba.frames.size <= maxKeyFrames)
+		if (sba.frames.size <= maxKeyFrames)
 			return keyframeIndexes;
 
 		// See if the current keyframe should be removed from the list and prevent it from becoming a real keyframe
@@ -71,9 +71,9 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 		}
 
 		// Now remove the current frames. This is done at the end to ensure the order of key frame indexes
-		if( removeCurrent ) {
-			for (int i = newFrames-1; i >= 0; i-- ) {
-				keyframeIndexes.add( sba.frames.size-1-i );
+		if (removeCurrent) {
+			for (int i = newFrames - 1; i >= 0; i--) {
+				keyframeIndexes.add(sba.frames.size - 1 - i);
 			}
 		}
 
@@ -84,8 +84,8 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	 * Tracker information is ignored
 	 */
 	@Override
-	public void handleSpawnedTracks(PointTracker<?> tracker, BCamera camera) {}
+	public void handleSpawnedTracks( PointTracker<?> tracker, BCamera camera ) {}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {}
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {}
 }

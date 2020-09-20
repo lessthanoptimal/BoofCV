@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,19 +25,19 @@ import georegression.struct.se.Se3_F64;
 
 /**
  * <P>
- * Interface for visual odometry from a single camera that provides 6-DOF pose.  The camera is assumed 
- * to be calibrated so that the "true" Euclidean motion can be extracted, up to a scale factor. 
- * Motion can only be found up to a scale factor because it is impossible to distinguish between a 
+ * Interface for visual odometry from a single camera that provides 6-DOF pose.  The camera is assumed
+ * to be calibrated so that the "true" Euclidean motion can be extracted, up to a scale factor.
+ * Motion can only be found up to a scale factor because it is impossible to distinguish between a
  * large motion and distant objects against a small motion and close objects when using a single camera.
  * </p>
- * 
+ *
  * <p>
  * Each time a new image arrives the function {@link #process} should be invoked and its return value
  * checked.  If false is returned then {@link #isFault()} needs to be called to see if a fatal error
  * occurred.  If a fatal error occurred then the motion estimate has been reset relative to the first
  * frame in which {@link #isFault} returns false.
  * </p>
- * 
+ *
  * @author Peter Abeles
  */
 public interface MonocularVisualOdometry<T extends ImageBase<T>> extends VisualOdometry<Se3_F64> {
@@ -47,7 +47,7 @@ public interface MonocularVisualOdometry<T extends ImageBase<T>> extends VisualO
 	 *
 	 * @param param Intrinsic parameters for camera
 	 */
-	public void setIntrinsic( CameraPinholeBrown param );
+	void setIntrinsic( CameraPinholeBrown param );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked
@@ -57,13 +57,12 @@ public interface MonocularVisualOdometry<T extends ImageBase<T>> extends VisualO
 	 * @param input Next image in the sequence.
 	 * @return If the motion estimate has been updated or not
 	 */
-	public boolean process( T input );
+	boolean process( T input );
 
 	/**
 	 * Type of input images it can process.
 	 *
 	 * @return The image type
 	 */
-	public ImageType<T> getImageType();
-
+	ImageType<T> getImageType();
 }

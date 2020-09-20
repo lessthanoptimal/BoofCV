@@ -30,8 +30,7 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  *
  * @author Peter Abeles
  */
-public class ConfigStereoDualTrackPnP implements Configuration
-{
+public class ConfigStereoDualTrackPnP implements Configuration {
 	/** Configuration for building and optimizing a local scene */
 	public ConfigVisOdomTrackPnP scene = new ConfigVisOdomTrackPnP();
 
@@ -66,7 +65,7 @@ public class ConfigStereoDualTrackPnP implements Configuration
 	@Override
 	public void checkValidity() {
 		scene.checkValidity();
-		if( scene.maxKeyFrames < 4 )
+		if (scene.maxKeyFrames < 4)
 			throw new IllegalArgumentException("There must be at least 4 key frames");
 
 		tracker.checkValidity();

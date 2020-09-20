@@ -66,7 +66,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	// Used to pre-maturely stop the scene estimation process
 	private volatile boolean stopRequested = false;
 
-	private double TRIANGULATE_MIN_ANGLE = Math.PI/20.0;
+	private final double TRIANGULATE_MIN_ANGLE = Math.PI/20.0;
 
 	// camera name to index
 	Map<String, Integer> cameraToIndex = new HashMap<>();
@@ -85,8 +85,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	List<View> viewsAdded = new ArrayList<>();
 
 	// work space for feature angles
-	private Vector3D_F64 arrowA = new Vector3D_F64();
-	private Vector3D_F64 arrowB = new Vector3D_F64();
+	private final Vector3D_F64 arrowA = new Vector3D_F64();
+	private final Vector3D_F64 arrowB = new Vector3D_F64();
 
 	// Output
 	SceneStructureMetric structure;
@@ -146,16 +146,14 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		if (stopRequested)
 			return false;
 
-		if (verbose != null)
-			verbose.println("Defining the coordinate system");
+		if (verbose != null) verbose.println("Defining the coordinate system");
 
 		// Using the selecting coordinate frames and triangulated points define the coordinate system
 		defineCoordinateSystem(origin, baseMotion);
 		if (stopRequested)
 			return false;
 
-		if (verbose != null)
-			verbose.println("Estimate all features");
+		if (verbose != null) verbose.println("Estimate all features");
 
 		// Now estimate all the other view locations and 3D features
 		estimateAllFeatures(origin, baseMotion.destination(origin));
@@ -409,8 +407,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		while (!open.isEmpty()) {
 			if (stopRequested)
 				return;
-			if (verbose != null)
-				verbose.println("### open.size=" + open.size());
+			if (verbose != null) verbose.println("### open.size=" + open.size());
 
 			// select the view with the 3D features. This view can be estimated which the highest degree of confience
 			int bestCount = countFeaturesWith3D(open.get(0));
@@ -425,8 +422,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			}
 
 			View v = open.remove(bestIndex);
-			if (verbose != null)
-				verbose.println("   processing view=" + v.index + " | 3D Features=" + bestCount);
+			if (verbose != null) verbose.println("   processing view=" + v.index + " | 3D Features=" + bestCount);
 
 			// Determine the view's location in the 3D view. This might have been previously estimated using
 			// stereo and the estimated scale factor. That will be ignored and the new estimate used instead
@@ -543,8 +539,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		// Estimate the target's location using robust PNP
 		ransacPnP.setIntrinsic(0, target.camera.pinhole);
 		if (list.size() < 20 || !ransacPnP.process(list)) {
-			if (verbose != null)
-				verbose.println("   View=" + target.index + " RANSAC failed. list.size=" + list.size());
+			if (verbose != null) verbose.println("   View=" + target.index + " RANSAC failed. list.size=" + list.size());
 			return false;
 		}
 
@@ -552,8 +547,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 
 		// add inliers to the features
 		int N = ransacPnP.getMatchSet().size();
-		if (verbose != null)
-			verbose.println("   View=" + target.index + " PNP RANSAC " + N + "/" + list.size());
+		if (verbose != null) verbose.println("   View=" + target.index + " PNP RANSAC " + N + "/" + list.size());
 		for (int i = 0; i < N; i++) {
 			int which = ransacPnP.getInputIndex(i);
 			Feature3D f = features.get(which);
@@ -656,8 +650,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 			if (other.state == ViewState.UNPROCESSED) {
 				other.state = ViewState.PENDING;
 				open.add(other);
-				if (verbose != null)
-					verbose.println("  adding to open " + viewed.index + "->" + other.index);
+				if (verbose != null) verbose.println("  adding to open " + viewed.index + "->" + other.index);
 			}
 		}
 	}
@@ -729,8 +722,7 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		double bestScore = 0;
 		View best = null;
 
-		if (verbose != null)
-			verbose.println("selectOriginNode");
+		if (verbose != null) verbose.println("selectOriginNode");
 		for (int i = 0; i < graph.nodes.size(); i++) {
 			double score = scoreNodeAsOrigin(graph.nodes.get(i));
 
@@ -739,11 +731,9 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 				best = graph.nodes.get(i);
 			}
 
-			if (verbose != null)
-				verbose.printf("  [%2d] score = %s\n", i, score);
+			if (verbose != null) verbose.printf("  [%2d] score = %s\n", i, score);
 		}
-		if (verbose != null && best != null)
-			verbose.println("     selected = " + best.index);
+		if (verbose != null && best != null) verbose.println("     selected = " + best.index);
 
 		return best;
 	}
@@ -767,14 +757,12 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 		double bestScore = 0;
 		Motion best = null;
 
-		if (verbose != null)
-			verbose.println("selectCoordinateBase");
+		if (verbose != null) verbose.println("selectCoordinateBase");
 		for (int i = 0; i < view.connections.size(); i++) {
 			Motion e = view.connections.get(i);
 
 			double s = e.scoreTriangulation();
-			if (verbose != null)
-				verbose.printf("  [%2d] score = %s\n", i, s);
+			if (verbose != null) verbose.printf("  [%2d] score = %s\n", i, s);
 			if (s > bestScore) {
 				bestScore = s;
 				best = e;

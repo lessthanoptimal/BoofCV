@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,18 +39,17 @@ public class FactorySfmMisc {
 
 		Class classType = imageType.getImageClass();
 
-		switch( imageType.getFamily() ) {
-			case GRAY:
-			{
+		switch (imageType.getFamily()) {
+			case GRAY: {
 				InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(classType, BorderType.EXTENDED);
 				return new CreateSyntheticOverheadViewS(interp);
 			}
 
 			case PLANAR:
-				return new CreateSyntheticOverheadViewPL(InterpolationType.BILINEAR,imageType.getNumBands(),classType);
+				return new CreateSyntheticOverheadViewPL(InterpolationType.BILINEAR, imageType.getNumBands(), classType);
 
 			default:
-				throw new IllegalArgumentException(imageType.getFamily()+" is not supported");
+				throw new IllegalArgumentException(imageType.getFamily() + " is not supported");
 		}
 	}
 }

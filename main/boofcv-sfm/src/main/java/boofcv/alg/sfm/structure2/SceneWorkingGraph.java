@@ -155,7 +155,7 @@ public class SceneWorkingGraph {
 
 		public boolean isEmpty() { return observations.size == 0; }
 
-		/**  Returns total number of features are included in this inlier set */
+		/** Returns total number of features are included in this inlier set */
 		public int getInlierCount() { return observations.get(0).size; }
 
 		public void reset() {

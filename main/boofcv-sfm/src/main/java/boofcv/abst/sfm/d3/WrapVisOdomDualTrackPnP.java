@@ -47,26 +47,25 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
-		implements StereoVisualOdometry<T>, AccessPointTracks3D
-{
-	@Getter	RefinePnPStereo refine;
-	@Getter	PnPStereoEstimator pnp;
-	@Getter	DistanceFromModelMultiView<Se3_F64,Point2D3D> distanceMono;
-	@Getter	PnPStereoDistanceReprojectionSq distanceStereo;
-	@Getter	AssociateStereo2D<?> assoc;
+		implements StereoVisualOdometry<T>, AccessPointTracks3D {
+	@Getter RefinePnPStereo refine;
+	@Getter PnPStereoEstimator pnp;
+	@Getter DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono;
+	@Getter PnPStereoDistanceReprojectionSq distanceStereo;
+	@Getter AssociateStereo2D<?> assoc;
 
-	VisOdomDualTrackPnP<T,?> visualOdometry;
+	VisOdomDualTrackPnP<T, ?> visualOdometry;
 
 	Class<T> imageType;
 
 	boolean success;
 
-	public WrapVisOdomDualTrackPnP(VisOdomDualTrackPnP<T, ?> visualOdometry, PnPStereoEstimator pnp,
-								   DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono,
-								   PnPStereoDistanceReprojectionSq distanceStereo,
-								   AssociateStereo2D<?> assoc,
-								   RefinePnPStereo refine,
-								   Class<T> imageType) {
+	public WrapVisOdomDualTrackPnP( VisOdomDualTrackPnP<T, ?> visualOdometry, PnPStereoEstimator pnp,
+									DistanceFromModelMultiView<Se3_F64, Point2D3D> distanceMono,
+									PnPStereoDistanceReprojectionSq distanceStereo,
+									AssociateStereo2D<?> assoc,
+									RefinePnPStereo refine,
+									Class<T> imageType ) {
 		this.visualOdometry = visualOdometry;
 		this.pnp = pnp;
 		this.distanceMono = distanceMono;
@@ -77,64 +76,70 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	}
 
 	@Override
-	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
+	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getVisibleTracks().get(index);
-		PerspectiveOps.homogenousTo3dPositiveZ(info.worldLoc,1e8,1e-8,world);
+		PerspectiveOps.homogenousTo3dPositiveZ(info.worldLoc, 1e8, 1e-8, world);
 		return true;
 	}
 
 	@Override public int getTotalTracks() {return visualOdometry.getVisibleTracks().size();}
-	@Override public long getTrackId(int index) {return visualOdometry.getVisibleTracks().get(index).id;}
+
+	@Override public long getTrackId( int index ) {return visualOdometry.getVisibleTracks().get(index).id;}
 
 	@Override
-	public void getTrackPixel(int index, Point2D_F64 pixel) {
+	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
 		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
-		pixel.set( visualOdometry.getVisibleTracks().get(index).visualTrack.pixel );
+		pixel.set(visualOdometry.getVisibleTracks().get(index).visualTrack.pixel);
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+	public List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage ) {
 		throw new RuntimeException("Not supported any more");
 	}
 
 	@Override
-	public boolean isTrackInlier(int index) {
+	public boolean isTrackInlier( int index ) {
 		VisOdomDualTrackPnP.TrackInfo info = visualOdometry.getVisibleTracks().get(index);
 		return info.lastInlier == visualOdometry.getFrameID();
 	}
 
-	@Override public boolean isTrackNew(int index) {
+	@Override public boolean isTrackNew( int index ) {
 		VisOdomDualTrackPnP.TrackInfo track = visualOdometry.getVisibleTracks().get(index);
 		return track.visualTrack.spawnFrameID == visualOdometry.getFrameID();
 	}
 
 	@Override
-	public void setCalibration(StereoParameters parameters) {
+	public void setCalibration( StereoParameters parameters ) {
 		Se3_F64 leftToRight = parameters.getRightToLeft().invert(null);
 
 		pnp.setLeftToRight(leftToRight);
-		if( refine != null )
+		if (refine != null)
 			refine.setLeftToRight(leftToRight);
 		visualOdometry.setCalibration(parameters);
 
 		CameraPinholeBrown left = parameters.left;
-		distanceMono.setIntrinsic(0,left);
+		distanceMono.setIntrinsic(0, left);
 		distanceStereo.setLeftToRight(parameters.right_to_left.invert(null));
-		distanceStereo.setIntrinsic(0,parameters.left);
-		distanceStereo.setIntrinsic(1,parameters.right);
+		distanceStereo.setIntrinsic(0, parameters.left);
+		distanceStereo.setIntrinsic(1, parameters.right);
 		assoc.setCalibration(parameters);
 	}
 
 	@Override public void reset() {
-		visualOdometry.reset();}
+		visualOdometry.reset();
+	}
+
 	@Override public Se3_F64 getCameraToWorld() {return visualOdometry.getCurrentToWorld();}
+
 	@Override public long getFrameID() {return visualOdometry.getFrameID();}
-	@Override public boolean process(T leftImage, T rightImage) {return success = visualOdometry.process(leftImage,rightImage);}
+
+	@Override
+	public boolean process( T leftImage, T rightImage ) {return success = visualOdometry.process(leftImage, rightImage);}
 
 	@Override
 	public boolean isFault() {
-		if( !success)
+		if (!success)
 			return visualOdometry.isFault();
 		else
 			return false;
@@ -143,11 +148,11 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	@Override public ImageType<T> getImageType() {return ImageType.single(imageType);}
 
 	@Override
-	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-		visualOdometry.setVerbose(out,configuration);
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		visualOdometry.setVerbose(out, configuration);
 	}
 
-	public VisOdomDualTrackPnP<T,?> getAlgorithm() {
+	public VisOdomDualTrackPnP<T, ?> getAlgorithm() {
 		return visualOdometry;
 	}
 }

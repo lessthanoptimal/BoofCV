@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,14 +30,14 @@ import org.ddogleg.struct.Stoppable;
  */
 public interface EstimateSceneStructure<Structure extends SceneStructure> extends Stoppable {
 
-
 	/**
 	 * Estimte the 3D structure of each point and view location given the
 	 * graph connecting each view
+	 *
 	 * @param graph Describes relationship of each feature between views and epipolar geometry
 	 * @return true if successful or false if it failed
 	 */
-	boolean process(PairwiseImageGraph graph );
+	boolean process( PairwiseImageGraph graph );
 
 	/**
 	 * Returns the scene structure. Camera models will not be specified since that requires additional information
@@ -49,6 +49,7 @@ public interface EstimateSceneStructure<Structure extends SceneStructure> extend
 
 	/**
 	 * Observations from each view
+	 *
 	 * @return observations
 	 */
 	SceneObservations getObservations();

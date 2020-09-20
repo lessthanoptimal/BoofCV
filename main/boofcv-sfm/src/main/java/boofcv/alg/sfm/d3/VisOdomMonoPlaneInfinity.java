@@ -67,16 +67,16 @@ import java.util.List;
 public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 	// Motion estimator for points on plane.  Motion estimated is from key-frame to current-frame
-	private ModelMatcher<Se2_F64, PlanePtPixel> planeMotion;
+	private final ModelMatcher<Se2_F64, PlanePtPixel> planeMotion;
 	// storage for data passed into planeMotion
-	private FastQueue<PlanePtPixel> planeSamples = new FastQueue<>(PlanePtPixel::new);
+	private final FastQueue<PlanePtPixel> planeSamples = new FastQueue<>(PlanePtPixel::new);
 
 	// when the inlier set is less than this number new features are detected
-	private int thresholdAdd;
+	private final int thresholdAdd;
 	// discard tracks after they have not been in the inlier set for this many updates in a row
-	private int thresholdRetire;
+	private final int thresholdRetire;
 	// maximum allowed pixel error.  Used for determining which tracks are inliers/outliers
-	private double thresholdPixelError;
+	private final double thresholdPixelError;
 
 	// Should it use the more strict rule for pruning far away points?
 	private boolean strictFar = false;
@@ -86,53 +86,53 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 	// transform from the plane to the camera
 	private Se3_F64 planeToCamera;
-	private Se3_F64 cameraToPlane = new Se3_F64();
+	private final Se3_F64 cameraToPlane = new Se3_F64();
 
 	// code for projection to/from plane
-	private CameraPlaneProjection planeProjection = new CameraPlaneProjection();
+	private final CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	// tracks point features
-	private PointTracker<T> tracker;
+	private final PointTracker<T> tracker;
 
 	// converts pixels between normalized image coordinates and pixel coordinates
 	private Point2Transform2_F64 normToPixel;
 	private Point2Transform2_F64 pixelToNorm;
 
 	// tracks which are assumed to be at an infinite distance away
-	private List<PointTrack> tracksFar = new ArrayList<>();
+	private final List<PointTrack> tracksFar = new ArrayList<>();
 	// trans which lie on the ground plane
-	private List<PointTrack> tracksOnPlane = new ArrayList<>();
+	private final List<PointTrack> tracksOnPlane = new ArrayList<>();
 
 	// storage for normalized image coordinate
-	private Point2D_F64 n = new Point2D_F64();
+	private final Point2D_F64 n = new Point2D_F64();
 	// storage for image pixel coordinate
-	private Point2D_F64 pixel = new Point2D_F64();
+	private final Point2D_F64 pixel = new Point2D_F64();
 	// 3D pointing vector of pixel observation
-	private Vector3D_F64 pointing = new Vector3D_F64();
+	private final Vector3D_F64 pointing = new Vector3D_F64();
 	// Adjusted pointing vector which removes off plane rotation
-	private Vector3D_F64 pointingAdj = new Vector3D_F64();
+	private final Vector3D_F64 pointingAdj = new Vector3D_F64();
 
 	// pointing vector on ground in current frame
-	private Point2D_F64 groundCurr = new Point2D_F64();
+	private final Point2D_F64 groundCurr = new Point2D_F64();
 
 	// transform from key frame to world frame
-	private Se2_F64 keyToWorld = new Se2_F64();
+	private final Se2_F64 keyToWorld = new Se2_F64();
 	// transform from the current camera view to the key frame
-	private Se2_F64 currToKey = new Se2_F64();
+	private final Se2_F64 currToKey = new Se2_F64();
 	// transform from the current camera view to the world frame
-	private Se2_F64 currToWorld = new Se2_F64();
+	private final Se2_F64 currToWorld = new Se2_F64();
 
 	// storage for 3D transform
-	private Se3_F64 currPlaneToWorld3D = new Se3_F64();
-	private Se3_F64 worldToCurrPlane3D = new Se3_F64();
-	private Se3_F64 worldToCurrCam3D = new Se3_F64();
+	private final Se3_F64 currPlaneToWorld3D = new Se3_F64();
+	private final Se3_F64 worldToCurrPlane3D = new Se3_F64();
+	private final Se3_F64 worldToCurrCam3D = new Se3_F64();
 
 	// local variable used in concating transforms
-	private Se2_F64 temp = new Se2_F64();
+	private final Se2_F64 temp = new Se2_F64();
 
 	// angles of rotation computed from points far away
-	private GrowQueue_F64 farAngles = new GrowQueue_F64();
-	private GrowQueue_F64 farAnglesCopy = new GrowQueue_F64();
+	private final GrowQueue_F64 farAngles = new GrowQueue_F64();
+	private final GrowQueue_F64 farAnglesCopy = new GrowQueue_F64();
 
 	// select angle from points far and the number of points used to estimate it
 	private double farAngle;
@@ -148,15 +148,15 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	/**
 	 * Configures motion estimation.
 	 *
-	 * @param thresholdAdd  New points are spawned when the number of on plane inliers drops below this value.
+	 * @param thresholdAdd New points are spawned when the number of on plane inliers drops below this value.
 	 * @param thresholdRetire Tracks are dropped when they are not contained in the inlier set for this many frames
-	 *                        in a row.  Try 2
+	 * in a row.  Try 2
 	 * @param thresholdPixelError Threshold used to determine inliers.  Try 1.5
-	 * @param planeMotion  Motion estimator for points on plane
+	 * @param planeMotion Motion estimator for points on plane
 	 * @param tracker Image feature tracker
 	 */
-	public VisOdomMonoPlaneInfinity(int thresholdAdd, int thresholdRetire, double thresholdPixelError,
-									ModelMatcher<Se2_F64, PlanePtPixel> planeMotion, PointTracker<T> tracker) {
+	public VisOdomMonoPlaneInfinity( int thresholdAdd, int thresholdRetire, double thresholdPixelError,
+									 ModelMatcher<Se2_F64, PlanePtPixel> planeMotion, PointTracker<T> tracker ) {
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
 		this.thresholdPixelError = thresholdPixelError;
@@ -169,10 +169,10 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 *
 	 * @param intrinsic Intrinsic camera parameters
 	 */
-	public void setIntrinsic(CameraPinholeBrown intrinsic) {
+	public void setIntrinsic( CameraPinholeBrown intrinsic ) {
 		planeProjection.setIntrinsic(intrinsic);
-		normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false,true);
-		pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
+		normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
+		pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true, false);
 
 		// Find the change in angle caused by a pixel error in the image center.  The same angle error will induce a
 		// larger change in pixel values towards the outside of the image edge.  For fish-eyes lenses this could
@@ -185,7 +185,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 *
 	 * @param planeToCamera Transform from the plane to camera.
 	 */
-	public void setExtrinsic(Se3_F64 planeToCamera) {
+	public void setExtrinsic( Se3_F64 planeToCamera ) {
 		this.planeToCamera = planeToCamera;
 		planeToCamera.invert(cameraToPlane);
 
@@ -210,7 +210,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 * @param image Most recent camera image.
 	 * @return true if motion was estimated or false if a fault occurred.  Should reset after a fault.
 	 */
-	public boolean process(T image) {
+	public boolean process( T image ) {
 		// update feature tracks
 		tracker.process(image);
 
@@ -283,8 +283,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 				pointing.normalize();
 
 				// save value of y-axis in pointing vector
-				double normXZ = Math.sqrt(pointing.x * pointing.x + pointing.z * pointing.z);
-				p.pointingY = pointing.y / normXZ;
+				double normXZ = Math.sqrt(pointing.x*pointing.x + pointing.z*pointing.z);
+				p.pointingY = pointing.y/normXZ;
 
 				// save the angle as a vector
 				p.ground.x = pointing.z;
@@ -299,7 +299,6 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 			p.lastInlier = tracker.getFrameID();
 		}
 	}
-
 
 	/**
 	 * Removes tracks which have not been included in the inlier set recently
@@ -383,19 +382,19 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 *
 	 * @param pointing Pointing vector of observation in plane reference frame
 	 */
-	protected boolean isRotationFromAxisY(PointTrack t, Vector3D_F64 pointing) {
+	protected boolean isRotationFromAxisY( PointTrack t, Vector3D_F64 pointing ) {
 
 		VoTrack p = t.getCookie();
 
 		// remove rotations not along x-z plane
-		double normXZ = Math.sqrt(pointing.x * pointing.x + pointing.z * pointing.z);
-		pointingAdj.set(pointing.x / normXZ, p.pointingY, pointing.z / normXZ);
+		double normXZ = Math.sqrt(pointing.x*pointing.x + pointing.z*pointing.z);
+		pointingAdj.set(pointing.x/normXZ, p.pointingY, pointing.z/normXZ);
 		// Put pointing vector back into camera frame
 		GeometryMath_F64.multTran(cameraToPlane.getR(), pointingAdj, pointingAdj);
 
 		// compute normalized image coordinates
-		n.x = pointingAdj.x / pointingAdj.z;
-		n.y = pointingAdj.y / pointingAdj.z;
+		n.x = pointingAdj.x/pointingAdj.z;
+		n.y = pointingAdj.y/pointingAdj.z;
 
 		// compute pixel of projected point
 		normToPixel.compute(n.x, n.y, pixel);
@@ -403,7 +402,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		// compute error
 		double error = pixel.distance2(t.pixel);
 
-		return error < thresholdPixelError * thresholdPixelError;
+		return error < thresholdPixelError*thresholdPixelError;
 	}
 
 	/**
@@ -411,7 +410,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 *
 	 * @param pointingPlane Pointing vector of observation in plane reference frame
 	 */
-	private void computeAngleOfRotation(PointTrack t, Vector3D_F64 pointingPlane) {
+	private void computeAngleOfRotation( PointTrack t, Vector3D_F64 pointingPlane ) {
 		VoTrack p = t.getCookie();
 
 		// Compute ground pointing vector
@@ -422,14 +421,14 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		groundCurr.y /= norm;
 
 		// dot product.  vectors are normalized to 1 already
-		double dot = groundCurr.x * p.ground.x + groundCurr.y * p.ground.y;
+		double dot = groundCurr.x*p.ground.x + groundCurr.y*p.ground.y;
 		// floating point round off error some times knocks it above 1.0
 		if (dot > 1.0)
 			dot = 1.0;
 		double angle = Math.acos(dot);
 
 		// cross product to figure out direction
-		if (groundCurr.x * p.ground.y - groundCurr.y * p.ground.x > 0)
+		if (groundCurr.x*p.ground.y - groundCurr.y*p.ground.x > 0)
 			angle = -angle;
 
 		farAngles.add(angle);
@@ -450,7 +449,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		farAnglesCopy.addAll(farAngles);
 
 		// find angle which maximizes inlier set
-		farAngle = maximizeCountInSpread(farAnglesCopy.data, farAngles.size, 2 * thresholdFarAngleError);
+		farAngle = maximizeCountInSpread(farAnglesCopy.data, farAngles.size, 2*thresholdFarAngleError);
 
 		// mark and count inliers
 		for (int i = 0; i < tracksFar.size(); i++) {
@@ -483,7 +482,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		for (int i = 0; i < closeInlierCount; i++) {
 			int index = planeMotion.getInputIndex(i);
 			VoTrack p = tracksOnPlane.get(index).getCookie();
-			p.lastInlier = tracker.getFrameID();;
+			p.lastInlier = tracker.getFrameID();
 		}
 
 		return true;
@@ -496,8 +495,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	private void fuseEstimates() {
 
 		// weighted average for angle
-		double x = closeMotionKeyToCurr.c * closeInlierCount + Math.cos(farAngle) * farInlierCount;
-		double y = closeMotionKeyToCurr.s * closeInlierCount + Math.sin(farAngle) * farInlierCount;
+		double x = closeMotionKeyToCurr.c*closeInlierCount + Math.cos(farAngle)*farInlierCount;
+		double y = closeMotionKeyToCurr.s*closeInlierCount + Math.sin(farAngle)*farInlierCount;
 
 		// update the motion estimate
 		closeMotionKeyToCurr.setYaw(Math.atan2(y, x));
@@ -530,6 +529,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 	/**
 	 * Number of frames processed
+	 *
 	 * @return Number of frames processed
 	 */
 	public long getFrameID() {
@@ -547,6 +547,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 	/**
 	 * Returns the 2D motion estimate
+	 *
 	 * @return Motion estimate from current frame into world frame in 2D
 	 */
 	public Se2_F64 getCurrToWorld2D() {
@@ -583,16 +584,15 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		return worldToCurrCam3D;
 	}
 
-
 	/**
 	 * Finds the value which has the largest number of points above and below it within the specified spread
 	 *
-	 * @param data      Input data.  Is modified by sort
-	 * @param size      number of elements in data
+	 * @param data Input data.  Is modified by sort
+	 * @param size number of elements in data
 	 * @param maxSpread the spread it's going after
 	 * @return best value
 	 */
-	public static double maximizeCountInSpread(double[] data, int size, double maxSpread) {
+	public static double maximizeCountInSpread( double[] data, int size, double maxSpread ) {
 		if (size <= 0)
 			return 0;
 
@@ -614,7 +614,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 			length--;
 
 			while (length < size) {
-				double s = UtilAngle.dist(data[start], data[(start + length) % size]);
+				double s = UtilAngle.dist(data[start], data[(start + length)%size]);
 				if (s > maxSpread) {
 					break;
 				} else {
@@ -627,7 +627,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 			}
 		}
 
-		return data[(bestStart + bestLength / 2) % size];
+		return data[(bestStart + bestLength/2)%size];
 	}
 
 	public PointTracker<T> getTracker() {
@@ -638,7 +638,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		return strictFar;
 	}
 
-	public void setStrictFar(boolean strictFar) {
+	public void setStrictFar( boolean strictFar ) {
 		this.strictFar = strictFar;
 	}
 

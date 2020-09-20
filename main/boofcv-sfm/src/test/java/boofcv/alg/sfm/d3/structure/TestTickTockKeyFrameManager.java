@@ -39,23 +39,23 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		VisOdomBundleAdjustment<BTrack> scene = createScene();
 
 		var alg = new TickTockKeyFrameManager();
-		alg.keyframePeriod=10000; // don't want it to add a new keyframe right afterwards
+		alg.keyframePeriod = 10000; // don't want it to add a new keyframe right afterwards
 
 		// not used but call it just in case that changes in the future
 		alg.initialize(scene.cameras);
 		// add the initial set of frames
 		for (int i = 0; i < 5; i++) {
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,1,scene);
-			assertEquals(0,discard.size);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
+			assertEquals(0, discard.size);
 			scene.addFrame(i);
 			tracker.process(null);
 		}
 		// add one more frame. It should now want to discard the current frame
 		scene.addFrame(6);
 		tracker.process(null);
-		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,1,scene);
-		assertEquals(1,discard.size);
-		assertEquals(5,discard.get(0));
+		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
+		assertEquals(1, discard.size);
+		assertEquals(5, discard.get(0));
 	}
 
 	/**
@@ -76,18 +76,18 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 
 		for (int i = 0; i < 10; i++) {
 			tracker.process(null);
-			scene.addFrame(i+5);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,1,scene);
-			assertEquals(1,discard.size);
+			scene.addFrame(i + 5);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
+			assertEquals(1, discard.size);
 			long id = tracker.getFrameID();
-			if( id%3 == 0 ) {
-				assertEquals(0,discard.get(0));
+			if (id%3 == 0) {
+				assertEquals(0, discard.get(0));
 			} else {
-				assertEquals(5,discard.get(0));
+				assertEquals(5, discard.get(0));
 			}
 			// remove the frame to make it realistic
 			VisOdomBundleAdjustment.BFrame frame = scene.frames.get(discard.get(0));
-			scene.removeFrame(frame,new ArrayList<>());
+			scene.removeFrame(frame, new ArrayList<>());
 		}
 	}
 
@@ -108,27 +108,27 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		for (int i = 0; i < 5; i++) {
 			tracker.process(null);
 			scene.addFrame(i*2);
-			scene.addFrame(i*2+1);
+			scene.addFrame(i*2 + 1);
 		}
 
 		for (int i = 0; i < 10; i++) {
 			tracker.process(null);
-			scene.addFrame((i+5)*2);
-			scene.addFrame((i+5)*2+1);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,2,scene);
-			assertEquals(2,discard.size);
+			scene.addFrame((i + 5)*2);
+			scene.addFrame((i + 5)*2 + 1);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 2, scene);
+			assertEquals(2, discard.size);
 			long id = tracker.getFrameID();
-			if( id%3 == 0 ) {
-				assertEquals(0,discard.get(0));
-				assertEquals(1,discard.get(1));
+			if (id%3 == 0) {
+				assertEquals(0, discard.get(0));
+				assertEquals(1, discard.get(1));
 			} else {
-				assertEquals(10,discard.get(0));
-				assertEquals(11,discard.get(1));
+				assertEquals(10, discard.get(0));
+				assertEquals(11, discard.get(1));
 			}
 			// remove the frame to make it realistic
 			for (int idxDiscard = 0; idxDiscard < discard.size; idxDiscard++) {
 				VisOdomBundleAdjustment.BFrame frame = scene.frames.get(discard.get(0));
-				scene.removeFrame(frame,new ArrayList<>());
+				scene.removeFrame(frame, new ArrayList<>());
 			}
 		}
 	}

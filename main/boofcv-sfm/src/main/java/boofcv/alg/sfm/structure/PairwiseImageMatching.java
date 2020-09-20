@@ -48,15 +48,14 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PairwiseImageMatching<T extends ImageBase<T>>
-	implements Stoppable
-{
+		implements Stoppable {
 	// Used to pre-maturely stop the scene estimation process
 	private volatile boolean stopRequested = false;
 
 	protected double MIN_ASSOCIATE_FRACTION = 0.05;
 	protected int MIN_FEATURE_ASSOCIATED = 30;
 
-	protected DetectDescribePoint<T,TupleDesc> detDesc;
+	protected DetectDescribePoint<T, TupleDesc> detDesc;
 	protected AssociateDescription<TupleDesc> associate;
 
 	// Graph describing the relationship between images
@@ -69,21 +68,21 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	// Temporary storage for feature pairs which are inliers
 	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
-	protected ModelMatcherMultiview<DMatrixRMaj,AssociatedPair> ransacEssential;
-	protected ModelMatcher<DMatrixRMaj,AssociatedPair> ransacFundamental;
+	protected ModelMatcherMultiview<DMatrixRMaj, AssociatedPair> ransacEssential;
+	protected ModelMatcher<DMatrixRMaj, AssociatedPair> ransacFundamental;
 
 	// print is verbose or not
 	protected PrintStream verbose;
 	protected int verboseLevel;
 
-	public PairwiseImageMatching(DetectDescribePoint<T, TupleDesc> detDesc,
-								 AssociateDescription<TupleDesc> associate ) {
+	public PairwiseImageMatching( DetectDescribePoint<T, TupleDesc> detDesc,
+								  AssociateDescription<TupleDesc> associate ) {
 		this();
 		this.detDesc = detDesc;
 		this.associate = associate;
 	}
 
-	protected PairwiseImageMatching(){
+	protected PairwiseImageMatching() {
 		configRansac.inlierThreshold = 2.5;
 		configRansac.iterations = 4000;
 	}
@@ -99,16 +98,17 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * @param minFeatureAssociate Minimum number of features a connection needs to have
 	 * @param minFeatureAssociateFraction Fraction of total features for edge and both images.
 	 */
-	public void configure( int minFeatureAssociate , double minFeatureAssociateFraction ) {
+	public void configure( int minFeatureAssociate, double minFeatureAssociateFraction ) {
 		this.MIN_ASSOCIATE_FRACTION = minFeatureAssociateFraction;
 		this.MIN_FEATURE_ASSOCIATED = minFeatureAssociate;
 	}
 
-	public void addCamera( String cameraName  ) {
-		addCamera(cameraName,null,null);
+	public void addCamera( String cameraName ) {
+		addCamera(cameraName, null, null);
 	}
-	public void addCamera( String cameraName , Point2Transform2_F64 pixelToNorm , CameraPinhole pinhole ) {
-		graph.cameras.put( cameraName, new PairwiseImageGraph.Camera(cameraName,pixelToNorm,pinhole));
+
+	public void addCamera( String cameraName, Point2Transform2_F64 pixelToNorm, CameraPinhole pinhole ) {
+		graph.cameras.put(cameraName, new PairwiseImageGraph.Camera(cameraName, pixelToNorm, pinhole));
 	}
 
 	/**
@@ -116,13 +116,13 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 *
 	 * @param image The image
 	 */
-	public void addImage(T image , String cameraName ) {
+	public void addImage( T image, String cameraName ) {
 
 		PairwiseImageGraph.View view = new PairwiseImageGraph.View(graph.nodes.size(),
 				new FastQueue<>(detDesc::createDescription));
 
 		view.camera = graph.cameras.get(cameraName);
-		if( view.camera == null )
+		if (view.camera == null)
 			throw new IllegalArgumentException("Must have added the camera first");
 
 		view.index = graph.nodes.size();
@@ -142,55 +142,55 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			view.observationPixels.grow().set(p);
 		}
 
-		if( view.camera.pixelToNorm == null ){
+		if (view.camera.pixelToNorm == null) {
 			return;
 		}
 
 		view.observationNorm.growArray(detDesc.getNumberOfFeatures());
 		for (int i = 0; i < view.observationPixels.size; i++) {
 			Point2D_F64 p = view.observationPixels.get(i);
-			view.camera.pixelToNorm.compute(p.x,p.y,view.observationNorm.grow());
+			view.camera.pixelToNorm.compute(p.x, p.y, view.observationNorm.grow());
 		}
 
-		if( verbose != null ) {
-			verbose.println("Detected Features: "+detDesc.getNumberOfFeatures());
+		if (verbose != null) {
+			verbose.println("Detected Features: " + detDesc.getNumberOfFeatures());
 		}
 	}
 
-
 	/**
 	 * Determines connectivity between images. Results can be found by calling {@link #getGraph()}.
+	 *
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process() {
-		if( graph.nodes.size() < 2 )
+		if (graph.nodes.size() < 2)
 			return false;
 		stopRequested = false;
 
 		declareModelFitting();
 
 		for (int i = 0; i < graph.nodes.size(); i++) {
-			if( verbose != null )
-				verbose.print("Matching node "+i+" -> ");
+			if (verbose != null)
+				verbose.print("Matching node " + i + " -> ");
 			associate.setSource(graph.nodes.get(i).descriptions);
-			for (int j = i+1; j < graph.nodes.size(); j++) {
+			for (int j = i + 1; j < graph.nodes.size(); j++) {
 				associate.setDestination(graph.nodes.get(j).descriptions);
 				associate.associate();
-				if( associate.getMatches().size < MIN_FEATURE_ASSOCIATED )
+				if (associate.getMatches().size < MIN_FEATURE_ASSOCIATED)
 					continue;
 
-				boolean connected = connectViews(graph.nodes.get(i),graph.nodes.get(j),associate.getMatches());
-				if( verbose != null ) {
-					if( connected )
+				boolean connected = connectViews(graph.nodes.get(i), graph.nodes.get(j), associate.getMatches());
+				if (verbose != null) {
+					if (connected)
 						verbose.print("+");
 					else
 						verbose.print("-");
 				}
 
-				if( stopRequested )
+				if (stopRequested)
 					return false;
 			}
-			if( verbose != null ) {
+			if (verbose != null) {
 				verbose.println();
 			}
 		}
@@ -208,8 +208,8 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * Associate features between the two views. Then compute a homography and essential matrix using LSMed. Add
 	 * features to the edge if they an inlier in essential. Save fit score of homography vs essential.
 	 */
-	protected boolean connectViews(PairwiseImageGraph.View viewA , PairwiseImageGraph.View viewB ,
-								   FastAccess<AssociatedIndex> matches) {
+	protected boolean connectViews( PairwiseImageGraph.View viewA, PairwiseImageGraph.View viewB,
+									FastAccess<AssociatedIndex> matches ) {
 
 		// Estimate fundamental/essential with RANSAC
 		PairwiseImageGraph.Motion edge = new PairwiseImageGraph.Motion();
@@ -218,13 +218,13 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		CameraPinhole pinhole0 = viewA.camera.pinhole;
 		CameraPinhole pinhole1 = viewB.camera.pinhole;
 
-		if( pinhole0 != null && pinhole1 != null ) {
+		if (pinhole0 != null && pinhole1 != null) {
 			// Fully calibrated camera pair
-			ransacEssential.setIntrinsic(0,pinhole0);
-			ransacEssential.setIntrinsic(1,pinhole1);
+			ransacEssential.setIntrinsic(0, pinhole0);
+			ransacEssential.setIntrinsic(1, pinhole1);
 
-			if( !fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(),ransacEssential,edge) ) {
-				if( verbose != null && verboseLevel >= 1 ) {
+			if (!fitEpipolar(matches, viewA.observationNorm.toList(), viewB.observationNorm.toList(), ransacEssential, edge)) {
+				if (verbose != null && verboseLevel >= 1) {
 					verbose.println(" fit essential failed");
 				}
 				return false;
@@ -232,24 +232,24 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 			edge.metric = true;
 			inliersEpipolar = ransacEssential.getMatchSet().size();
 			edge.F.set(ransacEssential.getModelParameters());
-		} else if( fitEpipolar(matches,
-					viewA.observationPixels.toList(), viewB.observationPixels.toList(),
-					ransacFundamental,edge) ) {
+		} else if (fitEpipolar(matches,
+				viewA.observationPixels.toList(), viewB.observationPixels.toList(),
+				ransacFundamental, edge)) {
 			// transform is only known up to a projective transform
 			edge.metric = false;
 			inliersEpipolar = ransacFundamental.getMatchSet().size();
 			edge.F.set(ransacFundamental.getModelParameters());
 		} else {
-			if( verbose != null && verboseLevel >= 1 ) {
+			if (verbose != null && verboseLevel >= 1) {
 				verbose.println(" fit fundamental failed");
 			}
 			return false;
 		}
 
-		if( inliersEpipolar < MIN_FEATURE_ASSOCIATED ) {
-			if( verbose != null && verboseLevel >= 1 ) {
-				verbose.println(" too too few inliers. "+inliersEpipolar+" min="+MIN_FEATURE_ASSOCIATED+
-						" obsA="+viewA.observationNorm.size+" obsB="+viewB.observationNorm.size);
+		if (inliersEpipolar < MIN_FEATURE_ASSOCIATED) {
+			if (verbose != null && verboseLevel >= 1) {
+				verbose.println(" too too few inliers. " + inliersEpipolar + " min=" + MIN_FEATURE_ASSOCIATED +
+						" obsA=" + viewA.observationNorm.size + " obsB=" + viewB.observationNorm.size);
 			}
 			return false;
 		}
@@ -258,7 +258,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		double fractionA = inliersEpipolar/(double)viewA.descriptions.size;
 		double fractionB = inliersEpipolar/(double)viewB.descriptions.size;
 
-		if( fractionA < MIN_ASSOCIATE_FRACTION || fractionB < MIN_ASSOCIATE_FRACTION )
+		if (fractionA < MIN_ASSOCIATE_FRACTION || fractionB < MIN_ASSOCIATE_FRACTION)
 			return false;
 
 		// If the geometry is good for triangulation this number will be lower
@@ -282,23 +282,22 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * @param edge Edge which will contain a description of found motion
 	 * @return true if no error
 	 */
-	boolean fitEpipolar(FastAccess<AssociatedIndex> matches ,
-						List<Point2D_F64> pointsA , List<Point2D_F64> pointsB ,
-						ModelMatcher<?,AssociatedPair> ransac ,
-						PairwiseImageGraph.Motion edge )
-	{
+	boolean fitEpipolar( FastAccess<AssociatedIndex> matches,
+						 List<Point2D_F64> pointsA, List<Point2D_F64> pointsB,
+						 ModelMatcher<?, AssociatedPair> ransac,
+						 PairwiseImageGraph.Motion edge ) {
 		pairs.resize(matches.size);
 		for (int i = 0; i < matches.size; i++) {
 			AssociatedIndex a = matches.get(i);
 			pairs.get(i).p1.set(pointsA.get(a.src));
 			pairs.get(i).p2.set(pointsB.get(a.dst));
 		}
-		if( !ransac.process(pairs.toList()) )
+		if (!ransac.process(pairs.toList()))
 			return false;
 		int N = ransac.getMatchSet().size();
 		for (int i = 0; i < N; i++) {
 			AssociatedIndex a = matches.get(ransac.getInputIndex(i));
-			edge.associated.add( a.copy() );
+			edge.associated.add(a.copy());
 		}
 		return true;
 	}
@@ -333,7 +332,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 		graph = new PairwiseImageGraph();
 	}
 
-	public void setVerbose(PrintStream verbose , int level ) {
+	public void setVerbose( PrintStream verbose, int level ) {
 		this.verbose = verbose;
 		this.verboseLevel = level;
 	}

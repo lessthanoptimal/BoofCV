@@ -36,55 +36,55 @@ public class StereoSparse3D<T extends ImageGray<T>>
 		extends StereoProcessingBase<T> implements ImagePixelTo3D {
 
 	// computes spare disparity
-	private StereoDisparitySparse<T> disparity;
+	private final StereoDisparitySparse<T> disparity;
 
 	// convert from left camera pixel coordinates into rectified coordinates
 	private Point2Transform2_F64 leftPixelToRect;
 
 	// storage for rectified pixel coordinate
-	private Point2D_F64 pixelRect = new Point2D_F64();
+	private final Point2D_F64 pixelRect = new Point2D_F64();
 
 	// 3D coordinate in the left camera: in homogeneous coordinates.  w = disparity
-	private Point3D_F64 pointLeft = new Point3D_F64();
+	private final Point3D_F64 pointLeft = new Point3D_F64();
 	// Found disparity or the 4th-axis in homogeneous coordinates
 	private double w;
 
 	/**
 	 * Configures and declares internal data
 	 *
-	 * @param imageType   Input image type
+	 * @param imageType Input image type
 	 */
-	public StereoSparse3D(StereoDisparitySparse<T> disparity, Class<T> imageType) {
+	public StereoSparse3D( StereoDisparitySparse<T> disparity, Class<T> imageType ) {
 		super(imageType);
 		this.disparity = disparity;
 	}
 
 	@Override
-	public void setCalibration(StereoParameters stereoParam) {
+	public void setCalibration( StereoParameters stereoParam ) {
 		super.setCalibration(stereoParam);
 
-		leftPixelToRect = RectifyImageOps.transformPixelToRect(stereoParam.left,rect1);
+		leftPixelToRect = RectifyImageOps.transformPixelToRect(stereoParam.left, rect1);
 	}
 
 	@Override
-	public void setImages( T leftImage , T rightImage ) {
-		super.setImages(leftImage,rightImage);
-		disparity.setImages(imageLeftRect,imageRightRect);
+	public void setImages( T leftImage, T rightImage ) {
+		super.setImages(leftImage, rightImage);
+		disparity.setImages(imageLeftRect, imageRightRect);
 	}
 
 	/**
 	 * Takes in pixel coordinates from the left camera in the original image coordinate system
+	 *
 	 * @param x x-coordinate of the pixel
 	 * @param y y-coordinate of the pixel
 	 * @return true if successful
 	 */
 	@Override
-	public boolean process(double x, double y) {
-
-		leftPixelToRect.compute(x,y,pixelRect);
+	public boolean process( double x, double y ) {
+		leftPixelToRect.compute(x, y, pixelRect);
 
 		// round to the nearest pixel
-		if( !disparity.process((int)(pixelRect.x+0.5),(int)(pixelRect.y+0.5)) )
+		if (!disparity.process((int)(pixelRect.x + 0.5), (int)(pixelRect.y + 0.5)))
 			return false;
 
 		// Compute coordinate in camera frame

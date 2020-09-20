@@ -41,6 +41,7 @@ public class TestWrapVisOdomStereoMonoPnP {
 
 	ConfigDisparityBM configBM = new ConfigDisparityBM();
 	ConfigVisOdomTrackPnP configPnP = new ConfigVisOdomTrackPnP();
+
 	{
 		configBM.disparityMin = 0;
 		configBM.disparityRange = 60;
@@ -109,7 +110,7 @@ public class TestWrapVisOdomStereoMonoPnP {
 			configDDA.detDesc.describeBrief.fixed = true;
 
 			StereoDisparitySparse<GrayF32> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayF32.class);
-			PointTracker<GrayF32> tracker = FactoryPointTracker.tracker(configDDA,GrayF32.class,GrayF32.class);
+			PointTracker<GrayF32> tracker = FactoryPointTracker.tracker(configDDA, GrayF32.class, GrayF32.class);
 
 			return FactoryVisualOdometry.stereoMonoPnP(configPnP, disparity, tracker, GrayF32.class);
 		}

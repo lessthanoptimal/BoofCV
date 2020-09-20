@@ -47,49 +47,47 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
-{
+public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 	// creates the overhead image
-	private CreateSyntheticOverheadView<T> createOverhead;
+	private final CreateSyntheticOverheadView<T> createOverhead;
 	// estimates 2D motion inside the overhead image
-	private ImageMotion2D<T,Se2_F64> motion2D;
+	private final ImageMotion2D<T, Se2_F64> motion2D;
 
 	// storage for overhead image
-	private OverheadView<T> overhead;
+	private final OverheadView<T> overhead;
 
 	// selects a reasonable overhead map
-	private SelectOverheadParameters selectOverhead;
+	private final SelectOverheadParameters selectOverhead;
 
 	// transform from the plane to the camera
 	private Se3_F64 planeToCamera;
 
 	// storage for intermediate results
-	private Se2_F64 worldToCurr2D = new Se2_F64();
-	private Se3_F64 worldToCurrCam3D = new Se3_F64();
-	private Se3_F64 worldToCurr3D = new Se3_F64();
-	private Se2_F64 temp = new Se2_F64();
+	private final Se2_F64 worldToCurr2D = new Se2_F64();
+	private final Se3_F64 worldToCurrCam3D = new Se3_F64();
+	private final Se3_F64 worldToCurr3D = new Se3_F64();
+	private final Se2_F64 temp = new Se2_F64();
 
 	// adjust for offset
-	private Se2_F64 origToMap = new Se2_F64();
-	private Se2_F64 mapToOrigin = new Se2_F64();
+	private final Se2_F64 origToMap = new Se2_F64();
+	private final Se2_F64 mapToOrigin = new Se2_F64();
 
 	/**
 	 * Configures motion estimation algorithm.
 	 *
 	 * @param cellSize Size of cells in plane in world units
 	 * @param maxCellsPerPixel Specifies minimum resolution of a region in overhead image. A pixel in the camera
-	 *                         can't overlap more than this number of map cells.   Higher values allow lower
-	 *                         resolution regions.  Try 4.
+	 * can't overlap more than this number of map cells.   Higher values allow lower
+	 * resolution regions.  Try 4.
 	 * @param mapHeightFraction Reduce the map height by this fraction to avoid excessive unusable image space.  Set to
-	 *                          1.0 to maximize the viewing area and any value less than one to crop it.
+	 * 1.0 to maximize the viewing area and any value less than one to crop it.
 	 * @param motion2D Estimates motion inside the overhead image.
 	 */
-	public VisOdomMonoOverheadMotion2D(double cellSize,
-									   double maxCellsPerPixel,
-									   double mapHeightFraction ,
-									   ImageMotion2D<T, Se2_F64> motion2D , ImageType<T> imageType )
-	{
-		selectOverhead = new SelectOverheadParameters(cellSize,maxCellsPerPixel,mapHeightFraction);
+	public VisOdomMonoOverheadMotion2D( double cellSize,
+										double maxCellsPerPixel,
+										double mapHeightFraction,
+										ImageMotion2D<T, Se2_F64> motion2D, ImageType<T> imageType ) {
+		selectOverhead = new SelectOverheadParameters(cellSize, maxCellsPerPixel, mapHeightFraction);
 		this.motion2D = motion2D;
 
 		createOverhead = FactorySfmMisc.createOverhead(imageType);
@@ -99,29 +97,30 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 
 	/**
 	 * Camera the camera's intrinsic and extrinsic parameters.  Can be called at any time.
+	 *
 	 * @param intrinsic Intrinsic camera parameters
 	 * @param planeToCamera Transform from the plane to camera.
 	 */
-	public void configureCamera(CameraPinholeBrown intrinsic ,
-								Se3_F64 planeToCamera ) {
+	public void configureCamera( CameraPinholeBrown intrinsic,
+								 Se3_F64 planeToCamera ) {
 		this.planeToCamera = planeToCamera;
 
-		if( !selectOverhead.process(intrinsic,planeToCamera) )
+		if (!selectOverhead.process(intrinsic, planeToCamera))
 			throw new IllegalArgumentException("Can't find a reasonable overhead map.  Can the camera view the plane?");
 
 		overhead.centerX = selectOverhead.getCenterX();
 		overhead.centerY = selectOverhead.getCenterY();
 
-		createOverhead.configure(intrinsic,planeToCamera,overhead.centerX,overhead.centerY,overhead.cellSize,
-				selectOverhead.getOverheadWidth(),selectOverhead.getOverheadHeight());
+		createOverhead.configure(intrinsic, planeToCamera, overhead.centerX, overhead.centerY, overhead.cellSize,
+				selectOverhead.getOverheadWidth(), selectOverhead.getOverheadHeight());
 
 		// used to counter act offset in overhead image
-		origToMap.set(overhead.centerX,overhead.centerY,0);
-		mapToOrigin.set(-overhead.centerX,-overhead.centerY,0);
+		origToMap.set(overhead.centerX, overhead.centerY, 0);
+		mapToOrigin.set(-overhead.centerX, -overhead.centerY, 0);
 
 		// fill it so there aren't any artifacts in the left over
 		overhead.image.reshape(selectOverhead.getOverheadWidth(), selectOverhead.getOverheadHeight());
-		GImageMiscOps.fill(overhead.image,0);
+		GImageMiscOps.fill(overhead.image, 0);
 	}
 
 	/**
@@ -140,7 +139,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 	public boolean process( T image ) {
 		createOverhead.process(image, overhead.image);
 
-		if( !motion2D.process(overhead.image) ) {
+		if (!motion2D.process(overhead.image)) {
 			return false;
 		}
 
@@ -149,8 +148,8 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 		worldToCurr2D.T.y *= overhead.cellSize;
 
 		// the true origin is offset from the overhead image which the transform is computed inside of
-		origToMap.concat(worldToCurr2D,temp);
-		temp.concat(mapToOrigin,worldToCurr2D);
+		origToMap.concat(worldToCurr2D, temp);
+		temp.concat(mapToOrigin, worldToCurr2D);
 
 		return true;
 	}
@@ -171,7 +170,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 	 */
 	public Se3_F64 getWorldToCurr3D() {
 		// 2D to 3D coordinates
-		worldToCurr3D.getT().set(-worldToCurr2D.T.y,0,worldToCurr2D.T.x);
+		worldToCurr3D.getT().set(-worldToCurr2D.T.y, 0, worldToCurr2D.T.x);
 		DMatrixRMaj R = worldToCurr3D.getR();
 
 		// set rotation around Y axis.
@@ -182,7 +181,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 		R.unsafe_set(2, 0, worldToCurr2D.s);
 		R.unsafe_set(2, 2, worldToCurr2D.c);
 
-		worldToCurr3D.concat(planeToCamera,worldToCurrCam3D);
+		worldToCurr3D.concat(planeToCamera, worldToCurrCam3D);
 
 		return worldToCurrCam3D;
 	}
@@ -200,6 +199,4 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 	public ImageMotion2D<T, Se2_F64> getMotion2D() {
 		return motion2D;
 	}
-
-
 }

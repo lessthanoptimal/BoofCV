@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,74 +39,73 @@ public class TestCameraPlaneProjection {
 
 	int width = 800;
 	int height = 850;
-	CameraPinholeBrown param = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0.002, 0);
-	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(param).distort_F64(false,true);
+	CameraPinholeBrown param = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0.002, 0);
+	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(param).distort_F64(false, true);
 
 	Se3_F64 planeToCamera;
 
-	Point3D_F64 worldPt = new Point3D_F64(0.3,0,3);
+	Point3D_F64 worldPt = new Point3D_F64(0.3, 0, 3);
 	Point3D_F64 cameraPt;
 	Point2D_F64 normalizedPt = new Point2D_F64();
 	Point2D_F64 pixelPt = new Point2D_F64();
 
-
 	public TestCameraPlaneProjection() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(-45),0,0.1,cameraToPlane.getR());
-		cameraToPlane.getT().set(0,-5,0);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(-45), 0, 0.1, cameraToPlane.getR());
+		cameraToPlane.getT().set(0, -5, 0);
 
 		planeToCamera = cameraToPlane.invert(null);
 
-		cameraPt = SePointOps_F64.transform(planeToCamera,worldPt,null);
-		normalizedPt.set(cameraPt.x/cameraPt.z,cameraPt.y/cameraPt.z);
-		normToPixel.compute(normalizedPt.x,normalizedPt.y,pixelPt);
+		cameraPt = SePointOps_F64.transform(planeToCamera, worldPt, null);
+		normalizedPt.set(cameraPt.x/cameraPt.z, cameraPt.y/cameraPt.z);
+		normToPixel.compute(normalizedPt.x, normalizedPt.y, pixelPt);
 	}
 
 	@Test
 	public void planeToPixel() {
 
 		CameraPlaneProjection alg = new CameraPlaneProjection();
-		alg.setConfiguration(planeToCamera,param);
+		alg.setConfiguration(planeToCamera, param);
 
 		Point2D_F64 found = new Point2D_F64();
 
 		assertTrue(alg.planeToPixel(worldPt.z, -worldPt.x, found));
 
-		assertEquals(found.x,pixelPt.x,1e-8);
-		assertEquals(found.y,pixelPt.y,1e-8);
+		assertEquals(found.x, pixelPt.x, 1e-8);
+		assertEquals(found.y, pixelPt.y, 1e-8);
 
 		// try giving it a point behind the camera
-		assertFalse(alg.planeToPixel(-50,-worldPt.x,found));
+		assertFalse(alg.planeToPixel(-50, -worldPt.x, found));
 	}
 
 	@Test
 	public void planeToNormalized() {
 
 		CameraPlaneProjection alg = new CameraPlaneProjection();
-		alg.setConfiguration(planeToCamera,param);
+		alg.setConfiguration(planeToCamera, param);
 
 		Point2D_F64 found = new Point2D_F64();
 
 		assertTrue(alg.planeToNormalized(worldPt.z, -worldPt.x, found));
 
-		assertEquals(found.x,normalizedPt.x,1e-8);
-		assertEquals(found.y,normalizedPt.y,1e-8);
+		assertEquals(found.x, normalizedPt.x, 1e-8);
+		assertEquals(found.y, normalizedPt.y, 1e-8);
 
 		// try giving it a point behind the camera
-		assertFalse(alg.planeToNormalized(-50,-worldPt.x,found));
+		assertFalse(alg.planeToNormalized(-50, -worldPt.x, found));
 	}
 
 	@Test
 	public void pixelToPlane() {
 		CameraPlaneProjection alg = new CameraPlaneProjection();
-		alg.setConfiguration(planeToCamera,param);
+		alg.setConfiguration(planeToCamera, param);
 
 		Point2D_F64 found = new Point2D_F64();
 
-		assertTrue(alg.pixelToPlane(pixelPt.x,pixelPt.y, found));
+		assertTrue(alg.pixelToPlane(pixelPt.x, pixelPt.y, found));
 
-		assertEquals(found.x,worldPt.z,1e-6);
+		assertEquals(found.x, worldPt.z, 1e-6);
 		assertEquals(found.y, -worldPt.x, 1e-6);
 
 		// give it a point which won't intersect the plane
@@ -116,17 +115,16 @@ public class TestCameraPlaneProjection {
 	@Test
 	public void normalToPlane() {
 		CameraPlaneProjection alg = new CameraPlaneProjection();
-		alg.setConfiguration(planeToCamera,param);
+		alg.setConfiguration(planeToCamera, param);
 
 		Point2D_F64 found = new Point2D_F64();
 
-		assertTrue(alg.normalToPlane(normalizedPt.x,normalizedPt.y, found));
+		assertTrue(alg.normalToPlane(normalizedPt.x, normalizedPt.y, found));
 
-		assertEquals(found.x,worldPt.z,1e-6);
+		assertEquals(found.x, worldPt.z, 1e-6);
 		assertEquals(found.y, -worldPt.x, 1e-6);
 
 		// give it a point which won't intersect the plane
 		assertFalse(alg.pixelToPlane(-10000, 0, found));
 	}
-
 }

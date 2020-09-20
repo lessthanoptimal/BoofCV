@@ -44,7 +44,6 @@ public class CommonStereoMotionNPoint {
 	protected Se3_F64 leftToRight;
 	protected Se3_F64 worldToRight;
 
-
 	// list of points in world reference frame
 	protected List<Point3D_F64> worldPts;
 	// list of points is camera reference frame
@@ -57,33 +56,33 @@ public class CommonStereoMotionNPoint {
 
 	public CommonStereoMotionNPoint() {
 		leftToRight = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01,-0.001,0.005,leftToRight.getR());
-		leftToRight.getT().set(-0.1,0.02,-0.03);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, -0.001, 0.005, leftToRight.getR());
+		leftToRight.getT().set(-0.1, 0.02, -0.03);
 
 		param = new StereoParameters();
 		param.right_to_left = leftToRight.invert(null);
 
-		param.left = new CameraPinholeBrown(400,500,0.1,160,120,320,240).fsetRadial(0, 0);
-		param.right = new CameraPinholeBrown(380,505,0.05,165,115,320,240).fsetRadial(0,0);
+		param.left = new CameraPinholeBrown(400, 500, 0.1, 160, 120, 320, 240).fsetRadial(0, 0);
+		param.right = new CameraPinholeBrown(380, 505, 0.05, 165, 115, 320, 240).fsetRadial(0, 0);
 
 		worldToLeft = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01, 0.04, -0.05, worldToLeft.getR());
-		worldToLeft.getT().set(0.1,-0.1,0.2);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, 0.04, -0.05, worldToLeft.getR());
+		worldToLeft.getT().set(0.1, -0.1, 0.2);
 
-		worldToRight = worldToLeft.concat(leftToRight,null);
+		worldToRight = worldToLeft.concat(leftToRight, null);
 	}
 
-	protected void generateScene(int N, Se3_F64 worldToLeft, boolean planar) {
-		if( worldToLeft == null ) {
+	protected void generateScene( int N, Se3_F64 worldToLeft, boolean planar ) {
+		if (worldToLeft == null) {
 			this.worldToLeft = worldToLeft = new Se3_F64();
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 1, -0.2, worldToLeft.getR());
-			worldToLeft.getT().set(-0.3,0.4,1);
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, worldToLeft.getR());
+			worldToLeft.getT().set(-0.3, 0.4, 1);
 		} else {
 			this.worldToLeft = worldToLeft;
 		}
 
 		// randomly generate points in space
-		if( planar ) {
+		if (planar) {
 			worldPts = createRandomPlane(rand, 3, N);
 		} else {
 			worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
@@ -94,14 +93,14 @@ public class CommonStereoMotionNPoint {
 
 		// transform points into second camera's reference frame
 		pointPose = new ArrayList<>();
-		for(Point3D_F64 p1 : worldPts ) {
+		for (Point3D_F64 p1 : worldPts) {
 			Point3D_F64 leftPt = SePointOps_F64.transform(worldToLeft, p1, null);
 			Point3D_F64 rightPt = SePointOps_F64.transform(leftToRight, leftPt, null);
 
-			Point2D_F64 leftObs = new Point2D_F64(leftPt.x/leftPt.z,leftPt.y/leftPt.z);
-			Point2D_F64 rightObs = new Point2D_F64(rightPt.x/rightPt.z,rightPt.y/rightPt.z);
+			Point2D_F64 leftObs = new Point2D_F64(leftPt.x/leftPt.z, leftPt.y/leftPt.z);
+			Point2D_F64 rightObs = new Point2D_F64(rightPt.x/rightPt.z, rightPt.y/rightPt.z);
 
-			pointPose.add( new Stereo2D3D(leftObs,rightObs,p1));
+			pointPose.add(new Stereo2D3D(leftObs, rightObs, p1));
 
 			cameraLeftPts.add(leftPt);
 			cameraRightPts.add(rightPt);
@@ -109,7 +108,7 @@ public class CommonStereoMotionNPoint {
 	}
 
 	public void addNoise( double sigma ) {
-		for( Stereo2D3D o : pointPose ) {
+		for (Stereo2D3D o : pointPose) {
 			o.leftObs.x += rand.nextGaussian()*sigma;
 			o.leftObs.y += rand.nextGaussian()*sigma;
 			o.rightObs.x += rand.nextGaussian()*sigma;
@@ -120,15 +119,14 @@ public class CommonStereoMotionNPoint {
 	/**
 	 * Creates a set of random points along the (X,Y) plane
 	 */
-	public static List<Point3D_F64> createRandomPlane( Random rand , double d , int N )
-	{
+	public static List<Point3D_F64> createRandomPlane( Random rand, double d, int N ) {
 		List<Point3D_F64> ret = new ArrayList<>();
 
-		for( int i = 0; i < N; i++ ) {
-			double x = (rand.nextDouble()-0.5)*2;
-			double y = (rand.nextDouble()-0.5)*2;
+		for (int i = 0; i < N; i++) {
+			double x = (rand.nextDouble() - 0.5)*2;
+			double y = (rand.nextDouble() - 0.5)*2;
 
-			ret.add( new Point3D_F64(x,y,d));
+			ret.add(new Point3D_F64(x, y, d));
 		}
 
 		return ret;

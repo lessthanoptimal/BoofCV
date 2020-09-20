@@ -29,10 +29,9 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public class CreateSyntheticOverheadViewS<T extends ImageGray<T>> extends CreateSyntheticOverheadView<T>
-{
+public class CreateSyntheticOverheadViewS<T extends ImageGray<T>> extends CreateSyntheticOverheadView<T> {
 	// computes interpolated pixel value
-	private InterpolatePixelS<T> interp;
+	private final InterpolatePixelS<T> interp;
 
 	// local variables
 	private GImageGray output;
@@ -42,9 +41,10 @@ public class CreateSyntheticOverheadViewS<T extends ImageGray<T>> extends Create
 	 *
 	 * @param interp Interpolation used when sampling camera image
 	 */
-	public CreateSyntheticOverheadViewS(InterpolatePixelS<T> interp) {
+	public CreateSyntheticOverheadViewS( InterpolatePixelS<T> interp ) {
 		this.interp = interp;
 	}
+
 	/**
 	 * Computes overhead view of input image.  All pixels in input image are assumed to be on the ground plane.
 	 *
@@ -52,18 +52,18 @@ public class CreateSyntheticOverheadViewS<T extends ImageGray<T>> extends Create
 	 * @param output (Output) Image containing overhead view.
 	 */
 	@Override
-	public void process(T input, T output) {
+	public void process( T input, T output ) {
 
-		this.output = FactoryGImageGray.wrap(output,this.output);
+		this.output = FactoryGImageGray.wrap(output, this.output);
 		interp.setImage(input);
 
 		int indexMap = 0;
-		for( int i = 0; i < output.height; i++ ) {
+		for (int i = 0; i < output.height; i++) {
 			int indexOut = output.startIndex + i*output.stride;
-			for( int j = 0; j < output.width; j++ , indexOut++,indexMap++ ) {
+			for (int j = 0; j < output.width; j++, indexOut++, indexMap++) {
 				Point2D_F32 p = mapPixels[indexMap];
-				if( p != null ) {
-					this.output.set(indexOut,interp.get( p.x, p.y));
+				if (p != null) {
+					this.output.set(indexOut, interp.get(p.x, p.y));
 				}
 			}
 		}

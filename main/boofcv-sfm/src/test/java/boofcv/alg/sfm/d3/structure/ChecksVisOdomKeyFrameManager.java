@@ -46,20 +46,20 @@ public abstract class ChecksVisOdomKeyFrameManager {
 
 		for (int i = 0; i < 5; i++) {
 			scene.addFrame(i);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,5,1,scene);
-			assertEquals(0,discard.size);
-			alg.handleSpawnedTracks(tracker,scene.cameras.getTail());
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, 5, 1, scene);
+			assertEquals(0, discard.size);
+			alg.handleSpawnedTracks(tracker, scene.cameras.getTail());
 		}
 		// connect the two most recent frames
 		scene.addFrame(5);
-		connectFrames(4,5,10,scene);
+		connectFrames(4, 5, 10, scene);
 
 		// tell it to only keep 3
-		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,3,1,scene);
+		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, 3, 1, scene);
 		// there should only be 3 dropped in this order
-		assertEquals(3,discard.size);
+		assertEquals(3, discard.size);
 		for (int i = 0; i < 3; i++) {
-			assertEquals(i,discard.get(i));
+			assertEquals(i, discard.get(i));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,15 +38,15 @@ public class TestGenerateScaleTranslateRotate2D {
 
 	@Test
 	public void perfect() {
-		for( int i = 0; i < 100; i++ ) {
-			double theta = rand.nextDouble()*Math.PI*2-Math.PI;
-			double scale = rand.nextDouble()*5+0.1;
+		for (int i = 0; i < 100; i++) {
+			double theta = rand.nextDouble()*Math.PI*2 - Math.PI;
+			double scale = rand.nextDouble()*5 + 0.1;
 
-			ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(theta,scale,-2,3);
+			ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(theta, scale, -2, 3);
 
 			AssociatedPair a = TestDistanceScaleTranslateRotate2DSq.apply(-5, 4, model);
-			AssociatedPair b = TestDistanceScaleTranslateRotate2DSq.apply(2,3,model);
-			AssociatedPair c = TestDistanceScaleTranslateRotate2DSq.apply(-3,2,model);
+			AssociatedPair b = TestDistanceScaleTranslateRotate2DSq.apply(2, 3, model);
+			AssociatedPair c = TestDistanceScaleTranslateRotate2DSq.apply(-3, 2, model);
 
 			List<AssociatedPair> obs = new ArrayList<>();
 			obs.add(a);
@@ -55,7 +55,7 @@ public class TestGenerateScaleTranslateRotate2D {
 
 			ScaleTranslateRotate2D found = new ScaleTranslateRotate2D();
 			GenerateScaleTranslateRotate2D alg = new GenerateScaleTranslateRotate2D();
-			assertTrue(alg.generate(obs,found));
+			assertTrue(alg.generate(obs, found));
 
 			assertEquals(model.transX, found.transX, 1e-8);
 			assertEquals(model.transY, found.transY, 1e-8);
@@ -67,6 +67,6 @@ public class TestGenerateScaleTranslateRotate2D {
 	@Test
 	public void getMinimumPoints() {
 		GenerateScaleTranslateRotate2D alg = new GenerateScaleTranslateRotate2D();
-		assertEquals(3,alg.getMinimumPoints());
+		assertEquals(3, alg.getMinimumPoints());
 	}
 }

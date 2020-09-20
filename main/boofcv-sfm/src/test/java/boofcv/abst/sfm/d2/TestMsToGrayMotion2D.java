@@ -25,8 +25,7 @@ import georegression.struct.InvertibleTransform;
 import georegression.struct.se.Se3_F64;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -38,10 +37,10 @@ public class TestMsToGrayMotion2D {
 		Dummy child = new Dummy();
 		PlToGrayMotion2D alg = new PlToGrayMotion2D(child, GrayF32.class);
 
-		Planar<GrayF32> ms = new Planar<>(GrayF32.class,20,30,3);
+		Planar<GrayF32> ms = new Planar<>(GrayF32.class, 20, 30, 3);
 
 		assertTrue(alg.process(ms));
-		assertTrue(child.input != null );
+		assertNotNull(child.input);
 		assertEquals(0, child.numReset);
 		assertEquals(0, child.numSetToFirst);
 		alg.reset();
@@ -52,7 +51,6 @@ public class TestMsToGrayMotion2D {
 		assertEquals(1, child.numSetToFirst);
 	}
 
-
 	protected class Dummy implements ImageMotion2D {
 
 		ImageBase input;
@@ -60,7 +58,7 @@ public class TestMsToGrayMotion2D {
 		int numSetToFirst = 0;
 
 		@Override
-		public boolean process(ImageBase input) {
+		public boolean process( ImageBase input ) {
 			this.input = input;
 			return true;
 		}

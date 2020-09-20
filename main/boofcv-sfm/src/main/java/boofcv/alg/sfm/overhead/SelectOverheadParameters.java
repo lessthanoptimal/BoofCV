@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,12 +60,12 @@ public class SelectOverheadParameters {
 	 *
 	 * @param cellSize Size of cells in plane in world units
 	 * @param maxCellsPerPixel Specifies minimum resolution of a region in overhead image. A pixel in the camera
-	 *                         can't overlap more than this number of cells.   Higher values allow lower
-	 *                         resolution regions.  Try 4.
+	 * can't overlap more than this number of cells.   Higher values allow lower
+	 * resolution regions.  Try 4.
 	 * @param viewHeightFraction Reduce the view height by this fraction to avoid excessive unusable image space.  Set to
-	 *                          1.0 to maximize the viewing area and any value less than one to crop it.
+	 * 1.0 to maximize the viewing area and any value less than one to crop it.
 	 */
-	public SelectOverheadParameters(double cellSize, double maxCellsPerPixel, double viewHeightFraction) {
+	public SelectOverheadParameters( double cellSize, double maxCellsPerPixel, double viewHeightFraction ) {
 		this.cellSize = cellSize;
 		this.maxCellsPerPixel = maxCellsPerPixel;
 		this.viewHeightFraction = viewHeightFraction;
@@ -78,9 +78,8 @@ public class SelectOverheadParameters {
 	 * @param planeToCamera Extrinsic camera parameters which specify the plane
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process(CameraPinholeBrown intrinsic , Se3_F64 planeToCamera )
-	{
-		proj.setPlaneToCamera(planeToCamera,true);
+	public boolean process( CameraPinholeBrown intrinsic, Se3_F64 planeToCamera ) {
+		proj.setPlaneToCamera(planeToCamera, true);
 		proj.setIntrinsic(intrinsic);
 
 		// find a bounding rectangle on the ground which is visible to the camera and at a high enough resolution
@@ -89,32 +88,32 @@ public class SelectOverheadParameters {
 		double x1 = -Double.MAX_VALUE;
 		double y1 = -Double.MAX_VALUE;
 
-		for( int y = 0; y < intrinsic.height; y++ ) {
-			for( int x = 0; x < intrinsic.width; x++ ) {
-				if( !checkValidPixel(x,y) )
+		for (int y = 0; y < intrinsic.height; y++) {
+			for (int x = 0; x < intrinsic.width; x++) {
+				if (!checkValidPixel(x, y))
 					continue;
 
-				if( plane0.x < x0 )
+				if (plane0.x < x0)
 					x0 = plane0.x;
-				if( plane0.x > x1 )
+				if (plane0.x > x1)
 					x1 = plane0.x;
-				if( plane0.y < y0 )
+				if (plane0.y < y0)
 					y0 = plane0.y;
-				if( plane0.y > y1 )
+				if (plane0.y > y1)
 					y1 = plane0.y;
 			}
 		}
 
-		if( x0 == Double.MAX_VALUE )
+		if (x0 == Double.MAX_VALUE)
 			return false;
 
 		// compute parameters with the intent of maximizing viewing area
-		double mapWidth = x1-x0;
-		double mapHeight = y1-y0;
+		double mapWidth = x1 - x0;
+		double mapHeight = y1 - y0;
 		overheadWidth = (int)Math.floor(mapWidth/cellSize);
-		overheadHeight = (int)Math.floor(mapHeight* viewHeightFraction /cellSize);
+		overheadHeight = (int)Math.floor(mapHeight*viewHeightFraction/cellSize);
 		centerX = -x0;
-		centerY = -(y0+mapHeight*(1- viewHeightFraction)/2.0);
+		centerY = -(y0 + mapHeight*(1 - viewHeightFraction)/2.0);
 
 		return true;
 	}
@@ -124,29 +123,26 @@ public class SelectOverheadParameters {
 	 */
 	public <T extends ImageBase<T>> OverheadView createOverhead( ImageType<T> imageType ) {
 		OverheadView ret = new OverheadView();
-		ret.image = imageType.createImage(overheadWidth,overheadHeight);
+		ret.image = imageType.createImage(overheadWidth, overheadHeight);
 		ret.cellSize = cellSize;
 		ret.centerX = centerX;
 		ret.centerY = centerY;
-		
+
 		return ret;
 	}
 
-	private boolean checkValidPixel( int x , int y ) {
-		if( !proj.pixelToPlane(x,y,plane0) )
+	private boolean checkValidPixel( int x, int y ) {
+		if (!proj.pixelToPlane(x, y, plane0))
 			return false;
-		if( !proj.pixelToPlane(x+1,y+1,plane1) )
+		if (!proj.pixelToPlane(x + 1, y + 1, plane1))
 			return false;
 
 		double width = Math.abs(plane0.x - plane1.x);
 		double height = Math.abs(plane0.y - plane1.y);
 
-		if( width > maxCellsPerPixel *cellSize)
+		if (width > maxCellsPerPixel*cellSize)
 			return false;
-		if( height > maxCellsPerPixel *cellSize)
-			return false;
-
-		return true;
+		return !(height > maxCellsPerPixel*cellSize);
 	}
 
 	public int getOverheadWidth() {

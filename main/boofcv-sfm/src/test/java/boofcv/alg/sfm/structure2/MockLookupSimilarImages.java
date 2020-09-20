@@ -64,7 +64,7 @@ class MockLookupSimilarImages implements LookupSimilarImages {
 			viewIds.add("View " + i);
 		}
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj) null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
 		// 3D location of points in view 0 reference frame
 		feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, numFeatures, rand);
@@ -72,8 +72,8 @@ class MockLookupSimilarImages implements LookupSimilarImages {
 		// render pixel coordinates of all points
 		for (int i = 0; i < numViews; i++) {
 			Se3_F64 view0_to_viewi = SpecialEuclideanOps_F64.eulerXyz(
-					0.01 + 0.1 * i, 0, rand.nextGaussian() * 0.03,
-					rand.nextGaussian() * 0.03, rand.nextGaussian() * 0.03, rand.nextGaussian() * 0.1, null);
+					0.01 + 0.1*i, 0, rand.nextGaussian()*0.03,
+					rand.nextGaussian()*0.03, rand.nextGaussian()*0.03, rand.nextGaussian()*0.1, null);
 
 			// first view is the origin
 			if (i == 0)
@@ -128,7 +128,7 @@ class MockLookupSimilarImages implements LookupSimilarImages {
 				PairwiseImageGraph2.Motion edge = new PairwiseImageGraph2.Motion();
 				edge.is3D = true;
 				// swap src and dst to exercise more edge cases
-				if (j % 2 == 0) {
+				if (j%2 == 0) {
 					edge.src = graph.mapNodes.get(nameI);
 					edge.dst = graph.mapNodes.get(nameJ);
 				} else {
@@ -142,7 +142,7 @@ class MockLookupSimilarImages implements LookupSimilarImages {
 				int[] tableJ = featToView.get(j);
 
 				for (int k = 0; k < numFeatures; k++) {
-					if (j % 2 == 0) {
+					if (j%2 == 0) {
 						edge.inliers.grow().setAssociation(tableI[k], tableJ[k], 0.0);
 					} else {
 						edge.inliers.grow().setAssociation(tableJ[k], tableI[k], 0.0);
@@ -151,7 +151,6 @@ class MockLookupSimilarImages implements LookupSimilarImages {
 
 				edge.src.connections.add(edge);
 				edge.dst.connections.add(edge);
-
 			}
 		}
 	}

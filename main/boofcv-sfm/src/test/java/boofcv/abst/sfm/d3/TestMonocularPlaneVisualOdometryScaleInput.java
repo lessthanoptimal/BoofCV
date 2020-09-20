@@ -46,19 +46,18 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	boolean result;
 	boolean resetCalled = false;
 
-
 	@Test
 	public void setCalibration() {
 		param = null;
 
 		CameraPinholeBrown intrinsic = createIntrinsic();
 		Se3_F64 extrinsic = new Se3_F64();
-		extrinsic.T.x=8;
+		extrinsic.T.x = 8;
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy, 0.5);
 		assertTrue(this.param == null);
-		alg.setCalibration(new MonoPlaneParameters(intrinsic,extrinsic));
+		alg.setCalibration(new MonoPlaneParameters(intrinsic, extrinsic));
 
 		assertEquals(320, this.param.intrinsic.width);
 		assertEquals(160, this.param.intrinsic.height);
@@ -72,10 +71,10 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		CameraPinholeBrown intrinsic = createIntrinsic();
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy, 0.5);
 		alg.setCalibration(new MonoPlaneParameters(intrinsic, new Se3_F64()));
 
-		GrayF32 inputImage = new GrayF32(width,height);
+		GrayF32 inputImage = new GrayF32(width, height);
 
 		alg.process(inputImage);
 
@@ -90,24 +89,24 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy, 0.5);
 
 		assertTrue(type == alg.getImageType());
 	}
 
 	public CameraPinholeBrown createIntrinsic() {
-		return new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0, 0);
+		return new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0, 0);
 	}
 
 	protected class Dummy implements MonocularPlaneVisualOdometry<GrayF32> {
 
 		@Override
-		public void setCalibration(MonoPlaneParameters config ) {
+		public void setCalibration( MonoPlaneParameters config ) {
 			param = config;
 		}
 
 		@Override
-		public boolean process(GrayF32 l) {
+		public boolean process( GrayF32 l ) {
 			image = l;
 			return result;
 		}
@@ -136,7 +135,6 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		public long getFrameID() { return 0; }
 
 		@Override
-		public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {}
+		public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {}
 	}
-
 }

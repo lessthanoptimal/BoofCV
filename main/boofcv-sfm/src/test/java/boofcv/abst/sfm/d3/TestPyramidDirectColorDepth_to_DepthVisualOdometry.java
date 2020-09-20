@@ -32,28 +32,28 @@ import boofcv.struct.pyramid.ImagePyramid;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidDirectColorDepth_to_DepthVisualOdometry extends CheckVisualOdometryDepthSim<GrayU8,GrayU16> {
+public class TestPyramidDirectColorDepth_to_DepthVisualOdometry extends CheckVisualOdometryDepthSim<GrayU8, GrayU16> {
 
 	public TestPyramidDirectColorDepth_to_DepthVisualOdometry() {
-		super(GrayU8.class,GrayU16.class);
+		super(GrayU8.class, GrayU16.class);
 
 		setAlgorithm(createAlgorithm());
 	}
 
-	protected DepthVisualOdometry<GrayU8,GrayU16> createAlgorithm() {
+	protected DepthVisualOdometry<GrayU8, GrayU16> createAlgorithm() {
 
 		ConfigDiscreteLevels config = ConfigDiscreteLevels.levels(3);
 
 		ImagePyramid<Planar<GrayU8>> pyramid = FactoryPyramid.discreteGaussian(config,
-				-1,2,false, ImageType.pl(1,GrayU8.class));
+				-1, 2, false, ImageType.pl(1, GrayU8.class));
 
 		PyramidDirectColorDepth<GrayU8> alg = new PyramidDirectColorDepth<>(pyramid);
 
-		ConvertImageFilter<GrayU8,Planar<GrayU8>> convertInput = new ConvertImageFilter<>(
-				ImageType.single(GrayU8.class), ImageType.pl(1,GrayU8.class));
+		ConvertImageFilter<GrayU8, Planar<GrayU8>> convertInput = new ConvertImageFilter<>(
+				ImageType.single(GrayU8.class), ImageType.pl(1, GrayU8.class));
 
 		DepthSparse3D<GrayU16> sparse3D = new DepthSparse3D.I<>(depthUnits);
 
-		return new PyramidDirectColorDepth_to_DepthVisualOdometry<>(sparse3D,convertInput,alg,GrayU16.class);
+		return new PyramidDirectColorDepth_to_DepthVisualOdometry<>(sparse3D, convertInput, alg, GrayU16.class);
 	}
 }
