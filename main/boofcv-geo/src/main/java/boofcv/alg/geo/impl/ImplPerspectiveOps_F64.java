@@ -103,7 +103,7 @@ public class ImplPerspectiveOps_F64 {
 		return K;
 	}
 
-	public static CameraPinhole matrixToPinhole( DMatrixRMaj K, int width, int height, CameraPinhole output ) {
+	public static CameraPinhole matrixToPinhole( DMatrixRMaj K, int width, int height, @Nullable CameraPinhole output ) {
 
 		if (output == null)
 			output = new CameraPinhole();

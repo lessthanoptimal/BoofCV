@@ -26,14 +26,13 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.factory.geo.*;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.geo.AssociatedTuple;
-import boofcv.struct.geo.AssociatedTupleN;
-import boofcv.struct.geo.TrifocalTensor;
+import boofcv.struct.geo.*;
 import boofcv.struct.image.ImageDimension;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -387,6 +386,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		listPinhole.clear();
 
+		boolean successfulSelfCalibration = false;
 		if (manualFocalLength <= 0) {
 			// Estimate calibration parameters
 			var config = new ConfigSelfCalibDualQuadratic();
@@ -406,43 +406,48 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			cameras.add(P2);
 			cameras.add(P3);
 			FastQueue<AssociatedTuple> observations = new FastQueue<>(() -> new AssociatedTupleN(3));
-			MultiViewOps.convert(ransac.getMatchSet(), observations);
+			MultiViewOps.convertTr(ransac.getMatchSet(), observations);
 
 			var results = new MetricCameras();
 			boolean success = selfcalib.process(dimensions, cameras, observations.toList(), results);
 
 			if (success) {
+				successfulSelfCalibration = true;
 				listPinhole.addAll(results.intrinsics.toList());
 				worldToView.get(0).reset();
 				worldToView.get(1).set(results.motion_1_to_k.get(0));
 				worldToView.get(2).set(results.motion_1_to_k.get(1));
+				if (verbose != null) verbose.println("Auto calibration success");
 			} else {
-//				// TODO Handle this better
-//				System.out.println("Self calibration failed!");
-//				for (int i = 0; i < 3; i++) {
-//					CameraPinhole p = new CameraPinhole(width / 2, width / 2, 0, 0, 0, width, height);
-//					listPinhole.add(p);
-//				}
-				throw new RuntimeException("Estimate H from known intrinsics");
+				if (verbose != null) verbose.println("Auto calibration failed");
 			}
-		} else {
-			throw new RuntimeException("Estimate H from known intrinsics");
-//			// Assume all cameras have a fixed known focal length
-//			EstimatePlaneAtInfinityGivenK estimateV = new EstimatePlaneAtInfinityGivenK();
-//			estimateV.setCamera1(manualFocalLength,manualFocalLength,0,0,0);
-//			estimateV.setCamera2(manualFocalLength,manualFocalLength,0,0,0);
-//
-//			Vector3D_F64 v = new Vector3D_F64(); // plane at infinity
-//			if( !estimateV.estimatePlaneAtInfinity(P2,v))
-//				throw new RuntimeException("Failed!");
-//
-//			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(manualFocalLength,manualFocalLength,0,0,0);
-//			MultiViewOps.createProjectiveToMetric(K,v.x,v.y,v.z,1,H);
-//
-//			for (int i = 0; i < 3; i++) {
-//				CameraPinhole p = new CameraPinhole(manualFocalLength,manualFocalLength, 0, 0, 0, width, height);
-//				listPinhole.add(p);
-//			}
+		}
+
+		if (!successfulSelfCalibration)
+		{
+			// Use provided focal length or guess using an "average" focal length across cameras
+			double focalLength = manualFocalLength <= 0 ? (double)(Math.max(width,height)/2) : manualFocalLength;
+
+			if (verbose != null) verbose.println("Assuming fixed focal length for all views. f="+focalLength);
+
+			final var estimateH = new TwoViewToCalibratingHomography();
+			DMatrixRMaj F21 = MultiViewOps.projectiveToFundamental(P2,null);
+			estimateH.initialize(F21,P2);
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(focalLength,focalLength,0,0,0);
+			FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+			MultiViewOps.convertTr(ransac.getMatchSet(),0,1,pairs);
+			if (!estimateH.process(K,K,pairs.toList()))
+				throw new RuntimeException("Failed to estimate H given 'known' intrinsics");
+
+			// Use the found calibration homography to find motion estimates
+			DMatrixRMaj H = estimateH.getCalibrationHomography();
+			listPinhole.clear();
+			for (int i = 0; i < 3; i++) {
+				listPinhole.add(PerspectiveOps.matrixToPinhole(K,width,height,null));
+			}
+			worldToView.get(0).reset();
+			MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
+			MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
 		}
 
 		if (verbose != null) {

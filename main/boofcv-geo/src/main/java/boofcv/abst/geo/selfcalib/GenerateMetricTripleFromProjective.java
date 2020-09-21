@@ -93,7 +93,7 @@ public class GenerateMetricTripleFromProjective implements
 		extractor.setTensor(tensor);
 		extractor.extractCamera(P2,P3);
 
-		MultiViewOps.convert(observationTriple, observationsN);
+		MultiViewOps.convertTr(observationTriple, observationsN);
 
 		if( !projectiveToMetric.process(dimensions.toList(),projective.toList(),observationsN.toList(),metricN) )
 			return false;

@@ -66,7 +66,7 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 		MultiViewOps.projectiveToFundamental(P2,F21);
 
 		// Convert observations into AssociatedPairs
-		MultiViewOps.convert(observations,0,1,pairs);
+		MultiViewOps.convertTu(observations,0,1,pairs);
 
 		// Projective to Metric calibration
 		if( !selfCalib.process(F21,P2,pairs.toList()) )

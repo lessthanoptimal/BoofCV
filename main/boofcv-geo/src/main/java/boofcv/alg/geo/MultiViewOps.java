@@ -1771,7 +1771,7 @@ public class MultiViewOps {
 		return dst;
 	}
 
-	public static void convert( List<AssociatedTriple> src, FastQueue<AssociatedTuple> dst ) {
+	public static void convertTr( List<AssociatedTriple> src, FastQueue<AssociatedTuple> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;
@@ -1786,8 +1786,22 @@ public class MultiViewOps {
 		}
 	}
 
-	public static void convert( List<AssociatedTuple> src, int idx0, int idx1,
-								FastQueue<AssociatedPair> dst ) {
+	public static void convertTr( List<AssociatedTriple> src, int idx0, int idx1,
+								  FastQueue<AssociatedPair> dst ) {
+		dst.resize(src.size());
+		if (src.size() == 0)
+			return;
+
+		for (int i = 0; i < src.size(); i++) {
+			AssociatedTriple a = src.get(i);
+			AssociatedPair b = dst.get(i);
+			b.p1.set(a.get(idx0));
+			b.p2.set(a.get(idx1));
+		}
+	}
+
+	public static void convertTu( List<AssociatedTuple> src, int idx0, int idx1,
+								  FastQueue<AssociatedPair> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;

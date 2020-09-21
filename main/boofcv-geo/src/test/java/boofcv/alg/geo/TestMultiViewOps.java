@@ -1374,4 +1374,28 @@ class TestMultiViewOps {
 			}
 		}
 	}
+
+	@Test
+	void convertTr_pair() {
+		var triples = new FastQueue<>(AssociatedTriple::new);
+		for (int i = 0; i < 8; i++) {
+			triples.grow().set(
+					rand.nextGaussian(), rand.nextGaussian(),
+					rand.nextGaussian(), rand.nextGaussian(),
+					rand.nextGaussian(), rand.nextGaussian());
+		}
+
+		var found = new FastQueue<>(AssociatedPair::new);
+		MultiViewOps.convertTr(triples.toList(), 0, 1, found);
+
+		assertEquals(triples.size, found.size);
+		triples.forIdx((i,t)-> assertEquals(0.0,t.p1.distance(found.get(i).p1), UtilEjml.TEST_F64));
+		triples.forIdx((i,t)-> assertEquals(0.0,t.p2.distance(found.get(i).p2), UtilEjml.TEST_F64));
+
+		MultiViewOps.convertTr(triples.toList(), 2, 1, found);
+
+		assertEquals(triples.size, found.size);
+		triples.forIdx((i,t)-> assertEquals(0.0,t.p3.distance(found.get(i).p1), UtilEjml.TEST_F64));
+		triples.forIdx((i,t)-> assertEquals(0.0,t.p2.distance(found.get(i).p2), UtilEjml.TEST_F64));
+	}
 }
