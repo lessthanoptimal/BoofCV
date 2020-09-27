@@ -18,12 +18,30 @@
 
 package boofcv;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * @author Peter Abeles
  */
 public class AutocodeMasterApp {
+	public static File findPathToProjectRoot() {
+		String path = "./";
+		while (true) {
+			File d = new File(path);
+			if (new File(d, "main").exists() && new File(d, "gradle.properties").exists())
+				break;
+			path = "../" + path;
+		}
+
+		// normalize().toFile() messes up in this situation and makes it relative to "/"
+		if (path.equals("./"))
+			return new File(path);
+
+		return Paths.get(path).normalize().toFile();
+	}
+
 	public static void main( String[] args ) throws IOException {
 		Autocode64to32App.main(new String[0]);
 		AutocodeConcurrentApp.main(new String[0]);

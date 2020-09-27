@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-//CONCURRENT_INLINE import javax.annotation.Generated;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 import boofcv.struct.image.GrayF32;
@@ -30,7 +29,6 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-//CONCURRENT_INLINE @Generated("boofcv.alg.filter.derivative.impl.GradientPrewitt_Shared")
 @SuppressWarnings("Duplicates")
 public class GradientPrewitt_Shared {
 	public static void process( GrayU8 orig,

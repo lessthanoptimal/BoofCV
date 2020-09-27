@@ -18,7 +18,7 @@
 
 package boofcv.generate;
 
-import boofcv.AutocodeConcurrentApp;
+import boofcv.AutocodeMasterApp;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
@@ -115,7 +115,7 @@ public abstract class CodeGeneratorBase {
 			if (moduleName == null)
 				throw new RuntimeException("Overwrite is true but the module isn't specified");
 
-			File path_to_root = AutocodeConcurrentApp.findPathToProjectRoot();
+			File path_to_root = AutocodeMasterApp.findPathToProjectRoot();
 			File path_to_file = new File(path_to_root, new File("main", moduleName).getPath());
 			if (!path_to_file.exists() || !path_to_file.isDirectory()) {
 				System.err.println("Can't find project root. Attempted to use " + path_to_root.getAbsolutePath());

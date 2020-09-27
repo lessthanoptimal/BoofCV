@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -54,14 +53,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class AutocodeConcurrentApp {
 
 	private static final String prefix = "//CONCURRENT_";
+	private static final String tab = "\t";
+	private static final FindProjectRoot findRootDirectory = AutocodeMasterApp::findPathToProjectRoot;
 
 	/**
 	 * Converts the file from single thread into concurrent implementation
 	 */
 	public static void convertFile( File original ) throws IOException {
 		File outputFile = determineClassName(original);
-
-		System.out.println("Writing to " + outputFile);
 
 		String classNameOld = className(original);
 		String classNameNew = className(outputFile);
@@ -70,7 +69,10 @@ public class AutocodeConcurrentApp {
 		List<String> inputLines = readLines(original, UTF_8);
 		List<String> outputLines = new ArrayList<>();
 
-//		List<Macro> macros = new ArrayList<>();
+		List<Macro> macros = new ArrayList<>();
+
+		// If an import statement has been found
+		boolean foundImport = false;
 
 		// parse each line by line looking for instructions
 		boolean foundClassDef = false;
@@ -80,14 +82,25 @@ public class AutocodeConcurrentApp {
 			String line = inputLines.get(i);
 			int where = line.indexOf(prefix);
 			if (where < 0) {
-				if (!foundClassDef && line.contains("class " + classNameOld)) {
+				if (!foundImport && !foundClassDef && line.startsWith("import")) {
+					foundImport = true;
+					outputLines.add("import javax.annotation.Generated;");
+				} else if (!foundClassDef && line.contains("class " + classNameOld)) {
 					foundClassDef = true;
+					if (foundImport)
+						outputLines.add("@Generated(\"" + derivePackagePath(outputFile) + "." + classNameOld + "\")");
 					line = line.replaceFirst("class " + classNameOld, "class " + classNameNew);
+				} else if (foundImport && line.startsWith("@Generated")) {
+					// If the file already has a generated statement and we are going to add our own remove the old one
+					continue;
 				} else {
 					line = line.replace(classNameOld + "(", classNameNew + "(");
 				}
-				if (!omit)
-					outputLines.add(line);
+				if (omit)
+					continue;
+				for (Macro m : macros)
+					line = line.replace(m.name, m.text);
+				outputLines.add(line);
 				continue;
 			}
 			String type = readType(line, where + prefix.length());
@@ -121,8 +134,16 @@ public class AutocodeConcurrentApp {
 				case "OMIT_END":
 					omit = false;
 					break;
-				case "MACRO":
-					throw new RuntimeException("MACRO not handled yet");
+				case "MACRO": {
+					String[] words = message.split(" ");
+					if (words.length != 2)
+						throw new RuntimeException("Expected only two words for the macro. " + message);
+					Macro m = new Macro();
+					m.name = words[0];
+					m.text = words[1];
+					macros.add(m);
+					break;
+				}
 				default:
 					throw new RuntimeException("Unknown: " + type);
 			}
@@ -137,29 +158,12 @@ public class AutocodeConcurrentApp {
 		createTestIfNotThere(outputFile);
 	}
 
-	public static File findPathToProjectRoot() {
-		String path = "./";
-		while (true) {
-			File d = new File(path);
-			if (new File(d, "main").exists() && new File(d, "gradle.properties").exists())
-				break;
-			path = "../" + path;
-		}
-
-		// normalize().toFile() messes up in this situation and makes it relative to "/"
-		if (path.equals("./"))
-			return new File(path);
-
-		return Paths.get(path).normalize().toFile();
-	}
-
 	/**
 	 * If a test class doesn't exist it will create one. This is to remind the user to do it
 	 */
 	private static void createTestIfNotThere( File file ) {
 		String fileName = "Test" + file.getName();
-		String sep = File.separator;
-		String parent = file.getParent().replace("src"+sep+"main"+sep+"java", "src"+sep+"test"+sep+"java");
+		String parent = file.getParent().replaceAll("src", "test");
 
 //		List<String> packagePath = new ArrayList<>();
 //		while( true ) {
@@ -205,10 +209,10 @@ public class AutocodeConcurrentApp {
 					"import static org.junit.jupiter.api.Assertions.fail;\n" +
 					"\n" +
 					"class " + className + " {\n" +
-					"\t@Test\n" +
-					"\tvoid implement() {\n" +
-					"\t\tfail(\"implement\");\n" +
-					"\t}\n" +
+					tab + "@Test\n" +
+					tab + "void compareToSingle() {\n" +
+					tab + tab + "fail(\"implement\");\n" +
+					tab + "}\n" +
 					"}\n");
 			out.close();
 		} catch (FileNotFoundException e) {
@@ -296,8 +300,7 @@ public class AutocodeConcurrentApp {
 		return text.substring(index0, location);
 	}
 
-	static String readFileToString( File file, Charset encoding )
-			throws IOException {
+	static String readFileToString( File file, Charset encoding ) throws IOException {
 		byte[] encoded = Files.readAllBytes(file.toPath());
 		return new String(encoded, encoding);
 	}
@@ -314,7 +317,7 @@ public class AutocodeConcurrentApp {
 
 	public static void convertDir( File directory, String include, String exclude ) {
 		if (!directory.isDirectory())
-			throw new IllegalArgumentException("Must be a directory");
+			throw new IllegalArgumentException("Must be a directory: '" + directory.getPath() + "'");
 		File[] files = directory.listFiles();
 		if (files == null)
 			throw new IllegalArgumentException("No files");
@@ -335,6 +338,11 @@ public class AutocodeConcurrentApp {
 		Stream<String> stream = Files.lines(file.toPath(), encoding);
 		stream.forEach(lines::add);
 		return lines;
+	}
+
+	public interface FindProjectRoot
+	{
+		File findPathToRoot();
 	}
 
 	public static void main( String[] args ) throws IOException {
@@ -364,7 +372,7 @@ public class AutocodeConcurrentApp {
 //				"main/boofcv-ip/src/main/java/boofcv/alg/enhance/impl/ImplEnhanceHistogram.java"
 		};
 
-		File rootDir = findPathToProjectRoot();
+		File rootDir = findRootDirectory.findPathToRoot();
 		System.out.println("Autocode Concurrent: current=" + new File(".").getAbsolutePath());
 		System.out.println("                     root=" + rootDir.getAbsolutePath());
 

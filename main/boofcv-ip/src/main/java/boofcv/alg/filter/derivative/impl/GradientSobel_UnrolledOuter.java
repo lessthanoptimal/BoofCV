@@ -23,7 +23,6 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
-//CONCURRENT_INLINE import javax.annotation.Generated;
 
 /**
  * <p>
@@ -35,7 +34,6 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  * @see boofcv.alg.filter.derivative.GradientSobel
  */
-//CONCURRENT_INLINE @Generated("boofcv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter")
 public class GradientSobel_UnrolledOuter {
 
 	/**
