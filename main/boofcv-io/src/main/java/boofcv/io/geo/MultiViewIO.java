@@ -20,8 +20,8 @@ package boofcv.io.geo;
 
 import boofcv.BoofVersion;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
-import boofcv.alg.sfm.structure2.PairwiseImageGraph2;
-import boofcv.alg.sfm.structure2.SceneWorkingGraph;
+import boofcv.alg.sfm.structure.PairwiseImageGraph;
+import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
@@ -50,7 +50,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class MultiViewIO {
 
-	public static void save( PairwiseImageGraph2 graph, String path ) {
+	public static void save( PairwiseImageGraph graph, String path ) {
 		try {
 			Writer writer = new OutputStreamWriter(new FileOutputStream(path), UTF_8);
 			save(graph, writer);
@@ -60,12 +60,12 @@ public class MultiViewIO {
 	}
 
 	/**
-	 * Saves a {@link PairwiseImageGraph2} into the {@link Writer}.
+	 * Saves a {@link PairwiseImageGraph} into the {@link Writer}.
 	 *
 	 * @param graph (Input) The graph which is to be saved
 	 * @param outputWriter (Output) where the graph is writen to
 	 */
-	public static void save( PairwiseImageGraph2 graph, Writer outputWriter ) {
+	public static void save( PairwiseImageGraph graph, Writer outputWriter ) {
 		PrintWriter out = new PrintWriter(outputWriter);
 
 		Yaml yaml = createYmlObject();
@@ -74,7 +74,7 @@ public class MultiViewIO {
 
 		List<Map<String, Object>> motions = new ArrayList<>();
 		for (int motionIdx = 0; motionIdx < graph.edges.size; motionIdx++) {
-			PairwiseImageGraph2.Motion pmotion = graph.edges.get(motionIdx);
+			PairwiseImageGraph.Motion pmotion = graph.edges.get(motionIdx);
 			assertEq(pmotion.index, motionIdx);
 
 			Map<String, Object> element = new HashMap<>();
@@ -90,7 +90,7 @@ public class MultiViewIO {
 
 		List<Map<String, Object>> views = new ArrayList<>();
 		for (int viewIdx = 0; viewIdx < graph.nodes.size; viewIdx++) {
-			PairwiseImageGraph2.View pview = graph.nodes.get(viewIdx);
+			PairwiseImageGraph.View pview = graph.nodes.get(viewIdx);
 
 			List<Integer> connections = new ArrayList<>();
 			pview.connections.forIdx(( i, v ) -> connections.add(v.index));
@@ -125,7 +125,7 @@ public class MultiViewIO {
 		return encoded;
 	}
 
-	public static PairwiseImageGraph2 load( String path, @Nullable PairwiseImageGraph2 graph ) {
+	public static PairwiseImageGraph load( String path, @Nullable PairwiseImageGraph graph ) {
 		try {
 			Reader reader = new InputStreamReader(new FileInputStream(path), UTF_8);
 			return load(reader, graph);
@@ -135,15 +135,15 @@ public class MultiViewIO {
 	}
 
 	/**
-	 * Decodes {@link PairwiseImageGraph2} encoded in a YAML format from a reader.
+	 * Decodes {@link PairwiseImageGraph} encoded in a YAML format from a reader.
 	 *
 	 * @param reader (Input/Output) Where the graph is read from
 	 * @param graph (Output) Optional storage for the graph. If null a new instance is created.
 	 * @return The decoded graph
 	 */
-	public static PairwiseImageGraph2 load( Reader reader, @Nullable PairwiseImageGraph2 graph ) {
+	public static PairwiseImageGraph load( Reader reader, @Nullable PairwiseImageGraph graph ) {
 		if (graph == null)
-			graph = new PairwiseImageGraph2();
+			graph = new PairwiseImageGraph();
 		else
 			graph.reset();
 		final var _graph = graph;
@@ -165,7 +165,7 @@ public class MultiViewIO {
 
 		for (int i = 0; i < yamlViews.size(); i++) {
 			Map<String, Object> yamlView = yamlViews.get(i);
-			PairwiseImageGraph2.View v = graph.nodes.get(i);
+			PairwiseImageGraph.View v = graph.nodes.get(i);
 			v.id = getOrThrow(yamlView, "id");
 			v.totalObservations = getOrThrow(yamlView, "total_observations");
 
@@ -179,7 +179,7 @@ public class MultiViewIO {
 
 		for (int i = 0; i < yamlMotions.size(); i++) {
 			Map<String, Object> yamlMotion = yamlMotions.get(i);
-			PairwiseImageGraph2.Motion m = graph.edges.get(i);
+			PairwiseImageGraph.Motion m = graph.edges.get(i);
 
 			m.countF = getOrThrow(yamlMotion, "count_f");
 			m.countH = getOrThrow(yamlMotion, "count_h");
@@ -258,7 +258,7 @@ public class MultiViewIO {
 		out.close();
 	}
 
-	public static SceneWorkingGraph load( String path, PairwiseImageGraph2 pairwise, @Nullable SceneWorkingGraph working ) {
+	public static SceneWorkingGraph load( String path, PairwiseImageGraph pairwise, @Nullable SceneWorkingGraph working ) {
 		try {
 			Reader reader = new InputStreamReader(new FileInputStream(path), UTF_8);
 			return load(reader, pairwise, working);
@@ -275,7 +275,7 @@ public class MultiViewIO {
 	 * @param working (Output) Optional storage for the working graph. If null a new instance is created.
 	 * @return The decoded graph
 	 */
-	public static SceneWorkingGraph load( Reader reader, PairwiseImageGraph2 pairwise, @Nullable SceneWorkingGraph working ) {
+	public static SceneWorkingGraph load( Reader reader, PairwiseImageGraph pairwise, @Nullable SceneWorkingGraph working ) {
 		if (working == null)
 			working = new SceneWorkingGraph();
 		else
@@ -294,7 +294,7 @@ public class MultiViewIO {
 
 		// First declare all the views and link to their respective pview
 		for (Map<String, Object> yamlView : yamlViews) {
-			PairwiseImageGraph2.View pview = pairwise.lookupNode(getOrThrow(yamlView, "pview"));
+			PairwiseImageGraph.View pview = pairwise.lookupNode(getOrThrow(yamlView, "pview"));
 			working.addView(pview);
 		}
 		for (Map<String, Object> yamlView : yamlViews) {
@@ -329,7 +329,7 @@ public class MultiViewIO {
 	}
 
 	public static SceneWorkingGraph.InlierInfo loadInlierInfo( Map<String, Object> map,
-															   PairwiseImageGraph2 pairwise,
+															   PairwiseImageGraph pairwise,
 															   @Nullable SceneWorkingGraph.InlierInfo inliers ) {
 		if (inliers == null)
 			inliers = new SceneWorkingGraph.InlierInfo();

@@ -23,7 +23,7 @@ import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.scene.PointTrackerToSimilarImages;
-import boofcv.alg.sfm.structure2.*;
+import boofcv.alg.sfm.structure.*;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.tracker.ConfigPointTracker;
@@ -60,7 +60,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		boolean forceRecompute = false;
 
-		PairwiseImageGraph2 pairwise = null;
+		PairwiseImageGraph pairwise = null;
 		LookupSimilarImages similarImages; // TODO save and load similar images too
 		SceneWorkingGraph working = null;
 
@@ -119,7 +119,7 @@ public class ExampleMultiviewSceneReconstruction {
 		System.out.println("  edges.size=" + pairwise.edges.size);
 		int nodesWithNo3D = 0;
 		for (int i = 0; i < pairwise.nodes.size; i++) {
-			PairwiseImageGraph2.View n = pairwise.nodes.get(i);
+			PairwiseImageGraph.View n = pairwise.nodes.get(i);
 			boolean found = false;
 			for (int j = 0; j < n.connections.size; j++) {
 				if (n.connections.get(j).is3D) {
@@ -169,7 +169,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Printing view info");
-		for (PairwiseImageGraph2.View pv : pairwise.nodes.toList()) {
+		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
 			var wv = working.lookupView(pv.id);
 			if (wv == null)
 				continue;

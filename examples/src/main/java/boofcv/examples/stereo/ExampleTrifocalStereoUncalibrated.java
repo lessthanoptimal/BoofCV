@@ -86,7 +86,7 @@ import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointClo
  * In this example three uncalibrated images are used to compute a point cloud. Extrinsic as well as all intrinsic
  * parameters (e.g. focal length and lens distortion) are found. Stereo disparity is computed between two of
  * the three views and the point cloud derived from that. To keep the code (relatively) simple, extra steps which
- * improve convergence have been omitted. See {@link boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene} for
+ * improve convergence have been omitted. See {@link ThreeViewEstimateMetricScene} for
  * a more robust version of what has been presented here. Even with these simplifications this example can be
  * difficult to fully understand.
  *

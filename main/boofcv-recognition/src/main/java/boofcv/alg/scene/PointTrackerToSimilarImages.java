@@ -20,7 +20,7 @@ package boofcv.alg.scene;
 
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.sfm.structure2.LookupSimilarImages;
+import boofcv.alg.sfm.structure.LookupSimilarImages;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;

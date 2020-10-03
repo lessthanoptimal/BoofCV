@@ -87,7 +87,6 @@ Version : 0.37
       - TODO Add a smart mode where it will skip over frames with little change
   * TODO MetricFromUncalibratedPairwiseGraph needs to identify mistakes and fix them
   * TODO Create validation tests for at least 3 scenarios with known constant motion along one axis
-  * TODO replace structure with structure2
 - Multi-View Stereo
   - TODO Use existing two view stereo to kludge something together
 - Sparse Bundle Adjustment

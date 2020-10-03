@@ -18,16 +18,11 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.TupleDesc;
-import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,87 +34,134 @@ import java.util.Map;
  */
 public class PairwiseImageGraph {
 
-	public List<View> nodes = new ArrayList<>();
-	public List<Motion> edges = new ArrayList<>();
-	public Map<String, Camera> cameras = new HashMap<>();
+	public FastQueue<View> nodes = new FastQueue<>(View::new);
+	public FastQueue<Motion> edges = new FastQueue<>(Motion::new);
 
-	public void addCamera( Camera camera ) {
-		cameras.put(camera.camera, camera);
+	public Map<String, View> mapNodes = new HashMap<>();
+
+	public void reset() {
+		mapNodes.clear();
+		nodes.reset();
+		edges.reset();
 	}
 
-	static class Camera {
-		public String camera;
-		public Point2Transform2_F64 pixelToNorm;
-		public CameraPinhole pinhole;
+	public View createNode( String id ) {
+		View v = nodes.grow();
+		v.init(id);
+		mapNodes.put(id, v);
+		return v;
+	}
 
-		public Camera( String camera, Point2Transform2_F64 pixelToNorm, CameraPinhole pinhole ) {
-			this.camera = camera;
-			this.pixelToNorm = pixelToNorm;
-			this.pinhole = pinhole;
+	public View lookupNode( String id ) {
+		return mapNodes.get(id);
+	}
+
+	public Motion connect( View a, View b ) {
+		Motion m = edges.grow();
+		m.src = a;
+		m.dst = b;
+		m.index = edges.size - 1;
+		a.connections.add(m);
+		b.connections.add(m);
+		return m;
+	}
+
+	public static class View {
+		/** Unique identifier for this view */
+		public String id;
+		/** Total number of features observations in this view */
+		public int totalObservations;
+		/** List of motions associated with this view. It can be either the src or dst */
+		public FastArray<Motion> connections = new FastArray<>(Motion.class);
+
+		void init( String id ) {
+			this.id = id;
+			this.connections.reset();
 		}
-	}
 
-	/**
-	 * Finds all motions which are observations of the specified camera entirely, src and dst
-	 *
-	 * @param target (Input) Camera being searched for
-	 * @param storage (Output) Optional storage for found camera motions
-	 */
-	public List<Motion> findCameraMotions( Camera target, @Nullable List<Motion> storage ) {
-		if (storage == null)
-			storage = new ArrayList<>();
+		public View connection( int index ) {
+			return connections.get(index).other(this);
+		}
 
-		for (int i = 0; i < edges.size(); i++) {
-			Motion m = edges.get(i);
-			if (m.viewSrc.camera == target && m.viewDst.camera == target) {
-				storage.add(m);
+		public Motion findMotion( View target ) {
+			int idx = findMotionIdx(target);
+			if (idx == -1)
+				return null;
+			else
+				return connections.get(idx);
+		}
+
+		public int findMotionIdx( View target ) {
+			for (int i = 0; i < connections.size; i++) {
+				Motion m = connections.get(i);
+				if (m.src == target || m.dst == target) {
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		/**
+		 * Adds the views that it's connected to from the list
+		 */
+		public void getConnections( int[] indexes, int length,
+									List<View> views ) {
+			views.clear();
+			for (int i = 0; i < length; i++) {
+				views.add(connections.get(indexes[i]).other(this));
 			}
 		}
 
-		return storage;
-	}
-
-	static class View {
-		Camera camera;
-		public int index;
-
-		public List<Motion> connections = new ArrayList<>();
-
-		/** feature descriptor of all features in this image */
-		public FastQueue<TupleDesc> descriptions;
-		/** observed location of all features in pixels */
-		public FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64::new);
-		public FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64::new);
-
-		public View( int index, FastQueue<TupleDesc> descriptions ) {
-			this.index = index;
-			this.descriptions = descriptions;
+		@Override
+		public String toString() {
+			return "PView{id=" + id + ", conn=" + connections.size + ", obs=" + totalObservations + "}";
 		}
 	}
 
-	static class Motion {
-		/** 3x3 matrix describing epipolar geometry. Fundamental or Essential  */
-		public DMatrixRMaj F = new DMatrixRMaj(3, 3);
-
+	public static class Motion {
+		/** 3x3 matrix describing epipolar geometry. Fundamental, Essential, or Homography */
+		public final DMatrixRMaj F = new DMatrixRMaj(3, 3);
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
-		public boolean metric;
+		public boolean is3D;
+		/** Number of inliers when an 3D model (Fundamental/Essential) was fit to observations. */
+		public int countF;
+		/** Number of inliers when a homography was fit to observations. */
+		public int countH;
+		/** Indexes of features in 'src' and 'dst' views which are inliers to the model {@link #F} */
+		public final FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex::new);
 
-		/** Which features are associated with each other and in the inlier set */
-		public List<AssociatedIndex> associated = new ArrayList<>();
+		/** Two views that this motion connects */
+		public View src, dst;
 
-		public View viewSrc;
-		public View viewDst;
-
+		/** Index of motion in {@link #edges} */
 		public int index;
 
-		public View destination( View src ) {
-			if (src == viewSrc) {
-				return viewDst;
-			} else if (src == viewDst) {
-				return viewSrc;
+		public void init() {
+			F.zero();
+			is3D = false;
+			index = -1;
+			src = null;
+			dst = null;
+		}
+
+		public boolean isConnected( View v ) {
+			return v == src || v == dst;
+		}
+
+		/** Given one of the view this motion connects return the other */
+		public View other( View src ) {
+			if (src == this.src) {
+				return dst;
+			} else if (src == dst) {
+				return this.src;
 			} else {
 				throw new RuntimeException("BUG!");
 			}
+		}
+
+		@Override
+		public String toString() {
+			return "Motion( " + (is3D ? "3D " : "") + " '" + src.id + "' <-> '" + dst.id + "')";
 		}
 	}
 }

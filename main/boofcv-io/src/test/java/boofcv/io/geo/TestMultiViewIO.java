@@ -18,8 +18,8 @@
 
 package boofcv.io.geo;
 
-import boofcv.alg.sfm.structure2.PairwiseImageGraph2;
-import boofcv.alg.sfm.structure2.SceneWorkingGraph;
+import boofcv.alg.sfm.structure.PairwiseImageGraph;
+import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.testing.BoofTesting;
 import georegression.struct.se.SpecialEuclideanOps_F64;
@@ -47,25 +47,25 @@ class TestMultiViewIO {
 	@Test
 	void save_load_PairwiseImageGraph() {
 		for (int trial = 0; trial < 20; trial++) {
-			PairwiseImageGraph2 expected = createPairwise();
+			PairwiseImageGraph expected = createPairwise();
 
 			var output = new ByteArrayOutputStream();
 			MultiViewIO.save(expected,new OutputStreamWriter(output));
 
 			var input = new ByteArrayInputStream(output.toByteArray());
-			PairwiseImageGraph2 found = MultiViewIO.load(new InputStreamReader(input),(PairwiseImageGraph2)null);
+			PairwiseImageGraph found = MultiViewIO.load(new InputStreamReader(input),(PairwiseImageGraph)null);
 			checkIdentical(expected,found);
 		}
 	}
 
-	private void checkIdentical( PairwiseImageGraph2 a , PairwiseImageGraph2 b ) {
+	private void checkIdentical( PairwiseImageGraph a , PairwiseImageGraph b ) {
 		assertEquals(a.edges.size,b.edges.size);
 		assertEquals(a.nodes.size,b.nodes.size);
 		assertEquals(a.mapNodes.size(),b.mapNodes.size());
 
 		for ( int viewIdx = 0;viewIdx < a.nodes.size; viewIdx++ ) {
-			PairwiseImageGraph2.View va = a.nodes.get(viewIdx);
-			PairwiseImageGraph2.View vb = b.nodes.get(viewIdx);
+			PairwiseImageGraph.View va = a.nodes.get(viewIdx);
+			PairwiseImageGraph.View vb = b.nodes.get(viewIdx);
 
 			assertSame(va,a.mapNodes.get(va.id));
 			assertSame(vb,b.mapNodes.get(vb.id));
@@ -75,8 +75,8 @@ class TestMultiViewIO {
 			assertEquals(va.connections.size, vb.connections.size);
 
 			for (int i = 0; i < va.connections.size; i++) {
-				PairwiseImageGraph2.Motion ma = va.connections.get(i);
-				PairwiseImageGraph2.Motion mb = vb.connections.get(i);
+				PairwiseImageGraph.Motion ma = va.connections.get(i);
+				PairwiseImageGraph.Motion mb = vb.connections.get(i);
 
 				// Make sure it didn't declare a new instance of the view
 				assertSame(ma.src,a.mapNodes.get(ma.src.id));
@@ -104,12 +104,12 @@ class TestMultiViewIO {
 		}
 	}
 
-	private PairwiseImageGraph2 createPairwise() {
-		var ret = new PairwiseImageGraph2();
+	private PairwiseImageGraph createPairwise() {
+		var ret = new PairwiseImageGraph();
 
 		ret.nodes.resize(rand.nextInt(10)+1);
 		for ( int viewIdx = 0;viewIdx < ret.nodes.size; viewIdx++ ) {
-			PairwiseImageGraph2.View v = ret.nodes.get(viewIdx);
+			PairwiseImageGraph.View v = ret.nodes.get(viewIdx);
 			v.id = rand.nextInt()+"";
 			v.totalObservations = rand.nextInt(200);
 			ret.mapNodes.put(v.id,v);
@@ -119,7 +119,7 @@ class TestMultiViewIO {
 			PrimitiveArrays.shuffle(candidates.data,0,candidates.size,rand);
 			int numConnections = rand.nextInt()+5;
 			for (int i = 0; i < Math.min(numConnections, candidates.size); i++) {
-				PairwiseImageGraph2.Motion m = ret.edges.grow();
+				PairwiseImageGraph.Motion m = ret.edges.grow();
 				m.is3D = rand.nextBoolean();
 				m.src = v;
 				m.dst = ret.nodes.get(candidates.get(i));
@@ -144,7 +144,7 @@ class TestMultiViewIO {
 	@Test
 	void save_load_SceneWorkingGraph() {
 		for (int trial = 0; trial < 20; trial++) {
-			PairwiseImageGraph2 pairwise = createPairwise();
+			PairwiseImageGraph pairwise = createPairwise();
 			SceneWorkingGraph expected = createWorkingGraph(pairwise);
 
 			var output = new ByteArrayOutputStream();
@@ -192,7 +192,7 @@ class TestMultiViewIO {
 		}
 	}
 
-	private SceneWorkingGraph createWorkingGraph(PairwiseImageGraph2 pairwise) {
+	private SceneWorkingGraph createWorkingGraph( PairwiseImageGraph pairwise) {
 		var ret = new SceneWorkingGraph();
 
 		pairwise.nodes.forIdx((i,v)->ret.addView(v));
