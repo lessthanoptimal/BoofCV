@@ -1,2 +1,4 @@
 dependencies {
+    implementation project.sourceSets.noauto.compileClasspath
+    implementation project.sourceSets.noauto.runtimeClasspath
 }
