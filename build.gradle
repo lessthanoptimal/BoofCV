@@ -45,10 +45,7 @@ subprojects {
     }
 
     // Creates Java 8 byte code
-    compileJava {
-        options.compilerArgs += ["--release", "8"]
-//        options.compilerArgs += '--enable-preview'
-    }
+    tasks.withType(JavaCompile).all { options.compilerArgs = ["--release", "8",] }
 
     // To make ErrorProne and Kotlin plugins happy
     configurations.all {
@@ -145,6 +142,7 @@ subprojects {
 
         // needed to use Java 11+ syntax with Java 1.8 byte code
         annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
+        noautoAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
 
         annotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
         noautoAnnotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
