@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.alg.sfm.structure.ReconstructionFromPairwiseGraph.SeedInfo;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestReconstructionFromPairwiseGraph {
+class TestReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 
 	@Test
 	void addOpenForView() {

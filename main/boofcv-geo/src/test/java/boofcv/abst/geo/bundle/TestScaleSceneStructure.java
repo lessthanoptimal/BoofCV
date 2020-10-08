@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.geo.bundle;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestScaleSceneStructure {
+class TestScaleSceneStructure extends BoofStandardJUnit {
 
 	@Test
 	void computePointStatistics() {

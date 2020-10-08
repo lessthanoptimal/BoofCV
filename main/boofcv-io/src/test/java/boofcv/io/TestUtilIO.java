@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.io;
 
 import boofcv.BoofVersion;
+import boofcv.testing.BoofStandardJUnit;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
@@ -38,12 +39,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  * @author Jalal
  */
-class TestUtilIO {
+class TestUtilIO extends BoofStandardJUnit {
 
-	private String validDemoPackage = "boofcv.demonstrations.color";
-	private String validDemoClass = "ShowColorModelApp";
-	private String validExamplePackage = "boofcv.examples.enhance";
-	private String validExampleClass = "ExampleImageEnhancement";
+	private final String validDemoPackage = "boofcv.demonstrations.color";
+	private final String validDemoClass = "ShowColorModelApp";
+	private final String validExamplePackage = "boofcv.examples.enhance";
+	private final String validExampleClass = "ExampleImageEnhancement";
 
 
 	/**
@@ -111,6 +112,9 @@ class TestUtilIO {
 		String nullPackage = null;
 		String nullClass = null;
 		assertEquals("",UtilIO.getSourcePath(nullPackage, nullClass));
+
+		// Flush err so that we don't get a false positive on the stderr check
+		err.reset();
 	}
 
 	@SuppressWarnings("ConstantConditions")

@@ -25,18 +25,16 @@ import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>, I extends ImageInterleaved<I>> {
-
-	protected Random rand = new Random(234);
+public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray<T>, I extends ImageInterleaved<I>>
+		extends BoofStandardJUnit {
 
 	boolean subimage;
 	double tolerance;

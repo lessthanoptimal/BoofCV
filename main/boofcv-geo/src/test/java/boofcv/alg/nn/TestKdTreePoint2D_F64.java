@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.nn;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestKdTreePoint2D_F64 {
+public class TestKdTreePoint2D_F64 extends BoofStandardJUnit {
 	KdTreePoint2D_F64 alg = new KdTreePoint2D_F64();
 
 	@Test

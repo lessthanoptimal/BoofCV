@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,11 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,9 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSegmentMeanShiftSearchColor {
-
-	Random rand = new Random(234);
+public class TestSegmentMeanShiftSearchColor extends BoofStandardJUnit {
 
 	ImageType<Planar<GrayF32>> imageType = ImageType.pl(2,GrayF32.class);
 	InterpolatePixelMB<Planar<GrayF32>> interp =

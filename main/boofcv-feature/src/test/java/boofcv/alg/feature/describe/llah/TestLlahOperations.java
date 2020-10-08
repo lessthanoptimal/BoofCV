@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe.llah;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
@@ -30,18 +31,16 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestLlahOperations {
+class TestLlahOperations extends BoofStandardJUnit {
 
 	int neighborsN = 7;
 	int comboM = 5;
-	Random rand = new Random(345);
 
 	List<List<Point2D_F64>> documents = new ArrayList<>();
 

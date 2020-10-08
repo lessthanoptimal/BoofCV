@@ -24,20 +24,17 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageGray<D>> {
+public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageGray<D>> extends BoofStandardJUnit {
 	Class<T> imageType;
 	Class<D> derivType;
-
-	Random rand = new Random(234);
 
 	int width = 20;
 	int height = 30;

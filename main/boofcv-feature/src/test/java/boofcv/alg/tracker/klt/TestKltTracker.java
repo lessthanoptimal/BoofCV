@@ -26,18 +26,15 @@ import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.ImageBorder1D_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestKltTracker {
-
-	Random rand = new Random(234);
+public class TestKltTracker extends BoofStandardJUnit {
 
 	int imageWidth = 40;
 	int imageHeight = 50;
@@ -85,14 +82,11 @@ public class TestKltTracker {
 				KltTrackFault faultA = trackerA.track(featureA);
 				KltTrackFault faultB = trackerB.track(featureB);
 
-				assertTrue(faultA == faultB);
-
-				if( x == 4 )
-					System.out.println();
+				assertSame(faultA, faultB);
 
 				if( faultA == KltTrackFault.SUCCESS ) {
-					assertTrue(featureA.x == featureB.x);
-					assertTrue(featureA.y == featureB.y);
+					assertEquals(featureB.x, featureA.x);
+					assertEquals(featureB.y, featureA.y);
 				}
 			}
 		}
@@ -120,7 +114,7 @@ public class TestKltTracker {
 		feature.setPosition(imageWidth-2, imageHeight-1);
 
 		// see if it got sucked back
-		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertSame(tracker.track(feature), KltTrackFault.SUCCESS);
 		assertEquals(imageWidth-4,feature.x,0.01);
 		assertEquals(imageHeight-4,feature.y,0.01);
 
@@ -131,7 +125,7 @@ public class TestKltTracker {
 		feature.setPosition(1, 2);
 
 		// see if it got sucked back
-		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertSame(tracker.track(feature), KltTrackFault.SUCCESS);
 		assertEquals(3,feature.x,0.01);
 		assertEquals(3,feature.y,0.01);
 	}
@@ -155,7 +149,7 @@ public class TestKltTracker {
 		feature.setPosition(imageWidth-3-1, imageHeight-3-1);
 
 		// see if it got sucked back
-		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertSame(tracker.track(feature), KltTrackFault.SUCCESS);
 		assertEquals(imageWidth-3-1+2,feature.x,0.01);
 		assertEquals(imageHeight-3-1+1,feature.y,0.01);
 
@@ -166,7 +160,7 @@ public class TestKltTracker {
 		feature.setPosition(3, 3);
 
 		// see if it got sucked back
-		assertTrue(tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertSame(tracker.track(feature), KltTrackFault.SUCCESS);
 		assertEquals(2,feature.x,0.01);
 		assertEquals(1,feature.y,0.01);
 	}
@@ -207,9 +201,9 @@ public class TestKltTracker {
 		tracker.internalSetDescriptionBorder(featureB);
 
 		for( int i = 0; i < featureA.desc.data.length; i++ ) {
-			assertTrue(featureA.desc.data[i] == featureB.desc.data[i]);
-			assertTrue(featureA.derivX.data[i] == featureB.derivX.data[i]);
-			assertTrue(featureA.derivY.data[i] == featureB.derivY.data[i]);
+			assertEquals(featureB.desc.data[i], featureA.desc.data[i]);
+			assertEquals(featureB.derivX.data[i], featureA.derivX.data[i]);
+			assertEquals(featureB.derivY.data[i], featureA.derivY.data[i]);
 		}
 	}
 
@@ -250,7 +244,7 @@ public class TestKltTracker {
 
 		// update the feature's position
 		tracker.setImage(image, derivX, derivY);
-		assertTrue(tracker.track(feature) != KltTrackFault.SUCCESS);
+		assertNotSame(tracker.track(feature), KltTrackFault.SUCCESS);
 	}
 
 	@Test

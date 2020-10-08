@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 /**
  * @author Peter Abeles
  */
-class TestSceneStructureCommon {
+class TestSceneStructureCommon extends BoofStandardJUnit {
 	@Test
 	void removePoints() {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -40,7 +41,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestRefineMetricWorkingGraph {
+class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 	public CameraPinhole intrinsic = new CameraPinhole(400, 400, 0, 400, 350, 800, 700);
 	public CameraPinhole intrinsicZ = new CameraPinhole(400, 400, 0, 0, 0, 800, 700);
 

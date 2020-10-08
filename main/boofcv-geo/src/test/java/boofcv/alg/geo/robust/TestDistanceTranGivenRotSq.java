@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.struct.geo.Point2D3D;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDistanceTranGivenRotSq {
+public class TestDistanceTranGivenRotSq extends BoofStandardJUnit {
 
 	DistanceTranGivenRotSq alg;
 

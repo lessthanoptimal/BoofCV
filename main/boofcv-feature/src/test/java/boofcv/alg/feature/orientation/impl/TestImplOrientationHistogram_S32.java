@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,13 +20,14 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
 import boofcv.struct.image.GrayS16;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplOrientationHistogram_S32 {
+public class TestImplOrientationHistogram_S32 extends BoofStandardJUnit {
 
 	int N = 10;
 	int r = 3;

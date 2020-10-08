@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestAssociateGreedyDesc_MT {
+class TestAssociateGreedyDesc_MT extends BoofStandardJUnit {
 	@Test
 	void compare() {
 		compare(false, 1.0);

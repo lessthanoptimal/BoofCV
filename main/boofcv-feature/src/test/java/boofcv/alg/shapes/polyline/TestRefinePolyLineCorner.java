@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polyline;
 
 import boofcv.misc.CircularIndex;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
@@ -28,16 +29,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestRefinePolyLineCorner {
-
-	Random rand = new Random(234);
+public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 
 	/**
 	 * Fit to a square

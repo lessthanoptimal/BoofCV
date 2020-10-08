@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.flow;
 
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ImagePyramid;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestUtilDenseOpticalFlow {
+public class TestUtilDenseOpticalFlow extends BoofStandardJUnit {
 
 	@Test
 	public void standardPyramid_sigma_05() {

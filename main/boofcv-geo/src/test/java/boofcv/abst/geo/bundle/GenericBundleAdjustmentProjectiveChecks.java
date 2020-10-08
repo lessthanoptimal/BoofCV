@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.geo.bundle;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -38,9 +39,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-abstract class GenericBundleAdjustmentProjectiveChecks {
-	Random rand = new Random(234);
-
+abstract class GenericBundleAdjustmentProjectiveChecks extends BoofStandardJUnit {
 	abstract BundleAdjustment<SceneStructureProjective> createAlg();
 
 	@Test

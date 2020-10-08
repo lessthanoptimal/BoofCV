@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.filter.derivative;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -31,14 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestGradientMultiToSingleBand_Reflection {
+public class TestGradientMultiToSingleBand_Reflection extends BoofStandardJUnit {
 
 	/**
 	 * Pass in a simple method and see if it is invoked correctly
 	 */
 	@Test
 	public void expected() {
-
 		try {
 			Method m = getClass().getMethod("helper",Planar.class,Planar.class,GrayF32.class,GrayF32.class);
 

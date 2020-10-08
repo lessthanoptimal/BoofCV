@@ -22,18 +22,15 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDescribePointPixelRegionNCC_F32 {
-
-	Random rand = new Random(234);
+public class TestImplDescribePointPixelRegionNCC_F32  extends BoofStandardJUnit {
 
 	GrayF32 img = new GrayF32(20,30);
 

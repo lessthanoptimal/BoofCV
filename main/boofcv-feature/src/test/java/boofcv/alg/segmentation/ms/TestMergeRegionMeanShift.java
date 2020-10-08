@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.struct.image.GrayS32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
 * @author Peter Abeles
 */
-public class TestMergeRegionMeanShift {
+public class TestMergeRegionMeanShift extends BoofStandardJUnit {
 	@Test
 	public void basicAll() {
 		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);

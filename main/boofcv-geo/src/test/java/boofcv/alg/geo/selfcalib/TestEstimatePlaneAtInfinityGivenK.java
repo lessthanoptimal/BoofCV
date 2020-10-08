@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestEstimatePlaneAtInfinityGivenK {
+public class TestEstimatePlaneAtInfinityGivenK extends BoofStandardJUnit {
 	/**
 	 * Give it perfect noise free inputs
 	 */

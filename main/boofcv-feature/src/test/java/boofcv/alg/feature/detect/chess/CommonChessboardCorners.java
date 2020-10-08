@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.struct.distort.PixelTransform;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-abstract class CommonChessboardCorners {
+abstract class CommonChessboardCorners extends BoofStandardJUnit {
 	protected int p = 40;
 	protected int w = 20;
 	protected int rows = 4;

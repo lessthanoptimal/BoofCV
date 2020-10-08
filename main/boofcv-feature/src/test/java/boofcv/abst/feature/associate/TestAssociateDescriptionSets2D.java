@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestAssociateDescriptionSets2D {
+class TestAssociateDescriptionSets2D extends BoofStandardJUnit {
 	@Test
 	void matchedOnlyWithinSets() {
 		AssociateDescriptionSets2D<TupleDesc_F64> alg = createAlgorithm();

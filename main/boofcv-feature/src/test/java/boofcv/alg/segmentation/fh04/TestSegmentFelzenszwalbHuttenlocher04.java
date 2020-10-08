@@ -23,11 +23,11 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.segmentation.fh04.impl.FhEdgeWeights4_U8;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,9 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSegmentFelzenszwalbHuttenlocher04 {
-
-	Random rand = new Random(234);
+public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 
 	/**
 	 * Test it on a trivial segmentation problem

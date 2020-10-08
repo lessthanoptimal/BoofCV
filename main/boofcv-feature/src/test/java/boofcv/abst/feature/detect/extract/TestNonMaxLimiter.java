@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxLimiter {
+public class TestNonMaxLimiter extends BoofStandardJUnit {
 	@Test
 	public void checkNoLimit() {
 		GrayF32 intensity = new GrayF32(30,25);

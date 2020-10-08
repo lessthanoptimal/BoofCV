@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestConvertFeatureSelectLimitToIntensity {
+class TestConvertFeatureSelectLimitToIntensity extends BoofStandardJUnit {
 	@Test
 	void callTheFunction() {
 		Dummy<Point2D_I16> dummy = new Dummy<>();

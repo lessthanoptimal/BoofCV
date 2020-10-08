@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestShiTomasiCorner_S32 {
+class TestShiTomasiCorner_S32 extends BoofStandardJUnit {
 	/**
 	 * Compare against the definition
 	 */

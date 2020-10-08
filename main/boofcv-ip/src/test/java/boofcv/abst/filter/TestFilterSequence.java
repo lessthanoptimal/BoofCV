@@ -27,9 +27,8 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,9 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class TestFilterSequence {
+public class TestFilterSequence extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int kernelWidth = 5;
 	int radius = kernelWidth/2;
 	int width = 30;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,12 +22,13 @@ import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapSiftDetector {
+public class TestWrapSiftDetector extends BoofStandardJUnit {
 
 	Class types[] = new Class[]{GrayU8.class,GrayF32.class};
 

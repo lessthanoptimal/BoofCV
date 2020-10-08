@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -25,16 +26,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestRadialDistortionEstimateLinear {
-
-	Random rand = new Random(34);
+public class TestRadialDistortionEstimateLinear extends BoofStandardJUnit {
 
 	/**
 	 * Given perfect observations and a random scenario see if it can compute the distortion parameters

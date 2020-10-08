@@ -22,16 +22,13 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-abstract class GeneralTemplateIntensityImage_MT <T extends ImageGray<T>> {
-
-	Random rand = new Random(344);
+abstract class GeneralTemplateIntensityImage_MT <T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	// image and template being matched
 	T image;

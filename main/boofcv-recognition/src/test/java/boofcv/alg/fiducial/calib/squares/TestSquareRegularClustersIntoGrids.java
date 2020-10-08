@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestSquareRegularClustersIntoGrids {
+public class TestSquareRegularClustersIntoGrids extends BoofStandardJUnit {
 
 	public static double DEFAULT_WIDTH = 1.2;
 	Random rand = new Random(23423);

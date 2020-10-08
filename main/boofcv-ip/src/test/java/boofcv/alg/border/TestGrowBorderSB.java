@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,13 @@
 package boofcv.alg.border;
 
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestGrowBorderSB
+public class TestGrowBorderSB extends BoofStandardJUnit
 {
 	@Nested
 	public class SB_I8 extends CheckGrowBodersSB<GrayU8> {

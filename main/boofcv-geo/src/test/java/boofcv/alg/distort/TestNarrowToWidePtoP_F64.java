@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform3_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.misc.GrlConstants;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestNarrowToWidePtoP_F64 {
+public class TestNarrowToWidePtoP_F64 extends BoofStandardJUnit {
 	/**
 	 * With no translation request a point in the center.  Should appear to be in the center in both views.
 	 */

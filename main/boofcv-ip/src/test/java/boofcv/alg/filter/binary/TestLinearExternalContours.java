@@ -24,6 +24,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestLinearExternalContours {
+class TestLinearExternalContours extends BoofStandardJUnit {
 	Random rand = BoofTesting.createRandom(0);
 
 	public static GrayU8 TEST1 = new GrayU8(new byte[][]

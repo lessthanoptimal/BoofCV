@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestMetricExpandByOneView {
+class TestMetricExpandByOneView extends BoofStandardJUnit {
 	/**
 	 * Perfect inputs that should yield perfect results.
 	 */

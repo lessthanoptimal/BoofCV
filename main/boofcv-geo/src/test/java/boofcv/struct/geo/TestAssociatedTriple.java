@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,16 @@
 
 package boofcv.struct.geo;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestAssociatedTriple {
+public class TestAssociatedTriple extends BoofStandardJUnit {
 
 	@Test
 	public void constructor_ThreePts() {
@@ -37,9 +38,9 @@ public class TestAssociatedTriple {
 		AssociatedTriple a = new AssociatedTriple(p1,p2,p3);
 
 		// make sure it isn't saving the reference
-		assertTrue(p1 != a.p1);
-		assertTrue(p2 != a.p2);
-		assertTrue(p3 != a.p3);
+		assertNotSame(p1, a.p1);
+		assertNotSame(p2, a.p2);
+		assertNotSame(p3, a.p3);
 
 		// see if they have the same value
 		assertTrue(p1.isIdentical(a.p1,1e-8));
@@ -56,15 +57,15 @@ public class TestAssociatedTriple {
 		AssociatedTriple a = new AssociatedTriple(p1,p2,p3,false);
 
 		// make sure it is saving the reference
-		assertTrue(p1 == a.p1);
-		assertTrue(p2 == a.p2);
-		assertTrue(p3 == a.p3);
+		assertSame(p1, a.p1);
+		assertSame(p2, a.p2);
+		assertSame(p3, a.p3);
 
 		a = new AssociatedTriple(p1,p2,p3,true);
 		// make sure it isn't saving the reference
-		assertTrue(p1 != a.p1);
-		assertTrue(p2 != a.p2);
-		assertTrue(p3 != a.p3);
+		assertNotSame(p1, a.p1);
+		assertNotSame(p2, a.p2);
+		assertNotSame(p3, a.p3);
 
 		// see if they have the same value
 		assertTrue(p1.isIdentical(a.p1,1e-8));
@@ -98,9 +99,9 @@ public class TestAssociatedTriple {
 		a.set(p1,p2,p3);
 
 		// make sure it isn't saving the reference
-		assertTrue(p1 != a.p1);
-		assertTrue(p2 != a.p2);
-		assertTrue(p3 != a.p3);
+		assertNotSame(p1, a.p1);
+		assertNotSame(p2, a.p2);
+		assertNotSame(p3, a.p3);
 
 		// see if they have the same value
 		assertTrue(p1.isIdentical(a.p1,1e-8));
@@ -119,9 +120,9 @@ public class TestAssociatedTriple {
 		AssociatedTriple b = a.copy();
 
 		// make sure it isn't saving the reference
-		assertTrue(b.p1 != a.p1);
-		assertTrue(b.p2 != a.p2);
-		assertTrue(b.p3 != a.p3);
+		assertNotSame(b.p1, a.p1);
+		assertNotSame(b.p2, a.p2);
+		assertNotSame(b.p3, a.p3);
 
 		// see if they have the same value
 		assertTrue(b.p1.isIdentical(a.p1,1e-8));

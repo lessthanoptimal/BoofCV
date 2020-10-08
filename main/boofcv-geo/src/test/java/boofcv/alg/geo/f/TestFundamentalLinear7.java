@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,13 @@
 package boofcv.alg.geo.f;
 
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,9 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFundamentalLinear7 {
-
-	Random rand = new Random(234);
+public class TestFundamentalLinear7 extends BoofStandardJUnit {
 
 	@Test
 	public void perfectFundamental() {

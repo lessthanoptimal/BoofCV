@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestNormalizedToPixelError {
+public class TestNormalizedToPixelError extends BoofStandardJUnit {
 
 	// intrinsic camera parameters
 	double fx = 60;

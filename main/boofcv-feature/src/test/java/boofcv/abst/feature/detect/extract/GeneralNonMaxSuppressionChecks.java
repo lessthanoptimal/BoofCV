@@ -23,10 +23,9 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -34,9 +33,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralNonMaxSuppressionChecks {
-
-	Random rand = new Random(123);
+public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 
 	int width = 20;
 	int height = 25;

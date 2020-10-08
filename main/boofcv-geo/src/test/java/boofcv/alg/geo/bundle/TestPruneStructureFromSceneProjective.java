@@ -18,13 +18,13 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.PruneStructureFromSceneProjective;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPoint4D_F64;
@@ -38,16 +38,13 @@ import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestPruneStructureFromSceneProjective {
-	private final Random rand = BoofTesting.createRandom(234);
-
+class TestPruneStructureFromSceneProjective extends BoofStandardJUnit {
 	SceneStructureProjective structure;
 	SceneObservations observations;
 

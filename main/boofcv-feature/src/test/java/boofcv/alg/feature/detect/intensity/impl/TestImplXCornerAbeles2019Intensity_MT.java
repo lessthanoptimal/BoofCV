@@ -21,15 +21,14 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-class TestImplXCornerAbeles2019Intensity_MT {
-	Random rand = new Random(234);
+class TestImplXCornerAbeles2019Intensity_MT extends BoofStandardJUnit {
+
 	int width = 60;
 	int height = 50;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,9 @@
 
 package boofcv.io.image.impl;
 
-class TestImplConvertRaster_MT {
+import boofcv.testing.BoofStandardJUnit;
+
+class TestImplConvertRaster_MT extends BoofStandardJUnit {
 	// This unit test should really be created. Skipping for now because it will be a real pain to write
 }
 

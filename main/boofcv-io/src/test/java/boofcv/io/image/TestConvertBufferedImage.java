@@ -24,12 +24,12 @@ import boofcv.alg.misc.ImageInterleavedTestingOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,9 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class TestConvertBufferedImage {
-
-	Random rand = new Random(234);
+public class TestConvertBufferedImage extends BoofStandardJUnit {
 
 	int imgWidth = 10;
 	int imgHeight = 20;

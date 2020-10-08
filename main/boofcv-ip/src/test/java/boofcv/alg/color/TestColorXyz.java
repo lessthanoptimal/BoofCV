@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,24 +22,22 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-class TestColorXyz {
-	private Random rand = new Random(234);
+class TestColorXyz extends BoofStandardJUnit {
 
-	private double[] rgb_F64 = new double[3];
-	private double[] xyz_F64 = new double[3];
+	private final double[] rgb_F64 = new double[3];
+	private final double[] xyz_F64 = new double[3];
 
-	private float[] rgb_F32 = new float[3];
-	private float[] xyz_F32 = new float[3];
+	private final float[] rgb_F32 = new float[3];
+	private final float[] xyz_F32 = new float[3];
 
 	@Test
 	void RGB_to_XYZ_to_RGB_F32_I32() {

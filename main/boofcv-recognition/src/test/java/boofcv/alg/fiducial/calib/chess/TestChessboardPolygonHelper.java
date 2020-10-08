@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.GrowQueue_B;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestChessboardPolygonHelper {
+public class TestChessboardPolygonHelper extends BoofStandardJUnit {
 
 	@Test
 	public void filterPixelPolygon_noborder() {

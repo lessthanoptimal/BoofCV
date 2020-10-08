@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.alg.feature.associate.AssociateUniqueByScoreAlg;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestEnforceUniqueByScore {
+public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 
 	@Test
 	public void generic() {
@@ -51,7 +52,7 @@ public class TestEnforceUniqueByScore {
 		alg.numDestination=6;
 
 		alg.associate();
-		assertTrue(unique.getMatches()==alg.getMatches());
+		assertSame(unique.getMatches(), alg.getMatches());
 		assertTrue(unique.calledProcess);
 		assertEquals(unique.numSource, alg.numSource);
 		assertEquals(unique.numDestination,alg.numDestination);

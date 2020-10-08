@@ -18,7 +18,7 @@
 
 package boofcv.io.fiducial;
 
-import boofcv.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.List;
-import java.util.Random;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,9 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestFiducialIO {
-	Random rand = BoofTesting.createRandom(0);
-
+class TestFiducialIO extends BoofStandardJUnit {
 	@Test
 	void uchiya_yaml() {
 		var expected = new RandomDotDefinition();

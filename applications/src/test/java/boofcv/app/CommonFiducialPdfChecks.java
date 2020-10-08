@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.app;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -35,18 +36,18 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class CommonFiducialPdfChecks {
+public class CommonFiducialPdfChecks extends BoofStandardJUnit {
 	String document_name = "target";
 
 	List<File> opened = new ArrayList<>();
 
 	public BufferedImage loadPDF() throws IOException {
-		File f = new File(document_name+".pdf");
+		File f = new File(document_name + ".pdf");
 		opened.add(f);
 
 		PDDocument document = PDDocument.load(f);
 		PDFRenderer pdfRenderer = new PDFRenderer(document);
-		if( document.getNumberOfPages() != 1 )
+		if (document.getNumberOfPages() != 1)
 			throw new RuntimeException("Egads");
 		BufferedImage output = pdfRenderer.renderImageWithDPI(0, 150, ImageType.RGB);
 		document.close();
@@ -56,19 +57,19 @@ public class CommonFiducialPdfChecks {
 
 	public GrayF32 loadPdfAsGray() throws IOException {
 		BufferedImage image = loadPDF();
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 		return gray;
 	}
 
 	public GrayF32 loadPngAsGray( String name ) {
 		BufferedImage image = loadImage(name);
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 		return gray;
 	}
 
-	public BufferedImage loadImage( String name )  {
+	public BufferedImage loadImage( String name ) {
 		File f = new File(name);
 		opened.add(f);
 		return UtilImageIO.loadImage(f.getAbsolutePath());

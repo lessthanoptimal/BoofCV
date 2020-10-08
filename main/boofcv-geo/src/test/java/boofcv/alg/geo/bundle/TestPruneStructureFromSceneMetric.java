@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.*;
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,9 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("RedundantCast")
-class TestPruneStructureFromSceneMetric {
-	private final Random rand = BoofTesting.createRandom(234);
-
+class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	SceneStructureMetric structure;
 	SceneObservations observations;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.EulerType;
@@ -35,7 +36,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,8 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestThreeViewEstimateMetricScene {
-	Random rand = new Random(234);
+public class TestThreeViewEstimateMetricScene extends BoofStandardJUnit {
 	CameraPinhole intrinsic = new CameraPinhole(400, 400, 0, 0, 0, 900, 900);
 
 	List<Point3D_F64> features;

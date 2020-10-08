@@ -18,10 +18,8 @@
 
 package boofcv.alg.color;
 
-import boofcv.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,9 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * [3] http://brucelindbloom.com/index.html?ColorDifferenceCalc.html
  *
  */
-class TestColorDifference {
-    final Random rand = BoofTesting.createRandom(234543);
-
+class TestColorDifference extends BoofStandardJUnit {
     final double precision = 0.0001;
     // Some reference values
     final double[] colorA1 = new double[]{50.0, 2.6772, -79.7751};

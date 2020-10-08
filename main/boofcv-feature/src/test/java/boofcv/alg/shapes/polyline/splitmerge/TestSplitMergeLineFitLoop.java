@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polyline.splitmerge;
 
 import boofcv.struct.ConfigLength;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSplitMergeLineFitLoop {
+public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 
 	public static final ConfigLength MINIMUM_LENGTH = ConfigLength.relative(0.01,0);
 	public static final ConfigLength MINIMUM_LENGTH_5X = ConfigLength.relative(0.05,0);

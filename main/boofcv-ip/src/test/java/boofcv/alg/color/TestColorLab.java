@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,9 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,9 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestColorLab {
-
-	Random rand = new Random(234);
+class TestColorLab extends BoofStandardJUnit {
 
 	@Test
 	void rgb_to_lab_srgb_gamma() {

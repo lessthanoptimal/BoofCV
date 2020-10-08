@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
@@ -28,16 +28,13 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Generic tests that applied to all {@link FeatureSelectLimitIntensity}.
  */
-public abstract class ChecksFeatureSelectLimitIntensity<Point> {
+public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStandardJUnit {
 
-	Random rand = BoofTesting.createRandom(0);
 
 	// the width and height passed in to the algorithm will depend on intensity being null. If it is not null then
 	// -1 is passed in since it should be ignored and if it's not it should blow up. Otherwise the true values

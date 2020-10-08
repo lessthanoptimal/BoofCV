@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -40,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestQuadPoseEstimator {
+public class TestQuadPoseEstimator extends BoofStandardJUnit {
 
 	private static LensDistortionNarrowFOV createDistortion() {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,550,0,400,300,800,600).fsetRadial(0.15,0.05);

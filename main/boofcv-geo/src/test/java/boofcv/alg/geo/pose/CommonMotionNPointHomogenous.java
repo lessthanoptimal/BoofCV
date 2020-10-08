@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -29,7 +30,6 @@ import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Common testing code for algorithms which estimate motion from a set of associated observations
@@ -37,9 +37,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class CommonMotionNPointHomogenous {
-
-	protected Random rand = new Random(234);
+public class CommonMotionNPointHomogenous extends BoofStandardJUnit {
 
 	// Projection matrix 3x4
 	protected DMatrixRMaj projection;

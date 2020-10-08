@@ -23,6 +23,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.BufferedImageChecks;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.*;
@@ -37,9 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Peter Abeles
  */
-public class TestImplConvertRaster {
-
-	Random rand = new Random(234);
+public class TestImplConvertRaster extends BoofStandardJUnit {
 
 	int imgWidth = 10;
 	int imgHeight = 20;

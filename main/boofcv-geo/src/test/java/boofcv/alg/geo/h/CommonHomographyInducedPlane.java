@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PairLineNorm;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class CommonHomographyInducedPlane {
+public class CommonHomographyInducedPlane extends BoofStandardJUnit {
 
 	public DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(500, 520, 0.1, 400, 450);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort.mls;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestImageDeformPointMLS_F32 {
+class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 
 	int width = 45;
 	int height = 60;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-class TestPoseFromPairLinear6 {
+class TestPoseFromPairLinear6 extends BoofStandardJUnit {
 
 	@Nested
 	class Calibrate extends ChecksMotionNPoint {

@@ -26,15 +26,13 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestGlobalFixedBinaryFilter {
-	Random rand = new Random(234);
+public class TestGlobalFixedBinaryFilter extends BoofStandardJUnit {
 
 	@Test
 	public void compare() {

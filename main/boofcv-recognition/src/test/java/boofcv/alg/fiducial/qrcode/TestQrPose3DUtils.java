@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.UtilEjml;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestQrPose3DUtils {
+public class TestQrPose3DUtils extends BoofStandardJUnit {
 
 	@Test
 	public void getLandmarkByIndex() {

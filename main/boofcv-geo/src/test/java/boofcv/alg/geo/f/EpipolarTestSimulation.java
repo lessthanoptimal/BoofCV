@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -32,16 +33,13 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Standardized checks for computing fundamental matrices
  *
  * @author Peter Abeles
  */
-public abstract class EpipolarTestSimulation {
-
-	protected Random rand = new Random(234234);
+public abstract class EpipolarTestSimulation extends BoofStandardJUnit {
 
 	// create a reasonable calibration matrix
 	protected CameraPinhole intrinsic = new CameraPinhole(60,80,0.01,200,150,400,300);

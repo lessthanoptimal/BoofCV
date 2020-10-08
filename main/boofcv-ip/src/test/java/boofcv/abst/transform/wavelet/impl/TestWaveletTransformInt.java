@@ -30,17 +30,15 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_I32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestWaveletTransformInt {
+public class TestWaveletTransformInt extends BoofStandardJUnit {
 
-	Random rand = new Random(3445);
 	int width = 30;
 	int height = 40;
 

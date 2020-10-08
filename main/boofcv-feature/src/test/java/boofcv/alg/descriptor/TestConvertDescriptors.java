@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,8 @@ import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,9 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestConvertDescriptors {
+public class TestConvertDescriptors extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 
 	/**
 	 * General test with a known output

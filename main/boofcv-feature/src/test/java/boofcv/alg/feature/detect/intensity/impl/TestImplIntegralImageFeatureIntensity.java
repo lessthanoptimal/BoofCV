@@ -23,17 +23,15 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplIntegralImageFeatureIntensity {
+public class TestImplIntegralImageFeatureIntensity extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 60;
 	int height = 70;
 

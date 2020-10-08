@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.sfm.PlanePtPixel;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDistancePlane2DToPixelSq {
+public class TestDistancePlane2DToPixelSq extends BoofStandardJUnit {
 
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200, 210, 0, 320, 240, 640, 480).fsetRadial(0, 0);
 

@@ -18,11 +18,11 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.BoofTesting;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -35,15 +35,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestPairwiseGraphUtils {
-	Random rand = BoofTesting.createRandom(1);
+class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 	@Test
 	void findCommonFeatures() {

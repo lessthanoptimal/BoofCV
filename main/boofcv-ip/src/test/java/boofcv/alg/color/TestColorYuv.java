@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,9 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,16 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestColorYuv {
+class TestColorYuv extends BoofStandardJUnit {
 	public static final double tol = 0.01;
 
-	Random rand = new Random(234);
+	double[] yuv_F64 = new double[3];
+	double[] rgb_F64 = new double[3];
 
-	double yuv_F64[] = new double[3];
-	double rgb_F64[] = new double[3];
-
-	float yuv_F32[] = new float[3];
-	float rgb_F32[] = new float[3];
+	float[] yuv_F32 = new float[3];
+	float[] rgb_F32 = new float[3];
 
 	@Test
 	void yuv_to_rgb_32bit() {
@@ -100,8 +97,8 @@ class TestColorYuv {
 	@Test
 	public void backAndForth_U8() {
 		for( int i = 0; i < 1000; i++ ) {
-			byte yuv[] = new byte[3];
-			byte rgb[] = new byte[3];
+			byte[] yuv = new byte[3];
+			byte[] rgb = new byte[3];
 
 			int r = rand.nextInt(256);
 			int g = rand.nextInt(256);
@@ -172,7 +169,7 @@ class TestColorYuv {
 
 	@Test
 	void ycbcr_to_rgb_32bit() {
-		byte yuv[] = new byte[3];
+		byte[] yuv = new byte[3];
 		ColorYuv.rgbToYCbCr(100,120,130, yuv);
 		int found = ColorYuv.ycbcrToRgb(yuv[0]&0xFF, yuv[1]&0xFF, yuv[2]&0xFF);
 
@@ -182,7 +179,7 @@ class TestColorYuv {
 	}
 
 
-	private static void check( double found[] , double a , double b , double c ) {
+	private static void check( double[] found, double a , double b , double c ) {
 		double tol = TestColorYuv.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;
 
 		assertEquals(a,found[0],tol);
@@ -190,7 +187,7 @@ class TestColorYuv {
 		assertEquals(c, found[2], tol);
 	}
 
-	private static void check( float found[] , float a , float b , float c ) {
+	private static void check( float[] found, float a , float b , float c ) {
 		double tol = TestColorYuv.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;
 
 		assertEquals(a,found[0],tol);

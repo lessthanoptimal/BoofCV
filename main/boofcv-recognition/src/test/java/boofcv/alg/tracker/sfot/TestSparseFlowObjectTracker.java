@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,9 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.RectangleRotate_F64;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,9 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSparseFlowObjectTracker {
-
-	Random rand = new Random(2342);
+public class TestSparseFlowObjectTracker extends BoofStandardJUnit {
 
 	@Test
 	public void noMotion() {

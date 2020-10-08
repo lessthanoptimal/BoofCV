@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,20 +18,18 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestReidSolomonCodes {
-	Random rand = new Random(234);
-	int primitive2 = 0b111;
+public class TestReidSolomonCodes extends BoofStandardJUnit {
+
 	int primitive8 = 0b100011101;
 
 	@Test

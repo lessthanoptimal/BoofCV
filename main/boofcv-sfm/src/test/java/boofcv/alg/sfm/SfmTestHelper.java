@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -32,7 +33,7 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
-public class SfmTestHelper {
+public class SfmTestHelper extends BoofStandardJUnit {
 
 	/**
 	 * Renders a 3D point in the left and right camera views given the stereo parameters. Lens distortion

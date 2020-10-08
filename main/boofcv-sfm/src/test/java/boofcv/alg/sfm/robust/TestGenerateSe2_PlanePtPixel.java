@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.sfm.robust;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.sfm.PlanePtPixel;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -32,7 +33,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,9 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestGenerateSe2_PlanePtPixel {
-
-	Random rand = new Random(93948);
+public class TestGenerateSe2_PlanePtPixel extends BoofStandardJUnit {
 
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200, 210, 0, 320, 240, 640, 480).fsetRadial(0, 0);
 

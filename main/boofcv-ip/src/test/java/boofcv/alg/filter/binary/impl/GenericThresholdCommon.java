@@ -25,9 +25,8 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,10 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericThresholdCommon<T extends ImageGray<T>> {
+public abstract class GenericThresholdCommon<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	Class<T> imageType;
-	Random rand = new Random(234);
 
 	protected GenericThresholdCommon( Class<T> imageType ) {
 		this.imageType = imageType;

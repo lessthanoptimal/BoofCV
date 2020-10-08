@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo.h;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedPair3D;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -39,9 +40,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class CommonHomographyChecks {
-
-	protected Random rand = new Random(234234);
+public class CommonHomographyChecks extends BoofStandardJUnit {
 
 	// create a reasonable calibration matrix
 	protected DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);

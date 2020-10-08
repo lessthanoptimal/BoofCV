@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.shapes.polyline;
 
 import boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksGenericPointsToPolyline {
+public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 
 	public abstract PointsToPolyline createAlg( boolean loop );
 

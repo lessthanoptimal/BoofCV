@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
@@ -33,8 +34,6 @@ import georegression.struct.shapes.RectangleLength2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,9 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestDistortImageOps {
+class TestDistortImageOps extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 20;
 	int height = 30;
 

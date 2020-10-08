@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,13 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestNonMaxExtractorNaive {
+public class TestNonMaxExtractorNaive extends BoofStandardJUnit {
 
 	@Test
 	public void standardTests() {

@@ -40,8 +40,8 @@ public class BoofStandardJUnit {
 	// Override output streams to keep log spam to a minimum
 	protected final ByteArrayOutputStream out = new ByteArrayOutputStream();
 	protected final ByteArrayOutputStream err = new ByteArrayOutputStream();
-	private final PrintStream systemOut = System.out;
-	private final PrintStream systemErr = System.err;
+	protected final PrintStream systemOut = System.out;
+	protected final PrintStream systemErr = System.err;
 
 	@BeforeEach
 	public void captureStreams() {

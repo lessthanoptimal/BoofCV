@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
@@ -37,9 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestCodecSceneStructureMetric {
-	private final Random rand = BoofTesting.createRandom(234);
-
+class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 	@Test
 	void encode_decode() {
 		encode_decode(true, false);

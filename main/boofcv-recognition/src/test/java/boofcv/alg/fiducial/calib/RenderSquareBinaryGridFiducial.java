@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.calib;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
@@ -31,12 +32,12 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RenderSquareBinaryGridFiducial {
+public class RenderSquareBinaryGridFiducial extends BoofStandardJUnit {
 
 	public double border = 0.25;
 	public int binaryGrid = 3;
 	public int squareWidth = 40;
-	public long values[];
+	public long[] values;
 
 
 	public List<Quadrilateral_F64> expectedCorners = new ArrayList<>();

@@ -30,19 +30,16 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> {
+public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	Class<T> imageType;
-	
-	Random rand = new Random(234234);
 
 	Affine2D_F32 affine = new Affine2D_F32(1,2,3,4,5,6);
 	PixelTransformAffine_F32 tran = new PixelTransformAffine_F32(affine);

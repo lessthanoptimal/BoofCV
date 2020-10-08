@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.io.points;
 
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.io.points.PointCloudIO.Format;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestPointCloudIO {
+class TestPointCloudIO extends BoofStandardJUnit {
 	@Test
 	void encode_decode_3D32F() throws IOException {
 		List<Point3D_F32> expected = new ArrayList<>();

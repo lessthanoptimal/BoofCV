@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.io.wrapper.images;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestLoadFileImageSequence {
+class TestLoadFileImageSequence extends BoofStandardJUnit {
 
 	private String imagePath = getClass().getResource("/boofcv/io/image/wrapper/images/").getFile();
 

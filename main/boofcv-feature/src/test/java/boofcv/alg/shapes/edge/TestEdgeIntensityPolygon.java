@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.shapes.edge;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestEdgeIntensityPolygon {
+public class TestEdgeIntensityPolygon extends BoofStandardJUnit {
 	@Test
 	public void computeEdge() {
 		GrayU8 image = new GrayU8(400,500);

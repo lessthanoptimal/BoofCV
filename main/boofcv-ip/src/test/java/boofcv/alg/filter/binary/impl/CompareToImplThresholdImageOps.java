@@ -27,7 +27,6 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static boofcv.BoofTesting.primitive;
 
@@ -37,7 +36,6 @@ import static boofcv.BoofTesting.primitive;
 public abstract class CompareToImplThresholdImageOps extends CompareIdenticalFunctions {
 
 	final int width=100,height=110;
-	private Random rand = new Random(234);
 
 	protected CompareToImplThresholdImageOps( Class testClass ) {
 		super(testClass, ImplThresholdImageOps.class);

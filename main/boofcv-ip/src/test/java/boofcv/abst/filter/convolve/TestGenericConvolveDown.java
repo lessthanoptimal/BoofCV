@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,14 @@
 
 package boofcv.abst.filter.convolve;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestGenericConvolveDown {
+public class TestGenericConvolveDown extends BoofStandardJUnit {
 
 	/**
 	 * No test is provided here since {@link boofcv.abst.filter.convolve.TestFactoryConvolveDown} already does an exhaustive test

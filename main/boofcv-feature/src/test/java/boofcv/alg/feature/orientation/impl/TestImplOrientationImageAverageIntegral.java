@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,13 +22,14 @@ import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplOrientationImageAverageIntegral {
+public class TestImplOrientationImageAverageIntegral extends BoofStandardJUnit {
 	double angleTol = 0.01;
 	int r = 4;
 

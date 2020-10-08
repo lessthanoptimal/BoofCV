@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Motion;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestExpandByOneView {
+class TestExpandByOneView extends BoofStandardJUnit {
 
 	/**
 	 * Creates a more complex scenario and sees if it selects the correct two views

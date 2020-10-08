@@ -25,6 +25,7 @@ import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImplEdgeNonMaxSuppressionCrude {
+public class TestImplEdgeNonMaxSuppressionCrude extends BoofStandardJUnit {
 
 	static int width = 20;
 	static int height = 30;

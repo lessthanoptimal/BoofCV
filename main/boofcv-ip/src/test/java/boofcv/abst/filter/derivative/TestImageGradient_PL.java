@@ -24,18 +24,16 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageGradient_PL {
+public class TestImageGradient_PL extends BoofStandardJUnit {
 
-	Class types[] = new Class[]{GrayU8.class, GrayF32.class};
+	Class[] types = new Class[]{GrayU8.class, GrayF32.class};
 
-	Random rand = new Random(234);
 	int width = 50,height=60;
 
 	@Test

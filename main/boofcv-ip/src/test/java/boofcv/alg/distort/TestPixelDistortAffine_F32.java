@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.affine.AffinePointOps_F32;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPixelDistortAffine_F32 {
+public class TestPixelDistortAffine_F32 extends BoofStandardJUnit {
 	@Test
 	public void constructor_32() {
 		Affine2D_F32 a = new Affine2D_F32(1,2,3,4,5,6);

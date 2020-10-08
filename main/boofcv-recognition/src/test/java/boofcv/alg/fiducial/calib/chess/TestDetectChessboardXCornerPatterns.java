@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Nested;
 
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-class TestDetectChessboardXCornerPatterns {
+class TestDetectChessboardXCornerPatterns extends BoofStandardJUnit {
 
 	@Nested
 	class SingleTarget extends GenericDetectFindChessboardCorners {

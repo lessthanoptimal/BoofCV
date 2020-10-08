@@ -128,7 +128,8 @@ public abstract class CommonGenerateMetricCameraTripleChecks extends CommonThree
 			BoofTesting.assertEqualsToScaleS(truthView_1_to_i(2), found.view_1_to_3, 1e-2, 1e-3);
 		}
 //		System.out.println("Passed "+countSuccess+" / "+totalTrials);
-		assertTrue(minimumFractionSuccess*totalTrials <= countSuccess,"Failed "+(totalTrials-countSuccess));
+		assertTrue(minimumFractionSuccess*totalTrials <= countSuccess,
+				"Failed "+(totalTrials-countSuccess)+" min "+(minimumFractionSuccess*totalTrials-countSuccess));
 	}
 
 	@Test

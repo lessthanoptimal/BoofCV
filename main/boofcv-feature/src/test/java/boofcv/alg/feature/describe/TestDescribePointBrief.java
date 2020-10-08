@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,18 +25,15 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointBrief {
-
-	Random rand = new Random(234);
+public class TestDescribePointBrief extends BoofStandardJUnit {
 
 	/**
 	 * Checks to see if it blows up when processing features

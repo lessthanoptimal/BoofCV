@@ -23,9 +23,8 @@ import boofcv.alg.feature.describe.impl.ImplSurfDescribeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,9 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestSurfDescribeOps {
-
-	Random rand = new Random(2342);
+public class TestSurfDescribeOps extends BoofStandardJUnit {
 
 	int width = 60;
 	int height = 70;

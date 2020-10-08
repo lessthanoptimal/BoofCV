@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestLensDistortionOps_F64 {
+public class TestLensDistortionOps_F64 extends BoofStandardJUnit {
 
 	Point2D_F64 pf = new Point2D_F64();
 	Point2D_F64 pd = new Point2D_F64();

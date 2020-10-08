@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.robust.GenerateSe2_AssociatedPair;
 import boofcv.alg.geo.robust.ModelTestingInterface;
 import boofcv.alg.geo.robust.StandardModelGeneratorTests;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.MotionSe2PointSVD_F64;
 import georegression.struct.point.Point2D_F64;
@@ -31,13 +32,12 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestGenerateSe2_AssociatedPair implements ModelTestingInterface<Se2_F64, AssociatedPair> {
-	Random rand = new Random(234);
+public class TestGenerateSe2_AssociatedPair extends BoofStandardJUnit
+		implements ModelTestingInterface<Se2_F64, AssociatedPair> {
 
 	@Test
 	public void modelGenerator() {

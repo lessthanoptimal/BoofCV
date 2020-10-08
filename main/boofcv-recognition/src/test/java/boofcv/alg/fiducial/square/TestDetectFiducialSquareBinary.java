@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,22 +27,20 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestDetectFiducialSquareBinary {
+public class TestDetectFiducialSquareBinary extends BoofStandardJUnit {
 
 	static int gridWidth = 4;
 	static double borderWidth = 0.25;
 	static double blackBorderFraction = 0.65;
 
-	private Random rand = new Random(234);
 	private DetectPolygonBinaryGrayRefine<GrayU8> squareDetector = FactoryShapeDetector.polygon(
 			new ConfigPolygonDetector(false, 4, 4), GrayU8.class);
 	private InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);

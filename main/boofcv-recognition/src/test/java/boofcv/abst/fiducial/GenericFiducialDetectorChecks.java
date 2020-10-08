@@ -29,6 +29,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -50,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class GenericFiducialDetectorChecks {
+public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 
 	// tolerance for difference between pixel location and geometric center from reprojection
 	protected double pixelAndProjectedTol = 3.0;

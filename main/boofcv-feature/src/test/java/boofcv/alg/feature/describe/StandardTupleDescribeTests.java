@@ -22,9 +22,8 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -34,8 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  *
  * @author Peter Abeles
  */
-public abstract class StandardTupleDescribeTests {
-	Random rand = new Random(234);
+public abstract class StandardTupleDescribeTests extends BoofStandardJUnit {
+
 	int width = 50;
 	int height = 60;
 

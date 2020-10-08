@@ -18,7 +18,7 @@
 
 package boofcv.alg.cloud;
 
-import boofcv.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.UtilEjml;
@@ -26,16 +26,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestPointCloudUtils_F64 {
-
-	Random rand = BoofTesting.createRandom(93);
+public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
 
 	@Test
 	public void autoScale() {

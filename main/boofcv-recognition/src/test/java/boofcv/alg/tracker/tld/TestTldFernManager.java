@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,15 @@
 
 package boofcv.alg.tracker.tld;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestTldFernManager {
+public class TestTldFernManager extends BoofStandardJUnit {
 
 	@Test
 	public void constructor() {
@@ -39,9 +39,9 @@ public class TestTldFernManager {
 		TldFernManager alg = new TldFernManager(10);
 
 		TldFernFeature a = alg.lookupFern(345);
-		assertTrue(a != null);
+		assertNotNull(a);
 
-		assertTrue(a == alg.lookupFern(345));
+		assertSame(a, alg.lookupFern(345));
 
 		assertEquals(345,a.value);
 	}
@@ -71,7 +71,7 @@ public class TestTldFernManager {
 		alg.reset();
 
 		for( int i = 0; i < alg.table.length; i++ ) {
-			assertTrue(alg.table[i] == null);
+			assertNull(alg.table[i]);
 		}
 
 		assertEquals(2,alg.unusedFern.size());
@@ -81,10 +81,10 @@ public class TestTldFernManager {
 	public void createFern() {
 		TldFernManager alg = new TldFernManager(3);
 
-		assertTrue(alg.createFern() != null);
+		assertNotNull(alg.createFern());
 		alg.unusedFern.push(new TldFernFeature());
 
-		assertTrue(alg.createFern() != null);
+		assertNotNull(alg.createFern());
 		assertEquals(0,alg.unusedFern.size());
 	}
 

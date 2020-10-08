@@ -18,7 +18,6 @@
 
 package boofcv.alg.scene;
 
-import boofcv.BoofTesting;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.alg.scene.PointTrackerToSimilarImages.Frame;
@@ -26,6 +25,7 @@ import boofcv.alg.scene.PointTrackerToSimilarImages.Matches;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.util.PrimitiveArrays;
@@ -35,15 +35,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestPointTrackerToSimilarImages {
-	Random rand = BoofTesting.createRandom(9);
+class TestPointTrackerToSimilarImages extends BoofStandardJUnit {
 
 	@Test
 	void processFrame() {

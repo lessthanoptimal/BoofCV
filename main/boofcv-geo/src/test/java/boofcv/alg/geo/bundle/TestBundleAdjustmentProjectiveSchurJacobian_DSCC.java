@@ -18,16 +18,14 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
 import org.ejml.data.DMatrixSparseCSC;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestBundleAdjustmentProjectiveResidualFunction.createObservations;
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureProjective.createScene3D;
@@ -37,9 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestBundleAdjustmentProjectiveSchurJacobian_DSCC {
-	private final Random rand = BoofTesting.createRandom(234);
-
+class TestBundleAdjustmentProjectiveSchurJacobian_DSCC extends BoofStandardJUnit {
 	@Test
 	void compareToNumerical_3D() {
 		SceneStructureProjective structure = createScene3D(rand);

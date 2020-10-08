@@ -22,12 +22,10 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
-class TestImplConvertImageMisc_MT {
-	Random rand = new Random(234);
+class TestImplConvertImageMisc_MT extends BoofStandardJUnit {
 	int width = 70,height=60;
 
 	@Test

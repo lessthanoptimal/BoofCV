@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericDetectFindChessboardCorners {
+public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUnit {
 	Random rand = new Random(234);
 
 	int squareLength = 30;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,11 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.dense.ConfigDenseHoG;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,14 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDescribeImageDenseHoG {
+public class TestDescribeImageDenseHoG extends BoofStandardJUnit {
 
 	int width = 120;
 	int height = 90;
 
-	Random rand = new Random(234);
 
-	ImageType imageTypes[] = new ImageType[]{
+	ImageType[] imageTypes = new ImageType[]{
 			ImageType.single(GrayU8.class), ImageType.single(GrayF32.class),
 			ImageType.pl(2, ImageDataType.U8),ImageType.pl(2, ImageDataType.F32) };
 

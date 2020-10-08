@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.squares;
 
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestSquaresIntoCrossClusters {
+public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 
 	/**
 	 * Create a simple perfect cluster.  Do a crude test based on number of edge histogram

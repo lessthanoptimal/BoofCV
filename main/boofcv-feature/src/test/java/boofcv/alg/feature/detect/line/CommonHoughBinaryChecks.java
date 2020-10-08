@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.line;
 
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.line.LineParametric2D_F32;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class CommonHoughBinaryChecks {
+public abstract class CommonHoughBinaryChecks extends BoofStandardJUnit {
 	int width = 30;
 	int height = 40;
 

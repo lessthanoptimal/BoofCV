@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,9 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,10 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> {
+abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	protected ImageType<T> imageType;
-	protected Random rand = new Random(234);
 
 	protected abstract DescribeRegionPoint<T, ?> createAlg();
 

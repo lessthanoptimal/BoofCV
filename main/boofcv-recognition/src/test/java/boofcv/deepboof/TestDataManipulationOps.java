@@ -24,11 +24,10 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import deepboof.tensors.Tensor_F32;
 import georegression.misc.GrlConstants;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -36,8 +35,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestDataManipulationOps {
-	Random rand = new Random(234);
+public class TestDataManipulationOps extends BoofStandardJUnit {
 
 	@Test
 	public void normalize() {

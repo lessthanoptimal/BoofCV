@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestQrCodeBinaryGridToPixel {
+class TestQrCodeBinaryGridToPixel extends BoofStandardJUnit {
 	@Test
 	void simple() {
 

@@ -31,19 +31,18 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestImplThresholdImageOps {
+public class TestImplThresholdImageOps extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	Random rand = new Random(234);
 	Method[] list = ImplThresholdImageOps.class.getMethods();
 
 	@Test

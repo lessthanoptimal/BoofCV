@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSimulatePlanarWorld {
+public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 	/**
 	 * Sees if a box appears to be the correct size using pinhole distortion
 	 */

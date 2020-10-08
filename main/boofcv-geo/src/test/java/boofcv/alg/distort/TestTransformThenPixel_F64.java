@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,21 +19,22 @@
 package boofcv.alg.distort;
 
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestTransformThenPixel_F64 {
+public class TestTransformThenPixel_F64 extends BoofStandardJUnit {
 	@Test
 	public void set() {
 		Transform2ThenPixel_F64 alg = new Transform2ThenPixel_F64(null);
 
-		assertTrue(alg == alg.set(1, 2, 3, 4, 5));
+		assertSame(alg, alg.set(1, 2, 3, 4, 5));
 		assertEquals(1,alg.fx,1e-8);
 		assertEquals(2,alg.fy,1e-8);
 		assertEquals(3,alg.skew,1e-8);

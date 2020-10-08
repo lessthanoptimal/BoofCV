@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestStereoProcessingBase {
+public class TestStereoProcessingBase extends BoofStandardJUnit {
 
 	int width = 320;
 	int height = 240;

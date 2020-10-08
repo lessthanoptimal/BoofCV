@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,22 +26,20 @@ import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> {
+public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
 	ImageType<T> imageType;
-
-	Random rand = new Random(234);
 
 	protected GeneralSegmentSlicColorChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;

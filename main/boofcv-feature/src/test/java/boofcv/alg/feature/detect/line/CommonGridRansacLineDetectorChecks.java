@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.MatrixOfList;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
@@ -42,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>> {
+public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>> extends BoofStandardJUnit {
 	int width = 40;
 	int height = 30;
 

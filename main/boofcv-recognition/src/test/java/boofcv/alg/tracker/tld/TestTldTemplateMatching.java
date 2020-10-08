@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,11 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,12 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestTldTemplateMatching {
+public class TestTldTemplateMatching extends BoofStandardJUnit {
 
 	int width = 60;
 	int height = 80;
-
-	Random rand = new Random(234);
 
 	GrayU8 input = new GrayU8(width,height);
 

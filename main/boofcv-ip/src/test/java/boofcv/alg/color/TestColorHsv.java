@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,9 @@ package boofcv.alg.color;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,14 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * @author Peter Abeles
  */
-public class TestColorHsv {
+public class TestColorHsv extends BoofStandardJUnit {
 	public static final double tol = 0.01;
 
-	Random rand = new Random(234);
-	double hsv_F64[] = new double[3];
-	double rgb_F64[] = new double[3];
-	float hsv_F32[] = new float[3];
-	float rgb_F32[] = new float[3];
+	double[] hsv_F64 = new double[3];
+	double[] rgb_F64 = new double[3];
+	float[] hsv_F32 = new float[3];
+	float[] rgb_F32 = new float[3];
 
 	@Test
 	void yuv_to_rgb_32bit() {
@@ -116,7 +114,7 @@ public class TestColorHsv {
 		ColorHsv.rgbToHsv(rgb, hsv);
 		ColorHsv.hsvToRgb(hsv, found);
 
-		float tmp[] = new float[3];
+		float[] tmp = new float[3];
 
 		for( int y = 0; y < rgb.height; y++ ) {
 			for( int x = 0; x < rgb.width; x++ ) {
@@ -136,7 +134,7 @@ public class TestColorHsv {
 		}
 	}
 
-	private static void check( double found[] , double a , double b , double c ) {
+	private static void check( double[] found, double a , double b , double c ) {
 		double tol = TestColorHsv.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;
 
 		for (int i = 0; i < found.length; i++) {
@@ -147,7 +145,7 @@ public class TestColorHsv {
 		assertEquals(c,found[2],tol);
 	}
 
-	private static void check( float found[] , float a , float b , float c ) {
+	private static void check( float[] found, float a , float b , float c ) {
 		double tol = TestColorHsv.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;
 
 		assertEquals(a,found[0],tol);

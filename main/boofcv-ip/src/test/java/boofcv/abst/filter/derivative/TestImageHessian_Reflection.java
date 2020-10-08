@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,16 +21,15 @@ package boofcv.abst.filter.derivative;
 import boofcv.alg.filter.derivative.HessianFromGradient;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestImageHessian_Reflection {
-
+public class TestImageHessian_Reflection extends BoofStandardJUnit {
 
 	int width = 20;
 	int height = 30;
@@ -40,16 +39,16 @@ public class TestImageHessian_Reflection {
 	 */
 	@Test
 	public void testNoException() throws NoSuchMethodException {
-		GrayF32 derivX = new GrayF32(width,height);
-		GrayF32 derivY = new GrayF32(width,height);
-		GrayF32 derivXX = new GrayF32(width,height);
-		GrayF32 derivYY = new GrayF32(width,height);
-		GrayF32 derivXY = new GrayF32(width,height);
+		GrayF32 derivX = new GrayF32(width, height);
+		GrayF32 derivY = new GrayF32(width, height);
+		GrayF32 derivXX = new GrayF32(width, height);
+		GrayF32 derivYY = new GrayF32(width, height);
+		GrayF32 derivXY = new GrayF32(width, height);
 
-		Method m = HessianFromGradient.class.getMethod("hessianSobel",GrayF32.class,GrayF32.class,GrayF32.class,GrayF32.class,GrayF32.class, ImageBorder_F32.class);
+		Method m = HessianFromGradient.class.getMethod("hessianSobel", GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class, ImageBorder_F32.class);
 
 		ImageHessian_Reflection<GrayF32> alg = new ImageHessian_Reflection<>(m);
 
-		alg.process(derivX,derivY,derivXX,derivXY,derivYY);
+		alg.process(derivX, derivY, derivXX, derivXY, derivYY);
 	}
 }

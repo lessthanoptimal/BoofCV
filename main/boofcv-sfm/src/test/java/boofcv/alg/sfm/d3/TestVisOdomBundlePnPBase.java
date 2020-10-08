@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestVisOdomBundlePnPBase {
+class TestVisOdomBundlePnPBase extends BoofStandardJUnit {
 
 	CameraPinholeBrown pinhole = new CameraPinholeBrown(400, 400, 0, 500, 500, 1000, 1000);
 

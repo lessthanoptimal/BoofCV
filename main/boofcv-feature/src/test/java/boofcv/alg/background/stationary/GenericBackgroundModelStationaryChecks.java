@@ -26,6 +26,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBackgroundModelStationaryChecks {
+public abstract class GenericBackgroundModelStationaryChecks extends BoofStandardJUnit {
 	Random rand = new Random(234);
 
 	int width = 60;

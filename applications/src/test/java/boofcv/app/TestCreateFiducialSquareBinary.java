@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 
 	public void createDocument( String args ) throws IOException, InterruptedException {
 		CreateFiducialSquareBinary.main(args.split("\\s+"));
+		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
 	}
-
 
 	@Test
 	public void single_pdf() throws IOException, InterruptedException {
@@ -60,7 +60,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 
 	@Test
 	public void grid() throws IOException, InterruptedException {
-		int expected[] = new int []{234,123};
+		int[] expected = new int []{234,123};
 		createDocument(String.format("--GridFill --DrawGrid --PaperSize letter --OutputFile %s -w 5 -s 2 -n %d -n %d",
 				document_name+".pdf",expected[0],expected[1]));
 		GrayF32 gray = loadPdfAsGray();
@@ -81,7 +81,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	 */
 	@Test
 	public void customized_pdf() throws IOException, InterruptedException {
-		int expected[] = new int []{234,23233};
+		int[] expected = new int []{234,23233};
 		double border = 0.1;
 		int gridWidth = 5;
 		createDocument(String.format("-bw %.1f --PatternGridWidth %d --GridFill --PaperSize letter --OutputFile %s -w 5 -s 2 -n %d -n %d",
@@ -106,7 +106,7 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	 */
 	@Test
 	public void create_png() throws IOException, InterruptedException {
-		int expected[] = new int []{0,234,678};
+		int[] expected = new int []{0,234,678};
 		createDocument(String.format("--OutputFile %s -w 200 -s 20 -n %d -n %d -n %d",
 				document_name+".png",expected[0],expected[1],expected[2]));
 		for (int i = 0; i < expected.length; i++) {

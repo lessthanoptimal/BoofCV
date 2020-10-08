@@ -26,11 +26,9 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 class TestImplEnhanceHistogram_MT extends CompareIdenticalFunctions {
 	int width = 70,height=80;
-	Random rand = new Random(234);
 
 	public TestImplEnhanceHistogram_MT() {
 		super(ImplEnhanceHistogram_MT.class, ImplEnhanceHistogram.class);

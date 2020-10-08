@@ -22,19 +22,16 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestBinaryThinning {
-
-	Random rand = new Random(234);
+public class TestBinaryThinning extends BoofStandardJUnit {
 
 	/**
 	 * Run the overall algorithm and compare against a known result

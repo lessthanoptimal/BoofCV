@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,17 +25,15 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public abstract class CheckGrowBodersSB<T extends ImageGray<T>> {
-	Random rand = new Random(345);
+public abstract class CheckGrowBodersSB<T extends ImageGray<T>> extends BoofStandardJUnit {
 	int width = 30, height = 20;
 
 	double minPixel, maxPixel;

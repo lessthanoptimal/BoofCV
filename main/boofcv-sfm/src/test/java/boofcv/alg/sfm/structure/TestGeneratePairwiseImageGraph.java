@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -31,16 +32,13 @@ import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestGeneratePairwiseImageGraph {
-
-	Random rand = new Random(234);
+class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 
 	/**
 	 * See if it gracefully handles 0 to 1 images

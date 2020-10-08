@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.ClosestPoint3D_F64;
@@ -42,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDistanceSe3SymmetricSq {
+public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 
 	Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
 			new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));

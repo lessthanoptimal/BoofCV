@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBinaryContourInterface {
+public abstract class GenericBinaryContourInterface extends BoofStandardJUnit {
 
 	boolean supportsInternalContour = true;
 

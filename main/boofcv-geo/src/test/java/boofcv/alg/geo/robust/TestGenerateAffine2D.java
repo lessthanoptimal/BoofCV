@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
@@ -27,16 +28,14 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestGenerateAffine2D implements ModelTestingInterface<Affine2D_F64,AssociatedPair>
+public class TestGenerateAffine2D extends BoofStandardJUnit
+		implements ModelTestingInterface<Affine2D_F64,AssociatedPair>
 {
-	Random rand = new Random(234);
-
 	@Test
 	public void fitModel() {
 		StandardModelFitterTests<Affine2D_F64,AssociatedPair> alg =

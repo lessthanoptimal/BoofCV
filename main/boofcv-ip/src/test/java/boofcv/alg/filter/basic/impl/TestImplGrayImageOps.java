@@ -24,11 +24,11 @@ import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,10 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImplGrayImageOps {
+public class TestImplGrayImageOps extends BoofStandardJUnit {
 	int width = 10;
 	int height = 15;
-	Random rand = new Random(234);
 
 	int numExpected = 5;
 

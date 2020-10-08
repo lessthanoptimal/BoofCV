@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.sfm.d3.structure.SelectTracksInFrameForBundleAdjustment.Info;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 /**
  * @author Peter Abeles
  */
-class TestSelectTracksInFrameForBundleAdjustment {
+class TestSelectTracksInFrameForBundleAdjustment extends BoofStandardJUnit {
 	final int width = 100;
 	final int height = 200;
 

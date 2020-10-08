@@ -28,10 +28,9 @@ import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,9 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>> {
+public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>> extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 30;
 	int height = 40;
 	Class<T> imageType;

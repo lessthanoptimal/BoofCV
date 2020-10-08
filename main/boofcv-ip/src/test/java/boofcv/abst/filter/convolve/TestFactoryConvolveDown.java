@@ -31,21 +31,19 @@ import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class TestFactoryConvolveDown {
+public class TestFactoryConvolveDown extends BoofStandardJUnit {
 
 	int skip = 2;
 	int kernelWidth = 5;
 	int radius = kernelWidth/2;
-	Random rand = new Random(2342);
 
 	int width = 30;
 	int height = 40;

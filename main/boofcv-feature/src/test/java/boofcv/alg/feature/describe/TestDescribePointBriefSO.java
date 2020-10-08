@@ -32,10 +32,9 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,8 +42,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointBriefSO {
-	Random rand = new Random(234);
+public class TestDescribePointBriefSO extends BoofStandardJUnit {
+
 	int width = 30;
 	int height = 40;
 	Class<GrayF32> imageType = GrayF32.class;

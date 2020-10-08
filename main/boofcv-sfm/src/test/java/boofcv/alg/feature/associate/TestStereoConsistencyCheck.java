@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.alg.sfm.SfmTestHelper;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestStereoConsistencyCheck {
+public class TestStereoConsistencyCheck extends BoofStandardJUnit {
 
 	@Test
 	public void checkRectification() {

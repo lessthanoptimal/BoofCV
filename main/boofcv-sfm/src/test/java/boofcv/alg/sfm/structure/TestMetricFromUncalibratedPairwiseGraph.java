@@ -24,6 +24,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.ImageDimension;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestMetricFromUncalibratedPairwiseGraph {
+class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 
 	// testing tolerance for focal length on perfect input data
 	double focalTol = 1e-2;

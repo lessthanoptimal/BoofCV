@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,9 @@ package boofcv.abst.tracker;
 import boofcv.abst.distort.FDistort;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,11 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>> {
+public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	boolean usesHint = true;
-
-	Random rand = new Random(234);
 
 	int width = 320;
 	int height = 240;

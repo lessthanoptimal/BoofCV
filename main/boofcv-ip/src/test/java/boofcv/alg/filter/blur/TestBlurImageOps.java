@@ -34,31 +34,29 @@ import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-class TestBlurImageOps {
+class TestBlurImageOps extends BoofStandardJUnit {
 	// TODO full support of interleaved image for all types
 	// TODO unit tests for different kernels along x and y axis. Can't do that just yet because
 	//      2D kernels have to have the same width along each axis!
 
-	Random rand = new Random(234);
-
 	int width = 15;
 	int height = 20;
 
-	ImageType imageTypes[] = new ImageType[]{
+	ImageType[] imageTypes = new ImageType[]{
 			ImageType.single(GrayU8.class),ImageType.single(GrayF32.class),
 			ImageType.pl(2,GrayU8.class),ImageType.pl(2,GrayF32.class)};
 //			ImageType.il(2,InterleavedU8.class),ImageType.il(2,InterleavedF32.class)}; TODO add in future
 
-	ImageType imageTypesGaussian[] = new ImageType[]{
+	ImageType[] imageTypesGaussian = new ImageType[]{
 			ImageType.single(GrayU8.class),ImageType.single(GrayF32.class),
 			ImageType.pl(2,GrayU8.class),ImageType.pl(2,GrayF32.class),
 			ImageType.il(2,InterleavedU8.class),ImageType.il(2,InterleavedF32.class)}; // delete after all support interleaved

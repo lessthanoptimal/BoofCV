@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.scene;
 
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.clustering.AssignCluster;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestFeatureToWordHistogram_F64 {
+public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 
 	public static final int NUM_CLUSTERS = 5;
 

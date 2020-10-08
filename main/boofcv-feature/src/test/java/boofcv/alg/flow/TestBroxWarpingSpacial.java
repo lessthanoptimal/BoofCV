@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,20 +24,18 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestBroxWarpingSpacial {
+public class TestBroxWarpingSpacial extends BoofStandardJUnit {
 
 	int width = 10;
 	int height = 13;
-	Random rand = new Random(234);
 
 	double epsilon = 0.001;
 

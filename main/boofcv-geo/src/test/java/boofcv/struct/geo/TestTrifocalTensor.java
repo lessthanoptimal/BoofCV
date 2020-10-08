@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,24 +18,25 @@
 
 package boofcv.struct.geo;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestTrifocalTensor {
+public class TestTrifocalTensor extends BoofStandardJUnit {
 
 	@Test
 	public void getT() {
 		TrifocalTensor t = new TrifocalTensor();
-		assertTrue(t.T1 == t.getT(0));
-		assertTrue(t.T2 == t.getT(1));
-		assertTrue(t.T3 == t.getT(2));
+		assertSame(t.T1, t.getT(0));
+		assertSame(t.T2, t.getT(1));
+		assertSame(t.T3, t.getT(2));
 	}
 
 	@Test
@@ -48,9 +49,9 @@ public class TestTrifocalTensor {
 		TrifocalTensor a = new TrifocalTensor();
 		a.set(t);
 
-		assertTrue(1 == a.T1.get(0,0));
-		assertTrue(2 == a.T2.get(0,0));
-		assertTrue(3 == a.T3.get(0,0));
+		assertEquals(a.T1.get(0, 0), 1);
+		assertEquals(a.T2.get(0, 0), 2);
+		assertEquals(a.T3.get(0, 0), 3);
 	}
 
 	@Test
@@ -63,7 +64,7 @@ public class TestTrifocalTensor {
 		t.convertFrom(A);
 
 		for( int i = 0; i < 27; i++ )
-			assertTrue(i == t.getT( i/9 ).get(i%9));
+			assertEquals(t.getT(i/9).get(i%9), i);
 	}
 
 	@Test
@@ -76,7 +77,7 @@ public class TestTrifocalTensor {
 		DMatrixRMaj A = new DMatrixRMaj(27,1);
 		t.convertTo(A);
 		for( int i = 0; i < 27; i++ )
-			assertTrue(i==A.get(i));
+			assertEquals(A.get(i), i);
 
 	}
 

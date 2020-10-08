@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 
 	private void createDocument( String args ) throws IOException {
 		CreateFiducialSquareImage.main(args.split("\\s+"));
+		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
 	}
 
 	private GrayF32 loadImageGray() throws IOException {

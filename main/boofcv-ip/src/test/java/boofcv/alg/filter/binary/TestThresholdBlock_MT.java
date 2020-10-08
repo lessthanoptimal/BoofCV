@@ -23,13 +23,10 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
-class TestThresholdBlock_MT {
-
-	Random rand = new Random(234);
+class TestThresholdBlock_MT extends BoofStandardJUnit {
 
 	/**
 	 * Compare single threaded vs multi threaded variant

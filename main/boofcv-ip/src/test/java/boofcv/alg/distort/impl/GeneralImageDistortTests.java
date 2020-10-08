@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,9 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -39,9 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GeneralImageDistortTests<T extends ImageBase<T>> {
-
-	Random rand = new Random(123);
+public abstract class GeneralImageDistortTests<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	int width = 30;
 	int height = 20;

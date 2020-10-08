@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.rectify;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestRectifyCalibrated {
+public class TestRectifyCalibrated extends BoofStandardJUnit {
 
 	/**
 	 * Compare results from rectified transform and a set of camera which are already rectified.

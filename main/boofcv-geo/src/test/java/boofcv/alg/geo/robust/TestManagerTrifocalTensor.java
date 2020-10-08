@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 /**
  * @author Peter Abeles
  */
-class TestManagerTrifocalTensor {
+class TestManagerTrifocalTensor extends BoofStandardJUnit {
 	@Test
 	public void newInstance() {
 		ManagerTrifocalTensor alg = new ManagerTrifocalTensor();

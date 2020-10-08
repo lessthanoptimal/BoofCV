@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.robust;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Peter Abeles
  */
-public abstract class StandardDistanceTest<Model, Data> {
-
+public abstract class StandardDistanceTest<Model, Data>
+		extends BoofStandardJUnit
+{
 	public abstract DistanceFromModel<Model, Data> create();
 
 	public abstract Model createRandomModel();

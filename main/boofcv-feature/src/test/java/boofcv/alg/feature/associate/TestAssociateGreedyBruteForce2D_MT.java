@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestAssociateGreedyBruteForce2D_MT {
+class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 
 	final static int width = 100;
 	final static int height = 120;

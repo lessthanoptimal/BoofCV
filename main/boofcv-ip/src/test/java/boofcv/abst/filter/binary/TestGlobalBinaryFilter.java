@@ -26,17 +26,15 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-class TestGlobalBinaryFilter {
-	Random rand = new Random(234);
-	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
+class TestGlobalBinaryFilter extends BoofStandardJUnit {
+	Class[] imageTypes = new Class[]{GrayU8.class, GrayF32.class};
 
 	@Nested
 	class Entropy {

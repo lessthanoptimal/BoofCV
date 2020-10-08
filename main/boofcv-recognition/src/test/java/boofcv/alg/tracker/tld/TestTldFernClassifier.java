@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,9 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,15 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestTldFernClassifier {
+public class TestTldFernClassifier extends BoofStandardJUnit {
 
 	int width = 60;
 	int height = 80;
 
 	int numFerns = 5;
 	int numLearnRandom = 7;
-
-	Random rand = new Random(234);
 
 	GrayU8 input = new GrayU8(width,height);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDescribeDenseHogFastAlg {
+public class TestDescribeDenseHogFastAlg extends BoofStandardJUnit {
 
 	ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
 

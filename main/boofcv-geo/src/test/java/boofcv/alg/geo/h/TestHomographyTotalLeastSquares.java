@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
+public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 	private Random rand = new Random(234);
 
 	@Test
@@ -123,7 +123,7 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 		eq.process("top    = [Xd*P-One*XP(0,:)-P*Pp*Xd*P , X(:,0)-P*Pp*X(:,0)]");
 		eq.process("bottom = [Yd*P-One*XP(1,:)-P*Pp*Yd*P , X(:,1)-P*Pp*X(:,1)]");
 		eq.process("A=[top;bottom]");
-		System.out.println();
+
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
 		alg.X1.set(P.getDDRM());
 		alg.X2.set(X.getDDRM());

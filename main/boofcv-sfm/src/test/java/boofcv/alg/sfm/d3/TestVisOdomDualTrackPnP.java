@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,13 @@
 
 package boofcv.alg.sfm.d3;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestVisOdomDualTrackPnP {
+public class TestVisOdomDualTrackPnP extends BoofStandardJUnit {
 	@Test
 	public void stuff() {
 		// This is intentionally left blank.  Tests are performed inside the abstract package

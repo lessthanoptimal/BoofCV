@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,12 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestComputeRegionMeanColor {
+public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 	int w = 5, h = 4;
 	GrayS32 segments;
 	GrowQueue_I32 regionMemberCount;
 	FastQueue<float[]> regionColor;
-
 
 	@BeforeEach
 	public void before() {

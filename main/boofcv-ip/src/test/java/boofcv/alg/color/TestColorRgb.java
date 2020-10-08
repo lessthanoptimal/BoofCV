@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,17 +20,15 @@ package boofcv.alg.color;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestColorRgb {
-	private Random rand = new Random(0);
+public class TestColorRgb extends BoofStandardJUnit {
 
 	@Test
 	public void scalar_U8() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDecomposeEssential {
+public class TestDecomposeEssential extends BoofStandardJUnit {
 
 	/**
 	 * Check the decomposition against a known input.  See if the solutions have the expected

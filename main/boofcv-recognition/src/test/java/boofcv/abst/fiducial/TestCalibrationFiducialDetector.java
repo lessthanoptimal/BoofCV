@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,14 @@ import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationFiducialDetector {
+public class TestCalibrationFiducialDetector extends BoofStandardJUnit {
 
 	@Nested
 	public static class ChessboardChecks extends GenericFiducialDetectorChecks {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,11 +31,10 @@ import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,9 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public class TestCompleteSift {
-
-	Random rand = new Random(234);
+public class TestCompleteSift extends BoofStandardJUnit {
 
 	/**
 	 * Doesn't do much more than see if it blows up and the expected size of objects is returned

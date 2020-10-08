@@ -25,6 +25,7 @@ import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImplMedianSortNaive {
+public class TestImplMedianSortNaive extends BoofStandardJUnit {
 
 	@Test
 	public void trivialTest() {

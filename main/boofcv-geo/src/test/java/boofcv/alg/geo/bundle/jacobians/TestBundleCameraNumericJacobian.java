@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle.jacobians;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestBundleCameraNumericJacobian {
+public class TestBundleCameraNumericJacobian extends BoofStandardJUnit {
 	@Test
 	public void jacobianIntrinsics() {
 		BundleCameraNumericJacobian alg = new BundleCameraNumericJacobian();

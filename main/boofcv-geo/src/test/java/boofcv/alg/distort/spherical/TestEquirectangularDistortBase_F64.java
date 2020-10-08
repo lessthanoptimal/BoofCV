@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.distort.spherical;
 
 import boofcv.struct.distort.PixelTransform;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-abstract class TestEquirectangularDistortBase_F64 {
+abstract class TestEquirectangularDistortBase_F64 extends BoofStandardJUnit {
 
 	void copy( EquirectangularDistortBase_F64 original , int equiWidth, int equiHeight) {
 

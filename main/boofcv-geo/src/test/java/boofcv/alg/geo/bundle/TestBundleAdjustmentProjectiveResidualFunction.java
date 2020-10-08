@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * @author Peter Abeles
  */
-class TestBundleAdjustmentProjectiveResidualFunction {
-	private final Random rand = BoofTesting.createRandom(234);
+class TestBundleAdjustmentProjectiveResidualFunction extends BoofStandardJUnit {
 
 	/**
 	 * Makes sure that when given the same input it produces the same output

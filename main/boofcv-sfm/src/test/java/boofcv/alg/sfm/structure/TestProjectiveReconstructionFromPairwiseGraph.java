@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.pose.CompatibleProjectiveHomography;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestProjectiveReconstructionFromPairwiseGraph {
+class TestProjectiveReconstructionFromPairwiseGraph extends BoofStandardJUnit {
 	/**
 	 * Random scene with fairly linear motion. Everything is randomized and physical constraints on camera are enforced
 	 */

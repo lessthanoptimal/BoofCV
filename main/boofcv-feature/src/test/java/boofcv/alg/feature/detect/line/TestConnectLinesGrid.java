@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.line;
 
 import boofcv.struct.feature.MatrixOfList;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestConnectLinesGrid {
+public class TestConnectLinesGrid extends BoofStandardJUnit {
 
 	/**
 	 * Very basic check which sees if lines are being connected in the same region

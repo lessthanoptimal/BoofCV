@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,9 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,11 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestDetectDescribeSurfPlanar_MT {
+class TestDetectDescribeSurfPlanar_MT extends BoofStandardJUnit {
 	int width = 200;
 	int height = 250;
-
-	Random rand = new Random(234);
 
 	@Test
 	void compare_Single_to_MT() {

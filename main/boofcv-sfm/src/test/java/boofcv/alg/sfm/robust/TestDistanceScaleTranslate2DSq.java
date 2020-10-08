@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslate2D;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDistanceScaleTranslate2DSq {
+public class TestDistanceScaleTranslate2DSq extends BoofStandardJUnit {
 	@Test
 	public void perfect() {
 		ScaleTranslate2D model = new ScaleTranslate2D(1.5, -2, 3);

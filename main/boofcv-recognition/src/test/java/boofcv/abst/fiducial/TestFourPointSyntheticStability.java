@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.fiducial;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.jupiter.api.Test;
@@ -30,10 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFourPointSyntheticStability {
+public class TestFourPointSyntheticStability extends BoofStandardJUnit {
 
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(300,300,0,300,300,600,600).fsetRadial(0.2,0.01);
-
 
 	/**
 	 * Try a few different known scenarios

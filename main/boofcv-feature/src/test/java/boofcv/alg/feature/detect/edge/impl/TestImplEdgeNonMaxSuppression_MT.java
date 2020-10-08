@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,9 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 class TestImplEdgeNonMaxSuppression_MT extends CompareIdenticalFunctions  {
-	private Random rand = new Random(234);
+
 	private int width = 60,height=70;
 
 	TestImplEdgeNonMaxSuppression_MT() {

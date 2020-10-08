@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.d3.direct;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestFeatureSpatialDiversity_F32 {
+public class TestFeatureSpatialDiversity_F32 extends BoofStandardJUnit {
 	@Disabled
 	@Test
 	public void checkKeyFrameLogic() {

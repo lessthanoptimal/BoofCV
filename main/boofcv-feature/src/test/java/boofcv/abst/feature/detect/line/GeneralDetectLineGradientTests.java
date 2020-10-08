@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F32;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GeneralDetectLineGradientTests {
+public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 
 	int width = 40;
 	int height = 50;

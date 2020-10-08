@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
+public abstract class GenericChecksPointTracker<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	public PointTracker<T> tracker;
 	Random rand = new Random(234);

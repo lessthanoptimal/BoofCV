@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import org.ejml.UtilEjml;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -29,15 +30,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPnPRodriguesCodec {
+public class TestPnPRodriguesCodec extends BoofStandardJUnit {
 
 	@Test
 	public void decode_encode() {
-		double param[] = new double[]{0.1,-0.3,4,1,2,3};
+		double[] param = new double[]{0.1,-0.3,4,1,2,3};
 
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
 
-		double found[] = new double[6];
+		double[] found = new double[6];
 		Se3_F64 storage = new Se3_F64();
 		Se3_F64 storage2 = new Se3_F64();
 
@@ -61,7 +62,7 @@ public class TestPnPRodriguesCodec {
 
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
 
-		double param[] = new double[6];
+		double[] param = new double[6];
 		alg.encode(a,param);
 
 		Se3_F64 found = new Se3_F64();
@@ -82,7 +83,7 @@ public class TestPnPRodriguesCodec {
 		Se3_F64 output = new Se3_F64();
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
 
-		double param[] = new double[6];
+		double[] param = new double[6];
 		alg.encode(input,param);
 		alg.decode(param, output);
 

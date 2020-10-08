@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,13 +21,12 @@ package boofcv.alg.sfm.d3.direct;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.misc.GrlConstants;
 import georegression.struct.se.Se3_F32;
 import georegression.struct.so.Rodrigues_F32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,9 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestVisOdomDirectColorDepth {
-
-	Random rand = new Random(234);
+public class TestVisOdomDirectColorDepth extends BoofStandardJUnit {
 
 	Class<GrayF32> imageType = GrayF32.class;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,11 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.testing.BoofStandardJUnit;
+
 /**
  * @author Peter Abeles
  */
-public class TestSquareBase_to_FiducialDetector {
+public class TestSquareBase_to_FiducialDetector extends BoofStandardJUnit {
 	// intentionally left blank since it's functionality is tested elsewhere
 }

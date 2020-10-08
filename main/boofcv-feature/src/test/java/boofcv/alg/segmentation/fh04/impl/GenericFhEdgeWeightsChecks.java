@@ -24,10 +24,9 @@ import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,11 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>> {
+public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>>
+		extends BoofStandardJUnit
+{
 	ImageType<T> imageType;
 	ConnectRule rule;
-
-	Random rand = new Random(234);
 
 	protected GenericFhEdgeWeightsChecks(ImageType<T> imageType, ConnectRule rule) {
 		this.imageType = imageType;

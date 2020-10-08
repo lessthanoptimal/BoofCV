@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
@@ -40,8 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatrix> {
-	private final Random rand = BoofTesting.createRandom(2345);
+public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatrix>
+		extends BoofStandardJUnit {
 
 	protected abstract BundleAdjustmentMetricSchurJacobian<M> createAlg();
 

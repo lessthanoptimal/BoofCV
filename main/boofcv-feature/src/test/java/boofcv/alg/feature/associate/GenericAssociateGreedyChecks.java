@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericAssociateGreedyChecks {
+public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 	protected abstract AssociateGreedyBase<TupleDesc_F64> createAlgorithm();
 
 	protected abstract void associate(AssociateGreedyBase<TupleDesc_F64> alg ,

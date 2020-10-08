@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestScoreAssociateEuclideanSq {
+class TestScoreAssociateEuclideanSq extends BoofStandardJUnit {
 	@Nested
 	class F32  extends StandardScoreAssociationChecks<TupleDesc_F32> {
 		public F32() {super(MatchScoreType.NORM_ERROR);}

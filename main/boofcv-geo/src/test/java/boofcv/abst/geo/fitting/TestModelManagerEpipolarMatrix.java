@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,24 @@
 
 package boofcv.abst.geo.fitting;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Peter Abeles
  */
-public class TestModelManagerEpipolarMatrix {
+public class TestModelManagerEpipolarMatrix extends BoofStandardJUnit {
 
 	@Test
 	public void createModelInstance() {
 		ModelManagerEpipolarMatrix alg = new ModelManagerEpipolarMatrix();
 		DMatrixRMaj found = alg.createModelInstance();
 
-		assertTrue( found != null );
+		assertNotNull(found);
 		assertEquals(3, found.getNumRows());
 		assertEquals(3,found.getNumCols());
 	}
@@ -52,5 +53,4 @@ public class TestModelManagerEpipolarMatrix {
 		for( int i = 0; i < 9; i++ )
 			assertEquals(i+1,copy.data[i],1e-8);
 	}
-
 }

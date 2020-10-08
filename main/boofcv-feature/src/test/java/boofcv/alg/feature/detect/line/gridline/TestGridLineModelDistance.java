@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.line.gridline;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LinePolar2D_F32;
 import org.junit.jupiter.api.Test;
@@ -30,13 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestGridLineModelDistance {
+public class TestGridLineModelDistance extends BoofStandardJUnit {
 
 	/**
 	 * Check to see that if two points exceed a max angle the distance is infinite
 	 */
-	@Test
-	public void maxAngle() {
+	@Test void maxAngle() {
 		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)), (float)(Math.PI/4.0));
 
 		GridLineModelDistance alg = new GridLineModelDistance(0.2f);
@@ -53,8 +53,7 @@ public class TestGridLineModelDistance {
 	/**
 	 * Assuming two points have an angle less than the max, check the distance
 	 */
-	@Test
-	public void distance() {
+	@Test void distance() {
 		float theta = (float)(Math.PI/4.0);
 		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)), theta);
 
@@ -65,8 +64,7 @@ public class TestGridLineModelDistance {
 		assertEquals(7.0711, alg.distance(new Edgel(0, 0, theta)), 0.1);
 	}
 
-	@Test
-	public void computeDistance_list() {
+	@Test void computeDistance_list() {
 		float theta = (float)(Math.PI/4.0);
 		LinePolar2D_F32 l = new LinePolar2D_F32((float)(Math.sqrt(2*5*5)), theta);
 

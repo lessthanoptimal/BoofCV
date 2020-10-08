@@ -24,18 +24,15 @@ import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestTldVarianceFilter {
-
-	Random rand = new Random(234);
+public class TestTldVarianceFilter extends BoofStandardJUnit {
 
 	@Test
 	public void selectThreshold() {

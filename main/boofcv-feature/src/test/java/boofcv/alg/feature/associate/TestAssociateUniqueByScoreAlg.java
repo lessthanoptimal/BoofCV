@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateUniqueByScoreAlg {
+public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 
 	FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardAssociateDescriptionChecks<Desc> {
+public abstract class StandardAssociateDescriptionChecks<Desc> extends BoofStandardJUnit {
 
 	// if true then the error used is squared
 	boolean distanceIsSquared = true;

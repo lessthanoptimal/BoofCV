@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GEquation;
 import georegression.geometry.UtilPoint3D_F64;
@@ -30,13 +31,11 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class CommonAutoCalibrationChecks {
-	Random rand = new Random(234);
+public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 
 	List<Point3D_F64> cloud = new ArrayList<>();
 

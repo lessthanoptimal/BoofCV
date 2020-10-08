@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.h.CommonHomographyInducedPlane;
@@ -28,6 +27,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPoint3D_F64;
@@ -59,16 +59,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestMultiViewOps {
-
-	Random rand = BoofTesting.createRandom(4);
+class TestMultiViewOps extends BoofStandardJUnit {
 
 	// camera calibration matrix
 	DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 60, 0.01, 200, 0, 80, 150, 0, 0, 1);

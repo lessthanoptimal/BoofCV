@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,25 +18,25 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestPackedBits32 {
-	@Test
-	public void set_get() {
-
+public class TestPackedBits32 extends BoofStandardJUnit {
+	@Test void set_get() {
 		PackedBits32 values = new PackedBits32(60);
 
-		values.set(2,1); assertTrue(1==values.get(2));
-		values.set(2,0); assertFalse(1==values.get(2));
+		values.set(2,1); assertEquals(values.get(2), 1);
+		values.set(2,0); assertNotEquals(values.get(2), 1);
 		isZeros(values);
 
-		values.set(33,1); assertTrue(1==values.get(33));
-		values.set(33,0); assertFalse(1==values.get(33));
+		values.set(33,1); assertEquals(values.get(33), 1);
+		values.set(33,0); assertNotEquals(values.get(33), 1);
 		isZeros(values);
 
 	}
@@ -48,8 +48,7 @@ public class TestPackedBits32 {
 		}
 	}
 
-	@Test
-	public void resize() {
+	@Test void resize() {
 		PackedBits32 values = new PackedBits32(60);
 		assertEquals(60,values.size);
 		assertEquals(2,values.data.length);
@@ -59,6 +58,5 @@ public class TestPackedBits32 {
 		values.resize(100);
 		assertEquals(100,values.size);
 		assertEquals(100/32+1,values.data.length);
-
 	}
 }

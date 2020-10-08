@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,12 +32,13 @@ import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomStereoMonoPnP {
+public class TestWrapVisOdomStereoMonoPnP extends BoofStandardJUnit {
 
 	ConfigDisparityBM configBM = new ConfigDisparityBM();
 	ConfigVisOdomTrackPnP configPnP = new ConfigVisOdomTrackPnP();

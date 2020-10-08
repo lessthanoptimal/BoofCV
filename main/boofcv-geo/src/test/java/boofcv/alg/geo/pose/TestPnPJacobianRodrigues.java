@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo.pose;
 import boofcv.abst.geo.optimization.ResidualsCodecToMatrix;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
@@ -29,16 +30,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestPnPJacobianRodrigues {
+public class TestPnPJacobianRodrigues extends BoofStandardJUnit {
 
-	Random rand = new Random(48854);
 	int numPoints = 3;
 
 	PnPRodriguesCodec codec = new PnPRodriguesCodec();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.tracker.tld;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestTldNonMaximalSuppression {
+public class TestTldNonMaximalSuppression extends BoofStandardJUnit {
 
 	/**
 	 * Just tests the connections graph generated in process()

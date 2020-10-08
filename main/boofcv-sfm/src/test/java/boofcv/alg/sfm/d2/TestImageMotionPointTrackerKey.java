@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.se.Se2_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestImageMotionPointTrackerKey {
+public class TestImageMotionPointTrackerKey extends BoofStandardJUnit {
 
 	/**
 	 * Give it a very simple example and see if it computes the correct motion and has the expected behavior

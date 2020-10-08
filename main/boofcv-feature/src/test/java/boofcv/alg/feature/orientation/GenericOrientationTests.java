@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,19 +22,17 @@ import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-abstract class GenericOrientationTests<T extends ImageGray<T>> {
+abstract class GenericOrientationTests<T extends ImageGray<T>> extends BoofStandardJUnit {
 
-	protected Random rand = new Random(234);
 	protected Class<T> imageType;
 	private RegionOrientation alg;
 

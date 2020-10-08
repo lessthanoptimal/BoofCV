@@ -29,6 +29,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -50,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("IntegerDivisionInFloatingPointContext")
-class TestProjectiveInitializeAllCommon {
+class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 
 	final static double reprojectionTol = 1e-5;
 	final static double matrixTol = 1e-3;

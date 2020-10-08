@@ -24,16 +24,13 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdSauvola {
-
-	Random rand = new Random(234);
+public class TestThresholdSauvola extends BoofStandardJUnit {
 
 	/**
 	 * Provide it a simple input image with obvious thresholding.  There will be regions of white space

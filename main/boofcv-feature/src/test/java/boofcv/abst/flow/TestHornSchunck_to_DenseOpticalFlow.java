@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,16 +21,17 @@ package boofcv.abst.flow;
 import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestHornSchunck_to_DenseOpticalFlow {
+public class TestHornSchunck_to_DenseOpticalFlow extends BoofStandardJUnit {
 
 	@Test
 	public void allTests() {
-		Class imageTypes[] = new Class[]{GrayU8.class,GrayF32.class};
+		Class[] imageTypes = new Class[]{GrayU8.class,GrayF32.class};
 
 		for( Class it : imageTypes ) {
 			new GeneralDenseOpticalFlowChecks(it) {

@@ -28,12 +28,12 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,12 +41,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestGradientToEdgeFeatures {
+public class TestGradientToEdgeFeatures extends BoofStandardJUnit {
 	int numExpected = 3;
 	int width = 20;
 	int height = 30;
-
-	Random rand = new Random(4378847);
 
 	GrayF32 intensity = new GrayF32(width,height);
 

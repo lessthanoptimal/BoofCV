@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,11 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,12 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public abstract class ChecksGeneralFeatureIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
+		extends BoofStandardJUnit
 {
 	public List<Class> listInputTypes = new ArrayList<>();
 	public List<Class> listDerivTypes = new ArrayList<>();
 
-
-	Random rand = new Random(234);
 	int width = 30;
 	int height = 40;
 

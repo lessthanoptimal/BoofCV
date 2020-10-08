@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.sfm.d3.structure;
 
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksVisOdomKeyFrameManager {
+public abstract class ChecksVisOdomKeyFrameManager extends BoofStandardJUnit {
 	int width = 100;
 	int height = 200;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.distort.brown;
 
 import boofcv.alg.distort.Transform2ThenPixel_F64;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestRemoveRadialPtoN_F64 {
+public class TestRemoveRadialPtoN_F64 extends BoofStandardJUnit {
 
 	@Test
 	public void checkAgainstAdd() {

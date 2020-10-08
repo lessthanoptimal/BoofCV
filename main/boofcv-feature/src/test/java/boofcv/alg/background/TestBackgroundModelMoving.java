@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.background;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.homography.Homography2D_F32;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundModelMoving
+public class TestBackgroundModelMoving extends BoofStandardJUnit
 {
 	@Test
 	public void updateBackground() {

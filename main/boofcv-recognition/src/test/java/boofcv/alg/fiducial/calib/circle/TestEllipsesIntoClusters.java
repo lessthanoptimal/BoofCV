@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector.EllipseInfo;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestEllipsesIntoClusters {
+public class TestEllipsesIntoClusters extends BoofStandardJUnit {
 	/**
 	 * Just make sure it doesn't blow up with an empty input
 	 */

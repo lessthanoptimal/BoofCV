@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.robust;
 
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardModelGeneratorTests<Model, Point> {
+public abstract class StandardModelGeneratorTests<Model, Point> extends BoofStandardJUnit {
 
 	int dof;
 

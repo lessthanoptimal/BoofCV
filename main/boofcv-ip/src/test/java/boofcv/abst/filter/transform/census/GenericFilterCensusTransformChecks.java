@@ -27,6 +27,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -36,7 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericFilterCensusTransformChecks<In extends ImageGray<In>, Out extends ImageBase<Out>> {
+public abstract class GenericFilterCensusTransformChecks<In extends ImageGray<In>, Out extends ImageBase<Out>>
+		extends BoofStandardJUnit {
 
 	int width = 30;
 	int height = 25;

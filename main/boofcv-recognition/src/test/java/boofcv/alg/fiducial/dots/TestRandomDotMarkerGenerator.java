@@ -18,14 +18,13 @@
 
 package boofcv.alg.fiducial.dots;
 
-import boofcv.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestRandomDotMarkerGenerator {
-	Random rand = BoofTesting.createRandom(0);
+class TestRandomDotMarkerGenerator extends BoofStandardJUnit {
 
 	/**
 	 * Makes sure the generated marker meets all the post conditions.

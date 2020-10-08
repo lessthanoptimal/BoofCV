@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,8 @@ package boofcv.alg.denoise;
 import boofcv.alg.denoise.wavelet.UtilDenoiseWavelet;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,9 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestUtilDenoiseWavelet {
-
-	Random rand = new Random(234235);
+public class TestUtilDenoiseWavelet extends BoofStandardJUnit {
 
 	int width = 20;
 	int height = 30;

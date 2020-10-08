@@ -23,9 +23,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,9 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImplEdgeNonMaxSuppression {
+public class TestImplEdgeNonMaxSuppression extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 20;
 	int height = 30;
 

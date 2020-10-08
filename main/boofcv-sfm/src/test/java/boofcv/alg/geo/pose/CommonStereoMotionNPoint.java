@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.GeoTestingOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.Stereo2D3D;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -36,8 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class CommonStereoMotionNPoint {
-	protected Random rand = new Random(234);
+public class CommonStereoMotionNPoint extends BoofStandardJUnit {
 
 	// the true motion
 	protected Se3_F64 worldToLeft;

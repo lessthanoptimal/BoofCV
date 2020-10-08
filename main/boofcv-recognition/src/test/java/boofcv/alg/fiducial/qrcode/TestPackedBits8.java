@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,20 +26,18 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestPackedBits8 {
+public class TestPackedBits8  extends BoofStandardJUnit {
 	@Test
 	public void set_get() {
-
 		PackedBits8 values = new PackedBits8(60);
 
-		values.set(2,1); assertTrue(1==values.get(2));
-		values.set(2,0); assertFalse(1==values.get(2));
+		values.set(2,1); assertEquals(values.get(2), 1);
+		values.set(2,0); assertNotEquals(values.get(2), 1);
 		isZeros(values);
 
-		values.set(33,1); assertTrue(1==values.get(33));
-		values.set(33,0); assertFalse(1==values.get(33));
+		values.set(33,1); assertEquals(values.get(33), 1);
+		values.set(33,0); assertNotEquals(values.get(33), 1);
 		isZeros(values);
-
 	}
 
 	private void isZeros( PackedBits8 values ) {
@@ -124,6 +123,5 @@ public class TestPackedBits8 {
 
 		assertEquals(0b1011,values.read(0,4,true));
 		assertEquals(0b11000,values.read(4,5,true));
-
 	}
 }

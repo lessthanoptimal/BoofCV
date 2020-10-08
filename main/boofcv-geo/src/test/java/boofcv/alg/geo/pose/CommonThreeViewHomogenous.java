@@ -18,13 +18,13 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.BoofTesting;
 import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.h.CommonHomographyChecks;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -33,14 +33,11 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public abstract class CommonThreeViewHomogenous {
-	protected Random rand = BoofTesting.createRandom(435);
-
+public abstract class CommonThreeViewHomogenous extends BoofStandardJUnit {
 	protected DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(
 			new CameraPinhole(500,500,0,250,250,1000,1000),(DMatrixRMaj)null);
 

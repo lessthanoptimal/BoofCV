@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,13 @@
 
 package boofcv.alg.feature.describe.llah;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestLlahHasher {
+public class TestLlahHasher extends BoofStandardJUnit {
 	@Nested
 	public class Affine extends GenericLlahHasherChecks {
 		@Override

@@ -24,6 +24,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestBinaryImageOps {
+public class TestBinaryImageOps extends BoofStandardJUnit {
 
 	Random rand = new Random(234);
 

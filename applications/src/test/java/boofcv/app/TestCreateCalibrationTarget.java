@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 
 	public void createDocument( String args ) throws IOException, InterruptedException {
 		CreateCalibrationTarget.main(args.split("\\s+"));
+		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
 	}
 
 	@Test

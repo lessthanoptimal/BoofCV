@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,9 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 class TestImplColorYuv_MT extends CompareIdenticalFunctions {
 	int width = 70,height=80;
-	Random rand = new Random(234);
 
 	TestImplColorYuv_MT() {
 		super(ImplColorYuv_MT.class,ImplColorYuv.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,22 +22,20 @@ import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageMotionPtkSmartRespawn {
-
-	Random rand = new Random(234);
+public class TestImageMotionPtkSmartRespawn extends BoofStandardJUnit {
 
 	GrayF32 input = new GrayF32(50, 60);
 

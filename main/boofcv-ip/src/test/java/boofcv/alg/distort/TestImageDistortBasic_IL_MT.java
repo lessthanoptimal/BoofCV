@@ -28,17 +28,15 @@ import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 /**
  * @author Peter Abeles
  */
-public class TestImageDistortBasic_IL_MT {
-	Random rand = new Random(234);
+public class TestImageDistortBasic_IL_MT extends BoofStandardJUnit {
 	int width = 60,height=80;
 	private static final int NUM_BANDS = 2;
 

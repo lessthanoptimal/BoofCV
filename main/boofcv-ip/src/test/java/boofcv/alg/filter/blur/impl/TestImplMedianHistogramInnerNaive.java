@@ -21,6 +21,7 @@ package boofcv.alg.filter.blur.impl;
 import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -28,7 +29,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplMedianHistogramInnerNaive {
+public class TestImplMedianHistogramInnerNaive extends BoofStandardJUnit {
 
 	@Test
 	public void compareToSort() {

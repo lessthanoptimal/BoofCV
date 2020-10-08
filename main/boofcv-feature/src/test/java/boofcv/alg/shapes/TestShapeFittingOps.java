@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.shapes;
 
 import boofcv.struct.PointIndex_I32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilEllipse_F32;
 import georegression.geometry.UtilEllipse_F64;
 import georegression.struct.curve.EllipseRotated_F32;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestShapeFittingOps {
+public class TestShapeFittingOps extends BoofStandardJUnit {
 
 	int minSideLength = 1;
 	double cornerPenalty = 0.25;

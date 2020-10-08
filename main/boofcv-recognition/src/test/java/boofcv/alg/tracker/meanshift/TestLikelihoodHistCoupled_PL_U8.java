@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.tracker.meanshift;
 
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestLikelihoodHistCoupled_PL_U8 {
+public class TestLikelihoodHistCoupled_PL_U8 extends BoofStandardJUnit {
 
 	@Test
 	public void numBins() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.geo.f.EssentialNister5;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
@@ -39,9 +40,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestGeoModelEstimatorNto1 {
+public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	List<AssociatedPair> obs = new ArrayList<>();
 
 	DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();

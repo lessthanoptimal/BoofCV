@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,20 +27,18 @@ import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestSiftDetector {
+public class TestSiftDetector extends BoofStandardJUnit {
 
-	Random rand = new Random(345);
-	
 	/**
 	 * Tests the ability to detect a single square feature at multiple scales and color
 	 */

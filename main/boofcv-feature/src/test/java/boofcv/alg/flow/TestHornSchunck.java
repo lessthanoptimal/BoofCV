@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,15 @@
 package boofcv.alg.flow;
 
 import boofcv.struct.flow.ImageFlow;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestHornSchunck {
-
-	Random rand = new Random(123);
+public class TestHornSchunck extends BoofStandardJUnit {
 
 	@Test
 	public void innerAverageFlow_borderAverageFlow() {

@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.BoofTesting;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,13 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestThresholdCornerExtractor {
+public class TestThresholdCornerExtractor extends BoofStandardJUnit {
 	/**
 	 * Tests to see if it extracts the expected number of points
 	 */
 	@Test
 	public void testThreshold() {
-		float inten[] = new float[]{0, 1, 0, 0, 3, 4, 4, 0, 0,
+		float[] inten = new float[]
+				{0, 1, 0, 0, 3, 4, 4, 0, 0,
 				1, 0, 2, 0, 5, 0, 0, 0, 1,
 				0, 0, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, 9, 0, 0, 0, 0,

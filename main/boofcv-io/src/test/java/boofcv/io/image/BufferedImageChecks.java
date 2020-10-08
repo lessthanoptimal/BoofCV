@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.io.image;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 
 import java.awt.image.*;
 
@@ -28,7 +29,7 @@ import java.awt.image.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("rawtypes")
-public class BufferedImageChecks {
+public class BufferedImageChecks extends BoofStandardJUnit {
 	public static void checkIdentical(BufferedImage imgA, BufferedImage imgB ) {
 		if(imgA.getWidth() != imgB.getWidth()) throw new IllegalArgumentException("Widths not equal");
 		if(imgA.getHeight() != imgB.getHeight()) throw new IllegalArgumentException("Heights not equal");

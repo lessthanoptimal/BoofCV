@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,13 @@ package boofcv.abst.filter;
 
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestFilterImageReflection {
+public class TestFilterImageReflection extends BoofStandardJUnit {
 
 	/**
 	 * Checks to see if the provided function is invoked and that it returned the correct border

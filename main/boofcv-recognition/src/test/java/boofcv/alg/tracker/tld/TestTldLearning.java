@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
@@ -31,9 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestTldLearning {
+public class TestTldLearning extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	ConfigTld config = new ConfigTld();
 
 	@Test

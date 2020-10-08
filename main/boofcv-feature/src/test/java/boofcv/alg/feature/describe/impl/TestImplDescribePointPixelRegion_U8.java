@@ -22,18 +22,15 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_U8;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDescribePointPixelRegion_U8 {
-
-	Random rand = new Random(234);
+public class TestImplDescribePointPixelRegion_U8 extends BoofStandardJUnit {
 
 	GrayU8 img = new GrayU8(20,30);
 

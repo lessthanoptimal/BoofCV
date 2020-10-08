@@ -18,22 +18,18 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import boofcv.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Generic tests that applied to all {@link FeatureSelectLimitIntensity}.
  */
-public abstract class ChecksFeatureSelectLimit<Point> {
-
-	Random rand = BoofTesting.createRandom(0);
+public abstract class ChecksFeatureSelectLimit<Point> extends BoofStandardJUnit {
 
 	int width = 30;
 	int height = 20;

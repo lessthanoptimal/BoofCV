@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import boofcv.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.UtilEjml;
@@ -28,16 +28,13 @@ import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.equation.Equation;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-class TestDecomposeProjectiveToMetric {
-	Random rand = BoofTesting.createRandom(43);
+class TestDecomposeProjectiveToMetric extends BoofStandardJUnit {
 
 	@Test
 	void decomposeMetricCamera() {

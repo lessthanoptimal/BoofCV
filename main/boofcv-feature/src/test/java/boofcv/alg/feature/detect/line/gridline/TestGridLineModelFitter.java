@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.line.gridline;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LinePolar2D_F32;
 import org.junit.jupiter.api.Test;
@@ -27,57 +28,53 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestGridLineModelFitter {
-
+public class TestGridLineModelFitter extends BoofStandardJUnit {
 
 	/**
 	 * If only two points are passed in, they should fail if their orientations
 	 * are more than the specified tolerance apart
 	 */
-	@Test
-	public void checkFailInCompatible() {
+	@Test void checkFailInCompatible() {
 		GridLineModelFitter alg = new GridLineModelFitter(0.1f);
 
 		// angle test should use half-circle and this should pass
 		List<Edgel> l = new ArrayList<>();
-		l.add( new Edgel(0,0,(float)Math.PI/2f));
-		l.add( new Edgel(1,0,(float)-Math.PI/2f));
+		l.add(new Edgel(0, 0, (float)Math.PI/2f));
+		l.add(new Edgel(1, 0, (float)-Math.PI/2f));
 
 		LinePolar2D_F32 model = new LinePolar2D_F32();
 		assertTrue(alg.generate(l, model));
 
 		// this one should fail
 		l.clear();
-		l.add( new Edgel(0,0,(float)Math.PI/2f));
-		l.add( new Edgel(1,0,(float)Math.PI/2f-0.5f));
+		l.add(new Edgel(0, 0, (float)Math.PI/2f));
+		l.add(new Edgel(1, 0, (float)Math.PI/2f - 0.5f));
 
 		assertFalse(alg.generate(l, model));
 	}
 
-	@Test
-	public void checkFit() {
+	@Test void checkFit() {
 		GridLineModelFitter alg = new GridLineModelFitter(0.1f);
 
 		// angle test should use half-circle and this should pass
 		List<Edgel> l = new ArrayList<>();
-		l.add( new Edgel(1,0,0f));
-		l.add( new Edgel(1,2,(float)Math.PI));
+		l.add(new Edgel(1, 0, 0f));
+		l.add(new Edgel(1, 2, (float)Math.PI));
 
 		LinePolar2D_F32 model = new LinePolar2D_F32();
 		assertTrue(alg.generate(l, model));
 
-		assertEquals(1,model.distance,1e-4f);
+		assertEquals(1, model.distance, 1e-4f);
 		assertTrue(UtilAngle.distHalf(0, model.angle) < 1e-4f);
 
 		// three points
-		l.add( new Edgel(1,3,(float)-Math.PI/2f));
+		l.add(new Edgel(1, 3, (float)-Math.PI/2f));
 
 		assertTrue(alg.generate(l, model));
-		assertEquals(1,model.distance,1e-4f);
+		assertEquals(1, model.distance, 1e-4f);
 		assertTrue(UtilAngle.distHalf(0, model.angle) < 1e-4f);
 	}
 }

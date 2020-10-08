@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,9 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 class TestImplBinaryInnerOps_MT extends CompareIdenticalFunctions
 {
-
-	Random rand = new Random(234);
 	int width = 640,height=480;
 
 	protected TestImplBinaryInnerOps_MT() {

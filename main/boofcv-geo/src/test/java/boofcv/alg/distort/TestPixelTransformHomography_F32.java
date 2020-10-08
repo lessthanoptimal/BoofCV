@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.distort;
 
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPixelTransformHomography_F32 {
+public class TestPixelTransformHomography_F32 extends BoofStandardJUnit {
 	@Test
 	public void constructor_32() {
 		Homography2D_F32 a = new Homography2D_F32(1,2,3,4,5,6,7,8,9);

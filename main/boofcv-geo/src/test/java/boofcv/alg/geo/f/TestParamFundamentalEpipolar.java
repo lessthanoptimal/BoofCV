@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestParamFundamentalEpipolar {
+public class TestParamFundamentalEpipolar extends BoofStandardJUnit {
 
 	@Test
 	public void backAndForth() {
@@ -41,7 +42,7 @@ public class TestParamFundamentalEpipolar {
 
 		DMatrixRMaj E = MultiViewOps.createEssential(R, T, null);
 		
-		double param[] = new double[7];
+		double[] param = new double[7];
 		
 		ParamFundamentalEpipolar alg = new ParamFundamentalEpipolar();
 		

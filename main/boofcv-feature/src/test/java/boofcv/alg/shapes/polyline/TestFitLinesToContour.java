@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polyline;
 
 import boofcv.misc.CircularIndex;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestFitLinesToContour {
+public class TestFitLinesToContour extends BoofStandardJUnit {
 
 	/**
 	 * Easy case were the corners are all in perfect location.  Try all permutations of first anchor and second anchor.

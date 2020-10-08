@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.circle;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.NodeInfo;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestEllipseClustersIntoGrid {
+public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 
 	@Test
 	public void checkDuplicates() {

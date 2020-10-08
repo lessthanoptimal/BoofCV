@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilCurves_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.curve.ConicGeneral_F64;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestNormalizationPoint2D {
+class TestNormalizationPoint2D extends BoofStandardJUnit {
 	@Test
 	void apply_2D() {
 		NormalizationPoint2D n = new NormalizationPoint2D(1,2,3,4);

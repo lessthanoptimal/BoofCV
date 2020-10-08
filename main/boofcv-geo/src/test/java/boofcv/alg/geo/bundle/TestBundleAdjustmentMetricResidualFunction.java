@@ -18,10 +18,10 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestBundleAdjustmentMetricResidualFunction {
-	private final Random rand = BoofTesting.createRandom(234);
+class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 
 	/**
 	 * Makes sure that when given the same input it produces the same output

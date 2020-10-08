@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,10 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestClipAndReduce {
+public class TestClipAndReduce extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
-	ImageType types[] = new ImageType[]{ImageType.single(GrayF32.class),ImageType.pl(3,GrayF32.class)};
+	ImageType[] types = new ImageType[]{ImageType.single(GrayF32.class),ImageType.pl(3,GrayF32.class)};
 
 	@Test
 	public void massage_clipped() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestBaseDetectFiducialSquare {
+public class TestBaseDetectFiducialSquare extends BoofStandardJUnit {
 
 	/**
 	 * Apply heavy lens distortion. This test will only pass if it's correctly removed.

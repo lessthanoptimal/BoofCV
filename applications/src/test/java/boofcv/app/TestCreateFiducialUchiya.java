@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 	public void createDocument(String args ) throws IOException, InterruptedException {
 		CreateFiducialRandomDot.main(args.split("\\s+"));
+		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
 	}
 
 	@Test

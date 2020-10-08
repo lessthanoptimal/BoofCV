@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,11 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,12 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class TestDescribeImageDenseSift {
+public class TestDescribeImageDenseSift extends BoofStandardJUnit {
 
 	int width = 120;
 	int height = 90;
-
-	Random rand = new Random(234);
 
 	Class[] imageTypes = new Class[]{GrayU8.class, GrayF32.class};
 

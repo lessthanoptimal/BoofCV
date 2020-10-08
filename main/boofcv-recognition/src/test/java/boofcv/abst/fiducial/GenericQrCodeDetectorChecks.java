@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
@@ -44,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Generic tests for qr codes under mild lens distortion
  */
-public abstract class GenericQrCodeDetectorChecks {
+public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 
 	double simulatedTargetWidth = 0.3; // size of target in simulated world
 

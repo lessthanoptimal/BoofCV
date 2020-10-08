@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -40,21 +41,19 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Base class for unit tests which fit binary polygons
  *
  * @author Peter Abeles
  */
-public class CommonFitPolygonChecks {
+public class CommonFitPolygonChecks extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	boolean showRendered = false;
 
 	int width = 400, height = 500;
 
-	Class imageTypes[] = new Class[]{GrayU8.class,GrayF32.class};
+	Class[] imageTypes = new Class[]{GrayU8.class,GrayF32.class};
 	ImageGray orig; // original image before affine has been applied
 	ImageGray image; // image after affine applied
 
@@ -145,8 +144,8 @@ public class CommonFitPolygonChecks {
 		for (int i = 0; i < polygons.size(); i++) {
 			Polygon2D_F64 orig = polygons.get(i);
 
-			int x[] = new int[ orig.size() ];
-			int y[] = new int[ orig.size() ];
+			int[] x = new int[ orig.size() ];
+			int[] y = new int[ orig.size() ];
 
 			for (int j = 0; j < orig.size(); j++) {
 				x[j] = (int)orig.get(j).x;

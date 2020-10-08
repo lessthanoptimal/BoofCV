@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,21 +19,19 @@
 package boofcv.alg.tracker;
 
 import boofcv.abst.tracker.PointTrack;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestPruneCloseTracks {
-
-	Random rand = new Random(234);
+class TestPruneCloseTracks extends BoofStandardJUnit {
 	int width = 14;
 	int height = 10;
 

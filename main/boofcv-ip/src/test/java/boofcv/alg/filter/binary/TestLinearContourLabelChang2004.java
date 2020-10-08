@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestLinearContourLabelChang2004 {
+public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 
 	public static GrayU8 TEST1 = new GrayU8(new byte[][]
 			{{0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1},

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.deepboof;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import deepboof.Function;
 import deepboof.graph.FunctionSequence;
 import deepboof.graph.Node;
@@ -31,7 +32,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static deepboof.misc.TensorOps.WI;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,9 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class CheckBaseImageClassifier {
+public abstract class CheckBaseImageClassifier extends BoofStandardJUnit {
 
-	protected Random rand = new Random(234);
 	protected int numCategories = 8;
 
 	/**

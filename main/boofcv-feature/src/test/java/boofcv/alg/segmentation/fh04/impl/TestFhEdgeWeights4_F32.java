@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,14 +23,10 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
-import java.util.Random;
-
 /**
 * @author Peter Abeles
 */
 public class TestFhEdgeWeights4_F32 extends GenericFhEdgeWeightsChecks<GrayF32> {
-
-	Random rand = new Random(234);
 
 	public TestFhEdgeWeights4_F32() {
 		super(ImageType.single(GrayF32.class), ConnectRule.FOUR);

@@ -24,15 +24,13 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.io.image.impl.ImplConvertImageMisc;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-class TestConvertImageMisc {
-	Random rand = new Random(234);
+class TestConvertImageMisc extends BoofStandardJUnit {
 	int width = 30,height=40;
 
 	@Test

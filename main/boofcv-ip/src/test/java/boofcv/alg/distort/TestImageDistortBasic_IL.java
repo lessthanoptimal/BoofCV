@@ -27,11 +27,11 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,8 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImageDistortBasic_IL {
-	Random rand = new Random(234);
+public class TestImageDistortBasic_IL extends BoofStandardJUnit {
 	private static final int NUM_BANDS = 2;
 	DummyInterpolate interp = new DummyInterpolate();
 

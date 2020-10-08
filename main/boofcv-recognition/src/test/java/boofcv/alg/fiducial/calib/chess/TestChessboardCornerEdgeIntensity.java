@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestChessboardCornerEdgeIntensity {
+class TestChessboardCornerEdgeIntensity extends BoofStandardJUnit {
 
 	double padding = 30;
 	double length = 50;

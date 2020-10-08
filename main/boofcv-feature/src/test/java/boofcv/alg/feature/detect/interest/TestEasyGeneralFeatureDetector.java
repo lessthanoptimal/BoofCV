@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,15 +22,15 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestEasyGeneralFeatureDetector {
+public class TestEasyGeneralFeatureDetector extends BoofStandardJUnit {
 
 	int width = 20;
 	int height = 30;
@@ -43,11 +43,11 @@ public class TestEasyGeneralFeatureDetector {
 		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
 				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
 
-		assertTrue(alg.derivX != null);
-		assertTrue(alg.derivY != null);
-		assertTrue(alg.derivXX == null);
-		assertTrue(alg.derivXY == null);
-		assertTrue(alg.derivYY == null);
+		assertNotNull(alg.derivX);
+		assertNotNull(alg.derivY);
+		assertNull(alg.derivXX);
+		assertNull(alg.derivXY);
+		assertNull(alg.derivYY);
 
 		alg.detect(image,null);
 
@@ -62,11 +62,11 @@ public class TestEasyGeneralFeatureDetector {
 				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
 
 		// It uses the gradient to compute the hessian faster
-		assertTrue(alg.derivX != null);
-		assertTrue(alg.derivY != null);
-		assertTrue(alg.derivXX != null);
-		assertTrue(alg.derivXY != null);
-		assertTrue(alg.derivYY != null);
+		assertNotNull(alg.derivX);
+		assertNotNull(alg.derivY);
+		assertNotNull(alg.derivXX);
+		assertNotNull(alg.derivXY);
+		assertNotNull(alg.derivYY);
 
 		alg.detect(image,null);
 
@@ -104,13 +104,13 @@ public class TestEasyGeneralFeatureDetector {
 		@Override
 		public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
 			if( gradient ) {
-				assertTrue(derivX != null );
-				assertTrue(derivY != null );
+				assertNotNull(derivX);
+				assertNotNull(derivY);
 			}
 			if( hessian ) {
-				assertTrue(derivXX != null );
-				assertTrue(derivYY != null );
-				assertTrue(derivXY != null );
+				assertNotNull(derivXX);
+				assertNotNull(derivYY);
+				assertNotNull(derivXY);
 			}
 		}
 

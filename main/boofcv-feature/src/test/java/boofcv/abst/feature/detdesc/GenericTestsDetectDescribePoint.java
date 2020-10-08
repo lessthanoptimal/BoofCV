@@ -24,11 +24,10 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,11 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D extends TupleDesc> {
+public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D extends TupleDesc>
+		extends BoofStandardJUnit {
 	int width = 100;
 	int height = 120;
-
-	Random rand = new Random(234);
 
 	// expected capabilities
 	boolean hasScale;

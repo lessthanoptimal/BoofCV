@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle.jacobians;
 
-import boofcv.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import org.ddogleg.optimization.DerivativeChecker;
@@ -30,15 +30,12 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public abstract class GenericChecksJacobianSo3 {
-	Random rand = BoofTesting.createRandom(34);
+public abstract class GenericChecksJacobianSo3 extends BoofStandardJUnit {
 	boolean skipJacobianAtIdentity = false;
 	boolean printJacobian = false;
 

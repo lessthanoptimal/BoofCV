@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.numerics;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestInterpolateArray {
+public class TestInterpolateArray extends BoofStandardJUnit {
 
 	@Test
 	public void linearCase() {
-		double d[] = new double[]{1,3,5,7};
+		double[] d = new double[]{1,3,5,7};
 
 		InterpolateArray alg = new InterpolateArray(d);
 
@@ -42,7 +43,7 @@ public class TestInterpolateArray {
 
 	@Test
 	public void checkBounds() {
-		double d[] = new double[]{1,3,5,7};
+		double[] d = new double[]{1,3,5,7};
 
 		InterpolateArray alg = new InterpolateArray(d);
 

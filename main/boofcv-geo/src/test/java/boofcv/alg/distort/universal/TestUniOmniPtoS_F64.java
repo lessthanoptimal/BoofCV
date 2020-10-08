@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.distort.universal;
 
 import boofcv.struct.calib.CameraUniversalOmni;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestUniOmniPtoS_F64 {
+public class TestUniOmniPtoS_F64 extends BoofStandardJUnit {
 	/**
 	 * Tell it to project the center pixel forwards.  All the distortion shouldn't affect it there and it should
 	 * appear to be image center exactly.
@@ -42,7 +43,6 @@ public class TestUniOmniPtoS_F64 {
 		centerIsCenter(1.0);
 		centerIsCenter(0.5);
 		centerIsCenter(3.5);
-
 	}
 
 	private void centerIsCenter( double mirror ) {

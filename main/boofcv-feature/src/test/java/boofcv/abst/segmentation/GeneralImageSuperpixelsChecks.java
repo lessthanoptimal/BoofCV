@@ -26,9 +26,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,11 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> {
+public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
 
-	ImageType imageTypes[];
-
-	Random rand = new Random(234);
+	ImageType[] imageTypes;
 
 	int width = 20;
 	int height = 30;
@@ -71,7 +68,7 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> {
 			assertTrue(alg.getTotalSuperpixels() > 4);
 
 			GrayU8 binary = new GrayU8(width,height);
-			boolean selected[] = new boolean[ alg.getTotalSuperpixels()];
+			boolean[] selected = new boolean[ alg.getTotalSuperpixels()];
 
 			for (int i = 0; i < alg.getTotalSuperpixels(); i++) {
 				selected[i] = true;
@@ -134,7 +131,7 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> {
 			int N = alg.getTotalSuperpixels();
 			assertTrue(N > 2);
 
-			boolean found[] = new boolean[N];
+			boolean[] found = new boolean[N];
 
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {

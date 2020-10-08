@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.structure;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestDecomposeAbsoluteDualQuadratic {
+class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 
 	DMatrixRMaj K = new DMatrixRMaj(new double[][]{{400,1.1,450},{0,420,460},{0,0,1}});
 

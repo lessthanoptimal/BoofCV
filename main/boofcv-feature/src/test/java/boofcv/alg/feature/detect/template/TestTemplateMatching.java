@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.Match;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-class TestTemplateMatching {
+class TestTemplateMatching extends BoofStandardJUnit {
 	int width = 30;
 	int height = 40;
 

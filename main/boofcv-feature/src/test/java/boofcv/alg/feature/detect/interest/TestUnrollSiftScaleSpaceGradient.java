@@ -24,18 +24,15 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestUnrollSiftScaleSpaceGradient {
-
-	Random rand = new Random(234);
+public class TestUnrollSiftScaleSpaceGradient extends BoofStandardJUnit {
 
 	/**
 	 * Manually compute the precomputed set of scaled derivatives and see if they are the same

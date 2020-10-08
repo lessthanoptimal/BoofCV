@@ -26,17 +26,16 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseImageGradient;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends ImageGray<II>> {
-	Random rand = new Random(234);
+public abstract class BaseTestDescribeSurf<I extends ImageGray<I>,II extends ImageGray<II>>
+		extends BoofStandardJUnit {
 	int width = 50;
 	int height = 60;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,12 +25,12 @@ import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,9 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestLocalWeightedHistogramRotRect {
-
-	Random rand = new Random(234);
+public class TestLocalWeightedHistogramRotRect extends BoofStandardJUnit {
 
 	/**
 	 * Crudely checks to see that the center has the most weight

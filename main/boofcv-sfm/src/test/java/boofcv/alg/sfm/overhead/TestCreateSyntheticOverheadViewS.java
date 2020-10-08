@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCreateSyntheticOverheadViewS {
+public class TestCreateSyntheticOverheadViewS extends BoofStandardJUnit {
 
 	int width = 800;
 	int height = 850;

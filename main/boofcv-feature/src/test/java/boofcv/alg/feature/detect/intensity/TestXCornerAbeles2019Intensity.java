@@ -22,15 +22,14 @@ import boofcv.BoofTesting;
 import boofcv.alg.feature.detect.intensity.impl.ImplXCornerAbeles2019Intensity;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-class TestXCornerAbeles2019Intensity {
-	Random rand = new Random(234);
+class TestXCornerAbeles2019Intensity extends BoofStandardJUnit {
+
 	int width = 30;
 	int height = 20;
 

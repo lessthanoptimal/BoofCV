@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,13 +22,14 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import boofcv.testing.BoofStandardJUnit;
 
 /**
  * Common tests for tracking hysteresis edges
  *
  * @author Peter Abeles
  */
-public abstract class CommonHysteresisEdgeTrace {
+public abstract class CommonHysteresisEdgeTrace extends BoofStandardJUnit {
 	// simple test going around the image edge
 	float[] inten0 = new float[]{
 			5,5,5,5,

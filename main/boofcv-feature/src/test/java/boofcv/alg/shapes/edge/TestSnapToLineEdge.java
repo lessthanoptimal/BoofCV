@@ -25,6 +25,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.metric.Intersection2D_F64;
@@ -47,9 +48,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSnapToLineEdge {
+public class TestSnapToLineEdge extends BoofStandardJUnit {
 
-	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
+	Class[] imageTypes = new Class[]{GrayU8.class, GrayF32.class};
 
 	Random rand = new Random(234);
 
@@ -167,7 +168,7 @@ public class TestSnapToLineEdge {
 	@Test
 	public void fit_noisy_affine() {
 		// distorted and undistorted views
-		Affine2D_F64 affines[] = new Affine2D_F64[2];
+		Affine2D_F64[] affines = new Affine2D_F64[2];
 		affines[0] = new Affine2D_F64();
 		affines[1] = new Affine2D_F64(1.3,0.05,-0.15,0.87,0.1,0.6);
 		ConvertTransform_F64.convert(new Se2_F64(0, 0, 0.2), affines[0]);
@@ -193,7 +194,7 @@ public class TestSnapToLineEdge {
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y0),input.get(3));
 
 
-		LineGeneral2D_F64 found[] = new LineGeneral2D_F64[input.size()];
+		LineGeneral2D_F64[] found = new LineGeneral2D_F64[input.size()];
 		for (int i = 0; i < found.length; i++) {
 			found[i] = new LineGeneral2D_F64();
 		}

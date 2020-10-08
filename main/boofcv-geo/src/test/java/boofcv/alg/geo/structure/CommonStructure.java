@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPoint3D_F64;
@@ -39,16 +40,13 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class CommonStructure {
-	protected Random rand = new Random(234);
-
+public class CommonStructure extends BoofStandardJUnit {
 	protected CameraPinhole pinhole = new CameraPinhole(400,420,0.1,500,490,-1,-1);
 
 	protected List<Point3D_F64> features3D;

@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImageSegmentationOps {
+public class TestImageSegmentationOps extends BoofStandardJUnit {
 
 	@Test
 	public void countRegionPixels_single() {

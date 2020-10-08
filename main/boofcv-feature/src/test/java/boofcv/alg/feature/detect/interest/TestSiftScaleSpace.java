@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,18 +21,15 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestSiftScaleSpace {
-
-	Random rand = new Random(234);
+public class TestSiftScaleSpace extends BoofStandardJUnit {
 
 	/**
 	 * Checks to see if the first image in each octave has the expected amount of image blur

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -41,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrateStereoPlanar {
+public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(250,260,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
 	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);

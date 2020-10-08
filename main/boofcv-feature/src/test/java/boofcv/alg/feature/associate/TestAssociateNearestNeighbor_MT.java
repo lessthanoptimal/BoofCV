@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.struct.FastQueue;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestAssociateNearestNeighbor_MT {
+class TestAssociateNearestNeighbor_MT extends BoofStandardJUnit {
 	@Test
 	void compare() {
 		FastQueue<TupleDesc_F64> dataSrc = TestAssociateGreedyDesc_MT.createData(200);

@@ -18,25 +18,22 @@
 
 package boofcv.alg.feature.detect.selector;
 
-import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-class TestSampleIntensityImage {
+class TestSampleIntensityImage extends BoofStandardJUnit {
 
-	Random rand = BoofTesting.createRandom(34);
 	GrayF32 image = new GrayF32(30, 40);
 
 	public TestSampleIntensityImage() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,13 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestFiducialDetectorPnP {
+public class TestFiducialDetectorPnP extends BoofStandardJUnit {
 	@Test
 	public void ignore() {
 		// intentionally left blank because it is tested elsewhere

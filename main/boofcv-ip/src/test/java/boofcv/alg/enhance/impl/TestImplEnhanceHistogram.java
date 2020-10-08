@@ -27,10 +27,10 @@ import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,11 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestImplEnhanceHistogram {
+public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 
 	int width = 15;
 	int height = 20;
-	Random rand = new Random(234);
 
 	@Test
 	public void applyTransform() {

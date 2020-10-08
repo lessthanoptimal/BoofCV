@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,13 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
 
 /**
  * @author Peter Abeles
  */
-public class TestImageHessianDirect_SB {
-
+public class TestImageHessianDirect_SB extends BoofStandardJUnit {
 
 	int width = 20;
 	int height = 30;
@@ -36,13 +35,13 @@ public class TestImageHessianDirect_SB {
 	 */
 	@Test
 	public void testNoException() {
-		GrayF32 input = new GrayF32(width,height);
-		GrayF32 derivXX = new GrayF32(width,height);
-		GrayF32 derivYY = new GrayF32(width,height);
-		GrayF32 derivXY = new GrayF32(width,height);
+		GrayF32 input = new GrayF32(width, height);
+		GrayF32 derivXX = new GrayF32(width, height);
+		GrayF32 derivYY = new GrayF32(width, height);
+		GrayF32 derivXY = new GrayF32(width, height);
 
-		ImageHessianDirect_SB<GrayF32,GrayF32> alg = new ImageHessianDirect_SB.Sobel<>(GrayF32.class,GrayF32.class);
+		ImageHessianDirect_SB<GrayF32, GrayF32> alg = new ImageHessianDirect_SB.Sobel<>(GrayF32.class, GrayF32.class);
 
-		alg.process(input,derivXX,derivYY,derivXY);
+		alg.process(input, derivXX, derivYY, derivXY);
 	}
 }

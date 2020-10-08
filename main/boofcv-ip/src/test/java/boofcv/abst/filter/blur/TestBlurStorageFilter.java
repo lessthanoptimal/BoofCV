@@ -25,18 +25,18 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestBlurStorageFilter {
+
+@SuppressWarnings("rawtypes")
+public class TestBlurStorageFilter extends BoofStandardJUnit {
 
 	int width = 20;
 	int height = 25;
-	Random rand = new Random(234);
 
 	ImageType[] imageTypes = new ImageType[]{ImageType.single(GrayU8.class), ImageType.single(GrayF32.class)};
 

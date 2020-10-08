@@ -23,22 +23,21 @@ import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribeDenseSiftAlg {
+public class TestDescribeDenseSiftAlg extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 50, height = 40;
 
 	/**

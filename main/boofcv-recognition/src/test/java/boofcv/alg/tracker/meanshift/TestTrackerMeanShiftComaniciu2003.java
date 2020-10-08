@@ -18,7 +18,6 @@
 
 package boofcv.alg.tracker.meanshift;
 
-import boofcv.BoofTesting;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
@@ -27,10 +26,9 @@ import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.util.UtilDouble;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,9 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestTrackerMeanShiftComaniciu2003 {
-
-	Random rand = BoofTesting.createRandom(34);
+public class TestTrackerMeanShiftComaniciu2003 extends BoofStandardJUnit {
 
 	@Test
 	public void track() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -39,9 +40,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBundleAdjustmentMetricChecks {
-	Random rand = new Random(234);
-
+@SuppressWarnings("ALL") public abstract class GenericBundleAdjustmentMetricChecks extends BoofStandardJUnit {
 	public abstract BundleAdjustment<SceneStructureMetric> createAlg();
 
 	@Test

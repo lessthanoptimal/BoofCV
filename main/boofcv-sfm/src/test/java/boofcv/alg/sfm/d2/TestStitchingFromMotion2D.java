@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestStitchingFromMotion2D {
+public class TestStitchingFromMotion2D extends BoofStandardJUnit {
 
 	GrayF32 image = new GrayF32(100, 150);
 	Affine2D_F64 translation = new Affine2D_F64(1, 0, 0, 1, 1, -2);

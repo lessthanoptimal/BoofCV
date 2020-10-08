@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Nested;
 
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-class TestDetectChessboardBinaryPattern {
+class TestDetectChessboardBinaryPattern extends BoofStandardJUnit {
 
 	private static class Base extends GenericDetectFindChessboardCorners {
 		boolean localThreshold;

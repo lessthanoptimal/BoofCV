@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestBinaryEllipseDetector {
+public class TestBinaryEllipseDetector extends BoofStandardJUnit {
 
 	// edge intensity theshold for a valid ellipse
 	public static int THRESHOLD = 20;

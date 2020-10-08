@@ -27,23 +27,21 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestCannyEdge {
+public class TestCannyEdge extends BoofStandardJUnit {
 
 	int width = 150;
 	int height = 200;
-
-	Random rand = new Random(234);
 
 	/**
 	 * Image has no texture and the sadistic user and specified a threshold of zero.  Everything should

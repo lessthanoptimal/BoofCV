@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestImplDescribePointPixelRegionNCC_U8 {
+public class TestImplDescribePointPixelRegionNCC_U8 extends BoofStandardJUnit {
 
 	Random rand = new Random(234);
 

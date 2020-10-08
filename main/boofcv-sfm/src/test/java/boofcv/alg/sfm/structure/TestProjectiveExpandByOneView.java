@@ -18,9 +18,9 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.BoofTesting;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -28,15 +28,12 @@ import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-class TestProjectiveExpandByOneView {
-	private final Random rand = BoofTesting.createRandom(0);
+class TestProjectiveExpandByOneView extends BoofStandardJUnit {
 	private final static double MATRIX_TOL = 1e-4;
 
 	@Test

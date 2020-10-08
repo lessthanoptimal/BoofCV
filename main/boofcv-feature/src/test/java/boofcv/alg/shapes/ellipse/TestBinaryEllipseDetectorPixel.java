@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.shapes.TestShapeFittingOps;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.curve.EllipseRotated_F32;
@@ -44,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestBinaryEllipseDetectorPixel {
+public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 
 	/**
 	 * Test the whole pipeline with a rendered image

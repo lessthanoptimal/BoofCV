@@ -29,21 +29,18 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
-
-	Random rand = new Random(344);
+public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	// image and template being matched
 	T image;

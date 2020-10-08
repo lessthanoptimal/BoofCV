@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.segmentation.ms;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
@@ -31,16 +32,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestClusterLabeledImage {
+public class TestClusterLabeledImage extends BoofStandardJUnit {
 
-	int case0[] = new int[] {
+	int[] case0 = new int[] {
 			0,0,1,0,1,
 			0,0,0,1,1,
 			1,2,1,2,1,
 			1,2,1,1,2,
 			1,1,2,2,2};
 
-	ConnectRule rules[] = new ConnectRule[]{ConnectRule.FOUR,ConnectRule.EIGHT};
+	ConnectRule[] rules = new ConnectRule[]{ConnectRule.FOUR,ConnectRule.EIGHT};
 
 	Random rand = new Random(123);
 
@@ -88,7 +89,7 @@ public class TestClusterLabeledImage {
 				0,0,1,1,1,
 				0,0,1,1,1};
 
-		int expected[] = new int[] {
+		int[] expected = new int[] {
 				0,0,1,1,1,
 				0,0,1,1,1,
 				1,1,1,1,1,
@@ -101,7 +102,7 @@ public class TestClusterLabeledImage {
 			ClusterLabeledImage alg = new ClusterLabeledImage(rules[i]);
 			alg.process(input, output, counts);
 
-			int convert[] = new int[3];
+			int[] convert = new int[3];
 			convert[0] = output.get(0,0);
 			convert[1] = output.get(2,0);
 			convert[2] = output.get(2,4);
@@ -123,7 +124,7 @@ public class TestClusterLabeledImage {
 		GrayS32 input = new GrayS32(5,5);
 		input.data = case0;
 
-		int expected[] = new int[] {
+		int[] expected = new int[] {
 				0,0,2,3,4,
 				0,0,0,4,4,
 				5,6,1,8,4,
@@ -135,7 +136,7 @@ public class TestClusterLabeledImage {
 		ClusterLabeledImage alg = new ClusterLabeledImage(ConnectRule.FOUR);
 		alg.process(input,output,counts);
 
-		int convert[] = new int[9];
+		int[] convert = new int[9];
 		convert[0] = output.get(0,0);
 		convert[1] = output.get(2,2);
 		convert[2] = output.get(2,0);
@@ -163,14 +164,14 @@ public class TestClusterLabeledImage {
 		GrayS32 input = new GrayS32(5,5);
 		input.data = case0;
 
-		int expected[] = case0;
+		int[] expected = case0;
 
 		GrayS32 output = new GrayS32(5,5);
 
 		ClusterLabeledImage alg = new ClusterLabeledImage(ConnectRule.EIGHT);
 		alg.process(input,output,counts);
 
-		int convert[] = new int[3];
+		int[] convert = new int[3];
 		convert[0] = output.get(0,0);
 		convert[1] = output.get(0,2);
 		convert[2] = output.get(1,2);

@@ -26,16 +26,14 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageDistortCache_SB_MT {
-	Random rand = new Random(234);
+public class TestImageDistortCache_SB_MT extends BoofStandardJUnit {
 	int width = 60,height=80;
 
 	@Test

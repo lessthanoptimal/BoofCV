@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo.selfcalib;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
@@ -26,6 +25,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.*;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -33,15 +33,13 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 
 /**
  * @author Peter Abeles
  */
-public class CommonThreeViewSelfCalibration {
-	protected Random rand = BoofTesting.createRandom(6);
+public class CommonThreeViewSelfCalibration extends BoofStandardJUnit {
 	protected CameraPinhole cameraA;
 	protected CameraPinhole cameraB;
 	protected CameraPinhole cameraC;

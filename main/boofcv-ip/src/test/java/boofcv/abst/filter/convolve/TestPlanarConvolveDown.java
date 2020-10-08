@@ -26,16 +26,13 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestPlanarConvolveDown {
-
-	Random rand = new Random(234);
+public class TestPlanarConvolveDown extends BoofStandardJUnit {
 
 	@Test
 	public void compareToSingleBand() {

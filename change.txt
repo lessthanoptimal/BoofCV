@@ -15,6 +15,8 @@ Version : 0.37
   * Modified sub-projects to stream line build process and to be more logical
   * Moved `calibration` into `geo`
   * Created `ip-multiview` and moved disparity code and a few classes in `geo` in to it
+  * TODO All functions are checked for stdout spam
+  * TODO Automate checking to see if a unit tests extends the class
 - Random Dot Markers
   * Created GUI for generating markers. Print or save to disk
   * Fully integrated into Applications

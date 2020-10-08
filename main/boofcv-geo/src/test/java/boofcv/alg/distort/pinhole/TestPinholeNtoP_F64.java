@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.distort.pinhole;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPinholeNtoP_F64 {
+public class TestPinholeNtoP_F64 extends BoofStandardJUnit {
 
 	@Test
 	public void basicTest() {

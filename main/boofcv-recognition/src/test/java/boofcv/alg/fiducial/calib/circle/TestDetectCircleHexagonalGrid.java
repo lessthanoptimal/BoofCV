@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.curve.EllipseRotated_F64;
@@ -44,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDetectCircleHexagonalGrid {
+public class TestDetectCircleHexagonalGrid extends BoofStandardJUnit {
 
 //	private static final double hexY = Math.sqrt(3.0/4.0);
 

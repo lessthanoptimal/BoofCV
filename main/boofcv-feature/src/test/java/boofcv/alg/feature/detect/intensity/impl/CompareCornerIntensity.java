@@ -24,6 +24,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class CompareCornerIntensity<D extends ImageGray<D>> {
+public abstract class CompareCornerIntensity<D extends ImageGray<D>> extends BoofStandardJUnit {
 
 	protected GradientCornerIntensity<D> algA, algB;
 

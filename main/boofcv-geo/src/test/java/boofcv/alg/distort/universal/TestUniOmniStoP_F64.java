@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.distort.universal;
 
 import boofcv.struct.calib.CameraUniversalOmni;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestUniOmniStoP_F64 {
+public class TestUniOmniStoP_F64 extends BoofStandardJUnit {
 	/**
 	 * A point in the world center should appear in the image center
 	 */

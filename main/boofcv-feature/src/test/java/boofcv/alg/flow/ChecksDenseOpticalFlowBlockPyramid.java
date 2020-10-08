@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,10 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
+public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	Class<T> imageType;
-	Random rand = new Random(234);
 	T image;
 
 	protected ChecksDenseOpticalFlowBlockPyramid(Class<T> imageType) {

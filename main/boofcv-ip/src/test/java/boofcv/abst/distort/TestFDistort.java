@@ -32,11 +32,10 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,12 +43,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFDistort {
+public class TestFDistort extends BoofStandardJUnit {
 
 	int width = 30, height = 40;
 	GrayU8 input = new GrayU8(width,height);
 	GrayU8 output = new GrayU8(width,height);
-	Random rand = new Random(234);
 
 	@Test
 	void scale() {

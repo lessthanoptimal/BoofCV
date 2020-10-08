@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,15 +21,16 @@ package boofcv.abst.feature.describe;
 import boofcv.alg.descriptor.ConvertDescriptors;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_U8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestConvertPositive_F64_U8 {
+public class TestConvertPositive_F64_U8 extends BoofStandardJUnit {
 
 	@Test
 	public void createOutput() {
@@ -37,7 +38,7 @@ public class TestConvertPositive_F64_U8 {
 
 		TupleDesc_U8 found = alg.createOutput();
 
-		assertTrue(5 == found.value.length);
+		assertEquals(found.value.length, 5);
 	}
 
 	@Test
@@ -61,6 +62,6 @@ public class TestConvertPositive_F64_U8 {
 	@Test
 	public void getOutputType() {
 		ConvertPositive_F64_U8 alg = new ConvertPositive_F64_U8(5);
-		assertTrue(TupleDesc_U8.class == alg.getOutputType());
+		assertSame(TupleDesc_U8.class, alg.getOutputType());
 	}
 }

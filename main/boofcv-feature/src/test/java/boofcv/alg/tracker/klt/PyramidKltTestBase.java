@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
-
-import java.util.Random;
+import boofcv.testing.BoofStandardJUnit;
 
 
 /**
@@ -37,8 +36,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidKltTestBase {
-	Random rand = new Random(234);
+public class PyramidKltTestBase extends BoofStandardJUnit {
 
 	int width = 50;
 	int height = 60;

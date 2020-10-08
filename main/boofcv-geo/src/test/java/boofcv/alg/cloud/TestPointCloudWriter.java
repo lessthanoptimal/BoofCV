@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.cloud;
 import boofcv.alg.cloud.PointCloudWriter.CloudArraysF32;
 import boofcv.struct.Point3dRgbI_F32;
 import boofcv.struct.Point3dRgbI_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestPointCloudWriter {
+class TestPointCloudWriter extends BoofStandardJUnit {
 
 	static abstract class PcwTests {
 		boolean supportsColor = true;

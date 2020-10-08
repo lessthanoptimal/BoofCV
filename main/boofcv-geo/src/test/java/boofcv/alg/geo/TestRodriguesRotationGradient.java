@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.optimization.DerivativeChecker;
@@ -28,17 +29,13 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestRodriguesRotationGradient {
+public class TestRodriguesRotationGradient extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
-	
 	@Test
 	public void checkUsingNumerical() {
 		RodToMatrix f = new RodToMatrix();

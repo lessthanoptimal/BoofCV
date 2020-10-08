@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"SillyAssignment"})
+@SuppressWarnings({"rawtypes", "unchecked", "unused", "IntegerDivisionInFloatingPointContext"})
 public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 
 	int width = 6;
@@ -60,12 +60,12 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 	@Test
 	public void checkAll() {
 		int numExpected = 35;
-		Method methods[] = ConvolveImageStandard_SB.class.getMethods();
+		Method[] methods = ConvolveImageStandard_SB.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
 		for (Method m : methods) {
-			if( !isTestMethod(m)) {
+			if (!isTestMethod(m)) {
 //				System.out.println(m.getName());
 				continue;
 			}
@@ -75,15 +75,15 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		}
 
 		// update this as needed when new functions are added
-		if(numExpected != numFound)
-			throw new RuntimeException("Unexpected number of methods: Found "+numFound+"  expected "+numExpected);
+		if (numExpected != numFound)
+			throw new RuntimeException("Unexpected number of methods: Found " + numFound + "  expected " + numExpected);
 	}
 
-	private boolean isTestMethod(Method m ) {
+	private boolean isTestMethod( Method m ) {
 
-		Class<?> param[] = m.getParameterTypes();
+		Class<?>[] param = m.getParameterTypes();
 
-		if( param.length < 3 )
+		if (param.length < 3)
 			return false;
 
 		return KernelBase.class.isAssignableFrom(param[0]);
@@ -93,61 +93,60 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 	 * Using the method's name and the number of parameters invoke the appropriate test function
 	 */
 	private void testMethod( Method m ) {
-		Class param[] = m.getParameterTypes();
+		Class[] param = m.getParameterTypes();
 
 		ImageGray input = GeneralizedImageOps.createSingleBand(param[1], width, height);
 		ImageGray output = GeneralizedImageOps.createSingleBand(param[2], width, height);
 
 		GImageMiscOps.fillUniform(input, rand, 1, maxPixelValue);
 
-		if( m.getName().contentEquals("horizontal")) {
-			if( param.length == 3 ) {
+		if (m.getName().contentEquals("horizontal")) {
+			if (param.length == 3) {
 				BoofTesting.checkSubImage(this, "horizontal", true, input, output);
 			} else {
 				BoofTesting.checkSubImage(this, "horizontalDiv", true, input, output);
 			}
-		} else if( m.getName().contentEquals("vertical")) {
-			if( param.length == 3 ) {
+		} else if (m.getName().contentEquals("vertical")) {
+			if (param.length == 3) {
 				BoofTesting.checkSubImage(this, "vertical", true, input, output);
 			} else {
 				BoofTesting.checkSubImage(this, "verticalDiv", true, input, output);
 			}
-		} else if( m.getName().contentEquals("convolve")) {
-			if( param.length == 3 ) {
+		} else if (m.getName().contentEquals("convolve")) {
+			if (param.length == 3) {
 				BoofTesting.checkSubImage(this, "convolve", true, input, output);
 			} else {
 				BoofTesting.checkSubImage(this, "convolveDiv", true, input, output);
 			}
 		} else {
-			fail("Unknown method name: "+m.getName());
+			fail("Unknown method name: " + m.getName());
 		}
 	}
-
 
 	/**
 	 * Unit test for horizontal convolution.
 	 */
-	public void horizontal(ImageGray img, ImageGray dest) {
+	public void horizontal( ImageGray img, ImageGray dest ) {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,kernelRadius,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, maxKernelValue, rand);
 		checkHorizontal(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
-		checkHorizontal(ker,img,dest);
-
-		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 0, maxKernelValue, rand);
 		checkHorizontal(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),4,2,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), 2, 1, 0, maxKernelValue, rand);
+		checkHorizontal(ker, img, dest);
+
+		// even non-symmetric kernel shape
+		ker = FactoryKernel.random(ker.getClass(), 4, 2, 0, maxKernelValue, rand);
 		checkHorizontal(ker, img, dest);
 	}
 
-	private void checkHorizontal(Kernel1D ker , ImageGray img, ImageGray dest ) {
+	private void checkHorizontal( Kernel1D ker, ImageGray img, ImageGray dest ) {
 		GImageMiscOps.fill(dest, 0);
 		invokeMethod("horizontal", ker, img, dest);
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
@@ -156,29 +155,29 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		double tol = toleranceByImageType(img);
 
 		int x0 = ker.offset;
-		int x1 = width-(ker.width-ker.offset-1);
+		int x1 = width - (ker.width - ker.offset - 1);
 
 		for (int x = 0; x < x0; x++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 		for (int x = x0; x < x1; x++) {
 			double expected = horizontal(x, y, img, ker, ker.width, ker.offset);
 			assertEquals(expected, get(dest, x, y), tol);
 		}
 		for (int x = x1; x < width; x++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 	}
 
-	public double horizontal(int x, int y, ImageGray img, Kernel1D ker, int width, int offset) {
+	public double horizontal( int x, int y, ImageGray img, Kernel1D ker, int width, int offset ) {
 
 		double total = 0;
 
-		for( int i = 0; i < width; i++ ) {
-			if( img.isInBounds(x-offset+i,y)) {
+		for (int i = 0; i < width; i++) {
+			if (img.isInBounds(x - offset + i, y)) {
 				double valI = get(img, x - offset + i, y);
 
-				total += valI * ker.getDouble(i);
+				total += valI*ker.getDouble(i);
 			}
 		}
 
@@ -188,23 +187,23 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 	/**
 	 * Unit test for horizontal convolution with division.
 	 */
-	public void horizontalDiv(ImageGray img, ImageGray dest) {
+	public void horizontalDiv( ImageGray img, ImageGray dest ) {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,kernelRadius,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, maxKernelValue, rand);
 		checkHorizontalDiv(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 0, maxKernelValue, rand);
 		checkHorizontalDiv(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), 2, 1, 0, maxKernelValue, rand);
 		checkHorizontalDiv(ker, img, dest);
 	}
 
-	private void checkHorizontalDiv(Kernel1D ker , ImageGray img, ImageGray dest ) {
+	private void checkHorizontalDiv( Kernel1D ker, ImageGray img, ImageGray dest ) {
 		int divisor = kernelWidth;
 		GImageMiscOps.fill(dest, 0);
 		invokeMethod("horizontal", ker, img, dest, divisor);
@@ -214,39 +213,39 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		double tol = toleranceByImageType(img);
 
 		int x0 = ker.offset;
-		int x1 = width-(ker.width-ker.offset-1);
+		int x1 = width - (ker.width - ker.offset - 1);
 
 		for (int x = 0; x < x0; x++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 		for (int x = x0; x < x1; x++) {
 			double expected = horizontal(x, y, img, ker, ker.width, ker.offset, divisor);
 			assertEquals(expected, get(dest, x, y), tol);
 		}
 		for (int x = x1; x < width; x++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 	}
 
-	public double horizontal(int x , int y , ImageGray img , Kernel1D ker , int width , int offset , int divisor ) {
+	public double horizontal( int x, int y, ImageGray img, Kernel1D ker, int width, int offset, int divisor ) {
 
 		double total = 0;
 
-		for( int i = 0; i < width; i++ ) {
-			if( img.isInBounds(x-offset+i,y)) {
+		for (int i = 0; i < width; i++) {
+			if (img.isInBounds(x - offset + i, y)) {
 				double valI = get(img, x - offset + i, y);
 
-				total += valI * ker.getDouble(i);
+				total += valI*ker.getDouble(i);
 			}
 		}
 
-		return (total+(divisor/2))/divisor;
+		return (total + (divisor/2))/divisor;
 	}
 
 	/**
 	 * Unit test for vertical convolution.
 	 */
-	public void vertical(ImageGray img, ImageGray dest) {
+	public void vertical( ImageGray img, ImageGray dest ) {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
@@ -254,15 +253,15 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		checkVertical(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 0, maxKernelValue, rand);
 		checkVertical(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), 2, 1, 0, maxKernelValue, rand);
 		checkVertical(ker, img, dest);
 	}
 
-	private void checkVertical(Kernel1D ker , ImageGray img, ImageGray dest ) {
+	private void checkVertical( Kernel1D ker, ImageGray img, ImageGray dest ) {
 		GImageMiscOps.fill(dest, 0);
 		invokeMethod("vertical", ker, img, dest);
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
@@ -271,28 +270,28 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		double tol = toleranceByImageType(img);
 
 		int y0 = ker.offset;
-		int y1 = height-(ker.width-ker.offset-1);
+		int y1 = height - (ker.width - ker.offset - 1);
 
 		for (int y = 0; y < y0; y++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 		for (int y = y0; y < y1; y++) {
 			double expected = vertical(x, y, img, ker, ker.width, ker.offset);
 			assertEquals(expected, get(dest, x, y), tol);
 		}
 		for (int y = y1; y < width; y++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 	}
 
-	public double vertical(int x , int y , ImageGray img , Kernel1D ker , int width , int offset ) {
+	public double vertical( int x, int y, ImageGray img, Kernel1D ker, int width, int offset ) {
 		double total = 0;
 
-		for( int i = 0; i < width; i++ ) {
-			if( img.isInBounds(x, y - offset + i)) {
+		for (int i = 0; i < width; i++) {
+			if (img.isInBounds(x, y - offset + i)) {
 				double valI = get(img, x, y - offset + i);
 
-				total += valI * ker.getDouble(i);
+				total += valI*ker.getDouble(i);
 			}
 		}
 
@@ -302,7 +301,7 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 	/**
 	 * Unit test for vertical convolution with division.
 	 */
-	public void verticalDiv(ImageGray img, ImageGray dest) {
+	public void verticalDiv( ImageGray img, ImageGray dest ) {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
@@ -310,15 +309,15 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		checkVerticalDiv(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 0, maxKernelValue, rand);
 		checkVerticalDiv(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), 2, 1, 0, maxKernelValue, rand);
 		checkVerticalDiv(ker, img, dest);
 	}
 
-	private void checkVerticalDiv(Kernel1D ker , ImageGray img, ImageGray dest ) {
+	private void checkVerticalDiv( Kernel1D ker, ImageGray img, ImageGray dest ) {
 		int divisor = kernelWidth;
 
 		GImageMiscOps.fill(dest, 0);
@@ -329,38 +328,38 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		double tol = toleranceByImageType(img);
 
 		int y0 = ker.offset;
-		int y1 = height-(ker.width-ker.offset-1);
+		int y1 = height - (ker.width - ker.offset - 1);
 
 		for (int y = 0; y < y0; y++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 		for (int y = y0; y < y1; y++) {
-			double expected = vertical(x, y, img, ker, ker.width, ker.offset,divisor);
+			double expected = vertical(x, y, img, ker, ker.width, ker.offset, divisor);
 			assertEquals(expected, get(dest, x, y), tol);
 		}
 		for (int y = y1; y < width; y++) {
-			assertEquals(0, get(dest,x, y), tol);
+			assertEquals(0, get(dest, x, y), tol);
 		}
 	}
 
-	public double vertical(int x , int y , ImageGray img , Kernel1D ker , int width , int offset , int divisor ) {
+	public double vertical( int x, int y, ImageGray img, Kernel1D ker, int width, int offset, int divisor ) {
 		double total = 0;
 
-		for( int i = 0; i < width; i++ ) {
-			if( img.isInBounds(x,y-offset+i)) {
+		for (int i = 0; i < width; i++) {
+			if (img.isInBounds(x, y - offset + i)) {
 				double valI = get(img, x, y - offset + i);
 
-				total += valI * ker.getDouble(i);
+				total += valI*ker.getDouble(i);
 			}
 		}
 
-		return (total+(divisor/2))/divisor;
+		return (total + (divisor/2))/divisor;
 	}
 
 	/**
 	 * Unit test for 2D convolution.
 	 */
-	public void convolve(ImageGray img, ImageGray dest) {
+	public void convolve( ImageGray img, ImageGray dest ) {
 		Kernel2D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 2, img.getClass());
 
 		// standard symmetric odd kernel shape
@@ -368,17 +367,17 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		convolve(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 0, maxKernelValue, rand);
 		convolve(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), 2, 1, 0, maxKernelValue, rand);
 		convolve(ker, img, dest);
 	}
 
-	private void convolve(Kernel2D kernel , ImageGray img, ImageGray dest) {
+	private void convolve( Kernel2D kernel, ImageGray img, ImageGray dest ) {
 		// manually perform a convolution
-		GImageMiscOps.fill(dest,0);
+		GImageMiscOps.fill(dest, 0);
 
 		invokeMethod("convolve", kernel, img, dest);
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
@@ -388,8 +387,8 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				if (i < kernel.offset || j < kernel.offset
-						|| i >= height-(kernel.width-kernel.offset-1)
-						|| j >= width-(kernel.width-kernel.offset-1))
+						|| i >= height - (kernel.width - kernel.offset - 1)
+						|| j >= width - (kernel.width - kernel.offset - 1))
 					assertEquals(0f, get(dest, j, i), tol);
 				else {
 					double expected = convolve(img, j, i, kernel);
@@ -399,13 +398,13 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		}
 	}
 
-	private double convolve(ImageGray img, int cx, int cy, Kernel2D kernel) {
+	private double convolve( ImageGray img, int cx, int cy, Kernel2D kernel ) {
 		double expected = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			int y = cy - kernel.offset + i;
 			for (int j = 0; j < kernel.width; j++) {
 				int x = cx - kernel.offset + j;
-				expected += kernel.getDouble(j, i) * get(img,x,y);
+				expected += kernel.getDouble(j, i)*get(img, x, y);
 			}
 		}
 		return expected;
@@ -414,7 +413,7 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 	/**
 	 * Unit test for 2D convolution with division.
 	 */
-	public void convolveDiv(ImageGray img, ImageGray dest) {
+	public void convolveDiv( ImageGray img, ImageGray dest ) {
 		Kernel2D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 2, img.getClass());
 
 		// standard symmetric odd kernel shape
@@ -422,20 +421,20 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		convolveDiv(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),kernelWidth,0,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 0, maxKernelValue, rand);
 		convolveDiv(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
+		ker = FactoryKernel.random(ker.getClass(), 2, 1, 0, maxKernelValue, rand);
 		convolveDiv(ker, img, dest);
 	}
 
-	private void convolveDiv(Kernel2D kernel , ImageGray img, ImageGray dest) {
+	private void convolveDiv( Kernel2D kernel, ImageGray img, ImageGray dest ) {
 		// manually perform a convolution
-		GImageMiscOps.fill(dest,0);
+		GImageMiscOps.fill(dest, 0);
 		int divisor = kernelWidth*kernelWidth;
 
-		invokeMethod("convolve", kernel, img, dest,divisor, new IWorkArrays());
+		invokeMethod("convolve", kernel, img, dest, divisor, new IWorkArrays());
 
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 
@@ -445,8 +444,8 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				if (i < kernel.offset || j < kernel.offset
-						|| i >= height-(kernel.width-kernel.offset-1)
-						|| j >= width-(kernel.width-kernel.offset-1))
+						|| i >= height - (kernel.width - kernel.offset - 1)
+						|| j >= width - (kernel.width - kernel.offset - 1))
 					assertEquals(0f, get(dest, j, i), tol);
 				else {
 					double expected = convolveDiv(img, j, i, kernel, divisor);
@@ -456,26 +455,25 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		}
 	}
 
-	private double convolveDiv(ImageGray img, int cx, int cy, Kernel2D kernel, int divisor ) {
+	private double convolveDiv( ImageGray img, int cx, int cy, Kernel2D kernel, int divisor ) {
 		double total = 0;
 		for (int i = 0; i < kernel.width; i++) {
 			int y = cy - kernel.offset + i;
 			for (int j = 0; j < kernel.width; j++) {
 				int x = cx - kernel.offset + j;
-				total += kernel.getDouble(j, i) * get(img,x,y);
+				total += kernel.getDouble(j, i)*get(img, x, y);
 			}
 		}
-		return (total+(divisor/2))/divisor;
+		return (total + (divisor/2))/divisor;
 	}
 
+	private void invokeMethod( String name, Object... inputs ) {
 
-	private void invokeMethod(String name, Object ...inputs ) {
-
-		Class<?> inputTypes[] = new Class<?>[ inputs.length ];
-		for( int i = 0; i < inputs.length; i++ ) {
-			if( inputs[i].getClass() == Boolean.class ) {
+		Class<?>[] inputTypes = new Class<?>[inputs.length];
+		for (int i = 0; i < inputs.length; i++) {
+			if (inputs[i].getClass() == Boolean.class) {
 				inputTypes[i] = boolean.class;
-			} else if( inputs[i].getClass() == Integer.class ) {
+			} else if (inputs[i].getClass() == Integer.class) {
 				inputTypes[i] = int.class;
 			} else {
 				inputTypes[i] = inputs[i].getClass();
@@ -492,17 +490,15 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		}
 	}
 
-	private double toleranceByImageType(ImageGray img) {
+	private double toleranceByImageType( ImageGray img ) {
 		double tol;
-		if( img.getDataType().isInteger() )  {
+		if (img.getDataType().isInteger()) {
 			tol = 0.99;
-		} else if( img.getDataType().getNumBits() == 32 ) {
+		} else if (img.getDataType().getNumBits() == 32) {
 			tol = 1e-3;
 		} else {
 			tol = 1e-7;
 		}
 		return tol;
 	}
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.ellipse;
 
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.curve.EllipseRotated_F64;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestEdgeIntensityEllipse {
+public class TestEdgeIntensityEllipse extends BoofStandardJUnit {
 	@Test
 	public void fullyInside() {
 		check(new EllipseRotated_F64(50,60,10,5,0.1));

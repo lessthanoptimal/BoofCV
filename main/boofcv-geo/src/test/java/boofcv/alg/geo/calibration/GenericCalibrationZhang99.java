@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.struct.calib.CameraModel;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -46,10 +47,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class GenericCalibrationZhang99<CM extends CameraModel>
+public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends BoofStandardJUnit
 {
-	protected Random rand = new Random(234);
-
 	/**
 	 * Create a set of observations from a known grid, give it the observations and see if it can
 	 * reconstruct the known parameters.

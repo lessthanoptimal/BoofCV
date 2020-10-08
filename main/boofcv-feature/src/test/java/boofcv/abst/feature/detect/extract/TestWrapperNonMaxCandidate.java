@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,13 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.feature.detect.extract.NonMaxCandidate;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapperNonMaxCandidate {
+public class TestWrapperNonMaxCandidate extends BoofStandardJUnit {
 
 	@Test
 	public void checkStrict() {

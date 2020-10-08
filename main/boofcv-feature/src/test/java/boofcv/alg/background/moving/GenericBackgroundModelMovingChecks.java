@@ -25,6 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.homography.HomographyPointOps_F32;
@@ -40,8 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBackgroundModelMovingChecks {
+public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUnit {
 
+	// Need to overwrite it for one of the tests
 	Random rand = new Random(234);
 
 	int width = 60;

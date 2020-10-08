@@ -24,18 +24,16 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * Compares two implementations of the same algorithm to see if they produce identical results
  *
  * @author Peter Abeles
  */
-public abstract class GenericInputToBinaryCompare<T extends ImageGray<T>> {
+public abstract class GenericInputToBinaryCompare<T extends ImageGray<T>>  extends BoofStandardJUnit {
 
-	protected Random rand = new Random(234);
 	protected int width = 100, height = 110;
 
 	// algorithm being tested

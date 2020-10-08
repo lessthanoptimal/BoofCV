@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestRandomDotMarkerGeneratorImage {
+class TestRandomDotMarkerGeneratorImage extends BoofStandardJUnit {
 	/**
 	 * Makes sure the dots are rendered and with the expected properties
 	 */

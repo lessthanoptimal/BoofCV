@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.GeoTestingOps;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
@@ -40,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 *
 * @author Peter Abeles
 */
-public class TestRelinearlize {
+public class TestRelinearlize extends BoofStandardJUnit {
 
 	Random rand = new Random(234);
 

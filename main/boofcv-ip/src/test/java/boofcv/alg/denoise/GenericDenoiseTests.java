@@ -23,8 +23,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
-
-import java.util.Random;
+import boofcv.testing.BoofStandardJUnit;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,9 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GenericDenoiseTests<T extends ImageGray<T>> {
+public abstract class GenericDenoiseTests<T extends ImageGray<T>> extends BoofStandardJUnit {
 
-	Random rand = new Random(10);
 	int width = 20;
 	int height = 30;
 

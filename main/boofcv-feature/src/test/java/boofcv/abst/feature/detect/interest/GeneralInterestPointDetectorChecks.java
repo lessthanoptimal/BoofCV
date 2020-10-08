@@ -22,12 +22,12 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,9 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>> {
-
-	private Random rand = new Random(234);
+public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	private InterestPointDetector<T> detector;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.struct.distort.Point2Transform3_F32;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F32;
 import boofcv.struct.distort.Point3Transform2_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F32;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralLensDistortionWideFOVChecks {
+public abstract class GeneralLensDistortionWideFOVChecks extends BoofStandardJUnit {
 	protected float pixel_tol_F32 = 1e-1f;
 	protected double pixel_tol_F64 = 1e-2;
 

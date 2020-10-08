@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,21 +28,18 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestDetectDescribeSurfPlanar {
+public class TestDetectDescribeSurfPlanar extends BoofStandardJUnit {
 
 	int width = 200;
 	int height = 250;
-
-	Random rand = new Random(234);
 
 	@Test
 	public void basicTest() {

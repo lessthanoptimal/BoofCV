@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.shapes.polyline.splitmerge;
 
 import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge.Corner;
 import boofcv.struct.ConfigLength;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.Distance2D_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.line.LineParametric2D_F64;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestPolylineSplitMerge {
+public class TestPolylineSplitMerge extends BoofStandardJUnit {
 
 	@Test
 	public void process_line() {
