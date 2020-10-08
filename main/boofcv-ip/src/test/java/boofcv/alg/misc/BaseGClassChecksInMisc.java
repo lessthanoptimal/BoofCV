@@ -39,49 +39,49 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 	int height = 30;
 	int numBands = 3;
 
-	protected BaseGClassChecksInMisc(Class<?> testClass, Class<?> validationClass) {
+	protected BaseGClassChecksInMisc( Class<?> testClass, Class<?> validationClass ) {
 		super(testClass, validationClass);
 	}
 
 	@Override
-	protected boolean isTestMethod(Method m) {
-		Class<?> param[] = m.getParameterTypes();
+	protected boolean isTestMethod( Method m ) {
+		Class<?>[] param = m.getParameterTypes();
 
-		if( param.length < 1 )
+		if (param.length < 1)
 			return false;
 
-		for( int i = 0; i < param.length; i++ ) {
-			if( ImageBase.class.isAssignableFrom(param[i]) )
+		for (int i = 0; i < param.length; i++) {
+			if (ImageBase.class.isAssignableFrom(param[i]))
 				return true;
 		}
 		return false;
 	}
 
 	@Override
-	protected boolean isEquivalent(Method candidate, Method validation) {
-		Class<?> c[] = candidate.getParameterTypes();
-		Class<?> v[] = validation.getParameterTypes();
+	protected boolean isEquivalent( Method candidate, Method validation ) {
+		Class<?>[] c = candidate.getParameterTypes();
+		Class<?>[] v = validation.getParameterTypes();
 
-		if( c.length != v.length)
+		if (c.length != v.length)
 			return false;
 
-		if( candidate.getName().compareTo(validation.getName()) != 0 )
+		if (candidate.getName().compareTo(validation.getName()) != 0)
 			return false;
 
-		for( int i = 0; i < v.length; i++ ) {
-			if( !v[i].isAssignableFrom(c[i]))
+		for (int i = 0; i < v.length; i++) {
+			if (!v[i].isAssignableFrom(c[i]))
 				return false;
 		}
 		return true;
 	}
 
 	@Override
-	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
 		Object[] ret = new Object[targetParam.length];
 
-		for( int i = 0; i < ret.length; i++ ) {
-			if( targetParam[i] instanceof ImageBase ) {
-				ret[i] = ((ImageBase)targetParam[i]).createNew(width,height);
+		for (int i = 0; i < ret.length; i++) {
+			if (targetParam[i] instanceof ImageBase) {
+				ret[i] = ((ImageBase)targetParam[i]).createNew(width, height);
 				((ImageBase)ret[i]).setTo((ImageBase)targetParam[i]);
 			} else {
 				ret[i] = targetParam[i];
@@ -91,40 +91,40 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 		return ret;
 	}
 
-	protected ImageBase createImage( Class imageType , Class bandType) {
-		if( ImageGray.class.isAssignableFrom(imageType) ) {
+	protected ImageBase createImage( Class imageType, Class bandType ) {
+		if (ImageGray.class.isAssignableFrom(imageType)) {
 			return GeneralizedImageOps.createSingleBand(imageType, width, height);
-		} else if( ImageInterleaved.class.isAssignableFrom(imageType) ) {
+		} else if (ImageInterleaved.class.isAssignableFrom(imageType)) {
 			return GeneralizedImageOps.createInterleaved(imageType, width, height, 3);
-		} else if( bandType != null ) {
-			return new Planar(bandType,width,height,3);
+		} else if (bandType != null) {
+			return new Planar(bandType, width, height, 3);
 		}
 		return null;
 	}
 
 	protected void fillRandom( ImageBase img ) {
-		if( img == null )
+		if (img == null)
 			return;
 
 		boolean isSigned = false;
-		if( img instanceof ImageGray) {
-			if( ((ImageGray)img).getDataType().isSigned() ) {
+		if (img instanceof ImageGray) {
+			if (((ImageGray)img).getDataType().isSigned()) {
 				isSigned = true;
 			}
-		} else if( img instanceof ImageInterleaved ) {
-			if( ((ImageInterleaved)img).getDataType().isSigned() ) {
+		} else if (img instanceof ImageInterleaved) {
+			if (((ImageInterleaved)img).getDataType().isSigned()) {
 				isSigned = true;
 			}
 		} else {
-			if( ((Planar)img).getBand(0).getDataType().isSigned() ) {
+			if (((Planar)img).getBand(0).getDataType().isSigned()) {
 				isSigned = true;
 			}
 		}
 
-		if( isSigned ) {
-			GImageMiscOps.fillUniform(img,rand,-10,10);
+		if (isSigned) {
+			GImageMiscOps.fillUniform(img, rand, -10, 10);
 		} else {
-			GImageMiscOps.fillUniform(img,rand,1,10);
+			GImageMiscOps.fillUniform(img, rand, 1, 10);
 		}
 	}
 }
