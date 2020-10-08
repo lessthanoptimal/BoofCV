@@ -76,11 +76,7 @@ subprojects {
 
     test {
         useJUnitPlatform()
-        ignoreFailures true
-        testLogging {
-            events 'FAILED'
-        }
-//        reports.html.enabled = false
+        reports.html.enabled = false
     }
 
     sourceSets {
