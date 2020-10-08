@@ -20,7 +20,6 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.tracker.dda.DetectDescribeAssociateTwoPass;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -561,9 +560,7 @@ public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Performs all the standard tracking steps.  Associates and updates tracks descriptions.  This function
-	 * is here for {@link DetectDescribeAssociateTwoPass} tests.  If overriden it should be
-	 * equivalent to just calling tracker.process()
+	 * Performs all the standard tracking steps
 	 */
 	protected void processImage( T image ) {
 		tracker.process(image);
