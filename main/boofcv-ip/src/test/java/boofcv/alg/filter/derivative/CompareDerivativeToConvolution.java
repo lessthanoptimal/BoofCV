@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.BoofTesting;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.FilterSequence;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -27,11 +28,9 @@ import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 
 /**
  * Compares a specialized image derivative function to the equivalent convolution
@@ -42,125 +41,123 @@ import java.lang.reflect.Method;
 public class CompareDerivativeToConvolution {
 
 	Method m;
-	FilterImageInterface outputFilters[];
-	Border borders[];
+	FilterImageInterface[] outputFilters;
+	Border[] borders;
 
 	Class<ImageGray> inputType;
 	Class<ImageGray> outputType;
 
 	boolean processBorder;
 
-	public void setTarget( Method m )  {
+	public void setTarget( Method m ) {
 		this.m = m;
-		Class<?> []param = m.getParameterTypes();
-		outputFilters = new FilterImageInterface<?,?>[ param.length ];
-		borders = new Border[ param.length ];
+		Class<?>[] param = m.getParameterTypes();
+		outputFilters = new FilterImageInterface<?, ?>[param.length];
+		borders = new Border[param.length];
 
 		inputType = (Class<ImageGray>)param[0];
 		outputType = (Class<ImageGray>)param[1];
 	}
 
-	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
-		FilterImageInterface<?,?> f1 = FactoryConvolve.convolve(horizontal,
-				ImageType.single(inputType),ImageType.single(outputType), BorderType.EXTENDED,true);
-		FilterImageInterface<?,?> f2 = FactoryConvolve.convolve(vertical,
-				ImageType.single(inputType),ImageType.single(outputType), BorderType.EXTENDED,false);
+	public void setKernel( int which, Kernel1D horizontal, Kernel1D vertical ) {
+		FilterImageInterface<?, ?> f1 = FactoryConvolve.convolve(horizontal,
+				ImageType.single(inputType), ImageType.single(outputType), BorderType.EXTENDED, true);
+		FilterImageInterface<?, ?> f2 = FactoryConvolve.convolve(vertical,
+				ImageType.single(inputType), ImageType.single(outputType), BorderType.EXTENDED, false);
 
-		outputFilters[which] = new FilterSequence(f1,f2);
-		borders[which] = setBorder(horizontal,vertical);
-
+		outputFilters[which] = new FilterSequence(f1, f2);
+		borders[which] = setBorder(horizontal, vertical);
 	}
 
-	public void setKernel( int which , Kernel1D kernel , boolean isHorizontal) {
+	public void setKernel( int which, Kernel1D kernel, boolean isHorizontal ) {
 		outputFilters[which] = FactoryConvolve.convolve(kernel,
-						ImageType.single(inputType),ImageType.single(outputType), BorderType.EXTENDED,isHorizontal);
-		borders[which] = setBorder(kernel,isHorizontal);
+				ImageType.single(inputType), ImageType.single(outputType), BorderType.EXTENDED, isHorizontal);
+		borders[which] = setBorder(kernel, isHorizontal);
 	}
 
-	public void setKernel( int which , Kernel2D kernel ) {
-		outputFilters[which] = FactoryConvolve.convolve(kernel,inputType,outputType, BorderType.EXTENDED);
+	public void setKernel( int which, Kernel2D kernel ) {
+		outputFilters[which] = FactoryConvolve.convolve(kernel, inputType, outputType, BorderType.EXTENDED);
 		borders[which] = setBorder(kernel);
 	}
-	public void compare(ImageGray inputImage , ImageGray...outputImages)  {
-		compare(false,inputImage,outputImages);
-		compare(true,inputImage,outputImages);
+
+	public void compare( ImageGray inputImage, ImageGray... outputImages ) {
+		compare(false, inputImage, outputImages);
+		compare(true, inputImage, outputImages);
 	}
 
-	public void compare(boolean processBorder , ImageGray inputImage , ImageGray...outputImages)  {
+	public void compare( boolean processBorder, ImageGray inputImage, ImageGray... outputImages ) {
 		this.processBorder = processBorder;
-		innerCompare(inputImage,outputImages);
+		innerCompare(inputImage, outputImages);
 
 		inputImage = (ImageGray)BoofTesting.createSubImageOf(inputImage);
-		ImageGray subOut[] = new ImageGray[ outputImages.length ];
-		for( int i = 0; i < outputImages.length; i++ )
+		ImageGray[] subOut = new ImageGray[outputImages.length];
+		for (int i = 0; i < outputImages.length; i++)
 			subOut[i] = (ImageGray)BoofTesting.createSubImageOf(outputImages[i]);
-		innerCompare(inputImage,subOut);
+		innerCompare(inputImage, subOut);
 	}
 
-	protected void innerCompare(ImageGray inputImage , ImageGray...outputImages)  {
-		Class<?> []param = m.getParameterTypes();
+	protected void innerCompare( ImageGray inputImage, ImageGray... outputImages ) {
+		Class<?>[] param = m.getParameterTypes();
 		int numImageOutputs = countImageOutputs(param);
-		if( outputImages.length != numImageOutputs )
+		if (outputImages.length != numImageOutputs)
 			throw new RuntimeException("Unexpected number of outputImages passed in");
 
 		// declare and compute the validation results
-		ImageGray expectedOutput[] = new ImageGray[param.length-2];
-		for( int i = 0; i < expectedOutput.length; i++ ) {
-			expectedOutput[i] = (ImageGray)outputImages[i].createNew(inputImage.width,inputImage.height);
-			outputFilters[i].process(inputImage,expectedOutput[i]);
+		ImageGray[] expectedOutput = new ImageGray[param.length - 2];
+		for (int i = 0; i < expectedOutput.length; i++) {
+			expectedOutput[i] = (ImageGray)outputImages[i].createNew(inputImage.width, inputImage.height);
+			outputFilters[i].process(inputImage, expectedOutput[i]);
 		}
 
 		// compute results from the test function
-		Object testInputs[] = new Object[ param.length ];
+		Object[] testInputs = new Object[param.length];
 		testInputs[0] = inputImage;
-		for( int i = 1; i < numImageOutputs+1; i++ ) {
-			testInputs[i] = outputImages[i-1];
+		for (int i = 1; i < numImageOutputs + 1; i++) {
+			testInputs[i] = outputImages[i - 1];
 		}
-		if( param.length == numImageOutputs + 2 ) {
-			if( processBorder ) {
-				testInputs[param.length-1] = FactoryImageBorder.single(BorderType.EXTENDED, inputImage.getClass());
+		if (param.length == numImageOutputs + 2) {
+			if (processBorder) {
+				testInputs[param.length - 1] = FactoryImageBorder.single(BorderType.EXTENDED, inputImage.getClass());
 			} else {
-				testInputs[param.length-1] = null;
+				testInputs[param.length - 1] = null;
 			}
-
-		} try {
-			m.invoke(null,testInputs);
+		}
+		try {
+			m.invoke(null, testInputs);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 
 		// assume the most extreme border is used
 		int borderX0 = 0, borderY0 = 0, borderX1 = 0, borderY1 = 0;
-		for( int i = 0; i < expectedOutput.length; i++ ) {
+		for (int i = 0; i < expectedOutput.length; i++) {
 			Border b = borders[i];
 
-			borderX0 = Math.max(borderX0,b.borderX0);
-			borderX1 = Math.max(borderX1,b.borderX1);
-			borderY0 = Math.max(borderY0,b.borderY0);
-			borderY1 = Math.max(borderY1,b.borderY1);
+			borderX0 = Math.max(borderX0, b.borderX0);
+			borderX1 = Math.max(borderX1, b.borderX1);
+			borderY0 = Math.max(borderY0, b.borderY0);
+			borderY1 = Math.max(borderY1, b.borderY1);
 		}
 
 		// compare the results
-		for( int i = 0; i < expectedOutput.length; i++ ) {
+		for (int i = 0; i < expectedOutput.length; i++) {
 			BoofTesting.assertEqualsInner(expectedOutput[i], outputImages[i], 1e-4f,
 					borderX0, borderY0, borderX1, borderY1, false);
 
-			if( !processBorder )
-				BoofTesting.checkBorderZero(outputImages[i],borderX0, borderY0, borderX1, borderY1);
+			if (!processBorder)
+				BoofTesting.checkBorderZero(outputImages[i], borderX0, borderY0, borderX1, borderY1);
 		}
 	}
 
 	/**
 	 * Counts the number of derivative images it takes in as an output.
-	 * @param param
-	 * @return
 	 */
-	private int countImageOutputs(Class<?>[] param) {
+	private int countImageOutputs( Class<?>[] param ) {
 
 		int count = 0;
 
-		for( int i = 1; i < param.length; i++ ) {
-			if( ImageGray.class.isAssignableFrom(param[i])) {
+		for (int i = 1; i < param.length; i++) {
+			if (ImageGray.class.isAssignableFrom(param[i])) {
 				count++;
 			}
 		}
@@ -174,7 +171,7 @@ public class CompareDerivativeToConvolution {
 		return b;
 	}
 
-	private Border setBorder( Kernel1D kernel , boolean isHorizontal ) {
+	private Border setBorder( Kernel1D kernel, boolean isHorizontal ) {
 		return setBorder(kernel, kernel);
 		// just assume it is going to convolve both at the same time
 //		Border b = new Border();
@@ -192,14 +189,14 @@ public class CompareDerivativeToConvolution {
 //		return b;
 	}
 
-	private Border setBorder( Kernel1D horizontal , Kernel1D vertical ) {
+	private Border setBorder( Kernel1D horizontal, Kernel1D vertical ) {
 		Border b = new Border();
 		b.borderX0 = horizontal.getOffset();
 		b.borderX1 = horizontal.getWidth() - horizontal.getOffset() - 1;
 		b.borderY0 = horizontal.getOffset();
 		b.borderY1 = horizontal.getWidth() - horizontal.getOffset() - 1;
 
-		if( horizontal.getWidth() != vertical.getWidth() )
+		if (horizontal.getWidth() != vertical.getWidth())
 			throw new RuntimeException("handle this case in the unit test");
 		return b;
 	}

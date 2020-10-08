@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.misc.impl;
 
 import boofcv.alg.misc.CompareToImplImageBandMath;
 
-class TestImplImageBandMath_MT  extends CompareToImplImageBandMath {
+class TestImplImageBandMath_MT extends CompareToImplImageBandMath {
 
 	TestImplImageBandMath_MT() {
 		super(ImplImageBandMath_MT.class, 40, 50);

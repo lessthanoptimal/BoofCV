@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,11 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.BoofTesting;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.testing.BoofTesting;
 import georegression.struct.se.Se3_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;

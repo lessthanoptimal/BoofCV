@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,16 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
 import boofcv.struct.sparse.SparseGradientSafe;
 import boofcv.struct.sparse.SparseImageGradient;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Peter Abeles
  */
-public class TestSparseGradientSafe {
+public class TestSparseGradientSafe extends BoofStandardJUnit {
 
 	static int r = 2;
 	static int width = 20;
@@ -38,30 +40,26 @@ public class TestSparseGradientSafe {
 	/**
 	 * Read in a border and see if it returns zeros
 	 */
-	@Test
-	public void checkMakeBorderSafe() {
+	@Test void checkMakeBorderSafe() {
 		Dummy d = new Dummy();
-		SparseImageGradient<GrayF32,GradientValue_F32> safe =
+		SparseImageGradient<GrayF32, GradientValue_F32> safe =
 				new SparseGradientSafe<>(d);
 
 		// read the border case
-		GradientValue_F32 v = safe.compute(0,0);
-		assertTrue(v.x==0);
-		assertTrue(v.y==0);
+		GradientValue_F32 v = safe.compute(0, 0);
+		assertEquals(v.x, 0);
+		assertEquals(v.y, 0);
 
 		// read inside and see if it has the expected results
-		assertTrue(safe.compute(width/2,height/2) == null);
+		assertNull(safe.compute(width/2, height/2));
 	}
-	
-	
-	private static class Dummy implements SparseImageGradient<GrayF32,GradientValue_F32>
-	{
 
+	private static class Dummy implements SparseImageGradient<GrayF32, GradientValue_F32> {
 		@Override
-		public GradientValue_F32 compute(int x, int y) {
-			if( !isInBounds(x,y) )
+		public GradientValue_F32 compute( int x, int y ) {
+			if (!isInBounds(x, y))
 				throw new RuntimeException("Bad stuff");
-			
+
 			return null;
 		}
 
@@ -71,13 +69,13 @@ public class TestSparseGradientSafe {
 		}
 
 		@Override
-		public void setImage(GrayF32 input) {
+		public void setImage( GrayF32 input ) {
 
 		}
 
 		@Override
-		public boolean isInBounds(int x, int y) {
-			return !( x <= r || x >= width-r || y <= r || y >= height-r );
+		public boolean isInBounds( int x, int y ) {
+			return !(x <= r || x >= width - r || y <= r || y >= height - r);
 		}
 	}
 }

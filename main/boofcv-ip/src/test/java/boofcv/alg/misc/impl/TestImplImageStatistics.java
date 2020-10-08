@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,9 @@
 
 package boofcv.alg.misc.impl;
 
-class TestImplImageStatistics {
+import boofcv.testing.BoofStandardJUnit;
+
+class TestImplImageStatistics extends BoofStandardJUnit {
 	// intentionally empty. This is tested by ImageStatistics
 }
 

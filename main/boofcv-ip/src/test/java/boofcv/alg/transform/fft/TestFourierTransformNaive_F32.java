@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,28 +18,25 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestFourierTransformNaive_F32 {
-
-	Random rand = new Random(234);
+public class TestFourierTransformNaive_F32 extends BoofStandardJUnit {
 
 	@Test
 	public void forwardsRRI_inverseRIR() {
-		float original[] = new float[]{0.5f,2f,-0.34f,5f,6f,2f,10f,10f,10f,0f,-0.4f,-6f};
-		float tranImag[] = new float[original.length];
-		float tranReal[] = new float[original.length];
-		float found[] = new float[original.length];
+		float[] original = new float[]{0.5f,2f,-0.34f,5f,6f,2f,10f,10f,10f,0f,-0.4f,-6f};
+		float[] tranImag = new float[original.length];
+		float[] tranReal = new float[original.length];
+		float[] found = new float[original.length];
 
 		FourierTransformNaive_F32.forward(original, tranReal, tranImag, 0, original.length);
 		FourierTransformNaive_F32.inverse(tranReal, tranImag, found, 0, original.length);
@@ -51,12 +48,12 @@ public class TestFourierTransformNaive_F32 {
 
 	@Test
 	public void transform_RIRI_RIRI() {
-		float originalR[] = new float[]{0.5f,2f,-0.34f,5f,6f,2f,10f,10f,10f,0f,-0.4f,-6f};
-		float originalI[] = new float[]{-0.5f,1.5f,-3f,1.5f,3.5f,-0.6f,-4f,4f,3f,-2f,-3f,2.5f};
-		float tranImag[] = new float[originalR.length];
-		float tranReal[] = new float[originalR.length];
-		float foundR[] = new float[originalR.length];
-		float foundI[] = new float[originalR.length];
+		float[] originalR = new float[]{0.5f,2f,-0.34f,5f,6f,2f,10f,10f,10f,0f,-0.4f,-6f};
+		float[] originalI = new float[]{-0.5f,1.5f,-3f,1.5f,3.5f,-0.6f,-4f,4f,3f,-2f,-3f,2.5f};
+		float[] tranImag = new float[originalR.length];
+		float[] tranReal = new float[originalR.length];
+		float[] foundR = new float[originalR.length];
+		float[] foundI = new float[originalR.length];
 
 		FourierTransformNaive_F32.transform(true, originalR, originalI, tranReal, tranImag, 0, originalR.length);
 		FourierTransformNaive_F32.transform(false, tranReal, tranImag, foundR, foundI, 0, originalR.length);

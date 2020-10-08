@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.core.image;
 
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,10 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestInterleavedImageOps {
+public class TestInterleavedImageOps extends BoofStandardJUnit {
 
-	@Test
-	public void split2() {
+	@Test void split2() {
 		InterleavedF32 interleaved = new InterleavedF32(2,4,2);
 		for( int i = 0; i < interleaved.data.length; i++ ) {
 			interleaved.data[i] = i+1;
@@ -48,8 +48,7 @@ public class TestInterleavedImageOps {
 		}
 	}
 
-	@Test
-	public void merge2() {
+	@Test void merge2() {
 		GrayF32 a = new GrayF32(2,4);
 		GrayF32 b = new GrayF32(2,4);
 

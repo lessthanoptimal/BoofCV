@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,13 @@
 
 package boofcv.alg.transform.wavelet.impl;
 
+import boofcv.BoofTesting;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.border.BorderIndex1D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlBorderCoef;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,7 +35,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class CompareToNaiveWavelet {
+public class CompareToNaiveWavelet extends BoofStandardJUnit {
 	int numExpected;
 
 	boolean isFloat;
@@ -50,7 +51,7 @@ public class CompareToNaiveWavelet {
 
 	protected void checkAll( String functionName , String testMethodName ) {
 		this.functionName = functionName;
-		Method methods[] = testClass.getMethods();
+		Method[] methods = testClass.getMethods();
 		Method testMethod;
 
 		try {
@@ -97,7 +98,7 @@ public class CompareToNaiveWavelet {
 		@Override
 		public void applyValidation(WaveletDescription<?> desc, ImageGray input, ImageGray output) {
 			Method m;
-			Object args[];
+			Object[] args;
 			if( functionName.contains("Inverse")) {
 				BorderIndex1D border = desc.getBorder();
 				WlBorderCoef<?> inv = desc.getInverse();

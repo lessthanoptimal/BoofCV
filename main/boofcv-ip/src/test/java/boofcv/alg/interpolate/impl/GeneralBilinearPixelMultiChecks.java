@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,41 +29,41 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 
-
 /**
  * Generic class for testing bilinear interpolation
  *
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearPixelMultiChecks<T extends ImageInterleaved<T>> extends GeneralChecksInterpolationPixelMB<T> {
+public abstract class GeneralBilinearPixelMultiChecks<T extends ImageInterleaved<T>>
+		extends GeneralChecksInterpolationPixelMB<T> {
 
 	@Override
-	protected InterpolatePixelMB<T> wrap(T image, int minValue, int maxValue) {
+	protected InterpolatePixelMB<T> wrap( T image, int minValue, int maxValue ) {
 		return FactoryInterpolation.bilinearPixelMB(image, null);
 	}
 
 	@Override
-	protected <SB extends ImageGray<SB>> InterpolatePixelS<SB> wrapSingle(SB image, int minValue, int maxValue) {
+	protected <SB extends ImageGray<SB>> InterpolatePixelS<SB> wrapSingle( SB image, int minValue, int maxValue ) {
 		return FactoryInterpolation.bilinearPixelS(image, null);
 	}
 
 	@Override
-	protected void compute(T _img, float x, float y, float pixel[] ) {
+	protected void compute( T _img, float x, float y, float pixel[] ) {
 		ImageBorder<T> imgB = FactoryImageBorder.wrap(BorderType.EXTENDED, _img);
 		GImageMultiBand img = FactoryGImageMultiBand.wrap(imgB);
 
-		float []X0Y0 = new float[ _img.getNumBands() ];
-		float []X1Y0 = new float[ _img.getNumBands() ];
-		float []X1Y1 = new float[ _img.getNumBands() ];
-		float []X0Y1 = new float[ _img.getNumBands() ];
+		float[] X0Y0 = new float[_img.getNumBands()];
+		float[] X1Y0 = new float[_img.getNumBands()];
+		float[] X1Y1 = new float[_img.getNumBands()];
+		float[] X0Y1 = new float[_img.getNumBands()];
 
-		int gX = (int) x;
-		int gY = (int) y;
+		int gX = (int)x;
+		int gY = (int)y;
 
-		img.get(gX  , gY  , X0Y0);
-		img.get(gX+1, gY  , X1Y0);
-		img.get(gX  , gY+1, X0Y1);
-		img.get(gX+1, gY+1, X1Y1);
+		img.get(gX, gY, X0Y0);
+		img.get(gX + 1, gY, X1Y0);
+		img.get(gX, gY + 1, X0Y1);
+		img.get(gX + 1, gY + 1, X1Y1);
 
 		for (int i = 0; i < _img.getNumBands(); i++) {
 			float v0 = X0Y0[i];
@@ -77,7 +77,7 @@ public abstract class GeneralBilinearPixelMultiChecks<T extends ImageInterleaved
 			float a = 1f - x;
 			float b = 1f - y;
 
-			pixel[i] = a * b * v0 + x * b * v1 + a * y * v2 + x * y * v3;
+			pixel[i] = a*b*v0 + x*b*v1 + a*y*v2 + x*y*v3;
 		}
 	}
 }

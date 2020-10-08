@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,20 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.BoofTesting;
 import boofcv.alg.filter.convolve.TestConvolveImageBox;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public class TestImplConvolveBox extends CompareEquivalentFunctions {
-
-	Random rand = new Random(0xFF);
 
 	static int width = 10;
 	static int height = 12;

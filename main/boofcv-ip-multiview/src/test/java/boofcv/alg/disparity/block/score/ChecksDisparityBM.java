@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.disparity.block.score;
 
+import boofcv.BoofTesting;
 import boofcv.alg.disparity.DisparityBlockMatch;
 import boofcv.alg.disparity.block.BlockRowScore;
 import boofcv.alg.disparity.block.DisparityBlockMatchNaive;
@@ -33,7 +34,6 @@ import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.*;
-import boofcv.testing.BoofTesting;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

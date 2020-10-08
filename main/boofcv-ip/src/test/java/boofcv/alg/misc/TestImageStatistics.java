@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,28 +21,27 @@ package boofcv.alg.misc;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageStatistics {
+public class TestImageStatistics extends BoofStandardJUnit {
 	int width = 10;
 	int height = 15;
 	int numBands = 2;
-	Random rand = new Random(234);
 
 	@Test
 	public void checkAll() {
 		int numExpected = 11*8 + 8*8;
-		Method methods[] = ImageStatistics.class.getMethods();
+		Method[] methods = ImageStatistics.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -91,7 +90,7 @@ public class TestImageStatistics {
 
 	private boolean isTestMethod(Method m ) {
 
-		Class param[] = m.getParameterTypes();
+		Class[] param = m.getParameterTypes();
 
 		if( param.length < 1 )
 			return false;
@@ -100,7 +99,7 @@ public class TestImageStatistics {
 	}
 
 	private void testMaxAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 
 		if( input.getImageType().getDataType().isSigned() ) {
@@ -118,7 +117,7 @@ public class TestImageStatistics {
 	}
 
 	private void testMax( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 
 		if( input.getImageType().getDataType().isSigned() ) {
@@ -143,7 +142,7 @@ public class TestImageStatistics {
 	}
 
 	private void testMin( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 
 		if( input.getImageType().getDataType().isSigned() ) {
@@ -169,7 +168,7 @@ public class TestImageStatistics {
 	}
 
 	private void testSum( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 
 		int numBands = inputA.getImageType().getNumBands();
@@ -195,7 +194,7 @@ public class TestImageStatistics {
 	}
 
 	private void testSumAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 
 		int numBands = inputA.getImageType().getNumBands();
@@ -221,7 +220,7 @@ public class TestImageStatistics {
 	}
 
 	private void testMean( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 
 		int numBands = inputA.getImageType().getNumBands();
@@ -249,7 +248,7 @@ public class TestImageStatistics {
 	}
 
 	private void testVariance( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		if( inputA.getDataType().isSigned() ) {
@@ -277,7 +276,7 @@ public class TestImageStatistics {
 	}
 
 	private void testMeanDiffSq(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 		ImageBase inputB = GeneralizedImageOps.createImage(paramTypes[1], width, height, numBands);
 
@@ -328,7 +327,7 @@ public class TestImageStatistics {
 	}
 
 	private void testMeanDiffAbs(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 		ImageBase inputB = GeneralizedImageOps.createImage(paramTypes[1], width, height, numBands);
 
@@ -361,10 +360,10 @@ public class TestImageStatistics {
 	}
 
 	private void testHistogram(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		int histogram[] = new int[ 40 ];
+		int[] histogram = new int[ 40 ];
 		// it should be zeroed
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 100;
@@ -381,7 +380,7 @@ public class TestImageStatistics {
 		}
 
 		// manually compute the histogram
-		int expected[] = new int[ histogram.length ];
+		int[] expected = new int[ histogram.length ];
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double a = GeneralizedImageOps.get(inputA,j,i);
@@ -395,10 +394,10 @@ public class TestImageStatistics {
 	}
 
 	private void testHistogramScaled(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
-		int histogram[] = new int[ 40 ];
+		int[] histogram = new int[ 40 ];
 		// it should be zeroed
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 100;
@@ -415,7 +414,7 @@ public class TestImageStatistics {
 		}
 
 		// manually compute the histogram
-		int expected[] = new int[ histogram.length ];
+		int[] expected = new int[ histogram.length ];
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double a = GeneralizedImageOps.get(inputA,j,i);

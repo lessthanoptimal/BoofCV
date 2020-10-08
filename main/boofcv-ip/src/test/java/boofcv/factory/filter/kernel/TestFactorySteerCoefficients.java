@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.factory.filter.kernel;
 
 import boofcv.alg.filter.kernel.SteerableCoefficients;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,13 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestFactorySteerCoefficients {
+public class TestFactorySteerCoefficients extends BoofStandardJUnit {
 
 	/**
 	 * For certain angles all but one coefficient should be zero
 	 */
-	@Test
-	public void polynomialZeros() {
+	@Test void polynomialZeros() {
 		for( int order = 1; order <= 4; order++ ) {
 			SteerableCoefficients coefs = FactorySteerCoefficients.polynomial(order);
 
@@ -53,8 +53,7 @@ public class TestFactorySteerCoefficients {
 	/**
 	 * See if it is zero
 	 */
-	@Test
-	public void separableZeros() {
+	@Test void separableZeros() {
 		for( int order = 1; order <= 4; order++ ) {
 			SteerableCoefficients coefs = FactorySteerCoefficients.separable(order);
 

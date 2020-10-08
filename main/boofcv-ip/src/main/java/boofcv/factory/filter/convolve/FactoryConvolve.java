@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.filter.convolve;
 
+import boofcv.BoofTesting;
 import boofcv.abst.filter.convolve.ConvolveInterface;
 import boofcv.abst.filter.convolve.GenericConvolve;
 import boofcv.alg.filter.convolve.ConvolveImage;
@@ -30,7 +31,6 @@ import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.Method;
 

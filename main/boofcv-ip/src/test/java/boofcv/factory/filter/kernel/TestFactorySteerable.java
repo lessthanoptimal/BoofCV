@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.factory.filter.kernel;
 
 import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,13 +29,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFactorySteerable {
+public class TestFactorySteerable extends BoofStandardJUnit {
 
 	/**
 	 * Very basis tests to see if the algorithm explodes or not.
 	 */
-	@Test
-	public void gaussian() {
+	@Test void gaussian() {
 
 		for( int totalOrder = 1; totalOrder <= 4; totalOrder++ ) {
 			for( int orderX = 0; orderX<= totalOrder; orderX++ ) {

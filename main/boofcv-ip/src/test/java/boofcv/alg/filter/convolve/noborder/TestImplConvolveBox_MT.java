@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestImplConvolveBox_MT {
-	Random random = new Random(234);
+public class TestImplConvolveBox_MT extends BoofStandardJUnit {
 	int width = 100,height=90;
 
 	/**
@@ -59,7 +58,7 @@ public class TestImplConvolveBox_MT {
 
 //			System.out.println("Method "+name+" "+input.getImageType());
 
-			GImageMiscOps.fillUniform(input,random,0,200);
+			GImageMiscOps.fillUniform(input,rand,0,200);
 
 			try {
 				if( name.equals("horizontal") ) {

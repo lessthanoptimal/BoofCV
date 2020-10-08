@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,20 @@
 
 package boofcv.struct.image;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestPlanar {
+public class TestPlanar extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int imgWidth = 10;
 	int imgHeight = 20;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author Peter Abeles
  */
-public class TestInterpolatePixelDistortS {
+public class TestInterpolatePixelDistortS extends BoofStandardJUnit {
 	@Test
 	public void simple() {
 		MockTransform transform = new MockTransform(1,2);

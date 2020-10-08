@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.segmentation.watershed;
 
+import boofcv.BoofTesting;
 import boofcv.struct.image.GrayS32;
-import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
 /**

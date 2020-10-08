@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.struct.image;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -39,11 +40,11 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
+public abstract class StandardSingleBandTests<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	public Random rand = new Random(234);
 
-	public abstract T createImage(int width, int height);
+	public abstract T createImage( int width, int height );
 
 	public abstract T createImage();
 
@@ -52,7 +53,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 	/**
 	 * Sets each element in the image to a random value.
 	 */
-	public void setRandom(T img) {
+	public void setRandom( T img ) {
 		Object data = img._getData();
 
 		int N = Array.getLength(data);
@@ -70,18 +71,18 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 		setRandom(img);
 
 		Number expected = randomNumber();
-		Number orig = (Number) call(img, "get", 0, null, 1, 1);
+		Number orig = (Number)call(img, "get", 0, null, 1, 1);
 
 		// make sure the two are not equal
 		assertFalse(expected.equals(orig));
 
 		// set the expected to the point in the image
 		call(img, "set", 1, expected, 1, 1);
-		Number found = (Number) call(img, "get", 0, null, 1, 1);
+		Number found = (Number)call(img, "get", 0, null, 1, 1);
 		if (!img.getDataType().isInteger())
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
-			if( img.getDataType().isSigned() )
+			if (img.getDataType().isSigned())
 				assertTrue(expected.intValue() == found.intValue());
 			else
 				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
@@ -97,18 +98,18 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 		setRandom(img);
 
 		Number expected = randomNumber();
-		Number orig = (Number) call(img, "unsafe_get", 0, null, 1, 1);
+		Number orig = (Number)call(img, "unsafe_get", 0, null, 1, 1);
 
 		// make sure the two are not equal
 		assertFalse(expected.equals(orig));
 
 		// set the expected to the point in the image
 		call(img, "unsafe_set", 1, expected, 1, 1);
-		Number found = (Number) call(img, "unsafe_get", 0, null, 1, 1);
+		Number found = (Number)call(img, "unsafe_get", 0, null, 1, 1);
 		if (!img.getDataType().isInteger())
 			assertEquals(expected.doubleValue(), found.doubleValue(), 1e-4);
 		else {
-			if( img.getDataType().isSigned() )
+			if (img.getDataType().isSigned())
 				assertTrue(expected.intValue() == found.intValue());
 			else
 				assertTrue((expected.intValue() & 0xFFFF) == found.intValue());
@@ -126,16 +127,16 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 		checkBound(img, "set", 1, randomNumber());
 	}
 
-	private void checkBound(ImageGray img, String method,
-							int type, Object typeData) {
+	private void checkBound( ImageGray img, String method,
+							 int type, Object typeData ) {
 		checkException(img, method, type, typeData, -1, 0);
 		checkException(img, method, type, typeData, 0, -1);
 		checkException(img, method, type, typeData, img.getWidth(), 0);
 		checkException(img, method, type, typeData, 0, img.getHeight());
 	}
 
-	private void checkException(ImageGray img, String method,
-								int type, Object typeData, int... where) {
+	private void checkException( ImageGray img, String method,
+								 int type, Object typeData, int... where ) {
 		boolean found = false;
 		try {
 			call(img, method, type, typeData, where);
@@ -143,11 +144,11 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 			found = true;
 		}
 
-		assertTrue(found,"No exception was thrown");
+		assertTrue(found, "No exception was thrown");
 	}
 
-	private Object call(ImageGray img, String method,
-						int type, Object typeData, int... where) {
+	private Object call( ImageGray img, String method,
+						 int type, Object typeData, int... where ) {
 		try {
 			Class<?>[] paramTypes = type == 0 ?
 					new Class<?>[where.length] : new Class<?>[where.length + 1];
@@ -176,17 +177,17 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 		} catch (NoSuchMethodException e) {
 			fail("The method " + method + " needs to be implemented");
 		} catch (InvocationTargetException e) {
-			throw (RuntimeException) e.getCause();
+			throw (RuntimeException)e.getCause();
 		}
 		throw new RuntimeException("Shouldn't be here");
 	}
-	
+
 	@Test
 	public void subimage() {
 		T img = createImage(10, 20);
 		setRandom(img);
-		
-		T sub = (T)img.subimage(2,3,3,5, null);
+
+		T sub = (T)img.subimage(2, 3, 3, 5, null);
 
 		assertTrue(img.getImageType() == sub.getImageType());
 		assertEquals(1, sub.getWidth());
@@ -194,22 +195,22 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 
 		GImageGray a = FactoryGImageGray.wrap(img);
 		GImageGray b = FactoryGImageGray.wrap(sub);
-		
+
 		assertEquals(a.get(2, 3), b.get(0, 0));
 		assertEquals(a.get(2, 4), b.get(0, 1));
 	}
-	
+
 	@Test
 	public void reshape() {
 		ImageGray img = createImage(10, 20);
-		
+
 		// reshape to something smaller
-		img.reshape(5,4);
+		img.reshape(5, 4);
 		assertEquals(5, img.getWidth());
 		assertEquals(4, img.getHeight());
 
 		// reshape to something larger
-		img.reshape(15,21);
+		img.reshape(15, 21);
 		assertEquals(15, img.getWidth());
 		assertEquals(21, img.getHeight());
 	}
@@ -242,15 +243,15 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 		checkEquals(imgA, found);
 	}
 
-	private void randomFill(ImageGray imgA, GImageGray a) {
+	private void randomFill( ImageGray imgA, GImageGray a ) {
 		for (int i = 0; i < imgA.getHeight(); i++) {
 			for (int j = 0; j < imgA.getWidth(); j++) {
-				a.set(j,i,rand.nextDouble()*200);
+				a.set(j, i, rand.nextDouble()*200);
 			}
 		}
 	}
 
-	private void checkEquals(ImageGray imgA, ImageGray imgB) {
+	private void checkEquals( ImageGray imgA, ImageGray imgB ) {
 		for (int i = 0; i < imgA.getHeight(); i++) {
 			for (int j = 0; j < imgA.getWidth(); j++) {
 				double valA = GeneralizedImageOps.get(imgA, j, i);
@@ -277,20 +278,20 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 
 		Object arrayRow = img.getDataType().newArray(img.width);
 
-		copyRow(1,0,10,img,arrayRow);
-		copyRow(19,0,10,img,arrayRow);
-		copyRow(1,5,10,img,arrayRow);
-		copyRow(1,5,6,img,arrayRow);
+		copyRow(1, 0, 10, img, arrayRow);
+		copyRow(19, 0, 10, img, arrayRow);
+		copyRow(1, 5, 10, img, arrayRow);
+		copyRow(1, 5, 6, img, arrayRow);
 	}
 
-	private void copyRow( int row , int col0 , int col1 , ImageGray img , Object array ) {
-		img.copyRow(row,col0,col1,0,array);
+	private void copyRow( int row, int col0, int col1, ImageGray img, Object array ) {
+		img.copyRow(row, col0, col1, 0, array);
 
 		boolean signed = img.getDataType().isSigned();
 		for (int x = col0; x < col1; x++) {
-			double valA = GeneralizedImageOps.get(img,x,row);
-			double valB = GeneralizedImageOps.arrayElement(array,x-col0,signed);
-			assertEquals(valA,valB, UtilEjml.TEST_F64);
+			double valA = GeneralizedImageOps.get(img, x, row);
+			double valB = GeneralizedImageOps.arrayElement(array, x - col0, signed);
+			assertEquals(valA, valB, UtilEjml.TEST_F64);
 		}
 	}
 
@@ -302,20 +303,20 @@ public abstract class StandardSingleBandTests<T extends ImageGray<T>> {
 
 		Object arrayCol = img.getDataType().newArray(img.height);
 
-		copyCol(0,0,20,img,arrayCol);
-		copyCol(9,0,20,img,arrayCol);
-		copyCol(1,5,20,img,arrayCol);
-		copyCol(1,5,6,img,arrayCol);
+		copyCol(0, 0, 20, img, arrayCol);
+		copyCol(9, 0, 20, img, arrayCol);
+		copyCol(1, 5, 20, img, arrayCol);
+		copyCol(1, 5, 6, img, arrayCol);
 	}
 
-	private void copyCol( int col , int row0 , int row1 , ImageGray img , Object array ) {
-		img.copyCol(col,row0,row1,0,array);
+	private void copyCol( int col, int row0, int row1, ImageGray img, Object array ) {
+		img.copyCol(col, row0, row1, 0, array);
 
 		boolean signed = img.getDataType().isSigned();
 		for (int y = row0; y < row1; y++) {
-			double valA = GeneralizedImageOps.get(img,col,y);
-			double valB = GeneralizedImageOps.arrayElement(array,y-row0,signed);
-			assertEquals(valA,valB, UtilEjml.TEST_F64);
+			double valA = GeneralizedImageOps.get(img, col, y);
+			double valB = GeneralizedImageOps.arrayElement(array, y - row0, signed);
+			assertEquals(valA, valB, UtilEjml.TEST_F64);
 		}
 	}
 }

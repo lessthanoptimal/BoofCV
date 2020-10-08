@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,20 +24,16 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestGradientPrewitt_Shared {
-	Random rand = new Random(234);
-
+public class TestGradientPrewitt_Shared extends BoofStandardJUnit {
 	int width = 20;
 	int height = 25;
-
 
 	@Test
 	public void compareToConvolve_I8() throws NoSuchMethodException {

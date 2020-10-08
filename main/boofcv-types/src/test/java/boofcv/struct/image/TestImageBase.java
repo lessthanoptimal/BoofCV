@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct.image;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,15 +26,15 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestImageBase {
+class TestImageBase extends BoofStandardJUnit {
 
 	@Test
 	void isInBounds() {
 		Dummy a = new Dummy();
 		a.width = 10;
 		a.height = 11;
-		
-		assertTrue(a.isInBounds(0,0));
+
+		assertTrue(a.isInBounds(0, 0));
 		assertTrue(a.isInBounds(9, 10));
 		assertFalse(a.isInBounds(-1, 0));
 		assertFalse(a.isInBounds(10, 0));
@@ -44,16 +45,16 @@ class TestImageBase {
 	@Test
 	void indexToPixel() {
 		Dummy a = new Dummy();
-		
+
 		a.startIndex = 7;
 		a.stride = 5;
 		a.width = 4;
 		a.height = 11;
 
-		int index = 7+6*5+2;
+		int index = 7 + 6*5 + 2;
 
-		assertEquals(2,a.indexToPixelX(index));
-		assertEquals(6,a.indexToPixelY(index));
+		assertEquals(2, a.indexToPixelX(index));
+		assertEquals(6, a.indexToPixelY(index));
 	}
 
 	@Test
@@ -74,28 +75,27 @@ class TestImageBase {
 		a.height = 22;
 		assertEquals(10*22, a.totalPixels());
 	}
-	
-	private static class Dummy extends ImageBase
-	{
+
+	private static class Dummy extends ImageBase {
 
 		@Override
-		public ImageBase subimage(int x0, int y0, int x1, int y1, ImageBase subimage) {return null;}
+		public ImageBase subimage( int x0, int y0, int x1, int y1, ImageBase subimage ) {return null;}
 
 		@Override
-		public void reshape(int width, int height) {}
+		public void reshape( int width, int height ) {}
 
 		@Override
-		public void setTo(ImageBase orig) {}
+		public void setTo( ImageBase orig ) {}
 
 		@Override
-		public ImageBase createNew(int imgWidth, int imgHeight) {
+		public ImageBase createNew( int imgWidth, int imgHeight ) {
 			return null;
 		}
 
 		@Override
-		public void copyRow(int row, int col0, int col1, int offset, Object array) {}
+		public void copyRow( int row, int col0, int col1, int offset, Object array ) {}
 
 		@Override
-		public void copyCol(int col, int row0, int row1, int offset, Object array) {}
+		public void copyCol( int col, int row0, int row1, int offset, Object array ) {}
 	}
 }

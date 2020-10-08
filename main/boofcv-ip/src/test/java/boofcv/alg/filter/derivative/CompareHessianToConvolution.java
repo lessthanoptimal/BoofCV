@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.BoofTesting;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.FilterSequence;
 import boofcv.core.image.border.BorderIndex1D_Extend;
@@ -29,7 +30,6 @@ import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

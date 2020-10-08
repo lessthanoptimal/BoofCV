@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,45 +18,43 @@
 
 package boofcv.struct.image;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageDataType {
+public class TestImageDataType extends BoofStandardJUnit {
 
-	@Test
-	public void classToType() {
-		assertTrue(ImageDataType.U8 == ImageDataType.classToType(GrayU8.class));
-		assertTrue(ImageDataType.S8 == ImageDataType.classToType(GrayS8.class));
-		assertTrue(ImageDataType.U16 == ImageDataType.classToType(GrayU16.class));
-		assertTrue(ImageDataType.S16 == ImageDataType.classToType(GrayS16.class));
-		assertTrue(ImageDataType.S32 == ImageDataType.classToType(GrayS32.class));
-		assertTrue(ImageDataType.S64 == ImageDataType.classToType(GrayS64.class));
-		assertTrue(ImageDataType.F32 == ImageDataType.classToType(GrayF32.class));
-		assertTrue(ImageDataType.F64 == ImageDataType.classToType(GrayF64.class));
-		assertTrue(ImageDataType.I8 == ImageDataType.classToType(GrayI8.class));
-		assertTrue(ImageDataType.I16 == ImageDataType.classToType(GrayI16.class));
-		assertTrue(ImageDataType.I == ImageDataType.classToType(GrayI.class));
-		assertTrue(ImageDataType.F == ImageDataType.classToType(GrayF.class));
+	@Test void classToType() {
+		assertSame(ImageDataType.U8, ImageDataType.classToType(GrayU8.class));
+		assertSame(ImageDataType.S8, ImageDataType.classToType(GrayS8.class));
+		assertSame(ImageDataType.U16, ImageDataType.classToType(GrayU16.class));
+		assertSame(ImageDataType.S16, ImageDataType.classToType(GrayS16.class));
+		assertSame(ImageDataType.S32, ImageDataType.classToType(GrayS32.class));
+		assertSame(ImageDataType.S64, ImageDataType.classToType(GrayS64.class));
+		assertSame(ImageDataType.F32, ImageDataType.classToType(GrayF32.class));
+		assertSame(ImageDataType.F64, ImageDataType.classToType(GrayF64.class));
+		assertSame(ImageDataType.I8, ImageDataType.classToType(GrayI8.class));
+		assertSame(ImageDataType.I16, ImageDataType.classToType(GrayI16.class));
+		assertSame(ImageDataType.I, ImageDataType.classToType(GrayI.class));
+		assertSame(ImageDataType.F, ImageDataType.classToType(GrayF.class));
 	}
 
-	@Test
-	public void typeToClass() {
-		assertTrue(GrayU8.class == ImageDataType.typeToSingleClass(ImageDataType.U8));
-		assertTrue(GrayS8.class == ImageDataType.typeToSingleClass(ImageDataType.S8));
-		assertTrue(GrayU16.class == ImageDataType.typeToSingleClass(ImageDataType.U16));
-		assertTrue(GrayS16.class == ImageDataType.typeToSingleClass(ImageDataType.S16));
-		assertTrue(GrayS32.class == ImageDataType.typeToSingleClass(ImageDataType.S32));
-		assertTrue(GrayS64.class == ImageDataType.typeToSingleClass(ImageDataType.S64));
-		assertTrue(GrayF32.class == ImageDataType.typeToSingleClass(ImageDataType.F32));
-		assertTrue(GrayF64.class == ImageDataType.typeToSingleClass(ImageDataType.F64));
-		assertTrue(GrayI8.class == ImageDataType.typeToSingleClass(ImageDataType.I8));
-		assertTrue(GrayI16.class == ImageDataType.typeToSingleClass(ImageDataType.I16));
-		assertTrue(GrayI.class == ImageDataType.typeToSingleClass(ImageDataType.I));
-		assertTrue(GrayF.class == ImageDataType.typeToSingleClass(ImageDataType.F));
+	@Test void typeToClass() {
+		assertSame(GrayU8.class, ImageDataType.typeToSingleClass(ImageDataType.U8));
+		assertSame(GrayS8.class, ImageDataType.typeToSingleClass(ImageDataType.S8));
+		assertSame(GrayU16.class, ImageDataType.typeToSingleClass(ImageDataType.U16));
+		assertSame(GrayS16.class, ImageDataType.typeToSingleClass(ImageDataType.S16));
+		assertSame(GrayS32.class, ImageDataType.typeToSingleClass(ImageDataType.S32));
+		assertSame(GrayS64.class, ImageDataType.typeToSingleClass(ImageDataType.S64));
+		assertSame(GrayF32.class, ImageDataType.typeToSingleClass(ImageDataType.F32));
+		assertSame(GrayF64.class, ImageDataType.typeToSingleClass(ImageDataType.F64));
+		assertSame(GrayI8.class, ImageDataType.typeToSingleClass(ImageDataType.I8));
+		assertSame(GrayI16.class, ImageDataType.typeToSingleClass(ImageDataType.I16));
+		assertSame(GrayI.class, ImageDataType.typeToSingleClass(ImageDataType.I));
+		assertSame(GrayF.class, ImageDataType.typeToSingleClass(ImageDataType.F));
 	}
-
 }

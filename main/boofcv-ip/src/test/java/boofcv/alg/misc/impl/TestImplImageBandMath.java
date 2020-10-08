@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,12 +27,12 @@
  import boofcv.struct.image.ImageBase;
  import boofcv.struct.image.ImageGray;
  import boofcv.struct.image.Planar;
+ import boofcv.testing.BoofStandardJUnit;
  import org.junit.jupiter.api.Test;
 
  import java.lang.reflect.InvocationTargetException;
  import java.lang.reflect.Method;
  import java.util.Arrays;
- import java.util.Random;
 
  import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,14 +40,12 @@
   * @author Nico Stuurman
   */
  @SuppressWarnings({"SelfAssignment"})
- public class TestImplImageBandMath {
+ public class TestImplImageBandMath extends BoofStandardJUnit {
 	 int width = 10;
 	 int height = 15;
 	 int numBands = 11;
 	 int firstBand = 0;
 	 int lastBand = numBands - 1;
-
-	 Random rand = new Random(234);
 
 	 @Test
 	 public void checkAll() {

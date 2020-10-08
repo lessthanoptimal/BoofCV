@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.dots;
 
+import boofcv.BoofTesting;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
@@ -25,7 +26,6 @@ import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
 import georegression.struct.ConvertFloatType;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;

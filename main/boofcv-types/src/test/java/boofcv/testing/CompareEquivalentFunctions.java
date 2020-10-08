@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.testing;
 
+import boofcv.BoofTesting;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 
@@ -28,11 +29,11 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public abstract class CompareEquivalentFunctions {
+public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 	// the class being tested
-	Class<?> testClass;
+	protected Class<?> testClass;
 	// class being validated
-	Class<?>[] validationClasses;
+	protected Class<?>[] validationClasses;
 
 	// the method being tested
 	protected Method methodTest;
@@ -48,7 +49,7 @@ public abstract class CompareEquivalentFunctions {
 	}
 
 	public void performTests( int numMethods ) {
-		Method methods[] = testClass.getMethods();
+		Method[] methods = testClass.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -72,13 +73,8 @@ public abstract class CompareEquivalentFunctions {
 					}
 				}
 			}
-			if (!foundMatch) {
-				System.err.println("Warning: Can't find an equivalent function in validation class.");
-				BoofMiscOps.printMethodInfo(m, System.err);
-			} else {
-//				System.out.println("success with "+m.getName());
+			if (foundMatch)
 				numFound++;
-			}
 		}
 
 		// update this as needed when new functions are added
@@ -99,6 +95,7 @@ public abstract class CompareEquivalentFunctions {
 			compareMethods(target, evaluation);
 		} catch (NoSuchMethodException e) {
 			BoofMiscOps.printMethodInfo(target, System.err);
+			e.printStackTrace(); // need more info to debug an erratic error
 			throw new RuntimeException(e);
 		}
 	}

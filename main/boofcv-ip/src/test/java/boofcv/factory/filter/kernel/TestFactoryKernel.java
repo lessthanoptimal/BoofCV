@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,12 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFactoryKernel {
+public class TestFactoryKernel extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
-
-	@Test
-	public void table1D_I32() {
+	@Test void table1D_I32() {
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(3);
 
 		assertEquals(7,kernel.width);
@@ -48,8 +44,7 @@ public class TestFactoryKernel {
 		}
 	}
 
-	@Test
-	public void table1D_F32_unnormalized() {
+	@Test void table1D_F32_unnormalized() {
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(3,false);
 
 		assertEquals(7,kernel.width);
@@ -59,8 +54,7 @@ public class TestFactoryKernel {
 		}
 	}
 
-	@Test
-	public void table1D_F32_normalized() {
+	@Test void table1D_F32_normalized() {
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(3,true);
 
 		assertEquals(7,kernel.width);
@@ -72,8 +66,7 @@ public class TestFactoryKernel {
 		}
 	}
 
-	@Test
-	public void random1D_I32() {
+	@Test void random1D_I32() {
 		Kernel1D_S32 kernel = FactoryKernel.random1D_I32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
@@ -85,8 +78,7 @@ public class TestFactoryKernel {
 		assertTrue(nonZero != 0);
 	}
 
-	@Test
-	public void random1D_F32() {
+	@Test void random1D_F32() {
 		Kernel1D_F32 kernel = FactoryKernel.random1D_F32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
@@ -98,8 +90,7 @@ public class TestFactoryKernel {
 		assertTrue(nonZero != 0);
 	}
 
-	@Test
-	public void random1D_F64() {
+	@Test void random1D_F64() {
 		Kernel1D_F64 kernel = FactoryKernel.random1D_F64(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
@@ -111,8 +102,7 @@ public class TestFactoryKernel {
 		assertTrue(nonZero != 0);
 	}
 
-	@Test
-	public void random2D_I32() {
+	@Test void random2D_I32() {
 		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
@@ -126,8 +116,7 @@ public class TestFactoryKernel {
 		assertTrue(nonZero != 0);
 	}
 
-	@Test
-	public void random2D_F32() {
+	@Test void random2D_F32() {
 		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(5,2, -2, 2, rand);
 		int nonZero = 0;
 		for (int i = 0; i < kernel.width; i++) {
@@ -141,14 +130,12 @@ public class TestFactoryKernel {
 		assertTrue(nonZero != 0);
 	}
 
-	@Test
-	public void get1DType() {
+	@Test void get1DType() {
 		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.get1DType(Kernel2D_F32.class));
 		assertTrue((Class)Kernel1D_S32.class == FactoryKernel.get1DType(Kernel2D_S32.class));
 	}
 
-	@Test
-	public void getKernelType() {
+	@Test void getKernelType() {
 		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.getKernelType(GrayF32.class,1));
 		assertTrue((Class)Kernel1D_S32.class == FactoryKernel.getKernelType(GrayS32.class,1));
 		assertTrue((Class)Kernel1D_S32.class == FactoryKernel.getKernelType(GrayS16.class,1));

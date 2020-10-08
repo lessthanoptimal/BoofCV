@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.core.image.border;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,12 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestBorderIndex1D_Wrap {
+public class TestBorderIndex1D_Wrap extends BoofStandardJUnit {
 
 	int length = 10;
 
-	@Test
-	public void simple() {
+	@Test void simple() {
 		BorderIndex1D_Wrap alg = new BorderIndex1D_Wrap();
 		alg.setLength(length);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,11 @@
 
 package boofcv.alg.feature.dense;
 
+import boofcv.BoofTesting;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
-import boofcv.testing.BoofTesting;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;

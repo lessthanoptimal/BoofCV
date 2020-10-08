@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,12 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -30,8 +31,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestGradientSobel_UnrolledOuter {
-	Random rand = new Random(234);
+public class TestGradientSobel_UnrolledOuter extends BoofStandardJUnit {
 
 	int width = 200;
 	int height = 250;

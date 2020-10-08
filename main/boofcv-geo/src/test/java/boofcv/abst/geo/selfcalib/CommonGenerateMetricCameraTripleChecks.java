@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,13 @@
 
 package boofcv.abst.geo.selfcalib;
 
+import boofcv.BoofTesting;
 import boofcv.alg.geo.robust.ModelGeneratorViews;
 import boofcv.alg.geo.selfcalib.CommonThreeViewSelfCalibration;
 import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.image.ImageDimension;
-import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.junit.jupiter.api.Test;

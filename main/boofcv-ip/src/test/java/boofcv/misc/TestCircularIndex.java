@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.misc;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,17 +26,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCircularIndex {
-	@Test
-	public void plusPOffset() {
+public class TestCircularIndex extends BoofStandardJUnit {
+	@Test void plusPOffset() {
 		assertEquals(3, CircularIndex.plusPOffset(2, 1, 5));
 		assertEquals(4, CircularIndex.plusPOffset(2, 2, 5));
 		assertEquals(0, CircularIndex.plusPOffset(2, 3, 5));
 		assertEquals(1, CircularIndex.plusPOffset(2, 4, 5));
 	}
 
-	@Test
-	public void addOffset() {
+	@Test void addOffset() {
 		assertEquals(3, CircularIndex.addOffset(2, 1, 5));
 		assertEquals(4, CircularIndex.addOffset(2, 2, 5));
 		assertEquals(0, CircularIndex.addOffset(2, 3, 5));
@@ -46,34 +45,30 @@ public class TestCircularIndex {
 		assertEquals(3, CircularIndex.addOffset(2, -4, 5));
 	}
 
-	@Test
-	public void minusPOffset() {
+	@Test void minusPOffset() {
 		assertEquals(1, CircularIndex.minusPOffset(2, 1, 5));
 		assertEquals(0, CircularIndex.minusPOffset(2, 2, 5));
 		assertEquals(4, CircularIndex.minusPOffset(2, 3, 5));
 		assertEquals(3, CircularIndex.minusPOffset(2, 4, 5));
 	}
 
-	@Test
-	public void distanceP() {
+	@Test void distanceP() {
 		assertEquals(0, CircularIndex.distanceP(2, 2, 4));
 		assertEquals(1, CircularIndex.distanceP(2, 3, 4));
 		assertEquals(3, CircularIndex.distanceP(2, 1, 4));
 		assertEquals(2, CircularIndex.distanceP(2, 0, 4));
 	}
 
-	@Test
-	public void distance() {
+	@Test void distance() {
 		assertEquals(0, CircularIndex.distance(2, 2, 4));
 		assertEquals(1, CircularIndex.distance(2, 3, 4));
 		assertEquals(1, CircularIndex.distance(2, 1, 4));
 		assertEquals(2, CircularIndex.distance(2, 0, 4));
 	}
 
-	@Test
-	public void subtract() {
-		assertEquals( 0, CircularIndex.subtract(2, 2, 4));
-		assertEquals( 1, CircularIndex.subtract(2, 3, 4));
+	@Test void subtract() {
+		assertEquals(0, CircularIndex.subtract(2, 2, 4));
+		assertEquals(1, CircularIndex.subtract(2, 3, 4));
 		assertEquals(-1, CircularIndex.subtract(2, 1, 4));
 		assertEquals(-2, CircularIndex.subtract(2, 0, 4));
 		assertEquals(-2, CircularIndex.subtract(2, 0, 5));

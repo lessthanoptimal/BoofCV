@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.d3.structure;
 
+import boofcv.BoofTesting;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
@@ -25,7 +26,6 @@ import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BObservation;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,18 +23,15 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.Planar;
-import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareEquivalentFunctions;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions {
 
-	Random rand = BoofTesting.createRandom(34);
 	int width = 20;
 	int height = 30;
 	int numBands = 3;

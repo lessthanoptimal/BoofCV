@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,125 +28,123 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WlCoef_F32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestUtilWavelet {
-
-	Random rand = new Random(234);
+public class TestUtilWavelet extends BoofStandardJUnit {
 
 	@Test
 	public void checkShape_positive() {
-		GrayF32 orig = new GrayF32(10,20);
-		GrayF32 transformed = new GrayF32(10,20);
+		GrayF32 orig = new GrayF32(10, 20);
+		GrayF32 transformed = new GrayF32(10, 20);
 
-		UtilWavelet.checkShape(orig,transformed);
+		UtilWavelet.checkShape(orig, transformed);
 
-		orig = new GrayF32(9,19);
-		UtilWavelet.checkShape(orig,transformed);
+		orig = new GrayF32(9, 19);
+		UtilWavelet.checkShape(orig, transformed);
 	}
 
 	@Test
 	public void checkShape_negative() {
-		GrayF32 orig = new GrayF32(9,19);
-		GrayF32 transformed = new GrayF32(19,19);
+		GrayF32 orig = new GrayF32(9, 19);
+		GrayF32 transformed = new GrayF32(19, 19);
 
 		try {
-		UtilWavelet.checkShape(orig,transformed);
+			UtilWavelet.checkShape(orig, transformed);
 			fail("transformed image can't be odd");
-		} catch( IllegalArgumentException e ){}
+		} catch (IllegalArgumentException ignore) {
+		}
 
-		orig = new GrayF32(12,22);
-		transformed = new GrayF32(10,20);
+		orig = new GrayF32(12, 22);
+		transformed = new GrayF32(10, 20);
 
 		try {
-		UtilWavelet.checkShape(orig,transformed);
+			UtilWavelet.checkShape(orig, transformed);
 			fail("Image are not compatible shapes");
-		} catch( IllegalArgumentException e ){}
+		} catch (IllegalArgumentException ignore) {
+		}
 	}
 
 	@Test
 	public void computeEnergy_F32() {
-		float[] a = new float[]{-2,3,4.67f,7,-10.2f};
+		float[] a = new float[]{-2, 3, 4.67f, 7, -10.2f};
 
-		assertEquals(187.8489f,UtilWavelet.computeEnergy(a),1e-4f);
+		assertEquals(187.8489f, UtilWavelet.computeEnergy(a), 1e-4f);
 	}
 
 	@Test
 	public void computeEnergy_I32() {
-		int[] a = new int[]{-2,3,4,7,-10};
+		int[] a = new int[]{-2, 3, 4, 7, -10};
 
-		assertEquals(11.125f,UtilWavelet.computeEnergy(a,4),1e-4f);
+		assertEquals(11.125f, UtilWavelet.computeEnergy(a, 4), 1e-4f);
 	}
 
 	@Test
 	public void sumCoefficients_F32() {
-		float[] a = new float[]{-2,3,4,7,-10};
+		float[] a = new float[]{-2, 3, 4, 7, -10};
 
-		assertEquals(2f,UtilWavelet.sumCoefficients(a),1e-4f);
+		assertEquals(2f, UtilWavelet.sumCoefficients(a), 1e-4f);
 	}
 
 	@Test
 	public void borderForwardUpper() {
-		checkForwardUpper(0,0,2,2,10,0);
-		checkForwardUpper(0,0,3,3,10,2);
-		checkForwardUpper(0,0,4,4,10,2);
-		checkForwardUpper(0,0,5,5,10,4);
-		checkForwardUpper(-1,-1,5,5,10,2);
-		checkForwardUpper(-1,-1,4,4,10,2);
-		checkForwardUpper(-1,0,4,2,10,2);
+		checkForwardUpper(0, 0, 2, 2, 10, 0);
+		checkForwardUpper(0, 0, 3, 3, 10, 2);
+		checkForwardUpper(0, 0, 4, 4, 10, 2);
+		checkForwardUpper(0, 0, 5, 5, 10, 4);
+		checkForwardUpper(-1, -1, 5, 5, 10, 2);
+		checkForwardUpper(-1, -1, 4, 4, 10, 2);
+		checkForwardUpper(-1, 0, 4, 2, 10, 2);
 
-		checkForwardUpper(0,0,2,2,11,1);
-		checkForwardUpper(0,0,3,3,11,1);
-		checkForwardUpper(0,0,4,4,11,3);
+		checkForwardUpper(0, 0, 2, 2, 11, 1);
+		checkForwardUpper(0, 0, 3, 3, 11, 1);
+		checkForwardUpper(0, 0, 4, 4, 11, 3);
 	}
 
-	private void checkForwardUpper( int offsetA , int offsetB ,
-						   int lengthA , int lengthB , int dataLength ,
-						   int expected ) {
+	private void checkForwardUpper( int offsetA, int offsetB,
+									int lengthA, int lengthB, int dataLength,
+									int expected ) {
 		WlCoef_F32 desc = new WlCoef_F32();
 		desc.offsetScaling = offsetA;
 		desc.offsetWavelet = offsetB;
 		desc.scaling = new float[lengthA];
 		desc.wavelet = new float[lengthB];
 
-		assertEquals(expected,UtilWavelet.borderForwardUpper(desc,dataLength));
+		assertEquals(expected, UtilWavelet.borderForwardUpper(desc, dataLength));
 	}
 
 	@Test
 	public void borderForwardLower() {
-		checkForwardLower(0,0,0);
-		checkForwardLower(-1,0,2);
-		checkForwardLower(0,-1,2);
-		checkForwardLower(-2,0,2);
-		checkForwardLower(0,-2,2);
-		checkForwardLower(-3,0,4);
-		checkForwardLower(0,-3,4);
-		checkForwardLower(-3,0,4);
-		checkForwardLower(-4,-4,4);
+		checkForwardLower(0, 0, 0);
+		checkForwardLower(-1, 0, 2);
+		checkForwardLower(0, -1, 2);
+		checkForwardLower(-2, 0, 2);
+		checkForwardLower(0, -2, 2);
+		checkForwardLower(-3, 0, 4);
+		checkForwardLower(0, -3, 4);
+		checkForwardLower(-3, 0, 4);
+		checkForwardLower(-4, -4, 4);
 	}
 
-	private void checkForwardLower( int offsetA , int offsetB ,
-							int expected ) {
+	private void checkForwardLower( int offsetA, int offsetB,
+									int expected ) {
 		WlCoef_F32 desc = new WlCoef_F32();
 		desc.offsetScaling = offsetA;
 		desc.offsetWavelet = offsetB;
 
-		assertEquals(expected,UtilWavelet.borderForwardLower(desc));
+		assertEquals(expected, UtilWavelet.borderForwardLower(desc));
 	}
 
 	@Test
 	public void convertToType() {
-		assertEquals(BorderType.REFLECT,UtilWavelet.convertToType(new BorderIndex1D_Reflect()));
-		assertEquals(BorderType.WRAP,UtilWavelet.convertToType(new BorderIndex1D_Wrap()));
+		assertEquals(BorderType.REFLECT, UtilWavelet.convertToType(new BorderIndex1D_Reflect()));
+		assertEquals(BorderType.WRAP, UtilWavelet.convertToType(new BorderIndex1D_Wrap()));
 	}
 
 	/**
@@ -161,9 +159,9 @@ public class TestUtilWavelet {
 	public <T extends ImageGray<T>>
 	void adjustForDisplay( Class<T> imageType ) {
 		ImageDimension d = UtilWavelet.transformDimension(320, 240, 3);
-		T b = GeneralizedImageOps.createSingleBand(imageType,d.width,d.height);
+		T b = GeneralizedImageOps.createSingleBand(imageType, d.width, d.height);
 		GImageMiscOps.fillUniform(b, rand, 0, 200);
 
-		UtilWavelet.adjustForDisplay(b,3,255);
+		UtilWavelet.adjustForDisplay(b, 3, 255);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,30 +26,28 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplPyramidOps {
-
-	Random rand = new Random(234);
+public class TestImplPyramidOps extends BoofStandardJUnit {
 
 	@Test
 	public void scaleImageUp() {
 		int numFound = 0;
-		Method methods[] = ImplPyramidOps.class.getMethods();
+		Method[] methods = ImplPyramidOps.class.getMethods();
 		for( Method m : methods ) {
 			if( m.getName().compareTo("scaleImageUp") != 0 )
 				continue;
 
-			Class params[] = m.getParameterTypes();
+			Class[] params = m.getParameterTypes();
 
 			scaleImageUp(params[0],m);
 			numFound++;
@@ -94,12 +92,12 @@ public class TestImplPyramidOps {
 	@Test
 	public void scaleDown2() {
 		int numFound = 0;
-		Method methods[] = ImplPyramidOps.class.getMethods();
+		Method[] methods = ImplPyramidOps.class.getMethods();
 		for( Method m : methods ) {
 			if( m.getName().compareTo("scaleDown2") != 0 )
 				continue;
 
-			Class params[] = m.getParameterTypes();
+			Class[] params = m.getParameterTypes();
 
 			scaleDown2(params[0],m);
 			numFound++;
@@ -110,7 +108,7 @@ public class TestImplPyramidOps {
 	private <T extends ImageGray<T>>
 	void scaleDown2(Class<T> imageType , Method m ) {
 
-		int sizes [] = new int[]{30,31};
+		int[] sizes = new int[]{30,31};
 
 		for( int width : sizes ) {
 			int height = width*2/3 + width%2;

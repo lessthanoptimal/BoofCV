@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.factory.transform.pyramid;
 import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,13 +30,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFactoryPyramid {
+public class TestFactoryPyramid  extends BoofStandardJUnit {
 	/**
 	 * Makes sure the correct amount of blur is applied to each layer.  The scale and getSigma() should be the same
 	 */
-	@Test
-	public void scaleSpace() {
-		double ss[] = new double[]{1,2,4,6,8,10};
+	@Test void scaleSpace() {
+		double[] ss = new double[]{1,2,4,6,8,10};
 
 		PyramidFloat<GrayF32> pyramid = FactoryPyramid.scaleSpacePyramid(ss, GrayF32.class);
 

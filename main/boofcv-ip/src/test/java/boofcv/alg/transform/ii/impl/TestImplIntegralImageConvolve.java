@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.transform.ii.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
@@ -31,12 +32,11 @@ import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -44,9 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImplIntegralImageConvolve {
+@SuppressWarnings({"rawtypes", "unchecked"})
+public class TestImplIntegralImageConvolve extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 20;
 	int height = 30;
 
@@ -64,7 +64,7 @@ public class TestImplIntegralImageConvolve {
 		ImageBorder_S32 border = FactoryImageBorderAlgs.value( input, 0);
 		ConvolveImage.convolve(kernel,input,expected,border);
 
-		Class paramType[] = m.getParameterTypes();
+		Class[] paramType = m.getParameterTypes();
 		Class inputType = paramType[0];
 		Class outputType = paramType[2];
 
@@ -103,7 +103,7 @@ public class TestImplIntegralImageConvolve {
 		ImageBorder_S32 border = FactoryImageBorderAlgs.value( input, 0);
 		ConvolveImage.convolve(kernel,input,expected,border);
 
-		Class paramType[] = m.getParameterTypes();
+		Class[] paramType = m.getParameterTypes();
 		Class inputType = paramType[0];
 		Class outputType = paramType[2];
 

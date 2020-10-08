@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.shapes.polygon;
 
+import boofcv.BoofTesting;
 import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.ConvertFloatType;

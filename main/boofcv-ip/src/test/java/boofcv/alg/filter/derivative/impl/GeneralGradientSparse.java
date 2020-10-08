@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,9 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,9 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class GeneralGradientSparse {
-
-	Random rand = new Random(234);
+public abstract class GeneralGradientSparse extends BoofStandardJUnit {
 
 	Class imageType,derivType;
 	ImageGray image;

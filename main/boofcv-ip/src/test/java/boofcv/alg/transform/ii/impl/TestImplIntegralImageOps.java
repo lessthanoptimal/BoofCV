@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.transform.ii.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
@@ -28,7 +29,7 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -41,7 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImplIntegralImageOps {
+@SuppressWarnings({"rawtypes", "unchecked"})
+public class TestImplIntegralImageOps extends BoofStandardJUnit {
 
 	Random rand = new Random(234);
 	int width = 20;
@@ -54,7 +56,7 @@ public class TestImplIntegralImageOps {
 	}
 
 	public void transform( Method m ) {
-		Class paramType[] = m.getParameterTypes();
+		Class[] paramType = m.getParameterTypes();
 		Class inputType = paramType[0];
 		Class outputType = paramType[1];
 
@@ -95,7 +97,7 @@ public class TestImplIntegralImageOps {
 	}
 
 	public void convolveSparse( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramType[] = m.getParameterTypes();
+		Class[] paramType = m.getParameterTypes();
 		Class inputType = paramType[0];
 
 		ImageGray integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
@@ -129,7 +131,7 @@ public class TestImplIntegralImageOps {
 	}
 
 	public void block_unsafe( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramType[] = m.getParameterTypes();
+		Class[] paramType = m.getParameterTypes();
 		Class inputType = paramType[0];
 		Class origType = inputType == GrayS32.class ? GrayU8.class : inputType;
 
@@ -151,7 +153,7 @@ public class TestImplIntegralImageOps {
 	}
 
 	public void block_zero( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramType[] = m.getParameterTypes();
+		Class[] paramType = m.getParameterTypes();
 		Class inputType = paramType[0];
 		Class origType = inputType == GrayS32.class ? GrayU8.class : inputType;
 

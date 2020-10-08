@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.tracker.meanshift;
 
+import boofcv.BoofTesting;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
@@ -26,7 +27,6 @@ import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
-import boofcv.testing.BoofTesting;
 import org.ddogleg.util.UtilDouble;
 import org.junit.jupiter.api.Test;
 

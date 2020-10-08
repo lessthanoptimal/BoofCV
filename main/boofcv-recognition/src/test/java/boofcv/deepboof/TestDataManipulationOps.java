@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.deepboof;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
-import boofcv.testing.BoofTesting;
 import deepboof.tensors.Tensor_F32;
 import georegression.misc.GrlConstants;
 import org.junit.jupiter.api.Test;

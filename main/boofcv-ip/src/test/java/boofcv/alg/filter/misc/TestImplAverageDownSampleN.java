@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,31 +18,29 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplAverageDownSampleN {
+public class TestImplAverageDownSampleN extends BoofStandardJUnit {
 
 	int numMethods = 7;
-
-	Random rand = new Random(234);
 
 	int width = 20;
 	int height = 15;
 
 	@Test
 	public void compareToNaive() {
-		Method methods[] = ImplAverageDownSampleN.class.getMethods();
+		Method[] methods = ImplAverageDownSampleN.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;

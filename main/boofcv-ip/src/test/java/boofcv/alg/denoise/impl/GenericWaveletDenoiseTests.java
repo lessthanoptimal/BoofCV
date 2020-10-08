@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.alg.denoise.impl;
 
+import boofcv.BoofTesting;
 import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.denoise.GenericDenoiseTests;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
-import boofcv.testing.BoofTesting;
 
 /**
  * Handles the forward and inverse wavelet transform

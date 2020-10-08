@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.misc;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.impl.ImplImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -25,7 +26,6 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -38,8 +38,6 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunctions {
-
-	private final Random rand = new Random(234);
 
 	private final int width;
 	private final int height;

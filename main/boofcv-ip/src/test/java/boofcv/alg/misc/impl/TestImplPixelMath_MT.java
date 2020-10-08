@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,24 +18,22 @@
 
 package boofcv.alg.misc.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.TestPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
-import static boofcv.testing.BoofTesting.primitive;
-import static boofcv.testing.BoofTesting.randomArray;
+import static boofcv.BoofTesting.primitive;
+import static boofcv.BoofTesting.randomArray;
 
 @SuppressWarnings("rawtypes")
 class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 
-	private final Random rand = new Random(234);
 	private final int width = 105;
 	private final int height = 100;
 

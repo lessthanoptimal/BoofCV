@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,25 +18,23 @@
 
 package boofcv.alg.transform.pyramid;
 
+import boofcv.BoofTesting;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.image.GrayF32;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestNoCacheScaleSpace {
+public class TestNoCacheScaleSpace extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 20;
 	int height = 30;
 

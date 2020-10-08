@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * Compares function to the code in ImplImageBandMath
@@ -34,11 +33,9 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public abstract class CompareToImplImageBandMath extends CompareIdenticalFunctions {
-
-	private Random rand = new Random(234);
-
-	private int width,height;
-	private int numBands = 12;
+	private final int width;
+	private final int height;
+	private final int numBands = 12;
 
 	protected CompareToImplImageBandMath(  Class testClass , int width , int height ) {
 		super(testClass, ImplImageBandMath.class);

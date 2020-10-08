@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,15 @@
 
 package boofcv.alg.interpolate.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,9 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
-	protected Random rand = new Random(0xff34);
-
+public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> extends BoofStandardJUnit {
 	protected int width = 320;
 	protected int height = 240;
 
@@ -62,10 +60,10 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	public void get(T img) {
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 
-		assertEquals(compute(img, 10, 10), interp.get(10, 10), 1e-5f);
-		assertEquals(compute(img, 10.1f, 10), interp.get(10.1f, 10), 1e-5f);
-		assertEquals(compute(img, 10, 10.6f), interp.get(10, 10.6f), 1e-5f);
-		assertEquals(compute(img, 10.8f, 10.6f), interp.get(10.8f, 10.6f), 1e-5f);
+		assertEquals(compute(img, 10, 10), interp.get(10, 10), UtilEjml.TEST_F32);
+		assertEquals(compute(img, 10.1f, 10), interp.get(10.1f, 10), UtilEjml.TEST_F32);
+		assertEquals(compute(img, 10, 10.6f), interp.get(10, 10.6f), UtilEjml.TEST_F32);
+		assertEquals(compute(img, 10.8f, 10.6f), interp.get(10.8f, 10.6f), UtilEjml.TEST_F32);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,14 +23,12 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
+@SuppressWarnings("rawtypes")
 class TestImplConvertYV12_MT extends CompareIdenticalFunctions {
 
-	private Random rand = new Random(234);
-	private int width = 105;
-	private int height = 100;
-
+	private final int width = 105;
+	private final int height = 100;
 
 	TestImplConvertYV12_MT() {
 		super(ImplConvertYV12_MT.class, ImplConvertYV12.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * Compares the target class to functions in the standard convolution class.
@@ -38,8 +37,6 @@ import java.util.Random;
  */
 public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunctions
 {
-	protected Random rand = new Random(0xFF);
-
 	protected int width = 7;
 	protected int height = 8;
 	protected int kernelRadius = 1;

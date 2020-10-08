@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static boofcv.alg.transform.fft.TestGeneralPurposeFFT_F64_1D.checkForChange;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,11 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestGeneralPurposeFFT_F64_2D {
+public class TestGeneralPurposeFFT_F64_2D extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
-
-	int sizes[] = new int[]{1,2,3,16,32,100,103};
+	int[] sizes = new int[]{1,2,3,16,32,100,103};
 
 	@Test
 	public void realFull() {
@@ -48,8 +45,8 @@ public class TestGeneralPurposeFFT_F64_2D {
 	}
 
 	private void checkRealFull(int numRows, int numColumns) {
-		double input[] = new double[numRows*numColumns*2];
-		double original[] = new double[input.length];
+		double[] input = new double[numRows*numColumns*2];
+		double[] original = new double[input.length];
 
 		for( int i = 0; i < input.length/2; i++ ) {
 			double val = rand.nextGaussian();
@@ -84,8 +81,8 @@ public class TestGeneralPurposeFFT_F64_2D {
 	}
 
 	private void checkComplex(int numRows , int numColumns) {
-		double input[] = new double[numRows*numColumns*2];
-		double original[] = new double[input.length];
+		double[] input = new double[numRows*numColumns*2];
+		double[] original = new double[input.length];
 
 		for( int i = 0; i < input.length/2; i++ ) {
 			double val = rand.nextGaussian();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,14 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.data.Complex_F64;
 import org.ejml.ops.ComplexMath_F64;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static boofcv.core.image.GeneralizedImageOps.get;
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,15 +33,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestDiscreteFourierTransformOps {
+@SuppressWarnings("rawtypes") 
+public class TestDiscreteFourierTransformOps extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
+	Class[] imageTypes = new Class[]{InterleavedF32.class,InterleavedF64.class};
+	Class[] imageTypesS = new Class[]{GrayF32.class,GrayF64.class};
 
-	Class imageTypes[] = new Class[]{InterleavedF32.class,InterleavedF64.class};
-	Class imageTypesS[] = new Class[]{GrayF32.class,GrayF64.class};
-
-	@Test
-	public void isPowerOf2() {
+	@Test void isPowerOf2() {
 		assertFalse(DiscreteFourierTransformOps.isPowerOf2(1));
 		assertTrue(DiscreteFourierTransformOps.isPowerOf2(2));
 		assertFalse(DiscreteFourierTransformOps.isPowerOf2(3));
@@ -55,8 +52,7 @@ public class TestDiscreteFourierTransformOps {
 		assertTrue(DiscreteFourierTransformOps.isPowerOf2(1024));
 	}
 
-	@Test
-	public void nextPow2() {
+	@Test void nextPow2() {
 		assertEquals(2,DiscreteFourierTransformOps.nextPow2(1));
 		assertEquals(2,DiscreteFourierTransformOps.nextPow2(2));
 		assertEquals(4,DiscreteFourierTransformOps.nextPow2(3));
@@ -65,8 +61,7 @@ public class TestDiscreteFourierTransformOps {
 		assertEquals(1024,DiscreteFourierTransformOps.nextPow2(1024));
 	}
 
-	@Test
-	public void checkImageArguments() {
+	@Test void checkImageArguments() {
 		DiscreteFourierTransformOps.checkImageArguments(new GrayF64(10,12),new InterleavedF32(10,12,2));
 
 		// test negative cases
@@ -84,8 +79,7 @@ public class TestDiscreteFourierTransformOps {
 		} catch( IllegalArgumentException ignore ){}
 	}
 
-	@Test
-	public void shiftZeroFrequency() {
+	@Test void shiftZeroFrequency() {
 		for( Class type : imageTypes ) {
 			ImageInterleaved complex;
 
@@ -146,8 +140,7 @@ public class TestDiscreteFourierTransformOps {
 		BoofTesting.assertEquals(original,input,1e-4);
 	}
 
-	@Test
-	public void magnitude() {
+	@Test void magnitude() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
 			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 			ImageGray output = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
@@ -177,8 +170,7 @@ public class TestDiscreteFourierTransformOps {
 		}
 	}
 
-	@Test
-	public void phase() {
+	@Test void phase() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
 			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 			ImageGray output = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
@@ -209,8 +201,7 @@ public class TestDiscreteFourierTransformOps {
 		}
 	}
 
-	@Test
-	public void realToComplex() {
+	@Test void realToComplex() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
 			ImageGray real = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
 			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
@@ -237,8 +228,7 @@ public class TestDiscreteFourierTransformOps {
 		}
 	}
 
-	@Test
-	public void multiplyRealComplex() {
+	@Test void multiplyRealComplex() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
 			ImageGray realA = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
 			ImageInterleaved complexB = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
@@ -274,8 +264,7 @@ public class TestDiscreteFourierTransformOps {
 		}
 	}
 
-	@Test
-	public void multiplyComplex() {
+	@Test void multiplyComplex() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
 			ImageInterleaved complexA = GeneralizedImageOps.createInterleaved(imageTypes[i], 10, 20, 2);
 			ImageInterleaved complexB = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);

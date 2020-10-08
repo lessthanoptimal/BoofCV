@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.filter.derivative.HessianThree;
 import boofcv.alg.misc.ImageMiscOps;
@@ -28,14 +29,10 @@ import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
-public class TestHessianThreeDeterminant_Inner {
-	Random rand = new Random(0xfeed);
-
+public class TestHessianThreeDeterminant_Inner extends BoofStandardJUnit {
 	private final int width = 8;
 	private final int height = 9;
 
@@ -48,11 +45,11 @@ public class TestHessianThreeDeterminant_Inner {
 		BoofTesting.checkSubImage(this, "process_U8_S16", true, img, deriv);
 	}
 
-	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
+	public void process_U8_S16( GrayU8 img, GrayS16 deriv ) {
 		HessianThreeDeterminant_Inner.process(img, deriv);
 
 		GrayS16 expected = hessianDetFromConv_U8_S16(img);
-		BoofTesting.assertEqualsInner(expected,deriv,0,2,2,false);
+		BoofTesting.assertEqualsInner(expected, deriv, 0, 2, 2, false);
 	}
 
 	@Test
@@ -64,12 +61,12 @@ public class TestHessianThreeDeterminant_Inner {
 		BoofTesting.checkSubImage(this, "process_U8_F32", true, img, deriv);
 	}
 
-	public void process_U8_F32(GrayU8 img, GrayF32 deriv) {
+	public void process_U8_F32( GrayU8 img, GrayF32 deriv ) {
 		HessianThreeDeterminant_Inner.process(img, deriv);
 
 		GrayS16 expected = hessianDetFromConv_U8_S16(img);
 
-		BoofTesting.assertEqualsInner(expected,deriv,1e-4,2,2,false);
+		BoofTesting.assertEqualsInner(expected, deriv, 1e-4, 2, 2, false);
 	}
 
 	@Test
@@ -81,48 +78,48 @@ public class TestHessianThreeDeterminant_Inner {
 		BoofTesting.checkSubImage(this, "process_F32", true, img, deriv);
 	}
 
-	public void process_F32(GrayF32 img, GrayF32 deriv) {
+	public void process_F32( GrayF32 img, GrayF32 deriv ) {
 		HessianThreeDeterminant_Inner.process(img, deriv);
 
 		GrayF32 expected = hessianDetFromConv_F32_F32(img);
-		BoofTesting.assertEqualsInner(expected,deriv,1e-4,2,2,false);
+		BoofTesting.assertEqualsInner(expected, deriv, 1e-4, 2, 2, false);
 	}
 
-	public static GrayS16 hessianDetFromConv_U8_S16(GrayU8 img) {
-		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
-		GrayS16 Lxx = new GrayS16(img.width,img.height);
-		GrayS16 Lyy = new GrayS16(img.width,img.height);
-		GrayS16 Lxy = new GrayS16(img.width,img.height);
+	public static GrayS16 hessianDetFromConv_U8_S16( GrayU8 img ) {
+		ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
+		GrayS16 Lxx = new GrayS16(img.width, img.height);
+		GrayS16 Lyy = new GrayS16(img.width, img.height);
+		GrayS16 Lxy = new GrayS16(img.width, img.height);
 
-		ConvolveImage.horizontal(HessianThree.kernelXXYY_I32,img,Lxx,border);
-		ConvolveImage.vertical(HessianThree.kernelXXYY_I32,img,Lyy,border);
-		ConvolveImage.convolve(HessianThree.kernelCross_I32,img,Lxy,border);
+		ConvolveImage.horizontal(HessianThree.kernelXXYY_I32, img, Lxx, border);
+		ConvolveImage.vertical(HessianThree.kernelXXYY_I32, img, Lyy, border);
+		ConvolveImage.convolve(HessianThree.kernelCross_I32, img, Lxy, border);
 
-		GrayS16 expected =new GrayS16(img.width,img.height);
+		GrayS16 expected = new GrayS16(img.width, img.height);
 
 		for (int y = 0; y < img.height; y++) {
 			for (int x = 0; x < img.width; x++) {
-				expected.data[expected.getIndex(x,y)] = (short)(Lxx.get(x,y)*Lyy.get(x,y) - Lxy.get(x,y)*Lxy.get(x,y));
+				expected.data[expected.getIndex(x, y)] = (short)(Lxx.get(x, y)*Lyy.get(x, y) - Lxy.get(x, y)*Lxy.get(x, y));
 			}
 		}
 		return expected;
 	}
 
-	public static GrayF32 hessianDetFromConv_F32_F32(GrayF32 img) {
-		ImageBorder_F32 border = (ImageBorder_F32) FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
-		GrayF32 Lxx = new GrayF32(img.width,img.height);
-		GrayF32 Lyy = new GrayF32(img.width,img.height);
-		GrayF32 Lxy = new GrayF32(img.width,img.height);
+	public static GrayF32 hessianDetFromConv_F32_F32( GrayF32 img ) {
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
+		GrayF32 Lxx = new GrayF32(img.width, img.height);
+		GrayF32 Lyy = new GrayF32(img.width, img.height);
+		GrayF32 Lxy = new GrayF32(img.width, img.height);
 
-		ConvolveImage.horizontal(HessianThree.kernelXXYY_F32,img,Lxx,border);
-		ConvolveImage.vertical(HessianThree.kernelXXYY_F32,img,Lyy,border);
-		ConvolveImage.convolve(HessianThree.kernelCross_F32,img,Lxy,border);
+		ConvolveImage.horizontal(HessianThree.kernelXXYY_F32, img, Lxx, border);
+		ConvolveImage.vertical(HessianThree.kernelXXYY_F32, img, Lyy, border);
+		ConvolveImage.convolve(HessianThree.kernelCross_F32, img, Lxy, border);
 
-		GrayF32 expected = new GrayF32(img.width,img.height);
+		GrayF32 expected = new GrayF32(img.width, img.height);
 
 		for (int y = 0; y < img.height; y++) {
 			for (int x = 0; x < img.width; x++) {
-				expected.data[expected.getIndex(x,y)] = 4*(Lxx.get(x,y)*Lyy.get(x,y) - Lxy.get(x,y)*Lxy.get(x,y));
+				expected.data[expected.getIndex(x, y)] = 4*(Lxx.get(x, y)*Lyy.get(x, y) - Lxy.get(x, y)*Lxy.get(x, y));
 			}
 		}
 		return expected;

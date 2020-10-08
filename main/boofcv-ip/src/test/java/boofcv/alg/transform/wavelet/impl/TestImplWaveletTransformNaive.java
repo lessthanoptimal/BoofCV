@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.transform.wavelet.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.struct.border.BorderType;
@@ -27,20 +28,14 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplWaveletTransformNaive {
-
-	Random rand = new Random(234);
-	int width = 20;
-	int height = 30;
+public class TestImplWaveletTransformNaive extends BoofStandardJUnit {
 
 	WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.daubJ_F32(4);
 

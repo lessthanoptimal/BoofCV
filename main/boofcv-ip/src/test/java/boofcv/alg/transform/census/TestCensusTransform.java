@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.transform.census;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-class TestCensusTransform {
+class TestCensusTransform extends BoofStandardJUnit {
 	@Test
 	void createBlockSamples_1() {
 		FastQueue<Point2D_I32> samples = CensusTransform.createBlockSamples(2);

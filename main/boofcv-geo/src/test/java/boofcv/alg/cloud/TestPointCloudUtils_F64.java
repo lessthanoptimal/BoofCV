@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.cloud;
 
-import boofcv.testing.BoofTesting;
+import boofcv.BoofTesting;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.UtilEjml;

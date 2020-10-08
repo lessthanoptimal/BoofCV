@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -32,9 +33,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public abstract class StandardConfigurationChecks {
+public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 
-	protected Random rand = new Random(234);
 	Class<Configuration> type;
 
 	protected StandardConfigurationChecks( Class type ) {

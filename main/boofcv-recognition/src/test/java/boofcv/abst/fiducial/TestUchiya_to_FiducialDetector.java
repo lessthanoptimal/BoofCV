@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.BoofTesting;
 import boofcv.alg.fiducial.dots.RandomDotMarkerGeneratorImage;
 import boofcv.factory.fiducial.ConfigUchiyaMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -25,7 +26,6 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;

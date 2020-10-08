@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	long randomSeed = 2345;
-
-	Random rand = new Random(234);
 
 	public TestGImageMiscOps() {
 		super(GImageMiscOps.class, ImageMiscOps.class);

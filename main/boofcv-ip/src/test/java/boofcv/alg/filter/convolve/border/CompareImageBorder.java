@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,6 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareEquivalentFunctions;
 
-import java.util.Random;
-
 /**
  * Validates an algorithm that convolves the image's border by convolving a larger image using {@link boofcv.alg.filter.convolve.ConvolveImageNoBorder}.
  * The larger image has been designed so that by only convolving the inner portion it will produce the same result as convolving the borders
@@ -37,7 +35,6 @@ import java.util.Random;
  */
 public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 
-	protected Random rand = new Random(234324);
 	protected int width = 30;
 	protected int height = 40;
 

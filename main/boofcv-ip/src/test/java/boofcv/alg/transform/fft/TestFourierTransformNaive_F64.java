@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,28 +18,25 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF64;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestFourierTransformNaive_F64 {
-
-	Random rand = new Random(234);
+public class TestFourierTransformNaive_F64 extends BoofStandardJUnit {
 
 	@Test
 	public void forwardsRRI_inverseRIR() {
-		double original[] = new double[]{0.5,2,-0.34,5,6,2,10,10,10,0f,-0.4,-6};
-		double tranImag[] = new double[original.length];
-		double tranReal[] = new double[original.length];
-		double found[] = new double[original.length];
+		double[] original = new double[]{0.5,2,-0.34,5,6,2,10,10,10,0f,-0.4,-6};
+		double[] tranImag = new double[original.length];
+		double[] tranReal = new double[original.length];
+		double[] found = new double[original.length];
 
 		FourierTransformNaive_F64.forward(original, tranReal, tranImag, 0, original.length);
 		FourierTransformNaive_F64.inverse(tranReal, tranImag, found, 0, original.length);
@@ -51,12 +48,12 @@ public class TestFourierTransformNaive_F64 {
 
 	@Test
 	public void transform_RIRI_RIRI() {
-		double originalR[] = new double[]{0.5,2,-0.34,5,6,2,10,10,10,0,-0.4,-6};
-		double originalI[] = new double[]{-0.5,1.5,-3,1.5,3.5,-0.6,-4,4,3,-2,-3,2.5};
-		double tranImag[] = new double[originalR.length];
-		double tranReal[] = new double[originalR.length];
-		double foundR[] = new double[originalR.length];
-		double foundI[] = new double[originalR.length];
+		double[] originalR = new double[]{0.5,2,-0.34,5,6,2,10,10,10,0,-0.4,-6};
+		double[] originalI = new double[]{-0.5,1.5,-3,1.5,3.5,-0.6,-4,4,3,-2,-3,2.5};
+		double[] tranImag = new double[originalR.length];
+		double[] tranReal = new double[originalR.length];
+		double[] foundR = new double[originalR.length];
+		double[] foundI = new double[originalR.length];
 
 		FourierTransformNaive_F64.transform(true, originalR, originalI, tranReal, tranImag, 0, originalR.length);
 		FourierTransformNaive_F64.transform(false, tranReal, tranImag, foundR, foundI, 0, originalR.length);

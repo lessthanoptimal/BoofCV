@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.io.geo;
 
+import boofcv.BoofTesting;
 import boofcv.alg.sfm.structure.PairwiseImageGraph;
 import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.testing.BoofTesting;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.util.PrimitiveArrays;

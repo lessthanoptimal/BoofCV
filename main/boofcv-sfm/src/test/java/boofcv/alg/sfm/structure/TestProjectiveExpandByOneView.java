@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.sfm.structure;
 
+import boofcv.BoofTesting;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
-import boofcv.testing.BoofTesting;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;

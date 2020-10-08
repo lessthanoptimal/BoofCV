@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.misc;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.misc.GrlConstants;
 import org.junit.jupiter.api.Test;
 
@@ -27,13 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestMovingAverage {
+public class TestMovingAverage extends BoofStandardJUnit {
 
 	/**
 	 * Basic check that makes sure the rate of decay changes the behavior in the expected way
 	 */
-	@Test
-	public void basic() {
+	@Test void basic() {
 		MovingAverage a = new MovingAverage(0.95);
 		MovingAverage b = new MovingAverage(0.8);
 

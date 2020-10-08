@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,30 +18,31 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestGImageDerivativeOps {
+public class TestGImageDerivativeOps extends BoofStandardJUnit {
 
 	@Test
 	public void lookupKernelX() {
-		assertTrue(GradientPrewitt.kernelDerivX_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT,true));
-		assertTrue(GradientPrewitt.kernelDerivX_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT,false));
+		assertSame(GradientPrewitt.kernelDerivX_I32, GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT, true));
+		assertSame(GradientPrewitt.kernelDerivX_F32, GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT, false));
 
-		assertTrue(GradientSobel.kernelDerivX_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.SOBEL,true));
-		assertTrue(GradientSobel.kernelDerivX_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.SOBEL,false));
+		assertSame(GradientSobel.kernelDerivX_I32, GImageDerivativeOps.lookupKernelX(DerivativeType.SOBEL, true));
+		assertSame(GradientSobel.kernelDerivX_F32, GImageDerivativeOps.lookupKernelX(DerivativeType.SOBEL, false));
 
-		assertTrue(GradientThree.kernelDeriv_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.THREE,true));
-		assertTrue(GradientThree.kernelDeriv_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.THREE,false));
+		assertSame(GradientThree.kernelDeriv_I32, GImageDerivativeOps.lookupKernelX(DerivativeType.THREE, true));
+		assertSame(GradientThree.kernelDeriv_F32, GImageDerivativeOps.lookupKernelX(DerivativeType.THREE, false));
 
-		assertTrue(GradientTwo0.kernelDeriv_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_0,true));
-		assertTrue(GradientTwo0.kernelDeriv_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_0,false));
+		assertSame(GradientTwo0.kernelDeriv_I32, GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_0, true));
+		assertSame(GradientTwo0.kernelDeriv_F32, GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_0, false));
 
-		assertTrue(GradientTwo1.kernelDeriv_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1,true));
-		assertTrue(GradientTwo1.kernelDeriv_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1,false));
+		assertSame(GradientTwo1.kernelDeriv_I32, GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1, true));
+		assertSame(GradientTwo1.kernelDeriv_F32, GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1, false));
 	}
 }

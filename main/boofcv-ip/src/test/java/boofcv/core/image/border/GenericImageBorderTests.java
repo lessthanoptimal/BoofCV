@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Peter Abeles
  */
-public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
+public abstract class GenericImageBorderTests<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	Random rand = new Random(234);
 	List<ImageType<T>> imageTypes = new ArrayList<>();
@@ -70,8 +71,7 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 		tmp1 = new double[imageType.getNumBands()];
 	}
 
-	@Test
-	public void get() {
+	@Test void get() {
 		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 
@@ -107,8 +107,7 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 		checkBorderGet(x, y, orig, tmp0);
 	}
 
-	@Test
-	public void set() {
+	@Test void set() {
 		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 			T img = imageType.createImage(width, height);
@@ -120,8 +119,7 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 		}
 	}
 
-	@Test
-	public void copy() {
+	@Test void copy() {
 		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 			T img = imageType.createImage(width, height);

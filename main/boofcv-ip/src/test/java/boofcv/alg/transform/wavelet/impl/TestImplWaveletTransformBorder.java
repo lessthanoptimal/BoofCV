@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.alg.transform.wavelet.impl;
 
+import boofcv.BoofTesting;
 import boofcv.struct.border.BorderIndex1D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef;
-import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;

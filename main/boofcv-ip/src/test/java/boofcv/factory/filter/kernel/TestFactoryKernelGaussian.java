@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.factory.filter.kernel;
 
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.struct.convolve.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.stats.UtilGaussian;
 import org.junit.jupiter.api.Test;
 
@@ -30,10 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestFactoryKernelGaussian {
+public class TestFactoryKernelGaussian extends BoofStandardJUnit {
 
-	@Test
-	public void gaussian() {
+	@Test void gaussian() {
 		// basic test to see if its creating kernels of the correct type
 		assertTrue( FactoryKernelGaussian.gaussian(1,true, 32, 1,2) instanceof Kernel1D_F32 );
 		assertTrue( FactoryKernelGaussian.gaussian(1,false, 32, 1,2) instanceof Kernel1D_S32);
@@ -41,8 +41,7 @@ public class TestFactoryKernelGaussian {
 		assertTrue( FactoryKernelGaussian.gaussian(2,false, 32, 1,2) instanceof Kernel2D_S32);
 	}
 
-	@Test
-	public void gaussian1D_F32() {
+	@Test void gaussian1D_F32() {
 		for( boolean odd : new boolean[]{true,false}) {
 			double adj = odd ? 0 : 0.5;
 			// un-normalized it should be the same as the PDF
@@ -84,8 +83,7 @@ public class TestFactoryKernelGaussian {
 
 	}
 
-	@Test
-	public void gaussian2D_F32() {
+	@Test void gaussian2D_F32() {
 		for( boolean odd : new boolean[]{true,false}) {
 			// testing using the separable property
 			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, odd, false);
@@ -113,8 +111,7 @@ public class TestFactoryKernelGaussian {
 		}
 	}
 
-	@Test
-	public void derivative1D_F32() {
+	@Test void derivative1D_F32() {
 		float sigma = 1.5f;
 		int radius = 2;
 		Kernel1D_F32 found = FactoryKernelGaussian.derivative1D_F32(1,sigma,radius, false);
@@ -130,8 +127,7 @@ public class TestFactoryKernelGaussian {
 	/**
 	 * Create a kernel with an even width
 	 */
-	@Test
-	public void gaussianWidth_even() {
+	@Test void gaussianWidth_even() {
 		Kernel2D_F64 a = FactoryKernelGaussian.gaussianWidth(2,4);
 
 		assertEquals(4, a.width);
@@ -148,8 +144,7 @@ public class TestFactoryKernelGaussian {
 	/**
 	 * Create a kernel with an odd width
 	 */
-	@Test
-	public void gaussianWidth_odd() {
+	@Test void gaussianWidth_odd() {
 		Kernel2D_F64 a = FactoryKernelGaussian.gaussianWidth(2,5);
 		assertEquals(5, a.width);
 		checkForSymmetry(a);

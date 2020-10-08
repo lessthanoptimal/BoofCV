@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,12 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -33,7 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public abstract class CommonGradientMultiThreadToSingle {
+@SuppressWarnings({"rawtypes", "unchecked"})
+public abstract class CommonGradientMultiThreadToSingle extends BoofStandardJUnit {
 	protected int width = 100,height=90;
 	Class targetClass,testClass;
 	int totalExpected;
@@ -67,7 +69,7 @@ public abstract class CommonGradientMultiThreadToSingle {
 			ImageBase expectedY = GeneralizedImageOps.createImage(params[2], width, height, 2);
 			ImageBase foundY = GeneralizedImageOps.createImage(params[2], width, height, 2);
 
-			System.out.println("Method " + name + " " + input.getImageType());
+//			System.out.println("Method " + name + " " + input.getImageType());
 
 			GImageMiscOps.fillUniform(input, random, 0, 200);
 

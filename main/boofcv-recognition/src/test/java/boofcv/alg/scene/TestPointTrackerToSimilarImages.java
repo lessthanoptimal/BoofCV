@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.scene;
 
+import boofcv.BoofTesting;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.alg.scene.PointTrackerToSimilarImages.Frame;
@@ -25,7 +26,6 @@ import boofcv.alg.scene.PointTrackerToSimilarImages.Matches;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
-import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.util.PrimitiveArrays;

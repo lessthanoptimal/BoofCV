@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,8 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -31,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 /**
  * @author Peter Abeles
  */
-class TestPyramidDiscreteNN2 {
-	private Random rand = new Random(30);
+class TestPyramidDiscreteNN2 extends BoofStandardJUnit {
 
 	@Test
 	void basicTest() {
@@ -44,7 +42,7 @@ class TestPyramidDiscreteNN2 {
 		checkSolution(input, alg);
 	}
 
-	private void checkSolution(GrayF32 input, PyramidDiscreteNN2<GrayF32> alg) {
+	private void checkSolution( GrayF32 input, PyramidDiscreteNN2<GrayF32> alg ) {
 		alg.process(input);
 
 		// Level zero is the input image
@@ -54,8 +52,8 @@ class TestPyramidDiscreteNN2 {
 		assertEquals(3, alg.getLevelsCount());
 
 		// nearest-neighbor interpolation
-		assertEquals(input.get(0,0),alg.getLayer(1).get(0,0),1e-4);
-		assertEquals(input.get(2,2),alg.getLayer(1).get(1,1),1e-4);
-		assertEquals(input.get(6,4),alg.getLayer(1).get(3,2),1e-4);
+		assertEquals(input.get(0, 0), alg.getLayer(1).get(0, 0), 1e-4);
+		assertEquals(input.get(2, 2), alg.getLayer(1).get(1, 1), 1e-4);
+		assertEquals(input.get(6, 4), alg.getLayer(1).get(3, 2), 1e-4);
 	}
 }

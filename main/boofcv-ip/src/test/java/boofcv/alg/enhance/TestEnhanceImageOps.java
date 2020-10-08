@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.alg.enhance;
 
+import boofcv.BoofTesting;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
-import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.misc.ImageMiscOps;
@@ -28,17 +29,13 @@ import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestDerivativeLaplacian_Inner {
-	Random rand = new Random(0xfeed);
-
+public class TestDerivativeLaplacian_Inner extends BoofStandardJUnit {
 	private final int width = 4;
 	private final int height = 5;
 

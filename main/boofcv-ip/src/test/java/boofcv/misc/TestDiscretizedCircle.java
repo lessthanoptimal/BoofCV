@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.misc;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,16 +26,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDiscretizedCircle {
+public class TestDiscretizedCircle extends BoofStandardJUnit {
 	/**
 	 * Make sure the circles have the expected properties.
 	 * <p/>
 	 * Right now it just checks the lengths.  I can do a better job..
 	 */
-	@Test
-	public void testCircles() {
+	@Test void testCircles() {
 
-		int pts[];
+		int[] pts;
 
 		pts = DiscretizedCircle.imageOffsets(1, 100);
 		assertEquals(4, pts.length);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.transform.fft;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,12 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestGeneralPurposeFFT_F32_1D {
+public class TestGeneralPurposeFFT_F32_1D extends BoofStandardJUnit {
 
 	float tol = 1e-4f;
-	Random rand = new Random(234);
 
-	int sizes[] = new int[]{1,2,3,16,32,100,103};
+	int[] sizes = new int[]{1,2,3,16,32,100,103};
 
 	@Test
 	public void real() {
@@ -43,8 +41,8 @@ public class TestGeneralPurposeFFT_F32_1D {
 	}
 
 	private void checkReal(int n) {
-		float input[] = new float[n *2];
-		float original[] = new float[n *2];
+		float[] input = new float[n *2];
+		float[] original = new float[n *2];
 
 		for( int i = 0; i < n; i++ ) {
 			float val = (float)rand.nextGaussian();
@@ -79,8 +77,8 @@ public class TestGeneralPurposeFFT_F32_1D {
 	}
 
 	private void checkRealFull(int n) {
-		float input[] = new float[n *2];
-		float original[] = new float[n *2];
+		float[] input = new float[n *2];
+		float[] original = new float[n *2];
 
 		for( int i = 0; i < n; i++ ) {
 			float val = (float)rand.nextGaussian();
@@ -127,8 +125,8 @@ public class TestGeneralPurposeFFT_F32_1D {
 	}
 
 	private void checkComplex(int n) {
-		float input[] = new float[n *2];
-		float original[] = new float[n *2];
+		float[] input = new float[n *2];
+		float[] original = new float[n *2];
 
 		for( int i = 0; i < n; i++ ) {
 			float val = (float)rand.nextGaussian();

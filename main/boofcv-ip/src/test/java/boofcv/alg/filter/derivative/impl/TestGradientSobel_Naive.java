@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,21 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestGradientSobel_Naive {
-
-	Random rand = new Random(0xfeed);
+public class TestGradientSobel_Naive extends BoofStandardJUnit {
 
 	private final int width = 4;
 	private final int height = 5;
@@ -90,7 +88,7 @@ public class TestGradientSobel_Naive {
 		float dY = -((img.get(2, 0) + img.get(0, 0)) * 0.25f + img.get(1, 0) * 0.5f);
 		dY += (img.get(2, 2) + img.get(0, 2)) * 0.25f + img.get(1, 2) * 0.5f;
 
-		assertEquals(dX, derivX.get(1, 1), 1e-6);
-		assertEquals(dY, derivY.get(1, 1), 1e-6);
+		assertEquals(dX, derivX.get(1, 1), UtilEjml.TEST_F32);
+		assertEquals(dY, derivY.get(1, 1), UtilEjml.TEST_F32);
 	}
 }

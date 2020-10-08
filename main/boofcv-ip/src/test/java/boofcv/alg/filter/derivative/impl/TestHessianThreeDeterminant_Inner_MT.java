@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,18 +18,15 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
-class TestHessianThreeDeterminant_Inner_MT {
-	Random rand = new Random(0xfeed);
-
+class TestHessianThreeDeterminant_Inner_MT extends BoofStandardJUnit {
 	private final int width = 100;
 	private final int height = 120;
 
@@ -44,7 +41,7 @@ class TestHessianThreeDeterminant_Inner_MT {
 		HessianThreeDeterminant_Inner.process(input, expected);
 		HessianThreeDeterminant_Inner_MT.process(input, found);
 
-		BoofTesting.assertEqualsInner(expected,found,0,2,2,false);
+		BoofTesting.assertEqualsInner(expected, found, 0, 2, 2, false);
 	}
 
 	@Test
@@ -58,7 +55,7 @@ class TestHessianThreeDeterminant_Inner_MT {
 		HessianThreeDeterminant_Inner.process(input, expected);
 		HessianThreeDeterminant_Inner_MT.process(input, found);
 
-		BoofTesting.assertEqualsInner(expected,found,0,2,2,false);
+		BoofTesting.assertEqualsInner(expected, found, 0, 2, 2, false);
 	}
 
 	@Test
@@ -72,7 +69,7 @@ class TestHessianThreeDeterminant_Inner_MT {
 		HessianThreeDeterminant_Inner.process(input, expected);
 		HessianThreeDeterminant_Inner_MT.process(input, found);
 
-		BoofTesting.assertEqualsInner(expected,found,0,2,2,false);
+		BoofTesting.assertEqualsInner(expected, found, 0, 2, 2, false);
 	}
 }
 

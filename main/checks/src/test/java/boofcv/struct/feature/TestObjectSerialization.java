@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,11 @@
 
 package boofcv.struct.feature;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.*;
-import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.AfterEach;

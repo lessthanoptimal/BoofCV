@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort;
 
+import boofcv.BoofTesting;
 import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
 import boofcv.alg.misc.GImageStatistics;
@@ -26,7 +27,6 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 

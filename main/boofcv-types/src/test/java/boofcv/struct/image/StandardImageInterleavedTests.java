@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.image;
 
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -36,11 +37,11 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T>> {
+@SuppressWarnings("rawtypes") public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T>> extends BoofStandardJUnit {
 
 	public Random rand = new Random(234);
 
-	public abstract T createImage(int width, int height, int numBands);
+	public abstract T createImage( int width, int height, int numBands );
 
 	public abstract T createImage();
 
@@ -51,7 +52,7 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 	/**
 	 * Sets each element in the image to a random value.
 	 */
-	public void setRandom(T img) {
+	public void setRandom( T img ) {
 		Object data = img._getData();
 
 		int N = Array.getLength(data);
@@ -82,8 +83,8 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		T img = createImage(10, 20, 3);
 		setRandom(img);
 
-		for( int y = 0; y < img.height; y++ ) {
-			for( int x = 0; x < img.width; x++ ) {
+		for (int y = 0; y < img.height; y++) {
+			for (int x = 0; x < img.width; x++) {
 				Object expected = createPixelArray(img);
 				Object orig = call(img, "get", 2, null, x, y);
 
@@ -106,19 +107,19 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		T img = createImage(10, 20, 2);
 		setRandom(img);
 
-		for( int y = 0; y < img.height; y++ ) {
-			for( int x = 0; x < img.width; x++ ) {
-				for( int b = 0; b < img.numBands; b++ ) {
+		for (int y = 0; y < img.height; y++) {
+			for (int x = 0; x < img.width; x++) {
+				for (int b = 0; b < img.numBands; b++) {
 					Number expected = randomNumber();
-					Number orig = (Number) call(img, "getBand", 0, null, x, y, b);
+					Number orig = (Number)call(img, "getBand", 0, null, x, y, b);
 
 					// make sure the two are not equal
-					assertFalse(expected.equals(orig));
+					assertNotEquals(orig, expected);
 
 					// set the expected to the point in the image
 					call(img, "setBand", 1, expected, x, y, b);
-					Number found = (Number) call(img, "getBand", 0, null, x, y, b);
-					assertTrue(getNumber(expected).doubleValue() == found.doubleValue() );
+					Number found = (Number)call(img, "getBand", 0, null, x, y, b);
+					assertEquals(found.doubleValue(), getNumber(expected).doubleValue());
 				}
 			}
 		}
@@ -137,16 +138,15 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		checkBoundBand(img, "setBand", 1, randomNumber());
 	}
 
-	private void checkBound(T img, String method,
-							int type, Object typeData) {
+	private void checkBound( T img, String method, int type, Object typeData ) {
 		checkException(img, method, type, typeData, -1, 0);
 		checkException(img, method, type, typeData, 0, -1);
 		checkException(img, method, type, typeData, img.getWidth(), 0);
 		checkException(img, method, type, typeData, 0, img.getHeight());
 	}
 
-	private void checkBoundBand(T img, String method,
-								int type, Object typeData) {
+	private void checkBoundBand( T img, String method,
+								 int type, Object typeData ) {
 		checkException(img, method, type, typeData, -1, 0, 0);
 		checkException(img, method, type, typeData, 0, -1, 0);
 		checkException(img, method, type, typeData, img.getWidth(), 0, 0);
@@ -154,8 +154,8 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		checkException(img, method, type, typeData, 0, 0, img.getNumBands());
 	}
 
-	private void checkException(ImageInterleaved img, String method,
-								int type, Object typeData, int... where) {
+	private void checkException( ImageInterleaved img, String method,
+								 int type, Object typeData, int... where ) {
 		boolean found = false;
 		try {
 			call(img, method, type, typeData, where);
@@ -163,11 +163,11 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 			found = true;
 		}
 
-		assertTrue(found,"No exception was thrown");
+		assertTrue(found, "No exception was thrown");
 	}
 
-	private Object call(ImageInterleaved img, String method,
-						int type, Object typeData, int... where) {
+	private Object call( ImageInterleaved img, String method,
+						 int type, Object typeData, int... where ) {
 		try {
 			Class<?>[] paramTypes = type == 0 ?
 					new Class<?>[where.length] : new Class<?>[where.length + 1];
@@ -184,7 +184,7 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 				args[index] = typeData;
 			} else if (type == 2) {
 				String name = "[" + img.getPrimitiveDataType().getName().toUpperCase().charAt(0);
-				if( name.charAt(1) == 'L')
+				if (name.charAt(1) == 'L')
 					name = "[J";
 				paramTypes[index] = Class.forName(name);
 				args[index] = typeData;
@@ -198,12 +198,12 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		} catch (NoSuchMethodException e) {
 			fail("The method " + method + " needs to be implemented");
 		} catch (InvocationTargetException e) {
-			throw (RuntimeException) e.getCause();
+			throw (RuntimeException)e.getCause();
 		}
 		throw new RuntimeException("Shouldn't be here");
 	}
 
-	private Object createPixelArray(ImageInterleaved img) {
+	private Object createPixelArray( ImageInterleaved img ) {
 		int numBands = img.getNumBands();
 
 		Object ret = Array.newInstance(img.getPrimitiveDataType(), numBands);
@@ -214,10 +214,10 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		return ret;
 	}
 
-	private boolean compareArrays(Object a, Object b, int length) {
+	private boolean compareArrays( Object a, Object b, int length ) {
 		for (int i = 0; i < length; i++) {
-			Number valA = (Number) Array.get(a, i);
-			Number valB = (Number) Array.get(b, i);
+			Number valA = (Number)Array.get(a, i);
+			Number valB = (Number)Array.get(b, i);
 
 			if (!valA.equals(valB))
 				return false;
@@ -231,36 +231,35 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 
 		a.setNumberOfBands(2);
 
-		assertEquals(2,a.getNumBands());
-		assertEquals(2,a.getImageType().getNumBands());
-		assertEquals(2*10,a.stride);
+		assertEquals(2, a.getNumBands());
+		assertEquals(2, a.getImageType().getNumBands());
+		assertEquals(2*10, a.stride);
 
-		assertTrue(Array.getLength(a._getData()) >= 10*20*2 );
+		assertTrue(Array.getLength(a._getData()) >= 10*20*2);
 
 		a.setNumberOfBands(4);
 
-		assertEquals(4,a.getNumBands());
-		assertEquals(4,a.getImageType().getNumBands());
-		assertEquals(4*10,a.stride);
-		assertTrue(Array.getLength(a._getData()) >= 10*20*4 );
-
+		assertEquals(4, a.getNumBands());
+		assertEquals(4, a.getImageType().getNumBands());
+		assertEquals(4*10, a.stride);
+		assertTrue(Array.getLength(a._getData()) >= 10*20*4);
 	}
 
 	@Test
 	public void checkImageTypeSet() {
 		T a = createImage(10, 20, 3);
 
-		assertTrue(a.getImageType() != null);
-		assertEquals(3,a.getImageType().getNumBands());
+		assertNotNull(a.getImageType());
+		assertEquals(3, a.getImageType().getNumBands());
 	}
 
 	@Test
 	public void checkNoArgumentConstructor() {
 		T a = createImage();
 
-		assertTrue(a._getData() == null);
-		assertTrue(a.getPrimitiveDataType() != null);
-		assertTrue(a.getImageType() != null);
+		assertNull(a._getData());
+		assertNotNull(a.getPrimitiveDataType());
+		assertNotNull(a.getImageType());
 	}
 
 	@Test
@@ -270,22 +269,22 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 
 		Object arrayRow = img.getDataType().newArray(img.width*img.numBands);
 
-		copyRow(1,0,10,img,arrayRow);
-		copyRow(19,0,10,img,arrayRow);
-		copyRow(1,5,10,img,arrayRow);
-		copyRow(1,5,6,img,arrayRow);
+		copyRow(1, 0, 10, img, arrayRow);
+		copyRow(19, 0, 10, img, arrayRow);
+		copyRow(1, 5, 10, img, arrayRow);
+		copyRow(1, 5, 6, img, arrayRow);
 	}
 
-	private void copyRow( int row , int col0 , int col1 , T img , Object array ) {
-		img.copyRow(row,col0,col1,0,array);
+	private void copyRow( int row, int col0, int col1, T img, Object array ) {
+		img.copyRow(row, col0, col1, 0, array);
 
 		boolean signed = img.getDataType().isSigned();
 		int idx = 0;
 		for (int x = col0; x < col1; x++) {
 			for (int band = 0; band < img.numBands; band++) {
-				double valA = GeneralizedImageOps.get(img,x,row,band);
-				double valB = GeneralizedImageOps.arrayElement(array,idx++,signed);
-				assertEquals(valA,valB, UtilEjml.TEST_F64);
+				double valA = GeneralizedImageOps.get(img, x, row, band);
+				double valB = GeneralizedImageOps.arrayElement(array, idx++, signed);
+				assertEquals(valA, valB, UtilEjml.TEST_F64);
 			}
 		}
 	}
@@ -297,20 +296,20 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 
 		Object arrayCol = img.getDataType().newArray(img.height*img.numBands);
 
-		copyCol(0,0,20,img,arrayCol);
-		copyCol(9,0,20,img,arrayCol);
-		copyCol(1,5,20,img,arrayCol);
-		copyCol(1,5,6,img,arrayCol);
+		copyCol(0, 0, 20, img, arrayCol);
+		copyCol(9, 0, 20, img, arrayCol);
+		copyCol(1, 5, 20, img, arrayCol);
+		copyCol(1, 5, 6, img, arrayCol);
 	}
 
-	private void copyCol( int col , int row0 , int row1 , T img , Object array ) {
-		img.copyCol(col,row0,row1,0,array);
+	private void copyCol( int col, int row0, int row1, T img, Object array ) {
+		img.copyCol(col, row0, row1, 0, array);
 
 		boolean signed = img.getDataType().isSigned();
 		int idx = 0;
 		for (int y = row0; y < row1; y++) {
 			for (int band = 0; band < img.numBands; band++) {
-				double valA = GeneralizedImageOps.get(img, col, y,band);
+				double valA = GeneralizedImageOps.get(img, col, y, band);
 				double valB = GeneralizedImageOps.arrayElement(array, idx++, signed);
 				assertEquals(valA, valB, UtilEjml.TEST_F64);
 			}

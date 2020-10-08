@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct.distort;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
@@ -26,16 +27,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestSequencePointTransform_F64 {
+public class TestSequencePointTransform_F64 extends BoofStandardJUnit {
 
-	@Test
-	public void simpleTest() {
+	@Test void simpleTest() {
 
 		Point2Transform2_F64 a = new Point2Transform2_F64() {
 			@Override
-			public void compute(double x, double y, Point2D_F64 out) {
-				out.x = x+1;
-				out.y = y+2;
+			public void compute( double x, double y, Point2D_F64 out ) {
+				out.x = x + 1;
+				out.y = y + 2;
 			}
 
 			@Override
@@ -44,12 +44,12 @@ public class TestSequencePointTransform_F64 {
 			}
 		};
 
-		SequencePoint2Transform2_F64 alg = new SequencePoint2Transform2_F64(a,a);
+		SequencePoint2Transform2_F64 alg = new SequencePoint2Transform2_F64(a, a);
 
 		Point2D_F64 p = new Point2D_F64();
-		alg.compute(3,4,p);
+		alg.compute(3, 4, p);
 
-		assertEquals(5,p.x,1e-8);
-		assertEquals(8,p.y,1e-8);
+		assertEquals(5, p.x, 1e-8);
+		assertEquals(8, p.y, 1e-8);
 	}
 }

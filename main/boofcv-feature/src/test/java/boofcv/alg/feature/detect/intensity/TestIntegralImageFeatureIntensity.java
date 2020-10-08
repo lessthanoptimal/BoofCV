@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.alg.feature.detect.intensity;
 
+import boofcv.BoofTesting;
 import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
-import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;

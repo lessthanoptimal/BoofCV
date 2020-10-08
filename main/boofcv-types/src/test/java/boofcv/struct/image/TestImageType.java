@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct.image;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.struct.image.ImageDataType.*;
@@ -28,48 +29,46 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestImageType {
+@SuppressWarnings("rawtypes")
+public class TestImageType extends BoofStandardJUnit {
 
-	@Test
-	public void getImageClass(){
-		assertTrue(GrayF32.class==ImageType.getImageClass(GRAY, F32));
-		assertTrue(GrayF64.class==ImageType.getImageClass(GRAY, F64));
-		assertTrue(GrayU8.class==ImageType.getImageClass(GRAY, U8));
-		assertTrue(GrayS8.class==ImageType.getImageClass(GRAY, S8));
-		assertTrue(GrayU16.class==ImageType.getImageClass(GRAY, U16));
-		assertTrue(GrayS16.class==ImageType.getImageClass(GRAY, S16));
-		assertTrue(GrayS32.class==ImageType.getImageClass(GRAY, S32));
-		assertTrue(GrayS64.class==ImageType.getImageClass(GRAY, S64));
+	@Test void getImageClass() {
+		assertSame(GrayF32.class, ImageType.getImageClass(GRAY, F32));
+		assertSame(GrayF64.class, ImageType.getImageClass(GRAY, F64));
+		assertSame(GrayU8.class, ImageType.getImageClass(GRAY, U8));
+		assertSame(GrayS8.class, ImageType.getImageClass(GRAY, S8));
+		assertSame(GrayU16.class, ImageType.getImageClass(GRAY, U16));
+		assertSame(GrayS16.class, ImageType.getImageClass(GRAY, S16));
+		assertSame(GrayS32.class, ImageType.getImageClass(GRAY, S32));
+		assertSame(GrayS64.class, ImageType.getImageClass(GRAY, S64));
 
-		assertTrue(InterleavedF32.class==ImageType.getImageClass(INTERLEAVED, F32));
-		assertTrue(InterleavedF64.class==ImageType.getImageClass(INTERLEAVED, F64));
-		assertTrue(InterleavedU8.class==ImageType.getImageClass(INTERLEAVED, U8));
-		assertTrue(InterleavedS8.class==ImageType.getImageClass(INTERLEAVED, S8));
-		assertTrue(InterleavedU16.class==ImageType.getImageClass(INTERLEAVED, U16));
-		assertTrue(InterleavedS16.class==ImageType.getImageClass(INTERLEAVED, S16));
-		assertTrue(InterleavedS32.class==ImageType.getImageClass(INTERLEAVED, S32));
-		assertTrue(InterleavedS64.class==ImageType.getImageClass(INTERLEAVED, S64));
+		assertSame(InterleavedF32.class, ImageType.getImageClass(INTERLEAVED, F32));
+		assertSame(InterleavedF64.class, ImageType.getImageClass(INTERLEAVED, F64));
+		assertSame(InterleavedU8.class, ImageType.getImageClass(INTERLEAVED, U8));
+		assertSame(InterleavedS8.class, ImageType.getImageClass(INTERLEAVED, S8));
+		assertSame(InterleavedU16.class, ImageType.getImageClass(INTERLEAVED, U16));
+		assertSame(InterleavedS16.class, ImageType.getImageClass(INTERLEAVED, S16));
+		assertSame(InterleavedS32.class, ImageType.getImageClass(INTERLEAVED, S32));
+		assertSame(InterleavedS64.class, ImageType.getImageClass(INTERLEAVED, S64));
 	}
 
-	@Test
-	public void isSameType() {
-		ImageType types[] = new ImageType[4];
+	@Test void isSameType() {
+		ImageType[] types = new ImageType[4];
 		types[0] = ImageType.single(GrayU8.class);
 		types[1] = ImageType.single(GrayF32.class);
-		types[2] = ImageType.pl(3,GrayU8.class);
-		types[3] = ImageType.pl(2,GrayU8.class);
+		types[2] = ImageType.pl(3, GrayU8.class);
+		types[3] = ImageType.pl(2, GrayU8.class);
 
 		for (int i = 0; i < types.length; i++) {
 			for (int j = 0; j < types.length; j++) {
-				assertEquals(i==j,types[i].isSameType(types[j]));
+				assertEquals(i == j, types[i].isSameType(types[j]));
 			}
 		}
 	}
 
-	@Test
-	public void setTo() {
+	@Test void setTo() {
 		ImageType a = ImageType.single(GrayU8.class);
-		ImageType b = ImageType.pl(2,GrayF32.class);
+		ImageType b = ImageType.pl(2, GrayF32.class);
 
 		assertFalse(a.isSameType(b));
 		a.setTo(b);

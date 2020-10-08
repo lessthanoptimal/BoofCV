@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,12 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 
 /**
  * @author Peter Abeles
  */
-public class ConvolutionTestHelper {
+public class ConvolutionTestHelper extends BoofStandardJUnit {
 	/**
 	 * Find the type of kernel based on the input image type.
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,23 +21,22 @@ package boofcv.core.encoding;
 import boofcv.alg.color.ColorYuv;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestConvertNV21 {
-	Random rand = new Random(234);
+@SuppressWarnings("rawtypes")
+public class TestConvertNV21 extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
 	@Test
 	public void testGray() {
-		Class types[] = new Class[]{GrayU8.class, GrayF32.class};
+		Class[] types = new Class[]{GrayU8.class, GrayF32.class};
 
 		byte[] data = random(width,height);
 
@@ -58,7 +57,7 @@ public class TestConvertNV21 {
 
 	@Test
 	public void testColor() {
-		ImageType types[] = new ImageType[]{ImageType.pl(3, ImageDataType.U8),ImageType.pl(3,ImageDataType.F32),
+		ImageType[] types = new ImageType[]{ImageType.pl(3, ImageDataType.U8),ImageType.pl(3,ImageDataType.F32),
 				ImageType.il(3, ImageDataType.U8),ImageType.il(3, ImageDataType.F32)};
 
 		byte[] data = random(width,height);
