@@ -199,7 +199,7 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 		SceneStructureMetric out = new SceneStructureMetric(homogenous);
 
 		int numSteps = 2;
-		out.initialize(2, 2*numSteps, 5);
+		out.initialize(2, 2*numSteps, 10);
 
 		// Left camera
 		out.setCamera(0, true, new CameraPinhole(200, 300,

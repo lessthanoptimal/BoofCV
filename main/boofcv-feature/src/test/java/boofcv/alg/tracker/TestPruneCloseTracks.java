@@ -199,8 +199,8 @@ class TestPruneCloseTracks extends BoofStandardJUnit {
 
 		for (int i = 0; i < total; i++) {
 			PointTrack t = new PointTrack();
-			t.pixel.x = rand.nextDouble()*width;
-			t.pixel.y = rand.nextDouble()*height;
+			t.pixel.x = rand.nextDouble()*0.9999*width; // make setting it to the width impossible
+			t.pixel.y = rand.nextDouble()*0.9999*height;
 			t.featureId = i;
 			t.spawnFrameID = rand.nextInt(100);
 			tracks.add(t);

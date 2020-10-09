@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,7 +166,7 @@ public class PruneCloseTracks<T> {
 				dropTracks.add(candidate);
 			}
 			// if the cell was empty add the candidate to it and mark it's drop status
-			if((trackImage[centerIndex] == null) || !candidateDropped) {
+			if (trackImage[centerIndex] == null || !candidateDropped) {
 				trackImage[centerIndex] = candidate;
 				dropImage[centerIndex] = candidateDropped;
 			}

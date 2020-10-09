@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,14 +33,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
-{
+public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks {
 	@Test
 	public void solvePerfect() {
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			expected.add(new CameraPinhole(400+i*5,420,0.1,410,420,0,0));
+			expected.add(new CameraPinhole(400 + i*5, 420, 0.1, 410, 420, 0, 0));
 
 			found.add(new CameraPinhole(expected.get(i)));
 		}
@@ -54,14 +53,14 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
-			expected.add(new CameraPinhole(400+i*5,420,0.1,410,420,0,0));
+			expected.add(new CameraPinhole(400 + i*5, 420, 0.1, 410, 420, 0, 0));
 
 			found.add(new CameraPinhole(expected.get(i)));
 
-			found.get(i).fx += 2*rand.nextGaussian();
-			found.get(i).fy += 2*rand.nextGaussian();
-			found.get(i).cx += 2*rand.nextGaussian();
-			found.get(i).cy += 2*rand.nextGaussian();
+			found.get(i).fx += 1.5*rand.nextGaussian();
+			found.get(i).fy += 1.5*rand.nextGaussian();
+			found.get(i).cx += 1.5*rand.nextGaussian();
+			found.get(i).cy += 1.5*rand.nextGaussian();
 		}
 
 		RefineDualQuadraticAlgebra alg = new RefineDualQuadraticAlgebra();
@@ -73,7 +72,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
-			expected.add(new CameraPinhole(400+i*5,420,0,410,420,0,0));
+			expected.add(new CameraPinhole(400 + i*5, 420, 0, 410, 420, 0, 0));
 
 			found.add(new CameraPinhole(expected.get(i)));
 
@@ -93,7 +92,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
-			expected.add(new CameraPinhole(400+i*5,420,0.1,0,0,0,0));
+			expected.add(new CameraPinhole(400 + i*5, 420, 0.1, 0, 0, 0, 0));
 
 			found.add(new CameraPinhole(expected.get(i)));
 
@@ -111,7 +110,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 		List<CameraPinhole> expected = new ArrayList<>();
 		List<CameraPinhole> found = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
-			expected.add(new CameraPinhole(400+i*5,420,0.1,410,420,0,0));
+			expected.add(new CameraPinhole(400 + i*5, 420, 0.1, 410, 420, 0, 0));
 
 			found.add(new CameraPinhole(expected.get(i)));
 
@@ -126,8 +125,8 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 		checkRefine(alg, expected, found, 6);
 	}
 
-	private void checkRefine(RefineDualQuadraticAlgebra alg,
-							 List<CameraPinhole> expected, List<CameraPinhole> found, double tol) {
+	private void checkRefine( RefineDualQuadraticAlgebra alg,
+							  List<CameraPinhole> expected, List<CameraPinhole> found, double tol ) {
 		renderGood(expected);
 
 		addProjectives(alg);
@@ -135,7 +134,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 		DMatrix4x4 Q = new DMatrix4x4();
 		ConvertDMatrixStruct.convert(this.Q, Q);
 
-		double ratio[] = new double[expected.size()];
+		double[] ratio = new double[expected.size()];
 		for (int i = 0; i < found.size(); i++) {
 			CameraPinhole p = found.get(i);
 			ratio[i] = p.fy/p.fx;
@@ -148,21 +147,21 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 			CameraPinhole e = expected.get(i);
 			CameraPinhole f = found.get(i);
 
-			if( alg.isFixedAspectRatio() ) {
+			if (alg.isFixedAspectRatio()) {
 				assertEquals(e.fx, f.fx, tol);
 				assertEquals(f.fx*ratio[i], f.fy, UtilEjml.TEST_F64_SQ);
 			} else {
 				assertEquals(e.fx, f.fx, tol);
 				assertEquals(e.fy, f.fy, tol);
 			}
-			if( alg.isZeroPrinciplePoint() ) {
+			if (alg.isZeroPrinciplePoint()) {
 				assertEquals(0, f.cx, UtilEjml.TEST_F64_SQ);
 				assertEquals(0, f.cy, UtilEjml.TEST_F64_SQ);
 			} else {
 				assertEquals(e.cx, f.cx, tol);
 				assertEquals(e.cy, f.cy, tol);
 			}
-			if( alg.isZeroSkew() ) {
+			if (alg.isZeroSkew()) {
 				assertEquals(0, f.skew, UtilEjml.TEST_F64_SQ);
 			} else {
 				assertEquals(e.skew, f.skew, tol);

@@ -67,8 +67,8 @@ class TestGenerateMetricTripleFromProjective extends BoofStandardJUnit {
 	@Nested
 	class PracticalGuessAndCheck extends CommonGenerateMetricCameraTripleChecks {
 		public PracticalGuessAndCheck() {
-			skewTol = 0.1;
-			minimumFractionSuccess = 0.9; // more unstable than most
+			skewTol = 0.4;
+			minimumFractionSuccess = 0.5; // more unstable than most
 		}
 
 		@Override

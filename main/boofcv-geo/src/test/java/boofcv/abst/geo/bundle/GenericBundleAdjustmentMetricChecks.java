@@ -249,7 +249,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 		CameraPinhole intrinsic = new CameraPinhole(400,400,0,300,300,width,width);
 
 		int numViews = 5;
-		int numFeatures = 200;
+		int numFeatures = 250;
 
 		SceneStructureMetric structure = new SceneStructureMetric(false);
 		structure.initialize(1,numViews,numFeatures);

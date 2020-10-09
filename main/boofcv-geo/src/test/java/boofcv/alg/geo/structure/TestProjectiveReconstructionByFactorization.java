@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,7 +118,7 @@ public class TestProjectiveReconstructionByFactorization extends CommonStructure
 	}
 
 	private void setPerfectDepths(int numFeatures, ProjectiveStructureByFactorization alg) {
-		double depths[] = new double[numFeatures];
+		double[] depths = new double[numFeatures];
 		Point3D_F64 X = new Point3D_F64();
 		for (int viewIdx = 0; viewIdx < projections.size(); viewIdx++) {
 			for (int featIdx = 0; featIdx < features3D.size(); featIdx++) {

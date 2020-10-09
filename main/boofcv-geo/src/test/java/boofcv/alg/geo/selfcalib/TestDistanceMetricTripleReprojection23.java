@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,7 +85,7 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 		var distances = new double[set.size()];
 		alg.distances(set, distances);
 		for (int i = 0; i < distances.length; i++) {
-			assertTrue(distances[i] > 0.1);
+			assertTrue(distances[i] != 0.0);
 			assertEquals(distances[i], alg.distance(set.get(i)), UtilEjml.TEST_F64);
 		}
 	}

@@ -47,30 +47,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class CommonStructure extends BoofStandardJUnit {
-	protected CameraPinhole pinhole = new CameraPinhole(400,420,0.1,500,490,-1,-1);
+	protected CameraPinhole pinhole = new CameraPinhole(400, 420, 0.1, 500, 490, -1, -1);
 
 	protected List<Point3D_F64> features3D;
 	protected List<Se3_F64> worldToViews;
 	protected List<DMatrixRMaj> projections;
 	protected List<List<Point2D_F64>> observations;
 
-
-
-	public void simulate( int numViews , int numFeatures , boolean planar ) {
+	public void simulate( int numViews, int numFeatures, boolean planar ) {
 		worldToViews = new ArrayList<>();
 		projections = new ArrayList<>();
 		observations = new ArrayList<>();
 
 		// Randomly generate structure in front of the cameras
-		if( planar ) {
-			PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0,0,2,0.1,-0.05,1);
+		if (planar) {
+			PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0, 0, 2, 0.1, -0.05, 1);
 			plane.n.normalize();
-			features3D = UtilPoint3D_F64.random(plane,0.5,numFeatures,rand);
+			features3D = UtilPoint3D_F64.random(plane, 0.5, numFeatures, rand);
 		} else {
 			features3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2), -0.5, 0.5, numFeatures, rand);
 		}
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(pinhole,(DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(pinhole, (DMatrixRMaj)null);
 
 		// Generate views the adjust all 6-DOF but and distinctive while pointing at the points
 		for (int i = 0; i < numViews; i++) {
@@ -79,12 +77,12 @@ public class CommonStructure extends BoofStandardJUnit {
 			worldToView.T.y = rand.nextGaussian()*0.05;
 			worldToView.T.z = -0.5 + 0.05*i + rand.nextGaussian()*0.01;
 
-			double rotX = rand.nextGaussian()*0.1;
-			double rotY = rand.nextGaussian()*0.1;
-			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,0,worldToView.R);
+			double rotX = rand.nextGaussian()*0.05;
+			double rotY = rand.nextGaussian()*0.05;
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, rotX, rotY, 0, worldToView.R);
 
-			DMatrixRMaj P = new DMatrixRMaj(3,4);
-			PerspectiveOps.createCameraMatrix(worldToView.R,worldToView.T,K,P);
+			DMatrixRMaj P = new DMatrixRMaj(3, 4);
+			PerspectiveOps.createCameraMatrix(worldToView.R, worldToView.T, K, P);
 
 			worldToViews.add(worldToView);
 			projections.add(P);
@@ -95,7 +93,7 @@ public class CommonStructure extends BoofStandardJUnit {
 		for (int i = 0; i < numViews; i++) {
 			List<Point2D_F64> viewObs = new ArrayList<>();
 
-			w2p.configure(pinhole,worldToViews.get(i));
+			w2p.configure(pinhole, worldToViews.get(i));
 			for (int j = 0; j < numFeatures; j++) {
 				viewObs.add(w2p.transform(features3D.get(j)));
 			}
@@ -113,13 +111,13 @@ public class CommonStructure extends BoofStandardJUnit {
 
 			for (int j = 0; j < view.size(); j++) {
 				Point2D_F64 p = view.get(j);
-				indexes.add( new PointIndex2D_F64(p.x,p.y,j));
+				indexes.add(new PointIndex2D_F64(p.x, p.y, j));
 			}
 
 			// order shouldn't matter
-			Collections.shuffle(indexes,rand);
+			Collections.shuffle(indexes, rand);
 
-			ret.add( indexes );
+			ret.add(indexes);
 		}
 
 		return ret;
@@ -139,18 +137,18 @@ public class CommonStructure extends BoofStandardJUnit {
 			List<AssociatedPair> matches = new ArrayList<>();
 
 			for (int j = 0; j < view0.size(); j++) {
-				matches.add( new AssociatedPair(view0.get(j),viewI.get(j)));
+				matches.add(new AssociatedPair(view0.get(j), viewI.get(j)));
 			}
 
-			DMatrixRMaj H = new DMatrixRMaj(3,3);
-			if( !estimateH.process(matches,H) )
+			DMatrixRMaj H = new DMatrixRMaj(3, 3);
+			if (!estimateH.process(matches, H))
 				throw new RuntimeException("EGads");
 			ret.add(H);
 
 			// make sure the homography is from view 0 to view i
-			GeometryMath_F64.mult(H,view0.get(0),sanity);
+			GeometryMath_F64.mult(H, view0.get(0), sanity);
 			double error = viewI.get(0).distance(sanity);
-			assertEquals(0,error, UtilEjml.TEST_F64);
+			assertEquals(0, error, UtilEjml.TEST_F64);
 		}
 
 		return ret;

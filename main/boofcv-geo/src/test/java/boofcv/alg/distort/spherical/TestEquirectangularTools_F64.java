@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("IntegerDivisionInFloatingPointContext")
 public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 
 	int width = 300;
@@ -163,8 +164,9 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		equiToNorm_reverse(tools, width/2, height-2);
 
 		for (int i = 0; i < 100; i++) {
-			int x = rand.nextInt(width);
-			int y = rand.nextInt(height-1)+1; // avoid pathological case
+			// Avoiding the image edges where the math becomes unstable
+			int x = rand.nextInt(width - 3) + 3;
+			int y = rand.nextInt(height - 3) + 3;
 
 			equiToNorm_reverse(tools,x,y);
 		}
@@ -195,8 +197,9 @@ public class TestEquirectangularTools_F64 extends BoofStandardJUnit {
 		equiToNorm_reverseFV(tools, width/2, height-2);
 
 		for (int i = 0; i < 100; i++) {
-			int x = rand.nextInt(width);
-			int y = rand.nextInt(height-1)+1; // avoid pathological case
+			// Avoiding the image edges where the math becomes unstable
+			int x = rand.nextInt(width - 3) + 3;
+			int y = rand.nextInt(height - 3) + 3;
 
 			equiToNorm_reverse(tools,x,y);
 		}

@@ -137,6 +137,7 @@ public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 			compareResults(targetResult, targetParamSub, validationResult, validationParamSub);
 		} catch (Exception e) {
 			BoofMiscOps.printMethodInfo(target, System.err);
+			e.printStackTrace(System.err);
 			throw new RuntimeException(e);
 		}
 	}

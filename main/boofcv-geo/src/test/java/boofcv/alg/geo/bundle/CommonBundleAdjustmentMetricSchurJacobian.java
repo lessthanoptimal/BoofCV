@@ -81,7 +81,7 @@ public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatri
 		//      multiplying tolerance by 100 is ridiculous
 
 //		DerivativeChecker.jacobianPrint(func, jac, param, 100*UtilEjml.TEST_F64_SQ );
-		assertTrue(DerivativeChecker.jacobian(func, jac, param, 100*UtilEjml.TEST_F64_SQ));
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, 110*UtilEjml.TEST_F64_SQ));
 	}
 
 	/**

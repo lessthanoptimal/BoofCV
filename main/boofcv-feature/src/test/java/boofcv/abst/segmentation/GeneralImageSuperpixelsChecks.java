@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	ImageType[] imageTypes;
@@ -42,7 +43,7 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> exte
 	int width = 20;
 	int height = 30;
 
-	protected GeneralImageSuperpixelsChecks(ImageType... types) {
+	protected GeneralImageSuperpixelsChecks( ImageType... types ) {
 		this.imageTypes = types;
 	}
 
@@ -51,33 +52,31 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> exte
 	/**
 	 * Makes sure all pixels with the same label are connected
 	 */
-	@Test
-	public void connectivity() {
-		for( ImageType<T> t : imageTypes ) {
-//			System.out.println("Image type "+t);
+	@Test void connectivity() {
+		for (ImageType<T> t : imageTypes) {
 
 			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width, height);
 			GrayS32 output = new GrayS32(width, height);
 
-			GImageMiscOps.fillUniform(input, rand, 0, 100);
+			GImageMiscOps.fillUniformSmart(input, rand, -125, 125);
 
 			alg.segment(input, output);
 
 			assertTrue(alg.getTotalSuperpixels() > 4);
 
-			GrayU8 binary = new GrayU8(width,height);
-			boolean[] selected = new boolean[ alg.getTotalSuperpixels()];
+			GrayU8 binary = new GrayU8(width, height);
+			boolean[] selected = new boolean[alg.getTotalSuperpixels()];
 
 			for (int i = 0; i < alg.getTotalSuperpixels(); i++) {
 				selected[i] = true;
-				BinaryImageOps.labelToBinary(output,binary,selected);
+				BinaryImageOps.labelToBinary(output, binary, selected);
 				selected[i] = false;
 
 				// the number of blobs should always be one
 				ConnectRule rule = alg.getRule();
-				assertEquals(1,BinaryImageOps.contour(binary,rule,null).size());
+				assertEquals(1, BinaryImageOps.contour(binary, rule, null).size());
 			}
 		}
 	}
@@ -85,90 +84,85 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> exte
 	/**
 	 * Make sure subimages produce the same results
 	 */
-	@Test
-	public void subimage() {
-		for( ImageType<T> t : imageTypes ) {
+	@Test void subimage() {
+		for (ImageType<T> t : imageTypes) {
 //			System.out.println("Image type "+t);
 
 			ImageSuperpixels<T> alg = createAlg(t);
 
-			T input = t.createImage(width,height);
-			GrayS32 expected = new GrayS32(width,height);
+			T input = t.createImage(width, height);
+			GrayS32 expected = new GrayS32(width, height);
 
-			GImageMiscOps.fillUniform(input,rand,0,100);
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-			alg.segment(input,expected);
+			alg.segment(input, expected);
 
 			// provide an output which is a sub-image
-			GrayS32 found = new GrayS32(width+3,height+2).subimage(2,1,width+2,height+1);
-			alg.segment(input,found);
-			BoofTesting.assertEquals(expected,found,0);
+			GrayS32 found = new GrayS32(width + 3, height + 2).subimage(2, 1, width + 2, height + 1);
+			alg.segment(input, found);
+			BoofTesting.assertEquals(expected, found, 0);
 
 			// Now make the input image an output
 			input = BoofTesting.createSubImageOf(input);
-			found = new GrayS32(width,height);
+			found = new GrayS32(width, height);
 
-			alg.segment(input,found);
-			BoofTesting.assertEquals(expected,found,0);
+			alg.segment(input, found);
+			BoofTesting.assertEquals(expected, found, 0);
 		}
 	}
 
 	/**
 	 * Makes sure that there really are regions 0 N-1 in the output image
 	 */
-	@Test
-	public void sequentialNumbers() {
-		for( ImageType<T> t : imageTypes ) {
+	@Test void sequentialNumbers() {
+		for (ImageType<T> t : imageTypes) {
 
 			ImageSuperpixels<T> alg = createAlg(t);
 
-			T input = t.createImage(width,height);
-			GrayS32 output = new GrayS32(width,height);
-			GImageMiscOps.fillUniform(input,rand,0,100);
+			T input = t.createImage(width, height);
+			GrayS32 output = new GrayS32(width, height);
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-			alg.segment(input,output);
+			alg.segment(input, output);
 
 			int N = alg.getTotalSuperpixels();
 			assertTrue(N > 2);
 
 			boolean[] found = new boolean[N];
 
-			for( int y = 0; y < height; y++ ) {
-				for( int x = 0; x < width; x++ ) {
-					found[ output.get(x,y) ] = true;
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					found[output.get(x, y)] = true;
 				}
 			}
 
-			for( int i = 0; i < N; i++ ) {
+			for (int i = 0; i < N; i++) {
 				assertTrue(found[i]);
 			}
 		}
 	}
 
 	/**
-
-
-	/**
+	 * /**
 	 * Produces the same results when run multiple times
 	 */
-	@Test
-	public void multipleCalls() {
-		for( ImageType<T> t : imageTypes ) {
+	@Test void multipleCalls() {
+		for (ImageType<T> t : imageTypes) {
 
 			ImageSuperpixels<T> alg = createAlg(t);
 
-			T input = t.createImage(width,height);
-			GrayS32 output = new GrayS32(width,height);
-			GImageMiscOps.fillUniform(input,rand,0,100);
+			T input = t.createImage(width, height);
+			GrayS32 output = new GrayS32(width, height);
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-			alg.segment(input,output);
+			alg.segment(input, output);
 
-			GrayS32 output2 = new GrayS32(width,height);
-			alg.segment(input,output2);
+			GrayS32 output2 = new GrayS32(width, height);
+			alg.segment(input, output2);
 
-			for( int y = 0; y < height; y++ ) {
-				for( int x = 0; x < width; x++ ) {
-					assertEquals(output.get(x,y),output2.get(x,y));
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					assertEquals(output.get(x, y), output2.get(x, y));
 				}
 			}
 		}
@@ -177,23 +171,21 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase<T>> exte
 	/**
 	 * See if it won't blow up if input image size is changed
 	 */
-	@Test
-	public void changeInImageSize() {
-		for( ImageType<T> t : imageTypes ) {
+	@Test void changeInImageSize() {
+		for (ImageType<T> t : imageTypes) {
 
 			ImageSuperpixels<T> alg = createAlg(t);
 
-			T input = t.createImage(width/2,height/2);
-			GrayS32 output = new GrayS32(width/2,height/2);
-			GImageMiscOps.fillUniform(input,rand,0,100);
+			T input = t.createImage(width/2, height/2);
+			GrayS32 output = new GrayS32(width/2, height/2);
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-			alg.segment(input,output);
+			alg.segment(input, output);
 
-			input = t.createImage(width,height);
-			output = new GrayS32(width,height);
+			input = t.createImage(width, height);
+			output = new GrayS32(width, height);
 
-			alg.segment(input,output);
+			alg.segment(input, output);
 		}
 	}
-
 }

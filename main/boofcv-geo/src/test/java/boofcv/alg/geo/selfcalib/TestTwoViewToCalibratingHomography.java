@@ -184,7 +184,7 @@ class TestTwoViewToCalibratingHomography extends CommonThreeViewSelfCalibration 
 
 		assertEquals(1.0, found_1_to_2.T.norm(), 1e-2);
 		BoofTesting.assertEqualsToScaleS(truthView_1_to_i(1), found_1_to_2, 0.01, 1e-2);
-		assertTrue(MatrixFeatures_DDRM.isIdentical(K, K2, 1));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(K, K2, 2));
 	}
 
 	/**

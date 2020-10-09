@@ -52,6 +52,9 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 	protected double rotationTol = 1e-2;
 	protected double translationTol = 1e-3;
 
+	// Amount of noise applied in noisy3_three_cameras
+	protected double noiseSigma = 0.2;
+
 	protected boolean zeroPrinciplePoint = true;
 
 	public abstract ProjectiveToMetricCameras createEstimator();
@@ -136,11 +139,11 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		cameraA = new CameraPinhole(600,600,0,0,0,imageWidth,imageHeight);
 		cameraB = new CameraPinhole(800,800,0,0,0,imageWidth,imageHeight);
 		cameraC = new CameraPinhole(350,350,0,0,0,imageWidth,imageHeight);
-		simulateScene(0.2);
+		simulateScene(noiseSigma);
 
 		translationTol = 0.1;
 		rotationTol = 0.1;
-		skewTol = 0.2;
+		skewTol = skewTol*10;
 		focusTol = 30;
 		checkScene();
 	}

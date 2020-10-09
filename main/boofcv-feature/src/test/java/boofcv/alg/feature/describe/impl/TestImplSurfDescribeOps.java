@@ -30,9 +30,7 @@ import boofcv.struct.sparse.SparseScaleGradient;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -42,61 +40,64 @@ public class TestImplSurfDescribeOps extends BoofStandardJUnit {
 	int width = 80;
 	int height = 100;
 
-	@Test
-	public void gradientInner_F32() {
-		GrayF32 ii = new GrayF32(width,height);
+	@Test void gradientInner_F32() {
+		GrayF32 ii = new GrayF32(width, height);
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		int r = 2;
-		int w = r*2+1;
+		int w = r*2 + 1;
 
-		double expectedX[] = new double[w*w];
-		double expectedY[] = new double[w*w];
-		float foundX[] = new float[w*w];
-		float foundY[] = new float[w*w];
+		double[] expectedX = new double[w*w];
+		double[] expectedY = new double[w*w];
+		float[] foundX = new float[w*w];
+		float[] foundY = new float[w*w];
 
-		for( double scale = 0.2; scale <= 1.8; scale += 0.2 ) {
+		for (double scale = 0.2; scale <= 1.8; scale += 0.2) {
 //			System.out.println("scale = "+scale);
-			ImplSurfDescribeOps.naiveGradient(ii, 8, 9, scale, w, 4 * scale, false, expectedX, expectedY);
+			ImplSurfDescribeOps.naiveGradient(ii, 8, 9, scale, w, 4*scale, false, expectedX, expectedY);
 //			System.out.println("------------------------");
-			ImplSurfDescribeOps.gradientInner(ii,8,9,scale,w, 4*scale, foundX,foundY);
+			ImplSurfDescribeOps.gradientInner(ii, 8, 9, scale, w, 4*scale, foundX, foundY);
 
-			for( int i = 0; i < foundX.length; i++ ) {
-				assertEquals(expectedX[i],foundX[i],1e-4);
-				assertEquals(expectedY[i],foundY[i],1e-4);
+			for (int i = 0; i < foundX.length; i++) {
+				assertEquals(expectedX[i], foundX[i], 1e-4);
+				assertEquals(expectedY[i], foundY[i], 1e-4);
 			}
 
-			for( int i = 0; i < foundX.length; i++ ) {
+			for (int i = 0; i < foundX.length; i++) {
 				assertTrue(foundX[i] != 0);
 				assertTrue(foundY[i] != 0);
 			}
 		}
 	}
 
-	@Test
-	public void gradientInner_I32() {
-		GrayS32 ii = new GrayS32(width,height);
-		GImageMiscOps.fillUniform(ii, rand, 0, 99);
+	@Test void gradientInner_I32() {
+		GrayS32 ii = new GrayS32(width, height);
+		GImageMiscOps.fillUniform(ii, rand, 1, 120);
 		int r = 2;
-		int w = r*2+1;
+		int w = r*2 + 1;
 
-		double expectedX[] = new double[w*w];
-		double expectedY[] = new double[w*w];
-		int foundX[] = new int[w*w];
-		int foundY[] = new int[w*w];
+		double[] expectedX = new double[w*w];
+		double[] expectedY = new double[w*w];
+		int[] foundX = new int[w*w];
+		int[] foundY = new int[w*w];
 
-		for( double scale = 0.2; scale <= 1.8; scale += 0.2 ) {
-			ImplSurfDescribeOps.naiveGradient(ii,10,9,scale,w, 4*scale, false, expectedX,expectedY);
-			ImplSurfDescribeOps.gradientInner(ii,10,9,scale,w, 4*scale,foundX,foundY);
+		for (double scale = 0.2; scale <= 1.8; scale += 0.2) {
+			ImplSurfDescribeOps.naiveGradient(ii, 10, 9, scale, w, 4*scale, false, expectedX, expectedY);
+			ImplSurfDescribeOps.gradientInner(ii, 10, 9, scale, w, 4*scale, foundX, foundY);
 
-			for( int i = 0; i < foundX.length; i++ ) {
-				assertEquals(expectedX[i],foundX[i],1e-4);
-				assertEquals(expectedY[i],foundY[i],1e-4);
+			for (int i = 0; i < foundX.length; i++) {
+				assertEquals(expectedX[i], foundX[i], 1e-4);
+				assertEquals(expectedY[i], foundY[i], 1e-4);
 			}
 
-			for( int i = 0; i < foundX.length; i++ ) {
-				assertTrue(foundX[i] != 0);
-				assertTrue(foundY[i] != 0);
+			// sanity check that it isn't all zeros
+			boolean allZeroX = true;
+			boolean allZeroY = true;
+			for (int i = 0; i < foundX.length; i++) {
+				allZeroX &= foundX[i] == 0;
+				allZeroY &= foundY[i] == 0;
 			}
+			assertFalse(allZeroX);
+			assertFalse(allZeroY);
 		}
 	}
 
@@ -104,9 +105,7 @@ public class TestImplSurfDescribeOps extends BoofStandardJUnit {
 	 * Create an image which has a constant slope.  See if
 	 * the wavelet correctly computes that slope.
 	 */
-	@Test
-	public void naiveGradient() {
-
+	@Test void naiveGradient() {
 		double scale = 1;
 		int r = 6;
 		checkNaiveGradient(scale, r);
@@ -122,59 +121,57 @@ public class TestImplSurfDescribeOps extends BoofStandardJUnit {
 		checkNaiveGradient(scale, r);
 	}
 
-	private void checkNaiveGradient(double scale, int r) {
-		int w = 2*r+1;
+	private void checkNaiveGradient( double scale, int r ) {
+		int w = 2*r + 1;
 
-		double derivX[] = new double[w*w];
-		double derivY[] = new double[w*w];
+		double[] derivX = new double[w*w];
+		double[] derivY = new double[w*w];
 
-		for( double theta = -Math.PI; theta <= Math.PI; theta += 0.15 ) {
-			GrayF32 img = new GrayF32(width,height);
-			createGradient(theta,img);
-			GrayF32 ii = IntegralImageOps.transform(img,null);
+		for (double theta = -Math.PI; theta <= Math.PI; theta += 0.15) {
+			GrayF32 img = new GrayF32(width, height);
+			createGradient(theta, img);
+			GrayF32 ii = IntegralImageOps.transform(img, null);
 
-			ImplSurfDescribeOps.naiveGradient(ii,r*2,r*2,scale,w, 4*scale, false, derivX,derivY);
+			ImplSurfDescribeOps.naiveGradient(ii, r*2, r*2, scale, w, 4*scale, false, derivX, derivY);
 
 			double c = Math.cos(theta);
 			double s = Math.sin(theta);
 
-			for( int i = 0; i < derivX.length; i++ ) {
+			for (int i = 0; i < derivX.length; i++) {
 				double dx = derivX[i];
 				double dy = derivY[i];
 
 				double n = Math.sqrt(dx*dx + dy*dy);
 
-				assertEquals(c,dx/n,1e-3);
-				assertEquals(s,dy/n,1e-3);
+				assertEquals(c, dx/n, 1e-3);
+				assertEquals(s, dy/n, 1e-3);
 			}
 		}
 	}
-
-
 
 	/**
 	 * Creates an image with a constant gradient in the specified direction
 	 */
 	public static <I extends ImageGray<I>>
-	void createGradient( double theta , I image ) {
+	void createGradient( double theta, I image ) {
 		GImageGray ret = FactoryGImageGray.wrap(image);
 
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);
 
-		for( int y = 0; y < image.height; y++ ) {
-			for( int x = 0; x < image.width; x++ ) {
+		for (int y = 0; y < image.height; y++) {
+			for (int x = 0; x < image.width; x++) {
 				double xx = c*x;
 				double yy = s*y;
-				ret.set(x,y,(float)(xx+yy));
+				ret.set(x, y, (float)(xx + yy));
 			}
 		}
 	}
 
-	public static < II extends ImageGray<II>>
-	SparseScaleGradient<II,?> createGradient( II ii , double scale) {
-		SparseScaleGradient<II,?> ret =
-				SurfDescribeOps.createGradient(false,(Class<II>)ii.getClass());
+	public static <II extends ImageGray<II>>
+	SparseScaleGradient<II, ?> createGradient( II ii, double scale ) {
+		SparseScaleGradient<II, ?> ret =
+				SurfDescribeOps.createGradient(false, (Class<II>)ii.getClass());
 		ret.setImage(ii);
 		ret.setWidth(4);
 		return ret;

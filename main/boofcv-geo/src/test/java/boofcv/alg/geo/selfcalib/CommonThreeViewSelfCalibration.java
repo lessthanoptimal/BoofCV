@@ -63,8 +63,8 @@ public class CommonThreeViewSelfCalibration extends BoofStandardJUnit {
 		cameraB = cameraC = cameraA;
 		list_world_to_cameras = new ArrayList<>();
 		list_world_to_cameras.add( eulerXyz(0,0,-2,0,0,0.0,null).invert(null));
-		list_world_to_cameras.add( eulerXyz(1,0.1,-2,-0.1,0,0.05,null).invert(null));
-		list_world_to_cameras.add( eulerXyz(0.1,1,-2,0,0.05,0.0,null).invert(null));
+		list_world_to_cameras.add( eulerXyz(1,0.1,-2.1,-0.1,0,0.05,null).invert(null));
+		list_world_to_cameras.add( eulerXyz(0.1,1,-1.9,0,0.05,0.0,null).invert(null));
 	}
 
 	/**
@@ -92,7 +92,6 @@ public class CommonThreeViewSelfCalibration extends BoofStandardJUnit {
 		projective = new ArrayList<>();
 
 		cloud = UtilPoint3D_F64.random(-1,1,numFeatures,rand);
-
 
 		BoofMiscOps.forIdx(list_world_to_cameras,(idx,world_to_camera)->{
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(cameras.get(idx),(DMatrixRMaj)null);

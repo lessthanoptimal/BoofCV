@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,27 +22,30 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * <p>
- *     Computes the best projective to metric 4x4 rectifying homography matrix by guessing different values
- *     for focal lengths of the first two views. Focal lengths are guessed using a log scale. Skew and image center
- *     are both assumed to be known and have to be specified by the user. This strategy shows better convergence
- *     than methods which attempt to guess the focal length using linear or gradient descent approaches due
- *     to the vast number of local minima in the search space. Non-linear refinement is highly recommended after
- *     using this algorithm due to its approximate nature.
+ * Computes the best projective to metric 4x4 rectifying homography matrix by guessing different values
+ * for focal lengths of the first two views. Focal lengths are guessed using a log scale. Skew and image center
+ * are both assumed to be known and have to be specified by the user. This strategy shows better convergence
+ * than methods which attempt to guess the focal length using linear or gradient descent approaches due
+ * to the vast number of local minima in the search space. Non-linear refinement is highly recommended after
+ * using this algorithm due to its approximate nature.
  * </p>
  * <p>
- *     NOTE: Performance on noise free synthetic data replicates paper claims. Have not been able to replicate
- *     performance on real data. Authors were contacted for a reference implementation and was told source code
- *     is not publicly available.
+ * NOTE: Performance on noise free synthetic data replicates paper claims. Have not been able to replicate
+ * performance on real data. Authors were contacted for a reference implementation and was told source code
+ * is not publicly available.
  * </p>
  *
  * <ul>
@@ -61,16 +64,15 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  * for positive depth of triangulated features.
  * </p>
  *
+ * @author Peter Abeles
  * @see EstimatePlaneAtInfinityGivenK
  *
  * <p>
  * <li>Gherardi, Riccardo, and Andrea Fusiello. "Practical autocalibration."
  * European Conference on Computer Vision. Springer, Berlin, Heidelberg, 2010.</li>
  * </p>
- *
- * @author Peter Abeles
  */
-public class SelfCalibrationPraticalGuessAndCheckFocus {
+public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 
 	// Development Note
 	// There was an attempt to modify this to use reprojection error like TrifocalBruteForceSelfCalibration to select
@@ -82,8 +84,8 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 	boolean fixedFocus;
 	// Defines which focus lengths are sampled based on a log scale
 	// Note that image has been normalized and 1.0 = focal length of image diagonal
-	double sampleMin=0.3,sampleMax=3;
-	int numSamples=50;
+	double sampleMin = 0.3, sampleMax = 3;
+	int numSamples = 50;
 
 	//--------------------- Input Related
 	// storage for internally normalized camera matrices
@@ -96,22 +98,22 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 
 	//---------------------------------- Internal Work Space
 	// intrinsic camera calibration matrix for view 1
-	DMatrixRMaj K1 = new DMatrixRMaj(3,3);
+	DMatrixRMaj K1 = new DMatrixRMaj(3, 3);
 
 	// Work space for view 1 projective matrix
-	DMatrixRMaj P1 = new DMatrixRMaj(3,4);
-	DMatrixRMaj tmpP = new DMatrixRMaj(3,4);
+	DMatrixRMaj P1 = new DMatrixRMaj(3, 4);
+	DMatrixRMaj tmpP = new DMatrixRMaj(3, 4);
 
 	// projective to metric homography
-	DMatrixRMaj H = new DMatrixRMaj(4,4);
-	DMatrixRMaj bestH = new DMatrixRMaj(4,4);
+	DMatrixRMaj H = new DMatrixRMaj(4, 4);
+	DMatrixRMaj bestH = new DMatrixRMaj(4, 4);
 
 	// Absolute dual quadratic
-	DMatrixRMaj Q = new DMatrixRMaj(4,4);
+	DMatrixRMaj Q = new DMatrixRMaj(4, 4);
 
 	// camera normalization matrices
-	DMatrixRMaj V = new DMatrixRMaj(3,3);
-	DMatrixRMaj Vinv = new DMatrixRMaj(3,3);
+	DMatrixRMaj V = new DMatrixRMaj(3, 3);
+	DMatrixRMaj Vinv = new DMatrixRMaj(3, 3);
 
 	double[] scores = new double[numSamples];
 
@@ -122,7 +124,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 
 	CameraPinhole intrinsic = new CameraPinhole();
 
-	DMatrixRMaj tmp = new DMatrixRMaj(3,3);
+	DMatrixRMaj tmp = new DMatrixRMaj(3, 3);
 
 	// Is the best score at a local minimum? If not that means it probably diverged
 	boolean localMinimum;
@@ -131,18 +133,19 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 	PrintStream verbose;
 
 	public SelfCalibrationPraticalGuessAndCheckFocus() {
-		normalizedP = new FastQueue<>(()->new DMatrixRMaj(3,4));
+		normalizedP = new FastQueue<>(() -> new DMatrixRMaj(3, 4));
 	}
 
 	/**
 	 * Specifies known portions of camera intrinsic parameters
+	 *
 	 * @param skew skew
 	 * @param cx image center x
 	 * @param cy image center y
 	 * @param width Image width
 	 * @param height Image height
 	 */
-	public void setCamera( double skew , double cx , double cy , int width , int height ) {
+	public void setCamera( double skew, double cx, double cy, int width, int height ) {
 
 		// Define normalization matrix
 		// center points, remove skew, scale coordinates
@@ -152,7 +155,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 		V.set(1,1,d/2); V.set(1,2,cy);
 		V.set(2,2,1);
 
-		CommonOps_DDRM.invert(V,Vinv);
+		CommonOps_DDRM.invert(V, Vinv);
 	}
 
 	/**
@@ -162,7 +165,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 	 * @param max max value. 3.0 is default
 	 * @param total Number of sample points. 50 is default
 	 */
-	public void setSampling( double min , double max , int total ) {
+	public void setSampling( double min, double max, int total ) {
 		this.sampleMin = min;
 		this.sampleMax = max;
 		this.numSamples = total;
@@ -177,14 +180,14 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 	 * @param cameraMatrices (Input) camera matrices for view 2 and beyond. Do not add the implicit P1=[I|0]
 	 * @return true if successful or false if it fails
 	 */
-	public boolean process(List<DMatrixRMaj> cameraMatrices) {
-		assertBoof(V.data[0] != 0.0,"Must call setCamera()");
-		assertBoof(cameraMatrices.size() > 0,"'cameraMatrices' contain at least 1 matrix");
+	public boolean process( List<DMatrixRMaj> cameraMatrices ) {
+		assertBoof(V.data[0] != 0.0, "Must call setCamera()");
+		assertBoof(cameraMatrices.size() > 0, "'cameraMatrices' contain at least 1 matrix");
 
 		// Apply normalization as suggested in the paper, then force the first camera matrix to be [I|0] again
 		CommonOps_DDRM.setIdentity(tmpP);
-		CommonOps_DDRM.mult(Vinv,tmpP,P1);
-		MultiViewOps.projectiveToIdentityH(P1,H);
+		CommonOps_DDRM.mult(Vinv, tmpP, P1);
+		MultiViewOps.projectiveToIdentityH(P1, H);
 
 		// P = inv(V)*P/||P(2,0:2)||
 		this.normalizedP.reset();
@@ -192,60 +195,60 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 			DMatrixRMaj A = cameraMatrices.get(i);
 
 			DMatrixRMaj Pi = normalizedP.grow();
-			CommonOps_DDRM.mult(Vinv,A,tmpP);
-			CommonOps_DDRM.mult(tmpP,H,Pi);
-			double a0 = Pi.get(2,0);
-			double a1 = Pi.get(2,1);
-			double a2 = Pi.get(2,2);
+			CommonOps_DDRM.mult(Vinv, A, tmpP);
+			CommonOps_DDRM.mult(tmpP, H, Pi);
+			double a0 = Pi.get(2, 0);
+			double a1 = Pi.get(2, 1);
+			double a2 = Pi.get(2, 2);
 			double scale = Math.sqrt(a0*a0 + a1*a1 + a2*a2);
-			CommonOps_DDRM.scale(1.0/scale,Pi);
+			CommonOps_DDRM.scale(1.0/scale, Pi);
 		}
 
 		// Find the best combinations of focal lengths
 		double bestScore;
-		if(fixedFocus) {
+		if (fixedFocus) {
 			bestScore = findBestFocusOne(normalizedP.get(0));
 		} else {
 			bestScore = findBestFocusTwo(normalizedP.get(0));
 		}
 
 		// undo normalization
-		CommonOps_DDRM.extract(bestH,0,0,tmp);
-		CommonOps_DDRM.mult(V,tmp, K1);
-		CommonOps_DDRM.insert(K1,bestH,0,0);
+		CommonOps_DDRM.extract(bestH, 0, 0, tmp);
+		CommonOps_DDRM.mult(V, tmp, K1);
+		CommonOps_DDRM.insert(K1, bestH, 0, 0);
 
 		// if it's not at a local minimum it almost definately failed
 		return bestScore != Double.MAX_VALUE && localMinimum;
 	}
 
-	private double findBestFocusOne(DMatrixRMaj P2) {
+	private double findBestFocusOne( DMatrixRMaj P2 ) {
 		localMinimum = false;
 
 		// coeffients for linear to log scale
-		double b = Math.log(sampleMax/sampleMin)/(numSamples-1);
+		double b = Math.log(sampleMax/sampleMin)/(numSamples - 1);
 		double bestScore = Double.MAX_VALUE;
 		int bestIndex = -1;
 
 		for (int i = 0; i < numSamples; i++) {
-			double f =sampleMin*Math.exp(b*i);
+			double f = sampleMin*Math.exp(b*i);
 
-			if( !computeRectifyH(f,f,P2,H)) {
+			if (!computeRectifyH(f, f, P2, H)) {
 				scores[i] = Double.NaN;
 				continue;
 			}
-			MultiViewOps.rectifyHToAbsoluteQuadratic(H,Q);
+			MultiViewOps.rectifyHToAbsoluteQuadratic(H, Q);
 
 			double score = scoreResults();
 			scores[i] = score;
 
-			if( score < bestScore ) {
+			if (score < bestScore) {
 				bestScore = score;
 				bestH.set(H);
 				bestIndex = i;
 			}
 
-			if( verbose != null ) {
-				verbose.printf("[%3d] f=%5.2f score=%f\n",i,f,score);
+			if (verbose != null) {
+				verbose.printf("[%3d] f=%5.2f score=%f\n", i, f, score);
 			}
 		}
 
@@ -256,46 +259,46 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 		return bestScore;
 	}
 
-	private double findBestFocusTwo(DMatrixRMaj P2) {
+	private double findBestFocusTwo( DMatrixRMaj P2 ) {
 		localMinimum = false;
 
 		// coeffients for linear to log scale
-		double b = Math.log(sampleMax/sampleMin)/(numSamples-1);
+		double b = Math.log(sampleMax/sampleMin)/(numSamples - 1);
 		double bestScore = Double.MAX_VALUE;
 
 		for (int i = 0; i < numSamples; i++) {
-			double f1 =sampleMin*Math.exp(b*i);
+			double f1 = sampleMin*Math.exp(b*i);
 
 			boolean minimumChanged = false;
 			int bestIndex = -1;
 
 			for (int j = 0; j < numSamples; j++) {
-				double f2 =sampleMin*Math.exp(b*j);
+				double f2 = sampleMin*Math.exp(b*j);
 
-				if( !computeRectifyH(f1,f2,P2,H)) {
+				if (!computeRectifyH(f1, f2, P2, H)) {
 					scores[i] = Double.NaN;
 					continue;
 				}
-				MultiViewOps.rectifyHToAbsoluteQuadratic(H,Q);
+				MultiViewOps.rectifyHToAbsoluteQuadratic(H, Q);
 
 				double score = scoreResults();
 				scores[j] = score;
 
-				if( score < bestScore ) {
+				if (score < bestScore) {
 					minimumChanged = true;
 					bestIndex = j;
 					bestScore = score;
 					bestH.set(H);
 				}
 
-				if( verbose != null ) {
-					verbose.printf("[%3d,%3d] f1=%5.2f f2=%5.2f score=%f\n",i,j,f1,f2,score);
+				if (verbose != null) {
+					verbose.printf("[%3d,%3d] f1=%5.2f f2=%5.2f score=%f\n", i, j, f1, f2, score);
 				}
 			}
 
-			if( minimumChanged ) {
+			if (minimumChanged) {
 				if (bestIndex > 0 && bestIndex < numSamples - 1) {
-					localMinimum = bestScore< scores[bestIndex - 1] && bestScore < scores[bestIndex + 1];
+					localMinimum = bestScore < scores[bestIndex - 1] && bestScore < scores[bestIndex + 1];
 				} else {
 					localMinimum = false;
 				}
@@ -306,18 +309,19 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 
 	/**
 	 * Given the focal lengths for the first two views compute homography H
+	 *
 	 * @param f1 view 1 focal length
 	 * @param f2 view 2 focal length
 	 * @param P2 projective camera matrix for view 2
 	 * @param H (Output) homography
 	 * @return true if successful
 	 */
-	boolean computeRectifyH( double f1 , double f2 , DMatrixRMaj P2, DMatrixRMaj H ) {
+	boolean computeRectifyH( double f1, double f2, DMatrixRMaj P2, DMatrixRMaj H ) {
 
-		estimatePlaneInf.setCamera1(f1,f1,0,0,0);
-		estimatePlaneInf.setCamera2(f2,f2,0,0,0);
+		estimatePlaneInf.setCamera1(f1, f1, 0, 0, 0);
+		estimatePlaneInf.setCamera2(f2, f2, 0, 0, 0);
 
-		if( !estimatePlaneInf.estimatePlaneAtInfinity(P2,planeInf) )
+		if (!estimatePlaneInf.estimatePlaneAtInfinity(P2, planeInf))
 			return false;
 
 		// TODO add a cost for distance from nominal and scale other cost by focal length fx for each view
@@ -333,10 +337,10 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 //			return false;
 
 		K1.zero();
-		K1.set(0,0,f1);
-		K1.set(1,1,f1);
-		K1.set(2,2,1);
-		MultiViewOps.createProjectiveToMetric(K1,planeInf.x,planeInf.y,planeInf.z,1,H);
+		K1.set(0, 0, f1);
+		K1.set(1, 1, f1);
+		K1.set(2, 2, 1);
+		MultiViewOps.createProjectiveToMetric(K1, planeInf.x, planeInf.y, planeInf.z, 1, H);
 
 		return true;
 	}
@@ -354,14 +358,14 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 
 		for (int i = 0; i < normalizedP.size; i++) {
 			DMatrixRMaj P = normalizedP.get(i);
-			MultiViewOps.intrinsicFromAbsoluteQuadratic(Q,P,intrinsic);
+			MultiViewOps.intrinsicFromAbsoluteQuadratic(Q, P, intrinsic);
 
 			double score = 0;
 
 			// skew should be zero
 			score += w_sk*Math.abs(intrinsic.skew);
 			// aspect ratio unity
-			score += w_ar*(Math.max(intrinsic.fx,intrinsic.fy)/Math.min(intrinsic.fx,intrinsic.fy) - 1);
+			score += w_ar*(Math.max(intrinsic.fx, intrinsic.fy)/Math.min(intrinsic.fx, intrinsic.fy) - 1);
 			// principle point zero
 			score += w_uo*(Math.abs(intrinsic.cx) + Math.abs(intrinsic.cy));
 
@@ -374,7 +378,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 		return fixedFocus;
 	}
 
-	public void setSingleCamera(boolean sameFocus) {
+	public void setSingleCamera( boolean sameFocus ) {
 		this.fixedFocus = sameFocus;
 	}
 
@@ -389,7 +393,8 @@ public class SelfCalibrationPraticalGuessAndCheckFocus {
 		return localMinimum;
 	}
 
-	public void setVerbose(PrintStream out , int level ) {
+	@Override
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
 	}
 }

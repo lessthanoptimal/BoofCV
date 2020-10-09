@@ -130,19 +130,19 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		Kernel1D ker = FactoryKernel.createKernelForImage(kernelWidth, kernelRadius, 1, img.getClass());
 
 		// standard symmetric odd kernel shape
-		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 0, maxKernelValue, rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, kernelRadius, 1, maxKernelValue, rand);
 		checkHorizontal(ker, img, dest);
 
 		// odd non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 0, maxKernelValue, rand);
+		ker = FactoryKernel.random(ker.getClass(), kernelWidth, 0, 1, maxKernelValue, rand);
 		checkHorizontal(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(), 2, 1, 0, maxKernelValue, rand);
+		ker = FactoryKernel.random(ker.getClass(), 2, 1, 1, maxKernelValue, rand);
 		checkHorizontal(ker, img, dest);
 
 		// even non-symmetric kernel shape
-		ker = FactoryKernel.random(ker.getClass(), 4, 2, 0, maxKernelValue, rand);
+		ker = FactoryKernel.random(ker.getClass(), 4, 2, 1, maxKernelValue, rand);
 		checkHorizontal(ker, img, dest);
 	}
 
