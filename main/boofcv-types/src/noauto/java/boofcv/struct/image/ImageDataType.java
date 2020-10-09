@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -216,8 +216,8 @@ public enum ImageDataType {
 			};
 		} else {
 			return switch (numBits) {
-				case 32 -> Float.MIN_VALUE;
-				case 64 -> Double.MIN_VALUE;
+				case 32 -> -Float.MAX_VALUE;
+				case 64 -> -Double.MAX_VALUE;
 				default -> throw new RuntimeException("Unexpected number of bits for float type: " + numBits);
 			};
 		}
