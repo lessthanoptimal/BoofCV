@@ -42,65 +42,65 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 
-	public void createDocument( String args ) throws IOException, InterruptedException {
+	public void createDocument( String args ) {
 		CreateCalibrationTarget.main(args.split("\\s+"));
 		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
+		err.reset();
 	}
 
 	@Test
-	public void chessboard() throws IOException, InterruptedException {
+	public void chessboard() throws IOException {
 		createDocument("-r 7 -c 5 -o target -t CHESSBOARD -u cm -w 3 -p LETTER");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 		CalibrationDetectorChessboardX detector =
-				FactoryFiducialCalibration.chessboardX(null,new ConfigGridDimen(7,5,3));
+				FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 3));
 
 		assertTrue(detector.process(gray));
 	}
 
 	@Test
-	public void square_grid() throws IOException, InterruptedException {
+	public void square_grid() throws IOException {
 		createDocument("-r 4 -c 3 -o target -t SQUARE_GRID -u cm -w 3 -s 3 -p LETTER\n");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 		CalibrationDetectorSquareGrid detector =
-				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4,3,3,3));
+				FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 3, 3));
 
 		assertTrue(detector.process(gray));
 	}
 
 	@Test
-	public void circle_hexagonal() throws IOException, InterruptedException {
+	public void circle_hexagonal() throws IOException {
 		createDocument("-r 8 -c 7 -o target -t CIRCLE_HEXAGONAL -u cm -w 2 -d 3 -p LETTER");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 		CalibrationDetectorCircleHexagonalGrid detector =
-				FactoryFiducialCalibration.circleHexagonalGrid(null,new ConfigGridDimen(8,7,2,3));
+				FactoryFiducialCalibration.circleHexagonalGrid(null, new ConfigGridDimen(8, 7, 2, 3));
 
 		assertTrue(detector.process(gray));
 	}
 
 	@Test
-	public void circle_regular() throws IOException, InterruptedException {
+	public void circle_regular() throws IOException {
 		createDocument("-r 8 -c 6 -o target -t CIRCLE_GRID -u cm -w 2 -d 3 -p LETTER");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 		DetectorFiducialCalibration detector =
-				FactoryFiducialCalibration.circleRegularGrid(null,new ConfigGridDimen(8,6,2,3));
+				FactoryFiducialCalibration.circleRegularGrid(null, new ConfigGridDimen(8, 6, 2, 3));
 
 		assertTrue(detector.process(gray));
 	}
-
 }

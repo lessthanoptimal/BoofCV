@@ -43,29 +43,30 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 		document_name = "uchiya";
 	}
 
-	public void createDocument(String args ) throws IOException, InterruptedException {
+	public void createDocument( String args ) {
 		CreateFiducialRandomDot.main(args.split("\\s+"));
 		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
+		err.reset();
 	}
 
 	@Test
-	public void case0() throws IOException, InterruptedException {
+	public void case0() throws IOException {
 		int N = 4;
 		createDocument("--MarkerBorder -w 8 -um 4 -n 30 -o uchiya.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayU8 gray = new GrayU8(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayU8 gray = new GrayU8(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 		ConfigUchiyaMarker config = new ConfigUchiyaMarker();
 		config.markerWidth = 8.0;
 		config.markerHeight = 8.0;
-		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config,GrayU8.class);
+		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config, GrayU8.class);
 
 		Random rand = new Random(defaults.randomSeed);
 		for (int i = 0; i < N; i++) {
 			detector.addMarker(RandomDotMarkerGenerator.createRandomMarker(
-					rand,30,config.markerWidth,config.markerHeight,defaults.dotDiameter));
+					rand, 30, config.markerWidth, config.markerHeight, defaults.dotDiameter));
 		}
 
 		detector.detect(gray);
@@ -74,25 +75,25 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	public void case1() throws IOException, InterruptedException {
+	public void case1() throws IOException {
 		int N = 8;
 		createDocument("-rs 4445 -w 5 -um 8 -n 22 -dd 0.6 -o uchiya.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayU8 gray = new GrayU8(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayU8 gray = new GrayU8(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 //		ShowImages.showBlocking(gray, "Foo", 5_000);
 
 		ConfigUchiyaMarker config = new ConfigUchiyaMarker();
 		config.markerWidth = 5.0;
 		config.markerHeight = 5.0;
-		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config,GrayU8.class);
+		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config, GrayU8.class);
 
 		Random rand = new Random(4445);
 		for (int i = 0; i < N; i++) {
 			detector.addMarker(RandomDotMarkerGenerator.createRandomMarker(
-					rand,22,config.markerHeight,config.markerHeight ,0.6));
+					rand, 22, config.markerWidth, config.markerHeight, 0.6));
 		}
 
 		detector.detect(gray);
@@ -101,23 +102,23 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 	}
 
 	@Test
-	void rectangleMarker() throws IOException, InterruptedException {
+	void rectangleMarker() throws IOException {
 		int N = 4;
 		createDocument("--MarkerBorder -w 5 -h 10 -um 4 -n 30 -o uchiya.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayU8 gray = new GrayU8(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayU8 gray = new GrayU8(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 		ConfigUchiyaMarker config = new ConfigUchiyaMarker();
 		config.markerWidth = 5.0;
 		config.markerHeight = 10.0;
-		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config,GrayU8.class);
+		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config, GrayU8.class);
 
 		Random rand = new Random(defaults.randomSeed);
 		for (int i = 0; i < N; i++) {
 			detector.addMarker(RandomDotMarkerGenerator.createRandomMarker(
-					rand,30,config.markerWidth,config.markerHeight,defaults.dotDiameter));
+					rand, 30, config.markerWidth, config.markerHeight, defaults.dotDiameter));
 		}
 
 		detector.detect(gray);
@@ -125,15 +126,14 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 		checkResults(N, detector);
 	}
 
-	private void checkResults(int n, Uchiya_to_FiducialDetector<GrayU8> detector) {
-		assertEquals(n,detector.totalFound());
+	private void checkResults( int n, Uchiya_to_FiducialDetector<GrayU8> detector ) {
+		assertEquals(n, detector.totalFound());
 		int[] count = new int[n];
 		for (int i = 0; i < n; i++) {
-			count[ (int)detector.getId(i) ]++;
+			count[(int)detector.getId(i)]++;
 		}
 		for (int i = 0; i < n; i++) {
-			assertEquals(1,count[i]);
+			assertEquals(1, count[i]);
 		}
 	}
-
 }

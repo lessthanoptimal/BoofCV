@@ -40,94 +40,94 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 
-	public void createDocument( String args ) throws IOException, InterruptedException {
+	public void createDocument( String args ) {
 		CreateQrCodeDocument.main(args.split("\\s+"));
 		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
+		err.reset();
 	}
 
 	@Test
-	public void single() throws IOException, InterruptedException {
+	public void single() throws IOException {
 		createDocument("-t http://boofcv.org -p LETTER -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 //		ShowImages.showWindow(image,"Rendered", true);
 //		BoofMiscOps.sleep(10000);
 //		UtilImageIO.saveImage(image,"test.png");
 
-		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null,GrayF32.class);
+		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null, GrayF32.class);
 
 		detector.process(gray);
 		List<QrCode> found = detector.getDetections();
 
-		checkFound(found,"http://boofcv.org");
+		checkFound(found, "http://boofcv.org");
 	}
 
 	@Test
-	public void two() throws IOException, InterruptedException {
+	public void two() throws IOException {
 		createDocument("-t http://boofcv.org -t second -p LETTER -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 //		ShowImages.showWindow(image,"Rendered", true);
 //		BoofMiscOps.sleep(10000);
 
-		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null,GrayF32.class);
+		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null, GrayF32.class);
 
 		detector.process(gray);
 		List<QrCode> found = detector.getDetections();
 
-		assertEquals(2,found.size());
+		assertEquals(2, found.size());
 
-		checkFound(found,"http://boofcv.org", "second");
-
+		checkFound(found, "http://boofcv.org", "second");
 	}
 
 	@Test
-	public void gridAndCustomDocument() throws IOException, InterruptedException {
+	public void gridAndCustomDocument() throws IOException {
 		createDocument("-t http://boofcv.org -t second -p 14cm:14cm --GridFill -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFrom(image,gray);
+		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		ConvertBufferedImage.convertFrom(image, gray);
 
 //		ShowImages.showWindow(image,"Rendered", true);
 //		BoofMiscOps.sleep(10000);
 
-		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null,GrayF32.class);
+		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null, GrayF32.class);
 
 		detector.process(gray);
 		List<QrCode> found = detector.getDetections();
 
-		assertEquals(4,found.size());
+		assertEquals(4, found.size());
 
-		checkFound(found,"http://boofcv.org", "second");
+		checkFound(found, "http://boofcv.org", "second");
 	}
 
-	private void checkFound( List<QrCode> found , String ...messages ) {
-		boolean matches[] = new boolean[messages.length];
+	private void checkFound( List<QrCode> found, String... messages ) {
+		boolean[] matches = new boolean[messages.length];
 		int total = 0;
 
 		for (int i = 0; i < found.size(); i++) {
 			int which = -1;
 			for (int j = 0; j < messages.length; j++) {
-				if( messages[j].equals(found.get(i).message.toString())) {
+				if (messages[j].equals(found.get(i).message)) {
 					which = j;
 				}
 			}
 
-			if( which >= 0 ) {
-				if( !matches[which]) {
+			if (which >= 0) {
+				if (!matches[which]) {
 					total++;
 				}
 				matches[which] = true;
 			}
 		}
 
-		assertEquals(messages.length,total);
+		assertEquals(messages.length, total);
 	}
 }

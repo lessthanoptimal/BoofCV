@@ -36,9 +36,10 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 
 	private final ConfigThreshold configThreshold = ConfigThreshold.fixed(125);
 
-	public void createDocument( String args ) throws IOException, InterruptedException {
+	public void createDocument( String args ) throws InterruptedException {
 		CreateFiducialSquareBinary.main(args.split("\\s+"));
 		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
+		err.reset();
 	}
 
 	@Test
@@ -46,33 +47,33 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 		// don't need to specif spacing
 		int expected = 234;
 		createDocument(String.format("--PaperSize letter --OutputFile %s -w 3 -n %d",
-				document_name+".pdf",expected));
+				document_name + ".pdf", expected));
 		GrayF32 gray = loadPdfAsGray();
 
 		ConfigFiducialBinary config = new ConfigFiducialBinary(30);
-		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config,configThreshold,GrayF32.class);
+		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config, configThreshold, GrayF32.class);
 
 		detector.detect(gray);
 
-		assertEquals(1,detector.totalFound());
-		assertEquals(expected,detector.getId(0));
+		assertEquals(1, detector.totalFound());
+		assertEquals(expected, detector.getId(0));
 	}
 
 	@Test
 	public void grid() throws IOException, InterruptedException {
-		int[] expected = new int []{234,123};
+		int[] expected = new int[]{234, 123};
 		createDocument(String.format("--GridFill --DrawGrid --PaperSize letter --OutputFile %s -w 5 -s 2 -n %d -n %d",
-				document_name+".pdf",expected[0],expected[1]));
+				document_name + ".pdf", expected[0], expected[1]));
 		GrayF32 gray = loadPdfAsGray();
 
 		ConfigFiducialBinary config = new ConfigFiducialBinary(30);
-		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config,configThreshold,GrayF32.class);
+		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config, configThreshold, GrayF32.class);
 
 		detector.detect(gray);
 
-		assertEquals(9,detector.totalFound());
+		assertEquals(9, detector.totalFound());
 		for (int i = 0; i < detector.totalFound(); i++) {
-			assertEquals(expected[i%2],detector.getId(i));
+			assertEquals(expected[i%2], detector.getId(i));
 		}
 	}
 
@@ -81,23 +82,23 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	 */
 	@Test
 	public void customized_pdf() throws IOException, InterruptedException {
-		int[] expected = new int []{234,23233};
+		int[] expected = new int[]{234, 23233};
 		double border = 0.1;
 		int gridWidth = 5;
 		createDocument(String.format("-bw %.1f --PatternGridWidth %d --GridFill --PaperSize letter --OutputFile %s -w 5 -s 2 -n %d -n %d",
-				border,gridWidth,document_name+".pdf",expected[0],expected[1]));
+				border, gridWidth, document_name + ".pdf", expected[0], expected[1]));
 		GrayF32 gray = loadPdfAsGray();
 
 		ConfigFiducialBinary config = new ConfigFiducialBinary(30);
 		config.borderWidthFraction = border;
 		config.gridWidth = gridWidth;
-		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config,configThreshold,GrayF32.class);
+		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config, configThreshold, GrayF32.class);
 
 		detector.detect(gray);
 
-		assertEquals(9,detector.totalFound());
+		assertEquals(9, detector.totalFound());
 		for (int i = 0; i < detector.totalFound(); i++) {
-			assertEquals(expected[i%2],detector.getId(i));
+			assertEquals(expected[i%2], detector.getId(i));
 		}
 	}
 
@@ -105,20 +106,19 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 	 * Create two images
 	 */
 	@Test
-	public void create_png() throws IOException, InterruptedException {
-		int[] expected = new int []{0,234,678};
+	public void create_png() throws InterruptedException {
+		int[] expected = new int[]{0, 234, 678};
 		createDocument(String.format("--OutputFile %s -w 200 -s 20 -n %d -n %d -n %d",
-				document_name+".png",expected[0],expected[1],expected[2]));
+				document_name + ".png", expected[0], expected[1], expected[2]));
 		for (int i = 0; i < expected.length; i++) {
-			GrayF32 gray = loadPngAsGray(document_name+expected[i]+".png");
+			GrayF32 gray = loadPngAsGray(document_name + expected[i] + ".png");
 
 			ConfigFiducialBinary config = new ConfigFiducialBinary(30);
-			FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config,configThreshold,GrayF32.class);
+			FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(config, configThreshold, GrayF32.class);
 
 			detector.detect(gray);
-			assertEquals(1,detector.totalFound());
-			assertEquals(expected[i],detector.getId(0));
+			assertEquals(1, detector.totalFound());
+			assertEquals(expected[i], detector.getId(0));
 		}
 	}
-
 }
