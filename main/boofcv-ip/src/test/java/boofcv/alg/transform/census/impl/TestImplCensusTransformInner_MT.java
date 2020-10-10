@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,14 +29,12 @@ import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static boofcv.alg.transform.census.impl.TestImplCensusTransformInner.createSamples;
 import static boofcv.alg.transform.census.impl.TestImplCensusTransformInner.samplesToIndexes;
 
 class TestImplCensusTransformInner_MT extends CompareIdenticalFunctions {
 	int width = 70,height=80;
-	Random rand = new Random(234);
 
 	TestImplCensusTransformInner_MT() {
 		super(ImplCensusTransformInner_MT.class, ImplCensusTransformInner.class);

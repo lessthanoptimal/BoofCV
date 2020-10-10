@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -48,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericPlanarCalibrationDetectorChecks {
+public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandardJUnit {
 
 	List<ConfigGridDimen> targetConfigs = new ArrayList<>();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,13 @@ package boofcv.alg.disparity.block;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestBlockRowScoreNcc {
+public class TestBlockRowScoreNcc extends BoofStandardJUnit {
 
 	@Nested
 	class F32 extends ChecksBlockRowScore<GrayF32, float[], float[]> {

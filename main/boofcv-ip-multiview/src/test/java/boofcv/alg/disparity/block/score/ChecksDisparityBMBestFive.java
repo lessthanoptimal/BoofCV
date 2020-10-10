@@ -35,20 +35,18 @@ import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI extends ImageGray<DI>> {
+public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI extends ImageGray<DI>> extends BoofStandardJUnit {
 
 	float eps = UtilEjml.F_EPS;
-	Random rand = new Random(234);
 
 	BlockRowScore scoreRow;
 	DisparitySelect compDisp;

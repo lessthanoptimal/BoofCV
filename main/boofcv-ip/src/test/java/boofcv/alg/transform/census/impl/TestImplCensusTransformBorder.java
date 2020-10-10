@@ -27,6 +27,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ import static boofcv.alg.transform.census.impl.TestImplCensusTransformInner.crea
  * @author Peter Abeles
  */
 @SuppressWarnings("rawtypes")
-class TestImplCensusTransformBorder {
+class TestImplCensusTransformBorder extends BoofStandardJUnit {
 	int w = 20, h = 30;
 
 	@Test

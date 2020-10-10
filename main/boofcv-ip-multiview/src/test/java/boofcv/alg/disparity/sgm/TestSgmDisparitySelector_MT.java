@@ -23,15 +23,13 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-class TestSgmDisparitySelector_MT {
-	Random rand = new Random(2345);
+class TestSgmDisparitySelector_MT extends BoofStandardJUnit {
 	int width = 60;
 	int height = 50;
 	int rangeD = 30;

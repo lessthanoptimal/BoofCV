@@ -26,6 +26,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -35,7 +36,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class ChecksDisparityBlockMatchNaive<T extends ImageBase<T>> {
+public abstract class ChecksDisparityBlockMatchNaive<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	protected static BorderType BORDER_TYPE = BorderType.EXTENDED;
 

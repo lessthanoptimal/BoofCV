@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv;
 
 import boofcv.generate.CodeGeneratorBase;
 import boofcv.io.UtilIO;
+import boofcv.testing.BoofStandardJUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -45,7 +46,75 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("StringConcatenationInLoop")
 public class TestEnforceCodeStandards {
 	// Skip over these directories since they don't contain library code
-	String[] blacklistConfig = new String[]{"autocode","boofcv-core","checks"};
+	String[] blacklistConfig = new String[]{"autocode", "boofcv-core", "checks"};
+
+	/**
+	 * Makes sure all unit tests extend BoofStandardJUnit
+	 */
+	@Test
+	void unitTestsMustExtendBoofStandardJUnit() {
+		String pathToMain = UtilIO.path("main");
+
+		File[] moduleDirectories = new File(pathToMain).listFiles();
+		assertNotNull(moduleDirectories);
+
+		for (File module : moduleDirectories) {
+//			System.out.println("module "+module.getPath());
+			File dirTest = new File(module, "src/test");
+
+			if (!dirTest.exists())
+				continue;
+
+			boolean inBlackList = Arrays.asList(blacklistConfig).contains(module.getName());
+			if (inBlackList)
+				continue;
+
+			Collection<File> files = FileUtils.listFiles(dirTest,
+					new RegexFileFilter("Test[A-Z]\\S*.java"),
+					DirectoryFileFilter.DIRECTORY);
+
+			boolean failed = false;
+			for (File classFile : files) {
+				Path f = new File(dirTest, "java").toPath().relativize(classFile.toPath());
+				String classPath = f.toString().replace(File.separatorChar, '.').replace(".java", "");
+
+				// This will be moved to a different project eventually. Update this line in the future
+				if (classPath.startsWith("boofcv.concurrency"))
+					continue;
+
+				// Load the class
+				Class<?> c;
+				try {
+					c = Class.forName(classPath);
+				} catch (NoClassDefFoundError e) {
+					System.err.println("loading " + classPath);
+					e.printStackTrace(System.err);
+					fail(e.getMessage());
+					return;
+				} catch (ClassNotFoundException e) {
+					System.err.println("Not Found: " + classPath);
+					failed = true;
+					continue;
+				}
+
+				// See if it extends BoofStandardJUnit
+				boolean found = false;
+				while (c != null) {
+					c = c.getSuperclass();
+					if (c == BoofStandardJUnit.class) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					System.err.println("Does not extend: " + classPath);
+					failed = true;
+				}
+			}
+
+			assertFalse(failed, "All tests must extend BoofStandardJUnit. See stderr.");
+		}
+	}
 
 	@Test
 	void configsAllHaveValidUnitTests() throws IOException {
@@ -57,23 +126,23 @@ public class TestEnforceCodeStandards {
 		File[] moduleDirectories = new File(pathToMain).listFiles();
 		assertNotNull(moduleDirectories);
 
-		for( File module : moduleDirectories ) {
-			File dirSrc = new File(module,"src/main");
+		for (File module : moduleDirectories) {
+			File dirSrc = new File(module, "src/main");
 
-			if( !dirSrc.exists())
+			if (!dirSrc.exists())
 				continue;
 
 			boolean inBlackList = Arrays.asList(blacklistConfig).contains(module.getName());
-			if( inBlackList )
+			if (inBlackList)
 				continue;
 
-			File dirTest = new File(module,"src/test");
+			File dirTest = new File(module, "src/test");
 
 			Collection<File> files = FileUtils.listFiles(dirSrc,
 					new RegexFileFilter("Config[A-Z]\\S*.java"),
 					DirectoryFileFilter.DIRECTORY);
 
-			for( File classFile : files ) {
+			for (File classFile : files) {
 
 				String text = UtilIO.readAsString(new FileInputStream(classFile));
 				assertNotNull(text);
@@ -81,13 +150,13 @@ public class TestEnforceCodeStandards {
 				// There is a weird situation that I decided to keep. A Config* was only an interface
 				// but you don't want to skip over situations where they forgot to implement Configuration or
 				// it extends a class and you can't see directly that it was an instance of Configuration
-				if( text.contains("extends Configuration") && !text.contains("implements Configuration"))
+				if (text.contains("extends Configuration") && !text.contains("implements Configuration"))
 					continue;
 
 				Path f = dirSrc.toPath().relativize(classFile.toPath());
 				File testFile = dirTest.toPath().resolve(f).toFile();
-				testFile = new File(testFile.getParentFile(),"Test"+testFile.getName());
-				if( !testFile.isFile() ) {
+				testFile = new File(testFile.getParentFile(), "Test" + testFile.getName());
+				if (!testFile.isFile()) {
 					missing.add(testFile);
 					continue;
 				}
@@ -95,64 +164,64 @@ public class TestEnforceCodeStandards {
 				text = UtilIO.readAsString(new FileInputStream(testFile));
 				assertNotNull(text);
 
-				if( !text.contains("extends StandardConfigurationChecks"))
+				if (!text.contains("extends StandardConfigurationChecks"))
 					invalid.add(testFile);
 			}
 		}
 
 		// Print out the problems to make it easier to fix
-		for( File f : missing ) {
-			System.out.println("Missing "+f.getPath());
+		for (File f : missing) {
+			System.out.println("Missing " + f.getPath());
 			// commented out since a unit test really shouldn't auto generate code and commit it to git. Plus
 			// the commit part won't work on all architectures
 //			generateDefaultConfigTest(f);
 		}
-		for( File f : invalid ) {
-			System.out.println("Invalid "+f.getPath());
+		for (File f : invalid) {
+			System.out.println("Invalid " + f.getPath());
 		}
 
-		assertEquals(0,missing.size());
-		assertEquals(0,invalid.size());
+		assertEquals(0, missing.size());
+		assertEquals(0, invalid.size());
 	}
 
 	private void generateDefaultConfigTest( File file ) throws IOException {
 		String[] dirs = file.getAbsolutePath().split(Pattern.quote(File.separator));
 
-		int start = dirs.length-1;
-		while( start >= 0 && !dirs[start].equals("java")) {
+		int start = dirs.length - 1;
+		while (start >= 0 && !dirs[start].equals("java")) {
 			start--;
 		}
-		if( start < 0 )
+		if (start < 0)
 			fail("Couldn't find src");
 
-		String path = dirs[start+1];
-		for (int i = start+2; i < dirs.length - 1; i++) {
-			path += "."+dirs[i];
+		String path = dirs[start + 1];
+		for (int i = start + 2; i < dirs.length - 1; i++) {
+			path += "." + dirs[i];
 		}
 
 		String className = FilenameUtils.getBaseName(file.getName());
 
-		if( !file.getParentFile().exists() )
+		if (!file.getParentFile().exists())
 			assertTrue(file.getParentFile().mkdirs());
-		assertTrue( file.createNewFile());
-		var out = new PrintStream(new FileOutputStream(file, false),true,"UTF-8");
+		assertTrue(file.createNewFile());
+		var out = new PrintStream(new FileOutputStream(file, false), true, "UTF-8");
 		out.println(CodeGeneratorBase.copyright);
 		out.println();
-		out.println("package "+path+";");
+		out.println("package " + path + ";");
 		out.println();
 		out.println("import boofcv.struct.StandardConfigurationChecks;");
 		out.println();
-		out.println("public class "+className+" extends StandardConfigurationChecks {}");
+		out.println("public class " + className + " extends StandardConfigurationChecks {}");
 		out.println();
 		out.close();
 
 		Runtime rt = Runtime.getRuntime();
 		try {
 			Process pr = rt.exec("git add " + file.getAbsolutePath());
-			if ( !pr.waitFor(10000, TimeUnit.MILLISECONDS)) {
+			if (!pr.waitFor(10000, TimeUnit.MILLISECONDS)) {
 				fail("Couldn't add new file to git");
 			}
-		} catch( Exception e ) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}

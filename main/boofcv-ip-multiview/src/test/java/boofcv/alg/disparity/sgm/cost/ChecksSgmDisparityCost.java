@@ -25,6 +25,7 @@ import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> {
+abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	Random rand = new Random(2345);
 	ImageType<T> imageType;

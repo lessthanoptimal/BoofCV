@@ -18,25 +18,21 @@
 
 package boofcv.alg.disparity.block.score;
 
-import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestDisparitySparseRectifiedScoreBM {
-
-	Random rand = BoofTesting.createRandom(0);
+class TestDisparitySparseRectifiedScoreBM extends BoofStandardJUnit {
 
 	int width = 40;
 	int height = 30;

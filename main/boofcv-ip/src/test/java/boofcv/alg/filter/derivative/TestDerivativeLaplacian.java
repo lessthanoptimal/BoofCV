@@ -28,19 +28,16 @@ import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestDerivativeLaplacian {
-
-	Random rand = new Random(0xfeed);
+public class TestDerivativeLaplacian extends BoofStandardJUnit {
 
 	private final int width = 4;
 	private final int height = 5;

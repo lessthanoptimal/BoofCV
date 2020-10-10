@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,12 +25,13 @@ import boofcv.factory.disparity.DisparityError;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-class TestStereoDisparityWtoNaiveFive {
+class TestStereoDisparityWtoNaiveFive extends BoofStandardJUnit {
 	@Nested
 	class BasicTests extends BasicDisparityTests<GrayU8, GrayF32> {
 		DisparityBlockMatchBestFiveNaive<GrayU8> alg;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.disparity.block.score;
 
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestDisparitySparseRectifiedScoreBM_S32 {
+class TestDisparitySparseRectifiedScoreBM_S32 extends BoofStandardJUnit {
 	@Test
 	void array() {
 		var alg = new DisparitySparseRectifiedScoreBM_S32<>(2, 3, GrayU8.class) {

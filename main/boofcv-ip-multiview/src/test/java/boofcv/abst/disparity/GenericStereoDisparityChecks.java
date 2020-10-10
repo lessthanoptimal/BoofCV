@@ -24,9 +24,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>> {
-	Random rand = new Random(234);
-
+public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>>
+		extends BoofStandardJUnit
+{
 	int width = 80;
 	int height = 60;
 

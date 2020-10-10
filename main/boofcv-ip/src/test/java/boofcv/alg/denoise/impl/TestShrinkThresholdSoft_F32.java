@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,13 +20,14 @@ package boofcv.alg.denoise.impl;
 
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestShrinkThresholdSoft_F32 {
+public class TestShrinkThresholdSoft_F32 extends BoofStandardJUnit {
 	int width = 10;
 	int height = 20;
 

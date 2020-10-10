@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.disparity.block.SelectSparseStandardWta;
 import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.alg.disparity.block.select.ChecksSelectDisparity.copyToCorrectType;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> {
+public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends BoofStandardJUnit {
 
 	Class<ArrayData> arrayType;
 

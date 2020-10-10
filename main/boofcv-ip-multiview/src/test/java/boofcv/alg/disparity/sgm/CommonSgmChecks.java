@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 
-import java.util.Random;
-
-public class CommonSgmChecks<T extends ImageGray<T>> {
-	protected Random rand = new Random(234);
+public class CommonSgmChecks<T extends ImageGray<T>> extends BoofStandardJUnit {
 	protected int width, height;
 
 	ImageType<T> imageType;

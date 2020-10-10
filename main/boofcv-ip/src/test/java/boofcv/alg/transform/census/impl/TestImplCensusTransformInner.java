@@ -23,6 +23,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.census.CensusNaive;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -30,15 +31,13 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 @SuppressWarnings("rawtypes")
-public class TestImplCensusTransformInner {
+public class TestImplCensusTransformInner extends BoofStandardJUnit {
 	final private int w = 25, h = 40;
-	Random rand = new Random(234);
 
 	@Test
 	void checkAll() {

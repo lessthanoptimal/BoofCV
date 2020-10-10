@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,10 @@
 package boofcv.factory.disparity;
 
 import boofcv.struct.StandardConfigurationChecks;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
-public class TestConfigDisparityError {
+public class TestConfigDisparityError extends BoofStandardJUnit {
 	@Nested
 	public class Census extends StandardConfigurationChecks {
 		public Census() {super(ConfigDisparityError.Census.class);}

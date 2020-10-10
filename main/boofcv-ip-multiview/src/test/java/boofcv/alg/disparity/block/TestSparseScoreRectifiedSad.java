@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,11 @@
 
 package boofcv.alg.disparity.block;
 
+import boofcv.testing.BoofStandardJUnit;
+
 /**
  * @author Peter Abeles
  */
-class TestSparseScoreRectifiedSad {
+class TestSparseScoreRectifiedSad extends BoofStandardJUnit {
 	// See TestWrapDisparitySparseRectifiedBM
 }

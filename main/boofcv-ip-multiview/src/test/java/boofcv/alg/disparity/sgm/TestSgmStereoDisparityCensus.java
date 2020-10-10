@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 import static boofcv.factory.transform.census.CensusVariants.BLOCK_3_3;
@@ -32,7 +33,7 @@ import static boofcv.factory.transform.census.CensusVariants.BLOCK_5_5;
 /**
  * @author Peter Abeles
  */
-class TestSgmStereoDisparityCensus {
+class TestSgmStereoDisparityCensus extends BoofStandardJUnit {
 	@Nested
 	public class U8_U8 extends GenericSgmStereoDisparityChecks<GrayU8, GrayU8> {
 		protected U8_U8() {

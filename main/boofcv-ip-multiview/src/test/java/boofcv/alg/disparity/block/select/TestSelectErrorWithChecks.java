@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,13 @@
 package boofcv.alg.disparity.block.select;
 
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestSelectErrorWithChecks {
+public class TestSelectErrorWithChecks extends BoofStandardJUnit {
 
 	@Nested
 	public class F32_U8 extends ChecksSelectDisparityWithChecksWtaError<float[], GrayU8> {

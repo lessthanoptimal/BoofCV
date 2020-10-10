@@ -27,17 +27,15 @@ import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestDerivativeIntegralImage {
+public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	int width = 30;
 	int height = 40;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,13 @@ import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestDisparityScoreBM_F32 {
+public class TestDisparityScoreBM_F32 extends BoofStandardJUnit {
 
 	@Nested
 	public class SAD extends ChecksDisparityBM<GrayF32, GrayU8> {

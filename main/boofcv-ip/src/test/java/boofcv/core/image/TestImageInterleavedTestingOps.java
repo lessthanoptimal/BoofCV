@@ -22,9 +22,8 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageInterleavedTestingOps;
 import boofcv.struct.image.InterleavedI8;
 import boofcv.struct.image.InterleavedU8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,9 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImageInterleavedTestingOps {
-
-	Random rand = new Random(234234);
+public class TestImageInterleavedTestingOps extends BoofStandardJUnit {
 
 	@Test
 	public void fill() {

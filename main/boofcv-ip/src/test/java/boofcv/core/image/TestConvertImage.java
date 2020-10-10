@@ -21,11 +21,11 @@ package boofcv.core.image;
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,9 +33,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"Duplicates", "rawtypes", "unchecked"})
-public class TestConvertImage {
+public class TestConvertImage extends BoofStandardJUnit {
 
-	Random rand = new Random(34);
 	int imgWidth = 10;
 	int imgHeight = 20;
 

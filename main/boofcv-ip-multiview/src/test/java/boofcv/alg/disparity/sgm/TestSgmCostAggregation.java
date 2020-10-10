@@ -27,6 +27,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings("SuspiciousNameCombination")
-class TestSgmCostAggregation {
+class TestSgmCostAggregation  extends BoofStandardJUnit {
 
 	Random rand = new Random(234);
 	int width = 40, height = 30, rangeD = 5;
