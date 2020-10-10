@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,33 +40,33 @@ public class GPixelMath {
 	public static <T extends ImageBase<T>> void lambda1( T input, Function1 function, T output )
 	{
 		if( input instanceof ImageGray) {
-			if (GrayI8.class == input.getClass()) {
+			if (GrayI8.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((GrayI8) input, (Function1_I8)function, (GrayI8) output);
-			} else if (GrayI16.class == input.getClass()) {
+			} else if (GrayI16.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((GrayI16) input, (Function1_I16)function, (GrayI16) output);
-			} else if (GrayS32.class == input.getClass()) {
+			} else if (GrayS32.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((GrayS32) input, (Function1_S32)function, (GrayS32) output);
-			} else if (GrayS64.class == input.getClass()) {
+			} else if (GrayS64.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((GrayS64) input, (Function1_S64)function, (GrayS64) output);
-			} else if (GrayF32.class == input.getClass()) {
+			} else if (GrayF32.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((GrayF32) input, (Function1_F32)function, (GrayF32) output);
-			} else if (GrayF64.class == input.getClass()) {
+			} else if (GrayF64.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((GrayF64) input, (Function1_F64)function, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 			}
 		} else if( input instanceof ImageInterleaved ) {
-			if (InterleavedI8.class == input.getClass()) {
+			if (InterleavedI8.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((InterleavedI8) input, (Function1_I8)function, (InterleavedI8) output);
-			} else if (InterleavedI16.class == input.getClass()) {
+			} else if (InterleavedI16.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((InterleavedI16) input, (Function1_I16)function, (InterleavedI16) output);
-			} else if (InterleavedS32.class == input.getClass()) {
+			} else if (InterleavedS32.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((InterleavedS32) input, (Function1_S32)function, (InterleavedS32) output);
-			} else if (InterleavedS64.class == input.getClass()) {
+			} else if (InterleavedS64.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((InterleavedS64) input, (Function1_S64)function, (InterleavedS64) output);
-			} else if (InterleavedF32.class == input.getClass()) {
+			} else if (InterleavedF32.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((InterleavedF32) input, (Function1_F32)function, (InterleavedF32) output);
-			} else if (InterleavedF64.class == input.getClass()) {
+			} else if (InterleavedF64.class.isAssignableFrom(input.getClass())) {
 				PixelMath.lambda1((InterleavedF64) input, (Function1_F64)function, (InterleavedF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
