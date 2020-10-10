@@ -25,6 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -34,10 +35,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings("WeakerAccess")
+@Disabled // TODO enable again, but might require a rewrite. Was commented out under develop and never written again
 class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 	final double sideLength = 40; // pixel distance between corners
 	double offsetX;
@@ -68,6 +67,7 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 	void perfect( int rows , int cols ) {
 		List<ChessboardCorner> input = createCorners(rows,cols);
 		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
+		alg.setThresholdEdgeIntensity(0.0); // turn off this check
 		alg.setMaxNeighbors(10); // this is perfect, 8 should be enough
 		// reduced the number so that having an non-exhaustive search is stressed more
 		alg.process(image,input, 1);

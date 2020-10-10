@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,16 +23,24 @@ import boofcv.alg.feature.detect.chess.ChessboardCornerDistance;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
+import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * From a set of {@link ChessboardCorner ChessboardCorners} find all the chessboard grids in view. Assumptions
@@ -73,37 +81,37 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"WeakerAccess", "ForLoopReplaceableByForEach"})
-public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
+public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements VerbosePrint {
 
-	// Tolerance for deciding if two directions are the same. 0 to 1. Higher is more tolerant
-	private double directionTol = 0.8;
-	// Tolerance for deciding of two corner orientations are the same. Radians
-	private double orientationTol = 0.50;
-	// Tolerance for how close two corners need to be to be considered ambiguous. Relative
-	private double ambiguousTol = 0.25;
+	/** Tolerance for deciding if two directions are the same. 0 to 1. Higher is more tolerant */
+	private @Getter @Setter double directionTol = 0.8;
+	/** Tolerance for deciding of two corner orientations are the same. Radians */
+	private @Getter @Setter double orientationTol = 0.50;
+	/** Tolerance for how close two corners need to be to be considered ambiguous. Relative */
+	private @Getter @Setter double ambiguousTol = 0.25;
 
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
-	private int maxNeighbors = 14; // 8 is minimum number given perfect data.
-	private double maxNeighborDistance = Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
+	private @Getter @Setter int maxNeighbors = 14; // 8 is minimum number given perfect data.
+	private @Getter @Setter double maxNeighborDistance = Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
 
-	// Computes the intensity of the line which connects two corners
-	private final ChessboardCornerEdgeIntensity<T> computeConnInten;
-	// Threshold relative to corner intensity used to prune. If <= 0 then this test is disabled
-	private double thresholdEdgeIntensity = 0.05;
+	/** Computes the intensity of the line which connects two corners */
+	private @Getter final ChessboardCornerEdgeIntensity<T> computeConnInten;
+	/** Threshold relative to corner intensity used to prune. If &le; 0 then this test is disabled */
+	private @Getter @Setter double thresholdEdgeIntensity = 0.05;
 
 	// Data structures for the crude graph
-	private final FastQueue<Vertex> vertexes = new FastQueue<>(Vertex::new);
-	private final FastQueue<Edge> edges = new FastQueue<>(Edge::new);
-	private final FastQueue<LineInfo> lines = new FastQueue<>(LineInfo::new);
+	private @Getter final FastQueue<Vertex> vertexes = new FastQueue<>(Vertex::new);
+	private @Getter final FastQueue<Edge> edges = new FastQueue<>(Edge::new);
+	private @Getter final FastQueue<LineInfo> lines = new FastQueue<>(LineInfo::new);
 
 	// data structures for nearest neighbor search
 	private final NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	private final NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
-	private final FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData::new);
+	private final FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue<>(NnData::new);
 
-	// Output. Contains a graph of connected corners
-	private final FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph::new);
+	/** Output. Contains a graph of connected corners */
+	private @Getter final FastQueue<ChessboardCornerGraph> outputClusters = new FastQueue<>(ChessboardCornerGraph::new);
 
 	// predeclared storage for results
 //	private SearchResults results = new SearchResults();
@@ -130,6 +138,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	private final List<Edge> solution = new ArrayList<>();
 	private final FastQueue<PairIdx> pairs = new FastQueue<>(PairIdx.class, PairIdx::new);
 	private final GrowQueue_B matched = new GrowQueue_B();
+
+	PrintStream verbose = null;
 
 	public ChessboardCornerClusterFinder( Class<T> imageType ) {
 		this(new ChessboardCornerEdgeIntensity<>(imageType));
@@ -158,21 +168,25 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		GrowQueue_I32 indexesUpToLevel = new GrowQueue_I32();
 		pyramidalFindNeighbors(corners, numLevels, cornersInLevel, cornersUpToLevel, indexesUpToLevel);
 
-		//		if( indexesUpToLevel.size != corners.size() )
-//			throw new RuntimeException("BUG!");
+		assertBoof(indexesUpToLevel.size == corners.size());
 
-//		printDualGraph();
+		if (verbose!=null) {
+			verbose.println("corners.size="+corners.size()+" vertexes.size="+vertexes.size);
+			printDualGraph();
+		}
 
 		// use edge intensity to prune connections
 		if (thresholdEdgeIntensity > 0) {
 			pruneConnectionsByIntensity(corners);
 		}
-//		printDualGraph();
-
 		pruneSingleConnections();
+
+		if (verbose!=null) printDualGraph();
 
 		// If more than one vertex's are near each other, pick one and remove the others
 		handleAmbiguousVertexes(corners);
+
+		if (verbose!=null) verbose.println("after ambiguous vertexes.size="+vertexes.size);
 
 		// TODO Change pruning of ambiguous vertexes here
 		//      use incoming perpendicular edges to set distance threshold
@@ -183,7 +197,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		for (int idx = 0; idx < vertexes.size(); idx++) {
 			selectConnections(vertexes.get(idx));
 		}
-		//		printConnectionGraph();
+		if (verbose!=null) printDualGraph();
 
 		// Connects must be mutual to be accepted. Keep track of vertexes which were modified
 		dirtyVertexes.clear();
@@ -197,7 +211,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			}
 		}
 
-//		printConnectionGraph();
+		if (verbose!=null) printDualGraph();
+
 		// attempt to recover from poorly made decisions in the past from the greedy algorithm
 		repairVertexes();
 
@@ -255,7 +270,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		vertexes.reset();
 		edges.reset();
 		lines.reset();
-		clusters.reset();
+		outputClusters.reset();
 		computeConnInten.setImage(image);
 		cornersInLevel.clear();
 
@@ -314,18 +329,18 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * Prints the graph. Used for debugging the code.
 	 */
 	public void printDualGraph() {
-		System.out.println("============= Dual");
+		verbose.println("============= Dual");
 		int l = BoofMiscOps.numDigits(vertexes.size);
 		String format = "%" + l + "d";
 
 		for (Vertex n : vertexes.toList()) {
 			ChessboardCorner c = corners.get(n.index);
-			System.out.printf("[" + format + "] {%3.0f, %3.0f} ->  90[ ", n.index, c.x, c.y);
+			verbose.printf("[" + format + "] {%3.0f, %3.0f} ->  90[ ", n.index, c.x, c.y);
 			for (int i = 0; i < n.perpendicular.size(); i++) {
 				Edge e = n.perpendicular.get(i);
-				System.out.printf(format + " ", e.dst.index);
+				verbose.printf(format + " ", e.dst.index);
 			}
-			System.out.println("]");
+			verbose.println("]");
 		}
 	}
 
@@ -814,7 +829,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			Vertex seedN = vertexes.get(seedIdx);
 			if (seedN.marked)
 				continue;
-			ChessboardCornerGraph graph = clusters.grow();
+			ChessboardCornerGraph graph = outputClusters.grow();
 			graph.reset();
 
 			// traverse the graph and add all the nodes in this cluster
@@ -844,7 +859,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			}
 
 			if (graph.corners.size <= 1)
-				clusters.removeTail();
+				outputClusters.removeTail();
 		}
 	}
 
@@ -877,72 +892,9 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		}
 	}
 
-	public FastQueue<ChessboardCornerGraph> getOutputClusters() {
-		return clusters;
-	}
-
-	public double getDirectionTol() {
-		return directionTol;
-	}
-
-	public void setDirectionTol( double directionTol ) {
-		this.directionTol = directionTol;
-	}
-
-	public int getMaxNeighbors() {
-		return maxNeighbors;
-	}
-
-	public void setMaxNeighbors( int maxNeighbors ) {
-		this.maxNeighbors = maxNeighbors;
-	}
-
-	public double getOrientationTol() {
-		return orientationTol;
-	}
-
-	public void setOrientationTol( double orientationTol ) {
-		this.orientationTol = orientationTol;
-	}
-
-	public double getAmbiguousTol() {
-		return ambiguousTol;
-	}
-
-	public void setAmbiguousTol( double ambiguousTol ) {
-		this.ambiguousTol = ambiguousTol;
-	}
-
-	public double getMaxNeighborDistance() {
-		return maxNeighborDistance;
-	}
-
-	public void setMaxNeighborDistance( double maxNeighborDistance ) {
-		this.maxNeighborDistance = maxNeighborDistance;
-	}
-
-	public double getThresholdEdgeIntensity() {
-		return thresholdEdgeIntensity;
-	}
-
-	public void setThresholdEdgeIntensity( double thresholdEdgeIntensity ) {
-		this.thresholdEdgeIntensity = thresholdEdgeIntensity;
-	}
-
-	public ChessboardCornerEdgeIntensity<T> getConnectionIntensity() {
-		return computeConnInten;
-	}
-
-	public FastQueue<Vertex> getVertexes() {
-		return vertexes;
-	}
-
-	public FastQueue<Edge> getEdges() {
-		return edges;
-	}
-
-	public FastQueue<LineInfo> getLines() {
-		return lines;
+	@Override
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = out;
 	}
 
 	public static class SearchResults {
@@ -1005,13 +957,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		}
 
 		public EdgeSet getEdgeSet( EdgeType which ) {
-			switch (which) {
-				case PERPENDICULAR:
-					return perpendicular;
-				case CONNECTION:
-					return connections;
-			}
-			throw new RuntimeException("BUG!");
+			return switch (which) {
+				case PERPENDICULAR -> perpendicular;
+				case CONNECTION -> connections;
+			};
 		}
 	}
 
