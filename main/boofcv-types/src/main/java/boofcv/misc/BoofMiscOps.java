@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,10 +32,7 @@ import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Miscellaneous functions which have no better place to go.
@@ -47,16 +44,16 @@ public class BoofMiscOps {
 
 	public static String timeStr() {
 		return Instant.now()
-				.atOffset( ZoneOffset.UTC )
-				.format( DateTimeFormatter.ISO_LOCAL_DATE_TIME )
-				.replace( "T" , " " );
+				.atOffset(ZoneOffset.UTC)
+				.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+				.replace("T", " ");
 	}
 
 	public static String timeStr( long systemTimeMS ) {
 		return Instant.ofEpochMilli(systemTimeMS)
-				.atOffset( ZoneOffset.UTC )
-				.format( DateTimeFormatter.ISO_LOCAL_DATE_TIME )
-				.replace( "T" , " " );
+				.atOffset(ZoneOffset.UTC)
+				.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+				.replace("T", " ");
 	}
 
 	public static float bound( float value, float min, float max ) {
@@ -615,5 +612,18 @@ public class BoofMiscOps {
 		if (value == null)
 			throw new IllegalArgumentException("Key not found in map. key=" + key);
 		return value;
+	}
+
+	/**
+	 * Checks to see if the list contains duplicate items
+	 */
+	public static <T> boolean containsDuplicates( List<T> list ) {
+		Set<T> set = new HashSet<>();
+		for (int i = 0; i < list.size(); i++) {
+			T o = list.get(i);
+			if (!set.add(o))
+				return true;
+		}
+		return false;
 	}
 }

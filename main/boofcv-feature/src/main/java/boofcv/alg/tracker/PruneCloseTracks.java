@@ -19,10 +19,13 @@
 package boofcv.alg.tracker;
 
 import boofcv.abst.tracker.PointTrack;
+import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.FastQueue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -37,17 +40,19 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked"})
 public class PruneCloseTracks<T> {
 	/** Number of pixels away that two objects can be before they are considered to be in conflict */
-	@Setter @Getter	private int radius;
+	@Setter @Getter private int radius;
 
 	// size of the grid
-	private int gridWidth,gridHeight;
+	private int gridWidth, gridHeight;
 
-	private T[] trackImage = (T[])new Object[0];
-	// indicates if the occupant of a cell has been dropped or not. This is needed to avoid dropping
-	// a track twice. Looking up the track in a list could be an expensive operation
-	private boolean[] dropImage = new boolean[0];
+	// Way to look up all the tracks inside a grid. Each element is null if there are no tracks inside
+	private List<TrackDrop<T>>[] gridToCell = new List[0];
+
+	FastQueue<List<TrackDrop<T>>> storageLists = new FastQueue<>(ArrayList::new, List::clear);
+	FastQueue<TrackDrop<T>> storageDrops = new FastQueue<>(TrackDrop::new, TrackDrop::reset);
 
 	/**
 	 * Used to extract information about a track. Enables this class to work with different formats.
@@ -63,14 +68,14 @@ public class PruneCloseTracks<T> {
 	 *  0 = both are equivalent
 	 * -1 =  'b' is preferred over 'a'
 	 * </pre>
- 	 */
-	@Setter Comparator<T> ambiguityResolver = (a, b) -> Long.compare( trackInfo.getID(b),trackInfo.getID(a));
+	 */
+	@Setter Comparator<T> ambiguityResolver = ( a, b ) -> Long.compare(trackInfo.getID(b), trackInfo.getID(a));
 
 	// workspace variables
-	private Point2D_F64 candidatePt = new Point2D_F64();
-	private Point2D_F64 currentPt = new Point2D_F64();
+	private final Point2D_F64 candidatePt = new Point2D_F64();
+	private final Point2D_F64 currentPt = new Point2D_F64();
 
-	public PruneCloseTracks(int radius, TrackInfo<T> trackInfo ) {
+	public PruneCloseTracks( int radius, TrackInfo<T> trackInfo ) {
 		this.radius = radius;
 		this.trackInfo = trackInfo;
 	}
@@ -78,103 +83,128 @@ public class PruneCloseTracks<T> {
 	/**
 	 * Initializes data structures for the specified input image size
 	 */
-	public void init(int imgWidth , int imgHeight ) {
+	public void init( int imgWidth, int imgHeight ) {
 		// +1 to avoid out of bounds error along image border
-		gridWidth = imgWidth / radius +1;
-		gridHeight = imgHeight / radius +1;
+		gridWidth = imgWidth/radius + 1;
+		gridHeight = imgHeight/radius + 1;
 		final int N = gridWidth*gridHeight;
-		
-		if( trackImage.length < N ) {
-			trackImage = (T[])new Object[ N ];
-			dropImage = new boolean[ N ];
+
+		if (gridToCell.length < N) {
+			gridToCell = (List<TrackDrop<T>>[])new List[N];
 		}
 	}
 
 	/**
 	 * Processes existing tracks and adds tracks to drop list if they are too close to other tracks and
 	 * considered less desirable
+	 *
 	 * @param tracks (Input) List of tracks. Not modified.
 	 * @param dropTracks (Output) List of tracks that need to be dropped by the tracker
 	 */
-	public void process( List<T> tracks , List<T> dropTracks ) {
+	public void process( List<T> tracks, List<T> dropTracks ) {
 
-		dropTracks.clear();
-
-		double tol = radius*radius;
+		// Initialize data structures and reset into their initial state
 		final int w = gridWidth;
 		final int h = gridHeight;
+		dropTracks.clear();
+		storageDrops.reset();
+		storageLists.reset();
+		Arrays.fill(gridToCell, 0, w*h, null);
 
-		Arrays.fill(dropImage,0,w*h, false);
-
-		for( int i = 0; i < tracks.size(); i++ ) {
+		// Go through all the tracks and use the local grid neighborhood to quickly find potential neighbors
+		for (int i = 0; i < tracks.size(); i++) {
 			final T candidate = tracks.get(i);
-			trackInfo.getLocation(candidate,candidatePt);
+			trackInfo.getLocation(candidate, candidatePt);
 			long candidateID = trackInfo.getID(candidate);
 
 			final int cx = (int)(candidatePt.x/radius);
 			final int cy = (int)(candidatePt.y/radius);
 
 			// Find the local neighborhood taking in account the image border
-			int x0 = cx-1;
-			int x1 = cx+2;
-			int y0 = cy-1;
-			int y1 = cy+2;
-			if( x0 < 0 ) x0 = 0;
-			if( x1 > w ) x1 = w;
-			if( y0 < 0 ) y0 = 0;
-			if( y1 > h ) y1 = h;
+			int x0 = cx - 1;
+			int x1 = cx + 2;
+			int y0 = cy - 1;
+			int y1 = cy + 2;
+			if (x0 < 0) x0 = 0;
+			if (x1 > w) x1 = w;
+			if (y0 < 0) y0 = 0;
+			if (y1 > h) y1 = h;
 
-			int centerIndex = cy*w+cx;
+			int centerIndex = cy*w + cx;
 
 			// Search through the local neighborhood for conflicts
 			boolean candidateDropped = false;
 			for (int y = y0; y < y1; y++) {
 				for (int x = x0; x < x1; x++) {
-					int index = y*w+x;
+					int index = y*w + x;
 
-					final T current = trackImage[index];
-					if( current == null )
+					final List<TrackDrop<T>> cell = gridToCell[index];
+					if (cell == null)
 						continue;
-
-					// See if they are in conflict
-					trackInfo.getLocation(current,currentPt);
-					if( currentPt.distance2(candidatePt) > tol )
-						continue;
-
-					// Use the ambiguity resolver to select one of them to keep
-					int result = ambiguityResolver.compare(candidate,current);
-					if( result < 0 ) {
-						// The current track is preferred
-						candidateDropped = true;
-					} else if( result == 0 && trackInfo.getID(current) < candidateID ) {
-						// Results are ambiguous, but the tie breaker is done using featureID so the candidate
-						// is still dropped
-						candidateDropped = true;
-					} else {
-						// the candidate track is preferred so drop the current track.
-						// If it has not already been dropped
-						if( !dropImage[index] ) {
-							dropTracks.add(trackImage[index]);
-							dropImage[index] = true;
-						}
-					}
+					candidateDropped = isCandidateDropped(dropTracks, candidate, candidateID, candidateDropped, cell);
 				}
 			}
 
 			// add candidate to the dropped list if it was dropped
-			if( candidateDropped ) {
+			if (candidateDropped) {
 				dropTracks.add(candidate);
 			}
-			// if the cell was empty add the candidate to it and mark it's drop status
-			if (trackImage[centerIndex] == null || !candidateDropped) {
-				trackImage[centerIndex] = candidate;
-				dropImage[centerIndex] = candidateDropped;
+
+			// Add the track to a cell
+			List<TrackDrop<T>> cell = gridToCell[centerIndex];
+			if (cell == null) {
+				gridToCell[centerIndex] = cell = storageLists.grow();
+				BoofMiscOps.assertBoof(cell.size() == 0);
+			}
+
+			TrackDrop<T> td = storageDrops.grow();
+			td.track = candidate;
+			td.dropped = candidateDropped;
+			cell.add(td);
+		}
+	}
+
+	private boolean isCandidateDropped( List<T> dropTracks, T candidate, long candidateID, boolean candidateDropped,
+										List<TrackDrop<T>> cell ) {
+		// Note the use of manhattan distance and not cartesian? This ensures that items in the same cell
+		// are in conflict AND that all neighbors are within 1 block
+		for (int trackIdx = 0; trackIdx < cell.size(); trackIdx++) {
+			TrackDrop<T> td = cell.get(trackIdx);
+
+			trackInfo.getLocation(td.track, currentPt);
+			if (Math.abs(currentPt.x - candidatePt.x) >= radius || Math.abs(currentPt.y - candidatePt.y) >= radius) {
+				continue;
+			}
+
+			// Use the ambiguity resolver to select one of them to keep
+			int result = ambiguityResolver.compare(candidate, td.track);
+			if (result < 0) {
+				// The current track is preferred
+				candidateDropped = true;
+			} else if (result == 0 && trackInfo.getID(td.track) < candidateID) {
+				// Results are ambiguous, but the tie breaker is done using featureID so the candidate
+				// is still dropped
+				candidateDropped = true;
+			} else {
+				// the candidate track is preferred so drop the current track.
+				// If it has not already been dropped
+				if (!td.dropped) {
+					dropTracks.add(td.track);
+					td.dropped = true;
+				}
 			}
 		}
+		return candidateDropped;
+	}
 
-		// clear the track image so that it will be null on the next call and so that it doesn't
-		// save references to objects when it's not going to use them again
-		Arrays.fill(trackImage,0,w*h,null);
+	protected static class TrackDrop<TD> {
+		public TD track;
+		public boolean dropped;
+
+		public void reset() {
+			track = null;
+			dropped = false;
+		}
 	}
 
 	/**
@@ -184,7 +214,7 @@ public class PruneCloseTracks<T> {
 		/**
 		 * Location of the track inside the image. It's assumed the track is inside the image.
 		 */
-		void getLocation(T track , Point2D_F64 location );
+		void getLocation( T track, Point2D_F64 location );
 
 		/**
 		 * Unique ID. It is assumed the older tracks have a lower ID
@@ -198,12 +228,12 @@ public class PruneCloseTracks<T> {
 	public static PruneCloseTracks<PointTrack> prunePointTrack( int radius ) {
 		return new PruneCloseTracks<>(radius, new TrackInfo<>() {
 			@Override
-			public void getLocation(PointTrack track, Point2D_F64 location) {
+			public void getLocation( PointTrack track, Point2D_F64 location ) {
 				location.set(track.pixel);
 			}
 
 			@Override
-			public long getID(PointTrack track) {
+			public long getID( PointTrack track ) {
 				return track.featureId;
 			}
 		});
