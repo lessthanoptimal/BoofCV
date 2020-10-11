@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,10 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.GrayU8;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -54,6 +56,7 @@ public class BenchmarkBlurImageOps {
 	GrayU8 output = new GrayU8(size, size);
 	GrayU8 storage = new GrayU8(size, size);
 	IWorkArrays work = new IWorkArrays();
+	GrowArray<GrowQueue_I32> growArray = new GrowArray<>(GrowQueue_I32::new);
 
 	@Setup
 	public void setup() {
@@ -81,7 +84,7 @@ public class BenchmarkBlurImageOps {
 
 	@Benchmark
 	public void median() {
-		BlurImageOps.median(input,output,radius,work);
+		BlurImageOps.median(input,output,radius,radius,growArray);
 	}
 
 	public static void main(String[] args) throws RunnerException {

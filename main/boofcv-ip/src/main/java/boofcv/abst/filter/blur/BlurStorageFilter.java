@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.border.ImageBorder;
@@ -48,6 +49,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	// type of image it processes
 	ImageType<T> inputType;
 	WorkArrays workArray;
+	GrowArray growArray;
 
 	/** Specified how the border is handled for mean images. If null then it's normalized */
 	@Getter	@Setter ImageBorder<T> border = null;
@@ -86,6 +88,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		}
 
 		workArray = GeneralizedImageOps.createWorkArray( inputType );
+		growArray = GeneralizedImageOps.createGrowArray( inputType );
 	}
 
 	private void createStorage() {
@@ -174,7 +177,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		public void process(ImageBase input, ImageBase output) {
 			if( border != null )
 				throw new IllegalArgumentException("Border has been set but will never be used. Must be a bug.");
-			GBlurImageOps.median(input,output, radiusX,workArray);
+			GBlurImageOps.median(input,output, radiusX, radiusY, growArray);
 		}
 	}
 }

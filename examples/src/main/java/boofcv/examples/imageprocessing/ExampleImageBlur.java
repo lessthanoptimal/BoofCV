@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,11 +42,11 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleImageBlur {
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		ListDisplayPanel panel = new ListDisplayPanel();
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("standard/kodim17.jpg"));
 
-		panel.addImage(buffered,"Original");
+		panel.addImage(buffered, "Original");
 
 		Planar<GrayU8> input = ConvertBufferedImage.convertFrom(buffered, true, ImageType.pl(3, GrayU8.class));
 		Planar<GrayU8> blurred = input.createSameShape();
@@ -55,20 +55,20 @@ public class ExampleImageBlur {
 		int radius = 8;
 
 		// Apply gaussian blur using a procedural interface
-		GBlurImageOps.gaussian(input,blurred,-1,radius,null);
-		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true),"Gaussian");
+		GBlurImageOps.gaussian(input, blurred, -1, radius, null);
+		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true), "Gaussian");
 
 		// Apply a mean filter using an object oriented interface.  This has the advantage of automatically
 		// recycling memory used in intermediate steps
-		BlurFilter<Planar<GrayU8>> filterMean = FactoryBlurFilter.mean(input.getImageType(),radius);
+		BlurFilter<Planar<GrayU8>> filterMean = FactoryBlurFilter.mean(input.getImageType(), radius);
 		filterMean.process(input, blurred);
-		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true),"Mean");
+		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true), "Mean");
 
 		// Apply a median filter using image type specific procedural interface.  Won't work if the type
 		// isn't known at compile time
-		BlurImageOps.median(input,blurred,radius, null);
-		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true),"Median");
+		BlurImageOps.median(input, blurred, radius, radius, null);
+		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true), "Median");
 
-		ShowImages.showWindow(panel,"Image Blur Examples",true);
+		ShowImages.showWindow(panel, "Image Blur Examples", true);
 	}
 }

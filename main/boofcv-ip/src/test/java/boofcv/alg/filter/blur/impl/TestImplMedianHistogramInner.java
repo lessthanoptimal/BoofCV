@@ -20,8 +20,10 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -33,8 +35,8 @@ public class TestImplMedianHistogramInner extends BoofStandardJUnit {
 
 	@Test
 	void compareToSort() {
-		GrayU8 input = new GrayU8(20,30);
-		ImageMiscOps.fillUniform(input,new Random(234), 0, 100);
+		GrayU8 input = new GrayU8(20, 30);
+		ImageMiscOps.fillUniform(input, new Random(234), 0, 100);
 
 		GrayU8 found = input.createSameShape();
 		GrayU8 expected = input.createSameShape();
@@ -42,15 +44,18 @@ public class TestImplMedianHistogramInner extends BoofStandardJUnit {
 		BoofTesting.checkSubImage(this, "compareToSort", true, input, found, expected);
 	}
 
-	public void compareToSort(GrayU8 image, GrayU8 found, GrayU8 expected) {
-		for( int radius = 1; radius <= 3; radius++ ) {
-			ImageMiscOps.fill(found,0);
-			ImageMiscOps.fill(expected,0);
+	public void compareToSort( GrayU8 image, GrayU8 found, GrayU8 expected ) {
+		GrowArray<GrowQueue_I32> work = new GrowArray<>(GrowQueue_I32::new);
 
-			ImplMedianHistogramInner.process(image,found,radius,null);
-			ImplMedianSortNaive.process(image,expected,radius,null);
+		for (int radiusX = 1; radiusX <= 3; radiusX++) {
+			int radiusY = radiusX + 1;
+			ImageMiscOps.fill(found, 0);
+			ImageMiscOps.fill(expected, 0);
 
-			BoofTesting.assertEqualsInner(expected,found,0,radius,radius,false);
+			ImplMedianHistogramInner.process(image, found, radiusX, radiusY, work);
+			ImplMedianSortNaive.process(image, expected, radiusX, radiusY, work.grow());
+
+			BoofTesting.assertEqualsInner(expected, found, 0, radiusX, radiusY, false);
 		}
 	}
 }

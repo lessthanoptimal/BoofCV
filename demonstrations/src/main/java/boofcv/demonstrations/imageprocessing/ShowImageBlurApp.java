@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.demonstrations.imageprocessing;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.DemonstrationBase;
@@ -57,6 +58,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 	T storage;
 	BufferedImage renderedImage;
 	WorkArrays work;
+	GrowArray growArray;
 
 	public ShowImageBlurApp( java.util.List<PathLabel> examples , Class<T> imageType ) {
 		super(examples, ImageType.pl(3,imageType));
@@ -64,6 +66,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 		output = new Planar<>(imageType, 1, 1, 3);
 		storage = GeneralizedImageOps.createSingleBand(imageType,1,1);
 		work = GeneralizedImageOps.createWorkArray(storage.getImageType());
+		growArray = GeneralizedImageOps.createGrowArray(storage.getImageType());
 
 		add(gui,BorderLayout.CENTER);
 		add(controls,BorderLayout.WEST);
@@ -110,7 +113,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 				break;
 
 			case 2:
-				GBlurImageOps.median(image, output, radius, work);
+				GBlurImageOps.median(image, output, radius, radius, growArray);
 				break;
 		}
 		long time1 = System.nanoTime();

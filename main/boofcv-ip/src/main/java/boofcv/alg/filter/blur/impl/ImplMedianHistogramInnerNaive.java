@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,52 +34,55 @@ public class ImplMedianHistogramInnerNaive {
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Filtered output image. Modified.
-	 * @param radius Size of the filter region.
+	 * @param radiusX Size of the filter region. x-axis
+	 * @param radiusY Size of the filter region. Y-axis
 	 * @param offset Array used to store relative pixel offsets.
 	 * @param histogram Saves the image histogram.  Must be at least 256 elements.
 	 */
-	public static void process(GrayU8 input, GrayU8 output, int radius, int offset[], int histogram[] ) {
-		if( histogram == null )
-			histogram = new int[ 256 ];
-		else if( histogram.length < 256 )
+	public static void process( GrayU8 input, GrayU8 output, int radiusX, int radiusY, int offset[], int histogram[] ) {
+		if (histogram == null)
+			histogram = new int[256];
+		else if (histogram.length < 256)
 			throw new IllegalArgumentException("'histogram' must have at least 256 elements.");
 
-		int w = 2*radius+1;
-		if( offset == null ) {
-			offset = new int[ w*w ];
-		} else if( offset.length < w*w ) {
-			throw new IllegalArgumentException("'offset' must be at least of length "+(w*w));
+		int w = 2*radiusX + 1;
+		int h = 2*radiusY + 1;
+
+		if (offset == null) {
+			offset = new int[w*h];
+		} else if (offset.length < w*h) {
+			throw new IllegalArgumentException("'offset' must be at least of length " + (w*w));
 		}
-		int threshold = (w*w)/2+1;
+		int threshold = (w*w)/2 + 1;
 
 		int index = 0;
-		for( int i = -radius; i <= radius; i++ ) {
-			for( int j = -radius; j <= radius; j++ ) {
+		for (int i = -radiusY; i <= radiusY; i++) {
+			for (int j = -radiusX; j <= radiusX; j++) {
 				offset[index++] = i*input.stride + j;
 			}
 		}
 
-		for( int y = radius; y < input.height-radius; y++ ) {
-			for( int x = radius; x < input.width-radius; x++ ) {
-				int seed = input.startIndex + y*input.stride+x;
+		for (int y = radiusY; y < input.height - radiusY; y++) {
+			for (int x = radiusX; x < input.width - radiusX; x++) {
+				int seed = input.startIndex + y*input.stride + x;
 
-				for( int i = 0; i < 256; i++ ) {
+				for (int i = 0; i < 256; i++) {
 					histogram[i] = 0;
 				}
 
-				for( int i = 0; i < offset.length; i++ ) {
-					int val = input.data[seed+offset[i]] & 0xFF;
+				for (int i = 0; i < offset.length; i++) {
+					int val = input.data[seed + offset[i]] & 0xFF;
 					histogram[val]++;
 				}
 
 				int count = 0;
 				int median;
-				for( median = 0; median < 256; median++ ) {
+				for (median = 0; median < 256; median++) {
 					count += histogram[median];
-					if( count >= threshold )
+					if (count >= threshold)
 						break;
 				}
-				output.data[ output.startIndex+y*output.stride+x] = (byte)median;
+				output.data[output.startIndex + y*output.stride + x] = (byte)median;
 			}
 		}
 	}

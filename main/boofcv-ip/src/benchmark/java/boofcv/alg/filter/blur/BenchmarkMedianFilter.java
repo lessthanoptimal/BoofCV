@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,12 @@ import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.Random;
 
@@ -57,37 +59,38 @@ public class BenchmarkMedianFilter  {
 
 	public int timeBlurImageOps_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BlurImageOps.median(imgInt8, out_I8, radius, null);
+			BlurImageOps.median(imgInt8, out_I8, radius, radius,null);
 		return 0;
 	}
 
 	public int timeBlurImageOps_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BlurImageOps.median(imgFloat32,out_F32,radius);
+			BlurImageOps.median(imgFloat32,out_F32,radius,radius,null);
 		return 0;
 	}
 
 	public int timeHistogramNaive_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplMedianHistogramInnerNaive.process(imgInt8, out_I8, radius, null, null);
+			ImplMedianHistogramInnerNaive.process(imgInt8, out_I8, radius, radius,null, null);
 		return 0;
 	}
 
 	public int timeHistogram_I8(int reps) {
+		GrowArray<GrowQueue_I32> work = new GrowArray<>(GrowQueue_I32::new);
 		for( int i = 0; i < reps; i++ )
-			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,null);
+			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,radius,work);
 		return 0;
 	}
 
 	public int timeSortNaive_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplMedianSortNaive.process(imgInt8,out_I8,radius,null);
+			ImplMedianSortNaive.process(imgInt8,out_I8,radius,radius,null);
 		return 0;
 	}
 
 	public int timeSortNaive_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,null);
+			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,radius,null);
 		return 0;
 	}
 

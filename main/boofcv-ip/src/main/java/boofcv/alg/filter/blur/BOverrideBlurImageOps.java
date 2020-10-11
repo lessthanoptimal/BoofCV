@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	}
 
 	public interface Median<T extends ImageBase<T>> {
-		void processMedian(T input, T output, int radius);
+		void processMedian(T input, T output, int radiusX, int radiusY);
 	}
 	
 	public interface Gaussian<T extends ImageBase<T>> {
@@ -83,11 +83,11 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	}
 
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMedian(T input, T output, int radius) {
+	boolean invokeNativeMedian(T input, T output, int radiusX, int radiusY) {
 		boolean processed = false;
 		if( BOverrideBlurImageOps.median != null ) {
 			try {
-				BOverrideBlurImageOps.median.processMedian(input,output,radius);
+				BOverrideBlurImageOps.median.processMedian(input,output,radiusX,radiusY);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}

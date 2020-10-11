@@ -20,8 +20,10 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,12 +43,15 @@ public class TestImplMedianHistogramInner_MT extends BoofStandardJUnit {
 	}
 
 	public void compareToSingle(GrayU8 image, GrayU8 found, GrayU8 expected) {
-		for( int radius = 1; radius <= 5; radius += 2 ) {
+		GrowArray<GrowQueue_I32> work = new GrowArray<>(GrowQueue_I32::new);
+
+		for (int radiusX = 1; radiusX <= 3; radiusX++) {
+			int radiusY = radiusX+1;
 			ImageMiscOps.fill(found,0);
 			ImageMiscOps.fill(expected,0);
 
-			ImplMedianHistogramInner.process(image,expected,radius,null);
-			ImplMedianHistogramInner_MT.process(image,found,radius,null);
+			ImplMedianHistogramInner.process(image,expected,radiusX,radiusY,work);
+			ImplMedianHistogramInner_MT.process(image,found,radiusX,radiusY,work);
 
 			BoofTesting.assertEquals(expected,found,0);
 		}
