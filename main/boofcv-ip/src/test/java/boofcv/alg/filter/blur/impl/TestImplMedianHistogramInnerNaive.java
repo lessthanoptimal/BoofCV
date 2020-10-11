@@ -45,8 +45,8 @@ public class TestImplMedianHistogramInnerNaive extends BoofStandardJUnit {
 	public void compareToSort(GrayU8 image, GrayU8 found, GrayU8 expected) {
 		for( int radius = 1; radius <= 3; radius++ ) 
 		{
-			ImplMedianHistogramInnerNaive.process(image,found,radius,null,null);
-			ImplMedianSortNaive.process(image,expected,radius,null);
+			ImplMedianHistogramInnerNaive.process(image,found,radius,radius,null,null);
+			ImplMedianSortNaive.process(image,expected,radius,radius,null);
 
 			BoofTesting.assertEqualsInner(expected, found, 0, radius, radius, false);
 		}

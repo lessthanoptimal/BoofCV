@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,20 +26,20 @@ import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 
-	Random rand = new Random(234234);
-	int width = 20;
+	int width = 23;
 	int height = 20;
 
-	int radius = 2;
+	int radiusX = 2;
+	int radiusY = 3;
 
 	public TestImplMedianSortEdgeNaive() {
 		super(ImplMedianSortEdgeNaive.class, ImplMedianSortNaive.class);
@@ -52,56 +52,57 @@ public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 	}
 
 	@Override
-	protected boolean isTestMethod(Method m) {
+	protected boolean isTestMethod( Method m ) {
 		return m.getName().equals("process");
 	}
 
 	@Override
-	protected boolean isEquivalent(Method candidate, Method validation) {
-		Class<?> c[] = candidate.getParameterTypes();
-		Class<?> v[] = validation.getParameterTypes();
+	protected boolean isEquivalent( Method candidate, Method validation ) {
+		Class<?>[] c = candidate.getParameterTypes();
+		Class<?>[] v = validation.getParameterTypes();
 
 		return c.length == v.length && c[0] == v[1];
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 
-		Class c[] = candidate.getParameterTypes();
+		Class[] c = candidate.getParameterTypes();
 
 		ImageGray input = GeneralizedImageOps.createSingleBand(c[0], width, height);
 		ImageGray output = GeneralizedImageOps.createSingleBand(c[1], width, height);
 
 
-		Object[][] ret = new Object[1][ c.length ];
+		Object[][] ret = new Object[1][c.length];
 		ret[0][0] = input;
 		ret[0][1] = output;
-		ret[0][2] = radius;
-		ret[0][3] = null;
+		ret[0][2] = radiusX;
+		ret[0][3] = radiusY;
+		ret[0][4] = null;
 
 		return ret;
 	}
 
 	@Override
-	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
 		return targetParam;
 	}
 
 	@Override
-	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
 
-		GImageGray found = FactoryGImageGray.wrap((ImageGray) targetParam[1]);
-		GImageGray expected = FactoryGImageGray.wrap((ImageGray) validationParam[1]);
+		GImageGray found = FactoryGImageGray.wrap((ImageGray)targetParam[1]);
+		GImageGray expected = FactoryGImageGray.wrap((ImageGray)validationParam[1]);
 
 
-		for( int y = 0; y < height; y++ ) {
-			if( y > radius || y < height-radius )
+		for (int y = 0; y < height; y++) {
+			if (y > radiusY || y < height - radiusY)
 				continue;
 
-			for( int x = 0; x < width; x++ ) {
-				if( x > radius || x < width-radius )
+			for (int x = 0; x < width; x++) {
+				if (x > radiusX || x < width - radiusX)
 					continue;
-				assertEquals(found.get(x,y).intValue(),expected.get(x,y).intValue());
+				assertEquals(found.get(x, y).intValue(), expected.get(x, y).intValue());
 			}
 		}
 	}

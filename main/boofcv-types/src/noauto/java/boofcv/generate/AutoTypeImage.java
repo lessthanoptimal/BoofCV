@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,6 +166,10 @@ public enum AutoTypeImage {
 
 	public String getKernelType() {
 		return isInteger() ? getNumBits() == 64 ? "S64" : "S32" : getNumBits() == 64 ? "F64" : "F32";
+	}
+
+	public String getGrowQueueType() {
+		return isInteger() ? getNumBits() == 64 ? "S64" : "I32" : getNumBits() == 64 ? "F64" : "F32";
 	}
 
 	public String getKernelDataType() {

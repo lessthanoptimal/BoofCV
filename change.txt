@@ -29,6 +29,7 @@ Version : 0.37
   * Added support for YUYV color format used in webcams
 - Image Processing
   * PixelMath now supports Lambdas
+  * Median blur supports kernel radius independently along x and y. Thanks thhart for the request.
 - GUI
   * Added clip and fog controls to point cloud controls
 - Features
@@ -98,6 +99,8 @@ Version : 0.37
   * Triangulate N-points using calibrated homogenous coordinates
 - Calibration
   * Stereo calibration now performs a join bundle adjustment after estimating the stereo baseline
+- Concurrency
+  * TODO make sure ImplSsdCorner_S16 is thread safe and everything else that uses IWorkArrays!
 
 TODO Move projective to metric and similar from multiview to perspective
 TODO rename RansacMultiView to RansacCalibrated

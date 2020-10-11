@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,10 @@ import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.GrowQueue_I64;
 
 /**
  * <p>
@@ -258,6 +262,20 @@ import boofcv.struct.image.*;
 			return new FWorkArrays();
 		} else {
 			return new DWorkArrays();
+		}
+	}
+
+	public static GrowArray createGrowArray( ImageType<?> type ) {
+		if (type.getDataType().isInteger()) {
+			if (type.getDataType().getNumBits() < 64) {
+				return new GrowArray<>(GrowQueue_I32::new);
+			} else {
+				return new GrowArray<>(GrowQueue_I64::new);
+			}
+		} else if (type.getDataType().getNumBits() < 64) {
+			return new GrowArray<>(GrowQueue_F32::new);
+		} else {
+			return new GrowArray<>(GrowQueue_F64::new);
 		}
 	}
 

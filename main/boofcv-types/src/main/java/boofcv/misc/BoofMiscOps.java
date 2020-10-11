@@ -18,14 +18,17 @@
 
 package boofcv.misc;
 
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.GrowArray;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.errors.BoofAssertFailure;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 import georegression.struct.GeoTuple;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.*;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -626,4 +629,47 @@ public class BoofMiscOps {
 		}
 		return false;
 	}
+
+	public static IWorkArrays checkDeclare( @Nullable IWorkArrays arrays, int length) {
+		if (arrays==null)
+			arrays = new IWorkArrays(length);
+		else
+			arrays.reset(length);
+		return arrays;
+	}
+
+	public static int[] checkDeclare( @Nullable GrowQueue_I32 queue, int length, boolean zero ) {
+		if (queue==null)
+			queue = new GrowQueue_I32(length);
+		queue.resize(length);
+		if( zero )
+			queue.fill(0);
+		return queue.data;
+	}
+
+	public static float[] checkDeclare( @Nullable GrowQueue_F32 queue, int length, boolean zero ) {
+		if (queue==null)
+			queue = new GrowQueue_F32(length);
+		queue.resize(length);
+		if( zero )
+			queue.fill(0.0f);
+		return queue.data;
+	}
+
+	public static double[] checkDeclare( @Nullable GrowQueue_F64 queue, int length, boolean zero ) {
+		if (queue==null)
+			queue = new GrowQueue_F64(length);
+		queue.resize(length);
+		if( zero )
+			queue.fill(0.0);
+		return queue.data;
+	}
+
+	public static<T> GrowArray<T> checkDeclare( @Nullable GrowArray<T> growable,
+												BoofConcurrency.NewInstance<T> factory ) {
+		growable = growable == null ? new GrowArray<>(factory) : growable;
+		growable.reset();
+		return growable;
+	}
+
 }

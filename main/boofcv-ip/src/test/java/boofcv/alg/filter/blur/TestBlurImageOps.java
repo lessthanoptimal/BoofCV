@@ -22,7 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -35,6 +35,7 @@ import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.GrowQueue;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -219,25 +220,27 @@ class TestBlurImageOps extends BoofStandardJUnit {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-			for( int radius = 1; radius <= 4; radius++ ) {
+			for( int radiusX = 1; radiusX <= 4; radiusX++ ) {
+				int radiusY = radiusX+1;
 				try {
 					if( type.getFamily() == ImageType.Family.PLANAR ) {
 						Method m = BlurImageOps.class.getMethod("median", input.getClass(),
-								found.getClass(), int.class, WorkArrays.class);
-						m.invoke(null, input, found, radius, null);
+								found.getClass(), int.class, int.class, GrowArray.class);
+						m.invoke(null, input, found, radiusX, radiusY, null);
 					} else if( type.getDataType().isInteger() ) {
 						Method m = BlurImageOps.class.getMethod("median", input.getClass(),
-								found.getClass(), int.class, IWorkArrays.class);
-						m.invoke(null, input, found, radius, null);
+								found.getClass(), int.class, int.class, GrowArray.class);
+						m.invoke(null, input, found, radiusX, radiusY, null);
 					} else {
 						Method m = BlurImageOps.class.getMethod("median", input.getClass(),
-								found.getClass(), int.class);
-						m.invoke(null, input, found, radius);
+								found.getClass(), int.class, int.class, GrowArray.class);
+						m.invoke(null, input, found, radiusX, radiusY, null);
 					}
 					Class image = type.getFamily() == ImageType.Family.PLANAR ? Planar.class : ImageGray.class;
 
-					Method m = ImplMedianSortNaive.class.getMethod("process",image,image, int.class);
-					m.invoke(null,input,expected, radius);
+					Method m = ImplMedianSortNaive.class.getMethod("process",image,image,
+							int.class, int.class, GrowQueue.class);
+					m.invoke(null,input,expected, radiusX, radiusY, null);
 
 					BoofTesting.assertEquals(expected,found,2);
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {

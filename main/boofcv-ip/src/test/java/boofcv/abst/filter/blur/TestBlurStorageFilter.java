@@ -91,7 +91,7 @@ public class TestBlurStorageFilter extends BoofStandardJUnit {
 
 			BlurStorageFilter alg = new BlurStorageFilter<>("median",c,2);
 
-			GBlurImageOps.median(input,found,2, null);
+			GBlurImageOps.median(input,found,2, 2,null);
 
 			alg.process(input,expected);
 
