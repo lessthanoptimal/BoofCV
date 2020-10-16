@@ -20,6 +20,7 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ public class TestImplMedianHistogramInnerNaive extends BoofStandardJUnit {
 		for( int radius = 1; radius <= 3; radius++ ) 
 		{
 			ImplMedianHistogramInnerNaive.process(image,found,radius,radius,null,null);
-			ImplMedianSortNaive.process(image,expected,radius,radius,null);
+			ImplMedianSortNaive.process(image,expected,radius,radius,(GrowArray)null);
 
 			BoofTesting.assertEqualsInner(expected, found, 0, radius, radius, false);
 		}

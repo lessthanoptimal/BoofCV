@@ -53,7 +53,7 @@ public class TestImplMedianHistogramInner extends BoofStandardJUnit {
 			ImageMiscOps.fill(expected, 0);
 
 			ImplMedianHistogramInner.process(image, found, radiusX, radiusY, work);
-			ImplMedianSortNaive.process(image, expected, radiusX, radiusY, work.grow());
+			ImplMedianSortNaive.process(image, expected, radiusX, radiusY, work);
 
 			BoofTesting.assertEqualsInner(expected, found, 0, radiusX, radiusY, false);
 		}

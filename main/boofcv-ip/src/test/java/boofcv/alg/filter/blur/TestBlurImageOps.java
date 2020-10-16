@@ -35,7 +35,6 @@ import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -239,7 +238,7 @@ class TestBlurImageOps extends BoofStandardJUnit {
 					Class image = type.getFamily() == ImageType.Family.PLANAR ? Planar.class : ImageGray.class;
 
 					Method m = ImplMedianSortNaive.class.getMethod("process",image,image,
-							int.class, int.class, GrowQueue.class);
+							int.class, int.class, GrowArray.class);
 					m.invoke(null,input,expected, radiusX, radiusY, null);
 
 					BoofTesting.assertEquals(expected,found,2);

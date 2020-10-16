@@ -48,10 +48,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print("import boofcv.alg.InputSanityCheck;\n" +
-				"import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;\n" +
-				"import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner_MT;\n" +
-				"import boofcv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;\n" +
-				"import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;\n" +
+				"import boofcv.alg.filter.blur.impl.*;\n" +
 				"import boofcv.alg.filter.convolve.ConvolveImageMean;\n" +
 				"import boofcv.alg.filter.convolve.ConvolveImageNormalized;\n" +
 				"import boofcv.concurrency.*;\n" +
@@ -109,19 +106,19 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static "+imageName+" mean( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable "+letter+"WorkArrays workVert ) {\n" +
-				"\t\tif( radiusX <= 0 || radiusY <= 0)\n" +
+				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input,output);\n" +
-				"\t\tstorage = InputSanityCheck.checkDeclare(input,storage);\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input, output);\n" +
+				"\t\tstorage = InputSanityCheck.checkDeclare(input, storage);\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);\n" +
 				"\n" +
-				"\t\tif( processed )\n" +
+				"\t\tif (processed)\n" +
 				"\t\t\treturn output;\n" +
 				"\n" +
-				"\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);\n" +
-				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);\n" +
+				"\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2 + 1);\n" +
+				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2 + 1, workVert);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
@@ -146,25 +143,25 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\tpublic static "+imageName+" meanB( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t\t\t\t  @Nullable ImageBorder_"+borderSuffix+" binput,\n" +
 				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable "+letter+"WorkArrays workVert ) {\n" +
-				"\t\tif( radiusX <= 0 || radiusY <= 0)\n" +
+				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input,output);\n" +
-				"\t\tstorage = InputSanityCheck.checkDeclare(input,storage);\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input, output);\n" +
+				"\t\tstorage = InputSanityCheck.checkDeclare(input, storage);\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);\n" +
 				"\n" +
-				"\t\tif( processed )\n" +
+				"\t\tif (processed)\n" +
 				"\t\t\treturn output;\n" +
 				"\n" +
-				"\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);\n" +
-				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);\n" +
+				"\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2 + 1, binput);\n" +
+				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2 + 1, binput, workVert);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
-	private void generateGaussian( String imageName , String kerType ) {
+	private void generateGaussian( String imageName, String kerType ) {
 		String kernel = "Kernel1D_"+kerType;
 		out.print("\t/**\n" +
 				"\t * Applies Gaussian blur.\n" +
@@ -176,7 +173,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.\n" +
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
-				"\tpublic static "+imageName+" gaussian( "+imageName+" input, @Nullable "+imageName+" output, double sigma , int radius,\n" +
+				"\tpublic static "+imageName+" gaussian( "+imageName+" input, @Nullable "+imageName+" output, double sigma, int radius,\n" +
 				"\t\t\t\t\t\t\t\t  @Nullable "+imageName+" storage ) {\n" +
 				"\t\treturn gaussian(input,output,sigma,radius,sigma,radius,storage);\n" +
 				"\t}\n" +
@@ -194,10 +191,10 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" gaussian( "+imageName+" input, @Nullable "+imageName+" output, \n" +
-				"\t\t\t\t\t\t\t\t  double sigmaX , int radiusX, double sigmaY , int radiusY,\n" +
+				"\t\t\t\t\t\t\t\t  double sigmaX, int radiusX, double sigmaY, int radiusY,\n" +
 				"\t\t\t\t\t\t\t\t  @Nullable "+imageName+" storage ) {\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input,output);\n" +
-				"\t\tstorage = InputSanityCheck.checkDeclare(input,storage);\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input, output);\n" +
+				"\t\tstorage = InputSanityCheck.checkDeclare(input, storage);\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);\n" +
 				"\n" +
@@ -267,8 +264,11 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMedian(input, output, radiusX, radiusY);\n" +
 				"\n" +
 				"\t\tif (!processed) {\n" +
-				"\t\t\twork = BoofMiscOps.checkDeclare(work, GrowQueue_F32::new);\n" +
-				"\t\t\tImplMedianSortNaive.process(input, output, radiusX, radiusY, work.grow());\n" +
+				"\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplMedianSortNaive_MT.process(input, output, radiusX, radiusY, work);\n" +
+				"\t\t\t} else {\n" +
+				"\t\t\t\tImplMedianSortNaive.process(input, output, radiusX, radiusY, work);\n" +
+				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\treturn output;\n" +
 				"\t}\n" +
@@ -310,7 +310,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
-				"\tPlanar<T> gaussian( Planar<T> input, @Nullable Planar<T> output, double sigma , int radius, @Nullable T storage ) {\n" +
+				"\tPlanar<T> gaussian( Planar<T> input, @Nullable Planar<T> output, double sigma, int radius, @Nullable T storage ) {\n" +
 				"\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
@@ -335,7 +335,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
-				"\tPlanar<T> gaussian(Planar<T> input, @Nullable Planar<T> output, double sigmaX , int radiusX, double sigmaY , int radiusY, @Nullable T storage ) {\n" +
+				"\tPlanar<T> gaussian(Planar<T> input, @Nullable Planar<T> output, double sigmaX, int radiusX, double sigmaY, int radiusY, @Nullable T storage ) {\n" +
 				"\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
@@ -360,7 +360,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
 				"\tPlanar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius ,\n" +
-				"\t\t\t\t   @Nullable T storage , @Nullable WorkArrays workVert ) {\n" +
+				"\t\t\t\t   @Nullable T storage, @Nullable WorkArrays workVert ) {\n" +
 				"\t\treturn mean(input,output,radius,radius,storage,workVert);\n" +
 				"\t}\n" +
 				"\n" +
@@ -375,8 +375,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
-				"\tPlanar<T> mean( Planar<T> input, @Nullable Planar<T> output, int radiusX , int radiusY,\n" +
-				"\t\t\t\t   @Nullable T storage , @Nullable WorkArrays workVert ) {\n" +
+				"\tPlanar<T> mean( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,\n" +
+				"\t\t\t\t   @Nullable T storage, @Nullable WorkArrays workVert ) {\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
@@ -400,9 +400,9 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
-				"\tPlanar<T> meanB( Planar<T> input, @Nullable Planar<T> output, int radiusX , int radiusY,\n" +
+				"\tPlanar<T> meanB( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t   @Nullable ImageBorder<T> binput,\n" +
-				"\t\t\t\t   @Nullable T storage , @Nullable WorkArrays workVert ) {\n" +
+				"\t\t\t\t   @Nullable T storage, @Nullable WorkArrays workVert ) {\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +

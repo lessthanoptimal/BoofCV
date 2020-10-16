@@ -20,9 +20,12 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.FWorkArrays;
 import boofcv.concurrency.GrowArray;
 import boofcv.concurrency.IWorkArrays;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -33,61 +36,66 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=2)
+@Fork(value = 1)
 public class BenchmarkBlurImageOps {
 
 	public static final int radius = 5;
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"100", "500", "2000"})
 	public int size;
 
-	GrayU8 input = new GrayU8(size, size);
-	GrayU8 output = new GrayU8(size, size);
-	GrayU8 storage = new GrayU8(size, size);
-	IWorkArrays work = new IWorkArrays();
-	GrowArray<GrowQueue_I32> growArray = new GrowArray<>(GrowQueue_I32::new);
+	GrayU8 inputU8 = new GrayU8(size, size);
+	GrayU8 outputU8 = new GrayU8(size, size);
+	GrayU8 storageU8 = new GrayU8(size, size);
+	IWorkArrays workI32 = new IWorkArrays();
+	GrowArray<GrowQueue_I32> growArrayI32 = new GrowArray<>(GrowQueue_I32::new);
+
+	GrayF32 inputF32 = new GrayF32(size, size);
+	GrayF32 outputF32 = new GrayF32(size, size);
+	GrayF32 storageF32 = new GrayF32(size, size);
+	FWorkArrays workF32 = new FWorkArrays();
+	GrowArray<GrowQueue_F32> growArrayF32 = new GrowArray<>(GrowQueue_F32::new);
 
 	@Setup
 	public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		input.reshape(size, size);
-		output.reshape(size, size);
-		storage.reshape(size, size);
+		inputU8.reshape(size, size);
+		outputU8.reshape(size, size);
+		storageU8.reshape(size, size);
 
-		ImageMiscOps.fillUniform(input,rand,0,200);
-		ImageMiscOps.fillUniform(output,rand,0,200);
-		ImageMiscOps.fillUniform(storage,rand,0,200);
+		ImageMiscOps.fillUniform(inputU8, rand, 0, 200);
+		ImageMiscOps.fillUniform(outputU8, rand, 0, 200);
+		ImageMiscOps.fillUniform(storageU8, rand, 0, 200);
+
+		inputF32.reshape(size, size);
+		outputF32.reshape(size, size);
+		storageF32.reshape(size, size);
+
+		ImageMiscOps.fillUniform(inputF32, rand, 0, 200);
+		ImageMiscOps.fillUniform(outputF32, rand, 0, 200);
+		ImageMiscOps.fillUniform(storageF32, rand, 0, 200);
 	}
 
-	@Benchmark
-	public void mean() {
-		BlurImageOps.mean(input,output,radius,storage,work);
-	}
+	// @formatter:off
+	@Benchmark public void mean_U8() { BlurImageOps.mean(inputU8, outputU8, radius, storageU8, workI32); }
+	@Benchmark public void gaussian_U8() { BlurImageOps.gaussian(inputU8, outputU8, -1, radius, storageU8); }
+	@Benchmark public void median_U8() { BlurImageOps.median(inputU8, outputU8, radius, radius, growArrayI32); }
+	@Benchmark public void mean_F32() { BlurImageOps.mean(inputF32, outputF32, radius, storageF32, workF32); }
+	@Benchmark public void gaussian_F32() { BlurImageOps.gaussian(inputF32, outputF32, -1, radius, storageF32); }
+	@Benchmark public void median_F32() { BlurImageOps.median(inputF32, outputF32, radius, radius, growArrayF32); }
+	// @formatter:on
 
-	@Benchmark
-	public void gaussian() {
-		BlurImageOps.gaussian(input,output,-1,radius,storage);
-	}
-
-	@Benchmark
-	public void median() {
-		BlurImageOps.median(input,output,radius,radius,growArray);
-	}
-
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkBlurImageOps.class.getSimpleName())
 				.build();
