@@ -18,16 +18,18 @@
 
 package boofcv.alg.filter.blur.impl;
 
+import boofcv.concurrency.GrowArray;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.GrowQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -46,16 +48,24 @@ public class ImplMedianSortNaive {
 	 * @param output Filtered image.
 	 * @param radiusX Size of the filter region. x-axis
 	 * @param radiusY Size of the filter region. Y-axis
-	 * @param workspace Array used for storage.  If null a new array is declared internally.
+	 * @param workArrays (Optional) Storage for internal workspace. Nullable.
 	 */
-	public static void process( GrayI input, GrayI output, int radiusX, int radiusY, @Nullable GrowQueue_I32 workspace ) {
+	public static void process( GrayI input, GrayI output, int radiusX, int radiusY,
+								@Nullable GrowArray<GrowQueue_I32> workArrays ) {
 
-		int w = 2*radiusX + 1;
-		int h = 2*radiusY + 1;
+		final int w = 2*radiusX + 1;
+		final int h = 2*radiusY + 1;
+
+		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I32::new);
+		//CONCURRENT_REMOVE_BELOW
+		GrowQueue_I32 workspace = workArrays.grow();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.height, h, workArrays, (workspace,y0,y1)->{
+		final int y0 = 0, y1 = input.height;
 
 		int[] workArray = BoofMiscOps.checkDeclare(workspace, w*h, false);
 
-		for (int y = 0; y < input.height; y++) {
+		for (int y = y0; y < y1; y++) {
 			int minI = y - radiusY;
 			int maxI = y + radiusY + 1;
 
@@ -75,7 +85,7 @@ public class ImplMedianSortNaive {
 
 				for (int i = minI; i < maxI; i++) {
 					for (int j = minJ; j < maxJ; j++) {
-						workArray[index++] = input.get(j, i);
+						workArray[index++] = input.unsafe_get(j, i);
 					}
 				}
 
@@ -84,6 +94,7 @@ public class ImplMedianSortNaive {
 				output.set(x, y, median);
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	/**
@@ -93,17 +104,24 @@ public class ImplMedianSortNaive {
 	 * @param output Filtered image.
 	 * @param radiusX Size of the filter region. x-axis
 	 * @param radiusY Size of the filter region. Y-axis
-	 * @param workspace Array used for storage.  If null a new array is declared internally.
+	 * @param workArrays (Optional) Storage for internal workspace. Nullable.
 	 */
 	public static void process( GrayF32 input, GrayF32 output, int radiusX, int radiusY,
-								@Nullable GrowQueue_F32 workspace ) {
+								@Nullable GrowArray<GrowQueue_F32> workArrays ) {
 
-		int w = 2*radiusX + 1;
-		int h = 2*radiusY + 1;
+		final int w = 2*radiusX + 1;
+		final int h = 2*radiusY + 1;
+
+		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_F32::new);
+		//CONCURRENT_REMOVE_BELOW
+		GrowQueue_F32 workspace = workArrays.grow();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.height, h, workArrays, (workspace,y0,y1)->{
+		final int y0 = 0, y1 = input.height;
 
 		float[] workArray = BoofMiscOps.checkDeclare(workspace, w*h, false);
 
-		for (int y = 0; y < input.height; y++) {
+		for (int y = y0; y < y1; y++) {
 			int minI = y - radiusY;
 			int maxI = y + radiusY + 1;
 
@@ -123,7 +141,7 @@ public class ImplMedianSortNaive {
 
 				for (int i = minI; i < maxI; i++) {
 					for (int j = minJ; j < maxJ; j++) {
-						workArray[index++] = input.get(j, i);
+						workArray[index++] = input.unsafe_get(j, i);
 					}
 				}
 
@@ -132,19 +150,20 @@ public class ImplMedianSortNaive {
 				output.set(x, y, median);
 			}
 		}
+		//CONCURRENT_ABOVE }});
 	}
 
 	public static void process( ImageGray input, ImageGray output, int radiusX, int radiusY,
-								@Nullable GrowQueue workspace ) {
+								@Nullable GrowArray workspace ) {
 		if (input.getDataType().isInteger()) {
-			process((GrayI)input, (GrayI)output, radiusX, radiusY, (GrowQueue_I32)workspace);
+			process((GrayI)input, (GrayI)output, radiusX, radiusY, (GrowArray<GrowQueue_I32>)workspace);
 		} else {
-			process((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrowQueue_F32)workspace);
+			process((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrowArray<GrowQueue_F32>)workspace);
 		}
 	}
 
 	public static void process( Planar input, Planar output, int radiusX, int radiusY,
-								@Nullable GrowQueue workspace ) {
+								@Nullable GrowArray workspace ) {
 		for (int i = 0; i < input.getNumBands(); i++) {
 			process(input.getBand(i), output.getBand(i), radiusX, radiusY, workspace);
 		}

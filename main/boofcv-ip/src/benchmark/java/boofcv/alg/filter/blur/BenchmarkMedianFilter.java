@@ -84,13 +84,13 @@ public class BenchmarkMedianFilter  {
 
 	public int timeSortNaive_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplMedianSortNaive.process(imgInt8,out_I8,radius,radius,null);
+			ImplMedianSortNaive.process(imgInt8,out_I8,radius,radius,(GrowArray)null);
 		return 0;
 	}
 
 	public int timeSortNaive_F32(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,radius,null);
+			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,radius,(GrowArray)null);
 		return 0;
 	}
 
