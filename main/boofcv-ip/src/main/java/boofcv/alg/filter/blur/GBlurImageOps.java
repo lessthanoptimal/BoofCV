@@ -18,13 +18,14 @@
 
 package boofcv.alg.filter.blur;
 
-import boofcv.concurrency.*;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,15 +49,15 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean( T input, @Nullable T output, int radius, @Nullable ImageBase storage, @Nullable WorkArrays workVert ) {
+	T mean( T input, @Nullable T output, int radius, @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radius, (GrayU8)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radius, (GrayU8)storage, (GrowArray<GrowQueue_I32>)workVert);
 		} else if (input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radius, (GrayU16)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radius, (GrayU16)storage, (GrowArray<GrowQueue_I32>)workVert);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radius, (GrayF32)storage, (FWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radius, (GrayF32)storage, (GrowArray<GrowQueue_F32>)workVert);
 		} else if (input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radius, (GrayF64)storage, (DWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radius, (GrayF64)storage, (GrowArray<GrowQueue_F64>)workVert);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radius, (ImageGray)storage, workVert);
 		} else {
@@ -76,15 +77,15 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage, @Nullable WorkArrays workVert ) {
+	T mean( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrayU8)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrayU8)storage, (GrowArray<GrowQueue_I32>)workVert);
 		} else if (input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radiusX, radiusY, (GrayU16)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radiusX, radiusY, (GrayU16)storage, (GrowArray<GrowQueue_I32>)workVert);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrayF32)storage, (FWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrayF32)storage, (GrowArray<GrowQueue_F32>)workVert);
 		} else if (input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radiusX, radiusY, (GrayF64)storage, (DWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radiusX, radiusY, (GrayF64)storage, (GrowArray<GrowQueue_F64>)workVert);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radiusX, radiusY, (ImageGray)storage, workVert);
 		} else {
@@ -105,15 +106,20 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T meanB( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, @Nullable ImageBase storage, @Nullable WorkArrays workVert ) {
+	T meanB( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border,
+			 @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.meanB((GrayU8)input, (GrayU8)output, radiusX, radiusY, (ImageBorder_S32)border, (GrayU8)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.meanB((GrayU8)input, (GrayU8)output, radiusX, radiusY, (ImageBorder_S32)border,
+					(GrayU8)storage, (GrowArray<GrowQueue_I32>)workVert);
 		} else if (input instanceof GrayU16) {
-			return (T)BlurImageOps.meanB((GrayU16)input, (GrayU16)output, radiusX, radiusY, (ImageBorder_S32)border, (GrayU16)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.meanB((GrayU16)input, (GrayU16)output, radiusX, radiusY, (ImageBorder_S32)border,
+					(GrayU16)storage, (GrowArray<GrowQueue_I32>)workVert);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.meanB((GrayF32)input, (GrayF32)output, radiusX, radiusY, (ImageBorder_F32)border, (GrayF32)storage, (FWorkArrays)workVert);
+			return (T)BlurImageOps.meanB((GrayF32)input, (GrayF32)output, radiusX, radiusY, (ImageBorder_F32)border,
+					(GrayF32)storage, (GrowArray<GrowQueue_F32>)workVert);
 		} else if (input instanceof GrayF64) {
-			return (T)BlurImageOps.meanB((GrayF64)input, (GrayF64)output, radiusX, radiusY, (ImageBorder_F64)border, (GrayF64)storage, (DWorkArrays)workVert);
+			return (T)BlurImageOps.meanB((GrayF64)input, (GrayF64)output, radiusX, radiusY, (ImageBorder_F64)border,
+					(GrayF64)storage, (GrowArray<GrowQueue_F64>)workVert);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.meanB((Planar)input, (Planar)output, radiusX, radiusY, (ImageBorder)border, (ImageGray)storage, workVert);
 		} else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,12 @@ package boofcv.alg.filter.binary;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.PixelMath;
-import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.GrowQueue_F32;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
@@ -59,7 +60,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	GrayF32 meanI2 = new GrayF32(1,1);
 
 	GrayF32 tmp = new GrayF32(1,1); // work space
-	FWorkArrays work = new FWorkArrays();
+	GrowArray<GrowQueue_F32> work = new GrowArray<>(GrowQueue_F32::new);
 
 	/**
 	 * Configures the algorithm.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,10 @@ package boofcv.alg.enhance;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -54,7 +56,7 @@ public class BenchmarkEnhanceImageOps {
 	GrayU8 inputU8 = new GrayU8(size, size);
 	GrayU8 outputU8 = new GrayU8(size, size);
 
-	IWorkArrays workArrays = new IWorkArrays();
+	GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
 
 	@Setup
 	public void setup() {
@@ -75,13 +77,12 @@ public class BenchmarkEnhanceImageOps {
 
 	@Benchmark
 	public void applyTransform_U8() {
-		workArrays.reset(256);
-		int[] histogram = workArrays.pop();
-		int[] transform = workArrays.pop();
+		workArrays.reset();
+		int[] histogram = BoofMiscOps.checkDeclare(workArrays.grow(), 256, false);
+		int[] transform = BoofMiscOps.checkDeclare(workArrays.grow(), 256, false);
 		ImageStatistics.histogram(inputU8,0, histogram);
 		EnhanceImageOps.equalize(histogram, transform);
 		EnhanceImageOps.applyTransform(inputU8,transform,outputU8);
-		workArrays.recycle(transform);
 	}
 
 	@Benchmark

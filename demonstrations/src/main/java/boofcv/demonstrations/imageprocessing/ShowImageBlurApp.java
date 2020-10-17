@@ -20,7 +20,6 @@ package boofcv.demonstrations.imageprocessing;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.concurrency.GrowArray;
-import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -57,16 +56,14 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 	Planar<T> output;
 	T storage;
 	BufferedImage renderedImage;
-	WorkArrays work;
-	GrowArray growArray;
+	GrowArray workspaces;
 
 	public ShowImageBlurApp( java.util.List<PathLabel> examples , Class<T> imageType ) {
 		super(examples, ImageType.pl(3,imageType));
 
 		output = new Planar<>(imageType, 1, 1, 3);
 		storage = GeneralizedImageOps.createSingleBand(imageType,1,1);
-		work = GeneralizedImageOps.createWorkArray(storage.getImageType());
-		growArray = GeneralizedImageOps.createGrowArray(storage.getImageType());
+		workspaces = GeneralizedImageOps.createGrowArray(storage.getImageType());
 
 		add(gui,BorderLayout.CENTER);
 		add(controls,BorderLayout.WEST);
@@ -109,11 +106,11 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 				break;
 
 			case 1:
-				GBlurImageOps.mean(image, output, radius, storage, work);
+				GBlurImageOps.mean(image, output, radius, storage, workspaces);
 				break;
 
 			case 2:
-				GBlurImageOps.median(image, output, radius, radius, growArray);
+				GBlurImageOps.median(image, output, radius, radius, workspaces);
 				break;
 		}
 		long time1 = System.nanoTime();

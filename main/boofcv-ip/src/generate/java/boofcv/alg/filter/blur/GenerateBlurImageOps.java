@@ -64,6 +64,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import boofcv.struct.convolve.Kernel1D_S32;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.struct.GrowQueue_F32;\n" +
+				"import org.ddogleg.struct.GrowQueue_F64;\n" +
 				"import org.ddogleg.struct.GrowQueue_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
@@ -79,7 +80,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	private void generateMeanWeighted(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
-		String letter = type.isInteger() ? "I" : type.getNumBits()==32?"F":"D";
+		String workType = ("GrowQueue_"+type.getKernelType()).replace("S32","I32");
 		out.print("\t/**\n" +
 				"\t * Applies a mean box filter with re-weighted image borders.\n" +
 				"\t *\n" +
@@ -90,7 +91,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" mean("+imageName+" input, @Nullable "+imageName+" output, int radius,\n" +
-				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable "+letter+"WorkArrays workVert ) {\n" +
+				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable GrowArray<"+workType+"> workVert ) {\n" +
 				"\t\treturn mean(input, output, radius, radius, storage, workVert);\n" +
 				"\t}\n" +
 				"\n" +
@@ -105,7 +106,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" mean( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY,\n" +
-				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable "+letter+"WorkArrays workVert ) {\n" +
+				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable GrowArray<"+workType+"> workVert ) {\n" +
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
@@ -126,7 +127,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	private void generateMeanBorder(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
-		String letter = type.isInteger() ? "I" : type.getNumBits()==32?"F":"D";
+		String workType = ("GrowQueue_"+type.getKernelType()).replace("S32","I32");
 		String suffix = type.getKernelType();
 		String borderSuffix = type.isInteger() ? suffix+"<"+imageName+">" : suffix;
 		out.print(
@@ -142,7 +143,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static "+imageName+" meanB( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t\t\t\t  @Nullable ImageBorder_"+borderSuffix+" binput,\n" +
-				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable "+letter+"WorkArrays workVert ) {\n" +
+				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable GrowArray<"+workType+"> workVert ) {\n" +
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
@@ -360,7 +361,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
 				"\tPlanar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius ,\n" +
-				"\t\t\t\t   @Nullable T storage, @Nullable WorkArrays workVert ) {\n" +
+				"\t\t\t\t   @Nullable T storage, @Nullable GrowArray workVert ) {\n" +
 				"\t\treturn mean(input,output,radius,radius,storage,workVert);\n" +
 				"\t}\n" +
 				"\n" +
@@ -376,7 +377,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
 				"\tPlanar<T> mean( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,\n" +
-				"\t\t\t\t   @Nullable T storage, @Nullable WorkArrays workVert ) {\n" +
+				"\t\t\t\t   @Nullable T storage, @Nullable GrowArray workVert ) {\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
@@ -402,7 +403,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\tpublic static <T extends ImageGray<T>>\n" +
 				"\tPlanar<T> meanB( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t   @Nullable ImageBorder<T> binput,\n" +
-				"\t\t\t\t   @Nullable T storage, @Nullable WorkArrays workVert ) {\n" +
+				"\t\t\t\t   @Nullable T storage, @Nullable GrowArray workVert ) {\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +

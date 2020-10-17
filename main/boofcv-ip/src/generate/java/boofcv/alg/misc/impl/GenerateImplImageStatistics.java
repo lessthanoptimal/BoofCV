@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -384,6 +384,8 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplImageStatistics gen = new GenerateImplImageStatistics();
-		gen.generateCode();
+		gen.setModuleName("boofcv-ip");
+		gen.parseArguments(args);
+		gen.generate();
 	}
 }

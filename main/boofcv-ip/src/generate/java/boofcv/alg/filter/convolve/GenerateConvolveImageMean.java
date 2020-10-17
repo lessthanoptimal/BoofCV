@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,29 +52,25 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print("import boofcv.alg.InputSanityCheck;\n" +
-				"import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;\n" +
+		out.print("import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;\n" +
 				"import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;\n" +
 				"import boofcv.alg.filter.convolve.noborder.ImplConvolveMean_MT;\n" +
 				"import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;\n" +
-				"import boofcv.concurrency.BoofConcurrency;\n" +
-				"import boofcv.concurrency.DWorkArrays;\n" +
-				"import boofcv.concurrency.FWorkArrays;\n" +
-				"import boofcv.concurrency.IWorkArrays;\n" +
+				"import boofcv.concurrency.*;\n" +
 				"import boofcv.factory.filter.kernel.FactoryKernel;\n" +
 				"import boofcv.struct.border.*;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
+				"\n" +
+				"import org.ddogleg.struct.GrowQueue_F32;\n" +
+				"import org.ddogleg.struct.GrowQueue_F64;\n" +
+				"import org.ddogleg.struct.GrowQueue_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
-				"\n" +
 				"/**\n" +
-				" * <p>\n" +
-				" * Convolves a mean filter across the image.  The mean value of all the pixels are computed inside the kernel.\n" +
-				" * </p>\n" +
-				" *\n" +
+				" * <p>Convolves a mean filter across the image. The mean value of all the pixels are computed inside the kernel.</p>\n" +
 				generateDocString("Peter Abeles") +
 				"public class "+className+" {\n\n");
 	}
@@ -91,10 +87,10 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t * @param offset Start offset from pixel coordinate\n" +
 				"\t * @param length How long the mean filter is\n" +
 				"\t */\n" +
-				"\tpublic static void horizontal("+ srcName+" input, "+ dstName+" output, int offset, int length) {\n" +
+				"\tpublic static void horizontal( "+ srcName+" input, "+ dstName+" output, int offset, int length ) {\n" +
 				"\t\toutput.reshape(input);\n" +
 				"\n" +
-				"\t\tif( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length) )\n" +
+				"\t\tif (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))\n" +
 				"\t\t\treturn;\n" +
 				"\n" +
 				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
@@ -102,7 +98,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t\t\tConvolveImageNormalized.horizontal(kernel, input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);\n" +
-				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
 				"\t\t\t\tImplConvolveMean_MT.horizontal(input, output, offset, length);\n" +
 				"\t\t\t} else {\n" +
 				"\t\t\t\tImplConvolveMean.horizontal(input, output, offset, length);\n" +
@@ -112,7 +108,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 	}
 
 	private void vertical( String srcName , String dstName ) {
-		String workArray = src.getLetterSum()+"WorkArrays";
+		String workType = ("GrowQueue_"+src.getKernelType()).replace("S32","I32");
 		String suffix = src.getKernelType();
 		String normalized = src.isInteger() ? "" : " , true";
 
@@ -125,10 +121,10 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t * @param length How long the mean filter is\n" +
 				"\t * @param work (Optional) Storage for work array\n" +
 				"\t */\n" +
-				"\tpublic static void vertical("+srcName+" input, "+dstName+" output, int offset, int length, @Nullable "+workArray+" work) {\n" +
+				"\tpublic static void vertical( "+srcName+" input, "+dstName+" output, int offset, int length, @Nullable GrowArray<"+workType+"> workspaces ) {\n" +
 				"\t\toutput.reshape(input);\n" +
 				"\n" +
-				"\t\tif( BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length) )\n" +
+				"\t\tif (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))\n" +
 				"\t\t\treturn;\n" +
 				"\n" +
 				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
@@ -136,10 +132,10 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t\t\tConvolveImageNormalized.vertical(kernel, input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);\n" +
-				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
-				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, offset, length, work);\n" +
+				"\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);\n" +
 				"\t\t\t} else {\n" +
-				"\t\t\t\tImplConvolveMean.vertical(input, output, offset, length, work);\n" +
+				"\t\t\t\tImplConvolveMean.vertical(input, output, offset, length, workspaces);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -161,10 +157,10 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t * @param binput Used to process image borders. If null borders are not processed.\n" +
 				"\t * @param length How long the mean filter is\n" +
 				"\t */\n" +
-				"\tpublic static void horizontal("+srcName+" input, "+dstName+" output, int offset, int length, @Nullable ImageBorder_"+borderSuffix+" binput) {\n" +
+				"\tpublic static void horizontal( "+srcName+" input, "+dstName+" output, int offset, int length, @Nullable ImageBorder_"+borderSuffix+" binput ) {\n" +
 				"\t\toutput.reshape(input.width,output.height);\n" +
 				"\n" +
-				"\t\tif( binput != null ) {\n" +
+				"\t\tif (binput != null) {\n" +
 				"\t\t\tbinput.setImage(input);\n" +
 				"\t\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
 				"\t\t\tConvolveJustBorder_General_SB.horizontal(kernel, binput, output"+divisor+");\n" +
@@ -180,7 +176,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 	}
 
 	private void verticalBorder( String srcName, String dstName ) {
-		String workArray = src.getLetterSum()+"WorkArrays";
+		String workType = ("GrowQueue_"+src.getKernelType()).replace("S32","I32");
 		String suffix = src.getKernelType();
 		String normalized = src.isInteger() ? "" : " , true";
 		String divisor = src.isInteger() ? ", kernel.computeSum()" : "";
@@ -195,7 +191,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t * @param binput Used to process image borders. If null borders are not processed.\n" +
 				"\t * @param work (Optional) Storage for work array\n" +
 				"\t */\n" +
-				"\tpublic static void vertical("+srcName+" input, "+dstName+" output, int offset, int length, @Nullable ImageBorder_"+borderSuffix+" binput, @Nullable "+workArray+" work) {\n" +
+				"\tpublic static void vertical( "+srcName+" input, "+dstName+" output, int offset, int length, @Nullable ImageBorder_"+borderSuffix+" binput, @Nullable GrowArray<"+workType+"> workspaces ) {\n" +
 				"\t\toutput.reshape(input);\n" +
 				"\n" +
 				"\t\tif( binput != null ) {\n" +
@@ -205,9 +201,9 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\t\tif (length <= input.height) {\n" +
 				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
-				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, offset, length, work);\n" +
+				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);\n" +
 				"\t\t\t} else {\n" +
-				"\t\t\t\tImplConvolveMean.vertical(input, output, offset, length, work);\n" +
+				"\t\t\t\tImplConvolveMean.vertical(input, output, offset, length, workspaces);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -215,6 +211,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		GenerateConvolveImageMean gen = new GenerateConvolveImageMean();
-		gen.generateCode();
+		gen.setModuleName("boofcv-ip");
+		gen.generate();
 	}
 }

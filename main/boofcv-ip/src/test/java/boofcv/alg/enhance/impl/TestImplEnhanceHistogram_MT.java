@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -72,15 +73,17 @@ class TestImplEnhanceHistogram_MT extends CompareIdenticalFunctions {
 			case "equalizeLocalNaive":
 			case "equalizeLocalInner":
 				parameters[1] = BoofTesting.primitive(2,types[1]);
-				parameters[2] = GeneralizedImageOps.createSingleBand(types[2],width,height);
-				parameters[3] = BoofTesting.createWorkArray(types[3],256);
+				parameters[2] = BoofTesting.primitive(256,types[2]);
+				parameters[3] = GeneralizedImageOps.createSingleBand(types[3],width,height);
+				parameters[4] = GeneralizedImageOps.createGrowArray(ImageType.single(types[3]));
 				break;
 			case "equalizeLocalRow":
 			case "equalizeLocalCol":
 				parameters[1] = BoofTesting.primitive(2,types[1]);
-				parameters[2] = BoofTesting.primitive(2,types[2]);
-				parameters[3] = GeneralizedImageOps.createSingleBand(types[3],width,height);
-				parameters[4] = BoofTesting.createWorkArray(types[4],256);
+				parameters[2] = BoofTesting.primitive(256,types[2]);
+				parameters[3] = BoofTesting.primitive(2,types[3]);
+				parameters[4] = GeneralizedImageOps.createSingleBand(types[4],width,height);
+				parameters[5] = GeneralizedImageOps.createGrowArray(ImageType.single(types[4]));
 				break;
 		}
 

@@ -20,7 +20,6 @@ package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.concurrency.GrowArray;
-import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
@@ -40,62 +39,60 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private BlurOperation operation;
 
 	// the Gaussian's standard deviation
-	private double sigmaX,sigmaY;
+	private double sigmaX, sigmaY;
 	// size of the blur region along each axis
-	private int radiusX,radiusY;
+	private int radiusX, radiusY;
 	// stores intermediate results
 	private T storage;
 
 	// type of image it processes
 	ImageType<T> inputType;
-	WorkArrays workArray;
-	GrowArray growArray;
+	GrowArray<?> growArray;
 
 	/** Specified how the border is handled for mean images. If null then it's normalized */
-	@Getter	@Setter ImageBorder<T> border = null;
+	@Getter @Setter ImageBorder<T> border = null;
 
-	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radius) {
-		this(functionName,inputType,-1,radius,-1,radius);
+	public BlurStorageFilter( String functionName, ImageType<T> inputType, int radius ) {
+		this(functionName, inputType, -1, radius, -1, radius);
 	}
 
-	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radiusX, int radiusY) {
-		this(functionName,inputType,-1,radiusX,-1,radiusY);
+	public BlurStorageFilter( String functionName, ImageType<T> inputType, int radiusX, int radiusY ) {
+		this(functionName, inputType, -1, radiusX, -1, radiusY);
 	}
 
-	public BlurStorageFilter( String functionName , ImageType<T> inputType,
-							  double sigmaX, int radiusX, double sigmaY , int radiusY) {
+	public BlurStorageFilter( String functionName, ImageType<T> inputType,
+							  double sigmaX, int radiusX, double sigmaY, int radiusY ) {
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
 		this.sigmaX = sigmaX;
 		this.sigmaY = sigmaY;
 		this.inputType = inputType;
 
-		if( functionName.equals("mean")) {
+		if (functionName.equals("mean")) {
 			operation = new MeanOperation();
 			createStorage();
-		} else if( functionName.equals("meanB")) {
+		} else if (functionName.equals("meanB")) {
 			operation = new MeanBorderOperation();
 			createStorage();
-		} else if( functionName.equals("gaussian")) {
+		} else if (functionName.equals("gaussian")) {
 			operation = new GaussianOperation();
 			createStorage();
-		} else if( functionName.equals("median")) {
-			if( radiusX != radiusY )
+		} else if (functionName.equals("median")) {
+			if (radiusX != radiusY)
 				throw new IllegalArgumentException("Median currently only supports equal radius");
 			operation = new MedianOperator();
 		} else {
-			throw new IllegalArgumentException("Unknown function "+functionName);
+			throw new IllegalArgumentException("Unknown function " + functionName);
 		}
 
-		workArray = GeneralizedImageOps.createWorkArray( inputType );
-		growArray = GeneralizedImageOps.createGrowArray( inputType );
+		growArray = GeneralizedImageOps.createGrowArray(inputType);
 	}
 
 	private void createStorage() {
-		if( inputType.getFamily() == ImageType.Family.PLANAR ) {
-			storage = (T)GeneralizedImageOps.createSingleBand(inputType.getImageClass(),1,1);
+		if (inputType.getFamily() == ImageType.Family.PLANAR) {
+			storage = (T)GeneralizedImageOps.createSingleBand(inputType.getImageClass(), 1, 1);
 		} else {
-			storage = inputType.createImage(1,1);
+			storage = inputType.createImage(1, 1);
 		}
 	}
 
@@ -110,16 +107,16 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	}
 
 	@Override
-	public void setRadius(int radius) {
+	public void setRadius( int radius ) {
 		this.radiusX = radius;
 		this.radiusY = radius;
 	}
 
 	@Override
-	public void process(T input, T output) {
-		if( storage != null )
+	public void process( T input, T output ) {
+		if (storage != null)
 			storage.reshape(output.width, output.height);
-		operation.process(input,output);
+		operation.process(input, output);
 	}
 
 	@Override
@@ -143,41 +140,41 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	}
 
 	private interface BlurOperation {
-		void process(ImageBase input , ImageBase output );
+		void process( ImageBase input, ImageBase output );
 	}
 
 	private class MeanOperation implements BlurOperation {
 		@Override
-		public void process(ImageBase input, ImageBase output) {
-			if( border != null )
+		public void process( ImageBase input, ImageBase output ) {
+			if (border != null)
 				throw new IllegalArgumentException(
 						"Border has been set but will never be used. Must be a bug. Use meanB() instead");
-			GBlurImageOps.mean(input,output, radiusX,radiusY,storage,workArray);
+			GBlurImageOps.mean(input, output, radiusX, radiusY, storage, growArray);
 		}
 	}
 
 	private class MeanBorderOperation implements BlurOperation {
 		@Override
-		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.meanB(input,output, radiusX,radiusY,(ImageBorder)border,storage,workArray);
+		public void process( ImageBase input, ImageBase output ) {
+			GBlurImageOps.meanB(input, output, radiusX, radiusY, (ImageBorder)border, storage, growArray);
 		}
 	}
 
 	private class GaussianOperation implements BlurOperation {
 		@Override
-		public void process(ImageBase input, ImageBase output) {
-			if( border != null )
+		public void process( ImageBase input, ImageBase output ) {
+			if (border != null)
 				throw new IllegalArgumentException("Border has been set but will never be used. Must be a bug.");
-			GBlurImageOps.gaussian(input,output,sigmaX, radiusX,sigmaY,radiusY,storage);
+			GBlurImageOps.gaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 		}
 	}
 
 	private class MedianOperator implements BlurOperation {
 		@Override
-		public void process(ImageBase input, ImageBase output) {
-			if( border != null )
+		public void process( ImageBase input, ImageBase output ) {
+			if (border != null)
 				throw new IllegalArgumentException("Border has been set but will never be used. Must be a bug.");
-			GBlurImageOps.median(input,output, radiusX, radiusY, growArray);
+			GBlurImageOps.median(input, output, radiusX, radiusY, growArray);
 		}
 	}
 }

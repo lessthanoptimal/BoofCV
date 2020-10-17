@@ -21,7 +21,7 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
@@ -29,6 +29,7 @@ import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -434,7 +435,7 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		GImageMiscOps.fill(dest, 0);
 		int divisor = kernelWidth*kernelWidth;
 
-		invokeMethod("convolve", kernel, img, dest, divisor, new IWorkArrays());
+		invokeMethod("convolve", kernel, img, dest, divisor, new GrowArray<>(GrowQueue_I32::new));
 
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 

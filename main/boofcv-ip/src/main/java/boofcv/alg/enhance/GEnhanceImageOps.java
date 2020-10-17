@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,17 @@
 package boofcv.alg.enhance;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.GrowQueue_I32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Weakly typed version of {@link EnhanceImageOps}.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class GEnhanceImageOps {
 	/**
 	 * Applies the transformation table to the provided input image.
@@ -37,21 +40,21 @@ public class GEnhanceImageOps {
 	 * @param output Output image.
 	 */
 	public static <T extends ImageGray<T>>
-	void applyTransform( T input , int transform[] , int minValue , T output ) {
+	void applyTransform( T input, int[] transform, int minValue, T output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if( input instanceof GrayU8) {
-			EnhanceImageOps.applyTransform((GrayU8) input, transform, (GrayU8) output);
-		} else if( input instanceof GrayS8) {
-			EnhanceImageOps.applyTransform((GrayS8)input,transform,minValue,(GrayS8)output);
-		} else if( input instanceof GrayU16) {
-			EnhanceImageOps.applyTransform((GrayU16)input,transform,(GrayU16)output);
-		} else if( input instanceof GrayS16) {
-			EnhanceImageOps.applyTransform((GrayS16)input,transform,minValue,(GrayS16)output);
-		} else if( input instanceof GrayS32) {
-			EnhanceImageOps.applyTransform((GrayS32)input,transform,minValue,(GrayS32)output);
+		if (input instanceof GrayU8) {
+			EnhanceImageOps.applyTransform((GrayU8)input, transform, (GrayU8)output);
+		} else if (input instanceof GrayS8) {
+			EnhanceImageOps.applyTransform((GrayS8)input, transform, minValue, (GrayS8)output);
+		} else if (input instanceof GrayU16) {
+			EnhanceImageOps.applyTransform((GrayU16)input, transform, (GrayU16)output);
+		} else if (input instanceof GrayS16) {
+			EnhanceImageOps.applyTransform((GrayS16)input, transform, minValue, (GrayS16)output);
+		} else if (input instanceof GrayS32) {
+			EnhanceImageOps.applyTransform((GrayS32)input, transform, minValue, (GrayS32)output);
 		} else {
-			throw new IllegalArgumentException("Image type not supported. "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Image type not supported. " + input.getClass().getSimpleName());
 		}
 	}
 
@@ -65,19 +68,19 @@ public class GEnhanceImageOps {
 	 * @param workArrays Used to create work arrays. can be null
 	 */
 	public static <T extends ImageBase<T>>
-	void equalizeLocal( T input , int radius , T output ,
-						int histogramLength , IWorkArrays workArrays ) {
-		if( input instanceof Planar ) {
+	void equalizeLocal( T input, int radius, T output,
+						int histogramLength, @Nullable GrowArray<GrowQueue_I32> workArrays ) {
+		if (input instanceof Planar) {
 			Planar pi = (Planar)input;
 			Planar po = (Planar)output;
 			for (int i = 0; i < pi.getNumBands(); i++) {
-				equalizeLocal(pi.getBand(i),radius,po.getBand(i),histogramLength, workArrays);
+				equalizeLocal(pi.getBand(i), radius, po.getBand(i), histogramLength, workArrays);
 			}
 		} else {
 			if (input instanceof GrayU8) {
-				EnhanceImageOps.equalizeLocal((GrayU8) input, radius, (GrayU8) output, histogramLength, workArrays);
+				EnhanceImageOps.equalizeLocal((GrayU8)input, radius, (GrayU8)output, histogramLength, workArrays);
 			} else if (input instanceof GrayU16) {
-				EnhanceImageOps.equalizeLocal((GrayU16) input, radius, (GrayU16) output, histogramLength, workArrays);
+				EnhanceImageOps.equalizeLocal((GrayU16)input, radius, (GrayU16)output, histogramLength, workArrays);
 			} else {
 				throw new IllegalArgumentException("Unsupported image type " + input.getClass().getSimpleName());
 			}
@@ -90,18 +93,18 @@ public class GEnhanceImageOps {
 	 * @param input Input image.
 	 * @param output Output image.
 	 */
-	public static <T extends ImageBase<T>> void sharpen4(T input , T output ) {
-		if( input instanceof Planar ) {
+	public static <T extends ImageBase<T>> void sharpen4( T input, T output ) {
+		if (input instanceof Planar) {
 			Planar pi = (Planar)input;
 			Planar po = (Planar)output;
 			for (int i = 0; i < pi.getNumBands(); i++) {
-				sharpen4(pi.getBand(i),po.getBand(i));
+				sharpen4(pi.getBand(i), po.getBand(i));
 			}
 		} else {
 			if (input instanceof GrayU8) {
-				EnhanceImageOps.sharpen4((GrayU8) input, (GrayU8) output);
+				EnhanceImageOps.sharpen4((GrayU8)input, (GrayU8)output);
 			} else if (input instanceof GrayF32) {
-				EnhanceImageOps.sharpen4((GrayF32) input, (GrayF32) output);
+				EnhanceImageOps.sharpen4((GrayF32)input, (GrayF32)output);
 			} else {
 				throw new IllegalArgumentException("Image type not supported. " + input.getClass().getSimpleName());
 			}
@@ -114,18 +117,18 @@ public class GEnhanceImageOps {
 	 * @param input Input image.
 	 * @param output Output image.
 	 */
-	public static <T extends ImageBase<T>> void sharpen8(T input , T output ) {
-		if( input instanceof Planar ) {
+	public static <T extends ImageBase<T>> void sharpen8( T input, T output ) {
+		if (input instanceof Planar) {
 			Planar pi = (Planar)input;
 			Planar po = (Planar)output;
 			for (int i = 0; i < pi.getNumBands(); i++) {
-				sharpen8(pi.getBand(i),po.getBand(i));
+				sharpen8(pi.getBand(i), po.getBand(i));
 			}
 		} else {
 			if (input instanceof GrayU8) {
-				EnhanceImageOps.sharpen8((GrayU8) input, (GrayU8) output);
+				EnhanceImageOps.sharpen8((GrayU8)input, (GrayU8)output);
 			} else if (input instanceof GrayF32) {
-				EnhanceImageOps.sharpen8((GrayF32) input, (GrayF32) output);
+				EnhanceImageOps.sharpen8((GrayF32)input, (GrayF32)output);
 			} else {
 				throw new IllegalArgumentException("Image type not supported. " + input.getClass().getSimpleName());
 			}

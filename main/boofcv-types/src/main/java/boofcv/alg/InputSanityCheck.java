@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,7 @@
 package boofcv.alg;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.*;
 import boofcv.struct.pyramid.ImagePyramid;
 
 /**
@@ -62,6 +60,35 @@ public class InputSanityCheck {
 			output.reshape(input.width, input.height);
 		}
 		return output;
+	}
+
+	public static <T extends ImageGray<T>> T checkDeclare(T image, int width, int height, Class<T> imageType ) {
+		if (image==null)
+			image = GeneralizedImageOps.createSingleBand(imageType,width,height);
+		else
+			image.reshape(width,height);
+		return image;
+	}
+
+	public static <T extends ImageInterleaved<T>>T checkDeclare( T image,
+																 int width, int height, int numBands,
+																 Class<T> imageType ) {
+		if (image==null)
+			image = GeneralizedImageOps.createInterleaved(imageType, width, height, numBands);
+		else
+			image.reshape(width,height, numBands);
+		return image;
+	}
+
+
+	public static <T extends ImageGray<T>> Planar<T> checkDeclare( Planar<T> image,
+																   int width, int height, int numBands,
+																   Class<T> imageType ) {
+		if (image==null)
+			image = new Planar<>(imageType, width, height, numBands);
+		else
+			image.reshape(width,height, numBands);
+		return image;
 	}
 
 	/**

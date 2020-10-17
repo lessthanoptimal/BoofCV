@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.concurrency.WorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
 /**
  * Adaptive/local threshold using a square region
  *
- * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, ConfigLength, double, boolean, ImageGray, ImageGray)
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean 
  *
  * @author Peter Abeles
  */
@@ -39,7 +39,7 @@ public class LocalMeanBinaryFilter<T extends ImageGray<T>> implements InputToBin
 
 	T work1;
 	ImageGray work2;
-	WorkArrays work3;
+	GrowArray work3;
 
 	ConfigLength regionWidth;
 	double scale;
@@ -56,7 +56,7 @@ public class LocalMeanBinaryFilter<T extends ImageGray<T>> implements InputToBin
 		this.inputType = inputType;
 		work1 = inputType.createImage(1,1);
 		work2 = inputType.createImage(1,1);
-		work3 = GeneralizedImageOps.createWorkArray(inputType);
+		work3 = GeneralizedImageOps.createGrowArray(inputType);
 	}
 
 	@Override

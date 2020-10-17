@@ -18,7 +18,6 @@
 
 package boofcv;
 
-import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.*;
 import boofcv.struct.image.*;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -1096,11 +1095,5 @@ public class BoofTesting {
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public static WorkArrays createWorkArray( Class<?> type, int length ) {
-		WorkArrays w = (WorkArrays)createInstance(type);
-		w.reset(length);
-		return w;
 	}
 }

@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplConvolveBox extends CompareEquivalentFunctions {
 
 	static int width = 10;
@@ -47,34 +48,34 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 	}
 
 	@Override
-	protected boolean isTestMethod(Method m) {
-		Class<?> params[] = m.getParameterTypes();
+	protected boolean isTestMethod( Method m ) {
+		Class<?>[] params = m.getParameterTypes();
 
-		if( params.length != 3 && params.length != 4)
+		if (params.length != 3 && params.length != 4)
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
 	}
 
 	@Override
-	protected boolean isEquivalent(Method candidate, Method validation) {
+	protected boolean isEquivalent( Method candidate, Method validation ) {
 
-		Class<?> v[] = candidate.getParameterTypes();
-		Class<?> c[] = validation.getParameterTypes();
+		Class<?>[] v = candidate.getParameterTypes();
+		Class<?>[] c = validation.getParameterTypes();
 
-		if( v.length != 3 )
+		if (v.length != 3)
 			return false;
 
-		if( !candidate.getName().equals(validation.getName()))
+		if (!candidate.getName().equals(validation.getName()))
 			return false;
 
 		return c[0] == v[1] && c[1] == v[2];
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 
-		Class c[] = candidate.getParameterTypes();
+		Class[] c = candidate.getParameterTypes();
 
 		ImageGray input = GeneralizedImageOps.createSingleBand(c[0], width, height);
 		ImageGray output = GeneralizedImageOps.createSingleBand(c[1], width, height);
@@ -82,26 +83,26 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		Object[][] ret = new Object[1][];
-		if( c.length == 3 )
-			ret[0] = new Object[]{input,output,kernelRadius};
+		if (c.length == 3)
+			ret[0] = new Object[]{input, output, kernelRadius};
 		else
-			ret[0] = new Object[]{input,output,kernelRadius,null};
+			ret[0] = new Object[]{input, output, kernelRadius, null};
 
 		return ret;
 	}
 
 	@Override
-	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		Class<?> params[] = m.getParameterTypes();
-		Object kernel = TestConvolveImageBox.createTableKernel(params[0],kernelRadius,rand);
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
+		Class<?>[] params = m.getParameterTypes();
+		Object kernel = TestConvolveImageBox.createTableKernel(params[0], kernelRadius, rand);
 
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
-		return new Object[]{kernel,targetParam[0],output};
+		return new Object[]{kernel, targetParam[0], output};
 	}
 
 	@Override
-	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
+	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
 		ImageGray expected = (ImageGray)validationParam[2];
 		ImageGray found = (ImageGray)targetParam[1];
 

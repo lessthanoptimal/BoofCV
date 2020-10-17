@@ -23,11 +23,12 @@ import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -37,17 +38,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 
 	int width = 15;
 	int height = 20;
+	int histogramLength = 10;
 
 	@Test
 	public void applyTransform() {
 		int numFound = 0;
 
-		Method methods[] = ImplEnhanceHistogram.class.getMethods();
+		Method[] methods = ImplEnhanceHistogram.class.getMethods();
 		for( int i = 0; i < methods.length; i++ ) {
 			if( methods[i].getName().compareTo("applyTransform") != 0 )
 				continue;
@@ -68,7 +70,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 
 	public void applyTransform(ImageGray input , ImageGray output ) {
 		int min = input.getDataType().isSigned() ? -10 : 0;
-		int transform[] = new int[10-min];
+		int[] transform = new int[10-min];
 
 		GImageMiscOps.fillUniform(input, rand, Math.min(min+1,0), 9); // upper limit is inclusive
 		for( int i = min; i < 10; i++ )
@@ -100,7 +102,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	public void equalizeLocalNaive() {
 		int numFound = 0;
 
-		Method methods[] = ImplEnhanceHistogram.class.getMethods();
+		Method[] methods = ImplEnhanceHistogram.class.getMethods();
 		for (Method method : methods) {
 			if (method.getName().compareTo("equalizeLocalNaive") != 0)
 				continue;
@@ -121,13 +123,13 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 
 	public void equalizeLocalNaive(GrayI input , GrayI output ) {
 
-		GrayI tmp = (GrayI)GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		IWorkArrays workArrays = new IWorkArrays(10);
+		GrayI tmp = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
 		for( int radius = 1; radius < 11; radius++ ) {
-			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, output, workArrays);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, histogramLength, output, workArrays);
 
 			int width = 2*radius+1;
 
@@ -174,7 +176,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	public void equalizeLocalInner() {
 		int numFound = 0;
 
-		Method methods[] = ImplEnhanceHistogram.class.getMethods();
+		Method[] methods = ImplEnhanceHistogram.class.getMethods();
 		for (Method method : methods) {
 			if (method.getName().compareTo("equalizeLocalNaive") != 0)
 				continue;
@@ -193,8 +195,8 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	}
 
 	public void equalizeLocalInner(GrayI input , GrayI found ) {
-		GrayI expected = (GrayI)GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		IWorkArrays workArrays = new IWorkArrays(10);
+		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
@@ -202,8 +204,8 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 			// fill with zeros so it can be tested using checkBorderZero
 			GImageMiscOps.fill(found,0);
 
-			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, expected, workArrays);
-			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalInner", input, radius, found, workArrays);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, histogramLength, expected, workArrays);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalInner", input, radius, histogramLength, found, workArrays);
 
 			BoofTesting.assertEqualsInner(expected,found,1e-10,radius,radius,false);
 			BoofTesting.checkBorderZero(found,radius);
@@ -214,7 +216,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	public void equalizeLocalRow() {
 		int numFound = 0;
 
-		Method methods[] = ImplEnhanceHistogram.class.getMethods();
+		Method[] methods = ImplEnhanceHistogram.class.getMethods();
 		for (Method method : methods) {
 			if (method.getName().compareTo("equalizeLocalRow") != 0)
 				continue;
@@ -233,8 +235,8 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	}
 
 	public void equalizeLocalRow(GrayI input , GrayI found ) {
-		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		IWorkArrays workArrays = new IWorkArrays(10);
+		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
@@ -244,9 +246,9 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 			GImageMiscOps.fill(found,0);
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, workArrays);
+					"equalizeLocalNaive", input, radius, histogramLength, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalRow", input, radius, 0, found, workArrays);
+					"equalizeLocalRow", input, radius, histogramLength, 0, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(0,0,width,radius, null);
 			GrayI subFound = (GrayI)found.subimage(0,0,width,radius, null);
@@ -264,9 +266,9 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 			int start = input.height-radius;
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, workArrays);
+					"equalizeLocalNaive", input, radius, histogramLength, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalRow", input, radius, start, found, workArrays);
+					"equalizeLocalRow", input, radius, histogramLength, start, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(0,start,width,height, null);
 			GrayI subFound = (GrayI)found.subimage(0,start,width,height, null);
@@ -291,7 +293,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	public void equalizeLocalCol() {
 		int numFound = 0;
 
-		Method methods[] = ImplEnhanceHistogram.class.getMethods();
+		Method[] methods = ImplEnhanceHistogram.class.getMethods();
 		for (Method method : methods) {
 			if (method.getName().compareTo("equalizeLocalCol") != 0)
 				continue;
@@ -310,8 +312,8 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	}
 
 	public void equalizeLocalCol(GrayI input , GrayI found ) {
-		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		IWorkArrays workArrays = new IWorkArrays(10);
+		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,1,9);
 
@@ -321,9 +323,9 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 			GImageMiscOps.fill(found,0);
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, workArrays);
+					"equalizeLocalNaive", input, radius, histogramLength, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalCol", input, radius, 0, found, workArrays);
+					"equalizeLocalCol", input, radius, histogramLength, 0, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(0,radius,radius,height-radius-1, null);
 			GrayI subFound = (GrayI)found.subimage(0,radius,radius,height-radius-1, null);
@@ -341,9 +343,9 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 			int start = input.width-radius;
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, workArrays);
+					"equalizeLocalNaive", input, radius, histogramLength, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalCol", input, radius, start, found, workArrays);
+					"equalizeLocalCol", input, radius, histogramLength, start, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(start,radius,width,height-radius-1, null);
 			GrayI subFound = (GrayI)found.subimage(start,radius,width,height-radius-1, null);

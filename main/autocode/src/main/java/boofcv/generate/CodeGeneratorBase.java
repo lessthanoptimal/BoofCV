@@ -46,10 +46,11 @@ public abstract class CodeGeneratorBase {
 	 */
 	protected @Getter @Setter boolean overwrite = true;
 
-	public CodeGeneratorBase() {
+	protected CodeGeneratorBase() {
 		try {
 			File pathCopyright = new File(findPathToProjectRoot(), "misc/copyright.txt");
-			copyright = readFile(pathCopyright.getAbsolutePath(), StandardCharsets.UTF_8);
+			// The trim is to make we know how much white space (i.e. none) is at the end, which can be variable
+			copyright = readFile(pathCopyright.getAbsolutePath(), StandardCharsets.UTF_8).trim()+"\n";
 		} catch( IOException e) {
 			e.printStackTrace();
 		}
