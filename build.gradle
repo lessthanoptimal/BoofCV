@@ -5,6 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
     id "com.peterabeles.gversion" version "1.8.3" apply false
     id "net.ltgt.errorprone" version "1.2.1" apply false
+    id "com.diffplug.spotless" version "5.6.1" apply false
 }
 
 ext.libpath = file('./').absolutePath
@@ -38,6 +39,7 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
     apply plugin: 'net.ltgt.errorprone'
+    apply plugin: 'com.diffplug.spotless'
 
     java {
         sourceCompatibility = JavaVersion.VERSION_14
@@ -211,6 +213,33 @@ subprojects {
         project.uploadArchives.enabled = false
         project.tasks.publish.enabled = false
     }
+
+    spotless {
+        ratchetFrom 'origin/SNAPSHOT'
+
+        format 'misc', {
+            // define the files to apply `misc` to
+            target '*.gradle', '*.md', '.gitignore'
+
+            // define the steps to apply to those files
+            trimTrailingWhitespace()
+            indentWithTabs()
+            endWithNewline()
+        }
+        java {
+            // There is currently no good way to exclude files that contain "@Generated" or are not versions.
+            // This should catch most of them with a few false positives.
+            target '**/*.java'
+            targetExclude('**/*_MT*.java','**/*_F32.java','**/generated/*')
+
+            toggleOffOn('formatter:off', 'formatter:on')
+            removeUnusedImports()
+            endWithNewline()
+
+            licenseHeaderFile "${project.rootDir}/misc/copyright.txt"
+        }
+    }
+
     if (!project.tasks.publish.enabled)
         return
 
