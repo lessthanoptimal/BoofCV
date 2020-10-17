@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,6 +55,8 @@ public class AutocodeConcurrentApp {
 	private static final String prefix = "//CONCURRENT_";
 	private static final String tab = "\t";
 	private static final FindProjectRoot findRootDirectory = AutocodeMasterApp::findPathToProjectRoot;
+	private static final String sourceRootName = "main";
+	private static final String pathRootToTest = "../test/java";
 
 	/**
 	 * Converts the file from single thread into concurrent implementation
@@ -155,38 +157,39 @@ public class AutocodeConcurrentApp {
 		}
 		out.close();
 
-		createTestIfNotThere(outputFile);
+		createTestIfNotThere(outputFile, sourceRootName, pathRootToTest);
 	}
 
 	/**
 	 * If a test class doesn't exist it will create one. This is to remind the user to do it
 	 */
-	private static void createTestIfNotThere( File file ) {
+	private static void createTestIfNotThere( File file, String sourceRootName, String pathRootToTest ) {
 		String fileName = "Test" + file.getName();
-		String parent = file.getParent().replaceAll("src", "test");
 
-//		List<String> packagePath = new ArrayList<>();
-//		while( true ) {
-//			String parent = file.getParentFile().getName();
-//			if( parent == null ) {
-//				throw new IllegalArgumentException("Problem! Can't find 'src/main' directory");
-//			} else if( parent.equals("main") ) {
-//				file = file.getParentFile();
-//				break;
-//			} else {
-//				packagePath.add(parent);
-//				file = file.getParentFile();
-//			}
-//		}
-//		file = new File(file.getParent(),"test/java");
-//		for (int i = packagePath.size()-2; i >= 0; i--) {
-//			file = new File(file,packagePath.get(i));
-//		}
-		file = new File(parent, fileName);
+		List<String> packagePath = new ArrayList<>();
+		while (true) {
+			if (file.getParentFile() == null) {
+				throw new IllegalArgumentException("Problem! Can't find '" + sourceRootName + "' directory");
+			}
+			String parentName = file.getParentFile().getName();
+			file = file.getParentFile();
+			if (parentName.equals(sourceRootName)) {
+				break;
+			} else {
+				packagePath.add(parentName);
+			}
+		}
+		file = new File(file, pathRootToTest);
+		for (int i = packagePath.size() - 2; i >= 0; i--) {
+			file = new File(file, packagePath.get(i));
+		}
+		file = new File(file, fileName);
+		// only create it if it doesn't exist
 		if (file.exists()) {
 			return;
 		}
-		createTestFile(file);
+		// Simplify the path before passing it in
+		createTestFile(file.toPath().toAbsolutePath().normalize().toFile());
 	}
 
 	private static void createTestFile( File path ) {
@@ -340,8 +343,7 @@ public class AutocodeConcurrentApp {
 		return lines;
 	}
 
-	public interface FindProjectRoot
-	{
+	public interface FindProjectRoot {
 		File findPathToRoot();
 	}
 
