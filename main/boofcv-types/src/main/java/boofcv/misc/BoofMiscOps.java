@@ -20,7 +20,6 @@ package boofcv.misc;
 
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.GrowArray;
-import boofcv.concurrency.IWorkArrays;
 import boofcv.errors.BoofAssertFailure;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
@@ -630,12 +629,22 @@ public class BoofMiscOps {
 		return false;
 	}
 
-	public static IWorkArrays checkDeclare( @Nullable IWorkArrays arrays, int length) {
-		if (arrays==null)
-			arrays = new IWorkArrays(length);
-		else
-			arrays.reset(length);
-		return arrays;
+	public static boolean[] checkDeclare( @Nullable GrowQueue_B queue, int length, boolean zero ) {
+		if (queue==null)
+			queue = new GrowQueue_B(length);
+		queue.resize(length);
+		if (zero)
+			queue.fill(false);
+		return queue.data;
+	}
+
+	public static byte[] checkDeclare( @Nullable GrowQueue_I8 queue, int length, boolean zero ) {
+		if (queue==null)
+			queue = new GrowQueue_I8(length);
+		queue.resize(length);
+		if( zero )
+			queue.fill((byte)0);
+		return queue.data;
 	}
 
 	public static int[] checkDeclare( @Nullable GrowQueue_I32 queue, int length, boolean zero ) {

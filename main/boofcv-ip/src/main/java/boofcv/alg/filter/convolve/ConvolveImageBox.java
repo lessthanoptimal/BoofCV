@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,18 +23,19 @@ import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox_MT;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.FWorkArrays;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.border.ImageBorderValue;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Convolves a kernel which is composed entirely of 1's across an image.  This special kernel can be highly optimized
- * and has a computational complexity independent of the kernel size. 
+ * and has a computational complexity independent of the kernel size.
  *
  * @author Peter Abeles
  */
@@ -43,16 +44,16 @@ public class ConvolveImageBox {
 	/**
 	 * Performs a horizontal 1D convolution of a box kernel across the image
 	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(GrayF32 input, GrayF32 output, int radius) {
-		InputSanityCheck.checkSameShape(input , output);
+	public static void horizontal( GrayF32 input, GrayF32 output, int radius ) {
+		InputSanityCheck.checkSameShape(input, output);
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
-		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, false);
+		ConvolveJustBorder_General_SB.horizontal(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplConvolveBox_MT.horizontal(input, output, radius);
 		} else {
 			ImplConvolveBox.horizontal(input, output, radius);
@@ -62,16 +63,16 @@ public class ConvolveImageBox {
 	/**
 	 * Performs a horizontal 1D convolution of a box kernel across the image
 	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(GrayU8 input, GrayI16 output, int radius) {
-		InputSanityCheck.checkSameShape(input , output);
+	public static void horizontal( GrayU8 input, GrayI16 output, int radius ) {
+		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
-		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		ConvolveJustBorder_General_SB.horizontal(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplConvolveBox_MT.horizontal(input, output, radius);
 		} else {
 			ImplConvolveBox.horizontal(input, output, radius);
@@ -81,16 +82,16 @@ public class ConvolveImageBox {
 	/**
 	 * Performs a horizontal 1D convolution of a box kernel across the image
 	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(GrayU8 input, GrayS32 output, int radius) {
-		InputSanityCheck.checkSameShape(input , output);
+	public static void horizontal( GrayU8 input, GrayS32 output, int radius ) {
+		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
-		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		ConvolveJustBorder_General_SB.horizontal(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplConvolveBox_MT.horizontal(input, output, radius);
 		} else {
 			ImplConvolveBox.horizontal(input, output, radius);
@@ -100,16 +101,16 @@ public class ConvolveImageBox {
 	/**
 	 * Performs a horizontal 1D convolution of a box kernel across the image
 	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(GrayS16 input, GrayI16 output, int radius) {
-		InputSanityCheck.checkSameShape(input , output);
+	public static void horizontal( GrayS16 input, GrayI16 output, int radius ) {
+		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
-		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		ConvolveJustBorder_General_SB.horizontal(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplConvolveBox_MT.horizontal(input, output, radius);
 		} else {
 			ImplConvolveBox.horizontal(input, output, radius);
@@ -119,35 +120,16 @@ public class ConvolveImageBox {
 	/**
 	 * Performs a vertical 1D convolution of a box kernel across the image
 	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(GrayF32 input, GrayF32 output, int radius, @Nullable FWorkArrays work) {
-		InputSanityCheck.checkSameShape(input , output );
+	public static void vertical( GrayF32 input, GrayF32 output, int radius, @Nullable GrowArray<GrowQueue_F32> work ) {
+		InputSanityCheck.checkSameShape(input, output);
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
-		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvolveBox_MT.vertical(input, output, radius, work);
-		} else {
-			ImplConvolveBox.vertical(input, output, radius,work);
-		}
-	}
-
-	/**
-	 * Performs a vertical 1D convolution of a box kernel across the image
-	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
-	 */
-	public static void vertical(GrayU8 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
-		InputSanityCheck.checkSameShape(input , output);
-
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
-		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, false);
+		ConvolveJustBorder_General_SB.vertical(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplConvolveBox_MT.vertical(input, output, radius, work);
 		} else {
 			ImplConvolveBox.vertical(input, output, radius, work);
@@ -157,16 +139,16 @@ public class ConvolveImageBox {
 	/**
 	 * Performs a vertical 1D convolution of a box kernel across the image
 	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(GrayU8 input, GrayS32 output, int radius, @Nullable IWorkArrays work) {
-		InputSanityCheck.checkSameShape(input , output);
+	public static void vertical( GrayU8 input, GrayI16 output, int radius, @Nullable GrowArray<GrowQueue_I32> work ) {
+		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
-		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		ConvolveJustBorder_General_SB.vertical(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplConvolveBox_MT.vertical(input, output, radius, work);
 		} else {
 			ImplConvolveBox.vertical(input, output, radius, work);
@@ -176,16 +158,35 @@ public class ConvolveImageBox {
 	/**
 	 * Performs a vertical 1D convolution of a box kernel across the image
 	 *
-	 * @param input	 The original image. Not modified.
-	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(GrayS16 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
-		InputSanityCheck.checkSameShape(input , output);
+	public static void vertical( GrayU8 input, GrayS32 output, int radius, @Nullable GrowArray<GrowQueue_I32> work ) {
+		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
-		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		ConvolveJustBorder_General_SB.vertical(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplConvolveBox_MT.vertical(input, output, radius, work);
+		} else {
+			ImplConvolveBox.vertical(input, output, radius, work);
+		}
+	}
+
+	/**
+	 * Performs a vertical 1D convolution of a box kernel across the image
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param radius Kernel size.
+	 */
+	public static void vertical( GrayS16 input, GrayI16 output, int radius, @Nullable GrowArray<GrowQueue_I32> work ) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		ConvolveJustBorder_General_SB.vertical(kernel, ImageBorderValue.wrap(input, 0), output);
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplConvolveBox_MT.vertical(input, output, radius, work);
 		} else {
 			ImplConvolveBox.vertical(input, output, radius, work);

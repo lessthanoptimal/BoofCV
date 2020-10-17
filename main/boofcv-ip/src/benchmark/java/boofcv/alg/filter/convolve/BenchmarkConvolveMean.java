@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.concurrency.FWorkArrays;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -32,29 +31,31 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.Random;
 
 /**
  * Benchmark for different convolution operations.
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveMean {
-	static private int width = 640;
-	static private int height = 480;
-	static private Random rand = new Random(234);
+	static private final int width = 640;
+	static private final int height = 480;
+	static private final Random rand = new Random(234);
 
-	static private Kernel1D_F32 kernelF32;
-	static private GrayF32 input_F32 = new GrayF32(width,height);
-	static private GrayF32 out_F32 = new GrayF32(width,height);
-	static private GrayF32 storageF32 = new GrayF32(width,height);
-	static private FWorkArrays workF32 = new FWorkArrays();
+	static private final GrayF32 input_F32 = new GrayF32(width,height);
+	static private final GrayF32 out_F32 = new GrayF32(width,height);
+	static private final GrayF32 storageF32 = new GrayF32(width,height);
+	static private final GrowArray<GrowQueue_F32> workF32 = new GrowArray<>(GrowQueue_F32::new);
 	static private Kernel1D_S32 kernelI32;
-	static private GrayU8 input_I8 = new GrayU8(width,height);
-	static private GrayS16 input_I16 = new GrayS16(width,height);
-	static private GrayU8 out_I8 = new GrayU8(width,height);
-	static private IWorkArrays workI32 = new IWorkArrays();
+	static private final GrayU8 input_I8 = new GrayU8(width,height);
+	static private final GrayS16 input_I16 = new GrayS16(width,height);
+	static private final GrayU8 out_I8 = new GrayU8(width,height);
+	static private final GrowArray<GrowQueue_I32> workI32 = new GrowArray<>(GrowQueue_I32::new);
 
 	static private BlurFilter<GrayF32> filter;
 
@@ -70,7 +71,7 @@ public class BenchmarkConvolveMean {
 
 	protected void setUp() throws Exception {
 		filter = FactoryBlurFilter.mean(ImageType.single(GrayF32.class),radius);
-		kernelF32 = FactoryKernel.table1D_F32(radius, true);
+		Kernel1D_F32 kernelF32 = FactoryKernel.table1D_F32(radius, true);
 		kernelI32 = FactoryKernel.table1D_S32(radius);
 	}
 

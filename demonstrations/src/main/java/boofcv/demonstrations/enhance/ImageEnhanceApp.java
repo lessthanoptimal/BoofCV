@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.demonstrations.enhance;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -34,6 +34,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -70,7 +71,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	// storage for histogram
 	int[] histogram = new int[256];
 	int[] transform = new int[256];
-	IWorkArrays workArrays = new IWorkArrays();
+	GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
 
 	GrayU8 gray = new GrayU8(1, 1);
 	GrayU8 enhancedGray = new GrayU8(1, 1);

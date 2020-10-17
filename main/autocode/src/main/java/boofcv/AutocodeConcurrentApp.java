@@ -40,6 +40,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *     <li>//CONCURRENT_BELOW TEXT  will replace the line below with the text</li>
  *     <li>//CONCURRENT_REMOVE_BELOW will remove the line below</li>
  *     <li>//CONCURRENT_REMOVE_ABOVE will remove the line above</li>
+ *     <li>//CONCURRENT_REMOVE_LINE will remove the line it is placed on</li>
  *     <li>//CONCURRENT_MACRO NAME TEXT creates a macro that can be used instead of text</li>
  *     <li>//CONCURRENT_OMIT_BEGIN It will omit everything until it finds an OMIT_END</li>
  *     <li>//CONCURRENT_OMIT_END It will stop omitting when this is encountered.</li>
@@ -129,6 +130,8 @@ public class AutocodeConcurrentApp {
 					break;
 				case "REMOVE_BELOW":
 					i += 1; // skip next line
+					break;
+				case "REMOVE_LINE":
 					break;
 				case "OMIT_BEGIN":
 					omit = true;

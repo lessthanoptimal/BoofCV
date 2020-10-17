@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -51,6 +51,7 @@ import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F32;
 import org.ejml.UtilEjml;
 
 import java.util.ArrayList;
@@ -158,7 +159,7 @@ public class DetectChessboardCornersX {
 
 	// Workspace
 	GrayF32 tmp = new GrayF32(1,1);
-	FWorkArrays fwork = new FWorkArrays();
+	GrowArray<GrowQueue_F32> fwork = new GrowArray<>(GrowQueue_F32::new);
 
 
 	/**

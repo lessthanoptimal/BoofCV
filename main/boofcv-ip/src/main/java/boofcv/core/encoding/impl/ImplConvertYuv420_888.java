@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,10 @@
 
 package boofcv.core.encoding.impl;
 
-import boofcv.concurrency.BWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.encoding.ConvertYuv420_888.ProcessorYuv;
+import boofcv.misc.BoofMiscOps;
+import org.ddogleg.struct.GrowQueue_I8;
 
 import java.nio.ByteBuffer;
 
@@ -33,9 +35,9 @@ import java.nio.ByteBuffer;
  * @author Peter Abeles
  */
 public class ImplConvertYuv420_888 {
-	public static void processYuv(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
-								  int width, int height, int strideY , int strideUV , int stridePixelUV,
-								  BWorkArrays workArrays, ProcessorYuv processor )
+	public static void processYuv( ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
+								   int width, int height, int strideY , int strideUV , int stridePixelUV,
+								   GrowArray<GrowQueue_I8> workArrays, ProcessorYuv processor )
 	{
 		// U and V stride are the same by 420_888 specification
 
@@ -44,8 +46,8 @@ public class ImplConvertYuv420_888 {
 		int periodUV = (int)Math.round(width/(strideUV/(double)stridePixelUV));
 
 		int workLength = strideY + strideUV + strideUV;
-		workArrays.reset(workLength);
-		byte[] work = workArrays.pop();
+		workArrays.reset();
+		byte[] work = BoofMiscOps.checkDeclare(workArrays.grow(),workLength,false);
 
 		// Index of the start of the row in the buffer
 		int positionY=0,positionUV=0;
@@ -97,8 +99,6 @@ public class ImplConvertYuv420_888 {
 					" strideY="+strideY+" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" periodUV="+periodUV+
 					" x="+x+" y="+y+" indexY="+indexY+" indexU="+indexU+" indexV="+indexV;
 			throw new RuntimeException(message,e);
-		} finally {
-			workArrays.recycle(work);
 		}
 	}
 }

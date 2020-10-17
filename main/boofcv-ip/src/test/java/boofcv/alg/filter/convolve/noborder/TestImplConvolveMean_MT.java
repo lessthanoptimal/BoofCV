@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.concurrency.WorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofStandardJUnit;
@@ -67,9 +67,9 @@ public class TestImplConvolveMean_MT extends BoofStandardJUnit {
 					testM.invoke(null, input, expected, 4, 8);
 					m.invoke(null, input, found, 4, 8);
 				} else {
-					WorkArrays workArrays = GeneralizedImageOps.createWorkArray(input.imageType);
-					testM.invoke(null, input, expected, 4, 8, workArrays);
-					m.invoke(null, input, found, 4, 8, workArrays);
+					GrowArray workspaces = GeneralizedImageOps.createGrowArray(input.imageType);
+					testM.invoke(null, input, expected, 4, 8, workspaces);
+					m.invoke(null, input, found, 4, 8, workspaces);
 				}
 			} catch( Exception e ) {
 				e.printStackTrace();

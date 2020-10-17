@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,23 +22,22 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.HistogramStatistics;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.FWorkArrays;
-import boofcv.concurrency.IWorkArrays;
-import boofcv.concurrency.WorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.UtilEjml;
 import org.jetbrains.annotations.Nullable;
-
 
 /**
  * Weakly typed version of {@link ThresholdImageOps}.
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"Duplicates", "unchecked", "rawtypes"})
 public class GThresholdImageOps {
 
 	/**
@@ -52,17 +51,17 @@ public class GThresholdImageOps {
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static double computeOtsu(ImageGray input , double minValue , double maxValue ) {
+	public static double computeOtsu( ImageGray input, double minValue, double maxValue ) {
 
-		int range = (int)(1+maxValue - minValue);
-		int histogram[] = new int[ range ];
+		int range = (int)(1 + maxValue - minValue);
+		int[] histogram = new int[range];
 
-		GImageStatistics.histogram(input,minValue,histogram);
+		GImageStatistics.histogram(input, minValue, histogram);
 
 		// Total number of pixels
 		int total = input.width*input.height;
 
-		return computeOtsu(histogram,range,total)+minValue;
+		return computeOtsu(histogram, range, total) + minValue;
 	}
 
 	/**
@@ -76,17 +75,17 @@ public class GThresholdImageOps {
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static int computeOtsu2(ImageGray input , int minValue , int maxValue ) {
+	public static int computeOtsu2( ImageGray input, int minValue, int maxValue ) {
 
-		int range = 1+maxValue - minValue;
-		int histogram[] = new int[ range ];
+		int range = 1 + maxValue - minValue;
+		int[] histogram = new int[range];
 
-		GImageStatistics.histogram(input,minValue,histogram);
+		GImageStatistics.histogram(input, minValue, histogram);
 
 		// Total number of pixels
 		int total = input.width*input.height;
 
-		return computeOtsu2(histogram,range,total)+minValue;
+		return computeOtsu2(histogram, range, total) + minValue;
 	}
 
 	/**
@@ -101,13 +100,13 @@ public class GThresholdImageOps {
 	// original code from http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
 	//                    Dr. Andrew Greensted
 	// modifications to reduce overflow
-	public static int computeOtsu( int histogram[] , int length , int totalPixels ) {
+	public static int computeOtsu( int[] histogram, int length, int totalPixels ) {
 
 		// NOTE: ComputeOtsu is not used here since that will create memory.
 
 		double dlength = length;
 		double sum = 0;
-		for (int i=0 ; i< length ; i++)
+		for (int i = 0; i < length; i++)
 			sum += (i/dlength)*histogram[i];
 
 		double sumB = 0;
@@ -116,7 +115,7 @@ public class GThresholdImageOps {
 		double varMax = 0;
 		int threshold = 0;
 
-		for (int i=0 ; i<length ; i++) {
+		for (int i = 0; i < length; i++) {
 			wB += histogram[i];               // Weight Background
 			if (wB == 0) continue;
 
@@ -125,8 +124,8 @@ public class GThresholdImageOps {
 
 			sumB += (i/dlength)*histogram[i];
 
-			double mB = sumB / wB;            // Mean Background
-			double mF = (sum - sumB) / wF;    // Mean Foreground
+			double mB = sumB/wB;            // Mean Background
+			double mF = (sum - sumB)/wF;    // Mean Foreground
 
 			// Calculate Between Class Variance
 			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
@@ -151,22 +150,22 @@ public class GThresholdImageOps {
 	 * @param totalPixels Total pixels in the image
 	 * @return Selected threshold
 	 */
-	public static int computeOtsu2( int histogram[] , int length , int totalPixels ) {
+	public static int computeOtsu2( int[] histogram, int length, int totalPixels ) {
 
 		// NOTE: ComputeOtsu is not used here since that will create memory.
 
 		double dlength = length;
 		double sum = 0;
 		for (int i = 0; i < length; i++)
-			sum += (i / dlength) * histogram[i];
+			sum += (i/dlength)*histogram[i];
 
 		double sumB = 0;
 		int wB = 0;
 
 		double variance = 0;
 
-		double selectedMB=0;
-		double selectedMF=0;
+		double selectedMB = 0;
+		double selectedMF = 0;
 
 		int i;
 		for (i = 0; i < length; i++) {
@@ -176,14 +175,14 @@ public class GThresholdImageOps {
 			int wF = totalPixels - wB;        // Weight Foreground
 			if (wF == 0) break;
 
-			double f = i / dlength;
-			sumB += f * histogram[i];
+			double f = i/dlength;
+			sumB += f*histogram[i];
 
-			double mB = sumB / wB;            // Mean Background
-			double mF = (sum - sumB) / wF;    // Mean Foreground
+			double mB = sumB/wB;            // Mean Background
+			double mF = (sum - sumB)/wF;    // Mean Foreground
 
 			// Calculate Between Class Variance
-			double varBetween = (double) wB * (double) wF * (mB - mF) * (mB - mF);
+			double varBetween = (double)wB*(double)wF*(mB - mF)*(mB - mF);
 
 			// Check if new maximum found
 			if (varBetween > variance) {
@@ -196,9 +195,9 @@ public class GThresholdImageOps {
 		// select a threshold which maximizes the distance between the two distributions. In pathological
 		// cases there's a dead zone where all the values are equally good and it would select a value with a low index
 		// arbitrarily. Then if you scaled the threshold it would reject everything
-		return (int)(length*(selectedMB+selectedMF)/2.0 + 0.5);
+		return (int)(length*(selectedMB + selectedMF)/2.0 + 0.5);
 	}
-   
+
 	/**
 	 * <p>
 	 * Computes Li's Minimum Cross Entropy thresholding from an input image. Internally it uses
@@ -210,17 +209,17 @@ public class GThresholdImageOps {
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static double computeLi(ImageGray input , double minValue , double maxValue ) {
+	public static double computeLi( ImageGray input, double minValue, double maxValue ) {
 
-		int range = (int)(1+maxValue - minValue);
-		int histogram[] = new int[ range ];
+		int range = (int)(1 + maxValue - minValue);
+		int[] histogram = new int[range];
 
-		GImageStatistics.histogram(input,minValue,histogram);
+		GImageStatistics.histogram(input, minValue, histogram);
 
-		return computeLi(histogram,range)+minValue;
+		return computeLi(histogram, range) + minValue;
 	}
-   
- /**
+
+	/**
 	 * Implements Li's Minimum Cross Entropy thresholding method This
 	 * implementation is based on the iterative version (Ref. 2) of the
 	 * algorithm. 1) Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy
@@ -239,7 +238,7 @@ public class GThresholdImageOps {
 	 * @param length Number of elements in the histogram.
 	 * @return Selected threshold
 	 */
-	public static int computeLi(int histogram[], int length) {
+	public static int computeLi( int[] histogram, int length ) {
 		// This function has been released by various authors under a public domain license
 
 		int threshold;
@@ -250,30 +249,30 @@ public class GThresholdImageOps {
 		double temp;
 
 		// Calculate the mean gray-level and set the threshold initially to this
-		int new_thresh = (int)(HistogramStatistics.mean(histogram,length)+0.5);
+		int new_thresh = (int)(HistogramStatistics.mean(histogram, length) + 0.5);
 
 		do {
 			old_thresh = new_thresh;
-			threshold = (int) (old_thresh + 0.5);
+			threshold = (int)(old_thresh + 0.5);
 			// Calculate the means of background and object pixels 
 
 			// Background
 			long sum_back = 0; // sum of the background pixels at a given threshold
 			long num_back = 0; // number of background pixels at a given threshold
 			for (int ih = 0; ih <= threshold; ih++) {
-				sum_back += ih * histogram[ih];
+				sum_back += ih*histogram[ih];
 				num_back += histogram[ih];
 			}
-			mean_back = (num_back == 0 ? 0.0 : (sum_back / (double) num_back));
+			mean_back = (num_back == 0 ? 0.0 : (sum_back/(double)num_back));
 
 			// Object
 			long sum_obj = 0; // sum of the object pixels at a given threshold
 			long num_obj = 0; // number of object pixels at a given threshold
 			for (int ih = threshold + 1; ih < length; ih++) {
-				sum_obj += ih * histogram[ih];
+				sum_obj += ih*histogram[ih];
 				num_obj += histogram[ih];
 			}
-			mean_obj = (num_obj == 0 ? 0.0 : (sum_obj / (double) num_obj));
+			mean_obj = (num_obj == 0 ? 0.0 : (sum_obj/(double)num_obj));
 
 			/* Calculate the new threshold: Equation (7) in Ref. 2 */
 			//new_thresh = simple_round ( ( mean_back - mean_obj ) / ( Math.log ( mean_back ) - Math.log ( mean_obj ) ) );
@@ -283,12 +282,12 @@ public class GThresholdImageOps {
 			//
 			//#define IS_NEG( x ) ( ( x ) < -DBL_EPSILON ) 
 			//DBL_EPSILON = 2.220446049250313E-16
-			temp = (mean_back - mean_obj) / (Math.log(mean_back) - Math.log(mean_obj));
+			temp = (mean_back - mean_obj)/(Math.log(mean_back) - Math.log(mean_obj));
 
 			if (temp < -UtilEjml.EPS) {
-				new_thresh = (int) (temp - 0.5);
+				new_thresh = (int)(temp - 0.5);
 			} else {
-				new_thresh = (int) (temp + 0.5);
+				new_thresh = (int)(temp + 0.5);
 			}
 			//  Stop the iterations when the difference between the
 			// new and old threshold values is less than the tolerance
@@ -308,16 +307,16 @@ public class GThresholdImageOps {
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static double computeHuang(ImageGray input , double minValue , double maxValue ) {
+	public static double computeHuang( ImageGray input, double minValue, double maxValue ) {
 
-		int range = (int)(1+maxValue - minValue);
-		int histogram[] = new int[ range ];
+		int range = (int)(1 + maxValue - minValue);
+		int[] histogram = new int[range];
 
-		GImageStatistics.histogram(input,minValue,histogram);
+		GImageStatistics.histogram(input, minValue, histogram);
 
-		return computeHuang(histogram,range)+minValue;
+		return computeHuang(histogram, range) + minValue;
 	}
-   
+
 	/**
 	 * Implements Huang's fuzzy thresholding method Uses Shannon's entropy
 	 * function (one can also use Yager's entropy function) Huang L.-K. and Wang
@@ -332,7 +331,7 @@ public class GThresholdImageOps {
 	 * @param length Number of elements in the histogram.
 	 * @return Selected threshold
 	 */
-	public static int computeHuang(int[] histogram, int length) {
+	public static int computeHuang( int[] histogram, int length ) {
 		// This function has been released by various authors under a public domain license
 
 		// Determine the first non-zero bin
@@ -352,15 +351,15 @@ public class GThresholdImageOps {
 				break;
 			}
 		}
-		double term = 1.0 / (double) (last_bin - first_bin);
+		double term = 1.0/(double)(last_bin - first_bin);
 		double[] mu_0 = new double[length];
 		{
 			long sum_pix = 0, num_pix = 0;
 			for (int ih = first_bin; ih < length; ih++) {
-				sum_pix += ih * histogram[ih];
+				sum_pix += ih*histogram[ih];
 				num_pix += histogram[ih];
 				// NUM_PIX cannot be zero !
-				mu_0[ih] = sum_pix / (double) num_pix;
+				mu_0[ih] = sum_pix/(double)num_pix;
 			}
 		}
 
@@ -368,10 +367,10 @@ public class GThresholdImageOps {
 		{
 			long sum_pix = 0, num_pix = 0;
 			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
-				sum_pix += ih * histogram[ih];
+				sum_pix += ih*histogram[ih];
 				num_pix += histogram[ih];
 				// NUM_PIX cannot be zero !
-				mu_1[ih] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
+				mu_1[ih] = sum_pix/(double)num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
 			}
 		}
 
@@ -382,19 +381,19 @@ public class GThresholdImageOps {
 			double ent = 0.0;  // entropy
 			for (int ih = first_bin; ih <= it; ih++) {
 				// Equation (4) in Ref. 1
-				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_0[it]));
+				double mu_x = 1.0/(1.0 + term*Math.abs(ih - mu_0[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
 					/* Equation (6) & (8) in Ref. 1 */
-					ent += histogram[ih] * (-mu_x * Math.log(mu_x) - (1.0 - mu_x) * Math.log(1.0 - mu_x));
+					ent += histogram[ih]*(-mu_x*Math.log(mu_x) - (1.0 - mu_x)*Math.log(1.0 - mu_x));
 				}
 			}
 
 			for (int ih = it + 1; ih <= last_bin; ih++) {
 				// Equation (4) in Ref. 1
-				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_1[it]));
+				double mu_x = 1.0/(1.0 + term*Math.abs(ih - mu_1[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
 					/* Equation (6) & (8) in Ref. 1 */
-					ent += histogram[ih] * (-mu_x * Math.log(mu_x) - (1.0 - mu_x) * Math.log(1.0 - mu_x));
+					ent += histogram[ih]*(-mu_x*Math.log(mu_x) - (1.0 - mu_x)*Math.log(1.0 - mu_x));
 				}
 			}
 			/* No need to divide by NUM_ROWS * NUM_COLS * LOG(2) ! */
@@ -406,32 +405,29 @@ public class GThresholdImageOps {
 		return threshold;
 	}
 
-	
-	
 	/**
 	 * <p>
 	 * Computes a threshold which maximizes the entropy between the foreground and background regions.  See
 	 * {@link #computeEntropy(int[], int, int)} for more details.
 	 * </p>
 	 *
-	 * @see boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])
-	 *
 	 * @param input Input gray-scale image
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
+	 * @see boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])
 	 */
-	public static double computeEntropy(ImageGray input , double minValue , double maxValue ) {
+	public static double computeEntropy( ImageGray input, double minValue, double maxValue ) {
 
 		int range = (int)(1 + maxValue - minValue);
-		int histogram[] = new int[ range ];
+		int[] histogram = new int[range];
 
-		GImageStatistics.histogram(input,minValue,histogram);
+		GImageStatistics.histogram(input, minValue, histogram);
 
 		// Total number of pixels
 		int total = input.width*input.height;
 
-		return computeEntropy(histogram, range, total)+minValue;
+		return computeEntropy(histogram, range, total) + minValue;
 	}
 
 	/**
@@ -451,13 +447,13 @@ public class GThresholdImageOps {
 	 * @param totalPixels Total pixels in the image
 	 * @return Selected threshold
 	 */
-	public static int computeEntropy( int histogram[] , int length , int totalPixels ) {
+	public static int computeEntropy( int[] histogram, int length, int totalPixels ) {
 
 		// precompute p[i]*ln(p[i]) and handle special case where p[i] = 0
-		double p[] = new double[length];
+		double[] p = new double[length];
 		for (int i = 0; i < length; i++) {
 			int h = histogram[i];
-			if( h == 0 ) {
+			if (h == 0) {
 				p[i] = 0;
 			} else {
 				p[i] = h/(double)totalPixels;
@@ -469,29 +465,29 @@ public class GThresholdImageOps {
 		int bestIndex = 0;
 		int countF = 0;
 
-		for (int i=0 ; i<length ; i++) {
+		for (int i = 0; i < length; i++) {
 			countF += histogram[i];
 			double sumF = countF/(double)totalPixels;
 
-			if( sumF == 0 || sumF == 1.0 ) continue;
+			if (sumF == 0 || sumF == 1.0) continue;
 
-			double sumB = 1.0-sumF;
+			double sumB = 1.0 - sumF;
 
 			double HA = 0;
 			for (int j = 0; j <= i; j++) {
 				HA += p[j];
 			}
-			HA/=sumF;
+			HA /= sumF;
 
 			double HB = 0;
-			for (int j = i+1; j < length; j++) {
+			for (int j = i + 1; j < length; j++) {
 				HB += p[j];
 			}
-			HB/=sumB;
+			HB /= sumB;
 
-			double entropy = Math.log(sumF) + Math.log(sumB)  - HA - HB;
+			double entropy = Math.log(sumF) + Math.log(sumB) - HA - HB;
 
-			if( entropy > bestScore ) {
+			if (entropy > bestScore) {
 				bestScore = entropy;
 				bestIndex = i;
 			}
@@ -512,23 +508,22 @@ public class GThresholdImageOps {
 	 * @return binary image.
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 threshold(T input , GrayU8 output ,
-					 double threshold , boolean down )
-	{
-		if( input instanceof GrayF32) {
-			return ThresholdImageOps.threshold((GrayF32)input,output,(float)threshold,down);
-		} else if( input instanceof GrayU8) {
-			return ThresholdImageOps.threshold((GrayU8)input,output,(int)threshold,down);
-		} else if( input instanceof GrayU16) {
-			return ThresholdImageOps.threshold((GrayU16)input,output,(int)threshold,down);
-		} else if( input instanceof GrayS16) {
-			return ThresholdImageOps.threshold((GrayS16)input,output,(int)threshold,down);
-		} else if( input instanceof GrayS32) {
-			return ThresholdImageOps.threshold((GrayS32)input,output,(int)threshold,down);
-		} else if( input instanceof GrayF64) {
-			return ThresholdImageOps.threshold((GrayF64)input,output,threshold,down);
+	GrayU8 threshold( T input, GrayU8 output,
+					  double threshold, boolean down ) {
+		if (input instanceof GrayF32) {
+			return ThresholdImageOps.threshold((GrayF32)input, output, (float)threshold, down);
+		} else if (input instanceof GrayU8) {
+			return ThresholdImageOps.threshold((GrayU8)input, output, (int)threshold, down);
+		} else if (input instanceof GrayU16) {
+			return ThresholdImageOps.threshold((GrayU16)input, output, (int)threshold, down);
+		} else if (input instanceof GrayS16) {
+			return ThresholdImageOps.threshold((GrayS16)input, output, (int)threshold, down);
+		} else if (input instanceof GrayS32) {
+			return ThresholdImageOps.threshold((GrayS32)input, output, (int)threshold, down);
+		} else if (input instanceof GrayF64) {
+			return ThresholdImageOps.threshold((GrayF64)input, output, threshold, down);
 		} else {
-			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
 		}
 	}
 
@@ -555,21 +550,20 @@ public class GThresholdImageOps {
 	 * @return binary image.
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localMean(T input, GrayU8 output,
-					 ConfigLength width, double scale, boolean down,
-					 @Nullable T work1, @Nullable T work2, @Nullable WorkArrays work3 )
-	{
-		if( input instanceof GrayF32) {
-			return ThresholdImageOps.localMean((GrayF32) input, output, width, (float) scale, down,
-					(GrayF32) work1, (GrayF32) work2, (FWorkArrays)work3);
-		} else if( input instanceof GrayU8) {
-			return ThresholdImageOps.localMean((GrayU8) input, output, width, (float) scale, down,
-					(GrayU8) work1, (GrayU8) work2, (IWorkArrays)work3);
-		} else if( input instanceof GrayU16) {
-			return ThresholdImageOps.localMean((GrayU16) input, output, width, (float) scale, down,
-					(GrayU16) work1, (GrayU16) work2, (IWorkArrays)work3);
+	GrayU8 localMean( T input, GrayU8 output,
+					  ConfigLength width, double scale, boolean down,
+					  @Nullable T work1, @Nullable T work2, @Nullable GrowArray work3 ) {
+		if (input instanceof GrayF32) {
+			return ThresholdImageOps.localMean((GrayF32)input, output, width, (float)scale, down,
+					(GrayF32)work1, (GrayF32)work2, (GrowArray<GrowQueue_F32>)work3);
+		} else if (input instanceof GrayU8) {
+			return ThresholdImageOps.localMean((GrayU8)input, output, width, (float)scale, down,
+					(GrayU8)work1, (GrayU8)work2, (GrowArray<GrowQueue_I32>)work3);
+		} else if (input instanceof GrayU16) {
+			return ThresholdImageOps.localMean((GrayU16)input, output, width, (float)scale, down,
+					(GrayU16)work1, (GrayU16)work2, (GrowArray<GrowQueue_I32>)work3);
 		} else {
-			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
 		}
 	}
 
@@ -596,37 +590,34 @@ public class GThresholdImageOps {
 	 * @return binary image.
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localGaussian(T input, GrayU8 output,
-						 ConfigLength width, double scale, boolean down,
-						 T work1, ImageGray work2)
-	{
-		if( input instanceof GrayF32) {
-			return ThresholdImageOps.localGaussian((GrayF32) input, output, width, (float) scale, down,
-					(GrayF32) work1, (GrayF32) work2);
-		} else if( input instanceof GrayU8) {
-			return ThresholdImageOps.localGaussian((GrayU8) input, output, width, (float) scale, down,
-					(GrayU8) work1, (GrayU8) work2);
-		} else if( input instanceof GrayU16) {
-			return ThresholdImageOps.localGaussian((GrayU16) input, output, width, (float) scale, down,
-					(GrayU16) work1, (GrayU16) work2);
+	GrayU8 localGaussian( T input, GrayU8 output,
+						  ConfigLength width, double scale, boolean down,
+						  T work1, ImageGray work2 ) {
+		if (input instanceof GrayF32) {
+			return ThresholdImageOps.localGaussian((GrayF32)input, output, width, (float)scale, down,
+					(GrayF32)work1, (GrayF32)work2);
+		} else if (input instanceof GrayU8) {
+			return ThresholdImageOps.localGaussian((GrayU8)input, output, width, (float)scale, down,
+					(GrayU8)work1, (GrayU8)work2);
+		} else if (input instanceof GrayU16) {
+			return ThresholdImageOps.localGaussian((GrayU16)input, output, width, (float)scale, down,
+					(GrayU16)work1, (GrayU16)work2);
 		} else {
-			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
 		}
 	}
 
 	/**
-	 *
 	 * @see FactoryThresholdBinary#localOtsu(ConfigLength, double, boolean, boolean, double, Class)
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
-	{
+	GrayU8 localOtsu( T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning, double scale, boolean down ) {
 		InputToBinary<T> alg = FactoryThresholdBinary.localOtsu(width, scale, down, otsu2, tuning, input.getImageType().getImageClass());
 
-		if( output == null )
-			output = new GrayU8(input.width,input.height);
+		if (output == null)
+			output = new GrayU8(input.width, input.height);
 
-		alg.process(input,output);
+		alg.process(input, output);
 
 		return output;
 	}
@@ -635,35 +626,33 @@ public class GThresholdImageOps {
 	 * Applies {@link ThresholdSauvola Sauvola} thresholding to the input image.
 	 * Intended for use with text image.
 	 *
-	 * @see ThresholdSauvola
-	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param width Width of square region.
 	 * @param k Positive parameter used to tune threshold.  Try 0.3
 	 * @param down Should it threshold up or down.
 	 * @return binary image
+	 * @see ThresholdSauvola
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localSauvola(T input, GrayU8 output, ConfigLength width, float k, boolean down)
-	{
+	GrayU8 localSauvola( T input, GrayU8 output, ConfigLength width, float k, boolean down ) {
 		InputToBinary<GrayF32> alg;
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			alg = new ThresholdSauvola_MT(width, k, down);
 		} else {
 			alg = new ThresholdSauvola(width, k, down);
 		}
 
-		if( output == null )
-			output = new GrayU8(input.width,input.height);
+		if (output == null)
+			output = new GrayU8(input.width, input.height);
 
-		if( input instanceof GrayF32) {
-			alg.process((GrayF32)input,output);
+		if (input instanceof GrayF32) {
+			alg.process((GrayF32)input, output);
 		} else {
-			GrayF32 conv = new GrayF32(input.width,input.height);
+			GrayF32 conv = new GrayF32(input.width, input.height);
 			GConvertImage.convert(input, conv);
-			alg.process(conv,output);
+			alg.process(conv, output);
 		}
 
 		return output;
@@ -673,31 +662,29 @@ public class GThresholdImageOps {
 	 * Applies {@link boofcv.alg.filter.binary.ThresholdNick NICK} thresholding to the input image.
 	 * Intended for use with text image.
 	 *
-	 * @see boofcv.alg.filter.binary.ThresholdNick
-	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param width Width of square region.
 	 * @param k Positive parameter used to tune threshold.  Try -0.1 to -0.2
 	 * @param down Should it threshold up or down.
 	 * @return binary image
+	 * @see boofcv.alg.filter.binary.ThresholdNick
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 localNick(T input, GrayU8 output, ConfigLength width, float k, boolean down)
-	{
+	GrayU8 localNick( T input, GrayU8 output, ConfigLength width, float k, boolean down ) {
 		InputToBinary<GrayF32> alg =
 				BoofConcurrency.USE_CONCURRENT ?
-				new ThresholdNick_MT(width,k, down) : new ThresholdNick(width, k, down);
+						new ThresholdNick_MT(width, k, down) : new ThresholdNick(width, k, down);
 
-		if( output == null )
-			output = new GrayU8(input.width,input.height);
+		if (output == null)
+			output = new GrayU8(input.width, input.height);
 
-		if( input instanceof GrayF32) {
-			alg.process((GrayF32)input,output);
+		if (input instanceof GrayF32) {
+			alg.process((GrayF32)input, output);
 		} else {
-			GrayF32 conv = new GrayF32(input.width,input.height);
+			GrayF32 conv = new GrayF32(input.width, input.height);
 			GConvertImage.convert(input, conv);
-			alg.process(conv,output);
+			alg.process(conv, output);
 		}
 
 		return output;
@@ -716,15 +703,14 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 blockMinMax(T input, GrayU8 output, ConfigLength width, double scale , boolean down, double textureThreshold)
-	{
+	GrayU8 blockMinMax( T input, GrayU8 output, ConfigLength width, double scale, boolean down, double textureThreshold ) {
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMinMax(
-				width,scale,down, true, textureThreshold, (Class)input.getClass());
+				width, scale, down, true, textureThreshold, (Class)input.getClass());
 
-		if( output == null )
-			output = new GrayU8(input.width,input.height);
+		if (output == null)
+			output = new GrayU8(input.width, input.height);
 
-		alg.process(input,output);
+		alg.process(input, output);
 
 		return output;
 	}
@@ -741,15 +727,14 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 blockMean(T input, GrayU8 output, ConfigLength width, double scale , boolean down)
-	{
-		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(width, scale, down,true,
-				(Class<T>) input.getClass());
+	GrayU8 blockMean( T input, GrayU8 output, ConfigLength width, double scale, boolean down ) {
+		InputToBinary<T> alg = FactoryThresholdBinary.blockMean(width, scale, down, true,
+				(Class<T>)input.getClass());
 
-		if( output == null )
-			output = new GrayU8(input.width,input.height);
+		if (output == null)
+			output = new GrayU8(input.width, input.height);
 
-		alg.process(input,output);
+		alg.process(input, output);
 
 		return output;
 	}
@@ -766,17 +751,15 @@ public class GThresholdImageOps {
 	 * @return Binary image
 	 */
 	public static <T extends ImageGray<T>>
-	GrayU8 blockOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
-	{
+	GrayU8 blockOtsu( T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning, double scale, boolean down ) {
 		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(width, scale, down, true, otsu2, tuning,
 				(Class)input.getClass());
 
-		if( output == null )
-			output = new GrayU8(input.width,input.height);
+		if (output == null)
+			output = new GrayU8(input.width, input.height);
 
-		alg.process(input,output);
+		alg.process(input, output);
 
 		return output;
 	}
-
 }

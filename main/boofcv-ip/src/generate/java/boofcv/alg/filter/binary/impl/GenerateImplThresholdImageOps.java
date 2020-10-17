@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,19 +50,19 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print(
 				"import javax.annotation.Generated;\n" +
+				"\n" +
+				"import boofcv.concurrency.GrowArray;\n" +
+				"import org.ddogleg.struct.GrowQueue_F32;\n" +
+				"import org.ddogleg.struct.GrowQueue_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
-				"import boofcv.concurrency.FWorkArrays;\n" +
-				"import boofcv.concurrency.IWorkArrays;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.filter.blur.BlurImageOps;\n" +
 				"import boofcv.struct.ConfigLength;\n" +
+				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"/**\n" +
-				" * <p>\n" +
-				" * Operations for thresholding images and converting them into a binary image.\n" +
-				" * </p>\n" +
-				" *\n" +
+				" * <p>Operations for thresholding images and converting them into a binary image.</p>\n" +
 				generateDocString("Peter Abeles") +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n\n");
@@ -116,13 +116,13 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 		String imageName = imageIn.getSingleBandName();
 		String bitwise = imageIn.getBitWise();
 
-		String workType = imageIn.getLetterSum()+"WorkArrays";
+		String workType = ("GrowQueue_"+imageIn.getKernelType()).replace("S32","I32");
 
 		out.print(
 				"\tpublic static GrayU8 localMean( "+imageName+" input , GrayU8 output ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t ConfigLength width , float scale , boolean down ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t @Nullable "+workType+" storage3 ) {\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t @Nullable GrowArray<"+workType+"> storage3 ) {\n" +
 				"\n" +
 				"\t\tint radius = width.computeI(Math.min(input.width,input.height))/2;\n" +
 				"\n" +
@@ -230,7 +230,8 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplThresholdImageOps app = new GenerateImplThresholdImageOps();
+		app.setModuleName("boofcv-ip");
 		app.parseArguments(args);
-		app.generateCode();
+		app.generate();
 	}
 }

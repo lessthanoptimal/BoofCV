@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,17 +55,17 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(
-				"import boofcv.concurrency.IWorkArrays;\n" +
+				"import boofcv.concurrency.GrowArray;\n" +
+				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"/**\n" +
-				" * <p>\n" +
-				" * Functions for enhancing images using the image histogram.\n" +
-				" * </p>\n" +
-				" *\n" +
+				" * <p>Functions for enhancing images using the image histogram.</p>\n" +
 				generateDocString("Peter Abeles") +
 				"public class "+className+" {\n\n");
 	}
@@ -114,15 +114,15 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t * Inefficiently computes the local histogram, but can handle every possible case for image size and\n" +
 				"\t * local region size\n" +
 				"\t */\n" +
-				"\tpublic static void equalizeLocalNaive( "+name+" input , int radius , "+name+" output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t   IWorkArrays workArrays )\n" +
-				"\t{\n" +
-				"\t\tint width = 2*radius+1;\n" +
-				"\t\tint maxValue = workArrays.length()-1;\n" +
+				"\tpublic static void equalizeLocalNaive( "+name+" input, int radius, int histogramLength, "+name+" output ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t   GrowArray<GrowQueue_I32> workspaces ) {\n" +
+				"\t\tfinal GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
+				"\t\tfinal int width = 2*radius + 1;\n" +
+				"\t\tfinal int maxValue = histogramLength - 1;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0,input.height,(idx0,idx1)->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0,input.height,workspaces,(work,idx0,idx1)->{\n" +
 				"\t\tint idx0 = 0, idx1 = input.height;\n" +
-				"\t\tint[] histogram = workArrays.pop();\n" +
+				"\t\tint[] histogram = BoofMiscOps.checkDeclare(work, histogramLength, false);\n" +
 				"\t\tfor( int y = idx0; y < idx1; y++ ) {\n" +
 				"\t\t\t// make sure it's inside the image bounds\n" +
 				"\t\t\tint y0 = y-radius;\n" +
@@ -171,8 +171,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t\t\t\toutput.data[indexOut++] = "+typecast+"((sum*maxValue)/area);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
-				"\t\tworkArrays.recycle(histogram);\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\t\t//CONCURRENT_ABOVE }});\n" +
 				"\t}\n\n");
 	}
 
@@ -185,16 +184,17 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t/**\n" +
 				"\t * Performs local histogram equalization just on the inner portion of the image\n" +
 				"\t */\n" +
-				"\tpublic static void equalizeLocalInner( "+name+" input , int radius , "+name+" output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t IWorkArrays workArrays ) {\n" +
+				"\tpublic static void equalizeLocalInner( "+name+" input, int radius, int histogramLength, "+name+" output,\n" +
+				"\t\t\t\t\t\t\t\t\t\t GrowArray<GrowQueue_I32> workspaces ) {\n" +
 				"\n" +
+				"\t\tfinal GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
 				"\t\tint width = 2*radius+1;\n" +
 				"\t\tint area = width*width;\n" +
-				"\t\tint maxValue = workArrays.length()-1;\n" +
+				"\t\tint maxValue = histogramLength - 1;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius,input.height-radius,(y0,y1)->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius,input.height-radius,workspaces,(work,y0,y1)->{\n" +
 				"\t\tint y0 = radius, y1 = input.height-radius;\n" +
-				"\t\tint[] histogram = workArrays.pop();\n" +
+				"\t\tint[] histogram = BoofMiscOps.checkDeclare(work, histogramLength, false);\n" +
 				"\t\tfor( int y = y0; y < y1; y++ ) {\n" +
 				"\t\t\tlocalHistogram(input,0,y-radius,width,y+radius+1,histogram);\n" +
 				"\n" +
@@ -218,19 +218,19 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t\t\tfor( int x = radius+1; x < input.width-radius; x++ ) {\n" +
 				"\n" +
 				"\t\t\t\t// update local histogram by removing the left column\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
+				"\t\t\t\tfor (int i = -radius; i <= radius; i++) {\n" +
 				"\t\t\t\t\thistogram[input.data[indexOld + i*input.stride] "+bitwise+"]--;\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\t// update local histogram by adding the right column\n" +
-				"\t\t\t\tfor( int i = -radius; i <= radius; i++ ) {\n" +
+				"\t\t\t\tfor (int i = -radius; i <= radius; i++) {\n" +
 				"\t\t\t\t\thistogram[input.data[indexNew + i*input.stride] "+bitwise+"]++;\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\t// compute equalized pixel value using the local histogram\n" +
 				"\t\t\t\tinputValue =  input.data[indexIn++] "+bitwise+";\n" +
 				"\t\t\t\tsum = 0;\n" +
-				"\t\t\t\tfor( int i = 0; i <= inputValue; i++ ) {\n" +
+				"\t\t\t\tfor (int i = 0; i <= inputValue; i++) {\n" +
 				"\t\t\t\t\tsum += histogram[i];\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
@@ -240,8 +240,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t\t\t\tindexNew++;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
-				"\t\tworkArrays.recycle(histogram);\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\t\t//CONCURRENT_ABOVE }});\n" +
 				"\t}\n\n");
 	}
 
@@ -253,19 +252,21 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 		out.println("\t/**\n" +
 				"\t * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.\n" +
 				"\t */\n" +
-				"\tpublic static void equalizeLocalRow( "+name+" input , int radius , int startY , "+name+" output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t IWorkArrays workArrays ) {\n" +
+				"\tpublic static void equalizeLocalRow( "+name+" input, int radius, int histogramLength, int startY, "+name+" output,\n" +
+				"\t\t\t\t\t\t\t\t\t\t GrowArray<GrowQueue_I32> workspaces ) {\n" +
 				"\n" +
 				"\t\tint width = 2*radius+1;\n" +
 				"\t\tint area = width*width;\n" +
-				"\t\tint maxValue = workArrays.length()-1;\n" +
-				"\t\tint[] histogram = workArrays.pop();\n" +
-				"\t\tint[] transform = workArrays.pop();\n" +
+				"\t\tint maxValue = histogramLength - 1;\n" +
+				"\n" +
+				"\t\tworkspaces.reset();\n" +
+				"\t\tint[] histogram = BoofMiscOps.checkDeclare(workspaces.grow(), histogramLength, false);\n" +
+				"\t\tint[] transform = BoofMiscOps.checkDeclare(workspaces.grow(), histogramLength, false);\n" +
 				"\n" +
 				"\t\t// specify the top and bottom of the histogram window and make sure it is inside bounds\n" +
 				"\t\tint hist0 = startY;\n" +
 				"\t\tint hist1 = startY+width;\n" +
-				"\t\tif( hist1 > input.height ) {\n" +
+				"\t\tif (hist1 > input.height) {\n" +
 				"\t\t\thist1 = input.height;\n" +
 				"\t\t\thist0 = hist1 - width;\n" +
 				"\t\t}\n" +
@@ -278,23 +279,23 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t\tlocalHistogram(input,0,hist0,width,hist1,histogram);\n" +
 				"\n" +
 				"\t\tint sum = 0;\n" +
-				"\t\tfor( int i = 0; i < histogram.length; i++ ) {\n" +
+				"\t\tfor (int i = 0; i < histogram.length; i++) {\n" +
 				"\t\t\ttransform[i] = sum += histogram[i];\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// equalize the first square region\n" +
-				"\t\tfor( int y = region0; y < region1; y++ ) {\n" +
+				"\t\tfor (int y = region0; y < region1; y++) {\n" +
 				"\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
-				"\t\t\tfor( int x = 0; x <= radius; x++ ) {\n" +
+				"\t\t\tfor (int x = 0; x <= radius; x++) {\n" +
 				"\t\t\t\tint inputValue =  input.data[indexIn++] & 0xff;\n" +
 				"\t\t\t\toutput.data[indexOut++] = "+typecast+"((transform[ inputValue ]*maxValue)/area);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// move right while equalizing the columns one at a time\n" +
-				"\t\tfor( int x = radius+1; x < input.width-radius-1; x++ ) {\n" +
+				"\t\tfor (int x = radius+1; x < input.width-radius-1; x++) {\n" +
 				"\n" +
 				"\t\t\t// remove the left most column\n" +
 				"\t\t\tint indexIn = input.startIndex + x-radius-1;\n" +
@@ -309,14 +310,14 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\t// compute transformation table\n" +
 				"\t\t\tsum = 0;\n" +
-				"\t\t\tfor( int i = 0; i < histogram.length; i++ ) {\n" +
+				"\t\t\tfor (int i = 0; i < histogram.length; i++) {\n" +
 				"\t\t\t\ttransform[i] = sum += histogram[i];\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\t// compute the output down the column\n" +
 				"\t\t\tindexIn = input.startIndex + region0*input.stride + x;\n" +
 				"\t\t\tint indexOut = output.startIndex + region0*output.stride + x;\n" +
-				"\t\t\tfor( int y = 0; y < radius; y++ ) {\n" +
+				"\t\t\tfor (int y = 0; y < radius; y++) {\n" +
 				"\t\t\t\tint inputValue =  input.data[indexIn] & 0xff;\n" +
 				"\t\t\t\toutput.data[indexOut] = "+typecast+"((transform[ inputValue ]*maxValue)/area);\n" +
 				"\n" +
@@ -329,24 +330,22 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t\tlocalHistogram(input,input.width-width,hist0,input.width,hist1,histogram);\n" +
 				"\n" +
 				"\t\tsum = 0;\n" +
-				"\t\tfor( int i = 0; i < histogram.length; i++ ) {\n" +
+				"\t\tfor (int i = 0; i < histogram.length; i++) {\n" +
 				"\t\t\ttransform[i] = sum += histogram[i];\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tfor( int y = region0; y < region1; y++ ) {\n" +
+				"\t\tfor (int y = region0; y < region1; y++) {\n" +
 				"\t\t\tint x = input.width-radius-1;\n" +
 				"\n" +
 				"\t\t\tint indexIn = input.startIndex + y*input.stride + x;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride + x;\n" +
 				"\n" +
-				"\t\t\tfor( ; x < input.width; x++ ) {\n" +
+				"\t\t\tfor (; x < input.width; x++) {\n" +
 				"\t\t\t\tint inputValue =  input.data[indexIn++] & 0xff;\n" +
 				"\t\t\t\toutput.data[indexOut++] = "+typecast+"((transform[ inputValue ]*maxValue)/area);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tworkArrays.recycle(histogram);\n" +
-				"\t\tworkArrays.recycle(transform);\n" +
 				"\t}\n\n");
 
 	}
@@ -359,14 +358,16 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.\n" +
 				"\t */\n" +
-				"\tpublic static void equalizeLocalCol( "+name+" input , int radius , int startX , "+name+" output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t IWorkArrays workArrays) {\n" +
+				"\tpublic static void equalizeLocalCol( "+name+" input, int radius, int histogramLength, int startX, "+name+" output,\n" +
+				"\t\t\t\t\t\t\t\t\t\t GrowArray<GrowQueue_I32> workspaces ) {\n" +
 				"\n" +
 				"\t\tint width = 2*radius+1;\n" +
 				"\t\tint area = width*width;\n" +
-				"\t\tint maxValue = workArrays.length()-1;\n" +
-				"\t\tint[] histogram = workArrays.pop();\n" +
-				"\t\tint[] transform = workArrays.pop();\n" +
+				"\t\tint maxValue = histogramLength - 1;\n" +
+				"\n" +
+				"\t\tworkspaces.reset();\n" +
+				"\t\tint[] histogram = BoofMiscOps.checkDeclare(workspaces.grow(), maxValue, false);\n" +
+				"\t\tint[] transform = BoofMiscOps.checkDeclare(workspaces.grow(), maxValue, false);\n" +
 				"\n" +
 				"\t\t// specify the top and bottom of the histogram window and make sure it is inside bounds\n" +
 				"\t\tint hist0 = startX;\n" +
@@ -381,48 +382,46 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\n" +
 				"\t\t// compute transformation table\n" +
 				"\t\tint sum = 0;\n" +
-				"\t\tfor( int i = 0; i < histogram.length; i++ ) {\n" +
+				"\t\tfor (int i = 0; i < histogram.length; i++) {\n" +
 				"\t\t\ttransform[i] = sum += histogram[i];\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// compute the output across the row\n" +
 				"\t\tint indexIn = input.startIndex + radius*input.stride + startX;\n" +
 				"\t\tint indexOut = output.startIndex + radius*output.stride + startX;\n" +
-				"\t\tfor( int x = 0; x < radius; x++ ) {\n" +
+				"\t\tfor (int x = 0; x < radius; x++) {\n" +
 				"\t\t\tint inputValue =  input.data[indexIn++] & 0xff;\n" +
 				"\t\t\toutput.data[indexOut++] = "+typecast+"((transform[ inputValue ]*maxValue)/area);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// move down while equalizing the rows one at a time\n" +
-				"\t\tfor( int y = radius+1; y < input.height-radius; y++ ) {\n" +
+				"\t\tfor (int y = radius+1; y < input.height-radius; y++) {\n" +
 				"\n" +
 				"\t\t\t// remove the top most row\n" +
 				"\t\t\tindexIn = input.startIndex + (y-radius-1)*input.stride;\n" +
-				"\t\t\tfor( int x = hist0; x < hist1; x++ ) {\n" +
+				"\t\t\tfor (int x = hist0; x < hist1; x++) {\n" +
 				"\t\t\t\thistogram[input.data[indexIn + x] "+bitwise+"]--;\n" +
 				"\t\t\t}\n" +
 				"\t\t\t// add the bottom most row\n" +
 				"\t\t\tindexIn += width*input.stride;\n" +
-				"\t\t\tfor( int x = hist0; x < hist1; x++ ) {\n" +
-				"\t\t\t\thistogram[input.data[indexIn + x] "+bitwise+"]++;\n" +
+				"\t\t\tfor (int x = hist0; x < hist1; x++) {\n" +
+				"\t\t\t\thistogram[input.data[indexIn + x]"+bitwise+"]++;\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\t// compute transformation table\n" +
 				"\t\t\tsum = 0;\n" +
-				"\t\t\tfor( int i = 0; i < histogram.length; i++ ) {\n" +
+				"\t\t\tfor (int i = 0; i < histogram.length; i++) {\n" +
 				"\t\t\t\ttransform[i] = sum += histogram[i];\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\t// compute the output across the row\n" +
 				"\t\t\tindexIn = input.startIndex + y*input.stride + startX;\n" +
 				"\t\t\tindexOut = output.startIndex + y*output.stride + startX;\n" +
-				"\t\t\tfor( int x = 0; x < radius; x++ ) {\n" +
+				"\t\t\tfor (int x = 0; x < radius; x++) {\n" +
 				"\t\t\t\tint inputValue =  input.data[indexIn++] & 0xff;\n" +
 				"\t\t\t\toutput.data[indexOut++] = "+typecast+"((transform[ inputValue ]*maxValue)/area);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
-				"\t\tworkArrays.recycle(histogram);\n" +
-				"\t\tworkArrays.recycle(transform);\n" +
 				"\t}\n\n");
 
 	}
@@ -434,11 +433,11 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Computes the local histogram just for the specified inner region\n" +
 				"\t */\n" +
-				"\tpublic static void localHistogram( "+name+" input , int x0 , int y0 , int x1, int y1 , int histogram[] ) {\n" +
-				"\t\tfor( int i = 0; i < histogram.length; i++ )\n" +
+				"\tpublic static void localHistogram( "+name+" input, int x0, int y0, int x1, int y1, int[] histogram ) {\n" +
+				"\t\tfor (int i = 0; i < histogram.length; i++)\n" +
 				"\t\t\thistogram[i] = 0;\n" +
 				"\n" +
-				"\t\tfor( int i = y0; i < y1; i++ ) {\n" +
+				"\t\tfor (int i = y0; i < y1; i++) {\n" +
 				"\t\t\tint index = input.startIndex + i*input.stride + x0;\n" +
 				"\t\t\tint end = index + x1-x0;\n" +
 				"\t\t\tfor( ; index < end; index++ ) {\n" +
@@ -450,6 +449,8 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplEnhanceHistogram app = new GenerateImplEnhanceHistogram();
-		app.generateCode();
+		app.setModuleName("boofcv-ip");
+		app.parseArguments(args);
+		app.generate();
 	}
 }

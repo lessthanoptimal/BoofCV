@@ -18,7 +18,7 @@
 
 package boofcv.core.image;
 
-import boofcv.concurrency.*;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
@@ -31,7 +31,7 @@ import org.ddogleg.struct.GrowQueue_I64;
 
 /**
  * <p>
- * Operations that return information about the specific image.  Useful when writing highly abstracted code
+ * Operations that return information about the specific image. Useful when writing highly abstracted code
  * which is independent of the input image.
  * </p>
  *
@@ -249,20 +249,6 @@ import org.ddogleg.struct.GrowQueue_I64;
 			return 64;
 		}
 		throw new RuntimeException("Unknown type: " + type.getSimpleName());
-	}
-
-	public static WorkArrays createWorkArray( ImageType<?> type ) {
-		if (type.getDataType().isInteger()) {
-			if (type.getDataType().getNumBits() < 64) {
-				return new IWorkArrays();
-			} else {
-				return new LWorkArrays();
-			}
-		} else if (type.getDataType().getNumBits() < 64) {
-			return new FWorkArrays();
-		} else {
-			return new DWorkArrays();
-		}
 	}
 
 	public static GrowArray createGrowArray( ImageType<?> type ) {

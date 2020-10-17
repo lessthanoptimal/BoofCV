@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,16 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.impl.ImplThresholdImageOps;
 import boofcv.alg.filter.binary.impl.ImplThresholdImageOps_MT;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.FWorkArrays;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.GrowArray;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -205,7 +207,7 @@ public class ThresholdImageOps {
 	public static GrayU8 localMean(GrayU8 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
 								   @Nullable GrayU8 storage1 , @Nullable GrayU8 storage2 ,
-								   @Nullable IWorkArrays storage3 ) {
+								   @Nullable GrowArray<GrowQueue_I32> storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
@@ -270,7 +272,7 @@ public class ThresholdImageOps {
 	public static GrayU8 localMean(GrayU16 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
 								   @Nullable GrayU16 storage1 , @Nullable GrayU16 storage2 ,
-								   @Nullable IWorkArrays storage3 ) {
+								   @Nullable GrowArray<GrowQueue_I32> storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU16.class);
@@ -335,7 +337,7 @@ public class ThresholdImageOps {
 	public static GrayU8 localMean(GrayF32 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
 								   @Nullable GrayF32 storage1 , @Nullable GrayF32 storage2 ,
-								   @Nullable FWorkArrays storage3 ) {
+								   @Nullable GrowArray<GrowQueue_F32> storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);
