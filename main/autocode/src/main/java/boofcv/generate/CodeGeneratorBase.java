@@ -18,15 +18,17 @@
 
 package boofcv.generate;
 
-import boofcv.AutocodeMasterApp;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static boofcv.AutocodeMasterApp.findPathToProjectRoot;
 
 /**
  * <p>Base class for code generators.</p>
@@ -34,23 +36,7 @@ import java.io.PrintStream;
  * @author Peter Abeles
  */
 public abstract class CodeGeneratorBase {
-	public static String copyright = "/*\n" +
-			" * Copyright (c) 2020, Peter Abeles. All Rights Reserved.\n" +
-			" *\n" +
-			" * This file is part of BoofCV (http://boofcv.org).\n" +
-			" *\n" +
-			" * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-			" * you may not use this file except in compliance with the License.\n" +
-			" * You may obtain a copy of the License at\n" +
-			" *\n" +
-			" *   http://www.apache.org/licenses/LICENSE-2.0\n" +
-			" *\n" +
-			" * Unless required by applicable law or agreed to in writing, software\n" +
-			" * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-			" * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-			" * See the License for the specific language governing permissions and\n" +
-			" * limitations under the License.\n" +
-			" */\n";
+	public static String copyright = "/** Copyright Peter Abeles. Failed to load copyright.txt. */";
 
 	protected PrintStream out;
 	protected @Nullable String className;
@@ -59,6 +45,19 @@ public abstract class CodeGeneratorBase {
 	 * If true the output will be in the source directory, overwriting existing code
 	 */
 	protected @Getter @Setter boolean overwrite = true;
+
+	public CodeGeneratorBase() {
+		try {
+			File pathCopyright = new File(findPathToProjectRoot(), "misc/copyright.txt");
+			copyright = readFile(pathCopyright.getAbsolutePath(), StandardCharsets.UTF_8);
+		} catch( IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static String readFile( String path, Charset encoding ) throws IOException {
+		return new String(Files.readAllBytes(Paths.get(path)), encoding);
+	}
 
 	public void parseArguments( String[] args ) {
 		// todo fill this in later
@@ -91,7 +90,7 @@ public abstract class CodeGeneratorBase {
 	protected void printParallelBlock( String var0, String var1, String lower, String upper, String minBlock, String body ) {
 		out.println();
 
-		out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(%s, %s, %s,(%s,%s)->{\n", lower, upper, minBlock, var0, var1);
+		out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(%s, %s, %s, workspaces, (work, %s,%s)->{\n", lower, upper, minBlock, var0, var1);
 		out.printf("\t\tfinal int %s = %s, %s = %s;\n", var0, lower, var1, upper);
 		out.print(body);
 		out.print("\t\t//CONCURRENT_INLINE });\n");
@@ -115,7 +114,7 @@ public abstract class CodeGeneratorBase {
 			if (moduleName == null)
 				throw new RuntimeException("Overwrite is true but the module isn't specified");
 
-			File path_to_root = AutocodeMasterApp.findPathToProjectRoot();
+			File path_to_root = findPathToProjectRoot();
 			File path_to_file = new File(path_to_root, new File("main", moduleName).getPath());
 			if (!path_to_file.exists() || !path_to_file.isDirectory()) {
 				System.err.println("Can't find project root. Attempted to use " + path_to_root.getAbsolutePath());
@@ -152,14 +151,14 @@ public abstract class CodeGeneratorBase {
 
 	public void setOutputFile( String className ) throws FileNotFoundException {
 		if (this.className != null)
-			throw new IllegalArgumentException("ClassName already set.  Out of date code?");
+			throw new IllegalArgumentException("ClassName already set. Out of date code?");
 		this.className = className;
 		initFile();
 	}
 
 	public String generateDocString( String... authors ) {
 		String ret = " *\n" +
-				" * <p>DO NOT MODIFY.  Automatically generated code created by " + getClass().getSimpleName() + "</p>\n" +
+				" * <p>DO NOT MODIFY. Automatically generated code created by " + getClass().getSimpleName() + "</p>\n" +
 				" *\n";
 
 		for (String author : authors) {
