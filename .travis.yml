@@ -4,3 +4,6 @@ jdk:
 install:
   - ./gradlew autogenerate
   - ./gradlew assemble
+script:
+  - ./gradlew test
+  - ./gradlew spotlessJavaCheck
