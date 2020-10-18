@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,11 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Base class for associating image features using descriptions and 2D distance cropping. Distance is computed

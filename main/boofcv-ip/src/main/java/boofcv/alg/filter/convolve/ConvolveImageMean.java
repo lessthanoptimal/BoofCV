@@ -23,7 +23,6 @@ import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean_MT;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
@@ -36,6 +35,7 @@ import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 import javax.annotation.Generated;
 

@@ -20,7 +20,6 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.GrowQueue_F32;
@@ -30,6 +29,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;

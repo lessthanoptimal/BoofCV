@@ -22,7 +22,6 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.HistogramStatistics;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
@@ -31,6 +30,7 @@ import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.UtilEjml;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Weakly typed version of {@link ThresholdImageOps}.

@@ -18,10 +18,10 @@
 
 package boofcv.core.encoding.impl;
 
-import boofcv.concurrency.GrowArray;
 import boofcv.core.encoding.ConvertYuv420_888.ProcessorYuv;
 import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.GrowQueue_I8;
+import pabeles.concurrency.GrowArray;
 
 import java.nio.ByteBuffer;
 

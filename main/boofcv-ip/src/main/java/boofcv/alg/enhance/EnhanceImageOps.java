@@ -25,13 +25,13 @@ import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram_MT;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 /**
  * <p>

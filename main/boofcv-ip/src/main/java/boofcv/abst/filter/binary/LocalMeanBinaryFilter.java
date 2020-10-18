@@ -19,12 +19,12 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Adaptive/local threshold using a square region

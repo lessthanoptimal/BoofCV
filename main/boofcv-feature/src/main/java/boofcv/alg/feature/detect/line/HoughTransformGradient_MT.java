@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,11 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Concurrent version of {@link HoughTransformGradient}

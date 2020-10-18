@@ -19,7 +19,6 @@
 package boofcv.demonstrations.imageprocessing;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -29,6 +28,7 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
+import pabeles.concurrency.GrowArray;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

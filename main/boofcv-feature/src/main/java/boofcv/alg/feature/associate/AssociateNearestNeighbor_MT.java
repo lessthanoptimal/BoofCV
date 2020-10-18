@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.IntRangeConsumer;
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
+import pabeles.concurrency.IntRangeConsumer;
 
 import java.util.ArrayList;
 import java.util.List;

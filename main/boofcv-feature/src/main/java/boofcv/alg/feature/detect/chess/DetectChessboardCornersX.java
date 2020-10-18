@@ -28,7 +28,6 @@ import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -53,6 +52,7 @@ import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ejml.UtilEjml;
+import pabeles.concurrency.GrowArray;
 
 import java.util.ArrayList;
 import java.util.List;

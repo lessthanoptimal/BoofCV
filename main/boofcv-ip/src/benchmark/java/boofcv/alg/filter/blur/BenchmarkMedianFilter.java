@@ -22,12 +22,12 @@ import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.GrowQueue_I32;
+import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
 

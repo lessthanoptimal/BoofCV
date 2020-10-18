@@ -22,7 +22,6 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -33,6 +32,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
+import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
 

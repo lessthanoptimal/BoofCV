@@ -66,7 +66,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 	private void printPreamble() {
 		autoSelectName();
 		out.print(
-				"import boofcv.concurrency.GrowArray;\n" +
+				"import pabeles.concurrency.GrowArray;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +

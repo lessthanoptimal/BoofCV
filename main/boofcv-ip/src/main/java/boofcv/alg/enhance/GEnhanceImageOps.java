@@ -19,10 +19,10 @@
 package boofcv.alg.enhance;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Weakly typed version of {@link EnhanceImageOps}.

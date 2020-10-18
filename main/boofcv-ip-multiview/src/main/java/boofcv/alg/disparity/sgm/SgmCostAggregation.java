@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,11 @@ package boofcv.alg.disparity.sgm;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
-import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.Planar;
 import org.ddogleg.struct.FastQueue;
+import pabeles.concurrency.GrowArray;
+import pabeles.concurrency.IntRangeObjectConsumer;
 
 /**
  * <p>

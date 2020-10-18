@@ -23,7 +23,6 @@ import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.GPixelMath;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
@@ -33,6 +32,7 @@ import boofcv.struct.image.GrayF;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageType;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Provides different functions for normalizing the spatially local statics of an image.

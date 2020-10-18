@@ -19,7 +19,6 @@
 package boofcv.misc;
 
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.errors.BoofAssertFailure;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
@@ -28,6 +27,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.*;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 import java.io.*;
 import java.lang.reflect.Method;

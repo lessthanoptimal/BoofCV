@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.image.GrayF32;
+import pabeles.concurrency.GrowArray;
 
 import javax.annotation.Generated;
 

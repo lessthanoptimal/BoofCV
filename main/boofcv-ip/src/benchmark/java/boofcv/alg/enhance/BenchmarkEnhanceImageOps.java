@@ -21,7 +21,6 @@ package boofcv.alg.enhance;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -30,6 +29,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;

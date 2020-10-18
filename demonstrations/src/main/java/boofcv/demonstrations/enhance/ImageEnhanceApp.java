@@ -21,7 +21,6 @@ package boofcv.demonstrations.enhance;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -35,6 +34,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import org.ddogleg.struct.GrowQueue_I32;
+import pabeles.concurrency.GrowArray;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

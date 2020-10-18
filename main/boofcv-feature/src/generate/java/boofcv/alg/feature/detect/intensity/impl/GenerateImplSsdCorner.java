@@ -64,7 +64,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() throws FileNotFoundException {
-		out.print("import boofcv.concurrency.GrowArray;\n");
+		out.print("import pabeles.concurrency.GrowArray;\n");
 		out.print("import boofcv.struct.image." + typeInput + ";\n");
 
 		if (typeInput.compareTo(typeOutput) != 0)

@@ -19,13 +19,13 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
 import lombok.Setter;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Simplified interface for using a blur filter that requires storage.  Reflections are used to look up a function inside

@@ -21,11 +21,11 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.noborder.*;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 import javax.annotation.Generated;
 

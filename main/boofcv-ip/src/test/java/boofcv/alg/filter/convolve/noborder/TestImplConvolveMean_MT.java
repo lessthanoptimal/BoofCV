@@ -20,11 +20,11 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
+import pabeles.concurrency.GrowArray;
 
 import java.lang.reflect.Method;
 
