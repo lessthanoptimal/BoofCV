@@ -16,7 +16,7 @@ fun CameraPinhole.asNarrowDistortion(): LensDistortionPinhole = LensDistortionPi
 fun CameraPinholeBrown.asNarrowDistortion(): LensDistortionBrown = LensDistortionBrown(this)
 fun CameraUniversalOmni.asWideDistortion(): LensDistortionUniversalOmni = LensDistortionUniversalOmni(this)
 
-fun CameraPinhole.toBrown(): CameraPinholeBrown { val model = CameraPinholeBrown(); model.set(this); return model }
+fun CameraPinhole.toBrown(): CameraPinholeBrown { val model = CameraPinholeBrown(); model.setTo(this); return model }
 fun CameraPinholeBrown.toPinhole(): CameraPinhole { return CameraPinhole(this) }
 
 fun CameraPinhole.times(norm : Point2D_F64, out : Point2D_F64 ) { PerspectiveOps.convertNormToPixel(this,norm.x,norm.y, out)}

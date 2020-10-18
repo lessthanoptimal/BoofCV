@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class CameraUniversalOmni extends CameraPinhole {
 	public double mirrorOffset;
 
 	/** radial distortion parameters: k<sub>1</sub>,...,k<sub>n</sub> */
-	public double radial[];
+	public double[] radial;
 	/** tangential distortion parameters */
 	public double t1, t2;
 
@@ -108,7 +108,7 @@ public class CameraUniversalOmni extends CameraPinhole {
 	 * @param original Model which is to be copied
 	 */
 	public void set( CameraUniversalOmni original ) {
-		super.set(original);
+		super.setTo(original);
 
 		this.mirrorOffset = original.mirrorOffset;
 

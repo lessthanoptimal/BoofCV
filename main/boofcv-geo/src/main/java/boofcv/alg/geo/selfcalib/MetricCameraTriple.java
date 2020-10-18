@@ -40,8 +40,8 @@ public class MetricCameraTriple {
 	public void setTo( MetricCameraTriple src ) {
 		view_1_to_2.setTo(src.view_1_to_2);
 		view_1_to_3.setTo(src.view_1_to_3);
-		view1.set(src.view1);
-		view2.set(src.view2);
-		view3.set(src.view3);
+		view1.setTo(src.view1);
+		view2.setTo(src.view2);
+		view3.setTo(src.view3);
 	}
 }

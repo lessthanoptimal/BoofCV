@@ -20,6 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
 import boofcv.alg.geo.MetricCameras;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
 import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
 import boofcv.factory.geo.FactoryMultiView;
@@ -217,7 +218,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			SceneWorkingGraph.View wview = workGraph.addView(pview);
 			if (i > 0)
 				wview.world_to_view.setTo(results.motion_1_to_k.get(i - 1));
-			wview.intrinsic.set(results.intrinsics.get(i));
+			BundleAdjustmentOps.convert(results.intrinsics.get(i), wview.intrinsic);
 			wview.imageDimension.setTo(dimensions.get(i));
 		}
 

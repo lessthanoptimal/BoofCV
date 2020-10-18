@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -337,7 +338,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 */
 	void createProjectionModel( BundlePinholeSimplified intrinsic ) {
 		CameraPinholeBrown brown = new CameraPinholeBrown();
-		intrinsic.convertTo(brown);
+		BundleAdjustmentOps.convert(intrinsic, brown);
 		LensDistortionNarrowFOV model = LensDistortionFactory.narrow(brown);
 		listPixelToNorm.add(model.undistort_F64(true, false));
 		listNormToPixel.add(model.distort_F64(false, true));

@@ -102,9 +102,9 @@ public class GenerateMetricTripleFromProjective implements
 		output.view_1_to_2.setTo(metricN.motion_1_to_k.get(0));
 		output.view_1_to_3.setTo(metricN.motion_1_to_k.get(1));
 
-		output.view1.set(metricN.intrinsics.get(0));
-		output.view2.set(metricN.intrinsics.get(1));
-		output.view3.set(metricN.intrinsics.get(2));
+		output.view1.setTo(metricN.intrinsics.get(0));
+		output.view2.setTo(metricN.intrinsics.get(1));
+		output.view3.setTo(metricN.intrinsics.get(2));
 
 		return true;
 	}

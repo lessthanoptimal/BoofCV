@@ -21,6 +21,7 @@ package boofcv.alg.sfm.structure;
 import boofcv.BoofTesting;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
@@ -265,7 +266,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 		var working = new SceneWorkingGraph();
 		pairwise.nodes.forIdx(( i, v ) -> working.addView(v));
 
-		working.viewList.forEach(v -> v.intrinsic.set(intrinsic));
+		working.viewList.forEach(v -> BundleAdjustmentOps.convert(intrinsic,v.intrinsic));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.projective.set(views.get(i).camera));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.world_to_view.setTo(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.index = i);

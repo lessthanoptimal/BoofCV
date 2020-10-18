@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,26 +39,23 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = false)
 public class CameraPinhole extends CameraModel {
 	/** focal length along x and y axis (units: pixels) */
-	@Getter @Setter	public double fx,fy;
-	/** skew parameter, typically 0 (units: pixels)*/
-	@Getter @Setter	public double skew;
+	@Getter @Setter public double fx, fy;
+	/** skew parameter, typically 0 (units: pixels) */
+	@Getter @Setter public double skew;
 	/** image center (units: pixels) */
-	@Getter @Setter	public double cx,cy;
+	@Getter @Setter public double cx, cy;
 
-	/**
-	 * Default constructor.  flipY is false and everything else is zero or null.
-	 */
-	public CameraPinhole() {
+	public CameraPinhole() { }
+
+	/** Copy constructor */
+	public CameraPinhole( CameraPinhole param ) {
+		setTo(param);
 	}
 
-	public CameraPinhole(CameraPinhole param ) {
-		set(param);
-	}
-
-	public CameraPinhole(double fx, double fy,
-						 double skew,
-						 double cx, double cy,
-						 int width, int height ) {
+	public CameraPinhole( double fx, double fy,
+						  double skew,
+						  double cx, double cy,
+						  int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
@@ -66,14 +63,14 @@ public class CameraPinhole extends CameraModel {
 	 * Sets all variables to zero.
 	 */
 	public void reset() {
-		fx=fy=skew=cx=cy=0.0;
-		width=height=0;
+		fx = fy = skew = cx = cy = 0.0;
+		width = height = 0;
 	}
 
-	public CameraPinhole fsetK(double fx, double fy,
-							   double skew,
-							   double cx, double cy,
-							   int width, int height) {
+	public CameraPinhole fsetK( double fx, double fy,
+								double skew,
+								double cx, double cy,
+								int width, int height ) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
@@ -85,7 +82,13 @@ public class CameraPinhole extends CameraModel {
 		return this;
 	}
 
-	public void set( CameraPinhole param ) {
+	public CameraPinhole fsetShape( int width, int height ) {
+		this.width = width;
+		this.height = height;
+		return this;
+	}
+
+	public void setTo( CameraPinhole param ) {
 		this.fx = param.fx;
 		this.fy = param.fy;
 		this.skew = param.skew;
@@ -104,26 +107,27 @@ public class CameraPinhole extends CameraModel {
 	 * @param y pixel location y-axis
 	 * @return true if inside or false if not
 	 */
-	public boolean isInside(double x , double y) {
+	public boolean isInside( double x, double y ) {
 		return x >= 0 && y >= 0 && x < width && y < height;
 	}
 
 	/**
 	 * Returns true if the pixel coordinate is inside the image
+	 *
 	 * @param x pixel location x-axis
 	 * @param y pixel location y-axis
 	 * @return true if inside or false if not
 	 */
-	public boolean isInside(int x, int y) {
+	public boolean isInside( int x, int y ) {
 		return x >= 0 && y >= 0 && x < width && y < height;
 	}
 
 	public void print() {
-		System.out.println("Shape "+width+" "+height);
+		System.out.println("Shape " + width + " " + height);
 		System.out.printf("center %7.2f %7.2f\n", cx, cy);
 		System.out.println("fx = " + fx);
-		System.out.println("fy = "+fy);
-		System.out.println("skew = "+skew);
+		System.out.println("fy = " + fy);
+		System.out.println("skew = " + skew);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -145,19 +149,19 @@ public class CameraPinhole extends CameraModel {
 				'}';
 	}
 
-	public boolean isEquals( CameraPinhole param , double tol ) {
-		if( Math.abs(fx-param.fx) > tol )
+	public boolean isEquals( CameraPinhole param, double tol ) {
+		if (Math.abs(fx - param.fx) > tol)
 			return false;
-		if( Math.abs(fy-param.fy) > tol )
+		if (Math.abs(fy - param.fy) > tol)
 			return false;
-		if( Math.abs(skew-param.skew) > tol )
+		if (Math.abs(skew - param.skew) > tol)
 			return false;
-		if( Math.abs(cx-param.cx) > tol )
+		if (Math.abs(cx - param.cx) > tol)
 			return false;
-		if( Math.abs(cy-param.cy) > tol )
+		if (Math.abs(cy - param.cy) > tol)
 			return false;
-		if( width != param.width)
+		if (width != param.width)
 			return false;
-		return height==param.height;
+		return height == param.height;
 	}
 }

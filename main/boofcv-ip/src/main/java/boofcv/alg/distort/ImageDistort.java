@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,8 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	/**
 	 * Applies the transform to the entire destination image.
 	 *
-	 * @param srcImg Input image. Not modified.
-	 * @param dstImg Output image. Modified.
+	 * @param srcImg (Input) Original image.
+	 * @param dstImg (Output) Distorted image.
 	 */
 	void apply( Input srcImg , Output dstImg );
 
@@ -54,17 +54,17 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 * Applies the transform, but marks pixels in the mask as 1 = inside, 0 = outside. Where
 	 * inside pixels are pixels in the dst image with an equivalent pixel in the src image's bounds
 	 *
-	 * @param srcImg Input image. Not modified.
-	 * @param dstImg Output image. Modified.
-	 * @param mask Mask. Automatically resized to match dstImg. Modified.
+	 * @param srcImg (Input) Original image.
+	 * @param dstImg (Output) Distorted image.
+	 * @param mask (Output) Mask of inside pixels. Automatically resized to match dstImg.
 	 */
 	void apply( Input srcImg , Output dstImg , GrayU8 mask );
 
 	/**
 	 * Applies the transform to only the specified region inside the destination image.
 	 *
-	 * @param srcImg Input image. Not modified.
-	 * @param dstImg Output image. Modified.
+	 * @param srcImg (Input) Original image.
+	 * @param dstImg (Output) Distorted image.
 	 * @param dstX0 Left most crop boundary. Inclusive.
 	 * @param dstY0 Top most crop boundary. Inclusive.
 	 * @param dstX1 Right most crop boundary. Exclusive.

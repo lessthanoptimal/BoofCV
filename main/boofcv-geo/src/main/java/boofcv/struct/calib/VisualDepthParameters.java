@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,20 +47,20 @@ public class VisualDepthParameters {
 	public VisualDepthParameters() {
 	}
 
-	public VisualDepthParameters(VisualDepthParameters param) {
+	public VisualDepthParameters( VisualDepthParameters param ) {
 		set(param);
 	}
 
 	public void set( VisualDepthParameters param ) {
 		maxDepth = param.maxDepth;
-		visualParam.set( param.visualParam );
+		visualParam.setTo(param.visualParam);
 	}
 
 	public CameraPinholeBrown getVisualParam() {
 		return visualParam;
 	}
 
-	public void setVisualParam(CameraPinholeBrown visualParam) {
+	public void setVisualParam( CameraPinholeBrown visualParam ) {
 		this.visualParam = visualParam;
 	}
 
@@ -68,7 +68,7 @@ public class VisualDepthParameters {
 		return maxDepth;
 	}
 
-	public void setMaxDepth(Number maxDepth) {
+	public void setMaxDepth( Number maxDepth ) {
 		this.maxDepth = maxDepth;
 	}
 
@@ -76,7 +76,7 @@ public class VisualDepthParameters {
 		return pixelNoDepth;
 	}
 
-	public void setPixelNoDepth(Number pixelNoDepth) {
+	public void setPixelNoDepth( Number pixelNoDepth ) {
 		this.pixelNoDepth = pixelNoDepth;
 	}
 }

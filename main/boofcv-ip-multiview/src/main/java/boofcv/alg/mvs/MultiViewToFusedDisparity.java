@@ -1,0 +1,236 @@
+/*
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.mvs;
+
+import boofcv.abst.disparity.StereoDisparity;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.brown.LensDistortionBrown;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
+import boofcv.alg.geo.RectifyImageOps;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.PointToPixelTransform_F64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageDimension;
+import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
+import gnu.trove.map.TIntObjectMap;
+import lombok.Getter;
+import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.ops.ConvertMatrixData;
+
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
+/**
+ * Given a set of distorted images with their known extrinsic and intrinsic parameters, compute a fused disparity
+ * image. Each pair of images has it's own disparity image computed independently of all the others. This set
+ * of disparity images are then fused together using {@link FuseDisparityImages}.
+ *
+ * Inside the code the stereo pairs often refer to a left and right camera. That is just a convention. The target
+ * camera, which is common to all pairs, is referenced as the left camera and all the others as the right camera.
+ * If the "right" camera is really to the left, above, below, ... etc, the rectified view will be flipped and/or
+ * rotated to force the left/right convention during disparity computation.
+ *
+ * @author Peter Abeles
+ */
+public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> {
+
+	//------------ References to input objects
+	private SceneStructureMetric scene; // Camera placement and parameters
+	private TIntObjectMap<Image> images; // Look up camera images
+
+	/** The computed disparity image in distorted pixel coordinates */
+	final @Getter GrayF32 fusedDisparity = new GrayF32(1, 1);
+	/** Disparity parameters for fused disparity image */
+	final @Getter DisparityParameters fusedParam = new DisparityParameters();
+
+	// TODO Have only a single copy of the paired info. Add to fused image immediately after computing
+	final StereoResults results = new StereoResults();
+	final FuseDisparityImages performFusion = new FuseDisparityImages();
+
+	// Computes disparity between each image pair
+	StereoDisparity<Image, GrayF32> disparityAlg;
+
+	// Storage for rectified stereo images
+	Image rectified1, rectified2;
+
+	// TODO comment this all up
+	final RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
+	final CameraPinholeBrown intrinsic1 = new CameraPinholeBrown();
+	final CameraPinholeBrown intrinsic2 = new CameraPinholeBrown();
+	final DMatrixRMaj K1 = new DMatrixRMaj(3, 3);
+	final DMatrixRMaj K2 = new DMatrixRMaj(3, 3);
+
+	final Se3_F64 left_to_world = new Se3_F64();
+	final Se3_F64 left_to_left = new Se3_F64();
+	final Se3_F64 left_to_right = new Se3_F64();
+	final FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3);
+	final FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
+
+	/**
+	 * Resets data structures and a describe of the scene and images to be processed
+	 *
+	 * @param scene Description of each view and their scene
+	 * @param images List of images which are to be processed
+	 */
+	public void initialize( SceneStructureMetric scene, TIntObjectMap<Image> images ) {
+		assertBoof(!images.isEmpty());
+		assertBoof(scene.views.size >= 2);
+
+		this.scene = scene;
+		this.images = images;
+
+		Image img = (Image)images.values()[0];
+		rectified1 = img.createNew(1, 1);
+		rectified2 = img.createNew(1, 1);
+	}
+
+	/**
+	 * Computes the disparity between the target and each of the views it has been paired with then fuses all
+	 * of these into a single disparity image in the target's original pixel coordinates.
+	 *
+	 * @param targetID Which view will act as the common ("left") camera
+	 * @param pairs Which views will the disparity be computed against
+	 * @return true if successful or false if it failed
+	 */
+	public boolean process( int targetID, GrowQueue_I32 pairs ) {
+		// Precompute what little can be for the target / left / image1
+		Image image1 = images.get(targetID);
+		int targetCamera = scene.views.get(targetID).camera;
+		BundleAdjustmentOps.convert(scene.cameras.get(targetCamera).model, intrinsic1);
+		intrinsic1.fsetShape(image1.width, image1.height);
+		PerspectiveOps.pinholeToMatrix(intrinsic1, K1);
+		scene.motions.get(targetID).motion.invert(left_to_world);
+		PixelTransform<Point2D_F64> dist_to_undist =
+				new PointToPixelTransform_F64(new LensDistortionBrown(intrinsic1).undistort_F64(true, true));
+
+		// Compute disparity for all the images it has been paired with and add them to the fusion algorithm
+		performFusion.initialize(intrinsic1, dist_to_undist);
+		for (int i = 0; i < pairs.size; i++) {
+			computeDisparity(image1, pairs.get(i), results);
+			performFusion.addDisparity(results.disparity, results.mask, results.param, results.rect);
+		}
+
+		// Fuse all of these into a single disparity image
+		if (!performFusion.process(fusedDisparity))
+			return false;
+
+		fusedParam.disparityMin = performFusion.getFusedDisparityMin();
+		fusedParam.disparityRange = performFusion.getFusedDisparityRange();
+		fusedParam.pinhole.setTo(intrinsic1);
+		fusedParam.baseline = performFusion.getFusedBaseline();
+		CommonOps_DDRM.setIdentity(fusedParam.rectifiedR);
+
+		return true;
+	}
+
+	/**
+	 * Computes the disparity between the common view "left" view and the specified "right"
+	 *
+	 * @param image1 Image for the left view
+	 * @param rightID Which view to use for the right view
+	 */
+	private void computeDisparity( Image image1, int rightID, StereoResults info ) {
+		// Look up the right stereo image
+		Image image2 = images.get(rightID);
+		int rightCamera = scene.views.get(rightID).camera;
+
+		// Compute the baseline between the two cameras
+		Se3_F64 world_to_right = scene.motions.get(rightID).motion;
+		left_to_world.concat(world_to_right, left_to_right);
+
+		// Look up intrinsic information
+		BundleAdjustmentOps.convert(scene.cameras.get(rightCamera).model, intrinsic2);
+		intrinsic2.fsetShape(image2.width, image2.height);
+
+		// original camera calibration matrices
+		PerspectiveOps.pinholeToMatrix(intrinsic2, K2);
+
+		rectifyAlg.process(K1, left_to_left, K2, left_to_right);
+
+		// rectification matrix for each image
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		info.param.rectifiedR.set(rectifyAlg.getRectifiedRotation());
+		info.rect.set(rect1);
+		assertBoof(!MatrixFeatures_DDRM.hasUncountable(rect1));
+
+		// New calibration matrix,
+		info.rectifiedK.set(rectifyAlg.getCalibrationMatrix());
+
+		// Maximize the view of the left image and adjust the size of the rectified image
+		ImageDimension rectifiedShape = new ImageDimension();
+		RectifyImageOps.fullViewLeft(intrinsic1, rect1, rect2, info.rectifiedK, rectifiedShape);
+
+		// undistorted and rectify images
+		ConvertMatrixData.convert(rect1, rect1_F32);
+		ConvertMatrixData.convert(rect2, rect2_F32);
+
+		ImageDistort<Image, Image> distortLeft =
+				RectifyDistortImageOps.rectifyImage(intrinsic1, rect1_F32, BorderType.EXTENDED, image1.getImageType());
+		ImageDistort<Image, Image> distortRight =
+				RectifyDistortImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.EXTENDED, image2.getImageType());
+
+		info.mask.reshape(rectifiedShape.width, rectifiedShape.height);
+		rectified1.reshape(rectifiedShape.width, rectifiedShape.height);
+		rectified2.reshape(rectifiedShape.width, rectifiedShape.height);
+
+		distortLeft.apply(image1, rectified1, info.mask);
+		distortRight.apply(image2, rectified2);
+
+		// Compute disparity from the rectified images
+		disparityAlg.process(rectified1, rectified2);
+
+		// Save the results
+		info.disparity = disparityAlg.getDisparity();
+
+		DisparityParameters param = info.param;
+		param.disparityMin = disparityAlg.getDisparityMin();
+		param.disparityRange = disparityAlg.getDisparityRange();
+		param.baseline = left_to_right.T.norm();
+		PerspectiveOps.matrixToPinhole(info.rectifiedK, rectifiedShape.width, rectifiedShape.height, param.pinhole);
+	}
+
+	/**
+	 * Results of disparity computation
+	 */
+	static class StereoResults {
+		// disparity image
+		GrayF32 disparity;
+		// mask indicating which pixels are invalid because they are outside the FOV
+		final GrayU8 mask = new GrayU8(1, 1);
+		// Geometric description of the disparity
+		final DisparityParameters param = new DisparityParameters();
+		// Rectification matrix
+		final DMatrixRMaj rect = new DMatrixRMaj(3, 3);
+		// Rectified camera's intrinsic parameters
+		final DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
+	}
+}

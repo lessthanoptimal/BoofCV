@@ -65,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("ConstantConditions")
 class TestMultiViewOps extends BoofStandardJUnit {
 
 	// camera calibration matrix

@@ -27,6 +27,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.*;
 import boofcv.testing.CompareIdenticalFunctions;
+import joptsimple.internal.Objects;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -37,6 +38,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "SuspiciousNameCombination", "unchecked"})
 public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunctions {
 
 	private final int width;
@@ -56,10 +58,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 
 	@Override
 	protected boolean isTestMethod( Method m ) {
-		if (!super.isTestMethod(m))
-			return false;
-
-		return true;
+		return super.isTestMethod(m);
 	}
 
 	@Override
@@ -93,6 +92,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 				GImageMiscOps.fillUniform((ImageBase)output[0][i], rand, 0, 100);
 				imageType = ((ImageBase)output[0][i]).getImageType();
 			} else if (ImageBorder.class.isAssignableFrom(types[i])) {
+				Objects.ensureNotNull(imageType);
 				output[0][i] = FactoryImageBorder.generic(BorderType.EXTENDED, imageType);
 			} else if (Random.class.isAssignableFrom(types[i])) {
 				output[0][i] = new Random(345);

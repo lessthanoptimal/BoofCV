@@ -50,7 +50,7 @@ public class ImplPerspectiveOps_F64 {
 															   C adjustedParam ) {
 		if (adjustedParam == null)
 			adjustedParam = parameters.createLike();
-		adjustedParam.set(parameters);
+		adjustedParam.setTo(parameters);
 
 		DMatrixRMaj K = ImplPerspectiveOps_F64.pinholeToMatrix(parameters, (DMatrixRMaj)null);
 		DMatrixRMaj K_adj = new DMatrixRMaj(3, 3);

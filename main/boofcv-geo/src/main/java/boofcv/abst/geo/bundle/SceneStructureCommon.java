@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.struct.calib.CameraPinhole;
@@ -96,11 +97,11 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	}
 
 	public void setCamera( int which, boolean fixed, CameraPinhole intrinsic ) {
-		setCamera(which, fixed, new BundlePinhole(intrinsic));
+		setCamera(which, fixed, BundleAdjustmentOps.convert(intrinsic,(BundlePinhole)null));
 	}
 
 	public void setCamera( int which, boolean fixed, CameraPinholeBrown intrinsic ) {
-		setCamera(which, fixed, new BundlePinholeBrown(intrinsic));
+		setCamera(which, fixed, BundleAdjustmentOps.convert(intrinsic,(BundlePinholeBrown)null));
 	}
 
 	/**

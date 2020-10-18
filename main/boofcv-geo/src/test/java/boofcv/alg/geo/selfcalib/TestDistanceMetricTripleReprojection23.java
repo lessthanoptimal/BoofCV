@@ -40,9 +40,9 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 		var alg = new DistanceMetricTripleReprojection23();
 
 		var model = new MetricCameraTriple();
-		model.view1.set(cameraA);
-		model.view2.set(cameraB);
-		model.view3.set(cameraC);
+		model.view1.setTo(cameraA);
+		model.view2.setTo(cameraB);
+		model.view3.setTo(cameraC);
 		model.view_1_to_2.setTo(truthView_1_to_i(1));
 		model.view_1_to_3.setTo(truthView_1_to_i(2));
 
@@ -71,9 +71,9 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 		var alg = new DistanceMetricTripleReprojection23();
 
 		var model = new MetricCameraTriple();
-		model.view1.set(cameraA);
-		model.view2.set(cameraB);
-		model.view3.set(cameraC);
+		model.view1.setTo(cameraA);
+		model.view2.setTo(cameraB);
+		model.view3.setTo(cameraC);
 		model.view_1_to_2.setTo(truthView_1_to_i(1));
 		model.view_1_to_3.setTo(truthView_1_to_i(2));
 

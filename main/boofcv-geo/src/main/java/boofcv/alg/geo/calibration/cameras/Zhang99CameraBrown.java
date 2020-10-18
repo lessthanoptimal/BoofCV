@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.geo.calibration.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.struct.calib.CameraModel;
-import boofcv.struct.calib.CameraPinholeBrown;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -32,28 +32,26 @@ public class Zhang99CameraBrown implements Zhang99Camera {
 	boolean includeTangential;
 	int numRadial;
 
-	public Zhang99CameraBrown(boolean assumeZeroSkew, boolean includeTangential, int numRadial) {
+	public Zhang99CameraBrown( boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
 		this.numRadial = numRadial;
 	}
 
 	@Override
-	public BundleAdjustmentCamera initalizeCamera(DMatrixRMaj K, double[] radial) {
-		BundlePinholeBrown cam = new BundlePinholeBrown(assumeZeroSkew,includeTangential);
+	public BundleAdjustmentCamera initalizeCamera( DMatrixRMaj K, double[] radial ) {
+		BundlePinholeBrown cam = new BundlePinholeBrown(assumeZeroSkew, includeTangential);
 		cam.radial = radial.clone();
-		if( cam.radial.length != numRadial )
+		if (cam.radial.length != numRadial)
 			throw new RuntimeException("BUGW!");
 		cam.setK(K);
 		return cam;
 	}
 
 	@Override
-	public CameraModel getCameraModel(BundleAdjustmentCamera bundleCam) {
+	public CameraModel getCameraModel( BundleAdjustmentCamera bundleCam ) {
 		BundlePinholeBrown cam = (BundlePinholeBrown)bundleCam;
-		CameraPinholeBrown out = new CameraPinholeBrown();
-		cam.convert(out);
-		return out;
+		return BundleAdjustmentOps.convert(cam, null);
 	}
 
 	@Override

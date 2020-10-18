@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.BundleAdjustmentMetricResidualFunction;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.CodecSceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -261,8 +262,8 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 
 		// save the output
 		structure.motions.get(left_to_right_idx).motion.invert(parameters.right_to_left);
-		((BundlePinholeBrown)structure.cameras.get(0).model).convert(parameters.left);
-		((BundlePinholeBrown)structure.cameras.get(1).model).convert(parameters.right);
+		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(0).model), parameters.left);
+		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(1).model), parameters.right);
 	}
 
 	public CalibrateMonoPlanar getCalibLeft() {

@@ -35,7 +35,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		p.fsetTangental(2,3);
 
 		CameraPinholeBrown f = new CameraPinholeBrown();
-		f.set(p);
+		f.setTo(p);
 
 		equalsR(p,f);
 	}
@@ -48,7 +48,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		f.fsetRadial(1,2);
 		f.fsetTangental(2,3);
 
-		f.set(p);
+		f.setTo(p);
 
 		equalsP(p,f);
 

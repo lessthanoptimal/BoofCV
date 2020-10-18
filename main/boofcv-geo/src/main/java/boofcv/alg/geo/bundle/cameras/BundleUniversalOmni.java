@@ -41,7 +41,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	/** Mirror offset distance. &xi; */
 	public double mirrorOffset;
 	/** radial distortion parameters: k<sub>1</sub>,...,k<sub>n</sub> */
-	public double radial[];
+	public double[] radial;
 	/** tangential distortion parameters */
 	public double t1, t2;
 

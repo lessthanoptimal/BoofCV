@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class PinholePanel extends StandardAlgConfigPanel
 	public PinholePanel(CameraPinholeBrown original ,
 						Listener listener ) {
 		this.original = original;
-		this.adjusted.set(original);
+		this.adjusted.setTo(original);
 		this.listener = listener;
 
 		selectWidth = spinner(original.width, 60, 1200, 10);
@@ -88,7 +88,7 @@ public class PinholePanel extends StandardAlgConfigPanel
 
 	public void setCameraModel( CameraPinholeBrown original ) {
 		this.original = original;
-		this.adjusted.set(original);
+		this.adjusted.setTo(original);
 
 		// disable notifications for a moment
 		int N = getComponentCount();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
-import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -30,64 +29,52 @@ import georegression.struct.point.Point2D_F64;
 public class BundlePinhole implements BundleAdjustmentCamera {
 
 	// parameters for the camera model
-	public boolean zeroSkew=true;
-	public double fx,fy,skew,cx,cy;
+	public boolean zeroSkew = true;
+	public double fx, fy, skew, cx, cy;
 
-	public BundlePinhole(boolean zeroSkew) {
+	public BundlePinhole( boolean zeroSkew ) {
 		this.zeroSkew = zeroSkew;
 	}
 
-	public BundlePinhole() {
-	}
+	public BundlePinhole() {}
 
-	public BundlePinhole(CameraPinhole intrinsic ) {
-		setTo(intrinsic);
-	}
-
-	public void setTo(CameraPinhole intrinsic) {
-		zeroSkew = intrinsic.skew == 0;
-		fx = intrinsic.fx;
-		fy = intrinsic.fy;
-		cx = intrinsic.cx;
-		cy = intrinsic.cy;
-		skew = intrinsic.skew;
-	}
-
-	public void copyInto(CameraPinhole intrinsic) {
-		intrinsic.fx = fx;
-		intrinsic.fy = fy;
-		intrinsic.cx = cx;
-		intrinsic.cy = cy;
-		intrinsic.skew = skew;
+	public BundlePinhole setK( double fx, double fy, double skew, double cx, double cy ) {
+		this.fx = fx;
+		this.fy = fy;
+		this.skew = skew;
+		this.cx = cx;
+		this.cy = cy;
+		this.zeroSkew = skew == 0.0;
+		return this;
 	}
 
 	@Override
-	public void setIntrinsic(double[] parameters, int offset) {
+	public void setIntrinsic( double[] parameters, int offset ) {
 		fx = parameters[offset];
-		fy = parameters[offset+1];
-		cx = parameters[offset+2];
-		cy = parameters[offset+3];
+		fy = parameters[offset + 1];
+		cx = parameters[offset + 2];
+		cy = parameters[offset + 3];
 
-		if( !zeroSkew ) {
-			skew = parameters[offset+4];
+		if (!zeroSkew) {
+			skew = parameters[offset + 4];
 		} else {
 			skew = 0;
 		}
 	}
 
 	@Override
-	public void getIntrinsic(double[] parameters, int offset) {
+	public void getIntrinsic( double[] parameters, int offset ) {
 		parameters[offset] = fx;
-		parameters[offset+1] = fy;
-		parameters[offset+2] = cx;
-		parameters[offset+3] = cy;
-		if( !zeroSkew ) {
-			parameters[offset+4] = skew;
+		parameters[offset + 1] = fy;
+		parameters[offset + 2] = cx;
+		parameters[offset + 3] = cy;
+		if (!zeroSkew) {
+			parameters[offset + 4] = skew;
 		}
 	}
 
 	@Override
-	public void project(double camX, double camY, double camZ, Point2D_F64 output) {
+	public void project( double camX, double camY, double camZ, Point2D_F64 output ) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
@@ -96,28 +83,34 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void jacobian(double camX, double camY, double camZ,
-						 double[] inputX, double[] inputY, boolean computeIntrinsic,
-						 double[] calibX, double[] calibY) {
+	public void jacobian( double camX, double camY, double camZ,
+						  double[] inputX, double[] inputY, boolean computeIntrinsic,
+						  double[] calibX, double[] calibY ) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
-		inputX[0] = fx/camZ;           inputY[0] = 0;
-		inputX[1] = skew/camZ;         inputY[1] = fy/camZ;
+		inputX[0] = fx/camZ;
+		inputY[0] = 0;
+		inputX[1] = skew/camZ;
+		inputY[1] = fy/camZ;
 		inputX[2] = -(fx*camX + skew*camY)/(camZ*camZ);
 		inputY[2] = -fy*camY/(camZ*camZ);
 
-		if(!computeIntrinsic)
+		if (!computeIntrinsic)
 			return;
 
-		calibX[0] = nx; calibY[0] = 0;
-		calibX[1] = 0;  calibY[1] = ny;
-		calibX[2] = 1;  calibY[2] = 0;
-		calibX[3] = 0;  calibY[3] = 1;
-		if( !zeroSkew ) {
-			calibX[4] = ny; calibY[4] = 0;
+		calibX[0] = nx;
+		calibY[0] = 0;
+		calibX[1] = 0;
+		calibY[1] = ny;
+		calibX[2] = 1;
+		calibY[2] = 0;
+		calibX[3] = 0;
+		calibY[3] = 1;
+		if (!zeroSkew) {
+			calibX[4] = ny;
+			calibY[4] = 0;
 		}
-
 	}
 
 	@Override

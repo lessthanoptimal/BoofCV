@@ -23,6 +23,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -95,7 +96,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		BCamera output = cameras.grow();
 		output.index = cameras.size - 1;
 		output.original = camera;
-		output.bundleCamera.set(camera);
+		BundleAdjustmentOps.convert(camera, output.bundleCamera);
 		return output;
 	}
 

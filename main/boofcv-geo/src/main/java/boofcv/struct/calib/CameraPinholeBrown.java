@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	}
 
 	public CameraPinholeBrown(CameraPinholeBrown param ) {
-		set(param);
+		setTo(param);
 	}
 
 	public CameraPinholeBrown(double fx, double fy,
@@ -95,7 +95,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	}
 
 	@Override
-	public void set( CameraPinhole param ) {
+	public void setTo( CameraPinhole param ) {
 		if( param instanceof CameraPinholeBrown) {
 			CameraPinholeBrown p = (CameraPinholeBrown)param;
 
@@ -112,7 +112,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 			this.t1 = 0;
 			this.t2 = 0;
 		}
-		super.set(param);
+		super.setTo(param);
 	}
 
 	/**

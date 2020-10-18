@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Motion;
@@ -197,7 +198,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		// Compute metric upgrade from found projective camera matrices
 		MultiViewOps.projectiveToMetric(utils.P2, H_cal, view1_to_view2H, K_target); // discard K_target
 		MultiViewOps.projectiveToMetric(utils.P3, H_cal, view1_to_target, K_target);
-		wview.intrinsic.set(K_target);
+		BundleAdjustmentOps.convert(K_target, wview.intrinsic);
 
 		// Normalize the scale so that it's close to 1.0
 		double normTarget = view1_to_target.T.norm();
@@ -324,8 +325,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		MultiViewOps.projectiveToFundamental(utils.P2, F21);
 		projectiveHomography.initialize(F21, utils.P2);
 
-		workGraph.lookupView(utils.seed.id).intrinsic.convertTo(K1);
-		workGraph.lookupView(utils.viewB.id).intrinsic.convertTo(K2);
+		BundleAdjustmentOps.convert(workGraph.lookupView(utils.seed.id).intrinsic, K1);
+		BundleAdjustmentOps.convert(workGraph.lookupView(utils.viewB.id).intrinsic, K2);
 
 		FastQueue<AssociatedTriple> triples = utils.matchesTriple;
 		pairs.resize(triples.size());

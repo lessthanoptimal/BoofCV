@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.bundle.cameras;
 
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -43,7 +44,7 @@ public class TestBundlePinholeBrown extends BoofStandardJUnit {
 		cam.t1 = 0.01;
 		cam.t2 = -0.01;
 
-		BundlePinholeBrown alg = new BundlePinholeBrown(cam);
+		BundlePinholeBrown alg = BundleAdjustmentOps.convert(cam, (BundlePinholeBrown)null);
 		Point2Transform2_F64 n2p = LensDistortionFactory.narrow(cam).distort_F64(false, true);
 
 		Point2D_F64 found = new Point2D_F64();
@@ -85,7 +86,7 @@ public class TestBundlePinholeBrown extends BoofStandardJUnit {
 			cam.t1 = -0.001;
 			cam.t2 = 0.002;
 
-			BundlePinholeBrown alg = new BundlePinholeBrown(cam);
+			BundlePinholeBrown alg = BundleAdjustmentOps.convert(cam, (BundlePinholeBrown)null);
 			double[][] parameters = new double[1][alg.getIntrinsicCount()];
 			alg.getIntrinsic(parameters[0], 0);
 			new GenericChecksBundleAdjustmentCamera(alg, 0.02) {}
@@ -103,7 +104,7 @@ public class TestBundlePinholeBrown extends BoofStandardJUnit {
 		cam.radial[0] = 0.02;
 		// since t1 and t2 are zero it will automatically turn off tangential
 
-		BundlePinholeBrown alg = new BundlePinholeBrown(cam);
+		BundlePinholeBrown alg = BundleAdjustmentOps.convert(cam, (BundlePinholeBrown)null);
 		double[][] parameters = new double[1][alg.getIntrinsicCount()];
 		alg.getIntrinsic(parameters[0], 0);
 		new GenericChecksBundleAdjustmentCamera(alg, 0.02) {}
