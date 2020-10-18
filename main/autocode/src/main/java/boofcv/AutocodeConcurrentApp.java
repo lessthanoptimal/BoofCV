@@ -56,8 +56,9 @@ public class AutocodeConcurrentApp {
 	private static final String prefix = "//CONCURRENT_";
 	private static final String tab = "\t";
 	private static final FindProjectRoot findRootDirectory = AutocodeMasterApp::findPathToProjectRoot;
-	private static final String sourceRootName = "main";
-	private static final String pathRootToTest = "../test/java";
+	private static final String sourceRootName = "java";
+	private static final String pathRootToTest = "../../test/java";
+	private static final ConvertString originalToMT = name -> name + "_MT.java";
 
 	/**
 	 * Converts the file from single thread into concurrent implementation
@@ -183,7 +184,7 @@ public class AutocodeConcurrentApp {
 			}
 		}
 		file = new File(file, pathRootToTest);
-		for (int i = packagePath.size() - 2; i >= 0; i--) {
+		for (int i = packagePath.size() - 1; i >= 0; i--) {
 			file = new File(file, packagePath.get(i));
 		}
 		file = new File(file, fileName);
@@ -263,18 +264,8 @@ public class AutocodeConcurrentApp {
 		String pattern = "//CONCURRENT_CLASS_NAME ";
 		int where = text.indexOf(pattern);
 		if (where < 0) {
-//			String name = className(original);
-//			String[] words = name.split("_");
-//			name = words[0];
-//			for (int i = 1; i < words.length; i++) {
-//				if (i == words.length - 1) {
-//					name += "_MT";
-//				}
-//				name += "_" + words[i];
-//			}
-//			return new File(original.getParent(), name + ".java");
-			String name = className(original);
-			return new File(original.getParent(), name + "_MT.java");
+			String name = originalToMT.convert(className(original));
+			return new File(original.getParent(), name);
 		}
 
 		String name = readUntilEndOfLine(text, where + pattern.length());
@@ -346,8 +337,14 @@ public class AutocodeConcurrentApp {
 		return lines;
 	}
 
+	@FunctionalInterface
 	public interface FindProjectRoot {
 		File findPathToRoot();
+	}
+
+	@FunctionalInterface
+	public interface ConvertString {
+		String convert( String input );
 	}
 
 	public static void main( String[] args ) throws IOException {

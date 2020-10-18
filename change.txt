@@ -100,7 +100,7 @@ Version : 0.37
 - Calibration
   * Stereo calibration now performs a join bundle adjustment after estimating the stereo baseline
 - Concurrency
-  * TODO make sure ImplSsdCorner_S16 is thread safe and everything else that uses IWorkArrays!
+  * Removed WorkArrays since they were poorly designed
 
 TODO Move projective to metric and similar from multiview to perspective
 TODO rename RansacMultiView to RansacCalibrated
