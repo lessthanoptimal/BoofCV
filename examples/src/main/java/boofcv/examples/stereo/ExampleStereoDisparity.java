@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,13 +48,13 @@ import java.io.File;
 
 /**
  * The disparity between two stereo images is used to estimate the range of objects inside
- * the camera's view.  Disparity is the difference in position between the viewed location
- * of a point in the left and right stereo images.  Because input images are rectified,
+ * the camera's view. Disparity is the difference in position between the viewed location
+ * of a point in the left and right stereo images. Because input images are rectified,
  * corresponding points can be found by only searching along image rows.
  *
- * Values in the disparity image specify how different the two images are.  A value of X indicates
+ * Values in the disparity image specify how different the two images are. A value of X indicates
  * that the corresponding point in the right image from the left is at "x' = x - X - minDisparity",
- * where x' and x are the locations in the right and left images respectively.  An invalid value
+ * where x' and x are the locations in the right and left images respectively. An invalid value
  * with no correspondence is set to a value more than (max - min) disparity.
  *
  * @author Peter Abeles
@@ -62,27 +62,26 @@ import java.io.File;
 public class ExampleStereoDisparity {
 
 	/**
-	 * Computes the dense disparity between between two stereo images.  The input images
+	 * Computes the dense disparity between between two stereo images. The input images
 	 * must be rectified with lens distortion removed to work!  Floating point images
 	 * are also supported.
 	 *
 	 * @param rectLeft Rectified left camera image
 	 * @param rectRight Rectified right camera image
 	 * @param regionSize Radius of region being matched
-	 * @param minDisparity Minimum disparity that is considered
-	 * @param rangeDisparity Number of disparity values considered.
+	 * @param disparityMin Minimum disparity that is considered
+	 * @param disparityRange Number of disparity values considered.
 	 * @return Disparity image
 	 */
-	public static GrayU8 denseDisparity(GrayU8 rectLeft , GrayU8 rectRight ,
-										int regionSize,
-										int minDisparity , int rangeDisparity )
-	{
+	public static GrayU8 denseDisparity( GrayU8 rectLeft, GrayU8 rectRight,
+										 int regionSize,
+										 int disparityMin, int disparityRange ) {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.CENSUS;
-		config.disparityMin = minDisparity;
-		config.disparityRange = rangeDisparity;
+		config.disparityMin = disparityMin;
+		config.disparityRange = disparityRange;
 		config.subpixel = false;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
 		config.maxPerPixelError = 35;
@@ -92,7 +91,7 @@ public class ExampleStereoDisparity {
 				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayU8.class);
 
 		// process and return the results
-		disparityAlg.process(rectLeft,rectRight);
+		disparityAlg.process(rectLeft, rectRight);
 
 		return disparityAlg.getDisparity();
 	}
@@ -101,16 +100,15 @@ public class ExampleStereoDisparity {
 	 * Same as above, but compute disparity to within sub-pixel accuracy. The difference between the
 	 * two is more apparent when a 3D point cloud is computed.
 	 */
-	public static GrayF32 denseDisparitySubpixel(GrayU8 rectLeft , GrayU8 rectRight ,
-												 int regionSize ,
-												 int minDisparity , int rangeDisparity )
-	{
+	public static GrayF32 denseDisparitySubpixel( GrayU8 rectLeft, GrayU8 rectRight,
+												  int regionSize,
+												  int disparityMin, int disparityRange ) {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.CENSUS;
-		config.disparityMin = minDisparity;
-		config.disparityRange = rangeDisparity;
+		config.disparityMin = disparityMin;
+		config.disparityRange = disparityRange;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
 		config.maxPerPixelError = 35;
@@ -120,7 +118,7 @@ public class ExampleStereoDisparity {
 				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
 
 		// process and return the results
-		disparityAlg.process(rectLeft,rectRight);
+		disparityAlg.process(rectLeft, rectRight);
 
 		return disparityAlg.getDisparity();
 	}
@@ -128,10 +126,9 @@ public class ExampleStereoDisparity {
 	/**
 	 * Rectified the input images using known calibration.
 	 */
-	public static RectifyCalibrated rectify(GrayU8 origLeft , GrayU8 origRight ,
-											StereoParameters param ,
-											GrayU8 rectLeft , GrayU8 rectRight )
-	{
+	public static RectifyCalibrated rectify( GrayU8 origLeft, GrayU8 origRight,
+											 StereoParameters param,
+											 GrayU8 rectLeft, GrayU8 rectRight ) {
 		// Compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 		Se3_F64 leftToRight = param.getRightToLeft().invert(null);
@@ -140,7 +137,7 @@ public class ExampleStereoDisparity {
 		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(param.getLeft(), (DMatrixRMaj)null);
 		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(param.getRight(), (DMatrixRMaj)null);
 
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
+		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
@@ -152,14 +149,14 @@ public class ExampleStereoDisparity {
 		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK, null);
 
 		// undistorted and rectify images
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3);
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
-		ImageDistort<GrayU8,GrayU8> imageDistortLeft =
+		ImageDistort<GrayU8, GrayU8> imageDistortLeft =
 				RectifyDistortImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.SKIP, origLeft.getImageType());
-		ImageDistort<GrayU8,GrayU8> imageDistortRight =
+		ImageDistort<GrayU8, GrayU8> imageDistortRight =
 				RectifyDistortImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, origRight.getImageType());
 
 		imageDistortLeft.apply(origLeft, rectLeft);
@@ -172,32 +169,33 @@ public class ExampleStereoDisparity {
 		String calibDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 		String imageDir = UtilIO.pathExample("stereo/");
 
-		StereoParameters param = CalibrationIO.load(new File(calibDir , "stereo.yaml"));
+		StereoParameters param = CalibrationIO.load(new File(calibDir, "stereo.yaml"));
 
 		// load and convert images into a BoofCV format
-		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "chair01_left.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(imageDir , "chair01_right.jpg");
+		BufferedImage origLeft = UtilImageIO.loadImage(imageDir, "chair01_left.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(imageDir, "chair01_right.jpg");
 
-		GrayU8 distLeft = ConvertBufferedImage.convertFrom(origLeft,(GrayU8)null);
-		GrayU8 distRight = ConvertBufferedImage.convertFrom(origRight,(GrayU8)null);
+		GrayU8 distLeft = ConvertBufferedImage.convertFrom(origLeft, (GrayU8)null);
+		GrayU8 distRight = ConvertBufferedImage.convertFrom(origRight, (GrayU8)null);
 
 		// rectify images
 		GrayU8 rectLeft = distLeft.createSameShape();
 		GrayU8 rectRight = distRight.createSameShape();
 
-		rectify(distLeft,distRight,param,rectLeft,rectRight);
+		rectify(distLeft, distRight, param, rectLeft, rectRight);
 
 		// compute disparity
-		GrayU8 disparity = denseDisparity(rectLeft,rectRight,5,10,60);
-//		GrayF32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,60);
+		int disparityRange = 60;
+		GrayU8 disparity = denseDisparity(rectLeft, rectRight, 5, 10, disparityRange);
+//		GrayF32 disparity = denseDisparitySubpixel(rectLeft, rectRight, 5, 10, disparityRange);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,60,0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, disparityRange, 0);
 
 		ListDisplayPanel gui = new ListDisplayPanel();
 		gui.addImage(rectLeft, "Rectified");
 		gui.addImage(visualized, "Disparity");
 
-		ShowImages.showWindow(gui,"Stereo Disparity", true);
+		ShowImages.showWindow(gui, "Stereo Disparity", true);
 	}
 }

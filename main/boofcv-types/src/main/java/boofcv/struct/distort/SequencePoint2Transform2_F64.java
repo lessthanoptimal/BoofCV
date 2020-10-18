@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,15 +33,15 @@ public class SequencePoint2Transform2_F64 implements Point2Transform2_F64 {
 	 *
 	 * @param sequence Sequence of transforms.
 	 */
-	public SequencePoint2Transform2_F64(Point2Transform2_F64... sequence) {
+	public SequencePoint2Transform2_F64( Point2Transform2_F64... sequence ) {
 		this.sequence = sequence;
 	}
 
 	@Override
-	public void compute( double x, double y, Point2D_F64 out) {
-		sequence[0].compute(x,y,out);
-		for( int i = 1; i < sequence.length; i++ ) {
-			sequence[i].compute(out.x,out.y,out);
+	public void compute( double x, double y, Point2D_F64 out ) {
+		sequence[0].compute(x, y, out);
+		for (int i = 1; i < sequence.length; i++) {
+			sequence[i].compute(out.x, out.y, out);
 		}
 	}
 
@@ -50,7 +50,7 @@ public class SequencePoint2Transform2_F64 implements Point2Transform2_F64 {
 	 */
 	@Override
 	public SequencePoint2Transform2_F64 copyConcurrent() {
-		Point2Transform2_F64[] s = new Point2Transform2_F64[ sequence.length ];
+		Point2Transform2_F64[] s = new Point2Transform2_F64[sequence.length];
 		for (int i = 0; i < sequence.length; i++) {
 			s[i] = sequence[i].copyConcurrent();
 		}

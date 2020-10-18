@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,8 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  *
  * <p>Output: {@link #getWorkGraph()}</p>
  *
- * <p>WARNING: There are serious issues with N-view projective scenes. See {@link ProjectiveToMetricReconstruction}
- * for a brief summary of the problems.</p>
+ * <p>WARNING: There are serious issues with N-view projective scenes. Even with "perfect" simulated data this
+ * approach is unstable.</p>
  * <p>NOTE: One possible way (not tested) to mitigate those issues would be to scale pixels using a 3x3 matrix
  * that essentially resembles the inverse of an intrinsic matrix. At that point you might as well do a metric
  * reconstruction.</p>

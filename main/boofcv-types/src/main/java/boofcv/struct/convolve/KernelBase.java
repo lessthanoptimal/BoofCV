@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct.convolve;
 
+import lombok.Getter;
 
 /**
  * Base class for all convolution kernels.
@@ -25,55 +26,36 @@ package boofcv.struct.convolve;
  * @author Peter Abeles
  */
 public abstract class KernelBase {
-	/* number of elements in the kernel */
-	public int width;
+	/** The kernel's width. */
+	public @Getter int width;
 
-	/** which index is the kernel's origin.  For symmetric kernels with an odd width it is width/2 */
-	public int offset;
+	/** Offset from array index to spatial index 0, For symmetric kernels with an odd width it is width/2 */
+	public @Getter int offset;
 
-	protected KernelBase(int width) {
+	protected KernelBase( int width ) {
 		if (width < 0)
-			throw new IllegalArgumentException("Kernel width must be greater than zero not "+width);
+			throw new IllegalArgumentException("Kernel width must be greater than zero not " + width);
 		this.width = width;
 		this.offset = width/2;
 	}
 
-	protected KernelBase(int width, int offset) {
+	protected KernelBase( int width, int offset ) {
 		if (width <= 0)
-			throw new IllegalArgumentException("Kernel width must be greater than zero not "+width);
+			throw new IllegalArgumentException("Kernel width must be greater than zero not " + width);
 		if (offset < 0 || offset >= width)
-			throw new IllegalArgumentException("The offset must be inside the kernel's bounds. o="+offset+" w="+width);
+			throw new IllegalArgumentException("The offset must be inside the kernel's bounds. o=" + offset + " w=" + width);
 		this.width = width;
 		this.offset = offset;
 	}
 
-	protected KernelBase() {
-	}
-
-	/**
-	 * The kernel's width.  This is an odd number.
-	 *
-	 * @return Kernel's width.
-	 */
-	public int getWidth() {
-		return width;
-	}
+	protected KernelBase() { }
 
 	/**
 	 * The radius is defined as the width divided by two.
 	 *
 	 * @return The kernel's radius.
 	 */
-	public int getRadius() {
-		return width / 2;
-	}
-
-	/**
-	 * Which index is the origin in the kernel
-	 */
-	public int getOffset() {
-		return offset;
-	}
+	public int getRadius() { return width/2; }
 
 	/**
 	 * Returns the dimension of this kernel, 1D or 2D.
@@ -84,5 +66,5 @@ public abstract class KernelBase {
 
 	public abstract boolean isInteger();
 
-	public abstract <T extends KernelBase>T copy();
+	public abstract <T extends KernelBase> T copy();
 }

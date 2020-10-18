@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo.rectify;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.simple.SimpleMatrix;
 
@@ -33,13 +34,13 @@ import org.ejml.simple.SimpleMatrix;
  * </p>
  *
  * <p>
- * The calibration matrix is the standard upper triangular matrix used throughout the library.  A single
+ * The calibration matrix is the standard upper triangular matrix used throughout the library. A single
  * calibration matrix is computed for both images by averaging the two original and setting the skew
  * to zero.
  * </p>
  *
  * <p>
- * The rectified view is chosen such that it will be most similar to the first camera.  This is done by making
+ * The rectified view is chosen such that it will be most similar to the first camera. This is done by making
  * the original z-axis and the rectified z-axis similar.
  * </p>
  *
@@ -52,20 +53,24 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class RectifyCalibrated {
 
-	// rectifying transform for left and right images
-	DMatrixRMaj rect1 = new DMatrixRMaj(3,3);
-	DMatrixRMaj rect2 = new DMatrixRMaj(3,3);
+	/** Rectification transform for first camera */
+	final @Getter DMatrixRMaj rect1 = new DMatrixRMaj(3, 3);
+	/** Rectification transform for first camera */
+	final @Getter DMatrixRMaj rect2 = new DMatrixRMaj(3, 3);
 
 	// direction of new coordinate system axises
-	Vector3D_F64 v1 = new Vector3D_F64();
-	Vector3D_F64 v2 = new Vector3D_F64();
-	Vector3D_F64 v3 = new Vector3D_F64();
+	final Vector3D_F64 v1 = new Vector3D_F64();
+	final Vector3D_F64 v2 = new Vector3D_F64();
+	final Vector3D_F64 v3 = new Vector3D_F64();
 
 	// Camera calibration matrix.
-	SimpleMatrix K = new SimpleMatrix(3,3);
+	final SimpleMatrix K = new SimpleMatrix(3, 3);
 
-	// rotation matrix of rectified cameras
-	DMatrixRMaj rectifiedR;
+	/**
+	 * Rotation matrix of rectified coordinate system. To convert back into left camera reference frame multiply
+	 * the triangulated point by the transpose of this matrix
+	 */
+	@Getter DMatrixRMaj rectifiedRotation;
 
 	/**
 	 * Computes rectification transforms for both cameras and optionally a single calibration
@@ -76,17 +81,16 @@ public class RectifyCalibrated {
 	 * @param K2 Calibration matrix for second camera.
 	 * @param worldToCamera2 Location of the second camera.
 	 */
-	public void process( DMatrixRMaj K1 , Se3_F64 worldToCamera1 ,
-						 DMatrixRMaj K2 , Se3_F64 worldToCamera2 )
-	{
+	public void process( DMatrixRMaj K1, Se3_F64 worldToCamera1,
+						 DMatrixRMaj K2, Se3_F64 worldToCamera2 ) {
 		SimpleMatrix sK1 = SimpleMatrix.wrap(K1);
 		SimpleMatrix sK2 = SimpleMatrix.wrap(K2);
 		SimpleMatrix R1 = SimpleMatrix.wrap(worldToCamera1.getR());
 		SimpleMatrix R2 = SimpleMatrix.wrap(worldToCamera2.getR());
-		SimpleMatrix T1 = new SimpleMatrix(3,1,true,
-				new double[]{worldToCamera1.getT().x,worldToCamera1.getT().y,worldToCamera1.getT().z});
-		SimpleMatrix T2 = new SimpleMatrix(3,1,true,
-				new double[]{worldToCamera2.getT().x,worldToCamera2.getT().y,worldToCamera2.getT().z});
+		SimpleMatrix T1 = new SimpleMatrix(3, 1, true,
+				new double[]{worldToCamera1.getT().x, worldToCamera1.getT().y, worldToCamera1.getT().z});
+		SimpleMatrix T2 = new SimpleMatrix(3, 1, true,
+				new double[]{worldToCamera2.getT().x, worldToCamera2.getT().y, worldToCamera2.getT().z});
 
 		//  P = K*[R|T]
 		SimpleMatrix KR1 = sK1.mult(R1);
@@ -98,19 +102,19 @@ public class RectifyCalibrated {
 		SimpleMatrix c2 = R2.transpose().mult(T2.scale(-1));
 
 		// new coordinate system axises
-		selectAxises(R1,R2, c1, c2);
+		selectAxises(R1, R2, c1, c2);
 
 		// new extrinsic parameters, rotation matrix with rows of camera 1's coordinate system in
 		// the world frame
-		SimpleMatrix RR = new SimpleMatrix(3,3,true,
+		SimpleMatrix RR = new SimpleMatrix(3, 3, true,
 				new double[]{
-				v1.x,v1.y,v1.z,
-				v2.x,v2.y,v2.z,
-				v3.x,v3.y,v3.z});
+						v1.x, v1.y, v1.z,
+						v2.x, v2.y, v2.z,
+						v3.x, v3.y, v3.z});
 
 		// new calibration matrix that is an average of the original
-		K = sK1.plus(sK2).scale(0.5);
-		K.set(0,1,0);// set skew to zero
+		K.set(sK1.plus(sK2).scale(0.5));
+		K.set(0, 1, 0);// set skew to zero
 
 		// new projection rotation matrices
 		SimpleMatrix KRR = K.mult(RR);
@@ -119,49 +123,35 @@ public class RectifyCalibrated {
 		rect1.set(KRR.mult(KR1.invert()).getDDRM());
 		rect2.set(KRR.mult(KR2.invert()).getDDRM());
 
-		rectifiedR = RR.getDDRM();
+		rectifiedRotation = RR.getDDRM();
 	}
 
 	/**
 	 * Selects axises of new coordinate system
 	 */
-	private void selectAxises(SimpleMatrix R1, SimpleMatrix R2, SimpleMatrix c1, SimpleMatrix c2) {
+	private void selectAxises( SimpleMatrix R1, SimpleMatrix R2, SimpleMatrix c1, SimpleMatrix c2 ) {
 		// --------- Compute the new x-axis
 		v1.set(c2.get(0) - c1.get(0), c2.get(1) - c1.get(1), c2.get(2) - c1.get(2));
 		v1.normalize();
 
 		// --------- Compute the new y-axis
 		//   cross product of old z axis and new x axis
-		// According to the paper [1] this choice is arbitrary, however it is not.  By selecting
-		// the original axis the similarity with the first view is maximized.  The other extreme
+		// According to the paper [1] this choice is arbitrary, however it is not. By selecting
+		// the original axis the similarity with the first view is maximized. The other extreme
 		// would be to make it perpendicular, resulting in an unusable rectification.
 
 		// extract old z-axis from rotation matrix
 		Vector3D_F64 oldZ = new Vector3D_F64(
-				R1.get(2,0)+R2.get(2,0),
-				R1.get(2,1)+R2.get(2,1),
-				R1.get(2,2)+R2.get(2,2));
+				R1.get(2, 0) + R2.get(2, 0),
+				R1.get(2, 1) + R2.get(2, 1),
+				R1.get(2, 2) + R2.get(2, 2));
 		GeometryMath_F64.cross(oldZ, v1, v2);
 		v2.normalize();
 
 		// ---------- Compute the new z-axis
 		// simply the process product of the first two
-		GeometryMath_F64.cross(v1,v2,v3);
+		GeometryMath_F64.cross(v1, v2, v3);
 		v3.normalize();
-	}
-
-	/**
-	 * Rectification transform for first camera
-	 */
-	public DMatrixRMaj getRect1() {
-		return rect1;
-	}
-
-	/**
-	 * Rectification transform for second camera
-	 */
-	public DMatrixRMaj getRect2() {
-		return rect2;
 	}
 
 	/**
@@ -171,15 +161,5 @@ public class RectifyCalibrated {
 	 */
 	public DMatrixRMaj getCalibrationMatrix() {
 		return K.getDDRM();
-	}
-
-	/**
-	 * Rotation matrix of rectified coordinate system. To convert back into left camera reference frame multiply
-	 * the triangulated point by the transpose of this matrix
-	 *
-	 * @return Rotation matrix
-	 */
-	public DMatrixRMaj getRectifiedRotation() {
-		return rectifiedR;
 	}
 }

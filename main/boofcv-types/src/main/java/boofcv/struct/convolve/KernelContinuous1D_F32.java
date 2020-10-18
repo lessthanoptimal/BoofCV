@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ package boofcv.struct.convolve;
  */
 public abstract class KernelContinuous1D_F32 extends Kernel1D {
 
-	protected KernelContinuous1D_F32(int width) {
+	protected KernelContinuous1D_F32( int width ) {
 		super(width);
 	}
 
@@ -39,7 +39,7 @@ public abstract class KernelContinuous1D_F32 extends Kernel1D {
 	 * Computes the value of the kernel at hte specified point.
 	 *
 	 * @param x Function's input.
-	 * @return  Function's value at point 'x'
+	 * @return Function's value at point 'x'
 	 */
 	abstract public float compute( float x );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,16 +48,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Fundamental matrix describes the epipolar relationship between two images.  If two points, one from
- * each image, match, then the inner product around the Fundamental matrix will be zero.  If a fundamental
+ * A Fundamental matrix describes the epipolar relationship between two images. If two points, one from
+ * each image, match, then the inner product around the Fundamental matrix will be zero. If a fundamental
  * matrix is known, then information about the scene and its structure can be extracted.
  *
  * Below are two examples of how a Fundamental matrix can be computed using different.
  * The robust technique attempts to find the best fit Fundamental matrix to the data while removing noisy
- * matches, The simple version just assumes that all the matches are correct.  Similar techniques can be used
+ * matches, The simple version just assumes that all the matches are correct. Similar techniques can be used
  * to fit various other types of motion or structural models to observations.
  *
- * The input image and associated features are displayed in a window.  In another window, inlier features
+ * The input image and associated features are displayed in a window. In another window, inlier features
  * from robust model fitting are shown.
  *
  * @author Peter Abeles
@@ -65,15 +65,14 @@ import java.util.List;
 public class ExampleFundamentalMatrix {
 
 	/**
-	 * Given a set of noisy observations, compute the Fundamental matrix while removing
-	 * the noise.
+	 * Given a set of noisy observations, compute the Fundamental matrix while removing the noise.
 	 *
 	 * @param matches List of associated features between the two images
 	 * @param inliers List of feature pairs that were determined to not be noise.
 	 * @return The found fundamental matrix.
 	 */
-	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches ,
-												 List<AssociatedPair> inliers , double inlierThreshold ) {
+	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches,
+												 List<AssociatedPair> inliers, double inlierThreshold ) {
 
 		ConfigRansac configRansac = new ConfigRansac();
 		configRansac.inlierThreshold = inlierThreshold;
@@ -87,20 +86,20 @@ public class ExampleFundamentalMatrix {
 		// the inlier threshold.
 
 		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac =
-				FactoryMultiViewRobust.fundamentalRansac(configFundamental,configRansac);
+				FactoryMultiViewRobust.fundamentalRansac(configFundamental, configRansac);
 
 		// Estimate the fundamental matrix while removing outliers
-		if( !ransac.process(matches) )
+		if (!ransac.process(matches))
 			throw new IllegalArgumentException("Failed");
 
 		// save the set of features that were used to compute the fundamental matrix
 		inliers.addAll(ransac.getMatchSet());
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
-		DMatrixRMaj F = new DMatrixRMaj(3,3);
-		ModelFitter<DMatrixRMaj,AssociatedPair> refine =
+		DMatrixRMaj F = new DMatrixRMaj(3, 3);
+		ModelFitter<DMatrixRMaj, AssociatedPair> refine =
 				FactoryMultiView.fundamentalRefine(1e-8, 400, EpipolarError.SAMPSON);
-		if( !refine.fitModel(inliers, ransac.getModelParameters(), F) )
+		if (!refine.fitModel(inliers, ransac.getModelParameters(), F))
 			throw new IllegalArgumentException("Failed");
 
 		// Return the solution
@@ -109,15 +108,15 @@ public class ExampleFundamentalMatrix {
 
 	/**
 	 * If the set of associated features are known to be correct, then the fundamental matrix can
-	 * be computed directly with a lot less code.  The down side is that this technique is very
+	 * be computed directly with a lot less code. The down side is that this technique is very
 	 * sensitive to noise.
 	 */
 	public static DMatrixRMaj simpleFundamental( List<AssociatedPair> matches ) {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
 		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_8, 0);
 
-		DMatrixRMaj F = new DMatrixRMaj(3,3);
-		if( !estimateF.process(matches,F) )
+		DMatrixRMaj F = new DMatrixRMaj(3, 3);
+		if (!estimateF.process(matches, F))
 			throw new IllegalArgumentException("Failed");
 
 		// while not done here, this initial linear estimate can be refined using non-linear optimization
@@ -129,26 +128,26 @@ public class ExampleFundamentalMatrix {
 	 * Use the associate point feature example to create a list of {@link AssociatedPair} for use in computing the
 	 * fundamental matrix.
 	 */
-	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
+	public static List<AssociatedPair> computeMatches( BufferedImage left, BufferedImage right ) {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(0, 2, 400, 1, 9, 4, 4), null,null, GrayF32.class);
+				new ConfigFastHessian(0, 2, 400, 1, 9, 4, 4), null, null, GrayF32.class);
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 0.1), scorer);
 
-		ExampleAssociatePoints<GrayF32,TupleDesc_F64> findMatches =
+		ExampleAssociatePoints<GrayF32, TupleDesc_F64> findMatches =
 				new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);
 
-		findMatches.associate(left,right);
+		findMatches.associate(left, right);
 
 		List<AssociatedPair> matches = new ArrayList<>();
 		FastAccess<AssociatedIndex> matchIndexes = associate.getMatches();
 
-		for( int i = 0; i < matchIndexes.size; i++ ) {
+		for (int i = 0; i < matchIndexes.size; i++) {
 			AssociatedIndex a = matchIndexes.get(i);
-			AssociatedPair p = new AssociatedPair(findMatches.pointsA.get(a.src) , findMatches.pointsB.get(a.dst));
-			matches.add( p);
+			AssociatedPair p = new AssociatedPair(findMatches.pointsA.get(a.src), findMatches.pointsB.get(a.dst));
+			matches.add(p);
 		}
 
 		return matches;
@@ -158,10 +157,10 @@ public class ExampleFundamentalMatrix {
 
 		String dir = UtilIO.pathExample("structure/");
 
-		BufferedImage imageA = UtilImageIO.loadImage(dir , "undist_cyto_01.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir , "undist_cyto_02.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage(dir, "undist_cyto_01.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir, "undist_cyto_02.jpg");
 
-		List<AssociatedPair> matches = computeMatches(imageA,imageB);
+		List<AssociatedPair> matches = computeMatches(imageA, imageB);
 
 		// Where the fundamental matrix is stored
 		DMatrixRMaj F;
@@ -184,7 +183,7 @@ public class ExampleFundamentalMatrix {
 		// display the inlier matches found using the robust estimator
 		AssociationPanel panel = new AssociationPanel(20);
 		panel.setAssociation(inliers);
-		panel.setImages(imageA,imageB);
+		panel.setImages(imageA, imageB);
 
 		ShowImages.showWindow(panel, "Inlier Pairs");
 	}

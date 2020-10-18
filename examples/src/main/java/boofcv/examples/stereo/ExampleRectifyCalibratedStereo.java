@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,20 +43,21 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * <p>
- * Shows how to rectify a pair of stereo images with known intrinsic parameters and stereo baseline.
- * The example code does the following:<br>
- * 1) Load stereo parameters from XML file with a pair of images.<br>
- * 2) Undistort and rectify images..  This provides one rectification matrix
- * for each image along with a new camera calibration matrix.<br>
- * 3) The original rectification does not try to maximize view area, however it can be adjusted.
- * 4)After rectification is finished the results are displayed.<br>
- * </p>
+ * Shows how to rectify a pair of stereo images with known intrinsic parameters and stereo baseline. When you
+ * rectify a stereo pair you are applying a transform that removes lens distortion and "rotates" the views
+ * such that they are parallel to each other, facilitating stereo processing.
  *
- * <p>
- * Note that the y-axis in left and right images align after rectification.  The curved image edge
- * is an artifact of lens distortion being removed.
- * </p>
+ * The example code does the following:
+ * <lo>
+ *     <li>Load stereo extrinsic and intrinsic parameters from a file along with a pair of images.</li>
+ *     <li>Undistort and rectify images. This provides one rectification matrix for each image along with a new
+ *         camera calibration matrix.</li>
+ *     <li>The original rectification does not try to maximize view area, however it can be adjusted.</li>
+ *     <li>After rectification is finished the results are displayed.</li>
+ * </lo>
+ *
+ * Note that the y-axis in left and right images align after rectification. You can click in the images to draw a line
+ * that makes this easy to see. The curved image birder is an artifact of lens distortion being removed.
  *
  * @author Peter Abeles
  */
@@ -65,17 +66,17 @@ public class ExampleRectifyCalibratedStereo {
 	public static void main( String[] args ) {
 		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
-		StereoParameters param = CalibrationIO.load(new File(dir , "stereo.yaml"));
+		StereoParameters param = CalibrationIO.load(new File(dir, "stereo.yaml"));
 
 		// load images
-		BufferedImage origLeft = UtilImageIO.loadImage(dir,"left05.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(dir,"right05.jpg");
+		BufferedImage origLeft = UtilImageIO.loadImage(dir, "left05.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(dir, "right05.jpg");
 
 		// distorted images
 		Planar<GrayF32> distLeft =
-				ConvertBufferedImage.convertFromPlanar(origLeft, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origLeft, null, true, GrayF32.class);
 		Planar<GrayF32> distRight =
-				ConvertBufferedImage.convertFromPlanar(origRight, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(origRight, null, true, GrayF32.class);
 
 		// storage for undistorted + rectified images
 		Planar<GrayF32> rectLeft = distLeft.createSameShape();
@@ -89,7 +90,7 @@ public class ExampleRectifyCalibratedStereo {
 		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(param.getLeft(), (DMatrixRMaj)null);
 		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(param.getRight(), (DMatrixRMaj)null);
 
-		rectifyAlg.process(K1,new Se3_F64(),K2,leftToRight);
+		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
@@ -103,8 +104,8 @@ public class ExampleRectifyCalibratedStereo {
 //		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK, null);
 
 		// undistorted and rectify images
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
@@ -113,18 +114,18 @@ public class ExampleRectifyCalibratedStereo {
 		ImageDistort rectifyImageRight =
 				RectifyDistortImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.SKIP, distRight.getImageType());
 
-		rectifyImageLeft.apply(distLeft,rectLeft);
-		rectifyImageRight.apply(distRight,rectRight);
+		rectifyImageLeft.apply(distLeft, rectLeft);
+		rectifyImageRight.apply(distRight, rectRight);
 
 		// convert for output
-		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null,true);
-		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null,true);
+		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft, null, true);
+		BufferedImage outRight = ConvertBufferedImage.convertTo(rectRight, null, true);
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
 		ListDisplayPanel panel = new ListDisplayPanel();
 		panel.addItem(new RectifiedPairPanel(true, origLeft, origRight), "Original");
 		panel.addItem(new RectifiedPairPanel(true, outLeft, outRight), "Rectified");
 
-		ShowImages.showWindow(panel,"Stereo Rectification Calibrated",true);
+		ShowImages.showWindow(panel, "Stereo Rectification Calibrated", true);
 	}
 }

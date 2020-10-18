@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public interface PixelTransform<T> {
 	 * @param y Pixel y-coordinate
 	 * @param output The transformed pixel
 	 */
-	void compute( int x , int y , T output );
+	void compute( int x, int y, T output );
 
 	/**
 	 * Creates a copy of this transform for use in concurrent application. What that means is that any variable

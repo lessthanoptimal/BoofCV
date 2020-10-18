@@ -361,6 +361,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			structure.setCamera(i, false, bp);
 			structure.setView(i, i, i == 0, listWorldToView.get(i));
 		}
+
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedTriple t = inliers.get(i);
 
@@ -424,31 +425,30 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			}
 		}
 
-		if (!successfulSelfCalibration)
-		{
+		if (!successfulSelfCalibration) {
 			// Use provided focal length or guess using an "average" focal length across cameras
-			double focalLength = manualFocalLength <= 0 ? (double)(Math.max(width,height)/2) : manualFocalLength;
+			double focalLength = manualFocalLength <= 0 ? (double)(Math.max(width, height)/2) : manualFocalLength;
 
-			if (verbose != null) verbose.println("Assuming fixed focal length for all views. f="+focalLength);
+			if (verbose != null) verbose.println("Assuming fixed focal length for all views. f=" + focalLength);
 
 			final var estimateH = new TwoViewToCalibratingHomography();
-			DMatrixRMaj F21 = MultiViewOps.projectiveToFundamental(P2,null);
-			estimateH.initialize(F21,P2);
-			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(focalLength,focalLength,0,0,0);
+			DMatrixRMaj F21 = MultiViewOps.projectiveToFundamental(P2, null);
+			estimateH.initialize(F21, P2);
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(focalLength, focalLength, 0, 0, 0);
 			FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
-			MultiViewOps.convertTr(ransac.getMatchSet(),0,1,pairs);
-			if (!estimateH.process(K,K,pairs.toList()))
+			MultiViewOps.convertTr(ransac.getMatchSet(), 0, 1, pairs);
+			if (!estimateH.process(K, K, pairs.toList()))
 				throw new RuntimeException("Failed to estimate H given 'known' intrinsics");
 
 			// Use the found calibration homography to find motion estimates
 			DMatrixRMaj H = estimateH.getCalibrationHomography();
 			listPinhole.clear();
 			for (int i = 0; i < 3; i++) {
-				listPinhole.add(PerspectiveOps.matrixToPinhole(K,width,height,null));
+				listPinhole.add(PerspectiveOps.matrixToPinhole(K, width, height, null));
 			}
 			listWorldToView.get(0).reset();
-			MultiViewOps.projectiveToMetric(P2,H, listWorldToView.get(1),K);
-			MultiViewOps.projectiveToMetric(P3,H, listWorldToView.get(2),K);
+			MultiViewOps.projectiveToMetric(P2,H, listWorldToView.get(1), K);
+			MultiViewOps.projectiveToMetric(P3,H, listWorldToView.get(2), K);
 		}
 
 		if (verbose != null) {
@@ -481,7 +481,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 	/**
 	 * Checks to see if a solution was converged to where the points are behind the camera. This is
-	 * pysically impossible
+	 * physically impossible
 	 */
 	private boolean checkBehindCamera( SceneStructureMetric structure ) {
 

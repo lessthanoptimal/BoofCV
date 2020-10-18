@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
  * Definition of transformed coordinate systems:
  * <dl>
  *     <dt>Pixel<dd>Original image coordinates in pixels.
- *     <dt>Rect<dd>Rectified image coordinates in pixels.  Lens distortion has been removed.
+ *     <dt>Rect<dd>Rectified image coordinates in pixels. Lens distortion has been removed.
  *     <dt>RectNorm<dd>Rectified image coordinates in normalized coordinates.
  * </dl>
  * </p>
@@ -53,13 +53,13 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Rectification for calibrated stereo pairs.  Two stereo camera care considered calibrated if
+	 * Rectification for calibrated stereo pairs. Two stereo camera are considered calibrated if
 	 * their baseline is known.
 	 * </p>
 	 *
 	 * <p>
 	 * After the rectification has been found it might still need to be adjusted
-	 * for maximum viewing area.  See fullViewLeft and allInsideLeft for adjusting the rectification.
+	 * for maximum viewing area. See fullViewLeft and allInsideLeft for adjusting the rectification.
 	 * </p>
 	 *
 	 * @return {@link RectifyCalibrated}
@@ -70,14 +70,14 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Rectification for uncalibrated stereo pairs using the fundamental matrix.  Uncalibrated refers
-	 * to the stereo baseline being unknown.  For this technique to work the fundamental matrix needs
-	 * to be known very accurately.  See comments in {@link RectifyFundamental} for more details.
+	 * Rectification for uncalibrated stereo pairs using the fundamental matrix. Uncalibrated refers
+	 * to the stereo baseline being unknown. For this technique to work the fundamental matrix needs
+	 * to be known very accurately. See comments in {@link RectifyFundamental} for more details.
 	 * </p>
 	 *
 	 * <p>
 	 * After the rectification has been found it might still need to be adjusted
-	 * for maximum viewing area.  See {@link #fullViewLeft(int, int, DMatrixRMaj, DMatrixRMaj)}
+	 * for maximum viewing area. See {@link #fullViewLeft(int, int, DMatrixRMaj, DMatrixRMaj)}
 	 * and {@link #allInsideLeft(int, int, DMatrixRMaj, DMatrixRMaj)}.
 	 * </p>
 	 *
@@ -92,12 +92,12 @@ public class RectifyImageOps {
 	 * Adjust the rectification such that the entire original left image can be seen and adjusts the shape
 	 * of the rectified image to maximize it's area. For use with calibrated stereo images having a known baseline.
 	 * Due to lens distortions it is possible for large parts of the
-	 * rectified image to have no overlap with the original and will appear to be black.  This can cause
+	 * rectified image to have no overlap with the original and will appear to be black. This can cause
 	 * issues when processing the image
 	 * </p>
 	 *
 	 * <p>
-	 * WARNING: There are pathological conditions where this will fail.  If the new rotated image view
+	 * WARNING: There are pathological conditions where this will fail. If the new rotated image view
 	 * and a pixel are parallel it will require infinite area.
 	 * </p>
 	 *
@@ -105,7 +105,7 @@ public class RectifyImageOps {
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
-	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
+	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
 	 */
 	public static void fullViewLeft( CameraPinholeBrown paramLeft,
 									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
@@ -118,14 +118,14 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that the entire original left image can be seen.  For use with
-	 * calibrated stereo images having a known baseline.  Due to lens distortions it is possible for large parts of the
-	 * rectified image to have no overlap with the original and will appear to be black.  This can cause
+	 * Adjust the rectification such that the entire original left image can be seen. For use with
+	 * calibrated stereo images having a known baseline. Due to lens distortions it is possible for large parts of the
+	 * rectified image to have no overlap with the original and will appear to be black. This can cause
 	 * issues when processing the image
 	 * </p>
 	 *
 	 * <p>
-	 * WARNING: There are pathological conditions where this will fail.  If the new rotated image view
+	 * WARNING: There are pathological conditions where this will fail. If the new rotated image view
 	 * and a pixel are parallel it will require infinite area.
 	 * </p>
 	 *
@@ -133,7 +133,7 @@ public class RectifyImageOps {
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
-	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
+	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
 	 */
 	public static void fullViewLeft( CameraPinholeBrown paramLeft,
 									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
@@ -146,7 +146,7 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that the entire original left image can be seen.  For use with
+	 * Adjust the rectification such that the entire original left image can be seen. For use with
 	 * uncalibrated stereo images with unknown baseline.
 	 * </p>
 	 *
@@ -167,7 +167,7 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that the entire original left image can be seen.  For use with
+	 * Adjust the rectification such that the entire original left image can be seen. For use with
 	 * uncalibrated stereo images with unknown baseline.
 	 * </p>
 	 *
@@ -188,9 +188,9 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that only pixels which overlap the original left image can be seen.  For use with
+	 * Adjust the rectification such that only pixels which overlap the original left image can be seen. For use with
 	 * calibrated stereo images having a known baseline. Image processing is easier since only the "true" image pixels
-	 * are visible, but information along the image border has been discarded.  The rectification matrices are
+	 * are visible, but information along the image border has been discarded. The rectification matrices are
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
@@ -198,7 +198,7 @@ public class RectifyImageOps {
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
-	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
+	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
 	 */
 	public static void allInsideLeft( CameraPinholeBrown paramLeft,
 									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
@@ -212,9 +212,9 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that only pixels which overlap the original left image can be seen.  For use with
+	 * Adjust the rectification such that only pixels which overlap the original left image can be seen. For use with
 	 * calibrated stereo images having a known baseline. Image processing is easier since only the "true" image pixels
-	 * are visible, but information along the image border has been discarded.  The rectification matrices are
+	 * are visible, but information along the image border has been discarded. The rectification matrices are
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
@@ -222,6 +222,7 @@ public class RectifyImageOps {
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
+	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
 	 */
 	public static void allInsideLeft( CameraPinholeBrown paramLeft,
 									  FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
@@ -234,9 +235,9 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that only pixels which overlap the original left image can be seen.  For use with
-	 * uncalibrated images with unknown baselines.  Image processing is easier since only the "true" image pixels
-	 * are visible, but information along the image border has been discarded.  The rectification matrices are
+	 * Adjust the rectification such that only pixels which overlap the original left image can be seen. For use with
+	 * uncalibrated images with unknown baselines. Image processing is easier since only the "true" image pixels
+	 * are visible, but information along the image border has been discarded. The rectification matrices are
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
@@ -252,9 +253,9 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that only pixels which overlap the original left image can be seen.  For use with
-	 * uncalibrated images with unknown baselines.  Image processing is easier since only the "true" image pixels
-	 * are visible, but information along the image border has been discarded.  The rectification matrices are
+	 * Adjust the rectification such that only pixels which overlap the original left image can be seen. For use with
+	 * uncalibrated images with unknown baselines. Image processing is easier since only the "true" image pixels
+	 * are visible, but information along the image border has been discarded. The rectification matrices are
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
@@ -271,7 +272,7 @@ public class RectifyImageOps {
 	/**
 	 * <p>
 	 * Creates a transform that goes from rectified to original distorted pixel coordinates.
-	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
+	 * Rectification includes removal of lens distortion. Used for rendering rectified images.
 	 * </p>
 	 *
 	 * @param param Intrinsic parameters.
@@ -286,7 +287,7 @@ public class RectifyImageOps {
 	/**
 	 * <p>
 	 * Creates a transform that goes from rectified to original distorted pixel coordinates.
-	 * Rectification includes removal of lens distortion.  Used for rendering rectified images.
+	 * Rectification includes removal of lens distortion. Used for rendering rectified images.
 	 * </p>
 	 *
 	 * @param param Intrinsic parameters.

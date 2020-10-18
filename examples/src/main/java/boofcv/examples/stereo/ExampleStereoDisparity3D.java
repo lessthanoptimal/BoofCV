@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,9 +53,9 @@ import java.io.File;
  */
 public class ExampleStereoDisparity3D {
 
-	// Specifies what disparity values are considered
-	public static final int minDisparity = 10;
-	public static final int rangeDisparity = 60;
+	// Specifies the disparity values which will be considered
+	private static final int disparityMin = 15;
+	private static final int disparityRange = 60;
 
 	public static void main( String[] args ) {
 		// ------------- Compute Stereo Correspondence
@@ -64,24 +64,24 @@ public class ExampleStereoDisparity3D {
 		String calibDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 		String imageDir = UtilIO.pathExample("stereo/");
 
-		StereoParameters param = CalibrationIO.load(new File(calibDir , "stereo.yaml"));
+		StereoParameters param = CalibrationIO.load(new File(calibDir, "stereo.yaml"));
 
 		// load and convert images into a BoofCV format
-		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "chair01_left.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(imageDir , "chair01_right.jpg");
+		BufferedImage origLeft = UtilImageIO.loadImage(imageDir, "chair01_left.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(imageDir, "chair01_right.jpg");
 
-		GrayU8 distLeft = ConvertBufferedImage.convertFrom(origLeft, (GrayU8) null);
-		GrayU8 distRight = ConvertBufferedImage.convertFrom(origRight,(GrayU8)null);
+		GrayU8 distLeft = ConvertBufferedImage.convertFrom(origLeft, (GrayU8)null);
+		GrayU8 distRight = ConvertBufferedImage.convertFrom(origRight, (GrayU8)null);
 
 		// rectify images and compute disparity
 		GrayU8 rectLeft = distLeft.createSameShape();
 		GrayU8 rectRight = distRight.createSameShape();
 
-		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(distLeft,distRight,param,rectLeft,rectRight);
+		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(distLeft, distRight, param, rectLeft, rectRight);
 
 //		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, rangeDisparity);
 		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(
-				rectLeft, rectRight, 5, minDisparity, rangeDisparity);
+				rectLeft, rectRight, 5, disparityMin, disparityRange);
 
 		// ------------- Convert disparity image into a 3D point cloud
 
@@ -91,10 +91,10 @@ public class ExampleStereoDisparity3D {
 
 		// extract intrinsic parameters from rectified camera
 		double baseline = param.getBaseline()*0.1;
-		double fx = rectK.get(0,0);
-		double fy = rectK.get(1,1);
-		double cx = rectK.get(0,2);
-		double cy = rectK.get(1,2);
+		double fx = rectK.get(0, 0);
+		double fy = rectK.get(1, 1);
+		double cx = rectK.get(0, 2);
+		double cy = rectK.get(1, 2);
 
 		double maxZ = baseline*100;
 
@@ -104,12 +104,12 @@ public class ExampleStereoDisparity3D {
 
 		Point3D_F64 pointRect = new Point3D_F64();
 		Point3D_F64 pointLeft = new Point3D_F64();
-		for( int y = 0; y < disparity.height; y++ ) {
-			for( int x = 0; x < disparity.width; x++ ) {
-				double d = disparity.unsafe_get(x,y) + minDisparity;
+		for (int y = 0; y < disparity.height; y++) {
+			for (int x = 0; x < disparity.width; x++) {
+				double d = disparity.unsafe_get(x, y) + disparityMin;
 
 				// skip over pixels were no correspondence was found
-				if( d >= rangeDisparity || d <= 0 )
+				if (d >= disparityRange || d <= 0)
 					continue;
 
 				// Coordinate in rectified camera frame
@@ -118,7 +118,7 @@ public class ExampleStereoDisparity3D {
 				pointRect.y = pointRect.z*(y - cy)/fy;
 
 				// prune points which are likely to be noise
-				if( pointRect.z >= maxZ )
+				if (pointRect.z >= maxZ)
 					continue;
 
 				// rotate into the original left camera frame
@@ -126,7 +126,7 @@ public class ExampleStereoDisparity3D {
 
 				// add pixel to the view for display purposes and sets its gray scale value
 				int v = rectLeft.unsafe_get(x, y);
-				pcv.addPoint(pointLeft.x,pointLeft.y,pointLeft.z,v << 16 | v << 8 | v);
+				pcv.addPoint(pointLeft.x, pointLeft.y, pointLeft.z, v << 16 | v << 8 | v);
 //				temp.add( pointLeft.copy() );
 			}
 		}
@@ -135,7 +135,7 @@ public class ExampleStereoDisparity3D {
 		Se3_F64 cameraToWorld = new Se3_F64();
 		cameraToWorld.T.z = -baseline*5;
 		cameraToWorld.T.x = baseline*12;
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0,cameraToWorld.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.4, 0, cameraToWorld.R);
 
 		// Configure the display
 //		pcv.setFog(true);
@@ -147,11 +147,11 @@ public class ExampleStereoDisparity3D {
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(param.left));
 		pcv.setCameraToWorld(cameraToWorld);
 		JComponent viewer = pcv.getComponent();
-		viewer.setPreferredSize(new Dimension(600,600*param.left.height/param.left.width));
+		viewer.setPreferredSize(new Dimension(600, 600*param.left.height/param.left.width));
 
 		// display the results.  Click and drag to change point cloud camera
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,rangeDisparity,0);
-		ShowImages.showWindow(visualized,"Disparity", true);
-		ShowImages.showWindow(viewer,"Point Cloud", true);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, disparityRange, 0);
+		ShowImages.showWindow(visualized, "Disparity", true);
+		ShowImages.showWindow(viewer, "Point Cloud", true);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.simple.SimpleMatrix;
 
@@ -31,17 +32,17 @@ import java.util.List;
 
 /**
  * <p>
- * Rectifies a stereo pair given a fundamental or essential matrix.  The rectification ensures that
+ * Rectifies a stereo pair given a fundamental or essential matrix. The rectification ensures that
  * the epipolar lines project to infinity along the x-axis. The computed transforms are designed to
  * minimize the range of disparity between the two images. For this technique to work
- * the epipoles must lie outside of both images.  See [1,2] for algorithmic details.
+ * the epipoles must lie outside of both images. See [1,2] for algorithmic details.
  * </p>
  *
  * <p>
- * WARNING: On paper this technique sounds straight forward.  In practice it requires a very
- * precise fundamental matrix estimate to be of practical use.  Using the epipolar constraint alone is not
+ * WARNING: On paper this technique sounds straight forward. In practice it requires a very
+ * precise fundamental matrix estimate to be of practical use. Using the epipolar constraint alone is not
  * sufficient to remove outliers because a point far away that lands on the epipolar line will have a small
- * error.  Removing lens distortion from the image is recommended.
+ * error. Removing lens distortion from the image is recommended.
  * </p>
  *
  * <ol>
@@ -54,13 +55,14 @@ import java.util.List;
  */
 public class RectifyFundamental {
 
-	// rectifying transform for left and right images
-	private DMatrixRMaj rect1 = new DMatrixRMaj(3,3);
-	private DMatrixRMaj rect2 = new DMatrixRMaj(3,3);
+	/** Rectification transform for first camera */
+	final @Getter DMatrixRMaj rect1 = new DMatrixRMaj(3, 3);
+	/** Rectification transform for first camera */
+	final @Getter DMatrixRMaj rect2 = new DMatrixRMaj(3, 3);
 
 	// storage for epipoles
-	private Point3D_F64 epipole1 = new Point3D_F64();
-	private Point3D_F64 epipole2 = new Point3D_F64();
+	private final Point3D_F64 epipole1 = new Point3D_F64();
+	private final Point3D_F64 epipole2 = new Point3D_F64();
 
 	/**
 	 * Compute rectification transforms for the stereo pair given a fundamental matrix and its observations.
@@ -70,8 +72,8 @@ public class RectifyFundamental {
 	 * @param width Width of first image.
 	 * @param height Height of first image.
 	 */
-	public void process( DMatrixRMaj F , List<AssociatedPair> observations ,
-						 int width , int height ) {
+	public void process( DMatrixRMaj F, List<AssociatedPair> observations,
+						 int width, int height ) {
 
 		int centerX = width/2;
 		int centerY = height/2;
@@ -81,16 +83,16 @@ public class RectifyFundamental {
 
 
 		// compute the transform H which will send epipole2 to infinity
-		SimpleMatrix R = rotateEpipole(epipole2,centerX,centerY);
-		SimpleMatrix T = translateToOrigin(centerX,centerY);
-		SimpleMatrix G = computeG(epipole2,centerX,centerY);
+		SimpleMatrix R = rotateEpipole(epipole2, centerX, centerY);
+		SimpleMatrix T = translateToOrigin(centerX, centerY);
+		SimpleMatrix G = computeG(epipole2, centerX, centerY);
 
 		SimpleMatrix H = G.mult(R).mult(T);
 
 		//Find the two matching transforms
-		SimpleMatrix Hzero = computeHZero(F,epipole2,H);
+		SimpleMatrix Hzero = computeHZero(F, epipole2, H);
 
-		SimpleMatrix Ha = computeAffineH(observations,H.getDDRM(),Hzero.getDDRM());
+		SimpleMatrix Ha = computeAffineH(observations, H.getDDRM(), Hzero.getDDRM());
 
 		rect1.set(Ha.mult(Hzero).getDDRM());
 		rect2.set(H.getDDRM());
@@ -99,23 +101,23 @@ public class RectifyFundamental {
 	/**
 	 * The epipoles need to be outside the image
 	 */
-	private void checkEpipoleInside(int width, int height) {
+	private void checkEpipoleInside( int width, int height ) {
 
 		double x1 = epipole1.x/epipole1.z;
 		double y1 = epipole1.y/epipole1.z;
 		double x2 = epipole2.x/epipole2.z;
 		double y2 = epipole2.y/epipole2.z;
 
-		if( x1 >= 0 && x1 < width && y1 >= 0 && y1 < height )
+		if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height)
 			throw new IllegalArgumentException("First epipole is inside the image");
-		if( x2 >= 0 && x2 < width && y2 >= 0 && y2 < height )
+		if (x2 >= 0 && x2 < width && y2 >= 0 && y2 < height)
 			throw new IllegalArgumentException("Second epipole is inside the image");
 	}
 
 	/**
 	 * Create a transform which will move the specified point to the origin
 	 */
-	private SimpleMatrix translateToOrigin( int x0 , int y0 ) {
+	private SimpleMatrix translateToOrigin( int x0, int y0 ) {
 
 		SimpleMatrix T = SimpleMatrix.identity(3);
 
@@ -126,35 +128,34 @@ public class RectifyFundamental {
 	}
 
 	/**
-	 * Apply a rotation such that the epipole  is equal to [f,0,1]
+	 * Apply a rotation such that the epipole is equal to [f,0,1]
 	 */
-	static SimpleMatrix rotateEpipole( Point3D_F64 epipole , int x0 , int y0 )
-	{
+	static SimpleMatrix rotateEpipole( Point3D_F64 epipole, int x0, int y0 ) {
 		// compute rotation which will set
 		// x * sin(theta) + y * cos(theta) = 0
 
-		double x = epipole.x/epipole.z-x0;
-		double y = epipole.y/epipole.z-y0;
+		double x = epipole.x/epipole.z - x0;
+		double y = epipole.y/epipole.z - y0;
 
-		double theta = Math.atan2(-y,x);
+		double theta = Math.atan2(-y, x);
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);
 
-		SimpleMatrix R = new SimpleMatrix(3,3);
-		R.setRow(0, 0, c,-s);
+		SimpleMatrix R = new SimpleMatrix(3, 3);
+		R.setRow(0, 0, c, -s);
 		R.setRow(1, 0, s, c);
 		R.set(2, 2, 1);
 
 		return R;
 	}
 
-	private SimpleMatrix computeG( Point3D_F64 epipole , int x0 , int y0 ) {
+	private SimpleMatrix computeG( Point3D_F64 epipole, int x0, int y0 ) {
 		double x = epipole.x/epipole.z - x0;
 		double y = epipole.y/epipole.z - y0;
 
 		double f = Math.sqrt(x*x + y*y);
 		SimpleMatrix G = SimpleMatrix.identity(3);
-		G.set(2,0,-1.0/f);
+		G.set(2, 0, -1.0/f);
 
 		return G;
 	}
@@ -168,29 +169,29 @@ public class RectifyFundamental {
 	 *
 	 * @return Affine transform
 	 */
-	private SimpleMatrix computeAffineH( List<AssociatedPair> observations ,
-										 DMatrixRMaj H , DMatrixRMaj Hzero ) {
+	private SimpleMatrix computeAffineH( List<AssociatedPair> observations,
+										 DMatrixRMaj H, DMatrixRMaj Hzero ) {
 
-		SimpleMatrix A = new SimpleMatrix(observations.size(),3);
-		SimpleMatrix b = new SimpleMatrix(A.numRows(),1);
+		SimpleMatrix A = new SimpleMatrix(observations.size(), 3);
+		SimpleMatrix b = new SimpleMatrix(A.numRows(), 1);
 
 		Point2D_F64 c = new Point2D_F64();
 		Point2D_F64 k = new Point2D_F64();
 
-		for( int i = 0; i < observations.size(); i++ ) {
+		for (int i = 0; i < observations.size(); i++) {
 			AssociatedPair a = observations.get(i);
 
 			GeometryMath_F64.mult(Hzero, a.p1, k);
-			GeometryMath_F64.mult(H,a.p2,c);
+			GeometryMath_F64.mult(H, a.p2, c);
 
-			A.setRow(i,0,k.x,k.y,1);
-			b.set(i,0,c.x);
+			A.setRow(i, 0, k.x, k.y, 1);
+			b.set(i, 0, c.x);
 		}
 
 		SimpleMatrix x = A.solve(b);
 
 		SimpleMatrix Ha = SimpleMatrix.identity(3);
-		Ha.setRow(0,0,x.getDDRM().data);
+		Ha.setRow(0, 0, x.getDDRM().data);
 
 		return Ha;
 	}
@@ -199,10 +200,9 @@ public class RectifyFundamental {
 	 * H0 = H*M
 	 * P=[M|m] from canonical camera
 	 */
-	private SimpleMatrix computeHZero( DMatrixRMaj F , Point3D_F64 e2 ,
-									   SimpleMatrix H ) {
+	private SimpleMatrix computeHZero( DMatrixRMaj F, Point3D_F64 e2, SimpleMatrix H ) {
 
-		Vector3D_F64 v = new Vector3D_F64(.1,0.5,.2);
+		Vector3D_F64 v = new Vector3D_F64(.1, 0.5, .2);
 
 		// need to make sure M is not singular for this technique to work
 		SimpleMatrix P = SimpleMatrix.wrap(MultiViewOps.fundamentalToProjective(F, e2, v, 1));
@@ -210,19 +210,5 @@ public class RectifyFundamental {
 		SimpleMatrix M = P.extractMatrix(0, 3, 0, 3);
 
 		return H.mult(M);
-	}
-
-	/**
-	 * Rectification transform for first camera
-	 */
-	public DMatrixRMaj getRect1() {
-		return rect1;
-	}
-
-	/**
-	 * Rectification transform for second camera
-	 */
-	public DMatrixRMaj getRect2() {
-		return rect2;
 	}
 }
