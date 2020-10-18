@@ -18,7 +18,6 @@
 
 package boofcv.core.image;
 
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
@@ -28,6 +27,7 @@ import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.GrowQueue_I64;
+import pabeles.concurrency.GrowArray;
 
 /**
  * <p>

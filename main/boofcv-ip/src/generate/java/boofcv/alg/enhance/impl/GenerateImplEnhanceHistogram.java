@@ -55,7 +55,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(
-				"import boofcv.concurrency.GrowArray;\n" +
+				"import pabeles.concurrency.GrowArray;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.struct.GrowQueue_I32;\n" +

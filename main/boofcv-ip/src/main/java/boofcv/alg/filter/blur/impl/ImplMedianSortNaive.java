@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.blur.impl;
 
-import boofcv.concurrency.GrowArray;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
@@ -28,6 +27,7 @@ import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 

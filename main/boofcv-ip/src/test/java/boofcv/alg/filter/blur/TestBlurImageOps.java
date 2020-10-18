@@ -22,7 +22,6 @@ import boofcv.BoofTesting;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -35,6 +34,7 @@ import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
+import pabeles.concurrency.GrowArray;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

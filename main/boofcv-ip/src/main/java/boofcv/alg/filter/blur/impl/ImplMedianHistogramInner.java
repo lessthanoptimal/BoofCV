@@ -20,10 +20,10 @@ package boofcv.alg.filter.blur.impl;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
-import boofcv.concurrency.GrowArray;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.GrowQueue_I32;
+import pabeles.concurrency.GrowArray;
 
 import java.util.Arrays;
 

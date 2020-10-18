@@ -22,12 +22,12 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.GrowQueue_F32;
+import pabeles.concurrency.GrowArray;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**

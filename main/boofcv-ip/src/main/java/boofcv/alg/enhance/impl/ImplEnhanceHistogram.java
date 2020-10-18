@@ -18,10 +18,10 @@
 
 package boofcv.alg.enhance.impl;
 
-import boofcv.concurrency.GrowArray;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I32;
+import pabeles.concurrency.GrowArray;
 
 import javax.annotation.Generated;
 

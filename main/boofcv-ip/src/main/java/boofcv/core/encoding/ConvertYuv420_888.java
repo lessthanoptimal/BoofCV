@@ -20,12 +20,12 @@ package boofcv.core.encoding;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.color.ColorFormat;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.encoding.impl.ImplConvertYuv420_888;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 import java.nio.ByteBuffer;
 

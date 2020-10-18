@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastQueue;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Concurrent implementation of {@link NonMaxCandidate}.

@@ -51,7 +51,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 		out.print(
 				"import javax.annotation.Generated;\n" +
 				"\n" +
-				"import boofcv.concurrency.GrowArray;\n" +
+				"import pabeles.concurrency.GrowArray;\n" +
 				"import org.ddogleg.struct.GrowQueue_F32;\n" +
 				"import org.ddogleg.struct.GrowQueue_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +

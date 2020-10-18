@@ -62,7 +62,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.alg.filter.convolve.noborder.*;\n" +
-				"import boofcv.concurrency.GrowArray;\n" +
+				"import pabeles.concurrency.GrowArray;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.struct.GrowQueue_I32;\n" +

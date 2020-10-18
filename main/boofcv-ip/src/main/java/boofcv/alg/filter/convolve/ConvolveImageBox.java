@@ -23,7 +23,6 @@ import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox_MT;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.border.ImageBorderValue;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -32,6 +31,7 @@ import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Convolves a kernel which is composed entirely of 1's across an image.  This special kernel can be highly optimized

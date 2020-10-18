@@ -22,12 +22,12 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.impl.ImplThresholdImageOps;
 import boofcv.alg.filter.binary.impl.ImplThresholdImageOps_MT;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.GrowArray;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 /**
  * <p>

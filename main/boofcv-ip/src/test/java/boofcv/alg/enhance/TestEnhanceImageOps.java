@@ -21,12 +21,12 @@ package boofcv.alg.enhance;
 import boofcv.BoofTesting;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.concurrency.GrowArray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
+import pabeles.concurrency.GrowArray;
 
 import java.lang.reflect.Method;
 
