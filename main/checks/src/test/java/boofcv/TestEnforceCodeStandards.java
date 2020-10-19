@@ -57,7 +57,8 @@ public class TestEnforceCodeStandards {
 		String pathToMain = UtilIO.path("main");
 
 		var checker = new CheckForbiddenLanguage();
-		CheckForbiddenHelper.addVarMustBeExplicit(checker);
+		CheckForbiddenHelper.forbidNonExplicitVar(checker, true);
+		CheckForbiddenHelper.forbidForEach(checker);
 
 		File[] moduleDirectories = new File(pathToMain).listFiles();
 		assertNotNull(moduleDirectories);
@@ -85,16 +86,19 @@ public class TestEnforceCodeStandards {
 
 				if (!checker.process(text)) {
 					failed = true;
+					System.err.println(classFile.getPath());
+					System.err.println();
 					for (var failure : checker.getFailures()) {
-						System.err.println(classFile.getName() + " line=" + failure.line);
+						System.err.println("  line:   " + failure.line);
 						System.err.println("  code:   " + failure.code.trim());
 						System.err.println("  reason: " + failure.check.reason);
+						System.err.println();
 					}
 				}
 			}
 
 			if (failed)
-				System.err.println("\nSee documentation for how to ignore false positives or exceptions");
+				System.err.println("\nSee documentation for how to ignore false positives or exceptions to the rule");
 
 			assertFalse(failed);
 		}

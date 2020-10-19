@@ -27,6 +27,41 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestCheckForbiddenLanguage {
 
+	@Test void disableAll() {
+		String D = CheckForbiddenLanguage.DEFAULT_IDENTIFIER;
+		String L = CheckForbiddenLanguage.DISABLE_ALL;
+		String comment = "//" + D + " " + L;
+
+		var alg = new CheckForbiddenLanguage();
+		CheckForbiddenHelper.addForbiddenFunction(alg, "forbidden", "Because");
+
+		assertTrue(alg.process(comment + "\n\n 1\nfoo.forbidden()"));
+	}
+
+	@Test void disableCheck() {
+		String D = CheckForbiddenLanguage.DEFAULT_IDENTIFIER;
+		String L = CheckForbiddenLanguage.DISABLE_CHECK;
+		String comment = "//" + D + " " + L + " function_forbidden";
+
+		var alg = new CheckForbiddenLanguage();
+		CheckForbiddenHelper.addForbiddenFunction(alg, "forbidden", "Because");
+
+		assertTrue(alg.process(comment + "\n\n 1\nfoo.forbidden()"));
+		assertFalse(alg.process("foo.forbidden()\n" + comment + "\n\n 1\nfoo.forbidden()"));
+	}
+
+	@Test void disableCheck_DoesNotExist() {
+		String D = CheckForbiddenLanguage.DEFAULT_IDENTIFIER;
+		String L = CheckForbiddenLanguage.DISABLE_CHECK;
+		String comment = "//" + D + " " + L + " function_yolo";
+
+		var alg = new CheckForbiddenLanguage();
+		CheckForbiddenHelper.addForbiddenFunction(alg, "forbidden", "Because");
+
+		assertFalse(alg.process(comment + "\n\n 1\nfoo.asdf()"));
+		assertSame(CheckForbiddenLanguage.MALFORMED_COMMAND, alg.getFailures().get(0).check);
+	}
+
 	@Test void ignoreBelow() {
 		// create a simple shorthand because of how verbose it would be otherwise
 		String D = CheckForbiddenLanguage.DEFAULT_IDENTIFIER;
@@ -38,14 +73,14 @@ public class TestCheckForbiddenLanguage {
 		assertTrue(alg.process(comment + " 1\nfoo.forbidden()"));
 		assertTrue(alg.process(comment + " 1\nfoo.forbidden()\n"));
 		assertFalse(alg.process(comment + " 1\n\nfoo.forbidden()"));
+		assertEquals(2, alg.getFailures().get(0).line);
+		assertEquals(3, alg.getFailures().get(1).line);
+		assertFalse(alg.process(comment + " 0\nfoo.forbidden()"));
 		assertEquals(1, alg.getFailures().get(0).line);
 		assertEquals(2, alg.getFailures().get(1).line);
-		assertFalse(alg.process(comment + " 0\nfoo.forbidden()"));
-		assertEquals(0, alg.getFailures().get(0).line);
-		assertEquals(1, alg.getFailures().get(1).line);
 		assertFalse(alg.process(comment + " 0\nfoo.forbidden()\n"));
-		assertEquals(0, alg.getFailures().get(0).line);
-		assertEquals(1, alg.getFailures().get(1).line);
+		assertEquals(1, alg.getFailures().get(0).line);
+		assertEquals(2, alg.getFailures().get(1).line);
 	}
 
 	/**

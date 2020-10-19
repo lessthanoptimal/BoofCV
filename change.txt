@@ -16,6 +16,7 @@ Version : 0.37
   * Moved `calibration` into `geo`
   * Created `ip-multiview` and moved disparity code and a few classes in `geo` in to it
   * All functions are checked for stdout spam
+  * Added lint checks for how "var" is used and for-each style loops in performant code
 - Random Dot Markers
   * Created GUI for generating markers. Print or save to disk
   * Fully integrated into Applications
