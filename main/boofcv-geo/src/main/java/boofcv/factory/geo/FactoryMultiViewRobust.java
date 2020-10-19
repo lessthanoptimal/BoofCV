@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -449,6 +449,7 @@ public class FactoryMultiViewRobust {
 		// Pixel error squared in two views
 		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold*2;
 
+		// lint:forbidden ignore_below 1
 		var generator = FactoryMultiView.selfCalibThree(selfcalib);
 		var manager = new ModelManagerMetricCameraTriple();
 		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ImageDimension>

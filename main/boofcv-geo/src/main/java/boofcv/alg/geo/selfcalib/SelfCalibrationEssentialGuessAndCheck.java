@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,8 +203,8 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	}
 
 	private void computeHomography( double F1, double F2, List<AssociatedPair> observations ) {
-		var K1 = CommonOps_DDRM.diag(F1,F1,1);
-		var K2 = CommonOps_DDRM.diag(F2,F2,1);
+		DMatrixRMaj K1 = CommonOps_DDRM.diag(F1,F1,1);
+		DMatrixRMaj K2 = CommonOps_DDRM.diag(F2,F2,1);
 
 		calibrator.process(K1, K2, observations);
 		rectifyingHomography.set(calibrator.getCalibrationHomography());
