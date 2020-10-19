@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,8 +116,8 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 			return false;
 
 		List<AssociatedPair> pairs = new ArrayList<>();
-		for (PointTrack t : tracks) {
-			pairs.add(t.getCookie());
+		for (int trackIdx = 0; trackIdx < tracks.size(); trackIdx++) {
+			pairs.add(tracks.get(trackIdx).getCookie());
 		}
 
 		// fit the motion model to the feature tracks
@@ -134,8 +134,9 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		// mark that the track is in the inlier set
 		final long frameID = tracker.getFrameID();
-		for (AssociatedPair p : modelMatcher.getMatchSet()) {
-			((AssociatedPairTrack)p).lastUsed = frameID;
+		List<AssociatedPair> matchSet = modelMatcher.getMatchSet();
+		for (int matchIdx = 0; matchIdx < matchSet.size(); matchIdx++) {
+			((AssociatedPairTrack)matchSet.get(matchIdx)).lastUsed = frameID;
 		}
 
 		// prune tracks which aren't being used
@@ -164,13 +165,13 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		// drop all inactive tracks since their location is unknown in the current frame
 		List<PointTrack> inactive = tracker.getInactiveTracks(null);
-		for (PointTrack l : inactive) {
+		for (PointTrack l : inactive) { // lint:forbidden ignore_line
 			tracker.dropTrack(l);
 		}
 
 		// set the keyframe for active tracks as their current location
 		List<PointTrack> active = tracker.getActiveTracks(null);
-		for (PointTrack l : active) {
+		for (PointTrack l : active) { // lint:forbidden ignore_line
 			AssociatedPairTrack p = l.getCookie();
 			p.p1.set(l.pixel);
 			p.lastUsed = frameID;
@@ -178,7 +179,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		tracker.spawnTracks();
 		List<PointTrack> spawned = tracker.getNewTracks(null);
-		for (PointTrack l : spawned) {
+		for (PointTrack l : spawned) { // lint:forbidden ignore_line
 			AssociatedPairTrack p = l.getCookie();
 			if (p == null) {
 				l.cookie = p = new AssociatedPairTrack();

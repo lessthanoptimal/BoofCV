@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ public class LengthUnit {
 
 	public LengthUnit( String string ) {
 		unit = null;
-		for( Unit u : Unit.values() ) {
+		for( Unit u : Unit.values() ) { // lint:forbidden ignore_line
 			if( string.endsWith(u.abbreviation)) {
 				unit = u;
 				string = string.substring(0,string.length()-u.abbreviation.length());

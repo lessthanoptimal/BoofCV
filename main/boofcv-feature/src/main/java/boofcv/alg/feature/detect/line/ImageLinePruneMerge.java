@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,22 +40,24 @@ public class ImageLinePruneMerge {
 		lines.clear();
 	}
 
-	public void add( LineParametric2D_F32 line , float intensity ) {
-		lines.add( new Data(line,intensity));
+	public void add( LineParametric2D_F32 line, float intensity ) {
+		lines.add(new Data(line, intensity));
 	}
 
 	public void pruneRelative( float fraction ) {
 		float max = 0;
-		for( Data d : lines ) {
-			if( d.intensity > max )
+		for (int lineIdx = 0; lineIdx < lines.size(); lineIdx++) {
+			Data d = lines.get(lineIdx);
+			if (d.intensity > max)
 				max = d.intensity;
 		}
 
 		float threshold = max*fraction;
 
 		List<Data> filtered = new ArrayList<>();
-		for( Data d : lines ) {
-			if( d.intensity >= threshold ) {
+		for (int lineIdx = 0; lineIdx < lines.size(); lineIdx++) {
+			Data d = lines.get(lineIdx);
+			if (d.intensity >= threshold) {
 				filtered.add(d);
 			}
 		}
@@ -63,61 +65,61 @@ public class ImageLinePruneMerge {
 	}
 
 	public void pruneNBest( int N ) {
-		if( lines.size() <= N )
+		if (lines.size() <= N)
 			return;
 
 		sortByIntensity();
 
 		List<Data> filtered = new ArrayList<>();
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			filtered.add(lines.get(i));
 		}
 		lines = filtered;
 	}
 
 	private void sortByIntensity() {
-		Collections.sort(lines, (o1, o2) -> {
+		Collections.sort(lines, ( o1, o2 ) -> {
 			// need to sort by location to make results repeatable even if input order has been shuffled
 			// that happens if concurrency is turned on
 			if (o1.intensity < o2.intensity)
 				return 1;
 			else if (o1.intensity > o2.intensity)
 				return -1;
-			else if( o1.line.p.x < o2.line.p.x ) {
+			else if (o1.line.p.x < o2.line.p.x) {
 				return -1;
-			} else if( o1.line.p.x > o2.line.p.x ) {
+			} else if (o1.line.p.x > o2.line.p.x) {
 				return 1;
 			} else {
-				return Float.compare(o1.line.p.y,o2.line.p.y);
+				return Float.compare(o1.line.p.y, o2.line.p.y);
 			}
 		});
 	}
 
-	public void pruneSimilar(float toleranceAngle, float toleranceDist, int imgWidth, int imgHeight) {
+	public void pruneSimilar( float toleranceAngle, float toleranceDist, int imgWidth, int imgHeight ) {
 		sortByIntensity();
 
-		float theta[] = new float[ lines.size() ];
+		float theta[] = new float[lines.size()];
 		List<LineSegment2D_F32> segments = new ArrayList<>(lines.size());
 
-		for( int i = 0; i < lines.size(); i++ ) {
+		for (int i = 0; i < lines.size(); i++) {
 			Data d = lines.get(i);
 			LineParametric2D_F32 l = d.line;
 			theta[i] = UtilAngle.atanSafe(l.getSlopeY(), l.getSlopeX());
-			segments.add( LineImageOps.convert(l, imgWidth, imgHeight));
+			segments.add(LineImageOps.convert(l, imgWidth, imgHeight));
 		}
 
-		for( int i = 0; i < segments.size(); i++ ) {
+		for (int i = 0; i < segments.size(); i++) {
 			LineSegment2D_F32 a = segments.get(i);
-			if( a == null ) continue;
+			if (a == null) continue;
 
-			for( int j = i+1; j < segments.size(); j++) {
+			for (int j = i + 1; j < segments.size(); j++) {
 				LineSegment2D_F32 b = segments.get(j);
 
-				if( b == null )
+				if (b == null)
 					continue;
 
 				// see if they are nearly parallel
-				if( UtilAngle.distHalf(theta[i],theta[j]) > toleranceAngle )
+				if (UtilAngle.distHalf(theta[i], theta[j]) > toleranceAngle)
 					continue;
 
 				// NOTE: I don't like the way this distance metric looks. Seems arbitrary and will vary depending on
@@ -127,15 +129,15 @@ public class ImageLinePruneMerge {
 
 				// If they intersect inside the image they are much more likely to be the same line
 				boolean close = false;
-				if( p != null ) {
-					if( p.x >= 0 && p.y >= 0 && p.x < imgWidth && p.y < imgHeight) {
+				if (p != null) {
+					if (p.x >= 0 && p.y >= 0 && p.x < imgWidth && p.y < imgHeight) {
 						close = true;
 					}
 				}
 
 				// While a bit arbitrary look at the distance at the image border as a measure of how visually
 				// similar two lines are
-				if( !close ) {
+				if (!close) {
 					// now just see if they are very close
 					float distA = Distance2D_F32.distance(a, b.a);
 					float distB = Distance2D_F32.distance(a, b.b);
@@ -154,7 +156,7 @@ public class ImageLinePruneMerge {
 					close = true;
 				}
 
-				if( close ) {
+				if (close) {
 					if (lines.get(j).intensity > lines.get(i).intensity) {
 						lines.get(i).intensity = lines.get(j).intensity;
 					}
@@ -163,38 +165,37 @@ public class ImageLinePruneMerge {
 			}
 		}
 
-		List<Data>  filtered = new ArrayList<>();
+		List<Data> filtered = new ArrayList<>();
 
-		for( int i = 0; i < segments.size(); i++ ) {
-			if( segments.get(i) != null ) {
-				filtered.add( lines.get(i));
+		for (int i = 0; i < segments.size(); i++) {
+			if (segments.get(i) != null) {
+				filtered.add(lines.get(i));
 			}
 		}
 
 		lines = filtered;
 	}
 
-	public List<LineParametric2D_F32> createList( List<LineParametric2D_F32>  ret ) {
-		if( ret == null )
+	public List<LineParametric2D_F32> createList( List<LineParametric2D_F32> ret ) {
+		if (ret == null)
 			ret = new ArrayList<>();
 		else
 			ret.clear();
-		for( Data d : lines ) {
+
+		for (int lineIdx = 0; lineIdx < lines.size(); lineIdx++) {
+			Data d = lines.get(lineIdx);
 			ret.add(d.line);
 		}
 		return ret;
 	}
 
-	private static class Data
-	{
+	private static class Data {
 		LineParametric2D_F32 line;
 		float intensity;
 
-		private Data(LineParametric2D_F32 line, float intensity) {
+		private Data( LineParametric2D_F32 line, float intensity ) {
 			this.line = line;
 			this.intensity = intensity;
 		}
 	}
 }
-
-

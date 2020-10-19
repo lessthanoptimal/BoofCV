@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,22 +41,23 @@ public class Contour {
 		internal.clear();
 	}
 
-   public Contour copy() {
-      Contour ret = new Contour();
-      for( Point2D_I32 p : external ) {
-         ret.external.add( p.copy() );
-      }
+	public Contour copy() {
+		Contour ret = new Contour();
+		for (int pointIdx = 0; pointIdx < external.size(); pointIdx++) {
+			ret.external.add(external.get(pointIdx).copy());
+		}
 
-      for( List<Point2D_I32> l : ret.internal ) {
-         List<Point2D_I32> a = new ArrayList<>();
+		for (int contourIdx = 0; contourIdx < ret.internal.size(); contourIdx++) {
+			List<Point2D_I32> l = ret.internal.get(contourIdx);
+			List<Point2D_I32> a = new ArrayList<>();
 
-         for( Point2D_I32 p : l ) {
-            a.add( p.copy() );
-         }
+			for (int pointIdx = 0; pointIdx < l.size(); pointIdx++) {
+				a.add(l.get(pointIdx).copy());
+			}
 
-         internal.add(a);
-      }
+			internal.add(a);
+		}
 
-      return ret;
-   }
+		return ret;
+	}
 }

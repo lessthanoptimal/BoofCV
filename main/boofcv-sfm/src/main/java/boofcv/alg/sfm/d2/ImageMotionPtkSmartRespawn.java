@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,8 +136,8 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 		// prune some of the ones which are too close
 		prune.clear();
 		pruneClose.process(tracker.getActiveTracks(null), prune);
-		for (PointTrack t : prune) {
-			tracker.dropTrack(t);
+		for (int pruneIdx = 0; pruneIdx < prune.size(); pruneIdx++) {
+			tracker.dropTrack(prune.get(pruneIdx));
 		}
 	}
 
@@ -151,7 +151,9 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 		// mark that the track is in the inlier set and compute the containment rectangle
 		contRect.x0 = contRect.y0 = Double.MAX_VALUE;
 		contRect.x1 = contRect.y1 = -Double.MAX_VALUE;
-		for (AssociatedPair p : motion.getModelMatcher().getMatchSet()) {
+		List<AssociatedPair> matchSet = motion.getModelMatcher().getMatchSet();
+		for (int matchIdx = 0; matchIdx < matchSet.size(); matchIdx++) {
+			AssociatedPair p = matchSet.get(matchIdx);
 			Point2D_F64 t = p.p2;
 			if (t.x > contRect.x1)
 				contRect.x1 = t.x;

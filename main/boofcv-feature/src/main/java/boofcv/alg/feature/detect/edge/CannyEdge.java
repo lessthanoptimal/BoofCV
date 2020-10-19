@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-
 /**
  * Implementation of canny edge detector.  The canny edge detector detects the edges of objects
  * using a hysteresis threshold.  When scanning the image pixels with edge intensities below
@@ -46,27 +45,27 @@ import java.util.List;
 public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// blurs the input image
-	private BlurFilter<T> blur;
+	private final BlurFilter<T> blur;
 
 	// computes the image gradient
-	private ImageGradient<T,D> gradient;
+	private final ImageGradient<T, D> gradient;
 
 	// blurred input image
-	private T blurred;
+	private final T blurred;
 
 	// image gradient
-	private D derivX;
-	private D derivY;
+	private final D derivX;
+	private final D derivY;
 
 	// edge intensity
-	private GrayF32 intensity = new GrayF32(1,1);
-	protected GrayF32 suppressed = new GrayF32(1,1);
+	private final GrayF32 intensity = new GrayF32(1, 1);
+	protected GrayF32 suppressed = new GrayF32(1, 1);
 	// edge direction in radians
-	private GrayF32 angle = new GrayF32(1,1);
+	private final GrayF32 angle = new GrayF32(1, 1);
 	// quantized direction
-	private GrayS8 direction = new GrayS8(1,1);
+	private final GrayS8 direction = new GrayS8(1, 1);
 	// work space
-	private GrayU8 work = new GrayU8(1,1);
+	private final GrayU8 work = new GrayU8(1, 1);
 
 	// different algorithms for performing hysteresis thresholding
 	protected HysteresisEdgeTracePoints hysteresisPts; // saves a list of points
@@ -79,17 +78,17 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * @param gradient Computes the image gradient.
 	 * @param saveTrace Should it save a list of points that compose the objects contour/trace?
 	 */
-	public CannyEdge(BlurFilter<T> blur, ImageGradient<T, D> gradient, boolean saveTrace) {
+	public CannyEdge( BlurFilter<T> blur, ImageGradient<T, D> gradient, boolean saveTrace ) {
 		this.blur = blur;
 		this.gradient = gradient;
 
 		Class<T> imageType = blur.getInputType().getImageClass();
 
 		blurred = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		derivX = gradient.getDerivativeType().createImage(1,1);
+		derivX = gradient.getDerivativeType().createImage(1, 1);
 		derivY = gradient.getDerivativeType().createImage(1, 1);
 
-		if( saveTrace ) {
+		if (saveTrace) {
 			hysteresisPts = new HysteresisEdgeTracePoints();
 		} else {
 			hysteresisMark = new HysteresisEdgeTraceMark();
@@ -104,35 +103,36 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * <p>
 	 * NOTE: Input and output can be the same instance, if the image type allows it.
 	 * </p>
+	 *
 	 * @param input Input image. Not modified.
 	 * @param threshLow Lower threshold. &ge; 0.
 	 * @param threshHigh Upper threshold. &ge; 0.
 	 * @param output (Might be option) Output binary image.  Edge pixels are marked with 1 and everything else 0.
 	 */
-	public void process(T input , float threshLow, float threshHigh , @Nullable GrayU8 output ) {
-		if( output != null )
+	public void process( T input, float threshLow, float threshHigh, @Nullable GrayU8 output ) {
+		if (output != null)
 			output.reshape(input);
 
-		if( threshLow < 0 || threshHigh < 0 )
+		if (threshLow < 0 || threshHigh < 0)
 			throw new IllegalArgumentException("Threshold must be >= zero!");
 
-		if( hysteresisMark != null ) {
-			if( output == null )
+		if (hysteresisMark != null) {
+			if (output == null)
 				throw new IllegalArgumentException("An output image must be specified when configured to mark edge points");
 		}
 
 		// setup internal data structures
-		blurred.reshape(input.width,input.height);
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-		intensity.reshape(input.width,input.height);
-		suppressed.reshape(input.width,input.height);
-		angle.reshape(input.width,input.height);
-		direction.reshape(input.width,input.height);
-		work.reshape(input.width,input.height);
+		blurred.reshape(input.width, input.height);
+		derivX.reshape(input.width, input.height);
+		derivY.reshape(input.width, input.height);
+		intensity.reshape(input.width, input.height);
+		suppressed.reshape(input.width, input.height);
+		angle.reshape(input.width, input.height);
+		direction.reshape(input.width, input.height);
+		work.reshape(input.width, input.height);
 
 		// run canny edge detector
-		blur.process(input,blurred);
+		blur.process(input, blurred);
 		gradient.process(blurred, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
@@ -142,21 +142,22 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 		performThresholding(threshLow, threshHigh, output);
 	}
 
-	protected void performThresholding(float threshLow, float threshHigh, GrayU8 output) {
-		if( hysteresisPts != null ) {
-			hysteresisPts.process(suppressed,direction,threshLow,threshHigh);
+	protected void performThresholding( float threshLow, float threshHigh, GrayU8 output ) {
+		if (hysteresisPts != null) {
+			hysteresisPts.process(suppressed, direction, threshLow, threshHigh);
 
 			// if there is an output image write the contour to it
-			if( output != null ) {
+			if (output != null) {
 				ImageMiscOps.fill(output, 0);
-				for( EdgeContour e : hysteresisPts.getContours() ) {
-					for( EdgeSegment s : e.segments)
-						for( Point2D_I32 p : s.points )
-							output.unsafe_set(p.x,p.y,1);
+				// lint:forbidden ignore_below 4
+				for (EdgeContour e : hysteresisPts.getContours()) {
+					for (EdgeSegment s : e.segments)
+						for (Point2D_I32 p : s.points)
+							output.unsafe_set(p.x, p.y, 1);
 				}
 			}
 		} else {
-			hysteresisMark.process(suppressed,direction,threshLow,threshHigh,output);
+			hysteresisMark.process(suppressed, direction, threshLow, threshHigh, output);
 		}
 	}
 

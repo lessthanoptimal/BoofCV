@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -349,7 +349,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 		// TODO make this optionally concurrent
 		// estimate 3D coordinate using stereo vision
-		for (PointTrack pt : spawned) {
+		for (PointTrack pt : spawned) { // lint:forbidden ignore_line
 //			for (int i = 0; i < visibleTracks.size(); i++) {
 //				if( visibleTracks.get(i).visualTrack == t ) {
 //					throw new RuntimeException("Bug. Adding duplicate track: " + visibleTracks.get(i).id + " " + t.featureId);
@@ -408,7 +408,8 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		// Create a list of observations for PnP
 		// normalized image coordinates and 3D in the previous keyframe's reference frame
 		observationsPnP.reset();
-		for (PointTrack pt : active) {
+		for (int activeIdx = 0; activeIdx < active.size(); activeIdx++) {
+			PointTrack pt = active.get(activeIdx);
 			// Build the list of tracks which are currently visible
 			initialVisible.add((Track)pt.cookie);
 

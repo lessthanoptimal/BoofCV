@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -181,7 +181,8 @@ public class TldLearning<T extends ImageGray<T>> {
 
 			// mark all ambiguous regions as bad
 			List<ImageRectangle> ambiguous = detection.getAmbiguousRegions();
-			for( ImageRectangle r : ambiguous ) {
+			for (int ambiguousIdx = 0; ambiguousIdx < ambiguous.size(); ambiguousIdx++) {
+				ImageRectangle r = ambiguous.get(ambiguousIdx);
 				overlap = helper.computeOverlap(r,targetRegion_I32);
 				if( overlap <= config.overlapLower ) {
 					fern.learnFernNoise(false, r );

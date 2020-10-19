@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,8 @@ public class SelectBestStereoTransform {
 		for( int i = 0; i < candidatesAtoB.size(); i++ ) {
 			Se3_F64 s = candidatesAtoB.get(i);
 			int count = 0;
-			for( AssociatedPair p : observations ) {
+			for (int pairIdx = 0; pairIdx < observations.size(); pairIdx++) {
+				AssociatedPair p = observations.get(pairIdx);
 				if( depthCheck.checkConstraint(p.p1,p.p2,s)) {
 					count++;
 				}

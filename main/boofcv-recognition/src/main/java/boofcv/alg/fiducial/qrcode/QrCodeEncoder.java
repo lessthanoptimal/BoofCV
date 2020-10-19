@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -483,15 +483,15 @@ public class QrCodeEncoder {
 		int expectedBitSize = bitsAtVersion(qr.version);
 
 		qr.message = "";
-		for( MessageSegment m : segments ) {
+		for (int segIdx = 0; segIdx < segments.size(); segIdx++) {
+			MessageSegment m = segments.get(segIdx);
 			qr.message += m.message;
-			switch( m.mode ) {
-				case NUMERIC:encodeNumeric(m.data,m.length);break;
-				case ALPHANUMERIC:encodeAlphanumeric(m.data,m.length);break;
-				case BYTE:encodeBytes(m.data,m.length);break;
-				case KANJI:encodeKanji(m.data,m.length);break;
-				default:
-					throw new RuntimeException("Unknown");
+			switch (m.mode) {
+				case NUMERIC -> encodeNumeric(m.data, m.length);
+				case ALPHANUMERIC -> encodeAlphanumeric(m.data, m.length);
+				case BYTE -> encodeBytes(m.data, m.length);
+				case KANJI -> encodeKanji(m.data, m.length);
+				default -> throw new RuntimeException("Unknown");
 			}
 		}
 
@@ -540,7 +540,7 @@ public class QrCodeEncoder {
 
 		// Bit value of 0 = white. 1 = black
 		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(qr.version);
-		for (QrCodeMaskPattern mask : QrCodeMaskPattern.values()) {
+		for (QrCodeMaskPattern mask : QrCodeMaskPattern.values()) { // lint:forbidden ignore_line
 			double score = scoreMask(N, locations, bits, matrix, mask);
 			if (score < bestScore) {
 				bestScore = score;
@@ -850,4 +850,3 @@ public class QrCodeEncoder {
 		}
 	}
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -185,8 +185,8 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 		float ss1 = (float)(Math.pow(sigma1, 2.0*0.75)/scale1);
 		float ss2 = (float)(Math.pow(sigma2, 2.0*0.75)/scale2);
 
-		for (Point2D_I16 c : candidates) {
-
+		for (int canIdx = 0; canIdx < candidates.size(); canIdx++) {
+			Point2D_I16 c = candidates.get(canIdx);
 			GrayF32 intensity = detector.getIntensity();
 
 			float target = intensity.unsafe_get(c.x, c.y);

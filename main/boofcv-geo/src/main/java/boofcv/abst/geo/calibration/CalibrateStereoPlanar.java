@@ -171,7 +171,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		List<Point2D_F64> points2D = layout;
 		List<Point3D_F64> points3D = new ArrayList<>();
 
-		for (Point2D_F64 p : points2D) {
+		for (Point2D_F64 p : points2D) { // lint:forbidden ignore_line
 			points3D.add(new Point3D_F64(p.x, p.y, 0));
 		}
 
@@ -184,7 +184,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 			Se3_F64 worldToRight = viewRight.get(i);
 
 			// These points can really be arbitrary and don't have to be target points
-			for (Point3D_F64 p : points3D) {
+			for (Point3D_F64 p : points3D) { // lint:forbidden ignore_line
 				Point3D_F64 l = SePointOps_F64.transform(worldToLeft, p, null);
 				Point3D_F64 r = SePointOps_F64.transform(worldToRight, p, null);
 

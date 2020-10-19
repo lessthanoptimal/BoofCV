@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// lint:forbidden disable_check for_each
+
 /**
  * Functions to aid in unit testing code for correctly handling sub-images
  *

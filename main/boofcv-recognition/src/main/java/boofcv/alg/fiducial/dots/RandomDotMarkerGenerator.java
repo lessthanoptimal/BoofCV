@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,7 +116,8 @@ public class RandomDotMarkerGenerator {
 
 		render.init();
 		dotsAdjusted.reset();
-		for( var p : dots ) {
+		for (int dotIdx = 0; dotIdx < dots.size(); dotIdx++) {
+			Point2D_F64 p = dots.get(dotIdx);
 			Point2D_F64 a = dotsAdjusted.grow();
 			a.x = p.x*point_to_pixel + regionCenterX;
 			a.y = p.y*point_to_pixel + regionCenterY;

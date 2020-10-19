@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,12 +66,11 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static GrayU8 logicAnd(GrayU8 inputA , GrayU8 inputB , GrayU8 output )
-	{
-		InputSanityCheck.checkSameShape(inputA,inputB);
+	public static GrayU8 logicAnd( GrayU8 inputA, GrayU8 inputB, GrayU8 output ) {
+		InputSanityCheck.checkSameShape(inputA, inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.logicAnd(inputA, inputB, output);
 		} else {
 			ImplBinaryImageOps.logicAnd(inputA, inputB, output);
@@ -88,12 +87,11 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static GrayU8 logicOr(GrayU8 inputA , GrayU8 inputB , GrayU8 output )
-	{
-		InputSanityCheck.checkSameShape(inputA,inputB);
+	public static GrayU8 logicOr( GrayU8 inputA, GrayU8 inputB, GrayU8 output ) {
+		InputSanityCheck.checkSameShape(inputA, inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.logicOr(inputA, inputB, output);
 		} else {
 			ImplBinaryImageOps.logicOr(inputA, inputB, output);
@@ -110,12 +108,11 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static GrayU8 logicXor(GrayU8 inputA , GrayU8 inputB , GrayU8 output )
-	{
-		InputSanityCheck.checkSameShape(inputA,inputB);
+	public static GrayU8 logicXor( GrayU8 inputA, GrayU8 inputB, GrayU8 output ) {
+		InputSanityCheck.checkSameShape(inputA, inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.logicXor(inputA, inputB, output);
 		} else {
 			ImplBinaryImageOps.logicXor(inputA, inputB, output);
@@ -131,11 +128,10 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static GrayU8 invert(GrayU8 input , GrayU8 output)
-	{
+	public static GrayU8 invert( GrayU8 input, GrayU8 output ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.invert(input, output);
 		} else {
 			ImplBinaryImageOps.invert(input, output);
@@ -150,18 +146,18 @@ public class BinaryImageOps {
 	 * is set to zero.
 	 * </p>
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static GrayU8 erode4(GrayU8 input, int numTimes, GrayU8 output) {
+	public static GrayU8 erode4( GrayU8 input, int numTimes, GrayU8 output ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( numTimes <= 0 )
+		if (numTimes <= 0)
 			throw new IllegalArgumentException("numTimes must be >= 1");
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.erode4(input, output);
 		} else {
 			ImplBinaryInnerOps.erode4(input, output);
@@ -169,12 +165,12 @@ public class BinaryImageOps {
 		ImplBinaryBorderOps.erode4(input, output);
 
 
-		if( numTimes > 1 ) {
-			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+		if (numTimes > 1) {
+			GrayU8 tmp1 = new GrayU8(input.width, input.height);
 			GrayU8 tmp2 = output;
 
-			for( int i = 1; i < numTimes; i++ ) {
-				if( BoofConcurrency.USE_CONCURRENT ) {
+			for (int i = 1; i < numTimes; i++) {
+				if (BoofConcurrency.USE_CONCURRENT) {
 					ImplBinaryInnerOps_MT.erode4(tmp2, tmp1);
 				} else {
 					ImplBinaryInnerOps.erode4(tmp2, tmp1);
@@ -186,7 +182,7 @@ public class BinaryImageOps {
 				tmp2 = a;
 			}
 
-			if( tmp2 != output ) {
+			if (tmp2 != output) {
 				output.setTo(tmp2);
 			}
 		}
@@ -200,27 +196,27 @@ public class BinaryImageOps {
 	 * value will be one.
 	 * </p>
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static GrayU8 dilate4(GrayU8 input, int numTimes, GrayU8 output) {
+	public static GrayU8 dilate4( GrayU8 input, int numTimes, GrayU8 output ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.dilate4(input, output);
 		} else {
 			ImplBinaryInnerOps.dilate4(input, output);
 		}
 		ImplBinaryBorderOps.dilate4(input, output);
 
-		if( numTimes > 1 ) {
-			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+		if (numTimes > 1) {
+			GrayU8 tmp1 = new GrayU8(input.width, input.height);
 			GrayU8 tmp2 = output;
 
-			for( int i = 1; i < numTimes; i++ ) {
-				if( BoofConcurrency.USE_CONCURRENT ) {
+			for (int i = 1; i < numTimes; i++) {
+				if (BoofConcurrency.USE_CONCURRENT) {
 					ImplBinaryInnerOps_MT.dilate4(tmp2, tmp1);
 				} else {
 					ImplBinaryInnerOps.dilate4(tmp2, tmp1);
@@ -232,7 +228,7 @@ public class BinaryImageOps {
 				tmp2 = a;
 			}
 
-			if( tmp2 != output ) {
+			if (tmp2 != output) {
 				output.setTo(tmp2);
 			}
 		}
@@ -250,15 +246,15 @@ public class BinaryImageOps {
 	 * NOTE: There are many ways to define an edge, this is just one of them.
 	 * </p>
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @param outsideZero if true then pixels outside the image are treated as zero, otherwise one
 	 * @return Output image.
 	 */
-	public static GrayU8 edge4(GrayU8 input, GrayU8 output, boolean outsideZero ) {
+	public static GrayU8 edge4( GrayU8 input, GrayU8 output, boolean outsideZero ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.edge4(input, output);
 		} else {
 			ImplBinaryInnerOps.edge4(input, output);
@@ -274,27 +270,27 @@ public class BinaryImageOps {
 	 * is set to zero.
 	 * </p>
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static GrayU8 erode8(GrayU8 input, int numTimes, GrayU8 output) {
+	public static GrayU8 erode8( GrayU8 input, int numTimes, GrayU8 output ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.erode8(input, output);
 		} else {
 			ImplBinaryInnerOps.erode8(input, output);
 		}
 		ImplBinaryBorderOps.erode8(input, output);
 
-		if( numTimes > 1 ) {
-			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+		if (numTimes > 1) {
+			GrayU8 tmp1 = new GrayU8(input.width, input.height);
 			GrayU8 tmp2 = output;
 
-			for( int i = 1; i < numTimes; i++ ) {
-				if( BoofConcurrency.USE_CONCURRENT ) {
+			for (int i = 1; i < numTimes; i++) {
+				if (BoofConcurrency.USE_CONCURRENT) {
 					ImplBinaryInnerOps_MT.erode8(tmp2, tmp1);
 				} else {
 					ImplBinaryInnerOps.erode8(tmp2, tmp1);
@@ -306,7 +302,7 @@ public class BinaryImageOps {
 				tmp2 = a;
 			}
 
-			if( tmp2 != output ) {
+			if (tmp2 != output) {
 				output.setTo(tmp2);
 			}
 		}
@@ -320,27 +316,27 @@ public class BinaryImageOps {
 	 * value will be one.
 	 * </p>
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param numTimes How many times the operation will be applied to the image.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static GrayU8 dilate8(GrayU8 input, int numTimes, GrayU8 output) {
+	public static GrayU8 dilate8( GrayU8 input, int numTimes, GrayU8 output ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.dilate8(input, output);
 		} else {
 			ImplBinaryInnerOps.dilate8(input, output);
 		}
 		ImplBinaryBorderOps.dilate8(input, output);
 
-		if( numTimes > 1 ) {
-			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+		if (numTimes > 1) {
+			GrayU8 tmp1 = new GrayU8(input.width, input.height);
 			GrayU8 tmp2 = output;
 
-			for( int i = 1; i < numTimes; i++ ) {
-				if( BoofConcurrency.USE_CONCURRENT ) {
+			for (int i = 1; i < numTimes; i++) {
+				if (BoofConcurrency.USE_CONCURRENT) {
 					ImplBinaryInnerOps_MT.dilate8(tmp2, tmp1);
 				} else {
 					ImplBinaryInnerOps.dilate8(tmp2, tmp1);
@@ -352,7 +348,7 @@ public class BinaryImageOps {
 				tmp2 = a;
 			}
 
-			if( tmp2 != output ) {
+			if (tmp2 != output) {
 				output.setTo(tmp2);
 			}
 		}
@@ -370,15 +366,15 @@ public class BinaryImageOps {
 	 * NOTE: There are many ways to define an edge, this is just one of them.
 	 * </p>
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @param outsideZero if true then pixels outside the image are treated as zero, otherwise one
 	 * @return Output image.
 	 */
-	public static GrayU8 edge8(GrayU8 input, GrayU8 output, boolean outsideZero ) {
+	public static GrayU8 edge8( GrayU8 input, GrayU8 output, boolean outsideZero ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.edge8(input, output);
 		} else {
 			ImplBinaryInnerOps.edge8(input, output);
@@ -393,14 +389,14 @@ public class BinaryImageOps {
 	 * If a pixel is connected to less than 2 neighbors then its value zero.  If connected to more than 6 then
 	 * its value is one.  Otherwise it retains its original value.
 	 *
-	 * @param input  Input image. Not modified.
+	 * @param input Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static GrayU8 removePointNoise(GrayU8 input, GrayU8 output) {
+	public static GrayU8 removePointNoise( GrayU8 input, GrayU8 output ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.removePointNoise(input, output);
 		} else {
 			ImplBinaryInnerOps.removePointNoise(input, output);
@@ -413,21 +409,20 @@ public class BinaryImageOps {
 	/**
 	 * Applies a morphological thinning operation to the image.  Also known as skeletonization.
 	 *
-	 * @see BinaryThinning
-	 *
 	 * @param input Input image.  Not modified.
 	 * @param maxIterations Maximum number of cycles it will thin for.  -1 for the maximum required
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
+	 * @see BinaryThinning
 	 */
-	public static GrayU8 thin(GrayU8 input , int maxIterations, GrayU8 output ) {
+	public static GrayU8 thin( GrayU8 input, int maxIterations, GrayU8 output ) {
 
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		output.setTo(input);
 		BinaryThinning thinning = new BinaryThinning();
 
-		thinning.apply(output,maxIterations);
+		thinning.apply(output, maxIterations);
 
 		return output;
 	}
@@ -447,34 +442,34 @@ public class BinaryImageOps {
 	 * the same point multiple times in the contour.
 	 * </p>
 	 *
-	 * @see LinearContourLabelChang2004
-	 *
 	 * @param input Input binary image.  Not modified.
 	 * @param rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
 	 * @param output (Optional) Output labeled image. If null, an image will be declared internally.  Modified.
 	 * @return List of found contours for each blob.
+	 * @see LinearContourLabelChang2004
 	 */
-	public static List<Contour> contour(GrayU8 input, ConnectRule rule, GrayS32 output) {
-		if( output == null ) {
-			output = new GrayS32(input.width,input.height);
+	public static List<Contour> contour( GrayU8 input, ConnectRule rule, GrayS32 output ) {
+		if (output == null) {
+			output = new GrayS32(input.width, input.height);
 		} else {
-			InputSanityCheck.checkSameShape(input,output);
+			InputSanityCheck.checkSameShape(input, output);
 		}
 
 		BinaryLabelContourFinder alg = FactoryBinaryContourFinder.linearChang2004();
 		alg.setConnectRule(rule);
-		alg.process(input,output);
+		alg.process(input, output);
 
 		return convertContours(alg);
 	}
 
 	/**
 	 * Finds the external contours only in the image
+	 *
 	 * @param input Input binary image.  Not modified.
 	 * @param rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
 	 * @return List of found contours for each blob.
 	 */
-	public static List<Contour> contourExternal(GrayU8 input, ConnectRule rule ) {
+	public static List<Contour> contourExternal( GrayU8 input, ConnectRule rule ) {
 		BinaryContourFinder alg = FactoryBinaryContourFinder.linearExternal();
 		alg.setConnectRule(rule);
 		alg.process(input);
@@ -482,7 +477,7 @@ public class BinaryImageOps {
 		return convertContours(alg);
 	}
 
-	public static List<Contour> convertContours(BinaryContourInterface alg ) {
+	public static List<Contour> convertContours( BinaryContourInterface alg ) {
 
 		List<ContourPacked> contours = alg.getContours();
 
@@ -490,10 +485,10 @@ public class BinaryImageOps {
 		for (int i = 0; i < contours.size(); i++) {
 			ContourPacked p = contours.get(i);
 			Contour c = new Contour();
-			c.external = BinaryContourInterface.copyContour(alg,p.externalIndex);
+			c.external = BinaryContourInterface.copyContour(alg, p.externalIndex);
 
 			for (int j = 0; j < p.internalIndexes.size; j++) {
-				c.internal.add( BinaryContourInterface.copyContour(alg,p.internalIndexes.get(j)));
+				c.internal.add(BinaryContourInterface.copyContour(alg, p.internalIndexes.get(j)));
 			}
 			ret.add(c);
 		}
@@ -506,8 +501,8 @@ public class BinaryImageOps {
 	 * @param input Labeled binary image.
 	 * @param labels Look up table where the indexes are the current label and the value are its new value.
 	 */
-	public static void relabel(GrayS32 input , int labels[] ) {
-		if( BoofConcurrency.USE_CONCURRENT ) {
+	public static void relabel( GrayS32 input, int labels[] ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.relabel(input, labels);
 		} else {
 			ImplBinaryImageOps.relabel(input, labels);
@@ -521,10 +516,10 @@ public class BinaryImageOps {
 	 * @param binaryImage Output image. Modified.
 	 * @return The binary image.
 	 */
-	public static GrayU8 labelToBinary(GrayS32 labelImage , GrayU8 binaryImage ) {
+	public static GrayU8 labelToBinary( GrayS32 labelImage, GrayU8 binaryImage ) {
 		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.labelToBinary(labelImage, binaryImage);
 		} else {
 			ImplBinaryImageOps.labelToBinary(labelImage, binaryImage);
@@ -539,18 +534,17 @@ public class BinaryImageOps {
 	 * @param labelImage Input image. Not modified.
 	 * @param binaryImage Output image. If null a new one will be declared. Modified.
 	 * @param selectedBlobs Each index corresponds to a blob and specifies if it is included or not.  Expected
-	 *                      size is the number of found clusters + 1.
+	 * size is the number of found clusters + 1.
 	 * @return The binary image.
 	 */
-	public static GrayU8 labelToBinary(GrayS32 labelImage , GrayU8 binaryImage ,
-									   boolean selectedBlobs[] )
-	{
+	public static GrayU8 labelToBinary( GrayS32 labelImage, GrayU8 binaryImage,
+										boolean selectedBlobs[] ) {
 		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplBinaryImageOps_MT.labelToBinary(labelImage, binaryImage,selectedBlobs);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplBinaryImageOps_MT.labelToBinary(labelImage, binaryImage, selectedBlobs);
 		} else {
-			ImplBinaryImageOps.labelToBinary(labelImage, binaryImage,selectedBlobs);
+			ImplBinaryImageOps.labelToBinary(labelImage, binaryImage, selectedBlobs);
 		}
 
 		return binaryImage;
@@ -566,15 +560,14 @@ public class BinaryImageOps {
 	 * @param selected The index of labels which will be marked as 1 in the output binary image.
 	 * @return The binary image.
 	 */
-	public static GrayU8 labelToBinary(GrayS32 labelImage , GrayU8 binaryImage ,
-									   int numLabels, int ...selected )
-	{
+	public static GrayU8 labelToBinary( GrayS32 labelImage, GrayU8 binaryImage,
+										int numLabels, int... selected ) {
 		boolean selectedBlobs[] = new boolean[numLabels];
 		for (int i = 0; i < selected.length; i++) {
 			selectedBlobs[selected[i]] = true;
 		}
 
-		return labelToBinary(labelImage,binaryImage,selectedBlobs);
+		return labelToBinary(labelImage, binaryImage, selectedBlobs);
 	}
 
 	/**
@@ -586,34 +579,33 @@ public class BinaryImageOps {
 	 * @param queue (Optional) Storage for pixel coordinates.  Improves runtime performance. Can be null.
 	 * @return List of pixels in each cluster.
 	 */
-	public static List<List<Point2D_I32>> labelToClusters( GrayS32 labelImage ,
-														   int numLabels ,
-														   FastQueue<Point2D_I32> queue )
-	{
+	public static List<List<Point2D_I32>> labelToClusters( GrayS32 labelImage,
+														   int numLabels,
+														   FastQueue<Point2D_I32> queue ) {
 		List<List<Point2D_I32>> ret = new ArrayList<>();
-		for( int i = 0; i < numLabels+1; i++ ) {
-			ret.add( new ArrayList<Point2D_I32>() );
+		for (int i = 0; i < numLabels + 1; i++) {
+			ret.add(new ArrayList<Point2D_I32>());
 		}
-		if( queue == null ) {
+		if (queue == null) {
 			queue = new FastQueue<>(numLabels, Point2D_I32::new);
 		} else
 			queue.reset();
 
-		for( int y = 0; y < labelImage.height; y++ ) {
+		for (int y = 0; y < labelImage.height; y++) {
 			int start = labelImage.startIndex + y*labelImage.stride;
 			int end = start + labelImage.width;
 
-			for( int index = start; index < end; index++ ) {
+			for (int index = start; index < end; index++) {
 				int v = labelImage.data[index];
-				if( v > 0 ) {
+				if (v > 0) {
 					Point2D_I32 p = queue.grow();
-					p.set(index-start,y);
+					p.set(index - start, y);
 					ret.get(v).add(p);
 				}
 			}
 		}
 		// first list is a place holder and should be empty
-		if( ret.get(0).size() != 0 )
+		if (ret.get(0).size() != 0)
 			throw new RuntimeException("BUG!");
 		ret.remove(0);
 		return ret;
@@ -625,38 +617,40 @@ public class BinaryImageOps {
 	 * @param clusters List of all the clusters.
 	 * @param binary Output
 	 */
-	public static void clusterToBinary( List<List<Point2D_I32>> clusters ,
-										GrayU8 binary )
-	{
+	public static void clusterToBinary( List<List<Point2D_I32>> clusters,
+										GrayU8 binary ) {
 		ImageMiscOps.fill(binary, 0);
-		
-		for( List<Point2D_I32> l : clusters ) {
-			for( Point2D_I32 p : l ) {
-				binary.set(p.x,p.y,1);
+
+		for (int clusterIdx = 0; clusterIdx < clusters.size(); clusterIdx++) {
+			List<Point2D_I32> cluster = clusters.get(clusterIdx);
+			for (int pointIdx = 0; pointIdx < cluster.size(); pointIdx++) {
+				Point2D_I32 p = cluster.get(pointIdx);
+				binary.set(p.x, p.y, 1);
 			}
 		}
 	}
-	
+
 	/**
 	 * Several blob rending functions take in an array of colors so that the random blobs can be drawn
 	 * with the same color each time.  This function selects a random color for each blob and returns it
 	 * in an array.
-	 * @param numBlobs  Number of blobs found.
+	 *
+	 * @param numBlobs Number of blobs found.
 	 * @param rand Random number generator
 	 * @return array of RGB colors for each blob + the background blob
 	 */
-	public static int[] selectRandomColors( int numBlobs , Random rand ) {
-		int colors[] = new int[ numBlobs+1 ];
+	public static int[] selectRandomColors( int numBlobs, Random rand ) {
+		int colors[] = new int[numBlobs + 1];
 		colors[0] = 0; // black
 
 		int B = 100;
 
-		for( int i = 1; i < colors.length; i++ ) {
+		for (int i = 1; i < colors.length; i++) {
 			int c;
-			while( true ) {
+			while (true) {
 				c = rand.nextInt(0xFFFFFF);
 				// make sure its not too dark and can't be distriquished from the background
-				if( (c & 0xFF) > B || ((c >> 8) & 0xFF) > B || ((c >> 8 ) & 0xFF) > B ) {
+				if ((c & 0xFF) > B || ((c >> 8) & 0xFF) > B || ((c >> 8) & 0xFF) > B) {
 					break;
 				}
 			}

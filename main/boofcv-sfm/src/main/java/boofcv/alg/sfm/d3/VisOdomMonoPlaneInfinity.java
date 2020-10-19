@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -258,7 +258,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		List<PointTrack> spawned = tracker.getNewTracks(null);
 
 		// estimate 3D coordinate using stereo vision
-		for (PointTrack t : spawned) {
+		for (PointTrack t : spawned) { // lint:forbidden ignore_line
 //			System.out.println("track spawn "+t.x+" "+t.y);
 			VoTrack p = t.getCookie();
 			if (p == null) {
@@ -311,7 +311,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		int num = 0;
 		long frameID = tracker.getFrameID();
 
-		for (PointTrack t : all) {
+		for (PointTrack t : all) { // lint:forbidden ignore_line
 			VoTrack p = t.getCookie();
 			if (frameID - p.lastInlier > thresholdRetire) {
 				tracker.dropTrack(t);
@@ -337,7 +337,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		// list of active tracks
 		List<PointTrack> active = tracker.getActiveTracks(null);
 
-		for (PointTrack t : active) {
+		for (PointTrack t : active) { // lint:forbidden ignore_line
 			VoTrack p = t.getCookie();
 
 			// compute normalized image coordinate
@@ -514,7 +514,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 		List<PointTrack> all = tracker.getAllTracks(null);
 
-		for (PointTrack t : all) {
+		for (PointTrack t : all) { // lint:forbidden ignore_line
 			VoTrack p = t.getCookie();
 
 			if (p.onPlane) {

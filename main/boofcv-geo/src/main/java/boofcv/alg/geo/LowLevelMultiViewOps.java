@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,8 @@ public class LowLevelMultiViewOps {
 		double meanX = 0;
 		double meanY = 0;
 
-		for( Point2D_F64 p : points ) {
+		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
+			Point2D_F64 p = points.get(pointIdx);
 			meanX += p.x;
 			meanY += p.y;
 		}
@@ -60,7 +61,8 @@ public class LowLevelMultiViewOps {
 		double stdX = 0;
 		double stdY = 0;
 
-		for( Point2D_F64 p : points ) {
+		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
+			Point2D_F64 p = points.get(pointIdx);
 			double dx = p.x - meanX;
 			double dy = p.y - meanY;
 			stdX += dx*dx;
@@ -136,7 +138,8 @@ public class LowLevelMultiViewOps {
 		double meanX1 = 0; double meanY1 = 0;
 		double meanX2 = 0; double meanY2 = 0;
 
-		for( AssociatedPair p : points ) {
+		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
+			AssociatedPair p = points.get(pointIdx);
 			meanX1 += p.p1.x; meanY1 += p.p1.y;
 			meanX2 += p.p2.x; meanY2 += p.p2.y;
 		}
@@ -147,7 +150,8 @@ public class LowLevelMultiViewOps {
 		double stdX1 = 0; double stdY1 = 0;
 		double stdX2 = 0; double stdY2 = 0;
 
-		for( AssociatedPair p : points ) {
+		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
+			AssociatedPair p = points.get(pointIdx);
 			double dx = p.p1.x - meanX1;
 			double dy = p.p1.y - meanY1;
 			stdX1 += dx*dx;
@@ -185,7 +189,8 @@ public class LowLevelMultiViewOps {
 		double meanX2 = 0; double meanY2 = 0;
 		double meanX3 = 0; double meanY3 = 0;
 
-		for( AssociatedTriple p : points ) {
+		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
+			AssociatedTriple p = points.get(pointIdx);
 			meanX1 += p.p1.x; meanY1 += p.p1.y;
 			meanX2 += p.p2.x; meanY2 += p.p2.y;
 			meanX3 += p.p3.x; meanY3 += p.p3.y;
@@ -199,7 +204,8 @@ public class LowLevelMultiViewOps {
 		double stdX2 = 0; double stdY2 = 0;
 		double stdX3 = 0; double stdY3 = 0;
 
-		for( AssociatedTriple p : points ) {
+		for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
+			AssociatedTriple p = points.get(pointIdx);
 			double dx = p.p1.x - meanX1; double dy = p.p1.y - meanY1;
 			stdX1 += dx*dx; stdY1 += dy*dy;
 

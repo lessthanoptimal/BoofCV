@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,8 +91,8 @@ public class P3PGrunert implements P3PLineDistance {
 			return false;
 
 		List<Complex_F64> roots = rootFinder.getRoots();
-
-		for( Complex_F64 r : roots ) {
+		for (int rootIdx = 0; rootIdx < roots.size(); rootIdx++) {
+			Complex_F64 r = roots.get(rootIdx);
 			if( !r.isReal() ) {
 				continue;
 			}

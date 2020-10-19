@@ -103,7 +103,7 @@ public class BoofMiscOps {
 
 	public static List<File> toFileList( String[] files ) {
 		List<File> output = new ArrayList<>();
-		for (String s : files) {
+		for (String s : files) { // lint:forbidden ignore_line
 			output.add(new File(s));
 		}
 		return output;
@@ -120,7 +120,7 @@ public class BoofMiscOps {
 
 	public static List<File> toFileList( List<String> files ) {
 		List<File> output = new ArrayList<>();
-		for (String s : files) {
+		for (String s : files) { // lint:forbidden ignore_line
 			output.add(new File(s));
 		}
 		return output;

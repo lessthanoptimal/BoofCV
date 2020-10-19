@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,7 +89,7 @@ public class EssentialNister5 {
 
 	// Used for finding polynomial roots
 	private final FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
-	private final PolynomialRoots findRoots = new WrapRealRootsSturm(sturm);
+	private final PolynomialRoots rootFinder = new WrapRealRootsSturm(sturm);
 
 	// private PolynomialRoots findRoots = new RootFinderCompanion();
 	private final Polynomial poly = new Polynomial(11);
@@ -123,10 +123,14 @@ public class EssentialNister5 {
 		helper.setDeterminantVectors(C);
 		helper.extractPolynomial(poly.getCoefficients());
 
-		if( !findRoots.process(poly) )
+		if( !rootFinder.process(poly) )
 			return false;
 
-		for( Complex_F64 c : findRoots.getRoots() ) {
+		List<Complex_F64> zeros = rootFinder.getRoots();
+
+		for (int rootIdx = 0; rootIdx < zeros.size(); rootIdx++) {
+			Complex_F64 c = zeros.get(rootIdx);
+
 			if( !c.isReal() )
 				continue;
 

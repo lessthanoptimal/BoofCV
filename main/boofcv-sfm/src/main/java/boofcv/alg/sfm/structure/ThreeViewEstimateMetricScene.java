@@ -126,7 +126,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	private int width, height; // TODO Get size for each image individually
 
 	// metric location of each camera. The first view is always identity
-	protected List<Se3_F64> worldToView = new ArrayList<>();
+	protected List<Se3_F64> listWorldToView = new ArrayList<>();
 
 	/**
 	 * Sets configurations to their default value
@@ -145,7 +145,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		configSBA.configOptimizer = configLM;
 
 		for (int i = 0; i < 3; i++) {
-			worldToView.add(new Se3_F64());
+			listWorldToView.add(new Se3_F64());
 		}
 	}
 
@@ -359,7 +359,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			bp.f = cp.fx;
 
 			structure.setCamera(i, false, bp);
-			structure.setView(i, i, i == 0, worldToView.get(i));
+			structure.setView(i, i, i == 0, listWorldToView.get(i));
 		}
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedTriple t = inliers.get(i);
@@ -415,9 +415,9 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			if (success) {
 				successfulSelfCalibration = true;
 				listPinhole.addAll(results.intrinsics.toList());
-				worldToView.get(0).reset();
-				worldToView.get(1).set(results.motion_1_to_k.get(0));
-				worldToView.get(2).set(results.motion_1_to_k.get(1));
+				listWorldToView.get(0).reset();
+				listWorldToView.get(1).set(results.motion_1_to_k.get(0));
+				listWorldToView.get(2).set(results.motion_1_to_k.get(1));
 				if (verbose != null) verbose.println("Auto calibration success");
 			} else {
 				if (verbose != null) verbose.println("Auto calibration failed");
@@ -446,9 +446,9 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			for (int i = 0; i < 3; i++) {
 				listPinhole.add(PerspectiveOps.matrixToPinhole(K,width,height,null));
 			}
-			worldToView.get(0).reset();
-			MultiViewOps.projectiveToMetric(P2,H,worldToView.get(1),K);
-			MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
+			listWorldToView.get(0).reset();
+			MultiViewOps.projectiveToMetric(P2,H, listWorldToView.get(1),K);
+			MultiViewOps.projectiveToMetric(P3,H, listWorldToView.get(2),K);
 		}
 
 		if (verbose != null) {
@@ -462,14 +462,17 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		// scale is arbitrary. Set max translation to 1
 		double maxT = 0;
-		for (Se3_F64 p : worldToView) {
-			maxT = Math.max(maxT, p.T.norm());
+		for (int i = 0; i < listWorldToView.size(); i++) {
+			Se3_F64 world_to_view = listWorldToView.get(i);
+			maxT = Math.max(maxT, world_to_view.T.norm());
 		}
-		for (Se3_F64 p : worldToView) {
-			p.T.scale(1.0/maxT);
+
+		for (int i = 0; i < listWorldToView.size(); i++) {
+			Se3_F64 world_to_view = listWorldToView.get(i);
+			world_to_view.T.scale(1.0/maxT);
 			if (verbose != null) {
-				Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(p.R, null);
-				verbose.println("  T=" + p.T + "  R=" + rod);
+				Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(world_to_view.R, null);
+				verbose.println("  T=" + world_to_view.T + "  R=" + rod);
 			}
 		}
 

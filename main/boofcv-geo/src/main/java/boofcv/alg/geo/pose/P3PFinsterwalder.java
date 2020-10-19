@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.Complex_F64;
+
+import java.util.List;
 
 import static boofcv.alg.geo.pose.P3PGrunert.computeCosine;
 import static boofcv.alg.geo.pose.P3PGrunert.pow2;
@@ -110,7 +112,9 @@ public class P3PFinsterwalder implements P3PLineDistance {
 
 		// search for real roots
 		Complex_F64 root = null;
-		for( Complex_F64 r : rootFinder.getRoots() ) {
+		List<Complex_F64> roots = rootFinder.getRoots();
+		for (int rootIdx = 0; rootIdx < roots.size(); rootIdx++) {
+			Complex_F64 r = roots.get(rootIdx);
 			if( r.isReal() ) {
 				root = r;
 				break;

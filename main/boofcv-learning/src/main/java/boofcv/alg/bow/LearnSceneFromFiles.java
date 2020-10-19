@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,14 +71,15 @@ public abstract class LearnSceneFromFiles {
 		}
 		System.out.println("total images "+total);
 
-		for (int i = 0; i < scenes.size(); i++) {
-			String scene = scenes.get(i);
+		for (int sceneIdx = 0; sceneIdx < scenes.size(); sceneIdx++) {
+			String scene = scenes.get(sceneIdx);
 
 			List<String> images = set.get(scene);
 			System.out.println("  "+scene+" "+images.size());
-			for (String image : images) {
+			for (int imageIdx = 0; imageIdx < images.size(); imageIdx++) {
+				String image = images.get(imageIdx);
 				int predicted = classify(image);
-				histogram.increment(i, predicted);
+				histogram.increment(sceneIdx, predicted);
 			}
 		}
 
@@ -106,7 +107,7 @@ public abstract class LearnSceneFromFiles {
 	private void extractKeys( Map<String,List<String>> images ) {
 		Set<String> keys = images.keySet();
 
-		for( String key : keys ) {
+		for( String key : keys ) { // lint:forbidden ignore_line
 			if( !scenes.contains(key)) {
 				scenes.add(key);
 			}
@@ -122,7 +123,7 @@ public abstract class LearnSceneFromFiles {
 
 		Set<String> keys = all.keySet();
 
-		for( String key : keys ) {
+		for( String key : keys ) { // lint:forbidden ignore_line
 			List<String> allImages = all.get(key);
 
 			// randomize the ordering to remove bias
@@ -166,20 +167,20 @@ public abstract class LearnSceneFromFiles {
 			return null;
 
 		List<File> imageDirectories = new ArrayList<>();
-		for( File f : files ) {
+		for( File f : files ) { // lint:forbidden ignore_line
 			if( f.isDirectory() ) {
 				imageDirectories.add(f);
 			}
 		}
 		Map<String,List<String>> out = new HashMap<>();
-		for( File d : imageDirectories ) {
+		for( File d : imageDirectories ) { // lint:forbidden ignore_line
 			List<String> images = new ArrayList<>();
 
 			files = d.listFiles();
 			if( files == null )
 				throw new RuntimeException("Should be a directory!");
 
-			for( File f : files ) {
+			for( File f : files ) { // lint:forbidden ignore_line
 				if( f.isHidden() || f.isDirectory() || f.getName().endsWith(".txt") ) {
 					continue;
 				}
