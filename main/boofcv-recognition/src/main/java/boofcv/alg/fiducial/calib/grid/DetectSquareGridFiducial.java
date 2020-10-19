@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	SquareGridTools tools = new SquareGridTools();
 
 	// storage for binary image
-	GrayU8 binary = new GrayU8(1,1);
+	GrayU8 binary = new GrayU8(1, 1);
 
 	List<List<SquareNode>> clusters;
 
@@ -87,22 +87,22 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	 * @param inputToBinary Converts input image into a binary image
 	 * @param detectorSquare Detects the squares in the image.  Must be configured to detect squares
 	 */
-	public DetectSquareGridFiducial(int numRows, int numCols, double spaceToSquareRatio,
-									InputToBinary<T> inputToBinary ,
-									DetectPolygonBinaryGrayRefine<T> detectorSquare) {
+	public DetectSquareGridFiducial( int numRows, int numCols, double spaceToSquareRatio,
+									 InputToBinary<T> inputToBinary,
+									 DetectPolygonBinaryGrayRefine<T> detectorSquare ) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		this.inputToBinary = inputToBinary;
 		this.detectorSquare = detectorSquare;
 
 		// some unit tests will pass in a null value
-		if( detectorSquare != null ) {
+		if (detectorSquare != null) {
 			detectorSquare.getDetector().setOutputClockwise(true);
 			detectorSquare.getDetector().setConvex(true);
 			detectorSquare.getDetector().setNumberOfSides(4, 4);
 		}
 
-		s2c = new SquaresIntoRegularClusters(spaceToSquareRatio,Integer.MAX_VALUE, 1.35);
+		s2c = new SquaresIntoRegularClusters(spaceToSquareRatio, Integer.MAX_VALUE, 1.35);
 		c2g = new SquareRegularClustersIntoGrids(numCols*numRows);
 
 		calibRows = numRows*2;
@@ -117,13 +117,13 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	 */
 	public boolean process( T image ) {
 		configureContourDetector(image);
-		binary.reshape(image.width,image.height);
+		binary.reshape(image.width, image.height);
 
-		inputToBinary.process(image,binary);
+		inputToBinary.process(image, binary);
 		detectorSquare.process(image, binary);
 		detectorSquare.refineAll();
 
-		detectorSquare.getPolygons(found,null);
+		detectorSquare.getPolygons(found, null);
 
 		clusters = s2c.process(found);
 		c2g.process(clusters);
@@ -131,9 +131,10 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 
 		SquareGrid match = null;
 		double matchSize = 0;
-		for( SquareGrid g : grids ) {
+		for (int gridIdx = 0; gridIdx < grids.size(); gridIdx++) {
+			SquareGrid g = grids.get(gridIdx);
 			if (g.columns != numCols || g.rows != numRows) {
-				if( g.columns == numRows && g.rows == numCols ) {
+				if (g.columns == numRows && g.rows == numCols) {
 					tools.transpose(g);
 				} else {
 					continue;
@@ -141,18 +142,18 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 			}
 
 			double size = tools.computeSize(g);
-			if( size > matchSize ) {
+			if (size > matchSize) {
 				matchSize = size;
 				match = g;
 			}
 		}
 
-		if( match != null ) {
-			if( tools.checkFlip(match) ) {
+		if (match != null) {
+			if (tools.checkFlip(match)) {
 				tools.flipRows(match);
 			}
 			tools.putIntoCanonical(match);
-			if( !tools.orderSquareCorners(match) )
+			if (!tools.orderSquareCorners(match))
 				return false;
 
 			extractCalibrationPoints(match);
@@ -165,10 +166,10 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
 	 * of inner contours and improve speed and reduce the memory foot print significantly.
 	 */
-	private void configureContourDetector(T gray) {
+	private void configureContourDetector( T gray ) {
 		// determine the maximum possible size of a square when viewed head on
 		// this doesn't take in account the spacing between squares and will be an over estimate
-		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
+		int maxContourSize = Math.max(gray.width, gray.height)/Math.max(numCols, numRows);
 		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize*4*2);
 		contourFinder.setSaveInnerContour(false);
@@ -176,23 +177,23 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 
 	List<Point2D_F64> row0 = new ArrayList<>();
 	List<Point2D_F64> row1 = new ArrayList<>();
+
 	/**
 	 * Extracts the calibration points from the corners of a fully ordered grid
 	 */
-	void extractCalibrationPoints(SquareGrid grid) {
+	void extractCalibrationPoints( SquareGrid grid ) {
 		calibrationPoints.clear();
 		for (int row = 0; row < grid.rows; row++) {
 
 			row0.clear();
 			row1.clear();
 			for (int col = 0; col < grid.columns; col++) {
-				Polygon2D_F64 square = grid.get(row,col).square;
+				Polygon2D_F64 square = grid.get(row, col).square;
 
 				row0.add(square.get(0));
 				row0.add(square.get(1));
 				row1.add(square.get(3));
 				row1.add(square.get(2));
-
 			}
 			calibrationPoints.addAll(row0);
 			calibrationPoints.addAll(row1);
@@ -241,5 +242,4 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	public int getRows() {
 		return numRows;
 	}
-
 }

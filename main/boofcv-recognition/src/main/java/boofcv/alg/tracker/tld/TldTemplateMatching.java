@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -212,7 +212,8 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 		double maximum = -Double.MAX_VALUE;
 
 		// The feature which has the best fit will maximize the score
-		for (NccFeature f : candidates) {
+		for (int featIdx = 0; featIdx < candidates.size(); featIdx++) {
+			NccFeature f = candidates.get(featIdx);
 			double score = DescriptorDistance.ncc(observed, f);
 			if (score > maximum)
 				maximum = score;

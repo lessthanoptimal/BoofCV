@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,9 @@ public enum Unit {
 	 * Sees if the specified work matches any of the units full name or short name.
 	 */
 	public static Unit lookup( String word ) {
-		for (Unit unit : values()) {
+		Unit[] values = values();
+		for (int i = 0; i < values.length; i++) {
+			Unit unit = values[i];
 			if (unit.toString().compareToIgnoreCase(word) == 0) {
 				return unit;
 			} else if (unit.getAbbreviation().compareToIgnoreCase(word) == 0) {

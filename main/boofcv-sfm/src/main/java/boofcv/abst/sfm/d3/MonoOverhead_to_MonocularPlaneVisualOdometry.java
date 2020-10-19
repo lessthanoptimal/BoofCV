@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,7 +176,8 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 		points3D.reset();
 		pixels.reset();
 
-		for (Point2D_F64 worldPt : tracksPlane) {
+		for (int pointIdx = 0; pointIdx < tracksPlane.size(); pointIdx++) {
+			Point2D_F64 worldPt = tracksPlane.get(pointIdx);
 			// 2D to 3D
 			Point3D_F64 p = points3D.grow();
 			p.z = worldPt.x*map.cellSize - map.centerX;
@@ -194,7 +195,5 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
-	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-
-	}
+	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {}
 }

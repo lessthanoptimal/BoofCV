@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -144,7 +144,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 
 		List<Complex_F64> zeros = rootFinder.getRoots();
 
-		for( Complex_F64 c : zeros ) {
+		for (int rootIdx = 0; rootIdx < zeros.size(); rootIdx++) {
+			Complex_F64 c = zeros.get(rootIdx);
 			if( !c.isReal() && Math.abs(c.imaginary) > 1e-10 )
 				continue;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,7 +84,8 @@ public class ChessboardCornerGraph {
 	}
 
 	public void print() {
-		for( Node n : corners.toList() ) {
+		for (int cornerIdx = 0; cornerIdx < corners.size; cornerIdx++) {
+			Node n = corners.get(cornerIdx);
 			System.out.printf("[%3d] {%3.0f, %3.0f} -> ",n.index,n.x,n.y);
 			for (int i = 0; i < 4; i++) {
 				if( n.edges[i] == null ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -143,7 +143,9 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		List<DMatrixRMaj> homographies = new ArrayList<>();
 		List<Se3_F64> motions = new ArrayList<>();
 
-		for (CalibrationObservation obs : observations) {
+		for (int i = 0; i < observations.size(); i++) {
+			CalibrationObservation obs = observations.get(i);
+
 			if (!computeHomography.computeHomography(obs))
 				return false;
 
@@ -158,7 +160,8 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		DMatrixRMaj K = computeK.getCalibrationMatrix();
 
 		decomposeH.setCalibrationMatrix(K);
-		for (DMatrixRMaj H : homographies) {
+		for (int i = 0; i < homographies.size(); i++) {
+			DMatrixRMaj H = homographies.get(i);
 			motions.add(decomposeH.decompose(H));
 		}
 

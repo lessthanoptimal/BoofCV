@@ -333,7 +333,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		int l = BoofMiscOps.numDigits(vertexes.size);
 		String format = "%" + l + "d";
 
-		for (Vertex n : vertexes.toList()) {
+		for (Vertex n : vertexes.toList()) { // lint:forbidden ignore_line
 			ChessboardCorner c = corners.get(n.index);
 			verbose.printf("[" + format + "] {%3.0f, %3.0f} ->  90[ ", n.index, c.x, c.y);
 			for (int i = 0; i < n.perpendicular.size(); i++) {
@@ -349,7 +349,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		int l = BoofMiscOps.numDigits(vertexes.size);
 		String format = "%" + l + "d";
 
-		for (Vertex n : vertexes.toList()) {
+		for (Vertex n : vertexes.toList()) { // lint:forbidden ignore_line
 			ChessboardCorner c = corners.get(n.index);
 			System.out.printf("[" + format + "] {%3.0f, %3.0f} -> [ ", n.index, c.x, c.y);
 			for (int i = 0; i < n.connections.size(); i++) {

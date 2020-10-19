@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -168,8 +168,8 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 			if (matchSet.size() < minInlierSize)
 				break;
 
-			for (Edgel e : matchSet) {
-				list.remove(e);
+			for (int edgeIdx = 0; edgeIdx < matchSet.size(); edgeIdx++) {
+				list.remove(matchSet.get(edgeIdx));
 			}
 
 			gridLines.add(convertToLineSegment(matchSet, robustMatcher.getModelParameters()));
@@ -191,7 +191,8 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 		LineParametric2D_F32 line = UtilLine2D_F32.convert(model, (LineParametric2D_F32)null);
 
 		Point2D_F32 p = new Point2D_F32();
-		for (Edgel e : matchSet) {
+		for (int edgeIdx = 0; edgeIdx < matchSet.size(); edgeIdx++) {
+			Edgel e = matchSet.get(edgeIdx);
 			p.set(e.x, e.y);
 			float t = ClosestPoint2D_F32.closestPointT(line, e);
 			if (minT > t)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -609,7 +609,8 @@ public class PerspectiveOps {
 	 */
 	public static void splitAssociated( List<AssociatedPair> pairs,
 										List<Point2D_F64> view1, List<Point2D_F64> view2 ) {
-		for (AssociatedPair p : pairs) {
+		for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
+			AssociatedPair p = pairs.get(pairIdx);
 			view1.add(p.p1);
 			view2.add(p.p2);
 		}
@@ -625,7 +626,8 @@ public class PerspectiveOps {
 	 */
 	public static void splitAssociated( List<AssociatedTriple> pairs,
 										List<Point2D_F64> view1, List<Point2D_F64> view2, List<Point2D_F64> view3 ) {
-		for (AssociatedTriple p : pairs) {
+		for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
+			AssociatedTriple p = pairs.get(pairIdx);
 			view1.add(p.p1);
 			view2.add(p.p2);
 			view3.add(p.p3);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,7 +132,8 @@ public class ShapeFittingOps {
 			closestPoint.setEllipse(outputStorage.shape);
 
 			double total = 0;
-			for( Point2D_F64 p : points ) {
+			for (int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
+				Point2D_F64 p = points.get(pointIdx);
 				closestPoint.process(p);
 				total += p.distance(closestPoint.getClosest());
 			}

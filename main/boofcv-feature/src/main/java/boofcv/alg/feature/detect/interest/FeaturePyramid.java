@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,11 +79,11 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 	/**
 	 * Create a feature detector.
 	 *
-	 * @param detector   Point feature detector which is used to find candidates in each scale level
+	 * @param detector Point feature detector which is used to find candidates in each scale level
 	 * @param scalePower Used to normalize feature intensity at different scales.  For many features this should be one.
 	 */
-	public FeaturePyramid(GeneralFeatureDetector<T, D> detector, AnyImageDerivative<T, D> computeDerivative,
-						  double scalePower) {
+	public FeaturePyramid( GeneralFeatureDetector<T, D> detector, AnyImageDerivative<T, D> computeDerivative,
+						   double scalePower ) {
 		this.detector = detector;
 
 		this.baseThreshold = detector.getThreshold();
@@ -97,7 +97,7 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 	 * @param ss Scale space of an image
 	 */
 	@Override
-	public void detect(PyramidFloat<T> ss) {
+	public void detect( PyramidFloat<T> ss ) {
 		spaceIndex = 0;
 		if (intensities == null) {
 			intensities = new GrayF32[3];
@@ -123,13 +123,12 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		}
 	}
 
-
 	/**
 	 * Use the feature detector to find candidate features in each level.  Only compute the needed image derivatives.
 	 */
-	private void detectCandidateFeatures(T image, double sigma) {
+	private void detectCandidateFeatures( T image, double sigma ) {
 		// adjust corner intensity threshold based upon the current scale factor
-		float scaleThreshold = (float) (baseThreshold / Math.pow(sigma, scalePower));
+		float scaleThreshold = (float)(baseThreshold/Math.pow(sigma, scalePower));
 		detector.setThreshold(scaleThreshold);
 		computeDerivative.setInput(image);
 
@@ -166,47 +165,48 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 	/**
 	 * Searches the pyramid layers up and down to see if the found 2D features are also scale space maximums.
 	 */
-	protected void findLocalScaleSpaceMax(PyramidFloat<T> ss, int layerID) {
+	protected void findLocalScaleSpaceMax( PyramidFloat<T> ss, int layerID ) {
 		int index0 = spaceIndex;
-		int index1 = (spaceIndex + 1) % 3;
-		int index2 = (spaceIndex + 2) % 3;
+		int index1 = (spaceIndex + 1)%3;
+		int index2 = (spaceIndex + 2)%3;
 
 		List<Point2D_I16> candidates = maximums[index1];
-		ImageBorder_F32 inten0 = (ImageBorder_F32) FactoryImageBorderAlgs.value(intensities[index0], 0);
+		ImageBorder_F32 inten0 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index0], 0);
 		GrayF32 inten1 = intensities[index1];
-		ImageBorder_F32 inten2 = (ImageBorder_F32) FactoryImageBorderAlgs.value(intensities[index2], 0);
+		ImageBorder_F32 inten2 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index2], 0);
 
-		float scale0 = (float) ss.scale[layerID - 1];
-		float scale1 = (float) ss.scale[layerID];
-		float scale2 = (float) ss.scale[layerID + 1];
+		float scale0 = (float)ss.scale[layerID - 1];
+		float scale1 = (float)ss.scale[layerID];
+		float scale2 = (float)ss.scale[layerID + 1];
 
-		float sigma0 = (float) ss.getSigma(layerID - 1);
-		float sigma1 = (float) ss.getSigma(layerID);
-		float sigma2 = (float) ss.getSigma(layerID + 1);
+		float sigma0 = (float)ss.getSigma(layerID - 1);
+		float sigma1 = (float)ss.getSigma(layerID);
+		float sigma2 = (float)ss.getSigma(layerID + 1);
 
 		// not sure if this is the correct way to handle the change in scale
-		float ss0 = (float) (Math.pow(sigma0, scalePower)/scale0);
-		float ss1 = (float) (Math.pow(sigma1, scalePower)/scale1);
-		float ss2 = (float) (Math.pow(sigma2, scalePower)/scale2);
+		float ss0 = (float)(Math.pow(sigma0, scalePower)/scale0);
+		float ss1 = (float)(Math.pow(sigma1, scalePower)/scale1);
+		float ss2 = (float)(Math.pow(sigma2, scalePower)/scale2);
 
-		for (Point2D_I16 c : candidates) {
-			float val = ss1 * inten1.get(c.x, c.y);
+		for (int canIdx = 0; canIdx < candidates.size(); canIdx++) {
+			Point2D_I16 c = candidates.get(canIdx);
+			float val = ss1*inten1.get(c.x, c.y);
 
 			// find pixel location in each image's local coordinate
-			int x0 = (int) (c.x * scale1 / scale0);
-			int y0 = (int) (c.y * scale1 / scale0);
+			int x0 = (int)(c.x*scale1/scale0);
+			int y0 = (int)(c.y*scale1/scale0);
 
-			int x2 = (int) (c.x * scale1 / scale2);
-			int y2 = (int) (c.y * scale1 / scale2);
+			int x2 = (int)(c.x*scale1/scale2);
+			int y2 = (int)(c.y*scale1/scale2);
 
-			if (checkMax(inten0, val / ss0, x0, y0) && checkMax(inten2, val / ss2, x2, y2)) {
+			if (checkMax(inten0, val/ss0, x0, y0) && checkMax(inten2, val/ss2, x2, y2)) {
 				// put features into the scale of the upper image
-				foundPoints.add(new ScalePoint(c.x * scale1, c.y * scale1, sigma1));
+				foundPoints.add(new ScalePoint(c.x*scale1, c.y*scale1, sigma1));
 			}
 		}
 	}
 
-	protected static boolean checkMax(ImageBorder_F32 inten, float bestScore, int c_x, int c_y) {
+	protected static boolean checkMax( ImageBorder_F32 inten, float bestScore, int c_x, int c_y ) {
 		boolean isMax = true;
 		beginLoop:
 		for (int i = c_y - 1; i <= c_y + 1; i++) {

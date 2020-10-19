@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 
-
 /**
  * <p>
  * Common operations for dealing with integral images.
@@ -44,53 +43,8 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static GrayF32 transform(GrayF32 input , GrayF32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed);
-
-		ImplIntegralImageOps.transform(input,transformed);
-
-		return transformed;
-	}
-
-	/**
-	 * Converts a regular image into an integral image.
-	 *
-	 * @param input Regular image. Not modified.
-	 * @param transformed Integral image. If null a new image will be created. Modified.
-	 * @return Integral image.
-	 */
-	public static GrayF64 transform(GrayF64 input , GrayF64 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed);
-
-		ImplIntegralImageOps.transform(input,transformed);
-
-		return transformed;
-	}
-
-	/**
-	 * Converts a regular image into an integral image.
-	 *
-	 * @param input Regular image. Not modified.
-	 * @param transformed Integral image. If null a new image will be created. Modified.
-	 * @return Integral image.
-	 */
-	public static GrayS32 transform(GrayU8 input , GrayS32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed,GrayS32.class);
-
-		ImplIntegralImageOps.transform(input,transformed);
-
-		return transformed;
-	}
-
-	/**
-	 * Converts a regular image into an integral image.
-	 *
-	 * @param input Regular image. Not modified.
-	 * @param transformed Integral image. If null a new image will be created. Modified.
-	 * @return Integral image.
-	 */
-	public static GrayS32 transform(GrayS32 input , GrayS32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed,GrayS32.class);
+	public static GrayF32 transform( GrayF32 input, GrayF32 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input, transformed);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -104,8 +58,53 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static GrayS64 transform(GrayS64 input , GrayS64 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed,GrayS64.class);
+	public static GrayF64 transform( GrayF64 input, GrayF64 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input, transformed);
+
+		ImplIntegralImageOps.transform(input, transformed);
+
+		return transformed;
+	}
+
+	/**
+	 * Converts a regular image into an integral image.
+	 *
+	 * @param input Regular image. Not modified.
+	 * @param transformed Integral image. If null a new image will be created. Modified.
+	 * @return Integral image.
+	 */
+	public static GrayS32 transform( GrayU8 input, GrayS32 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS32.class);
+
+		ImplIntegralImageOps.transform(input, transformed);
+
+		return transformed;
+	}
+
+	/**
+	 * Converts a regular image into an integral image.
+	 *
+	 * @param input Regular image. Not modified.
+	 * @param transformed Integral image. If null a new image will be created. Modified.
+	 * @return Integral image.
+	 */
+	public static GrayS32 transform( GrayS32 input, GrayS32 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS32.class);
+
+		ImplIntegralImageOps.transform(input, transformed);
+
+		return transformed;
+	}
+
+	/**
+	 * Converts a regular image into an integral image.
+	 *
+	 * @param input Regular image. Not modified.
+	 * @param transformed Integral image. If null a new image will be created. Modified.
+	 * @return Integral image.
+	 */
+	public static GrayS64 transform( GrayS64 input, GrayS64 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS64.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -120,13 +119,12 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static GrayF32 convolve(GrayF32 integral ,
-								   IntegralKernel kernel ,
-								   GrayF32 output )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayF32 convolve( GrayF32 integral,
+									IntegralKernel kernel,
+									GrayF32 output ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
 		} else {
 			ImplIntegralImageConvolve.convolve(integral, kernel, output);
@@ -143,13 +141,12 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static GrayF64 convolve(GrayF64 integral ,
-								   IntegralKernel kernel ,
-								   GrayF64 output )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayF64 convolve( GrayF64 integral,
+									IntegralKernel kernel,
+									GrayF64 output ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
 		} else {
 			ImplIntegralImageConvolve.convolve(integral, kernel, output);
@@ -166,13 +163,12 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static GrayS32 convolve(GrayS32 integral ,
-								   IntegralKernel kernel ,
-								   GrayS32 output )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayS32 convolve( GrayS32 integral,
+									IntegralKernel kernel,
+									GrayS32 output ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
 		} else {
 			ImplIntegralImageConvolve.convolve(integral, kernel, output);
@@ -189,13 +185,12 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static GrayS64 convolve(GrayS64 integral ,
-								   IntegralKernel kernel ,
-								   GrayS64 output )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayS64 convolve( GrayS64 integral,
+									IntegralKernel kernel,
+									GrayS64 output ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
 		} else {
 			ImplIntegralImageConvolve.convolve(integral, kernel, output);
@@ -213,13 +208,12 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static GrayF32 convolveBorder(GrayF32 integral ,
-										 IntegralKernel kernel ,
-										 GrayF32 output , int borderX , int borderY )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayF32 convolveBorder( GrayF32 integral,
+										  IntegralKernel kernel,
+										  GrayF32 output, int borderX, int borderY ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
 		} else {
 			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
@@ -237,13 +231,12 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static GrayF64 convolveBorder(GrayF64 integral ,
-										 IntegralKernel kernel ,
-										 GrayF64 output , int borderX , int borderY )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayF64 convolveBorder( GrayF64 integral,
+										  IntegralKernel kernel,
+										  GrayF64 output, int borderX, int borderY ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
 		} else {
 			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
@@ -261,13 +254,12 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static GrayS32 convolveBorder(GrayS32 integral ,
-										 IntegralKernel kernel ,
-										 GrayS32 output , int borderX , int borderY )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayS32 convolveBorder( GrayS32 integral,
+										  IntegralKernel kernel,
+										  GrayS32 output, int borderX, int borderY ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
 		} else {
 			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
@@ -285,13 +277,12 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static GrayS64 convolveBorder(GrayS64 integral ,
-										 IntegralKernel kernel ,
-										 GrayS64 output , int borderX , int borderY )
-	{
-		output = InputSanityCheck.checkDeclare(integral,output);
+	public static GrayS64 convolveBorder( GrayS64 integral,
+										  IntegralKernel kernel,
+										  GrayS64 output, int borderX, int borderY ) {
+		output = InputSanityCheck.checkDeclare(integral, output);
 
-		if(BoofConcurrency.USE_CONCURRENT) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
 		} else {
 			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
@@ -309,8 +300,7 @@ public class IntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static float convolveSparse(GrayF32 integral , IntegralKernel kernel , int x , int y )
-	{
+	public static float convolveSparse( GrayF32 integral, IntegralKernel kernel, int x, int y ) {
 		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
 	}
 
@@ -323,22 +313,7 @@ public class IntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static double convolveSparse(GrayF64 integral , IntegralKernel kernel , int x , int y )
-	{
-		return ImplIntegralImageOps.convolveSparse(integral,kernel,x,y);
-	}
-
-	/**
-	 * Convolves a kernel around a single point in the integral image.
-	 *
-	 * @param integral Input integral image. Not modified.
-	 * @param kernel Convolution kernel.
-	 * @param x Pixel the convolution is performed at.
-	 * @param y Pixel the convolution is performed at.
-	 * @return Value of the convolution
-	 */
-	public static int convolveSparse(GrayS32 integral , IntegralKernel kernel , int x , int y )
-	{
+	public static double convolveSparse( GrayF64 integral, IntegralKernel kernel, int x, int y ) {
 		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
 	}
 
@@ -351,9 +326,21 @@ public class IntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static long convolveSparse(GrayS64 integral , IntegralKernel kernel , int x , int y )
-	{
-		return ImplIntegralImageOps.convolveSparse(integral,kernel,x,y);
+	public static int convolveSparse( GrayS32 integral, IntegralKernel kernel, int x, int y ) {
+		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
+	}
+
+	/**
+	 * Convolves a kernel around a single point in the integral image.
+	 *
+	 * @param integral Input integral image. Not modified.
+	 * @param kernel Convolution kernel.
+	 * @param x Pixel the convolution is performed at.
+	 * @param y Pixel the convolution is performed at.
+	 * @return Value of the convolution
+	 */
+	public static long convolveSparse( GrayS64 integral, IntegralKernel kernel, int x, int y ) {
+		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
 	}
 
 	/**
@@ -369,44 +356,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static double block_unsafe(GrayF64 integral , int x0 , int y0 , int x1 , int y1 )
-	{
-		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
-	}
-
-	/**
-	 * <p>
-	 * Computes the value of a block inside an integral image without bounds checking.  The block is
-	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
-	 * </p>
-	 *
-	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
-	 * @return Value inside the block.
-	 */
-	public static float block_unsafe(GrayF32 integral , int x0 , int y0 , int x1 , int y1 )
-	{
-		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
-	}
-
-	/**
-	 * <p>
-	 * Computes the value of a block inside an integral image without bounds checking.  The block is
-	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
-	 * </p>
-	 *
-	 * @param integral Integral image.
-	 * @param x0 Lower bound of the block.  Exclusive.
-	 * @param y0 Lower bound of the block.  Exclusive.
-	 * @param x1 Upper bound of the block.  Inclusive.
-	 * @param y1 Upper bound of the block.  Inclusive.
-	 * @return Value inside the block.
-	 */
-	public static int block_unsafe(GrayS32 integral , int x0 , int y0 , int x1 , int y1 )
-	{
+	public static double block_unsafe( GrayF64 integral, int x0, int y0, int x1, int y1 ) {
 		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
 	}
 
@@ -423,8 +373,41 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static long block_unsafe(GrayS64 integral , int x0 , int y0 , int x1 , int y1 )
-	{
+	public static float block_unsafe( GrayF32 integral, int x0, int y0, int x1, int y1 ) {
+		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
+	}
+
+	/**
+	 * <p>
+	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
+	 * </p>
+	 *
+	 * @param integral Integral image.
+	 * @param x0 Lower bound of the block.  Exclusive.
+	 * @param y0 Lower bound of the block.  Exclusive.
+	 * @param x1 Upper bound of the block.  Inclusive.
+	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @return Value inside the block.
+	 */
+	public static int block_unsafe( GrayS32 integral, int x0, int y0, int x1, int y1 ) {
+		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
+	}
+
+	/**
+	 * <p>
+	 * Computes the value of a block inside an integral image without bounds checking.  The block is
+	 * defined as follows: x0 &lt; x &le; x1 and y0 &lt; y &le; y1.
+	 * </p>
+	 *
+	 * @param integral Integral image.
+	 * @param x0 Lower bound of the block.  Exclusive.
+	 * @param y0 Lower bound of the block.  Exclusive.
+	 * @param x1 Upper bound of the block.  Inclusive.
+	 * @param y1 Upper bound of the block.  Inclusive.
+	 * @return Value inside the block.
+	 */
+	public static long block_unsafe( GrayS64 integral, int x0, int y0, int x1, int y1 ) {
 		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
 	}
 
@@ -441,9 +424,8 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static float block_zero(GrayF32 integral , int x0 , int y0 , int x1 , int y1 )
-	{
-		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
+	public static float block_zero( GrayF32 integral, int x0, int y0, int x1, int y1 ) {
+		return ImplIntegralImageOps.block_zero(integral, x0, y0, x1, y1);
 	}
 
 	/**
@@ -459,9 +441,8 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static double block_zero(GrayF64 integral , int x0 , int y0 , int x1 , int y1 )
-	{
-		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
+	public static double block_zero( GrayF64 integral, int x0, int y0, int x1, int y1 ) {
+		return ImplIntegralImageOps.block_zero(integral, x0, y0, x1, y1);
 	}
 
 	/**
@@ -477,9 +458,8 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static int block_zero(GrayS32 integral , int x0 , int y0 , int x1 , int y1 )
-	{
-		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
+	public static int block_zero( GrayS32 integral, int x0, int y0, int x1, int y1 ) {
+		return ImplIntegralImageOps.block_zero(integral, x0, y0, x1, y1);
 	}
 
 	/**
@@ -495,9 +475,8 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static long block_zero(GrayS64 integral , int x0 , int y0 , int x1 , int y1 )
-	{
-		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
+	public static long block_zero( GrayS64 integral, int x0, int y0, int x1, int y1 ) {
+		return ImplIntegralImageOps.block_zero(integral, x0, y0, x1, y1);
 	}
 
 	/**
@@ -505,42 +484,42 @@ public class IntegralImageOps {
 	 *
 	 * @param kernel THe kernel which is to be printed.
 	 */
-	public static void print( IntegralKernel kernel )
-	{
-		int x0 = 0,x1=0,y0=0,y1=0;
-		for( ImageRectangle k : kernel.blocks) {
-			if( k.x0 < x0 )
+	public static void print( IntegralKernel kernel ) {
+		int x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+		for (int blockIdx = 0; blockIdx < kernel.blocks.length; blockIdx++) {
+			ImageRectangle k = kernel.blocks[blockIdx];
+			if (k.x0 < x0)
 				x0 = k.x0;
-			if( k.y0 < y0 )
+			if (k.y0 < y0)
 				y0 = k.y0;
-			if( k.x1 > x1 )
+			if (k.x1 > x1)
 				x1 = k.x1;
-			if( k.y1 > y1 )
+			if (k.y1 > y1)
 				y1 = k.y1;
 		}
 
-		int w = x1-x0;
-		int h = y1-y0;
+		int w = x1 - x0;
+		int h = y1 - y0;
 
-		int sum[] = new int[ w*h ];
+		int[] sum = new int[w*h];
 
-		for( int i = 0; i < kernel.blocks.length; i++ ) {
+		for (int i = 0; i < kernel.blocks.length; i++) {
 			ImageRectangle r = kernel.blocks[i];
 			int value = kernel.scales[i];
 
-			for( int y = r.y0; y < r.y1; y++ ) {
-				int yy = y-y0;
-				for( int x = r.x0; x < r.x1; x++ ) {
+			for (int y = r.y0; y < r.y1; y++) {
+				int yy = y - y0;
+				for (int x = r.x0; x < r.x1; x++) {
 					int xx = x - x0;
-					sum[ yy*w + xx ] += value;
+					sum[yy*w + xx] += value;
 				}
 			}
 		}
 
-		System.out.println("IntegralKernel: TL = ("+(x0+1)+","+(y0+1)+") BR=("+x1+","+y1+")");
-		for( int y = 0; y < h; y++ ) {
-			for( int x = 0; x < w; x++ ) {
-				System.out.printf("%4d ",sum[y*w+x]);
+		System.out.println("IntegralKernel: TL = (" + (x0 + 1) + "," + (y0 + 1) + ") BR=(" + x1 + "," + y1 + ")");
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				System.out.printf("%4d ", sum[y*w + x]);
 			}
 			System.out.println();
 		}
@@ -557,12 +536,12 @@ public class IntegralImageOps {
 	 * @param height Image's height
 	 * @return true if in bounds and false if out of bounds
 	 */
-	public static boolean isInBounds( int x , int y , IntegralKernel kernel , int width , int height )
-	{
-		for(ImageRectangle r : kernel.blocks ) {
-			if( x+r.x0 < 0 || y+r.y0 < 0 )
+	public static boolean isInBounds( int x, int y, IntegralKernel kernel, int width, int height ) {
+		for (int blockIdx = 0; blockIdx < kernel.blocks.length; blockIdx++) {
+			ImageRectangle r = kernel.blocks[blockIdx];
+			if (x + r.x0 < 0 || y + r.y0 < 0)
 				return false;
-			if( x+r.x1 >= width || y+r.y1 >= height )
+			if (x + r.x1 >= width || y + r.y1 >= height)
 				return false;
 		}
 

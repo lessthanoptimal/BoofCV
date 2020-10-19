@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -346,7 +346,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 		// Put observation and prior knowledge into a format the model matcher will understand
 		listStereo2D3D.growArray(candidates.size());
 		listStereo2D3D.reset();
-		for (PointTrack l : candidates) {
+		for (int candidateIdx = 0; candidateIdx < candidates.size(); candidateIdx++) {
+			PointTrack l = candidates.get(candidateIdx);
 			Stereo2D3D stereo = listStereo2D3D.grow();
 
 			// Get the track location
@@ -407,13 +408,13 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	 */
 	private void mutualTrackDrop() {
 		int total = 0;
-		for (PointTrack t : trackerLeft.getDroppedTracks(null)) {
+		for (PointTrack t : trackerLeft.getDroppedTracks(null)) { // lint:forbidden ignore_line
 			TrackInfo bt = t.getCookie();
 			trackerRight.dropTrack(bt.visualRight);
 			bt.visualTrack = null; // This tells the scene that it is no longer in the visual tracker
 			total++;
 		}
-		for (PointTrack t : trackerRight.getDroppedTracks(null)) {
+		for (PointTrack t : trackerRight.getDroppedTracks(null)) { // lint:forbidden ignore_line
 			TrackInfo bt = t.getCookie();
 			if (bt.visualTrack != null) {
 				trackerLeft.dropTrack(bt.visualTrack);
@@ -431,7 +432,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 		final long frameID = getFrameID();
 		// mark tracks in right frame that are active
 		List<PointTrack> activeRight = trackerRight.getActiveTracks(null);
-		for (PointTrack t : activeRight) {
+		for (PointTrack t : activeRight) { // lint:forbidden ignore_line
 			TrackInfo bt = t.getCookie();
 			// If the visual track is null then it got dropped earlier
 			if (bt.visualTrack == null)
@@ -442,7 +443,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 
 		List<PointTrack> activeLeft = trackerLeft.getActiveTracks(null);
 		candidates.clear();
-		for (PointTrack left : activeLeft) {
+		for (PointTrack left : activeLeft) { // lint:forbidden ignore_line
 			TrackInfo bt = left.getCookie();
 
 			if (bt.lastSeenRightFrame != frameID) {
