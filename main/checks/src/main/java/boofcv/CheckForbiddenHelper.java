@@ -30,23 +30,13 @@ public class CheckForbiddenHelper {
 	 */
 	public static void addForbiddenFunction( CheckForbiddenLanguage checker,
 											 String functionName, String reason ) {
-		CheckForbiddenLanguage.ConditionalRule rule = line -> {
-			String[] words = line.trim().split("\\s+");
-			for (int wordIdx = 0; wordIdx < words.length; wordIdx++) {
-				String w = words[wordIdx];
-				int lastLoc = 0;
-				while (lastLoc < w.length()) {
-					int loc = w.indexOf(functionName, lastLoc);
-					if (loc < 0)
-						break;
-					if (loc > 0) {
-						if (w.charAt(loc - 1) == '.')
-							return false;
-					} else if (wordIdx > 0 && words[wordIdx - 1].endsWith(".")) {
-						return false;
-					}
-					lastLoc = loc + functionName.length();
-				}
+		CheckForbiddenLanguage.ConditionalRule rule = (line, words) -> {
+			for (int wordIdx = 1; wordIdx < words.size(); wordIdx++) {
+				if (!words.get(wordIdx).equals(functionName))
+					continue;
+
+				if (words.get(wordIdx-1).equals("."))
+					return false;
 			}
 			return true;
 		};
@@ -56,66 +46,51 @@ public class CheckForbiddenHelper {
 	/**
 	 * A simple check that sees if var is only used when the type is shown via "new". There are ways to trick this
 	 * function into thinking the type is explicitly shown when it is not.
+	 *
+	 * @param allowForEach If true then var inside of for each loops will be allowed
 	 */
-	public static void addVarMustBeExplicit( CheckForbiddenLanguage checker ) {
-		CheckForbiddenLanguage.ConditionalRule rule = line -> {
-			String[] words = line.trim().split("\\s+");
-			for (int i = 0; i < words.length; i++) {
-				String w = words[i];
-				if (!w.endsWith("var"))
+	public static void forbidNonExplicitVar( CheckForbiddenLanguage checker, boolean allowForEach ) {
+		CheckForbiddenLanguage.ConditionalRule rule = (line, words) -> {
+			for (int i = 0; i < words.size()-3; i++) {
+				if (!words.get(i).equals("var"))
 					continue;
 
-				if (words.length <= i + 1)
-					return true;
-
-				String wn = words[i + 1];
-
-				// var a= new
-				if (wn.charAt(wn.length() - 1) == '=') {
-					if (words.length > i + 2) {
-						if (words[i + 2].equals("new")) {
-							i += 2;
-							continue;
-						} else {
-							return false;
-						}
-					} else {
-						continue;
-					}
+				if (allowForEach && i >= 2 && words.get(i-2).equals("for")) {
+					continue;
 				}
 
-				// var a=new
-				if (wn.endsWith("=new")) {
-					i++;
+				// see if it's used as a variable name
+				if (words.get(i+1).equals("=") || words.get(i+1).equals(".") || words.get(i+1).equals(","))
 					continue;
-				} else if (wn.contains("="))
+
+				// var moo = new Foo()
+				if (!words.get(i+3).equals("new"))
 					return false;
-
-				if (words.length <= i + 2)
-					continue;
-
-				// var a =new
-				if (words[i + 2].length() > 1 && words[i + 2].charAt(0) == '=') {
-					if (words[i + 2].endsWith("new")) {
-						i += 2;
-						continue;
-					} else {
-						return false;
-					}
-				}
-
-				// var a = new
-				if (words.length <= i + 3)
-					continue;
-				// var foo = new Foo()
-				// 0    1  2  3   4
-				return words[i + 3].equals("new");
-				// var foo = new Foo().sneaky() will trick this approach
-				// var foo \n = Factory.foo() will also get by
 			}
 			return true;
 		};
 		checker.addConditional("explicit_var", "var",
-				"Auto type inference with var reduces code maintainability and can hide mistakes during refactoring", rule);
+				"Auto type inference with var reduces code readability, maintainability, and hide mistakes during refactoring", rule);
+	}
+
+	/**
+	 * Looks for "for-each" style loops
+	 */
+	public static void forbidForEach( CheckForbiddenLanguage checker ) {
+		CheckForbiddenLanguage.ConditionalRule rule = (line, words) -> {
+			for (int wordIdx = 0; wordIdx < words.size()-4; wordIdx++) {
+				if (!words.get(wordIdx).equals("for"))
+					continue;
+
+				// for ( var a : list ) {
+				//  0  1  2  3 4   5  6 7
+				if (words.get(wordIdx+4).equals(":"))
+					return false;
+			}
+			return true;
+		};
+		checker.addConditional("for_each", "for",
+				"For highly optimized code that requires a constant runtime GC calls must be avoided. "+
+				"for-each style loops create a temporary iterator which can kill performance.", rule);
 	}
 }

@@ -40,16 +40,16 @@ public class TestCheckForbiddenHelper {
 		assertFalse(alg.process("foo.forEach();"));
 		assertFalse(alg.process("void main(){\n\ta = b;foo.forEach();\n\n"));
 		assertFalse(alg.process("void main(){\n\tfoo \t. forEach();\n\n"));
-		assertEquals(3, alg.lineNumber);
+		assertEquals(4, alg.lineNumber);
 		assertEquals(1, alg.failures.size());
 		CheckForbiddenLanguage.Failure f = alg.getFailures().get(0);
-		assertEquals(1, f.line);
+		assertEquals(2, f.line);
 		assertEquals("forEach", f.check.keyword);
 	}
 
-	@Test void addVarMustBeExplicit() {
+	@Test void forbidNonExplicitVar() {
 		var alg = new CheckForbiddenLanguage();
-		CheckForbiddenHelper.addVarMustBeExplicit(alg);
+		CheckForbiddenHelper.forbidNonExplicitVar(alg, false);
 
 		assertTrue(alg.process("var a = new Foo()"));
 		assertTrue(alg.process("var a =new Foo()"));
@@ -57,12 +57,16 @@ public class TestCheckForbiddenHelper {
 		assertTrue(alg.process("var a=new Foo()"));
 		assertTrue(alg.process("void main(){\n\tvar a=new Foo();\n} \n"));
 		assertTrue(alg.process("void main(){\n\tb = s;var a=new Foo();\n} \n"));
+		assertTrue(alg.process("Boo var = new Foo()")); // this is legal for legacy reasons
+		assertTrue(alg.process("var.moo.stuff()"));
+		assertTrue(alg.process("call(var,1.0)"));
 		assertTrue(alg.process("var a = \nmoo.foo()")); // known false negative
 
 		// Known false failures
 		assertFalse(alg.process("var a = value ? new Foo() : new Foo()"));
 
 		// Failures
+		assertFalse(alg.process("for( var a : list )"));
 		assertFalse(alg.process("var a = moo.foo()"));
 		assertFalse(alg.process("var a= moo.foo()"));
 		assertFalse(alg.process("var a =moo.foo()"));
@@ -71,12 +75,32 @@ public class TestCheckForbiddenHelper {
 		assertFalse(alg.process("dude = moo;var a = moo.foo()"));
 		assertFalse(alg.process("var b=new Moo();var a = moo.foo()"));
 		assertEquals(1, alg.getFailures().size());
-		assertEquals(0, alg.getFailures().get(0).line);
+		assertEquals(1, alg.getFailures().get(0).line);
 		assertEquals("var", alg.getFailures().get(0).check.keyword);
 
 		assertFalse(alg.process("var b=new \n\nMoo();var a = moo.foo()\n\n"));
 		assertEquals(1, alg.getFailures().size());
-		assertEquals(2, alg.getFailures().get(0).line);
+		assertEquals(3, alg.getFailures().get(0).line);
 		assertEquals("var", alg.getFailures().get(0).check.keyword);
+	}
+
+	@Test void forbidNonExplicitVar_allowForEach() {
+		var alg = new CheckForbiddenLanguage();
+		CheckForbiddenHelper.forbidNonExplicitVar(alg, true);
+
+		assertTrue(alg.process("for( var a : list )"));
+		assertTrue(alg.process("for ( var a : list )"));
+	}
+
+	@Test void forbidForEach() {
+		var alg = new CheckForbiddenLanguage();
+		CheckForbiddenHelper.forbidForEach(alg);
+
+		assertFalse(alg.process("for( var a : list )"));
+		assertFalse(alg.process("for( var a:list)"));
+		assertFalse(alg.process("\nfor( var a:list)\n"));
+
+		assertTrue(alg.process("for( int i = 0; i < 10; i++)"));
+		assertTrue(alg.process("for( int i=0;i<10;i++)"));
 	}
 }

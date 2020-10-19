@@ -39,15 +39,25 @@ public class CheckForbiddenLanguage {
 	// Command for ignoring the code below
 	public static final String IGNORE_BELOW = "ignore_below";
 
+	// Once this line is encountered it will abort processing the file
+	public static final String DISABLE_ALL = "disable_all";
+
+	// Once this line is encountered it will ignore the specified check for the remainder of the file
+	public static final String DISABLE_CHECK = "disable_check";
+
 	// If there's a special command for ignoring lint errors and there are no errors then that's an error
-	private static final Check NOTHING_IGNORED =
+	static final Check NOTHING_IGNORED =
 			new Check("nothing_ignored", "N/A", "The ignore request does noting.", null);
+	static final Check MALFORMED_COMMAND =
+			new Check("malformed_command", "N/A", "Single line comment command is malformed", null);
 
 	/** Specifies the text used to identify special lint commands in single line comments */
 	public String commentIdentifier = DEFAULT_IDENTIFIER;
 
 	// list of all the checks it will apply
-	List<Check> checks = new ArrayList<>();
+	List<Check> allChecks = new ArrayList<>();
+	// List of checks which are active for this file
+	List<Check> activeChecks = new ArrayList<>();
 
 	// List of all the problems found
 	@Getter List<Failure> failures = new ArrayList<>();
@@ -58,9 +68,14 @@ public class CheckForbiddenLanguage {
 	int ignoreLines;
 	boolean exceptionWasIgnored;
 
+	// if the test has been disabled or not
+	boolean disabled;
+
 	// The last line of code which was extracted. It's not processed until the new line is encountered so that
 	// a skip command can be processed.
 	@Nullable String lineOfCode = "";
+
+	JavaLineTokenizer tokenizer = new JavaLineTokenizer();
 
 	/**
 	 * Searches the document for a line with the keyword then applies the conditional rule to see if the activity
@@ -77,7 +92,7 @@ public class CheckForbiddenLanguage {
 		c.keyword = keyword;
 		c.reason = reason;
 		c.rule = rule;
-		checks.add(c);
+		allChecks.add(c);
 	}
 
 	/**
@@ -91,14 +106,18 @@ public class CheckForbiddenLanguage {
 		if (!isNewLine(sourceCode.charAt(sourceCode.length() - 1)))
 			sourceCode = sourceCode + '\n';
 
+		activeChecks.clear();
+		activeChecks.addAll(allChecks);
+
 		failures.clear();
 		// beginning and end index of code on the same line
 		int codeIdx0 = 0;
 		int codeIdx1 = 0;
 
 		// Initialize the state
+		disabled = false;
 		lineOfCode = null;
-		lineNumber = 0;
+		lineNumber = 1; // most IDEs seem to start counting at 1
 		Mode mode = Mode.CODE;
 
 		// Go through the string one character at a time looking for comments and new lines
@@ -130,6 +149,8 @@ public class CheckForbiddenLanguage {
 				case LINE_COMMENT -> {
 					if (isNewLine(c)) {
 						checkCommentForCommands(sourceCode, codeIdx1, idx);
+						if (disabled)
+							return true;
 						incrementLine = shouldIncrementLine(prev, c);
 						codeIdx0 = idx + 1;
 						mode = Mode.CODE;
@@ -170,11 +191,7 @@ public class CheckForbiddenLanguage {
 			ignoreLines--;
 			if (ignoreLines == 0 && !exceptionWasIgnored) {
 				// If nothing was ignored then the comment can be removed
-				Failure f = new Failure();
-				f.code = "nothing_ignored";
-				f.line = lineNumber;
-				f.check = NOTHING_IGNORED;
-				failures.add(f);
+				addFailure("nothing_ignored", NOTHING_IGNORED);
 			}
 		}
 	}
@@ -199,12 +216,16 @@ public class CheckForbiddenLanguage {
 	 * Examines the line of code and sees if any of the Checks are triggered by it
 	 */
 	private void processLine( String line ) {
-		line = line.trim();
-		for (int i = 0; i < checks.size(); i++) {
-			Check c = checks.get(i);
+		List<String> tokens = null;
+		for (int i = 0; i < activeChecks.size(); i++) {
+			Check c = activeChecks.get(i);
 			if (!line.contains(c.keyword))
 				continue;
-			if (c.rule.matches(line)) {
+			// don't tokenize unless necessary
+			if (tokens == null) {
+				tokens = tokenizer.parse(line).stringTokens;
+			}
+			if (c.rule.matches(line, tokens)) {
 				continue;
 			}
 			// See if it's ignoring exceptions and if it was, note that it did ignore at least one exception
@@ -212,11 +233,7 @@ public class CheckForbiddenLanguage {
 				exceptionWasIgnored = true;
 				return;
 			}
-			Failure f = new Failure();
-			f.code = line;
-			f.line = lineNumber;
-			f.check = c;
-			failures.add(f);
+			addFailure(line, c);
 		}
 	}
 
@@ -243,7 +260,40 @@ public class CheckForbiddenLanguage {
 			// the current line has not been processed yet, so this will ignore it when it is processed
 			ignoreLines = 1;
 			exceptionWasIgnored = false;
+			return;
 		}
+
+		if (substring.contains(DISABLE_ALL)) {
+			disabled = true;
+			return;
+		}
+
+		if (substring.contains(DISABLE_CHECK)) {
+			String[] words = substring.trim().split("\\s+");
+			if (words.length < 3) {
+				addFailure(substring, MALFORMED_COMMAND);
+				return;
+			}
+
+			String target = words[2];
+
+			for (int i = 0; i < activeChecks.size(); i++) {
+				if (activeChecks.get(i).ruleName.equals(target)) {
+					activeChecks.remove(i);
+					return;
+				}
+			}
+
+			addFailure("No check with the name: " + target, MALFORMED_COMMAND);
+		}
+	}
+
+	private void addFailure( String substring, Check check ) {
+		Failure f = new Failure();
+		f.code = substring;
+		f.line = lineNumber;
+		f.check = check;
+		failures.add(f);
 	}
 
 	@FunctionalInterface
@@ -251,14 +301,14 @@ public class CheckForbiddenLanguage {
 		/**
 		 * @return true if the code is valid by this rule or false if not
 		 */
-		boolean matches( String line );
+		boolean matches( String line, List<String> tokens );
 	}
 
 	static class Check {
 		String ruleName;
 		String keyword;
 		String reason;
-		ConditionalRule rule = ( s ) -> false;
+		ConditionalRule rule = ( s, tokens ) -> false;
 
 		public Check() {}
 
