@@ -47,6 +47,58 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestEnforceCodeStandards {
 	// Skip over these directories since they don't contain library code
 	String[] blacklistConfig = new String[]{"autocode", "boofcv-core", "checks"};
+	// Only run this on performance critical code
+	String[] blackListLanguage = new String[]{"boofcv-io", "checks", "autocode"};
+
+	/**
+	 * This code needs to run fast and minimize memory usage. Lint check for certain illegal operations.
+	 */
+	@Test void performanceCodeLanguageApiCheck() throws FileNotFoundException {
+		String pathToMain = UtilIO.path("main");
+
+		var checker = new CheckForbiddenLanguage();
+		CheckForbiddenHelper.addVarMustBeExplicit(checker);
+
+		File[] moduleDirectories = new File(pathToMain).listFiles();
+		assertNotNull(moduleDirectories);
+
+		for (File module : moduleDirectories) {
+//			System.out.println("module "+module.getPath());
+			File dirCode = new File(module, "src/main");
+
+			if (!dirCode.exists())
+				continue;
+
+			boolean inBlackList = Arrays.asList(blackListLanguage).contains(module.getName());
+			if (inBlackList)
+				continue;
+
+			Collection<File> files = FileUtils.listFiles(dirCode,
+					new RegexFileFilter("\\S*.java"), DirectoryFileFilter.DIRECTORY);
+
+			boolean failed = false;
+			for (File classFile : files) {
+//				System.out.println(classFile.getPath());
+
+				String text = UtilIO.readAsString(new FileInputStream(classFile));
+				assertNotNull(text);
+
+				if (!checker.process(text)) {
+					failed = true;
+					for (var failure : checker.getFailures()) {
+						System.err.println(classFile.getName() + " line=" + failure.line);
+						System.err.println("  code:   " + failure.code.trim());
+						System.err.println("  reason: " + failure.check.reason);
+					}
+				}
+			}
+
+			if (failed)
+				System.err.println("\nSee documentation for how to ignore false positives or exceptions");
+
+			assertFalse(failed);
+		}
+	}
 
 	/**
 	 * Makes sure all unit tests extend BoofStandardJUnit
