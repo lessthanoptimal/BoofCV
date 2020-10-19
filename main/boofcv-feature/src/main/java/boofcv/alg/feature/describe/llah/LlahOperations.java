@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -474,7 +474,7 @@ public class LlahOperations {
 			matches.reset();
 			for (int i = 0; i < landmarkHits.size; i++) {
 				if( landmarkHits.get(i) > 0 ) {
-					var p = document.landmarks.get(i);
+					Point2D_F64 p = document.landmarks.get(i);
 					matches.grow().set(p.x,p.y,i);
 				}
 			}

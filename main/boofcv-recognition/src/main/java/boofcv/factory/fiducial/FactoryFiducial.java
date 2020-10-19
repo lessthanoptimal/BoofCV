@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,11 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.geo.ConfigHomography;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.struct.homography.Homography2D_F64;
+import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -250,8 +253,9 @@ public class FactoryFiducial {
 			default: throw new IllegalArgumentException("Unknown hash type "+config.llah.hashType);
 		}
 
-		var ops = new LlahOperations(config.llah.numberOfNeighborsN, config.llah.sizeOfCombinationM,hasher);
-		var ransac = FactoryMultiViewRobust.homographyRansac(new ConfigHomography(false), config.ransac);
+		LlahOperations ops = new LlahOperations(config.llah.numberOfNeighborsN, config.llah.sizeOfCombinationM,hasher);
+		Ransac<Homography2D_F64, AssociatedPair> ransac =
+				FactoryMultiViewRobust.homographyRansac(new ConfigHomography(false), config.ransac);
 		UchiyaMarkerTracker uchiya = new UchiyaMarkerTracker(ops,ransac);
 
 		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,check,uchiya);

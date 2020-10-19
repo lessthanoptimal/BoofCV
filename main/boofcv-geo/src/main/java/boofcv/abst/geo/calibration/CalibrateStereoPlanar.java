@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -206,11 +206,11 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 
 		Se3_F64 left_to_right = parameters.right_to_left.invert(null);
 
-		final var structure = bundleUtils.getStructure();
-		final var observations = bundleUtils.getObservations();
+		final SceneStructureMetric structure = bundleUtils.getStructure();
+		final SceneObservations observations = bundleUtils.getObservations();
 
-		var structureLeft = calibLeft.getStructure();
-		var structureRight = calibRight.getStructure();
+		final SceneStructureMetric structureLeft = calibLeft.getStructure();
+		final SceneStructureMetric structureRight = calibRight.getStructure();
 
 		int numViews = structureLeft.views.size;
 
@@ -289,8 +289,8 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	}
 
 	public List<ImageResults> computeErrors() {
-		final var structure = bundleUtils.getStructure();
-		final var observations = bundleUtils.getObservations();
+		final SceneStructureMetric structure = bundleUtils.getStructure();
+		final SceneObservations observations = bundleUtils.getObservations();
 		List<ImageResults> errors = new ArrayList<>();
 
 		double[] parameters = new double[structure.getParameterCount()];

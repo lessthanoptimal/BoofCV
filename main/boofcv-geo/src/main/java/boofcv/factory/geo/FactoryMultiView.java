@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -716,7 +716,7 @@ public class FactoryMultiView {
 		config.checkValidity();
 
 		final ConfigSelfCalibDualQuadratic c = config;
-		var selfCalib = c.knownAspectRatio ?
+		var selfCalib = c.knownAspectRatio ? // lint:forbidden ignore_line
 				new SelfCalibrationLinearDualQuadratic(c.aspectRatio) :
 				new SelfCalibrationLinearDualQuadratic(c.zeroSkew);
 
