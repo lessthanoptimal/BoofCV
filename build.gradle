@@ -229,7 +229,7 @@ subprojects {
         java {
             // There is currently no good way to exclude files that contain "@Generated" or are not versions.
             // This should catch most of them with a few false positives.
-            target '**/*.java'
+            target('**/java/boofcv/**/*.java')
             targetExclude('**/*_MT*.java','**/*_F32.java','**/generated/*')
 
             toggleOffOn('formatter:off', 'formatter:on')
