@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,30 +36,27 @@ import georegression.struct.point.Point3D_F64;
  * @author Peter Abeles
  */
 public class CameraToEquirectangular_F64
-		extends EquirectangularDistortBase_F64
-{
+		extends EquirectangularDistortBase_F64 {
 	public void setCameraModel( CameraPinholeBrown camera ) {
 		Point2Transform2_F64 pixelToNormalized =
-				new LensDistortionBrown(camera).undistort_F64(true,false);
-		setCameraModel(camera.width,camera.height,pixelToNormalized);
+				new LensDistortionBrown(camera).undistort_F64(true, false);
+		setCameraModel(camera.width, camera.height, pixelToNormalized);
 	}
 
 	public void setCameraModel( CameraPinhole camera ) {
 		Point2Transform2_F64 pixelToNormalized =
-				new LensDistortionPinhole(camera).undistort_F64(true,false);
-		setCameraModel(camera.width,camera.height,pixelToNormalized);
+				new LensDistortionPinhole(camera).undistort_F64(true, false);
+		setCameraModel(camera.width, camera.height, pixelToNormalized);
 	}
 
 	public void setCameraModel( CameraUniversalOmni camera ) {
 		Point2Transform3_F64 pixelToSpherical =
 				new LensDistortionUniversalOmni(camera).undistortPtoS_F64();
-		setCameraModel(camera.width,camera.height,pixelToSpherical);
+		setCameraModel(camera.width, camera.height, pixelToSpherical);
 	}
 
-
-	public void setCameraModel( int width , int height , Point2Transform2_F64 pixelToNormalized )
-	{
-		declareVectors( width, height );
+	public void setCameraModel( int width, int height, Point2Transform2_F64 pixelToNormalized ) {
+		declareVectors(width, height);
 
 		// computing the 3D ray through each pixel in the pinhole camera at it's canonical
 		// location
@@ -71,14 +68,13 @@ public class CameraToEquirectangular_F64
 				pixelToNormalized.compute(pixelX, pixelY, norm);
 				Point3D_F64 v = vectors[index++];
 
-				v.set(norm.x,norm.y,1);
+				v.set(norm.x, norm.y, 1);
 			}
 		}
 	}
 
-	public void setCameraModel( int width , int height , Point2Transform3_F64 pixelToNSpherical )
-	{
-		declareVectors( width, height );
+	public void setCameraModel( int width, int height, Point2Transform3_F64 pixelToNSpherical ) {
+		declareVectors(width, height);
 
 		for (int pixelY = 0; pixelY < height; pixelY++) {
 			int index = pixelY*width;

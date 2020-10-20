@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.abst.fiducial.calib;
 
 import boofcv.struct.StandardConfigurationChecks;

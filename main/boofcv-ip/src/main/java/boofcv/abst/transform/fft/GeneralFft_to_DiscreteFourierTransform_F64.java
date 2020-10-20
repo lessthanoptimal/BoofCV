@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import boofcv.struct.image.InterleavedF64;
  * @author Peter Abeles
  */
 public class GeneralFft_to_DiscreteFourierTransform_F64
-		implements DiscreteFourierTransform<GrayF64,InterleavedF64>
-{
+		implements DiscreteFourierTransform<GrayF64, InterleavedF64> {
 	// previous size of input image
 	private int prevWidth = -1;
 	private int prevHeight = -1;
@@ -39,40 +38,40 @@ public class GeneralFft_to_DiscreteFourierTransform_F64
 	private GeneralPurposeFFT_F64_2D alg;
 
 	// storage for temporary results
-	private InterleavedF64 tmp = new InterleavedF64(1,1,2);
+	private InterleavedF64 tmp = new InterleavedF64(1, 1, 2);
 
 	// if true then it can modify the input images
 	private boolean modifyInputs = false;
 
 	@Override
-	public void forward(GrayF64 image, InterleavedF64 transform ) {
-		DiscreteFourierTransformOps.checkImageArguments(image,transform);
-		if( image.isSubimage() )
+	public void forward( GrayF64 image, InterleavedF64 transform ) {
+		DiscreteFourierTransformOps.checkImageArguments(image, transform);
+		if (image.isSubimage())
 			throw new IllegalArgumentException("Subimages are not supported");
 
 		checkDeclareAlg(image);
 
 		int N = image.width*image.height;
-		System.arraycopy(image.data,0,transform.data,0,N);
+		System.arraycopy(image.data, 0, transform.data, 0, N);
 
 		// the transform over writes the input data
 		alg.realForwardFull(transform.data);
 	}
 
 	@Override
-	public void inverse(InterleavedF64 transform, GrayF64 image ) {
-		DiscreteFourierTransformOps.checkImageArguments(image,transform);
-		if( image.isSubimage() )
+	public void inverse( InterleavedF64 transform, GrayF64 image ) {
+		DiscreteFourierTransformOps.checkImageArguments(image, transform);
+		if (image.isSubimage())
 			throw new IllegalArgumentException("Subimages are not supported");
 
 		checkDeclareAlg(image);
 
 		// If he user lets us, modify the transform
 		InterleavedF64 workImage;
-		if(modifyInputs) {
+		if (modifyInputs) {
 			workImage = transform;
 		} else {
-			tmp.reshape(transform.width,transform.height);
+			tmp.reshape(transform.width, transform.height);
 			tmp.setTo(transform);
 			workImage = tmp;
 		}
@@ -81,7 +80,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F64
 
 		// copy the real portion.  imaginary should be zeros
 		int N = image.width*image.height;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			image.data[i] = workImage.data[i*2];
 		}
 	}
@@ -89,16 +88,16 @@ public class GeneralFft_to_DiscreteFourierTransform_F64
 	/**
 	 * Declare the algorithm if the image size has changed
 	 */
-	private void checkDeclareAlg(GrayF64 image) {
-		if( prevWidth != image.width || prevHeight != image.height ) {
+	private void checkDeclareAlg( GrayF64 image ) {
+		if (prevWidth != image.width || prevHeight != image.height) {
 			prevWidth = image.width;
 			prevHeight = image.height;
-			alg = new GeneralPurposeFFT_F64_2D(image.height,image.width);
+			alg = new GeneralPurposeFFT_F64_2D(image.height, image.width);
 		}
 	}
 
 	@Override
-	public void setModifyInputs(boolean modify) {
+	public void setModifyInputs( boolean modify ) {
 		this.modifyInputs = modify;
 	}
 

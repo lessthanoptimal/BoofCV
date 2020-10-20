@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,30 +22,30 @@ import boofcv.struct.image.ImageGray;
 
 /**
  * Interface for {@link SparseImageGradient} whose size can be scaled up and down.
- * 
+ *
  * @author Peter Abeles
  */
-public abstract class SparseScaleGradient<T extends ImageGray<T>,G extends GradientValue>
-		implements SparseImageGradient<T, G>
-{
+public abstract class SparseScaleGradient<T extends ImageGray<T>, G extends GradientValue>
+		implements SparseImageGradient<T, G> {
 	protected T input;
-	
+
 	// defines the kernel's bounds
-	protected int x0,y0,x1,y1;
+	protected int x0, y0, x1, y1;
 
 	/**
 	 * Sets how wide the gradient operator is in pixels
+	 *
 	 * @param width width in pixels
 	 */
 	public abstract void setWidth( double width );
 
 	@Override
-	public void setImage(T input ) {
+	public void setImage( T input ) {
 		this.input = input;
 	}
 
 	@Override
-	public boolean isInBounds( int x , int y ) {
-		return( x+x0 >= 0 && y+y0 >= 0 && x+x1 < input.width && y+y1 < input.height );
+	public boolean isInBounds( int x, int y ) {
+		return (x + x0 >= 0 && y + y0 >= 0 && x + x1 < input.width && y + y1 < input.height);
 	}
 }

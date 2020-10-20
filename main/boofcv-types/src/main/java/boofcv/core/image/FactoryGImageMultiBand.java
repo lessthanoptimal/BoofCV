@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.struct.image.*;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FactoryGImageMultiBand {
 
 	public static GImageMultiBand wrap( ImageBase image ) {
@@ -51,16 +52,12 @@ public class FactoryGImageMultiBand {
 		if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			return new PL();
 		} else if (imageType.getFamily() == ImageType.Family.INTERLEAVED) {
-			switch (imageType.getDataType()) {
-				case U8:
-					return new IL_U8();
-				case S8:
-					return new IL_S8();
-				case F32:
-					return new IL_F32();
-				default:
-					throw new IllegalArgumentException("Need to support more data types");
-			}
+			return switch (imageType.getDataType()) {
+				case U8 -> new IL_U8();
+				case S8 -> new IL_S8();
+				case F32 -> new IL_F32();
+				default -> throw new IllegalArgumentException("Need to support more data types");
+			};
 		} else {
 			throw new RuntimeException("Add support for more families");
 		}
@@ -71,31 +68,22 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand wrap( ImageInterleaved image ) {
-		switch (image.getDataType()) {
-			case U8:
-				return new IL_U8((InterleavedU8)image);
-			case S8:
-				return new IL_S8((InterleavedS8)image);
-			case U16:
-				return new IL_U16((InterleavedU16)image);
-			case S16:
-				return new IL_S16((InterleavedS16)image);
-			case S32:
-				return new IL_S32((InterleavedS32)image);
-			case S64:
-				return new IL_S64((InterleavedS64)image);
-			case F32:
-				return new IL_F32((InterleavedF32)image);
-			case F64:
-				return new IL_F64((InterleavedF64)image);
-			default:
-				throw new IllegalArgumentException("Need to support more data types: " + image.getDataType());
-		}
+		return switch (image.getDataType()) {
+			case U8 -> new IL_U8((InterleavedU8)image);
+			case S8 -> new IL_S8((InterleavedS8)image);
+			case U16 -> new IL_U16((InterleavedU16)image);
+			case S16 -> new IL_S16((InterleavedS16)image);
+			case S32 -> new IL_S32((InterleavedS32)image);
+			case S64 -> new IL_S64((InterleavedS64)image);
+			case F32 -> new IL_F32((InterleavedF32)image);
+			case F64 -> new IL_F64((InterleavedF64)image);
+			default -> throw new IllegalArgumentException("Need to support more data types: " + image.getDataType());
+		};
 	}
 
 	public static class PL implements GImageMultiBand {
 		Planar image;
-		GImageGray bandWrappers[];
+		GImageGray[] bandWrappers;
 
 		public PL( Planar image ) {
 			wrap(image);
@@ -650,20 +638,20 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public void set( int x, int y, float[] value ) {
-			int value_d[] = BoofMiscOps.convertArray(value, (int[])null);
+			int[] value_d = BoofMiscOps.convertArray(value, (int[])null);
 			image.set(x, y, value_d);
 		}
 
 		@Override
 		public void get( int x, int y, float[] value ) {
-			int value_d[] = new int[value.length];
+			int[] value_d = new int[value.length];
 			image.get(x, y, value_d);
 			BoofMiscOps.convertArray(value_d, value);
 		}
 
 		@Override
 		public Number get( int x, int y, int band ) {
-			int value_d[] = new int[image.getImage().getImageType().numBands];
+			int[] value_d = new int[image.getImage().getImageType().numBands];
 			image.get(x, y, value_d);
 			return value_d[band];
 		}
@@ -692,7 +680,7 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public Number get( int x, int y, int band ) {
-			float value_d[] = new float[image.getImage().getImageType().numBands];
+			float[] value_d = new float[image.getImage().getImageType().numBands];
 			image.get(x, y, value_d);
 			return value_d[band];
 		}
@@ -711,20 +699,20 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public void set( int x, int y, float[] value ) {
-			double value_d[] = BoofMiscOps.convertArray(value, (double[])null);
+			double[] value_d = BoofMiscOps.convertArray(value, (double[])null);
 			image.set(x, y, value_d);
 		}
 
 		@Override
 		public void get( int x, int y, float[] value ) {
-			double value_d[] = new double[value.length];
+			double[] value_d = new double[value.length];
 			image.get(x, y, value_d);
 			BoofMiscOps.convertArray(value_d, value);
 		}
 
 		@Override
 		public Number get( int x, int y, int band ) {
-			double value_d[] = new double[image.getImage().getImageType().numBands];
+			double[] value_d = new double[image.getImage().getImageType().numBands];
 			image.get(x, y, value_d);
 			return value_d[band];
 		}

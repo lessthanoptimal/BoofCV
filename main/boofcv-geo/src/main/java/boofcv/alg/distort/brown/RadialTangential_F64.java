@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ public class RadialTangential_F64 {
 	/**
 	 * Radial distortion parameters
 	 */
-	public double radial[];
+	public double[] radial;
 	/**
 	 * Tangential distortion parameters
 	 */

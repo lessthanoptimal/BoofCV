@@ -45,7 +45,6 @@ import org.bytedeco.javacpp.indexer.*;
 
 import java.nio.*;
 
-// CHECKSTYLE:OFF
 /**
  * A class to manage the data of audio and video frames. It it used by
  * {@link CanvasFrame}, {@link FrameGrabber}, {@link FrameRecorder}, and their

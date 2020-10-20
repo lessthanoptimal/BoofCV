@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,15 +32,14 @@ import org.ddogleg.struct.FastAccess;
  * @author Peter Abeles
  */
 public abstract class FilterCensusTransform<In extends ImageGray<In>, Out extends ImageBase<Out>>
-		implements FilterImageInterface<In, Out>
-{
+		implements FilterImageInterface<In, Out> {
 	ImageBorder<In> border;       // How the border for the input image is handled
 	ImageType<In> inputType;      // Input image type
 	ImageType<Out> outType;       // Output image type
 	int ignoreRadius;             // Size of the region along the image border which is ignored
 	int sampleRadius;             // Radius of the local region sampled along y-axis
 
-	protected FilterCensusTransform(int radius, ImageBorder<In> border, Class<In> imageType , ImageType<Out> outType ) {
+	protected FilterCensusTransform( int radius, ImageBorder<In> border, Class<In> imageType, ImageType<Out> outType ) {
 		this.border = border;
 		this.inputType = ImageType.single(imageType);
 		this.outType = outType;
@@ -55,8 +54,8 @@ public abstract class FilterCensusTransform<In extends ImageGray<In>, Out extend
 		int radius = 0;
 		for (int i = 0; i < sample.size; i++) {
 			Point2D_I32 p = sample.get(i);
-			radius = Math.max(radius,Math.abs(p.x));
-			radius = Math.max(radius,Math.abs(p.y));
+			radius = Math.max(radius, Math.abs(p.x));
+			radius = Math.max(radius, Math.abs(p.y));
 		}
 		return radius;
 	}

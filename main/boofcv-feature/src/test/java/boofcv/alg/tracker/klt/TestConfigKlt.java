@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.alg.tracker.klt;
 
 import boofcv.struct.StandardConfigurationChecks;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,12 +33,12 @@ public class FlipVertical_F64 implements Point2Transform2_F64 {
 
 	int height;
 
-	public FlipVertical_F64(int imageHeight) {
+	public FlipVertical_F64( int imageHeight ) {
 		this.height = imageHeight - 1;
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute( double x, double y, Point2D_F64 out ) {
 		out.x = x;
 		out.y = height - y;
 	}

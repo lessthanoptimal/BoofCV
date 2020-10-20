@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.transform.homography.HomographyPointOps_F32;
 
-
 /**
  * Distorts pixels using {@link Homography2D_F32}.
  *
@@ -37,14 +36,15 @@ public class PixelTransformHomography_F32 implements PixelTransform<Point2D_F32>
 	public PixelTransformHomography_F32() {
 	}
 
-	public PixelTransformHomography_F32(Homography2D_F32 homo) {
+	public PixelTransformHomography_F32( Homography2D_F32 homo ) {
 		this.homo.set(homo);
 	}
-	public PixelTransformHomography_F32(Homography2D_F64 homo) {
+
+	public PixelTransformHomography_F32( Homography2D_F64 homo ) {
 		set(homo);
 	}
 
-	public void set(Homography2D_F32 transform ) {
+	public void set( Homography2D_F32 transform ) {
 		this.homo.set(transform);
 	}
 
@@ -65,7 +65,7 @@ public class PixelTransformHomography_F32 implements PixelTransform<Point2D_F32>
 	}
 
 	@Override
-	public void compute(int x, int y, Point2D_F32 output) {
+	public void compute( int x, int y, Point2D_F32 output ) {
 		HomographyPointOps_F32.transform(homo, x, y, output);
 	}
 

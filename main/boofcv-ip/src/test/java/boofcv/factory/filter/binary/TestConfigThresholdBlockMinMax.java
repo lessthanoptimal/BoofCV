@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.factory.filter.binary;
 
 import boofcv.struct.StandardConfigurationChecks;

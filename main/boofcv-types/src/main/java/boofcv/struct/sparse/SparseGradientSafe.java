@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,39 +25,38 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Wraps around other {@link SparseImageGradient} classes and checks to see if
  * the image is in bounds or not.  If it is out of bounds the return value is set to one.
- * 
+ *
  * @author Peter Abeles
  */
 public class SparseGradientSafe<T extends ImageGray<T>, G extends GradientValue>
-	implements SparseImageGradient<T,G>
-{
-	SparseImageGradient<T,G> wrap;
+		implements SparseImageGradient<T, G> {
+	SparseImageGradient<T, G> wrap;
 	G zero;
-	
-	public SparseGradientSafe(SparseImageGradient<T, G> wrap) {
+
+	public SparseGradientSafe( SparseImageGradient<T, G> wrap ) {
 		this.wrap = wrap;
 
 		try {
-			zero = (G) wrap.getGradientType().getConstructor().newInstance();
+			zero = (G)wrap.getGradientType().getConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public void setImage(T input) {
+	public void setImage( T input ) {
 		wrap.setImage(input);
 	}
 
 	@Override
-	public boolean isInBounds(int x, int y) {
-		return wrap.isInBounds(x,y);
+	public boolean isInBounds( int x, int y ) {
+		return wrap.isInBounds(x, y);
 	}
 
 	@Override
-	public G compute(int x, int y) {                                                           
-		if( wrap.isInBounds(x,y))
-			return wrap.compute(x,y);
+	public G compute( int x, int y ) {
+		if (wrap.isInBounds(x, y))
+			return wrap.compute(x, y);
 		else
 			return zero;
 	}

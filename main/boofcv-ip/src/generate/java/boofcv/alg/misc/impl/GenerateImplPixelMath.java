@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 							"\t\t\t\t\toutput[indexDst] = (" + type + ")-Math.log(val - value);\n" +
 							"\t\t\t\t} else {\n" +
 							"\t\t\t\t\toutput[indexDst] = (" + type + ")Math.log(val + value);\n" +
-							"\t\t\t\t}";
+							"\t\t\t\t}\n";
 				},
 				AutoTypeImage.getFloatingTypes(), AutoTypeImage.getFloatingTypes());
 

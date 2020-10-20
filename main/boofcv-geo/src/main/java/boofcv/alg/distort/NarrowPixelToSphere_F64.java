@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,16 +33,16 @@ public class NarrowPixelToSphere_F64 implements Point2Transform3_F64 {
 	Point2Transform2_F64 pixelToNorm;
 	Point2D_F64 projected = new Point2D_F64();
 
-	public NarrowPixelToSphere_F64(Point2Transform2_F64 pixelToNorm) {
+	public NarrowPixelToSphere_F64( Point2Transform2_F64 pixelToNorm ) {
 		this.pixelToNorm = pixelToNorm;
 	}
 
 	@Override
-	public void compute(double x, double y, Point3D_F64 out) {
-		pixelToNorm.compute(x,y,projected);
+	public void compute( double x, double y, Point3D_F64 out ) {
+		pixelToNorm.compute(x, y, projected);
 
-		out.set(projected.x,projected.y,1);
-		out.scale( 1.0/out.norm() );
+		out.set(projected.x, projected.y, 1);
+		out.scale(1.0/out.norm());
 	}
 
 	@Override

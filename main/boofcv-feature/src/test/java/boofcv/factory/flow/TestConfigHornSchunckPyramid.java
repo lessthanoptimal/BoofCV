@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.factory.flow;
 
 import boofcv.struct.StandardConfigurationChecks;

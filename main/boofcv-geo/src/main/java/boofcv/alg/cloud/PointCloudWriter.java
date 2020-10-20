@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,9 @@ import org.ddogleg.struct.GrowQueue_I32;
 public interface PointCloudWriter {
 	void init( int estimatedSize );
 
-	void add( double x , double y , double z );
+	void add( double x, double y, double z );
 
-	void add( double x , double y , double z , int rgb );
+	void add( double x, double y, double z, int rgb );
 
 	class CloudArraysF32 implements PointCloudWriter {
 		// Storage for point cloud
@@ -44,7 +44,7 @@ public interface PointCloudWriter {
 		public GrowQueue_I32 cloudRgb = new GrowQueue_I32();
 
 		@Override
-		public void init(int estimatedSize) {
+		public void init( int estimatedSize ) {
 			cloudRgb.setMaxSize(estimatedSize);
 			cloudXyz.setMaxSize(estimatedSize*3);
 			cloudRgb.reset();
@@ -52,14 +52,14 @@ public interface PointCloudWriter {
 		}
 
 		@Override
-		public void add(double x, double y, double z) {
+		public void add( double x, double y, double z ) {
 			cloudXyz.add((float)x);
 			cloudXyz.add((float)y);
 			cloudXyz.add((float)z);
 		}
 
 		@Override
-		public void add(double x, double y, double z, int rgb) {
+		public void add( double x, double y, double z, int rgb ) {
 			cloudXyz.add((float)x);
 			cloudXyz.add((float)y);
 			cloudXyz.add((float)z);
@@ -67,82 +67,82 @@ public interface PointCloudWriter {
 		}
 	}
 
-	static PointCloudWriter wrapF32(FastQueue<Point3D_F32> cloud) {
+	static PointCloudWriter wrapF32( FastQueue<Point3D_F32> cloud ) {
 		return new PointCloudWriter() {
 			@Override
-			public void init(int estimatedSize) {
+			public void init( int estimatedSize ) {
 				cloud.growArray(estimatedSize);
 				cloud.reset();
 			}
 
 			@Override
-			public void add(double x, double y, double z) {
+			public void add( double x, double y, double z ) {
 				cloud.grow().set((float)x, (float)y, (float)z);
 			}
 
 			@Override
-			public void add(double x, double y, double z, int rgb) {
+			public void add( double x, double y, double z, int rgb ) {
 				cloud.grow().set((float)x, (float)y, (float)z);
 			}
 		};
 	}
 
-	static PointCloudWriter wrapF64(FastQueue<Point3D_F64> cloud) {
+	static PointCloudWriter wrapF64( FastQueue<Point3D_F64> cloud ) {
 		return new PointCloudWriter() {
 			@Override
-			public void init(int estimatedSize) {
+			public void init( int estimatedSize ) {
 				cloud.growArray(estimatedSize);
 				cloud.reset();
 			}
 
 			@Override
-			public void add(double x, double y, double z) {
+			public void add( double x, double y, double z ) {
 				cloud.grow().set(x, y, z);
 			}
 
 			@Override
-			public void add(double x, double y, double z, int rgb) {
+			public void add( double x, double y, double z, int rgb ) {
 				cloud.grow().set(x, y, z);
 			}
 		};
 	}
 
-	static PointCloudWriter wrapF32RGB(FastQueue<Point3dRgbI_F32> cloud) {
+	static PointCloudWriter wrapF32RGB( FastQueue<Point3dRgbI_F32> cloud ) {
 		return new PointCloudWriter() {
 			@Override
-			public void init(int estimatedSize) {
+			public void init( int estimatedSize ) {
 				cloud.growArray(estimatedSize);
 				cloud.reset();
 			}
 
 			@Override
-			public void add(double x, double y, double z) {
+			public void add( double x, double y, double z ) {
 				cloud.grow().set((float)x, (float)y, (float)z);
 			}
 
 			@Override
-			public void add(double x, double y, double z, int rgb) {
-				cloud.grow().set((float)x, (float)y, (float)z,rgb);
+			public void add( double x, double y, double z, int rgb ) {
+				cloud.grow().set((float)x, (float)y, (float)z, rgb);
 			}
 		};
 	}
 
-	static PointCloudWriter wrapF64RGB(FastQueue<Point3dRgbI_F64> cloud) {
+	static PointCloudWriter wrapF64RGB( FastQueue<Point3dRgbI_F64> cloud ) {
 		return new PointCloudWriter() {
 			@Override
-			public void init(int estimatedSize) {
+			public void init( int estimatedSize ) {
 				cloud.growArray(estimatedSize);
 				cloud.reset();
 			}
 
 			@Override
-			public void add(double x, double y, double z) {
+			public void add( double x, double y, double z ) {
 				cloud.grow().set(x, y, z);
 			}
 
 			@Override
-			public void add(double x, double y, double z, int rgb) {
-				cloud.grow().set(x, y, z,rgb);
+			public void add( double x, double y, double z, int rgb ) {
+				cloud.grow().set(x, y, z, rgb);
 			}
 		};
 	}

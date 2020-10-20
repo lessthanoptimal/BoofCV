@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.abst.feature.detdesc;
 
 import boofcv.struct.StandardConfigurationChecks;

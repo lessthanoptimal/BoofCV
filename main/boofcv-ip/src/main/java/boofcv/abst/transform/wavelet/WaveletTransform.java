@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,21 +23,18 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
-
 /**
  * <p>
  * Easy to use interface for performing a multilevel wavelet transformations.  Internally it handles
  * all buffer maintenance and type conversion.  To create a new instance of this interface use
  * {@link boofcv.factory.transform.wavelet.FactoryWaveletTransform}.
  * </p>
- * 
- * @see boofcv.alg.transform.wavelet.WaveletTransformOps
  *
  * @author Peter Abeles
+ * @see boofcv.alg.transform.wavelet.WaveletTransformOps
  */
 public interface WaveletTransform
-		<O extends ImageGray<O>, T extends ImageGray<T>, C extends WlCoef >
-{
+		<O extends ImageGray<O>, T extends ImageGray<T>, C extends WlCoef> {
 	/**
 	 * Computes the wavelet transform of the input image.  If no output/transform image is provided a new image is
 	 * created and returned.
@@ -46,7 +43,7 @@ public interface WaveletTransform
 	 * @param transformed Where the computed transform is stored.  If null a new image is created. Modified.
 	 * @return Wavelet transform.
 	 */
-	public T transform( O original , T transformed );
+	public T transform( O original, T transformed );
 
 	/**
 	 * Applies the inverse wavelet transform to the specified image.
@@ -54,7 +51,7 @@ public interface WaveletTransform
 	 * @param transformed Wavelet transform of the image. Not modified.
 	 * @param original Reconstructed image from transform. Modified.
 	 */
-	public void invert( T transformed , O original );
+	public void invert( T transformed, O original );
 
 	/**
 	 * Number of levels in the wavelet transform.

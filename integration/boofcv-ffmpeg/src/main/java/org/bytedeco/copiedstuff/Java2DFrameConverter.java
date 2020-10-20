@@ -45,7 +45,6 @@ import java.awt.color.ColorSpace;
 import java.awt.image.*;
 import java.nio.*;
 
-// CHECKSTYLE:OFF
 /**
  * A utility class to copy data between {@link Frame} and {@link BufferedImage}.
  * Since {@link BufferedImage} does not support NIO buffers, we cannot share

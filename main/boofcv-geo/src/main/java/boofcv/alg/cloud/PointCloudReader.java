@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,41 +41,41 @@ public interface PointCloudReader {
 	/**
 	 * Copies the point
 	 */
-	void get(int index , Point3D_F32 point );
+	void get( int index, Point3D_F32 point );
 
 	/**
 	 * Copies the point
 	 */
-	void get(int index , Point3D_F64 point );
+	void get( int index, Point3D_F64 point );
 
 	/**
 	 * RGB value of point
 	 */
 	int getRGB( int index );
 
-	static PointCloudReader wrap3FRGB( float[] cloud, float[] rgb, int offset , int length ) {
+	static PointCloudReader wrap3FRGB( float[] cloud, float[] rgb, int offset, int length ) {
 		return new PointCloudReader() {
 			@Override
 			public int size() {return length;}
 
 			@Override
-			public void get(int index, Point3D_F32 point) {
+			public void get( int index, Point3D_F32 point ) {
 				int i = offset + index*3;
-				point.set(cloud[i],cloud[i+1],cloud[i+2]);
+				point.set(cloud[i], cloud[i + 1], cloud[i + 2]);
 			}
 
 			@Override
-			public void get(int index, Point3D_F64 point) {
+			public void get( int index, Point3D_F64 point ) {
 				int i = offset + index*3;
-				point.set(cloud[i],cloud[i+1],cloud[i+2]);
+				point.set(cloud[i], cloud[i + 1], cloud[i + 2]);
 			}
 
 			@Override
-			public int getRGB(int index) {
+			public int getRGB( int index ) {
 				int i = offset + index*3;
-				int r = (int)(rgb[i  ]*255);
-				int g = (int)(rgb[i+1]*255);
-				int b = (int)(rgb[i+2]*255);
+				int r = (int)(rgb[i]*255);
+				int g = (int)(rgb[i + 1]*255);
+				int b = (int)(rgb[i + 2]*255);
 				return (r << 16) | (g << 8) | b;
 			}
 		};
@@ -87,13 +87,13 @@ public interface PointCloudReader {
 			public int size() {return cloud.size();}
 
 			@Override
-			public void get(int index, Point3D_F32 point) {point.set(cloud.get(index));}
+			public void get( int index, Point3D_F32 point ) {point.set(cloud.get(index));}
 
 			@Override
-			public void get(int index, Point3D_F64 point) {convert(cloud.get(index),point);}
+			public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
 
 			@Override
-			public int getRGB(int index) {return 0;}
+			public int getRGB( int index ) {return 0;}
 		};
 	}
 
@@ -103,13 +103,13 @@ public interface PointCloudReader {
 			public int size() {return cloud.size();}
 
 			@Override
-			public void get(int index, Point3D_F32 point) {convert(cloud.get(index),point);}
+			public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
 
 			@Override
-			public void get(int index, Point3D_F64 point) {point.set(cloud.get(index));}
+			public void get( int index, Point3D_F64 point ) {point.set(cloud.get(index));}
 
 			@Override
-			public int getRGB(int index) {return 0;}
+			public int getRGB( int index ) {return 0;}
 		};
 	}
 
@@ -119,13 +119,13 @@ public interface PointCloudReader {
 			public int size() {return cloud.size();}
 
 			@Override
-			public void get(int index, Point3D_F32 point) {point.set(cloud.get(index));}
+			public void get( int index, Point3D_F32 point ) {point.set(cloud.get(index));}
 
 			@Override
-			public void get(int index, Point3D_F64 point) {convert(cloud.get(index),point);}
+			public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
 
 			@Override
-			public int getRGB(int index) {return cloud.get(index).rgb;}
+			public int getRGB( int index ) {return cloud.get(index).rgb;}
 		};
 	}
 
@@ -135,13 +135,13 @@ public interface PointCloudReader {
 			public int size() {return cloud.size();}
 
 			@Override
-			public void get(int index, Point3D_F32 point) {convert(cloud.get(index),point);}
+			public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
 
 			@Override
-			public void get(int index, Point3D_F64 point) {point.set(cloud.get(index));}
+			public void get( int index, Point3D_F64 point ) {point.set(cloud.get(index));}
 
 			@Override
-			public int getRGB(int index) {return cloud.get(index).rgb;}
+			public int getRGB( int index ) {return cloud.get(index).rgb;}
 		};
 	}
 }

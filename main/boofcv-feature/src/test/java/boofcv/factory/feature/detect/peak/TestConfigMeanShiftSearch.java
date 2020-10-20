@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.factory.feature.detect.peak;
 
 import boofcv.struct.StandardConfigurationChecks;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,19 +34,18 @@ public class FlipVerticalNorm2_F64 implements Point2Transform2_F64 {
 	Point2Transform2_F64 pixelToNormalized;
 	int height;
 
-	public FlipVerticalNorm2_F64(Point2Transform2_F64 pixelToNormalized, int imageHeight) {
+	public FlipVerticalNorm2_F64( Point2Transform2_F64 pixelToNormalized, int imageHeight ) {
 		this.pixelToNormalized = pixelToNormalized;
 		this.height = imageHeight - 1;
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute( double x, double y, Point2D_F64 out ) {
 		pixelToNormalized.compute(x, height - y, out);
 	}
 
 	@Override
 	public FlipVerticalNorm2_F64 copyConcurrent() {
-		return new FlipVerticalNorm2_F64(pixelToNormalized.copyConcurrent(),height);
+		return new FlipVerticalNorm2_F64(pixelToNormalized.copyConcurrent(), height);
 	}
-
 }

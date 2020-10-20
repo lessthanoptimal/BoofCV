@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,6 @@ import java.util.List;
  */
 public class LensDistortionOps_F64 {
 
-
 	/**
 	 * Creates a {@link Point2Transform2_F32} for converting pixels from original camera model into a new synthetic
 	 * model.  The scaling of the image can be adjusted to ensure certain visibility requirements.
@@ -47,43 +46,42 @@ public class LensDistortionOps_F64 {
 	 * @param paramOriginal Camera model for the current image
 	 * @param paramDesired Desired camera model for the distorted image
 	 * @param desiredToOriginal If true then the transform's input is assumed to be pixels in the desired
-	 *                       image and the output will be in original image, if false then the reverse transform
-	 *                       is returned.
+	 * image and the output will be in original image, if false then the reverse transform
+	 * is returned.
 	 * @param paramMod The modified camera model to meet the requested visibility requirements.  Null if you don't want it.
 	 * @return The requested transform
 	 */
 	public static <O extends CameraPinhole, D extends CameraPinhole>
-	Point2Transform2_F64 transformChangeModel(AdjustmentType type,
-											  O paramOriginal,
-											  D paramDesired,
-											  boolean desiredToOriginal,
-											  D paramMod)
-	{
+	Point2Transform2_F64 transformChangeModel( AdjustmentType type,
+											   O paramOriginal,
+											   D paramDesired,
+											   boolean desiredToOriginal,
+											   D paramMod ) {
 		LensDistortionNarrowFOV original = LensDistortionFactory.narrow(paramOriginal);
 		LensDistortionNarrowFOV desired = LensDistortionFactory.narrow(paramDesired);
 
 		Point2Transform2_F64 ori_p_to_n = original.undistort_F64(true, false);
 		Point2Transform2_F64 des_n_to_p = desired.distort_F64(false, true);
 
-		Point2Transform2_F64 ori_to_des = new SequencePoint2Transform2_F64(ori_p_to_n,des_n_to_p);
+		Point2Transform2_F64 ori_to_des = new SequencePoint2Transform2_F64(ori_p_to_n, des_n_to_p);
 
 		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound;
-		if( type == AdjustmentType.FULL_VIEW ) {
+		if (type == AdjustmentType.FULL_VIEW) {
 			bound = DistortImageOps.boundBox_F64(paramOriginal.width, paramOriginal.height,
-					new PointToPixelTransform_F64(ori_to_des),work);
-		} else if( type == AdjustmentType.EXPAND) {
+					new PointToPixelTransform_F64(ori_to_des), work);
+		} else if (type == AdjustmentType.EXPAND) {
 			bound = LensDistortionOps_F64.boundBoxInside(paramOriginal.width, paramOriginal.height,
-					new PointToPixelTransform_F64(ori_to_des),work);
+					new PointToPixelTransform_F64(ori_to_des), work);
 			// ensure there are no strips of black
 			LensDistortionOps_F64.roundInside(bound);
-		} else if( type == AdjustmentType.CENTER) {
+		} else if (type == AdjustmentType.CENTER) {
 			bound = LensDistortionOps_F64.centerBoxInside(paramOriginal.width, paramOriginal.height,
-					new PointToPixelTransform_F64(ori_to_des),work);
-		} else if( type == AdjustmentType.NONE ) {
-			bound = new RectangleLength2D_F64(0,0,paramDesired.width, paramDesired.height);
+					new PointToPixelTransform_F64(ori_to_des), work);
+		} else if (type == AdjustmentType.NONE) {
+			bound = new RectangleLength2D_F64(0, 0, paramDesired.width, paramDesired.height);
 		} else {
-			throw new IllegalArgumentException("Unsupported type "+type);
+			throw new IllegalArgumentException("Unsupported type " + type);
 		}
 
 		double scaleX = bound.width/paramDesired.width;
@@ -91,35 +89,35 @@ public class LensDistortionOps_F64 {
 
 		double scale;
 
-		if( type == AdjustmentType.FULL_VIEW ) {
+		if (type == AdjustmentType.FULL_VIEW) {
 			scale = Math.max(scaleX, scaleY);
-		} else if( type == AdjustmentType.EXPAND) {
+		} else if (type == AdjustmentType.EXPAND) {
 			scale = Math.min(scaleX, scaleY);
-		} else if( type == AdjustmentType.CENTER) {
+		} else if (type == AdjustmentType.CENTER) {
 			scale = Math.max(scaleX, scaleY);
 		} else {
 			scale = 1.0;
 		}
 
-		double deltaX = (bound.x0 + (scaleX-scale)*paramDesired.width/ 2.0 );
-		double deltaY = (bound.y0 + (scaleY-scale)*paramDesired.height/ 2.0 );
+		double deltaX = (bound.x0 + (scaleX - scale)*paramDesired.width/2.0);
+		double deltaY = (bound.y0 + (scaleY - scale)*paramDesired.height/2.0);
 
 		// adjustment matrix
-		DMatrixRMaj A = new DMatrixRMaj(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+		DMatrixRMaj A = new DMatrixRMaj(3, 3, true, scale, 0, deltaX, 0, scale, deltaY, 0, 0, 1);
 		DMatrixRMaj A_inv = new DMatrixRMaj(3, 3);
 		if (!CommonOps_DDRM.invert(A, A_inv)) {
 			throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
 		}
 
-		if( paramMod != null ) {
+		if (paramMod != null) {
 			PerspectiveOps.adjustIntrinsic(paramDesired, A_inv, paramMod);
 		}
 
-		if( desiredToOriginal ) {
+		if (desiredToOriginal) {
 			Point2Transform2_F64 des_p_to_n = desired.undistort_F64(true, false);
 			Point2Transform2_F64 ori_n_to_p = original.distort_F64(false, true);
 			PointTransformHomography_F64 adjust = new PointTransformHomography_F64(A);
-			return new SequencePoint2Transform2_F64(adjust,des_p_to_n,ori_n_to_p);
+			return new SequencePoint2Transform2_F64(adjust, des_p_to_n, ori_n_to_p);
 		} else {
 			PointTransformHomography_F64 adjust = new PointTransformHomography_F64(A_inv);
 			return new SequencePoint2Transform2_F64(ori_to_des, adjust);
@@ -134,27 +132,26 @@ public class LensDistortionOps_F64 {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static RectangleLength2D_F64 boundBoxInside(int srcWidth, int srcHeight,
-													   PixelTransform<Point2D_F64> transform,
-													   Point2D_F64 work )
-	{
+	public static RectangleLength2D_F64 boundBoxInside( int srcWidth, int srcHeight,
+														PixelTransform<Point2D_F64> transform,
+														Point2D_F64 work ) {
 		List<Point2D_F64> points = computeBoundingPoints(srcWidth, srcHeight, transform, work);
 		Point2D_F64 center = new Point2D_F64();
-		UtilPoint2D_F64.mean(points,center);
+		UtilPoint2D_F64.mean(points, center);
 
-		double x0,x1,y0,y1;
+		double x0, x1, y0, y1;
 		x0 = y0 = Float.MAX_VALUE;
 		x1 = y1 = -Float.MAX_VALUE;
 
 		for (int i = 0; i < points.size(); i++) {
 			Point2D_F64 p = points.get(i);
-			if( p.x < x0 )
+			if (p.x < x0)
 				x0 = p.x;
-			if( p.x > x1 )
+			if (p.x > x1)
 				x1 = p.x;
-			if( p.y < y0 )
+			if (p.y < y0)
 				y0 = p.y;
-			if( p.y > y1 )
+			if (p.y > y1)
 				y1 = p.y;
 		}
 
@@ -171,18 +168,18 @@ public class LensDistortionOps_F64 {
 
 		for (int i = 0; i < points.size(); i++) {
 			Point2D_F64 p = points.get(i);
-			double dx = p.x-center.x;
-			double dy = p.y-center.y;
+			double dx = p.x - center.x;
+			double dy = p.y - center.y;
 
 			// see if the point is inside the box
-			if( dx > x0 && dy > y0 && dx < x1 && dy < y1 ) {
+			if (dx > x0 && dy > y0 && dx < x1 && dy < y1) {
 				// find smallest reduction in side length and closest to original rectangle
-				double d0 = (double) Math.abs(dx - x0) + x0 - ox0;
-				double d1 = (double) Math.abs(dx - x1) + ox1 - x1;
-				double d2 = (double) Math.abs(dy - y0) + y0 - oy0;
-				double d3 = (double) Math.abs(dy - y1) + oy1 - y1;
+				double d0 = (double)Math.abs(dx - x0) + x0 - ox0;
+				double d1 = (double)Math.abs(dx - x1) + ox1 - x1;
+				double d2 = (double)Math.abs(dy - y0) + y0 - oy0;
+				double d3 = (double)Math.abs(dy - y1) + oy1 - y1;
 
-				if ( d0 <= d1 && d0 <= d2 && d0 <= d3) {
+				if (d0 <= d1 && d0 <= d2 && d0 <= d3) {
 					x0 = dx;
 				} else if (d1 <= d2 && d1 <= d3) {
 					x1 = dx;
@@ -194,7 +191,7 @@ public class LensDistortionOps_F64 {
 			}
 		}
 
-		return new RectangleLength2D_F64(x0+center.x,y0+center.y,x1-x0,y1-y0);
+		return new RectangleLength2D_F64(x0 + center.x, y0 + center.y, x1 - x0, y1 - y0);
 	}
 
 	/**
@@ -205,61 +202,60 @@ public class LensDistortionOps_F64 {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static RectangleLength2D_F64 centerBoxInside(int srcWidth, int srcHeight,
-														PixelTransform<Point2D_F64> transform ,
-														Point2D_F64 work ) {
+	public static RectangleLength2D_F64 centerBoxInside( int srcWidth, int srcHeight,
+														 PixelTransform<Point2D_F64> transform,
+														 Point2D_F64 work ) {
 
 		List<Point2D_F64> points = computeBoundingPoints(srcWidth, srcHeight, transform, work);
 
 		Point2D_F64 center = new Point2D_F64();
-		UtilPoint2D_F64.mean(points,center);
+		UtilPoint2D_F64.mean(points, center);
 
-		double x0,x1,y0,y1;
-		double bx0,bx1,by0,by1;
-		x0=x1=y0=y1=0;
-		bx0=bx1=by0=by1=Double.MAX_VALUE;
+		double x0, x1, y0, y1;
+		double bx0, bx1, by0, by1;
+		x0 = x1 = y0 = y1 = 0;
+		bx0 = bx1 = by0 = by1 = Double.MAX_VALUE;
 
 		for (int i = 0; i < points.size(); i++) {
 			Point2D_F64 p = points.get(i);
-			double dx = p.x-center.x;
-			double dy = p.y-center.y;
+			double dx = p.x - center.x;
+			double dy = p.y - center.y;
 			double adx = Math.abs(dx);
 			double ady = Math.abs(dy);
 
-			if( adx < ady ) {
-				if( dy < 0 ) {
-					if( adx < by0 ) {
+			if (adx < ady) {
+				if (dy < 0) {
+					if (adx < by0) {
 						by0 = adx;
 						y0 = dy;
 					}
- 				} else {
-					if( adx < by1 ) {
+				} else {
+					if (adx < by1) {
 						by1 = adx;
 						y1 = dy;
 					}
 				}
 			} else {
-				if( dx < 0 ) {
-					if( ady < bx0 ) {
+				if (dx < 0) {
+					if (ady < bx0) {
 						bx0 = ady;
 						x0 = dx;
 					}
 				} else {
-					if( ady < bx1 ) {
+					if (ady < bx1) {
 						bx1 = ady;
 						x1 = dx;
 					}
 				}
-
 			}
 		}
 
-		return new RectangleLength2D_F64(x0+center.x,y0+center.y,x1-x0,y1-y0);
+		return new RectangleLength2D_F64(x0 + center.x, y0 + center.y, x1 - x0, y1 - y0);
 	}
 
-	private static List<Point2D_F64> computeBoundingPoints(int srcWidth, int srcHeight,
-														   PixelTransform<Point2D_F64> transform,
-														   Point2D_F64 work ) {
+	private static List<Point2D_F64> computeBoundingPoints( int srcWidth, int srcHeight,
+															PixelTransform<Point2D_F64> transform,
+															Point2D_F64 work ) {
 		List<Point2D_F64> points = new ArrayList<>();
 
 		for (int x = 0; x < srcWidth; x++) {
@@ -285,12 +281,12 @@ public class LensDistortionOps_F64 {
 	public static void roundInside( RectangleLength2D_F64 bound ) {
 		double x0 = Math.ceil(bound.x0);
 		double y0 = Math.ceil(bound.y0);
-		double x1 = Math.floor(bound.x0+bound.width);
-		double y1 = Math.floor(bound.y0+bound.height);
+		double x1 = Math.floor(bound.x0 + bound.width);
+		double y1 = Math.floor(bound.y0 + bound.height);
 
 		bound.x0 = x0;
 		bound.y0 = y0;
-		bound.width = x1-x0;
-		bound.height = y1-y0;
+		bound.width = x1 - x0;
+		bound.height = y1 - y0;
 	}
 }

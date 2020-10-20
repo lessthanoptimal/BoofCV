@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
-
 /**
  * <p>
  * Provides common function for distorting images.
@@ -49,24 +48,23 @@ public class DistortImageOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static RectangleLength2D_I32 boundBox( int srcWidth , int srcHeight ,
-												  int dstWidth , int dstHeight ,
+	public static RectangleLength2D_I32 boundBox( int srcWidth, int srcHeight,
+												  int dstWidth, int dstHeight,
 												  Point2D_F32 work,
-												  PixelTransform<Point2D_F32> transform )
-	{
-		RectangleLength2D_I32 ret = boundBox(srcWidth,srcHeight,work,transform);
+												  PixelTransform<Point2D_F32> transform ) {
+		RectangleLength2D_I32 ret = boundBox(srcWidth, srcHeight, work, transform);
 
 		int x0 = ret.x0;
 		int y0 = ret.y0;
 		int x1 = ret.x0 + ret.width;
 		int y1 = ret.y0 + ret.height;
 
-		if( x0 < 0 ) x0 = 0;
-		if( x1 > dstWidth) x1 = dstWidth;
-		if( y0 < 0 ) y0 = 0;
-		if( y1 > dstHeight) y1 = dstHeight;
+		if (x0 < 0) x0 = 0;
+		if (x1 > dstWidth) x1 = dstWidth;
+		if (y0 < 0) y0 = 0;
+		if (y1 > dstHeight) y1 = dstHeight;
 
-		return new RectangleLength2D_I32(x0,y0,x1-x0,y1-y0);
+		return new RectangleLength2D_I32(x0, y0, x1 - x0, y1 - y0);
 	}
 
 	/**
@@ -78,35 +76,34 @@ public class DistortImageOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static RectangleLength2D_I32 boundBox( int srcWidth , int srcHeight ,
+	public static RectangleLength2D_I32 boundBox( int srcWidth, int srcHeight,
 												  Point2D_F32 work,
-												  PixelTransform<Point2D_F32> transform )
-	{
-		int x0,y0,x1,y1;
+												  PixelTransform<Point2D_F32> transform ) {
+		int x0, y0, x1, y1;
 
-		transform.compute(0,0,work);
-		x0=x1=(int)work.x;
-		y0=y1=(int)work.y;
+		transform.compute(0, 0, work);
+		x0 = x1 = (int)work.x;
+		y0 = y1 = (int)work.y;
 
-		for( int i = 1; i < 4; i++ ) {
-			if( i == 1 )
-				transform.compute(srcWidth,0,work);
-			else if( i == 2 )
-				transform.compute(0,srcHeight,work);
-			else if( i == 3 )
-				transform.compute(srcWidth-1,srcHeight,work);
+		for (int i = 1; i < 4; i++) {
+			if (i == 1)
+				transform.compute(srcWidth, 0, work);
+			else if (i == 2)
+				transform.compute(0, srcHeight, work);
+			else if (i == 3)
+				transform.compute(srcWidth - 1, srcHeight, work);
 
-			if( work.x < x0 )
+			if (work.x < x0)
 				x0 = (int)work.x;
-			else if( work.x > x1 )
+			else if (work.x > x1)
 				x1 = (int)work.x;
-			if( work.y < y0 )
+			if (work.y < y0)
 				y0 = (int)work.y;
-			else if( work.y > y1 )
+			else if (work.y > y1)
 				y1 = (int)work.y;
 		}
 
-		return new RectangleLength2D_I32(x0,y0,x1-x0,y1-y0);
+		return new RectangleLength2D_I32(x0, y0, x1 - x0, y1 - y0);
 	}
 
 	/**
@@ -118,40 +115,39 @@ public class DistortImageOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static RectangleLength2D_F32 boundBox_F32( int srcWidth , int srcHeight ,
-													  PixelTransform<Point2D_F32> transform ,
-													  Point2D_F32 transformed )
-	{
-		ImageRectangle_F32 r=new ImageRectangle_F32();
+	public static RectangleLength2D_F32 boundBox_F32( int srcWidth, int srcHeight,
+													  PixelTransform<Point2D_F32> transform,
+													  Point2D_F32 transformed ) {
+		ImageRectangle_F32 r = new ImageRectangle_F32();
 
-		r.x0=r.y0=Float.MAX_VALUE;
-		r.x1=r.y1=-Float.MAX_VALUE;
+		r.x0 = r.y0 = Float.MAX_VALUE;
+		r.x1 = r.y1 = -Float.MAX_VALUE;
 
-		for( int y = 0; y < srcHeight; y++ ) {
+		for (int y = 0; y < srcHeight; y++) {
 			transform.compute(0, y, transformed);
 			updateBoundBox(transformed, r);
 			transform.compute(srcWidth, y, transformed);
 			updateBoundBox(transformed, r);
 		}
 
-		for( int x = 0; x < srcWidth; x++ ) {
+		for (int x = 0; x < srcWidth; x++) {
 			transform.compute(x, 0, transformed);
 			updateBoundBox(transformed, r);
 			transform.compute(x, srcHeight, transformed);
 			updateBoundBox(transformed, r);
 		}
 
-		return new RectangleLength2D_F32(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
+		return new RectangleLength2D_F32(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
 	}
 
-	private static void updateBoundBox(Point2D_F32 p, ImageRectangle_F32 r) {
-		if( p.x < r.x0 )
+	private static void updateBoundBox( Point2D_F32 p, ImageRectangle_F32 r ) {
+		if (p.x < r.x0)
 			r.x0 = p.x;
-		else if( p.x > r.x1 )
+		else if (p.x > r.x1)
 			r.x1 = p.x;
-		if( p.y < r.y0 )
+		if (p.y < r.y0)
 			r.y0 = p.y;
-		else if( p.y > r.y1 )
+		else if (p.y > r.y1)
 			r.y1 = p.y;
 	}
 
@@ -164,40 +160,39 @@ public class DistortImageOps {
 	 * @param transform Transform being applied to the image
 	 * @return Bounding box
 	 */
-	public static RectangleLength2D_F64 boundBox_F64( int srcWidth , int srcHeight ,
-													  PixelTransform<Point2D_F64> transform ,
-													  Point2D_F64 transformed )
-	{
+	public static RectangleLength2D_F64 boundBox_F64( int srcWidth, int srcHeight,
+													  PixelTransform<Point2D_F64> transform,
+													  Point2D_F64 transformed ) {
 		ImageRectangle_F64 r = new ImageRectangle_F64();
 
-		r.x0=r.y0=Double.MAX_VALUE;
-		r.x1=r.y1=-Double.MAX_VALUE;
+		r.x0 = r.y0 = Double.MAX_VALUE;
+		r.x1 = r.y1 = -Double.MAX_VALUE;
 
-		for( int y = 0; y < srcHeight; y++ ) {
-			transform.compute(0, y,transformed);
+		for (int y = 0; y < srcHeight; y++) {
+			transform.compute(0, y, transformed);
 			updateBoundBox(transformed, r);
-			transform.compute(srcWidth, y,transformed);
+			transform.compute(srcWidth, y, transformed);
 			updateBoundBox(transformed, r);
 		}
 
-		for( int x = 0; x < srcWidth; x++ ) {
-			transform.compute(x, 0,transformed);
+		for (int x = 0; x < srcWidth; x++) {
+			transform.compute(x, 0, transformed);
 			updateBoundBox(transformed, r);
-			transform.compute(x, srcHeight,transformed);
+			transform.compute(x, srcHeight, transformed);
 			updateBoundBox(transformed, r);
 		}
 
-		return new RectangleLength2D_F64(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
+		return new RectangleLength2D_F64(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
 	}
 
-	private static void updateBoundBox(Point2D_F64 transform, ImageRectangle_F64 r) {
-		if( transform.x < r.x0 )
+	private static void updateBoundBox( Point2D_F64 transform, ImageRectangle_F64 r ) {
+		if (transform.x < r.x0)
 			r.x0 = transform.x;
-		else if( transform.x > r.x1 )
+		else if (transform.x > r.x1)
 			r.x1 = transform.x;
-		if( transform.y < r.y0 )
+		if (transform.y < r.y0)
 			r.y0 = transform.y;
-		else if( transform.y > r.y1 )
+		else if (transform.y > r.y1)
 			r.y1 = transform.y;
 	}
 }

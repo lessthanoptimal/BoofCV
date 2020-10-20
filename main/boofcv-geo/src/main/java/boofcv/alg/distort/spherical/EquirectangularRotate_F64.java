@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,14 +33,14 @@ public class EquirectangularRotate_F64 extends EquirectangularDistortBase_F64 {
 	 * @param height Image height
 	 */
 	@Override
-	public void setEquirectangularShape( int width , int height ) {
+	public void setEquirectangularShape( int width, int height ) {
 		super.setEquirectangularShape(width, height);
 		declareVectors(width, height);
 
 		// precompute vectors for each pixel
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				tools.equiToNormFV(x,y,vectors[y*width+x]);
+				tools.equiToNormFV(x, y, vectors[y*width + x]);
 			}
 		}
 	}

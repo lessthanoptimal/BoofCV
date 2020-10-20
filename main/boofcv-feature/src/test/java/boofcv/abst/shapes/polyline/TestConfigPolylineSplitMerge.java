@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.abst.shapes.polyline;
 
 import boofcv.struct.StandardConfigurationChecks;

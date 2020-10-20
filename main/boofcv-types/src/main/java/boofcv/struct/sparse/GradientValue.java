@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.sparse;
 
-
 /**
  * Image gradient at a specific pixel.  Output of sparse gradient algorithms.
  *
@@ -26,15 +25,15 @@ package boofcv.struct.sparse;
  */
 public interface GradientValue {
 
-	public void set( double dx , double dy );
+	void set( double dx, double dy );
 
 	/**
 	 * Derivative along the x-axis
 	 */
-	public double getX();
+	double getX();
 
 	/**
 	 * Derivative along the y-axis
 	 */
-	public double getY();
+	double getY();
 }

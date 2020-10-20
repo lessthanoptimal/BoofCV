@@ -57,21 +57,21 @@ import java.util.List;
  */
 public class FundamentalLinear7 extends FundamentalLinear {
 	// extracted from the null space of A
-	protected DMatrixRMaj F1 = new DMatrixRMaj(3,3);
-	protected DMatrixRMaj F2 = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj F1 = new DMatrixRMaj(3, 3);
+	protected DMatrixRMaj F2 = new DMatrixRMaj(3, 3);
 
-	private DMatrixRMaj nullspace = new DMatrixRMaj(1,1);
+	private final DMatrixRMaj nullspace = new DMatrixRMaj(1, 1);
 
 	// temporary storage for cubic coefficients
-	private Polynomial poly = new Polynomial(4);
-	private PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD,4);
+	private final Polynomial poly = new Polynomial(4);
+	private final PolynomialRoots rootFinder = PolynomialSolver.createRootFinder(RootFinderType.EVD, 4);
 
 	/**
 	 * When computing the essential matrix normalization is optional because pixel coordinates
 	 *
 	 * @param computeFundamental true it computes a fundamental matrix and false for essential
 	 */
-	public FundamentalLinear7(boolean computeFundamental) {
+	public FundamentalLinear7( boolean computeFundamental ) {
 		super(computeFundamental);
 	}
 
@@ -81,13 +81,13 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * </p>
 	 *
 	 * @param points Input: List of corresponding image coordinates. In pixel for fundamental matrix or
-	 *               normalized coordinates for essential matrix.
+	 * normalized coordinates for essential matrix.
 	 * @param solutions Output: Storage for the found solutions.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points , FastQueue<DMatrixRMaj> solutions ) {
-		if( points.size() != 7 )
-			throw new IllegalArgumentException("Must be exactly 7 points. Not "+points.size()+" you gelatinous piece of pond scum.");
+	public boolean process( List<AssociatedPair> points, FastQueue<DMatrixRMaj> solutions ) {
+		if (points.size() != 7)
+			throw new IllegalArgumentException("Must be exactly 7 points. Not " + points.size() + " you gelatinous piece of pond scum.");
 
 		// reset data structures
 		solutions.reset();
@@ -97,20 +97,20 @@ public class FundamentalLinear7 extends FundamentalLinear {
 		LowLevelMultiViewOps.computeNormalization(points, N1, N2);
 
 		// extract F1 and F2 from two null spaces
-		createA(points,A);
+		createA(points, A);
 
 		if (!process(A))
 			return false;
 
 		// Undo normalization on F
-		PerspectiveOps.multTranA(N2.matrix(),F1,N1.matrix(),F1);
-		PerspectiveOps.multTranA(N2.matrix(),F2,N1.matrix(),F2);
+		PerspectiveOps.multTranA(N2.matrix(), F1, N1.matrix(), F1);
+		PerspectiveOps.multTranA(N2.matrix(), F2, N1.matrix(), F2);
 
 		// compute polynomial coefficients
 		computeCoefficients(F1, F2, poly.c);
 
 		// Find polynomial roots and solve for Fundamental matrices
-		computeSolutions( solutions );
+		computeSolutions(solutions);
 
 		return true;
 	}
@@ -118,8 +118,8 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	/**
 	 * Computes the SVD of A and extracts the essential/fundamental matrix from its null space
 	 */
-	private boolean process(DMatrixRMaj A) {
-		if( !solverNull.process(A,2,nullspace) )
+	private boolean process( DMatrixRMaj A ) {
+		if (!solverNull.process(A, 2, nullspace))
 			return false;
 
 		SpecializedOps_DDRM.subvector(nullspace, 0, 0, 9, false, 0, F1);
@@ -135,33 +135,31 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 *
 	 * det(&alpha*F1 + (1-&alpha;)*F2 ) = 0
 	 * </p>
-
 	 */
-	public void computeSolutions( FastQueue<DMatrixRMaj> solutions )
-	{
-		if( !rootFinder.process(poly))
+	public void computeSolutions( FastQueue<DMatrixRMaj> solutions ) {
+		if (!rootFinder.process(poly))
 			return;
 
 		List<Complex_F64> zeros = rootFinder.getRoots();
 
 		for (int rootIdx = 0; rootIdx < zeros.size(); rootIdx++) {
 			Complex_F64 c = zeros.get(rootIdx);
-			if( !c.isReal() && Math.abs(c.imaginary) > 1e-10 )
+			if (!c.isReal() && Math.abs(c.imaginary) > 1e-10)
 				continue;
 
 			DMatrixRMaj F = solutions.grow();
 
 			double a = c.real;
-			double b = 1-c.real;
+			double b = 1 - c.real;
 
-			for( int i = 0; i < 9; i++ ) {
+			for (int i = 0; i < 9; i++) {
 				F.data[i] = a*F1.data[i] + b*F2.data[i];
 			}
 
 			// det(F) = 0 is already enforced, but for essential matrices it needs to enforce
 			// that the first two singular values are zero and the last one is zero
-			if( !computeFundamental && !projectOntoEssential(F) ) {
-					solutions.removeTail();
+			if (!computeFundamental && !projectOntoEssential(F)) {
+				solutions.removeTail();
 			}
 		}
 	}
@@ -177,46 +175,43 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * @param F2 a fundamental matrix
 	 * @param coefs Where results are returned.
 	 */
-	public static void computeCoefficients( DMatrixRMaj F1 ,
-											DMatrixRMaj F2 ,
-											double coefs[] )
-	{
+	public static void computeCoefficients( DMatrixRMaj F1,
+											DMatrixRMaj F2,
+											double coefs[] ) {
 		Arrays.fill(coefs, 0);
 
-		computeCoefficients(F1,F2,0,4,8,coefs,false);
-		computeCoefficients(F1,F2,1,5,6,coefs,false);
-		computeCoefficients(F1,F2,2,3,7,coefs,false);
-		computeCoefficients(F1,F2,2,4,6,coefs,true);
-		computeCoefficients(F1,F2,1,3,8,coefs,true);
-		computeCoefficients(F1,F2,0,5,7,coefs,true);
+		computeCoefficients(F1, F2, 0, 4, 8, coefs, false);
+		computeCoefficients(F1, F2, 1, 5, 6, coefs, false);
+		computeCoefficients(F1, F2, 2, 3, 7, coefs, false);
+		computeCoefficients(F1, F2, 2, 4, 6, coefs, true);
+		computeCoefficients(F1, F2, 1, 3, 8, coefs, true);
+		computeCoefficients(F1, F2, 0, 5, 7, coefs, true);
 	}
 
-	public static void computeCoefficients( DMatrixRMaj F1 ,
-											DMatrixRMaj F2 ,
-											int i , int j , int k ,
-											double coefs[] , boolean minus )
-	{
-		if( minus )
+	public static void computeCoefficients( DMatrixRMaj F1,
+											DMatrixRMaj F2,
+											int i, int j, int k,
+											double coefs[], boolean minus ) {
+		if (minus)
 			computeCoefficientsMinus(F1.data[i], F1.data[j], F1.data[k], F2.data[i], F2.data[j], F2.data[k], coefs);
 		else
-			computeCoefficients(F1.data[i],F1.data[j],F1.data[k],F2.data[i],F2.data[j],F2.data[k],coefs);
+			computeCoefficients(F1.data[i], F1.data[j], F1.data[k], F2.data[i], F2.data[j], F2.data[k], coefs);
 	}
 
-	public static void computeCoefficients( double x1 , double y1 , double z1 ,
-											double x2 , double y2 , double z2 ,
-											double coefs[] )
-	{
-		coefs[3] += x1*(y1*(z1 - z2) + y2*(z2 - z1)) + x2*( y1*(z2 - z1) + y2*(z1 - z2));
-		coefs[2] += x1*(y1*z2 + y2*(z1 - 2*z2)) + x2*(y1*(z1 - 2*z2) + y2*( 3*z2 - 2*z1) );
+	public static void computeCoefficients( double x1, double y1, double z1,
+											double x2, double y2, double z2,
+											double coefs[] ) {
+		coefs[3] += x1*(y1*(z1 - z2) + y2*(z2 - z1)) + x2*(y1*(z2 - z1) + y2*(z1 - z2));
+		coefs[2] += x1*(y1*z2 + y2*(z1 - 2*z2)) + x2*(y1*(z1 - 2*z2) + y2*(3*z2 - 2*z1));
 		coefs[1] += x1*y2*z2 + x2*(y1*z2 + y2*(z1 - 3*z2));
 		coefs[0] += x2*y2*z2;
 	}
-	public static void computeCoefficientsMinus( double x1 , double y1 , double z1 ,
-												 double x2 , double y2 , double z2 ,
-												 double coefs[] )
-	{
-		coefs[3] -= x1*(y1*(z1 - z2) + y2*(z2 - z1)) + x2*( y1*(z2 - z1) + y2*(z1 - z2));
-		coefs[2] -= x1*(y1*z2 + y2*(z1 - 2*z2)) + x2*(y1*(z1 - 2*z2) + y2*( 3*z2 - 2*z1) );
+
+	public static void computeCoefficientsMinus( double x1, double y1, double z1,
+												 double x2, double y2, double z2,
+												 double coefs[] ) {
+		coefs[3] -= x1*(y1*(z1 - z2) + y2*(z2 - z1)) + x2*(y1*(z2 - z1) + y2*(z1 - z2));
+		coefs[2] -= x1*(y1*z2 + y2*(z1 - 2*z2)) + x2*(y1*(z1 - 2*z2) + y2*(3*z2 - 2*z1));
 		coefs[1] -= x1*y2*z2 + x2*(y1*z2 + y2*(z1 - 3*z2));
 		coefs[0] -= x2*y2*z2;
 	}

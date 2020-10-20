@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 
 	// rotation matrix
-	DMatrixRMaj rotateWideToNarrow = CommonOps_DDRM.identity(3,3);
+	DMatrixRMaj rotateWideToNarrow = CommonOps_DDRM.identity(3, 3);
 	Point2Transform2_F64 narrowToNorm;
 	Point3Transform2_F64 unitToWide;
 
@@ -47,20 +47,21 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	public NarrowToWidePtoP_F64() {
 	}
 
-	public NarrowToWidePtoP_F64(LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide) {
+	public NarrowToWidePtoP_F64( LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide ) {
 		configure(narrow, wide);
 	}
 
-	public void configure(LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide) {
-		narrowToNorm = narrow.undistort_F64(true,false);
+	public void configure( LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide ) {
+		narrowToNorm = narrow.undistort_F64(true, false);
 		unitToWide = wide.distortStoP_F64();
 	}
 
 	/**
 	 * Specifies rotation matrix which determines the pointing direction of the camera
+	 *
 	 * @param R rotation matrix
 	 */
-	public void setRotationWideToNarrow(DMatrixRMaj R ) {
+	public void setRotationWideToNarrow( DMatrixRMaj R ) {
 		this.rotateWideToNarrow.set(R);
 	}
 
@@ -72,20 +73,20 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	 * @param out Pixel location of point in wide FOV camera.
 	 */
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
-		narrowToNorm.compute(x,y, norm);
+	public void compute( double x, double y, Point2D_F64 out ) {
+		narrowToNorm.compute(x, y, norm);
 
 		// Convert from 2D homogenous to 3D
-		unit.set( norm.x , norm.y , 1.0);
+		unit.set(norm.x, norm.y, 1.0);
 
 		// Rotate then make it a unit vector
-		GeometryMath_F64.mult(rotateWideToNarrow,unit,unit);
+		GeometryMath_F64.mult(rotateWideToNarrow, unit, unit);
 		double n = unit.norm();
 		unit.x /= n;
 		unit.y /= n;
 		unit.z /= n;
 
-		unitToWide.compute(unit.x,unit.y,unit.z,out);
+		unitToWide.compute(unit.x, unit.y, unit.z, out);
 	}
 
 	@Override

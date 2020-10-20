@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class DisparityToColorPointCloud {
 	float focalLengthY;
 	float centerX;
 	float centerY;
-	FMatrixRMaj rectifiedR = new FMatrixRMaj(3,3);
+	FMatrixRMaj rectifiedR = new FMatrixRMaj(3, 3);
 
 	// minimum disparity
 	int disparityMin;
@@ -75,24 +75,25 @@ public class DisparityToColorPointCloud {
 
 	/**
 	 * Stereo and intrinsic camera parameters
+	 *
 	 * @param baseline Stereo baseline (world units)
 	 * @param K Intrinsic camera calibration matrix of rectified camera
 	 * @param rectifiedToColor Transform from rectified pixels to the color image pixels.
 	 * @param disparityMin Minimum disparity that's computed (pixels)
 	 * @param disparityRange Number of possible disparity values (pixels)
 	 */
-	public void configure(double baseline,
-						  DMatrixRMaj K, DMatrixRMaj rectifiedR,
-						  Point2Transform2_F64 rectifiedToColor,
-						  int disparityMin, int disparityRange ) {
+	public void configure( double baseline,
+						   DMatrixRMaj K, DMatrixRMaj rectifiedR,
+						   Point2Transform2_F64 rectifiedToColor,
+						   int disparityMin, int disparityRange ) {
 		this.K = K;
-		ConvertMatrixData.convert(rectifiedR,this.rectifiedR);
+		ConvertMatrixData.convert(rectifiedR, this.rectifiedR);
 		this.rectifiedToColor = rectifiedToColor;
 		this.baseline = (float)baseline;
-		this.focalLengthX = (float)K.get(0,0);
-		this.focalLengthY = (float)K.get(1,1);
-		this.centerX = (float)K.get(0,2);
-		this.centerY = (float)K.get(1,2);
+		this.focalLengthX = (float)K.get(0, 0);
+		this.focalLengthY = (float)K.get(1, 1);
+		this.centerX = (float)K.get(0, 2);
+		this.centerY = (float)K.get(1, 2);
 		this.disparityMin = disparityMin;
 		this.disparityRange = disparityRange;
 
@@ -106,42 +107,43 @@ public class DisparityToColorPointCloud {
 	 * @param disparity Disparity image
 	 * @param color Color image of left camera
 	 */
-	public void process(ImageGray<?> disparity , ColorImage color , PointCloudWriter output ) {
+	public void process( ImageGray<?> disparity, ColorImage color, PointCloudWriter output ) {
 
-		if( disparity instanceof GrayU8)
+		if (disparity instanceof GrayU8)
 			process((GrayU8)disparity, color, output);
-		else if( disparity instanceof  GrayF32 )
+		else if (disparity instanceof GrayF32)
 			process((GrayF32)disparity, color, output);
 		else
-			throw new IllegalArgumentException("Unsupported image type "+disparity.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unsupported image type " + disparity.getClass().getSimpleName());
 	}
 
 	/**
 	 * Converts the disparity image into a color point cloud
+	 *
 	 * @param disparity (Input) Disparity image
 	 * @param color (Input) Color image
 	 * @param output (Output) destination for the colorized point cloud
 	 */
-	private void process(GrayU8 disparity , ColorImage color , PointCloudWriter output ) {
+	private void process( GrayU8 disparity, ColorImage color, PointCloudWriter output ) {
 
-		final int x0 = Math.max(roi.x0,0);
-		final int y0 = Math.max(roi.y0,0);
-		final int x1 = Math.min(roi.x1,disparity.width);
-		final int y1 = Math.min(roi.y1,disparity.height);
+		final int x0 = Math.max(roi.x0, 0);
+		final int y0 = Math.max(roi.y0, 0);
+		final int x1 = Math.min(roi.x1, disparity.width);
+		final int y1 = Math.min(roi.y1, disparity.height);
 
-		for( int pixelY = y0; pixelY < y1; pixelY++ ) {
+		for (int pixelY = y0; pixelY < y1; pixelY++) {
 			int index = disparity.startIndex + disparity.stride*pixelY + x0;
 
-			for( int pixelX = x0; pixelX < x1; pixelX++ ) {
+			for (int pixelX = x0; pixelX < x1; pixelX++) {
 				int value = disparity.data[index++] & 0xFF;
 
-				if( value >= disparityRange)
+				if (value >= disparityRange)
 					continue;
 
 				value += disparityMin;
 
 				// The point lies at infinity.
-				if( value == 0 )
+				if (value == 0)
 					continue;
 
 				// Note that this will be in the rectified left camera's reference frame.
@@ -151,40 +153,41 @@ public class DisparityToColorPointCloud {
 				p.y = p.z*(pixelY - centerY)/focalLengthY;
 
 				// Bring it back into left camera frame
-				GeometryMath_F32.multTran(rectifiedR,p,p);
+				GeometryMath_F32.multTran(rectifiedR, p, p);
 
-				output.add(p.x,p.y,p.z,getColor(color, pixelX, pixelY));
+				output.add(p.x, p.y, p.z, getColor(color, pixelX, pixelY));
 			}
 		}
 	}
 
 	/**
 	 * Converts the disparity image into a color point cloud
+	 *
 	 * @param disparity (Input) Disparity image
 	 * @param color (Input) Color image
 	 * @param output (Output) destination for the colorized point cloud
 	 */
-	private void process(GrayF32 disparity , ColorImage color , PointCloudWriter output) {
+	private void process( GrayF32 disparity, ColorImage color, PointCloudWriter output ) {
 
-		final int x0 = Math.max(roi.x0,0);
-		final int y0 = Math.max(roi.y0,0);
-		final int x1 = Math.min(roi.x1,disparity.width);
-		final int y1 = Math.min(roi.y1,disparity.height);
+		final int x0 = Math.max(roi.x0, 0);
+		final int y0 = Math.max(roi.y0, 0);
+		final int x1 = Math.min(roi.x1, disparity.width);
+		final int y1 = Math.min(roi.y1, disparity.height);
 
-		for( int pixelY = y0; pixelY < y1; pixelY++ ) {
+		for (int pixelY = y0; pixelY < y1; pixelY++) {
 			int index = disparity.startIndex + disparity.stride*pixelY + x0;
 
-			for( int pixelX = x0; pixelX < x1; pixelX++ ) {
+			for (int pixelX = x0; pixelX < x1; pixelX++) {
 				float value = disparity.data[index++];
 
 				// invalid disparity
-				if( value >= disparityRange)
+				if (value >= disparityRange)
 					continue;
 
 				value += disparityMin;
 
 				// The point lies at infinity.
-				if( value == 0 )
+				if (value == 0)
 					continue;
 
 				p.z = baseline*focalLengthX/value;
@@ -192,9 +195,9 @@ public class DisparityToColorPointCloud {
 				p.y = p.z*(pixelY - centerY)/focalLengthY;
 
 				// Bring it back into left camera frame
-				GeometryMath_F32.multTran(rectifiedR,p,p);
+				GeometryMath_F32.multTran(rectifiedR, p, p);
 
-				output.add(p.x,p.y,p.z,getColor(color, pixelX, pixelY));
+				output.add(p.x, p.y, p.z, getColor(color, pixelX, pixelY));
 			}
 		}
 	}
@@ -205,13 +208,13 @@ public class DisparityToColorPointCloud {
 	 * @param y coordinate in disparity image
 	 * @return RGB
 	 */
-	private int getColor(ColorImage color, int x, int y ) {
-		rectifiedToColor.compute(x,y,colorPt);
+	private int getColor( ColorImage color, int x, int y ) {
+		rectifiedToColor.compute(x, y, colorPt);
 		int xx = (int)colorPt.getX();
 		int yy = (int)colorPt.getY();
 
-		if( color.isInBounds( xx , yy ) ) {
-			return color.getRGB(xx,yy);
+		if (color.isInBounds(xx, yy)) {
+			return color.getRGB(xx, yy);
 		} else {
 			return 0x000000;
 		}
@@ -219,12 +222,13 @@ public class DisparityToColorPointCloud {
 
 	/**
 	 * Specifies a ROI in the disparity image the cloud should come from
+	 *
 	 * @param x0 lower extent, x-axis, inclusive
 	 * @param y0 lower extent, y-axis, inclusive
 	 * @param x1 upper extent, x-axis, exclusive
 	 * @param y1 upper extent, y-axis, exclusive
 	 */
-	public void setRegionOfInterest(int x0 , int y0 , int x1 , int y1 ) {
+	public void setRegionOfInterest( int x0, int y0, int x1, int y1 ) {
 		roi.set(x0, y0, x1, y1);
 	}
 
@@ -232,15 +236,15 @@ public class DisparityToColorPointCloud {
 	 * Removes the ROI
 	 */
 	public void clearRegionOfInterest() {
-		roi.set(-1,-1,Integer.MAX_VALUE,Integer.MAX_VALUE);
+		roi.set(-1, -1, Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 
 	/**
 	 * Interface for accessing RGB values inside an image
 	 */
 	public interface ColorImage {
-		boolean isInBounds( int x , int y );
-		int getRGB( int x , int y );
-	}
+		boolean isInBounds( int x, int y );
 
+		int getRGB( int x, int y );
+	}
 }

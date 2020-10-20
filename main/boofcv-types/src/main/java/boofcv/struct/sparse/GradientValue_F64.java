@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ public class GradientValue_F64 implements GradientValue {
 
 	@Override
 	public void set( /**/double dx, /**/double dy ) {
-		this.x = (double) dx;
-		this.y = (double) dy;
+		this.x = (double)dx;
+		this.y = (double)dy;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,15 +20,13 @@ package boofcv.struct.sparse;
 
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Computes the image gradient on a per pixel basis.
  *
  * @author Peter Abeles
  */
 public interface SparseImageGradient<T extends ImageGray<T>, G extends GradientValue>
-	extends SparseImageOperator<T>
-{
+		extends SparseImageOperator<T> {
 	/**
 	 * Computes the gradient at the specified point.
 	 *
@@ -36,7 +34,7 @@ public interface SparseImageGradient<T extends ImageGray<T>, G extends GradientV
 	 * @param y y-axis pixel coordinate
 	 * @return Gradient at that point.
 	 */
-	public G compute( int x , int y );
-	
+	public G compute( int x, int y );
+
 	public Class<G> getGradientType();
 }

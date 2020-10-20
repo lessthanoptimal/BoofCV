@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 
 	// inverse of camera calibration matrix
 	// These are the upper triangular elements in a 3x3 matrix
-	private double a11,a12,a13,a22,a23;
+	private double a11, a12, a13, a22, a23;
 
 	public PinholePtoN_F64( PinholePtoN_F64 original ) {
 		this.a11 = original.a11;
@@ -44,8 +44,8 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 
 	public PinholePtoN_F64() {}
 
-	public void set(CameraPinhole pinhole) {
-		set(pinhole.fx,pinhole.fy,pinhole.skew,pinhole.cx,pinhole.cy);
+	public void set( CameraPinhole pinhole ) {
+		set(pinhole.fx, pinhole.fy, pinhole.skew, pinhole.cx, pinhole.cy);
 	}
 
 	public void set(/**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
@@ -59,7 +59,7 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute( double x, double y, Point2D_F64 out ) {
 		out.x = a11*x + a12*y + a13;
 		out.y = a22*y + a23;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import georegression.transform.homography.HomographyPointOps_F64;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 
-
 /**
  * {@link Point2Transform2Model_F64} using {@link Homography2D_F64}.
  *
@@ -36,28 +35,27 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 
 	Homography2D_F64 homo = new Homography2D_F64();
 
-	public PointTransformHomography_F64() {
-	}
+	public PointTransformHomography_F64() {}
 
-	public PointTransformHomography_F64(DMatrixRMaj homo) {
+	public PointTransformHomography_F64( DMatrixRMaj homo ) {
 		UtilHomography_F64.convert(homo, this.homo);
 	}
 
-	public PointTransformHomography_F64(Homography2D_F64 homo) {
+	public PointTransformHomography_F64( Homography2D_F64 homo ) {
 		set(homo);
 	}
 
-	public void set(DMatrix transform ) {
+	public void set( DMatrix transform ) {
 		this.homo.set(transform);
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute( double x, double y, Point2D_F64 out ) {
 		HomographyPointOps_F64.transform(homo, x, y, out);
 	}
 
 	@Override
-	public void setModel(Homography2D_F64 o) {
+	public void setModel( Homography2D_F64 o ) {
 		homo.set(o);
 	}
 

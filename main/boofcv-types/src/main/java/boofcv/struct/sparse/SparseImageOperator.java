@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,18 +26,17 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public interface SparseImageOperator <T extends ImageBase<T>>
-{
+public interface SparseImageOperator<T extends ImageBase<T>> {
 	/**
 	 * Specifies the image being processed.
 	 *
 	 * @param input Image being processed
 	 */
-	public void setImage(T input );
+	void setImage( T input );
 
 	/**
 	 * Checks to see if the entire sample region is contained inside the image or not.
 	 * Depending on the implementation it might be able to handle out of bounds pixels or not.
 	 */
-	public boolean isInBounds( int x , int y );
+	boolean isInBounds( int x, int y );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,10 +44,9 @@ import static boofcv.factory.distort.LensDistortionFactory.narrow;
  */
 public class ImplRectifyImageOps_F64 {
 
-	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									DMatrixRMaj rectifyK, ImageDimension rectifiedSize)
-	{
+	public static void fullViewLeft( CameraPinholeBrown paramLeft,
+									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									 DMatrixRMaj rectifyK, ImageDimension rectifiedSize ) {
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -55,38 +54,36 @@ public class ImplRectifyImageOps_F64 {
 
 		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound = DistortImageOps.boundBox_F64(paramLeft.width, paramLeft.height,
-				new PointToPixelTransform_F64(tranLeft),work);
+				new PointToPixelTransform_F64(tranLeft), work);
 
 		// Select scale to maintain the same number of pixels
 		double scale = Math.sqrt((paramLeft.width*paramLeft.height)/(bound.width*bound.height));
 
-		rectifiedSize.width = (int)(scale*bound.width+0.5);
-		rectifiedSize.height = (int)(scale*bound.height+0.5);
+		rectifiedSize.width = (int)(scale*bound.width + 0.5);
+		rectifiedSize.height = (int)(scale*bound.height + 0.5);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
 	}
 
-	public static void fullViewLeft(int imageWidth,int imageHeight,
-									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight )
-	{
+	public static void fullViewLeft( int imageWidth, int imageHeight,
+									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight ) {
 		Point2Transform2_F64 tranLeft = new PointTransformHomography_F64(rectifyLeft);
 
 		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound = DistortImageOps.boundBox_F64(imageWidth, imageHeight,
-				new PointToPixelTransform_F64(tranLeft),work);
+				new PointToPixelTransform_F64(tranLeft), work);
 
 		double scaleX = imageWidth/bound.width;
 		double scaleY = imageHeight/bound.height;
 
-		double scale = Math.min(scaleX,scaleY);
+		double scale = Math.min(scaleX, scaleY);
 
 		adjustUncalibrated(rectifyLeft, rectifyRight, bound, scale);
 	}
 
-	public static void allInsideLeft(CameraPinholeBrown paramLeft,
-									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									 DMatrixRMaj rectifyK, ImageDimension rectifiedSize)
-	{
+	public static void allInsideLeft( CameraPinholeBrown paramLeft,
+									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									  DMatrixRMaj rectifyK, ImageDimension rectifiedSize ) {
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -94,22 +91,21 @@ public class ImplRectifyImageOps_F64 {
 
 		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound = LensDistortionOps_F64.boundBoxInside(paramLeft.width, paramLeft.height,
-				new PointToPixelTransform_F64(tranLeft),work);
+				new PointToPixelTransform_F64(tranLeft), work);
 
 		LensDistortionOps_F64.roundInside(bound);
 
 		// Select scale to maintain the same number of pixels
 		double scale = Math.sqrt((paramLeft.width*paramLeft.height)/(bound.width*bound.height));
 
-		rectifiedSize.width = (int)(scale*bound.width+0.5);
-		rectifiedSize.height = (int)(scale*bound.height+0.5);
+		rectifiedSize.width = (int)(scale*bound.width + 0.5);
+		rectifiedSize.height = (int)(scale*bound.height + 0.5);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
 	}
 
-	public static void allInsideLeft( int imageWidth,int imageHeight,
-									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight )
-	{
+	public static void allInsideLeft( int imageWidth, int imageHeight,
+									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight ) {
 		PointTransformHomography_F64 tranLeft = new PointTransformHomography_F64(rectifyLeft);
 
 		Point2D_F64 work = new Point2D_F64();
@@ -127,15 +123,15 @@ public class ImplRectifyImageOps_F64 {
 	/**
 	 * Internal function which applies the rectification adjustment to a calibrated stereo pair
 	 */
-	private static void adjustCalibrated(DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-										 DMatrixRMaj rectifyK,
-										 RectangleLength2D_F64 bound, double scale) {
+	private static void adjustCalibrated( DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+										  DMatrixRMaj rectifyK,
+										  RectangleLength2D_F64 bound, double scale ) {
 		// translation
 		double deltaX = -bound.x0*scale;
 		double deltaY = -bound.y0*scale;
 
 		// adjustment matrix
-		SimpleMatrix A = new SimpleMatrix(3,3,true,new double[]{scale,0,deltaX,0,scale,deltaY,0,0,1});
+		SimpleMatrix A = new SimpleMatrix(3, 3, true, new double[]{scale, 0, deltaX, 0, scale, deltaY, 0, 0, 1});
 		SimpleMatrix rL = SimpleMatrix.wrap(rectifyLeft);
 		SimpleMatrix rR = SimpleMatrix.wrap(rectifyRight);
 		SimpleMatrix K = SimpleMatrix.wrap(rectifyK);
@@ -156,14 +152,14 @@ public class ImplRectifyImageOps_F64 {
 	/**
 	 * Internal function which applies the rectification adjustment to an uncalibrated stereo pair
 	 */
-	private static void adjustUncalibrated(DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-										   RectangleLength2D_F64 bound, double scale) {
+	private static void adjustUncalibrated( DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+											RectangleLength2D_F64 bound, double scale ) {
 		// translation
 		double deltaX = -bound.x0*scale;
 		double deltaY = -bound.y0*scale;
 
 		// adjustment matrix
-		SimpleMatrix A = new SimpleMatrix(3,3,true,new double[]{scale,0,deltaX,0,scale,deltaY,0,0,1});
+		SimpleMatrix A = new SimpleMatrix(3, 3, true, new double[]{scale, 0, deltaX, 0, scale, deltaY, 0, 0, 1});
 		SimpleMatrix rL = SimpleMatrix.wrap(rectifyLeft);
 		SimpleMatrix rR = SimpleMatrix.wrap(rectifyRight);
 
@@ -171,31 +167,29 @@ public class ImplRectifyImageOps_F64 {
 		rectifyRight.set(A.mult(rR).getDDRM());
 	}
 
-	public static Point2Transform2_F64 transformRectToPixel(CameraPinholeBrown param,
-															DMatrixRMaj rectify)
-	{
+	public static Point2Transform2_F64 transformRectToPixel( CameraPinholeBrown param,
+															 DMatrixRMaj rectify ) {
 		Point2Transform2_F64 add_p_to_p = narrow(param).distort_F64(true, true);
 
-		DMatrixRMaj rectifyInv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(rectify,rectifyInv);
+		DMatrixRMaj rectifyInv = new DMatrixRMaj(3, 3);
+		CommonOps_DDRM.invert(rectify, rectifyInv);
 		PointTransformHomography_F64 removeRect = new PointTransformHomography_F64(rectifyInv);
 
-		return new SequencePoint2Transform2_F64(removeRect,add_p_to_p);
+		return new SequencePoint2Transform2_F64(removeRect, add_p_to_p);
 	}
 
-	public static Point2Transform2_F64 transformPixelToRect(CameraPinholeBrown param,
-															DMatrixRMaj rectify)
-	{
+	public static Point2Transform2_F64 transformPixelToRect( CameraPinholeBrown param,
+															 DMatrixRMaj rectify ) {
 		Point2Transform2_F64 remove_p_to_p = narrow(param).undistort_F64(true, true);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
-		return new SequencePoint2Transform2_F64(remove_p_to_p,rectifyDistort);
+		return new SequencePoint2Transform2_F64(remove_p_to_p, rectifyDistort);
 	}
 
-	public static Point2Transform2_F64 transformPixelToRectNorm(CameraPinholeBrown param,
-																DMatrixRMaj rectify,
-																DMatrixRMaj rectifyK) {
+	public static Point2Transform2_F64 transformPixelToRectNorm( CameraPinholeBrown param,
+																 DMatrixRMaj rectify,
+																 DMatrixRMaj rectifyK ) {
 		if (rectifyK.get(0, 1) != 0)
 			throw new IllegalArgumentException("Skew should be zero in rectified images");
 
@@ -210,5 +204,4 @@ public class ImplRectifyImageOps_F64 {
 
 		return new SequencePoint2Transform2_F64(remove_p_to_p, rectifyDistort, pixelToNorm);
 	}
-
 }

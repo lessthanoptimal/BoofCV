@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,19 +44,19 @@ public class CylinderToEquirectangular_F64 extends EquirectangularDistortBase_F6
 	 * @param height Cylinder height in pixels
 	 * @param vfov vertical FOV in radians
 	 */
-	public void configure( int width , int height , double vfov ) {
-		declareVectors( width, height );
+	public void configure( int width, int height, double vfov ) {
+		declareVectors(width, height);
 
 		double r = Math.tan(vfov/2.0);
 
 		for (int pixelY = 0; pixelY < height; pixelY++) {
-			double z = 2*r*pixelY/(height-1) - r;
+			double z = 2*r*pixelY/(height - 1) - r;
 			for (int pixelX = 0; pixelX < width; pixelX++) {
 				double theta = GrlConstants.PI2*pixelX/width - GrlConstants.PI;
 				double x = Math.cos(theta);
 				double y = Math.sin(theta);
 
-				vectors[pixelY*width+pixelX].set(x,y,z);
+				vectors[pixelY*width + pixelX].set(x, y, z);
 			}
 		}
 	}

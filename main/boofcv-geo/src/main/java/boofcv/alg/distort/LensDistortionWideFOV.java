@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ public interface LensDistortionWideFOV {
 	 * (Input) Undistorted unit sphere coordinate
 	 * (Output) Distorted pixel coordinates
 	 * </pre>
+	 *
 	 * @return Transform
 	 */
 	Point3Transform2_F64 distortStoP_F64();
@@ -49,6 +50,7 @@ public interface LensDistortionWideFOV {
 	 * (Input) Undistorted unit sphere coordinate
 	 * (Output) Distorted pixel coordinates
 	 * </pre>
+	 *
 	 * @return Transform
 	 */
 	Point3Transform2_F32 distortStoP_F32();
@@ -59,6 +61,7 @@ public interface LensDistortionWideFOV {
 	 * (Input) Distorted pixel coordinate
 	 * (Output) Undistorted unit sphere coordinates
 	 * </pre>
+	 *
 	 * @return Transform
 	 */
 	Point2Transform3_F64 undistortPtoS_F64();
@@ -69,9 +72,8 @@ public interface LensDistortionWideFOV {
 	 * (Input) Distorted pixel coordinate
 	 * (Output) Undistorted unit sphere coordinates
 	 * </pre>
+	 *
 	 * @return Transform
 	 */
 	Point2Transform3_F32 undistortPtoS_F32();
-
-
 }

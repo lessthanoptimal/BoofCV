@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.factory.feature.detect.selector;
 
 import boofcv.struct.StandardConfigurationChecks;

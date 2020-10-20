@@ -106,6 +106,8 @@ Version : 0.37
 TODO Move projective to metric and similar from multiview to perspective
 TODO rename RansacMultiView to RansacCalibrated
 
+TODO BoofVersion - Add new line to end - Mark as @Generated
+
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint
     * Could this be done by adding two functions: hint(motion) and undo() to undo the last association
@@ -124,6 +126,10 @@ TODO Stereo Feature Association
   * TODO when associating objects split into feature types, e.g. white and black blobs
   * TODO try improving 3-view by estimating lens distortion in projective camera
 
+NOTES: Format lint checks
+ - Checkstyle can't be used since it does not allow for concise blocks and there is no built in way to just run on
+   files that have been changed
+ - Spotless is best option so far, but finding a flexible formatter is challenging. Might need to install eclipse
 
 ---------------------------------------------
 Date    : 2020/May/18

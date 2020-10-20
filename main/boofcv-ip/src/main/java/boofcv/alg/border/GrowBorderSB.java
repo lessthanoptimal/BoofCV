@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,24 +33,23 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.border.GenerateGrowBorderSB")
-public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBorder<T,PixelArray>
-{
-	abstract class SB_I_S32<T extends GrayI<T>,PixelArray> implements GrowBorderSB<T,PixelArray> {
+public interface GrowBorderSB<T extends ImageGray<T>, PixelArray> extends GrowBorder<T, PixelArray> {
+	abstract class SB_I_S32<T extends GrayI<T>, PixelArray> implements GrowBorderSB<T, PixelArray> {
 		T image;
 		ImageBorder_S32<T> border;
 		ImageType<T> imageType;
 
-		protected SB_I_S32(ImageType<T> imageType) {
+		protected SB_I_S32( ImageType<T> imageType ) {
 			this.imageType = imageType;
 		}
 
 		@Override
-		public void setBorder(ImageBorder<T> _border) {
+		public void setBorder( ImageBorder<T> _border ) {
 			border = (ImageBorder_S32<T>)_border;
 		}
 
 		@Override
-		public void setImage(T image) {
+		public void setImage( T image ) {
 			this.image = image;
 			this.border.setImage(image);
 		}
@@ -61,17 +60,17 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		}
 	}
 
-	class SB_I8<T extends GrayI8<T>> extends SB_I_S32<T,byte[]> {
+	class SB_I8<T extends GrayI8<T>> extends SB_I_S32<T, byte[]> {
 
-		public SB_I8(ImageType<T> imageType) {
+		public SB_I8( ImageType<T> imageType ) {
 			super(imageType);
 		}
 
 		@Override
-		public void growRow(int y, int borderLower , int borderUpper, byte[] output, int offset) {
+		public void growRow( int y, int borderLower, int borderUpper, byte[] output, int offset ) {
 			int idxDst = offset;
-			if( y < 0 || y >= image.height ) {
-				int end = image.width+borderUpper;
+			if (y < 0 || y >= image.height) {
+				int end = image.width + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = (byte)border.getOutside(i, y);
 				}
@@ -88,11 +87,11 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		}
 
 		@Override
-		public void growCol(int x, int borderLower , int borderUpper, byte[] output, int offset) {
+		public void growCol( int x, int borderLower, int borderUpper, byte[] output, int offset ) {
 			int idxDst = offset;
 
-			if( x < 0 || x >= image.width ) {
-				int end = image.height+borderUpper;
+			if (x < 0 || x >= image.width) {
+				int end = image.height + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = (byte)border.getOutside(x, i);
 				}
@@ -107,20 +106,21 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 				for (int i = 0; i < borderUpper; i++) {
 					output[idxDst++] = (byte)border.getOutside(x, image.height + i);
 				}
-			}		}
+			}
+		}
 	}
 
-	class SB_I16<T extends GrayI16<T>> extends SB_I_S32<T,short[]> {
+	class SB_I16<T extends GrayI16<T>> extends SB_I_S32<T, short[]> {
 
-		public SB_I16(ImageType<T> imageType) {
+		public SB_I16( ImageType<T> imageType ) {
 			super(imageType);
 		}
 
 		@Override
-		public void growRow(int y, int borderLower , int borderUpper, short[] output, int offset) {
+		public void growRow( int y, int borderLower, int borderUpper, short[] output, int offset ) {
 			int idxDst = offset;
-			if( y < 0 || y >= image.height ) {
-				int end = image.width+borderUpper;
+			if (y < 0 || y >= image.height) {
+				int end = image.width + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = (short)border.getOutside(i, y);
 				}
@@ -137,11 +137,11 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		}
 
 		@Override
-		public void growCol(int x, int borderLower , int borderUpper, short[] output, int offset) {
+		public void growCol( int x, int borderLower, int borderUpper, short[] output, int offset ) {
 			int idxDst = offset;
 
-			if( x < 0 || x >= image.width ) {
-				int end = image.height+borderUpper;
+			if (x < 0 || x >= image.width) {
+				int end = image.height + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = (short)border.getOutside(x, i);
 				}
@@ -156,20 +156,21 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 				for (int i = 0; i < borderUpper; i++) {
 					output[idxDst++] = (short)border.getOutside(x, image.height + i);
 				}
-			}		}
+			}
+		}
 	}
 
-	class SB_S32 implements GrowBorderSB<GrayS32,int[]> {
+	class SB_S32 implements GrowBorderSB<GrayS32, int[]> {
 		GrayS32 image;
 		ImageBorder_S32<GrayS32> border;
 
 		@Override
-		public void setBorder(ImageBorder<GrayS32> border) {
+		public void setBorder( ImageBorder<GrayS32> border ) {
 			this.border = (ImageBorder_S32<GrayS32>)border;
 		}
 
 		@Override
-		public void setImage(GrayS32 image) {
+		public void setImage( GrayS32 image ) {
 			this.image = image;
 			this.border.setImage(image);
 		}
@@ -178,11 +179,12 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		public ImageType<GrayS32> getImageType() {
 			return ImageType.SB_S32;
 		}
+
 		@Override
-		public void growRow(int y, int borderLower , int borderUpper, int[] output, int offset) {
+		public void growRow( int y, int borderLower, int borderUpper, int[] output, int offset ) {
 			int idxDst = offset;
-			if( y < 0 || y >= image.height ) {
-				int end = image.width+borderUpper;
+			if (y < 0 || y >= image.height) {
+				int end = image.width + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(i, y);
 				}
@@ -199,11 +201,11 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		}
 
 		@Override
-		public void growCol(int x, int borderLower , int borderUpper, int[] output, int offset) {
+		public void growCol( int x, int borderLower, int borderUpper, int[] output, int offset ) {
 			int idxDst = offset;
 
-			if( x < 0 || x >= image.width ) {
-				int end = image.height+borderUpper;
+			if (x < 0 || x >= image.width) {
+				int end = image.height + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(x, i);
 				}
@@ -218,20 +220,21 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 				for (int i = 0; i < borderUpper; i++) {
 					output[idxDst++] = border.getOutside(x, image.height + i);
 				}
-			}		}
+			}
+		}
 	}
 
-	class SB_S64 implements GrowBorderSB<GrayS64,long[]> {
+	class SB_S64 implements GrowBorderSB<GrayS64, long[]> {
 		GrayS64 image;
 		ImageBorder_S64 border;
 
 		@Override
-		public void setBorder(ImageBorder<GrayS64> border) {
+		public void setBorder( ImageBorder<GrayS64> border ) {
 			this.border = (ImageBorder_S64)border;
 		}
 
 		@Override
-		public void setImage(GrayS64 image) {
+		public void setImage( GrayS64 image ) {
 			this.image = image;
 			this.border.setImage(image);
 		}
@@ -240,11 +243,12 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		public ImageType<GrayS64> getImageType() {
 			return ImageType.SB_S64;
 		}
+
 		@Override
-		public void growRow(int y, int borderLower , int borderUpper, long[] output, int offset) {
+		public void growRow( int y, int borderLower, int borderUpper, long[] output, int offset ) {
 			int idxDst = offset;
-			if( y < 0 || y >= image.height ) {
-				int end = image.width+borderUpper;
+			if (y < 0 || y >= image.height) {
+				int end = image.width + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(i, y);
 				}
@@ -261,11 +265,11 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		}
 
 		@Override
-		public void growCol(int x, int borderLower , int borderUpper, long[] output, int offset) {
+		public void growCol( int x, int borderLower, int borderUpper, long[] output, int offset ) {
 			int idxDst = offset;
 
-			if( x < 0 || x >= image.width ) {
-				int end = image.height+borderUpper;
+			if (x < 0 || x >= image.width) {
+				int end = image.height + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(x, i);
 				}
@@ -280,20 +284,21 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 				for (int i = 0; i < borderUpper; i++) {
 					output[idxDst++] = border.getOutside(x, image.height + i);
 				}
-			}		}
+			}
+		}
 	}
 
-	class SB_F32 implements GrowBorderSB<GrayF32,float[]> {
+	class SB_F32 implements GrowBorderSB<GrayF32, float[]> {
 		GrayF32 image;
 		ImageBorder_F32 border;
 
 		@Override
-		public void setBorder(ImageBorder<GrayF32> border) {
+		public void setBorder( ImageBorder<GrayF32> border ) {
 			this.border = (ImageBorder_F32)border;
 		}
 
 		@Override
-		public void setImage(GrayF32 image) {
+		public void setImage( GrayF32 image ) {
 			this.image = image;
 			this.border.setImage(image);
 		}
@@ -302,11 +307,12 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		public ImageType<GrayF32> getImageType() {
 			return ImageType.SB_F32;
 		}
+
 		@Override
-		public void growRow(int y, int borderLower , int borderUpper, float[] output, int offset) {
+		public void growRow( int y, int borderLower, int borderUpper, float[] output, int offset ) {
 			int idxDst = offset;
-			if( y < 0 || y >= image.height ) {
-				int end = image.width+borderUpper;
+			if (y < 0 || y >= image.height) {
+				int end = image.width + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(i, y);
 				}
@@ -323,11 +329,11 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		}
 
 		@Override
-		public void growCol(int x, int borderLower , int borderUpper, float[] output, int offset) {
+		public void growCol( int x, int borderLower, int borderUpper, float[] output, int offset ) {
 			int idxDst = offset;
 
-			if( x < 0 || x >= image.width ) {
-				int end = image.height+borderUpper;
+			if (x < 0 || x >= image.width) {
+				int end = image.height + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(x, i);
 				}
@@ -342,20 +348,21 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 				for (int i = 0; i < borderUpper; i++) {
 					output[idxDst++] = border.getOutside(x, image.height + i);
 				}
-			}		}
+			}
+		}
 	}
 
-	class SB_F64 implements GrowBorderSB<GrayF64,double[]> {
+	class SB_F64 implements GrowBorderSB<GrayF64, double[]> {
 		GrayF64 image;
 		ImageBorder_F64 border;
 
 		@Override
-		public void setBorder(ImageBorder<GrayF64> border) {
+		public void setBorder( ImageBorder<GrayF64> border ) {
 			this.border = (ImageBorder_F64)border;
 		}
 
 		@Override
-		public void setImage(GrayF64 image) {
+		public void setImage( GrayF64 image ) {
 			this.image = image;
 			this.border.setImage(image);
 		}
@@ -364,11 +371,12 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		public ImageType<GrayF64> getImageType() {
 			return ImageType.SB_F64;
 		}
+
 		@Override
-		public void growRow(int y, int borderLower , int borderUpper, double[] output, int offset) {
+		public void growRow( int y, int borderLower, int borderUpper, double[] output, int offset ) {
 			int idxDst = offset;
-			if( y < 0 || y >= image.height ) {
-				int end = image.width+borderUpper;
+			if (y < 0 || y >= image.height) {
+				int end = image.width + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(i, y);
 				}
@@ -385,11 +393,11 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 		}
 
 		@Override
-		public void growCol(int x, int borderLower , int borderUpper, double[] output, int offset) {
+		public void growCol( int x, int borderLower, int borderUpper, double[] output, int offset ) {
 			int idxDst = offset;
 
-			if( x < 0 || x >= image.width ) {
-				int end = image.height+borderUpper;
+			if (x < 0 || x >= image.width) {
+				int end = image.height + borderUpper;
 				for (int i = -borderLower; i < end; i++) {
 					output[idxDst++] = border.getOutside(x, i);
 				}
@@ -404,7 +412,7 @@ public interface GrowBorderSB<T extends ImageGray<T>,PixelArray> extends  GrowBo
 				for (int i = 0; i < borderUpper; i++) {
 					output[idxDst++] = border.getOutside(x, image.height + i);
 				}
-			}		}
+			}
+		}
 	}
-
 }

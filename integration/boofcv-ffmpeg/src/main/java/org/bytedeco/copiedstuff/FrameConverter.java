@@ -40,7 +40,6 @@
 
 package org.bytedeco.copiedstuff;
 
-// CHECKSTYLE:OFF
 /**
  * Defines two methods to convert between a {@link Frame} and another generic
  * data object that can contain the same data. The idea with this design is

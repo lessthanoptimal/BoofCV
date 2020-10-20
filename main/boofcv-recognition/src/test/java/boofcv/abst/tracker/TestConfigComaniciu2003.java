@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.abst.tracker;
 
 import boofcv.struct.StandardConfigurationChecks;

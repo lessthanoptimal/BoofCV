@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,44 +33,45 @@ import org.ejml.interfaces.decomposition.SingularValueDecomposition_F64;
  * @author Peter Abeles
  */
 public class ProjectiveToIdentity {
-	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true,true,false);
-	DMatrixRMaj Ut = new DMatrixRMaj(3,3);
-	DMatrixRMaj Wt = new DMatrixRMaj(4,3);
-	DMatrixRMaj V = new DMatrixRMaj(4,4);
+	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(true, true, false);
+	DMatrixRMaj Ut = new DMatrixRMaj(3, 3);
+	DMatrixRMaj Wt = new DMatrixRMaj(4, 3);
+	DMatrixRMaj V = new DMatrixRMaj(4, 4);
 
-	DMatrixRMaj tmp = new DMatrixRMaj(4,4);
-	DMatrixRMaj ns = new DMatrixRMaj(4,1);
+	DMatrixRMaj tmp = new DMatrixRMaj(4, 4);
+	DMatrixRMaj ns = new DMatrixRMaj(4, 1);
 
 	// storage for pseudo inverse of P
-	DMatrixRMaj PA = new DMatrixRMaj(4,3);
+	DMatrixRMaj PA = new DMatrixRMaj(4, 3);
 
 	/**
 	 * Compute projective transform that converts P into identity
+	 *
 	 * @param P (Input) 3x4 camera matrix
 	 * @return true if no errors
 	 */
 	public boolean process( DMatrixRMaj P ) {
-		if( !svd.decompose(P) )
+		if (!svd.decompose(P))
 			return false;
 
-		svd.getU(Ut,true);
-		svd.getV(V,false);
+		svd.getU(Ut, true);
+		svd.getV(V, false);
 		double sv[] = svd.getSingularValues();
 
-		SingularOps_DDRM.descendingOrder(Ut,true,sv,3,V,false);
+		SingularOps_DDRM.descendingOrder(Ut, true, sv, 3, V, false);
 
 		// compute W+, which is transposed and non-negative inverted
 		for (int i = 0; i < 3; i++) {
-			Wt.unsafe_set(i,i, 1.0/sv[i]);
+			Wt.unsafe_set(i, i, 1.0/sv[i]);
 		}
 
 		// get the pseudo inverse
 		// A+ = V*(W+)*U'
-		CommonOps_DDRM.mult(V,Wt,tmp);
-		CommonOps_DDRM.mult(tmp, Ut,PA);
+		CommonOps_DDRM.mult(V, Wt, tmp);
+		CommonOps_DDRM.mult(tmp, Ut, PA);
 
 		// Vector U, which is P*U = 0
-		SpecializedOps_DDRM.subvector(V,0,3,V.numRows,false,0,ns);
+		SpecializedOps_DDRM.subvector(V, 0, 3, V.numRows, false, 0, ns);
 
 		return true;
 	}
@@ -79,14 +80,13 @@ public class ProjectiveToIdentity {
 	 * Retrieve projective transform H
 	 */
 	public void computeH( DMatrixRMaj H ) {
-		H.reshape(4,4);
+		H.reshape(4, 4);
 
-		CommonOps_DDRM.insert(PA,H,0,0);
+		CommonOps_DDRM.insert(PA, H, 0, 0);
 
 		for (int i = 0; i < 4; i++) {
-			H.unsafe_set(i,3,ns.data[i]);
+			H.unsafe_set(i, 3, ns.data[i]);
 		}
-
 	}
 
 	public DMatrixRMaj getPseudoInvP() {

@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.factory.tracker;
 
 import boofcv.struct.StandardConfigurationChecks;

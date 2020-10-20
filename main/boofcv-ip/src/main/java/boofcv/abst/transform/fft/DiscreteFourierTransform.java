@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,14 +51,15 @@ public interface DiscreteFourierTransform<I extends ImageBase<I>, T extends Imag
 	 * @param image (Input) Input image.  Default: Not modified.
 	 * @param transform (Output) Fourier transform, twice width and same height of input.  Modified.
 	 */
-	public void forward( I image , T transform );
+	public void forward( I image, T transform );
 
 	/**
 	 * Applies the inverse transform to a fourier transformed image to recover the original image
+	 *
 	 * @param transform (Input) Fourier transform. twice width and same height of output.  Default: Not modified.
 	 * @param image (Output) reconstructed image.  Modified.
 	 */
-	public void inverse( T transform , I image );
+	public void inverse( T transform, I image );
 
 	/**
 	 * This function can toggle the internal implementations ability to modify the input image or input transform.
@@ -69,6 +70,7 @@ public interface DiscreteFourierTransform<I extends ImageBase<I>, T extends Imag
 
 	/**
 	 * Returns state of forward modification flag
+	 *
 	 * @return true for the input can be modified and false for it will not be modified.
 	 */
 	public boolean isModifyInputs();

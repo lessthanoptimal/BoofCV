@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,90 +29,90 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class FactoryGImageGray {
 
 	public static GImageGray create( Class imageType ) {
-		if( imageType == GrayU8.class )
+		if (imageType == GrayU8.class)
 			return new GSingle_U8(null);
-		else if( imageType == GrayS8.class )
-			return new GSingle_S8( null );
-		else if( imageType == GrayU16.class )
-			return new GSingle_U16( null );
-		else if( imageType == GrayS16.class )
-			return new GSingle_S16( null );
-		else if( imageType == GrayS32.class )
-			return new GSingle_S32( null );
-		else if( imageType == GrayS64.class )
-			return new GSingle_I64( null );
-		else if( imageType == GrayF32.class )
-			return new GSingle_F32( null );
-		else if( imageType == GrayF64.class )
-			return new GSingle_F64( null );
+		else if (imageType == GrayS8.class)
+			return new GSingle_S8(null);
+		else if (imageType == GrayU16.class)
+			return new GSingle_U16(null);
+		else if (imageType == GrayS16.class)
+			return new GSingle_S16(null);
+		else if (imageType == GrayS32.class)
+			return new GSingle_S32(null);
+		else if (imageType == GrayS64.class)
+			return new GSingle_I64(null);
+		else if (imageType == GrayF32.class)
+			return new GSingle_F32(null);
+		else if (imageType == GrayF64.class)
+			return new GSingle_F64(null);
 		else
-			throw new IllegalArgumentException("Unknown image type: "+imageType);
+			throw new IllegalArgumentException("Unknown image type: " + imageType);
 	}
 
 	public static GImageGray wrap( ImageGray image ) {
-		if( image.getClass() == GrayU8.class )
-			return new GSingle_U8( (GrayU8)image );
-		else if( image.getClass() == GrayS8.class )
-			return new GSingle_S8( (GrayS8)image );
-		else if( image.getClass() == GrayU16.class )
-			return new GSingle_U16( (GrayU16)image );
-		else if( image.getClass() == GrayS16.class )
-			return new GSingle_S16( (GrayS16)image );
-		else if( image.getClass() == GrayS32.class )
-			return new GSingle_S32( (GrayS32)image );
-		else if( image.getClass() == GrayS64.class )
-			return new GSingle_I64( (GrayS64)image );
-		else if( image.getClass() == GrayF32.class )
-			return new GSingle_F32( (GrayF32)image );
-		else if( image.getClass() == GrayF64.class )
-			return new GSingle_F64( (GrayF64)image );
+		if (image.getClass() == GrayU8.class)
+			return new GSingle_U8((GrayU8)image);
+		else if (image.getClass() == GrayS8.class)
+			return new GSingle_S8((GrayS8)image);
+		else if (image.getClass() == GrayU16.class)
+			return new GSingle_U16((GrayU16)image);
+		else if (image.getClass() == GrayS16.class)
+			return new GSingle_S16((GrayS16)image);
+		else if (image.getClass() == GrayS32.class)
+			return new GSingle_S32((GrayS32)image);
+		else if (image.getClass() == GrayS64.class)
+			return new GSingle_I64((GrayS64)image);
+		else if (image.getClass() == GrayF32.class)
+			return new GSingle_F32((GrayF32)image);
+		else if (image.getClass() == GrayF64.class)
+			return new GSingle_F64((GrayF64)image);
 		else
-			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
+			throw new IllegalArgumentException("Unknown image type: " + image.getClass());
 	}
 
-	public static GImageGray wrap(ImageGray image , GImageGray output ) {
-		if( output == null )
+	public static GImageGray wrap( ImageGray image, GImageGray output ) {
+		if (output == null)
 			return wrap(image);
 
-		if( image.getClass() == GrayU8.class )
+		if (image.getClass() == GrayU8.class)
 			((GSingle_U8)output).image = (GrayU8)image;
-		else if( image.getClass() == GrayS8.class )
+		else if (image.getClass() == GrayS8.class)
 			((GSingle_S8)output).image = (GrayS8)image;
-		else if( image.getClass() == GrayU16.class )
+		else if (image.getClass() == GrayU16.class)
 			((GSingle_U16)output).image = (GrayU16)image;
-		else if( image.getClass() == GrayS16.class )
+		else if (image.getClass() == GrayS16.class)
 			((GSingle_S16)output).image = (GrayS16)image;
-		else if( image.getClass() == GrayS32.class )
+		else if (image.getClass() == GrayS32.class)
 			((GSingle_S32)output).image = (GrayS32)image;
-		else if( image.getClass() == GrayS64.class )
+		else if (image.getClass() == GrayS64.class)
 			((GSingle_I64)output).image = (GrayS64)image;
-		else if( image.getClass() == GrayF32.class )
+		else if (image.getClass() == GrayF32.class)
 			((GSingle_F32)output).image = (GrayF32)image;
-		else if( image.getClass() == GrayF64.class )
+		else if (image.getClass() == GrayF64.class)
 			((GSingle_F64)output).image = (GrayF64)image;
 		else
-			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
+			throw new IllegalArgumentException("Unknown image type: " + image.getClass());
 
 		return output;
 	}
 
 	public static GImageGray wrap( ImageBorder image ) {
-		if( GrayI.class.isAssignableFrom(image.getImage().getClass()) )
-			return new Border_S32( (ImageBorder_S32)image );
-		else if( image.getImage().getClass() == GrayF32.class )
-			return new Border_F32( (ImageBorder_F32)image );
-		else if( image.getImage().getClass() == GrayF64.class )
-			return new Border_F64( (ImageBorder_F64)image );
+		if (GrayI.class.isAssignableFrom(image.getImage().getClass()))
+			return new Border_S32((ImageBorder_S32)image);
+		else if (image.getImage().getClass() == GrayF32.class)
+			return new Border_F32((ImageBorder_F32)image);
+		else if (image.getImage().getClass() == GrayF64.class)
+			return new Border_F64((ImageBorder_F64)image);
 		else
-			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
+			throw new IllegalArgumentException("Unknown image type: " + image.getClass());
 	}
 
-	public static class Border_S32 extends GSingleBorder<ImageBorder_S32>
-	{
-		public Border_S32(ImageBorder_S32 image) {
+	public static class Border_S32 extends GSingleBorder<ImageBorder_S32> {
+		public Border_S32( ImageBorder_S32 image ) {
 			super(image);
 		}
 
@@ -122,32 +122,32 @@ public class FactoryGImageGray {
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.intValue());
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
 
@@ -157,9 +157,8 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class Border_F32 extends GSingleBorder<ImageBorder_F32>
-	{
-		public Border_F32(ImageBorder_F32 image) {
+	public static class Border_F32 extends GSingleBorder<ImageBorder_F32> {
+		public Border_F32( ImageBorder_F32 image ) {
 			super(image);
 		}
 
@@ -169,32 +168,32 @@ public class FactoryGImageGray {
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.floatValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.floatValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
 
@@ -204,9 +203,8 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class Border_F64 extends GSingleBorder<ImageBorder_F64>
-	{
-		public Border_F64(ImageBorder_F64 image) {
+	public static class Border_F64 extends GSingleBorder<ImageBorder_F64> {
+		public Border_F64( ImageBorder_F64 image ) {
 			super(image);
 		}
 
@@ -216,32 +214,32 @@ public class FactoryGImageGray {
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return (float)image.get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return (float)image.get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.floatValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.floatValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
 
@@ -251,39 +249,38 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_U8 extends GSingleBaseInt<GrayU8>
-	{
-		public GSingle_U8(GrayU8 image) {
+	public static class GSingle_U8 extends GSingleBaseInt<GrayU8> {
+		public GSingle_U8( GrayU8 image ) {
 			super(image);
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.intValue());
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.unsafe_get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			image.data[index] = (byte)value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index] & 0xFF;
 		}
 
@@ -293,40 +290,38 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_S8 extends GSingleBaseInt<GrayS8>
-	{
-		public GSingle_S8(GrayS8 image) {
+	public static class GSingle_S8 extends GSingleBaseInt<GrayS8> {
+		public GSingle_S8( GrayS8 image ) {
 			super(image);
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.unsafe_get(x,y);
-		}
-
-
-		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
+		public float unsafe_getF( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.intValue());
+		}
+
+		@Override
+		public void set( int index, float value ) {
 			image.data[index] = (byte)value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 
@@ -336,39 +331,38 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_U16 extends GSingleBaseInt<GrayU16>
-	{
-		public GSingle_U16(GrayU16 image) {
+	public static class GSingle_U16 extends GSingleBaseInt<GrayU16> {
+		public GSingle_U16( GrayU16 image ) {
 			super(image);
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.unsafe_get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.intValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			image.data[index] = (short)value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index] & 0xFFFF;
 		}
 
@@ -378,39 +372,38 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_S16 extends GSingleBaseInt<GrayS16>
-	{
-		public GSingle_S16(GrayS16 image) {
+	public static class GSingle_S16 extends GSingleBaseInt<GrayS16> {
+		public GSingle_S16( GrayS16 image ) {
 			super(image);
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.unsafe_get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.intValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			image.data[index] = (short)value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 
@@ -420,39 +413,38 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_S32 extends GSingleBaseInt<GrayS32>
-	{
-		public GSingle_S32(GrayS32 image) {
+	public static class GSingle_S32 extends GSingleBaseInt<GrayS32> {
+		public GSingle_S32( GrayS32 image ) {
 			super(image);
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.unsafe_get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.intValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			image.data[index] = (short)value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 
@@ -462,39 +454,38 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_I64 extends GSingleBaseInt<GrayS64>
-	{
-		public GSingle_I64(GrayS64 image) {
+	public static class GSingle_I64 extends GSingleBaseInt<GrayS64> {
+		public GSingle_I64( GrayS64 image ) {
 			super(image);
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.unsafe_get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.intValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.intValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			image.data[index] = (long)value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 
@@ -504,9 +495,8 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_F32 extends GSingleBase<GrayF32>
-	{
-		public GSingle_F32(GrayF32 image) {
+	public static class GSingle_F32 extends GSingleBase<GrayF32> {
+		public GSingle_F32( GrayF32 image ) {
 			super(image);
 		}
 
@@ -516,32 +506,32 @@ public class FactoryGImageGray {
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+		public double unsafe_getD( int x, int y ) {
+			return image.unsafe_get(x, y);
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return image.data[image.getIndex(x,y)];
+		public float unsafe_getF( int x, int y ) {
+			return image.data[image.getIndex(x, y)];
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.floatValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.floatValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			image.data[index] = value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return image.data[index];
 		}
 
@@ -551,9 +541,8 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static class GSingle_F64 extends GSingleBase<GrayF64>
-	{
-		public GSingle_F64(GrayF64 image) {
+	public static class GSingle_F64 extends GSingleBase<GrayF64> {
+		public GSingle_F64( GrayF64 image ) {
 			super(image);
 		}
 
@@ -563,32 +552,32 @@ public class FactoryGImageGray {
 		}
 
 		@Override
-		public Number get(int x, int y) {
-			return image.get(x,y);
+		public Number get( int x, int y ) {
+			return image.get(x, y);
 		}
 
 		@Override
-		public double unsafe_getD(int x, int y) {
+		public double unsafe_getD( int x, int y ) {
 			return image.data[image.getIndex(x, y)];
 		}
 
 		@Override
-		public float unsafe_getF(int x, int y) {
-			return (float)image.unsafe_get(x,y);
+		public float unsafe_getF( int x, int y ) {
+			return (float)image.unsafe_get(x, y);
 		}
 
 		@Override
-		public void set(int x, int y, Number num) {
-			image.set(x,y,num.doubleValue());
+		public void set( int x, int y, Number num ) {
+			image.set(x, y, num.doubleValue());
 		}
 
 		@Override
-		public void set(int index, float value) {
+		public void set( int index, float value ) {
 			image.data[index] = value;
 		}
 
 		@Override
-		public float getF(int index) {
+		public float getF( int index ) {
 			return (float)image.data[index];
 		}
 
@@ -598,9 +587,8 @@ public class FactoryGImageGray {
 		}
 	}
 
-	public static abstract class GSingleBaseInt<T extends ImageGray<T>> extends GSingleBase<T>
-	{
-		protected GSingleBaseInt(T image) {
+	public static abstract class GSingleBaseInt<T extends ImageGray<T>> extends GSingleBase<T> {
+		protected GSingleBaseInt( T image ) {
 			super(image);
 		}
 
@@ -614,12 +602,12 @@ public class FactoryGImageGray {
 
 		protected T image;
 
-		protected GSingleBase(T image) {
+		protected GSingleBase( T image ) {
 			this.image = image;
 		}
 
 		@Override
-		public void wrap(ImageGray image) {
+		public void wrap( ImageGray image ) {
 			this.image = (T)image;
 		}
 
@@ -643,12 +631,12 @@ public class FactoryGImageGray {
 
 		protected T image;
 
-		protected GSingleBorder(T image) {
+		protected GSingleBorder( T image ) {
 			this.image = image;
 		}
 
 		@Override
-		public void wrap(ImageGray image) {
+		public void wrap( ImageGray image ) {
 			this.image.setImage(image);
 		}
 

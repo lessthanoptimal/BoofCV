@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.struct.StandardConfigurationChecks;

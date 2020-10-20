@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public abstract class EquirectangularDistortBase_F64 implements PixelTransform<P
 	int outWidth;
 
 	// rotation matrix
-	DMatrixRMaj R = CommonOps_DDRM.identity(3,3);
+	DMatrixRMaj R = CommonOps_DDRM.identity(3, 3);
 
 	// storage for intermediate variables
 	Vector3D_F64 n = new Vector3D_F64();
@@ -56,14 +56,14 @@ public abstract class EquirectangularDistortBase_F64 implements PixelTransform<P
 	 * @param width equirectangular image width
 	 * @param height equirectangular image height
 	 */
-	public void setEquirectangularShape(int width , int height ) {
+	public void setEquirectangularShape( int width, int height ) {
 		tools.configure(width, height);
 	}
 
 	/**
 	 * Set for concurrent code. Doesn't copy expensive model variables
 	 */
-	public void setConcurrent(EquirectangularDistortBase_F64 original ) {
+	public void setConcurrent( EquirectangularDistortBase_F64 original ) {
 		this.outWidth = original.outWidth;
 		this.R.set(original.R);
 		this.n.set(original.n);
@@ -73,16 +73,18 @@ public abstract class EquirectangularDistortBase_F64 implements PixelTransform<P
 
 	/**
 	 * Specifies the rotation offset from the canonical location using yaw and pitch.
+	 *
 	 * @param yaw Radian from -pi to pi
 	 * @param pitch Radian from -pi/2 to pi/2
 	 * @param roll Radian from -pi to pi
 	 */
-	public void setDirection(double yaw, double pitch, double roll ) {
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,pitch,yaw,roll,R);
+	public void setDirection( double yaw, double pitch, double roll ) {
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX, pitch, yaw, roll, R);
 	}
 
 	/**
 	 * Specifies direction using a rotation matrix
+	 *
 	 * @param R rotation matrix
 	 */
 	public void setDirection( DMatrixRMaj R ) {
@@ -95,13 +97,13 @@ public abstract class EquirectangularDistortBase_F64 implements PixelTransform<P
 	 * @param width output image width
 	 * @param height output image height
 	 */
-	protected void declareVectors( int width , int height ) {
+	protected void declareVectors( int width, int height ) {
 		this.outWidth = width;
 
-		if( vectors.length < width*height ) {
+		if (vectors.length < width*height) {
 			Point3D_F64[] tmp = new Point3D_F64[width*height];
 
-			System.arraycopy(vectors,0,tmp,0,vectors.length);
+			System.arraycopy(vectors, 0, tmp, 0, vectors.length);
 			for (int i = vectors.length; i < tmp.length; i++) {
 				tmp[i] = new Point3D_F64();
 			}
@@ -116,14 +118,14 @@ public abstract class EquirectangularDistortBase_F64 implements PixelTransform<P
 	 * @param y Pixel y-coordinate in rendered pinhole camera
 	 */
 	@Override
-	public void compute(int x, int y, Point2D_F64 out ) {
+	public void compute( int x, int y, Point2D_F64 out ) {
 		// grab precomputed normalized image coordinate at canonical location
-		Point3D_F64 v = vectors[y*outWidth+x];
+		Point3D_F64 v = vectors[y*outWidth + x];
 		// move to requested orientation
-		GeometryMath_F64.mult(R,v,n); // TODO make faster by not using an array based matrix
+		GeometryMath_F64.mult(R, v, n); // TODO make faster by not using an array based matrix
 
 		// compute pixel coordinate
-		tools.normToEquiFV(n.x,n.y,n.z,out);
+		tools.normToEquiFV(n.x, n.y, n.z, out);
 	}
 
 	public EquirectangularTools_F64 getTools() {

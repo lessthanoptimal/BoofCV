@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.factory.geo;
 
 import boofcv.struct.StandardConfigurationChecks;

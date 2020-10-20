@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.misc;
 
 import boofcv.struct.StandardConfigurationChecks;

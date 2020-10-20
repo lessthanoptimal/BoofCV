@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,10 +66,11 @@ public class EquirectangularTools_F64 {
 
 	/**
 	 * Specifies the image and which latitude/longtiude will comprise the center axises
+	 *
 	 * @param width Image width
 	 * @param height Image height
 	 */
-	public void configure( int width , int height ) {
+	public void configure( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}
@@ -81,43 +82,44 @@ public class EquirectangularTools_F64 {
 	 * @param y pixel coordinate in equirectangular image
 	 * @param norm Normalized pointing vector
 	 */
-	public void equiToNorm(double x , double y , Point3D_F64 norm ) {
-		equiToLatLon(x,y, temp);
-		ConvertCoordinates3D_F64.latlonToUnitVector(temp.lat,temp.lon, norm);
+	public void equiToNorm( double x, double y, Point3D_F64 norm ) {
+		equiToLatLon(x, y, temp);
+		ConvertCoordinates3D_F64.latlonToUnitVector(temp.lat, temp.lon, norm);
 	}
 
-	public void normToEqui( double nx , double ny , double nz , Point2D_F64 rect ) {
+	public void normToEqui( double nx, double ny, double nz, Point2D_F64 rect ) {
 		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
 
-		/**/double lon = /**/Math.atan2(ny,nx);
-		/**/double lat = UtilAngle.atanSafe(-nz,r);
+		/**/double lon = /**/Math.atan2(ny, nx);
+		/**/double lat = UtilAngle.atanSafe(-nz, r);
 
-		latlonToEqui((double) lat, (double) lon, rect);
+		latlonToEqui((double)lat, (double)lon, rect);
 	}
 
-	public void equiToNormFV(double x , double y , Point3D_F64 norm ) {
-		equiToLatLonFV(x,y, temp);
-		ConvertCoordinates3D_F64.latlonToUnitVector(temp.lat,temp.lon, norm);
+	public void equiToNormFV( double x, double y, Point3D_F64 norm ) {
+		equiToLatLonFV(x, y, temp);
+		ConvertCoordinates3D_F64.latlonToUnitVector(temp.lat, temp.lon, norm);
 	}
 
-	public void normToEquiFV( double nx , double ny , double nz , Point2D_F64 rect ) {
+	public void normToEquiFV( double nx, double ny, double nz, Point2D_F64 rect ) {
 		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
 
-		/**/double lon = /**/Math.atan2(ny,nx);
-		/**/double lat = UtilAngle.atanSafe(-nz,r);
+		/**/double lon = /**/Math.atan2(ny, nx);
+		/**/double lat = UtilAngle.atanSafe(-nz, r);
 
-		latlonToEquiFV((double) lat, (double) lon, rect);
+		latlonToEquiFV((double)lat, (double)lon, rect);
 	}
 
 	/**
 	 * Converts the equirectangular coordinate into a latitude and longitude
+	 *
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param geo  (output)
+	 * @param geo (output)
 	 */
-	public void equiToLatLon(double x , double y , GeoLL_F64 geo ) {
+	public void equiToLatLon( double x, double y, GeoLL_F64 geo ) {
 		geo.lon = (x/width - 0.5)*GrlConstants.PI2;
-		geo.lat = (y/(height-1) - 0.5)*GrlConstants.PI;
+		geo.lat = (y/(height - 1) - 0.5)*GrlConstants.PI;
 	}
 
 	/**
@@ -129,34 +131,36 @@ public class EquirectangularTools_F64 {
 	 *
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param geo  (output)
+	 * @param geo (output)
 	 */
-	public void equiToLatLonFV(double x , double y , GeoLL_F64 geo ) {
+	public void equiToLatLonFV( double x, double y, GeoLL_F64 geo ) {
 		geo.lon = (x/width - 0.5)*GrlConstants.PI2;
-		geo.lat = ((height-y-1.0)/(height-1) - 0.5)*GrlConstants.PI;
+		geo.lat = ((height - y - 1.0)/(height - 1) - 0.5)*GrlConstants.PI;
 	}
 
 	/**
 	 * Convert from latitude-longitude coordinates into equirectangular coordinates
+	 *
 	 * @param lat Latitude
 	 * @param lon Longitude
 	 * @param rect (Output) equirectangular coordinate
 	 */
-	public void latlonToEqui(double lat, double lon, Point2D_F64 rect) {
-		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.PI2 + 0.5)*width;
-		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.PI + 0.5)*(height-1);
+	public void latlonToEqui( double lat, double lon, Point2D_F64 rect ) {
+		rect.x = UtilAngle.wrapZeroToOne(lon/GrlConstants.PI2 + 0.5)*width;
+		rect.y = UtilAngle.reflectZeroToOne(lat/GrlConstants.PI + 0.5)*(height - 1);
 	}
 
 	/**
 	 * Convert from latitude-longitude coordinates into equirectangular coordinates.
 	 * Vertical equirectangular axis has been flipped
+	 *
 	 * @param lat Latitude
 	 * @param lon Longitude
 	 * @param rect (Output) equirectangular coordinate
 	 */
-	public void latlonToEquiFV(double lat, double lon, Point2D_F64 rect) {
-		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.PI2 + 0.5)*width;
-		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.PI + 0.5)*(height-1);
+	public void latlonToEquiFV( double lat, double lon, Point2D_F64 rect ) {
+		rect.x = UtilAngle.wrapZeroToOne(lon/GrlConstants.PI2 + 0.5)*width;
+		rect.y = UtilAngle.reflectZeroToOne(lat/GrlConstants.PI + 0.5)*(height - 1);
 		rect.y = height - rect.y - 1;
 	}
 

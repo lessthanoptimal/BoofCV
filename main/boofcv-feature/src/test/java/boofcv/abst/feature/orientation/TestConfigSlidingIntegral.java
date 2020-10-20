@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.abst.feature.orientation;
 
 import boofcv.struct.StandardConfigurationChecks;

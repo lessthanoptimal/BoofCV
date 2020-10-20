@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.factory.segmentation;
 
 import boofcv.struct.StandardConfigurationChecks;

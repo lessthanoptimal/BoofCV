@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.abst.distort;
 
 import boofcv.struct.StandardConfigurationChecks;

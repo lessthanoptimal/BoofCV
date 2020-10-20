@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package boofcv.alg.flow;
 
 import boofcv.struct.StandardConfigurationChecks;
