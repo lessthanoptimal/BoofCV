@@ -1,21 +1,21 @@
 dependencies {
-    api project(':main:boofcv-ip')
-    api project(':main:boofcv-feature')
-    api project(':main:boofcv-geo')
-    api project(':main:boofcv-sfm')
+	api project(':main:boofcv-ip')
+	api project(':main:boofcv-feature')
+	api project(':main:boofcv-geo')
+	api project(':main:boofcv-sfm')
 
-    ['main','models'].each {String a ->
-        compile( group: 'org.deepboof', name: a, version: project.deepboof_version) {
-            exclude group: 'com.thoughtworks.xstream'
-            exclude group: 'org.ddogleg'
-            exclude group: 'org.georegression'
-            exclude group: 'org.ejml'
-        }}
+	['main','models'].each {String a ->
+		compile( group: 'org.deepboof', name: a, version: project.deepboof_version) {
+			exclude group: 'com.thoughtworks.xstream'
+			exclude group: 'org.ddogleg'
+			exclude group: 'org.georegression'
+			exclude group: 'org.ejml'
+		}}
 
-    benchmarkImplementation project(':main:boofcv-io')
-    benchmarkImplementation project(':main:boofcv-ip')
-    
-    testImplementation project(':main:boofcv-io')
-    testImplementation project(':main:boofcv-simulation')
-    testImplementation project(':integration:boofcv-swing')
+	benchmarkImplementation project(':main:boofcv-io')
+	benchmarkImplementation project(':main:boofcv-ip')
+
+	testImplementation project(':main:boofcv-io')
+	testImplementation project(':main:boofcv-simulation')
+	testImplementation project(':integration:boofcv-swing')
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.interpolate.array;
 
-
 /**
  * <p>
  * Neville's algorithm for polynomial interpolation and extrapolation.  Neville's algorithm improves upon
@@ -27,26 +26,27 @@ package boofcv.alg.interpolate.array;
  * <p>
  * See Numerical Recipes Third Edition page 118.
  * </p>
+ *
  * @author Peter Abeles
  */
 public class PolynomialNeville_F32 extends Interpolate1D_F32 {
-	private float c[];
-	private float d[];
+	private final float[] c;
+	private final float[] d;
 
-	public PolynomialNeville_F32(int maxDegree) {
+	public PolynomialNeville_F32( int maxDegree ) {
 		super(maxDegree);
 		c = new float[M];
 		d = new float[M];
 	}
 
-	public PolynomialNeville_F32(int maxDegree, float x[], float y[], int size) {
+	public PolynomialNeville_F32( int maxDegree, float x[], float y[], int size ) {
 		super(maxDegree, x, y, size);
 		c = new float[M];
 		d = new float[M];
 	}
 
 	@Override
-	protected float compute(float sample) {
+	protected float compute( float sample ) {
 		int i0 = index0;
 
 		// find the index with the smallest difference and set c and b arrays
@@ -76,12 +76,12 @@ public class PolynomialNeville_F32 extends Interpolate1D_F32 {
 				if (den == 0.0) {
 					throw new RuntimeException("Two x's are identical");
 				}
-				den = w / den;
-				d[i] = hp * den;
-				c[i] = ho * den;
+				den = w/den;
+				d[i] = hp*den;
+				c[i] = ho*den;
 			}
 
-			if (2 * (closestIndex + 1) < M - m) {
+			if (2*(closestIndex + 1) < M - m) {
 				estimate += c[closestIndex + 1];
 			} else {
 				estimate += d[closestIndex];

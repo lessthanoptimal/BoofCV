@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,12 +49,12 @@ public class ContourPacked {
 		internalIndexes.reset();
 	}
 
-   public ContourPacked copy() {
-      ContourPacked ret = new ContourPacked();
-      ret.id = id;
-      ret.externalIndex = externalIndex;
-      ret.internalIndexes = internalIndexes.copy();
+	public ContourPacked copy() {
+		ContourPacked ret = new ContourPacked();
+		ret.id = id;
+		ret.externalIndex = externalIndex;
+		ret.internalIndexes = internalIndexes.copy();
 
-      return ret;
-   }
+		return ret;
+	}
 }

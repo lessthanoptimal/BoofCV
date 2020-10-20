@@ -125,4 +125,3 @@ public class TestHessianThreeDeterminant_Inner extends BoofStandardJUnit {
 		return expected;
 	}
 }
-

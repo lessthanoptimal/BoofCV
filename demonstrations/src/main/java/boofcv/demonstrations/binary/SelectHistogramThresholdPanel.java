@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
-public class SelectHistogramThresholdPanel extends JPanel implements ChangeListener , ActionListener {
+public class SelectHistogramThresholdPanel extends JPanel implements ChangeListener, ActionListener {
 	JSlider thresholdLevel;
 	HistogramThresholdPanel histogramPanel;
 	JButton toggleButton;
@@ -42,24 +42,23 @@ public class SelectHistogramThresholdPanel extends JPanel implements ChangeListe
 	int valueThreshold;
 	boolean valueDown;
 
-	public SelectHistogramThresholdPanel( int threshold ,
-										  boolean directionDown )
-	{
-	    this.valueThreshold = threshold;
+	public SelectHistogramThresholdPanel( int threshold,
+										  boolean directionDown ) {
+		this.valueThreshold = threshold;
 		this.valueDown = directionDown;
 
-		histogramPanel = new HistogramThresholdPanel(256,256);
-		histogramPanel.setPreferredSize(new Dimension(120,60));
+		histogramPanel = new HistogramThresholdPanel(256, 256);
+		histogramPanel.setPreferredSize(new Dimension(120, 60));
 		histogramPanel.setMaximumSize(histogramPanel.getPreferredSize());
 
-		thresholdLevel = new JSlider(JSlider.HORIZONTAL,0,255,20);
+		thresholdLevel = new JSlider(JSlider.HORIZONTAL, 0, 255, 20);
 		thresholdLevel.setMajorTickSpacing(20);
 		thresholdLevel.setPaintTicks(true);
 		thresholdLevel.addChangeListener(this);
 		thresholdLevel.setValue(threshold);
 
 		toggleButton = new JButton();
-		toggleButton.setPreferredSize(new Dimension(100,30));
+		toggleButton.setPreferredSize(new Dimension(100, 30));
 		toggleButton.setMaximumSize(toggleButton.getPreferredSize());
 		toggleButton.setMinimumSize(toggleButton.getPreferredSize());
 		setToggleText();
@@ -69,14 +68,13 @@ public class SelectHistogramThresholdPanel extends JPanel implements ChangeListe
 		add(Box.createRigidArea(new Dimension(8, 8)));
 		add(thresholdLevel);
 		add(toggleButton);
-
 	}
 
 	public HistogramThresholdPanel getHistogramPanel() {
 		return histogramPanel;
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
@@ -89,51 +87,50 @@ public class SelectHistogramThresholdPanel extends JPanel implements ChangeListe
 	}
 
 	private void setToggleText() {
-		if(valueDown)
+		if (valueDown)
 			toggleButton.setText("down");
 		else
 			toggleButton.setText("Up");
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
+	public void stateChanged( ChangeEvent e ) {
 
-		if( e.getSource() == thresholdLevel )  {
+		if (e.getSource() == thresholdLevel) {
 			int oldValue = valueThreshold;
 			valueThreshold = ((Number)thresholdLevel.getValue()).intValue();
-			if( oldValue == valueThreshold )
+			if (oldValue == valueThreshold)
 				return;
 		}
 
-		histogramPanel.setThreshold(valueThreshold,valueDown);
+		histogramPanel.setThreshold(valueThreshold, valueDown);
 		histogramPanel.repaint();
 
-		if( listener != null )
+		if (listener != null)
 			listener.histogramThresholdChange();
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == toggleButton ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == toggleButton) {
 			valueDown = !valueDown;
 			setToggleText();
 		}
 
-		histogramPanel.setThreshold(valueThreshold,valueDown);
+		histogramPanel.setThreshold(valueThreshold, valueDown);
 		histogramPanel.repaint();
 
-		if( listener != null )
+		if (listener != null)
 			listener.histogramThresholdChange();
 	}
 
-	public void setThreshold(int threshold) {
+	public void setThreshold( int threshold ) {
 		valueThreshold = threshold;
 		thresholdLevel.setValue(threshold);
-		histogramPanel.setThreshold(valueThreshold,valueDown);
+		histogramPanel.setThreshold(valueThreshold, valueDown);
 	}
 
-	public static interface Listener
-	{
+	public static interface Listener {
 		public void histogramThresholdChange();
 	}
 }

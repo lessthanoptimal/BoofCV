@@ -1,44 +1,44 @@
 
 dependencies {
-    api project(':main:boofcv-ip')
-    api project(':main:boofcv-io')
-    api project(':main:boofcv-feature')
-    api project(':main:boofcv-geo')
-    api project(':main:boofcv-sfm')
-    api project(':main:boofcv-recognition')
-    api project(':integration:boofcv-swing')
-    api project(':integration:boofcv-WebcamCapture')
-    api project(':integration:boofcv-javacv')
-    api project(':integration:boofcv-pdf')
+	api project(':main:boofcv-ip')
+	api project(':main:boofcv-io')
+	api project(':main:boofcv-feature')
+	api project(':main:boofcv-geo')
+	api project(':main:boofcv-sfm')
+	api project(':main:boofcv-recognition')
+	api project(':integration:boofcv-swing')
+	api project(':integration:boofcv-WebcamCapture')
+	api project(':integration:boofcv-javacv')
+	api project(':integration:boofcv-pdf')
 
-    api group: 'args4j', name: 'args4j', version: '2.33'
+	api group: 'args4j', name: 'args4j', version: '2.33'
 }
 
 idea {
-    module {
-        name = "BoofCV Applications"
-    }
+	module {
+		name = "BoofCV Applications"
+	}
 }
 
 // Create a jar which contains all the applications
 task applicationsJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'BoofCV Applications Jar',
-                'Implementation-Version': version,
-                'Main-Class': 'boofcv.app.Help'
-    }
+	manifest {
+		attributes 'Implementation-Title': 'BoofCV Applications Jar',
+				'Implementation-Version': version,
+				'Main-Class': 'boofcv.app.Help'
+	}
 
-    outputs.upToDateWhen { false }
+	outputs.upToDateWhen { false }
 
-    from sourceSets.main.output
+	from sourceSets.main.output
 
-    dependsOn configurations.runtimeClasspath
-    from { configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) } } {
-        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
-    }
+	dependsOn configurations.runtimeClasspath
+	from { configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) } } {
+		exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+	}
 
 
-    doLast {
-        archivePath.renameTo(file('applications.jar'))
-    }
+	doLast {
+		archivePath.renameTo(file('applications.jar'))
+	}
 }

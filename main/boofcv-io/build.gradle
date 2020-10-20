@@ -1,8 +1,8 @@
 dependencies {
-    api project(':main:boofcv-ip')
-    api project(':main:boofcv-geo')
-    api project(':main:boofcv-sfm')
+	api project(':main:boofcv-ip')
+	api project(':main:boofcv-geo')
+	api project(':main:boofcv-sfm')
 
-    api group: 'org.yaml', name: 'snakeyaml', version: '1.23'
-    api group: 'commons-io', name: 'commons-io', version: COMMONS_IO_VERSION
+	api group: 'org.yaml', name: 'snakeyaml', version: '1.23'
+	api group: 'commons-io', name: 'commons-io', version: COMMONS_IO_VERSION
 }

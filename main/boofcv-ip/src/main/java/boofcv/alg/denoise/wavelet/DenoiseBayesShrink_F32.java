@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.denoise.wavelet;
 import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.GrayF32;
-
 
 /**
  * <p>
@@ -51,17 +50,16 @@ public class DenoiseBayesShrink_F32 extends SubbandShrink<GrayF32> {
 	}
 
 	@Override
-	protected Number computeThreshold( GrayF32 subband )
-	{
+	protected Number computeThreshold( GrayF32 subband ) {
 		// the maximum magnitude coefficient is used to normalize all the other coefficients
 		// and reduce numerical round-off error
 		float max = ImageStatistics.maxAbs(subband);
 		float varianceY = 0;
-		for( int y = 0; y < subband.height; y++ ) {
+		for (int y = 0; y < subband.height; y++) {
 			int index = subband.startIndex + subband.stride*y;
 			int end = index + subband.width;
 
-			for( ;index < end; index++ ) {
+			for (; index < end; index++) {
 				float v = subband.data[index]/max;
 				varianceY += v*v;
 			}
@@ -71,26 +69,26 @@ public class DenoiseBayesShrink_F32 extends SubbandShrink<GrayF32> {
 		varianceY = (varianceY/(subband.width*subband.height))*max*max;
 
 		// signal standard deviation
-		float inner = varianceY-noiseVariance;
+		float inner = varianceY - noiseVariance;
 
-		if( inner < 0 )
+		if (inner < 0)
 			return Float.POSITIVE_INFINITY;
 		else
 			return noiseVariance/(float)Math.sqrt(inner);
 	}
 
 	@Override
-	public void denoise(GrayF32 transform , int numLevels ) {
+	public void denoise( GrayF32 transform, int numLevels ) {
 
 		int w = transform.width;
 		int h = transform.height;
 
 		// compute the noise variance using the HH_1 subband
-		noiseVariance = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h, null),null);
+		noiseVariance = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2, h/2, w, h, null), null);
 		noiseVariance *= noiseVariance;
 
 //		System.out.println("Noise Variance: "+noiseVariance);
 
-		performShrinkage(transform,numLevels);
+		performShrinkage(transform, numLevels);
 	}
 }

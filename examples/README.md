@@ -17,4 +17,3 @@ Alternatively, to run a specific example outside the application launcher:
 ```bash
 java -cp examples.jar boofcv.examples.imageprocessing.ExampleBinaryOps
 ```
-

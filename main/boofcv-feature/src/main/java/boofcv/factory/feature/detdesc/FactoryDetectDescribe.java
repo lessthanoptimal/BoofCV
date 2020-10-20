@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -223,7 +223,9 @@ public class FactoryDetectDescribe {
 		}
 	}
 
-	protected static <II extends ImageGray<II>> DetectDescribeSurfPlanar<II> createDescribeSurfPlanar(FastHessianFeatureDetector<II> detector, OrientationIntegral<II> orientation, DescribePointSurfPlanar<II> describeMulti) {
+	protected static <II extends ImageGray<II>> DetectDescribeSurfPlanar<II>
+	createDescribeSurfPlanar(FastHessianFeatureDetector<II> detector, OrientationIntegral<II> orientation,
+							 DescribePointSurfPlanar<II> describeMulti) {
 		DetectDescribeSurfPlanar<II> detectDesc;
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			detectDesc = new DetectDescribeSurfPlanar_MT<>(detector, orientation, describeMulti);

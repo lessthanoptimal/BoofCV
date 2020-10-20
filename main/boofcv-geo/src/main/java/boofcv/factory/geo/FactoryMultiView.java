@@ -156,8 +156,8 @@ public class FactoryMultiView {
 	 * @param config (Optional) configuration
 	 * @return bundle adjustment
 	 */
-	public static BundleAdjustment<SceneStructureProjective> bundleDenseProjective( boolean robust,
-																					@Nullable ConfigBundleAdjustment config ) {
+	public static BundleAdjustment<SceneStructureProjective>
+	bundleDenseProjective( boolean robust, @Nullable ConfigBundleAdjustment config ) {
 		if (config == null)
 			config = new ConfigBundleAdjustment();
 

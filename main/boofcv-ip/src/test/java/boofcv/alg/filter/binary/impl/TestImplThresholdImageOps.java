@@ -287,4 +287,3 @@ public class TestImplThresholdImageOps extends BoofStandardJUnit {
 		assertEquals(areaAbove, GImageStatistics.sum(output),1e-4);
 	}
 }
-

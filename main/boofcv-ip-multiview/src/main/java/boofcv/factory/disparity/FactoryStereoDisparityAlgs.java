@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,20 +176,14 @@ public class FactoryStereoDisparityAlgs {
 		return stereoMI;
 	}
 
-	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat<T, GrayU8> createSgmBlockMatch( ConfigDisparitySGM config, Class<T> imageType, ConfigDisparityBM configBM, SgmCostFromBlocks<T> blockCost, BlockRowScore rowScore ) {
-		DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
-		switch (config.configBlockMatch.approach) {
-			case BASIC:
-				blockScore = createBlockMatching(configBM, imageType, blockCost, rowScore);
-				break;
-
-			case BEST5:
-				blockScore = createBestFive(configBM, imageType, blockCost, rowScore);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown type " + config.configBlockMatch.approach);
-		}
+	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat<T, GrayU8>
+	createSgmBlockMatch( ConfigDisparitySGM config, Class<T> imageType, ConfigDisparityBM configBM,
+						 SgmCostFromBlocks<T> blockCost, BlockRowScore rowScore ) {
+		DisparityBlockMatchRowFormat<T, GrayU8> blockScore = switch (config.configBlockMatch.approach) {
+			case BASIC -> createBlockMatching(configBM, imageType, blockCost, rowScore);
+			case BEST5 -> createBestFive(configBM, imageType, blockCost, rowScore);
+			default -> throw new IllegalArgumentException("Unknown type " + config.configBlockMatch.approach);
+		};
 		return blockScore;
 	}
 

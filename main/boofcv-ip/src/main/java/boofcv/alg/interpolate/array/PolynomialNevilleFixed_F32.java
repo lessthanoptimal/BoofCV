@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.interpolate.array;
 
-
 /**
  * Same as {@link PolynomialNeville_F32} but it assumes that the points are
  * sampled at integer values only.
@@ -34,26 +33,25 @@ public class PolynomialNevilleFixed_F32 {
 	float c[];
 	float d[];
 
-	public PolynomialNevilleFixed_F32(int maxDegree) {
+	public PolynomialNevilleFixed_F32( int maxDegree ) {
 		c = new float[maxDegree];
 		d = new float[maxDegree];
 	}
 
-	public PolynomialNevilleFixed_F32(int maxDegree, float y[], int size) {
+	public PolynomialNevilleFixed_F32( int maxDegree, float y[], int size ) {
 		this(maxDegree);
 		setInput(y, size);
 	}
 
-	public void setInput(float y[], int size) {
+	public void setInput( float y[], int size ) {
 		this.size = size;
 		this.y = y;
 	}
 
 	/**
-	 * @param sample
-	 * @return
+	 *
 	 */
-	public float process(float sample, int i0, int i1) {
+	public float process( float sample, int i0, int i1 ) {
 		if (i1 < i0 || (i1 - i0 + 1) > c.length || i1 >= size) {
 			throw new IllegalArgumentException("Bad arguments");
 		}
@@ -61,7 +59,7 @@ public class PolynomialNevilleFixed_F32 {
 		int M = i1 - i0 + 1;
 
 		// compute the closest index
-		int closestIndex = sample % 1f <= 0.5f ? (int) sample : ((int) sample) + 1;
+		int closestIndex = sample%1f <= 0.5f ? (int)sample : ((int)sample) + 1;
 		if (closestIndex > i1) closestIndex = i1;
 		else if (closestIndex < i0) closestIndex = i0;
 		closestIndex -= i0;
@@ -85,12 +83,12 @@ public class PolynomialNevilleFixed_F32 {
 				if (den == 0.0) {
 					throw new RuntimeException("Two x's are identical");
 				}
-				den = w / den;
-				d[i] = hp * den;
-				c[i] = ho * den;
+				den = w/den;
+				d[i] = hp*den;
+				c[i] = ho*den;
 			}
 
-			if (2 * (closestIndex + 1) < M - m) {
+			if (2*(closestIndex + 1) < M - m) {
 				estimate += c[closestIndex + 1];
 			} else {
 				estimate += d[closestIndex];

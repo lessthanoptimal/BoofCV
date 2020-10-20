@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,11 @@
 package boofcv.alg.filter.derivative.impl;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-
 
 /**
  * <p>
@@ -37,7 +37,7 @@ public class GradientThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void process(GrayF32 orig, GrayF32 derivX, GrayF32 derivY) {
+	public static void process( GrayF32 orig, GrayF32 derivX, GrayF32 derivY ) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 		final float[] imgY = derivY.data;
@@ -48,14 +48,14 @@ public class GradientThree_Standard {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
-			int indexSrc = orig.startIndex + stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
+			int indexSrc = orig.startIndex + stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
 			for (; indexSrc < endX; indexSrc++) {
-				imgX[indexX++] = (data[indexSrc + 1] - data[indexSrc - 1]) * 0.5f;
-				imgY[indexY++] = (data[indexSrc + stride] - data[indexSrc - stride]) * 0.5f;
+				imgX[indexX++] = (data[indexSrc + 1] - data[indexSrc - 1])*0.5f;
+				imgY[indexY++] = (data[indexSrc + stride] - data[indexSrc - stride])*0.5f;
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -64,7 +64,7 @@ public class GradientThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void process(GrayU8 orig, GrayS16 derivX, GrayS16 derivY) {
+	public static void process( GrayU8 orig, GrayS16 derivX, GrayS16 derivY ) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -75,14 +75,14 @@ public class GradientThree_Standard {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
-			int indexSrc = orig.startIndex + stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
+			int indexSrc = orig.startIndex + stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
 			for (; indexSrc < endX; indexSrc++) {
-				imgX[indexX++] = (short) ((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF));
-				imgY[indexY++] = (short) ((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
+				imgX[indexX++] = (short)((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF));
+				imgY[indexY++] = (short)((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -91,7 +91,7 @@ public class GradientThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void process(GrayU8 orig, GrayS32 derivX, GrayS32 derivY) {
+	public static void process( GrayU8 orig, GrayS32 derivX, GrayS32 derivY ) {
 		final byte[] data = orig.data;
 		final int[] imgX = derivX.data;
 		final int[] imgY = derivY.data;
@@ -102,9 +102,9 @@ public class GradientThree_Standard {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
-			int indexSrc = orig.startIndex + stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
+			int indexSrc = orig.startIndex + stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
 			for (; indexSrc < endX; indexSrc++) {
@@ -115,7 +115,7 @@ public class GradientThree_Standard {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY) {
+	public static void process( GrayS16 orig, GrayS16 derivX, GrayS16 derivY ) {
 		final short[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -126,17 +126,16 @@ public class GradientThree_Standard {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
-			int indexX = derivX.startIndex + derivX.stride * y + 1;
-			int indexY = derivY.startIndex + derivY.stride * y + 1;
-			int indexSrc = orig.startIndex + stride * y + 1;
+			int indexX = derivX.startIndex + derivX.stride*y + 1;
+			int indexY = derivY.startIndex + derivY.stride*y + 1;
+			int indexSrc = orig.startIndex + stride*y + 1;
 			final int endX = indexSrc + width - 2;
 
 			for (; indexSrc < endX; indexSrc++) {
-				imgX[indexX++] = (short) (data[indexSrc + 1] - data[indexSrc - 1]);
-				imgY[indexY++] = (short) (data[indexSrc + stride] - data[indexSrc - stride]);
+				imgX[indexX++] = (short)(data[indexSrc + 1] - data[indexSrc - 1]);
+				imgY[indexY++] = (short)(data[indexSrc + stride] - data[indexSrc - stride]);
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
-
 }

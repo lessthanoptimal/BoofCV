@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,7 @@ import org.bytedeco.javacpp.indexer.*;
 
 import java.nio.*;
 
+// CHECKSTYLE:OFF
 /**
  * A class to manage the data of audio and video frames. It it used by
  * {@link CanvasFrame}, {@link FrameGrabber}, {@link FrameRecorder}, and their

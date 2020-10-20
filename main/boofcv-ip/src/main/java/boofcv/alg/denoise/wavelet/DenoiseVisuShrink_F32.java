@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.struct.image.GrayF32;
-
 
 /**
  * <p>
@@ -49,7 +48,7 @@ public class DenoiseVisuShrink_F32 implements DenoiseWavelet<GrayF32> {
 	 * @param numLevels Number of levels in the transform.
 	 */
 	@Override
-	public void denoise(GrayF32 transform , int numLevels ) {
+	public void denoise( GrayF32 transform, int numLevels ) {
 		int scale = UtilWavelet.computeScale(numLevels);
 
 		final int h = transform.height;
@@ -59,12 +58,12 @@ public class DenoiseVisuShrink_F32 implements DenoiseWavelet<GrayF32> {
 		final int innerWidth = w/scale;
 		final int innerHeight = h/scale;
 
-		GrayF32 subbandHH = transform.subimage(w/2,h/2,w,h, null);
-		float sigma = UtilDenoiseWavelet.estimateNoiseStdDev(subbandHH,null);
-		float threshold = (float) UtilDenoiseWavelet.universalThreshold(subbandHH,sigma);
+		GrayF32 subbandHH = transform.subimage(w/2, h/2, w, h, null);
+		float sigma = UtilDenoiseWavelet.estimateNoiseStdDev(subbandHH, null);
+		float threshold = (float)UtilDenoiseWavelet.universalThreshold(subbandHH, sigma);
 
 		// apply same threshold to all wavelet coefficients
-		rule.process(transform.subimage(innerWidth,0,w,h, null),threshold);
-		rule.process(transform.subimage(0,innerHeight,innerWidth,h, null),threshold);
+		rule.process(transform.subimage(innerWidth, 0, w, h, null), threshold);
+		rule.process(transform.subimage(0, innerHeight, innerWidth, h, null), threshold);
 	}
 }

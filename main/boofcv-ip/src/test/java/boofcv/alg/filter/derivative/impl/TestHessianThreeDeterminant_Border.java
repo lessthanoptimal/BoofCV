@@ -128,4 +128,3 @@ public class TestHessianThreeDeterminant_Border extends BoofStandardJUnit {
 		return expected;
 	}
 }
-

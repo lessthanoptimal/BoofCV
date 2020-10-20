@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,6 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
-
 
 /**
  * <p>
@@ -69,49 +68,52 @@ import org.jetbrains.annotations.Nullable;
 public class HessianSobel {
 
 	public static Kernel2D_S32 kernelYY_I32 = new Kernel2D_S32(5, new int[]
-			{1, 4, 6 , 4, 1,
-			 0, 0, 0 , 0, 0,
-			-2,-8,-12,-8,-2,
-		     0, 0, 0 , 0, 0,
-		     1, 4, 6 , 4, 1});
+			{1, 4, 6, 4, 1,
+			 0, 0, 0, 0, 0,
+			-2, -8, -12, -8, -2,
+			 0, 0, 0, 0, 0,
+			 1, 4, 6, 4, 1});
 	public static Kernel2D_S32 kernelXX_I32 = new Kernel2D_S32(5, new int[]
-			{1, 0,-2 , 0, 1,
-			 4, 0,-8 , 0, 4,
-		     6, 0,-12, 0, 6,
-		     4, 0,-8 , 0, 4,
-			 1, 0,-2 , 0, 1});
+			{1, 0, -2, 0, 1,
+			4, 0, -8, 0, 4,
+			6, 0, -12, 0, 6,
+			4, 0, -8, 0, 4,
+			1, 0, -2, 0, 1});
 	public static Kernel2D_S32 kernelXY_I32 = new Kernel2D_S32(5, new int[]
-			{1, 2,0,-2,-1,
-			 2, 4,0,-4,-2,
-		     0, 0,0, 0, 0,
-		    -2,-4,0, 4, 2,
-			-1,-2,0, 2, 1});
+			{1, 2, 0, -2, -1,
+			2, 4, 0, -4, -2,
+			0, 0, 0, 0, 0,
+			-2, -4, 0, 4, 2,
+			-1, -2, 0, 2, 1});
 	public static Kernel2D_F32 kernelYY_F32 = new Kernel2D_F32(5, new float[]
-			{1, 4, 6 , 4, 1,
-			 0, 0, 0 , 0, 0,
-			-2,-8,-12,-8,-2,
-		     0, 0, 0 , 0, 0,
-		     1, 4, 6 , 4, 1});
+			{1, 4, 6, 4, 1,
+			0, 0, 0, 0, 0,
+			-2, -8, -12, -8, -2,
+			0, 0, 0, 0, 0,
+			1, 4, 6, 4, 1});
 	public static Kernel2D_F32 kernelXX_F32 = new Kernel2D_F32(5, new float[]
-			{1, 0,-2 , 0, 1,
-			 4, 0,-8 , 0, 4,
-		     6, 0,-12, 0, 6,
-		     4, 0,-8 , 0, 4,
-			 1, 0,-2 , 0, 1});
+			{1, 0, -2, 0, 1,
+			4, 0, -8, 0, 4,
+			6, 0, -12, 0, 6,
+			4, 0, -8, 0, 4,
+			1, 0, -2, 0, 1});
 	public static Kernel2D_F32 kernelXY_F32 = new Kernel2D_F32(5, new float[]
-			{1, 2,0,-2,-1,
-			 2, 4,0,-4,-2,
-		     0, 0,0, 0, 0,
-		    -2,-4,0, 4, 2,
-			-1,-2,0, 2, 1});
+			{1, 2, 0, -2, -1,
+			2, 4, 0, -4, -2,
+			0, 0, 0, 0, 0,
+			-2, -4, 0, 4, 2,
+			-1, -2, 0, 2, 1});
 
-	public static<I extends ImageGray<I>,D extends ImageGray<D>> void process(I input ,
-																			  D derivXX , D derivYY , D derivXY ,
-																			  @Nullable ImageBorder border)
-	{
-		switch( input.getImageType().getDataType()) {
-			case U8: process((GrayU8)input,(GrayS16)derivXX, (GrayS16) derivYY , (GrayS16) derivXY, (ImageBorder_S32)border); break;
-			case F32: process((GrayF32)input,(GrayF32)derivXX, (GrayF32) derivYY, (GrayF32) derivXY , (ImageBorder_F32)border); break;
+	public static <I extends ImageGray<I>, D extends ImageGray<D>> void process( I input,
+																				 D derivXX, D derivYY, D derivXY,
+																				 @Nullable ImageBorder border ) {
+		switch (input.getImageType().getDataType()) {
+			case U8:
+				process((GrayU8)input, (GrayS16)derivXX, (GrayS16)derivYY, (GrayS16)derivXY, (ImageBorder_S32)border);
+				break;
+			case F32:
+				process((GrayF32)input, (GrayF32)derivXX, (GrayF32)derivYY, (GrayF32)derivXY, (ImageBorder_F32)border);
+				break;
 			default:
 				throw new IllegalArgumentException("Unknown input image type");
 		}
@@ -120,46 +122,46 @@ public class HessianSobel {
 	/**
 	 * Computes the image's second derivatives.
 	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
+	 * @param orig Which which is to be differentiated. Not Modified.
 	 * @param derivXX Second derivative along the x-axis. Modified.
 	 * @param derivYY Second derivative along the y-axis. Modified.
 	 * @param derivXY Second cross derivative. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayU8 orig,
-							   GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY ,
-							   ImageBorder_S32 border ) {
+	public static void process( GrayU8 orig,
+								GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY,
+								ImageBorder_S32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivXX, derivYY, derivXY);
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
-		if( border != null ) {
+		if (border != null) {
 			border.setImage(orig);
-			ConvolveJustBorder_General_SB.convolve(kernelXX_I32, border,derivXX);
-			ConvolveJustBorder_General_SB.convolve(kernelYY_I32, border,derivYY);
-			ConvolveJustBorder_General_SB.convolve(kernelXY_I32, border,derivXY);
+			ConvolveJustBorder_General_SB.convolve(kernelXX_I32, border, derivXX);
+			ConvolveJustBorder_General_SB.convolve(kernelYY_I32, border, derivYY);
+			ConvolveJustBorder_General_SB.convolve(kernelXY_I32, border, derivXY);
 		}
 	}
 
 	/**
 	 * Computes the image's second derivatives.
 	 *
-	 * @param orig   Which which is to be differentiated. Not Modified.
+	 * @param orig Which which is to be differentiated. Not Modified.
 	 * @param derivXX Second derivative along the x-axis. Modified.
 	 * @param derivYY Second derivative along the y-axis. Modified.
 	 * @param derivXY Second cross derivative. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayF32 orig,
-							   GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY ,
-							   ImageBorder_F32 border ) {
+	public static void process( GrayF32 orig,
+								GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY,
+								ImageBorder_F32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivXX, derivYY, derivXY);
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 
-		if( border != null ) {
+		if (border != null) {
 			border.setImage(orig);
-			ConvolveJustBorder_General_SB.convolve(kernelXX_F32, border , derivXX);
-			ConvolveJustBorder_General_SB.convolve(kernelYY_F32, border , derivYY);
-			ConvolveJustBorder_General_SB.convolve(kernelXY_F32, border , derivXY);
+			ConvolveJustBorder_General_SB.convolve(kernelXX_F32, border, derivXX);
+			ConvolveJustBorder_General_SB.convolve(kernelYY_F32, border, derivYY);
+			ConvolveJustBorder_General_SB.convolve(kernelXY_F32, border, derivXY);
 		}
 	}
 }

@@ -1,21 +1,21 @@
 
 dependencies {
-    api project(':main:boofcv-ip')
-    api project(':main:boofcv-io')
-    api project(':integration:boofcv-swing')
+	api project(':main:boofcv-ip')
+	api project(':main:boofcv-io')
+	api project(':integration:boofcv-swing')
 
-    compile 'org.jcodec:jcodec:0.2.3'
-    compile 'org.jcodec:jcodec-javase:0.2.3'
+	compile 'org.jcodec:jcodec:0.2.3'
+	compile 'org.jcodec:jcodec-javase:0.2.3'
 }
 
 sourceSets {
-    test {
-        java {
-            srcDir 'test'
-            srcDir 'examples'
-        }
-        resources {
-            srcDir 'resources/test'
-        }
-    }
+	test {
+		java {
+			srcDir 'test'
+			srcDir 'examples'
+		}
+		resources {
+			srcDir 'resources/test'
+		}
+	}
 }

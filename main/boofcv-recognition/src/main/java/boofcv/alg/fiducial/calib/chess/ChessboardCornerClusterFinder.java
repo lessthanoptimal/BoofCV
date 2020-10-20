@@ -242,7 +242,9 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		}
 	}
 
-	private void pyramidalFindNeighbors( List<ChessboardCorner> corners, int numLevels, List<GrowQueue_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel, GrowQueue_I32 indexesUpToLevel ) {
+	private void pyramidalFindNeighbors( List<ChessboardCorner> corners, int numLevels,
+										 List<GrowQueue_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel,
+										 GrowQueue_I32 indexesUpToLevel ) {
 		// start from top of the pyramid, which is the lowest resolution
 		for (int level = numLevels - 1; level >= 0; level--) {
 			GrowQueue_I32 levelCornerIdx = cornersInLevel.get(level);

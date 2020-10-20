@@ -95,4 +95,3 @@ public class TestDerivativeLaplacian_Inner extends BoofStandardJUnit {
 		BoofTesting.assertEqualsInner(expected,deriv, UtilEjml.TEST_F32,1,1,false);
 	}
 }
-

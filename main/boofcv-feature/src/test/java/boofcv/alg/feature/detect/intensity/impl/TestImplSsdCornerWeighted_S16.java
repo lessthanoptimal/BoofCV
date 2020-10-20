@@ -115,4 +115,3 @@ class TestImplSsdCornerWeighted_S16 extends BoofStandardJUnit {
 		}
 	}
 }
-

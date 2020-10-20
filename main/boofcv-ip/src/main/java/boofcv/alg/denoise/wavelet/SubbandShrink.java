@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Performs an adaptive threshold based wavelet shrinkage across each of the wavelet subbands in each
  * layer of the transformed image.
@@ -34,7 +33,7 @@ public abstract class SubbandShrink<I extends ImageGray<I>> implements DenoiseWa
 	// specifies how the threshold is applied to each pixel in the image
 	protected ShrinkThresholdRule<I> rule;
 
-	protected SubbandShrink(ShrinkThresholdRule<I> rule) {
+	protected SubbandShrink( ShrinkThresholdRule<I> rule ) {
 		this.rule = rule;
 	}
 
@@ -42,7 +41,6 @@ public abstract class SubbandShrink<I extends ImageGray<I>> implements DenoiseWa
 	 * Compute the threshold for the specified subband.
 	 *
 	 * @param subband Subband whose threshold is being computed.
-	 * @return
 	 */
 	protected abstract Number computeThreshold( I subband );
 
@@ -53,10 +51,10 @@ public abstract class SubbandShrink<I extends ImageGray<I>> implements DenoiseWa
 	 * @param transform The image being transformed.
 	 * @param numLevels Number of levels in the transform.
 	 */
-	protected void performShrinkage( I transform , int numLevels ) {
+	protected void performShrinkage( I transform, int numLevels ) {
 
 		// step through each layer in the pyramid.
-		for( int i = 0; i < numLevels; i++ ) {
+		for (int i = 0; i < numLevels; i++) {
 			int w = transform.width;
 			int h = transform.height;
 			int ww = w/2;
@@ -65,28 +63,27 @@ public abstract class SubbandShrink<I extends ImageGray<I>> implements DenoiseWa
 			I subband;
 
 			// HL
-			subband = transform.subimage(ww,0,w,hh, null);
+			subband = transform.subimage(ww, 0, w, hh, null);
 			threshold = computeThreshold(subband);
-			rule.process(subband,threshold);
+			rule.process(subband, threshold);
 
 //			System.out.print("HL = "+threshold);
 
 			// LH
-			subband = transform.subimage(0,hh,ww,h, null);
+			subband = transform.subimage(0, hh, ww, h, null);
 			threshold = computeThreshold(subband);
-			rule.process(subband,threshold);
+			rule.process(subband, threshold);
 
 //			System.out.print("  LH = "+threshold);
 
 			// HH
-			subband = transform.subimage(ww,hh,w,h, null);
+			subband = transform.subimage(ww, hh, w, h, null);
 			threshold = computeThreshold(subband);
-			rule.process(subband,threshold);
+			rule.process(subband, threshold);
 
 //			System.out.println("  HH = "+threshold);
 
-			transform = transform.subimage(0,0,ww,hh, null);
+			transform = transform.subimage(0, 0, ww, hh, null);
 		}
-
 	}
 }

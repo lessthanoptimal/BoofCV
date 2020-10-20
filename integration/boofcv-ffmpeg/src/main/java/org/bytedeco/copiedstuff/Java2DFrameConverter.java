@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,7 @@ import java.awt.color.ColorSpace;
 import java.awt.image.*;
 import java.nio.*;
 
+// CHECKSTYLE:OFF
 /**
  * A utility class to copy data between {@link Frame} and {@link BufferedImage}.
  * Since {@link BufferedImage} does not support NIO buffers, we cannot share

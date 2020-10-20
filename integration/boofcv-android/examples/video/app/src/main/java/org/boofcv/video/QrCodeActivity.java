@@ -19,14 +19,10 @@
 
 package org.boofcv.video;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CaptureRequest;
 import android.os.Bundle;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
@@ -38,21 +34,16 @@ import java.util.List;
 import java.util.Locale;
 
 import boofcv.abst.fiducial.QrCodeDetector;
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.android.VisualizeImageData;
 import boofcv.android.camera2.VisualizeCamera2Activity;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
  * Demonstrates how to detect a QR Code and visualize the results.

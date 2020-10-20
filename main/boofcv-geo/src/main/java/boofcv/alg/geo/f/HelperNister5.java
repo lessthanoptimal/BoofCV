@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class HelperNister5 {
 	double L00,L01,L02,L03,L04,L05,L06,L07,L08,L09,L10,L11,L12;
 	double M00,M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12;
 
-	public void setNullSpace( double x[], double y[], double z[] , double w[] ) {
+	public void setNullSpace( double[] x, double[] y, double[] z, double[] w ) {
 		X00=x[0];X01=x[1];X02=x[2]; X10=x[3];X11=x[4];X12=x[5]; X20=x[6];X21=x[7];X22=x[8];
 		Y00=y[0];Y01=y[1];Y02=y[2]; Y10=y[3];Y11=y[4];Y12=y[5]; Y20=y[6];Y21=y[7];Y22=y[8];
 		Z00=z[0];Z01=z[1];Z02=z[2]; Z10=z[3];Z11=z[4];Z12=z[5]; Z20=z[6];Z21=z[7];Z22=z[8];
@@ -54,6 +54,7 @@ public class HelperNister5 {
 	 * @param A a 10 by 10 matrix
 	 */
 	public void setupA1(DMatrixRMaj A) {
+		// CHECKSTYLE:OFF
 		A.data[0] = X20*( X01*X12 - X02*X11 ) + X10*( -X01*X22 + X02*X21 ) + X00*( X11*X22 - X12*X21 );
 		A.data[1] = Y02*( Y10*Y21 - Y11*Y20 ) + Y00*( Y11*Y22 - Y12*Y21 ) + Y01*( -Y10*Y22 + Y12*Y20 );
 		A.data[2] = X22*( X00*Y11 - X01*Y10 - X10*Y01 + X11*Y00 ) + X20*( X01*Y12 - X02*Y11 - X11*Y02 + X12*Y01 ) + X21*( -X00*Y12 + X02*Y10 + X10*Y02 - X12*Y00 ) + X01*( -X10*Y22 + X12*Y20 ) + Y21*( -X00*X12 + X02*X10 ) + X11*( X00*Y22 - X02*Y20 );
@@ -154,6 +155,7 @@ public class HelperNister5 {
 		A.data[97] = Y22*( -W00*Y00 - W01*Y01 + W02*Y02 - W10*Y10 - W11*Y11 + W12*Y12 + W20*Y20 + W21*Y21 + 1.5*W22*Y22 ) + 0.5*( W22*( -Y00*Y00 - Y01*Y01 + Y02*Y02 - Y10*Y10 - Y11*Y11 + Y12*Y12 + Y20*Y20 + Y21*Y21 ) ) + Y02*( W00*Y20 + W01*Y21 + W20*Y00 + W21*Y01 ) + Y12*( W10*Y20 + W11*Y21 + W20*Y10 + W21*Y11 ) + W12*( Y10*Y20 + Y11*Y21 ) + W02*( Y00*Y20 + Y01*Y21 );
 		A.data[98] = Z22*( -X00*Y00 - X01*Y01 + X02*Y02 - X10*Y10 - X11*Y11 + X12*Y12 + X20*Y20 + X21*Y21 + 3.0*X22*Y22 ) + Y22*( -X00*Z00 - X01*Z01 + X02*Z02 - X10*Z10 - X11*Z11 + X12*Z12 + X20*Z20 + X21*Z21 ) + X22*( -Y00*Z00 - Y01*Z01 + Y02*Z02 - Y10*Z10 - Y11*Z11 + Y12*Z12 + Y20*Z20 + Y21*Z21 ) + Y02*( X00*Z20 + X01*Z21 + X20*Z00 + X21*Z01 ) + Z02*( X00*Y20 + X01*Y21 + X20*Y00 + X21*Y01 ) + Z12*( X10*Y20 + X11*Y21 + X20*Y10 + X21*Y11 ) + X02*( Y00*Z20 + Y01*Z21 + Y20*Z00 + Y21*Z01 ) + X12*( Y10*Z20 + Y11*Z21 + Y20*Z10 + Y21*Z11 ) + Y12*( X10*Z20 + X11*Z21 + X20*Z10 + X21*Z11 );
 		A.data[99] = W22*( -X00*Y00 - X01*Y01 + X02*Y02 - X10*Y10 - X11*Y11 + X12*Y12 + X20*Y20 + X21*Y21 + 3.0*X22*Y22 ) + Y22*( -W00*X00 - W01*X01 + W02*X02 - W10*X10 - W11*X11 + W12*X12 + W20*X20 + W21*X21 ) + X22*( -W00*Y00 - W01*Y01 + W02*Y02 - W10*Y10 - W11*Y11 + W12*Y12 + W20*Y20 + W21*Y21 ) + Y02*( W00*X20 + W01*X21 + W20*X00 + W21*X01 ) + X02*( W00*Y20 + W01*Y21 + W20*Y00 + W21*Y01 ) + X12*( W10*Y20 + W11*Y21 + W20*Y10 + W21*Y11 ) + W12*( X10*Y20 + X11*Y21 + X20*Y10 + X21*Y11 ) + W02*( X00*Y20 + X01*Y21 + X20*Y00 + X21*Y01 ) + Y12*( W10*X20 + W11*X21 + W20*X10 + W21*X11 );
+		// CHECKSTYLE:ON
 	}
 
 	/**
@@ -164,6 +166,7 @@ public class HelperNister5 {
 	 * @param B a 10 by 10 matrix
 	 */
 	public void setupA2(DMatrixRMaj B) {
+		// CHECKSTYLE:OFF
 		B.data[0] = Z22*( X00*Z11 - X01*Z10 - X10*Z01 + X11*Z00 ) + Z21*( -X00*Z12 + X02*Z10 + X10*Z02 - X12*Z00 ) + Z20*( X01*Z12 - X02*Z11 - X11*Z02 + X12*Z01 ) + Z01*( X20*Z12 - X22*Z10 ) + Z00*( -X21*Z12 + X22*Z11 ) + Z02*( -X20*Z11 + X21*Z10 );
 		B.data[1] = Z22*( W00*X11 - W01*X10 - W10*X01 + W11*X00 ) + Z21*( -W00*X12 + W02*X10 + W10*X02 - W12*X00 ) + Z20*( W01*X12 - W02*X11 - W11*X02 + W12*X01 ) + Z01*( -W10*X22 + W12*X20 + W20*X12 - W22*X10 ) + Z00*( W11*X22 - W12*X21 - W21*X12 + W22*X11 ) + Z02*( W10*X21 - W11*X20 - W20*X11 + W21*X10 ) + Z12*( -W00*X21 + W01*X20 + W20*X01 - W21*X00 ) + Z11*( W00*X22 - W02*X20 - W20*X02 + W22*X00 ) + Z10*( -W01*X22 + W02*X21 + W21*X02 - W22*X01 );
 		B.data[2] = W00*( W11*X22 - W12*X21 - W21*X12 + W22*X11 ) + W01*( -W10*X22 + W12*X20 + W20*X12 - W22*X10 ) + W02*( W10*X21 - W11*X20 - W20*X11 + W21*X10 ) + W12*( W20*X01 - W21*X00 ) + W11*( -W20*X02 + W22*X00 ) + W10*( W21*X02 - W22*X01 );
@@ -264,6 +267,7 @@ public class HelperNister5 {
 		B.data[97] = Z22*( -W00*Z00 - W01*Z01 + W02*Z02 - W10*Z10 - W11*Z11 + W12*Z12 + W20*Z20 + W21*Z21 + 1.5*W22*Z22 ) + W22*( -0.5*Z00*Z00 - 0.5*Z01*Z01 + 0.5*Z02*Z02 - 0.5*Z10*Z10 - 0.5*Z11*Z11 + 0.5*Z12*Z12 + 0.5*Z20*Z20 + 0.5*Z21*Z21 ) + Z12*( W10*Z20 + W11*Z21 + W20*Z10 + W21*Z11 ) + Z02*( W00*Z20 + W01*Z21 + W20*Z00 + W21*Z01 ) + Z21*( W02*Z01 + W12*Z11 ) + Z20*( W02*Z00 + W12*Z10 );
 		B.data[98] = W22*( -W00*Z00 - W01*Z01 + W02*Z02 - W10*Z10 - W11*Z11 + W12*Z12 + W20*Z20 + W21*Z21 + 1.5*W22*Z22 ) + Z22*( -0.5*W00*W00 - 0.5*W01*W01 + 0.5*W02*W02 - 0.5*W10*W10 - 0.5*W11*W11 + 0.5*W12*W12 + 0.5*W20*W20 + 0.5*W21*W21 ) + W02*( W00*Z20 + W01*Z21 + W20*Z00 + W21*Z01 ) + W12*( W10*Z20 + W11*Z21 + W20*Z10 + W21*Z11 ) + Z12*( W10*W20 + W11*W21 ) + Z02*( W00*W20 + W01*W21 );
 		B.data[99] = W22*( -0.5*W00*W00 - 0.5*W01*W01 + 0.5*W02*W02 - 0.5*W10*W10 - 0.5*W11*W11 + 0.5*W12*W12 + 0.5*W20*W20 + 0.5*W21*W21 + 0.5*W22*W22 ) + W02*( W00*W20 + W01*W21 ) + W12*( W10*W20 + W11*W21 );
+		// CHECKSTYLE:ON
 	}
 
 	/**
@@ -336,7 +340,8 @@ public class HelperNister5 {
 	 *
 	 * @param coefs Array with 11 elements. The index corresponds to the coefficient power.
 	 */
-	public void extractPolynomial( double coefs[] ) {
+	public void extractPolynomial( double[] coefs ) {
+		// CHECKSTYLE:OFF
 		coefs[0] = K12*( L03*M07 - L07*M03 ) + K03*( L07*M12 - L12*M07 ) + K07*( -L03*M12 + L12*M03 );
 		coefs[1] = K03*( L06*M12 + L07*M11 - L11*M07 - L12*M06 ) + K12*( L02*M07 + L03*M06 - L06*M03 - L07*M02 ) + K07*( -L02*M12 - L03*M11 + L11*M03 + L12*M02 ) + K02*( L07*M12 - L12*M07 ) + K11*( L03*M07 - L07*M03 ) + K06*( -L03*M12 + L12*M03 );
 		coefs[2] = K12*( L01*M07 + L02*M06 + L03*M05 - L05*M03 - L06*M02 - L07*M01 ) + L12*( -K01*M07 - K02*M06 - K03*M05 + K05*M03 + K06*M02 + K07*M01 ) + M12*( K01*L07 + K02*L06 + K03*L05 - K05*L03 - K06*L02 - K07*L01 ) + L03*( -K06*M11 - K07*M10 + K10*M07 + K11*M06 ) + K03*( L06*M11 + L07*M10 - L10*M07 - L11*M06 ) + M03*( K06*L11 + K07*L10 - K10*L07 - K11*L06 ) + K02*( L07*M11 - L11*M07 ) + K11*( L02*M07 - L07*M02 ) + K07*( -L02*M11 + L11*M02 );
@@ -348,5 +353,6 @@ public class HelperNister5 {
 		coefs[8] = M04*( -K00*L10 - K01*L09 - K02*L08 + K08*L02 + K09*L01 + K10*L00 ) + M00*( K04*L10 + K05*L09 + K06*L08 - K08*L06 - K09*L05 - K10*L04 ) + M08*( K00*L06 + K01*L05 + K02*L04 - K04*L02 - K05*L01 - K06*L00 ) + K00*( L04*M10 + L05*M09 - L08*M06 - L09*M05 ) + K04*( -L00*M10 - L01*M09 + L08*M02 + L09*M01 ) + K08*( L00*M06 + L01*M05 - L04*M02 - L05*M01 ) + K01*( L04*M09 - L08*M05 ) + K05*( -L00*M09 + L08*M01 ) + K09*( L00*M05 - L04*M01 );
 		coefs[9] = K00*( L04*M09 + L05*M08 - L08*M05 - L09*M04 ) + K04*( -L00*M09 - L01*M08 + L08*M01 + L09*M00 ) + K08*( L00*M05 + L01*M04 - L04*M01 - L05*M00 ) + K01*( L04*M08 - L08*M04 ) + K05*( -L00*M08 + L08*M00 ) + K09*( L00*M04 - L04*M00 );
 		coefs[10] = K00*( L04*M08 - L08*M04 ) + K04*( -L00*M08 + L08*M00 ) + K08*( L00*M04 - L04*M00 );
+		// CHECKSTYLE:ON
 	}
 }

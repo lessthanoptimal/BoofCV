@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,4 +39,3 @@ public class FoundFiducial {
 	public Quadrilateral_F64 distortedPixels = new Quadrilateral_F64();
 
 }
-

@@ -39,4 +39,3 @@ public class TestConfigDisparityError extends BoofStandardJUnit {
 		public HMI() {super(ConfigDisparityError.Census.class);}
 	}
 }
-

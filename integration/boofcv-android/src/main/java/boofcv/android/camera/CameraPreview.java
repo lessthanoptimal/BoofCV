@@ -177,4 +177,3 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 
 }
-

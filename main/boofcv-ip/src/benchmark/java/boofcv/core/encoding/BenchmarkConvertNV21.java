@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,4 +109,3 @@ public class BenchmarkConvertNV21 {
 		ConvertNV21.nv21ToInterleaved(nv21, size, size, interF32);
 	}
 }
-

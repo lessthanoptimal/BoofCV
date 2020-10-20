@@ -18,6 +18,6 @@ Chessboard detector doesn't detect exact corners towards image border
 
 * Assumes straight lines when they are curved
 * Solutions
-  * Going back to or providing the option of using a corner based detector
-  * Fit quadratic edges instead of straight lines
-  * Hybrid approach. Detect squares, compute corners using a corner detector
+* Going back to or providing the option of using a corner based detector
+* Fit quadratic edges instead of straight lines
+* Hybrid approach. Detect squares, compute corners using a corner detector

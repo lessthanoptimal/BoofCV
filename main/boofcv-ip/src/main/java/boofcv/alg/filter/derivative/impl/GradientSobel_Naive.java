@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class GradientSobel_Naive {
 	 */
 	public static void process( GrayI orig,
 								GrayI derivX,
-								GrayI derivY) {
+								GrayI derivY ) {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight();
 
@@ -49,12 +49,12 @@ public class GradientSobel_Naive {
 
 			for (int x = 1; x < width - 1; x++) {
 
-				int dy = -(orig.get(x - 1, y - 1) + 2 * orig.get(x, y - 1) + orig.get(x + 1, y - 1));
-				dy += (orig.get(x - 1, y + 1) + 2 * orig.get(x, y + 1) + orig.get(x + 1, y + 1));
+				int dy = -(orig.get(x - 1, y - 1) + 2*orig.get(x, y - 1) + orig.get(x + 1, y - 1));
+				dy += (orig.get(x - 1, y + 1) + 2*orig.get(x, y + 1) + orig.get(x + 1, y + 1));
 
 
-				int dx = -(orig.get(x - 1, y - 1) + 2 * orig.get(x - 1, y) + orig.get(x - 1, y + 1));
-				dx += (orig.get(x + 1, y - 1) + 2 * orig.get(x + 1, y) + orig.get(x + 1, y + 1));
+				int dx = -(orig.get(x - 1, y - 1) + 2*orig.get(x - 1, y) + orig.get(x - 1, y + 1));
+				dx += (orig.get(x + 1, y - 1) + 2*orig.get(x + 1, y) + orig.get(x + 1, y + 1));
 
 				derivX.set(x, y, dx);
 				derivY.set(x, y, dy);
@@ -67,7 +67,7 @@ public class GradientSobel_Naive {
 	 */
 	public static void process( GrayF32 orig,
 								GrayF32 derivX,
-								GrayF32 derivY) {
+								GrayF32 derivY ) {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight();
 
@@ -75,17 +75,16 @@ public class GradientSobel_Naive {
 
 			for (int x = 1; x < width - 1; x++) {
 
-				float dy = -(orig.get(x - 1, y - 1) * 0.25F + orig.get(x, y - 1) * 0.5F + orig.get(x + 1, y - 1) * 0.25F);
-				dy += (orig.get(x - 1, y + 1) * 0.25F + orig.get(x, y + 1) * 0.5F + orig.get(x + 1, y + 1) * 0.25F);
+				float dy = -(orig.get(x - 1, y - 1)*0.25F + orig.get(x, y - 1)*0.5F + orig.get(x + 1, y - 1)*0.25F);
+				dy += (orig.get(x - 1, y + 1)*0.25F + orig.get(x, y + 1)*0.5F + orig.get(x + 1, y + 1)*0.25F);
 
 
-				float dx = -(orig.get(x - 1, y - 1) * 0.25F + orig.get(x - 1, y) * 0.5F + orig.get(x - 1, y + 1) * 0.25F);
-				dx += (orig.get(x + 1, y - 1) * 0.25F + orig.get(x + 1, y) * 0.5F + orig.get(x + 1, y + 1) * 0.25F);
+				float dx = -(orig.get(x - 1, y - 1)*0.25F + orig.get(x - 1, y)*0.5F + orig.get(x - 1, y + 1)*0.25F);
+				dx += (orig.get(x + 1, y - 1)*0.25F + orig.get(x + 1, y)*0.5F + orig.get(x + 1, y + 1)*0.25F);
 
 				derivX.set(x, y, dx);
 				derivY.set(x, y, dy);
 			}
 		}
 	}
-
 }

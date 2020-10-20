@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,4 +44,3 @@ public interface DetectDescribePoint<T extends ImageBase<T>, Desc extends TupleD
 	 */
 	Desc getDescription(int index);
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.denoise.wavelet;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.sorting.QuickSelect;
-
 
 /**
  * Various functions useful for denoising wavelet transforms.
@@ -50,29 +49,29 @@ public class UtilDenoiseWavelet {
 	 * @param storage Used to temporarily store the absolute value of each element in the subband.
 	 * @return estimated noise variance.
 	 */
-	public static float estimateNoiseStdDev(GrayF32 subband , float storage[] ) {
+	public static float estimateNoiseStdDev( GrayF32 subband, float storage[] ) {
 
-		storage = subbandAbsVal(subband, storage );
+		storage = subbandAbsVal(subband, storage);
 
 		int N = subband.width*subband.height;
-		return QuickSelect.select(storage, N / 2, N)/0.6745f;
+		return QuickSelect.select(storage, N/2, N)/0.6745f;
 	}
 
 	/**
 	 * Computes the absolute value of each element in the subband image are places it into
 	 * 'coef'
 	 */
-	public static float[] subbandAbsVal(GrayF32 subband, float[] coef ) {
-		if( coef == null ) {
+	public static float[] subbandAbsVal( GrayF32 subband, float[] coef ) {
+		if (coef == null) {
 			coef = new float[subband.width*subband.height];
 		}
 
 		int i = 0;
-		for( int y = 0; y < subband.height; y++ ) {
+		for (int y = 0; y < subband.height; y++) {
 			int index = subband.startIndex + subband.stride*y;
 			int end = index + subband.width;
 
-			for( ;index < end; index++  ) {
+			for (; index < end; index++) {
 				coef[i++] = Math.abs(subband.data[index]);
 			}
 		}
@@ -94,14 +93,15 @@ public class UtilDenoiseWavelet {
 	 * [1] D. L. Donoho and I. M. Johnstone, "Ideal spatial adaption via wavelet shrinkage."
 	 * Biometrika, vol 81, pp. 425-455, 1994
 	 * </p>
+	 *
 	 * @param image Input image.  Only the width and height are used in computing this thresold.
 	 * @param noiseSigma Estimated noise sigma.
 	 * @return universal threshold.
 	 */
-	public static double universalThreshold(ImageGray image , double noiseSigma ) {
+	public static double universalThreshold( ImageGray image, double noiseSigma ) {
 		int w = image.width;
 		int h = image.height;
 
-		return noiseSigma*Math.sqrt(2*Math.log(Math.max(w,h)));
+		return noiseSigma*Math.sqrt(2*Math.log(Math.max(w, h)));
 	}
 }

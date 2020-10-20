@@ -23,4 +23,3 @@ import boofcv.testing.BoofStandardJUnit;
 class TestImplImageStatistics extends BoofStandardJUnit {
 	// intentionally empty. This is tested by ImageStatistics
 }
-

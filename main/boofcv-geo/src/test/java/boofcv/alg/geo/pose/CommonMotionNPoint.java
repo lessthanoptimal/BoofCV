@@ -77,5 +77,3 @@ public class CommonMotionNPoint extends BoofStandardJUnit {
 		}
 	}
 }
-
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 
 import java.util.List;
-
 
 /**
  * <p>
@@ -61,13 +60,13 @@ import java.util.List;
 public class PoseFromPairLinear6 {
 
 	// The rank 11 linear system
-	private DMatrixRMaj A = new DMatrixRMaj(1,12);
+	private DMatrixRMaj A = new DMatrixRMaj(1, 12);
 
 	private SolveNullSpace<DMatrixRMaj> solveNullspace = new SolveNullSpaceSvd_DDRM();
 
 	// Found projective transform
-	private DMatrixRMaj P = new DMatrixRMaj(3,4);
-    
+	private DMatrixRMaj P = new DMatrixRMaj(3, 4);
+
 	/**
 	 * Computes the transformation between two camera frames using a linear equation.  Both the
 	 * observed feature locations in each camera image and the depth (z-coordinate) of each feature
@@ -76,16 +75,16 @@ public class PoseFromPairLinear6 {
 	 * @param observations List of observations on the image plane in calibrated coordinates.
 	 * @param locations List of object locations.  One for each observation pair.
 	 */
-	public boolean process( List<AssociatedPair> observations , List<Point3D_F64> locations ) {
-		if( observations.size() != locations.size() )
+	public boolean process( List<AssociatedPair> observations, List<Point3D_F64> locations ) {
+		if (observations.size() != locations.size())
 			throw new IllegalArgumentException("Number of observations and locations must match.");
 
-		if( observations.size() < 6 )
+		if (observations.size() < 6)
 			throw new IllegalArgumentException("At least (if not more than) six points are required.");
 
-		setupA(observations,locations);
+		setupA(observations, locations);
 
-		if( !solveNullspace.process(A,1,P))
+		if (!solveNullspace.process(A, 1, P))
 			return false;
 
 		P.numRows = 3;
@@ -102,16 +101,16 @@ public class PoseFromPairLinear6 {
 	 * @param observations List of pixel or normalized image coordinate observations
 	 * @param locations List of object locations in homogenous coordinates.  One for each observation pair.
 	 */
-	public boolean processHomogenous( List<AssociatedPair> observations , List<Point4D_F64> locations ) {
-		if( observations.size() != locations.size() )
+	public boolean processHomogenous( List<AssociatedPair> observations, List<Point4D_F64> locations ) {
+		if (observations.size() != locations.size())
 			throw new IllegalArgumentException("Number of observations and locations must match.");
 
-		if( observations.size() < 6 )
+		if (observations.size() < 6)
 			throw new IllegalArgumentException("At least (if not more than) six points are required.");
 
-		setupHomogenousA(observations,locations);
+		setupHomogenousA(observations, locations);
 
-		if( !solveNullspace.process(A,1,P))
+		if (!solveNullspace.process(A, 1, P))
 			return false;
 
 		P.numRows = 3;
@@ -136,10 +135,10 @@ public class PoseFromPairLinear6 {
 		return A;
 	}
 
-	private void setupA(List<AssociatedPair> observations , List<Point3D_F64> locations) {
-		A.reshape(2*observations.size(),12,false);
+	private void setupA( List<AssociatedPair> observations, List<Point3D_F64> locations ) {
+		A.reshape(2*observations.size(), 12, false);
 
-		for( int i = 0; i < observations.size(); i++ ) {
+		for (int i = 0; i < observations.size(); i++) {
 			AssociatedPair p = observations.get(i);
 			Point3D_F64 loc = locations.get(i);
 
@@ -147,38 +146,38 @@ public class PoseFromPairLinear6 {
 			Point2D_F64 pt2 = p.p2;
 
 			// normalize the points
-			int w=i*2;
+			int w = i*2;
 
 			double alpha = 1.0/loc.z;
 
-			A.set( w , 4  , -pt1.x);
-			A.set( w , 5  , -pt1.y);
-			A.set( w , 6  , -1);
-			A.set( w , 8  , pt2.y*pt1.x);
-			A.set( w , 9  , pt2.y*pt1.y);
-			A.set( w , 10  , pt2.y);
-			A.set( w , 3  , 0);
-			A.set( w , 7 , -alpha);
-			A.set( w , 11 , alpha*pt2.y);
+			A.set(w, 4, -pt1.x);
+			A.set(w, 5, -pt1.y);
+			A.set(w, 6, -1);
+			A.set(w, 8, pt2.y*pt1.x);
+			A.set(w, 9, pt2.y*pt1.y);
+			A.set(w, 10, pt2.y);
+			A.set(w, 3, 0);
+			A.set(w, 7, -alpha);
+			A.set(w, 11, alpha*pt2.y);
 
 			w++;
 
-			A.set( w , 0  , pt1.x);
-			A.set( w , 1  , pt1.y);
-			A.set( w , 2  , 1);
-			A.set( w , 8  , -pt2.x*pt1.x);
-			A.set( w , 9  , -pt2.x*pt1.y);
-			A.set( w , 10  , -pt2.x);
-			A.set( w , 3  , alpha);
-			A.set( w , 7 , 0);
-			A.set( w , 11 , -alpha*pt2.x);
+			A.set(w, 0, pt1.x);
+			A.set(w, 1, pt1.y);
+			A.set(w, 2, 1);
+			A.set(w, 8, -pt2.x*pt1.x);
+			A.set(w, 9, -pt2.x*pt1.y);
+			A.set(w, 10, -pt2.x);
+			A.set(w, 3, alpha);
+			A.set(w, 7, 0);
+			A.set(w, 11, -alpha*pt2.x);
 		}
 	}
 
-	private void setupHomogenousA(List<AssociatedPair> observations , List<Point4D_F64> locations) {
-		A.reshape(2*observations.size(),12,false);
+	private void setupHomogenousA( List<AssociatedPair> observations, List<Point4D_F64> locations ) {
+		A.reshape(2*observations.size(), 12, false);
 
-		for( int i = 0; i < observations.size(); i++ ) {
+		for (int i = 0; i < observations.size(); i++) {
 			AssociatedPair p = observations.get(i);
 			Point4D_F64 loc = locations.get(i);
 
@@ -186,31 +185,31 @@ public class PoseFromPairLinear6 {
 			Point2D_F64 pt2 = p.p2;
 
 			// normalize the points
-			int w=i*2;
+			int w = i*2;
 
 			double alpha = loc.w/loc.z;
 
-			A.set( w , 4  , -pt1.x);
-			A.set( w , 5  , -pt1.y);
-			A.set( w , 6  , -1);
-			A.set( w , 8  , pt2.y*pt1.x);
-			A.set( w , 9  , pt2.y*pt1.y);
-			A.set( w , 10  , pt2.y);
-			A.set( w , 3  , 0);
-			A.set( w , 7 , -alpha);
-			A.set( w , 11 , alpha*pt2.y);
+			A.set(w, 4, -pt1.x);
+			A.set(w, 5, -pt1.y);
+			A.set(w, 6, -1);
+			A.set(w, 8, pt2.y*pt1.x);
+			A.set(w, 9, pt2.y*pt1.y);
+			A.set(w, 10, pt2.y);
+			A.set(w, 3, 0);
+			A.set(w, 7, -alpha);
+			A.set(w, 11, alpha*pt2.y);
 
 			w++;
 
-			A.set( w , 0  , pt1.x);
-			A.set( w , 1  , pt1.y);
-			A.set( w , 2  , 1);
-			A.set( w , 8  , -pt2.x*pt1.x);
-			A.set( w , 9  , -pt2.x*pt1.y);
-			A.set( w , 10  , -pt2.x);
-			A.set( w , 3  , alpha);
-			A.set( w , 7 , 0);
-			A.set( w , 11 , -alpha*pt2.x);
+			A.set(w, 0, pt1.x);
+			A.set(w, 1, pt1.y);
+			A.set(w, 2, 1);
+			A.set(w, 8, -pt2.x*pt1.x);
+			A.set(w, 9, -pt2.x*pt1.y);
+			A.set(w, 10, -pt2.x);
+			A.set(w, 3, alpha);
+			A.set(w, 7, 0);
+			A.set(w, 11, -alpha*pt2.x);
 		}
 	}
 }

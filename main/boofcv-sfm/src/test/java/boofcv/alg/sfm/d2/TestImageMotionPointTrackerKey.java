@@ -310,4 +310,3 @@ public class TestImageMotionPointTrackerKey extends BoofStandardJUnit {
 		}
 	}
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.transform.fft;
 
 import java.util.Arrays;
 
+// CHECKSTYLE:OFF
 /**
  * Computes 1D Discrete Fourier Transform (DFT) of complex and real, float
  * precision data. The size of the data can be an arbitrary number. The code originally comes from

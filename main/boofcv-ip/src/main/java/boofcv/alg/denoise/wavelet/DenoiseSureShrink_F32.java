@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.denoise.wavelet;
 import boofcv.struct.image.GrayF32;
 
 import java.util.Arrays;
-
 
 /**
  * <p>
@@ -50,30 +49,29 @@ public class DenoiseSureShrink_F32 extends SubbandShrink<GrayF32> {
 	}
 
 	@Override
-	protected Number computeThreshold( GrayF32 subband  )
-	{
-		float coef[] = new float[ subband.width*subband.height ];
-		UtilDenoiseWavelet.subbandAbsVal(subband,coef);
+	protected Number computeThreshold( GrayF32 subband ) {
+		float coef[] = new float[subband.width*subband.height];
+		UtilDenoiseWavelet.subbandAbsVal(subband, coef);
 		Arrays.sort(coef);
 
-		float maxThreshold =(float) UtilDenoiseWavelet.universalThreshold(subband,1.0);
+		float maxThreshold = (float)UtilDenoiseWavelet.universalThreshold(subband, 1.0);
 
 		float N = coef.length;
 
 		float threshold = maxThreshold;
 		float bestRisk = Float.MAX_VALUE;
 		float sumW = 0;
-		float right = N-2.0f;
-		for( int i = 0; i < coef.length; i++ , right -= 2.0f) {
+		float right = N - 2.0f;
+		for (int i = 0; i < coef.length; i++, right -= 2.0f) {
 			float c = coef[i]/noiseSigma;
-			if( c > maxThreshold ) {
+			if (c > maxThreshold) {
 				break;
 			}
 
 			float cc = c*c;
 			sumW += cc;
-			float risk = sumW + cc*(N-i-1.0f) + right;
-			if( risk < bestRisk ) {
+			float risk = sumW + cc*(N - i - 1.0f) + right;
+			if (risk < bestRisk) {
 				threshold = c;
 				bestRisk = risk;
 			}
@@ -83,16 +81,16 @@ public class DenoiseSureShrink_F32 extends SubbandShrink<GrayF32> {
 	}
 
 	@Override
-	public void denoise(GrayF32 transform , int numLevels ) {
+	public void denoise( GrayF32 transform, int numLevels ) {
 
 		int w = transform.width;
 		int h = transform.height;
 
 		// compute the noise variance using the HH_1 subband
-		noiseSigma = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2,h/2,w,h, null),null);
+		noiseSigma = UtilDenoiseWavelet.estimateNoiseStdDev(transform.subimage(w/2, h/2, w, h, null), null);
 
 //		System.out.println("Noise sigma: "+noiseSigma);
 
-		performShrinkage(transform,numLevels);
+		performShrinkage(transform, numLevels);
 	}
 }

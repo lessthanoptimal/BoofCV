@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,15 +100,15 @@ public class SiftDetector {
 	double edgeThreshold;
 
 	/** Maximum number of features after combining results across all scales. if <= 0 then all are returned */
-	public int maxFeaturesAll=-1;
+	public int maxFeaturesAll = -1;
 
 	// all the found detections in a single octave
 	protected FastQueue<ScalePoint> detectionsAll = new FastQueue<>(ScalePoint::new);
 
 	// Computes image derivatives. used in edge rejection
-	ImageConvolveSparse<GrayF32,?> derivXX;
-	ImageConvolveSparse<GrayF32,?> derivXY;
-	ImageConvolveSparse<GrayF32,?> derivYY;
+	ImageConvolveSparse<GrayF32, ?> derivXX;
+	ImageConvolveSparse<GrayF32, ?> derivXY;
+	ImageConvolveSparse<GrayF32, ?> derivYY;
 
 	// local scale space around the current scale image being processed
 	GrayF32 dogLower;  // DoG image in lower scale
@@ -117,7 +117,7 @@ public class SiftDetector {
 	double sigmaLower, sigmaTarget, sigmaUpper;
 
 	// finds features from 2D intensity image
-	private @Getter	NonMaxLimiter extractor;
+	private @Getter NonMaxLimiter extractor;
 
 	// Used to select features from the combined set when there are too many
 	private FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll;
@@ -130,24 +130,24 @@ public class SiftDetector {
 	 * @param edgeR Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
 	 * @param extractor Spatial feature detector that can be configured to limit the number of detected features in each scale.
 	 */
-	public SiftDetector(SiftScaleSpace scaleSpace ,
-						FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
-						double edgeR ,
-						NonMaxLimiter extractor ) {
-		if( !extractor.getNonmax().canDetectMaximums() || !extractor.getNonmax().canDetectMinimums() )
+	public SiftDetector( SiftScaleSpace scaleSpace,
+						 FeatureSelectLimitIntensity<ScalePoint> selectFeaturesAll,
+						 double edgeR,
+						 NonMaxLimiter extractor ) {
+		if (!extractor.getNonmax().canDetectMaximums() || !extractor.getNonmax().canDetectMinimums())
 			throw new IllegalArgumentException("The extractor must be able to detect maximums and minimums");
-		if( edgeR < 1 ) {
+		if (edgeR < 1) {
 			throw new IllegalArgumentException("R must be >= 1");
 		}
 
-		if( extractor.getNonmax().getIgnoreBorder() != 1 ) {
+		if (extractor.getNonmax().getIgnoreBorder() != 1) {
 			throw new RuntimeException("Non-max should have an ignore border of 1");
 		}
 
 		this.scaleSpace = scaleSpace;
 		this.extractor = extractor;
 
-		this.edgeThreshold = (edgeR+1)*(edgeR+1)/edgeR;
+		this.edgeThreshold = (edgeR + 1)*(edgeR + 1)/edgeR;
 		this.selectFeaturesAll = selectFeaturesAll;
 		selectFeaturesAll.setSampler(new SampleIntensityScalePoint());
 
@@ -158,7 +158,7 @@ public class SiftDetector {
 	 * Define sparse image derivative operators.
 	 */
 	private void createSparseDerivatives() {
-		Kernel1D_F32 kernelD = new Kernel1D_F32(new float[]{-1,0,1},3);
+		Kernel1D_F32 kernelD = new Kernel1D_F32(new float[]{-1, 0, 1}, 3);
 
 		Kernel1D_F32 kernelDD = KernelMath.convolve1D_F32(kernelD, kernelD);
 		Kernel2D_F32 kernelXY = KernelMath.convolve2D(kernelD, kernelD);
@@ -189,32 +189,32 @@ public class SiftDetector {
 			pixelScaleToInput = scaleSpace.pixelScaleCurrentToInput();
 
 			// detect features in the image
-			for (int j = 1; j < scaleSpace.getNumScales()+1; j++) {
+			for (int j = 1; j < scaleSpace.getNumScales() + 1; j++) {
 
 				// not really sure how to compute the scale for features found at a particular DoG image
 				// using the average resulted in less visually appealing circles in a test image
-				sigmaLower  = scaleSpace.computeSigmaScale( j - 1);
-				sigmaTarget = scaleSpace.computeSigmaScale( j    );
-				sigmaUpper  = scaleSpace.computeSigmaScale( j + 1);
+				sigmaLower = scaleSpace.computeSigmaScale(j - 1);
+				sigmaTarget = scaleSpace.computeSigmaScale(j);
+				sigmaUpper = scaleSpace.computeSigmaScale(j + 1);
 
 				// grab the local DoG scale space images
-				dogLower  = scaleSpace.getDifferenceOfGaussian(j-1);
-				dogTarget = scaleSpace.getDifferenceOfGaussian(j  );
-				dogUpper  = scaleSpace.getDifferenceOfGaussian(j+1);
+				dogLower = scaleSpace.getDifferenceOfGaussian(j - 1);
+				dogTarget = scaleSpace.getDifferenceOfGaussian(j);
+				dogUpper = scaleSpace.getDifferenceOfGaussian(j + 1);
 
 				detectFeatures(j);
 			}
-		} while( scaleSpace.computeNextOctave() );
+		} while (scaleSpace.computeNextOctave());
 
-		if( maxFeaturesAll > 0 )
-			selectFeaturesAll.select(null, input.width, input.height, true,null, detectionsAll,maxFeaturesAll,selectedAll);
+		if (maxFeaturesAll > 0)
+			selectFeaturesAll.select(null, input.width, input.height, true, null, detectionsAll, maxFeaturesAll, selectedAll);
 	}
 
 	/**
 	 * Detect features inside the Difference-of-Gaussian image at the current scale
 	 *
 	 * @param scaleIndex Which scale in the octave is it detecting features inside up.
-	 *              Primarily provided here for use in child classes.
+	 * Primarily provided here for use in child classes.
 	 */
 	protected void detectFeatures( int scaleIndex ) {
 		extractor.process(dogTarget);
@@ -227,8 +227,8 @@ public class SiftDetector {
 		for (int i = 0; i < found.size; i++) {
 			NonMaxLimiter.LocalExtreme e = found.get(i);
 
-			if( isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), e.max ? 1f : -1f)) {
-				processFeatureCandidate(e.location.x,e.location.y,e.getValue(),e.max);
+			if (isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), e.max ? 1f : -1f)) {
+				processFeatureCandidate(e.location.x, e.location.y, e.getValue(), e.max);
 			}
 		}
 	}
@@ -242,21 +242,21 @@ public class SiftDetector {
 	 * @param signAdj Adjust the sign so that it can check for maximums
 	 * @return true if its a local extremum
 	 */
-	boolean isScaleSpaceExtremum(int c_x, int c_y, float value, float signAdj) {
-		if( c_x <= 1 || c_y <= 1 || c_x >= dogLower.width-1 || c_y >= dogLower.height-1)
+	boolean isScaleSpaceExtremum( int c_x, int c_y, float value, float signAdj ) {
+		if (c_x <= 1 || c_y <= 1 || c_x >= dogLower.width - 1 || c_y >= dogLower.height - 1)
 			return false;
 
 		float v;
 
 		value *= signAdj;
 
-		for( int y = -1; y <= 1; y++ ) {
-			for( int x = -1; x <= 1; x++ ) {
-			    v = dogLower.unsafe_get(c_x+x,c_y+y);
-				if( v*signAdj >= value )
+		for (int y = -1; y <= 1; y++) {
+			for (int x = -1; x <= 1; x++) {
+				v = dogLower.unsafe_get(c_x + x, c_y + y);
+				if (v*signAdj >= value)
 					return false;
-				v = dogUpper.unsafe_get(c_x+x,c_y+y);
-				if( v*signAdj >= value )
+				v = dogUpper.unsafe_get(c_x + x, c_y + y);
+				if (v*signAdj >= value)
 					return false;
 			}
 		}
@@ -277,7 +277,7 @@ public class SiftDetector {
 	 */
 	protected void processFeatureCandidate( int x, int y, float value, boolean maximum ) {
 		// suppress response along edges
-		if( isEdge(x,y) )
+		if (isEdge(x, y))
 			return;
 
 		// Estimate the scale and 2D point by fitting 2nd order polynomials
@@ -288,11 +288,11 @@ public class SiftDetector {
 
 		float x0 = dogTarget.unsafe_get(x - 1, y)*signAdj;
 		float x2 = dogTarget.unsafe_get(x + 1, y)*signAdj;
-		float y0 = dogTarget.unsafe_get(x , y - 1)*signAdj;
-		float y2 = dogTarget.unsafe_get(x , y + 1)*signAdj;
+		float y0 = dogTarget.unsafe_get(x, y - 1)*signAdj;
+		float y2 = dogTarget.unsafe_get(x, y + 1)*signAdj;
 
-		float s0 = dogLower.unsafe_get(x , y )*signAdj;
-		float s2 = dogUpper.unsafe_get(x , y )*signAdj;
+		float s0 = dogLower.unsafe_get(x, y)*signAdj;
+		float s2 = dogUpper.unsafe_get(x, y)*signAdj;
 
 		ScalePoint p = detectionsAll.grow();
 
@@ -302,10 +302,10 @@ public class SiftDetector {
 
 		// find the peak then do bilinear interpolate between the two appropriate sigmas
 		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1
-		if( sigmaInterp < 0 ) {
-			p.scale = sigmaLower*-sigmaInterp + (1+sigmaInterp)*sigmaTarget;
+		if (sigmaInterp < 0) {
+			p.scale = sigmaLower*-sigmaInterp + (1 + sigmaInterp)*sigmaTarget;
 		} else {
-			p.scale = sigmaUpper*sigmaInterp + (1-sigmaInterp)*sigmaTarget;
+			p.scale = sigmaUpper*sigmaInterp + (1 - sigmaInterp)*sigmaTarget;
 		}
 
 		// a maximum corresponds to a dark object and a minimum to a whiter object
@@ -320,27 +320,28 @@ public class SiftDetector {
 	/**
 	 * Function for handling a detected point.  Does nothing here, but can be used by a child class
 	 * to process detections
+	 *
 	 * @param p Detected point in scale-space.
 	 */
-	protected void handleDetection( ScalePoint p ){}
+	protected void handleDetection( ScalePoint p ) {}
 
 	/**
 	 * Performs an edge test to remove false positives.  See 4.1 in [1].
 	 */
-	boolean isEdge( int x , int y ) {
-		if( edgeThreshold <= 0 )
+	boolean isEdge( int x, int y ) {
+		if (edgeThreshold <= 0)
 			return false;
 
-		double xx = derivXX.compute(x,y);
-		double xy = derivXY.compute(x,y);
-		double yy = derivYY.compute(x,y);
+		double xx = derivXX.compute(x, y);
+		double xy = derivXY.compute(x, y);
+		double yy = derivYY.compute(x, y);
 
 		double Tr = xx + yy;
 		double det = xx*yy - xy*xy;
 
 		// Paper quite "In the unlikely event that the determinant is negative, the curvatures have different signs
 		// so the point is discarded as not being an extremum"
-		if( det <= 0)
+		if (det <= 0)
 			return true;
 		else {
 			// In paper this is:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,4 +28,3 @@ public class TestConfigBundleAdjustment extends StandardConfigurationChecks {
 		// skipping this test since it references a config outside of BoofCV adn has non standard behavior
 	}
 }
-

@@ -1,31 +1,31 @@
 
 dependencies {
-    api project(':main:boofcv-core')
-    api project(':integration:boofcv-swing')
+	api project(':main:boofcv-core')
+	api project(':integration:boofcv-swing')
 
-    implementation project(':integration:boofcv-ffmpeg')
-    implementation project(':integration:boofcv-jcodec')
-    implementation project(':integration:boofcv-WebcamCapture')
+	implementation project(':integration:boofcv-ffmpeg')
+	implementation project(':integration:boofcv-jcodec')
+	implementation project(':integration:boofcv-WebcamCapture')
 }
 
 // Create a jar which contains all the applications
 task demonstrations(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'BoofCV Demonstrations Jar',
-                'Implementation-Version': version,
-                'Main-Class': 'boofcv.DemonstrationLauncherApp'
-    }
+	manifest {
+		attributes 'Implementation-Title': 'BoofCV Demonstrations Jar',
+				'Implementation-Version': version,
+				'Main-Class': 'boofcv.DemonstrationLauncherApp'
+	}
 
-    outputs.upToDateWhen { false }
+	outputs.upToDateWhen { false }
 
-    from sourceSets.main.output
+	from sourceSets.main.output
 
-    dependsOn configurations.runtimeClasspath
-    from { configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) } } {
-        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
-    }
+	dependsOn configurations.runtimeClasspath
+	from { configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) } } {
+		exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+	}
 
-    doLast {
-        archivePath.renameTo(file('demonstrations.jar'))
-    }
+	doLast {
+		archivePath.renameTo(file('demonstrations.jar'))
+	}
 }

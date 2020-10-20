@@ -1,16 +1,16 @@
 dependencies {
-    api project(':main:boofcv-core')
-    api project(':main:autocode')
+	api project(':main:boofcv-core')
+	api project(':main:autocode')
 
-    testImplementation project(':main:boofcv-feature').sourceSets.test.output
-    testImplementation project(':main:boofcv-geo').sourceSets.test.output
-    testImplementation project(':main:boofcv-io').sourceSets.test.output
-    testImplementation project(':main:boofcv-ip').sourceSets.test.output
-    testImplementation project(':main:boofcv-ip-multiview').sourceSets.test.output
-    testImplementation project(':main:boofcv-learning').sourceSets.test.output
-    testImplementation project(':main:boofcv-recognition').sourceSets.test.output
-    testImplementation project(':main:boofcv-sfm').sourceSets.test.output
-    testImplementation project(':main:boofcv-simulation').sourceSets.test.output
-    testImplementation project(':main:boofcv-types').sourceSets.test.output
-    testImplementation project(':integration:boofcv-swing')
+	testImplementation project(':main:boofcv-feature').sourceSets.test.output
+	testImplementation project(':main:boofcv-geo').sourceSets.test.output
+	testImplementation project(':main:boofcv-io').sourceSets.test.output
+	testImplementation project(':main:boofcv-ip').sourceSets.test.output
+	testImplementation project(':main:boofcv-ip-multiview').sourceSets.test.output
+	testImplementation project(':main:boofcv-learning').sourceSets.test.output
+	testImplementation project(':main:boofcv-recognition').sourceSets.test.output
+	testImplementation project(':main:boofcv-sfm').sourceSets.test.output
+	testImplementation project(':main:boofcv-simulation').sourceSets.test.output
+	testImplementation project(':main:boofcv-types').sourceSets.test.output
+	testImplementation project(':integration:boofcv-swing')
 }

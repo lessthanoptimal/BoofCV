@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,10 +57,12 @@ public class CreateQrCodeDocument {
 	private String _error = "M";
 	public QrCode.ErrorLevel error;
 
-	@Option(name = "-v", aliases = {"--Version"}, usage = "QR-Code version. Determines size and amount of data. If unspecified it will be automatically selected based on the data. Values 1 to 40.")
+	@Option(name = "-v", aliases = {"--Version"}, usage =
+			"QR-Code version. Determines size and amount of data. If unspecified it will be automatically selected based on the data. Values 1 to 40.")
 	public int version = -1;
 
-	@Option(name = "-n", aliases = {"--Encoding"}, usage = "Type of data that can be encoded. Default is auto select. Options: NUMERIC, ALPHANUMERIC, BYTE, KANJI")
+	@Option(name = "-n", aliases = {"--Encoding"}, usage =
+			"Type of data that can be encoded. Default is auto select. Options: NUMERIC, ALPHANUMERIC, BYTE, KANJI")
 	private String _encoding = "AUTO";
 	public QrCode.Mode encoding;
 
