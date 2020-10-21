@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -287,7 +287,7 @@ public class VisualizeBinaryData {
 		try {
 
 			if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				renderLabeled(labelImage, colors, (DataBufferInt)buffer, raster);
+				renderLabeled(labelImage, colors, (DataBufferInt)buffer);
 			} else {
 				_renderLabeled(labelImage, out, colors);
 			}
@@ -354,14 +354,12 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderLabeled( GrayS32 labelImage, int[] colors,
-									   DataBufferInt buffer, WritableRaster raster ) {
+	private static void renderLabeled( GrayS32 labelImage, int[] colors, DataBufferInt buffer ) {
 		int rasterIndex = 0;
 		int[] data = buffer.getData();
 
 		int w = labelImage.getWidth();
 		int h = labelImage.getHeight();
-
 
 		for (int y = 0; y < h; y++) {
 			int indexSrc = labelImage.startIndex + y*labelImage.stride;
@@ -391,7 +389,7 @@ public class VisualizeBinaryData {
 			if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
 				renderBinary(binaryImage, invert, (DataBufferByte)buffer, raster);
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				renderBinary(binaryImage, invert, (DataBufferInt)buffer, raster);
+				renderBinary(binaryImage, invert, (DataBufferInt)buffer);
 			} else {
 				_renderBinary(binaryImage, invert, out);
 			}
@@ -500,8 +498,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderBinary( GrayU8 binaryImage, boolean invert,
-									  DataBufferInt buffer, WritableRaster raster ) {
+	private static void renderBinary( GrayU8 binaryImage, boolean invert, DataBufferInt buffer ) {
 		int rasterIndex = 0;
 		int[] data = buffer.getData();
 

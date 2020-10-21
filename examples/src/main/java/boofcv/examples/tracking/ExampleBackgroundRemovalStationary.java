@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.examples.tracking;
 
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.factory.background.ConfigBackgroundBasic;
-import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageGridPanel;
@@ -56,7 +55,7 @@ public class ExampleBackgroundRemovalStationary {
 //		ImageType imageType = ImageType.il(3, InterleavedF32.class);
 //		ImageType imageType = ImageType.il(3, InterleavedU8.class);
 
-		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
+//		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
 
 		// Comment/Uncomment to switch algorithms
 		BackgroundModelStationary background =

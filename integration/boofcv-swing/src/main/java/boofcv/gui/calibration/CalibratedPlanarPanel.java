@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -129,9 +129,9 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 	}
 
 	public void setImagesFailed( List<File> imageFiles ) {
-		for (File f : imageFiles) {
+//		for (File f : imageFiles) {
 //			addImage(f);
-		}
+//		}
 	}
 
 	protected void setSelected( int selected ) {

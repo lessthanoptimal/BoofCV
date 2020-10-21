@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,6 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
@@ -142,7 +141,6 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	private final Point2D_F64 normLeft = new Point2D_F64();
 	private final Point2D_F64 normRight = new Point2D_F64();
 	private final Point3D_F64 X3 = new Point3D_F64();
-	private final Point4D_F64 X4 = new Point4D_F64();
 	private final FastQueue<Point2D_F64> listNorm = new FastQueue<>(Point2D_F64::new);
 	private final FastQueue<Se3_F64> listWorldToView = new FastQueue<>(Se3_F64::new);
 	private final List<TrackQuad> inliers = new ArrayList<>();

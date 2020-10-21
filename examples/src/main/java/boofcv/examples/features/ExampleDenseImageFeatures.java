@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,15 +90,13 @@ public class ExampleDenseImageFeatures {
 
 		// go through all the cells in the image. If you only wanted to process part of the image it could be done here
 		// In the high level API the order of cells isn't specified and might be in some arbitrary order or in some
-		// cases might even skip regions depending on the implementation. HOG will allways compute a cell
+		// cases might even skip regions depending on the implementation. HOG will always compute a cell
 
-		for ( int i = 0; i < describer.getCellRows(); i++ ) {
-			for (int j = 0; j < describer.getCellCols(); j++) {
-				DescribeDenseHogFastAlg.Cell c = describer.getCell(i,j);
-
-				// this is where you could do processing on an individual cell
-			}
-		}
+//		for ( int i = 0; i < describer.getCellRows(); i++ ) {
+//			for (int j = 0; j < describer.getCellCols(); j++) {
+//				DescribeDenseHogFastAlg.Cell c = describer.getCell(i,j);
+//			}
+//		}
 	}
 
 	public static void main(String[] args) {

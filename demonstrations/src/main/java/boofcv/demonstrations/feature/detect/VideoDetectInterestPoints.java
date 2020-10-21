@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,8 +106,8 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>>
 		int radius = 2;
 
 		// if null then no orientation will be computed
-		OrientationImageAverage<T> orientation = null;
-		orientation = FactoryOrientationAlgs.nogradient(1.0/2.0, radius, imageType);
+		OrientationImageAverage<T> orientation =
+				FactoryOrientationAlgs.nogradient(1.0/2.0, radius, imageType);
 
 		InterestPointDetector<T> detector;
 

@@ -172,6 +172,7 @@ subprojects {
                 "MutablePublicArray", // Done intentionally in every case
                 "CatchAndPrintStackTrace", // Should clean up, but done too often right now
                 "FallThrough", // JDK-14 Error Prone BUG
+                "UnnecessaryParentheses", // Log SPAM due to JDK-14 Error Prone BUG
                 "MissingSummary", "UnescapedEntity", "EmptyBlockTag")
         options.errorprone.error("MissingOverride", "MissingCasesInEnumSwitch", "BadInstanceof",
                 "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete")

@@ -18,7 +18,6 @@
 
 package boofcv.misc;
 
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.errors.BoofAssertFailure;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
@@ -27,6 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.*;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.ConcurrencyOps;
 import pabeles.concurrency.GrowArray;
 
 import java.io.*;
@@ -675,7 +675,7 @@ public class BoofMiscOps {
 	}
 
 	public static<T> GrowArray<T> checkDeclare( @Nullable GrowArray<T> growable,
-												BoofConcurrency.NewInstance<T> factory ) {
+												ConcurrencyOps.NewInstance<T> factory ) {
 		growable = growable == null ? new GrowArray<>(factory) : growable;
 		growable.reset();
 		return growable;

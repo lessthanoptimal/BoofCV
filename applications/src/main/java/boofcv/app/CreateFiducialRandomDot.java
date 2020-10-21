@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,11 +34,14 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Generates a printable random dot marker
@@ -46,20 +49,20 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class CreateFiducialRandomDot extends BaseFiducialSquare {
-	@Option(name="-n",aliases = {"--DotsPerMarker"}, usage="Maximum number of dots per marker")
-	public int maxDotsPerMarker =30;
+	@Option(name = "-n", aliases = {"--DotsPerMarker"}, usage = "Maximum number of dots per marker")
+	public int maxDotsPerMarker = 30;
 
-	@Option(name="-um",aliases = {"--UniqueMarkers"}, usage="Number of unique markers that it should create")
-	public int totalUnique=1;
+	@Option(name = "-um", aliases = {"--UniqueMarkers"}, usage = "Number of unique markers that it should create")
+	public int totalUnique = 1;
 
 	@Option(name = "-dd", aliases = {"--Diameter"}, usage = "The diameter of each dot. In document units")
-	public double dotDiameter =0.5;
+	public double dotDiameter = 0.5;
 
 	@Option(name = "--SpaceDiameter", usage = "Specify to use space dots using a different diameter. In document units")
 	public double spaceDiameter = -1;
 
 	@Option(name = "-rs", aliases = {"--RandomSeed"}, usage = "Random seed used to create the markers")
-	public long randomSeed=0xDEAD_BEEFL;
+	public long randomSeed = 0xDEAD_BEEFL;
 
 	@Option(name = "--DumpYaml", usage = "Save marker coordinates into a YAML file")
 	public boolean dumpLocations = false;
@@ -76,7 +79,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	public void run() throws IOException {
 		super.run();
 
-		if( dumpLocations )
+		if (dumpLocations)
 			saveMarkersToYaml();
 	}
 
@@ -91,7 +94,8 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	 */
 	private void saveMarkersToYaml() throws IOException {
 		String nameYaml = FilenameUtils.getBaseName(fileName)+".yaml";
-		FileWriter writer = new FileWriter(new File(new File(fileName).getParentFile(),nameYaml));
+		var writer = new OutputStreamWriter(
+				new FileOutputStream(new File(new File(fileName).getParentFile(),nameYaml)), UTF_8);
 
 		var def = new RandomDotDefinition();
 		def.randomSeed = randomSeed;
@@ -100,14 +104,14 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		def.markerWidth = markerWidth;
 		def.markerHeight = markerHeight;
 		def.units = unit.getAbbreviation();
-		def.markers.addAll( markers );
+		def.markers.addAll(markers);
 
-		FiducialIO.saveRandomDotYaml(def,writer);
+		FiducialIO.saveRandomDotYaml(def, writer);
 		writer.close();
 	}
 
 	@Override
-	protected CreateFiducialDocumentImage createRendererImage(String filename) {
+	protected CreateFiducialDocumentImage createRendererImage( String filename ) {
 		var ret = new CreateRandomDotDocumentImage(filename);
 		ret.dotDiameter = dotDiameter;
 		ret.markerHeight = (int)markerHeight;
@@ -115,7 +119,7 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	}
 
 	@Override
-	protected CreateFiducialDocumentPDF createRendererPdf(String documentName, PaperSize paper, Unit units) {
+	protected CreateFiducialDocumentPDF createRendererPdf( String documentName, PaperSize paper, Unit units ) {
 		var ret = new CreateRandomDotDocumentPDF(documentName, paper, units);
 		ret.dotDiameter = dotDiameter;
 		ret.drawLineBorder = drawLineBorder;
@@ -124,12 +128,12 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	}
 
 	@Override
-	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
-		((CreateRandomDotDocumentPDF)renderer).render(markers, maxDotsPerMarker,randomSeed);
+	protected void callRenderPdf( CreateFiducialDocumentPDF renderer ) throws IOException {
+		((CreateRandomDotDocumentPDF)renderer).render(markers, maxDotsPerMarker, randomSeed);
 	}
 
 	@Override
-	protected void callRenderImage(CreateFiducialDocumentImage renderer) {
+	protected void callRenderImage( CreateFiducialDocumentImage renderer ) {
 		((CreateRandomDotDocumentImage)renderer).render(markers);
 	}
 
@@ -138,22 +142,22 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		super.finishParsing();
 
 		// assume square if height is not specified
-		if( markerHeight < 0 )
+		if (markerHeight < 0)
 			markerHeight = markerWidth;
 
 		Random rand = new Random(randomSeed);
 
-		double spacingDiameter = this.spaceDiameter<=0?dotDiameter:this.spaceDiameter;
+		double spacingDiameter = this.spaceDiameter <= 0 ? dotDiameter : this.spaceDiameter;
 
-		for( int i = 0; i < totalUnique; i++ ) {
+		for (int i = 0; i < totalUnique; i++) {
 			List<Point2D_F64> marker = RandomDotMarkerGenerator.createRandomMarker(rand,
-					maxDotsPerMarker, markerWidth, markerHeight,spacingDiameter);
-			markers.add( marker );
+					maxDotsPerMarker, markerWidth, markerHeight, spacingDiameter);
+			markers.add(marker);
 		}
 	}
 
 	@Override
-	protected void printHelp(CmdLineParser parser) {
+	protected void printHelp( CmdLineParser parser ) {
 		super.printHelp(parser);
 
 		System.out.println("Creates 3 images in PNG format 500x500 pixels. Circles with a diameter of 21 pixels." +
@@ -170,18 +174,18 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 		System.exit(-1);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		CreateFiducialRandomDot generator = new CreateFiducialRandomDot();
 		CmdLineParser parser = new CmdLineParser(generator);
 
-		if( args.length == 0 ) {
+		if (args.length == 0) {
 			generator.printHelp(parser);
 		}
 
 		try {
 			parser.parseArgument(args);
-			if( generator.guiMode ) {
-				BoofSwingUtil.invokeNowOrLater(()->new CreateFiducialRandomDotGui(generator));
+			if (generator.guiMode) {
+				BoofSwingUtil.invokeNowOrLater(() -> new CreateFiducialRandomDotGui(generator));
 			} else {
 				generator.finishParsing();
 				generator.run();
@@ -194,5 +198,4 @@ public class CreateFiducialRandomDot extends BaseFiducialSquare {
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class ConfigSquareGridBinary implements Configuration {
 	/**
 	 * Description of image thresholding algorithm
 	 */
-	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,41);
+	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 41);
 
 	/**
 	 * Ordered list of expected square fiducial ID numbers.  Starts from top left and follows a row major
@@ -81,18 +81,18 @@ public class ConfigSquareGridBinary implements Configuration {
 	 * Configures the grid with the following specifications and configures the fiducial detector to be
 	 * 3x3 with fiducials id number 0 to (numRows*numCols)-1.
 	 */
-	public ConfigSquareGridBinary(int numRows, int numCols , double squareWidth , double spaceWidth ) {
+	public ConfigSquareGridBinary( int numRows, int numCols, double squareWidth, double spaceWidth ) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		this.squareWidth = squareWidth;
 		this.spaceWidth = spaceWidth;
 
-		int maxID = configDetector.gridWidth*configDetector.gridWidth-4;
-		maxID = (int)Math.pow(2,maxID);
+		int maxID = configDetector.gridWidth*configDetector.gridWidth - 4;
+		maxID = (int)Math.pow(2, maxID);
 		this.ids = new long[numRows*numCols];
 		int space = maxID/ids.length;
 		for (int i = 0; i < ids.length; i++) {
-			ids[i] = i*space;
+			ids[i] = (long)i*space;
 		}
 	}
 
@@ -111,7 +111,7 @@ public class ConfigSquareGridBinary implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( ids == null )
+		if (ids == null)
 			throw new IllegalArgumentException("Need to specify expected ids");
 	}
 
@@ -125,30 +125,30 @@ public class ConfigSquareGridBinary implements Configuration {
 	 * space_width 20
 	 * numbers 0 1 2 3 4 5 6 7 8 9 10 11
 	 * </pre>
+	 *
 	 * @param reader Input
 	 * @return Configuration
-	 * @throws IOException
 	 */
 	public static ConfigSquareGridBinary parseSimple( BufferedReader reader ) throws IOException {
 		ConfigSquareGridBinary config = new ConfigSquareGridBinary();
 
 		String line = reader.readLine();
-		while( line != null ) {
-			if( line.charAt(0) != '#') {
+		while (line != null) {
+			if (line.charAt(0) != '#') {
 				String words[] = line.split(" ");
-				if( words[0].equals("binary_width")) {
+				if (words[0].equals("binary_width")) {
 					config.configDetector.gridWidth = Integer.parseInt(words[1]);
-				} else if( words[0].equals("grid_shape")) {
+				} else if (words[0].equals("grid_shape")) {
 					config.numRows = Integer.parseInt(words[1]);
 					config.numCols = Integer.parseInt(words[2]);
-				} else if( words[0].equals("square_width")) {
+				} else if (words[0].equals("square_width")) {
 					config.squareWidth = Double.parseDouble(words[1]);
-				} else if( words[0].equals("space_width")) {
+				} else if (words[0].equals("space_width")) {
 					config.spaceWidth = Double.parseDouble(words[1]);
-				} else if( words[0].equals("numbers")) {
-					config.ids = new long[ words.length-1 ];
+				} else if (words[0].equals("numbers")) {
+					config.ids = new long[words.length - 1];
 					for (int i = 1; i < words.length; i++) {
-						config.ids[i-1] = Integer.parseInt(words[i]);
+						config.ids[i - 1] = Integer.parseInt(words[i]);
 					}
 				}
 			}

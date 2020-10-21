@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public enum FeatureTrackerTypes {
 		return name;
 	}
 
-	private String name;
+	private final String name;
 
 	public static List<String> getTrackerNames() {
 		List<String> output = new ArrayList<>();

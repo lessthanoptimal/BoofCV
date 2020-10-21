@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 	int lineY=-1;
 
 	@Override
-	public void setImage(BufferedImage image) {
+	public synchronized void setImage(BufferedImage image) {
 		this.distorted = image;
 
 		undoRadialDistortion(distorted);

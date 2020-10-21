@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -145,6 +146,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		stepSize = keyStepSize;
 
 		addFocusListener(new FocusListener() {
+			ScheduledFuture<?> future;
 			@Override
 			public void focusGained( FocusEvent e ) {
 //				System.out.println("focus gained");
@@ -152,7 +154,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 				// start a timed task which checks current key presses. Less OS dependent this way
 				pressedTask = Executors.newScheduledThreadPool(1);
-				pressedTask.scheduleAtFixedRate(new KeypressedTask(), 100, 30, TimeUnit.MILLISECONDS);
+				future = pressedTask.scheduleAtFixedRate(new KeypressedTask(), 100, 30, TimeUnit.MILLISECONDS);
 			}
 
 			@Override

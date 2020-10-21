@@ -332,8 +332,9 @@ public class AutocodeConcurrentApp {
 
 	public static List<String> readLines( final File file, final Charset encoding ) throws IOException {
 		List<String> lines = new ArrayList<>();
-		Stream<String> stream = Files.lines(file.toPath(), encoding);
-		stream.forEach(lines::add);
+		try (Stream<String> stream = Files.lines(file.toPath(), encoding)) {
+			stream.forEach(lines::add);
+		}
 		return lines;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import lombok.Getter;
 
 /**
  * <p>
@@ -77,7 +78,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 
 	// the input image
 	protected T image;
-	private final Class<T> imageType;
+	private @Getter final Class<T> imageType;
 
 	// work space for checking to see if the line estimate diverged
 	private final Point2D_F64 tempA = new Point2D_F64();
