@@ -32,7 +32,8 @@ import lombok.Getter;
  */
 public class PointTransformAffine_F64 implements Point2Transform2Model_F64<Affine2D_F64> {
 
-	@Getter protected final Affine2D_F64 model = new Affine2D_F64();
+	@Getter(onMethod = @__(@Override))
+	protected final Affine2D_F64 model = new Affine2D_F64();
 
 	public PointTransformAffine_F64( Affine2D_F64 affine ) {
 		this.model.set(affine);

@@ -9,6 +9,7 @@ gversion {
 	srcDir = "../boofcv-types/src/main/java"
 	classPackage = "boofcv"
 	className = "BoofVersion"
+	annotate = true
 	debug = true
 }
 

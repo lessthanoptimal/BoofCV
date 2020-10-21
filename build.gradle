@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 //import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-    id "com.peterabeles.gversion" version "1.8.3" apply false
+    id "com.peterabeles.gversion" version "1.9" apply false
     id "net.ltgt.errorprone" version "1.2.1" apply false
     id "com.diffplug.spotless" version "5.6.1" apply false
 }
@@ -66,9 +66,7 @@ subprojects {
     configurations.all { resolutionStrategy { failOnVersionConflict() } }
 
     // Enable incremental compile. Should make single file changes faster
-    tasks.withType(JavaCompile) {
-        options.incremental = true
-    }
+    tasks.withType(JavaCompile) { options.incremental = true }
 
     repositories {
         mavenCentral()
@@ -349,7 +347,6 @@ def javadocProjects = mainProjects + integrationProjects
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
 task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten() ) {
-
     doLast {
         // Compiled jars (bin and src) for all BoofCV modules
         ext.boofJars = files(javadocProjects.collect { project(it).tasks.jar.archivePath })
@@ -421,7 +418,6 @@ task alljavadoc(type: Javadoc,  group: "Documentation") {
             into destinationDir
         }
     }
-
 }
 
 task alljavadocWeb() {
@@ -431,7 +427,6 @@ task alljavadocWeb() {
     }
 }
 alljavadocWeb.finalizedBy(alljavadoc)
-
 
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")

@@ -34,7 +34,8 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class PointTransformHomography_F64 implements Point2Transform2Model_F64<Homography2D_F64> {
 
-	@Getter final Homography2D_F64 model = new Homography2D_F64();
+	@Getter(onMethod = @__(@Override))
+	final Homography2D_F64 model = new Homography2D_F64();
 
 	public PointTransformHomography_F64() {}
 
