@@ -23,6 +23,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
+import lombok.Getter;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 
@@ -33,44 +34,35 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class PointTransformHomography_F64 implements Point2Transform2Model_F64<Homography2D_F64> {
 
-	Homography2D_F64 homo = new Homography2D_F64();
+	@Getter final Homography2D_F64 model = new Homography2D_F64();
 
 	public PointTransformHomography_F64() {}
 
-	public PointTransformHomography_F64( DMatrixRMaj homo ) {
-		UtilHomography_F64.convert(homo, this.homo);
+	public PointTransformHomography_F64( DMatrixRMaj model ) {
+		UtilHomography_F64.convert(model, this.model);
 	}
 
-	public PointTransformHomography_F64( Homography2D_F64 homo ) {
-		set(homo);
+	public PointTransformHomography_F64( Homography2D_F64 model ) {
+		set(model);
 	}
 
 	public void set( DMatrix transform ) {
-		this.homo.set(transform);
+		this.model.set(transform);
 	}
 
-	@Override
-	public void compute( double x, double y, Point2D_F64 out ) {
-		HomographyPointOps_F64.transform(homo, x, y, out);
+	@Override public void compute( double x, double y, Point2D_F64 out ) {
+		HomographyPointOps_F64.transform(model, x, y, out);
 	}
 
-	@Override
-	public void setModel( Homography2D_F64 o ) {
-		homo.set(o);
+	@Override public void setModel( Homography2D_F64 o ) {
+		model.set(o);
 	}
 
-	@Override
-	public Homography2D_F64 getModel() {
-		return homo;
-	}
-
-	@Override
-	public Homography2D_F64 newInstanceModel() {
+	@Override public Homography2D_F64 newInstanceModel() {
 		return new Homography2D_F64();
 	}
 
-	@Override
-	public PointTransformHomography_F64 copyConcurrent() {
-		return new PointTransformHomography_F64(homo.copy());
+	@Override public PointTransformHomography_F64 copyConcurrent() {
+		return new PointTransformHomography_F64(model.copy());
 	}
 }

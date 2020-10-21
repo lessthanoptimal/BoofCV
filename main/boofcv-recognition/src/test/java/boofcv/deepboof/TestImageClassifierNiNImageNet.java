@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class TestImageClassifierNiNImageNet extends CheckBaseImageClassifier {
 
 	@Override
 	public Planar<GrayF32> createImage() {
-		return new Planar<>(GrayF32.class,width,height,3);
+		return new Planar<>(GrayF32.class, width, height, 3);
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class TestImageClassifierNiNImageNet extends CheckBaseImageClassifier {
 		nin.stdev = new float[width*height];
 
 		for (int i = 0; i < nin.mean.length; i++) {
-			nin.mean[i] = rand.nextFloat()*30+110;
+			nin.mean[i] = rand.nextFloat()*30 + 110;
 			nin.stdev[i] = 120;
 		}
 

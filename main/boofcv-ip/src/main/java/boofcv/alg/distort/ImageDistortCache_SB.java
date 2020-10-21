@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,13 +31,13 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
-		implements ImageDistort<Input,Output> {
+public class ImageDistortCache_SB<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
+		implements ImageDistort<Input, Output> {
 
 	protected AssignPixelValue_SB<Output> assigner;
 
 	// size of output image
-	protected int width=-1,height=-1;
+	protected int width = -1, height = -1;
 	protected Point2D_F32 map[];
 	// sub pixel interpolation
 	protected InterpolatePixelS<Input> interp;
@@ -46,7 +46,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 	protected PixelTransform<Point2D_F32> dstToSrc;
 
 	// crop boundary
-	protected int x0,y0,x1,y1;
+	protected int x0, y0, x1, y1;
 
 	// should it render all pixels in the destination, even ones outside the input image
 	protected boolean renderAll = true;
@@ -60,76 +60,85 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortCache_SB(AssignPixelValue_SB<Output> assigner,
-								InterpolatePixelS<Input> interp) {
+	public ImageDistortCache_SB( AssignPixelValue_SB<Output> assigner,
+								 InterpolatePixelS<Input> interp ) {
 		this.assigner = assigner;
 		this.interp = interp;
 	}
 
 	@Override
-	public void setModel(PixelTransform<Point2D_F32> dstToSrc) {
+	public void setModel( PixelTransform<Point2D_F32> dstToSrc ) {
 		this.dirty = true;
 		this.dstToSrc = dstToSrc;
 	}
 
 	@Override
-	public void apply(Input srcImg, Output dstImg) {
+	public void apply( Input srcImg, Output dstImg ) {
 		init(srcImg, dstImg);
 
-		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
+		x0 = 0;
+		y0 = 0;
+		x1 = dstImg.width;
+		y1 = dstImg.height;
 
-		if( renderAll )
+		if (renderAll)
 			renderAll();
 		else
 			applyOnlyInside();
 	}
 
 	@Override
-	public void apply(Input srcImg, Output dstImg, GrayU8 mask) {
+	public void apply( Input srcImg, Output dstImg, GrayU8 mask ) {
 		init(srcImg, dstImg);
 		mask.reshape(dstImg);
 
-		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
+		x0 = 0;
+		y0 = 0;
+		x1 = dstImg.width;
+		y1 = dstImg.height;
 
-		if( renderAll )
+		if (renderAll)
 			renderAll(mask);
 		else
 			applyOnlyInside(mask);
 	}
 
 	@Override
-	public void apply(Input srcImg, Output dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
+	public void apply( Input srcImg, Output dstImg, int dstX0, int dstY0, int dstX1, int dstY1 ) {
 		init(srcImg, dstImg);
 
 		// Check that a valid region was specified. If not do nothing
-		if( dstX1 <= dstX0 || dstY1 <= dstY0 )
+		if (dstX1 <= dstX0 || dstY1 <= dstY0)
 			return;
 
-		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
+		x0 = dstX0;
+		y0 = dstY0;
+		x1 = dstX1;
+		y1 = dstY1;
 
-		if( renderAll )
+		if (renderAll)
 			renderAll();
 		else
 			applyOnlyInside();
 	}
 
-	protected void init(Input srcImg, Output dstImg) {
-		if( dirty || width != dstImg.width || height != dstImg.height) {
+	protected void init( Input srcImg, Output dstImg ) {
+		if (dirty || width != dstImg.width || height != dstImg.height) {
 			width = dstImg.width;
 			height = dstImg.height;
 			map = new Point2D_F32[width*height];
-			for( int i = 0; i < map.length; i++ ) {
+			for (int i = 0; i < map.length; i++) {
 				map[i] = new Point2D_F32();
 			}
 
 			int index = 0;
-			for( int y = 0; y < height; y++ ) {
-				for( int x = 0; x < width; x++ ) {
-					dstToSrc.compute(x,y,map[index++]);
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					dstToSrc.compute(x, y, map[index++]);
 				}
 			}
 			dirty = false;
-		} else if( dstImg.width != width || dstImg.height != height )
+		} else if (dstImg.width != width || dstImg.height != height)
 			throw new IllegalArgumentException("Unexpected dstImg dimension");
 
 		this.srcImg = srcImg;
@@ -142,30 +151,29 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 
 		// todo TO make this faster first apply inside the region which can process the fast border
 		// then do the slower border thingy
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
+			for (int x = x0; x < x1; x++, indexDst++) {
 				Point2D_F32 s = map[indexDst];
 
-				assigner.assign(indexDst,interp.get(s.x, s.y));
+				assigner.assign(indexDst, interp.get(s.x, s.y));
 			}
 		}
 	}
 
-
 	protected void renderAll( GrayU8 mask ) {
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			int indexMsk = mask.startIndex + mask.stride*y + x0;
 
-			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
+			for (int x = x0; x < x1; x++, indexDst++, indexMsk++) {
 				Point2D_F32 s = map[indexDst];
 
-				assigner.assign(indexDst,interp.get(s.x, s.y));
-				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
+				assigner.assign(indexDst, interp.get(s.x, s.y));
+				if (s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight) {
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -175,34 +183,34 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 	}
 
 	protected void applyOnlyInside() {
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
+			for (int x = x0; x < x1; x++, indexDst++) {
 				Point2D_F32 s = map[indexDst];
 
-				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
-					assigner.assign(indexDst,interp.get(s.x, s.y));
+				if (s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight) {
+					assigner.assign(indexDst, interp.get(s.x, s.y));
 				}
 			}
 		}
 	}
 
 	protected void applyOnlyInside( GrayU8 mask ) {
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
+		for (int y = y0; y < y1; y++) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			int indexMsk = mask.startIndex + mask.stride*y + x0;
 
-			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
+			for (int x = x0; x < x1; x++, indexDst++, indexMsk++) {
 				Point2D_F32 s = map[indexDst];
 
-				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
-					assigner.assign(indexDst,interp.get(s.x, s.y));
+				if (s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight) {
+					assigner.assign(indexDst, interp.get(s.x, s.y));
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -224,7 +232,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 	}
 
 	@Override
-	public void setRenderAll(boolean renderAll) {
+	public void setRenderAll( boolean renderAll ) {
 		this.renderAll = renderAll;
 	}
 

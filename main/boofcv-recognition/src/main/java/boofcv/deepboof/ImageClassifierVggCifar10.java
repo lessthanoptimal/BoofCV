@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,15 +41,14 @@ import static deepboof.misc.TensorOps.WI;
  * Image classification using VGG network trained in CIFAR 10 data.  On the CIFAR 10 training set it get has
  * 89.9% accuracy.  This dataset contains images in 10 categories and 32x32 images.
  *
- * @see <a href="https://github.com/szagoruyko/cifar.torch">szagoruyko/cifar.torch</a>
- *
  * @author Peter Abeles
+ * @see <a href="https://github.com/szagoruyko/cifar.torch">szagoruyko/cifar.torch</a>
  */
 public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 
 	static final int inputSize = 32;
 
-	Planar<GrayF32> imageYuv = new Planar<>(GrayF32.class,inputSize,inputSize,3);
+	Planar<GrayF32> imageYuv = new Planar<>(GrayF32.class, inputSize, inputSize, 3);
 
 	ImageLocalNormalization<GrayF32> localNorm;
 	YuvStatistics stats;
@@ -58,7 +57,6 @@ public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 	public ImageClassifierVggCifar10() {
 		super(inputSize);
 		categories.addAll(UtilCifar10.getClassNames());
-
 	}
 
 	/**
@@ -70,14 +68,14 @@ public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 	 * @throws IOException Throw if anything goes wrong while reading data
 	 */
 	@Override
-	public void loadModel(File directory)  throws IOException {
-		stats = DeepModelIO.load(new File(directory,"YuvStatistics.txt"));
+	public void loadModel( File directory ) throws IOException {
+		stats = DeepModelIO.load(new File(directory, "YuvStatistics.txt"));
 
 		SequenceAndParameters<Tensor_F32, Function<Tensor_F32>> sequence =
-				new ParseBinaryTorch7().parseIntoBoof(new File(directory,"model.net"));
+				new ParseBinaryTorch7().parseIntoBoof(new File(directory, "model.net"));
 
-		network = sequence.createForward(3,inputSize,inputSize);
-		tensorOutput = new Tensor_F32(WI(1,network.getOutputShape()));
+		network = sequence.createForward(3, inputSize, inputSize);
+		tensorOutput = new Tensor_F32(WI(1, network.getOutputShape()));
 
 		BorderType type = BorderType.valueOf(stats.border);
 		localNorm = new ImageLocalNormalization<>(GrayF32.class, type);
@@ -85,13 +83,13 @@ public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 	}
 
 	@Override
-	protected Planar<GrayF32> preprocess(Planar<GrayF32> image) {
+	protected Planar<GrayF32> preprocess( Planar<GrayF32> image ) {
 		super.preprocess(image);
 
 		ColorYuv.rgbToYuv(imageRgb, imageYuv);
 
 		// Normalize the image
-		localNorm.zeroMeanStdOne(kernel, imageYuv.getBand(0),255.0,1e-4, imageYuv.getBand(0));
+		localNorm.zeroMeanStdOne(kernel, imageYuv.getBand(0), 255.0, 1e-4, imageYuv.getBand(0));
 		DataManipulationOps.normalize(imageYuv.getBand(1), (float)stats.meanU, (float)stats.stdevU);
 		DataManipulationOps.normalize(imageYuv.getBand(2), (float)stats.meanV, (float)stats.stdevV);
 

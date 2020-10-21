@@ -52,7 +52,7 @@ public abstract class CheckBaseImageClassifier extends BoofStandardJUnit {
 	@Test
 	public void checkForBlowUp() {
 		Planar<GrayF32> input = createImage();
-		GImageMiscOps.fillUniform(input,rand,0,255);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
 		BaseImageClassifier classifier = createClassifier();
 
 		createDummyNetwork(classifier, input.width, input.height);
@@ -60,25 +60,25 @@ public abstract class CheckBaseImageClassifier extends BoofStandardJUnit {
 		classifier.classify(input);
 
 		int best = classifier.getBestResult();
-		assertTrue(best>=0 && best < numCategories);
+		assertTrue(best >= 0 && best < numCategories);
 	}
 
 	public abstract Planar<GrayF32> createImage();
 
 	public abstract BaseImageClassifier createClassifier();
 
-	private void createDummyNetwork(BaseImageClassifier alg, int width , int height ) {
+	private void createDummyNetwork( BaseImageClassifier alg, int width, int height ) {
 
 		for (int i = 0; i < numCategories; i++) {
-			alg.getCategories().add("Category "+i);
+			alg.getCategories().add("Category " + i);
 		}
 
 		FunctionLinear_F32 function = new FunctionLinear_F32(numCategories);
-		function.initialize(3,height,width);
+		function.initialize(3, height, width);
 
 		List<Tensor_F32> parameters = new ArrayList<>();
-		parameters.add(TensorFactory_F32.random(rand,false,function.getParameterShapes().get(0)));
-		parameters.add(TensorFactory_F32.random(rand,false,function.getParameterShapes().get(1)));
+		parameters.add(TensorFactory_F32.random(rand, false, function.getParameterShapes().get(0)));
+		parameters.add(TensorFactory_F32.random(rand, false, function.getParameterShapes().get(1)));
 		function.setParameters(parameters);
 
 		Node<Tensor_F32, Function<Tensor_F32>> node = new Node<>();
@@ -88,6 +88,6 @@ public abstract class CheckBaseImageClassifier extends BoofStandardJUnit {
 		sequence.add(node);
 
 		alg.network = new FunctionSequence<>(sequence, Tensor_F32.class);
-		alg.tensorOutput = new Tensor_F32(WI(1,alg.network.getOutputShape()));
+		alg.tensorOutput = new Tensor_F32(WI(1, alg.network.getOutputShape()));
 	}
 }

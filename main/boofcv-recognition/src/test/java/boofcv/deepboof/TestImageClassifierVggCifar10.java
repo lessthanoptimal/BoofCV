@@ -34,7 +34,7 @@ public class TestImageClassifierVggCifar10 extends CheckBaseImageClassifier {
 
 	@Override
 	public Planar<GrayF32> createImage() {
-		return new Planar<>(GrayF32.class,width,height,3);
+		return new Planar<>(GrayF32.class, width, height, 3);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class TestImageClassifierVggCifar10 extends CheckBaseImageClassifier {
 		alg.stats.stdevU = 25;
 		alg.stats.meanV = 40;
 		alg.stats.stdevV = 10;
-		alg.stats.kernel = new double[]{0.1,0.5,0.1};
+		alg.stats.kernel = new double[]{0.1, 0.5, 0.1};
 		alg.stats.kernelOffset = 1;
 
 		alg.localNorm = new ImageLocalNormalization<>(GrayF32.class, BorderType.EXTENDED);

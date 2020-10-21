@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,19 +49,18 @@ public class ImageClassifierResNet extends BaseImageClassifier {
 
 	int resnetID;
 
-	public ImageClassifierResNet(int resnetID) {
+	public ImageClassifierResNet( int resnetID ) {
 		super(50);
 		this.resnetID = resnetID;
 		this.resnetID = 18;
 	}
 
 	@Override
-	public void loadModel(File path) throws IOException {
-		String name = String.format("resnet/resnet-%d.t7",resnetID);
+	public void loadModel( File path ) throws IOException {
+		String name = String.format("resnet/resnet-%d.t7", resnetID);
 
-		List<TorchObject> list = new ParseBinaryTorch7().parse(new File(path,name));
+		List<TorchObject> list = new ParseBinaryTorch7().parse(new File(path, name));
 		TorchGeneric torchSequence = (TorchGeneric)list.get(0);
-
 
 //		mean = torchListToArray( (TorchList)torchNorm.get("mean"));
 //		stdev = torchListToArray( (TorchList)torchNorm.get("std"));

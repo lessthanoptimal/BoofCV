@@ -18,38 +18,41 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.distort.Point2Transform2Model_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
 import lombok.Getter;
 
 /**
- * Distorts pixels using {@link Affine2D_F64}.
+ * Applies an affine transform to a 2D point.
  *
  * @author Peter Abeles
  */
-public class PixelTransformAffine_F64 implements PixelTransform<Point2D_F64> {
+public class PointTransformAffine_F64 implements Point2Transform2Model_F64<Affine2D_F64> {
 
 	@Getter protected final Affine2D_F64 model = new Affine2D_F64();
 
-	public PixelTransformAffine_F64() {}
-
-	public PixelTransformAffine_F64( Affine2D_F64 affine ) {
+	public PointTransformAffine_F64( Affine2D_F64 affine ) {
 		this.model.set(affine);
 	}
 
-	public void set( Affine2D_F64 affine ) {
-		this.model.set(affine);
+	public PointTransformAffine_F64() {}
+
+	@Override public void compute( double x, double y, Point2D_F64 out ) {
+		AffinePointOps_F64.transform(model, x, y, out);
 	}
 
-	@Override
-	public void compute( int x, int y, Point2D_F64 output ) {
-		AffinePointOps_F64.transform(model, x, y, output);
+	@Override public Point2Transform2_F64 copyConcurrent() {
+		return new PointTransformAffine_F64(model);
 	}
 
-	@Override
-	public PixelTransformAffine_F64 copyConcurrent() {
-		return new PixelTransformAffine_F64(model);
+	@Override public void setModel( Affine2D_F64 model ) {
+		this.model.set(model);
+	}
+
+	@Override public Affine2D_F64 newInstanceModel() {
+		return new Affine2D_F64();
 	}
 }

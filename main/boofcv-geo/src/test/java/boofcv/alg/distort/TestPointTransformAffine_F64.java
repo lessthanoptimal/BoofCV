@@ -18,38 +18,23 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.affine.AffinePointOps_F64;
-import lombok.Getter;
+import org.ejml.UtilEjml;
+import org.junit.jupiter.api.Test;
 
-/**
- * Distorts pixels using {@link Affine2D_F64}.
- *
- * @author Peter Abeles
- */
-public class PixelTransformAffine_F64 implements PixelTransform<Point2D_F64> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-	@Getter protected final Affine2D_F64 model = new Affine2D_F64();
+public class TestPointTransformAffine_F64 extends BoofStandardJUnit {
+	@Test void known() {
+		var affine = new Affine2D_F64(1,0,0,2,-1,2);
+		var alg = new PointTransformAffine_F64(affine);
 
-	public PixelTransformAffine_F64() {}
+		var found = new Point2D_F64();
+		alg.compute(5,9,found);
 
-	public PixelTransformAffine_F64( Affine2D_F64 affine ) {
-		this.model.set(affine);
-	}
-
-	public void set( Affine2D_F64 affine ) {
-		this.model.set(affine);
-	}
-
-	@Override
-	public void compute( int x, int y, Point2D_F64 output ) {
-		AffinePointOps_F64.transform(model, x, y, output);
-	}
-
-	@Override
-	public PixelTransformAffine_F64 copyConcurrent() {
-		return new PixelTransformAffine_F64(model);
+		assertEquals(4, found.x, UtilEjml.TEST_F64);
+		assertEquals(20, found.y, UtilEjml.TEST_F64);
 	}
 }

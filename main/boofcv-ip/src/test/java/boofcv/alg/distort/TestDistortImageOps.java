@@ -133,7 +133,7 @@ class TestDistortImageOps extends BoofStandardJUnit {
 		assertEquals(15,found.height);
 		
 		// top right border
-		affine.set(new Affine2D_F32(1,0,0,1,-2,-3));
+		transform.getModel().set(new Affine2D_F32(1,0,0,1,-2,-3));
 		found = DistortImageOps.boundBox(10,20,8,18,work,transform);
 		assertEquals(0,found.x0);
 		assertEquals(0,found.y0);
