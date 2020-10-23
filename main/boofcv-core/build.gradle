@@ -10,3 +10,9 @@ dependencies {
 	api project(':main:boofcv-sfm')
 	api project(':main:boofcv-types')
 }
+
+// Print out information about dependencies to stdout. Intended use is so we know exactly what CI is running
+task dependencyInfo(type:JavaExec) {
+	main = 'boofcv.PrintDependenciesVersionInfo'
+	classpath = sourceSets.main.runtimeClasspath
+}

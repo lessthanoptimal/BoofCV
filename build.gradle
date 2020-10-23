@@ -200,8 +200,6 @@ subprojects {
     // Force uploadArchives to fail if trying to upload a stable release and git is dirty
     uploadArchives.dependsOn failDirtyNotSnapshot
 
-    println("submodule ${project.path}")
-
     // Skip these codeless directories when publishing jars locally or to a remote destination
     if (['main', 'integration', 'checks'].contains(name)) {
         project.jar.enabled = false

@@ -7,5 +7,6 @@ install:
   - ./gradlew autogenerate
   - ./gradlew assemble
 script:
+  - ./gradlew  -q --console plain dependencyInfo
   - ./gradlew test
   - ./gradlew spotlessJavaCheck
