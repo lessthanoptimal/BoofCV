@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import boofcv.alg.nn.KdTreePoint2D_F64;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import georegression.geometry.UtilPoint2D_F64;
+import georegression.helper.KdTreePoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;

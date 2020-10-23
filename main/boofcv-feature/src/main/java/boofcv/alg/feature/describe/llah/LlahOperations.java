@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.describe.llah;
 
-import boofcv.alg.nn.KdTreePoint2D_F64;
 import boofcv.struct.geo.PointIndex2D_F64;
+import georegression.helper.KdTreePoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
