@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -883,6 +883,12 @@ public class UtilIO {
 		switch (url.getProtocol()) {
 			case "file":
 				filename = url.getPath();
+				// url will add %20 if there's a space in the path. This removes that and other encoding
+				try {
+					filename = URLDecoder.decode(filename, UTF_8.name());
+				} catch (UnsupportedEncodingException e) {
+					throw new RuntimeException(e);
+				}
 				// the filename will include an extra / in windows, this is fine
 				// in Java but FFMPEG can't handle it. So this will strip off the
 				// extra character and be cross platform
