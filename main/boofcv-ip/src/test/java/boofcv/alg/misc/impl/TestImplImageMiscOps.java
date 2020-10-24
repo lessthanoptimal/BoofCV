@@ -18,9 +18,11 @@
 
 package boofcv.alg.misc.impl;
 
+import boofcv.alg.misc.CompareToImplImageMiscOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.*;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
@@ -36,6 +38,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TestImplImageMiscOps extends BoofStandardJUnit {
 
 	int width = 10;
@@ -44,7 +47,7 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 
 	@Test
 	void checkAll() {
-		int numExpected = 26*6 + 4*8;
+		int numExpected = 27*6 + 4*8;
 		Method[] methods = ImplImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -88,6 +91,8 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 					testGrowBorder(m);
 				} else if( m.getName().compareTo("runConcurrent") == 0 ) {
 					continue;
+				} else if( m.getName().compareTo("findAndProcess") == 0 ) {
+					testFindAndProcess(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -1001,6 +1006,31 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 				assertEquals(expected,found, UtilEjml.TEST_F64,x+" "+y);
 			}
 		}
+	}
 
+	/**
+	 * Modifies the input depending on it being an even or odd number
+	 */
+	private void testFindAndProcess( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class[] paramTypes = m.getParameterTypes();
+		ImageGray src = GeneralizedImageOps.createSingleBand(paramTypes[0],width,height);
+		GImageMiscOps.fillUniform(src,rand,0,100);
+		ImageGray orig = (ImageGray)src.createSameShape();
+		orig.setTo(src);
+
+		m.invoke(null, src, CompareToImplImageMiscOps.createMatchLambda(paramTypes[0]),
+				(BoofLambdas.ProcessIIB)(int x,int y)->{GeneralizedImageOps.set(src,x,y,0); return true;});
+
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				int o = (int)GeneralizedImageOps.get(orig, x, y);
+				int f = (int)GeneralizedImageOps.get(src, x, y);
+				if (o%2 == 1) {
+					assertEquals(o, f);
+				} else {
+					assertEquals(0, f);
+				}
+			}
+		}
 	}
 }

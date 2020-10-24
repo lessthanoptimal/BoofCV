@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print(
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
+				"import boofcv.misc.BoofLambdas;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.misc.ImageMiscOps;\n" +
 				"import boofcv.struct.border.ImageBorder_F32;\n" +
@@ -101,6 +102,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 			printRotateCCW_two();
 			printRotateCCW_two_interleaved();
 			growBorder();
+			printFindValues();
 		}
 	}
 
@@ -128,9 +130,8 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String imageNameSrc = useGenerics ? "T" : imageName;
 		String generic = useGenerics ? "< T extends "+imageName+"<T>> " : "";
 
-		out.print("\tpublic static "+generic+"void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
-				"\t\t\t\t\t\t\t "+imageNameSrc+" input , "+borderName+" border, "+imageName+" output )\n" +
-				"\t{\n" +
+		out.print("\tpublic static "+generic+"void copy( int srcX, int srcY, int dstX, int dstY, int width, int height ,\n" +
+				"\t\t\t\t\t\t\t "+imageNameSrc+" input, "+borderName+" border, "+imageName+" output ) {\n" +
 				"\t\tif( output.width < dstX+width || output.height < dstY+height )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained in the output image. w=\"+output.width+\" < \"+(dstX+width)+\" or y=\"+output.height+\" < \"+(dstY+height));\n" +
 				"\t\t\n" +
@@ -163,9 +164,8 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 	private void printCopy() {
 		out.print(
-				"\tpublic static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
-				"\t\t\t\t\t\t\t "+imageName+" input , "+imageName+" output ) {\n" +
-				"\n" +
+				"\tpublic static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height ,\n" +
+				"\t\t\t\t\t\t\t "+imageName+" input, "+imageName+" output ) {\n" +
 				"\t\tif( input.width < srcX+width || input.height < srcY+height )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained in the input image\");\n" +
 				"\t\tif( output.width < dstX+width || output.height < dstY+height )\n" +
@@ -185,9 +185,8 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 	private void printCopy_Interleaved() {
 
 		out.print(
-				"\tpublic static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
-				"\t\t\t\t\t\t\t "+imageNameI+" input , "+imageNameI+" output ) {\n" +
-				"\n" +
+				"\tpublic static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height ,\n" +
+				"\t\t\t\t\t\t\t "+imageNameI+" input, "+imageNameI+" output ) {\n" +
 				"\t\tif( input.width < srcX+width || input.height < srcY+height )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained input image\");\n" +
 				"\t\tif( output.width < dstX+width || output.height < dstY+height )\n" +
@@ -213,7 +212,6 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 		out.print(
 				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
-				"\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
@@ -229,7 +227,6 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 		out.print(
 				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
-				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tint end = index + input.width*input.numBands;\n" +
@@ -244,7 +241,6 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 		out.print(
 				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+"[] values) {\n" +
-				"\n" +
 				"\t\tfinal int numBands = input.numBands;\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -266,8 +262,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String imageName = imageType.getInterleavedName();
 		String typeCast = imageType.getTypeCastFromSum();
 		out.print(
-				"\tpublic static void fillBand("+imageName+" input, int band , "+imageType.getSumType()+" value) {\n" +
-				"\n" +
+				"\tpublic static void fillBand("+imageName+" input, int band, "+imageType.getSumType()+" value) {\n" +
 				"\t\tfinal int numBands = input.numBands;\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -286,15 +281,14 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String singleName = imageType.getSingleBandName();
 		String interleavedName = imageType.getInterleavedName();
 		out.print(
-				"\tpublic static void insertBand( "+singleName+" input, int band , "+interleavedName+" output) {\n" +
-				"\n" +
+				"\tpublic static void insertBand( "+singleName+" input, int band, "+interleavedName+" output) {\n" +
 				"\t\tfinal int numBands = output.numBands;\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint indexIn = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride() + band;\n" +
 				"\t\t\tint end = indexOut + output.width*numBands - band;\n" +
-				"\t\t\tfor (; indexOut < end; indexOut += numBands , indexIn++ ) {\n" +
+				"\t\t\tfor (; indexOut < end; indexOut += numBands, indexIn++ ) {\n" +
 				"\t\t\t\toutput.data[indexOut] = input.data[indexIn];\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -307,15 +301,14 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String singleName = imageType.getSingleBandName();
 		String interleavedName = imageType.getInterleavedName();
 		out.print(
-				"\tpublic static void extractBand( "+interleavedName+" input, int band , "+singleName+" output) {\n" +
-				"\n" +
+				"\tpublic static void extractBand( "+interleavedName+" input, int band, "+singleName+" output) {\n" +
 				"\t\tfinal int numBands = input.numBands;\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint indexIn = input.getStartIndex() + y * input.getStride() + band;\n" +
 				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
 				"\t\t\tint end = indexOut + output.width;\n" +
-				"\t\t\tfor (; indexOut < end; indexIn += numBands , indexOut++ ) {\n" +
+				"\t\t\tfor (; indexOut < end; indexIn += numBands, indexOut++ ) {\n" +
 				"\t\t\t\toutput.data[indexOut] = input.data[indexIn];\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -329,7 +322,6 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 		out.print(
 				"\tpublic static void fillBorder("+imageName+" input, "+imageType.getSumType()+" value, int radius ) {\n" +
-				"\n" +
 				"\t\t// top and bottom\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,y->{\n" +
 				"\t\tfor (int y = 0; y < radius; y++) {\n" +
@@ -365,8 +357,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 
 		out.print(
-				"\tpublic static void fillBorder("+imageName+" input, "+imageType.getSumType()+" value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {\n" +
-				"\n" +
+				"\tpublic static void fillBorder("+imageName+" input, "+imageType.getSumType()+" value, int borderX0, int borderY0, int borderX1, int borderY1 ) {\n" +
 				"\t\t// top and bottom\n" +
 				"\t\tfor (int y = 0; y < borderY0; y++) {\n" +
 				"\t\t\tint srcIdx = input.startIndex + y * input.stride;\n" +
@@ -454,7 +445,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 //		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
 
 		out.print(
-				"\tpublic static void fillUniform("+imageName+" image, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void fillUniform("+imageName+" image, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = image.data;\n" +
@@ -488,7 +479,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 //		String maxInclusive = imageType.isInteger() ? "exclusive" : "inclusive";
 
 		out.print(
-				"\tpublic static void fillUniform("+imageName+" image, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void fillUniform("+imageName+" image, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = image.data;\n" +
@@ -521,8 +512,8 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 
 		out.print(
-				"\tpublic static void fillGaussian("+imageName+" image, Random rand , double mean , double sigma , "
-				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
+				"\tpublic static void fillGaussian("+imageName+" image, Random rand, double mean, double sigma, "
+				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
 				"\t\t"+dataType+"[] data = image.data;\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < image.height; y++) {\n" +
@@ -545,8 +536,8 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 
 		out.print(
-				"\tpublic static void fillGaussian("+imageName+" image, Random rand , double mean , double sigma , "
-				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
+				"\tpublic static void fillGaussian("+imageName+" image, Random rand, double mean, double sigma, "
+				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
 				"\t\t"+dataType+"[] data = image.data;\n" +
 				"\t\tint length = image.width*image.numBands;\n" +
 				"\n" +
@@ -572,7 +563,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 
 		out.print(
-				"\tpublic static void addUniform("+imageName+" image, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void addUniform("+imageName+" image, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = image.data;\n" +
@@ -608,7 +599,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String typeCast = imageType.getTypeCastFromSum();
 
 		out.print(
-				"\tpublic static void addUniform("+imageName+" image, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void addUniform("+imageName+" image, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = image.data;\n" +
@@ -644,8 +635,8 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String sumCast = sumType.equals("double") ? "" : "("+sumType+")";
 
 		out.print(
-				"\tpublic static void addGaussian("+imageName+" image, Random rand , double sigma , "
-				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
+				"\tpublic static void addGaussian("+imageName+" image, Random rand, double sigma, "
+				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < image.height; y++) {\n" +
 				"\t\t\tint index = image.getStartIndex() + y * image.getStride();\n" +
@@ -666,9 +657,8 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		String sumCast = sumType.equals("double") ? "" : "("+sumType+")";
 
 		out.print(
-				"\tpublic static void addGaussian("+imageName+" image, Random rand , double sigma , "
-				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
-				"\n" +
+				"\tpublic static void addGaussian("+imageName+" image, Random rand, double sigma, "
+				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
 				"\t\tint length = image.width*image.numBands;\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < image.height; y++) {\n" +
@@ -768,7 +758,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 	private void printRotateCW_two() {
 		out.print(
-				"\tpublic static void rotateCW( "+imageName+" input , "+imageName+" output ) {\n" +
+				"\tpublic static void rotateCW( "+imageName+" input, "+imageName+" output ) {\n" +
 				"\t\toutput.reshape(input.height,input.width);\n" +
 				"\n" +
 				"\t\tint h = input.height-1;\n" +
@@ -786,7 +776,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 	private void printRotateCW_two_interleaved() {
 		out.print(
-				"\tpublic static void rotateCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
+				"\tpublic static void rotateCW( "+imageNameI+" input, "+imageNameI+" output ) {\n" +
 				"\t\toutput.reshape(input.height,input.width,input.numBands);\n" +
 				"\n" +
 				"\t\tint h = input.height-1;\n" +
@@ -843,7 +833,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 	private void printRotateCCW_two() {
 		out.print(
-				"\tpublic static void rotateCCW( "+imageName+" input , "+imageName+" output ) {\n" +
+				"\tpublic static void rotateCCW( "+imageName+" input, "+imageName+" output ) {\n" +
 				"\t\toutput.reshape(input.height,input.width);\n" +
 				"\n" +
 				"\t\tint w = input.width-1;\n" +
@@ -861,7 +851,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
 	private void printRotateCCW_two_interleaved() {
 		out.print(
-				"\tpublic static void rotateCCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
+				"\tpublic static void rotateCCW( "+imageNameI+" input, "+imageNameI+" output ) {\n" +
 				"\t\toutput.reshape(input.height,input.width,input.numBands);\n" +
 				"\n" +
 				"\t\tint w = input.width-1;\n" +
@@ -895,8 +885,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		} else {
 			typecast = "";
 		}
-		out.print("\tpublic static "+generic+"void growBorder("+srcType+" src , "+borderName+" border, int borderX0, int borderY0, int borderX1, int borderY1 , "+srcType+" dst )\n" +
-				"\t{\n" +
+		out.print("\tpublic static "+generic+"void growBorder("+srcType+" src, "+borderName+" border, int borderX0, int borderY0, int borderX1, int borderY1, "+srcType+" dst ) {\n" +
 				"\t\tdst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);\n" +
 				"\t\tborder.setImage(src);\n" +
 				"\n" +
@@ -931,8 +920,27 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
+	private void printFindValues() {
+		String suffix = imageType.getGenericAbbreviated();
+
+		out.print(
+				"\tpublic static void findAndProcess( "+imageType.getSingleBandName()+" input, BoofLambdas.Match_"+suffix+
+				" finder, BoofLambdas.ProcessIIB process ) {\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++, index++) {\n" +
+				"\t\t\t\tif (finder.process(input.data[index])) {\n" +
+				"\t\t\t\t\tif (!process.process(x, y))\n" +
+				"\t\t\t\t\t\treturn;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplImageMiscOps gen = new GenerateImplImageMiscOps();
-		gen.generateCode();
+		gen.setModuleName("boofcv-ip");
+		gen.generate();
 	}
 }

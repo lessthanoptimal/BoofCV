@@ -173,6 +173,7 @@ Version : 0.36
   * Deterministic non-max suppression block candidate concurrent
   * ImageMiscOps.copy() with border for input image
   * ImageMiscOps now has concurrent code
+  * ImageMiscOps.findAndProcess()
   * Split mean filter into BlurImageOps.mean() and BlurImageOps.meanB()
   * BlurImageOps.meanB() requires a border to be specified, if null is specified then just the inner portion is processed
   * Created Histogram2D_S32 to easily create and process 2D histograms

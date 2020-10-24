@@ -22,10 +22,10 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.impl.ImplImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +51,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 
 	@Test
 	void compareFunctions() {
-		super.performTests(26*6 + 4*8);
+		super.performTests(27*6 + 4*8);
 	}
 
 	@Override
@@ -142,10 +142,33 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 				p[2]=BoofTesting.primitive(2,types[2]);p[3]=BoofTesting.primitive(1,types[3]);
 				p[4]=BoofTesting.primitive(60,types[4]);;
 				break;
+			case "findAndProcess":
+				// this isn't a great test since it does nothing. At least you can tell if it blows up or not
+				p[1]=createMatchLambda(types[0]);
+				p[2]=(BoofLambdas.ProcessIIB)(x,y)-> false;
+				break;
 
 			default:
 				throw new RuntimeException("Implement " + candidate.getName());
 		}
 		return output;
+	}
+
+	public static Object createMatchLambda( Class type ) {
+		if (GrayI8.class.isAssignableFrom(type)) {
+			return (BoofLambdas.Match_I8)value -> value%2==0;
+		} else if (GrayI16.class.isAssignableFrom(type)) {
+			return (BoofLambdas.Match_I16)value -> value%2==0;
+		} else if (GrayS32.class.isAssignableFrom(type)) {
+			return (BoofLambdas.Match_S32)value -> value%2==0;
+		} else if (GrayS64.class.isAssignableFrom(type)) {
+			return (BoofLambdas.Match_S64)value -> value%2==0;
+		} else if (GrayF32.class.isAssignableFrom(type)) {
+			return (BoofLambdas.Match_F32)value -> ((int)value)%2==0;
+		} else if (GrayF64.class.isAssignableFrom(type)) {
+			return (BoofLambdas.Match_F64)value -> ((int)value)%2==0;
+		} else {
+			throw new RuntimeException("Unknown");
+		}
 	}
 }
