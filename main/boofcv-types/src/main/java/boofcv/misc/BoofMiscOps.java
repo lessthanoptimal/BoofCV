@@ -44,6 +44,21 @@ import java.util.*;
 @SuppressWarnings("rawtypes")
 public class BoofMiscOps {
 
+	/**
+	 * Computes the elapsed time in calling the provided function in nano seconds
+	 */
+	public static long timeNano( BoofLambdas.ProcessCall process ) {
+		long time0 = System.nanoTime();
+		process.process();
+		long time1 = System.nanoTime();
+		return time1-time0;
+	}
+
+	public static void profile( BoofLambdas.ProcessCall process, String description ) {
+		long nano = timeNano(process);
+		System.out.println("Elapsed: "+(nano*1e-6)+" (ms) "+description);
+	}
+
 	public static String timeStr() {
 		return Instant.now()
 				.atOffset(ZoneOffset.UTC)
