@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -184,7 +184,7 @@ public class SimulatePlanarWorld {
 			r.rectInCamera();
 		}
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		if( BoofConcurrency.USE_CONCURRENT && output.width*output.height > 100*100) {
 			renderMultiThread();
 		} else {
 			renderSingleThread();
@@ -283,7 +283,7 @@ public class SimulatePlanarWorld {
 				double surfaceX = p3.x * r.texture.width / r.width3D;
 				double surfaceY = p3.y * r.texture.height / r.height3D;
 
-				if( surfaceX < r.texture.width && surfaceY < r.texture.height ) {
+				if( surfaceX >= 0.0 && surfaceX < r.texture.width && surfaceY >= 0.0 && surfaceY < r.texture.height ) {
 					float value = interp.get((float) surfaceX, (float) surfaceY);
 					output.unsafe_set(x, y, value);
 					depthMap.unsafe_set(x,y,(float)depth);
