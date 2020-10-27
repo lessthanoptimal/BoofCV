@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,13 +100,13 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 				System.out.printf("click %5.1f %5.1f\n",p.x,p.y);
 				synchronized (detected) {
 					for (int i = 0; i < detected.size; i++) {
-						if( Intersection2D_F64.containConvex(detected.get(i).bounds,p) ) {
+						if( Intersection2D_F64.containsConvex(detected.get(i).bounds,p) ) {
 							selectedMarkerMouse(i,false);
 							return;
 						}
 					}
 					for (int i = 0; i < failures.size; i++) {
-						if( Intersection2D_F64.containConvex(failures.get(i).bounds,p) ) {
+						if( Intersection2D_F64.containsConvex(failures.get(i).bounds,p) ) {
 							selectedMarkerMouse(i,true);
 							return;
 						}

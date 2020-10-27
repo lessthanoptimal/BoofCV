@@ -487,7 +487,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 			// in almost all cases the center should be inside
 			Point2D_F64 center = new Point2D_F64();
 			detector.getCenter(i,center);
-			Intersection2D_F64.containConvex(polygon,center);
+			Intersection2D_F64.containsConvex(polygon,center);
 		}
 	}
 

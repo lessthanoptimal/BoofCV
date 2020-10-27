@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,7 +96,7 @@ public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrac
 			for( int x = bounds.x0; x < bounds.x1; x++ ) {
 				p.x = x;
 
-				if( Intersection2D_F64.containConvex(poly64, p)) {
+				if( Intersection2D_F64.containsConvex(poly64, p)) {
 					GeneralizedImageOps.set(image, x, y, value);
 				}
 			}

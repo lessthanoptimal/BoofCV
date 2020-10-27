@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.fitting.polygon.FitPolygon2D_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -204,7 +205,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		List<Point2D_F64> layout = detector.getLayout();
 
 		Polygon2D_F64 hull = new Polygon2D_F64();
-		UtilPolygons2D_F64.convexHull(layout,hull);
+		FitPolygon2D_F64.convexHull(layout,hull);
 		UtilPolygons2D_F64.removeAlmostParallel(hull,0.02);
 
 		boundaryIndexes = new int[hull.size()];

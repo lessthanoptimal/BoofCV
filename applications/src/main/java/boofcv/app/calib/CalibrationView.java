@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.geo.PointIndex2D_F64;
+import georegression.fitting.polygon.FitPolygon2D_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
@@ -159,7 +160,7 @@ public interface CalibrationView {
 			// find the convex hull and use that as the collision region
 			List<Point2D_F64> layout = detector.getLayout();
 			Polygon2D_F64 poly = new Polygon2D_F64(layout.size());
-			UtilPolygons2D_F64.convexHull(layout,poly);
+			FitPolygon2D_F64.convexHull(layout,poly);
 
 			if( !poly.isCCW() )
 				poly.flip();
@@ -244,7 +245,7 @@ public interface CalibrationView {
 			// find the convex hull and use that as the collision region
 			List<Point2D_F64> layout = detector.getLayout();
 			Polygon2D_F64 poly = new Polygon2D_F64(layout.size());
-			UtilPolygons2D_F64.convexHull(layout,poly);
+			FitPolygon2D_F64.convexHull(layout,poly);
 
 			if( !poly.isCCW() )
 				poly.flip();
