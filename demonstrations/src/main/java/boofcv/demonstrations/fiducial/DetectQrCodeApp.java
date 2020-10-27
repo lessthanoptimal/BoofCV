@@ -70,10 +70,8 @@ import static boofcv.alg.fiducial.qrcode.QrCode.Failure.ALIGNMENT;
  * @author Peter Abeles
  */
 public class DetectQrCodeApp<T extends ImageGray<T>>
-		extends DetectBlackShapeAppBase<T> implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener
-{
+		extends DetectBlackShapeAppBase<T> implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener {
 	QrCodePreciseDetector<T> detector;
-
 
 	//--------- ONLY INVOKE IN THE GUI ------------
 	DetectQrCodeControlPanel controlPanel;
@@ -84,30 +82,30 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	final FastQueue<QrCode> detected = new FastQueue<>(QrCode::new);
 	final FastQueue<QrCode> failures = new FastQueue<>(QrCode::new);
 
-	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
+	public DetectQrCodeApp( List<String> examples, Class<T> imageType ) {
 		super(examples, imageType);
 
 		controlPanel = new DetectQrCodeControlPanel(this);
 		controlPanel.polygonPanel.removeControlNumberOfSides();
-		setupGui(gui,controlPanel);
+		setupGui(gui, controlPanel);
 
 		gui.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed( MouseEvent e ) {
 				gui.getImagePanel().grabFocus();
 				double scale = gui.getScale();
-				Point2D_F64 p = new Point2D_F64(e.getX()/scale,e.getY()/scale);
-				System.out.printf("click %5.1f %5.1f\n",p.x,p.y);
+				Point2D_F64 p = new Point2D_F64(e.getX()/scale, e.getY()/scale);
+				System.out.printf("click %5.1f %5.1f\n", p.x, p.y);
 				synchronized (detected) {
 					for (int i = 0; i < detected.size; i++) {
-						if( Intersection2D_F64.containsConvex(detected.get(i).bounds,p) ) {
-							selectedMarkerMouse(i,false);
+						if (Intersection2D_F64.containsConvex(detected.get(i).bounds, p)) {
+							selectedMarkerMouse(i, false);
 							return;
 						}
 					}
 					for (int i = 0; i < failures.size; i++) {
-						if( Intersection2D_F64.containsConvex(failures.get(i).bounds,p) ) {
-							selectedMarkerMouse(i,true);
+						if (Intersection2D_F64.containsConvex(failures.get(i).bounds, p)) {
+							selectedMarkerMouse(i, true);
 							return;
 						}
 					}
@@ -118,49 +116,50 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 				.addKeyEventDispatcher(new KeyEventDispatcher() {
 					boolean spaceDown = false;
+
 					@Override
-					public boolean dispatchKeyEvent(KeyEvent e) {
-						if( e.getKeyCode() != KeyEvent.VK_SPACE )
+					public boolean dispatchKeyEvent( KeyEvent e ) {
+						if (e.getKeyCode() != KeyEvent.VK_SPACE)
 							return false;
 
-						if( spaceDown ) {
-							if( e.getID() != KeyEvent.KEY_RELEASED )
+						if (spaceDown) {
+							if (e.getID() != KeyEvent.KEY_RELEASED)
 								return false;
 						} else {
-							if( e.getID() != KeyEvent.KEY_PRESSED ) {
+							if (e.getID() != KeyEvent.KEY_PRESSED) {
 								return false;
 							}
 						}
 						spaceDown = !spaceDown;
 
-						System.out.println("Space down = "+spaceDown);
+						System.out.println("Space down = " + spaceDown);
 
-						if( spaceDown ) {
+						if (spaceDown) {
 							switch (DetectQrCodeApp.this.inputMethod) {
 								case VIDEO:
 								case WEBCAM:
 									DetectQrCodeApp.this.streamPaused = !DetectQrCodeApp.this.streamPaused;
 									break;
-								default: break;
+								default:
+									break;
 							}
 						}
 						return false;
 					}
 				});
 
-		setPreferredSize(new Dimension(1200,800));
+		setPreferredSize(new Dimension(1200, 800));
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		super.handleInputChange(source, method, width, height);
 		detector.resetRuntimeProfiling();
-
 	}
 
 	@Override
-	protected void createDetector(boolean initializing) {
-		if( !initializing)
+	protected void createDetector( boolean initializing ) {
+		if (!initializing)
 			BoofSwingUtil.checkGuiThread();
 
 		DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
@@ -169,7 +168,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			ConfigQrCode config = controls.getConfigQr();
 			config.threshold = controls.getThreshold().createConfig();
 
-			detector = FactoryFiducial.qrcode(config,imageClass);
+			detector = FactoryFiducial.qrcode(config, imageClass);
 			detector.setProfilerState(true);
 		}
 	}
@@ -190,7 +189,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	 * Override this function so that it doesn't threshold the image twice
 	 */
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, ImageBase input ) {
 		System.out.flush();
 
 		synchronized (bufferedImageLock) {
@@ -198,7 +197,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			work = ConvertBufferedImage.checkDeclare(buffered, work);
 		}
 
-		if( saveRequested ) {
+		if (saveRequested) {
 			saveInputImage();
 			saveRequested = false;
 		}
@@ -210,7 +209,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			long before = System.nanoTime();
 			detector.process((T)input);
 			long after = System.nanoTime();
-			timeInSeconds = (after-before)*1e-9;
+			timeInSeconds = (after - before)*1e-9;
 		}
 
 		// create a local copy so that gui and processing thread's dont conflict
@@ -221,7 +220,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			}
 			this.failures.reset();
 			for (QrCode d : detector.getFailures()) {
-				if( d.failureCause.ordinal() >= QrCode.Failure.READING_BITS.ordinal())
+				if (d.failureCause.ordinal() >= QrCode.Failure.READING_BITS.ordinal())
 					this.failures.grow().set(d);
 			}
 //			System.out.println("Failed "+failures.size());
@@ -236,28 +235,28 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			controls.setProcessingTimeS(timeInSeconds);
 			viewUpdated();
 			synchronized (detected) {
-				controlPanel.messagePanel.updateList(detected.toList(),failures.toList());
+				controlPanel.messagePanel.updateList(detected.toList(), failures.toList());
 			}
 		});
 	}
 
 	@Override
-	protected void detectorProcess(ImageGray input, GrayU8 binary) {
+	protected void detectorProcess( ImageGray input, GrayU8 binary ) {
 		throw new RuntimeException("This shouldn't be called");
 	}
 
-	public void selectedMarkerMouse( int index , boolean failure ) {
-		controlPanel.messagePanel.setSelectedMarker(index,failure);
+	public void selectedMarkerMouse( int index, boolean failure ) {
+		controlPanel.messagePanel.setSelectedMarker(index, failure);
 	}
 
 	@Override
-	public void selectedMarkerInList(int index, boolean failure) {
-		double width=0;
+	public void selectedMarkerInList( int index, boolean failure ) {
+		double width = 0;
 		final Point2D_F64 center = new Point2D_F64();
 
 		synchronized (detected) {
 			QrCode qr;
-			if( failure ) {
+			if (failure) {
 				if (index >= failures.size)
 					return;
 				qr = failures.get(index);
@@ -266,30 +265,29 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					return;
 				qr = detected.get(index);
 			}
-			UtilPolygons2D_F64.vertexAverage(qr.bounds,center);
+			UtilPolygons2D_F64.vertexAverage(qr.bounds, center);
 
 
 			for (int i = 0; i < 4; i++) {
-				width = Math.max(width,qr.bounds.getSideLength(i));
+				width = Math.max(width, qr.bounds.getSideLength(i));
 			}
 		}
 
 		final double _width = width;
 
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			double scale = 0.75*Math.min(gui.getWidth(),gui.getHeight())/_width;
-			gui.setScaleAndCenter(scale,center.x,center.y);
+			double scale = 0.75*Math.min(gui.getWidth(), gui.getHeight())/_width;
+			gui.setScaleAndCenter(scale, center.x, center.y);
 			controlPanel.setZoom(scale);
 		});
-
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
 
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 
-			DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel) DetectQrCodeApp.this.controls;
+			DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
 
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -301,7 +299,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0,scale, g2);
+					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 				}
 
 				synchronized (detected) {
@@ -340,7 +338,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					}
 				}
 
-				if( controls.bShowBits ) {
+				if (controls.bShowBits) {
 					synchronized (detected) {
 						for (int i = 0; i < detected.size(); i++) {
 							QrCode qr = detected.get(i);
@@ -403,21 +401,21 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 						Point2D_F64 a = e.a.center;
 						Point2D_F64 b = e.b.center;
 
-						l.setLine(scale * a.x, scale * a.y, scale * b.x, scale * b.y);
+						l.setLine(scale*a.x, scale*a.y, scale*b.x, scale*b.y);
 						g2.draw(l);
 					}
 				}
 			}
 		}
 
-		private void renderAlignmentPatterns(Graphics2D g2, List<QrCode> codes) {
+		private void renderAlignmentPatterns( Graphics2D g2, List<QrCode> codes ) {
 			g2.setColor(Color.BLUE);
 			g2.setStroke(new BasicStroke(3));
 			for (QrCode qr : codes) {
-				double size = Math.sqrt(qr.ppCorner.areaSimple()) / 14.0;
+				double size = Math.sqrt(qr.ppCorner.areaSimple())/14.0;
 				for (int i = 0; i < qr.alignment.size; i++) {
 					QrCode.Alignment a = qr.alignment.get(i);
-					VisualizeFeatures.drawCircle(g2, a.pixel.x * scale, a.pixel.y * scale, size * scale);
+					VisualizeFeatures.drawCircle(g2, a.pixel.x*scale, a.pixel.y*scale, size*scale);
 				}
 			}
 		}
@@ -425,7 +423,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		/**
 		 * Draws the estimated value of each bit onto the image
 		 */
-		private void renderBinaryValues( Graphics2D g2 , QrCode qr ) {
+		private void renderBinaryValues( Graphics2D g2, QrCode qr ) {
 
 			locator.setHomographyInv(qr.Hinv);
 
@@ -439,15 +437,15 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			g2.setStroke(new BasicStroke(1));
 			for (int i = 0; i < bits.size; i++) {
 				Point2D_I32 c = points.get(i);
-				locator.gridToImage(c.y+0.5f,c.x+0.5f,  p);
-				int value = qr.mask.apply(c.y,c.x,bits.get(i));
+				locator.gridToImage(c.y + 0.5f, c.x + 0.5f, p);
+				int value = qr.mask.apply(c.y, c.x, bits.get(i));
 
-				if( value == 1 ) {
-					renderCircleAt(g2, p, Color.BLACK,Color.LIGHT_GRAY);
-				} else if( value == 0 ) {
-					renderCircleAt(g2, p, Color.WHITE,Color.LIGHT_GRAY);
+				if (value == 1) {
+					renderCircleAt(g2, p, Color.BLACK, Color.LIGHT_GRAY);
+				} else if (value == 0) {
+					renderCircleAt(g2, p, Color.WHITE, Color.LIGHT_GRAY);
 				} else {
-					renderCircleAt(g2, p, Color.RED	,Color.LIGHT_GRAY);
+					renderCircleAt(g2, p, Color.RED, Color.LIGHT_GRAY);
 				}
 			}
 
@@ -463,29 +461,29 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 //			renderCircleAt(g2, p);
 		}
 
-		private void renderCircleAt(Graphics2D g2, Point2D_F32 p, Color center , Color border ) {
-			int x = (int)(scale*p.x+0.5);
-			int y = (int)(scale*p.y+0.5);
+		private void renderCircleAt( Graphics2D g2, Point2D_F32 p, Color center, Color border ) {
+			int x = (int)(scale*p.x + 0.5);
+			int y = (int)(scale*p.y + 0.5);
 			g2.setColor(center);
-			g2.fillOval(x-3,y-3,7,7);
+			g2.fillOval(x - 3, y - 3, 7, 7);
 			g2.setColor(border);
-			g2.drawOval(x-3,y-3,7,7);
+			g2.drawOval(x - 3, y - 3, 7, 7);
 		}
 	}
 
 	@Override
 	public void viewUpdated() {
 		BufferedImage active;
-		if( controls.selectedView == 0 ) {
+		if (controls.selectedView == 0) {
 			active = original;
-		} else if( controls.selectedView == 1 ) {
-			VisualizeBinaryData.renderBinary(detector.getBinary(),false,work);
+		} else if (controls.selectedView == 1) {
+			VisualizeBinaryData.renderBinary(detector.getBinary(), false, work);
 			active = work;
 			work.setRGB(0, 0, work.getRGB(0, 0)); // hack so that Swing knows it's been modified
 		} else {
 			Graphics2D g2 = work.createGraphics();
 			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
+			g2.fillRect(0, 0, work.getWidth(), work.getHeight());
 			active = work;
 		}
 
@@ -495,7 +493,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		guiImage.repaint();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/qrcode/image02.jpg"));
@@ -503,8 +501,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("fiducial/qrcode/image04.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/qrcode/movie.mp4"));
 
-		SwingUtilities.invokeLater(()->{
-			var app = new DetectQrCodeApp<>(examples,GrayF32.class);
+		SwingUtilities.invokeLater(() -> {
+			var app = new DetectQrCodeApp<>(examples, GrayF32.class);
 			app.openExample(examples.get(0));
 			app.display("QR-Code Detector");
 		});

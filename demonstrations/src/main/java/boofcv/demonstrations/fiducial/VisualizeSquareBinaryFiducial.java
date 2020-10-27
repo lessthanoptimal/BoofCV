@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,50 +58,50 @@ public class VisualizeSquareBinaryFiducial {
 	final static int gridWidth = 4;
 	final static double borderWidth = 0.25;
 
-	public void process( String nameImage , String nameIntrinsic ) {
+	public void process( String nameImage, String nameIntrinsic ) {
 
 		CameraPinholeBrown intrinsic = nameIntrinsic == null ? null : (CameraPinholeBrown)CalibrationIO.load(nameIntrinsic);
 		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
-		GrayF32 undistorted = new GrayF32(input.width,input.height);
+		GrayF32 undistorted = new GrayF32(input.width, input.height);
 
-		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, 1.0,true,GrayF32.class);
-		Detector detector = new Detector(gridWidth,borderWidth,inputToBinary);
+		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, 1.0, true, GrayF32.class);
+		Detector detector = new Detector(gridWidth, borderWidth, inputToBinary);
 		detector.setLengthSide(0.1);
 
-		if( intrinsic != null ) {
+		if (intrinsic != null) {
 			CameraPinholeBrown paramUndist = new CameraPinholeBrown();
 			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.changeCameraModel(
 					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, new CameraPinhole(intrinsic), paramUndist,
 					ImageType.single(GrayF32.class));
 			detector.configure(new LensDistortionBrown(paramUndist),
 					paramUndist.width, paramUndist.height, false);
-			undistorter.apply(input,undistorted);
+			undistorter.apply(input, undistorted);
 			detector.process(undistorted);
 		} else {
 			detector.process(input);
 		}
 
-		System.out.println("Total Found: "+detector.squares.size());
+		System.out.println("Total Found: " + detector.squares.size());
 		FastQueue<FoundFiducial> fiducials = detector.getFound();
 
-		int N = Math.min(20,detector.squares.size());
+		int N = Math.min(20, detector.squares.size());
 		ListDisplayPanel squares = new ListDisplayPanel();
 		for (int i = 0; i < N; i++) {
-			squares.addImage(VisualizeBinaryData.renderBinary(detector.squares.get(i),false, null)," "+i);
-			squares.addImage(ConvertBufferedImage.convertTo(detector.squaresGray.get(i),null)," "+i);
+			squares.addImage(VisualizeBinaryData.renderBinary(detector.squares.get(i), false, null), " " + i);
+			squares.addImage(ConvertBufferedImage.convertTo(detector.squaresGray.get(i), null), " " + i);
 		}
 
-		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(input,output);
+		BufferedImage output = new BufferedImage(input.width, input.height, BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.convertTo(input, output);
 		Graphics2D g2 = output.createGraphics();
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 		for (int i = 0; i < N; i++) {
-			VisualizeShapes.drawArrowSubPixel(fiducials.get(i).distortedPixels,3, 1, g2);
+			VisualizeShapes.drawArrowSubPixel(fiducials.get(i).distortedPixels, 3, 1, g2);
 		}
 
-		ShowImages.showWindow(output,"Binary",true);
-		ShowImages.showWindow(squares,"Candidates",true);
+		ShowImages.showWindow(output, "Binary", true);
+		ShowImages.showWindow(squares, "Candidates", true);
 	}
 
 	public static class Detector extends DetectFiducialSquareBinary<GrayF32> {
@@ -109,14 +109,14 @@ public class VisualizeSquareBinaryFiducial {
 		public List<GrayU8> squares = new ArrayList<>();
 		public List<GrayF32> squaresGray = new ArrayList<>();
 
-		protected Detector( int gridWidth, double borderWidth , InputToBinary<GrayF32> inputToBinary ) {
-			super(gridWidth,borderWidth,0.65,inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), GrayF32.class)
-					,GrayF32.class);
+		protected Detector( int gridWidth, double borderWidth, InputToBinary<GrayF32> inputToBinary ) {
+			super(gridWidth, borderWidth, 0.65, inputToBinary, FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4, 4), GrayF32.class)
+					, GrayF32.class);
 		}
 
 		@Override
-		protected boolean processSquare(GrayF32 square, Result result, double a , double b) {
-			if( super.processSquare(square,result,a,b)) {
+		protected boolean processSquare( GrayF32 square, Result result, double a, double b ) {
+			if (super.processSquare(square, result, a, b)) {
 				squares.add(super.getBinaryInner().clone());
 				squaresGray.add(super.getGrayNoBorder().clone());
 				return true;
@@ -126,9 +126,9 @@ public class VisualizeSquareBinaryFiducial {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
 			app.process(UtilIO.pathExample("fiducial/binary/image0001.jpg"), null);
 		});

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,18 +68,17 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 
 	ImagePanel panel;
 
-	public VideoDetectCorners(SimpleImageSequence<T> sequence,
-							  GeneralFeatureDetector<T, D> detector,
-							  Class<D> derivType) {
+	public VideoDetectCorners( SimpleImageSequence<T> sequence,
+							   GeneralFeatureDetector<T, D> detector,
+							   Class<D> derivType ) {
 		super(sequence);
 
 		this.derivType = derivType;
 		this.detector = detector;
 	}
 
-
 	@Override
-	public void processFrame(T image) {
+	public void processFrame( T image ) {
 
 		if (detector.getRequiresGradient()) {
 			if (derivX == null) {
@@ -107,7 +106,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	@Override
-	public void updateGUI(BufferedImage guiImage, T origImage) {
+	public void updateGUI( BufferedImage guiImage, T origImage ) {
 		Graphics2D g2 = guiImage.createGraphics();
 
 		for (int i = 0; i < corners.size(); i++) {
@@ -129,7 +128,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	void perform(String fileName, Class<T> imageType, Class<D> derivType) {
+	void perform( String fileName, Class<T> imageType, Class<D> derivType ) {
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
 
 		int maxCorners = 200;
@@ -148,7 +147,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity,null, extractor, selector);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null, extractor, selector);
 		detector.setFeatureLimit(maxCorners);
 
 		VideoDetectCorners<T, D> display = new VideoDetectCorners<>(sequence, detector, derivType);
@@ -156,7 +155,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 		display.process();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		String fileName;
 
 		if (args.length == 0) {

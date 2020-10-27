@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,15 +43,13 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-
 /**
- *  Allows the user to select a point and show the description of the region at that point
+ * Allows the user to select a point and show the description of the region at that point
  *
  * @author Peter Abeles
  */
-public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
-	extends DemonstrationBase implements SelectRegionDescriptionPanel.Listener
-{
+public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
+		extends DemonstrationBase implements SelectRegionDescriptionPanel.Listener {
 	BufferedImage image;
 
 	private final Object lock = new Object();
@@ -69,13 +67,13 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 
 	T gray;
 
-	public VisualizeRegionDescriptionApp( java.util.List<PathLabel> examples , Class<T> imageType  ) {
-		super(examples,ImageType.pl(3,imageType));
+	public VisualizeRegionDescriptionApp( java.util.List<PathLabel> examples, Class<T> imageType ) {
+		super(examples, ImageType.pl(3, imageType));
 
-		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		panel.setListener(this);
-		tuplePanel.setPreferredSize(new Dimension(100,50));
+		tuplePanel.setPreferredSize(new Dimension(100, 50));
 
 		createAlgorithm();
 
@@ -85,19 +83,19 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
-		panel.setPreferredSize(new Dimension(width,height));
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
+		panel.setPreferredSize(new Dimension(width, height));
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input ) {
 		this.image = bufferedIn;
 
-		GConvertImage.convert(input,gray);
+		GConvertImage.convert(input, gray);
 
 		synchronized (lock) {
-			if( describe != null ) {
-				if( describe.getImageType().getFamily() == ImageType.Family.PLANAR ) {
+			if (describe != null) {
+				if (describe.getImageType().getFamily() == ImageType.Family.PLANAR) {
 					describe.setImage(input);
 				} else {
 					describe.setImage(gray);
@@ -113,8 +111,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 	}
 
 	@Override
-	public synchronized void descriptionChanged(Point2D_I32 pt, double radius, double orientation) {
-		if( pt == null || radius < 1) {
+	public synchronized void descriptionChanged( Point2D_I32 pt, double radius, double orientation ) {
+		if (pt == null || radius < 1) {
 			targetPt = null;
 		} else {
 			this.targetPt = pt;
@@ -143,14 +141,28 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 	private void createAlgorithm() {
 		Class<T> imageType = super.getImageType(0).getImageClass();
 		synchronized (lock) {
-			switch( controls.selectedDescriptor ) {
-				case 0: describe = FactoryDescribeRegionPoint.surfStable(null, imageType); break;
-				case 1: describe = FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)); break;
-				case 2: describe = FactoryDescribeRegionPoint.sift(null,null, imageType); break;
-				case 3: describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType); break;
-				case 4: describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType); break;
-				case 5: describe = FactoryDescribeRegionPoint.pixel(5, 5, imageType); break;
-				case 6: describe = FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType); break;
+			switch (controls.selectedDescriptor) {
+				case 0:
+					describe = FactoryDescribeRegionPoint.surfStable(null, imageType);
+					break;
+				case 1:
+					describe = FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType));
+					break;
+				case 2:
+					describe = FactoryDescribeRegionPoint.sift(null, null, imageType);
+					break;
+				case 3:
+					describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType);
+					break;
+				case 4:
+					describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType);
+					break;
+				case 5:
+					describe = FactoryDescribeRegionPoint.pixel(5, 5, imageType);
+					break;
+				case 6:
+					describe = FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType);
+					break;
 			}
 		}
 	}
@@ -164,8 +176,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboDescribe ) {
+		public void actionPerformed( ActionEvent e ) {
+			if (e.getSource() == comboDescribe) {
 				selectedDescriptor = comboDescribe.getSelectedIndex();
 				createAlgorithm();
 				reprocessInput();
@@ -176,11 +188,11 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 	public static void main( String[] args ) {
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Cave", UtilIO.pathExample("stitch/cave_01.jpg")));
-		inputs.add(new PathLabel("Kayak",UtilIO.pathExample("stitch/kayak_02.jpg")));
-		inputs.add(new PathLabel("Forest",UtilIO.pathExample("scale/rainforest_01.jpg")));
+		inputs.add(new PathLabel("Kayak", UtilIO.pathExample("stitch/kayak_02.jpg")));
+		inputs.add(new PathLabel("Forest", UtilIO.pathExample("scale/rainforest_01.jpg")));
 
-		SwingUtilities.invokeLater(()->{
-			var app = new VisualizeRegionDescriptionApp<>(inputs,GrayF32.class);
+		SwingUtilities.invokeLater(() -> {
+			var app = new VisualizeRegionDescriptionApp<>(inputs, GrayF32.class);
 
 			// Processing time takes a bit so don't open right away
 			app.openExample(inputs.get(0));

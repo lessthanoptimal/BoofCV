@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import java.awt.image.BufferedImage;
  */
 public class DetectFastHessianApp {
 
-//	static String fileName = UtilIO.pathExample("outdoors01.jpg");
+	//	static String fileName = UtilIO.pathExample("outdoors01.jpg");
 	static String fileName = UtilIO.pathExample("sunflowers.jpg");
 //	static String fileName = UtilIO.pathExample("particles01.jpg");
 //	static String fileName = UtilIO.pathExample("scale/beach02.jpg");
@@ -53,7 +53,7 @@ public class DetectFastHessianApp {
 
 	static int NUM_FEATURES = 120;
 
-	private static <T extends ImageGray<T>> void doStuff(Class<T> imageType , BufferedImage input ) {
+	private static <T extends ImageGray<T>> void doStuff( Class<T> imageType, BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		ConfigFastHessian config = new ConfigFastHessian();
@@ -64,21 +64,21 @@ public class DetectFastHessianApp {
 
 		FastHessianFeatureDetector<T> det = FactoryInterestPointAlgs.fastHessian(config);
 
-		T integral = GIntegralImageOps.transform(workImage,null);
+		T integral = GIntegralImageOps.transform(workImage, null);
 		det.detect(integral);
 
-		System.out.println("total features found: "+det.getFoundFeatures().size());
+		System.out.println("total features found: " + det.getFoundFeatures().size());
 
-		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundFeatures(),
+		VisualizeFeatures.drawScalePoints(input.createGraphics(), det.getFoundFeatures(),
 				BoofDefaults.SURF_SCALE_TO_RADIUS);
 
-		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName(),true);
+		ShowImages.showWindow(input, "Found Features: " + imageType.getSimpleName(), true);
 	}
 
 	public static void main( String[] args ) {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
-		doStuff(GrayF32.class,input);
+		doStuff(GrayF32.class, input);
 //		doStuff(GrayU8.class,input);
 	}
 }

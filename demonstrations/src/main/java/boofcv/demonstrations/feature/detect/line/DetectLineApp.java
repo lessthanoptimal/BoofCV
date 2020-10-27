@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.demonstrations.feature.detect.line;
-
 
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
@@ -57,8 +56,7 @@ import java.util.List;
 // todo configure: blur, edge threshold, non-max radius,  min counts
 // todo show binary image, transform
 public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends DemonstrationBase
-{
+		extends DemonstrationBase {
 	Class<T> imageType;
 	Class<D> derivType;
 
@@ -74,8 +72,7 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 	DetectLineSegment<T> segmentDetector;
 	final Object lockDetector = new Object();
 
-
-	public DetectLineApp( List<PathLabel> examples , Class<T> imageType , Class<D> derivType ) {
+	public DetectLineApp( List<PathLabel> examples, Class<T> imageType, Class<D> derivType ) {
 		super(examples, ImageType.single(imageType));
 
 		this.imageType = imageType;
@@ -84,8 +81,8 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		work = blur.createSameShape();
 
-		add(controls,BorderLayout.WEST);
-		add(gui,BorderLayout.CENTER);
+		add(controls, BorderLayout.WEST);
+		add(gui, BorderLayout.CENTER);
 
 		declareDetector();
 	}
@@ -100,11 +97,11 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 
 			switch (controls.whichAlg) {
 				case 0:
-					lineDetector = FactoryDetectLine.houghLinePolar(configGradient,null, imageType);
+					lineDetector = FactoryDetectLine.houghLinePolar(configGradient, null, imageType);
 					break;
 
 				case 1:
-					lineDetector = FactoryDetectLine.houghLineFoot(configGradient,null, imageType);
+					lineDetector = FactoryDetectLine.houghLineFoot(configGradient, null, imageType);
 					break;
 
 				case 2:
@@ -121,20 +118,19 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	@Override
-	protected void handleInputChange( int source , InputMethod method , int width , int height ) {
-		blur.reshape(width,height);
-		work.reshape(width,height);
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
+		blur.reshape(width, height);
+		work.reshape(width, height);
 		SwingUtilities.invokeLater(() -> {
-			gui.setPreferredSize(new Dimension(width,height));
+			gui.setPreferredSize(new Dimension(width, height));
 		});
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered , final ImageBase _input  )
-	{
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, final ImageBase _input ) {
 		T input = (T)_input;
 
-		if( controls.blurRadius >= 1 )
+		if (controls.blurRadius >= 1)
 			GBlurImageOps.gaussian(input, blur, -1, controls.blurRadius, work);
 		else
 			blur.setTo(input);
@@ -159,7 +155,7 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	private class ControlPanel extends StandardAlgConfigPanel
-			implements ActionListener , ChangeListener {
+			implements ActionListener, ChangeListener {
 
 		JComboBox comboAlg;
 		JSpinner spinnerMaxLines;
@@ -171,18 +167,18 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 
 		public ControlPanel() {
 
-			comboAlg = combo(whichAlg,"Hough Polar","Hough Foot","Hough Foot Sub Image","Grid Line");
-			spinnerMaxLines = spinner(maxLines,1,100,1);
-			spinnerBlur = spinner(blurRadius,0,20,1);
+			comboAlg = combo(whichAlg, "Hough Polar", "Hough Foot", "Hough Foot Sub Image", "Grid Line");
+			spinnerMaxLines = spinner(maxLines, 1, 100, 1);
+			spinnerBlur = spinner(blurRadius, 0, 20, 1);
 
 			addAlignCenter(comboAlg);
-			addLabeled(spinnerMaxLines,"Lines");
-			addLabeled(spinnerBlur,"Blur Radius");
+			addLabeled(spinnerMaxLines, "Lines");
+			addLabeled(spinnerBlur, "Blur Radius");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboAlg ) {
+		public void actionPerformed( ActionEvent e ) {
+			if (e.getSource() == comboAlg) {
 				whichAlg = comboAlg.getSelectedIndex();
 
 				switch (whichAlg) {
@@ -201,10 +197,10 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == spinnerBlur ) {
+		public void stateChanged( ChangeEvent e ) {
+			if (e.getSource() == spinnerBlur) {
 				blurRadius = ((Number)spinnerBlur.getValue()).intValue();
-			} else if( e.getSource() == spinnerMaxLines ) {
+			} else if (e.getSource() == spinnerMaxLines) {
 				maxLines = ((Number)spinnerMaxLines.getValue()).intValue();
 			}
 			declareDetector();
@@ -212,22 +208,21 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		Class imageType = GrayF32.class;
 		Class derivType = GrayF32.class;
 
 		java.util.List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Objects", UtilIO.pathExample("simple_objects.jpg")));
-		examples.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
-		examples.add(new PathLabel("Chessboard",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
+		examples.add(new PathLabel("Indoors", UtilIO.pathExample("lines_indoors.jpg")));
+		examples.add(new PathLabel("Chessboard", UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		examples.add(new PathLabel("Apartment", UtilIO.pathExample("lines_indoors.mjpeg")));
 
-		SwingUtilities.invokeLater(()->{
-			DetectLineApp app = new DetectLineApp(examples,imageType,derivType);
+		SwingUtilities.invokeLater(() -> {
+			DetectLineApp app = new DetectLineApp(examples, imageType, derivType);
 
 			app.openExample(examples.get(0));
 			app.display("Line Detector");
 		});
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
-public class GeneralExtractConfigPanel extends StandardAlgConfigPanel implements ActionListener , ChangeListener {
+public class GeneralExtractConfigPanel extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 	JComboBox selectImage;
 	JSpinner selectSeparation;
 	JSpinner selectThreshold;
@@ -46,34 +46,34 @@ public class GeneralExtractConfigPanel extends StandardAlgConfigPanel implements
 		selectImage.addItem("Intensity");
 		selectImage.addItem("Features");
 		selectImage.addActionListener(this);
-		selectImage.setMaximumSize(new Dimension(175,(int)selectImage.getPreferredSize().getHeight()));
+		selectImage.setMaximumSize(new Dimension(175, (int)selectImage.getPreferredSize().getHeight()));
 
-		selectSeparation = new JSpinner(new SpinnerNumberModel(1,1,20,1));
+		selectSeparation = new JSpinner(new SpinnerNumberModel(1, 1, 20, 1));
 		selectSeparation.addChangeListener(this);
-		int w = (int)selectSeparation.getPreferredSize().getWidth()+20;
+		int w = (int)selectSeparation.getPreferredSize().getWidth() + 20;
 		int h = (int)selectSeparation.getPreferredSize().getHeight() + 10;
 
-		selectSeparation.setPreferredSize(new Dimension(w,h));
-		selectSeparation.setMaximumSize(new Dimension(w,h));
+		selectSeparation.setPreferredSize(new Dimension(w, h));
+		selectSeparation.setMaximumSize(new Dimension(w, h));
 
-		selectThreshold = new JSpinner(new SpinnerNumberModel(0.01,0,1,0.01));
+		selectThreshold = new JSpinner(new SpinnerNumberModel(0.01, 0, 1, 0.01));
 		selectThreshold.addChangeListener(this);
-		selectThreshold.setPreferredSize(new Dimension(w,h));
-		selectThreshold.setMaximumSize(new Dimension(w,h));
+		selectThreshold.setPreferredSize(new Dimension(w, h));
+		selectThreshold.setMaximumSize(new Dimension(w, h));
 
-		selectNumFeatures = new JSpinner(new SpinnerNumberModel(200,0,1000,20));
+		selectNumFeatures = new JSpinner(new SpinnerNumberModel(200, 0, 1000, 20));
 		selectNumFeatures.addChangeListener(this);
-		selectNumFeatures.setPreferredSize(new Dimension(w,h));
-		selectNumFeatures.setMaximumSize(new Dimension(w,h));
+		selectNumFeatures.setPreferredSize(new Dimension(w, h));
+		selectNumFeatures.setMaximumSize(new Dimension(w, h));
 
-		addLabeled(selectImage,"Display");
-		addLabeled(selectNumFeatures,"Total");
-		addLabeled(selectSeparation,"Separation");
-		addLabeled(selectThreshold,"Threshold");
+		addLabeled(selectImage, "Display");
+		addLabeled(selectNumFeatures, "Total");
+		addLabeled(selectSeparation, "Separation");
+		addLabeled(selectThreshold, "Threshold");
 		add(Box.createVerticalGlue());
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
@@ -90,38 +90,40 @@ public class GeneralExtractConfigPanel extends StandardAlgConfigPanel implements
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( listener == null )
+	public void actionPerformed( ActionEvent e ) {
+		if (listener == null)
 			return;
 
-		if( e.getSource() == selectImage ) {
+		if (e.getSource() == selectImage) {
 			int selected = selectImage.getSelectedIndex();
 			listener.changeImage(selected);
 		}
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( listener == null )
+	public void stateChanged( ChangeEvent e ) {
+		if (listener == null)
 			return;
 
-		if( e.getSource() == selectThreshold ) {
+		if (e.getSource() == selectThreshold) {
 			double value = ((Number)selectThreshold.getValue()).doubleValue();
 			listener.changeThreshold(value);
-		} else if( e.getSource() == selectSeparation ) {
-			int radius =  ((Number)selectSeparation.getValue()).intValue();
+		} else if (e.getSource() == selectSeparation) {
+			int radius = ((Number)selectSeparation.getValue()).intValue();
 			listener.changeFeatureSeparation(radius);
-		} else if( e.getSource() == selectNumFeatures ) {
-			int total =  ((Number)selectNumFeatures.getValue()).intValue();
+		} else if (e.getSource() == selectNumFeatures) {
+			int total = ((Number)selectNumFeatures.getValue()).intValue();
 			listener.changeNumFeatures(total);
 		}
 	}
 
-	public static interface Listener
-	{
+	public static interface Listener {
 		public void changeImage( int index );
-		public void changeFeatureSeparation(int radius);
+
+		public void changeFeatureSeparation( int radius );
+
 		public void changeThreshold( double value );
+
 		public void changeNumFeatures( int total );
 	}
 }

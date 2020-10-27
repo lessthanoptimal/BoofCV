@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,22 +57,22 @@ import java.util.List;
 public class CompareConvertedDescriptionsApp {
 
 	public static <TD extends TupleDesc>
-	void visualize( String title ,
+	void visualize( String title,
 					BufferedImage image1, BufferedImage image2,
-					InterestPointDetector<GrayF32> detector ,
-					DescribeRegionPoint<GrayF32,TD> describe ,
+					InterestPointDetector<GrayF32> detector,
+					DescribeRegionPoint<GrayF32, TD> describe,
 					ScoreAssociation<TD> scorer ) {
 
-		AssociateDescription<TD> assoc = FactoryAssociation.greedy(new ConfigAssociateGreedy(false),scorer);
+		AssociateDescription<TD> assoc = FactoryAssociation.greedy(new ConfigAssociateGreedy(false), scorer);
 
 		List<Point2D_F64> locationSrc = new ArrayList<>();
 		List<Point2D_F64> locationDst = new ArrayList<>();
 
-		GrayF32 input1 = ConvertBufferedImage.convertFrom(image1,(GrayF32)null);
-		GrayF32 input2 = ConvertBufferedImage.convertFrom(image2,(GrayF32)null);
+		GrayF32 input1 = ConvertBufferedImage.convertFrom(image1, (GrayF32)null);
+		GrayF32 input2 = ConvertBufferedImage.convertFrom(image2, (GrayF32)null);
 
-		FastAccess<TD> listSrc = describeImage(input1,detector,describe,locationSrc);
-		FastAccess<TD> listDst = describeImage(input2,detector,describe,locationDst);
+		FastAccess<TD> listSrc = describeImage(input1, detector, describe, locationSrc);
+		FastAccess<TD> listDst = describeImage(input2, detector, describe, locationDst);
 
 		assoc.setSource(listSrc);
 		assoc.setDestination(listDst);
@@ -81,18 +81,17 @@ public class CompareConvertedDescriptionsApp {
 		FastAccess<AssociatedIndex> matches = assoc.getMatches();
 
 		AssociationPanel panel = new AssociationPanel(20);
-		panel.setImages(image1,image2);
-		panel.setAssociation(locationSrc,locationDst,matches);
+		panel.setImages(image1, image2);
+		panel.setAssociation(locationSrc, locationDst, matches);
 
-		ShowImages.showWindow(panel,title);
+		ShowImages.showWindow(panel, title);
 	}
 
 	public static <TD extends TupleDesc>
-	FastArray<TD>  describeImage( GrayF32 input ,
-								  InterestPointDetector<GrayF32> detector ,
-								  DescribeRegionPoint<GrayF32,TD> describe ,
-								  List<Point2D_F64> location )
-	{
+	FastArray<TD> describeImage( GrayF32 input,
+								 InterestPointDetector<GrayF32> detector,
+								 DescribeRegionPoint<GrayF32, TD> describe,
+								 List<Point2D_F64> location ) {
 		FastArray<TD> list = new FastArray<>(describe.getDescriptionType());
 
 		System.out.println("Detecting");
@@ -100,15 +99,15 @@ public class CompareConvertedDescriptionsApp {
 		System.out.println("Describing");
 		describe.setImage(input);
 
-		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
+		for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 			Point2D_F64 p = detector.getLocation(i);
 			double radius = detector.getRadius(i);
 			double ori = detector.getOrientation(i);
 
 			TD d = describe.createDescription();
-			if( describe.process(p.x,p.y,ori,radius,d) ) {
-				list.add( d );
-				location.add( p.copy() );
+			if (describe.process(p.x, p.y, ori, radius, d)) {
+				list.add(d);
+				location.add(p.copy());
 			}
 		}
 
@@ -120,15 +119,15 @@ public class CompareConvertedDescriptionsApp {
 		String file2 = UtilIO.pathExample("stitch/kayak_02.jpg");
 
 		InterestPointDetector<GrayF32> detector =
-				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1,10,-1,2,9,4,4), GrayF32.class);
+				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 10, -1, 2, 9, 4, 4), GrayF32.class);
 
-		DescribeRegionPoint<GrayF32,TupleDesc_F64> describeA =
+		DescribeRegionPoint<GrayF32, TupleDesc_F64> describeA =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 
-		ConvertTupleDesc<TupleDesc_F64,TupleDesc_S8> converter =
+		ConvertTupleDesc<TupleDesc_F64, TupleDesc_S8> converter =
 				FactoryConvertTupleDesc.real_F64_S8(describeA.createDescription().size());
 
-		DescribeRegionPoint<GrayF32,TupleDesc_S8> describeB =
+		DescribeRegionPoint<GrayF32, TupleDesc_S8> describeB =
 				new DescribeRegionPointConvert<>(describeA, converter);
 
 		ScoreAssociation<TupleDesc_F64> scoreA = FactoryAssociation.scoreSad(TupleDesc_F64.class);
@@ -137,8 +136,8 @@ public class CompareConvertedDescriptionsApp {
 		BufferedImage image1 = UtilImageIO.loadImage(file1);
 		BufferedImage image2 = UtilImageIO.loadImage(file2);
 
-		visualize("Original",image1,image2,detector,describeA,scoreA);
-		visualize("Modified",image1,image2,detector,describeB,scoreB);
+		visualize("Original", image1, image2, detector, describeA, scoreA);
+		visualize("Modified", image1, image2, detector, describeB, scoreB);
 
 		System.out.println("Done");
 	}

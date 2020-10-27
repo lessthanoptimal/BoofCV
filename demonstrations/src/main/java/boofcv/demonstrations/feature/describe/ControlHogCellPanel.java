@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,13 +32,11 @@ import java.awt.event.ItemListener;
  * @author Peter Abeles
  */
 public class ControlHogCellPanel extends StandardAlgConfigPanel
-	implements ChangeListener, ItemListener
-{
+		implements ChangeListener, ItemListener {
 	JCheckBox showInput;
 	JCheckBox showGrid;
 	JCheckBox showLog;
 	JCheckBox showLocal;
-
 
 	JSpinner selectWidth;
 	JSpinner selectHistogram;
@@ -52,7 +50,7 @@ public class ControlHogCellPanel extends StandardAlgConfigPanel
 
 	VisualizeImageHogCellApp owner;
 
-	public ControlHogCellPanel(VisualizeImageHogCellApp owner) {
+	public ControlHogCellPanel( VisualizeImageHogCellApp owner ) {
 
 		this.owner = owner;
 
@@ -94,28 +92,28 @@ public class ControlHogCellPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( selectWidth == e.getSource() ) {
-			cellWidth = ((Number) selectWidth.getValue()).intValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (selectWidth == e.getSource()) {
+			cellWidth = ((Number)selectWidth.getValue()).intValue();
 			owner.setCellWidth(cellWidth);
-		} else if( selectHistogram == e.getSource() ) {
-			histogram = ((Number) selectHistogram.getValue()).intValue();
+		} else if (selectHistogram == e.getSource()) {
+			histogram = ((Number)selectHistogram.getValue()).intValue();
 			owner.setOrientationBins(histogram);
 		}
 	}
 
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( showGrid == e.getSource() ) {
+	public void itemStateChanged( ItemEvent e ) {
+		if (showGrid == e.getSource()) {
 			doShowGrid = showGrid.isSelected();
 			owner.setShowGrid(doShowGrid);
-		} else if( showLog == e.getSource() ) {
+		} else if (showLog == e.getSource()) {
 			doShowLog = showLog.isSelected();
 			owner.setShowLog(doShowLog);
-		} else if( showLocal == e.getSource() ) {
+		} else if (showLocal == e.getSource()) {
 			doShowLocal = showLocal.isSelected();
 			owner.setShowLocal(doShowLocal);
-		} else if( showInput == e.getSource() ) {
+		} else if (showInput == e.getSource()) {
 			owner.setShowInput(showInput.isSelected());
 		}
 	}

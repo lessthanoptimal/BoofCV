@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,12 +34,10 @@ import java.awt.event.ItemListener;
  * @author Peter Abeles
  */
 public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
-	implements ChangeListener, ItemListener, ActionListener
-{
+		implements ChangeListener, ItemListener, ActionListener {
 	JCheckBox showGrid;
 	JCheckBox showLogScaling;
 	JCheckBox useFast;
-
 
 	JSpinner selectWidth;
 	JSpinner selectHistogram;
@@ -57,7 +55,7 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 
 	VisualizeHogDescriptorApp owner;
 
-	public ControlHogDescriptorPanel(VisualizeHogDescriptorApp owner) {
+	public ControlHogDescriptorPanel( VisualizeHogDescriptorApp owner ) {
 
 		this.owner = owner;
 
@@ -66,7 +64,7 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 		showGrid.addItemListener(this);
 		showGrid.setMaximumSize(showGrid.getPreferredSize());
 
-		showLogScaling = checkbox("Show Log",doShowLog);
+		showLogScaling = checkbox("Show Log", doShowLog);
 
 		useFast = new JCheckBox("Fast HOG");
 		useFast.setSelected(fast);
@@ -103,36 +101,36 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( selectWidth == e.getSource() ) {
-			cellWidth = ((Number) selectWidth.getValue()).intValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (selectWidth == e.getSource()) {
+			cellWidth = ((Number)selectWidth.getValue()).intValue();
 			owner.configChanged();
-		} else if( selectHistogram == e.getSource() ) {
-			histogram = ((Number) selectHistogram.getValue()).intValue();
+		} else if (selectHistogram == e.getSource()) {
+			histogram = ((Number)selectHistogram.getValue()).intValue();
 			owner.configChanged();
-		} else if( selectGridX == e.getSource() ) {
-			gridX = ((Number) selectGridX.getValue()).intValue();
+		} else if (selectGridX == e.getSource()) {
+			gridX = ((Number)selectGridX.getValue()).intValue();
 			owner.configChanged();
-		} else if( selectGridY == e.getSource() ) {
-			gridY = ((Number) selectGridY.getValue()).intValue();
+		} else if (selectGridY == e.getSource()) {
+			gridY = ((Number)selectGridY.getValue()).intValue();
 			owner.configChanged();
 		}
 	}
 
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if( showGrid == e.getSource() ) {
+	public void itemStateChanged( ItemEvent e ) {
+		if (showGrid == e.getSource()) {
 			doShowGrid = showGrid.isSelected();
 			owner.visualsChanged();
-		} else if( useFast == e.getSource() ) {
+		} else if (useFast == e.getSource()) {
 			fast = useFast.isSelected();
 			owner.configChanged();
 		}
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( showLogScaling == e.getSource() ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (showLogScaling == e.getSource()) {
 			doShowLog = showLogScaling.isSelected();
 			owner.visualsChanged();
 		}

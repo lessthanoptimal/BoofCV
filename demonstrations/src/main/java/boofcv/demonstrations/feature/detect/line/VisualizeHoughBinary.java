@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.demonstrations.feature.detect.line;
-
 
 import boofcv.abst.feature.detect.line.HoughBinary_to_DetectLine;
 import boofcv.alg.filter.blur.GBlurImageOps;
@@ -60,14 +59,14 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>>
-	extends DemonstrationBase {
+		extends DemonstrationBase {
 
 	Visualization imagePanel = new Visualization();
 	ControlPanel controlPanel;
 
 	//--------------------------
 	final Object lockAlg = new Object();
-	HoughBinary_to_DetectLine<I,D> lineDetector;
+	HoughBinary_to_DetectLine<I, D> lineDetector;
 	//--------------------------
 	ConfigHoughBinary configHough = new ConfigHoughBinary();
 	ConfigParamPolar configPolar = new ConfigParamPolar();
@@ -88,16 +87,16 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 	BufferedImage renderedTran;
 	BufferedImage renderedBinary;
 
-	public VisualizeHoughBinary(List<PathLabel> examples , Class<I> imageType ) {
+	public VisualizeHoughBinary( List<PathLabel> examples, Class<I> imageType ) {
 		super(true, true, examples, ImageType.single(imageType));
 
-		blur = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		blur = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		controlPanel = new ControlPanel();
-		controlPanel.setListener((zoom) -> imagePanel.setScale(zoom));
+		controlPanel.setListener(( zoom ) -> imagePanel.setScale(zoom));
 		imagePanel.addMouseWheelListener(controlPanel);
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed( MouseEvent e ) {
 				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
 				controlPanel.setCursor(p.x, p.y);
 
@@ -106,16 +105,16 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 				}
 
 				// let the user select a line
-				float tolerance = 10.0f / (float)imagePanel.getScale();
+				float tolerance = 10.0f/(float)imagePanel.getScale();
 				int s = -1;
-				if( view == 0 ) {
+				if (view == 0) {
 					s = imagePanel.findLine(p.x, p.y, tolerance);
-				} else if( view == 2 ) {
-					s = findLineInTransformed((int)p.x,(int)p.y,tolerance);
+				} else if (view == 2) {
+					s = findLineInTransformed((int)p.x, (int)p.y, tolerance);
 				}
 				if (s != -1) {
 					// deselect if clicked twice
-					if( imagePanel.getSelected() == s )
+					if (imagePanel.getSelected() == s)
 						s = -1;
 				} else {
 					imagePanel.centerView(p.x, p.y);
@@ -133,7 +132,7 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 	}
 
 	protected void createAlg() {
-		if( mergeSimilar ) {
+		if (mergeSimilar) {
 			ConfigHoughGradient tmp = new ConfigHoughGradient();
 			configHough.mergeAngle = tmp.mergeAngle;
 			configHough.mergeDistance = tmp.mergeDistance;
@@ -143,12 +142,12 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 			configHough.mergeDistance = -1;
 		}
 		synchronized (lockAlg) {
-			lineDetector = (HoughBinary_to_DetectLine<I,D>)
-					FactoryDetectLine.houghLinePolar(configHough,configPolar, getImageType(0).getImageClass());
+			lineDetector = (HoughBinary_to_DetectLine<I, D>)
+					FactoryDetectLine.houghLinePolar(configHough, configPolar, getImageType(0).getImageClass());
 		}
 	}
 
-	private int findLineInTransformed( int x , int y , double tolerance) {
+	private int findLineInTransformed( int x, int y, double tolerance ) {
 		Point2D_F64 location = new Point2D_F64();
 		synchronized (lockAlg) {
 			double bestDistance = tolerance;
@@ -157,8 +156,8 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 			for (int i = 0; lines != null && i < lines.size(); i++) {
 				LineParametric2D_F32 l = lines.get(i);
 				lineDetector.getHough().getParameters().lineToCoordinate(l, location);
-				if( location.distance2(x,y) < bestDistance ) {
-					bestDistance = location.distance2(x,y);
+				if (location.distance2(x, y) < bestDistance) {
+					bestDistance = location.distance2(x, y);
 					bestIndex = i;
 				}
 			}
@@ -167,7 +166,7 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		synchronized (lockAlg) {
 			int tranWidth = lineDetector.getHough().getTransform().width;
 			int tranHeight = lineDetector.getHough().getTransform().height;
@@ -175,9 +174,9 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 			renderedBinary = ConvertBufferedImage.checkDeclare(width, height, renderedBinary, BufferedImage.TYPE_INT_RGB);
 		}
 
-		BoofSwingUtil.invokeNowOrLater(()-> {
+		BoofSwingUtil.invokeNowOrLater(() -> {
 			imagePanel.setPreferredSize(new Dimension(width, height));
-			controlPanel.setImageSize(width,height);
+			controlPanel.setImageSize(width, height);
 		});
 
 		// let it know a new image has been opened so that the view can be reset later
@@ -185,24 +184,24 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 		long time0 = System.nanoTime();
 		long time1;
 		synchronized (lockAlg) {
-			if( blurRadius > 0 ) {
+			if (blurRadius > 0) {
 				GBlurImageOps.gaussian((I)input, blur, -1, blurRadius, null);
 			} else {
 				blur.setTo((I)input);
 			}
 
 			List<LineParametric2D_F32> lines = lineDetector.detect(blur);
-			imagePanel.setLines(lines,input.width,input.height);
+			imagePanel.setLines(lines, input.width, input.height);
 			time1 = System.nanoTime();
 
 			imagePanel.input = buffered;
 
 			if (logIntensity) {
-				PixelMath.log(lineDetector.getHough().getTransform(),1.0f, transformLog);
+				PixelMath.log(lineDetector.getHough().getTransform(), 1.0f, transformLog);
 				renderedTran = VisualizeImageData.grayMagnitude(transformLog, renderedTran, -1);
 			} else {
 				renderedTran = VisualizeImageData.grayMagnitude(lineDetector.getHough().getTransform(), renderedTran, -1);
@@ -211,13 +210,13 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 			VisualizeBinaryData.renderBinary(lineDetector.getBinary(), false, renderedBinary);
 		}
 
-		BoofSwingUtil.invokeNowOrLater(()->{
+		BoofSwingUtil.invokeNowOrLater(() -> {
 			imagePanel.handleViewChange(view);
-			if( firstOpenImage ) {
+			if (firstOpenImage) {
 				firstOpenImage = false;
 				imagePanel.autoScaleCenterOnSetImage = true;
 			}
-			controlPanel.setProcessingTimeMS((time1-time0)*1e-6);
+			controlPanel.setProcessingTimeMS((time1 - time0)*1e-6);
 			imagePanel.repaint();
 		});
 	}
@@ -227,8 +226,8 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 		Ellipse2D.Double c = new Ellipse2D.Double();
 
 		@Override
-		protected synchronized void paintInPanel(AffineTransform tran, Graphics2D g2) {
-			if( !showLines )
+		protected synchronized void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
+			if (!showLines)
 				return;
 			if (view == 0) {
 				super.paintInPanel(tran, g2);
@@ -237,7 +236,7 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 			}
 		}
 
-		private void paintLinesInTransform(Graphics2D g2) {
+		private void paintLinesInTransform( Graphics2D g2 ) {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -252,7 +251,7 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 					lineDetector.getHough().getParameters().lineToCoordinate(l, location);
 
 					// +0.5 to put in the center
-					c.setFrame((location.x + 0.5) * scale - r, (location.y + 0.5) * scale - r, 2 * r, 2 * r);
+					c.setFrame((location.x + 0.5)*scale - r, (location.y + 0.5)*scale - r, 2*r, 2*r);
 //			System.out.println(x+" "+y+"  "+renderedTran.getWidth()+" "+renderedTran.getHeight());
 
 					if (i == selected) {
@@ -286,23 +285,21 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 		}
 	}
 
-	protected class ControlPanel extends ViewedImageInfoPanel
-	{
+	protected class ControlPanel extends ViewedImageInfoPanel {
 		JComboBox<String> comboView = combo(0, "Lines", "Binary", "Transformed");
 		JCheckBox checkLog = checkbox("Log Intensity", logIntensity);
-		JCheckBox checkShowLines = checkbox("Show Lines",showLines);
+		JCheckBox checkShowLines = checkbox("Show Lines", showLines);
 		JComboBox<String> comboBinarization = combo(configHough.binarization.ordinal(),
-				(Object[]) ConfigHoughBinary.Binarization.values());
+				(Object[])ConfigHoughBinary.Binarization.values());
 		JSpinner spinnerResRange = spinner(configPolar.resolutionRange, 0.1, 50, 0.5);
 		JSpinner spinnerBinsAngle = spinner(configPolar.numBinsAngle, 10, 1000, 1);
 		JSpinner spinnerMaxLines = spinner(configHough.maxLines, 0, 200, 1);
 		JSpinner spinnerBlur = spinner(blurRadius, 0, 20, 1);
-		JConfigLength lengthCounts = configLength(configHough.minCounts,0,Double.MAX_VALUE);
+		JConfigLength lengthCounts = configLength(configHough.minCounts, 0, Double.MAX_VALUE);
 		JSpinner spinnerLocalMax = spinner(configHough.localMaxRadius, 1, 100, 2);
-		JCheckBox checkMergeSimilar = checkbox("Merge Similar",mergeSimilar);
+		JCheckBox checkMergeSimilar = checkbox("Merge Similar", mergeSimilar);
 		ControlPanelEdgeThreshold controlEdgeThreshold = new ControlPanelEdgeThreshold(configHough.thresholdEdge,
 				VisualizeHoughBinary.this::handleConfigChange);
-
 
 		public ControlPanel() {
 			super(BoofSwingUtil.MIN_ZOOM, BoofSwingUtil.MAX_ZOOM, 0.5, false);
@@ -314,48 +311,48 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 
 			handleChangeBinarization();
 
-			addLabeled(comboView,"View");
-			addAlignLeft(checkLog,"Transform parameter space visualization by applying log");
-			addAlignLeft(checkShowLines,"Renders found lines");
+			addLabeled(comboView, "View");
+			addAlignLeft(checkLog, "Transform parameter space visualization by applying log");
+			addAlignLeft(checkShowLines, "Renders found lines");
 			addSeparator(140);
-			addLabeled(comboBinarization,"Binarization","Method used to compute a binary image of points on lines");
-			addLabeled(spinnerMaxLines, "Max Lines","Maximum number of lines it will detect");
-			addLabeled(spinnerBlur, "Blur Radius","Amount of blur applied prior to processing");
-			addLabeled(spinnerResRange, "Res. Range","Resolution of range discretization in transform (pixels)");
-			addLabeled(spinnerBinsAngle, "Bins Angle","Number of bins for angles in transform");
-			addLabeled(lengthCounts, "Min. Count","Minimum number of counts for detected line");
-			addLabeled(spinnerLocalMax, "Local Max","Local maximum suppression radius");
-			addAlignLeft(checkMergeSimilar,"Merge lines which are similar");
-			addAlignCenter(BoofSwingUtil.wrapBorder(controlEdgeThreshold),"Threshold for thresholding an edge");
+			addLabeled(comboBinarization, "Binarization", "Method used to compute a binary image of points on lines");
+			addLabeled(spinnerMaxLines, "Max Lines", "Maximum number of lines it will detect");
+			addLabeled(spinnerBlur, "Blur Radius", "Amount of blur applied prior to processing");
+			addLabeled(spinnerResRange, "Res. Range", "Resolution of range discretization in transform (pixels)");
+			addLabeled(spinnerBinsAngle, "Bins Angle", "Number of bins for angles in transform");
+			addLabeled(lengthCounts, "Min. Count", "Minimum number of counts for detected line");
+			addLabeled(spinnerLocalMax, "Local Max", "Local maximum suppression radius");
+			addAlignLeft(checkMergeSimilar, "Merge lines which are similar");
+			addAlignCenter(BoofSwingUtil.wrapBorder(controlEdgeThreshold), "Threshold for thresholding an edge");
 			addVerticalGlue();
 		}
 
 		private void handleChangeBinarization() {
 			boolean enabled = configHough.binarization == ConfigHoughBinary.Binarization.EDGE;
-			BoofSwingUtil.recursiveEnable(controlEdgeThreshold,enabled);
+			BoofSwingUtil.recursiveEnable(controlEdgeThreshold, enabled);
 		}
 
 		@Override
-		public void controlChanged(final Object source) {
+		public void controlChanged( final Object source ) {
 			if (source == comboBinarization) {
 				configHough.binarization =
 						ConfigHoughBinary.Binarization.values()[comboBinarization.getSelectedIndex()];
 				handleChangeBinarization();
 				handleConfigChange();
 			} else if (source == spinnerResRange) {
-				configPolar.resolutionRange = (Double) spinnerResRange.getValue();
+				configPolar.resolutionRange = (Double)spinnerResRange.getValue();
 				handleConfigChange();
 			} else if (source == spinnerBinsAngle) {
 				configPolar.numBinsAngle = (Integer)spinnerBinsAngle.getValue();
 				handleConfigChange();
 			} else if (source == spinnerMaxLines) {
-				configHough.maxLines = (Integer) spinnerMaxLines.getValue();
+				configHough.maxLines = (Integer)spinnerMaxLines.getValue();
 				handleConfigChange();
 			} else if (source == spinnerBlur) {
-				blurRadius = (Integer) spinnerBlur.getValue();
+				blurRadius = (Integer)spinnerBlur.getValue();
 				handleConfigChange();
 			} else if (source == spinnerLocalMax) {
-				configHough.localMaxRadius = (Integer) spinnerLocalMax.getValue();
+				configHough.localMaxRadius = (Integer)spinnerLocalMax.getValue();
 				handleConfigChange();
 			} else if (source == comboView) {
 				imagePanel.handleViewChange(comboView.getSelectedIndex());
@@ -366,10 +363,10 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 			} else if (source == checkMergeSimilar) {
 				mergeSimilar = checkMergeSimilar.isSelected();
 				handleConfigChange();
-			} else if( source == checkShowLines ) {
+			} else if (source == checkShowLines) {
 				showLines = checkShowLines.isSelected();
 				imagePanel.repaint();
-			} else if( source == lengthCounts ) {
+			} else if (source == lengthCounts) {
 				configHough.minCounts.setTo(lengthCounts.getValue());
 				handleConfigChange();
 			}
@@ -381,17 +378,17 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 		reprocessImageOnly();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		java.util.List<PathLabel> examples = new ArrayList<>();
 
-		examples.add(new PathLabel("Simple Objects",UtilIO.pathExample("simple_objects.jpg")));
-		examples.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
+		examples.add(new PathLabel("Simple Objects", UtilIO.pathExample("simple_objects.jpg")));
+		examples.add(new PathLabel("Indoors", UtilIO.pathExample("lines_indoors.jpg")));
 		examples.add(new PathLabel("Outdoors", UtilIO.pathExample("outdoors01.jpg")));
-		examples.add(new PathLabel("Drawn Lines",UtilIO.pathExample("shapes/black_lines_01.jpg")));
-		examples.add(new PathLabel("Indoors Video",UtilIO.pathExample("lines_indoors.mjpeg")));
+		examples.add(new PathLabel("Drawn Lines", UtilIO.pathExample("shapes/black_lines_01.jpg")));
+		examples.add(new PathLabel("Indoors Video", UtilIO.pathExample("lines_indoors.mjpeg")));
 
-		SwingUtilities.invokeLater(()->{
-			var app = new VisualizeHoughBinary<GrayF32,GrayF32>(examples,GrayF32.class);
+		SwingUtilities.invokeLater(() -> {
+			var app = new VisualizeHoughBinary<GrayF32, GrayF32>(examples, GrayF32.class);
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();

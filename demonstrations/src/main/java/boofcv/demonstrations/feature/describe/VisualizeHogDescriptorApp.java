@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends DemonstrationBase
-{
+public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends DemonstrationBase {
 	ControlHogDescriptorPanel controlPanel = new ControlHogDescriptorPanel(this);
 	VisualizePanel imagePanel = new VisualizePanel();
 
@@ -57,8 +56,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 	DescribeImageDenseHoG<T> hog;
 
 	Color[] colors;
-	float[] cos,sin;
-
+	float[] cos, sin;
 
 	Point2D_I32 selectedPixel;
 	int selectedIndex;
@@ -67,12 +65,12 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 	T input;
 
-	public VisualizeHogDescriptorApp(List<String> exampleInputs, ImageType<T> imageType) {
+	public VisualizeHogDescriptorApp( List<String> exampleInputs, ImageType<T> imageType ) {
 		super(exampleInputs, imageType);
 
 
-		add(controlPanel,BorderLayout.WEST);
-		add(imagePanel,BorderLayout.CENTER);
+		add(controlPanel, BorderLayout.WEST);
+		add(imagePanel, BorderLayout.CENTER);
 
 		config.pixelsPerCell = 20;
 		config.cellsPerBlockY = 5;
@@ -85,18 +83,18 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		imagePanel.setCentering(false);
 		imagePanel.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
-				selectRegion(e.getX(),e.getY());
+			public void mousePressed( MouseEvent e ) {
+				selectRegion(e.getX(), e.getY());
 			}
 		});
 	}
 
 	private void setColors( boolean logIntensity ) {
 		Color colors[] = new Color[256];
-		if( logIntensity ) {
-			double k = 255.0 / Math.log(255);
+		if (logIntensity) {
+			double k = 255.0/Math.log(255);
 			for (int i = 0; i < colors.length; i++) {
-				int v = (int) (k * Math.log(i + 1));
+				int v = (int)(k*Math.log(i + 1));
 				colors[i] = new Color(v, v, v);
 			}
 		} else {
@@ -107,7 +105,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		this.colors = colors;
 	}
 
-	private void selectRegion( int x , int y ) {
+	private void selectRegion( int x, int y ) {
 		int bestIndex = -1;
 		synchronized (hogLock) {
 			double bestDistance = Double.MAX_VALUE;
@@ -121,8 +119,8 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 				}
 			}
 
-			if( bestIndex >= 0 ) {
-				selectedPixel = new Point2D_I32(x,y);
+			if (bestIndex >= 0) {
+				selectedPixel = new Point2D_I32(x, y);
 				selectedIndex = bestIndex;
 				targetDesc = hog.getDescriptions().get(bestIndex);
 				targetLocation = hog.getLocations().get(bestIndex);
@@ -133,7 +131,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 	private void updateDescriptor() {
 		synchronized (hogLock) {
-			hog = (DescribeImageDenseHoG<T>) FactoryDescribeImageDense.hog(config, getImageType(0));
+			hog = (DescribeImageDenseHoG<T>)FactoryDescribeImageDense.hog(config, getImageType(0));
 		}
 
 		int numAngles = config.orientationBins;
@@ -141,7 +139,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		sin = new float[numAngles];
 
 		for (int i = 0; i < numAngles; i++) {
-			double theta = Math.PI*(i+0.5)/numAngles;
+			double theta = Math.PI*(i + 0.5)/numAngles;
 
 			cos[i] = (float)Math.cos(theta);
 			sin[i] = (float)Math.sin(theta);
@@ -149,15 +147,15 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		super.handleInputChange(source, method, width, height);
 
-		imagePanel.setPreferredSize(new Dimension(width,height));
-		imagePanel.setMinimumSize(new Dimension(width,height));
+		imagePanel.setPreferredSize(new Dimension(width, height));
+		imagePanel.setMinimumSize(new Dimension(width, height));
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 		boolean inputSizeChanged = false;
 		synchronized (hogLock) {
 			inputSizeChanged =
@@ -165,7 +163,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 			this.input = (T)input;
 			hog.process((T)input);
 
-			if( inputSizeChanged ) {
+			if (inputSizeChanged) {
 				targetDesc = null;
 				targetLocation = null;
 				selectedPixel = null;
@@ -185,9 +183,9 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		return targetDesc != null;
 	}
 
-	private void renderHog(int bcx , int bcy ,
-						   TupleDesc_F64 desc ,
-						   Graphics2D g2 ) {
+	private void renderHog( int bcx, int bcy,
+							TupleDesc_F64 desc,
+							Graphics2D g2 ) {
 
 		Line2D.Float line = new Line2D.Float();
 
@@ -198,11 +196,11 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		int tl_y = bcy - gridHeight/2;
 
 		g2.setColor(Color.BLACK);
-		g2.fillRect(tl_x,tl_y,gridWidth,gridHeight);
+		g2.fillRect(tl_x, tl_y, gridWidth, gridHeight);
 
 		double maxValue = 0;
 		for (int i = 0; i < desc.value.length; i++) {
-			maxValue = Math.max(maxValue,desc.value[i]);
+			maxValue = Math.max(maxValue, desc.value[i]);
 		}
 
 		float foo = config.pixelsPerCell/2.0f;
@@ -211,17 +209,17 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 		int index = 0;
 		for (int cellY = 0; cellY < config.cellsPerBlockY; cellY++) {
 			for (int cellX = 0; cellX < config.cellsPerBlockX; cellX++) {
-				int c_x = tl_x + (int)((cellX+0.5)*config.pixelsPerCell);
-				int c_y = tl_y + (int)((cellY+0.5)*config.pixelsPerCell);
+				int c_x = tl_x + (int)((cellX + 0.5)*config.pixelsPerCell);
+				int c_y = tl_y + (int)((cellY + 0.5)*config.pixelsPerCell);
 
 				for (int i = 0; i < config.orientationBins; i++) {
-					int a = (int) (255.0f * desc.value[index++]/maxValue);
+					int a = (int)(255.0f*desc.value[index++]/maxValue);
 					g2.setColor(colors[a]);
 
-					float x0 = c_x - foo * cos[i];
-					float x1 = c_x + foo * cos[i];
-					float y0 = c_y - foo * sin[i];
-					float y1 = c_y + foo * sin[i];
+					float x0 = c_x - foo*cos[i];
+					float x1 = c_x + foo*cos[i];
+					float y0 = c_y - foo*sin[i];
+					float y1 = c_y + foo*sin[i];
 
 					line.setLine(x0, y0, x1, y1);
 					g2.draw(line);
@@ -229,27 +227,27 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 			}
 		}
 
-		if( controlPanel.doShowGrid ) {
+		if (controlPanel.doShowGrid) {
 			g2.setColor(Color.RED);
 			for (int cellY = 0; cellY <= config.cellsPerBlockY; cellY++) {
-				int y = tl_y+cellY*config.pixelsPerCell;
-				g2.drawLine(tl_x,y,tl_x+gridWidth,y);
+				int y = tl_y + cellY*config.pixelsPerCell;
+				g2.drawLine(tl_x, y, tl_x + gridWidth, y);
 			}
 			for (int cellX = 0; cellX <= config.cellsPerBlockX; cellX++) {
-				int x = tl_x+cellX*config.pixelsPerCell;
-				g2.drawLine(x,tl_y,x,tl_y+gridHeight);
+				int x = tl_x + cellX*config.pixelsPerCell;
+				g2.drawLine(x, tl_y, x, tl_y + gridHeight);
 			}
 		}
 	}
 
 	private class VisualizePanel extends ImagePanel {
 		@Override
-		public void paintComponent(Graphics g) {
+		public void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 
 			synchronized (hogLock) {
-				if( isRegionSelected() ) {
-					renderHog(targetLocation.x, targetLocation.y,targetDesc,(Graphics2D)g);
+				if (isRegionSelected()) {
+					renderHog(targetLocation.x, targetLocation.y, targetDesc, (Graphics2D)g);
 				}
 			}
 		}
@@ -272,14 +270,14 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 			hog.process(input);
 		}
 
-		synchronized (hogLock ) {
-			if( selectedPixel != null ) {
-				selectRegion(selectedPixel.x,selectedPixel.y);
+		synchronized (hogLock) {
+			if (selectedPixel != null) {
+				selectRegion(selectedPixel.x, selectedPixel.y);
 			}
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		List<String> examples = new ArrayList<>();
 
 		examples.add(UtilIO.pathExample("segment/berkeley_horses.jpg"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectQrCodeMessagePanel extends StandardAlgConfigPanel
-implements ListSelectionListener
-{
+		implements ListSelectionListener {
 
 	Listener listener;
 	JList listDetected;
@@ -43,7 +42,7 @@ implements ListSelectionListener
 	List<QrCode> detected = new ArrayList<>();
 	List<QrCode> failures = new ArrayList<>();
 
-	public DetectQrCodeMessagePanel(Listener listener ) {
+	public DetectQrCodeMessagePanel( Listener listener ) {
 		this.listener = listener;
 
 		listDetected = new JList();
@@ -62,32 +61,32 @@ implements ListSelectionListener
 		listDetected.setMinimumSize(minimumSize);
 		textArea.setMinimumSize(minimumSize);
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(listDetected),textArea);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(listDetected), textArea);
 		splitPane.setDividerLocation(150);
-		splitPane.setPreferredSize(new Dimension(200,0));
+		splitPane.setPreferredSize(new Dimension(200, 0));
 
 		addAlignCenter(new JLabel("QR-Codes"));
 		addAlignCenter(splitPane);
 	}
 
-	public void updateList(List<QrCode> detected , List<QrCode> failures ) {
+	public void updateList( List<QrCode> detected, List<QrCode> failures ) {
 		BoofSwingUtil.checkGuiThread();
 
 		this.listDetected.removeListSelectionListener(this);
-		DefaultListModel<String>  model = (DefaultListModel)listDetected.getModel();
+		DefaultListModel<String> model = (DefaultListModel)listDetected.getModel();
 		model.clear();
 
 		this.detected.clear();
 		for (int i = 0; i < detected.size(); i++) {
 			QrCode qr = detected.get(i);
-			model.addElement(String.format("v%2d Mode %.5s %.10s",qr.version,qr.mode.toString(),qr.message.toString()));
-			this.detected.add( qr.clone() );
+			model.addElement(String.format("v%2d Mode %.5s %.10s", qr.version, qr.mode.toString(), qr.message.toString()));
+			this.detected.add(qr.clone());
 		}
 		this.failures.clear();
 		for (int i = 0; i < failures.size(); i++) {
 			QrCode qr = failures.get(i);
-			model.addElement(String.format("v%2d Cause: %s",qr.version,qr.failureCause.toString()));
-			this.failures.add( qr.clone() );
+			model.addElement(String.format("v%2d Cause: %s", qr.version, qr.failureCause.toString()));
+			this.failures.add(qr.clone());
 		}
 		listDetected.invalidate();
 		listDetected.repaint();
@@ -97,12 +96,11 @@ implements ListSelectionListener
 		this.listDetected.addListSelectionListener(this);
 	}
 
-
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		if( e.getValueIsAdjusting() )
+	public void valueChanged( ListSelectionEvent e ) {
+		if (e.getValueIsAdjusting())
 			return;
-		if( e.getSource() == listDetected ) {
+		if (e.getSource() == listDetected) {
 			int selected = listDetected.getSelectedIndex();
 			if (selected == -1)
 				return;
@@ -112,45 +110,44 @@ implements ListSelectionListener
 			if (failed) {
 				selected -= detected.size();
 				QrCode qr = failures.get(selected);
-				listener.selectedMarkerInList(selected,true);
-				setMarkerMessageText(qr,true);
+				listener.selectedMarkerInList(selected, true);
+				setMarkerMessageText(qr, true);
 			} else {
-				listener.selectedMarkerInList(selected,false);
+				listener.selectedMarkerInList(selected, false);
 				QrCode qr = detected.get(selected);
-				setMarkerMessageText(qr,false);
+				setMarkerMessageText(qr, false);
 			}
 			textArea.invalidate();
-
 		}
 	}
 
-	private void setMarkerMessageText(QrCode qr, boolean failure ) {
+	private void setMarkerMessageText( QrCode qr, boolean failure ) {
 		String mask = qr.mask == null ? "" : qr.mask.toString();
 		String mode = qr.mode == null ? "" : qr.mode.toString();
 		String error = qr.error == null ? "" : qr.error.toString();
 
-		if( failure ) {
+		if (failure) {
 			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\n%s",
-					qr.version, error,mask,mode,qr.failureCause.toString()));
+					qr.version, error, mask, mode, qr.failureCause.toString()));
 		} else {
 			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\n%s",
-					qr.version, error,mask,mode, qr.message));
+					qr.version, error, mask, mode, qr.message));
 		}
 	}
 
-	public void setSelectedMarker(int index, boolean failure) {
+	public void setSelectedMarker( int index, boolean failure ) {
 		BoofSwingUtil.checkGuiThread();
 		this.listDetected.removeListSelectionListener(this);
 
-		if( failure ) {
-			if( index < failures.size() ) {
-				listDetected.setSelectedIndex(index+detected.size());
-				setMarkerMessageText(failures.get(index),true);
+		if (failure) {
+			if (index < failures.size()) {
+				listDetected.setSelectedIndex(index + detected.size());
+				setMarkerMessageText(failures.get(index), true);
 			}
 		} else {
-			if( index < detected.size() ) {
+			if (index < detected.size()) {
 				listDetected.setSelectedIndex(index);
-				setMarkerMessageText(detected.get(index),false);
+				setMarkerMessageText(detected.get(index), false);
 			}
 		}
 
@@ -158,6 +155,6 @@ implements ListSelectionListener
 	}
 
 	public interface Listener {
-		void selectedMarkerInList(int index , boolean failure );
+		void selectedMarkerInList( int index, boolean failure );
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,6 @@ import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
-
 /**
  * @author Peter Abeles
  */
@@ -51,25 +50,25 @@ public class VisualizeCannySteps {
 //	static String fileName = UtilIO.pathExample("indoors01.jpg");
 //	static String fileName = UtilIO.pathExample("shapes01.png)";
 
-	public static void main( String[] args ){
+	public static void main( String[] args ) {
 
 		BufferedImage input = UtilImageIO.loadImage(fileName);
-		GrayF32 inputF32 = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
+		GrayF32 inputF32 = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
 
-		GrayF32 blurred = new GrayF32(inputF32.width,inputF32.height);
-		GrayF32 derivX = new GrayF32(inputF32.width,inputF32.height);
-		GrayF32 derivY = new GrayF32(inputF32.width,inputF32.height);
-		GrayF32 intensity = new GrayF32(inputF32.width,inputF32.height);
-		GrayF32 orientation = new GrayF32(inputF32.width,inputF32.height);
-		GrayF32 suppressed = new GrayF32(inputF32.width,inputF32.height);
-		GrayS8 direction = new GrayS8(inputF32.width,inputF32.height);
-		GrayU8 output = new GrayU8(inputF32.width,inputF32.height);
+		GrayF32 blurred = new GrayF32(inputF32.width, inputF32.height);
+		GrayF32 derivX = new GrayF32(inputF32.width, inputF32.height);
+		GrayF32 derivY = new GrayF32(inputF32.width, inputF32.height);
+		GrayF32 intensity = new GrayF32(inputF32.width, inputF32.height);
+		GrayF32 orientation = new GrayF32(inputF32.width, inputF32.height);
+		GrayF32 suppressed = new GrayF32(inputF32.width, inputF32.height);
+		GrayS8 direction = new GrayS8(inputF32.width, inputF32.height);
+		GrayU8 output = new GrayU8(inputF32.width, inputF32.height);
 
-		BlurStorageFilter<GrayF32> blur = FactoryBlurFilter.gaussian(GrayF32.class,-1,2);
-		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,null);
+		BlurStorageFilter<GrayF32> blur = FactoryBlurFilter.gaussian(GrayF32.class, -1, 2);
+		ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class, null);
 
-		blur.process(inputF32,blurred);
-		gradient.process(blurred,derivX,derivY);
+		blur.process(inputF32, blurred);
+		gradient.process(blurred, derivX, derivY);
 
 		float threshLow = 5;
 		float threshHigh = 40;
@@ -79,19 +78,19 @@ public class VisualizeCannySteps {
 		GradientToEdgeFeatures.discretizeDirection4(orientation, direction);
 		GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction, suppressed);
 
-		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction,suppressed,threshLow,null);
+		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction, suppressed, threshLow, null);
 
 		HysteresisEdgeTraceMark hysteresis = new HysteresisEdgeTraceMark();
-		hysteresis.process(suppressed,direction,threshLow,threshHigh,output);
+		hysteresis.process(suppressed, direction, threshLow, threshHigh, output);
 
 		BufferedImage renderedLabel = VisualizeBinaryData.renderBinary(output, false, null);
 
-		ListDisplayPanel gui =  new ListDisplayPanel();
-		gui.addImage(suppressed,"Suppressed Intensity");
-		gui.addImage(intensity,"Raw Intensity");
-		gui.addImage(renderedOrientation,"Orientation");
+		ListDisplayPanel gui = new ListDisplayPanel();
+		gui.addImage(suppressed, "Suppressed Intensity");
+		gui.addImage(intensity, "Raw Intensity");
+		gui.addImage(renderedOrientation, "Orientation");
 		gui.addImage(renderedLabel, "Labeled Contours");
 
-		ShowImages.showWindow(gui,"Visualized Canny Steps", true);
+		ShowImages.showWindow(gui, "Visualized Canny Steps", true);
 	}
 }

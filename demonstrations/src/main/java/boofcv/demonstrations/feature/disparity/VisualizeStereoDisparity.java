@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,10 +80,9 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  *
  * @author Peter Abeles
  */
-public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGray<D>>
+public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends DemonstrationBase
-		implements ControlPanelDisparityDisplay.Listener
-{
+		implements ControlPanelDisparityDisplay.Listener {
 	// original input before rescaling
 	BufferedImage origLeft;
 	BufferedImage origRight;
@@ -105,7 +104,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	// Stored disparity results. if a new instance of the detector is created we will
 	// still have a reference to the old image and things won't blow up
 	private D disparityImage;
-	private int disparityMin,disparityRange;
+	private int disparityMin, disparityRange;
 
 	// calibration parameters
 	private StereoParameters calib;
@@ -113,7 +112,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 	// GUI components
-	private final ControlPanelDisparityDisplay control = new ControlPanelDisparityDisplay(0,150,GrayU8.class);
+	private final ControlPanelDisparityDisplay control = new ControlPanelDisparityDisplay(0, 150, GrayU8.class);
 	private final JPanel panel = new JPanel();
 	private final DisparityImageView imagePanel = new DisparityImageView();
 	private final PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
@@ -122,7 +121,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private boolean computedCloud;
 
 	// instance of the selected algorithm
-	private StereoDisparity<T,D> activeAlg;
+	private StereoDisparity<T, D> activeAlg;
 
 	// camera calibration matrix of rectified images
 	private DMatrixRMaj rectK;
@@ -137,8 +136,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	// coordinate transform from left rectified image to its original pixels
 	Point2Transform2_F64 leftRectToPixel;
 
-	public VisualizeStereoDisparity(List<PathLabel> examples ) {
-		super(true,false,examples,ImageType.single(GrayU8.class));
+	public VisualizeStereoDisparity( List<PathLabel> examples ) {
+		super(true, false, examples, ImageType.single(GrayU8.class));
 
 		// Tell the demo code to not extract inputs from inputs
 		super.inputAsFile = true;
@@ -147,19 +146,21 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		panel.setLayout(new BorderLayout());
 		panel.add(control, BorderLayout.WEST);
-		panel.add(imagePanel,BorderLayout.CENTER);
+		panel.add(imagePanel, BorderLayout.CENTER);
 
-		add(BorderLayout.WEST,control);
-		add(BorderLayout.CENTER,panel);
+		add(BorderLayout.WEST, control);
+		add(BorderLayout.CENTER, panel);
 
 		// When a new image is opened it will be automatically re-scaled, Turn off that feature so that it doesn't
 		// keep on happening when views change
-		imagePanel.setListener(scale-> {
-			imagePanel.autoScaleCenterOnSetImage = false;control.setZoom(imagePanel.getScale());});
+		imagePanel.setListener(scale -> {
+			imagePanel.autoScaleCenterOnSetImage = false;
+			control.setZoom(imagePanel.getScale());
+		});
 	}
 
 	@Override
-	protected void customAddToFileMenu(JMenu menuFile) {
+	protected void customAddToFileMenu( JMenu menuFile ) {
 		menuFile.addSeparator();
 
 		JMenuItem itemSaveDisparity = new JMenuItem("Save Disparity");
@@ -172,26 +173,26 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	}
 
 	private void saveDisparity() {
-		StereoDisparity<T,D> activeAlg = this.activeAlg;
-		if( activeAlg == null )
+		StereoDisparity<T, D> activeAlg = this.activeAlg;
+		if (activeAlg == null)
 			return;
-		saveDisparityDialog(this,KEY_PREVIOUS_DIRECTORY,activeAlg.getDisparity());
+		saveDisparityDialog(this, KEY_PREVIOUS_DIRECTORY, activeAlg.getDisparity());
 	}
 
 	private void savePointCloud() {
-		if( !computedCloud ) {
+		if (!computedCloud) {
 			JOptionPane.showMessageDialog(this, "Need to generate point cloud first");
 		} else {
-			BoofSwingUtil.savePointCloudDialog(this,KEY_PREVIOUS_DIRECTORY,pcv);
+			BoofSwingUtil.savePointCloudDialog(this, KEY_PREVIOUS_DIRECTORY, pcv);
 		}
 	}
 
 	@Override
 	protected void openFileMenuBar() {
-		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
-		if( files == null )
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY, 2);
+		if (files == null)
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
+		BoofSwingUtil.invokeNowOrLater(() -> openImageSet(false, files));
 	}
 
 	@Override
@@ -201,15 +202,15 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {}
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {}
 
 	@Override
-	public void processFiles(String[] files) {
-		if( files.length == 3 ) {
+	public void processFiles( String[] files ) {
+		if (files.length == 3) {
 			origCalib = CalibrationIO.load(media.openFile(files[0]));
 			origLeft = media.openImage(files[1]);
 			origRight = media.openImage(files[2]);
-		} else if( files.length == 2 ) {
+		} else if (files.length == 2) {
 			origLeft = media.openImage(files[0]);
 			origRight = media.openImage(files[1]);
 
@@ -218,16 +219,15 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			origCalib = new StereoParameters();
 			origCalib.right_to_left = new Se3_F64();
 			origCalib.right_to_left.T.x = 1;
-			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(),origLeft.getHeight(), 90);
-			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(),origRight.getHeight(), 90);
+			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(), origLeft.getHeight(), 90);
+			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(), origRight.getHeight(), 90);
 		} else {
-			throw new IllegalArgumentException("Unexpected number of files. "+files.length);
+			throw new IllegalArgumentException("Unexpected number of files. " + files.length);
 		}
-		if( activeAlg == null )
+		if (activeAlg == null)
 			createAlgConcurrent();
 		changeInputScale();
 	}
-
 
 	public void processDisparityInThread() {
 		// make sure the user can't modify settings while the disparity is being computed
@@ -236,13 +236,13 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	}
 
 	public synchronized void processDisparity() {
-		if( !rectifiedImages ) {
-			SwingUtilities.invokeLater(()-> control.enableAlgControls(true));
+		if (!rectifiedImages) {
+			SwingUtilities.invokeLater(() -> control.enableAlgControls(true));
 			return;
 		}
 
 		// if the data types have changed the images need to be rectified again
-		if( !activeAlg.getInputType().isSameType(rectLeft.getImageType())) {
+		if (!activeAlg.getInputType().isSameType(rectLeft.getImageType())) {
 			changeInputScale();
 		}
 
@@ -250,19 +250,19 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		progress.start();
 
 		computedCloud = false;
-		long elapsedTime=0;
+		long elapsedTime = 0;
 		try {
 			BoofConcurrency.USE_CONCURRENT = control.concurrent;
 			long time0 = System.nanoTime();
 			activeAlg.process(rectLeft, rectRight);
 			long time1 = System.nanoTime();
-			elapsedTime = time1-time0;
+			elapsedTime = time1 - time0;
 			disparityImage = activeAlg.getDisparity();
 			disparityMin = activeAlg.getDisparityMin();
 			disparityRange = activeAlg.getDisparityRange();
-		} catch( RuntimeException e ) {
+		} catch (RuntimeException e) {
 			e.printStackTrace();
-			BoofSwingUtil.warningDialog(this,e);
+			BoofSwingUtil.warningDialog(this, e);
 		} finally {
 			BoofConcurrency.USE_CONCURRENT = true;
 			processCalled = true;
@@ -271,7 +271,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		progress.stopThread();
 
 		final long _elapsedTime = elapsedTime;
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			control.enableAlgControls(true);
 			control.setProcessingTimeMS(_elapsedTime/1e6);
 			disparityRender();
@@ -281,46 +281,52 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	/**
 	 * Changes which image is being displayed depending on GUI selection
 	 */
-	private synchronized void changeImageView()
-	{
-		if( !SwingUtilities.isEventDispatchThread() )
+	private synchronized void changeImageView() {
+		if (!SwingUtilities.isEventDispatchThread())
 			throw new RuntimeException("Must be in UI thread");
 
-		if( control.selectedView < 3 ) {
+		if (control.selectedView < 3) {
 			BufferedImage img;
 
 			switch (control.selectedView) {
-				case 0: img = disparityOut; break;
-				case 1: img = colorLeft; break;
-				case 2: img = colorRight; break;
-				default: throw new RuntimeException("Unknown option");
+				case 0:
+					img = disparityOut;
+					break;
+				case 1:
+					img = colorLeft;
+					break;
+				case 2:
+					img = colorRight;
+					break;
+				default:
+					throw new RuntimeException("Unknown option");
 			}
-			if( img == null )
+			if (img == null)
 				return;
 
 			imagePanel.setImage(img);
 			imagePanel.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
-			swapVisualizationPanel(imagePanel,pcv.getComponent());
+			swapVisualizationPanel(imagePanel, pcv.getComponent());
 		} else {
 			// TODO spawn this into it's own thread?
 			// TODO is thread safety a concern here? What happens if these settings are changed at the same time?
-			if( !computedCloud ) {
+			if (!computedCloud) {
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 				PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
 
 				double baseline = calib.getRightToLeft().getT().norm();
-				d2c.configure(baseline, rectK,rectR, leftRectToPixel, disparityMin,disparityRange);
-				if(imagePanel.state==2) // has the user defined the ROI?
+				d2c.configure(baseline, rectK, rectR, leftRectToPixel, disparityMin, disparityRange);
+				if (imagePanel.state == 2) // has the user defined the ROI?
 					d2c.setRegionOfInterest(imagePanel.x0, imagePanel.y0, imagePanel.x1, imagePanel.y1);
 				d2c.process(disparityImage, UtilDisparitySwing.wrap(colorLeft), cloud);
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
-						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
+						rectK, colorLeft.getWidth(), colorLeft.getHeight(), null);
 
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
-				pcv.addCloud(cloud.cloudXyz,cloud.cloudRgb);
+				pcv.addCloud(cloud.cloudXyz, cloud.cloudRgb);
 				changeView3D();
 			}
 
@@ -328,11 +334,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 	}
 
-	private void swapVisualizationPanel( Component target , Component other ) {
-		if( panel != target.getParent() ) {
-			assertBoof(other.getParent()==panel);
+	private void swapVisualizationPanel( Component target, Component other ) {
+		if (panel != target.getParent()) {
+			assertBoof(other.getParent() == panel);
 			panel.remove(other);
-			panel.add(target,BorderLayout.CENTER);
+			panel.add(target, BorderLayout.CENTER);
 			panel.revalidate();
 		}
 		panel.repaint();
@@ -352,7 +358,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		// if rectified just copy the image and return, computing rectification again will not help improve it
 		// and could add a little bit of noise
-		if( rectifiedImages ) {
+		if (rectifiedImages) {
 			rectLeft.setTo(inputLeft);
 			rectRight.setTo(inputRight);
 			leftRectToPixel = new DoNothing2Transform2_F64();
@@ -362,7 +368,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 
 		// compute rectification matrices
-		rectifyAlg.process(K1,new Se3_F64(),K2,calib.getRightToLeft().invert(null));
+		rectifyAlg.process(K1, new Se3_F64(), K2, calib.getRightToLeft().invert(null));
 
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
 		DMatrixRMaj rect2 = rectifyAlg.getRect2();
@@ -377,19 +383,19 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		ImageType<T> imageType = activeAlg.getInputType();
 
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3); // TODO simplify code some how
+		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
-		ImageDistort<T,T> distortRect1 = RectifyDistortImageOps.rectifyImage(
-				calib.left, rect1_F32, BorderType.EXTENDED,imageType);
-		ImageDistort<T,T> distortRect2 = RectifyDistortImageOps.rectifyImage(
+		ImageDistort<T, T> distortRect1 = RectifyDistortImageOps.rectifyImage(
+				calib.left, rect1_F32, BorderType.EXTENDED, imageType);
+		ImageDistort<T, T> distortRect2 = RectifyDistortImageOps.rectifyImage(
 				calib.right, rect2_F32, BorderType.EXTENDED, imageType);
 
 		// rectify and undo distortion
 		distortRect1.apply(inputLeft, rectLeft);
-		distortRect2.apply(inputRight,rectRight);
+		distortRect2.apply(inputRight, rectRight);
 
 		rectifiedImages = true;
 	}
@@ -398,14 +404,14 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	public synchronized void algorithmChanged() {
 		createAlgConcurrent();
 		// Only disparity of the user wants to on every setting change
-		if( control.recompute ) {
+		if (control.recompute) {
 			processDisparityInThread();
 		}
 	}
 
 	@Override
 	public synchronized void recompute() {
-		if( control.recompute ) {
+		if (control.recompute) {
 			processDisparityInThread();
 		}
 	}
@@ -417,13 +423,13 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public synchronized void disparityRender() {
-		if( !processCalled )
+		if (!processCalled)
 			return;
 
 		D disparity = activeAlg.getDisparity();
 
 		// TODO Got a NPE inside of this function once when rapidly changing settings. Make sure everything is locked down
-		disparityOut = VisualizeImageData.disparity(disparity,null, activeAlg.getDisparityRange(), control.backgroundColorDisparity);
+		disparityOut = VisualizeImageData.disparity(disparity, null, activeAlg.getDisparityRange(), control.backgroundColorDisparity);
 
 		changeImageView();
 	}
@@ -434,34 +440,34 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		double scale = control.inputScale/100.0;
 
-		PerspectiveOps.scaleIntrinsic(calib.left,scale);
-		PerspectiveOps.scaleIntrinsic(calib.right,scale);
+		PerspectiveOps.scaleIntrinsic(calib.left, scale);
+		PerspectiveOps.scaleIntrinsic(calib.right, scale);
 
 		int w = (int)(origLeft.getWidth()*scale);
 		int h = (int)(origLeft.getHeight()*scale);
 
-		colorLeft = new BufferedImage(w,h,BufferedImage.TYPE_INT_BGR);
-		colorRight = new BufferedImage(w,h,BufferedImage.TYPE_INT_BGR);
+		colorLeft = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
+		colorRight = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
 
-		colorLeft.createGraphics().drawImage(origLeft, AffineTransform.getScaleInstance(scale,scale),null);
-		colorRight.createGraphics().drawImage(origRight, AffineTransform.getScaleInstance(scale,scale),null);
+		colorLeft.createGraphics().drawImage(origLeft, AffineTransform.getScaleInstance(scale, scale), null);
+		colorRight.createGraphics().drawImage(origRight, AffineTransform.getScaleInstance(scale, scale), null);
 
-		inputLeft = activeAlg.getInputType().createImage(w,h);
-		inputRight = activeAlg.getInputType().createImage(w,h);
-		rectLeft = activeAlg.getInputType().createImage(w,h);
-		rectRight = activeAlg.getInputType().createImage(w,h);
+		inputLeft = activeAlg.getInputType().createImage(w, h);
+		inputRight = activeAlg.getInputType().createImage(w, h);
+		rectLeft = activeAlg.getInputType().createImage(w, h);
+		rectRight = activeAlg.getInputType().createImage(w, h);
 
-		ConvertBufferedImage.convertFrom(colorLeft,inputLeft,true);
-		ConvertBufferedImage.convertFrom(colorRight,inputRight,true);
+		ConvertBufferedImage.convertFrom(colorLeft, inputLeft, true);
+		ConvertBufferedImage.convertFrom(colorRight, inputRight, true);
 
 		// When the input image has changed automatically scale and center
 		imagePanel.autoScaleCenterOnSetImage = true;
-		imagePanel.setPreferredSize(new Dimension(inputLeft.width,inputLeft.height));
+		imagePanel.setPreferredSize(new Dimension(inputLeft.width, inputLeft.height));
 		imagePanel.resetRoi();
 
 		rectifyInputImages();
 
-		BoofSwingUtil.invokeNowOrLater(()->control.setImageSize(rectLeft.width,rectLeft.height));
+		BoofSwingUtil.invokeNowOrLater(() -> control.setImageSize(rectLeft.width, rectLeft.height));
 
 		processDisparity();
 	}
@@ -475,7 +481,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	@Override
 	public void changeView3D() {
 		double baseline = calib.getRightToLeft().getT().norm();
-		control.controlCloud.configure(pcv,baseline*10,baseline/30.0);
+		control.controlCloud.configure(pcv, baseline*10, baseline/30.0);
 		pcv.getComponent().repaint();
 	}
 
@@ -486,9 +492,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public void changeBackgroundColor() {
-		if( control.selectedView == 0 ) {
+		if (control.selectedView == 0) {
 			disparityRender();
-		} else if( control.selectedView == 3 ) {
+		} else if (control.selectedView == 3) {
 			pcv.setBackgroundColor(control.controlCloud.getActiveBackgroundColor());
 			pcv.getComponent().repaint();
 		}
@@ -498,7 +504,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	 * Displays images and sets the user select a region of interest
 	 */
 	public class DisparityImageView extends ImageZoomPanel implements MouseListener, MouseMotionListener {
-		int x0,y0,x1,y1;
+		int x0, y0, x1, y1;
 
 		int state = 0;
 
@@ -508,14 +514,14 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			panel.addMouseListener(this);
 			panel.addMouseMotionListener(this);
 
-			panel.addMouseWheelListener(e->{
-				setScale(BoofSwingUtil.mouseWheelImageZoom(scale,e));
+			panel.addMouseWheelListener(e -> {
+				setScale(BoofSwingUtil.mouseWheelImageZoom(scale, e));
 			});
 		}
 
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
-			if( state == 0 )
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
+			if (state == 0)
 				return;
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -528,10 +534,10 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			int x1 = (int)Math.round(this.x1*scale);
 			int y1 = (int)Math.round(this.y1*scale);
 
-			g2.drawLine(x0,y0,x1,y0);
-			g2.drawLine(x1,y0,x1,y1);
-			g2.drawLine(x0,y1,x1,y1);
-			g2.drawLine(x0,y0,x0,y1);
+			g2.drawLine(x0, y0, x1, y0);
+			g2.drawLine(x1, y0, x1, y1);
+			g2.drawLine(x0, y1, x1, y1);
+			g2.drawLine(x0, y0, x0, y1);
 		}
 
 		void resetRoi() {
@@ -540,12 +546,12 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent e) {
+		public void mouseClicked( MouseEvent e ) {
 			// clear region if one has been selected
-			if( state != 0 ) {
+			if (state != 0) {
 				boolean change = state == 2;
 				state = 0;
-				if( change ) {
+				if (change) {
 					computedCloud = false;
 					changeImageView();
 				}
@@ -554,39 +560,39 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 
 		@Override
-		public void mousePressed(MouseEvent e) {
+		public void mousePressed( MouseEvent e ) {
 			panel.requestFocus();
-			if( SwingUtilities.isLeftMouseButton(e)) {
+			if (SwingUtilities.isLeftMouseButton(e)) {
 				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 
 				// if shift it down the user is defining the ROI
-				if( (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0 ) {
+				if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
 					state = 1;
 					x0 = x1 = (int)Math.round(p.x);
 					y0 = y1 = (int)Math.round(p.y);
 				} else {
-					centerView(p.x,p.y);
+					centerView(p.x, p.y);
 				}
 			}
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {
+		public void mouseReleased( MouseEvent e ) {
 			// Finish defining the ROI, save it, and update the cloud
-			if( state == 1 ) {
+			if (state == 1) {
 				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 				x1 = (int)Math.round(p.x);
 				y1 = (int)Math.round(p.y);
 
 				// make sure the top left is the lower extent
-				int x0 = Math.min(this.x0,this.x1);
-				int x1 = Math.max(this.x0,this.x1);
-				int y0 = Math.min(this.y0,this.y1);
-				int y1 = Math.max(this.y0,this.y1);
-				this.x0=x0;
-				this.x1=x1;
-				this.y0=y0;
-				this.y1=y1;
+				int x0 = Math.min(this.x0, this.x1);
+				int x1 = Math.max(this.x0, this.x1);
+				int y0 = Math.min(this.y0, this.y1);
+				int y1 = Math.max(this.y0, this.y1);
+				this.x0 = x0;
+				this.x1 = x1;
+				this.y0 = y0;
+				this.y1 = y1;
 
 				// tell it to update the view with the new region
 				state = 2;
@@ -596,12 +602,12 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent e) {}
+		public void mouseEntered( MouseEvent e ) {}
 
 		@Override
-		public void mouseExited(MouseEvent e) {
+		public void mouseExited( MouseEvent e ) {
 			// user exited, clear the ROI that's in progress
-			if( state == 1 ) {
+			if (state == 1) {
 				resetRoi();
 				state = 0;
 				computedCloud = false;
@@ -610,8 +616,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 
 		@Override
-		public void mouseDragged(MouseEvent e) {
-			if( state == 1 ) {
+		public void mouseDragged( MouseEvent e ) {
+			if (state == 1) {
 				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 				x1 = (int)Math.round(p.x);
 				y1 = (int)Math.round(p.y);
@@ -622,14 +628,13 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		}
 
 		@Override
-		public void mouseMoved(MouseEvent e) {}
+		public void mouseMoved( MouseEvent e ) {}
 	}
 
 	/**
 	 * Displays a progress monitor and updates its state periodically
 	 */
-	public static class ProcessThread extends ProgressMonitorThread
-	{
+	public static class ProcessThread extends ProgressMonitorThread {
 		int state = 0;
 
 		public ProcessThread( JComponent owner ) {
@@ -640,7 +645,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		public void doRun() {
 			SwingUtilities.invokeLater(() -> {
 				monitor.setProgress(state);
-				state = (++state % 100);
+				state = (++state%100);
 			});
 		}
 	}
@@ -649,22 +654,22 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		String stereoCalib = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/stereo.yaml");
 
 		List<PathLabel> examples = new ArrayList<>();
-		examples.add(new PathLabel("Chair 1",  stereoCalib
-				,UtilIO.pathExample("stereo/chair01_left.jpg"),UtilIO.pathExample("stereo/chair01_right.jpg")));
+		examples.add(new PathLabel("Chair 1", stereoCalib
+				, UtilIO.pathExample("stereo/chair01_left.jpg"), UtilIO.pathExample("stereo/chair01_right.jpg")));
 //		inputs.add(new PathLabel("Chair 2",  new File(dirCalib,"stereo.yaml"),dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		examples.add(new PathLabel("Stones 1", stereoCalib
-				,UtilIO.pathExample("stereo/stones01_left.jpg"),UtilIO.pathExample("stereo/stones01_right.jpg")));
-		examples.add(new PathLabel("Lantern 1",stereoCalib
-				,UtilIO.pathExample("stereo/lantern01_left.jpg"),UtilIO.pathExample("stereo/lantern01_right.jpg")));
-		examples.add(new PathLabel("Wall 1",   stereoCalib
-				,UtilIO.pathExample("stereo/wall01_left.jpg"),UtilIO.pathExample("stereo/wall01_right.jpg")));
+				, UtilIO.pathExample("stereo/stones01_left.jpg"), UtilIO.pathExample("stereo/stones01_right.jpg")));
+		examples.add(new PathLabel("Lantern 1", stereoCalib
+				, UtilIO.pathExample("stereo/lantern01_left.jpg"), UtilIO.pathExample("stereo/lantern01_right.jpg")));
+		examples.add(new PathLabel("Wall 1", stereoCalib
+				, UtilIO.pathExample("stereo/wall01_left.jpg"), UtilIO.pathExample("stereo/wall01_right.jpg")));
 //		inputs.add(new PathLabel("Garden 1", new File(dirCalib,"stereo.yaml",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
 		examples.add(new PathLabel("Garden 2", stereoCalib
-				,UtilIO.pathExample("stereo/garden02_left.jpg"),UtilIO.pathExample("stereo/garden02_right.jpg")));
+				, UtilIO.pathExample("stereo/garden02_left.jpg"), UtilIO.pathExample("stereo/garden02_right.jpg")));
 		examples.add(new PathLabel("Sundial 1", stereoCalib
-				,UtilIO.pathExample("stereo/sundial01_left.jpg"),UtilIO.pathExample("stereo/sundial01_right.jpg")));
+				, UtilIO.pathExample("stereo/sundial01_left.jpg"), UtilIO.pathExample("stereo/sundial01_right.jpg")));
 
-		SwingUtilities.invokeLater(()->{
+		SwingUtilities.invokeLater(() -> {
 			VisualizeStereoDisparity app = new VisualizeStereoDisparity(examples);
 
 			app.openExample(examples.get(0));

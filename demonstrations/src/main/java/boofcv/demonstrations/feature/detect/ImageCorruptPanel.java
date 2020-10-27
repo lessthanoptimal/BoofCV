@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,51 +56,50 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 
 	public ImageCorruptPanel() {
 
-		noiseLevel = new JSpinner(new SpinnerNumberModel(valueNoise,0,100,5));
+		noiseLevel = new JSpinner(new SpinnerNumberModel(valueNoise, 0, 100, 5));
 		noiseLevel.addChangeListener(this);
 		noiseLevel.setMaximumSize(noiseLevel.getPreferredSize());
 
-		lightScale = new JSpinner(new SpinnerNumberModel(valueScale,0.5,2,0.1));
+		lightScale = new JSpinner(new SpinnerNumberModel(valueScale, 0.5, 2, 0.1));
 		lightScale.addChangeListener(this);
 		lightScale.setMaximumSize(lightScale.getPreferredSize());
 
-		lightOffset = new JSpinner(new SpinnerNumberModel(valueOffset,-30,30,5));
+		lightOffset = new JSpinner(new SpinnerNumberModel(valueOffset, -30, 30, 5));
 		lightOffset.addChangeListener(this);
 		lightOffset.setMaximumSize(lightOffset.getPreferredSize());
 
-		addLabeled(noiseLevel,"Noise");
-		addLabeled(lightScale,"Light Scale");
-		addLabeled(lightOffset,"Light Offset");
+		addLabeled(noiseLevel, "Noise");
+		addLabeled(lightScale, "Light Scale");
+		addLabeled(lightOffset, "Light Offset");
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
+	public void stateChanged( ChangeEvent e ) {
 		valueNoise = ((Number)noiseLevel.getValue()).doubleValue();
 		valueScale = ((Number)lightScale.getValue()).doubleValue();
 		valueOffset = ((Number)lightOffset.getValue()).doubleValue();
 
-		if( listener != null )
+		if (listener != null)
 			listener.corruptImageChange();
 	}
 
 	/**
 	 * Applies the specified corruption to the image.
+	 *
 	 * @param original Original uncorrupted image.
 	 * @param corrupted Corrupted mage.
 	 */
-	public <T extends ImageGray<T>> void corruptImage(T original , T corrupted )
-	{
+	public <T extends ImageGray<T>> void corruptImage( T original, T corrupted ) {
 		GGrayImageOps.stretch(original, valueScale, valueOffset, 255.0, corrupted);
 		GImageMiscOps.addGaussian(corrupted, rand, valueNoise, 0, 255);
-		GPixelMath.boundImage(corrupted,0,255);
+		GPixelMath.boundImage(corrupted, 0, 255);
 	}
 
-	public static interface Listener
-	{
-		public void corruptImageChange();
+	public interface Listener {
+		void corruptImageChange();
 	}
 }

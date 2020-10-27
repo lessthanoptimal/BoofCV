@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 
 	boolean showInput = false;
 
-	public VisualizeImageHogCellApp(List<String> exampleInputs, ImageType<T> imageType) {
+	public VisualizeImageHogCellApp( List<String> exampleInputs, ImageType<T> imageType ) {
 		super(exampleInputs, imageType);
 
 		createHoG(imageType);
@@ -66,58 +66,58 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		visualizers.setLocalMax(control.doShowLocal);
 		visualizers.setShowGrid(control.doShowGrid);
 
-		add(imagePanel,BorderLayout.CENTER);
-		add(control,BorderLayout.WEST);
+		add(imagePanel, BorderLayout.CENTER);
+		add(control, BorderLayout.WEST);
 
 		imagePanel.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseClicked(MouseEvent e) {}
+			public void mouseClicked( MouseEvent e ) {}
 
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed( MouseEvent e ) {
 				int row = e.getY()/hog.getPixelsPerCell();
 				int col = e.getX()/hog.getPixelsPerCell();
 
-				if( row >= 0 && col >= 0 && row < hog.getCellRows() &&  col < hog.getCellCols() ) {
-					DescribeDenseHogFastAlg.Cell c = hog.getCell(row,col);
-					System.out.print("Cell["+row+" , "+col+"] histogram =");
+				if (row >= 0 && col >= 0 && row < hog.getCellRows() && col < hog.getCellCols()) {
+					DescribeDenseHogFastAlg.Cell c = hog.getCell(row, col);
+					System.out.print("Cell[" + row + " , " + col + "] histogram =");
 					for (int i = 0; i < c.histogram.length; i++) {
-						System.out.print("  "+c.histogram[i]);
+						System.out.print("  " + c.histogram[i]);
 					}
 					System.out.println();
 				}
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) {}
+			public void mouseReleased( MouseEvent e ) {}
 
 			@Override
-			public void mouseEntered(MouseEvent e) {}
+			public void mouseEntered( MouseEvent e ) {}
 
 			@Override
-			public void mouseExited(MouseEvent e) {}
+			public void mouseExited( MouseEvent e ) {}
 		});
 	}
 
-	private void createHoG(ImageType<T> imageType) {
+	private void createHoG( ImageType<T> imageType ) {
 		ConfigDenseHoG config = new ConfigDenseHoG();
 		config.pixelsPerCell = control.cellWidth;
 		config.orientationBins = control.histogram;
 
-		hog = FactoryDescribeImageDenseAlg.hogFast(config,imageType);
+		hog = FactoryDescribeImageDenseAlg.hogFast(config, imageType);
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		super.handleInputChange(source, method, width, height);
 
 
-		imagePanel.setPreferredSize(new Dimension(width,height));
-		imagePanel.setMinimumSize(new Dimension(width,height));
+		imagePanel.setPreferredSize(new Dimension(width, height));
+		imagePanel.setMinimumSize(new Dimension(width, height));
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 		synchronized (lock) {
 			hog.setInput((T)input);
 			hog.process();
@@ -130,8 +130,8 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 
 			visualizers.render(g2);
 
-			if( showInput )
-				g2.drawImage(buffered,0,0,buffered.getWidth()/5,buffered.getHeight()/5,null);
+			if (showInput)
+				g2.drawImage(buffered, 0, 0, buffered.getWidth()/5, buffered.getHeight()/5, null);
 		}
 
 		imagePanel.setImage(work);
@@ -146,7 +146,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		}
 	}
 
-	public void setOrientationBins(int histogram) {
+	public void setOrientationBins( int histogram ) {
 		synchronized (lock) {
 			createHoG((ImageType)getImageType(0));
 			visualizers.setHoG(hog);
@@ -154,17 +154,17 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		}
 	}
 
-	public void setShowGrid(boolean showGrid) {
+	public void setShowGrid( boolean showGrid ) {
 		visualizers.showGrid = showGrid;
 		reprocessImageOnly();
 	}
 
-	public void setShowLocal(boolean show ) {
+	public void setShowLocal( boolean show ) {
 		visualizers.localMax = show;
 		reprocessImageOnly();
 	}
 
-	public void setShowLog(boolean show ) {
+	public void setShowLog( boolean show ) {
 		visualizers.setShowLog(show);
 		reprocessImageOnly();
 	}
@@ -174,7 +174,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		reprocessImageOnly();
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		List<String> examples = new ArrayList<>();
 
 		examples.add(UtilIO.pathExample("shapes/shapes01.png"));
@@ -186,6 +186,6 @@ public class VisualizeImageHogCellApp<T extends ImageBase<T>> extends Demonstrat
 		VisualizeImageHogCellApp app = new VisualizeImageHogCellApp(examples, imageType);
 
 		app.openFile(new File(examples.get(0)));
-		app.display( "Hog Descriptor Unnormalized Cell");
+		app.display("Hog Descriptor Unnormalized Cell");
 	}
 }

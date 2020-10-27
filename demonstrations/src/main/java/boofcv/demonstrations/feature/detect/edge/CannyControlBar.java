@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,23 +38,23 @@ public class CannyControlBar extends StandardAlgConfigPanel implements ChangeLis
 
 	Listener listener;
 
-	public CannyControlBar( int blurRadius , int threshold ) {
+	public CannyControlBar( int blurRadius, int threshold ) {
 		this.blurRadius = blurRadius;
 		this.threshold = threshold;
 
-		controlBlur = spinner(blurRadius,1,20,1);
+		controlBlur = spinner(blurRadius, 1, 20, 1);
 //		controlBlur = new JSpinner(new SpinnerNumberModel(blurRadius,1,20,1));
 //		controlBlur.addChangeListener(this);
 //		controlBlur.setPreferredSize(new Dimension((int)controlBlur.getPreferredSize().getWidth(),(int)controlBlur.getPreferredSize().getHeight()+8));
 //		controlBlur.setMaximumSize(controlBlur.getPreferredSize());
 
-		controlThreshold = new JSlider(JSlider.HORIZONTAL,5,100,threshold);
+		controlThreshold = new JSlider(JSlider.HORIZONTAL, 5, 100, threshold);
 		controlThreshold.setMajorTickSpacing(20);
 		controlThreshold.setPaintTicks(true);
 		controlThreshold.addChangeListener(this);
 
-		addLabeled(controlBlur,"Blur Radius");
-		addCenterLabel("Threshold",this);
+		addLabeled(controlBlur, "Blur Radius");
+		addCenterLabel("Threshold", this);
 		addAlignCenter(controlThreshold);
 //		add(new JLabel("Blur Radius"));
 //		add(controlBlur);
@@ -64,15 +64,15 @@ public class CannyControlBar extends StandardAlgConfigPanel implements ChangeLis
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
+	public void stateChanged( ChangeEvent e ) {
 
-		if( controlBlur == e.getSource() ) {
+		if (controlBlur == e.getSource()) {
 			blurRadius = ((Number)controlBlur.getValue()).intValue();
-		}  else if( controlThreshold == e.getSource() ) {
+		} else if (controlThreshold == e.getSource()) {
 			threshold = ((Number)controlThreshold.getValue()).intValue();
 		}
 
-		if( listener != null )
+		if (listener != null)
 			listener.changeCanny();
 	}
 
@@ -84,12 +84,11 @@ public class CannyControlBar extends StandardAlgConfigPanel implements ChangeLis
 		return threshold;
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
-	public static interface Listener
-	{
+	public static interface Listener {
 		void changeCanny();
 	}
 }

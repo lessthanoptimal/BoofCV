@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class DetectQrCodeControlPanel extends DetectBlackShapePanel
-		implements ActionListener, ChangeListener
-{
+		implements ActionListener, ChangeListener {
 	DetectQrCodeApp owner;
 
 	DetectQrCodeMessagePanel messagePanel;
@@ -71,17 +70,17 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 
 	ConfigQrCode config = new ConfigQrCode();
 
-	public DetectQrCodeControlPanel(DetectQrCodeApp owner) {
+	public DetectQrCodeControlPanel( DetectQrCodeApp owner ) {
 		this.owner = owner;
 
 		messagePanel = new DetectQrCodeMessagePanel(owner);
 
-		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.polygon,config.threshold);
+		polygonPanel = new DetectBlackPolygonControlPanel(owner, config.polygon, config.threshold);
 		polygonPanel.thresholdPanel.addHistogramGraph();
 
 		bRunAgain.addActionListener(actionEvent -> DetectQrCodeControlPanel.this.owner.reprocessImageOnly());
 		bRunAgain.setMaximumSize(bRunAgain.getPreferredSize());
-		bRunAgain.setBorder(BorderFactory.createEmptyBorder(1,4,1,4));
+		bRunAgain.setBorder(BorderFactory.createEmptyBorder(1, 4, 1, 4));
 
 		imageView = new JComboBox();
 		imageView.addItem("Input");
@@ -90,22 +89,22 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		imageView.addActionListener(this);
 		imageView.setMaximumSize(imageView.getPreferredSize());
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
+		selectZoom = new JSpinner(new SpinnerNumberModel(1, MIN_ZOOM, MAX_ZOOM, 1));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		spinnerMinimumVersion = spinner(config.versionMinimum,1,40,1);
-		spinnerMaximumVersion = spinner(config.versionMaximum,1,40,1);
+		spinnerMinimumVersion = spinner(config.versionMinimum, 1, 40, 1);
+		spinnerMaximumVersion = spinner(config.versionMaximum, 1, 40, 1);
 
-		showMarkers = checkbox("Markers",bShowMarkers);
-		showFailures = checkbox("Failures",bShowFailures);
-		showBits = checkbox("Bits",bShowBits);
+		showMarkers = checkbox("Markers", bShowMarkers);
+		showFailures = checkbox("Failures", bShowFailures);
+		showBits = checkbox("Bits", bShowBits);
 		showSquares = checkbox("Squares", bShowSquares);
-		showPositionPattern = checkbox("Pos. Pattern",bShowPositionPattern);
+		showPositionPattern = checkbox("Pos. Pattern", bShowPositionPattern);
 		showAlignmentPattern = checkbox("Align. Pattern", bShowAlignmentPattern);
-		showContour = checkbox("Contour",bShowContour);
+		showContour = checkbox("Contour", bShowContour);
 
-		JPanel togglePanel = new JPanel( new GridLayout(0,2));
+		JPanel togglePanel = new JPanel(new GridLayout(0, 2));
 		togglePanel.add(showMarkers);
 		togglePanel.add(showFailures);
 		togglePanel.add(showSquares);
@@ -120,61 +119,61 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		tabbedPanel.addTab("Controls", polygonPanel);
 
 		JPanel timePanel = new JPanel();
-		timePanel.setLayout(new BoxLayout(timePanel,BoxLayout.X_AXIS));
+		timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.X_AXIS));
 		timePanel.add(processingTimeLabel);
 		timePanel.add(bRunAgain);
 
-		addLabeled(timePanel,"Time");
-		addLabeled(imageSizeLabel,"Size");
+		addLabeled(timePanel, "Time");
+		addLabeled(imageSizeLabel, "Size");
 		addLabeled(imageView, "View: ");
-		addLabeled(selectZoom,"Zoom");
+		addLabeled(selectZoom, "Zoom");
 		add(togglePanel);
-		addLabeled(spinnerMinimumVersion,"Min. Version");
-		addLabeled(spinnerMaximumVersion,"Max. Version");
+		addLabeled(spinnerMinimumVersion, "Min. Version");
+		addLabeled(spinnerMaximumVersion, "Max. Version");
 		add(tabbedPanel);
 		addVerticalGlue();
-		setPreferredSize(new Dimension(225,200));
+		setPreferredSize(new Dimension(225, 200));
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == showMarkers ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == showMarkers) {
 			bShowMarkers = showMarkers.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showFailures ) {
+		} else if (e.getSource() == showFailures) {
 			bShowFailures = showFailures.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showBits ) {
+		} else if (e.getSource() == showBits) {
 			bShowBits = showBits.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == imageView ) {
+		} else if (e.getSource() == imageView) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
-		} else if( e.getSource() == showSquares ) {
+		} else if (e.getSource() == showSquares) {
 			bShowSquares = showSquares.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showPositionPattern ) {
+		} else if (e.getSource() == showPositionPattern) {
 			bShowPositionPattern = showPositionPattern.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showAlignmentPattern ) {
+		} else if (e.getSource() == showAlignmentPattern) {
 			bShowAlignmentPattern = showAlignmentPattern.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showContour ) {
+		} else if (e.getSource() == showContour) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
 		}
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == selectZoom) {
+			zoom = ((Number)selectZoom.getValue()).doubleValue();
 			owner.viewUpdated();
 			return;
-		} else if( e.getSource() == spinnerMinimumVersion ) {
-			config.versionMinimum = ((Number) spinnerMinimumVersion.getValue()).intValue();
-		} else if( e.getSource() == spinnerMaximumVersion ) {
-			config.versionMaximum = ((Number) spinnerMaximumVersion.getValue()).intValue();
+		} else if (e.getSource() == spinnerMinimumVersion) {
+			config.versionMinimum = ((Number)spinnerMinimumVersion.getValue()).intValue();
+		} else if (e.getSource() == spinnerMaximumVersion) {
+			config.versionMaximum = ((Number)spinnerMaximumVersion.getValue()).intValue();
 		}
 		owner.configUpdate();
 	}

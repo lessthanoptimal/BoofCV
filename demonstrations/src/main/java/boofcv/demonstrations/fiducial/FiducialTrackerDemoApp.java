@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,9 +72,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FiducialTrackerDemoApp<I extends ImageGray<I>>
-		extends DemonstrationBase
-{
+public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends DemonstrationBase {
 	private static final String SQUARE_NUMBER = "Square Number";
 	private static final String SQUARE_PICTURE = "Square Picture";
 	private static final String QR_CODE = "QR Code";
@@ -103,15 +101,15 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 	boolean firstDetection = false;
 
-	public FiducialTrackerDemoApp(List<PathLabel> examples, Class<I> imageType) {
-		super(false,false,examples, ImageType.single(imageType));
+	public FiducialTrackerDemoApp( List<PathLabel> examples, Class<I> imageType ) {
+		super(false, false, examples, ImageType.single(imageType));
 		this.imageClass = imageType;
 
 		panel.setPreferredSize(new Dimension(640, 480));
 		panel.setFocusable(true);
 		panel.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked( MouseEvent e ) {
 				streamPaused = !streamPaused;
 			}
 		});
@@ -121,8 +119,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input)
-	{
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 		detector.detect((I)input);
 
 		// copy the results for drawing in the GUI thread
@@ -139,25 +136,25 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 				info.visible = true;
 				info.width = detector.getWidth(i);
 
-				if( detector.hasMessage() ) {
+				if (detector.hasMessage()) {
 					info.message = detector.getMessage(i);
-					if( info.message.length() > 4 ) {
+					if (info.message.length() > 4) {
 						info.message = info.message.substring(0, 4);
 					}
 				} else {
 					info.message = "" + info.id;
 				}
 
-				detector.getFiducialToCamera(i,info.fidToCam);
-				detector.getBounds(i,info.polygon);
-				detector.getCenter(i,info.center);
+				detector.getFiducialToCamera(i, info.fidToCam);
+				detector.getBounds(i, info.polygon);
+				detector.getCenter(i, info.center);
 
 				if (detector.computeStability(i, 0.25, info.stability)) {
 					stabilityMax.location = Math.max(info.stability.location, stabilityMax.location);
 					stabilityMax.orientation = Math.max(info.stability.orientation, stabilityMax.orientation);
 				}
 
-				if( firstDetection ) {
+				if (firstDetection) {
 					// give it "reasonable" initial values based on the marker's size
 					stabilityMax.location = detector.getWidth(0)*0.1;
 					stabilityMax.orientation = 0.05;
@@ -170,14 +167,14 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	protected void configureVideo( int which , SimpleImageSequence sequence ) {
+	protected void configureVideo( int which, SimpleImageSequence sequence ) {
 		sequence.setLoop(true);
 	}
 
 	private FiducialInfo findFiducial( long id ) {
 		for (int i = 0; i < fiducialInfo.size(); i++) {
 			FiducialInfo info = fiducialInfo.get(i);
-			if( info.id == id ) {
+			if (info.id == id) {
 				return info;
 			}
 		}
@@ -201,17 +198,18 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 		String videoName = example.getPath();
 		int location = videoName.lastIndexOf(File.separatorChar);
-		if( location == -1 ) { // windows vs unix issue
+		if (location == -1) { // windows vs unix issue
 			location = videoName.lastIndexOf('/');
 		}
 		String path = videoName.substring(0, location);
 
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 
-		switch( name ) {
+		switch (name) {
 			case SQUARE_NUMBER: {
 				detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
-			} break;
+			}
+			break;
 
 			case SQUARE_PICTURE: {
 				double length = 0.1;
@@ -219,21 +217,22 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 				SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
 
-				String pathImg = new File(path,"../patterns").getPath();
+				String pathImg = new File(path, "../patterns").getPath();
 				List<String> names = new ArrayList<>();
 				names.add("chicken.png");
 				names.add("yinyang.png");
 
-				for( String foo : names ) {
-					BufferedImage img = media.openImage(new File(pathImg,foo).getPath());
-					if( img == null )
-						throw new RuntimeException("Can't find file "+new File(pathImg,foo).getPath());
+				for (String foo : names) {
+					BufferedImage img = media.openImage(new File(pathImg, foo).getPath());
+					if (img == null)
+						throw new RuntimeException("Can't find file " + new File(pathImg, foo).getPath());
 					d.addPatternImage(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
 				}
-			} break;
+			}
+			break;
 
 			case RANDOM_DOTS: {
-				RandomDotDefinition defs = FiducialIO.loadRandomDotYaml(new File(path,"descriptions.yaml"));
+				RandomDotDefinition defs = FiducialIO.loadRandomDotYaml(new File(path, "descriptions.yaml"));
 				var config = new ConfigUchiyaMarker();
 				config.markerWidth = defs.markerWidth;
 				config.markerHeight = defs.markerHeight;
@@ -242,19 +241,23 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 				for (int i = 0; i < defs.markers.size(); i++) {
 					tracker.addMarker(defs.markers.get(i));
 				}
-			} break;
+			}
+			break;
 
 			case QR_CODE: {
 				detector = FactoryFiducial.qrcode3D(null, imageClass);
-			} break;
+			}
+			break;
 			case CALIB_CHESS: {
-				detector = FactoryFiducial.calibChessboardX(null,new ConfigGridDimen(7, 5, 0.03), imageClass);
-			} break;
+				detector = FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(7, 5, 0.03), imageClass);
+			}
+			break;
 			case CALIB_SQUARE_GRID: {
-				detector = FactoryFiducial.calibSquareGrid(null,new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
-			} break;
+				detector = FactoryFiducial.calibSquareGrid(null, new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
+			}
+			break;
 			case CALIB_SQUARE_BINARY_GRID: {
-				File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
+				File configFile = new File(path, "description_4x3_3x3_4cm_2cm.txt");
 				try {
 					ConfigSquareGridBinary config =
 							ConfigSquareGridBinary.parseSimple(Files.newBufferedReader(configFile.toPath()));
@@ -262,40 +265,43 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
-			} break;
+			}
+			break;
 			case CALIB_CIRCLE_HEXAGONAL_GRID: {
-				detector = FactoryFiducial.calibCircleHexagonalGrid(null,new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
-			} break;
+				detector = FactoryFiducial.calibCircleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
+			}
+			break;
 			case CALIB_CIRCLE_REGULAR_GRID: {
-				detector = FactoryFiducial.calibCircleRegularGrid(null,new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
-			} break;
+				detector = FactoryFiducial.calibCircleRegularGrid(null, new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
+			}
+			break;
 
 			default:
 				throw new RuntimeException("Unknown selection");
 		}
 		controls.setShowStability(true);
 
-		intrinsic = UtilIO.loadExampleIntrinsic(media,new File(example.getPath()));
-		if( intrinsic == null ) {
-			throw new RuntimeException("BUG! can't open intrinsic calibration for "+example.getPath());
+		intrinsic = UtilIO.loadExampleIntrinsic(media, new File(example.getPath()));
+		if (intrinsic == null) {
+			throw new RuntimeException("BUG! can't open intrinsic calibration for " + example.getPath());
 		}
 
-		detector.setLensDistortion(new LensDistortionBrown(intrinsic),intrinsic.width,intrinsic.height);
+		detector.setLensDistortion(new LensDistortionBrown(intrinsic), intrinsic.width, intrinsic.height);
 
 		fiducialInfo.clear();
 		firstDetection = true;
 
-		openVideo(false,videoName);
+		openVideo(false, videoName);
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
-		panel.setPreferredSize(new Dimension(width,height));
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
+		panel.setPreferredSize(new Dimension(width, height));
 	}
 
 	class VisualizePanel extends ImagePanel {
 		@Override
-		public void paintComponent(Graphics g) {
+		public void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 
 			Graphics2D g2 = (Graphics2D)g;
@@ -303,39 +309,38 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 
-			synchronized (fiducialInfo ) {
+			synchronized (fiducialInfo) {
 				for (int i = 0; i < fiducialInfo.size(); i++) {
 					FiducialInfo info = fiducialInfo.get(i);
 
-					if( !info.visible )
+					if (!info.visible)
 						continue;
 
 
-					if( controls.showBoundary ) {
+					if (controls.showBoundary) {
 						g2.setStroke(new BasicStroke(11));
 						g2.setColor(Color.BLUE);
-						VisualizeShapes.drawPolygon(info.polygon,true,scale,g2);
+						VisualizeShapes.drawPolygon(info.polygon, true, scale, g2);
 					}
 
-					if( controls.showCenter ) {
+					if (controls.showCenter) {
 						double x = info.center.x*scale + offsetX;
 						double y = info.center.y*scale + offsetY;
 
-						VisualizeFeatures.drawPoint(g2,x,y,10,Color.MAGENTA,true);
+						VisualizeFeatures.drawPoint(g2, x, y, 10, Color.MAGENTA, true);
 					}
 
-					if( controls.show3D ) {
+					if (controls.show3D) {
 						double width = detector.getWidth(i);
 
 						VisualizeFiducial.drawLabelCenter(info.fidToCam, intrinsic, info.message, g2, scale);
 						VisualizeFiducial.drawCube(info.fidToCam, intrinsic, width, 0.5, 5, g2, scale);
 					}
 
-					if( controls.showStability )
-						handleStability(g2,info);
+					if (controls.showStability)
+						handleStability(g2, info);
 				}
 			}
-
 		}
 
 		/**
@@ -348,21 +353,21 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 			if (info.totalObserved > 20) {
 
-				double fractionLocation = info.stability.location / stabilityMax.location;
-				double fractionOrientation = info.stability.orientation / stabilityMax.orientation;
+				double fractionLocation = info.stability.location/stabilityMax.location;
+				double fractionOrientation = info.stability.orientation/stabilityMax.orientation;
 
-				int maxHeight = (int) (height * 0.15);
+				int maxHeight = (int)(height*0.15);
 
-				int x = info.grid * 60;
+				int x = info.grid*60;
 				int y = 10 + maxHeight;
 
 				g2.setColor(Color.BLUE);
-				int h = (int) (fractionLocation * maxHeight);
+				int h = (int)(fractionLocation*maxHeight);
 				g2.fillRect(x, y - h, 20, h);
 
 				g2.setColor(Color.CYAN);
 				x += 25;
-				h = (int) (fractionOrientation * maxHeight);
+				h = (int)(fractionOrientation*maxHeight);
 				g2.fillRect(x, y - h, 20, h);
 
 				g2.setColor(Color.RED);
@@ -385,10 +390,10 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		boolean showCenter = false;
 
 		public ControlPanel() {
-			checkStability = checkbox("Stability",showStability);
-			check3D = checkbox("Box 3D",show3D);
-			checkBoundary = checkbox("Boundary",showBoundary);
-			checkCenter = checkbox("center",showCenter);
+			checkStability = checkbox("Stability", showStability);
+			check3D = checkbox("Box 3D", show3D);
+			checkBoundary = checkbox("Boundary", showBoundary);
+			checkCenter = checkbox("center", showCenter);
 
 			addAlignLeft(checkStability);
 			addAlignLeft(check3D);
@@ -396,20 +401,20 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 			addAlignLeft(checkCenter);
 		}
 
-		public void setShowStability(boolean value ) {
+		public void setShowStability( boolean value ) {
 			showStability = value;
-			BoofSwingUtil.invokeNowOrLater(()->checkStability.setSelected(value));
+			BoofSwingUtil.invokeNowOrLater(() -> checkStability.setSelected(value));
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == checkStability ) {
+		public void actionPerformed( ActionEvent e ) {
+			if (e.getSource() == checkStability) {
 				showStability = checkStability.isSelected();
-			} else if( e.getSource() == check3D ) {
+			} else if (e.getSource() == check3D) {
 				show3D = check3D.isSelected();
-			} else if( e.getSource() == checkBoundary ) {
+			} else if (e.getSource() == checkBoundary) {
 				showBoundary = checkBoundary.isSelected();
-			} else if( e.getSource() == checkCenter ) {
+			} else if (e.getSource() == checkCenter) {
 				showCenter = checkCenter.isSelected();
 			}
 		}
@@ -428,7 +433,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		double width;
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 //		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 
@@ -443,7 +448,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		inputs.add(new PathLabel(CALIB_CIRCLE_HEXAGONAL_GRID, UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CIRCLE_REGULAR_GRID, UtilIO.pathExample("fiducial/circle_regular/movie.mp4")));
 
-		SwingUtilities.invokeLater(()-> {
+		SwingUtilities.invokeLater(() -> {
 			FiducialTrackerDemoApp app = new FiducialTrackerDemoApp(inputs, type);
 			app.openExample(inputs.get(0));
 			app.display("Fiducial Demonstrations");

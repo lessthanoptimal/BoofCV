@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Visually shows the location of matching pairs of associated features in two images.
  *
@@ -62,13 +61,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	DescribeRegionPoint descriptor;
 	AssociateDescription<TupleDesc> matcher;
 	OrientationImage<T> orientation;
-	boolean algorithmChange=true;
-	boolean failure=false;
+	boolean algorithmChange = true;
+	boolean failure = false;
 	// images
 	BufferedImage buffLeft;
 	BufferedImage buffRight;
-	Planar<T> colorLeft,colorRight;
-	T grayLeft,grayRight;
+	Planar<T> colorLeft, colorRight;
+	T grayLeft, grayRight;
 
 	Class<T> imageType;
 
@@ -78,8 +77,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	// tells the progress monitor how far along it is
 	int progress;
 
-	public VisualizeAssociationMatchesApp(java.util.List<PathLabel> examples , Class<T> imageType) {
-		super(true,false,examples,ImageType.pl(3,imageType));
+	public VisualizeAssociationMatchesApp( java.util.List<PathLabel> examples, Class<T> imageType ) {
+		super(true, false, examples, ImageType.pl(3, imageType));
 		this.imageType = imageType;
 
 		colorLeft = new Planar<>(imageType, 1, 1, 3);
@@ -92,12 +91,12 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	}
 
 	@Override
-	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
-		switch( source ) {
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
+		switch (source) {
 			case 0:
-				buffLeft = ConvertBufferedImage.checkDeclare(width,height,buffLeft,BufferedImage.TYPE_INT_RGB);
-				colorLeft.reshape(width,height);
-				grayLeft.reshape(width,height);
+				buffLeft = ConvertBufferedImage.checkDeclare(width, height, buffLeft, BufferedImage.TYPE_INT_RGB);
+				colorLeft.reshape(width, height);
+				grayLeft.reshape(width, height);
 				break;
 
 //			case 1:
@@ -106,51 +105,51 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 //				grayRight.reshape(width,height);
 //				break;
 		}
-		SwingUtilities.invokeLater(()->{
-			panel.setPreferredSize(width,height,width,height);
-			controls.setImageSize(width,height);
+		SwingUtilities.invokeLater(() -> {
+			panel.setPreferredSize(width, height, width, height);
+			controls.setImageSize(width, height);
 		});
 	}
 
 	@Override
-	protected void handleInputFailure(int source, String error) {
+	protected void handleInputFailure( int source, String error ) {
 		failure = true;
 		JOptionPane.showMessageDialog(this, error);
 	}
 
 	@Override
 	protected void openFileMenuBar() {
-		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
-		if( files == null )
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY, 2);
+		if (files == null)
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
+		BoofSwingUtil.invokeNowOrLater(() -> openImageSet(false, files));
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
-		switch( sourceID ) {
+	public void processImage( int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input ) {
+		switch (sourceID) {
 			case 0:
 				failure = false;
-				buffLeft.createGraphics().drawImage(bufferedIn,0,0,null);
+				buffLeft.createGraphics().drawImage(bufferedIn, 0, 0, null);
 				colorLeft.setTo((Planar<T>)input);
-				GConvertImage.average(colorLeft,grayLeft);
+				GConvertImage.average(colorLeft, grayLeft);
 				break;
 
 			case 1:
-				if( failure ) // abort if it failed earlier
+				if (failure) // abort if it failed earlier
 					return;
 				int width = input.width;
 				int height = input.height;
 				// work around for input change only working for the first image
-				buffRight = ConvertBufferedImage.checkDeclare(width,height,buffRight,BufferedImage.TYPE_INT_RGB);
-				colorRight.reshape(width,height);
-				grayRight.reshape(width,height);
+				buffRight = ConvertBufferedImage.checkDeclare(width, height, buffRight, BufferedImage.TYPE_INT_RGB);
+				colorRight.reshape(width, height);
+				grayRight.reshape(width, height);
 
-				buffRight.createGraphics().drawImage(bufferedIn,0,0,null);
+				buffRight.createGraphics().drawImage(bufferedIn, 0, 0, null);
 				colorRight.setTo((Planar<T>)input);
-				GConvertImage.average(colorRight,grayRight);
+				GConvertImage.average(colorRight, grayRight);
 
-				BoofSwingUtil.invokeNowOrLater(()-> panel.setImages(buffLeft,buffRight));
+				BoofSwingUtil.invokeNowOrLater(() -> panel.setImages(buffLeft, buffRight));
 				processImage();
 				break;
 		}
@@ -163,16 +162,16 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		// estimate orientation using this once since it is fast and accurate
 		Class integralType = GIntegralImageOps.getIntegralType(imageType);
 		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
-		orientation = FactoryOrientation.convertImage(orientationII,imageType);
+		orientation = FactoryOrientation.convertImage(orientationII, imageType);
 
 		matcher = controls.createAssociate(descriptor);
 		return true;
 	}
 
 	private void processImage() {
-		if( algorithmChange ) {
+		if (algorithmChange) {
 			algorithmChange = false;
-			if( !declareAlgorithms() ) {
+			if (!declareAlgorithms()) {
 				return;
 			}
 		}
@@ -181,7 +180,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		final List<Point2D_F64> leftPts = new ArrayList<>();
 		final List<Point2D_F64> rightPts = new ArrayList<>();
 		FastQueue<TupleDesc> leftDesc = UtilFeature.createQueue(descriptor, 10);
-		FastQueue<TupleDesc> rightDesc = UtilFeature.createQueue(descriptor,10);
+		FastQueue<TupleDesc> rightDesc = UtilFeature.createQueue(descriptor, 10);
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Associating Features",
@@ -197,7 +196,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 					SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progress));
 					try {
 						wait(100);
-					} catch (InterruptedException ignore) {}
+					} catch (InterruptedException ignore) {
+					}
 				}
 				progressMonitor.close();
 			}
@@ -205,9 +205,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 
 		// find feature points  and descriptions
-		extractImageFeatures(colorLeft,grayLeft, leftDesc, leftPts);
+		extractImageFeatures(colorLeft, grayLeft, leftDesc, leftPts);
 		progress++;
-		extractImageFeatures(colorRight,grayRight, rightDesc, rightPts);
+		extractImageFeatures(colorRight, grayRight, rightDesc, rightPts);
 		progress++;
 		matcher.setSource(leftDesc);
 		matcher.setDestination(rightDesc);
@@ -215,7 +215,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		progress = 3;
 
 		long time1 = System.nanoTime();
-		controls.setTime((time1-time0)*1e-6); // TODO in gui thread?
+		controls.setTime((time1 - time0)*1e-6); // TODO in gui thread?
 
 		SwingUtilities.invokeLater(() -> {
 			panel.setAssociation(leftPts, rightPts, matcher.getMatches());
@@ -223,9 +223,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		});
 	}
 
-	private void extractImageFeatures(Planar<T> color , T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs) {
+	private void extractImageFeatures( Planar<T> color, T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs ) {
 		detector.detect(gray);
-		if( descriptor.getImageType().getFamily() == ImageType.Family.GRAY)
+		if (descriptor.getImageType().getFamily() == ImageType.Family.GRAY)
 			descriptor.setImage(gray);
 		else
 			descriptor.setImage(color);
@@ -275,10 +275,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		final JLabel labelSize = new JLabel();
 
 		public AssociateControls() {
-			super(()->{
+			super(() -> {
 				algorithmChange = true;
 				reprocessInput();
-			},false);
+			}, false);
 
 			initializeControlsGUI();
 
@@ -311,24 +311,24 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 		@Override
 		protected void layoutComponents() {
-			labelTime.setPreferredSize(new Dimension(70,26));
+			labelTime.setPreferredSize(new Dimension(70, 26));
 			labelTime.setHorizontalAlignment(SwingConstants.RIGHT);
 
-			addLabeled(labelTime,"Time (ms)");
+			addLabeled(labelTime, "Time (ms)");
 			add(labelSize);
 			super.layoutComponents();
 		}
 
-		public void setTime(double milliseconds ) {
-			labelTime.setText(String.format("%.1f",milliseconds));
+		public void setTime( double milliseconds ) {
+			labelTime.setText(String.format("%.1f", milliseconds));
 		}
 
-		public void setImageSize( int width , int height ) {
-			labelSize.setText(width+" x "+height);
+		public void setImageSize( int width, int height ) {
+			labelSize.setText(width + " x " + height);
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(new PathLabel("Cave",
@@ -342,8 +342,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		examples.add(new PathLabel("Trees Rotate",
 				UtilIO.pathExample("stitch/trees_rotate_01.jpg"), UtilIO.pathExample("stitch/trees_rotate_03.jpg")));
 
-		SwingUtilities.invokeLater(()->{
-			VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(examples,GrayF32.class);
+		SwingUtilities.invokeLater(() -> {
+			VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(examples, GrayF32.class);
 
 			// Processing time takes a bit so don't open right away
 			app.openExample(examples.get(0));

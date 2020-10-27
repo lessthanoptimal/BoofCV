@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.awt.*;
 public class LlahControlPanel extends StandardAlgConfigPanel {
 	ConfigLlah config;
 
-	JCheckBox cEnable = checkbox("",false);
+	JCheckBox cEnable = checkbox("", false);
 	JSpinner spinnerN, spinnerM, spinnerK;
 	JComboBox<String> cInvariant;
 
@@ -43,10 +43,10 @@ public class LlahControlPanel extends StandardAlgConfigPanel {
 		this.config = config;
 		setBorder(BorderFactory.createTitledBorder("LLAH"));
 
-		spinnerN = spinner(config.numberOfNeighborsN,3,20,1);
-		spinnerM = spinner(config.sizeOfCombinationM,3,20,1);
-		spinnerK = spinner(config.quantizationK,3,200,1);
-		cInvariant = combo(config.hashType.ordinal(), (Object[]) ConfigLlah.HashType.values());
+		spinnerN = spinner(config.numberOfNeighborsN, 3, 20, 1);
+		spinnerM = spinner(config.sizeOfCombinationM, 3, 20, 1);
+		spinnerK = spinner(config.quantizationK, 3, 200, 1);
+		cInvariant = combo(config.hashType.ordinal(), (Object[])ConfigLlah.HashType.values());
 
 		// disable by default to prevent accidental clicking and potential freezing
 		spinnerN.setEnabled(false);
@@ -59,34 +59,34 @@ public class LlahControlPanel extends StandardAlgConfigPanel {
 
 		add(createHorizontalPanel(
 				cEnable,
-				new JLabel("N"),Box.createRigidArea(new Dimension(s, 8)),spinnerN,
+				new JLabel("N"), Box.createRigidArea(new Dimension(s, 8)), spinnerN,
 				Box.createRigidArea(new Dimension(s, 8)),
-				new JLabel("M"),Box.createRigidArea(new Dimension(s, 8)),spinnerM,
+				new JLabel("M"), Box.createRigidArea(new Dimension(s, 8)), spinnerM,
 				Box.createRigidArea(new Dimension(s, 8)),
-				new JLabel("K"),Box.createRigidArea(new Dimension(s, 8)),spinnerK));
+				new JLabel("K"), Box.createRigidArea(new Dimension(s, 8)), spinnerK));
 //		addAlignCenter(cInvariant); TODO add this back in once it's understood why CROSS_RATIO causes a hard freeze
 	}
 
 	@Override
-	public void controlChanged(Object source) {
-		if( source == spinnerN ) {
+	public void controlChanged( Object source ) {
+		if (source == spinnerN) {
 			int v = (Integer)spinnerN.getValue();
-			if( v == config.numberOfNeighborsN ) return;
+			if (v == config.numberOfNeighborsN) return;
 			config.numberOfNeighborsN = v;
-		} else if( source == spinnerM ) {
+		} else if (source == spinnerM) {
 			int v = (Integer)spinnerM.getValue();
-			if( v == config.sizeOfCombinationM ) return;
+			if (v == config.sizeOfCombinationM) return;
 			config.sizeOfCombinationM = v;
-		} else if( source == spinnerK ) {
+		} else if (source == spinnerK) {
 			int v = (Integer)spinnerK.getValue();
-			if( v == config.quantizationK ) return;
+			if (v == config.quantizationK) return;
 			config.quantizationK = v;
-		} else if( source == cInvariant ) {
+		} else if (source == cInvariant) {
 			int ordinal = cInvariant.getSelectedIndex();
 			if (config.hashType.ordinal() == ordinal) return;
 			config.hashType = ConfigLlah.HashType.values()[ordinal];
-		} else if( source == cEnable ) {
-			if( cEnable.isSelected() ) {
+		} else if (source == cEnable) {
+			if (cEnable.isSelected()) {
 				JOptionPane.showMessageDialog(this, "You can easily freeze the app by changing these settings");
 			}
 			spinnerN.setEnabled(cEnable.isSelected());

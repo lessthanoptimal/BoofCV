@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,26 +38,26 @@ public class ControlPanelEdgeThreshold extends StandardAlgConfigPanel {
 
 	private final Listener listener;
 
-	public ControlPanelEdgeThreshold(ConfigEdgeThreshold config, Listener listener) {
+	public ControlPanelEdgeThreshold( ConfigEdgeThreshold config, Listener listener ) {
 		this.config = config;
 		this.listener = listener;
 
-		comboDerivative = combo(config.gradient.ordinal(), (Object[]) DerivativeType.values());
-		sThreshold = spinner(config.threshold,0,1000,1.0f);
-		cNonMax = checkbox("Non-Max",config.nonMax,"Apply gradient non-maximum suppression");
+		comboDerivative = combo(config.gradient.ordinal(), (Object[])DerivativeType.values());
+		sThreshold = spinner(config.threshold, 0, 1000, 1.0f);
+		cNonMax = checkbox("Non-Max", config.nonMax, "Apply gradient non-maximum suppression");
 
-		addLabeled(comboDerivative,"Derivative");
-		addLabeled(sThreshold,"Threshold");
+		addLabeled(comboDerivative, "Derivative");
+		addLabeled(sThreshold, "Threshold");
 		addAlignLeft(cNonMax);
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
-		if( source == comboDerivative ) {
+	public void controlChanged( final Object source ) {
+		if (source == comboDerivative) {
 			config.gradient = DerivativeType.values()[comboDerivative.getSelectedIndex()];
-		} else if( source == sThreshold ) {
+		} else if (source == sThreshold) {
 			config.threshold = ((Number)sThreshold.getValue()).floatValue();
-		} else if( source == cNonMax ) {
+		} else if (source == cNonMax) {
 			config.nonMax = cNonMax.isSelected();
 		}
 		listener.handleEdgeThreshold();

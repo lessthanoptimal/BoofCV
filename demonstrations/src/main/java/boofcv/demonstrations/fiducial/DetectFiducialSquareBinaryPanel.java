@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
-		implements ActionListener, ChangeListener
-{
+		implements ActionListener, ChangeListener {
 	ShapeGuiListener owner;
 
 	// selects which image to view
@@ -58,23 +57,23 @@ public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
 
 	ConfigFiducialBinary config = new ConfigFiducialBinary(1);
 
-	public DetectFiducialSquareBinaryPanel(ShapeGuiListener owner) {
+	public DetectFiducialSquareBinaryPanel( ShapeGuiListener owner ) {
 		this.owner = owner;
 
-		polygonPanel = new DetectBlackPolygonControlPanel(owner,config.squareDetector,null);
+		polygonPanel = new DetectBlackPolygonControlPanel(owner, config.squareDetector, null);
 		polygonPanel.removeControlNumberOfSides();
 
-		imageView = combo(0,"Input","Binary","Black");
-		selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,0.1);
-		showSquares = checkbox("Squares",bShowSquares);
-		showOrientation = checkbox("Orientation",bShowOrienation);
-		showContour = checkbox("Contour",bShowContour);
-		showLabels = checkbox("Labels",bShowlabels);
+		imageView = combo(0, "Input", "Binary", "Black");
+		selectZoom = spinner(1, MIN_ZOOM, MAX_ZOOM, 0.1);
+		showSquares = checkbox("Squares", bShowSquares);
+		showOrientation = checkbox("Orientation", bShowOrienation);
+		showContour = checkbox("Contour", bShowContour);
+		showLabels = checkbox("Labels", bShowlabels);
 
-		addLabeled(processingTimeLabel,"Time (ms)");
-		addLabeled(imageSizeLabel,"Size");
+		addLabeled(processingTimeLabel, "Time (ms)");
+		addLabeled(imageSizeLabel, "Size");
 		addLabeled(imageView, "View");
-		addLabeled(selectZoom,"Zoom");
+		addLabeled(selectZoom, "Zoom");
 		addAlignLeft(showOrientation);
 		addAlignLeft(showLabels);
 		addAlignLeft(showSquares);
@@ -84,29 +83,29 @@ public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == imageView) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
-		} else if( e.getSource() == showSquares ) {
+		} else if (e.getSource() == showSquares) {
 			bShowSquares = showSquares.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showOrientation) {
+		} else if (e.getSource() == showOrientation) {
 			bShowOrienation = showOrientation.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showContour ) {
+		} else if (e.getSource() == showContour) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showLabels ) {
+		} else if (e.getSource() == showLabels) {
 			bShowlabels = showLabels.isSelected();
 			owner.viewUpdated();
 		}
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == selectZoom) {
+			zoom = ((Number)selectZoom.getValue()).doubleValue();
 			owner.viewUpdated();
 			return;
 		}
