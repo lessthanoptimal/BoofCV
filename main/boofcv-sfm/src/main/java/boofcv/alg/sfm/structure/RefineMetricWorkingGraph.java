@@ -108,8 +108,9 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/**
 	 * Use the `graph` to define a 3D scene which can be optimized.
 	 *
-	 * @param db (Input) Information on each view
-	 * @param graph (Input) Description of the scene which is to be optimized
+	 * @param db (Input) Used to lookup common features between views.
+	 * @param graph (Input, Output) Describes scene and provides initial estimate for parameters. Updated with refined
+	 * parameters on output.
 	 */
 	public boolean process( LookupSimilarImages db, SceneWorkingGraph graph ) {
 		// Pre-declare and compute basic data structures

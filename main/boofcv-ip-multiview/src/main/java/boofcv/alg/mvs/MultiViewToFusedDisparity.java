@@ -39,12 +39,18 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.ops.ConvertMatrixData;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.PrintStream;
+import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
 
@@ -60,7 +66,10 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  *
  * @author Peter Abeles
  */
-public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> {
+public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implements VerbosePrint {
+
+	/** Provides access to intermediate stereo results */
+	private @Getter @Setter @Nullable Listener listener;
 
 	//------------ References to input objects
 	private SceneStructureMetric scene; // Camera placement and parameters
@@ -71,8 +80,9 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> {
 	/** Disparity parameters for fused disparity image */
 	final @Getter DisparityParameters fusedParam = new DisparityParameters();
 
-	// TODO Have only a single copy of the paired info. Add to fused image immediately after computing
+	// Storage for stereo disparity results
 	final StereoResults results = new StereoResults();
+	// Fuses multiple disparity images together provided they have the same "left" view
 	final FuseDisparityImages performFusion = new FuseDisparityImages();
 
 	// Computes disparity between each image pair
@@ -81,18 +91,25 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> {
 	// Storage for rectified stereo images
 	Image rectified1, rectified2;
 
-	// TODO comment this all up
+	// Used to compute rectification parameters for a stereo pair
 	final RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
+	// Storage for intrinsic parameters of original distorted images
 	final CameraPinholeBrown intrinsic1 = new CameraPinholeBrown();
 	final CameraPinholeBrown intrinsic2 = new CameraPinholeBrown();
+	// Intrinsic parameters of rectified images
 	final DMatrixRMaj K1 = new DMatrixRMaj(3, 3);
 	final DMatrixRMaj K2 = new DMatrixRMaj(3, 3);
 
+	// Specifies the relationships between reference frames
 	final Se3_F64 left_to_world = new Se3_F64();
 	final Se3_F64 left_to_left = new Se3_F64();
 	final Se3_F64 left_to_right = new Se3_F64();
+	// Rectification homographies describing how to warp pixels
 	final FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3);
 	final FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
+
+	// Where verbose stdout is printed to
+	@Nullable PrintStream verbose = null;
 
 	/**
 	 * Resets data structures and a describe of the scene and images to be processed
@@ -134,13 +151,21 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> {
 		// Compute disparity for all the images it has been paired with and add them to the fusion algorithm
 		performFusion.initialize(intrinsic1, dist_to_undist);
 		for (int i = 0; i < pairs.size; i++) {
+			if (verbose !=null) verbose.println("Computing stereo for view "+pairs.get(i));
 			computeDisparity(image1, pairs.get(i), results);
+			// allow access to the disparity before it's discarded
+			if (listener != null) listener.handlePairDisparity(targetID, pairs.get(i),
+					results.disparity, results.mask, results.param, results.rect);
 			performFusion.addDisparity(results.disparity, results.mask, results.param, results.rect);
 		}
 
+		if (verbose !=null) verbose.println("Created fused stereo disparity image");
+
 		// Fuse all of these into a single disparity image
-		if (!performFusion.process(fusedDisparity))
+		if (!performFusion.process(fusedDisparity)) {
+			if (verbose !=null) verbose.println("Failed to fuse together disparity images");
 			return false;
+		}
 
 		fusedParam.disparityMin = performFusion.getFusedDisparityMin();
 		fusedParam.disparityRange = performFusion.getFusedDisparityRange();
@@ -218,6 +243,10 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> {
 		PerspectiveOps.matrixToPinhole(info.rectifiedK, rectifiedShape.width, rectifiedShape.height, param.pinhole);
 	}
 
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = out;
+	}
+
 	/**
 	 * Results of disparity computation
 	 */
@@ -232,5 +261,13 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> {
 		final DMatrixRMaj rect = new DMatrixRMaj(3, 3);
 		// Rectified camera's intrinsic parameters
 		final DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
+	}
+
+	/**
+	 * Used to gain access to intermediate results
+	 */
+	public interface Listener {
+		void handlePairDisparity( int left, int right, GrayF32 disparity, GrayU8 mask,
+								  DisparityParameters parameters, DMatrixRMaj rect );
 	}
 }

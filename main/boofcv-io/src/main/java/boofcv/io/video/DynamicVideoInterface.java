@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class DynamicVideoInterface implements VideoInterface {
 			try {
 				if( jcodec != null ) {
 					SimpleImageSequence<T> sequence = jcodec.load(fileName,imageType);
-					System.err.println("WARNING: Using JCodec to read in movie files as a last resort. " +
+					System.err.println("WARNING: Using JCodec to read movie files as a last resort. " +
 							"Great that it works, but it's very slow. Might want to look at alternatives.");
 					return sequence;
 				}

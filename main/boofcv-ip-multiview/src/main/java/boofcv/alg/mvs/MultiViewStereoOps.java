@@ -37,8 +37,11 @@ import java.util.List;
  */
 public class MultiViewStereoOps {
 	/**
-	 * Masks out point in a disparity image which appear to be too similar to what's already in a point cloud. This
-	 * is done to avoid adding the same point twice
+	 * <p>Masks out point in a disparity image which appear to be too similar to what's already in a point cloud. This
+	 * is done to avoid adding the same point twice</p>
+	 *
+	 * <p>NOTE: The reason a transform is required to go from norm to pixel for stereo, which is normally a simple
+	 * equation, is that the disparity image might be a fused disparity image that includes lens distortion</p>
 	 *
 	 * @param cloud (Input) set of 3D points
 	 * @param disparity (Input) Disparity image.
@@ -65,8 +68,11 @@ public class MultiViewStereoOps {
 		// d = baseline*f/z
 		final double baselineFocal = parameters.baseline*parameters.pinhole.fx;
 
-		Point3D_F64 rectPt = new Point3D_F64();
+		// 3D coordinate of point in original camera reference frame
 		Point3D_F64 cameraPt = new Point3D_F64();
+		// 3D coordinate of point in rectified reference frame
+		Point3D_F64 rectPt = new Point3D_F64();
+		// Pixel coordinate in disparity image
 		Point2D_F64 pixel = new Point2D_F64();
 
 		for (int cloudIdx = 0; cloudIdx < cloud.size(); cloudIdx++) {

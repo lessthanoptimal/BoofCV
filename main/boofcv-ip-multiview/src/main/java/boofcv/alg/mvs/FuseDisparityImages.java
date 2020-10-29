@@ -33,7 +33,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
 
@@ -121,7 +121,8 @@ public class FuseDisparityImages {
 
 		// For each image, map valid pixels back into the original and add to that
 		for (int i = 0; i < images.size; i++) {
-			addToFusedImage(images.get(i));
+			if (!addToFusedImage(images.get(i)))
+				return false;
 		}
 
 		// Combine all the disparity information together robustly
@@ -153,7 +154,7 @@ public class FuseDisparityImages {
 		final float fusedFocalX = (float)fusedIntrinsic.fx;
 		final float fusedBaseline = (float)this.fusedBaseline;
 
-		ConvertDMatrixStruct.convert(image.rect, rect);
+		DConvertMatrixStruct.convert(image.rect, rect);
 
 		// fused image undistorted pixel coordinates
 		Point2D_F64 pixelUndist = new Point2D_F64();
