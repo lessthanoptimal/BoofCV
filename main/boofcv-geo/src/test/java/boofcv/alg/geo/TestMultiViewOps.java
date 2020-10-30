@@ -52,7 +52,7 @@ import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.equation.Equation;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.ejml.ops.MatrixFeatures_D;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
@@ -1100,7 +1100,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		eq.process("Q=H*diag([1 1 1 0])*H'");
 		DMatrixRMaj Q = eq.lookupDDRM("Q");
 		DMatrix4x4 Q_neg = new DMatrix4x4();
-		ConvertDMatrixStruct.convert(Q, Q_neg);
+		DConvertMatrixStruct.convert(Q, Q_neg);
 		CommonOps_DDF4.scale(-0.045, Q_neg); // negative and non-standard scale
 
 		MultiViewOps.enforceAbsoluteQuadraticConstraints(Q_neg, false, false);
@@ -1125,7 +1125,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		DMatrixRMaj Q = eq.lookupDDRM("Q");
 
 		DMatrix4x4 Q_in = new DMatrix4x4();
-		ConvertDMatrixStruct.convert(Q, Q_in);
+		DConvertMatrixStruct.convert(Q, Q_in);
 
 		assertTrue(MultiViewOps.enforceAbsoluteQuadraticConstraints(Q_in, true, true));
 
@@ -1151,7 +1151,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		eq.process("Q=H*diag([1 1 1 0])*H'");
 		DMatrixRMaj Q = eq.lookupDDRM("Q");
 		DMatrix4x4 Q_in = new DMatrix4x4();
-		ConvertDMatrixStruct.convert(Q, Q_in);
+		DConvertMatrixStruct.convert(Q, Q_in);
 		CommonOps_DDF4.scale(0.0394, Q_in);
 
 
@@ -1174,7 +1174,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		eq.process("Q=H*diag([1 1 1 0])*H'");
 		DMatrixRMaj Q = eq.lookupDDRM("Q");
 		DMatrix4x4 Q_in = new DMatrix4x4();
-		ConvertDMatrixStruct.convert(Q, Q_in);
+		DConvertMatrixStruct.convert(Q, Q_in);
 
 		DMatrixRMaj H = eq.lookupDDRM("H");
 		DMatrixRMaj foundH = new DMatrixRMaj(4, 4);

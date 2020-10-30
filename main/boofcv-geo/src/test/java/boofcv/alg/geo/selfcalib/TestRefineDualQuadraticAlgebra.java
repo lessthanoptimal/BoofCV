@@ -21,7 +21,7 @@ package boofcv.alg.geo.selfcalib;
 import boofcv.struct.calib.CameraPinhole;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix4x4;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -132,7 +132,7 @@ public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks 
 		addProjectives(alg);
 
 		DMatrix4x4 Q = new DMatrix4x4();
-		ConvertDMatrixStruct.convert(this.Q, Q);
+		DConvertMatrixStruct.convert(this.Q, Q);
 
 		double[] ratio = new double[expected.size()];
 		for (int i = 0; i < found.size(); i++) {

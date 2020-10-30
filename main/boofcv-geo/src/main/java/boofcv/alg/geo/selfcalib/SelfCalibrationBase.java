@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrix4x4;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 
 import java.util.List;
 
@@ -91,7 +91,7 @@ public class SelfCalibrationBase {
 	}
 
 	public void computeW( Projective P , DMatrix4x4 Q , DMatrixRMaj w_i) {
-		ConvertDMatrixStruct.convert(Q,_Q);
+		DConvertMatrixStruct.convert(Q,_Q);
 
 		convert(P, _P);
 		CommonOps_DDRM.mult(_P,_Q,tmp);

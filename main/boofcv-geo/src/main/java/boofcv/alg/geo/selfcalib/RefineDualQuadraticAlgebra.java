@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.equation.Equation;
 import org.ejml.interfaces.SolveNullSpace;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 
 import java.util.List;
 
@@ -110,7 +110,7 @@ public class RefineDualQuadraticAlgebra extends SelfCalibrationBase
 
 
 		// plane at infinity to the null space of Q
-		ConvertDMatrixStruct.convert(Q,_Q);
+		DConvertMatrixStruct.convert(Q,_Q);
 		nullspace.process(_Q,1,p);
 		CommonOps_DDRM.divide(p,p.get(3));
 		p.numRows=3;
@@ -161,7 +161,7 @@ public class RefineDualQuadraticAlgebra extends SelfCalibrationBase
 		eq.process("Q=[w , -w*p;-p'*w , p'*w*p]");
 		DMatrixRMaj _Q = eq.lookupDDRM("Q");
 		CommonOps_DDRM.divide(_Q, NormOps_DDRM.normF(_Q));
-		ConvertDMatrixStruct.convert(_Q,Q);
+		DConvertMatrixStruct.convert(_Q,Q);
 	}
 
 	void encode( List<CameraPinhole> calibration , DMatrixRMaj p , DGrowArray params) {

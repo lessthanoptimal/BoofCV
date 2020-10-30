@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DMatrixSparseTriplet;
 import org.ejml.data.IGrowArray;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.ejml.sparse.csc.CommonOps_DSCC;
 
 /**
@@ -42,8 +42,8 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 	public void process( double[] input, DMatrixSparseCSC left, DMatrixSparseCSC right ) {
 		internalProcess(input, leftTriplet, rightTriplet);
 
-		ConvertDMatrixStruct.convert(leftTriplet, left, work);
-		ConvertDMatrixStruct.convert(rightTriplet, right, work);
+		DConvertMatrixStruct.convert(leftTriplet, left, work);
+		DConvertMatrixStruct.convert(rightTriplet, right, work);
 
 		// There is no good way to do an element-wise add in these sparse data structures. What it does here is
 		// allow you to construct an invalid matrix with too many elements with the same coordinate. Then below

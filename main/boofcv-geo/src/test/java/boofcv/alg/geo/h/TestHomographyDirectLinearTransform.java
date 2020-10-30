@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -153,7 +153,7 @@ class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 
 	private List<AssociatedPairConic> createConicPairs(int N, DMatrixRMaj H) {
 		DMatrix3x3 Hinv = new DMatrix3x3();
-		CommonOps_DDF3.invert(ConvertDMatrixStruct.convert(H,(DMatrix3x3)null),Hinv);
+		CommonOps_DDF3.invert(DConvertMatrixStruct.convert(H,(DMatrix3x3)null),Hinv);
 		DMatrix3x3 C = new DMatrix3x3();
 
 		List<AssociatedPairConic> pairs = new ArrayList<>();
@@ -205,7 +205,7 @@ class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 		DMatrix3x3 Hinv = new DMatrix3x3();
 		DMatrix3x3 C = new DMatrix3x3();
 
-		ConvertDMatrixStruct.convert(H,H3);
+		DConvertMatrixStruct.convert(H,H3);
 		CommonOps_DDF3.invert(H3,Hinv);
 
 		AssociatedPairConic pair1 = new AssociatedPairConic();

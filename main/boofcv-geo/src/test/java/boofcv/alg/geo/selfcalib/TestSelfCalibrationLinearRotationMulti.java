@@ -32,7 +32,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -91,7 +91,7 @@ public class TestSelfCalibrationLinearRotationMulti
 
 			DMatrixRMaj H = MultiViewOps.createHomography(c2w.R,c2w.T,1.1,V,K);
 			Homography2D_F64 HH = new Homography2D_F64();
-			ConvertDMatrixStruct.convert(H,HH);
+			DConvertMatrixStruct.convert(H,HH);
 			viewsI_to_view0.add(HH);
 		}
 		return viewsI_to_view0;
@@ -377,7 +377,7 @@ public class TestSelfCalibrationLinearRotationMulti
 		DMatrixRMaj H = MultiViewOps.createHomography(v1_to_v0.R,v1_to_v0.T,1,new Vector3D_F64(0,0,1));
 		Homography2D_F64 H1 = new Homography2D_F64();
 		Homography2D_F64 H1_inv = new Homography2D_F64();
-		ConvertDMatrixStruct.convert(H,H1);
+		DConvertMatrixStruct.convert(H,H1);
 		CommonOps_DDF3.invert(H1,H1_inv);
 
 		Homography2D_F64 tmp = new Homography2D_F64();

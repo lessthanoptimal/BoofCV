@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -200,7 +200,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		} else {
 			saveInlierMatches(ransacH, matches, edge);
 			Homography2D_F64 H = ransacH.getModelParameters();
-			ConvertDMatrixStruct.convert(H, edge.F);
+			DConvertMatrixStruct.convert(H, edge.F);
 		}
 	}
 

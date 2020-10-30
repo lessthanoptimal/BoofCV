@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class HomographyInducedStereo2Line {
 		planeA.set( line0.l1.x , line0.l1.y , line0.l1.z , 0 );
 		planeB.set( Al0.x , Al0.y , Al0.z , a0 );
 
-		if( !Intersection3D_F64.intersect(planeA,planeB,intersect0) )
+		if( !Intersection3D_F64.intersection(planeA,planeB,intersect0) )
 			return false;
 		intersect0.slope.normalize(); // maybe this will reduce overflow problems?
 
@@ -129,7 +129,7 @@ public class HomographyInducedStereo2Line {
 		planeA.set( line1.l1.x , line1.l1.y , line1.l1.z , 0 );
 		planeB.set( Al1.x , Al1.y , Al1.z , a1 );
 
-		if( !Intersection3D_F64.intersect(planeA,planeB,intersect1) )
+		if( !Intersection3D_F64.intersection(planeA,planeB,intersect1) )
 			return false;
 
 		intersect1.slope.normalize();

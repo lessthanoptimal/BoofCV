@@ -97,7 +97,7 @@ public class BaseChecksPnP extends BoofStandardJUnit {
 			if( worldPointsZZero ) {
 				// find the world plane in the image
 				ray.slope.set(norm.x,norm.y,1);
-				Intersection3D_F64.intersect(plane3D,ray,cameraPt);
+				Intersection3D_F64.intersection(plane3D,ray,cameraPt);
 			} else {
 				cameraPt.z = rand.nextDouble() + nominalZ;
 				cameraPt.x = norm.x * cameraPt.z;

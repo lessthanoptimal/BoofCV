@@ -25,7 +25,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.equation.Equation;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.ejml.ops.MatrixFeatures_D;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +53,7 @@ class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 		DMatrixRMaj p = eq.process("p=-inv(w)*Q(0:2,3)").lookupDDRM("p");
 
 		DMatrix4x4 _Q = new DMatrix4x4();
-		ConvertDMatrixStruct.convert(Q,_Q);
+		DConvertMatrixStruct.convert(Q,_Q);
 
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		assertTrue(alg.decompose(_Q));
@@ -74,8 +74,8 @@ class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 
 
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
-		ConvertDMatrixStruct.convert(eq.lookupDDRM("k"),alg.getK());
-		ConvertDMatrixStruct.convert(eq.lookupDDRM("p"),alg.getP());
+		DConvertMatrixStruct.convert(eq.lookupDDRM("k"),alg.getK());
+		DConvertMatrixStruct.convert(eq.lookupDDRM("p"),alg.getP());
 
 		DMatrix4x4 found = new DMatrix4x4();
 		alg.recomputeQ(found);
@@ -100,7 +100,7 @@ class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 		DMatrixRMaj H = eq.lookupDDRM("H");
 
 		DMatrix4x4 _Q = new DMatrix4x4();
-		ConvertDMatrixStruct.convert(Q,_Q);
+		DConvertMatrixStruct.convert(Q,_Q);
 
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		assertTrue(alg.decompose(_Q));

@@ -26,7 +26,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.equation.Equation;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 			eq.alias(P,"P",p,"p");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 			Homography2D_F64 H = new Homography2D_F64();
-			ConvertDMatrixStruct.convert(eq.lookupDDRM("H"),H);
+			DConvertMatrixStruct.convert(eq.lookupDDRM("H"),H);
 			homographies.add(H);
 		}
 
@@ -108,7 +108,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 			eq.alias(P,"P",p,"p");
 			eq.process("H = P(:,0:2) - P(:,3)*p'");
 			Homography2D_F64 H = new Homography2D_F64();
-			ConvertDMatrixStruct.convert(eq.lookupDDRM("H"),H);
+			DConvertMatrixStruct.convert(eq.lookupDDRM("H"),H);
 			homographies.add(H);
 		}
 
@@ -145,7 +145,7 @@ public class TestSelfCalibrationLinearRotationSingle extends CommonAutoCalibrati
 //			eq.lookupDDRM("w2").print();
 
 			Homography2D_F64 H = new Homography2D_F64();
-			ConvertDMatrixStruct.convert(eq.lookupDDRM("H"),H);
+			DConvertMatrixStruct.convert(eq.lookupDDRM("H"),H);
 			homographies.add(H);
 //			H.print();
 		}

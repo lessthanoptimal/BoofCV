@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,10 @@ import boofcv.abst.filter.binary.BinaryContourHelper;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
-import boofcv.alg.distort.*;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.PixelTransformCached_F32;
+import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
@@ -47,7 +50,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -286,7 +289,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			}
 
 			// pass the found homography onto the image transform
-			ConvertDMatrixStruct.convert(H_refined,H_fixed);
+			DConvertMatrixStruct.convert(H_refined,H_fixed);
 			ConvertFloatType.convert(H_fixed, transformHomography.getModel());
 
 			// TODO Improve how perspective is removed

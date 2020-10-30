@@ -32,7 +32,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.equation.Equation;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
@@ -137,7 +137,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		DMatrixRMaj found = new DMatrixRMaj(3,3);
 		DMatrixRMaj R_v = eq.lookupDDRM("R_v");
 		DMatrix2x2 R22 = new DMatrix2x2();
-		ConvertDMatrixStruct.convert(eq.lookupDDRM("R22"),R22);
+		DConvertMatrixStruct.convert(eq.lookupDDRM("R22"),R22);
 		Vector3D_F64 ca = new Vector3D_F64(1.1,2.1,3.1);
 
 		PnPInfinitesimalPlanePoseEstimation.constructR(found,R_v,R22,-0.4,0.2,ca,1,new DMatrixRMaj(3,3));

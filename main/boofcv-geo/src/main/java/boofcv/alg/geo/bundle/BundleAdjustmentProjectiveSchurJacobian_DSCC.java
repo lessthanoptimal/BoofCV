@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixSparseCSC;
 import org.ejml.data.DMatrixSparseTriplet;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 
 /**
  * Computes the Jacobian for {@link BundleAdjustmentSchur_DSCC} using sparse matrices
@@ -40,8 +40,8 @@ public class BundleAdjustmentProjectiveSchurJacobian_DSCC
 	public void process( double[] input, DMatrixSparseCSC left, DMatrixSparseCSC right ) {
 		processInternal(input, leftTriplet, rightTriplet);
 
-		ConvertDMatrixStruct.convert(leftTriplet, left);
-		ConvertDMatrixStruct.convert(rightTriplet, right);
+		DConvertMatrixStruct.convert(leftTriplet, left);
+		DConvertMatrixStruct.convert(rightTriplet, right);
 	}
 
 	@Override

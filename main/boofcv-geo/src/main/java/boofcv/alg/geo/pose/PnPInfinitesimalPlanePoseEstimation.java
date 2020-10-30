@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF2;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.ops.ConvertDMatrixStruct;
+import org.ejml.ops.DConvertMatrixStruct;
 
 import java.util.List;
 
@@ -218,7 +218,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		Wty.reshape(3,1);
 
 		DMatrix3x3 Rtmp = new DMatrix3x3();
-		ConvertDMatrixStruct.convert(R,Rtmp);
+		DConvertMatrixStruct.convert(R,Rtmp);
 
 		int indexY = 0,indexW = 0;
 		for (int i = 0; i < N; i++) {
