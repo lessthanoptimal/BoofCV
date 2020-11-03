@@ -59,45 +59,43 @@ public class ConvertYuv420_888
 			return;
 		} else if( output.getImageType().getFamily() == ImageType.Family.PLANAR ) {
 			switch (colorOutput) {
-				case RGB:{
-					switch( output.getImageType().getDataType()) {
+				case RGB -> {
+					switch (output.getImageType().getDataType()) {
 						case U8:
-							yuvToPlanarRgbU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayU8>)output,workArrays);
+							yuvToPlanarRgbU8(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, (Planar<GrayU8>)output, workArrays);
 							return;
 						case F32:
-							yuvToPlanarRgbF32(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayF32>)output,workArrays);
+							yuvToPlanarRgbF32(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, (Planar<GrayF32>)output, workArrays);
 							return;
 					}
-				}break;
-
-				case YUV:{
-					switch( output.getImageType().getDataType()) {
+				}
+				case YUV -> {
+					switch (output.getImageType().getDataType()) {
 						case U8:
-							yuvToPlanarYuvU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayU8>)output,workArrays);
+							yuvToPlanarYuvU8(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, (Planar<GrayU8>)output, workArrays);
 							return;
 					}
-				}break;
+				}
 			}
 		} else if( output.getImageType().getFamily() == ImageType.Family.INTERLEAVED ) {
 			switch (colorOutput) {
-				case RGB:{
-					switch( output.getImageType().getDataType()) {
+				case RGB -> {
+					switch (output.getImageType().getDataType()) {
 						case U8:
-							yuvToInterleavedRgbU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV, (InterleavedU8) output, workArrays);
+							yuvToInterleavedRgbU8(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, (InterleavedU8)output, workArrays);
 							return;
 						case F32:
-							yuvToInterleavedRgbF32(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV, (InterleavedF32) output, workArrays);
+							yuvToInterleavedRgbF32(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, (InterleavedF32)output, workArrays);
 							return;
 					}
-				}break;
-
-				case YUV:{
-					switch( output.getImageType().getDataType()) {
+				}
+				case YUV -> {
+					switch (output.getImageType().getDataType()) {
 						case U8:
-							yuvToInterleavedYuvU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(InterleavedU8)output,workArrays);
+							yuvToInterleavedYuvU8(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, (InterleavedU8)output, workArrays);
 							return;
 					}
-				}break;
+				}
 			}
 		}
 		throw new RuntimeException("Not yet supported. format="+colorOutput+" out="+output.getImageType());
@@ -114,7 +112,7 @@ public class ConvertYuv420_888
 	 */
 	public static <T extends ImageGray<T>>
 	T yuvToGray(ByteBuffer bufferY , int width , int height, int strideRow , T output ,
-				GrowArray<GrowQueue_I8> workArrays, Class<T> outputType )
+				@Nullable GrowArray<GrowQueue_I8> workArrays, Class<T> outputType )
 	{
 		if( outputType == GrayU8.class ) {
 			return (T) yuvToGray(bufferY,width,height,strideRow,(GrayU8)output);
@@ -132,7 +130,7 @@ public class ConvertYuv420_888
 	 * @return Gray scale image
 	 */
 	public static GrayF32 yuvToGray( ByteBuffer bufferY , int width , int height, int strideRow, GrayF32 output,
-									 GrowArray<GrowQueue_I8> workArrays ) {
+									 @Nullable GrowArray<GrowQueue_I8> workArrays ) {
 		output = InputSanityCheck.checkDeclare(output, width, height, GrayF32.class);
 		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,11 @@ package boofcv.android;
 import android.graphics.ImageFormat;
 import android.media.Image;
 import boofcv.alg.color.ColorFormat;
-import boofcv.concurrency.BWorkArrays;
 import boofcv.core.encoding.ConvertYuv420_888;
 import boofcv.struct.image.ImageBase;
+import org.ddogleg.struct.GrowQueue_I8;
+import org.jetbrains.annotations.Nullable;
+import pabeles.concurrency.GrowArray;
 
 import java.nio.ByteBuffer;
 
@@ -31,11 +33,8 @@ import java.nio.ByteBuffer;
  * Converts the android {@link Image} into a boofcv format.
  */
 public class ConvertCameraImage {
-	public static byte[] declareWork( Image yuv, byte[] work ) {
-		return ConvertYuv420_888.declareWork(yuv.getPlanes()[0].getRowStride(), yuv.getPlanes()[1].getRowStride(), work);
-	}
-
-	public static void imageToBoof( Image yuv, ColorFormat colorOutput, ImageBase output, BWorkArrays work ) {
+	public static void imageToBoof( Image yuv, ColorFormat colorOutput, ImageBase output,
+									@Nullable GrowArray<GrowQueue_I8> workArrays) {
 		if (BOverrideConvertAndroid.invokeYuv420ToBoof(yuv, colorOutput, output))
 			return;
 
@@ -58,6 +57,6 @@ public class ConvertCameraImage {
 		ConvertYuv420_888.yuvToBoof(
 				bufferY, bufferU, bufferV,
 				width, height, strideY, strideUV, stridePixelUV,
-				colorOutput, output, work);
+				colorOutput, output, workArrays);
 	}
 }

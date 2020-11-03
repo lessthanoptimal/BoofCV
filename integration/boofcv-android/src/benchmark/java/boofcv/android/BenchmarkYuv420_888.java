@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,10 @@ package boofcv.android;
 import android.media.Image;
 import android.media.MockImage_420_888;
 import boofcv.alg.color.ColorFormat;
-import boofcv.concurrency.BWorkArrays;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.GrowQueue_I8;
 import org.openjdk.jmh.annotations.*;
+import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -52,14 +53,11 @@ public class BenchmarkYuv420_888 {
 	final InterleavedU8 interleavedU8 = new InterleavedU8(1, 1, 3);
 	final InterleavedF32 interleavedF32 = new InterleavedF32(1, 1, 3);
 
-	BWorkArrays work;
+	GrowArray<GrowQueue_I8> work = new GrowArray<>(GrowQueue_I8::new);
 
 	@Setup
 	public void setup() {
 //		BoofConcurrency.USE_CONCURRENT = concurrent;
-
-		work = new BWorkArrays();
-
 		image = new MockImage_420_888(new Random(234),size,size,2,2,0);
 
 		grayU8.reshape(size, size);
