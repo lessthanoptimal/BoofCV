@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -256,7 +256,7 @@ public class DetectCalibrationChessboardXCornerApp
 				FastQueue<ChessboardCorner> orig = detector.getDetector().getCorners();
 				foundCorners.reset();
 				for (int i = 0; i < orig.size; i++) {
-					foundCorners.grow().set( orig.get(i) );
+					foundCorners.grow().setTo( orig.get(i) );
 				}
 				if( success ) {
 					CalibrationObservation detected = detector.getDetectedPoints();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
-
 /**
  * A list that allows fast access to a queue of points that represents corners in an image.
  * All the points are predeclared and recycled.
@@ -31,31 +30,32 @@ import org.ddogleg.struct.FastQueue;
  */
 public class QueueCorner extends FastQueue<Point2D_I16> {
 
-	public QueueCorner(int max) {
-		super(max,Point2D_I16::new);
+	public QueueCorner( int max ) {
+		super(max, Point2D_I16::new);
 	}
 
 	public QueueCorner() {
-		super(10,Point2D_I16::new);
+		super(10, Point2D_I16::new);
 	}
 
-	public final void append(int x, int y) {
-		grow().set((short)x,(short)y);
+	public final void append( int x, int y ) {
+		grow().setTo((short)x, (short)y);
 	}
 
 	public final void append( Point2D_I16 pt ) {
-		grow().set(pt.x, pt.y);
+		grow().setTo(pt.x, pt.y);
 	}
 
 	/**
 	 * Adds a copy of each element in 'list' which is owned by 'this' queue
+	 *
 	 * @param list The list that is to added and copied
 	 */
-	public final void appendAll(FastAccess<Point2D_I16> list ) {
+	public final void appendAll( FastAccess<Point2D_I16> list ) {
 		int sizeBefore = size;
-		resize(sizeBefore+list.size);
+		resize(sizeBefore + list.size);
 		for (int i = 0; i < list.size; i++) {
-			get(sizeBefore+i).set(list.get(i));
+			get(sizeBefore + i).setTo(list.get(i));
 		}
 	}
 }

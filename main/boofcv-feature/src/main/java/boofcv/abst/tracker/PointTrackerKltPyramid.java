@@ -189,8 +189,8 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		tracker.setDescription(t);
 
 		PointTrackMod p = t.getCookie();
-		p.pixel.set(x, y);
-		p.prev.set(x, y);
+		p.pixel.setTo(x, y);
+		p.prev.setTo(x, y);
 
 		if (checkValidSpawn(p)) {
 			p.featureId = totalFeatures++;
@@ -227,7 +227,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		excludeList.resize(active.size());
 		for (int i = 0; i < active.size(); i++) {
 			PyramidKltFeature f = active.get(i);
-			excludeList.get(i).set((int)(f.x/scaleBottom), (int)(f.y/scaleBottom));
+			excludeList.get(i).setTo((int)(f.x/scaleBottom), (int)(f.y/scaleBottom));
 		}
 
 		// Don't want to detect features again which are already being tracked
@@ -260,13 +260,13 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 
 			// set up point description
 			PointTrackMod p = t.getCookie();
-			p.pixel.set(t.x, t.y);
+			p.pixel.setTo(t.x, t.y);
 
 			if (checkValidSpawn(p)) {
 				p.featureId = totalFeatures++;
 				p.spawnFrameID = frameID;
 				p.lastSeenFrameID = frameID;
-				p.prev.set(t.x, t.y);
+				p.prev.setTo(t.x, t.y);
 
 				// add to appropriate lists
 				active.add(t);
@@ -327,7 +327,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 				// discard a track if its center drifts outside the image.
 				if (image.isInBounds((int)t.x, (int)t.y) && tracker.setDescription(t)) {
 					PointTrack p = t.getCookie();
-					p.pixel.set(t.x, t.y);
+					p.pixel.setTo(t.x, t.y);
 					p.lastSeenFrameID = frameID;
 					success = true;
 				}
@@ -385,7 +385,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 				unused.add(t);
 			} else {
 				// the new previous will be the current location
-				p.prev.set(p.pixel);
+				p.prev.setTo(p.pixel);
 				// Revert the update by KLT
 				t.x = (float)p.pixel.x;
 				t.y = (float)p.pixel.y;

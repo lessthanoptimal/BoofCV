@@ -36,7 +36,7 @@ public class PointTransformAffine_F64 implements Point2Transform2Model_F64<Affin
 	protected final Affine2D_F64 model = new Affine2D_F64();
 
 	public PointTransformAffine_F64( Affine2D_F64 affine ) {
-		this.model.set(affine);
+		this.model.setTo(affine);
 	}
 
 	public PointTransformAffine_F64() {}
@@ -50,7 +50,7 @@ public class PointTransformAffine_F64 implements Point2Transform2Model_F64<Affin
 	}
 
 	@Override public void setModel( Affine2D_F64 model ) {
-		this.model.set(model);
+		this.model.setTo(model);
 	}
 
 	@Override public Affine2D_F64 newInstanceModel() {

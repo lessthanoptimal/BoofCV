@@ -51,8 +51,8 @@ public class TestTriangulate2ViewsReprojectionMetricError extends BoofStandardJU
 	public void setup() {
 		a_to_b.transform(Xa,Xb);
 
-		na.set( Xa.x/Xa.z, Xa.y/Xa.z );
-		nb.set( Xb.x/Xb.z, Xb.y/Xb.z );
+		na.setTo( Xa.x/Xa.z, Xa.y/Xa.z );
+		nb.setTo( Xb.x/Xb.z, Xb.y/Xb.z );
 	}
 
 	@Test

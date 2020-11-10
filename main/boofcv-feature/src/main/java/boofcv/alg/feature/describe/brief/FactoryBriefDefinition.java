@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,45 +40,44 @@ public class FactoryBriefDefinition {
 	 * @param numPairs Number of sample point pairs.
 	 * @return Definition of a BRIEF feature.
 	 */
-	public static BinaryCompareDefinition_I32 gaussian( Random rand, int radius , int numPairs ) {
-		BinaryCompareDefinition_I32 ret = new BinaryCompareDefinition_I32(radius,numPairs*2,numPairs);
+	public static BinaryCompareDefinition_I32 gaussian( Random rand, int radius, int numPairs ) {
+		BinaryCompareDefinition_I32 ret = new BinaryCompareDefinition_I32(radius, numPairs*2, numPairs);
 
-		double sigma = (2.0*radius+1.0)/5.0;
-		for( int i = 0; i < numPairs; i++ ) {
-			randomGaussian(rand,sigma,radius,ret.samplePoints[i]);
-			randomGaussian(rand,sigma,radius,ret.samplePoints[i+numPairs]);
+		double sigma = (2.0*radius + 1.0)/5.0;
+		for (int i = 0; i < numPairs; i++) {
+			randomGaussian(rand, sigma, radius, ret.samplePoints[i]);
+			randomGaussian(rand, sigma, radius, ret.samplePoints[i + numPairs]);
 
-			ret.compare[i].set(i,i+numPairs);
+			ret.compare[i].setTo(i, i + numPairs);
 		}
 
 		return ret;
 	}
 
-	public static BinaryCompareDefinition_I32 gaussian2( Random rand, int radius , int numPairs ) {
-		BinaryCompareDefinition_I32 ret = new BinaryCompareDefinition_I32(radius,numPairs,numPairs);
+	public static BinaryCompareDefinition_I32 gaussian2( Random rand, int radius, int numPairs ) {
+		BinaryCompareDefinition_I32 ret = new BinaryCompareDefinition_I32(radius, numPairs, numPairs);
 
-		double sigma = (2.0*radius+1.0)/5.0;
-		for( int i = 0; i < numPairs; i++ ) {
-			randomGaussian(rand,sigma,radius,ret.samplePoints[i]);
-			ret.compare[i].set(i,rand.nextInt(numPairs));
+		double sigma = (2.0*radius + 1.0)/5.0;
+		for (int i = 0; i < numPairs; i++) {
+			randomGaussian(rand, sigma, radius, ret.samplePoints[i]);
+			ret.compare[i].setTo(i, rand.nextInt(numPairs));
 		}
 
 		return ret;
 	}
-
 
 	/**
 	 * Randomly selects a point which is inside a square region using a Gaussian distribution.
 	 */
-	private static void randomGaussian( Random rand , double sigma , int radius , Point2D_I32 pt ) {
+	private static void randomGaussian( Random rand, double sigma, int radius, Point2D_I32 pt ) {
 
-		int x,y;
+		int x, y;
 
 		do {
-			x = (int) (rand.nextGaussian() * sigma);
-			y = (int) (rand.nextGaussian() * sigma);
-		} while (!(Math.sqrt(x * x + y * y) < radius));
+			x = (int)(rand.nextGaussian()*sigma);
+			y = (int)(rand.nextGaussian()*sigma);
+		} while (!(Math.sqrt(x*x + y*y) < radius));
 
-		pt.set(x,y);
+		pt.setTo(x, y);
 	}
 }

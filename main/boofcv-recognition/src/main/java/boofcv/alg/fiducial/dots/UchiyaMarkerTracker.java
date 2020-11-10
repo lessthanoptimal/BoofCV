@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,11 +55,10 @@ import java.util.List;
  * to the current image pixels. This homography is then used to recompute the predicted location of all features,
  * even ones which were not observed. The new track LLAH description is computed from these predicted landmarks.
  *
+ * @author Peter Abeles
  * @see boofcv.alg.feature.describe.llah.LlahOperations
  *
  * <p>[1] Uchiyama, Hideaki, and Hideo Saito. "Random dot markers." 2011 IEEE Virtual Reality Conference. IEEE, 2011.</p>
- *
- * @author Peter Abeles
  */
 public class UchiyaMarkerTracker {
 
@@ -101,9 +100,9 @@ public class UchiyaMarkerTracker {
 	// Estimate from a batch of observations
 	Estimate1ofEpipolar estimateHomography = FactoryMultiView.homographyTLS();
 	// Non-linear refinement with mixel errors
-	RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(0.01,50, EpipolarError.SAMPSON);
-	DMatrixRMaj foundH = new DMatrixRMaj(3,3);
-	DMatrixRMaj refinedH = new DMatrixRMaj(3,3);
+	RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(0.01, 50, EpipolarError.SAMPSON);
+	DMatrixRMaj foundH = new DMatrixRMaj(3, 3);
+	DMatrixRMaj refinedH = new DMatrixRMaj(3, 3);
 	// landmark -> dots
 	FastQueue<AssociatedPair> ransacPairs = new FastQueue<>(AssociatedPair::new);
 	List<AssociatedPair> inlierPairs = new ArrayList<>(); // for refinement
@@ -113,12 +112,12 @@ public class UchiyaMarkerTracker {
 	/**
 	 * Configures the tracker
 	 */
-	public UchiyaMarkerTracker(LlahOperations llahOps,
-							   Ransac<Homography2D_F64, AssociatedPair> ransac) {
+	public UchiyaMarkerTracker( LlahOperations llahOps,
+								Ransac<Homography2D_F64, AssociatedPair> ransac ) {
 		this.llahOps = llahOps;
 		this.ransac = ransac;
 
-		llahTrackingOps = new LlahOperations(llahOps.getNumberOfNeighborsN(),llahOps.getSizeOfCombinationM(),llahOps.getHasher());
+		llahTrackingOps = new LlahOperations(llahOps.getNumberOfNeighborsN(), llahOps.getSizeOfCombinationM(), llahOps.getHasher());
 	}
 
 	/**
@@ -133,9 +132,10 @@ public class UchiyaMarkerTracker {
 
 	/**
 	 * Detects and tracks dot patterns.
+	 *
 	 * @param detectedDots Input image. Not modified.
 	 */
-	public void process(List<Point2D_F64> detectedDots ) {
+	public void process( List<Point2D_F64> detectedDots ) {
 		// Reset the tracker
 		currentTracks.reset();
 		globalId_to_track.clear();
@@ -148,9 +148,9 @@ public class UchiyaMarkerTracker {
 		setTrackDescriptionsAndID();
 		double nano3 = System.nanoTime();
 
-		this.timeTrack  = (nano1-nano0)*1e-6;
-		this.timeDetect = (nano2-nano1)*1e-6;
-		this.timeUpdate = (nano3-nano2)*1e-6;
+		this.timeTrack = (nano1 - nano0)*1e-6;
+		this.timeDetect = (nano2 - nano1)*1e-6;
+		this.timeUpdate = (nano3 - nano2)*1e-6;
 	}
 
 	/**
@@ -161,18 +161,18 @@ public class UchiyaMarkerTracker {
 		llahTrackingOps.lookupDocuments(detectedDots, minLandmarkDoc, foundDocs);
 
 		// save the observations
-		for( int i = 0; i < foundDocs.size(); i++ ) {
+		for (int i = 0; i < foundDocs.size(); i++) {
 			LlahOperations.FoundDocument foundTrackDoc = foundDocs.get(i);
 			Track track = currentTracks.grow();
 			track.reset();
-			if( fitHomographAndPredict(detectedDots,foundTrackDoc,track) ) {
+			if (fitHomographAndPredict(detectedDots, foundTrackDoc, track)) {
 				// convert from track doc to dictionary doc ID
 				int globalID = trackId_to_globalId.get(foundTrackDoc.document.documentID);
 				track.globalDoc = llahOps.getDocuments().get(globalID);
-				globalId_to_track.put(globalID,track);
-				if( verbose != null ) verbose.println(" tracked doc "+globalID);
+				globalId_to_track.put(globalID, track);
+				if (verbose != null) verbose.println(" tracked doc " + globalID);
 			} else {
-				if( verbose != null ) verbose.println(" failed to fit homography while tracking");
+				if (verbose != null) verbose.println(" failed to fit homography while tracking");
 				currentTracks.removeTail();
 			}
 		}
@@ -186,17 +186,17 @@ public class UchiyaMarkerTracker {
 		llahOps.lookupDocuments(detectedDots, minLandmarkDoc, foundDocs);
 
 		// save the observations, but ignore previously detected markers
-		for( int i = 0; i < foundDocs.size(); i++ ) {
+		for (int i = 0; i < foundDocs.size(); i++) {
 			LlahOperations.FoundDocument foundDoc = foundDocs.get(i);
-			if( globalId_to_track.containsKey(foundDoc.document.documentID))
+			if (globalId_to_track.containsKey(foundDoc.document.documentID))
 				continue;
 
 			Track track = currentTracks.grow();
 			track.reset();
 			track.globalDoc = foundDoc.document;
-			if( fitHomographAndPredict(detectedDots,foundDoc,track) ) {
-				globalId_to_track.put(track.globalDoc.documentID,track);
-				if( verbose != null ) verbose.println(" detected doc "+track.globalDoc.documentID);
+			if (fitHomographAndPredict(detectedDots, foundDoc, track)) {
+				globalId_to_track.put(track.globalDoc.documentID, track);
+				if (verbose != null) verbose.println(" detected doc " + track.globalDoc.documentID);
 			} else {
 				currentTracks.removeTail();
 			}
@@ -210,29 +210,29 @@ public class UchiyaMarkerTracker {
 		// Compute new definitions for all tracks
 		llahTrackingOps.clearDocuments();
 		trackId_to_globalId.clear();
-		globalId_to_track.forEachEntry((globalID, track)-> {
+		globalId_to_track.forEachEntry(( globalID, track ) -> {
 			track.trackDoc = llahTrackingOps.createDocument(track.predicted.toList());
 			// copy global landmarks into track so that in the next iteration the homography will be correct
 			track.trackDoc.landmarks.reset();
-			track.trackDoc.landmarks.copyAll(track.globalDoc.landmarks.toList(),(src,dst)->dst.set(src));
-			trackId_to_globalId.put(track.trackDoc.documentID,globalID);
+			track.trackDoc.landmarks.copyAll(track.globalDoc.landmarks.toList(), ( src, dst ) -> dst.setTo(src));
+			trackId_to_globalId.put(track.trackDoc.documentID, globalID);
 			return true;
 		});
 	}
 
 	/**
 	 * Robustly fit a homography to the observations and then use that to predict where all the
-	 * corners should have appearred.
+	 * corners should have appeared.
+	 *
 	 * @param doc observed corners on document
 	 * @param track (Output) storage for results
 	 * @return true is successful
 	 */
 	private boolean fitHomographAndPredict( List<Point2D_F64> detectedDots,
 											LlahOperations.FoundDocument doc,
-											Track track )
-	{
+											Track track ) {
 		// Fit a homography to points
-		if( !fitHomography(detectedDots,doc) )
+		if (!fitHomography(detectedDots, doc))
 			return false;
 
 		// Create a list of used landmarks from the inlier set
@@ -242,24 +242,24 @@ public class UchiyaMarkerTracker {
 			int inputIdx = ransac.getInputIndex(i);
 			int dotIdx = ransacDotIdx.get(inputIdx);
 			int landmarkIdx = doc.landmarkToDots.indexOf(dotIdx);
-			track.observed.grow().set(detectedDots.get(dotIdx),landmarkIdx);
-			inlierPairs.add( ransacPairs.get(inputIdx) );
+			track.observed.grow().set(detectedDots.get(dotIdx), landmarkIdx);
+			inlierPairs.add(ransacPairs.get(inputIdx));
 		}
 
 		// Estimate using all the inliers by minimizing algebraic errors
-		estimateHomography.process(inlierPairs,foundH);
+		estimateHomography.process(inlierPairs, foundH);
 		// Non-linear refinement of reprojection error
-		refineHomography.fitModel(inlierPairs,foundH, refinedH);
+		refineHomography.fitModel(inlierPairs, foundH, refinedH);
 
 		// Use the homography to estimate where the landmarks would have appeared
-		UtilHomography_F64.convert(refinedH,track.doc_to_imagePixel);
+		UtilHomography_F64.convert(refinedH, track.doc_to_imagePixel);
 		track.predicted.resize(doc.document.landmarks.size);
 
 		// Predict where all the observations shuld be based on the homography
 		for (int landmarkIdx = 0; landmarkIdx < doc.document.landmarks.size; landmarkIdx++) {
 			Point2D_F64 predictedPixel = track.predicted.get(landmarkIdx);
 			HomographyPointOps_F64.transform(track.doc_to_imagePixel,
-					doc.document.landmarks.get(landmarkIdx),predictedPixel);
+					doc.document.landmarks.get(landmarkIdx), predictedPixel);
 		}
 
 		return true;
@@ -267,27 +267,28 @@ public class UchiyaMarkerTracker {
 
 	/**
 	 * Fits a homography from document coordinates to observed image pixels
+	 *
 	 * @param dots Dots seen in the image
 	 * @param observed The matched document
 	 * @return true if successful
 	 */
-	boolean fitHomography( List<Point2D_F64> dots , LlahOperations.FoundDocument observed ) {
+	boolean fitHomography( List<Point2D_F64> dots, LlahOperations.FoundDocument observed ) {
 		// create the ransac pairs
 		ransacPairs.reset();
 		ransacDotIdx.reset();
 		for (int landmarkIdx = 0; landmarkIdx < observed.document.landmarks.size; landmarkIdx++) {
 			final Point2D_F64 landmark = observed.document.landmarks.get(landmarkIdx);
 			int dotIdx = observed.landmarkToDots.get(landmarkIdx);
-			if( dotIdx < 0 )
+			if (dotIdx < 0)
 				continue;
 			ransacDotIdx.add(dotIdx);
-			ransacPairs.grow().set(landmark,dots.get(dotIdx));
+			ransacPairs.grow().setTo(landmark, dots.get(dotIdx));
 		}
-		if( ransacPairs.size < ransac.getMinimumSize() )
+		if (ransacPairs.size < ransac.getMinimumSize())
 			return false;
 
 		// Ransac needs to find an inlier set and the inlier set needs to be of sufficient size
-		if( ransac.process(ransacPairs.toList()) ) {
+		if (ransac.process(ransacPairs.toList())) {
 			return ransac.getMatchSet().size() >= minLandmarkDoc;
 		}
 		return false;
@@ -296,8 +297,7 @@ public class UchiyaMarkerTracker {
 	/**
 	 * Contains information on a marker that's being tracked
 	 */
-	public static class Track
-	{
+	public static class Track {
 		/** Reference to Tracking document */
 		public LlahDocument trackDoc;
 		/** Reference to the global document */
@@ -311,7 +311,7 @@ public class UchiyaMarkerTracker {
 
 		/** Resets to initial state */
 		public void reset() {
-			trackDoc  = null;
+			trackDoc = null;
 			globalDoc = null;
 			predicted.reset();
 			observed.reset();

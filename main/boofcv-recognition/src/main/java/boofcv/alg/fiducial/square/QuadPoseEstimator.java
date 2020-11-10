@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class QuadPoseEstimator {
 	// iterative refinement
 	private RefinePnP refine;
 
-	private Estimate1ofPnP epnp = FactoryMultiView.pnp_1(EnumPNP.EPNP,50,0);
+	private Estimate1ofPnP epnp = FactoryMultiView.pnp_1(EnumPNP.EPNP, 50, 0);
 
 	// transforms from distorted pixel observation normalized image coordinates
 	protected Point2Transform2_F64 pixelToNorm;
@@ -106,62 +106,64 @@ public class QuadPoseEstimator {
 	/**
 	 * Constructor which picks reasonable and generally good algorithms for pose estimation.
 	 *
-	 * @param refineTol  Convergence tolerance.  Try 1e-8
+	 * @param refineTol Convergence tolerance.  Try 1e-8
 	 * @param refineIterations Number of refinement iterations.  Try 200
 	 */
-	public QuadPoseEstimator( double refineTol , int refineIterations ) {
+	public QuadPoseEstimator( double refineTol, int refineIterations ) {
 		this(FactoryMultiView.pnp_N(EnumPNP.P3P_GRUNERT, -1),
-				FactoryMultiView.pnpRefine(refineTol,refineIterations));
+				FactoryMultiView.pnpRefine(refineTol, refineIterations));
 	}
 
 	/**
 	 * Constructor in which internal estimation algorithms are provided
 	 */
-	public QuadPoseEstimator(EstimateNofPnP p3p, RefinePnP refine) {
+	public QuadPoseEstimator( EstimateNofPnP p3p, RefinePnP refine ) {
 		this.p3p = p3p;
 		this.refine = refine;
 
 		for (int i = 0; i < 4; i++) {
-			points.add( new Point2D3D() );
+			points.add(new Point2D3D());
 		}
 	}
 
 	/**
 	 * Specifies the intrinsic parameters.
+	 *
 	 * @param distortion Intrinsic camera parameters
 	 */
-	public void setLensDistoriton(LensDistortionNarrowFOV distortion ) {
-		pixelToNorm = distortion.undistort_F64(true,false);
+	public void setLensDistoriton( LensDistortionNarrowFOV distortion ) {
+		pixelToNorm = distortion.undistort_F64(true, false);
 		normToPixel = distortion.distort_F64(false, true);
 	}
 
 	/**
 	 * Specify the location of points on the 2D fiducial.  These should be in "world coordinates"
 	 */
-	public void setFiducial( double x0 , double y0 , double x1 , double y1 ,
-							 double x2 , double y2 , double x3 , double y3 ) {
-		points.get(0).location.set(x0,y0,0);
-		points.get(1).location.set(x1,y1,0);
-		points.get(2).location.set(x2,y2,0);
-		points.get(3).location.set(x3,y3,0);
+	public void setFiducial( double x0, double y0, double x1, double y1,
+							 double x2, double y2, double x3, double y3 ) {
+		points.get(0).location.set(x0, y0, 0);
+		points.get(1).location.set(x1, y1, 0);
+		points.get(2).location.set(x2, y2, 0);
+		points.get(3).location.set(x3, y3, 0);
 	}
 
 	/**
 	 * Given the found solution, compute the the observed pixel would appear on the marker's surface.
 	 * pixel -> normalized pixel -> rotated -> projected on to plane
+	 *
 	 * @param pixelX (Input) pixel coordinate
 	 * @param pixelY (Input) pixel coordinate
 	 * @param marker (Output) location on the marker
 	 */
-	public void pixelToMarker( double pixelX , double pixelY , Point2D_F64 marker ) {
+	public void pixelToMarker( double pixelX, double pixelY, Point2D_F64 marker ) {
 
 		// find pointing vector in camera reference frame
-		pixelToNorm.compute(pixelX,pixelY,marker);
-		cameraP3.set(marker.x,marker.y,1);
+		pixelToNorm.compute(pixelX, pixelY, marker);
+		cameraP3.set(marker.x, marker.y, 1);
 
 		// rotate into marker reference frame
-		GeometryMath_F64.multTran(outputFiducialToCamera.R,cameraP3,ray.slope);
-		GeometryMath_F64.multTran(outputFiducialToCamera.R,outputFiducialToCamera.T,ray.p);
+		GeometryMath_F64.multTran(outputFiducialToCamera.R, cameraP3, ray.slope);
+		GeometryMath_F64.multTran(outputFiducialToCamera.R, outputFiducialToCamera.T, ray.p);
 		ray.p.scale(-1);
 
 		double t = -ray.p.z/ray.slope.z;
@@ -179,23 +181,23 @@ public class QuadPoseEstimator {
 	 * @param unitsPixels If true the specified corners are in  original image pixels or false for normalized image coordinates
 	 * @return true if successful or false if not
 	 */
-	public boolean process(Quadrilateral_F64 corners, boolean unitsPixels) {
+	public boolean process( Quadrilateral_F64 corners, boolean unitsPixels ) {
 
-		if( unitsPixels ) {
-			pixelCorners.set(corners);
+		if (unitsPixels) {
+			pixelCorners.setTo(corners);
 			pixelToNorm.compute(corners.a.x, corners.a.y, normCorners.a);
 			pixelToNorm.compute(corners.b.x, corners.b.y, normCorners.b);
 			pixelToNorm.compute(corners.c.x, corners.c.y, normCorners.c);
 			pixelToNorm.compute(corners.d.x, corners.d.y, normCorners.d);
 		} else {
-			normCorners.set(corners);
+			normCorners.setTo(corners);
 			normToPixel.compute(corners.a.x, corners.a.y, pixelCorners.a);
 			normToPixel.compute(corners.b.x, corners.b.y, pixelCorners.b);
 			normToPixel.compute(corners.c.x, corners.c.y, pixelCorners.c);
 			normToPixel.compute(corners.d.x, corners.d.y, pixelCorners.d);
 		}
 
-		if( estimate(pixelCorners, normCorners, outputFiducialToCamera) ) {
+		if (estimate(pixelCorners, normCorners, outputFiducialToCamera)) {
 			outputError = computeErrors(outputFiducialToCamera);
 			return true;
 		} else {
@@ -207,21 +209,21 @@ public class QuadPoseEstimator {
 	 * Given the observed corners of the quad in the image in pixels estimate and store the results
 	 * of its pose
 	 */
-	protected boolean estimate( Quadrilateral_F64 cornersPixels ,
-								Quadrilateral_F64 cornersNorm ,
+	protected boolean estimate( Quadrilateral_F64 cornersPixels,
+								Quadrilateral_F64 cornersNorm,
 								Se3_F64 foundFiducialToCamera ) {
 		// put it into a list to simplify algorithms
 		listObs.clear();
-		listObs.add( cornersPixels.a );
-		listObs.add( cornersPixels.b );
-		listObs.add( cornersPixels.c );
-		listObs.add( cornersPixels.d );
+		listObs.add(cornersPixels.a);
+		listObs.add(cornersPixels.b);
+		listObs.add(cornersPixels.c);
+		listObs.add(cornersPixels.d);
 
 		// convert observations into normalized image coordinates which P3P requires
-		points.get(0).observation.set(cornersNorm.a);
-		points.get(1).observation.set(cornersNorm.b);
-		points.get(2).observation.set(cornersNorm.c);
-		points.get(3).observation.set(cornersNorm.d);
+		points.get(0).observation.setTo(cornersNorm.a);
+		points.get(1).observation.setTo(cornersNorm.b);
+		points.get(2).observation.setTo(cornersNorm.c);
+		points.get(3).observation.setTo(cornersNorm.d);
 
 		// estimate pose using all permutations
 		bestError = Double.MAX_VALUE;
@@ -230,32 +232,32 @@ public class QuadPoseEstimator {
 		estimateP3P(2);
 		estimateP3P(3);
 
-		if( bestError == Double.MAX_VALUE )
+		if (bestError == Double.MAX_VALUE)
 			return false;
 
 		// refine the best estimate
 		inputP3P.clear();
-		for( int i = 0; i < 4; i++ ) {
-			inputP3P.add( points.get(i) );
+		for (int i = 0; i < 4; i++) {
+			inputP3P.add(points.get(i));
 		}
 
 		// got poor or horrible solution the first way, let's try it with EPNP
 		// and see if it does better
-		if( bestError > 2 ) {
+		if (bestError > 2) {
 			if (epnp.process(inputP3P, foundEPNP)) {
-				if( foundEPNP.T.z > 0 ) {
+				if (foundEPNP.T.z > 0) {
 					double error = computeErrors(foundEPNP);
 //					System.out.println("   error EPNP = "+error);
 					if (error < bestError) {
-						bestPose.set(foundEPNP);
+						bestPose.setTo(foundEPNP);
 					}
 				}
 			}
 		}
 
-		if( !refine.fitModel(inputP3P,bestPose,foundFiducialToCamera) ) {
+		if (!refine.fitModel(inputP3P, bestPose, foundFiducialToCamera)) {
 			// us the previous estimate instead
-			foundFiducialToCamera.set(bestPose);
+			foundFiducialToCamera.setTo(bestPose);
 			return true;
 		}
 
@@ -267,19 +269,19 @@ public class QuadPoseEstimator {
 	 *
 	 * @param excluded which corner to exclude and use to check the answers from the others
 	 */
-	protected void estimateP3P(int excluded) {
+	protected void estimateP3P( int excluded ) {
 
 		// the point used to check the solutions is the last one
 		inputP3P.clear();
-		for( int i = 0; i < 4; i++ ) {
-			if( i != excluded ) {
-				inputP3P.add( points.get(i) );
+		for (int i = 0; i < 4; i++) {
+			if (i != excluded) {
+				inputP3P.add(points.get(i));
 			}
 		}
 
 		// initial estimate for the pose
 		solutions.reset();
-		if( !p3p.process(inputP3P,solutions) ) {
+		if (!p3p.process(inputP3P, solutions)) {
 //			System.err.println("PIP Failed!?! That's weird");
 			return;
 		}
@@ -289,12 +291,11 @@ public class QuadPoseEstimator {
 			double error = computeErrors(solutions.get(i));
 
 			// see if it's better and it should save the results
-			if( error < bestError ) {
+			if (error < bestError) {
 				bestError = error;
-				bestPose.set(solutions.get(i));
+				bestPose.setTo(solutions.get(i));
 			}
 		}
-
 	}
 
 	/**
@@ -304,41 +305,42 @@ public class QuadPoseEstimator {
 
 		UtilPolygons2D_F64.center(corners, center);
 
-		extend(center,corners.a,scale);
-		extend(center,corners.b,scale);
-		extend(center,corners.c,scale);
-		extend(center,corners.d,scale);
+		extend(center, corners.a, scale);
+		extend(center, corners.b, scale);
+		extend(center, corners.c, scale);
+		extend(center, corners.d, scale);
 	}
 
-	protected void extend( Point2D_F64 pivot , Point2D_F64 corner , double scale ) {
-		corner.x = pivot.x + (corner.x-pivot.x)*scale;
-		corner.y = pivot.y + (corner.y-pivot.y)*scale;
+	protected void extend( Point2D_F64 pivot, Point2D_F64 corner, double scale ) {
+		corner.x = pivot.x + (corner.x - pivot.x)*scale;
+		corner.y = pivot.y + (corner.y - pivot.y)*scale;
 	}
 
 	/**
 	 * Compute the sum of reprojection errors for all four points
+	 *
 	 * @param fiducialToCamera Transform being evaluated
 	 * @return sum of Euclidean-squared errors
 	 */
-	protected double computeErrors(Se3_F64 fiducialToCamera ) {
-		if( fiducialToCamera.T.z < 0 ) {
+	protected double computeErrors( Se3_F64 fiducialToCamera ) {
+		if (fiducialToCamera.T.z < 0) {
 			// the low level algorithm should already filter this code, but just incase
 			return Double.MAX_VALUE;
 		}
 
 		double maxError = 0;
 
-		for( int i = 0; i < 4; i++ ) {
-			maxError = Math.max(maxError,computePixelError(fiducialToCamera, points.get(i).location, listObs.get(i)));
+		for (int i = 0; i < 4; i++) {
+			maxError = Math.max(maxError, computePixelError(fiducialToCamera, points.get(i).location, listObs.get(i)));
 		}
 
 		return maxError;
 	}
 
-	private double computePixelError( Se3_F64 fiducialToCamera , Point3D_F64 X , Point2D_F64 pixel ) {
-		SePointOps_F64.transform(fiducialToCamera,X,cameraP3);
+	private double computePixelError( Se3_F64 fiducialToCamera, Point3D_F64 X, Point2D_F64 pixel ) {
+		SePointOps_F64.transform(fiducialToCamera, X, cameraP3);
 
-		normToPixel.compute( cameraP3.x/cameraP3.z , cameraP3.y/cameraP3.z , predicted );
+		normToPixel.compute(cameraP3.x/cameraP3.z, cameraP3.y/cameraP3.z, predicted);
 
 		return predicted.distance(pixel);
 	}
@@ -358,7 +360,7 @@ public class QuadPoseEstimator {
 		List<Point2D3D> out = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			out.add( points.get(i).copy() );
+			out.add(points.get(i).copy());
 		}
 		return out;
 	}

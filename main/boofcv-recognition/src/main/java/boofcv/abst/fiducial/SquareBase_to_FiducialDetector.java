@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,16 +103,16 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Det
 
 	@Override
 	protected boolean estimatePose( int which, List<Point2D3D> points, Se3_F64 fiducialToCamera ) {
-		quad.a.set(points.get(0).observation);
-		quad.b.set(points.get(1).observation);
-		quad.c.set(points.get(2).observation);
-		quad.d.set(points.get(3).observation);
+		quad.a.setTo(points.get(0).observation);
+		quad.b.setTo(points.get(1).observation);
+		quad.c.setTo(points.get(2).observation);
+		quad.d.setTo(points.get(3).observation);
 
 		if (!poseEstimator.process(quad, false)) {
 			return false;
 		}
 
-		fiducialToCamera.set(poseEstimator.getWorldToCamera());
+		fiducialToCamera.setTo(poseEstimator.getWorldToCamera());
 		double width = getWidth(which);
 		fiducialToCamera.T.x *= width;
 		fiducialToCamera.T.y *= width;
@@ -163,10 +163,10 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Det
 	@Override
 	public List<PointIndex2D_F64> getDetectedControl( int which ) {
 		FoundFiducial found = getAlgorithm().getFound().get(which);
-		listQuad.get(0).set(found.distortedPixels.a);
-		listQuad.get(1).set(found.distortedPixels.b);
-		listQuad.get(2).set(found.distortedPixels.c);
-		listQuad.get(3).set(found.distortedPixels.d);
+		listQuad.get(0).setTo(found.distortedPixels.a);
+		listQuad.get(1).setTo(found.distortedPixels.b);
+		listQuad.get(2).setTo(found.distortedPixels.c);
+		listQuad.get(3).setTo(found.distortedPixels.d);
 
 		return listQuad;
 	}
@@ -184,10 +184,10 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Det
 			storage.vertexes.reset();
 
 		FoundFiducial found = getAlgorithm().getFound().get(which);
-		storage.vertexes.grow().set(found.distortedPixels.a);
-		storage.vertexes.grow().set(found.distortedPixels.b);
-		storage.vertexes.grow().set(found.distortedPixels.c);
-		storage.vertexes.grow().set(found.distortedPixels.d);
+		storage.vertexes.grow().setTo(found.distortedPixels.a);
+		storage.vertexes.grow().setTo(found.distortedPixels.b);
+		storage.vertexes.grow().setTo(found.distortedPixels.c);
+		storage.vertexes.grow().setTo(found.distortedPixels.d);
 
 		return storage;
 	}

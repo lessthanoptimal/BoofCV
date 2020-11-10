@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -154,7 +154,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 
 	@Override
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
-		pixel.set(active.get(index).pixel);
+		pixel.setTo(active.get(index).pixel);
 	}
 
 	@Override

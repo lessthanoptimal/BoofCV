@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -482,7 +482,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		}
 
 		boolean firstView = true;
-		worldX.set(X, Y, Z, W);
+		worldX.setTo(X, Y, Z, W);
 
 		// Recursively computed rotation R[i]*R[i-1] ... etc
 		CommonOps_DDRM.setIdentity(accumulatedR);
@@ -647,7 +647,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	protected void lookupWorldToView( SceneStructureMetric.View v, Se3_F64 world_to_view ) {
 		Se3_F64 parent_to_view = structure.getParentToView(v);
 		if (v.parent == null) {
-			world_to_view.set(parent_to_view);
+			world_to_view.setTo(parent_to_view);
 			return;
 		}
 		Se3_F64 saved_world_to_view = mapWorldToView.get(v);
@@ -662,7 +662,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 			Se3_F64 world_to_parent = mapWorldToView.get(v.parent);
 			world_to_parent.concat(parent_to_view, saved_world_to_view);
 		}
-		world_to_view.set(saved_world_to_view);
+		world_to_view.setTo(saved_world_to_view);
 	}
 
 	/**

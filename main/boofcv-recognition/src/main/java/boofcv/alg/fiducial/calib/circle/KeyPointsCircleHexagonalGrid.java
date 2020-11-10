@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.calib.circle;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilVector2D_F64;
-import georegression.geometry.algs.TangentLinesTwoEllipses_F64;
+import georegression.geometry.curves.TangentLinesTwoEllipses_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
@@ -52,18 +52,18 @@ public class KeyPointsCircleHexagonalGrid {
 	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64::new);
 
 	// used to compute tangent lines between two ellipses
-	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
+	private final TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
 
 	// storage for tangent points on ellipses
-	private Point2D_F64 A0 = new Point2D_F64(); private Point2D_F64 A1 = new Point2D_F64();
-	private Point2D_F64 A2 = new Point2D_F64(); private Point2D_F64 A3 = new Point2D_F64();
-	private Point2D_F64 B0 = new Point2D_F64(); private Point2D_F64 B1 = new Point2D_F64();
-	private Point2D_F64 B2 = new Point2D_F64(); private Point2D_F64 B3 = new Point2D_F64();
+	private final Point2D_F64 A0 = new Point2D_F64(); private final Point2D_F64 A1 = new Point2D_F64();
+	private final Point2D_F64 A2 = new Point2D_F64(); private final Point2D_F64 A3 = new Point2D_F64();
+	private final Point2D_F64 B0 = new Point2D_F64(); private final Point2D_F64 B1 = new Point2D_F64();
+	private final Point2D_F64 B2 = new Point2D_F64(); private final Point2D_F64 B3 = new Point2D_F64();
 
 	// local work space for center of intersections
-	private LineGeneral2D_F64 lineA = new LineGeneral2D_F64();
-	private LineGeneral2D_F64 lineB = new LineGeneral2D_F64();
-	private Point2D_F64 location = new Point2D_F64();
+	private final LineGeneral2D_F64 lineA = new LineGeneral2D_F64();
+	private final LineGeneral2D_F64 lineB = new LineGeneral2D_F64();
+	private final Point2D_F64 location = new Point2D_F64();
 
 	/**
 	 * Computes key points from the grid of ellipses
@@ -174,11 +174,11 @@ public class KeyPointsCircleHexagonalGrid {
 		Tangents tb = tangents.get(grid.getIndexOfHexEllipse(rowB,colB));
 
 		// add tangent points from the two lines which do not cross the center line
-		ta.grow().set(A0);
-		ta.grow().set(A3);
+		ta.grow().setTo(A0);
+		ta.grow().setTo(A3);
 
-		tb.grow().set(B0);
-		tb.grow().set(B3);
+		tb.grow().setTo(B0);
+		tb.grow().setTo(B3);
 		return true;
 	}
 
@@ -194,7 +194,7 @@ public class KeyPointsCircleHexagonalGrid {
 //			System.out.println("tangent id "+tangentIdx);
 			Tangents t = tangents.get(tangentIdx);
 			Point2D_F64 center = keypoints.grow();
-			center.set(0,0);
+			center.setTo(0,0);
 			double totalWeight = 0;
 
 			for (int i = 0; i < t.size(); i += 2) {

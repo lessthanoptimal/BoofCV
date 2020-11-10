@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-public class TestSfot_to_TrackObjectQuad extends TextureGrayTrackerObjectRectangleTests {
+public class TestSfot_to_TrackObjectQuad extends TextureGrayTrackerObjectRectangleChecks {
 
 	public TestSfot_to_TrackObjectQuad() {
 		usesHint = false;

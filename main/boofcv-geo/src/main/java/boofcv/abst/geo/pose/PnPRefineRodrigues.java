@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,7 +83,7 @@ public class PnPRefineRodrigues implements RefinePnP {
 				if( i == 0 ) {
 					// if it converted on the first iteration then that means it already
 					// meet convergence.  use input to avoid introduction of small numerical errors
-					refinedWorldToCamera.set(worldToCamera);
+					refinedWorldToCamera.setTo(worldToCamera);
 				}
 				break;
 			}

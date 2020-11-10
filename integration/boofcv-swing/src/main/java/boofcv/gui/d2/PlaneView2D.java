@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,25 +58,15 @@ public class PlaneView2D extends JPanel implements MouseMotionListener, MouseLis
 	}
 
 	public void reset() {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				points.reset();
-			}
-		});
+		SwingUtilities.invokeLater(() -> points.reset());
 	}
 
-	public void addPoint( final double x , final double y ) {
-		SwingUtilities.invokeLater( new Runnable() {
-			@Override
-			public void run() {
-				points.grow().set(x, y);
-			}
-		});
+	public void addPoint( final double x, final double y ) {
+		SwingUtilities.invokeLater(() -> points.grow().setTo(x, y));
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
 		Graphics2D g2 = (Graphics2D)g;
@@ -84,29 +74,29 @@ public class PlaneView2D extends JPanel implements MouseMotionListener, MouseLis
 		int offsetX = getWidth()/2;
 		int offsetY = getHeight()/2;
 
-		int H = getHeight()-1;
+		int H = getHeight() - 1;
 
 		int r = 2;
-		int w =2*r+1;
+		int w = 2*r + 1;
 
-		for( Point2D_F64 p : points.toList() ) {
-			SePointOps_F64.transform(transform,p,a);
+		for (Point2D_F64 p : points.toList()) {
+			SePointOps_F64.transform(transform, p, a);
 			a.x *= scale/pixelToUnit;
 			a.y *= scale/pixelToUnit;
 
-			g2.fillOval(offsetX+(int)a.x,H-(offsetY+(int)a.y),w,w);
+			g2.fillOval(offsetX + (int)a.x, H - (offsetY + (int)a.y), w, w);
 		}
 	}
 
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		double scale = BoofSwingUtil.mouseWheelImageZoom(this.scale,e);
-		if( scale == this.scale )
+	public void mouseWheelMoved( MouseWheelEvent e ) {
+		double scale = BoofSwingUtil.mouseWheelImageZoom(this.scale, e);
+		if (scale == this.scale)
 			return;
 
-		if( scale < 0.001 )
+		if (scale < 0.001)
 			scale = 0.001;
-		else if( scale > 1000 )
+		else if (scale > 1000)
 			scale = 1000;
 
 		this.scale = scale;
@@ -114,29 +104,26 @@ public class PlaneView2D extends JPanel implements MouseMotionListener, MouseLis
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked( MouseEvent e ) {
 		grabFocus();
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed( MouseEvent e ) {
 		prevX = e.getX();
 		prevY = e.getY();
 	}
 
-	@Override
-	public void mouseReleased(MouseEvent e) {}
+	@Override public void mouseReleased( MouseEvent e ) {}
+
+	@Override public void mouseEntered( MouseEvent e ) {}
+
+	@Override public void mouseExited( MouseEvent e ) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
-
-	@Override
-	public void mouseExited(MouseEvent e) {}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		final int deltaX = e.getX()-prevX;
-		final int deltaY = e.getY()-prevY;
+	public void mouseDragged( MouseEvent e ) {
+		final int deltaX = e.getX() - prevX;
+		final int deltaY = e.getY() - prevY;
 
 //		if( SwingUtilities.isRightMouseButton(e) ) {
 //			offsetZ -= deltaY*pixelToDistance;
@@ -154,42 +141,36 @@ public class PlaneView2D extends JPanel implements MouseMotionListener, MouseLis
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {}
+	public void mouseMoved( MouseEvent e ) {}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
-		if( e.getKeyChar() == 'w' ) {
+	public void keyTyped( KeyEvent e ) {
+		if (e.getKeyChar() == 'w') {
 			transform.T.y -= pixelToUnit/scale;
-		} else if( e.getKeyChar() == 's' ) {
+		} else if (e.getKeyChar() == 's') {
 			transform.T.y += pixelToUnit/scale;
-		} else if( e.getKeyChar() == 'a' ) {
+		} else if (e.getKeyChar() == 'a') {
 			transform.T.x += pixelToUnit/scale;
-		} else if( e.getKeyChar() == 'd' ) {
+		} else if (e.getKeyChar() == 'd') {
 			transform.T.x -= pixelToUnit/scale;
-		} else if( e.getKeyChar() == 'q' ) {
+		} else if (e.getKeyChar() == 'q') {
 			scale *= 1.05;
-		} else if( e.getKeyChar() == 'e' ) {
+		} else if (e.getKeyChar() == 'e') {
 			scale *= 0.95;
-		} else if( e.getKeyChar() == 'h' ) {
+		} else if (e.getKeyChar() == 'h') {
 			transform.reset();
 			scale = 1;
 		}
 
-		if( scale < 0.001 )
+		if (scale < 0.001)
 			scale = 0.001;
-		else if( scale > 1000 )
+		else if (scale > 1000)
 			scale = 1000;
 
 		repaint();
 	}
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	@Override public void keyPressed( KeyEvent e ) {}
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
+	@Override public void keyReleased( KeyEvent e ) { }
 }

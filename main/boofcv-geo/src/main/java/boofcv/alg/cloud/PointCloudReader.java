@@ -83,65 +83,49 @@ public interface PointCloudReader {
 
 	static PointCloudReader wrapF32( List<Point3D_F32> cloud ) {
 		return new PointCloudReader() {
-			@Override
-			public int size() {return cloud.size();}
+			@Override public int size() {return cloud.size();}
 
-			@Override
-			public void get( int index, Point3D_F32 point ) {point.set(cloud.get(index));}
+			@Override public void get( int index, Point3D_F32 point ) {point.setTo(cloud.get(index));}
 
-			@Override
-			public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
+			@Override public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
 
-			@Override
-			public int getRGB( int index ) {return 0;}
+			@Override public int getRGB( int index ) {return 0;}
 		};
 	}
 
 	static PointCloudReader wrapF64( List<Point3D_F64> cloud ) {
 		return new PointCloudReader() {
-			@Override
-			public int size() {return cloud.size();}
+			@Override public int size() {return cloud.size();}
 
-			@Override
-			public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
+			@Override public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
 
-			@Override
-			public void get( int index, Point3D_F64 point ) {point.set(cloud.get(index));}
+			@Override public void get( int index, Point3D_F64 point ) {point.setTo(cloud.get(index));}
 
-			@Override
-			public int getRGB( int index ) {return 0;}
+			@Override public int getRGB( int index ) {return 0;}
 		};
 	}
 
 	static PointCloudReader wrapF32RGB( List<Point3dRgbI_F32> cloud ) {
 		return new PointCloudReader() {
-			@Override
-			public int size() {return cloud.size();}
+			@Override public int size() {return cloud.size();}
 
-			@Override
-			public void get( int index, Point3D_F32 point ) {point.set(cloud.get(index));}
+			@Override public void get( int index, Point3D_F32 point ) {point.setTo(cloud.get(index));}
 
-			@Override
-			public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
+			@Override public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
 
-			@Override
-			public int getRGB( int index ) {return cloud.get(index).rgb;}
+			@Override public int getRGB( int index ) {return cloud.get(index).rgb;}
 		};
 	}
 
 	static PointCloudReader wrapF64RGB( List<Point3dRgbI_F64> cloud ) {
 		return new PointCloudReader() {
-			@Override
-			public int size() {return cloud.size();}
+			@Override public int size() {return cloud.size();}
 
-			@Override
-			public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
+			@Override public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
 
-			@Override
-			public void get( int index, Point3D_F64 point ) {point.set(cloud.get(index));}
+			@Override public void get( int index, Point3D_F64 point ) {point.setTo(cloud.get(index));}
 
-			@Override
-			public int getRGB( int index ) {return cloud.get(index).rgb;}
+			@Override public int getRGB( int index ) {return cloud.get(index).rgb;}
 		};
 	}
 }

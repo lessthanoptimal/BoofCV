@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
- *
  * <p>
  * Computes the homography induced by a plane from correspondences of a line and a point.  Works with both
  * calibrated and uncalibrated cameras.  The Fundamental/Essential matrix must be known.  The found homography will be
@@ -56,14 +55,14 @@ public class HomographyInducedStereoLinePt {
 	private Point3D_F64 e2 = new Point3D_F64();
 
 	// The found homography from view 1 to view 2
-	private DMatrixRMaj H = new DMatrixRMaj(3,3);
+	private DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
 
 	// storage for intermediate results
-	private DMatrixRMaj el = new DMatrixRMaj(3,3);
-	private DMatrixRMaj lf = new DMatrixRMaj(3,3);
+	private DMatrixRMaj el = new DMatrixRMaj(3, 3);
+	private DMatrixRMaj lf = new DMatrixRMaj(3, 3);
 
 	private Point3D_F64 Fx = new Point3D_F64();
 
@@ -76,31 +75,32 @@ public class HomographyInducedStereoLinePt {
 	 * @param F Fundamental matrix.
 	 * @param e2 Epipole for camera 2.  If null it will be computed internally.
 	 */
-	public void setFundamental( DMatrixRMaj F , Point3D_F64 e2 ) {
+	public void setFundamental( DMatrixRMaj F, Point3D_F64 e2 ) {
 		this.F = F;
-		if( e2 != null )
-			this.e2.set(e2);
+		if (e2 != null)
+			this.e2.setTo(e2);
 		else {
-			MultiViewOps.extractEpipoles(F,new Point3D_F64(),this.e2);
+			MultiViewOps.extractEpipoles(F, new Point3D_F64(), this.e2);
 		}
 	}
 
 	/**
 	 * Computes the homography based on a line and point on the plane
+	 *
 	 * @param line Line on the plane
 	 * @param point Point on the plane
 	 */
-	public void process(PairLineNorm line, AssociatedPair point) {
+	public void process( PairLineNorm line, AssociatedPair point ) {
 
 		// t0 = (F*x) cross l'
-		GeometryMath_F64.mult(F,point.p1,Fx);
-		GeometryMath_F64.cross(Fx,line.getL2(),t0);
+		GeometryMath_F64.mult(F, point.p1, Fx);
+		GeometryMath_F64.cross(Fx, line.getL2(), t0);
 		// t1 = x' cross ((f*x) cross l')
 		GeometryMath_F64.cross(point.p2, t0, t1);
 		// t0 = x' cross e'
-		GeometryMath_F64.cross(point.p2,e2,t0);
+		GeometryMath_F64.cross(point.p2, e2, t0);
 
-		double top = GeometryMath_F64.dot(t0,t1);
+		double top = GeometryMath_F64.dot(t0, t1);
 		double bottom = t0.normSq()*(line.l1.x*point.p1.x + line.l1.y*point.p1.y + line.l1.z);
 
 		// e' * l^T
@@ -108,7 +108,7 @@ public class HomographyInducedStereoLinePt {
 		// cross(l')*F
 		GeometryMath_F64.multCrossA(line.l2, F, lf);
 
-		CommonOps_DDRM.add(lf,top/bottom,el,H);
+		CommonOps_DDRM.add(lf, top/bottom, el, H);
 
 		// pick a good scale and sign for H
 		adjust.adjust(H, point);

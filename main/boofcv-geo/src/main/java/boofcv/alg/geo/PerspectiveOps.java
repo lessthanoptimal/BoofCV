@@ -541,7 +541,7 @@ public class PerspectiveOps {
 	public static Point2D_F64 renderPixel( CameraPinhole intrinsic, Point3D_F64 X, @Nullable Point2D_F64 pixel ) {
 		if (pixel == null)
 			pixel = new Point2D_F64();
-		pixel.set(X.x/X.z, X.y/X.z);
+		pixel.setTo(X.x/X.z, X.y/X.z);
 		return convertNormToPixel(intrinsic, pixel, pixel);
 	}
 

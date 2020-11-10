@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class DistortSupport {
 		float scaleY = (float)to.height/(float)from.height;
 
 		Affine2D_F32 affine = distort.getModel();
-		affine.set(scaleX, 0, 0, scaleY, 0, 0);
+		affine.setTo(scaleX, 0, 0, scaleY, 0, 0);
 
 		return distort;
 	}
@@ -69,7 +69,7 @@ public class DistortSupport {
 	public static PixelTransformAffine_F32 transformRotate( float x0, float y0, float x1, float y1, float angle ) {
 		Affine2D_F32 affine = rotateCenterAffine(x0, y0, x1, y1, angle);
 		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
-		distort.set(affine);
+		distort.setTo(affine);
 
 		return distort;
 	}

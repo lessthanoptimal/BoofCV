@@ -130,7 +130,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStand
 		protected FastQueue<Point2D_I16> createRandom(int i2) {
 			FastQueue<Point2D_I16> detected = new FastQueue<>(Point2D_I16::new);
 			for (int i = 0; i < i2; i++) {
-				detected.grow().set(rand.nextInt(width), rand.nextInt(height));
+				detected.grow().setTo(rand.nextInt(width), rand.nextInt(height));
 			}
 			return detected;
 		}

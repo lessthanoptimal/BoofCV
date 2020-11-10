@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ import georegression.struct.InvertibleTransform;
  * @author Peter Abeles
  */
 public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundMovingGaussian<T,Motion>
-{
+		extends BackgroundMovingGaussian<T, Motion> {
 
 	// interpolates the input image
 	protected InterpolatePixelMB<T> interpolateInput;
@@ -60,16 +59,15 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 	 *
 	 * @param learnRate Specifies how quickly the background is updated.  0 = static  1.0 = instant.  Try 0.05
 	 * @param threshold Threshold for background.  Consult a chi-square table for reasonably values.
-	 *                  10 to 16 for 1 to 3 bands.
+	 * 10 to 16 for 1 to 3 bands.
 	 * @param transform Used to apply motion model
 	 * @param interpType Type of interpolation.  BILINEAR recommended for accuracy. NEAREST_NEIGHBOR for speed. .
 	 * @param imageType Type of input image.
 	 */
-	public BackgroundMovingGaussian_IL(float learnRate, float threshold,
-									   Point2Transform2Model_F32<Motion> transform,
-									   InterpolationType interpType,
-									   ImageType<T> imageType)
-	{
+	public BackgroundMovingGaussian_IL( float learnRate, float threshold,
+										Point2Transform2Model_F32<Motion> transform,
+										InterpolationType interpType,
+										ImageType<T> imageType ) {
 		super(learnRate, threshold, transform, imageType);
 
 		int numBands = imageType.getNumBands();
@@ -77,7 +75,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 		this.interpolateInput = FactoryInterpolation.createPixelMB(0, 255,
 				InterpolationType.BILINEAR, BorderType.EXTENDED, imageType);
 
-		background = new InterleavedF32(1,1,2*numBands);
+		background = new InterleavedF32(1, 1, 2*numBands);
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, ImageType.il(numBands*2, InterleavedF32.class));
 		this.interpolationBG.setImage(background);
@@ -88,11 +86,11 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 	}
 
 	@Override
-	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
-		background.reshape(backgroundWidth,backgroundHeight);
+	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+		background.reshape(backgroundWidth, backgroundHeight);
 		GImageMiscOps.fill(background, -1);
 
-		this.homeToWorld.set(homeToWorld);
+		this.homeToWorld.setTo(homeToWorld);
 		this.homeToWorld.invert(worldToHome);
 
 		this.backgroundWidth = backgroundWidth;
@@ -105,7 +103,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 	}
 
 	@Override
-	protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
+	protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
@@ -115,26 +113,26 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 
 		for (int y = y0; y < y1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0*background.numBands;
-			for (int x = x0; x < x1; x++, indexBG += numBands*2 ) {
-				transform.compute(x,y,work);
+			for (int x = x0; x < x1; x++, indexBG += numBands*2) {
+				transform.compute(x, y, work);
 
-				if( work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
-					interpolateInput.get(work.x,work.y,pixelInput);
+				if (work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
+					interpolateInput.get(work.x, work.y, pixelInput);
 
 					for (int band = 0; band < numBands; band++) {
 						int indexBG_band = indexBG + band*2;
 
 						float inputValue = pixelInput[band];
-						float meanBG     = background.data[indexBG_band];
+						float meanBG = background.data[indexBG_band];
 						float varianceBG = background.data[indexBG_band + 1];
 
-						if( varianceBG < 0) {
-							background.data[indexBG_band]   = inputValue;
-							background.data[indexBG_band+1] = initialVariance;
+						if (varianceBG < 0) {
+							background.data[indexBG_band] = inputValue;
+							background.data[indexBG_band + 1] = initialVariance;
 						} else {
-							float diff = meanBG-inputValue;
-							background.data[indexBG_band]   = minusLearn*meanBG + learnRate*inputValue;
-							background.data[indexBG_band+1] = minusLearn*varianceBG + learnRate*diff*diff;
+							float diff = meanBG - inputValue;
+							background.data[indexBG_band] = minusLearn*meanBG + learnRate*inputValue;
+							background.data[indexBG_band + 1] = minusLearn*varianceBG + learnRate*diff*diff;
 						}
 					}
 				}
@@ -143,7 +141,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
+	protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
@@ -154,35 +152,36 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 			int indexFrame = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-			for (int x = 0; x < frame.width; x++, indexFrame += numBands , indexSegmented++ ) {
-				transform.compute(x,y,work);
+			for (int x = 0; x < frame.width; x++, indexFrame += numBands, indexSegmented++) {
+				transform.compute(x, y, work);
 
-				escapeIf:if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-					interpolationBG.get(work.x,work.y,pixelBG);
-					inputWrapper.getF(indexFrame,pixelInput);
+				escapeIf:
+				if (work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
+					interpolationBG.get(work.x, work.y, pixelBG);
+					inputWrapper.getF(indexFrame, pixelInput);
 
 					float mahalanobis = 0;
 
 					for (int band = 0; band < numBands; band++) {
 						float meanBG = pixelBG[band*2];
-						float varBG = pixelBG[band*2+1];
+						float varBG = pixelBG[band*2 + 1];
 
 						if (varBG < 0) {
 							segmented.data[indexSegmented] = unknownValue;
 							break escapeIf;
 						} else {
 							float diff = meanBG - pixelInput[band];
-							mahalanobis += diff * diff / varBG;
+							mahalanobis += diff*diff/varBG;
 						}
 					}
 
 					if (mahalanobis <= threshold) {
 						segmented.data[indexSegmented] = 0;
 					} else {
-						if( minimumDifference > 0 ) {
+						if (minimumDifference > 0) {
 							float sumAbsDiff = 0;
 							for (int band = 0; band < numBands; band++) {
-								sumAbsDiff += Math.abs(pixelBG[band * 2] - pixelInput[band]);
+								sumAbsDiff += Math.abs(pixelBG[band*2] - pixelInput[band]);
 							}
 							if (sumAbsDiff >= adjustedMinimumDifference) {
 								segmented.data[indexSegmented] = 1;

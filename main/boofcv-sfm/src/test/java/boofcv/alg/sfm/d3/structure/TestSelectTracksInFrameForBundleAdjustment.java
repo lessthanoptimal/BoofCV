@@ -67,7 +67,7 @@ class TestSelectTracksInFrameForBundleAdjustment extends BoofStandardJUnit {
 				int y = 10*((i*10)/width);
 				VisOdomBundleAdjustment.BObservation o = track.observations.grow();
 				o.frame = frame;
-				o.pixel.set(x, y);
+				o.pixel.setTo(x, y);
 			}
 		}
 		alg.selectTracks(scene, selected);
@@ -94,7 +94,7 @@ class TestSelectTracksInFrameForBundleAdjustment extends BoofStandardJUnit {
 			int y = 10*((i*10)/width);
 			// make sure it's false. should be already
 			track.selected = false;
-			track.findObservationBy(targetFrame).pixel.set(x, y);
+			track.findObservationBy(targetFrame).pixel.setTo(x, y);
 		}
 
 		// mark this one as active so that it isn't added to a cell. There should only be one empty cell

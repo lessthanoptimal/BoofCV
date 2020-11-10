@@ -369,7 +369,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 			frameIdGui = tracker.getFrameID();
 
 			for (int i = 0; i < active.size(); i++) {
-				tracksGui.grow().set(active.get(i));
+				tracksGui.grow().setTo(active.get(i));
 			}
 		}
 

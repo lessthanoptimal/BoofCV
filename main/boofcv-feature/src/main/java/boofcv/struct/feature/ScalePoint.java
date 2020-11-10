@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class ScalePoint {
 	public @Getter @Setter float intensity = Float.NaN;
 
 	public ScalePoint(double x, double y, double scale) {
-		this.pixel.set(x,y);
+		this.pixel.setTo(x,y);
 		this.scale = scale;
 	}
 
@@ -49,20 +49,20 @@ public class ScalePoint {
 	public ScalePoint() {}
 
 	public void setTo(double x, double y, double scale) {
-		this.pixel.set(x,y);
+		this.pixel.setTo(x,y);
 		this.scale = scale;
 		this.intensity = Float.NaN;
 	}
 
 	public void setTo(double x, double y, double scale, boolean white ) {
-		this.pixel.set(x,y);
+		this.pixel.setTo(x,y);
 		this.scale = scale;
 		this.white = white;
 		this.intensity = Float.NaN;
 	}
 
 	public void setTo(double x, double y, double scale, boolean white, float intensity ) {
-		this.pixel.set(x,y);
+		this.pixel.setTo(x,y);
 		this.scale = scale;
 		this.white = white;
 		this.intensity = intensity;
@@ -76,7 +76,7 @@ public class ScalePoint {
 
 	public void setTo(ScalePoint p) {
 		this.scale = p.scale;
-		this.pixel.set(p.pixel);
+		this.pixel.setTo(p.pixel);
 		this.white = p.white;
 		this.intensity = p.intensity;
 	}

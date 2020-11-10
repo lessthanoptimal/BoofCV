@@ -258,7 +258,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 				}
 
 				var track = tracker.getTracks().get(i);
-				d.dots.copyAll((List)track.observed.toList(), ( src, dst ) -> dst.set(src));
+				d.dots.copyAll((List)track.observed.toList(), ( src, dst ) -> dst.setTo(src));
 			}
 		}
 

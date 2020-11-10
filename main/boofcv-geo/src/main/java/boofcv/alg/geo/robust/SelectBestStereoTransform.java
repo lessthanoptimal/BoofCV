@@ -83,7 +83,7 @@ public class SelectBestStereoTransform {
 		if( bestModel == null )
 			throw new RuntimeException("BUG");
 
-		model.set(bestModel);
+		model.setTo(bestModel);
 	}
 
 }

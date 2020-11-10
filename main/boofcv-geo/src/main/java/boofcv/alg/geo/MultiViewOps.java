@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1795,8 +1795,8 @@ public class MultiViewOps {
 		for (int i = 0; i < src.size(); i++) {
 			AssociatedTriple a = src.get(i);
 			AssociatedPair b = dst.get(i);
-			b.p1.set(a.get(idx0));
-			b.p2.set(a.get(idx1));
+			b.p1.setTo(a.get(idx0));
+			b.p2.setTo(a.get(idx1));
 		}
 	}
 
@@ -1809,7 +1809,7 @@ public class MultiViewOps {
 
 		for (int i = 0; i < src.size(); i++) {
 			AssociatedTuple a = src.get(i);
-			dst.get(i).set(a.get(idx0), a.get(idx1));
+			dst.get(i).setTo(a.get(idx0), a.get(idx1));
 		}
 	}
 }

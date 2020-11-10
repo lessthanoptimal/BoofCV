@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,7 +203,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 				if( after > before ) {
 					info.edgeInside = edgeIntensity.getAverageInside();
 					info.edgeOutside = edgeIntensity.getAverageOutside();
-					info.polygon.set(work);
+					info.polygon.setTo(work);
 					success = true;
 					before = after;
 				}
@@ -225,7 +225,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 					if( after*1.5 > before ) {
 						info.edgeInside = edgeIntensity.getAverageInside();
 						info.edgeOutside = edgeIntensity.getAverageOutside();
-						info.polygon.set(work);
+						info.polygon.setTo(work);
 						success = true;
 					}
 				}

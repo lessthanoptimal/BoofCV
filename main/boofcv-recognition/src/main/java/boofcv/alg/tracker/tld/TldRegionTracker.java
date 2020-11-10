@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import java.lang.reflect.Array;
 public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// maximum allowed median forwards-backwards error in pixels squared
-	private double maxErrorFB;
+	private final double maxErrorFB;
 
 	// for the current image
 	private ImagePyramid<I> currentImage;
@@ -62,47 +62,47 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	private D[] previousDerivY;
 
 	// Derivative image type
-	private Class<D> derivType;
+	private final Class<D> derivType;
 
 	// computes the gradient in each layer
-	private ImageGradient<I, D> gradient;
+	private final ImageGradient<I, D> gradient;
 	// number of layers in the input image pyramid
 	private int numPyramidLayers;
 
 	// tracks features from frame-to-frame
-	private PyramidKltTracker<I, D> tracker;
+	private final PyramidKltTracker<I, D> tracker;
 
 	// Storage for feature tracks
-	private Track[] tracks;
+	private final Track[] tracks;
 
 	// List showing how each active feature moved
-	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+	private final FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
 	// storage for computing error statistics
-	private double[] errorsFB;
+	private final double[] errorsFB;
 
 	// size of grid that features are spawned in
-	private int gridWidth;
+	private final int gridWidth;
 	// size of features being tracked
-	private int featureRadius;
+	private final int featureRadius;
 
 	// tracking rectangle adjusted for the image's view rectangle
-	private Rectangle2D_F64 spawnRect = new Rectangle2D_F64();
+	private final Rectangle2D_F64 spawnRect = new Rectangle2D_F64();
 
 	/**
 	 * Configures tracker
 	 *
 	 * @param gridWidth Number of tracks spawned along a side in the grid.  Try 10
-	 * @param featureRadius  Radius of KLT features being tracked.  Try 5
+	 * @param featureRadius Radius of KLT features being tracked.  Try 5
 	 * @param maxErrorFB Maximum allowed forwards-backwards error
 	 * @param gradient Computes image gradient used by KLT tracker
 	 * @param tracker Feature tracker
 	 * @param imageType Type of input image
 	 * @param derivType Type of derivative image
 	 */
-	public TldRegionTracker(int gridWidth, int featureRadius, double maxErrorFB,
-							ImageGradient<I, D> gradient, PyramidKltTracker<I, D> tracker,
-							Class<I> imageType, Class<D> derivType) {
+	public TldRegionTracker( int gridWidth, int featureRadius, double maxErrorFB,
+							 ImageGradient<I, D> gradient, PyramidKltTracker<I, D> tracker,
+							 Class<I> imageType, Class<D> derivType ) {
 		this.gridWidth = gridWidth;
 		this.featureRadius = featureRadius;
 		this.maxErrorFB = maxErrorFB;
@@ -112,8 +112,8 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 		this.derivType = derivType;
 
-		tracks = new Track[ gridWidth*gridWidth ];
-		errorsFB = new double[ gridWidth*gridWidth ];
+		tracks = new Track[gridWidth*gridWidth];
+		errorsFB = new double[gridWidth*gridWidth];
 	}
 
 	/**
@@ -121,13 +121,13 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 *
 	 * @param image Most recent video image.
 	 */
-	public void initialize(PyramidDiscrete<I> image ) {
-		if( previousDerivX == null || previousDerivX.length != image.getNumLayers()
-				|| previousImage.getInputWidth() != image.getInputWidth() || previousImage.getInputHeight() != image.getInputHeight() ) {
+	public void initialize( PyramidDiscrete<I> image ) {
+		if (previousDerivX == null || previousDerivX.length != image.getNumLayers()
+				|| previousImage.getInputWidth() != image.getInputWidth() || previousImage.getInputHeight() != image.getInputHeight()) {
 			declareDataStructures(image);
 		}
 
-		for( int i = 0; i < image.getNumLayers(); i++ ) {
+		for (int i = 0; i < image.getNumLayers(); i++) {
 			gradient.process(image.getLayer(i), previousDerivX[i], previousDerivY[i]);
 		}
 
@@ -137,15 +137,15 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Declares internal data structures based on the input image pyramid
 	 */
-	protected void declareDataStructures(PyramidDiscrete<I> image) {
+	protected void declareDataStructures( PyramidDiscrete<I> image ) {
 		numPyramidLayers = image.getNumLayers();
 
-		previousDerivX = (D[])Array.newInstance(derivType,image.getNumLayers());
-		previousDerivY = (D[])Array.newInstance(derivType,image.getNumLayers());
-		currentDerivX = (D[])Array.newInstance(derivType,image.getNumLayers());
-		currentDerivY = (D[])Array.newInstance(derivType,image.getNumLayers());
+		previousDerivX = (D[])Array.newInstance(derivType, image.getNumLayers());
+		previousDerivY = (D[])Array.newInstance(derivType, image.getNumLayers());
+		currentDerivX = (D[])Array.newInstance(derivType, image.getNumLayers());
+		currentDerivY = (D[])Array.newInstance(derivType, image.getNumLayers());
 
-		for( int i = 0; i < image.getNumLayers(); i++ ) {
+		for (int i = 0; i < image.getNumLayers(); i++) {
 			int w = image.getWidth(i);
 			int h = image.getHeight(i);
 
@@ -159,9 +159,9 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		previousImage = FactoryPyramid.discreteGaussian(image.getConfigLayers(), -1, 1, false, ImageType.single(imageClass));
 		previousImage.initialize(image.getInputWidth(), image.getInputHeight());
 
-		for( int i = 0; i < tracks.length; i++ ) {
+		for (int i = 0; i < tracks.length; i++) {
 			Track t = new Track();
-			t.klt = new PyramidKltFeature(numPyramidLayers,featureRadius);
+			t.klt = new PyramidKltFeature(numPyramidLayers, featureRadius);
 			tracks[i] = t;
 		}
 	}
@@ -173,7 +173,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * @param targetRectangle Location of target in previous frame. Not modified.
 	 * @return true if tracking was successful or false if not
 	 */
-	public boolean process(ImagePyramid<I> image , Rectangle2D_F64 targetRectangle ) {
+	public boolean process( ImagePyramid<I> image, Rectangle2D_F64 targetRectangle ) {
 
 		boolean success = true;
 		updateCurrent(image);
@@ -182,7 +182,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		spawnGrid(targetRectangle);
 
 		// track features while computing forward/backward error and NCC error
-		if( !trackFeature() )
+		if (!trackFeature())
 			success = false;
 
 		// makes the current image into a previous image
@@ -194,9 +194,9 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Computes the gradient and changes the reference to the current pyramid
 	 */
-	protected void updateCurrent(ImagePyramid<I> image) {
+	protected void updateCurrent( ImagePyramid<I> image ) {
 		this.currentImage = image;
-		for( int i = 0; i < image.getNumLayers(); i++ ) {
+		for (int i = 0; i < image.getNumLayers(); i++) {
 			gradient.process(image.getLayer(i), currentDerivX[i], currentDerivY[i]);
 		}
 	}
@@ -225,18 +225,18 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		// tracks which are not dropped
 		int numTracksRemaining = 0;
 
-		for( int i = 0; i < tracks.length; i++ ) {
+		for (int i = 0; i < tracks.length; i++) {
 			Track t = tracks[i];
-			if( !t.active )
+			if (!t.active)
 				continue;
 
 			float prevX = t.klt.x;
 			float prevY = t.klt.y;
 
 			// track in forwards direction
-			tracker.setImage(currentImage,currentDerivX,currentDerivY);
+			tracker.setImage(currentImage, currentDerivX, currentDerivY);
 			KltTrackFault result = tracker.track(t.klt);
-			if( result != KltTrackFault.SUCCESS ) {
+			if (result != KltTrackFault.SUCCESS) {
 				t.active = false;
 				continue;
 			}
@@ -248,37 +248,37 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			tracker.setDescription(t.klt);
 			tracker.setImage(previousImage, previousDerivX, previousDerivY);
 			result = tracker.track(t.klt);
-			if( result != KltTrackFault.SUCCESS ) {
+			if (result != KltTrackFault.SUCCESS) {
 				t.active = false;
 				continue;
 			}
 
 			// compute forward-backwards error
-			double errorForwardBackwards = UtilPoint2D_F32.distanceSq(prevX,prevY,t.klt.x,t.klt.y);
+			double errorForwardBackwards = UtilPoint2D_F32.distanceSq(prevX, prevY, t.klt.x, t.klt.y);
 
 			// put into lists for computing the median error
 			errorsFB[numTracksFB++] = errorForwardBackwards;
 
 			// discard if error is too large
-			if( errorForwardBackwards > maxErrorFB ) {
+			if (errorForwardBackwards > maxErrorFB) {
 				t.active = false;
 				continue;
 			}
 
 			// create data structure used for group motion estimation
 			AssociatedPair p = pairs.grow();
-			p.p1.set( prevX, prevY );
-			p.p2.set( currX, currY );
+			p.p1.setTo(prevX, prevY);
+			p.p2.setTo(currX, currY);
 
 			numTracksRemaining++;
 		}
 
 		// if the forward-backwards error is too large, give up
-		double medianFB = QuickSelect.select(errorsFB,numTracksFB/2,numTracksFB);
+		double medianFB = QuickSelect.select(errorsFB, numTracksFB/2, numTracksFB);
 
 //		System.out.println("Median tracking error FB: "+medianFB);
 
-		if( medianFB > maxErrorFB || numTracksRemaining < 4 )
+		if (medianFB > maxErrorFB || numTracksRemaining < 4)
 			return false;
 
 		return true;
@@ -287,7 +287,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/**
 	 * Spawn KLT tracks at evenly spaced points inside a grid
 	 */
-	protected void spawnGrid(Rectangle2D_F64 prevRect ) {
+	protected void spawnGrid( Rectangle2D_F64 prevRect ) {
 		// Shrink the rectangle to ensure that all features are entirely contained inside
 		spawnRect.p0.x = prevRect.p0.x + featureRadius;
 		spawnRect.p0.y = prevRect.p0.y + featureRadius;
@@ -298,20 +298,20 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		double spawnHeight = spawnRect.getHeight();
 
 		// try spawning features at evenly spaced points inside the grid
-		tracker.setImage(previousImage,previousDerivX,previousDerivY);
+		tracker.setImage(previousImage, previousDerivX, previousDerivY);
 
-		for( int i = 0; i < gridWidth; i++ ) {
+		for (int i = 0; i < gridWidth; i++) {
 
-			float y = (float)(spawnRect.p0.y + i*spawnHeight/(gridWidth-1));
+			float y = (float)(spawnRect.p0.y + i*spawnHeight/(gridWidth - 1));
 
-			for( int j = 0; j < gridWidth; j++ ) {
-				float x = (float)(spawnRect.p0.x + j*spawnWidth/(gridWidth-1));
+			for (int j = 0; j < gridWidth; j++) {
+				float x = (float)(spawnRect.p0.x + j*spawnWidth/(gridWidth - 1));
 
-				Track t = tracks[i*gridWidth+j];
+				Track t = tracks[i*gridWidth + j];
 				t.klt.x = x;
 				t.klt.y = y;
 
-				if( tracker.setDescription(t.klt) ) {
+				if (tracker.setDescription(t.klt)) {
 					t.active = true;
 				} else {
 					t.active = false;

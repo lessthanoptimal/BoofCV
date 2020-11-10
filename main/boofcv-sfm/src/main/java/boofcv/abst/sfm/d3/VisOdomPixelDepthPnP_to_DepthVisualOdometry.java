@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 			return true;
 		} catch (RuntimeException ignore) {
 		}
-		world.set(((Point2D3D)active.get(index).getCookie()).getLocation());
+		world.setTo(((Point2D3D)active.get(index).getCookie()).getLocation());
 		return true;
 	}
 
@@ -98,7 +98,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 
 	@Override
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
-		pixel.set(active.get(index).pixel);
+		pixel.setTo(active.get(index).pixel);
 	}
 
 	@Override

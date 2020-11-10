@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,11 @@ import org.ddogleg.struct.FastQueue;
  *
  * @param <T> Input image type.
  * @param <D> Image derivative type.
- *
  * @author Peter Abeles
  */
 public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends EasyGeneralFeatureDetector<T,D>
-		implements InterestPointDetector<T>
-{
+		extends EasyGeneralFeatureDetector<T, D>
+		implements InterestPointDetector<T> {
 	int numSets;
 	double radius;
 
@@ -50,23 +48,23 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	// list of points it found
 	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<>(10, Point2D_F64::new);
 
-	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
-								  double radius,
-								  Class<T> imageType, Class<D> derivType) {
-		super(detector,imageType,derivType);
+	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector,
+								   double radius,
+								   Class<T> imageType, Class<D> derivType ) {
+		super(detector, imageType, derivType);
 		configure(detector, radius);
 	}
 
-	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
-								  ImageGradient<T, D> gradient,
-								  ImageHessian<D> hessian,
-								  double radius,
-								  Class<D> derivType) {
+	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector,
+								   ImageGradient<T, D> gradient,
+								   ImageHessian<D> hessian,
+								   double radius,
+								   Class<D> derivType ) {
 		super(detector, gradient, hessian, derivType);
 		configure(detector, radius);
 	}
 
-	private void configure(GeneralFeatureDetector<T, D> detector, double radius) {
+	private void configure( GeneralFeatureDetector<T, D> detector, double radius ) {
 		this.radius = radius;
 
 		// Maximums and minimums are each considered a different set
@@ -78,29 +76,29 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	}
 
 	@Override
-	public void detect(T input) {
-		super.detect(input,null);
+	public void detect( T input ) {
+		super.detect(input, null);
 
 		foundPoints.reset();
-		if( getDetector().isDetectMaximums() ) {
+		if (getDetector().isDetectMaximums()) {
 			QueueCorner corners = detector.getMaximums();
 
 			for (int i = 0; i < corners.size; i++) {
 				Point2D_I16 p = corners.get(i);
-				foundPoints.grow().set(p.x,p.y);
+				foundPoints.grow().setTo(p.x, p.y);
 			}
 		}
 
-		if( getDetector().isDetectMinimums() ) {
+		if (getDetector().isDetectMinimums()) {
 			QueueCorner corners = detector.getMinimums();
 
 			for (int i = 0; i < corners.size; i++) {
 				Point2D_I16 p = corners.get(i);
-				foundPoints.grow().set(p.x,p.y);
+				foundPoints.grow().setTo(p.x, p.y);
 			}
 		}
 
-		if( numSets == 2 ) {
+		if (numSets == 2) {
 			// If there are two sets the maximums will be set 0 and minimums set 1
 			indexOfSetSplit = detector.getMaximums().size;
 		} else {
@@ -108,48 +106,39 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 		}
 	}
 
-	@Override
-	public int getNumberOfSets() {
+	@Override public int getNumberOfSets() {
 		return numSets;
 	}
 
-	@Override
-	public int getSet(int index) {
+	@Override public int getSet( int index ) {
 		return index < indexOfSetSplit ? 0 : 1;
 	}
 
-	@Override
-	public int getNumberOfFeatures() {
+	@Override public int getNumberOfFeatures() {
 		return foundPoints.size();
 	}
 
-	@Override
-	public Point2D_F64 getLocation(int featureIndex) {
+	@Override public Point2D_F64 getLocation( int featureIndex ) {
 		return foundPoints.get(featureIndex);
 	}
 
-	@Override
-	public double getRadius(int featureIndex) {
+	@Override public double getRadius( int featureIndex ) {
 		return radius;
 	}
 
-	@Override
-	public double getOrientation(int featureIndex) {
+	@Override public double getOrientation( int featureIndex ) {
 		return 0;
 	}
 
-	@Override
-	public boolean hasScale() {
+	@Override public boolean hasScale() {
 		return false;
 	}
 
-	@Override
-	public boolean hasOrientation() {
+	@Override public boolean hasOrientation() {
 		return false;
 	}
 
-	@Override
-	public ImageType<T> getInputType() {
+	@Override public ImageType<T> getInputType() {
 		return ImageType.single(super.detector.getImageType());
 	}
 }

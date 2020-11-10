@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 
 	@Override
 	public void setModel(Vector3D_F64 translation) {
-		motion.getT().set(translation);
+		motion.getT().setTo(translation);
 	}
 
 	@Override

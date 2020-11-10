@@ -93,7 +93,7 @@ public abstract class CommonThreeViewHomogenous extends BoofStandardJUnit {
 			pixelsInView[2].add(x2.copy());
 
 			AssociatedTriple t = new AssociatedTriple();
-			t.set(x0,x1,x2);
+			t.setTo(x0,x1,x2);
 			triples.add(t);
 		}
 	}

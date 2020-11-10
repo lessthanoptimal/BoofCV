@@ -97,7 +97,7 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 		for (int i = 0; i < numAmbiguous; i++) {
 			ChessboardCorner c = input.get(rand.nextInt(N));
 			ChessboardCorner d = new ChessboardCorner();
-			d.set(c);
+			d.setTo(c);
 			d.x += rand.nextGaussian()*sideLength/30.0;
 			d.y += rand.nextGaussian()*sideLength/30.0;
 			input.add(d);

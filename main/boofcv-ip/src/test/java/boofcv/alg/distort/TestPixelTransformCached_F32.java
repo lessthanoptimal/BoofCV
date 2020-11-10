@@ -36,9 +36,9 @@ public class TestPixelTransformCached_F32 extends BoofStandardJUnit {
 	@Test
 	public void compareToOrig() {
 		PixelTransformAffine_F32 orig = new PixelTransformAffine_F32();
-		orig.set(new Affine2D_F32(1f,0.1f,0.05f,2f,5f,6f));
+		orig.setTo(new Affine2D_F32(1f, 0.1f, 0.05f, 2f, 5f, 6f));
 
-		PixelTransformCached_F32 alg = new PixelTransformCached_F32(width,height,orig);
+		PixelTransformCached_F32 alg = new PixelTransformCached_F32(width, height, orig);
 
 		Point2D_F32 expected = new Point2D_F32();
 		Point2D_F32 found = new Point2D_F32();
@@ -46,10 +46,10 @@ public class TestPixelTransformCached_F32 extends BoofStandardJUnit {
 		// it goes outside the border by one since some times the outside bound is used
 		for (int y = 0; y < height + 1; y++) {
 			for (int x = 0; x < width + 1; x++) {
-				alg.compute(x,y,found);
-				orig.compute(x,y,expected);
-				assertEquals(expected.x,found.x,1e-8);
-				assertEquals(expected.y,found.y,1e-8);
+				alg.compute(x, y, found);
+				orig.compute(x, y, expected);
+				assertEquals(expected.x, found.x, 1e-8);
+				assertEquals(expected.y, found.y, 1e-8);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,24 +97,24 @@ public class AssociatedPair3D {
 		}
 	}
 
-	public void set(AssociatedPair3D original ) {
-		this.p1.set(original.p1);
-		this.p2.set(original.p2);
+	public void setTo( AssociatedPair3D original ) {
+		this.p1.setTo(original.p1);
+		this.p2.setTo(original.p2);
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void set( Point3D_F64 p1 , Point3D_F64 p2 ) {
-		this.p1.set(p1);
-		this.p2.set(p2);
+	public void setTo( Point3D_F64 p1 , Point3D_F64 p2 ) {
+		this.p1.setTo(p1);
+		this.p2.setTo(p2);
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void set( double x1, double y1, double z1,
-					 double x2, double y2, double z2 ) {
+	public void setTo( double x1, double y1, double z1,
+					   double x2, double y2, double z2 ) {
 		this.p1.set(x1,y1,z1);
 		this.p2.set(x2,y2,z2);
 	}

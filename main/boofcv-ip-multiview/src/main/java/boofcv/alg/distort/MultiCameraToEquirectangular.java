@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,17 +48,18 @@ import java.util.List;
  */
 public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
-	private EquirectangularTools_F32 tools = new EquirectangularTools_F32();
-	private int equiWidth, equHeight;
+	private final EquirectangularTools_F32 tools = new EquirectangularTools_F32();
+	private final int equiWidth;
+	private final int equHeight;
 
 	List<Camera> cameras = new ArrayList<>();
 
-	private T averageImage;
-	private T workImage;
-	private T cameraRendered;
-	private GrayF32 weightImage;
+	private final T averageImage;
+	private final T workImage;
+	private final T cameraRendered;
+	private final GrayF32 weightImage;
 
-	private ImageDistort<T,T> distort;
+	private final ImageDistort<T, T> distort;
 
 	// how close two spherical coordinates need to be to be considered a match when doing back and forth validation
 	// in radians
@@ -66,14 +67,15 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 	/**
 	 * Configuration constructor
+	 *
 	 * @param distort Used to apply image distortion from different input images
 	 * @param equiWidth Width of output equirectangular image
 	 * @param equiHeight Height of output equirectangular image
 	 * @param imageType Type of image it processes and outputs.  Must be floating point.  Hmm why isn't this fixed?
 	 */
-	public MultiCameraToEquirectangular(ImageDistort<T,T> distort , int equiWidth , int equiHeight , ImageType<T> imageType ) {
+	public MultiCameraToEquirectangular( ImageDistort<T, T> distort, int equiWidth, int equiHeight, ImageType<T> imageType ) {
 
-		if( imageType.getDataType().isInteger() || imageType.getDataType().getNumBits() != 32 )
+		if (imageType.getDataType().isInteger() || imageType.getDataType().getNumBits() != 32)
 			throw new IllegalArgumentException("Must be a 32 bit floating point image");
 
 		this.distort = distort;
@@ -82,7 +84,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 		tools.configure(equiWidth, equiHeight);
 
-		weightImage = new GrayF32(equiWidth,equiHeight);
+		weightImage = new GrayF32(equiWidth, equiHeight);
 		averageImage = imageType.createImage(equiWidth, equiHeight);
 		workImage = averageImage.createSameShape();
 		cameraRendered = averageImage.createSameShape();
@@ -94,16 +96,16 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 * different then it is masked out.
 	 *
 	 * @param cameraToCommon Rigid body transform from this camera to the common frame the equirectangular image
-	 *                       is in
+	 * is in
 	 * @param factory Distortion model
 	 * @param width Input image width
 	 * @param height Input image height
 	 */
-	public void addCamera(Se3_F32 cameraToCommon , LensDistortionWideFOV factory , int width , int height ) {
+	public void addCamera( Se3_F32 cameraToCommon, LensDistortionWideFOV factory, int width, int height ) {
 		Point2Transform3_F32 p2s = factory.undistortPtoS_F32();
 		Point3Transform2_F32 s2p = factory.distortStoP_F32();
 
-		EquiToCamera equiToCamera = new EquiToCamera(cameraToCommon.getR(),s2p);
+		EquiToCamera equiToCamera = new EquiToCamera(cameraToCommon.getR(), s2p);
 
 		GrayF32 equiMask = new GrayF32(equiWidth, equHeight);
 
@@ -115,28 +117,28 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 		for (int row = 0; row < equHeight; row++) {
 			for (int col = 0; col < equiWidth; col++) {
-				equiToCamera.compute(col,row,p2);
+				equiToCamera.compute(col, row, p2);
 
-				int camX = (int)(p2.x+0.5f);
-				int camY = (int)(p2.y+0.5f);
+				int camX = (int)(p2.x + 0.5f);
+				int camY = (int)(p2.y + 0.5f);
 
-				if( Double.isNaN(p2.x) || Double.isNaN(p2.y) ||
-						camX < 0 || camY < 0 || camX >= width || camY >= height )
+				if (Double.isNaN(p2.x) || Double.isNaN(p2.y) ||
+						camX < 0 || camY < 0 || camX >= width || camY >= height)
 					continue;
 
-				p2s.compute(p2.x,p2.y,p3b);
+				p2s.compute(p2.x, p2.y, p3b);
 
-				if( Double.isNaN(p3b.x) || Double.isNaN(p3b.y) || Double.isNaN(p3b.z))
+				if (Double.isNaN(p3b.x) || Double.isNaN(p3b.y) || Double.isNaN(p3b.z))
 					continue;
 
-				double angle = UtilVector3D_F32.acute(equiToCamera.unitCam,p3b);
+				double angle = UtilVector3D_F32.acute(equiToCamera.unitCam, p3b);
 
-				if( angle < maskToleranceAngle) {
-					equiMask.set(col,row,1);
+				if (angle < maskToleranceAngle) {
+					equiMask.set(col, row, 1);
 				}
 			}
 		}
-		cameras.add( new Camera(equiMask, transformEquiToCam));
+		cameras.add(new Camera(equiMask, transformEquiToCam));
 	}
 
 	/**
@@ -145,16 +147,16 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 * different then it is masked out.
 	 *
 	 * @param cameraToCommon Rigid body transform from this camera to the common frame the equirectangular image
-	 *                       is in
+	 * is in
 	 * @param factory Distortion model
 	 * @param camMask Binary mask with invalid pixels marked as not zero.  Pixels are in camera image frame.
 	 */
-	public void addCamera(Se3_F32 cameraToCommon , LensDistortionWideFOV factory , GrayU8 camMask ) {
+	public void addCamera( Se3_F32 cameraToCommon, LensDistortionWideFOV factory, GrayU8 camMask ) {
 
 		Point2Transform3_F32 p2s = factory.undistortPtoS_F32();
 		Point3Transform2_F32 s2p = factory.distortStoP_F32();
 
-		EquiToCamera equiToCamera = new EquiToCamera(cameraToCommon.getR(),s2p);
+		EquiToCamera equiToCamera = new EquiToCamera(cameraToCommon.getR(), s2p);
 
 		GrayF32 equiMask = new GrayF32(equiWidth, equHeight);
 
@@ -168,37 +170,37 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 		Point2D_F32 p2 = new Point2D_F32();
 		for (int row = 0; row < equHeight; row++) {
 			for (int col = 0; col < equiWidth; col++) {
-				equiToCamera.compute(col,row,p2);
+				equiToCamera.compute(col, row, p2);
 
-				if( UtilEjml.isUncountable(p2.x) || UtilEjml.isUncountable(p2.y) ) {
+				if (UtilEjml.isUncountable(p2.x) || UtilEjml.isUncountable(p2.y)) {
 					// can't have it be an invalid number in the cache, but had to be invalid so that the mask
 					// could be set to zero.  So set it to some valid value that won't cause it to blow up
-					transformEquiToCam.getPixel(col,row).set(-1,-1);
+					transformEquiToCam.getPixel(col, row).setTo(-1, -1);
 					continue;
 				}
 
-				int camX = (int)(p2.x+0.5f);
-				int camY = (int)(p2.y+0.5f);
+				int camX = (int)(p2.x + 0.5f);
+				int camY = (int)(p2.y + 0.5f);
 
-				if( camX < 0 || camY < 0 || camX >= width || camY >= height )
+				if (camX < 0 || camY < 0 || camX >= width || camY >= height)
 					continue;
 
-				if( camMask.unsafe_get(camX,camY) == 1 ) {
-					p2s.compute(p2.x,p2.y,p3b);
+				if (camMask.unsafe_get(camX, camY) == 1) {
+					p2s.compute(p2.x, p2.y, p3b);
 
-					if( Double.isNaN(p3b.x) || Double.isNaN(p3b.y) || Double.isNaN(p3b.z))
+					if (Double.isNaN(p3b.x) || Double.isNaN(p3b.y) || Double.isNaN(p3b.z))
 						continue;
 
-					double angle = UtilVector3D_F32.acute(equiToCamera.unitCam,p3b);
+					double angle = UtilVector3D_F32.acute(equiToCamera.unitCam, p3b);
 
-					if( angle < maskToleranceAngle) {
-						equiMask.set(col,row,1);
+					if (angle < maskToleranceAngle) {
+						equiMask.set(col, row, 1);
 					}
 				}
 			}
 		}
 
-		cameras.add( new Camera(equiMask, transformEquiToCam));
+		cameras.add(new Camera(equiMask, transformEquiToCam));
 	}
 
 	/**
@@ -208,41 +210,41 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 * @param cameraImages List of camera images
 	 */
 	public void render( List<T> cameraImages ) {
-		if( cameraImages.size() != cameras.size())
+		if (cameraImages.size() != cameras.size())
 			throw new IllegalArgumentException("Input camera image count doesn't equal the expected number");
 
 		// avoid divide by zero errors by initializing it to a small non-zero value
-		GImageMiscOps.fill(weightImage,1e-4);
-		GImageMiscOps.fill(averageImage,0);
+		GImageMiscOps.fill(weightImage, 1e-4);
+		GImageMiscOps.fill(averageImage, 0);
 
 		for (int i = 0; i < cameras.size(); i++) {
 			Camera c = cameras.get(i);
 			T cameraImage = cameraImages.get(i);
 
 			distort.setModel(c.equiToCamera);
-			distort.apply(cameraImage,cameraRendered);
+			distort.apply(cameraImage, cameraRendered);
 
 			/// sum up the total weight for each pixel
-			PixelMath.add(weightImage,c.mask,weightImage);
+			PixelMath.add(weightImage, c.mask, weightImage);
 
 			// apply the weight for this image to the rendered image
-			GPixelMath.multiply(c.mask,cameraRendered,workImage);
+			GPixelMath.multiply(c.mask, cameraRendered, workImage);
 
 			// add the result to the average image
 			GPixelMath.add(workImage, averageImage, averageImage);
 		}
 
 		// comput the final output by dividing
-		GPixelMath.divide(averageImage,weightImage,averageImage);
+		GPixelMath.divide(averageImage, weightImage, averageImage);
 	}
 
 	public T getRenderedImage() {
 		return averageImage;
 	}
 
-
 	/**
 	 * Returns the mask for a specific camera
+	 *
 	 * @param which index of the camera
 	 * @return Mask image.  pixel values from 0 to 1
 	 */
@@ -259,7 +261,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 	 *
 	 * @param maskToleranceAngle tolerance in radians
 	 */
-	public void setMaskToleranceAngle(float maskToleranceAngle) {
+	public void setMaskToleranceAngle( float maskToleranceAngle ) {
 		this.maskToleranceAngle = maskToleranceAngle;
 	}
 
@@ -269,7 +271,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 		PixelTransform<Point2D_F32> equiToCamera;
 
-		public Camera(GrayF32 mask, PixelTransform<Point2D_F32> equiToCamera) {
+		public Camera( GrayF32 mask, PixelTransform<Point2D_F32> equiToCamera ) {
 			this.mask = mask;
 			this.equiToCamera = equiToCamera;
 		}
@@ -286,25 +288,24 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 		Point3D_F32 unitCam = new Point3D_F32();
 		Point3D_F32 unitCommon = new Point3D_F32();
 
-		EquiToCamera(FMatrixRMaj cameraToCommon, Point3Transform2_F32 s2p) {
+		EquiToCamera( FMatrixRMaj cameraToCommon, Point3Transform2_F32 s2p ) {
 			this.cameraToCommon = cameraToCommon;
 			this.s2p = s2p;
 		}
 
 		@Override
-		public void compute(float x, float y, Point2D_F32 out) {
+		public void compute( float x, float y, Point2D_F32 out ) {
 			// go from equirectangular pixel to unit sphere in common frame
-			tools.equiToNormFV(x,y, unitCommon);
+			tools.equiToNormFV(x, y, unitCommon);
 
 			// rotate the point into camera frame
 			GeometryMath_F32.multTran(cameraToCommon, unitCommon, unitCam);
 
 			// input camera image pixels
-			s2p.compute(unitCam.x, unitCam.y, unitCam.z , out);
+			s2p.compute(unitCam.x, unitCam.y, unitCam.z, out);
 		}
 
-		@Override
-		public EquiToCamera copyConcurrent() {
+		@Override public EquiToCamera copyConcurrent() {
 			throw new RuntimeException("Implement");
 		}
 	}

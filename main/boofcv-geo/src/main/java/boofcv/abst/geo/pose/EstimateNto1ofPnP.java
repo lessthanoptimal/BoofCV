@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,15 +31,14 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class EstimateNto1ofPnP extends GeoModelEstimatorNto1<Se3_F64,Point2D3D>
-		implements Estimate1ofPnP
-{
-	public EstimateNto1ofPnP(GeoModelEstimatorN<Se3_F64, Point2D3D> alg, FastQueue<Se3_F64> solutions, int numTest) {
+public class EstimateNto1ofPnP extends GeoModelEstimatorNto1<Se3_F64, Point2D3D>
+		implements Estimate1ofPnP {
+	public EstimateNto1ofPnP( GeoModelEstimatorN<Se3_F64, Point2D3D> alg, FastQueue<Se3_F64> solutions, int numTest ) {
 		super(alg, new PnPDistanceReprojectionSq(), solutions, numTest);
 	}
 
 	@Override
-	protected void copy(Se3_F64 src, Se3_F64 dst) {
-		dst.set(src);
+	protected void copy( Se3_F64 src, Se3_F64 dst ) {
+		dst.setTo(src);
 	}
 }

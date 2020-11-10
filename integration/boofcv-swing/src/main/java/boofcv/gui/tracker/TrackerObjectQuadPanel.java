@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class TrackerObjectQuadPanel extends ImagePanel implements MouseListener,
 
 	public synchronized void setTarget( Quadrilateral_F64 quad , boolean visible ) {
 		if( quad != null )
-			this.quad.set(quad);
+			this.quad.setTo(quad);
 		mode = Mode.TRACKING;
 		targetVisible = visible;
 		repaint();
@@ -152,13 +152,13 @@ public class TrackerObjectQuadPanel extends ImagePanel implements MouseListener,
 		}
 
 		if( numSelected == 0 ) {
-			quad.a.set(e.getX()/scale,e.getY()/scale);
+			quad.a.setTo(e.getX()/scale,e.getY()/scale);
 		} else if( numSelected == 1 ) {
-			quad.b.set(e.getX()/scale,e.getY()/scale);
+			quad.b.setTo(e.getX()/scale,e.getY()/scale);
 		} else if( numSelected == 2 ) {
-			quad.c.set(e.getX()/scale,e.getY()/scale);
+			quad.c.setTo(e.getX()/scale,e.getY()/scale);
 		} else if( numSelected == 3 ) {
-			quad.d.set(e.getX()/scale,e.getY()/scale);
+			quad.d.setTo(e.getX()/scale,e.getY()/scale);
 		}
 		numSelected++;
 		repaint();
@@ -174,7 +174,7 @@ public class TrackerObjectQuadPanel extends ImagePanel implements MouseListener,
 		if( mode == Mode.PLACING_POINTS )
 			return;
 		mode = Mode.DRAGGING_RECT;
-		quad.a.set(e.getX()/scale,e.getY()/scale);
+		quad.a.setTo(e.getX()/scale,e.getY()/scale);
 		setCornerC(e.getX(),e.getY());
 
 		listener.pauseTracker();
@@ -185,9 +185,9 @@ public class TrackerObjectQuadPanel extends ImagePanel implements MouseListener,
 		x /= scale;
 		y /= scale;
 
-		quad.b.set(quad.a.x,y);
-		quad.c.set(x,y);
-		quad.d.set(x,quad.a.y);
+		quad.b.setTo(quad.a.x,y);
+		quad.c.setTo(x,y);
+		quad.d.setTo(x,quad.a.y);
 	}
 
 	@Override
@@ -214,7 +214,7 @@ public class TrackerObjectQuadPanel extends ImagePanel implements MouseListener,
 	public void mouseExited(MouseEvent e) {}
 
 	public synchronized void setDefaultTarget(Quadrilateral_F64 target) {
-		this.quad.set(target);
+		this.quad.setTo(target);
 		numSelected = 4;
 		mode = Mode.TRACKING;
 		targetVisible = true;
@@ -248,10 +248,10 @@ public class TrackerObjectQuadPanel extends ImagePanel implements MouseListener,
 		TRACKING
 	}
 
-	public static interface Listener
+	public interface Listener
 	{
-		public void selectedTarget( Quadrilateral_F64 target );
+		void selectedTarget( Quadrilateral_F64 target );
 
-		public void pauseTracker();
+		void pauseTracker();
 	}
 }

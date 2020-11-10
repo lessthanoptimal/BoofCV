@@ -162,8 +162,8 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 		addPoints(20, 0, 20, 20, contour);
 
 		// add a kink which could throw it off locally
-		contour.get(17).set(17, 1);
-		contour.get(18).set(18, 2);
+		contour.get(17).setTo(17, 1);
+		contour.get(18).setTo(18, 2);
 
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 		alg.searchRadius = 5;

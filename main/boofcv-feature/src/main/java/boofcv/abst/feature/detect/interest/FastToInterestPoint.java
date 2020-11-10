@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class FastToInterestPoint<T extends ImageGray<T>>
-	implements InterestPointDetector<T>
-{
+		implements InterestPointDetector<T> {
 	@Getter FastCornerDetector<T> detector;
 	// Storage for all the found corners
 	private final FastQueue<Point2D_F64> found = new FastQueue<>(Point2D_F64::new);
@@ -53,44 +52,44 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 	// temporary storage for corner candidates
 	QueueCorner candidates = new QueueCorner();
 
-	public FastToInterestPoint(FastCornerDetector<T> detector , FeatureSelectLimit<Point2D_I16> selectLimit) {
+	public FastToInterestPoint( FastCornerDetector<T> detector, FeatureSelectLimit<Point2D_I16> selectLimit ) {
 		this.detector = detector;
 		this.selectLimit = selectLimit;
 	}
 
 	@Override
-	public void detect(T input) {
+	public void detect( T input ) {
 		detector.process(input);
 
 		// get all the low candidates
 		candidates.reset();
 		detector.getCandidatesLow().copyInto(candidates);
 		// If there are too many select a subset based on this rule
-		selectLimit.select(input.width,input.height,null,candidates,featureLimitPerSet,selected);
+		selectLimit.select(input.width, input.height, null, candidates, featureLimitPerSet, selected);
 		// Note how many low corners there are so that the set is known in the future
 		totalLow = selected.size;
 		// copy the results
 		found.resize(totalLow);
 		for (int i = 0; i < selected.size; i++) {
 			Point2D_I16 c = selected.get(i);
-			found.get(i).set(c.x,c.y);
+			found.get(i).setTo(c.x, c.y);
 		}
 
 		// Do the same for high corners
 		candidates.reset();
 		detector.getCandidatesHigh().copyInto(candidates);
-		selectLimit.select(input.width,input.height,null,candidates,featureLimitPerSet,selected);
+		selectLimit.select(input.width, input.height, null, candidates, featureLimitPerSet, selected);
 		// predeclare and reshape the array
-		found.growArray(found.size+selected.size);
-		found.size = found.size+selected.size;
+		found.growArray(found.size + selected.size);
+		found.size = found.size + selected.size;
 		// copy the new elements into the found array
 		for (int i = 0; i < selected.size; i++) {
 			Point2D_I16 c = selected.get(i);
-			found.get(i+totalLow).set(c.x,c.y);
+			found.get(i + totalLow).setTo(c.x, c.y);
 		}
 	}
 
-	@Override public int getSet(int index) { return index < totalLow ? 0 : 1; }
+	@Override public int getSet( int index ) { return index < totalLow ? 0 : 1; }
 
 	@Override public boolean hasScale() { return false; }
 
@@ -102,9 +101,9 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 
 	@Override public int getNumberOfFeatures() { return found.size; }
 
-	@Override public Point2D_F64 getLocation(int featureIndex) { return found.get(featureIndex); }
+	@Override public Point2D_F64 getLocation( int featureIndex ) { return found.get(featureIndex); }
 
-	@Override public double getRadius(int featureIndex) { return 1.0; }
+	@Override public double getRadius( int featureIndex ) { return 1.0; }
 
-	@Override public double getOrientation(int featureIndex) { return 0; }
+	@Override public double getOrientation( int featureIndex ) { return 0; }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,8 +115,8 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 				selectOverhead.getOverheadWidth(), selectOverhead.getOverheadHeight());
 
 		// used to counter act offset in overhead image
-		origToMap.set(overhead.centerX, overhead.centerY, 0);
-		mapToOrigin.set(-overhead.centerX, -overhead.centerY, 0);
+		origToMap.setTo(overhead.centerX, overhead.centerY, 0);
+		mapToOrigin.setTo(-overhead.centerX, -overhead.centerY, 0);
 
 		// fill it so there aren't any artifacts in the left over
 		overhead.image.reshape(selectOverhead.getOverheadWidth(), selectOverhead.getOverheadHeight());
@@ -143,7 +143,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 			return false;
 		}
 
-		worldToCurr2D.set(motion2D.getFirstToCurrent());
+		worldToCurr2D.setTo(motion2D.getFirstToCurrent());
 		worldToCurr2D.T.x *= overhead.cellSize;
 		worldToCurr2D.T.y *= overhead.cellSize;
 

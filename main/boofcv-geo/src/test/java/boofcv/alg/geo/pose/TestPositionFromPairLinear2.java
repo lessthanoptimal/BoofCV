@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class TestPositionFromPairLinear2 extends ChecksMotionNPoint {
 		
 		Se3_F64 found = new Se3_F64();
 		found.R.set(motion.R);
-		found.T.set(alg.getT());
+		found.T.setTo(alg.getT());
 
 		return found;
 	}

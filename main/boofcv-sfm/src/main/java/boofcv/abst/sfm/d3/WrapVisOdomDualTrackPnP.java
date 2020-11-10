@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
 		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
-		pixel.set(visualOdometry.getVisibleTracks().get(index).visualTrack.pixel);
+		pixel.setTo(visualOdometry.getVisibleTracks().get(index).visualTrack.pixel);
 	}
 
 	@Override

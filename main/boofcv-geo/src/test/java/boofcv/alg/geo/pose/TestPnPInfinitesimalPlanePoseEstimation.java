@@ -114,8 +114,8 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 			SePointOps_F64.transform(worldToCamera,world,camera);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.p1.set(world.x,world.y);
-			pair.p2.set(camera.x/camera.z,camera.y/camera.z);
+			pair.p1.setTo(world.x,world.y);
+			pair.p2.setTo(camera.x/camera.z,camera.y/camera.z);
 
 			list.add( pair );
 		}

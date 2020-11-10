@@ -129,7 +129,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 			if (!modelRefiner.fitModel(modelMatcher.getMatchSet(), modelMatcher.getModelParameters(), keyToCurr))
 				return false;
 		} else {
-			keyToCurr.set(modelMatcher.getModelParameters());
+			keyToCurr.setTo(modelMatcher.getModelParameters());
 		}
 
 		// mark that the track is in the inlier set
@@ -173,7 +173,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 		List<PointTrack> active = tracker.getActiveTracks(null);
 		for (PointTrack l : active) { // lint:forbidden ignore_line
 			AssociatedPairTrack p = l.getCookie();
-			p.p1.set(l.pixel);
+			p.p1.setTo(l.pixel);
 			p.lastUsed = frameID;
 		}
 
@@ -187,11 +187,11 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 				// in the current frame is updated for free as PointTrack is
 				p.p2 = l.pixel;
 			}
-			p.p1.set(l.pixel);
+			p.p1.setTo(l.pixel);
 			p.lastUsed = frameID;
 		}
 
-		worldToKey.set(worldToCurr);
+		worldToKey.setTo(worldToCurr);
 		keyToCurr.reset();
 
 		keyFrame = true;

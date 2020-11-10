@@ -139,10 +139,10 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 
 		double r = width / 2;
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
-		poly.get(0).set(-r, r);
-		poly.get(1).set(r, r);
-		poly.get(2).set(r, -r);
-		poly.get(3).set(-r, -r);
+		poly.get(0).setTo(-r, r);
+		poly.get(1).setTo(r, r);
+		poly.get(2).setTo(r, -r);
+		poly.get(3).setTo(-r, -r);
 
 		for (int i = 0; i < 4; i++) {
 			SePointOps_F64.transform(motion, poly.get(i), poly.get(i));
@@ -228,14 +228,14 @@ public class TestSquaresIntoRegularClusters extends BoofStandardJUnit {
 
 		double off = 0.1;
 		double thresh = 0.1 * 3;// threshold which will pass all checks inside
-		p1.set(-1, 3 + off);
+		p1.setTo(-1, 3 + off);
 		alg.distanceTol = thresh * 1.01;
 		assertTrue(alg.areMiddlePointsClose(p0, p1, p2, p3));
 		alg.distanceTol = thresh * 0.99;
 		assertFalse(alg.areMiddlePointsClose(p0, p1, p2, p3));
 
-		p1.set(-1, 3);
-		p2.set(1, 3 + off);
+		p1.setTo(-1, 3);
+		p2.setTo(1, 3 + off);
 		alg.distanceTol = thresh * 1.01;
 		assertTrue(alg.areMiddlePointsClose(p0, p1, p2, p3));
 		alg.distanceTol = thresh * 0.99;

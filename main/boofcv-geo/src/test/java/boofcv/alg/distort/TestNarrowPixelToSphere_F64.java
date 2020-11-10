@@ -48,7 +48,7 @@ public class TestNarrowPixelToSphere_F64 extends BoofStandardJUnit {
 
 		@Override
 		public void compute(double x, double y, Point2D_F64 out) {
-			out.set(x,y);
+			out.setTo(x,y);
 		}
 
 		@Override

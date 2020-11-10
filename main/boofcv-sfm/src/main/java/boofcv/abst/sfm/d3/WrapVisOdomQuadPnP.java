@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,7 +87,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 
 	@Override
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
-		pixel.set(alg.getTrackQuads().get(index).v2);
+		pixel.setTo(alg.getTrackQuads().get(index).v2);
 	}
 
 	@Override

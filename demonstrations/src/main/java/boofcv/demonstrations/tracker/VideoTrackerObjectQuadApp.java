@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -233,7 +233,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	@Override
 	public void selectedTarget(Quadrilateral_F64 target) {
 		System.out.println(target.a.x+" "+target.a.y+" "+target.b.x+" "+target.b.y+" "+target.c.x+" "+target.c.y+" "+target.d.x+" "+target.d.y);
-		this.target.set(target);
+		this.target.setTo(target);
 		targetSelected = true;
 		initializeTracker = true;
 		if( infoBar.autoStart )
@@ -263,7 +263,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	private void resetTracker() {
 		if( hasDefaultRect ) {
 			videoPanel.setDefaultTarget(targetDefault);
-			target.set(targetDefault);
+			target.setTo(targetDefault);
 			targetSelected = true;
 		} else {
 			videoPanel.setMode(TrackerObjectQuadPanel.Mode.IDLE);

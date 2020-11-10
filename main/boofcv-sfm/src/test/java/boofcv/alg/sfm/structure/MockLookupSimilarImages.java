@@ -176,7 +176,7 @@ class MockLookupSimilarImages implements LookupSimilarImages {
 		List<Point2D_F64> l = viewObs.get(index);
 		features.reset();
 		for (int i = 0; i < l.size(); i++) {
-			features.grow().set(l.get(i));
+			features.grow().setTo(l.get(i));
 		}
 	}
 

@@ -253,7 +253,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 			triangulateNotSelectedBundleTracks();
 		}
 		// Save the output
-		current_to_world.set(frameCurrent.frame_to_world);
+		current_to_world.setTo(frameCurrent.frame_to_world);
 	}
 
 	private void handleDroppedVisualTracks() {

@@ -193,7 +193,7 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 		Point2D_F32 p = new Point2D_F32();
 		for (int edgeIdx = 0; edgeIdx < matchSet.size(); edgeIdx++) {
 			Edgel e = matchSet.get(edgeIdx);
-			p.set(e.x, e.y);
+			p.setTo(e.x, e.y);
 			float t = ClosestPoint2D_F32.closestPointT(line, e);
 			if (minT > t)
 				minT = t;

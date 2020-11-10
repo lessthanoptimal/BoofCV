@@ -43,8 +43,8 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 		model.view1.set(cameraA);
 		model.view2.set(cameraB);
 		model.view3.set(cameraC);
-		model.view_1_to_2.set(truthView_1_to_i(1));
-		model.view_1_to_3.set(truthView_1_to_i(2));
+		model.view_1_to_2.setTo(truthView_1_to_i(1));
+		model.view_1_to_3.setTo(truthView_1_to_i(2));
 
 		alg.setModel(model);
 
@@ -74,8 +74,8 @@ class TestDistanceMetricTripleReprojection23 extends CommonThreeViewSelfCalibrat
 		model.view1.set(cameraA);
 		model.view2.set(cameraB);
 		model.view3.set(cameraC);
-		model.view_1_to_2.set(truthView_1_to_i(1));
-		model.view_1_to_3.set(truthView_1_to_i(2));
+		model.view_1_to_2.setTo(truthView_1_to_i(1));
+		model.view_1_to_3.setTo(truthView_1_to_i(2));
 
 		model.view3.fx += 40; // this will mess things up a bit
 

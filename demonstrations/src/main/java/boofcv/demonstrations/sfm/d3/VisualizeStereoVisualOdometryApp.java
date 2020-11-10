@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -392,12 +392,12 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		Se3_F64 world_to_camera = camera_to_world.invert(null);
 
 		// Save the camera motion history
-		egoMotion_cam_to_world.grow().set(camera_to_world);
+		egoMotion_cam_to_world.grow().setTo(camera_to_world);
 
 		if( success ) {
 			// Sum up the total distance traveled. This will be approximate since it optimizes past history
 			traveled += prev_to_world.concat(world_to_camera,null).T.norm();
-			prev_to_world.set(camera_to_world);
+			prev_to_world.setTo(camera_to_world);
 		}
 
 		if( alg instanceof AccessPointTracks3D ) {

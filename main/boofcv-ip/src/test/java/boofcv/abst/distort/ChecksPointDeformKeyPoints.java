@@ -91,7 +91,7 @@ public abstract class ChecksPointDeformKeyPoints extends BoofStandardJUnit {
 		Point2D_F32 expected = new Point2D_F32();
 		alg.compute(12, 19.5f, expected);
 
-		src.get(1).set(20, 25);
+		src.get(1).setTo(20, 25);
 		Point2D_F32 found = new Point2D_F32();
 		alg.compute(12, 19.5f, found);
 
@@ -116,7 +116,7 @@ public abstract class ChecksPointDeformKeyPoints extends BoofStandardJUnit {
 		Point2D_F32 expected = new Point2D_F32();
 		alg.compute(12, 19.5f, expected);
 
-		dst.get(1).set(20, 25);
+		dst.get(1).setTo(20, 25);
 		Point2D_F32 found = new Point2D_F32();
 		alg.compute(12, 19.5f, found);
 

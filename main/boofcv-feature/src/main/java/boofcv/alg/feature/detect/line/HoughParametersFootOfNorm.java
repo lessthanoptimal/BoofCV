@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class HoughParametersFootOfNorm implements HoughTransformParameters {
 
 	@Override
 	public void lineToCoordinate(LineParametric2D_F32 line, Point2D_F64 coordinate) {
-		coordinate.set(line.p.x,line.p.y);
+		coordinate.setTo(line.p.x,line.p.y);
 	}
 
 	@Override

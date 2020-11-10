@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class FourPointSyntheticStability {
 			p23.observation.x = cameraPt.x/cameraPt.z;
 			p23.observation.y = cameraPt.y/cameraPt.z;
 
-			refNorm.get(i).set(p23.observation);
+			refNorm.get(i).setTo(p23.observation);
 
 			normToPixel.compute(p23.observation.x, p23.observation.y, refPixels.get(i));
 		}
@@ -130,7 +130,7 @@ public class FourPointSyntheticStability {
 			// see what happens if you tweak this observation a little bit
 			perturb(disturbance, refPixels.get(i), points2D3D.get(i));
 			// set it back to the nominal value
-			points2D3D.get(i).observation.set(refNorm.get(i));
+			points2D3D.get(i).observation.setTo(refNorm.get(i));
 		}
 
 		results.location = maxLocation;

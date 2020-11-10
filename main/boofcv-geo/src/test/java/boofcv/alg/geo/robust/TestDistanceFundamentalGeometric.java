@@ -37,8 +37,8 @@ public class TestDistanceFundamentalGeometric extends EpipolarTestSimulation {
 		init(20,true);
 
 		// create an outlier
-		pairs.get(5).p1.set(rand.nextInt(intrinsic.width),rand.nextInt(intrinsic.height));
-		pairs.get(5).p2.set(rand.nextInt(intrinsic.width),rand.nextInt(intrinsic.height));
+		pairs.get(5).p1.setTo(rand.nextInt(intrinsic.width),rand.nextInt(intrinsic.height));
+		pairs.get(5).p2.setTo(rand.nextInt(intrinsic.width),rand.nextInt(intrinsic.height));
 
 		DMatrixRMaj E = MultiViewOps.createEssential(a_to_b.R,a_to_b.T,null);
 		DMatrixRMaj F21 = MultiViewOps.createFundamental(E,K);

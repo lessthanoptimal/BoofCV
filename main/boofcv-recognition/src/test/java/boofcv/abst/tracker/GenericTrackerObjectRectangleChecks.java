@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>> extends BoofStandardJUnit {
+public abstract class GenericTrackerObjectRectangleChecks<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	boolean usesHint = true;
 
@@ -50,9 +50,9 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 	protected double tolStationary = 1e-8;
 
 	// the initial location of the target in the image
-	protected Quadrilateral_F64 initRegion = rect(20,25,120,160);
+	protected Quadrilateral_F64 initRegion = rect(20, 25, 120, 160);
 
-	protected GenericTrackerObjectRectangleTests(ImageType<T> imageType) {
+	protected GenericTrackerObjectRectangleChecks( ImageType<T> imageType ) {
 		this.imageType = imageType;
 	}
 
@@ -61,11 +61,11 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 	@Test
 	public void changeInputImageSize() {
 		TrackerObjectQuad<T> tracker = create(imageType);
-		render(1,0,0);
+		render(1, 0, 0);
 
-		T smaller = (T)input.createNew(width/2,height/2);
+		T smaller = (T)input.createNew(width/2, height/2);
 
-		new FDistort(input,smaller).scaleExt().apply();
+		new FDistort(input, smaller).scaleExt().apply();
 
 		assertTrue(tracker.initialize(smaller, rect(20, 25, 70, 100)));
 		assertTrue(tracker.process(smaller, where));
@@ -77,7 +77,7 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 	@Test
 	public void stationary() {
 		TrackerObjectQuad<T> tracker = create(imageType);
-		render(1,0,0);
+		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
 		assertTrue(tracker.process(input, where));
 
@@ -89,62 +89,64 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 
 	@Test
 	public void hint() {
-		if( !usesHint )
+		if (!usesHint)
 			return;
 
 		TrackerObjectQuad<T> tracker = create(imageType);
-		where = rect(20,25,90,100);
-		render(1,0,0);
+		where = rect(20, 25, 90, 100);
+		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, where));
 
-		render(1,100,110);
+		render(1, 100, 110);
 
-		where = rect(20+100,25+110,90+100,100+110);
+		where = rect(20 + 100, 25 + 110, 90 + 100, 100 + 110);
 		tracker.hint(where);
-		where.a.set(0,0);where.b.set(0,0);where.c.set(0,0);where.d.set(0,0);
+		where.a.setTo(0, 0);
+		where.b.setTo(0, 0);
+		where.c.setTo(0, 0);
+		where.d.setTo(0, 0);
 		assertTrue(tracker.process(input, where));
-		checkSolution(20+100,25+110,90+100,100+110,tolTranslateSmall);
+		checkSolution(20 + 100, 25 + 110, 90 + 100, 100 + 110, tolTranslateSmall);
 	}
 
 	@Test
 	public void translation_small() {
 		TrackerObjectQuad<T> tracker = create(imageType);
-		render(1,0,0);
+		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
 
-		for( int i = 0; i < 10; i++ ) {
-			int tranX =  2*i;
+		for (int i = 0; i < 10; i++) {
+			int tranX = 2*i;
 			int tranY = -2*i;
 
-			render(1,tranX,tranY);
+			render(1, tranX, tranY);
 			assertTrue(tracker.process(input, where));
 
-			checkSolution(20+tranX,25+tranY,120+tranX,160+tranY,tolTranslateSmall);
+			checkSolution(20 + tranX, 25 + tranY, 120 + tranX, 160 + tranY, tolTranslateSmall);
 		}
 
-		double totalX = (where.a.x+where.b.x+where.c.x+where.d.x)/4 -
-				(initRegion.a.x+initRegion.b.x+initRegion.c.x+initRegion.d.x)/4;
-		double totalY = (where.a.y+where.b.y+where.c.y+where.d.y)/4 -
-				(initRegion.a.y+initRegion.b.y+initRegion.c.y+initRegion.d.y)/4;
+		double totalX = (where.a.x + where.b.x + where.c.x + where.d.x)/4 -
+				(initRegion.a.x + initRegion.b.x + initRegion.c.x + initRegion.d.x)/4;
+		double totalY = (where.a.y + where.b.y + where.c.y + where.d.y)/4 -
+				(initRegion.a.y + initRegion.b.y + initRegion.c.y + initRegion.d.y)/4;
 
-		assertEquals(2*9,totalX,4);
-		assertEquals(-2*9,totalY,4);
-
+		assertEquals(2*9, totalX, 4);
+		assertEquals(-2*9, totalY, 4);
 	}
 
 	@Test
 	public void translation_large() {
 		TrackerObjectQuad<T> tracker = create(imageType);
-		render(1,0,0);
+		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
 
-		int tranX =  20;
-		int tranY =  30;
+		int tranX = 20;
+		int tranY = 30;
 
-		render(1,tranX,tranY);
+		render(1, tranX, tranY);
 		assertTrue(tracker.process(input, where));
 
-		checkSolution(20+tranX,25+tranY,120+tranX,160+tranY,0.05);
+		checkSolution(20 + tranX, 25 + tranY, 120 + tranX, 160 + tranY, 0.05);
 	}
 
 	@Test
@@ -159,30 +161,29 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 
 	/**
 	 * Zoom in and out without any visual translation of the object.  e.g. the center is constant
-	 * @param dir
 	 */
 	protected void zoom( double dir ) {
 		TrackerObjectQuad<T> tracker = create(imageType);
-		render(1,0,0);
+		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
 
-		double centerX = 20+50;
-		double centerY = 25+(160-25)/2.0;
+		double centerX = 20 + 50;
+		double centerY = 25 + (160 - 25)/2.0;
 
-		for( int i = 0; i < 20; i++ ) {
+		for (int i = 0; i < 20; i++) {
 			double scale = 1 + dir*0.2*(i/9.0);
 //			System.out.println("scale "+scale);
 
 			double w2 = 100*scale/2.0;
-			double h2 = (160-25)*scale/2.0;
+			double h2 = (160 - 25)*scale/2.0;
 
 			double tranX = centerX - centerX*scale;
 			double tranY = centerY - centerY*scale;
 
-			render(scale,tranX,tranY);
+			render(scale, tranX, tranY);
 			assertTrue(tracker.process(input, where));
 
-			checkSolution(centerX-w2,centerY-h2,centerX+w2,centerY+h2,tolScale);
+			checkSolution(centerX - w2, centerY - h2, centerX + w2, centerY + h2, tolScale);
 		}
 	}
 
@@ -195,31 +196,31 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 		Quadrilateral_F64 where1 = new Quadrilateral_F64();
 
 		TrackerObjectQuad<T> tracker = create(imageType);
-		render(1,0,0);
+		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
-		render(1,3,-3);
+		render(1, 3, -3);
 		assertTrue(tracker.process(input, where));
-		render(1,6,-6);
+		render(1, 6, -6);
 		assertTrue(tracker.process(input, where));
 
-		render(1,0,0);
+		render(1, 0, 0);
 		assertTrue(tracker.initialize(input, initRegion));
-		render(1,3,-3);
+		render(1, 3, -3);
 		assertTrue(tracker.process(input, where1));
-		render(1,6,-6);
+		render(1, 6, -6);
 		assertTrue(tracker.process(input, where1));
 
 		// Might not be a perfect match due to robust algorithm not being reset to their initial state
-		checkSolution(where1.a.x,where1.a.y,where1.c.x,where1.c.y,0.02);
+		checkSolution(where1.a.x, where1.a.y, where1.c.x, where1.c.y, 0.02);
 	}
 
-	private void checkSolution( double x0 , double y0 , double x1 , double y1 , double fractionError ) {
+	private void checkSolution( double x0, double y0, double x1, double y1, double fractionError ) {
 //		System.out.println("Expected "+x0+" "+y0+" "+x1+" "+y1);
 //		System.out.println("Actual "+where.a.x+" "+where.a.y+" "+where.c.x+" "+where.c.y);
 
-		double tolX = (x1-x0)*fractionError;
-		double tolY = (y1-y0)*fractionError;
-		double tol = Math.max(tolX,tolY);
+		double tolX = (x1 - x0)*fractionError;
+		double tolY = (y1 - y0)*fractionError;
+		double tol = Math.max(tolX, tolY);
 
 		assertTrue(Math.abs(where.a.x - x0) <= tol);
 		assertTrue(Math.abs(where.a.y - y0) <= tol);
@@ -227,10 +228,9 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase<T>>
 		assertTrue(Math.abs(where.c.y - y1) <= tol);
 	}
 
-	protected abstract void render( double scale , double tranX , double tranY );
+	protected abstract void render( double scale, double tranX, double tranY );
 
-	private static Quadrilateral_F64 rect( int x0 , int y0 , int x1 , int y1 ) {
-		return new Quadrilateral_F64(x0,y0,x1,y0,x1,y1,x0,y1);
+	private static Quadrilateral_F64 rect( int x0, int y0, int x1, int y1 ) {
+		return new Quadrilateral_F64(x0, y0, x1, y0, x1, y1, x0, y1);
 	}
-
 }

@@ -33,8 +33,8 @@ class TestResolveSignAmbiguityPositiveDepth extends CommonThreeViewSelfCalibrati
 		var alg = new ResolveSignAmbiguityPositiveDepth();
 
 		var results = new MetricCameraTriple();
-		results.view_1_to_2.set(super.truthView_1_to_i(1));
-		results.view_1_to_3.set(super.truthView_1_to_i(2));
+		results.view_1_to_2.setTo(super.truthView_1_to_i(1));
+		results.view_1_to_3.setTo(super.truthView_1_to_i(2));
 		results.view1.set(super.cameraA);
 		results.view2.set(super.cameraB);
 		results.view3.set(super.cameraC);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
-import georegression.geometry.algs.TangentLinesTwoEllipses_F64;
+import georegression.geometry.curves.TangentLinesTwoEllipses_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
@@ -47,27 +47,32 @@ public class KeyPointsCircleRegularGrid {
 	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64::new);
 
 	// used to compute tangent lines between two ellipses
-	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
+	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64, 10);
 
 	// storage for tangent points on ellipses
-	private Point2D_F64 A0 = new Point2D_F64(); private Point2D_F64 A1 = new Point2D_F64();
-	private Point2D_F64 A2 = new Point2D_F64(); private Point2D_F64 A3 = new Point2D_F64();
-	private Point2D_F64 B0 = new Point2D_F64(); private Point2D_F64 B1 = new Point2D_F64();
-	private Point2D_F64 B2 = new Point2D_F64(); private Point2D_F64 B3 = new Point2D_F64();
+	private Point2D_F64 A0 = new Point2D_F64();
+	private Point2D_F64 A1 = new Point2D_F64();
+	private Point2D_F64 A2 = new Point2D_F64();
+	private Point2D_F64 A3 = new Point2D_F64();
+	private Point2D_F64 B0 = new Point2D_F64();
+	private Point2D_F64 B1 = new Point2D_F64();
+	private Point2D_F64 B2 = new Point2D_F64();
+	private Point2D_F64 B3 = new Point2D_F64();
 
 	/**
 	 * Computes key points from the grid of ellipses
+	 *
 	 * @param grid Grid of ellipses
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process(Grid grid ) {
+	public boolean process( Grid grid ) {
 		// reset and initialize data structures
 		init(grid);
 
 		// add tangent points from adjacent ellipses
-		if( !horizontal(grid) )
+		if (!horizontal(grid))
 			return false;
-		if( !vertical(grid) )
+		if (!vertical(grid))
 			return false;
 
 		keypoints.reset();
@@ -81,18 +86,18 @@ public class KeyPointsCircleRegularGrid {
 		return true;
 	}
 
-	void init(Grid grid) {
+	void init( Grid grid ) {
 		tangents.resize(grid.ellipses.size());
 		for (int i = 0; i < tangents.size(); i++) {
 			tangents.get(i).reset();
 		}
 	}
 
-	boolean horizontal(Grid grid) {
+	boolean horizontal( Grid grid ) {
 		for (int i = 0; i < grid.rows; i++) {
-			for (int j = 0; j < grid.columns-1; j++) {
+			for (int j = 0; j < grid.columns - 1; j++) {
 
-				if (!addTangents(grid, i, j, i, j+1))
+				if (!addTangents(grid, i, j, i, j + 1))
 					return false;
 			}
 		}
@@ -100,10 +105,10 @@ public class KeyPointsCircleRegularGrid {
 		return true;
 	}
 
-	boolean vertical(Grid grid) {
-		for (int i = 0; i < grid.rows-1; i++) {
+	boolean vertical( Grid grid ) {
+		for (int i = 0; i < grid.rows - 1; i++) {
 			for (int j = 0; j < grid.columns; j++) {
-				if (!addTangents(grid, i, j, i+1, j))
+				if (!addTangents(grid, i, j, i + 1, j))
 					return false;
 			}
 		}
@@ -114,24 +119,24 @@ public class KeyPointsCircleRegularGrid {
 	/**
 	 * Computes tangent points to the two ellipses specified by the grid coordinates
 	 */
-	private boolean addTangents(Grid grid, int rowA, int colA, int rowB, int colB) {
-		EllipseRotated_F64 a = grid.get(rowA,colA);
-		EllipseRotated_F64 b = grid.get(rowB,colB);
+	private boolean addTangents( Grid grid, int rowA, int colA, int rowB, int colB ) {
+		EllipseRotated_F64 a = grid.get(rowA, colA);
+		EllipseRotated_F64 b = grid.get(rowB, colB);
 
-		if( !tangentFinder.process(a,b, A0, A1, A2, A3, B0, B1, B2, B3) ) {
+		if (!tangentFinder.process(a, b, A0, A1, A2, A3, B0, B1, B2, B3)) {
 			return false;
 		}
-		Tangents ta = tangents.get(grid.getIndexOfRegEllipse(rowA,colA));
-		Tangents tb = tangents.get(grid.getIndexOfRegEllipse(rowB,colB));
+		Tangents ta = tangents.get(grid.getIndexOfRegEllipse(rowA, colA));
+		Tangents tb = tangents.get(grid.getIndexOfRegEllipse(rowB, colB));
 
 		// Which point is 0 or 3 is not defined and can swap arbitrarily.  To fix this problem
 		// 0 will be defined as on the 'positive side' of the line connecting the ellipse centers
 
-		double slopeX = b.center.x-a.center.x;
-		double slopeY = b.center.y-a.center.y;
+		double slopeX = b.center.x - a.center.x;
+		double slopeY = b.center.y - a.center.y;
 
-		double dx0 = A0.x-a.center.x;
-		double dy0 = A0.y-a.center.y;
+		double dx0 = A0.x - a.center.x;
+		double dy0 = A0.y - a.center.y;
 
 		double z = slopeX*dy0 - slopeY*dx0;
 		if( z < 0 == (rowA == rowB)) {
@@ -140,22 +145,23 @@ public class KeyPointsCircleRegularGrid {
 		}
 
 		// add tangent points from the two lines which do not cross the center line
-		if( rowA == rowB ) {
-			ta.t[ta.countT++].set(A0);
-			ta.b[ta.countB++].set(A3);
-			tb.t[tb.countT++].set(B0);
-			tb.b[tb.countB++].set(B3);
+		if (rowA == rowB) {
+			ta.t[ta.countT++].setTo(A0);
+			ta.b[ta.countB++].setTo(A3);
+			tb.t[tb.countT++].setTo(B0);
+			tb.b[tb.countB++].setTo(B3);
 		} else {
-			ta.r[ta.countL++].set(A0);
-			ta.l[ta.countR++].set(A3);
-			tb.r[tb.countL++].set(B0);
-			tb.l[tb.countR++].set(B3);
+			ta.r[ta.countL++].setTo(A0);
+			ta.l[ta.countR++].setTo(A3);
+			tb.r[tb.countL++].setTo(B0);
+			tb.l[tb.countR++].setTo(B3);
 		}
 		return true;
 	}
 
 	/**
 	 * Returns the location of each key point in the image from the most recently processed grid.
+	 *
 	 * @return detected image location
 	 */
 	public FastQueue<Point2D_F64> getKeyPoints() {
@@ -169,10 +175,10 @@ public class KeyPointsCircleRegularGrid {
 	public static class Tangents {
 
 		// top bottom left right
-		public Point2D_F64 t[] = new Point2D_F64[2];
-		public Point2D_F64 b[] = new Point2D_F64[2];
-		public Point2D_F64 l[] = new Point2D_F64[2];
-		public Point2D_F64 r[] = new Point2D_F64[2];
+		public Point2D_F64[] t = new Point2D_F64[2];
+		public Point2D_F64[] b = new Point2D_F64[2];
+		public Point2D_F64[] l = new Point2D_F64[2];
+		public Point2D_F64[] r = new Point2D_F64[2];
 
 		int countT = 0;
 		int countB = 0;
@@ -192,24 +198,23 @@ public class KeyPointsCircleRegularGrid {
 			countT = countB = countL = countR = 0;
 		}
 
-		public void getTop( Point2D_F64 top ) {assign(t,countT,top);}
+		public void getTop( Point2D_F64 top ) {assign(t, countT, top);}
 
 		public void getBottom( Point2D_F64 p ) {
-			assign(b,countB,p);
+			assign(b, countB, p);
 		}
 
 		public void getLeft( Point2D_F64 p ) {
-			assign(l,countL,p);
+			assign(l, countL, p);
 		}
 
 		public void getRight( Point2D_F64 p ) {
-			assign(r,countR,p);
+			assign(r, countR, p);
 		}
 
-
-		private void assign( Point2D_F64 array[] , int length , Point2D_F64 output ) {
-			if( length == 1 ) {
-				output.set(array[0]);
+		private void assign( Point2D_F64[] array, int length, Point2D_F64 output ) {
+			if (length == 1) {
+				output.setTo(array[0]);
 			} else {
 				output.x = (array[0].x + array[1].x)/2.0;
 				output.y = (array[0].y + array[1].y)/2.0;

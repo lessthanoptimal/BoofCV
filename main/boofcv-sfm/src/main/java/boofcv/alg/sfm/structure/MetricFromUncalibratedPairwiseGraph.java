@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -216,7 +216,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			PairwiseImageGraph.View pview = graph.lookupNode(viewIds.get(i));
 			SceneWorkingGraph.View wview = workGraph.addView(pview);
 			if (i > 0)
-				wview.world_to_view.set(results.motion_1_to_k.get(i - 1));
+				wview.world_to_view.setTo(results.motion_1_to_k.get(i - 1));
 			wview.intrinsic.set(results.intrinsics.get(i));
 			wview.imageDimension.setTo(dimensions.get(i));
 		}

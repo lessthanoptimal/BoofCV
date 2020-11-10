@@ -188,8 +188,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	 * Refines the initial line estimates using EM.  The number of iterations is fixed.
 	 */
 	protected boolean optimize( Polygon2D_F64 seed, Polygon2D_F64 current ) {
-
-		previous.set(seed);
+		previous.setTo(seed);
 
 		// pixels squares is faster to compute
 		double convergeTol = convergeTolPixels*convergeTolPixels;
@@ -210,7 +209,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 				Point2D_F64 a = previous.get(i);
 				Point2D_F64 b = previous.get(j);
 
-				before.set(general[i]);
+				before.setTo(general[i]);
 
 				boolean failed = false;
 				if (!optimize(a, b, general[i])) {
@@ -232,7 +231,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 
 				// The line fit failed.  Probably because its along the image border.  Revert it
 				if (failed) {
-					general[i].set(before);
+					general[i].setTo(before);
 				} else {
 					changed = true;
 				}
@@ -254,7 +253,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 //				System.out.println("Converged early at "+iteration);
 				break;
 			} else {
-				previous.set(current);
+				previous.setTo(current);
 			}
 		}
 

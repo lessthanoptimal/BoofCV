@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,15 +40,13 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	protected int N;
 
 	/**
-	 * @see SplitMergeLineFit#SplitMergeLineFit(double,ConfigLength, int)
+	 * @see SplitMergeLineFit#SplitMergeLineFit(double, ConfigLength, int)
 	 */
-	public SplitMergeLineFitLoop(double splitFraction,
-								 ConfigLength minimumSplit,
-								 int maxIterations)
-	{
-		super(splitFraction,minimumSplit, maxIterations);
+	public SplitMergeLineFitLoop( double splitFraction,
+								  ConfigLength minimumSplit,
+								  int maxIterations ) {
+		super(splitFraction, minimumSplit, maxIterations);
 	}
-
 
 	@Override
 	public boolean _process( List<Point2D_I32> contour ) {
@@ -56,35 +54,35 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		// ------------- find initial line segments
 		// can't fit a line to a single point
-		if( N <= 1 ) {
+		if (N <= 1) {
 			return false;
 		}
 
 		// Go around the contour looking for two points on opposite ends which are far apart
 		int startIndex = selectFarthest(contour);
-		int middleIndex = (startIndex+N/2)%N;
+		int middleIndex = (startIndex + N/2)%N;
 
 		// split each half recursively
 		splits.add(startIndex);
-		splitPixels(startIndex, N / 2);
+		splitPixels(startIndex, N/2);
 		splits.add(middleIndex);
-		splitPixels(middleIndex, N - (N / 2));
+		splitPixels(middleIndex, N - (N/2));
 
 		// ------------  Refine the initial segments by splitting and merging each segment
-		if( splits.size <= 2 )
+		if (splits.size <= 2)
 			return false; // can't merge a single line
 
 //		System.out.println("Enter loop");
-		for( int i = 0; i < maxIterations; i++ ) {
+		for (int i = 0; i < maxIterations; i++) {
 			boolean merged = mergeSegments();
 
-			if( splits.size() <= 0)
+			if (splits.size() <= 0)
 				return false;
 
-			if( !merged && !splitSegments() )
+			if (!merged && !splitSegments())
 				break;
 
-			if( splits.size() <= 2 || splits.size() >= abortSplits )
+			if (splits.size() <= 2 || splits.size() >= abortSplits)
 				return false;
 		}
 
@@ -95,20 +93,20 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	 * Recursively splits pixels between indexStart to indexStart+length.  A split happens if there is a pixel
 	 * more than the desired distance away from the two end points. Results are placed into 'splits'
 	 */
-	protected void splitPixels(int indexStart, int length) {
+	protected void splitPixels( int indexStart, int length ) {
 		// too short to split
-		if( length < minimumSideLengthPixel)
+		if (length < minimumSideLengthPixel)
 			return;
 
 		// end points of the line
-		int indexEnd = (indexStart+length)%N;
+		int indexEnd = (indexStart + length)%N;
 
-		int splitOffset = selectSplitOffset(indexStart,length);
+		int splitOffset = selectSplitOffset(indexStart, length);
 
-		if( splitOffset >= 0 ) {
+		if (splitOffset >= 0) {
 //			System.out.println("  splitting ");
 			splitPixels(indexStart, splitOffset);
-			int indexSplit = (indexStart+splitOffset)%N;
+			int indexSplit = (indexStart + splitOffset)%N;
 			splits.add(indexSplit);
 			splitPixels(indexSplit, circularDistance(indexSplit, indexEnd));
 		}
@@ -117,6 +115,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	/**
 	 * Computes the distance between pairs of points which are separated by 1/2 the contour list. The index of the
 	 * first pixel in the pair with the greatest distance is returned
+	 *
 	 * @return Index of the first pixel which should be used to split the list.  The other end is ret + N/2
 	 */
 	protected int selectFarthest( List<Point2D_I32> contour ) {
@@ -126,15 +125,15 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		int N = contour.size();
 		int half = N/2;
 
-		for( int i = 0; i < half; i++ ) {
+		for (int i = 0; i < half; i++) {
 
-			int end = (i+half)%N;
+			int end = (i + half)%N;
 
 			Point2D_I32 a = contour.get(i);
 			Point2D_I32 b = contour.get(end);
 
-			int dist = UtilPoint2D_I32.distanceSq(a.x,a.y,b.x,b.y);
-			if( bestDistance < dist ) {
+			int dist = UtilPoint2D_I32.distanceSq(a.x, a.y, b.x, b.y);
+			if (bestDistance < dist) {
 				bestIndex = i;
 				bestDistance = dist;
 			}
@@ -148,28 +147,28 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 	/**
 	 * Merges lines together if the common corner is close to a common line
+	 *
 	 * @return true the list being changed
 	 */
 	protected boolean mergeSegments() {
 
 		// See if merging will cause a degenerate case
-		if( splits.size() <= 3 )
+		if (splits.size() <= 3)
 			return false;
 
 		boolean change = false;
 		work.reset();
 
-		for( int i = 0; i < splits.size; i++ ) {
+		for (int i = 0; i < splits.size; i++) {
 			int start = splits.data[i];
-			int end = splits.data[(i+2)%splits.size];
+			int end = splits.data[(i + 2)%splits.size];
 
-			if( selectSplitOffset(start,circularDistance(start,end)) < 0 ) {
+			if (selectSplitOffset(start, circularDistance(start, end)) < 0) {
 				// merge the two lines by not adding it
 				change = true;
 			} else {
 				work.add(splits.data[(i + 1)%splits.size]);
 			}
-
 		}
 
 		// swap the two lists
@@ -182,14 +181,15 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 	/**
 	 * Splits a line in two if there is a point that is too far away
+	 *
 	 * @return true for change
 	 */
 	protected boolean splitSegments() {
 		boolean change = false;
 
 		work.reset();
-		for( int i = 0; i < splits.size-1; i++ ) {
-			change |= checkSplit(change, i,i+1);
+		for (int i = 0; i < splits.size - 1; i++) {
+			change |= checkSplit(change, i, i + 1);
 		}
 
 		change |= checkSplit(change, splits.size - 1, 0);
@@ -202,22 +202,21 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		return change;
 	}
 
-	private boolean checkSplit(boolean change, int i0 , int i1) {
+	private boolean checkSplit( boolean change, int i0, int i1 ) {
 		int start = splits.data[i0];
 		int end = splits.data[i1];
 		int length = circularDistance(start, end);
 
-		int bestOffset = selectSplitOffset(start,length);
-		if( bestOffset >= 0 ) {
+		int bestOffset = selectSplitOffset(start, length);
+		if (bestOffset >= 0) {
 			change = true;
 			work.add(start);
-			work.add((start+bestOffset)%N);
+			work.add((start + bestOffset)%N);
 		} else {
 			work.add(start);
 		}
 		return change;
 	}
-
 
 	/**
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
@@ -225,27 +224,27 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	 *
 	 * @return Selected offset from start of the split. -1 if no split was selected
 	 */
-	protected int selectSplitOffset( int indexStart , int length ) {
+	protected int selectSplitOffset( int indexStart, int length ) {
 		int bestOffset = -1;
 
-		int indexEnd = (indexStart + length) % N;
+		int indexEnd = (indexStart + length)%N;
 		Point2D_I32 startPt = contour.get(indexStart);
 		Point2D_I32 endPt = contour.get(indexEnd);
 
-		line.p.set(startPt.x,startPt.y);
-		line.slope.set(endPt.x-startPt.x,endPt.y-startPt.y);
+		line.p.setTo(startPt.x, startPt.y);
+		line.slope.setTo(endPt.x - startPt.x, endPt.y - startPt.y);
 
 		double bestDistanceSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
 
 		// adjusting using 'minimumSideLengthPixel' to ensure it doesn't create a new line which is too short
-		int minLength = Math.max(1,minimumSideLengthPixel);// 1 is the minimum so that you don't split on the same corner
+		int minLength = Math.max(1, minimumSideLengthPixel);// 1 is the minimum so that you don't split on the same corner
 		length -= minLength;
-		for( int i = minLength; i <= length; i++ ) {
-			Point2D_I32 b = contour.get((indexStart+i)%N);
-			point2D.set(b.x,b.y);
+		for (int i = minLength; i <= length; i++) {
+			Point2D_I32 b = contour.get((indexStart + i)%N);
+			point2D.setTo(b.x, b.y);
 
 			double dist = Distance2D_F64.distanceSq(line, point2D);
-			if( dist >= bestDistanceSq ) {
+			if (dist >= bestDistanceSq) {
 				bestDistanceSq = dist;
 				bestOffset = i;
 			}
@@ -257,10 +256,10 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	/**
 	 * Distance the two points are apart in clockwise direction
 	 */
-	protected int circularDistance( int start , int end ) {
-		if( end >= start )
-			return end-start;
+	protected int circularDistance( int start, int end ) {
+		if (end >= start)
+			return end - start;
 		else
-			return N-start+end;
+			return N - start + end;
 	}
 }

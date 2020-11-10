@@ -30,7 +30,7 @@ import java.util.List;
 
 import static boofcv.alg.fiducial.calib.circle.TestDetectCircleHexagonalGrid.createGrid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
@@ -88,22 +88,22 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 
 		assertEquals(0, DetectCircleGrid.closestCorner4(g));
 
-		g.ellipses.get(0).center.set(20,100);
-		g.ellipses.get(2).center.set(100,20);
-		g.ellipses.get(6).center.set(100,100);
-		g.ellipses.get(8).center.set(20,20);
+		g.ellipses.get(0).center.setTo(20,100);
+		g.ellipses.get(2).center.setTo(100,20);
+		g.ellipses.get(6).center.setTo(100,100);
+		g.ellipses.get(8).center.setTo(20,20);
 		assertEquals(2, DetectCircleGrid.closestCorner4(g));
 
-		g.ellipses.get(0).center.set(100,20);
-		g.ellipses.get(2).center.set(100,100);
-		g.ellipses.get(6).center.set(20,20);
-		g.ellipses.get(8).center.set(20,100);
+		g.ellipses.get(0).center.setTo(100,20);
+		g.ellipses.get(2).center.setTo(100,100);
+		g.ellipses.get(6).center.setTo(20,20);
+		g.ellipses.get(8).center.setTo(20,100);
 		assertEquals(1, DetectCircleGrid.closestCorner4(g));
 
-		g.ellipses.get(0).center.set(100,100);
-		g.ellipses.get(2).center.set(20,20);
-		g.ellipses.get(6).center.set(20,100);
-		g.ellipses.get(8).center.set(100,20);
+		g.ellipses.get(0).center.setTo(100,100);
+		g.ellipses.get(2).center.setTo(20,20);
+		g.ellipses.get(6).center.setTo(20,100);
+		g.ellipses.get(8).center.setTo(100,20);
 		assertEquals(3, DetectCircleGrid.closestCorner4(g));
 	}
 
@@ -153,10 +153,10 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 
 		alg.rotateGridCCW(g);
 		assertEquals(9,g.ellipses.size());
-		assertTrue( original.get(6) == g.get(0,0));
-		assertTrue( original.get(0) == g.get(0,2));
-		assertTrue( original.get(2) == g.get(2,2));
-		assertTrue( original.get(8) == g.get(2,0));
+		assertSame(original.get(6), g.get(0, 0));
+		assertSame(original.get(0), g.get(0, 2));
+		assertSame(original.get(2), g.get(2, 2));
+		assertSame(original.get(8), g.get(2, 0));
 
 	}
 
@@ -166,9 +166,7 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 		}
 
 		@Override
-		protected void configureContourDetector(ImageGray gray) {
-
-		}
+		protected void configureContourDetector(ImageGray gray) {}
 
 		@Override
 		protected int totalEllipses(int numRows, int numCols) {
@@ -176,8 +174,6 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 		}
 
 		@Override
-		protected void putGridIntoCanonical(Grid g) {
-
-		}
+		protected void putGridIntoCanonical(Grid g) {}
 	}
 }

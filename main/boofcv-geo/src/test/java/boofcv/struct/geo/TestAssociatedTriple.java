@@ -82,7 +82,7 @@ public class TestAssociatedTriple extends BoofStandardJUnit {
 		AssociatedTriple a = new AssociatedTriple(p1,p2,p3);
 		AssociatedTriple b = new AssociatedTriple();
 
-		b.set(a);
+		b.setTo(a);
 
 		assertTrue(b.p1.isIdentical(a.p1, 1e-8));
 		assertTrue(b.p2.isIdentical(a.p2,1e-8));
@@ -96,7 +96,7 @@ public class TestAssociatedTriple extends BoofStandardJUnit {
 		Point2D_F64 p3 = new Point2D_F64(5,6);
 
 		AssociatedTriple a = new AssociatedTriple();
-		a.set(p1,p2,p3);
+		a.setTo(p1,p2,p3);
 
 		// make sure it isn't saving the reference
 		assertNotSame(p1, a.p1);

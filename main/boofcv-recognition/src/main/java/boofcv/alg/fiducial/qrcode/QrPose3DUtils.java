@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,20 +60,20 @@ public class QrPose3DUtils {
 	 * Converts the corner observations into {@link PointIndex2D_F64} where observations are in pixels
 	 */
 	public List<PointIndex2D_F64> getLandmarkByIndex( QrCode qr) {
-		pixelControl.get(0).set(qr.ppCorner.get(0));
-		pixelControl.get(1).set(qr.ppCorner.get(1));
-		pixelControl.get(2).set(qr.ppCorner.get(2));
-		pixelControl.get(3).set(qr.ppCorner.get(3));
+		pixelControl.get(0).setTo(qr.ppCorner.get(0));
+		pixelControl.get(1).setTo(qr.ppCorner.get(1));
+		pixelControl.get(2).setTo(qr.ppCorner.get(2));
+		pixelControl.get(3).setTo(qr.ppCorner.get(3));
 
-		pixelControl.get(4).set(qr.ppRight.get(0));
-		pixelControl.get(5).set(qr.ppRight.get(1));
-		pixelControl.get(6).set(qr.ppRight.get(2));
-		pixelControl.get(7).set(qr.ppRight.get(3));
+		pixelControl.get(4).setTo(qr.ppRight.get(0));
+		pixelControl.get(5).setTo(qr.ppRight.get(1));
+		pixelControl.get(6).setTo(qr.ppRight.get(2));
+		pixelControl.get(7).setTo(qr.ppRight.get(3));
 
-		pixelControl.get(8).set(qr.ppDown.get(0));
-		pixelControl.get(9).set(qr.ppDown.get(1));
-		pixelControl.get(10).set(qr.ppDown.get(2));
-		pixelControl.get(11).set(qr.ppDown.get(3));
+		pixelControl.get(8).setTo(qr.ppDown.get(0));
+		pixelControl.get(9).setTo(qr.ppDown.get(1));
+		pixelControl.get(10).setTo(qr.ppDown.get(2));
+		pixelControl.get(11).setTo(qr.ppDown.get(3));
 
 		// put it back into distorted pixels. Required by FiducialDetectorPnP
 		for (int i = 0; i < pixelControl.size(); i++) {

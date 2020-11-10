@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,68 +41,61 @@ import org.jetbrains.annotations.Nullable;
  * European conference on computer vision. Springer, Berlin, Heidelberg, 1994.
  * </p>
  *
- * @see CensusTransform
- *
  * @author Peter Abeles
+ * @see CensusTransform
  */
 public class GCensusTransform {
-	public static<T extends ImageGray<T>> void dense3x3(final T input , final GrayU8 output ,
-														@Nullable ImageBorder<T> border )
-	{
-		if( input.getClass() == GrayU8.class ) {
-			CensusTransform.dense3x3((GrayU8)input,output,(ImageBorder_S32)border);
-		} else if( input.getClass() == GrayU16.class ) {
-			CensusTransform.dense3x3((GrayU16)input,output,(ImageBorder_S32)border);
-		} else if( input.getClass() == GrayF32.class ) {
-			CensusTransform.dense3x3((GrayF32)input,output,(ImageBorder_F32)border);
+	public static <T extends ImageGray<T>> void dense3x3( final T input, final GrayU8 output,
+														  @Nullable ImageBorder<T> border ) {
+		if (input.getClass() == GrayU8.class) {
+			CensusTransform.dense3x3((GrayU8)input, output, (ImageBorder_S32)border);
+		} else if (input.getClass() == GrayU16.class) {
+			CensusTransform.dense3x3((GrayU16)input, output, (ImageBorder_S32)border);
+		} else if (input.getClass() == GrayF32.class) {
+			CensusTransform.dense3x3((GrayF32)input, output, (ImageBorder_F32)border);
 		} else {
-			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown input image type. " + input.getClass().getSimpleName());
 		}
 	}
 
-	public static<T extends ImageGray<T>> void dense5x5(final T input , final GrayS32 output ,
-														@Nullable ImageBorder<T> border )
-	{
-		if( input.getClass() == GrayU8.class ) {
-			CensusTransform.dense5x5((GrayU8)input,output,(ImageBorder_S32)border);
-		} else if( input.getClass() == GrayU16.class ) {
-			CensusTransform.dense5x5((GrayU16)input,output,(ImageBorder_S32)border);
-		} else if( input.getClass() == GrayF32.class ) {
-			CensusTransform.dense5x5((GrayF32)input,output,(ImageBorder_F32)border);
+	public static <T extends ImageGray<T>> void dense5x5( final T input, final GrayS32 output,
+														  @Nullable ImageBorder<T> border ) {
+		if (input.getClass() == GrayU8.class) {
+			CensusTransform.dense5x5((GrayU8)input, output, (ImageBorder_S32)border);
+		} else if (input.getClass() == GrayU16.class) {
+			CensusTransform.dense5x5((GrayU16)input, output, (ImageBorder_S32)border);
+		} else if (input.getClass() == GrayF32.class) {
+			CensusTransform.dense5x5((GrayF32)input, output, (ImageBorder_F32)border);
 		} else {
-			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown input image type. " + input.getClass().getSimpleName());
 		}
 	}
 
-	public static<T extends ImageGray<T>> void sample_S64(final T input , final FastAccess<Point2D_I32> sample,
-														  final GrayS64 output ,
-														  @Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace )
-	{
-		if( input.getClass() == GrayU8.class ) {
-			CensusTransform.sample_S64((GrayU8)input,sample,output,(ImageBorder_S32)border,workSpace);
-		} else if( input.getClass() == GrayU16.class ) {
-			CensusTransform.sample_S64((GrayU16)input,sample,output,(ImageBorder_S32)border,workSpace);
-		} else if( input.getClass() == GrayF32.class ) {
-			CensusTransform.sample_S64((GrayF32)input,sample,output,(ImageBorder_F32)border,workSpace);
+	public static <T extends ImageGray<T>> void sample_S64( final T input, final FastAccess<Point2D_I32> sample,
+															final GrayS64 output,
+															@Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace ) {
+		if (input.getClass() == GrayU8.class) {
+			CensusTransform.sample_S64((GrayU8)input, sample, output, (ImageBorder_S32)border, workSpace);
+		} else if (input.getClass() == GrayU16.class) {
+			CensusTransform.sample_S64((GrayU16)input, sample, output, (ImageBorder_S32)border, workSpace);
+		} else if (input.getClass() == GrayF32.class) {
+			CensusTransform.sample_S64((GrayF32)input, sample, output, (ImageBorder_F32)border, workSpace);
 		} else {
-			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown input image type. " + input.getClass().getSimpleName());
 		}
 	}
 
-	public static<T extends ImageGray<T>> void sample_IU16(final T input , final FastAccess<Point2D_I32> sample,
-														   final InterleavedU16 output ,
-														   @Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace )
-	{
-		if( input.getClass() == GrayU8.class ) {
-			CensusTransform.sample_IU16((GrayU8)input,sample,output,(ImageBorder_S32)border,workSpace);
-		} else if( input.getClass() == GrayU16.class ) {
-			CensusTransform.sample_IU16((GrayU16)input,sample,output,(ImageBorder_S32)border,workSpace);
-		} else if( input.getClass() == GrayF32.class ) {
-			CensusTransform.sample_IU16((GrayF32)input,sample,output,(ImageBorder_F32)border,workSpace);
+	public static <T extends ImageGray<T>> void sample_IU16( final T input, final FastAccess<Point2D_I32> sample,
+															 final InterleavedU16 output,
+															 @Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace ) {
+		if (input.getClass() == GrayU8.class) {
+			CensusTransform.sample_IU16((GrayU8)input, sample, output, (ImageBorder_S32)border, workSpace);
+		} else if (input.getClass() == GrayU16.class) {
+			CensusTransform.sample_IU16((GrayU16)input, sample, output, (ImageBorder_S32)border, workSpace);
+		} else if (input.getClass() == GrayF32.class) {
+			CensusTransform.sample_IU16((GrayF32)input, sample, output, (ImageBorder_F32)border, workSpace);
 		} else {
-			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown input image type. " + input.getClass().getSimpleName());
 		}
-
 	}
-
 }

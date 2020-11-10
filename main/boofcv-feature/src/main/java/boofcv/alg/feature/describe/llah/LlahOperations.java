@@ -180,7 +180,7 @@ public class LlahOperations {
 		doc.documentID = documents.size() - 1;
 
 		// copy the points
-		doc.landmarks.copyAll(locations2D, ( src, dst ) -> dst.set(src));
+		doc.landmarks.copyAll(locations2D, ( src, dst ) -> dst.setTo(src));
 
 		computeAllFeatures(locations2D, ( idx, l ) -> createProcessor(doc, idx));
 

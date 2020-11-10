@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 	{
 		final SetStruct2D ss = (SetStruct2D)sets.data[set];
 		ss.src.add(description);
-		ss.pixelsSrc.grow().set(pixelX,pixelY);
+		ss.pixelsSrc.grow().setTo(pixelX,pixelY);
 		ss.indexSrc.add(countSrc++);
 	}
 
@@ -88,7 +88,7 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 	{
 		final SetStruct2D ss = (SetStruct2D)sets.data[set];
 		ss.dst.add(description);
-		ss.pixelsDst.grow().set(pixelX,pixelY);
+		ss.pixelsDst.grow().setTo(pixelX,pixelY);
 		ss.indexDst.add(countDst++);
 	}
 

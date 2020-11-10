@@ -28,53 +28,53 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
-* @author Peter Abeles
-*/
+ * @author Peter Abeles
+ */
 public class TestMergeRegionMeanShift extends BoofStandardJUnit {
 	@Test
 	public void basicAll() {
-		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
+		MergeRegionMeanShift alg = new MergeRegionMeanShift(1, 1);
 
-		GrayS32 pixelToRegion = new GrayS32(4,4);
+		GrayS32 pixelToRegion = new GrayS32(4, 4);
 		pixelToRegion.data = new int[]
-				{0,0,0,1,
-				 2,0,0,1,
-				 2,0,1,1,
-				 0,0,3,1};
+				{0, 0, 0, 1,
+						2, 0, 0, 1,
+						2, 0, 1, 1,
+						0, 0, 3, 1};
 
 		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
-		regionMemberCount.data = new int[]{1,2,3,4};
+		regionMemberCount.data = new int[]{1, 2, 3, 4};
 		regionMemberCount.size = 4;
 
-		FastQueue<float[]> regionColor = createList(5,1,6,4);
+		FastQueue<float[]> regionColor = createList(5, 1, 6, 4);
 		FastQueue<Point2D_I32> modeLocation = new FastQueue<>(Point2D_I32::new);
-		modeLocation.grow().set(0,0);
-		modeLocation.grow().set(3,3);
-		modeLocation.grow().set(0,1);
-		modeLocation.grow().set(2, 3);
+		modeLocation.grow().setTo(0, 0);
+		modeLocation.grow().setTo(3, 3);
+		modeLocation.grow().setTo(0, 1);
+		modeLocation.grow().setTo(2, 3);
 
 		alg.process(pixelToRegion, regionMemberCount, regionColor, modeLocation);
 
-		GrayS32 expectedP2R = new GrayS32(4,4);
+		GrayS32 expectedP2R = new GrayS32(4, 4);
 		expectedP2R.data = new int[]
-				{0,0,0,1,
-				 0,0,0,1,
-				 0,0,1,1,
-				 0,0,2,1};
+				{0, 0, 0, 1,
+						0, 0, 0, 1,
+						0, 0, 1, 1,
+						0, 0, 2, 1};
 
-		int expectedCount[] = new int[]{4,2,4};
+		int[] expectedCount = new int[]{4, 2, 4};
 
-		for( int i = 0; i < expectedP2R.data.length; i++ )
-			assertEquals(expectedP2R.data[i],pixelToRegion.data[i]);
+		for (int i = 0; i < expectedP2R.data.length; i++)
+			assertEquals(expectedP2R.data[i], pixelToRegion.data[i]);
 
-		for( int i = 0; i < expectedCount.length; i++ )
-			assertEquals(expectedCount[i],regionMemberCount.data[i]);
+		for (int i = 0; i < expectedCount.length; i++)
+			assertEquals(expectedCount[i], regionMemberCount.data[i]);
 	}
 
-	private FastQueue<float[]> createList( int ...colors ) {
-		FastQueue<float[]> ret = new FastQueue<>(()->new float[1]);
+	private FastQueue<float[]> createList( int... colors ) {
+		FastQueue<float[]> ret = new FastQueue<>(() -> new float[1]);
 
-		for( int i = 0; i < colors.length; i++ ) {
+		for (int i = 0; i < colors.length; i++) {
 			ret.grow()[0] = colors[i];
 		}
 		return ret;

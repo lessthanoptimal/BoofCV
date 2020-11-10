@@ -69,7 +69,7 @@ public class SfmTestHelper extends BoofStandardJUnit {
 		distRight.compute((float)pixelRight.x, (float)pixelRight.y, lensRight);
 
 		// output solution
-		left.set(lensLeft.x, lensLeft.y);
-		right.set(lensRight.x, lensRight.y);
+		left.setTo(lensLeft.x, lensLeft.y);
+		right.setTo(lensRight.x, lensRight.y);
 	}
 }

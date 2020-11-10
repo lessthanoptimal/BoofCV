@@ -223,8 +223,8 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 				// optimize it a few times to get a good solution
 				for (int k = 0; k < 5; k++) {
 					assertTrue(alg.refine(edge.a,edge.b, found[j]));
-					edge.a.set(ClosestPoint2D_F64.closestPoint(found[j],edge.a,null));
-					edge.b.set(ClosestPoint2D_F64.closestPoint(found[j],edge.b,null));
+					edge.a.setTo(ClosestPoint2D_F64.closestPoint(found[j],edge.a,null));
+					edge.b.setTo(ClosestPoint2D_F64.closestPoint(found[j],edge.b,null));
 				}
 
 			}
@@ -267,7 +267,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 		float H = y1-y0-10;
 
 		alg.setImage(image);
-		alg.center.set(10, 12);
+		alg.center.setTo(10, 12);
 		alg.localScale = 2;
 		alg.computePointsAndWeights(0, H, x0, y0 + 5, 1, 0);
 
@@ -321,7 +321,7 @@ public class TestSnapToLineEdge extends BoofStandardJUnit {
 		LineSegment2D_F64 segment = new LineSegment2D_F64(10,20,50,-10);
 
 		SnapToLineEdge alg = new SnapToLineEdge(10,2, GrayU8.class);
-		alg.center.set(20,23);
+		alg.center.setTo(20,23);
 		alg.localScale = 10;
 
 		LineSegment2D_F64 local = segment.copy();

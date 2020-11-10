@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -165,7 +165,7 @@ implements FiducialTracker<T>
 			PointIndex2D_F64 dot = track.observed.get(dotIdx);
 			Point2D_F64 landmark = track.globalDoc.landmarks.get(dot.index);
 			pixelToNorm.compute(dot.x,dot.y, norm);
-			control3D.grow().set(norm.x,norm.y,landmark.x,-landmark.y,0);
+			control3D.grow().setTo(norm.x,norm.y,landmark.x,-landmark.y,0);
 		}
 
 		return control3D.toList();

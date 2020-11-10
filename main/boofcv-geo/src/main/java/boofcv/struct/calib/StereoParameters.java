@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,7 +128,7 @@ public class StereoParameters implements Serializable {
 		if( this.right_to_left == null )
 			this.right_to_left = src.right_to_left.copy();
 		else
-			this.right_to_left.set(src.right_to_left);
+			this.right_to_left.setTo(src.right_to_left);
 	}
 
 	public void print() {

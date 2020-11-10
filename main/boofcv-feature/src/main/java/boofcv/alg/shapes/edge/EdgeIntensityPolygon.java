@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
+public class EdgeIntensityPolygon<T extends ImageGray<T>> {
 
 	// distance away from corner that sampling will start and end
 	private double cornerOffset;
@@ -56,10 +56,10 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
 	 * @param numSamples Number of points it will sample along an edge
 	 * @param imageType Type of image it will process
 	 */
-	public EdgeIntensityPolygon(double cornerOffset ,
-								double tangentDistance,
-								int numSamples,
-								Class<T> imageType ) {
+	public EdgeIntensityPolygon( double cornerOffset,
+								 double tangentDistance,
+								 int numSamples,
+								 Class<T> imageType ) {
 		this.cornerOffset = cornerOffset;
 		this.tangentDistance = tangentDistance;
 
@@ -81,7 +81,7 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
 	/**
 	 * Sets the image which is going to be processed.
 	 */
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		scorer.setImage(image);
 	}
 
@@ -92,49 +92,49 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
 	 * @param ccw True if the polygon is counter clockwise
 	 * @return true if it could compute the edge intensity, otherwise false
 	 */
-	public boolean computeEdge(Polygon2D_F64 polygon , boolean ccw ) {
+	public boolean computeEdge( Polygon2D_F64 polygon, boolean ccw ) {
 		averageInside = 0;
 		averageOutside = 0;
 
 		double tangentSign = ccw ? 1 : -1;
 
 		int totalSides = 0;
-		for (int i = polygon.size()-1,j=0; j < polygon.size(); i=j,j++) {
+		for (int i = polygon.size() - 1, j = 0; j < polygon.size(); i = j, j++) {
 
 			Point2D_F64 a = polygon.get(i);
 			Point2D_F64 b = polygon.get(j);
 
-			double dx = b.x-a.x;
-			double dy = b.y-a.y;
+			double dx = b.x - a.x;
+			double dy = b.y - a.y;
 			double t = Math.sqrt(dx*dx + dy*dy);
 			dx /= t;
 			dy /= t;
 
 			// see if the side is too small
-			if( t < 3*cornerOffset ) {
-				offsetA.set(a);
-				offsetB.set(b);
+			if (t < 3*cornerOffset) {
+				offsetA.setTo(a);
+				offsetB.setTo(b);
 			} else {
-				offsetA.x = a.x + cornerOffset * dx;
-				offsetA.y = a.y + cornerOffset * dy;
+				offsetA.x = a.x + cornerOffset*dx;
+				offsetA.y = a.y + cornerOffset*dy;
 
-				offsetB.x = b.x - cornerOffset * dx;
-				offsetB.y = b.y - cornerOffset * dy;
+				offsetB.x = b.x - cornerOffset*dx;
+				offsetB.y = b.y - cornerOffset*dy;
 			}
 
 			double tanX = -dy*tangentDistance*tangentSign;
-			double tanY =  dx*tangentDistance*tangentSign;
+			double tanY = dx*tangentDistance*tangentSign;
 
-			scorer.computeAverageDerivative(offsetA, offsetB, tanX,tanY);
+			scorer.computeAverageDerivative(offsetA, offsetB, tanX, tanY);
 
-			if( scorer.getSamplesInside() > 0 ) {
+			if (scorer.getSamplesInside() > 0) {
 				totalSides++;
-				averageInside += scorer.getAverageUp() / tangentDistance;
-				averageOutside += scorer.getAverageDown() / tangentDistance;
+				averageInside += scorer.getAverageUp()/tangentDistance;
+				averageOutside += scorer.getAverageDown()/tangentDistance;
 			}
 		}
 
-		if( totalSides > 0 ) {
+		if (totalSides > 0) {
 			averageInside /= totalSides;
 			averageOutside /= totalSides;
 		} else {
@@ -155,18 +155,18 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
 	 * @param threshold threshold for average difference
 	 * @return true if the edge intensity is significant enough
 	 */
-	public boolean checkIntensity( boolean insideDark , double threshold ) {
-		if( insideDark )
-			return averageOutside-averageInside >= threshold;
+	public boolean checkIntensity( boolean insideDark, double threshold ) {
+		if (insideDark)
+			return averageOutside - averageInside >= threshold;
 		else
-			return averageInside-averageOutside >= threshold;
+			return averageInside - averageOutside >= threshold;
 	}
 
 	public double getCornerOffset() {
 		return cornerOffset;
 	}
 
-	public void setCornerOffset(double cornerOffset) {
+	public void setCornerOffset( double cornerOffset ) {
 		this.cornerOffset = cornerOffset;
 	}
 
@@ -174,7 +174,7 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>>  {
 		return tangentDistance;
 	}
 
-	public void setTangentDistance(double tangentDistance) {
+	public void setTangentDistance( double tangentDistance ) {
 		this.tangentDistance = tangentDistance;
 	}
 

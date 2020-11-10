@@ -64,13 +64,13 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		SquareGraph alg = new SquareGraph();
 		Point2D_F64 intersection = new Point2D_F64();
 
-		line.b.set(0,2);
+		line.b.setTo(0,2);
 		assertEquals(0,alg.findSideIntersect(a,line,intersection,storage));
-		line.b.set(0, -2);
+		line.b.setTo(0, -2);
 		assertEquals(2, alg.findSideIntersect(a, line, intersection,storage));
-		line.b.set(2, 0);
+		line.b.setTo(2, 0);
 		assertEquals(1,alg.findSideIntersect(a,line,intersection,storage));
-		line.b.set(-2, 0);
+		line.b.setTo(-2, 0);
 		assertEquals(3, alg.findSideIntersect(a, line, intersection,storage));
 	}
 
@@ -108,10 +108,10 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		double cos1 = Math.cos(angle1);
 		double sin1 = Math.sin(angle1);
 
-		a.square.get(adj).set(-1 + 2 * cos0, 1 + 2 * sin0);
+		a.square.get(adj).setTo(-1 + 2 * cos0, 1 + 2 * sin0);
 		assertTrue(alg.almostParallel(a, 0, b, 0));
 		assertFalse(alg.almostParallel(a, 1, b, 0));
-		a.square.get(adj).set(-1 + 2 * cos1, 1 + 2 * sin1);
+		a.square.get(adj).setTo(-1 + 2 * cos1, 1 + 2 * sin1);
 		assertTrue(alg.almostParallel(a, 0, b, 0));
 		assertFalse(alg.almostParallel(a, 1, b, 0));
 	}
@@ -169,8 +169,8 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		alg.detachEdge(e);
 
 		assertEquals(1, alg.edgeManager.getUnused().size());
-		assertTrue(a.edges[1] == null);
-		assertTrue(b.edges[2] == null);
+		assertNull(a.edges[1]);
+		assertNull(b.edges[2]);
 	}
 
 	@Test
@@ -182,7 +182,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 
 		alg.connect(a,1,b,2,2.5);
 
-		assertTrue(a.edges[1] == b.edges[2]);
+		assertSame(a.edges[1], b.edges[2]);
 		SquareEdge e = a.edges[1];
 		assertEquals(e.distance,2.5,1e-8);
 		assertEquals(1, e.sideA);
@@ -222,7 +222,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 
 	public static void assertConnected(SquareNode a , int indexA , SquareNode b , int indexB , double distance)
 	{
-		assertTrue(a.edges[indexA]==b.edges[indexB]);
+		assertSame(a.edges[indexA], b.edges[indexB]);
 		assertEquals(distance,a.edges[indexA].distance,1e-8);
 	}
 
@@ -231,13 +231,13 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		for (int i = 0; i < 4; i++) {
 			if( a.edges[i] != null ) {
 				SquareEdge e = a.edges[i];
-				assertFalse(e.a==b);
-				assertFalse(e.b==b);
+				assertNotSame(e.a, b);
+				assertNotSame(e.b, b);
 			}
 			if( b.edges[i] != null ) {
 				SquareEdge e = b.edges[i];
-				assertFalse(e.a==a);
-				assertFalse(e.b==a);
+				assertNotSame(e.a, a);
+				assertNotSame(e.b, a);
 			}
 		}
 	}

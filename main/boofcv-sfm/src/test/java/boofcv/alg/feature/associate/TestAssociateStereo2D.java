@@ -80,8 +80,8 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		Point3D_F64 X = new Point3D_F64(0.02, -0.5, 3);
 
 		SfmTestHelper.renderPointPixel(param, X, leftP, rightP);
-		pointsLeft.grow().set(leftP);
-		pointsRight.grow().set(rightP);
+		pointsLeft.grow().setTo(leftP);
+		pointsRight.grow().setTo(rightP);
 
 		descLeft.grow();
 		descRight.grow();
@@ -114,8 +114,8 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		// mangle the x-axis
 		leftP.x = rightP.x - 0.25;
 
-		pointsLeft.grow().set(leftP);
-		pointsRight.grow().set(rightP);
+		pointsLeft.grow().setTo(leftP);
+		pointsRight.grow().setTo(rightP);
 
 		descLeft.grow();
 		descRight.grow();
@@ -154,8 +154,8 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		// mangle the y-axis
 		leftP.y += 0.25;
 
-		pointsLeft.grow().set(leftP);
-		pointsRight.grow().set(rightP);
+		pointsLeft.grow().setTo(leftP);
+		pointsRight.grow().setTo(rightP);
 
 		descLeft.grow();
 		descRight.grow();

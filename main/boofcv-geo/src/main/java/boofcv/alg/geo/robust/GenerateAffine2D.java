@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,16 +28,14 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Fits an {@link Affine2D_F64} motion model to a list of {@link AssociatedPair}.
  *
  * @author Peter Abeles
  */
 public class GenerateAffine2D implements
-		ModelGenerator<Affine2D_F64,AssociatedPair>,
-		ModelFitter<Affine2D_F64,AssociatedPair>
-{
+		ModelGenerator<Affine2D_F64, AssociatedPair>,
+		ModelFitter<Affine2D_F64, AssociatedPair> {
 
 	// model affine fitter
 	MotionAffinePoint2D_F64 fitter = new MotionAffinePoint2D_F64();
@@ -48,39 +46,39 @@ public class GenerateAffine2D implements
 	List<Point2D_F64> to = new ArrayList<>();
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> dataSet, Affine2D_F64 initial, Affine2D_F64 found) {
+	public boolean fitModel( List<AssociatedPair> dataSet, Affine2D_F64 initial, Affine2D_F64 found ) {
 		from.clear();
 		to.clear();
 
-		for( int i = 0; i < dataSet.size(); i++ ) {
+		for (int i = 0; i < dataSet.size(); i++) {
 			AssociatedPair p = dataSet.get(i);
 			from.add(p.p1);
 			to.add(p.p2);
 		}
 
-		if( !fitter.process(from,to) )
+		if (!fitter.process(from, to))
 			return false;
 
-		found.set(fitter.getTransformSrcToDst());
+		found.setTo(fitter.getTransformSrcToDst());
 		return true;
 	}
 
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, Affine2D_F64 model ) {
+	public boolean generate( List<AssociatedPair> dataSet, Affine2D_F64 model ) {
 
 		from.clear();
 		to.clear();
 
-		for( int i = 0; i < dataSet.size(); i++ ) {
+		for (int i = 0; i < dataSet.size(); i++) {
 			AssociatedPair p = dataSet.get(i);
 			from.add(p.p1);
 			to.add(p.p2);
 		}
 
-		if( !fitter.process(from,to) )
+		if (!fitter.process(from, to))
 			return false;
 
-		model.set(fitter.getTransformSrcToDst());
+		model.setTo(fitter.getTransformSrcToDst());
 
 		return true;
 	}
@@ -94,5 +92,4 @@ public class GenerateAffine2D implements
 	public double getFitScore() {
 		return 0;
 	}
-
 }

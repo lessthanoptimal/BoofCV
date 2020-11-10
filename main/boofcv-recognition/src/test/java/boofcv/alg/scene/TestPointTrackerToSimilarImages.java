@@ -280,7 +280,7 @@ class TestPointTrackerToSimilarImages extends BoofStandardJUnit {
 			for (int i = 0; i < numTracks; i++) {
 				PointTrack t = tracks.grow();
 				t.featureId = offsetID+i;
-				t.pixel.set(i,i+1);
+				t.pixel.setTo(i,i+1);
 			}
 
 			super.process(image);

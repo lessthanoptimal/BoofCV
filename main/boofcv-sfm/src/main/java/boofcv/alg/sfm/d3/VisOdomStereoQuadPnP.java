@@ -192,7 +192,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	 */
 	public void setCalibration( StereoParameters param ) {
 		this.stereoParameters.set(param);
-		right_to_left.set(param.right_to_left);
+		right_to_left.setTo(param.right_to_left);
 		right_to_left.invert(left_to_right);
 		leftPixelToNorm = LensDistortionFactory.narrow(param.left).undistort_F64(true, false);
 		rightPixelToNorm = LensDistortionFactory.narrow(param.right).undistort_F64(true, false);
@@ -268,7 +268,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 			performTrackMaintenance(key_to_curr);
 			// compound the just found motion with the previously found motion
 			key_to_curr.invert(curr_to_key);
-			prevLeft_to_world.set(left_to_world);
+			prevLeft_to_world.setTo(left_to_world);
 			curr_to_key.concat(prevLeft_to_world, left_to_world);
 			long time7 = System.nanoTime();
 
@@ -325,9 +325,9 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		// key left is origin and never changes
 		listWorldToView.get(0).reset();
 		// key right to key left is also constant and assumed known
-		listWorldToView.get(1).set(left_to_right);
+		listWorldToView.get(1).setTo(left_to_right);
 		// This was just estimated
-		listWorldToView.get(2).set(key_to_curr);
+		listWorldToView.get(2).setTo(key_to_curr);
 		// (left key -> left curr) -> (left curr -> right curr)
 		key_to_curr.concat(left_to_right, listWorldToView.get(3));
 
@@ -352,7 +352,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 			}
 
 			// save the results
-			q.X.set(X3);
+			q.X.setTo(X3);
 		}
 	}
 
@@ -557,7 +557,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		d.resize(detector.getNumberOfFeatures());
 		info.sets.resize(detector.getNumberOfFeatures());
 		for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
-			l.data[i].set(detector.getLocation(i));
+			l.data[i].setTo(detector.getLocation(i));
 			d.data[i].setTo(detector.getDescription(i));
 			info.sets.data[i] = detector.getSet(i);
 		}
@@ -576,7 +576,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 			Stereo2D3D data = modelFitData.grow();
 			leftPixelToNorm.compute(quad.v2.x, quad.v2.y, data.leftObs);
 			rightPixelToNorm.compute(quad.v3.x, quad.v3.y, data.rightObs);
-			data.location.set(quad.X);
+			data.location.setTo(quad.X);
 		}
 
 		// robustly match the data
@@ -602,7 +602,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		// optionally refine the results
 		if (modelRefiner != null) {
 			if (modelRefiner.fitModel(matcher.getMatchSet(), key_to_curr, found)) {
-				key_to_curr.set(found);
+				key_to_curr.setTo(found);
 			}
 		}
 
@@ -660,7 +660,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		}
 
 		// Reminder: World here refers to key left view
-		key_to_curr.set(structure.getParentToView(2));
+		key_to_curr.setTo(structure.getParentToView(2));
 	}
 
 	public Se3_F64 getLeftToWorld() {return left_to_world; }

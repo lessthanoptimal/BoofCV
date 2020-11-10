@@ -37,7 +37,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 /**
  * @author Peter Abeles
  */
@@ -51,12 +50,12 @@ class TestDistortImageOps extends BoofStandardJUnit {
 	 */
 	@Test
 	void scale_InterpTypeStyle() {
-		GrayF32 input = new GrayF32(width,height);
+		GrayF32 input = new GrayF32(width, height);
 		GrayF32 output = input.createSameShape();
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		new FDistort(input,output).border(BorderType.ZERO).scale().apply();
+		new FDistort(input, output).border(BorderType.ZERO).scale().apply();
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		interp.setImage(input);
@@ -64,18 +63,18 @@ class TestDistortImageOps extends BoofStandardJUnit {
 		float scaleX = (float)input.width/(float)output.width;
 		float scaleY = (float)input.height/(float)output.height;
 
-		if( input.getDataType().isInteger() ) {
-			for( int i = 0; i < output.height; i++ ) {
-				for( int j = 0; j < output.width; j++ ) {
-					float val = interp.get(j*scaleX,i*scaleY);
-					assertEquals((int)val,output.get(j,i),1e-4);
+		if (input.getDataType().isInteger()) {
+			for (int i = 0; i < output.height; i++) {
+				for (int j = 0; j < output.width; j++) {
+					float val = interp.get(j*scaleX, i*scaleY);
+					assertEquals((int)val, output.get(j, i), 1e-4);
 				}
 			}
 		} else {
-			for( int i = 0; i < output.height; i++ ) {
-				for( int j = 0; j < output.width; j++ ) {
-					float val = interp.get(j*scaleX,i*scaleY);
-					assertEquals(val,output.get(j,i),1e-4);
+			for (int i = 0; i < output.height; i++) {
+				for (int j = 0; j < output.width; j++) {
+					float val = interp.get(j*scaleX, i*scaleY);
+					assertEquals(val, output.get(j, i), 1e-4);
 				}
 			}
 		}
@@ -86,25 +85,25 @@ class TestDistortImageOps extends BoofStandardJUnit {
 	 */
 	@Test
 	void rotate_SanityCheck() {
-		var input = new GrayF32(width,height);
-		var output = new GrayF32(height,width);
+		var input = new GrayF32(width, height);
+		var output = new GrayF32(height, width);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		new FDistort(input,output).border(BorderType.ZERO).rotate(Math.PI/2.0).apply();
+		new FDistort(input, output).border(BorderType.ZERO).rotate(Math.PI/2.0).apply();
 
 		double error = 0;
 		// the outside pixels are ignored because numerical round off can cause those to be skipped
-		for( int y = 1; y < input.height-1; y++ ) {
-			for( int x = 1; x < input.width-1; x++ ) {
-				int xx = output.width-y;
+		for (int y = 1; y < input.height - 1; y++) {
+			for (int x = 1; x < input.width - 1; x++) {
+				int xx = output.width - y;
 				int yy = x;
 
-				double e = input.get(x,y)-output.get(xx,yy);
+				double e = input.get(x, y) - output.get(xx, yy);
 				error += Math.abs(e);
 			}
 		}
-		assertTrue(error / (width * height) < 0.1);
+		assertTrue(error/(width*height) < 0.1);
 	}
 
 	/**
@@ -116,29 +115,29 @@ class TestDistortImageOps extends BoofStandardJUnit {
 		Point2D_F32 work = new Point2D_F32();
 
 		// basic sanity check
-		var affine = new Affine2D_F32(1,0,0,1,2,3);
+		var affine = new Affine2D_F32(1, 0, 0, 1, 2, 3);
 		var transform = new PixelTransformAffine_F32(affine);
-		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,30,40,work,transform);
-		
-		assertEquals(2,found.x0);
-		assertEquals(3,found.y0);
-		assertEquals(10,found.width);
-		assertEquals(20,found.height);
-		
+		RectangleLength2D_I32 found = DistortImageOps.boundBox(10, 20, 30, 40, work, transform);
+
+		assertEquals(2, found.x0);
+		assertEquals(3, found.y0);
+		assertEquals(10, found.width);
+		assertEquals(20, found.height);
+
 		// bottom right border
-		found = DistortImageOps.boundBox(10,20,8,18,work,transform);
-		assertEquals(2,found.x0);
-		assertEquals(3,found.y0);
-		assertEquals(6,found.width);
-		assertEquals(15,found.height);
-		
+		found = DistortImageOps.boundBox(10, 20, 8, 18, work, transform);
+		assertEquals(2, found.x0);
+		assertEquals(3, found.y0);
+		assertEquals(6, found.width);
+		assertEquals(15, found.height);
+
 		// top right border
-		transform.getModel().set(new Affine2D_F32(1,0,0,1,-2,-3));
-		found = DistortImageOps.boundBox(10,20,8,18,work,transform);
-		assertEquals(0,found.x0);
-		assertEquals(0,found.y0);
-		assertEquals(8,found.width);
-		assertEquals(17,found.height);
+		transform.getModel().setTo(new Affine2D_F32(1, 0, 0, 1, -2, -3));
+		found = DistortImageOps.boundBox(10, 20, 8, 18, work, transform);
+		assertEquals(0, found.x0);
+		assertEquals(0, found.y0);
+		assertEquals(8, found.width);
+		assertEquals(17, found.height);
 	}
 
 	@Test
@@ -146,14 +145,14 @@ class TestDistortImageOps extends BoofStandardJUnit {
 		Point2D_F32 work = new Point2D_F32();
 
 		// basic sanity check
-		var affine = new Affine2D_F32(1,0,0,1,2,3);
+		var affine = new Affine2D_F32(1, 0, 0, 1, 2, 3);
 		var transform = new PixelTransformAffine_F32(affine);
-		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,work,transform);
+		RectangleLength2D_I32 found = DistortImageOps.boundBox(10, 20, work, transform);
 
-		assertEquals(2,found.x0);
-		assertEquals(3,found.y0);
-		assertEquals(10,found.width);
-		assertEquals(20,found.height);
+		assertEquals(2, found.x0);
+		assertEquals(3, found.y0);
+		assertEquals(10, found.width);
+		assertEquals(20, found.height);
 	}
 
 	@Test
@@ -161,14 +160,14 @@ class TestDistortImageOps extends BoofStandardJUnit {
 		Point2D_F32 transformed = new Point2D_F32();
 
 		// basic sanity check
-		var affine = new Affine2D_F32(1,0,0,1,2,3);
+		var affine = new Affine2D_F32(1, 0, 0, 1, 2, 3);
 		var transform = new PixelTransformAffine_F32(affine);
-		RectangleLength2D_F32 found = DistortImageOps.boundBox_F32(10,20,transform,transformed);
+		RectangleLength2D_F32 found = DistortImageOps.boundBox_F32(10, 20, transform, transformed);
 
-		assertEquals(2,found.x0,1e-4);
-		assertEquals(3,found.y0,1e-4);
-		assertEquals(10,found.width,1e-4);
-		assertEquals(20,found.height,1e-4);
+		assertEquals(2, found.x0, 1e-4);
+		assertEquals(3, found.y0, 1e-4);
+		assertEquals(10, found.width, 1e-4);
+		assertEquals(20, found.height, 1e-4);
 	}
 
 	@Test
@@ -176,13 +175,13 @@ class TestDistortImageOps extends BoofStandardJUnit {
 		Point2D_F64 transformed = new Point2D_F64();
 
 		// basic sanity check
-		var affine = new Affine2D_F64(1,0,0,1,2,3);
+		var affine = new Affine2D_F64(1, 0, 0, 1, 2, 3);
 		var transform = new PixelTransformAffine_F64(affine);
-		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20,transform,transformed);
+		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20, transform, transformed);
 
-		assertEquals(2,found.x0,1e-8);
-		assertEquals(3,found.y0,1e-8);
-		assertEquals(10,found.width,1e-8);
-		assertEquals(20,found.height,1e-8);
+		assertEquals(2, found.x0, 1e-8);
+		assertEquals(3, found.y0, 1e-8);
+		assertEquals(10, found.width, 1e-8);
+		assertEquals(20, found.height, 1e-8);
 	}
 }

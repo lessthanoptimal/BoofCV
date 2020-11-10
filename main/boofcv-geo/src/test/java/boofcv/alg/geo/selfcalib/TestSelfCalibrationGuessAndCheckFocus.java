@@ -237,13 +237,13 @@ public class TestSelfCalibrationGuessAndCheckFocus extends BoofStandardJUnit {
 		assertEquals(0,y.y, UtilEjml.TEST_F64);
 
 		// this should be negative
-		x.set(0,0);
+		x.setTo(0,0);
 		GeometryMath_F64.mult(alg.Vinv,x,y);
 		assertTrue(y.x < 0 && -y.x < 1);
 		assertTrue(y.y < 0 && -y.y < 1);
 
 		// this should be positive
-		x.set(999,799);
+		x.setTo(999,799);
 		GeometryMath_F64.mult(alg.Vinv,x,y);
 		assertTrue(y.x > 0 && y.x < 1);
 		assertTrue(y.y > 0 && y.y < 1);

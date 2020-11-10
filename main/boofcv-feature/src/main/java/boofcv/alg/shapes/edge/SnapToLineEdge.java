@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,7 +172,7 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 
 				if( w > 0 ) {
 					weights.add(w);
-					samplePts.grow().set((x - center.x) / localScale, (y - center.y) / localScale);
+					samplePts.grow().setTo((x - center.x) / localScale, (y - center.y) / localScale);
 				}
 
 				x += tanX; y += tanY;

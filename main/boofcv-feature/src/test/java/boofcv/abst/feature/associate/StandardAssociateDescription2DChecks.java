@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public abstract class StandardAssociateDescription2DChecks<Desc> extends Standar
 		public void setSource(FastAccess<Desc> listSrc) {
 			var points = new FastQueue<>(Point2D_F64::new);
 			for (int i = 0; i < listSrc.size; i++) {
-				points.grow().set(5,5);
+				points.grow().setTo(5,5);
 			}
 			alg.setSource(points,listSrc);
 		}
@@ -62,7 +62,7 @@ public abstract class StandardAssociateDescription2DChecks<Desc> extends Standar
 		public void setDestination(FastAccess<Desc> listDst) {
 			var points = new FastQueue<>(Point2D_F64::new);
 			for (int i = 0; i < listDst.size; i++) {
-				points.grow().set(5,5);
+				points.grow().setTo(5,5);
 			}
 			alg.setDestination(points,listDst);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,7 +128,7 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3
 		if (bestMotion == null)
 			return false;
 
-		estimatedModel.set(bestMotion);
+		estimatedModel.setTo(bestMotion);
 		return true;
 	}
 

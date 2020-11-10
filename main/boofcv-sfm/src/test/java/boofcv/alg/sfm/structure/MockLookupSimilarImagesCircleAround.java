@@ -243,7 +243,7 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 		for (int i = 0; i < l.size(); i++) {
 			if (l.get(i) == null)
 				throw new RuntimeException("WTF");
-			features.grow().set(l.get(i));
+			features.grow().setTo(l.get(i));
 		}
 	}
 

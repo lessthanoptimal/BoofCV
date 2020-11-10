@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public abstract class Motion2DPanel extends JPanel
 
 		if( list != null ) {
 			for( Point2D_F64 p : list ) {
-				inliers.grow().set(p);
+				inliers.grow().setTo(p);
 			}
 		}
 	}
@@ -78,7 +78,7 @@ public abstract class Motion2DPanel extends JPanel
 
 		if( list != null ) {
 			for( Point2D_F64 p : list ) {
-				allTracks.grow().set(p);
+				allTracks.grow().setTo(p);
 			}
 		}
 	}

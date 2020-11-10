@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("ConstantConditions")
 public class TestPolylineSplitMerge extends BoofStandardJUnit {
 
 	@Test
@@ -555,7 +556,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 			contour.add( new Point2D_I32(i,0));
 		}
 
-		contour.get(8).set(8,20);
+		contour.get(8).setTo(8,20);
 
 		assertEquals(8,PolylineSplitMerge.maximumDistance(contour,19,3));
 	}
@@ -905,8 +906,8 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		}
 
 		// make these points offset from all the others. That way if it grabs the wrong points the line will be wrong
-		contour.get(1).set(1,5);
-		contour.get(9).set(9,5);
+		contour.get(1).setTo(1,5);
+		contour.get(9).setTo(9,5);
 
 		LineParametric2D_F64 line = new LineParametric2D_F64();
 
@@ -927,8 +928,8 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		}
 
 		// make these points offset from all the others. That way if it grabs the wrong points the line will be wrong
-		contour.get(1).set(1,5);
-		contour.get(9).set(9,5);
+		contour.get(1).setTo(1,5);
+		contour.get(9).setTo(9,5);
 
 		LineSegment2D_F64 line = new LineSegment2D_F64();
 
@@ -937,7 +938,6 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		assertEquals(1, Distance2D_F64.distanceSq(line,0,5), GrlConstants.TEST_F64);
 		assertEquals(0, Distance2D_F64.distanceSq(line,2,5), GrlConstants.TEST_F64);
 		assertEquals(0, Distance2D_F64.distanceSq(line,8,5), GrlConstants.TEST_F64);
-
 	}
 
 	public static List<Point2D_I32> rect( int x0 , int y0 , int x1 , int y1 ) {

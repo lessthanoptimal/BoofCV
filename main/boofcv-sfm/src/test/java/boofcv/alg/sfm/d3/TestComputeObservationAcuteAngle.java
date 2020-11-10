@@ -46,7 +46,7 @@ public class TestComputeObservationAcuteAngle extends BoofStandardJUnit {
 
 		assertEquals(0, alg.computeAcuteAngle(a, b), 1e-8);
 
-		b.set(-1, 0);
+		b.setTo(-1, 0);
 
 		assertEquals(Math.PI/4.0, alg.computeAcuteAngle(a, b), 1e-8);
 	}

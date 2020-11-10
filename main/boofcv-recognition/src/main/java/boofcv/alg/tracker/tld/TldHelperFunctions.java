@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class TldHelperFunctions {
 	}
 
 	public static void convertRegion(Rectangle2D_I32 input, Rectangle2D_F64 output) {
-		output.p0.set(input.x0,input.y0);
-		output.p1.set(input.x1,input.y1);
+		output.p0.setTo(input.x0,input.y0);
+		output.p1.setTo(input.x1,input.y1);
 	}
 }

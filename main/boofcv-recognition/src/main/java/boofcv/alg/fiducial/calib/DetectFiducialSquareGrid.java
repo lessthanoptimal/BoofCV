@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,9 +68,8 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 	 * @param numbers The fiducial ID numbers its expected to see.  Order matters.
 	 * @param detector Fiducial detector
 	 */
-	public DetectFiducialSquareGrid(int numRows, int numCols, long[] numbers,
-									BaseDetectFiducialSquare<T> detector)
-	{
+	public DetectFiducialSquareGrid( int numRows, int numCols, long[] numbers,
+									 BaseDetectFiducialSquare<T> detector ) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		this.numbers = numbers;
@@ -96,15 +95,15 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 			FoundFiducial fid = found.get(i);
 
 			int gridIndex = isExpected(fid.id);
-			if( gridIndex >= 0 ) {
-				Detection d = lookupDetection(fid.id,gridIndex);
-				d.location.set(fid.distortedPixels);
+			if (gridIndex >= 0) {
+				Detection d = lookupDetection(fid.id, gridIndex);
+				d.location.setTo(fid.distortedPixels);
 				d.numDetected++;
 			}
 		}
 
-		for (int i = detections.size-1; i >= 0; i--) {
-			if( detections.get(i).numDetected != 1 ) {
+		for (int i = detections.size - 1; i >= 0; i--) {
+			if (detections.get(i).numDetected != 1) {
 				detections.remove(i);
 			}
 		}
@@ -124,9 +123,9 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 		int bestNumber = -1;
 		for (int i = 0; i < numbers.length; i++) {
 
-			int hamming = DescriptorDistance.hamming((int)found^(int)numbers[i]);
+			int hamming = DescriptorDistance.hamming((int)found ^ (int)numbers[i]);
 
-			if( hamming < bestHamming ) {
+			if (hamming < bestHamming) {
 				bestHamming = hamming;
 				bestNumber = i;
 			}
@@ -138,10 +137,10 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 	 * Looks up a detection given the fiducial ID number.  If not seen before the gridIndex is saved and
 	 * a new instance returned.
 	 */
-	private Detection lookupDetection( long found , int gridIndex) {
+	private Detection lookupDetection( long found, int gridIndex ) {
 		for (int i = 0; i < detections.size(); i++) {
 			Detection d = detections.get(i);
-			if( d.id == found ) {
+			if (d.id == found) {
 				return d;
 			}
 		}
@@ -179,10 +178,10 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 			numDetected = 0;
 			id = -1;
 			gridIndex = -1;
-			location.a.set(0 ,0);
-			location.b.set(0, 0);
-			location.c.set(0, 0);
-			location.d.set(0, 0);
+			location.a.setTo(0, 0);
+			location.b.setTo(0, 0);
+			location.c.setTo(0, 0);
+			location.d.setTo(0, 0);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -144,11 +144,11 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 
 			if (parameters.isTransformValid(p.x, p.y)) {
 				LineParametric2D_F32 l = linesAll.grow();
-				l.p.set(p.x, p.y);
+				l.p.setTo(p.x, p.y);
 				refine.search(p.x, p.y);
 				// check for divergence
 				if (l.p.distance(refine.getPeakX(), refine.getPeakY()) < refine.getRadius()*2) {
-					l.p.set(refine.getPeakX(), refine.getPeakY());
+					l.p.setTo(refine.getPeakX(), refine.getPeakY());
 				}
 				parameters.transformToLine(l.p.x, l.p.y, l);
 				foundIntensity.push(transform.get(p.x, p.y));

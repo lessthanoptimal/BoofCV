@@ -81,7 +81,7 @@ public class TestDistanceScaleTranslate2DSq extends BoofStandardJUnit {
 
 	public static AssociatedPair apply( double x, double y, ScaleTranslate2D model ) {
 		AssociatedPair p = new AssociatedPair();
-		p.p1.set(x, y);
+		p.p1.setTo(x, y);
 		p.p2.x = x*model.scale + model.transX;
 		p.p2.y = y*model.scale + model.transY;
 

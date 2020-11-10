@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class PointTrack {
 	private Object description;
 
 	public PointTrack( double x, double y, long featureId ) {
-		this.pixel.set(x, y);
+		this.pixel.setTo(x, y);
 		this.featureId = featureId;
 	}
 
@@ -72,11 +72,11 @@ public class PointTrack {
 		return storage;
 	}
 
-	public void set( PointTrack t ) {
+	public void setTo( PointTrack t ) {
 		featureId = t.featureId;
 		spawnFrameID = t.spawnFrameID;
 		lastSeenFrameID = t.lastSeenFrameID;
-		pixel.set(t.pixel);
+		pixel.setTo(t.pixel);
 		cookie = t.cookie;
 		description = t.description;
 	}

@@ -80,7 +80,7 @@ public class TestDistanceScaleTranslateRotate2DSq extends BoofStandardJUnit {
 
 	public static AssociatedPair apply( double x, double y, ScaleTranslateRotate2D model ) {
 		var p = new AssociatedPair();
-		p.p1.set(x, y);
+		p.p1.setTo(x, y);
 
 		double c = Math.cos(model.theta);
 		double s = Math.sin(model.theta);

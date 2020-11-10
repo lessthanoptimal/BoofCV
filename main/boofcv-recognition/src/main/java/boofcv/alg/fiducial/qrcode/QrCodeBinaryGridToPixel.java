@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -131,7 +131,7 @@ public class QrCodeBinaryGridToPixel {
 		for (int i = 0; i < qr.alignment.size; i++) {
 			QrCode.Alignment a = qr.alignment.get(i);
 			AssociatedPair p = storagePairs2D.grow();
-			p.set(a.pixel.x,a.pixel.y,a.moduleX+0.5f,a.moduleY+0.5f);
+			p.setTo(a.pixel.x,a.pixel.y,a.moduleX+0.5f,a.moduleY+0.5f);
 			pairs2D.add(p);
 		}
 	}
@@ -194,7 +194,7 @@ public class QrCodeBinaryGridToPixel {
 	private void set(float row, float col, Polygon2D_F64 polygon, int corner) {
 		AssociatedPair p = storagePairs2D.grow();
 		Point2D_F64 c = polygon.get(corner);
-		p.set(c.x,c.y,col,row);
+		p.setTo(c.x,c.y,col,row);
 		pairs2D.add(p);
 	}
 
@@ -204,7 +204,7 @@ public class QrCodeBinaryGridToPixel {
 		Point2D_F64 c0 = polygon0.get(corner0);
 		Point2D_F64 c1 = polygon1.get(corner1);
 
-		p.set(c1.x-c0.x,c1.y-c0.y,0,col1-col0,row1-row0,0);
+		p.setTo(c1.x-c0.x,c1.y-c0.y,0,col1-col0,row1-row0,0);
 		// normalize for numerical reasons. Scale of line parameters doesn't matter
 		p.p1.divideIP(p.p1.norm());
 		p.p2.divideIP(p.p2.norm());

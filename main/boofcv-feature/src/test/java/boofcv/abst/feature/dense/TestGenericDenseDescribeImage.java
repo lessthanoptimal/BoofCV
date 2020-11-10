@@ -31,8 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -109,8 +108,8 @@ public class TestGenericDenseDescribeImage extends BoofStandardJUnit {
 		int found07b = alg.getDescriptions().size();
 
 		// same sampling period, should have same number of samples
-		assertTrue(found07a == found10);
-		assertTrue(found10 == found15);
+		assertEquals(found10, found07a);
+		assertEquals(found15, found10);
 		// sampling period is shorter so there should be more features
 		assertTrue(found07b > found10);
 	}
@@ -131,9 +130,9 @@ public class TestGenericDenseDescribeImage extends BoofStandardJUnit {
 
 		@Override
 		public boolean process(double x, double y, double orientation, double radius, TupleDesc description) {
-			assertTrue(description!=null);
+			assertNotNull(description);
 			if( ++count != 20 ) {
-				points.grow().set((int) x, (int) y);
+				points.grow().setTo((int) x, (int) y);
 				inputRadius = radius;
 				return true;
 			} else {

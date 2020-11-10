@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.struct.geo;
 
 import georegression.struct.curve.ConicGeneral_F64;
-
 
 /**
  * <p>
@@ -49,8 +48,8 @@ public class AssociatedPairConic {
 	 *
 	 * @param declare If true then new points will be declared
 	 */
-	public AssociatedPairConic(boolean declare ) {
-		if( declare ) {
+	public AssociatedPairConic( boolean declare ) {
+		if (declare) {
 			p1 = new ConicGeneral_F64();
 			p2 = new ConicGeneral_F64();
 		}
@@ -62,8 +61,8 @@ public class AssociatedPairConic {
 	 * @param p1 image 1 location
 	 * @param p2 image 2 location
 	 */
-	public AssociatedPairConic(ConicGeneral_F64 p1, ConicGeneral_F64 p2) {
-		this(p1, p2,true);
+	public AssociatedPairConic( ConicGeneral_F64 p1, ConicGeneral_F64 p2 ) {
+		this(p1, p2, true);
 	}
 
 	/**
@@ -73,7 +72,7 @@ public class AssociatedPairConic {
 	 * @param p2 image 2 location
 	 * @param newInstance Should it create new points or save a reference to these instances.
 	 */
-	public AssociatedPairConic(ConicGeneral_F64 p1, ConicGeneral_F64 p2, boolean newInstance) {
+	public AssociatedPairConic( ConicGeneral_F64 p1, ConicGeneral_F64 p2, boolean newInstance ) {
 		if (newInstance) {
 			this.p1 = new ConicGeneral_F64(p1);
 			this.p2 = new ConicGeneral_F64(p2);
@@ -83,23 +82,23 @@ public class AssociatedPairConic {
 		}
 	}
 
-	public void set(AssociatedPairConic original ) {
-		this.p1.set(original.p1);
-		this.p2.set(original.p2);
+	public void setTo( AssociatedPairConic original ) {
+		this.p1.setTo(original.p1);
+		this.p2.setTo(original.p2);
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void set( ConicGeneral_F64 p1 , ConicGeneral_F64 p2 ) {
-		this.p1.set(p1);
-		this.p2.set(p2);
+	public void setTo( ConicGeneral_F64 p1, ConicGeneral_F64 p2 ) {
+		this.p1.setTo(p1);
+		this.p2.setTo(p2);
 	}
 
 	/**
 	 * Changes the references to the passed in objects.
 	 */
-	public void assign( ConicGeneral_F64 p1 , ConicGeneral_F64 p2 ) {
+	public void assign( ConicGeneral_F64 p1, ConicGeneral_F64 p2 ) {
 		this.p1 = p1;
 		this.p2 = p2;
 	}
@@ -113,7 +112,7 @@ public class AssociatedPairConic {
 	}
 
 	public AssociatedPairConic copy() {
-		return new AssociatedPairConic(p1,p2,true);
+		return new AssociatedPairConic(p1, p2, true);
 	}
 
 	@Override

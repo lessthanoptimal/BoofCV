@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,8 +177,8 @@ public class ExamplePnP {
 
 			// Save the perfect noise free observation
 			Point2D3D o = new Point2D3D();
-			o.getLocation().set(worldPt);
-			o.getObservation().set(norm.x,norm.y);
+			o.getLocation().setTo(worldPt);
+			o.getObservation().setTo(norm.x,norm.y);
 
 			observations.add(o);
 		}
@@ -198,7 +198,7 @@ public class ExamplePnP {
 			Point2D3D p = observations.get(rand.nextInt(size));
 
 			Point2D3D o = new Point2D3D();
-			o.observation.set(p.observation);
+			o.observation.setTo(p.observation);
 			o.location.x = p.location.x + rand.nextGaussian()*5;
 			o.location.y = p.location.y + rand.nextGaussian()*5;
 			o.location.z = p.location.z + rand.nextGaussian()*5;

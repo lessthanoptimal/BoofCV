@@ -481,7 +481,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 				assertFalse(UtilEjml.isUncountable(pa.x));
 				assertFalse(UtilEjml.isUncountable(pa.y));
 
-				polygon.get(j).set(pa);
+				polygon.get(j).setTo(pa);
 			}
 
 			// in almost all cases the center should be inside

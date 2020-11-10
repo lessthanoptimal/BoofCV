@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,14 +92,14 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * @param squareDetector Square detector
 	 * @param maxVersionQR Maximum QR code version it can detect.
 	 */
-	public QrCodePositionPatternDetector(DetectPolygonBinaryGrayRefine<T> squareDetector , int maxVersionQR) {
+	public QrCodePositionPatternDetector( DetectPolygonBinaryGrayRefine<T> squareDetector, int maxVersionQR ) {
 
 		this.squareDetector = squareDetector;
 		this.maxVersionQR = maxVersionQR;
 
 		squareDetector.getDetector().setConvex(true);
 		squareDetector.getDetector().setOutputClockwise(false);
-		squareDetector.getDetector().setNumberOfSides(4,4);
+		squareDetector.getDetector().setNumberOfSides(4, 4);
 
 		interpolate = FactoryInterpolation.bilinearPixelS(squareDetector.getInputType(), BorderType.EXTENDED);
 	}
@@ -115,17 +115,18 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	/**
 	 * Detects position patterns inside the image and forms a graph.
+	 *
 	 * @param gray Gray scale input image
 	 * @param binary Thresholed version of gray image.
 	 */
-	public void process(T gray, GrayU8 binary ) {
+	public void process( T gray, GrayU8 binary ) {
 		configureContourDetector(gray);
 		recycleData();
 		positionPatterns.reset();
 		interpolate.setImage(gray);
 
 		// detect squares
-		squareDetector.process(gray,binary);
+		squareDetector.process(gray, binary);
 
 		long time0 = System.nanoTime();
 		squaresToPositionList();
@@ -136,11 +137,11 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		createPositionPatternGraph();
 //		long time2 = System.nanoTime();  // doesn't take very long
 
-		double milli = (time1-time0)*1e-6;
+		double milli = (time1 - time0)*1e-6;
 
 		milliGraph.update(milli);
 
-		if( profiler ) {
+		if (profiler) {
 			DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
 			System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
 					detectorPoly.getMilliContour(), detectorPoly.getMilliShapes(), squareDetector.getMilliAdjustBias(),
@@ -156,21 +157,20 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * @param height Input image height.  Used in sanity check only.
 	 * @param model distortion model. Null to remove a distortion model.
 	 */
-	public void setLensDistortion(int width , int height ,
-								  @Nullable LensDistortionNarrowFOV model )
-	{
+	public void setLensDistortion( int width, int height,
+								   @Nullable LensDistortionNarrowFOV model ) {
 		interpolate = FactoryInterpolation.bilinearPixelS(
 				squareDetector.getInputType(), BorderType.EXTENDED);
 
-		if( model != null ) {
-			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(model.undistort_F32(true,true));
-			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(model.distort_F32(true,true));
+		if (model != null) {
+			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(model.undistort_F32(true, true));
+			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(model.distort_F32(true, true));
 
 			squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
 
 			// needs to sample the original image when the
-			Point2Transform2_F32 u2d = model.distort_F32(true,true);
-			this.interpolate = new InterpolatePixelDistortS<>(this.interpolate,u2d);
+			Point2Transform2_F32 u2d = model.distort_F32(true, true);
+			this.interpolate = new InterpolatePixelDistortS<>(this.interpolate, u2d);
 		} else {
 			squareDetector.setLensDistortion(width, height, null, null);
 		}
@@ -180,11 +180,11 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
 	 * of inner contours and improve speed and reduce the memory foot print significantly.
 	 */
-	private void configureContourDetector(T gray) {
+	private void configureContourDetector( T gray ) {
 		// determine the maximum possible size of a position pattern
 		// contour size is maximum when viewed head one. Assume the smallest qrcode is 3x this width
 		// 4 side in a square
-		int maxContourSize = Math.min(gray.width,gray.height)*4/3;
+		int maxContourSize = Math.min(gray.width, gray.height)*4/3;
 		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize);
 		contourFinder.setSaveInnerContour(false);
@@ -218,8 +218,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 //				continue;
 
 			// See if the appearance matches a finder pattern
-			double grayThreshold = (info.edgeInside+info.edgeOutside)/2;
-			if( !checkPositionPatternAppearance(info.polygon,(float)grayThreshold))
+			double grayThreshold = (info.edgeInside + info.edgeOutside)/2;
+			if (!checkPositionPatternAppearance(info.polygon, (float)grayThreshold))
 				continue;
 
 			// refine the edge estimate
@@ -241,7 +241,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	private void createPositionPatternGraph() {
 		// Add items to NN search
 
-		nn.setPoints((List)positionPatterns.toList(),false);
+		nn.setPoints((List)positionPatterns.toList(), false);
 
 		for (int i = 0; i < positionPatterns.size(); i++) {
 			PositionPatternNode f = positionPatterns.get(i);
@@ -249,20 +249,20 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 			// The QR code version specifies the number of "modules"/blocks across the marker is
 			// A position pattern is 7 blocks. A version 1 qr code is 21 blocks. Each version past one increments
 			// by 4 blocks. The search is relative to the center of each position pattern, hence the - 7
-			double maximumQrCodeWidth = f.largestSide*(17+4*maxVersionQR-7.0)/7.0;
+			double maximumQrCodeWidth = f.largestSide*(17 + 4*maxVersionQR - 7.0)/7.0;
 			double searchRadius = 1.2*maximumQrCodeWidth; // search 1/2 the width + some fudge factor
-			searchRadius*=searchRadius;
+			searchRadius *= searchRadius;
 
 			// Connect all the finder patterns which are near by each other together in a graph
-			search.findNearest(f,searchRadius,Integer.MAX_VALUE,searchResults);
+			search.findNearest(f, searchRadius, Integer.MAX_VALUE, searchResults);
 
-			if( searchResults.size > 1) {
+			if (searchResults.size > 1) {
 				for (int j = 0; j < searchResults.size; j++) {
 					NnData<SquareNode> r = searchResults.get(j);
 
-					if( r.point == f ) continue; // skip over if it's the square that initiated the search
+					if (r.point == f) continue; // skip over if it's the square that initiated the search
 
-					considerConnect(f,r.point);
+					considerConnect(f, r.point);
 				}
 			}
 		}
@@ -271,17 +271,17 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	/**
 	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
 	 */
-	void considerConnect(SquareNode node0, SquareNode node1) {
+	void considerConnect( SquareNode node0, SquareNode node1 ) {
 		// Find the side on each line which intersects the line connecting the two centers
 		lineA.a = node0.center;
 		lineA.b = node1.center;
 
-		int intersection0 = graph.findSideIntersect(node0,lineA,intersection,lineB);
-		connectLine.a.set(intersection);
-		int intersection1 = graph.findSideIntersect(node1,lineA,intersection,lineB);
-		connectLine.b.set(intersection);
+		int intersection0 = graph.findSideIntersect(node0, lineA, intersection, lineB);
+		connectLine.a.setTo(intersection);
+		int intersection1 = graph.findSideIntersect(node1, lineA, intersection, lineB);
+		connectLine.b.setTo(intersection);
 
-		if( intersection1 < 0 || intersection0 < 0 ) {
+		if (intersection1 < 0 || intersection0 < 0) {
 			return;
 		}
 
@@ -293,32 +293,32 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		double sideLoc0 = connectLine.a.distance(node0.square.get(intersection0))/side0;
 		double sideLoc1 = connectLine.b.distance(node1.square.get(intersection1))/side1;
 
-		if( Math.abs(sideLoc0-0.5)>0.35 || Math.abs(sideLoc1-0.5)>0.35 )
+		if (Math.abs(sideLoc0 - 0.5) > 0.35 || Math.abs(sideLoc1 - 0.5) > 0.35)
 			return;
 
 		// see if connecting sides are of similar size
-		if( Math.abs(side0-side1)/Math.max(side0,side1) > 0.25 ) {
+		if (Math.abs(side0 - side1)/Math.max(side0, side1) > 0.25) {
 			return;
 		}
 
 		// Checks to see if the two sides selected above are closest to being parallel to each other.
 		// Perspective distortion will make the lines not parallel, but will still have a smaller
 		// acute angle than the adjacent sides
-		if( !graph.almostParallel(node0, intersection0, node1, intersection1)) {
+		if (!graph.almostParallel(node0, intersection0, node1, intersection1)) {
 			return;
 		}
 
-		double ratio = Math.max(node0.smallestSide/node1.largestSide ,
+		double ratio = Math.max(node0.smallestSide/node1.largestSide,
 				node1.smallestSide/node0.largestSide);
 
 //		System.out.println("ratio "+ratio);
-		if( ratio > 1.3 )
+		if (ratio > 1.3)
 			return;
 
 		double angle = graph.acuteAngle(node0, intersection0, node1, intersection1);
-		double score = lineA.getLength()*(1.0+angle/0.1);
+		double score = lineA.getLength()*(1.0 + angle/0.1);
 
-		graph.checkConnect(node0,intersection0,node1,intersection1,score);
+		graph.checkConnect(node0, intersection0, node1, intersection1, score);
 	}
 
 	/**
@@ -328,39 +328,39 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 *
 	 * @param square Position pattern square.
 	 */
-	boolean checkPositionPatternAppearance( Polygon2D_F64 square , float grayThreshold ) {
-		return( checkLine(square,grayThreshold,0) || checkLine(square,grayThreshold,1));
+	boolean checkPositionPatternAppearance( Polygon2D_F64 square, float grayThreshold ) {
+		return (checkLine(square, grayThreshold, 0) || checkLine(square, grayThreshold, 1));
 	}
 
 	LineSegment2D_F64 segment = new LineSegment2D_F64();
 	LineParametric2D_F64 parametric = new LineParametric2D_F64();
-	float[] samples = new float[9*5+1];
-	int length[] = new int[12]; // 9 is the max, but I'll let it go farther for no reason
-	int type[] = new int[12];
-	private boolean checkLine( Polygon2D_F64 square , float grayThreshold , int side )
-	{
+	float[] samples = new float[9*5 + 1];
+	int[] length = new int[12]; // 9 is the max, but I'll let it go farther for no reason
+	int[] type = new int[12];
+
+	private boolean checkLine( Polygon2D_F64 square, float grayThreshold, int side ) {
 		// find the mid point between two parallel sides
 		int c0 = side;
-		int c1 = (side+1)%4;
-		int c2 = (side+2)%4;
-		int c3 = (side+3)%4;
+		int c1 = (side + 1)%4;
+		int c2 = (side + 2)%4;
+		int c3 = (side + 3)%4;
 
-		UtilPoint2D_F64.mean(square.get(c0),square.get(c1), segment.a);
-		UtilPoint2D_F64.mean(square.get(c2),square.get(c3), segment.b);
+		UtilPoint2D_F64.mean(square.get(c0), square.get(c1), segment.a);
+		UtilPoint2D_F64.mean(square.get(c2), square.get(c3), segment.b);
 
-		UtilLine2D_F64.convert(segment,parametric);
+		UtilLine2D_F64.convert(segment, parametric);
 
 		// Scan along the line plus some extra
 		int period = samples.length/9;
-		double N = samples.length-2*period-1;
+		double N = samples.length - 2*period - 1;
 
 		for (int i = 0; i < samples.length; i++) {
-			double location = (i-period)/N;
+			double location = (i - period)/N;
 
 			float x = (float)(parametric.p.x + location*parametric.slope.x);
 			float y = (float)(parametric.p.y + location*parametric.slope.y);
 
-			samples[i] = interpolate.get(x,y);
+			samples[i] = interpolate.get(x, y);
 		}
 
 		// threshold and compute run length encoding
@@ -371,11 +371,11 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		for (int i = 0; i < samples.length; i++) {
 			boolean b = samples[i] < grayThreshold;
 
-			if( black == b ) {
+			if (black == b) {
 				length[size]++;
 			} else {
 				black = b;
-				if( size < type.length-1 ) {
+				if (size < type.length - 1) {
 					size += 1;
 					type[size] = black ? 0 : 1;
 					length[size] = 1;
@@ -387,29 +387,29 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		size++;
 
 		// if too simple or too complex reject
-		if( size < 5 || size > 9)
+		if (size < 5 || size > 9)
 			return false;
 		// detect finder pattern inside RLE
-		for (int i = 0; i+5 <= size; i++) {
-			if( type[i] != 0)
+		for (int i = 0; i + 5 <= size; i++) {
+			if (type[i] != 0)
 				continue;
 
 			int black0 = length[i];
-			int black1 = length[i+2];
-			int black2 = length[i+4];
+			int black1 = length[i + 2];
+			int black2 = length[i + 4];
 
-			int white0 = length[i+1];
-			int white1 = length[i+3];
+			int white0 = length[i + 1];
+			int white1 = length[i + 3];
 
 			// the center black area can get exagerated easily
-			if( black0 < 0.4*white0 || black0 > 3*white0 )
+			if (black0 < 0.4*white0 || black0 > 3*white0)
 				continue;
-			if( black2 < 0.4*white1 || black2 > 3*white1 )
+			if (black2 < 0.4*white1 || black2 > 3*white1)
 				continue;
 
-			int black02 = black0+black2;
+			int black02 = black0 + black2;
 
-			if( black1 >= black02 && black1 <= 2*black02 )
+			if (black1 >= black02 && black1 <= 2*black02)
 				return true;
 		}
 		return false;
@@ -419,12 +419,12 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * Checks to see if the array of sampled intensity values follows the expected pattern for a position pattern.
 	 * X.XXX.X where x = black and . = white.
 	 */
-	static boolean positionSquareIntensityCheck(float values[] , float threshold ) {
-		if( values[0] > threshold || values[1] < threshold )
+	static boolean positionSquareIntensityCheck( float[] values, float threshold ) {
+		if (values[0] > threshold || values[1] < threshold)
 			return false;
-		if( values[2] > threshold || values[3] > threshold || values[4] > threshold  )
+		if (values[2] > threshold || values[3] > threshold || values[4] > threshold)
 			return false;
-		if( values[5] < threshold || values[6] > threshold )
+		if (values[5] < threshold || values[6] > threshold)
 			return false;
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,7 +118,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	public void configure( int widthStitch, int heightStitch, IT worldToInit ) {
 		this.worldToInit = (IT)worldToCurr.createInstance();
 		if (worldToInit != null)
-			this.worldToInit.set(worldToInit);
+			this.worldToInit.setTo(worldToInit);
 		this.widthStitch = widthStitch;
 		this.heightStitch = heightStitch;
 	}
@@ -270,7 +270,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 			// update the transforms
 			IT tmp = (IT)worldToCurr.createInstance();
 			newToOldStitch.concat(worldToInit, tmp);
-			worldToInit.set(tmp);
+			worldToInit.setTo(tmp);
 
 			computeCurrToInit_PixelTran();
 		} else {
@@ -301,13 +301,13 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		int h = height;
 
 		tranCurrToWorld.compute(0, 0, work);
-		corners.p0.set(work.x, work.y);
+		corners.p0.setTo(work.x, work.y);
 		tranCurrToWorld.compute(w, 0, work);
-		corners.p1.set(work.x, work.y);
+		corners.p1.setTo(work.x, work.y);
 		tranCurrToWorld.compute(w, h, work);
-		corners.p2.set(work.x, work.y);
+		corners.p2.setTo(work.x, work.y);
 		tranCurrToWorld.compute(0, h, work);
-		corners.p3.set(work.x, work.y);
+		corners.p3.setTo(work.x, work.y);
 
 		return corners;
 	}

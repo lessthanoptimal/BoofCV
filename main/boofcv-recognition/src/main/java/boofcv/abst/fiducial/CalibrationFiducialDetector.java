@@ -34,7 +34,6 @@ import georegression.fitting.polygon.FitPolygon2D_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,8 +47,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrationFiducialDetector<T extends ImageGray<T>>
-		extends FiducialDetectorPnP<T>
-{
+		extends FiducialDetectorPnP<T> {
 	// detects the calibration target
 	private DetectorFiducialCalibration detector;
 
@@ -82,12 +80,12 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	 */
 	public CalibrationFiducialDetector( @Nullable ConfigChessboardBinary configDet,
 										ConfigGridDimen configGrid,
-									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboardB(configDet,configGrid);
+										Class<T> imageType ) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboardB(configDet, configGrid);
 		sideWidth = configGrid.numCols*configGrid.shapeSize;
 		sideHeight = configGrid.numRows*configGrid.shapeSize;
 
-		width = (sideWidth+sideHeight)/2.0;
+		width = (sideWidth + sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
@@ -96,13 +94,13 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	 * Configure it to detect chessboard style targets
 	 */
 	public CalibrationFiducialDetector( @Nullable ConfigChessboardX configDet,
-									   ConfigGridDimen configGrid,
-									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboardX(configDet,configGrid);
+										ConfigGridDimen configGrid,
+										Class<T> imageType ) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboardX(configDet, configGrid);
 		sideWidth = configGrid.numCols*configGrid.shapeSize;
 		sideHeight = configGrid.numRows*configGrid.shapeSize;
 
-		width = (sideWidth+sideHeight)/2.0;
+		width = (sideWidth + sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
@@ -112,14 +110,14 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	 */
 	public CalibrationFiducialDetector( @Nullable ConfigSquareGrid configDet,
 										ConfigGridDimen configGrid,
-										Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.squareGrid(configDet,configGrid);
+										Class<T> imageType ) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.squareGrid(configDet, configGrid);
 		int squareCols = configGrid.numCols;
 		int squareRows = configGrid.numRows;
-		sideWidth = squareCols* configGrid.shapeSize + (squareCols-1)*configGrid.shapeDistance;
-		sideHeight = squareRows*configGrid.shapeSize + (squareRows-1)*configGrid.shapeDistance;
+		sideWidth = squareCols*configGrid.shapeSize + (squareCols - 1)*configGrid.shapeDistance;
+		sideHeight = squareRows*configGrid.shapeSize + (squareRows - 1)*configGrid.shapeDistance;
 
-		double width = (sideWidth+sideHeight)/2.0;
+		double width = (sideWidth + sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
@@ -127,50 +125,50 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	/**
 	 * Configure it to detect square-grid style targets
 	 */
-	public CalibrationFiducialDetector(ConfigSquareGridBinary config,
-									   Class<T> imageType) {
+	public CalibrationFiducialDetector( ConfigSquareGridBinary config,
+										Class<T> imageType ) {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.binaryGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
-		sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
-		sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+		sideWidth = squareCols*config.squareWidth + (squareCols - 1)*config.spaceWidth;
+		sideHeight = squareRows*config.squareWidth + (squareRows - 1)*config.spaceWidth;
 
-		double width = (sideWidth+sideHeight)/2.0;
+		double width = (sideWidth + sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
 
-	public CalibrationFiducialDetector(@Nullable ConfigCircleHexagonalGrid configDet,
-									   ConfigGridDimen configGrid,
-									   Class<T> imageType) {
+	public CalibrationFiducialDetector( @Nullable ConfigCircleHexagonalGrid configDet,
+										ConfigGridDimen configGrid,
+										Class<T> imageType ) {
 		CalibrationDetectorCircleHexagonalGrid detector =
-				FactoryFiducialCalibration.circleHexagonalGrid(configDet,configGrid);
+				FactoryFiducialCalibration.circleHexagonalGrid(configDet, configGrid);
 		int squareCols = configGrid.numCols;
 		int squareRows = configGrid.numRows;
 		sideWidth = squareCols*configGrid.shapeDistance/2.0;
 		sideHeight = squareRows*configGrid.shapeDistance/2.0;
 
-		double width = (sideWidth+sideHeight)/2.0;
+		double width = (sideWidth + sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
 
 	public CalibrationFiducialDetector( @Nullable ConfigCircleRegularGrid configDet,
-									   ConfigGridDimen configGrid,
-									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleRegularGrid(configDet,configGrid);
-		sideWidth = (configGrid.numCols-1)*configGrid.shapeDistance;
-		sideHeight = (configGrid.numRows-1)*configGrid.shapeDistance;
+										ConfigGridDimen configGrid,
+										Class<T> imageType ) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleRegularGrid(configDet, configGrid);
+		sideWidth = (configGrid.numCols - 1)*configGrid.shapeDistance;
+		sideHeight = (configGrid.numRows - 1)*configGrid.shapeDistance;
 
-		double width = (sideWidth+sideHeight)/2.0;
+		double width = (sideWidth + sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
 
-	protected void init(DetectorFiducialCalibration detector, double width, Class<T> imageType) {
+	protected void init( DetectorFiducialCalibration detector, double width, Class<T> imageType ) {
 		this.detector = detector;
 		this.type = ImageType.single(imageType);
-		this.converted = new GrayF32(1,1);
+		this.converted = new GrayF32(1, 1);
 
 		this.width = width;
 
@@ -179,7 +177,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		for (int i = 0; i < layout.size(); i++) {
 			Point2D_F64 p2 = layout.get(i);
 			Point2D3D p = new Point2D3D();
-			p.location.set(p2.x,p2.y,0);
+			p.location.set(p2.x, p2.y, 0);
 
 			points2D3D.add(p);
 		}
@@ -187,14 +185,13 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		selectBoundaryCorners();
 	}
 
-
 	@Override
-	public double getSideWidth(int which) {
+	public double getSideWidth( int which ) {
 		return sideWidth;
 	}
 
 	@Override
-	public double getSideHeight(int which) {
+	public double getSideHeight( int which ) {
 		return sideHeight;
 	}
 
@@ -205,65 +202,64 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		List<Point2D_F64> layout = detector.getLayout();
 
 		Polygon2D_F64 hull = new Polygon2D_F64();
-		FitPolygon2D_F64.convexHull(layout,hull);
-		UtilPolygons2D_F64.removeAlmostParallel(hull,0.02);
+		FitPolygon2D_F64.convexHull(layout, hull);
+		UtilPolygons2D_F64.removeAlmostParallel(hull, 0.02);
 
 		boundaryIndexes = new int[hull.size()];
 		for (int i = 0; i < hull.size(); i++) {
 			Point2D_F64 h = hull.get(i);
 			boolean matched = false;
 			for (int j = 0; j < layout.size(); j++) {
-				if( h.isIdentical(layout.get(j),1e-6)) {
+				if (h.isIdentical(layout.get(j), 1e-6)) {
 					matched = true;
 					boundaryIndexes[i] = j;
 					break;
 				}
 			}
-			if( !matched )
+			if (!matched)
 				throw new RuntimeException("Bug!");
 		}
-
 	}
 
 	@Override
-	public void detect(T input) {
-		if( input instanceof GrayF32) {
+	public void detect( T input ) {
+		if (input instanceof GrayF32) {
 			converted = (GrayF32)input;
 		} else {
-			converted.reshape(input.width,input.height);
+			converted.reshape(input.width, input.height);
 			GConvertImage.convert(input, converted);
 		}
 
-		if( !detector.process(converted) ) {
+		if (!detector.process(converted)) {
 			targetDetected = false;
 		} else {
 			targetDetected = true;
 
 			// put detected corners back into distorted coordinates
 			// Required for FiducialDetectorPnP
-			if( pointUndistToDist != null) {
+			if (pointUndistToDist != null) {
 				CalibrationObservation detected = detector.getDetectedPoints();
 				for (int i = 0; i < detected.size(); i++) {
 					Point2D_F64 p = detected.get(i);
-					pointUndistToDist.compute(p.x,p.y,p);
+					pointUndistToDist.compute(p.x, p.y, p);
 				}
 			}
 		}
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
 		super.setLensDistortion(distortion, width, height);
 
-		if( distortion == null )
+		if (distortion == null)
 			pointUndistToDist = null;
 		else {
 			// verify that distortion is actually applied. If not don't undistort the image while extracting features
 			// this makes it run faster
 			pointUndistToDist = distortion.distort_F64(true, true);
 			Point2D_F64 test = new Point2D_F64();
-			pointUndistToDist.compute(0,0,test);
-			if( test.norm() <= UtilEjml.TEST_F32) {
+			pointUndistToDist.compute(0, 0, test);
+			if (test.norm() <= UtilEjml.TEST_F32) {
 				detector.setLensDistortion(null, width, height);
 				pointUndistToDist = null;
 			} else {
@@ -279,10 +275,10 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	 * @param location (output) Storage for the transform. modified.
 	 */
 	@Override
-	public void getCenter(int which, Point2D_F64 location) {
+	public void getCenter( int which, Point2D_F64 location ) {
 		CalibrationObservation view = detector.getDetectedPoints();
 
-		location.set(0,0);
+		location.setTo(0, 0);
 		for (int i = 0; i < view.size(); i++) {
 			PointIndex2D_F64 p = view.get(i);
 			location.x += p.x;
@@ -294,8 +290,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public Polygon2D_F64 getBounds(int which, @Nullable Polygon2D_F64 storage) {
-		if( storage == null )
+	public Polygon2D_F64 getBounds( int which, @Nullable Polygon2D_F64 storage ) {
+		if (storage == null)
 			storage = new Polygon2D_F64();
 		else
 			storage.vertexes.reset();
@@ -303,8 +299,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		List<PointIndex2D_F64> control = getDetectedControl(which);
 		for (int i = 0; i < boundaryIndexes.length; i++) {
 			PointIndex2D_F64 p = control.get(boundaryIndexes[i]);
-			if( p.index == boundaryIndexes[i])
-				storage.vertexes.grow().set(p);
+			if (p.index == boundaryIndexes[i])
+				storage.vertexes.grow().setTo(p);
 			else
 				System.out.println("control points are out of order or not detected");
 		}
@@ -323,7 +319,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public String getMessage(int which) {
+	public String getMessage( int which ) {
 		return null;
 	}
 
@@ -345,7 +341,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public double getWidth(int which) {
+	public double getWidth( int which ) {
 		return width;
 	}
 
@@ -360,17 +356,13 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public List<PointIndex2D_F64> getDetectedControl(int which) {
+	public List<PointIndex2D_F64> getDetectedControl( int which ) {
 		CalibrationObservation view = getCalibDetector().getDetectedPoints();
 		return view.points;
 	}
 
 	@Override
-	protected List<Point2D3D> getControl3D(int which) {
+	protected List<Point2D3D> getControl3D( int which ) {
 		return getPoints2D3D();
-	}
-
-	interface TargetBounds {
-		void bounds( FastQueue<Point2D_F64> list );
 	}
 }

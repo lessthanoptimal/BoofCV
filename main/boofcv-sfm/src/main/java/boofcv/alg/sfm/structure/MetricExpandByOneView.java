@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -217,7 +217,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// Now set the global view-1 to view-2 at the local scale
 		double scale = MultiViewOps.findScale(view1_to_view2.T, view1_to_view2H.T);
-		view1_to_view2H.set(view1_to_view2);
+		view1_to_view2H.setTo(view1_to_view2);
 		view1_to_view2H.T.scale(scale);
 
 		if (verbose != null) {
@@ -303,8 +303,8 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 		// copy results for output
 		wview3.intrinsic.set((BundlePinholeSimplified)structure.cameras.get(2).model);
-		view1_to_view2H.set(structure.getParentToView(1));
-		view1_to_target.set(structure.getParentToView(2));
+		view1_to_view2H.setTo(structure.getParentToView(1));
+		view1_to_target.setTo(structure.getParentToView(2));
 
 		if (verbose != null) {
 			verbose.printf("G View 1 to 2     T={%.1f %.1f %.1f)\n",
@@ -331,7 +331,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		pairs.resize(triples.size());
 		for (int idx = 0; idx < triples.size(); idx++) {
 			AssociatedTriple a = triples.get(idx);
-			pairs.get(idx).set(a.p1, a.p2);
+			pairs.get(idx).setTo(a.p1, a.p2);
 		}
 
 		return projectiveHomography.process(K1, K2, pairs.toList());

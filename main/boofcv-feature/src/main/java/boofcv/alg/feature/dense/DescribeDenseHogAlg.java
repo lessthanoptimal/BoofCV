@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,15 +86,15 @@ import java.util.Arrays;
 public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDenseHog<Input> {
 
 	// orientation and magnitude of each pixel
-	protected GrayF32 orientation = new GrayF32(1,1);
-	protected GrayF64 magnitude = new GrayF64(1,1); // stored as F64 instead of F32 for speed
+	protected GrayF32 orientation = new GrayF32(1, 1);
+	protected GrayF64 magnitude = new GrayF64(1, 1); // stored as F64 instead of F32 for speed
 
 	// the active histogram being worked on
-	double histogram[];
+	double[] histogram;
 
 	// spatial weights applied to each in a block
 	// stored in a row major order
-	double weights[];
+	double[] weights;
 
 	/**
 	 * Configures HOG descriptor computation
@@ -105,11 +105,10 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 	 * @param cellsPerBlockY Number of cells's wide a block is. x-axis 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
 	 */
-	public DescribeDenseHogAlg(int orientationBins , int pixelsPerCell ,
-							   int cellsPerBlockX , int cellsPerBlockY,
-							   int stepBlock ,
-							   ImageType<Input> imageType )
-	{
+	public DescribeDenseHogAlg( int orientationBins, int pixelsPerCell,
+								int cellsPerBlockX, int cellsPerBlockY,
+								int stepBlock,
+								ImageType<Input> imageType ) {
 		super(orientationBins, pixelsPerCell, cellsPerBlockX, cellsPerBlockY, stepBlock, imageType);
 
 		computeWeightBlockPixels();
@@ -123,14 +122,14 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 		int rows = cellsPerBlockY*pixelsPerCell;
 		int cols = cellsPerBlockX*pixelsPerCell;
 
-		weights = new double[ rows*cols ];
+		weights = new double[rows*cols];
 
-		double offsetRow=0,offsetCol=0;
-		int radiusRow=rows/2,radiusCol=cols/2;
-		if( rows%2 == 0 ) {
+		double offsetRow = 0, offsetCol = 0;
+		int radiusRow = rows/2, radiusCol = cols/2;
+		if (rows%2 == 0) {
 			offsetRow = 0.5;
 		}
-		if( cols%2 == 0 ) {
+		if (cols%2 == 0) {
 			offsetCol = 0.5;
 		}
 
@@ -138,11 +137,11 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 		// sigma is 1/2 the width along each axis
 		int index = 0;
 		for (int row = 0; row < rows; row++) {
-			double drow = row-radiusRow+offsetRow;
+			double drow = row - radiusRow + offsetRow;
 			double pdfRow = UtilGaussian.computePDF(0, radiusRow, drow);
 
 			for (int col = 0; col < cols; col++) {
-				double dcol = col-radiusCol+offsetCol;
+				double dcol = col - radiusCol + offsetCol;
 				double pdfCol = UtilGaussian.computePDF(0, radiusCol, dcol);
 
 				weights[index++] = pdfCol*pdfRow;
@@ -151,7 +150,7 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 		// normalize so that the largest value is 1.0
 		double max = 0;
 		for (int i = 0; i < weights.length; i++) {
-			if( weights[i] > max ) {
+			if (weights[i] > max) {
 				max = weights[i];
 			}
 		}
@@ -162,13 +161,14 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 
 	/**
 	 * Specifies input image.  Gradient is computed immediately
+	 *
 	 * @param input input image
 	 */
 	@Override
 	public void setInput( Input input ) {
 		super.setInput(input);
-		orientation.reshape(input.width,input.height);
-		magnitude.reshape(input.width,input.height);
+		orientation.reshape(input.width, input.height);
+		magnitude.reshape(input.width, input.height);
 
 		computePixelFeatures();
 	}
@@ -179,13 +179,13 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 	private void computePixelFeatures() {
 		for (int y = 0; y < derivX.height; y++) {
 			int pixelIndex = y*derivX.width;
-			int endIndex = pixelIndex+derivX.width;
-			for (; pixelIndex < endIndex; pixelIndex++ ) {
+			int endIndex = pixelIndex + derivX.width;
+			for (; pixelIndex < endIndex; pixelIndex++) {
 				float dx = derivX.data[pixelIndex];
 				float dy = derivY.data[pixelIndex];
 
 				// angle from 0 to pi radians
-				orientation.data[pixelIndex] = UtilAngle.atanSafe(dy,dx) + GrlConstants.F_PId2;
+				orientation.data[pixelIndex] = UtilAngle.atanSafe(dy, dx) + GrlConstants.F_PId2;
 				// gradient magnitude
 				magnitude.data[pixelIndex] = Math.sqrt(dx*dx + dy*dy);
 			}
@@ -200,53 +200,54 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 		locations.reset();
 		descriptions.reset();
 
-		int stepBlockPixelsX = pixelsPerCell *stepBlock;
-		int stepBlockPixelsY = pixelsPerCell *stepBlock;
+		int stepBlockPixelsX = pixelsPerCell*stepBlock;
+		int stepBlockPixelsY = pixelsPerCell*stepBlock;
 
-		int maxY = derivX.height - pixelsPerCell * cellsPerBlockY + 1;
-		int maxX = derivX.width - pixelsPerCell * cellsPerBlockX + 1;
+		int maxY = derivX.height - pixelsPerCell*cellsPerBlockY + 1;
+		int maxX = derivX.width - pixelsPerCell*cellsPerBlockX + 1;
 
-		for (int y = 0; y < maxY; y += stepBlockPixelsY ) {
-			for (int x = 0; x < maxX; x += stepBlockPixelsX ) {
+		for (int y = 0; y < maxY; y += stepBlockPixelsY) {
+			for (int x = 0; x < maxX; x += stepBlockPixelsX) {
 				TupleDesc_F64 d = descriptions.grow();
-				Arrays.fill(d.value,0);
+				Arrays.fill(d.value, 0);
 				histogram = d.value;
 
 				for (int cellRow = 0; cellRow < cellsPerBlockY; cellRow++) {
-					int blockPixelRow = cellRow* pixelsPerCell;
+					int blockPixelRow = cellRow*pixelsPerCell;
 					for (int cellCol = 0; cellCol < cellsPerBlockX; cellCol++) {
-						int blockPixelCol = cellCol* pixelsPerCell;
+						int blockPixelCol = cellCol*pixelsPerCell;
 
-						computeCellHistogram(x+blockPixelCol, y+blockPixelRow, cellCol, cellRow);
+						computeCellHistogram(x + blockPixelCol, y + blockPixelRow, cellCol, cellRow);
 					}
 				}
 
-				DescribeSiftCommon.normalizeDescriptor(d,0.2);
-				locations.grow().set(x,y);
+				DescribeSiftCommon.normalizeDescriptor(d, 0.2);
+				locations.grow().setTo(x, y);
 			}
 		}
 	}
 
 	/**
 	 * Computes the histogram for the block with the specified lower extent
+	 *
 	 * @param pixelX0 cell's lower extent x-axis in the image
 	 * @param pixelY0 cell's lower extent y-axis in the image
 	 * @param cellX Location of the cell in the block x-axis
 	 * @param cellY Location of the cell in the block y-axis
 	 */
-	void computeCellHistogram(int pixelX0 , int pixelY0 ,
-							  int cellX , int cellY ) {
+	void computeCellHistogram( int pixelX0, int pixelY0,
+							   int cellX, int cellY ) {
 
 		float angleBinSize = GrlConstants.F_PI/orientationBins;
 
 		for (int i = 0; i < pixelsPerCell; i++) {
-			int indexPixel = (pixelY0+i)*derivX.stride + pixelX0;
-			int indexBlock = (cellY*pixelsPerCell+i)*pixelsPerCell*cellsPerBlockX + cellX*pixelsPerCell;
+			int indexPixel = (pixelY0 + i)*derivX.stride + pixelX0;
+			int indexBlock = (cellY*pixelsPerCell + i)*pixelsPerCell*cellsPerBlockX + cellX*pixelsPerCell;
 
 			// Use center point of this cell to compute interpolation weights - bilinear interpolation
-			double spatialWeightY0,spatialWeightY1,spatialWeightY2;
+			double spatialWeightY0, spatialWeightY1, spatialWeightY2;
 
-			if( i <= pixelsPerCell/2 ) {
+			if (i <= pixelsPerCell/2) {
 				spatialWeightY1 = (i + pixelsPerCell/2.0)/pixelsPerCell;
 				spatialWeightY0 = 1.0 - spatialWeightY1;
 				spatialWeightY2 = 0;
@@ -256,11 +257,11 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 				spatialWeightY1 = 1.0 - spatialWeightY2;
 			}
 
-			for (int j = 0; j < pixelsPerCell; j++, indexPixel++, indexBlock++ ) {
+			for (int j = 0; j < pixelsPerCell; j++, indexPixel++, indexBlock++) {
 				// Use center point of this cell to compute interpolation weights - bilinear interpolation
-				double spatialWeightX0,spatialWeightX1,spatialWeightX2;
+				double spatialWeightX0, spatialWeightX1, spatialWeightX2;
 
-				if( j <= pixelsPerCell/2 ) {
+				if (j <= pixelsPerCell/2) {
 					spatialWeightX1 = (j + pixelsPerCell/2.0)/pixelsPerCell;
 					spatialWeightX0 = 1.0 - spatialWeightX1;
 					spatialWeightX2 = 0;
@@ -277,61 +278,61 @@ public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDen
 				double magnitude = this.magnitude.data[indexPixel];
 
 				// Apply spatial weighting to magnitude
-				magnitude *= this.weights[ indexBlock ];
+				magnitude *= this.weights[indexBlock];
 
 				// Add the weighted gradient using linear interpolation to angle bins
 				float findex0 = angle/angleBinSize;
 				int index0 = (int)findex0;
-				double oriWeight1 = findex0-index0;
+				double oriWeight1 = findex0 - index0;
 				index0 %= orientationBins;
-				int index1 = (index0+1)%orientationBins;
+				int index1 = (index0 + 1)%orientationBins;
 
 
 				// spatial bilinear interpolation + orientation linear interpolation
 				// + gaussian weighting (previously applied)
-				addToHistogram( cellX-1, cellY-1 , index0, (1.0-oriWeight1)*magnitude*spatialWeightX0*spatialWeightY0);
-				addToHistogram( cellX-1, cellY-1 , index1, oriWeight1*magnitude*spatialWeightX0*spatialWeightY0);
+				addToHistogram(cellX - 1, cellY - 1, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX0*spatialWeightY0);
+				addToHistogram(cellX - 1, cellY - 1, index1, oriWeight1*magnitude*spatialWeightX0*spatialWeightY0);
 
-				addToHistogram( cellX, cellY-1 , index0, (1.0-oriWeight1)*magnitude*spatialWeightX1*spatialWeightY0);
-				addToHistogram( cellX, cellY-1 , index1, oriWeight1*magnitude*spatialWeightX1*spatialWeightY0);
+				addToHistogram(cellX, cellY - 1, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX1*spatialWeightY0);
+				addToHistogram(cellX, cellY - 1, index1, oriWeight1*magnitude*spatialWeightX1*spatialWeightY0);
 
-				addToHistogram( cellX+1, cellY-1 , index0, (1.0-oriWeight1)*magnitude*spatialWeightX2*spatialWeightY0);
-				addToHistogram( cellX+1, cellY-1 , index1, oriWeight1*magnitude*spatialWeightX2*spatialWeightY0);
+				addToHistogram(cellX + 1, cellY - 1, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX2*spatialWeightY0);
+				addToHistogram(cellX + 1, cellY - 1, index1, oriWeight1*magnitude*spatialWeightX2*spatialWeightY0);
 
-				addToHistogram( cellX-1, cellY , index0, (1.0-oriWeight1)*magnitude*spatialWeightX0*spatialWeightY1);
-				addToHistogram( cellX-1, cellY , index1, oriWeight1*magnitude*spatialWeightX0*spatialWeightY1);
+				addToHistogram(cellX - 1, cellY, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX0*spatialWeightY1);
+				addToHistogram(cellX - 1, cellY, index1, oriWeight1*magnitude*spatialWeightX0*spatialWeightY1);
 
-				addToHistogram( cellX, cellY , index0, (1.0-oriWeight1)*magnitude*spatialWeightX1*spatialWeightY1);
-				addToHistogram( cellX, cellY , index1, oriWeight1*magnitude*spatialWeightX1*spatialWeightY1);
+				addToHistogram(cellX, cellY, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX1*spatialWeightY1);
+				addToHistogram(cellX, cellY, index1, oriWeight1*magnitude*spatialWeightX1*spatialWeightY1);
 
-				addToHistogram( cellX+1, cellY , index0, (1.0-oriWeight1)*magnitude*spatialWeightX2*spatialWeightY1);
-				addToHistogram( cellX+1, cellY , index1, oriWeight1*magnitude*spatialWeightX2*spatialWeightY1);
+				addToHistogram(cellX + 1, cellY, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX2*spatialWeightY1);
+				addToHistogram(cellX + 1, cellY, index1, oriWeight1*magnitude*spatialWeightX2*spatialWeightY1);
 
-				addToHistogram( cellX-1, cellY+1 , index0, (1.0-oriWeight1)*magnitude*spatialWeightX0*spatialWeightY2);
-				addToHistogram( cellX-1, cellY+1 , index1, oriWeight1*magnitude*spatialWeightX0*spatialWeightY2);
+				addToHistogram(cellX - 1, cellY + 1, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX0*spatialWeightY2);
+				addToHistogram(cellX - 1, cellY + 1, index1, oriWeight1*magnitude*spatialWeightX0*spatialWeightY2);
 
-				addToHistogram( cellX, cellY+1 , index0, (1.0-oriWeight1)*magnitude*spatialWeightX1*spatialWeightY2);
-				addToHistogram( cellX, cellY+1 , index1, oriWeight1*magnitude*spatialWeightX1*spatialWeightY2);
+				addToHistogram(cellX, cellY + 1, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX1*spatialWeightY2);
+				addToHistogram(cellX, cellY + 1, index1, oriWeight1*magnitude*spatialWeightX1*spatialWeightY2);
 
-				addToHistogram( cellX+1, cellY+1 , index0, (1.0-oriWeight1)*magnitude*spatialWeightX2*spatialWeightY2);
-				addToHistogram( cellX+1, cellY+1 , index1, oriWeight1*magnitude*spatialWeightX2*spatialWeightY2);
-
+				addToHistogram(cellX + 1, cellY + 1, index0, (1.0 - oriWeight1)*magnitude*spatialWeightX2*spatialWeightY2);
+				addToHistogram(cellX + 1, cellY + 1, index1, oriWeight1*magnitude*spatialWeightX2*spatialWeightY2);
 			}
 		}
 	}
 
 	/**
 	 * Adds the magnitude to the histogram at the specified cell and orientation
+	 *
 	 * @param cellX cell coordinate
 	 * @param cellY cell coordinate
 	 * @param orientationIndex orientation coordinate
 	 * @param magnitude edge magnitude
 	 */
-	void addToHistogram(int cellX, int cellY, int orientationIndex, double magnitude) {
+	void addToHistogram( int cellX, int cellY, int orientationIndex, double magnitude ) {
 		// see if it's being applied to a valid cell in the histogram
-		if( cellX < 0 || cellX >= cellsPerBlockX)
+		if (cellX < 0 || cellX >= cellsPerBlockX)
 			return;
-		if( cellY < 0 || cellY >= cellsPerBlockY)
+		if (cellY < 0 || cellY >= cellsPerBlockY)
 			return;
 
 		int index = (cellY*cellsPerBlockX + cellX)*orientationBins + orientationIndex;

@@ -187,7 +187,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	 * since there's no generic way to handle that.
 	 */
 	public void setCalibration( StereoParameters param ) {
-		right_to_left.set(param.right_to_left);
+		right_to_left.setTo(param.right_to_left);
 		param.right_to_left.invert(left_to_right);
 
 		CameraModel left = new CameraModel();
@@ -257,7 +257,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 			addNewTracks();
 			// The left camera is the world frame right now
 			currentLeft.frame_to_world.reset();
-			currentRight.frame_to_world.set(right_to_left);
+			currentRight.frame_to_world.setTo(right_to_left);
 			return true;
 		}
 
@@ -328,7 +328,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 			triangulateNotSelectedBundleTracks();
 		}
 		// Save the output
-		current_to_world.set(currentLeft.frame_to_world);
+		current_to_world.setTo(currentLeft.frame_to_world);
 	}
 
 	/**
@@ -371,7 +371,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 		if (modelRefiner != null) {
 			modelRefiner.fitModel(matcher.getMatchSet(), matcher.getModelParameters(), previous_to_current);
 		} else {
-			previous_to_current.set(matcher.getModelParameters());
+			previous_to_current.setTo(matcher.getModelParameters());
 		}
 
 		// Convert the found transforms back to world
@@ -537,7 +537,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 			if (triangulate2.triangulate(normLeft, normRight, left_to_right, cameraP3)) {
 				// put the track into the world coordinate system
 				SePointOps_F64.transform(currentLeft.frame_to_world, cameraP3, cameraP3);
-				bt.worldLoc.set(cameraP3.x, cameraP3.y, cameraP3.z, 1.0);
+				bt.worldLoc.setTo(cameraP3.x, cameraP3.y, cameraP3.z, 1.0);
 
 				// Finalize the track data structure
 				bt.id = trackL.featureId;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,8 @@ public class LlahDocument {
 	 */
 	public List<LlahFeature> features = new ArrayList<>();
 
-	public void addFeature( double x , double y ) {
-		landmarks.grow().set(x,y);
+	public void addFeature( double x, double y ) {
+		landmarks.grow().setTo(x, y);
 	}
 
 	public void reset() {

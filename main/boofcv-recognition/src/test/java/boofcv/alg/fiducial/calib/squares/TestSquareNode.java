@@ -34,10 +34,10 @@ public class TestSquareNode extends BoofStandardJUnit {
 	public void distanceSqCorner() {
 		SquareNode a = new SquareNode();
 		a.square = new Polygon2D_F64(4);
-		a.square.get(0).set(-2,-2);
-		a.square.get(1).set( 2,-2);
-		a.square.get(2).set( 2, 2);
-		a.square.get(3).set(-2, 2);
+		a.square.get(0).setTo(-2,-2);
+		a.square.get(1).setTo( 2,-2);
+		a.square.get(2).setTo( 2, 2);
+		a.square.get(3).setTo(-2, 2);
 
 		assertEquals(0, a.distanceSqCorner(new Point2D_F64(-2, -2)), 1e-8);
 		assertEquals(0, a.distanceSqCorner(new Point2D_F64( 2, 2)),1e-8);

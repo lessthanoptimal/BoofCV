@@ -225,8 +225,8 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 			double c = Math.cos(theta);
 			double s = Math.sin(theta);
 
-			t.grow().set( r*c - r*s + cx,  r*s + r*c + cy);
-			t.grow().set(-r*c + r*s + cx, -r*s - r*c + cy);
+			t.grow().setTo( r*c - r*s + cx,  r*s + r*c + cy);
+			t.grow().setTo(-r*c + r*s + cx, -r*s - r*c + cy);
 		}
 
 		alg.computeEllipseCenters();

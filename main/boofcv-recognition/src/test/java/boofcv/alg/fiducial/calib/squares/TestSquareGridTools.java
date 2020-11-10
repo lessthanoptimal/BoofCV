@@ -197,10 +197,10 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 					double y1 = w*2*(rows-1) + w/2;
 
 					Polygon2D_F64 expected = new Polygon2D_F64(4);
-					expected.get(0).set(x0 ,y0);
-					expected.get(1).set(x1 ,y0);
-					expected.get(2).set(x1 ,y1);
-					expected.get(3).set(x0 ,y1);
+					expected.get(0).setTo(x0 ,y0);
+					expected.get(1).setTo(x1 ,y0);
+					expected.get(2).setTo(x1 ,y1);
+					expected.get(3).setTo(x0 ,y1);
 
 					assertTrue(UtilPolygons2D_F64.isEquivalent(expected,poly,1e-8));
 				}
@@ -342,15 +342,15 @@ public class TestSquareGridTools extends BoofStandardJUnit {
 	public void orderNode() {
 		SquareNode target = new SquareNode();
 		target.square = new Polygon2D_F64(4);
-		target.square.get(0).set(-1,-1);
-		target.square.get(1).set( 1,-1);
-		target.square.get(2).set( 1, 1);
-		target.square.get(3).set(-1, 1);
+		target.square.get(0).setTo(-1,-1);
+		target.square.get(1).setTo( 1,-1);
+		target.square.get(2).setTo( 1, 1);
+		target.square.get(3).setTo(-1, 1);
 
-		SquareNode up = new SquareNode();    up.center.set(0, 5);
-		SquareNode down = new SquareNode();  down.center.set(0,-5);
-		SquareNode left = new SquareNode();  left.center.set(-5, 0);
-		SquareNode right = new SquareNode(); right.center.set( 5,0);
+		SquareNode up = new SquareNode();    up.center.setTo(0, 5);
+		SquareNode down = new SquareNode();  down.center.setTo(0,-5);
+		SquareNode left = new SquareNode();  left.center.setTo(-5, 0);
+		SquareNode right = new SquareNode(); right.center.setTo( 5,0);
 
 		SquareGridTools alg = new SquareGridTools();
 

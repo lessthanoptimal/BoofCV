@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,12 +88,12 @@ public class BinaryEllipseDetectorPixel {
 	private @Getter ConnectRule connectRule;
 	// allow it to switch between two algorithms
 	private BinaryLabelContourFinder contourFinder;
-	private GrayS32 labeled = new GrayS32(1,1);
+	private GrayS32 labeled = new GrayS32(1, 1);
 	private BinaryContourFinderLinearExternal contourExternal;
 
 	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
 
-	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-4f,15);
+	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-4f, 15);
 
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform<Point2D_F32> distToUndist;
@@ -134,6 +134,7 @@ public class BinaryEllipseDetectorPixel {
 
 	/**
 	 * Finds all valid ellipses in the binary image
+	 *
 	 * @param binary binary image
 	 */
 	public void process( GrayU8 binary ) {
@@ -141,10 +142,10 @@ public class BinaryEllipseDetectorPixel {
 
 		final BinaryContourInterface selectedFinder = getContourFinder();
 
-		selectedFinder.setMaxContour(maximumContour==0?Integer.MAX_VALUE:maximumContour);
+		selectedFinder.setMaxContour(maximumContour == 0 ? Integer.MAX_VALUE : maximumContour);
 		selectedFinder.setMinContour(minimumContour);
 
-		if( isInternalContour() ) {
+		if (isInternalContour()) {
 			contourFinder.process(binary, labeled);
 		} else {
 			contourExternal.process(binary);
@@ -158,16 +159,16 @@ public class BinaryEllipseDetectorPixel {
 			selectedFinder.loadContour(c.externalIndex, contourTmp);
 			proccessContour(contourTmp.toList(), binary.width, binary.height);
 
-			if(isInternalContour()) {
-				for( int j = 0; j < c.internalIndexes.size(); j++ ) {
-					selectedFinder.loadContour(c.internalIndexes.get(j),contourTmp);
+			if (isInternalContour()) {
+				for (int j = 0; j < c.internalIndexes.size(); j++) {
+					selectedFinder.loadContour(c.internalIndexes.get(j), contourTmp);
 					proccessContour(contourTmp.toList(), binary.width, binary.height);
 				}
 			}
 		}
 	}
 
-	private void proccessContour(List<Point2D_I32> contour, final int width , final int height) {
+	private void proccessContour( List<Point2D_I32> contour, final int width, final int height ) {
 		// No longer needed since contourFinder can have handle the limit internally now. Keeping this commented out
 		// for quick sanity checks in the future
 //		if (contour.size() < minimumContour || (maximumContour > 0 && contour.size() > maximumContour) ) {
@@ -177,41 +178,41 @@ public class BinaryEllipseDetectorPixel {
 //		}
 
 		// discard shapes which touch the image border
-		if(ContourOps.isTouchBorder(contour, width, height) )
+		if (ContourOps.isTouchBorder(contour, width, height))
 			return;
 
 		pointsF.reset();
-		undistortContour(contour,pointsF);
+		undistortContour(contour, pointsF);
 
 		// fit it to an ellipse.  This will just be approximate.  The more precise technique is much slower
-		if( !algebraic.process(pointsF.toList())) {
-			if( verbose != null )
-				verbose.println("Rejecting: algebraic fit failed. size = "+pointsF.size());
+		if (!algebraic.process(pointsF.toList())) {
+			if (verbose != null)
+				verbose.println("Rejecting: algebraic fit failed. size = " + pointsF.size());
 			return;
 		}
 
 		EllipseQuadratic_F64 quad = algebraic.getEllipse();
 		Found f = found.grow();
-		UtilEllipse_F64.convert(quad,f.ellipse);
+		UtilEllipse_F64.convert(quad, f.ellipse);
 
 		boolean accepted = true;
 
-		if( f.ellipse.b <= minimumMinorAxis ) {
-			if( verbose != null )
-				verbose.println("Rejecting: Minor axis too small. size = "+f.ellipse.b);
+		if (f.ellipse.b <= minimumMinorAxis) {
+			if (verbose != null)
+				verbose.println("Rejecting: Minor axis too small. size = " + f.ellipse.b);
 			accepted = false;
-		} else if( !isApproximatelyElliptical(f.ellipse,pointsF.toList(),20)) {
-			if( verbose != null )
-				verbose.println("Rejecting: Not approximately elliptical. size = "+pointsF.size());
+		} else if (!isApproximatelyElliptical(f.ellipse, pointsF.toList(), 20)) {
+			if (verbose != null)
+				verbose.println("Rejecting: Not approximately elliptical. size = " + pointsF.size());
 			accepted = false;
-		} else if( f.ellipse.a > maxMajorToMinorRatio*f.ellipse.b ) {
-			if( verbose != null )
-				verbose.println("Rejecting: Major to minor axis length ratio too extreme = "+pointsF.size());
+		} else if (f.ellipse.a > maxMajorToMinorRatio*f.ellipse.b) {
+			if (verbose != null)
+				verbose.println("Rejecting: Major to minor axis length ratio too extreme = " + pointsF.size());
 			accepted = false;
 		}
 
-		if( accepted ) {
-			if( verbose != null )
+		if (accepted) {
+			if (verbose != null)
 				verbose.println("Success!  size = " + pointsF.size());
 
 			adjustElipseForBinaryBias(f.ellipse);
@@ -239,15 +240,15 @@ public class BinaryEllipseDetectorPixel {
 	 * @param external The external contour
 	 * @param pointsF Output of converted points
 	 */
-	void undistortContour(List<Point2D_I32> external, FastQueue<Point2D_F64> pointsF ) {
+	void undistortContour( List<Point2D_I32> external, FastQueue<Point2D_F64> pointsF ) {
 		for (int j = 0; j < external.size(); j++) {
 			Point2D_I32 p = external.get(j);
 
-			if( distToUndist != null ) {
-				distToUndist.compute(p.x,p.y,distortedPoint);
-				pointsF.grow().set( distortedPoint.x , distortedPoint.y );
+			if (distToUndist != null) {
+				distToUndist.compute(p.x, p.y, distortedPoint);
+				pointsF.grow().setTo(distortedPoint.x, distortedPoint.y);
 			} else {
-				pointsF.grow().set(p.x, p.y);
+				pointsF.grow().setTo(p.x, p.y);
 			}
 		}
 	}
@@ -255,29 +256,29 @@ public class BinaryEllipseDetectorPixel {
 	/**
 	 * Look at the maximum distance contour points are from the ellipse and see if they exceed a maximum threshold
 	 */
-	boolean isApproximatelyElliptical(EllipseRotated_F64 ellipse , List<Point2D_F64> points , int maxSamples ) {
+	boolean isApproximatelyElliptical( EllipseRotated_F64 ellipse, List<Point2D_F64> points, int maxSamples ) {
 
 		closestPoint.setEllipse(ellipse);
 
 		double maxDistance2 = maxDistanceFromEllipse*maxDistanceFromEllipse;
 
-		if( points.size() <= maxSamples ) {
-			for( int i = 0; i < points.size(); i++ ) {
+		if (points.size() <= maxSamples) {
+			for (int i = 0; i < points.size(); i++) {
 				Point2D_F64 p = points.get(i);
 				closestPoint.process(p);
 				double d = closestPoint.getClosest().distance2(p);
 
-				if( d > maxDistance2 ) {
+				if (d > maxDistance2) {
 					return false;
 				}
 			}
 		} else {
 			for (int i = 0; i < maxSamples; i++) {
-				Point2D_F64 p = points.get( i*points.size()/maxSamples );
+				Point2D_F64 p = points.get(i*points.size()/maxSamples);
 				closestPoint.process(p);
 				double d = closestPoint.getClosest().distance2(p);
 
-				if( d > maxDistance2 ) {
+				if (d > maxDistance2) {
 					return false;
 				}
 			}
@@ -289,12 +290,12 @@ public class BinaryEllipseDetectorPixel {
 		return getContourFinder().getContours();
 	}
 
-	public void loadContour( int id , FastQueue<Point2D_I32> storage ) {
+	public void loadContour( int id, FastQueue<Point2D_I32> storage ) {
 		getContourFinder().loadContour(id, storage);
 	}
 
 	public BinaryContourInterface getContourFinder() {
-		if( contourFinder != null )
+		if (contourFinder != null)
 			return contourFinder;
 		else
 			return contourExternal;
@@ -308,14 +309,14 @@ public class BinaryEllipseDetectorPixel {
 		return contourFinder != null;
 	}
 
-	public void setInternalContour(boolean internalContour) {
-		if( internalContour == isInternalContour() )
+	public void setInternalContour( boolean internalContour ) {
+		if (internalContour == isInternalContour())
 			return;
 		declareContour(internalContour);
 	}
 
-	private void declareContour(boolean internalContour) {
-		if( internalContour ) {
+	private void declareContour( boolean internalContour ) {
+		if (internalContour) {
 			contourFinder = FactoryBinaryContourFinder.linearChang2004();
 			contourFinder.setConnectRule(connectRule);
 			contourExternal = null;
@@ -324,12 +325,12 @@ public class BinaryEllipseDetectorPixel {
 			contourExternal.setConnectRule(connectRule);
 			// If these are not set then a black border is added to the input image
 			contourExternal.setCreatePaddedCopy(true);
-			contourExternal.setCoordinateAdjustment(1,1);
+			contourExternal.setCoordinateAdjustment(1, 1);
 			contourFinder = null;
 		}
 	}
 
-	public void setVerbose(PrintStream verbose) {
+	public void setVerbose( PrintStream verbose ) {
 		this.verbose = verbose;
 	}
 

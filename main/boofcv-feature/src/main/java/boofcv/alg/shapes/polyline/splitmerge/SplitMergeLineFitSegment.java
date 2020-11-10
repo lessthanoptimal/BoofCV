@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,29 +34,27 @@ import java.util.List;
 @Deprecated
 public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 
-	public SplitMergeLineFitSegment(double splitFraction,
-									ConfigLength minimumSplit,
-									int maxIterations) {
-		super(splitFraction,minimumSplit, maxIterations);
+	public SplitMergeLineFitSegment( double splitFraction, ConfigLength minimumSplit, int maxIterations ) {
+		super(splitFraction, minimumSplit, maxIterations);
 	}
 
 	@Override
-	public boolean _process(List<Point2D_I32> list) {
-		if( list.size() <= 2 ) { // can't do anything with two or less points
+	public boolean _process( List<Point2D_I32> list ) {
+		if (list.size() <= 2) { // can't do anything with two or less points
 			return false;
 		}
 
 		// initial segmentation
 		splits.add(0);
 		splitPixels(0, list.size() - 1);
-		splits.add(list.size()-1);
+		splits.add(list.size() - 1);
 
-		for( int i = 0; i < maxIterations; i++ ) {
+		for (int i = 0; i < maxIterations; i++) {
 			boolean changed = mergeSegments();
-			if( !changed && !splitSegments() )
+			if (!changed && !splitSegments())
 				break;
 
-			if( splits.size() <= 2 || splits.size() >= abortSplits )
+			if (splits.size() <= 2 || splits.size() >= abortSplits)
 				break;
 		}
 
@@ -67,14 +65,14 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 	 * Recursively splits pixels.  Used in the initial segmentation.  Only split points between
 	 * the two ends are added
 	 */
-	protected void splitPixels( int indexStart , int indexStop ) {
+	protected void splitPixels( int indexStart, int indexStop ) {
 		// too short to split
-		if( indexStart+1 >= indexStop )
+		if (indexStart + 1 >= indexStop)
 			return;
 
 		int indexSplit = selectSplitBetween(indexStart, indexStop);
 
-		if( indexSplit >= 0 ) {
+		if (indexSplit >= 0) {
 			splitPixels(indexStart, indexSplit);
 			splits.add(indexSplit);
 			splitPixels(indexSplit, indexStop);
@@ -83,18 +81,19 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 
 	/**
 	 * Splits a line in two if there is a paint that is too far away
+	 *
 	 * @return true for change
 	 */
 	protected boolean splitSegments() {
 		boolean change = false;
 
 		work.reset();
-		for( int i = 0; i < splits.size-1; i++ ) {
+		for (int i = 0; i < splits.size - 1; i++) {
 			int start = splits.data[i];
-			int end = splits.data[i+1];
+			int end = splits.data[i + 1];
 
 			int bestIndex = selectSplitBetween(start, end);
-			if( bestIndex >= 0 ) {
+			if (bestIndex >= 0) {
 				change |= true;
 				work.add(start);
 				work.add(bestIndex);
@@ -102,7 +101,7 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 				work.add(start);
 			}
 		}
-		work.add(splits.data[ splits.size-1] );
+		work.add(splits.data[splits.size - 1]);
 
 		// swap the two lists
 		GrowQueue_I32 tmp = work;
@@ -116,29 +115,29 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
 	 * (set up prior to calling).  Returns the index if the distance is less than tolerance, otherwise -1
 	 */
-	protected int selectSplitBetween(int indexStart, int indexEnd) {
+	protected int selectSplitBetween( int indexStart, int indexEnd ) {
 
 		Point2D_I32 a = contour.get(indexStart);
 		Point2D_I32 c = contour.get(indexEnd);
 
-		line.p.set(a.x,a.y);
-		line.slope.set(c.x-a.x,c.y-a.y);
+		line.p.setTo(a.x, a.y);
+		line.slope.setTo(c.x - a.x, c.y - a.y);
 
 		int bestIndex = -1;
 		double bestDistanceSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
 
 		// adjusting using 'minimumSideLengthPixel' to ensure it doesn't create a new line which is too short
-		int minLength = Math.max(1,minimumSideLengthPixel);// 1 is the minimum so that you don't split on the same corner
-		int length = indexEnd-indexStart-minLength;
+		int minLength = Math.max(1, minimumSideLengthPixel);// 1 is the minimum so that you don't split on the same corner
+		int length = indexEnd - indexStart - minLength;
 
 		// don't try splitting at the two end points
-		for( int i = minLength; i <= length; i++ ) {
-			int index = indexStart+i;
+		for (int i = minLength; i <= length; i++) {
+			int index = indexStart + i;
 			Point2D_I32 b = contour.get(index);
-			point2D.set(b.x,b.y);
+			point2D.setTo(b.x, b.y);
 
 			double dist = Distance2D_F64.distanceSq(line, point2D);
-			if( dist >= bestDistanceSq ) {
+			if (dist >= bestDistanceSq) {
 				bestDistanceSq = dist;
 				bestIndex = index;
 			}
@@ -148,11 +147,12 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 
 	/**
 	 * Merges lines together which have an acute angle less than the threshold.
+	 *
 	 * @return true the list being changed
 	 */
 	protected boolean mergeSegments() {
 		// can't merge a single line
-		if( splits.size <= 2 )
+		if (splits.size <= 2)
 			return false;
 
 		boolean change = false;
@@ -161,8 +161,8 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		// first point is always at the start
 		work.add(splits.data[0]);
 
-		for( int i = 0; i < splits.size-2; i++ ) {
-			if( selectSplitBetween(splits.data[i],splits.data[i+2]) < 0 ) {
+		for (int i = 0; i < splits.size - 2; i++) {
+			if (selectSplitBetween(splits.data[i], splits.data[i + 2]) < 0) {
 				// merge the two lines by not adding it
 				change = true;
 			} else {
@@ -171,7 +171,7 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		}
 
 		// and end
-		work.add(splits.data[splits.size-1]);
+		work.add(splits.data[splits.size - 1]);
 
 		// swap the two lists
 		GrowQueue_I32 tmp = work;

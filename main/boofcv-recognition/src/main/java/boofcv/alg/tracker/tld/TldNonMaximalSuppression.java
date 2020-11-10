@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class TldNonMaximalSuppression {
 				TldRegion o = output.grow();
 				o.connections = ra.connections;
 				o.confidence = ra.confidence;
-				o.rect.set(ra.rect);
+				o.rect.setTo(ra.rect);
 			} else if( ra.connections == 0 ) {
 				System.out.println("Not a maximum but has zero connections?");
 			}

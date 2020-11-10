@@ -36,7 +36,7 @@ public class TestPixelDistortAffine_F32 extends BoofStandardJUnit {
 		Affine2D_F32 a = new Affine2D_F32(1,2,3,4,5,6);
 
 		PixelTransformAffine_F32 alg = new PixelTransformAffine_F32();
-		alg.set(a);
+		alg.setTo(a);
 
 		Point2D_F32 transformed = new Point2D_F32();
 		alg.compute(2,3, transformed);

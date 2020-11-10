@@ -79,7 +79,7 @@ public class TestDetectPolygonBinaryGrayRefine extends CommonFitPolygonChecks {
 		rectangles.add(new Rectangle2D_I32(30,90,60,120));
 		rectangles.add(new Rectangle2D_I32(90,90,120,120));
 
-		transform.set(0.8, 0, 0, 0.8, 1, 2);
+		transform.setTo(0.8, 0, 0, 0.8, 1, 2);
 		transform = transform.invert(null);
 
 		for( Class imageType : imageTypes ) {

@@ -202,7 +202,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	public void setWorldToCamera( Se3_F32 worldToCamera ) {
 		rendering.lock.lock();
 		try {
-			rendering.worldToCamera.set(worldToCamera);
+			rendering.worldToCamera.setTo(worldToCamera);
 		} finally {
 			rendering.lock.unlock();
 		}
@@ -258,7 +258,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 			worldToCamera = new Se3_F32();
 		rendering.lock.lock();
 		try {
-			worldToCamera.set(rendering.worldToCamera);
+			worldToCamera.setTo(rendering.worldToCamera);
 		} finally {
 			rendering.lock.unlock();
 		}
@@ -634,7 +634,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		rendering.lock.lock();
 		try {
 			Se3_F32 temp = rendering.worldToCamera.concat(rotTran, null);
-			rendering.worldToCamera.set(temp);
+			rendering.worldToCamera.setTo(temp);
 		} finally {
 			rendering.lock.unlock();
 		}

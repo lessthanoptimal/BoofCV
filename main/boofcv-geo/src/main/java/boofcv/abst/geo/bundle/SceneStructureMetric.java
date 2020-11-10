@@ -153,7 +153,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		if (tmp == null)
 			tmp = new Se3_F64();
 
-		world_to_view.set(getParentToView(view));
+		world_to_view.setTo(getParentToView(view));
 
 		while (view.parent != null) {
 			view = view.parent;
@@ -161,7 +161,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 			// world_to_view is really view_to_child
 			parent_to_view.concat(world_to_view, tmp);
-			world_to_view.set(tmp);
+			world_to_view.setTo(tmp);
 		}
 
 		return world_to_view;
@@ -227,7 +227,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		int index = motions.size;
 		Motion m = motions.grow();
 		m.known = known;
-		m.motion.set(motion);
+		m.motion.setTo(motion);
 		return index;
 	}
 
@@ -243,7 +243,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	public void setRigid( int which, boolean known, Se3_F64 worldToObject, int totalPoints ) {
 		Rigid r = rigids.data[which] = new Rigid();
 		r.known = known;
-		r.object_to_world.set(worldToObject);
+		r.object_to_world.setTo(worldToObject);
 		r.points = new Point[totalPoints];
 		for (int i = 0; i < totalPoints; i++) {
 			r.points[i] = new Point(pointSize);

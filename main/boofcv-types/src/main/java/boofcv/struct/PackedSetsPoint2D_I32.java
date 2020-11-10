@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,12 +52,12 @@ public class PackedSetsPoint2D_I32 {
 	 *
 	 * @param blockLength Number of elements in the block's array. Try 2000
 	 */
-	public PackedSetsPoint2D_I32(final int blockLength ) {
-		if( blockLength < 2 )
+	public PackedSetsPoint2D_I32( final int blockLength ) {
+		if (blockLength < 2)
 			throw new IllegalArgumentException("Block length must be more than 2");
 		// ensure that the block length is divisible by two
 		this.blockLength = blockLength + (blockLength%2);
-		blocks = new FastQueue<>(int[].class,()->new int[ this.blockLength ]);
+		blocks = new FastQueue<>(int[].class, () -> new int[this.blockLength]);
 		blocks.grow();
 	}
 
@@ -79,13 +79,13 @@ public class PackedSetsPoint2D_I32 {
 	 * Adds a new point set to the end.
 	 */
 	public void grow() {
-		if( tailBlockSize >= blockLength ) {
+		if (tailBlockSize >= blockLength) {
 			tailBlockSize = 0;
 			blocks.grow();
 		}
 
 		BlockIndexLength s = sets.grow();
-		s.block = blocks.size-1;
+		s.block = blocks.size - 1;
 		s.start = tailBlockSize;
 		s.length = 0;
 
@@ -96,47 +96,48 @@ public class PackedSetsPoint2D_I32 {
 	 * Removes the current point set from the end
 	 */
 	public void removeTail() {
-		while( blocks.size-1 != tail.block )
+		while (blocks.size - 1 != tail.block)
 			blocks.removeTail();
 		tailBlockSize = tail.start;
 		sets.removeTail();
-		tail = sets.size > 0 ? sets.get( sets.size-1 ) : null;
+		tail = sets.size > 0 ? sets.get(sets.size - 1) : null;
 	}
 
 	/**
 	 * Adds a point to the tail point set
+	 *
 	 * @param x coordinate
 	 * @param y coordinate
 	 */
-	public void addPointToTail( int x , int y ) {
+	public void addPointToTail( int x, int y ) {
 		int index = tail.start + tail.length*2;
 
-		int block[];
+		int[] block;
 		int blockIndex = tail.block + index/blockLength;
-		if( blockIndex == blocks.size ) {
+		if (blockIndex == blocks.size) {
 			tailBlockSize = 0;
 			block = blocks.grow();
 		} else {
-			block = blocks.get( blockIndex );
+			block = blocks.get(blockIndex);
 		}
 		tailBlockSize += 2;
 		index %= blockLength;
 
-		block[index ] = x;
-		block[index+1 ] = y;
+		block[index] = x;
+		block[index + 1] = y;
 		tail.length += 1;
 	}
 
 	/**
 	 * Total number of points
-	 * @return
 	 */
 	public int totalPoints() {
-		return (blockLength*(blocks.size-1) + tailBlockSize)/2;
+		return (blockLength*(blocks.size - 1) + tailBlockSize)/2;
 	}
 
 	/**
 	 * Number of point sets
+	 *
 	 * @return number of point sets
 	 */
 	public int size() {
@@ -145,6 +146,7 @@ public class PackedSetsPoint2D_I32 {
 
 	/**
 	 * Returns the size/length of a point set
+	 *
 	 * @param which index of point set
 	 * @return the size
 	 */
@@ -154,10 +156,11 @@ public class PackedSetsPoint2D_I32 {
 
 	/**
 	 * Copies all the points in the set into the specified list
+	 *
 	 * @param which (Input) which point set
 	 * @param list (Output) Storage for points
 	 */
-	public void getSet(int which , FastQueue<Point2D_I32> list ) {
+	public void getSet( int which, FastQueue<Point2D_I32> list ) {
 		list.reset();
 
 		BlockIndexLength set = sets.get(which);
@@ -167,16 +170,16 @@ public class PackedSetsPoint2D_I32 {
 			int blockIndex = set.block + index/blockLength;
 			index %= blockLength;
 
-			int block[] = blocks.get( blockIndex );
-			list.grow().set( block[index] , block[index+1] );
+			int[] block = blocks.get(blockIndex);
+			list.grow().setTo(block[index], block[index + 1]);
 		}
 	}
 
-	public List<Point2D_I32> getSet(int which) {
+	public List<Point2D_I32> getSet( int which ) {
 		FastQueue<Point2D_I32> tmp = new FastQueue<>(Point2D_I32::new);
-		getSet(which,tmp);
+		getSet(which, tmp);
 		List<Point2D_I32> output = new ArrayList<>();
-		output.addAll( tmp.toList() );
+		output.addAll(tmp.toList());
 		return output;
 	}
 
@@ -196,9 +199,9 @@ public class PackedSetsPoint2D_I32 {
 	 *
 	 * @param points Points which are to be written into the set. Must be the same size as the set.
 	 */
-	public void writeOverSet(int which, List<Point2D_I32> points) {
+	public void writeOverSet( int which, List<Point2D_I32> points ) {
 		BlockIndexLength set = sets.get(which);
-		if( set.length != points.size() )
+		if (set.length != points.size())
 			throw new IllegalArgumentException("points and set don't have the same length");
 
 		for (int i = 0; i < set.length; i++) {
@@ -207,9 +210,9 @@ public class PackedSetsPoint2D_I32 {
 			index %= blockLength;
 
 			Point2D_I32 p = points.get(i);
-			int block[] = blocks.get( blockIndex );
+			int[] block = blocks.get(blockIndex);
 			block[index] = p.x;
-			block[index+1] = p.y;
+			block[index + 1] = p.y;
 		}
 	}
 
@@ -223,6 +226,7 @@ public class PackedSetsPoint2D_I32 {
 
 		/**
 		 * Specifies which set the iterator should process
+		 *
 		 * @param whichSet index of the set
 		 */
 		public void setup( int whichSet ) {
@@ -243,8 +247,8 @@ public class PackedSetsPoint2D_I32 {
 			int blockIndex = set.block + index/blockLength;
 			index %= blockLength;
 
-			int block[] = blocks.get( blockIndex );
-			p.set( block[index] , block[index+1] );
+			int[] block = blocks.get(blockIndex);
+			p.setTo(block[index], block[index + 1]);
 
 			pointIndex++;
 			return p;

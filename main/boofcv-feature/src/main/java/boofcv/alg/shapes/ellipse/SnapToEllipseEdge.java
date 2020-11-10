@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 	 * @param radialSamples When the difference between two ellipses is less than this amount stop iterating
 	 * @param imageType Type of gray-scale input image
 	 */
-	public SnapToEllipseEdge( int numSampleContour, int radialSamples , Class<T> imageType) {
+	public SnapToEllipseEdge( int numSampleContour, int radialSamples, Class<T> imageType ) {
 		super(imageType);
 
 		this.numSampleContour = numSampleContour;
@@ -78,18 +78,18 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 	 * @param refined (Output) Storage for refined estimate.  Can be same instance as input
 	 * @return True if a refined estimate could be found, false if it failed
 	 */
-	public boolean process(EllipseRotated_F64 input, EllipseRotated_F64 refined) {
+	public boolean process( EllipseRotated_F64 input, EllipseRotated_F64 refined ) {
 
-		refined.set(input);
-		previous.set(input);
+		refined.setTo(input);
+		previous.setTo(input);
 
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
-			refined.set(previous);
+			refined.setTo(previous);
 			computePointsAndWeights(refined);
 
-			if( fitter.process(samplePts.toList(),weights.data) ) {
+			if (fitter.process(samplePts.toList(), weights.data)) {
 				// Get the results in local coordinates
-				UtilEllipse_F64.convert(fitter.getEllipse(),refined);
+				UtilEllipse_F64.convert(fitter.getEllipse(), refined);
 				// convert back into image coordinates
 				double scale = previous.a;
 				refined.center.x = refined.center.x*scale + previous.center.x;
@@ -101,10 +101,10 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 			}
 
 			// stop once the change between two iterations is insignificant
-			if( change(previous,refined) <= convergenceTol) {
+			if (change(previous, refined) <= convergenceTol) {
 				return true;
 			} else {
-				previous.set(refined);
+				previous.setTo(refined);
 			}
 		}
 		return true;
@@ -113,7 +113,7 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 	/**
 	 * Computes a numerical value for the difference in parameters between the two ellipses
 	 */
-	protected static double change( EllipseRotated_F64 a , EllipseRotated_F64 b ) {
+	protected static double change( EllipseRotated_F64 a, EllipseRotated_F64 b ) {
 		double total = 0;
 
 		total += Math.abs(a.center.x - b.center.x);
@@ -122,8 +122,8 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 		total += Math.abs(a.b - b.b);
 
 		// only care about the change of angle when it is not a circle
-		double weight = Math.min(4,2.0*(a.a/a.b-1.0));
-		total += weight*UtilAngle.distHalf(a.phi , b.phi);
+		double weight = Math.min(4, 2.0*(a.a/a.b - 1.0));
+		total += weight*UtilAngle.distHalf(a.phi, b.phi);
 
 		return total;
 	}
@@ -131,37 +131,37 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 	/**
 	 * Computes the location of points along the line and their weights
 	 */
-	void computePointsAndWeights(EllipseRotated_F64 ellipse) {
+	void computePointsAndWeights( EllipseRotated_F64 ellipse ) {
 
 		// use the semi-major axis to scale the input points for numerical stability
 		double localScale = ellipse.a;
 
 		samplePts.reset();
 		weights.reset();
-		int numSamples = radialSamples * 2 + 2;
+		int numSamples = radialSamples*2 + 2;
 		int numPts = numSamples - 1;
 
 		Point2D_F64 sample = new Point2D_F64();
 		for (int i = 0; i < numSampleContour; i++) {
 
 			// find a point along the ellipse at evenly spaced angles
-			double theta = 2.0 * Math.PI * i / numSampleContour;
+			double theta = 2.0*Math.PI*i/numSampleContour;
 
 			UtilEllipse_F64.computePoint(theta, ellipse, sample);
 
 			// compute the unit tangent along the ellipse at this point
 			double tanX = sample.x - ellipse.center.x;
 			double tanY = sample.y - ellipse.center.y;
-			double r = Math.sqrt(tanX * tanX + tanY * tanY);
+			double r = Math.sqrt(tanX*tanX + tanY*tanY);
 			tanX /= r;
 			tanY /= r;
 
 			// define the line it will sample along
-			double x = sample.x - numSamples * tanX / 2.0;
-			double y = sample.y - numSamples * tanY / 2.0;
+			double x = sample.x - numSamples*tanX/2.0;
+			double y = sample.y - numSamples*tanY/2.0;
 
-			double lengthX = numSamples * tanX;
-			double lengthY = numSamples * tanY;
+			double lengthX = numSamples*tanX;
+			double lengthY = numSamples*tanY;
 
 			// Unless all the sample points are inside the image, ignore this point
 			if (!integral.isInside(x, y) || !integral.isInside(x + lengthX, y + lengthY))
@@ -179,7 +179,7 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 				if (w > 0) {
 					// convert into a local coordinate so make the linear fitting more numerically stable and
 					// independent on position in the image
-					samplePts.grow().set((x - ellipse.center.x) / localScale, (y - ellipse.center.y) / localScale);
+					samplePts.grow().setTo((x - ellipse.center.x)/localScale, (y - ellipse.center.y)/localScale);
 					weights.add(w);
 				}
 
@@ -187,7 +187,6 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 				y += tanY;
 				sample0 = sample1;
 			}
-
 		}
 	}
 
@@ -195,7 +194,7 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 		return maxIterations;
 	}
 
-	public void setMaxIterations(int maxIterations) {
+	public void setMaxIterations( int maxIterations ) {
 		this.maxIterations = maxIterations;
 	}
 
@@ -203,7 +202,7 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 		return convergenceTol;
 	}
 
-	public void setConvergenceTol(double convergenceTol) {
+	public void setConvergenceTol( double convergenceTol ) {
 		this.convergenceTol = convergenceTol;
 	}
 }

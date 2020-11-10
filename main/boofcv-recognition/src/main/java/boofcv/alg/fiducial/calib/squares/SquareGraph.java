@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -170,8 +170,8 @@ public class SquareGraph {
 		Point2D_F64 b0 = b.square.get(sideB);
 		Point2D_F64 b1 = b.square.get(add(sideB, 1));
 
-		vector0.set(a1.x - a0.x, a1.y - a0.y);
-		vector1.set(b1.x - b0.x, b1.y - b0.y);
+		vector0.setTo(a1.x - a0.x, a1.y - a0.y);
+		vector1.setTo(b1.x - b0.x, b1.y - b0.y);
 
 		double acute = vector0.acute(vector1);
 		return Math.min(UtilAngle.dist(Math.PI, acute), acute);

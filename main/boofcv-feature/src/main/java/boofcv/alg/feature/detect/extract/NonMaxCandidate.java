@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,82 +59,82 @@ public class NonMaxCandidate {
 	 * Checks to see if the specified candidates are local minimums or maximums.  If a candidate list is
 	 * null then that test is skipped.
 	 */
-	public void process(GrayF32 intensityImage,
-						@Nullable ListIntPoint2D candidatesMin,
-						@Nullable ListIntPoint2D candidatesMax,
-						FastQueue<Point2D_I16> foundMin , FastQueue<Point2D_I16> foundMax ) {
+	public void process( GrayF32 intensityImage,
+						 @Nullable ListIntPoint2D candidatesMin,
+						 @Nullable ListIntPoint2D candidatesMax,
+						 FastQueue<Point2D_I16> foundMin, FastQueue<Point2D_I16> foundMax ) {
 
 		this.input = intensityImage;
 
 		// pixels indexes larger than these should not be examined
-		endBorderX = intensityImage.width-ignoreBorder;
-		endBorderY = intensityImage.height-ignoreBorder;
+		endBorderX = intensityImage.width - ignoreBorder;
+		endBorderY = intensityImage.height - ignoreBorder;
 
 		search.initialize(intensityImage);
 
-		if( candidatesMin != null ) {
+		if (candidatesMin != null) {
 			foundMin.reset();
 			examineMinimum(intensityImage, candidatesMin, foundMin);
 		}
-		if( candidatesMax != null ) {
+		if (candidatesMax != null) {
 			foundMax.reset();
 			examineMaximum(intensityImage, candidatesMax, foundMax);
 		}
 	}
 
-	protected void examineMinimum(GrayF32 intensityImage , ListIntPoint2D candidates , FastQueue<Point2D_I16> found ) {
+	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
-		final float inten[] = intensityImage.data;
+		final float[] inten = intensityImage.data;
 
 		for (int pointIdx = 0; pointIdx < candidates.size(); pointIdx++) {
 			final Point2D_I16 pt = this.pt;
-			candidates.get(pointIdx,pt);
+			candidates.get(pointIdx, pt);
 
-			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
+			if (pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 				continue;
 
-			int center = intensityImage.startIndex + pt.y * stride + pt.x;
+			int center = intensityImage.startIndex + pt.y*stride + pt.x;
 
 			float val = inten[center];
-			if (val > thresholdMin || val == -Float.MAX_VALUE ) continue;
+			if (val > thresholdMin || val == -Float.MAX_VALUE) continue;
 
-			int x0 = Math.max(0,pt.x - radius);
-			int y0 = Math.max(0,pt.y - radius);
+			int x0 = Math.max(0, pt.x - radius);
+			int y0 = Math.max(0, pt.y - radius);
 			int x1 = Math.min(intensityImage.width, pt.x + radius + 1);
 			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
-			if( search.searchMin(x0,y0,x1,y1,center,val) )
-				found.grow().set(pt.x,pt.y);
+			if (search.searchMin(x0, y0, x1, y1, center, val))
+				found.grow().setTo(pt.x, pt.y);
 		}
 	}
 
-	protected void examineMaximum(GrayF32 intensityImage , ListIntPoint2D candidates , FastQueue<Point2D_I16> found ) {
+	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
-		final float inten[] = intensityImage.data;
+		final float[] inten = intensityImage.data;
 
 		for (int pointIdx = 0; pointIdx < candidates.size(); pointIdx++) {
 			final Point2D_I16 pt = this.pt;
-			candidates.get(pointIdx,pt);
+			candidates.get(pointIdx, pt);
 
-			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
+			if (pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 				continue;
 
-			int center = intensityImage.startIndex + pt.y * stride + pt.x;
+			int center = intensityImage.startIndex + pt.y*stride + pt.x;
 
 			float val = inten[center];
-			if (val < thresholdMax || val == Float.MAX_VALUE ) continue;
+			if (val < thresholdMax || val == Float.MAX_VALUE) continue;
 
-			int x0 = Math.max(0,pt.x - radius);
-			int y0 = Math.max(0,pt.y - radius);
+			int x0 = Math.max(0, pt.x - radius);
+			int y0 = Math.max(0, pt.y - radius);
 			int x1 = Math.min(intensityImage.width, pt.x + radius + 1);
 			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
-			if( search.searchMax(x0,y0,x1,y1,center,val) )
-				found.grow().set(pt.x,pt.y);
+			if (search.searchMax(x0, y0, x1, y1, center, val))
+				found.grow().setTo(pt.x, pt.y);
 		}
 	}
 
-	public void setSearchRadius(int radius) {
+	public void setSearchRadius( int radius ) {
 		this.radius = radius;
 	}
 
@@ -146,7 +146,7 @@ public class NonMaxCandidate {
 		return thresholdMin;
 	}
 
-	public void setThresholdMin(float thresholdMin) {
+	public void setThresholdMin( float thresholdMin ) {
 		this.thresholdMin = thresholdMin;
 	}
 
@@ -154,13 +154,12 @@ public class NonMaxCandidate {
 		return thresholdMax;
 	}
 
-	public void setThresholdMax(float thresholdMax) {
+	public void setThresholdMax( float thresholdMax ) {
 		this.thresholdMax = thresholdMax;
 	}
 
 	public void setBorder( int border ) {
 		this.ignoreBorder = border;
-
 	}
 
 	public int getBorder() {
@@ -184,8 +183,9 @@ public class NonMaxCandidate {
 		 * @param val value at the candidate pixel
 		 * @return true if it's a local min
 		 */
-		boolean searchMin( int x0 , int y0 , int x1 , int y1, int centerIdx , float val );
-		boolean searchMax( int x0 , int y0 , int x1 , int y1, int centerIdx , float val );
+		boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val );
+
+		boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val );
 
 		/**
 		 * Create a new instance of this search algorithm. Useful for concurrent implementations
@@ -200,15 +200,15 @@ public class NonMaxCandidate {
 		GrayF32 intensity;
 
 		@Override
-		public void initialize(GrayF32 intensity) {
+		public void initialize( GrayF32 intensity ) {
 			this.intensity = intensity;
 		}
 
 		@Override
-		public boolean searchMin(int x0, int y0, int x1, int y1, int centerIdx, float val) {
-			for( int i = y0; i < y1; i++ ) {
-				int index = intensity.startIndex + i * intensity.stride + x0;
-				for( int j = x0; j < x1; j++ , index++ ) {
+		public boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+			for (int i = y0; i < y1; i++) {
+				int index = intensity.startIndex + i*intensity.stride + x0;
+				for (int j = x0; j < x1; j++, index++) {
 					if (val > intensity.data[index]) {
 						return false;
 					}
@@ -218,10 +218,10 @@ public class NonMaxCandidate {
 		}
 
 		@Override
-		public boolean searchMax(int x0, int y0, int x1, int y1, int centerIdx, float val) {
-			for( int i = y0; i < y1; i++ ) {
-				int index = intensity.startIndex + i * intensity.stride + x0;
-				for( int j = x0; j < x1; j++ , index++ ) {
+		public boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+			for (int i = y0; i < y1; i++) {
+				int index = intensity.startIndex + i*intensity.stride + x0;
+				for (int j = x0; j < x1; j++, index++) {
 					if (val < intensity.data[index]) {
 						return false;
 					}
@@ -243,17 +243,17 @@ public class NonMaxCandidate {
 		GrayF32 intensity;
 
 		@Override
-		public void initialize(GrayF32 intensity) {
+		public void initialize( GrayF32 intensity ) {
 			this.intensity = intensity;
 		}
 
 		@Override
-		public boolean searchMin(int x0, int y0, int x1, int y1, int centerIdx, float val) {
-			for( int i = y0; i < y1; i++ ) {
-				int index = intensity.startIndex + i * intensity.stride + x0;
-				for( int j = x0; j < x1; j++ , index++ ) {
+		public boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+			for (int i = y0; i < y1; i++) {
+				int index = intensity.startIndex + i*intensity.stride + x0;
+				for (int j = x0; j < x1; j++, index++) {
 					// don't compare the center point against itself
-					if ( centerIdx == index )
+					if (centerIdx == index)
 						continue;
 
 					if (val >= intensity.data[index]) {
@@ -265,12 +265,12 @@ public class NonMaxCandidate {
 		}
 
 		@Override
-		public boolean searchMax(int x0, int y0, int x1, int y1, int centerIdx, float val) {
-			for( int i = y0; i < y1; i++ ) {
-				int index = intensity.startIndex + i * intensity.stride + x0;
-				for( int j = x0; j < x1; j++ , index++ ) {
+		public boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+			for (int i = y0; i < y1; i++) {
+				int index = intensity.startIndex + i*intensity.stride + x0;
+				for (int j = x0; j < x1; j++, index++) {
 					// don't compare the center point against itself
-					if ( centerIdx == index )
+					if (centerIdx == index)
 						continue;
 
 					if (val <= intensity.data[index]) {

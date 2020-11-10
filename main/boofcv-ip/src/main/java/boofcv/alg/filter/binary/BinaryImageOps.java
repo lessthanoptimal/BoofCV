@@ -599,7 +599,7 @@ public class BinaryImageOps {
 				int v = labelImage.data[index];
 				if (v > 0) {
 					Point2D_I32 p = queue.grow();
-					p.set(index - start, y);
+					p.setTo(index - start, y);
 					ret.get(v).add(p);
 				}
 			}
