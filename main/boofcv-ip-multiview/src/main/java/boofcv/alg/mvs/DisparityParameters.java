@@ -38,7 +38,7 @@ public class DisparityParameters {
 	public int disparityRange;
 	/** The baseline between the two views */
 	public double baseline;
-	/** The camera's focal length */
+	/** Rectified camera's intrinsic parameters */
 	public final CameraPinhole pinhole = new CameraPinhole();
 	/** Rotation from view to rectified synthetic view */
 	public final DMatrixRMaj rectifiedR = CommonOps_DDRM.identity(3);

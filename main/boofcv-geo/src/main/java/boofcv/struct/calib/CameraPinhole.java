@@ -45,7 +45,7 @@ public class CameraPinhole extends CameraModel {
 	/** image center (units: pixels) */
 	@Getter @Setter public double cx, cy;
 
-	public CameraPinhole() { }
+	public CameraPinhole() {}
 
 	/** Copy constructor */
 	public CameraPinhole( CameraPinhole param ) {

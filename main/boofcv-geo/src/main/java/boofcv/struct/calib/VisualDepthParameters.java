@@ -18,6 +18,8 @@
 
 package boofcv.struct.calib;
 
+import lombok.Data;
+
 /**
  * <p>
  * Calibration parameters for depth sensors (e.g. Kinect) which provide depth information for pixels inside an RGB
@@ -27,56 +29,27 @@ package boofcv.struct.calib;
  *
  * @author Peter Abeles
  */
+@Data
 public class VisualDepthParameters {
 
-	/**
-	 * The maximum depth which the depth sensor can sense
-	 */
+	/** The maximum depth which the depth sensor can sense */
 	public Number maxDepth;
 
-	/**
-	 * The value to a pixel in the depth image if there is no information there
-	 */
+	/** Indicates that the depth is unknown at a pixel in the depth image */
 	public Number pixelNoDepth;
 
-	/**
-	 * Intrinsic camera parameters for the visual sensor.
-	 */
+	/** Intrinsic camera parameters for the visual sensor. */
 	public CameraPinholeBrown visualParam;
 
-	public VisualDepthParameters() {
-	}
+	public VisualDepthParameters() {}
 
 	public VisualDepthParameters( VisualDepthParameters param ) {
-		set(param);
+		setTo(param);
 	}
 
-	public void set( VisualDepthParameters param ) {
+	public void setTo( VisualDepthParameters param ) {
 		maxDepth = param.maxDepth;
+		pixelNoDepth = param.pixelNoDepth;
 		visualParam.setTo(param.visualParam);
-	}
-
-	public CameraPinholeBrown getVisualParam() {
-		return visualParam;
-	}
-
-	public void setVisualParam( CameraPinholeBrown visualParam ) {
-		this.visualParam = visualParam;
-	}
-
-	public Number getMaxDepth() {
-		return maxDepth;
-	}
-
-	public void setMaxDepth( Number maxDepth ) {
-		this.maxDepth = maxDepth;
-	}
-
-	public Number getPixelNoDepth() {
-		return pixelNoDepth;
-	}
-
-	public void setPixelNoDepth( Number pixelNoDepth ) {
-		this.pixelNoDepth = pixelNoDepth;
 	}
 }

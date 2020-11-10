@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.structure;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestMultiViewStereoFromSceneGraph {
-	@Test void implement() {fail("implement");}
+public class TestMultiViewStereoFromSceneGraph extends BoofStandardJUnit {
+	@Test void implement() {
+		fail("implement");
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,19 +40,18 @@ public class MonoPlaneParameters {
 	 */
 	public Se3_F64 planeToCamera;
 
-	public MonoPlaneParameters(CameraPinholeBrown intrinsic, Se3_F64 planeToCamera) {
+	public MonoPlaneParameters( CameraPinholeBrown intrinsic, Se3_F64 planeToCamera ) {
 		this.intrinsic = intrinsic;
 		this.planeToCamera = planeToCamera;
 	}
 
-	public MonoPlaneParameters() {
-	}
+	public MonoPlaneParameters() {}
 
 	public CameraPinholeBrown getIntrinsic() {
 		return intrinsic;
 	}
 
-	public void setIntrinsic(CameraPinholeBrown intrinsic) {
+	public void setIntrinsic( CameraPinholeBrown intrinsic ) {
 		this.intrinsic = intrinsic;
 	}
 
@@ -60,7 +59,7 @@ public class MonoPlaneParameters {
 		return planeToCamera;
 	}
 
-	public void setPlaneToCamera(Se3_F64 planeToCamera) {
+	public void setPlaneToCamera( Se3_F64 planeToCamera ) {
 		this.planeToCamera = planeToCamera;
 	}
 }

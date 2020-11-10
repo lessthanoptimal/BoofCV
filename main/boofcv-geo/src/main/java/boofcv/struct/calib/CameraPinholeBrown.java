@@ -18,6 +18,8 @@
 
 package boofcv.struct.calib;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.ejml.FancyPrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +46,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 	/** radial distortion parameters */
 	public @Nullable double[] radial;
 	/** tangential distortion parameters */
-	public double t1, t2;
+	public @Getter @Setter double t1, t2;
 
 	/**
 	 * Default constructor.  flipY is false and everything else is zero or null.
@@ -144,22 +146,6 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 
 	public void setRadial(double... radial) {
 		this.radial = radial;
-	}
-
-	public double getT1() {
-		return t1;
-	}
-
-	public void setT1(double t1) {
-		this.t1 = t1;
-	}
-
-	public double getT2() {
-		return t2;
-	}
-
-	public void setT2(double t2) {
-		this.t2 = t2;
 	}
 
 	@Override

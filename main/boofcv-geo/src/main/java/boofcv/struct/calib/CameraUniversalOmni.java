@@ -59,6 +59,7 @@ package boofcv.struct.calib;
  * [1] Christopher Mei, and Patrick Rives. "Single view point omnidirectional camera calibration
  *     from planar grids." ICRA 2007.
  * </p>
+ *
  * @author Peter Abeles
  */
 public class CameraUniversalOmni extends CameraPinhole {
@@ -76,15 +77,16 @@ public class CameraUniversalOmni extends CameraPinhole {
 	 * @param numRadial Number of radial distortion parameters
 	 */
 	public CameraUniversalOmni( int numRadial ) {
-		this.radial = new double[ numRadial ];
+		this.radial = new double[numRadial];
 	}
 
 	/**
 	 * Copy constructor
+	 *
 	 * @param original Model which is to be copied
 	 */
 	public CameraUniversalOmni( CameraUniversalOmni original ) {
-		set(original);
+		setTo(original);
 	}
 
 	public CameraUniversalOmni fsetMirror( double mirrorOffset ) {
@@ -92,12 +94,12 @@ public class CameraUniversalOmni extends CameraPinhole {
 		return this;
 	}
 
-	public CameraUniversalOmni fsetRadial(double ...radial ) {
+	public CameraUniversalOmni fsetRadial( double... radial ) {
 		this.radial = radial.clone();
 		return this;
 	}
 
-	public CameraUniversalOmni fsetTangental(double t1 , double t2) {
+	public CameraUniversalOmni fsetTangental( double t1, double t2 ) {
 		this.t1 = t1;
 		this.t2 = t2;
 		return this;
@@ -105,16 +107,17 @@ public class CameraUniversalOmni extends CameraPinhole {
 
 	/**
 	 * Assigns this model to be identical to the passed in model
+	 *
 	 * @param original Model which is to be copied
 	 */
-	public void set( CameraUniversalOmni original ) {
+	public void setTo( CameraUniversalOmni original ) {
 		super.setTo(original);
 
 		this.mirrorOffset = original.mirrorOffset;
 
-		if( radial.length != original.radial.length )
-			radial = new double[ original.radial.length ];
-		System.arraycopy(original.radial,0,radial,0,radial.length);
+		if (radial.length != original.radial.length)
+			radial = new double[original.radial.length];
+		System.arraycopy(original.radial, 0, radial, 0, radial.length);
 
 		this.t1 = original.t1;
 		this.t2 = original.t2;
@@ -129,7 +132,7 @@ public class CameraUniversalOmni extends CameraPinhole {
 		return radial;
 	}
 
-	public void setRadial(double[] radial) {
+	public void setRadial( double[] radial ) {
 		this.radial = radial;
 	}
 
@@ -137,7 +140,7 @@ public class CameraUniversalOmni extends CameraPinhole {
 		return t1;
 	}
 
-	public void setT1(double t1) {
+	public void setT1( double t1 ) {
 		this.t1 = t1;
 	}
 
@@ -145,7 +148,7 @@ public class CameraUniversalOmni extends CameraPinhole {
 		return t2;
 	}
 
-	public void setT2(double t2) {
+	public void setT2( double t2 ) {
 		this.t2 = t2;
 	}
 
@@ -153,25 +156,25 @@ public class CameraUniversalOmni extends CameraPinhole {
 		return mirrorOffset;
 	}
 
-	public void setMirrorOffset(double mirrorOffset) {
+	public void setMirrorOffset( double mirrorOffset ) {
 		this.mirrorOffset = mirrorOffset;
 	}
 
 	@Override
 	public void print() {
 		super.print();
-		if( radial != null ) {
-			for( int i = 0; i < radial.length; i++ ) {
-				System.out.printf("radial[%d] = %6.2e\n",i,radial[i]);
+		if (radial != null) {
+			for (int i = 0; i < radial.length; i++) {
+				System.out.printf("radial[%d] = %6.2e\n", i, radial[i]);
 			}
 		} else {
 			System.out.println("No radial");
 		}
-		if( t1 != 0 && t2 != 0)
+		if (t1 != 0 && t2 != 0)
 			System.out.printf("tangential = ( %6.2e , %6.2e)\n", t1, t2);
 		else {
 			System.out.println("No tangential");
 		}
-		System.out.printf("mirror offset = %7.3f",mirrorOffset);
+		System.out.printf("mirror offset = %7.3f", mirrorOffset);
 	}
 }

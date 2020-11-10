@@ -67,7 +67,7 @@ public class CreateCloudFromDisparityImages {
 	 */
 	public int addCloud( List<Point3D_F64> cloud ) {
 		views.add(this.cloud.size + cloud.size());
-		this.cloud.copyAll(cloud,(s,d)->d.set(s));
+		this.cloud.copyAll(cloud,(s,d)->d.setTo(s));
 		return this.views.size-1;
 	}
 

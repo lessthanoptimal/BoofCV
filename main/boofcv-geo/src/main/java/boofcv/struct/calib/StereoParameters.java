@@ -22,6 +22,10 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -38,6 +42,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
+@Data
 public class StereoParameters implements Serializable {
 
 	// serialization version
@@ -48,6 +53,8 @@ public class StereoParameters implements Serializable {
 	/** intrinsic camera parameters of right camera */
 	public CameraPinholeBrown right;
 	/** transform from left camera to right camera */
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	public Se3_F64 right_to_left;
 
 	public StereoParameters( StereoParameters param ) {
@@ -60,18 +67,10 @@ public class StereoParameters implements Serializable {
 		this.left = new CameraPinholeBrown(left);
 		this.right_to_left = right_to_left.copy();
 		this.right = new CameraPinholeBrown(right);
+
 	}
 
-	public StereoParameters() {
-	}
-
-	public CameraPinholeBrown getLeft() {
-		return left;
-	}
-
-	public void setLeft( CameraPinholeBrown left ) {
-		this.left = left;
-	}
+	public StereoParameters() {}
 
 	public Se3_F64 getRightToLeft() {
 		return right_to_left;
@@ -79,14 +78,6 @@ public class StereoParameters implements Serializable {
 
 	public void setRightToLeft( Se3_F64 right_to_left ) {
 		this.right_to_left = right_to_left;
-	}
-
-	public CameraPinholeBrown getRight() {
-		return right;
-	}
-
-	public void setRight( CameraPinholeBrown right ) {
-		this.right = right;
 	}
 
 	/**
@@ -117,7 +108,7 @@ public class StereoParameters implements Serializable {
 	 *
 	 * @param src The set of parameters that is to be copied.
 	 */
-	public void set( StereoParameters src ) {
+	public void setTo( StereoParameters src ) {
 		if (this.left == null)
 			this.left = new CameraPinholeBrown(src.left);
 		else

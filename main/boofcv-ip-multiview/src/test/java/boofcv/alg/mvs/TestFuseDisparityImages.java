@@ -45,7 +45,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 	@Test void simpleAll() {
 		var alg = new FuseDisparityImages();
 		var distort = new PixelTransformAffine_F64();
-		distort.getModel().set(2, 0, 0, 2, 0, 0);
+		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
 		intrinsic.width = 100;
 		intrinsic.height = 80;
 		alg.initialize(intrinsic, distort);
@@ -90,7 +90,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 	@Test void addToFusedImage() {
 		var alg = new FuseDisparityImages();
 		var distort = new PixelTransformAffine_F64();
-		distort.getModel().set(2, 0, 0, 2, 0, 0);
+		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
 		alg.initialize(intrinsic, distort);
 		alg.fusedBaseline = parameters.baseline;
 
