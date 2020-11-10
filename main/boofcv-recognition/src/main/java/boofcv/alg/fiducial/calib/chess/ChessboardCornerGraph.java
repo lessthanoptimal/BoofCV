@@ -30,7 +30,6 @@ import java.util.List;
  * represent the 4 cardinal directions. Edges are directed. orientation refers to the corner's orientation
  * which has a range of 180 degrees or -pi/2 to pi/2
  *
- *
  * @author Peter Abeles
  */
 public class ChessboardCornerGraph {
@@ -47,16 +46,16 @@ public class ChessboardCornerGraph {
 			Node c = corners.get(i);
 			FeatureGraph2D.Node n = graph.nodes.grow();
 			n.reset();
-			n.set(c.x,c.y);
+			n.setTo(c.x, c.y);
 			n.index = c.index;
 		}
 
 		for (int i = 0; i < corners.size; i++) {
 			Node c = corners.get(i);
 			for (int j = 0; j < 4; j++) {
-				if( c.edges[j] == null )
+				if (c.edges[j] == null)
 					continue;
-				graph.connect(c.index,c.edges[j].index);
+				graph.connect(c.index, c.edges[j].index);
 			}
 		}
 	}
@@ -64,17 +63,17 @@ public class ChessboardCornerGraph {
 	public Node growCorner() {
 		Node n = corners.grow();
 		n.reset();
-		n.index = corners.size-1;
+		n.index = corners.size - 1;
 		return n;
 	}
 
-	public Node findClosest( double x , double y ) {
+	public Node findClosest( double x, double y ) {
 		double distance = Double.MAX_VALUE;
 		Node closest = null;
 		for (int i = 0; i < corners.size; i++) {
 			Node n = corners.get(i);
-			double d = n.distance2(x,y);
-			if( d < distance ) {
+			double d = n.distance2(x, y);
+			if (d < distance) {
 				distance = d;
 				closest = n;
 			}
@@ -86,12 +85,12 @@ public class ChessboardCornerGraph {
 	public void print() {
 		for (int cornerIdx = 0; cornerIdx < corners.size; cornerIdx++) {
 			Node n = corners.get(cornerIdx);
-			System.out.printf("[%3d] {%3.0f, %3.0f} -> ",n.index,n.x,n.y);
+			System.out.printf("[%3d] {%3.0f, %3.0f} -> ", n.index, n.x, n.y);
 			for (int i = 0; i < 4; i++) {
-				if( n.edges[i] == null ) {
+				if (n.edges[i] == null) {
 					System.out.print("[    ] ");
 				} else {
-					System.out.printf("[ %2d ] ",n.edges[i].index);
+					System.out.printf("[ %2d ] ", n.edges[i].index);
 				}
 			}
 			System.out.println();
@@ -116,19 +115,19 @@ public class ChessboardCornerGraph {
 		 */
 		public final Node[] edges = new Node[4];
 
-		public void set(ChessboardCorner c) {
-			super.set(c);
+		public void set( ChessboardCorner c ) {
+			super.setTo(c);
 			this.orientation = c.orientation;
 		}
 
 		/**
 		 * Iterates through edges until it encounters edge 'count'
 		 */
-		public void putEdgesIntoList(List<Node> found) {
+		public void putEdgesIntoList( List<Node> found ) {
 			found.clear();
 			for (int i = 0; i < 4; i++) {
-				if( edges[i] != null ) {
-					found.add( edges[i] );
+				if (edges[i] != null) {
+					found.add(edges[i]);
 				}
 			}
 		}
@@ -139,7 +138,7 @@ public class ChessboardCornerGraph {
 		public void rotateEdgesDown() {
 			Node tmp = edges[0];
 			for (int i = 1; i < 4; i++) {
-				edges[i-1] = edges[i];
+				edges[i - 1] = edges[i];
 			}
 			edges[3] = tmp;
 		}
@@ -157,7 +156,7 @@ public class ChessboardCornerGraph {
 			int total = 0;
 
 			for (int i = 0; i < 4; i++) {
-				if( edges[i] != null )
+				if (edges[i] != null)
 					total++;
 			}
 

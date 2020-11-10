@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,31 +32,29 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
  */
 public class ImplGridRansacLineDetector_S16 extends GridRansacLineDetector<GrayS16> {
 
-	public ImplGridRansacLineDetector_S16(int regionSize, int maxDetectLines,
-										  ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher)
-	{
+	public ImplGridRansacLineDetector_S16( int regionSize, int maxDetectLines,
+										   ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher ) {
 		super(regionSize, maxDetectLines, robustMatcher);
 	}
 
 	@Override
-	protected void detectEdgels(int index0 , int x0 , int y0 ,
-								GrayS16 derivX , GrayS16 derivY ,
-								GrayU8 binaryEdges) {
-
+	protected void detectEdgels( int index0, int x0, int y0,
+								 GrayS16 derivX, GrayS16 derivY,
+								 GrayU8 binaryEdges ) {
 		edgels.reset();
-		for( int y = 0; y < regionSize; y++ ) {
+		for (int y = 0; y < regionSize; y++) {
 			int index = index0 + y*binaryEdges.stride;
 
-			for( int x = 0; x < regionSize; x++ ) {
-				if( binaryEdges.data[index++] != 0 ) {
+			for (int x = 0; x < regionSize; x++) {
+				if (binaryEdges.data[index++] != 0) {
 					Edgel e = edgels.grow();
-					int xx = x0+x;
-					int yy = y0+y;
+					int xx = x0 + x;
+					int yy = y0 + y;
 
-					e.set(xx,yy);
+					e.setTo(xx, yy);
 
-					int dx = derivX.unsafe_get(xx,yy);
-					int dy = derivY.unsafe_get(xx,yy);
+					int dx = derivX.unsafe_get(xx, yy);
+					int dy = derivY.unsafe_get(xx, yy);
 
 					e.theta = UtilAngle.atanSafe(dy, dx);
 				}

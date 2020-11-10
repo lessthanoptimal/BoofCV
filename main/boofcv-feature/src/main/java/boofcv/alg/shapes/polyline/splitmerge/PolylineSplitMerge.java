@@ -102,18 +102,18 @@ public class PolylineSplitMerge {
 	ConfigLength maxSideError = ConfigLength.relative(0.1,3);
 
 	// work space for side score calculation
-	private LineSegment2D_F64 line = new LineSegment2D_F64();
+	private final LineSegment2D_F64 line = new LineSegment2D_F64();
 
 	// the corner list that's being built
 	DogLinkedList<Corner> list = new DogLinkedList<>();
 	FastQueue<Corner> corners = new FastQueue<>(Corner::new);
 
 	private SplitSelector splitter = new MaximumLineDistance();
-	private SplitResults resultsA = new SplitResults();
-	private SplitResults resultsB = new SplitResults();
+	private final SplitResults resultsA = new SplitResults();
+	private final SplitResults resultsB = new SplitResults();
 
 	// List of all the found polylines and their score
-	private FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline::new);
+	private final FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline::new);
 	private CandidatePolyline bestPolyline;
 
 	// if true that means a fatal error and no polygon can be fit
@@ -819,8 +819,8 @@ public class PolylineSplitMerge {
 		Point2D_I32 endA = contour.get(indexA);
 		Point2D_I32 endB = contour.get(indexB);
 
-		line.a.set(endA.x,endA.y);
-		line.b.set(endB.x,endB.y);
+		line.a.setTo(endA.x,endA.y);
+		line.b.setTo(endB.x,endB.y);
 	}
 
 	public FastQueue<CandidatePolyline> getPolylines() {

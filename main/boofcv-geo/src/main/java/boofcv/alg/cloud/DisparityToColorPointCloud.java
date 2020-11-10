@@ -229,14 +229,14 @@ public class DisparityToColorPointCloud {
 	 * @param y1 upper extent, y-axis, exclusive
 	 */
 	public void setRegionOfInterest( int x0, int y0, int x1, int y1 ) {
-		roi.set(x0, y0, x1, y1);
+		roi.setTo(x0, y0, x1, y1);
 	}
 
 	/**
 	 * Removes the ROI
 	 */
 	public void clearRegionOfInterest() {
-		roi.set(-1, -1, Integer.MAX_VALUE, Integer.MAX_VALUE);
+		roi.setTo(-1, -1, Integer.MAX_VALUE, Integer.MAX_VALUE);
 	}
 
 	/**

@@ -398,9 +398,9 @@ public class QrCode implements Cloneable {
 	 */
 	public void reset() {
 		for (int i = 0; i < 4; i++) {
-			ppCorner.get(i).set(0, 0);
-			ppDown.get(i).set(0, 0);
-			ppRight.get(i).set(0, 0);
+			ppCorner.get(i).setTo(0, 0);
+			ppDown.get(i).setTo(0, 0);
+			ppRight.get(i).setTo(0, 0);
 		}
 		this.threshCorner = 0;
 		this.threshDown = 0;
@@ -439,11 +439,11 @@ public class QrCode implements Cloneable {
 		this.threshCorner = o.threshCorner;
 		this.threshDown = o.threshDown;
 		this.threshRight = o.threshRight;
-		this.ppCorner.set(o.ppCorner);
-		this.ppDown.set(o.ppDown);
-		this.ppRight.set(o.ppRight);
+		this.ppCorner.setTo(o.ppCorner);
+		this.ppDown.setTo(o.ppDown);
+		this.ppRight.setTo(o.ppRight);
 		this.failureCause = o.failureCause;
-		this.bounds.set(o.bounds);
+		this.bounds.setTo(o.bounds);
 		this.alignment.reset();
 		for (int i = 0; i < o.alignment.size; i++) {
 			this.alignment.grow().set(o.alignment.get(i));
@@ -536,10 +536,10 @@ public class QrCode implements Cloneable {
 		public double threshold;
 
 		public void set( Alignment o ) {
-			this.pixel.set(o.pixel);
+			this.pixel.setTo(o.pixel);
 			this.moduleX = o.moduleX;
 			this.moduleY = o.moduleY;
-			this.moduleFound.set(o.moduleFound);
+			this.moduleFound.setTo(o.moduleFound);
 		}
 	}
 

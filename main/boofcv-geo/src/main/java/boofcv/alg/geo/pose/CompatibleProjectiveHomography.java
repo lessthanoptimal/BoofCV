@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -421,7 +421,7 @@ public class CompatibleProjectiveHomography {
 		solver.solve(B,H);
 
 		// copy v into 'a'
-		a.set(H.data[0],H.data[1],H.data[2],H.data[3]);
+		a.setTo(H.data[0],H.data[1],H.data[2],H.data[3]);
 		// H = P+P' + h*v^T
 		H.reshape(4,4);
 		for (int i = 0; i < 4; i++) {

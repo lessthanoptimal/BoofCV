@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardSquarePoints<T extends ImageGray<T>>
-{
+public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 	// detector for squares
 	DetectPolygonBinaryGrayRefine<T> detectorSquare;
@@ -52,7 +51,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	SquareCrossClustersIntoGrids c2g;
 
 	// size of square grids
-	private int numRows,numCols;
+	private int numRows, numCols;
 
 	// bounding quadrilateral
 	private Polygon2D_I32 boundPolygon = new Polygon2D_I32();
@@ -76,26 +75,25 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * @param numCols Number of columns in square grid
 	 * @param maxCornerDistance Maximum distance in pixels that two "overlapping" corners can be from each other.
 	 */
-	public DetectChessboardSquarePoints(int numRows, int numCols, ConfigLength maxCornerDistance,
-										DetectPolygonBinaryGrayRefine<T> detectorSquare)
-	{
+	public DetectChessboardSquarePoints( int numRows, int numCols, ConfigLength maxCornerDistance,
+										 DetectPolygonBinaryGrayRefine<T> detectorSquare ) {
 		this.maxCornerDistance = maxCornerDistance;
 
 		this.numRows = numRows;
 		this.numCols = numCols;
 
 		this.detectorSquare = detectorSquare;
-		if( detectorSquare != null ) { // null in some unit tests for simplicity
+		if (detectorSquare != null) { // null in some unit tests for simplicity
 			// configure the detector
 			detectorSquare.setHelper(new ChessboardPolygonHelper<>());
 			detectorSquare.getDetector().setOutputClockwise(true);
 			detectorSquare.getDetector().setConvex(true);
 //			detectorSquare.getDetector().setNumberOfSides(3,8);  <--- this is handled by the helper
-			this.detectorSquare.setFunctionAdjust((info, clockwise) ->
-					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners,clockwise));
+			this.detectorSquare.setFunctionAdjust(( info, clockwise ) ->
+					DetectChessboardSquarePoints.this.adjustBeforeOptimize(info.polygon, info.borderCorners, clockwise));
 		}
 
-		s2c = new SquaresIntoCrossClusters(-1,-1);
+		s2c = new SquaresIntoCrossClusters(-1, -1);
 		c2g = new SquareCrossClustersIntoGrids();
 	}
 
@@ -107,9 +105,9 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * @param binary Binary image of chessboard
 	 * @return True if successful.
 	 */
-	public boolean process( T input , GrayU8 binary ) {
+	public boolean process( T input, GrayU8 binary ) {
 
-		double maxCornerDistancePixels = maxCornerDistance.computeI(Math.min(input.width,input.height));
+		double maxCornerDistancePixels = maxCornerDistance.computeI(Math.min(input.width, input.height));
 		s2c.setMaxCornerDistance(maxCornerDistancePixels);
 
 		configureContourDetector(input);
@@ -126,15 +124,15 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 
 		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid grid = grids.get(i);
-			if( grid.rows == numCols && grid.columns == numRows ) {
+			if (grid.rows == numCols && grid.columns == numRows) {
 				tools.transpose(grid);
 			}
-			if( grid.rows == numRows && grid.columns == numCols ) {
+			if (grid.rows == numRows && grid.columns == numCols) {
 				// this detector requires that the (0,0) grid cell has a square inside of it
-				if( grid.get(0,0) == null ){
-					if( grid.get(0,-1) != null ) {
+				if (grid.get(0, 0) == null) {
+					if (grid.get(0, -1) != null) {
 						tools.flipColumns(grid);
-					} else if( grid.get(-1,0) != null ) {
+					} else if (grid.get(-1, 0) != null) {
 						tools.flipRows(grid);
 					} else {
 						continue;
@@ -142,7 +140,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 				}
 
 				// make sure its in the expected orientation
-				if( !ensureCCW(grid) )
+				if (!ensureCCW(grid))
 					continue;
 
 				// If symmetric, ensure that the (0,0) is closest to top-left image corner
@@ -160,10 +158,10 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
 	 * of inner contours and improve speed and reduce the memory foot print significantly.
 	 */
-	private void configureContourDetector(T gray) {
+	private void configureContourDetector( T gray ) {
 		// determine the maximum possible size of a square when viewed head on
 		// also take in account shapes touching the edge will be concave
-		int maxContourSize = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
+		int maxContourSize = Math.max(gray.width, gray.height)/Math.max(numCols, numRows);
 		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize*4*2); // fisheye distortion can let one square go larger
 		contourFinder.setSaveInnerContour(false);
@@ -173,23 +171,25 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * The polygon detected from the contour is too small because the binary image was eroded. This expand the size
 	 * of the polygon so that it fits the image edge better
 	 */
-	public void adjustBeforeOptimize(Polygon2D_F64 polygon, GrowQueue_B touchesBorder, boolean clockwise) {
+	public void adjustBeforeOptimize( Polygon2D_F64 polygon, GrowQueue_B touchesBorder, boolean clockwise ) {
 		int N = polygon.size();
 		work.vertexes.resize(N);
 		for (int i = 0; i < N; i++) {
-			work.get(i).set(0, 0);
+			work.get(i).setTo(0, 0);
 		}
 
 		for (int i = N - 1, j = 0; j < N; i = j, j++) {
-			int ii,jj,kk,mm;
-			if( clockwise ) {
-				mm = CircularIndex.addOffset(-1,i,N);
-				ii=i;jj=j;
-				kk = CircularIndex.addOffset(1,j,N);
+			int ii, jj, kk, mm;
+			if (clockwise) {
+				mm = CircularIndex.addOffset(-1, i, N);
+				ii = i;
+				jj = j;
+				kk = CircularIndex.addOffset(1, j, N);
 			} else {
-				mm = CircularIndex.addOffset(1,j,N);
-				ii=j;jj=i;
-				kk = CircularIndex.addOffset(-1,i,N);
+				mm = CircularIndex.addOffset(1, j, N);
+				ii = j;
+				jj = i;
+				kk = CircularIndex.addOffset(-1, i, N);
 			}
 
 			Point2D_F64 a = polygon.get(ii), b = polygon.get(jj);
@@ -197,22 +197,22 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 			double dx = b.x - a.x;
 			double dy = b.y - a.y;
 
-			double l = Math.sqrt(dx * dx + dy * dy);
+			double l = Math.sqrt(dx*dx + dy*dy);
 
 			// The input polygon has two identical corners. This is bad. We will just skip over the first corner
-			if( l == 0 ) {
+			if (l == 0) {
 				throw new RuntimeException("Input polygon has two identical corners. You need to fix that.");
 			}
 
-			dx *= 1.5 / l;
-			dy *= 1.5 / l;
+			dx *= 1.5/l;
+			dy *= 1.5/l;
 
 			Point2D_F64 _a = work.get(ii);
 			Point2D_F64 _b = work.get(jj);
 
 			// move the point away from the line
-			if( touchesBorder.size>0 && touchesBorder.get(ii) ) {
-				if(!touchesBorder.get(mm)) {
+			if (touchesBorder.size > 0 && touchesBorder.get(ii)) {
+				if (!touchesBorder.get(mm)) {
 					_a.x -= dx;
 					_a.y -= dy;
 				}
@@ -220,8 +220,8 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 				_a.x += -dy;
 				_a.y += dx;
 			}
-			if( touchesBorder.size>0 && touchesBorder.get(jj) ) {
-				if( !touchesBorder.get(kk) ) {
+			if (touchesBorder.size > 0 && touchesBorder.get(jj)) {
+				if (!touchesBorder.get(kk)) {
 					_b.x += dx;
 					_b.y += dy;
 				}
@@ -245,34 +245,34 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * @return true if it was able to make it CCW or false if it failed to
 	 */
 	boolean ensureCCW( SquareGrid grid ) {
-		if( grid.columns <= 2 && grid.rows <= 2 )
+		if (grid.columns <= 2 && grid.rows <= 2)
 			return true;
 
-		Point2D_F64 a,b,c;
+		Point2D_F64 a, b, c;
 
-		a = grid.get(0,0).center;
-		if( grid.columns > 2)
-			b = grid.get(0,2).center;
+		a = grid.get(0, 0).center;
+		if (grid.columns > 2)
+			b = grid.get(0, 2).center;
 		else
-			b = grid.get(1,1).center;
+			b = grid.get(1, 1).center;
 
-		if( grid.rows > 2)
-			c = grid.get(2,0).center;
+		if (grid.rows > 2)
+			c = grid.get(2, 0).center;
 		else
-			c = grid.get(1,1).center;
+			c = grid.get(1, 1).center;
 
-		double x0 = b.x-a.x;
-		double y0 = b.y-a.y;
+		double x0 = b.x - a.x;
+		double y0 = b.y - a.y;
 
-		double x1 = c.x-a.x;
-		double y1 = c.y-a.y;
+		double x1 = c.x - a.x;
+		double y1 = c.y - a.y;
 
-		double z = x0 * y1 - y0 * x1;
-		if( z < 0 ) {
+		double z = x0*y1 - y0*x1;
+		if (z < 0) {
 			// flip it along an axis which is symmetric
-			if( grid.columns%2 == 1 )
+			if (grid.columns%2 == 1)
 				tools.flipColumns(grid);
-			else if( grid.rows%2 == 1 )
+			else if (grid.rows%2 == 1)
 				tools.flipRows(grid);
 			else
 				return false;
@@ -289,16 +289,16 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		boolean rowOdd = grid.rows%2 == 1;
 		boolean colOdd = grid.columns%2 == 1;
 
-		if( colOdd == rowOdd ) {
+		if (colOdd == rowOdd) {
 			// if odd and square then 4 solutions.  Otherwise just two solution that are on
 			// opposite sides on the grid
-			if( rowOdd && grid.rows == grid.columns ) {
+			if (rowOdd && grid.rows == grid.columns) {
 				int best = -1;
 				double bestDistance = Double.MAX_VALUE;
 				for (int i = 0; i < 4; i++) {
 					SquareNode n = grid.getCornerByIndex(i);
 					double d = n.center.normSq();
-					if( d < bestDistance ) {
+					if (d < bestDistance) {
 						best = i;
 						bestDistance = d;
 					}
@@ -308,10 +308,10 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 					tools.rotateCCW(grid);
 				}
 			} else {
-				double first = grid.get(0,0).center.normSq();
+				double first = grid.get(0, 0).center.normSq();
 				double last = grid.getCornerByIndex(2).center.normSq();
 
-				if( last < first ) {
+				if (last < first) {
 					tools.reverse(grid);
 				}
 			}
@@ -324,23 +324,23 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 	 * Find inner corner points across the grid.  Start from the "top" row and work its way down.  Corners
 	 * are found by finding the average point between two adjacent corners on adjacent squares.
 	 */
-	boolean computeCalibrationPoints(SquareGrid grid) {
+	boolean computeCalibrationPoints( SquareGrid grid ) {
 		calibrationPoints.reset();
 
-		for (int row = 0; row < grid.rows-1; row++) {
+		for (int row = 0; row < grid.rows - 1; row++) {
 			int offset = row%2;
 			for (int col = offset; col < grid.columns; col += 2) {
-				SquareNode a = grid.get(row,col);
+				SquareNode a = grid.get(row, col);
 
-				if( col > 0 ) {
-					SquareNode b = grid.get(row+1,col-1);
-					if( !setIntersection(a,b,calibrationPoints.grow()))
+				if (col > 0) {
+					SquareNode b = grid.get(row + 1, col - 1);
+					if (!setIntersection(a, b, calibrationPoints.grow()))
 						return false;
 				}
 
-				if( col < grid.columns-1) {
-					SquareNode b = grid.get(row+1,col+1);
-					if( !setIntersection(a,b,calibrationPoints.grow()))
+				if (col < grid.columns - 1) {
+					SquareNode b = grid.get(row + 1, col + 1);
+					if (!setIntersection(a, b, calibrationPoints.grow()))
 						return false;
 				}
 			}
@@ -349,15 +349,15 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 		return true;
 	}
 
-	private boolean setIntersection( SquareNode a , SquareNode n , Point2D_F64 point ) {
+	private boolean setIntersection( SquareNode a, SquareNode n, Point2D_F64 point ) {
 		for (int i = 0; i < a.edges.length; i++) {
 			SquareEdge edge = a.edges[i];
-			if( edge != null && edge.destination(a) == n ) {
+			if (edge != null && edge.destination(a) == n) {
 				Point2D_F64 p0 = edge.a.square.get(edge.sideA);
 				Point2D_F64 p1 = edge.b.square.get(edge.sideB);
 
-				point.x = (p0.x+p1.x)/2.0;
-				point.y = (p0.y+p1.y)/2.0;
+				point.x = (p0.x + p1.x)/2.0;
+				point.y = (p0.y + p1.y)/2.0;
 				return true;
 			}
 		}

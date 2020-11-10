@@ -47,6 +47,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class CommonFitPolygonChecks extends BoofStandardJUnit {
 
 	boolean showRendered = false;
@@ -231,10 +232,10 @@ public class CommonFitPolygonChecks extends BoofStandardJUnit {
 			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y1), input.get(2));
 			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y0), input.get(3));
 		} else {
-			input.get(0).set(new Point2D_F64(x0, y0));
-			input.get(1).set(new Point2D_F64(x0, y1));
-			input.get(2).set(new Point2D_F64(x1, y1));
-			input.get(3).set(new Point2D_F64(x1, y0));
+			input.get(0).setTo(new Point2D_F64(x0, y0));
+			input.get(1).setTo(new Point2D_F64(x0, y1));
+			input.get(2).setTo(new Point2D_F64(x1, y1));
+			input.get(3).setTo(new Point2D_F64(x1, y0));
 		}
 		return input;
 	}

@@ -263,19 +263,19 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 				double found = p.get(0).normSq();
 				if( found < best ) {
 					best = found;
-					interpolationHack.set(p);
+					interpolationHack.setTo(p);
 				}
 				UtilPolygons2D_F64.shiftDown(p);
 			}
 
-			p.set(interpolationHack);
+			p.setTo(interpolationHack);
 
 			// remember, visual clockwise isn't the same as math clockwise, hence
 			// counter clockwise visual to the clockwise quad
-			pairsRemovePerspective.get(0).set(0, 0, p.get(0).x, p.get(0).y);
-			pairsRemovePerspective.get(1).set( square.width ,      0        , p.get(1).x , p.get(1).y );
-			pairsRemovePerspective.get(2).set( square.width , square.height , p.get(2).x , p.get(2).y );
-			pairsRemovePerspective.get(3).set( 0            , square.height , p.get(3).x , p.get(3).y );
+			pairsRemovePerspective.get(0).setTo(0, 0, p.get(0).x, p.get(0).y);
+			pairsRemovePerspective.get(1).setTo( square.width ,      0        , p.get(1).x , p.get(1).y );
+			pairsRemovePerspective.get(2).setTo( square.width , square.height , p.get(2).x , p.get(2).y );
+			pairsRemovePerspective.get(3).setTo( 0            , square.height , p.get(3).x , p.get(3).y );
 
 			if( !computeHomography.process(pairsRemovePerspective,H) ) {
 				if( verbose ) System.out.println("  rejected initial homography");

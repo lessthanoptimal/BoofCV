@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,53 +56,53 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 	QrPose3DUtils poseUtils = new QrPose3DUtils();
 	double sideWidth = 1.0;
 
-	public QrCodeDetectorPnP(QrCodeDetector<T> detector) {
+	public QrCodeDetectorPnP( QrCodeDetector<T> detector ) {
 		this.detector = detector;
 		imageType = ImageType.single(detector.getImageType());
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
+	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
 		super.setLensDistortion(distortion, width, height);
-		if( distortion == null ) {
+		if (distortion == null) {
 			poseUtils.setLensDistortion(null, null);
 
 			// Yes this shouldn't be hard coded to that type. It feels dirty adding lens distortion to the
 			// generic QR Code detector... deal with this later if there is more than one detector
 
-			((QrCodePreciseDetector)detector).setLensDistortion(width,height,null);
+			((QrCodePreciseDetector)detector).setLensDistortion(width, height, null);
 		} else {
 			Point2D_F64 test = new Point2D_F64();
-			Point2Transform2_F64 undistToDist = distortion.distort_F64(true,true);
-			undistToDist.compute(0,0,test);
+			Point2Transform2_F64 undistToDist = distortion.distort_F64(true, true);
+			undistToDist.compute(0, 0, test);
 			poseUtils.setLensDistortion(
 					distortion.undistort_F64(true, false),
 					undistToDist);
 
 			// If there's no actual distortion don't undistort the image while processing. Faster this way
-			if( test.norm() <= UtilEjml.TEST_F32) {
-				((QrCodePreciseDetector) detector).setLensDistortion(width,height,null);
+			if (test.norm() <= UtilEjml.TEST_F32) {
+				((QrCodePreciseDetector)detector).setLensDistortion(width, height, null);
 			} else {
-				((QrCodePreciseDetector) detector).setLensDistortion(width, height, distortion);
+				((QrCodePreciseDetector)detector).setLensDistortion(width, height, distortion);
 			}
 		}
 	}
 
 	@Override
-	public double getSideWidth(int which) {
+	public double getSideWidth( int which ) {
 		return sideWidth;
 	}
 
 	@Override
-	public double getSideHeight(int which) {
+	public double getSideHeight( int which ) {
 		return sideWidth;
 	}
 
 	@Override
-	public boolean getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
+	public boolean getFiducialToCamera( int which, Se3_F64 fiducialToCamera ) {
 		// need to scale solution since marker coordinates are scaled to
 		// gave values from -1 to 1, which is a width of 2.0
-		if( super.getFiducialToCamera(which,fiducialToCamera)) {
+		if (super.getFiducialToCamera(which, fiducialToCamera)) {
 			fiducialToCamera.T.scale(sideWidth/2.0);
 			return true;
 		} else {
@@ -111,19 +111,19 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 	}
 
 	@Override
-	public List<PointIndex2D_F64> getDetectedControl(int which) {
+	public List<PointIndex2D_F64> getDetectedControl( int which ) {
 		QrCode qr = detector.getDetections().get(which);
 		return poseUtils.getLandmarkByIndex(qr);
 	}
 
 	@Override
-	protected List<Point2D3D> getControl3D(int which) {
+	protected List<Point2D3D> getControl3D( int which ) {
 		QrCode qr = detector.getDetections().get(which);
 		return poseUtils.getLandmark2D3D(qr);
 	}
 
 	@Override
-	public void detect(T input) {
+	public void detect( T input ) {
 		detector.process(input);
 	}
 
@@ -133,43 +133,43 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 	}
 
 	@Override
-	public void getCenter(int which, Point2D_F64 location) {
+	public void getCenter( int which, Point2D_F64 location ) {
 		// use intersections being invariant under perspective distoriton
 		QrCode qr = detector.getDetections().get(which);
 
 		// find the intersection of two lines which are closer to the origin to reduce error
 		Intersection2D_F64.intersection(
-				qr.ppDown.get(0),qr.ppDown.get(1),
-				qr.ppRight.get(0),qr.ppRight.get(3),location);
+				qr.ppDown.get(0), qr.ppDown.get(1),
+				qr.ppRight.get(0), qr.ppRight.get(3), location);
 
 		// need one more intersection. again pick corners close to center
-		Intersection2D_F64.intersection(qr.ppCorner.get(2),location,qr.ppDown.get(1),qr.ppRight.get(3),location);
+		Intersection2D_F64.intersection(qr.ppCorner.get(2), location, qr.ppDown.get(1), qr.ppRight.get(3), location);
 	}
 
 	@Override
-	public Polygon2D_F64 getBounds(int which, @Nullable Polygon2D_F64 storage) {
-		if( storage == null )
+	public Polygon2D_F64 getBounds( int which, @Nullable Polygon2D_F64 storage ) {
+		if (storage == null)
 			storage = new Polygon2D_F64();
-		storage.set(detector.getDetections().get(which).bounds);
+		storage.setTo(detector.getDetections().get(which).bounds);
 		return storage;
 	}
 
 	@Override
-	public long getId(int which) {
+	public long getId( int which ) {
 		return detector.getDetections().get(which).message.hashCode();
 	}
 
 	@Override
-	public String getMessage(int which) {
+	public String getMessage( int which ) {
 		return detector.getDetections().get(which).message;
 	}
 
 	@Override
-	public double getWidth(int which) {
+	public double getWidth( int which ) {
 		return sideWidth;
 	}
 
-	public void setMarkerWidth(double markerWidth) {
+	public void setMarkerWidth( double markerWidth ) {
 		this.sideWidth = markerWidth;
 	}
 

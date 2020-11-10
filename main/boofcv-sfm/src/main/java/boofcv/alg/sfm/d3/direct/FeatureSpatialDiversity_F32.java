@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class FeatureSpatialDiversity_F32 {
 	 * Adds the estimated 3D location of a feature.
 	 */
 	public void addPoint( float x, float y, float z ) {
-		norm.grow().set(x/z, y/z);
+		norm.grow().setTo(x/z, y/z);
 	}
 
 	/**

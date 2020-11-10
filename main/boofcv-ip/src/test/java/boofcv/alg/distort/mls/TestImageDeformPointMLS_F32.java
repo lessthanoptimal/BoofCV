@@ -42,19 +42,19 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	 */
 	@Test
 	void test_shape_independent() {
-		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+		for (TypeDeformMLS type : TypeDeformMLS.values()) {
 			var alg = new ImageDeformPointMLS_F32(type);
 
 			// try different shapes of image and grid and see if anything breaks
-			check_shape_independent(60, 60, 30, 30, alg );
-			check_shape_independent(60, 80, 30, 30, alg );
-			check_shape_independent(80, 60, 30, 30, alg );
-			check_shape_independent(60, 60, 30, 35, alg );
-			check_shape_independent(60, 60, 35, 30, alg );
+			check_shape_independent(60, 60, 30, 30, alg);
+			check_shape_independent(60, 80, 30, 30, alg);
+			check_shape_independent(80, 60, 30, 30, alg);
+			check_shape_independent(60, 60, 30, 35, alg);
+			check_shape_independent(60, 60, 35, 30, alg);
 		}
 	}
 
-	private void check_shape_independent( int width , int height , int rows , int cols , ImageDeformPointMLS_F32 alg ) {
+	private void check_shape_independent( int width, int height, int rows, int cols, ImageDeformPointMLS_F32 alg ) {
 		alg.configure(width, height, rows, cols);
 		alg.addControl(5, 5);
 		alg.addControl(10, 20);
@@ -63,14 +63,14 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 		checkNoTransform(alg);
 	}
 
-	private void checkNoTransform(ImageDeformPointMLS_F32 alg) {
+	private void checkNoTransform( ImageDeformPointMLS_F32 alg ) {
 		alg.fixate();
 
 		// should be no change now
 		Point2D_F32 found = new Point2D_F32();
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				alg.compute(j,i, found);
+				alg.compute(j, i, found);
 				assertEquals(j, found.x, GrlConstants.TEST_F32);
 				assertEquals(i, found.y, GrlConstants.TEST_F32);
 			}
@@ -82,7 +82,7 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	 */
 	@Test
 	void testAllAtOnce_OnControlPoints() {
-		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+		for (TypeDeformMLS type : TypeDeformMLS.values()) {
 //			System.out.println("type "+type);
 			var alg = new ImageDeformPointMLS_F32(type);
 			alg.configure(100, 100, 11, 11);
@@ -107,9 +107,9 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 		}
 	}
 
-	private void checkCompute( float x , float y , float expectedX , float expectedY , ImageDeformPointMLS_F32 alg ) {
+	private void checkCompute( float x, float y, float expectedX, float expectedY, ImageDeformPointMLS_F32 alg ) {
 		Point2D_F32 found = new Point2D_F32();
-		alg.compute(x,y, found);
+		alg.compute(x, y, found);
 
 		assertEquals(expectedX, found.x, GrlConstants.TEST_F32);
 		assertEquals(expectedY, found.y, GrlConstants.TEST_F32);
@@ -120,7 +120,7 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	 */
 	@Test
 	void testAllAtOnce_CloserToCloser() {
-		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+		for (TypeDeformMLS type : TypeDeformMLS.values()) {
 			var alg = new ImageDeformPointMLS_F32(type);
 			alg.configure(width, height, rows, cols);
 
@@ -154,7 +154,7 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	 */
 	@Test
 	void multipleCallsToFixate() {
-		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+		for (TypeDeformMLS type : TypeDeformMLS.values()) {
 			var alg = new ImageDeformPointMLS_F32(type);
 			alg.configure(width, height, rows, cols);
 
@@ -187,21 +187,21 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	@Test
 	void computeAverageP() {
 		var alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
+		alg.configure(width, height, rows, cols);
 
-		alg.addControl(10,15);
-		alg.addControl(5,4);
-		alg.addControl(20,24);
+		alg.addControl(10, 15);
+		alg.addControl(5, 4);
+		alg.addControl(20, 24);
 
 		// set p locations
-		alg.controls.get(0).p.set(12,17);
-		alg.controls.get(1).p.set(2,7);
-		alg.controls.get(2).p.set(18,30);
+		alg.controls.get(0).p.setTo(12, 17);
+		alg.controls.get(1).p.setTo(2, 7);
+		alg.controls.get(2).p.setTo(18, 30);
 
 
-		var weights = new float[]{0.1f,0.6f,0.3f};
+		var weights = new float[]{0.1f, 0.6f, 0.3f};
 		alg.totalWeight = 1;
-		alg.aveP.set(1,2);
+		alg.aveP.setTo(1, 2);
 
 		alg.computeAverageP(weights);
 
@@ -215,15 +215,15 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	@Test
 	void computeAverageQ() {
 		var alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
+		alg.configure(width, height, rows, cols);
 
-		alg.addControl(10,15);
-		alg.addControl(5,4);
-		alg.addControl(20,24);
+		alg.addControl(10, 15);
+		alg.addControl(5, 4);
+		alg.addControl(20, 24);
 
-		var weights = new float[]{0.1f,0.6f,0.3f};
+		var weights = new float[]{0.1f, 0.6f, 0.3f};
 		alg.totalWeight = 1;
-		alg.aveQ.set(1,2);
+		alg.aveQ.setTo(1, 2);
 
 		alg.computeAverageQ(weights);
 
@@ -237,42 +237,41 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	@Test
 	void computeWeights() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
+		alg.configure(width, height, rows, cols);
 
-		alg.addControl(10,15);
-		alg.addControl(5,4);
-		alg.addControl(20,24);
+		alg.addControl(10, 15);
+		alg.addControl(5, 4);
+		alg.addControl(20, 24);
 
 		alg.weights.resize(alg.controls.size);
 
 		// test an edge case
 		alg.computeWeights(5/alg.scaleX, 4/alg.scaleY, alg.weights.data);
-		checkWeights(alg,0,1,0);
+		checkWeights(alg, 0, 1, 0);
 		alg.computeWeights(20/alg.scaleX, 24/alg.scaleY, alg.weights.data);
-		checkWeights(alg,0,0,1);
+		checkWeights(alg, 0, 0, 1);
 
 		// this should be a bit fuzzier
 		alg.computeWeights(14/alg.scaleX, 17/alg.scaleY, alg.weights.data);
-		assertTrue( alg.weights.data[0] > alg.weights.data[1]);
-		assertTrue( alg.weights.data[0] > alg.weights.data[2]);
-		assertTrue( alg.weights.data[2] > alg.weights.data[1]);
+		assertTrue(alg.weights.data[0] > alg.weights.data[1]);
+		assertTrue(alg.weights.data[0] > alg.weights.data[2]);
+		assertTrue(alg.weights.data[2] > alg.weights.data[1]);
 
 		// do a manual computation of the weight
 		float alpha = 2.1f;
 		double x2 = alg.scaleX*alg.scaleX;
 		double y2 = alg.scaleY*alg.scaleY;
 
-		double expected0 = Math.pow(2*2/x2 + 1/y2,-alpha);
+		double expected0 = Math.pow(2*2/x2 + 1/y2, -alpha);
 
 		alg.setAlpha(alpha);
-		alg.computeWeights(12/alg.scaleX,16/alg.scaleY, alg.weights.data);
+		alg.computeWeights(12/alg.scaleX, 16/alg.scaleY, alg.weights.data);
 		assertEquals(expected0, alg.weights.data[0], GrlConstants.TEST_F32);
-
 	}
 
-	private void checkWeights(ImageDeformPointMLS_F32 alg, float... expected) {
+	private void checkWeights( ImageDeformPointMLS_F32 alg, float... expected ) {
 		for (int i = 0; i < alg.weights.size(); i++) {
-			float expectedW = expected[i] * alg.totalWeight;
+			float expectedW = expected[i]*alg.totalWeight;
 			assertEquals(alg.weights.data[i], expectedW, GrlConstants.TEST_F32);
 		}
 	}
@@ -280,34 +279,33 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 	@Test
 	void interpolateDeformedPoint() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-		alg.configure(width,height, rows, cols);
+		alg.configure(width, height, rows, cols);
 
 		float x0 = 4, x1 = 6;
 		float y0 = 5, y1 = 10;
 
-		alg.getGrid(2,3).set(x0,y0);
-		alg.getGrid(3,3).set(x0,y1);
-		alg.getGrid(3,4).set(x1,y1);
-		alg.getGrid(2,4).set(x1,y0);
+		alg.getGrid(2, 3).setTo(x0, y0);
+		alg.getGrid(3, 3).setTo(x0, y1);
+		alg.getGrid(3, 4).setTo(x1, y1);
+		alg.getGrid(2, 4).setTo(x1, y0);
 
 		// when sampled exactly on the coordinate it should be the distored value at that coordinate
-		CheckInterpolated( 3,2,x0,y0, alg );
-		CheckInterpolated( 3,3,x0,y1, alg );
-		CheckInterpolated( 4,3,x1,y1, alg );
-		CheckInterpolated( 4,2,x1,y0, alg );
+		CheckInterpolated(3, 2, x0, y0, alg);
+		CheckInterpolated(3, 3, x0, y1, alg);
+		CheckInterpolated(4, 3, x1, y1, alg);
+		CheckInterpolated(4, 2, x1, y0, alg);
 
 		// try values exactly between
-		CheckInterpolated( 3.5f,2,0.5f*x0+0.5f*x1,y0, alg );
-		CheckInterpolated( 3.7f,2,0.3f*x0+0.7f*x1,y0, alg );
-		CheckInterpolated( 3f,2.5f,x0,0.5f*y0+0.5f*y1, alg );
-		CheckInterpolated( 3f,2.7f,x0,0.3f*y0+0.7f*y1, alg );
-
+		CheckInterpolated(3.5f, 2, 0.5f*x0 + 0.5f*x1, y0, alg);
+		CheckInterpolated(3.7f, 2, 0.3f*x0 + 0.7f*x1, y0, alg);
+		CheckInterpolated(3f, 2.5f, x0, 0.5f*y0 + 0.5f*y1, alg);
+		CheckInterpolated(3f, 2.7f, x0, 0.3f*y0 + 0.7f*y1, alg);
 	}
 
-	private void CheckInterpolated(float x , float y , float expectedX , float expectedY , ImageDeformPointMLS_F32 alg ) {
+	private void CheckInterpolated( float x, float y, float expectedX, float expectedY, ImageDeformPointMLS_F32 alg ) {
 
 		Point2D_F32 p = new Point2D_F32();
-		alg.interpolateDeformedPoint(x,y, p);
+		alg.interpolateDeformedPoint(x, y, p);
 
 		assertEquals(expectedX, p.x, GrlConstants.TEST_F32);
 		assertEquals(expectedY, p.y, GrlConstants.TEST_F32);
@@ -315,7 +313,7 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 
 	@Test
 	void copyConcurrent() {
-		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+		for (TypeDeformMLS type : TypeDeformMLS.values()) {
 //			System.out.println("type "+type);
 			ImageDeformPointMLS_F32 orig = new ImageDeformPointMLS_F32(type);
 			orig.configure(100, 100, 11, 11);
@@ -335,19 +333,19 @@ class TestImageDeformPointMLS_F32 extends BoofStandardJUnit {
 
 			ImageDeformPointMLS_F32 copy = orig.copyConcurrent();
 
-			checkCompute(10, 0 , orig, copy);
+			checkCompute(10, 0, orig, copy);
 			checkCompute(10, 20, orig, copy);
 			checkCompute(30, 40, orig, copy);
 			checkCompute(80, 30, orig, copy);
 		}
 	}
 
-	private void checkCompute( float x , float y ,
-							   ImageDeformPointMLS_F32 orig, ImageDeformPointMLS_F32 copy) {
+	private void checkCompute( float x, float y,
+							   ImageDeformPointMLS_F32 orig, ImageDeformPointMLS_F32 copy ) {
 		Point2D_F32 expected = new Point2D_F32();
 		Point2D_F32 found = new Point2D_F32();
-		orig.compute(x,y, expected);
-		copy.compute(x,y, found);
+		orig.compute(x, y, expected);
+		copy.compute(x, y, found);
 
 		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
 		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);

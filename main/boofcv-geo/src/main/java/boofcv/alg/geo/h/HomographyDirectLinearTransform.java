@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -213,8 +213,8 @@ public class HomographyDirectLinearTransform {
 			N1.apply(pair.p1, a1);
 			N2.apply(pair.p2, a2);
 		} else {
-			a1.set(pair.p1);
-			a2.set(pair.p2);
+			a1.setTo(pair.p1);
+			a2.setTo(pair.p2);
 		}
 	}
 
@@ -227,8 +227,8 @@ public class HomographyDirectLinearTransform {
 			N1.apply(pair.p1, a1);
 			N2.apply(pair.p2, a2);
 		} else {
-			a1.set(pair.p1);
-			a2.set(pair.p2);
+			a1.setTo(pair.p1);
+			a2.setTo(pair.p2);
 		}
 	}
 

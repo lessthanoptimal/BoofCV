@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -452,7 +452,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			if (transform != null) {
 				transform.compute((float)p.x, (float)p.y, adj);
 			} else {
-				adj.set((float)p.x, (float)p.y);
+				adj.setTo((float)p.x, (float)p.y);
 			}
 
 			String text = String.format("%2d", i);

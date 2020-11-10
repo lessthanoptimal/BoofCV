@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -158,7 +158,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 		reacquiring = false;
 
-		targetRegion.set(x0, y0, x1, y1);
+		targetRegion.setTo(x0, y0, x1, y1);
 		createCascadeRegion(image.width,image.height);
 
 		template.reset();
@@ -276,7 +276,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 				valid = false;
 				// set it to the detected region
 				ImageRectangle r = region.rect;
-				targetRegion.set(r.x0, r.y0, r.x1, r.y1);
+				targetRegion.setTo(r.x0, r.y0, r.x1, r.y1);
 				// get tracking running again
 				tracking.initialize(imagePyramid);
 
@@ -289,7 +289,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 			detection.detectionCascade(cascadeRegions);
 
 			// update the previous track region using the tracker
-			trackerRegion.set(targetRegion);
+			trackerRegion.setTo(targetRegion);
 			boolean trackingWorked = tracking.process(imagePyramid, trackerRegion);
 			trackingWorked &= adjustRegion.process(tracking.getPairs(), trackerRegion);
 			TldHelperFunctions.convertRegion(trackerRegion, trackerRegion_I32);
@@ -362,7 +362,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 			} else {
 				// Otherwise use the tracker region
-				targetRegion.set(trackerRegion);
+				targetRegion.setTo(trackerRegion);
 				confidenceTarget = scoreTrack;
 
 				strongMatch |= confidenceTarget > config.confidenceThresholdStrong;
@@ -400,7 +400,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 			scale *= 2;
 		}
 
-		int ret[] = new int[n];
+		int[] ret = new int[n];
 		scale = 1;
 		for( int i = 0; i < n; i++ ) {
 			ret[i] = scale;

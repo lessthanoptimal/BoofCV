@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class ResolveSignAmbiguityPositiveDepth {
 			normalizers.get(viewIdx).set(views.intrinsics.get(viewIdx));
 		}
 		for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
-			worldToViews.get(viewIdx).set(views.motion_1_to_k.get(viewIdx-1));
+			worldToViews.get(viewIdx).setTo(views.motion_1_to_k.get(viewIdx-1));
 		}
 
 		signChanged = false;
@@ -153,8 +153,8 @@ public class ResolveSignAmbiguityPositiveDepth {
 		Point2D_F64 n2 = pixelNorms.get(1);
 		Point2D_F64 n3 = pixelNorms.get(2);
 
-		worldToViews.get(1).set(result.view_1_to_2);
-		worldToViews.get(2).set(result.view_1_to_3);
+		worldToViews.get(1).setTo(result.view_1_to_2);
+		worldToViews.get(2).setTo(result.view_1_to_3);
 
 		normalize1.set(result.view1);
 		normalize2.set(result.view2);

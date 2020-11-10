@@ -85,7 +85,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 
 		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -r, pathLength + r, -r, r, -r, r, numFeatures, rand)) {
 			Feature f = new Feature();
-			f.world.set(X);
+			f.world.setTo(X);
 			points.add(f);
 		}
 
@@ -117,7 +117,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 
 		for (Point3D_F64 X : UtilPoint3D_F64.random(new Point3D_F64(0, 0, 0), -0.5, 0.5, numFeatures, rand)) {
 			Feature f = new Feature();
-			f.world.set(X);
+			f.world.setTo(X);
 			points.add(f);
 		}
 
@@ -174,7 +174,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 					continue;
 				Observation o = new Observation();
 				o.feature = f;
-				o.pixel.set(pixel);
+				o.pixel.setTo(pixel);
 				v.observations.add(o);
 			}
 			assertBoof(v.observations.size() > 0);
@@ -267,7 +267,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 
 		working.viewList.forEach(v -> v.intrinsic.set(intrinsic));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.projective.set(views.get(i).camera));
-		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.world_to_view.set(views.get(i).world_to_view));
+		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.world_to_view.setTo(views.get(i).world_to_view));
 		BoofMiscOps.forIdx(working.viewList, ( i, v ) -> v.index = i);
 
 		return working;
@@ -356,7 +356,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 			if (!matched) {
 				continue;
 			}
-			triples.grow().set(a);
+			triples.grow().setTo(a);
 			featureIdx.add(points.indexOf(o.feature));
 		}
 	}

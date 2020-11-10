@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,8 @@ public class BenchmarkStabilityFundamental {
 	List<AssociatedPair> observations;
 
 	// create a reasonable calibration matrix
-	DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
-	DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+	DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 60, 0.01, -200, 0, 80, -150, 0, 0, 1);
+	DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 	// relationship between both camera
 	protected Se3_F64 motion;
 
@@ -75,12 +75,12 @@ public class BenchmarkStabilityFundamental {
 	public void createSceneCube() {
 		scene = new ArrayList<>();
 
-		for( int i = 0; i < totalPoints; i++ ) {
+		for (int i = 0; i < totalPoints; i++) {
 			Point3D_F64 p = new Point3D_F64();
 
-			p.x = (rand.nextDouble()-0.5)*2*sceneRadius;
-			p.y = (rand.nextDouble()-0.5)*2*sceneRadius;
-			p.z = (rand.nextDouble()-0.5)*2*sceneRadius+sceneCenterZ;
+			p.x = (rand.nextDouble() - 0.5)*2*sceneRadius;
+			p.y = (rand.nextDouble() - 0.5)*2*sceneRadius;
+			p.z = (rand.nextDouble() - 0.5)*2*sceneRadius + sceneCenterZ;
 
 			scene.add(p);
 		}
@@ -89,11 +89,11 @@ public class BenchmarkStabilityFundamental {
 	public void createScenePlane() {
 		scene = new ArrayList<>();
 
-		for( int i = 0; i < totalPoints; i++ ) {
+		for (int i = 0; i < totalPoints; i++) {
 			Point3D_F64 p = new Point3D_F64();
 
-			p.x = (rand.nextDouble()-0.5)*2*sceneRadius;
-			p.y = (rand.nextDouble()-0.5)*2*sceneRadius;
+			p.x = (rand.nextDouble() - 0.5)*2*sceneRadius;
+			p.y = (rand.nextDouble() - 0.5)*2*sceneRadius;
 			p.z = sceneCenterZ;
 
 			scene.add(p);
@@ -102,32 +102,32 @@ public class BenchmarkStabilityFundamental {
 
 	public void motionTranslate() {
 		motion = new Se3_F64();
-		motion.getT().set(0.2,0,0);
+		motion.getT().set(0.2, 0, 0);
 	}
 
 	public void motionTransRot() {
 		motion = new Se3_F64();
-		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01,-0.02,0.05,null));
-		motion.getT().set(0.2,0,0);
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, -0.02, 0.05, null));
+		motion.getT().set(0.2, 0, 0);
 	}
 
 	public void createObservations() {
 		observations = new ArrayList<>();
 
-		for( Point3D_F64 p1 : scene ) {
+		for (Point3D_F64 p1 : scene) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
-			if( p1.z < 0 || p2.z < 0 )
+			if (p1.z < 0 || p2.z < 0)
 				continue;
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
-			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
+			pair.p1.setTo(p1.x/p1.z, p1.y/p1.z);
+			pair.p2.setTo(p2.x/p2.z, p2.y/p2.z);
 			observations.add(pair);
 
 			// convert to pixels
 			GeometryMath_F64.mult(K, pair.p1, pair.p1);
-			GeometryMath_F64.mult(K, pair.p2,pair.p2);
+			GeometryMath_F64.mult(K, pair.p2, pair.p2);
 
 			// add noise
 			pair.p1.x += rand.nextGaussian()*sigmaPixels;
@@ -136,19 +136,19 @@ public class BenchmarkStabilityFundamental {
 			pair.p2.y += rand.nextGaussian()*sigmaPixels;
 
 			// if needed, convert back into normalized image coordinates
-			if( !isPixels ) {
+			if (!isPixels) {
 				GeometryMath_F64.mult(K_inv, pair.p1, pair.p1);
-				GeometryMath_F64.mult(K_inv, pair.p2,pair.p2);
+				GeometryMath_F64.mult(K_inv, pair.p2, pair.p2);
 			}
 		}
 	}
 
-	public void evaluateMinimal( GeoModelEstimatorN<DMatrixRMaj,AssociatedPair> estimatorN ) {
+	public void evaluateMinimal( GeoModelEstimatorN<DMatrixRMaj, AssociatedPair> estimatorN ) {
 
 		DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 
 		Estimate1ofEpipolar estimator =
-				new EstimateNto1ofEpipolar(estimatorN,distance,1);
+				new EstimateNto1ofEpipolar(estimatorN, distance, 1);
 
 		scores = new ArrayList<>();
 		int failed = 0;
@@ -157,33 +157,33 @@ public class BenchmarkStabilityFundamental {
 
 		Random rand = new Random(234);
 
-		DMatrixRMaj F = new DMatrixRMaj(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3, 3);
 
-		for( int i = 0; i < 50; i++ ) {
+		for (int i = 0; i < 50; i++) {
 			List<AssociatedPair> pairs = new ArrayList<>();
 
 			// create a unique set of pairs
-			while( pairs.size() < numSamples) {
-				AssociatedPair p = observations.get( rand.nextInt(observations.size()) );
+			while (pairs.size() < numSamples) {
+				AssociatedPair p = observations.get(rand.nextInt(observations.size()));
 
-				if( !pairs.contains(p) ) {
+				if (!pairs.contains(p)) {
 					pairs.add(p);
 				}
 			}
 
-			if( !estimator.process(pairs,F) ) {
+			if (!estimator.process(pairs, F)) {
 				failed++;
 				continue;
 			}
 
 			// normalize the scale of F
-			CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F),F);
+			CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F), F);
 
 //			double totalScore = 0;
 			// score against all observations
-			for( AssociatedPair p : observations ) {
+			for (AssociatedPair p : observations) {
 				double score = Math.abs(GeometryMath_F64.innerProd(p.p2, F, p.p1));
-				if( Double.isNaN(score))
+				if (Double.isNaN(score))
 					System.out.println("Score is NaN");
 				scores.add(score);
 //				totalScore += score;
@@ -193,29 +193,29 @@ public class BenchmarkStabilityFundamental {
 
 		Collections.sort(scores);
 
-		System.out.printf(" Failures %3d  Score:  50%% = %6.3e  95%% = %6.3e\n", failed, scores.get(scores.size() / 2), scores.get((int) (scores.size() * 0.95)));
+		System.out.printf(" Failures %3d  Score:  50%% = %6.3e  95%% = %6.3e\n", failed, scores.get(scores.size()/2), scores.get((int)(scores.size()*0.95)));
 	}
 
-	public void evaluateAll( GeoModelEstimator1<DMatrixRMaj,AssociatedPair> estimator ) {
+	public void evaluateAll( GeoModelEstimator1<DMatrixRMaj, AssociatedPair> estimator ) {
 		scores = new ArrayList<>();
 		int failed = 0;
 
-		DMatrixRMaj F = new DMatrixRMaj(3,3);
+		DMatrixRMaj F = new DMatrixRMaj(3, 3);
 
-		for( int i = 0; i < 50; i++ ) {
+		for (int i = 0; i < 50; i++) {
 
-			if( !estimator.process(observations,F) ) {
+			if (!estimator.process(observations, F)) {
 				failed++;
 				continue;
 			}
 
 			// normalize the scale of F
-			CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F),F);
+			CommonOps_DDRM.scale(1.0/CommonOps_DDRM.elementMaxAbs(F), F);
 
 			// score against all observations
-			for( AssociatedPair p : observations ) {
+			for (AssociatedPair p : observations) {
 				double score = Math.abs(GeometryMath_F64.innerProd(p.p2, F, p.p1));
-				if( Double.isNaN(score))
+				if (Double.isNaN(score))
 					System.out.println("Score is NaN");
 				scores.add(score);
 			}
@@ -223,7 +223,7 @@ public class BenchmarkStabilityFundamental {
 
 		Collections.sort(scores);
 
-		System.out.printf(" Failures %3d  Score:  50%% = %6.3e  95%% = %6.3e\n", failed, scores.get(scores.size() / 2), scores.get((int) (scores.size() * 0.95)));
+		System.out.printf(" Failures %3d  Score:  50%% = %6.3e  95%% = %6.3e\n", failed, scores.get(scores.size()/2), scores.get((int)(scores.size()*0.95)));
 	}
 
 	public static void main( String[] args ) {
@@ -233,7 +233,7 @@ public class BenchmarkStabilityFundamental {
 //		app.createScenePlane();
 		app.motionTranslate();
 		app.createObservations();
-		if( isPixels ){
+		if (isPixels) {
 			app.evaluateMinimal(FactoryMultiView.fundamental_N(EnumFundamental.LINEAR_8));
 			app.evaluateMinimal(FactoryMultiView.fundamental_N(EnumFundamental.LINEAR_7));
 		} else {

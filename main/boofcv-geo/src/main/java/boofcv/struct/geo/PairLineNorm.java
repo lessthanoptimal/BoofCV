@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,9 +84,9 @@ public class PairLineNorm {
 	/**
 	 * Sets the value of p1 and p2 to be equal to the values of the passed in objects
 	 */
-	public void set( Vector3D_F64 l1 , Vector3D_F64 l2 ) {
-		this.l1.set(l1);
-		this.l2.set(l2);
+	public void setTo( Vector3D_F64 l1 , Vector3D_F64 l2 ) {
+		this.l1.setTo(l1);
+		this.l2.setTo(l2);
 	}
 
 	/**

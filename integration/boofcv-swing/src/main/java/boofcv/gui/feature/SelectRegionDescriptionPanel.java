@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -190,14 +190,14 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 					dragMode = true;
 					current.x += x-target.x;
 					current.y += y-target.y;
-					target.set(x,y);
+					target.setTo(x,y);
 					adjusted = true;
 				} else {
 					// see if the user clicked on the circle, if so go into adjustment mode
 					double radiusCircle = imageScale*UtilPoint2D_I32.distance(target,current);
 					distance = Math.abs( distance - radiusCircle);
 					if( distance < clickTolerance ) {
-						current.set(x,y);
+						current.setTo(x,y);
 						adjusted = true;
 					}
 				}
@@ -237,9 +237,9 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 		if( dragMode ) {
 			current.x += x-target.x;
 			current.y += y-target.y;
-			target.set(x,y);
+			target.setTo(x,y);
 		} else {
-			current.set(x,y);
+			current.setTo(x,y);
 		}
 		repaint();
 
@@ -251,8 +251,8 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 	@Override
 	public void mouseMoved(MouseEvent e) {}
 
-	public static interface Listener
+	public interface Listener
 	{
-		public void descriptionChanged( Point2D_I32 pt , double radius , double orientation );
+		void descriptionChanged( Point2D_I32 pt , double radius , double orientation );
 	}
 }

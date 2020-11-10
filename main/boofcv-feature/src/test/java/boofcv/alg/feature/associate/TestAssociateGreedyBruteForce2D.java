@@ -77,7 +77,7 @@ class TestAssociateGreedyBruteForce2D extends GenericAssociateGreedyChecks {
 
 		double d = 10.0;
 		for (int i = 0; i < 4; i++) {
-			locDst.get(i).set(d,0);
+			locDst.get(i).setTo(d,0);
 		}
 
 		var alg = new AssociateGreedyBruteForce2D<>(score, new AssociateImageDistanceEuclideanSq());

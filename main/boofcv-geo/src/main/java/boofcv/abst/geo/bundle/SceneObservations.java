@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -152,7 +152,7 @@ public class SceneObservations {
 				throw new IndexOutOfBoundsException(index + " >= " + point.size);
 			observation.index = point.data[index];
 			index *= 2;
-			observation.set(observations.data[index], observations.data[index + 1]);
+			observation.setTo(observations.data[index], observations.data[index + 1]);
 		}
 
 		/**

@@ -129,10 +129,10 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> extends BoofStandard
 				continue;
 
 			Polygon2D_I32 p = new Polygon2D_I32(4);
-			p.vertexes.data[0].set((int)p1.x, (int)p1.y);
-			p.vertexes.data[1].set((int)p2.x, (int)p2.y);
-			p.vertexes.data[2].set((int)p3.x, (int)p3.y);
-			p.vertexes.data[3].set((int)p4.x, (int)p4.y);
+			p.vertexes.data[0].setTo((int)p1.x, (int)p1.y);
+			p.vertexes.data[1].setTo((int)p2.x, (int)p2.y);
+			p.vertexes.data[2].setTo((int)p3.x, (int)p3.y);
+			p.vertexes.data[3].setTo((int)p4.x, (int)p4.y);
 
 			convexFill(p, outputImage, s.gray);
 		}
@@ -154,10 +154,10 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> extends BoofStandard
 				continue;
 
 			Polygon2D_I32 p = new Polygon2D_I32(4);
-			p.vertexes.data[0].set((int)p1.x, (int)p1.y);
-			p.vertexes.data[1].set((int)p2.x, (int)p2.y);
-			p.vertexes.data[2].set((int)p3.x, (int)p3.y);
-			p.vertexes.data[3].set((int)p4.x, (int)p4.y);
+			p.vertexes.data[0].setTo((int)p1.x, (int)p1.y);
+			p.vertexes.data[1].setTo((int)p2.x, (int)p2.y);
+			p.vertexes.data[2].setTo((int)p3.x, (int)p3.y);
+			p.vertexes.data[3].setTo((int)p4.x, (int)p4.y);
 
 			int depth = (int)(s.a.z/units);
 
@@ -191,7 +191,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> extends BoofStandard
 		Point2D_F64 p = new Point2D_F64();
 		Polygon2D_F64 poly64 = new Polygon2D_F64(4);
 		for (int i = 0; i < 4; i++)
-			poly64.vertexes.data[i].set(poly.vertexes.data[i].x, poly.vertexes.data[i].y);
+			poly64.vertexes.data[i].setTo(poly.vertexes.data[i].x, poly.vertexes.data[i].y);
 
 		for (int y = bounds.y0; y < bounds.y1; y++) {
 			p.y = y;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,7 +116,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 				// If the mode is new add it to the list
 				if( modeIndex < 0 ) {
 					modeIndex = this.modeLocation.size();
-					this.modeLocation.grow().set(modeX, modeY);
+					this.modeLocation.grow().setTo(modeX, modeY);
 					// Save the peak's color
 					savePeakColor(meanColor);
 					// Mark the mode in the segment image
@@ -157,7 +157,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 	protected void findPeak( float cx , float cy , float[] meanColor ) {
 
 		history.reset();
-		history.grow().set(cx,cy);
+		history.grow().setTo(cx,cy);
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			float total = 0;
@@ -223,7 +223,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 			float peakY = sumY/total;
 
 			if( fast ) {
-				history.grow().set(peakX,peakY);
+				history.grow().setTo(peakX,peakY);
 
 				// see if it has already been here before
 				int px = (int)(peakX+0.5f);

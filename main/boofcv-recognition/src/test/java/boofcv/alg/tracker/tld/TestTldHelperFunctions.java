@@ -35,7 +35,7 @@ public class TestTldHelperFunctions extends BoofStandardJUnit {
 		Rectangle2D_F64 a = new Rectangle2D_F64();
 		Rectangle2D_I32 b = new Rectangle2D_I32();
 
-		a.set(10,12,10.8,60.9);
+		a.setTo(10,12,10.8,60.9);
 
 		TldHelperFunctions.convertRegion(a,b);
 
@@ -50,7 +50,7 @@ public class TestTldHelperFunctions extends BoofStandardJUnit {
 		Rectangle2D_F64 a = new Rectangle2D_F64();
 		Rectangle2D_I32 b = new Rectangle2D_I32();
 
-		b.set(10,12,11,61);
+		b.setTo(10,12,11,61);
 
 		TldHelperFunctions.convertRegion(b,a);
 

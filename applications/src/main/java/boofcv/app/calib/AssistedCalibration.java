@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -478,7 +478,7 @@ public class AssistedCalibration {
 		Polygon2D_F64 p = regions.grow();
 		p.vertexes.resize(sidesCollision.size());
 		for (int i = 0; i < sidesCollision.size(); i++) {
-			p.get(i).set( sidesCollision.get(i) );
+			p.get(i).setTo( sidesCollision.get(i) );
 		}
 		quality.addObservations(detector.getDetectedPoints());
 		gui.getInfoPanel().updateGeometry(quality.getScore());
@@ -561,7 +561,7 @@ public class AssistedCalibration {
 
 			if( d < bestDistanceSq ) {
 				bestDistanceSq = d;
-				result.set(center);
+				result.setTo(center);
 			}
 		}
 
@@ -578,7 +578,7 @@ public class AssistedCalibration {
 
 			if( d < bestDistanceSq ) {
 				bestDistanceSq = d;
-				result.set(sidesCollision.get(i));
+				result.setTo(sidesCollision.get(i));
 			}
 		}
 
@@ -596,7 +596,7 @@ public class AssistedCalibration {
 		boolean close = false;
 
 		public Magnet( double x , double y , boolean corner ) {
-			location.set(x,y);
+			location.setTo(x,y);
 			this.corner = corner;
 		}
 

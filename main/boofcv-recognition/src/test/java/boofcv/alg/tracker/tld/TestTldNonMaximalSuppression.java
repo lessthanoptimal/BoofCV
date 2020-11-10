@@ -37,10 +37,10 @@ public class TestTldNonMaximalSuppression extends BoofStandardJUnit {
 		TldNonMaximalSuppression alg = new TldNonMaximalSuppression(0.5);
 
 		FastQueue<TldRegion> regions = new FastQueue<>(TldRegion::new);
-		regions.grow().rect.set(0,100,10,120);
-		regions.grow().rect.set(2,3,8,33);
-		regions.grow().rect.set(0,100,9,119);
-		regions.grow().rect.set(0,100,2,102);
+		regions.grow().rect.setTo(0,100,10,120);
+		regions.grow().rect.setTo(2,3,8,33);
+		regions.grow().rect.setTo(0,100,9,119);
+		regions.grow().rect.setTo(0,100,2,102);
 		regions.get(0).confidence = 100;
 		regions.get(1).confidence = 200;
 		regions.get(2).confidence = 300;

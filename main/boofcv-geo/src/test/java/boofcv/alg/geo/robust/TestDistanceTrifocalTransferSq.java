@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class TestDistanceTrifocalTransferSq extends CommonTrifocalChecks {
 		double error = 0.5;
 		AssociatedTriple tmp = new AssociatedTriple();
 		for (AssociatedTriple a : observationsPixels) {
-			tmp.set(a);
+			tmp.setTo(a);
 			tmp.p3.x += error;
 
 			// the error will be larger than this value but not too much larger

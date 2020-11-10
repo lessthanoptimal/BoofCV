@@ -277,9 +277,9 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			int view3_idx = db.featToView.get(3)[i];
 
 			AssociatedTriple t = new AssociatedTriple();
-			t.p1.set(db.viewObs.get(0).get(view1_idx));
-			t.p2.set(db.viewObs.get(1).get(view2_idx));
-			t.p3.set(db.viewObs.get(3).get(view3_idx));
+			t.p1.setTo(db.viewObs.get(0).get(view1_idx));
+			t.p2.setTo(db.viewObs.get(1).get(view2_idx));
+			t.p3.setTo(db.viewObs.get(3).get(view3_idx));
 
 			alg.inliersThreeView.add(t);
 		}

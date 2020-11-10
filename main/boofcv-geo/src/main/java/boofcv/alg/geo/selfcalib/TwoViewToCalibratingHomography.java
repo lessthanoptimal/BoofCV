@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -245,7 +245,7 @@ public class TwoViewToCalibratingHomography {
 		hypothesesH.reset();
 
 		for( int motionIdx = 0; motionIdx < list_view_1_to_2.size(); motionIdx++ ) {
-			view_1_to_2.set(list_view_1_to_2.get(motionIdx));
+			view_1_to_2.setTo(list_view_1_to_2.get(motionIdx));
 
 			// K2*[R,T] = [K2*R, K2*T] = P2*H
 			// KR = K2*R
@@ -346,7 +346,7 @@ public class TwoViewToCalibratingHomography {
 		if( view_1_to_2e.T.distance(view_1_to_2.T) > 1.0 ) {
 			scale *= -1;
 		}
-		view_1_to_2.set(view_1_to_2e);
+		view_1_to_2.setTo(view_1_to_2e);
 
 		// Besides fixing the sign, also scale it so that the resulting translation vector has norm(1) for view-2
 		H.set(3,3,1.0/scale);

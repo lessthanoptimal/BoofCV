@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class GenerateSe2_PlanePtPixel implements
 		if (!estimator.process(from, to.toList()))
 			return false;
 
-		keyToCurr.set(estimator.getTransformSrcToDst());
+		keyToCurr.setTo(estimator.getTransformSrcToDst());
 		return true;
 	}
 

@@ -81,7 +81,7 @@ public class TestGenerateSe2_PlanePtPixel extends BoofStandardJUnit {
 			SePointOps_F64.transform(motion2D, planePtA, planePtB);
 			planeProjection.planeToNormalized(planePtB.x, planePtB.y, s.normalizedCurr);
 
-			s.planeKey.set(planePtA);
+			s.planeKey.setTo(planePtA);
 			observations.add(s);
 		}
 

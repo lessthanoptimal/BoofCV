@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,12 +52,12 @@ public class HysteresisEdgeTracePoints {
 	private GrayS8 direction; // 4-direction
 
 	// List of found contours in the image
-	private List<EdgeContour> contours = new ArrayList<>();
+	private final List<EdgeContour> contours = new ArrayList<>();
 
 	// list of segments which have yet to be explored
-	private List<EdgeSegment> open = new ArrayList<>();
+	private final List<EdgeSegment> open = new ArrayList<>();
 
-	private FastQueue<Point2D_I32> queuePoints = new FastQueue<>(Point2D_I32::new);
+	private final FastQueue<Point2D_I32> queuePoints = new FastQueue<>(Point2D_I32::new);
 
 	// the active contour which is being traced
 	private EdgeContour e;
@@ -73,8 +73,8 @@ public class HysteresisEdgeTracePoints {
 	 * @param lower Lower threshold.
 	 * @param upper Upper threshold.
 	 */
-	public void process(GrayF32 intensity , GrayS8 direction , float lower , float upper ) {
-		if( lower < 0 )
+	public void process( GrayF32 intensity, GrayS8 direction, float lower, float upper ) {
+		if (lower < 0)
 			throw new IllegalArgumentException("Lower must be >= 0!");
 		InputSanityCheck.checkSameShape(intensity, direction);
 
@@ -86,13 +86,13 @@ public class HysteresisEdgeTracePoints {
 		contours.clear();
 
 		// step through each pixel in the image
-		for( int y = 0; y < intensity.height; y++ ) {
+		for (int y = 0; y < intensity.height; y++) {
 			int indexInten = intensity.startIndex + y*intensity.stride;
 
-			for( int x = 0; x < intensity.width; x++ , indexInten++ ) {
+			for (int x = 0; x < intensity.width; x++, indexInten++) {
 				// start a search if a pixel is found that's above the threshold
-				if( intensity.data[indexInten] >= upper ) {
-					trace( x,y,indexInten);
+				if (intensity.data[indexInten] >= upper) {
+					trace(x, y, indexInten);
 				}
 			}
 		}
@@ -106,32 +106,32 @@ public class HysteresisEdgeTracePoints {
 	 * @param y y-coordinate of seed pixel above threshold
 	 * @param indexInten Pixel index in the image array of coordinate (x,y)
 	 */
-	protected void trace( int x , int y , int indexInten ) {
+	protected void trace( int x, int y, int indexInten ) {
 
 		e = new EdgeContour();
 		contours.add(e);
 
-		int dx,dy;
+		int dx, dy;
 
 		addFirstSegment(x, y);
-		intensity.data[ indexInten ] = MARK_TRAVERSED;
+		intensity.data[indexInten] = MARK_TRAVERSED;
 
-		while( open.size() > 0 ) {
-			EdgeSegment s = open.remove( open.size()-1 );
+		while (open.size() > 0) {
+			EdgeSegment s = open.remove(open.size() - 1);
 			Point2D_I32 p = s.points.get(0);
-			indexInten = intensity.getIndex(p.x,p.y);
-			int indexDir = direction.getIndex(p.x,p.y);
+			indexInten = intensity.getIndex(p.x, p.y);
+			int indexDir = direction.getIndex(p.x, p.y);
 
 			boolean first = true;
 
-			while( true ) {
+			while (true) {
 				//----- First check along the direction of the edge.  Only need to check 2 points this way
-				switch( direction.data[ indexDir ] ) {
-					case  0: dx =  0;dy=  1; break;
-					case  1: dx =  1;dy= -1; break;
-					case  2: dx =  1;dy=  0; break;
-					case -1: dx =  1;dy=  1; break;
-					default: throw new RuntimeException("Unknown direction: "+direction.data[ indexDir ]);
+				switch (direction.data[indexDir]) {
+					case 0 -> { dx = 0; dy = 1; }
+					case 1 -> { dx = 1; dy = -1; }
+					case 2 -> { dx = 1; dy = 0; }
+					case -1 -> { dx = 1; dy = 1; }
+					default -> throw new RuntimeException("Unknown direction: " + direction.data[indexDir]);
 				}
 
 				int indexForward = indexInten + dy*intensity.stride + dx;
@@ -143,54 +143,54 @@ public class HysteresisEdgeTracePoints {
 
 				// pixel coordinate of forward and backward point
 				x = p.x; y = p.y;
-				int fx = p.x+dx, fy = p.y+dy;
-				int bx = p.x-dx, by = p.y-dy;
+				int fx = p.x + dx, fy = p.y + dy;
+				int bx = p.x - dx, by = p.y - dy;
 
 				// See if the forward point is in bounds and above the lower threshold
-				if( intensity.isInBounds(fx,fy) && intensity.data[ indexForward ] >= lower ) {
-					intensity.data[ indexForward ] = MARK_TRAVERSED;
+				if (intensity.isInBounds(fx, fy) && intensity.data[indexForward] >= lower) {
+					intensity.data[indexForward] = MARK_TRAVERSED;
 					p = queuePoints.grow();
-					p.set(fx,fy);
+					p.setTo(fx, fy);
 					s.points.add(p);
 					match = true; // note that a match has already been found
 					indexInten = indexForward;
-					indexDir = prevIndexDir  + dy*intensity.stride + dx;
+					indexDir = prevIndexDir + dy*intensity.stride + dx;
 				}
 				// See if the backwards point is in bounds and above the lower threshold
-				if( intensity.isInBounds(bx,by) && intensity.data[ indexBackward ] >= lower ) {
-					intensity.data[ indexBackward ] = MARK_TRAVERSED;
-					if( match ) {
+				if (intensity.isInBounds(bx, by) && intensity.data[indexBackward] >= lower) {
+					intensity.data[indexBackward] = MARK_TRAVERSED;
+					if (match) {
 						// a match was found in the forwards direction, so start a new segment here
-						startNewSegment(bx, by,s);
+						startNewSegment(bx, by, s);
 					} else {
 						p = queuePoints.grow();
-						p.set(bx,by);
+						p.setTo(bx, by);
 						s.points.add(p);
 						match = true;
 						indexInten = indexBackward;
-						indexDir = prevIndexDir  - dy*intensity.stride - dx;
+						indexDir = prevIndexDir - dy*intensity.stride - dx;
 					}
 				}
 
 				// if it failed to find a match in the forwards/backwards direction or its the first pixel
 				// search the whole 8-neighborhood.
-				if( first || !match ) {
+				if (first || !match) {
 					boolean priorMatch = match;
 					// Check local neighbors if its one of the end points, which would be the first point or
 					// any point for which no matches were found
-					match = checkAllNeighbors(x,y,s,match);
+					match = checkAllNeighbors(x, y, s, match);
 
-					if( !match )
+					if (!match)
 						break;
 					else {
 						// if it was the first it's no longer the first
 						first = false;
 
 						// the point at the end was just added and is to be searched in the next iteration
-						if( !priorMatch ) {
-							p = s.points.get( s.points.size()-1 );
+						if (!priorMatch) {
+							p = s.points.get(s.points.size() - 1);
 							indexInten = intensity.getIndex(p.x, p.y);
-							indexDir = direction.getIndex(p.x,p.y);
+							indexDir = direction.getIndex(p.x, p.y);
 						}
 					}
 				}
@@ -198,16 +198,16 @@ public class HysteresisEdgeTracePoints {
 		}
 	}
 
-	private boolean checkAllNeighbors( int x , int y ,EdgeSegment parent , boolean match ) {
-		match |= check(x+1,y,parent,match);
-		match |= check(x,y+1,parent,match);
-		match |= check(x-1,y,parent,match);
-		match |= check(x,y-1,parent,match);
+	private boolean checkAllNeighbors( int x, int y, EdgeSegment parent, boolean match ) {
+		match |= check(x + 1, y, parent, match);
+		match |= check(x, y + 1, parent, match);
+		match |= check(x - 1, y, parent, match);
+		match |= check(x, y - 1, parent, match);
 
-		match |= check(x+1,y+1,parent,match);
-		match |= check(x+1,y-1,parent,match);
-		match |= check(x-1,y+1,parent,match);
-		match |= check(x-1,y-1,parent,match);
+		match |= check(x + 1, y + 1, parent, match);
+		match |= check(x + 1, y - 1, parent, match);
+		match |= check(x - 1, y + 1, parent, match);
+		match |= check(x - 1, y - 1, parent, match);
 
 		return match;
 	}
@@ -220,20 +220,20 @@ public class HysteresisEdgeTracePoints {
 	 * @param match Has a match to the current segment already been found?
 	 * @return true if a match was found at this point
 	 */
-	private boolean check( int x , int y , EdgeSegment parent , boolean match ) {
+	private boolean check( int x, int y, EdgeSegment parent, boolean match ) {
 
-		if( intensity.isInBounds(x,y)  ) {
-			int index = intensity.getIndex(x,y);
-			if( intensity.data[index] >= lower ) {
+		if (intensity.isInBounds(x, y)) {
+			int index = intensity.getIndex(x, y);
+			if (intensity.data[index] >= lower) {
 				intensity.data[index] = MARK_TRAVERSED;
 
-				if( !match ) {
+				if (!match) {
 					Point2D_I32 p = queuePoints.grow();
-					p.set(x,y);
+					p.setTo(x, y);
 					parent.points.add(p);
 				} else {
 					// a match was found so it can't just be added to the current edge
-					startNewSegment(x,y,parent);
+					startNewSegment(x, y, parent);
 				}
 				return true;
 			}
@@ -244,9 +244,9 @@ public class HysteresisEdgeTracePoints {
 	/**
 	 * Starts a new segment at the first point in the contour
 	 */
-	private void addFirstSegment(int x, int y) {
+	private void addFirstSegment( int x, int y ) {
 		Point2D_I32 p = queuePoints.grow();
-		p.set(x,y);
+		p.setTo(x, y);
 		EdgeSegment s = new EdgeSegment();
 		s.points.add(p);
 		s.index = 0;
@@ -258,14 +258,14 @@ public class HysteresisEdgeTracePoints {
 	/**
 	 * Starts a new segment in the contour at the specified coordinate.
 	 */
-	private void startNewSegment( int x , int y , EdgeSegment parent ) {
+	private void startNewSegment( int x, int y, EdgeSegment parent ) {
 		// create the point which is the first
 		Point2D_I32 p = queuePoints.grow();
-		p.set(x,y);
+		p.setTo(x, y);
 		EdgeSegment s = new EdgeSegment();
 		s.parent = parent.index;
 		// if a new segment is created that means an extra point has been added to the end already, hence -2 and not -1
-		s.parentPixel = parent.points.size()-2;
+		s.parentPixel = parent.points.size() - 2;
 		s.index = e.segments.size();
 		s.points.add(p);
 		e.segments.add(s);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,14 +48,13 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO is there some way to change accessors to go use the image standard col,row instead of matrix row,col?
-	// do this without breaking code silently? deprecate?
+// do this without breaking code silently? deprecate?
 public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends BaseDenseHog<Input> {
 
-
 	// storage for histograms in each cell
-	Cell cells[] = new Cell[0];
+	Cell[] cells = new Cell[0];
 	// number of cell rows and columns in the image
-	int cellRows,cellCols;
+	int cellRows, cellCols;
 
 	/**
 	 * Configures HOG descriptor computation
@@ -66,10 +65,9 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 	 * @param cellsPerBlockY Number of cells's wide a block is. 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
 	 */
-	public DescribeDenseHogFastAlg(int orientationBins , int pixelsPerCell , int cellsPerBlockX , int cellsPerBlockY,
-								   int stepBlock ,
-								   ImageType<Input> imageType )
-	{
+	public DescribeDenseHogFastAlg( int orientationBins, int pixelsPerCell, int cellsPerBlockX, int cellsPerBlockY,
+									int stepBlock,
+									ImageType<Input> imageType ) {
 		super(orientationBins, pixelsPerCell, cellsPerBlockX, cellsPerBlockY, stepBlock, imageType);
 	}
 
@@ -86,32 +84,31 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 
 		computeCellHistograms();
 
-		int cellRowMax = (cellRows - (cellsPerBlockY -1));
-		int cellColMax = (cellCols - (cellsPerBlockX -1));
+		int cellRowMax = (cellRows - (cellsPerBlockY - 1));
+		int cellColMax = (cellCols - (cellsPerBlockX - 1));
 
 		for (int i = 0; i < cellRowMax; i += stepBlock) {
 			for (int j = 0; j < cellColMax; j += stepBlock) {
-				computeDescriptor(i,j);
+				computeDescriptor(i, j);
 			}
 		}
-
 	}
 
 	/**
 	 * Determines if the cell array needs to grow.  If it does a new array is declared.  Old data is recycled when
 	 * possible
 	 */
-	void growCellArray(int imageWidth, int imageHeight) {
-		cellCols = imageWidth/ pixelsPerCell;
-		cellRows = imageHeight/ pixelsPerCell;
+	void growCellArray( int imageWidth, int imageHeight ) {
+		cellCols = imageWidth/pixelsPerCell;
+		cellRows = imageHeight/pixelsPerCell;
 
-		if( cellRows*cellCols > cells.length ) {
+		if (cellRows*cellCols > cells.length) {
 			Cell[] a = new Cell[cellCols*cellRows];
 
-			System.arraycopy(cells,0,a,0,cells.length);
+			System.arraycopy(cells, 0, a, 0, cells.length);
 			for (int i = cells.length; i < a.length; i++) {
 				a[i] = new Cell();
-				a[i].histogram = new float[ orientationBins ];
+				a[i].histogram = new float[orientationBins];
 			}
 			cells = a;
 		}
@@ -126,37 +123,38 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 	 * @param pixelY1 Pixel coordinate Y-axis upper extent
 	 * @param output List of descriptions
 	 */
-	public void getDescriptorsInRegion(int pixelX0 , int pixelY0 , int pixelX1 , int pixelY1 ,
-									   List<TupleDesc_F64> output ) {
-		int gridX0 = (int)Math.ceil(pixelX0/(double) pixelsPerCell);
-		int gridY0 = (int)Math.ceil(pixelY0/(double) pixelsPerCell);
+	public void getDescriptorsInRegion( int pixelX0, int pixelY0, int pixelX1, int pixelY1,
+										List<TupleDesc_F64> output ) {
+		int gridX0 = (int)Math.ceil(pixelX0/(double)pixelsPerCell);
+		int gridY0 = (int)Math.ceil(pixelY0/(double)pixelsPerCell);
 
-		int gridX1 = pixelX1/ pixelsPerCell - cellsPerBlockX;
-		int gridY1 = pixelY1/ pixelsPerCell - cellsPerBlockY;
+		int gridX1 = pixelX1/pixelsPerCell - cellsPerBlockX;
+		int gridY1 = pixelY1/pixelsPerCell - cellsPerBlockY;
 
 		for (int y = gridY0; y <= gridY1; y++) {
 			int index = y*cellCols + gridX0;
-			for (int x = gridX0; x <= gridX1; x++ ) {
-				output.add( descriptions.get(index++) );
+			for (int x = gridX0; x <= gridX1; x++) {
+				output.add(descriptions.get(index++));
 			}
 		}
 	}
 
 	/**
 	 * Compute the descriptor from the specified cells.  (row,col) to (row+w,col+w)
+	 *
 	 * @param row Lower extent of cell rows
 	 * @param col Lower extent of cell columns
 	 */
-	void computeDescriptor(int row, int col) {
+	void computeDescriptor( int row, int col ) {
 		// set location to top-left pixel
-		locations.grow().set(col* pixelsPerCell,row* pixelsPerCell);
+		locations.grow().setTo(col*pixelsPerCell, row*pixelsPerCell);
 
 		TupleDesc_F64 d = descriptions.grow();
 
 		int indexDesc = 0;
 		for (int i = 0; i < cellsPerBlockY; i++) {
 			for (int j = 0; j < cellsPerBlockX; j++) {
-				Cell c = cells[(row+i)*cellCols + (col+j)];
+				Cell c = cells[(row + i)*cellCols + (col + j)];
 
 				for (int k = 0; k < c.histogram.length; k++) {
 					d.value[indexDesc++] = c.histogram[k];
@@ -165,35 +163,34 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 		}
 
 		// Apply SIFT style L2-Hys normalization
-		DescribeSiftCommon.normalizeDescriptor(d,0.2);
+		DescribeSiftCommon.normalizeDescriptor(d, 0.2);
 	}
 
 	/**
 	 * Compute histograms for all the cells inside the image using precomputed derivative.
-
 	 */
 	void computeCellHistograms() {
 
-		int width = cellCols* pixelsPerCell;
-		int height = cellRows* pixelsPerCell;
+		int width = cellCols*pixelsPerCell;
+		int height = cellRows*pixelsPerCell;
 
 		float angleBinSize = GrlConstants.F_PI/orientationBins;
 
 		int indexCell = 0;
 		for (int i = 0; i < height; i += pixelsPerCell) {
-			for (int j = 0; j < width; j += pixelsPerCell, indexCell++ ) {
+			for (int j = 0; j < width; j += pixelsPerCell, indexCell++) {
 				Cell c = cells[indexCell];
 				c.reset();
 
 				for (int k = 0; k < pixelsPerCell; k++) {
-					int indexPixel = (i+k)*derivX.width+j;
+					int indexPixel = (i + k)*derivX.width + j;
 
-					for (int l = 0; l < pixelsPerCell; l++, indexPixel++ ) {
+					for (int l = 0; l < pixelsPerCell; l++, indexPixel++) {
 						float pixelDX = this.derivX.data[indexPixel];
 						float pixelDY = this.derivY.data[indexPixel];
 
 						// angle from 0 to pi radians
-						float angle = UtilAngle.atanSafe(pixelDY,pixelDX) + GrlConstants.F_PId2;
+						float angle = UtilAngle.atanSafe(pixelDY, pixelDX) + GrlConstants.F_PId2;
 
 						// gradient magnitude
 						float magnitude = (float)Math.sqrt(pixelDX*pixelDX + pixelDY*pixelDY);
@@ -201,15 +198,14 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 						// Add the weighted gradient using bilinear interpolation
 						float findex0 = angle/angleBinSize;
 						int index0 = (int)findex0;
-						float weight1 = findex0-index0;
+						float weight1 = findex0 - index0;
 						index0 %= orientationBins;
-						int index1 = (index0+1)%orientationBins;
+						int index1 = (index0 + 1)%orientationBins;
 
-						c.histogram[index0] += magnitude*(1.0f-weight1);
+						c.histogram[index0] += magnitude*(1.0f - weight1);
 						c.histogram[index1] += magnitude*weight1;
 					}
 				}
-
 			}
 		}
 	}
@@ -222,16 +218,15 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 		return cellCols;
 	}
 
-	public Cell getCell( int row , int col ) {
+	public Cell getCell( int row, int col ) {
 		return cells[row*cellCols + col];
 	}
 
-	public static class Cell
-	{
-		public float histogram[];
+	public static class Cell {
+		public float[] histogram;
 
 		public void reset() {
-			Arrays.fill(histogram,0);
+			Arrays.fill(histogram, 0);
 		}
 	}
 }

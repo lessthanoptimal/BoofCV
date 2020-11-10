@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -401,7 +401,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 
 		// copy geometric information over
 		localView.intrinsic.set(origView.intrinsic);
-		localView.world_to_view.set(origView.world_to_view);
+		localView.world_to_view.setTo(origView.world_to_view);
 		localView.imageDimension.setTo(origView.imageDimension);
 
 		// If this isn't a view with inliers move on

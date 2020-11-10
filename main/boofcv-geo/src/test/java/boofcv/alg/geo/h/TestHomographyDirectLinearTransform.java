@@ -163,7 +163,7 @@ class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 					0.5+rand.nextDouble()*2,0.5,rand.nextGaussian()*1.5);
 			UtilEllipse_F64.convert(ellipseR,ellipseQ);
 			AssociatedPairConic pair = new AssociatedPairConic();
-			pair.p1.set(ellipseQ);
+			pair.p1.setTo(ellipseQ);
 
 			UtilCurves_F64.convert(pair.p1, C);
 			PerspectiveOps.multTranA(Hinv,C,Hinv,C);

@@ -190,8 +190,8 @@ public class TestImageMotionPtkSmartRespawn extends BoofStandardJUnit {
 
 	private AssociatedPair createPair( int x, int y ) {
 		AssociatedPair p = new AssociatedPairTrack();
-		p.p1.set(x, y);
-		p.p2.set(x, y);
+		p.p1.setTo(x, y);
+		p.p2.setTo(x, y);
 
 		return p;
 	}

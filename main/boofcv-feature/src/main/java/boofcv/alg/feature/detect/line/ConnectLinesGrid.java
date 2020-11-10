@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.alg.feature.detect.line;
-
 
 import boofcv.struct.feature.MatrixOfList;
 import georegression.metric.UtilAngle;
@@ -53,6 +52,7 @@ import java.util.List;
  * [1] M. Hirzer, "Marker Detection for Augmented Reality Applications" Seminar/Project Image Analysis Graz,
  * October 27, 2008.
  * </p>
+ *
  * @author Peter Abeles
  */
 // todo compute stan once for every line
@@ -65,7 +65,7 @@ public class ConnectLinesGrid {
 	float tangentTol;
 
 	// used to store results of an internal function
-	float dist[] = new float[4];
+	float[] dist = new float[4];
 	int closestIndex;
 	int farthestIndex;
 
@@ -79,7 +79,7 @@ public class ConnectLinesGrid {
 	 * @param tangentTol Tolerance along tangential axis.  Try 1.
 	 * @param parallelTol Tolerance along longitudinal axis.  Try 8.
 	 */
-	public ConnectLinesGrid(double lineSlopeAngleTol, double tangentTol, double parallelTol ) {
+	public ConnectLinesGrid( double lineSlopeAngleTol, double tangentTol, double parallelTol ) {
 		this.lineSlopeAngleTol = (float)lineSlopeAngleTol;
 		this.tangentTol = (float)tangentTol;
 		this.parallelTol = (float)parallelTol;
@@ -89,15 +89,15 @@ public class ConnectLinesGrid {
 		this.grid = grid;
 
 		// first connect lines inside the same element
-		for( int i = 0; i < grid.height; i++ ) {
-			for( int j = 0; j < grid.width; j++ ) {
-				connectInSameElement(grid.get(j,i));
+		for (int i = 0; i < grid.height; i++) {
+			for (int j = 0; j < grid.width; j++) {
+				connectInSameElement(grid.get(j, i));
 			}
 		}
 
 		// connect neighboring grid cells
-		for( int i = 0; i < grid.height; i++ ) {
-			for( int j = 0; j < grid.width; j++ ) {
+		for (int i = 0; i < grid.height; i++) {
+			for (int j = 0; j < grid.width; j++) {
 				connectToNeighbors(j, i);
 			}
 		}
@@ -110,27 +110,26 @@ public class ConnectLinesGrid {
 	 * @param x target region grid x-coordinate
 	 * @param y target region grid y-coordinate
 	 */
-	private void connectToNeighbors(int x, int y ) {
-		List<LineSegment2D_F32> lines = grid.get(x,y);
+	private void connectToNeighbors( int x, int y ) {
+		List<LineSegment2D_F32> lines = grid.get(x, y);
 
 		Iterator<LineSegment2D_F32> iter = lines.iterator();
-		while( iter.hasNext() )
-		{
+		while (iter.hasNext()) {
 			LineSegment2D_F32 l = iter.next();
 			boolean connected = false;
 
-			if( connectTry(l,x+1,y) )
+			if (connectTry(l, x + 1, y))
 				connected = true;
-			if( !connected && connectTry(l,x+1,y+1) )
+			if (!connected && connectTry(l, x + 1, y + 1))
 				connected = true;
-			if( !connected && connectTry(l,x,y+1) )
+			if (!connected && connectTry(l, x, y + 1))
 				connected = true;
-			if( !connected && connectTry(l,x-1,y+1) )
+			if (!connected && connectTry(l, x - 1, y + 1))
 				connected = true;
 
 			// the line was added to the connecting grid
 			// remove it to avoid double counting the line
-			if( connected )
+			if (connected)
 				iter.remove();
 		}
 	}
@@ -143,25 +142,25 @@ public class ConnectLinesGrid {
 	 * @param y y-coordinate of adjacent region.
 	 * @return true if a connection was made.
 	 */
-	private boolean connectTry( LineSegment2D_F32 target , int x , int y ) {
-		if( !grid.isInBounds(x,y) )
+	private boolean connectTry( LineSegment2D_F32 target, int x, int y ) {
+		if (!grid.isInBounds(x, y))
 			return false;
 
-		List<LineSegment2D_F32> lines = grid.get(x,y);
+		List<LineSegment2D_F32> lines = grid.get(x, y);
 
-		int index = findBestCompatible(target,lines,0);
+		int index = findBestCompatible(target, lines, 0);
 
-		if( index == -1 )
+		if (index == -1)
 			return false;
 
 		LineSegment2D_F32 b = lines.remove(index);
 
 		// join the two lines by connecting the farthest points from each other
 		Point2D_F32 pt0 = farthestIndex < 2 ? target.a : target.b;
-		Point2D_F32 pt1 = farthestIndex %2 == 0 ? b.a : b.b;
+		Point2D_F32 pt1 = farthestIndex%2 == 0 ? b.a : b.b;
 
-		target.a.set(pt0);
-		target.b.set(pt1);
+		target.a.setTo(pt0);
+		target.b.setTo(pt1);
 
 		// adding the merged one back in allows it to be merged with other lines down
 		// the line.  It will be compared against others in 'target's grid though
@@ -175,12 +174,12 @@ public class ConnectLinesGrid {
 	 *
 	 * @param lines All the lines in the region.
 	 */
-	private void connectInSameElement(List<LineSegment2D_F32> lines ) {
-		for( int i = 0; i < lines.size(); i++ ) {
+	private void connectInSameElement( List<LineSegment2D_F32> lines ) {
+		for (int i = 0; i < lines.size(); i++) {
 			LineSegment2D_F32 a = lines.get(i);
 
-			int index = findBestCompatible(a,lines,i+1);
-			if( index == -1 )
+			int index = findBestCompatible(a, lines, i + 1);
+			if (index == -1)
 				continue;
 
 			// remove the line from the index which it is being connected to
@@ -188,10 +187,10 @@ public class ConnectLinesGrid {
 
 			// join the two lines by connecting the farthest points from each other
 			Point2D_F32 pt0 = farthestIndex < 2 ? a.a : a.b;
-			Point2D_F32 pt1 = farthestIndex %2 == 0 ? b.a : b.b;
+			Point2D_F32 pt1 = farthestIndex%2 == 0 ? b.a : b.b;
 
-			a.a.set(pt0);
-			a.b.set(pt1);
+			a.a.setTo(pt0);
+			a.b.setTo(pt1);
 		}
 	}
 
@@ -204,25 +203,24 @@ public class ConnectLinesGrid {
 	 * @param start First index in the candidate list it should start searching at.
 	 * @return Index of the candidate it can connect to.  -1 if there is no match.
 	 */
-	private int findBestCompatible( LineSegment2D_F32 target ,
-									List<LineSegment2D_F32> candidates ,
-									int start )
-	{
+	private int findBestCompatible( LineSegment2D_F32 target,
+									List<LineSegment2D_F32> candidates,
+									int start ) {
 		int bestIndex = -1;
 		double bestDistance = Double.MAX_VALUE;
 		int bestFarthest = 0;
 
-		float targetAngle = UtilAngle.atanSafe(target.slopeY(),target.slopeX());
+		float targetAngle = UtilAngle.atanSafe(target.slopeY(), target.slopeX());
 		float cos = (float)Math.cos(targetAngle);
 		float sin = (float)Math.sin(targetAngle);
 
-		for( int i = start; i < candidates.size(); i++ ) {
+		for (int i = start; i < candidates.size(); i++) {
 			LineSegment2D_F32 c = candidates.get(i);
 
-			float angle = UtilAngle.atanSafe(c.slopeY(),c.slopeX());
+			float angle = UtilAngle.atanSafe(c.slopeY(), c.slopeX());
 
 			// see if the two lines have the same slope
-			if( UtilAngle.distHalf(targetAngle,angle) > lineSlopeAngleTol )
+			if (UtilAngle.distHalf(targetAngle, angle) > lineSlopeAngleTol)
 				continue;
 
 			// see the distance the two lines are apart and if it could be the best line
@@ -230,32 +228,32 @@ public class ConnectLinesGrid {
 
 			// two closest end points
 			Point2D_F32 pt0 = closestIndex < 2 ? target.a : target.b;
-			Point2D_F32 pt1 = closestIndex %2 == 0 ? c.a : c.b;
+			Point2D_F32 pt1 = closestIndex%2 == 0 ? c.a : c.b;
 
-			float xx = pt1.x-pt0.x;
-			float yy = pt1.y-pt0.y;
+			float xx = pt1.x - pt0.x;
+			float yy = pt1.y - pt0.y;
 
 			float distX = Math.abs(cos*xx - sin*yy);
 			float distY = Math.abs(cos*yy + sin*xx);
 
-			if( distX >= bestDistance ||
-					distX > parallelTol || distY > tangentTol )
+			if (distX >= bestDistance ||
+					distX > parallelTol || distY > tangentTol)
 				continue;
 
 			// check the angle of the combined line
 			pt0 = farthestIndex < 2 ? target.a : target.b;
-			pt1 = farthestIndex %2 == 0 ? c.a : c.b;
+			pt1 = farthestIndex%2 == 0 ? c.a : c.b;
 
-			float angleCombined = UtilAngle.atanSafe(pt1.y-pt0.y,pt1.x-pt0.x);
+			float angleCombined = UtilAngle.atanSafe(pt1.y - pt0.y, pt1.x - pt0.x);
 
-			if( UtilAngle.distHalf(targetAngle,angleCombined) <= lineSlopeAngleTol ) {
+			if (UtilAngle.distHalf(targetAngle, angleCombined) <= lineSlopeAngleTol) {
 				bestDistance = distX;
 				bestIndex = i;
 				bestFarthest = farthestIndex;
 			}
 		}
 
-		if( bestDistance < parallelTol) {
+		if (bestDistance < parallelTol) {
 			farthestIndex = bestFarthest;
 			return bestIndex;
 		}
@@ -265,8 +263,7 @@ public class ConnectLinesGrid {
 	/**
 	 * Finds the points on each line which are closest and farthest away from each other.
 	 */
-	private void closestFarthestPoints(LineSegment2D_F32 a, LineSegment2D_F32 b)
-	{
+	private void closestFarthestPoints( LineSegment2D_F32 a, LineSegment2D_F32 b ) {
 		dist[0] = a.a.distance2(b.a);
 		dist[1] = a.a.distance2(b.b);
 		dist[2] = a.b.distance2(b.a);
@@ -277,13 +274,13 @@ public class ConnectLinesGrid {
 		farthestIndex = 0;
 		float closest = dist[0];
 		float farthest = dist[0];
-		for( int i = 1; i < 4; i++ ) {
+		for (int i = 1; i < 4; i++) {
 			float d = dist[i];
-			if( d < closest ) {
+			if (d < closest) {
 				closest = d;
 				closestIndex = i;
 			}
-			if( d > farthest ) {
+			if (d > farthest) {
 				farthest = d;
 				farthestIndex = i;
 			}

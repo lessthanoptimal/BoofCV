@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,6 @@ public class MinimizeEnergyPrune {
 	LineParametric2D_F64 line = new LineParametric2D_F64();
 	Point2D_F64 point = new Point2D_F64();
 
-
 	List<Point2D_I32> contour;
 	double energySegment[] = new double[1];
 
@@ -56,25 +55,26 @@ public class MinimizeEnergyPrune {
 	GrowQueue_I32 workCorners1 = new GrowQueue_I32();
 	GrowQueue_I32 workCorners2 = new GrowQueue_I32();
 
-	public MinimizeEnergyPrune(double splitPenalty) {
+	public MinimizeEnergyPrune( double splitPenalty ) {
 		this.splitPenalty = splitPenalty;
 	}
 
 	/**
 	 * Given a contour and initial set of corners compute a new set of corner indexes
+	 *
 	 * @param contour List of points in the shape's contour
 	 * @param input Initial set of corners
 	 * @param output Pruned set of corners
 	 * @return true if one or more corners were pruned, false if nothing changed
 	 */
-	public boolean prune(List<Point2D_I32> contour, GrowQueue_I32 input, GrowQueue_I32 output) {
+	public boolean prune( List<Point2D_I32> contour, GrowQueue_I32 input, GrowQueue_I32 output ) {
 
 		this.contour = contour;
 		output.setTo(input);
 		removeDuplicates(output);
 
 		// can't prune a corner and it will still be a polygon
-		if( output.size() <= 3 )
+		if (output.size() <= 3)
 			return false;
 
 		computeSegmentEnergy(output);
@@ -88,7 +88,7 @@ public class MinimizeEnergyPrune {
 		fit.setContour(contour);
 
 		boolean modified = false;
-		while( output.size() > 3 ) {
+		while (output.size() > 3) {
 			double bestEnergy = total;
 			boolean betterFound = false;
 			bestCorners.reset();
@@ -97,14 +97,14 @@ public class MinimizeEnergyPrune {
 				// add all but the one which was removed
 				workCorners1.reset();
 				for (int j = 0; j < output.size(); j++) {
-					if( i != j ) {
+					if (i != j) {
 						workCorners1.add(output.get(j));
 					}
 				}
 
 				// just in case it created a duplicate
 				removeDuplicates(workCorners1);
-				if( workCorners1.size() > 3 ) {
+				if (workCorners1.size() > 3) {
 
 					// when looking at these anchors remember that they are relative to the new list without
 					// the removed corner and that the two adjacent corners need to be optimized
@@ -131,7 +131,7 @@ public class MinimizeEnergyPrune {
 				}
 			}
 
-			if ( betterFound ) {
+			if (betterFound) {
 				modified = true;
 				total = bestEnergy;
 				output.setTo(bestCorners);
@@ -152,10 +152,10 @@ public class MinimizeEnergyPrune {
 			Point2D_I32 a = contour.get(corners.get(i));
 
 			// start from the top so that removing a corner doesn't mess with the for loop
-			for (int j = corners.size()-1; j > i; j--) {
+			for (int j = corners.size() - 1; j > i; j--) {
 				Point2D_I32 b = contour.get(corners.get(j));
 
-				if( a.x == b.x && a.y == b.y ) {
+				if (a.x == b.x && a.y == b.y) {
 					// this is still ok if j == 0 because it wrapped around.  'i' will now be > size
 					corners.remove(j);
 				}
@@ -167,29 +167,30 @@ public class MinimizeEnergyPrune {
 	 * Computes the energy of each segment individually
 	 */
 	void computeSegmentEnergy( GrowQueue_I32 corners ) {
-		if( energySegment.length < corners.size() ) {
-			energySegment = new double[ corners.size() ];
+		if (energySegment.length < corners.size()) {
+			energySegment = new double[corners.size()];
 		}
 
-		for (int i = 0,j=corners.size()-1; i < corners.size(); j=i,i++) {
+		for (int i = 0, j = corners.size() - 1; i < corners.size(); j = i, i++) {
 			energySegment[j] = computeSegmentEnergy(corners, j, i);
 		}
 	}
 
 	/**
 	 * Returns the total energy after removing a corner
+	 *
 	 * @param removed index of the corner that is being removed
 	 * @param corners list of corner indexes
 	 */
-	protected double energyRemoveCorner( int removed , GrowQueue_I32 corners ) {
+	protected double energyRemoveCorner( int removed, GrowQueue_I32 corners ) {
 		double total = 0;
 
-		int cornerA = CircularIndex.addOffset(removed, -1 , corners.size());
-		int cornerB = CircularIndex.addOffset(removed,  1 , corners.size());
+		int cornerA = CircularIndex.addOffset(removed, -1, corners.size());
+		int cornerB = CircularIndex.addOffset(removed, 1, corners.size());
 
 		total += computeSegmentEnergy(corners, cornerA, cornerB);
 
-		if( cornerA > cornerB ) {
+		if (cornerA > cornerB) {
 			for (int i = cornerB; i < cornerA; i++)
 				total += energySegment[i];
 		} else {
@@ -207,11 +208,11 @@ public class MinimizeEnergyPrune {
 	/**
 	 * Computes the energy for a segment defined by the two corner indexes
 	 */
-	protected double computeSegmentEnergy(GrowQueue_I32 corners, int cornerA, int cornerB) {
+	protected double computeSegmentEnergy( GrowQueue_I32 corners, int cornerA, int cornerB ) {
 		int indexA = corners.get(cornerA);
 		int indexB = corners.get(cornerB);
 
-		if( indexA == indexB ) {
+		if (indexA == indexB) {
 			return 100000.0;
 		}
 
@@ -220,29 +221,29 @@ public class MinimizeEnergyPrune {
 
 		line.p.x = a.x;
 		line.p.y = a.y;
-		line.slope.set(b.x-a.x,b.y-a.y);
+		line.slope.setTo(b.x - a.x, b.y - a.y);
 
 		double total = 0;
-		int length = circularDistance(indexA,indexB);
+		int length = circularDistance(indexA, indexB);
 
 		for (int k = 1; k < length; k++) {
 			Point2D_I32 c = getContour(indexA + 1 + k);
-			point.set(c.x, c.y);
+			point.setTo(c.x, c.y);
 
 			total += Distance2D_F64.distanceSq(line, point);
 		}
 
-		return (total+ splitPenalty)/a.distance2(b);
+		return (total + splitPenalty)/a.distance2(b);
 	}
 
-	protected Point2D_I32 getContour(int index) {
-		return contour.get(index % contour.size());
+	protected Point2D_I32 getContour( int index ) {
+		return contour.get(index%contour.size());
 	}
 
 	/**
 	 * Distance the two points are apart in clockwise direction
 	 */
-	protected int circularDistance( int start , int end ) {
-		return CircularIndex.distanceP(start,end,contour.size());
+	protected int circularDistance( int start, int end ) {
+		return CircularIndex.distanceP(start, end, contour.size());
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -252,7 +252,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 		InputSanityCheck.checkSameShape(derivX, input);
 		initMotion(input);
 
-		keyToCurrent.set(hintKeyToInput);
+		keyToCurrent.setTo(hintKeyToInput);
 
 		boolean foundSolution = false;
 		float previousError = Float.MAX_VALUE;
@@ -267,7 +267,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 				// update the estimated motion from the computed twist
 				previousError = errorOptical;
 				keyToCurrent.concat(motionTwist, tmp);
-				keyToCurrent.set(tmp);
+				keyToCurrent.setTo(tmp);
 				foundSolution = true;
 			}
 		}

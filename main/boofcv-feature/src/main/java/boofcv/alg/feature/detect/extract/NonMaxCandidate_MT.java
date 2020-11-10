@@ -78,7 +78,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 		// by doing the last step outside we ensure the corners are in a deterministic order and that no locking
 		// is required inside each thread
 		for (int i = 0; i < searches.size(); i++) {
-			found.copyAll(searches.get(i).corners.toList(), ( src, dst ) -> dst.set(src));
+			found.copyAll(searches.get(i).corners.toList(), ( src, dst ) -> dst.setTo(src));
 		}
 	}
 
@@ -121,7 +121,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 		// by doing the last step outside we ensure the corners are in a deterministic order and that no locking
 		// is required inside each thread
 		for (int i = 0; i < searches.size(); i++) {
-			found.copyAll(searches.get(i).corners.toList(), ( src, dst ) -> dst.set(src));
+			found.copyAll(searches.get(i).corners.toList(), ( src, dst ) -> dst.setTo(src));
 		}
 	}
 

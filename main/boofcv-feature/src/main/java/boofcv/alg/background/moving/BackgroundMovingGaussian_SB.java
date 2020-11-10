@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,9 +35,8 @@ import georegression.struct.InvertibleTransform;
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundMovingGaussian<T,Motion>
-{
+public class BackgroundMovingGaussian_SB<T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
+		extends BackgroundMovingGaussian<T, Motion> {
 
 	// interpolates the input image
 	protected InterpolatePixelS<T> interpolateInput;
@@ -50,7 +49,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 	protected float[] pixelBG = new float[2];
 
 	// background is composed of two channels.  0 = mean, 1 = variance
-	Planar<GrayF32> background = new Planar<>(GrayF32.class,1,1,2);
+	Planar<GrayF32> background = new Planar<>(GrayF32.class, 1, 1, 2);
 
 	/**
 	 * Configurations background removal.
@@ -61,11 +60,10 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 	 * @param interpType Type of interpolation.  BILINEAR recommended for accuracy. NEAREST_NEIGHBOR for speed. .
 	 * @param imageType Type of input image.
 	 */
-	public BackgroundMovingGaussian_SB(float learnRate, float threshold,
-									   Point2Transform2Model_F32<Motion> transform,
-									   InterpolationType interpType,
-									   Class<T> imageType)
-	{
+	public BackgroundMovingGaussian_SB( float learnRate, float threshold,
+										Point2Transform2Model_F32<Motion> transform,
+										InterpolationType interpType,
+										Class<T> imageType ) {
 		super(learnRate, threshold, transform, ImageType.single(imageType));
 
 		this.interpolateInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
@@ -77,12 +75,12 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 	}
 
 	@Override
-	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
-		background.reshape(backgroundWidth,backgroundHeight);
-		GImageMiscOps.fill(background.getBand(0),0);
-		GImageMiscOps.fill(background.getBand(1),-1);
+	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+		background.reshape(backgroundWidth, backgroundHeight);
+		GImageMiscOps.fill(background.getBand(0), 0);
+		GImageMiscOps.fill(background.getBand(1), -1);
 
-		this.homeToWorld.set(homeToWorld);
+		this.homeToWorld.setTo(homeToWorld);
 		this.homeToWorld.invert(worldToHome);
 
 		this.backgroundWidth = backgroundWidth;
@@ -91,12 +89,12 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 
 	@Override
 	public void reset() {
-		GImageMiscOps.fill(background.getBand(0),0);
-		GImageMiscOps.fill(background.getBand(1),-1);
+		GImageMiscOps.fill(background.getBand(0), 0);
+		GImageMiscOps.fill(background.getBand(1), -1);
 	}
 
 	@Override
-	protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
+	protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
@@ -107,19 +105,19 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 
 		for (int y = y0; y < y1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0;
-			for (int x = x0; x < x1; x++, indexBG++ ) {
-				transform.compute(x,y,work);
+			for (int x = x0; x < x1; x++, indexBG++) {
+				transform.compute(x, y, work);
 
-				if( work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
-					float inputValue = interpolateInput.get(work.x,work.y);
+				if (work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
+					float inputValue = interpolateInput.get(work.x, work.y);
 					float meanBG = backgroundMean.data[indexBG];
 					float varianceBG = backgroundVar.data[indexBG];
 
-					if( varianceBG < 0) {
+					if (varianceBG < 0) {
 						backgroundMean.data[indexBG] = inputValue;
 						backgroundVar.data[indexBG] = initialVariance;
 					} else {
-						float diff = meanBG-inputValue;
+						float diff = meanBG - inputValue;
 						backgroundMean.data[indexBG] = minusLearn*meanBG + learnRate*inputValue;
 						backgroundVar.data[indexBG] = minusLearn*varianceBG + learnRate*diff*diff;
 					}
@@ -129,7 +127,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
+	protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
@@ -137,17 +135,17 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 			int indexFrame = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-			for (int x = 0; x < frame.width; x++, indexFrame++ , indexSegmented++ ) {
-				transform.compute(x,y,work);
+			for (int x = 0; x < frame.width; x++, indexFrame++, indexSegmented++) {
+				transform.compute(x, y, work);
 
-				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-					interpolationBG.get(work.x,work.y,pixelBG);
+				if (work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
+					interpolationBG.get(work.x, work.y, pixelBG);
 					float pixelFrame = inputWrapper.getF(indexFrame);
 
 					float meanBG = pixelBG[0];
 					float varBG = pixelBG[1];
 
-					if( varBG < 0) {
+					if (varBG < 0) {
 						segmented.data[indexSegmented] = unknownValue;
 					} else {
 						float diff = meanBG - pixelFrame;
@@ -156,7 +154,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray<T>, Motion extends
 						if (chisq <= threshold) {
 							segmented.data[indexSegmented] = 0;
 						} else {
-							if( diff > minimumDifference || -diff > minimumDifference )
+							if (diff > minimumDifference || -diff > minimumDifference)
 								segmented.data[indexSegmented] = 1;
 							else
 								segmented.data[indexSegmented] = 0;

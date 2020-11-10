@@ -42,7 +42,7 @@ public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 		for( int i = 0; i < 12; i++ ) {
 			Point2D_F64 p = new Point2D_F64();
 
-			p.set(rand.nextDouble()*5,rand.nextDouble()*5);
+			p.setTo(rand.nextDouble()*5,rand.nextDouble()*5);
 
 			list.add(p);
 		}
@@ -97,7 +97,7 @@ public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 			for (int j = 0; j < 6; j++) {
 				Point2D_F64 p = new Point2D_F64();
 
-				p.set(rand.nextDouble()*5,rand.nextDouble()*5);
+				p.setTo(rand.nextDouble()*5,rand.nextDouble()*5);
 				l.add(p);
 				list.add(p);
 			}
@@ -122,8 +122,8 @@ public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedPair p = new AssociatedPair();
 
-			p.p2.set(rand.nextDouble()*5,rand.nextDouble()*5);
-			p.p1.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+			p.p2.setTo(rand.nextDouble()*5,rand.nextDouble()*5);
+			p.p1.setTo(rand.nextDouble() * 5, rand.nextDouble() * 5);
 
 			list.add(p);
 		}
@@ -158,9 +158,9 @@ public class TestLowLevelMultiViewOps extends BoofStandardJUnit {
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedTriple p = new AssociatedTriple();
 
-			p.p1.set(rand.nextDouble()*5,rand.nextDouble()*5);
-			p.p2.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
-			p.p3.set(rand.nextDouble() * 5, rand.nextDouble() * 5);
+			p.p1.setTo(rand.nextDouble()*5,rand.nextDouble()*5);
+			p.p2.setTo(rand.nextDouble() * 5, rand.nextDouble() * 5);
+			p.p3.setTo(rand.nextDouble() * 5, rand.nextDouble() * 5);
 
 			list.add(p);
 		}

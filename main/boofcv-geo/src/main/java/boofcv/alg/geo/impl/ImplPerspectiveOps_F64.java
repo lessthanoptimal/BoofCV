@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -199,7 +199,7 @@ public class ImplPerspectiveOps_F64 {
 		if (pixel == null)
 			pixel = new Point2D_F64();
 
-		pixel.set(x/z, y/z);
+		pixel.setTo(x/z, y/z);
 
 		if (K == null)
 			return pixel;

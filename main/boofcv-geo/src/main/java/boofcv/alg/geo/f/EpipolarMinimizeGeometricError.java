@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,8 +133,8 @@ public class EpipolarMinimizeGeometricError {
 		originalCoordinates(T2,R2,e2);
 
 		// back to 2D coordinates
-		p1.set(e1.x/e1.z, e1.y/e1.z);
-		p2.set(e2.x/e2.z, e2.y/e2.z);
+		p1.setTo(e1.x/e1.z, e1.y/e1.z);
+		p2.setTo(e2.x/e2.z, e2.y/e2.z);
 
 		return true;
 	}

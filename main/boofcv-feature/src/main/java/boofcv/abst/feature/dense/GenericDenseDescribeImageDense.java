@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends TupleDesc>
-	implements DescribeImageDense<T,Desc>
-{
+		implements DescribeImageDense<T, Desc> {
 	// Computes the image feature
-	DescribeRegionPoint<T,Desc> alg;
+	DescribeRegionPoint<T, Desc> alg;
 
 	// Radius of the "detected" feature
 	double radius;
@@ -51,18 +50,19 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 
 	/**
 	 * Configures dense description.
+	 *
 	 * @param alg Sparse feature sampler.
 	 * @param descriptorScale Relative scale of the descriptor's region
 	 * @param samplePeriodX How frequently the image is sampled in pixels. X-axis
 	 * @param samplePeriodY How frequently the image is sampled in pixels. Y-axis
 	 */
-	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg,
-										  double descriptorScale,
-										  double samplePeriodX ,
-										  double samplePeriodY ) {
+	public GenericDenseDescribeImageDense( DescribeRegionPoint<T, Desc> alg,
+										   double descriptorScale,
+										   double samplePeriodX,
+										   double samplePeriodY ) {
 		this.alg = alg;
 		descriptions = new FastQueue<>(alg.getDescriptionType(), alg::createDescription);
-		configure(descriptorScale,samplePeriodX,samplePeriodY);
+		configure(descriptorScale, samplePeriodX, samplePeriodY);
 	}
 
 	/**
@@ -72,36 +72,36 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	 * @param periodX Period in pixels along x-axis of samples
 	 * @param periodY Period in pixels along y-axis of samples
 	 */
-	public void configure( double descriptorRegionScale , double periodX, double periodY) {
+	public void configure( double descriptorRegionScale, double periodX, double periodY ) {
 		this.radius = (alg.getCanonicalWidth()/2.0)*descriptorRegionScale;
-		this.periodX = (int)(periodX+0.5);
-		this.periodY = (int)(periodY+0.5);
+		this.periodX = (int)(periodX + 0.5);
+		this.periodY = (int)(periodY + 0.5);
 		this.featureWidth = (int)(alg.getCanonicalWidth()*descriptorRegionScale + 0.5);
 	}
 
 	@Override
-	public void process(T input ) {
-		if( periodX <= 0 || periodY <= 0 )
+	public void process( T input ) {
+		if (periodX <= 0 || periodY <= 0)
 			throw new IllegalArgumentException("Must call configure() first");
 
 		alg.setImage(input);
 
 		int x0 = featureWidth/2;
-		int x1 = input.getWidth()-featureWidth/2;
+		int x1 = input.getWidth() - featureWidth/2;
 		int y0 = featureWidth/2;
-		int y1 = input.getHeight()-featureWidth/2;
+		int y1 = input.getHeight() - featureWidth/2;
 
 		descriptions.reset();
 		locations.reset();
 
-		for (int y = y0; y < y1; y += periodY ) {
-			for (int x = x0; x < x1; x += periodX ) {
+		for (int y = y0; y < y1; y += periodY) {
+			for (int x = x0; x < x1; x += periodX) {
 				Desc d = descriptions.grow();
 
-				if( !alg.process(x,y,0,radius,d) ) {
+				if (!alg.process(x, y, 0, radius, d)) {
 					descriptions.removeTail();
 				} else {
-					locations.grow().set(x,y);
+					locations.grow().setTo(x, y);
 				}
 			}
 		}

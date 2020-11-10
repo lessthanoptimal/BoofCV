@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -259,7 +259,7 @@ public class PairwiseGraphUtils {
 			int indexB = table_A_to_B.data[indexA];
 			int indexC = table_A_to_C.data[indexA];
 
-			matchesTriple.get(i).set(featsA.get(indexA), featsB.get(indexB), featsC.get(indexC));
+			matchesTriple.get(i).setTo(featsA.get(indexA), featsB.get(indexB), featsC.get(indexC));
 		}
 	}
 

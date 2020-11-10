@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,9 +58,8 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 	private List<Point3D_F64> cloudWorld = new ArrayList<>();
 	private List<Point3D_F64> cloudCamera = new ArrayList<>();
 
-	public WrapP3PLineDistance(P3PLineDistance alg,
-							   MotionTransformPoint<Se3_F64, Point3D_F64> motionFit )
-	{
+	public WrapP3PLineDistance( P3PLineDistance alg,
+								MotionTransformPoint<Se3_F64, Point3D_F64> motionFit ) {
 		this.alg = alg;
 		this.motionFit = motionFit;
 
@@ -70,9 +69,9 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 	}
 
 	@Override
-	public boolean process(List<Point2D3D> inputs , FastQueue<Se3_F64> solutions ) {
-		if( inputs.size() != 3 )
-			throw new IllegalArgumentException("Three and only three inputs are required.  Not "+inputs.size());
+	public boolean process( List<Point2D3D> inputs, FastQueue<Se3_F64> solutions ) {
+		if (inputs.size() != 3)
+			throw new IllegalArgumentException("Three and only three inputs are required.  Not " + inputs.size());
 
 		solutions.reset();
 
@@ -85,20 +84,22 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 		double length13 = P1.location.distance(P3.getLocation());
 		double length23 = P2.location.distance(P3.getLocation());
 
-		if( !alg.process(P1.observation,P2.observation,P3.observation,length23,length13,length12))
+		if (!alg.process(P1.observation, P2.observation, P3.observation, length23, length13, length12))
 			return false;
 
 		FastQueue<PointDistance3> distances = alg.getSolutions();
 
-		if( distances.size == 0 )
+		if (distances.size == 0)
 			return false;
 
 		// convert observations into a 3D pointing vector and normalize to one
-		u1.set(P1.observation.x,P1.observation.y,1); // homogeneous coordinates
-		u2.set(P2.observation.x,P2.observation.y,1);
-		u3.set(P3.observation.x,P3.observation.y,1);
+		u1.set(P1.observation.x, P1.observation.y, 1); // homogeneous coordinates
+		u2.set(P2.observation.x, P2.observation.y, 1);
+		u3.set(P3.observation.x, P3.observation.y, 1);
 
-		u1.normalize(); u2.normalize(); u3.normalize();
+		u1.normalize();
+		u2.normalize();
+		u3.normalize();
 
 		// set up world point cloud
 		cloudWorld.clear();
@@ -106,25 +107,25 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 		cloudWorld.add(P2.location);
 		cloudWorld.add(P3.location);
 
-		for( int i = 0; i < distances.size; i++ ) {
+		for (int i = 0; i < distances.size; i++) {
 			PointDistance3 pd = distances.get(i);
 
 			// find points in camera frame
-			X1.set( u1.x*pd.dist1 , u1.y*pd.dist1 , u1.z*pd.dist1 );
-			X2.set( u2.x*pd.dist2 , u2.y*pd.dist2 , u2.z*pd.dist2 );
-			X3.set( u3.x*pd.dist3 , u3.y*pd.dist3 , u3.z*pd.dist3 );
+			X1.set(u1.x*pd.dist1, u1.y*pd.dist1, u1.z*pd.dist1);
+			X2.set(u2.x*pd.dist2, u2.y*pd.dist2, u2.z*pd.dist2);
+			X3.set(u3.x*pd.dist3, u3.y*pd.dist3, u3.z*pd.dist3);
 
-			if( !motionFit.process(cloudWorld,cloudCamera) )
+			if (!motionFit.process(cloudWorld, cloudCamera))
 				continue;
 
 			// NOTE: This transform is world to camera and it's perfectly valid for to have a negative Z value
 			//       and be behind the camera.
 			Se3_F64 found = solutions.grow();
-			found.set( motionFit.getTransformSrcToDst() );
+			found.setTo(motionFit.getTransformSrcToDst());
 		}
 
 
-		return solutions.size() != 0 ;
+		return solutions.size() != 0;
 	}
 
 	@Override

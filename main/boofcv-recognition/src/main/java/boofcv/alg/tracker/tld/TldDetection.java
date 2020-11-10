@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -175,7 +175,7 @@ public class TldDetection<T extends ImageGray<T>> {
 				continue;
 			TldRegion r = candidateDetections.grow();
 			r.connections = 0;
-			r.rect.set(region);
+			r.rect.setTo(region);
 			r.confidence = confidence;
 		}
 	}

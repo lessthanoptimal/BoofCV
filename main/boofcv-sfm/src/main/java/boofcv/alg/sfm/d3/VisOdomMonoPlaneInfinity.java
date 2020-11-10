@@ -306,7 +306,6 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 * @return Number of dropped tracks
 	 */
 	private int dropUnusedTracks() {
-
 		List<PointTrack> all = tracker.getAllTracks(null);
 		int num = 0;
 		long frameID = tracker.getFrameID();
@@ -353,8 +352,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 				if (pointing.y > 0) {
 					// create data structure for robust motion estimation
 					PlanePtPixel ppp = planeSamples.grow();
-					ppp.normalizedCurr.set(n);
-					ppp.planeKey.set(p.ground);
+					ppp.normalizedCurr.setTo(n);
+					ppp.planeKey.setTo(p.ground);
 
 					tracksOnPlane.add(t);
 				}
@@ -541,7 +540,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 */
 	private void concatMotion() {
 		currToKey.concat(keyToWorld, temp);
-		keyToWorld.set(temp);
+		keyToWorld.setTo(temp);
 		currToKey.reset();
 	}
 

@@ -141,8 +141,8 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 
 			Polygon2D_F64 input = createFromSquare(null);
 
-			input.get(0).set(x0,y0+1.1);
-			input.get(1).set(x0,y1-1.1);
+			input.get(0).setTo(x0,y0+1.1);
+			input.get(1).setTo(x0,y1-1.1);
 
 			Polygon2D_F64 found = new Polygon2D_F64(4);
 
@@ -177,7 +177,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	}
 
 	public void fit_perfect_affine(boolean black, Affine2D_F64 affine, Class imageType) {
-		this.transform.set(affine);
+		this.transform.setTo(affine);
 		renderDistortedRectangles(black, imageType);
 
 		RefinePolygonToGrayLine alg = createAlg(4,imageType);
@@ -223,7 +223,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	}
 
 	public void fit_perfect_transform(boolean black, Affine2D_F64 regToDist, Class imageType) {
-		this.transform.set(regToDist);
+		this.transform.setTo(regToDist);
 		renderDistortedRectangles(black, imageType);
 
 		RefinePolygonToGrayLine alg = createAlg(4,imageType);
@@ -241,7 +241,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
 		Affine2D_F32 regToDist_F32 = new Affine2D_F32();
 		ConvertFloatType.convert(regToDist, regToDist_F32);
-		transform.set(regToDist_F32);
+		transform.setTo(regToDist_F32);
 		alg.setTransform(transform);
 		alg.setImage(image);
 		assertTrue(alg.refine(input,found));
@@ -272,7 +272,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 	}
 
 	public void fit_noisy_affine(boolean black, Affine2D_F64 affine, Class imageType) {
-		this.transform.set(affine);
+		this.transform.setTo(affine);
 		renderDistortedRectangles(black, imageType);
 
 		RefinePolygonToGrayLine alg = createAlg(4,imageType);
@@ -284,7 +284,7 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 
 		for (int i = 0; i < 10; i++) {
 			// add some noise
-			input.set(expected);
+			input.setTo(expected);
 			addNoise(input, 2);
 
 			alg.setImage(image);

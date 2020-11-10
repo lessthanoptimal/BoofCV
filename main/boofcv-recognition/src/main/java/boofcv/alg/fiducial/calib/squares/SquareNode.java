@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class SquareNode {
 	public void reset() {
 		square = null;
 		touch = null;
-		center.set(-1,-1);
+		center.setTo(-1,-1);
 		largestSide = 0;
 		smallestSide = Double.MAX_VALUE;
 		graph = RESET_GRAPH;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class TldFernDescription {
 	/**
 	 * Pairs used to compute fern.  Must be &le; 32 to fit inside an integer
 	 */
-	SamplePair pairs[];
+	SamplePair[] pairs;
 
 	/**
 	 * Creates random fern.
@@ -42,23 +42,22 @@ public class TldFernDescription {
 	 * @param rand Random number generator used to select sample locations
 	 * @param num Number of features/pairs
 	 */
-	public TldFernDescription(Random rand, int num) {
-		if( num < 1 || num > 32 )
+	public TldFernDescription( Random rand, int num ) {
+		if (num < 1 || num > 32)
 			throw new IllegalArgumentException("Number of pairs must be from 1 to 32, inclusive");
 
 		pairs = new SamplePair[num];
-		for( int i = 0; i < num; i++ ) {
+		for (int i = 0; i < num; i++) {
 			SamplePair p = new SamplePair();
 
-			p.a.set( rand.nextFloat()-0.5f , rand.nextFloat()-0.5f );
-			p.b.set( rand.nextFloat()-0.5f , rand.nextFloat()-0.5f );
+			p.a.setTo(rand.nextFloat() - 0.5f, rand.nextFloat() - 0.5f);
+			p.b.setTo(rand.nextFloat() - 0.5f, rand.nextFloat() - 0.5f);
 
 			pairs[i] = p;
 		}
 	}
 
-	public static class SamplePair
-	{
+	public static class SamplePair {
 		Point2D_F32 a = new Point2D_F32();
 		Point2D_F32 b = new Point2D_F32();
 	}

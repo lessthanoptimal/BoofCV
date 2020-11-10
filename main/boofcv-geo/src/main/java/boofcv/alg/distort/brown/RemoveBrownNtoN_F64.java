@@ -111,6 +111,6 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 				prevSum = sum;
 			}
 		}
-		out.set(x, y);
+		out.setTo(x, y);
 	}
 }

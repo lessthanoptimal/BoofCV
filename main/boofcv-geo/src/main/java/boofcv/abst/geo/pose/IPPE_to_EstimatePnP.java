@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,14 +54,14 @@ public class IPPE_to_EstimatePnP implements Estimate1ofPnP {
 				throw new IllegalArgumentException("All points must lie on the x-y plane. If data is planar rotate it first");
 			}
 
-			pair.p1.set(p.location.x,p.location.y);
-			pair.p2.set(p.observation);
+			pair.p1.setTo(p.location.x,p.location.y);
+			pair.p2.setTo(p.observation);
 		}
 
 		if( !alg.process(pairs.toList()))
 			return false;
 
-		estimatedModel.set(alg.getWorldToCamera0());
+		estimatedModel.setTo(alg.getWorldToCamera0());
 
 		return true;
 	}

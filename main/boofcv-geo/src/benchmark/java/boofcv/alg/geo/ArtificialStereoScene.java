@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ public class ArtificialStereoScene {
 	Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
-	DMatrixRMaj K = new DMatrixRMaj(3,3,true,705,0.001,326,0,704,224,0,0,1);
-	DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+	DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 705, 0.001, 326, 0, 704, 224, 0, 0, 1);
+	DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 
 	protected Se3_F64 motion;
 	protected List<AssociatedPair> pairs;
@@ -51,18 +51,18 @@ public class ArtificialStereoScene {
 	protected boolean isPixels;
 
 	public ArtificialStereoScene() {
-		CommonOps_DDRM.invert(K,K_inv);
+		CommonOps_DDRM.invert(K, K_inv);
 	}
 
-	public void init( int N , boolean isPixels , boolean planar ) {
+	public void init( int N, boolean isPixels, boolean planar ) {
 		this.isPixels = isPixels;
 		// define the camera's motion
 		motion = new Se3_F64();
-		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.5 , -0.2, 0.15,null));
-		motion.getT().set(0.1,-0.2,5);
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.5, -0.2, 0.15, null));
+		motion.getT().set(0.1, -0.2, 5);
 
 		// randomly generate points in space
-		if( planar )
+		if (planar)
 			worldPoints = createPlanarScene(N);
 		else
 			worldPoints = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, -0.5, 1.5, N, rand);
@@ -72,29 +72,29 @@ public class ArtificialStereoScene {
 		observationCurrent = new ArrayList<>();
 		observationPose = new ArrayList<>();
 
-		for(Point3D_F64 p1 : worldPoints) {
+		for (Point3D_F64 p1 : worldPoints) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
-			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
+			pair.p1.setTo(p1.x/p1.z, p1.y/p1.z);
+			pair.p2.setTo(p2.x/p2.z, p2.y/p2.z);
 			pairs.add(pair);
 
 			observationCurrent.add(pair.p2);
-			observationPose.add( new Point2D3D(pair.p2,p1));
+			observationPose.add(new Point2D3D(pair.p2, p1));
 
-			if( isPixels ) {
-				PerspectiveOps.convertNormToPixel(K,pair.p1,pair.p1);
-				PerspectiveOps.convertNormToPixel(K,pair.p2,pair.p2);
+			if (isPixels) {
+				PerspectiveOps.convertNormToPixel(K, pair.p1, pair.p1);
+				PerspectiveOps.convertNormToPixel(K, pair.p2, pair.p2);
 			}
 		}
 	}
-	
+
 	public void addPixelNoise( double noiseSigma ) {
 
-		for( AssociatedPair p : pairs ) {
+		for (AssociatedPair p : pairs) {
 
-			if( !isPixels ) {
+			if (!isPixels) {
 				PerspectiveOps.convertNormToPixel(K, p.p1, p.p1);
 				PerspectiveOps.convertNormToPixel(K, p.p2, p.p2);
 			}
@@ -105,7 +105,7 @@ public class ArtificialStereoScene {
 			p.p1.x += rand.nextGaussian()*noiseSigma;
 			p.p1.y += rand.nextGaussian()*noiseSigma;
 
-			if( !isPixels ) {
+			if (!isPixels) {
 				PerspectiveOps.convertPixelToNorm(K, p.p1, p.p1);
 				PerspectiveOps.convertPixelToNorm(K, p.p2, p.p2);
 			}
@@ -113,15 +113,15 @@ public class ArtificialStereoScene {
 
 		// observationCurrent simply references the data in pairs
 	}
-	
+
 	private List<Point3D_F64> createPlanarScene( int N ) {
 		List<Point3D_F64> ret = new ArrayList<>();
 
-		for( int i = 0; i < N; i++ ) {
-			double x = (rand.nextDouble()-0.5)*2;
-			double y = (rand.nextDouble()-0.5)*2;
+		for (int i = 0; i < N; i++) {
+			double x = (rand.nextDouble() - 0.5)*2;
+			double y = (rand.nextDouble() - 0.5)*2;
 
-			ret.add( new Point3D_F64(x,y,0));
+			ret.add(new Point3D_F64(x, y, 0));
 		}
 
 		return ret;

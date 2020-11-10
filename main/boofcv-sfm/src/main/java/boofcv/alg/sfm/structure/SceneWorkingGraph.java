@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public class SceneWorkingGraph {
 		public final List<Observation> observations = new ArrayList<>();
 
 		public void reset() {
-			location.set(Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+			location.setTo(Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 			observations.clear();
 		}
 
@@ -138,7 +138,7 @@ public class SceneWorkingGraph {
 		public void reset() {
 			this.view = null;
 			this.observationIdx = -1;
-			this.pixel.set(Double.NaN, -Double.NaN);
+			this.pixel.setTo(Double.NaN, -Double.NaN);
 		}
 	}
 

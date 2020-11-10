@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ import georegression.struct.InvertibleTransform;
  * @author Peter Abeles
  */
 public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion extends InvertibleTransform<Motion>>
-	extends BackgroundMovingBasic<T,Motion>
-{
+		extends BackgroundMovingBasic<T, Motion> {
 	// where the background image is stored
 	protected InterleavedF32 background;
 	// interpolates the input image
@@ -50,16 +49,16 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 	protected float[] pixelInput;
 	protected float[] pixelBack;
 
-	public BackgroundMovingBasic_IL(float learnRate, float threshold,
-									Point2Transform2Model_F32<Motion> transform,
-									InterpolationType interpType,
-									ImageType<T> imageType) {
-		super(learnRate, threshold,transform, imageType);
+	public BackgroundMovingBasic_IL( float learnRate, float threshold,
+									 Point2Transform2Model_F32<Motion> transform,
+									 InterpolationType interpType,
+									 ImageType<T> imageType ) {
+		super(learnRate, threshold, transform, imageType);
 
-		this.interpolationInput = FactoryInterpolation.createPixelMB(0, 255, interpType,BorderType.EXTENDED,imageType);
+		this.interpolationInput = FactoryInterpolation.createPixelMB(0, 255, interpType, BorderType.EXTENDED, imageType);
 
 		int numBands = imageType.getNumBands();
-		background = new InterleavedF32(1,1,numBands);
+		background = new InterleavedF32(1, 1, numBands);
 
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, ImageType.il(numBands, InterleavedF32.class));
@@ -81,11 +80,11 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 	}
 
 	@Override
-	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
-		background.reshape(backgroundWidth,backgroundHeight);
+	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+		background.reshape(backgroundWidth, backgroundHeight);
 		GImageMiscOps.fill(background, Float.MAX_VALUE);
 
-		this.homeToWorld.set(homeToWorld);
+		this.homeToWorld.setTo(homeToWorld);
 		this.homeToWorld.invert(worldToHome);
 
 		this.backgroundWidth = backgroundWidth;
@@ -94,11 +93,11 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 
 	@Override
 	public void reset() {
-		GImageMiscOps.fill(background,Float.MAX_VALUE);
+		GImageMiscOps.fill(background, Float.MAX_VALUE);
 	}
 
 	@Override
-	protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
+	protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 
 		transform.setModel(worldToCurrent);
 		interpolationInput.setImage(frame);
@@ -108,10 +107,10 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 
 		for (int y = y0; y < y1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0*numBands;
-			for (int x = x0; x < x1; x++ ) {
-				transform.compute(x,y,work);
+			for (int x = x0; x < x1; x++) {
+				transform.compute(x, y, work);
 
-				if( work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
+				if (work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
 
 					interpolationInput.get(work.x, work.y, pixelInput);
 
@@ -120,7 +119,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 						float value = pixelInput[band];
 						float bg = background.data[indexBG];
 
-						if( bg == Float.MAX_VALUE ) {
+						if (bg == Float.MAX_VALUE) {
 							background.data[indexBG] = value;
 						} else {
 							background.data[indexBG] = minusLearn*bg + learnRate*value;
@@ -134,7 +133,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
+	protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
@@ -146,20 +145,20 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 			int indexFrame = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-			for (int x = 0; x < frame.width; x++, indexFrame += numBands , indexSegmented++ ) {
-				transform.compute(x,y,work);
+			for (int x = 0; x < frame.width; x++, indexFrame += numBands, indexSegmented++) {
+				transform.compute(x, y, work);
 
 				escapeIf:
-				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
+				if (work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
 
-					interpolationBG.get(work.x,work.y,pixelBack);
+					interpolationBG.get(work.x, work.y, pixelBack);
 
 					double sumErrorSq = 0;
 					for (int band = 0; band < numBands; band++) {
 						float bg = pixelBack[band];
 						float pixelFrame = inputWrapper.getF(indexFrame + band);
 
-						if( bg == Float.MAX_VALUE ) {
+						if (bg == Float.MAX_VALUE) {
 							segmented.data[indexSegmented] = unknownValue;
 							break escapeIf;
 						} else {
@@ -168,7 +167,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 						}
 					}
 
-					if ( sumErrorSq <= thresholdSq) {
+					if (sumErrorSq <= thresholdSq) {
 						segmented.data[indexSegmented] = 0;
 					} else {
 						segmented.data[indexSegmented] = 1;
@@ -180,6 +179,4 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved<T>, Motion exte
 			}
 		}
 	}
-
-
 }

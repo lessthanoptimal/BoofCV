@@ -54,7 +54,7 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		QueueCorner detected = new QueueCorner();
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				detected.grow().set(x, y);
+				detected.grow().setTo(x, y);
 			}
 		}
 		int cellSize = 10;
@@ -135,13 +135,13 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				detected.grow().set(x + 2, y + 2);
+				detected.grow().setTo(x + 2, y + 2);
 			}
 		}
 		// add two prior features to the top row
 		for (int x = 0; x < width; x += cellSize) {
-			prior.grow().set(x + 2, 2);
-			prior.grow().set(x + 2, 2);
+			prior.grow().setTo(x + 2, 2);
+			prior.grow().setTo(x + 2, 2);
 		}
 
 		var found = new FastArray<>(Point2D_I16.class);
@@ -181,9 +181,9 @@ class TestFeatureSelectUniformBest extends ChecksFeatureSelectLimitIntensity.I16
 		int cellSize = 10;
 		for (int y = 0; y < height; y += cellSize) {
 			for (int x = 0; x < width; x += cellSize) {
-				detected.grow().set(x + 2, y + 2);
-				prior.grow().set(x + 2, y + 2);
-				prior.grow().set(x + 1, y + 1);
+				detected.grow().setTo(x + 2, y + 2);
+				prior.grow().setTo(x + 2, y + 2);
+				prior.grow().setTo(x + 1, y + 1);
 			}
 		}
 

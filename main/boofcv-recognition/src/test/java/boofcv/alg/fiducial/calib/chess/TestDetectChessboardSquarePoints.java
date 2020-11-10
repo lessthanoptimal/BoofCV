@@ -98,14 +98,14 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		basicTest(5, 6);
 	}
 
-	public void basicTest(int rows, int cols) {
+	public void basicTest( int rows, int cols ) {
 //		System.out.println("grid shape rows = "+ rows +" cols = "+ cols);
 
 		GrayU8 binary = createTarget(rows, cols);
 
 		GrayU8 gray = binary.clone();
 		PixelMath.multiply(gray, 200, gray);
-		PixelMath.minus(255,gray,gray);
+		PixelMath.minus(255, gray, gray);
 
 //		ShowImages.showWindow(gray,"Input");
 //		try {
@@ -113,7 +113,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 //		} catch (InterruptedException ignore) {}
 
 		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
-				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
+				polygon(new ConfigPolygonDetector(4, 4), GrayU8.class);
 		DetectChessboardSquarePoints<GrayU8> alg =
 				new DetectChessboardSquarePoints<>(rows, cols, ConfigLength.fixed(2), detectorSquare);
 
@@ -122,43 +122,43 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 
 		List<Point2D_F64> calib = alg.getCalibrationPoints().toList();
 
-		double x0 = offsetX+squareLength;
-		double y0 = offsetY+squareLength;
+		double x0 = offsetX + squareLength;
+		double y0 = offsetY + squareLength;
 
-		int pointRows = 2*(rows /2)-1+ rows %2;
-		int pointCols = 2*(cols /2)-1+ cols %2;
+		int pointRows = 2*(rows/2) - 1 + rows%2;
+		int pointCols = 2*(cols/2) - 1 + cols%2;
 
 		assertEquals(pointCols*pointRows, calib.size());
 
 		int index = 0;
 		for (int row = 0; row < pointRows; row++) {
 			for (int col = 0; col < pointCols; col++) {
-				assertTrue(calib.get(index++).distance(x0+col*squareLength,y0+row*squareLength) < 3  );
+				assertTrue(calib.get(index++).distance(x0 + col*squareLength, y0 + row*squareLength) < 3);
 			}
 		}
 	}
 
-	private GrayU8 createTarget(int rows, int cols) {
-		int squareLength2 = squareLength-2;
-		GrayU8 binary = new GrayU8(w,h);
+	private GrayU8 createTarget( int rows, int cols ) {
+		int squareLength2 = squareLength - 2;
+		GrayU8 binary = new GrayU8(w, h);
 
-		SimpleMatrix a = new SimpleMatrix(1,2);
+		SimpleMatrix a = new SimpleMatrix(1, 2);
 		a.fill(5);
 
 		// create the grid
-		for(int y = 0; y < rows; y += 2) {
-			for(int x = 0; x < cols; x += 2 ) {
-				int pixelX = x*squareLength+offsetX;
-				int pixelY = y*squareLength+offsetY;
+		for (int y = 0; y < rows; y += 2) {
+			for (int x = 0; x < cols; x += 2) {
+				int pixelX = x*squareLength + offsetX;
+				int pixelY = y*squareLength + offsetY;
 
 				ImageMiscOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength, squareLength);
 			}
 		}
 		// don't want the square touching each other
-		for(int y = 1; y < rows; y += 2) {
-			for(int x = 1; x < cols; x += 2 ) {
-				int pixelX = x*squareLength+offsetX+1;
-				int pixelY = y*squareLength+offsetY+1;
+		for (int y = 1; y < rows; y += 2) {
+			for (int x = 1; x < cols; x += 2) {
+				int pixelX = x*squareLength + offsetX + 1;
+				int pixelY = y*squareLength + offsetY + 1;
 
 				ImageMiscOps.fillRectangle(binary, 1, pixelX, pixelY, squareLength2, squareLength2);
 			}
@@ -175,14 +175,14 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		offsetX = -10;
 		offsetY = -15;
 
-		int gridWidth=4;
-		int gridHeight=5;
+		int gridWidth = 4;
+		int gridHeight = 5;
 
 		GrayU8 binary = createTarget(gridHeight, gridWidth);
 
 		GrayU8 gray = binary.clone();
 		PixelMath.multiply(gray, 200, gray);
-		PixelMath.minus(255,gray,gray);
+		PixelMath.minus(255, gray, gray);
 
 //		ShowImages.showWindow(gray, "Input");
 //		try {
@@ -190,9 +190,9 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 //		} catch (InterruptedException ignore) {}
 
 		DetectPolygonBinaryGrayRefine<GrayU8> detectorSquare = FactoryShapeDetector.
-				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
+				polygon(new ConfigPolygonDetector(4, 4), GrayU8.class);
 		DetectChessboardSquarePoints<GrayU8> alg =
-				new DetectChessboardSquarePoints<>(gridWidth,gridHeight,ConfigLength.fixed(2), detectorSquare);
+				new DetectChessboardSquarePoints<>(gridWidth, gridHeight, ConfigLength.fixed(2), detectorSquare);
 
 		assertFalse(alg.process(gray, binary));
 	}
@@ -201,7 +201,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 	public void putIntoCanonical() {
 		SquareGridTools tools = new SquareGridTools();
 
-		DetectChessboardSquarePoints alg = new DetectChessboardSquarePoints(2,2,ConfigLength.fixed(10),null);
+		DetectChessboardSquarePoints alg = new DetectChessboardSquarePoints(2, 2, ConfigLength.fixed(10), null);
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
 				SquareGrid uber = createGrid(rows, cols);
@@ -213,10 +213,10 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 				boolean oddRow = rows%2 == 1;
 				boolean oddCol = cols%2 == 1;
 
-				if( oddRow == oddCol ) {
-					if( oddRow && rows==cols ) {
+				if (oddRow == oddCol) {
+					if (oddRow && rows == cols) {
 						tools.rotateCCW(uber);
-					} else{
+					} else {
 						tools.reverse(uber);
 					}
 				}
@@ -230,10 +230,10 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 	private void checkCanonical( SquareGrid uber ) {
 		double best = uber.nodes.get(0).center.norm();
 
-		for( SquareNode n : uber.nodes ) {
-			if( n == null ) continue;
+		for (SquareNode n : uber.nodes) {
+			if (n == null) continue;
 			double d = n.center.norm();
-			if( d < best )
+			if (d < best)
 				fail("0 should be best");
 		}
 	}
@@ -241,20 +241,20 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 	@Test
 	public void ensureCCW() {
 
-		int shapes[][] = new int[][]{{4,5},{2,3},{3,2},{2,2}};
+		int shapes[][] = new int[][]{{4, 5}, {2, 3}, {3, 2}, {2, 2}};
 
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
-		for( int[]shape : shapes ) {
+		for (int[] shape : shapes) {
 //			System.out.println(shape[0]+" "+shape[1]);
-			SquareGrid grid = createGrid(shape[0],shape[1]);
+			SquareGrid grid = createGrid(shape[0], shape[1]);
 			assertTrue(isCCW((grid)));
 			assertTrue(alg.ensureCCW(grid));
 			assertTrue(isCCW((grid)));
 
-			if( grid.columns%2 == 1)
+			if (grid.columns%2 == 1)
 				alg.tools.flipColumns(grid);
-			else if( grid.rows%2 == 1)
+			else if (grid.rows%2 == 1)
 				alg.tools.flipRows(grid);
 			else
 				continue;
@@ -266,12 +266,12 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 	}
 
 	private static boolean isCCW( SquareGrid grid ) {
-		SquareNode a,b,c;
-		a=b=c=null;
+		SquareNode a, b, c;
+		a = b = c = null;
 
 		for (int i = 0; i < grid.columns; i++) {
-			if( grid.get(0,i) != null ) {
-				if( a == null )
+			if (grid.get(0, i) != null) {
+				if (a == null)
 					a = grid.get(0, i);
 				else {
 					b = grid.get(0, i);
@@ -279,7 +279,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 				}
 			}
 		}
-		if( b == null ) {
+		if (b == null) {
 			for (int i = 0; i < grid.columns; i++) {
 				if (grid.get(1, i) != null) {
 					b = grid.get(1, i);
@@ -288,17 +288,17 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		}
 
 		for (int i = 0; i < grid.columns; i++) {
-			SquareNode n = grid.get(grid.rows-1,i);
+			SquareNode n = grid.get(grid.rows - 1, i);
 
-			if( n != null ) {
+			if (n != null) {
 				c = n;
 				break;
 			}
 		}
 
-		assertTrue(a!=null);
-		assertTrue(b!=null);
-		assertTrue(c!=null);
+		assertTrue(a != null);
+		assertTrue(b != null);
+		assertTrue(c != null);
 
 		double x0 = b.center.x - a.center.x;
 		double y0 = b.center.y - a.center.y;
@@ -306,16 +306,16 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		double x1 = c.center.x - a.center.x;
 		double y1 = c.center.y - a.center.y;
 
-		double angle0 = Math.atan2(y0,x0);
-		double angle1 = Math.atan2(y1,x1);
+		double angle0 = Math.atan2(y0, x0);
+		double angle1 = Math.atan2(y1, x1);
 
-		return UtilAngle.distanceCCW(angle0,angle1) < Math.PI;
+		return UtilAngle.distanceCCW(angle0, angle1) < Math.PI;
 	}
 
 	@Test
 	public void computeCalibrationPoints() {
 
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
 		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 
@@ -326,10 +326,10 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 
 				assertTrue(alg.computeCalibrationPoints(grid));
 
-				assertEquals((rows - 1) * (cols - 1), alg.calibrationPoints.size());
+				assertEquals((rows - 1)*(cols - 1), alg.calibrationPoints.size());
 
-				double x0 =  w/2;
-				double y0 =  w/2;
+				double x0 = w/2;
+				double y0 = w/2;
 
 				int index = 0;
 				for (int i = 0; i < rows - 1; i++) {
@@ -349,11 +349,11 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 	@Test
 	public void adjustBeforeOptimize() {
 
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
-		Polygon2D_F64 polygon = new Polygon2D_F64(10,12,30,12,30,40,10,40);
+		Polygon2D_F64 polygon = new Polygon2D_F64(10, 12, 30, 12, 30, 40, 10, 40);
 
-		alg.adjustBeforeOptimize(polygon,new GrowQueue_B(),false);
+		alg.adjustBeforeOptimize(polygon, new GrowQueue_B(), false);
 
 		assertEquals(8.5, polygon.get(0).x, UtilEjml.TEST_F64);
 		assertEquals(10.5, polygon.get(0).y, UtilEjml.TEST_F64);
@@ -367,9 +367,9 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		assertEquals(8.5, polygon.get(3).x, UtilEjml.TEST_F64);
 		assertEquals(41.5, polygon.get(3).y, UtilEjml.TEST_F64);
 
-		polygon = new Polygon2D_F64(10,12,30,12,30,40,10,40);
+		polygon = new Polygon2D_F64(10, 12, 30, 12, 30, 40, 10, 40);
 		polygon.flip();
-		alg.adjustBeforeOptimize(polygon,new GrowQueue_B(),true);
+		alg.adjustBeforeOptimize(polygon, new GrowQueue_B(), true);
 
 		assertEquals(8.5, polygon.get(0).x, UtilEjml.TEST_F64);
 		assertEquals(10.5, polygon.get(0).y, UtilEjml.TEST_F64);
@@ -386,7 +386,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 
 	@Test
 	public void adjustBeforeOptimize_touchesBorder() {
-		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2,2,ConfigLength.fixed(0.01),null);
+		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
 
 		GrowQueue_B touches = new GrowQueue_B();
@@ -395,10 +395,10 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		touches.add(false);
 		touches.add(true);
 
-		for( boolean clockwise : new boolean[]{true,false} ) {
-			Polygon2D_F64 polygon = new Polygon2D_F64(10,12,30,12,30,40,10,40);
+		for (boolean clockwise : new boolean[]{true, false}) {
+			Polygon2D_F64 polygon = new Polygon2D_F64(10, 12, 30, 12, 30, 40, 10, 40);
 
-			if(clockwise)
+			if (clockwise)
 				polygon.flip();
 
 			alg.adjustBeforeOptimize(polygon, touches, clockwise);
@@ -419,7 +419,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		}
 	}
 
-	public static SquareGrid createGrid(int rows , int cols ) {
+	public static SquareGrid createGrid( int rows, int cols ) {
 		SquareGrid grid = new SquareGrid();
 		grid.columns = cols;
 		grid.rows = rows;
@@ -427,34 +427,34 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
-				if( row%2 == 0 ) {
-					if( col%2 == 0 ) {
-						grid.nodes.add( createSquare(col*w,row*w,w));
+				if (row%2 == 0) {
+					if (col%2 == 0) {
+						grid.nodes.add(createSquare(col*w, row*w, w));
 					} else {
 						grid.nodes.add(null);
 					}
 				} else {
-					if( col%2 == 0 ) {
+					if (col%2 == 0) {
 						grid.nodes.add(null);
 					} else {
-						grid.nodes.add( createSquare(col*w,row*w,w));
+						grid.nodes.add(createSquare(col*w, row*w, w));
 					}
 				}
 			}
 		}
 
-		for (int row = 0; row < rows-1; row++) {
+		for (int row = 0; row < rows - 1; row++) {
 			for (int col = 0; col < cols; col++) {
-				SquareNode n = grid.get(row,col);
-				if( n == null )
+				SquareNode n = grid.get(row, col);
+				if (n == null)
 					continue;
-				if( col > 0 ) {
-					SquareNode a = grid.get(row+1,col-1);
-					connect(n,3,a,1);
+				if (col > 0) {
+					SquareNode a = grid.get(row + 1, col - 1);
+					connect(n, 3, a, 1);
 				}
-				if( col < cols-1 ) {
-					SquareNode a = grid.get(row+1,col+1);
-					connect(n,2,a,0);
+				if (col < cols - 1) {
+					SquareNode a = grid.get(row + 1, col + 1);
+					connect(n, 2, a, 0);
 				}
 			}
 		}
@@ -462,14 +462,14 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		return grid;
 	}
 
-	public static SquareNode createSquare( double x , double y , double width ) {
+	public static SquareNode createSquare( double x, double y, double width ) {
 
 		double r = width/2;
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
-		poly.get(0).set(-r, -r);
-		poly.get(1).set( r, -r);
-		poly.get(2).set( r,  r);
-		poly.get(3).set(-r,  r);
+		poly.get(0).setTo(-r, -r);
+		poly.get(1).setTo(r, -r);
+		poly.get(2).setTo(r, r);
+		poly.get(3).setTo(-r, r);
 
 		SquareNode square = new SquareNode();
 		for (int i = 0; i < 4; i++) {
@@ -478,9 +478,9 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		}
 
 		square.square = poly;
-		square.center.set(x, y);
+		square.center.setTo(x, y);
 		square.largestSide = width;
 
 		return square;
 	}
- }
+}

@@ -73,7 +73,7 @@ class TestChessboardCornerEdgeIntensity extends BoofStandardJUnit {
 
 	private static ChessboardCorner create( double x , double y , double yaw ) {
 		ChessboardCorner c = new ChessboardCorner();
-		c.set(x,y,yaw,0);
+		c.setTo(x,y,yaw,0);
 		return c;
 	}
 }

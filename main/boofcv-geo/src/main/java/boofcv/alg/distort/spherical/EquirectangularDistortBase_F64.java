@@ -66,7 +66,7 @@ public abstract class EquirectangularDistortBase_F64 implements PixelTransform<P
 	public void setConcurrent( EquirectangularDistortBase_F64 original ) {
 		this.outWidth = original.outWidth;
 		this.R.set(original.R);
-		this.n.set(original.n);
+		this.n.setTo(original.n);
 		this.tools = original.tools;
 		this.vectors = original.vectors;
 	}

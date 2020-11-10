@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class QrCodeGenerator {
 	protected double markerWidth;
 
 	// used to toggle rendering of data
-	protected boolean renderData=true;
+	protected boolean renderData = true;
 
 	// derived constants
 	protected double moduleWidth;
@@ -56,7 +56,7 @@ public class QrCodeGenerator {
 	public QrCodeGenerator() {
 	}
 
-	public void setRender(FiducialRenderEngine render) {
+	public void setRender( FiducialRenderEngine render ) {
 		this.render = render;
 	}
 
@@ -68,16 +68,16 @@ public class QrCodeGenerator {
 		initialize(qr);
 
 		render.init();
-		positionPattern(0,0, qr.ppCorner);
-		positionPattern((numModules-7)*moduleWidth,0, qr.ppRight);
-		positionPattern(0,(numModules-7)*moduleWidth, qr.ppDown);
+		positionPattern(0, 0, qr.ppCorner);
+		positionPattern((numModules - 7)*moduleWidth, 0, qr.ppRight);
+		positionPattern(0, (numModules - 7)*moduleWidth, qr.ppDown);
 
-		timingPattern(7*moduleWidth,6*moduleWidth,moduleWidth,0);
-		timingPattern(6*moduleWidth,7*moduleWidth,0,moduleWidth);
+		timingPattern(7*moduleWidth, 6*moduleWidth, moduleWidth, 0);
+		timingPattern(6*moduleWidth, 7*moduleWidth, 0, moduleWidth);
 
 		formatInformation();
 
-		if( qr.version >= QrCode.VERSION_ENCODED_AT)
+		if (qr.version >= QrCode.VERSION_ENCODED_AT)
 			versionInformation();
 
 		// render alignment patterns
@@ -87,27 +87,27 @@ public class QrCodeGenerator {
 			int row = alignment[i];
 
 			for (int j = 0; j < alignment.length; j++) {
-				if( i == 0 && j == 0 )
+				if (i == 0 && j == 0)
 					continue;
-				if( i == alignment.length-1 && j == 0)
+				if (i == alignment.length - 1 && j == 0)
 					continue;
-				if( i == 0 && j == alignment.length-1)
+				if (i == 0 && j == alignment.length - 1)
 					continue;
 
 				int col = alignment[j];
-				alignmentPattern(col,row);
+				alignmentPattern(col, row);
 			}
 		}
 
-		if( renderData ) {
+		if (renderData) {
 
-			if( qr.rawbits.length != QrCode.VERSION_INFO[qr.version].codewords )
+			if (qr.rawbits.length != QrCode.VERSION_INFO[qr.version].codewords)
 				throw new RuntimeException("Unexpected length of raw data.");
 
 			// mark which modules can store data
 			bitLocations = new QrCodeCodeWordLocations(qr.version).bits;
 
-			int numBytes = bitLocations.size() / 8;
+			int numBytes = bitLocations.size()/8;
 			if (numBytes != qr.rawbits.length)
 				throw new RuntimeException("Egads. unexpected length of qrcode raw data");
 
@@ -115,15 +115,15 @@ public class QrCodeGenerator {
 			renderData();
 		}
 
-		qr.bounds.set(0,0,0);
-		qr.bounds.set(1,markerWidth,0);
-		qr.bounds.set(2,markerWidth,markerWidth);
-		qr.bounds.set(3,0,markerWidth);
+		qr.bounds.set(0, 0, 0);
+		qr.bounds.set(1, markerWidth, 0);
+		qr.bounds.set(2, markerWidth, markerWidth);
+		qr.bounds.set(3, 0, markerWidth);
 
 		return this;
 	}
 
-	protected void initialize(QrCode qr) {
+	protected void initialize( QrCode qr ) {
 		this.qr = qr;
 		this.numModules = QrCode.totalModules(qr.version);
 		this.moduleWidth = markerWidth/numModules;
@@ -138,48 +138,47 @@ public class QrCodeGenerator {
 		int count = 0;
 
 		int length = bitLocations.size() - bitLocations.size()%8;
-		while( count < length ) {
-			int bits = qr.rawbits[count/8]&0xFF;
+		while (count < length) {
+			int bits = qr.rawbits[count/8] & 0xFF;
 
-			int N = Math.min(8,bitLocations.size()-count);
+			int N = Math.min(8, bitLocations.size() - count);
 
 			for (int i = 0; i < N; i++) {
-				Point2D_I32 coor = bitLocations.get(count+i);
-				int value = mask.apply(coor.y,coor.x, ((bits >> i ) & 0x01));
+				Point2D_I32 coor = bitLocations.get(count + i);
+				int value = mask.apply(coor.y, coor.x, ((bits >> i) & 0x01));
 //				int value = ((bits >> i ) & 0x01);
-				if( value > 0 ) {
-					square(coor.y,coor.x);
+				if (value > 0) {
+					square(coor.y, coor.x);
 				}
 			}
 			count += 8;
 		}
-
 	}
 
-	private void positionPattern(double x , double y , Polygon2D_F64 where ) {
+	private void positionPattern( double x, double y, Polygon2D_F64 where ) {
 		// draw the outside square
-		render.square(x,y,moduleWidth*7, moduleWidth);
+		render.square(x, y, moduleWidth*7, moduleWidth);
 
 		// draw the inside square
-		render.square(x+ moduleWidth *2,y+ moduleWidth *2, moduleWidth*3);
+		render.square(x + moduleWidth*2, y + moduleWidth*2, moduleWidth*3);
 
-		where.get(0).set(x,y);
-		where.get(1).set(x+moduleWidth*7,y);
-		where.get(2).set(x+moduleWidth*7,y+moduleWidth*7);
-		where.get(3).set(x,y+moduleWidth*7);
+		where.get(0).setTo(x, y);
+		where.get(1).setTo(x + moduleWidth*7, y);
+		where.get(2).setTo(x + moduleWidth*7, y + moduleWidth*7);
+		where.get(3).setTo(x, y + moduleWidth*7);
 	}
 
-	private void timingPattern( double x , double y, double slopeX , double slopeY ) {
-		int length = numModules-7*2;
+	private void timingPattern( double x, double y, double slopeX, double slopeY ) {
+		int length = numModules - 7*2;
 
 		for (int i = 1; i < length; i += 2) {
-			render.square(x+i*slopeX,y+i*slopeY,moduleWidth);
+			render.square(x + i*slopeX, y + i*slopeY, moduleWidth);
 		}
 	}
 
 	static PackedBits32 formatInformationBits( QrCode qr ) {
 		PackedBits32 bits = new PackedBits32(15);
-		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.error,qr.mask.bits);
+		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.error, qr.mask.bits);
 		bits.data[0] ^= QrCodePolynomialMath.FORMAT_MASK;
 		return bits;
 	}
@@ -189,26 +188,26 @@ public class QrCodeGenerator {
 //		System.out.println("encoder format bits "+Integer.toBinaryString(bits.data[0]));
 
 		for (int i = 0; i < 15; i++) {
-			if( bits.get(i)==0) {
+			if (bits.get(i) == 0) {
 				continue;
 			}
-			if( i < 6 ) {
-				square(i,8);
-			} else if( i < 8) {
-				square(i+1,8);
-			} else if( i == 8 ) {
-				square( 8,7);
+			if (i < 6) {
+				square(i, 8);
+			} else if (i < 8) {
+				square(i + 1, 8);
+			} else if (i == 8) {
+				square(8, 7);
 			} else {
-				square( 8,14-i);
+				square(8, 14 - i);
 			}
 
-			if( i < 8 ) {
-				square(8,numModules-i-1);
+			if (i < 8) {
+				square(8, numModules - i - 1);
 			} else {
-				square(numModules-(15-i),8);
+				square(numModules - (15 - i), 8);
 			}
 		}
-		square(numModules-8,8);
+		square(numModules - 8, 8);
 	}
 
 	private void versionInformation() {
@@ -217,7 +216,7 @@ public class QrCodeGenerator {
 //		System.out.println("encoder version bits "+Integer.toBinaryString(bits.data[0]));
 
 		for (int i = 0; i < 18; i++) {
-			if( bits.get(i)==0) {
+			if (bits.get(i) == 0) {
 				continue;
 			}
 
@@ -225,28 +224,27 @@ public class QrCodeGenerator {
 			int col = i%3;
 
 			// top right
-			square(row,numModules-11+col);
+			square(row, numModules - 11 + col);
 			// bottom left
-			square(numModules-11+col,+row);
+			square(numModules - 11 + col, +row);
 		}
 	}
 
-	private void alignmentPattern(int gridX , int gridY ) {
+	private void alignmentPattern( int gridX, int gridY ) {
 
-		double x = (gridX-2)*moduleWidth;
-		double y = (gridY-2)*moduleWidth;
+		double x = (gridX - 2)*moduleWidth;
+		double y = (gridY - 2)*moduleWidth;
 
-		render.square(x,y,moduleWidth*5, moduleWidth);
-		render.square(x + moduleWidth*2,y + moduleWidth*2, moduleWidth);
+		render.square(x, y, moduleWidth*5, moduleWidth);
+		render.square(x + moduleWidth*2, y + moduleWidth*2, moduleWidth);
 
 		QrCode.Alignment a = qr.alignment.grow();
 		a.moduleX = gridX;
 		a.moduleY = gridY;
-		a.pixel.set( (gridX + 0.5)*moduleWidth , (gridY + 0.5)*moduleWidth );
+		a.pixel.setTo((gridX + 0.5)*moduleWidth, (gridY + 0.5)*moduleWidth);
 	}
 
-	private void square( int row , int col ) {
-		render.square(col*moduleWidth,row*moduleWidth,moduleWidth);
+	private void square( int row, int col ) {
+		render.square(col*moduleWidth, row*moduleWidth, moduleWidth);
 	}
-
 }

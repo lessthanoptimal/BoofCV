@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -242,7 +242,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 			AssociatedIndex indexes = matches.data[i];
 			PointTrack track = tracksAll.get(indexes.src);
 			Point2D_F64 loc = dstPixels.data[indexes.dst];
-			track.pixel.set(loc.x, loc.y);
+			track.pixel.setTo(loc.x, loc.y);
 			track.lastSeenFrameID = frameID;
 			tracksActive.add(track);
 
@@ -281,7 +281,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	 */
 	protected void addNewTrack( int set,  double x , double y , TD desc ) {
 		PointTrack p = tracksAll.grow();
-		p.pixel.set(x, y);
+		p.pixel.setTo(x, y);
 		((TD)p.getDescription()).setTo(desc);
 
 		p.spawnFrameID = frameID;

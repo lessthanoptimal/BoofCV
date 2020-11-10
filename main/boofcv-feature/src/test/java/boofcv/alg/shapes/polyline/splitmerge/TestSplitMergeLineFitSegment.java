@@ -160,7 +160,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 		for (int i = 0; i < 20; i++) {
 			alg.contour.add(new Point2D_I32(i, 0));
 		}
-		alg.contour.get(10).set(10,10);
+		alg.contour.get(10).setTo(10,10);
 
 		// force it to use the default of 1 pixel
 		alg.minimumSideLengthPixel = 0;

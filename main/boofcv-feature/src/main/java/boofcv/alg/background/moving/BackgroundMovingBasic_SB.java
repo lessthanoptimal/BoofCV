@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,10 +39,9 @@ import georegression.struct.InvertibleTransform;
  * @author Peter Abeles
  */
 public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends InvertibleTransform<Motion>>
-	extends BackgroundMovingBasic<T,Motion>
-{
+		extends BackgroundMovingBasic<T, Motion> {
 	// storage for background image
-	protected GrayF32 background = new GrayF32(1,1);
+	protected GrayF32 background = new GrayF32(1, 1);
 	// interpolates the input image
 	protected InterpolatePixelS<T> interpolateInput;
 	// interpolates the background image
@@ -51,10 +50,10 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 	// wrapper which provides abstraction across image types
 	protected GImageGray inputWrapper;
 
-	public BackgroundMovingBasic_SB(float learnRate, float threshold,
-									Point2Transform2Model_F32<Motion> transform,
-									InterpolationType interpType,
-									Class<T> imageType) {
+	public BackgroundMovingBasic_SB( float learnRate, float threshold,
+									 Point2Transform2Model_F32<Motion> transform,
+									 InterpolationType interpType,
+									 Class<T> imageType ) {
 		super(learnRate, threshold, transform, ImageType.single(imageType));
 
 		this.interpolateInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
@@ -76,11 +75,11 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 	}
 
 	@Override
-	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
-		background.reshape(backgroundWidth,backgroundHeight);
-		ImageMiscOps.fill(background,Float.MAX_VALUE);
+	public void initialize( int backgroundWidth, int backgroundHeight, Motion homeToWorld ) {
+		background.reshape(backgroundWidth, backgroundHeight);
+		ImageMiscOps.fill(background, Float.MAX_VALUE);
 
-		this.homeToWorld.set(homeToWorld);
+		this.homeToWorld.setTo(homeToWorld);
 		this.homeToWorld.invert(worldToHome);
 
 		this.backgroundWidth = backgroundWidth;
@@ -89,11 +88,11 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 
 	@Override
 	public void reset() {
-		ImageMiscOps.fill(background,Float.MAX_VALUE);
+		ImageMiscOps.fill(background, Float.MAX_VALUE);
 	}
 
 	@Override
-	protected void updateBackground(int x0, int y0, int x1, int y1, T frame) {
+	protected void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
@@ -101,14 +100,14 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 
 		for (int y = y0; y < y1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0;
-			for (int x = x0; x < x1; x++, indexBG++ ) {
-				transform.compute(x,y,work);
+			for (int x = x0; x < x1; x++, indexBG++) {
+				transform.compute(x, y, work);
 
-				if( work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
-					float value = interpolateInput.get(work.x,work.y);
+				if (work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
+					float value = interpolateInput.get(work.x, work.y);
 					float bg = background.data[indexBG];
 
-					if( bg == Float.MAX_VALUE ) {
+					if (bg == Float.MAX_VALUE) {
 						background.data[indexBG] = value;
 					} else {
 						background.data[indexBG] = minusLearn*bg + learnRate*value;
@@ -119,7 +118,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
+	protected void _segment( Motion currentToWorld, T frame, GrayU8 segmented ) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
@@ -129,18 +128,18 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 			int indexFrame = frame.startIndex + y*frame.stride;
 			int indexSegmented = segmented.startIndex + y*segmented.stride;
 
-			for (int x = 0; x < frame.width; x++, indexFrame++ , indexSegmented++ ) {
-				transform.compute(x,y,work);
+			for (int x = 0; x < frame.width; x++, indexFrame++, indexSegmented++) {
+				transform.compute(x, y, work);
 
-				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-					float bg = interpolationBG.get(work.x,work.y);
+				if (work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
+					float bg = interpolationBG.get(work.x, work.y);
 					float pixelFrame = inputWrapper.getF(indexFrame);
 
-					if( bg == Float.MAX_VALUE ) {
+					if (bg == Float.MAX_VALUE) {
 						segmented.data[indexSegmented] = unknownValue;
 					} else {
 						float diff = bg - pixelFrame;
-						if (diff * diff <= thresholdSq) {
+						if (diff*diff <= thresholdSq) {
 							segmented.data[indexSegmented] = 0;
 						} else {
 							segmented.data[indexSegmented] = 1;
@@ -153,6 +152,4 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 			}
 		}
 	}
-
-
 }

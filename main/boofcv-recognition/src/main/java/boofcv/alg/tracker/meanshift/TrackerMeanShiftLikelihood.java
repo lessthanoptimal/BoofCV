@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 	 * @param location new location
 	 */
 	public void setTrackLocation( RectangleLength2D_I32 location ) {
-		this.location.set(location);
+		this.location.setTo(location);
 
 		// massage the rectangle so that it has an odd width and height
 		// otherwise it could experience a bias when localizing
@@ -146,7 +146,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase<T>> {
 		targetModel.setImage(image);
 
 		// mark the region where the pdf has been modified as dirty
-		dirty.set(location.x0, location.y0, location.x0 + location.width, location.y0 + location.height);
+		dirty.setTo(location.x0, location.y0, location.x0 + location.width, location.y0 + location.height);
 		// compute the pdf inside the initial rectangle
 		updatePdfImage(location.x0 , location.y0 , location.x0+location.width , location.y0+location.height);
 

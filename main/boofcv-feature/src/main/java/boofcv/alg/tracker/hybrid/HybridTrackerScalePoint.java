@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc>
-{
+public class HybridTrackerScalePoint<I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc> {
 	// The max number of allowed unassociated tracks before it starts to drop them
 	public int maxInactiveTracks = 200;
 	// Used to select tracks to drop
@@ -59,13 +58,13 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	protected int imageWidth, imageHeight;
 
 	/** The KLT tracker used to perform the nominal track update */
-	protected @Getter PyramidKltForHybrid<I,D> trackerKlt;
+	protected @Getter PyramidKltForHybrid<I, D> trackerKlt;
 
 	// tolerance for forwards-backwards validation for KLT tracks in pixels at level 0. disabled if < 0
-	protected double toleranceFB=-1; // TODO implement this
+	protected double toleranceFB = -1; // TODO implement this
 
 	/** feature detector and describer */
-	protected @Getter DetectDescribePoint<I,TD> detector;
+	protected @Getter DetectDescribePoint<I, TD> detector;
 	/** Used to associate features using their DDA description */
 	protected @Getter AssociateDescriptionSets2D<TD> associate;
 
@@ -76,9 +75,9 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	protected @Getter FastArray<HybridTrack<TD>> tracksActive = new FastArray(HybridTrack.class);
 	/** tracks not visible in the current frame and were not updated */
 	protected @Getter FastArray<HybridTrack<TD>> tracksInactive = new FastArray(HybridTrack.class);
-	 /** recently spawned tracks */
+	/** recently spawned tracks */
 	protected @Getter List<HybridTrack<TD>> tracksSpawned = new ArrayList<>();
-	 /** tracks which were dropped this frame */
+	/** tracks which were dropped this frame */
 	protected @Getter List<HybridTrack<TD>> tracksDropped = new ArrayList<>();
 
 	// local storage used by association
@@ -107,27 +106,28 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	 * @param associate Association algorithm
 	 * @param tooCloseRadius If tracks are less than or equal to this distance to each other some will be pruned
 	 */
-	public HybridTrackerScalePoint(PyramidKltForHybrid<I, D> trackerKlt,
-								   DetectDescribePoint<I,TD> detector,
-								   AssociateDescription2D<TD> associate,
-								   int tooCloseRadius) {
-		if( !associate.uniqueDestination() || !associate.uniqueSource() )
+	public HybridTrackerScalePoint( PyramidKltForHybrid<I, D> trackerKlt,
+									DetectDescribePoint<I, TD> detector,
+									AssociateDescription2D<TD> associate,
+									int tooCloseRadius ) {
+		if (!associate.uniqueDestination() || !associate.uniqueSource())
 			throw new IllegalArgumentException("Associations must be unique");
 
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 
 		detectedDesc = new FastArray<>(detector.getDescriptionType());
-		knownDesc = new FastArray<>( detector.getDescriptionType());
+		knownDesc = new FastArray<>(detector.getDescriptionType());
 
-		this.associate = new AssociateDescriptionSets2D<>(associate,detector.getDescriptionType());
+		this.associate = new AssociateDescriptionSets2D<>(associate, detector.getDescriptionType());
 		this.associate.initialize(detector.getNumberOfSets());
 
 		this.tracksAll = new FastQueue<>(this::createNewTrack);
-		if( tooCloseRadius > 0 ) {
+		if (tooCloseRadius > 0) {
 			this.pruneClose = new PruneCloseTracks<>(tooCloseRadius, new PruneCloseTracks.TrackInfo<>() {
-				@Override public void getLocation(HybridTrack<TD> track, Point2D_F64 l) {l.set(track.pixel);}
-				@Override public long getID(HybridTrack<TD> track) {return track.featureId;}
+				@Override public void getLocation( HybridTrack<TD> track, Point2D_F64 l ) {l.setTo(track.pixel);}
+
+				@Override public long getID( HybridTrack<TD> track ) {return track.featureId;}
 			});
 		}
 	}
@@ -140,7 +140,6 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 		track.descriptor = detector.createDescription();
 		return track;
 	}
-
 
 	/**
 	 * Sets the tracker into its initial state.  Previously declared track data structures are saved
@@ -160,15 +159,14 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	 * @param derivX Derivative pyramid of input x-axis
 	 * @param derivY Derivative pyramid of input y-axis
 	 */
-	public void updateTracks( PyramidDiscrete<I> pyramid ,
+	public void updateTracks( PyramidDiscrete<I> pyramid,
 							  D[] derivX,
-							  D[] derivY )
-	{
+							  D[] derivY ) {
 		this.imageWidth = pyramid.getInputWidth();
 		this.imageHeight = pyramid.getInputWidth();
 		this.tracksDropped.clear();
 		this.tracksSpawned.clear();
-		if( frameID == -1 )
+		if (frameID == -1)
 			associate.initialize(imageWidth, imageHeight);
 
 		frameID++;
@@ -178,16 +176,16 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 		trackerKlt.setInputs(pyramid, derivX, derivY);
 
 		// TODO add forwards-backwards validation
-		for( int i = tracksActive.size()-1; i >= 0; i-- ) {
+		for (int i = tracksActive.size() - 1; i >= 0; i--) {
 			HybridTrack<TD> track = tracksActive.get(i);
 
-			if( !trackerKlt.performTracking(track.trackKlt) ) {
+			if (!trackerKlt.performTracking(track.trackKlt)) {
 				// The track got dropped by KLT but will still be around as an inactive track
 				tracksActive.removeSwap(i);
 				tracksInactive.add(track);
 			} else {
 				track.lastSeenFrameID = frameID;
-				track.pixel.set(track.trackKlt.x,track.trackKlt.y);
+				track.pixel.setTo(track.trackKlt.x, track.trackKlt.y);
 			}
 		}
 	}
@@ -197,11 +195,11 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	 * information is added by each track
 	 */
 	public void pruneActiveTracksWhichAreTooClose() {
-		if( pruneClose == null )
+		if (pruneClose == null)
 			return;
 
 		pruneClose.init(imageWidth, imageHeight);
-		pruneClose.process(tracksActive.toList(),closeDropped);
+		pruneClose.process(tracksActive.toList(), closeDropped);
 
 		for (int dropIdx = 0; dropIdx < closeDropped.size(); dropIdx++) {
 			HybridTrack<TD> track = closeDropped.get(dropIdx);
@@ -227,7 +225,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 		detectedPixels.resize(N);
 
 		// create a list of detected feature descriptions
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			detectedDesc.data[i] = detector.getDescription(i);
 			detectedSet.data[i] = detector.getSet(i);
 			detectedPixels.data[i] = detector.getLocation(i);
@@ -246,8 +244,8 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 		}
 
 		// associate features
-		UtilFeature.setSource(knownDesc,knownSet,knownPixels,associate);
-		UtilFeature.setDestination(detectedDesc,detectedSet,detectedPixels,associate);
+		UtilFeature.setSource(knownDesc, knownSet, knownPixels, associate);
+		UtilFeature.setDestination(detectedDesc, detectedSet, detectedPixels, associate);
 		associate.associate();
 
 		// Re-active / re-initial all non pure KLT tracks
@@ -263,23 +261,23 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 			// detected tracks match the original one to a very high level of accuracy it's better to just
 			// re-init all non pure KLT tracks
 			boolean active = track.lastSeenFrameID == frameID;
-			if( !track.respawned && active) { // skip pure KLT tracks
+			if (!track.respawned && active) { // skip pure KLT tracks
 				continue;
 			}
 
 			// re-active the track and update it's state
 			track.respawned = true;
 			track.lastSeenFrameID = frameID;
-			track.pixel.set(detectedPixel);
-			trackerKlt.setDescription((float)detectedPixel.x,(float)detectedPixel.y,track.trackKlt);
-			if( !active ) { // don't add the same track twice to the active list
+			track.pixel.setTo(detectedPixel);
+			trackerKlt.setDescription((float)detectedPixel.x, (float)detectedPixel.y, track.trackKlt);
+			if (!active) { // don't add the same track twice to the active list
 				tracksActive.add(track);
 			}
 		}
 
 		// Updated inactive list by removing tracks which have become active
-		for (int i = tracksInactive.size()-1; i >= 0; i--) {
-			if( tracksInactive.get(i).lastSeenFrameID == frameID ) {
+		for (int i = tracksInactive.size() - 1; i >= 0; i--) {
+			if (tracksInactive.get(i).lastSeenFrameID == frameID) {
 				tracksInactive.removeSwap(i);
 			}
 		}
@@ -293,7 +291,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 		GrowQueue_I32 unassociatedDetected = associate.getUnassociatedDestination();
 
 		// spawn new tracks for unassociated detected features
-		for( int unassociatedIdx = 0; unassociatedIdx < unassociatedDetected.size; unassociatedIdx++ ) {
+		for (int unassociatedIdx = 0; unassociatedIdx < unassociatedDetected.size; unassociatedIdx++) {
 			int detectedIdx = unassociatedDetected.get(unassociatedIdx);
 
 			Point2D_F64 p = detectedPixels.data[detectedIdx];
@@ -301,17 +299,17 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 			HybridTrack<TD> track = tracksAll.grow();
 
 			// KLT track descriptor shape isn't known until after the first image has been processed
-			if( track.trackKlt == null)
+			if (track.trackKlt == null)
 				track.trackKlt = trackerKlt.createNewTrack();
 			// create the descriptor for KLT tracking
-			trackerKlt.setDescription((float)p.x,(float)p.y,track.trackKlt);
+			trackerKlt.setDescription((float)p.x, (float)p.y, track.trackKlt);
 			// set track ID and location
 			track.respawned = false;
 			track.spawnFrameID = track.lastSeenFrameID = frameID;
 			track.featureId = totalTracks++;
 			track.descriptor.setTo(detectedDesc.get(detectedIdx));
 			track.detectorSetId = detectedSet.get(detectedIdx);
-			track.pixel.set(p);
+			track.pixel.setTo(p);
 
 			// update list of active tracks
 			tracksActive.add(track);
@@ -323,8 +321,8 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	 * If there are too many inactive tracks drop some of them
 	 */
 	public void dropExcessiveInactiveTracks() {
-		if( tracksInactive.size() > maxInactiveTracks ) {
-			int numDrop = tracksInactive.size()-maxInactiveTracks;
+		if (tracksInactive.size() > maxInactiveTracks) {
+			int numDrop = tracksInactive.size() - maxInactiveTracks;
 			for (int i = 0; i < numDrop; i++) {
 				// Randomly select tracks to drop
 				int selectedIdx = rand.nextInt(tracksInactive.size());
@@ -345,7 +343,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 	 */
 	public boolean dropTrack( HybridTrack<TD> track ) {
 		int index = tracksAll.indexOf(track);
-		if( index < 0 )
+		if (index < 0)
 			return false;
 		HybridTrack<TD> dropped = dropTrackByAllIndex(index);
 		assert dropped == track;
@@ -354,6 +352,7 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 
 	/**
 	 * Drops the track using its index in all. Note that removeSwap is used so the order will change
+	 *
 	 * @return The dropped track
 	 */
 	public HybridTrack<TD> dropTrackByAllIndex( int index ) {
@@ -366,14 +365,14 @@ public class HybridTrackerScalePoint <I extends ImageGray<I>, D extends ImageGra
 		{
 			// TODO update code when ddogleg adds a remove function
 			int indexActive = tracksActive.indexOf(track);
-			if( indexActive >= 0 ) {
+			if (indexActive >= 0) {
 				found = true;
 				tracksActive.remove(indexActive);
 			}
 		}
-		if( !found ) {
+		if (!found) {
 			int indexInactive = tracksInactive.indexOf(track);
-			if( indexInactive >= 0 ) {
+			if (indexInactive >= 0) {
 				found = true;
 				tracksInactive.remove(indexInactive);
 			}

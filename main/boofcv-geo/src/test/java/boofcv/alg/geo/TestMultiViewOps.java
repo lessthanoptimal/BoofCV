@@ -406,9 +406,9 @@ class TestMultiViewOps extends BoofStandardJUnit {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		line1.set(computeLine(X, X2, new Se3_F64(), null));
-		line2.set(computeLine(X, X2, worldToCam2, K));
-		line3.set(computeLine(X, X2, worldToCam3, K));
+		line1.setTo(computeLine(X, X2, new Se3_F64(), null));
+		line2.setTo(computeLine(X, X2, worldToCam2, K));
+		line3.setTo(computeLine(X, X2, worldToCam3, K));
 	}
 
 	private Vector3D_F64 computeLine( Point3D_F64 X1, Point3D_F64 X2, Se3_F64 worldToCam, DMatrixRMaj K ) {
@@ -1346,7 +1346,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	void splits3Lists() {
 		FastQueue<AssociatedTriple> triples = new FastQueue<>(AssociatedTriple::new);
 		for (int i = 0; i < 8; i++) {
-			triples.grow().set(
+			triples.grow().setTo(
 					rand.nextGaussian(), rand.nextGaussian(),
 					rand.nextGaussian(), rand.nextGaussian(),
 					rand.nextGaussian(), rand.nextGaussian());
@@ -1376,7 +1376,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	void convertTr_pair() {
 		var triples = new FastQueue<>(AssociatedTriple::new);
 		for (int i = 0; i < 8; i++) {
-			triples.grow().set(
+			triples.grow().setTo(
 					rand.nextGaussian(), rand.nextGaussian(),
 					rand.nextGaussian(), rand.nextGaussian(),
 					rand.nextGaussian(), rand.nextGaussian());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,7 +136,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 				TupleDesc_F64 desc = descriptors.grow();
 
 				computeDescriptor(x, y, desc);
-				sampleLocations.grow().set(x, y);
+				sampleLocations.grow().setTo(x, y);
 			}
 		}
 	}

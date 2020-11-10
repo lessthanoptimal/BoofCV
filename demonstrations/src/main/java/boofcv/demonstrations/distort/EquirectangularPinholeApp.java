@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -345,7 +345,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 				int y = (y1-y0)*i/segments + y0;
 
 				distorter.compute(x,y,distored);
-				corners[i+offset].set(distored.x,distored.y);
+				corners[i+offset].setTo(distored.x,distored.y);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ public class RefinePolyLineCorner {
 	 * @param looping true if it loops or false if not
 	 * @param maxIterations Number of internal EM iterations
 	 */
-	public RefinePolyLineCorner(boolean looping, int maxIterations) {
+	public RefinePolyLineCorner( boolean looping, int maxIterations ) {
 		this.looping = looping;
 		this.maxIterations = maxIterations;
 	}
@@ -78,7 +78,7 @@ public class RefinePolyLineCorner {
 	/**
 	 * Constructor using default parameters
 	 */
-	public RefinePolyLineCorner(boolean looping) {
+	public RefinePolyLineCorner( boolean looping ) {
 		this.looping = looping;
 	}
 
@@ -89,33 +89,32 @@ public class RefinePolyLineCorner {
 	 * @param contour Contours around the shape
 	 * @param corners (Input) initial set of corners.  (output) refined set of corners
 	 */
-	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 corners )
-	{
-		if( corners.size() < 3 ) {
+	public boolean fit( List<Point2D_I32> contour, GrowQueue_I32 corners ) {
+		if (corners.size() < 3) {
 			return false;
 		}
-		searchRadius = Math.min(6,Math.max(contour.size()/12,3));
+		searchRadius = Math.min(6, Math.max(contour.size()/12, 3));
 
-		int startCorner,endCorner;
-		if( looping ) {
+		int startCorner, endCorner;
+		if (looping) {
 			startCorner = 0;
 			endCorner = corners.size;
 		} else {
 			// the end point positions are fixed
 			startCorner = 1;
-			endCorner = corners.size-1;
+			endCorner = corners.size - 1;
 		}
 
 		boolean change = true;
-		for( int iteration = 0; iteration < maxIterations && change; iteration++ ) {
+		for (int iteration = 0; iteration < maxIterations && change; iteration++) {
 			change = false;
 			for (int i = startCorner; i < endCorner; i++) {
 				int c0 = CircularIndex.minusPOffset(i, 1, corners.size());
 				int c2 = CircularIndex.plusPOffset(i, 1, corners.size());
 
 				int improved = optimize(contour, corners.get(c0), corners.get(i), corners.get(c2));
-				if( improved != corners.get(i)) {
-					corners.set(i,improved);
+				if (improved != corners.get(i)) {
+					corners.set(i, improved);
 					change = true;
 				}
 			}
@@ -124,21 +123,20 @@ public class RefinePolyLineCorner {
 		return true;
 	}
 
-
 	/**
 	 * Searches around the current c1 point for the best place to put the corner
 	 *
 	 * @return location of best corner in local search region
 	 */
-	protected int optimize( List<Point2D_I32> contour , int c0,int c1,int c2 ) {
+	protected int optimize( List<Point2D_I32> contour, int c0, int c1, int c2 ) {
 
-		double bestDistance = computeCost(contour,c0,c1,c2,0);
+		double bestDistance = computeCost(contour, c0, c1, c2, 0);
 		int bestIndex = 0;
-		for( int i = -searchRadius; i <= searchRadius; i++ ) {
-			if( i == 0 ) {
+		for (int i = -searchRadius; i <= searchRadius; i++) {
+			if (i == 0) {
 				// if it found a better point in the first half stop the search since that's probably the correct
 				// direction.  Could be improved by remember past search direction
-				if( bestIndex != 0 )
+				if (bestIndex != 0)
 					break;
 			} else {
 				double found = computeCost(contour, c0, c1, c2, i);
@@ -153,6 +151,7 @@ public class RefinePolyLineCorner {
 
 	/**
 	 * Computes the distance between the two lines defined by corner points in the contour
+	 *
 	 * @param contour list of contour points
 	 * @param c0 end point of line 0
 	 * @param c1 start of line 0 and 1
@@ -160,45 +159,44 @@ public class RefinePolyLineCorner {
 	 * @param offset added to c1 to make start of lines
 	 * @return sum of distance of points along contour
 	 */
-	protected double computeCost(List<Point2D_I32> contour, int c0, int c1, int c2,
-							   int offset)
-	{
+	protected double computeCost( List<Point2D_I32> contour, int c0, int c1, int c2,
+								  int offset ) {
 		c1 = CircularIndex.addOffset(c1, offset, contour.size());
-		createLine(c0,c1,contour,line0);
-		createLine(c1,c2,contour,line1);
-		return distanceSum(line0,c0,c1,contour)+distanceSum(line1,c1,c2,contour);
+		createLine(c0, c1, contour, line0);
+		createLine(c1, c2, contour, line1);
+		return distanceSum(line0, c0, c1, contour) + distanceSum(line1, c1, c2, contour);
 	}
 
 	/**
 	 * Sum of Euclidean distance of contour points along the line
 	 */
-	protected double distanceSum( LineGeneral2D_F64 line , int c0 , int c1 , List<Point2D_I32> contour ) {
+	protected double distanceSum( LineGeneral2D_F64 line, int c0, int c1, List<Point2D_I32> contour ) {
 		double total = 0;
-		if( c0 < c1  ) {
-			int length = c1-c0+1;
-			int samples = Math.min(maxLineSamples,length);
+		if (c0 < c1) {
+			int length = c1 - c0 + 1;
+			int samples = Math.min(maxLineSamples, length);
 
 			for (int i = 0; i < samples; i++) {
-				int index = c0 + i*(length-1)/(samples-1);
-				total += distance(line,contour.get(index));
+				int index = c0 + i*(length - 1)/(samples - 1);
+				total += distance(line, contour.get(index));
 			}
 		} else {
-			int lengthFirst = contour.size()-c0;
-			int lengthSecond = c1+1;
+			int lengthFirst = contour.size() - c0;
+			int lengthSecond = c1 + 1;
 
-			int length = lengthFirst+c1+1;
-			int samples = Math.min(maxLineSamples,length);
+			int length = lengthFirst + c1 + 1;
+			int samples = Math.min(maxLineSamples, length);
 
 			int samplesFirst = samples*lengthFirst/length;
 			int samplesSecond = samples*lengthSecond/length;
 
 			for (int i = 0; i < samplesFirst; i++) {
-				int index = c0 + i*lengthFirst/(samples-1);
-				total += distance(line,contour.get(index));
+				int index = c0 + i*lengthFirst/(samples - 1);
+				total += distance(line, contour.get(index));
 			}
 			for (int i = 0; i < samplesSecond; i++) {
-				int index = i*lengthSecond/(samples-1);
-				total += distance(line,contour.get(index));
+				int index = i*lengthSecond/(samples - 1);
+				total += distance(line, contour.get(index));
 			}
 		}
 		return total;
@@ -207,26 +205,25 @@ public class RefinePolyLineCorner {
 	/**
 	 * If A*A + B*B == 1 then a simplified distance formula can be used
 	 */
-	protected static double distance( LineGeneral2D_F64 line , Point2D_I32 p ) {
+	protected static double distance( LineGeneral2D_F64 line, Point2D_I32 p ) {
 		return Math.abs(line.A*p.x + line.B*p.y + line.C);
 	}
 
 	/**
 	 * Given segment information create a line in general notation which has been normalized
 	 */
-	private void createLine( int index0 , int index1 , List<Point2D_I32> contour , LineGeneral2D_F64 line )
-	{
-		if( index1 < 0 )
+	private void createLine( int index0, int index1, List<Point2D_I32> contour, LineGeneral2D_F64 line ) {
+		if (index1 < 0)
 			System.out.println("SHIT");
 		Point2D_I32 p0 = contour.get(index0);
 		Point2D_I32 p1 = contour.get(index1);
 
 //		System.out.println("createLine "+p0+" "+p1);
 
-		work.a.set(p0.x, p0.y);
-		work.b.set(p1.x, p1.y);
+		work.a.setTo(p0.x, p0.y);
+		work.b.setTo(p1.x, p1.y);
 
-		UtilLine2D_F64.convert(work,line);
+		UtilLine2D_F64.convert(work, line);
 
 		// ensure A*A + B*B = 1
 		line.normalize();

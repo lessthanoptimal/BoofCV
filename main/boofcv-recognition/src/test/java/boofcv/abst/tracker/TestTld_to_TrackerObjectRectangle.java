@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageType;
 /**
  * @author Peter Abeles
  */
-public class TestTld_to_TrackerObjectRectangle extends TextureGrayTrackerObjectRectangleTests {
+public class TestTld_to_TrackerObjectRectangle extends TextureGrayTrackerObjectRectangleChecks {
 
 	public TestTld_to_TrackerObjectRectangle() {
 		tolScale = 0.15;

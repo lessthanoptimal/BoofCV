@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,16 +90,16 @@ public class ClusterLabeledImage extends RegionMergeTree {
 			setUpEdges8(input,edgesIn);
 			setUpEdges8(output,edgesOut);
 
-			edges[0].set( 1, 0);
-			edges[1].set( 1, 1);
-			edges[2].set( 0, 1);
-			edges[3].set(-1, 0);
+			edges[0].setTo( 1, 0);
+			edges[1].setTo( 1, 1);
+			edges[2].setTo( 0, 1);
+			edges[3].setTo(-1, 0);
 		} else {
 			setUpEdges4(input,edgesIn);
 			setUpEdges4(output,edgesOut);
 
-			edges[0].set( 1,0);
-			edges[1].set( 0, 1);
+			edges[0].setTo( 1,0);
+			edges[1].setTo( 0, 1);
 		}
 	}
 

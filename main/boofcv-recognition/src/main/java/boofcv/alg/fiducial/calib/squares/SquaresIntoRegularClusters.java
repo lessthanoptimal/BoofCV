@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,17 +70,18 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 
 	/**
 	 * Declares data structures and configures algorithm
+	 *
 	 * @param spaceToSquareRatio Ratio of space between squares to square lengths
 	 * @param maxNeighbors The maximum number of neighbors it will look at when connecting a node
 	 * @param maxNeighborDistanceRatio Maximum distance away a neighbor can be from a square to be connected.  Relative
-	 *                                 to the size of the square.  Try 1.35
+	 * to the size of the square.  Try 1.35
 	 */
-	public SquaresIntoRegularClusters(double spaceToSquareRatio, int maxNeighbors, double maxNeighborDistanceRatio) {
+	public SquaresIntoRegularClusters( double spaceToSquareRatio, int maxNeighbors, double maxNeighborDistanceRatio ) {
 		this.spaceToSquareRatio = spaceToSquareRatio;
 		this.maxNeighbors = maxNeighbors;
 		//  avoid a roll over later on in the code
-		if( this.maxNeighbors == Integer.MAX_VALUE ) {
-			this.maxNeighbors = Integer.MAX_VALUE-1;
+		if (this.maxNeighbors == Integer.MAX_VALUE) {
+			this.maxNeighbors = Integer.MAX_VALUE - 1;
 		}
 		this.maxNeighborDistanceRatio = maxNeighborDistanceRatio;
 	}
@@ -88,10 +89,11 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	/**
 	 * Processes the unordered set of squares and creates a graph out of them using prior knowledge and geometric
 	 * constraints.
+	 *
 	 * @param squares Set of squares
 	 * @return List of graphs.  All data structures are recycled on the next call to process().
 	 */
-	public List<List<SquareNode>> process(List<Polygon2D_F64> squares ) {
+	public List<List<SquareNode>> process( List<Polygon2D_F64> squares ) {
 		recycleData();
 
 		// set up nodes
@@ -115,8 +117,8 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			n.reset();
 			n.square = squares.get(i);
 
-			if( n.square.size() != 4 )
-				throw new RuntimeException("Squares have four corners not "+n.square.size());
+			if (n.square.size() != 4)
+				throw new RuntimeException("Squares have four corners not " + n.square.size());
 
 			graph.computeNodeInfo(n);
 		}
@@ -136,7 +138,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			// distance between center when viewed head on will be space + 0.5*2*width.
 			// when you factor in foreshortening this search will not be symmetric
 			// the smaller will miss its larger neighbor but the larger one will find the smaller one.
-			double neighborDistance = n.largestSide*(1.0+spaceToSquareRatio)*maxNeighborDistanceRatio;
+			double neighborDistance = n.largestSide*(1.0 + spaceToSquareRatio)*maxNeighborDistanceRatio;
 
 			// find it's neighbors
 			searchResults.reset();
@@ -145,7 +147,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			// try to attach it's closest neighbors
 			for (int j = 0; j < searchResults.size(); j++) {
 				NnData<SquareNode> neighbor = searchResults.get(j);
-				if( neighbor.point != n )
+				if (neighbor.point != n)
 					considerConnect(n, neighbor.point);
 			}
 		}
@@ -166,7 +168,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		}
 
 
-		while( !open.isEmpty() ) {
+		while (!open.isEmpty()) {
 			for (int i = 0; i < open.size(); i++) {
 				SquareNode n = open.get(i);
 				checkDisconnectSingleEdge(open2, n);
@@ -179,11 +181,11 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		}
 	}
 
-	private void checkDisconnectSingleEdge(List<SquareNode> open, SquareNode n) {
-		if( n.getNumberOfConnections() == 1 )  {
+	private void checkDisconnectSingleEdge( List<SquareNode> open, SquareNode n ) {
+		if (n.getNumberOfConnections() == 1) {
 			for (int j = 0; j < n.square.size(); j++) {
-				if( n.edges[j] != null ) {
-					open.add( n.edges[j].destination(n));
+				if (n.edges[j] != null) {
+					open.add(n.edges[j].destination(n));
 					graph.detachEdge(n.edges[j]);
 					break;
 				}
@@ -195,35 +197,35 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 * Sets up data structures for nearest-neighbor search used in {@link #connectNodes()}
 	 */
 	private void setupSearch() {
-		nn.setPoints(nodes.toList(),false);
+		nn.setPoints(nodes.toList(), false);
 	}
 
 	/**
 	 * Returns true if point p1 and p2 are close to the line defined by points p0 and p3.
 	 */
-	boolean areMiddlePointsClose( Point2D_F64 p0 , Point2D_F64 p1 , Point2D_F64 p2 , Point2D_F64 p3 ) {
-		UtilLine2D_F64.convert(p0,p3,line);
+	boolean areMiddlePointsClose( Point2D_F64 p0, Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3 ) {
+		UtilLine2D_F64.convert(p0, p3, line);
 
 		// (computed expected length of a square) * (fractional tolerance)
 		double tol1 = p0.distance(p1)*distanceTol;
 
 		// see if inner points are close to the line
-		if(Distance2D_F64.distance(line, p1) > tol1 )
+		if (Distance2D_F64.distance(line, p1) > tol1)
 			return false;
 
 		double tol2 = p2.distance(p3)*distanceTol;
 
-		if( Distance2D_F64.distance(lineB, p2) > tol2 )
+		if (Distance2D_F64.distance(lineB, p2) > tol2)
 			return false;
 
 		//------------ Now see if the line defined by one side of a square is close to the closest point on the same
 		//             side on the other square
-		UtilLine2D_F64.convert(p0,p1,line);
-		if(Distance2D_F64.distance(line, p2) > tol2 )
+		UtilLine2D_F64.convert(p0, p1, line);
+		if (Distance2D_F64.distance(line, p2) > tol2)
 			return false;
 
-		UtilLine2D_F64.convert(p3,p2,line);
-		if(Distance2D_F64.distance(line, p1) > tol1 )
+		UtilLine2D_F64.convert(p3, p2, line);
+		if (Distance2D_F64.distance(line, p1) > tol1)
 			return false;
 
 		return true;
@@ -232,18 +234,18 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	/**
 	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
 	 */
-	void considerConnect(SquareNode node0, SquareNode node1) {
+	void considerConnect( SquareNode node0, SquareNode node1 ) {
 
 		// Find the side on each line which intersects the line connecting the two centers
 		lineA.a = node0.center;
 		lineA.b = node1.center;
 
-		int intersection0 = graph.findSideIntersect(node0,lineA,intersection,lineB);
-		connectLine.a.set(intersection);
-		int intersection1 = graph.findSideIntersect(node1,lineA,intersection,lineB);
-		connectLine.b.set(intersection);
+		int intersection0 = graph.findSideIntersect(node0, lineA, intersection, lineB);
+		connectLine.a.setTo(intersection);
+		int intersection1 = graph.findSideIntersect(node1, lineA, intersection, lineB);
+		connectLine.b.setTo(intersection);
 
-		if( intersection1 < 0 || intersection0 < 0 ) {
+		if (intersection1 < 0 || intersection0 < 0) {
 			return;
 		}
 
@@ -254,7 +256,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		double sideLoc0 = connectLine.a.distance(node0.square.get(intersection0))/side0;
 		double sideLoc1 = connectLine.b.distance(node1.square.get(intersection1))/side1;
 
-		if( Math.abs(sideLoc0-0.5)>0.35 || Math.abs(sideLoc1-0.5)>0.35 )
+		if (Math.abs(sideLoc0 - 0.5) > 0.35 || Math.abs(sideLoc1 - 0.5) > 0.35)
 			return;
 
 		// seems to be about 1/2 the length typically
@@ -270,7 +272,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 //			return;
 
 		// see if connecting sides are of similar size
-		if( Math.abs(side0-side1)/Math.max(side0,side1) > 0.25 ) {
+		if (Math.abs(side0 - side1)/Math.max(side0, side1) > 0.25) {
 			return;
 		}
 //
@@ -288,15 +290,15 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		// Checks to see if the two sides selected above are closest to being parallel to each other.
 		// Perspective distortion will make the lines not parallel, but will still have a smaller
 		// acute angle than the adjacent sides
-		if( !graph.almostParallel(node0, intersection0, node1, intersection1)) {
+		if (!graph.almostParallel(node0, intersection0, node1, intersection1)) {
 			return;
 		}
 
-		double ratio = Math.max(node0.smallestSide/node1.largestSide ,
+		double ratio = Math.max(node0.smallestSide/node1.largestSide,
 				node1.smallestSide/node0.largestSide);
 
 //		System.out.println("ratio "+ratio);
-		if( ratio > 1.3 )
+		if (ratio > 1.3)
 			return;
 
 		// See if they are crudely the same size
@@ -320,8 +322,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 //				node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)))) {
 //			return;
 //		}
-		graph.checkConnect(node0,intersection0,node1,intersection1,spaceDistance);
+		graph.checkConnect(node0, intersection0, node1, intersection1, spaceDistance);
 	}
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,9 +48,9 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 //	RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-8,20, EpipolarError.SIMPLE);
 
 	// storage for computed homography
-	DMatrixRMaj H = new DMatrixRMaj(3,3);
-	FMatrixRMaj H32 = new FMatrixRMaj(3,3);
-//	DMatrixRMaj Hrefined = new DMatrixRMaj(3,3);
+	DMatrixRMaj H = new DMatrixRMaj(3, 3);
+	FMatrixRMaj H32 = new FMatrixRMaj(3, 3);
+	//	DMatrixRMaj Hrefined = new DMatrixRMaj(3,3);
 	// transform which applies the homography
 	PointTransformHomography_F32 transform = new PointTransformHomography_F32();
 
@@ -67,9 +67,9 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	 * @param height Height of undistorted image
 	 * @param imageType Type of undistorted image
 	 */
-	public RemovePerspectiveDistortion( int width , int height , ImageType<T> imageType ) {
-		this(width,height);
-		output = imageType.createImage(width,height);
+	public RemovePerspectiveDistortion( int width, int height, ImageType<T> imageType ) {
+		this(width, height);
+		output = imageType.createImage(width, height);
 		distort = new FDistort(imageType);
 		distort.output(output);
 		distort.interp(InterpolationType.BILINEAR).transform(transform);
@@ -77,22 +77,24 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 
 	/**
 	 * Creates the variables for computing the transform but not rendering the image
+	 *
 	 * @param width Width of undistorted image
 	 * @param height Height of undistorted image
 	 */
-	public RemovePerspectiveDistortion(int width , int height) {
+	public RemovePerspectiveDistortion( int width, int height ) {
 		for (int i = 0; i < 4; i++) {
-			associatedPairs.add( new AssociatedPair());
+			associatedPairs.add(new AssociatedPair());
 		}
 
-		associatedPairs.get(0).p1.set(0,0);
-		associatedPairs.get(1).p1.set(width,0);
-		associatedPairs.get(2).p1.set(width,height);
-		associatedPairs.get(3).p1.set(0,height);
+		associatedPairs.get(0).p1.setTo(0, 0);
+		associatedPairs.get(1).p1.setTo(width, 0);
+		associatedPairs.get(2).p1.setTo(width, height);
+		associatedPairs.get(3).p1.setTo(0, height);
 	}
 
 	/**
 	 * Applies distortion removal to the specified region in the input image.  The undistorted image is returned.
+	 *
 	 * @param input Input image
 	 * @param corner0 Top left corner
 	 * @param corner1 Top right corner
@@ -100,11 +102,10 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	 * @param corner3 Bottom left corner
 	 * @return true if successful or false if it failed
 	 */
-	public boolean apply( T input ,
-					Point2D_F64 corner0 , Point2D_F64 corner1 ,
-					Point2D_F64 corner2 , Point2D_F64 corner3 )
-	{
-		if( createTransform(corner0, corner1, corner2, corner3)) {
+	public boolean apply( T input,
+						  Point2D_F64 corner0, Point2D_F64 corner1,
+						  Point2D_F64 corner2, Point2D_F64 corner3 ) {
+		if (createTransform(corner0, corner1, corner2, corner3)) {
 			distort.input(input).apply();
 
 			return true;
@@ -122,15 +123,14 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	 * @param bl Bottom left corner
 	 * @return true if successful or false if it failed
 	 */
-	public boolean createTransform( Point2D_F64 tl , Point2D_F64 tr ,
-									Point2D_F64 br , Point2D_F64 bl )
-	{
-		associatedPairs.get(0).p2.set(tl);
-		associatedPairs.get(1).p2.set(tr);
-		associatedPairs.get(2).p2.set(br);
-		associatedPairs.get(3).p2.set(bl);
+	public boolean createTransform( Point2D_F64 tl, Point2D_F64 tr,
+									Point2D_F64 br, Point2D_F64 bl ) {
+		associatedPairs.get(0).p2.setTo(tl);
+		associatedPairs.get(1).p2.setTo(tr);
+		associatedPairs.get(2).p2.setTo(br);
+		associatedPairs.get(3).p2.setTo(bl);
 
-		if( !computeHomography.process(associatedPairs, H) )
+		if (!computeHomography.process(associatedPairs, H))
 			return false;
 
 //		if( !refineHomography.fitModel(associatedPairs,H,Hrefined) ) {
@@ -138,7 +138,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 //		}
 //		homography.set(Hrefined);
 
-		ConvertMatrixData.convert(H,H32);
+		ConvertMatrixData.convert(H, H32);
 		transform.set(H32);
 
 		return true;

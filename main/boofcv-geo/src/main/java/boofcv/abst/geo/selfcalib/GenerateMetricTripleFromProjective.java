@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,8 +99,8 @@ public class GenerateMetricTripleFromProjective implements
 			return false;
 
 		// Converts the output
-		output.view_1_to_2.set(metricN.motion_1_to_k.get(0));
-		output.view_1_to_3.set(metricN.motion_1_to_k.get(1));
+		output.view_1_to_2.setTo(metricN.motion_1_to_k.get(0));
+		output.view_1_to_3.setTo(metricN.motion_1_to_k.get(1));
 
 		output.view1.set(metricN.intrinsics.get(0));
 		output.view2.set(metricN.intrinsics.get(1));

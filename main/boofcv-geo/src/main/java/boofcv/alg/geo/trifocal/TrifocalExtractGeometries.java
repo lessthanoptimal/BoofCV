@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -142,8 +142,8 @@ public class TrifocalExtractGeometries {
 	 * @param e3  Output: Epipole in image 3. Homogeneous coordinates. Modified
 	 */
 	public void extractEpipoles( Point3D_F64 e2 , Point3D_F64 e3 ) {
-		e2.set(this.e2);
-		e3.set(this.e3);
+		e2.setTo(this.e2);
+		e3.setTo(this.e3);
 	}
 
 	/**

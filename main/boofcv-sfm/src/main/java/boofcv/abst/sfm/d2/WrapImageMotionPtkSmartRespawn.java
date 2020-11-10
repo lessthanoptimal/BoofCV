@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,7 +104,7 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 
 	@Override
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
-		pixel.set(allTracks.get(index));
+		pixel.setTo(allTracks.get(index));
 	}
 
 	private void checkInitialize() {

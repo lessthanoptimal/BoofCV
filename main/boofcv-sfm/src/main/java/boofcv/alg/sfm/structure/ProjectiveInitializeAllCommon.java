@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -323,7 +323,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		for (int i = 0; i < inlierToSeed.size; i++) {
 			// inliers from triple RANSAC
 			// each of these inliers was declared a feature in the world reference frame
-			assocPixel.get(i).p1.set(utils.inliersThreeView.get(i).p1);
+			assocPixel.get(i).p1.setTo(utils.inliersThreeView.get(i).p1);
 		}
 
 		var cameraMatrix = new DMatrixRMaj(3, 4);
@@ -386,7 +386,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			int seedIdx = inlierToSeed.get(i);
 			int dstIdx = utils.table_A_to_B.data[seedIdx];
 			// Assume that p1 from the seed view has already been set
-			assocPixel.get(i).p2.set(featsB.get(dstIdx));
+			assocPixel.get(i).p2.setTo(featsB.get(dstIdx));
 		}
 
 		// Estimate the camera matrix given homogenous pixel observations

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -408,7 +408,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			// save results
 			for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 				Point2D_F64 pixel = detDesc.getLocation(i);
-				locations[sourceID].data[i].set(pixel.x - cx, pixel.y - cy);
+				locations[sourceID].data[i].setTo(pixel.x - cx, pixel.y - cy);
 				features[sourceID].data[i].setTo(detDesc.getDescription(i));
 				featureSets[sourceID].data[i] = detDesc.getSet(i);
 			}
@@ -542,7 +542,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			associated.reset();
 			for (int i = 0; i < associatedIdx.size; i++) {
 				AssociatedTripleIndex p = associatedIdx.get(i);
-				associated.grow().set(locations[0].get(p.a), locations[1].get(p.b), locations[2].get(p.c));
+				associated.grow().setTo(locations[0].get(p.a), locations[1].get(p.b), locations[2].get(p.c));
 			}
 
 			// Show work in progress and items are computed

@@ -46,9 +46,9 @@ public class TestQrPose3DUtils extends BoofStandardJUnit {
 		qr.version = 2;
 
 		for (int i = 0; i < 4; i++) {
-			qr.ppCorner.get(i).set(i,i+1);
-			qr.ppRight.get(i).set(4+i,4+i+1);
-			qr.ppDown.get(i).set(8+i,8+i+1);
+			qr.ppCorner.get(i).setTo(i,i+1);
+			qr.ppRight.get(i).setTo(4+i,4+i+1);
+			qr.ppDown.get(i).setTo(8+i,8+i+1);
 		}
 
 		QrPose3DUtils alg = new QrPose3DUtils();
@@ -72,9 +72,9 @@ public class TestQrPose3DUtils extends BoofStandardJUnit {
 			qr.version = v;
 
 			for (int i = 0; i < 4; i++) {
-				qr.ppCorner.get(i).set(i, i + 1);
-				qr.ppRight.get(i).set(4 + i, 4 + i + 1);
-				qr.ppDown.get(i).set(8 + i, 8 + i + 1);
+				qr.ppCorner.get(i).setTo(i, i + 1);
+				qr.ppRight.get(i).setTo(4 + i, 4 + i + 1);
+				qr.ppDown.get(i).setTo(8 + i, 8 + i + 1);
 			}
 
 			QrPose3DUtils alg = createAlg();
@@ -111,9 +111,9 @@ public class TestQrPose3DUtils extends BoofStandardJUnit {
 			qr.version = v;
 
 			for (int i = 0; i < 4; i++) {
-				qr.ppCorner.get(i).set(i, i + 1);
-				qr.ppRight.get(i).set(4 + i, 4 + i + 1);
-				qr.ppDown.get(i).set(8 + i, 8 + i + 1);
+				qr.ppCorner.get(i).setTo(i, i + 1);
+				qr.ppRight.get(i).setTo(4 + i, 4 + i + 1);
+				qr.ppDown.get(i).setTo(8 + i, 8 + i + 1);
 			}
 
 			QrPose3DUtils alg = createAlg();

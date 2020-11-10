@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -432,7 +432,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		// save the results
 		for (int viewIdx = 0; viewIdx < graph.viewList.size(); viewIdx++) {
 			SceneWorkingGraph.View wview = graph.viewList.get(viewIdx);
-			wview.world_to_view.set(structure.getParentToView(viewIdx));
+			wview.world_to_view.setTo(structure.getParentToView(viewIdx));
 			wview.intrinsic.set((BundlePinholeSimplified)structure.cameras.get(viewIdx).model);
 		}
 		return true;

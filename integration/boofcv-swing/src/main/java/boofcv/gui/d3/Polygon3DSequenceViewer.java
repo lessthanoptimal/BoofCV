@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -269,7 +269,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
 		synchronized (worldToCamera) {
 			Se3_F64 temp = worldToCamera.concat(rotTran,null);
-			worldToCamera.set(temp);
+			worldToCamera.setTo(temp);
 		}
 
 		prevX = e.getX();

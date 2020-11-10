@@ -311,7 +311,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			for (int i = 0; i < structure.cameras.size; i++) {
 				BundlePinholeSimplified c = structure.cameras.data[i].getModel();
 				c.set(bestCameras.get(i));
-				structure.getParentToView(i).set(bestPose.get(i));
+				structure.getParentToView(i).setTo(bestPose.get(i));
 			}
 			triangulatePoints(structure, observations);
 			bundleAdjustment.setParameters(structure, observations);
@@ -417,8 +417,8 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 				successfulSelfCalibration = true;
 				listPinhole.addAll(results.intrinsics.toList());
 				listWorldToView.get(0).reset();
-				listWorldToView.get(1).set(results.motion_1_to_k.get(0));
-				listWorldToView.get(2).set(results.motion_1_to_k.get(1));
+				listWorldToView.get(1).setTo(results.motion_1_to_k.get(0));
+				listWorldToView.get(2).setTo(results.motion_1_to_k.get(1));
 				if (verbose != null) verbose.println("Auto calibration success");
 			} else {
 				if (verbose != null) verbose.println("Auto calibration failed");
@@ -508,7 +508,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		// The first view will be identity
 		for (int i = 1; i < structure.views.size; i++) {
 			Se3_F64 w2v = structure.getParentToView(i);
-			w2v.set(w2v.invert(null));
+			w2v.setTo(w2v.invert(null));
 		}
 		triangulatePoints(structure, observations);
 	}

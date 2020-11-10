@@ -173,7 +173,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 			double theta = 2.0*(double)Math.PI*i/20;
 			Point2D_F64 p = UtilEllipse_F64.computePoint(theta, rotated, null);
 			Point2D_I32 pi = new Point2D_I32((int)p.x,(int)p.y) ;
-			p.set(pi.x,pi.y);
+			p.setTo(pi.x,pi.y);
 			pointsF.add(p);
 			pointsI.add(pi);
 		}

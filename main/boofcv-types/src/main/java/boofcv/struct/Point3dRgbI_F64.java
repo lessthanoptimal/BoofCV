@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class Point3dRgbI_F64 extends Point3D_F64 {
 	public int rgb;
 
 	public Point3dRgbI_F64( Point3D_F64 p, int rgb ) {
-		this.set(p);
+		this.setTo(p);
 		this.rgb = rgb;
 	}
 

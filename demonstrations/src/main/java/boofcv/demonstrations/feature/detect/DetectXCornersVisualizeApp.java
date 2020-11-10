@@ -190,7 +190,7 @@ public class DetectXCornersVisualizeApp
 				FastQueue<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
 				for (int i = 0; i < orig.size(); i++) {
-					foundCorners.grow().set(orig.get(i));
+					foundCorners.grow().setTo(orig.get(i));
 				}
 			}
 		}

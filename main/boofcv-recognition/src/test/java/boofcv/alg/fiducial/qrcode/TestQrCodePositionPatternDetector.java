@@ -189,7 +189,7 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		node.square = square;
 		node.largestSide = width;
 		node.smallestSide = width;
-		node.center.set(x0 + width/2, y0 + width/2);
+		node.center.setTo(x0 + width/2, y0 + width/2);
 		for (int i = 0; i < 4; i++) {
 			node.sideLengths[i] = width;
 		}
@@ -199,10 +199,10 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 
 	public static Polygon2D_F64 square( int x0, int y0, int width ) {
 		Polygon2D_F64 square = new Polygon2D_F64(4);
-		square.get(0).set(x0, y0);
-		square.get(1).set(x0 + width, y0);
-		square.get(2).set(x0 + width, y0 + width);
-		square.get(3).set(x0, y0 + width);
+		square.get(0).setTo(x0, y0);
+		square.get(1).setTo(x0 + width, y0);
+		square.get(2).setTo(x0 + width, y0 + width);
+		square.get(3).setTo(x0, y0 + width);
 		return square;
 	}
 

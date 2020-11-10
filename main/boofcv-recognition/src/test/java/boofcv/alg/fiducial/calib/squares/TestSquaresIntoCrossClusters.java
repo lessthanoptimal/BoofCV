@@ -127,10 +127,10 @@ public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 		info.reset();
 		info.polygon = new Polygon2D_F64(4);
 
-		info.polygon.get(0).set(x,y);
-		info.polygon.get(1).set(x+1,y);
-		info.polygon.get(2).set(x+1,y-1);
-		info.polygon.get(3).set(x,y-1);
+		info.polygon.get(0).setTo(x,y);
+		info.polygon.get(1).setTo(x+1,y);
+		info.polygon.get(2).setTo(x+1,y-1);
+		info.polygon.get(3).setTo(x,y-1);
 
 		return info;
 	}
@@ -139,10 +139,10 @@ public class TestSquaresIntoCrossClusters extends BoofStandardJUnit {
 	public void getCornerIndex() {
 		SquareNode node = new SquareNode();
 		node.square = new Polygon2D_F64(4);
-		node.square.get(0).set(5,6);
-		node.square.get(1).set(6,7);
-		node.square.get(2).set(7,8);
-		node.square.get(3).set(8,9);
+		node.square.get(0).setTo(5,6);
+		node.square.get(1).setTo(6,7);
+		node.square.get(2).setTo(7,8);
+		node.square.get(3).setTo(8,9);
 
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,-1);
 

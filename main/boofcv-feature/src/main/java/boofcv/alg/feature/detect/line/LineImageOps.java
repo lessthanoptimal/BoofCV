@@ -210,8 +210,8 @@ public class LineImageOps {
 		}
 
 		// set the first line to the extreme points on each line
-		a.a.set(pts[indexMin]);
-		a.b.set(pts[indexMax]);
+		a.a.setTo(pts[indexMin]);
+		a.b.setTo(pts[indexMax]);
 	}
 
 	/**
@@ -220,24 +220,24 @@ public class LineImageOps {
 	public static LineSegment2D_F32 convert( LineParametric2D_F32 l,
 											 int width, int height ) {
 		LineParametric2D_F32 side = new LineParametric2D_F32();
-		side.p.set(0, 0);
-		side.slope.set(1, 0);
+		side.p.setTo(0, 0);
+		side.slope.setTo(1, 0);
 
 		List<Point2D_F32> inside = new ArrayList<>();
 		Point2D_F32 a = new Point2D_F32();
 		if (null != Intersection2D_F32.intersection(side, l, a)) {
 			checkAddInside(width, height, a, inside);
 		}
-		side.slope.set(0, 1);
+		side.slope.setTo(0, 1);
 		if (null != Intersection2D_F32.intersection(side, l, a)) {
 			checkAddInside(width, height, a, inside);
 		}
-		side.p.set(width - 1, height - 1);
-		side.slope.set(-1, 0);
+		side.p.setTo(width - 1, height - 1);
+		side.slope.setTo(-1, 0);
 		if (null != Intersection2D_F32.intersection(side, l, a)) {
 			checkAddInside(width, height, a, inside);
 		}
-		side.slope.set(0, -1);
+		side.slope.setTo(0, -1);
 		if (null != Intersection2D_F32.intersection(side, l, a)) {
 			checkAddInside(width, height, a, inside);
 		}

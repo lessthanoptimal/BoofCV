@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,10 +46,10 @@ public class FactoryStitchingTransform {
 				ConvertFloatType.convert(input, input_F32);
 
 				if (output != null) {
-					((PixelTransformAffine_F32)output).set(input_F32);
+					((PixelTransformAffine_F32)output).setTo(input_F32);
 				} else {
 					PixelTransformAffine_F32 a = new PixelTransformAffine_F32();
-					a.set(input_F32);
+					a.setTo(input_F32);
 					output = a;
 				}
 
@@ -75,7 +75,7 @@ public class FactoryStitchingTransform {
 			@Override
 			public PixelTransform<Point2D_F32> convertPixel( Affine2D_F32 input, PixelTransform<Point2D_F32> output ) {
 				if (output != null) {
-					((PixelTransformAffine_F32)output).set(input);
+					((PixelTransformAffine_F32)output).setTo(input);
 				} else {
 					output = new PixelTransformAffine_F32(input);
 				}

@@ -311,7 +311,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 
 		// move the node out of range it nothing should be accepted
 
-		alg.listInfo.get(3).ellipse.set(0,1,1,1,0);
+		alg.listInfo.get(3).ellipse.setTo(0,1,1,1,0);
 		input = connectEllipses(ellipses,1.1);
 		alg.computeNodeInfo(input.d1,input.d0);
 		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
@@ -342,7 +342,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 
 		// move the node out of range it nothing should be accepted
 
-		alg.listInfo.get(3).ellipse.set(0,1,1,1,0);
+		alg.listInfo.get(3).ellipse.setTo(0,1,1,1,0);
 		input = connectEllipses(ellipses,1.1);
 		alg.computeNodeInfo(input.d1,input.d0);
 		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));

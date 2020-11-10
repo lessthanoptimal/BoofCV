@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -274,7 +274,7 @@ public class PnPLepetitEPnP {
 		UtilLepetitEPnP.computeCameraControl(solution, nullPts, solutionPts, numControl);
 		motionFit.process(controlWorldPts.toList(), solutionPts.toList());
 
-		solutionModel.set(motionFit.getTransformSrcToDst());
+		solutionModel.setTo(motionFit.getTransformSrcToDst());
 	}
 
 	/**

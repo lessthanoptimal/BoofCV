@@ -134,7 +134,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 			failedToDetect = 0;
 			for (int j = 0; j < fisheye_poses.size(); j++) {
 //				System.out.println("fisheye pose = "+j);
-				markerToWorld.set(fisheye_poses.get(j));
+				markerToWorld.setTo(fisheye_poses.get(j));
 				checkRenderedResults(detector, simulator, locations2D);
 			}
 		}

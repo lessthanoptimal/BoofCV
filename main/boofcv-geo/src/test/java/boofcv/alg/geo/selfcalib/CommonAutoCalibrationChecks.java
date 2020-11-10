@@ -157,7 +157,7 @@ public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 		Se3_F64 tmp = new Se3_F64();
 		for (int i = 0; i < listCameraToWorld.size(); i++) {
 			a.concat(listCameraToWorld.get(i),tmp);
-			listCameraToWorld.get(i).set(tmp);
+			listCameraToWorld.get(i).setTo(tmp);
 		}
 
 		// compute fundamental matrices

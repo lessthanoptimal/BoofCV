@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,14 +137,14 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			layersOdom[layer].setKeyFrame(layerImage, layerTo3D);
 		}
 		worldToKey.concat(keyToCurrent, work);
-		worldToKey.set(work);
+		worldToKey.setTo(work);
 		keyToCurrent.reset();
 
 		keyframeDiversity = layersOdom[layersOdom.length - 1].computeFeatureDiversity(keyToCurrent);
 	}
 
 	protected boolean estimateMotion() {
-		work.set(keyToCurrent);
+		work.setTo(keyToCurrent);
 
 		boolean oneLayerWorked = false;
 		for (int layer = layersOdom.length - 1; layer >= 0; layer--) {
@@ -153,7 +153,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 			VisOdomDirectColorDepth<T, ?> o = layersOdom[layer];
 			if (o.estimateMotion(layerImage, work)) {
 				oneLayerWorked = true;
-				work.set(o.getKeyToCurrent());
+				work.setTo(o.getKeyToCurrent());
 //				work.print();
 
 				fractionInBounds = o.getInboundsPixels()/(double)o.getKeyframePixels();
@@ -165,7 +165,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		}
 
 		if (oneLayerWorked) {
-			keyToCurrent.set(work);
+			keyToCurrent.setTo(work);
 			worldToKey.concat(keyToCurrent, worldToCurrent);
 
 			// compute diversity in the smallest image.  Should be about the same in all the layers

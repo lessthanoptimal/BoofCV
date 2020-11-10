@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,13 +49,13 @@ public class Point2D3D {
 	/**
 	 * Sets 'this' to be identical to 'src'.
 	 */
-	public void set( Point2D3D src ) {
-		observation.set(src.observation);
-		location.set(src.location);
+	public void setTo( Point2D3D src ) {
+		observation.setTo(src.observation);
+		location.setTo(src.location);
 	}
 
-	public void set( double x2 , double y2, double x3, double y3, double z3 ) {
-		observation.set(x2,y2);
+	public void setTo( double x2 , double y2, double x3, double y3, double z3 ) {
+		observation.setTo(x2,y2);
 		location.set(x3,y3,z3);
 	}
 

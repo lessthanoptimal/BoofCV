@@ -117,8 +117,8 @@ public class BaseChecksPnP extends BoofStandardJUnit {
 
 			// Save the perfect noise free observation
 			Point2D3D o = new Point2D3D();
-			o.getLocation().set(worldPt);
-			o.getObservation().set(norm.x,norm.y);
+			o.getLocation().setTo(worldPt);
+			o.getObservation().setTo(norm.x,norm.y);
 
 			observations.add(o);
 		}

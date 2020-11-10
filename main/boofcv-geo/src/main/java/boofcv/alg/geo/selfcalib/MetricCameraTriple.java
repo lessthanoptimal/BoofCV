@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ public class MetricCameraTriple {
 	public final CameraPinhole view3 = new CameraPinhole();
 
 	public void setTo( MetricCameraTriple src ) {
-		view_1_to_2.set(src.view_1_to_2);
-		view_1_to_3.set(src.view_1_to_3);
+		view_1_to_2.setTo(src.view_1_to_2);
+		view_1_to_3.setTo(src.view_1_to_3);
 		view1.set(src.view1);
 		view2.set(src.view2);
 		view3.set(src.view3);

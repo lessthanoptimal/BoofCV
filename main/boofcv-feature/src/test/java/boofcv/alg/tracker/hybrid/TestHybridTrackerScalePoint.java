@@ -157,7 +157,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		addTracks(alg.tracksAll,8);
 		// assign all tracks to the same pixel
 		for( var t : alg.tracksAll.toList() ) {
-			t.pixel.set(5,5);
+			t.pixel.setTo(5,5);
 		}
 		alg.pruneActiveTracksWhichAreTooClose();
 

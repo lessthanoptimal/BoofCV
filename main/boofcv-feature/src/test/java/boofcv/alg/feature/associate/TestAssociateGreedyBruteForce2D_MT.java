@@ -103,7 +103,7 @@ class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 		Random rand = new Random(234);
 		FastQueue<Point2D_F64> ret = new FastQueue<>(count,Point2D_F64::new);
 		for( int i = 0; i < count; i++ ) {
-			ret.grow().set(rand.nextDouble()*width,rand.nextDouble()*height);
+			ret.grow().setTo(rand.nextDouble()*width,rand.nextDouble()*height);
 		}
 		return ret;
 	}

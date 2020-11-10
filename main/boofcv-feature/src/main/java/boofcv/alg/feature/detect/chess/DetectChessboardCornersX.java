@@ -78,9 +78,8 @@ import static boofcv.misc.CircularIndex.addOffset;
  *
  * At several different steps various adaptive filters are applied. See code for details.
  *
- * @see XCornerAbeles2019Intensity
- *
  * @author Peter Abeles
+ * @see XCornerAbeles2019Intensity
  */
 public class DetectChessboardCornersX {
 	// The largest x-corner intensity is found in the image then multiplied by this factor to select the cut off point
@@ -106,7 +105,7 @@ public class DetectChessboardCornersX {
 	// dynamically computed thresholds
 	float nonmaxThreshold;
 
-	@Getter GrayF32 blurred = new GrayF32(1,1);
+	@Getter GrayF32 blurred = new GrayF32(1, 1);
 	BlurFilter<GrayF32> blurFilter;
 
 	SearchLocalPeak<GrayF32> meanShift;
@@ -115,8 +114,8 @@ public class DetectChessboardCornersX {
 	List<ChessboardCorner> filtered = new ArrayList<>();
 
 	// storage for corner detector output
-	@Getter GrayF32 intensityRaw = new GrayF32(1,1);
-	@Getter GrayF32 intensity2x2 = new GrayF32(1,1);
+	@Getter GrayF32 intensityRaw = new GrayF32(1, 1);
+	@Getter GrayF32 intensity2x2 = new GrayF32(1, 1);
 	// Reference to the intensity image used to extract features from. it will be one of the two above
 	GrayF32 _intensity;
 	/**
@@ -131,12 +130,12 @@ public class DetectChessboardCornersX {
 	public float considerMaxIntensityImage = 0;
 
 	// Used to compute line integrals of spokes around a corner
-	final ImageBorder<GrayF32> borderInput = FactoryImageBorder.generic(BorderType.EXTENDED,ImageType.SB_F32);
+	final ImageBorder<GrayF32> borderInput = FactoryImageBorder.generic(BorderType.EXTENDED, ImageType.SB_F32);
 	final ImageLineIntegral integral = new ImageLineIntegral();
 
 	// for mean-shift
-	final ImageBorder_F32 borderBlur = (ImageBorder_F32)FactoryImageBorder.generic(BorderType.EXTENDED,ImageType.SB_F32);
-	final InterpolatePixelS<GrayF32> inputInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
+	final ImageBorder_F32 borderBlur = (ImageBorder_F32)FactoryImageBorder.generic(BorderType.EXTENDED, ImageType.SB_F32);
+	final InterpolatePixelS<GrayF32> inputInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
 	public boolean useMeanShift = true;
 
 	// Find corners in intensity image
@@ -150,7 +149,7 @@ public class DetectChessboardCornersX {
 	private final double[] spokesDiam = new double[numSpokeDiam];
 	private final double[] smoothedDiam = new double[numSpokeDiam];
 	private final double[] scoreDiam = new double[numSpokeDiam];
-	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1,true,64,-1,numSpokeDiam/4);
+	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1, true, 64, -1, numSpokeDiam/4);
 
 	// used to check up and down patterns of intensity image
 	FastQueue<Point2D_I32> outsideCircle4 = new FastQueue<>(Point2D_I32::new);
@@ -158,9 +157,8 @@ public class DetectChessboardCornersX {
 	private final float[] outsideCircleValues;
 
 	// Workspace
-	GrayF32 tmp = new GrayF32(1,1);
+	GrayF32 tmp = new GrayF32(1, 1);
 	GrowArray<GrowQueue_F32> fwork = new GrowArray<>(GrowQueue_F32::new);
-
 
 	/**
 	 * Declares internal data structures
@@ -176,23 +174,23 @@ public class DetectChessboardCornersX {
 			nonmax = FactoryFeatureExtractor.nonmax(config);
 		}
 
-		blurFilter = FactoryBlurFilter.gaussian(ImageType.SB_F32,-1,blurRadius);
+		blurFilter = FactoryBlurFilter.gaussian(ImageType.SB_F32, -1, blurRadius);
 
 		// just give it something. this will be changed later
-		borderInput.setImage(new GrayF32(1,1));
+		borderInput.setImage(new GrayF32(1, 1));
 		integral.setImage(FactoryGImageGray.wrap(borderInput));
 
 		{
-			ConfigMeanShiftSearch config = new ConfigMeanShiftSearch(5,1e-6);
+			ConfigMeanShiftSearch config = new ConfigMeanShiftSearch(5, 1e-6);
 			config.positiveOnly = true;
 			config.odd = false;
-			meanShift = FactorySearchLocalPeak.meanShiftGaussian(config,GrayF32.class);
+			meanShift = FactorySearchLocalPeak.meanShiftGaussian(config, GrayF32.class);
 			meanShift.setSearchRadius(2);
 		}
 
 		DiscretizedCircle.coordinates(4, outsideCircle4);
 		DiscretizedCircle.coordinates(3, outsideCircle3);
-		outsideCircleValues = new float[ outsideCircle4.size ];
+		outsideCircleValues = new float[outsideCircle4.size];
 
 		borderBlur.setImage(blurred);
 	}
@@ -211,12 +209,12 @@ public class DetectChessboardCornersX {
 		inputInterp.setImage(input);
 
 		// The x-corner detector requires a little bit of blur to be applied ot the input image
-		blurFilter.process(input,blurred);
+		blurFilter.process(input, blurred);
 		XCornerAbeles2019Intensity.process(blurred, intensityRaw);
 		// x-corner intensity is results in a symmetric 2x2 region under ideal conditions. Applying a 2x2 mean filter
 		// breaks the symmetry. There will be a single unique optimal value, but it will be biased by 0.5 of a pixel.
-		ConvolveImageMean.horizontal(intensityRaw,tmp,0,2);
-		ConvolveImageMean.vertical(tmp,intensity2x2,0,2,fwork);
+		ConvolveImageMean.horizontal(intensityRaw, tmp, 0, 2);
+		ConvolveImageMean.vertical(tmp, intensity2x2, 0, 2, fwork);
 
 		// NOTE: There's a small improvement if raw is used after detection. That's why everything is so funky
 		//       the small performance improvement might be a result of over fitting to test set
@@ -237,14 +235,14 @@ public class DetectChessboardCornersX {
 
 		// Find features using non-maximum suppression and the threshold computed above
 		nonmax.setThresholdMaximum(nonmaxThreshold);
-		nonmax.process(intensity2x2,null,null,null,foundNonmax);
+		nonmax.process(intensity2x2, null, null, null, foundNonmax);
 
 		// Convert found points to corner data structure
 		for (int i = 0; i < foundNonmax.size; i++) {
 			Point2D_I16 c = foundNonmax.get(i);
 			ChessboardCorner corner = corners.grow();
 			corner.reset();
-			corner.set(c.x+0.5,c.y+0.5);
+			corner.setTo(c.x + 0.5, c.y + 0.5);
 		}
 
 		double maxEdge = 0;
@@ -254,54 +252,54 @@ public class DetectChessboardCornersX {
 		for (int i = 0; i < corners.size(); i++) {
 			ChessboardCorner c = corners.get(i);
 
-			int xx = (int)(c.x+0.5f);
-			int yy = (int)(c.y+0.5f);
+			int xx = (int)(c.x + 0.5f);
+			int yy = (int)(c.y + 0.5f);
 
 			// A bunch of code below will crash if it's near the border
-			if( xx < 3 || yy < 3 || xx >= input.width-3 || yy >= input.height-3 )
+			if (xx < 3 || yy < 3 || xx >= input.width - 3 || yy >= input.height - 3)
 				continue;
 
 			// Very crude checks to remove situations where there was a little bit of noise that caused a corner
 			// They work by seeing if there's a consistent pattern of x-corner like pixels near the center
 			// and non-x-corner like pixels in the outside
-			if( !checkPositiveInside(xx,yy,4) ) {
+			if (!checkPositiveInside(xx, yy, 4)) {
 				continue;
 			}
 
-			if( !checkNegativeInside(xx,yy,12)) {
+			if (!checkNegativeInside(xx, yy, 12)) {
 				continue;
 			}
 
 			// Check to see if there's the expected up/down pattern in the surrounding pixels in a circle around
-			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle4, 3, 6, symmetricTol)) {
+			if (!checkChessboardCircle((float)c.x, (float)c.y, outsideCircle4, 3, 6, symmetricTol)) {
 				continue;
 			}
 
-			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle3, 3, 4, symmetricTol)) {
+			if (!checkChessboardCircle((float)c.x, (float)c.y, outsideCircle3, 3, 4, symmetricTol)) {
 				continue;
 			}
 
 			// Refines the corner location estimate using mean-shift
-			if( useMeanShift ) {
-				meanShift.search((float)c.x,(float)c.y);
+			if (useMeanShift) {
+				meanShift.search((float)c.x, (float)c.y);
 				c.x = meanShift.getPeakX(); // No shift here since mean-shift is run on RAW
 				c.y = meanShift.getPeakY();
 			}
 
 			// tighter tolerance now that the center is known
-			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle4, 4, 4, symmetricTol-1)) {
+			if (!checkChessboardCircle((float)c.x, (float)c.y, outsideCircle4, 4, 4, symmetricTol - 1)) {
 				c.edgeIntensity = -1;
 				continue;
 			}
 
 			// See if it's a corner also using the eigen value definition
-			if( !checkEigenCorner(c)) {
+			if (!checkEigenCorner(c)) {
 				c.edgeIntensity = -1;
 				continue;
 			}
 
 			// Computes features like orientation
-			if( !computeFeatures(c) ) {
+			if (!computeFeatures(c)) {
 				c.edgeIntensity = -1;
 				continue;
 			}
@@ -311,14 +309,14 @@ public class DetectChessboardCornersX {
 			c.y += 0.5f;
 
 			// Save the max values for the entire image for use in later pruning
-			maxEdge = Math.max(maxEdge,c.edgeIntensity);
-			maxIntensity = Math.max(c.intensity,maxIntensity);
+			maxEdge = Math.max(maxEdge, c.edgeIntensity);
+			maxIntensity = Math.max(c.intensity, maxIntensity);
 		}
 
 		// Filter corners based on edge intensity of found corners
-		for (int i = corners.size-1; i >= 0;  i--) {
+		for (int i = corners.size - 1; i >= 0; i--) {
 			ChessboardCorner c = corners.get(i);
-			if( c.edgeIntensity >= edgeIntensityRatioThreshold*maxEdge ) {
+			if (c.edgeIntensity >= edgeIntensityRatioThreshold*maxEdge) {
 				filtered.add(c);
 			}
 		}
@@ -331,7 +329,7 @@ public class DetectChessboardCornersX {
 	/**
 	 * Around the corer there should be around 4 pixels which have a positive x-corner score
 	 */
-	boolean checkPositiveInside(int cx , int cy , int threshold ) {
+	boolean checkPositiveInside( int cx, int cy, int threshold ) {
 		int radius = 1;
 
 		final int x0 = cx - radius;
@@ -339,10 +337,10 @@ public class DetectChessboardCornersX {
 		final int x1 = cx + radius + 1;
 		final int y1 = cy + radius + 1;
 
-		int count=0;
+		int count = 0;
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( _intensity.unsafe_get(x,y) >= nonmaxThreshold)
+				if (_intensity.unsafe_get(x, y) >= nonmaxThreshold)
 					count++;
 			}
 		}
@@ -352,7 +350,7 @@ public class DetectChessboardCornersX {
 	/**
 	 * Outside of the center most of the pixels should have a negative x-corner score
 	 */
-	boolean checkNegativeInside(int cx , int cy , int threshold ) {
+	boolean checkNegativeInside( int cx, int cy, int threshold ) {
 		int radius = 3;
 
 		final int x0 = cx - radius;
@@ -360,10 +358,10 @@ public class DetectChessboardCornersX {
 		final int x1 = cx + radius + 1;
 		final int y1 = cy + radius + 1;
 
-		int count=0;
+		int count = 0;
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( _intensity.unsafe_get(x,y) <= -nonmaxThreshold )
+				if (_intensity.unsafe_get(x, y) <= -nonmaxThreshold)
 					count++;
 			}
 		}
@@ -374,14 +372,14 @@ public class DetectChessboardCornersX {
 	/**
 	 * Looks for an up down pattern in a circle around the corner
 	 */
-	private boolean checkChessboardCircle(float cx , float cy , FastQueue<Point2D_I32> outside , int min , int max , int symmetric ) {
+	private boolean checkChessboardCircle( float cx, float cy, FastQueue<Point2D_I32> outside, int min, int max, int symmetric ) {
 		// NOTE: using `mean = (max(:) + min(:))/2` produced slightly better results, but that might have been
 		//       over fitting to the dataset
 
 		float mean = 0;
 		for (int i = 0; i < outside.size; i++) {
 			Point2D_I32 p = outside.get(i);
-			float v = inputInterp.get(cx+p.x,cy+p.y);
+			float v = inputInterp.get(cx + p.x, cy + p.y);
 			outsideCircleValues[i] = v;
 			mean += v;
 		}
@@ -393,7 +391,7 @@ public class DetectChessboardCornersX {
 		int prevDir = outsideCircleValues[0] > mean ? 1 : -1;
 		for (int i = 1; i < outside.size; i++) {
 			int dir = outsideCircleValues[i] > mean ? 1 : -1;
-			if( prevDir != dir ) {
+			if (prevDir != dir) {
 				numUpDown++;
 				prevDir = dir;
 			}
@@ -405,13 +403,13 @@ public class DetectChessboardCornersX {
 		int halfCount = outside.size/2;
 		for (int i = 0; i < halfCount; i++) {
 			int dirI = outsideCircleValues[i] > mean ? 1 : -1;
-			int dirJ = outsideCircleValues[i+halfCount] > mean ? 1 : -1;
+			int dirJ = outsideCircleValues[i + halfCount] > mean ? 1 : -1;
 
-			if( dirI == dirJ )
+			if (dirI == dirJ)
 				numMirror++;
 		}
 
-		return numUpDown >= min && numUpDown <= max && numMirror >= halfCount-symmetric;
+		return numUpDown >= min && numUpDown <= max && numMirror >= halfCount - symmetric;
 	}
 
 	/**
@@ -419,15 +417,15 @@ public class DetectChessboardCornersX {
 	 * near the chessboard corner, but even with a very forgiving threshold this eliminates a lot of the false
 	 * positives
 	 */
-	private boolean checkEigenCorner(ChessboardCorner c ) {
+	private boolean checkEigenCorner( ChessboardCorner c ) {
 		int radius = 3;
 
-		int cx = (int)(c.x+0.5f);
-		int cy = (int)(c.y+0.5f);
+		int cx = (int)(c.x + 0.5f);
+		int cy = (int)(c.y + 0.5f);
 
-		float xx=0,yy=0,xy=0;
+		float xx = 0, yy = 0, xy = 0;
 
-		int width = radius*2+1;
+		int width = radius*2 + 1;
 
 		for (int iy = 0; iy < width; iy++) {
 			for (int ix = 0; ix < width; ix++) {
@@ -435,30 +433,30 @@ public class DetectChessboardCornersX {
 				int y = cy + iy - radius;
 				int x = cx + ix - radius;
 
-				float dx = borderBlur.get(x+1,y)- borderBlur.get(x-1,y);
-				float dy = borderBlur.get(x,y+1)- borderBlur.get(x,y-1);
+				float dx = borderBlur.get(x + 1, y) - borderBlur.get(x - 1, y);
+				float dy = borderBlur.get(x, y + 1) - borderBlur.get(x, y - 1);
 
-				xx += dx * dx;
-				xy += dx * dy;
-				yy += dy * dy;
+				xx += dx*dx;
+				xy += dx*dy;
+				yy += dy*dy;
 			}
 		}
 
-		float totalWeight=width*width;
+		float totalWeight = width*width;
 		xx /= totalWeight;
 		xy /= totalWeight;
 		yy /= totalWeight;
 
-		float left = (xx + yy) * 0.5f;
-		float b = (xx - yy) * 0.5f;
-		float right = (float)Math.sqrt(b * b + xy * xy);
+		float left = (xx + yy)*0.5f;
+		float b = (xx - yy)*0.5f;
+		float right = (float)Math.sqrt(b*b + xy*xy);
 
 		// tempting to use edge intensity as a way to filter out false positives
 		// but that makes the corner no longer invariant to affine changes in light, e.g. changes in scale and offset
-		c.edgeIntensity = left-right; // smallest eigen value
+		c.edgeIntensity = left - right; // smallest eigen value
 		// the smallest eigenvalue divided by largest. A perfect corner would be 1. As it approaches zero it indicates
 		// that there's more of a line.
-		c.edgeRatio = (left - right)/(left+right);
+		c.edgeRatio = (left - right)/(left + right);
 
 		// NOTE: Setting the Eigen ratio to a higher value is an effective ratio, but for fisheye images it will
 		//       filter out many of the corners at the border where they are highly distorted
@@ -474,7 +472,7 @@ public class DetectChessboardCornersX {
 	 * Intensity is found by subtracting bright lines from the dark line on the other side. dark/light lines are
 	 * offset by 90 degrees.
 	 */
-	private boolean computeFeatures(ChessboardCorner corner) {
+	private boolean computeFeatures( ChessboardCorner corner ) {
 		double r = 4;
 
 		// magnitude of the difference is used remove false chessboard corners caused by the corners on black
@@ -485,17 +483,17 @@ public class DetectChessboardCornersX {
 		double sumDifference = 0;
 		double mean = 0;
 		for (int i = 0; i < numSpokeDiam; i++) {
-			int j = (i+ numSpokeDiam)%numSpokes;
-			double angle = Math.PI*i/ numSpokeDiam;
+			int j = (i + numSpokeDiam)%numSpokes;
+			double angle = Math.PI*i/numSpokeDiam;
 			double c = Math.cos(angle);
 			double s = Math.sin(angle);
 
-			double valA = spokesRadi[i] = integral.compute(cx,cy,cx+r*c,cy+r*s)/r;
-			double valB = spokesRadi[j] = integral.compute(cx,cy,cx-r*c,cy-r*s)/r;
+			double valA = spokesRadi[i] = integral.compute(cx, cy, cx + r*c, cy + r*s)/r;
+			double valB = spokesRadi[j] = integral.compute(cx, cy, cx - r*c, cy - r*s)/r;
 
-			spokesDiam[i] = valA+valB;
+			spokesDiam[i] = valA + valB;
 
-			sumDifference += Math.abs(valA-valB);
+			sumDifference += Math.abs(valA - valB);
 			mean += valA + valB;
 		}
 		mean /= numSpokes;
@@ -510,21 +508,21 @@ public class DetectChessboardCornersX {
 		double bestScore = Double.MAX_VALUE;
 		for (int i = 0; i < numSpokeDiam; i++) {
 			// j = 90 off, which should be the opposite color
-			int j = (i+ numSpokeDiam /2)% numSpokeDiam;
+			int j = (i + numSpokeDiam/2)%numSpokeDiam;
 			double score = scoreDiam[i] = smoothedDiam[i] - smoothedDiam[j];
 			// select black 'i', which will negative because white has a higher value
-			if( score < bestScore ) {
+			if (score < bestScore) {
 				bestScore = score;
 				bestSpoke = i;
 			}
 		}
 
 		// Use a quadratic to estimate the peak's location to a sub-bin accuracy
-		double value0 = scoreDiam[ addOffset(bestSpoke,-1, numSpokeDiam)];
-		double value2 = scoreDiam[ addOffset(bestSpoke, 1, numSpokeDiam)];
+		double value0 = scoreDiam[addOffset(bestSpoke, -1, numSpokeDiam)];
+		double value2 = scoreDiam[addOffset(bestSpoke, 1, numSpokeDiam)];
 
-		double adjustedIndex = bestSpoke + FastHessianFeatureDetector.polyPeak(value0,bestSpoke,value2);
-		corner.orientation = UtilAngle.boundHalf(Math.PI*adjustedIndex/ numSpokeDiam);
+		double adjustedIndex = bestSpoke + FastHessianFeatureDetector.polyPeak(value0, bestSpoke, value2);
+		corner.orientation = UtilAngle.boundHalf(Math.PI*adjustedIndex/numSpokeDiam);
 
 		// Compute a how X-Corner like metric
 		double stdev = 0;
@@ -537,7 +535,7 @@ public class DetectChessboardCornersX {
 		corner.intensity = -bestScore*stdev/(sumDifference + UtilEjml.EPS);
 
 		// Compute difference between white and black region
-		corner.contrast = (scoreDiam[(bestSpoke+numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
+		corner.contrast = (scoreDiam[(bestSpoke + numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
 
 		return corner.intensity >= refinedXCornerThreshold;
 	}
@@ -548,11 +546,11 @@ public class DetectChessboardCornersX {
 		int r_smooth = kernelSmooth.getRadius();
 		int w_smooth = kernelSmooth.getWidth();
 		for (int i = 0; i < numSpokeDiam; i++) {
-			int start = addOffset(i,-r_smooth, numSpokeDiam);
+			int start = addOffset(i, -r_smooth, numSpokeDiam);
 
 			double sum = 0;
 			for (int j = 0; j < w_smooth; j++) {
-				int index = addOffset(start,j, numSpokeDiam);
+				int index = addOffset(start, j, numSpokeDiam);
 				sum += spokesDiam[index]*kernelSmooth.data[j];
 			}
 			smoothedDiam[i] = sum;
@@ -567,7 +565,7 @@ public class DetectChessboardCornersX {
 		return nonmax.getSearchRadius();
 	}
 
-	public void setNonmaxRadius(int nonmaxRadius) {
+	public void setNonmaxRadius( int nonmaxRadius ) {
 		nonmax.setSearchRadius(nonmaxRadius);
 	}
 }

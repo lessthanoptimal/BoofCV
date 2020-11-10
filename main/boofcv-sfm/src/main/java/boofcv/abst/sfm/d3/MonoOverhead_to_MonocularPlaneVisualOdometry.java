@@ -112,7 +112,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	@Override
 	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		computeTracks();
-		world.set(points3D.get(index));
+		world.setTo(points3D.get(index));
 		return true;
 	}
 
@@ -131,7 +131,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 
 	@Override
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
-		pixel.set(this.pixels.get(index));
+		pixel.setTo(this.pixels.get(index));
 	}
 
 	@Override

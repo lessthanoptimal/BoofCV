@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,12 +30,12 @@ public class AssociateImageDistanceEuclideanSq implements AssociateImageDistance
 	final Point2D_F64 src = new Point2D_F64();
 
 	@Override
-	public void setSource(int index, Point2D_F64 pixel) {
-		this.src.set(pixel);
+	public void setSource( int index, Point2D_F64 pixel ) {
+		this.src.setTo(pixel);
 	}
 
 	@Override
-	public double distance(int index, Point2D_F64 pixel) {
+	public double distance( int index, Point2D_F64 pixel ) {
 		return src.distance2(pixel);
 	}
 
@@ -45,7 +45,7 @@ public class AssociateImageDistanceEuclideanSq implements AssociateImageDistance
 	}
 
 	@Override
-	public double convertPixelsToDistance(double pixels) {
+	public double convertPixelsToDistance( double pixels ) {
 		return pixels*pixels;
 	}
 }

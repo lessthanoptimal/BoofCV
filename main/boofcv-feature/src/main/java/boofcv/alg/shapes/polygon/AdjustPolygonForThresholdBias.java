@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,33 +48,35 @@ public class AdjustPolygonForThresholdBias {
 	 * @param polygon The polygon that is to be adjusted. Modified.
 	 * @param clockwise Is the polygon in a lockwise orientation?
 	 */
-	public void process( Polygon2D_F64 polygon, boolean clockwise) {
+	public void process( Polygon2D_F64 polygon, boolean clockwise ) {
 		int N = polygon.size();
 		segments.resize(N);
 
 		// Apply the adjustment independently to each side
 		for (int i = N - 1, j = 0; j < N; i = j, j++) {
 
-			int ii,jj;
-			if( clockwise ) {
-				ii = i; jj = j;
+			int ii, jj;
+			if (clockwise) {
+				ii = i;
+				jj = j;
 			} else {
-				ii = j; jj = i;
+				ii = j;
+				jj = i;
 			}
 
 			Point2D_F64 a = polygon.get(ii), b = polygon.get(jj);
 
 			double dx = b.x - a.x;
 			double dy = b.y - a.y;
-			double l = Math.sqrt(dx * dx + dy * dy);
-			if( l == 0) {
+			double l = Math.sqrt(dx*dx + dy*dy);
+			if (l == 0) {
 				throw new RuntimeException("Two identical corners!");
 			}
 
 			// only needs to be shifted in two directions
-			if( dx < 0 )
+			if (dx < 0)
 				dx = 0;
-			if( dy > 0 )
+			if (dy > 0)
 				dy = 0;
 
 			LineSegment2D_F64 s = segments.get(ii);
@@ -86,20 +88,22 @@ public class AdjustPolygonForThresholdBias {
 
 		// Find the intersection between the adjusted lines to convert it back into polygon format
 		for (int i = N - 1, j = 0; j < N; i = j, j++) {
-			int ii,jj;
-			if( clockwise ) {
-				ii = i; jj = j;
+			int ii, jj;
+			if (clockwise) {
+				ii = i;
+				jj = j;
 			} else {
-				ii = j; jj = i;
+				ii = j;
+				jj = i;
 			}
 
-			UtilLine2D_F64.convert(segments.get(ii),ga);
-			UtilLine2D_F64.convert(segments.get(jj),gb);
+			UtilLine2D_F64.convert(segments.get(ii), ga);
+			UtilLine2D_F64.convert(segments.get(jj), gb);
 
-			if( null != Intersection2D_F64.intersection(ga,gb,intersection)) {
+			if (null != Intersection2D_F64.intersection(ga, gb, intersection)) {
 				// very acute angles can cause a large delta. This is conservative and prevents that
-				if( intersection.distance2(polygon.get(jj)) < 20 ) {
-					polygon.get(jj).set(intersection);
+				if (intersection.distance2(polygon.get(jj)) < 20) {
+					polygon.get(jj).setTo(intersection);
 				}
 			}
 		}
@@ -107,6 +111,6 @@ public class AdjustPolygonForThresholdBias {
 		// if two corners have a distance of 1 there are some conditions which exist where the corners can be shifted
 		// such that two points will now be equal. Avoiding the shift isn't a good idea shift the shift should happen
 		// there might be a more elegant solution to this problem but this is probably the simplest
-		UtilPolygons2D_F64.removeAdjacentDuplicates(polygon,1e-8);
+		UtilPolygons2D_F64.removeAdjacentDuplicates(polygon, 1e-8);
 	}
 }

@@ -75,9 +75,9 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		sceneB = new ArrayList<>();
 		for (int i = 0; i < numFeatures; i++) {
 			AssociatedTriple t = triples.get(i);
-			observations.get(0).set(t.p1);
-			observations.get(1).set(t.p2);
-			observations.get(2).set(t.p3);
+			observations.get(0).setTo(t.p1);
+			observations.get(1).setTo(t.p2);
+			observations.get(2).setTo(t.p3);
 			Point4D_F64 location = new Point4D_F64();
 			assertTrue(triangulator.triangulate(observations,camerasB,location));
 

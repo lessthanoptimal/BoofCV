@@ -68,8 +68,8 @@ public class CommonMotionNPointHomogenous extends BoofStandardJUnit {
 			Point2D_F64 p2 = PerspectiveOps.renderPixel(P, X, (Point2D_F64)null);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.p1.set(p1.x,p1.y);
-			pair.p2.set(p2.x,p2.y);
+			pair.p1.setTo(p1.x,p1.y);
+			pair.p2.setTo(p2.x,p2.y);
 			assocPairs.add(pair);
 			pixelsView2.add(p2);
 		}

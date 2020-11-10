@@ -114,7 +114,7 @@ class TestUchiyaMarkerTracker extends BoofStandardJUnit {
 			if( frame > 0 ) {
 				assertEquals(5.0,currMean.x-prevMean.x, 0.5);
 			}
-			prevMean.set(currMean);
+			prevMean.setTo(currMean);
 		}
 	}
 
@@ -170,7 +170,7 @@ class TestUchiyaMarkerTracker extends BoofStandardJUnit {
 		Collections.shuffle(dotsShuffled, rand);
 
 		var document = new LlahDocument();
-		document.landmarks.copyAll(landmarks,(src,dst)->dst.set(src));
+		document.landmarks.copyAll(landmarks,(src,dst)->dst.setTo(src));
 
 		var observed = new LlahOperations.FoundDocument();
 		observed.init(document);

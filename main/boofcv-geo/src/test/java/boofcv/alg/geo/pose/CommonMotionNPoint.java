@@ -49,11 +49,11 @@ public class CommonMotionNPoint extends BoofStandardJUnit {
 	// list of point pairs
 	protected List<Point2D3D> pointPose;
 
-	protected void generateScene(int N, Se3_F64 motion, boolean planar) {
+	protected void generateScene( int N, Se3_F64 motion, boolean planar ) {
 		this.motion = motion;
 
 		// randomly generate points in space
-		if( planar ) {
+		if (planar) {
 			worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, N);
 		} else {
 			worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
@@ -64,14 +64,14 @@ public class CommonMotionNPoint extends BoofStandardJUnit {
 		// transform points into second camera's reference frame
 		assocPairs = new ArrayList<>();
 		pointPose = new ArrayList<>();
-		for(Point3D_F64 p1 : worldPts ) {
+		for (Point3D_F64 p1 : worldPts) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
-			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
+			pair.p1.setTo(p1.x/p1.z, p1.y/p1.z);
+			pair.p2.setTo(p2.x/p2.z, p2.y/p2.z);
 			assocPairs.add(pair);
-			pointPose.add( new Point2D3D(pair.p2,p1));
+			pointPose.add(new Point2D3D(pair.p2, p1));
 
 			cameraPts.add(p2);
 		}

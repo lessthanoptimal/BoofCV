@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -182,7 +182,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public void addObservation( BFrame frame, T track, double pixelX, double pixelY ) {
 		BObservation o = track.observations.grow();
 		o.frame = frame;
-		o.pixel.set(pixelX, pixelY);
+		o.pixel.setTo(pixelX, pixelY);
 		frame.tracks.add(track);
 	}
 
@@ -198,7 +198,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 	public T addTrack( double x, double y, double z, double w ) {
 		T track = tracks.grow();
-		track.worldLoc.set(x, y, z, w);
+		track.worldLoc.setTo(x, y, z, w);
 		return track;
 	}
 
@@ -311,7 +311,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		public BFrame frame;
 
 		public void reset() {
-			pixel.set(-1, -1);
+			pixel.setTo(-1, -1);
 			frame = null;
 		}
 	}
@@ -350,7 +350,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		}
 
 		public void reset() {
-			worldLoc.set(0, 0, 0, 0);
+			worldLoc.setTo(0, 0, 0, 0);
 			observations.reset();
 			hasBeenInlier = false;
 			selected = false;

@@ -208,13 +208,13 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
 			for (PointIndex2D_F64 p : set.points) {
-				adj.set((float)p.x, (float)p.y);
+				adj.setTo((float)p.x, (float)p.y);
 				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
 			for (PointIndex2D_F64 p : set.points) {
-				adj.set((float)p.x, (float)p.y);
+				adj.setTo((float)p.x, (float)p.y);
 				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
 		}
@@ -222,7 +222,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 		if (showAll) {
 			for (CalibrationObservation l : allFeatures) {
 				for (PointIndex2D_F64 p : l.points) {
-					adj.set((float)p.x, (float)p.y);
+					adj.setTo((float)p.x, (float)p.y);
 					VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
 				}
 			}
@@ -238,7 +238,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 			g2.setColor(Color.BLACK);
 			for (int i = 0; i < set.size(); i++) {
 				PointIndex2D_F64 p = set.get(i);
-				adj.set((float)p.x, (float)p.y);
+				adj.setTo((float)p.x, (float)p.y);
 
 				double r = errorScale*results.pointError[i];
 				if (r < 1)
@@ -251,7 +251,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 			g2.setColor(Color.ORANGE);
 			for (int i = 0; i < set.size(); i++) {
 				PointIndex2D_F64 p = set.get(i);
-				adj.set((float)p.x, (float)p.y);
+				adj.setTo((float)p.x, (float)p.y);
 
 				double r = errorScale*results.pointError[i];
 				if (r < 1)

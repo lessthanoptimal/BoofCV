@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.image.Planar;
 /**
  * @author Peter Abeles
  */
-public class TestComaniciu2003_to_TrackerObjectQuad extends ColorTrackerObjectRectangleTests {
+public class TestComaniciu2003_to_TrackerObjectQuad extends ColorTrackerObjectRectangleChecks {
 
 	public TestComaniciu2003_to_TrackerObjectQuad() {
 		super(true);

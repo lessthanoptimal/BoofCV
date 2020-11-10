@@ -143,7 +143,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 				pairs.reset();
 				for (int i = 0; i < matches.size; i++) {
 					AssociatedIndex m = matches.get(i);
-					pairs.grow().set(srcFeats.get(m.src), dstFeats.get(m.dst));
+					pairs.grow().setTo(srcFeats.get(m.src), dstFeats.get(m.dst));
 				}
 
 				createEdge(src, dst, pairs, matches);

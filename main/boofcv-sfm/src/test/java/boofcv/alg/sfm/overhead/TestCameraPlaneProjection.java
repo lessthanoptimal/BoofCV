@@ -59,7 +59,7 @@ public class TestCameraPlaneProjection extends BoofStandardJUnit {
 		planeToCamera = cameraToPlane.invert(null);
 
 		cameraPt = SePointOps_F64.transform(planeToCamera, worldPt, null);
-		normalizedPt.set(cameraPt.x/cameraPt.z, cameraPt.y/cameraPt.z);
+		normalizedPt.setTo(cameraPt.x/cameraPt.z, cameraPt.y/cameraPt.z);
 		normToPixel.compute(normalizedPt.x, normalizedPt.y, pixelPt);
 	}
 

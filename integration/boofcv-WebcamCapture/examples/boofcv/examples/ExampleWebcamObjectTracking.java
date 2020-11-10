@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,7 +116,7 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 			boolean success = false;
 			if( mode == 2 ) {
 				Rectangle2D_F64 rect = new Rectangle2D_F64();
-				rect.set(point0.x, point0.y, point1.x, point1.y);
+				rect.setTo(point0.x, point0.y, point1.x, point1.y);
 				UtilPolygons2D_F64.convert(rect, target);
 				success = tracker.initialize(input,target);
 				this.mode = success ? 3 : 0;
@@ -185,14 +185,14 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		point0.set(e.getX(),e.getY());
-		point1.set(e.getX(),e.getY());
+		point0.setTo(e.getX(),e.getY());
+		point1.setTo(e.getX(),e.getY());
 		mode = 1;
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		point1.set(e.getX(),e.getY());
+		point1.setTo(e.getX(),e.getY());
 		mode = 2;
 	}
 
@@ -204,7 +204,7 @@ public class ExampleWebcamObjectTracking<T extends ImageBase<T>> extends JPanel
 
 	@Override public void mouseDragged(MouseEvent e) {
 		if( mode == 1 ) {
-			point1.set(e.getX(),e.getY());
+			point1.setTo(e.getX(),e.getY());
 		}
 	}
 

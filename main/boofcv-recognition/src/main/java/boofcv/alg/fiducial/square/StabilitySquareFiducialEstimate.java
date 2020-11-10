@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,26 +35,26 @@ import org.ddogleg.struct.FastQueue;
 public class StabilitySquareFiducialEstimate {
 
 	// estimates the pose of the fiducial
-	private QuadPoseEstimator estimator;
+	private final QuadPoseEstimator estimator;
 	// storage for corner observations
-	private Quadrilateral_F64 work = new Quadrilateral_F64();
+	private final Quadrilateral_F64 work = new Quadrilateral_F64();
 
 	// the pose estimate at the current unmodified location
-	private Se3_F64 referenceCameraToWorld = new Se3_F64();
+	private final Se3_F64 referenceCameraToWorld = new Se3_F64();
 
 	// storage for the difference between a sample pose estimate and the reference
-	private Se3_F64 difference = new Se3_F64();
+	private final Se3_F64 difference = new Se3_F64();
 
 	// storage for all the samples
-	private FastQueue<Se3_F64> samples = new FastQueue<>(Se3_F64::new);
+	private final FastQueue<Se3_F64> samples = new FastQueue<>(Se3_F64::new);
 
-	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
+	private final Rodrigues_F64 rodrigues = new Rodrigues_F64();
 
 	// compute metrics.
 	private double maxLocation;
 	private double maxOrientation;
 
-	public StabilitySquareFiducialEstimate(QuadPoseEstimator estimator) {
+	public StabilitySquareFiducialEstimate( QuadPoseEstimator estimator ) {
 		this.estimator = estimator;
 	}
 
@@ -65,21 +65,21 @@ public class StabilitySquareFiducialEstimate {
 	 * @param input Observed corner location of the fiducial in distorted pixels.  Must be in correct order.
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( double sampleRadius , Quadrilateral_F64 input ) {
-		work.set(input);
+	public boolean process( double sampleRadius, Quadrilateral_F64 input ) {
+		work.setTo(input);
 
 		samples.reset();
-		estimator.process(work,false);
+		estimator.process(work, false);
 		estimator.getWorldToCamera().invert(referenceCameraToWorld);
 
 		samples.reset();
 
-		createSamples(sampleRadius,work.a,input.a);
-		createSamples(sampleRadius,work.b,input.b);
-		createSamples(sampleRadius,work.c,input.c);
-		createSamples(sampleRadius,work.d,input.d);
+		createSamples(sampleRadius, work.a, input.a);
+		createSamples(sampleRadius, work.b, input.b);
+		createSamples(sampleRadius, work.c, input.c);
+		createSamples(sampleRadius, work.d, input.d);
 
-		if( samples.size() < 10 )
+		if (samples.size() < 10)
 			return false;
 
 		maxLocation = 0;
@@ -87,19 +87,18 @@ public class StabilitySquareFiducialEstimate {
 		for (int i = 0; i < samples.size(); i++) {
 			referenceCameraToWorld.concat(samples.get(i), difference);
 
-			ConvertRotation3D_F64.matrixToRodrigues(difference.getR(),rodrigues);
+			ConvertRotation3D_F64.matrixToRodrigues(difference.getR(), rodrigues);
 
 			double theta = Math.abs(rodrigues.theta);
 
 			double d = difference.getT().norm();
 
-			if( theta > maxOrientation ) {
+			if (theta > maxOrientation) {
 				maxOrientation = theta;
 			}
-			if( d > maxLocation ) {
+			if (d > maxLocation) {
 				maxLocation = d;
 			}
-
 		}
 
 		return true;
@@ -108,27 +107,27 @@ public class StabilitySquareFiducialEstimate {
 	/**
 	 * Samples around the provided corner +- in x and y directions
 	 */
-	private void createSamples( double sampleRadius , Point2D_F64 workPoint , Point2D_F64 originalPoint ) {
+	private void createSamples( double sampleRadius, Point2D_F64 workPoint, Point2D_F64 originalPoint ) {
 
 		workPoint.x = originalPoint.x + sampleRadius;
-		if( estimator.process(work,false) ) {
-			samples.grow().set( estimator.getWorldToCamera() );
+		if (estimator.process(work, false)) {
+			samples.grow().setTo(estimator.getWorldToCamera());
 		}
 		workPoint.x = originalPoint.x - sampleRadius;
-		if( estimator.process(work,false) ) {
-			samples.grow().set( estimator.getWorldToCamera() );
+		if (estimator.process(work, false)) {
+			samples.grow().setTo(estimator.getWorldToCamera());
 		}
 		workPoint.x = originalPoint.x;
 
 		workPoint.y = originalPoint.y + sampleRadius;
-		if( estimator.process(work,false) ) {
-			samples.grow().set( estimator.getWorldToCamera() );
+		if (estimator.process(work, false)) {
+			samples.grow().setTo(estimator.getWorldToCamera());
 		}
 		workPoint.y = originalPoint.y - sampleRadius;
-		if( estimator.process(work,false) ) {
-			samples.grow().set( estimator.getWorldToCamera() );
+		if (estimator.process(work, false)) {
+			samples.grow().setTo(estimator.getWorldToCamera());
 		}
-		workPoint.set(originalPoint);
+		workPoint.setTo(originalPoint);
 	}
 
 	public double getLocationStability() {

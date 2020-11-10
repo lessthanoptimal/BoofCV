@@ -36,7 +36,7 @@ class TestChessboardCornerGraph extends BoofStandardJUnit {
 	void findClosest() {
 		ChessboardCornerGraph alg = new ChessboardCornerGraph();
 		for (int i = 0; i < 10; i++) {
-			alg.corners.grow().set(i*5,1);
+			alg.corners.grow().setTo(i*5,1);
 		}
 		Node n = alg.findClosest(10.1,0.5);
 		assertEquals(0,n.distance(10,1), UtilEjml.TEST_F64);
@@ -46,7 +46,7 @@ class TestChessboardCornerGraph extends BoofStandardJUnit {
 	void reset() {
 		ChessboardCornerGraph alg = new ChessboardCornerGraph();
 		for (int i = 0; i < 10; i++) {
-			alg.corners.grow().set(i*5,1);
+			alg.corners.grow().setTo(i*5,1);
 		}
 		assertTrue(alg.corners.size>0);
 		alg.reset();
@@ -87,7 +87,7 @@ class TestChessboardCornerGraph extends BoofStandardJUnit {
 	@Test
 	void node_reset() {
 		Node n = new Node();
-		n.set(1,2);
+		n.setTo(1,2);
 		n.index = 3;
 		n.orientation = 9;
 		n.edges[1] = new Node();

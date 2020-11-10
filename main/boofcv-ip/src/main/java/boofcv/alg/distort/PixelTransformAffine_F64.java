@@ -36,11 +36,11 @@ public class PixelTransformAffine_F64 implements PixelTransform<Point2D_F64> {
 	public PixelTransformAffine_F64() {}
 
 	public PixelTransformAffine_F64( Affine2D_F64 affine ) {
-		this.model.set(affine);
+		this.model.setTo(affine);
 	}
 
-	public void set( Affine2D_F64 affine ) {
-		this.model.set(affine);
+	public void setTo( Affine2D_F64 affine ) {
+		this.model.setTo(affine);
 	}
 
 	@Override

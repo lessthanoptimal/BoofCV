@@ -173,21 +173,21 @@ public class ExampleTrifocalStereoUncalibrated {
 		detDesc.detect(image01);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
-			locations01.grow().set(pixel.x - cx, pixel.y - cy);
+			locations01.grow().setTo(pixel.x - cx, pixel.y - cy);
 			features01.grow().setTo(detDesc.getDescription(i));
 			featureSet01.add(detDesc.getSet(i));
 		}
 		detDesc.detect(image02);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
-			locations02.grow().set(pixel.x - cx, pixel.y - cy);
+			locations02.grow().setTo(pixel.x - cx, pixel.y - cy);
 			features02.grow().setTo(detDesc.getDescription(i));
 			featureSet02.add(detDesc.getSet(i));
 		}
 		detDesc.detect(image03);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
-			locations03.grow().set(pixel.x - cx, pixel.y - cy);
+			locations03.grow().setTo(pixel.x - cx, pixel.y - cy);
 			features03.grow().setTo(detDesc.getDescription(i));
 			featureSet03.add(detDesc.getSet(i));
 		}
@@ -225,7 +225,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple::new);
 		for (int i = 0; i < associatedIdx.size; i++) {
 			AssociatedTripleIndex p = associatedIdx.get(i);
-			associated.grow().set(locations01.get(p.a), locations02.get(p.b), locations03.get(p.c));
+			associated.grow().setTo(locations01.get(p.a), locations02.get(p.b), locations03.get(p.c));
 		}
 		ransac.process(associated.toList());
 
@@ -419,7 +419,7 @@ public class ExampleTrifocalStereoUncalibrated {
 			System.out.println("Flipping because it's reversed. score = " + bundleAdjustment.getFitScore());
 			for (int i = 1; i < structure.views.size; i++) {
 				Se3_F64 w2v = structure.getParentToView(i);
-				w2v.set(w2v.invert(null));
+				w2v.setTo(w2v.invert(null));
 			}
 			triangulatePoints(structure, observations);
 

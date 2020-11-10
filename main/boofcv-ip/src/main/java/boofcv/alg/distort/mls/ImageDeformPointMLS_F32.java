@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -148,7 +148,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 */
 	public int addControl( float x , float y ) {
 		Control c = controls.grow();
-		c.q.set(x,y);
+		c.q.setTo(x,y);
 		setUndistorted(controls.size-1,x,y);
 		return controls.size-1;
 	}
@@ -162,7 +162,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		if( scaleX <= 0 || scaleY <= 0 )
 			throw new IllegalArgumentException("Must call configure first");
 
-		controls.get(which).p.set(x/scaleX,y/scaleY);
+		controls.get(which).p.setTo(x/scaleX,y/scaleY);
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * @param y distorted coordinate y-axis in image pixels
 	 */
 	public void setDistorted( int which , float x , float y ) {
-		controls.get(which).q.set(x,y);
+		controls.get(which).q.setTo(x,y);
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			x += c.p.x * w;
 			y += c.p.y * w;
 		}
-		aveP.set(x / totalWeight, y / totalWeight);
+		aveP.setTo(x / totalWeight, y / totalWeight);
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			x += c.q.x * w;
 			y += c.q.y * w;
 		}
-		aveQ.set(x / totalWeight, y / totalWeight);
+		aveQ.setTo(x / totalWeight, y / totalWeight);
 	}
 
 	/**
@@ -330,7 +330,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		Point2D_F32 d10 = getGrid(y1,x0);
 		Point2D_F32 d11 = getGrid(y1,x1);
 
-		deformed.set(0,0);
+		deformed.setTo(0,0);
 		deformed.x += w00 * d00.x;
 		deformed.x += w01 * d01.x;
 		deformed.x += w11 * d11.x;
@@ -417,7 +417,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 		@Override
 		public void computeDeformed(float v_x, float v_y, Point2D_F32 deformed) {
-			deformed.set(0,0);
+			deformed.setTo(0,0);
 
 			final int totalControls =  controls.size;
 			for (int i = 0; i < totalControls; i++) {
@@ -477,7 +477,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 		@Override
 		public void computeDeformed(float v_x, float v_y, Point2D_F32 deformed) {
-			deformed.set(0,0);
+			deformed.setTo(0,0);
 
 			final int totalControls =  controls.size;
 			for (int i = 0; i < totalControls; i++) {

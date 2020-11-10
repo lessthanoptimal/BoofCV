@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,12 +62,12 @@ public class AssociatedTupleN implements AssociatedTuple {
 
 	@Override
 	public void set( int index , double x , double y ) {
-		p[index].set(x,y);
+		p[index].setTo(x,y);
 	}
 
 	@Override
 	public void set( int index , Point2D_F64 src ) {
-		p[index].set(src);
+		p[index].setTo(src);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class Point2D4D {
 		location = new Point4D_F64();
 	}
 
-	public Point2D4D(Point2D_F64 observation, Point4D_F64 location) {
+	public Point2D4D( Point2D_F64 observation, Point4D_F64 location ) {
 		this.observation = observation;
 		this.location = location;
 	}
@@ -49,16 +49,16 @@ public class Point2D4D {
 	/**
 	 * Sets 'this' to be identical to 'src'.
 	 */
-	public void set( Point2D4D src ) {
-		observation.set(src.observation);
-		location.set(src.location);
+	public void setTo( Point2D4D src ) {
+		observation.setTo(src.observation);
+		location.setTo(src.location);
 	}
 
 	public Point2D_F64 getObservation() {
 		return observation;
 	}
 
-	public void setObservation(Point2D_F64 observation) {
+	public void setObservation( Point2D_F64 observation ) {
 		this.observation = observation;
 	}
 
@@ -66,12 +66,11 @@ public class Point2D4D {
 		return location;
 	}
 
-	public void setLocation(Point4D_F64 location) {
+	public void setLocation( Point4D_F64 location ) {
 		this.location = location;
 	}
 
 	public Point2D4D copy() {
-		return new Point2D4D(observation.copy(),location.copy());
+		return new Point2D4D(observation.copy(), location.copy());
 	}
-
 }

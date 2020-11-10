@@ -56,7 +56,7 @@ public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 				// If left as uncountable it can mess up the processing completely later on.
 				// Figured a pixel out of the image at -1,-1 might get someone's attention that something is up
 				if (!ignoreNaN && (UtilEjml.isUncountable(p.x) || UtilEjml.isUncountable(p.y))) {
-					p.set(-1, -1);
+					p.setTo(-1, -1);
 				}
 				map[index++] = p;
 			}
@@ -83,7 +83,7 @@ public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 //		if( x < 0 || y < 0 || x >= width || y >= height )
 //			throw new IllegalArgumentException("Out of bounds");
 
-		output.set(map[y*width + x]);
+		output.setTo(map[y*width + x]);
 	}
 
 	@Override
