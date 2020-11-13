@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class ImageDimension {
 		this.height = src.height;
 	}
 
-	public void set( int width, int height ) {
+	public void setTo( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}

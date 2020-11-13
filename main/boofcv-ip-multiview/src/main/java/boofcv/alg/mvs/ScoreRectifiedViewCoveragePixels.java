@@ -21,7 +21,7 @@ package boofcv.alg.mvs;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.PixelTransform;
-import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
@@ -52,7 +52,7 @@ public class ScoreRectifiedViewCoveragePixels {
 	// Calibrated intrinsic parameters for "left" camera
 	double scale;
 	// Indicates the number of times a 3D disparity lands on this pixel. -1 means the pixel is invalid
-	final GrayS16 viewed = new GrayS16(1, 1);
+	final GrayF32 viewed = new GrayF32(1, 1);
 	// Precomputed transform from distorted pixels to undistorted pixels
 	final FastQueue<Point2D_F64> pixel_to_undist = new FastQueue<>(Point2D_F64::new, p -> p.setTo(0.0, 0.0));
 
@@ -99,9 +99,11 @@ public class ScoreRectifiedViewCoveragePixels {
 	 *
 	 * @param width (Input) Width of the new view being added
 	 * @param height (Input) Height of the new view being added
-	 * @param rect (Input) Homography from undistorted pixels to rectified pixels
+	 * @param rect (Input) Homography from undistorted pixels to rectified pixels in this view.
+	 * @param quality3D (Input) Signifies the quality of 3D information available. Higher numbers mean more 3D
+	 * information from this view. A value of 0 indicates no 3D information. Typically this ranges from 0 to 1.
 	 */
-	public void addView( int width, int height, DMatrixRMaj rect ) {
+	public void addView( int width, int height, DMatrixRMaj rect, float quality3D ) {
 
 		pixel_to_rect.set(rect);
 
@@ -119,7 +121,7 @@ public class ScoreRectifiedViewCoveragePixels {
 				if (!BoofMiscOps.isInside(width, height, rectified.x, rectified.y))
 					continue;
 
-				viewed.data[index]++;
+				viewed.data[index] += quality3D;
 			}
 		}
 	}
@@ -129,12 +131,12 @@ public class ScoreRectifiedViewCoveragePixels {
 	 */
 	public void process() {
 		int totalValid = 0;
-		int total = 0;
+		float total = 0.0f;
 
 		for (int y = 0, index = 0; y < viewed.height; y++) {
 			for (int x = 0; x < viewed.width; x++, index++) {
-				int value = viewed.data[index];
-				if (value <= 0)
+				float value = viewed.data[index];
+				if (value <= 0.0f)
 					continue;
 
 				totalValid++;

@@ -322,7 +322,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 
 	@Override
 	public void lookupShape( String target, ImageDimension shape ) {
-		shape.set(intrinsic.width, intrinsic.height);
+		shape.setTo(intrinsic.width, intrinsic.height);
 	}
 
 	/**

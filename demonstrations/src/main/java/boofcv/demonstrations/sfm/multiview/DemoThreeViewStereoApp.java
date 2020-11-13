@@ -388,7 +388,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			ConvertBufferedImage.convertFrom(buffered, input, true);
 			System.out.println("Processing image " + sourceID + "  shape " + input.width + " " + input.height);
 			System.out.println("  " + inputFilePath);
-			dimensions[sourceID].set(input.width, input.height);
+			dimensions[sourceID].setTo(input.width, input.height);
 			buff[sourceID] = buffered;
 
 			// assume the image center is the principle point

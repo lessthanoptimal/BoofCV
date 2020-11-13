@@ -101,11 +101,11 @@ public class RectifyImageOps {
 	 * and a pixel are parallel it will require infinite area.
 	 * </p>
 	 *
-	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
-	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
-	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
+	 * @param paramLeft (Input) Left camera intrinsic parameters
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
+	 * @param rectifyK (Input, Output) Rectified intrinsic calibration matrix.
+	 * @param rectifiedSize (Output, Optional) Rectified image size that maximizes usable pixels at native resolution.
 	 */
 	public static void fullViewLeft( CameraPinholeBrown paramLeft,
 									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
@@ -129,11 +129,11 @@ public class RectifyImageOps {
 	 * and a pixel are parallel it will require infinite area.
 	 * </p>
 	 *
-	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
-	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
-	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
+	 * @param paramLeft (Input) Left camera intrinsic parameters
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
+	 * @param rectifyK (Input, Output) Rectified intrinsic calibration matrix.
+	 * @param rectifiedSize (Output, Optional) Rectified image size that maximizes usable pixels at native resolution.
 	 */
 	public static void fullViewLeft( CameraPinholeBrown paramLeft,
 									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
@@ -154,10 +154,10 @@ public class RectifyImageOps {
 	 * Input rectification matrices are overwritten with adjusted values on output.
 	 * </p>
 	 *
-	 * @param imageWidth Width of left image.
-	 * @param imageHeight Height of left image.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
+	 * @param imageWidth (Input) Width of left image.
+	 * @param imageHeight (Input) Height of left image.
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft( int imageWidth, int imageHeight,
@@ -175,10 +175,10 @@ public class RectifyImageOps {
 	 * Input rectification matrices are overwritten with adjusted values on output.
 	 * </p>
 	 *
-	 * @param imageWidth Width of left image.
-	 * @param imageHeight Height of left image.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
+	 * @param imageWidth (Input) Width of left image.
+	 * @param imageHeight (Input) Height of left image.
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft( int imageWidth, int imageHeight,
@@ -194,11 +194,11 @@ public class RectifyImageOps {
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
-	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
-	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
-	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
+	 * @param paramLeft (Input) Left camera intrinsic parameters
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
+	 * @param rectifyK (Input, Output) Rectified intrinsic calibration matrix.
+	 * @param rectifiedSize (Output, Optional) Rectified image size that maximizes usable pixels at native resolution.
 	 */
 	public static void allInsideLeft( CameraPinholeBrown paramLeft,
 									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
@@ -218,11 +218,11 @@ public class RectifyImageOps {
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
-	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
-	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
-	 * @param rectifiedSize (Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
+	 * @param paramLeft (Input) Left camera intrinsic parameters
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
+	 * @param rectifyK (Input, Output) Rectified intrinsic calibration matrix.
+	 * @param rectifiedSize (Output, Optional) Rectified image size that maximizes usable pixels at native resolution. Modified.
 	 */
 	public static void allInsideLeft( CameraPinholeBrown paramLeft,
 									  FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
@@ -241,10 +241,10 @@ public class RectifyImageOps {
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
-	 * @param imageWidth Width of left image.
-	 * @param imageHeight Height of left image.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
+	 * @param imageWidth (Input) Width of left image.
+	 * @param imageHeight (Input) Height of left image.
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
 	 */
 	public static void allInsideLeft( int imageWidth, int imageHeight,
 									  DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight ) {
@@ -259,10 +259,10 @@ public class RectifyImageOps {
 	 * overwritten with adjusted values on output.
 	 * </p>
 	 *
-	 * @param imageWidth Width of left image.
-	 * @param imageHeight Height of left image.
-	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
-	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
+	 * @param imageWidth (Input) Width of left image.
+	 * @param imageHeight (Input) Height of left image.
+	 * @param rectifyLeft (Input, Output) Left image transform from pixels to rectified pixels.
+	 * @param rectifyRight (Input, Output) Right image transform from pixels to rectified pixels.
 	 */
 	public static void allInsideLeft( int imageWidth, int imageHeight,
 									  FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight ) {
@@ -275,8 +275,8 @@ public class RectifyImageOps {
 	 * Rectification includes removal of lens distortion. Used for rendering rectified images.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters.
-	 * @param rectify Transform for rectifying the image.
+	 * @param param (Input) Intrinsic parameters.
+	 * @param rectify (Input) Transform from pixels to rectified pixels
 	 * @return Transform from rectified to unrectified pixels
 	 */
 	public static Point2Transform2_F64 transformRectToPixel( CameraPinholeBrown param,
@@ -290,8 +290,8 @@ public class RectifyImageOps {
 	 * Rectification includes removal of lens distortion. Used for rendering rectified images.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters.
-	 * @param rectify Transform for rectifying the image.
+	 * @param param (Input) Intrinsic parameters.
+	 * @param rectify (Input) Transform from pixels to rectified pixels
 	 * @return Transform from rectified to unrectified pixels
 	 */
 	public static Point2Transform2_F32 transformRectToPixel( CameraPinholeBrown param,
@@ -304,8 +304,8 @@ public class RectifyImageOps {
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters. Not modified.
-	 * @param rectify Transform for rectifying the image. Not modified.
+	 * @param param (Input) Intrinsic parameters.
+	 * @param rectify (Input) Transform from pixels to rectified pixels
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
 	public static Point2Transform2_F64 transformPixelToRect( CameraPinholeBrown param,
@@ -318,8 +318,8 @@ public class RectifyImageOps {
 	 * Creates a transform that applies rectification to unrectified distorted pixels.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters. Not modified.
-	 * @param rectify Transform for rectifying the image. Not modified.
+	 * @param param (Input) Intrinsic parameters.
+	 * @param rectify (Input) Transform from pixels to rectified pixels
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
 	public static Point2Transform2_F32 transformPixelToRect( CameraPinholeBrown param,
@@ -333,9 +333,9 @@ public class RectifyImageOps {
 	 * normalized pixel coordinates.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters.
-	 * @param rectify Transform for rectifying the image.
-	 * @param rectifyK Camera calibration matrix after rectification
+	 * @param param (Input) Intrinsic parameters.
+	 * @param rectify (Input) Transform from pixels to rectified pixels
+	 * @param rectifyK (Input) Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
 	public static Point2Transform2_F64 transformPixelToRectNorm( CameraPinholeBrown param,
@@ -350,8 +350,8 @@ public class RectifyImageOps {
 	 * normalized pixel coordinates.
 	 * </p>
 	 *
-	 * @param param Intrinsic parameters.
-	 * @param rectify Transform for rectifying the image.
+	 * @param param (Input) Intrinsic parameters.
+	 * @param rectify (Input) Transform from pixels to rectified pixels
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */

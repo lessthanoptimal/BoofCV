@@ -208,7 +208,7 @@ public class SceneWorkingGraph {
 		public void reset() {
 			index = -1;
 			pview = null;
-			imageDimension.set(-1, -1);
+			imageDimension.setTo(-1, -1);
 			obs_to_feat.clear();
 			projective.zero();
 			intrinsic.reset();

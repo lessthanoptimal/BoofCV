@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -242,7 +242,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 
 	@Override
 	public void lookupShape(String target, ImageDimension shape) {
-		shape.set(imageWidth, imageHeight);
+		shape.setTo(imageWidth, imageHeight);
 	}
 
 	/**
