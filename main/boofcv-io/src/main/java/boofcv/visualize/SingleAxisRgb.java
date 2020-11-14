@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,14 +35,13 @@ public abstract class SingleAxisRgb extends PeriodicColorizer {
 		int Y=(int)Math.floor(HV*(a-X)); //fractional part from 0 to 255
 
 		int r,g,b;
-		switch(X) {
-			case 0: r=HV;  g=Y;   b=LV;break;
-			case 1: r=HV-Y;g=HV;  b=LV;break;
-			case 2: r=LV;  g=HV;  b=Y;break;
-			case 3: r=LV;  g=HV-Y;b=HV;break;
-			case 4: r=LV;  g=LV;  b=HV;break;
-			default:
-				throw new RuntimeException("BUG! X="+X+"  f="+f);
+		switch (X) {
+			case 0 -> { r = HV; g = Y; b = LV; }
+			case 1 -> { r = HV - Y; g = HV; b = LV; }
+			case 2 -> { r = LV; g = HV; b = Y; }
+			case 3 -> { r = LV; g = HV - Y; b = HV; }
+			case 4 -> { r = LV; g = LV; b = HV; }
+			default -> throw new RuntimeException("BUG! X=" + X + "  f=" + f);
 		}
 		return (r << 16) | (g <<8) | b;
 	}

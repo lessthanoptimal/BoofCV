@@ -33,12 +33,12 @@ public abstract class StereoDisparityAbstract<T extends ImageBase<T>, D extends 
 	ImageType<T> imageType;
 	Class<D> disparityType;
 
-	public StereoDisparityAbstract( ImageType<T> imageType, Class<D> disparityType ) {
+	protected StereoDisparityAbstract( ImageType<T> imageType, Class<D> disparityType ) {
 		this.imageType = imageType;
 		this.disparityType = disparityType;
 	}
 
-	public StereoDisparityAbstract() {}
+	protected StereoDisparityAbstract() {}
 
 	@Override public void process( T imageLeft, T imageRight ) {}
 

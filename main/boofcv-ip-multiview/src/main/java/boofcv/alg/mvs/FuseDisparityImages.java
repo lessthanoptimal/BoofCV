@@ -186,18 +186,22 @@ public class FuseDisparityImages {
 				if (imageDisp >= imageRange)
 					continue;
 
-				// Convert the disparity from "image" into "fused image"
+				if (imageDisp + imageMin != 0) {
+					// Convert the disparity from "image" into "fused image"
+					// First compute the 3D point in the rectified coordinate system
+					double rectZ = imageBaseline*imageFocalX/(imageDisp + imageMin);
+					double rectX = rectZ*(x - imagePinhole.cx)/imagePinhole.fx;
+					double rectY = rectZ*(y - imagePinhole.cy)/imagePinhole.fy;
+					// Go from rectified to left camera, which is the fused camera
+					double worldZ = dotRightCol(imageParam.rectifiedR, rectX, rectY, rectZ);
+					// Now that we know Z we can compute the disparity
+					float fusedDisp = fusedBaseline*fusedFocalX/(float)worldZ;
 
-				// First compute the 3D point in the rectified coordinate system
-				double rectZ = imageBaseline*imageFocalX/(imageDisp + imageMin);
-				double rectX = rectZ*(x - imagePinhole.cx)/imagePinhole.fx;
-				double rectY = rectZ*(y - imagePinhole.cy)/imagePinhole.fy;
-				// Go from rectified to left camera, which is the fused camera
-				double worldZ = dotRightCol(imageParam.rectifiedR, rectX, rectY, rectZ);
-				// Now that we know Z we can compute the disparity
-				float fusedDisp = fusedBaseline*fusedFocalX/(float)worldZ;
-
-				fused.get(x, y).add(fusedDisp);
+					fused.get(x, y).add(fusedDisp);
+				} else {
+					// Points at infinity are a special case. They will remain at infinity
+					fused.get(x, y).add(0.0f);
+				}
 			}
 		}
 		return true;

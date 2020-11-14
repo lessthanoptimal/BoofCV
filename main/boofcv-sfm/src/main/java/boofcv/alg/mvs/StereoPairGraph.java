@@ -18,10 +18,7 @@
 
 package boofcv.alg.mvs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Specifies which views can be used as stereo pairs and the quality of the 3D information between the views
@@ -30,23 +27,60 @@ import java.util.Map;
  */
 public class StereoPairGraph {
 	/** List of all the views */
-	public final Map<String,View> views = new HashMap<>();
+	public final Map<String, Vertex> vertexes = new HashMap<>();
+
+	public Vertex addVertex( String id, int indexSba ) {
+		var v = new Vertex();
+		v.id = id;
+		v.indexSba = indexSba;
+
+		if (null != vertexes.put(v.id, v))
+			throw new IllegalArgumentException("There was already a node with id=" + v.id);
+
+		return v;
+	}
+
+	public Edge connect( String a, String b, double quality3D ) {
+		Vertex va = Objects.requireNonNull(vertexes.get(a));
+		Vertex vb = Objects.requireNonNull(vertexes.get(b));
+
+		Edge e = new Edge();
+		e.va = va;
+		e.vb = vb;
+		e.quality3D = quality3D;
+
+		va.pairs.add(e);
+		vb.pairs.add(e);
+
+		return e;
+	}
 
 	public void reset() {
-		views.clear();
+		vertexes.clear();
 	}
 
-	public static class View {
+	public static class Vertex {
 		/** The view this is in reference to */
 		public String id = "";
+		/** Index in the SBA scene */
+		public int indexSba = -1;
 		/** List of all views it can form a 3D stereo pair with */
-		public final List<Pair> pairs = new ArrayList<>();
+		public final List<Edge> pairs = new ArrayList<>();
 	}
 
-	public static class Pair {
-		/** Which view it's connected to */
-		public String id = "";
+	public static class Edge {
+		/** Vertexes this edge is connected to */
+		public Vertex va = null, vb = null;
+
 		/** How good the 3D information is between these two views. 0.0 = no 3D. 1.0 = best possible. */
 		public double quality3D = 0.0;
+
+		public Vertex other( Vertex src ) {
+			if (src == va)
+				return vb;
+			else if (src == vb)
+				return va;
+			throw new IllegalArgumentException("Edge does not link to src.id=" + src.id);
+		}
 	}
 }

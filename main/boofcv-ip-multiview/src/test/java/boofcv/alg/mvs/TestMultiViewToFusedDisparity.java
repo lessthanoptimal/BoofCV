@@ -103,7 +103,7 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		configDisp.texture = 0.05;
 		configDisp.disparityMin = 20;
 		configDisp.disparityRange = 80;
-		alg.disparityAlg = FactoryStereoDisparity.blockMatchBest5(configDisp, GrayF32.class, GrayF32.class);
+		alg.setStereoDisparity = FactoryStereoDisparity.blockMatchBest5(configDisp, GrayF32.class, GrayF32.class);
 		TIntObjectMap<GrayF32> images = new TIntObjectHashMap<>();
 
 		// Textured target that stereo will work well on
@@ -173,7 +173,7 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		var configDisp = new ConfigDisparityBMBest5();
 		configDisp.errorType = DisparityError.SAD;
 		configDisp.disparityRange = 5;
-		alg.disparityAlg = FactoryStereoDisparity.blockMatchBest5(configDisp, GrayF32.class, GrayF32.class);
+		alg.setStereoDisparity = FactoryStereoDisparity.blockMatchBest5(configDisp, GrayF32.class, GrayF32.class);
 		TIntObjectMap<GrayF32> images = new TIntObjectHashMap<>();
 		for (int i = 0; i < 3; i++) {
 			images.put(i, new GrayF32(50, 50));

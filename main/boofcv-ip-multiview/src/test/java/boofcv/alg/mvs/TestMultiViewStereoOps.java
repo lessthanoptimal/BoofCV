@@ -51,7 +51,7 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 		var parameters = new DisparityParameters(2, 100, 1.5, intrinsic);
 		Se3_F64 cloud_to_stereo = SpecialEuclideanOps_F64.eulerXyz(-0.1, 0.05, 0.2, 0.01, 0.02, -0.03, null);
 		var norm_to_pixel = new LensDistortionPinhole(intrinsic).distort_F64(false, true);
-		double tolerance = 1.0;
+		float tolerance = 1.0f;
 		GrayU8 mask = disparity.createSameShape(GrayU8.class);
 
 		// Render the cloud onto the disparity image
@@ -66,7 +66,7 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 		// Make a disparity point barely within tolerance. The mask should not change
 		ImageMiscOps.fill(mask, 0);
 		ImageMiscOps.findAndProcess(disparity, ( v ) -> v < parameters.disparityRange, ( int x, int y ) -> {
-			disparity.data[disparity.getIndex(x, y)] += tolerance - 0.0001;
+			disparity.data[disparity.getIndex(x, y)] += tolerance - 0.0001f;
 			return false;
 		});
 		MultiViewStereoOps.maskOutPointsInCloud(
@@ -76,7 +76,7 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 		// Make that same point outside of tolerance. The pixel should not be masked
 		ImageMiscOps.fill(mask, 0);
 		ImageMiscOps.findAndProcess(disparity, ( v ) -> v < parameters.disparityRange, ( int x, int y ) -> {
-			disparity.data[disparity.getIndex(x, y)] += 0.0002;
+			disparity.data[disparity.getIndex(x, y)] += 0.0002f;
 			return false;
 		});
 		MultiViewStereoOps.maskOutPointsInCloud(

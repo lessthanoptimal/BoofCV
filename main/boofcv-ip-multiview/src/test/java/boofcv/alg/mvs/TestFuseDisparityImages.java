@@ -119,6 +119,37 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 		}
 	}
 
+	/** Checks to see if it handles points with zero disparity at infinity correctly */
+	@Test void addToFusedImage_infinity() {
+		// make the images smaller for slightly faster processing since size doesn't matter
+		intrinsic.fsetShape(10, 12);
+
+		var alg = new FuseDisparityImages();
+		var distort = new PixelTransformAffine_F64();
+		distort.getModel().setTo(1, 0, 0, 1, 0, 0);
+		alg.initialize(intrinsic, distort);
+		alg.fusedBaseline = parameters.baseline;
+
+		var image = new FuseDisparityImages.DisparityImage();
+		image.disparity.reshape(intrinsic.width, intrinsic.height);
+		image.mask.reshape(image.disparity);
+		image.parameters.setTo(parameters);
+		ImageMiscOps.fill(image.mask, 1);
+		CommonOps_DDRM.diag(image.rect, 3, 1, 1, 1);
+		// every point will be at infinity
+		ImageMiscOps.fill(image.disparity, 0);
+		image.parameters.disparityMin = 0;
+
+		// Every point should be filled in with zero disparity
+		assertTrue(alg.addToFusedImage(image));
+		for (int y = 0; y < intrinsic.height; y++) {
+			for (int x = 0; x < intrinsic.width; x++) {
+				assertEquals(1, alg.fused.get(x, y).size);
+				assertEquals(0, alg.fused.get(x, y).get(0));
+			}
+		}
+	}
+
 	/**
 	 * Given an already constructed fused image, compute the disparity image output.
 	 */

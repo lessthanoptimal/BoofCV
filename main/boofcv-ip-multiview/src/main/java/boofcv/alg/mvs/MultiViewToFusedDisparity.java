@@ -42,6 +42,7 @@ import java.io.PrintStream;
 import java.util.Set;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Given a set of distorted images with their known extrinsic and intrinsic parameters, compute a fused disparity
@@ -60,6 +61,9 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	/** Provides access to intermediate stereo results */
 	private @Getter @Setter @Nullable Listener listener;
 
+	/** Computes disparity between each image pair. Must be set. */
+	@Getter @Setter @Nullable StereoDisparity<Image, GrayF32> setStereoDisparity = null;
+
 	//------------ References to input objects
 	private SceneStructureMetric scene; // Camera placement and parameters
 	private TIntObjectMap<Image> images; // Look up camera images
@@ -73,9 +77,6 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	final StereoResults results = new StereoResults();
 	// Fuses multiple disparity images together provided they have the same "left" view
 	final FuseDisparityImages performFusion = new FuseDisparityImages();
-
-	// Computes disparity between each image pair
-	StereoDisparity<Image, GrayF32> disparityAlg;
 
 	// Storage for rectified stereo images
 	Image rectified1, rectified2;
@@ -117,6 +118,8 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process( int targetID, GrowQueue_I32 pairs ) {
+		requireNonNull(setStereoDisparity, "setStereoDisparity must be configured");
+
 		// Precompute what little can be for the target / left / image1
 		Image image1 = images.get(targetID);
 		int targetCamera = scene.views.get(targetID).camera;
@@ -126,7 +129,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		// Compute disparity for all the images it has been paired with and add them to the fusion algorithm
 		performFusion.initialize(computeRectification.intrinsic1, computeRectification.view1_dist_to_undist);
 		for (int i = 0; i < pairs.size; i++) {
-			if (verbose !=null) verbose.println("Computing stereo for view "+pairs.get(i));
+			if (verbose != null) verbose.println("Computing stereo for view " + pairs.get(i));
 			computeDisparity(image1, pairs.get(i), results);
 			// allow access to the disparity before it's discarded
 			if (listener != null) listener.handlePairDisparity(targetID, pairs.get(i),
@@ -134,11 +137,11 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 			performFusion.addDisparity(results.disparity, results.mask, results.param, results.rect1);
 		}
 
-		if (verbose !=null) verbose.println("Created fused stereo disparity image");
+		if (verbose != null) verbose.println("Created fused stereo disparity image");
 
 		// Fuse all of these into a single disparity image
 		if (!performFusion.process(fusedDisparity)) {
-			if (verbose !=null) verbose.println("Failed to fuse together disparity images");
+			if (verbose != null) verbose.println("Failed to fuse together disparity images");
 			return false;
 		}
 
@@ -192,14 +195,14 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		distortRight.apply(image2, rectified2);
 
 		// Compute disparity from the rectified images
-		disparityAlg.process(rectified1, rectified2);
+		requireNonNull(setStereoDisparity).process(rectified1, rectified2);
 
 		// Save the results
-		info.disparity = disparityAlg.getDisparity();
+		info.disparity = setStereoDisparity.getDisparity();
 
 		DisparityParameters param = info.param;
-		param.disparityMin = disparityAlg.getDisparityMin();
-		param.disparityRange = disparityAlg.getDisparityRange();
+		param.disparityMin = setStereoDisparity.getDisparityMin();
+		param.disparityRange = setStereoDisparity.getDisparityRange();
 		param.baseline = left_to_right.T.norm();
 		PerspectiveOps.matrixToPinhole(info.rectifiedK, rectifiedShape.width, rectifiedShape.height, param.pinhole);
 	}

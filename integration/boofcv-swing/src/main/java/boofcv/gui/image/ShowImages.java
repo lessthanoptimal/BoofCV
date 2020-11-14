@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,6 +121,16 @@ public class ShowImages {
 			JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(panel);
 			topFrame.setVisible(false);
 			topFrame.dispose();
+		});
+	}
+
+	public static void showBlocking( JComponent component, String title , long milliseconds ) {
+		JFrame frame = showWindow(component,title);
+		BoofMiscOps.sleep(milliseconds);
+		// close the window
+		SwingUtilities.invokeLater(()->{
+			frame.setVisible(false);
+			frame.dispose();
 		});
 	}
 

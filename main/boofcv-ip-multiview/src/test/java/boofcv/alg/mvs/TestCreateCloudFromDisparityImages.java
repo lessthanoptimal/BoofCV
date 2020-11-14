@@ -126,7 +126,7 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 	 * Checks to see it obeys the similarity tolerance
 	 */
 	@Test void disparitySimilarTol() {
-		double tol = 0.5;
+		float tol = 0.5f;
 		var disparity = new GrayF32(width, height);
 		GrayU8 mask = disparity.createSameShape(GrayU8.class);
 
@@ -138,12 +138,12 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 		assertEquals(width*height, alg.cloud.size);
 
 		// Changing the disparity, but just under the tolerance. Nothing should be added
-		disparity.data[72] += tol - 0.001;
+		disparity.data[72] += tol - 0.001f;
 		assertEquals(1, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
 		assertEquals(width*height, alg.cloud.size);
 
 		// It should now be above the tolerance
-		disparity.data[72] += 0.002;
+		disparity.data[72] += 0.002f;
 		// zero the mask again so that it can add points
 		ImageMiscOps.fill(mask, 0);
 		assertEquals(2, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
