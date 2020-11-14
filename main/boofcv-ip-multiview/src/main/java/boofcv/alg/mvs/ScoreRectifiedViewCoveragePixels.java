@@ -31,6 +31,8 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
+
 /**
  * Scores different views to act as a common view based on coverage of rectified image. It works by using a shrunk
  * down image to compute the area which would be covered by multiple stereo images. An image
@@ -104,6 +106,11 @@ public class ScoreRectifiedViewCoveragePixels {
 	 * information from this view. A value of 0 indicates no 3D information. Typically this ranges from 0 to 1.
 	 */
 	public void addView( int width, int height, DMatrixRMaj rect, float quality3D ) {
+		// if the quality is zero it can't contribute
+		if (quality3D == 0.0f)
+			return;
+		assertBoof(quality3D >= 0.0f, "Quality must be positive");
+		assertBoof(scale != 0.0, "You must call initialize() first");
 
 		pixel_to_rect.set(rect);
 

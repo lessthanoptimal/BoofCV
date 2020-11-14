@@ -27,7 +27,10 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Creates a dense point cloud using a {@link SceneWorkingGraph} and Multi View Stereo to fuse data from multiple
@@ -122,7 +125,6 @@ public class MultiViewStereoFromSceneGraph<T extends ImageGray<T>> implements Ve
 
 	public static class ViewInfo {
 		SceneWorkingGraph.View view;
-		List<ViewInfo> pairs = new ArrayList<>();
 		int index;
 		double score;
 		boolean used;

@@ -102,8 +102,8 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 			double d = param.baseline*param.pinhole.fx/w2p.getCameraPt().z - param.disparityMin;
 			assertTrue(d >= 0.0 && d < param.disparityRange);
 
-			int xx = (int)pixel.x;
-			int yy = (int)pixel.y;
+			int xx = (int)(pixel.x + 0.5);
+			int yy = (int)(pixel.y + 0.5);
 
 			if (disparity.get(xx, yy) != param.disparityRange) {
 				cloud.remove(i);

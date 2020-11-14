@@ -46,18 +46,18 @@ class TestScoreRectifiedViewCoveragePixels extends BoofStandardJUnit {
 		alg.initialize(width, height, new DoNothingPixelTransform_F64());
 
 		// add a view that's half the size and rectification is simply identity (no change in pixels)
-		alg.addView(width/2,height, CommonOps_DDRM.diag(1,1,1));
+		alg.addView(width/2, height, CommonOps_DDRM.diag(1, 1, 1), 1.0f);
 
 		// compute for just this one view
 		alg.process();
 		// coverage should be 0.5 and average 1.0
-		double expected0 = 0.5*(alg.scoreAverageOffset+300.0/(1.0+300.0));
+		double expected0 = 0.5*(alg.scoreAverageOffset + 300.0/(1.0 + 300.0));
 		assertEquals(expected0, alg.getScore(), UtilEjml.TEST_F64);
 
 		// Add another image which will cover everything
-		alg.addView(width,height, CommonOps_DDRM.diag(1,1,1));
+		alg.addView(width, height, CommonOps_DDRM.diag(1, 1, 1), 1.0f);
 		alg.process();
-		double expected1 = 1.0*(alg.scoreAverageOffset+900/(1.0+600.0));
+		double expected1 = 1.0*(alg.scoreAverageOffset + 900/(1.0 + 600.0));
 		assertEquals(expected1, alg.getScore(), UtilEjml.TEST_F64);
 	}
 
@@ -87,24 +87,24 @@ class TestScoreRectifiedViewCoveragePixels extends BoofStandardJUnit {
 	@Test void addView() {
 		var alg = new ScoreRectifiedViewCoveragePixels();
 		alg.maxSide = 30;
-		alg.initialize(width, height,new DoNothingPixelTransform_F64());
+		alg.initialize(width, height, new DoNothingPixelTransform_F64());
 		// set one pixels to -1 and it should not be updated
-		alg.viewed.set(0,0,-1);
+		alg.viewed.set(0, 0, -1);
 
 		// This will scale x-coordinate by a factor of two and leave y as is
-		DMatrixRMaj rect = CommonOps_DDRM.diag(2.0,1.0,1.0);
+		DMatrixRMaj rect = CommonOps_DDRM.diag(2.0, 1.0, 1.0);
 
 		// Call the function being tested. Note that the height is smaller
-		alg.addView(width,1000,rect);
+		alg.addView(width, 1000, rect, 0.5f);
 
 		for (int y = 0; y < 30; y++) {
 			for (int x = 0; x < 20; x++) {
-				int found = alg.viewed.unsafe_get(x,y);
-				if (x==0&&y==0) {
+				float found = alg.viewed.unsafe_get(x, y);
+				if (x == 0 && y == 0) {
 					assertEquals(-1, found);
 				} else if (x < 10 && y < 20) {
 					// These should all be updated since they are within the small view AND 1/2 the x-axis resolution
-					assertEquals(1, found);
+					assertEquals(0.5f, found);
 				} else {
 					assertEquals(0, found);
 				}

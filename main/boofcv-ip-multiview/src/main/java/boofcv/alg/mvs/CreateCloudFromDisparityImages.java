@@ -39,7 +39,7 @@ import java.util.List;
  * Creates a point cloud from multiple disparity images. An effort is made to avoid adding the same point twice
  * to the cloud. Initially the cloud is kept in separate lists to make it easy to see which view contributed
  * what points to the cloud.
- * 
+ *
  * @author Peter Abeles
  */
 public class CreateCloudFromDisparityImages {
@@ -51,10 +51,13 @@ public class CreateCloudFromDisparityImages {
 	public double disparitySimilarTol = 1.0;
 
 	/** List of all the points in the cloud */
-	final @Getter FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64::new, p->p.set(0,0,0));
+	final @Getter FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64::new, p -> p.set(0, 0, 0));
 	/** List of indices which specify the cloud size when a view was added */
 	final @Getter GrowQueue_I32 views = new GrowQueue_I32();
 
+	/**
+	 * Clears previously added views and points.
+	 */
 	public void reset() {
 		cloud.reset();
 		views.reset();
@@ -62,20 +65,25 @@ public class CreateCloudFromDisparityImages {
 
 	/**
 	 * Adds a point cloud. This can be used to add prior data.
+	 *
 	 * @param cloud (Input) A point cloud. This is copied.
 	 * @return The index of the view that can be used to retrieve the specified points added
 	 */
 	public int addCloud( List<Point3D_F64> cloud ) {
 		views.add(this.cloud.size + cloud.size());
-		this.cloud.copyAll(cloud,(s,d)->d.setTo(s));
-		return this.views.size-1;
+		this.cloud.copyAll(cloud, ( s, d ) -> d.setTo(s));
+		return this.views.size - 1;
 	}
 
 	/**
-	 * Add points from the disparity image which have not been masked out
+	 * Add points from the disparity image which have not been masked out.
+	 *
+	 * NOTE: The reason point and pixel transforms are used is that combined disparity images might include lens
+	 * distortion.
 	 *
 	 * @param disparity (Input) Disparity image
-	 * @param mask (Input) Mask that specifies which points in the disparity image are valid.
+	 * @param mask (Input,Output) Mask that specifies which points in the disparity image are valid. When an existing
+	 * point in the cloud hits this image the mask is updated.
 	 * @param world_to_view (Input) Transform from world to view reference frame
 	 * @param parameters (Input) Describes how to interpret the disparity values
 	 * @param rectNorm_to_dispPixel (Input) Transform from rectified normalized image coordinates into disparity pixels
@@ -84,9 +92,8 @@ public class CreateCloudFromDisparityImages {
 	 */
 	public int addDisparity( GrayF32 disparity, GrayU8 mask, Se3_F64 world_to_view, DisparityParameters parameters,
 							 Point2Transform2_F64 rectNorm_to_dispPixel,
-							 PixelTransform<Point2D_F64> dispPixel_to_rectNorm )
-	{
-		InputSanityCheck.checkSameShape(disparity,mask);
+							 PixelTransform<Point2D_F64> dispPixel_to_rectNorm ) {
+		InputSanityCheck.checkSameShape(disparity, mask);
 
 		MultiViewStereoOps.maskOutPointsInCloud(cloud.toList(), disparity, parameters, world_to_view,
 				rectNorm_to_dispPixel, disparitySimilarTol, mask);
@@ -108,11 +115,11 @@ public class CreateCloudFromDisparityImages {
 
 			for (int x = 0; x < disparity.width; x++, indexDisp++, indexMask++) {
 				// Check to see if it has been masked out as invalid
-				if (mask.data[indexMask]!=0)
+				if (mask.data[indexMask] != 0)
 					continue;
 				// Get the disparity and see if it has a valid value
 				float d = disparity.data[indexDisp];
-				if (d >=parameters.disparityRange)
+				if (d >= parameters.disparityRange)
 					continue;
 
 				// Get normalized image coordinates.
@@ -120,10 +127,10 @@ public class CreateCloudFromDisparityImages {
 
 				// Find 3D point in rectified reference frame
 				rectP.z = baseline*intrinsic.fx/(d + disparityMin);
-				rectP.y = rectP.z*norm.x;
-				rectP.x = rectP.z*norm.y;
+				rectP.x = rectP.z*norm.x;
+				rectP.y = rectP.z*norm.y;
 
-				// Rectified to left camera
+				// Rectified left camera to native left camera
 				GeometryMath_F64.multTran(parameters.rectifiedR, rectP, leftP);
 
 				// Left to world frame
@@ -134,6 +141,6 @@ public class CreateCloudFromDisparityImages {
 		// Denote where this set of points end
 		views.add(cloud.size());
 
-		return this.views.size-1;
+		return this.views.size - 1;
 	}
 }
