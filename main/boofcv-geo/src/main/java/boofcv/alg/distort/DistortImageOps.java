@@ -126,18 +126,19 @@ public class DistortImageOps {
 		for (int y = 0; y < srcHeight; y++) {
 			transform.compute(0, y, transformed);
 			updateBoundBox(transformed, r);
-			transform.compute(srcWidth, y, transformed);
+			transform.compute(srcWidth-1, y, transformed);
 			updateBoundBox(transformed, r);
 		}
 
 		for (int x = 0; x < srcWidth; x++) {
 			transform.compute(x, 0, transformed);
 			updateBoundBox(transformed, r);
-			transform.compute(x, srcHeight, transformed);
+			transform.compute(x, srcHeight-1, transformed);
 			updateBoundBox(transformed, r);
 		}
 
-		return new RectangleLength2D_F32(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+		// The upper extent is inclusive not exclusive, hence the +1
+		return new RectangleLength2D_F32(r.x0, r.y0, 1+r.x1 - r.x0, 1+r.y1 - r.y0);
 	}
 
 	private static void updateBoundBox( Point2D_F32 p, ImageRectangle_F32 r ) {
@@ -171,18 +172,19 @@ public class DistortImageOps {
 		for (int y = 0; y < srcHeight; y++) {
 			transform.compute(0, y, transformed);
 			updateBoundBox(transformed, r);
-			transform.compute(srcWidth, y, transformed);
+			transform.compute(srcWidth-1, y, transformed);
 			updateBoundBox(transformed, r);
 		}
 
 		for (int x = 0; x < srcWidth; x++) {
 			transform.compute(x, 0, transformed);
 			updateBoundBox(transformed, r);
-			transform.compute(x, srcHeight, transformed);
+			transform.compute(x, srcHeight-1, transformed);
 			updateBoundBox(transformed, r);
 		}
 
-		return new RectangleLength2D_F64(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+		// The upper extent is inclusive not exclusive, hence the +1
+		return new RectangleLength2D_F64(r.x0, r.y0, 1+r.x1 - r.x0, 1+r.y1 - r.y0);
 	}
 
 	private static void updateBoundBox( Point2D_F64 transform, ImageRectangle_F64 r ) {

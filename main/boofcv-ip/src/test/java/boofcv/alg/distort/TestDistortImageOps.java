@@ -111,7 +111,6 @@ class TestDistortImageOps extends BoofStandardJUnit {
 	 */
 	@Test
 	void boundBox_check() {
-
 		Point2D_F32 work = new Point2D_F32();
 
 		// basic sanity check
@@ -170,8 +169,8 @@ class TestDistortImageOps extends BoofStandardJUnit {
 		assertEquals(20, found.height, 1e-4);
 	}
 
-	@Test
-	void boundBox_F64() {
+	/** The transform does a simple translation */
+	@Test void boundBox_F64_shifted() {
 		Point2D_F64 transformed = new Point2D_F64();
 
 		// basic sanity check
@@ -181,6 +180,21 @@ class TestDistortImageOps extends BoofStandardJUnit {
 
 		assertEquals(2, found.x0, 1e-8);
 		assertEquals(3, found.y0, 1e-8);
+		assertEquals(10, found.width, 1e-8);
+		assertEquals(20, found.height, 1e-8);
+	}
+
+	/** The view is now flipped. This was causing problems for a long time */
+	@Test void boundBox_F64_flipped() {
+		Point2D_F64 transformed = new Point2D_F64();
+
+		// basic sanity check
+		var affine = new Affine2D_F64(-1, 0, 0, -1, 10, 20);
+		var transform = new PixelTransformAffine_F64(affine);
+		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20, transform, transformed);
+
+		assertEquals(1, found.x0, 1e-8);
+		assertEquals(1, found.y0, 1e-8);
 		assertEquals(10, found.width, 1e-8);
 		assertEquals(20, found.height, 1e-8);
 	}
