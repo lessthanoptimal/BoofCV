@@ -303,7 +303,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 									 Point2D_F64 pixelObs, Point4D_F64 world3D ) {
 		// Compute observed pixel coordinate
 		SePointOps_F64.transform(world_to_view, world3D, camera3D);
-		// w component is ignores. x = [I(3) 0]*X
+		// w component is ignored. x = [I(3) 0]*X
 		double normX = camera3D.x/camera3D.z;
 		double normY = camera3D.y/camera3D.z;
 		normToPixels.compute(normX, normY, pixelPredicted);
@@ -339,7 +339,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 */
 	void createProjectionModel( BundlePinholeSimplified intrinsic ) {
 		CameraPinholeBrown brown = new CameraPinholeBrown();
-		BundleAdjustmentOps.convert(intrinsic, brown);
+		BundleAdjustmentOps.convert(intrinsic, 0, 0, brown);
 		LensDistortionNarrowFOV model = LensDistortionFactory.narrow(brown);
 		listPixelToNorm.add(model.undistort_F64(true, false));
 		listNormToPixel.add(model.distort_F64(false, true));

@@ -36,24 +36,30 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestBundleAdjustmentOps extends BoofStandardJUnit {
+
+	int width = 50;
+	int height = 60;
+
 	@Test void convert_bundlePinhole_pinhole() {
 		var src = new BundlePinhole().setK(2, 3, 0, 7, 3);
 		var dst = new CameraPinhole(10, 12, 1, 1, 2, 10, 32);
 
-		assertSame(dst, BundleAdjustmentOps.convert(src, dst));
+		assertSame(dst, BundleAdjustmentOps.convert(src, width, height, dst));
 
 		assertEquals(src.fx, dst.fx);
 		assertEquals(src.fy, dst.fy);
 		assertEquals(src.cx, dst.cx);
 		assertEquals(src.cy, dst.cy);
 		assertEquals(src.skew, dst.skew);
+		assertEquals(width, dst.width);
+		assertEquals(height, dst.height);
 	}
 
 	@Test void convert_bundleBrown_brown() {
 		var src = new BundlePinholeBrown().setK(2, 3, 0, 7, 3).setRadial(1, 2).setTangential(-1, -9);
 		var dst = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangental(0.1, 0.2);
 
-		assertSame(dst, BundleAdjustmentOps.convert(src, dst));
+		assertSame(dst, BundleAdjustmentOps.convert(src, width, height, dst));
 
 		assertArrayEquals(src.radial, dst.radial);
 		assertEquals(src.t1, dst.t1);
@@ -63,22 +69,26 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 		assertEquals(src.cx, dst.cx);
 		assertEquals(src.cy, dst.cy);
 		assertEquals(src.skew, dst.skew);
+		assertEquals(width, dst.width);
+		assertEquals(height, dst.height);
 	}
 
 	@Test void convert_bundleSimple_brown() {
 		var src = new BundlePinholeSimplified(10, 1, 2);
 		var dst = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangental(0.1, 0.2);
 
-		assertSame(dst, BundleAdjustmentOps.convert(src, dst));
+		assertSame(dst, BundleAdjustmentOps.convert(src, width, height, dst));
 
 		assertArrayEquals(new double[]{src.k1, src.k2}, dst.radial);
 		assertEquals(0.0, dst.t1);
 		assertEquals(0.0, dst.t2);
 		assertEquals(src.f, dst.fx);
 		assertEquals(src.f, dst.fy);
-		assertEquals(0.0, dst.cx);
-		assertEquals(0.0, dst.cy);
+		assertEquals(width/2, dst.cx);
+		assertEquals(height/2, dst.cy);
 		assertEquals(0.0, dst.skew);
+		assertEquals(width, dst.width);
+		assertEquals(height, dst.height);
 	}
 
 	@Test void convert_brown_to_bundlePinhole() {
@@ -114,7 +124,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 		assertEquals(src.skew, dst.skew);
 	}
 
-	@Test void convert_pnhole_to_bundleSimple() {
+	@Test void convert_pinhole_to_bundleSimple() {
 		var src = new CameraPinhole(10, 12, 1, 1, 2, 10, 32);
 		var dst = new BundlePinholeSimplified(9, 2, 3);
 
@@ -125,7 +135,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 		assertEquals(0, dst.k2);
 	}
 
-	@Test void convert_pnhole_to_bundlePinhole() {
+	@Test void convert_pinhole_to_bundlePinhole() {
 		var src = new CameraPinhole(10, 12, 1, 1, 2, 10, 32);
 		var dst = new BundlePinhole().setK(9,3,0,0,2);
 

@@ -193,7 +193,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			return false;
 		}
 
-		// Save the results to the working grpah
+		// Save the results to the working graph
 		saveMetricSeed(graph, viewIds, dimensions.toList(),
 				initProjective.getInlierToSeed(), initProjective.getInlierIndexes(), results);
 

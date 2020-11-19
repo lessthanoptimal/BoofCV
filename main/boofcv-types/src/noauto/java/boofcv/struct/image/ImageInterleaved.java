@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,14 +49,14 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 * Creates a new image with all of its parameters initialized, including the
 	 * data array.
 	 *
-	 * @param width	Image's width.
-	 * @param height   Image's height.
+	 * @param width Image's width.
+	 * @param height Image's height.
 	 * @param numBands Number of bands/colors.
 	 */
-	protected ImageInterleaved(int width, int height, int numBands) {
-		_setData(Array.newInstance(getPrimitiveDataType(), width * height * numBands));
+	protected ImageInterleaved( int width, int height, int numBands ) {
+		_setData(Array.newInstance(getPrimitiveDataType(), width*height*numBands));
 		this.startIndex = 0;
-		this.stride = width * numBands;
+		this.stride = width*numBands;
 		this.numBands = numBands;
 		this.width = width;
 		this.height = height;
@@ -71,7 +71,6 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 * that stores each pixel's value, but will only pertain to an axis-aligned rectangular segment
 	 * of the original.
 	 *
-	 *
 	 * @param x0 x-coordinate of top-left corner of the sub-image.
 	 * @param y0 y-coordinate of top-left corner of the sub-image.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image.
@@ -80,14 +79,14 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 * @return A sub-image of this image.
 	 */
 	@Override
-	public T subimage(int x0, int y0, int x1, int y1, @Nullable T subimage) {
+	public T subimage( int x0, int y0, int x1, int y1, @Nullable T subimage ) {
 		T ret = createNew(-1, -1);
 		ret._setData(_getData());
-		ret.stride = Math.max(width * numBands, stride); // ok why is this done?!?!  Shouldn't it always be stride?
+		ret.stride = Math.max(width*numBands, stride); // ok why is this done?!?!  Shouldn't it always be stride?
 		ret.width = x1 - x0;
 		ret.height = y1 - y0;
 		ret.numBands = numBands;
-		ret.startIndex = startIndex + y0 * stride + x0 * numBands;
+		ret.startIndex = startIndex + y0*stride + x0*numBands;
 		ret.subImage = true;
 		ret.imageType = imageType;
 
@@ -95,17 +94,17 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	}
 
 	@Override
-	public void reshape(int width, int height) {
-		if( this.width == width && this.height == height )
+	public void reshape( int width, int height ) {
+		if (this.width == width && this.height == height)
 			return;
 
-		if( isSubimage() )
+		if (isSubimage())
 			throw new IllegalArgumentException("Can't reshape sub-images");
 
 		Object data = _getData();
 
-		if( Array.getLength(data) < width*height*numBands ) {
-			ImageInterleaved<?> a = createNew(width,height);
+		if (Array.getLength(data) < width*height*numBands) {
+			ImageInterleaved<?> a = createNew(width, height);
 			_setData(a._getData());
 		}
 
@@ -115,8 +114,8 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	}
 
 	@Override
-	public void reshape(int width, int height, int numberOfBands) {
-		if( this.numBands != numberOfBands ) {
+	public void reshape( int width, int height, int numberOfBands ) {
+		if (this.numBands != numberOfBands) {
 			if (isSubimage())
 				throw new IllegalArgumentException("Can't reshape sub-images");
 			this.numBands = -1; // force it to redeclare memory
@@ -129,12 +128,12 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	}
 
 	@Override
-	public int getIndex(int x, int y) {
-		return startIndex + y * stride + x * numBands;
+	public int getIndex( int x, int y ) {
+		return startIndex + y*stride + x*numBands;
 	}
 
-	public int getIndex(int x, int y, int band) {
-		return startIndex + y * stride + x * numBands + band;
+	public int getIndex( int x, int y, int band ) {
+		return startIndex + y*stride + x*numBands + band;
 	}
 
 	/**
@@ -144,17 +143,17 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 */
 	@SuppressWarnings({"SuspiciousSystemArraycopy"})
 	@Override
-	public void setTo(T orig) {
-		if (orig.width != width || orig.height != height || orig.numBands != numBands )
-			reshape(orig.width,orig.height,orig.numBands);
+	public void setTo( T orig ) {
+		if (orig.width != width || orig.height != height || orig.numBands != numBands)
+			reshape(orig.width, orig.height, orig.numBands);
 
 		if (!orig.isSubimage() && !isSubimage()) {
-			System.arraycopy(orig._getData(), orig.startIndex, _getData(), startIndex, stride * height);
+			System.arraycopy(orig._getData(), orig.startIndex, _getData(), startIndex, stride*height);
 		} else {
 			int indexSrc = orig.startIndex;
 			int indexDst = startIndex;
 			for (int y = 0; y < height; y++) {
-				System.arraycopy(orig._getData(), indexSrc, _getData(), indexDst, width * numBands);
+				System.arraycopy(orig._getData(), indexSrc, _getData(), indexDst, width*numBands);
 				indexSrc += orig.stride;
 				indexDst += stride;
 			}
@@ -167,11 +166,11 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	}
 
 	@Override
-	public final void setNumberOfBands(int numBands) {
-		if( this.numBands == numBands )
+	public final void setNumberOfBands( int numBands ) {
+		if (this.numBands == numBands)
 			return;
 
-		if( isSubimage() )
+		if (isSubimage())
 			throw new IllegalArgumentException("Can't reshape sub-images");
 
 		this.imageType.numBands = numBands;
@@ -180,8 +179,8 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 
 		Object data = _getData();
 
-		if( data == null || Array.getLength(data) < width*height*numBands ) {
-			ImageInterleaved<?> a = createNew(width,height);
+		if (data == null || Array.getLength(data) < width*height*numBands) {
+			ImageInterleaved<?> a = createNew(width, height);
 			_setData(a._getData());
 		}
 	}
@@ -207,54 +206,52 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 *
 	 * @param data data array
 	 */
-	protected abstract void _setData(Object data);
+	protected abstract void _setData( Object data );
 
 	/**
 	 * Creates an interleaved image of the specified type that will have the same shape
 	 */
-	public <B extends ImageInterleaved<B>> B createSameShape( Class<B> type )
-	{
-		return create(type,width,height,numBands);
+	public <B extends ImageInterleaved<B>> B createSameShape( Class<B> type ) {
+		return create(type, width, height, numBands);
 	}
 
-	public static <B extends ImageInterleaved<B>> B create( Class<B> type , int width, int height, int numBands)
-	{
+	public static <B extends ImageInterleaved<B>> B create( Class<B> type, int width, int height, int numBands ) {
 		if (type == InterleavedU8.class) {
-			return (B)new InterleavedU8(width, height,numBands);
+			return (B)new InterleavedU8(width, height, numBands);
 		} else if (type == InterleavedS8.class) {
-			return (B)new InterleavedS8(width, height,numBands);
+			return (B)new InterleavedS8(width, height, numBands);
 		} else if (type == InterleavedU16.class) {
-			return (B)new InterleavedU16(width, height,numBands);
+			return (B)new InterleavedU16(width, height, numBands);
 		} else if (type == InterleavedS16.class) {
-			return (B)new InterleavedS16(width, height,numBands);
+			return (B)new InterleavedS16(width, height, numBands);
 		} else if (type == InterleavedS32.class) {
-			return (B)new InterleavedS32(width, height,numBands);
+			return (B)new InterleavedS32(width, height, numBands);
 		} else if (type == InterleavedS64.class) {
-			return (B)new InterleavedS64(width, height,numBands);
+			return (B)new InterleavedS64(width, height, numBands);
 		} else if (type == InterleavedF32.class) {
-			return (B)new InterleavedF32(width, height,numBands);
+			return (B)new InterleavedF32(width, height, numBands);
 		} else if (type == InterleavedF64.class) {
-			return (B)new InterleavedF64(width, height,numBands);
+			return (B)new InterleavedF64(width, height, numBands);
 		}
-		throw new IllegalArgumentException("Unknown type "+type);
+		throw new IllegalArgumentException("Unknown type " + type);
 	}
 
 	@Override
-	public void copyRow(int row, int col0, int col1, int offset, Object array) {
+	public void copyRow( int row, int col0, int col1, int offset, Object array ) {
 		int idxSrc = startIndex + stride*row + col0*numBands;
-		System.arraycopy(_getData(),idxSrc,array,offset,(col1-col0)*numBands);
+		System.arraycopy(_getData(), idxSrc, array, offset, (col1 - col0)*numBands);
 	}
 
 	@Override
 	public String toString() {
-		String out = getClass().getSimpleName()+" : w="+width+", h="+height+", c="+numBands+"\n";
+		String out = getClass().getSimpleName() + " : w=" + width + ", h=" + height + ", c=" + numBands + "\n";
 		for (int y = 0; y < height; y++) {
 			int index = startIndex + y*stride;
 			for (int x = 0; x < width; x++) {
 				for (int band = 0; band < numBands; band++) {
-					out += toString_element(index++)+" ";
+					out += toString_element(index++) + " ";
 				}
-				if( x < width-1)
+				if (x < width - 1)
 					out += ", ";
 			}
 			out += "\n";

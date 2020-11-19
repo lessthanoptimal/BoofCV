@@ -29,6 +29,13 @@ public class StereoPairGraph {
 	/** List of all the views */
 	public final Map<String, Vertex> vertexes = new HashMap<>();
 
+	/**
+	 * Creates a new vertex. Throws an exception if a Vertex with the same ID already exists.
+	 *
+	 * @param id ID of the new vertex
+	 * @param indexSba Index of the vertex's view in SBA
+	 * @return The new Vertex.
+	 */
 	public Vertex addVertex( String id, int indexSba ) {
 		var v = new Vertex();
 		v.id = id;
@@ -40,6 +47,14 @@ public class StereoPairGraph {
 		return v;
 	}
 
+	/**
+	 * Connects two vertexes together with the specified quality
+	 *
+	 * @param a (Input) ID of vertex A
+	 * @param b (Input) ID of vertex B
+	 * @param quality3D (Input) Quality of connection between them
+	 * @return The Edge connecting the two vertexes
+	 */
 	public Edge connect( String a, String b, double quality3D ) {
 		Vertex va = Objects.requireNonNull(vertexes.get(a));
 		Vertex vb = Objects.requireNonNull(vertexes.get(b));

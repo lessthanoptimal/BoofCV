@@ -52,15 +52,16 @@ public class CreateCloudFromDisparityImages {
 
 	/** List of all the points in the cloud */
 	final @Getter FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64::new, p -> p.set(0, 0, 0));
-	/** List of indices which specify the cloud size when a view was added */
-	final @Getter GrowQueue_I32 views = new GrowQueue_I32();
+	/** List of indices which specify the cloud size when a view 'i' was added. idx[i] &le; cloud < idx[i+1] */
+	final @Getter GrowQueue_I32 viewPointIdx = new GrowQueue_I32();
 
 	/**
 	 * Clears previously added views and points.
 	 */
 	public void reset() {
 		cloud.reset();
-		views.reset();
+		viewPointIdx.reset();
+		viewPointIdx.add(0);
 	}
 
 	/**
@@ -70,9 +71,9 @@ public class CreateCloudFromDisparityImages {
 	 * @return The index of the view that can be used to retrieve the specified points added
 	 */
 	public int addCloud( List<Point3D_F64> cloud ) {
-		views.add(this.cloud.size + cloud.size());
+		viewPointIdx.add(this.cloud.size + cloud.size());
 		this.cloud.copyAll(cloud, ( s, d ) -> d.setTo(s));
-		return this.views.size - 1;
+		return this.viewPointIdx.size - 1;
 	}
 
 	/**
@@ -139,8 +140,8 @@ public class CreateCloudFromDisparityImages {
 		}
 
 		// Denote where this set of points end
-		views.add(cloud.size());
+		viewPointIdx.add(cloud.size());
 
-		return this.views.size - 1;
+		return this.viewPointIdx.size - 1;
 	}
 }

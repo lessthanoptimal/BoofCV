@@ -108,6 +108,7 @@ TODO Rename FastQueue to ManagedArray. It manages the memory. RecycleArray. It d
 TODO Rename FastArray to FastArray, DiscardArray, GrowArray,
 TODO Rename linked list . previous to prev
 TODO Rename assertBoof to assertTrue.  Rename assert* to valid* to differentiate it from other asserts?
+TODO Add seek to SimpleSequence
 
 
 TODO Move projective to metric and similar from multiview to perspective

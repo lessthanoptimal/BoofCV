@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,11 +30,11 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.
 	 *
-	 * @param width	number of columns in the image.
-	 * @param height   number of rows in the image.
+	 * @param width number of columns in the image.
+	 * @param height number of rows in the image.
 	 * @param numBands number of bands/colors in the image.
 	 */
-	public InterleavedU8(int width, int height, int numBands) {
+	public InterleavedU8( int width, int height, int numBands ) {
 		super(width, height, numBands);
 	}
 
@@ -53,9 +53,9 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	 * @param y row
 	 * @return 32 bit integer
 	 */
-	public int get32( int x , int y ) {
-		int i = startIndex + y*stride+x*4;
-		return ((data[i]&0xFF) << 24) | ((data[i+1]&0xFF) << 16) | ((data[i+2]&0xFF) << 8) | (data[i+3]&0xFF);
+	public int get32( int x, int y ) {
+		int i = startIndex + y*stride + x*4;
+		return ((data[i] & 0xFF) << 24) | ((data[i + 1] & 0xFF) << 16) | ((data[i + 2] & 0xFF) << 8) | (data[i + 3] & 0xFF);
 	}
 
 	/**
@@ -65,36 +65,36 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	 * @param y row
 	 * @return 32 bit integer
 	 */
-	public int get24( int x , int y ) {
-		int i = startIndex + y*stride+x*3;
-		return ((data[i]&0xFF) << 16) | ((data[i+1]&0xFF) << 8) | (data[i+2]&0xFF);
+	public int get24( int x, int y ) {
+		int i = startIndex + y*stride + x*3;
+		return ((data[i] & 0xFF) << 16) | ((data[i + 1] & 0xFF) << 8) | (data[i + 2] & 0xFF);
 	}
 
-	public void set24( int x , int y , int value ) {
-		int i = startIndex + y*stride+x*3;
-		data[i++] = (byte)(value>>>16);
-		data[i++] = (byte)(value>>>8);
-		data[i]   = (byte)value;
+	public void set24( int x, int y, int value ) {
+		int i = startIndex + y*stride + x*3;
+		data[i++] = (byte)(value >>> 16);
+		data[i++] = (byte)(value >>> 8);
+		data[i] = (byte)value;
 	}
 
-	public void set32( int x , int y , int value ) {
-		int i = startIndex + y*stride+x*4;
-		data[i++] = (byte)(value>>>24);
-		data[i++] = (byte)(value>>>16);
-		data[i++] = (byte)(value>>>8);
-		data[i]   = (byte)value;
+	public void set32( int x, int y, int value ) {
+		int i = startIndex + y*stride + x*4;
+		data[i++] = (byte)(value >>> 24);
+		data[i++] = (byte)(value >>> 16);
+		data[i++] = (byte)(value >>> 8);
+		data[i] = (byte)value;
 	}
 
 	/**
 	 * Returns the value of the specified band in the specified pixel.
 	 *
-	 * @param x	pixel coordinate.
-	 * @param y	pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param band which color band in the pixel
 	 * @return an intensity value.
 	 */
 	@Override
-	public int getBand(int x, int y, int band) {
+	public int getBand( int x, int y, int band ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
 		if (band < 0 || band >= numBands)
@@ -104,7 +104,7 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	}
 
 	@Override
-	public void unsafe_get(int x, int y, int[] storage) {
+	public void unsafe_get( int x, int y, int[] storage ) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index] & 0xFF;
@@ -112,7 +112,7 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	}
 
 	@Override
-	public InterleavedU8 createNew(int imgWidth, int imgHeight) {
+	public InterleavedU8 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedU8();
 		return new InterleavedU8(imgWidth, imgHeight, numBands);

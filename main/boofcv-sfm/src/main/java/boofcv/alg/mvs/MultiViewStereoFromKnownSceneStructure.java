@@ -42,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 
+import static boofcv.misc.BoofMiscOps.assertBoof;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -78,7 +79,10 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	public @Getter @Setter double minimumQuality3D = 0.25;
 
 	/** Used to access temporary results before they are discarded */
-	protected @Getter @Setter @Nullable Listener listener;
+	protected @Getter @Setter @Nullable Listener<T> listener;
+
+	/** Which views acted as "centers" and contributed to the point cloud */
+	protected final @Getter List<ViewInfo> listCenters = new ArrayList<>();
 
 	// Used to retrieve images from a data base. There could be easily too images to load all at once
 	final LookUpImages imageLookUp;
@@ -105,6 +109,9 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	// Quick look up of view info by ID
 	final Map<String, ViewInfo> mapScores = new HashMap<>();
 	final FastQueue<ViewInfo> arrayScores = new FastQueue<>(ViewInfo::new, ViewInfo::reset);
+
+	// Used to look up ViewInfo from SBA index
+	TIntObjectMap<String> indexSbaToViewID = new TIntObjectHashMap<>();
 
 	// storage for images used to compute the disparity for this set of stereo views
 	TIntObjectMap<T> indexSbaToImage = new TIntObjectHashMap<>();
@@ -144,8 +151,9 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		initializeScores(scene, pairs);
 		scoreViewsSelectStereoPairs(scene);
 
-		// Reset the cloud
+		// Initialize data structures
 		disparityCloud.reset();
+		listCenters.clear();
 
 		// Sort views based on their score for being the center view. best views are first
 		Collections.sort(arrayScores.toList(), Comparator.comparingDouble(a -> -a.score));
@@ -157,12 +165,23 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			if (center.used)
 				continue;
 
+			if (verbose != null) verbose.println("Center[" + index + "] View=" + center.relations.id);
+
+			// TODO compute fraction of view area which has already been covered by a previous center
+			//      and skip if over a certain value to avoid wasting time. This can happen if a view is very
+			//      similar to a "center" view and not used due to lack of 3D information between the two
+
 			// Compute a disparity image for this cluster of stereo pairs
 			selectAndLoadConnectedImages(pairs, center.relations);
 
-			// If no views had enough quality abort
-			if (indexSbaToImage.size() < 1)
+			// If none of the connected views had enough quality abort
+			if (indexSbaToImage.size() < 1) {
+				if (verbose != null) verbose.println("  too few connections to use as a center");
 				continue;
+			}
+
+			// Record that this view was used as a center
+			listCenters.add(center);
 
 			// Add image for center view
 			addImageToMap(center.relations);
@@ -181,9 +200,11 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		Objects.requireNonNull(computeFused.getSetStereoDisparity(), "Must call setStereoDisparity() first");
 
 		if (listener != null) {
-			// TODO look up left/right image IDs
-			computeFused.setListener(( left, right, disparity, mask, parameters, rect ) ->
-					this.listener.handlePairDisparity("left", "right", disparity, mask, parameters));
+			computeFused.setListener(( left, right, rectLeft, rectRight, disparity, mask, parameters, rect ) -> {
+				String leftID = indexSbaToViewID.get(left);
+				String rightID = indexSbaToViewID.get(right);
+				this.listener.handlePairDisparity(leftID, rightID, rectLeft, rectRight, disparity, mask, parameters);
+			});
 		} else {
 			computeFused.setListener(null);
 		}
@@ -223,11 +244,21 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 			scene.getWorldToView(center.metric, world_to_view1, tmp);
 
+			// Compute statistics for verbose mode
+			int totalQualifiedConnections = 0;
+			double averageQuality = 0.0;
+
 			for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
 				StereoPairGraph.Edge pair = pairs.get(pairIdx);
+				// sanity check, since this can be hard to debug if done wrong
+				assertBoof(pair.quality3D >= 0.0 && pair.quality3D <= 1.0);
+
 				// Skip if insufficient geometric information
 				if (pair.quality3D < minimumQuality3D)
 					continue;
+
+				totalQualifiedConnections++;
+				averageQuality += pair.quality3D;
 
 				// Look up information that the "center" under consideration is connected to
 				ViewInfo connected = mapScores.get(pair.other(center.relations).id);
@@ -238,7 +269,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 				world_to_view1.invert(tmp).concat(world_to_view2, view1_to_view2);
 
 				// Compute rectification then apply coverage with geometric score
-				computeRectification.processView2(connectedCamera, view1_to_view2);
+				computeRectification.processView2(connectedCamera,
+						connected.dimension.width, connected.dimension.height, view1_to_view2);
 				scoreCoverage.addView(connected.dimension.width, connected.dimension.height,
 						computeRectification.rect2, (float)pair.quality3D);
 			}
@@ -246,6 +278,12 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			// Look at the sum of all information and see what the score is
 			scoreCoverage.process();
 			center.score = scoreCoverage.getScore();
+			if (verbose != null) {
+				averageQuality = totalQualifiedConnections > 0 ? averageQuality/totalQualifiedConnections : -1;
+				verbose.println("View[" + center.relations.id + "] center score=" + center.score +
+						" aveQuality=" + averageQuality + " " +
+						" conn=" + totalQualifiedConnections + "/" + pairs.size());
+			}
 		}
 	}
 
@@ -271,7 +309,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 		// Convert data structures into a format which is understood by disparity to cloud
 		BundleAdjustmentCamera camera = scene.cameras.get(center.metric.camera).model;
-		BundleAdjustmentOps.convert(camera, brown);
+		BundleAdjustmentOps.convert(camera, disparity.width, disparity.height, brown);
 		// The fused disparity is in regular pixels and not rectified
 		Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(brown).distort_F64(false, true);
 		Point2Transform2_F64 pixel_to_norm = new LensDistortionBrown(brown).undistort_F64(true, false);
@@ -291,6 +329,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	void selectAndLoadConnectedImages( StereoPairGraph pairs, StereoPairGraph.Vertex center ) {
 		imageStorage.reset();
 		indexSbaToImage.clear();
+		indexSbaToViewID.clear();
 		imagePairIndexesSba.reset();
 
 		List<StereoPairGraph.Edge> connections = requireNonNull(pairs.vertexes.get(center.id)).pairs;
@@ -303,6 +342,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 			// Look up the "other" view this is connected to
 			StereoPairGraph.Vertex other = connected.other(center);
+
+			if (verbose != null) verbose.println("  connected.id=" + other.id);
 
 			// Add the image associated with "other"
 			addImageToMap(other);
@@ -319,6 +360,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			throw new RuntimeException("Failed to look up image: " + view.id);
 
 		indexSbaToImage.put(view.indexSba, image);
+		indexSbaToViewID.put(view.indexSba, view.id);
 		imagePairIndexesSba.add(view.indexSba);
 	}
 
@@ -361,25 +403,20 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		}
 	}
 
-	/** Used to look up images as needed for disparity calculation. */
-	public interface LookUpImages {
-		boolean loadShape( String name, ImageDimension shape );
-
-		<LT extends ImageGray<LT>> boolean loadImage( String name, LT output );
-	}
-
 	/** Used to capture intermediate results */
-	public interface Listener {
+	public interface Listener<RectImg> {
 		/**
 		 * After a regular disparity image has been computed from a pair, this function is called and the results
 		 * passed in
 		 */
-		void handlePairDisparity( String left, String right, GrayF32 disparity, GrayU8 mask,
+		void handlePairDisparity( String left, String right, RectImg rectLeft, RectImg rectRight,
+								  GrayF32 disparity, GrayU8 mask,
 								  DisparityParameters parameters );
 
 		/**
 		 * After a fused disparity image has been computed, this function is called and the results passed in
 		 */
-		void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters );
+		void handleFusedDisparity( String centerViewName, GrayF32 disparity, GrayU8 mask,
+								   DisparityParameters parameters );
 	}
 }

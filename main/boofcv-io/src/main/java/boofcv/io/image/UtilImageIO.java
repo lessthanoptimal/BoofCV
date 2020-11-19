@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -170,6 +170,17 @@ public class UtilImageIO {
 		ConvertBufferedImage.convertFrom(img, orderRgb, output);
 		return output;
 	}
+
+	public static <T extends ImageBase<T>> T loadImage( String imagePath, boolean orderRgb, T output ) {
+		BufferedImage buffered = loadImage(imagePath);
+		if( buffered == null )
+			return null;
+
+		ConvertBufferedImage.convertFrom(buffered, orderRgb, output);
+
+		return output;
+	}
+
 
 	/**
 	 * Saves the {@link BufferedImage} to the specified file.  The image type of the output is determined by

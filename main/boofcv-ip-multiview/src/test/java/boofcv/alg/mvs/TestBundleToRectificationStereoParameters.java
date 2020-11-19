@@ -68,7 +68,7 @@ public class TestBundleToRectificationStereoParameters extends BoofStandardJUnit
 		alg.setView1(bundle1, 100, 150);
 
 		// Invoke the function being tested
-		alg.processView2(bundle2, view1_to_view2);
+		alg.processView2(bundle2, 100, 150, view1_to_view2);
 
 		// See if everything is initialized
 		assertTrue(CommonOps_DDRM.elementSum(alg.rect1) != 0);

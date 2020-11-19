@@ -21,6 +21,7 @@ package boofcv.demonstrations.sfm.multiview;
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.cloud.PointCloudWriter;
@@ -31,6 +32,7 @@ import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
@@ -119,8 +121,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	DMatrixRMaj rectifiedR = new DMatrixRMaj(3, 3);
 
 	// Results from bundle adjustment
-	CameraPinholeBrown intrinsic01;
-	CameraPinholeBrown intrinsic02;
+	final CameraPinholeBrown intrinsic01 = new CameraPinholeBrown();
+	final CameraPinholeBrown intrinsic02 = new CameraPinholeBrown();
 	Se3_F64 leftToRight;
 
 	// Saved disparity image for saving to disk
@@ -610,7 +612,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// Pick the two best views to compute stereo from
 		int[] selected = selectBestPair(structureEstimator.structure);
 
-		if (!computeStereoCloud(selected[0], selected[1], cx, cy, skipStructure, _automaticChangeViews))
+		if (!computeStereoCloud(selected[0], selected[1], skipStructure, _automaticChangeViews))
 			return;
 
 		long time1 = System.currentTimeMillis();
@@ -620,21 +622,17 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		System.out.println("Success!");
 	}
 
-	private boolean computeStereoCloud( int view0, int view1, double cx, double cy, boolean skipRectify,
+	private boolean computeStereoCloud( int view0, int view1, boolean skipRectify,
 										boolean _automaticChangeViews ) {
 		if (!skipRectify) {
 			System.out.println("Computing rectification: views " + view0 + " " + view1);
 			SceneStructureMetric structure = structureEstimator.getStructure();
 
-			BundlePinholeSimplified cp = structure.getCameras().get(view0).getModel();
-			intrinsic01 = new CameraPinholeBrown();
-			intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view0].width, dimensions[view0].height);
-			intrinsic01.fsetRadial(cp.k1, cp.k2);
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameras().get(view0).getModel(),
+					dimensions[view0].width, dimensions[view0].height, intrinsic01);
 
-			cp = structure.getCameras().get(view1).getModel();
-			intrinsic02 = new CameraPinholeBrown();
-			intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view1].width, dimensions[view1].height);
-			intrinsic02.fsetRadial(cp.k1, cp.k2);
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameras().get(view1).getModel(),
+					dimensions[view1].width, dimensions[view1].height, intrinsic02);
 
 			Se3_F64 w_to_0 = structure.getParentToView(view0);
 			Se3_F64 w_to_1 = structure.getParentToView(view1);

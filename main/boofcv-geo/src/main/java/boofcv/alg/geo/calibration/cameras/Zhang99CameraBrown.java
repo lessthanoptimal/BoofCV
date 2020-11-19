@@ -51,7 +51,7 @@ public class Zhang99CameraBrown implements Zhang99Camera {
 	@Override
 	public CameraModel getCameraModel( BundleAdjustmentCamera bundleCam ) {
 		BundlePinholeBrown cam = (BundlePinholeBrown)bundleCam;
-		return BundleAdjustmentOps.convert(cam, null);
+		return BundleAdjustmentOps.convert(cam, 0, 0, null);
 	}
 
 	@Override

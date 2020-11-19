@@ -262,8 +262,10 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 
 		// save the output
 		structure.motions.get(left_to_right_idx).motion.invert(parameters.right_to_left);
-		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(0).model), parameters.left);
-		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(1).model), parameters.right);
+		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(0).model),
+				parameters.left.width, parameters.left.height, parameters.left);
+		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(1).model),
+				parameters.left.width, parameters.left.height, parameters.right);
 	}
 
 	public CalibrateMonoPlanar getCalibLeft() {

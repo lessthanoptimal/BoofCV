@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -327,21 +327,11 @@ public class ConvertBufferedImage {
 
 		ImageType<T> imageType = output.getImageType();
 
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				convertFromSingle(src, (ImageGray)output, imageType.getImageClass());
-				break;
-
-			case PLANAR:
-				convertFromPlanar(src, (Planar) output, orderRgb, imageType.getImageClass());
-				break;
-
-			case INTERLEAVED:
-				convertFromInterleaved(src, (ImageInterleaved) output, orderRgb);
-				break;
-
-			default:
-				throw new RuntimeException("Not supported yet");
+		switch (imageType.getFamily()) {
+			case GRAY -> convertFromSingle(src, (ImageGray)output, imageType.getImageClass());
+			case PLANAR -> convertFromPlanar(src, (Planar)output, orderRgb, imageType.getImageClass());
+			case INTERLEAVED -> convertFromInterleaved(src, (ImageInterleaved)output, orderRgb);
+			default -> throw new RuntimeException("Not supported yet");
 		}
 
 		return output;

@@ -186,7 +186,7 @@ public class SceneWorkingGraph {
 		public final ImageDimension imageDimension = new ImageDimension();
 
 		// index in list of views. Only value during construction of SBA data structures
-		public int index;
+		public int index=-1;
 
 		/**
 		 * Given the observation index return the feature associated with it. Return null if there are none

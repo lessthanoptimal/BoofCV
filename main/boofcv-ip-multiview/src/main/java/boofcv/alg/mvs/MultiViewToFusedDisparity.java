@@ -59,7 +59,7 @@ import static java.util.Objects.requireNonNull;
 public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implements VerbosePrint {
 
 	/** Provides access to intermediate stereo results */
-	private @Getter @Setter @Nullable Listener listener;
+	private @Getter @Setter @Nullable Listener<Image> listener;
 
 	/** Computes disparity between each image pair. Must be set. */
 	@Getter @Setter @Nullable StereoDisparity<Image, GrayF32> setStereoDisparity = null;
@@ -87,6 +87,9 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	// Specifies the relationships between reference frames
 	final Se3_F64 left_to_world = new Se3_F64();
 	final Se3_F64 left_to_right = new Se3_F64();
+	final Se3_F64 world_to_left = new Se3_F64();
+	final Se3_F64 world_to_right = new Se3_F64();
+	final Se3_F64 tmpse3 = new Se3_F64();
 
 	// Where verbose stdout is printed to
 	@Nullable PrintStream verbose = null;
@@ -124,7 +127,8 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		Image image1 = images.get(targetID);
 		int targetCamera = scene.views.get(targetID).camera;
 		computeRectification.setView1(scene.cameras.get(targetCamera).model, image1.width, image1.height);
-		scene.motions.get(targetID).motion.invert(left_to_world);
+		scene.getWorldToView(scene.views.get(targetID), world_to_left, tmpse3);
+		world_to_left.invert(left_to_world);
 
 		// Compute disparity for all the images it has been paired with and add them to the fusion algorithm
 		performFusion.initialize(computeRectification.intrinsic1, computeRectification.view1_dist_to_undist);
@@ -133,6 +137,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 			computeDisparity(image1, pairs.get(i), results);
 			// allow access to the disparity before it's discarded
 			if (listener != null) listener.handlePairDisparity(targetID, pairs.get(i),
+					rectified1, rectified2,
 					results.disparity, results.mask, results.param, results.rect1);
 			performFusion.addDisparity(results.disparity, results.mask, results.param, results.rect1);
 		}
@@ -166,11 +171,12 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		int rightCamera = scene.views.get(rightID).camera;
 
 		// Compute the baseline between the two cameras
-		Se3_F64 world_to_right = scene.motions.get(rightID).motion;
+		scene.getWorldToView(scene.views.get(rightID), world_to_right, tmpse3);
 		left_to_world.concat(world_to_right, left_to_right);
 
 		// Compute rectification data
-		computeRectification.processView2(scene.cameras.get(rightCamera).model, left_to_right);
+		computeRectification.processView2(scene.cameras.get(rightCamera).model,
+				image2.getWidth(), image2.getHeight(), left_to_right);
 
 		// Save the results
 		info.param.rectifiedR.set(computeRectification.rectifiedRotation);
@@ -230,8 +236,20 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	/**
 	 * Used to gain access to intermediate results
 	 */
-	public interface Listener {
-		void handlePairDisparity( int left, int right, GrayF32 disparity, GrayU8 mask,
+	public interface Listener<RectImage> {
+		/**
+		 * Results of stereo processing between two views
+		 *
+		 * @param leftView View index in SBA
+		 * @param rightView View index in SBA
+		 * @param disparity Computed disparity image between these two views
+		 * @param mask Disparity mask
+		 * @param parameters Disparity parameters
+		 * @param rect Disparity rectification matrix
+		 */
+		void handlePairDisparity( int leftView, int rightView,
+								  RectImage rectLeft, RectImage rectRight,
+								  GrayF32 disparity, GrayU8 mask,
 								  DisparityParameters parameters, DMatrixRMaj rect );
 	}
 }

@@ -19,7 +19,6 @@
 package boofcv.alg.mvs;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
@@ -147,12 +146,9 @@ public class FuseDisparityImages {
 		// Only do the int to float and double to float conversion once
 		final float imageRange = imageParam.disparityRange;
 		final float imageMin = imageParam.disparityMin;
-		final float imageFocalX = (float)imageParam.pinhole.fx;
-		final float imageBaseline = (float)imageParam.baseline;
+		final double imageFocalX = imageParam.pinhole.fx;
+		final double imageBaseline = imageParam.baseline;
 		final CameraPinhole imagePinhole = imageParam.pinhole;
-
-		final float fusedFocalX = (float)fusedIntrinsic.fx;
-		final float fusedBaseline = (float)this.fusedBaseline;
 
 		DConvertMatrixStruct.convert(image.rect, rect);
 
@@ -169,13 +165,18 @@ public class FuseDisparityImages {
 				// undistorted to rectified pixels
 				HomographyPointOps_F64.transform(rect, pixelUndist.x, pixelUndist.y, pixelRect);
 
-				// Make sure it's inside the disparity image before sampling
-				if (!BoofMiscOps.isInside(disparity.width, disparity.height, pixelRect.x, pixelRect.y))
+				// Make sure it's inside the disparity image before sampling. Only checking lower bound because of the
+				// tricked used below
+				if (pixelRect.x < 0.0 || pixelRect.y < 0.0)
 					continue;
 
-				// Discretize the point so that a pixel can be read
-				int xx = (int)pixelRect.x;
-				int yy = (int)pixelRect.y;
+				// Discretize the point so that a pixel can be read. Round to reduce error. This faster then round()
+				int xx = (int)(pixelRect.x + 0.5);
+				int yy = (int)(pixelRect.y + 0.5);
+
+				// Make sure it's inside the disparity image before sampling
+				if (xx >= mask.width || yy >= mask.height)
+					continue;
 
 				// If marked as invalid don't sample here
 				if (mask.unsafe_get(xx, yy) == 0)
@@ -195,7 +196,7 @@ public class FuseDisparityImages {
 					// Go from rectified to left camera, which is the fused camera
 					double worldZ = dotRightCol(imageParam.rectifiedR, rectX, rectY, rectZ);
 					// Now that we know Z we can compute the disparity
-					float fusedDisp = fusedBaseline*fusedFocalX/(float)worldZ;
+					float fusedDisp = (float)(fusedBaseline*fusedIntrinsic.fx/worldZ);
 
 					fused.get(x, y).add(fusedDisp);
 				} else {

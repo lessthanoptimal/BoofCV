@@ -22,23 +22,29 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.geo.RectifyImageOps;
+import boofcv.alg.mvs.*;
 import boofcv.alg.scene.PointTrackerToSimilarImages;
 import boofcv.alg.sfm.structure.*;
+import boofcv.core.image.LookUpColorRgbFormats;
+import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.MediaManager;
+import boofcv.gui.image.VisualizeImageData;
+import boofcv.gui.stereo.RectifiedPairPanel;
+import boofcv.io.UtilIO;
 import boofcv.io.geo.MultiViewIO;
-import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.PointIndex2D_F64;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
+import boofcv.struct.image.*;
 import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.SingleAxisRgb;
 import boofcv.visualize.VisualizeData;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
@@ -48,8 +54,11 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static boofcv.misc.BoofMiscOps.assertBoof;
@@ -60,11 +69,45 @@ import static boofcv.misc.BoofMiscOps.assertBoof;
  * @author Peter Abeles
  */
 public class ExampleMultiviewSceneReconstruction {
+
+	static class LookUpImageFiles implements LookUpImages {
+		List<String> paths;
+		ImageDimension dimension = new ImageDimension();
+
+		public LookUpImageFiles( List<String> paths ) {
+			assertBoof(paths.size()>0);
+			this.paths = paths;
+
+			if (paths.size()==0)
+				return;
+
+			BufferedImage b = UtilImageIO.loadImage(paths.get(0));
+			dimension.width = b.getWidth();
+			dimension.height = b.getHeight();
+		}
+
+		@Override public boolean loadShape( String name, ImageDimension shape ) {
+			int index = Integer.parseInt(name);
+			if (index<0 || index>=paths.size())
+				return false;
+			shape.setTo(dimension);
+			return true;
+		}
+
+		@Override public <LT extends ImageBase<LT>> boolean loadImage( String name, LT output ) {
+			int index = Integer.parseInt(name);
+			if (index<0 || index>=paths.size())
+				return false;
+
+			UtilImageIO.loadImage(paths.get(index), true, output);
+
+			return true;
+		}
+	}
+
 	public static void main( String[] args ) {
 		// Turn on threaded code for bundle adjustment
 		DDoglegConcurrency.USE_CONCURRENT = true;
-
-		MediaManager media = DefaultMediaManager.INSTANCE;
 
 		boolean forceRecompute = true;
 
@@ -91,24 +134,33 @@ public class ExampleMultiviewSceneReconstruction {
 
 		var trackerSimilar = new PointTrackerToSimilarImages();
 
-		String path = "20201020_111045_small.mp4";
+		String path = "desert/";
 //		String path = "20201022_155545_small.mp4";
-		SimpleImageSequence<GrayU8> sequence = media.openVideo(path, ImageType.SB_U8);
-		trackerSimilar.initialize(sequence.getWidth(), sequence.getHeight());
+
+		List<String> imageFiles = UtilIO.listAll(path);
+		Collections.sort(imageFiles);
+
+//		SimpleImageSequence<GrayU8> sequence = media.openVideo(path, ImageType.SB_U8);
 
 		BoofMiscOps.profile(()-> {
-			while (sequence.hasNext()) {
-				GrayU8 frame = sequence.next();
+			boolean first = true;
+			for (int frameId = 0; frameId < imageFiles.size(); frameId++) {
+				String filePath = imageFiles.get(frameId);
+				GrayU8 frame = UtilImageIO.loadImage(filePath,GrayU8.class);
+				if (first) {
+					first = false;
+					trackerSimilar.initialize(frame.width, frame.height);
+				}
 				tracker.process(frame);
 				int active = tracker.getTotalActive();
 				int dropped = tracker.getDroppedTracks(null).size();
 				tracker.spawnTracks();
 				trackerSimilar.processFrame(tracker);
-				String id = trackerSimilar.frames.getTail().frameID;
+				String id = frameId+"";//trackerSimilar.frames.getTail().frameID;
 				System.out.println("frame id = " + id + " active=" + active + " dropped=" + dropped);
 
 				// Bad: 30 has a large error to start and doesn't converge well
-				if (sequence.getFrameNumber() >= 40) // Good: 10,15,20,
+				if (frameId >= 15) // Good: 10,15,20,
 					break;
 			}
 		}, "Tracking Features");
@@ -184,7 +236,75 @@ public class ExampleMultiviewSceneReconstruction {
 			}
 		},"SBA refine");
 
-		visualizeInPointCloud(path, refine.bundleAdjustment.getStructure(), refine.bundleAdjustment.getObservations());
+//		visualizeInPointCloud(imageFiles, refine.bundleAdjustment.getStructure(), refine.bundleAdjustment.getObservations());
+
+		var configDisparity = new ConfigDisparityBMBest5();
+		configDisparity.validateRtoL = 1;
+		configDisparity.texture = 0.5;
+		configDisparity.regionRadiusX = configDisparity.regionRadiusY = 4;
+		configDisparity.disparityRange = 50;
+
+		var imageLookup = new LookUpImageFiles(imageFiles);
+		var mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, ImageType.SB_U8);
+		mvs.setVerbose(System.out,null);
+//		mvs.setMinimumQuality3D(0.75);
+		mvs.setStereoDisparity(FactoryStereoDisparity.blockMatchBest5(configDisparity,GrayU8.class,GrayF32.class));
+		mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
+			@Override
+			public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+				System.out.println("Paired stereo: "+left+" "+right);
+
+				// remove annoying false points
+				RectifyImageOps.applyMask(disparity, mask, 0);
+
+				BufferedImage rbuff0 = ConvertBufferedImage.convertTo(rect0, null);
+				BufferedImage rbuff1 = ConvertBufferedImage.convertTo(rect1, null);
+
+				var rectPanel = new RectifiedPairPanel(true,rbuff0,rbuff1);
+				rectPanel.setPreferredSize(new Dimension(1000,500));
+				BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
+				ShowImages.showWindow(colorized, "left "+left+" right "+right);
+				ShowImages.showWindow(rectPanel, "Rectified left "+left+" right "+right);
+			}
+
+			@Override
+			public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+				System.out.println("Fused center view "+name);
+				BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
+				ShowImages.showWindow(colorized, "Center "+name);
+			}
+		});
+
+		var mvsGraph = new StereoPairGraph();
+
+		PairwiseImageGraph _pairwise = pairwise;
+		BoofMiscOps.forIdx(working.viewList,(i,wv)->mvsGraph.addVertex(wv.pview.id, i));
+		BoofMiscOps.forIdx(working.viewList,(workIdxI,wv)->{
+			var pv = _pairwise.mapNodes.get(wv.pview.id);
+			System.out.println("view.id="+wv.pview.id+" indexSba="+workIdxI);
+			pv.connections.forIdx(( j, e ) -> {
+				PairwiseImageGraph.View po = e.other(pv);
+				double ratio = 1.0 - Math.min(1.0, e.countH/(1.0 + e.countF));
+				if (ratio <= 0.05)
+					return;
+				SceneWorkingGraph.View wvo = _working.views.get(po.id);
+				int workIdxO = _working.viewList.indexOf(wvo);
+				if (workIdxO <=workIdxI)
+					return;
+				mvsGraph.connect(pv.id, po.id, ratio);
+			});
+			});
+
+
+		BoofMiscOps.profile(()-> {
+			mvs.process(refine.bundleAdjustment.getStructure(), mvsGraph);
+		},"MVS Cloud");
+
+		GrowQueue_I32 colorRgb = new GrowQueue_I32();
+		colorRgb.resize(mvs.getCloud().size());
+		var colorizeMvs = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(),imageLookup);
+		colorizeMvs.process(refine.bundleAdjustment.getStructure(), mvs, (i,r,g,b)->colorRgb.set(i,(r<<16)|(g<<8)|b));
+		visualizeInPointCloud(mvs.getCloud(),colorRgb);
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Printing view info");
@@ -205,22 +325,19 @@ public class ExampleMultiviewSceneReconstruction {
 	/**
 	 * Looks up the color of each point in the cloud using the first frame it was observed in
 	 */
-	public static void colorizeCloud( String path , int totalFeatures,
+	public static void colorizeCloud( List<String> imagePaths , int totalFeatures,
 									  SceneObservations observations, GrowQueue_I32 rgb )
 	{
 		rgb.resize(totalFeatures);
 		rgb.fill(0);
 
-		MediaManager media = DefaultMediaManager.INSTANCE;
-		SimpleImageSequence<Planar<GrayU8>> sequence = media.openVideo(path, ImageType.PL_U8);
-
 		var pixel = new PointIndex2D_F64();
 
-		int frameID = 0;
-		while (sequence.hasNext()) {
+		for (int frameID = 0; frameID < imagePaths.size(); frameID++) {
 			if (frameID >= observations.views.size)
 				break;
-			Planar<GrayU8> frame = sequence.next();
+
+			Planar<GrayU8> frame = UtilImageIO.loadImage(new File(imagePaths.get(frameID)),true,ImageType.PL_U8);
 
 			double cx = frame.width/2;
 			double cy = frame.height/2;
@@ -240,11 +357,28 @@ public class ExampleMultiviewSceneReconstruction {
 				rgb.set(pixel.index, frame.get24u8((int)pixel.x, (int)pixel.y));
 			}
 		}
-
-		sequence.close();
 	}
 
-	public static void visualizeInPointCloud( String path, SceneStructureMetric structure,
+	public static void visualizeInPointCloud( List<Point3D_F64> cloud, GrowQueue_I32 colorsRgb ) {
+		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
+		viewer.setFog(true);
+		viewer.setDotSize(1);
+		viewer.setTranslationStep(0.15);
+		if (colorsRgb!=null) {
+			viewer.addCloud(cloud,colorsRgb.data);
+		} else {
+			viewer.addCloud(cloud);
+			viewer.setColorizer(new SingleAxisRgb.Z().fperiod(30));
+		}
+		viewer.setCameraHFov(UtilAngle.radian(60));
+
+		SwingUtilities.invokeLater(() -> {
+			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
+			ShowImages.showWindow(viewer.getComponent(), "Refined Scene", true);
+		});
+	}
+
+	public static void visualizeInPointCloud( List<String> imageFiles, SceneStructureMetric structure,
 											  SceneObservations observations ) {
 
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
@@ -261,7 +395,7 @@ public class ExampleMultiviewSceneReconstruction {
 		}
 
 		GrowQueue_I32 rgb = new GrowQueue_I32();
-		colorizeCloud( path, structure.points.size, observations, rgb);
+		colorizeCloud( imageFiles, structure.points.size, observations, rgb);
 
 		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
 		viewer.setFog(true);

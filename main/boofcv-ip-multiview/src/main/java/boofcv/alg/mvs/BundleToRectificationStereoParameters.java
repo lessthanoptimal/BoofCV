@@ -91,7 +91,7 @@ public class BundleToRectificationStereoParameters {
 		assertBoof(width > 0);
 		assertBoof(height > 0);
 
-		BundleAdjustmentOps.convert(bundle1, intrinsic1);
+		BundleAdjustmentOps.convert(bundle1, width, height, intrinsic1);
 		PerspectiveOps.pinholeToMatrix(intrinsic1, K1);
 
 		intrinsic1.width = width;
@@ -107,9 +107,9 @@ public class BundleToRectificationStereoParameters {
 	 * @param bundle2 (Input) Intrinsic lens distortion parameters
 	 * @param view1_to_view2 (Input) Extrinsic relationship between view-1 and view-2
 	 */
-	public void processView2( BundleAdjustmentCamera bundle2, Se3_F64 view1_to_view2 ) {
+	public void processView2( BundleAdjustmentCamera bundle2, int width, int height , Se3_F64 view1_to_view2 ) {
 		assertBoof(intrinsic1.width != 0, "Did you call setView1() Must be called first.");
-		BundleAdjustmentOps.convert(bundle2, intrinsic2);
+		BundleAdjustmentOps.convert(bundle2, width, height, intrinsic2);
 		PerspectiveOps.pinholeToMatrix(intrinsic2, K2);
 
 		// Compute the parameters for the rectified view

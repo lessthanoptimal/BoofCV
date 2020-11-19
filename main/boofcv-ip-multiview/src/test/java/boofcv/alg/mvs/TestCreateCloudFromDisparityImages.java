@@ -112,14 +112,14 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 
 		assertEquals(0, ImageStatistics.sum(mask)); // no previous points should fill it in
 		assertEquals(width*height, alg.cloud.size);
-		assertEquals(1, alg.views.size);
+		assertEquals(1, alg.viewPointIdx.size);
 
 		// add it again and see if no new points were added but the views increased
 		assertEquals(1, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
 
 		assertTrue(ImageStatistics.sum(mask) > 0); // it should be filled in with existing points
 		assertEquals(width*height, alg.cloud.size);
-		assertEquals(2, alg.views.size);
+		assertEquals(2, alg.viewPointIdx.size);
 	}
 
 	/**

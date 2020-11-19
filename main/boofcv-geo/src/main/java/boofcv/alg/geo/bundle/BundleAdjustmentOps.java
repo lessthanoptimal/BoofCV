@@ -35,22 +35,27 @@ import org.jetbrains.annotations.Nullable;
 public class BundleAdjustmentOps {
 
 	/**
-	 * Converts the {@link BundleAdjustmentCamera} into {@link CameraPinholeBrown}.
+	 * Converts the {@link BundleAdjustmentCamera} into {@link CameraPinholeBrown}. Sets the width and height
+	 * parameters and if applicable, sets the image center to be the implicit (width/2, height/2)
 	 *
 	 * @param src (Input) Input camera model.
+	 * @param width (Input) Input image width
+	 * @param height (Input) Input image height
 	 * @param dst (Output) Storage for output.
 	 */
-	public static CameraPinholeBrown convert( BundleAdjustmentCamera src, @Nullable CameraPinholeBrown dst ) {
+	public static CameraPinholeBrown convert( BundleAdjustmentCamera src, int width, int height,
+											  @Nullable CameraPinholeBrown dst ) {
 		if (dst == null)
 			dst = new CameraPinholeBrown();
 
 		if (src instanceof BundlePinhole) {
 			dst.fsetRadial().fsetTangental(0, 0); // remove distortion terms
-			convert((BundlePinhole)src, (CameraPinhole)dst);
+			convert((BundlePinhole)src, width, height, (CameraPinhole)dst);
 		} else if (src instanceof BundlePinholeBrown) {
-			convert((BundlePinholeBrown)src, dst);
+			convert((BundlePinholeBrown)src, width, height, dst);
+			dst.fsetShape(width, height);
 		} else if (src instanceof BundlePinholeSimplified) {
-			convert((BundlePinholeSimplified)src, dst);
+			convert((BundlePinholeSimplified)src, width, height, dst);
 		} else {
 			throw new RuntimeException("Unknown src type. " + src);
 		}
@@ -64,7 +69,8 @@ public class BundleAdjustmentOps {
 	 * @param dst (Output) Storage for output. If null a new instance is created.
 	 * @return The converted camera model
 	 */
-	public static CameraPinhole convert( BundlePinhole src, @Nullable CameraPinhole dst ) {
+	public static CameraPinhole convert( BundlePinhole src, int width, int height,
+										 @Nullable CameraPinhole dst ) {
 		if (dst == null)
 			dst = new CameraPinhole();
 
@@ -77,6 +83,8 @@ public class BundleAdjustmentOps {
 		else
 			dst.skew = src.skew;
 
+		dst.fsetShape(width, height);
+
 		return dst;
 	}
 
@@ -87,7 +95,8 @@ public class BundleAdjustmentOps {
 	 * @param dst (Output) Storage for output. If null a new instance is created.
 	 * @return The converted camera model
 	 */
-	public static CameraPinholeBrown convert( BundlePinholeBrown src, @Nullable CameraPinholeBrown dst ) {
+	public static CameraPinholeBrown convert( BundlePinholeBrown src, int width, int height,
+											  @Nullable CameraPinholeBrown dst ) {
 		if (dst == null)
 			dst = new CameraPinholeBrown();
 
@@ -106,6 +115,7 @@ public class BundleAdjustmentOps {
 		} else {
 			dst.t1 = dst.t2 = 0;
 		}
+		dst.fsetShape(width, height);
 
 		return dst;
 	}
@@ -117,12 +127,14 @@ public class BundleAdjustmentOps {
 	 * @param dst (Output) Storage for output. If null a new instance is created.
 	 * @return The converted camera model
 	 */
-	public static CameraPinholeBrown convert( BundlePinholeSimplified src, @Nullable CameraPinholeBrown dst ) {
+	public static CameraPinholeBrown convert( BundlePinholeSimplified src, int width, int height,
+											  @Nullable CameraPinholeBrown dst ) {
 		if (dst == null)
 			dst = new CameraPinholeBrown();
 
 		dst.fsetRadial(src.k1, src.k2).fsetTangental(0.0, 0.0);
-		dst.fsetK(src.f, src.f, 0.0, 0.0, 0.0, 0, 0);
+		dst.fsetK(src.f, src.f, 0.0, width/2, height/2, 0, 0);
+		dst.fsetShape(width, height);
 
 		return dst;
 	}
@@ -134,11 +146,13 @@ public class BundleAdjustmentOps {
 	 * @param dst (Output) Storage for output. If null a new instance is created.
 	 * @return The converted camera model
 	 */
-	public static CameraPinhole convert( BundlePinholeSimplified src, @Nullable CameraPinhole dst ) {
+	public static CameraPinhole convert( BundlePinholeSimplified src, int width, int height,
+										 @Nullable CameraPinhole dst ) {
 		if (dst == null)
 			dst = new CameraPinhole();
 
-		dst.fsetK(src.f, src.f, 0.0, 0.0, 0.0, 0, 0);
+		dst.fsetK(src.f, src.f, 0.0, width/2, height/2, 0, 0);
+		dst.fsetShape(width, height);
 
 		return dst;
 	}

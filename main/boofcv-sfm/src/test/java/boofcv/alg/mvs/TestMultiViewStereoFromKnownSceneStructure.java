@@ -32,8 +32,8 @@ import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import boofcv.visualize.PointCloudViewer;
@@ -99,7 +99,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 			if (visualize) visualizeResults(alg);
 			checkCloudPlane(alg.getCloud());
 			// sanity checks
-			assertTrue(numViews >= alg.getDisparityCloud().views.size);
+			assertTrue(numViews >= alg.getDisparityCloud().viewPointIdx.size);
 		}
 	}
 
@@ -121,7 +121,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		if (visualize) visualizeResults(alg);
 
 		checkCloudPlane(alg.getCloud());
-		assertEquals(alg.getDisparityCloud().views.size, 2);
+		assertEquals(alg.getDisparityCloud().viewPointIdx.size, 3);
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		return alg;
 	}
 
-	private class DummyLookUp implements MultiViewStereoFromKnownSceneStructure.LookUpImages {
+	private class DummyLookUp implements LookUpImages {
 		private final List<String> requestShapes = new ArrayList<>();
 		private final List<String> requestImage = new ArrayList<>();
 
@@ -310,7 +310,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 			return true;
 		}
 
-		@Override public <LT extends ImageGray<LT>> boolean loadImage( String name, LT output ) {
+		@Override public <LT extends ImageBase<LT>> boolean loadImage( String name, LT output ) {
 			requestImage.add(name);
 			output.reshape(width, height);
 			return true;
@@ -320,7 +320,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 	/**
 	 * Renders images as requested with a simulated target
 	 */
-	private class SimulatedLookUp implements MultiViewStereoFromKnownSceneStructure.LookUpImages {
+	private class SimulatedLookUp implements LookUpImages {
 		SimulatePlanarWorld sim = new SimulatePlanarWorld();
 
 		public SimulatedLookUp() {
@@ -336,10 +336,10 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 			return true;
 		}
 
-		@Override public <LT extends ImageGray<LT>> boolean loadImage( String name, LT output ) {
+		@Override public <LT extends ImageBase<LT>> boolean loadImage( String name, LT output ) {
 			int indexSba = Integer.parseInt(name.substring(3));
 			var pinhole = new CameraPinhole();
-			BundleAdjustmentOps.convert((BundlePinhole)scene.cameras.get(indexSba).model, pinhole);
+			BundleAdjustmentOps.convert((BundlePinhole)scene.cameras.get(indexSba).model, 0, 0, pinhole);
 			pinhole.width = width;
 			pinhole.height = height;
 
