@@ -61,8 +61,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
-
 /**
  * TODO comment
  *
@@ -75,7 +73,7 @@ public class ExampleMultiviewSceneReconstruction {
 		ImageDimension dimension = new ImageDimension();
 
 		public LookUpImageFiles( List<String> paths ) {
-			assertBoof(paths.size()>0);
+			BoofMiscOps.checkTrue(paths.size()>0);
 			this.paths = paths;
 
 			if (paths.size()==0)
@@ -384,7 +382,7 @@ public class ExampleMultiviewSceneReconstruction {
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
 		Point4D_F64 world = new Point4D_F64();
 
-		assertBoof(structure.isHomogenous());
+		BoofMiscOps.checkTrue(structure.isHomogenous());
 
 		// Convert the structure into regular 3D points from homogenous
 		for (int i = 0; i < structure.points.size; i++) {

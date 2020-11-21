@@ -42,7 +42,7 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Expands a metric {@link SceneWorkingGraph scene} by one view (the taget) using the geometric relationship between
@@ -122,7 +122,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	public boolean process( LookupSimilarImages db,
 							SceneWorkingGraph workGraph,
 							View target ) {
-		assertBoof(!workGraph.isKnown(target), "Target shouldn't already be in the workGraph");
+		checkTrue(!workGraph.isKnown(target), "Target shouldn't already be in the workGraph");
 		this.workGraph = workGraph;
 		this.utils.db = db;
 

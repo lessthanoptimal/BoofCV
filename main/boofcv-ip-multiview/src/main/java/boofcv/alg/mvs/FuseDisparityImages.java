@@ -34,7 +34,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.DConvertMatrixStruct;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Given a set of disparity images, all of which were computed from the same left image, fuse into a single
@@ -108,7 +108,7 @@ public class FuseDisparityImages {
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process( GrayF32 disparity ) {
-		assertBoof(!images.isEmpty(), "No images have been added");
+		checkTrue(!images.isEmpty(), "No images have been added");
 
 		disparity.reshape(fused.width, fused.height);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.geo.triangulate;
 
 import boofcv.abst.geo.RefineTriangulateProjective;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateProjective;
+import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
@@ -29,8 +30,6 @@ import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
-
-import static boofcv.misc.BoofMiscOps.assertEq;
 
 /**
  * Nonlinear least-squares triangulation for projective geometry in homogenous coordinates.
@@ -51,7 +50,7 @@ public class TriangulateRefineProjectiveLS implements RefineTriangulateProjectiv
 		this.convergenceTol = convergenceTol;
 		this.maxIterations = maxIterations;
 		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
-		assertEq(4,func.getNumOfInputsN());
+		BoofMiscOps.checkEq(4,func.getNumOfInputsN());
 	}
 
 	@Override

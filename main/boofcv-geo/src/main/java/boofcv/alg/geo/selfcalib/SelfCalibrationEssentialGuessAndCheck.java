@@ -19,6 +19,7 @@
 package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedPair;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
@@ -33,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * <p>
@@ -128,11 +129,11 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 	 */
 	public boolean process(DMatrixRMaj F21, DMatrixRMaj P2, List<AssociatedPair> observations ) {
 		// sanity check configurations
-		assertBoof(imageLengthPixels>0,"Must set imageLengthPixels to max(imageWidth,imageHeight)");
-		assertBoof(sampleFocalRatioMin !=0 && sampleFocalRatioMax !=0,"You must call configure");
-		assertBoof(sampleFocalRatioMin < sampleFocalRatioMax && sampleFocalRatioMin > 0);
-		assertBoof(observations.size()>0);
-		assertBoof(numberOfSamples>0);
+		checkTrue(imageLengthPixels>0,"Must set imageLengthPixels to max(imageWidth,imageHeight)");
+		checkTrue(sampleFocalRatioMin !=0 && sampleFocalRatioMax !=0,"You must call configure");
+		BoofMiscOps.checkTrue(sampleFocalRatioMin < sampleFocalRatioMax && sampleFocalRatioMin > 0);
+		BoofMiscOps.checkTrue(observations.size()>0);
+		BoofMiscOps.checkTrue(numberOfSamples>0);
 
 		// Pass in the trifocal tensor so that it can estimate self calibration
 		calibrator.initialize(F21,P2);

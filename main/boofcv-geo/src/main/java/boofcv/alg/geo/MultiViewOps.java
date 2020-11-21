@@ -68,8 +68,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
-
 /**
  * <p>
  * Contains commonly used operations used in 2-view and 3-view perspective geometry.
@@ -1062,7 +1060,7 @@ public class MultiViewOps {
 	 * @param H (output + Optional) storage for homography
 	 */
 	public static void projectiveMakeFirstIdentity( List<DMatrixRMaj> cameraMatrices, @Nullable DMatrixRMaj H ) {
-		BoofMiscOps.assertBoof(cameraMatrices.size() >= 1);
+		BoofMiscOps.checkTrue(cameraMatrices.size() >= 1);
 		H = projectiveToIdentityH(cameraMatrices.get(0), H);
 		DMatrixRMaj tmp = new DMatrixRMaj(3, 4);
 		for (int i = 0; i < cameraMatrices.size(); i++) {
@@ -1703,8 +1701,8 @@ public class MultiViewOps {
 	 * @return scale factor
 	 */
 	public static double findScale( DMatrixRMaj a, DMatrixRMaj b ) {
-		assertBoof(a.numRows == b.numRows);
-		assertBoof(a.numCols == b.numCols);
+		BoofMiscOps.checkTrue(a.numRows == b.numRows);
+		BoofMiscOps.checkTrue(a.numCols == b.numCols);
 
 		final int N = a.getNumElements();
 		double sum = 0.0;
@@ -1775,7 +1773,7 @@ public class MultiViewOps {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;
-		assertBoof(dst.get(0).size() == 3);
+		BoofMiscOps.checkTrue(dst.get(0).size() == 3);
 
 		for (int i = 0; i < src.size(); i++) {
 			AssociatedTriple a = src.get(i);
@@ -1805,7 +1803,7 @@ public class MultiViewOps {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;
-		assertBoof(src.get(0).size() == 3);
+		BoofMiscOps.checkTrue(src.get(0).size() == 3);
 
 		for (int i = 0; i < src.size(); i++) {
 			AssociatedTuple a = src.get(i);

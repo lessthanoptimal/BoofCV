@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Common parent for metric and projective expand scene by one. Mostly contains functions for selecting which of the
@@ -76,7 +76,7 @@ public abstract class ExpandByOneView implements VerbosePrint {
 			PairwiseImageGraph.View viewC = connectC.other(target);
 
 			PairwiseImageGraph.Motion connectBtoC = viewB.findMotion(viewC);
-			assertBoof(connectBtoC != null, "BUG");
+			checkTrue(connectBtoC != null, "BUG");
 
 			double score = Math.min(utils.scoreMotion.score(connectB), utils.scoreMotion.score(connectC));
 			score = Math.min(score, utils.scoreMotion.score(connectBtoC));

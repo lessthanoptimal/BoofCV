@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,13 @@
 
 package boofcv.alg.feature.detect.selector;
 
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Randomly selects features up to the limit from the set of detected. This is actually not as bad of an approach
@@ -49,7 +48,7 @@ public class FeatureSelectRandom<Point> implements FeatureSelectLimit<Point> {
 	public void select( int imageWidth, int imageHeight,
 						@Nullable FastAccess<Point> prior,
 						FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
-		assertBoof(limit > 0);
+		BoofMiscOps.checkTrue(limit > 0);
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!

@@ -43,7 +43,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Given a set of views and a set of features which are visible in all views, estimate their structure up to a
@@ -113,11 +113,11 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 									 View seed, GrowQueue_I32 seedFeatsIdx, GrowQueue_I32 seedConnIdx ) {
 		// Check preconditions. Exceptions are thrown since these are easily checked and shouldn't be ignored under
 		// the assumption that geometry was simply bad
-		assertBoof(seedFeatsIdx.size >= 6,
+		checkTrue(seedFeatsIdx.size >= 6,
 				"need at least 6 common features to estimate camera matrix");
-		assertBoof(seedConnIdx.size >= 2,
+		checkTrue(seedConnIdx.size >= 2,
 				"2-views, a.k.a. stereo, is a special case and requires different logic and isn't yet supported");
-		assertBoof(seed.connections.size >= seedConnIdx.size,
+		checkTrue(seed.connections.size >= seedConnIdx.size,
 				"Can't have more seed connection indexes than actual connections");
 
 		if (verbose != null)
@@ -175,7 +175,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		}
 
 		// sanity check for bugs
-		viewsByStructureIndex.forIdx(( i, o ) -> assertBoof(o != null));
+		viewsByStructureIndex.forIdx(( i, o ) -> BoofMiscOps.checkTrue(o != null));
 
 		// create observation data structure for SBA
 		createObservationsForBundleAdjustment(seedConnIdx);
@@ -203,7 +203,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		// in the seedConnIdx list
 		int indexSbaViewB = 1 + seedConnIdx.indexOf(selectedTriple[0]);
 		int indexSbaViewC = 1 + seedConnIdx.indexOf(selectedTriple[1]);
-		assertBoof(indexSbaViewB > 0 && indexSbaViewC > 0, "indexOf() failed");
+		checkTrue(indexSbaViewB > 0 && indexSbaViewC > 0, "indexOf() failed");
 
 		for (int i = 0; i < 2; i++) {
 			Motion motion = seed.connections.get(selectedTriple[i]);
@@ -261,7 +261,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param selected (output) Indexes of the two selected edges going out of `seed`
 	 */
 	boolean selectInitialTriplet( View seed, GrowQueue_I32 edgeIdxs, int[] selected ) {
-		assertBoof(selected.length == 2);
+		BoofMiscOps.checkTrue(selected.length == 2);
 		double bestScore = 0; // zero is used for invalid triples
 		for (int i = 0; i < edgeIdxs.size; i++) {
 			int edgeI = edgeIdxs.get(i);
@@ -309,7 +309,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @return true if successful or false if not
 	 */
 	boolean findRemainingCameraMatrices( LookupSimilarImages db, View seed, GrowQueue_I32 seedConnIdx ) {
-		assertBoof(inlierToSeed.size == utils.inliersThreeView.size());
+		BoofMiscOps.checkTrue(inlierToSeed.size == utils.inliersThreeView.size());
 
 		// Look up the 3D coordinates of features from the scene's structure previously computed
 		points3D.reset(); // points in 3D
@@ -354,7 +354,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			utils.structure.setView(indexSbaView, false, cameraMatrix, shape.width, shape.height);
 			// observation of features
 			SceneObservations.View sbaObsView = utils.observations.getView(indexSbaView);
-			assertBoof(sbaObsView.size() == 0, "Must be reset to initial state first");
+			checkTrue(sbaObsView.size() == 0, "Must be reset to initial state first");
 			for (int i = 0; i < inlierToSeed.size; i++) {
 				Point2D_F64 p = assocPixel.get(i).p2;
 				sbaObsView.add(i, (float)p.x, (float)p.y);
@@ -376,7 +376,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @return true if successful
 	 */
 	boolean computeCameraMatrix( View seed, Motion edge, FastQueue<Point2D_F64> featsB, DMatrixRMaj cameraMatrix ) {
-		assertBoof(assocPixel.size == inlierToSeed.size);
+		BoofMiscOps.checkTrue(assocPixel.size == inlierToSeed.size);
 
 		// how to convert a feature in the seed to one in viewI
 		PairwiseGraphUtils.createTableViewAtoB(seed, edge, utils.table_A_to_B);
@@ -479,7 +479,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			utils.db.lookupShape(id, dimensions.get(viewIdx));
 
 			SceneObservations.View oview = utils.observations.views.get(viewIdx);
-			assertBoof(oview.size() == observations.size);
+			BoofMiscOps.checkTrue(oview.size() == observations.size);
 
 			for (int obsIdx = 0; obsIdx < observations.size; obsIdx++) {
 				oview.get(obsIdx, observations.get(obsIdx).get(viewIdx));

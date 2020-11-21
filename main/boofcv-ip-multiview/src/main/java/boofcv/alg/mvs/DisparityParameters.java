@@ -18,12 +18,11 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import lombok.Data;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Describes the geometric meaning of values in a disparity image.
@@ -79,9 +78,9 @@ public class DisparityParameters {
 
 	/** Checks if specified parameters are valid */
 	public void checkValidity() {
-		assertBoof(disparityMin >= 0);
-		assertBoof(disparityRange > 0);
-		assertBoof(baseline > 0);
-		assertBoof(pinhole.fx > 0);
+		BoofMiscOps.checkTrue(disparityMin >= 0);
+		BoofMiscOps.checkTrue(disparityRange > 0);
+		BoofMiscOps.checkTrue(baseline > 0);
+		BoofMiscOps.checkTrue(pinhole.fx > 0);
 	}
 }

@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * A scene graph which is designed to be easy to manipulate as the scene's structure is determined. Intended to be
@@ -76,7 +76,7 @@ public class SceneWorkingGraph {
 	public View addView( PairwiseImageGraph.View pview ) {
 		View v = new View();
 		v.pview = pview;
-		assertBoof(null == views.put(v.pview.id, v),
+		checkTrue(null == views.put(v.pview.id, v),
 				"There shouldn't be an existing view with the same key: '" + v.pview.id + "'");
 		viewList.add(v);
 		return v;

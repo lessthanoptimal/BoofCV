@@ -43,8 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
-
 /**
  * Simulation where not all the features will be visible at the same time
  *
@@ -178,7 +176,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 				o.pixel.setTo(pixel);
 				v.observations.add(o);
 			}
-			assertBoof(v.observations.size() > 0);
+			BoofMiscOps.checkTrue(v.observations.size() > 0);
 
 //			System.out.println("view="+viewCnt+" obs.size="+v.observations.size());
 			// Randomize the order of the observations
@@ -333,7 +331,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	 * @param featureIdx (output)which features were in common
 	 */
 	public void createTripleObs( int[] viewIdx, FastQueue<AssociatedTriple> triples, GrowQueue_I32 featureIdx ) {
-		BoofMiscOps.assertBoof(viewIdx.length == 3);
+		BoofMiscOps.checkTrue(viewIdx.length == 3);
 
 		triples.reset();
 		featureIdx.reset();

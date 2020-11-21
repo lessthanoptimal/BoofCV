@@ -18,9 +18,8 @@
 
 package boofcv.struct.geo;
 
+import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Associated set of {@link Point2D_F64} for an arbitrary number of views that is fixed.
@@ -77,7 +76,7 @@ public class AssociatedTupleN implements AssociatedTuple {
 
 	@Override
 	public void setTo( AssociatedTuple src ) {
-		assertBoof(src.size()== size());
+		BoofMiscOps.checkTrue(src.size()== size());
 
 		for (int i = 0; i < p.length; i++) {
 			p[i].setTo(src.get(i));

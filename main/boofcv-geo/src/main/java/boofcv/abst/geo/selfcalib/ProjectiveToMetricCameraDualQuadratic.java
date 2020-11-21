@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
 
-import static boofcv.misc.BoofMiscOps.assertEq;
+import static boofcv.misc.BoofMiscOps.checkEq;
 
 /**
  * Wrapper around {@link SelfCalibrationLinearDualQuadratic} for {@link ProjectiveToMetricCameras}.
@@ -66,7 +66,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
 						   List<AssociatedTuple> observations, MetricCameras metricViews)
 	{
-		assertEq(views.size()+1,dimensions.size(),"View[0] is implicitly identity and not included");
+		checkEq(views.size()+1,dimensions.size(),"View[0] is implicitly identity and not included");
 		metricViews.reset();
 
 		// Determine metric parameters

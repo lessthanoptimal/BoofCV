@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,10 @@
 package boofcv.factory.geo;
 
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Configuration for {@link SelfCalibrationLinearDualQuadratic}. Note that the principle point is always assumed
@@ -40,8 +41,8 @@ public class ConfigSelfCalibDualQuadratic implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		assertBoof(aspectRatio > 0);
-		assertBoof( knownAspectRatio && zeroSkew , "If aspect ratio is known then zero skew must be assumed");
+		BoofMiscOps.checkTrue(aspectRatio > 0);
+		checkTrue( knownAspectRatio && zeroSkew , "If aspect ratio is known then zero skew must be assumed");
 	}
 
 	public void setTo( ConfigSelfCalibDualQuadratic src ) {

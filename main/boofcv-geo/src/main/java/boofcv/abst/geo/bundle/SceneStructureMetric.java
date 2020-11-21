@@ -24,7 +24,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Specifies a metric (calibrated) scene for optimizing using {@link BundleAdjustment}.
@@ -196,7 +196,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param parent ID / index of the parent this this view is relative to
 	 */
 	public void setView( int viewIndex, int cameraIndex, boolean known, Se3_F64 parent_to_view, int parent ) {
-		assertBoof(parent < viewIndex, "Parent must be less than viewIndex");
+		checkTrue(parent < viewIndex, "Parent must be less than viewIndex");
 		views.get(viewIndex).camera = cameraIndex;
 		views.get(viewIndex).parent_to_view = addMotion(known, parent_to_view);
 		views.get(viewIndex).parent = parent >= 0 ? views.get(parent) : null;
@@ -210,7 +210,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param parent ID / index of the parent this this view is relative to
 	 */
 	public void setView( int viewIndex, int cameraIndex, int motionIndex, int parent ) {
-		assertBoof(parent < viewIndex, "Parent must be less than viewIndex");
+		checkTrue(parent < viewIndex, "Parent must be less than viewIndex");
 		views.get(viewIndex).camera = cameraIndex;
 		views.get(viewIndex).parent_to_view = motionIndex;
 		views.get(viewIndex).parent = parent >= 0 ? views.get(parent) : null;

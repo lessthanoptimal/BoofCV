@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Processes frames from {@link PointTracker} and converts the tracking results into a {@link LookupSimilarImages}.
@@ -88,7 +88,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	 * @param tracker Track after processing the latest frame/image
 	 */
 	public void processFrame(PointTracker<?> tracker) {
-		assertBoof(imageWidth!=0,"Must call initialize first and specify the image size");
+		checkTrue(imageWidth!=0,"Must call initialize first and specify the image size");
 
 		// Create a new frame and save the observations
 		Frame current = createFrameSaveObservations(tracker);
@@ -177,7 +177,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	public void findSimilar(String target, List<String> similar) {
 		similar.clear();
 		Frame f = frameMap.get(target);
-		assertBoof(f != null, "Unknown image");
+		checkTrue(f != null, "Unknown image");
 		for (int i = 0; i < f.related.size(); i++) {
 			similar.add(f.related.get(i).frameID);
 		}
@@ -187,7 +187,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	public void lookupPixelFeats(String target, FastQueue<Point2D_F64> features) {
 		features.reset();
 		Frame f = frameMap.get(target);
-		assertBoof(f != null, "Unknown image");
+		checkTrue(f != null, "Unknown image");
 
 		final int N = f.size();
 		for (int i = 0; i < N; i++) {

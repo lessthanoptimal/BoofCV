@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,12 @@
 
 package boofcv.alg.feature.detect.selector;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
 import org.jetbrains.annotations.Nullable;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Selects and sorts up to the N best features based on their intensity.
@@ -46,7 +45,7 @@ public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Po
 	@Override
 	public void select( GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
 						FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
-		assertBoof(limit > 0);
+		BoofMiscOps.checkTrue(limit > 0);
 		selected.reset();
 
 		if (detected.size <= limit) {

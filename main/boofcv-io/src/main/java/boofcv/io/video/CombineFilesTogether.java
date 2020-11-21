@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,12 @@
 package boofcv.io.video;
 
 import boofcv.io.UtilIO;
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.GrowQueue_I8;
 
 import java.io.*;
 import java.util.Collections;
 import java.util.List;
-
-import static boofcv.misc.BoofMiscOps.assertEq;
 
 /**
  * Combines a sequence of files together using a simple format.  At the beginning of each segment/file [0xff,0xff,0xff]
@@ -57,7 +56,7 @@ public class CombineFilesTogether {
 			fos.write((byte)length);
 
 			int readLength = fis.read(buffer.data, 0, (int)length);
-			assertEq(readLength, (int)length);
+			BoofMiscOps.checkEq(readLength, (int)length);
 			fos.write(buffer.data, 0, (int)length);
 		}
 	}
@@ -76,7 +75,7 @@ public class CombineFilesTogether {
 
 		output.resize(length);
 		int readLength = fis.read(output.data, 0, length);
-		assertEq(readLength, length);
+		BoofMiscOps.checkEq(readLength, length);
 
 		return true;
 	}

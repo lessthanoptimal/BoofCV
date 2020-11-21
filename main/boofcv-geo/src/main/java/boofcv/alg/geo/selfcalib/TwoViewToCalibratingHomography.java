@@ -24,6 +24,7 @@ import boofcv.alg.geo.DecomposeProjectiveToMetric;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -39,8 +40,6 @@ import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolver;
 
 import java.util.List;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Estimates the calibrating/rectifying homography when given a trifocal tensor and two calibration matrices for
@@ -144,8 +143,8 @@ public class TwoViewToCalibratingHomography {
 	 */
 	public void initialize(DMatrixRMaj F21, DMatrixRMaj P2) {
 		// TODO add image width,height here and use to normalize
-		assertBoof(F21.numRows==3 && F21.numCols==3);
-		assertBoof(P2.numRows==3 && P2.numCols==4);
+		BoofMiscOps.checkTrue(F21.numRows==3 && F21.numCols==3);
+		BoofMiscOps.checkTrue(P2.numRows==3 && P2.numCols==4);
 		this.F21.set(F21);
 		this.P2.set(P2);
 	}

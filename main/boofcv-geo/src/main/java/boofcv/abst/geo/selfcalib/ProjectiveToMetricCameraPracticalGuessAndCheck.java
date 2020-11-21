@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.selfcalib.ResolveSignAmbiguityPositiveDepth;
 import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
@@ -30,8 +31,6 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.List;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Wrapper around {@link SelfCalibrationPraticalGuessAndCheckFocus} for {@link ProjectiveToMetricCameras}.
@@ -55,7 +54,7 @@ public class ProjectiveToMetricCameraPracticalGuessAndCheck implements Projectiv
 	public boolean process(List<ImageDimension> dimensions, List<DMatrixRMaj> views,
 						   List<AssociatedTuple> observations, MetricCameras metricViews)
 	{
-		assertBoof(views.size()+1==dimensions.size());
+		BoofMiscOps.checkTrue(views.size()+1==dimensions.size());
 		metricViews.reset();
 
 		// tell it the image size

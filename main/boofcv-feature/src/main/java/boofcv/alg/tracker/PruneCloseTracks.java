@@ -154,7 +154,7 @@ public class PruneCloseTracks<T> {
 			List<TrackDrop<T>> cell = gridToCell[centerIndex];
 			if (cell == null) {
 				gridToCell[centerIndex] = cell = storageLists.grow();
-				BoofMiscOps.assertBoof(cell.size() == 0);
+				BoofMiscOps.checkTrue(cell.size() == 0);
 			}
 
 			TrackDrop<T> td = storageDrops.grow();

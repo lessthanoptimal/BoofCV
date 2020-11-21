@@ -22,6 +22,7 @@ import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.AssociatedTuple;
 import georegression.struct.point.Point2D_F64;
@@ -31,8 +32,6 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * There's a sign ambiguity which flips the translation vector for several self calibration functions. This
@@ -67,8 +66,8 @@ public class ResolveSignAmbiguityPositiveDepth {
 	 * @param views (input/output) the current solution and modified to have the correct sign on output
 	 */
 	public void process(List<AssociatedTuple> observations, MetricCameras views ) {
-		assertBoof(views.intrinsics.size==views.motion_1_to_k.size+1);
-		assertBoof(observations.size()>0);
+		BoofMiscOps.checkTrue(views.intrinsics.size==views.motion_1_to_k.size+1);
+		BoofMiscOps.checkTrue(observations.size()>0);
 
 		final int numViews = views.intrinsics.size;
 		final int numObs = observations.size();

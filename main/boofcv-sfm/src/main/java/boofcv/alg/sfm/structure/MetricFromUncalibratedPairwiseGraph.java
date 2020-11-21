@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
-import static boofcv.misc.BoofMiscOps.assertEq;
+import static boofcv.misc.BoofMiscOps.checkEq;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Fully computes views (intrinsics + SE3) for each view and saves which observations were inliers. This should
@@ -210,7 +210,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 						 GrowQueue_I32 inlierToSeed,
 						 FastQueue<GrowQueue_I32> inlierToOther,
 						 MetricCameras results ) {
-		assertEq(viewIds.size(), results.motion_1_to_k.size + 1, "Implicit view[0] no included");
+		checkEq(viewIds.size(), results.motion_1_to_k.size + 1, "Implicit view[0] no included");
 
 		// Save the metric views
 		for (int i = 0; i < viewIds.size(); i++) {
@@ -224,7 +224,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Save the inliers used to construct the metric scene
 		SceneWorkingGraph.View wtarget = workGraph.lookupView(viewIds.get(0));
-		assertEq(wtarget.inliers.views.size, 0, "There should be at most one set of inliers per view");
+		checkEq(wtarget.inliers.views.size, 0, "There should be at most one set of inliers per view");
 		SceneWorkingGraph.InlierInfo inliers = wtarget.inliers;
 		inliers.views.resize(viewIds.size());
 		inliers.observations.resize(viewIds.size());
@@ -232,11 +232,11 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 			inliers.views.set(viewIdx, graph.lookupNode(viewIds.get(viewIdx)));
 			if (viewIdx == 0) {
 				inliers.observations.get(0).setTo(inlierToSeed);
-				assertBoof(inliers.observations.get(0).size > 0, "There should be observations");
+				checkTrue(inliers.observations.get(0).size > 0, "There should be observations");
 				continue;
 			}
 			inliers.observations.get(viewIdx).setTo(inlierToOther.get(viewIdx - 1));
-			assertEq(inliers.observations.get(viewIdx).size, inliers.observations.get(0).size,
+			checkEq(inliers.observations.get(viewIdx).size, inliers.observations.get(0).size,
 					"Each view should have the same number of observations");
 		}
 	}

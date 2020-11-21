@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
+import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -26,8 +27,6 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 import java.util.Map;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Given a {@link PairwiseImageGraph} that describes how a set of images are related to each other based on point
@@ -190,7 +189,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 			wview.projective.set(cameraMatrix);
 
 			// save which features were used for later use in metric reconstruction
-			assertBoof(utils.seed == wview.pview);// just being paranoid
+			BoofMiscOps.checkTrue(utils.seed == wview.pview);// just being paranoid
 			utils.saveRansacInliers(wview);
 
 			// Add views which are neighbors

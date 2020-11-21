@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,11 +23,11 @@ package boofcv.errors;
  *
  * @author Peter Abeles
  */
-public class BoofAssertFailure extends RuntimeException {
-	public BoofAssertFailure() {
+public class BoofCheckFailure extends RuntimeException {
+	public BoofCheckFailure() {
 	}
 
-	public BoofAssertFailure(String message) {
+	public BoofCheckFailure( String message) {
 		super(message);
 	}
 }

@@ -18,9 +18,8 @@
 
 package boofcv.core.image;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Specific implementations of {@link LookUpColorRgb}
@@ -32,7 +31,7 @@ public class LookUpColorRgbFormats {
 		Planar<GrayU8> image;
 
 		@Override public void setImage( Planar<GrayU8> image ) {
-			assertBoof(image.getNumBands() >= 3);
+			BoofMiscOps.checkTrue(image.getNumBands() >= 3);
 			this.image = image;
 		}
 
@@ -47,7 +46,7 @@ public class LookUpColorRgbFormats {
 		Planar<GrayF32> image;
 
 		@Override public void setImage( Planar<GrayF32> image ) {
-			assertBoof(image.getNumBands() >= 3);
+			BoofMiscOps.checkTrue(image.getNumBands() >= 3);
 			this.image = image;
 		}
 
@@ -66,7 +65,7 @@ public class LookUpColorRgbFormats {
 		InterleavedU8 image;
 
 		@Override public void setImage( InterleavedU8 image ) {
-			assertBoof(image.getNumBands() >= 3);
+			BoofMiscOps.checkTrue(image.getNumBands() >= 3);
 			this.image = image;
 		}
 
@@ -81,7 +80,7 @@ public class LookUpColorRgbFormats {
 		InterleavedF32 image;
 
 		@Override public void setImage( InterleavedF32 image ) {
-			assertBoof(image.getNumBands() >= 3);
+			BoofMiscOps.checkTrue(image.getNumBands() >= 3);
 			this.image = image;
 		}
 

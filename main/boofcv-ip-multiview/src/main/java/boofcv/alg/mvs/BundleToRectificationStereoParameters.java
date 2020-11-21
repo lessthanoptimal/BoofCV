@@ -24,6 +24,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -36,7 +37,7 @@ import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.ops.ConvertMatrixData;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Given parameters from bundle adjustment, compute all the parameters needed to compute a rectified stereo image
@@ -88,8 +89,8 @@ public class BundleToRectificationStereoParameters {
 	 * multiple other views
 	 */
 	public void setView1( BundleAdjustmentCamera bundle1, int width, int height ) {
-		assertBoof(width > 0);
-		assertBoof(height > 0);
+		BoofMiscOps.checkTrue(width > 0);
+		BoofMiscOps.checkTrue(height > 0);
 
 		BundleAdjustmentOps.convert(bundle1, width, height, intrinsic1);
 		PerspectiveOps.pinholeToMatrix(intrinsic1, K1);
@@ -108,7 +109,7 @@ public class BundleToRectificationStereoParameters {
 	 * @param view1_to_view2 (Input) Extrinsic relationship between view-1 and view-2
 	 */
 	public void processView2( BundleAdjustmentCamera bundle2, int width, int height , Se3_F64 view1_to_view2 ) {
-		assertBoof(intrinsic1.width != 0, "Did you call setView1() Must be called first.");
+		checkTrue(intrinsic1.width != 0, "Did you call setView1() Must be called first.");
 		BundleAdjustmentOps.convert(bundle2, width, height, intrinsic2);
 		PerspectiveOps.pinholeToMatrix(intrinsic2, K2);
 
@@ -121,8 +122,8 @@ public class BundleToRectificationStereoParameters {
 		rectifiedRotation.set(rectifyAlg.getRectifiedRotation());
 
 		// Sanity check to see if it's bad
-		assertBoof(!MatrixFeatures_DDRM.hasUncountable(rect1));
-		assertBoof(!MatrixFeatures_DDRM.hasUncountable(rect2));
+		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(rect1));
+		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(rect2));
 
 		// New calibration matrix,
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());

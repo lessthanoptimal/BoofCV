@@ -27,6 +27,7 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.distort.LensDistortionFactory;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageDimension;
@@ -46,8 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
-import static boofcv.misc.BoofMiscOps.assertEq;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Uses SBA to refine the intrinsic parameters and camera locations inside of a {@link SceneWorkingGraph}. This is
@@ -149,11 +149,11 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 
 			oview.resize(wview.pview.totalObservations);
 			db.lookupPixelFeats(wview.pview.id, pixels);
-			assertEq(pixels.size, wview.pview.totalObservations);
+			BoofMiscOps.checkEq(pixels.size, wview.pview.totalObservations);
 
 			// The camera model assumes the principle point is (0,0) and this is done by assuming it's the image center
 			ImageDimension dimension = wview.imageDimension;
-			assertBoof(dimension.width > 0,
+			checkTrue(dimension.width > 0,
 					"You must assign width and height so that pixels can be re-centered");
 			float cx = (float)(dimension.width/2);
 			float cy = (float)(dimension.height/2);

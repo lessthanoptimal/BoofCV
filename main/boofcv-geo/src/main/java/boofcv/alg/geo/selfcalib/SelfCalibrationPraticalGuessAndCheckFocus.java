@@ -31,7 +31,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * <p>
@@ -181,8 +181,8 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 	 * @return true if successful or false if it fails
 	 */
 	public boolean process( List<DMatrixRMaj> cameraMatrices ) {
-		assertBoof(V.data[0] != 0.0, "Must call setCamera()");
-		assertBoof(cameraMatrices.size() > 0, "'cameraMatrices' contain at least 1 matrix");
+		checkTrue(V.data[0] != 0.0, "Must call setCamera()");
+		checkTrue(cameraMatrices.size() > 0, "'cameraMatrices' contain at least 1 matrix");
 
 		// Apply normalization as suggested in the paper, then force the first camera matrix to be [I|0] again
 		CommonOps_DDRM.setIdentity(tmpP);

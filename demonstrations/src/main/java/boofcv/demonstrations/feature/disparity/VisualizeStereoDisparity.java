@@ -39,6 +39,7 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.StereoParameters;
@@ -71,7 +72,6 @@ import java.util.List;
 import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
 import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_DIRECTORY;
 import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Computes and displays disparity from still disparity images.  The disparity can be viewed
@@ -336,7 +336,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 
 	private void swapVisualizationPanel( Component target, Component other ) {
 		if (panel != target.getParent()) {
-			assertBoof(other.getParent() == panel);
+			BoofMiscOps.checkTrue(other.getParent() == panel);
 			panel.remove(other);
 			panel.add(target, BorderLayout.CENTER);
 			panel.revalidate();

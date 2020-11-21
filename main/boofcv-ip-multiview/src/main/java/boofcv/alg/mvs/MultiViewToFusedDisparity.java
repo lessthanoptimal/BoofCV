@@ -23,6 +23,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyDistortImageOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -41,7 +42,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -101,8 +101,8 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	 * @param images List of images which are to be processed
 	 */
 	public void initialize( SceneStructureMetric scene, TIntObjectMap<Image> images ) {
-		assertBoof(!images.isEmpty());
-		assertBoof(scene.views.size >= 2);
+		BoofMiscOps.checkTrue(!images.isEmpty());
+		BoofMiscOps.checkTrue(scene.views.size >= 2);
 
 		this.scene = scene;
 		this.images = images;

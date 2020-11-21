@@ -40,8 +40,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
-
 /**
  * From a set of {@link ChessboardCorner ChessboardCorners} find all the chessboard grids in view. Assumptions
  * about the grids size are not made at this stage.
@@ -168,7 +166,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		GrowQueue_I32 indexesUpToLevel = new GrowQueue_I32();
 		pyramidalFindNeighbors(corners, numLevels, cornersInLevel, cornersUpToLevel, indexesUpToLevel);
 
-		assertBoof(indexesUpToLevel.size == corners.size());
+		BoofMiscOps.checkTrue(indexesUpToLevel.size == corners.size());
 
 		if (verbose!=null) {
 			verbose.println("corners.size="+corners.size()+" vertexes.size="+vertexes.size);

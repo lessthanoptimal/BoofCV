@@ -80,7 +80,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Computes a stereo point cloud using three uncalibrated images. Visualizes different pre-processing steps and
@@ -269,7 +269,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	@Override
 	protected boolean openCustomFiles( String[] filePaths, List<String> outSequence, List<String> outImages ) {
-		assertBoof(filePaths.length == 3, "Expected 3 images to be selected");
+		checkTrue(filePaths.length == 3, "Expected 3 images to be selected");
 		outImages.addAll(Arrays.asList(filePaths));
 		return true;
 	}

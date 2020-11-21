@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import static boofcv.io.calibration.CalibrationIO.*;
-import static boofcv.misc.BoofMiscOps.assertEq;
 import static boofcv.misc.BoofMiscOps.getOrThrow;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -75,7 +74,7 @@ public class MultiViewIO {
 		List<Map<String, Object>> motions = new ArrayList<>();
 		for (int motionIdx = 0; motionIdx < graph.edges.size; motionIdx++) {
 			PairwiseImageGraph.Motion pmotion = graph.edges.get(motionIdx);
-			assertEq(pmotion.index, motionIdx);
+			BoofMiscOps.checkEq(pmotion.index, motionIdx);
 
 			Map<String, Object> element = new HashMap<>();
 			motions.add(element);
@@ -195,7 +194,7 @@ public class MultiViewIO {
 	}
 
 	private static void copyIntoMatrix( List<Double> arrayData, DMatrixRMaj matrix ) {
-		assertEq(arrayData.size(), matrix.data.length);
+		BoofMiscOps.checkEq(arrayData.size(), matrix.data.length);
 		for (int j = 0; j < matrix.data.length; j++) {
 			matrix.data[j] = arrayData.get(j);
 		}

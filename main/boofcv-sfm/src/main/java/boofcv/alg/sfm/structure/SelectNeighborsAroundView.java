@@ -20,6 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.alg.sfm.structure.PairwiseImageGraph.Motion;
 import boofcv.alg.sfm.structure.SceneWorkingGraph.View;
+import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.FastQueue;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Selects a subset of views from a {@link SceneWorkingGraph} as the first step before performing local bundle
@@ -291,7 +292,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 
 		// Remove the specified node from the candidate list data structures
 		View v = lookup.remove(id);
-		assertBoof(candidates.remove(v));
+		BoofMiscOps.checkTrue(candidates.remove(v));
 
 		// Keep track of how many direct neighbors to the target have been removed
 		if (null != v.pview.findMotion(seed.pview)) {
@@ -311,8 +312,8 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			// TODO see comment about graph splits. This should be handled by that logic and this removed
 			if (isOrphan(o)) {
 				if (verbose != null) verbose.println("Removing orphaned view='" + o.pview.id + "'");
-				assertBoof(null != lookup.remove(o.pview.id), "Not in lookup list");
-				assertBoof(candidates.remove(o), "Can't remove. Not in candidate list");
+				checkTrue(null != lookup.remove(o.pview.id), "Not in lookup list");
+				checkTrue(candidates.remove(o), "Can't remove. Not in candidate list");
 			}
 
 			boolean found = false;
@@ -323,7 +324,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 				found = true;
 				break;
 			}
-			assertBoof(found, "No matching edge found. BUG. id='" + id + "' m.other='" + o.pview.id + "'");
+			checkTrue(found, "No matching edge found. BUG. id='" + id + "' m.other='" + o.pview.id + "'");
 		}
 	}
 
@@ -385,7 +386,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 				if (!origView.inliers.isEmpty())
 					break;
 			}
-			assertBoof(!origView.inliers.isEmpty(), "BUG! there can be no estimated state if it was never in an " +
+			checkTrue(!origView.inliers.isEmpty(), "BUG! there can be no estimated state if it was never in an " +
 					"inlier list of a neighbor. view.id=" + origView.pview.id);
 		}
 	}

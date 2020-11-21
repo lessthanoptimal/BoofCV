@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.PointToPixelTransform_F64;
@@ -42,7 +43,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -251,7 +251,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
 				StereoPairGraph.Edge pair = pairs.get(pairIdx);
 				// sanity check, since this can be hard to debug if done wrong
-				assertBoof(pair.quality3D >= 0.0 && pair.quality3D <= 1.0);
+				BoofMiscOps.checkTrue(pair.quality3D >= 0.0 && pair.quality3D <= 1.0);
 
 				// Skip if insufficient geometric information
 				if (pair.quality3D < minimumQuality3D)

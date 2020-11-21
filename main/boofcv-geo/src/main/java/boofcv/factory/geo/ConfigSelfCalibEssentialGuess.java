@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,10 @@
 
 package boofcv.factory.geo;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Configuration for {@link boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck}.
@@ -39,9 +40,9 @@ public class ConfigSelfCalibEssentialGuess implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		assertBoof(sampleMin>0,"Minimum focal length must be more than 0");
-		assertBoof(sampleMin<sampleMax,"Minimum focal length must less than the maximum");
-		assertBoof(numberOfSamples>=1);
+		checkTrue(sampleMin>0,"Minimum focal length must be more than 0");
+		checkTrue(sampleMin<sampleMax,"Minimum focal length must less than the maximum");
+		BoofMiscOps.checkTrue(numberOfSamples>=1);
 	}
 
 	public void setTo( ConfigSelfCalibEssentialGuess src ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,10 @@
 
 package boofcv.alg.geo.robust;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageDimension;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * RANSAC for dealing with projective geometry. Shape of input images is provided and that allows for proper
@@ -44,7 +43,7 @@ public class RansacProjective<Model,Point> extends Ransac<Model,Point>
 		super(randSeed, modelManager, modelGenerator, modelDistance, maxIterations, thresholdFit);
 		this.modelDistance = modelDistance;
 		this.modelGenerator = modelGenerator;
-		assertBoof(modelDistance.getNumberOfViews() == modelGenerator.getNumberOfViews());
+		BoofMiscOps.checkTrue(modelDistance.getNumberOfViews() == modelGenerator.getNumberOfViews());
 	}
 
 	@Override

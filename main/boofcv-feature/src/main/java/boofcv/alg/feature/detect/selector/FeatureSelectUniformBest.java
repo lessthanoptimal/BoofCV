@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.selector;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
 import boofcv.struct.image.GrayF32;
@@ -30,8 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Attempts to select features uniformly across the image with a preference for locally more intense features. This
@@ -65,7 +64,7 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 	public void select( @Nullable GrayF32 intensity, int width, int height, boolean positive,
 						@Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
 						FastArray<Point> selected ) {
-		assertBoof(limit > 0);
+		BoofMiscOps.checkTrue(limit > 0);
 		selected.reset();
 
 		// Get the image shape from whatever source is available

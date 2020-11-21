@@ -31,7 +31,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Scores different views to act as a common view based on coverage of rectified image. It works by using a shrunk
@@ -109,8 +109,8 @@ public class ScoreRectifiedViewCoveragePixels {
 		// if the quality is zero it can't contribute
 		if (quality3D == 0.0f)
 			return;
-		assertBoof(quality3D >= 0.0f, "Quality must be positive");
-		assertBoof(scale != 0.0, "You must call initialize() first");
+		checkTrue(quality3D >= 0.0f, "Quality must be positive");
+		checkTrue(scale != 0.0, "You must call initialize() first");
 
 		pixel_to_rect.set(rect);
 

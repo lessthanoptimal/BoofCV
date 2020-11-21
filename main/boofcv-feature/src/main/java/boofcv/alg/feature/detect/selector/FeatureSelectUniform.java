@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.selector;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
 import georegression.struct.point.Point2D_F32;
@@ -30,8 +31,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static boofcv.misc.BoofMiscOps.assertBoof;
 
 /**
  * Attempts to select features uniformly across the image. This is done by breaking the image up into a grid and
@@ -54,7 +53,7 @@ public abstract class FeatureSelectUniform<Point> implements FeatureSelectLimit<
 	public void select( int imageWidth, int imageHeight,
 						@Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
 						FastArray<Point> selected ) {
-		assertBoof(limit > 0);
+		BoofMiscOps.checkTrue(limit > 0);
 		selected.reset();
 
 		// the limit is more than the total number of features. Return them all!

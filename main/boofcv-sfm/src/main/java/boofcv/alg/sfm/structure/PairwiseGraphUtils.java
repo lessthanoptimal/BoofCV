@@ -50,7 +50,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.misc.BoofMiscOps.assertBoof;
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Various utility functions for dealing with {@link PairwiseImageGraph}
@@ -298,7 +298,7 @@ public class PairwiseGraphUtils {
 
 		int numInliers = inliersThreeView.size();
 		final InlierInfo info = view.inliers;
-		assertBoof(info.views.size == 0, "Inliers should not have already been set for this view");
+		checkTrue(info.views.size == 0, "Inliers should not have already been set for this view");
 
 		info.observations.reset();
 		info.observations.resize(3);
@@ -356,8 +356,8 @@ public class PairwiseGraphUtils {
 	 * Triangulates the location of each features in homogenous space and save to bundle adjustment scene
 	 */
 	protected void triangulateFeatures() {
-		assertBoof(structure.views.size > 0, "Must initialize the structure first");
-		assertBoof(structure.points.size == inliersThreeView.size(),
+		checkTrue(structure.views.size > 0, "Must initialize the structure first");
+		checkTrue(structure.points.size == inliersThreeView.size(),
 				"Number of inliers must match the number of points in the scene");
 
 		// TODO Normalize camera matrices for better numerics?
