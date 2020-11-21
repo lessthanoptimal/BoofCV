@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,8 @@ public class FundamentalExtractEpipoles {
 		SingularOps_DDRM.descendingOrder(U,false,singular,3,V,false);
 
 		if( e2 != null )
-			e2.set(U.get(0,2),U.get(1,2),U.get(2,2));
+			e2.setTo(U.get(0,2),U.get(1,2),U.get(2,2));
 		if( e1 != null )
-			e1.set(V.get(0,2),V.get(1,2),V.get(2,2));
+			e1.setTo(V.get(0,2),V.get(1,2),V.get(2,2));
 	}
 }

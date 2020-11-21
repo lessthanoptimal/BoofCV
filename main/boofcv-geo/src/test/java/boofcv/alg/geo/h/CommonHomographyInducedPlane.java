@@ -55,7 +55,7 @@ public class CommonHomographyInducedPlane extends BoofStandardJUnit {
 
 	public CommonHomographyInducedPlane() {
 
-		rightToLeft.getT().set(10,0,0);
+		rightToLeft.getT().setTo(10,0,0);
 		Se3_F64 leftToRight = rightToLeft.invert(null);
 
 		p1 = render(leftToRight,K,X1);

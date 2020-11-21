@@ -52,7 +52,7 @@ public class TestCreateSyntheticOverheadViewPL extends BoofStandardJUnit {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
-		cameraToPlane.getT().set(0, -5, 0);
+		cameraToPlane.getT().setTo(0, -5, 0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 

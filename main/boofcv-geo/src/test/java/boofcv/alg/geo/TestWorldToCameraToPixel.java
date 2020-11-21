@@ -46,7 +46,7 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 	Point2D_F64 expectedInFront = new Point2D_F64();
 
 	public TestWorldToCameraToPixel() {
-		worldToCamera.getT().set(0,0,3);
+		worldToCamera.getT().setTo(0,0,3);
 
 		Point3D_F64 tmp = new Point3D_F64();
 		SePointOps_F64.transform(worldToCamera,infront,tmp);

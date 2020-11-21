@@ -338,7 +338,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 
 		Se3_F64 worldToCamera = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.05, 0.03, worldToCamera.getR());
-		worldToCamera.getT().set(0.2, 0.01, -0.03);
+		worldToCamera.getT().setTo(0.2, 0.01, -0.03);
 
 		DMatrixRMaj K = RandomMatrices_DDRM.triangularUpper(3, 0, -1, 1, rand);
 
@@ -436,7 +436,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 
 		// test to see if it can handle points at infinity. Translational component shouldn't matter
 		Se3_F64 noTranslate = worldToCamera.copy();
-		noTranslate.T.set(0, 0, 0);
+		noTranslate.T.setTo(0, 0, 0);
 
 		{
 			X4.w = 0.0;

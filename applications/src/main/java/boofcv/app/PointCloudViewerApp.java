@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class PointCloudViewerApp {
 			}
 
 			Se3_F64 worldToCamera = new Se3_F64();
-			worldToCamera.T.set(x,y,z);
+			worldToCamera.T.setTo(x,y,z);
 
 			// TODO pick a better method for selecting the initial step size
 			distances.sort();

@@ -68,7 +68,7 @@ public class CameraToEquirectangular_F64
 				pixelToNormalized.compute(pixelX, pixelY, norm);
 				Point3D_F64 v = vectors[index++];
 
-				v.set(norm.x, norm.y, 1);
+				v.setTo(norm.x, norm.y, 1);
 			}
 		}
 	}

@@ -57,15 +57,14 @@ public class TestPnPJacobianRodrigues extends BoofStandardJUnit {
 
 		Se3_F64 worldToCamera = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 1, -0.2, worldToCamera.getR());
-		worldToCamera.getT().set(-0.3,0.4,1);
+		worldToCamera.getT().setTo(-0.3,0.4,1);
 
 		List<Point2D3D> observations = new ArrayList<>();
 
 		for( int i = 0; i < numPoints; i++ ) {
 			Point2D3D p = new Point2D3D();
 
-			p.location.set( rand.nextGaussian()*0.1,
-					rand.nextGaussian()*0.2 , 3 + rand.nextGaussian() );
+			p.location.setTo( rand.nextGaussian()*0.1, rand.nextGaussian()*0.2 , 3 + rand.nextGaussian() );
 
 			p.observation = PerspectiveOps.renderPixel(worldToCamera, p.location, null);
 

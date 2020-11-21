@@ -89,11 +89,11 @@ public abstract class CommonTrifocalChecks extends BoofStandardJUnit {
 	public void createRandomScenario( boolean planar ) {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 				rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, -rand.nextGaussian()*0.1, worldToCam2.R);
-		worldToCam2.getT().set(0.3,0,0.05);
+		worldToCam2.getT().setTo(0.3,0,0.05);
 
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 				rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, -rand.nextGaussian()*0.1, worldToCam3.R);
-		worldToCam3.getT().set(0.6, 0.2, -0.02);
+		worldToCam3.getT().setTo(0.6, 0.2, -0.02);
 
 		createSceneObservations(planar);
 	}

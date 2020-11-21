@@ -52,7 +52,7 @@ public class TestStereoSparse3D extends BoofStandardJUnit {
 		K2 = new DMatrixRMaj(3, 3, true, 120, 0, 330, 0, 160, 220, 0, 0, 1);
 
 		param.right_to_left = new Se3_F64();
-		param.right_to_left.getT().set(0.2, 0, 0.1);
+		param.right_to_left.getT().setTo(0.2, 0, 0.1);
 //		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02,0.01,-0.03,param.rightToLeft.getR());
 
 		param.left = PerspectiveOps.matrixToPinhole(K1, 640, 480, new CameraPinholeBrown());

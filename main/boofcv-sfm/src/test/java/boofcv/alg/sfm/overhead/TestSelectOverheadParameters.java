@@ -96,7 +96,7 @@ public class TestSelectOverheadParameters extends BoofStandardJUnit {
 
 	private void createExtrinsic( double y, double rotX, double rotZ ) {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, rotX, 0, rotZ, cameraToPlane.getR());
-		cameraToPlane.getT().set(0, y, 0);
+		cameraToPlane.getT().setTo(0, y, 0);
 		planeToCamera = cameraToPlane.invert(null);
 	}
 }

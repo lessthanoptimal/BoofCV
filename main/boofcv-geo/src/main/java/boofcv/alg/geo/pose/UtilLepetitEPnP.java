@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class UtilLepetitEPnP {
 	{
 		cameraPts.reset();
 		for( int i = 0; i < numControl; i++ ) {
-			cameraPts.grow().set(0,0,0);
+			cameraPts.grow().setTo(0,0,0);
 		}
 
 		for( int i = 0; i < numControl; i++ ) {

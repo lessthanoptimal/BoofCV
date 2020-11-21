@@ -91,10 +91,10 @@ public class FourPointSyntheticStability {
 	 * @param height Length along y-axis
 	 */
 	public void setShape( double width, double height ) {
-		points2D3D.get(0).location.set(-width/2, -height/2, 0);
-		points2D3D.get(1).location.set(-width/2, height/2, 0);
-		points2D3D.get(2).location.set(width/2, height/2, 0);
-		points2D3D.get(3).location.set(width/2, -height/2, 0);
+		points2D3D.get(0).location.setTo(-width/2, -height/2, 0);
+		points2D3D.get(1).location.setTo(-width/2, height/2, 0);
+		points2D3D.get(2).location.setTo(width/2, height/2, 0);
+		points2D3D.get(3).location.setTo(width/2, -height/2, 0);
 	}
 
 	/**

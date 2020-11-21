@@ -145,7 +145,7 @@ public class HomographyInducedStereo2Line {
 		// convert this plane description into general format
 		UtilPlane3D_F64.convert(pi, pi_gen);
 
-		v.set(pi_gen.A/pi_gen.D, pi_gen.B/pi_gen.D, pi_gen.C/pi_gen.D);
+		v.setTo(pi_gen.A/pi_gen.D, pi_gen.B/pi_gen.D, pi_gen.C/pi_gen.D);
 
 		// H = A - e2*v^T
 		GeometryMath_F64.outerProd(e2, v, av);

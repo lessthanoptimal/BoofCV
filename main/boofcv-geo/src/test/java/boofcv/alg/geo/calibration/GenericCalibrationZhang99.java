@@ -225,7 +225,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 
 			// render pixel observations
 			for (int i = 0; i < ret.layout.size(); i++) {
-				worldP.set(ret.layout.get(i).x,ret.layout.get(i).y,0);
+				worldP.setTo(ret.layout.get(i).x,ret.layout.get(i).y,0);
 				worldToView.transform(worldP,viewP);
 				PointIndex2D_F64 pixel = new PointIndex2D_F64();
 

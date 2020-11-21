@@ -354,10 +354,10 @@ public class PnPLepetitEPnP {
 			double vy = V.unsafe_get(1, i)*m;
 			double vz = V.unsafe_get(2, i)*m;
 
-			controlWorldPts.grow().set(meanWorldPts.x + vx, meanWorldPts.y + vy, meanWorldPts.z + vz);
+			controlWorldPts.grow().setTo(meanWorldPts.x + vx, meanWorldPts.y + vy, meanWorldPts.z + vz);
 		}
 		// set a control point to be the centroid
-		controlWorldPts.grow().set(meanWorldPts.x, meanWorldPts.y, meanWorldPts.z);
+		controlWorldPts.grow().setTo(meanWorldPts.x, meanWorldPts.y, meanWorldPts.z);
 	}
 
 	/**
@@ -550,7 +550,7 @@ public class PnPLepetitEPnP {
 				z += betas[j]*p.z;
 			}
 
-			tempPts0.get(i).set(x, y, z);
+			tempPts0.get(i).setTo(x, y, z);
 		}
 
 		double adj = matchScale(tempPts0, controlWorldPts);

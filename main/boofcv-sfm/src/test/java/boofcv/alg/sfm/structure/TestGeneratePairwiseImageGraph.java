@@ -175,7 +175,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		Se3_F64 view0_to_view1 = SpecialEuclideanOps_F64.eulerXyz(0.3, 0, 0.01, -0.04, -2e-3, 0.4, null);
 
 		if (pureRotation)
-			view0_to_view1.T.set(0, 0, 0);
+			view0_to_view1.T.setTo(0, 0, 0);
 
 		List<Point3D_F64> feats3D;
 

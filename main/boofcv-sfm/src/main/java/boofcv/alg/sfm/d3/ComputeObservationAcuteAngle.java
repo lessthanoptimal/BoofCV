@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,8 @@ public class ComputeObservationAcuteAngle {
 
 	public double computeAcuteAngle( Point2D_F64 a, Point2D_F64 b ) {
 
-		A.set(a.x, a.y, 1);
-		B.set(b.x, b.y, 1);
+		A.setTo(a.x, a.y, 1);
+		B.setTo(b.x, b.y, 1);
 
 		GeometryMath_F64.mult(fromAtoB.getR(), A, A);
 

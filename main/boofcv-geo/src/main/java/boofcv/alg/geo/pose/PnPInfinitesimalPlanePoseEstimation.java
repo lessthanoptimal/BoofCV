@@ -161,7 +161,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		}
 
 		// Undo centering adjustment
-		center3.set(-center.x, -center.y, 0);
+		center3.setTo(-center.x, -center.y, 0);
 		GeometryMath_F64.addMult(pose0.T, pose0.R, center3, pose0.T);
 		GeometryMath_F64.addMult(pose1.T, pose1.R, center3, pose1.T);
 
@@ -177,7 +177,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 
 		for (int i = 0; i < points.size(); i++) {
 			AssociatedPair pair = points.get(i);
-			tmpP.set(pair.p1.x, pair.p1.y, 0);
+			tmpP.setTo(pair.p1.x, pair.p1.y, 0);
 			SePointOps_F64.transform(worldToCamera, tmpP, tmpP);
 
 			error += pair.p2.distance2(tmpP.x/tmpP.z, tmpP.y/tmpP.z);
@@ -296,8 +296,8 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		double b2 = Math.signum(B.a12)*Math.sqrt(B.a22);
 
 		// [c;a] = [R22;b^T]*[1;0] cross [R22;b^T]*[0;1]
-		l0.set(R22.a11, R22.a21, b1);
-		l1.set(R22.a12, R22.a22, b2);
+		l0.setTo(R22.a11, R22.a21, b1);
+		l1.setTo(R22.a12, R22.a22, b2);
 
 		ca.cross(l0, l1); // ca = [c;a]
 

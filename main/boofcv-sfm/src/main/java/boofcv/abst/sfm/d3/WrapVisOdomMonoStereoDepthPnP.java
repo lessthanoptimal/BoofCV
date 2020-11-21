@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	@Override
 	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		Point4D_F64 p = alg.getVisibleTracks().get(index).worldLoc;
-		world.set(p.x/p.w, p.y/p.w, p.z/p.w);
+		world.setTo(p.x/p.w, p.y/p.w, p.z/p.w);
 		return true;
 	}
 

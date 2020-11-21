@@ -77,7 +77,7 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 		narrowToNorm.compute(x, y, norm);
 
 		// Convert from 2D homogenous to 3D
-		unit.set(norm.x, norm.y, 1.0);
+		unit.setTo(norm.x, norm.y, 1.0);
 
 		// Rotate then make it a unit vector
 		GeometryMath_F64.mult(rotateWideToNarrow, unit, unit);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public class BundleCameraNumericJacobian {
 	 */
 	public void jacobianIntrinsics( double camX, double camY, double camZ,
 									double[] calibX, double[] calibY ) {
-		funcIntrinsic.X.set(camX, camY, camZ);
+		funcIntrinsic.X.setTo(camX, camY, camZ);
 
 		jacobian.reshape(2, numIntrinsic);
 		numericalIntrinsic.process(intrinsic, jacobian);

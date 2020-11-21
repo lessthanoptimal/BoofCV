@@ -156,7 +156,7 @@ public class TestStereoProcessingBase extends BoofStandardJUnit {
 		StereoParameters ret = new StereoParameters();
 
 		ret.setRightToLeft(new Se3_F64());
-		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
+		ret.getRightToLeft().getT().setTo(-0.2, 0.001, -0.012);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
 		ret.left = new CameraPinholeBrown().fsetK(300, 320, 0, width/2, height/2, width, height).fsetRadial(0.1, 1e-4);

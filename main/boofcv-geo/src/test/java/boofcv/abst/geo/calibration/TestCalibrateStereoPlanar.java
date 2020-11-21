@@ -65,7 +65,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,0,0.15,null));
 		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,-0.1,0.1,null));
 
-		leftToRight.getT().set(100,0,0);
+		leftToRight.getT().setTo(100,0,0);
 	}
 
 	/**

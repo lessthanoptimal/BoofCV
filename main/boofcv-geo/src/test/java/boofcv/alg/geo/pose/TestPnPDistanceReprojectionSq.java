@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -46,7 +45,7 @@ public class TestPnPDistanceReprojectionSq extends BoofStandardJUnit {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		worldToCamera.getT().set(0.1, -0.1, 0.2);
+		worldToCamera.getT().setTo(0.1, -0.1, 0.2);
 
 		// Point location in world frame
 		Point3D_F64 X = new Point3D_F64(0.1, -0.04, 2.3);
@@ -81,7 +80,7 @@ public class TestPnPDistanceReprojectionSq extends BoofStandardJUnit {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		worldToCamera.getT().set(0.1, -0.1, -2.5);
+		worldToCamera.getT().setTo(0.1, -0.1, -2.5);
 
 		// Point location in world frame
 		Point3D_F64 X = new Point3D_F64(0.1, -0.04, 2.3);
@@ -94,7 +93,7 @@ public class TestPnPDistanceReprojectionSq extends BoofStandardJUnit {
 
 		double found = alg.distance(new Point2D3D(observed, X));
 
-		assertTrue(Double.MAX_VALUE == found);
+		assertEquals(found, Double.MAX_VALUE);
 	}
 
 	/**
@@ -107,7 +106,7 @@ public class TestPnPDistanceReprojectionSq extends BoofStandardJUnit {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.01, 200, 0, 150, 200, 0, 0, 1);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		worldToCamera.getT().set(0.1, -0.1, 0.2);
+		worldToCamera.getT().setTo(0.1, -0.1, 0.2);
 
 		List<Point2D3D> obs = new ArrayList<>();
 		for (int i = 0; i < expected.length; i++) {

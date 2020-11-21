@@ -53,7 +53,7 @@ class TestColorizeCloudFromImage extends BoofStandardJUnit {
 
 	public TestColorizeCloudFromImage() {
 		norm_to_pixel = new LensDistortionPinhole(camera).distort_F64(false, true);
-		world_to_view.T.set(0.1, 0, 0);
+		world_to_view.T.setTo(0.1, 0, 0);
 
 		for (int i = 0; i < 20; i++) {
 			cloud3.add(new Point3D_F64(rand.nextGaussian(), rand.nextGaussian(), 2.0 + rand.nextDouble()*0.5));

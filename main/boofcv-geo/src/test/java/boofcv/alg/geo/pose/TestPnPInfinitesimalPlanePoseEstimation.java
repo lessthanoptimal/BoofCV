@@ -55,7 +55,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 					0.2+rand.nextGaussian()*0.05,
 					0.1+rand.nextGaussian()*0.05,
 					0.05+rand.nextGaussian()*0.001,actual.R);
-			actual.T.set(rand.nextGaussian(),1+rand.nextGaussian(),20+rand.nextGaussian()*2);
+			actual.T.setTo(rand.nextGaussian(),1+rand.nextGaussian(),20+rand.nextGaussian()*2);
 
 			List<AssociatedPair> observation = createRandomInputs(20,actual);
 
@@ -89,7 +89,7 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 	public void estimateTranslation() {
 		Se3_F64 actual = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,0.05,0,actual.R);
-		actual.T.set(0.1,0,3);
+		actual.T.setTo(0.1,0,3);
 
 		List<AssociatedPair> observation = createRandomInputs(20,actual);
 

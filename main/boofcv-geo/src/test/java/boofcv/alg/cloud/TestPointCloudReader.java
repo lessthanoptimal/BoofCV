@@ -112,7 +112,7 @@ class TestPointCloudReader extends BoofStandardJUnit {
 			var cloud = new ArrayList<Point3D_F32>();
 			for (Point3dRgbI_F64 p : points) {
 				var c = new Point3D_F32();
-				c.set((float) p.x, (float) p.y, (float) p.z);
+				c.setTo((float) p.x, (float) p.y, (float) p.z);
 				cloud.add(c);
 			}
 
@@ -144,7 +144,7 @@ class TestPointCloudReader extends BoofStandardJUnit {
 			var cloud = new ArrayList<Point3dRgbI_F32>();
 			for (Point3dRgbI_F64 p : points) {
 				var c = new Point3dRgbI_F32();
-				c.set((float) p.x, (float) p.y, (float) p.z);
+				c.setTo((float) p.x, (float) p.y, (float) p.z);
 				c.rgb = p.rgb;
 				cloud.add(c);
 			}

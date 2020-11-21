@@ -123,8 +123,8 @@ public class EpipolarMinimizeGeometricError {
 
 		// find the closeset point on the two lines below to the origin
 		double t = solutionT;
-		l1.set(t*f1,1,-t);
-		l2.set(-f2*(c*t+d),a*t+b,c*t+d);
+		l1.setTo(t*f1,1,-t);
+		l2.setTo(-f2*(c*t+d),a*t+b,c*t+d);
 		closestPointToOrigin(l1,e1); // recycle epipole storage
 		closestPointToOrigin(l2,e2);
 

@@ -51,11 +51,11 @@ public class BaseChecksPnP extends BoofStandardJUnit {
 	public BaseChecksPnP() {
 		// the world is directly in front of the camera
 		worldToCamera0 = new Se3_F64();
-		worldToCamera0.getT().set(0,0,5);
+		worldToCamera0.getT().setTo(0,0,5);
 
 		// in front of the camera and rotated
 		worldToCamera1 = new Se3_F64();
-		worldToCamera1.getT().set(2, 5, 10);
+		worldToCamera1.getT().setTo(2, 5, 10);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2, -0.34, 0.7, worldToCamera1.getR());
 
 		// an early version of this test had it behind the camera.
@@ -78,9 +78,9 @@ public class BaseChecksPnP extends BoofStandardJUnit {
 		Point2D_F64 norm = new Point2D_F64();
 
 		PlaneNormal3D_F64 plane3D = new PlaneNormal3D_F64();
-		plane3D.n.set(0,0,1);
+		plane3D.n.setTo(0,0,1);
 		GeometryMath_F64.mult(worldToCamera.R,plane3D.n,plane3D.n);
-		plane3D.p.set(worldToCamera.T.x,worldToCamera.T.y,worldToCamera.T.z);
+		plane3D.p.setTo(worldToCamera.T.x,worldToCamera.T.y,worldToCamera.T.z);
 
 		LineParametric3D_F64 ray = new LineParametric3D_F64();
 		Point3D_F64 cameraPt = new Point3D_F64();
@@ -96,7 +96,7 @@ public class BaseChecksPnP extends BoofStandardJUnit {
 
 			if( worldPointsZZero ) {
 				// find the world plane in the image
-				ray.slope.set(norm.x,norm.y,1);
+				ray.slope.setTo(norm.x,norm.y,1);
 				Intersection3D_F64.intersection(plane3D,ray,cameraPt);
 			} else {
 				cameraPt.z = rand.nextDouble() + nominalZ;

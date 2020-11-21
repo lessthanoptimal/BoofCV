@@ -170,7 +170,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 	 */
 	public Se3_F64 getWorldToCurr3D() {
 		// 2D to 3D coordinates
-		worldToCurr3D.getT().set(-worldToCurr2D.T.y, 0, worldToCurr2D.T.x);
+		worldToCurr3D.getT().setTo(-worldToCurr2D.T.y, 0, worldToCurr2D.T.x);
 		DMatrixRMaj R = worldToCurr3D.getR();
 
 		// set rotation around Y axis.

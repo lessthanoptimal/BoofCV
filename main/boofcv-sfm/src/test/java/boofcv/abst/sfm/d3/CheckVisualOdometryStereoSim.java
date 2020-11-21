@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -190,7 +190,7 @@ abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 		StereoParameters ret = new StereoParameters();
 
 		ret.setRightToLeft(new Se3_F64());
-		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
+		ret.getRightToLeft().getT().setTo(-0.2, 0.001, -0.012);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
 		ret.left = new CameraPinholeBrown(200, 201, 0, width/2, height/2, width, height).fsetRadial(0, 0);

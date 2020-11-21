@@ -61,13 +61,13 @@ public interface PointCloudReader {
 			@Override
 			public void get( int index, Point3D_F32 point ) {
 				int i = offset + index*3;
-				point.set(cloud[i], cloud[i + 1], cloud[i + 2]);
+				point.setTo(cloud[i], cloud[i + 1], cloud[i + 2]);
 			}
 
 			@Override
 			public void get( int index, Point3D_F64 point ) {
 				int i = offset + index*3;
-				point.set(cloud[i], cloud[i + 1], cloud[i + 2]);
+				point.setTo(cloud[i], cloud[i + 1], cloud[i + 2]);
 			}
 
 			@Override

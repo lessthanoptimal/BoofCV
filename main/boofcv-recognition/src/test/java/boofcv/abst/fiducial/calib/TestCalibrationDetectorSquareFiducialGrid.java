@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,17 +58,17 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld.R);
 
 		// up close exploding - center
-		markerToWorld.T.set(0,0,0.12);
+		markerToWorld.T.setTo(0,0,0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
 		// up close exploding - left
-		markerToWorld.T.set(0.1,0,0.12);
+		markerToWorld.T.setTo(0.1,0,0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
-		markerToWorld.T.set(0.25,0,0.2);
+		markerToWorld.T.setTo(0.25,0,0.2);
 		fisheye_poses.add(markerToWorld.copy());
 
-		markerToWorld.T.set(0.25,0,0.2);
+		markerToWorld.T.setTo(0.25,0,0.2);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI-0.2,0,markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 

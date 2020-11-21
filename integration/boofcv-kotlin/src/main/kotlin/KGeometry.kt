@@ -45,7 +45,7 @@ operator fun Se2_F32.times( t : Se2_F32 ): Se2_F32 {return t.concat(this,null)}
 operator fun Se2_F64.times( t : Se2_F64 ): Se2_F64 {return t.concat(this,null)}
 
 fun Point2D_F64.asHomogenous(): Point3D_F64 = Point3D_F64(this.x,this.y,1.0)
-fun Point2D_F64.asHomogenous(out : Point3D_F64): Point3D_F64 { out.set(this.x,this.y,1.0); return out}
+fun Point2D_F64.asHomogenous(out : Point3D_F64): Point3D_F64 { out.setTo(this.x,this.y,1.0); return out}
 
 fun Point3D_F32.transform( t : Se3_F32 ) { SePointOps_F32.transform(t,this,this)}
 fun Point3D_F32.transform( t : Se3_F32 , dst : Point3D_F32) { SePointOps_F32.transform(t,this,dst)}

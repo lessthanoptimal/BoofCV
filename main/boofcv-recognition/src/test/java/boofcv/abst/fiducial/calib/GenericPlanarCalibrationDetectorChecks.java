@@ -75,20 +75,20 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI + 0.2, 0, markerToWorld.R);
 
 		// up close exploding - center
-		markerToWorld.T.set(0, 0, 0.12);
+		markerToWorld.T.setTo(0, 0, 0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
 		// up close exploding - left
-		markerToWorld.T.set(0.1, 0, 0.12);
+		markerToWorld.T.setTo(0.1, 0, 0.12);
 		fisheye_poses.add(markerToWorld.copy());
 
-		markerToWorld.T.set(0.25, 0, 0.2);
+		markerToWorld.T.setTo(0.25, 0, 0.2);
 		fisheye_poses.add(markerToWorld.copy());
 
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 0.2, 0, markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
-		markerToWorld.T.set(0.3, 0, 0.2);
+		markerToWorld.T.setTo(0.3, 0, 0.2);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI + .5, 0, markerToWorld.getR());
 		fisheye_poses.add(markerToWorld.copy());
 
@@ -246,14 +246,14 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 			simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 
 			// up close exploding - center
-			markerToWorld.T.set(0, 0, 0.5);
+			markerToWorld.T.setTo(0, 0, 0.5);
 			checkRenderedResults(detector, simulator, locations2D);
 
 			// farther away centered
-			markerToWorld.T.set(0, 0, 1);
+			markerToWorld.T.setTo(0, 0, 1);
 			checkRenderedResults(detector, simulator, locations2D);
 
-			markerToWorld.T.set(-0.33, 0, 1);
+			markerToWorld.T.setTo(-0.33, 0, 1);
 			checkRenderedResults(detector, simulator, locations2D);
 
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 1, 0, markerToWorld.getR());
@@ -262,18 +262,18 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 1, 0.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			markerToWorld.T.set(-0.33, 0.33, 1);
+			markerToWorld.T.setTo(-0.33, 0.33, 1);
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, Math.PI - 1, 0.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			markerToWorld.T.set(0, -0.20, 1);
+			markerToWorld.T.setTo(0, -0.20, 1);
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.8, Math.PI, 0.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.8, Math.PI, 1.8, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 
-			markerToWorld.T.set(0, -0.15, 1);
+			markerToWorld.T.setTo(0, -0.15, 1);
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.2, Math.PI, 2.4, markerToWorld.getR());
 			checkRenderedResults(detector, simulator, locations2D);
 		}

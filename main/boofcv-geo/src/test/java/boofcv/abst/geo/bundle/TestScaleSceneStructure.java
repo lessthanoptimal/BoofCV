@@ -62,7 +62,7 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 
 			ScaleSceneStructure alg = new ScaleSceneStructure();
 
-			alg.medianPoint.set(0.5, 0.9, 1.3);
+			alg.medianPoint.setTo(0.5, 0.9, 1.3);
 			alg.medianDistancePoint = 1.2;
 
 			SceneStructureMetric expected = new SceneStructureMetric(homogenous);
@@ -101,7 +101,7 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 				boolean homogenous = h == 1;
 				ScaleSceneStructure alg = new ScaleSceneStructure();
 				alg.setScalePixelsUsingStats(pointsStats);
-				alg.medianPoint.set(0.5, 0.9, 1.3);
+				alg.medianPoint.setTo(0.5, 0.9, 1.3);
 				alg.medianDistancePoint = 1.2;
 
 				SceneStructureProjective expected = new SceneStructureProjective(homogenous);

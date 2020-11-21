@@ -40,7 +40,7 @@ public class TestPnPResidualReprojection extends BoofStandardJUnit {
 	public void basicTest() {
 		Se3_F64 motion = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,1,-0.2,motion.getR());
-		motion.getT().set(-0.3,0.4,1);
+		motion.getT().setTo(-0.3,0.4,1);
 
 		Point3D_F64 world = new Point3D_F64(0.5,-0.5,3);
 		Point2D_F64 obs = new Point2D_F64();
@@ -52,7 +52,7 @@ public class TestPnPResidualReprojection extends BoofStandardJUnit {
 		PnPResidualReprojection alg = new PnPResidualReprojection();
 		
 		// compute errors with perfect model
-		double error[] = new double[ alg.getN() ];
+		double[] error = new double[ alg.getN() ];
 		alg.setModel(motion);
 		int index = alg.computeResiduals(new Point2D3D(obs,world),error,0);
 		assertEquals(alg.getN(), index);

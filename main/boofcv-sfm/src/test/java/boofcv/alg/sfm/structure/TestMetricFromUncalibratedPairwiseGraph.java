@@ -127,7 +127,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		for (int viewIdx = 0; viewIdx < viewIds.size(); viewIdx++) {
 			// skip zero since it's implicit
 			if (viewIdx > 0)
-				results.motion_1_to_k.grow().T.set(1, viewIdx, 0);
+				results.motion_1_to_k.grow().T.setTo(1, viewIdx, 0);
 			CameraPinhole pinhole = results.intrinsics.grow();
 			pinhole.fx = pinhole.fy = 100 + viewIdx;
 			graph.createNode(viewIds.get(viewIdx));

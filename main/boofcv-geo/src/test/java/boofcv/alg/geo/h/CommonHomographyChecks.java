@@ -81,8 +81,8 @@ public class CommonHomographyChecks extends BoofStandardJUnit {
 
 			// same point but in homogenous coordinates and Z isn't always 1
 			double z = 1.0+rand.nextGaussian()*0.1;
-			p3.p1.set(p2.p1.x*z,p2.p1.y*z,z);
-			p3.p2.set(p2.p2.x*z,p2.p2.y*z,z);
+			p3.p1.setTo(p2.p1.x*z,p2.p1.y*z,z);
+			p3.p2.setTo(p2.p2.x*z,p2.p2.y*z,z);
 
 			pairs3D.add(p3);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,7 +104,7 @@ public class CameraPlaneProjection {
 	 */
 	public boolean planeToPixel( double pointX, double pointY, Point2D_F64 pixel ) {
 		// convert it into a 3D coordinate and transform into camera reference frame
-		plain3D.set(-pointY, 0, pointX);
+		plain3D.setTo(-pointY, 0, pointX);
 		SePointOps_F64.transform(planeToCamera, plain3D, camera3D);
 
 		// if it's behind the camera it can't be seen
@@ -129,7 +129,7 @@ public class CameraPlaneProjection {
 	 */
 	public boolean planeToNormalized( double pointX, double pointY, Point2D_F64 normalized ) {
 		// convert it into a 3D coordinate and transform into camera reference frame
-		plain3D.set(-pointY, 0, pointX);
+		plain3D.setTo(-pointY, 0, pointX);
 		SePointOps_F64.transform(planeToCamera, plain3D, camera3D);
 
 		// if it's behind the camera it can't be seen
@@ -157,7 +157,7 @@ public class CameraPlaneProjection {
 		pixelToNorm.compute(pixelX, pixelY, norm);
 
 		// Ray pointing from camera center through pixel to ground in ground reference frame
-		pointing.set(norm.x, norm.y, 1);
+		pointing.setTo(norm.x, norm.y, 1);
 		GeometryMath_F64.mult(cameraToPlane.getR(), pointing, pointing);
 
 		double height = cameraToPlane.getY();
@@ -187,7 +187,7 @@ public class CameraPlaneProjection {
 	 */
 	public boolean normalToPlane( double normX, double normY, Point2D_F64 plane ) {
 		// Ray pointing from camera center through pixel to ground in ground reference frame
-		pointing.set(normX, normY, 1);
+		pointing.setTo(normX, normY, 1);
 		GeometryMath_F64.mult(cameraToPlane.getR(), pointing, pointing);
 
 		double height = cameraToPlane.getY();

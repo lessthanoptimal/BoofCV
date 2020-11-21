@@ -102,13 +102,13 @@ public class BenchmarkStabilityFundamental {
 
 	public void motionTranslate() {
 		motion = new Se3_F64();
-		motion.getT().set(0.2, 0, 0);
+		motion.getT().setTo(0.2, 0, 0);
 	}
 
 	public void motionTransRot() {
 		motion = new Se3_F64();
 		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, -0.02, 0.05, null));
-		motion.getT().set(0.2, 0, 0);
+		motion.getT().setTo(0.2, 0, 0);
 	}
 
 	public void createObservations() {

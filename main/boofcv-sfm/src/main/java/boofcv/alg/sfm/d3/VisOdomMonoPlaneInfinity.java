@@ -278,7 +278,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 				// Handle points at infinity which are off plane.
 
 				// rotate observation pointing vector into plane reference frame
-				pointing.set(n.x, n.y, 1);
+				pointing.setTo(n.x, n.y, 1);
 				GeometryMath_F64.mult(cameraToPlane.getR(), pointing, pointing);
 				pointing.normalize();
 
@@ -343,7 +343,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 			pixelToNorm.compute(t.pixel.x, t.pixel.y, n);
 
 			// rotate pointing vector into plane reference frame
-			pointing.set(n.x, n.y, 1);
+			pointing.setTo(n.x, n.y, 1);
 			GeometryMath_F64.mult(cameraToPlane.getR(), pointing, pointing);
 			pointing.normalize();
 
@@ -387,7 +387,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 		// remove rotations not along x-z plane
 		double normXZ = Math.sqrt(pointing.x*pointing.x + pointing.z*pointing.z);
-		pointingAdj.set(pointing.x/normXZ, p.pointingY, pointing.z/normXZ);
+		pointingAdj.setTo(pointing.x/normXZ, p.pointingY, pointing.z/normXZ);
 		// Put pointing vector back into camera frame
 		GeometryMath_F64.multTran(cameraToPlane.getR(), pointingAdj, pointingAdj);
 
@@ -565,7 +565,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		Se2_F64 currToWorld = getCurrToWorld2D();
 
 		// 2D to 3D coordinates
-		currPlaneToWorld3D.getT().set(-currToWorld.T.y, 0, currToWorld.T.x);
+		currPlaneToWorld3D.getT().setTo(-currToWorld.T.y, 0, currToWorld.T.x);
 		DMatrixRMaj R = currPlaneToWorld3D.getR();
 
 		// set rotation around Y axis.

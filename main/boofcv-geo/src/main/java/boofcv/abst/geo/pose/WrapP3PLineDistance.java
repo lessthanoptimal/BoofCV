@@ -39,24 +39,24 @@ import java.util.List;
 public class WrapP3PLineDistance implements EstimateNofPnP {
 
 	// estimates the distance the camera center is from each of the 3 points.
-	private P3PLineDistance alg;
+	private final P3PLineDistance alg;
 	// computes the optimal rigid body motion between the two views given a point cloud
-	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit;
+	private final MotionTransformPoint<Se3_F64, Point3D_F64> motionFit;
 
 	// location of 3D point given the found distance
-	private Point3D_F64 X1 = new Point3D_F64();
-	private Point3D_F64 X2 = new Point3D_F64();
-	private Point3D_F64 X3 = new Point3D_F64();
+	private final Point3D_F64 X1 = new Point3D_F64();
+	private final Point3D_F64 X2 = new Point3D_F64();
+	private final Point3D_F64 X3 = new Point3D_F64();
 
 	// observations normalized to 1
-	private Vector3D_F64 u1 = new Vector3D_F64();
-	private Vector3D_F64 u2 = new Vector3D_F64();
-	private Vector3D_F64 u3 = new Vector3D_F64();
+	private final Vector3D_F64 u1 = new Vector3D_F64();
+	private final Vector3D_F64 u2 = new Vector3D_F64();
+	private final Vector3D_F64 u3 = new Vector3D_F64();
 
 	// storage for 3D point clouds.
 	// World = point in world coordinate system and Camera = camera coordinates sytsem
-	private List<Point3D_F64> cloudWorld = new ArrayList<>();
-	private List<Point3D_F64> cloudCamera = new ArrayList<>();
+	private final List<Point3D_F64> cloudWorld = new ArrayList<>();
+	private final List<Point3D_F64> cloudCamera = new ArrayList<>();
 
 	public WrapP3PLineDistance( P3PLineDistance alg,
 								MotionTransformPoint<Se3_F64, Point3D_F64> motionFit ) {
@@ -93,9 +93,9 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 			return false;
 
 		// convert observations into a 3D pointing vector and normalize to one
-		u1.set(P1.observation.x, P1.observation.y, 1); // homogeneous coordinates
-		u2.set(P2.observation.x, P2.observation.y, 1);
-		u3.set(P3.observation.x, P3.observation.y, 1);
+		u1.setTo(P1.observation.x, P1.observation.y, 1); // homogeneous coordinates
+		u2.setTo(P2.observation.x, P2.observation.y, 1);
+		u3.setTo(P3.observation.x, P3.observation.y, 1);
 
 		u1.normalize();
 		u2.normalize();
@@ -111,9 +111,9 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 			PointDistance3 pd = distances.get(i);
 
 			// find points in camera frame
-			X1.set(u1.x*pd.dist1, u1.y*pd.dist1, u1.z*pd.dist1);
-			X2.set(u2.x*pd.dist2, u2.y*pd.dist2, u2.z*pd.dist2);
-			X3.set(u3.x*pd.dist3, u3.y*pd.dist3, u3.z*pd.dist3);
+			X1.setTo(u1.x*pd.dist1, u1.y*pd.dist1, u1.z*pd.dist1);
+			X2.setTo(u2.x*pd.dist2, u2.y*pd.dist2, u2.z*pd.dist2);
+			X3.setTo(u3.x*pd.dist3, u3.y*pd.dist3, u3.z*pd.dist3);
 
 			if (!motionFit.process(cloudWorld, cloudCamera))
 				continue;

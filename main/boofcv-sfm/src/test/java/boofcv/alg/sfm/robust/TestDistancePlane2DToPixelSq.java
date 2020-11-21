@@ -59,7 +59,7 @@ public class TestDistancePlane2DToPixelSq extends BoofStandardJUnit {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(-75), 0.1, 0.0, cameraToPlane.getR());
-		cameraToPlane.getT().set(0, -2, 0);
+		cameraToPlane.getT().setTo(0, -2, 0);
 
 		planeToCamera = cameraToPlane.invert(null);
 		motion2D = new Se2_F64(0.5, -0.05, 0.15);

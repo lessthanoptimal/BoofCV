@@ -51,7 +51,7 @@ public class CreateCloudFromDisparityImages {
 	public double disparitySimilarTol = 1.0;
 
 	/** List of all the points in the cloud */
-	final @Getter FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64::new, p -> p.set(0, 0, 0));
+	final @Getter FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64::new, p -> p.setTo(0, 0, 0));
 	/** List of indices which specify the cloud size when a view 'i' was added. idx[i] &le; cloud < idx[i+1] */
 	final @Getter GrowQueue_I32 viewPointIdx = new GrowQueue_I32();
 

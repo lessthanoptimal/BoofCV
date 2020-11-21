@@ -141,10 +141,10 @@ public class QuadPoseEstimator {
 	 */
 	public void setFiducial( double x0, double y0, double x1, double y1,
 							 double x2, double y2, double x3, double y3 ) {
-		points.get(0).location.set(x0, y0, 0);
-		points.get(1).location.set(x1, y1, 0);
-		points.get(2).location.set(x2, y2, 0);
-		points.get(3).location.set(x3, y3, 0);
+		points.get(0).location.setTo(x0, y0, 0);
+		points.get(1).location.setTo(x1, y1, 0);
+		points.get(2).location.setTo(x2, y2, 0);
+		points.get(3).location.setTo(x3, y3, 0);
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class QuadPoseEstimator {
 
 		// find pointing vector in camera reference frame
 		pixelToNorm.compute(pixelX, pixelY, marker);
-		cameraP3.set(marker.x, marker.y, 1);
+		cameraP3.setTo(marker.x, marker.y, 1);
 
 		// rotate into marker reference frame
 		GeometryMath_F64.multTran(outputFiducialToCamera.R, cameraP3, ray.slope);

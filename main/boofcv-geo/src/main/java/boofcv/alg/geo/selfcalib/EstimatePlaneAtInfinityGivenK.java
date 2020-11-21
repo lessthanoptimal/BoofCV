@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,8 +101,8 @@ public class EstimatePlaneAtInfinityGivenK {
 
 		// Compute v, the plane at infinity
 		// v = (w2 cross w3 / ||w3|| - w1 ) / ||t2||
-		w2.set(W.a21,W.a22,W.a23);
-		w3.set(W.a31,W.a32,W.a33);
+		w2.setTo(W.a21,W.a22,W.a23);
+		w3.setTo(W.a31,W.a32,W.a33);
 		double n3 = w3.norm();
 		v.cross(w2,w3); // approximation here, w2 and w3 might not be orthogonal
 		v.divideIP(n3);

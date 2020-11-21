@@ -41,7 +41,7 @@ public class NarrowPixelToSphere_F64 implements Point2Transform3_F64 {
 	public void compute( double x, double y, Point3D_F64 out ) {
 		pixelToNorm.compute(x, y, projected);
 
-		out.set(projected.x, projected.y, 1);
+		out.setTo(projected.x, projected.y, 1);
 		out.scale(1.0/out.norm());
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -162,7 +162,7 @@ public class DecomposeProjectiveToMetric {
 	 */
 	public boolean decomposeMetricCamera( DMatrixRMaj cameraMatrix, DMatrixRMaj K, Se3_F64 worldToView ) {
 		CommonOps_DDRM.extract(cameraMatrix, 0, 3, 0, 3, A, 0, 0);
-		worldToView.T.set(cameraMatrix.get(0, 3), cameraMatrix.get(1, 3), cameraMatrix.get(2, 3));
+		worldToView.T.setTo(cameraMatrix.get(0, 3), cameraMatrix.get(1, 3), cameraMatrix.get(2, 3));
 
 		CommonOps_DDRM.mult(Pv, A, A_p);
 		CommonOps_DDRM.transpose(A_p);

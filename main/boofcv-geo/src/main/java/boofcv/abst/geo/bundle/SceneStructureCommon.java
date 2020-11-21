@@ -97,11 +97,11 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	}
 
 	public void setCamera( int which, boolean fixed, CameraPinhole intrinsic ) {
-		setCamera(which, fixed, BundleAdjustmentOps.convert(intrinsic,(BundlePinhole)null));
+		setCamera(which, fixed, BundleAdjustmentOps.convert(intrinsic, (BundlePinhole)null));
 	}
 
 	public void setCamera( int which, boolean fixed, CameraPinholeBrown intrinsic ) {
-		setCamera(which, fixed, BundleAdjustmentOps.convert(intrinsic,(BundlePinholeBrown)null));
+		setCamera(which, fixed, BundleAdjustmentOps.convert(intrinsic, (BundlePinholeBrown)null));
 	}
 
 	/**

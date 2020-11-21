@@ -113,11 +113,11 @@ public class TestRelinearlize extends BoofStandardJUnit {
 		// using the provided beta compute the world points
 		// this way the constraint matrix will be consistent
 		FastQueue<Point3D_F64> worldPts = new FastQueue<>(4, Point3D_F64::new);
-		worldPts.grow().set(1,0,0);
-		worldPts.grow().set(0,1,0);
-		worldPts.grow().set(0,0,1);
+		worldPts.grow().setTo(1,0,0);
+		worldPts.grow().setTo(0,1,0);
+		worldPts.grow().setTo(0,0,1);
 		if( numControl == 4 )
-			worldPts.grow().set(0, 0, 0);
+			worldPts.grow().setTo(0, 0, 0);
 
 		if( numControl == 4 )
 			UtilLepetitEPnP.constraintMatrix6x10(L_full,y,worldPts,nullPts);

@@ -69,8 +69,8 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 
 		// One point for each view. Both points are in the image center
 		mvs.disparityCloud.viewPointIdx.setTo(0, 1, 2);
-		mvs.disparityCloud.cloud.grow().set(0, 0, 1);
-		mvs.disparityCloud.cloud.grow().set(0, 0, 1);
+		mvs.disparityCloud.cloud.grow().setTo(0, 0, 1);
+		mvs.disparityCloud.cloud.grow().setTo(0, 0, 1);
 
 		var alg = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.SB_U8(), new MockLookUp());
 		alg.process(scene, mvs, ( idx, r, g, b ) -> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -152,7 +152,7 @@ public class ExampleBundleAdjustment {
 
 		// Give it a good initial pose. This was determined through trial and error
 		Se3_F64 cameraToWorld = new Se3_F64();
-		cameraToWorld.T.set(-10.848385, -6.957626, 2.9747992);
+		cameraToWorld.T.setTo(-10.848385, -6.957626, 2.9747992);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -2.734419, -0.27446, -0.24310, cameraToWorld.R);
 		viewer.setCameraToWorld(cameraToWorld);
 

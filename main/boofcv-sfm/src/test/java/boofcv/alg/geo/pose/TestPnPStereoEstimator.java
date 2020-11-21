@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 
 		Se3_F64 expected = new Se3_F64();
 		expected.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
-		expected.getT().set(0.2, -0.1, 0.01);
+		expected.getT().setTo(0.2, -0.1, 0.01);
 
 		generateScene(alg.getMinimumPoints(), expected, false);
 

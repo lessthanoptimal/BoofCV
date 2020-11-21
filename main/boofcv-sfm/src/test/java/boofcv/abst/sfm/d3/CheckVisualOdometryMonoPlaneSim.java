@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,10 +92,10 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 			double y = 0;
 
 			Square s = new Square();
-			s.a.set(x, y, z);
-			s.b.set(x + t, y, z);
-			s.c.set(x + t, y, z + t);
-			s.d.set(x, y, z + t);
+			s.a.setTo(x, y, z);
+			s.b.setTo(x + t, y, z);
+			s.c.setTo(x + t, y, z + t);
+			s.d.setTo(x, y, z + t);
 
 			s.gray = rand.nextInt(255);
 
@@ -114,10 +114,10 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 			double y = -rand.nextDouble()*2 - 5; // stick them a bit up in the
 
 			Square s = new Square();
-			s.a.set(x, y, z);
-			s.b.set(x + t, y, z);
-			s.c.set(x + t, y + t, z);
-			s.d.set(x, y + t, z);
+			s.a.setTo(x, y, z);
+			s.b.setTo(x + t, y, z);
+			s.c.setTo(x + t, y + t, z);
+			s.d.setTo(x, y + t, z);
 
 			s.gray = rand.nextInt(255);
 
@@ -125,17 +125,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 		}
 
 		// sort by depth so that objects farther way are rendered first and obstructed by objects closer in view
-		Collections.sort(squares, new Comparator<Square>() {
-			@Override
-			public int compare( Square o1, Square o2 ) {
-				if (o1.a.z < o2.a.z)
-					return -1;
-				if (o1.a.z > o2.a.z)
-					return 1;
-				else
-					return 0;
-			}
-		});
+		Collections.sort(squares, Comparator.comparingDouble(o -> o.a.z));
 	}
 
 	@Test
@@ -153,7 +143,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, UtilAngle.degreeToRadian(cameraAngle), 0.1, 0.0, cameraToPlane.getR());
-		cameraToPlane.getT().set(0, -2, 0);
+		cameraToPlane.getT().setTo(0, -2, 0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 

@@ -225,7 +225,7 @@ public class TestRectifyCalibrated extends BoofStandardJUnit {
 	private Se3_F64 createPose( double rotX, double rotY, double rotZ, double x, double y, double z ) {
 		Se3_F64 ret = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, rotX, rotY, rotZ, ret.getR());
-		ret.getT().set(x, y, z);
+		ret.getT().setTo(x, y, z);
 		return ret;
 	}
 }

@@ -92,10 +92,10 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> extends BoofStandard
 			double y = n.y*z;
 
 			Square s = new Square();
-			s.a.set(x, y, z);
-			s.b.set(x + t, y, z);
-			s.c.set(x + t, y + t, z);
-			s.d.set(x, y + t, z);
+			s.a.setTo(x, y, z);
+			s.b.setTo(x + t, y, z);
+			s.c.setTo(x + t, y + t, z);
+			s.d.setTo(x, y + t, z);
 
 			s.gray = rand.nextInt(200) + 55;
 

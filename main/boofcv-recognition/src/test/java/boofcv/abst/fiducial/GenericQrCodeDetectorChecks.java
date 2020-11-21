@@ -79,7 +79,7 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 		Se3_F64 markerToWorld = new Se3_F64();
 		simulator.addSurface(markerToWorld, simulatedTargetWidth, generateMarker());
 
-		markerToWorld.T.set(0, 0, 0.5);
+		markerToWorld.T.setTo(0, 0, 0.5);
 
 		for (int i = 0; i < 30; i++) {
 			double roll = 2*Math.PI*i/30.0;
@@ -103,7 +103,7 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 		Se3_F64 markerToWorld = new Se3_F64();
 		simulator.addSurface(markerToWorld, simulatedTargetWidth, generateMarker());
 
-		markerToWorld.T.set(0, 0, 0.5);
+		markerToWorld.T.setTo(0, 0, 0.5);
 
 		for (int i = 0; i < 30; i++) {
 			double roll = 2*Math.PI*i/30.0;
@@ -129,7 +129,7 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 		simulator.addSurface(markerToWorld, simulatedTargetWidth, generateMarker());
 
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld.R);
-		markerToWorld.T.set(0, 0, 0.3);
+		markerToWorld.T.setTo(0, 0, 0.3);
 
 		for (int i = 0; i < 30; i++) {
 			renderAndCheck(detector, simulator);
@@ -155,9 +155,9 @@ public abstract class GenericQrCodeDetectorChecks extends BoofStandardJUnit {
 		simulator.addSurface(markerToWorld1, simulatedTargetWidth, generateMarker());
 
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld0.R);
-		markerToWorld0.T.set(0.2, 0, 0.6);
+		markerToWorld0.T.setTo(0.2, 0, 0.6);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI,0,markerToWorld1.R);
-		markerToWorld1.T.set(-0.2, 0, 0.6);
+		markerToWorld1.T.setTo(-0.2, 0, 0.6);
 
 		simulator.render();
 

@@ -244,7 +244,7 @@ public class TestSimulatePlanarWorld extends BoofStandardJUnit {
 				F.z = alg.pointing[index++];
 
 				PerspectiveOps.convertPixelToNorm(pinhole,new Point2D_F64(x,y),n);
-				E.set(n.x,n.y,1);
+				E.setTo(n.x,n.y,1);
 				E.divideIP(E.norm());
 
 				assertEquals(0,F.distance(E), UtilEjml.TEST_F64_SQ);

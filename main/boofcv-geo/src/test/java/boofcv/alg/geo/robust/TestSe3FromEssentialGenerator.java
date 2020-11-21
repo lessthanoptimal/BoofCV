@@ -49,7 +49,7 @@ public class TestSe3FromEssentialGenerator extends BoofStandardJUnit {
 		// define motion
 		Se3_F64 motion = new Se3_F64();
 		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.05, -0.01, null));
-		motion.getT().set(2,-0.1,0.1);
+		motion.getT().setTo(2,-0.1,0.1);
 
 		// define observations
 		List<AssociatedPair> obs = new ArrayList<>();

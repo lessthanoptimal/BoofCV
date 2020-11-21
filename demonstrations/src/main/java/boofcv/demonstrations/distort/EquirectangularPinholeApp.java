@@ -300,7 +300,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			// center the center cicle
 			FMatrixRMaj R = distorter.getRotation();
 
-			v.set(0,0,1); // canonical view is +z for pinhole cvamera
+			v.setTo(0,0,1); // canonical view is +z for pinhole camera
 			GeometryMath_F32.mult(R,v,v);
 
 			distorter.getTools().normToEquiFV((float)v.x,(float)v.y,(float)v.z,p);

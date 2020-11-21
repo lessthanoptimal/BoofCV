@@ -214,7 +214,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 
 				p.x = x;
 				p.y = y;
-				p.p3.set(P_x/P_w, P_y/P_w, P_z/P_w);
+				p.p3.setTo(P_x/P_w, P_y/P_w, P_z/P_w);
 			}
 		}
 	}

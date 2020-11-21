@@ -732,7 +732,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		public boolean inlier;
 
 		public void reset() {
-			X.set(0, 0, 0);
+			X.setTo(0, 0, 0);
 			v0 = v1 = v2 = v3 = null;
 			inlier = false;
 			id = -1;

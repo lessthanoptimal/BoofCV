@@ -47,7 +47,7 @@ public class TestDistanceEpipolarConstraint extends BoofStandardJUnit {
 	DMatrixRMaj E,F;
 
 	public TestDistanceEpipolarConstraint() {
-		worldToCamera.getT().set(0.1,-0.1,0.2);
+		worldToCamera.getT().setTo(0.1,-0.1,0.2);
 
 		p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X, null);
 		p2 = PerspectiveOps.renderPixel(worldToCamera,K,X, null);

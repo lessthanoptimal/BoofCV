@@ -54,7 +54,7 @@ public class TestQuadPoseEstimator extends BoofStandardJUnit {
 		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 expectedW2C = new Se3_F64();
-		expectedW2C.T.set(0.1,-0.05,4);
+		expectedW2C.T.setTo(0.1,-0.05,4);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.03,0,0,expectedW2C.R);
 
 		Quadrilateral_F64 quadPlane = new Quadrilateral_F64(-0.5,0.5,0.5,0.5,0.5,-0.5,-0.5,-0.5);
@@ -106,7 +106,7 @@ public class TestQuadPoseEstimator extends BoofStandardJUnit {
 		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
-		fiducialToCamera.getT().set(0.2,-0.15,2);
+		fiducialToCamera.getT().setTo(0.2,-0.15,2);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05,0.015,0.001,fiducialToCamera.R);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
@@ -143,7 +143,7 @@ public class TestQuadPoseEstimator extends BoofStandardJUnit {
 		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
-		fiducialToCamera.getT().set(0.2,-0.15,2);
+		fiducialToCamera.getT().setTo(0.2,-0.15,2);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, 0.015, 0.001, fiducialToCamera.R);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);

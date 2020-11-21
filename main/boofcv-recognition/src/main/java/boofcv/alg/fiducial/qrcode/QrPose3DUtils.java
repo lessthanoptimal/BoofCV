@@ -163,7 +163,7 @@ public class QrPose3DUtils {
 		double gridX = 2.0*(col/_N-0.5);
 		double gridY = 2.0*(0.5-row/_N);
 
-		location.set(gridX,gridY,0);
+		location.setTo(gridX,gridY,0);
 	}
 
 	/**

@@ -77,12 +77,12 @@ public interface PointCloudWriter {
 
 			@Override
 			public void add( double x, double y, double z ) {
-				cloud.grow().set((float)x, (float)y, (float)z);
+				cloud.grow().setTo((float)x, (float)y, (float)z);
 			}
 
 			@Override
 			public void add( double x, double y, double z, int rgb ) {
-				cloud.grow().set((float)x, (float)y, (float)z);
+				cloud.grow().setTo((float)x, (float)y, (float)z);
 			}
 		};
 	}
@@ -97,12 +97,12 @@ public interface PointCloudWriter {
 
 			@Override
 			public void add( double x, double y, double z ) {
-				cloud.grow().set(x, y, z);
+				cloud.grow().setTo(x, y, z);
 			}
 
 			@Override
 			public void add( double x, double y, double z, int rgb ) {
-				cloud.grow().set(x, y, z);
+				cloud.grow().setTo(x, y, z);
 			}
 		};
 	}
@@ -117,7 +117,7 @@ public interface PointCloudWriter {
 
 			@Override
 			public void add( double x, double y, double z ) {
-				cloud.grow().set((float)x, (float)y, (float)z);
+				cloud.grow().setTo((float)x, (float)y, (float)z);
 			}
 
 			@Override
@@ -137,7 +137,7 @@ public interface PointCloudWriter {
 
 			@Override
 			public void add( double x, double y, double z ) {
-				cloud.grow().set(x, y, z);
+				cloud.grow().setTo(x, y, z);
 			}
 
 			@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	// Interpolation function
 	private InterpolatePixelMB<T> interpolate;
 	// storage for interpolated pixel
-	private float value[];
+	private float[] value;
 
 	// maximum value of a pixel in any band
 	protected float maxPixelValue;
@@ -56,11 +56,11 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	public float imageX,imageY;
 
 	// which element in the histogram does a coordinate in the grid belong to
-	protected int sampleHistIndex[];
+	protected int[] sampleHistIndex;
 
 	// storage for sample weights and the histogram
-	protected float weights[];
-	protected float histogram[];
+	protected float[] weights;
+	protected float[] histogram;
 
 	// list of sample points.  in square coordinates.  where 0.5 is 1/2 the width or height
 	protected List<Point2D_F32> samplePts = new ArrayList<>();
@@ -97,7 +97,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	protected void computeWeights(int numSamples, double numSigmas) {
 		weights = new float[ numSamples*numSamples ];
 
-		float w[] = new float[ numSamples ];
+		float[] w = new float[ numSamples ];
 		for( int i = 0; i < numSamples; i++ ) {
 			float x = i/(float)(numSamples-1);
 			w[i] = (float) UtilGaussian.computePDF(0, 1, 2f*numSigmas * (x - 0.5f));
@@ -197,7 +197,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 	/**
 	 * Given the value of a pixel, compute which bin in the histogram it belongs in
 	 */
-	protected int computeHistogramBin( float value[] ) {
+	protected int computeHistogramBin( float[] value ) {
 		int indexHistogram = 0;
 		int binStride = 1;
 		for( int bandIndex = 0; bandIndex < value.length; bandIndex++ ) {

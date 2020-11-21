@@ -40,7 +40,7 @@ public class TestStereoConsistencyCheck extends BoofStandardJUnit {
 	public void checkRectification() {
 		Se3_F64 leftToRight = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, -0.001, 0.005, leftToRight.getR());
-		leftToRight.getT().set(-0.1, 0, 0);
+		leftToRight.getT().setTo(-0.1, 0, 0);
 
 		StereoParameters param = new StereoParameters();
 		param.right_to_left = leftToRight.invert(null);

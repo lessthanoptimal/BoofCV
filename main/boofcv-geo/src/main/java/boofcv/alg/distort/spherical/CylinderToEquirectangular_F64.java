@@ -56,7 +56,7 @@ public class CylinderToEquirectangular_F64 extends EquirectangularDistortBase_F6
 				double x = Math.cos(theta);
 				double y = Math.sin(theta);
 
-				vectors[pixelY*width + pixelX].set(x, y, z);
+				vectors[pixelY*width + pixelX].setTo(x, y, z);
 			}
 		}
 	}

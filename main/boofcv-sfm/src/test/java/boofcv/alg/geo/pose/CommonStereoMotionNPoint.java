@@ -57,7 +57,7 @@ public class CommonStereoMotionNPoint extends BoofStandardJUnit {
 	public CommonStereoMotionNPoint() {
 		leftToRight = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, -0.001, 0.005, leftToRight.getR());
-		leftToRight.getT().set(-0.1, 0.02, -0.03);
+		leftToRight.getT().setTo(-0.1, 0.02, -0.03);
 
 		param = new StereoParameters();
 		param.right_to_left = leftToRight.invert(null);
@@ -67,7 +67,7 @@ public class CommonStereoMotionNPoint extends BoofStandardJUnit {
 
 		worldToLeft = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.01, 0.04, -0.05, worldToLeft.getR());
-		worldToLeft.getT().set(0.1, -0.1, 0.2);
+		worldToLeft.getT().setTo(0.1, -0.1, 0.2);
 
 		worldToRight = worldToLeft.concat(leftToRight, null);
 	}
@@ -76,7 +76,7 @@ public class CommonStereoMotionNPoint extends BoofStandardJUnit {
 		if (worldToLeft == null) {
 			this.worldToLeft = worldToLeft = new Se3_F64();
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, worldToLeft.getR());
-			worldToLeft.getT().set(-0.3, 0.4, 1);
+			worldToLeft.getT().setTo(-0.3, 0.4, 1);
 		} else {
 			this.worldToLeft = worldToLeft;
 		}

@@ -115,8 +115,8 @@ public class AssociatedPair3D {
 	 */
 	public void setTo( double x1, double y1, double z1,
 					   double x2, double y2, double z2 ) {
-		this.p1.set(x1,y1,z1);
-		this.p2.set(x2,y2,z2);
+		this.p1.setTo(x1,y1,z1);
+		this.p2.setTo(x2,y2,z2);
 	}
 
 	/**

@@ -44,23 +44,23 @@ class TestPointCloudIO extends BoofStandardJUnit {
 	void encode_decode_3D32F() throws IOException {
 		List<Point3D_F32> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			expected.add( new Point3D_F32(i*123.45f,i-1.01f,i+2.34f));
+			expected.add(new Point3D_F32(i*123.45f, i - 1.01f, i + 2.34f));
 		}
 
 		Format[] formats = new Format[]{Format.PLY};
-		for( Format f : formats ) {
+		for (Format f : formats) {
 			FastQueue<Point3D_F32> found = new FastQueue<>(Point3D_F32::new);
-			found.grow().set(1,1,1);
+			found.grow().setTo(1, 1, 1);
 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			PointCloudIO.save3D(f, PointCloudReader.wrapF32(expected),false,stream);
+			PointCloudIO.save3D(f, PointCloudReader.wrapF32(expected), false, stream);
 			InputStream input = new ByteArrayInputStream(stream.toByteArray());
-			PointCloudIO.load3D32F(f,input,found);
+			PointCloudIO.load3D32F(f, input, found);
 
 			// make sure it cleared the points
-			assertEquals(expected.size(),found.size);
+			assertEquals(expected.size(), found.size);
 			for (int i = 0; i < expected.size(); i++) {
-				assertEquals(0.0,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F32);
+				assertEquals(0.0, found.get(i).distance(expected.get(i)), UtilEjml.TEST_F32);
 			}
 		}
 	}
@@ -69,23 +69,23 @@ class TestPointCloudIO extends BoofStandardJUnit {
 	void encode_decode_3D64F() throws IOException {
 		List<Point3D_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
-			expected.add( new Point3D_F64(i*123.45,i-1.01,i+2.34));
+			expected.add(new Point3D_F64(i*123.45, i - 1.01, i + 2.34));
 		}
 
 		Format[] formats = new Format[]{Format.PLY};
-		for( Format f : formats ) {
+		for (Format f : formats) {
 			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64::new);
-			found.grow().set(1,1,1);
+			found.grow().setTo(1, 1, 1);
 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			PointCloudIO.save3D(f,PointCloudReader.wrapF64(expected), false, stream);
+			PointCloudIO.save3D(f, PointCloudReader.wrapF64(expected), false, stream);
 			InputStream input = new ByteArrayInputStream(stream.toByteArray());
-			PointCloudIO.load3D64F(f,input,found);
+			PointCloudIO.load3D64F(f, input, found);
 
 			// make sure it cleared the points
-			assertEquals(expected.size(),found.size);
+			assertEquals(expected.size(), found.size);
 			for (int i = 0; i < expected.size(); i++) {
-				assertEquals(0.0,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
+				assertEquals(0.0, found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
 			}
 		}
 	}

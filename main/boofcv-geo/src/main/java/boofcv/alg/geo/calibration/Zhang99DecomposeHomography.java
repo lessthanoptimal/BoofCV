@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,7 +113,7 @@ public class Zhang99DecomposeHomography {
 		// the R matrix is probably not a real rotation matrix.  So find
 		// the closest real rotation matrix
 		ConvertRotation3D_F64.approximateRotationMatrix(R,ret.getR());
-		ret.getT().set(t.data[0],t.data[1],t.data[2]);
+		ret.getT().setTo(t.data[0],t.data[1],t.data[2]);
 
 		return ret;
 	}

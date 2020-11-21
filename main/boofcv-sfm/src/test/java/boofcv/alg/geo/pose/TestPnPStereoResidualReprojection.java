@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 	public void basicTest() {
 		Se3_F64 worldToLeft = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, worldToLeft.getR());
-		worldToLeft.getT().set(-0.3, 0.4, 1);
+		worldToLeft.getT().setTo(-0.3, 0.4, 1);
 
 		generateScene(10, worldToLeft, false);
 
@@ -67,7 +67,7 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 	public void compareToReprojection() {
 		Se3_F64 worldToLeft = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, worldToLeft.getR());
-		worldToLeft.getT().set(-0.3, 0.4, 1);
+		worldToLeft.getT().setTo(-0.3, 0.4, 1);
 
 		generateScene(10, worldToLeft, false);
 

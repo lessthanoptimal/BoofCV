@@ -177,7 +177,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		for (int i = 0; i < layout.size(); i++) {
 			Point2D_F64 p2 = layout.get(i);
 			Point2D3D p = new Point2D3D();
-			p.location.set(p2.x, p2.y, 0);
+			p.location.setTo(p2.x, p2.y, 0);
 
 			points2D3D.add(p);
 		}

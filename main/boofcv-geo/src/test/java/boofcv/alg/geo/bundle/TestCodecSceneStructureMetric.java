@@ -168,10 +168,10 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 			Se3_F64 a = new Se3_F64();
 			if (fixed) {
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, 0.2*i + 0.1, 0.7, 0, a.R);
-				a.T.set(2, 3, i*7.3 + 5);
+				a.T.setTo(2, 3, i*7.3 + 5);
 			} else {
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, 0.2*i + 0.1, rand.nextGaussian()*0.1, 0, a.R);
-				a.T.set(rand.nextGaussian()*0.2, 3*rand.nextGaussian()*0.2, i*7.3 + 5);
+				a.T.setTo(rand.nextGaussian()*0.2, 3*rand.nextGaussian()*0.2, i*7.3 + 5);
 			}
 			out.setView(i, i/2, fixed, a);
 

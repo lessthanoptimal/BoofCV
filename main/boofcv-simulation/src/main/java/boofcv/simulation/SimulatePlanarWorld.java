@@ -338,7 +338,7 @@ public class SimulatePlanarWorld {
 			rectToWorld.concat(worldToCamera, rectToCamera);
 
 			// surface normal in world frame
-			normal.set(0, 0, 1);
+			normal.setTo(0, 0, 1);
 			GeometryMath_F64.mult(rectToCamera.R, normal, normal);
 
 			visible = normal.z < 0;

@@ -58,7 +58,7 @@ public class ExamplePnP {
 	public static void main(String[] args) {
 		// create an arbitrary transform from world to camera reference frames
 		Se3_F64 worldToCamera = new Se3_F64();
-		worldToCamera.getT().set(5, 10, -7);
+		worldToCamera.getT().setTo(5, 10, -7);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.3,0,worldToCamera.getR());
 
 		ExamplePnP app = new ExamplePnP();

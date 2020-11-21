@@ -78,7 +78,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		try {
 			Point4D_F64 p = ((VisOdomBundleAdjustment.BTrack)active.get(index).getCookie()).worldLoc;
-			world.set(p.x/p.w, p.y/p.w, p.z/p.w);
+			world.setTo(p.x/p.w, p.y/p.w, p.z/p.w);
 			return true;
 		} catch (RuntimeException ignore) {
 		}

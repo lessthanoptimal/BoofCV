@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,7 +122,7 @@ public class DecomposeHomography {
 		s0 *= s0;
 		s2 *= s2;
 
-		v2.set(V.get(0, 1), V.get(1, 1), V.get(2, 1));
+		v2.setTo(V.get(0, 1), V.get(1, 1), V.get(2, 1));
 
 		double a = Math.sqrt(1 - s2);
 		double b = Math.sqrt(s0 - 1);

@@ -867,10 +867,10 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 						// Represent the camera with a box
 						vertexes.reset();
-						vertexes.grow().set(-r, -r, 0);
-						vertexes.grow().set(r, -r, 0);
-						vertexes.grow().set(r, r, 0);
-						vertexes.grow().set(-r, r, 0);
+						vertexes.grow().setTo(-r, -r, 0);
+						vertexes.grow().setTo(r, -r, 0);
+						vertexes.grow().setTo(r, r, 0);
+						vertexes.grow().setTo(-r, r, 0);
 
 						for (int j = 0; j < vertexes.size; j++) {
 							var p = vertexes.get(j);

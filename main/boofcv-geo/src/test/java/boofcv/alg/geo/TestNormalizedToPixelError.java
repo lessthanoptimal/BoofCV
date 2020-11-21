@@ -50,7 +50,7 @@ public class TestNormalizedToPixelError extends BoofStandardJUnit {
 	public TestNormalizedToPixelError() {
 		worldToCamera = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, 0.05, -0.02, worldToCamera.R);
-		worldToCamera.getT().set(0.3,-0.02,0.05);
+		worldToCamera.getT().setTo(0.3,-0.02,0.05);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.02,3);
 

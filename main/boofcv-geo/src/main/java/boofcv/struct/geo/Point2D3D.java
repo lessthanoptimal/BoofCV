@@ -20,6 +20,8 @@ package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Observed point feature location on the image plane and its 3D position.
@@ -30,11 +32,11 @@ public class Point2D3D {
 	/**
 	 * Observed location of the feature on the image plane
 	 */
-	public Point2D_F64 observation;
+	public @Getter @Setter Point2D_F64 observation;
 	/**
 	 * 3D location of the feature in world coordinates
 	 */
-	public Point3D_F64 location;
+	public @Getter @Setter Point3D_F64 location;
 
 	public Point2D3D() {
 		observation = new Point2D_F64();
@@ -56,23 +58,7 @@ public class Point2D3D {
 
 	public void setTo( double x2 , double y2, double x3, double y3, double z3 ) {
 		observation.setTo(x2,y2);
-		location.set(x3,y3,z3);
-	}
-
-	public Point2D_F64 getObservation() {
-		return observation;
-	}
-
-	public void setObservation(Point2D_F64 observation) {
-		this.observation = observation;
-	}
-
-	public Point3D_F64 getLocation() {
-		return location;
-	}
-
-	public void setLocation(Point3D_F64 location) {
-		this.location = location;
+		location.setTo(x3,y3,z3);
 	}
 
 	public Point2D3D copy() {

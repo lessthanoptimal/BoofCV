@@ -127,11 +127,11 @@ public class TrifocalExtractGeometries {
 
 		svd.decompose(U);
 		SingularOps_DDRM.nullVector(svd, false, tempE);
-		e2.set(tempE.get(0), tempE.get(1), tempE.get(2));
+		e2.setTo(tempE.get(0), tempE.get(1), tempE.get(2));
 
 		svd.decompose(V);
 		SingularOps_DDRM.nullVector(svd, false, tempE);
-		e3.set(tempE.get(0), tempE.get(1), tempE.get(2));
+		e3.setTo(tempE.get(0), tempE.get(1), tempE.get(2));
 	}
 
 	/**

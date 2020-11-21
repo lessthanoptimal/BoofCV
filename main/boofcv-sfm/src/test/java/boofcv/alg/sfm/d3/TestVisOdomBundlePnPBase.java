@@ -119,11 +119,7 @@ class TestVisOdomBundlePnPBase extends BoofStandardJUnit {
 
 			// with the exception of these tracks
 			switch (tidx) {
-				case 3:
-				case 8:
-				case 18:
-					alg.bundleViso.addObservation(alg.bundleViso.frames.get(6), bt, 0, 0);
-					break;
+				case 3, 8, 18 -> alg.bundleViso.addObservation(alg.bundleViso.frames.get(6), bt, 0, 0);
 			}
 		}
 
@@ -201,7 +197,7 @@ class TestVisOdomBundlePnPBase extends BoofStandardJUnit {
 		// Create frames at regular intervals along the z-axis
 		for (int fidx = 0; fidx < 3; fidx++) {
 			BFrame bf = alg.bundleViso.addFrame(fidx);
-			bf.frame_to_world.T.set(0, 0, fidx);
+			bf.frame_to_world.T.setTo(0, 0, fidx);
 		}
 
 		// Create tracks at regular intervals along the z-axis and make each one visible by all frames

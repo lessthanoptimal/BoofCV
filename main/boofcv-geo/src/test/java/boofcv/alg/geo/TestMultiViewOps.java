@@ -94,10 +94,10 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		worldToCam3 = new Se3_F64();
 
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.2, 0.001, -0.02, worldToCam2.R);
-		worldToCam2.getT().set(0.3, 0, 0.05);
+		worldToCam2.getT().setTo(0.3, 0, 0.05);
 
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.8, -0.02, 0.003, worldToCam3.R);
-		worldToCam3.getT().set(0.6, 0.2, -0.02);
+		worldToCam3.getT().setTo(0.6, 0.2, -0.02);
 
 		P2 = PerspectiveOps.createCameraMatrix(worldToCam2.R, worldToCam2.T, K, null);
 		P3 = PerspectiveOps.createCameraMatrix(worldToCam3.R, worldToCam3.T, K, null);

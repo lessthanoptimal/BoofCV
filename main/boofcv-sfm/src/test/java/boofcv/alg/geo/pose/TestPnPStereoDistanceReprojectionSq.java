@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,7 +109,7 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 
 		PnPStereoDistanceReprojectionSq alg = new PnPStereoDistanceReprojectionSq();
 		StereoParameters param = new StereoParameters(this.param.left, this.param.right, new Se3_F64());
-		param.right_to_left.getT().set(0.1, 0, Tz);
+		param.right_to_left.getT().setTo(0.1, 0, Tz);
 
 		alg.setStereoParameters(param);
 		alg.setModel(new Se3_F64());

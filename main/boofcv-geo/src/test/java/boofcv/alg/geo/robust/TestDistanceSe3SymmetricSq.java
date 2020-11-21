@@ -59,7 +59,7 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 	public void testPerfect() {
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
-		keyToCurr.getT().set(0.1, -0.1, 0.01);
+		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
@@ -81,7 +81,7 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 	public void testNoisy() {
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
-		keyToCurr.getT().set(0.1, -0.1, 0.01);
+		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
@@ -103,7 +103,7 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 	public void testBehindCamera() {
 		Se3_F64 keyToCurr = new Se3_F64();
 		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
-		keyToCurr.getT().set(0.1, -0.1, 0.01);
+		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, -3);
 
@@ -135,7 +135,7 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 		CommonOps_DDRM.invert(K2, K2_inv);
 
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getT().set(0.1, -0.1, 0.01);
+		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.02, -0.05, 3);
 
@@ -167,9 +167,9 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 		// triangulate the point's position given noisy data
 		LineParametric3D_F64 rayA = new LineParametric3D_F64();
 		LineParametric3D_F64 rayB = new LineParametric3D_F64();
-		rayA.slope.set(obsP.p1.x, obsP.p1.y, 1);
-		rayB.p.set(-0.1, 0.1, -0.01);
-		rayB.slope.set(obsP.p2.x, obsP.p2.y, 1);
+		rayA.slope.setTo(obsP.p1.x, obsP.p1.y, 1);
+		rayB.p.setTo(-0.1, 0.1, -0.01);
+		rayB.slope.setTo(obsP.p2.x, obsP.p2.y, 1);
 
 		ClosestPoint3D_F64.closestPoint(rayA, rayB, X);
 

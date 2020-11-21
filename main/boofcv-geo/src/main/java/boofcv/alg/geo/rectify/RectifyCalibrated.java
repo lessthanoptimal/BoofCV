@@ -131,7 +131,7 @@ public class RectifyCalibrated {
 	 */
 	private void selectAxises( SimpleMatrix R1, SimpleMatrix R2, SimpleMatrix c1, SimpleMatrix c2 ) {
 		// --------- Compute the new x-axis
-		v1.set(c2.get(0) - c1.get(0), c2.get(1) - c1.get(1), c2.get(2) - c1.get(2));
+		v1.setTo(c2.get(0) - c1.get(0), c2.get(1) - c1.get(1), c2.get(2) - c1.get(2));
 		v1.normalize();
 
 		// --------- Compute the new y-axis

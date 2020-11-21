@@ -328,14 +328,14 @@ public class PerspectiveOps {
 
 		pixelToNorm.compute(0, height/2, normA);
 		pixelToNorm.compute(width, height/2, normB);
-		vectorA.set(normA.x, normA.y, 1);
-		vectorB.set(normB.x, normB.y, 1);
+		vectorA.setTo(normA.x, normA.y, 1);
+		vectorB.setTo(normB.x, normB.y, 1);
 		double hfov = UtilVector3D_F64.acute(vectorA, vectorB);
 
 		pixelToNorm.compute(width/2, 0, normA);
 		pixelToNorm.compute(width/2, height, normB);
-		vectorA.set(normA.x, normA.y, 1);
-		vectorB.set(normB.x, normB.y, 1);
+		vectorA.setTo(normA.x, normA.y, 1);
+		vectorB.setTo(normB.x, normB.y, 1);
 		double vfov = UtilVector3D_F64.acute(vectorA, vectorB);
 
 		CameraPinhole intrinsic = new CameraPinhole();
@@ -1002,9 +1002,9 @@ public class PerspectiveOps {
 			// it was observed so it has to be in front of the camera
 			if (p4.z < 0)
 				scale *= -1;
-			p3.set(scale*p4.x, scale*p4.y, scale*p4.z);
+			p3.setTo(scale*p4.x, scale*p4.y, scale*p4.z);
 		} else {
-			p3.set(p4.x/w, p4.y/w, p4.z/w);
+			p3.setTo(p4.x/w, p4.y/w, p4.z/w);
 		}
 	}
 
