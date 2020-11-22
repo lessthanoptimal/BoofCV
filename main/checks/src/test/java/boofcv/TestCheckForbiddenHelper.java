@@ -64,6 +64,7 @@ public class TestCheckForbiddenHelper {
 
 		// Known false failures
 		assertFalse(alg.process("var a = value ? new Foo() : new Foo()"));
+		assertFalse(alg.process("var a = (Foo)a.getStuff()"));
 
 		// Failures
 		assertFalse(alg.process("for( var a : list )"));
