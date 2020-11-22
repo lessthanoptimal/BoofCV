@@ -61,7 +61,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
 		graph.viewList.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
@@ -134,7 +134,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 				pathLine(5, 0.1, 0.6, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
 		graph.viewList.forEach(v -> intrinsicZ.getDimension(v.imageDimension));
 
 		// Create two views with inliers
@@ -167,7 +167,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
 		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		// create an inlier set composed of observations from 3 views
@@ -210,7 +210,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
 		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		var alg = new RefineMetricWorkingGraph() {
@@ -290,7 +290,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImagesRealistic().pathLine(5, 0.3, 1.5, 2);
 		var pairwise = db.createPairwise();
 		var graph = db.createWorkingGraph(pairwise);
-		graph.viewList.forEach(v -> v.intrinsic.set(new BundlePinholeSimplified(400, 0, 0)));
+		graph.viewList.forEach(v -> v.intrinsic.setTo(new BundlePinholeSimplified(400, 0, 0)));
 		graph.viewList.forEach(v -> db.intrinsic.getDimension(v.imageDimension));
 
 		var alg = new RefineMetricWorkingGraph();

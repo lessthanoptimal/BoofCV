@@ -21,6 +21,7 @@ package boofcv.abst.geo.bundle;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point3D_F64;
@@ -28,6 +29,7 @@ import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base class for implementations of {@link SceneStructure}. Contains data structures
@@ -161,7 +163,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		 * If the parameters are assumed to be known and should not be optimised.
 		 */
 		public boolean known = true;
-		public BundleAdjustmentCamera model;
+		public @Nullable BundleAdjustmentCamera model;
 
 		public <T extends BundleAdjustmentCamera> T getModel() {
 			return (T)model;
@@ -171,6 +173,25 @@ public abstract class SceneStructureCommon implements SceneStructure {
 			known = true;
 			model = null;
 		}
+
+		public boolean isIdentical( Camera m, double tol ) {
+			if (known != m.known)
+				return false;
+			if (model == null)
+				return m.model == null;
+
+			try {
+				if (model instanceof BundlePinholeSimplified) {
+					var a = (BundlePinholeSimplified)model;
+					var b = (BundlePinholeSimplified)m.model;
+					return a.isIdentical(b, tol);
+				} else {
+					throw new RuntimeException("Add support for " + model.getClass().getSimpleName());
+				}
+			} catch (ClassCastException e) {
+				return false;
+			}
+		}
 	}
 
 	public static class Point {
@@ -178,7 +199,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		/**
 		 * Where the point is in the world reference frame. 3D or 4D space
 		 */
-		public double[] coordinate;
+		public final double[] coordinate;
 
 		/**
 		 * Indexes of the views that this point appears in

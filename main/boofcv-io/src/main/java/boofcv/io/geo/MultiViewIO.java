@@ -19,12 +19,15 @@
 package boofcv.io.geo;
 
 import boofcv.BoofVersion;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.sfm.structure.PairwiseImageGraph;
 import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
+import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -112,6 +115,103 @@ public class MultiViewIO {
 		out.close();
 	}
 
+	/**
+	 * Saves a {@link SceneStructureMetric} into the {@link Writer}.
+	 *
+	 * @param scene (Input) The scene
+	 * @param outputWriter (Output) where the scene is writen to
+	 */
+	public static void save( SceneStructureMetric scene, Writer outputWriter ) {
+		PrintWriter out = new PrintWriter(outputWriter);
+
+		Yaml yaml = createYmlObject();
+
+		out.println("# " + scene.getClass().getSimpleName() + " in YAML format. BoofCV " + BoofVersion.VERSION);
+
+		List<Map<String, Object>> views = new ArrayList<>();
+		List<Map<String, Object>> motions = new ArrayList<>();
+		List<Map<String, Object>> rigids = new ArrayList<>();
+		List<Map<String, Object>> cameras = new ArrayList<>();
+		List<Map<String, Object>> points = new ArrayList<>();
+
+		scene.views.forEach(v -> views.add(encodeSceneView(scene, v)));
+		scene.motions.forEach(m -> motions.add(encodeSceneMotion(m)));
+		scene.rigids.forEach(r -> rigids.add(encodeSceneRigid(r)));
+		scene.cameras.forEach(c -> cameras.add(encodeSceneCamera(c)));
+		scene.points.forEach(p -> points.add(encodeScenePoint(p)));
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("views", views);
+		data.put("motions", motions);
+		data.put("rigids", rigids);
+		data.put("cameras", cameras);
+		data.put("points", points);
+		data.put("homogenous", scene.isHomogenous());
+		data.put("data_type", "SceneStructureMetric");
+		data.put("version", 0);
+
+		yaml.dump(data, out);
+
+		out.close();
+	}
+
+	private static Map<String, Object> encodeSceneView( SceneStructureMetric scene,
+														SceneStructureMetric.View v ) {
+		Map<String, Object> encoded = new HashMap<>();
+		encoded.put("camera", v.camera);
+		encoded.put("parent_to_view", v.parent_to_view);
+		if (v.parent != null)
+			encoded.put("parent", scene.views.indexOf(v.parent));
+		return encoded;
+	}
+
+	private static Map<String, Object> encodeSceneMotion( SceneStructureMetric.Motion m ) {
+		Map<String, Object> encoded = new HashMap<>();
+		encoded.put("known", m.known);
+		encoded.put("motion", putSE3(m.motion));
+		return encoded;
+	}
+
+	private static Map<String, Object> encodeSceneRigid( SceneStructureMetric.Rigid r ) {
+		Map<String, Object> encoded = new HashMap<>();
+		encoded.put("known", r.known);
+		encoded.put("object_to_world", putSE3(r.object_to_world));
+		encoded.put("indexFirst", r.indexFirst);
+		List<Map<String, Object>> points = new ArrayList<>();
+		for (int i = 0; i < r.points.length; i++) {
+			points.add(encodeScenePoint(r.points[i]));
+		}
+		encoded.put("points", points);
+
+		return encoded;
+	}
+
+	private static Map<String, Object> encodeScenePoint( SceneStructureMetric.Point p ) {
+		Map<String, Object> encoded = new HashMap<>();
+		encoded.put("coordinate", p.coordinate);
+		encoded.put("views", p.views.toArray());
+		return encoded;
+	}
+
+	private static SceneStructureCommon.Point decodeScenePoint( Map<String, Object> map,
+																@Nullable SceneStructureCommon.Point p ) {
+		List<Double> coordinate = getOrThrow(map, "coordinate");
+		List<Integer> views = getOrThrow(map, "views");
+
+		if (p == null)
+			p = new SceneStructureCommon.Point(coordinate.size());
+
+		for (int i = 0; i < coordinate.size(); i++) {
+			p.coordinate[i] = coordinate.get(i);
+		}
+		p.views.resize(views.size());
+		for (int i = 0; i < views.size(); i++) {
+			p.views.data[i] = views.get(i);
+		}
+
+		return p;
+	}
+
 	private static List<Map<String, Object>> encodeInliers( FastAccess<AssociatedIndex> inliers ) {
 		List<Map<String, Object>> encoded = new ArrayList<>();
 		for (int i = 0; i < inliers.size; i++) {
@@ -122,6 +222,105 @@ public class MultiViewIO {
 			encoded.add(element);
 		}
 		return encoded;
+	}
+
+	private static Map<String, Object> encodeSceneCamera( SceneStructureCommon.Camera c ) {
+		Map<String, Object> encoded = new HashMap<>();
+		encoded.put("known", c.known);
+
+		Map<String, Object> model;
+		if (c.model instanceof BundlePinholeSimplified) {
+			model = putPinholeSimplified((BundlePinholeSimplified)c.model);
+			model.put("type", "PinholeSimplified");
+		} else {
+			throw new RuntimeException("BundleAdjustmentCamera type not yet supported. " + c.getClass().getSimpleName());
+		}
+		encoded.put("model", model);
+		return encoded;
+	}
+
+	private static SceneStructureCommon.Camera decodeSceneCamera( Map<String, Object> map,
+																  @Nullable SceneStructureCommon.Camera c ) {
+		if (c == null)
+			c = new SceneStructureCommon.Camera();
+		c.known = getOrThrow(map, "known");
+		Map<String, Object> model = getOrThrow(map, "model");
+		String type = getOrThrow(model, "type");
+		c.model = switch (type) {
+			case "PinholeSimplified" -> loadPinholeSimplified(model, null);
+			default -> throw new RuntimeException("Unknown camera. " + type);
+		};
+
+		return c;
+	}
+
+	/**
+	 * Decodes {@link SceneStructureMetric} encoded in a YAML format from a reader.
+	 *
+	 * @param reader (Input/Output) Where the graph is read from
+	 * @param scene (Output) Optional storage for the scene. If null a new instance is created.
+	 * @return The decoded graph
+	 */
+	public static SceneStructureMetric load( Reader reader, @Nullable SceneStructureMetric scene ) {
+		Yaml yaml = createYmlObject();
+
+		Map<String, Object> data = yaml.load(reader);
+		try {
+			reader.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		boolean homogenous = getOrThrow(data, "homogenous");
+
+		List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
+		List<Map<String, Object>> yamlMotions = getOrThrow(data, "motions");
+		List<Map<String, Object>> yamlRigids = getOrThrow(data, "rigids");
+		List<Map<String, Object>> yamlCameras = getOrThrow(data, "cameras");
+		List<Map<String, Object>> yamlPoints = getOrThrow(data, "points");
+
+		if (scene != null && scene.isHomogenous() != homogenous)
+			scene = null;
+		if (scene == null)
+			scene = new SceneStructureMetric(homogenous);
+		final SceneStructureMetric _scene = scene; // for lambas
+		scene.initialize(
+				yamlCameras.size(), yamlViews.size(), yamlMotions.size(), yamlPoints.size(), yamlRigids.size());
+
+		for (int i = 0; i < yamlViews.size(); i++) {
+			SceneStructureMetric.View v = scene.views.get(i);
+			Map<String, Object> yamlView = yamlViews.get(i);
+			v.camera = getOrThrow(yamlView, "camera");
+			v.parent_to_view = getOrThrow(yamlView, "parent_to_view");
+			v.parent = yamlView.containsKey("parent") ? scene.views.get(getOrThrow(yamlView, "parent")) : null;
+		}
+
+		for (int i = 0; i < yamlMotions.size(); i++) {
+			SceneStructureMetric.Motion m = scene.motions.grow();
+			Map<String, Object> yamlMotion = yamlMotions.get(i);
+			m.known = getOrThrow(yamlMotion, "known");
+			loadSE3(getOrThrow(yamlMotion, "motion"), m.motion);
+		}
+
+		for (int i = 0; i < yamlRigids.size(); i++) {
+			SceneStructureMetric.Rigid r = scene.rigids.get(i);
+			Map<String, Object> yamlRigid = yamlRigids.get(i);
+
+			r.known = getOrThrow(yamlRigid, "known");
+			r.indexFirst = getOrThrow(yamlRigid, "indexFirst");
+			loadSE3(getOrThrow(yamlRigid, "object_to_world"), r.object_to_world);
+			List<Map<String, Object>> points = getOrThrow(yamlRigid, "points");
+			r.points = new SceneStructureCommon.Point[points.size()];
+			for (int j = 0; j < r.points.length; j++) {
+				r.points[j] = decodeScenePoint(points.get(j), null);
+			}
+		}
+
+		scene.points.forIdx(( i, p ) -> decodeScenePoint(yamlPoints.get(i), p));
+
+		BoofMiscOps.forIdx(yamlCameras, ( i, c ) -> decodeSceneCamera(yamlCameras.get(i), _scene.cameras.get(i)));
+
+		return scene;
 	}
 
 	public static PairwiseImageGraph load( String path, @Nullable PairwiseImageGraph graph ) {
@@ -392,5 +591,30 @@ public class MultiViewIO {
 		intrinsic.k2 = (double)map.get("k2");
 
 		return intrinsic;
+	}
+
+	public static Map<String, Object> putSE3( Se3_F64 m ) {
+		Map<String, Object> map = new HashMap<>();
+
+		map.put("x", m.T.x);
+		map.put("y", m.T.y);
+		map.put("z", m.T.z);
+		map.put("R", m.R.data);
+
+		return map;
+	}
+
+	public static Se3_F64 loadSE3( Map<String, Object> map,
+								   @Nullable Se3_F64 m ) {
+		if (m == null)
+			m = new Se3_F64();
+
+		m.T.x = (double)map.get("x");
+		m.T.y = (double)map.get("y");
+		m.T.z = (double)map.get("z");
+
+		copyIntoMatrix(getOrThrow(map, "R"), m.R);
+
+		return m;
 	}
 }
