@@ -401,7 +401,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 		View localView = localWorking.addView(origView.pview);
 
 		// copy geometric information over
-		localView.intrinsic.set(origView.intrinsic);
+		localView.intrinsic.setTo(origView.intrinsic);
 		localView.world_to_view.setTo(origView.world_to_view);
 		localView.imageDimension.setTo(origView.imageDimension);
 

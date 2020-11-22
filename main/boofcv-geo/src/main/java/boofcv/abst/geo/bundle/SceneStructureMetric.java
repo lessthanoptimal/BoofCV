@@ -176,6 +176,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
+	 *
 	 * @param viewIndex Which view is being specified.
 	 * @param cameraIndex Index of camera model
 	 * @param known If these parameters are fixed or not
@@ -189,6 +190,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Specifies the spacial transform for a view and assumes the parent is the world frame.
+	 *
 	 * @param viewIndex Which view is being specified.
 	 * @param cameraIndex Index of camera model
 	 * @param known If the parameters are known and not optimized or unknown and optimized
@@ -204,6 +206,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 	/**
 	 * Specifies which motion is attached to a view
+	 *
 	 * @param viewIndex Which view is being specified.
 	 * @param cameraIndex Index of camera model
 	 * @param motionIndex The motion that describes the parent_to_view relationship
@@ -342,6 +345,54 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	public FastQueue<Rigid> getRigids() { return rigids; }
 
 	/**
+	 * Checks to see if the passed in scene is identical to "this" scene. Floating point values are checked to within
+	 * tolerance
+	 *
+	 * @return true if identical to within specified float tolerance and false if not
+	 */
+	public boolean isIdentical( SceneStructureMetric m, double tol ) {
+		if (isHomogenous() != m.isHomogenous())
+			return false;
+		if (views.size != m.views.size)
+			return false;
+		if (motions.size != m.motions.size)
+			return false;
+		if (rigids.size != m.rigids.size)
+			return false;
+		if (cameras.size != m.cameras.size)
+			return false;
+		if (points.size != m.points.size)
+			return false;
+
+		for (int i = 0; i < views.size; i++) {
+			if (!views.get(i).isIdentical(m.views.get(i)))
+				return false;
+		}
+
+		for (int i = 0; i < motions.size; i++) {
+			if (!motions.get(i).isIdentical(m.motions.get(i), tol))
+				return false;
+		}
+
+		for (int i = 0; i < rigids.size; i++) {
+			if (!rigids.get(i).isIdentical(m.rigids.get(i), tol))
+				return false;
+		}
+
+		for (int i = 0; i < cameras.size; i++) {
+			if (!cameras.get(i).isIdentical(m.cameras.get(i), tol))
+				return false;
+		}
+
+		for (int i = 0; i < points.size; i++) {
+			if (points.get(i).distance(m.points.get(i)) > tol)
+				return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Describes a view from a camera at a particular point. References are provided to the data structures which
 	 * provide the intrinsic and extrinsic parameters. A view contains no parameters that are optimized directly
 	 * but instead describes the graph's structure.
@@ -359,6 +410,20 @@ public class SceneStructureMetric extends SceneStructureCommon {
 			camera = -1;
 			parent = null;
 		}
+
+		public boolean isIdentical( View m ) {
+			if (parent_to_view != m.parent_to_view)
+				return false;
+			if (camera != m.camera)
+				return false;
+			if (parent == null) {
+				return m.parent == null;
+			} else if (m.parent == null)
+				return false;
+
+			// NOTE: Can't check to see if the parent is the same because that requires knowing the view index
+			return true;
+		}
 	}
 
 	/**
@@ -374,6 +439,18 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		public void reset() {
 			known = true;
 			motion.reset();
+		}
+
+		public boolean isIdentical( Motion m, double tol ) {
+			if (known != m.known)
+				return false;
+			if (motion.T.distance(m.motion.T) > tol)
+				return false;
+			for (int i = 0; i < 9; i++) {
+				if (Math.abs(motion.R.data[i] - m.motion.R.data[i]) > tol)
+					return false;
+			}
+			return true;
 		}
 	}
 
@@ -419,6 +496,24 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 		public int getTotalPoints() {
 			return points.length;
+		}
+
+		public boolean isIdentical( Rigid m, double tol ) {
+			if (known != m.known)
+				return false;
+			if (indexFirst != m.indexFirst)
+				return false;
+			if (points != null) {
+				if (m.points == null)
+					return false;
+				if (points.length != m.points.length)
+					return false;
+				for (int i = 0; i < points.length; i++) {
+					if (points[i].distance(m.points[i]) > tol)
+						return false;
+				}
+			} else return m.points == null;
+			return true;
 		}
 	}
 }

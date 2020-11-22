@@ -146,7 +146,7 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 		k1 = k2 = f = 0.0;
 	}
 
-	public void set( BundlePinholeSimplified c ) {
+	public void setTo( BundlePinholeSimplified c ) {
 		this.f = c.f;
 		this.k1 = c.k1;
 		this.k2 = c.k2;
@@ -154,5 +154,15 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 
 	public BundlePinholeSimplified copy() {
 		return new BundlePinholeSimplified(f, k1, k2);
+	}
+
+	public boolean isIdentical( BundlePinholeSimplified c, double tol ) {
+		if (Math.abs(f - c.f) > tol)
+			return false;
+		if (Math.abs(k1 - c.k1) > tol)
+			return false;
+		if (Math.abs(k2 - c.k2) > tol)
+			return false;
+		return true;
 	}
 }

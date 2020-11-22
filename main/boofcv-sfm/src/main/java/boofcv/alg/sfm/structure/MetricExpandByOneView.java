@@ -303,7 +303,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 			throw new RuntimeException("Bundle adjustment failed. Handle this");
 
 		// copy results for output
-		wview3.intrinsic.set((BundlePinholeSimplified)structure.cameras.get(2).model);
+		wview3.intrinsic.setTo((BundlePinholeSimplified)structure.cameras.get(2).model);
 		view1_to_view2H.setTo(structure.getParentToView(1));
 		view1_to_target.setTo(structure.getParentToView(2));
 

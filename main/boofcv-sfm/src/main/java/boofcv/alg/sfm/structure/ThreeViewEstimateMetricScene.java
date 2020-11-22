@@ -310,7 +310,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 				verbose.println("  recomputing old structure");
 			for (int i = 0; i < structure.cameras.size; i++) {
 				BundlePinholeSimplified c = structure.cameras.data[i].getModel();
-				c.set(bestCameras.get(i));
+				c.setTo(bestCameras.get(i));
 				structure.getParentToView(i).setTo(bestPose.get(i));
 			}
 			triangulatePoints(structure, observations);
