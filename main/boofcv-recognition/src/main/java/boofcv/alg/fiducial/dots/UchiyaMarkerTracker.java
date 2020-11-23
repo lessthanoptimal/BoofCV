@@ -242,7 +242,7 @@ public class UchiyaMarkerTracker {
 			int inputIdx = ransac.getInputIndex(i);
 			int dotIdx = ransacDotIdx.get(inputIdx);
 			int landmarkIdx = doc.landmarkToDots.indexOf(dotIdx);
-			track.observed.grow().set(detectedDots.get(dotIdx), landmarkIdx);
+			track.observed.grow().setTo(detectedDots.get(dotIdx), landmarkIdx);
 			inlierPairs.add(ransacPairs.get(inputIdx));
 		}
 

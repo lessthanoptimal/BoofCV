@@ -184,7 +184,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 					p3.y = p4.y/p4.w;
 					p3.z = p4.z/p4.w;
 					wcp.transform(p3, predicted);
-					double residual = o.distance(predicted);
+					double residual = o.p.distance(predicted);
 					if (Math.abs(residual) > tol)
 						fail("Error is too large. " + residual);
 				}
@@ -200,7 +200,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 					v.get(j, o);
 					structure.points.data[o.index].get(p3);
 					wcp.transform(p3, predicted);
-					double residual = o.distance(predicted);
+					double residual = o.p.distance(predicted);
 					if (Math.abs(residual) > tol)
 						fail("Error is too large. " + residual);
 				}

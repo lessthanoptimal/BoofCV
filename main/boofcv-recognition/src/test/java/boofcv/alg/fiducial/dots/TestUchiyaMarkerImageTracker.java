@@ -141,7 +141,7 @@ class TestUchiyaMarkerImageTracker extends BoofStandardJUnit {
 
 		Point2D_F64 adj = new Point2D_F64();
 		for( var f : found ) {
-			AffinePointOps_F64.transform(affine,f.x,f.y,adj);
+			AffinePointOps_F64.transform(affine,f.p.x,f.p.y,adj);
 			Point2D_F64 e = expected.get(f.index);
 			assertTrue(e.distance(adj) <= tol );
 		}

@@ -474,7 +474,7 @@ public class LlahOperations {
 			for (int i = 0; i < landmarkHits.size; i++) {
 				if (landmarkHits.get(i) > 0) {
 					Point2D_F64 p = document.landmarks.get(i);
-					matches.grow().set(p.x, p.y, i);
+					matches.grow().setTo(p.x, p.y, i);
 				}
 			}
 		}

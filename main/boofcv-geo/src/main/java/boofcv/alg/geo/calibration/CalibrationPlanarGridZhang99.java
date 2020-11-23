@@ -239,7 +239,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 			CalibrationObservation ca = obs.get(viewIdx);
 			for (int j = 0; j < ca.size(); j++) {
 				PointIndex2D_F64 p = ca.get(j);
-				v.add(p.index, (float)p.x, (float)p.y);
+				v.add(p.index, (float)p.p.x, (float)p.p.y);
 				structure.connectPointToView(p.index, viewIdx);
 			}
 		}

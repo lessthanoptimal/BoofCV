@@ -49,13 +49,12 @@ public interface CalibrationView {
 	/**
 	 * Get the sidesCollision for collision detection with points
 	 */
-	void getSidesCollision(CalibrationObservation detections , List<Point2D_F64> sides );
+	void getSidesCollision( CalibrationObservation detections, List<Point2D_F64> sides );
 
 	/**
 	 * Returns a quadrilateral that's used when checking focus and if the target is being held straight
 	 */
-	void getQuadFocus( CalibrationObservation detections , List<Point2D_F64> sides );
-
+	void getQuadFocus( CalibrationObservation detections, List<Point2D_F64> sides );
 
 	/**
 	 * Returns how wide the image border should be given the visual width of the canonical fiducial
@@ -64,47 +63,47 @@ public interface CalibrationView {
 
 	class Chessboard implements CalibrationView {
 
-		int numRows,numCols;
-		int pointRows,pointCols;
+		int numRows, numCols;
+		int pointRows, pointCols;
 
 		@Override
 		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorChessboardX chessboard = (CalibrationDetectorChessboardX)detector;
-			this.numRows = chessboard.getCornerRows()+1;
-			this.numCols = chessboard.getCornerCols()+1;
+			this.numRows = chessboard.getCornerRows() + 1;
+			this.numCols = chessboard.getCornerCols() + 1;
 
-			pointRows = numRows-1;
-			pointCols = numCols-1;
+			pointRows = numRows - 1;
+			pointCols = numCols - 1;
 		}
 
 		@Override
-		public void getSidesCollision(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getSidesCollision( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			sides.clear();
-			sides.add( get(0, 0, detections.points));
-			sides.add( get(0, pointCols-1, detections.points));
-			sides.add( get(pointRows-1, pointCols-1, detections.points));
-			sides.add( get(pointRows-1, 0, detections.points));
+			sides.add(get(0, 0, detections.points));
+			sides.add(get(0, pointCols - 1, detections.points));
+			sides.add(get(pointRows - 1, pointCols - 1, detections.points));
+			sides.add(get(pointRows - 1, 0, detections.points));
 		}
 
 		@Override
-		public void getQuadFocus(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getQuadFocus( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			getSidesCollision(detections, sides);
 		}
 
-		private Point2D_F64 get(int row , int col , List<PointIndex2D_F64> detections ) {
-			return detections.get(row*pointCols+col);
+		private Point2D_F64 get( int row, int col, List<PointIndex2D_F64> detections ) {
+			return detections.get(row*pointCols + col).p;
 		}
 
 		@Override
 		public int getBufferWidth( double gridPixelsWide ) {
-			return (int)(0.2*gridPixelsWide/(pointCols-1)+0.5);
+			return (int)(0.2*gridPixelsWide/(pointCols - 1) + 0.5);
 		}
 	}
 
 	class SquareGrid implements CalibrationView {
 
 		int gridCols;
-		int pointRows,pointCols;
+		int pointRows, pointCols;
 
 		@Override
 		public void initialize( DetectorFiducialCalibration detector ) {
@@ -117,26 +116,26 @@ public interface CalibrationView {
 		}
 
 		@Override
-		public void getSidesCollision(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getSidesCollision( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			sides.clear();
-			sides.add( get(0, 0, detections.points));
-			sides.add( get(0, pointCols-1, detections.points));
-			sides.add( get(pointRows-1, pointCols-1, detections.points));
-			sides.add( get(pointRows-1, 0, detections.points));
+			sides.add(get(0, 0, detections.points));
+			sides.add(get(0, pointCols - 1, detections.points));
+			sides.add(get(pointRows - 1, pointCols - 1, detections.points));
+			sides.add(get(pointRows - 1, 0, detections.points));
 		}
 
 		@Override
-		public void getQuadFocus(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getQuadFocus( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			getSidesCollision(detections, sides);
 		}
 
-		private Point2D_F64 get( int row , int col , List<PointIndex2D_F64> detections ) {
-			return detections.get(row*pointCols+col);
+		private Point2D_F64 get( int row, int col, List<PointIndex2D_F64> detections ) {
+			return detections.get(row*pointCols + col).p;
 		}
 
 		@Override
 		public int getBufferWidth( double gridPixelsWide ) {
-			return (int)(0.15*(gridPixelsWide/gridCols)+0.5);
+			return (int)(0.15*(gridPixelsWide/gridCols) + 0.5);
 		}
 	}
 
@@ -160,9 +159,9 @@ public interface CalibrationView {
 			// find the convex hull and use that as the collision region
 			List<Point2D_F64> layout = detector.getLayout();
 			Polygon2D_F64 poly = new Polygon2D_F64(layout.size());
-			FitPolygon2D_F64.convexHull(layout,poly);
+			FitPolygon2D_F64.convexHull(layout, poly);
 
-			if( !poly.isCCW() )
+			if (!poly.isCCW())
 				poly.flip();
 
 			UtilPolygons2D_F64.removeAlmostParallel(poly, UtilAngle.radian(5));
@@ -172,7 +171,7 @@ public interface CalibrationView {
 			for (int i = 0; i < poly.size(); i++) {
 				int match = -1;
 				for (int j = 0; j < layout.size(); j++) {
-					if( layout.get(j).distance(poly.get(i)) <= 1e-8 ) {
+					if (layout.get(j).distance(poly.get(i)) <= 1e-8) {
 						match = j;
 						break;
 					}
@@ -182,46 +181,46 @@ public interface CalibrationView {
 		}
 
 		@Override
-		public void getSidesCollision(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getSidesCollision( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			sides.clear();
-			for( int i = 0; i < indexes.length; i++ ) {
-				sides.add( detections.get(indexes[i]));
+			for (int i = 0; i < indexes.length; i++) {
+				sides.add(detections.get(indexes[i]).p);
 			}
 		}
 
 		@Override
-		public void getQuadFocus(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getQuadFocus( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			sides.clear();
 
-			int outerCols=gridCols - (1-gridCols%2);
-			int outerRows=gridRows - (1-gridRows%2);
+			int outerCols = gridCols - (1 - gridCols%2);
+			int outerRows = gridRows - (1 - gridRows%2);
 
-			sides.add( detections.get(0) );
-			sides.add( detections.get(getIndex(0,outerCols-1)) );
-			sides.add( detections.get(getIndex(outerRows-1,outerCols-1)) );
-			sides.add( detections.get(getIndex(outerRows-1,0)) );
+			sides.add(detections.get(0).p);
+			sides.add(detections.get(getIndex(0, outerCols - 1)).p);
+			sides.add(detections.get(getIndex(outerRows - 1, outerCols - 1)).p);
+			sides.add(detections.get(getIndex(outerRows - 1, 0)).p);
 		}
 
-		private int getIndex( int row , int col ) {
+		private int getIndex( int row, int col ) {
 			int evenCols = gridCols/2 + gridCols%2;
 			int oddCols = gridCols/2;
 
-			int index = (row/2+row%2)*evenCols + (row/2)*oddCols;
-			if( row%2 == 0 )
+			int index = (row/2 + row%2)*evenCols + (row/2)*oddCols;
+			if (row%2 == 0)
 				index += col/2;
 			else
-				index += col/2+col%2;
+				index += col/2 + col%2;
 
 			return index;
 		}
 
 		@Override
 		public int getBufferWidth( double gridPixelsWide ) {
-			int outerCols=gridCols/2+gridCols%2;
+			int outerCols = gridCols/2 + gridCols%2;
 
-			double spaceWidth = gridPixelsWide/(outerCols-1);
-			System.out.println("grid width "+gridPixelsWide+" spaceWidth "+spaceWidth+" GRID COLS "+gridCols+"  outerCols "+outerCols);
-			return (int)(1.25*spaceWidth/ (2.0*spaceToDiameter) +0.5);
+			double spaceWidth = gridPixelsWide/(outerCols - 1);
+			System.out.println("grid width " + gridPixelsWide + " spaceWidth " + spaceWidth + " GRID COLS " + gridCols + "  outerCols " + outerCols);
+			return (int)(1.25*spaceWidth/(2.0*spaceToDiameter) + 0.5);
 		}
 	}
 
@@ -245,9 +244,9 @@ public interface CalibrationView {
 			// find the convex hull and use that as the collision region
 			List<Point2D_F64> layout = detector.getLayout();
 			Polygon2D_F64 poly = new Polygon2D_F64(layout.size());
-			FitPolygon2D_F64.convexHull(layout,poly);
+			FitPolygon2D_F64.convexHull(layout, poly);
 
-			if( !poly.isCCW() )
+			if (!poly.isCCW())
 				poly.flip();
 
 			UtilPolygons2D_F64.removeAlmostParallel(poly, UtilAngle.radian(5));
@@ -257,7 +256,7 @@ public interface CalibrationView {
 			for (int i = 0; i < poly.size(); i++) {
 				int match = -1;
 				for (int j = 0; j < layout.size(); j++) {
-					if( layout.get(j).distance(poly.get(i)) <= 1e-8 ) {
+					if (layout.get(j).distance(poly.get(i)) <= 1e-8) {
 						match = j;
 						break;
 					}
@@ -267,32 +266,31 @@ public interface CalibrationView {
 		}
 
 		@Override
-		public void getSidesCollision(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getSidesCollision( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			sides.clear();
-			for( int i = 0; i < indexes.length; i++ ) {
-				sides.add( detections.get(indexes[i]));
+			for (int i = 0; i < indexes.length; i++) {
+				sides.add(detections.get(indexes[i]).p);
 			}
 		}
 
 		@Override
-		public void getQuadFocus(CalibrationObservation detections, List<Point2D_F64> sides) {
+		public void getQuadFocus( CalibrationObservation detections, List<Point2D_F64> sides ) {
 			sides.clear();
 
 			int pointsCols = 4*gridCols;
 
-			sides.add( detections.get(3) );
-			sides.add( detections.get(pointsCols-3) );
-			sides.add( detections.get(pointsCols*gridRows-3));
-			sides.add( detections.get(3+pointsCols*(gridRows-1)) );
+			sides.add(detections.get(3).p);
+			sides.add(detections.get(pointsCols - 3).p);
+			sides.add(detections.get(pointsCols*gridRows - 3).p);
+			sides.add(detections.get(3 + pointsCols*(gridRows - 1)).p);
 		}
 
 		@Override
 		public int getBufferWidth( double gridPixelsWide ) {
 
-			double spaceWidth = gridPixelsWide/(gridCols-1);
-			System.out.println("grid width "+gridPixelsWide+" spaceWidth "+spaceWidth+" GRID COLS "+gridCols);
-			return (int)(1.25*spaceWidth/ (2.0*spaceToDiameter) +0.5);
+			double spaceWidth = gridPixelsWide/(gridCols - 1);
+			System.out.println("grid width " + gridPixelsWide + " spaceWidth " + spaceWidth + " GRID COLS " + gridCols);
+			return (int)(1.25*spaceWidth/(2.0*spaceToDiameter) + 0.5);
 		}
 	}
-
 }

@@ -164,7 +164,7 @@ implements FiducialTracker<T>
 		for (int dotIdx = 0; dotIdx < track.observed.size; dotIdx++) {
 			PointIndex2D_F64 dot = track.observed.get(dotIdx);
 			Point2D_F64 landmark = track.globalDoc.landmarks.get(dot.index);
-			pixelToNorm.compute(dot.x,dot.y, norm);
+			pixelToNorm.compute(dot.p.x,dot.p.y, norm);
 			control3D.grow().setTo(norm.x,norm.y,landmark.x,-landmark.y,0);
 		}
 

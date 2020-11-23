@@ -240,7 +240,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 			if (pointUndistToDist != null) {
 				CalibrationObservation detected = detector.getDetectedPoints();
 				for (int i = 0; i < detected.size(); i++) {
-					Point2D_F64 p = detected.get(i);
+					Point2D_F64 p = detected.get(i).p;
 					pointUndistToDist.compute(p.x, p.y, p);
 				}
 			}
@@ -280,7 +280,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 
 		location.setTo(0, 0);
 		for (int i = 0; i < view.size(); i++) {
-			PointIndex2D_F64 p = view.get(i);
+			Point2D_F64 p = view.get(i).p;
 			location.x += p.x;
 			location.y += p.y;
 		}
@@ -300,7 +300,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		for (int i = 0; i < boundaryIndexes.length; i++) {
 			PointIndex2D_F64 p = control.get(boundaryIndexes[i]);
 			if (p.index == boundaryIndexes[i])
-				storage.vertexes.grow().setTo(p);
+				storage.vertexes.grow().setTo(p.p);
 			else
 				System.out.println("control points are out of order or not detected");
 		}

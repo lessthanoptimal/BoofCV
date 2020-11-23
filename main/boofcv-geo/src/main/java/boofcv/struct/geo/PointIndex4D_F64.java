@@ -18,43 +18,43 @@
 
 package boofcv.struct.geo;
 
-import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * A 2D point with an index associated with it
+ * A 4D point with an index associated with it
  *
  * @author Peter Abeles
  */
-public class PointIndex2D_F64 {
-	public @Getter final Point2D_F64 p = new Point2D_F64();
+public class PointIndex4D_F64 {
+	public @Getter final Point4D_F64 p = new Point4D_F64();
 	public @Getter @Setter int index;
 
-	public PointIndex2D_F64( double x, double y, int index ) { setTo(x, y, index); }
+	public PointIndex4D_F64( double x, double y, double z, double w, int index ) { setTo(x, y, z, w, index); }
 
-	public PointIndex2D_F64( double x, double y ) { setTo(x, y, 0);}
+	public PointIndex4D_F64( double x, double y, double z, double w ) { setTo(x, y, z, w, 0);}
 
-	public PointIndex2D_F64() {}
+	public PointIndex4D_F64() {}
 
-	public PointIndex2D_F64( Point2D_F64 p, int index ) { setTo(p, index); }
+	public PointIndex4D_F64( Point4D_F64 p, int index ) { setTo(p, index); }
 
-	public void setTo( Point2D_F64 p, int index ) {
+	public void setTo( Point4D_F64 p, int index ) {
 		this.p.setTo(p);
 		this.index = index;
 	}
 
-	public void setTo( double x, double y, int index ) {
-		this.p.setTo(x, y);
+	public void setTo( double x, double y, double z, double w, int index ) {
+		this.p.setTo(x, y, z, w);
 		this.index = index;
 	}
 
-	public void setTo( PointIndex2D_F64 src ) {
+	public void setTo( PointIndex4D_F64 src ) {
 		this.p.setTo(src.p);
 		this.index = src.index;
 	}
 
-	public PointIndex2D_F64 copy() {
-		return new PointIndex2D_F64(p, index);
+	public PointIndex4D_F64 copy() {
+		return new PointIndex4D_F64(p, index);
 	}
 }

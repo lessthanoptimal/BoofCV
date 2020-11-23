@@ -60,24 +60,24 @@ public class QrPose3DUtils {
 	 * Converts the corner observations into {@link PointIndex2D_F64} where observations are in pixels
 	 */
 	public List<PointIndex2D_F64> getLandmarkByIndex( QrCode qr) {
-		pixelControl.get(0).setTo(qr.ppCorner.get(0));
-		pixelControl.get(1).setTo(qr.ppCorner.get(1));
-		pixelControl.get(2).setTo(qr.ppCorner.get(2));
-		pixelControl.get(3).setTo(qr.ppCorner.get(3));
+		pixelControl.get(0).p.setTo(qr.ppCorner.get(0));
+		pixelControl.get(1).p.setTo(qr.ppCorner.get(1));
+		pixelControl.get(2).p.setTo(qr.ppCorner.get(2));
+		pixelControl.get(3).p.setTo(qr.ppCorner.get(3));
 
-		pixelControl.get(4).setTo(qr.ppRight.get(0));
-		pixelControl.get(5).setTo(qr.ppRight.get(1));
-		pixelControl.get(6).setTo(qr.ppRight.get(2));
-		pixelControl.get(7).setTo(qr.ppRight.get(3));
+		pixelControl.get(4).p.setTo(qr.ppRight.get(0));
+		pixelControl.get(5).p.setTo(qr.ppRight.get(1));
+		pixelControl.get(6).p.setTo(qr.ppRight.get(2));
+		pixelControl.get(7).p.setTo(qr.ppRight.get(3));
 
-		pixelControl.get(8).setTo(qr.ppDown.get(0));
-		pixelControl.get(9).setTo(qr.ppDown.get(1));
-		pixelControl.get(10).setTo(qr.ppDown.get(2));
-		pixelControl.get(11).setTo(qr.ppDown.get(3));
+		pixelControl.get(8).p.setTo(qr.ppDown.get(0));
+		pixelControl.get(9).p.setTo(qr.ppDown.get(1));
+		pixelControl.get(10).p.setTo(qr.ppDown.get(2));
+		pixelControl.get(11).p.setTo(qr.ppDown.get(3));
 
 		// put it back into distorted pixels. Required by FiducialDetectorPnP
 		for (int i = 0; i < pixelControl.size(); i++) {
-			PointIndex2D_F64 p = pixelControl.get(i);
+			Point2D_F64 p = pixelControl.get(i).p;
 			undistToDist.compute(p.x,p.y,p);
 		}
 

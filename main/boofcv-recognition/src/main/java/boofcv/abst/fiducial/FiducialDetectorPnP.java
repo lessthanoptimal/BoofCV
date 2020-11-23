@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -149,7 +149,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 		detected2D3D.clear();
 		List<Point2D3D> all = getControl3D(which);
 		for (int i = 0; i < pixels.size(); i++) {
-			PointIndex2D_F64 a = pixels.get(i);
+			Point2D_F64 a = pixels.get(i).p;
 			Point2D3D b = all.get(i);
 
 			pixelToNorm.compute(a.x,a.y, b.observation);
@@ -176,9 +176,9 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 			// compute the error for each point in image pixels
 			errors.reset();
 			for (int idx = 0; idx < detectedPixels.size(); idx++) {
-				PointIndex2D_F64 foo = detectedPixels.get(idx);
+				PointIndex2D_F64 dp = detectedPixels.get(idx);
 				w2p.transform(points.get(idx).location, predicted);
-				errors.add(predicted.distance2(foo));
+				errors.add(predicted.distance2(dp.p));
 			}
 
 			// compute the prune threshold based on the standard deviation. well variance really

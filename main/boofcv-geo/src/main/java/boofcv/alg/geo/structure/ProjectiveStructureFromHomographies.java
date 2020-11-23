@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -173,7 +173,7 @@ public class ProjectiveStructureFromHomographies {
 			for (int i = 0; i < obs.size(); i++) {
 				PointIndex2D_F64 p_pixel = obs.get(i);
 
-				N.apply(p_pixel,p);
+				N.apply(p_pixel.p,p);
 
 				// column this feature is at
 				int col = p_pixel.index*3;
@@ -223,7 +223,7 @@ public class ProjectiveStructureFromHomographies {
 				if( p.index < 0 || p.index >= totalFeatures)
 					throw new IllegalArgumentException("Feature index outside of bounds. Must be from 0 to "+(totalFeatures-1));
 
-				GeometryMath_F64.mult(H,p,tmp);
+				GeometryMath_F64.mult(H,p.p,tmp);
 				// Homogenous coordinates are scale invariant. A scale
 				// needs to be picked for consistency. I picked the largest x or y value
 				double m = Math.max(Math.abs(tmp.x),Math.abs(tmp.y));

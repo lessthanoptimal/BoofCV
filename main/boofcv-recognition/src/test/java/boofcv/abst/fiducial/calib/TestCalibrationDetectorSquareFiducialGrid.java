@@ -149,7 +149,7 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 
 			// TODO ensure that the order is correct. Kinda a pain since some targets have symmetry...
 			for (int j = 0; j < found.size(); j++) {
-				double distance = found.get(j).distance(truth);
+				double distance = found.get(j).p.distance(truth);
 				if( distance <= fisheyeMatchTol ) {
 					totalMatched++;
 					break;

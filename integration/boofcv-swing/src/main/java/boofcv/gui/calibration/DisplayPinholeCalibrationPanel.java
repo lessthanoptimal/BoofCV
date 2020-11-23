@@ -142,7 +142,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 			if (showUndistorted) {
 				adjusted = new ArrayList<>();
 				for (PointIndex2D_F64 p : set.points) {
-					remove_p_to_p.compute((float)p.x, (float)p.y, adj);
+					remove_p_to_p.compute((float)p.p.x, (float)p.p.y, adj);
 					adjusted.add(new Point2D_F64(adj.x, adj.y));
 				}
 			} else {
@@ -156,9 +156,9 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 			g2.setStroke(new BasicStroke(3));
 			for (PointIndex2D_F64 p : set.points) {
 				if (showUndistorted) {
-					remove_p_to_p.compute((float)p.x, (float)p.y, adj);
+					remove_p_to_p.compute((float)p.p.x, (float)p.p.y, adj);
 				} else {
-					adj.setTo((float)p.x, (float)p.y);
+					adj.setTo((float)p.p.x, (float)p.p.y);
 				}
 				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
@@ -166,9 +166,9 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 			g2.setColor(Color.RED);
 			for (PointIndex2D_F64 p : set.points) {
 				if (showUndistorted) {
-					remove_p_to_p.compute((float)p.x, (float)p.y, adj);
+					remove_p_to_p.compute((float)p.p.x, (float)p.p.y, adj);
 				} else {
-					adj.setTo((float)p.x, (float)p.y);
+					adj.setTo((float)p.p.x, (float)p.p.y);
 				}
 				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
@@ -178,9 +178,9 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 			for (CalibrationObservation l : allFeatures) {
 				for (PointIndex2D_F64 p : l.points) {
 					if (showUndistorted) {
-						remove_p_to_p.compute((float)p.x, (float)p.y, adj);
+						remove_p_to_p.compute((float)p.p.x, (float)p.p.y, adj);
 					} else {
-						adj.setTo((float)p.x, (float)p.y);
+						adj.setTo((float)p.p.x, (float)p.p.y);
 					}
 					VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
 				}
@@ -201,9 +201,9 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 				PointIndex2D_F64 p = set.get(i);
 
 				if (showUndistorted) {
-					remove_p_to_p.compute((float)p.x, (float)p.y, adj);
+					remove_p_to_p.compute((float)p.p.x, (float)p.p.y, adj);
 				} else {
-					adj.setTo((float)p.x, (float)p.y);
+					adj.setTo((float)p.p.x, (float)p.p.y);
 				}
 
 				double r = scale*errorScale*results.pointError[i];
@@ -280,7 +280,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 
 		AffineTransform origTran = g2.getTransform();
 		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.get(i);
+			Point2D_F64 p = points.get(i).p;
 			int gridIndex = points.get(i).index;
 
 			if (transform != null) {
