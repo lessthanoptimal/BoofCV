@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class ExampleDetectCalibrationPoints {
 		// render and display the results
 		Graphics2D g2 = orig.createGraphics();
 		for( PointIndex2D_F64 p : set.points )
-			VisualizeFeatures.drawPoint(g2,p.x,p.y,3,Color.RED, true);
+			VisualizeFeatures.drawPoint(g2,p.p.x,p.p.y,3,Color.RED, true);
 
 		ShowImages.showWindow(orig,"Calibration Points", true);
 	}

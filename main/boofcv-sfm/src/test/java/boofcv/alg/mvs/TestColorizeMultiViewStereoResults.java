@@ -30,6 +30,7 @@ import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -45,7 +46,7 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 	 * Two images contribute to the point cloud. Each image has a different color so that the source of the RGB
 	 * value can be easily found.
 	 */
-	@Test void simple() {
+	@Test void simple_processMvsCloud() {
 		// scene with two views that are identical
 		var scene = new SceneStructureMetric(false);
 		scene.initialize(1, 2, 0);
@@ -73,7 +74,7 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 		mvs.disparityCloud.cloud.grow().setTo(0, 0, 1);
 
 		var alg = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.SB_U8(), new MockLookUp());
-		alg.process(scene, mvs, ( idx, r, g, b ) -> {
+		alg.processMvsCloud(scene, mvs, ( idx, r, g, b ) -> {
 			// we can assume the first view is called first, but that's not strictly required to be correct
 			int expected = idx == 0 ? 10 : 15;
 			assertEquals(expected, r);
@@ -84,6 +85,10 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 
 		// make sure the functions were called
 		assertEquals(2, count);
+	}
+
+	@Test void simple_processScenePoints() {
+		fail("IMplement");
 	}
 
 	class MockLookUp implements LookUpImages {

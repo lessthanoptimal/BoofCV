@@ -16,14 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.mvs;
+package boofcv.io.image;
+
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Processes 3D points one at a time given their index.
- *
  * @author Peter Abeles
  */
-@FunctionalInterface
-public interface IndexPoint3 {
-	void process( int index, double x, double y, double z);
+public class TestLookUpImageFilesByIndex extends BoofStandardJUnit {
+	@Test void implement() {
+		fail("implement");
+	}
 }
