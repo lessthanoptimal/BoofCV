@@ -115,6 +115,15 @@ public class MultiViewIO {
 		out.close();
 	}
 
+	public static void save( SceneStructureMetric scene, String path ) {
+		try {
+			Writer writer = new OutputStreamWriter(new FileOutputStream(path), UTF_8);
+			save(scene, writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
 	/**
 	 * Saves a {@link SceneStructureMetric} into the {@link Writer}.
 	 *
@@ -252,6 +261,15 @@ public class MultiViewIO {
 		};
 
 		return c;
+	}
+
+	public static SceneStructureMetric load( String path, @Nullable SceneStructureMetric graph ) {
+		try {
+			Reader reader = new InputStreamReader(new FileInputStream(path), UTF_8);
+			return load(reader, graph);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**

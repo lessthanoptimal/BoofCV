@@ -82,6 +82,11 @@ public interface BoofLambdas {
 		void process( int index , T object );
 	}
 
+	@FunctionalInterface
+	interface IndexToString {
+		String process( int index );
+	}
+
 	@FunctionalInterface interface Match_I8 { boolean process( byte value ); }
 
 	@FunctionalInterface interface Match_I16 { boolean process( short value ); }

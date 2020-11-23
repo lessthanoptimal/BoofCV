@@ -18,30 +18,32 @@
 
 package boofcv.struct.geo;
 
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.GeoTuple;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * A 3D point with an index associated with it
+ * Base class for all PointIndex implementations.
  *
  * @author Peter Abeles
  */
-public class PointIndex3D_F64 extends PointIndex<PointIndex3D_F64, Point3D_F64> {
+public abstract class PointIndex<T extends PointIndex<T,P>, P extends GeoTuple<P>> {
+	public @Getter final P p;
+	public @Getter @Setter int index;
 
-	public PointIndex3D_F64( double x, double y, double z, int index ) { this();setTo(x, y, z, index); }
+	public PointIndex( P p ) {
+		this.p = p;
+	}
 
-	public PointIndex3D_F64( double x, double y, double z ) { this();setTo(x, y, z, 0);}
-
-	public PointIndex3D_F64() {super(new Point3D_F64());}
-
-	public PointIndex3D_F64( Point3D_F64 p, int index ) { this();setTo(p, index); }
-
-	public void setTo( double x, double y, double z, int index ) {
-		this.p.setTo(x, y, z);
+	public void setTo( P point, int index ) {
+		this.p.setTo(point);
 		this.index = index;
 	}
 
-	@Override
-	public PointIndex3D_F64 copy() {
-		return new PointIndex3D_F64(p, index);
+	public void setTo( T src ) {
+		this.p.setTo(src.p);
+		this.index = src.index;
 	}
+
+	public abstract T copy();
 }

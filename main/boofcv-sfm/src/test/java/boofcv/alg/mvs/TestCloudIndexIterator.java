@@ -18,12 +18,16 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
- * Processes 3D points in homogenous coordinates one at a time given their index.
- *
  * @author Peter Abeles
  */
-@FunctionalInterface
-public interface IndexPoint4 {
-	void process( int index, double x, double y, double z, double w);
+public class TestCloudIndexIterator extends BoofStandardJUnit {
+	@Test void implement() {
+		fail("implement");
+	}
 }

@@ -16,32 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.alg.mvs;
 
-import georegression.struct.point.Point2D_F64;
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * A 2D point with an index associated with it
- *
  * @author Peter Abeles
  */
-public class PointIndex2D_F64 extends PointIndex<PointIndex2D_F64, Point2D_F64> {
-
-	public PointIndex2D_F64( double x, double y, int index ) { this();setTo(x, y, index); }
-
-	public PointIndex2D_F64( double x, double y ) { this();setTo(x, y, 0);}
-
-	public PointIndex2D_F64() {super(new Point2D_F64());}
-
-	public PointIndex2D_F64( Point2D_F64 p, int index ) { this();setTo(p, index); }
-
-	public void setTo( double x, double y, int index ) {
-		this.p.setTo(x, y);
-		this.index = index;
-	}
-
-	@Override
-	public PointIndex2D_F64 copy() {
-		return new PointIndex2D_F64(p, index);
+public class TestScenePointsSetIterator extends BoofStandardJUnit {
+	@Test void implement() {
+		fail("implement");
 	}
 }

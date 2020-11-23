@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.dialogs.FilePreviewChooser;
@@ -33,6 +34,9 @@ import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.visualize.PointCloudViewer;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
@@ -816,6 +820,43 @@ public class BoofSwingUtil {
 			file = ensureSuffix(file, ".png");
 			UtilImageIO.saveImage(output, file.getAbsolutePath());
 		}
+	}
+
+	/**
+	 * Renders camera views as squares from a {@link SceneStructureMetric}
+	 */
+	public static void visualizeCameras( SceneStructureMetric structure, PointCloudViewer viewer ) {
+		FastQueue<Point3D_F64> vertexes = new FastQueue<>(Point3D_F64::new);
+		Se3_F64 world_to_view = new Se3_F64();
+		Se3_F64 view_to_world = new Se3_F64();
+		Se3_F64 tmpSE3 = new Se3_F64();
+		double r = 0.1;
+		structure.views.forEach(v->{
+			structure.getWorldToView(v,world_to_view,tmpSE3).invert(view_to_world);
+
+			// Represent the camera with a box
+			vertexes.reset();
+			vertexes.grow().setTo(-r, -r, 0);
+			vertexes.grow().setTo(r, -r, 0);
+			vertexes.grow().setTo(r, r, 0);
+			vertexes.grow().setTo(-r, r, 0);
+
+			for (int j = 0; j < vertexes.size; j++) {
+				var p = vertexes.get(j);
+				SePointOps_F64.transform(view_to_world, p, p);
+			}
+			viewer.addWireFrame(vertexes.toList(), true, 0xFF0000, 1);
+
+			// Line indicating pointing direction
+			vertexes.reset();
+			vertexes.grow().setTo(0, 0, 0);
+			vertexes.grow().setTo(0, 0, r);
+			for (int j = 0; j < vertexes.size; j++) {
+				var p = vertexes.get(j);
+				SePointOps_F64.transform(view_to_world, p, p);
+			}
+			viewer.addWireFrame(vertexes.toList(), false, 0x0000FF, 1);
+		});
 	}
 
 	public static class RecentFiles {
