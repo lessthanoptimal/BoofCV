@@ -152,7 +152,7 @@ public class SceneObservations {
 				throw new IndexOutOfBoundsException(index + " >= " + point.size);
 			observation.index = point.data[index];
 			index *= 2;
-			observation.setTo(observations.data[index], observations.data[index + 1]);
+			observation.p.setTo(observations.data[index], observations.data[index + 1]);
 		}
 
 		/**

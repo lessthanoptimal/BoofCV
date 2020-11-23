@@ -172,7 +172,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 			// TODO ensure that the order is correct. Kinda a pain since some targets have symmetry...
 			double bestDistance = Double.MAX_VALUE;
 			for (int j = 0; j < found.size(); j++) {
-				double distance = found.get(j).distance(truth);
+				double distance = found.get(j).p.distance(truth);
 				if (distance < bestDistance) {
 					bestDistance = distance;
 				}
@@ -197,11 +197,11 @@ public abstract class GenericPlanarCalibrationDetectorChecks extends BoofStandar
 		Point2D_F64 p, f;
 		if (found != null) {
 			for (int j = 0; j < found.size(); j++) {
-				f = found.get(j);
+				f = found.get(j).p;
 				VisualizeFeatures.drawPoint(g2, f.x, f.y, 2, Color.RED, false);
 			}
 			g2.setStroke(new BasicStroke(5));
-			f = found.get(0);
+			f = found.get(0).p;
 			VisualizeFeatures.drawCircle(g2, f.x, f.y, 4);
 		}
 		Point2D_F64 truth = new Point2D_F64();

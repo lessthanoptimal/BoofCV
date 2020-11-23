@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,8 +125,8 @@ public class BundleAdjustmentProjectiveResidualFunction
 
 				// Save results
 				int outputIndex = observationIndex*2;
-				output[outputIndex] = predictedPixel.x - observedPixel.x;
-				output[outputIndex + 1] = predictedPixel.y - observedPixel.y;
+				output[outputIndex] = predictedPixel.x - observedPixel.p.x;
+				output[outputIndex + 1] = predictedPixel.y - observedPixel.p.y;
 				observationIndex++;
 			}
 		}
@@ -155,8 +155,8 @@ public class BundleAdjustmentProjectiveResidualFunction
 
 				// Save results
 				int outputIndex = observationIndex*2;
-				output[outputIndex] = predictedPixel.x - observedPixel.x;
-				output[outputIndex + 1] = predictedPixel.y - observedPixel.y;
+				output[outputIndex] = predictedPixel.x - observedPixel.p.x;
+				output[outputIndex + 1] = predictedPixel.y - observedPixel.p.y;
 				observationIndex++;
 			}
 		}

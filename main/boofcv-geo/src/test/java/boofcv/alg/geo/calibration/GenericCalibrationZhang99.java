@@ -229,7 +229,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 				worldToView.transform(worldP,viewP);
 				PointIndex2D_F64 pixel = new PointIndex2D_F64();
 
-				p2p.compute(viewP.x,viewP.y,viewP.z,pixel);
+				p2p.compute(viewP.x,viewP.y,viewP.z,pixel.p);
 				pixel.index = i;
 				obs.points.add(pixel);
 			}

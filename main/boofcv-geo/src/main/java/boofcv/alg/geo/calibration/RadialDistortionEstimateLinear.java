@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,23 +55,23 @@ import java.util.List;
  * <p>
  * [1] Zhengyou Zhang, "Flexible Camera Calibration By Viewing a Plane From Unknown Orientations," 1999
  * </p>
+ *
  * @author Peter Abeles
  */
 public class RadialDistortionEstimateLinear {
 	// matrices in the linear equations
-	private DMatrixRMaj A = new DMatrixRMaj(1,1);
-	private DMatrixRMaj B = new DMatrixRMaj(1,1);
+	private final DMatrixRMaj A = new DMatrixRMaj(1, 1);
+	private final DMatrixRMaj B = new DMatrixRMaj(1, 1);
 
 	// where the results are stored
-	private DMatrixRMaj X;
+	private final DMatrixRMaj X;
 
 	// linear solver
-	private LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(0, 0);
+	private final LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(0, 0);
 
 	// location of grid coordinates in the world frame.
 	// the z-axis is assumed to be zero
-	private List<Point2D_F64> worldPoints;
-
+	private final List<Point2D_F64> worldPoints;
 
 	/**
 	 * Creates a estimator for the specified number of distortion parameters.
@@ -79,9 +79,9 @@ public class RadialDistortionEstimateLinear {
 	 * @param layout Description of calibration grid
 	 * @param numParam Number of radial distortion parameters. Two is a good number.
 	 */
-	public RadialDistortionEstimateLinear(List<Point2D_F64> layout, int numParam) {
+	public RadialDistortionEstimateLinear( List<Point2D_F64> layout, int numParam ) {
 		worldPoints = layout;
-		X = new DMatrixRMaj(numParam,1);
+		X = new DMatrixRMaj(numParam, 1);
 	}
 
 	/**
@@ -90,80 +90,78 @@ public class RadialDistortionEstimateLinear {
 	 * @param cameraCalibration Camera calibration matrix.  Not modified.
 	 * @param observations Observations of calibration grid. Not modified.
 	 */
-	public void process( DMatrixRMaj cameraCalibration ,
-						 List<DMatrixRMaj> homographies ,
-						 List<CalibrationObservation> observations )
-	{
-		init( observations );
+	public void process( DMatrixRMaj cameraCalibration,
+						 List<DMatrixRMaj> homographies,
+						 List<CalibrationObservation> observations ) {
+		init(observations);
 
-		setupA_and_B(cameraCalibration,homographies,observations);
+		setupA_and_B(cameraCalibration, homographies, observations);
 
-		if( !solver.setA(A) )
+		if (!solver.setA(A))
 			throw new RuntimeException("Solver had problems");
 
-		solver.solve(B,X);
+		solver.solve(B, X);
 	}
 
 	/**
 	 * Declares and sets up data structures
 	 */
-	private void init( List<CalibrationObservation> observations )
-	{
+	private void init( List<CalibrationObservation> observations ) {
 		int totalPoints = 0;
 		for (int i = 0; i < observations.size(); i++) {
 			totalPoints += observations.get(i).size();
 		}
 
-		A.reshape(2*totalPoints,X.numRows,false);
-		B.reshape(A.numRows,1,false);
+		A.reshape(2*totalPoints, X.numRows, false);
+		B.reshape(A.numRows, 1, false);
 	}
 
-	private void setupA_and_B( DMatrixRMaj K ,
-							   List<DMatrixRMaj> homographies ,
-							   List<CalibrationObservation> observations) {
+	private void setupA_and_B( DMatrixRMaj K,
+							   List<DMatrixRMaj> homographies,
+							   List<CalibrationObservation> observations ) {
 
 		final int N = observations.size();
 
 		// image center in pixels
-		double u0 = K.get(0,2); // image center x-coordinate
-		double v0 = K.get(1,2); // image center y-coordinate
+		double u0 = K.get(0, 2); // image center x-coordinate
+		double v0 = K.get(1, 2); // image center y-coordinate
 
 		// projected predicted
 		Point2D_F64 projCalibrated = new Point2D_F64();
 		Point2D_F64 projPixel = new Point2D_F64();
 
 		int pointIndex = 0;
-		for( int indexObs = 0; indexObs < N; indexObs++ ) {
+		for (int indexObs = 0; indexObs < N; indexObs++) {
 			DMatrixRMaj H = homographies.get(indexObs);
 			CalibrationObservation set = observations.get(indexObs);
 
-			for( int i = 0; i < set.size(); i++ ) {
+			for (int i = 0; i < set.size(); i++) {
 				int gridIndex = set.get(i).index;
-				Point2D_F64 obsPixel = set.get(i);
+				Point2D_F64 obsPixel = set.get(i).p;
 
 				// location of grid point in world coordinate (x,y,0)  assume z=0
 				Point2D_F64 gridPt = worldPoints.get(gridIndex);
 
 				// compute the predicted location of the point in calibrated units
-				GeometryMath_F64.mult(H,gridPt, projCalibrated);
+				GeometryMath_F64.mult(H, gridPt, projCalibrated);
 
 				// compute the predicted location in (uncalibrated) pixels
-				GeometryMath_F64.mult(K,projCalibrated,projPixel);
+				GeometryMath_F64.mult(K, projCalibrated, projPixel);
 
 				// construct the matrices
 				double r2 = projCalibrated.x*projCalibrated.x + projCalibrated.y*projCalibrated.y;
 
 				double a = 1.0;
-				for( int j = 0; j < X.numRows; j++ ) {
+				for (int j = 0; j < X.numRows; j++) {
 					a *= r2;
 
-					A.set(pointIndex*2+0,j,(projPixel.x-u0)*a);
-					A.set(pointIndex*2+1,j,(projPixel.y-v0)*a);
+					A.set(pointIndex*2 + 0, j, (projPixel.x - u0)*a);
+					A.set(pointIndex*2 + 1, j, (projPixel.y - v0)*a);
 				}
 
 				// observed location
-				B.set(pointIndex*2+0,0,obsPixel.x-projPixel.x);
-				B.set(pointIndex*2+1,0,obsPixel.y-projPixel.y);
+				B.set(pointIndex*2 + 0, 0, obsPixel.x - projPixel.x);
+				B.set(pointIndex*2 + 1, 0, obsPixel.y - projPixel.y);
 
 				pointIndex++;
 			}
@@ -178,5 +176,4 @@ public class RadialDistortionEstimateLinear {
 	public double[] getParameters() {
 		return X.data;
 	}
-
 }

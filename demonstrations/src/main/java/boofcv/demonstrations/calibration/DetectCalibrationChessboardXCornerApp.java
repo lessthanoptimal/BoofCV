@@ -262,7 +262,7 @@ public class DetectCalibrationChessboardXCornerApp
 					CalibrationObservation detected = detector.getDetectedPoints();
 					foundChessboard.reset();
 					for (int i = 0; i < detected.size(); i++) {
-						foundChessboard.grow().set(detected.get(i));
+						foundChessboard.grow().setTo(detected.get(i));
 					}
 				}
 

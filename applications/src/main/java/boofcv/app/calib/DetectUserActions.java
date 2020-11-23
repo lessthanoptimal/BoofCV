@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,7 @@ public class DetectUserActions {
 	private double averageDifference( CalibrationObservation reference ) {
 		double average = 0;
 		for( int i = 0; i < points.size(); i++ ) {
-			double difference = reference.points.get(i).distance(points.points.get(i));
+			double difference = reference.points.get(i).p.distance(points.points.get(i).p);
 
 			average += difference;
 		}
@@ -102,7 +102,7 @@ public class DetectUserActions {
 		double centerX = 0, centerY = 0;
 
 		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.points.get(i);
+			Point2D_F64 p = points.points.get(i).p;
 
 			centerX += p.x;
 			centerY += p.y;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,8 @@ import java.util.List;
  */
 public class Zhang99ComputeTargetHomography {
 
-	private Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
-	private DMatrixRMaj found = new DMatrixRMaj(3,3);
+	private final Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
+	private final DMatrixRMaj found = new DMatrixRMaj(3,3);
 
 	// location of calibration points in the target frame's in world units.
 	// the z-axis is assumed to be zero
@@ -71,7 +71,7 @@ public class Zhang99ComputeTargetHomography {
 		List<AssociatedPair> pairs = new ArrayList<>();
 		for( int i = 0; i < observedPoints.size(); i++ ) {
 			int which = observedPoints.get(i).index;
-			Point2D_F64 obs = observedPoints.get(i);
+			Point2D_F64 obs = observedPoints.get(i).p;
 
 			pairs.add( new AssociatedPair(worldPoints.get(which),obs,true));
 		}

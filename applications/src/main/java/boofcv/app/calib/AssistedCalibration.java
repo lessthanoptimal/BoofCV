@@ -267,7 +267,7 @@ public class AssistedCalibration {
 			if( skewed ) {
 				g2.setColor(Color.BLUE);
 				for (int i = 0; i < points.size(); i++) {
-					Point2D_F64 p = points.points.get(i);
+					Point2D_F64 p = points.points.get(i).p;
 
 					ellipse.setFrame(p.x - r, p.y - r, w, w);
 					g2.draw(ellipse);
@@ -432,7 +432,7 @@ public class AssistedCalibration {
 		int r = 6;
 		int w = 2 * r;
 		for (int i = 0; i < points.size(); i++) {
-			PointIndex2D_F64 p = points.get(i);
+			Point2D_F64 p = points.get(i).p;
 			ellipse.setFrame(p.x - r, p.y - r, w, w);
 			g2.fill(ellipse);
 		}

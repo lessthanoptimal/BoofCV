@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardXCornerPatterns;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
@@ -79,7 +78,7 @@ public class CalibrationDetectorChessboardX
 			// remove lens distortion
 			if( pixel2undist != null ) {
 				for (int i = 0; i < info.nodes.size(); i++) {
-					PointIndex2D_F64 p = detected.points.get(i);
+					Point2D_F64 p = detected.points.get(i).p;
 					pixel2undist.compute(p.x,p.y,p);
 				}
 			}

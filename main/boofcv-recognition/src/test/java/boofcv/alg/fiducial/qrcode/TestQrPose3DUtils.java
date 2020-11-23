@@ -56,7 +56,7 @@ public class TestQrPose3DUtils extends BoofStandardJUnit {
 
 		assertEquals(12,list.size());
 		for (int i = 0; i < 12; i++) {
-			assertEquals(0,list.get(i).distance(i,i+1), UtilEjml.TEST_F64);
+			assertEquals(0,list.get(i).p.distance(i,i+1), UtilEjml.TEST_F64);
 		}
 	}
 
