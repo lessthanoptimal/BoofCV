@@ -78,6 +78,7 @@ public class SceneWorkingGraph {
 		v.pview = pview;
 		checkTrue(null == views.put(v.pview.id, v),
 				"There shouldn't be an existing view with the same key: '" + v.pview.id + "'");
+		v.index = viewList.size();
 		viewList.add(v);
 		return v;
 	}
@@ -185,7 +186,7 @@ public class SceneWorkingGraph {
 		public final Se3_F64 world_to_view = new Se3_F64();
 		public final ImageDimension imageDimension = new ImageDimension();
 
-		// index in list of views. Only value during construction of SBA data structures
+		// Index of the view in the list. This will be the same index in the SBA scene
 		public int index=-1;
 
 		/**

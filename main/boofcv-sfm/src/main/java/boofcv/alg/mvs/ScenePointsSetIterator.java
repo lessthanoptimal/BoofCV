@@ -18,34 +18,49 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.misc.IteratorReset;
 import boofcv.struct.geo.PointIndex;
 import georegression.struct.GeoTuple;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
-import java.util.Iterator;
-
 /**
- * Given a set of points by index for a scene, iterator through them one at a time.
+ * Given a {@link SceneStructureMetric scene}, this will iterate through points in that scene that are inside
+ * of a provided array full of indexes. This handles 3D and homogenous points.
  *
  * @author Peter Abeles
  */
-public class ScenePointsSetIterator<T extends PointIndex<T,P>, P extends GeoTuple<P>> implements Iterator<T> {
-	SceneStructureMetric scene;
+public class ScenePointsSetIterator<T extends PointIndex<T, P>, P extends GeoTuple<P>> implements IteratorReset<T> {
+	// Reference to the scene. Only it's points are used
+	SceneStructureCommon scene;
+	// Set if points in the scene
 	GrowQueue_I32 indexes;
+	// which element in 'indexes' is the current index
 	int index;
+	// Storage for the point. Returned by next
 	T point;
 
-	public ScenePointsSetIterator( SceneStructureMetric scene, GrowQueue_I32 indexes, T point ) {
+	/**
+	 * Constructor
+	 *
+	 * @param scene (Input) The scene which is to be iterated through
+	 * @param indexes (Input) Indexes that specify which features in the scene it should be iterating through
+	 * @param point (Input,Output) Storage for the point. Make sure you get 3D vs homogenous correct.
+	 */
+	public ScenePointsSetIterator( SceneStructureCommon scene, GrowQueue_I32 indexes, T point ) {
 		this(point);
 		initialize(scene, indexes);
 	}
 
-	public ScenePointsSetIterator(T point) {this.point=point;}
+	public ScenePointsSetIterator( T point ) {this.point = point;}
 
-	public void initialize( SceneStructureMetric scene, GrowQueue_I32 indexes) {
+	/**
+	 * Re-initializes and can be used to change the scene and set of indexes
+	 */
+	public void initialize( SceneStructureCommon scene, GrowQueue_I32 indexes ) {
 		if (scene.isHomogenous() != point.p instanceof Point4D_F64)
 			throw new IllegalArgumentException("Scene point type does not match provided point type");
 
@@ -54,7 +69,7 @@ public class ScenePointsSetIterator<T extends PointIndex<T,P>, P extends GeoTupl
 		this.index = 0;
 	}
 
-	public void reset() {
+	@Override public void reset() {
 		index = 0;
 	}
 
@@ -62,6 +77,9 @@ public class ScenePointsSetIterator<T extends PointIndex<T,P>, P extends GeoTupl
 		return index < indexes.size;
 	}
 
+	/**
+	 * Returns a copy of the next point in the scene. This is overwritten on the next call.
+	 */
 	@Override public T next() {
 		// Get the index of the point in this scene
 		int indexScene = indexes.get(index++);

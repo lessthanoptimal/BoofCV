@@ -18,10 +18,10 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.misc.IteratorReset;
 import boofcv.struct.geo.PointIndex;
 import georegression.struct.GeoTuple;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -30,13 +30,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CloudIndexIterator<T extends PointIndex<T,P>, P extends GeoTuple<P>> implements Iterator<T> {
+public class PointToIndexIterator<T extends PointIndex<T,P>, P extends GeoTuple<P>> implements IteratorReset<T> {
 	List<P> list;
 	int idx0, idx1;
 	int index;
 	T point;
 
-	public CloudIndexIterator( List<P> list, int idx0, int idx1, T point ) {
+	public PointToIndexIterator( List<P> list, int idx0, int idx1, T point ) {
 		this.list = list;
 		this.idx0 = idx0;
 		this.idx1 = idx1;
@@ -44,7 +44,7 @@ public class CloudIndexIterator<T extends PointIndex<T,P>, P extends GeoTuple<P>
 		this.point = point;
 	}
 
-	public void reset() {
+	@Override public void reset() {
 		index = idx0;
 	}
 

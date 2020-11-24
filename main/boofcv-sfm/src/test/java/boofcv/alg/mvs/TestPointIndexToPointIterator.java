@@ -18,16 +18,36 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F64;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestCloudIndexIterator extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("implement");
+public class TestPointIndexToPointIterator extends BoofStandardJUnit {
+	@Test void basic() {
+		List<Point2D_F64> list = new ArrayList<>();
+		list.add(new Point2D_F64(1.0, 2.0));
+		list.add(new Point2D_F64(2.0, 2.0));
+		list.add(new Point2D_F64(3.0, 2.0));
+
+		var alg = new PointToIndexIterator<>(list, 1, 3, new PointIndex2D_F64());
+
+		for (int i = 1; i < list.size(); i++) {
+			assertTrue(alg.hasNext());
+			PointIndex2D_F64 found = alg.next();
+			assertEquals(i, found.index);
+			assertEquals(0.0, list.get(i).distance(found.p), UtilEjml.TEST_F64);
+		}
+
+		assertFalse(alg.hasNext());
 	}
 }

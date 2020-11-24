@@ -18,16 +18,37 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.struct.geo.PointIndex4D_F64;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestScenePointsSetIterator extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("implement");
+	@Test void basic() {
+		var scene = new SceneStructureMetric(true);
+		scene.initialize(1, 1, 5);
+		for (int i = 0; i < 5; i++) {
+			scene.setPoint(i, 1, i + 2, 3, 4);
+		}
+
+		var indexes = GrowQueue_I32.array(1, 3);
+
+		var alg = new ScenePointsSetIterator<>(scene, indexes, new PointIndex4D_F64());
+
+		for (int i = 0; i < indexes.size; i++) {
+			assertTrue(alg.hasNext());
+
+			PointIndex4D_F64 found = alg.next();
+			assertEquals(i*2 + 1, found.index);
+			assertEquals(0.0, found.p.distance(1, (i*2 + 3), 3, 4), UtilEjml.TEST_F64);
+		}
+		assertFalse(alg.hasNext());
 	}
 }

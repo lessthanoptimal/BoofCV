@@ -87,6 +87,17 @@ public interface BoofLambdas {
 		String process( int index );
 	}
 
+	@FunctionalInterface
+	interface ConvertOut<In, Out> {
+		Out process( In src );
+	}
+
+	@FunctionalInterface
+	interface ConvertCopy<In, Out> {
+		void process( In src, Out dst );
+	}
+
+
 	@FunctionalInterface interface Match_I8 { boolean process( byte value ); }
 
 	@FunctionalInterface interface Match_I16 { boolean process( short value ); }

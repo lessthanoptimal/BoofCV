@@ -62,7 +62,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	private @Getter @Setter @Nullable Listener<Image> listener;
 
 	/** Computes disparity between each image pair. Must be set. */
-	@Getter @Setter @Nullable StereoDisparity<Image, GrayF32> setStereoDisparity = null;
+	@Getter @Setter @Nullable StereoDisparity<Image, GrayF32> stereoDisparity = null;
 
 	//------------ References to input objects
 	private SceneStructureMetric scene; // Camera placement and parameters
@@ -121,7 +121,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process( int targetID, GrowQueue_I32 pairs ) {
-		requireNonNull(setStereoDisparity, "setStereoDisparity must be configured");
+		requireNonNull(stereoDisparity, "setStereoDisparity must be configured");
 
 		// Precompute what little can be for the target / left / image1
 		Image image1 = images.get(targetID);
@@ -201,14 +201,14 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		distortRight.apply(image2, rectified2);
 
 		// Compute disparity from the rectified images
-		requireNonNull(setStereoDisparity).process(rectified1, rectified2);
+		requireNonNull(stereoDisparity).process(rectified1, rectified2);
 
 		// Save the results
-		info.disparity = setStereoDisparity.getDisparity();
+		info.disparity = stereoDisparity.getDisparity();
 
 		DisparityParameters param = info.param;
-		param.disparityMin = setStereoDisparity.getDisparityMin();
-		param.disparityRange = setStereoDisparity.getDisparityRange();
+		param.disparityMin = stereoDisparity.getDisparityMin();
+		param.disparityRange = stereoDisparity.getDisparityRange();
 		param.baseline = left_to_right.T.norm();
 		PerspectiveOps.matrixToPinhole(info.rectifiedK, rectifiedShape.width, rectifiedShape.height, param.pinhole);
 	}

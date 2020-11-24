@@ -86,7 +86,7 @@ public class ExampleMultiviewSparseReconstruction {
 	PairwiseImageGraph pairwise = null;
 	LookupSimilarImages similarImages;
 	SceneWorkingGraph working = null;
-	SceneStructureMetric structure = null;
+	SceneStructureMetric scene = null;
 
 	public void compute( String videoName ) {
 		String path = UtilIO.pathExample("mvs/" + videoName);
@@ -245,11 +245,11 @@ public class ExampleMultiviewSparseReconstruction {
 
 		if (!forceRecompute)
 			try {
-				structure = MultiViewIO.load(savePath.getPath(), (SceneStructureMetric)null);
+				scene = MultiViewIO.load(savePath.getPath(), (SceneStructureMetric)null);
 			} catch (UncheckedIOException ignore) {}
 
 		SceneWorkingGraph _working = working;
-		if (structure == null) {
+		if (scene == null) {
 			System.out.println("----------------------------------------------------------------------------");
 			System.out.println("Refining the scene");
 
@@ -261,8 +261,8 @@ public class ExampleMultiviewSparseReconstruction {
 					System.out.println("REFINE FAILED");
 				}
 			}, "SBA refine");
-			structure = refine.bundleAdjustment.structure;
-			MultiViewIO.save(structure, savePath.getPath());
+			scene = refine.bundleAdjustment.structure;
+			MultiViewIO.save(scene, savePath.getPath());
 		} else {
 			System.out.println("Loaded Refined Scene");
 		}
@@ -273,7 +273,7 @@ public class ExampleMultiviewSparseReconstruction {
 	 * scene.
 	 */
 	public void visualizeSparseCloud() {
-		checkTrue(structure.isHomogenous());
+		checkTrue(scene.isHomogenous());
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
 		Point4D_F64 world = new Point4D_F64();
 
@@ -285,14 +285,14 @@ public class ExampleMultiviewSparseReconstruction {
 		var colorize = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), imageLookup);
 
 		GrowQueue_I32 rgb = new GrowQueue_I32();
-		rgb.resize(structure.points.size);
-		colorize.processScenePoints(structure,
+		rgb.resize(scene.points.size);
+		colorize.processScenePoints(scene,
 				( viewIdx ) -> viewIdx + "", // String encodes the image's index
 				( pointIdx, r, g, b ) -> rgb.set(pointIdx, (r << 16) | (g << 8) | b)); // Assign the RGB color
 
 		// Convert the structure into regular 3D points from homogenous
-		for (int i = 0; i < structure.points.size; i++) {
-			structure.points.get(i).get(world);
+		for (int i = 0; i < scene.points.size; i++) {
+			scene.points.get(i).get(world);
 			// If the point is at infinity it's not clear what to do. It would be best to skip it then the color
 			// array would be out of sync. Let's just throw it far far away then.
 			if (world.w == 0.0)
@@ -313,7 +313,7 @@ public class ExampleMultiviewSparseReconstruction {
 
 		SwingUtilities.invokeLater(() -> {
 			// Show where the cameras are
-			BoofSwingUtil.visualizeCameras(structure, viewer);
+			BoofSwingUtil.visualizeCameras(scene, viewer);
 
 			// Size the window and show it to the user
 			viewer.getComponent().setPreferredSize(new Dimension(600, 600));

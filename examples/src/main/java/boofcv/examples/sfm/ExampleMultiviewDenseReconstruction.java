@@ -103,7 +103,7 @@ public class ExampleMultiviewDenseReconstruction {
 		// the connection between two views are
 		var mvsGraph = new StereoPairGraph();
 		PairwiseImageGraph _pairwise = example.pairwise;
-		SceneStructureMetric _structure = example.structure;
+		SceneStructureMetric _structure = example.scene;
 		// Add a vertex for each view
 		BoofMiscOps.forIdx(example.working.viewList, ( i, wv ) -> mvsGraph.addVertex(wv.pview.id, i));
 		// Compute the 3D score for each connected view
@@ -132,8 +132,8 @@ public class ExampleMultiviewDenseReconstruction {
 		GrowQueue_I32 colorRgb = new GrowQueue_I32();
 		colorRgb.resize(mvs.getCloud().size());
 		var colorizeMvs = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), imageLookup);
-		colorizeMvs.processMvsCloud(example.structure, mvs, ( i, r, g, b ) -> colorRgb.set(i, (r << 16) | (g << 8) | b));
-		visualizeInPointCloud(mvs.getCloud(), colorRgb, example.structure);
+		colorizeMvs.processMvsCloud(example.scene, mvs, ( i, r, g, b ) -> colorRgb.set(i, (r << 16) | (g << 8) | b));
+		visualizeInPointCloud(mvs.getCloud(), colorRgb, example.scene);
 
 		// See the dense reconstruction example for a much better looking cloud
 	}
