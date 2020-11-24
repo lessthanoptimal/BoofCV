@@ -19,44 +19,13 @@
 package boofcv.misc;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
- * Implements {@link Iterator} for a range of numbers in a List.
+ * Extension of {@link Iterator} which allows you to call {@link #reset} to return it to its original state
  *
  * @author Peter Abeles
  */
-public class IteratorRange<T> implements IteratorReset<T> {
-	// List it's iterating through
-	List<T> list;
-	// low extent and upper extent
-	int idx0, idx1;
-
-	// The next index will return
-	int index;
-
-	public IteratorRange( List<T> list, int idx0, int idx1 ) {
-		this.list = list;
-		this.idx0 = idx0;
-		this.idx1 = idx1;
-		this.index = idx0;
-	}
-
-	public void reset(int idx0, int idx1 ) {
-		this.idx0 = idx0;
-		this.idx1 = idx1;
-		this.index = idx0;
-	}
-
-	@Override public void reset() {
-		this.index = idx0;
-	}
-
-	@Override public boolean hasNext() {
-		return index < idx1;
-	}
-
-	@Override public T next() {
-		return list.get(index++);
-	}
+public interface IteratorReset<T> extends Iterator<T> {
+	/** Returns the iterator to its original state allowing it to be reused */
+	void reset();
 }

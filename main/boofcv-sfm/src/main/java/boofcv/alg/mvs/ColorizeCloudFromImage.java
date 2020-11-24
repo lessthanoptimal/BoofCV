@@ -64,7 +64,7 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 	 */
 	public void process3( T image, List<Point3D_F64> cloud, int idx0, int idx1, Se3_F64 world_to_view,
 						  Point2Transform2_F64 norm_to_pixel, IndexColor colorizer ) {
-		var iterator = new CloudIndexIterator<>(cloud,idx0,idx1, new PointIndex3D_F64());
+		var iterator = new PointToIndexIterator<>(cloud,idx0,idx1, new PointIndex3D_F64());
 		process3(image, iterator, world_to_view, norm_to_pixel, colorizer);
 	}
 
@@ -105,7 +105,7 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 	 */
 	public void process4( T image, List<Point4D_F64> cloud, int idx0, int idx1, Se3_F64 world_to_view,
 						  Point2Transform2_F64 norm_to_pixel, IndexColor colorizer ) {
-		var iterator = new CloudIndexIterator<>(cloud,idx0,idx1, new PointIndex4D_F64());
+		var iterator = new PointToIndexIterator<>(cloud,idx0,idx1, new PointIndex4D_F64());
 		process4(image, iterator, world_to_view, norm_to_pixel, colorizer);
 	}
 

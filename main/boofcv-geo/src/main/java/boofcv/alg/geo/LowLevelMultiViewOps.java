@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
@@ -81,16 +82,18 @@ public class LowLevelMultiViewOps {
 	 * @param points Input: List of observed points. Not modified.
 	 * @param normalize Output: 3x3 normalization matrix for first set of points. Modified.
 	 */
-	public static void computeNormalizationLL( List<List<Point2D_F64>> points, NormalizationPoint2D normalize ) {
+	public static <In> void computeNormalizationLL( List<List<In>> points,
+													BoofLambdas.ConvertOut<In,Point2D_F64> convert,
+													NormalizationPoint2D normalize ) {
 		double meanX = 0;
 		double meanY = 0;
 
 		int count = 0;
 
 		for (int i = 0; i < points.size(); i++) {
-			List<Point2D_F64> l = points.get(i);
+			List<In> l = points.get(i);
 			for (int j = 0; j < l.size(); j++) {
-				Point2D_F64 p = l.get(j);
+				Point2D_F64 p = convert.process(l.get(j));
 				meanX += p.x;
 				meanY += p.y;
 			}
@@ -104,9 +107,9 @@ public class LowLevelMultiViewOps {
 		double stdY = 0;
 
 		for (int i = 0; i < points.size(); i++) {
-			List<Point2D_F64> l = points.get(i);
+			List<In> l = points.get(i);
 			for (int j = 0; j < l.size(); j++) {
-				Point2D_F64 p = l.get(j);
+				Point2D_F64 p = convert.process(l.get(j));
 				double dx = p.x - meanX;
 				double dy = p.y - meanY;
 				stdX += dx*dx;

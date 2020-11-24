@@ -197,7 +197,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * Sets up the listener for individual stereo pairs
 	 */
 	void initializeListener() {
-		Objects.requireNonNull(computeFused.getSetStereoDisparity(), "Must call setStereoDisparity() first");
+		Objects.requireNonNull(computeFused.getStereoDisparity(), "Must call setStereoDisparity() first");
 
 		if (listener != null) {
 			computeFused.setListener(( left, right, rectLeft, rectRight, disparity, mask, parameters, rect ) -> {
@@ -371,7 +371,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 	/** Specifies which stereo disparity algorithm to use */
 	public void setStereoDisparity( StereoDisparity<T, GrayF32> stereoDisparity ) {
-		computeFused.setSetStereoDisparity(stereoDisparity);
+		computeFused.setStereoDisparity(stereoDisparity);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
