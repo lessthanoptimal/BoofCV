@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,25 +34,21 @@ public class LensDistortionPinhole implements LensDistortionNarrowFOV {
 
 	CameraPinhole p;
 
-	public LensDistortionPinhole(CameraPinhole p) {
+	public LensDistortionPinhole( CameraPinhole p ) {
 		this.p = p;
 	}
 
 	@Override
-	public Point2Transform2_F64 distort_F64(boolean pixelIn, boolean pixelOut) {
-		if( pixelIn ) {
-			if( pixelOut ) {
+	public Point2Transform2_F64 distort_F64( boolean pixelIn, boolean pixelOut ) {
+		if (pixelIn) {
+			if (pixelOut) {
 				return new DoNothing2Transform2_F64();
 			} else {
-				PinholePtoN_F64 p2n = new PinholePtoN_F64();
-				p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
-				return p2n;
+				return new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			}
 		} else {
-			if( pixelOut ) {
-				PinholeNtoP_F64 n2p = new PinholeNtoP_F64();
-				n2p.set(p.fx, p.fy, p.skew, p.cx, p.cy);
-				return n2p;
+			if (pixelOut) {
+				return new PinholeNtoP_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
 				return new DoNothing2Transform2_F64();
 			}
@@ -60,25 +56,21 @@ public class LensDistortionPinhole implements LensDistortionNarrowFOV {
 	}
 
 	@Override
-	public Point2Transform2_F64 undistort_F64(boolean pixelIn, boolean pixelOut) {
-		return distort_F64(pixelIn,pixelOut);
+	public Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut ) {
+		return distort_F64(pixelIn, pixelOut);
 	}
 
 	@Override
-	public Point2Transform2_F32 distort_F32(boolean pixelIn, boolean pixelOut) {
-		if( pixelIn ) {
-			if( pixelOut ) {
+	public Point2Transform2_F32 distort_F32( boolean pixelIn, boolean pixelOut ) {
+		if (pixelIn) {
+			if (pixelOut) {
 				return new DoNothing2Transform2_F32();
 			} else {
-				PinholePtoN_F32 p2n = new PinholePtoN_F32();
-				p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
-				return p2n;
+				return new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			}
 		} else {
-			if( pixelOut ) {
-				PinholeNtoP_F32 n2p = new PinholeNtoP_F32();
-				n2p.set(p.fx, p.fy, p.skew, p.cx, p.cy);
-				return n2p;
+			if (pixelOut) {
+				return new PinholeNtoP_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
 				return new DoNothing2Transform2_F32();
 			}
@@ -86,22 +78,18 @@ public class LensDistortionPinhole implements LensDistortionNarrowFOV {
 	}
 
 	@Override
-	public Point2Transform2_F32 undistort_F32(boolean pixelIn, boolean pixelOut) {
-		return distort_F32(pixelIn,pixelOut);
+	public Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut ) {
+		return distort_F32(pixelIn, pixelOut);
 	}
 
 	@Override
 	public Point2Transform2_F32 normalized_F32() {
-		PinholePtoN_F32 p2n = new PinholePtoN_F32();
-		p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
-		return p2n;
+		return new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 	}
 
 	@Override
 	public Point2Transform2_F64 normalized_F64() {
-		PinholePtoN_F64 p2n = new PinholePtoN_F64();
-		p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
-		return p2n;
+		return new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 	}
 
 	public CameraPinhole getIntrinsic() {

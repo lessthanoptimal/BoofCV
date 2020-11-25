@@ -27,11 +27,11 @@ import lombok.Setter;
  *
  * @author Peter Abeles
  */
-public abstract class PointIndex<T extends PointIndex<T,P>, P extends GeoTuple<P>> {
+public abstract class PointIndex<T extends PointIndex<T, P>, P extends GeoTuple<P>> {
 	public @Getter final P p;
 	public @Getter @Setter int index;
 
-	public PointIndex( P p ) {
+	protected PointIndex( P p ) {
 		this.p = p;
 	}
 

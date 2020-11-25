@@ -26,9 +26,13 @@ import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.LookUpImages;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDimension;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
@@ -95,7 +99,8 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		scene.setView(1, 1, true, world_to_view1);
 		scene.setView(2, 2, true, world_to_view2);
 
-		var alg = new MultiViewToFusedDisparity<GrayF32>();
+		var lookup = new MockLookUp();
+		var alg = new MultiViewToFusedDisparity<>(lookup, ImageType.SB_F32);
 		// Not mocking disparity because of how complex that would be to pull off. This makes it a bit of an inexact
 		// science to ensure fill in
 		var configDisp = new ConfigDisparityBMBest5();
@@ -104,7 +109,6 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		configDisp.disparityMin = 20;
 		configDisp.disparityRange = 80;
 		alg.stereoDisparity = FactoryStereoDisparity.blockMatchBest5(configDisp, GrayF32.class, GrayF32.class);
-		TIntObjectMap<GrayF32> images = new TIntObjectHashMap<>();
 
 		// Textured target that stereo will work well on
 		var texture = new GrayF32(100, 100);
@@ -113,18 +117,20 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		SimulatePlanarWorld sim = new SimulatePlanarWorld();
 		sim.addSurface(eulerXyz(0, 0, 2, 0, Math.PI, 0, null), 3, texture);
 
+		List<GrayF32> images = new ArrayList<>();
+		TIntObjectMap<String> sbaIndexToViewID = new TIntObjectHashMap<>();
 		for (int i = 0; i < listIntrinsic.size(); i++) {
+			sbaIndexToViewID.put(i, i + "");
 			sim.setCamera(listIntrinsic.get(i));
 			sim.setWorldToCamera(scene.motions.get(i).motion);
-			GrayF32 image = sim.render().clone();
-			images.put(i, image);
+			images.add(sim.render().clone());
 
 			if (visualize)
-				ShowImages.showWindow(image, "Frame " + i);
+				ShowImages.showWindow(images.get(images.size() - 1), "Frame " + i);
 		}
+		lookup.images = images;
 
-		alg.initialize(scene, images);
-		assertTrue(alg.process(0, GrowQueue_I32.array(1, 2)));
+		assertTrue(alg.process(scene, 0, GrowQueue_I32.array(1, 2), sbaIndexToViewID::get));
 
 		GrayF32 found = alg.getFusedDisparity();
 		assertEquals(listIntrinsic.get(0).width, found.width);
@@ -168,19 +174,40 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 			scene.setView(i, 0, true, eulerXyz(i, 0, 0, 0, 0, 0, null));
 		}
 
-		var alg = new MultiViewToFusedDisparity<GrayF32>();
+		var alg = new MultiViewToFusedDisparity<>(ImageType.SB_F32);
 
 		var configDisp = new ConfigDisparityBMBest5();
 		configDisp.errorType = DisparityError.SAD;
 		configDisp.disparityRange = 5;
 		alg.stereoDisparity = FactoryStereoDisparity.blockMatchBest5(configDisp, GrayF32.class, GrayF32.class);
-		TIntObjectMap<GrayF32> images = new TIntObjectHashMap<>();
+		List<GrayF32> images = new ArrayList<>();
+		TIntObjectMap<String> sbaIndexToViewID = new TIntObjectHashMap<>();
 		for (int i = 0; i < 3; i++) {
-			images.put(i, new GrayF32(50, 50));
+			images.add(new GrayF32(50, 50));
+			sbaIndexToViewID.put(i, i + "");
 		}
+		alg.lookUpImages = new MockLookUp(images);
 
 		// just see if it blows up
-		alg.initialize(scene, images);
-		assertTrue(alg.process(0, GrowQueue_I32.array(1, 2)));
+		assertTrue(alg.process(scene, 0, GrowQueue_I32.array(1, 2), sbaIndexToViewID::get));
+	}
+
+	class MockLookUp implements LookUpImages {
+		List<GrayF32> images;
+
+		public MockLookUp( List<GrayF32> images ) {this.images = images;}
+
+		public MockLookUp() {}
+
+		@Override public boolean loadShape( String name, ImageDimension shape ) {
+			GrayF32 image = images.get(Integer.parseInt(name));
+			shape.setTo(image.width, image.height);
+			return true;
+		}
+
+		@Override public <LT extends ImageBase<LT>> boolean loadImage( String name, LT output ) {
+			output.setTo((LT)images.get(Integer.parseInt(name)));
+			return true;
+		}
 	}
 }

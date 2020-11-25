@@ -198,7 +198,7 @@ public class ImplRectifyImageOps_F64 {
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
 		PinholePtoN_F64 pixelToNorm = new PinholePtoN_F64();
-		pixelToNorm.set(rectifyK.get(0, 0), rectifyK.get(1, 1),
+		pixelToNorm.setK(rectifyK.get(0, 0), rectifyK.get(1, 1),
 				rectifyK.get(0, 1),
 				rectifyK.get(0, 2), rectifyK.get(1, 2));
 

@@ -137,7 +137,7 @@ public class ImplPerspectiveOps_F64 {
 			pixel = new Point2D_F64();
 
 		PinholeNtoP_F64 alg = new PinholeNtoP_F64();
-		alg.set(K.get(0, 0), K.get(1, 1), K.get(0, 1), K.get(0, 2), K.get(1, 2));
+		alg.setK(K.get(0, 0), K.get(1, 1), K.get(0, 1), K.get(0, 2), K.get(1, 2));
 
 		alg.compute(norm.x, norm.y, pixel);
 
@@ -160,7 +160,7 @@ public class ImplPerspectiveOps_F64 {
 			norm = new Point2D_F64();
 
 		PinholePtoN_F64 alg = new PinholePtoN_F64();
-		alg.set(K.get(0, 0), K.get(1, 1), K.get(0, 1), K.get(0, 2), K.get(1, 2));
+		alg.setK(K.get(0, 0), K.get(1, 1), K.get(0, 1), K.get(0, 2), K.get(1, 2));
 
 		alg.compute(pixel.x, pixel.y, norm);
 

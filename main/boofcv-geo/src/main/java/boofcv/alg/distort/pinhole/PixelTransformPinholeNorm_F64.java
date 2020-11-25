@@ -19,7 +19,7 @@
 package boofcv.alg.distort.pinhole;
 
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.distort.PixelTransform;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -28,13 +28,13 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class PinholePtoN_F64 implements Point2Transform2_F64 {
+public class PixelTransformPinholeNorm_F64 implements PixelTransform<Point2D_F64> {
 
 	// inverse of camera calibration matrix
 	// These are the upper triangular elements in a 3x3 matrix
 	private double a11, a12, a13, a22, a23;
 
-	public PinholePtoN_F64( PinholePtoN_F64 original ) {
+	public PixelTransformPinholeNorm_F64( PixelTransformPinholeNorm_F64 original ) {
 		this.a11 = original.a11;
 		this.a12 = original.a12;
 		this.a13 = original.a13;
@@ -42,13 +42,13 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 		this.a23 = original.a23;
 	}
 
-	public PinholePtoN_F64() {}
+	public PixelTransformPinholeNorm_F64() {}
 
-	public PinholePtoN_F64 setK( CameraPinhole pinhole ) {
-		return setK(pinhole.fx, pinhole.fy, pinhole.skew, pinhole.cx, pinhole.cy);
+	public PixelTransformPinholeNorm_F64 fset( CameraPinhole pinhole ) {
+		return fset(pinhole.fx, pinhole.fy, pinhole.skew, pinhole.cx, pinhole.cy);
 	}
 
-	public PinholePtoN_F64 setK(/**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
+	public PixelTransformPinholeNorm_F64 fset(/**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 		// analytic solution to matrix inverse
 		a11 = (double)(1.0/fx);
 		a12 = (double)(-skew/(fx*fy));
@@ -58,14 +58,13 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 		return this;
 	}
 
-	@Override
-	public void compute( double x, double y, Point2D_F64 out ) {
+	@Override public void compute( int x, int y, Point2D_F64 out ) {
 		out.x = a11*x + a12*y + a13;
 		out.y = a22*y + a23;
 	}
 
 	@Override
-	public PinholePtoN_F64 copyConcurrent() {
-		return new PinholePtoN_F64(this);
+	public PixelTransformPinholeNorm_F64 copyConcurrent() {
+		return new PixelTransformPinholeNorm_F64(this);
 	}
 }

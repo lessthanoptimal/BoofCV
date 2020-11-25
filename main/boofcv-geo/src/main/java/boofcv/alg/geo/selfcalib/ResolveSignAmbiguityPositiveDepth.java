@@ -77,7 +77,7 @@ public class ResolveSignAmbiguityPositiveDepth {
 		worldToViews.resize(numViews);
 
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
-			normalizers.get(viewIdx).set(views.intrinsics.get(viewIdx));
+			normalizers.get(viewIdx).setK(views.intrinsics.get(viewIdx));
 		}
 		for (int viewIdx = 1; viewIdx < numViews; viewIdx++) {
 			worldToViews.get(viewIdx).setTo(views.motion_1_to_k.get(viewIdx-1));
@@ -155,9 +155,9 @@ public class ResolveSignAmbiguityPositiveDepth {
 		worldToViews.get(1).setTo(result.view_1_to_2);
 		worldToViews.get(2).setTo(result.view_1_to_3);
 
-		normalize1.set(result.view1);
-		normalize2.set(result.view2);
-		normalize3.set(result.view3);
+		normalize1.setK(result.view1);
+		normalize2.setK(result.view2);
+		normalize3.setK(result.view3);
 
 		for (int trial = 0; trial < 2; trial++) {
 			int foundInvalid = 0;

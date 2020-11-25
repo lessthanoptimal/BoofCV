@@ -19,17 +19,19 @@
 package boofcv.alg.mvs;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.CameraPinhole;
+import boofcv.alg.distort.pinhole.PixelTransformPinholeNorm_F64;
+import boofcv.alg.mvs.impl.ImplMultiViewStereoOps;
+import boofcv.misc.BoofLambdas;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -65,7 +67,6 @@ public class MultiViewStereoOps {
 											 final Point2Transform2_F64 rectNorm_to_dispPixel,
 											 final double tolerance,
 											 final GrayU8 mask ) {
-
 		InputSanityCheck.checkSameShape(disparity, mask);
 		parameters.checkValidity();
 
@@ -130,47 +131,38 @@ public class MultiViewStereoOps {
 	 * @param disparity (Input) Disparity image
 	 * @param mask (Input) Mask specifying valid pixels in disparity image
 	 * @param parameters (Input) Parameters which describe the meaning of values in the disparity image
-	 * @param cloud (Output) Storage for point cloud. Reset is NOT called.
-	 * @return Computed point cloud
 	 */
-	public static FastQueue<Point3D_F64> disparityToCloud( GrayF32 disparity, GrayU8 mask,
-														   DisparityParameters parameters,
-														   @Nullable FastQueue<Point3D_F64> cloud ) {
-		InputSanityCheck.checkSameShape(disparity, mask);
+	public static void disparityToCloud( GrayF32 disparity, GrayU8 mask,
+										 DisparityParameters parameters,
+										 BoofLambdas.PixXyzConsumer_F64 consumer ) {
+		ImplMultiViewStereoOps.disparityToCloud(disparity, mask, parameters, consumer);
+	}
 
-		if (cloud == null)
-			cloud = new FastQueue<>(Point3D_F64::new);
+	/**
+	 * Converts the disparity image into a point cloud. Output cloud will be in camera frame
+	 * and not rectified frame.
+	 *
+	 * @param disparity (Input) Disparity image
+	 * @param parameters (Input) Parameters which describe the meaning of values in the disparity image
+	 * @param pixelToNorm (Input) Normally this can be set to null. If not null, then it specifies how to convert
+	 * pixels into normalized image coordinates. Almost always a disparity image has no lens distortion,
+	 * but in the unusual situation that it does (i.e. fused disparity) then you need to pass this in.
+	 * @param consumer (Output) Passes along the rectified pixel coordinate and 3D (X,Y,Z) for each
+	 * valid disparity point
+	 */
+	public static void disparityToCloud( ImageGray<?> disparity,
+										 DisparityParameters parameters,
+										 @Nullable PixelTransform<Point2D_F64> pixelToNorm,
+										 BoofLambdas.PixXyzConsumer_F64 consumer ) {
+		if (pixelToNorm == null)
+			pixelToNorm = new PixelTransformPinholeNorm_F64().fset(parameters.pinhole);
 
-		final CameraPinhole intrinsic = parameters.pinhole;
-		final double baseline = parameters.baseline;
-		final double disparityMin = parameters.disparityMin;
-		// pixel in normalized image coordinates
-		final Point2D_F64 norm = new Point2D_F64();
-
-		for (int y = 0; y < disparity.height; y++) {
-			int indexDisp = disparity.startIndex + y*disparity.stride;
-			int indexMask = mask.startIndex + y*mask.stride;
-
-			for (int x = 0; x < disparity.width; x++, indexDisp++, indexMask++) {
-				if (mask.data[indexMask] != 0)
-					continue;
-				float d = disparity.data[indexDisp];
-				if (d >= parameters.disparityRange)
-					continue;
-
-				PerspectiveOps.convertPixelToNorm(intrinsic, x, y, norm);
-
-				// Compute the point in rectified reference frame
-				Point3D_F64 X = cloud.grow();
-				X.z = baseline*intrinsic.fx/(d + disparityMin);
-				X.x = X.z*norm.x;
-				X.y = X.z*norm.y;
-
-				// Rotate back into the camera reference frame
-				GeometryMath_F64.multTran(parameters.rectifiedR, X, X);
-			}
+		if (disparity instanceof GrayF32) {
+			ImplMultiViewStereoOps.disparityToCloud((GrayF32)disparity, parameters, pixelToNorm, consumer);
+		} else if (disparity instanceof GrayU8) {
+			ImplMultiViewStereoOps.disparityToCloud((GrayU8)disparity, parameters, pixelToNorm, consumer);
+		} else {
+			throw new IllegalArgumentException("Unknown image type. " + disparity.getClass().getSimpleName());
 		}
-
-		return cloud;
 	}
 }

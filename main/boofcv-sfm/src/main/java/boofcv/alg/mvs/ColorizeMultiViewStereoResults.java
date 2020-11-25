@@ -25,6 +25,7 @@ import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure.ViewInfo;
 import boofcv.core.image.LookUpColorRgb;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.LookUpImages;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.PointIndex4D_F64;
@@ -86,7 +87,7 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 	 */
 	public void processMvsCloud( SceneStructureMetric scene,
 								 MultiViewStereoFromKnownSceneStructure<?> mvs,
-								 IndexColor indexColor ) {
+								 BoofLambdas.IndexRgbConsumer indexColor ) {
 
 		// Get a list of views that were used as "centers"
 		List<ViewInfo> centers = mvs.getListCenters();
@@ -106,8 +107,8 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 			int idx1 = mvs.getDisparityCloud().viewPointIdx.get(centerIdx + 1);
 
 			// Setup the camera projection model using bundle adjustment model directly
-			BundleAdjustmentOps.convert(scene.getViewCamera(center.metric).model,image.width,image.height,intrinsic);
-			Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false,true);
+			BundleAdjustmentOps.convert(scene.getViewCamera(center.metric).model, image.width, image.height, intrinsic);
+			Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false, true);
 
 			// Get the transform from world/cloud to this view
 			scene.getWorldToView(center.metric, world_to_view, tmp);
@@ -124,7 +125,9 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 	 * @param indexToId (Input) Convert view index to view ID
 	 * @param indexColor (Output) RGB values are passed through to this function.
 	 */
-	public void processScenePoints( SceneStructureMetric scene, BoofLambdas.IndexToString indexToId, IndexColor indexColor ) {
+	public void processScenePoints( SceneStructureMetric scene,
+									BoofLambdas.IndexToString indexToId,
+									BoofLambdas.IndexRgbConsumer indexColor ) {
 
 		// Loading images is expensive so when we get the color of each pixel we want to process all features
 		// inside the same image at once. Unfortunately there is no fast way to look up all features by image.
@@ -147,14 +150,14 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 			checkTrue(lookupImages.loadImage(indexToId.process(viewIdx), image), "Failed to load image");
 
 			// Set up the iterator for this image
-			iterator.initialize(scene,lookupPointsByView.get(viewIdx));
+			iterator.initialize(scene, lookupPointsByView.get(viewIdx));
 
 			// Get the view that is being processed
 			SceneStructureMetric.View v = scene.views.get(viewIdx);
 
 			// Setup the camera projection model using bundle adjustment model directly
-			BundleAdjustmentOps.convert(scene.getViewCamera(v).model,image.width,image.height,intrinsic);
-			Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false,true);
+			BundleAdjustmentOps.convert(scene.getViewCamera(v).model, image.width, image.height, intrinsic);
+			Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false, true);
 
 			// Get the transform from world/cloud to this view
 			scene.getWorldToView(v, world_to_view, tmp);

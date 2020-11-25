@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.mvs;
+package boofcv.alg.mvs.impl;
 
-/**
- * Specifies the RGB color for an index in an array.
- *
- * @author Peter Abeles
- */
-@FunctionalInterface
-public interface IndexColor {
-	void setRgb( int index, int red, int green, int blue);
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
+
+class TestImplMultiViewStereoOps extends BoofStandardJUnit {
+	@Test void notTestedHere() {
+		// This class is intentionally left blank since testing is done in TestMultiViewStereoOps
+	}
 }

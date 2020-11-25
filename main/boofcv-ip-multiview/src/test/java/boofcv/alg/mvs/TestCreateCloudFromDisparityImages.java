@@ -87,7 +87,9 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 		// Only the two pixels marked as invalid should be excluded
 		assertEquals(width*height - 2, alg.cloud.size);
 
-		FastQueue<Point3D_F64> expected = MultiViewStereoOps.disparityToCloud(disparity, mask, parameters, null);
+		FastQueue<Point3D_F64> expected = new FastQueue<>(Point3D_F64::new);
+		MultiViewStereoOps.disparityToCloud(disparity, mask, parameters,
+				( pixX, pixY, x, y, z ) -> expected.grow().setTo(x, y, z));
 
 		// While not a strict requirement, the order of the two point clouds should match because they are both
 		// processed in a row-major order

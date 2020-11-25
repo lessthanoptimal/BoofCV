@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.mvs;
+package boofcv.misc;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageDimension;
 public interface LookUpImages {
 	/**
 	 * Loads the shape for an image
+	 *
 	 * @param name (Input) Name of the image
 	 * @param shape (Output) shape of the image
 	 * @return true if the image was found or false if not
