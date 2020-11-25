@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort.pinhole;
 
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 
@@ -41,7 +42,11 @@ public class PinholeNtoP_F64 implements Point2Transform2_F64 {
 
 	public PinholeNtoP_F64() {}
 
-	public PinholeNtoP_F64 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
+	public PinholeNtoP_F64 setK( CameraPinhole pinhole ) {
+		return setK(pinhole.fx, pinhole.fy, pinhole.skew, pinhole.cx, pinhole.cy);
+	}
+
+	public PinholeNtoP_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 		this.fx = (double)fx;
 		this.fy = (double)fy;
 		this.skew = (double)skew;

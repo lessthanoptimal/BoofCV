@@ -23,14 +23,11 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyDistortImageOps;
-import boofcv.misc.BoofMiscOps;
+import boofcv.misc.BoofLambdas;
+import boofcv.misc.LookUpImages;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 import georegression.struct.se.Se3_F64;
-import gnu.trove.map.TIntObjectMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -64,9 +61,11 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	/** Computes disparity between each image pair. Must be set. */
 	@Getter @Setter @Nullable StereoDisparity<Image, GrayF32> stereoDisparity = null;
 
+	/** Used to retrieve images by their ID */
+	@Getter @Setter LookUpImages lookUpImages = null;
+
 	//------------ References to input objects
 	private SceneStructureMetric scene; // Camera placement and parameters
-	private TIntObjectMap<Image> images; // Look up camera images
 
 	/** The computed disparity image in distorted pixel coordinates */
 	final @Getter GrayF32 fusedDisparity = new GrayF32(1, 1);
@@ -77,6 +76,9 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	final StereoResults results = new StereoResults();
 	// Fuses multiple disparity images together provided they have the same "left" view
 	final FuseDisparityImages performFusion = new FuseDisparityImages();
+
+	// Storage for the original images in the stereo pair
+	Image image1, image2;
 
 	// Storage for rectified stereo images
 	Image rectified1, rectified2;
@@ -94,49 +96,52 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	// Where verbose stdout is printed to
 	@Nullable PrintStream verbose = null;
 
-	/**
-	 * Resets data structures and a describe of the scene and images to be processed
-	 *
-	 * @param scene Description of each view and their scene
-	 * @param images List of images which are to be processed
-	 */
-	public void initialize( SceneStructureMetric scene, TIntObjectMap<Image> images ) {
-		BoofMiscOps.checkTrue(!images.isEmpty());
-		BoofMiscOps.checkTrue(scene.views.size >= 2);
+	public MultiViewToFusedDisparity( LookUpImages lookUpImages, ImageType<Image> imageType ) {
+		this(imageType);
+		this.lookUpImages = lookUpImages;
+	}
 
-		this.scene = scene;
-		this.images = images;
-
-		Image img = (Image)images.values()[0];
-		rectified1 = img.createNew(1, 1);
-		rectified2 = img.createNew(1, 1);
+	public MultiViewToFusedDisparity( ImageType<Image> imageType ) {
+		this.rectified1 = imageType.createImage(1, 1);
+		this.rectified2 = imageType.createImage(1, 1);
+		this.image1 = imageType.createImage(1, 1);
+		this.image2 = imageType.createImage(1, 1);
 	}
 
 	/**
 	 * Computes the disparity between the target and each of the views it has been paired with then fuses all
 	 * of these into a single disparity image in the target's original pixel coordinates.
 	 *
-	 * @param targetID Which view will act as the common ("left") camera
-	 * @param pairs Which views will the disparity be computed against
+	 * @param scene Contains extrinsic and intrinsics for each view
+	 * @param targetIdx The "center" view which is common to all stereo pairs
+	 * @param pairIdxs List of views (as indexes) which will act as the second image in the stereo pairs
+	 * @param sbaIndexToViewID Look up table from view index to view ID
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( int targetID, GrowQueue_I32 pairs ) {
-		requireNonNull(stereoDisparity, "setStereoDisparity must be configured");
+	public boolean process( SceneStructureMetric scene, int targetIdx, GrowQueue_I32 pairIdxs,
+							BoofLambdas.IndexToString sbaIndexToViewID ) {
+		requireNonNull(stereoDisparity, "stereoDisparity must be configured");
+		requireNonNull(lookUpImages, "lookUpImages must be configured");
+		this.scene = scene;
 
-		// Precompute what little can be for the target / left / image1
-		Image image1 = images.get(targetID);
-		int targetCamera = scene.views.get(targetID).camera;
+		// Load the "center" image and initialize related data structures
+		if (!lookUpImages.loadImage(sbaIndexToViewID.process(targetIdx), image1)) {
+			if (verbose != null) verbose.println("Failed to load center image[" + targetIdx + "]");
+			return false;
+		}
+		int targetCamera = scene.views.get(targetIdx).camera;
 		computeRectification.setView1(scene.cameras.get(targetCamera).model, image1.width, image1.height);
-		scene.getWorldToView(scene.views.get(targetID), world_to_left, tmpse3);
+		scene.getWorldToView(scene.views.get(targetIdx), world_to_left, tmpse3);
 		world_to_left.invert(left_to_world);
 
 		// Compute disparity for all the images it has been paired with and add them to the fusion algorithm
 		performFusion.initialize(computeRectification.intrinsic1, computeRectification.view1_dist_to_undist);
-		for (int i = 0; i < pairs.size; i++) {
-			if (verbose != null) verbose.println("Computing stereo for view " + pairs.get(i));
-			computeDisparity(image1, pairs.get(i), results);
+		for (int i = 0; i < pairIdxs.size; i++) {
+			if (verbose != null) verbose.println("Computing stereo for view " + pairIdxs.get(i));
+			if (!computeDisparity(image1, pairIdxs.get(i), sbaIndexToViewID.process(pairIdxs.get(i)), results))
+				return false;
 			// allow access to the disparity before it's discarded
-			if (listener != null) listener.handlePairDisparity(targetID, pairs.get(i),
+			if (listener != null) listener.handlePairDisparity(targetIdx, pairIdxs.get(i),
 					rectified1, rectified2,
 					results.disparity, results.mask, results.param, results.rect1);
 			performFusion.addDisparity(results.disparity, results.mask, results.param, results.rect1);
@@ -163,15 +168,18 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	 * Computes the disparity between the common view "left" view and the specified "right"
 	 *
 	 * @param image1 Image for the left view
-	 * @param rightID Which view to use for the right view
+	 * @param rightIdx Which view to use for the right view
 	 */
-	private void computeDisparity( Image image1, int rightID, StereoResults info ) {
-		// Look up the right stereo image
-		Image image2 = images.get(rightID);
-		int rightCamera = scene.views.get(rightID).camera;
+	private boolean computeDisparity( Image image1, int rightIdx, String rightID, StereoResults info ) {
+		// Look up the second image in the stereo image
+		if (!lookUpImages.loadImage(rightID, image2)) {
+			if (verbose != null) verbose.println("Failed to load second image[" + rightIdx + "]");
+			return false;
+		}
+		int rightCamera = scene.views.get(rightIdx).camera;
 
 		// Compute the baseline between the two cameras
-		scene.getWorldToView(scene.views.get(rightID), world_to_right, tmpse3);
+		scene.getWorldToView(scene.views.get(rightIdx), world_to_right, tmpse3);
 		left_to_world.concat(world_to_right, left_to_right);
 
 		// Compute rectification data
@@ -211,6 +219,8 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		param.disparityRange = stereoDisparity.getDisparityRange();
 		param.baseline = left_to_right.T.norm();
 		PerspectiveOps.matrixToPinhole(info.rectifiedK, rectifiedShape.width, rectifiedShape.height, param.pinhole);
+
+		return true;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

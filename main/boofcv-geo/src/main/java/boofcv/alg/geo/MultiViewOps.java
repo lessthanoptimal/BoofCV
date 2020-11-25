@@ -1810,4 +1810,16 @@ public class MultiViewOps {
 			dst.get(i).setTo(a.get(idx0), a.get(idx1));
 		}
 	}
+
+	/**
+	 * Applies stereo disparity equation to compute the distance of an object. Simple equation but if you use
+	 * this equation you know you didn't screw it up.
+	 */
+	public static double disparityToRange( double disparity, double focalLength, double baseline ) {
+		if (disparity == 0.0)
+			return Double.POSITIVE_INFINITY;
+		if (disparity < 0.0)
+			throw new IllegalArgumentException("Disparity can't be less than zero");
+		return focalLength*baseline/disparity;
+	}
 }

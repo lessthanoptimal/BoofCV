@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestPinholeNtoP_F64 extends BoofStandardJUnit {
 
-	@Test
-	public void basicTest() {
+	@Test void basicTest() {
 		CameraPinholeBrown p = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 200, 300);
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(p, (DMatrixRMaj)null);
@@ -46,12 +45,11 @@ public class TestPinholeNtoP_F64 extends BoofStandardJUnit {
 		GeometryMath_F64.mult(K, pixel, expected);
 
 		PinholeNtoP_F64 alg = new PinholeNtoP_F64();
-		alg.set(p.fx, p.fy, p.skew, p.cx, p.cy);
+		alg.setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 
 		alg.compute(pixel.x, pixel.y, found);
 
 		assertEquals(expected.x, found.x, 1e-8);
 		assertEquals(expected.y, found.y, 1e-8);
 	}
-
 }

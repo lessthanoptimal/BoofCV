@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPinholePtoN_F64 extends BoofStandardJUnit {
+class TestPixelTransformPinholeNorm_F64 extends BoofStandardJUnit {
 	double fx = 200;
 	double fy = 300;
 	double skew = 1.2;
@@ -41,13 +41,15 @@ public class TestPinholePtoN_F64 extends BoofStandardJUnit {
 	 * Do the same calculation but using a different but equivalent equation
 	 */
 	@Test void basic() {
-		PinholePtoN_F64 alg = new PinholePtoN_F64();
-		alg.setK(fx, fy, skew, x_c, y_c);
+		var alg = new PixelTransformPinholeNorm_F64();
+		alg.fset(fx, fy, skew, x_c, y_c);
 
-		Point2D_F64 in = new Point2D_F64(100, 120);
-		Point2D_F64 out = new Point2D_F64();
+		int pixX = 100;
+		int pixY = 120;
+		var in = new Point2D_F64(pixX, pixY);
+		var out = new Point2D_F64();
 
-		alg.compute(in.x, in.y, out);
+		alg.compute(100, 120, out);
 
 		Point2D_F64 expected = new Point2D_F64();
 		DMatrixRMaj K_inv = new DMatrixRMaj(3, 3, true, fx, skew, x_c, 0, fy, y_c, 0, 0, 1);

@@ -21,16 +21,17 @@ package boofcv.alg.mvs;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.LookUpColorRgbFormats;
+import boofcv.misc.LookUpImages;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.SpecialEuclideanOps_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -87,8 +88,35 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 		assertEquals(2, count);
 	}
 
+	/**
+	 * Two points seen in the two views. Which view is first depends on the point. See if the expected point
+	 * has the expected color.
+	 */
 	@Test void simple_processScenePoints() {
-		fail("IMplement");
+		// scene with two views that are identical
+		var scene = new SceneStructureMetric(true);
+		scene.initialize(1, 2, 2);
+		scene.setCamera(0, true, new CameraPinhole(200, 200, 0, width/2, height/2, 0, 0));
+		scene.setView(0, 0, true, SpecialEuclideanOps_F64.eulerXyz(0, 0, 0, 0, 0, 0, null));
+		scene.setView(1, 0, true, SpecialEuclideanOps_F64.eulerXyz(0, 0, 0, 0, 0, 0, null));
+
+		// only difference between the points are the order of their views
+		scene.setPoint(0, 0.01, -0.01, 2.0, 0.99);
+		scene.setPoint(1, 0.01, -0.01, 2.0, 0.99);
+		scene.points.get(0).views.addAll(GrowQueue_I32.array(0, 1));
+		scene.points.get(1).views.addAll(GrowQueue_I32.array(1, 0));
+
+		var alg = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.SB_U8(), new MockLookUp());
+		alg.processScenePoints(scene, ( idx ) -> (5*idx + 10) + "", ( idx, r, g, b ) -> {
+			// we can assume the first view is called first, but that's not strictly required to be correct
+			int expected = idx == 0 ? 10 : 15;
+			assertEquals(expected, r);
+			assertEquals(expected, g);
+			assertEquals(expected, b);
+			count++;
+		});
+
+		assertEquals(2, count);
 	}
 
 	class MockLookUp implements LookUpImages {

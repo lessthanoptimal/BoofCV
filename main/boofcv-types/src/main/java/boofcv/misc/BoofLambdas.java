@@ -27,87 +27,80 @@ import java.util.List;
  */
 public interface BoofLambdas {
 
-	@FunctionalInterface
-	interface MassageString {
+	@FunctionalInterface interface MassageString {
 		String process( String input );
 	}
 
-	@FunctionalInterface
-	interface Factory<T> {
+	@FunctionalInterface interface Factory<T> {
 		T newInstance();
 	}
 
-	@FunctionalInterface
-	interface ProcessCall {
+	@FunctionalInterface interface ProcessCall {
 		void process();
 	}
 
-	@FunctionalInterface
-	interface ProcessObject<T> {
+	@FunctionalInterface interface ProcessObject<T> {
 		void process(T object);
 	}
 
-	@FunctionalInterface
-	interface MassageObject<T> {
+	@FunctionalInterface interface MassageObject<T> {
 		T process(T object);
 	}
 
-	@FunctionalInterface
-	interface ProcessI {
+	@FunctionalInterface interface ProcessI {
 		void process( int a );
 	}
 
-	@FunctionalInterface
-	interface ProcessII {
+	@FunctionalInterface interface ProcessII {
 		void process( int a, int b );
 	}
 
-	@FunctionalInterface
-	interface ProcessIIB {
+	@FunctionalInterface interface ProcessIIB {
 		boolean process( int a, int b );
 	}
 
-	@FunctionalInterface
-	interface SelectElement<T> {
+	@FunctionalInterface interface SelectElement<T> {
 		int select(List<T> list);
 	}
 
-	@FunctionalInterface
-	interface Extract<In,Out> {
+	@FunctionalInterface interface Extract<In,Out> {
 		Out process(In o);
 	}
 
-	@FunctionalInterface
-	interface ProcessIndex<T> {
+	@FunctionalInterface interface ProcessIndex<T> {
 		void process( int index , T object );
 	}
 
-	@FunctionalInterface
-	interface IndexToString {
+	@FunctionalInterface interface IndexToString {
 		String process( int index );
 	}
 
-	@FunctionalInterface
-	interface ConvertOut<In, Out> {
+	@FunctionalInterface interface ConvertOut<In, Out> {
 		Out process( In src );
 	}
 
-	@FunctionalInterface
-	interface ConvertCopy<In, Out> {
+	@FunctionalInterface interface ConvertCopy<In, Out> {
 		void process( In src, Out dst );
 	}
 
+	@FunctionalInterface interface PixXyzConsumer_F64 {
+		void process( int pixX, int pixY, double x, double y, double z );
+	}
 
+	@FunctionalInterface interface PixXyzConsumer_F32 {
+		void process( int pixX, int pixY, float x, float y, float z );
+	}
+
+	@FunctionalInterface interface IndexRgbConsumer {
+		void setRgb( int index, int red, int green, int blue);
+	}
+
+	// @formatter:off
 	@FunctionalInterface interface Match_I8 { boolean process( byte value ); }
-
 	@FunctionalInterface interface Match_I16 { boolean process( short value ); }
-
 	@FunctionalInterface interface Match_S32 { boolean process( int value ); }
-
 	@FunctionalInterface interface Match_S64 { boolean process( long value ); }
-
 	@FunctionalInterface interface Match_F32 { boolean process( float value ); }
-
 	@FunctionalInterface interface Match_F64 { boolean process( double value ); }
-
+	// @formatter:on
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,9 +78,9 @@ public class DistanceMetricTripleReprojection23 implements DistanceFromModel<Met
 	public void setModel( MetricCameraTriple model ) {
 		this.model = model;
 
-		pixelToNorm1.set(model.view1);
-		pixelToNorm2.set(model.view2);
-		pixelToNorm3.set(model.view3);
+		pixelToNorm1.setK(model.view1);
+		pixelToNorm2.setK(model.view2);
+		pixelToNorm3.setK(model.view3);
 
 		locations.clear();
 		locations.add(view_1_to_1);

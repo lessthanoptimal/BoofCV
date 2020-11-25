@@ -20,6 +20,8 @@ package boofcv.examples.stereo;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.alg.mvs.DisparityParameters;
+import boofcv.alg.mvs.MultiViewStereoOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -31,11 +33,6 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
-import georegression.struct.EulerType;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
@@ -79,7 +76,7 @@ public class ExampleStereoDisparity3D {
 
 		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(distLeft, distRight, param, rectLeft, rectRight);
 
-//		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, rangeDisparity);
+//		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,disparityMin, disparityRange);
 		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(
 				rectLeft, rectRight, 5, disparityMin, disparityRange);
 
@@ -89,53 +86,27 @@ public class ExampleStereoDisparity3D {
 		DMatrixRMaj rectK = rectAlg.getCalibrationMatrix();
 		DMatrixRMaj rectR = rectAlg.getRectifiedRotation();
 
-		// extract intrinsic parameters from rectified camera
-		double baseline = param.getBaseline()*0.1;
-		double fx = rectK.get(0, 0);
-		double fy = rectK.get(1, 1);
-		double cx = rectK.get(0, 2);
-		double cy = rectK.get(1, 2);
-
-		double maxZ = baseline*100;
+		// Put all the disparity parameters into one data structure
+		var disparityParameters = new DisparityParameters();
+		disparityParameters.baseline = param.getBaseline();
+		disparityParameters.disparityMin = disparityMin;
+		disparityParameters.disparityRange = disparityRange;
+		disparityParameters.rectifiedR.set(rectR);
+		PerspectiveOps.matrixToPinhole(rectK, rectLeft.width, rectRight.height, disparityParameters.pinhole);
 
 		// Iterate through each pixel in disparity image and compute its 3D coordinate
 		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
-		pcv.setTranslationStep(1.5);
+		pcv.setTranslationStep(param.getBaseline()*0.1);
 
-		Point3D_F64 pointRect = new Point3D_F64();
-		Point3D_F64 pointLeft = new Point3D_F64();
-		for (int y = 0; y < disparity.height; y++) {
-			for (int x = 0; x < disparity.width; x++) {
-				double d = disparity.unsafe_get(x, y) + disparityMin;
-
-				// skip over pixels were no correspondence was found
-				if (d >= disparityRange || d <= 0)
-					continue;
-
-				// Coordinate in rectified camera frame
-				pointRect.z = baseline*fx/d;
-				pointRect.x = pointRect.z*(x - cx)/fx;
-				pointRect.y = pointRect.z*(y - cy)/fy;
-
-				// prune points which are likely to be noise
-				if (pointRect.z >= maxZ)
-					continue;
-
-				// rotate into the original left camera frame
-				GeometryMath_F64.multTran(rectR, pointRect, pointLeft);
-
-				// add pixel to the view for display purposes and sets its gray scale value
-				int v = rectLeft.unsafe_get(x, y);
-				pcv.addPoint(pointLeft.x, pointLeft.y, pointLeft.z, v << 16 | v << 8 | v);
-//				temp.add( pointLeft.copy() );
-			}
-		}
-
-		// move it back a bit to make the 3D structure more apparent
-		Se3_F64 cameraToWorld = new Se3_F64();
-		cameraToWorld.T.z = -baseline*5;
-		cameraToWorld.T.x = baseline*12;
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.4, 0, cameraToWorld.R);
+		// Next create the 3D point cloud. The function below will handle conversion from disparity into
+		// XYZ, then transform from rectified into normal camera coordinate system. Feel free to glance at the
+		// source code to understand exactly what it's doing
+		MultiViewStereoOps.disparityToCloud(disparity, disparityParameters,null,
+				( pixX, pixY, x, y, z ) -> {
+					// look up the gray value. Then convert it into RGB
+					int v = rectLeft.unsafe_get(pixX, pixY);
+					pcv.addPoint(x, y, z, v << 16 | v << 8 | v);
+				});
 
 		// Configure the display
 //		pcv.setFog(true);
@@ -145,7 +116,7 @@ public class ExampleStereoDisparity3D {
 //		pcv.setColorizer(colorizer); // sometimes pseudo color can be easier to view
 		pcv.setDotSize(1);
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(param.left));
-		pcv.setCameraToWorld(cameraToWorld);
+//		pcv.setCameraToWorld(cameraToWorld);
 		JComponent viewer = pcv.getComponent();
 		viewer.setPreferredSize(new Dimension(600, 600*param.left.height/param.left.width));
 

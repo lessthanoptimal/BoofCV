@@ -21,12 +21,10 @@ package boofcv.examples.sfm;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
-import boofcv.alg.mvs.ColorizeCloudFromImage;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoOps;
 import boofcv.alg.mvs.MultiViewToFusedDisparity;
 import boofcv.alg.sfm.structure.SceneWorkingGraph;
-import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.gui.ListDisplayPanel;
@@ -37,13 +35,15 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.LookUpImageFilesByIndex;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.distort.PointToPixelTransform_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedU8;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.ddogleg.struct.FastQueue;
@@ -77,37 +77,35 @@ public class ExampleCombineDisparity {
 		// The final scene refined by bundle adjustment is created by the Working graph. However the 3D relationship
 		// between views is contained in the pairwise graph. A View in the working graph has a reference to the view
 		// in the pairwise graph. Using that we will find all connected views that have a 3D relationship
-		GrowQueue_I32 pairs = new GrowQueue_I32();
-		TIntObjectMap<GrayU8> images = new TIntObjectHashMap<>();
+		GrowQueue_I32 pairedViewIdxs = new GrowQueue_I32();
+		TIntObjectMap<String> sbaIndexToImageID = new TIntObjectHashMap<>();
 
 		// This relationship between pairwise and working graphs might seem (and is) a bit convoluted. The Pairwise
 		// graph is the initial crude sketch of what might be connected. The working graph is an intermediate
 		// data structure for computing the metric scene. SBA is a refinement of the working graph.
 
 		// Iterate through all connected views in the pairwise graph for this view in the working graph
-		center.pview.connections.forEach((m)->{
+		center.pview.connections.forEach(( m ) -> {
 			// if there isn't a 3D relationship just skip it
-			if( !m.is3D )
+			if (!m.is3D)
 				return;
 
-			String imageID = m.other(center.pview).id;
-			SceneWorkingGraph.View connected = example.working.views.get(imageID);
+			String connectedID = m.other(center.pview).id;
+			SceneWorkingGraph.View connected = example.working.views.get(connectedID);
 
 			// Make sure the view exists in the working graph too
-			if (connected==null)
+			if (connected == null)
 				return;
 
-			// Load the image and record the mapping of SBA index to image
-			var image = new GrayU8(1,1);
-			imageLookup.loadImage(imageID,image);
-			images.put(connected.index, image);
-			pairs.add(connected.index);
+			// Add this view to the index to name/ID lookup table
+			sbaIndexToImageID.put(connected.index, connectedID);
+
+			// Note that this view is one which acts as the second image in the stereo pair
+			pairedViewIdxs.add(connected.index);
 		});
 
-		// Add the center camera image
-		var centerImage = new GrayU8(1,1);
-		imageLookup.loadImage(center.pview.id,centerImage);
-		images.put(center.index, centerImage);
+		// Add the center camera image to the ID look up table
+		sbaIndexToImageID.put(20, center.pview.id);
 
 		// Configure there stereo disparity algorithm which is used
 		var configDisparity = new ConfigDisparityBMBest5();
@@ -118,34 +116,37 @@ public class ExampleCombineDisparity {
 
 		// This is the code which combines/fuses multiple disparity images together. It employs a very simple
 		// algorithm based on voting. See class description for details.
-		var combiner = new MultiViewToFusedDisparity<GrayU8>();
+		var combiner = new MultiViewToFusedDisparity<>(imageLookup, ImageType.SB_U8);
 		combiner.setVerbose(System.out, null);
 		combiner.setStereoDisparity(FactoryStereoDisparity.blockMatchBest5(configDisparity, GrayU8.class, GrayF32.class));
-		combiner.initialize(example.scene, images);
 
+		// Creates a list where you can switch between different images/visualizations
 		var listDisplay = new ListDisplayPanel();
-		listDisplay.setPreferredSize(new Dimension(1000,300));
+		listDisplay.setPreferredSize(new Dimension(1000, 300));
+		ShowImages.showWindow(listDisplay, "Intermediate Results", true);
 
-		// We will display intermediate results
+		// We will display intermediate results as they come in
 		combiner.setListener(( leftView, rightView, rectLeft, rectRight,
-									 disparity, mask, parameters, rect ) -> {
+							   disparity, mask, parameters, rect ) -> {
 			// Visualize the rectified stereo pair. You can interact with this window and verify
 			// that the y-axis is  aligned
 			var rectified = new RectifiedPairPanel(true);
-			rectified.setImages(ConvertBufferedImage.convertTo(rectLeft,null),
-					ConvertBufferedImage.convertTo(rectRight,null));
-			listDisplay.addItem(rectified,"Rectified "+leftView+" "+rightView);
+			rectified.setImages(ConvertBufferedImage.convertTo(rectLeft, null),
+					ConvertBufferedImage.convertTo(rectRight, null));
 
 			// Cleans up the disparity image by zeroing out pixels that are outside the original image bounds
 			RectifyImageOps.applyMask(disparity, mask, 0);
 			// Display the colorized disparity
 			BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
-			listDisplay.addImage(colorized, leftView+" " +rightView);
+
+			SwingUtilities.invokeLater(() -> {
+				listDisplay.addItem(rectified, "Rectified " + leftView + " " + rightView);
+				listDisplay.addImage(colorized, leftView + " " + rightView);
+			});
 		});
 
-		ShowImages.showWindow(listDisplay,"Intermediate Results",true);
-
-		if (!combiner.process(center.index, pairs)) {
+		// Process the images and compute a single combined disparity image
+		if (!combiner.process(example.scene, center.index, pairedViewIdxs, sbaIndexToImageID::get)) {
 			throw new RuntimeException("Failed to fuse stereo views");
 		}
 
@@ -155,33 +156,35 @@ public class ExampleCombineDisparity {
 		BufferedImage colorizedDisp = VisualizeImageData.disparity(fusedDisparity, null, fusedParam.disparityRange, 0);
 		ShowImages.showWindow(colorizedDisp, "Fused Disparity");
 
-		// Now the point cloud it represents
+		// Now compute the point cloud it represents and the color of each pixel.
+		// For the fused image, instead of being in rectified image coordinates it's in the original image coordinates
+		// this makes extracting color much easier.
 		var cloud = new FastQueue<>(Point3D_F64::new);
-		// The fused image has no mask since it marks pixels outside of all views as invalid
-		var dummyMask = fusedDisparity.createSameShape(GrayU8.class);
-		MultiViewStereoOps.disparityToCloud(fusedDisparity,dummyMask, fusedParam, cloud);
-
-		// Extract the color of each point for visualize. We could look up the image as color but will use the gray
-		// image we have on hand. Another option would be pseudo color but that doesn't look as good.
 		var cloudRgb = new GrowQueue_I32(cloud.size);
-		var colorizer = new ColorizeCloudFromImage<>(new LookUpColorRgbFormats.SB_U8());
-		// Convert from a bundle adjustment camera model into the standard camera models
+		// Load the center image in color
+		var colorImage = new InterleavedU8(1, 1, 3);
+		imageLookup.loadImage(center.pview.id, colorImage);
+		// Since the fused image is in distorted pixel coordinates that needs to be taken in account
+		// Convert from a bundle adjustment camera model into a standard camera models, then a distortion model
 		CameraPinholeBrown intrinsic = BundleAdjustmentOps.convert(example.scene.cameras.get(center.index).model,
-				centerImage.width, centerImage.height, null);
-		// conversion from normalized to pixel coordinates that takes in acount lens distortion
-		Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false,true);
-		colorizer.process3(centerImage, cloud.toList(),0,cloud.size,new Se3_F64(),norm_to_pixel,
-				(i,r,g,b)->cloudRgb.set(i,(r<<16)|(g<<8)|b));
+				colorImage.width, colorImage.height, null);
+		Point2Transform2_F64 pixel_to_norm = new LensDistortionBrown(intrinsic).distort_F64(true, false);
+		MultiViewStereoOps.disparityToCloud(fusedDisparity, fusedParam,
+				new PointToPixelTransform_F64(pixel_to_norm),
+				( pixX, pixY, x, y, z ) -> {
+					cloud.grow().setTo(x, y, z);
+					cloudRgb.add(colorImage.get24(pixX, pixY));
+				});
 
 		// Configure the point cloud viewer
 		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 		pcv.setCameraHFov(UtilAngle.radian(70));
 		pcv.setTranslationStep(0.15);
-		pcv.addCloud(cloud.toList(),cloudRgb.data);
+		pcv.addCloud(cloud.toList(), cloudRgb.data);
 //		pcv.setColorizer(new SingleAxisRgb.Z().fperiod(30.0));
 		JComponent viewer = pcv.getComponent();
 		viewer.setPreferredSize(new Dimension(600, 600));
-		ShowImages.showWindow(viewer,"Point Cloud", true);
+		ShowImages.showWindow(viewer, "Point Cloud", true);
 
 		System.out.println("Done");
 	}

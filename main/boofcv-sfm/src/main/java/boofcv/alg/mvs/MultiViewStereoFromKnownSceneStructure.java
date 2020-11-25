@@ -25,6 +25,7 @@ import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.LookUpImages;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.PointToPixelTransform_F64;
@@ -86,8 +87,6 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 	// Used to retrieve images from a data base. There could be easily too images to load all at once
 	final LookUpImages imageLookUp;
-	// where all the images needed for a single set of stereo pairs are stored
-	final FastQueue<T> imageStorage;
 
 	/** Computes the score for a given view acting as the "center" among its neighbors */
 	final @Getter ScoreRectifiedViewCoveragePixels scoreCoverage = new ScoreRectifiedViewCoveragePixels();
@@ -99,7 +98,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * Given one "center" view and several other views which form a stereo pair, compute a single
 	 * combined disparity image
 	 */
-	final @Getter MultiViewToFusedDisparity<T> computeFused = new MultiViewToFusedDisparity<>();
+	final @Getter MultiViewToFusedDisparity<T> computeFused;
 	/** Combine multiple disparity images into a single point cloud while avoiding redundant points */
 	final @Getter CreateCloudFromDisparityImages disparityCloud = new CreateCloudFromDisparityImages();
 
@@ -113,8 +112,6 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	// Used to look up ViewInfo from SBA index
 	TIntObjectMap<String> indexSbaToViewID = new TIntObjectHashMap<>();
 
-	// storage for images used to compute the disparity for this set of stereo views
-	TIntObjectMap<T> indexSbaToImage = new TIntObjectHashMap<>();
 	// Which SBA view indexes are paired to the target
 	GrowQueue_I32 imagePairIndexesSba = new GrowQueue_I32();
 
@@ -135,8 +132,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	@Nullable PrintStream verbose = null;
 
 	public MultiViewStereoFromKnownSceneStructure( LookUpImages imageLookUp, ImageType<T> imageType ) {
+		this.computeFused = new MultiViewToFusedDisparity<>(imageLookUp, imageType);
 		this.imageLookUp = imageLookUp;
-		imageStorage = new FastQueue<>(() -> imageType.createImage(1, 1));
 	}
 
 	/**
@@ -175,7 +172,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			selectAndLoadConnectedImages(pairs, center.relations);
 
 			// If none of the connected views had enough quality abort
-			if (indexSbaToImage.size() < 1) {
+			if (imagePairIndexesSba.size() < 1) {
 				if (verbose != null) verbose.println("  too few connections to use as a center");
 				continue;
 			}
@@ -184,12 +181,10 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			listCenters.add(center);
 
 			// Add image for center view
-			addImageToMap(center.relations);
-			// Remove the tail since only the pair views can be in this list
-			imagePairIndexesSba.removeTail();
+			indexSbaToViewID.put(center.relations.indexSba, center.relations.id);
 
 			// Compute the fused disparity from all the views, then add points to the point cloud
-			computeFusedDisparityAddCloud(scene, center, indexSbaToImage, imagePairIndexesSba);
+			computeFusedDisparityAddCloud(scene, center, indexSbaToViewID, imagePairIndexesSba);
 		}
 	}
 
@@ -291,9 +286,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * Combing stereo information from all images in this cluster, compute a disparity image and add it to the cloud
 	 */
 	void computeFusedDisparityAddCloud( SceneStructureMetric scene, ViewInfo center,
-										TIntObjectMap<T> imageMap, GrowQueue_I32 pairIndexes ) {
-		computeFused.initialize(scene, imageMap);
-		if (!computeFused.process(center.relations.indexSba, pairIndexes))
+										TIntObjectMap<String> sbaIndexToName, GrowQueue_I32 pairIndexes ) {
+		if (!computeFused.process(scene, center.relations.indexSba, pairIndexes, sbaIndexToName::get))
 			throw new RuntimeException("Disparity failed!");
 
 		// The fused disparity doesn't compute a mask since all invalid pixels are marked as invalid using
@@ -327,8 +321,6 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * add it to the list of views which is used in this cluster and mark them as used.
 	 */
 	void selectAndLoadConnectedImages( StereoPairGraph pairs, StereoPairGraph.Vertex center ) {
-		imageStorage.reset();
-		indexSbaToImage.clear();
 		indexSbaToViewID.clear();
 		imagePairIndexesSba.reset();
 
@@ -345,23 +337,13 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 			if (verbose != null) verbose.println("  connected.id=" + other.id);
 
-			// Add the image associated with "other"
-			addImageToMap(other);
+			// Add view to the look up table and mark it as the second image in a stereo pair
+			indexSbaToViewID.put(other.indexSba, other.id);
+			imagePairIndexesSba.add(other.indexSba);
 
 			// This view has been consumed so it can't be used as a center view
 			mapScores.get(other.id).used = true;
 		}
-	}
-
-	/** Load the pixel image and add it to the set of images in this cluster */
-	void addImageToMap( StereoPairGraph.Vertex view ) {
-		T image = imageStorage.grow();
-		if (!imageLookUp.loadImage(view.id, image))
-			throw new RuntimeException("Failed to look up image: " + view.id);
-
-		indexSbaToImage.put(view.indexSba, image);
-		indexSbaToViewID.put(view.indexSba, view.id);
-		imagePairIndexesSba.add(view.indexSba);
 	}
 
 	/** Returns the computed 3D point cloud. */

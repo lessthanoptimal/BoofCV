@@ -28,6 +28,7 @@ import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.gui.image.ShowImages;
+import boofcv.misc.LookUpImages;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
@@ -178,18 +179,16 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		// All views are connected to each other. Every view but the "center" should be added here
 		alg.selectAndLoadConnectedImages(pairs, pairs.vertexes.get("id=" + 0));
 
-		assertEquals(2, alg.imageStorage.size);
-		assertEquals(2, alg.indexSbaToImage.size());
+		assertEquals(2, alg.indexSbaToViewID.size());
 		assertEquals(2, alg.imagePairIndexesSba.size);
 		assertEquals(3, dummy.requestShapes.size());
-		assertEquals(2, dummy.requestImage.size());
+		assertEquals(0, dummy.requestImage.size());
 
 		// mark was connection as being below the threshold
 		pairs.vertexes.get("id=" + 0).pairs.get(0).quality3D = 0;
 		alg.selectAndLoadConnectedImages(pairs, pairs.vertexes.get("id=" + 0));
 
-		assertEquals(1, alg.imageStorage.size);
-		assertEquals(1, alg.indexSbaToImage.size());
+		assertEquals(1, alg.indexSbaToViewID.size());
 		assertEquals(1, alg.imagePairIndexesSba.size);
 
 		// See if the correct two views were added

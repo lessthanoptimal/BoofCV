@@ -19,6 +19,7 @@
 package boofcv.alg.mvs;
 
 import boofcv.core.image.LookUpColorRgb;
+import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.PointIndex3D_F64;
@@ -63,13 +64,13 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 	 * @param colorizer (Output) As the color of each point becomes known this function is invoked.
 	 */
 	public void process3( T image, List<Point3D_F64> cloud, int idx0, int idx1, Se3_F64 world_to_view,
-						  Point2Transform2_F64 norm_to_pixel, IndexColor colorizer ) {
-		var iterator = new PointToIndexIterator<>(cloud,idx0,idx1, new PointIndex3D_F64());
+						  Point2Transform2_F64 norm_to_pixel, BoofLambdas.IndexRgbConsumer colorizer ) {
+		var iterator = new PointToIndexIterator<>(cloud, idx0, idx1, new PointIndex3D_F64());
 		process3(image, iterator, world_to_view, norm_to_pixel, colorizer);
 	}
 
 	public void process3( T image, Iterator<PointIndex3D_F64> cloud, Se3_F64 world_to_view,
-						  Point2Transform2_F64 norm_to_pixel, IndexColor colorizer ) {
+						  Point2Transform2_F64 norm_to_pixel, BoofLambdas.IndexRgbConsumer colorizer ) {
 		colorLookup.setImage(image);
 		while (cloud.hasNext()) {
 			PointIndex3D_F64 pidx = cloud.next();
@@ -84,8 +85,8 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 			if (!BoofMiscOps.isInside(image, pixel.x, pixel.y))
 				continue;
 
-			int xx = (int)(pixel.x+0.5);
-			int yy = (int)(pixel.y+0.5);
+			int xx = (int)(pixel.x + 0.5);
+			int yy = (int)(pixel.y + 0.5);
 
 			int rgb = colorLookup.lookupRgb(xx, yy);
 			colorizer.setRgb(pidx.index, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
@@ -104,13 +105,13 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 	 * @param colorizer (Output) As the color of each point becomes known this function is invoked.
 	 */
 	public void process4( T image, List<Point4D_F64> cloud, int idx0, int idx1, Se3_F64 world_to_view,
-						  Point2Transform2_F64 norm_to_pixel, IndexColor colorizer ) {
-		var iterator = new PointToIndexIterator<>(cloud,idx0,idx1, new PointIndex4D_F64());
+						  Point2Transform2_F64 norm_to_pixel, BoofLambdas.IndexRgbConsumer colorizer ) {
+		var iterator = new PointToIndexIterator<>(cloud, idx0, idx1, new PointIndex4D_F64());
 		process4(image, iterator, world_to_view, norm_to_pixel, colorizer);
 	}
 
 	public void process4( T image, Iterator<PointIndex4D_F64> cloud, Se3_F64 world_to_view,
-						  Point2Transform2_F64 norm_to_pixel, IndexColor colorizer ) {
+						  Point2Transform2_F64 norm_to_pixel, BoofLambdas.IndexRgbConsumer colorizer ) {
 		colorLookup.setImage(image);
 		while (cloud.hasNext()) {
 			PointIndex4D_F64 pidx = cloud.next();
@@ -126,8 +127,8 @@ public class ColorizeCloudFromImage<T extends ImageBase<T>> {
 			if (!BoofMiscOps.isInside(image, pixel.x, pixel.y))
 				continue;
 
-			int xx = (int)(pixel.x+0.5);
-			int yy = (int)(pixel.y+0.5);
+			int xx = (int)(pixel.x + 0.5);
+			int yy = (int)(pixel.y + 0.5);
 
 			int rgb = colorLookup.lookupRgb(xx, yy);
 			colorizer.setRgb(pidx.index, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
