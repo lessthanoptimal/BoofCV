@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -333,7 +333,8 @@ public class ReidSolomonCodes {
 	}
 
 	void initToOne( GrowQueue_I8 poly , int length ) {
-		poly.setMaxSize(length);
+		poly.reset();
+		poly.reserve(length);
 		poly.size = 1;
 		poly.data[0] = 1;
 	}
