@@ -45,10 +45,10 @@ public interface PointCloudWriter {
 
 		@Override
 		public void init( int estimatedSize ) {
-			cloudRgb.setMaxSize(estimatedSize);
-			cloudXyz.setMaxSize(estimatedSize*3);
 			cloudRgb.reset();
 			cloudXyz.reset();
+			cloudRgb.reserve(estimatedSize);
+			cloudXyz.reserve(estimatedSize*3);
 		}
 
 		@Override
