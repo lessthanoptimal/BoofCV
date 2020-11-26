@@ -88,10 +88,10 @@ Version : 0.37
   * Projective to Metric for arbitrary number of views
   * PointTrackerToSimilarImages uses a tracker to match features for reconstruction
       - TODO Add a smart mode where it will skip over frames with little change
-  * TODO MetricFromUncalibratedPairwiseGraph needs to identify mistakes and fix them
-  * TODO Create validation tests for at least 3 scenarios with known constant motion along one axis
+  * TODO Create validation tests of nature scenes with known marks to provide ground truth
 - Multi-View Stereo
-  - TODO Use existing two view stereo to kludge something together
+  - Added MultiViewToFusedDisparity to combine multiple disparity images into one
+  - Added MultiViewStereoFromKnownSceneStructure which computes a dense cloud from multiple disparity images
 - Sparse Bundle Adjustment
   * Fixed bug in how pixels are scaled in ScaleSceneStructure.
   * A view's pose can now be specified relative to other views. Can be a known or estimated parameter
@@ -103,18 +103,13 @@ Version : 0.37
 - Concurrency
   * Removed WorkArrays since they were poorly designed
 
-
 TODO Rename FastQueue to ManagedArray. It manages the memory. RecycleArray. It declares and recycles memory
 TODO Rename FastArray to FastArray, DiscardArray, GrowArray,
 TODO Rename linked list . previous to prev
-TODO Rename assertBoof to assertTrue.  Rename assert* to valid* to differentiate it from other asserts?
 TODO Add seek to SimpleSequence
-
 
 TODO Move projective to metric and similar from multiview to perspective
 TODO rename RansacMultiView to RansacCalibrated
-
-TODO BoofVersion - Add new line to end - Mark as @Generated
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint
@@ -130,9 +125,12 @@ TODO Stereo Feature Association
    - Verify that it doesn't allow impossible associations either
 
 - Scene Reconstruction
-  * TODO Loop closure / some generic methods for detecting the same image from a slightly different perspective
+  * TODO Improve stability of sparse metric upgrade. Local SBA and multiple seeds?
+  * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
   * TODO when associating objects split into feature types, e.g. white and black blobs
   * TODO try improving 3-view by estimating lens distortion in projective camera
+- Multi-View Stereo
+  * TODO Improve point filtering of dense cloud. Way too noisy now
 
 NOTES: Format lint checks
  - Checkstyle can't be used since it does not allow for concise blocks and there is no built in way to just run on

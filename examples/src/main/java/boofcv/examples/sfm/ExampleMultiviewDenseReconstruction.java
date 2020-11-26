@@ -48,12 +48,12 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * A dense point cloud is created using a previously sparse reconstruction and a basic implementation of
+ * A dense point cloud is created using a previously computed sparse reconstruction and a basic implementation of
  * multiview stereo (MVS). This approach to MVS works by identifying "center" views which have the best set of
- * neighbors for stereo computations using a heuristic. Then a global point cloud is computed from the "center" view
+ * neighbors for stereo computations using a heuristic. Then a global point cloud is created from the "center" view
  * disparity images while taking care to avoid adding duplicate points.
  *
- * As you can see there is still a fair amount of noise in the image. Additional filtering and processing is typically
+ * As you can see there is still a fair amount of noise in the cloud. Additional filtering and processing is typically
  * required at this point.
  *
  * @author Peter Abeles
@@ -61,21 +61,22 @@ import java.util.List;
 public class ExampleMultiviewDenseReconstruction {
 	public static void main( String[] args ) {
 		var example = new ExampleMultiviewSparseReconstruction();
-		example.compute("house_01.mp4");
+//		example.compute("house_01.mp4");
 //		example.compute("forest_path_01.mp4");
-//		example.compute("rock_01.mp4");
+		example.compute("rock_01.mp4");
 
-		// Configure there stereo disparity algorithm which is used
+		// Configure how a disparity image is computed
 		var configDisparity = new ConfigDisparityBMBest5();
 		configDisparity.validateRtoL = 1;
 		configDisparity.texture = 0.5;
 		configDisparity.regionRadiusX = configDisparity.regionRadiusY = 4;
 		configDisparity.disparityRange = 50;
 
-		// This will look up images based on their index in the file list
+		// Looks up images based on their index in the file list
 		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);
 
 		// Create and configure MVS
+		//
 		// Note that the stereo disparity algorithm used must output a GrayF32 disparity image as much of the code
 		// is hard coded to use it. MVS would not work without sub-pixel enabled.
 		var mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, ImageType.SB_U8);
@@ -99,9 +100,12 @@ public class ExampleMultiviewDenseReconstruction {
 			}
 		});
 
-		// MVS stereo needs to know which views have the best stereo information between them. This will guide which
-		// images are used as the "center". Here we use information from the pairwise graph to determine how 3D
-		// the connection between two views are
+		// MVS stereo needs to know which view pairs have enough 3D information to act as a stereo pair and
+		// the quality of that 3D information. This is used to guide which views act as "centers" for accumulating
+		// 3D information which is then converted into the point cloud.
+		//
+		// StereoPairGraph contains this information and we will create it from Pairwise and Working graphs.
+
 		var mvsGraph = new StereoPairGraph();
 		PairwiseImageGraph _pairwise = example.pairwise;
 		SceneStructureMetric _structure = example.scene;
@@ -111,10 +115,12 @@ public class ExampleMultiviewDenseReconstruction {
 		BoofMiscOps.forIdx(example.working.viewList, ( workIdxI, wv ) -> {
 			var pv = _pairwise.mapNodes.get(wv.pview.id);
 			pv.connections.forIdx(( j, e ) -> {
+				// Look at the ratio of inliers for a homography and fundamental matrix model
 				PairwiseImageGraph.View po = e.other(pv);
 				double ratio = 1.0 - Math.min(1.0, e.countH/(1.0 + e.countF));
-				if (ratio <= 0.05)
+				if (ratio <= 0.25)
 					return;
+				// There is sufficient 3D information between these two views
 				SceneWorkingGraph.View wvo = example.working.views.get(po.id);
 				int workIdxO = example.working.viewList.indexOf(wvo);
 				if (workIdxO <= workIdxI)
@@ -128,15 +134,14 @@ public class ExampleMultiviewDenseReconstruction {
 
 		System.out.println("Dense Cloud Size: "+mvs.getCloud().size());
 
-		// We need to colorize the cloud to make it easier to view. This is done by projecting points back into the
-		// first view they were seen in
+		// Colorize the cloud to make it easier to view. This is done by projecting points back into the
+		// first view they were seen in and reading the color
 		GrowQueue_I32 colorRgb = new GrowQueue_I32();
 		colorRgb.resize(mvs.getCloud().size());
 		var colorizeMvs = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), imageLookup);
-		colorizeMvs.processMvsCloud(example.scene, mvs, ( i, r, g, b ) -> colorRgb.set(i, (r << 16) | (g << 8) | b));
+		colorizeMvs.processMvsCloud(example.scene, mvs,
+				( idx, r, g, b ) -> colorRgb.set(idx, (r << 16) | (g << 8) | b));
 		visualizeInPointCloud(mvs.getCloud(), colorRgb, example.scene);
-
-		// See the dense reconstruction example for a much better looking cloud
 	}
 
 	public static void visualizeInPointCloud( List<Point3D_F64> cloud, GrowQueue_I32 colorsRgb,

@@ -88,6 +88,18 @@ public class ExampleMultiviewSparseReconstruction {
 	SceneWorkingGraph working = null;
 	SceneStructureMetric scene = null;
 
+	public static void main( String[] args ) {
+		// Turn on threaded code for bundle adjustment
+		DDoglegConcurrency.USE_CONCURRENT = true;
+
+		var example = new ExampleMultiviewSparseReconstruction();
+		example.compute("house_01.mp4");
+//		example.compute("forest_path_01.mp4");
+		example.visualizeSparseCloud();
+
+		System.out.println("done");
+	}
+
 	public void compute( String videoName ) {
 		String path = UtilIO.pathExample("mvs/" + videoName);
 		workDirectory = "mvs_work/" + FilenameUtils.getBaseName(videoName);
@@ -116,13 +128,15 @@ public class ExampleMultiviewSparseReconstruction {
 	}
 
 	/**
-	 * For a pairwise graph to be constructed, point feature relationships between frame are needed. For a video
-	 * sequence an easy and fast way to do this is with a KLT tracker. This however will not "close the loop"
-	 * which if trying to create a model by going in a circle around it.
+	 * For a pairwise graph to be constructed, image feature relationships between frames are needed. For a video
+	 * sequence, KLT is an easy and fast way to do this. However, KLT will not "close the loop", and it will
+	 * not realize you're back at the initial location. Typically this results in a noticeable miss alignment.
 	 */
 	private void trackImageFeatures() {
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Similar Images");
+
+		// Configure the KLT tracker
 		int radius = 5;
 		var configTracker = new ConfigPointTracker();
 		configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
@@ -142,6 +156,7 @@ public class ExampleMultiviewSparseReconstruction {
 
 		var trackerSimilar = new PointTrackerToSimilarImages();
 
+		// Track features across the entire sequence and save the results
 		BoofMiscOps.profile(() -> {
 			boolean first = true;
 			for (int frameId = 0; frameId < imageFiles.size(); frameId++) {
@@ -179,29 +194,26 @@ public class ExampleMultiviewSparseReconstruction {
 		if (!forceRecompute)
 			try {
 				pairwise = MultiViewIO.load(savePath.getPath(), (PairwiseImageGraph)null);
-			} catch (UncheckedIOException ignore) {
-			}
+				System.out.println("Loaded Pairwise Graph");
+				return;
+			} catch (UncheckedIOException ignore) {}
 
-		if (pairwise == null) {
-			trackImageFeatures();
-			System.out.println("----------------------------------------------------------------------------");
-			System.out.println("### Creating Pairwise");
-			var generatePairwise = new GeneratePairwiseImageGraph();
-			BoofMiscOps.profile(() -> {
-				generatePairwise.setVerbose(System.out, null);
-				generatePairwise.process(similarImages);
-			}, "Created Pairwise graph");
-			pairwise = generatePairwise.getGraph();
-			MultiViewIO.save(pairwise, savePath.getPath());
-			System.out.println("  nodes.size=" + pairwise.nodes.size);
-			System.out.println("  edges.size=" + pairwise.edges.size);
-		} else {
-			System.out.println("Loaded Pairwise Graph");
-		}
+		trackImageFeatures();
+		System.out.println("----------------------------------------------------------------------------");
+		System.out.println("### Creating Pairwise");
+		var generatePairwise = new GeneratePairwiseImageGraph();
+		BoofMiscOps.profile(() -> {
+			generatePairwise.setVerbose(System.out, null);
+			generatePairwise.process(similarImages);
+		}, "Created Pairwise graph");
+		pairwise = generatePairwise.getGraph();
+		MultiViewIO.save(pairwise, savePath.getPath());
+		System.out.println("  nodes.size=" + pairwise.nodes.size);
+		System.out.println("  edges.size=" + pairwise.edges.size);
 	}
 
 	/**
-	 * In this step a metric reconstruction is attempted using views with a 3D relationship. This is a tricky step
+	 * Next a metric reconstruction is attempted using views with a 3D relationship. This is a tricky step
 	 * and works by finding clusters of views which are likely to have numerically stable results then expanding
 	 * the sparse metric reconstruction.
 	 */
@@ -211,34 +223,32 @@ public class ExampleMultiviewSparseReconstruction {
 		if (!forceRecompute)
 			try {
 				working = MultiViewIO.load(savePath.getPath(), pairwise, null);
+				System.out.println("Loaded Metric Reconstruction");
+				return;
 			} catch (UncheckedIOException ignore) {}
 
-		if (working == null) {
-			System.out.println("----------------------------------------------------------------------------");
-			System.out.println("### Metric Reconstruction");
+		System.out.println("----------------------------------------------------------------------------");
+		System.out.println("### Metric Reconstruction");
 
-			var metric = new MetricFromUncalibratedPairwiseGraph();
-			metric.setVerbose(System.out, null);
-			metric.getInitProjective().setVerbose(System.out, null);
-			metric.getExpandMetric().setVerbose(System.out, null);
-			PairwiseImageGraph _pairwise = pairwise;
-			BoofMiscOps.profile(() -> {
-				if (!metric.process(similarImages, _pairwise)) {
-					System.err.println("Reconstruction failed");
-					System.exit(0);
-				}
-			}, "Computed metric working graph");
+		var metric = new MetricFromUncalibratedPairwiseGraph();
+		metric.setVerbose(System.out, null);
+		metric.getInitProjective().setVerbose(System.out, null);
+		metric.getExpandMetric().setVerbose(System.out, null);
+		PairwiseImageGraph _pairwise = pairwise;
+		BoofMiscOps.profile(() -> {
+			if (!metric.process(similarImages, _pairwise)) {
+				System.err.println("Reconstruction failed");
+				System.exit(0);
+			}
+		}, "Metric Reconstruction");
 
-			working = metric.getWorkGraph();
-			MultiViewIO.save(working, savePath.getPath());
-		} else {
-			System.out.println("Loaded Metric Reconstruction");
-		}
+		working = metric.getWorkGraph();
+		MultiViewIO.save(working, savePath.getPath());
 	}
 
 	/**
-	 * In this step we will consider all views, cameras, and points at once when optimizing. Unlike the previous
-	 * step which was focused on local optimality and stability.
+	 * Here the initial estimate found in the metric reconstruction is refined using Bundle Adjustment, which just
+	 * means all parameters (camera, view pose, point location) are optimized all at once.
 	 */
 	public void bundleAdjustmentRefine() {
 		var savePath = new File(workDirectory, "structure.yaml");
@@ -246,26 +256,25 @@ public class ExampleMultiviewSparseReconstruction {
 		if (!forceRecompute)
 			try {
 				scene = MultiViewIO.load(savePath.getPath(), (SceneStructureMetric)null);
+				System.out.println("Loaded Refined Scene");
+				return;
 			} catch (UncheckedIOException ignore) {}
 
-		SceneWorkingGraph _working = working;
-		if (scene == null) {
-			System.out.println("----------------------------------------------------------------------------");
-			System.out.println("Refining the scene");
+		System.out.println("----------------------------------------------------------------------------");
+		System.out.println("Refining the scene");
 
-			var refine = new RefineMetricWorkingGraph();
-			BoofMiscOps.profile(() -> {
-				refine.bundleAdjustment.keepFraction = 0.95;
-				refine.bundleAdjustment.getSba().setVerbose(System.out, null);
-				if (!refine.process(similarImages, _working)) {
-					System.out.println("REFINE FAILED");
-				}
-			}, "SBA refine");
-			scene = refine.bundleAdjustment.structure;
-			MultiViewIO.save(scene, savePath.getPath());
-		} else {
-			System.out.println("Loaded Refined Scene");
-		}
+		var refine = new RefineMetricWorkingGraph();
+		SceneWorkingGraph _working = working;
+		BoofMiscOps.profile(() -> {
+			// Bundle adjustment is run twice, with the worse 5% of points discarded in an attempt to reduce noise
+			refine.bundleAdjustment.keepFraction = 0.95;
+			refine.bundleAdjustment.getSba().setVerbose(System.out, null);
+			if (!refine.process(similarImages, _working)) {
+				System.out.println("SBA REFINE FAILED");
+			}
+		}, "Bundle Adjustment refine");
+		scene = refine.bundleAdjustment.structure;
+		MultiViewIO.save(scene, savePath.getPath());
 	}
 
 	/**
@@ -319,17 +328,5 @@ public class ExampleMultiviewSparseReconstruction {
 			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
 			ShowImages.showWindow(viewer.getComponent(), "Refined Scene", true);
 		});
-	}
-
-	public static void main( String[] args ) {
-		// Turn on threaded code for bundle adjustment
-		DDoglegConcurrency.USE_CONCURRENT = true;
-
-		var example = new ExampleMultiviewSparseReconstruction();
-		example.compute("house_01.mp4");
-//		example.compute("forest_path_01.mp4");
-		example.visualizeSparseCloud();
-
-		System.out.println("done");
 	}
 }
