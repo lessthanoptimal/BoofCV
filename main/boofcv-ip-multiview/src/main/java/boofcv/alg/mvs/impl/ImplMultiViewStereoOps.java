@@ -42,7 +42,7 @@ public class ImplMultiViewStereoOps {
 		final CameraPinhole intrinsic = parameters.pinhole;
 		final double baseline = parameters.baseline;
 		final double disparityMin = parameters.disparityMin;
-		final double[] R = parameters.rectifiedR.data;
+		final double[] R = parameters.rotateToRectified.data;
 		// pixel in normalized image coordinates
 		final Point2D_F64 norm = new Point2D_F64();
 
@@ -84,7 +84,7 @@ public class ImplMultiViewStereoOps {
 		final CameraPinhole intrinsic = parameters.pinhole;
 		final double baseline = parameters.baseline;
 		final double disparityMin = parameters.disparityMin;
-		final double[] R = parameters.rectifiedR.data;
+		final double[] R = parameters.rotateToRectified.data;
 
 		// pixel in normalized image coordinates
 		final Point2D_F64 norm = new Point2D_F64();
@@ -125,7 +125,7 @@ public class ImplMultiViewStereoOps {
 		final CameraPinhole intrinsic = parameters.pinhole;
 		final double baseline = parameters.baseline;
 		final double disparityMin = parameters.disparityMin;
-		final double[] R = parameters.rectifiedR.data;
+		final double[] R = parameters.rotateToRectified.data;
 
 		// pixel in normalized image coordinates
 		final Point2D_F64 norm = new Point2D_F64();

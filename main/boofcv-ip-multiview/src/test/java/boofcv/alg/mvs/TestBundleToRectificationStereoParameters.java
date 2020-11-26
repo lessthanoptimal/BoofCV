@@ -71,15 +71,15 @@ public class TestBundleToRectificationStereoParameters extends BoofStandardJUnit
 		alg.processView2(bundle2, 100, 150, view1_to_view2);
 
 		// See if everything is initialized
-		assertTrue(CommonOps_DDRM.elementSum(alg.rect1) != 0);
-		assertTrue(CommonOps_DDRM.elementSum(alg.rect2) != 0);
-		assertTrue(CommonOps_FDRM.elementSum(alg.rect1_F32) != 0);
-		assertTrue(CommonOps_FDRM.elementSum(alg.rect2_F32) != 0);
-		assertFalse(MatrixFeatures_DDRM.isEquals(alg.rect1, alg.rect2, UtilEjml.TEST_F64));
-		assertFalse(MatrixFeatures_FDRM.isEquals(alg.rect1_F32, alg.rect2_F32, UtilEjml.TEST_F32));
+		assertTrue(CommonOps_DDRM.elementSum(alg.undist_to_rect1) != 0);
+		assertTrue(CommonOps_DDRM.elementSum(alg.undist_to_rect2) != 0);
+		assertTrue(CommonOps_FDRM.elementSum(alg.undist_to_rect1_F32) != 0);
+		assertTrue(CommonOps_FDRM.elementSum(alg.undist_to_rect2_F32) != 0);
+		assertFalse(MatrixFeatures_DDRM.isEquals(alg.undist_to_rect1, alg.undist_to_rect2, UtilEjml.TEST_F64));
+		assertFalse(MatrixFeatures_FDRM.isEquals(alg.undist_to_rect1_F32, alg.undist_to_rect2_F32, UtilEjml.TEST_F32));
 
 		assertTrue(CommonOps_DDRM.elementSum(alg.rectifiedK) != 0);
-		assertTrue(CommonOps_DDRM.elementSum(alg.rectifiedRotation) != 0);
+		assertTrue(CommonOps_DDRM.elementSum(alg.rotate_orig_to_rect) != 0);
 
 		assertTrue(alg.rectifiedShape.height*alg.rectifiedShape.width > 0);
 	}

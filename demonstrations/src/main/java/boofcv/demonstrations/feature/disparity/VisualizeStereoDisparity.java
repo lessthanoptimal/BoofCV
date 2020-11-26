@@ -370,8 +370,8 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		// compute rectification matrices
 		rectifyAlg.process(K1, new Se3_F64(), K2, calib.getRightToLeft().invert(null));
 
-		DMatrixRMaj rect1 = rectifyAlg.getRect1();
-		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getUndistToRectPixels1();
+		DMatrixRMaj rect2 = rectifyAlg.getUndistToRectPixels2();
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();
 

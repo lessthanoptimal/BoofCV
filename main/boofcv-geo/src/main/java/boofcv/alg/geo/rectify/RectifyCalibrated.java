@@ -53,10 +53,10 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class RectifyCalibrated {
 
-	/** Rectification transform for first camera */
-	final @Getter DMatrixRMaj rect1 = new DMatrixRMaj(3, 3);
-	/** Rectification transform for first camera */
-	final @Getter DMatrixRMaj rect2 = new DMatrixRMaj(3, 3);
+	/** Rectification transform for view-1 camera. Undistored to rectified pixels. */
+	final @Getter DMatrixRMaj undistToRectPixels1 = new DMatrixRMaj(3, 3);
+	/** Rectification transform for view-2 camera. Undistored to rectified pixels. */
+	final @Getter DMatrixRMaj undistToRectPixels2 = new DMatrixRMaj(3, 3);
 
 	// direction of new coordinate system axises
 	final Vector3D_F64 v1 = new Vector3D_F64();
@@ -120,8 +120,8 @@ public class RectifyCalibrated {
 		SimpleMatrix KRR = K.mult(RR);
 
 		// rectification transforms
-		rect1.set(KRR.mult(KR1.invert()).getDDRM());
-		rect2.set(KRR.mult(KR2.invert()).getDDRM());
+		undistToRectPixels1.set(KRR.mult(KR1.invert()).getDDRM());
+		undistToRectPixels2.set(KRR.mult(KR2.invert()).getDDRM());
 
 		rectifiedRotation = RR.getDDRM();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -153,8 +153,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1, new Se3_F64(), K2, param.getRightToLeft().invert(null));
 
-		final DMatrixRMaj rect1 = rectify.getRect1();
-		final DMatrixRMaj rect2 = rectify.getRect2();
+		final DMatrixRMaj rect1 = rectify.getUndistToRectPixels1();
+		final DMatrixRMaj rect2 = rectify.getUndistToRectPixels2();
 
 		SwingUtilities.invokeLater(() -> gui.setRectification(param.getLeft(), rect1, param.getRight(), rect2));
 		gui.repaint();

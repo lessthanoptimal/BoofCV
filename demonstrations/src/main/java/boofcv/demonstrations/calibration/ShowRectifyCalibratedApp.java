@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,8 +99,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
-		DMatrixRMaj rect1 = rectifyAlg.getRect1();
-		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getUndistToRectPixels1();
+		DMatrixRMaj rect2 = rectifyAlg.getUndistToRectPixels2();
 		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier

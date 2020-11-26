@@ -88,7 +88,7 @@ public class MultiViewStereoOps {
 				continue;
 
 			// Convert it into rectified camera coordinates
-			GeometryMath_F64.mult(parameters.rectifiedR, cameraPt, rectPt);
+			GeometryMath_F64.mult(parameters.rotateToRectified, cameraPt, rectPt);
 
 			// Find the pixel it's projected onto
 			rectNorm_to_dispPixel.compute(rectPt.x/rectPt.z, rectPt.y/rectPt.z, pixel);

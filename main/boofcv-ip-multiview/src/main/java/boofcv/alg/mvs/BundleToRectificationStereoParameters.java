@@ -66,18 +66,18 @@ public class BundleToRectificationStereoParameters {
 	/** The rectified image's shape. The shape is adjust to minimize wasted pixels */
 	public final ImageDimension rectifiedShape = new ImageDimension();
 
-	/** Rectification homography. Pixels to rectified pixels. view-1 F64 */
-	public final DMatrixRMaj rect1 = new DMatrixRMaj(3, 3);
-	/** Rectification homography. Pixels to rectified pixels. view-2 F64 */
-	public final DMatrixRMaj rect2 = new DMatrixRMaj(3, 3);
+	/** Rectification homography. Undistorted pixels to rectified pixels. view-1 F64 */
+	public final DMatrixRMaj undist_to_rect1 = new DMatrixRMaj(3, 3);
+	/** Rectification homography. Undistorted pixels to rectified pixels. view-2 F64 */
+	public final DMatrixRMaj undist_to_rect2 = new DMatrixRMaj(3, 3);
 
-	/** Rectification homography. Pixels to rectified pixels. view-1 F32 */
-	public final FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3);
-	/** Rectification homography. Pixels to rectified pixels. view-2 F32 */
-	public final FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
+	/** Rectification homography. Undistorted pixels to rectified pixels. view-1 F32 */
+	public final FMatrixRMaj undist_to_rect1_F32 = new FMatrixRMaj(3, 3);
+	/** Rectification homography. Undistorted pixels to rectified pixels. view-2 F32 */
+	public final FMatrixRMaj undist_to_rect2_F32 = new FMatrixRMaj(3, 3);
 
 	/** Rotation from original to rectified coordinate system */
-	public final DMatrixRMaj rectifiedRotation = new DMatrixRMaj(3, 3);
+	public final DMatrixRMaj rotate_orig_to_rect = new DMatrixRMaj(3, 3);
 
 	// Used to compute rectification parameters for a stereo pair
 	final RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
@@ -117,22 +117,22 @@ public class BundleToRectificationStereoParameters {
 		rectifyAlg.process(K1, view1_to_view1, K2, view1_to_view2);
 
 		// rectification matrix for each image
-		rect1.set(rectifyAlg.getRect1());
-		rect2.set(rectifyAlg.getRect2());
-		rectifiedRotation.set(rectifyAlg.getRectifiedRotation());
+		undist_to_rect1.set(rectifyAlg.getUndistToRectPixels1());
+		undist_to_rect2.set(rectifyAlg.getUndistToRectPixels2());
+		rotate_orig_to_rect.set(rectifyAlg.getRectifiedRotation());
 
 		// Sanity check to see if it's bad
-		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(rect1));
-		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(rect2));
+		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(undist_to_rect1));
+		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(undist_to_rect2));
 
 		// New calibration matrix,
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
 
 		// Maximize the view of the left image and adjust the size of the rectified image
-		RectifyImageOps.fullViewLeft(intrinsic1, rect1, rect2, rectifiedK, rectifiedShape);
+		RectifyImageOps.fullViewLeft(intrinsic1, undist_to_rect1, undist_to_rect2, rectifiedK, rectifiedShape);
 
 		// undistorted and rectify images
-		ConvertMatrixData.convert(rect1, rect1_F32);
-		ConvertMatrixData.convert(rect2, rect2_F32);
+		ConvertMatrixData.convert(undist_to_rect1, undist_to_rect1_F32);
+		ConvertMatrixData.convert(undist_to_rect2, undist_to_rect2_F32);
 	}
 }

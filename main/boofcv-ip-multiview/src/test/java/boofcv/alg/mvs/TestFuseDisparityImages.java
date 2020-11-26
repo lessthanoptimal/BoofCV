@@ -102,7 +102,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 		// only part of the mask has valid values
 		ImageMiscOps.fillRectangle(image.mask, 1, 1, 1, 79, 59);
 		// when inverted this will counter act the distort above
-		CommonOps_DDRM.diag(image.rect, 3, 0.5, 0.5, 1);
+		CommonOps_DDRM.diag(image.undist_to_rect_px, 3, 0.5, 0.5, 1);
 
 		assertTrue(alg.addToFusedImage(image));
 		for (int y = 0; y < intrinsic.height; y++) {
@@ -135,7 +135,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 		image.mask.reshape(image.disparity);
 		image.parameters.setTo(parameters);
 		ImageMiscOps.fill(image.mask, 1);
-		CommonOps_DDRM.diag(image.rect, 3, 1, 1, 1);
+		CommonOps_DDRM.diag(image.undist_to_rect_px, 3, 1, 1, 1);
 		// every point will be at infinity
 		ImageMiscOps.fill(image.disparity, 0);
 		image.parameters.disparityMin = 0;
@@ -223,7 +223,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 		image.mask.reshape(image.disparity);
 		ImageMiscOps.fill(image.mask, 1);
 		image.parameters.setTo(param2);
-		CommonOps_DDRM.setIdentity(image.rect);
+		CommonOps_DDRM.setIdentity(image.undist_to_rect_px);
 
 		assertTrue(alg.addToFusedImage(image));
 		for (int y = 0; y < height; y++) {

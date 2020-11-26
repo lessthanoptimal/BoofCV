@@ -267,7 +267,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 				computeRectification.processView2(connectedCamera,
 						connected.dimension.width, connected.dimension.height, view1_to_view2);
 				scoreCoverage.addView(connected.dimension.width, connected.dimension.height,
-						computeRectification.rect2, (float)pair.quality3D);
+						computeRectification.undist_to_rect2, (float)pair.quality3D);
 			}
 
 			// Look at the sum of all information and see what the score is

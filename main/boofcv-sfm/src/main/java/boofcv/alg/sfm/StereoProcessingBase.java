@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,8 +112,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
-		rect1 = rectifyAlg.getRect1();
-		rect2 = rectifyAlg.getRect2();
+		rect1 = rectifyAlg.getUndistToRectPixels1();
+		rect2 = rectifyAlg.getUndistToRectPixels2();
 		// New calibration and rotation matrix, Both cameras are the same after rectification.
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();

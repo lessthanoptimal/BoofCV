@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,8 +69,8 @@ public class StereoConsistencyCheck {
 		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
-		DMatrixRMaj rect1 = rectifyAlg.getRect1();
-		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getUndistToRectPixels1();
+		DMatrixRMaj rect2 = rectifyAlg.getUndistToRectPixels2();
 
 		leftImageToRect = RectifyImageOps.transformPixelToRect(param.left, rect1);
 		rightImageToRect = RectifyImageOps.transformPixelToRect(param.right, rect2);
