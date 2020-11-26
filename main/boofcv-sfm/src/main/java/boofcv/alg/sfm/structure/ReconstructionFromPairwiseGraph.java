@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -209,22 +209,32 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		// ignore nodes with too low of a score
 		double minScore = candidates.get(candidates.size() - 1).score*0.2;
 
+		// Collect summary information on rejections
+		int rejectedNeighbor = 0;
+		int rejectedScore = 0;
+		int rejectedClose = 0;
+
 		// Start iterating from the best scores
 		for (int i = candidates.size() - 1; i >= 0; i--) {
 			SeedInfo s = candidates.get(i);
 
 			// skip if it's a neighbor to an already selected seed
-			if (s.neighbor)
+			if (s.neighbor) {
+				rejectedNeighbor++;
 				continue;
+			}
 
 			// All scores for now on will be below the minimum
-			if (s.score <= minScore)
+			if (s.score <= minScore) {
+				rejectedScore++;
 				break;
+			}
 
 			// If any of the connected seeds are zero it's too close to another seed and you should pass over it
 			boolean skip = false;
 			for (int j = 0; j < s.seed.connections.size; j++) {
 				if (lookupInfo.get(s.seed.connections.get(j).other(s.seed).id).neighbor) {
+					rejectedClose++;
 					skip = true;
 					break;
 				}
@@ -240,6 +250,12 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 				lookupInfo.get(s.seed.connections.get(j).other(s.seed).id).neighbor = true;
 			}
 		}
+
+		if (verbose!=null)
+			verbose.printf("Seed Rejections: neighbor=%3d score=%3d close=%d\n",
+					rejectedNeighbor,rejectedScore,rejectedClose);
+
+
 		return seeds;
 	}
 

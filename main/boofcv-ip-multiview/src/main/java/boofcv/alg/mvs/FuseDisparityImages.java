@@ -154,55 +154,59 @@ public class FuseDisparityImages {
 		DConvertMatrixStruct.convert(image.undist_to_rect_px, rect);
 
 		// fused image undistorted pixel coordinates
-		Point2D_F64 pixelUndist = new Point2D_F64();
+		Point2D_F64 undistPix = new Point2D_F64();
 		// rectified image coordinates
-		Point2D_F64 pixelRect = new Point2D_F64();
+		Point2D_F64 rectPix = new Point2D_F64();
 
 		// To avoid sampling issues, go from fused image to disparity image
-		for (int y = 0; y < fused.height; y++) {
-			for (int x = 0; x < fused.width; x++) {
+		for (int origPixY = 0; origPixY < fused.height; origPixY++) {
+			for (int origPixX = 0; origPixX < fused.width; origPixX++) {
 				// Go from distorted to undistorted pixels
-				pixelOrig_to_Undist.compute(x, y, pixelUndist);
+				pixelOrig_to_Undist.compute(origPixX, origPixY, undistPix);
 				// undistorted to rectified pixels
-				HomographyPointOps_F64.transform(rect, pixelUndist.x, pixelUndist.y, pixelRect);
+				HomographyPointOps_F64.transform(rect, undistPix.x, undistPix.y, rectPix);
 
 				// Make sure it's inside the disparity image before sampling. Only checking lower bound because of the
 				// tricked used below
-				if (pixelRect.x < 0.0 || pixelRect.y < 0.0)
+				if (rectPix.x < 0.0 || rectPix.y < 0.0)
 					continue;
 
 				// Discretize the point so that a pixel can be read. Round instead of floor to reduce error.
-				int xx = (int)(pixelRect.x + 0.5);
-				int yy = (int)(pixelRect.y + 0.5);
+				int rectPixX = (int)(rectPix.x + 0.5);
+				int rectPixY = (int)(rectPix.y + 0.5);
 
 				// Make sure it's inside the disparity image before sampling
-				if (xx >= mask.width || yy >= mask.height)
+				if (rectPixX >= mask.width || rectPixY >= mask.height)
 					continue;
 
 				// If marked as invalid don't sample here
-				if (mask.unsafe_get(xx, yy) == 0)
+				if (mask.unsafe_get(rectPixX, rectPixY) == 0)
 					continue;
 
 				// Sample the disparity image and make sure it has a valid value
-				float imageDisp = disparity.unsafe_get(xx, yy);
+				float imageDisp = disparity.unsafe_get(rectPixX, rectPixY);
 				if (imageDisp >= imageRange)
 					continue;
+				// Don't trust the disparity if it's at the upper or lower extremes. It's likely that the true value
+				// was above or below but it wasn't allowed to match there
+//				if (imageDisp < 1.0f || imageDisp > imageRange-1.0f)
+//					continue;  TODO consider in the future once there are metrics
 
 				if (imageDisp + imageMin != 0) {
 					// Convert the disparity from "image" into "fused image"
 					// First compute the 3D point in the rectified coordinate system
 					double rectZ = imageBaseline*imageFocalX/(imageDisp + imageMin);
-					double rectX = rectZ*(x - imagePinhole.cx)/imagePinhole.fx;
-					double rectY = rectZ*(y - imagePinhole.cy)/imagePinhole.fy;
+					double rectX = rectZ*(rectPixX - imagePinhole.cx)/imagePinhole.fx;
+					double rectY = rectZ*(rectPixY - imagePinhole.cy)/imagePinhole.fy;
 					// Go from rectified to left camera, which is the fused camera
 					double worldZ = dotRightCol(imageParam.rotateToRectified, rectX, rectY, rectZ);
 					// Now that we know Z we can compute the disparity
 					float fusedDisp = (float)(fusedBaseline*fusedIntrinsic.fx/worldZ);
 
-					fused.get(x, y).add(fusedDisp);
+					fused.get(origPixX, origPixY).add(fusedDisp);
 				} else {
 					// Points at infinity are a special case. They will remain at infinity
-					fused.get(x, y).add(0.0f);
+					fused.get(origPixX, origPixY).add(0.0f);
 				}
 			}
 		}
