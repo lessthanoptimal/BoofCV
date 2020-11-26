@@ -91,7 +91,7 @@ public class ExampleStereoDisparity3D {
 		disparityParameters.baseline = param.getBaseline();
 		disparityParameters.disparityMin = disparityMin;
 		disparityParameters.disparityRange = disparityRange;
-		disparityParameters.rectifiedR.set(rectR);
+		disparityParameters.rotateToRectified.set(rectR);
 		PerspectiveOps.matrixToPinhole(rectK, rectLeft.width, rectRight.height, disparityParameters.pinhole);
 
 		// Iterate through each pixel in disparity image and compute its 3D coordinate

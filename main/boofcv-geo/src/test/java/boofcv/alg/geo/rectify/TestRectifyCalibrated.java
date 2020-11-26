@@ -66,9 +66,9 @@ public class TestRectifyCalibrated extends BoofStandardJUnit {
 
 		// apply rectification transform
 		DMatrixRMaj temp = new DMatrixRMaj(3, 4);
-		CommonOps_DDRM.mult(alg.getRect1(), foundP1, temp);
+		CommonOps_DDRM.mult(alg.getUndistToRectPixels1(), foundP1, temp);
 		foundP1.set(temp);
-		CommonOps_DDRM.mult(alg.getRect2(), foundP2, temp);
+		CommonOps_DDRM.mult(alg.getUndistToRectPixels2(), foundP2, temp);
 		foundP2.set(temp);
 
 		CommonOps_DDRM.scale(0.1/Math.abs(foundP1.get(2, 3)), foundP1);
@@ -138,8 +138,8 @@ public class TestRectifyCalibrated extends BoofStandardJUnit {
 		RectifyCalibrated alg = new RectifyCalibrated();
 		alg.process(k1, poseA1, k2, poseA2);
 
-		assertTrue(MatrixFeatures_DDRM.isEquals(expected1, alg.rect1, UtilEjml.TEST_F64));
-		assertTrue(MatrixFeatures_DDRM.isEquals(expected2, alg.rect2, UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isEquals(expected1, alg.undistToRectPixels1, UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isEquals(expected2, alg.undistToRectPixels2, UtilEjml.TEST_F64));
 	}
 
 	/**
@@ -163,9 +163,9 @@ public class TestRectifyCalibrated extends BoofStandardJUnit {
 
 		// apply transform
 		Point3D_F64 epi1a = new Point3D_F64();
-		GeometryMath_F64.mult(alg.getRect1(), epi1, epi1a);
+		GeometryMath_F64.mult(alg.getUndistToRectPixels1(), epi1, epi1a);
 		Point3D_F64 epi2a = new Point3D_F64();
-		GeometryMath_F64.mult(alg.getRect2(), epi2, epi2a);
+		GeometryMath_F64.mult(alg.getUndistToRectPixels2(), epi2, epi2a);
 
 		// see if epipoles are now at infinity
 		assertEquals(0, epi1a.getZ(), 1e-8);
@@ -215,8 +215,8 @@ public class TestRectifyCalibrated extends BoofStandardJUnit {
 		Point2D_F64 r1 = new Point2D_F64();
 		Point2D_F64 r2 = new Point2D_F64();
 
-		GeometryMath_F64.mult(alg.getRect1(), o1, r1);
-		GeometryMath_F64.mult(alg.getRect2(), o2, r2);
+		GeometryMath_F64.mult(alg.getUndistToRectPixels1(), o1, r1);
+		GeometryMath_F64.mult(alg.getUndistToRectPixels2(), o2, r2);
 
 		// see if they line up
 		assertEquals(r1.y, r2.y, 1e-8);

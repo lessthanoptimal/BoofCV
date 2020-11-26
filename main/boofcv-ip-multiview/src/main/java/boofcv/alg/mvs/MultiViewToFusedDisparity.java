@@ -143,8 +143,8 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 			// allow access to the disparity before it's discarded
 			if (listener != null) listener.handlePairDisparity(targetIdx, pairIdxs.get(i),
 					rectified1, rectified2,
-					results.disparity, results.mask, results.param, results.rect1);
-			performFusion.addDisparity(results.disparity, results.mask, results.param, results.rect1);
+					results.disparity, results.mask, results.param, results.undist_to_rect1);
+			performFusion.addDisparity(results.disparity, results.mask, results.param, results.undist_to_rect1);
 		}
 
 		if (verbose != null) verbose.println("Created fused stereo disparity image");
@@ -159,7 +159,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		fusedParam.disparityRange = performFusion.getFusedDisparityRange();
 		fusedParam.pinhole.setTo(computeRectification.intrinsic1);
 		fusedParam.baseline = performFusion.getFusedBaseline();
-		CommonOps_DDRM.setIdentity(fusedParam.rectifiedR);
+		CommonOps_DDRM.setIdentity(fusedParam.rotateToRectified);
 
 		return true;
 	}
@@ -187,18 +187,18 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 				image2.getWidth(), image2.getHeight(), left_to_right);
 
 		// Save the results
-		info.param.rectifiedR.set(computeRectification.rectifiedRotation);
-		info.rect1.set(computeRectification.rect1);
+		info.param.rotateToRectified.set(computeRectification.rotate_orig_to_rect);
+		info.undist_to_rect1.set(computeRectification.undist_to_rect1);
 
 		// New calibration matrix,
 		info.rectifiedK.set(computeRectification.rectifiedK);
 
 		ImageDistort<Image, Image> distortLeft =
 				RectifyDistortImageOps.rectifyImage(computeRectification.intrinsic1,
-						computeRectification.rect1_F32, BorderType.EXTENDED, image1.getImageType());
+						computeRectification.undist_to_rect1_F32, BorderType.EXTENDED, image1.getImageType());
 		ImageDistort<Image, Image> distortRight =
 				RectifyDistortImageOps.rectifyImage(computeRectification.intrinsic2,
-						computeRectification.rect2_F32, BorderType.EXTENDED, image2.getImageType());
+						computeRectification.undist_to_rect2_F32, BorderType.EXTENDED, image2.getImageType());
 
 		ImageDimension rectifiedShape = computeRectification.rectifiedShape;
 		info.mask.reshape(rectifiedShape.width, rectifiedShape.height);
@@ -238,7 +238,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 		// Geometric description of the disparity
 		final DisparityParameters param = new DisparityParameters();
 		// Rectification matrix for view-1
-		final DMatrixRMaj rect1 = new DMatrixRMaj(3, 3);
+		final DMatrixRMaj undist_to_rect1 = new DMatrixRMaj(3, 3);
 		// Rectified camera's intrinsic parameters
 		final DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
 	}

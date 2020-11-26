@@ -55,7 +55,7 @@ public class FuseDisparityImages {
 	@Getter double fusedBaseline; // computed dynamically
 
 	// undistorted to distorted pixel coordinates
-	PixelTransform<Point2D_F64> pixelDist_to_Undist;
+	PixelTransform<Point2D_F64> pixelOrig_to_Undist;
 
 	// A copy of all the input disparity images
 	final @Getter FastQueue<DisparityImage> images = new FastQueue<>(DisparityImage::new, DisparityImage::reset);
@@ -77,7 +77,7 @@ public class FuseDisparityImages {
 		this.fusedIntrinsic.setTo(intrinsic);
 		this.images.reset();
 		this.fused.resize(intrinsic.width, intrinsic.height);
-		this.pixelDist_to_Undist = pixelDist_to_Undist;
+		this.pixelOrig_to_Undist = pixelDist_to_Undist;
 	}
 
 	/**
@@ -86,16 +86,17 @@ public class FuseDisparityImages {
 	 * @param disparity The disparity image. Does not need to be same shape as original.
 	 * @param mask Indicates which pixels could have usable disparity information
 	 * @param parameters Disparity parameters for this stereo pair.
-	 * @param rect Rectification matrix (3x3) from undistorted to rectified pixel coordinates
+	 * @param undist_to_rect_px Rectification matrix (3x3) from undistorted to rectified pixel coordinates
 	 */
-	public void addDisparity( GrayF32 disparity, GrayU8 mask, DisparityParameters parameters, DMatrixRMaj rect ) {
+	public void addDisparity( GrayF32 disparity, GrayU8 mask, DisparityParameters parameters,
+							  DMatrixRMaj undist_to_rect_px ) {
 		InputSanityCheck.checkSameShape(disparity, mask);
 		parameters.checkValidity();
 
 		DisparityImage d = images.grow();
 		d.disparity.setTo(disparity);
 		d.mask.setTo(mask);
-		d.rect.set(rect);
+		d.undist_to_rect_px.set(undist_to_rect_px);
 		d.parameters.setTo(parameters);
 	}
 
@@ -150,7 +151,7 @@ public class FuseDisparityImages {
 		final double imageBaseline = imageParam.baseline;
 		final CameraPinhole imagePinhole = imageParam.pinhole;
 
-		DConvertMatrixStruct.convert(image.rect, rect);
+		DConvertMatrixStruct.convert(image.undist_to_rect_px, rect);
 
 		// fused image undistorted pixel coordinates
 		Point2D_F64 pixelUndist = new Point2D_F64();
@@ -161,7 +162,7 @@ public class FuseDisparityImages {
 		for (int y = 0; y < fused.height; y++) {
 			for (int x = 0; x < fused.width; x++) {
 				// Go from distorted to undistorted pixels
-				pixelDist_to_Undist.compute(x, y, pixelUndist);
+				pixelOrig_to_Undist.compute(x, y, pixelUndist);
 				// undistorted to rectified pixels
 				HomographyPointOps_F64.transform(rect, pixelUndist.x, pixelUndist.y, pixelRect);
 
@@ -170,7 +171,7 @@ public class FuseDisparityImages {
 				if (pixelRect.x < 0.0 || pixelRect.y < 0.0)
 					continue;
 
-				// Discretize the point so that a pixel can be read. Round to reduce error. This faster then round()
+				// Discretize the point so that a pixel can be read. Round instead of floor to reduce error.
 				int xx = (int)(pixelRect.x + 0.5);
 				int yy = (int)(pixelRect.y + 0.5);
 
@@ -194,7 +195,7 @@ public class FuseDisparityImages {
 					double rectX = rectZ*(x - imagePinhole.cx)/imagePinhole.fx;
 					double rectY = rectZ*(y - imagePinhole.cy)/imagePinhole.fy;
 					// Go from rectified to left camera, which is the fused camera
-					double worldZ = dotRightCol(imageParam.rectifiedR, rectX, rectY, rectZ);
+					double worldZ = dotRightCol(imageParam.rotateToRectified, rectX, rectY, rectZ);
 					// Now that we know Z we can compute the disparity
 					float fusedDisp = (float)(fusedBaseline*fusedIntrinsic.fx/worldZ);
 
@@ -285,14 +286,14 @@ public class FuseDisparityImages {
 		/** Mask which indicates pixels that have a source inside the original image and are valid */
 		public final GrayU8 mask = new GrayU8(1, 1);
 		/** Rectification matrix/homography. From undistorted pixel to rectified pixel */
-		public final DMatrixRMaj rect = new DMatrixRMaj(3, 3);
+		public final DMatrixRMaj undist_to_rect_px = new DMatrixRMaj(3, 3);
 		/** Geometric meaning of disparity fo this view */
 		public final DisparityParameters parameters = new DisparityParameters();
 
 		public void reset() {
 			disparity.reshape(1, 1);
 			mask.reshape(1, 1);
-			CommonOps_DDRM.fill(rect, 0);
+			CommonOps_DDRM.fill(undist_to_rect_px, 0);
 			parameters.reset();
 		}
 	}

@@ -40,7 +40,7 @@ public class DisparityParameters {
 	/** Rectified camera's intrinsic parameters */
 	public final CameraPinhole pinhole = new CameraPinhole();
 	/** Rotation from view to rectified synthetic view */
-	public final DMatrixRMaj rectifiedR = CommonOps_DDRM.identity(3);
+	public final DMatrixRMaj rotateToRectified = CommonOps_DDRM.identity(3);
 
 	// TODO update everything to use rectifiedR
 
@@ -60,7 +60,7 @@ public class DisparityParameters {
 		disparityRange = 0;
 		baseline = 0;
 		pinhole.fsetK(0, 0, 0, 0, 0, 0, 0);
-		CommonOps_DDRM.setIdentity(rectifiedR);
+		CommonOps_DDRM.setIdentity(rotateToRectified);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class DisparityParameters {
 		this.disparityRange = src.disparityRange;
 		this.baseline = src.baseline;
 		this.pinhole.setTo(src.pinhole);
-		this.rectifiedR.set(src.rectifiedR);
+		this.rotateToRectified.set(src.rotateToRectified);
 	}
 
 	/** Checks if specified parameters are valid */

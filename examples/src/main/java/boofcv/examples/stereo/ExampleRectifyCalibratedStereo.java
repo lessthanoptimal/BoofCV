@@ -93,8 +93,8 @@ public class ExampleRectifyCalibratedStereo {
 		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
-		DMatrixRMaj rect1 = rectifyAlg.getRect1();
-		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getUndistToRectPixels1();
+		DMatrixRMaj rect2 = rectifyAlg.getUndistToRectPixels2();
 		// New calibration matrix,
 		// Both cameras have the same one after rectification.
 		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();

@@ -61,7 +61,7 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 		parameters.disparityRange = disparityRange;
 		parameters.pinhole.fsetK(50, 50, 0.0, width/2, height/2, width, height);
 		parameters.baseline = 1.2;
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -0.05, 0.0, -0.02, parameters.rectifiedR);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -0.05, 0.0, -0.02, parameters.rotateToRectified);
 		n_to_p = new LensDistortionPinhole(parameters.pinhole).distort_F64(false, true);
 		p_to_n = new PointToPixelTransform_F64(new LensDistortionPinhole(parameters.pinhole).
 				distort_F64(true, false));

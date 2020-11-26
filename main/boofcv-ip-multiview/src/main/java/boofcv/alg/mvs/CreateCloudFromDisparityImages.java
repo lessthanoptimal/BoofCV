@@ -132,7 +132,7 @@ public class CreateCloudFromDisparityImages {
 				rectP.y = rectP.z*norm.y;
 
 				// Rectified left camera to native left camera
-				GeometryMath_F64.multTran(parameters.rectifiedR, rectP, leftP);
+				GeometryMath_F64.multTran(parameters.rotateToRectified, rectP, leftP);
 
 				// Left to world frame
 				SePointOps_F64.transformReverse(world_to_view, leftP, cloud.grow());

@@ -29,7 +29,7 @@ public class TestDisparityParameters extends BoofStandardJUnit {
 	@Test void setTo() {
 		var src = new DisparityParameters();
 		src.pinhole.fsetK(1,2,3,4,5,6,9);
-		src.rectifiedR.set(0,0,2);
+		src.rotateToRectified.set(0,0,2);
 		src.baseline = 10;
 		src.disparityRange = 102;
 		src.disparityMin = 8;
@@ -38,7 +38,7 @@ public class TestDisparityParameters extends BoofStandardJUnit {
 		dst.setTo(src);
 
 		assertTrue(src.pinhole.isEquals(dst.pinhole, 1e-8));
-		assertTrue(MatrixFeatures_DDRM.isEquals(src.rectifiedR, dst.rectifiedR));
+		assertTrue(MatrixFeatures_DDRM.isEquals(src.rotateToRectified, dst.rotateToRectified));
 		assertEquals(src.baseline, dst.baseline);
 		assertEquals(src.disparityRange, dst.disparityRange);
 		assertEquals(src.disparityMin, dst.disparityMin);
