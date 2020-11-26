@@ -63,6 +63,7 @@ public class ExampleMultiviewDenseReconstruction {
 		var example = new ExampleMultiviewSparseReconstruction();
 		example.compute("house_01.mp4");
 //		example.compute("forest_path_01.mp4");
+//		example.compute("rock_01.mp4");
 
 		// Configure there stereo disparity algorithm which is used
 		var configDisparity = new ConfigDisparityBMBest5();

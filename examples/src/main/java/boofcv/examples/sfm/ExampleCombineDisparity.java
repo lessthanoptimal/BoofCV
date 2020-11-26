@@ -72,7 +72,8 @@ public class ExampleCombineDisparity {
 		// The next task is selecting a view to act as the "center" then we will compute stereo disparity images from
 		// all of its neighbors. The process of selecting the best views to use as centers is a problem all it's own
 		// instead we will pick a view and just hope everything works out
-		SceneWorkingGraph.View center = example.working.getAllViews().get(20);
+		int centerViewIdx = 20;
+		SceneWorkingGraph.View center = example.working.getAllViews().get(centerViewIdx);
 
 		// The final scene refined by bundle adjustment is created by the Working graph. However the 3D relationship
 		// between views is contained in the pairwise graph. A View in the working graph has a reference to the view
@@ -105,7 +106,7 @@ public class ExampleCombineDisparity {
 		});
 
 		// Add the center camera image to the ID look up table
-		sbaIndexToImageID.put(20, center.pview.id);
+		sbaIndexToImageID.put(centerViewIdx, center.pview.id);
 
 		// Configure there stereo disparity algorithm which is used
 		var configDisparity = new ConfigDisparityBMBest5();
