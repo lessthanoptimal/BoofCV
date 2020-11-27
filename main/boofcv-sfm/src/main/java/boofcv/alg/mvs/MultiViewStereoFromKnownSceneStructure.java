@@ -66,7 +66,7 @@ import static java.util.Objects.requireNonNull;
  * NOTE: Before this can be used you must call {@link #setStereoDisparity}.
  *
  * @see ScoreRectifiedViewCoveragePixels
- * @see MultiViewToFusedDisparity
+ * @see MultiBaselineStereoIndependent
  * @see CreateCloudFromDisparityImages
  *
  * * @author Peter Abeles
@@ -98,7 +98,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * Given one "center" view and several other views which form a stereo pair, compute a single
 	 * combined disparity image
 	 */
-	final @Getter MultiViewToFusedDisparity<T> computeFused;
+	final @Getter MultiBaselineStereoIndependent<T> computeFused;
 	/** Combine multiple disparity images into a single point cloud while avoiding redundant points */
 	final @Getter CreateCloudFromDisparityImages disparityCloud = new CreateCloudFromDisparityImages();
 
@@ -132,7 +132,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	@Nullable PrintStream verbose = null;
 
 	public MultiViewStereoFromKnownSceneStructure( LookUpImages imageLookUp, ImageType<T> imageType ) {
-		this.computeFused = new MultiViewToFusedDisparity<>(imageLookUp, imageType);
+		this.computeFused = new MultiBaselineStereoIndependent<>(imageLookUp, imageType);
 		this.imageLookUp = imageLookUp;
 	}
 

@@ -22,8 +22,8 @@ import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.mvs.DisparityParameters;
+import boofcv.alg.mvs.MultiBaselineStereoIndependent;
 import boofcv.alg.mvs.MultiViewStereoOps;
-import boofcv.alg.mvs.MultiViewToFusedDisparity;
 import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.FactoryStereoDisparity;
@@ -54,13 +54,15 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * This example shows how multiple disparity images computed with a common "center" image can be combined
- * into a single disparity image that has less noise and simplify processing. This is a common intermediate
- * step in a MVS pipeline.
+ * Multi Baseline Stereo (MBS) is a problem where you have one common/center image with multiple paired images that have
+ * different baselines from each other and the goal is to output a single combined stereo image. In BoofCV, this
+ * combined stereo image will be the original image's pixel as compared to the more standard rectified image. At
+ * the time of this writing, BoofCV only contains one MBS algorithm, which is just about the simplest one possible
+ * and works by combining independently computed disparity images together using a median filter to select the output.
  *
  * @author Peter Abeles
  */
-public class ExampleCombineDisparity {
+public class ExampleMultiBaselineStereo {
 	public static void main( String[] args ) {
 		// Compute a sparse reconstruction. This will give us intrinsic and extrinsic for all views
 		var example = new ExampleMultiViewSparseReconstruction();
@@ -115,11 +117,11 @@ public class ExampleCombineDisparity {
 		configDisparity.regionRadiusX = configDisparity.regionRadiusY = 4;
 		configDisparity.disparityRange = 50;
 
-		// This is the code which combines/fuses multiple disparity images together. It employs a very simple
-		// algorithm based on voting. See class description for details.
-		var disparityFusion = new MultiViewToFusedDisparity<>(imageLookup, ImageType.SB_U8);
-		disparityFusion.setVerbose(System.out, null);
-		disparityFusion.setStereoDisparity(
+		// This is the actual MBS algorithm mentioned previously. It selects the best disparity for each pixel
+		// in the original image using a median filter.
+		var multiBaseline = new MultiBaselineStereoIndependent<>(imageLookup, ImageType.SB_U8);
+		multiBaseline.setVerbose(System.out, null);
+		multiBaseline.setStereoDisparity(
 				FactoryStereoDisparity.blockMatchBest5(configDisparity, GrayU8.class, GrayF32.class));
 
 		// Creates a list where you can switch between different images/visualizations
@@ -128,8 +130,8 @@ public class ExampleCombineDisparity {
 		ShowImages.showWindow(listDisplay, "Intermediate Results", true);
 
 		// We will display intermediate results as they come in
-		disparityFusion.setListener(( leftView, rightView, rectLeft, rectRight,
-									  disparity, mask, parameters, rect ) -> {
+		multiBaseline.setListener(( leftView, rightView, rectLeft, rectRight,
+									disparity, mask, parameters, rect ) -> {
 			// Visualize the rectified stereo pair. You can interact with this window and verify
 			// that the y-axis is  aligned
 			var rectified = new RectifiedPairPanel(true);
@@ -148,13 +150,13 @@ public class ExampleCombineDisparity {
 		});
 
 		// Process the images and compute a single combined disparity image
-		if (!disparityFusion.process(example.scene, center.index, pairedViewIdxs, sbaIndexToImageID::get)) {
+		if (!multiBaseline.process(example.scene, center.index, pairedViewIdxs, sbaIndexToImageID::get)) {
 			throw new RuntimeException("Failed to fuse stereo views");
 		}
 
 		// Extract the point cloud from the fused disparity image
-		GrayF32 fusedDisparity = disparityFusion.getFusedDisparity();
-		DisparityParameters fusedParam = disparityFusion.getFusedParam();
+		GrayF32 fusedDisparity = multiBaseline.getFusedDisparity();
+		DisparityParameters fusedParam = multiBaseline.getFusedParam();
 		BufferedImage colorizedDisp = VisualizeImageData.disparity(fusedDisparity, null, fusedParam.disparityRange, 0);
 		ShowImages.showWindow(colorizedDisp, "Fused Disparity");
 

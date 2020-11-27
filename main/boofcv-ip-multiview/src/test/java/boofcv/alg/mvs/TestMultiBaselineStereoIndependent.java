@@ -47,7 +47,7 @@ import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
+public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 
 	boolean visualize = false;
 
@@ -100,7 +100,7 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		scene.setView(2, 2, true, world_to_view2);
 
 		var lookup = new MockLookUp();
-		var alg = new MultiViewToFusedDisparity<>(lookup, ImageType.SB_F32);
+		var alg = new MultiBaselineStereoIndependent<>(lookup, ImageType.SB_F32);
 		// Not mocking disparity because of how complex that would be to pull off. This makes it a bit of an inexact
 		// science to ensure fill in
 		var configDisp = new ConfigDisparityBMBest5();
@@ -174,7 +174,7 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 			scene.setView(i, 0, true, eulerXyz(i, 0, 0, 0, 0, 0, null));
 		}
 
-		var alg = new MultiViewToFusedDisparity<>(ImageType.SB_F32);
+		var alg = new MultiBaselineStereoIndependent<>(ImageType.SB_F32);
 
 		var configDisp = new ConfigDisparityBMBest5();
 		configDisp.errorType = DisparityError.SAD;
