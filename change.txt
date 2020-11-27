@@ -106,7 +106,6 @@ Version : 0.37
 TODO Add seek to SimpleSequence
 
 TODO Move projective to metric and similar from multiview to perspective
-TODO rename RansacMultiView to RansacCalibrated
 
 TODO PointTracker
   - Redesign PointTrackerTwoPass into PointTrackerHint

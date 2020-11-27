@@ -125,7 +125,7 @@ public class FactoryMultiViewRobust {
 		// convert from pixels to pixels squared
 		double threshold = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new RansacMultiView<>(ransac.randSeed, manager, generator, distance, ransac.iterations, threshold);
+		return new RansacCalibrated<>(ransac.randSeed, manager, generator, distance, ransac.iterations, threshold);
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class FactoryMultiViewRobust {
 
 	/**
 	 * Robust solution for estimating the stereo baseline {@link Se3_F64} using epipolar geometry from two views with
-	 * {@link RansacMultiView}.  Input observations are in normalized image coordinates.
+	 * {@link RansacCalibrated}.  Input observations are in normalized image coordinates.
 	 *
 	 * <p>See code for all the details.</p>
 	 *
@@ -238,7 +238,7 @@ public class FactoryMultiViewRobust {
 
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold * 2.0;
 
-		return new RansacMultiView<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
+		return new RansacCalibrated<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
 				ransac.iterations, ransacTOL);
 	}
 
@@ -267,7 +267,7 @@ public class FactoryMultiViewRobust {
 				new DistanceMultiView_EssentialSampson();
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold;
 
-		return new RansacMultiView<>(ransac.randSeed, managerE, generateE, errorMetric,
+		return new RansacCalibrated<>(ransac.randSeed, managerE, generateE, errorMetric,
 				ransac.iterations, ransacTOL);
 	}
 
@@ -375,7 +375,7 @@ public class FactoryMultiViewRobust {
 	 * @param ransac RANSAC configuration
 	 * @return Ransac
 	 */
-	public static RansacMultiView<Homography2D_F64,AssociatedPair>
+	public static RansacCalibrated<Homography2D_F64,AssociatedPair>
 	homographyCalibratedRansac( ConfigRansac ransac )
 	{
 		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
@@ -384,7 +384,7 @@ public class FactoryMultiViewRobust {
 
 		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new RansacMultiView<>
+		return new RansacCalibrated<>
 				(ransac.randSeed, manager, modelFitter, distance, ransac.iterations, ransacTol);
 	}
 

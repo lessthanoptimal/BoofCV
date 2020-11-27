@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,15 +29,15 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  *
  * @author Peter Abeles
  */
-public class RansacMultiView<Model,Point> extends Ransac<Model,Point>
+public class RansacCalibrated<Model,Point> extends Ransac<Model,Point>
 		implements ModelMatcherMultiview<Model,Point>
 {
 	private DistanceFromModelMultiView<Model,Point> modelDistance;
 
-	public RansacMultiView(long randSeed,
-						   ModelManager<Model> modelManager,
-						   ModelGenerator<Model, Point> modelGenerator,
-						   DistanceFromModelMultiView<Model,Point> modelDistance, int maxIterations, double thresholdFit)
+	public RansacCalibrated( long randSeed,
+							 ModelManager<Model> modelManager,
+							 ModelGenerator<Model, Point> modelGenerator,
+							 DistanceFromModelMultiView<Model,Point> modelDistance, int maxIterations, double thresholdFit)
 	{
 		super(randSeed, modelManager, modelGenerator, modelDistance, maxIterations, thresholdFit);
 		this.modelDistance = modelDistance;
