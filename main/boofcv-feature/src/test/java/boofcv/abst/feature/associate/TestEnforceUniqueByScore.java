@@ -22,9 +22,9 @@ import boofcv.alg.feature.associate.AssociateUniqueByScoreAlg;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -97,7 +97,7 @@ public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 	private static class Dummy extends AssociateUniqueByScoreAlg {
 
 		boolean calledProcess = false;
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
+		DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 		int numSource;
 		int numDestination;
 
@@ -113,7 +113,7 @@ public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 		}
 
 		@Override
-		public FastQueue<AssociatedIndex> getMatches() {
+		public DogArray<AssociatedIndex> getMatches() {
 			return matches;
 		}
 	}
@@ -125,10 +125,10 @@ public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 		boolean uniqueSource;
 		boolean uniqueDestination;
 
-		GrowQueue_I32 unSrc = new GrowQueue_I32();
-		GrowQueue_I32 unDst = new GrowQueue_I32();
+		DogArray_I32 unSrc = new DogArray_I32();
+		DogArray_I32 unDst = new DogArray_I32();
 
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
+		DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 
 		@Override
 		public void associate() {
@@ -136,17 +136,17 @@ public class TestEnforceUniqueByScore extends BoofStandardJUnit {
 		}
 
 		@Override
-		public FastQueue<AssociatedIndex> getMatches() {
+		public DogArray<AssociatedIndex> getMatches() {
 			return matches;
 		}
 
 		@Override
-		public GrowQueue_I32 getUnassociatedSource() {
+		public DogArray_I32 getUnassociatedSource() {
 			return unSrc;
 		}
 
 		@Override
-		public GrowQueue_I32 getUnassociatedDestination() {
+		public DogArray_I32 getUnassociatedDestination() {
 			return unDst;
 		}
 

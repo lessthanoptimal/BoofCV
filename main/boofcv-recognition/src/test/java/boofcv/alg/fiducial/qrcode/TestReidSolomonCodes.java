@@ -19,8 +19,8 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.DogArray_I8;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,8 +34,8 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 	@Test
 	public void computeECC() {
-		GrowQueue_I8 message = randomMessage(50);
-		GrowQueue_I8 ecc = new GrowQueue_I8();
+		DogArray_I8 message = randomMessage(50);
+		DogArray_I8 ecc = new DogArray_I8();
 
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.generator(6);
@@ -63,8 +63,8 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		byte b[] = new byte[]{(byte)0xbc, 0x2a, (byte)0x90, 0x13, 0x6b,
 				(byte)0xaf, (byte)0xef, (byte)0xfd, 0x4b, (byte)0xe0};
 
-		GrowQueue_I8 message = new GrowQueue_I8();
-		GrowQueue_I8 ecc = new GrowQueue_I8();
+		DogArray_I8 message = new DogArray_I8();
+		DogArray_I8 ecc = new DogArray_I8();
 		message.data = a;
 		message.size = a.length;
 
@@ -80,14 +80,14 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 	@Test
 	public void computeSyndromes() {
-		GrowQueue_I8 message = randomMessage(50);
-		GrowQueue_I8 ecc = new GrowQueue_I8();
+		DogArray_I8 message = randomMessage(50);
+		DogArray_I8 ecc = new DogArray_I8();
 
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.generator(6);
 		alg.computeECC(message, ecc);
 
-		GrowQueue_I8 syndromes = GrowQueue_I8.zeros(6);
+		DogArray_I8 syndromes = DogArray_I8.zeros(6);
 		alg.computeSyndromes(message, ecc, syndromes);
 
 		// no error. All syndromes values should be zero
@@ -107,8 +107,8 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		assertTrue(notZero > 1);
 	}
 
-	private GrowQueue_I8 randomMessage( int N ) {
-		GrowQueue_I8 message = new GrowQueue_I8();
+	private DogArray_I8 randomMessage( int N ) {
+		DogArray_I8 message = new DogArray_I8();
 		for (int i = 0; i < N; i++) {
 			message.add(rand.nextInt(256));
 		}
@@ -136,11 +136,11 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	 */
 	@Test
 	public void findErrorLocatorPolynomialBM() {
-		GrowQueue_I8 message = GrowQueue_I8.parseHex(
+		DogArray_I8 message = DogArray_I8.parseHex(
 				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
-		GrowQueue_I8 ecc = new GrowQueue_I8();
+		DogArray_I8 ecc = new DogArray_I8();
 		int nsyn = 10;
-		GrowQueue_I8 syndromes = GrowQueue_I8.zeros(nsyn);
+		DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
 
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.generator(nsyn);
@@ -148,7 +148,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 		message.data[0] = 0;
 		alg.computeSyndromes(message, ecc, syndromes);
-		GrowQueue_I8 errorLocator = new GrowQueue_I8();
+		DogArray_I8 errorLocator = new DogArray_I8();
 		alg.findErrorLocatorPolynomialBM(syndromes, errorLocator);
 		assertEquals(2, errorLocator.size);
 		assertEquals(3, errorLocator.get(0));
@@ -170,16 +170,16 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	@Test
 	public void findErrorLocatorPolynomialBM_compareToDirect() {
 
-		GrowQueue_I8 found = new GrowQueue_I8();
-		GrowQueue_I8 expected = new GrowQueue_I8();
+		DogArray_I8 found = new DogArray_I8();
+		DogArray_I8 expected = new DogArray_I8();
 
 		for (int i = 0; i < 30; i++) {
 			int N = 50;
-			GrowQueue_I8 message = randomMessage(N);
+			DogArray_I8 message = randomMessage(N);
 
-			GrowQueue_I8 ecc = new GrowQueue_I8();
+			DogArray_I8 ecc = new DogArray_I8();
 			int nsyn = 10;
-			GrowQueue_I8 syndromes = GrowQueue_I8.zeros(nsyn);
+			DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
 
 			ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 			alg.generator(nsyn);
@@ -189,7 +189,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 			message.data[where] ^= (byte)0x12;
 			alg.computeSyndromes(message, ecc, syndromes);
 
-			GrowQueue_I32 whereList = new GrowQueue_I32(1);
+			DogArray_I32 whereList = new DogArray_I32(1);
 			whereList.add(where);
 
 			alg.findErrorLocatorPolynomialBM(syndromes, found);
@@ -207,24 +207,24 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	 */
 	@Test
 	public void findErrors_BruteForce() {
-		GrowQueue_I8 message = randomMessage(50);
+		DogArray_I8 message = randomMessage(50);
 		for (int i = 0; i < 200; i++) {
 			findErrors_BruteForce(message, rand.nextInt(5), false);
 		}
 	}
 
-	public void findErrors_BruteForce( GrowQueue_I8 message, int numErrors, boolean expectedFail ) {
-		GrowQueue_I8 ecc = new GrowQueue_I8();
+	public void findErrors_BruteForce( DogArray_I8 message, int numErrors, boolean expectedFail ) {
+		DogArray_I8 ecc = new DogArray_I8();
 		int nsyn = 10;
-		GrowQueue_I8 syndromes = GrowQueue_I8.zeros(nsyn);
-		GrowQueue_I8 errorLocator = new GrowQueue_I8();
-		GrowQueue_I32 locations = new GrowQueue_I32();
+		DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
+		DogArray_I8 errorLocator = new DogArray_I8();
+		DogArray_I32 locations = new DogArray_I32();
 
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.generator(nsyn);
 		alg.computeECC(message, ecc);
 
-		GrowQueue_I8 cmessage = message.copy();
+		DogArray_I8 cmessage = message.copy();
 
 		// corrupt the message and ecc
 		int N = message.size + ecc.size;
@@ -261,7 +261,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 				assertEquals(1, num);
 			}
 
-			GrowQueue_I8 hack = new GrowQueue_I8();
+			DogArray_I8 hack = new DogArray_I8();
 			alg.findErrorLocatorPolynomial(N, locations, hack);
 		}
 	}
@@ -271,7 +271,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	 */
 	@Test
 	public void findErrors_BruteForce_TooMany() {
-		GrowQueue_I8 message = randomMessage(50);
+		DogArray_I8 message = randomMessage(50);
 		findErrors_BruteForce(message, 6, true);
 		findErrors_BruteForce(message, 8, true);
 	}
@@ -316,10 +316,10 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 				array(0, 32, 217, 182));
 	}
 
-	private void findErrorEvaluator( GrowQueue_I8 syndromes,
-									 GrowQueue_I8 errorLocator,
-									 GrowQueue_I8 expected ) {
-		GrowQueue_I8 found = new GrowQueue_I8();
+	private void findErrorEvaluator( DogArray_I8 syndromes,
+									 DogArray_I8 errorLocator,
+									 DogArray_I8 expected ) {
+		DogArray_I8 found = new DogArray_I8();
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.findErrorEvaluator(syndromes, errorLocator, found);
 
@@ -334,25 +334,25 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	 */
 	@Test
 	public void correctErrors_hand() {
-		GrowQueue_I8 message = GrowQueue_I8.parseHex(
+		DogArray_I8 message = DogArray_I8.parseHex(
 				"[ 0x40, 0xd2, 0x75, 0x47, 0x76, 0x17, 0x32, 0x06, 0x27, 0x26, 0x96, 0xc6, 0xc6, 0x96, 0x70, 0xec ]");
-		GrowQueue_I8 ecc = new GrowQueue_I8();
-		GrowQueue_I8 syndromes = new GrowQueue_I8();
-		GrowQueue_I8 errorLocator = new GrowQueue_I8();
+		DogArray_I8 ecc = new DogArray_I8();
+		DogArray_I8 syndromes = new DogArray_I8();
+		DogArray_I8 errorLocator = new DogArray_I8();
 		int nsyn = 10;
 
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.generator(nsyn);
 		alg.computeECC(message, ecc);
 
-		GrowQueue_I8 corrupted = message.copy();
+		DogArray_I8 corrupted = message.copy();
 		corrupted.data[0] = 0;
 		corrupted.data[4] = 8;
 		corrupted.data[5] = 9;
 		alg.computeSyndromes(corrupted, ecc, syndromes);
 		alg.findErrorLocatorPolynomialBM(syndromes, errorLocator);
 
-		GrowQueue_I32 errorLocations = new GrowQueue_I32(3);
+		DogArray_I32 errorLocations = new DogArray_I32(3);
 		errorLocations.data[0] = 0;
 		errorLocations.data[1] = 4;
 		errorLocations.data[2] = 5;
@@ -371,15 +371,15 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	 */
 	@Test
 	public void correct_random() {
-		GrowQueue_I8 ecc = new GrowQueue_I8();
+		DogArray_I8 ecc = new DogArray_I8();
 		int nsyn = 10; // should be able to recover from 4 errors
 
 		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
 		alg.generator(nsyn);
 
 		for (int i = 0; i < 20000; i++) {
-			GrowQueue_I8 message = randomMessage(100);
-			GrowQueue_I8 corrupted = message.copy();
+			DogArray_I8 message = randomMessage(100);
+			DogArray_I8 corrupted = message.copy();
 
 			alg.computeECC(message, ecc);
 
@@ -406,8 +406,8 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		}
 	}
 
-	private static GrowQueue_I8 array( int... values ) {
-		GrowQueue_I8 out = GrowQueue_I8.zeros(values.length);
+	private static DogArray_I8 array( int... values ) {
+		DogArray_I8 out = DogArray_I8.zeros(values.length);
 		for (int i = 0; i < values.length; i++) {
 			out.data[i] = (byte)values[i];
 		}

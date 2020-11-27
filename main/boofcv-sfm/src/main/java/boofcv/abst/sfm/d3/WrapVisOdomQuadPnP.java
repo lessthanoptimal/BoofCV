@@ -33,7 +33,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -74,7 +74,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	@Override
 	public boolean getTrackWorld3D( int index, Point3D_F64 world ) {
 		Se3_F64 left_to_world = alg.getLeftToWorld();
-		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features = alg.getTrackQuads();
+		DogArray<VisOdomStereoQuadPnP.TrackQuad> features = alg.getTrackQuads();
 		SePointOps_F64.transform(left_to_world, features.get(index).X, world);
 		return true;
 	}
@@ -97,7 +97,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		else
 			storage.clear();
 
-		FastQueue<VisOdomStereoQuadPnP.TrackQuad> features = alg.getTrackQuads();
+		DogArray<VisOdomStereoQuadPnP.TrackQuad> features = alg.getTrackQuads();
 
 		for (VisOdomStereoQuadPnP.TrackQuad v : features.toList())
 			storage.add(v.v2); // new left camera

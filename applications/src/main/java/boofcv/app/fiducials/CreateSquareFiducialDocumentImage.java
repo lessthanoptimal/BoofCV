@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.app.fiducials;
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.square.FiducialSquareGenerator;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_I64;
+import org.ddogleg.struct.DogArray_I64;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class CreateSquareFiducialDocumentImage extends CreateFiducialDocumentIma
 		return generator;
 	}
 
-	public void render( java.util.List<String> names , GrowQueue_I64 patterns , int gridWidth ) {
+	public void render( java.util.List<String> names , DogArray_I64 patterns , int gridWidth ) {
 		if( markerHeight > 0 )
 			throw new IllegalArgumentException("markerHeight must be < 0 since only square is supported");
 		generator.setMarkerWidth(markerWidth);

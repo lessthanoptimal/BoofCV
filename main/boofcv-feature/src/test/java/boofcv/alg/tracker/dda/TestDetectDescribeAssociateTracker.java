@@ -27,9 +27,9 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +52,7 @@ class TestDetectDescribeAssociateTracker extends BoofStandardJUnit {
 		var alg = createAlgorithm();
 		alg.maxInactiveTracks = 20;
 		addTracks(alg.tracksAll,50);
-		var unassociatedIdx = new GrowQueue_I32();
+		var unassociatedIdx = new DogArray_I32();
 		for (int i = 0; i < 30; i++) {
 			unassociatedIdx.add(i);
 			alg.tracksInactive.add(alg.tracksAll.get(i));
@@ -84,7 +84,7 @@ class TestDetectDescribeAssociateTracker extends BoofStandardJUnit {
 		assertEquals(2,t.pixel.y, UtilEjml.TEST_F64);
 	}
 
-	private void addTracks(FastQueue<PointTrack> l , int num ) {
+	private void addTracks(DogArray<PointTrack> l , int num ) {
 		for( int i = 0; i < num; i++ ) {
 			l.grow();
 		}
@@ -99,7 +99,7 @@ class TestDetectDescribeAssociateTracker extends BoofStandardJUnit {
 
 		@Override
 		public FastAccess<AssociatedIndex> getMatches() {
-			FastQueue<AssociatedIndex> queue = new FastQueue<>(N, AssociatedIndex::new);
+			DogArray<AssociatedIndex> queue = new DogArray<>(N, AssociatedIndex::new);
 
 			for( int i = 0; i < N; i++ ) {
 				queue.grow().setAssociation(i,i,1);

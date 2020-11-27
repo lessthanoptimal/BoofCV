@@ -21,7 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 
-	FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
+	DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 
 	@Test
 	public void checkSource() {

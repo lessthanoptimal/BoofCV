@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.sfm.ScaleTranslate2D;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +37,7 @@ public class TestTldAdjustRegion extends BoofStandardJUnit {
 	public void process() {
 		ScaleTranslate2D motion = new ScaleTranslate2D(1.5,2,3);
 
-		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+		DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 		for( int i = 0; i < 200; i++ ) {
 			AssociatedPair p = pairs.grow();

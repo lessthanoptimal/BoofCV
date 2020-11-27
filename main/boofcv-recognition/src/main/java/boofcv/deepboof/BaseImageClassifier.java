@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.Planar;
 import deepboof.Function;
 import deepboof.graph.FunctionSequence;
 import deepboof.tensors.Tensor_F32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +60,7 @@ public abstract class BaseImageClassifier implements ImageClassifier<Planar<Gray
 	protected Tensor_F32 tensorOutput;
 
 	// storage for the final output
-	protected FastQueue<Score> categoryScores = new FastQueue<>(Score::new);
+	protected DogArray<Score> categoryScores = new DogArray<>(Score::new);
 	protected int categoryBest;
 
 	Comparator<Score> comparator = ( o1, o2 ) -> {

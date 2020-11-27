@@ -35,8 +35,8 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.io.PrintStream;
@@ -79,7 +79,7 @@ public class UchiyaMarkerTracker {
 	List<LlahOperations.FoundDocument> foundDocs = new ArrayList<>();
 
 	// List of tracks which were visible in the most recent frame
-	@Getter FastQueue<Track> currentTracks = new FastQueue<>(Track::new);
+	@Getter DogArray<Track> currentTracks = new DogArray<>(Track::new);
 	// Look up table that goes from global ID to Track
 	TIntObjectHashMap<Track> globalId_to_track = new TIntObjectHashMap<>();
 	// Lookup table from track ID to global ID
@@ -104,10 +104,10 @@ public class UchiyaMarkerTracker {
 	DMatrixRMaj foundH = new DMatrixRMaj(3, 3);
 	DMatrixRMaj refinedH = new DMatrixRMaj(3, 3);
 	// landmark -> dots
-	FastQueue<AssociatedPair> ransacPairs = new FastQueue<>(AssociatedPair::new);
+	DogArray<AssociatedPair> ransacPairs = new DogArray<>(AssociatedPair::new);
 	List<AssociatedPair> inlierPairs = new ArrayList<>(); // for refinement
 	// which dots were given as input to RANSAC
-	GrowQueue_I32 ransacDotIdx = new GrowQueue_I32();
+	DogArray_I32 ransacDotIdx = new DogArray_I32();
 
 	/**
 	 * Configures the tracker
@@ -305,9 +305,9 @@ public class UchiyaMarkerTracker {
 		/** Found homography from landmark to image pixels */
 		public final Homography2D_F64 doc_to_imagePixel = new Homography2D_F64();
 		/** Pixel location of each landmark predicted using the homography */
-		public final FastQueue<Point2D_F64> predicted = new FastQueue<>(Point2D_F64::new);
+		public final DogArray<Point2D_F64> predicted = new DogArray<>(Point2D_F64::new);
 		/** Observed pixels with landmarks indexes */
-		public final FastQueue<PointIndex2D_F64> observed = new FastQueue<>(PointIndex2D_F64::new);
+		public final DogArray<PointIndex2D_F64> observed = new DogArray<>(PointIndex2D_F64::new);
 
 		/** Resets to initial state */
 		public void reset() {

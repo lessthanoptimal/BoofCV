@@ -22,7 +22,7 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -47,7 +47,7 @@ public class TestTldLearning extends BoofStandardJUnit {
 		TldLearning alg = new TldLearning(rand,config,template,variance,fern,detection);
 
 
-		FastQueue<ImageRectangle> regions = new FastQueue<>(ImageRectangle::new);
+		DogArray<ImageRectangle> regions = new DogArray<>(ImageRectangle::new);
 		regions.grow();
 		regions.grow();
 		regions.grow();
@@ -174,7 +174,7 @@ public class TestTldLearning extends BoofStandardJUnit {
 		}
 
 		@Override
-		protected void detectionCascade( FastQueue<ImageRectangle> cascadeRegions ) {
+		protected void detectionCascade( DogArray<ImageRectangle> cascadeRegions ) {
 			calledDetection++;
 		}
 	}

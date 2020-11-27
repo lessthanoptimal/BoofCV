@@ -27,7 +27,7 @@ import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * <p>Computes key points from an observed hexagonal circular grid.  Each key point is defined as the circle's true
@@ -46,10 +46,10 @@ import org.ddogleg.struct.FastQueue;
 public class KeyPointsCircleHexagonalGrid {
 
 	// tangent points on each ellipse
-	FastQueue<Tangents> tangents = new FastQueue<>(Tangents::new);
+	DogArray<Tangents> tangents = new DogArray<>(Tangents::new);
 
 	// detected location
-	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64::new);
+	DogArray<Point2D_F64> keypoints = new DogArray<>(Point2D_F64::new);
 
 	// used to compute tangent lines between two ellipses
 	private final TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
@@ -240,15 +240,15 @@ public class KeyPointsCircleHexagonalGrid {
 	 * Returns the location of each key point in the image from the most recently processed grid.
 	 * @return detected image location
 	 */
-	public FastQueue<Point2D_F64> getKeyPoints() {
+	public DogArray<Point2D_F64> getKeyPoints() {
 		return keypoints;
 	}
 
-	public FastQueue<Tangents> getTangents() {
+	public DogArray<Tangents> getTangents() {
 		return tangents;
 	}
 
-	public static class Tangents extends FastQueue<Point2D_F64> {
+	public static class Tangents extends DogArray<Point2D_F64> {
 		public Tangents() {
 			super(8, Point2D_F64::new);
 		}

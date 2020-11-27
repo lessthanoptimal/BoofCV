@@ -66,8 +66,8 @@ import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -105,13 +105,13 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	AssociateDescription<TupleDesc> associate;
 
 	AssociateThreeByPairs<TupleDesc> associateThree;
-	FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple::new);
+	DogArray<AssociatedTriple> associated = new DogArray<>(AssociatedTriple::new);
 
 	ThreeViewEstimateMetricScene structureEstimator = new ThreeViewEstimateMetricScene();
 
-	FastQueue<Point2D_F64>[] locations = new FastQueue[3];
-	FastQueue<TupleDesc>[] features = new FastQueue[3];
-	GrowQueue_I32[] featureSets = new GrowQueue_I32[3];
+	DogArray<Point2D_F64>[] locations = new DogArray[3];
+	DogArray<TupleDesc>[] features = new DogArray[3];
+	DogArray_I32[] featureSets = new DogArray_I32[3];
 	ImageDimension[] dimensions = new ImageDimension[3];
 
 	BufferedImage[] buff = new BufferedImage[3];
@@ -154,9 +154,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		fileMenu.remove(1);
 
 		for (int i = 0; i < 3; i++) {
-			locations[i] = new FastQueue<>(Point2D_F64::new);
+			locations[i] = new DogArray<>(Point2D_F64::new);
 			dimensions[i] = new ImageDimension();
-			featureSets[i] = new GrowQueue_I32();
+			featureSets[i] = new DogArray_I32();
 		}
 
 		rectifiedPanel.setImages(visualRect1, visualRect2);
@@ -540,7 +540,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			associateThree.setFeaturesC(features[2], featureSets[2]);
 			associateThree.associate();
 
-			FastQueue<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();
+			DogArray<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();
 			associated.reset();
 			for (int i = 0; i < associatedIdx.size; i++) {
 				AssociatedTripleIndex p = associatedIdx.get(i);

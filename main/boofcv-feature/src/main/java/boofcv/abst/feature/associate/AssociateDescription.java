@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.associate;
 
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 
 
 /**
@@ -31,7 +31,7 @@ import org.ddogleg.struct.FastQueue;
  * </p>
  *
  * <p>
- * DESIGN NOTE: {@link FastQueue} is used instead of {@link java.util.List} because in the association
+ * DESIGN NOTE: {@link DogArray} is used instead of {@link java.util.List} because in the association
  * micro benchmark it produced results that were about 20% faster consistently.  Which is surprising since
  * one would think descriptor comparisons would dominate.
  * </p>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -212,7 +212,7 @@ public class DetectFiducialSquareBinaryApp
 					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 				}
 
-				FastQueue<FoundFiducial> detected = detector.getFound();
+				DogArray<FoundFiducial> detected = detector.getFound();
 
 //				g2.setColor(new Color(0x50FF0000,true));
 //				for (int i = 0; i < detected.size; i++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -50,7 +50,7 @@ public class NonMaxLimiter {
 	// Selects features when too many are detected
 	FeatureSelectLimitIntensity<LocalExtreme> selector;
 	// All detected features
-	FastQueue<LocalExtreme> foundAll = new FastQueue<>(LocalExtreme::new);
+	DogArray<LocalExtreme> foundAll = new DogArray<>(LocalExtreme::new);
 	// Just the selected features
 	FastArray<LocalExtreme> foundSelected = new FastArray<>(LocalExtreme.class);
 

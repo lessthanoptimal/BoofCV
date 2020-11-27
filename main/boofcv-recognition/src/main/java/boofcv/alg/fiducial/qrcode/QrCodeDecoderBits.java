@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.UnsupportedEncodingException;
@@ -39,9 +39,9 @@ public class QrCodeDecoderBits {
 	// used to compute error correction
 	ReidSolomonCodes rscodes = new ReidSolomonCodes(8,0b100011101);
 	// storage for the data message
-	GrowQueue_I8 message = new GrowQueue_I8();
+	DogArray_I8 message = new DogArray_I8();
 	// storage fot the message's ecc
-	GrowQueue_I8 ecc = new GrowQueue_I8();
+	DogArray_I8 ecc = new DogArray_I8();
 
 	StringBuilder workString = new StringBuilder();
 
@@ -115,7 +115,7 @@ public class QrCodeDecoderBits {
 		return true;
 	}
 
-	private void copyFromRawData( byte[] input , GrowQueue_I8 message , GrowQueue_I8 ecc ,
+	private void copyFromRawData( byte[] input , DogArray_I8 message , DogArray_I8 ecc ,
 								  int offsetBlock , int stride , int offsetEcc )
 	{
 		for (int i = 0; i < message.size; i++) {

@@ -25,7 +25,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
@@ -56,7 +56,7 @@ public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>>
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
 		FhEdgeWeights<T> alg = createAlg();
-		FastQueue<Edge> edges = new FastQueue<>(Edge::new);
+		DogArray<Edge> edges = new DogArray<>(Edge::new);
 		alg.process(input,edges);
 
 		int hist[] = new int[input.width*input.height];
@@ -125,8 +125,8 @@ public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>>
 		T inputSub = BoofTesting.createSubImageOf(input);
 
 		FhEdgeWeights<T> alg = createAlg();
-		FastQueue<Edge> edges0 = new FastQueue<>(Edge::new);
-		FastQueue<Edge> edges1 = new FastQueue<>(Edge::new);
+		DogArray<Edge> edges0 = new DogArray<>(Edge::new);
+		DogArray<Edge> edges1 = new DogArray<>(Edge::new);
 
 		alg.process(input,edges0);
 		alg.process(inputSub,edges1);

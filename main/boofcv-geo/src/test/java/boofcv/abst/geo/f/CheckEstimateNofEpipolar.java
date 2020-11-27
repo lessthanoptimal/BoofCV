@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ public abstract class CheckEstimateNofEpipolar extends EpipolarTestSimulation {
 
 		boolean workedOnce = false;
 
-		FastQueue<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
+		DogArray<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 
 		for( int i = 0; i < 10; i++ ) {
 			List<AssociatedPair> pairs = randomPairs(alg.getMinimumPoints());

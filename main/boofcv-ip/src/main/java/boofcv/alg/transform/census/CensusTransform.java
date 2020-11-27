@@ -28,9 +28,9 @@ import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -51,10 +51,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class CensusTransform {
 
-	public static FastQueue<Point2D_I32> createBlockSamples( int radius ) {
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
+	public static DogArray<Point2D_I32> createBlockSamples( int radius ) {
+		DogArray<Point2D_I32> samples = new DogArray<>(Point2D_I32::new);
 		int w = radius*2 + 1;
-		samples.growArray(w*w - 1);
+		samples.reserve(w*w - 1);
 
 		for (int y = -radius; y <= radius; y++) {
 			for (int x = -radius; x <= radius; x++) {
@@ -67,11 +67,11 @@ public class CensusTransform {
 		return samples;
 	}
 
-	public static FastQueue<Point2D_I32> createBlockSamples( int radiusX, int radiusY ) {
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
+	public static DogArray<Point2D_I32> createBlockSamples( int radiusX, int radiusY ) {
+		DogArray<Point2D_I32> samples = new DogArray<>(Point2D_I32::new);
 		int wx = radiusX*2 + 1;
 		int wy = radiusY*2 + 1;
-		samples.growArray(wx*wy - 1);
+		samples.reserve(wx*wy - 1);
 
 		for (int y = -radiusY; y <= radiusY; y++) {
 			for (int x = -radiusX; x <= radiusX; x++) {
@@ -84,8 +84,8 @@ public class CensusTransform {
 		return samples;
 	}
 
-	public static FastQueue<Point2D_I32> createCircleSamples() {
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
+	public static DogArray<Point2D_I32> createCircleSamples() {
+		DogArray<Point2D_I32> samples = new DogArray<>(Point2D_I32::new);
 		for (int row = 0; row < 9; row++) {
 			int col0 = row <= 4 ? Math.max(0, 3 - row) : row - 5;
 			int col1 = 9 - col0;
@@ -240,12 +240,12 @@ public class CensusTransform {
 	 */
 	public static void sample_S64( final GrayU8 input, final FastAccess<Point2D_I32> sample,
 								   final GrayS64 output, @Nullable ImageBorder_S32<GrayU8> border,
-								   @Nullable GrowQueue_I32 workSpace ) {
+								   @Nullable DogArray_I32 workSpace ) {
 		output.reshape(input.width, input.height);
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
-			workSpace = new GrowQueue_I32();
+			workSpace = new DogArray_I32();
 
 		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
@@ -271,12 +271,12 @@ public class CensusTransform {
 	 */
 	public static void sample_S64( final GrayU16 input, final FastAccess<Point2D_I32> sample,
 								   final GrayS64 output, @Nullable ImageBorder_S32<GrayU16> border,
-								   @Nullable GrowQueue_I32 workSpace ) {
+								   @Nullable DogArray_I32 workSpace ) {
 		output.reshape(input.width, input.height);
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
-			workSpace = new GrowQueue_I32();
+			workSpace = new DogArray_I32();
 
 		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
@@ -302,12 +302,12 @@ public class CensusTransform {
 	 */
 	public static void sample_S64( final GrayF32 input, final FastAccess<Point2D_I32> sample,
 								   final GrayS64 output, @Nullable ImageBorder_F32 border,
-								   @Nullable GrowQueue_I32 workSpace ) {
+								   @Nullable DogArray_I32 workSpace ) {
 		output.reshape(input.width, input.height);
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
-			workSpace = new GrowQueue_I32();
+			workSpace = new DogArray_I32();
 
 		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
@@ -333,14 +333,14 @@ public class CensusTransform {
 	 */
 	public static void sample_IU16( final GrayU8 input, final FastAccess<Point2D_I32> sample,
 									final InterleavedU16 output, @Nullable ImageBorder_S32<GrayU8> border,
-									@Nullable GrowQueue_I32 workSpace ) {
+									@Nullable DogArray_I32 workSpace ) {
 		// Compute the number of 16-bit values that are needed to store
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size, 16);
 		output.reshape(input.width, input.height, numBlocks);
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
-			workSpace = new GrowQueue_I32();
+			workSpace = new DogArray_I32();
 
 		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
@@ -366,14 +366,14 @@ public class CensusTransform {
 	 */
 	public static void sample_IU16( final GrayU16 input, final FastAccess<Point2D_I32> sample,
 									final InterleavedU16 output, @Nullable ImageBorder_S32<GrayU16> border,
-									@Nullable GrowQueue_I32 workSpace ) {
+									@Nullable DogArray_I32 workSpace ) {
 		// Compute the number of 16-bit values that are needed to store
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size, 16);
 		output.reshape(input.width, input.height, numBlocks);
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
-			workSpace = new GrowQueue_I32();
+			workSpace = new DogArray_I32();
 
 		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
@@ -399,14 +399,14 @@ public class CensusTransform {
 	 */
 	public static void sample_IU16( final GrayF32 input, final FastAccess<Point2D_I32> sample,
 									final InterleavedU16 output, @Nullable ImageBorder_F32 border,
-									@Nullable GrowQueue_I32 workSpace ) {
+									@Nullable DogArray_I32 workSpace ) {
 		// Compute the number of 16-bit values that are needed to store
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size, 16);
 		output.reshape(input.width, input.height, numBlocks);
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
-			workSpace = new GrowQueue_I32();
+			workSpace = new DogArray_I32();
 
 		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
@@ -428,7 +428,7 @@ public class CensusTransform {
 	 * @param workSpace (Output) Stores the offsets from current point that need to be sampled
 	 * @return The maximum distance away (x and y) that a point is sampled
 	 */
-	private static int computeRadiusWorkspace( ImageBase input, FastAccess<Point2D_I32> sample, GrowQueue_I32 workSpace ) {
+	private static int computeRadiusWorkspace( ImageBase input, FastAccess<Point2D_I32> sample, DogArray_I32 workSpace ) {
 		int radius = 0;
 		workSpace.resize(sample.size);
 		for (int i = 0; i < sample.size; i++) {

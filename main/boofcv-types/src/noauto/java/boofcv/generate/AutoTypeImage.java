@@ -168,7 +168,7 @@ public enum AutoTypeImage {
 		return isInteger() ? getNumBits() == 64 ? "S64" : "S32" : getNumBits() == 64 ? "F64" : "F32";
 	}
 
-	public String getGrowQueueType() {
+	public String getDogArrayType() {
 		return isInteger() ? getNumBits() == 64 ? "S64" : "I32" : getNumBits() == 64 ? "F64" : "F32";
 	}
 

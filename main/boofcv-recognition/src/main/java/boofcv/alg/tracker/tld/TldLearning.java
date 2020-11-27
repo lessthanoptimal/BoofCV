@@ -21,8 +21,8 @@ package boofcv.alg.tracker.tld;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class TldLearning<T extends ImageGray<T>> {
 	private TldDetection<T> detection;
 
 	// Storage for sorting of results
-	private GrowQueue_F64 storageMetric = new GrowQueue_F64();
+	private DogArray_F64 storageMetric = new DogArray_F64();
 
 	// regions which need to have their ferns updated
 	private List<ImageRectangle> fernNegative = new ArrayList<>();
@@ -81,7 +81,7 @@ public class TldLearning<T extends ImageGray<T>> {
 	 * @param cascadeRegions Set of regions used by the cascade detector
 	 */
 	public void initialLearning( Rectangle2D_F64 targetRegion ,
-								 FastQueue<ImageRectangle> cascadeRegions ) {
+								 DogArray<ImageRectangle> cascadeRegions ) {
 		storageMetric.reset();
 		fernNegative.clear();
 
@@ -142,7 +142,7 @@ public class TldLearning<T extends ImageGray<T>> {
 
 		// mark only a few of the far away regions as negative.  Marking all of them as negative is
 		// computationally expensive
-		FastQueue<TldRegionFernInfo> ferns = detection.getFernInfo();
+		DogArray<TldRegionFernInfo> ferns = detection.getFernInfo();
 		int N = Math.min(config.numNegativeFerns,ferns.size);
 		for( int i = 0; i < N; i++ ) {
 			int index = rand.nextInt(ferns.size);

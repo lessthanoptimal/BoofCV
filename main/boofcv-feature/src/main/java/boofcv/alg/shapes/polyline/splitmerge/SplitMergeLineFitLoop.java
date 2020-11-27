@@ -22,7 +22,7 @@ import boofcv.struct.ConfigLength;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.metric.Distance2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -172,7 +172,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		}
 
 		// swap the two lists
-		GrowQueue_I32 tmp = work;
+		DogArray_I32 tmp = work;
 		work = splits;
 		splits = tmp;
 
@@ -195,7 +195,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		change |= checkSplit(change, splits.size - 1, 0);
 
 		// swap the two lists
-		GrowQueue_I32 tmp = work;
+		DogArray_I32 tmp = work;
 		work = splits;
 		splits = tmp;
 

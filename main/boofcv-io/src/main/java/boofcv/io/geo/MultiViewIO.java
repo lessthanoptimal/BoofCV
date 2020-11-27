@@ -28,9 +28,9 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
@@ -417,7 +417,7 @@ public class MultiViewIO {
 		}
 	}
 
-	private static void decodeInliers( List<Map<String, Object>> encoded, FastQueue<AssociatedIndex> inliers ) {
+	private static void decodeInliers( List<Map<String, Object>> encoded, DogArray<AssociatedIndex> inliers ) {
 		inliers.resize(encoded.size());
 
 		for (int i = 0; i < inliers.size; i++) {
@@ -561,7 +561,7 @@ public class MultiViewIO {
 		inliers.observations.resize(views.size());
 		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
 			List<Integer> src = observations.get(viewIdx);
-			GrowQueue_I32 dst = inliers.observations.get(viewIdx);
+			DogArray_I32 dst = inliers.observations.get(viewIdx);
 			dst.resize(src.size());
 			dst.reset();
 			src.forEach(dst::add);

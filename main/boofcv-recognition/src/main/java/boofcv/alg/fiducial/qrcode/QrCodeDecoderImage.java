@@ -25,7 +25,7 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	// used to compute error correction
 	QrCodeDecoderBits decoder;
 
-	FastQueue<QrCode> storageQR = new FastQueue<>(QrCode::new);
+	DogArray<QrCode> storageQR = new DogArray<>(QrCode::new);
 	List<QrCode> successes = new ArrayList<>();
 	List<QrCode> failures = new ArrayList<>();
 
@@ -70,7 +70,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	 * @param pps position pattern graph
 	 * @param gray Gray input image
 	 */
-	public void process( FastQueue<PositionPatternNode> pps, T gray ) {
+	public void process( DogArray<PositionPatternNode> pps, T gray ) {
 		gridReader.setImage(gray);
 		storageQR.reset();
 		successes.clear();

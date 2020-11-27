@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedU16;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
@@ -60,10 +60,10 @@ public class BenchmarkCensus {
 
 	private ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.wrap(BorderType.ZERO,input);
 
-	private FastQueue<Point2D_I32> points5x5 = CensusTransform.createBlockSamples(2);
-	private FastQueue<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
-	private FastQueue<Point2D_I32> points9x9 = CensusTransform.createBlockSamples(4);
-	private GrowQueue_I32 workSpace = new GrowQueue_I32();
+	private DogArray<Point2D_I32> points5x5 = CensusTransform.createBlockSamples(2);
+	private DogArray<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
+	private DogArray<Point2D_I32> points9x9 = CensusTransform.createBlockSamples(4);
+	private DogArray_I32 workSpace = new DogArray_I32();
 
 	@Setup
 	public void setup() {

@@ -31,7 +31,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -295,7 +295,7 @@ public class AssistedCalibration {
 	}
 
 	boolean pictureTaken = false;
-	FastQueue<Polygon2D_F64> regions = new FastQueue<Polygon2D_F64>(Polygon2D_F64::new) {
+	DogArray<Polygon2D_F64> regions = new DogArray<Polygon2D_F64>(Polygon2D_F64::new) {
 		@Override
 		protected Polygon2D_F64 createInstance() {
 			return new Polygon2D_F64(4);

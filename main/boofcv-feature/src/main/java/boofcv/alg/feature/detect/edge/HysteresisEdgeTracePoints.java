@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class HysteresisEdgeTracePoints {
 	// list of segments which have yet to be explored
 	private final List<EdgeSegment> open = new ArrayList<>();
 
-	private final FastQueue<Point2D_I32> queuePoints = new FastQueue<>(Point2D_I32::new);
+	private final DogArray<Point2D_I32> queuePoints = new DogArray<>(Point2D_I32::new);
 
 	// the active contour which is being traced
 	private EdgeContour e;

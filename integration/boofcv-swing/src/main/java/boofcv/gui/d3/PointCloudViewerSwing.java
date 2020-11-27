@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import georegression.struct.ConvertFloatType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -114,7 +114,7 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 	}
 
 	@Override
-	public void addCloud(GrowQueue_F32 cloudXYZ, GrowQueue_I32 colorRGB) {
+	public void addCloud(DogArray_F32 cloudXYZ, DogArray_I32 colorRGB) {
 		if( cloudXYZ.size/3 != colorRGB.size ) {
 			throw new IllegalArgumentException("Number of points do not match");
 		}
@@ -187,15 +187,15 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 	}
 
 	@Override
-	public FastQueue<Point3dRgbI_F64> copyCloud(@Nullable FastQueue<Point3dRgbI_F64> copy) {
+	public DogArray<Point3dRgbI_F64> copyCloud(@Nullable DogArray<Point3dRgbI_F64> copy) {
 		if( copy == null )
-			copy = new FastQueue<>(Point3dRgbI_F64::new);
+			copy = new DogArray<>(Point3dRgbI_F64::new);
 		else
 			copy.reset();
 
 		// See if it has color information on the points or not
-		final GrowQueue_F32 cloudXyz = panel.getCloudXyz();
-		final GrowQueue_I32 cloudColor = panel.getCloudColor();
+		final DogArray_F32 cloudXyz = panel.getCloudXyz();
+		final DogArray_I32 cloudColor = panel.getCloudColor();
 		synchronized (cloudXyz) {
 			int N = cloudXyz.size / 3;
 			if (N == cloudColor.size) {

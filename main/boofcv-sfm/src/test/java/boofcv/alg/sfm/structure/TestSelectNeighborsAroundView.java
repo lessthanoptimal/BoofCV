@@ -20,7 +20,7 @@ package boofcv.alg.sfm.structure;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -363,7 +363,7 @@ public class TestSelectNeighborsAroundView extends BoofStandardJUnit {
 		for (int i = idx0; i <= idx1; i++) {
 			PairwiseImageGraph.View pv = working.viewList.get(i).pview;
 			v.inliers.views.add(pv);
-			GrowQueue_I32 obs = v.inliers.observations.grow();
+			DogArray_I32 obs = v.inliers.observations.grow();
 			for (int j = 0; j < 5 + i; j++) {
 				obs.add(j);
 			}

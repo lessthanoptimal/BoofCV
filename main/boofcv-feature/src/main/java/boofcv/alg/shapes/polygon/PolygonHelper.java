@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.shapes.polygon;
 import boofcv.abst.shapes.polyline.PointsToPolyline;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray_B;
 
 import java.util.List;
 
@@ -61,7 +61,7 @@ public interface PolygonHelper {
 	 * @param touchesBorder true if the contour touches the image border or false if it doesnt
 	 * @return true to keep the contour for further processing or false to reject it
 	 */
-	boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted, GrowQueue_B touches, boolean touchesBorder);
+	boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted, DogArray_B touches, boolean touchesBorder);
 
 	/**
 	 * Provide an oportunity to configure the polyline fit based on what's currently known

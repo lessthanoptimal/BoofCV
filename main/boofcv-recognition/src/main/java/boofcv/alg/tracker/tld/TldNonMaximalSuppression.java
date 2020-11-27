@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.tld;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Performs non-maximum suppression on high confidence detected regions.  A graph of connected regions is constructed.
@@ -37,7 +37,7 @@ public class TldNonMaximalSuppression {
 	private double connectionThreshold;
 
 	// connection graph
-	private FastQueue<Connections> conn = new FastQueue<>(Connections::new);
+	private DogArray<Connections> conn = new DogArray<>(Connections::new);
 
 	// used for computing the overlap between two regions
 	private TldHelperFunctions helper = new TldHelperFunctions();
@@ -58,12 +58,12 @@ public class TldNonMaximalSuppression {
 	 * @param regions Set of high confidence regions for target
 	 * @param output Output after non-maximum suppression
 	 */
-	public void process( FastQueue<TldRegion> regions , FastQueue<TldRegion> output ) {
+	public void process( DogArray<TldRegion> regions , DogArray<TldRegion> output ) {
 
 		final int N = regions.size;
 
 		// set all connections to be a local maximum initially
-		conn.growArray(N);
+		conn.reserve(N);
 		for( int i = 0; i < N; i++ ) {
 			conn.data[i].reset();
 		}
@@ -107,7 +107,7 @@ public class TldNonMaximalSuppression {
 		}
 	}
 
-	public FastQueue<Connections> getConnections() {
+	public DogArray<Connections> getConnections() {
 		return conn;
 	}
 

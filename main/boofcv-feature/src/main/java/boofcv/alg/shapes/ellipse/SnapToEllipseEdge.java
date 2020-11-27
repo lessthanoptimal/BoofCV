@@ -25,8 +25,8 @@ import georegression.geometry.UtilEllipse_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 
 /**
  * Refines an initial estimate of an elipse using a subpixel contour technique.  A local line integral around each
@@ -49,9 +49,9 @@ public class SnapToEllipseEdge<T extends ImageGray<T>> extends BaseIntegralEdge<
 	// and points added to line fitting is radius*2+1.
 	protected int radialSamples;
 
-	protected GrowQueue_F64 weights = new GrowQueue_F64();// storage for weights in line fitting
+	protected DogArray_F64 weights = new DogArray_F64();// storage for weights in line fitting
 	// storage for where the points that are sampled along the line
-	protected FastQueue<Point2D_F64> samplePts = new FastQueue<>(Point2D_F64::new);
+	protected DogArray<Point2D_F64> samplePts = new DogArray<>(Point2D_F64::new);
 
 	protected FitEllipseWeightedAlgebraic_F64 fitter = new FitEllipseWeightedAlgebraic_F64();
 

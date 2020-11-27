@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import boofcv.alg.feature.associate.AssociateGreedyDescBase;
 import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
 
 
 /**
@@ -38,14 +38,14 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	AssociateGreedyDescBase<T> alg;
 
-	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex::new);
+	DogArray<AssociatedIndex> matches = new DogArray<>(10, AssociatedIndex::new);
 
 	// reference to input list
 	FastAccess<T> listSrc;
 	FastAccess<T> listDst;
 
 	// indexes of unassociated features
-	GrowQueue_I32 unassocSrc = new GrowQueue_I32();
+	DogArray_I32 unassocSrc = new DogArray_I32();
 	// creates a list of unassociated features from the list of matches
 	FindUnassociated unassociated = new FindUnassociated();
 
@@ -68,7 +68,7 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	}
 
 	@Override
-	public FastQueue<AssociatedIndex> getMatches() {
+	public DogArray<AssociatedIndex> getMatches() {
 		return matches;
 	}
 
@@ -82,8 +82,8 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 		unassocSrc.reset();
 		alg.associate(listSrc,listDst);
 
-		GrowQueue_I32 pairs = alg.getPairs();
-		GrowQueue_F64 score = alg.getFitQuality();
+		DogArray_I32 pairs = alg.getPairs();
+		DogArray_F64 score = alg.getFitQuality();
 
 		matches.reset();
 		for( int i = 0; i < listSrc.size; i++ ) {
@@ -96,12 +96,12 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedSource() {
+	public DogArray_I32 getUnassociatedSource() {
 		return unassocSrc;
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedDestination() {
+	public DogArray_I32 getUnassociatedDestination() {
 		return unassociated.checkDestination(matches,listDst.size);
 	}
 

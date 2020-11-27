@@ -27,7 +27,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 import pabeles.concurrency.GrowArray;
 
@@ -124,7 +124,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 	public void equalizeLocalNaive(GrayI input , GrayI output ) {
 
 		GrayI tmp = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
+		GrowArray<DogArray_I32> workArrays = new GrowArray<>(DogArray_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
@@ -196,7 +196,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 
 	public void equalizeLocalInner(GrayI input , GrayI found ) {
 		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
+		GrowArray<DogArray_I32> workArrays = new GrowArray<>(DogArray_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
@@ -236,7 +236,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 
 	public void equalizeLocalRow(GrayI input , GrayI found ) {
 		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
+		GrowArray<DogArray_I32> workArrays = new GrowArray<>(DogArray_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
@@ -313,7 +313,7 @@ public class TestImplEnhanceHistogram extends BoofStandardJUnit {
 
 	public void equalizeLocalCol(GrayI input , GrayI found ) {
 		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
+		GrowArray<DogArray_I32> workArrays = new GrowArray<>(DogArray_I32::new);
 
 		GImageMiscOps.fillUniform(input,rand,1,9);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +30,10 @@ import java.util.List;
  */
 public class SquaresIntoClusters {
 
-	protected FastQueue<SquareNode> nodes = new FastQueue<>(SquareNode::new);
+	protected DogArray<SquareNode> nodes = new DogArray<>(SquareNode::new);
 
 	// storage for found clusters
-	protected FastQueue<List<SquareNode>> clusters = new FastQueue(ArrayList::new);
+	protected DogArray<List<SquareNode>> clusters = new DogArray(ArrayList::new);
 
 	// storage for open list when clustering points
 	protected List<SquareNode> open = new ArrayList<>();

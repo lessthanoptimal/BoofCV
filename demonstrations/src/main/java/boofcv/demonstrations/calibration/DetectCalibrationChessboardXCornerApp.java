@@ -49,7 +49,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -97,10 +97,10 @@ public class DetectCalibrationChessboardXCornerApp
 
 	//-----------------
 	private final Object lockCorners = new Object();
-	private FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner::new);
-	private FastQueue<PointIndex2D_F64> foundChessboard = new FastQueue<>(PointIndex2D_F64::new);
-	private FastQueue<CalibrationObservation> foundGrids = new FastQueue<>(CalibrationObservation::new);
-	private FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D::new);
+	private DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
+	private DogArray<PointIndex2D_F64> foundChessboard = new DogArray<>(PointIndex2D_F64::new);
+	private DogArray<CalibrationObservation> foundGrids = new DogArray<>(CalibrationObservation::new);
+	private DogArray<FeatureGraph2D> foundClusters = new DogArray<>(FeatureGraph2D::new);
 	private boolean success;
 	//-----------------
 
@@ -253,7 +253,7 @@ public class DetectCalibrationChessboardXCornerApp
 
 			synchronized (lockCorners) {
 				this.success = success;
-				FastQueue<ChessboardCorner> orig = detector.getDetector().getCorners();
+				DogArray<ChessboardCorner> orig = detector.getDetector().getCorners();
 				foundCorners.reset();
 				for (int i = 0; i < orig.size; i++) {
 					foundCorners.grow().setTo( orig.get(i) );
@@ -267,7 +267,7 @@ public class DetectCalibrationChessboardXCornerApp
 				}
 
 				{
-					FastQueue<GridInfo> found = detector.getFoundChessboard();
+					DogArray<GridInfo> found = detector.getFoundChessboard();
 					foundGrids.reset();
 					for (int i = 0; i < found.size; i++) {
 						GridInfo grid = found.get(i);
@@ -281,7 +281,7 @@ public class DetectCalibrationChessboardXCornerApp
 				}
 
 				foundClusters.reset();
-				FastQueue<ChessboardCornerGraph> clusters = detector.getClusterFinder().getOutputClusters();
+				DogArray<ChessboardCornerGraph> clusters = detector.getClusterFinder().getOutputClusters();
 				for (int i = 0; i < clusters.size; i++) {
 					clusters.get(i).convert(foundClusters.grow());
 				}

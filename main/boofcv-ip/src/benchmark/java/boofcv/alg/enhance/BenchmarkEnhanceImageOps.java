@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -56,7 +56,7 @@ public class BenchmarkEnhanceImageOps {
 	GrayU8 inputU8 = new GrayU8(size, size);
 	GrayU8 outputU8 = new GrayU8(size, size);
 
-	GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
+	GrowArray<DogArray_I32> workArrays = new GrowArray<>(DogArray_I32::new);
 
 	@Setup
 	public void setup() {

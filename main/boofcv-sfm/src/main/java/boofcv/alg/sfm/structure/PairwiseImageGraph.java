@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.HashMap;
@@ -34,8 +34,8 @@ import java.util.Map;
  */
 public class PairwiseImageGraph {
 
-	public FastQueue<View> nodes = new FastQueue<>(View::new);
-	public FastQueue<Motion> edges = new FastQueue<>(Motion::new);
+	public DogArray<View> nodes = new DogArray<>(View::new);
+	public DogArray<Motion> edges = new DogArray<>(Motion::new);
 
 	public Map<String, View> mapNodes = new HashMap<>();
 
@@ -128,7 +128,7 @@ public class PairwiseImageGraph {
 		/** Number of inliers when a homography was fit to observations. */
 		public int countH;
 		/** Indexes of features in 'src' and 'dst' views which are inliers to the model {@link #F} */
-		public final FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex::new);
+		public final DogArray<AssociatedIndex> inliers = new DogArray<>(AssociatedIndex::new);
 
 		/** Two views that this motion connects */
 		public View src, dst;

@@ -22,9 +22,9 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,8 +64,8 @@ public class TestAssociateDescTo2D extends BoofStandardJUnit {
 		public FastAccess<TupleDesc_F64> listDst;
 		public boolean calledAssociate = false;
 		public FastArray<AssociatedIndex> matches = new FastArray<>(AssociatedIndex.class);
-		public GrowQueue_I32 unassociatedSrc = new GrowQueue_I32(10);
-		public GrowQueue_I32 unassociatedDst = new GrowQueue_I32(10);
+		public DogArray_I32 unassociatedSrc = new DogArray_I32(10);
+		public DogArray_I32 unassociatedDst = new DogArray_I32(10);
 		public double threshold;
 
 		@Override
@@ -89,12 +89,12 @@ public class TestAssociateDescTo2D extends BoofStandardJUnit {
 		}
 
 		@Override
-		public GrowQueue_I32 getUnassociatedSource() {
+		public DogArray_I32 getUnassociatedSource() {
 			return unassociatedSrc;
 		}
 
 		@Override
-		public GrowQueue_I32 getUnassociatedDestination() {
+		public DogArray_I32 getUnassociatedDestination() {
 			return unassociatedDst;
 		}
 

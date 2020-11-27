@@ -24,7 +24,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 import pabeles.concurrency.GrowArray;
 
@@ -82,7 +82,7 @@ public class TestEnhanceImageOps extends BoofStandardJUnit {
 		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		GImageMiscOps.fillUniform(input, rand, 0, 9);
 
-		GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
+		GrowArray<DogArray_I32> workArrays = new GrowArray<>(DogArray_I32::new);
 
 		for( int radius = 1; radius < 11; radius++ ) {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, histogramLength, expected, workArrays);

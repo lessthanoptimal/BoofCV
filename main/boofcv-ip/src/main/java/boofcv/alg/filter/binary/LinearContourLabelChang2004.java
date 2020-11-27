@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * <p>
@@ -73,7 +73,7 @@ public class LinearContourLabelChang2004 {
 
 	// predeclared/recycled data structures
 	PackedSetsPoint2D_I32 packedPoints = new PackedSetsPoint2D_I32(2000);
-	private FastQueue<ContourPacked> contours = new FastQueue<>(ContourPacked::new);
+	private DogArray<ContourPacked> contours = new DogArray<>(ContourPacked::new);
 
 	// internal book keeping variables
 	private int x,y,indexIn,indexOut;
@@ -161,7 +161,7 @@ public class LinearContourLabelChang2004 {
 		return index;
 	}
 
-	public FastQueue<ContourPacked> getContours() {
+	public DogArray<ContourPacked> getContours() {
 		return contours;
 	}
 

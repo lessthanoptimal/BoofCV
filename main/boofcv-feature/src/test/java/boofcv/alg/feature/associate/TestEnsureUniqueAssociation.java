@@ -20,8 +20,8 @@ package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +34,7 @@ public class TestEnsureUniqueAssociation extends BoofStandardJUnit {
 	@Test
 	public void basicTest() {
 
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex::new);
+		DogArray<AssociatedIndex> matches = new DogArray<>(10, AssociatedIndex::new);
 
 		matches.grow().setAssociation(0,1,10);
 		matches.grow().setAssociation(1,0,20);

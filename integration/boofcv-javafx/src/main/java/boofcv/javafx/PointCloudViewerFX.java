@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.visualize.PointCloudViewer;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import javafx.application.Platform;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.util.List;
@@ -76,7 +76,7 @@ public class PointCloudViewerFX implements PointCloudViewer {
 
 	@Override
 	public void addCloud(List<Point3D_F64> cloud) {
-		GrowQueue_F32 fcloud = new GrowQueue_F32();
+		DogArray_F32 fcloud = new DogArray_F32();
 		fcloud.resize(cloud.size()*3);
 		int fidx = 0;
 		for (int i = 0; i < cloud.size(); i++) {
@@ -89,7 +89,7 @@ public class PointCloudViewerFX implements PointCloudViewer {
 	}
 
 	@Override
-	public void addCloud(GrowQueue_F32 cloudXYZ, GrowQueue_I32 colorRGB) {
+	public void addCloud(DogArray_F32 cloudXYZ, DogArray_I32 colorRGB) {
 		Platform.runLater(()->panel.addCloud(cloudXYZ));
 	}
 

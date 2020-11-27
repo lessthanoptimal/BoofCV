@@ -21,7 +21,7 @@ package boofcv.io.image;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.*;
 import org.apache.commons.io.FilenameUtils;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 import javax.imageio.ImageIO;
 import java.awt.image.*;
@@ -387,7 +387,7 @@ public class UtilImageIO {
 	 * @return The image.
 	 * @throws IOException Thrown if there is a problem reading the image
 	 */
-	public static Planar<GrayU8> loadPPM_U8(String fileName , Planar<GrayU8> storage , GrowQueue_I8 temp )
+	public static Planar<GrayU8> loadPPM_U8(String fileName , Planar<GrayU8> storage , DogArray_I8 temp )
 			throws IOException
 	{
 		return loadPPM_U8(new FileInputStream(fileName),storage,temp);
@@ -404,7 +404,7 @@ public class UtilImageIO {
 	 * @return The image.
 	 * @throws IOException Thrown if there is a problem reading the image
 	 */
-	public static Planar<GrayU8> loadPPM_U8(InputStream inputStream, Planar<GrayU8> storage , GrowQueue_I8 temp )
+	public static Planar<GrayU8> loadPPM_U8(InputStream inputStream, Planar<GrayU8> storage , DogArray_I8 temp )
 			throws IOException
 	{
 		DataInputStream in = new DataInputStream(inputStream);
@@ -425,7 +425,7 @@ public class UtilImageIO {
 
 		int length = w*h*3;
 		if( temp == null )
-			temp = new GrowQueue_I8(length);
+			temp = new DogArray_I8(length);
 		temp.resize(length);
 
 		byte[] data = temp.data;
@@ -500,7 +500,7 @@ public class UtilImageIO {
 	 * @param temp (Optional) Used internally to store the image.  Can be null.
 	 * @throws IOException Thrown if there is a problem reading the image
 	 */
-	public static void savePPM(Planar<GrayU8> rgb , String fileName , GrowQueue_I8 temp ) throws IOException {
+	public static void savePPM(Planar<GrayU8> rgb , String fileName , DogArray_I8 temp ) throws IOException {
 		File out = new File(fileName);
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
 
@@ -508,7 +508,7 @@ public class UtilImageIO {
 		os.write(header.getBytes(UTF_8));
 
 		if( temp == null )
-			temp = new GrowQueue_I8();
+			temp = new DogArray_I8();
 		temp.resize(rgb.width*rgb.height*3);
 		byte[] data = temp.data;
 

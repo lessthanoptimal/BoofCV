@@ -31,7 +31,7 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import joptsimple.internal.Objects;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -174,7 +174,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var inliers = new SceneWorkingGraph.InlierInfo();
 		for (int viewIdx : new int[]{1, 2, 3}) {
 			inliers.views.add(pairwise.nodes.get(viewIdx));
-			inliers.observations.grow().setTo(GrowQueue_I32.array(1, 2, 3, 5, 6));
+			inliers.observations.grow().setTo(DogArray_I32.array(1, 2, 3, 5, 6));
 		}
 
 		var alg = new RefineMetricWorkingGraph();
@@ -192,7 +192,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		assertEquals(1, alg.featureIdx3D.size);
 		assertEquals(0, alg.featureIdx3D.get(0));
 		assertEquals(2, alg.unassigned.size);
-		GrowQueue_I32.array(0, 1).forIdx(( i, v ) -> assertTrue(alg.unassigned.contains(v)));
+		DogArray_I32.array(0, 1).forIdx(( i, v ) -> assertTrue(alg.unassigned.contains(v)));
 	}
 
 	/**
@@ -230,11 +230,11 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var inliers = new SceneWorkingGraph.InlierInfo();
 		for (int viewIdx : new int[]{1, 2, 3}) {
 			inliers.views.add(pairwise.nodes.get(viewIdx));
-			inliers.observations.grow().setTo(GrowQueue_I32.array(1, 2, 3, 5, 6));
+			inliers.observations.grow().setTo(DogArray_I32.array(1, 2, 3, 5, 6));
 		}
 
 		// Specific which of the observations in the inlier set are currently unassigned
-		var unassignedOrig = GrowQueue_I32.array(0, 2);
+		var unassignedOrig = DogArray_I32.array(0, 2);
 		alg.unassigned.setTo(unassignedOrig);
 		// There is only one 3D feature they can be matched with
 		alg.featureIdx3D.add(3);
@@ -255,7 +255,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 			if (shouldBeAssigned) {
 				// Make sure the point in the inlier set which is being inspected was assigned a value
 				int pointID = inliers.observations.get(inlierViewIdx).get(inlierFeatIdx);
-				GrowQueue_I32 point = alg.bundleAdjustment.observations.views.get(i).point;
+				DogArray_I32 point = alg.bundleAdjustment.observations.views.get(i).point;
 				assertEquals(3, point.get(pointID));
 				// Set it to -1 make the next test easier since everything should now be -1
 				point.set(pointID, -1);
@@ -300,10 +300,10 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var inliers = new SceneWorkingGraph.InlierInfo();
 		for (int viewIdx : new int[]{1, 2, 3}) {
 			inliers.views.add(pairwise.nodes.get(viewIdx));
-			inliers.observations.grow().setTo(GrowQueue_I32.array(1, 2, 3, 5, 6));
+			inliers.observations.grow().setTo(DogArray_I32.array(1, 2, 3, 5, 6));
 		}
-		alg.viewIntIds.setTo(GrowQueue_I32.array(1, 2, 3));
-		alg.unassigned.setTo(GrowQueue_I32.array(1, 2));
+		alg.viewIntIds.setTo(DogArray_I32.array(1, 2, 3));
+		alg.unassigned.setTo(DogArray_I32.array(1, 2));
 
 		alg.initLookUpTablesForInlierSet(graph, inliers.views);
 		alg.triangulateAndSave(inliers, 4);

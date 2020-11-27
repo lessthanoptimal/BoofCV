@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -48,9 +48,9 @@ public abstract class AssociateGreedyBase<D> {
 	/** worst allowed fit score to associate */
 	@Getter double maxFitError = Double.MAX_VALUE;
 	/** Fit score for each assigned pair */
-	@Getter GrowQueue_F64 fitQuality = new GrowQueue_F64(100);
+	@Getter DogArray_F64 fitQuality = new DogArray_F64(100);
 	/** Look up table with the index of dst features that have been assigned to src features. pairs[src] = dst */
-	@Getter GrowQueue_I32 pairs = new GrowQueue_I32(100);
+	@Getter DogArray_I32 pairs = new DogArray_I32(100);
 	// Score matrix in row-major format. rows = src.size, cols = dst.size
 	@Getter DMatrixRMaj scoreMatrix = new DMatrixRMaj(1,1);
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.android;
 import android.graphics.Bitmap;
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
@@ -47,12 +47,12 @@ public class ConvertBitmap {
 		}
 	}
 
-	public static GrowQueue_I8 resizeStorage( Bitmap input, @Nullable GrowQueue_I8 storage ) {
+	public static DogArray_I8 resizeStorage( Bitmap input, @Nullable DogArray_I8 storage ) {
 		int byteCount = input.getConfig() == Bitmap.Config.ARGB_8888 ? 4 : 2;
 		int length = input.getWidth()*input.getHeight()*byteCount;
 
 		if (storage == null)
-			return new GrowQueue_I8(length);
+			return new DogArray_I8(length);
 		else {
 			storage.resize(length);
 			return storage;
@@ -67,7 +67,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageBase<T>>
-	void bitmapToBoof( Bitmap input, T output, @Nullable GrowQueue_I8 storage ) {
+	void bitmapToBoof( Bitmap input, T output, @Nullable DogArray_I8 storage ) {
 		storage = resizeStorage(input, storage);
 		if (BOverrideConvertAndroid.invokeBitmapToBoof(input, output, storage.data))
 			return;
@@ -103,7 +103,7 @@ public class ConvertBitmap {
 	 * @return The converted gray scale image.
 	 */
 	public static <T extends ImageGray<T>>
-	T bitmapToGray( Bitmap input, T output, Class<T> imageType, @Nullable GrowQueue_I8 storage ) {
+	T bitmapToGray( Bitmap input, T output, Class<T> imageType, @Nullable DogArray_I8 storage ) {
 		storage = resizeStorage(input, storage);
 		if (imageType == GrayF32.class)
 			return (T)bitmapToGray(input, (GrayF32)output, storage);
@@ -121,7 +121,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */
-	public static GrayU8 bitmapToGray( Bitmap input, GrayU8 output, @Nullable GrowQueue_I8 storage ) {
+	public static GrayU8 bitmapToGray( Bitmap input, GrayU8 output, @Nullable DogArray_I8 storage ) {
 		storage = resizeStorage(input, storage);
 		if (output == null) {
 			output = new GrayU8(input.getWidth(), input.getHeight());
@@ -144,7 +144,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */
-	public static GrayF32 bitmapToGray( Bitmap input, GrayF32 output, @Nullable GrowQueue_I8 storage ) {
+	public static GrayF32 bitmapToGray( Bitmap input, GrayF32 output, @Nullable DogArray_I8 storage ) {
 		if (output == null) {
 			output = new GrayF32(input.getWidth(), input.getHeight());
 		} else {
@@ -169,7 +169,7 @@ public class ConvertBitmap {
 	 * @return The converted Planar image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> bitmapToPlanar( Bitmap input, Planar<T> output, Class<T> type, @Nullable GrowQueue_I8 storage ) {
+	Planar<T> bitmapToPlanar( Bitmap input, Planar<T> output, Class<T> type, @Nullable DogArray_I8 storage ) {
 		if (output == null) {
 			output = new Planar<>(type, input.getWidth(), input.getHeight(), 3);
 		} else {
@@ -197,7 +197,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void boofToBitmap( ImageBase input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	public static void boofToBitmap( ImageBase input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		if (BOverrideConvertAndroid.invokeBoofToBitmap(ColorFormat.RGB, input, output, storage.data))
 			return;
 
@@ -212,7 +212,7 @@ public class ConvertBitmap {
 		}
 	}
 
-	public static void boofToBitmap( ColorFormat color, ImageBase input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	public static void boofToBitmap( ColorFormat color, ImageBase input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		storage = resizeStorage(output, storage);
 		if (BOverrideConvertAndroid.invokeBoofToBitmap(color, input, output, storage.data))
 			return;
@@ -248,7 +248,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( ImageGray input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	public static void grayToBitmap( ImageGray input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		if (input instanceof GrayU8)
 			grayToBitmap((GrayU8)input, output, storage);
 		else if (input instanceof GrayF32)
@@ -264,7 +264,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( GrayU8 input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	public static void grayToBitmap( GrayU8 input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		if (output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight()) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -282,7 +282,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( GrayF32 input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	public static void grayToBitmap( GrayF32 input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		if (output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight()) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -301,7 +301,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageGray<T>>
-	void planarToBitmap( Planar<T> input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	void planarToBitmap( Planar<T> input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		if (output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight()) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -325,7 +325,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageInterleaved<T>>
-	void interleavedToBitmap( T input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	void interleavedToBitmap( T input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		if (output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight()) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -342,7 +342,7 @@ public class ConvertBitmap {
 	}
 
 	public static <T extends ImageInterleaved<T>>
-	void interleavedYuvToBitmap( T input, Bitmap output, @Nullable GrowQueue_I8 storage ) {
+	void interleavedYuvToBitmap( T input, Bitmap output, @Nullable DogArray_I8 storage ) {
 		if (output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight()) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}

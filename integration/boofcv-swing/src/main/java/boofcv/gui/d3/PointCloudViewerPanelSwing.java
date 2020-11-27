@@ -38,10 +38,10 @@ import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -75,12 +75,12 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// use vectors to figure out that rotation
 
 	// Storage for xyz coordinates of points in the count
-	private @Getter final GrowQueue_F32 cloudXyz = new GrowQueue_F32(); // lock for reading/writing cloud data
+	private @Getter final DogArray_F32 cloudXyz = new DogArray_F32(); // lock for reading/writing cloud data
 	// Storage for rgb values of points in the cloud
-	private @Getter final GrowQueue_I32 cloudColor = new GrowQueue_I32();
+	private @Getter final DogArray_I32 cloudColor = new DogArray_I32();
 
 	// Wireframes which will be rendered. Also the LOCK
-	private final FastQueue<Wireframe> wireframes = new FastQueue<>(Wireframe::new);
+	private final DogArray<Wireframe> wireframes = new DogArray<>(Wireframe::new);
 	private final ReentrantLock lockWireFrame = new ReentrantLock();
 
 	// Maximum render distance
@@ -118,9 +118,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 		final Se3_F32 worldToCamera = new Se3_F32();
 
 		// used when rendering wireframes
-		private final FastQueue<Point3D_F32> cameraPts = new FastQueue<>(Point3D_F32::new);
-		private final FastQueue<Point2D_F32> pixels = new FastQueue<>(Point2D_F32::new);
-		private final GrowQueue_B visible = new GrowQueue_B();
+		private final DogArray<Point3D_F32> cameraPts = new DogArray<>(Point3D_F32::new);
+		private final DogArray<Point2D_F32> pixels = new DogArray<>(Point2D_F32::new);
+		private final DogArray_B visible = new DogArray_B();
 
 		// used when rendering the point cloud
 		private final Point3D_F32 worldPt = new Point3D_F32();
@@ -376,9 +376,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 		if (!lockWireFrame.isLocked())
 			throw new RuntimeException("Wireframe must already be locked");
 
-		final FastQueue<Point3D_F32> cameraPts = rendering.cameraPts;
-		final FastQueue<Point2D_F32> pixels = rendering.pixels;
-		final GrowQueue_B visible = rendering.visible;
+		final DogArray<Point3D_F32> cameraPts = rendering.cameraPts;
+		final DogArray<Point2D_F32> pixels = rendering.pixels;
+		final DogArray_B visible = rendering.visible;
 		final Se3_F32 worldToCamera = rendering.worldToCamera;
 		final GrayF32 imageDepth = rendering.imageDepth;
 
@@ -665,7 +665,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	}
 
 	private static class Wireframe {
-		public final FastQueue<Point3D_F32> vertexes = new FastQueue<>(Point3D_F32::new);
+		public final DogArray<Point3D_F32> vertexes = new DogArray<>(Point3D_F32::new);
 		public int radiusPixels = 1;
 		public int rgb;
 	}

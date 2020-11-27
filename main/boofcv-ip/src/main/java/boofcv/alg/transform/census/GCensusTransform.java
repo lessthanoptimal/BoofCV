@@ -23,8 +23,8 @@ import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -73,7 +73,7 @@ public class GCensusTransform {
 
 	public static <T extends ImageGray<T>> void sample_S64( final T input, final FastAccess<Point2D_I32> sample,
 															final GrayS64 output,
-															@Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace ) {
+															@Nullable ImageBorder<T> border, @Nullable DogArray_I32 workSpace ) {
 		if (input.getClass() == GrayU8.class) {
 			CensusTransform.sample_S64((GrayU8)input, sample, output, (ImageBorder_S32)border, workSpace);
 		} else if (input.getClass() == GrayU16.class) {
@@ -87,7 +87,7 @@ public class GCensusTransform {
 
 	public static <T extends ImageGray<T>> void sample_IU16( final T input, final FastAccess<Point2D_I32> sample,
 															 final InterleavedU16 output,
-															 @Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace ) {
+															 @Nullable ImageBorder<T> border, @Nullable DogArray_I32 workSpace ) {
 		if (input.getClass() == GrayU8.class) {
 			CensusTransform.sample_IU16((GrayU8)input, sample, output, (ImageBorder_S32)border, workSpace);
 		} else if (input.getClass() == GrayU16.class) {

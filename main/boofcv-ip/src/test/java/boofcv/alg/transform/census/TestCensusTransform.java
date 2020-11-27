@@ -20,7 +20,7 @@ package boofcv.alg.transform.census;
 
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestCensusTransform extends BoofStandardJUnit {
 	@Test
 	void createBlockSamples_1() {
-		FastQueue<Point2D_I32> samples = CensusTransform.createBlockSamples(2);
+		DogArray<Point2D_I32> samples = CensusTransform.createBlockSamples(2);
 		assertEquals(5*5-1, samples.size);
 		for (int y = -2, i=0; y < 3; y++) {
 			for (int x = -2; x < 3; x++) {
@@ -47,7 +47,7 @@ class TestCensusTransform extends BoofStandardJUnit {
 
 	@Test
 	void createBlockSamples_2() {
-		FastQueue<Point2D_I32> samples = CensusTransform.createBlockSamples(1,2);
+		DogArray<Point2D_I32> samples = CensusTransform.createBlockSamples(1,2);
 		assertEquals(3*5-1, samples.size);
 		for (int y = -2, i=0; y < 3; y++) {
 			for (int x = -1; x < 2; x++) {
@@ -60,7 +60,7 @@ class TestCensusTransform extends BoofStandardJUnit {
 
 	@Test
 	void createCircleSamples() {
-		FastQueue<Point2D_I32> samples = CensusTransform.createCircleSamples();
+		DogArray<Point2D_I32> samples = CensusTransform.createCircleSamples();
 		assertEquals(9 * 9 - 4 * 6 - 1, samples.size);
 
 		// make sure there's no zero

@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.selector;
 
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +43,7 @@ public abstract class ChecksFeatureSelectLimit<Point> extends BoofStandardJUnit 
 	 */
 	@Test
 	void lessThanMax_and_SelectedCleared() {
-		FastQueue<Point> detected = createRandom(15);
+		DogArray<Point> detected = createRandom(15);
 
 		FeatureSelectLimit<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
@@ -67,14 +67,14 @@ public abstract class ChecksFeatureSelectLimit<Point> extends BoofStandardJUnit 
 	 */
 	@Test
 	void multipleCalls_MoreThan_SelectCleared() {
-		FastQueue<Point> prior = createRandom(20);
+		DogArray<Point> prior = createRandom(20);
 
 
 		FeatureSelectLimit<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
-			FastQueue<Point> detected = createRandom(30);
+			DogArray<Point> detected = createRandom(30);
 			alg.select(width, height, prior, detected, 22, found);
 
 			// partial check to make sure the input wasn't modified
@@ -95,7 +95,7 @@ public abstract class ChecksFeatureSelectLimit<Point> extends BoofStandardJUnit 
 	 */
 	@Test
 	void priorIsBlowUp() {
-		FastQueue<Point> prior = createRandom(20);
+		DogArray<Point> prior = createRandom(20);
 		FeatureSelectLimit<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
 
@@ -105,7 +105,7 @@ public abstract class ChecksFeatureSelectLimit<Point> extends BoofStandardJUnit 
 		alg.select(width, height, null, createRandom(15), 10, found);
 	}
 
-	protected abstract FastQueue<Point> createRandom( int i2 );
+	protected abstract DogArray<Point> createRandom( int i2 );
 
 	public static abstract class I16 extends ChecksFeatureSelectLimit<Point2D_I16> {
 		@Override
@@ -114,8 +114,8 @@ public abstract class ChecksFeatureSelectLimit<Point> extends BoofStandardJUnit 
 		}
 
 		@Override
-		protected FastQueue<Point2D_I16> createRandom( int i2 ) {
-			FastQueue<Point2D_I16> detected = new FastQueue<>(Point2D_I16::new);
+		protected DogArray<Point2D_I16> createRandom( int i2 ) {
+			DogArray<Point2D_I16> detected = new DogArray<>(Point2D_I16::new);
 			for (int i = 0; i < i2; i++) {
 				detected.grow().setTo(rand.nextInt(width), rand.nextInt(height));
 			}

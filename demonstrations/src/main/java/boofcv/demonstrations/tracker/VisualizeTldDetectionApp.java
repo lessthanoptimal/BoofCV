@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,7 +60,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 	int numClicks = 0;
 	ImageRectangle target = new ImageRectangle();
 
-//	private FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion::new);
+//	private DogArray<TldRegion> candidateDetections = new DogArray<>(TldRegion::new);
 
 
 	public VisualizeTldDetectionApp( BufferedImage input , Class<T> imageType ) {
@@ -91,8 +91,8 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 
 		g2.drawImage(input,0,0,null);
 
-//		FastQueue<TldRegion> detected = tracker.getDetectedTargets();
-		FastQueue<TldRegion> detected = tracker.getDetection().getCandidateDetections();
+//		DogArray<TldRegion> detected = tracker.getDetectedTargets();
+		DogArray<TldRegion> detected = tracker.getDetection().getCandidateDetections();
 
 		drawDetections(g2, detected,0);
 //		drawFerns(g2,0);
@@ -112,7 +112,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 //		}
 	}
 
-	private void drawDetections(Graphics2D g2, FastQueue<TldRegion> detected , int shift ) {
+	private void drawDetections(Graphics2D g2, DogArray<TldRegion> detected , int shift ) {
 		double max = 0;
 		double min = Double.MAX_VALUE;
 
@@ -139,7 +139,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 //		double max = 0;
 //		double min = Double.MAX_VALUE;
 //
-//		GrowQueue_F64 value = tracker.getDetection().getStorageMetric();
+//		DogArray_F64 value = tracker.getDetection().getStorageMetric();
 //		java.util.List<ImageRectangle> rects = tracker.getDetection().getStorageRect();
 //
 //		for( int i = 0; i < value.size; i++ ) {
@@ -164,7 +164,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 //		}
 //	}
 
-	private void drawDetections(Graphics2D g2, FastQueue<TldRegion> detected , Color c ) {
+	private void drawDetections(Graphics2D g2, DogArray<TldRegion> detected , Color c ) {
 
 		for( TldRegion r : detected.toList() ) {
 			drawRectangle(g2,r.rect,c,3);
@@ -191,7 +191,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 
 	private void printDetectedConfidence() {
 
-		FastQueue<TldRegion> detected = tracker.getDetection().getLocalMaximums();
+		DogArray<TldRegion> detected = tracker.getDetection().getLocalMaximums();
 
 		System.out.println("Target: "+target);
 		for( int i = 0; i < detected.size; i++ ) {
@@ -203,7 +203,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 	private void printDescriptions() {
 		TldTemplateMatching<T> matching = tracker.getTemplateMatching();
 
-		FastQueue<TldRegion> detected = tracker.getDetection().getLocalMaximums();
+		DogArray<TldRegion> detected = tracker.getDetection().getLocalMaximums();
 
 		NccFeature t = matching.createDescriptor();
 		NccFeature f = matching.createDescriptor();

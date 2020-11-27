@@ -21,7 +21,7 @@ package boofcv.abst.shapes.polyline;
 import boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -72,7 +72,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 		contour.addAll(line(20,30,0,30));
 		contour.addAll(line(0,30,0,0));
 
-		GrowQueue_I32 found = new GrowQueue_I32();
+		DogArray_I32 found = new DogArray_I32();
 		if( alg.process(contour,found)) {
 			assertEquals(10, found.size);
 		}
@@ -97,7 +97,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 		contour.addAll(line(20,10,20,30));
 		contour.addAll(line(20,30,0,30));
 
-		GrowQueue_I32 found = new GrowQueue_I32();
+		DogArray_I32 found = new DogArray_I32();
 		if( alg.process(contour,found)) {
 			assertEquals(9, found.size);
 		}
@@ -116,7 +116,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 		alg.setMaximumSides(3);
 
 		List<Point2D_I32> contour = TestPolylineSplitMerge.rect(0,0,10,20);
-		GrowQueue_I32 found = new GrowQueue_I32();
+		DogArray_I32 found = new DogArray_I32();
 
 		// will fail because the error is too large for 3 sides
 		assertFalse(alg.process(contour,found));
@@ -141,7 +141,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 		contour.addAll(line(20,30,0,30));
 		contour.addAll(line(0,30,0,0));
 
-		GrowQueue_I32 found = new GrowQueue_I32();
+		DogArray_I32 found = new DogArray_I32();
 		assertFalse(alg.process(contour,found));
 
 		alg.setConvex(false);
@@ -149,7 +149,7 @@ public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 	}
 
 
-	private void check( GrowQueue_I32 found , int ...expected) {
+	private void check( DogArray_I32 found , int ...expected) {
 		assertEquals(expected.length,found.size());
 		boolean matched[] = new boolean[expected.length];
 		for (int i = 0; i < found.size(); i++) {

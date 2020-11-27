@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.numerics.InterpolateArray;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.Arrays;
 
@@ -70,10 +70,10 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	private double histAngleBin;
 
 	// peaks in histogram
-	private GrowQueue_I32 peaks = new GrowQueue_I32(10);
+	private DogArray_I32 peaks = new DogArray_I32(10);
 
 	// Found orientations of the feature
-	private GrowQueue_F64 angles = new GrowQueue_F64(10);
+	private DogArray_F64 angles = new DogArray_F64(10);
 	// Angle of the largest peak
 	private double peakAngle;
 
@@ -313,7 +313,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 	 *
 	 * @return orientations
 	 */
-	public GrowQueue_F64 getOrientations() {
+	public DogArray_F64 getOrientations() {
 		return angles;
 	}
 

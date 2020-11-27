@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -181,7 +181,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 	}
 
 	protected void renderTangents(Graphics2D g2 , double scale ) {
-		FastQueue<Tangents> tangents = detector.getKeypointFinder().getTangents();
+		DogArray<Tangents> tangents = detector.getKeypointFinder().getTangents();
 
 		BasicStroke thick = new BasicStroke(2.0f);
 		BasicStroke thin = new BasicStroke(1.0f);

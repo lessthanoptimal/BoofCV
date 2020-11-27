@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.Quadrilateral_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 	BaseDetectFiducialSquare<T> detector;
 
 	// found squares inside the image
-	FastQueue<Detection> detections = new FastQueue<>(Detection::new);
+	DogArray<Detection> detections = new DogArray<>(Detection::new);
 
 	/**
 	 * Configures the fiducial detector.
@@ -89,7 +89,7 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 
 		detector.process(input);
 
-		FastQueue<FoundFiducial> found = detector.getFound();
+		DogArray<FoundFiducial> found = detector.getFound();
 
 		for (int i = 0; i < found.size(); i++) {
 			FoundFiducial fid = found.get(i);

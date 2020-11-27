@@ -27,7 +27,7 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.ConvertTransform_F64;
 import georegression.transform.affine.AffinePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.Tuple2;
 import org.junit.jupiter.api.Test;
 
@@ -122,7 +122,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	private void processAndCheck(int rows, int cols, EllipseClustersIntoHexagonalGrid alg, Tuple2<List<Node>, List<EllipseRotated_F64>> grid, List<List<Node>> nodes) {
 		alg.process(grid.d1, nodes);
 
-		FastQueue<Grid> found = alg.getGrids();
+		DogArray<Grid> found = alg.getGrids();
 
 		assertEquals( 1 , found.size() );
 		checkShape(rows, cols, found.get(0));
@@ -159,7 +159,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 
 		alg.process(ellipses, nodes);
 
-		FastQueue<Grid> found = alg.getGrids();
+		DogArray<Grid> found = alg.getGrids();
 
 		assertEquals( 2 , found.size() );
 		checkShape(rows, cols, found.get(0));

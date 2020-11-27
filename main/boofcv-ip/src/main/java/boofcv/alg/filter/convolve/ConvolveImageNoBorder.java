@@ -23,7 +23,7 @@ import boofcv.alg.filter.convolve.noborder.*;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -457,7 +457,7 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU8 input, GrayI8 output, int divisor, @Nullable GrowArray<GrowQueue_I32> work) {
+								  GrayU8 input, GrayI8 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -529,7 +529,7 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS16 input, GrayI16 output, int divisor, @Nullable GrowArray<GrowQueue_I32> work) {
+								  GrayS16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -601,7 +601,7 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU16 input, GrayI16 output, int divisor, @Nullable GrowArray<GrowQueue_I32> work) {
+								  GrayU16 input, GrayI16 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -767,7 +767,7 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS32 input, GrayS32 output, int divisor, @Nullable GrowArray<GrowQueue_I32> work) {
+								  GrayS32 input, GrayS32 output, int divisor, @Nullable GrowArray<DogArray_I32> work) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {

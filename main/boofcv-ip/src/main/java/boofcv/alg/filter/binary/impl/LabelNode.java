@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 
 /**
@@ -30,7 +30,7 @@ public class LabelNode {
 
 	public int index;
 	public int maxIndex;
-	public GrowQueue_I32 connections = new GrowQueue_I32(5);
+	public DogArray_I32 connections = new DogArray_I32(5);
 
 	public LabelNode(int index) {
 		this.index = index;

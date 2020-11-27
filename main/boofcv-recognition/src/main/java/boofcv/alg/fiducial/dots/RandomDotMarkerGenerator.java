@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class RandomDotMarkerGenerator {
 	@Getter protected final RectangleLength2D_F64 documentRegion = new RectangleLength2D_F64();
 
 	/** dot locations after being transformed ot fit inside the region */
-	@Getter FastQueue<Point2D_F64> dotsAdjusted = new FastQueue<>(Point2D_F64::new);
+	@Getter DogArray<Point2D_F64> dotsAdjusted = new DogArray<>(Point2D_F64::new);
 
 	/**
 	 * Randomly generates a marker within the allowed region. Ensures that dots do not overlap or touch the marker's

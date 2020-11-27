@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		alg.initialize(scene.cameras);
 		// add the initial set of frames
 		for (int i = 0; i < 5; i++) {
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
+			DogArray_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
 			assertEquals(0, discard.size);
 			scene.addFrame(i);
 			tracker.process(null);
@@ -53,7 +53,7 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		// add one more frame. It should now want to discard the current frame
 		scene.addFrame(6);
 		tracker.process(null);
-		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
+		DogArray_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
 		assertEquals(1, discard.size);
 		assertEquals(5, discard.get(0));
 	}
@@ -77,7 +77,7 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		for (int i = 0; i < 10; i++) {
 			tracker.process(null);
 			scene.addFrame(i + 5);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
+			DogArray_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 1, scene);
 			assertEquals(1, discard.size);
 			long id = tracker.getFrameID();
 			if (id%3 == 0) {
@@ -115,7 +115,7 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 			tracker.process(null);
 			scene.addFrame((i + 5)*2);
 			scene.addFrame((i + 5)*2 + 1);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 2, scene);
+			DogArray_I32 discard = alg.selectFramesToDiscard(tracker, maxKeyFrames, 2, scene);
 			assertEquals(2, discard.size);
 			long id = tracker.getFrameID();
 			if (id%3 == 0) {

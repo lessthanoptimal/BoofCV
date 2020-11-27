@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,8 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -112,8 +112,8 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 
 	//======== Triangulation related
 	// observations in normalized image coordinates
-	protected FastQueue<Point2D_F64> observationsNorm = new FastQueue<>(Point2D_F64::new);
-	protected FastQueue<Se3_F64> listOf_world_to_frame = new FastQueue<>(Se3_F64::new);
+	protected DogArray<Point2D_F64> observationsNorm = new DogArray<>(Point2D_F64::new);
+	protected DogArray<Se3_F64> listOf_world_to_frame = new DogArray<>(Se3_F64::new);
 	protected Point3D_F64 found3D = new Point3D_F64();
 
 	protected Se3_F64 world_to_frame = new Se3_F64();
@@ -184,7 +184,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 * @return true if current frame
 	 */
 	protected boolean performKeyFrameMaintenance( PointTracker<?> tracker, int newFrames ) {
-		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, bundleViso);
+		DogArray_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, bundleViso);
 		boolean droppedCurrentFrame = false;
 		if (dropFrameIndexes.size != 0) {
 			droppedCurrentFrame = dropFrameIndexes.getTail(0) == bundleViso.frames.size - 1;
@@ -201,7 +201,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	 *
 	 * @param dropFrameIndexes List of indexes to drop. Sorted from lowest to highest
 	 */
-	protected void dropFramesFromScene( GrowQueue_I32 dropFrameIndexes ) {
+	protected void dropFramesFromScene( DogArray_I32 dropFrameIndexes ) {
 		for (int i = dropFrameIndexes.size - 1; i >= 0; i--) {
 			// indexes are ordered from lowest to highest, so you can remove frames without
 			// changing the index in the list

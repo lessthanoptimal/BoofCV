@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.segmentation;
 
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Computes the mean color for regions in a segmented image.
@@ -36,7 +36,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	int numBands;
 
 	// storage for the sum of each color
-	FastQueue<float[]> regionSums;
+	DogArray<float[]> regionSums;
 
 	/**
 	 * Constructor
@@ -59,8 +59,8 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	 * declared.
 	 */
 	public void process( T image, GrayS32 pixelToRegion,
-						 GrowQueue_I32 regionMemberCount,
-						 FastQueue<float[]> regionColor ) {
+						 DogArray_I32 regionMemberCount,
+						 DogArray<float[]> regionColor ) {
 
 		// See if the input image has the expected number of bands
 		if (image.getImageType().getFamily() != ImageType.Family.GRAY) {

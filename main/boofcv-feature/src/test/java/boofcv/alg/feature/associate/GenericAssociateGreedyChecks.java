@@ -20,10 +20,10 @@ package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,22 +39,22 @@ public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 
 	@Test
 	void basic() {
-		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
-		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
+		DogArray<TupleDesc_F64> a = createData(1,2,3,4);
+		DogArray<TupleDesc_F64> b = createData(3,4,1,40);
 
 		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
 		alg.setMaxFitError(0.5);
 
 		associate(alg, a,b);
 
-		GrowQueue_I32 pairs = alg.getPairs();
+		DogArray_I32 pairs = alg.getPairs();
 
 		assertEquals( 2,pairs.get(0));
 		assertEquals(-1,pairs.get(1));
 		assertEquals( 0,pairs.get(2));
 		assertEquals( 1,pairs.get(3));
 
-		GrowQueue_F64 fitScore = alg.getFitQuality();
+		DogArray_F64 fitScore = alg.getFitQuality();
 
 		assertEquals(0,fitScore.get(0),1e-5);
 		assertEquals(0,fitScore.get(2),1e-5);
@@ -63,8 +63,8 @@ public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 
 	@Test
 	void maxError() {
-		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
-		FastQueue<TupleDesc_F64> b = createData(3,4,1.1,40);
+		DogArray<TupleDesc_F64> a = createData(1,2,3,4);
+		DogArray<TupleDesc_F64> b = createData(3,4,1.1,40);
 
 		// large margin for error
 		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
@@ -82,8 +82,8 @@ public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 
 	@Test
 	void backwards() {
-		FastQueue<TupleDesc_F64> a = createData(1,2,3,8);
-		FastQueue<TupleDesc_F64> b = createData(3,4,1,10);
+		DogArray<TupleDesc_F64> a = createData(1,2,3,8);
+		DogArray<TupleDesc_F64> b = createData(3,4,1,10);
 
 		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
 		alg.backwardsValidation = true;
@@ -91,14 +91,14 @@ public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 
 		associate(alg, a,b);
 
-		GrowQueue_I32 pairs = alg.getPairs();
+		DogArray_I32 pairs = alg.getPairs();
 
 		assertEquals( 2,pairs.get(0));
 		assertEquals(-1,pairs.get(1));
 		assertEquals( 0,pairs.get(2));
 		assertEquals( 3,pairs.get(3));
 
-		GrowQueue_F64 fitScore = alg.getFitQuality();
+		DogArray_F64 fitScore = alg.getFitQuality();
 
 		assertEquals(0,fitScore.get(0),1e-5);
 		assertEquals(0,fitScore.get(2),1e-5);
@@ -109,14 +109,14 @@ public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 	void ratioTest() {
 		// perfect match is a special case
 		// [2] is a very good fit and should pass the ratio test, but is not zero
-		FastQueue<TupleDesc_F64> a = createData(1,2,3,10);
-		FastQueue<TupleDesc_F64> b = createData(1,2,3.01,4);
+		DogArray<TupleDesc_F64> a = createData(1,2,3,10);
+		DogArray<TupleDesc_F64> b = createData(1,2,3.01,4);
 
 		AssociateGreedyBase<TupleDesc_F64> alg = createAlgorithm();
 
 		// ratio test is turned off by default
 		associate(alg, a,b);
-		GrowQueue_I32 pairs = alg.getPairs();
+		DogArray_I32 pairs = alg.getPairs();
 		for (int i = 0; i < 4; i++) {
 			assertEquals(i,pairs.get(i));
 		}
@@ -131,9 +131,9 @@ public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 		assertEquals(-1,pairs.get(3));
 	}
 
-	protected FastQueue<TupleDesc_F64> createData( double ...values )
+	protected DogArray<TupleDesc_F64> createData( double ...values )
 	{
-		FastQueue<TupleDesc_F64> ret = new FastQueue<>(()-> new TupleDesc_F64(1));
+		DogArray<TupleDesc_F64> ret = new DogArray<>(()-> new TupleDesc_F64(1));
 		ret.resize(values.length);
 
 		for( int i = 0; i < values.length; i++ ) {

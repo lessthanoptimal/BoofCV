@@ -44,7 +44,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -68,13 +68,13 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	// Detects squares inside the image
 	DetectPolygonBinaryGrayRefine<T> squareDetector;
 
-	FastQueue<PositionPatternNode> positionPatterns = new FastQueue<>(PositionPatternNode::new);
+	DogArray<PositionPatternNode> positionPatterns = new DogArray<>(PositionPatternNode::new);
 	SquareGraph graph = new SquareGraph();
 
 	// Nearst Neighbor Search related variables
 	private NearestNeighbor<SquareNode> nn = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
 	private NearestNeighbor.Search<SquareNode> search = nn.createSearch();
-	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData::new);
+	private DogArray<NnData<SquareNode>> searchResults = new DogArray(NnData::new);
 
 	// Workspace for checking to see if two squares should be connected
 	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();
@@ -436,7 +436,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 *
 	 * @return List of PP
 	 */
-	public FastQueue<PositionPatternNode> getPositionPatterns() {
+	public DogArray<PositionPatternNode> getPositionPatterns() {
 		return positionPatterns;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,15 @@
 
 package boofcv.struct.geo;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 /**
- * {@link FastQueue} which will internally declare {@link DMatrixRMaj} of a specific shape.
+ * {@link DogArray} which will internally declare {@link DMatrixRMaj} of a specific shape.
  *
  * @author Peter Abeles
  */
-public class QueueMatrix extends FastQueue<DMatrixRMaj> {
+public class QueueMatrix extends DogArray<DMatrixRMaj> {
 
 	/**
 	 * Specifies the matrix shape.

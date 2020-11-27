@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Default implementations for all functions in {@link AssociateDescription2D}
@@ -36,8 +36,8 @@ public class AbstractAssociateDescription2D<Desc> implements AssociateDescriptio
 	@Override public void setDestination(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {}
 	@Override public void associate() {}
 	@Override public FastAccess<AssociatedIndex> getMatches() {return null;}
-	@Override public GrowQueue_I32 getUnassociatedSource() {return null;}
-	@Override public GrowQueue_I32 getUnassociatedDestination() {return null;}
+	@Override public DogArray_I32 getUnassociatedSource() {return null;}
+	@Override public DogArray_I32 getUnassociatedDestination() {return null;}
 	@Override public void setMaxScoreThreshold(double score) {}
 	@Override public MatchScoreType getScoreType() {return null;}
 	@Override public boolean uniqueSource() {return false;}

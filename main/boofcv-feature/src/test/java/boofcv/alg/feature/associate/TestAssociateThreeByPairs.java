@@ -26,8 +26,8 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,12 +38,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	@Test
 	void perfect() {
-		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
-		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray_I32 featuresSetA = new DogArray_I32();
+		DogArray_I32 featuresSetB = new DogArray_I32();
+		DogArray_I32 featuresSetC = new DogArray_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -75,7 +75,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		alg.associate();
 
-		FastQueue<AssociatedTripleIndex> matches = alg.getMatches();
+		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
 		assertEquals(10,matches.size);
 
@@ -92,12 +92,12 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	 */
 	@Test
 	void failOnCtoA() {
-		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
-		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray_I32 featuresSetA = new DogArray_I32();
+		DogArray_I32 featuresSetB = new DogArray_I32();
+		DogArray_I32 featuresSetC = new DogArray_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -130,7 +130,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		alg.associate();
 
-		FastQueue<AssociatedTripleIndex> matches = alg.getMatches();
+		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
 		assertEquals(0,matches.size);
 	}
@@ -140,12 +140,12 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	 */
 	@Test
 	void failOnBtoC() {
-		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
-		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray_I32 featuresSetA = new DogArray_I32();
+		DogArray_I32 featuresSetB = new DogArray_I32();
+		DogArray_I32 featuresSetC = new DogArray_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -179,7 +179,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		alg.associate();
 
-		FastQueue<AssociatedTripleIndex> matches = alg.getMatches();
+		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
 		assertEquals(0,matches.size);
 	}
@@ -189,12 +189,12 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	 */
 	@Test
 	void failOnAtoB() {
-		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
-		GrowQueue_I32 featuresSetA = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetB = new GrowQueue_I32();
-		GrowQueue_I32 featuresSetC = new GrowQueue_I32();
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray_I32 featuresSetA = new DogArray_I32();
+		DogArray_I32 featuresSetB = new DogArray_I32();
+		DogArray_I32 featuresSetC = new DogArray_I32();
 
 		featuresB.grow().set(234234234);
 		featuresC.grow().set(2344234);
@@ -227,7 +227,7 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 
 		alg.associate();
 
-		FastQueue<AssociatedTripleIndex> matches = alg.getMatches();
+		DogArray<AssociatedTripleIndex> matches = alg.getMatches();
 
 		assertEquals(0,matches.size);
 	}

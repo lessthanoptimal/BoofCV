@@ -40,7 +40,7 @@ import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,9 +58,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleMultiviewDenseReconstruction {
+public class ExampleMultiViewDenseReconstruction {
 	public static void main( String[] args ) {
-		var example = new ExampleMultiviewSparseReconstruction();
+		var example = new ExampleMultiViewSparseReconstruction();
 //		example.compute("house_01.mp4");
 //		example.compute("forest_path_01.mp4");
 		example.compute("rock_01.mp4");
@@ -136,7 +136,7 @@ public class ExampleMultiviewDenseReconstruction {
 
 		// Colorize the cloud to make it easier to view. This is done by projecting points back into the
 		// first view they were seen in and reading the color
-		GrowQueue_I32 colorRgb = new GrowQueue_I32();
+		DogArray_I32 colorRgb = new DogArray_I32();
 		colorRgb.resize(mvs.getCloud().size());
 		var colorizeMvs = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), imageLookup);
 		colorizeMvs.processMvsCloud(example.scene, mvs,
@@ -144,7 +144,7 @@ public class ExampleMultiviewDenseReconstruction {
 		visualizeInPointCloud(mvs.getCloud(), colorRgb, example.scene);
 	}
 
-	public static void visualizeInPointCloud( List<Point3D_F64> cloud, GrowQueue_I32 colorsRgb,
+	public static void visualizeInPointCloud( List<Point3D_F64> cloud, DogArray_I32 colorsRgb,
 											  SceneStructureMetric structure ) {
 		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
 		viewer.setFog(true);

@@ -24,7 +24,7 @@ import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -45,9 +45,9 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.setContour(createSquare( 10,12 , 30,40));
-		GrowQueue_I32 corners = createSquareCorners(10,12 , 30,40);
+		DogArray_I32 corners = createSquareCorners(10,12 , 30,40);
 
-		GrowQueue_I32 found = new GrowQueue_I32();
+		DogArray_I32 found = new DogArray_I32();
 		for (int anchor0 = 0; anchor0 < 4; anchor0++) {
 			for (int j = 0; j < 4; j++) {
 				if( j == 1 ) continue; // this case it can't optimize
@@ -70,9 +70,9 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.setContour(createSquare( 10,12 , 30,40));
-		GrowQueue_I32 expected = createSquareCorners(10,12 , 30,40);
-		GrowQueue_I32 input = createSquareCorners(10,12 , 30,40);
-		GrowQueue_I32 found = new GrowQueue_I32();
+		DogArray_I32 expected = createSquareCorners(10,12 , 30,40);
+		DogArray_I32 input = createSquareCorners(10,12 , 30,40);
+		DogArray_I32 found = new DogArray_I32();
 
 		input.set(2, input.get(2) + 3);
 
@@ -87,7 +87,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 	public void sanityCheckCornerOrder() {
 		FitLinesToContour alg = new FitLinesToContour();
 		alg.contour = createSquare( 10,12 , 30,40);
-		GrowQueue_I32 corners = new GrowQueue_I32();
+		DogArray_I32 corners = new DogArray_I32();
 
 		corners.add(6);
 		corners.add(12);
@@ -113,7 +113,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.contour = createSquare( 10,12 , 30,40);
-		GrowQueue_I32 corners = createSquareCorners(10,12 , 30,40);
+		DogArray_I32 corners = createSquareCorners(10,12 , 30,40);
 
 		// first generate the lines it will fit
 		alg.lines.resize(3);
@@ -121,7 +121,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		alg.fitLinesUsingCorners(3, corners);
 
 		// now extract the corners
-		GrowQueue_I32 found = new GrowQueue_I32(corners.size);
+		DogArray_I32 found = new DogArray_I32(corners.size);
 		found.resize(corners.size());
 		alg.anchor0 = 1;
 		alg.linesIntoCorners(3,found);
@@ -138,7 +138,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		FitLinesToContour alg = new FitLinesToContour();
 
 		alg.contour = createSquare( 10,12 , 30,40);
-		GrowQueue_I32 corners = createSquareCorners(10,12 , 30,40);
+		DogArray_I32 corners = createSquareCorners(10,12 , 30,40);
 
 		alg.lines.resize(3);
 		alg.anchor0 = 1;
@@ -163,7 +163,7 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		// create the rectangle so that two sizes are less than max samples and the other two more
 		int w = alg.maxSamples;
 		alg.contour = createSquare( 10,12 , 10+w-1,12+w+4);
-		GrowQueue_I32 corners = createSquareCorners(10,12 , 10+w-1,12+w+4);
+		DogArray_I32 corners = createSquareCorners(10,12 , 10+w-1,12+w+4);
 
 		LineGeneral2D_F64 line = new LineGeneral2D_F64();
 		for (int i = 0,j=corners.size()-1; i < corners.size(); j=i,i++) {
@@ -220,8 +220,8 @@ public class TestFitLinesToContour extends BoofStandardJUnit {
 		return output;
 	}
 
-	private GrowQueue_I32 createSquareCorners( int x0 , int y0 , int x1 , int y1 ) {
-		GrowQueue_I32 corners = new GrowQueue_I32();
+	private DogArray_I32 createSquareCorners( int x0 , int y0 , int x1 , int y1 ) {
+		DogArray_I32 corners = new DogArray_I32();
 
 		int c0 = 0;
 		int c1 = c0 + x1-x0;

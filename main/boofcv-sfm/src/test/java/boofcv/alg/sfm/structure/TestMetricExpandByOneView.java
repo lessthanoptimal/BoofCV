@@ -24,7 +24,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
@@ -158,7 +158,7 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 		MultiViewOps.projectiveMakeFirstIdentity(cameras, null);
 
 		// Create the pixel observations
-		db.createTripleObs(viewIdx, alg.utils.matchesTriple, new GrowQueue_I32());
+		db.createTripleObs(viewIdx, alg.utils.matchesTriple, new DogArray_I32());
 
 		// Compute the homogrpahy
 		assertTrue(alg.computeCalibratingHomography());

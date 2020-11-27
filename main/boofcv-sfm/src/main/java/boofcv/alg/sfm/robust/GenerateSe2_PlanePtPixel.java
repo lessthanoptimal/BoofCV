@@ -26,7 +26,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class GenerateSe2_PlanePtPixel implements
 	private final CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	List<Point2D_F64> from = new ArrayList<>();
-	FastQueue<Point2D_F64> to = new FastQueue<>(Point2D_F64::new);
+	DogArray<Point2D_F64> to = new DogArray<>(Point2D_F64::new);
 
 	public GenerateSe2_PlanePtPixel( MotionTransformPoint<Se2_F64, Point2D_F64> estimator ) {
 		this.estimator = estimator;

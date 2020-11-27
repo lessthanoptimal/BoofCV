@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -153,7 +153,7 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 		edgeIntensity.setImage(gray);
 
 		long time0 = System.nanoTime();
-		FastQueue<DetectPolygonFromContour.Info> detections = detector.getFound();
+		DogArray<DetectPolygonFromContour.Info> detections = detector.getFound();
 
 		if( adjustForBias != null ) {
 			int minSides = getMinimumSides();

@@ -83,7 +83,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		sumType = inputImg.getSumType();
 		bitWise = inputImg.getBitWise();
 		hasDivisor = divided;
-		workType = ("GrowQueue_"+inputImg.getKernelType()).replace("S32","I32");
+		workType = ("DogArray_"+inputImg.getKernelType()).replace("S32","I32");
 
 		declareHalf = isInteger ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		divide = isInteger ? "(total + halfDivisor)/divisor" : "total/divisor";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,9 @@ import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -132,7 +132,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 
 		alg.associate();
 
-		FastQueue<AssociatedIndex> matches = alg.getMatches();
+		DogArray<AssociatedIndex> matches = alg.getMatches();
 
 		assertEquals(7,matches.size);
 		for( int i = 0, count = 0; i < nn.assoc.length; i++ ) {
@@ -144,7 +144,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 			}
 		}
 
-		GrowQueue_I32 unassoc = alg.getUnassociatedSource();
+		DogArray_I32 unassoc = alg.getUnassociatedSource();
 		assertEquals(1, unassoc.size);
 		assertEquals(3,unassoc.get(0));
 		unassoc = alg.getUnassociatedDestination();
@@ -190,7 +190,7 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 			}
 
 			@Override
-			public void findNearest(D point, double maxDistance, int numNeighbors, FastQueue<NnData<D>> result) {
+			public void findNearest(D point, double maxDistance, int numNeighbors, DogArray<NnData<D>> result) {
 				result.reset();
 				int w = assoc[numCalls];
 

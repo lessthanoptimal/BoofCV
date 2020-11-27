@@ -34,8 +34,8 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
@@ -92,7 +92,7 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 		alg.setLensDistortion(image.width, image.height, tranTo, tranFrom);
 		alg.process(image, binary);
 
-		FastQueue<DetectPolygonFromContour.Info> found = alg.getFound();
+		DogArray<DetectPolygonFromContour.Info> found = alg.getFound();
 
 		assertEquals(rectangles.size(),found.size);
 
@@ -137,7 +137,7 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides,numberOfSides);
 		alg.process(image, binary);
 
-		FastQueue<DetectPolygonFromContour.Info> found = alg.getFound();
+		DogArray<DetectPolygonFromContour.Info> found = alg.getFound();
 
 		assertEquals(rectangles.size(), found.size);
 
@@ -168,7 +168,7 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 		DetectPolygonFromContour alg = createDetector(imageType, 3,4);
 		alg.process(image, binary);
 
-		FastQueue<DetectPolygonFromContour.Info> found = alg.getFound();
+		DogArray<DetectPolygonFromContour.Info> found = alg.getFound();
 
 		assertEquals(polygons.size(), found.size);
 
@@ -362,7 +362,7 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 
 		Polygon2D_F64 poly = new Polygon2D_F64(0,0, 10,0, 10,10, 0,10);
 
-		GrowQueue_B corners = new GrowQueue_B();
+		DogArray_B corners = new DogArray_B();
 		alg.determineCornersOnBorder(poly,corners);
 
 		assertEquals(4,corners.size());

@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Runs a template matching algorithm across the image. Local peaks are found in the resulting
@@ -56,7 +56,7 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	private int indexes[] = new int[10];
 
 	// storage for final points
-	private FastQueue<Match> results = new FastQueue<>(10, Match::new);
+	private DogArray<Match> results = new DogArray<>(10, Match::new);
 
 	// shape of input image
 	int imageWidth,imageHeight;
@@ -181,7 +181,7 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	 *
 	 * @return List of found templates
 	 */
-	public FastQueue<Match> getResults() {
+	public DogArray<Match> getResults() {
 		return results;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class HoughTransformBinary {
 	// extracts line from the transform
 	NonMaxSuppression extractor;
 	// stores returned lines
-	FastQueue<LineParametric2D_F32> linesAll = new FastQueue<>(10, LineParametric2D_F32::new);
+	DogArray<LineParametric2D_F32> linesAll = new DogArray<>(10, LineParametric2D_F32::new);
 	// Lines after similar ones have been merged together
 	List<LineParametric2D_F32> linesMerged = new ArrayList<>();
 	// contains a set of counts for detected lines in each pixel
@@ -73,7 +73,7 @@ public class HoughTransformBinary {
 	// found lines in transform space
 	QueueCorner foundPeaks = new QueueCorner(10);
 	// line intensities for later pruning
-	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
+	DogArray_F32 foundIntensity = new DogArray_F32(10);
 
 	HoughTransformParameters parameters;
 
@@ -188,7 +188,7 @@ public class HoughTransformBinary {
 		return foundIntensity.data;
 	}
 
-	public FastQueue<LineParametric2D_F32> getLinesAll() {
+	public DogArray<LineParametric2D_F32> getLinesAll() {
 		return linesAll;
 	}
 

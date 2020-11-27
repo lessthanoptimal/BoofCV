@@ -32,7 +32,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.geometry.UtilPoint2D_F32;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.lang.reflect.Array;
 
@@ -76,7 +76,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	private final Track[] tracks;
 
 	// List showing how each active feature moved
-	private final FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+	private final DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 	// storage for computing error statistics
 	private final double[] errorsFB;
@@ -320,7 +320,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		}
 	}
 
-	public FastQueue<AssociatedPair> getPairs() {
+	public DogArray<AssociatedPair> getPairs() {
 		return pairs;
 	}
 

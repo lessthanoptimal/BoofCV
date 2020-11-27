@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.segmentation.fh04;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Computes edge weights for {@link SegmentFelzenszwalbHuttenlocher04}.  An edge weight is measure of how different
@@ -30,7 +30,7 @@ import org.ddogleg.struct.FastQueue;
  */
 public interface FhEdgeWeights<T extends ImageBase<T>> {
 
-	public void process( T input , FastQueue<SegmentFelzenszwalbHuttenlocher04.Edge> edges );
+	public void process( T input , DogArray<SegmentFelzenszwalbHuttenlocher04.Edge> edges );
 
 	public ImageType<T> getInputType();
 }

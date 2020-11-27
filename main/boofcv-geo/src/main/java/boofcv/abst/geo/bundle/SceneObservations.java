@@ -20,9 +20,9 @@ package boofcv.abst.geo.bundle;
 
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Storage for feature observation in each view. Input for bundle adjustment. When possible arrays are used to
@@ -32,10 +32,10 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public class SceneObservations {
 	/** Views of general points. */
-	public final FastQueue<View> views = new FastQueue<>(View::new, View::reset);
+	public final DogArray<View> views = new DogArray<>(View::new, View::reset);
 
 	/** Views of points on rigid objects */
-	public final FastQueue<View> viewsRigid = new FastQueue<>(View::new, View::reset);
+	public final DogArray<View> viewsRigid = new DogArray<>(View::new, View::reset);
 
 	/**
 	 * Initialize the data structures for this number of views. Rigid is set to be false.
@@ -70,7 +70,7 @@ public class SceneObservations {
 		return countObservations(viewsRigid) + countObservations(views);
 	}
 
-	private int countObservations( FastQueue<View> views ) {
+	private int countObservations( DogArray<View> views ) {
 		if (views == null)
 			return 0;
 		int total = 0;
@@ -97,9 +97,9 @@ public class SceneObservations {
 
 	public static class View {
 		// list of Point ID's which this view can see. -1 indicates the point has been removed
-		public GrowQueue_I32 point = new GrowQueue_I32();
+		public DogArray_I32 point = new DogArray_I32();
 		// The observation of the point in the view in an interleaved format (x,y). In image pixels.
-		public GrowQueue_F32 observations = new GrowQueue_F32();
+		public DogArray_F32 observations = new DogArray_F32();
 
 		public int size() {
 			return point.size;

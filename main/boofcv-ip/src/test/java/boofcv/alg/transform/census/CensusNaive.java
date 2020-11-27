@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Brute force implementation of Census Transform used for testing
@@ -79,7 +79,7 @@ public class CensusNaive {
 		}
 	}
 
-	public static void sample(ImageGray input , final FastQueue<Point2D_I32> sample, GrayS64 output ) {
+	public static void sample(ImageGray input , final DogArray<Point2D_I32> sample, GrayS64 output ) {
 		output.reshape(input.width,input.height);
 		GImageGray src = FactoryGImageGray.wrap(FactoryImageBorder.wrap(BorderType.EXTENDED,input));
 
@@ -101,7 +101,7 @@ public class CensusNaive {
 		}
 	}
 
-	public static void sample(ImageGray input , final FastQueue<Point2D_I32> sample, InterleavedU16 output ) {
+	public static void sample(ImageGray input , final DogArray<Point2D_I32> sample, InterleavedU16 output ) {
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size,16);
 		output.reshape(input.width,input.height,numBlocks);
 		GImageGray src = FactoryGImageGray.wrap(FactoryImageBorder.wrap(BorderType.EXTENDED,input));

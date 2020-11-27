@@ -34,9 +34,9 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
@@ -119,7 +119,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	private QueueCorner foundFeatures = new QueueCorner(100);
 
 	// List of found feature points from all scales combined together
-	private FastQueue<ScalePoint> featuresAllScales = new FastQueue<>(10, ScalePoint::new);
+	private DogArray<ScalePoint> featuresAllScales = new DogArray<>(10, ScalePoint::new);
 
 	// size of detected feature at the smallest scale
 	private @Getter final int initialSize;
@@ -295,7 +295,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		int sizeStep = levelSize-size[level-1];
 
 		// grow the internal array all at once if needed
-		featuresAllScales.growArray(featuresAllScales.size+features.size);
+		featuresAllScales.reserve(featuresAllScales.size+features.size);
 
 		// see if these local maximums are also a maximum in scale-space
 		for( int i = 0; i < features.size; i++ ) {

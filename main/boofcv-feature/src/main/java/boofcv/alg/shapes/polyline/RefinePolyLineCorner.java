@@ -24,7 +24,7 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -89,7 +89,7 @@ public class RefinePolyLineCorner {
 	 * @param contour Contours around the shape
 	 * @param corners (Input) initial set of corners.  (output) refined set of corners
 	 */
-	public boolean fit( List<Point2D_I32> contour, GrowQueue_I32 corners ) {
+	public boolean fit( List<Point2D_I32> contour, DogArray_I32 corners ) {
 		if (corners.size() < 3) {
 			return false;
 		}

@@ -49,8 +49,8 @@ import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 import org.ejml.UtilEjml;
 import pabeles.concurrency.GrowArray;
 
@@ -110,7 +110,7 @@ public class DetectChessboardCornersX {
 
 	SearchLocalPeak<GrayF32> meanShift;
 
-	private FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner::new);
+	private DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
 	List<ChessboardCorner> filtered = new ArrayList<>();
 
 	// storage for corner detector output
@@ -152,13 +152,13 @@ public class DetectChessboardCornersX {
 	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1, true, 64, -1, numSpokeDiam/4);
 
 	// used to check up and down patterns of intensity image
-	FastQueue<Point2D_I32> outsideCircle4 = new FastQueue<>(Point2D_I32::new);
-	FastQueue<Point2D_I32> outsideCircle3 = new FastQueue<>(Point2D_I32::new);
+	DogArray<Point2D_I32> outsideCircle4 = new DogArray<>(Point2D_I32::new);
+	DogArray<Point2D_I32> outsideCircle3 = new DogArray<>(Point2D_I32::new);
 	private final float[] outsideCircleValues;
 
 	// Workspace
 	GrayF32 tmp = new GrayF32(1, 1);
-	GrowArray<GrowQueue_F32> fwork = new GrowArray<>(GrowQueue_F32::new);
+	GrowArray<DogArray_F32> fwork = new GrowArray<>(DogArray_F32::new);
 
 	/**
 	 * Declares internal data structures
@@ -372,7 +372,7 @@ public class DetectChessboardCornersX {
 	/**
 	 * Looks for an up down pattern in a circle around the corner
 	 */
-	private boolean checkChessboardCircle( float cx, float cy, FastQueue<Point2D_I32> outside, int min, int max, int symmetric ) {
+	private boolean checkChessboardCircle( float cx, float cy, DogArray<Point2D_I32> outside, int min, int max, int symmetric ) {
 		// NOTE: using `mean = (max(:) + min(:))/2` produced slightly better results, but that might have been
 		//       over fitting to the dataset
 

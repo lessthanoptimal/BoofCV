@@ -46,8 +46,8 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +63,7 @@ import java.awt.image.BufferedImage;
 public class ExampleCombineDisparity {
 	public static void main( String[] args ) {
 		// Compute a sparse reconstruction. This will give us intrinsic and extrinsic for all views
-		var example = new ExampleMultiviewSparseReconstruction();
+		var example = new ExampleMultiViewSparseReconstruction();
 		example.compute("forest_path_01.mp4");
 
 		// We need a way to load images based on their ID. In this particular case the ID encodes the array index.
@@ -78,7 +78,7 @@ public class ExampleCombineDisparity {
 		// The final scene refined by bundle adjustment is created by the Working graph. However the 3D relationship
 		// between views is contained in the pairwise graph. A View in the working graph has a reference to the view
 		// in the pairwise graph. Using that we will find all connected views that have a 3D relationship
-		GrowQueue_I32 pairedViewIdxs = new GrowQueue_I32();
+		DogArray_I32 pairedViewIdxs = new DogArray_I32();
 		TIntObjectMap<String> sbaIndexToImageID = new TIntObjectHashMap<>();
 
 		// This relationship between pairwise and working graphs might seem (and is) a bit convoluted. The Pairwise
@@ -161,8 +161,8 @@ public class ExampleCombineDisparity {
 		// Now compute the point cloud it represents and the color of each pixel.
 		// For the fused image, instead of being in rectified image coordinates it's in the original image coordinates
 		// this makes extracting color much easier.
-		var cloud = new FastQueue<>(Point3D_F64::new);
-		var cloudRgb = new GrowQueue_I32(cloud.size);
+		var cloud = new DogArray<>(Point3D_F64::new);
+		var cloudRgb = new DogArray_I32(cloud.size);
 		// Load the center image in color
 		var colorImage = new InterleavedU8(1, 1, 3);
 		imageLookup.loadImage(center.pview.id, colorImage);

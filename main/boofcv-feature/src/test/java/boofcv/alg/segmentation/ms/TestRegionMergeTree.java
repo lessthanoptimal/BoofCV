@@ -19,7 +19,7 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +35,7 @@ public class TestRegionMergeTree extends BoofStandardJUnit {
 		alg.mergeList.resize(7);
 		alg.mergeList.data = new int[]{1,1,2,2,2,3,5};
 
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32(7);
+		DogArray_I32 regionMemberCount = new DogArray_I32(7);
 		regionMemberCount.size = 7;
 		regionMemberCount.data = new int[]{1,2,3,4,5,6,7};
 
@@ -58,7 +58,7 @@ public class TestRegionMergeTree extends BoofStandardJUnit {
 
 	@Test
 	public void setToRootNodeNewID() {
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32(7);
+		DogArray_I32 regionMemberCount = new DogArray_I32(7);
 		regionMemberCount.size = 7;
 		regionMemberCount.data = new int[]{1,2,3,4,5,6,7};
 

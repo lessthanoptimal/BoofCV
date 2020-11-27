@@ -32,9 +32,9 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.set.hash.TLongHashSet;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -49,11 +49,11 @@ import java.util.List;
 public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 	/** List of all tracks that can be feed into bundle adjustment */
-	public final FastQueue<T> tracks;
+	public final DogArray<T> tracks;
 	/** List of all frames that can be feed into bundle adjustment */
-	public final FastQueue<BFrame> frames = new FastQueue<>(BFrame::new, BFrame::reset);
+	public final DogArray<BFrame> frames = new DogArray<>(BFrame::new, BFrame::reset);
 	/** List of all the cameras */
-	public final FastQueue<BCamera> cameras = new FastQueue<>(BCamera::new, BCamera::reset);
+	public final DogArray<BCamera> cameras = new DogArray<>(BCamera::new, BCamera::reset);
 
 	/** Configurations and implementation of bundle adjustment */
 	public final MetricBundleAdjustmentUtils bundle = new MetricBundleAdjustmentUtils();
@@ -66,7 +66,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	final Se3_F64 world_to_view = new Se3_F64();
 
 	public VisOdomBundleAdjustment( Factory<T> factoryTracks ) {
-		this.tracks = new FastQueue<>(factoryTracks, BTrack::reset);
+		this.tracks = new DogArray<>(factoryTracks, BTrack::reset);
 		bundle.configConverge.setTo(new ConfigConverge(1e-3, 1e-3, 3));
 	}
 
@@ -326,7 +326,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		 */
 		public PointTrack visualTrack;
 		public final Point4D_F64 worldLoc = new Point4D_F64();
-		public final FastQueue<BObservation> observations = new FastQueue<>(BObservation::new, BObservation::reset);
+		public final DogArray<BObservation> observations = new DogArray<>(BObservation::new, BObservation::reset);
 		/** if true then the track has been an inlier at least once and should be considered for optimization */
 		public boolean hasBeenInlier;
 		/** true if it was selected for inclusion in the optimization */

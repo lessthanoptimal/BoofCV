@@ -23,7 +23,7 @@ import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -51,9 +51,9 @@ public class MinimizeEnergyPrune {
 	List<Point2D_I32> contour;
 	double energySegment[] = new double[1];
 
-	GrowQueue_I32 bestCorners = new GrowQueue_I32();
-	GrowQueue_I32 workCorners1 = new GrowQueue_I32();
-	GrowQueue_I32 workCorners2 = new GrowQueue_I32();
+	DogArray_I32 bestCorners = new DogArray_I32();
+	DogArray_I32 workCorners1 = new DogArray_I32();
+	DogArray_I32 workCorners2 = new DogArray_I32();
 
 	public MinimizeEnergyPrune( double splitPenalty ) {
 		this.splitPenalty = splitPenalty;
@@ -67,7 +67,7 @@ public class MinimizeEnergyPrune {
 	 * @param output Pruned set of corners
 	 * @return true if one or more corners were pruned, false if nothing changed
 	 */
-	public boolean prune( List<Point2D_I32> contour, GrowQueue_I32 input, GrowQueue_I32 output ) {
+	public boolean prune( List<Point2D_I32> contour, DogArray_I32 input, DogArray_I32 output ) {
 
 		this.contour = contour;
 		output.setTo(input);
@@ -146,7 +146,7 @@ public class MinimizeEnergyPrune {
 	/**
 	 * Look for two corners which point to the same point and removes one of them from the corner list
 	 */
-	void removeDuplicates( GrowQueue_I32 corners ) {
+	void removeDuplicates( DogArray_I32 corners ) {
 		// remove duplicates
 		for (int i = 0; i < corners.size(); i++) {
 			Point2D_I32 a = contour.get(corners.get(i));
@@ -166,7 +166,7 @@ public class MinimizeEnergyPrune {
 	/**
 	 * Computes the energy of each segment individually
 	 */
-	void computeSegmentEnergy( GrowQueue_I32 corners ) {
+	void computeSegmentEnergy( DogArray_I32 corners ) {
 		if (energySegment.length < corners.size()) {
 			energySegment = new double[corners.size()];
 		}
@@ -182,7 +182,7 @@ public class MinimizeEnergyPrune {
 	 * @param removed index of the corner that is being removed
 	 * @param corners list of corner indexes
 	 */
-	protected double energyRemoveCorner( int removed, GrowQueue_I32 corners ) {
+	protected double energyRemoveCorner( int removed, DogArray_I32 corners ) {
 		double total = 0;
 
 		int cornerA = CircularIndex.addOffset(removed, -1, corners.size());
@@ -208,7 +208,7 @@ public class MinimizeEnergyPrune {
 	/**
 	 * Computes the energy for a segment defined by the two corner indexes
 	 */
-	protected double computeSegmentEnergy( GrowQueue_I32 corners, int cornerA, int cornerB ) {
+	protected double computeSegmentEnergy( DogArray_I32 corners, int cornerA, int cornerB ) {
 		int indexA = corners.get(cornerA);
 		int indexB = corners.get(cornerB);
 

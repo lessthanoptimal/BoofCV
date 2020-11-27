@@ -34,7 +34,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -87,7 +87,7 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 		// Only the two pixels marked as invalid should be excluded
 		assertEquals(width*height - 2, alg.cloud.size);
 
-		FastQueue<Point3D_F64> expected = new FastQueue<>(Point3D_F64::new);
+		DogArray<Point3D_F64> expected = new DogArray<>(Point3D_F64::new);
 		MultiViewStereoOps.disparityToCloud(disparity, mask, parameters,
 				( pixX, pixY, x, y, z ) -> expected.grow().setTo(x, y, z));
 

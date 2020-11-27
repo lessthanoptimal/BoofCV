@@ -31,10 +31,10 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	protected DetectDescribePoint<I,TD> detector;
 
 	// all tracks. active and inactive.
-	protected @Getter FastQueue<PointTrack> tracksAll;
+	protected @Getter DogArray<PointTrack> tracksAll;
 	// recently associated tracks
 	protected @Getter List<PointTrack> tracksActive = new ArrayList<>();
 	// tracks not matched to any recent features
@@ -85,12 +85,12 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 
 	// destination features are ones which were detected in this frame
 	protected FastArray<TD> dstDesc;
-	protected GrowQueue_I32 dstSet = new GrowQueue_I32();
+	protected DogArray_I32 dstSet = new DogArray_I32();
 	protected FastArray<Point2D_F64> dstPixels = new FastArray<>(Point2D_F64.class);
 
 	// source features are ones from active tracks
 	protected FastArray<TD> srcDesc;
-	protected GrowQueue_I32 srcSet = new GrowQueue_I32();
+	protected DogArray_I32 srcSet = new DogArray_I32();
 	protected FastArray<Point2D_F64> srcPixels = new FastArray<>(Point2D_F64.class);
 
 	/**
@@ -111,7 +111,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		this.dstDesc = new FastArray<>(detector.getDescriptionType());
 		this.srcDesc = new FastArray<>(detector.getDescriptionType());
 
-		this.tracksAll = new FastQueue<>(this::createNewTrack, this::resetTrack);
+		this.tracksAll = new DogArray<>(this::createNewTrack, this::resetTrack);
 
 		this.associate.initialize(detector.getNumberOfSets());
 	}
@@ -182,7 +182,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		performTracking();
 
 		// add unassociated to the list
-		GrowQueue_I32 unassociatedIdx = associate.getUnassociatedSource();
+		DogArray_I32 unassociatedIdx = associate.getUnassociatedSource();
 		for( int j = 0; j < unassociatedIdx.size(); j++ ) {
 			tracksInactive.add(tracksAll.get(unassociatedIdx.get(j)));
 		}
@@ -193,7 +193,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 	/**
 	 * If there are too many unassociated tracks, randomly select some of those tracks and drop them
 	 */
-	void dropExcessiveInactiveTracks(GrowQueue_I32 unassociated) {
+	void dropExcessiveInactiveTracks(DogArray_I32 unassociated) {
 		if( unassociated.size > maxInactiveTracks ) {
 			// make the first N elements the ones which will be dropped
 			int numDrop = unassociated.size-maxInactiveTracks;
@@ -268,7 +268,7 @@ public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends T
 		}
 
 		// create new tracks from latest unassociated detected features
-		GrowQueue_I32 unassociated = associate.getUnassociatedDestination();
+		DogArray_I32 unassociated = associate.getUnassociatedDestination();
 		for( int i = 0; i < unassociated.size; i++ ) {
 			int indexDst = unassociated.get(i);
 			Point2D_F64 loc = dstPixels.get(indexDst);

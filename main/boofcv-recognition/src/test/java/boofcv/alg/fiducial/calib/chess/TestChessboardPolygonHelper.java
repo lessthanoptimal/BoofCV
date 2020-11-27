@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray_B;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,7 +45,7 @@ public class TestChessboardPolygonHelper extends BoofStandardJUnit {
 		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
 
 		Polygon2D_F64 distorted = new Polygon2D_F64(2);
-		GrowQueue_B touches = new GrowQueue_B();
+		DogArray_B touches = new DogArray_B();
 
 		// test initially with all corners inside
 		touches.add(false);
@@ -73,7 +73,7 @@ public class TestChessboardPolygonHelper extends BoofStandardJUnit {
 		ChessboardPolygonHelper alg = new ChessboardPolygonHelper();
 
 		Polygon2D_F64 distorted = new Polygon2D_F64(3);
-		GrowQueue_B touches = new GrowQueue_B();
+		DogArray_B touches = new DogArray_B();
 
 		touches.add(false);
 		touches.add(false);

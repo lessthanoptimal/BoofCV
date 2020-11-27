@@ -33,8 +33,8 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +93,7 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 		List<ViewInfo> centers = mvs.getListCenters();
 
 		// Get the point cloud
-		FastQueue<Point3D_F64> cloud = mvs.getDisparityCloud().getCloud();
+		DogArray<Point3D_F64> cloud = mvs.getDisparityCloud().getCloud();
 
 		// Step through each "center" view
 		for (int centerIdx = 0; centerIdx < centers.size(); centerIdx++) {
@@ -132,9 +132,9 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 		// Loading images is expensive so when we get the color of each pixel we want to process all features
 		// inside the same image at once. Unfortunately there is no fast way to look up all features by image.
 		// So a lookup table is constructed below
-		List<GrowQueue_I32> lookupPointsByView = new ArrayList<>();
+		List<DogArray_I32> lookupPointsByView = new ArrayList<>();
 		for (int i = 0; i < scene.views.size; i++) {
-			lookupPointsByView.add(new GrowQueue_I32());
+			lookupPointsByView.add(new DogArray_I32());
 		}
 		// Add the first view each point was seen in to the list
 		for (int pointIdx = 0; pointIdx < scene.points.size; pointIdx++) {

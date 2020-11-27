@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Chessboard detector that uses X-Corners and finds all valid chessboard patterns inside the image.
@@ -36,7 +36,7 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 	protected ChessboardCornerClusterFinder<T> clusterFinder;
 	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
-	protected FastQueue<GridInfo> found = new FastQueue<>(GridInfo::new);
+	protected DogArray<GridInfo> found = new DogArray<>(GridInfo::new);
 
 	public DetectChessboardXCornerPatterns(ConfigChessboardX config , Class<T> imageType ) {
 
@@ -74,7 +74,7 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 		detector.process(input);
 //		T blurred = detector.getDetector().getBlurred();
 		clusterFinder.process(input,detector.getCorners().toList(),detector.getNumberOfLevels());
-		FastQueue<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
+		DogArray<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
 
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
 			ChessboardCornerGraph c = clusters.get(clusterIdx);
@@ -97,7 +97,7 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 		return clusterToGrid;
 	}
 
-	public FastQueue<GridInfo> getFoundChessboard() {
+	public DogArray<GridInfo> getFoundChessboard() {
 		return found;
 	}
 }

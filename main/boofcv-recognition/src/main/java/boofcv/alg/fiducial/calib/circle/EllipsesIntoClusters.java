@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.nn.alg.KdTreeDistance;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +54,10 @@ public class EllipsesIntoClusters {
 
 	private NearestNeighbor<EllipseInfo> nn = FactoryNearestNeighbor.kdtree(new KdTreeEllipseInfo());
 	private NearestNeighbor.Search<EllipseInfo> search = nn.createSearch();
-	private FastQueue<NnData<EllipseInfo>> searchResults = new FastQueue<>(NnData::new);
+	private DogArray<NnData<EllipseInfo>> searchResults = new DogArray<>(NnData::new);
 
-	FastQueue<Node> nodes = new FastQueue<>(Node::new);
-	FastQueue<List<Node>> clusters = new FastQueue<>(ArrayList::new);
+	DogArray<Node> nodes = new DogArray<>(Node::new);
+	DogArray<List<Node>> clusters = new DogArray<>(ArrayList::new);
 
 	/**
 	 * Configures clustering
@@ -352,7 +352,7 @@ public class EllipsesIntoClusters {
 		 * Index of all the ellipses which it is connected to.  Both node should be
 		 * connected to each other
 		 */
-		public GrowQueue_I32 connections = new GrowQueue_I32();
+		public DogArray_I32 connections = new DogArray_I32();
 	}
 
 	private static class KdTreeEllipseInfo implements KdTreeDistance<EllipseInfo> {

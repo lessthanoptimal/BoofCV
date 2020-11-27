@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -112,7 +112,7 @@ class TestListIntPoint2D extends BoofStandardJUnit {
 		alg.add(10,20);
 		alg.add(16,2);
 
-		var list = new FastQueue<>(Point2D_I16::new);
+		var list = new DogArray<>(Point2D_I16::new);
 		alg.copyInto(list);
 
 		assertEquals(2,list.size());

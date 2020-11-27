@@ -23,9 +23,9 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.TupleDesc_F64;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,8 +53,8 @@ class TestAssociateGreedyBruteForce2D extends GenericAssociateGreedyChecks {
 		var alg = (AssociateGreedyBruteForce2D<TupleDesc_F64>)_alg;
 
 		// Dummy Values
-		var locSrc = new FastQueue<>(Point2D_F64::new);
-		var locDst = new FastQueue<>(Point2D_F64::new);
+		var locSrc = new DogArray<>(Point2D_F64::new);
+		var locDst = new DogArray<>(Point2D_F64::new);
 
 		for (int i = 0; i < src.size; i++) {locSrc.grow();}
 		for (int i = 0; i < dst.size; i++) {locDst.grow();}
@@ -69,8 +69,8 @@ class TestAssociateGreedyBruteForce2D extends GenericAssociateGreedyChecks {
 		var descSrc = createData(1,2,3,4,5,6,7,8,9,10);
 		var descDst = createData(1,2,3,4,5,6,7,8,9,10,11);
 
-		var locSrc = new FastQueue<>(Point2D_F64::new);
-		var locDst = new FastQueue<>(Point2D_F64::new);
+		var locSrc = new DogArray<>(Point2D_F64::new);
+		var locDst = new DogArray<>(Point2D_F64::new);
 
 		locSrc.resize(descSrc.size);
 		locDst.resize(descDst.size);
@@ -101,7 +101,7 @@ class TestAssociateGreedyBruteForce2D extends GenericAssociateGreedyChecks {
 		assertEquals(10,countMatches(alg.getPairs()));
 	}
 
-	private int countMatches(GrowQueue_I32 pairs) {
+	private int countMatches(DogArray_I32 pairs) {
 		int total = 0;
 		for (int i = 0; i < pairs.size; i++) {
 			if( pairs.data[i] >= 0 )

@@ -24,8 +24,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -171,8 +171,8 @@ public class TestSegmentSlic extends BoofStandardJUnit {
 		}
 
 		GrayS32 image = new GrayS32(2,3);
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
-		FastQueue<float[]> regionColor = new ColorQueue_F32(1);
+		DogArray_I32 regionMemberCount = new DogArray_I32();
+		DogArray<float[]> regionColor = new ColorQueue_F32(1);
 
 		alg.assignLabelsToPixels(image,regionMemberCount,regionColor);
 

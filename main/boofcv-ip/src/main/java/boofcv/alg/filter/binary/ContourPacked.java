@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Internal and externals contours for a binary blob with the actual points stored in a
@@ -41,7 +41,7 @@ public class ContourPacked {
 	/**
 	 * Index for each internal contour
 	 */
-	public GrowQueue_I32 internalIndexes = new GrowQueue_I32(0);
+	public DogArray_I32 internalIndexes = new DogArray_I32(0);
 
 	public void reset() {
 		id = -1;

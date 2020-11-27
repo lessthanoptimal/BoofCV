@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * <p>
@@ -42,7 +42,7 @@ public class SegmentMeanShiftSearchGray<T extends ImageGray<T>> extends SegmentM
 	protected float meanGray;
 
 	// Mean-shift trajectory history
-	protected FastQueue<Point2D_F32> history = new FastQueue<>(Point2D_F32::new);
+	protected DogArray<Point2D_F32> history = new DogArray<>(Point2D_F32::new);
 
 	public SegmentMeanShiftSearchGray(int maxIterations, float convergenceTol,
 									  InterpolatePixelS<T> interpolate,

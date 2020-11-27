@@ -19,7 +19,7 @@
 package boofcv.misc;
 
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Functions related to discretized circles for image processing
@@ -76,7 +76,7 @@ public class DiscretizedCircle {
 		}
 	}
 
-	public static void coordinates(double radius, FastQueue<Point2D_I32> coordinates ) {
+	public static void coordinates(double radius, DogArray<Point2D_I32> coordinates ) {
 
 		coordinates.reset();
 

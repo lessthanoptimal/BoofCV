@@ -32,9 +32,9 @@ import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
@@ -103,7 +103,7 @@ public class SiftDetector {
 	public int maxFeaturesAll = -1;
 
 	// all the found detections in a single octave
-	protected FastQueue<ScalePoint> detectionsAll = new FastQueue<>(ScalePoint::new);
+	protected DogArray<ScalePoint> detectionsAll = new DogArray<>(ScalePoint::new);
 
 	// Computes image derivatives. used in edge rejection
 	ImageConvolveSparse<GrayF32, ?> derivXX;

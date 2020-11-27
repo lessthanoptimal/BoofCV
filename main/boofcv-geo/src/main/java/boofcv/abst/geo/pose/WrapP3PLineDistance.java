@@ -26,7 +26,7 @@ import georegression.fitting.MotionTransformPoint;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,7 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 	}
 
 	@Override
-	public boolean process( List<Point2D3D> inputs, FastQueue<Se3_F64> solutions ) {
+	public boolean process( List<Point2D3D> inputs, DogArray<Se3_F64> solutions ) {
 		if (inputs.size() != 3)
 			throw new IllegalArgumentException("Three and only three inputs are required.  Not " + inputs.size());
 
@@ -87,7 +87,7 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 		if (!alg.process(P1.observation, P2.observation, P3.observation, length23, length13, length12))
 			return false;
 
-		FastQueue<PointDistance3> distances = alg.getSolutions();
+		DogArray<PointDistance3> distances = alg.getSolutions();
 
 		if (distances.size == 0)
 			return false;

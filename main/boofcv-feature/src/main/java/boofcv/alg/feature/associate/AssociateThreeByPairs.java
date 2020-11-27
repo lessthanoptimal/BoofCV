@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,10 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Associates features in three view with each other by associating each pair of images individually. Only unique
@@ -44,19 +44,19 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 
 	// Reference to descriptions in each image
 	protected FastAccess<Desc> featuresA,featuresB,featuresC;
-	protected GrowQueue_I32 setsA,setsB,setsC;
+	protected DogArray_I32 setsA,setsB,setsC;
 
 	// work space variables
 	protected FastArray<Desc> tmpB;
 	protected FastArray<Desc> tmpA;
-	protected GrowQueue_I32 tmpSetsA = new GrowQueue_I32();
-	protected GrowQueue_I32 tmpSetsB = new GrowQueue_I32();
+	protected DogArray_I32 tmpSetsA = new DogArray_I32();
+	protected DogArray_I32 tmpSetsB = new DogArray_I32();
 
 	// storage for final output
-	protected FastQueue<AssociatedTripleIndex> matches = new FastQueue<>(AssociatedTripleIndex::new);
+	protected DogArray<AssociatedTripleIndex> matches = new DogArray<>(AssociatedTripleIndex::new);
 
 	// used to map indexes
-	protected GrowQueue_I32 srcToC = new GrowQueue_I32();
+	protected DogArray_I32 srcToC = new DogArray_I32();
 
 	/**
 	 * Specifies which algorithms to use internally
@@ -79,19 +79,19 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 	}
 
 	@Override
-	public void setFeaturesA(FastAccess<Desc> features, GrowQueue_I32 sets) {
+	public void setFeaturesA(FastAccess<Desc> features, DogArray_I32 sets) {
 		this.featuresA = features;
 		this.setsA = sets;
 	}
 
 	@Override
-	public void setFeaturesB(FastAccess<Desc> features, GrowQueue_I32 sets) {
+	public void setFeaturesB(FastAccess<Desc> features, DogArray_I32 sets) {
 		this.featuresB = features;
 		this.setsB = sets;
 	}
 
 	@Override
-	public void setFeaturesC(FastAccess<Desc> features, GrowQueue_I32 sets) {
+	public void setFeaturesC(FastAccess<Desc> features, DogArray_I32 sets) {
 		this.featuresC = features;
 		this.setsC = sets;
 	}
@@ -127,7 +127,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		tmpB.resize(pairs.size); tmpSetsB.resize(pairs.size);
 		srcToC.resize(pairs.size);
 		FastArray<Desc> tmpC = tmpB; // do this to make the code easier to read
-		GrowQueue_I32 tmpSetsC = tmpSetsB;
+		DogArray_I32 tmpSetsC = tmpSetsB;
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
 			// tmpSrc points to indexes in matches
@@ -137,7 +137,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 			srcToC.data[i] = p.dst;           // save mapping back to original input index
 		}
 		// mark the unmatched as unmatched
-		GrowQueue_I32 unsrc = associator.getUnassociatedSource();
+		DogArray_I32 unsrc = associator.getUnassociatedSource();
 		for (int i = 0; i < unsrc.size; i++) {
 			int idx = unsrc.get(i);
 			matches.get(idx).c = -1;
@@ -157,7 +157,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 				t.c = -1;// mark it so that it will be pruned
 			}
 		}
-		GrowQueue_I32 undst = associator.getUnassociatedDestination();
+		DogArray_I32 undst = associator.getUnassociatedDestination();
 		for (int i = 0; i < undst.size; i++) {
 			int idx = undst.get(i);
 			matches.get(idx).c = -1;
@@ -198,7 +198,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 	}
 
 	@Override
-	public FastQueue<AssociatedTripleIndex> getMatches() {
+	public DogArray<AssociatedTripleIndex> getMatches() {
 		return matches;
 	}
 

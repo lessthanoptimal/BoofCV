@@ -64,7 +64,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 	private void printFunction( AutoTypeImage image ) {
 
 		String sumType = image.getSumType();
-		String workspace = "GrowQueue_" + image.getGrowQueueType();
+		String workspace = "DogArray_" + image.getDogArrayType();
 
 		out.print("\tpublic static void process( " + image.getSingleBandName() + " input, " + image.getSingleBandName() + " output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t\t\t\t\t@Nullable " + workspace + " workspace ) {\n" +

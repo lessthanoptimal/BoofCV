@@ -24,8 +24,8 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 
 /**
  * <p>
@@ -65,9 +65,9 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 	// storage for computed polar line
 	private LinePolar2D_F64 polar = new LinePolar2D_F64();
 
-	protected GrowQueue_F64 weights = new GrowQueue_F64();// storage for weights in line fitting
+	protected DogArray_F64 weights = new DogArray_F64();// storage for weights in line fitting
 	// storage for where the points that are sampled along the line
-	protected FastQueue<Point2D_F64> samplePts = new FastQueue<>(Point2D_F64::new);
+	protected DogArray<Point2D_F64> samplePts = new DogArray<>(Point2D_F64::new);
 
 
 	// storage for the line's center.  used to reduce numerical problems.

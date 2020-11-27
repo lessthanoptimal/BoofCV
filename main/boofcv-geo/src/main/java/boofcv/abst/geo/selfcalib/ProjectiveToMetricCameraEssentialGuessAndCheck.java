@@ -27,7 +27,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class ProjectiveToMetricCameraEssentialGuessAndCheck implements Projectiv
 
 	//--------------- Internal Work Space
 	DMatrixRMaj K = new DMatrixRMaj(3,3);
-	FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+	DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 	DMatrixRMaj F21 = new DMatrixRMaj(3,3);
 
 	public ProjectiveToMetricCameraEssentialGuessAndCheck(SelfCalibrationEssentialGuessAndCheck selfCalib) {

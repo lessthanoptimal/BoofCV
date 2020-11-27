@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Given a list of associated features, find all the unassociated features.
@@ -31,10 +31,10 @@ import org.ddogleg.struct.GrowQueue_I32;
 public class FindUnassociated {
 
 	// list of indexes in source which are unassociated
-	GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
-	GrowQueue_I32 unassociatedDst = new GrowQueue_I32();
+	DogArray_I32 unassociatedSrc = new DogArray_I32();
+	DogArray_I32 unassociatedDst = new DogArray_I32();
 	// list that indicates what was associated in the source list
-	GrowQueue_B matched = new GrowQueue_B();
+	DogArray_B matched = new DogArray_B();
 
 	/**
 	 *
@@ -42,7 +42,7 @@ public class FindUnassociated {
 	 * @param featureCount Number of source features
 	 * @return indexes of unassociated features from source
 	 */
-	public GrowQueue_I32 checkSource(FastAccess<AssociatedIndex> matches , int featureCount ) {
+	public DogArray_I32 checkSource(FastAccess<AssociatedIndex> matches , int featureCount ) {
 		matched.resize(featureCount);
 		matched.fill(false);
 
@@ -65,7 +65,7 @@ public class FindUnassociated {
 	 * @param featureCount Number of destination features
 	 * @return indexes of unassociated features from destination
 	 */
-	public GrowQueue_I32 checkDestination( FastAccess<AssociatedIndex> matches , final int featureCount ) {
+	public DogArray_I32 checkDestination( FastAccess<AssociatedIndex> matches , final int featureCount ) {
 		matched.resize(featureCount);
 		matched.fill(false);
 

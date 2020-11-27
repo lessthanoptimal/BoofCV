@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +147,7 @@ public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 	/**
 	 * Returns list of actively tracked markers
 	 */
-	public FastQueue<UchiyaMarkerTracker.Track> getTracks() {
+	public DogArray<UchiyaMarkerTracker.Track> getTracks() {
 		return tracker.getCurrentTracks();
 	}
 }

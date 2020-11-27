@@ -29,7 +29,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -173,10 +173,10 @@ public class EnhanceImageOps {
 	 * @param workspaces (Optional) Used to create work arrays. Nullable
 	 */
 	public static void equalizeLocal( GrayU8 input, int radius, GrayU8 output,
-									  int histogramLength, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+									  int histogramLength, @Nullable GrowArray<DogArray_I32> workspaces ) {
 
 		output.reshape(input.width, input.height);
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 
 		int width = radius*2 + 1;
 
@@ -235,10 +235,10 @@ public class EnhanceImageOps {
 	 * @param workspaces Used to create work arrays. can be null
 	 */
 	public static void equalizeLocal( GrayU16 input, int radius, GrayU16 output,
-									  int histogramLength, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+									  int histogramLength, @Nullable GrowArray<DogArray_I32> workspaces ) {
 
 		InputSanityCheck.checkReshape(input, output);
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 
 		int width = radius*2 + 1;
 

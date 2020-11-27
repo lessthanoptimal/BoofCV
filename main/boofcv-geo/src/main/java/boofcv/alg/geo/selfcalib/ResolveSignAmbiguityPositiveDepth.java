@@ -29,7 +29,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -54,10 +54,10 @@ public class ResolveSignAmbiguityPositiveDepth {
 	Point3D_F64 Xcam = new Point3D_F64();
 
 	// precompute how to convert pixels into normalized image coordinates
-	FastQueue<PinholePtoN_F64> normalizers = new FastQueue<>(PinholePtoN_F64::new);
+	DogArray<PinholePtoN_F64> normalizers = new DogArray<>(PinholePtoN_F64::new);
 	// Storage for normalized image coordinates
-	FastQueue<Point2D_F64> pixelNorms = new FastQueue<>(Point2D_F64::new);
-	FastQueue<Se3_F64> worldToViews = new FastQueue<>(Se3_F64::new);
+	DogArray<Point2D_F64> pixelNorms = new DogArray<>(Point2D_F64::new);
+	DogArray<Se3_F64> worldToViews = new DogArray<>(Se3_F64::new);
 
 	/**
 	 * Processes the results and observations to fix the sign

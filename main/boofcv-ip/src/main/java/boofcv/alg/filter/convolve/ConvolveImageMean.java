@@ -31,9 +31,9 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -85,7 +85,7 @@ public class ConvolveImageMean {
 	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
@@ -139,7 +139,7 @@ public class ConvolveImageMean {
 	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable ImageBorder_S32<GrayU8> binput, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable ImageBorder_S32<GrayU8> binput, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		output.reshape(input);
 
 		if( binput != null ) {
@@ -192,7 +192,7 @@ public class ConvolveImageMean {
 	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
@@ -246,7 +246,7 @@ public class ConvolveImageMean {
 	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayS16> binput, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayS16> binput, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		output.reshape(input);
 
 		if( binput != null ) {
@@ -299,7 +299,7 @@ public class ConvolveImageMean {
 	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
@@ -353,7 +353,7 @@ public class ConvolveImageMean {
 	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayU16> binput, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
+	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayU16> binput, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		output.reshape(input);
 
 		if( binput != null ) {
@@ -406,7 +406,7 @@ public class ConvolveImageMean {
 	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<GrowQueue_F32> workspaces ) {
+	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<DogArray_F32> workspaces ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
@@ -460,7 +460,7 @@ public class ConvolveImageMean {
 	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable ImageBorder_F32 binput, @Nullable GrowArray<GrowQueue_F32> workspaces ) {
+	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable ImageBorder_F32 binput, @Nullable GrowArray<DogArray_F32> workspaces ) {
 		output.reshape(input);
 
 		if( binput != null ) {
@@ -513,7 +513,7 @@ public class ConvolveImageMean {
 	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<GrowQueue_F64> workspaces ) {
+	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<DogArray_F64> workspaces ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
@@ -567,7 +567,7 @@ public class ConvolveImageMean {
 	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable ImageBorder_F64 binput, @Nullable GrowArray<GrowQueue_F64> workspaces ) {
+	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable ImageBorder_F64 binput, @Nullable GrowArray<DogArray_F64> workspaces ) {
 		output.reshape(input);
 
 		if( binput != null ) {

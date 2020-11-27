@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -39,7 +39,7 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	public int keyframePeriod = 1;
 
 	// list of frames to discard
-	private final GrowQueue_I32 keyframeIndexes = new GrowQueue_I32();
+	private final DogArray_I32 keyframeIndexes = new DogArray_I32();
 
 	public TickTockKeyFrameManager( int keyframePeriod ) {
 		this.keyframePeriod = keyframePeriod;
@@ -55,7 +55,7 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	public void initialize( FastAccess<BCamera> cameras ) {}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba ) {
+	public DogArray_I32 selectFramesToDiscard( PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba ) {
 		keyframeIndexes.reset();
 		// Add key frames until it hits the max
 		if (sba.frames.size <= maxKeyFrames)

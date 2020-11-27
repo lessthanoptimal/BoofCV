@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
@@ -46,7 +46,7 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	int indexOfSetSplit;
 
 	// list of points it found
-	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<>(10, Point2D_F64::new);
+	protected DogArray<Point2D_F64> foundPoints = new DogArray<>(10, Point2D_F64::new);
 
 	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector,
 								   double radius,

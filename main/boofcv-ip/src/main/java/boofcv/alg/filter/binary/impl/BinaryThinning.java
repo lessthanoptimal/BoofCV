@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.binary.impl;
 import boofcv.struct.border.ImageBorderValue;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Applies binary thinning operators to the input image.  Thinning discards most of objects foreground
@@ -84,11 +84,11 @@ public class BinaryThinning {
 	// all pixels outside the image are set to 0
 	ImageBorder_S32<GrayU8> inputBorder = ImageBorderValue.wrap(binary, 0);
 	// list of one valued pixels, input
-	GrowQueue_I32 ones0 = new GrowQueue_I32();
-	GrowQueue_I32 ones1 = new GrowQueue_I32();
+	DogArray_I32 ones0 = new DogArray_I32();
+	DogArray_I32 ones1 = new DogArray_I32();
 
 	// list of pixels which need to be set to zero
-	GrowQueue_I32 zerosOut = new GrowQueue_I32();
+	DogArray_I32 zerosOut = new DogArray_I32();
 
 	/**
 	 * Applies the thinning algorithm.  Runs for the specified number of loops or until no change is detected.
@@ -124,7 +124,7 @@ public class BinaryThinning {
 				}
 
 				// swap the lists
-				GrowQueue_I32 tmp = ones0;
+				DogArray_I32 tmp = ones0;
 				ones0 = ones1;
 				ones1 = tmp;
 			}
@@ -137,7 +137,7 @@ public class BinaryThinning {
 	/**
 	 * Scans through the image and record the array index of all marked pixels
 	 */
-	protected void findOnePixels( GrowQueue_I32 ones ) {
+	protected void findOnePixels( DogArray_I32 ones ) {
 		for (int y = 0; y < binary.height; y++) {
 			int index = binary.startIndex + y*binary.stride;
 			for (int x = 0; x < binary.width; x++, index++) {
@@ -165,7 +165,7 @@ public class BinaryThinning {
 		 * @param onesOut (output) Indexes of pixels with a value of 1 after the mask is applied
 		 * @param zerosOut (output) Indexes of pixels whose values have changed form 1 to 0
 		 */
-		public void apply( GrowQueue_I32 onesIn, GrowQueue_I32 onesOut, GrowQueue_I32 zerosOut ) {
+		public void apply( DogArray_I32 onesIn, DogArray_I32 onesOut, DogArray_I32 zerosOut ) {
 			int w = binary.width - 1;
 			int h = binary.height - 1;
 

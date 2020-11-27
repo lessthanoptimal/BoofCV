@@ -30,7 +30,7 @@ import georegression.struct.curve.EllipseRotated_F32;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -85,7 +85,7 @@ public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 	@Test
 	public void undistortContour() {
 		List<Point2D_I32> input = new ArrayList<>();
-		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> output = new DogArray<>(Point2D_F64::new);
 
 		for (int i = 0; i < 10; i++) {
 			input.add( new Point2D_I32(i,i));
@@ -111,7 +111,7 @@ public class TestBinaryEllipseDetectorPixel extends BoofStandardJUnit {
 
 
 		List<Point2D_I32> input = new ArrayList<>();
-		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> output = new DogArray<>(Point2D_F64::new);
 
 		for (int i = 0; i < 10; i++) {
 			input.add( new Point2D_I32(i,i));

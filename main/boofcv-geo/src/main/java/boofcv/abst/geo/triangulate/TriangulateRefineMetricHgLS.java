@@ -29,7 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public class TriangulateRefineMetricHgLS implements RefineTriangulateMetricH {
 
 	final @Getter UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
-	final FastQueue<DMatrixRMaj> cameras = new FastQueue<>(()->new DMatrixRMaj(3,4));
+	final DogArray<DMatrixRMaj> cameras = new DogArray<>(()->new DMatrixRMaj(3,4));
 
 	final double[] param = new double[4];
 	@Getter @Setter int maxIterations;

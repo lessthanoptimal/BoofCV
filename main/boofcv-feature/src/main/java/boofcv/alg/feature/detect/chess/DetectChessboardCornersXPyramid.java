@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,15 +56,15 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	DetectChessboardCornersX detector;
 
 	// Detection results for each layer in the pyramid
-	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
+	DogArray<PyramidLevel> featureLevels = new DogArray<>(PyramidLevel.class, PyramidLevel::new);
 
 	// Storage for final output corners
-	FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner::new);
+	DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
 
 	// Nearest-Neighbor search data structures
 	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
-	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData::new);
+	DogArray<NnData<ChessboardCorner>> nnResults = new DogArray(NnData::new);
 
 	ImageType<T> imageType;
 
@@ -158,7 +158,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 //		System.out.println("Found Pyramid "+corners.size+" dropped "+dropped);
 	}
 
-	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1, double scale ) {
+	void markSeenAsFalse(DogArray<ChessboardCorner> corners0 , DogArray<ChessboardCorner> corners1, double scale ) {
 		nn.setPoints(corners1.toList(),false);
 
 		double searchRadius = radius*scale;
@@ -259,14 +259,14 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	}
 
 	private static class PyramidLevel {
-		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner::new);
+		DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
 	}
 
 	public DetectChessboardCornersX getDetector() {
 		return detector;
 	}
 
-	public FastQueue<ChessboardCorner> getCorners() {
+	public DogArray<ChessboardCorner> getCorners() {
 		return corners;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.descriptor;
 import boofcv.abst.feature.associate.Associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * @author Peter Abeles
@@ -40,12 +40,12 @@ public class AssociateAbstract implements Associate {
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedSource() {
+	public DogArray_I32 getUnassociatedSource() {
 		return null;
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedDestination() {
+	public DogArray_I32 getUnassociatedDestination() {
 		return null;
 	}
 

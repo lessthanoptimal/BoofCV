@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.gui.feature;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -208,7 +208,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 
 	private void findBestPoints(int x, int y,  List<Point2D_F64> pts , List<Integer> selected ) {
 		double bestDist = clickDistance*clickDistance;
-		GrowQueue_I32 bestIndexes = new GrowQueue_I32(20);
+		DogArray_I32 bestIndexes = new DogArray_I32(20);
 		for( int i = 0; i < pts.size(); i++ ) {
 			if( !isValidPoint(i) )
 				continue;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.awt.image.BufferedImage;
 
@@ -94,7 +94,7 @@ public class VisualizeRegions {
 	 * @return Output image.
 	 */
 	public static BufferedImage regionsColor( GrayS32 pixelToRegion ,
-											  FastQueue<float[]> segmentColor ,
+											  DogArray<float[]> segmentColor ,
 											  BufferedImage output ) {
 		if( output == null )
 			output = new BufferedImage(pixelToRegion.width,pixelToRegion.height,BufferedImage.TYPE_INT_RGB);

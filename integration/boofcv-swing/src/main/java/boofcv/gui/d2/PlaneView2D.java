@@ -22,7 +22,7 @@ import boofcv.gui.BoofSwingUtil;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,7 @@ import java.awt.event.*;
  */
 public class PlaneView2D extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
-	FastQueue<Point2D_F64> points = new FastQueue<>(Point2D_F64::new);
+	DogArray<Point2D_F64> points = new DogArray<>(Point2D_F64::new);
 
 	Se2_F64 transform = new Se2_F64();
 	double scale = 1;

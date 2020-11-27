@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.RectangleLength2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -115,8 +115,8 @@ public class TestContourEdgeIntensity extends BoofStandardJUnit {
 		return contour;
 	}
 
-	public static GrowQueue_I32 computeContourVertexes(RectangleLength2D_I32 r ) {
-		GrowQueue_I32 out = new GrowQueue_I32();
+	public static DogArray_I32 computeContourVertexes(RectangleLength2D_I32 r ) {
+		DogArray_I32 out = new DogArray_I32();
 		out.add(r.width-2);
 		out.add(r.width+r.height-3);
 		out.add(2*r.width+r.height-4);

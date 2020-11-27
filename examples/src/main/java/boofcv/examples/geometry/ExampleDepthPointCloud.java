@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import boofcv.struct.image.Planar;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -58,8 +58,8 @@ public class ExampleDepthPointCloud {
 		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered,null,true,GrayU8.class);
 		GrayU16 depth = ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
 
-		var cloud = new FastQueue<>(Point3D_F64::new);
-		var cloudColor = new FastQueue<>(() -> new int[3]);
+		var cloud = new DogArray<>(Point3D_F64::new);
+		var cloudColor = new DogArray<>(() -> new int[3]);
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);
 

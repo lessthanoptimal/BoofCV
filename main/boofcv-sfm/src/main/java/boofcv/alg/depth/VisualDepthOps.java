@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Various functions and operations specific to visual depth sensors.
@@ -42,7 +42,7 @@ public class VisualDepthOps {
 	 * @param depth depth image.  each value is in millimeters.
 	 * @param cloud Output point cloud
 	 */
-	public static void depthTo3D( CameraPinholeBrown param, GrayU16 depth, FastQueue<Point3D_F64> cloud ) {
+	public static void depthTo3D( CameraPinholeBrown param, GrayU16 depth, DogArray<Point3D_F64> cloud ) {
 		cloud.reset();
 
 		Point2Transform2_F64 p2n = LensDistortionFactory.narrow(param).undistort_F64(true, false);
@@ -80,7 +80,7 @@ public class VisualDepthOps {
 	 * @param cloudColor Output color for each point in the cloud
 	 */
 	public static void depthTo3D( CameraPinholeBrown param, Planar<GrayU8> rgb, GrayU16 depth,
-								  FastQueue<Point3D_F64> cloud, FastQueue<int[]> cloudColor ) {
+								  DogArray<Point3D_F64> cloud, DogArray<int[]> cloudColor ) {
 		cloud.reset();
 		cloudColor.reset();
 

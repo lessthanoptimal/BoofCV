@@ -28,8 +28,8 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.sorting.QuickSort_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,25 +76,25 @@ public class LlahOperations {
 	@Getter final LlahHashTable hashTable = new LlahHashTable();
 
 	// List of all documents
-	@Getter final FastQueue<LlahDocument> documents = new FastQueue<>(LlahDocument::new);
+	@Getter final DogArray<LlahDocument> documents = new DogArray<>(LlahDocument::new);
 
 	//========================== Internal working variables
 	final NearestNeighbor<Point2D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint2D_F64());
 	private final NearestNeighbor.Search<Point2D_F64> search = nn.createSearch();
-	private final FastQueue<NnData<Point2D_F64>> resultsNN = new FastQueue<>(NnData::new);
+	private final DogArray<NnData<Point2D_F64>> resultsNN = new DogArray<>(NnData::new);
 	final List<Point2D_F64> neighbors = new ArrayList<>();
 	private final double[] angles;
 	private final QuickSort_F64 sorter = new QuickSort_F64();
-	private final FastQueue<FoundDocument> resultsStorage = new FastQueue<>(FoundDocument::new);
+	private final DogArray<FoundDocument> resultsStorage = new DogArray<>(FoundDocument::new);
 	private final TIntObjectHashMap<FoundDocument> foundMap = new TIntObjectHashMap<>();
 
-	private final FastQueue<LlahFeature> allFeatures;
+	private final DogArray<LlahFeature> allFeatures;
 
 	// Used to compute all the combinations of a set
 	private final Combinations<Point2D_F64> combinator = new Combinations<>();
 
 	// recycle to avoid garbage collector
-	FastQueue<DotCount> storageD2L = new FastQueue<>(DotCount::new); // dot to landmark
+	DogArray<DotCount> storageD2L = new DogArray<>(DotCount::new); // dot to landmark
 
 	/**
 	 * Configures the LLAH feature computation
@@ -111,7 +111,7 @@ public class LlahOperations {
 		this.hasher = hasher;
 
 		angles = new double[numberOfNeighborsN];
-		allFeatures = new FastQueue<>(() -> new LlahFeature(numberOfInvariants));
+		allFeatures = new DogArray<>(() -> new LlahFeature(numberOfInvariants));
 	}
 
 	/**
@@ -295,7 +295,7 @@ public class LlahOperations {
 		resultsStorage.reset();
 
 		// Used to keep track of what has been seen and what has not been seen
-		FastQueue<DotVotingBooth> votingBooths = new FastQueue<>(DotVotingBooth::new);
+		DogArray<DotVotingBooth> votingBooths = new DogArray<>(DotVotingBooth::new);
 		votingBooths.resize(dots.size());
 
 		var featureComputed = new LlahFeature(numberOfInvariants);
@@ -360,7 +360,7 @@ public class LlahOperations {
 	 * Computes the feature for the set of points and see if they match anything in the dictionary. If they do vote.
 	 */
 	private void lookupProcessor( List<Point2D_F64> pointSet, int dotIdx, LlahFeature featureComputed,
-								  FastQueue<DotVotingBooth> votingBooths ) {
+								  DogArray<DotVotingBooth> votingBooths ) {
 		DotVotingBooth booth = votingBooths.get(dotIdx);
 
 		// Compute the feature for this set
@@ -387,7 +387,7 @@ public class LlahOperations {
 	}
 
 	public static class DotVotingBooth {
-		final FastQueue<DotToLandmark> votes = new FastQueue<>(DotToLandmark::new);
+		final DogArray<DotToLandmark> votes = new DogArray<>(DotToLandmark::new);
 		final TIntObjectHashMap<TIntObjectHashMap<DotToLandmark>> map = new TIntObjectHashMap<>();
 
 		public void reset() {
@@ -452,9 +452,9 @@ public class LlahOperations {
 		/**
 		 * Indicates the number of times a particular point was matched
 		 */
-		public final GrowQueue_I32 landmarkHits = new GrowQueue_I32();
+		public final DogArray_I32 landmarkHits = new DogArray_I32();
 
-		public final GrowQueue_I32 landmarkToDots = new GrowQueue_I32();
+		public final DogArray_I32 landmarkToDots = new DogArray_I32();
 
 		public void init( LlahDocument document ) {
 			this.document = document;
@@ -469,7 +469,7 @@ public class LlahOperations {
 			return landmarkHits.get(which) > 0;
 		}
 
-		public void lookupMatches( FastQueue<PointIndex2D_F64> matches ) {
+		public void lookupMatches( DogArray<PointIndex2D_F64> matches ) {
 			matches.reset();
 			for (int i = 0; i < landmarkHits.size; i++) {
 				if (landmarkHits.get(i) > 0) {

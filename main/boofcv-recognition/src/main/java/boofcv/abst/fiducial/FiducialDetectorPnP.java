@@ -29,7 +29,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	private Se3_F64 targetToCamera = new Se3_F64();
 
 	// workspace for pose estimation
-	GrowQueue_F64 errors = new GrowQueue_F64();
+	DogArray_F64 errors = new DogArray_F64();
 	Point2D_F64 predicted = new Point2D_F64();
 	List<Point2D3D> filtered = new ArrayList<>();
 

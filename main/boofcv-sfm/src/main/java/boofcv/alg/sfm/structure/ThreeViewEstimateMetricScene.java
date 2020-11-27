@@ -41,7 +41,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -407,7 +407,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			List<DMatrixRMaj> cameras = new ArrayList<>();
 			cameras.add(P2);
 			cameras.add(P3);
-			FastQueue<AssociatedTuple> observations = new FastQueue<>(() -> new AssociatedTupleN(3));
+			DogArray<AssociatedTuple> observations = new DogArray<>(() -> new AssociatedTupleN(3));
 			MultiViewOps.convertTr(ransac.getMatchSet(), observations);
 
 			var results = new MetricCameras();
@@ -435,7 +435,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			DMatrixRMaj F21 = MultiViewOps.projectiveToFundamental(P2, null);
 			estimateH.initialize(F21, P2);
 			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(focalLength, focalLength, 0, 0, 0);
-			FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+			DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 			MultiViewOps.convertTr(ransac.getMatchSet(), 0, 1, pairs);
 			if (!estimateH.process(K, K, pairs.toList()))
 				throw new RuntimeException("Failed to estimate H given 'known' intrinsics");

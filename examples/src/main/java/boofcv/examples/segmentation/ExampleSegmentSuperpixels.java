@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.awt.image.BufferedImage;
 
@@ -80,10 +80,10 @@ public class ExampleSegmentSuperpixels {
 		ImageType<T> type = color.getImageType();
 		ComputeRegionMeanColor<T> colorize = FactorySegmentationAlg.regionMeanColor(type);
 
-		FastQueue<float[]> segmentColor = new ColorQueue_F32(type.getNumBands());
+		DogArray<float[]> segmentColor = new ColorQueue_F32(type.getNumBands());
 		segmentColor.resize(numSegments);
 
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+		DogArray_I32 regionMemberCount = new DogArray_I32();
 		regionMemberCount.resize(numSegments);
 
 		ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.ConfigLength;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	// refine corner location
 	RefinePolyLineCorner refine;
 	// removes extra corners
-	private GrowQueue_I32 pruned = new GrowQueue_I32(); // corners after pruning
+	private DogArray_I32 pruned = new DogArray_I32(); // corners after pruning
 	private MinimizeEnergyPrune pruner;
 
 	boolean convex = true;
@@ -80,7 +80,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 
 
 	@Override
-	public boolean process(List<Point2D_I32> input, GrowQueue_I32 vertexes) {
+	public boolean process(List<Point2D_I32> input, DogArray_I32 vertexes) {
 		if (!splitMerge.process(input, vertexes)) {
 			return false;
 		}

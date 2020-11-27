@@ -23,7 +23,7 @@ import boofcv.io.points.PointCloudIO.Format;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ class TestPointCloudIO extends BoofStandardJUnit {
 
 		Format[] formats = new Format[]{Format.PLY};
 		for (Format f : formats) {
-			FastQueue<Point3D_F32> found = new FastQueue<>(Point3D_F32::new);
+			DogArray<Point3D_F32> found = new DogArray<>(Point3D_F32::new);
 			found.grow().setTo(1, 1, 1);
 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -74,7 +74,7 @@ class TestPointCloudIO extends BoofStandardJUnit {
 
 		Format[] formats = new Format[]{Format.PLY};
 		for (Format f : formats) {
-			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64::new);
+			DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 			found.grow().setTo(1, 1, 1);
 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();

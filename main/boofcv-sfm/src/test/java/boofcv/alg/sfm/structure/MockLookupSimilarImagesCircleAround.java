@@ -30,8 +30,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.data.DMatrixRMaj;
 
@@ -236,7 +236,7 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 	}
 
 	@Override
-	public void lookupPixelFeats( String target, FastQueue<Point2D_F64> features ) {
+	public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
 		int index = viewIds.indexOf(target);
 		List<Point2D_F64> l = viewObs.get(index);
 		features.reset();
@@ -248,7 +248,7 @@ class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
 	}
 
 	@Override
-	public boolean lookupMatches( String viewA, String viewB, FastQueue<AssociatedIndex> pairs ) {
+	public boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs ) {
 		int[] tableA = featToView.get(indexOfView(viewA));
 		int[] tableB = featToView.get(indexOfView(viewB));
 

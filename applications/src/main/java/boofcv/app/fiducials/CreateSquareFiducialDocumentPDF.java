@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.app.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_I64;
+import org.ddogleg.struct.DogArray_I64;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 
 	public float blackBorderFractionalWidth;
 
-	GrowQueue_I64 binaryPatterns;
+	DogArray_I64 binaryPatterns;
 	int gridWidth;
 	java.util.List<GrayU8> imagePatterns;
 
@@ -53,7 +53,7 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 		return markerType;
 	}
 
-	public void render( java.util.List<String> names , GrowQueue_I64 patterns , int gridWidth ) throws IOException {
+	public void render( java.util.List<String> names , DogArray_I64 patterns , int gridWidth ) throws IOException {
 		this.names = names;
 		binaryPatterns = patterns;
 		this.gridWidth = gridWidth;

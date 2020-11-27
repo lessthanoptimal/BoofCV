@@ -26,8 +26,8 @@ import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
@@ -555,13 +555,13 @@ public class GThresholdImageOps {
 					  @Nullable T work1, @Nullable T work2, @Nullable GrowArray work3 ) {
 		if (input instanceof GrayF32) {
 			return ThresholdImageOps.localMean((GrayF32)input, output, width, (float)scale, down,
-					(GrayF32)work1, (GrayF32)work2, (GrowArray<GrowQueue_F32>)work3);
+					(GrayF32)work1, (GrayF32)work2, (GrowArray<DogArray_F32>)work3);
 		} else if (input instanceof GrayU8) {
 			return ThresholdImageOps.localMean((GrayU8)input, output, width, (float)scale, down,
-					(GrayU8)work1, (GrayU8)work2, (GrowArray<GrowQueue_I32>)work3);
+					(GrayU8)work1, (GrayU8)work2, (GrowArray<DogArray_I32>)work3);
 		} else if (input instanceof GrayU16) {
 			return ThresholdImageOps.localMean((GrayU16)input, output, width, (float)scale, down,
-					(GrayU16)work1, (GrayU16)work2, (GrowArray<GrowQueue_I32>)work3);
+					(GrayU16)work1, (GrayU16)work2, (GrowArray<DogArray_I32>)work3);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
 		}

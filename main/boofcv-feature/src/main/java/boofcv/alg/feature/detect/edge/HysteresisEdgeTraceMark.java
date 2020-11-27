@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Given the output from edge non-maximum suppression, perform hysteresis threshold along the edge and mark selected
@@ -49,7 +49,7 @@ public class HysteresisEdgeTraceMark {
 	private float lower;
 
 	// list of points which have yet to be explored
-	private final FastQueue<Point2D_I32> open = new FastQueue<>(Point2D_I32::new);
+	private final DogArray<Point2D_I32> open = new DogArray<>(Point2D_I32::new);
 
 	// point which is current being examined
 	private final Point2D_I32 active = new Point2D_I32();

@@ -22,7 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -45,7 +45,7 @@ public class TestClusterLabeledImage extends BoofStandardJUnit {
 
 	Random rand = new Random(123);
 
-	GrowQueue_I32 counts = new GrowQueue_I32();
+	DogArray_I32 counts = new DogArray_I32();
 
 	/**
 	 * Uniform image given different values.  Should produce an output image of all zeros.

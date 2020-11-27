@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.transform.census.impl;
 
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import javax.annotation.Generated;
 
@@ -187,7 +187,7 @@ public class ImplCensusTransformInner {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void sample_S64( final GrayU8 input , final int radius , final GrowQueue_I32 offsets,
+	public static void sample_S64( final GrayU8 input , final int radius , final DogArray_I32 offsets,
 								  final GrayS64 output ) {
 		final int height = input.height-radius;
 		final byte[] src = input.data;
@@ -216,7 +216,7 @@ public class ImplCensusTransformInner {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void sample_IU16( final GrayU8 input , final int radius , final GrowQueue_I32 offsets,
+	public static void sample_IU16( final GrayU8 input , final int radius , final DogArray_I32 offsets,
 								   final InterleavedU16 output ) {
 		final int height = input.height-radius;
 		final byte[] src = input.data;
@@ -439,7 +439,7 @@ public class ImplCensusTransformInner {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void sample_S64( final GrayU16 input , final int radius , final GrowQueue_I32 offsets,
+	public static void sample_S64( final GrayU16 input , final int radius , final DogArray_I32 offsets,
 								  final GrayS64 output ) {
 		final int height = input.height-radius;
 		final short[] src = input.data;
@@ -468,7 +468,7 @@ public class ImplCensusTransformInner {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void sample_IU16( final GrayU16 input , final int radius , final GrowQueue_I32 offsets,
+	public static void sample_IU16( final GrayU16 input , final int radius , final DogArray_I32 offsets,
 								   final InterleavedU16 output ) {
 		final int height = input.height-radius;
 		final short[] src = input.data;
@@ -691,7 +691,7 @@ public class ImplCensusTransformInner {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void sample_S64( final GrayF32 input , final int radius , final GrowQueue_I32 offsets,
+	public static void sample_S64( final GrayF32 input , final int radius , final DogArray_I32 offsets,
 								  final GrayS64 output ) {
 		final int height = input.height-radius;
 		final float[] src = input.data;
@@ -720,7 +720,7 @@ public class ImplCensusTransformInner {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void sample_IU16( final GrayF32 input , final int radius , final GrowQueue_I32 offsets,
+	public static void sample_IU16( final GrayF32 input , final int radius , final DogArray_I32 offsets,
 								   final InterleavedU16 output ) {
 		final int height = input.height-radius;
 		final float[] src = input.data;

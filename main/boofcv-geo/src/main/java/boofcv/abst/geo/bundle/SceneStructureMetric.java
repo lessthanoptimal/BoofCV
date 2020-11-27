@@ -21,7 +21,7 @@ package boofcv.abst.geo.bundle;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
@@ -40,13 +40,13 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 public class SceneStructureMetric extends SceneStructureCommon {
 
 	/** List of views. A view is composed of a camera model and it's pose. */
-	public final FastQueue<View> views = new FastQueue<>(View::new, View::reset);
+	public final DogArray<View> views = new DogArray<>(View::new, View::reset);
 
 	/** List of motions for the views that specifies their spatial relationship */
-	public final FastQueue<Motion> motions = new FastQueue<>(Motion::new, Motion::reset);
+	public final DogArray<Motion> motions = new DogArray<>(Motion::new, Motion::reset);
 
 	/** List of rigid objects. A rigid object is a group of 3D points that have a known relationship with each other. */
-	public final FastQueue<Rigid> rigids = new FastQueue<>(Rigid::new, Rigid::reset);
+	public final DogArray<Rigid> rigids = new DogArray<>(Rigid::new, Rigid::reset);
 	// Lookup table from rigid point to rigid object
 	public int[] lookupRigid;
 
@@ -338,11 +338,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		return getUnknownMotionCount()*6 + getUnknownRigidCount()*6 + points.size*pointSize + getUnknownCameraParameterCount();
 	}
 
-	public FastQueue<View> getViews() {
+	public DogArray<View> getViews() {
 		return views;
 	}
 
-	public FastQueue<Rigid> getRigids() { return rigids; }
+	public DogArray<Rigid> getRigids() { return rigids; }
 
 	/**
 	 * Checks to see if the passed in scene is identical to "this" scene. Floating point values are checked to within

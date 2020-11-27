@@ -28,7 +28,7 @@ import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 import pabeles.concurrency.GrowArray;
 
@@ -435,7 +435,7 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		GImageMiscOps.fill(dest, 0);
 		int divisor = kernelWidth*kernelWidth;
 
-		invokeMethod("convolve", kernel, img, dest, divisor, new GrowArray<>(GrowQueue_I32::new));
+		invokeMethod("convolve", kernel, img, dest, divisor, new GrowArray<>(DogArray_I32::new));
 
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 

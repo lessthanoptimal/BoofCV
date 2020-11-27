@@ -33,7 +33,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray_B;
 import org.ejml.UtilEjml;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.BeforeEach;
@@ -353,7 +353,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 
 		Polygon2D_F64 polygon = new Polygon2D_F64(10, 12, 30, 12, 30, 40, 10, 40);
 
-		alg.adjustBeforeOptimize(polygon, new GrowQueue_B(), false);
+		alg.adjustBeforeOptimize(polygon, new DogArray_B(), false);
 
 		assertEquals(8.5, polygon.get(0).x, UtilEjml.TEST_F64);
 		assertEquals(10.5, polygon.get(0).y, UtilEjml.TEST_F64);
@@ -369,7 +369,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 
 		polygon = new Polygon2D_F64(10, 12, 30, 12, 30, 40, 10, 40);
 		polygon.flip();
-		alg.adjustBeforeOptimize(polygon, new GrowQueue_B(), true);
+		alg.adjustBeforeOptimize(polygon, new DogArray_B(), true);
 
 		assertEquals(8.5, polygon.get(0).x, UtilEjml.TEST_F64);
 		assertEquals(10.5, polygon.get(0).y, UtilEjml.TEST_F64);
@@ -389,7 +389,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		DetectChessboardSquarePoints<GrayU8> alg = new DetectChessboardSquarePoints<>(2, 2, ConfigLength.fixed(0.01), null);
 
 
-		GrowQueue_B touches = new GrowQueue_B();
+		DogArray_B touches = new DogArray_B();
 		touches.add(true);
 		touches.add(true);
 		touches.add(false);

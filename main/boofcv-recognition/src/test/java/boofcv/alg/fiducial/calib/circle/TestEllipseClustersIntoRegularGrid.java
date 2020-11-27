@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.NodeInfo;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.curve.EllipseRotated_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.Tuple2;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +59,7 @@ public class TestEllipseClustersIntoRegularGrid extends BoofStandardJUnit {
 
 		alg.process(grid.d1,clusters);
 
-		FastQueue<Grid> found = alg.getGrids();
+		DogArray<Grid> found = alg.getGrids();
 
 		if( fail ) {
 			assertEquals(0,found.size);

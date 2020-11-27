@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.segmentation.watershed;
 
 import boofcv.struct.image.GrayS32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Examines a segmented image created by {@link WatershedVincentSoille1991} and merged watershed pixels
@@ -34,8 +34,8 @@ public class RemoveWatersheds {
 	private int connect[] = new int[4];
 
 	// list of watershed pixels which have yet to be merged.
-	private GrowQueue_I32 open = new GrowQueue_I32();
-	private GrowQueue_I32 open2 = new GrowQueue_I32();
+	private DogArray_I32 open = new DogArray_I32();
+	private DogArray_I32 open2 = new DogArray_I32();
 
 	/**
 	 * Removes watersheds from the segmented image.  The input image must be the entire original
@@ -92,7 +92,7 @@ public class RemoveWatersheds {
 			}
 
 			// swap open and open2
-			GrowQueue_I32 tmp = open;
+			DogArray_I32 tmp = open;
 			open = open2;
 			open2 = tmp;
 		}

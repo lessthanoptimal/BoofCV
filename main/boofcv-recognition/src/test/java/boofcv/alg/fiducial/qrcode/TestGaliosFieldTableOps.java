@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -162,14 +162,14 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 input = new GrowQueue_I8(3);
+		DogArray_I8 input = new DogArray_I8(3);
 		input.set(0,0x12);
 		input.set(1,0x54);
 		input.set(2,0xFF);
 
 		int scale = 0x45;
 
-		GrowQueue_I8 output = new GrowQueue_I8();
+		DogArray_I8 output = new DogArray_I8();
 
 		alg.polyScale(input.copy(),scale,output);
 
@@ -186,23 +186,23 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8(3);
+		DogArray_I8 inputA = new DogArray_I8(3);
 		inputA.resize(3);
 		inputA.set(0,0x12);
 		inputA.set(1,0x54);
 		inputA.set(2,0xFF);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
-		GrowQueue_I8 inputB = new GrowQueue_I8(4);
+		DogArray_I8 inputB = new DogArray_I8(4);
 		inputB.resize(4);
 		inputB.set(0,0xA0);
 		inputB.set(3,0x45);
 
 		// make sure the order doesn't matter
-		GrowQueue_I8 output0 = new GrowQueue_I8();
+		DogArray_I8 output0 = new DogArray_I8();
 		alg.polyAdd(inputA,inputB,output0);
 
-		GrowQueue_I8 output1 = new GrowQueue_I8();
+		DogArray_I8 output1 = new DogArray_I8();
 		alg.polyAdd(inputB,inputA,output1);
 
 		assertEquals(4,output0.size);
@@ -220,23 +220,23 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8(3);
+		DogArray_I8 inputA = new DogArray_I8(3);
 		inputA.resize(3);
 		inputA.set(2,0x12);
 		inputA.set(1,0x54);
 		inputA.set(0,0xFF);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
-		GrowQueue_I8 inputB = new GrowQueue_I8(4);
+		DogArray_I8 inputB = new DogArray_I8(4);
 		inputB.resize(4);
 		inputB.set(3,0xA0);
 		inputB.set(0,0x45);
 
 		// make sure the order doesn't matter
-		GrowQueue_I8 output0 = new GrowQueue_I8();
+		DogArray_I8 output0 = new DogArray_I8();
 		alg.polyAdd_S(inputA,inputB,output0);
 
-		GrowQueue_I8 output1 = new GrowQueue_I8();
+		DogArray_I8 output1 = new DogArray_I8();
 		alg.polyAdd_S(inputB,inputA,output1);
 
 		assertEquals(4,output0.size);
@@ -254,25 +254,25 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8(3);
+		DogArray_I8 inputA = new DogArray_I8(3);
 		inputA.resize(3);
 		inputA.set(0,0x12);
 		inputA.set(1,0x54);
 		inputA.set(2,0xFF);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
-		GrowQueue_I8 inputB = new GrowQueue_I8(4);
+		DogArray_I8 inputB = new DogArray_I8(4);
 		inputB.resize(4);
 		inputB.set(0,0xA0);
 		inputB.set(3,0x45);
 
 		int scale = 0x62;
-		GrowQueue_I8 scaleB = new GrowQueue_I8();
+		DogArray_I8 scaleB = new DogArray_I8();
 		alg.polyScale(inputB,scale,scaleB);
-		GrowQueue_I8 expected = new GrowQueue_I8();
+		DogArray_I8 expected = new DogArray_I8();
 		alg.polyAdd(inputA,scaleB,expected);
 
-		GrowQueue_I8 found = new GrowQueue_I8();
+		DogArray_I8 found = new DogArray_I8();
 		alg.polyAddScaleB(inputA,inputB,scale,found);
 
 		assertEqualsG(expected, found);
@@ -283,28 +283,28 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
 		inputA.set(0,0x12);
 		inputA.set(1,0x54);
 		inputA.set(2,0xFF);
 
-		GrowQueue_I8 inputB = new GrowQueue_I8();
+		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
 		inputB.set(1,0x03);
 
 		// make sure the order doesn't matter
-		GrowQueue_I8 output0 = new GrowQueue_I8();
+		DogArray_I8 output0 = new DogArray_I8();
 		alg.polyMult(inputA,inputB,output0);
 
-		GrowQueue_I8 output1 = new GrowQueue_I8();
+		DogArray_I8 output1 = new DogArray_I8();
 		alg.polyMult(inputB,inputA,output1);
 
 		assertEquals(4,output0.size);
 		assertEqualsG(output0, output1);
 
 		// check the value against a manual solution
-		GrowQueue_I8 expected = new GrowQueue_I8();
+		DogArray_I8 expected = new DogArray_I8();
 		expected.resize(4);
 		expected.set(1,alg.multiply(0x12,0x03));
 		expected.set(2,alg.multiply(0x54,0x03));
@@ -316,23 +316,23 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
 		inputA.set(2,0x12);
 		inputA.set(1,0x54);
 		inputA.set(0,0xFF);
 
-		GrowQueue_I8 inputB = new GrowQueue_I8();
+		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
 		inputB.set(1,0x03);
 
-		GrowQueue_I8 output0 = new GrowQueue_I8();
+		DogArray_I8 output0 = new DogArray_I8();
 		alg.polyMult_flipA(inputA,inputB,output0);
 
 		assertEquals(4,output0.size);
 
 		// check the value against a manual solution
-		GrowQueue_I8 expected = new GrowQueue_I8();
+		DogArray_I8 expected = new DogArray_I8();
 		expected.resize(4);
 		expected.set(1,alg.multiply(0x12,0x03));
 		expected.set(2,alg.multiply(0x54,0x03));
@@ -344,35 +344,35 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
 		inputA.set(2,0x12);
 		inputA.set(1,0x54);
 		inputA.set(0,0xFF);
 
-		GrowQueue_I8 inputB = new GrowQueue_I8();
+		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
 		inputB.set(0,0x03);
 
 		// make sure the order doesn't matter
-		GrowQueue_I8 output0 = new GrowQueue_I8();
+		DogArray_I8 output0 = new DogArray_I8();
 		alg.polyMult_S(inputA,inputB,output0);
 
-		GrowQueue_I8 output1 = new GrowQueue_I8();
+		DogArray_I8 output1 = new DogArray_I8();
 		alg.polyMult_S(inputB,inputA,output1);
 
 		assertEquals(4,output0.size);
 		assertEqualsG_S(output0, output1);
 
 		// check the value against a manual solution
-		GrowQueue_I8 expected = new GrowQueue_I8();
+		DogArray_I8 expected = new DogArray_I8();
 		expected.resize(4);
 		expected.set(2,alg.multiply(0x12,0x03));
 		expected.set(1,alg.multiply(0x54,0x03));
 		expected.set(0,alg.multiply(0xFF,0x03));
 	}
 
-	private void randomPoly(GrowQueue_I8 inputA, int length) {
+	private void randomPoly(DogArray_I8 inputA, int length) {
 		inputA.reset();
 		for (int j = 0; j < length; j++) {
 			inputA.add( rand.nextInt(256));
@@ -384,7 +384,7 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
 		inputA.set(0,0x12);
 		inputA.set(1,0x54);
@@ -402,7 +402,7 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 	@Test
 	public void polyEval_random() {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 
 		for (int i = 0; i < 1000; i++) {
 			randomPoly(inputA,30);
@@ -419,7 +419,7 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(3);
 		inputA.set(2,0x12);
 		inputA.set(1,0x54);
@@ -438,13 +438,13 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 	public void polyEvalContinue() {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
-		GrowQueue_I8 polyA = new GrowQueue_I8();
+		DogArray_I8 polyA = new DogArray_I8();
 		randomPoly(polyA,30);
 
 		int x = 0x09;
 		int expected = alg.polyEval(polyA,x);
 
-		GrowQueue_I8 polyB = new GrowQueue_I8(10);
+		DogArray_I8 polyB = new DogArray_I8(10);
 		polyB.resize(10);
 		System.arraycopy(polyA.data,20,polyB.data,0,10);
 		polyA.size = 20;
@@ -460,20 +460,20 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0BB*x^4 + 0x12*x^3 + 0x54*x^2 + 0*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(5);
 		inputA.set(0,0xBB);
 		inputA.set(1,0x12);
 		inputA.set(2,0x54);
 		inputA.set(4,0xFF);
 
-		GrowQueue_I8 inputB = new GrowQueue_I8();
+		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
 		inputB.set(0,0xF0);
 		inputB.set(1,0x0A);
 
-		GrowQueue_I8 quotient = new GrowQueue_I8();
-		GrowQueue_I8 remainder = new GrowQueue_I8();
+		DogArray_I8 quotient = new DogArray_I8();
+		DogArray_I8 remainder = new DogArray_I8();
 		alg.polyDivide(inputA,inputB,quotient,remainder);
 		assertEquals(4,quotient.size);
 		assertEquals(1,remainder.size);
@@ -489,9 +489,9 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		checkDivision(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision(GaliosFieldTableOps alg, GrowQueue_I8 inputA, GrowQueue_I8 inputB, GrowQueue_I8 quotent, GrowQueue_I8 remainder) {
-		GrowQueue_I8 tmp = new GrowQueue_I8();
-		GrowQueue_I8 found = new GrowQueue_I8();
+	private void checkDivision(GaliosFieldTableOps alg, DogArray_I8 inputA, DogArray_I8 inputB, DogArray_I8 quotent, DogArray_I8 remainder) {
+		DogArray_I8 tmp = new DogArray_I8();
+		DogArray_I8 found = new DogArray_I8();
 		alg.polyMult(inputB,quotent,tmp);
 		alg.polyAdd(tmp,remainder,found);
 		assertEqualsG(inputA, found);
@@ -502,20 +502,20 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		GaliosFieldTableOps alg =  new GaliosFieldTableOps(8, primitive8);
 
 		// Create an arbitrary polynomial: 0BB*x^4 + 0x12*x^3 + 0x54*x^2 + 0*x + 0xFF
-		GrowQueue_I8 inputA = new GrowQueue_I8();
+		DogArray_I8 inputA = new DogArray_I8();
 		inputA.resize(5);
 		inputA.set(4,0xBB);
 		inputA.set(3,0x12);
 		inputA.set(2,0x54);
 		inputA.set(0,0xFF);
 
-		GrowQueue_I8 inputB = new GrowQueue_I8();
+		DogArray_I8 inputB = new DogArray_I8();
 		inputB.resize(2);
 		inputB.set(1,0xF0);
 		inputB.set(0,0x0A);
 
-		GrowQueue_I8 quotient = new GrowQueue_I8();
-		GrowQueue_I8 remainder = new GrowQueue_I8();
+		DogArray_I8 quotient = new DogArray_I8();
+		DogArray_I8 remainder = new DogArray_I8();
 		alg.polyDivide_S(inputA,inputB,quotient,remainder);
 		assertEquals(4,quotient.size);
 		assertEquals(1,remainder.size);
@@ -531,15 +531,15 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		checkDivision_S(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision_S(GaliosFieldTableOps alg, GrowQueue_I8 inputA, GrowQueue_I8 inputB, GrowQueue_I8 quotent, GrowQueue_I8 remainder) {
-		GrowQueue_I8 tmp = new GrowQueue_I8();
-		GrowQueue_I8 found = new GrowQueue_I8();
+	private void checkDivision_S(GaliosFieldTableOps alg, DogArray_I8 inputA, DogArray_I8 inputB, DogArray_I8 quotent, DogArray_I8 remainder) {
+		DogArray_I8 tmp = new DogArray_I8();
+		DogArray_I8 found = new DogArray_I8();
 		alg.polyMult_S(inputB,quotent,tmp);
 		alg.polyAdd_S(tmp,remainder,found);
 		assertEqualsG_S(inputA, found);
 	}
 
-	private static void assertEqualsG(GrowQueue_I8 inputA, GrowQueue_I8 inputB) {
+	private static void assertEqualsG(DogArray_I8 inputA, DogArray_I8 inputB) {
 		int offsetA=0,offsetB=0;
 		if( inputA.size > inputB.size ) {
 			offsetA = inputA.size-inputB.size;
@@ -559,7 +559,7 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 		}
 	}
 
-	private static void assertEqualsG_S(GrowQueue_I8 inputA, GrowQueue_I8 inputB) {
+	private static void assertEqualsG_S(DogArray_I8 inputA, DogArray_I8 inputB) {
 		int M = Math.min(inputA.size,inputB.size);
 
 		for (int i = M; i < inputA.size; i++) {

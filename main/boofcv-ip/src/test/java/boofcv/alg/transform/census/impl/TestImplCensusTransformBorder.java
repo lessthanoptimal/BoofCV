@@ -29,7 +29,7 @@ import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -103,7 +103,7 @@ class TestImplCensusTransformBorder extends BoofStandardJUnit {
 			var expected = new GrayS64(w, h);
 			ImageBorder border = FactoryImageBorder.wrap(BorderType.EXTENDED, input);
 
-			FastQueue<Point2D_I32> samples = createSamples(r);
+			DogArray<Point2D_I32> samples = createSamples(r);
 
 			if( type.getDataType().isInteger() ) {
 				GImageMiscOps.fillUniform(input, rand, 0, 255);
@@ -128,7 +128,7 @@ class TestImplCensusTransformBorder extends BoofStandardJUnit {
 			InterleavedU16 found = new InterleavedU16(w, h, 2);
 			InterleavedU16 expected = new InterleavedU16(w, h, 2);
 			ImageBorder border = FactoryImageBorder.wrap(BorderType.EXTENDED, input);
-			FastQueue<Point2D_I32> samples5x5 = createSamples(2);
+			DogArray<Point2D_I32> samples5x5 = createSamples(2);
 
 			if( type.getDataType().isInteger() ) {
 				GImageMiscOps.fillUniform(input, rand, 0, 255);

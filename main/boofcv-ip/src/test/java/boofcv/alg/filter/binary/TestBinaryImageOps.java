@@ -26,7 +26,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -290,7 +290,7 @@ public class TestBinaryImageOps extends BoofStandardJUnit {
 
 	@Test
 	public void labelToClusters() {
-		FastQueue<Point2D_I32> queue = new FastQueue<>(16, Point2D_I32::new);
+		DogArray<Point2D_I32> queue = new DogArray<>(16, Point2D_I32::new);
 		GrayS32 labels = new GrayS32(4,4);
 		labels.data = new int[]{
 				1,2,3,4,

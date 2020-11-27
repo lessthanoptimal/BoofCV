@@ -20,7 +20,7 @@ package boofcv.core.encoding.impl;
 
 import boofcv.core.encoding.ConvertYuv420_888.ProcessorYuv;
 import boofcv.misc.BoofMiscOps;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import pabeles.concurrency.GrowArray;
 
 import java.nio.ByteBuffer;
@@ -37,7 +37,7 @@ import java.nio.ByteBuffer;
 public class ImplConvertYuv420_888 {
 	public static void processYuv( ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 								   int width, int height, int strideY , int strideUV , int stridePixelUV,
-								   GrowArray<GrowQueue_I8> workArrays, ProcessorYuv processor )
+								   GrowArray<DogArray_I8> workArrays, ProcessorYuv processor )
 	{
 		// U and V stride are the same by 420_888 specification
 

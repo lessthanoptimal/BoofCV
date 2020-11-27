@@ -29,7 +29,7 @@ import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * <p>Computes {@link DescribePointSift SIFT} features in a regular grid across an entire image at a single
@@ -54,14 +54,14 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 	GImageGray imageDerivX, imageDerivY;
 
 	// storage for descriptors
-	FastQueue<TupleDesc_F64> descriptors;
+	DogArray<TupleDesc_F64> descriptors;
 
 	// storage for precomputed angle
 	GrayF64 savedAngle = new GrayF64(1, 1);
 	GrayF32 savedMagnitude = new GrayF32(1, 1);
 
 	// saved location of where in the image it sampled
-	FastQueue<Point2D_I32> sampleLocations = new FastQueue<>(Point2D_I32::new);
+	DogArray<Point2D_I32> sampleLocations = new DogArray<>(Point2D_I32::new);
 
 	/**
 	 * Specifies SIFT descriptor structure and sampling frequency.
@@ -87,7 +87,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		imageDerivX = FactoryGImageGray.create(derivType);
 		imageDerivY = FactoryGImageGray.create(derivType);
 
-		descriptors = new FastQueue<>(() -> new TupleDesc_F64(DOF));
+		descriptors = new DogArray<>(() -> new TupleDesc_F64(DOF));
 	}
 
 	/**
@@ -210,14 +210,14 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		this.periodColumns = periodColumns;
 	}
 
-	public FastQueue<TupleDesc_F64> getDescriptors() {
+	public DogArray<TupleDesc_F64> getDescriptors() {
 		return descriptors;
 	}
 
 	/**
 	 * Returns where in the image it sampled the features
 	 */
-	public FastQueue<Point2D_I32> getLocations() {
+	public DogArray<Point2D_I32> getLocations() {
 		return sampleLocations;
 	}
 

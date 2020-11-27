@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	EdgeIntensityEllipse<T> intensityCheck;
 
 	// storage for the output refined ellipses
-	FastQueue<EllipseInfo> results = new FastQueue<>(EllipseInfo::new);
+	DogArray<EllipseInfo> results = new DogArray<>(EllipseInfo::new);
 
 	Class<T> inputType;
 
@@ -188,7 +188,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 *
 	 * @return List of found ellipses.
 	 */
-	public FastQueue<EllipseInfo> getFound() {
+	public DogArray<EllipseInfo> getFound() {
 		return results;
 	}
 

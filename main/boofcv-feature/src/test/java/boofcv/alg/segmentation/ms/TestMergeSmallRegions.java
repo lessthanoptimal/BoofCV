@@ -24,9 +24,9 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,13 +68,13 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 				0,0,0,0,0,0,6,6,7,8};
 
 
-		GrowQueue_I32 memberCount = new GrowQueue_I32();
+		DogArray_I32 memberCount = new DogArray_I32();
 		memberCount.resize(10);
 		for( int i = 0; i < pixelToRegion.data.length; i++ ) {
 			memberCount.data[pixelToRegion.data[i]]++;
 		}
 
-		FastQueue<float[]> regionColor = new FastQueue<>(()->new float[ 1 ]);
+		DogArray<float[]> regionColor = new DogArray<>(()->new float[ 1 ]);
 		regionColor.resize(10);
 
 		ComputeRegionMeanColor<GrayU8> mean = new ComputeRegionMeanColor.U8();
@@ -88,7 +88,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 		assertEquals(3,memberCount.size);
 		assertEquals(3,regionColor.size);
 
-		GrowQueue_I32 memberExpected = new GrowQueue_I32(3);
+		DogArray_I32 memberExpected = new DogArray_I32(3);
 		memberExpected.resize(3);
 		for( int i = 0; i < pixelToRegion.data.length; i++ ) {
 			memberExpected.data[pixelToRegion.data[i]]++;
@@ -103,7 +103,7 @@ public class TestMergeSmallRegions extends BoofStandardJUnit {
 
 	@Test
 	public void setupPruneList() {
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+		DogArray_I32 regionMemberCount = new DogArray_I32();
 		regionMemberCount.size = 6;
 		regionMemberCount.data = new int[]{10,11,20,20,10,20};
 

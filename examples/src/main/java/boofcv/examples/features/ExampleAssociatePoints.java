@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -84,8 +84,8 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 		pointsB = new ArrayList<>();
 
 		// stores the description of detected interest points
-		FastQueue<TD> descA = UtilFeature.createQueue(detDesc,100);
-		FastQueue<TD> descB = UtilFeature.createQueue(detDesc,100);
+		DogArray<TD> descA = UtilFeature.createQueue(detDesc,100);
+		DogArray<TD> descB = UtilFeature.createQueue(detDesc,100);
 
 		// describe each image using interest points
 		describeImage(inputA,pointsA,descA);
@@ -107,7 +107,7 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private void describeImage(T input, List<Point2D_F64> points, FastQueue<TD> descs )
+	private void describeImage(T input, List<Point2D_F64> points, DogArray<TD> descs )
 	{
 		detDesc.detect(input);
 

@@ -19,7 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.alg.geo.bundle.cameras.BundleCameraProjective;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -30,7 +30,7 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 public class SceneStructureProjective extends SceneStructureCommon {
-	public final FastQueue<View> views = new FastQueue<>(View::new, View::reset);
+	public final DogArray<View> views = new DogArray<>(View::new, View::reset);
 
 	/**
 	 * Configure bundle adjustment
@@ -126,7 +126,7 @@ public class SceneStructureProjective extends SceneStructureCommon {
 		return getUnknownViewCount()*12 + getUnknownCameraParameterCount() + points.size*pointSize;
 	}
 
-	public FastQueue<View> getViews() {
+	public DogArray<View> getViews() {
 		return views;
 	}
 

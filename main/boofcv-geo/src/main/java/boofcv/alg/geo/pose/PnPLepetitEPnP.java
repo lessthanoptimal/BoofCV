@@ -24,7 +24,7 @@ import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SingularOps_DDRM;
@@ -130,11 +130,11 @@ public class PnPLepetitEPnP {
 	protected List<Point3D_F64>[] nullPts = new ArrayList[4];
 
 	// control points in world coordinate frame
-	protected FastQueue<Point3D_F64> controlWorldPts = new FastQueue<>(4, Point3D_F64::new);
+	protected DogArray<Point3D_F64> controlWorldPts = new DogArray<>(4, Point3D_F64::new);
 
 	// list of found solutions
 	private final List<double[]> solutions = new ArrayList<>();
-	protected FastQueue<Point3D_F64> solutionPts = new FastQueue<>(4, Point3D_F64::new);
+	protected DogArray<Point3D_F64> solutionPts = new DogArray<>(4, Point3D_F64::new);
 
 	// estimates rigid body motion between two associated sets of points
 	private final MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
@@ -308,7 +308,7 @@ public class PnPLepetitEPnP {
 	 * The data's axis is determined by computing the covariance matrix then performing SVD.  The axis
 	 * is contained along the
 	 */
-	public void selectWorldControlPoints( List<Point3D_F64> worldPts, FastQueue<Point3D_F64> controlWorldPts ) {
+	public void selectWorldControlPoints( List<Point3D_F64> worldPts, DogArray<Point3D_F64> controlWorldPts ) {
 
 		UtilPoint3D_F64.mean(worldPts, meanWorldPts);
 
@@ -372,7 +372,7 @@ public class PnPLepetitEPnP {
 	 * X = [ cameraPts' ; ones(1,N) ]
 	 * </p>
 	 */
-	protected void computeBarycentricCoordinates( FastQueue<Point3D_F64> controlWorldPts,
+	protected void computeBarycentricCoordinates( DogArray<Point3D_F64> controlWorldPts,
 												  DMatrixRMaj alphas,
 												  List<Point3D_F64> worldPts ) {
 		alphas.reshape(worldPts.size(), numControl, false);
@@ -475,7 +475,7 @@ public class PnPLepetitEPnP {
 	 * between world control points and the null points.
 	 */
 	protected double matchScale( List<Point3D_F64> nullPts,
-								 FastQueue<Point3D_F64> controlWorldPts ) {
+								 DogArray<Point3D_F64> controlWorldPts ) {
 
 		Point3D_F64 meanNull = UtilPoint3D_F64.mean(nullPts, numControl, null);
 		Point3D_F64 meanWorld = UtilPoint3D_F64.mean(controlWorldPts.toList(), numControl, null);

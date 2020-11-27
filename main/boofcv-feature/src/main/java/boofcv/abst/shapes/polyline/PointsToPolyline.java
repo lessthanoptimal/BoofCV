@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.shapes.polyline;
 
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public interface PointsToPolyline {
 	 *
 	 * @return true if successful or false if no fit could be found which matched the requirements
 	 */
-	boolean process(List<Point2D_I32> input , GrowQueue_I32 vertexes );
+	boolean process(List<Point2D_I32> input , DogArray_I32 vertexes );
 
 	/**
 	 * Specifies the minimum number of sides in a polyline that's returned

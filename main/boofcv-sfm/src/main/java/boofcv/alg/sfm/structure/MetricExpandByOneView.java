@@ -36,7 +36,7 @@ import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	// Storage for intrinsic camera matrices in view-2 and view-3
 	DMatrixRMaj K1 = new DMatrixRMaj(3, 3);
 	DMatrixRMaj K2 = new DMatrixRMaj(3, 3);
-	FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+	DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 	// Found Se3 from view-1 to target
 	Se3_F64 view1_to_view1 = new Se3_F64();
@@ -328,7 +328,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 		BundleAdjustmentOps.convert(workGraph.lookupView(utils.seed.id).intrinsic, K1);
 		BundleAdjustmentOps.convert(workGraph.lookupView(utils.viewB.id).intrinsic, K2);
 
-		FastQueue<AssociatedTriple> triples = utils.matchesTriple;
+		DogArray<AssociatedTriple> triples = utils.matchesTriple;
 		pairs.resize(triples.size());
 		for (int idx = 0; idx < triples.size(); idx++) {
 			AssociatedTriple a = triples.get(idx);

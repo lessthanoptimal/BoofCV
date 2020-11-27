@@ -20,9 +20,9 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -72,9 +72,9 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final int backStep = length*input.stride;
 		final int offsetEnd = length - offset - 1;
 
@@ -145,9 +145,9 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final int backStep = length*input.stride;
 		final int offsetEnd = length - offset - 1;
 
@@ -218,9 +218,9 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final int backStep = length*input.stride;
 		final int offsetEnd = length - offset - 1;
 
@@ -290,9 +290,9 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<GrowQueue_F32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_F32::new);
-		final GrowQueue_F32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<DogArray_F32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F32::new);
+		final DogArray_F32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final int backStep = length*input.stride;
 		final int offsetEnd = length - offset - 1;
 
@@ -361,9 +361,9 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<GrowQueue_F64> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_F64::new);
-		final GrowQueue_F64 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<DogArray_F64> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F64::new);
+		final DogArray_F64 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final int backStep = length*input.stride;
 		final int offsetEnd = length - offset - 1;
 

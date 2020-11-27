@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Nested;
@@ -57,8 +57,8 @@ class TestPointTrackerToSimilarImages extends BoofStandardJUnit {
 			tracker.offsetID += 5; // this will cause 5 tracks to not match
 		}
 
-		FastQueue<Point2D_F64> features = new FastQueue<>(Point2D_F64::new);
-		FastQueue<AssociatedIndex> associated = new FastQueue<>(AssociatedIndex::new);
+		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
+		DogArray<AssociatedIndex> associated = new DogArray<>(AssociatedIndex::new);
 		List<String> imageIds = alg.getImageIDs();
 		assertEquals(numFrames, imageIds.size());
 		List<String> similarIds = new ArrayList<>();
@@ -220,7 +220,7 @@ class TestPointTrackerToSimilarImages extends BoofStandardJUnit {
 	@Test
 	void lookupMatches() {
 		var alg = new PointTrackerToSimilarImages();
-		FastQueue<AssociatedIndex> associated = new FastQueue<>(AssociatedIndex::new);
+		DogArray<AssociatedIndex> associated = new DogArray<>(AssociatedIndex::new);
 
 		// both don't match
 		assertFalse(alg.lookupMatches("asdf","asdf",associated));
@@ -272,7 +272,7 @@ class TestPointTrackerToSimilarImages extends BoofStandardJUnit {
 	{
 		long offsetID = 0;
 		int numTracks = 20;
-		FastQueue<PointTrack> tracks = new FastQueue<>(PointTrack::new);
+		DogArray<PointTrack> tracks = new DogArray<>(PointTrack::new);
 
 		@Override
 		public void process(GrayU8 image) {

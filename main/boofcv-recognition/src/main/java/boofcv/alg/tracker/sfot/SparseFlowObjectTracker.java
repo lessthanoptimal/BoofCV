@@ -37,7 +37,7 @@ import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.geometry.UtilPoint2D_F32;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.lang.reflect.Array;
 
@@ -65,7 +65,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	private final PyramidKltTracker<Image, Derivative> klt;
 	private PyramidKltFeature track;
 
-	private final FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+	private final DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 	// used for estimating motion from track locations
 	private final LeastMedianOfSquares<ScaleTranslateRotate2D, AssociatedPair> estimateMotion;

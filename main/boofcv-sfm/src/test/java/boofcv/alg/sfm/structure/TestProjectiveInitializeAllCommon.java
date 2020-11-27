@@ -33,7 +33,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
@@ -75,10 +75,10 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 			PairwiseImageGraph graph = db.createPairwise();
 
 			View seed = graph.nodes.get(seedIdx);
-			var seedConnIdx = GrowQueue_I32.array(0, 2);
+			var seedConnIdx = DogArray_I32.array(0, 2);
 
 			// in this specific scenario all features are visible by all frames
-			var seedFeatsIdx = GrowQueue_I32.range(0, db.numFeatures);
+			var seedFeatsIdx = DogArray_I32.range(0, db.numFeatures);
 			// however not all features are in the inlier set. Remove all features not in inlier set
 			removeConnectionOutliers(seed, seedFeatsIdx);
 
@@ -108,7 +108,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 				View seed = graph.nodes.get(0);
 
 				// randomly select the connections
-				var seedConnIdx = new GrowQueue_I32();
+				var seedConnIdx = new DogArray_I32();
 				for (int i = 0; i < seed.connections.size; i++) {
 					seedConnIdx.add(i);
 				}
@@ -118,14 +118,14 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 				PrimitiveArrays.shuffle(seedConnIdx.data, 0, seedConnIdx.size, rand); // order should not matter
 
 				// index of connected views in ground truth
-				var connectedViewidx = new GrowQueue_I32();
+				var connectedViewidx = new DogArray_I32();
 				for (int i = 0; i < seedConnIdx.size; i++) {
 					String id = seed.connections.get(seedConnIdx.get(i)).other(seed).id;
 					connectedViewidx.add(viewIdStr.indexOf(id));
 				}
 
 				// in this specific scenario all features are visible by all frames
-				var seedFeatsIdx = GrowQueue_I32.range(0, db.numFeatures);
+				var seedFeatsIdx = DogArray_I32.range(0, db.numFeatures);
 				// however not all features are in the inlier set. Remove all features not in inlier set
 				removeConnectionOutliers(seed, seedFeatsIdx);
 
@@ -140,7 +140,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		}
 	}
 
-	private void removeConnectionOutliers( View seed, GrowQueue_I32 seedFeatsIdx ) {
+	private void removeConnectionOutliers( View seed, DogArray_I32 seedFeatsIdx ) {
 		for (Motion m : seed.connections.toList()) {
 			// mark all indexes which are inliers
 			boolean isSrc = m.src == seed;
@@ -197,8 +197,8 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		alg.utils.configScaleSBA = scale;
 
 		View seed = db.graph.nodes.get(0);
-		var seedFeatsIdx = new GrowQueue_I32();
-		var seedConnIdx = threeViews ? GrowQueue_I32.array(0, 2) : GrowQueue_I32.array(1, 2, 3);
+		var seedFeatsIdx = new DogArray_I32();
+		var seedConnIdx = threeViews ? DogArray_I32.array(0, 2) : DogArray_I32.array(1, 2, 3);
 
 		// Give a subset as a test to see if the size is being properly pass down the chain
 		int offset = 0;
@@ -220,7 +220,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	 */
 	private void checkReconstruction( ProjectiveInitializeAllCommon alg,
 									  MockLookupSimilarImages db,
-									  GrowQueue_I32 seedConnIdx,
+									  DogArray_I32 seedConnIdx,
 									  int numFeatures,
 									  double reprojectionTol ) {
 
@@ -270,7 +270,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 	 */
 	private void checkReconstruction( ProjectiveInitializeAllCommon alg,
 									  MockLookupSimilarImagesRealistic db,
-									  GrowQueue_I32 seedConnIdx,
+									  DogArray_I32 seedConnIdx,
 									  double reprojectionTol ) {
 
 		final SceneStructureProjective structure = alg.getStructure();
@@ -379,7 +379,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		// Select the results
 		var alg = new ProjectiveInitializeAllCommon();
 
-		GrowQueue_I32 edgeIdxs = GrowQueue_I32.array(0, 2, 3, 4, 5); // skip one to see if it uses this list
+		DogArray_I32 edgeIdxs = DogArray_I32.array(0, 2, 3, 4, 5); // skip one to see if it uses this list
 		int[] selected = new int[2];
 
 		alg.selectInitialTriplet(seed, edgeIdxs, selected);
@@ -473,7 +473,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		alg.utils.P1.set(db.listCameraMatrices.get(0));
 		alg.utils.P2.set(db.listCameraMatrices.get(1));
 		alg.utils.P3.set(db.listCameraMatrices.get(3));
-		alg.utils.commonIdx.setTo(GrowQueue_I32.range(0, db.feats3D.size()));
+		alg.utils.commonIdx.setTo(DogArray_I32.range(0, db.feats3D.size()));
 		// order shouldn't mattter
 		PrimitiveArrays.shuffle(alg.utils.commonIdx.data, 0, alg.utils.commonIdx.size, rand);
 
@@ -498,7 +498,7 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		var db = new MockLookupSimilarImages(5, 0xDEADBEEF);
 		PairwiseImageGraph graph = db.graph;
 		View seed = graph.nodes.get(0);
-		GrowQueue_I32 motionIndexes = GrowQueue_I32.array(0, 2, 3); // which edges in the first view should be considered
+		DogArray_I32 motionIndexes = DogArray_I32.array(0, 2, 3); // which edges in the first view should be considered
 		var alg = new ProjectiveInitializeAllCommon();
 		alg.utils.db = db;
 		alg.utils.seed = seed;

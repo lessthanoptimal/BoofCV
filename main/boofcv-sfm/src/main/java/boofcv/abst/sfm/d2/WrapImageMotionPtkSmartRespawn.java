@@ -25,7 +25,7 @@ import boofcv.alg.sfm.d2.ImageMotionPtkSmartRespawn;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray_B;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	List<Point2D_F64> allTracks = new ArrayList<>();
 
 	boolean inliersMarked = false;
-	GrowQueue_B inliers = new GrowQueue_B(10);
+	DogArray_B inliers = new DogArray_B(10);
 
 	public WrapImageMotionPtkSmartRespawn( ImageMotionPtkSmartRespawn<T, IT> alg ) {
 		this.alg = alg;

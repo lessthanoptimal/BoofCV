@@ -22,7 +22,7 @@ import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -72,7 +72,7 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 		// reduced the number so that having an non-exhaustive search is stressed more
 		alg.process(image,input, 1);
 
-		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
+		DogArray<ChessboardCornerGraph> found = alg.getOutputClusters();
 		assertEquals(1,found.size);
 		checkClusterPerfect(found.get(0), rows,cols);
 	}
@@ -108,7 +108,7 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 		// reduced the number so that having an non-exhaustive search is stressed more
 		alg.process(image,input,1);
 
-		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
+		DogArray<ChessboardCornerGraph> found = alg.getOutputClusters();
 		if( numAmbiguous == 0 ) {
 			assertEquals(1, found.size);
 			checkClusterPerfect(found.get(0), rows, cols);
@@ -132,7 +132,7 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
 		alg.setMaxNeighborDistance(200);
 		alg.process(image,input,1);
-		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
+		DogArray<ChessboardCornerGraph> found = alg.getOutputClusters();
 
 		assertEquals(2,found.size);
 
@@ -159,7 +159,7 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
 		alg.setThresholdEdgeIntensity(-1);
 		alg.process(new GrayU8(480,480),createFisheye(),1);
-		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
+		DogArray<ChessboardCornerGraph> found = alg.getOutputClusters();
 		assertEquals(1,found.size);
 		assertEquals(24,found.get(0).corners.size);
 	}

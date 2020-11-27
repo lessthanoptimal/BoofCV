@@ -30,7 +30,7 @@ import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	protected int minInlierSize;
 
 	// list of detected edge pixels in a region
-	protected FastQueue<Edgel> edgels = new FastQueue<>(30, Edgel::new);
+	protected DogArray<Edgel> edgels = new DogArray<>(30, Edgel::new);
 	// The maximum number of lines which can be detected in a region
 	protected int maxDetectLines;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph.Node;
 import georegression.metric.UtilAngle;
 import org.ddogleg.sorting.QuickSort_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -57,7 +57,7 @@ public class ChessboardCornerClusterToGrid {
 	Node[] tmpEdges = new Node[4];
 
 	// Indicates which corners have been added to the sparse grd
-	GrowQueue_B marked = new GrowQueue_B();
+	DogArray_B marked = new DogArray_B();
 	Queue<Node> open = new ArrayDeque<>(); // FIFO queue
 
 	// Workspace for isCornerValidOrigin
@@ -75,7 +75,7 @@ public class ChessboardCornerClusterToGrid {
 	// optional check on the shape
 	CheckShape checkShape;
 
-	FastQueue<GridElement> sparseGrid = new FastQueue<>(GridElement::new);
+	DogArray<GridElement> sparseGrid = new DogArray<>(GridElement::new);
 	int sparseCols, sparseRows;
 	GridElement[] denseGrid = new GridElement[0];
 
@@ -123,7 +123,7 @@ public class ChessboardCornerClusterToGrid {
 	 * Creates a grid where a sparse data structure is used to define it. The shape and which elements
 	 * are filled in are not known initially. This is used as an intermediate step to building the dense grid
 	 */
-	boolean createSparseGrid( FastQueue<Node> corners ) {
+	boolean createSparseGrid( DogArray<Node> corners ) {
 		marked.resize(corners.size);
 		marked.fill(false);
 
@@ -403,7 +403,7 @@ public class ChessboardCornerClusterToGrid {
 	 * Put corners into a proper grid. Make sure its a rectangular grid or else return false. Rows and columns
 	 * are selected to ensure right hand rule.
 	 */
-	boolean orderNodes( FastQueue<Node> corners, GridInfo info ) {
+	boolean orderNodes( DogArray<Node> corners, GridInfo info ) {
 
 		// Find a node with just two edges. This is a corner and will be the arbitrary origin in our graph
 		Node seed = null;
@@ -486,7 +486,7 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Enforces the rule that an edge in node A has an edge in node B that points back to A at index (i+2)%4.
 	 */
-	boolean alignEdges( FastQueue<Node> corners ) {
+	boolean alignEdges( DogArray<Node> corners ) {
 		open.clear();
 		open.add(corners.get(0));
 
@@ -542,7 +542,7 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Sorts edges so that they point towards nodes in an increasing counter clockwise direction
 	 */
-	void sortEdgesCCW( FastQueue<Node> corners ) {
+	void sortEdgesCCW( DogArray<Node> corners ) {
 		for (int nodeIdx = 0; nodeIdx < corners.size; nodeIdx++) {
 			Node na = corners.get(nodeIdx);
 

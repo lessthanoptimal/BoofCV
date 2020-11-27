@@ -23,8 +23,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 	int w = 5, h = 4;
 	GrayS32 segments;
-	GrowQueue_I32 regionMemberCount;
-	FastQueue<float[]> regionColor;
+	DogArray_I32 regionMemberCount;
+	DogArray<float[]> regionColor;
 
 	@BeforeEach
 	public void before() {
@@ -48,13 +48,13 @@ public class TestComputeRegionMeanColor extends BoofStandardJUnit {
 				2,2,2,2,2,
 				3,3,3,3,3};
 
-		regionMemberCount = new GrowQueue_I32();
+		regionMemberCount = new DogArray_I32();
 		for( int i = 0; i < 4; i++ )
 			regionMemberCount.add(5);
 	}
 
 	private void createRegionColor( final int numBands ) {
-		regionColor = new FastQueue<>(()->new float[ numBands ]);
+		regionColor = new DogArray<>(()->new float[ numBands ]);
 		regionColor.resize(4);
 	}
 

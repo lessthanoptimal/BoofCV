@@ -23,8 +23,8 @@ import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -101,7 +101,7 @@ public class PointCloudUtils_F64 {
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 
 		nn.setPoints(cloud, false);
-		FastQueue<NnData<Point3D_F64>> results = new FastQueue<>(NnData::new);
+		DogArray<NnData<Point3D_F64>> results = new DogArray<>(NnData::new);
 
 		// It will always find itself
 		minNeighbors += 1;
@@ -126,14 +126,14 @@ public class PointCloudUtils_F64 {
 	 * @param minNeighbors Minimum number of neighbors for it to not be pruned
 	 * @param radius search distance for neighbors
 	 */
-	public static void prune( List<Point3D_F64> cloud, GrowQueue_I32 colors, int minNeighbors, double radius ) {
+	public static void prune( List<Point3D_F64> cloud, DogArray_I32 colors, int minNeighbors, double radius ) {
 		if (minNeighbors < 0)
 			throw new IllegalArgumentException("minNeighbors must be >= 0");
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 
 		nn.setPoints(cloud, false);
-		FastQueue<NnData<Point3D_F64>> results = new FastQueue<>(NnData::new);
+		DogArray<NnData<Point3D_F64>> results = new DogArray<>(NnData::new);
 
 		// It will always find itself
 		minNeighbors += 1;

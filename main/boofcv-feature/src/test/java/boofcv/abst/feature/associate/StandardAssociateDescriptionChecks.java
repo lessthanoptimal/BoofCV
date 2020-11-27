@@ -21,9 +21,9 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -222,7 +222,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> extends BoofStand
 		assertEquals(0,alg.getUnassociatedSource().size);
 		assertEquals(4,alg.getUnassociatedDestination().size);
 
-		GrowQueue_I32 unassociated = alg.getUnassociatedDestination();
+		DogArray_I32 unassociated = alg.getUnassociatedDestination();
 		unassociated.sort();
 		for( int i = 0; i < unassociated.size; i++ ) {
 			assertEquals(i,unassociated.get(i));
@@ -249,7 +249,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> extends BoofStand
 		assertEquals(3,alg.getUnassociatedSource().size);
 		assertEquals(0,alg.getUnassociatedDestination().size);
 
-		GrowQueue_I32 unassociated = alg.getUnassociatedSource();
+		DogArray_I32 unassociated = alg.getUnassociatedSource();
 		unassociated.sort();
 		for( int i = 0; i < unassociated.size; i++ ) {
 			assertEquals(i,unassociated.get(i));

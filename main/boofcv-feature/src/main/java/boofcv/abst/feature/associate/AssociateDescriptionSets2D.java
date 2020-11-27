@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Feature set aware association algorithm that takes in account image location. It works by breaking sorting
@@ -120,8 +120,8 @@ public class AssociateDescriptionSets2D<Desc> extends BaseAssociateSets<Desc> {
 	 */
 	class SetStruct2D extends SetStruct {
 		// feature locations in each set
-		FastQueue<Point2D_F64> pixelsSrc = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> pixelsDst = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> pixelsSrc = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> pixelsDst = new DogArray<>(Point2D_F64::new);
 
 		@Override
 		public void reset() {

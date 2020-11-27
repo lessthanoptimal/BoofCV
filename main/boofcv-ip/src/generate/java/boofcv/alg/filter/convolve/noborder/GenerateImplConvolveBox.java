@@ -59,9 +59,9 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 				"import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
 				"import boofcv.concurrency.*;\n" +
-				"import org.ddogleg.struct.GrowQueue_F32;\n" +
-				"import org.ddogleg.struct.GrowQueue_F64;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_F32;\n" +
+				"import org.ddogleg.struct.DogArray_F64;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n");
 
 		out.print("\n//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n");
@@ -116,7 +116,7 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 		String sumType = imageIn.getSumType();
 		String bitWise = imageIn.getBitWise();
 
-		String workType = ("GrowQueue_"+imageIn.getKernelType()).replace("S32","I32");
+		String workType = ("DogArray_"+imageIn.getKernelType()).replace("S32","I32");
 
 		out.print("\tpublic static void vertical(" + imageIn.getSingleBandName() + " input, "
 				+ imageOut.getSingleBandName() + " output, int radius, @Nullable GrowArray<"+workType+"> workspaces) {\n" +

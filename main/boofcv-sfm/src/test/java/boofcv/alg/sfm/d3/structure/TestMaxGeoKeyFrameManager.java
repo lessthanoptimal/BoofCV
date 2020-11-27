@@ -23,8 +23,8 @@ import boofcv.alg.misc.ImageCoverage;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 
 	@Test
 	void configure() {
-		FastQueue<BCamera> cameras = createScene().cameras;
+		DogArray<BCamera> cameras = createScene().cameras;
 		var alg = new MaxGeoKeyFrameManager();
 		alg.cameras.grow().maxFeaturesPerFrame = 234; // give it a garbage value that should be reset
 		alg.minimumCoverage = 0.7;
@@ -244,7 +244,7 @@ class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 			checkDiscard(alg.selectFramesToDiscard(tracker, maxKeyFrames, newFrames, scene), 1);
 	}
 
-	private void checkDiscard( GrowQueue_I32 discarded, int... expected ) {
+	private void checkDiscard( DogArray_I32 discarded, int... expected ) {
 		assertEquals(expected.length, discarded.size);
 		for (int i = 0; i < expected.length; i++) {
 			assertEquals(expected[i], discarded.get(i));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 /**
  * Precomputed look up table for performing operations on GF polynomials of the specified degree.
@@ -125,7 +125,7 @@ public class GaliosFieldTableOps {
 	 * @param scale scale
 	 * @param output Output polynomial.
 	 */
-	public void polyScale( GrowQueue_I8 input, int scale, GrowQueue_I8 output ) {
+	public void polyScale( DogArray_I8 input, int scale, DogArray_I8 output ) {
 
 		output.resize(input.size);
 
@@ -143,7 +143,7 @@ public class GaliosFieldTableOps {
 	 * @param polyB (Input) Second polynomial
 	 * @param output (Output) Results of addition
 	 */
-	public void polyAdd( GrowQueue_I8 polyA, GrowQueue_I8 polyB, GrowQueue_I8 output ) {
+	public void polyAdd( DogArray_I8 polyA, DogArray_I8 polyB, DogArray_I8 output ) {
 		output.resize(Math.max(polyA.size, polyB.size));
 
 		// compute offset that would align the smaller polynomial with the larger polynomial
@@ -171,7 +171,7 @@ public class GaliosFieldTableOps {
 	 * @param polyB (Input) Second polynomial
 	 * @param output (Output) Results of addition
 	 */
-	public void polyAdd_S( GrowQueue_I8 polyA, GrowQueue_I8 polyB, GrowQueue_I8 output ) {
+	public void polyAdd_S( DogArray_I8 polyA, DogArray_I8 polyB, DogArray_I8 output ) {
 		output.resize(Math.max(polyA.size, polyB.size));
 		int M = Math.min(polyA.size, polyB.size);
 
@@ -197,7 +197,7 @@ public class GaliosFieldTableOps {
 	 * @param scaleB (Input) Scale factor applied to polyB
 	 * @param output (Output) Results of addition
 	 */
-	public void polyAddScaleB( GrowQueue_I8 polyA, GrowQueue_I8 polyB, int scaleB, GrowQueue_I8 output ) {
+	public void polyAddScaleB( DogArray_I8 polyA, DogArray_I8 polyB, int scaleB, DogArray_I8 output ) {
 		output.resize(Math.max(polyA.size, polyB.size));
 
 		// compute offset that would align the smaller polynomial with the larger polynomial
@@ -219,7 +219,7 @@ public class GaliosFieldTableOps {
 	/**
 	 * <p>Coefficients for largest powers are first, e.g. 2*x**3 + 8*x**2+1 = [2,8,0,1]</p>
 	 */
-	public void polyMult( GrowQueue_I8 polyA, GrowQueue_I8 polyB, GrowQueue_I8 output ) {
+	public void polyMult( DogArray_I8 polyA, DogArray_I8 polyB, DogArray_I8 output ) {
 
 		// Lots of room for efficiency improvements in this function
 		output.resize(polyA.size + polyB.size - 1);
@@ -234,7 +234,7 @@ public class GaliosFieldTableOps {
 		}
 	}
 
-	public void polyMult_flipA( GrowQueue_I8 polyA, GrowQueue_I8 polyB, GrowQueue_I8 output ) {
+	public void polyMult_flipA( DogArray_I8 polyA, DogArray_I8 polyB, DogArray_I8 output ) {
 
 		// Lots of room for efficiency improvements in this function
 		output.resize(polyA.size + polyB.size - 1);
@@ -250,11 +250,11 @@ public class GaliosFieldTableOps {
 	}
 
 	/**
-	 * Identical to {@link #polyMult(GrowQueue_I8, GrowQueue_I8, GrowQueue_I8)}
+	 * Identical to {@link #polyMult(DogArray_I8, DogArray_I8, DogArray_I8)}
 	 *
 	 * <p>Coefficients for smallest powers are first, e.g. 2*x**3 + 8*x**2+1 = [1,0,2,8]</p>
 	 */
-	public void polyMult_S( GrowQueue_I8 polyA, GrowQueue_I8 polyB, GrowQueue_I8 output ) {
+	public void polyMult_S( DogArray_I8 polyA, DogArray_I8 polyB, DogArray_I8 output ) {
 
 		// Lots of room for efficiency improvements in this function
 		output.resize(polyA.size + polyB.size - 1);
@@ -281,7 +281,7 @@ public class GaliosFieldTableOps {
 	 * @param x Value of x
 	 * @return Output of function
 	 */
-	public int polyEval( GrowQueue_I8 input, int x ) {
+	public int polyEval( DogArray_I8 input, int x ) {
 		int y = input.data[0] & 0xFF;
 
 		for (int i = 1; i < input.size; i++) {
@@ -303,7 +303,7 @@ public class GaliosFieldTableOps {
 	 * @param x Value of x
 	 * @return Output of function
 	 */
-	public int polyEval_S( GrowQueue_I8 input, int x ) {
+	public int polyEval_S( DogArray_I8 input, int x ) {
 		int y = input.data[input.size - 1] & 0xFF;
 
 		for (int i = input.size - 2; i >= 0; i--) {
@@ -321,7 +321,7 @@ public class GaliosFieldTableOps {
 	 * @param x Point it's being evaluated at
 	 * @return results
 	 */
-	public int polyEvalContinue( int previousOutput, GrowQueue_I8 part, int x ) {
+	public int polyEvalContinue( int previousOutput, DogArray_I8 part, int x ) {
 		int y = previousOutput;
 		for (int i = 0; i < part.size; i++) {
 			y = multiply(y, x) ^ (part.data[i] & 0xFF);
@@ -340,8 +340,8 @@ public class GaliosFieldTableOps {
 	 * @param quotient (Output) Division's quotient
 	 * @param remainder (Output) Divisions's remainder
 	 */
-	public void polyDivide( GrowQueue_I8 dividend, GrowQueue_I8 divisor,
-							GrowQueue_I8 quotient, GrowQueue_I8 remainder ) {
+	public void polyDivide( DogArray_I8 dividend, DogArray_I8 divisor,
+							DogArray_I8 quotient, DogArray_I8 remainder ) {
 
 		// handle special case
 		if (divisor.size > dividend.size) {
@@ -386,8 +386,8 @@ public class GaliosFieldTableOps {
 	 * @param quotient (Output) Division's quotient
 	 * @param remainder (Output) Divisions's remainder
 	 */
-	public void polyDivide_S( GrowQueue_I8 dividend, GrowQueue_I8 divisor,
-							  GrowQueue_I8 quotient, GrowQueue_I8 remainder ) {
+	public void polyDivide_S( DogArray_I8 dividend, DogArray_I8 divisor,
+							  DogArray_I8 quotient, DogArray_I8 remainder ) {
 
 		// handle special case
 		if (divisor.size > dividend.size) {

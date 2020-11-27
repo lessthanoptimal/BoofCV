@@ -26,7 +26,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
@@ -76,7 +76,7 @@ public class BenchmarkMedianFilter  {
 	}
 
 	public int timeHistogram_I8(int reps) {
-		GrowArray<GrowQueue_I32> work = new GrowArray<>(GrowQueue_I32::new);
+		GrowArray<DogArray_I32> work = new GrowArray<>(DogArray_I32::new);
 		for( int i = 0; i < reps; i++ )
 			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,radius,work);
 		return 0;

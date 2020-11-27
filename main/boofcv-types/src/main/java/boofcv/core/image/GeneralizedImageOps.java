@@ -23,10 +23,10 @@ import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
-import org.ddogleg.struct.GrowQueue_I64;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.DogArray_I64;
 import pabeles.concurrency.GrowArray;
 
 /**
@@ -254,14 +254,14 @@ import pabeles.concurrency.GrowArray;
 	public static GrowArray createGrowArray( ImageType<?> type ) {
 		if (type.getDataType().isInteger()) {
 			if (type.getDataType().getNumBits() < 64) {
-				return new GrowArray<>(GrowQueue_I32::new);
+				return new GrowArray<>(DogArray_I32::new);
 			} else {
-				return new GrowArray<>(GrowQueue_I64::new);
+				return new GrowArray<>(DogArray_I64::new);
 			}
 		} else if (type.getDataType().getNumBits() < 64) {
-			return new GrowArray<>(GrowQueue_F32::new);
+			return new GrowArray<>(DogArray_F32::new);
 		} else {
-			return new GrowArray<>(GrowQueue_F64::new);
+			return new GrowArray<>(DogArray_F64::new);
 		}
 	}
 

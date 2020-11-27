@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.struct.so.Rodrigues_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Used to estimate the stability of {@link BaseDetectFiducialSquare} fiducials.  Each corner point is disturbed by
@@ -46,7 +46,7 @@ public class StabilitySquareFiducialEstimate {
 	private final Se3_F64 difference = new Se3_F64();
 
 	// storage for all the samples
-	private final FastQueue<Se3_F64> samples = new FastQueue<>(Se3_F64::new);
+	private final DogArray<Se3_F64> samples = new DogArray<>(Se3_F64::new);
 
 	private final Rodrigues_F64 rodrigues = new Rodrigues_F64();
 

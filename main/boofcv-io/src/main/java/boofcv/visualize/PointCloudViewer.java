@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.visualize;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -70,7 +70,7 @@ public interface PointCloudViewer {
 
 	void addCloud( List<Point3D_F64> cloud );
 
-	void addCloud(GrowQueue_F32 cloudXYZ , GrowQueue_I32 colorRGB );
+	void addCloud(DogArray_F32 cloudXYZ , DogArray_I32 colorRGB );
 
 	/**
 	 * adds a single point to the point cloud. This method can be very slow compared to doing it in a batch
@@ -123,7 +123,7 @@ public interface PointCloudViewer {
 	 * @param copy Where the cloud should be copied into. if null a new instance is created
 	 * @return The copy
 	 */
-	FastQueue<Point3dRgbI_F64> copyCloud(@Nullable FastQueue<Point3dRgbI_F64> copy);
+	DogArray<Point3dRgbI_F64> copyCloud(@Nullable DogArray<Point3dRgbI_F64> copy);
 
 	/**
 	 * Returns a swing component for adding to a GUI

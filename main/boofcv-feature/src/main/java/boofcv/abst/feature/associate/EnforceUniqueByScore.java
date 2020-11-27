@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
@@ -88,12 +88,12 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedSource() {
+	public DogArray_I32 getUnassociatedSource() {
 		return unassociated.checkSource(uniqueByScore.getMatches(),numSource);
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedDestination() {
+	public DogArray_I32 getUnassociatedDestination() {
 		return unassociated.checkDestination(uniqueByScore.getMatches(), numDestination);
 	}
 

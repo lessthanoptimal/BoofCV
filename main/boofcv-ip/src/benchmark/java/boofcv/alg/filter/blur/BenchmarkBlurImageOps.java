@@ -22,8 +22,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -53,14 +53,14 @@ public class BenchmarkBlurImageOps {
 	private final GrayU8 inputU8 = new GrayU8(size, size);
 	private final GrayU8 outputU8 = new GrayU8(size, size);
 	private final GrayU8 storageU8 = new GrayU8(size, size);
-	private final GrowArray<GrowQueue_I32> workI32 = new GrowArray<>(GrowQueue_I32::new);
-	private final GrowArray<GrowQueue_I32> growArrayI32 = new GrowArray<>(GrowQueue_I32::new);
+	private final GrowArray<DogArray_I32> workI32 = new GrowArray<>(DogArray_I32::new);
+	private final GrowArray<DogArray_I32> growArrayI32 = new GrowArray<>(DogArray_I32::new);
 
 	private final GrayF32 inputF32 = new GrayF32(size, size);
 	private final GrayF32 outputF32 = new GrayF32(size, size);
 	private final GrayF32 storageF32 = new GrayF32(size, size);
-	private final GrowArray<GrowQueue_F32> workF32 = new GrowArray<>(GrowQueue_F32::new);
-	private final GrowArray<GrowQueue_F32> growArrayF32 = new GrowArray<>(GrowQueue_F32::new);
+	private final GrowArray<DogArray_F32> workF32 = new GrowArray<>(DogArray_F32::new);
+	private final GrowArray<DogArray_F32> growArrayF32 = new GrowArray<>(DogArray_F32::new);
 
 	@Setup
 	public void setup() {

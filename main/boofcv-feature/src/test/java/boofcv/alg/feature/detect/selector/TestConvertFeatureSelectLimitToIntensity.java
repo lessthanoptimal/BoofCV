@@ -21,9 +21,9 @@ package boofcv.alg.feature.detect.selector;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class TestConvertFeatureSelectLimitToIntensity extends BoofStandardJUnit {
 
 		FeatureSelectLimitIntensity<Point2D_I16> wrapped = new ConvertLimitToIntensity<>(dummy);
 
-		var detected = new FastQueue<>(Point2D_I16::new);
+		var detected = new DogArray<>(Point2D_I16::new);
 		var selected = new FastArray<>(Point2D_I16.class);
 
 		wrapped.select(intensity, -1, -1, true, null, detected, 100, selected);

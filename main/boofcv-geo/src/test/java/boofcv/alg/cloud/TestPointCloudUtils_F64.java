@@ -20,7 +20,7 @@ package boofcv.alg.cloud;
 
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -108,7 +108,7 @@ public class TestPointCloudUtils_F64 extends BoofStandardJUnit {
 	@Test
 	public void prune_color() {
 		List<Point3D_F64> list = new ArrayList<>();
-		GrowQueue_I32 rgb = new GrowQueue_I32();
+		DogArray_I32 rgb = new DogArray_I32();
 		for (int i = 0; i < 100; i++) {
 			list.add(new Point3D_F64(i*0.1, 0, 0));
 			rgb.add(i);

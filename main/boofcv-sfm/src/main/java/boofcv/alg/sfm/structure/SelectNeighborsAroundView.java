@@ -23,8 +23,8 @@ import boofcv.alg.sfm.structure.SceneWorkingGraph.View;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import org.ddogleg.sorting.QuickSort_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,12 +92,12 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	// Fast look up of candidates
 	Map<String, View> lookup = new HashMap<>();
 	// List of all edges with scores
-	FastQueue<EdgeScore> edges = new FastQueue<>(EdgeScore::new);
+	DogArray<EdgeScore> edges = new DogArray<>(EdgeScore::new);
 	// indicates if a view has been included in an inlier set
 	Set<String> hasFeatures = new HashSet<>();
 
 	// storage for the score of connected edges
-	GrowQueue_F64 connScores = new GrowQueue_F64();
+	DogArray_F64 connScores = new DogArray_F64();
 	QuickSort_F64 sorter = new QuickSort_F64();
 
 	/**

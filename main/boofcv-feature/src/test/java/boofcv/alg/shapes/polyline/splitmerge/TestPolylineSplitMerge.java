@@ -326,7 +326,7 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 		e.object.splitError0 = 0;
 		e.object.splitError1 = 0;
 
-		e = e.previous;
+		e = e.prev;
 		e.object.sideError = alg.computeSideError(contour,e.object.index,5);
 		e.object.splitable = true;
 		e.object.splitLocation = 24;

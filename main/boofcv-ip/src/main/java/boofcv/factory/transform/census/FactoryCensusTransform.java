@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Factory for creating different types of census transforms
@@ -55,7 +55,7 @@ public class FactoryCensusTransform {
 			case BLOCK_9_7: return blockDense(4,3, border, imageType);
 			case BLOCK_13_5: return blockDense(5,2, border, imageType);
 			case CIRCLE_9: {
-				FastQueue<Point2D_I32> points = CensusTransform.createCircleSamples();
+				DogArray<Point2D_I32> points = CensusTransform.createCircleSamples();
 				ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
 				return new FilterCensusTransformSampleS64(points,imageBorder, imageType);
 			}
@@ -82,7 +82,7 @@ public class FactoryCensusTransform {
 			case 2:
 				return new FilterCensusTransformD55S32(imageBorder, imageType);
 			case 3: {
-				FastQueue<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
+				DogArray<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
 				return new FilterCensusTransformSampleS64(points7x7,imageBorder, imageType);
 			}
 
@@ -93,7 +93,7 @@ public class FactoryCensusTransform {
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
 	FilterCensusTransform<In, Out> blockDense(int radiusX, int radiusY, boolean border, Class<In> imageType) {
 		ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
-		FastQueue<Point2D_I32> points = CensusTransform.createBlockSamples(radiusX,radiusY);
+		DogArray<Point2D_I32> points = CensusTransform.createBlockSamples(radiusX,radiusY);
 		return new FilterCensusTransformSampleS64(points,imageBorder, imageType);
 	}
 }

@@ -22,7 +22,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.RectangleLength2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 	public static final ConfigLength MINIMUM_LENGTH = ConfigLength.relative(0.01,0);
 	public static final ConfigLength MINIMUM_LENGTH_5X = ConfigLength.relative(0.05,0);
 
-	GrowQueue_I32 splits = new GrowQueue_I32();
+	DogArray_I32 splits = new DogArray_I32();
 	
 	/**
 	 * Tests contours with zero and one points in them
@@ -349,7 +349,7 @@ public class TestSplitMergeLineFitLoop extends BoofStandardJUnit {
 		return ret;
 	}
 
-	public static boolean matchSplitsToExpected(int[] expected, GrowQueue_I32 found) {
+	public static boolean matchSplitsToExpected(int[] expected, DogArray_I32 found) {
 		assertEquals(expected.length,found.size());
 
 		for (int i = 0; i < expected.length; i++) {

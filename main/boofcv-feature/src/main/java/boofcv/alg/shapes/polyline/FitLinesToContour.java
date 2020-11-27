@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,14 +60,14 @@ public class FitLinesToContour {
 	List<Point2D_I32> contour;
 
 	// storage for working space
-	FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64::new);
-	FastQueue<Point2D_F64> pointsFit = new FastQueue<>(Point2D_F64::new);
+	DogArray<LineGeneral2D_F64> lines = new DogArray<>(LineGeneral2D_F64::new);
+	DogArray<Point2D_F64> pointsFit = new DogArray<>(Point2D_F64::new);
 
 	private LinePolar2D_F64 linePolar = new LinePolar2D_F64();
 
 	private Point2D_F64 intersection = new Point2D_F64();
 
-	private GrowQueue_I32 workCorners = new GrowQueue_I32();
+	private DogArray_I32 workCorners = new DogArray_I32();
 
 	int anchor0;
 	int anchor1;
@@ -88,7 +88,7 @@ public class FitLinesToContour {
 	 * @param corners Initial location of the corners
 	 * @param output Optimized location of the corners
 	 */
-	public boolean fitAnchored( int anchor0 , int anchor1 , GrowQueue_I32 corners , GrowQueue_I32 output )
+	public boolean fitAnchored( int anchor0 , int anchor1 , DogArray_I32 corners , DogArray_I32 output )
 	{
 		this.anchor0 = anchor0;
 		this.anchor1 = anchor1;
@@ -134,7 +134,7 @@ public class FitLinesToContour {
 //	/**
 //	 * Throws an exception of two corners in a row are duplicates
 //	 */
-//	private void checkDuplicateCorner(GrowQueue_I32 corners) {
+//	private void checkDuplicateCorner(DogArray_I32 corners) {
 //		for (int i = 0; i < corners.size();) {
 //			int j = (i+1)%corners.size();
 //			int index0 = corners.get(i);
@@ -154,7 +154,7 @@ public class FitLinesToContour {
 	/**
 	 * All the corners should be in increasing order from the first anchor.
 	 */
-	boolean sanityCheckCornerOrder( int numLines, GrowQueue_I32 corners ) {
+	boolean sanityCheckCornerOrder( int numLines, DogArray_I32 corners ) {
 		int contourAnchor0 = corners.get(anchor0);
 		int previous = 0;
 		for (int i = 1; i < numLines; i++) {
@@ -170,11 +170,11 @@ public class FitLinesToContour {
 		return true;
 	}
 
-	GrowQueue_I32 skippedCorners = new GrowQueue_I32();
+	DogArray_I32 skippedCorners = new DogArray_I32();
 	/**
 	 * finds the intersection of a line and update the corner index
 	 */
-	boolean linesIntoCorners( int numLines, GrowQueue_I32 contourCorners ) {
+	boolean linesIntoCorners( int numLines, DogArray_I32 contourCorners ) {
 
 		skippedCorners.reset();
 
@@ -267,7 +267,7 @@ public class FitLinesToContour {
 	 *
 	 * @param numLines number of lines it will fit
 	 */
-	boolean fitLinesUsingCorners( int numLines , GrowQueue_I32 cornerIndexes) {
+	boolean fitLinesUsingCorners( int numLines , DogArray_I32 cornerIndexes) {
 		for (int i = 1; i <= numLines; i++) {
 			int index0 = cornerIndexes.get(CircularIndex.addOffset(anchor0, i - 1, cornerIndexes.size));
 			int index1 = cornerIndexes.get(CircularIndex.addOffset(anchor0, i, cornerIndexes.size));

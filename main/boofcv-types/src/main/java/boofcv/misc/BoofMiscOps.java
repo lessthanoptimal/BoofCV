@@ -109,8 +109,8 @@ public class BoofMiscOps {
 	 * Copies all of src into dst by appended it onto it
 	 */
 	public static <Point extends GeoTuple<Point>>
-	void copyAll( FastAccess<Point> src, FastQueue<Point> dst ) {
-		dst.growArray(dst.size + src.size);
+	void copyAll( FastAccess<Point> src, DogArray<Point> dst ) {
+		dst.reserve(dst.size + src.size);
 		for (int i = 0; i < src.size; i++) {
 			dst.grow().setTo(src.get(i));
 		}
@@ -644,45 +644,45 @@ public class BoofMiscOps {
 		return false;
 	}
 
-	public static boolean[] checkDeclare( @Nullable GrowQueue_B queue, int length, boolean zero ) {
+	public static boolean[] checkDeclare( @Nullable DogArray_B queue, int length, boolean zero ) {
 		if (queue==null)
-			queue = new GrowQueue_B(length);
+			queue = new DogArray_B(length);
 		queue.resize(length);
 		if (zero)
 			queue.fill(false);
 		return queue.data;
 	}
 
-	public static byte[] checkDeclare( @Nullable GrowQueue_I8 queue, int length, boolean zero ) {
+	public static byte[] checkDeclare( @Nullable DogArray_I8 queue, int length, boolean zero ) {
 		if (queue==null)
-			queue = new GrowQueue_I8(length);
+			queue = new DogArray_I8(length);
 		queue.resize(length);
 		if( zero )
 			queue.fill((byte)0);
 		return queue.data;
 	}
 
-	public static int[] checkDeclare( @Nullable GrowQueue_I32 queue, int length, boolean zero ) {
+	public static int[] checkDeclare( @Nullable DogArray_I32 queue, int length, boolean zero ) {
 		if (queue==null)
-			queue = new GrowQueue_I32(length);
+			queue = new DogArray_I32(length);
 		queue.resize(length);
 		if( zero )
 			queue.fill(0);
 		return queue.data;
 	}
 
-	public static float[] checkDeclare( @Nullable GrowQueue_F32 queue, int length, boolean zero ) {
+	public static float[] checkDeclare( @Nullable DogArray_F32 queue, int length, boolean zero ) {
 		if (queue==null)
-			queue = new GrowQueue_F32(length);
+			queue = new DogArray_F32(length);
 		queue.resize(length);
 		if( zero )
 			queue.fill(0.0f);
 		return queue.data;
 	}
 
-	public static double[] checkDeclare( @Nullable GrowQueue_F64 queue, int length, boolean zero ) {
+	public static double[] checkDeclare( @Nullable DogArray_F64 queue, int length, boolean zero ) {
 		if (queue==null)
-			queue = new GrowQueue_F64(length);
+			queue = new DogArray_F64(length);
 		queue.resize(length);
 		if( zero )
 			queue.fill(0.0);

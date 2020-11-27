@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +42,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		helper.render();
 
 		// find location of position patterns and create graph
-		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode::new);
+		DogArray<PositionPatternNode> pps = new DogArray<>(PositionPatternNode::new);
 
 		pps.grow().square = new Polygon2D_F64(4);
 		pps.grow().square = new Polygon2D_F64(4);
@@ -88,7 +88,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
-			FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+			DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
@@ -119,7 +119,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
-			FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+			DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
@@ -146,7 +146,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
-		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
@@ -172,7 +172,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
-		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
@@ -198,7 +198,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
-		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
@@ -245,7 +245,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		generator.renderData = false;
 		generator.render(expected);
 
-		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
+		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 
@@ -286,8 +286,8 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		}
 	}
 
-	private FastQueue<PositionPatternNode> createPositionPatterns( QrCodeGeneratorImage generator ) {
-		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode::new);
+	private DogArray<PositionPatternNode> createPositionPatterns( QrCodeGeneratorImage generator ) {
+		DogArray<PositionPatternNode> pps = new DogArray<>(PositionPatternNode::new);
 
 		pps.grow().square = generator.qr.ppCorner;
 		pps.grow().square = generator.qr.ppRight;

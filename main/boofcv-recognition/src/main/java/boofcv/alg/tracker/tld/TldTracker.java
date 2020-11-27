@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.Random;
 
@@ -77,7 +77,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	private ImageRectangle trackerRegion_I32 = new ImageRectangle();
 
 	// Region used inside detection cascade
-	private FastQueue<ImageRectangle> cascadeRegions = new FastQueue<>(ImageRectangle::new);
+	private DogArray<ImageRectangle> cascadeRegions = new DogArray<>(ImageRectangle::new);
 
 	// Image pyramid of input image
 	private PyramidDiscrete<T> imagePyramid;

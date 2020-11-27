@@ -40,7 +40,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -179,8 +179,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		long time0 = System.nanoTime();
 		final List<Point2D_F64> leftPts = new ArrayList<>();
 		final List<Point2D_F64> rightPts = new ArrayList<>();
-		FastQueue<TupleDesc> leftDesc = UtilFeature.createQueue(descriptor, 10);
-		FastQueue<TupleDesc> rightDesc = UtilFeature.createQueue(descriptor, 10);
+		DogArray<TupleDesc> leftDesc = UtilFeature.createQueue(descriptor, 10);
+		DogArray<TupleDesc> rightDesc = UtilFeature.createQueue(descriptor, 10);
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Associating Features",
@@ -223,7 +223,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		});
 	}
 
-	private void extractImageFeatures( Planar<T> color, T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs ) {
+	private void extractImageFeatures( Planar<T> color, T gray, DogArray<TupleDesc> descs, List<Point2D_F64> locs ) {
 		detector.detect(gray);
 		if (descriptor.getImageType().getFamily() == ImageType.Family.GRAY)
 			descriptor.setImage(gray);

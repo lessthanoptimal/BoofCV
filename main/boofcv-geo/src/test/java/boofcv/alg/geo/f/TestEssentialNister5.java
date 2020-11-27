@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.struct.geo.AssociatedPair;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +50,7 @@ public class TestEssentialNister5 extends EpipolarTestSimulation {
 			}
 
 			@Override
-			public void computeFundamental(List<AssociatedPair> pairs , FastQueue<DMatrixRMaj> solutions ) {
+			public void computeFundamental(List<AssociatedPair> pairs , DogArray<DMatrixRMaj> solutions ) {
 				assertTrue(alg.process(pairs,solutions));
 			}
 		};

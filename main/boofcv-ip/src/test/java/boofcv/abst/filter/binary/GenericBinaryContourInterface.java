@@ -23,7 +23,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -116,21 +116,21 @@ public abstract class GenericBinaryContourInterface extends BoofStandardJUnit {
 
 	void checkExternalSize(BinaryContourInterface alg , int which , int expected )
 	{
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> points = new DogArray<>(Point2D_I32::new);
 		alg.loadContour(alg.getContours().get(which).externalIndex,points);
 		assertEquals(expected,points.size);
 	}
 
 	void checkInternalSize(BinaryContourInterface alg , int blob, int which , int expected )
 	{
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> points = new DogArray<>(Point2D_I32::new);
 		alg.loadContour(alg.getContours().get(blob).internalIndexes.get(which),points);
 		assertEquals(expected,points.size);
 	}
 
 	static void printResults( BinaryContourInterface alg ) {
 		List<ContourPacked> contours = alg.getContours();
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> points = new DogArray<>(Point2D_I32::new);
 
 		int sizes[] = new int[contours.size()];
 
@@ -148,7 +148,7 @@ public abstract class GenericBinaryContourInterface extends BoofStandardJUnit {
 		List<ContourPacked> contours = alg.getContours();
 		assertEquals(expected.length, contours.size());
 
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> points = new DogArray<>(Point2D_I32::new);
 
 		boolean matched[] = new boolean[ expected.length ];
 

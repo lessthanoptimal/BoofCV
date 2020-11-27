@@ -23,10 +23,10 @@ import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.sorting.QuickSort_F32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,9 +51,9 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 	SampleIntensity<Point> sampler;
 
 	// Workspace variables for sorting the cells
-	final GrowQueue_F32 pointIntensity = new GrowQueue_F32();
+	final DogArray_F32 pointIntensity = new DogArray_F32();
 	final QuickSort_F32 sorter = new QuickSort_F32();
-	final GrowQueue_I32 indexes = new GrowQueue_I32();
+	final DogArray_I32 indexes = new DogArray_I32();
 	List<Point> workList = new ArrayList<>();
 
 	public FeatureSelectUniformBest( SampleIntensity<Point> sampler ) {this.sampler = sampler;}

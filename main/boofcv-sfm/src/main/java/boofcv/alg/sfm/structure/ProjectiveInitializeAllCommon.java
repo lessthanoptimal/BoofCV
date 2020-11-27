@@ -32,9 +32,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
@@ -73,13 +73,13 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	/**
 	 * List of feature indexes in the seed view that are the inliers from robust model matching.
 	 */
-	protected @Getter final GrowQueue_I32 inlierToSeed = new GrowQueue_I32();
+	protected @Getter final DogArray_I32 inlierToSeed = new DogArray_I32();
 	/**
 	 * List of feature indexes for connected views. Order is in `seedConnIdx` order. Each array of inliers points
 	 * to the same feature as each index in 'inlierToSeed'.
 	 */
-	protected @Getter final FastQueue<GrowQueue_I32> inlierIndexes =
-			new FastQueue<>(GrowQueue_I32::new, GrowQueue_I32::reset);
+	protected @Getter final DogArray<DogArray_I32> inlierIndexes =
+			new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
 	protected final FastArray<View> viewsByStructureIndex = new FastArray<>(View.class);
 
@@ -89,15 +89,15 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	//-------------- Internal workspace variables
 	protected final int[] selectedTriple = new int[2];
 	// triangulated 3D homogenous points in seed reference frame
-	protected final FastQueue<Point4D_F64> points3D = new FastQueue<>(Point4D_F64::new);
+	protected final DogArray<Point4D_F64> points3D = new DogArray<>(Point4D_F64::new);
 	// Associated pixel observations
-	protected final FastQueue<AssociatedPair> assocPixel = new FastQueue<>(AssociatedPair::new);
+	protected final DogArray<AssociatedPair> assocPixel = new DogArray<>(AssociatedPair::new);
 	protected final ImageDimension shape = new ImageDimension();
 	/**
 	 * lookup table from feature ID in seed view to structure index. There will only be 3D features for members
 	 * of the inlier set.
 	 */
-	protected final GrowQueue_I32 seedToStructure = new GrowQueue_I32();
+	protected final DogArray_I32 seedToStructure = new DogArray_I32();
 
 	/**
 	 * Computes a projective reconstruction. Reconstruction will be relative the 'seed' and only use features
@@ -110,7 +110,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @return true is successful or false if it failed
 	 */
 	public boolean projectiveSceneN( LookupSimilarImages db,
-									 View seed, GrowQueue_I32 seedFeatsIdx, GrowQueue_I32 seedConnIdx ) {
+									 View seed, DogArray_I32 seedFeatsIdx, DogArray_I32 seedConnIdx ) {
 		// Check preconditions. Exceptions are thrown since these are easily checked and shouldn't be ignored under
 		// the assumption that geometry was simply bad
 		checkTrue(seedFeatsIdx.size >= 6,
@@ -188,7 +188,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Initializes the bundle adjustment structure for all views not just the initial set of 3. The seed view is
 	 * view index=0. The other views are in order of `seedConnIdx` after that.
 	 */
-	private void initializeStructureForAllViews( LookupSimilarImages db, int numberOfFeatures, View seed, GrowQueue_I32 seedConnIdx ) {
+	private void initializeStructureForAllViews( LookupSimilarImages db, int numberOfFeatures, View seed, DogArray_I32 seedConnIdx ) {
 		utils.observations.initialize(1 + seedConnIdx.size);
 		utils.structure.initialize(1 + seedConnIdx.size, numberOfFeatures);
 		viewsByStructureIndex.resize(utils.structure.views.size, null);
@@ -260,7 +260,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param edgeIdxs (input) List of edges in seed it will consider
 	 * @param selected (output) Indexes of the two selected edges going out of `seed`
 	 */
-	boolean selectInitialTriplet( View seed, GrowQueue_I32 edgeIdxs, int[] selected ) {
+	boolean selectInitialTriplet( View seed, DogArray_I32 edgeIdxs, int[] selected ) {
 		BoofMiscOps.checkTrue(selected.length == 2);
 		double bestScore = 0; // zero is used for invalid triples
 		for (int i = 0; i < edgeIdxs.size; i++) {
@@ -308,7 +308,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 *
 	 * @return true if successful or false if not
 	 */
-	boolean findRemainingCameraMatrices( LookupSimilarImages db, View seed, GrowQueue_I32 seedConnIdx ) {
+	boolean findRemainingCameraMatrices( LookupSimilarImages db, View seed, DogArray_I32 seedConnIdx ) {
 		BoofMiscOps.checkTrue(inlierToSeed.size == utils.inliersThreeView.size());
 
 		// Look up the 3D coordinates of features from the scene's structure previously computed
@@ -375,7 +375,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param cameraMatrix (Output) resulting camera matrix
 	 * @return true if successful
 	 */
-	boolean computeCameraMatrix( View seed, Motion edge, FastQueue<Point2D_F64> featsB, DMatrixRMaj cameraMatrix ) {
+	boolean computeCameraMatrix( View seed, Motion edge, DogArray<Point2D_F64> featsB, DMatrixRMaj cameraMatrix ) {
 		BoofMiscOps.checkTrue(assocPixel.size == inlierToSeed.size);
 
 		// how to convert a feature in the seed to one in viewI
@@ -403,7 +403,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 *
 	 * @param seedConnIdx Which edges in seed to use
 	 */
-	protected void createObservationsForBundleAdjustment( GrowQueue_I32 seedConnIdx ) {
+	protected void createObservationsForBundleAdjustment( DogArray_I32 seedConnIdx ) {
 		// seed view + the motions
 		utils.observations.initialize(seedConnIdx.size + 1);
 		inlierIndexes.resize(seedConnIdx.size);
@@ -430,7 +430,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			BoofMiscOps.offsetPixels(utils.featsB.toList(), -utils.dimenB.width/2, -utils.dimenB.height/2);
 
 			// indicate which observation from this view contributed to which 3D feature
-			GrowQueue_I32 connInlierIndexes = inlierIndexes.get(motionIdx);
+			DogArray_I32 connInlierIndexes = inlierIndexes.get(motionIdx);
 			connInlierIndexes.resize(inlierToSeed.size);
 
 			for (int epipolarInlierIdx = 0; epipolarInlierIdx < m.inliers.size; epipolarInlierIdx++) {
@@ -456,9 +456,9 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param observations (Output) Found observations shifted to have (0,0) center
 	 */
 	public void lookupInfoForMetricElevation( List<String> viewIds,
-											  FastQueue<ImageDimension> dimensions,
-											  FastQueue<DMatrixRMaj> cameraMatrices,
-											  FastQueue<AssociatedTupleDN> observations ) {
+											  DogArray<ImageDimension> dimensions,
+											  DogArray<DMatrixRMaj> cameraMatrices,
+											  DogArray<AssociatedTupleDN> observations ) {
 		// Initialize all data structures to the correct size
 		final int numViews = utils.structure.views.size;
 		viewIds.clear();

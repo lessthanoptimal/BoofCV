@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -71,7 +71,7 @@ public class ExampleDetectBlackEllipse {
 			detector.process(input, binary);
 
 			// visualize results by drawing red polygons
-			FastQueue<BinaryEllipseDetector.EllipseInfo> found = detector.getFound();
+			DogArray<BinaryEllipseDetector.EllipseInfo> found = detector.getFound();
 			Graphics2D g2 = image.createGraphics();
 			g2.setStroke(new BasicStroke(3));
 			g2.setColor(Color.RED);

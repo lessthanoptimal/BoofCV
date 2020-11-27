@@ -30,7 +30,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,9 +47,9 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 
 	Point2D_F64 leftP = new Point2D_F64();
 	Point2D_F64 rightP = new Point2D_F64();
-	FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64::new);
-	FastQueue<Point2D_F64> pointsRight = new FastQueue<>(Point2D_F64::new);
-	FastQueue<TupleDesc_F64> descLeft, descRight;
+	DogArray<Point2D_F64> pointsLeft = new DogArray<>(Point2D_F64::new);
+	DogArray<Point2D_F64> pointsRight = new DogArray<>(Point2D_F64::new);
+	DogArray<TupleDesc_F64> descLeft, descRight;
 
 	ScoreAssociateEuclidean_F64 scorer = new ScoreAssociateEuclidean_F64();
 
@@ -65,8 +65,8 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 		param.left = new CameraPinholeBrown(400, 500, 0.1, 160, 120, 320, 240).fsetRadial(0, 0);
 		param.right = new CameraPinholeBrown(380, 505, 0.05, 165, 115, 320, 240).fsetRadial(0, 0);
 
-		descLeft = new FastQueue<>(() -> new TupleDesc_F64(10));
-		descRight = new FastQueue<>(() -> new TupleDesc_F64(10));
+		descLeft = new DogArray<>(() -> new TupleDesc_F64(10));
+		descRight = new DogArray<>(() -> new TupleDesc_F64(10));
 
 		pointsLeft.reset();
 		pointsRight.reset();
@@ -95,7 +95,7 @@ public class TestAssociateStereo2D extends BoofStandardJUnit {
 
 		alg.associate();
 
-		FastQueue<AssociatedIndex> matches = alg.getMatches();
+		DogArray<AssociatedIndex> matches = alg.getMatches();
 
 		assertEquals(1, matches.size);
 	}

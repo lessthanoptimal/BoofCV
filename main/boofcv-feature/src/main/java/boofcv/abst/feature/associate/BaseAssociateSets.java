@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,10 @@ package boofcv.abst.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Base class for set aware feature association
@@ -38,14 +38,14 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 	protected final Class<Desc> type;
 
 	// Stores sorted descriptors by sets
-	protected final FastQueue<SetStruct> sets;
+	protected final DogArray<SetStruct> sets;
 	// Number of source and destination descriptors added in all sets combined
 	protected int countSrc, countDst;
 
 	// Output data structures
-	protected final FastQueue<AssociatedIndex> matches;
-	protected final GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
-	protected final GrowQueue_I32 unassociatedDst = new GrowQueue_I32();
+	protected final DogArray<AssociatedIndex> matches;
+	protected final DogArray_I32 unassociatedSrc = new DogArray_I32();
+	protected final DogArray_I32 unassociatedDst = new DogArray_I32();
 
 	/**
 	 * Specifies the type of descriptor
@@ -57,8 +57,8 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 		this.type = type;
 
 		// Declare this now since type information is now known
-		this.matches = new FastQueue<>(AssociatedIndex::new);
-		this.sets = new FastQueue<>(this::newSetStruct, SetStruct::reset);
+		this.matches = new DogArray<>(AssociatedIndex::new);
+		this.sets = new DogArray<>(this::newSetStruct, SetStruct::reset);
 	}
 
 	protected SetStruct newSetStruct() {
@@ -122,13 +122,13 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 		}
 
 		// Copy unassociated indexes over and updated indexes to input indexes
-		GrowQueue_I32 setUnassociatedSrc = _associator.getUnassociatedSource();
+		DogArray_I32 setUnassociatedSrc = _associator.getUnassociatedSource();
 		before = unassociatedSrc.size;
 		unassociatedSrc.extend(before + setUnassociatedSrc.size);
 		for (int i = 0; i < setUnassociatedSrc.size; i++) {
 			unassociatedSrc.data[before + i] = set.indexSrc.data[setUnassociatedSrc.get(i)];
 		}
-		GrowQueue_I32 setUnassociatedDst = _associator.getUnassociatedDestination();
+		DogArray_I32 setUnassociatedDst = _associator.getUnassociatedDestination();
 		before = unassociatedDst.size;
 		unassociatedDst.extend(before + setUnassociatedDst.size);
 		for (int i = 0; i < setUnassociatedDst.size; i++) {
@@ -138,9 +138,9 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 
 	@Override public FastAccess<AssociatedIndex> getMatches() {return matches;}
 
-	@Override public GrowQueue_I32 getUnassociatedSource() {return unassociatedSrc;}
+	@Override public DogArray_I32 getUnassociatedSource() {return unassociatedSrc;}
 
-	@Override public GrowQueue_I32 getUnassociatedDestination() {return unassociatedDst;}
+	@Override public DogArray_I32 getUnassociatedDestination() {return unassociatedDst;}
 
 	@Override public void setMaxScoreThreshold( double score ) {_associator.setMaxScoreThreshold(score);}
 
@@ -159,8 +159,8 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 		public FastArray<Desc> dst = new FastArray<>(type);
 
 		// index of the descriptors in the input list
-		public GrowQueue_I32 indexSrc = new GrowQueue_I32();
-		public GrowQueue_I32 indexDst = new GrowQueue_I32();
+		public DogArray_I32 indexSrc = new DogArray_I32();
+		public DogArray_I32 indexDst = new DogArray_I32();
 
 		public void reset() {
 			src.reset();

@@ -64,9 +64,9 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
-				"import org.ddogleg.struct.GrowQueue_F32;\n" +
-				"import org.ddogleg.struct.GrowQueue_F64;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_F32;\n" +
+				"import org.ddogleg.struct.DogArray_F64;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"/**\n" +
@@ -108,7 +108,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 	}
 
 	private void vertical( String srcName , String dstName ) {
-		String workType = ("GrowQueue_"+src.getKernelType()).replace("S32","I32");
+		String workType = ("DogArray_"+src.getKernelType()).replace("S32","I32");
 		String suffix = src.getKernelType();
 		String normalized = src.isInteger() ? "" : " , true";
 
@@ -176,7 +176,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 	}
 
 	private void verticalBorder( String srcName, String dstName ) {
-		String workType = ("GrowQueue_"+src.getKernelType()).replace("S32","I32");
+		String workType = ("DogArray_"+src.getKernelType()).replace("S32","I32");
 		String suffix = src.getKernelType();
 		String normalized = src.isInteger() ? "" : " , true";
 		String divisor = src.isInteger() ? ", kernel.computeSum()" : "";

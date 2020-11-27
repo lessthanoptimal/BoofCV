@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.nn.alg.distance.KdTreeEuclideanSq_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -224,7 +224,7 @@ public class ExampleColorHistogramLookup {
 		// Use a generic NN search algorithm.  This uses Euclidean distance as a distance metric.
 		NearestNeighbor<double[]> nn = FactoryNearestNeighbor.exhaustive(new KdTreeEuclideanSq_F64(targetPoint.length));
 		NearestNeighbor.Search<double[]> search = nn.createSearch();
-		FastQueue<NnData<double[]>> results = new FastQueue(NnData::new);
+		DogArray<NnData<double[]>> results = new DogArray(NnData::new);
 
 		nn.setPoints(points, true);
 		search.findNearest(targetPoint, -1, 10, results);

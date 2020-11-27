@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +57,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	private FeatureToWordHistogram<Desc> featureToHistogram;
 
 	// storage for NN results
-	private FastQueue<NnData<HistogramScene>> resultsNN = new FastQueue(NnData::new);
+	private DogArray<NnData<HistogramScene>> resultsNN = new DogArray(NnData::new);
 
 	// number of neighbors it will consider
 	private int numNeighbors;

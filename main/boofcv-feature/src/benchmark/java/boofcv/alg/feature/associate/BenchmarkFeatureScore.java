@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.misc.Performer;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.*;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.Random;
 
@@ -44,14 +44,14 @@ public class BenchmarkFeatureScore {
 	static final int DOF_TUPLE = 64;
 	static final int DOF_BRIEF = 512;
 
-	static final FastQueue<TupleDesc_F64> listA = createSet();
-	static final FastQueue<TupleDesc_F64> listB = createSet();
+	static final DogArray<TupleDesc_F64> listA = createSet();
+	static final DogArray<TupleDesc_F64> listB = createSet();
 
-	static final FastQueue<TupleDesc_B> briefA = createBriefSet();
-	static final FastQueue<TupleDesc_B> briefB = createBriefSet();
+	static final DogArray<TupleDesc_B> briefA = createBriefSet();
+	static final DogArray<TupleDesc_B> briefB = createBriefSet();
 
-	static final FastQueue<NccFeature> nccA = createNccSet();
-	static final FastQueue<NccFeature> nccB = createNccSet();
+	static final DogArray<NccFeature> nccA = createNccSet();
+	static final DogArray<NccFeature> nccB = createNccSet();
 
 	public static class General implements Performer {
 
@@ -100,8 +100,8 @@ public class BenchmarkFeatureScore {
 		}
 	}
 
-	private static FastQueue<TupleDesc_F64> createSet() {
-		FastQueue<TupleDesc_F64> ret = new FastQueue<>(()->new TupleDesc_F64(DOF_TUPLE));
+	private static DogArray<TupleDesc_F64> createSet() {
+		DogArray<TupleDesc_F64> ret = new DogArray<>(()->new TupleDesc_F64(DOF_TUPLE));
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.grow();
@@ -112,8 +112,8 @@ public class BenchmarkFeatureScore {
 		return ret;
 	}
 
-	private static FastQueue<TupleDesc_B> createBriefSet() {
-		FastQueue<TupleDesc_B> ret = new BriefFeatureQueue(DOF_BRIEF);
+	private static DogArray<TupleDesc_B> createBriefSet() {
+		DogArray<TupleDesc_B> ret = new BriefFeatureQueue(DOF_BRIEF);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_B t = ret.grow();
@@ -124,8 +124,8 @@ public class BenchmarkFeatureScore {
 		return ret;
 	}
 
-	private static FastQueue<NccFeature> createNccSet() {
-		FastQueue<NccFeature> ret = new NccFeatureQueue(DOF_TUPLE);
+	private static DogArray<NccFeature> createNccSet() {
+		DogArray<NccFeature> ret = new NccFeatureQueue(DOF_TUPLE);
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			NccFeature t = ret.grow();

@@ -24,8 +24,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareIdenticalFunctions;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -57,8 +57,8 @@ class TestImplCensusTransformInner_MT extends CompareIdenticalFunctions {
 			parameters[1] = GeneralizedImageOps.createSingleBand(types[1],width,height);
 		} else if( candidate.getName().startsWith("sample") ) {
 			int r = 3;
-			FastQueue<Point2D_I32> samples = createSamples(r);
-			GrowQueue_I32 indexes = samplesToIndexes((ImageGray)parameters[0],samples);
+			DogArray<Point2D_I32> samples = createSamples(r);
+			DogArray_I32 indexes = samplesToIndexes((ImageGray)parameters[0],samples);
 			parameters[1] = r;
 			parameters[2] = indexes;
 			parameters[3] = GeneralizedImageOps.createImage(types[3],width,height,1);

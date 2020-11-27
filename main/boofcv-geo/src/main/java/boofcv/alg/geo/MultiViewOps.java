@@ -49,8 +49,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ddogleg.struct.Tuple3;
 import org.ejml.UtilEjml;
@@ -1196,7 +1196,7 @@ public class MultiViewOps {
 	public static void errorsHomographySymm( List<AssociatedPair> observations,
 											 DMatrixRMaj H,
 											 @Nullable DMatrixRMaj H_inv,
-											 GrowQueue_F64 storage ) {
+											 DogArray_F64 storage ) {
 		storage.reset();
 		if (H_inv == null)
 			H_inv = new DMatrixRMaj(3, 3);
@@ -1658,7 +1658,7 @@ public class MultiViewOps {
 			list_p_to_n.add(p2n);
 		}
 
-		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> normObs = new DogArray<>(Point2D_F64::new);
 		normObs.resize(3);
 
 		final boolean homogenous = structure.isHomogenous();
@@ -1769,7 +1769,7 @@ public class MultiViewOps {
 		return dst;
 	}
 
-	public static void convertTr( List<AssociatedTriple> src, FastQueue<AssociatedTuple> dst ) {
+	public static void convertTr( List<AssociatedTriple> src, DogArray<AssociatedTuple> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;
@@ -1785,7 +1785,7 @@ public class MultiViewOps {
 	}
 
 	public static void convertTr( List<AssociatedTriple> src, int idx0, int idx1,
-								  FastQueue<AssociatedPair> dst ) {
+								  DogArray<AssociatedPair> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;
@@ -1799,7 +1799,7 @@ public class MultiViewOps {
 	}
 
 	public static void convertTu( List<AssociatedTuple> src, int idx0, int idx1,
-								  FastQueue<AssociatedPair> dst ) {
+								  DogArray<AssociatedPair> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;

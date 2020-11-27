@@ -38,7 +38,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -101,12 +101,12 @@ public class BinaryEllipseDetectorPixel {
 
 	private PrintStream verbose = null;
 
-	private FastQueue<Point2D_F64> pointsF = new FastQueue<>(Point2D_F64::new);
+	private DogArray<Point2D_F64> pointsF = new DogArray<>(Point2D_F64::new);
 
-	private FastQueue<Found> found = new FastQueue<>(Found::new);
+	private DogArray<Found> found = new DogArray<>(Found::new);
 
 	// temporary storage for a contour
-	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32::new);
+	private DogArray<Point2D_I32> contourTmp = new DogArray<>(Point2D_I32::new);
 
 	public BinaryEllipseDetectorPixel( ConnectRule connectRule ) {
 		this.connectRule = connectRule;
@@ -240,7 +240,7 @@ public class BinaryEllipseDetectorPixel {
 	 * @param external The external contour
 	 * @param pointsF Output of converted points
 	 */
-	void undistortContour( List<Point2D_I32> external, FastQueue<Point2D_F64> pointsF ) {
+	void undistortContour( List<Point2D_I32> external, DogArray<Point2D_F64> pointsF ) {
 		for (int j = 0; j < external.size(); j++) {
 			Point2D_I32 p = external.get(j);
 
@@ -290,7 +290,7 @@ public class BinaryEllipseDetectorPixel {
 		return getContourFinder().getContours();
 	}
 
-	public void loadContour( int id, FastQueue<Point2D_I32> storage ) {
+	public void loadContour( int id, DogArray<Point2D_I32> storage ) {
 		getContourFinder().loadContour(id, storage);
 	}
 

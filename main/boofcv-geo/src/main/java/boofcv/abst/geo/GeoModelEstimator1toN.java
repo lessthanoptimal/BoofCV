@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.geo;
 
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class GeoModelEstimator1toN<Model,Point> implements GeoModelEstimatorN<Mo
 	}
 
 	@Override
-	public boolean process(List<Point> points, FastQueue<Model> estimatedModels) {
+	public boolean process(List<Point> points, DogArray<Model> estimatedModels) {
 		estimatedModels.reset();
 
 		Model m = estimatedModels.grow();

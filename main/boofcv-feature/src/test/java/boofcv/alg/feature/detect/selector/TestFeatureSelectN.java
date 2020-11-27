@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect.selector;
 
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +40,7 @@ class TestFeatureSelectN extends ChecksFeatureSelectLimit.I16 {
 	 */
 	@Test
 	void checkOrder() {
-		FastQueue<Point2D_I16> detected = createRandom(15);
+		DogArray<Point2D_I16> detected = createRandom(15);
 
 		var found = new FastArray<>(Point2D_I16.class);
 		FeatureSelectN<Point2D_I16> alg = createAlgorithm();

@@ -24,7 +24,7 @@ import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,7 @@ class TestDisparityToColorPointCloud extends BoofStandardJUnit {
 			}
 		};
 
-		var output = new FastQueue<>(Point3dRgbI_F64::new);
+		var output = new DogArray<>(Point3dRgbI_F64::new);
 		alg.process(disparity,color,PointCloudWriter.wrapF64RGB(output));
 
 		assertEquals(width*height,output.size);

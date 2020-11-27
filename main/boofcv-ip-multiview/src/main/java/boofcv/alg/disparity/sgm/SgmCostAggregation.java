@@ -22,7 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.Planar;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
@@ -89,7 +89,7 @@ public class SgmCostAggregation {
 	int penalty1 = 200, penalty2 = 2000;
 
 	// Book keeping for concurrency
-	FastQueue<Trajectory> trajectories = new FastQueue<>(Trajectory.class, Trajectory::new);
+	DogArray<Trajectory> trajectories = new DogArray<>(Trajectory.class, Trajectory::new);
 	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 

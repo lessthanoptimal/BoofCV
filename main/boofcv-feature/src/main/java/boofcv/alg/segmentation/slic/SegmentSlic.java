@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Stoppable;
 
 import java.util.Arrays;
@@ -92,9 +92,9 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	// Initial segmentation before connectivity is enforced
 	private GrayS32 initialSegments = new GrayS32(1,1);
 	// number of members in each region
-	private GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+	private DogArray_I32 regionMemberCount = new DogArray_I32();
 	// color of each region
-	private FastQueue<float[]> regionColor;
+	private DogArray<float[]> regionColor;
 	// merges smaller regions into larger ones
 	private MergeSmallRegions<T> mergeSmall;
 
@@ -102,8 +102,8 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	protected ClusterLabeledImage segment;
 
 	// storage for clusters and pixel information
-	protected FastQueue<Cluster> clusters;
-	protected FastQueue<Pixel> pixels = new FastQueue<>(Pixel::new);
+	protected DogArray<Cluster> clusters;
+	protected DogArray<Pixel> pixels = new DogArray<>(Pixel::new);
 
 	// type of input image
 	protected ImageType<T> imageType;
@@ -128,7 +128,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 		this.regionColor = new ColorQueue_F32(numBands);
 
 		// custom declaration for pixel color
-		clusters = new FastQueue<>(Cluster.class, () -> {
+		clusters = new DogArray<>(Cluster.class, () -> {
 			Cluster c = new Cluster();
 			c.color = new float[ SegmentSlic.this.numBands ];
 			return c;
@@ -340,8 +340,8 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	 * Selects which region each pixel belongs to based on which cluster it is the closest to
 	 */
 	public void assignLabelsToPixels( GrayS32 pixelToRegions ,
-									  GrowQueue_I32 regionMemberCount ,
-									  FastQueue<float[]> regionColor ) {
+									  DogArray_I32 regionMemberCount ,
+									  DogArray<float[]> regionColor ) {
 
 		regionColor.reset();
 		for( int i = 0; i < clusters.size(); i++ ) {
@@ -385,11 +385,11 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 		}
 	}
 
-	public GrowQueue_I32 getRegionMemberCount() {
+	public DogArray_I32 getRegionMemberCount() {
 		return regionMemberCount;
 	}
 
-	public FastQueue<Cluster> getClusters() {
+	public DogArray<Cluster> getClusters() {
 		return clusters;
 	}
 
@@ -399,7 +399,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	public static class Pixel
 	{
 		// list of clusters it is interacting with
-		public FastQueue<ClusterDistance> clusters = new FastQueue<>(12, ClusterDistance::new);
+		public DogArray<ClusterDistance> clusters = new DogArray<>(12, ClusterDistance::new);
 
 		public void add( Cluster c , float distance ) {
 			// make sure it isn't already full.  THis should almost never happen

@@ -62,10 +62,10 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -102,9 +102,9 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 	StereoParameters stereoParameters;
 
 	//-------------- Control lock on features
-	final FastQueue<FeatureInfo> features = new FastQueue<>(FeatureInfo::new);
-	final FastQueue<Se3_F64> egoMotion_cam_to_world = new FastQueue<>(Se3_F64::new); // estimated ego motion
-	final GrowQueue_I32 visibleTracks = new GrowQueue_I32(); // index of tracks visible in current frame in 'features'
+	final DogArray<FeatureInfo> features = new DogArray<>(FeatureInfo::new);
+	final DogArray<Se3_F64> egoMotion_cam_to_world = new DogArray<>(Se3_F64::new); // estimated ego motion
+	final DogArray_I32 visibleTracks = new DogArray_I32(); // index of tracks visible in current frame in 'features'
 	final TLongIntMap trackId_to_arrayIdx = new TLongIntHashMap(); // track ID to array Index
 	volatile long latestFrameID; // the frame ID after processing the most recent image
 	//-------------- END lock
@@ -753,7 +753,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 					return;
 
 				// Adaptive colorize depths based on distribution in current frame
-				var depths = new GrowQueue_F64();
+				var depths = new DogArray_F64();
 				long maxAge = Long.MAX_VALUE;
 				depths.reset();
 				for (int i = 0; i < visibleTracks.size; i++) {
@@ -823,7 +823,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 
 	class PointCloudPanel extends JPanel {
 		PointCloudViewer gui = VisualizeData.createPointCloudViewer();
-		FastQueue<Point3D_F64> vertexes = new FastQueue<>(Point3D_F64::new);
+		DogArray<Point3D_F64> vertexes = new DogArray<>(Point3D_F64::new);
 
 		public PointCloudPanel() {
 			super(new BorderLayout());

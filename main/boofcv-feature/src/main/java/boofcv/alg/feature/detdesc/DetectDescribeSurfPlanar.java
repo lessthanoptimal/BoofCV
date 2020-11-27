@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 
 import java.util.List;
 
@@ -53,11 +53,11 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 
 
 	// storage for computed features
-	protected FastQueue<TupleDesc_F64> descriptions;
+	protected DogArray<TupleDesc_F64> descriptions;
 	// detected scale points
 	protected List<ScalePoint> foundPoints;
 	// orientation of features
-	protected GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
+	protected DogArray_F64 featureAngles = new DogArray_F64(10);
 
 	public DetectDescribeSurfPlanar(FastHessianFeatureDetector<II> detector,
 									OrientationIntegral<II> orientation,
@@ -67,7 +67,7 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 		this.orientation = orientation;
 		this.describe = describe;
 
-		descriptions = new FastQueue<>(()->new TupleDesc_F64(describe.getDescriptorLength()));
+		descriptions = new DogArray<>(()->new TupleDesc_F64(describe.getDescriptorLength()));
 	}
 
 	public TupleDesc_F64 createDescription() {

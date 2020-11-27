@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.geo.GeometricResult;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.Matrix3x3_F64;
 import georegression.struct.homography.Homography2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.dense.row.SingularOps_DDRM;
@@ -80,14 +80,14 @@ public class SelfCalibrationLinearRotationMulti {
 	Matrix3x3_F64 K = new Matrix3x3_F64();
 	Matrix3x3_F64 tmp = new Matrix3x3_F64();
 
-	GrowQueue_I32 notZeros = new GrowQueue_I32();
+	DogArray_I32 notZeros = new DogArray_I32();
 
 	// storage for null vector
 	DMatrixRMaj nv = new DMatrixRMaj(1,1);
 
-	FastQueue<Homography2D_F64> listHInv = new FastQueue<>(Homography2D_F64::new);
+	DogArray<Homography2D_F64> listHInv = new DogArray<>(Homography2D_F64::new);
 
-	FastQueue<CameraPinhole> calibration = new FastQueue<>(CameraPinhole::new);
+	DogArray<CameraPinhole> calibration = new DogArray<>(CameraPinhole::new);
 
 	/**
 	 * Specifies linear constraints
@@ -299,7 +299,7 @@ public class SelfCalibrationLinearRotationMulti {
 		return true;
 	}
 
-	public FastQueue<CameraPinhole> getFound() {
+	public DogArray<CameraPinhole> getFound() {
 		return calibration;
 	}
 }

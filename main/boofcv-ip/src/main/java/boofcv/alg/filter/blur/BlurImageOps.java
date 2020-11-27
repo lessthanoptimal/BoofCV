@@ -34,9 +34,9 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -63,7 +63,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius,
-							  @Nullable GrayU8 storage, @Nullable GrowArray<GrowQueue_I32> workVert ) {
+							  @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -78,7 +78,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 mean( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
-							  @Nullable GrayU8 storage, @Nullable GrowArray<GrowQueue_I32> workVert ) {
+							  @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -108,7 +108,7 @@ public class BlurImageOps {
 	 */
 	public static GrayU8 meanB( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_S32<GrayU8> binput,
-							  @Nullable GrayU8 storage, @Nullable GrowArray<GrowQueue_I32> workVert ) {
+							  @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -232,7 +232,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU16 mean(GrayU16 input, @Nullable GrayU16 output, int radius,
-							  @Nullable GrayU16 storage, @Nullable GrowArray<GrowQueue_I32> workVert ) {
+							  @Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -247,7 +247,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU16 mean( GrayU16 input, @Nullable GrayU16 output, int radiusX, int radiusY,
-							  @Nullable GrayU16 storage, @Nullable GrowArray<GrowQueue_I32> workVert ) {
+							  @Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -277,7 +277,7 @@ public class BlurImageOps {
 	 */
 	public static GrayU16 meanB( GrayU16 input, @Nullable GrayU16 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_S32<GrayU16> binput,
-							  @Nullable GrayU16 storage, @Nullable GrowArray<GrowQueue_I32> workVert ) {
+							  @Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -401,7 +401,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 mean(GrayF32 input, @Nullable GrayF32 output, int radius,
-							  @Nullable GrayF32 storage, @Nullable GrowArray<GrowQueue_F32> workVert ) {
+							  @Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -416,7 +416,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 mean( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
-							  @Nullable GrayF32 storage, @Nullable GrowArray<GrowQueue_F32> workVert ) {
+							  @Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -446,7 +446,7 @@ public class BlurImageOps {
 	 */
 	public static GrayF32 meanB( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_F32 binput,
-							  @Nullable GrayF32 storage, @Nullable GrowArray<GrowQueue_F32> workVert ) {
+							  @Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -570,7 +570,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF64 mean(GrayF64 input, @Nullable GrayF64 output, int radius,
-							  @Nullable GrayF64 storage, @Nullable GrowArray<GrowQueue_F64> workVert ) {
+							  @Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -585,7 +585,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF64 mean( GrayF64 input, @Nullable GrayF64 output, int radiusX, int radiusY,
-							  @Nullable GrayF64 storage, @Nullable GrowArray<GrowQueue_F64> workVert ) {
+							  @Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -615,7 +615,7 @@ public class BlurImageOps {
 	 */
 	public static GrayF64 meanB( GrayF64 input, @Nullable GrayF64 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_F64 binput,
-							  @Nullable GrayF64 storage, @Nullable GrowArray<GrowQueue_F64> workVert ) {
+							  @Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -855,14 +855,14 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 median( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
-								 @Nullable GrowArray<GrowQueue_I32> work ) {
+								 @Nullable GrowArray<DogArray_I32> work ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMedian(input, output, radiusX, radiusY);
 
 		if (!processed) {
-			work = BoofMiscOps.checkDeclare(work, GrowQueue_I32::new);
+			work = BoofMiscOps.checkDeclare(work, DogArray_I32::new);
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplMedianHistogramInner_MT.process(input, output, radiusX, radiusY, work);
 			} else {
@@ -886,7 +886,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 median( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
-								 @Nullable GrowArray<GrowQueue_F32> work ) {
+								 @Nullable GrowArray<DogArray_F32> work ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 

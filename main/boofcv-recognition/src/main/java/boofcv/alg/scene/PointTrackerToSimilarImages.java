@@ -25,7 +25,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import gnu.trove.map.hash.TLongIntHashMap;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,18 +56,18 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	public int searchRadius = 5;
 
 	/** Stores observations and track ID for every frame */
-	public final FastQueue<Frame> frames = new FastQueue<>(Frame::new, Frame::reset);
+	public final DogArray<Frame> frames = new DogArray<>(Frame::new, Frame::reset);
 	/** Quick way to retrieve a frame based on its ID */
 	public final Map<String, Frame> frameMap = new HashMap<>();
 	/**  List of all matches between frames */
-	public final FastQueue<Matches> matches = new FastQueue<>(Matches::new, Matches::reset);
+	public final DogArray<Matches> matches = new DogArray<>(Matches::new, Matches::reset);
 
 	// shape of images
 	public int imageWidth, imageHeight;
 
 	//------------------- Internal Workspace ------------------------------------
 	List<PointTrack> tracks = new ArrayList<>();
-	FastQueue<AssociatedIndex> pairs = new FastQueue<>(AssociatedIndex::new);
+	DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
 
 	/**
 	 * Resets all data structures and saves the image size. Must be called before other functions
@@ -184,7 +184,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	}
 
 	@Override
-	public void lookupPixelFeats(String target, FastQueue<Point2D_F64> features) {
+	public void lookupPixelFeats(String target, DogArray<Point2D_F64> features) {
 		features.reset();
 		Frame f = frameMap.get(target);
 		checkTrue(f != null, "Unknown image");
@@ -196,7 +196,7 @@ public class PointTrackerToSimilarImages implements LookupSimilarImages {
 	}
 
 	@Override
-	public boolean lookupMatches(String viewA, String viewB, FastQueue<AssociatedIndex> pairs) {
+	public boolean lookupMatches(String viewA, String viewB, DogArray<AssociatedIndex> pairs) {
 		// clear the set of pairs so that if it fails it will be empty
 		pairs.reset();
 

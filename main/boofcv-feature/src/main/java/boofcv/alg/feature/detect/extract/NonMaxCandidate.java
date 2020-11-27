@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -62,7 +62,7 @@ public class NonMaxCandidate {
 	public void process( GrayF32 intensityImage,
 						 @Nullable ListIntPoint2D candidatesMin,
 						 @Nullable ListIntPoint2D candidatesMax,
-						 FastQueue<Point2D_I16> foundMin, FastQueue<Point2D_I16> foundMax ) {
+						 DogArray<Point2D_I16> foundMin, DogArray<Point2D_I16> foundMax ) {
 
 		this.input = intensityImage;
 
@@ -82,7 +82,7 @@ public class NonMaxCandidate {
 		}
 	}
 
-	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, FastQueue<Point2D_I16> found ) {
+	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;
 
@@ -108,7 +108,7 @@ public class NonMaxCandidate {
 		}
 	}
 
-	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, FastQueue<Point2D_I16> found ) {
+	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;
 

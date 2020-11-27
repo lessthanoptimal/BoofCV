@@ -21,9 +21,9 @@ package boofcv.alg.tracker.tld;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,22 +45,22 @@ public class TldDetection<T extends ImageGray<T>> {
 	private TldVarianceFilter<T> variance;
 
 	// Storage for results of the fern test on individual regions
-	protected FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<>(TldRegionFernInfo::new);
+	protected DogArray<TldRegionFernInfo> fernInfo = new DogArray<>(TldRegionFernInfo::new);
 
 	protected ConfigTld config;
 
 	// Storage for sorting of results
-	private GrowQueue_F64 storageMetric = new GrowQueue_F64();
-	private GrowQueue_I32 storageIndexes = new GrowQueue_I32();
+	private DogArray_F64 storageMetric = new DogArray_F64();
+	private DogArray_I32 storageIndexes = new DogArray_I32();
 	private List<ImageRectangle> storageRect = new ArrayList<>();
 
 	// storage for regions which pass the fern test
 	protected List<ImageRectangle> fernRegions = new ArrayList<>();
 
 	// list all regions which had the template test run on them
-	protected FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion::new);
+	protected DogArray<TldRegion> candidateDetections = new DogArray<>(TldRegion::new);
 	// results from non-maximum suppression
-	private FastQueue<TldRegion> localMaximums = new FastQueue<>(TldRegion::new);
+	private DogArray<TldRegion> localMaximums = new DogArray<>(TldRegion::new);
 
 	// list of regions which have almost the same confidence as the maximum
 	private List<ImageRectangle> ambiguousRegions = new ArrayList<>();
@@ -92,7 +92,7 @@ public class TldDetection<T extends ImageGray<T>> {
 	/**
 	 * Detects the object inside the image.  Eliminates candidate regions using a cascade of tests
 	 */
-	protected void detectionCascade( FastQueue<ImageRectangle> cascadeRegions ) {
+	protected void detectionCascade( DogArray<ImageRectangle> cascadeRegions ) {
 
 		// initialize data structures
 		success = false;
@@ -262,7 +262,7 @@ public class TldDetection<T extends ImageGray<T>> {
 		return nonmax;
 	}
 
-	public GrowQueue_F64 getStorageMetric() {
+	public DogArray_F64 getStorageMetric() {
 		return storageMetric;
 	}
 
@@ -270,11 +270,11 @@ public class TldDetection<T extends ImageGray<T>> {
 		return storageRect;
 	}
 
-	public FastQueue<TldRegion> getCandidateDetections() {
+	public DogArray<TldRegion> getCandidateDetections() {
 		return candidateDetections;
 	}
 
-	public FastQueue<TldRegion> getLocalMaximums() {
+	public DogArray<TldRegion> getLocalMaximums() {
 		return localMaximums;
 	}
 
@@ -282,7 +282,7 @@ public class TldDetection<T extends ImageGray<T>> {
 		return ambiguousRegions;
 	}
 
-	public FastQueue<TldRegionFernInfo> getFernInfo() {
+	public DogArray<TldRegionFernInfo> getFernInfo() {
 		return fernInfo;
 	}
 

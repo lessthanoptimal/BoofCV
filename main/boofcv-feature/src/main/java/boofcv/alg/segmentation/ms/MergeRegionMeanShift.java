@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.struct.image.GrayS32;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Merges together regions which have modes close to each other and have a similar color.
@@ -63,9 +63,9 @@ public class MergeRegionMeanShift extends RegionMergeTree
 	 * @param modeLocation (Input) Location of each region's mode. Not modified.
 	 */
 	public void process( GrayS32 pixelToRegion ,
-						 GrowQueue_I32 regionMemberCount,
-						 FastQueue<float[]> regionColor ,
-						 FastQueue<Point2D_I32> modeLocation ) {
+						 DogArray_I32 regionMemberCount,
+						 DogArray<float[]> regionColor ,
+						 DogArray<Point2D_I32> modeLocation ) {
 		stopRequested = false;
 		initializeMerge(regionMemberCount.size);
 
@@ -81,8 +81,8 @@ public class MergeRegionMeanShift extends RegionMergeTree
 	 * is also within the local area its color is checked to see if it's similar enough.  If the color is similar
 	 * enough then the two regions are marked for merger.
 	 */
-	protected void markMergeRegions(FastQueue<float[]> regionColor,
-									FastQueue<Point2D_I32> modeLocation,
+	protected void markMergeRegions(DogArray<float[]> regionColor,
+									DogArray<Point2D_I32> modeLocation,
 									GrayS32 pixelToRegion  ) {
 		for( int targetId = 0; targetId < modeLocation.size &&!stopRequested; targetId++ ) {
 

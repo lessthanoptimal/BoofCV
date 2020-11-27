@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe.llah;
 
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class LlahDocument {
 	/**
 	 * 2D locations of landmarks in the document's plane
 	 */
-	public FastQueue<Point2D_F64> landmarks = new FastQueue<>(Point2D_F64::new);
+	public DogArray<Point2D_F64> landmarks = new DogArray<>(Point2D_F64::new);
 	/**
 	 * Description of LLAH features in the document
 	 */

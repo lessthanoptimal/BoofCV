@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
 
@@ -38,19 +38,19 @@ import java.util.List;
  */
 public class UtilFeature {
 	/**
-	 * Creates a FastQueue and declares new instances of the descriptor using the provided
+	 * Creates a DogArray and declares new instances of the descriptor using the provided
 	 * {@link DetectDescribePoint}.  The queue will have declareInstance set to true, otherwise
 	 * why would you be using this function?
 	 */
 	public static <TD extends TupleDesc>
-	FastQueue<TD> createQueue(final DescriptorInfo<TD> detDesc , int initialMax ) {
-		FastQueue<TD> ret = new FastQueue<>(detDesc::createDescription);
-		ret.growArray(initialMax);
+	DogArray<TD> createQueue(final DescriptorInfo<TD> detDesc , int initialMax ) {
+		DogArray<TD> ret = new DogArray<>(detDesc::createDescription);
+		ret.reserve(initialMax);
 		return ret;
 	}
 
-	public static FastQueue<TupleDesc_F64> createQueueF64( final int length ) {
-		return new FastQueue<>(()->new TupleDesc_F64(length));
+	public static DogArray<TupleDesc_F64> createQueueF64( final int length ) {
+		return new DogArray<>(()->new TupleDesc_F64(length));
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class UtilFeature {
 	 * @param association (Output) association algorithm which is having its source configured
 	 */
 	public static <TD extends TupleDesc>
-	void setSource(FastAccess<TD> descriptors , GrowQueue_I32 sets , AssociateDescriptionSets<TD> association )
+	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionSets<TD> association )
 	{
 		assert(descriptors.size==sets.size);
 
@@ -160,7 +160,7 @@ public class UtilFeature {
 	 * @param association (Output) association algorithm which is having its destination configured
 	 */
 	public static <TD extends TupleDesc>
-	void setDestination(FastAccess<TD> descriptors , GrowQueue_I32 sets , AssociateDescriptionSets<TD> association )
+	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionSets<TD> association )
 	{
 		assert(descriptors.size==sets.size);
 
@@ -179,7 +179,7 @@ public class UtilFeature {
 	 * @param association (Output) association algorithm which is having its source configured
 	 */
 	public static <TD extends TupleDesc>
-	void setSource(FastAccess<TD> descriptors , GrowQueue_I32 sets , FastAccess<Point2D_F64> locs,
+	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , FastAccess<Point2D_F64> locs,
 				   AssociateDescriptionSets2D<TD> association )
 	{
 		assert(descriptors.size==sets.size);
@@ -201,7 +201,7 @@ public class UtilFeature {
 	 * @param association (Output) association algorithm which is having its destination configured
 	 */
 	public static <TD extends TupleDesc>
-	void setDestination(FastAccess<TD> descriptors , GrowQueue_I32 sets , FastAccess<Point2D_F64> locs,
+	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , FastAccess<Point2D_F64> locs,
 						AssociateDescriptionSets2D<TD> association )
 	{
 		assert(descriptors.size==sets.size);

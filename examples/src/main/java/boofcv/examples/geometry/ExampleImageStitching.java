@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.examples.geometry;
-
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
@@ -51,8 +50,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -89,9 +88,9 @@ public class ExampleImageStitching {
 	{
 		// get the length of the description
 		List<Point2D_F64> pointsA = new ArrayList<>();
-		FastQueue<FD> descA = UtilFeature.createQueue(detDesc,100);
+		DogArray<FD> descA = UtilFeature.createQueue(detDesc,100);
 		List<Point2D_F64> pointsB = new ArrayList<>();
-		FastQueue<FD> descB = UtilFeature.createQueue(detDesc,100);
+		DogArray<FD> descB = UtilFeature.createQueue(detDesc,100);
 
 		// extract feature locations and descriptions from each image
 		describeImage(imageA, detDesc, pointsA, descA);
@@ -130,7 +129,7 @@ public class ExampleImageStitching {
 	void describeImage(T image,
 					   DetectDescribePoint<T,FD> detDesc,
 					   List<Point2D_F64> points,
-					   FastQueue<FD> listDescs) {
+					   DogArray<FD> listDescs) {
 		detDesc.detect(image);
 
 		listDescs.reset();

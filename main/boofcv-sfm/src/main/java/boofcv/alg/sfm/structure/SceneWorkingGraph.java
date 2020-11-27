@@ -24,9 +24,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -152,7 +152,7 @@ public class SceneWorkingGraph {
 		public final FastArray<PairwiseImageGraph.View> views = new FastArray<>(PairwiseImageGraph.View.class);
 		// indexes of observations for each view listed in 'views'.  obs[view][idx] will refer to the same feature
 		// for all 'idx'
-		public final FastQueue<GrowQueue_I32> observations = new FastQueue<>(GrowQueue_I32::new, GrowQueue_I32::reset);
+		public final DogArray<DogArray_I32> observations = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
 		public boolean isEmpty() { return observations.size == 0; }
 

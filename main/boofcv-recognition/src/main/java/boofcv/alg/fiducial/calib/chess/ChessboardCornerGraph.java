@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.core.graph.FeatureGraph2D;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class ChessboardCornerGraph {
 
-	public FastQueue<Node> corners = new FastQueue<>(Node::new);
+	public DogArray<Node> corners = new DogArray<>(Node::new);
 
 	/**
 	 * Convert into a generic graph.

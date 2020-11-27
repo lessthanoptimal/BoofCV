@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,7 @@ public class SelectTracksInFrameForBundleAdjustment {
 		}
 
 		// skip degenerate situation
-		FastQueue<BFrame> frames = sba.frames;
+		DogArray<BFrame> frames = sba.frames;
 		if (frames.size < 1)
 			return;
 
