@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestFuseDisparityImages extends BoofStandardJUnit {
+public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 
 	// Standard disparity parameters. Most test use the same for convenience
 	CameraPinhole intrinsic = new CameraPinhole(40, 41, 0, 42.1, 40.6, 80, 82);
@@ -43,7 +43,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 
 	/** Test everything all together with a simple problem */
 	@Test void simpleAll() {
-		var alg = new FuseDisparityImages();
+		var alg = new MultiBaselineDisparityMedian();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
 		intrinsic.width = 100;
@@ -88,13 +88,13 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 	 * warping between the two images are handled correctly.
 	 */
 	@Test void addToFusedImage() {
-		var alg = new FuseDisparityImages();
+		var alg = new MultiBaselineDisparityMedian();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
 		alg.initialize(intrinsic, distort);
 		alg.fusedBaseline = parameters.baseline;
 
-		var image = new FuseDisparityImages.DisparityImage();
+		var image = new MultiBaselineDisparityMedian.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height - 12);
 		ImageMiscOps.fill(image.disparity, 5);
 		image.mask.reshape(image.disparity);
@@ -124,13 +124,13 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 		// make the images smaller for slightly faster processing since size doesn't matter
 		intrinsic.fsetShape(10, 12);
 
-		var alg = new FuseDisparityImages();
+		var alg = new MultiBaselineDisparityMedian();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(1, 0, 0, 1, 0, 0);
 		alg.initialize(intrinsic, distort);
 		alg.fusedBaseline = parameters.baseline;
 
-		var image = new FuseDisparityImages.DisparityImage();
+		var image = new MultiBaselineDisparityMedian.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height);
 		image.mask.reshape(image.disparity);
 		image.parameters.setTo(parameters);
@@ -154,7 +154,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 	 * Given an already constructed fused image, compute the disparity image output.
 	 */
 	@Test void computeFused() {
-		var alg = new FuseDisparityImages();
+		var alg = new MultiBaselineDisparityMedian();
 		intrinsic.width = 10;
 		intrinsic.height = 8;
 		alg.initialize(intrinsic, new DoNothingPixelTransform_F64());
@@ -213,11 +213,11 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 
 		var param2 = new DisparityParameters(5, 100, 500*baselineScale, intrinsic2);
 
-		var alg = new FuseDisparityImages();
+		var alg = new MultiBaselineDisparityMedian();
 		alg.initialize(intrinsic, new DoNothingPixelTransform_F64());
 		alg.fusedBaseline = 500; // keep the baseline the same, yes this should be checked too but isn't here
 
-		var image = new FuseDisparityImages.DisparityImage();
+		var image = new MultiBaselineDisparityMedian.DisparityImage();
 		image.disparity.reshape(width, height);
 		ImageMiscOps.fill(image.disparity, imageValue);
 		image.mask.reshape(image.disparity);
@@ -244,7 +244,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 	 */
 	@Test void computeDynamicParameters() {
 		float fx = 800.0f; // an arbitrary focal length
-		var alg = new FuseDisparityImages();
+		var alg = new MultiBaselineDisparityMedian();
 		var disparity = new GrayF32(40, 30);
 
 		//  Give it a max value more than the fixed range of 100

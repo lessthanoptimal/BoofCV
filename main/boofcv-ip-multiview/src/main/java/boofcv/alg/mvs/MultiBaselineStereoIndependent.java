@@ -42,18 +42,30 @@ import java.util.Set;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Given a set of distorted images with their known extrinsic and intrinsic parameters, compute a fused disparity
- * image. Each pair of images has it's own disparity image computed independently of all the others. This set
- * of disparity images are then fused together using {@link FuseDisparityImages}.
+ * <p>Solution for the Multi Baseline Stereo (MBS) problem which uses independently computed stereo
+ * disparity images [1] with one common "center" image. Internally it calls another algorithm
+ * to decide how to fuse the different options into a single disparity image. The output disparity image
+ * is in the original image's pixel coordinates and not a rectified image.
+ * </p>
  *
- * Inside the code the stereo pairs often refer to a left and right camera. That is just a convention. The target
- * camera, which is common to all pairs, is referenced as the left camera and all the others as the right camera.
- * If the "right" camera is really to the left, above, below, ... etc, the rectified view will be flipped and/or
- * rotated to force the left/right convention during disparity computation.
+ * Steps:
+ * <ol>
+ *     <li>Input: The scene (view locations, camera parameters), image references, center image, and stereo pairs</li>
+ *     <li>For each paired image:</li>
+ *     <ol>
+ *         <li>Rectify</li>
+ *         <li>Compute the disparity</li>
+ *         <li>Pass to MBS disparity algorithm</li>
+ *     </ol>
+ *     <li>Compute single disparity image for output</li>
+ * </ol>
+ *
+ * <p>[1] There is no citation since this wasn't based on any specific paper but created out of a need to reuse
+ * existing stereo code based on a high level description of MVS pipeline.</p>
  *
  * @author Peter Abeles
  */
-public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implements VerbosePrint {
+public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> implements VerbosePrint {
 
 	/** Provides access to intermediate stereo results */
 	private @Getter @Setter @Nullable Listener<Image> listener;
@@ -75,7 +87,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	// Storage for stereo disparity results
 	final StereoResults results = new StereoResults();
 	// Fuses multiple disparity images together provided they have the same "left" view
-	final FuseDisparityImages performFusion = new FuseDisparityImages();
+	final MultiBaselineDisparityMedian performFusion = new MultiBaselineDisparityMedian();
 
 	// Storage for the original images in the stereo pair
 	Image image1, image2;
@@ -96,12 +108,12 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	// Where verbose stdout is printed to
 	@Nullable PrintStream verbose = null;
 
-	public MultiViewToFusedDisparity( LookUpImages lookUpImages, ImageType<Image> imageType ) {
+	public MultiBaselineStereoIndependent( LookUpImages lookUpImages, ImageType<Image> imageType ) {
 		this(imageType);
 		this.lookUpImages = lookUpImages;
 	}
 
-	public MultiViewToFusedDisparity( ImageType<Image> imageType ) {
+	public MultiBaselineStereoIndependent( ImageType<Image> imageType ) {
 		this.rectified1 = imageType.createImage(1, 1);
 		this.rectified2 = imageType.createImage(1, 1);
 		this.image1 = imageType.createImage(1, 1);

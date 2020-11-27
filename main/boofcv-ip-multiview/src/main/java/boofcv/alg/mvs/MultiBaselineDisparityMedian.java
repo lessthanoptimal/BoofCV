@@ -39,14 +39,15 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 /**
  * Given a set of disparity images, all of which were computed from the same left image, fuse into a single
  * disparity image which should have better fill in and lower noise. The output disparity image will be in
- * the original image's pixel coordinate and will not be a rectified image.
+ * the original image's pixel coordinate and will not be a rectified image. The disparity for each pixel
+ * is selected using a median filter.
  *
  * The fused disparity image will always have a disparityMin of 0 and disparityRange of 100.
  * The baseline is computed dynamically to ensure that max value
  *
  * @author Peter Abeles
  */
-public class FuseDisparityImages {
+public class MultiBaselineDisparityMedian {
 
 	// Disparity parameters for fused view
 	@Getter final CameraPinhole fusedIntrinsic = new CameraPinhole();
