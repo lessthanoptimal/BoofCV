@@ -19,6 +19,7 @@
 package boofcv.alg.filter.misc;
 
 import boofcv.BoofTesting;
+import boofcv.alg.filter.misc.impl.ImplAverageDownSample;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
@@ -31,6 +32,7 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestAverageDownSampleOps extends BoofStandardJUnit {
 
 	/**
@@ -38,8 +40,8 @@ public class TestAverageDownSampleOps extends BoofStandardJUnit {
 	 */
 	@Test
 	public void down_2inputs() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		Class input[] = new Class[]{GrayU8.class, GrayU16.class,GrayF32.class, GrayF64.class};
-		Class middle[] = new Class[]{GrayF32.class, GrayF32.class,GrayF32.class, GrayF64.class};
+		Class[] input = new Class[]{GrayU8.class, GrayU16.class,GrayF32.class, GrayF64.class};
+		Class[] middle = new Class[]{GrayF32.class, GrayF32.class,GrayF32.class, GrayF64.class};
 
 		for (int i = 0; i < input.length; i++) {
 			ImageGray in = GeneralizedImageOps.createSingleBand(input[i],17,14);

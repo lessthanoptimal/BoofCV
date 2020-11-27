@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter.misc.impl;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
@@ -33,12 +33,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplAverageDownSample extends BoofStandardJUnit {
 
 	public static List<Method> find( String name ) {
 		List<Method> ret = new ArrayList<>();
 
-		Method methods[] = ImplAverageDownSample.class.getMethods();
+		Method[] methods = ImplAverageDownSample.class.getMethods();
 
 		for( Method m : methods ) {
 			if( m.getName().equals(name) ) {
@@ -183,7 +184,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 			fillVertical(src);
 			m.invoke(null,src,dst);
 
-			double expected[];
+			double[] expected;
 			if( dst.getDataType().isInteger() ) {
 				expected = new double[]{1,3,5};
 			} else {
@@ -216,7 +217,7 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 			fillVertical(src);
 			m.invoke(null,src,dst);
 
-			double expected[];
+			double[] expected;
 			if( dst.getDataType().isInteger() ) {
 				expected = new double[]{1,3,5,7};
 			} else {
