@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.f;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.QueueMatrix;
 import georegression.geometry.GeometryMath_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
@@ -39,9 +39,9 @@ public abstract class CommonFundamentalChecks extends EpipolarTestSimulation {
 
 	double zeroTol = 1e-8;
 
-	FastQueue<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
+	DogArray<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 
-	public abstract void computeFundamental(List<AssociatedPair> pairs , FastQueue<DMatrixRMaj> solutions );
+	public abstract void computeFundamental(List<AssociatedPair> pairs , DogArray<DMatrixRMaj> solutions );
 
 
 	public void checkEpipolarMatrix(int N, boolean isFundamental) {

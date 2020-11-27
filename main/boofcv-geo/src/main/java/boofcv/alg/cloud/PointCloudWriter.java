@@ -22,9 +22,9 @@ import boofcv.struct.Point3dRgbI_F32;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Interface for reading a point cloud
@@ -40,8 +40,8 @@ public interface PointCloudWriter {
 
 	class CloudArraysF32 implements PointCloudWriter {
 		// Storage for point cloud
-		public GrowQueue_F32 cloudXyz = new GrowQueue_F32();
-		public GrowQueue_I32 cloudRgb = new GrowQueue_I32();
+		public DogArray_F32 cloudXyz = new DogArray_F32();
+		public DogArray_I32 cloudRgb = new DogArray_I32();
 
 		@Override
 		public void init( int estimatedSize ) {
@@ -67,11 +67,11 @@ public interface PointCloudWriter {
 		}
 	}
 
-	static PointCloudWriter wrapF32( FastQueue<Point3D_F32> cloud ) {
+	static PointCloudWriter wrapF32( DogArray<Point3D_F32> cloud ) {
 		return new PointCloudWriter() {
 			@Override
 			public void init( int estimatedSize ) {
-				cloud.growArray(estimatedSize);
+				cloud.reserve(estimatedSize);
 				cloud.reset();
 			}
 
@@ -87,11 +87,11 @@ public interface PointCloudWriter {
 		};
 	}
 
-	static PointCloudWriter wrapF64( FastQueue<Point3D_F64> cloud ) {
+	static PointCloudWriter wrapF64( DogArray<Point3D_F64> cloud ) {
 		return new PointCloudWriter() {
 			@Override
 			public void init( int estimatedSize ) {
-				cloud.growArray(estimatedSize);
+				cloud.reserve(estimatedSize);
 				cloud.reset();
 			}
 
@@ -107,11 +107,11 @@ public interface PointCloudWriter {
 		};
 	}
 
-	static PointCloudWriter wrapF32RGB( FastQueue<Point3dRgbI_F32> cloud ) {
+	static PointCloudWriter wrapF32RGB( DogArray<Point3dRgbI_F32> cloud ) {
 		return new PointCloudWriter() {
 			@Override
 			public void init( int estimatedSize ) {
-				cloud.growArray(estimatedSize);
+				cloud.reserve(estimatedSize);
 				cloud.reset();
 			}
 
@@ -127,11 +127,11 @@ public interface PointCloudWriter {
 		};
 	}
 
-	static PointCloudWriter wrapF64RGB( FastQueue<Point3dRgbI_F64> cloud ) {
+	static PointCloudWriter wrapF64RGB( DogArray<Point3dRgbI_F64> cloud ) {
 		return new PointCloudWriter() {
 			@Override
 			public void init( int estimatedSize ) {
-				cloud.growArray(estimatedSize);
+				cloud.reserve(estimatedSize);
 				cloud.reset();
 			}
 

@@ -23,7 +23,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -78,7 +78,7 @@ class TestGCensusTransform extends CompareIdenticalFunctions {
 			parameters[1] = GeneralizedImageOps.createSingleBand(types[1], width, height);
 		} else if (candidate.getName().startsWith("sample")) {
 			int r = 3;
-			FastQueue<Point2D_I32> samples = createSamples(r);
+			DogArray<Point2D_I32> samples = createSamples(r);
 			parameters[1] = samples;
 			parameters[2] = GeneralizedImageOps.createImage(types[2], width, height, 1);
 			parameters[3] = null; // really should provide a border function

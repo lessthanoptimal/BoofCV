@@ -47,7 +47,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 
 import java.util.ArrayList;
@@ -323,7 +323,7 @@ public class SimulatePlanarWorld {
 		double height3D;
 
 		// 3D point of corners in camera frame
-		FastQueue<Point3D_F64> rect3D = new FastQueue<>(Point3D_F64::new);
+		DogArray<Point3D_F64> rect3D = new DogArray<>(Point3D_F64::new);
 		// 2D point of corners in surface frame
 		Polygon2D_F64 rect2D = new Polygon2D_F64();
 		// bounding box of visible region in pixels

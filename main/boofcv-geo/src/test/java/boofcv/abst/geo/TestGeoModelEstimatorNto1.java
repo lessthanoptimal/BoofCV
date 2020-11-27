@@ -25,7 +25,7 @@ import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.RandomMatrices_DDRM;
@@ -104,7 +104,7 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 		EssentialNister5 nister = new EssentialNister5();
 
 
-		FastQueue<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
+		DogArray<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 		assertTrue(nister.process(obs,solutions));
 
 		return solutions.get(0);
@@ -128,7 +128,7 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 		}
 
 		@Override
-		public boolean process(List<AssociatedPair> points , FastQueue<DMatrixRMaj> solutions ) {
+		public boolean process(List<AssociatedPair> points , DogArray<DMatrixRMaj> solutions ) {
 			assertEquals(3, points.size());
 
 			solutions.reset();

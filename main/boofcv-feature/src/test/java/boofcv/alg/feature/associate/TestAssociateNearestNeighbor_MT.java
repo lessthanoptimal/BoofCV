@@ -24,7 +24,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestAssociateNearestNeighbor_MT extends BoofStandardJUnit {
 	@Test
 	void compare() {
-		FastQueue<TupleDesc_F64> dataSrc = TestAssociateGreedyDesc_MT.createData(200);
-		FastQueue<TupleDesc_F64> dataDst = TestAssociateGreedyDesc_MT.createData(200);
+		DogArray<TupleDesc_F64> dataSrc = TestAssociateGreedyDesc_MT.createData(200);
+		DogArray<TupleDesc_F64> dataDst = TestAssociateGreedyDesc_MT.createData(200);
 
 		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
 
@@ -50,8 +50,8 @@ class TestAssociateNearestNeighbor_MT extends BoofStandardJUnit {
 		sequentialAlg.associate();
 		parallelAlg.associate();
 
-		FastQueue<AssociatedIndex> matches0 = sequentialAlg.getMatches();
-		FastQueue<AssociatedIndex> matches1 = parallelAlg.getMatches();
+		DogArray<AssociatedIndex> matches0 = sequentialAlg.getMatches();
+		DogArray<AssociatedIndex> matches1 = parallelAlg.getMatches();
 
 		assertEquals(matches0.size,matches1.size);
 

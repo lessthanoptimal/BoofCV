@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Base calss for dense HOG implementations.
@@ -41,10 +41,10 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	protected GrayF32 derivY = new GrayF32(1, 1);
 
 	// Storage for descriptors
-	FastQueue<TupleDesc_F64> descriptions;
+	DogArray<TupleDesc_F64> descriptions;
 
 	// Location of each descriptor in the image, top-left corner (lower extents)
-	FastQueue<Point2D_I32> locations = new FastQueue<>(Point2D_I32::new);
+	DogArray<Point2D_I32> locations = new DogArray<>(Point2D_I32::new);
 
 	int orientationBins; // number of orientation bins computed in a block
 	int pixelsPerCell; // number of pixels wide a cell is
@@ -83,7 +83,7 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 
 		final int descriptorLength = orientationBins*cellsPerBlockX*cellsPerBlockY;
 
-		descriptions = new FastQueue<>(() -> new TupleDesc_F64(descriptorLength));
+		descriptions = new DogArray<>(() -> new TupleDesc_F64(descriptorLength));
 	}
 
 	/**
@@ -130,14 +130,14 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	/**
 	 * List of locations for each descriptor.
 	 */
-	public FastQueue<Point2D_I32> getLocations() {
+	public DogArray<Point2D_I32> getLocations() {
 		return locations;
 	}
 
 	/**
 	 * List of descriptors
 	 */
-	public FastQueue<TupleDesc_F64> getDescriptions() {
+	public DogArray<TupleDesc_F64> getDescriptions() {
 		return descriptions;
 	}
 

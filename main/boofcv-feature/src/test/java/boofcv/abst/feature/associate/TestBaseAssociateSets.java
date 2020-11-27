@@ -22,9 +22,9 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,13 +61,13 @@ class TestBaseAssociateSets extends BoofStandardJUnit {
 		public boolean uniqueSrc;
 		public boolean uniqueDst;
 		public FastAccess<AssociatedIndex> matches = new FastArray<>(AssociatedIndex.class);
-		public GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
-		public GrowQueue_I32 unassociatedDst = new GrowQueue_I32();
+		public DogArray_I32 unassociatedSrc = new DogArray_I32();
+		public DogArray_I32 unassociatedDst = new DogArray_I32();
 
 		@Override public void associate() {calledAssociate++;}
 		@Override public FastAccess<AssociatedIndex> getMatches() {return matches;}
-		@Override public GrowQueue_I32 getUnassociatedSource() {return unassociatedSrc;}
-		@Override public GrowQueue_I32 getUnassociatedDestination() {return unassociatedDst;}
+		@Override public DogArray_I32 getUnassociatedSource() {return unassociatedSrc;}
+		@Override public DogArray_I32 getUnassociatedDestination() {return unassociatedDst;}
 		@Override public void setMaxScoreThreshold(double score) {this.maxScore = score;}
 		@Override public MatchScoreType getScoreType() {return MatchScoreType.NORM_ERROR;}
 		@Override public boolean uniqueSource() {return uniqueSrc;}

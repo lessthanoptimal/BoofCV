@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
 
 
 /**
@@ -40,10 +40,10 @@ public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
 	AssociateGreedyBase2D<D> alg;
 
 	// Found matches
-	FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
+	DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 
 	// indexes of unassociated features
-	GrowQueue_I32 unassocSrc = new GrowQueue_I32();
+	DogArray_I32 unassocSrc = new DogArray_I32();
 	// creates a list of unassociated features from the list of matches
 	FindUnassociated unassociated = new FindUnassociated();
 
@@ -73,8 +73,8 @@ public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
 		unassocSrc.reset();
 		alg.associate();
 
-		GrowQueue_I32 pairs = alg.getPairs();
-		GrowQueue_F64 score = alg.getFitQuality();
+		DogArray_I32 pairs = alg.getPairs();
+		DogArray_F64 score = alg.getFitQuality();
 
 		matches.reset();
 		for (int i = 0; i < pairs.size; i++) {
@@ -84,9 +84,9 @@ public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
 		}
 	}
 
-	@Override public FastQueue<AssociatedIndex> getMatches() {return matches;}
-	@Override public GrowQueue_I32 getUnassociatedSource() {return unassocSrc;}
-	@Override public GrowQueue_I32 getUnassociatedDestination() { return unassociated.checkDestination(matches, sizeDst); }
+	@Override public DogArray<AssociatedIndex> getMatches() {return matches;}
+	@Override public DogArray_I32 getUnassociatedSource() {return unassocSrc;}
+	@Override public DogArray_I32 getUnassociatedDestination() { return unassociated.checkDestination(matches, sizeDst); }
 	@Override public void setMaxScoreThreshold(double score) {alg.setMaxFitError(score);}
 	@Override public MatchScoreType getScoreType() {return alg.getScore().getScoreType();}
 	@Override public boolean uniqueSource() {return true;}

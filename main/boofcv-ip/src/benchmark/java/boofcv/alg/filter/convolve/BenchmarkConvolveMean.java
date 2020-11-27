@@ -30,8 +30,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
@@ -50,12 +50,12 @@ public class BenchmarkConvolveMean {
 	static private final GrayF32 input_F32 = new GrayF32(width,height);
 	static private final GrayF32 out_F32 = new GrayF32(width,height);
 	static private final GrayF32 storageF32 = new GrayF32(width,height);
-	static private final GrowArray<GrowQueue_F32> workF32 = new GrowArray<>(GrowQueue_F32::new);
+	static private final GrowArray<DogArray_F32> workF32 = new GrowArray<>(DogArray_F32::new);
 	static private Kernel1D_S32 kernelI32;
 	static private final GrayU8 input_I8 = new GrayU8(width,height);
 	static private final GrayS16 input_I16 = new GrayS16(width,height);
 	static private final GrayU8 out_I8 = new GrayU8(width,height);
-	static private final GrowArray<GrowQueue_I32> workI32 = new GrowArray<>(GrowQueue_I32::new);
+	static private final GrowArray<DogArray_I32> workI32 = new GrowArray<>(DogArray_I32::new);
 
 	static private BlurFilter<GrayF32> filter;
 

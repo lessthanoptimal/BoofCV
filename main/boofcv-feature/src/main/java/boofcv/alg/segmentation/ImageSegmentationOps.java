@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.Arrays;
 
@@ -82,7 +82,7 @@ public class ImageSegmentationOps {
 	 * @param segmentId List of segment ID's.  See comment above about what ID's are acceptable.
 	 * @param output The new image after it has been compacted
 	 */
-	public static void regionPixelId_to_Compact(GrayS32 graph, GrowQueue_I32 segmentId, GrayS32 output) {
+	public static void regionPixelId_to_Compact(GrayS32 graph, DogArray_I32 segmentId, GrayS32 output) {
 
 		InputSanityCheck.checkSameShape(graph,output);
 

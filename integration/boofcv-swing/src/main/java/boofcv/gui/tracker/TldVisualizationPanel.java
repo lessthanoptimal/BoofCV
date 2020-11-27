@@ -23,7 +23,7 @@ import boofcv.alg.tracker.tld.TldRegion;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.struct.ImageRectangle;
 import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +45,7 @@ public class TldVisualizationPanel extends JPanel implements MouseListener {
 	ImageRectangle selected = new ImageRectangle();
 	boolean hasSelected = false;
 
-	FastQueue<TldRegion> detections = new FastQueue<>(TldRegion::new);
+	DogArray<TldRegion> detections = new DogArray<>(TldRegion::new);
 
 	TldTemplatePanel positivePanel = new TldTemplatePanel(15);
 	TldTemplatePanel negativePanel = new TldTemplatePanel(15);
@@ -106,7 +106,7 @@ public class TldVisualizationPanel extends JPanel implements MouseListener {
 		repaint();
 	}
 
-	private void addDetections( FastQueue<TldRegion> detections ) {
+	private void addDetections( DogArray<TldRegion> detections ) {
 		this.detections.reset();
 		for (TldRegion r : detections.toList()) {
 			TldRegion a = this.detections.grow();

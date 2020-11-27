@@ -27,7 +27,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -71,13 +71,13 @@ class TestBinaryContourFinderLinearExternal extends GenericBinaryContourFinder
 			chang.process(binary.clone(),labeled);
 			alg.process(binary);
 
-			FastQueue<ContourPacked> expected = chang.getContours();
+			DogArray<ContourPacked> expected = chang.getContours();
 			List<ContourPacked> found = alg.getContours();
 
 			assertEquals(expected.size, found.size());
 
-			FastQueue<Point2D_I32> contourExpected = new FastQueue<>(Point2D_I32::new);
-			FastQueue<Point2D_I32> contourFound = new FastQueue<>(Point2D_I32::new);
+			DogArray<Point2D_I32> contourExpected = new DogArray<>(Point2D_I32::new);
+			DogArray<Point2D_I32> contourFound = new DogArray<>(Point2D_I32::new);
 			for (int i = 0; i < expected.size; i++ ) {
 				chang.getPackedPoints().getSet(expected.get(i).externalIndex,contourExpected);
 				boolean matched = false;

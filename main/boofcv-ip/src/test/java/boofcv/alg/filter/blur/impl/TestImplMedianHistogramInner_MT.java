@@ -22,7 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 import pabeles.concurrency.GrowArray;
 
@@ -43,7 +43,7 @@ public class TestImplMedianHistogramInner_MT extends BoofStandardJUnit {
 	}
 
 	public void compareToSingle(GrayU8 image, GrayU8 found, GrayU8 expected) {
-		GrowArray<GrowQueue_I32> work = new GrowArray<>(GrowQueue_I32::new);
+		GrowArray<DogArray_I32> work = new GrowArray<>(DogArray_I32::new);
 
 		for (int radiusX = 1; radiusX <= 3; radiusX++) {
 			int radiusY = radiusX+1;

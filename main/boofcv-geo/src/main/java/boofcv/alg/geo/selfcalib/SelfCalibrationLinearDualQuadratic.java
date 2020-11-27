@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.calib.CameraPinhole;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
@@ -82,7 +82,7 @@ public class SelfCalibrationLinearDualQuadratic extends SelfCalibrationBase {
 	double aspectRatio;
 
 	// Found calibration parameters
-	FastQueue<Intrinsic> solutions = new FastQueue<>(Intrinsic::new);
+	DogArray<Intrinsic> solutions = new DogArray<>(Intrinsic::new);
 
 	// The dual absolute quadratic
 	DMatrix4x4 Q = new DMatrix4x4();

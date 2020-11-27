@@ -19,7 +19,7 @@
 package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.PerspectiveOps;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrix4x4;
@@ -47,7 +47,7 @@ import java.util.List;
 public class SelfCalibrationBase {
 
 	// 3x4 camera matrices
-	FastQueue<Projective> cameras = new FastQueue<>(Projective::new);
+	DogArray<Projective> cameras = new DogArray<>(Projective::new);
 
 	// Minimum number of projective views/camera matrices to estimate the parameters
 	int minimumProjectives;

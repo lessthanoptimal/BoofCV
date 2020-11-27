@@ -26,7 +26,7 @@ import boofcv.io.points.PointCloudIO;
 import georegression.geometry.UtilPoint3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray_F32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -100,7 +100,7 @@ public class PointCloudViewerApp {
 			y /= N;
 			z /= N;
 
-			GrowQueue_F32 distances = new GrowQueue_F32();
+			DogArray_F32 distances = new DogArray_F32();
 			distances.resize(N);
 			for (int i = 0; i < N; i++) {
 				float X = cloud.cloudXyz.data[i*3  ];

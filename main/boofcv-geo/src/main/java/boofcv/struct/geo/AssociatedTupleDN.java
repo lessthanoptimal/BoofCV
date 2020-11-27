@@ -19,7 +19,7 @@
 package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Associated set of {@link Point2D_F64} for an arbitrary number of views which can be changed.
@@ -28,10 +28,10 @@ import org.ddogleg.struct.FastQueue;
  */
 public class AssociatedTupleDN implements AssociatedTuple {
 	/** Set of associated observations */
-	public final FastQueue<Point2D_F64> p;
+	public final DogArray<Point2D_F64> p;
 
 	public AssociatedTupleDN( int num ) {
-		p = new FastQueue<>(num,Point2D_F64::new);
+		p = new DogArray<>(num,Point2D_F64::new);
 	}
 
 	public AssociatedTupleDN() {

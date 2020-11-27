@@ -20,7 +20,7 @@ package boofcv.alg.enhance;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -69,7 +69,7 @@ public class GEnhanceImageOps {
 	 */
 	public static <T extends ImageBase<T>>
 	void equalizeLocal( T input, int radius, T output,
-						int histogramLength, @Nullable GrowArray<GrowQueue_I32> workArrays ) {
+						int histogramLength, @Nullable GrowArray<DogArray_I32> workArrays ) {
 		if (input instanceof Planar) {
 			Planar pi = (Planar)input;
 			Planar po = (Planar)output;

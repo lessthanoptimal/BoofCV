@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -137,7 +137,7 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 		int minContourPixels = minimumContourSize.computeI(Math.min(input.width, input.height));
 
 		polylines.clear();
-		GrowQueue_I32 indices = new GrowQueue_I32();
+		DogArray_I32 indices = new DogArray_I32();
 		for (int i = 0; i < contours.size(); i++) {
 			List<Point2D_I32> contour = contours.get(i).external;
 			if (contour.size() < minContourPixels)

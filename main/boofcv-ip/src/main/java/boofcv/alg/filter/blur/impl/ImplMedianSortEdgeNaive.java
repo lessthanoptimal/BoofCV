@@ -22,8 +22,8 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Generated;
@@ -46,7 +46,7 @@ import javax.annotation.Generated;
 public class ImplMedianSortEdgeNaive {
 
 	public static void process( GrayF32 input, GrayF32 output, int radiusX, int radiusY,
-								@Nullable GrowQueue_F32 workspace ) {
+								@Nullable DogArray_F32 workspace ) {
 		int w = 2*radiusX + 1;
 		int h = 2*radiusY + 1;
 
@@ -160,7 +160,7 @@ public class ImplMedianSortEdgeNaive {
 	}
 
 	public static void process( GrayI input, GrayI output, int radiusX, int radiusY,
-								@Nullable GrowQueue_I32 workspace ) {
+								@Nullable DogArray_I32 workspace ) {
 		int w = 2*radiusX + 1;
 		int h = 2*radiusY + 1;
 

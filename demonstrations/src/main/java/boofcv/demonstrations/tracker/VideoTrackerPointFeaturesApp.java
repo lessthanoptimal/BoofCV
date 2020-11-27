@@ -35,8 +35,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,7 +66,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	VisualizePanel gui = new VisualizePanel();
 	// synchronized when manipulating
 	long frameIdGui = -1;
-	final FastQueue<PointTrack> tracksGui = new FastQueue<>(PointTrack::new);
+	final DogArray<PointTrack> tracksGui = new DogArray<>(PointTrack::new);
 	final Map<Long, Point2D_F64> tracksPrev = new HashMap<>();
 
 	long selectedTrackID = -1;
@@ -79,7 +79,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	// track duration 50% and 95%
 	volatile double duration50,duration95;
 	// track duration work space
-	GrowQueue_F64 storageDuration = new GrowQueue_F64();
+	DogArray_F64 storageDuration = new DogArray_F64();
 
 	public VideoTrackerPointFeaturesApp(List<PathLabel> examples,
 										Class<I> imageType ) {

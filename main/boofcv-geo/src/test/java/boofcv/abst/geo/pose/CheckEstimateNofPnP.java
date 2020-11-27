@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.geo.pose;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +44,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 	// true if it can only process the minimum number of observations
 	boolean onlyMinimum;
 
-	FastQueue<Se3_F64> solutions = new FastQueue<>(1, Se3_F64::new);
+	DogArray<Se3_F64> solutions = new DogArray<>(1, Se3_F64::new);
 
 	Se3_F64 worldToCamera0 = new Se3_F64();
 	Se3_F64 worldToCamera1 = new Se3_F64();

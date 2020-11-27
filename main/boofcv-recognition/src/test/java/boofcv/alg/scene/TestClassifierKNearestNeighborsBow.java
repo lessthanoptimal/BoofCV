@@ -28,7 +28,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public class TestClassifierKNearestNeighborsBow extends BoofStandardJUnit {
 
 			@Override
 			public void findNearest(HistogramScene point, double maxDistance, int numNeighbors,
-									FastQueue<NnData<HistogramScene>> result) {
+									DogArray<NnData<HistogramScene>> result) {
 				assertTrue(result.size() == 0);
 
 				for (int i = 0; i < numNeighbors; i++) {

@@ -21,7 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -38,8 +38,8 @@ class TestAssociateGreedyDesc_MT extends BoofStandardJUnit {
 	}
 
 	void compare( boolean backwards , double ratioTest ) {
-		FastQueue<TupleDesc_F64> a = createData(200);
-		FastQueue<TupleDesc_F64> b = createData(200);
+		DogArray<TupleDesc_F64> a = createData(200);
+		DogArray<TupleDesc_F64> b = createData(200);
 
 		AssociateGreedyDesc<TupleDesc_F64> sequentialAlg = new AssociateGreedyDesc<>( new ScoreAssociateEuclidean_F64());
 		sequentialAlg.backwardsValidation = backwards;
@@ -66,11 +66,11 @@ class TestAssociateGreedyDesc_MT extends BoofStandardJUnit {
 		}
 	}
 
-	public static FastQueue<TupleDesc_F64> createData( int count )
+	public static DogArray<TupleDesc_F64> createData( int count )
 	{
 		Random rand = new Random(234);
 
-		FastQueue<TupleDesc_F64> ret = new FastQueue<>(count,()-> new TupleDesc_F64(1));
+		DogArray<TupleDesc_F64> ret = new DogArray<>(count,()-> new TupleDesc_F64(1));
 
 		for( int i = 0; i < count; i++ ) {
 			ret.grow().set(rand.nextDouble()*10);

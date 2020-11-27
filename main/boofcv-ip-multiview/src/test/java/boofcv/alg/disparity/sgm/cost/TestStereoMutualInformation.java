@@ -25,7 +25,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -118,8 +118,8 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 
 		// Get a list of values in the left and right image
 		// Mutual information isn't designed to handle cases where you attempt to match up with a non-existing pixel
-		GrowQueue_I32 valuesLeft = new GrowQueue_I32();
-		GrowQueue_I32 valuesRight = new GrowQueue_I32();
+		DogArray_I32 valuesLeft = new DogArray_I32();
+		DogArray_I32 valuesRight = new DogArray_I32();
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

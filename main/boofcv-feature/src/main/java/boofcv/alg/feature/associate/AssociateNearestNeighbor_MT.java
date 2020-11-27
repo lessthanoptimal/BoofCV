@@ -22,8 +22,8 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 import pabeles.concurrency.IntRangeConsumer;
 
 import java.util.ArrayList;
@@ -148,9 +148,9 @@ public class AssociateNearestNeighbor_MT<D>
 	 */
 	private class Helper {
 		NearestNeighbor.Search<D> search;
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex::new);
+		DogArray<AssociatedIndex> matches = new DogArray<>(10, AssociatedIndex::new);
 		private NnData<D> result = new NnData<>();
-		private FastQueue<NnData<D>> result2 = new FastQueue(NnData::new);
+		private DogArray<NnData<D>> result2 = new DogArray(NnData::new);
 
 		Helper() {
 			search = alg.createSearch();

@@ -26,7 +26,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray_F32;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -173,7 +173,7 @@ public class TestFuseDisparityImages extends BoofStandardJUnit {
 		alg.computeFused(found);
 
 		// manually compute the solution. Use a brute force approach for median value since it requires no thinking
-		GrowQueue_F32 expected = new GrowQueue_F32();
+		DogArray_F32 expected = new DogArray_F32();
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 10; x++) {
 				if (expected.size == 0)

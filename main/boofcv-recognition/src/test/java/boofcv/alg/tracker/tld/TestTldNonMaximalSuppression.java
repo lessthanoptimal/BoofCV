@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +36,7 @@ public class TestTldNonMaximalSuppression extends BoofStandardJUnit {
 	public void process() {
 		TldNonMaximalSuppression alg = new TldNonMaximalSuppression(0.5);
 
-		FastQueue<TldRegion> regions = new FastQueue<>(TldRegion::new);
+		DogArray<TldRegion> regions = new DogArray<>(TldRegion::new);
 		regions.grow().rect.setTo(0,100,10,120);
 		regions.grow().rect.setTo(2,3,8,33);
 		regions.grow().rect.setTo(0,100,9,119);
@@ -46,12 +46,12 @@ public class TestTldNonMaximalSuppression extends BoofStandardJUnit {
 		regions.get(2).confidence = 300;
 		regions.get(3).confidence = 400;
 
-		FastQueue<TldRegion> output = new FastQueue<>(TldRegion::new);
+		DogArray<TldRegion> output = new DogArray<>(TldRegion::new);
 
 		alg.process(regions,output);
 		assertEquals(output.size(), 3);
 
-		FastQueue<TldNonMaximalSuppression.Connections> conn = alg.getConnections();
+		DogArray<TldNonMaximalSuppression.Connections> conn = alg.getConnections();
 
 		assertFalse(conn.data[0].maximum);
 		assertTrue(conn.data[1].maximum);

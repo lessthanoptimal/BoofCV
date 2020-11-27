@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Association for a stereo pair where the source is the left camera and the destination is the right camera. Pixel
@@ -41,9 +41,9 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	// computes match score between two descriptions
 	private final ScoreAssociation<Desc> scorer;
 	// storage for associated features
-	private final FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
+	private final DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
 	// stores indexes of unassociated source features
-	private final GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
+	private final DogArray_I32 unassociatedSrc = new DogArray_I32();
 	// creates a list of unassociated features from the list of matches
 	private final FindUnassociated unassociated = new FindUnassociated();
 
@@ -51,8 +51,8 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	private double scoreThreshold = Double.MAX_VALUE;
 
 	// stores rectified coordinates of observations in left and right images
-	private final FastQueue<Point2D_F64> locationLeft = new FastQueue<>(Point2D_F64::new);
-	private final FastQueue<Point2D_F64> locationRight = new FastQueue<>(Point2D_F64::new);
+	private final DogArray<Point2D_F64> locationLeft = new DogArray<>(Point2D_F64::new);
+	private final DogArray<Point2D_F64> locationRight = new DogArray<>(Point2D_F64::new);
 	// stores reference to descriptions in left and right images
 	private FastAccess<Desc> descriptionsLeft;
 	private FastAccess<Desc> descriptionsRight;
@@ -127,17 +127,17 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	}
 
 	@Override
-	public FastQueue<AssociatedIndex> getMatches() {
+	public DogArray<AssociatedIndex> getMatches() {
 		return matches;
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedSource() {
+	public DogArray_I32 getUnassociatedSource() {
 		return unassociatedSrc;
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedDestination() {
+	public DogArray_I32 getUnassociatedDestination() {
 		return unassociated.checkDestination(matches, locationRight.size);
 	}
 

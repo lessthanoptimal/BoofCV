@@ -24,7 +24,7 @@ import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.solver.impl.FindRealRootsSturm;
 import org.ddogleg.solver.impl.WrapRealRootsSturm;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.Complex_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -101,7 +101,7 @@ public class EssentialNister5 {
 	 * @param solutions Output: Storage for the found solutions.   .
 	 * @return true for success or false if a fault has been detected
 	 */
-	public boolean process( List<AssociatedPair> points , FastQueue<DMatrixRMaj> solutions ) {
+	public boolean process( List<AssociatedPair> points , DogArray<DMatrixRMaj> solutions ) {
 		if( points.size() != 5 )
 			throw new IllegalArgumentException("Exactly 5 points are required, not "+points.size());
 		solutions.reset();

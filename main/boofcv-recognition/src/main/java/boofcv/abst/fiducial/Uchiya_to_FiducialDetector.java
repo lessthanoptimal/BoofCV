@@ -31,7 +31,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -58,7 +58,7 @@ implements FiducialTracker<T>
 	final double markerHeight;
 
 	// Storage
-	final FastQueue<Point2D3D> control3D = new FastQueue<>(Point2D3D::new);
+	final DogArray<Point2D3D> control3D = new DogArray<>(Point2D3D::new);
 
 	// Local work space
 	final Point2D_F64 norm = new Point2D_F64();
@@ -210,7 +210,7 @@ implements FiducialTracker<T>
 		return tracker.getTracker().getLlahOps();
 	}
 
-	public FastQueue<UchiyaMarkerTracker.Track> getTracks() {
+	public DogArray<UchiyaMarkerTracker.Track> getTracks() {
 		return tracker.getTracks();
 	}
 }

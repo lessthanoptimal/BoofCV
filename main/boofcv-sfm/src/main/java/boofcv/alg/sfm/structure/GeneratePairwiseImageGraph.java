@@ -28,7 +28,7 @@ import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.DConvertMatrixStruct;
@@ -100,10 +100,10 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		this.graph.reset();
 
 		List<String> similar = new ArrayList<>();
-		FastQueue<Point2D_F64> srcFeats = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> dstFeats = new FastQueue<>(Point2D_F64::new);
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
-		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+		DogArray<Point2D_F64> srcFeats = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> dstFeats = new DogArray<>(Point2D_F64::new);
+		DogArray<AssociatedIndex> matches = new DogArray<>(AssociatedIndex::new);
+		DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 		// map to quickly look up the ID of a view
 		Map<String, Integer> imageToindex = new HashMap<>();
@@ -161,7 +161,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	 * @param matches Associated features feature indexes
 	 */
 	protected void createEdge( String src, String dst,
-							   FastQueue<AssociatedPair> pairs, FastQueue<AssociatedIndex> matches ) {
+							   DogArray<AssociatedPair> pairs, DogArray<AssociatedIndex> matches ) {
 		// Fitting Essential/Fundamental works when the scene is not planar and not pure rotation
 		int countF = 0;
 		if (ransac3D.process(pairs.toList())) {
@@ -212,7 +212,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	 * @param edge The edge that the inliers are to be saved to
 	 */
 	private void saveInlierMatches( ModelMatcher<?, ?> ransac,
-									FastQueue<AssociatedIndex> matches, PairwiseImageGraph.Motion edge ) {
+									DogArray<AssociatedIndex> matches, PairwiseImageGraph.Motion edge ) {
 
 		int N = ransac.getMatchSet().size();
 		edge.inliers.reset();

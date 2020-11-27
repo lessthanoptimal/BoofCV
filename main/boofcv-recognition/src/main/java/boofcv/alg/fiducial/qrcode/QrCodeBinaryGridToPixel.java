@@ -31,7 +31,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.homography.HomographyPointOps_F32;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -46,12 +46,12 @@ public class QrCodeBinaryGridToPixel {
 	ModelGenerator<Homography2D_F64,AssociatedPair> generator = new GenerateHomographyLinear(true);
 	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
 
-	FastQueue<AssociatedPair> storagePairs2D = new FastQueue<>(AssociatedPair::new);
-	FastQueue<AssociatedPair3D> storagePairs3D = new FastQueue<>(AssociatedPair3D::new);
+	DogArray<AssociatedPair> storagePairs2D = new DogArray<>(AssociatedPair::new);
+	DogArray<AssociatedPair3D> storagePairs3D = new DogArray<>(AssociatedPair3D::new);
 
 	List<AssociatedPair> pairs2D = new ArrayList<>();
 
-	FastQueue<Point2D_F64> adjustments = new FastQueue<>(Point2D_F64::new);
+	DogArray<Point2D_F64> adjustments = new DogArray<>(Point2D_F64::new);
 
 	Homography2D_F64 H = new Homography2D_F64();
 	Homography2D_F64 Hinv = new Homography2D_F64();

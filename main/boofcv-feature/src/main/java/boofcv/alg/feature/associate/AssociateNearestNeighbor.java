@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public abstract class AssociateNearestNeighbor<D>
 	double scoreRatioThreshold = 1.0;
 
 	// List of final associated points
-	protected final FastQueue<AssociatedIndex> matchesAll = new FastQueue<>(100, AssociatedIndex::new);
+	protected final DogArray<AssociatedIndex> matchesAll = new DogArray<>(100, AssociatedIndex::new);
 
 	// creates a list of unassociated features from the list of matches
 	private FindUnassociated unassociated = new FindUnassociated();
@@ -87,17 +87,17 @@ public abstract class AssociateNearestNeighbor<D>
 	}
 
 	@Override
-	public FastQueue<AssociatedIndex> getMatches() {
+	public DogArray<AssociatedIndex> getMatches() {
 		return matchesAll;
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedSource() {
+	public DogArray_I32 getUnassociatedSource() {
 		return unassociated.checkSource(matchesAll, sizeSrc);
 	}
 
 	@Override
-	public GrowQueue_I32 getUnassociatedDestination() {
+	public DogArray_I32 getUnassociatedDestination() {
 		return unassociated.checkDestination(matchesAll, listDst.size());
 	}
 

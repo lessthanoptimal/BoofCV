@@ -21,9 +21,9 @@ package boofcv.alg.sfm.structure;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
 import boofcv.struct.ScoreIndex;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,11 +51,11 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 	//--------------------------------------------- Internal workspace
 	// scores of individual motions for a View
-	FastQueue<ScoreIndex> scoresMotions = new FastQueue<>(ScoreIndex::new);
+	DogArray<ScoreIndex> scoresMotions = new DogArray<>(ScoreIndex::new);
 	// list of views that have already been explored
 	HashSet<String> exploredViews = new HashSet<>();
 	// information related to each view being a potential seed
-	FastQueue<SeedInfo> seedScores = new FastQueue<>(SeedInfo::new, SeedInfo::reset);
+	DogArray<SeedInfo> seedScores = new DogArray<>(SeedInfo::new, SeedInfo::reset);
 
 	protected ReconstructionFromPairwiseGraph( PairwiseGraphUtils utils ) {
 		this.utils = utils;
@@ -198,7 +198,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	 * @param lookupInfo (input) Used to lookup SeedInfo by View ID
 	 * @return List of seeds with the best seeds first.
 	 */
-	protected List<SeedInfo> selectSeeds( FastQueue<SeedInfo> candidates, Map<String, SeedInfo> lookupInfo ) {
+	protected List<SeedInfo> selectSeeds( DogArray<SeedInfo> candidates, Map<String, SeedInfo> lookupInfo ) {
 		// Storage for selected seeds
 		List<SeedInfo> seeds = new ArrayList<>();
 		// sort it so best scores are last
@@ -300,7 +300,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		// score for how good of a seed this node would make. higher is better
 		double score;
 		// edges in seed that were used to generate the score
-		GrowQueue_I32 motions = new GrowQueue_I32();
+		DogArray_I32 motions = new DogArray_I32();
 		// if it's a neighbor of a seed
 		boolean neighbor = false;
 

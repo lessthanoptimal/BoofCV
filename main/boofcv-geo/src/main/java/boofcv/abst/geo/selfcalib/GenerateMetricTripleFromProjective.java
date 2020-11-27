@@ -30,7 +30,7 @@ import boofcv.struct.geo.AssociatedTupleN;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -57,9 +57,9 @@ public class GenerateMetricTripleFromProjective implements
 	@Getter final DMatrixRMaj P3;
 
 	// Data structures which have been converted
-	@Getter final FastQueue<AssociatedTuple> observationsN = new FastQueue<>(()->new AssociatedTupleN(3));
-	@Getter final FastQueue<DMatrixRMaj> projective = new FastQueue<>(()->new DMatrixRMaj(3,4));
-	@Getter final FastQueue<ImageDimension> dimensions = new FastQueue<>(ImageDimension::new);
+	@Getter final DogArray<AssociatedTuple> observationsN = new DogArray<>(()->new AssociatedTupleN(3));
+	@Getter final DogArray<DMatrixRMaj> projective = new DogArray<>(()->new DMatrixRMaj(3,4));
+	@Getter final DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
 	@Getter final MetricCameras metricN = new MetricCameras();
 
 	public GenerateMetricTripleFromProjective(Estimate1ofTrifocalTensor trifocal,

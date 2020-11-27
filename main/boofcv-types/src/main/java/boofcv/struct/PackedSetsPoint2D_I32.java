@@ -19,7 +19,7 @@
 package boofcv.struct;
 
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +38,9 @@ public class PackedSetsPoint2D_I32 {
 	// maximum number of elements that can be in a block
 	final int blockLength;
 	// arrays which store the points
-	final FastQueue<int[]> blocks;
+	final DogArray<int[]> blocks;
 	// describes where there data for a set is stored
-	final FastQueue<BlockIndexLength> sets = new FastQueue<>(BlockIndexLength::new);
+	final DogArray<BlockIndexLength> sets = new DogArray<>(BlockIndexLength::new);
 
 	// the length/size of the last block
 	int tailBlockSize;
@@ -57,7 +57,7 @@ public class PackedSetsPoint2D_I32 {
 			throw new IllegalArgumentException("Block length must be more than 2");
 		// ensure that the block length is divisible by two
 		this.blockLength = blockLength + (blockLength%2);
-		blocks = new FastQueue<>(int[].class, () -> new int[this.blockLength]);
+		blocks = new DogArray<>(int[].class, () -> new int[this.blockLength]);
 		blocks.grow();
 	}
 
@@ -160,7 +160,7 @@ public class PackedSetsPoint2D_I32 {
 	 * @param which (Input) which point set
 	 * @param list (Output) Storage for points
 	 */
-	public void getSet( int which, FastQueue<Point2D_I32> list ) {
+	public void getSet( int which, DogArray<Point2D_I32> list ) {
 		list.reset();
 
 		BlockIndexLength set = sets.get(which);
@@ -176,7 +176,7 @@ public class PackedSetsPoint2D_I32 {
 	}
 
 	public List<Point2D_I32> getSet( int which ) {
-		FastQueue<Point2D_I32> tmp = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> tmp = new DogArray<>(Point2D_I32::new);
 		getSet(which, tmp);
 		List<Point2D_I32> output = new ArrayList<>();
 		output.addAll(tmp.toList());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.core.graph;
 
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class FeatureGraph2D {
-	public FastQueue<Node> nodes = new FastQueue<>(Node::new);
-	public FastQueue<Edge> edges = new FastQueue<>(Edge::new);
+	public DogArray<Node> nodes = new DogArray<>(Node::new);
+	public DogArray<Edge> edges = new DogArray<>(Edge::new);
 
 	public void reset() {
 		nodes.reset();

@@ -26,7 +26,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -88,7 +88,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 	void findCommonFeatures_list() {
 		PairwiseImageGraph.View seed = new PairwiseImageGraph.View();
 		seed.totalObservations = 100;
-		GrowQueue_I32 seedFeatsIdx = new GrowQueue_I32();
+		DogArray_I32 seedFeatsIdx = new DogArray_I32();
 
 		for (int i = 0; i < seed.totalObservations/2; i++) {
 			seedFeatsIdx.add(i);
@@ -347,7 +347,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 	@Test
 	void createTableViewAtoB() {
 		// Create a randomized table showing how features are matched between the two views
-		GrowQueue_I32 table_src_to_dst = GrowQueue_I32.range(0, 50);
+		DogArray_I32 table_src_to_dst = DogArray_I32.range(0, 50);
 		PrimitiveArrays.shuffle(table_src_to_dst.data, 0, table_src_to_dst.size, rand);
 
 		// Create the list of associated pairs
@@ -363,7 +363,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		motion.src.totalObservations = motion.dst.totalObservations = table_src_to_dst.size;
 		motion.inliers.shuffle(rand); // shuffle this to make the order interesting to test
 
-		GrowQueue_I32 found_src_to_dst = new GrowQueue_I32(table_src_to_dst.size);
+		DogArray_I32 found_src_to_dst = new DogArray_I32(table_src_to_dst.size);
 		// Reconstruct the look up table
 		PairwiseGraphUtils.createTableViewAtoB(motion.src, motion, found_src_to_dst);
 		for (int i = 0; i < table_src_to_dst.size; i++) {
@@ -402,12 +402,12 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.viewC = new PairwiseImageGraph.View();
 
 		// tables need to cover every observation in A
-		alg.table_A_to_B.setTo(GrowQueue_I32.range(0, viewA.pview.totalObservations));
-		alg.table_A_to_C.setTo(GrowQueue_I32.range(0, viewA.pview.totalObservations));
+		alg.table_A_to_B.setTo(DogArray_I32.range(0, viewA.pview.totalObservations));
+		alg.table_A_to_C.setTo(DogArray_I32.range(0, viewA.pview.totalObservations));
 		PrimitiveArrays.shuffle(alg.table_A_to_B.data, 0, alg.table_A_to_B.size, rand);
 		PrimitiveArrays.shuffle(alg.table_A_to_C.data, 0, alg.table_A_to_C.size, rand);
 
-		alg.commonIdx.setTo(GrowQueue_I32.range(0, numInliers*2));
+		alg.commonIdx.setTo(DogArray_I32.range(0, numInliers*2));
 
 		// just add elements until it hits the desired size
 		alg.inliersThreeView = new ArrayList<>();
@@ -439,7 +439,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			assertEquals(3, inliers.observations.size);
 			for (int checkView = 0; checkView < 3; checkView++) {
 				PairwiseImageGraph.View v = inliers.views.get(checkView);
-				GrowQueue_I32 indexes = inliers.observations.get(checkView);
+				DogArray_I32 indexes = inliers.observations.get(checkView);
 				assertEquals(numInliers, indexes.size);
 
 				if (alg.seed == v) {

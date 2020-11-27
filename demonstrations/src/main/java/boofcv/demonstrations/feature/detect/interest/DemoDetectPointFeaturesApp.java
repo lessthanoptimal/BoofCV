@@ -38,8 +38,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -70,8 +70,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	boolean detectorChanged = true;
 
 	final Object featureLock = new Object();
-	final FastQueue<Point2D_F64> featureLocs = new FastQueue<>(Point2D_F64::new);
-	final GrowQueue_I32 featureSets = new GrowQueue_I32();
+	final DogArray<Point2D_F64> featureLocs = new DogArray<>(Point2D_F64::new);
+	final DogArray_I32 featureSets = new DogArray_I32();
 	int totalSets;
 
 	// filter the speed to make the numbers less erratic

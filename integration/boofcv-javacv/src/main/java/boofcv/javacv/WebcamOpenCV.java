@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageType;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.OpenCVFrameGrabber;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 /**
  * @author Peter Abeles
@@ -63,7 +63,7 @@ public class WebcamOpenCV implements WebcamInterface {
 
 		int frameNumber;
 
-		GrowQueue_I8 work = new GrowQueue_I8();
+		DogArray_I8 work = new DogArray_I8();
 
 		boolean bgr_to_rgb;
 

@@ -27,7 +27,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	// used to search for neighbors that which are candidates for connecting
 	private NearestNeighbor<SquareNode> nn = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
 	private NearestNeighbor.Search<SquareNode> search = nn.createSearch();
-	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData::new);
+	private DogArray<NnData<SquareNode>> searchResults = new DogArray(NnData::new);
 
 	/**
 	 * Declares data structures and configures algorithm

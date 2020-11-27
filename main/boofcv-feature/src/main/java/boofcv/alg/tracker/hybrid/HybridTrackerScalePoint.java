@@ -29,10 +29,10 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,7 @@ public class HybridTrackerScalePoint<I extends ImageGray<I>, D extends ImageGray
 	protected @Getter AssociateDescriptionSets2D<TD> associate;
 
 	/** List of all tracks (active + inactive) and stores unused track data for future re-use */
-	protected @Getter FastQueue<HybridTrack<TD>> tracksAll;
+	protected @Getter DogArray<HybridTrack<TD>> tracksAll;
 
 	/** all active tracks that have been tracked purely by KLT */
 	protected @Getter FastArray<HybridTrack<TD>> tracksActive = new FastArray(HybridTrack.class);
@@ -83,8 +83,8 @@ public class HybridTrackerScalePoint<I extends ImageGray<I>, D extends ImageGray
 	// local storage used by association
 	protected FastArray<TD> detectedDesc;
 	protected FastArray<TD> knownDesc;
-	protected GrowQueue_I32 detectedSet = new GrowQueue_I32();
-	protected GrowQueue_I32 knownSet = new GrowQueue_I32();
+	protected DogArray_I32 detectedSet = new DogArray_I32();
+	protected DogArray_I32 knownSet = new DogArray_I32();
 	protected FastArray<Point2D_F64> detectedPixels = new FastArray<>(Point2D_F64.class);
 	protected FastArray<Point2D_F64> knownPixels = new FastArray<>(Point2D_F64.class);
 
@@ -122,7 +122,7 @@ public class HybridTrackerScalePoint<I extends ImageGray<I>, D extends ImageGray
 		this.associate = new AssociateDescriptionSets2D<>(associate, detector.getDescriptionType());
 		this.associate.initialize(detector.getNumberOfSets());
 
-		this.tracksAll = new FastQueue<>(this::createNewTrack);
+		this.tracksAll = new DogArray<>(this::createNewTrack);
 		if (tooCloseRadius > 0) {
 			this.pruneClose = new PruneCloseTracks<>(tooCloseRadius, new PruneCloseTracks.TrackInfo<>() {
 				@Override public void getLocation( HybridTrack<TD> track, Point2D_F64 l ) {l.setTo(track.pixel);}
@@ -288,7 +288,7 @@ public class HybridTrackerScalePoint<I extends ImageGray<I>, D extends ImageGray
 	 */
 	public void spawnNewTracks() {
 		// mark detected features with no matches as available
-		GrowQueue_I32 unassociatedDetected = associate.getUnassociatedDestination();
+		DogArray_I32 unassociatedDetected = associate.getUnassociatedDestination();
 
 		// spawn new tracks for unassociated detected features
 		for (int unassociatedIdx = 0; unassociatedIdx < unassociatedDetected.size; unassociatedIdx++) {

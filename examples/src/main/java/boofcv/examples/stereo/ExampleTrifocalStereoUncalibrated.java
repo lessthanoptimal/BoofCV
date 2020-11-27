@@ -69,8 +69,8 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -149,16 +149,16 @@ public class ExampleTrifocalStereoUncalibrated {
 		DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null, null, GrayU8.class);
 
-		FastQueue<Point2D_F64> locations01 = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> locations02 = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> locations03 = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> locations01 = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> locations02 = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> locations03 = new DogArray<>(Point2D_F64::new);
 
-		FastQueue<TupleDesc_F64> features01 = UtilFeature.createQueue(detDesc, 100);
-		FastQueue<TupleDesc_F64> features02 = UtilFeature.createQueue(detDesc, 100);
-		FastQueue<TupleDesc_F64> features03 = UtilFeature.createQueue(detDesc, 100);
-		GrowQueue_I32 featureSet01 = new GrowQueue_I32();
-		GrowQueue_I32 featureSet02 = new GrowQueue_I32();
-		GrowQueue_I32 featureSet03 = new GrowQueue_I32();
+		DogArray<TupleDesc_F64> features01 = UtilFeature.createQueue(detDesc, 100);
+		DogArray<TupleDesc_F64> features02 = UtilFeature.createQueue(detDesc, 100);
+		DogArray<TupleDesc_F64> features03 = UtilFeature.createQueue(detDesc, 100);
+		DogArray_I32 featureSet01 = new DogArray_I32();
+		DogArray_I32 featureSet02 = new DogArray_I32();
+		DogArray_I32 featureSet03 = new DogArray_I32();
 
 		// Converting data formats for the found features into what can be processed by SFM algorithms
 		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
@@ -221,8 +221,8 @@ public class ExampleTrifocalStereoUncalibrated {
 		Ransac<TrifocalTensor, AssociatedTriple> ransac =
 				FactoryMultiViewRobust.trifocalRansac(configTri, configError, configRansac);
 
-		FastQueue<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();
-		FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple::new);
+		DogArray<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();
+		DogArray<AssociatedTriple> associated = new DogArray<>(AssociatedTriple::new);
 		for (int i = 0; i < associatedIdx.size; i++) {
 			AssociatedTripleIndex p = associatedIdx.get(i);
 			associated.grow().setTo(locations01.get(p.a), locations02.get(p.b), locations03.get(p.c));

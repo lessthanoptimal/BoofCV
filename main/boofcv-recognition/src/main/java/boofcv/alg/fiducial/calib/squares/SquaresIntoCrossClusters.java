@@ -26,7 +26,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	private NearestNeighbor.Search<Point2D_F64> search = nn.createSearch();
 	private List<Point2D_F64> searchPoints = new ArrayList<>();
 	private List<SquareNode> searchSquareList = new ArrayList<>();
-	private FastQueue<NnData<Point2D_F64>> searchResults = new FastQueue(NnData::new);
+	private DogArray<NnData<Point2D_F64>> searchResults = new DogArray(NnData::new);
 
 	/**
 	 * Declares data structures and configures algorithm

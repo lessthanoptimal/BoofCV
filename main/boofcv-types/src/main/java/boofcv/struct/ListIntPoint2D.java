@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Compact format for storing 2D points as a single integer in an array. Offers much more efficient memory and
@@ -34,7 +34,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public class ListIntPoint2D {
 	/** Points encoded into a single integer value. y*width + x */
-	@Getter GrowQueue_I32 points = new GrowQueue_I32();
+	@Getter DogArray_I32 points = new DogArray_I32();
 	int imageWidth;
 
 	/**
@@ -101,7 +101,7 @@ public class ListIntPoint2D {
 	/**
 	 * Copy points from 'this' into 'dst'
 	 */
-	public void copyInto(FastQueue<Point2D_I16> dst ) {
+	public void copyInto(DogArray<Point2D_I16> dst ) {
 		for (int i = 0; i < points.size; i++) {
 			get(i,dst.grow());
 		}

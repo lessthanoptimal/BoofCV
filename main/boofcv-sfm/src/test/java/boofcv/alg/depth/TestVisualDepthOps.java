@@ -27,7 +27,7 @@ import boofcv.struct.image.Planar;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +49,7 @@ public class TestVisualDepthOps extends BoofStandardJUnit {
 		depth.set(200, 80, 3400);
 		depth.set(600, 420, 50);
 
-		FastQueue<Point3D_F64> pts = new FastQueue<>(Point3D_F64::new);
+		DogArray<Point3D_F64> pts = new DogArray<>(Point3D_F64::new);
 
 		VisualDepthOps.depthTo3D(param, depth, pts);
 
@@ -69,8 +69,8 @@ public class TestVisualDepthOps extends BoofStandardJUnit {
 		Planar<GrayU8> rgb = new Planar<>(GrayU8.class, width, height, 3);
 		GImageMiscOps.fillUniform(rgb, rand, 0, 200);
 
-		FastQueue<Point3D_F64> pts = new FastQueue<>(Point3D_F64::new);
-		FastQueue<int[]> color = new FastQueue<>(() -> new int[3]);
+		DogArray<Point3D_F64> pts = new DogArray<>(Point3D_F64::new);
+		DogArray<int[]> color = new DogArray<>(() -> new int[3]);
 
 		VisualDepthOps.depthTo3D(param, rgb, depth, pts, color);
 

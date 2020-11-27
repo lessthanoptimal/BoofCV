@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -31,15 +31,15 @@ import java.util.List;
  */
 public interface GeoModelEstimatorN<Model,Sample> {
 	/**
-	 * Estimates a set of models which fit the given a set of observations.  A FastQueue is used to store
+	 * Estimates a set of models which fit the given a set of observations.  A DogArray is used to store
 	 * the found models.  Each time this function is invoked 'estimatedModels' is reset and new models are
-	 * requested using the FastQueue.pop() function.
+	 * requested using the DogArray.pop() function.
 	 *
 	 * @param points Input: Set of observations. Not modified.
 	 * @param estimatedModels Output: Storage for the set of estimated models.  Modified.
 	 * @return true if successful
 	 */
-	public boolean process(List<Sample> points , FastQueue<Model> estimatedModels );
+	public boolean process(List<Sample> points , DogArray<Model> estimatedModels );
 
 	/**
 	 * Minimum number of points required to estimate the model.

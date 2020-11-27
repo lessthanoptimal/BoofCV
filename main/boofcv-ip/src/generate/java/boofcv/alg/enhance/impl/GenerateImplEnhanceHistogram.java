@@ -58,7 +58,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"import pabeles.concurrency.GrowArray;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
@@ -115,8 +115,8 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t * local region size\n" +
 				"\t */\n" +
 				"\tpublic static void equalizeLocalNaive( "+name+" input, int radius, int histogramLength, "+name+" output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t   GrowArray<GrowQueue_I32> workspaces ) {\n" +
-				"\t\tfinal GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
+				"\t\t\t\t\t\t\t\t\t\t   GrowArray<DogArray_I32> workspaces ) {\n" +
+				"\t\tfinal DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
 				"\t\tfinal int width = 2*radius + 1;\n" +
 				"\t\tfinal int maxValue = histogramLength - 1;\n" +
 				"\n" +
@@ -185,9 +185,9 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t * Performs local histogram equalization just on the inner portion of the image\n" +
 				"\t */\n" +
 				"\tpublic static void equalizeLocalInner( "+name+" input, int radius, int histogramLength, "+name+" output,\n" +
-				"\t\t\t\t\t\t\t\t\t\t GrowArray<GrowQueue_I32> workspaces ) {\n" +
+				"\t\t\t\t\t\t\t\t\t\t GrowArray<DogArray_I32> workspaces ) {\n" +
 				"\n" +
-				"\t\tfinal GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
+				"\t\tfinal DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
 				"\t\tint width = 2*radius+1;\n" +
 				"\t\tint area = width*width;\n" +
 				"\t\tint maxValue = histogramLength - 1;\n" +
@@ -253,7 +253,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.\n" +
 				"\t */\n" +
 				"\tpublic static void equalizeLocalRow( "+name+" input, int radius, int histogramLength, int startY, "+name+" output,\n" +
-				"\t\t\t\t\t\t\t\t\t\t GrowArray<GrowQueue_I32> workspaces ) {\n" +
+				"\t\t\t\t\t\t\t\t\t\t GrowArray<DogArray_I32> workspaces ) {\n" +
 				"\n" +
 				"\t\tint width = 2*radius+1;\n" +
 				"\t\tint area = width*width;\n" +
@@ -359,7 +359,7 @@ public class GenerateImplEnhanceHistogram extends CodeGeneratorBase {
 				"\t * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.\n" +
 				"\t */\n" +
 				"\tpublic static void equalizeLocalCol( "+name+" input, int radius, int histogramLength, int startX, "+name+" output,\n" +
-				"\t\t\t\t\t\t\t\t\t\t GrowArray<GrowQueue_I32> workspaces ) {\n" +
+				"\t\t\t\t\t\t\t\t\t\t GrowArray<DogArray_I32> workspaces ) {\n" +
 				"\n" +
 				"\t\tint width = 2*radius+1;\n" +
 				"\t\tint area = width*width;\n" +

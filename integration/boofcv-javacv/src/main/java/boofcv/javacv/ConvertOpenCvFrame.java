@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.javacv;
 import boofcv.core.image.ConvertByteBufferImage;
 import boofcv.struct.image.*;
 import org.bytedeco.javacv.Frame;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -39,10 +39,10 @@ public class ConvertOpenCvFrame {
 		planar.bands[2] = tmp0;
 	}
 
-	public static void convert(Frame input , ImageBase output , boolean swapRgb, GrowQueue_I8 work) {
+	public static void convert(Frame input , ImageBase output , boolean swapRgb, DogArray_I8 work) {
 
 		if( work == null )
-			work = new GrowQueue_I8();
+			work = new DogArray_I8();
 
 		Buffer data = input.image[0];
 		if( !(data instanceof ByteBuffer) ) {

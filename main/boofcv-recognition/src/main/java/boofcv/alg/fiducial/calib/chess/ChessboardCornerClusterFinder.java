@@ -28,9 +28,9 @@ import lombok.Setter;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,29 +99,29 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	private @Getter @Setter double thresholdEdgeIntensity = 0.05;
 
 	// Data structures for the crude graph
-	private @Getter final FastQueue<Vertex> vertexes = new FastQueue<>(Vertex::new);
-	private @Getter final FastQueue<Edge> edges = new FastQueue<>(Edge::new);
-	private @Getter final FastQueue<LineInfo> lines = new FastQueue<>(LineInfo::new);
+	private @Getter final DogArray<Vertex> vertexes = new DogArray<>(Vertex::new);
+	private @Getter final DogArray<Edge> edges = new DogArray<>(Edge::new);
+	private @Getter final DogArray<LineInfo> lines = new DogArray<>(LineInfo::new);
 
 	// data structures for nearest neighbor search
 	private final NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	private final NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
-	private final FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue<>(NnData::new);
+	private final DogArray<NnData<ChessboardCorner>> nnResults = new DogArray<>(NnData::new);
 
 	/** Output. Contains a graph of connected corners */
-	private @Getter final FastQueue<ChessboardCornerGraph> outputClusters = new FastQueue<>(ChessboardCornerGraph::new);
+	private @Getter final DogArray<ChessboardCornerGraph> outputClusters = new DogArray<>(ChessboardCornerGraph::new);
 
 	// predeclared storage for results
 //	private SearchResults results = new SearchResults();
 //	private TupleI32 tuple3 = new TupleI32();
 
 	// Used to convert the internal graph into the output clusters
-	private final GrowQueue_I32 c2n = new GrowQueue_I32(); // corner index to output node index
-	private final GrowQueue_I32 n2c = new GrowQueue_I32(); // output node index to corner index
-	private final GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
+	private final DogArray_I32 c2n = new DogArray_I32(); // corner index to output node index
+	private final DogArray_I32 n2c = new DogArray_I32(); // output node index to corner index
+	private final DogArray_I32 open = new DogArray_I32(); // list of corner index's which still need ot be processed
 
 	// Work space to store distances from NN searched to find median distance
-//	private GrowQueue_F64 distanceTmp = new GrowQueue_F64();
+//	private DogArray_F64 distanceTmp = new DogArray_F64();
 //	private QuickSort_F64 sorter = new QuickSort_F64(); // use this instead of build in to minimize memory allocation
 
 	// reference to input corners for debugging
@@ -134,8 +134,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	// Workspace for connecting vertices
 	private final List<Edge> bestSolution = new ArrayList<>();
 	private final List<Edge> solution = new ArrayList<>();
-	private final FastQueue<PairIdx> pairs = new FastQueue<>(PairIdx.class, PairIdx::new);
-	private final GrowQueue_B matched = new GrowQueue_B();
+	private final DogArray<PairIdx> pairs = new DogArray<>(PairIdx.class, PairIdx::new);
+	private final DogArray_B matched = new DogArray_B();
 
 	PrintStream verbose = null;
 
@@ -156,14 +156,14 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	public void process( T image, List<ChessboardCorner> corners, int numLevels ) {
 		this.corners = corners;
 
-		List<GrowQueue_I32> cornersInLevel = new ArrayList<>();
+		List<DogArray_I32> cornersInLevel = new ArrayList<>();
 
 		initalizeStructures(image, corners, numLevels, cornersInLevel);
 
 
 		// Find neighbor corners starting at low resolution layers going to high resolution
 		List<ChessboardCorner> cornersUpToLevel = new ArrayList<>();
-		GrowQueue_I32 indexesUpToLevel = new GrowQueue_I32();
+		DogArray_I32 indexesUpToLevel = new DogArray_I32();
 		pyramidalFindNeighbors(corners, numLevels, cornersInLevel, cornersUpToLevel, indexesUpToLevel);
 
 		BoofMiscOps.checkTrue(indexesUpToLevel.size == corners.size());
@@ -241,11 +241,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	}
 
 	private void pyramidalFindNeighbors( List<ChessboardCorner> corners, int numLevels,
-										 List<GrowQueue_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel,
-										 GrowQueue_I32 indexesUpToLevel ) {
+										 List<DogArray_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel,
+										 DogArray_I32 indexesUpToLevel ) {
 		// start from top of the pyramid, which is the lowest resolution
 		for (int level = numLevels - 1; level >= 0; level--) {
-			GrowQueue_I32 levelCornerIdx = cornersInLevel.get(level);
+			DogArray_I32 levelCornerIdx = cornersInLevel.get(level);
 			for (int i = 0; i < levelCornerIdx.size; i++) {
 				cornersUpToLevel.add(corners.get(levelCornerIdx.get(i)));
 			}
@@ -265,7 +265,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		}
 	}
 
-	private void initalizeStructures( T image, List<ChessboardCorner> corners, int numLevels, List<GrowQueue_I32> cornersInLevel ) {
+	private void initalizeStructures( T image, List<ChessboardCorner> corners, int numLevels, List<DogArray_I32> cornersInLevel ) {
 		// reset internal data structures
 		vertexes.reset();
 		edges.reset();
@@ -283,7 +283,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 
 		// declare queues to store the corner index that appears in each level
 		for (int level = 0; level < numLevels; level++) {
-			cornersInLevel.add(new GrowQueue_I32());
+			cornersInLevel.add(new DogArray_I32());
 		}
 
 		// Add corners to the pyramid at the lowest resolution level they appear at
@@ -364,7 +364,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	 * Use nearest neighbor search to find closest corners. Split those into two groups, parallel and
 	 * perpendicular.
 	 */
-	void findVertexNeighbors( Vertex va, GrowQueue_I32 indexesUpToLevel, List<ChessboardCorner> corners ) {
+	void findVertexNeighbors( Vertex va, DogArray_I32 indexesUpToLevel, List<ChessboardCorner> corners ) {
 		ChessboardCorner targetCorner = corners.get(va.index);
 		// distance is Euclidean squared
 		double maxDist = Double.MAX_VALUE == maxNeighborDistance ? maxNeighborDistance : maxNeighborDistance*maxNeighborDistance;

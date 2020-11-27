@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.app.fiducials.CreateSquareFiducialDocumentImage;
 import boofcv.app.fiducials.CreateSquareFiducialDocumentPDF;
 import boofcv.gui.BoofSwingUtil;
-import org.ddogleg.struct.GrowQueue_I64;
+import org.ddogleg.struct.DogArray_I64;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -48,7 +48,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquareBorder {
 	@Override
 	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
 		List<String> names = new ArrayList<>();
-		GrowQueue_I64 numbers = new GrowQueue_I64();
+		DogArray_I64 numbers = new DogArray_I64();
 
 		for (int i = 0; i < this.numbers.length; i++) {
 			names.add( this.numbers[i].toString() );
@@ -61,7 +61,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquareBorder {
 	@Override
 	protected void callRenderImage(CreateFiducialDocumentImage renderer) {
 		List<String> names = new ArrayList<>();
-		GrowQueue_I64 numbers = new GrowQueue_I64();
+		DogArray_I64 numbers = new DogArray_I64();
 
 		for (int i = 0; i < this.numbers.length; i++) {
 			names.add( this.numbers[i].toString() );

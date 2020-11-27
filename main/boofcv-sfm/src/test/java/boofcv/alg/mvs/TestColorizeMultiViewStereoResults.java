@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.SpecialEuclideanOps_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -103,8 +103,8 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 		// only difference between the points are the order of their views
 		scene.setPoint(0, 0.01, -0.01, 2.0, 0.99);
 		scene.setPoint(1, 0.01, -0.01, 2.0, 0.99);
-		scene.points.get(0).views.addAll(GrowQueue_I32.array(0, 1));
-		scene.points.get(1).views.addAll(GrowQueue_I32.array(1, 0));
+		scene.points.get(0).views.addAll(DogArray_I32.array(0, 1));
+		scene.points.get(1).views.addAll(DogArray_I32.array(1, 0));
 
 		var alg = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.SB_U8(), new MockLookUp());
 		alg.processScenePoints(scene, ( idx ) -> (5*idx + 10) + "", ( idx, r, g, b ) -> {

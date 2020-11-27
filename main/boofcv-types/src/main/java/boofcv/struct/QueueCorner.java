@@ -19,8 +19,8 @@
 package boofcv.struct;
 
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * A list that allows fast access to a queue of points that represents corners in an image.
@@ -28,7 +28,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class QueueCorner extends FastQueue<Point2D_I16> {
+public class QueueCorner extends DogArray<Point2D_I16> {
 
 	public QueueCorner( int max ) {
 		super(max, Point2D_I16::new);

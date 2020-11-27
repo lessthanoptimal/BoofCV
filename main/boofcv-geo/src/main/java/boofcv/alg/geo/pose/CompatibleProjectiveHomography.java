@@ -29,7 +29,7 @@ import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.optimization.UtilOptimize;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
@@ -78,8 +78,8 @@ public class CompatibleProjectiveHomography {
 	private final Point4D_F64 a = new Point4D_F64();
 
 	// Scrambled versions of input camera matrices. See include comments
-	private final FastQueue<DMatrixRMaj> copyA = new FastQueue<>(()->new DMatrixRMaj(3,4));
-	private final FastQueue<DMatrixRMaj> copyB = new FastQueue<>(()->new DMatrixRMaj(3,4));
+	private final DogArray<DMatrixRMaj> copyA = new DogArray<>(()->new DMatrixRMaj(3,4));
+	private final DogArray<DMatrixRMaj> copyB = new DogArray<>(()->new DMatrixRMaj(3,4));
 
 	// RM = random matrix. Used to scramble inputs. See code comments below for why orthogonal
 	private final DMatrixRMaj RM = RandomMatrices_DDRM.orthogonal(4,4,new Random(3245));

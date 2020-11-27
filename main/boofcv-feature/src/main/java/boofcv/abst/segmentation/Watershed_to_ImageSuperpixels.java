@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Wrapper around {@link WatershedVincentSoille1991} for {@link ImageSuperpixels}.  Watershed regions
@@ -49,8 +49,8 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase<T>> implements Im
 
 	private MergeSmallRegions<GrayU8> pruneSmall;
 
-	private GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
-	private FastQueue<float[]> regionColor = new ColorQueue_F32(1);
+	private DogArray_I32 regionMemberCount = new DogArray_I32();
+	private DogArray<float[]> regionColor = new ColorQueue_F32(1);
 
 	private int numRegions;
 

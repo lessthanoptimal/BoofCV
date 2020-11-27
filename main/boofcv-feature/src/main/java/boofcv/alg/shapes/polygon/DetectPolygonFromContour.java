@@ -34,9 +34,9 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,13 +83,13 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 
 	// finds the initial polygon around a target candidate
 	private PointsToPolyline contourToPolyline;
-	private GrowQueue_I32 splits = new GrowQueue_I32();
+	private DogArray_I32 splits = new DogArray_I32();
 
 	// Used to prune false positives
 	private ContourEdgeIntensity<T> contourEdgeIntensity;
 
 	// extera information for found shapes
-	FastQueue<Info> foundInfo = new FastQueue<>(Info::new);
+	DogArray<Info> foundInfo = new DogArray<>(Info::new);
 
 	// true if points touching the border are NOT pruned
 	private boolean canTouchBorder;
@@ -114,16 +114,16 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private PolygonHelper helper;
 
 	// storage space for contour in undistorted pixels
-	private FastQueue<Point2D_I32> undistorted = new FastQueue<>(Point2D_I32::new);
+	private DogArray<Point2D_I32> undistorted = new DogArray<>(Point2D_I32::new);
 
 	// type of input gray scale image it can process
 	private Class<T> inputType;
 
 	// indicates which corners touch the border
-	private GrowQueue_B borderCorners = new GrowQueue_B();
+	private DogArray_B borderCorners = new DogArray_B();
 
 	// temporary storage for a contour
-	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32::new);
+	private DogArray<Point2D_I32> contourTmp = new DogArray<>(Point2D_I32::new);
 	List<Point2D_I32> polygonPixel = new ArrayList<>();
 
 	// times for internal profiling
@@ -442,7 +442,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param polygon Polygon in distorted (original image) pixels
 	 * @param onImageBorder storage for corner indexes
 	 */
-	void determineCornersOnBorder( Polygon2D_F64 polygon, GrowQueue_B onImageBorder ) {
+	void determineCornersOnBorder( Polygon2D_F64 polygon, DogArray_B onImageBorder ) {
 		onImageBorder.reset();
 		for (int i = 0; i < polygon.size(); i++) {
 			Point2D_F64 p = polygon.get(i);
@@ -469,7 +469,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 //	 * @param polygon Refined polygon
 //	 * @param corners storage for corner indexes
 //	 */
-//	void determineCornersOnBorder( Polygon2D_F64 polygon , GrowQueue_B corners , float tol ) {
+//	void determineCornersOnBorder( Polygon2D_F64 polygon , DogArray_B corners , float tol ) {
 //		corners.reset();
 //		for (int i = 0; i < polygon.size(); i++) {
 //			corners.add(isUndistortedOnBorder(polygon.get(i),tol));
@@ -500,7 +500,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	/**
 	 * Removes lens distortion from the found contour
 	 */
-	private void removeDistortionFromContour( List<Point2D_I32> distorted, FastQueue<Point2D_I32> undistorted ) {
+	private void removeDistortionFromContour( List<Point2D_I32> distorted, DogArray<Point2D_I32> undistorted ) {
 		undistorted.reset();
 
 		for (int j = 0; j < distorted.size(); j++) {
@@ -600,7 +600,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	/**
 	 * Returns additional information on the polygon
 	 */
-	public FastQueue<Info> getFound() {
+	public DogArray<Info> getFound() {
 		return foundInfo;
 	}
 
@@ -636,7 +636,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		 * Boolean value for each corner being along the border.  If empty then non of the corners are long the border.
 		 * true means the corner is a border corner.
 		 */
-		public GrowQueue_B borderCorners = new GrowQueue_B();
+		public DogArray_B borderCorners = new DogArray_B();
 
 		/**
 		 * Polygon in undistorted image pixels.
@@ -647,7 +647,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		 */
 		public Polygon2D_F64 polygonDistorted = new Polygon2D_F64();
 
-		public GrowQueue_I32 splits = new GrowQueue_I32();
+		public DogArray_I32 splits = new DogArray_I32();
 
 		/**
 		 * Contour that the shape was fit to. The point coordinates will be in undistorted coordinates if

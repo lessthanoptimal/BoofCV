@@ -26,7 +26,7 @@ import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -110,7 +110,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	 * Take this many observations and turn into garbage observations
 	 */
 	private void movePointBehindCameras( int count ) {
-		FastQueue<Point> points = structure.points;
+		DogArray<Point> points = structure.points;
 
 		int[] indexes = new int[points.size];
 		for (int i = 0; i < points.size; i++) {

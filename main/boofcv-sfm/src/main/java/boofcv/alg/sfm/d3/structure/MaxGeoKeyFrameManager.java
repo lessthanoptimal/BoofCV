@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,10 @@ import georegression.struct.point.Point2D_F64;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import org.ddogleg.sorting.QuickSort_S32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -50,10 +50,10 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	public double minimumCoverage = 0.4;
 
 	// list of frames to discard
-	protected final GrowQueue_I32 discardKeyIndices = new GrowQueue_I32();
+	protected final DogArray_I32 discardKeyIndices = new DogArray_I32();
 
 	// Information of each camera and is used to compute the coverage
-	protected FastQueue<CameraInfo> cameras = new FastQueue<>(CameraInfo::new, CameraInfo::reset);
+	protected DogArray<CameraInfo> cameras = new DogArray<>(CameraInfo::new, CameraInfo::reset);
 
 	// used to compute the feature coverage on the image
 	ImageCoverage coverage = new ImageCoverage();
@@ -101,7 +101,7 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba ) {
+	public DogArray_I32 selectFramesToDiscard( PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba ) {
 		// always add a new keyframe until it hits the max
 		discardKeyIndices.reset();
 		if (sba.frames.size <= maxKeyFrames)

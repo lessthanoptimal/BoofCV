@@ -43,7 +43,7 @@ import boofcv.visualize.VisualizeData;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -242,7 +242,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 	private void checkCloudPlane( List<Point3D_F64> cloud ) {
 		assertTrue(cloud.size() > 100);
 
-		GrowQueue_F64 arrayZ = new GrowQueue_F64();
+		DogArray_F64 arrayZ = new DogArray_F64();
 		arrayZ.resize(cloud.size());
 		arrayZ.reset();
 		double error = 0.0;

@@ -37,7 +37,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -130,7 +130,7 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		}
 		lookup.images = images;
 
-		assertTrue(alg.process(scene, 0, GrowQueue_I32.array(1, 2), sbaIndexToViewID::get));
+		assertTrue(alg.process(scene, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
 
 		GrayF32 found = alg.getFusedDisparity();
 		assertEquals(listIntrinsic.get(0).width, found.width);
@@ -189,7 +189,7 @@ public class TestMultiViewToFusedDisparity extends BoofStandardJUnit {
 		alg.lookUpImages = new MockLookUp(images);
 
 		// just see if it blows up
-		assertTrue(alg.process(scene, 0, GrowQueue_I32.array(1, 2), sbaIndexToViewID::get));
+		assertTrue(alg.process(scene, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
 	}
 
 	class MockLookUp implements LookUpImages {

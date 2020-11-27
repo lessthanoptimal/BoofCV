@@ -28,8 +28,8 @@ import boofcv.struct.border.ImageBorderValue;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -124,7 +124,7 @@ public class ConvolveImageBox {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical( GrayF32 input, GrayF32 output, int radius, @Nullable GrowArray<GrowQueue_F32> work ) {
+	public static void vertical( GrayF32 input, GrayF32 output, int radius, @Nullable GrowArray<DogArray_F32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius, false);
@@ -143,7 +143,7 @@ public class ConvolveImageBox {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical( GrayU8 input, GrayI16 output, int radius, @Nullable GrowArray<GrowQueue_I32> work ) {
+	public static void vertical( GrayU8 input, GrayI16 output, int radius, @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
@@ -162,7 +162,7 @@ public class ConvolveImageBox {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical( GrayU8 input, GrayS32 output, int radius, @Nullable GrowArray<GrowQueue_I32> work ) {
+	public static void vertical( GrayU8 input, GrayS32 output, int radius, @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
@@ -181,7 +181,7 @@ public class ConvolveImageBox {
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical( GrayS16 input, GrayI16 output, int radius, @Nullable GrowArray<GrowQueue_I32> work ) {
+	public static void vertical( GrayS16 input, GrayI16 output, int radius, @Nullable GrowArray<DogArray_I32> work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);

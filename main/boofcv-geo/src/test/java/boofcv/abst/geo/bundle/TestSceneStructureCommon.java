@@ -20,7 +20,7 @@ package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ class TestSceneStructureCommon extends BoofStandardJUnit {
 			original.add(structure.points.grow());
 		}
 
-		GrowQueue_I32 which = new GrowQueue_I32();
+		DogArray_I32 which = new DogArray_I32();
 		which.add(2);
 		which.add(5);
 

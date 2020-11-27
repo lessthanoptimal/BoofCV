@@ -32,7 +32,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.dense.fixed.MatrixFeatures_DDF3;
@@ -72,7 +72,7 @@ class TestUchiyaMarkerTracker extends BoofStandardJUnit {
 
 		tracker.process(dots);
 
-		FastQueue<UchiyaMarkerTracker.Track> tracks = tracker.getCurrentTracks();
+		DogArray<UchiyaMarkerTracker.Track> tracks = tracker.getCurrentTracks();
 		assertEquals(1,tracks.size);
 		UchiyaMarkerTracker.Track t = tracks.get(0);
 		assertEquals(targetID, t.globalDoc.documentID);
@@ -104,7 +104,7 @@ class TestUchiyaMarkerTracker extends BoofStandardJUnit {
 			}
 			tracker.process(copied);
 
-			FastQueue<UchiyaMarkerTracker.Track> tracks = tracker.getCurrentTracks();
+			DogArray<UchiyaMarkerTracker.Track> tracks = tracker.getCurrentTracks();
 			assertEquals(1,tracks.size);
 			UchiyaMarkerTracker.Track t = tracks.get(0);
 			assertEquals(targetID, t.globalDoc.documentID);

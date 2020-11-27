@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.struct.ConnectRule;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public interface BinaryContourInterface {
 	 * @param contourID ID of the contour you wish to load
 	 * @param storage Storage for the contour points. Must be set to declare new elements.
 	 */
-	void loadContour(int contourID, FastQueue<Point2D_I32> storage);
+	void loadContour(int contourID, DogArray<Point2D_I32> storage);
 
 	/**
 	 * Overwrites the coordinates of the saved contour. Useful when points have
@@ -86,7 +86,7 @@ public interface BinaryContourInterface {
 	 * @return New copy of contour
 	 */
 	static List<Point2D_I32> copyContour(BinaryContourInterface finder , int contourID) {
-		FastQueue<Point2D_I32> storage = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> storage = new DogArray<>(Point2D_I32::new);
 		finder.loadContour(contourID,storage);
 		List<Point2D_I32> list = new ArrayList<>(storage.size);
 		for (int i = 0; i < storage.size; i++) {

@@ -39,7 +39,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +77,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 
 	// estimate the camera motion up to a scale factor from two sets of point correspondences
 	private final ModelMatcher<Se3_F64, Point2D3D> motionEstimator;
-	private final FastQueue<Point2D3D> observationsPnP = new FastQueue<>(Point2D3D::new);
+	private final DogArray<Point2D3D> observationsPnP = new DogArray<>(Point2D3D::new);
 
 	// Internal profiling
 	private @Getter double timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance, timeSpawn;

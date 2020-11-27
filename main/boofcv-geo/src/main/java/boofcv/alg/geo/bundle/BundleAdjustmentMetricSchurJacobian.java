@@ -33,7 +33,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.ReshapeMatrix;
@@ -67,8 +67,8 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	public @Getter @Setter JacobianSo3 jacSO3 = new JacobianSo3Rodrigues();
 
 	// Recycled data structures for use in the maps below
-	private final FastQueue<Se3_F64> storageSe3 = new FastQueue<>(Se3_F64::new);
-	private final FastQueue<DMatrixRMaj[]> storageSO3Jac = new FastQueue<>(this::declareRotJacStorage);
+	private final DogArray<Se3_F64> storageSe3 = new DogArray<>(Se3_F64::new);
+	private final DogArray<DMatrixRMaj[]> storageSO3Jac = new DogArray<>(this::declareRotJacStorage);
 	// Look up workspace by view ID when relative view. Only filled in when a relative view is encountered
 	private final Map<SceneStructureMetric.View, Se3_F64> mapWorldToView = new HashMap<>();
 	private final TIntObjectMap<DMatrixRMaj[]> mapSO3Jac = new TIntObjectHashMap<>();

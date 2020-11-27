@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.geo.f;
 import boofcv.abst.geo.EstimateNofEpipolar;
 import boofcv.alg.geo.f.EssentialNister5;
 import boofcv.struct.geo.AssociatedPair;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class WrapEssentialNister5 implements EstimateNofEpipolar {
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, FastQueue<DMatrixRMaj> estimatedModels) {
+	public boolean process(List<AssociatedPair> points, DogArray<DMatrixRMaj> estimatedModels) {
 		if( !alg.process(points,estimatedModels) )
 			return false;
 

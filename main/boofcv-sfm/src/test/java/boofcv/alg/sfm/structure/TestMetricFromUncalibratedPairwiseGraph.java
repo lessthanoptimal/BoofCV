@@ -26,8 +26,8 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -109,12 +109,12 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 		var graph = new PairwiseImageGraph();
 		List<String> viewIds = BoofMiscOps.asList("A", "B", "C");
 		List<ImageDimension> dimensions = new ArrayList<>();
-		var inlierToSeed = GrowQueue_I32.array(1, 3, 5, 7, 9);
-		var inlierToOther = new FastQueue<>(GrowQueue_I32::new, GrowQueue_I32::reset);
+		var inlierToSeed = DogArray_I32.array(1, 3, 5, 7, 9);
+		var inlierToOther = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
 		// create distinctive sets of inlier indexes for each view
 		for (int otherIdx = 0; otherIdx < viewIds.size() - 1; otherIdx++) {
-			GrowQueue_I32 inliers = inlierToOther.grow();
+			DogArray_I32 inliers = inlierToOther.grow();
 			for (int i = 0; i < inlierToSeed.size; i++) {
 				inliers.add(inlierToSeed.get(i) + 1 + otherIdx);
 			}
@@ -164,7 +164,7 @@ class TestMetricFromUncalibratedPairwiseGraph extends BoofStandardJUnit {
 			assertEquals(viewId, wview.inliers.views.get(0).id);
 			for (int checkIdx = 0; checkIdx < viewIds.size(); checkIdx++) {
 				final int c = checkIdx;
-				GrowQueue_I32 obs = wview.inliers.observations.get(checkIdx);
+				DogArray_I32 obs = wview.inliers.observations.get(checkIdx);
 				obs.forIdx(( i, value ) -> assertEquals(i*2 + 1 + c, value));
 			}
 		});

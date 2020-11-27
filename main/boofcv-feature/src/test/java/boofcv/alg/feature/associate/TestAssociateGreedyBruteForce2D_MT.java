@@ -23,7 +23,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -47,10 +47,10 @@ class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 	}
 
 	void compare( boolean backwards , double ratioTest ) {
-		FastQueue<TupleDesc_F64> descSrc = createData(200);
-		FastQueue<TupleDesc_F64> descDst = createData(200);
-		FastQueue<Point2D_F64> pointsSrc = createPoints(200);
-		FastQueue<Point2D_F64> pointsDst = createPoints(200);
+		DogArray<TupleDesc_F64> descSrc = createData(200);
+		DogArray<TupleDesc_F64> descDst = createData(200);
+		DogArray<Point2D_F64> pointsSrc = createPoints(200);
+		DogArray<Point2D_F64> pointsDst = createPoints(200);
 
 
 		var distance = new AssociateImageDistanceEuclideanSq();
@@ -88,20 +88,20 @@ class TestAssociateGreedyBruteForce2D_MT extends BoofStandardJUnit {
 		}
 	}
 
-	public static FastQueue<TupleDesc_F64> createData( int count )
+	public static DogArray<TupleDesc_F64> createData( int count )
 	{
 		Random rand = new Random(234);
-		FastQueue<TupleDesc_F64> ret = new FastQueue<>(count,()-> new TupleDesc_F64(1));
+		DogArray<TupleDesc_F64> ret = new DogArray<>(count,()-> new TupleDesc_F64(1));
 		for( int i = 0; i < count; i++ ) {
 			ret.grow().set(rand.nextDouble()*10);
 		}
 		return ret;
 	}
 
-	public static FastQueue<Point2D_F64> createPoints(int count )
+	public static DogArray<Point2D_F64> createPoints(int count )
 	{
 		Random rand = new Random(234);
-		FastQueue<Point2D_F64> ret = new FastQueue<>(count,Point2D_F64::new);
+		DogArray<Point2D_F64> ret = new DogArray<>(count,Point2D_F64::new);
 		for( int i = 0; i < count; i++ ) {
 			ret.grow().setTo(rand.nextDouble()*width,rand.nextDouble()*height);
 		}

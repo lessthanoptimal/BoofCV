@@ -36,8 +36,8 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,13 +107,13 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 	// Quick look up of view info by ID
 	final Map<String, ViewInfo> mapScores = new HashMap<>();
-	final FastQueue<ViewInfo> arrayScores = new FastQueue<>(ViewInfo::new, ViewInfo::reset);
+	final DogArray<ViewInfo> arrayScores = new DogArray<>(ViewInfo::new, ViewInfo::reset);
 
 	// Used to look up ViewInfo from SBA index
 	TIntObjectMap<String> indexSbaToViewID = new TIntObjectHashMap<>();
 
 	// Which SBA view indexes are paired to the target
-	GrowQueue_I32 imagePairIndexesSba = new GrowQueue_I32();
+	DogArray_I32 imagePairIndexesSba = new DogArray_I32();
 
 	// Used when a stereo mask is required but none is available
 	GrayU8 dummyMask = new GrayU8(1, 1);
@@ -286,7 +286,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * Combing stereo information from all images in this cluster, compute a disparity image and add it to the cloud
 	 */
 	void computeFusedDisparityAddCloud( SceneStructureMetric scene, ViewInfo center,
-										TIntObjectMap<String> sbaIndexToName, GrowQueue_I32 pairIndexes ) {
+										TIntObjectMap<String> sbaIndexToName, DogArray_I32 pairIndexes ) {
 		if (!computeFused.process(scene, center.relations.indexSba, pairIndexes, sbaIndexToName::get))
 			throw new RuntimeException("Disparity failed!");
 

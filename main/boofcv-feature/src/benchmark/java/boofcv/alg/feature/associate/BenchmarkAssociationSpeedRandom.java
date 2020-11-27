@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
@@ -51,8 +51,8 @@ public class BenchmarkAssociationSpeedRandom {
 	int NUM_FEATURES = 1000;
 
 	Random rand = new Random(234234);
-	FastQueue<TupleDesc_F64> listA = createSet(rand);
-	FastQueue<TupleDesc_F64> listB = createSet(rand);
+	DogArray<TupleDesc_F64> listA = createSet(rand);
+	DogArray<TupleDesc_F64> listB = createSet(rand);
 
 	ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 
@@ -101,8 +101,8 @@ public class BenchmarkAssociationSpeedRandom {
 //		kdtree.associate();
 //	}
 
-	private FastQueue<TupleDesc_F64> createSet( Random rand ) {
-		FastQueue<TupleDesc_F64> ret = new FastQueue<>(() -> new TupleDesc_F64(DOF));
+	private DogArray<TupleDesc_F64> createSet( Random rand ) {
+		DogArray<TupleDesc_F64> ret = new DogArray<>(() -> new TupleDesc_F64(DOF));
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.grow();

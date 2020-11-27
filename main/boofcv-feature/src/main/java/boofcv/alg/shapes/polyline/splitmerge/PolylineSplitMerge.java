@@ -25,11 +25,11 @@ import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.DogLinkedList;
 import org.ddogleg.struct.DogLinkedList.Element;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
 
@@ -106,14 +106,14 @@ public class PolylineSplitMerge {
 
 	// the corner list that's being built
 	DogLinkedList<Corner> list = new DogLinkedList<>();
-	FastQueue<Corner> corners = new FastQueue<>(Corner::new);
+	DogArray<Corner> corners = new DogArray<>(Corner::new);
 
 	private SplitSelector splitter = new MaximumLineDistance();
 	private final SplitResults resultsA = new SplitResults();
 	private final SplitResults resultsB = new SplitResults();
 
 	// List of all the found polylines and their score
-	private final FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline::new);
+	private final DogArray<CandidatePolyline> polylines = new DogArray<>(CandidatePolyline::new);
 	private CandidatePolyline bestPolyline;
 
 	// if true that means a fatal error and no polygon can be fit
@@ -751,10 +751,10 @@ public class PolylineSplitMerge {
 	 * Returns the previous corner in the list
 	 */
 	Element<Corner> previous( Element<Corner> e ) {
-		if( e.previous == null ) {
+		if( e.prev == null ) {
 			return list.getTail();
 		} else {
-			return e.previous;
+			return e.prev;
 		}
 	}
 
@@ -823,7 +823,7 @@ public class PolylineSplitMerge {
 		line.b.setTo(endB.x,endB.y);
 	}
 
-	public FastQueue<CandidatePolyline> getPolylines() {
+	public DogArray<CandidatePolyline> getPolylines() {
 		return polylines;
 	}
 
@@ -877,10 +877,10 @@ public class PolylineSplitMerge {
 
 	public static class CandidatePolyline
 	{
-		public GrowQueue_I32 splits = new GrowQueue_I32();
+		public DogArray_I32 splits = new DogArray_I32();
 		public double score;
 		public double maxSideError;
-		public GrowQueue_F64 sideErrors = new GrowQueue_F64();
+		public DogArray_F64 sideErrors = new DogArray_F64();
 
 		public void reset() {
 			splits.reset();

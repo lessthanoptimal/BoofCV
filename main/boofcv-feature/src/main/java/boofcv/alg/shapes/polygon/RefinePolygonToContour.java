@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LinePolar2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class RefinePolygonToContour {
 	private List<Point2D_I32> work = new ArrayList<>();
 	private LinePolar2D_F64 polar = new LinePolar2D_F64();
 
-	private FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64::new);
+	private DogArray<LineGeneral2D_F64> lines = new DogArray<>(LineGeneral2D_F64::new);
 
 	/**
 	 * Refines the estimate using all the points in the contour
@@ -51,7 +51,7 @@ public class RefinePolygonToContour {
 	 * @param vertexes (Input) List of indexes that are vertexes in the contour
 	 * @param output (Output) Storage for where the found polygon is saved to
 	 */
-	public void process(List<Point2D_I32> contour , GrowQueue_I32 vertexes , Polygon2D_F64 output ) {
+	public void process(List<Point2D_I32> contour , DogArray_I32 vertexes , Polygon2D_F64 output ) {
 
 		int numDecreasing = 0;
 		for (int i = vertexes.size-1,j=0; j < vertexes.size; i=j,j++) {

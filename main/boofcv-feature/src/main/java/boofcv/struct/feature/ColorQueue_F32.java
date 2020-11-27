@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.struct.feature;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Stores an array of floats on constant size.  Intended for storing multi band data.
  *
  * @author Peter Abeles
  */
-public class ColorQueue_F32 extends FastQueue<float[]> {
+public class ColorQueue_F32 extends DogArray<float[]> {
 
 	public ColorQueue_F32(int numBands) {
 		super(float[].class,()->new float[numBands]);

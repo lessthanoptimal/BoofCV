@@ -26,7 +26,7 @@ import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.SpecialEuclideanOps_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -115,7 +115,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			ret.mapNodes.put(v.id, v);
 
 			// Randomly select connecting nodes from ones which higher indexes to ensure (src,dst) pairs are unique
-			var candidates = GrowQueue_I32.range(viewIdx + 1, ret.nodes.size);
+			var candidates = DogArray_I32.range(viewIdx + 1, ret.nodes.size);
 			PrimitiveArrays.shuffle(candidates.data, 0, candidates.size, rand);
 			int numConnections = rand.nextInt() + 5;
 			for (int i = 0; i < Math.min(numConnections, candidates.size); i++) {
@@ -183,8 +183,8 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			for (int i = 0; i < numViews; i++) {
 				assertEquals(va.inliers.views.get(i).id, vb.inliers.views.get(i).id);
 
-				GrowQueue_I32 oa = va.inliers.observations.get(i);
-				GrowQueue_I32 ob = vb.inliers.observations.get(i);
+				DogArray_I32 oa = va.inliers.observations.get(i);
+				DogArray_I32 ob = vb.inliers.observations.get(i);
 				assertEquals(oa.size, ob.size);
 				oa.forIdx(( idx, v ) -> assertEquals(v, ob.get(idx)));
 			}
@@ -196,7 +196,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 
 		pairwise.nodes.forIdx(( i, v ) -> ret.addView(v));
 
-		var candidates = GrowQueue_I32.range(0, pairwise.nodes.size);
+		var candidates = DogArray_I32.range(0, pairwise.nodes.size);
 
 		ret.viewList.forEach(v -> {
 			v.intrinsic.f = rand.nextDouble();
@@ -219,7 +219,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			v.inliers.observations.resize(numViews);
 			for (int i = 0; i < numViews; i++) {
 				v.inliers.views.set(i, pairwise.nodes.get(candidates.get(i)));
-				GrowQueue_I32 obs = v.inliers.observations.get(i);
+				DogArray_I32 obs = v.inliers.observations.get(i);
 				obs.resize(numObs);
 				for (int j = 0; j < numObs; j++) {
 					obs.data[j] = rand.nextInt();

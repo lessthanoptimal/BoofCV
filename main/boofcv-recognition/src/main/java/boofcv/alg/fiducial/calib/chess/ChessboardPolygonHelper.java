@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.shapes.polygon.PolygonHelper;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray_B;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class ChessboardPolygonHelper<T extends ImageGray<T>> implements PolygonH
 	 */
 	@Override
 	public boolean filterPixelPolygon(Polygon2D_F64 undistorted , Polygon2D_F64 distorted,
-									  GrowQueue_B touches, boolean touchesBorder) {
+									  DogArray_B touches, boolean touchesBorder) {
 
 		if( touchesBorder ) {
 			if( distorted.size() < 3)

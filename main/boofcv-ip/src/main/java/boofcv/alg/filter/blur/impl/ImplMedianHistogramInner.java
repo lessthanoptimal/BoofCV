@@ -22,7 +22,7 @@ package boofcv.alg.filter.blur.impl;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
 import java.util.Arrays;
@@ -54,12 +54,12 @@ public class ImplMedianHistogramInner {
 	 * @param radiusY Size of the filter region. Y-axis
 	 * @param work Creates local work space arrays
 	 */
-	public static void process( GrayU8 input, GrayU8 output, int radiusX, int radiusY, GrowArray<GrowQueue_I32> work ) {
+	public static void process( GrayU8 input, GrayU8 output, int radiusX, int radiusY, GrowArray<DogArray_I32> work ) {
 		int w = 2*radiusX + 1;
 		int h = 2*radiusY + 1;
 
 		//CONCURRENT_REMOVE_BELOW
-		GrowQueue_I32 array = work.grow();
+		DogArray_I32 array = work.grow();
 
 		// sanity check to make sure the image isn't too small to be processed by this algorithm
 		if (input.width < w || input.height < h)

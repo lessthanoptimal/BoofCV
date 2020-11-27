@@ -38,7 +38,7 @@ import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
 import georegression.transform.twist.TwistCoordinate_F32;
 import georegression.transform.twist.TwistOps_F32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolverDense;
@@ -73,7 +73,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 	Planar<D> derivX, derivY;
 
 	// storage for pixel information in the key frame
-	FastQueue<Pixel> keypixels;
+	DogArray<Pixel> keypixels;
 
 	// Estimated motion from key frame to current frame
 	private final Se3_F32 keyToCurrent = new Se3_F32();
@@ -122,7 +122,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 		derivX = this.derivType.createImage(1, 1);
 		derivY = this.derivType.createImage(1, 1);
 
-		keypixels = new FastQueue<>(() -> new Pixel(numBands));
+		keypixels = new DogArray<>(() -> new Pixel(numBands));
 		computeD = FactoryDerivative.gradient(DerivativeType.THREE, this.imageType, this.derivType);
 	}
 

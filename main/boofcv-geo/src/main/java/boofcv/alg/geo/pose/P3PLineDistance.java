@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * <p>
@@ -56,5 +56,5 @@ public interface P3PLineDistance {
 	 *
 	 * @return List of solutions.
 	 */
-	public FastQueue<PointDistance3> getSolutions();
+	public DogArray<PointDistance3> getSolutions();
 }

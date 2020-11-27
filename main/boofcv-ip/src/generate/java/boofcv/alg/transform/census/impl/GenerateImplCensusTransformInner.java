@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 		out.print(
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.struct.image.InterleavedU16;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
@@ -226,7 +226,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 		String dataType = src.getDataType();
 		String sumType = src.getSumType();
 
-		out.print("\tpublic static void sample_S64( final "+src.getSingleBandName()+" input , final int radius , final GrowQueue_I32 offsets,\n" +
+		out.print("\tpublic static void sample_S64( final "+src.getSingleBandName()+" input , final int radius , final DogArray_I32 offsets,\n" +
 				"\t\t\t\t\t\t\t\t  final GrayS64 output ) {\n" +
 				"\t\tfinal int height = input.height-radius;\n" +
 				"\t\tfinal "+dataType+"[] src = input.data;\n" +
@@ -261,7 +261,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 		String dataType = src.getDataType();
 		String sumType = src.getSumType();
 
-		out.print("\tpublic static void sample_IU16( final "+src.getSingleBandName()+" input , final int radius , final GrowQueue_I32 offsets,\n" +
+		out.print("\tpublic static void sample_IU16( final "+src.getSingleBandName()+" input , final int radius , final DogArray_I32 offsets,\n" +
 				"\t\t\t\t\t\t\t\t   final InterleavedU16 output ) {\n" +
 				"\t\tfinal int height = input.height-radius;\n" +
 				"\t\tfinal "+dataType+"[] src = input.data;\n" +

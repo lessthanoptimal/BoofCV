@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -68,8 +68,8 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 
 	// Mesh for points added one at a time
 	TriangleMesh meshSingles = new TriangleMesh();
-	GrowQueue_F32 pointSingles = new GrowQueue_F32();
-	GrowQueue_I32 facesSingles = new GrowQueue_I32();
+	DogArray_F32 pointSingles = new DogArray_F32();
+	DogArray_I32 facesSingles = new DogArray_I32();
 	final Object lockSingles = new Object();
 	Timer timerSingles = null;
 	TimerTask taskSingles = null;
@@ -108,7 +108,7 @@ public class PointCloudViewerPanelFX extends JFXPanel {
 		world.getChildren().clear();
 	}
 
-	public void addCloud(GrowQueue_F32 cloudXYZ) {
+	public void addCloud(DogArray_F32 cloudXYZ) {
 		int N = cloudXYZ.size/3;
 
 		float[] points = new float[ templatePoints.length*N ];

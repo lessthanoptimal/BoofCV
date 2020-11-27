@@ -34,8 +34,8 @@ import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	// Motion estimator for points on plane.  Motion estimated is from key-frame to current-frame
 	private final ModelMatcher<Se2_F64, PlanePtPixel> planeMotion;
 	// storage for data passed into planeMotion
-	private final FastQueue<PlanePtPixel> planeSamples = new FastQueue<>(PlanePtPixel::new);
+	private final DogArray<PlanePtPixel> planeSamples = new DogArray<>(PlanePtPixel::new);
 
 	// when the inlier set is less than this number new features are detected
 	private final int thresholdAdd;
@@ -131,8 +131,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	private final Se2_F64 temp = new Se2_F64();
 
 	// angles of rotation computed from points far away
-	private final GrowQueue_F64 farAngles = new GrowQueue_F64();
-	private final GrowQueue_F64 farAnglesCopy = new GrowQueue_F64();
+	private final DogArray_F64 farAngles = new DogArray_F64();
+	private final DogArray_F64 farAnglesCopy = new DogArray_F64();
 
 	// select angle from points far and the number of points used to estimate it
 	private double farAngle;

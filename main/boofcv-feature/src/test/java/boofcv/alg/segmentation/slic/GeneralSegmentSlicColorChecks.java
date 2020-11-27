@@ -27,8 +27,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -61,11 +61,11 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> exte
 
 		alg.process(input, output);
 
-		GrowQueue_I32 memberCount = alg.getRegionMemberCount();
+		DogArray_I32 memberCount = alg.getRegionMemberCount();
 		checkUnique(alg, output, memberCount.size);
 
 		// see if the member count is correctly computed
-		GrowQueue_I32 foundCount = new GrowQueue_I32(memberCount.size);
+		DogArray_I32 foundCount = new DogArray_I32(memberCount.size);
 		foundCount.resize(memberCount.size);
 		ImageSegmentationOps.countRegionPixels(output, foundCount.size, foundCount.data);
 		for (int i = 0; i < memberCount.size; i++) {
@@ -179,7 +179,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase<T>> exte
 
 		boolean[] assigned = new boolean[numRegions];
 		Arrays.fill(assigned, false);
-		FastQueue<float[]> colors = new ColorQueue_F32(imageType.getNumBands());
+		DogArray<float[]> colors = new ColorQueue_F32(imageType.getNumBands());
 		colors.resize(numRegions);
 
 		float[] found = new float[imageType.getNumBands()];

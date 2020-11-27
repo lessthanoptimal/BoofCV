@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -108,7 +108,7 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 
 	@Override
 	public void dropTracks(Dropper dropper) {
-		FastQueue<HybridTrack<Desc>> all = tracker.getTracksAll();
+		DogArray<HybridTrack<Desc>> all = tracker.getTracksAll();
 
 		for (int i = all.size-1; i >= 0; i--) {
 			if( !dropper.shouldDropTrack(all.get(i)) )

@@ -28,7 +28,7 @@ import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -100,8 +100,8 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
 
-		FastQueue<AssociatedPair> associated = createAssociations(100, false, false);
-		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex::new);
+		DogArray<AssociatedPair> associated = createAssociations(100, false, false);
+		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
 			associtedIdx.grow().setAssociation(i, i, 1);
 		}
@@ -125,8 +125,8 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
 
-		FastQueue<AssociatedPair> associated = createAssociations(100, false, true);
-		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex::new);
+		DogArray<AssociatedPair> associated = createAssociations(100, false, true);
+		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
 			associtedIdx.grow().setAssociation(i, i, 1);
 		}
@@ -150,8 +150,8 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
 
-		FastQueue<AssociatedPair> associated = createAssociations(100, true, false);
-		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex::new);
+		DogArray<AssociatedPair> associated = createAssociations(100, true, false);
+		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
 			associtedIdx.grow().setAssociation(i, i, 1);
 		}
@@ -170,7 +170,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		assertEquals("foo", found.dst.id);
 	}
 
-	private FastQueue<AssociatedPair> createAssociations( int N, boolean planar, boolean pureRotation ) {
+	private DogArray<AssociatedPair> createAssociations( int N, boolean planar, boolean pureRotation ) {
 		var intrinsic = new CameraPinhole(400, 410, 0, 500, 500, 1000, 1000);
 		Se3_F64 view0_to_view1 = SpecialEuclideanOps_F64.eulerXyz(0.3, 0, 0.01, -0.04, -2e-3, 0.4, null);
 
@@ -186,7 +186,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 			feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, N, rand);
 		}
 
-		var associated = new FastQueue<>(AssociatedPair::new);
+		var associated = new DogArray<>(AssociatedPair::new);
 
 		for (int i = 0; i < feats3D.size(); i++) {
 			Point3D_F64 X = feats3D.get(i);

@@ -24,7 +24,7 @@ import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3
 	private final DistanceFromModel<Se3_F64, Point2D3D> distance;
 
 	// Stereo observations converted into a monocular observation
-	private final FastQueue<Point2D3D> monoPoints = new FastQueue<>(10, Point2D3D::new);
+	private final DogArray<Point2D3D> monoPoints = new DogArray<>(10, Point2D3D::new);
 
 	// known transform from left camera view into the right camera view
 	private Se3_F64 leftToRight = new Se3_F64();
@@ -52,7 +52,7 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64, Stereo2D3
 	// computed transform from worldToRight
 	private final Se3_F64 worldToRight = new Se3_F64();
 
-	private final FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64::new);
+	private final DogArray<Se3_F64> solutions = new DogArray<>(4, Se3_F64::new);
 
 	// extra observation used for testing solutions
 	int extraForTest;

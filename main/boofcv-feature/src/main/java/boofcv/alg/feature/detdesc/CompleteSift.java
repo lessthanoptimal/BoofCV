@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,10 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
 
 /**
  * SIFT combined together to simultaneously detect and describe the key points it finds.  Memory is conserved by
@@ -51,10 +51,10 @@ public class CompleteSift extends SiftDetector
 	// describes the keypoints
 	DescribePointSift<GrayF32> describe;
 	// storage for found features
-	FastQueue<TupleDesc_F64> features;
+	DogArray<TupleDesc_F64> features;
 	// found orientations and feature locations
 	FastArray<ScalePoint> locations = new FastArray<>(ScalePoint.class);
-	GrowQueue_F64 orientations = new GrowQueue_F64();
+	DogArray_F64 orientations = new DogArray_F64();
 
 	// used to compute the image gradient
 	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three(GrayF32.class,null);
@@ -83,7 +83,7 @@ public class CompleteSift extends SiftDetector
 		this.describe = describe;
 
 		final int dof = describe.getDescriptorLength();
-		features = new FastQueue<>(()->new TupleDesc_F64(dof));
+		features = new DogArray<>(()->new TupleDesc_F64(dof));
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class CompleteSift extends SiftDetector
 		orientation.process(localX,localY,localSigma);
 
 		// describe each feature
-		GrowQueue_F64 angles = orientation.getOrientations();
+		DogArray_F64 angles = orientation.getOrientations();
 		for (int i = 0; i < angles.size; i++) {
 			describe.process(localX,localY,localSigma,angles.get(i),features.grow());
 
@@ -139,7 +139,7 @@ public class CompleteSift extends SiftDetector
 		return features;
 	}
 
-	public GrowQueue_F64 getOrientations() {
+	public DogArray_F64 getOrientations() {
 		return orientations;
 	}
 

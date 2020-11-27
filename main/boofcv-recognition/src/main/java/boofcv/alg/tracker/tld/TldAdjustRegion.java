@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Adjusts the previous region using information from the region tracker.
@@ -69,7 +69,7 @@ public class TldAdjustRegion {
 	 * @param targetRectangle (Input) current location of rectangle.  (output) adjusted location
 	 * @return true if successful
 	 */
-	public boolean process( FastQueue<AssociatedPair> pairs , Rectangle2D_F64 targetRectangle ) {
+	public boolean process( DogArray<AssociatedPair> pairs , Rectangle2D_F64 targetRectangle ) {
 		// estimate how the rectangle has changed and update it
 		if( !estimateMotion.process(pairs.toList()) )
 			return false;

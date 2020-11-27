@@ -46,9 +46,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +89,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	private final @Getter ModelMatcher<Se3_F64, Stereo2D3D> matcher;
 	private final ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
-	private final FastQueue<Stereo2D3D> modelFitData = new FastQueue<>(10, Stereo2D3D::new);
+	private final DogArray<Stereo2D3D> modelFitData = new DogArray<>(10, Stereo2D3D::new);
 
 	/** Configures and performs bundle adjustment */
 	private final @Getter MetricBundleAdjustmentUtils bundle = new MetricBundleAdjustmentUtils();
@@ -102,7 +102,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	private final AssociateDescription2D<TD> assocL2R;
 
 	/** Set of associated features across all views */
-	private final @Getter FastQueue<TrackQuad> trackQuads = new FastQueue<>(TrackQuad::new, TrackQuad::reset);
+	private final @Getter DogArray<TrackQuad> trackQuads = new DogArray<>(TrackQuad::new, TrackQuad::reset);
 
 	// features info extracted from the stereo pairs. 0 = previous 1 = current
 	private ImageInfo featsLeft0, featsLeft1;
@@ -129,7 +129,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 
 	// Total number of tracks it has created
 	private long totalTracks;
-	private final GrowQueue_I32 keyToTrackIdx = new GrowQueue_I32();
+	private final DogArray_I32 keyToTrackIdx = new DogArray_I32();
 
 	// Internal profiling
 	protected @Getter @Setter PrintStream profileOut;
@@ -141,8 +141,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	private final Point2D_F64 normLeft = new Point2D_F64();
 	private final Point2D_F64 normRight = new Point2D_F64();
 	private final Point3D_F64 X3 = new Point3D_F64();
-	private final FastQueue<Point2D_F64> listNorm = new FastQueue<>(Point2D_F64::new);
-	private final FastQueue<Se3_F64> listWorldToView = new FastQueue<>(Se3_F64::new);
+	private final DogArray<Point2D_F64> listNorm = new DogArray<>(Point2D_F64::new);
+	private final DogArray<Se3_F64> listWorldToView = new DogArray<>(Se3_F64::new);
 	private final List<TrackQuad> inliers = new ArrayList<>();
 	private final List<TrackQuad> consistentTracks = new ArrayList<>();
 	private final Se3_F64 found = new Se3_F64();
@@ -418,8 +418,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 		matches.swap();
 		matches.match2to3.reset();
 
-		FastQueue<Point2D_F64> leftLoc = featsLeft1.locationPixels;
-		FastQueue<Point2D_F64> rightLoc = featsRight1.locationPixels;
+		DogArray<Point2D_F64> leftLoc = featsLeft1.locationPixels;
+		DogArray<Point2D_F64> rightLoc = featsRight1.locationPixels;
 
 		assocL2R.setSource(leftLoc, featsLeft1.description);
 		assocL2R.setDestination(rightLoc, featsRight1.description);
@@ -460,10 +460,10 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 			trackQuads.get(i).leftCurrIndex = -1;
 		}
 
-		FastQueue<Point2D_F64> obs0 = featsLeft0.locationPixels;
-		FastQueue<Point2D_F64> obs1 = featsRight0.locationPixels;
-		FastQueue<Point2D_F64> obs2 = featsLeft1.locationPixels;
-		FastQueue<Point2D_F64> obs3 = featsRight1.locationPixels;
+		DogArray<Point2D_F64> obs0 = featsLeft0.locationPixels;
+		DogArray<Point2D_F64> obs1 = featsRight0.locationPixels;
+		DogArray<Point2D_F64> obs2 = featsLeft1.locationPixels;
+		DogArray<Point2D_F64> obs3 = featsRight1.locationPixels;
 
 
 		if (matches.match0to1.size != matches.match0to2.size)
@@ -535,7 +535,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	/**
 	 * Creates a look up table from src image feature index to dst image feature index
 	 */
-	private void setMatches( GrowQueue_I32 matches, FastAccess<AssociatedIndex> found, int sizeSrc ) {
+	private void setMatches( DogArray_I32 matches, FastAccess<AssociatedIndex> found, int sizeSrc ) {
 		matches.resize(sizeSrc);
 		for (int j = 0; j < sizeSrc; j++) {
 			matches.data[j] = -1;
@@ -551,8 +551,8 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	 */
 	private void describeImage( T image, ImageInfo info ) {
 		detector.detect(image);
-		FastQueue<Point2D_F64> l = info.locationPixels;
-		FastQueue<TD> d = info.description;
+		DogArray<Point2D_F64> l = info.locationPixels;
+		DogArray<TD> d = info.description;
 		l.resize(detector.getNumberOfFeatures());
 		d.resize(detector.getNumberOfFeatures());
 		info.sets.resize(detector.getNumberOfFeatures());
@@ -670,11 +670,11 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	 */
 	public class ImageInfo {
 		// Descriptor of each feature
-		FastQueue<TD> description = new FastQueue<>(detector::createDescription);
+		DogArray<TD> description = new DogArray<>(detector::createDescription);
 		// The set each feature belongs in
-		GrowQueue_I32 sets = new GrowQueue_I32();
+		DogArray_I32 sets = new DogArray_I32();
 		// The observed location in the image of each feature (pixels)
-		FastQueue<Point2D_F64> locationPixels = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> locationPixels = new DogArray<>(Point2D_F64::new);
 
 		public void reset() {
 			locationPixels.reset();
@@ -688,16 +688,16 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc>
 	 */
 	public static class QuadMatches {
 		// previous left to previous right
-		GrowQueue_I32 match0to1 = new GrowQueue_I32(10);
+		DogArray_I32 match0to1 = new DogArray_I32(10);
 		// previous left to current left
-		GrowQueue_I32 match0to2 = new GrowQueue_I32(10);
+		DogArray_I32 match0to2 = new DogArray_I32(10);
 		// current left to current right
-		GrowQueue_I32 match2to3 = new GrowQueue_I32(10);
+		DogArray_I32 match2to3 = new DogArray_I32(10);
 		// previous right to current right
-		GrowQueue_I32 match1to3 = new GrowQueue_I32(10);
+		DogArray_I32 match1to3 = new DogArray_I32(10);
 
 		public void swap() {
-			GrowQueue_I32 tmp;
+			DogArray_I32 tmp;
 
 			tmp = match2to3;
 			match2to3 = match0to1;

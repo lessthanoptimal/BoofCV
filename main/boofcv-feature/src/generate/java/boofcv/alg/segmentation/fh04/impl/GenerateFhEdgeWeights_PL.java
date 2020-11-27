@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class GenerateFhEdgeWeights_PL extends CodeGeneratorBase {
 				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.alg.segmentation.fh04.FhEdgeWeights;\n" +
 				"import boofcv.struct.image.Planar;\n" +
-				"import org.ddogleg.struct.FastQueue;\n" +
+				"import org.ddogleg.struct.DogArray;\n" +
 				"\n" +
 				"import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;\n" +
 				"\n" +
@@ -92,7 +92,7 @@ public class GenerateFhEdgeWeights_PL extends CodeGeneratorBase {
 		String weightString = rule == ConnectRule.EIGHT ? ",weight3=0,weight4=0" : "";
 
 		out.print("\t@Override\n" +
-				"\tpublic void process(Planar<"+imageName+"> input, FastQueue<Edge> edges) {\n" +
+				"\tpublic void process(Planar<"+imageName+"> input, DogArray<Edge> edges) {\n" +
 				"\t\tif( pixelColor.length != input.getNumBands() ) {\n" +
 				"\t\t\tpixelColor = new "+sumType+"[ input.getNumBands() ];\n" +
 				"\t\t}\n" +
@@ -195,7 +195,7 @@ public class GenerateFhEdgeWeights_PL extends CodeGeneratorBase {
 
 		out.print("\tprivate void checkAround( int x , int y ,\n" +
 				"\t\t\t\t\t\t\t  Planar<"+imageName+"> input ,\n" +
-				"\t\t\t\t\t\t\t  FastQueue<Edge> edges )\n" +
+				"\t\t\t\t\t\t\t  DogArray<Edge> edges )\n" +
 				"\t{\n" +
 				"\t\tint indexSrc = input.startIndex + y*input.stride + x;\n" +
 				"\t\tint indexA =                      y*input.width  + x;\n" +
@@ -225,7 +225,7 @@ public class GenerateFhEdgeWeights_PL extends CodeGeneratorBase {
 
 		out.print("\tprivate void check( int x , int y , "+sumType+" color0[] , int indexA,\n" +
 				"\t\t\t\t\t\tPlanar<"+imageName+"> input ,\n" +
-				"\t\t\t\t\t\tFastQueue<Edge> edges ) {\n" +
+				"\t\t\t\t\t\tDogArray<Edge> edges ) {\n" +
 				"\t\tif( !input.isInBounds(x,y) )\n" +
 				"\t\t\treturn;\n" +
 				"\n" +

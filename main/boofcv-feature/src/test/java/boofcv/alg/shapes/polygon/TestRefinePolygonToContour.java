@@ -22,7 +22,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class TestRefinePolygonToContour extends BoofStandardJUnit {
 	public void basic() {
 		RectangleLength2D_I32 rect = new RectangleLength2D_I32(0,0,10,5);
 		List<Point2D_I32> contour = rectToContour(rect);
-		GrowQueue_I32 vertexes = computeContourVertexes(rect);
+		DogArray_I32 vertexes = computeContourVertexes(rect);
 		RefinePolygonToContour alg = new RefinePolygonToContour();
 
 		Polygon2D_F64 found = new Polygon2D_F64();
@@ -52,7 +52,7 @@ public class TestRefinePolygonToContour extends BoofStandardJUnit {
 	public void reverseOrder() {
 		RectangleLength2D_I32 rect = new RectangleLength2D_I32(0,0,10,5);
 		List<Point2D_I32> contour = rectToContour(rect);
-		GrowQueue_I32 vertexes = computeContourVertexes(rect);
+		DogArray_I32 vertexes = computeContourVertexes(rect);
 
 		flip(vertexes.data,vertexes.size);
 

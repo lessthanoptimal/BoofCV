@@ -34,7 +34,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class QuadPoseEstimator {
 	protected List<Point2D_F64> listObs = new ArrayList<>();
 
 	private List<Point2D3D> inputP3P = new ArrayList<>();
-	private FastQueue<Se3_F64> solutions = new FastQueue(Se3_F64::new);
+	private DogArray<Se3_F64> solutions = new DogArray(Se3_F64::new);
 	private Se3_F64 outputFiducialToCamera = new Se3_F64();
 	private Se3_F64 foundEPNP = new Se3_F64();
 

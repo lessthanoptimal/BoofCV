@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.visualize.VisualizeData;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -77,7 +77,7 @@ public class PointCloudViewerPanel extends JPanel {
 		periodBaseline = total*0.05;
 	}
 
-	public void addCloud64(List<Point3D_F64> cloud , @Nullable GrowQueue_I32 colorRGB )
+	public void addCloud64(List<Point3D_F64> cloud , @Nullable DogArray_I32 colorRGB )
 	{
 		BoofSwingUtil.checkGuiThread();
 

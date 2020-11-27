@@ -21,7 +21,7 @@ package boofcv.alg.geo.pose;
 import boofcv.alg.geo.GeoTestingOps;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -112,7 +112,7 @@ public class TestRelinearlize extends BoofStandardJUnit {
 
 		// using the provided beta compute the world points
 		// this way the constraint matrix will be consistent
-		FastQueue<Point3D_F64> worldPts = new FastQueue<>(4, Point3D_F64::new);
+		DogArray<Point3D_F64> worldPts = new DogArray<>(4, Point3D_F64::new);
 		worldPts.grow().setTo(1,0,0);
 		worldPts.grow().setTo(0,1,0);
 		worldPts.grow().setTo(0,0,1);

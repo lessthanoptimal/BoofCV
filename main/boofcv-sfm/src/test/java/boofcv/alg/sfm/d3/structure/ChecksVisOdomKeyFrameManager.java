@@ -21,7 +21,7 @@ package boofcv.alg.sfm.d3.structure;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.alg.sfm.d3.structure.TestMaxGeoKeyFrameManager.connectFrames;
@@ -47,7 +47,7 @@ public abstract class ChecksVisOdomKeyFrameManager extends BoofStandardJUnit {
 
 		for (int i = 0; i < 5; i++) {
 			scene.addFrame(i);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, 5, 1, scene);
+			DogArray_I32 discard = alg.selectFramesToDiscard(tracker, 5, 1, scene);
 			assertEquals(0, discard.size);
 			alg.handleSpawnedTracks(tracker, scene.cameras.getTail());
 		}
@@ -56,7 +56,7 @@ public abstract class ChecksVisOdomKeyFrameManager extends BoofStandardJUnit {
 		connectFrames(4, 5, 10, scene);
 
 		// tell it to only keep 3
-		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker, 3, 1, scene);
+		DogArray_I32 discard = alg.selectFramesToDiscard(tracker, 3, 1, scene);
 		// there should only be 3 dropped in this order
 		assertEquals(3, discard.size);
 		for (int i = 0; i < 3; i++) {

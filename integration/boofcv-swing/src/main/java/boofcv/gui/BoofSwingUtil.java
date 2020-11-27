@@ -38,7 +38,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.apache.commons.io.FilenameUtils;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -751,7 +751,7 @@ public class BoofSwingUtil {
 			File file = fileChooser.getSelectedFile();
 			saveDefaultPath(owner, key, file);
 
-			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
+			DogArray<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
 			String n = FilenameUtils.getBaseName(file.getName()) + ".ply";
 			try {
 				var f = new File(file.getParent(), n);
@@ -777,7 +777,7 @@ public class BoofSwingUtil {
 			File file = fileChooser.getSelectedFile();
 			saveDefaultPath(owner, key, file);
 
-			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
+			DogArray<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
 			String n = FilenameUtils.getBaseName(file.getName()) + ".ply";
 			try {
 				var f = new File(file.getParent(), n);
@@ -826,7 +826,7 @@ public class BoofSwingUtil {
 	 * Renders camera views as squares from a {@link SceneStructureMetric}
 	 */
 	public static void visualizeCameras( SceneStructureMetric structure, PointCloudViewer viewer ) {
-		FastQueue<Point3D_F64> vertexes = new FastQueue<>(Point3D_F64::new);
+		DogArray<Point3D_F64> vertexes = new DogArray<>(Point3D_F64::new);
 		Se3_F64 world_to_view = new Se3_F64();
 		Se3_F64 view_to_world = new Se3_F64();
 		Se3_F64 tmpSE3 = new Se3_F64();

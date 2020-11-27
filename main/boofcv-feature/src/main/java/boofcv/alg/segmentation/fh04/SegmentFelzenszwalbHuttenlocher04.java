@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,10 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.sorting.ApproximateSort_F32;
 import org.ddogleg.sorting.QuickSortObj_F32;
 import org.ddogleg.sorting.SortableParameter_F32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
@@ -97,19 +97,19 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
 	private ApproximateSort_F32 sorterApprox = null;
 	// storage for edges so that they can be recycled on the next call
-	protected FastQueue<Edge> edges = new FastQueue<>(Edge::new);
+	protected DogArray<Edge> edges = new DogArray<>(Edge::new);
 	// list of edges which were not matched to anything.  used to merge small regions
 	protected FastArray<Edge> edgesNotMatched = new FastArray<>(Edge.class);
 	// Size of each region
-	protected GrowQueue_I32 regionSize = new GrowQueue_I32();
+	protected DogArray_I32 regionSize = new DogArray_I32();
 	// This is equivalent to Int(C) + tau(C) in Equation 4.
 	// NOTE: Is the maximum weight in the MST really weight of the edge causing the merge?  Maybe I'm missing
 	// something, but it seems trivial to find counter examples.
-	protected GrowQueue_F32 threshold = new GrowQueue_F32();
+	protected DogArray_F32 threshold = new DogArray_F32();
 
 	// List of region ID's and their size
-	private GrowQueue_I32 outputRegionId = new GrowQueue_I32();
-	private GrowQueue_I32 outputRegionSizes = new GrowQueue_I32();
+	private DogArray_I32 outputRegionId = new DogArray_I32();
+	private DogArray_I32 outputRegionSizes = new DogArray_I32();
 
 	/**
 	 * Specifies tuning parameter
@@ -319,14 +319,14 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	/**
 	 * List of ID's for each region in the segmented image.
 	 */
-	public GrowQueue_I32 getRegionId() {
+	public DogArray_I32 getRegionId() {
 		return outputRegionId;
 	}
 
 	/**
 	 * Number of pixels in each region
 	 */
-	public GrowQueue_I32 getRegionSizes() {
+	public DogArray_I32 getRegionSizes() {
 		return outputRegionSizes;
 	}
 

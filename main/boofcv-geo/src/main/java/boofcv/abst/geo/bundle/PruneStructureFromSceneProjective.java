@@ -22,7 +22,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -115,7 +115,7 @@ public class PruneStructureFromSceneProjective {
 		int oldToNew[] = new int[structure.points.size];
 
 		// list of remaining points
-		GrowQueue_I32 removeIdx = new GrowQueue_I32();
+		DogArray_I32 removeIdx = new DogArray_I32();
 //		List<SceneStructureProjective.Point> remainingP = new ArrayList<>();
 		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
 			SceneStructureCommon.Point sp = structure.points.data[pointIdx];
@@ -162,12 +162,12 @@ public class PruneStructureFromSceneProjective {
 	 * @return true if views were pruned or false if not
 	 */
 	public boolean pruneViews( int count ) {
-		GrowQueue_I32 pruneIdx = new GrowQueue_I32();
+		DogArray_I32 pruneIdx = new DogArray_I32();
 
 		// count number of observations in each view
 		int[] counts = new int[structure.views.size];
 		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
-			GrowQueue_I32 viewsIn = structure.points.data[pointIdx].views;
+			DogArray_I32 viewsIn = structure.points.data[pointIdx].views;
 			for (int i = 0; i < viewsIn.size; i++) {
 				counts[viewsIn.get(i)]++;
 			}
@@ -184,7 +184,7 @@ public class PruneStructureFromSceneProjective {
 
 		// remove the view from points
 		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
-			GrowQueue_I32 viewsIn = structure.points.data[pointIdx].views;
+			DogArray_I32 viewsIn = structure.points.data[pointIdx].views;
 			for (int i = viewsIn.size - 1; i >= 0; i--) {
 				SceneStructureProjective.View v = structure.views.data[viewsIn.get(i)];
 				if (v.width == -2) {

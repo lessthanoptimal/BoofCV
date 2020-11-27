@@ -70,7 +70,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n");
@@ -105,7 +105,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		outputData = output.getDataType();
 		sumType = input.getSumType();
 		bitWise = input.getBitWise();
-		workType = ("GrowQueue_"+input.getKernelType()).replace("S32","I32");
+		workType = ("DogArray_"+input.getKernelType()).replace("S32","I32");
 		this.hasDivide = hasDivide;
 
 		if( justVertical ) {

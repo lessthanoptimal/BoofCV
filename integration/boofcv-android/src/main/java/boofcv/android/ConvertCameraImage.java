@@ -23,7 +23,7 @@ import android.media.Image;
 import boofcv.alg.color.ColorFormat;
 import boofcv.core.encoding.ConvertYuv420_888;
 import boofcv.struct.image.ImageBase;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
  */
 public class ConvertCameraImage {
 	public static void imageToBoof( Image yuv, ColorFormat colorOutput, ImageBase output,
-									@Nullable GrowArray<GrowQueue_I8> workArrays) {
+									@Nullable GrowArray<DogArray_I8> workArrays) {
 		if (BOverrideConvertAndroid.invokeYuv420ToBoof(yuv, colorOutput, output))
 			return;
 

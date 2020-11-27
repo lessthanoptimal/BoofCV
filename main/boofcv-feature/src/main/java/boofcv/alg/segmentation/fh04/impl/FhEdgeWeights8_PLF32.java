@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
 
@@ -41,7 +41,7 @@ public class FhEdgeWeights8_PLF32 implements FhEdgeWeights<Planar<GrayF32>> {
 	float[] pixelColor = new float[1];
 
 	@Override
-	public void process(Planar<GrayF32> input, FastQueue<Edge> edges) {
+	public void process(Planar<GrayF32> input, DogArray<Edge> edges) {
 		if( pixelColor.length != input.getNumBands() ) {
 			pixelColor = new float[ input.getNumBands() ];
 		}
@@ -115,7 +115,7 @@ public class FhEdgeWeights8_PLF32 implements FhEdgeWeights<Planar<GrayF32>> {
 
 	private void checkAround( int x , int y ,
 							  Planar<GrayF32> input ,
-							  FastQueue<Edge> edges )
+							  DogArray<Edge> edges )
 	{
 		int indexSrc = input.startIndex + y*input.stride + x;
 		int indexA =                      y*input.width  + x;
@@ -135,7 +135,7 @@ public class FhEdgeWeights8_PLF32 implements FhEdgeWeights<Planar<GrayF32>> {
 
 	private void check( int x , int y , float color0[] , int indexA,
 						Planar<GrayF32> input ,
-						FastQueue<Edge> edges ) {
+						DogArray<Edge> edges ) {
 		if( !input.isInBounds(x,y) )
 			return;
 

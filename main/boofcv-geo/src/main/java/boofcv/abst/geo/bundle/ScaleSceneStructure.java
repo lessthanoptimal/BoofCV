@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -69,7 +69,7 @@ public class ScaleSceneStructure {
 	boolean scalePixelsUsingStats = true;
 
 	/** Pixel scaling for each view */
-	public FastQueue<NormalizationPoint2D> pixelScaling = new FastQueue<>(NormalizationPoint2D::new);
+	public DogArray<NormalizationPoint2D> pixelScaling = new DogArray<>(NormalizationPoint2D::new);
 
 	/**
 	 * Configures how scaling is applied
@@ -211,7 +211,7 @@ public class ScaleSceneStructure {
 	/**
 	 * For 3D points, computes the median value and variance along each dimension.
 	 */
-	void computePointStatistics( FastQueue<Point> points ) {
+	void computePointStatistics( DogArray<Point> points ) {
 		final int length = points.size;
 		double v[] = new double[length];
 

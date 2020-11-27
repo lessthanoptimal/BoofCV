@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.api.PictureWithMetadata;
@@ -58,7 +58,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 	// type of output image
 	ImageType<T> typeOutput;
 
-	FastQueue<PictureInfo> reorder = new FastQueue<>(PictureInfo::new);
+	DogArray<PictureInfo> reorder = new DogArray<>(PictureInfo::new);
 	int width,height;
 	boolean endOfFile = false;
 	int frame = -1;

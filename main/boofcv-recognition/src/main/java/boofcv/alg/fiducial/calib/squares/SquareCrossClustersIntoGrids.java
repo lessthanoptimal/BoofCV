@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import static boofcv.misc.CircularIndex.addOffset;
  */
 public class SquareCrossClustersIntoGrids {
 
-	FastQueue<SquareGrid> grids = new FastQueue<>(SquareGrid::new);
+	DogArray<SquareGrid> grids = new DogArray<>(SquareGrid::new);
 
 	// indicates if a fatal error was found in the grid
 	protected boolean invalid;
@@ -439,7 +439,7 @@ public class SquareCrossClustersIntoGrids {
 		return seed;
 	}
 
-	public FastQueue<SquareGrid> getGrids() {
+	public DogArray<SquareGrid> getGrids() {
 		return grids;
 	}
 }

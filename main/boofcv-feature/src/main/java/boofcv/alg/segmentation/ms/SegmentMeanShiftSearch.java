@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Stoppable;
 
 /**
@@ -92,13 +92,13 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	protected GrayS32 quickMode = new GrayS32(1, 1);
 
 	// location of each peak in image pixel indexes
-	protected FastQueue<Point2D_I32> modeLocation = new FastQueue<>(Point2D_I32::new);
+	protected DogArray<Point2D_I32> modeLocation = new DogArray<>(Point2D_I32::new);
 
 	// number of members in this peak
-	protected GrowQueue_I32 modeMemberCount = new GrowQueue_I32();
+	protected DogArray_I32 modeMemberCount = new DogArray_I32();
 
 	// storage for segment colors
-	protected FastQueue<float[]> modeColor;
+	protected DogArray<float[]> modeColor;
 
 	// quick lookup for spacial distance
 	protected float[] spacialTable;
@@ -209,18 +209,18 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	/**
 	 * Location of each peak in the image
 	 */
-	public FastQueue<Point2D_I32> getModeLocation() {
+	public DogArray<Point2D_I32> getModeLocation() {
 		return modeLocation;
 	}
 
 	/**
 	 * Number of pixels which each peak as a member
 	 */
-	public GrowQueue_I32 getRegionMemberCount() {
+	public DogArray_I32 getRegionMemberCount() {
 		return modeMemberCount;
 	}
 
-	public FastQueue<float[]> getModeColor() {
+	public DogArray<float[]> getModeColor() {
 		return modeColor;
 	}
 

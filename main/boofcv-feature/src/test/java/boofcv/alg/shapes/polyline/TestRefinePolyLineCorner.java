@@ -24,7 +24,7 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
-		GrowQueue_I32 corners = new GrowQueue_I32();
+		DogArray_I32 corners = new DogArray_I32();
 		corners.add(0);
 		corners.add(50);
 		corners.add(50+84);
@@ -83,7 +83,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(false);
 
 		for( int i = 0; i < 10; i++ ) {
-			GrowQueue_I32 corners = new GrowQueue_I32();
+			DogArray_I32 corners = new DogArray_I32();
 			corners.add(0);
 			corners.add(50  + rand.nextInt(6)-3);
 			corners.add(50 + 84 + rand.nextInt(6)-3);
@@ -111,7 +111,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 		addPoints(40,40, 0,40, points);
 		addPoints(0 ,40, 0,0, points);
 
-		GrowQueue_I32 corners = new GrowQueue_I32();
+		DogArray_I32 corners = new DogArray_I32();
 		corners.add(0);
 		corners.add(20);
 		corners.add(40);
@@ -211,7 +211,7 @@ public class TestRefinePolyLineCorner extends BoofStandardJUnit {
 	public void tooFewPoints() {
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
-		GrowQueue_I32 corners = new GrowQueue_I32();
+		DogArray_I32 corners = new DogArray_I32();
 		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			assertFalse(alg.fit(contour, corners));

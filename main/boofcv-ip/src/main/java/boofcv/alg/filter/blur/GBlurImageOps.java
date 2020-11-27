@@ -23,9 +23,9 @@ import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -51,13 +51,13 @@ public class GBlurImageOps {
 	public static <T extends ImageBase<T>>
 	T mean( T input, @Nullable T output, int radius, @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radius, (GrayU8)storage, (GrowArray<GrowQueue_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radius, (GrayU8)storage, (GrowArray<DogArray_I32>)workVert);
 		} else if (input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radius, (GrayU16)storage, (GrowArray<GrowQueue_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radius, (GrayU16)storage, (GrowArray<DogArray_I32>)workVert);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radius, (GrayF32)storage, (GrowArray<GrowQueue_F32>)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radius, (GrayF32)storage, (GrowArray<DogArray_F32>)workVert);
 		} else if (input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radius, (GrayF64)storage, (GrowArray<GrowQueue_F64>)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radius, (GrayF64)storage, (GrowArray<DogArray_F64>)workVert);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radius, (ImageGray)storage, workVert);
 		} else {
@@ -79,13 +79,13 @@ public class GBlurImageOps {
 	public static <T extends ImageBase<T>>
 	T mean( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrayU8)storage, (GrowArray<GrowQueue_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrayU8)storage, (GrowArray<DogArray_I32>)workVert);
 		} else if (input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radiusX, radiusY, (GrayU16)storage, (GrowArray<GrowQueue_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radiusX, radiusY, (GrayU16)storage, (GrowArray<DogArray_I32>)workVert);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrayF32)storage, (GrowArray<GrowQueue_F32>)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrayF32)storage, (GrowArray<DogArray_F32>)workVert);
 		} else if (input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radiusX, radiusY, (GrayF64)storage, (GrowArray<GrowQueue_F64>)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radiusX, radiusY, (GrayF64)storage, (GrowArray<DogArray_F64>)workVert);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radiusX, radiusY, (ImageGray)storage, workVert);
 		} else {
@@ -110,16 +110,16 @@ public class GBlurImageOps {
 			 @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
 		if (input instanceof GrayU8) {
 			return (T)BlurImageOps.meanB((GrayU8)input, (GrayU8)output, radiusX, radiusY, (ImageBorder_S32)border,
-					(GrayU8)storage, (GrowArray<GrowQueue_I32>)workVert);
+					(GrayU8)storage, (GrowArray<DogArray_I32>)workVert);
 		} else if (input instanceof GrayU16) {
 			return (T)BlurImageOps.meanB((GrayU16)input, (GrayU16)output, radiusX, radiusY, (ImageBorder_S32)border,
-					(GrayU16)storage, (GrowArray<GrowQueue_I32>)workVert);
+					(GrayU16)storage, (GrowArray<DogArray_I32>)workVert);
 		} else if (input instanceof GrayF32) {
 			return (T)BlurImageOps.meanB((GrayF32)input, (GrayF32)output, radiusX, radiusY, (ImageBorder_F32)border,
-					(GrayF32)storage, (GrowArray<GrowQueue_F32>)workVert);
+					(GrayF32)storage, (GrowArray<DogArray_F32>)workVert);
 		} else if (input instanceof GrayF64) {
 			return (T)BlurImageOps.meanB((GrayF64)input, (GrayF64)output, radiusX, radiusY, (ImageBorder_F64)border,
-					(GrayF64)storage, (GrowArray<GrowQueue_F64>)workVert);
+					(GrayF64)storage, (GrowArray<DogArray_F64>)workVert);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.meanB((Planar)input, (Planar)output, radiusX, radiusY, (ImageBorder)border, (ImageGray)storage, workVert);
 		} else {
@@ -156,9 +156,9 @@ public class GBlurImageOps {
 	public static <T extends ImageBase<T>>
 	T median( T input, @Nullable T output, int radiusX, int radiusY, @Nullable GrowArray<?> work ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.median((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrowArray<GrowQueue_I32>)work);
+			return (T)BlurImageOps.median((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrowArray<DogArray_I32>)work);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.median((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrowArray<GrowQueue_F32>)work);
+			return (T)BlurImageOps.median((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrowArray<DogArray_F32>)work);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.median((Planar)input, (Planar)output, radiusX, radiusY, work);
 		} else {

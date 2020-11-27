@@ -23,7 +23,7 @@ import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import pabeles.concurrency.GrowArray;
 
 /**
@@ -40,7 +40,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	}
 
 	@Override
-	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, FastQueue<Point2D_I16> found ) {
+	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
 		found.reset();
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;
@@ -83,7 +83,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	}
 
 	@Override
-	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, FastQueue<Point2D_I16> found ) {
+	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
 		found.reset();
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;

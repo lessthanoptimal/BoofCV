@@ -31,7 +31,7 @@ import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -96,7 +96,7 @@ class TestUchiyaMarkerImageTracker extends BoofStandardJUnit {
 			// Sanity check. This is an easy situation
 			assertEquals(20, tracker.ransac.getMatchSet().size());
 
-			FastQueue<UchiyaMarkerTracker.Track> found =  trackerImage.getTracks();
+			DogArray<UchiyaMarkerTracker.Track> found =  trackerImage.getTracks();
 
 			assertEquals(1,found.size);
 

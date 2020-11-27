@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.d3.direct;
 
 import georegression.struct.point.Point2D_F32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.FMatrix2x2;
 import org.ejml.dense.fixed.CommonOps_FDF2;
 
@@ -33,7 +33,7 @@ public class FeatureSpatialDiversity_F32 {
 	FMatrix2x2 var = new FMatrix2x2();
 	float meanX, meanY;
 
-	FastQueue<Point2D_F32> norm = new FastQueue<>(Point2D_F32::new);
+	DogArray<Point2D_F32> norm = new DogArray<>(Point2D_F32::new);
 
 	// number of standard deviations that will be used to compute the spread
 	float sigmas = 3.0f;

@@ -22,7 +22,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.QueueMatrix;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestGeoModelEstimator1toN extends BoofStandardJUnit {
 
 	List<AssociatedPair> points = new ArrayList<>();
-	FastQueue<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
+	DogArray<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
 
 	@Test
 	public void basicTest() {

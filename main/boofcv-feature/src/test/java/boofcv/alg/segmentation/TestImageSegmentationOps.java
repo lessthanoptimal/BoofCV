@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -99,7 +99,7 @@ public class TestImageSegmentationOps extends BoofStandardJUnit {
 			}
 		}
 
-		GrowQueue_I32 rootNodes = new GrowQueue_I32();
+		DogArray_I32 rootNodes = new DogArray_I32();
 		rootNodes.add(adjust(2,graph));
 		rootNodes.add(adjust(5,graph));
 		rootNodes.add(adjust(15,graph));

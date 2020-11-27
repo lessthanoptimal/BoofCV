@@ -25,8 +25,8 @@ import boofcv.abst.feature.associate.AssociateDescriptionSets2D;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -110,8 +110,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 	void setSource() {
 		var associate = new PAssociateDescriptionSets<>(null, TupleDesc_F64.class);
 
-		var descriptors = new FastQueue<>(() -> new TupleDesc_F64(1));
-		var sets = new GrowQueue_I32();
+		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
+		var sets = new DogArray_I32();
 
 		for (int i = 0; i < 5; i++) {
 			descriptors.grow();
@@ -137,8 +137,8 @@ class TestUtilFeature extends BoofStandardJUnit {
 	void setDestination() {
 		var associate = new PAssociateDescriptionSets<>(null, TupleDesc_F64.class);
 
-		var descriptors = new FastQueue<>(() -> new TupleDesc_F64(1));
-		var sets = new GrowQueue_I32();
+		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
+		var sets = new DogArray_I32();
 
 		for (int i = 0; i < 5; i++) {
 			descriptors.grow();
@@ -164,9 +164,9 @@ class TestUtilFeature extends BoofStandardJUnit {
 	void setSource_2D() {
 		var associate = new PAssociateDescriptionSets2D<>(null, TupleDesc_F64.class);
 
-		var descriptors = new FastQueue<>(() -> new TupleDesc_F64(1));
-		var locs = new FastQueue<>(Point2D_F64::new);
-		var sets = new GrowQueue_I32();
+		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
+		var locs = new DogArray<>(Point2D_F64::new);
+		var sets = new DogArray_I32();
 
 		for (int i = 0; i < 5; i++) {
 			descriptors.grow();
@@ -193,9 +193,9 @@ class TestUtilFeature extends BoofStandardJUnit {
 	void setDestination_2D() {
 		var associate = new PAssociateDescriptionSets2D<>(null, TupleDesc_F64.class);
 
-		var descriptors = new FastQueue<>(() -> new TupleDesc_F64(1));
-		var locs = new FastQueue<>(Point2D_F64::new);
-		var sets = new GrowQueue_I32();
+		var descriptors = new DogArray<>(() -> new TupleDesc_F64(1));
+		var locs = new DogArray<>(Point2D_F64::new);
+		var sets = new DogArray_I32();
 
 		for (int i = 0; i < 5; i++) {
 			descriptors.grow();

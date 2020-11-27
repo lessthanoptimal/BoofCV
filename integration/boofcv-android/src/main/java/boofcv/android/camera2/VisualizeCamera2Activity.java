@@ -36,7 +36,7 @@ import boofcv.android.ConvertCameraImage;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import pabeles.concurrency.GrowArray;
 
 import java.util.ArrayDeque;
@@ -99,7 +99,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected BitmapMode bitmapMode = BitmapMode.DOUBLE_BUFFER;
 	protected Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
 	protected Bitmap bitmapWork = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-	protected GrowQueue_I8 bitmapTmp = new GrowQueue_I8();
+	protected DogArray_I8 bitmapTmp = new DogArray_I8();
 	//---- END LOCK BITMAP
 
 	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
@@ -520,7 +520,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		 * When removed they are owned by the thread in which they were removed.
 		 */
 		protected ArrayDeque<ImageBase> stackImages = new ArrayDeque<>();
-		protected GrowArray<GrowQueue_I8> convertWork = new GrowArray<>(GrowQueue_I8::new);
+		protected GrowArray<DogArray_I8> convertWork = new GrowArray<>(DogArray_I8::new);
 	}
 
 	/**

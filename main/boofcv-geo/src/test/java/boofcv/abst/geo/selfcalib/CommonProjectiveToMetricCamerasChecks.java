@@ -27,7 +27,7 @@ import boofcv.struct.geo.AssociatedTuple;
 import boofcv.struct.geo.AssociatedTupleN;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
@@ -163,7 +163,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 				-1.8370892,  -.061992654,  .486096194, -1.00684043,
 				.000185405, -.010046842,  31.8668685, -.000209807);
 
-		FastQueue<AssociatedTuple> observations = new FastQueue<>(()->new AssociatedTupleN(3));
+		DogArray<AssociatedTuple> observations = new DogArray<>(()->new AssociatedTupleN(3));
 
 		// These are in front of both cameras
 		add( -47.208221435546875,-14.024078369140625 , -49.9302978515625,36.35797119140625 , -50.079071044921875,77.59286499023438, observations);
@@ -207,7 +207,7 @@ abstract class CommonProjectiveToMetricCamerasChecks extends CommonThreeViewSelf
 		assertEquals(0,checkMatches.bestInvalid);
 	}
 
-	void add( double x1, double y1, double x2, double y2, double x3, double y3 , FastQueue<AssociatedTuple> observations)
+	void add( double x1, double y1, double x2, double y2, double x3, double y3 , DogArray<AssociatedTuple> observations)
 	{
 		AssociatedTuple a = observations.grow();
 		a.set(0,x1,y1);

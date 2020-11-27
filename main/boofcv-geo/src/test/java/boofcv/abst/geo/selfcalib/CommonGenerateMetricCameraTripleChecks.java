@@ -25,7 +25,7 @@ import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.image.ImageDimension;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.junit.jupiter.api.Test;
 
@@ -100,7 +100,7 @@ public abstract class CommonGenerateMetricCameraTripleChecks extends CommonThree
 		var found = new MetricCameraTriple();
 		List<AssociatedTriple> selected = new ArrayList<>();
 
-		GrowQueue_I32 indexes = GrowQueue_I32.range(0,numFeatures);
+		DogArray_I32 indexes = DogArray_I32.range(0,numFeatures);
 
 		int countSuccess = 0;
 		for (int trial = 0; trial < totalTrials; trial++) {

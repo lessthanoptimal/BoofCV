@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import georegression.metric.UtilAngle;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.sorting.QuickSortComparator;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +39,13 @@ import java.util.List;
  */
 public abstract class EllipseClustersIntoGrid {
 
-	protected FastQueue<Grid> foundGrids = new FastQueue<>(Grid::new);
+	protected DogArray<Grid> foundGrids = new DogArray<>(Grid::new);
 
 	// When finding lines this is the largest change in angle between the two edges allowed for it to be on the line
 	protected static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(30);
 
 	// Information on each ellipse/node in a cluster
-	protected FastQueue<NodeInfo> listInfo = new FastQueue<>(NodeInfo::new);
+	protected DogArray<NodeInfo> listInfo = new DogArray<>(NodeInfo::new);
 	// Used to sort edges in a node.  used instead of built in sorting algorithm to maximize memory being recycled
 	protected QuickSortComparator<Edge> sorter;
 
@@ -432,7 +432,7 @@ public abstract class EllipseClustersIntoGrid {
 	 *
 	 * @return found grids
 	 */
-	public FastQueue<Grid> getGrids() {
+	public DogArray<Grid> getGrids() {
 		return foundGrids;
 	}
 
@@ -440,7 +440,7 @@ public abstract class EllipseClustersIntoGrid {
 		EllipseRotated_F64 ellipse;
 
 		// List of all the ellipses connected to this one in CCW order
-		FastQueue<Edge> edges = new FastQueue<>(Edge::new);
+		DogArray<Edge> edges = new DogArray<>(Edge::new);
 
 		// flag used to indicate if a node is along the shape's contour
 		boolean contour;

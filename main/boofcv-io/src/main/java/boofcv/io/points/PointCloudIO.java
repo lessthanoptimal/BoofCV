@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.io.points.impl.PlyCodec;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -62,28 +62,28 @@ public class PointCloudIO {
 	}
 
 
-	public static FastQueue<Point3D_F32>
-	load3D32F( Format format , InputStream input , @Nullable FastQueue<Point3D_F32> storage  ) throws IOException {
+	public static DogArray<Point3D_F32>
+	load3D32F( Format format , InputStream input , @Nullable DogArray<Point3D_F32> storage  ) throws IOException {
 		if( storage == null )
-			storage = new FastQueue<>(Point3D_F32::new);
+			storage = new DogArray<>(Point3D_F32::new);
 		PointCloudWriter output = PointCloudWriter.wrapF32(storage);
 		load(format,input,output);
 		return storage;
 	}
 
-	public static FastQueue<Point3D_F64>
-	load3D64F( Format format , InputStream input , @Nullable FastQueue<Point3D_F64> storage  ) throws IOException {
+	public static DogArray<Point3D_F64>
+	load3D64F( Format format , InputStream input , @Nullable DogArray<Point3D_F64> storage  ) throws IOException {
 		if( storage == null )
-			storage = new FastQueue<>(Point3D_F64::new);
+			storage = new DogArray<>(Point3D_F64::new);
 		PointCloudWriter output = PointCloudWriter.wrapF64(storage);
 		load(format,input,output);
 		return storage;
 	}
 
-	public static FastQueue<Point3dRgbI_F64>
-	load3DRgb64F(Format format , InputStream input , @Nullable FastQueue<Point3dRgbI_F64> storage  ) throws IOException {
+	public static DogArray<Point3dRgbI_F64>
+	load3DRgb64F(Format format , InputStream input , @Nullable DogArray<Point3dRgbI_F64> storage  ) throws IOException {
 		if( storage == null )
-			storage = new FastQueue<>(Point3dRgbI_F64::new);
+			storage = new DogArray<>(Point3dRgbI_F64::new);
 		PointCloudWriter output = PointCloudWriter.wrapF64RGB(storage);
 		load(format,input,output);
 		return storage;

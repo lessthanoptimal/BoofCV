@@ -24,7 +24,7 @@ import boofcv.struct.Point3dRgbI_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -110,12 +110,12 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 	@Nested
 	public class CheckWrapF32 extends PcwTests {
 
-		FastQueue<Point3D_F32> cloud;
+		DogArray<Point3D_F32> cloud;
 
 		@Override
 		public PointCloudWriter create() {
 			supportsColor = false;
-			cloud = new FastQueue<>(Point3D_F32::new);
+			cloud = new DogArray<>(Point3D_F32::new);
 			return PointCloudWriter.wrapF32(cloud);
 		}
 
@@ -139,12 +139,12 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 	@Nested
 	public class CheckWrapF64 extends PcwTests {
 
-		FastQueue<Point3D_F64> cloud;
+		DogArray<Point3D_F64> cloud;
 
 		@Override
 		public PointCloudWriter create() {
 			supportsColor = false;
-			cloud = new FastQueue<>(Point3D_F64::new);
+			cloud = new DogArray<>(Point3D_F64::new);
 			return PointCloudWriter.wrapF64(cloud);
 		}
 
@@ -167,11 +167,11 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 	@Nested
 	public class CheckWrapF32RGB extends PcwTests {
 
-		FastQueue<Point3dRgbI_F32> cloud;
+		DogArray<Point3dRgbI_F32> cloud;
 
 		@Override
 		public PointCloudWriter create() {
-			cloud = new FastQueue<>(Point3dRgbI_F32::new);
+			cloud = new DogArray<>(Point3dRgbI_F32::new);
 			return PointCloudWriter.wrapF32RGB(cloud);
 		}
 
@@ -195,11 +195,11 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 	@Nested
 	public class CheckWrap642RGB extends PcwTests {
 
-		FastQueue<Point3dRgbI_F64> cloud;
+		DogArray<Point3dRgbI_F64> cloud;
 
 		@Override
 		public PointCloudWriter create() {
-			cloud = new FastQueue<>(Point3dRgbI_F64::new);
+			cloud = new DogArray<>(Point3dRgbI_F64::new);
 			return PointCloudWriter.wrapF64RGB(cloud);
 		}
 

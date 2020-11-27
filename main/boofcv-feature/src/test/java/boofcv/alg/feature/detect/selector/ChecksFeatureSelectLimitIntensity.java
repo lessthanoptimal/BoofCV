@@ -22,8 +22,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStand
 	 */
 	@Test
 	void lessThanMax_and_SelectedCleared() {
-		FastQueue<Point> detected = createRandom(15);
+		DogArray<Point> detected = createRandom(15);
 
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
@@ -81,13 +81,13 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStand
 	 */
 	@Test
 	void multipleCalls_MoreThan_SelectCleared() {
-		FastQueue<Point> prior = createRandom(20);
+		DogArray<Point> prior = createRandom(20);
 
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
 
 		for (int count = 0; count < 2; count++) {
-			FastQueue<Point> detected = createRandom(30);
+			DogArray<Point> detected = createRandom(30);
 			alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, count==0,prior,detected,22,found);
 
 			// partial check to make sure the input wasn't modified
@@ -108,7 +108,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStand
 	 */
 	@Test
 	void priorIsBlowUp() {
-		FastQueue<Point> prior = createRandom(20);
+		DogArray<Point> prior = createRandom(20);
 		FeatureSelectLimitIntensity<Point> alg = createAlgorithm();
 		FastArray<Point> found = createArray();
 
@@ -118,7 +118,7 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStand
 		alg.select(intensity, intensity!=null?-1:width, intensity!=null?-1:height, true,null,createRandom(15),10,found);
 	}
 
-	protected abstract FastQueue<Point> createRandom(int i2);
+	protected abstract DogArray<Point> createRandom(int i2);
 
 	public static abstract class I16 extends ChecksFeatureSelectLimitIntensity<Point2D_I16> {
 		@Override
@@ -127,8 +127,8 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStand
 		}
 
 		@Override
-		protected FastQueue<Point2D_I16> createRandom(int i2) {
-			FastQueue<Point2D_I16> detected = new FastQueue<>(Point2D_I16::new);
+		protected DogArray<Point2D_I16> createRandom(int i2) {
+			DogArray<Point2D_I16> detected = new DogArray<>(Point2D_I16::new);
 			for (int i = 0; i < i2; i++) {
 				detected.grow().setTo(rand.nextInt(width), rand.nextInt(height));
 			}
@@ -152,8 +152,8 @@ public abstract class ChecksFeatureSelectLimitIntensity<Point> extends BoofStand
 		}
 
 		@Override
-		protected FastQueue<IntensityPoint> createRandom(int i2) {
-			FastQueue<IntensityPoint> detected = new FastQueue<>(IntensityPoint::new);
+		protected DogArray<IntensityPoint> createRandom(int i2) {
+			DogArray<IntensityPoint> detected = new DogArray<>(IntensityPoint::new);
 			for (int i = 0; i < i2; i++) {
 				IntensityPoint p = detected.grow();
 				p.p.x = (short)rand.nextInt(width);

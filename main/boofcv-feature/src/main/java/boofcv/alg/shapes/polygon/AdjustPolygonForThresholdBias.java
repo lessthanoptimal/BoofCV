@@ -25,7 +25,7 @@ import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * When a binary image is created some of the sides are shifted up to a pixel. This is due to how the image is
@@ -36,7 +36,7 @@ import org.ddogleg.struct.FastQueue;
  */
 public class AdjustPolygonForThresholdBias {
 
-	private FastQueue<LineSegment2D_F64> segments = new FastQueue<>(LineSegment2D_F64::new);
+	private DogArray<LineSegment2D_F64> segments = new DogArray<>(LineSegment2D_F64::new);
 	private LineGeneral2D_F64 ga = new LineGeneral2D_F64();
 	private LineGeneral2D_F64 gb = new LineGeneral2D_F64();
 	private Point2D_F64 intersection = new Point2D_F64();

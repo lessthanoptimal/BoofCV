@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +119,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 
 		grider.process(foundEllipses, clustersPruned);
 
-		FastQueue<Grid> grids = grider.getGrids();
+		DogArray<Grid> grids = grider.getGrids();
 
 		if (verbose) System.out.println("  Found " + grids.size() + " grids");
 		pruneIncorrectShape(grids, numRows, numCols);
@@ -246,7 +246,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	/**
 	 * Remove grids which cannot possible match the expected shape
 	 */
-	static void pruneIncorrectShape( FastQueue<Grid> grids, int numRows, int numCols ) {
+	static void pruneIncorrectShape( DogArray<Grid> grids, int numRows, int numCols ) {
 		// prune clusters which can't be a member calibration target
 		for (int i = grids.size() - 1; i >= 0; i--) {
 			Grid g = grids.get(i);

@@ -30,7 +30,7 @@ import boofcv.struct.image.*;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -118,7 +118,7 @@ public class MultiViewToFusedDisparity<Image extends ImageGray<Image>> implement
 	 * @param sbaIndexToViewID Look up table from view index to view ID
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( SceneStructureMetric scene, int targetIdx, GrowQueue_I32 pairIdxs,
+	public boolean process( SceneStructureMetric scene, int targetIdx, DogArray_I32 pairIdxs,
 							BoofLambdas.IndexToString sbaIndexToViewID ) {
 		requireNonNull(stereoDisparity, "stereoDisparity must be configured");
 		requireNonNull(lookUpImages, "lookUpImages must be configured");

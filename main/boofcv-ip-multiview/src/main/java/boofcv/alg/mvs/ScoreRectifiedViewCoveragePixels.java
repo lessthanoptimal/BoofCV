@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 
@@ -56,7 +56,7 @@ public class ScoreRectifiedViewCoveragePixels {
 	// Indicates the number of times a 3D disparity lands on this pixel. -1 means the pixel is invalid
 	final GrayF32 viewed = new GrayF32(1, 1);
 	// Precomputed transform from distorted pixels to undistorted pixels
-	final FastQueue<Point2D_F64> pixel_to_undist = new FastQueue<>(Point2D_F64::new, p -> p.setTo(0.0, 0.0));
+	final DogArray<Point2D_F64> pixel_to_undist = new DogArray<>(Point2D_F64::new, p -> p.setTo(0.0, 0.0));
 
 	// internal work space variables
 	Homography2D_F64 pixel_to_rect = new Homography2D_F64();

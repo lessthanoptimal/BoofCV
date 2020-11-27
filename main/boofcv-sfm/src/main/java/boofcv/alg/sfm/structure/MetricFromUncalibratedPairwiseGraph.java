@@ -28,9 +28,9 @@ import boofcv.struct.geo.AssociatedTupleDN;
 import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -131,7 +131,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		SeedInfo info = seeds.get(0);
 
 		// Find the common features
-		GrowQueue_I32 common = utils.findCommonFeatures(info.seed, info.motions);
+		DogArray_I32 common = utils.findCommonFeatures(info.seed, info.motions);
 		if (common.size < 6) // if less than the minimum it will fail
 			return false;
 
@@ -157,7 +157,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	/**
 	 * Initializes the scene at the seed view
 	 */
-	private boolean estimateProjectiveSceneFromSeed( LookupSimilarImages db, SeedInfo info, GrowQueue_I32 common ) {
+	private boolean estimateProjectiveSceneFromSeed( LookupSimilarImages db, SeedInfo info, DogArray_I32 common ) {
 		// initialize projective scene using common tracks
 		if (!initProjective.projectiveSceneN(db, info.seed, common, info.motions)) {
 			if (verbose != null) verbose.println("Failed initialize seed");
@@ -180,9 +180,9 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	private boolean projectiveSeedToMetric( PairwiseImageGraph graph ) {
 		// Declare storage for projective scene in a format that 'projectiveToMetric' understands
 		List<String> viewIds = new ArrayList<>();
-		FastQueue<ImageDimension> dimensions = new FastQueue<>(ImageDimension::new);
-		FastQueue<DMatrixRMaj> views = new FastQueue<>(() -> new DMatrixRMaj(3, 4));
-		FastQueue<AssociatedTupleDN> observations = new FastQueue<>(AssociatedTupleDN::new);
+		DogArray<ImageDimension> dimensions = new DogArray<>(ImageDimension::new);
+		DogArray<DMatrixRMaj> views = new DogArray<>(() -> new DMatrixRMaj(3, 4));
+		DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
 
 		initProjective.lookupInfoForMetricElevation(viewIds, dimensions, views, observations);
 
@@ -207,8 +207,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * @param inlierToOther Indexes of observations for all the other views which are part of the inlier set.
 	 */
 	void saveMetricSeed( PairwiseImageGraph graph, List<String> viewIds, List<ImageDimension> dimensions,
-						 GrowQueue_I32 inlierToSeed,
-						 FastQueue<GrowQueue_I32> inlierToOther,
+						 DogArray_I32 inlierToSeed,
+						 DogArray<DogArray_I32> inlierToOther,
 						 MetricCameras results ) {
 		checkEq(viewIds.size(), results.motion_1_to_k.size + 1, "Implicit view[0] no included");
 

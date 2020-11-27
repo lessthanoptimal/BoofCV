@@ -21,7 +21,7 @@ package boofcv.alg.geo.pose;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.Complex_F64;
 
 import java.util.List;
@@ -49,7 +49,7 @@ import static boofcv.alg.geo.pose.P3PGrunert.pow2;
 public class P3PFinsterwalder implements P3PLineDistance {
 
 	// storage for solutions
-	private FastQueue<PointDistance3> solutions = new FastQueue<>(4, PointDistance3::new);
+	private DogArray<PointDistance3> solutions = new DogArray<>(4, PointDistance3::new);
 
 	// square of a,b,c
 	private double a2,b2,c2;
@@ -176,7 +176,7 @@ public class P3PFinsterwalder implements P3PLineDistance {
 	}
 
 	@Override
-	public FastQueue<PointDistance3> getSolutions() {
+	public DogArray<PointDistance3> getSolutions() {
 		return solutions;
 	}
 }

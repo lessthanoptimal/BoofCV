@@ -50,7 +50,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.apache.commons.io.FilenameUtils;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,7 +84,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 	boolean addingMarkers = false;
 	Uchiya_to_FiducialDetector<T> tracker;
 	RandomDotDefinition definition;
-	FastQueue<DetectInfo> detections = new FastQueue<>(DetectInfo::new);
+	DogArray<DetectInfo> detections = new DogArray<>(DetectInfo::new);
 	//------------ END LOCK
 
 	VisualizePanel gui = new VisualizePanel();
@@ -504,7 +504,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		int id;
 		final Polygon2D_F64 bounds = new Polygon2D_F64();
 		final Point2D_F64 center = new Point2D_F64();
-		final FastQueue<Point2D_F64> dots = new FastQueue<>(Point2D_F64::new);
+		final DogArray<Point2D_F64> dots = new DogArray<>(Point2D_F64::new);
 		final Se3_F64 markerToCamera = new Se3_F64();
 
 		public void reset() {

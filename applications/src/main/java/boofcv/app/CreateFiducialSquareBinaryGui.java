@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.app;
 import boofcv.app.fiducials.CreateSquareFiducialControlPanel;
 import boofcv.app.fiducials.CreateSquareFiducialGui;
 import boofcv.io.image.ConvertBufferedImage;
-import org.ddogleg.struct.GrowQueue_I64;
+import org.ddogleg.struct.DogArray_I64;
 
 import javax.swing.*;
 
@@ -84,7 +84,7 @@ public class CreateFiducialSquareBinaryGui extends CreateSquareFiducialGui {
 
 		DefaultListModel<Long> listModel = new DefaultListModel<>();
 		JList<Long> listPatterns = new JList<>(listModel);
-		GrowQueue_I64 patterns = new GrowQueue_I64();
+		DogArray_I64 patterns = new DogArray_I64();
 		JSpinner spinnerGridWidth;
 
 		long selectedPattern =-1;

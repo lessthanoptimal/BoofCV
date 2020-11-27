@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * Removes any ambiguous associations.  If multiple features from the 'src' match the same feature
@@ -43,7 +43,7 @@ public class EnsureUniqueAssociation {
 	 * @param matches List of candidate associations
 	 * @param sizeDst Number of 'dst' features
 	 */
-	public void process( FastQueue<AssociatedIndex> matches, int sizeDst ) {
+	public void process( DogArray<AssociatedIndex> matches, int sizeDst ) {
 		// initialize data structures
 		if( bestScores.length < sizeDst )
 			bestScores = new AssociatedIndex[sizeDst];

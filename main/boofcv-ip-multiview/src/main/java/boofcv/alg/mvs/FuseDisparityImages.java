@@ -28,8 +28,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.DConvertMatrixStruct;
@@ -58,7 +58,7 @@ public class FuseDisparityImages {
 	PixelTransform<Point2D_F64> pixelOrig_to_Undist;
 
 	// A copy of all the input disparity images
-	final @Getter FastQueue<DisparityImage> images = new FastQueue<>(DisparityImage::new, DisparityImage::reset);
+	final @Getter DogArray<DisparityImage> images = new DogArray<>(DisparityImage::new, DisparityImage::reset);
 
 	// Where the combined results are stored
 	final @Getter FusedImage fused = new FusedImage();
@@ -228,7 +228,7 @@ public class FuseDisparityImages {
 		for (int y = 0; y < fused.height; y++) {
 			int indexOut = disparity.startIndex + y*disparity.stride;
 			for (int x = 0; x < fused.width; x++) {
-				GrowQueue_F32 values = fused.get(x, y);
+				DogArray_F32 values = fused.get(x, y);
 				float outputValue;
 				if (values.size == 0) {
 					// mark this pixel as invalid. The disparity will be rescaled later on and the max value at this
@@ -306,10 +306,10 @@ public class FuseDisparityImages {
 	 * Contains disparity information mapped to original distorted pixels.
 	 */
 	static class FusedImage {
-		public final FastQueue<GrowQueue_F32> pixels = new FastQueue<>(GrowQueue_F32::new, GrowQueue_F32::reset);
+		public final DogArray<DogArray_F32> pixels = new DogArray<>(DogArray_F32::new, DogArray_F32::reset);
 		public int width, height;
 
-		public GrowQueue_F32 get( int x, int y ) {
+		public DogArray_F32 get( int x, int y ) {
 			return pixels.get(y*width + x);
 		}
 

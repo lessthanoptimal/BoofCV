@@ -24,8 +24,8 @@ import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -51,14 +51,14 @@ public class ImplMedianSortNaive {
 	 * @param workArrays (Optional) Storage for internal workspace. Nullable.
 	 */
 	public static void process( GrayI input, GrayI output, int radiusX, int radiusY,
-								@Nullable GrowArray<GrowQueue_I32> workArrays ) {
+								@Nullable GrowArray<DogArray_I32> workArrays ) {
 
 		final int w = 2*radiusX + 1;
 		final int h = 2*radiusY + 1;
 
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I32::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I32::new);
 		//CONCURRENT_REMOVE_BELOW
-		GrowQueue_I32 workspace = workArrays.grow();
+		DogArray_I32 workspace = workArrays.grow();
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.height, h, workArrays, (workspace,y0,y1)->{
 		final int y0 = 0, y1 = input.height;
@@ -107,14 +107,14 @@ public class ImplMedianSortNaive {
 	 * @param workArrays (Optional) Storage for internal workspace. Nullable.
 	 */
 	public static void process( GrayF32 input, GrayF32 output, int radiusX, int radiusY,
-								@Nullable GrowArray<GrowQueue_F32> workArrays ) {
+								@Nullable GrowArray<DogArray_F32> workArrays ) {
 
 		final int w = 2*radiusX + 1;
 		final int h = 2*radiusY + 1;
 
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_F32::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_F32::new);
 		//CONCURRENT_REMOVE_BELOW
-		GrowQueue_F32 workspace = workArrays.grow();
+		DogArray_F32 workspace = workArrays.grow();
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.height, h, workArrays, (workspace,y0,y1)->{
 		final int y0 = 0, y1 = input.height;
@@ -156,9 +156,9 @@ public class ImplMedianSortNaive {
 	public static void process( ImageGray input, ImageGray output, int radiusX, int radiusY,
 								@Nullable GrowArray workspace ) {
 		if (input.getDataType().isInteger()) {
-			process((GrayI)input, (GrayI)output, radiusX, radiusY, (GrowArray<GrowQueue_I32>)workspace);
+			process((GrayI)input, (GrayI)output, radiusX, radiusY, (GrowArray<DogArray_I32>)workspace);
 		} else {
-			process((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrowArray<GrowQueue_F32>)workspace);
+			process((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrowArray<DogArray_F32>)workspace);
 		}
 	}
 

@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,7 +86,7 @@ public class TestBinaryThinning extends BoofStandardJUnit {
 	}
 
 	private void findBlackPixels(GrayU8 img) {
-		GrowQueue_I32 marked = new GrowQueue_I32();
+		DogArray_I32 marked = new DogArray_I32();
 		BinaryThinning alg = new BinaryThinning();
 
 		alg.binary = img;

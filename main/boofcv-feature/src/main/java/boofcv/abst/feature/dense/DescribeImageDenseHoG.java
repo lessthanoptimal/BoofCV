@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class DescribeImageDenseHoG<T extends ImageBase<T>> implements DescribeIm
 		hog.process();
 
 		// center region locations to make it compliant with this interface
-		FastQueue<Point2D_I32> locations = hog.getLocations();
+		DogArray<Point2D_I32> locations = hog.getLocations();
 		int rx = hog.getRegionWidthPixelX()/2;
 		int ry = hog.getRegionWidthPixelY()/2;
 

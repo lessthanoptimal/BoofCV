@@ -65,7 +65,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 				"import pabeles.concurrency.GrowArray;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n"+
 				"import javax.annotation.Generated;\n");
@@ -130,7 +130,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 		String divideArg = hasDivide ? ", int divisor" : "";
 		String divideSuf = hasDivide ? "_Div" : "";
 		String divideInput = hasDivide ? ", divisor" : "";
-		String workspaceArg = hasDivide && singleBand && name.equals("convolve") ? ", @Nullable GrowArray<GrowQueue_I32> work" : "";
+		String workspaceArg = hasDivide && singleBand && name.equals("convolve") ? ", @Nullable GrowArray<DogArray_I32> work" : "";
 		String workspaceInput = workspaceArg.length()==0 ? "" : ", work";
 
 		// Not all permutations of unrolled are generated

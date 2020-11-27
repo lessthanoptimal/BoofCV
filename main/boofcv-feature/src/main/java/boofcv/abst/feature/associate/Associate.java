@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
@@ -65,7 +65,7 @@ public interface Associate {
 	 *
 	 * @return List of unassociated source features by index.
 	 */
-	GrowQueue_I32 getUnassociatedSource();
+	DogArray_I32 getUnassociatedSource();
 
 	/**
 	 * Indexes of features in the destination set which are not associated.
@@ -75,7 +75,7 @@ public interface Associate {
 	 *
 	 * @return List of unassociated destination features by index.
 	 */
-	GrowQueue_I32 getUnassociatedDestination();
+	DogArray_I32 getUnassociatedDestination();
 
 	/**
 	 * Associations are only considered if their score is less than or equal to the specified threshold.  To remove

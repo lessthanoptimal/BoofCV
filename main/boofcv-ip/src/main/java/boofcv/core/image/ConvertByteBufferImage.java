@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.core.image;
 
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 import java.nio.ByteBuffer;
 
@@ -32,7 +32,7 @@ import java.nio.ByteBuffer;
 public class ConvertByteBufferImage {
 
 	public static void from_3BU8_to_U8(ByteBuffer src , int srcOffset , int srcStride ,
-									   GrayU8 dst , GrowQueue_I8 work )
+									   GrayU8 dst , DogArray_I8 work )
 	{
 		work.resize(dst.width*3);
 
@@ -56,7 +56,7 @@ public class ConvertByteBufferImage {
 	}
 
 	public static void from_3BU8_to_3PU8(ByteBuffer src , int srcOffset , int srcStride ,
-										 Planar<GrayU8> dst , GrowQueue_I8 work )
+										 Planar<GrayU8> dst , DogArray_I8 work )
 	{
 		work.resize(dst.width*3);
 
@@ -91,7 +91,7 @@ public class ConvertByteBufferImage {
 	}
 
 	public static void from_3BU8_to_F32(ByteBuffer src , int srcOffset , int srcStride ,
-										GrayF32 dst , GrowQueue_I8 work )
+										GrayF32 dst , DogArray_I8 work )
 	{
 		work.resize(dst.width*3);
 
@@ -115,7 +115,7 @@ public class ConvertByteBufferImage {
 	}
 
 	public static void from_3BU8_to_3PF32(ByteBuffer src , int srcOffset , int srcStride ,
-										  Planar<GrayF32> dst , GrowQueue_I8 work )
+										  Planar<GrayF32> dst , DogArray_I8 work )
 	{
 		work.resize(dst.width*3);
 
@@ -139,7 +139,7 @@ public class ConvertByteBufferImage {
 	}
 
 	public static void from_3BU8_to_3IF32(ByteBuffer src , int srcOffset , int srcStride ,
-										  InterleavedF32 dst , GrowQueue_I8 work )
+										  InterleavedF32 dst , DogArray_I8 work )
 	{
 		work.resize(dst.width*3);
 

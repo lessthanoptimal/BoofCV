@@ -62,7 +62,7 @@ import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ddogleg.solver.PolynomialOps;
 import org.ddogleg.solver.RootFinderType;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 import org.jetbrains.annotations.Nullable;
@@ -471,7 +471,7 @@ public class FactoryMultiView {
 			return new IPPE_to_EstimatePnP(H);
 		}
 
-		FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64::new);
+		DogArray<Se3_F64> solutions = new DogArray<>(4, Se3_F64::new);
 
 		return new EstimateNto1ofPnP(pnp_N(which, -1), solutions, numTest);
 	}

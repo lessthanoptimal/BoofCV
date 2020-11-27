@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.struct;
 import boofcv.concurrency.BoofConcurrency;
 import lombok.Getter;
 import org.ddogleg.struct.DProcess;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.Factory;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * Breaks the image up into a grid. For use when processing individual regions of the image at a time. The size
@@ -31,7 +31,7 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class ImageGrid<T> {
-	public final FastQueue<T> cells;
+	public final DogArray<T> cells;
 
 	// Number of rows and columns in the grid
 	@Getter public int rows, cols;
@@ -40,7 +40,7 @@ public class ImageGrid<T> {
 	@Getter public int lengthX, lengthY;
 
 	public ImageGrid(Factory<T> factory , DProcess<T> reset) {
-		cells = new FastQueue<T>(factory, reset);
+		cells = new DogArray<T>(factory, reset);
 	}
 
 	/**

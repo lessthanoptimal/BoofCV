@@ -22,7 +22,7 @@ import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph.Node;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -176,7 +176,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 	@Test
 	void isCornerValidOrigin_2x2() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		FastQueue<Node> nodes = createGrid(2,2, true);
+		DogArray<Node> nodes = createGrid(2,2, true);
 
 //		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
 		assertTrue(alg.isCornerValidOrigin(nodes.get(1)));
@@ -187,7 +187,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 	@Test
 	void isCornerValidOrigin_2x3() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		FastQueue<Node> nodes = createGrid(2,3, true);
+		DogArray<Node> nodes = createGrid(2,3, true);
 
 		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
 		assertFalse(alg.isCornerValidOrigin(nodes.get(2)));
@@ -198,7 +198,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 	@Test
 	void isCornerValidOrigin_3x3() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		FastQueue<Node> nodes = createGrid(3,3, true);
+		DogArray<Node> nodes = createGrid(3,3, true);
 
 		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
 		assertFalse(alg.isCornerValidOrigin(nodes.get(2*3)));
@@ -211,7 +211,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 		for (int rows = 2; rows <= 4; rows++) {
 			for (int cols = 2; cols <= 4; cols++) {
 				for (int i = 0; i < 10; i++) {
-					FastQueue<Node> corners = createGrid(rows, cols, true);
+					DogArray<Node> corners = createGrid(rows, cols, true);
 
 					// randomize the order so that it needs to do something interesting
 					corners.shuffle(rand);
@@ -221,7 +221,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 		}
 	}
 
-	void orderNodes(FastQueue<Node> corners , int rows, int cols ) {
+	void orderNodes(DogArray<Node> corners , int rows, int cols ) {
 		GridInfo info = new GridInfo();
 		info.reset();
 
@@ -263,7 +263,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 	void alignEdges() {
 		for (int rows = 2; rows <= 4; rows++) {
 			for (int cols = 2; cols <= 4; cols++) {
-				FastQueue<Node> corners = createGrid(rows, cols, true);
+				DogArray<Node> corners = createGrid(rows, cols, true);
 
 				// Shift the edges so that they won't be aligned
 				// They are already in order
@@ -300,8 +300,8 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 		return output;
 	}
 
-	private FastQueue<Node> createGrid(int rows, int cols, boolean cornerSquare) {
-		FastQueue<Node> corners = new FastQueue<>(Node::new);
+	private DogArray<Node> createGrid(int rows, int cols, boolean cornerSquare) {
+		DogArray<Node> corners = new DogArray<>(Node::new);
 
 		// declare the grid
 		for (int row = 0; row < rows; row++) {
@@ -333,7 +333,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 
 	@Test
 	void sortEdgesCCW() {
-		FastQueue<Node> corners = new FastQueue<>(Node::new);
+		DogArray<Node> corners = new DogArray<>(Node::new);
 
 		for (int nodeIdx = 0; nodeIdx < 6; nodeIdx++) {
 			Node target = corners.grow();
@@ -384,7 +384,7 @@ class TestChessboardCornerClusterToGrid extends BoofStandardJUnit
 	 */
 	@Test
 	void sortEdgesCCW_shift() {
-		FastQueue<Node> corners = new FastQueue<>(Node::new);
+		DogArray<Node> corners = new DogArray<>(Node::new);
 
 		// Add nodes with 3 edges
 		for (int jump = 0; jump < 3; jump++) {

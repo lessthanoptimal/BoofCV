@@ -42,7 +42,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,7 +82,7 @@ public class VisualizeSquareBinaryFiducial {
 		}
 
 		System.out.println("Total Found: " + detector.squares.size());
-		FastQueue<FoundFiducial> fiducials = detector.getFound();
+		DogArray<FoundFiducial> fiducials = detector.getFound();
 
 		int N = Math.min(20, detector.squares.size());
 		ListDisplayPanel squares = new ListDisplayPanel();

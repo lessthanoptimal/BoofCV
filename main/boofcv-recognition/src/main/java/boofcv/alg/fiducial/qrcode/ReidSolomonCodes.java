@@ -18,8 +18,8 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import org.ddogleg.struct.GrowQueue_I32;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.DogArray_I8;
 
 import java.util.Arrays;
 
@@ -37,14 +37,14 @@ public class ReidSolomonCodes {
 
 	GaliosFieldTableOps math;
 
-	GrowQueue_I8 generator = new GrowQueue_I8();
+	DogArray_I8 generator = new DogArray_I8();
 
-	GrowQueue_I8 tmp0 = new GrowQueue_I8();
-	GrowQueue_I8 tmp1 = new GrowQueue_I8();
+	DogArray_I8 tmp0 = new DogArray_I8();
+	DogArray_I8 tmp1 = new DogArray_I8();
 
-	GrowQueue_I32 errorLocations = new GrowQueue_I32();
-	GrowQueue_I8 errorLocatorPoly = new GrowQueue_I8();
-	GrowQueue_I8 syndromes = new GrowQueue_I8();
+	DogArray_I32 errorLocations = new DogArray_I32();
+	DogArray_I8 errorLocatorPoly = new DogArray_I8();
+	DogArray_I8 syndromes = new DogArray_I8();
 
 	public ReidSolomonCodes( int numBits , int primitive) {
 		math = new GaliosFieldTableOps(numBits,primitive);
@@ -59,7 +59,7 @@ public class ReidSolomonCodes {
 	 * @param input Input message. Modified internally then returned to its initial state
 	 * @param output error correction code
 	 */
-	public void computeECC( GrowQueue_I8 input , GrowQueue_I8 output ) {
+	public void computeECC( DogArray_I8 input , DogArray_I8 output ) {
 
 		int N = generator.size-1;
 		input.extend(input.size+N);
@@ -76,7 +76,7 @@ public class ReidSolomonCodes {
 	 * @param ecc (Input) error correction code for the message
 	 * @return true if it was successful or false if it failed
 	 */
-	public boolean correct(GrowQueue_I8 input , GrowQueue_I8 ecc )
+	public boolean correct(DogArray_I8 input , DogArray_I8 ecc )
 	{
 		computeSyndromes(input,ecc,syndromes);
 		findErrorLocatorPolynomialBM(syndromes,errorLocatorPoly);
@@ -93,9 +93,9 @@ public class ReidSolomonCodes {
 	 * @param ecc ECC portion of the message
 	 * @param syndromes (Output) results of the syndromes computations
 	 */
-	void computeSyndromes( GrowQueue_I8 input ,
-						   GrowQueue_I8 ecc ,
-						   GrowQueue_I8 syndromes)
+	void computeSyndromes( DogArray_I8 input ,
+						   DogArray_I8 ecc ,
+						   DogArray_I8 syndromes)
 	{
 		syndromes.resize(syndromeLength());
 		for (int i = 0; i < syndromes.size; i++) {
@@ -114,15 +114,15 @@ public class ReidSolomonCodes {
 	 * @param syndromes (Input) The syndromes
 	 * @param errorLocator (Output) Error locator polynomial. Coefficients are large to small.
 	 */
-	void findErrorLocatorPolynomialBM(GrowQueue_I8 syndromes , GrowQueue_I8 errorLocator ) {
-		GrowQueue_I8 C = errorLocator; // error polynomial
-		GrowQueue_I8 B = new GrowQueue_I8();  // previous error polynomial
+	void findErrorLocatorPolynomialBM(DogArray_I8 syndromes , DogArray_I8 errorLocator ) {
+		DogArray_I8 C = errorLocator; // error polynomial
+		DogArray_I8 B = new DogArray_I8();  // previous error polynomial
 		// TODO remove new from this function
 
 		initToOne(C,syndromes.size+1);
 		initToOne(B,syndromes.size+1);
 
-		GrowQueue_I8 tmp = new GrowQueue_I8(syndromes.size);
+		DogArray_I8 tmp = new DogArray_I8(syndromes.size);
 
 //		int L = 0;
 //		int m = 1; // stores how much B is 'shifted' by
@@ -164,7 +164,7 @@ public class ReidSolomonCodes {
 		removeLeadingZeros(C);
 	}
 
-	private void removeLeadingZeros(GrowQueue_I8 poly ) {
+	private void removeLeadingZeros(DogArray_I8 poly ) {
 		int count = 0;
 		for (; count < poly.size; count++) {
 			if( poly.data[count] != 0 )
@@ -183,7 +183,7 @@ public class ReidSolomonCodes {
 	 * @param errorLocations (Input) List of error locations in the byte
 	 * @param errorLocator (Output) Error locator polynomial. Coefficients are large to small.
 	 */
-	void findErrorLocatorPolynomial( int messageLength , GrowQueue_I32 errorLocations , GrowQueue_I8 errorLocator ) {
+	void findErrorLocatorPolynomial( int messageLength , DogArray_I32 errorLocations , DogArray_I8 errorLocator ) {
 		tmp1.resize(2);
 		tmp1.data[1] = 1;
 		errorLocator.resize(1);
@@ -208,9 +208,9 @@ public class ReidSolomonCodes {
 	 * @param messageLength (Input) Length of the message + ecc.
 	 * @param locations (Output) locations of bytes in message with errors.
 	 */
-	public boolean findErrorLocations_BruteForce(GrowQueue_I8 errorLocator ,
+	public boolean findErrorLocations_BruteForce(DogArray_I8 errorLocator ,
 												 int messageLength ,
-												 GrowQueue_I32 locations )
+												 DogArray_I32 locations )
 	{
 		locations.resize(0);
 		for (int i = 0; i < messageLength; i++) {
@@ -230,17 +230,17 @@ public class ReidSolomonCodes {
 	 * @param length_msg_ecc (Input) length of message and ecc code
 	 * @param errorLocations (Input) locations of bytes in message with errors.
 	 */
-	void correctErrors( GrowQueue_I8 message ,
+	void correctErrors( DogArray_I8 message ,
 						int length_msg_ecc,
-						GrowQueue_I8 syndromes,
-						GrowQueue_I8 errorLocator ,
-						GrowQueue_I32 errorLocations)
+						DogArray_I8 syndromes,
+						DogArray_I8 errorLocator ,
+						DogArray_I32 errorLocations)
 	{
-		GrowQueue_I8 err_eval = new GrowQueue_I8(); // TODO avoid new
+		DogArray_I8 err_eval = new DogArray_I8(); // TODO avoid new
 		findErrorEvaluator(syndromes,errorLocator,err_eval);
 
 		// Compute error positions
-		GrowQueue_I8 X = GrowQueue_I8.zeros(errorLocations.size); // TODO avoid new
+		DogArray_I8 X = DogArray_I8.zeros(errorLocations.size); // TODO avoid new
 		for (int i = 0; i < errorLocations.size; i++) {
 			int coef_pos = (length_msg_ecc-errorLocations.data[i]-1);
 			X.data[i] = (byte)math.power(2,coef_pos);
@@ -250,7 +250,7 @@ public class ReidSolomonCodes {
 //			X.data[i] = (byte)math.power_n(2,-coef_pos);
 		}
 
-		GrowQueue_I8 err_loc_prime_tmp = new GrowQueue_I8(X.size);
+		DogArray_I8 err_loc_prime_tmp = new DogArray_I8(X.size);
 
 		// storage for error magnitude polynomial
 		for (int i = 0; i < X.size; i++) {
@@ -291,8 +291,8 @@ public class ReidSolomonCodes {
 	 * @param errorLocator (Input) error locator polynomial.
 	 * @param evaluator (Output) error evaluator polynomial. large to small coef
 	 */
-	void findErrorEvaluator( GrowQueue_I8 syndromes , GrowQueue_I8 errorLocator ,
-							 GrowQueue_I8 evaluator )
+	void findErrorEvaluator( DogArray_I8 syndromes , DogArray_I8 errorLocator ,
+							 DogArray_I8 evaluator )
 	{
 		math.polyMult_flipA(syndromes,errorLocator,evaluator);
 		int N = errorLocator.size-1;
@@ -332,7 +332,7 @@ public class ReidSolomonCodes {
 		}
 	}
 
-	void initToOne( GrowQueue_I8 poly , int length ) {
+	void initToOne( DogArray_I8 poly , int length ) {
 		poly.reset();
 		poly.reserve(length);
 		poly.size = 1;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.struct.feature;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 
 /**
- * {@link org.ddogleg.struct.FastQueue} for {@link TupleDesc_B}.
+ * {@link org.ddogleg.struct.DogArray} for {@link TupleDesc_B}.
  *
  * @author Peter Abeles
  */
-public class BriefFeatureQueue extends FastQueue<TupleDesc_B> {
+public class BriefFeatureQueue extends DogArray<TupleDesc_B> {
 
 	int numBits;
 
 	public BriefFeatureQueue(int numBits) {
 		super(()->new TupleDesc_B(numBits));
 		this.numBits = numBits;
-		growArray(10);
+		reserve(10);
 	}
 }

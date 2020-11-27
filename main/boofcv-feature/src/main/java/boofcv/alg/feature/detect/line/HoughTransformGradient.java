@@ -34,8 +34,8 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	// extracts line from the transform
 	NonMaxSuppression extractor;
 	// stores returned lines
-	FastQueue<LineParametric2D_F32> linesAll = new FastQueue<>(10, LineParametric2D_F32::new);
+	DogArray<LineParametric2D_F32> linesAll = new DogArray<>(10, LineParametric2D_F32::new);
 	// Lines after similar ones have been merged together
 	List<LineParametric2D_F32> linesMerged = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	// list of points in the transform with non-zero values
 	final ListIntPoint2D candidates = new ListIntPoint2D();
 	// line intensities for later pruning
-	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
+	DogArray_F32 foundIntensity = new DogArray_F32(10);
 
 	// Refine lines using mean shift. If radius <= 0 it won't be used
 	MeanShiftPeak<GrayF32> refine = new MeanShiftPeak<>(10, 0.001f,
@@ -218,7 +218,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 		return transform;
 	}
 
-	public FastQueue<LineParametric2D_F32> getLinesAll() {
+	public DogArray<LineParametric2D_F32> getLinesAll() {
 		return linesAll;
 	}
 

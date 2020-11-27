@@ -30,8 +30,8 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,10 +61,10 @@ public class TestSegmentMeanShiftSearchColor extends BoofStandardJUnit {
 
 		alg.process(image);
 
-		FastQueue<Point2D_I32> locations = alg.getModeLocation();
-		GrowQueue_I32 counts = alg.getRegionMemberCount();
+		DogArray<Point2D_I32> locations = alg.getModeLocation();
+		DogArray_I32 counts = alg.getRegionMemberCount();
 		GrayS32 peaks = alg.getPixelToRegion();
-		FastQueue<float[]> values = alg.getModeColor();
+		DogArray<float[]> values = alg.getModeColor();
 
 		// there should be a fair number of local peaks due to the image being random
 		assertTrue( locations.size > 20 );

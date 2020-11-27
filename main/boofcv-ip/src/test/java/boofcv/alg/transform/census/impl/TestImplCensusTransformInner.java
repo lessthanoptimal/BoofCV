@@ -25,8 +25,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -127,8 +127,8 @@ public class TestImplCensusTransformInner extends BoofStandardJUnit {
 		fillUniform(input);
 
 		int r = 3;
-		FastQueue<Point2D_I32> samples = createSamples(r);
-		GrowQueue_I32 indexes = samplesToIndexes(input, samples);
+		DogArray<Point2D_I32> samples = createSamples(r);
+		DogArray_I32 indexes = samplesToIndexes(input, samples);
 
 		m.invoke(null, input, r, indexes, found);
 		CensusNaive.sample(input, samples, expected);
@@ -145,8 +145,8 @@ public class TestImplCensusTransformInner extends BoofStandardJUnit {
 
 		fillUniform(input);
 
-		FastQueue<Point2D_I32> samples5x5 = createSamples(2);
-		GrowQueue_I32 indexes = samplesToIndexes(input, samples5x5);
+		DogArray<Point2D_I32> samples5x5 = createSamples(2);
+		DogArray_I32 indexes = samplesToIndexes(input, samples5x5);
 
 		m.invoke(null, input, 2, indexes, found);
 		CensusNaive.sample(input, samples5x5, expected);
@@ -163,8 +163,8 @@ public class TestImplCensusTransformInner extends BoofStandardJUnit {
 		}
 	}
 
-	public static GrowQueue_I32 samplesToIndexes( ImageGray input, FastQueue<Point2D_I32> samples ) {
-		GrowQueue_I32 indexes = new GrowQueue_I32();
+	public static DogArray_I32 samplesToIndexes( ImageGray input, DogArray<Point2D_I32> samples ) {
+		DogArray_I32 indexes = new DogArray_I32();
 		for (int i = 0; i < samples.size; i++) {
 			Point2D_I32 p = samples.get(i);
 			indexes.add(p.y*input.stride + p.x);
@@ -172,8 +172,8 @@ public class TestImplCensusTransformInner extends BoofStandardJUnit {
 		return indexes;
 	}
 
-	public static FastQueue<Point2D_I32> createSamples( int r ) {
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
+	public static DogArray<Point2D_I32> createSamples( int r ) {
+		DogArray<Point2D_I32> samples = new DogArray<>(Point2D_I32::new);
 		for (int y = -r; y <= r; y++) {
 			for (int x = -r; x <= r; x++) {
 				samples.grow().setTo(x, y);

@@ -49,7 +49,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.DDoglegConcurrency;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -73,7 +73,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
-public class ExampleMultiviewSparseReconstruction {
+public class ExampleMultiViewSparseReconstruction {
 
 	// Instead of processing all the frames just process the first N frames
 	int maxFrames = 30;
@@ -92,7 +92,7 @@ public class ExampleMultiviewSparseReconstruction {
 		// Turn on threaded code for bundle adjustment
 		DDoglegConcurrency.USE_CONCURRENT = true;
 
-		var example = new ExampleMultiviewSparseReconstruction();
+		var example = new ExampleMultiViewSparseReconstruction();
 		example.compute("house_01.mp4");
 //		example.compute("forest_path_01.mp4");
 		example.visualizeSparseCloud();
@@ -293,7 +293,7 @@ public class ExampleMultiviewSparseReconstruction {
 		var imageLookup = new LookUpImageFilesByIndex(imageFiles);
 		var colorize = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), imageLookup);
 
-		GrowQueue_I32 rgb = new GrowQueue_I32();
+		DogArray_I32 rgb = new DogArray_I32();
 		rgb.resize(scene.points.size);
 		colorize.processScenePoints(scene,
 				( viewIdx ) -> viewIdx + "", // String encodes the image's index

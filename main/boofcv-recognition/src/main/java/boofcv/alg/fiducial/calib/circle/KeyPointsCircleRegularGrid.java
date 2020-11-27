@@ -23,7 +23,7 @@ import georegression.geometry.curves.TangentLinesTwoEllipses_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * <p>Computes key points from an observed regular circular grid.  Each circle has 4 key points at the grid aligned
@@ -41,10 +41,10 @@ import org.ddogleg.struct.FastQueue;
 public class KeyPointsCircleRegularGrid {
 
 	// tangent points on each ellipse
-	FastQueue<Tangents> tangents = new FastQueue<>(Tangents::new);
+	DogArray<Tangents> tangents = new DogArray<>(Tangents::new);
 
 	// detected location
-	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64::new);
+	DogArray<Point2D_F64> keypoints = new DogArray<>(Point2D_F64::new);
 
 	// used to compute tangent lines between two ellipses
 	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64, 10);
@@ -164,11 +164,11 @@ public class KeyPointsCircleRegularGrid {
 	 *
 	 * @return detected image location
 	 */
-	public FastQueue<Point2D_F64> getKeyPoints() {
+	public DogArray<Point2D_F64> getKeyPoints() {
 		return keypoints;
 	}
 
-	public FastQueue<Tangents> getTangents() {
+	public DogArray<Tangents> getTangents() {
 		return tangents;
 	}
 

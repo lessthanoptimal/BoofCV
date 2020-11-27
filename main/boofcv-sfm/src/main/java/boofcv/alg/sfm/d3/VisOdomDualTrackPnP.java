@@ -45,10 +45,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,8 +98,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	// Data structures used when associating left and right cameras
 	private final FastArray<Point2D_F64> pointsLeft = new FastArray<>(Point2D_F64.class);
 	private final FastArray<Point2D_F64> pointsRight = new FastArray<>(Point2D_F64.class);
-	private final FastQueue<Desc> descLeft;
-	private final FastQueue<Desc> descRight;
+	private final DogArray<Desc> descLeft;
+	private final DogArray<Desc> descRight;
 
 	// matches features between left and right images
 	private final AssociateDescription2D<Desc> assocL2R;
@@ -124,7 +124,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 
 	//---------------------------------------------------------------------------------------------------
 	//----------- Internal Work Space
-	FastQueue<Stereo2D3D> listStereo2D3D = new FastQueue<>(Stereo2D3D::new);
+	DogArray<Stereo2D3D> listStereo2D3D = new DogArray<>(Stereo2D3D::new);
 
 	private final Se3_F64 left_to_right = new Se3_F64();
 	private final Se3_F64 right_to_left = new Se3_F64();
@@ -166,8 +166,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 		this.matcher = matcher;
 		this.modelRefiner = modelRefiner;
 
-		descLeft = new FastQueue<>(describe::createDescription);
-		descRight = new FastQueue<>(describe::createDescription);
+		descLeft = new DogArray<>(describe::createDescription);
+		descRight = new DogArray<>(describe::createDescription);
 
 		stereoCheck = new StereoConsistencyCheck(epilolarTol, epilolarTol);
 
@@ -344,7 +344,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 		previousLeft.frame_to_world.invert(world_to_prev);
 
 		// Put observation and prior knowledge into a format the model matcher will understand
-		listStereo2D3D.growArray(candidates.size());
+		listStereo2D3D.reserve(candidates.size());
 		listStereo2D3D.reset();
 		for (int candidateIdx = 0; candidateIdx < candidates.size(); candidateIdx++) {
 			PointTrack l = candidates.get(candidateIdx);
@@ -563,12 +563,12 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 			verbose.println("New Tracks: left=" + spawnedLeft.size() + " right=" + spawnedRight.size() + " stereo=" + total);
 
 		// drop visual tracks that were not associated
-		GrowQueue_I32 unassignedRight = assocL2R.getUnassociatedDestination();
+		DogArray_I32 unassignedRight = assocL2R.getUnassociatedDestination();
 		for (int i = 0; i < unassignedRight.size; i++) {
 			int index = unassignedRight.get(i);
 			trackerRight.dropTrack(spawnedRight.get(index));
 		}
-		GrowQueue_I32 unassignedLeft = assocL2R.getUnassociatedSource();
+		DogArray_I32 unassignedLeft = assocL2R.getUnassociatedSource();
 		for (int i = 0; i < unassignedLeft.size; i++) {
 			int index = unassignedLeft.get(i);
 			trackerLeft.dropTrack(spawnedLeft.get(index));
@@ -583,7 +583,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, Desc extends TupleDesc>
 	 * Given list of new visual tracks, describe the region around each track using a descriptor
 	 */
 	private void describeSpawnedTracks( T image, List<PointTrack> tracks,
-										FastArray<Point2D_F64> points, FastQueue<Desc> descs ) {
+										FastArray<Point2D_F64> points, DogArray<Desc> descs ) {
 		describe.setImage(image);
 		points.reset();
 		descs.reset();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.geo;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,11 +48,11 @@ public abstract class GeoModelEstimatorNto1<Model, Point> implements GeoModelEst
 	private List<Point> list = new ArrayList<>();
 
 	// storage for initial set of solutions
-	private FastQueue<Model> solutions;
+	private DogArray<Model> solutions;
 
 	protected GeoModelEstimatorNto1( GeoModelEstimatorN<Model, Point> alg,
 									 DistanceFromModel<Model, Point> distance,
-									 FastQueue<Model> solutions,
+									 DogArray<Model> solutions,
 									 int numTest ) {
 		this.alg = alg;
 		this.numTest = numTest;

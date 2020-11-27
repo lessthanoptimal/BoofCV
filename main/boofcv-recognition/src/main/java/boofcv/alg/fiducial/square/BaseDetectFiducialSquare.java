@@ -47,7 +47,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.DConvertMatrixStruct;
@@ -78,7 +78,7 @@ import java.util.List;
 public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	// Storage for the found fiducials
-	private FastQueue<FoundFiducial> found = new FastQueue<>(FoundFiducial::new);
+	private DogArray<FoundFiducial> found = new DogArray<>(FoundFiducial::new);
 
 	// converts input image into a binary image
 	InputToBinary<T> inputToBinary;
@@ -419,7 +419,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	/**
 	 * Returns list of found fiducials
 	 */
-	public FastQueue<FoundFiducial> getFound() {
+	public DogArray<FoundFiducial> getFound() {
 		return found;
 	}
 

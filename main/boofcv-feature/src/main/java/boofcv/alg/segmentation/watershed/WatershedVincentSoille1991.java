@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.CircularQueue_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.CircularArray_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * <p>
@@ -81,7 +81,7 @@ public abstract class WatershedVincentSoille1991 {
 
 	// histogram for sorting the image.  8-bits so 256 possible values
 	// each element refers to a pixel in the input image
-	protected GrowQueue_I32[] histogram = new GrowQueue_I32[256];
+	protected DogArray_I32[] histogram = new DogArray_I32[256];
 
 	// Output image.  This is im_o in the paper.
 	// The output image has a 1-pixel wide border which means that bound checks don't need
@@ -99,7 +99,7 @@ public abstract class WatershedVincentSoille1991 {
 	protected int currentLabel;
 
 	// FIFO circular queue
-	protected CircularQueue_I32 fifo = new CircularQueue_I32();
+	protected CircularArray_I32 fifo = new CircularArray_I32();
 
 	// used to remove watersheds
 	protected RemoveWatersheds removeWatersheds = new RemoveWatersheds();
@@ -107,7 +107,7 @@ public abstract class WatershedVincentSoille1991 {
 
 	protected WatershedVincentSoille1991() {
 		for (int i = 0; i < histogram.length; i++) {
-			histogram[i] = new GrowQueue_I32();
+			histogram[i] = new DogArray_I32();
 		}
 	}
 
@@ -133,7 +133,7 @@ public abstract class WatershedVincentSoille1991 {
 		currentLabel = 0;
 
 		for (int i = 0; i < histogram.length; i++) {
-			GrowQueue_I32 level = histogram[i];
+			DogArray_I32 level = histogram[i];
 			if (level.size == 0)
 				continue;
 
@@ -232,7 +232,7 @@ public abstract class WatershedVincentSoille1991 {
 
 		// perform watershed
 		for (int i = 0; i < histogram.length; i++) {
-			GrowQueue_I32 level = histogram[i];
+			DogArray_I32 level = histogram[i];
 			if (level.size == 0)
 				continue;
 

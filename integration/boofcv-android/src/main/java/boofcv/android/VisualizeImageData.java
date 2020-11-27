@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
@@ -49,7 +49,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void binaryToBitmap( GrayU8 binary, boolean invert, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void binaryToBitmap( GrayU8 binary, boolean invert, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(binary, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -94,7 +94,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeSign( GrayS16 input, int maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void colorizeSign( GrayS16 input, int maxAbsValue, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(input, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -133,7 +133,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeSign( GrayF32 input, float maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void colorizeSign( GrayF32 input, float maxAbsValue, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(input, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -172,7 +172,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void grayMagnitude( GrayS32 input, int maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void grayMagnitude( GrayS32 input, int maxAbsValue, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(input, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -205,7 +205,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
-	public static void grayMagnitude( GrayF32 input, float maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void grayMagnitude( GrayF32 input, float maxAbsValue, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(input, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -240,7 +240,7 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
 	public static void colorizeGradient( GrayS16 derivX, GrayS16 derivY,
-										 int maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+										 int maxAbsValue, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(derivX, derivY, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -299,7 +299,7 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image.
 	 */
 	public static void colorizeGradient( GrayF32 derivX, GrayF32 derivY,
-										 float maxAbsValue, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+										 float maxAbsValue, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(derivX, derivY, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -358,7 +358,7 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
 	public static void disparity( GrayI disparity, int disparityRange,
-								  int invalidColor, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+								  int invalidColor, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(disparity, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -405,7 +405,7 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
 	public static void disparity( GrayF32 disparity, int disparityRange,
-								  int invalidColor, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+								  int invalidColor, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		shapeShape(disparity, output);
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
@@ -450,7 +450,7 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void drawEdgeContours( List<EdgeContour> contours, int[] colors, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void drawEdgeContours( List<EdgeContour> contours, int[] colors, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		if (output.getConfig() != Bitmap.Config.ARGB_8888)
 			throw new IllegalArgumentException("Only ARGB_8888 is supported");
 
@@ -490,7 +490,7 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void drawEdgeContours( List<EdgeContour> contours, int color, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void drawEdgeContours( List<EdgeContour> contours, int color, Bitmap output, @Nullable DogArray_I8 _storage ) {
 		if (output.getConfig() != Bitmap.Config.ARGB_8888)
 			throw new IllegalArgumentException("Only ARGB_8888 is supported");
 
@@ -532,7 +532,7 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 **/
-	public static void renderLabeled( GrayS32 labelImage, int numRegions, Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+	public static void renderLabeled( GrayS32 labelImage, int numRegions, Bitmap output, @Nullable DogArray_I8 _storage ) {
 
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
@@ -572,7 +572,7 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
 	public static void regionBorders( GrayS32 pixelToRegion, int borderColor,
-									  Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+									  Bitmap output, @Nullable DogArray_I8 _storage ) {
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 
@@ -604,8 +604,8 @@ public class VisualizeImageData {
 	 * @param _storage Optional working buffer for Bitmap image. Can be null.
 	 */
 	public static void regionsColor( GrayS32 pixelToRegion,
-									 FastQueue<float[]> segmentColor,
-									 Bitmap output, @Nullable GrowQueue_I8 _storage ) {
+									 DogArray<float[]> segmentColor,
+									 Bitmap output, @Nullable DogArray_I8 _storage ) {
 		_storage = ConvertBitmap.resizeStorage(output, _storage);
 		final byte[] storage = _storage.data;
 

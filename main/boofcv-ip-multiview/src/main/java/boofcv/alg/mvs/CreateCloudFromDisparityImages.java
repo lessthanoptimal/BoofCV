@@ -30,8 +30,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -51,9 +51,9 @@ public class CreateCloudFromDisparityImages {
 	public double disparitySimilarTol = 1.0;
 
 	/** List of all the points in the cloud */
-	final @Getter FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64::new, p -> p.setTo(0, 0, 0));
+	final @Getter DogArray<Point3D_F64> cloud = new DogArray<>(Point3D_F64::new, p -> p.setTo(0, 0, 0));
 	/** List of indices which specify the cloud size when a view 'i' was added. idx[i] &le; cloud < idx[i+1] */
-	final @Getter GrowQueue_I32 viewPointIdx = new GrowQueue_I32();
+	final @Getter DogArray_I32 viewPointIdx = new DogArray_I32();
 
 	/**
 	 * Clears previously added views and points.

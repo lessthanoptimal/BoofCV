@@ -33,7 +33,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
 import javax.swing.*;
@@ -71,7 +71,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	// storage for histogram
 	int[] histogram = new int[256];
 	int[] transform = new int[256];
-	GrowArray<GrowQueue_I32> workArrays = new GrowArray<>(GrowQueue_I32::new);
+	GrowArray<DogArray_I32> workArrays = new GrowArray<>(DogArray_I32::new);
 
 	GrayU8 gray = new GrayU8(1, 1);
 	GrayU8 enhancedGray = new GrayU8(1, 1);

@@ -29,7 +29,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -130,7 +130,7 @@ class TestVisOdomBundlePnPBase extends BoofStandardJUnit {
 		alg.bundleViso.tracks.get(11).visualTrack.cookie = alg.bundleViso.tracks.get(11);
 
 		// pick a few frames to drop
-		GrowQueue_I32 drop = new GrowQueue_I32();
+		DogArray_I32 drop = new DogArray_I32();
 		drop.add(0);
 		drop.add(4);
 		drop.add(5);

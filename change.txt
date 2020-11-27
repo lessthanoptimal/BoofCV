@@ -103,9 +103,6 @@ Version : 0.37
 - Concurrency
   * Removed WorkArrays since they were poorly designed
 
-TODO Rename FastQueue to ManagedArray. It manages the memory. RecycleArray. It declares and recycles memory
-TODO Rename FastArray to FastArray, DiscardArray, GrowArray,
-TODO Rename linked list . previous to prev
 TODO Add seek to SimpleSequence
 
 TODO Move projective to metric and similar from multiview to perspective

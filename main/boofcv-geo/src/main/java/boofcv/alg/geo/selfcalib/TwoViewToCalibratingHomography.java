@@ -33,7 +33,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
@@ -87,7 +87,7 @@ public class TwoViewToCalibratingHomography {
 	//--------------------------------------------------------------------------------
 	// Output Data Structures
 	/** List of all hopotheses for calibrating homography */
-	public final FastQueue<DMatrixRMaj> hypothesesH = new FastQueue<>(()->new DMatrixRMaj(4,4));
+	public final DogArray<DMatrixRMaj> hypothesesH = new DogArray<>(()->new DMatrixRMaj(4,4));
 	/** Which hypothesis was selected as the best. Call {@link #getCalibrationHomography()} as an alternative */
 	public @Getter int bestSolutionIdx;
 	/** The number of invalid observations that appeared behind the camera in the best hypothesis */

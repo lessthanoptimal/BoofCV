@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
 
 /**
@@ -46,7 +46,7 @@ public interface VisOdomKeyFrameManager extends VerbosePrint {
 	 * @param sba scene graph
 	 * @return Returns a list of frames to discard. They are in sequential order from least to greatest.
 	 */
-	GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker, int limit, int newFrames,
+	DogArray_I32 selectFramesToDiscard( PointTracker<?> tracker, int limit, int newFrames,
 										 VisOdomBundleAdjustment<?> sba );
 
 	/**

@@ -24,7 +24,7 @@ import boofcv.alg.geo.pose.PnPInfinitesimalPlanePoseEstimation;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class IPPE_to_EstimatePnP implements Estimate1ofPnP {
 
 	PnPInfinitesimalPlanePoseEstimation alg;
 
-	FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
+	DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 	public IPPE_to_EstimatePnP(Estimate1ofEpipolar homography) {
 		alg = new PnPInfinitesimalPlanePoseEstimation(homography);

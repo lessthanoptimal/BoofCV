@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.associate;
 
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * <p>Matches features using a {@link NearestNeighbor} search from DDogleg.  The source features are processed
@@ -46,7 +46,7 @@ public class AssociateNearestNeighbor_ST<D>
 	// Nearest Neighbor algorithm and storage for the results
 	private NearestNeighbor.Search<D> search;
 	NnData<D> result = new NnData<>();
-	FastQueue<NnData<D>> result2 = new FastQueue<>(NnData<D>::new);
+	DogArray<NnData<D>> result2 = new DogArray<>(NnData<D>::new);
 
 	public AssociateNearestNeighbor_ST(NearestNeighbor<D> alg) {
 		super(alg);

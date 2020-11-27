@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class UtilLepetitEPnP {
 	 */
 	public static void computeCameraControl(double beta[],
 											List<Point3D_F64> nullPts[],
-											FastQueue<Point3D_F64> cameraPts ,
+											DogArray<Point3D_F64> cameraPts ,
 											int numControl )
 	{
 		cameraPts.reset();
@@ -114,7 +114,7 @@ public class UtilLepetitEPnP {
 	 * @param nullPts Null points
 	 */
 	public static void constraintMatrix6x10( DMatrixRMaj L , DMatrixRMaj y ,
-											 FastQueue<Point3D_F64> controlWorldPts ,
+											 DogArray<Point3D_F64> controlWorldPts ,
 											 List<Point3D_F64> nullPts[] ) {
 		int row = 0;
 		for( int i = 0; i < 4; i++ ) {
@@ -211,7 +211,7 @@ public class UtilLepetitEPnP {
 	 * @param nullPts Null points
 	 */
 	public static void constraintMatrix3x6( DMatrixRMaj L , DMatrixRMaj y ,
-											FastQueue<Point3D_F64> controlWorldPts ,
+											DogArray<Point3D_F64> controlWorldPts ,
 											List<Point3D_F64> nullPts[] ) {
 		int row = 0;
 		for( int i = 0; i < 3; i++ ) {

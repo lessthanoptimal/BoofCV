@@ -29,8 +29,8 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 	SquareGridTools tools = new SquareGridTools();
 
-	FastQueue<Point2D_F64> calibrationPoints = new FastQueue<>(Point2D_F64::new);
+	DogArray<Point2D_F64> calibrationPoints = new DogArray<>(Point2D_F64::new);
 
 	// maximum distance two corners can be from each other
 	ConfigLength maxCornerDistance;
@@ -171,7 +171,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 	 * The polygon detected from the contour is too small because the binary image was eroded. This expand the size
 	 * of the polygon so that it fits the image edge better
 	 */
-	public void adjustBeforeOptimize( Polygon2D_F64 polygon, GrowQueue_B touchesBorder, boolean clockwise ) {
+	public void adjustBeforeOptimize( Polygon2D_F64 polygon, DogArray_B touchesBorder, boolean clockwise ) {
 		int N = polygon.size();
 		work.vertexes.resize(N);
 		for (int i = 0; i < N; i++) {
@@ -380,7 +380,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 		return detectorSquare;
 	}
 
-	public FastQueue<Point2D_F64> getCalibrationPoints() {
+	public DogArray<Point2D_F64> getCalibrationPoints() {
 		return calibrationPoints;
 	}
 

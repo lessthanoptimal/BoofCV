@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Stoppable;
 
 /**
@@ -110,10 +110,10 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 
 //		long time1 = System.currentTimeMillis();
 
-		FastQueue<float[]> regionColor = search.getModeColor();
+		DogArray<float[]> regionColor = search.getModeColor();
 		GrayS32 pixelToRegion = search.getPixelToRegion();
-		GrowQueue_I32 regionPixelCount = search.getRegionMemberCount();
-		FastQueue<Point2D_I32> modeLocation = search.getModeLocation();
+		DogArray_I32 regionPixelCount = search.getRegionMemberCount();
+		DogArray<Point2D_I32> modeLocation = search.getModeLocation();
 
 		merge.process(pixelToRegion,regionPixelCount,regionColor,modeLocation);
 		if( stopRequested ) return;
@@ -145,14 +145,14 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	/**
 	 * Average color of each region
 	 */
-	public FastQueue<float[]> getRegionColor() {
+	public DogArray<float[]> getRegionColor() {
 		return search.getModeColor();
 	}
 
 	/**
 	 * Number of pixels in each region
 	 */
-	public GrowQueue_I32 getRegionSize() {
+	public DogArray_I32 getRegionSize() {
 		return search.getRegionMemberCount();
 	}
 

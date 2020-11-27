@@ -25,7 +25,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.simple.SimpleMatrix;
@@ -93,7 +93,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 	public void selectWorldControlPoints_planar() {
 
 		List<Point3D_F64> worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, 30);
-		FastQueue<Point3D_F64> controlPts = new FastQueue<>(4, Point3D_F64::new);
+		DogArray<Point3D_F64> controlPts = new DogArray<>(4, Point3D_F64::new);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -123,7 +123,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 	public void selectControlPoints() {
 
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		FastQueue<Point3D_F64> controlPts = new FastQueue<>(4, Point3D_F64::new);
+		DogArray<Point3D_F64> controlPts = new DogArray<>(4, Point3D_F64::new);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -150,7 +150,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 	@Test
 	public void computeBarycentricCoordinates() {
 		List<Point3D_F64> worldPoints = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		FastQueue<Point3D_F64> worldControlPts = new FastQueue<>(4, Point3D_F64::new);
+		DogArray<Point3D_F64> worldControlPts = new DogArray<>(4, Point3D_F64::new);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 

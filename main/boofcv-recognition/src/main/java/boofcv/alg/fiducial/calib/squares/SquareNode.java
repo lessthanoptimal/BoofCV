@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.calib.squares;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.alg.KdTreeDistance;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.DogArray_B;
 
 /**
  * Graph representation of square blobs.  Each blob can be connected to at most 4 other shapes which are directly
@@ -37,7 +37,7 @@ public class SquareNode {
 	// cw or ccw ordering of edges doesn't matter
 	public Polygon2D_F64 square;
 	// does a corner touch the border?
-	public GrowQueue_B touch;
+	public DogArray_B touch;
 
 	// intersection of line 0 and 2  with 1 and 3.
 	public Point2D_F64 center = new Point2D_F64();

@@ -26,7 +26,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray_F32;
 import pabeles.concurrency.GrowArray;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
@@ -64,7 +64,7 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 	GrayF32 stdev = new GrayF32(1,1); // computed standard deviation
 
 	GrayF32 tmp = new GrayF32(1,1); // work space
-	GrowArray<GrowQueue_F32> work = new GrowArray<>(GrowQueue_F32::new);
+	GrowArray<DogArray_F32> work = new GrowArray<>(DogArray_F32::new);
 
 	/**
 	 * Configures the algorithm.

@@ -63,9 +63,9 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import boofcv.struct.convolve.Kernel1D_F64;\n" +
 				"import boofcv.struct.convolve.Kernel1D_S32;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import org.ddogleg.struct.GrowQueue_F32;\n" +
-				"import org.ddogleg.struct.GrowQueue_F64;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_F32;\n" +
+				"import org.ddogleg.struct.DogArray_F64;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
@@ -80,7 +80,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	private void generateMeanWeighted(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
-		String workType = ("GrowQueue_"+type.getKernelType()).replace("S32","I32");
+		String workType = ("DogArray_"+type.getKernelType()).replace("S32","I32");
 		out.print("\t/**\n" +
 				"\t * Applies a mean box filter with re-weighted image borders.\n" +
 				"\t *\n" +
@@ -127,7 +127,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	private void generateMeanBorder(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
-		String workType = ("GrowQueue_"+type.getKernelType()).replace("S32","I32");
+		String workType = ("DogArray_"+type.getKernelType()).replace("S32","I32");
 		String suffix = type.getKernelType();
 		String borderSuffix = type.isInteger() ? suffix+"<"+imageName+">" : suffix;
 		out.print(
@@ -225,14 +225,14 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static GrayU8 median( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,\n" +
-				"\t\t\t\t\t\t\t\t @Nullable GrowArray<GrowQueue_I32> work ) {\n" +
+				"\t\t\t\t\t\t\t\t @Nullable GrowArray<DogArray_I32> work ) {\n" +
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMedian(input, output, radiusX, radiusY);\n" +
 				"\n" +
 				"\t\tif (!processed) {\n" +
-				"\t\t\twork = BoofMiscOps.checkDeclare(work, GrowQueue_I32::new);\n" +
+				"\t\t\twork = BoofMiscOps.checkDeclare(work, DogArray_I32::new);\n" +
 				"\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
 				"\t\t\t\tImplMedianHistogramInner_MT.process(input, output, radiusX, radiusY, work);\n" +
 				"\t\t\t} else {\n" +
@@ -256,7 +256,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static GrayF32 median( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,\n" +
-				"\t\t\t\t\t\t\t\t @Nullable GrowArray<GrowQueue_F32> work ) {\n" +
+				"\t\t\t\t\t\t\t\t @Nullable GrowArray<DogArray_F32> work ) {\n" +
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +

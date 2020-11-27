@@ -30,7 +30,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -581,13 +581,13 @@ public class BinaryImageOps {
 	 */
 	public static List<List<Point2D_I32>> labelToClusters( GrayS32 labelImage,
 														   int numLabels,
-														   FastQueue<Point2D_I32> queue ) {
+														   DogArray<Point2D_I32> queue ) {
 		List<List<Point2D_I32>> ret = new ArrayList<>();
 		for (int i = 0; i < numLabels + 1; i++) {
 			ret.add(new ArrayList<Point2D_I32>());
 		}
 		if (queue == null) {
-			queue = new FastQueue<>(numLabels, Point2D_I32::new);
+			queue = new DogArray<>(numLabels, Point2D_I32::new);
 		} else
 			queue.reset();
 

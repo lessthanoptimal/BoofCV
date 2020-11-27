@@ -20,7 +20,7 @@ package boofcv.io.video;
 
 import boofcv.io.UtilIO;
 import boofcv.misc.BoofMiscOps;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 import java.io.*;
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class CombineFilesTogether {
 	public static void combine( List<String> fileNames, String outputName ) throws IOException {
 		FileOutputStream fos = new FileOutputStream(outputName);
 
-		GrowQueue_I8 buffer = new GrowQueue_I8();
+		DogArray_I8 buffer = new DogArray_I8();
 
 		for (String s : fileNames) {
 			File f = new File(s);
@@ -62,7 +62,7 @@ public class CombineFilesTogether {
 	}
 
 	@SuppressWarnings({"IdentityBinaryExpression"})
-	public static boolean readNext( DataInputStream fis, GrowQueue_I8 output ) throws IOException {
+	public static boolean readNext( DataInputStream fis, DogArray_I8 output ) throws IOException {
 		int r;
 		if ((r = fis.read()) != 0xFF || (r = fis.read()) != 0xFF || (r = fis.read()) != 0xFF)
 			if (r == -1)

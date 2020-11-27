@@ -27,8 +27,8 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -38,8 +38,8 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public abstract class SceneStructureCommon implements SceneStructure {
-	public final FastQueue<Camera> cameras = new FastQueue<>(Camera::new, Camera::reset);
-	public FastQueue<Point> points;
+	public final DogArray<Camera> cameras = new DogArray<>(Camera::new, Camera::reset);
+	public DogArray<Point> points;
 	/** True if homogenous coordinates are being used */
 	protected boolean homogenous;
 	/** number of elements in a point. Will be 3 or 4 */
@@ -58,7 +58,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	public void setHomogenous( boolean homogenous ) {
 		this.homogenous = homogenous;
 		pointSize = homogenous ? 4 : 3;
-		points = new FastQueue<>(() -> new Point(pointSize), Point::reset);
+		points = new DogArray<>(() -> new Point(pointSize), Point::reset);
 	}
 
 	/**
@@ -122,11 +122,11 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		p.views.add(viewIndex);
 	}
 
-	public FastQueue<Point> getPoints() {
+	public DogArray<Point> getPoints() {
 		return points;
 	}
 
-	public FastQueue<Camera> getCameras() {
+	public DogArray<Camera> getCameras() {
 		return cameras;
 	}
 
@@ -151,7 +151,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	 *
 	 * @param which Ordered list of point indexes to remove
 	 */
-	public void removePoints( GrowQueue_I32 which ) {
+	public void removePoints( DogArray_I32 which ) {
 		points.remove(which.data, 0, which.size, null);
 	}
 
@@ -204,7 +204,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		/**
 		 * Indexes of the views that this point appears in
 		 */
-		public GrowQueue_I32 views = new GrowQueue_I32();
+		public DogArray_I32 views = new DogArray_I32();
 
 		public Point( int dof ) {
 			coordinate = new double[dof];

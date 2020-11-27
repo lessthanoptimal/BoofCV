@@ -28,7 +28,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -72,7 +72,7 @@ public class BundleAdjustmentMetricResidualFunction
 	private final CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
 	// Recycled world to view transforms
-	private final FastQueue<Se3_F64> storageSe3 = new FastQueue<>(Se3_F64::new);
+	private final DogArray<Se3_F64> storageSe3 = new DogArray<>(Se3_F64::new);
 	// Look up workspace by view ID when relative view
 	private final Map<SceneStructureMetric.View, Se3_F64> mapWorldToView = new HashMap<>();
 

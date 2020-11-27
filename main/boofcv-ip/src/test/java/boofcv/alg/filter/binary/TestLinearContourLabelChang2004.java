@@ -26,7 +26,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -193,7 +193,7 @@ public class TestLinearContourLabelChang2004 extends BoofStandardJUnit {
 	 */
 	private void checkContour( LinearContourLabelChang2004 alg, GrayS32 labeled, int rule ) {
 
-		FastQueue<ContourPacked> contours = alg.getContours();
+		DogArray<ContourPacked> contours = alg.getContours();
 
 		for (int i = 0; i < contours.size(); i++) {
 //			System.out.println("=================== Contour "+i);

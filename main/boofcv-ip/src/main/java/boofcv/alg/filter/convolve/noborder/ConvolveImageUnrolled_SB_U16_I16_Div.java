@@ -23,7 +23,7 @@ import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayI16;
 import boofcv.struct.image.GrayU16;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -87,7 +87,7 @@ public class ConvolveImageUnrolled_SB_U16_I16_Div {
 	}
 
 	public static boolean convolve( Kernel2D_S32 kernel ,
-								   GrayU16 image, GrayI16 dest, int divisor , GrowArray<GrowQueue_I32> work) {
+								   GrayU16 image, GrayI16 dest, int divisor , GrowArray<DogArray_I32> work) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -554,9 +554,9 @@ public class ConvolveImageUnrolled_SB_U16_I16_Div {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void convolve3( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void convolve3( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
 
@@ -615,9 +615,9 @@ public class ConvolveImageUnrolled_SB_U16_I16_Div {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void convolve5( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void convolve5( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
 
@@ -684,9 +684,9 @@ public class ConvolveImageUnrolled_SB_U16_I16_Div {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void convolve7( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void convolve7( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
 
@@ -761,9 +761,9 @@ public class ConvolveImageUnrolled_SB_U16_I16_Div {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void convolve9( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void convolve9( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
 
@@ -846,9 +846,9 @@ public class ConvolveImageUnrolled_SB_U16_I16_Div {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void convolve11( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<GrowQueue_I32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, GrowQueue_I32::new);
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void convolve11( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dest , int divisor , @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
 

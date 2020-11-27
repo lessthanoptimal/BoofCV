@@ -23,7 +23,7 @@ import boofcv.alg.color.ColorFormat;
 import boofcv.core.encoding.impl.ImplConvertYuv420_888;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -49,7 +49,7 @@ public class ConvertYuv420_888
 	@SuppressWarnings({"MissingCasesInEnumSwitch"})
 	public static void yuvToBoof(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 								 int width, int height, int strideY , int strideUV , int stridePixelUV,
-								 ColorFormat colorOutput, ImageBase output, GrowArray<GrowQueue_I8> workArrays)
+								 ColorFormat colorOutput, ImageBase output, GrowArray<DogArray_I8> workArrays)
 	{
 		if( output instanceof GrayU8 ) {
 			yuvToGray(bufferY,width,height,strideY,(GrayU8)output);
@@ -112,7 +112,7 @@ public class ConvertYuv420_888
 	 */
 	public static <T extends ImageGray<T>>
 	T yuvToGray(ByteBuffer bufferY , int width , int height, int strideRow , T output ,
-				@Nullable GrowArray<GrowQueue_I8> workArrays, Class<T> outputType )
+				@Nullable GrowArray<DogArray_I8> workArrays, Class<T> outputType )
 	{
 		if( outputType == GrayU8.class ) {
 			return (T) yuvToGray(bufferY,width,height,strideRow,(GrayU8)output);
@@ -130,9 +130,9 @@ public class ConvertYuv420_888
 	 * @return Gray scale image
 	 */
 	public static GrayF32 yuvToGray( ByteBuffer bufferY , int width , int height, int strideRow, GrayF32 output,
-									 @Nullable GrowArray<GrowQueue_I8> workArrays ) {
+									 @Nullable GrowArray<DogArray_I8> workArrays ) {
 		output = InputSanityCheck.checkDeclare(output, width, height, GrayF32.class);
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I8::new);
 
 		byte[] work = BoofMiscOps.checkDeclare(workArrays.grow(), width, false);
 
@@ -205,9 +205,9 @@ public class ConvertYuv420_888
 
 	public static Planar<GrayU8> yuvToPlanarRgbU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 												  int width, int height, int strideY , int strideUV , int stridePixelUV,
-												  @Nullable Planar<GrayU8> output , @Nullable GrowArray<GrowQueue_I8> workArrays ) {
+												  @Nullable Planar<GrayU8> output , @Nullable GrowArray<DogArray_I8> workArrays ) {
 		output = InputSanityCheck.checkDeclare(output, width, height, 3, GrayU8.class);
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I8::new);
 
 		final byte[] red = output.getBand(0).data;
 		final byte[] green = output.getBand(1).data;
@@ -231,10 +231,10 @@ public class ConvertYuv420_888
 
 	public static Planar<GrayF32> yuvToPlanarRgbF32(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 													int width, int height, int strideY , int strideUV , int stridePixelUV,
-													@Nullable Planar<GrayF32> output , @Nullable GrowArray<GrowQueue_I8> workArrays )
+													@Nullable Planar<GrayF32> output , @Nullable GrowArray<DogArray_I8> workArrays )
 	{
 		output = InputSanityCheck.checkDeclare(output, width, height, 3, GrayF32.class);
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I8::new);
 
 		final float[] red = output.getBand(0).data;
 		final float[] green = output.getBand(1).data;
@@ -263,10 +263,10 @@ public class ConvertYuv420_888
 
 	public static InterleavedU8 yuvToInterleavedRgbU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 													  int width, int height, int strideY , int strideUV , int stridePixelUV,
-													  @Nullable InterleavedU8 output , @Nullable GrowArray<GrowQueue_I8> workArrays )
+													  @Nullable InterleavedU8 output , @Nullable GrowArray<DogArray_I8> workArrays )
 	{
 		output = InputSanityCheck.checkDeclare(output, width, height, 3, InterleavedU8.class);
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I8::new);
 
 		InterleavedU8 _output = output;
 
@@ -288,10 +288,10 @@ public class ConvertYuv420_888
 
 	public static InterleavedF32 yuvToInterleavedRgbF32(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 														int width, int height, int strideY , int strideUV , int stridePixelUV,
-														@Nullable InterleavedF32 output , @Nullable GrowArray<GrowQueue_I8> workArrays )
+														@Nullable InterleavedF32 output , @Nullable GrowArray<DogArray_I8> workArrays )
 	{
 		output = InputSanityCheck.checkDeclare(output, width, height, 3, InterleavedF32.class);
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I8::new);
 
 		InterleavedF32 _output = output;
 
@@ -313,10 +313,10 @@ public class ConvertYuv420_888
 
 	public static Planar<GrayU8> yuvToPlanarYuvU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 												  int width, int height, int strideY , int strideUV , int stridePixelUV,
-												  @Nullable Planar<GrayU8> output , @Nullable GrowArray<GrowQueue_I8> workArrays )
+												  @Nullable Planar<GrayU8> output , @Nullable GrowArray<DogArray_I8> workArrays )
 	{
 		output = InputSanityCheck.checkDeclare(output, width, height, 3, GrayU8.class);
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I8::new);
 
 		final byte[] dataY = output.getBand(0).data;
 		final byte[] dataU = output.getBand(1).data;
@@ -339,10 +339,10 @@ public class ConvertYuv420_888
 
 	public static InterleavedU8 yuvToInterleavedYuvU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 													  int width, int height, int strideY , int strideUV , int stridePixelUV,
-													  @Nullable InterleavedU8 output , @Nullable GrowArray<GrowQueue_I8> workArrays )
+													  @Nullable InterleavedU8 output , @Nullable GrowArray<DogArray_I8> workArrays )
 	{
 		output = InputSanityCheck.checkDeclare(output, width, height, 3, InterleavedU8.class);
-		workArrays = BoofMiscOps.checkDeclare(workArrays, GrowQueue_I8::new);
+		workArrays = BoofMiscOps.checkDeclare(workArrays, DogArray_I8::new);
 
 		final byte[] data = output.data;
 

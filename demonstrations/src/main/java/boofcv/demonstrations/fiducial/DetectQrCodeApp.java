@@ -49,7 +49,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,8 +79,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	QrCodeBinaryGridToPixel locator = new QrCodeBinaryGridToPixel();
 
 	// Lock against detected
-	final FastQueue<QrCode> detected = new FastQueue<>(QrCode::new);
-	final FastQueue<QrCode> failures = new FastQueue<>(QrCode::new);
+	final DogArray<QrCode> detected = new DogArray<>(QrCode::new);
+	final DogArray<QrCode> failures = new DogArray<>(QrCode::new);
 
 	public DetectQrCodeApp( List<String> examples, Class<T> imageType ) {
 		super(examples, imageType);
@@ -374,7 +374,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 				if (controls.bShowPositionPattern) {
 					// todo copy after process() to avoid thread issues
-					FastQueue<PositionPatternNode> nodes = detector.getDetectPositionPatterns().getPositionPatterns();
+					DogArray<PositionPatternNode> nodes = detector.getDetectPositionPatterns().getPositionPatterns();
 
 					g2.setColor(Color.ORANGE);
 					g2.setStroke(new BasicStroke(3));

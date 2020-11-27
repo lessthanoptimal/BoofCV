@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Finds regions which are too small and merges them with a neighbor that is the most similar to it and connected.
@@ -44,13 +44,13 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	protected ComputeRegionMeanColor<T> computeColor;
 
 	// List which indicates ia segment is to be pruned based on its ID
-	protected GrowQueue_B segmentPruneFlag = new GrowQueue_B();
+	protected DogArray_B segmentPruneFlag = new DogArray_B();
 
 	// Conversion between segment ID and prune ID
-	protected GrowQueue_I32 segmentToPruneID = new GrowQueue_I32();
+	protected DogArray_I32 segmentToPruneID = new DogArray_I32();
 
 	// Used to mark pixels as not being a member of any region
-	protected FastQueue<Node> pruneGraph = new FastQueue<>(Node::new);
+	protected DogArray<Node> pruneGraph = new DogArray<>(Node::new);
 
 	// Relative location of neighbors according to connection rule
 	protected Point2D_I32 connect[];
@@ -100,8 +100,8 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 */
 	public void process( T image,
 						 GrayS32 pixelToRegion ,
-						 GrowQueue_I32 regionMemberCount,
-						 FastQueue<float[]> regionColor ) {
+						 DogArray_I32 regionMemberCount,
+						 DogArray<float[]> regionColor ) {
 		stopRequested = false;
 
 		// iterate until no more regions need to be merged together
@@ -136,7 +136,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 *
 	 * @return true If elements need to be pruned and false if not.
 	 */
-	protected boolean setupPruneList(GrowQueue_I32 regionMemberCount) {
+	protected boolean setupPruneList(DogArray_I32 regionMemberCount) {
 		segmentPruneFlag.resize(regionMemberCount.size);
 		pruneGraph.reset();
 		segmentToPruneID.resize(regionMemberCount.size);
@@ -375,7 +375,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	{
 		public int segment;
 		// List of segments this segment is connected to
-		public GrowQueue_I32 edges = new GrowQueue_I32();
+		public DogArray_I32 edges = new DogArray_I32();
 
 		public void init( int segment ) {
 			this.segment = segment;

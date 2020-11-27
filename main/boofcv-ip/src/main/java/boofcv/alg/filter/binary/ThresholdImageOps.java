@@ -24,8 +24,8 @@ import boofcv.alg.filter.binary.impl.ImplThresholdImageOps_MT;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -207,7 +207,7 @@ public class ThresholdImageOps {
 	public static GrayU8 localMean(GrayU8 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
 								   @Nullable GrayU8 storage1 , @Nullable GrayU8 storage2 ,
-								   @Nullable GrowArray<GrowQueue_I32> storage3 ) {
+								   @Nullable GrowArray<DogArray_I32> storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
@@ -272,7 +272,7 @@ public class ThresholdImageOps {
 	public static GrayU8 localMean(GrayU16 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
 								   @Nullable GrayU16 storage1 , @Nullable GrayU16 storage2 ,
-								   @Nullable GrowArray<GrowQueue_I32> storage3 ) {
+								   @Nullable GrowArray<DogArray_I32> storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU16.class);
@@ -337,7 +337,7 @@ public class ThresholdImageOps {
 	public static GrayU8 localMean(GrayF32 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
 								   @Nullable GrayF32 storage1 , @Nullable GrayF32 storage2 ,
-								   @Nullable GrowArray<GrowQueue_F32> storage3 ) {
+								   @Nullable GrowArray<DogArray_F32> storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);

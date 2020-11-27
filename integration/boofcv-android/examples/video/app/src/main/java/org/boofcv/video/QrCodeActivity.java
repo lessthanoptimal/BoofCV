@@ -27,7 +27,7 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +63,7 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 	private Paint colorDetected = new Paint();
 
 	// Storage for bounds of found QR Codes
-	private final FastQueue<Polygon2D_F64> foundQR = new FastQueue<>(Polygon2D_F64::new);
+	private final DogArray<Polygon2D_F64> foundQR = new DogArray<>(Polygon2D_F64::new);
 	private String message=""; // most recently decoded QR code
 
 	// Used to compute average time in the detector

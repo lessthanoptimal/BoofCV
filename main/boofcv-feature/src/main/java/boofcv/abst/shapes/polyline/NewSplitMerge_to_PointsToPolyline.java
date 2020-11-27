@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.shapes.polyline;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 	}
 
 	@Override
-	public boolean process(List<Point2D_I32> input, GrowQueue_I32 vertexes) {
+	public boolean process(List<Point2D_I32> input, DogArray_I32 vertexes) {
 		if( !alg.process(input) )
 			return false;
 

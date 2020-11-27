@@ -23,7 +23,7 @@ import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +45,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			expected.add( new Point3D_F64(i*123.45,i-1.01,i+2.34));
 		}
 
-		FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64::new);
+		DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
 		Writer output = new StringWriter();
 		PlyCodec.saveAscii(PointCloudReader.wrapF64(expected),false,output);
@@ -71,7 +71,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			expected.add( new Point3dRgbI_F64(i*123.45,i-1.01,i+2.34,rgb));
 		}
 
-		FastQueue<Point3dRgbI_F64> found = new FastQueue<>(Point3dRgbI_F64::new);
+		DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
 		Writer output = new StringWriter();
 		PlyCodec.saveAscii(PointCloudReader.wrapF64RGB(expected),true,output);
@@ -92,7 +92,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		}
 
 		for( boolean asFloat : new boolean[]{true,false}) {
-			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64::new);
+			DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			PlyCodec.saveBinary(PointCloudReader.wrapF64(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
@@ -121,7 +121,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		}
 
 		for( boolean asFloat : new boolean[]{true,false}) {
-			FastQueue<Point3dRgbI_F64> found = new FastQueue<>(Point3dRgbI_F64::new);
+			DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			PlyCodec.saveBinary(PointCloudReader.wrapF64RGB(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);

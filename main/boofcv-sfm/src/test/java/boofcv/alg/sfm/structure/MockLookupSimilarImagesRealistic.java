@@ -34,8 +34,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -288,7 +288,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	}
 
 	@Override
-	public void lookupPixelFeats( String target, FastQueue<Point2D_F64> features ) {
+	public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
 		View view = getView(target);
 
 		features.reset();
@@ -304,7 +304,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	}
 
 	@Override
-	public boolean lookupMatches( String identA, String identB, FastQueue<AssociatedIndex> pairs ) {
+	public boolean lookupMatches( String identA, String identB, DogArray<AssociatedIndex> pairs ) {
 		View viewA = getView(identA);
 		View viewB = getView(identB);
 
@@ -330,7 +330,7 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	 * @param triples (output) pixel observations
 	 * @param featureIdx (output)which features were in common
 	 */
-	public void createTripleObs( int[] viewIdx, FastQueue<AssociatedTriple> triples, GrowQueue_I32 featureIdx ) {
+	public void createTripleObs( int[] viewIdx, DogArray<AssociatedTriple> triples, DogArray_I32 featureIdx ) {
 		BoofMiscOps.checkTrue(viewIdx.length == 3);
 
 		triples.reset();

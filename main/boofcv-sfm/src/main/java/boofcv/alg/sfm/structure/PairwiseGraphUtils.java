@@ -41,9 +41,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -61,8 +61,8 @@ public class PairwiseGraphUtils {
 
 	LookupSimilarImages db;
 
-	GrowQueue_B visibleAll = new GrowQueue_B();
-	GrowQueue_B visibleMotion = new GrowQueue_B();
+	DogArray_B visibleAll = new DogArray_B();
+	DogArray_B visibleMotion = new DogArray_B();
 
 	//-------------------------------- Configurations. Must call fixate() if modified
 	/** Converge tolerance for SBA */
@@ -87,7 +87,7 @@ public class PairwiseGraphUtils {
 	public ImageDimension dimenB = new ImageDimension();
 	public ImageDimension dimenC = new ImageDimension();
 
-	public final FastQueue<AssociatedTriple> matchesTriple = new FastQueue<>(AssociatedTriple::new);
+	public final DogArray<AssociatedTriple> matchesTriple = new DogArray<>(AssociatedTriple::new);
 	/** Inliers from robust fitting of trifocal tensor */
 	public List<AssociatedTriple> inliersThreeView;
 
@@ -97,17 +97,17 @@ public class PairwiseGraphUtils {
 	public final DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
 
 	// Location of features in the image. Pixels
-	public final FastQueue<Point2D_F64> featsA = new FastQueue<>(Point2D_F64::new);
-	public final FastQueue<Point2D_F64> featsB = new FastQueue<>(Point2D_F64::new);
-	public final FastQueue<Point2D_F64> featsC = new FastQueue<>(Point2D_F64::new);
+	public final DogArray<Point2D_F64> featsA = new DogArray<>(Point2D_F64::new);
+	public final DogArray<Point2D_F64> featsB = new DogArray<>(Point2D_F64::new);
+	public final DogArray<Point2D_F64> featsC = new DogArray<>(Point2D_F64::new);
 
 	// look up tables for feature indexes from one view to another
-	public final GrowQueue_I32 table_A_to_B = new GrowQueue_I32();
-	public final GrowQueue_I32 table_A_to_C = new GrowQueue_I32();
-	public final GrowQueue_I32 table_B_to_C = new GrowQueue_I32();
-	public final GrowQueue_I32 table_C_to_A = new GrowQueue_I32();
+	public final DogArray_I32 table_A_to_B = new DogArray_I32();
+	public final DogArray_I32 table_A_to_C = new DogArray_I32();
+	public final DogArray_I32 table_B_to_C = new DogArray_I32();
+	public final DogArray_I32 table_C_to_A = new DogArray_I32();
 	// List indexes in the seed view that are common among all the views
-	public final GrowQueue_I32 commonIdx = new GrowQueue_I32();
+	public final DogArray_I32 commonIdx = new DogArray_I32();
 
 	/** Score function used to evaluate which motions should be used */
 	public ScoreMotion scoreMotion = new DefaultScoreMotion();
@@ -141,7 +141,7 @@ public class PairwiseGraphUtils {
 	 * @param connectIdx (Input) Indexes of connections in the seed view that will be searched for common connections
 	 * @return indexes of common tracks. Indexes are indexes in the seed View
 	 */
-	public GrowQueue_I32 findCommonFeatures( View seed, GrowQueue_I32 connectIdx ) {
+	public DogArray_I32 findCommonFeatures( View seed, DogArray_I32 connectIdx ) {
 		if (connectIdx.size < 1)
 			throw new RuntimeException("Called when there are no connections");
 		// if true then it is visible in all tracks
@@ -168,7 +168,7 @@ public class PairwiseGraphUtils {
 				visibleAll.data[i] &= visibleMotion.data[i];
 			}
 		}
-		GrowQueue_I32 common = new GrowQueue_I32(visibleAll.count(true));
+		DogArray_I32 common = new DogArray_I32(visibleAll.count(true));
 		for (int i = 0; i < seed.totalObservations; i++) {
 			if (visibleAll.data[i]) {
 				common.add(i);
@@ -216,7 +216,7 @@ public class PairwiseGraphUtils {
 	 *
 	 * @param selectedIdxA List of feature indexes in A to consider
 	 */
-	public void findCommonFeatures( GrowQueue_I32 selectedIdxA ) {
+	public void findCommonFeatures( DogArray_I32 selectedIdxA ) {
 		commonIdx.reset();
 		for (int selectedIdx = 0; selectedIdx < selectedIdxA.size; selectedIdx++) {
 			final int featureIdxA = selectedIdxA.get(selectedIdx);
@@ -302,9 +302,9 @@ public class PairwiseGraphUtils {
 
 		info.observations.reset();
 		info.observations.resize(3);
-		final GrowQueue_I32 indexesA = info.observations.get(order[0]);
-		final GrowQueue_I32 indexesB = info.observations.get(order[1]);
-		final GrowQueue_I32 indexesC = info.observations.get(order[2]);
+		final DogArray_I32 indexesA = info.observations.get(order[0]);
+		final DogArray_I32 indexesB = info.observations.get(order[1]);
+		final DogArray_I32 indexesC = info.observations.get(order[2]);
 
 		for (int inlierCnt = 0; inlierCnt < numInliers; inlierCnt++) {
 			int inputIdx = ransac.getInputIndex(inlierCnt);
@@ -443,7 +443,7 @@ public class PairwiseGraphUtils {
 	 */
 	public static void createTableViewAtoB( View viewA,
 											Motion edge,
-											GrowQueue_I32 table_a_to_b ) {
+											DogArray_I32 table_a_to_b ) {
 		table_a_to_b.resize(viewA.totalObservations, -1);
 		boolean src_is_A = edge.src == viewA;
 		for (int i = 0; i < edge.inliers.size; i++) {

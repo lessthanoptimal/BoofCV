@@ -30,8 +30,8 @@ import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -165,7 +165,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 		addTracks(alg.tracksAll,1);
 	}
 
-	private void addTracks( FastQueue<HybridTrack<TupleDesc_F64>> l , int num ) {
+	private void addTracks( DogArray<HybridTrack<TupleDesc_F64>> l , int num ) {
 		for( int i = 0; i < num; i++ ) {
 			HybridTrack t = l.grow();
 			t.trackKlt = new PyramidKltFeature(2,5);
@@ -198,7 +198,7 @@ class TestHybridTrackerScalePoint extends BoofStandardJUnit {
 
 		@Override
 		public FastAccess<AssociatedIndex> getMatches() {
-			FastQueue<AssociatedIndex> queue = new FastQueue<>(N, AssociatedIndex::new);
+			DogArray<AssociatedIndex> queue = new DogArray<>(N, AssociatedIndex::new);
 
 			for( int i = 0; i < N; i++ ) {
 				queue.grow().setAssociation(i,i,1);

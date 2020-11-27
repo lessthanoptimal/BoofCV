@@ -22,7 +22,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * <p>
@@ -57,7 +57,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	protected Point2D_I32 edges[];
 
 	// contains the number of pixels in each output label
-	protected GrowQueue_I32 regionMemberCount;
+	protected DogArray_I32 regionMemberCount;
 
 	/**
 	 * Configures labeling
@@ -122,7 +122,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 * @param output Labeled output image.
 	 * @param regionMemberCount (Input/Output) Number of pixels which belong to each group.
 	 */
-	public void process(GrayS32 input , GrayS32 output , GrowQueue_I32 regionMemberCount ) {
+	public void process(GrayS32 input , GrayS32 output , DogArray_I32 regionMemberCount ) {
 		// initialize data structures
 		this.regionMemberCount = regionMemberCount;
 		regionMemberCount.reset();

@@ -27,7 +27,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrix3x3;
@@ -93,7 +93,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 	private final DMatrixRMaj Wty = new DMatrixRMaj(1, 1);
 
 	// Input adjust centering it
-	FastQueue<AssociatedPair> pointsAdj = new FastQueue<>(AssociatedPair::new);
+	DogArray<AssociatedPair> pointsAdj = new DogArray<>(AssociatedPair::new);
 	Point3D_F64 tmpP = new Point3D_F64();
 
 	public PnPInfinitesimalPlanePoseEstimation( Estimate1ofEpipolar estimateHomography ) {

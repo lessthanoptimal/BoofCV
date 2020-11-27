@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 
 	GrayU8 work = new GrayU8(1,1);
 
-	FastQueue<ContourPacked> contours = new FastQueue<>(ContourPacked::new);
+	DogArray<ContourPacked> contours = new DogArray<>(ContourPacked::new);
 
 	public BinaryContourFinderLinearExternal() {
 		this.alg = new LinearExternalContours(ConnectRule.FOUR);
@@ -77,7 +77,7 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 	}
 
 	@Override
-	public void loadContour(int contourID, FastQueue<Point2D_I32> storage) {
+	public void loadContour(int contourID, DogArray<Point2D_I32> storage) {
 		alg.getExternalContours().getSet(contourID,storage);
 	}
 

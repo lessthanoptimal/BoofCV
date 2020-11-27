@@ -30,7 +30,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,7 +168,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		GrayU8 binary = this.binary.subimage(x0, y0, x1, y1);
 
 		alg.transform(derivX, derivY, binary);
-		FastQueue<LineParametric2D_F32> lines = alg.getLinesAll();
+		DogArray<LineParametric2D_F32> lines = alg.getLinesAll();
 		float intensity[] = alg.getFoundIntensity();
 
 		for (int i = 0; i < lines.size; i++) {

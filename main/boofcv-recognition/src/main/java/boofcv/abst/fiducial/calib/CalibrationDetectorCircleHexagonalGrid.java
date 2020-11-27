@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +103,7 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialC
 		if( !keypoint.process(grids.get(0)) )
 			return false;
 
-		FastQueue<Point2D_F64> foundPixels = keypoint.getKeyPoints();
+		DogArray<Point2D_F64> foundPixels = keypoint.getKeyPoints();
 
 		for (int i = 0; i < foundPixels.size; i++) {
 			results.add(foundPixels.get(i),i);

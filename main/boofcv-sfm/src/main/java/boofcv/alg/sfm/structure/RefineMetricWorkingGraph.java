@@ -36,9 +36,9 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,20 +80,20 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	//------------------------ Internal workspace
 
 	// Storage for pixel observations looked up from the db
-	protected final FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64::new);
+	protected final DogArray<Point2D_F64> pixels = new DogArray<>(Point2D_F64::new);
 
 	// Used for triangulation
-	protected final FastQueue<Point2D_F64> pixelNormalized = new FastQueue<>(Point2D_F64::new);
+	protected final DogArray<Point2D_F64> pixelNormalized = new DogArray<>(Point2D_F64::new);
 	// Poses from local view[0] to view[i]. This is done to reduce numerical issues
-	protected final FastQueue<Se3_F64> listPoses = new FastQueue<>(Se3_F64::new);
+	protected final DogArray<Se3_F64> listPoses = new DogArray<>(Se3_F64::new);
 	protected final Se3_F64 view0_to_world = new Se3_F64();
 
 	// which observations in the inlier set are unassigned. values are indexes in inlier set
-	final GrowQueue_I32 unassigned = new GrowQueue_I32();
+	final DogArray_I32 unassigned = new DogArray_I32();
 	// array index of a world / 3D feature
-	final GrowQueue_I32 featureIdx3D = new GrowQueue_I32();
+	final DogArray_I32 featureIdx3D = new DogArray_I32();
 	// Look up table from inlier view index to index of the view in the graph view list
-	final GrowQueue_I32 viewIntIds = new GrowQueue_I32();
+	final DogArray_I32 viewIntIds = new DogArray_I32();
 	// storage for pixel observation
 	private final Point2D_F64 pixelObserved = new Point2D_F64();
 	// storage for predicted pixel

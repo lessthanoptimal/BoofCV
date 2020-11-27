@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.GrayS32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Stoppable;
 
 /**
@@ -40,13 +40,13 @@ public class RegionMergeTree implements Stoppable {
 	// The values indicate which region a region is to be merged into
 	// An value of equal to its index indicates that the region is a root in the graph and
 	// is not to be merged with any others
-	protected GrowQueue_I32 mergeList = new GrowQueue_I32();
+	protected DogArray_I32 mergeList = new DogArray_I32();
 
 	// Local copy of these lists after elements which have been merged are removed
-	protected GrowQueue_I32 tmpMemberCount = new GrowQueue_I32();
+	protected DogArray_I32 tmpMemberCount = new DogArray_I32();
 
 	// the new ID of the root nodes (segments)
-	protected GrowQueue_I32 rootID = new GrowQueue_I32();
+	protected DogArray_I32 rootID = new DogArray_I32();
 
 	protected boolean stopRequested=false;
 
@@ -67,7 +67,7 @@ public class RegionMergeTree implements Stoppable {
 	 * @param regionMemberCount (Input/Output) List containing how many pixels belong to each region.  Modified.
 	 */
 	public void performMerge( GrayS32 pixelToRegion ,
-							  GrowQueue_I32 regionMemberCount ) {
+							  DogArray_I32 regionMemberCount ) {
 		// update member counts
 		flowIntoRootNode(regionMemberCount);
 
@@ -83,7 +83,7 @@ public class RegionMergeTree implements Stoppable {
 	 * its member count and set the index  in mergeList to the root node.  If a node is a root node just note
 	 * what its new ID will be after all the other segments are removed.
 	 */
-	protected void flowIntoRootNode(GrowQueue_I32 regionMemberCount) {
+	protected void flowIntoRootNode(DogArray_I32 regionMemberCount) {
 		rootID.resize(regionMemberCount.size);
 		int count = 0;
 
@@ -114,7 +114,7 @@ public class RegionMergeTree implements Stoppable {
 	 * Does much of the work needed to remove the redundant segments that are being merged into their root node.
 	 * The list of member count is updated.  mergeList is updated with the new segment IDs.
 	 */
-	protected void setToRootNodeNewID( GrowQueue_I32 regionMemberCount ) {
+	protected void setToRootNodeNewID( DogArray_I32 regionMemberCount ) {
 
 		tmpMemberCount.reset();
 

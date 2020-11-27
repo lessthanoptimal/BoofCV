@@ -20,8 +20,8 @@ package boofcv.alg.distort.mls;
 
 import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F32;
 import org.ejml.data.FMatrix2x2;
 
 import java.util.Arrays;
@@ -61,12 +61,12 @@ import java.util.Arrays;
 public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 	// control points that specify the distortion
-	FastQueue<Control> controls = new FastQueue<>(Control::new);
+	DogArray<Control> controls = new DogArray<>(Control::new);
 
 	// size of interpolation grid
 	int gridRows,gridCols;
 	// points inside interpolation grid
-	FastQueue<Point2D_F32> deformationGrid = new FastQueue<>(Point2D_F32::new);
+	DogArray<Point2D_F32> deformationGrid = new DogArray<>(Point2D_F32::new);
 
 	// DESIGN NOTE:  Because the aspect ratio is maintained it's likely that some points in the grid are unreachable
 	//               a small speed boost could be brought about by adjusting the grid size so that the minimum number
@@ -82,9 +82,9 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	Model model;
 
 	//--------------------------- Internal Workspace --------------------------------------------
-	GrowQueue_F32 weights = new GrowQueue_F32(); // weight of each control point
-	FastQueue<FMatrix2x2> matrices = new FastQueue<>(FMatrix2x2::new);
-	GrowQueue_F32 A = new GrowQueue_F32(); // As as the variable 'A' in the paper
+	DogArray_F32 weights = new DogArray_F32(); // weight of each control point
+	DogArray<FMatrix2x2> matrices = new DogArray<>(FMatrix2x2::new);
+	DogArray_F32 A = new DogArray_F32(); // As as the variable 'A' in the paper
 	Point2D_F32 aveP = new Point2D_F32();  // average control point for given weights
 	Point2D_F32 aveQ = new Point2D_F32();  // average distorted point for given weights
 	float totalWeight;
@@ -355,7 +355,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public class AffineModel implements Model {
 
 		@Override
-		public void allocate(GrowQueue_F32 weights, GrowQueue_F32 A, FastQueue<FMatrix2x2> matrices) {
+		public void allocate(DogArray_F32 weights, DogArray_F32 A, DogArray<FMatrix2x2> matrices) {
 			weights.resize(controls.size);
 			A.resize(controls.size);
 			matrices.resize(controls.size);
@@ -437,7 +437,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public class SimilarityModel implements Model
 	{
 		@Override
-		public void allocate(GrowQueue_F32 weights, GrowQueue_F32 A, FastQueue<FMatrix2x2> matrices) {
+		public void allocate(DogArray_F32 weights, DogArray_F32 A, DogArray<FMatrix2x2> matrices) {
 			weights.resize(controls.size);
 			matrices.resize(controls.size);
 		}
@@ -549,7 +549,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 */
 	private interface Model {
 		/** Pre-allocates the size of each of these arrays */
-		void allocate( GrowQueue_F32 weights, GrowQueue_F32 A , FastQueue<FMatrix2x2> matrices );
+		void allocate( DogArray_F32 weights, DogArray_F32 A , DogArray<FMatrix2x2> matrices );
 
 		/** Computes intermediate results needed for the distortion*/
 		void computeIntermediate(float v_x, float v_y);

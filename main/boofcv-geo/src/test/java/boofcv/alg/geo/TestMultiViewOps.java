@@ -38,7 +38,7 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.Tuple2;
 import org.ddogleg.struct.Tuple3;
 import org.ejml.UtilEjml;
@@ -1345,7 +1345,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 
 	@Test
 	void splits3Lists() {
-		FastQueue<AssociatedTriple> triples = new FastQueue<>(AssociatedTriple::new);
+		DogArray<AssociatedTriple> triples = new DogArray<>(AssociatedTriple::new);
 		for (int i = 0; i < 8; i++) {
 			triples.grow().setTo(
 					rand.nextGaussian(), rand.nextGaussian(),
@@ -1362,7 +1362,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		checkSplit3Lists(triples, found);
 	}
 
-	private void checkSplit3Lists( FastQueue<AssociatedTriple> triples, List<List<Point2D_F64>> found ) {
+	private void checkSplit3Lists( DogArray<AssociatedTriple> triples, List<List<Point2D_F64>> found ) {
 		assertEquals(3, found.size());
 		for (int i = 0; i < 3; i++) {
 			List<Point2D_F64> list = found.get(i);
@@ -1375,7 +1375,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 
 	@Test
 	void convertTr_pair() {
-		var triples = new FastQueue<>(AssociatedTriple::new);
+		var triples = new DogArray<>(AssociatedTriple::new);
 		for (int i = 0; i < 8; i++) {
 			triples.grow().setTo(
 					rand.nextGaussian(), rand.nextGaussian(),
@@ -1383,7 +1383,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 					rand.nextGaussian(), rand.nextGaussian());
 		}
 
-		var found = new FastQueue<>(AssociatedPair::new);
+		var found = new DogArray<>(AssociatedPair::new);
 		MultiViewOps.convertTr(triples.toList(), 0, 1, found);
 
 		assertEquals(triples.size, found.size);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 		out.print("import boofcv.struct.image."+imageName+";\n" +
 				"import boofcv.alg.segmentation.fh04.FhEdgeWeights;\n" +
 				"import boofcv.struct.image.ImageType;\n" +
-				"import org.ddogleg.struct.FastQueue;\n" +
+				"import org.ddogleg.struct.DogArray;\n" +
 				"\n" +
 				"import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;\n" +
 				"\n" +
@@ -86,7 +86,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 		out.print("\t@Override\n" +
 				"\tpublic void process("+imageName+" input,\n" +
-				"\t\t\t\t\t\tFastQueue<Edge> edges) {\n" +
+				"\t\t\t\t\t\tDogArray<Edge> edges) {\n" +
 				"\n" +
 				"\t\tint w = input.width-1;\n" +
 				"\t\tint h = input.height-1;\n" +
@@ -165,7 +165,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 		out.print("\tprivate void checkAround( int x , int y ,\n" +
 				"\t\t\t\t\t\t\t  "+imageName+" input ,\n" +
-				"\t\t\t\t\t\t\t  FastQueue<Edge> edges )\n" +
+				"\t\t\t\t\t\t\t  DogArray<Edge> edges )\n" +
 				"\t{\n" +
 				"\t\tint indexSrc = input.startIndex + y*input.stride + x;\n" +
 				"\t\tint indexA =                      y*input.width  + x;\n" +
@@ -191,7 +191,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 		out.print("\tprivate void check( int x , int y , "+sumType+" color0 , int indexA,\n" +
 				"\t\t\t\t\t\t"+imageName+" input ,\n" +
-				"\t\t\t\t\t\tFastQueue<Edge> edges ) {\n" +
+				"\t\t\t\t\t\tDogArray<Edge> edges ) {\n" +
 				"\t\tif( !input.isInBounds(x,y) )\n" +
 				"\t\t\treturn;\n" +
 				"\n" +

@@ -27,8 +27,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 
 /**
  * Provides a wrapper around a fast corner detector for {@link PointDetector} no non-maximum suppression will be done
@@ -39,7 +39,7 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 		implements InterestPointDetector<T> {
 	@Getter FastCornerDetector<T> detector;
 	// Storage for all the found corners
-	private final FastQueue<Point2D_F64> found = new FastQueue<>(Point2D_F64::new);
+	private final DogArray<Point2D_F64> found = new DogArray<>(Point2D_F64::new);
 	// total number of low corners. Used to identify which set a feature belongs in
 	private int totalLow;
 
@@ -80,7 +80,7 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 		detector.getCandidatesHigh().copyInto(candidates);
 		selectLimit.select(input.width, input.height, null, candidates, featureLimitPerSet, selected);
 		// predeclare and reshape the array
-		found.growArray(found.size + selected.size);
+		found.reserve(found.size + selected.size);
 		found.size = found.size + selected.size;
 		// copy the new elements into the found array
 		for (int i = 0; i < selected.size; i++) {

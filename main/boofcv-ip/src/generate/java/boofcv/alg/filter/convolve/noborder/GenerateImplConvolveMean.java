@@ -55,9 +55,9 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
 				"import boofcv.concurrency.*;\n" +
-				"import org.ddogleg.struct.GrowQueue_F32;\n" +
-				"import org.ddogleg.struct.GrowQueue_F64;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_F32;\n" +
+				"import org.ddogleg.struct.DogArray_F64;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n");
@@ -119,7 +119,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		String divide = imageIn.isInteger() ? "(total + halfDivisor)/divisor" : "total/divisor";
 
-		String workType = ("GrowQueue_"+imageIn.getKernelType()).replace("S32","I32");
+		String workType = ("DogArray_"+imageIn.getKernelType()).replace("S32","I32");
 
 		out.print("\tpublic static void vertical( "+imageIn.getSingleBandName()+" input, "+
 				imageOut.getSingleBandName()+" output, int offset, int length, @Nullable GrowArray<"+workType+"> workspaces ) {\n" +

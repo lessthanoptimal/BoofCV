@@ -31,9 +31,9 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.trig.Circle2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ public class ShapeFittingOps {
 		alg.process(sequence);
 		PolylineSplitMerge.CandidatePolyline best = alg.getBestPolyline();
 
-		FastQueue<PointIndex_I32> output = new FastQueue<>(PointIndex_I32::new);
+		DogArray<PointIndex_I32> output = new DogArray<>(PointIndex_I32::new);
 		if (best != null) {
 			indexToPointIndex(sequence, best.splits, output);
 		}
@@ -173,9 +173,9 @@ public class ShapeFittingOps {
 		return convert_I32_F64(points, null).toList();
 	}
 
-	public static FastQueue<Point2D_F64> convert_I32_F64( List<Point2D_I32> input, FastQueue<Point2D_F64> output ) {
+	public static DogArray<Point2D_F64> convert_I32_F64( List<Point2D_I32> input, DogArray<Point2D_F64> output ) {
 		if (output == null)
-			output = new FastQueue<>(input.size(), Point2D_F64::new);
+			output = new DogArray<>(input.size(), Point2D_F64::new);
 		else
 			output.reset();
 
@@ -190,9 +190,9 @@ public class ShapeFittingOps {
 		return convert_I32_F32(points, null).toList();
 	}
 
-	public static FastQueue<Point2D_F32> convert_I32_F32( List<Point2D_I32> input, FastQueue<Point2D_F32> output ) {
+	public static DogArray<Point2D_F32> convert_I32_F32( List<Point2D_I32> input, DogArray<Point2D_F32> output ) {
 		if (output == null)
-			output = new FastQueue<>(input.size(), Point2D_F32::new);
+			output = new DogArray<>(input.size(), Point2D_F32::new);
 		else
 			output.reset();
 
@@ -213,13 +213,13 @@ public class ShapeFittingOps {
 	 * @param outputStorage (Output/Optional) Storage for results.  If null then a new circle instance will be returned.
 	 * @return The found circle fit.
 	 */
-	public static FitData<Circle2D_F64> averageCircle_I32( List<Point2D_I32> points, GrowQueue_F64 optional,
+	public static FitData<Circle2D_F64> averageCircle_I32( List<Point2D_I32> points, DogArray_F64 optional,
 														   FitData<Circle2D_F64> outputStorage ) {
 		if (outputStorage == null) {
 			outputStorage = new FitData<>(new Circle2D_F64());
 		}
 		if (optional == null) {
-			optional = new GrowQueue_F64();
+			optional = new DogArray_F64();
 		}
 
 		Circle2D_F64 circle = outputStorage.shape;
@@ -272,13 +272,13 @@ public class ShapeFittingOps {
 	 * @param outputStorage (Output/Optional) Storage for results.  If null then a new circle instance will be returned.
 	 * @return The found circle fit.
 	 */
-	public static FitData<Circle2D_F64> averageCircle_F64( List<Point2D_F64> points, GrowQueue_F64 optional,
+	public static FitData<Circle2D_F64> averageCircle_F64( List<Point2D_F64> points, DogArray_F64 optional,
 														   FitData<Circle2D_F64> outputStorage ) {
 		if (outputStorage == null) {
 			outputStorage = new FitData<>(new Circle2D_F64());
 		}
 		if (optional == null) {
-			optional = new GrowQueue_F64();
+			optional = new DogArray_F64();
 		}
 
 		Circle2D_F64 circle = outputStorage.shape;
@@ -328,8 +328,8 @@ public class ShapeFittingOps {
 	 * @param indexes List of indexes in the sequence.
 	 * @param output Output list of {@link PointIndex_I32}.
 	 */
-	public static void indexToPointIndex( List<Point2D_I32> sequence, GrowQueue_I32 indexes,
-										  FastQueue<PointIndex_I32> output ) {
+	public static void indexToPointIndex( List<Point2D_I32> sequence, DogArray_I32 indexes,
+										  DogArray<PointIndex_I32> output ) {
 		output.reset();
 
 		for (int i = 0; i < indexes.size; i++) {

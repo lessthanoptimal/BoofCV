@@ -20,7 +20,7 @@ package boofcv.alg.shapes.polyline;
 
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -40,11 +40,11 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 	@Test
 	public void prine_no_change() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
-		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
+		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 
 		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 
-		GrowQueue_I32 output = new GrowQueue_I32();
+		DogArray_I32 output = new DogArray_I32();
 		alg.prune(contours, corners, output);
 
 		assertEquals(corners.size(),output.size());
@@ -59,12 +59,12 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 	@Test
 	public void prune_obvious() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
-		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
+		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 		corners.add(corners.get(3)+4);
 
 		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 
-		GrowQueue_I32 output = new GrowQueue_I32();
+		DogArray_I32 output = new DogArray_I32();
 		alg.prune(contours, corners, output);
 
 		assertEquals(4, output.size());
@@ -77,7 +77,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 	@Test
 	public void energyRemoveCorner() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
-		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
+		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 
 		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 		alg.contour = contours;
@@ -115,7 +115,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 	public void computeSegmentEnergy() {
 
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
-		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
+		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 
 		// test with everything perfectly lining up
 		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
@@ -144,7 +144,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 	public void removeDuplicates() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 
-		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
+		DogArray_I32 corners = createSquareCorners(10, 12, 20, 30);
 
 		corners.add(corners.get(0));
 		corners.add(corners.get(2));
@@ -178,8 +178,8 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 		return output;
 	}
 
-	private GrowQueue_I32 createSquareCorners( int x0 , int y0 , int x1 , int y1 ) {
-		GrowQueue_I32 corners = new GrowQueue_I32();
+	private DogArray_I32 createSquareCorners( int x0 , int y0 , int x1 , int y1 ) {
+		DogArray_I32 corners = new DogArray_I32();
 
 		int c0 = 0;
 		int c1 = c0 + x1-x0;
@@ -194,7 +194,7 @@ public class TestMinimizeEnergyPrune extends BoofStandardJUnit {
 		return corners;
 	}
 
-	private void checkMatched(GrowQueue_I32 corners, GrowQueue_I32 output) {
+	private void checkMatched(DogArray_I32 corners, DogArray_I32 output) {
 		boolean foundMatch = false;
 		for (int offset = 0; offset < 4; offset++) {
 			boolean matched = true;

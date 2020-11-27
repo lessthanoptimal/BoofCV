@@ -21,8 +21,8 @@ package boofcv.alg.segmentation.ms;
 import boofcv.struct.image.GrayS32;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,12 +42,12 @@ public class TestMergeRegionMeanShift extends BoofStandardJUnit {
 						2, 0, 1, 1,
 						0, 0, 3, 1};
 
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+		DogArray_I32 regionMemberCount = new DogArray_I32();
 		regionMemberCount.data = new int[]{1, 2, 3, 4};
 		regionMemberCount.size = 4;
 
-		FastQueue<float[]> regionColor = createList(5, 1, 6, 4);
-		FastQueue<Point2D_I32> modeLocation = new FastQueue<>(Point2D_I32::new);
+		DogArray<float[]> regionColor = createList(5, 1, 6, 4);
+		DogArray<Point2D_I32> modeLocation = new DogArray<>(Point2D_I32::new);
 		modeLocation.grow().setTo(0, 0);
 		modeLocation.grow().setTo(3, 3);
 		modeLocation.grow().setTo(0, 1);
@@ -71,8 +71,8 @@ public class TestMergeRegionMeanShift extends BoofStandardJUnit {
 			assertEquals(expectedCount[i], regionMemberCount.data[i]);
 	}
 
-	private FastQueue<float[]> createList( int... colors ) {
-		FastQueue<float[]> ret = new FastQueue<>(() -> new float[1]);
+	private DogArray<float[]> createList( int... colors ) {
+		DogArray<float[]> ret = new DogArray<>(() -> new float[1]);
 
 		for (int i = 0; i < colors.length; i++) {
 			ret.grow()[0] = colors[i];

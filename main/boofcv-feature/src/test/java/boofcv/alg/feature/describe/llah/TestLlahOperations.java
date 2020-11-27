@@ -25,7 +25,7 @@ import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.combinatorics.Combinations;
 import org.ddogleg.sorting.QuickSort_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -249,7 +249,7 @@ class TestLlahOperations extends BoofStandardJUnit {
 		List<LlahOperations.FoundDocument> foundDocuments = new ArrayList<>();
 		llahOps.lookupDocuments(target, 8, foundDocuments);
 		assertEquals(1, foundDocuments.size());
-		GrowQueue_I32 expected = foundDocuments.get(0).landmarkToDots;
+		DogArray_I32 expected = foundDocuments.get(0).landmarkToDots;
 
 		for (int angleIdx = 0; angleIdx < 12; angleIdx++) {
 			var se = new Se2_F64(0, 0, angleIdx * Math.PI / 4);
@@ -263,7 +263,7 @@ class TestLlahOperations extends BoofStandardJUnit {
 			}
 			llahOps.lookupDocuments(rotated, 8, foundDocuments);
 			assertEquals(1, foundDocuments.size());
-			GrowQueue_I32 found = foundDocuments.get(0).landmarkToDots;
+			DogArray_I32 found = foundDocuments.get(0).landmarkToDots;
 
 			// Use the number of matches as a finger print
 			for (int i = 0; i < expected.size; i++) {
@@ -291,7 +291,7 @@ class TestLlahOperations extends BoofStandardJUnit {
 		List<LlahOperations.FoundDocument> foundDocuments = new ArrayList<>();
 		llahOps.lookupDocuments(target, 8, foundDocuments);
 		assertEquals(1, foundDocuments.size());
-		GrowQueue_I32 expected = foundDocuments.get(0).landmarkToDots;
+		DogArray_I32 expected = foundDocuments.get(0).landmarkToDots;
 
 		for (int trial = 0; trial < 12; trial++) {
 			// Change the input's order
@@ -301,7 +301,7 @@ class TestLlahOperations extends BoofStandardJUnit {
 			// Look up the document
 			llahOps.lookupDocuments(shuffled, 8, foundDocuments);
 			assertEquals(1, foundDocuments.size());
-			GrowQueue_I32 found = foundDocuments.get(0).landmarkToDots;
+			DogArray_I32 found = foundDocuments.get(0).landmarkToDots;
 
 			// Use the number of matches as a finger print
 			for (int i = 0; i < expected.size; i++) {
@@ -341,7 +341,7 @@ class TestLlahOperations extends BoofStandardJUnit {
 			LlahOperations.FoundDocument doc = foundDocuments.get(0);
 			assertEquals(2,doc.document.documentID);
 
-			GrowQueue_I32 found = doc.landmarkToDots;
+			DogArray_I32 found = doc.landmarkToDots;
 
 			// The order should be the same, but a few misses are allowed
 			int totalMatched = 0;

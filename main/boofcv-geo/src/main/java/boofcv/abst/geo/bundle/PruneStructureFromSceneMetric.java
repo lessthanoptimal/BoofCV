@@ -25,8 +25,8 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.*;
 
@@ -197,7 +197,7 @@ public class PruneStructureFromSceneMetric {
 		int[] oldToNew = new int[structure.points.size];
 		Arrays.fill(oldToNew, -1); // crash is bug
 
-		GrowQueue_I32 prune = new GrowQueue_I32(); // List of point ID's which are to be removed.
+		DogArray_I32 prune = new DogArray_I32(); // List of point ID's which are to be removed.
 		for (int i = 0; i < structure.points.size; i++) {
 			if (structure.points.data[i].views.size < count) {
 				prune.add(i);
@@ -208,7 +208,7 @@ public class PruneStructureFromSceneMetric {
 		pruneUpdatePointID(oldToNew, prune);
 	}
 
-	private void pruneUpdatePointID( int[] oldToNew, GrowQueue_I32 prune ) {
+	private void pruneUpdatePointID( int[] oldToNew, DogArray_I32 prune ) {
 		if (prune.size == 0)
 			return;
 
@@ -248,13 +248,13 @@ public class PruneStructureFromSceneMetric {
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 		nn.setPoints(cloud, false);
-		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue<>(NnData::new);
+		DogArray<NnData<Point3D_F64>> resultsNN = new DogArray<>(NnData::new);
 
 		// Create a look up table containing from old to new indexes for each point
 		int[] oldToNew = new int[structure.points.size];
 		Arrays.fill(oldToNew, -1); // crash is bug
 		// List of point ID's which are to be removed.
-		GrowQueue_I32 prunePointID = new GrowQueue_I32();
+		DogArray_I32 prunePointID = new DogArray_I32();
 
 		// identify points which need to be pruned
 		for (int pointId = 0; pointId < structure.points.size; pointId++) {
@@ -296,7 +296,7 @@ public class PruneStructureFromSceneMetric {
 	 * @return true if the graph has been modified
 	 */
 	public boolean pruneViews( int count ) {
-		GrowQueue_I32 removeIdx = new GrowQueue_I32();
+		DogArray_I32 removeIdx = new DogArray_I32();
 		Set<SceneStructureMetric.View> parents = new HashSet<>();
 
 		// Traverse in reverse order since parents always have an index less than the child. This way if an entire
@@ -350,7 +350,7 @@ public class PruneStructureFromSceneMetric {
 
 		// See which cameras need to be removed and create a look up table from old to new camera IDs
 		int[] oldToNew = new int[structure.cameras.size];
-		var removeIdx = new GrowQueue_I32();
+		var removeIdx = new DogArray_I32();
 		for (int i = 0; i < structure.cameras.size; i++) {
 			if (histogram[i] > 0) {
 				oldToNew[i] = i - removeIdx.size();
@@ -389,7 +389,7 @@ public class PruneStructureFromSceneMetric {
 
 		// See which cameras need to be removed and create a look up table from old to new camera IDs
 		int[] oldToNew = new int[structure.motions.size];
-		var removeIdx = new GrowQueue_I32();
+		var removeIdx = new DogArray_I32();
 		for (int i = 0; i < structure.motions.size; i++) {
 			if (histogram[i] > 0) {
 				oldToNew[i] = i - removeIdx.size();

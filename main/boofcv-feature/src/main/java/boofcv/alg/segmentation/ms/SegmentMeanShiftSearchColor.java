@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.Arrays;
 
@@ -47,7 +47,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 	protected float[] sumColor;
 
 	// Mean-shift trajectory history
-	protected FastQueue<Point2D_F32> history = new FastQueue<>(Point2D_F32::new);
+	protected DogArray<Point2D_F32> history = new DogArray<>(Point2D_F32::new);
 
 	ImageType<T> imageType;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class SquareRegularClustersIntoGrids {
 	private int minimumElements;
 
 	// All valid graphics
-	FastQueue<SquareGrid> valid = new FastQueue<>(SquareGrid::new);
+	DogArray<SquareGrid> valid = new DogArray<>(SquareGrid::new);
 
 	/**
 	 * Configures class

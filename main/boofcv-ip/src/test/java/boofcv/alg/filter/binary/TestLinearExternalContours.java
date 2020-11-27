@@ -26,7 +26,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -131,7 +131,7 @@ class TestLinearExternalContours extends BoofStandardJUnit {
 
 			alg.process(binaryExpanded.clone(),1,1);
 
-			FastQueue<ContourPacked> expected = chang.getContours();
+			DogArray<ContourPacked> expected = chang.getContours();
 			PackedSetsPoint2D_I32 found = alg.getExternalContours();
 
 			assertEquals(expected.size, found.size());
@@ -260,7 +260,7 @@ class TestLinearExternalContours extends BoofStandardJUnit {
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
 		assertEquals(expected.length, contours.size());
 
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> points = new DogArray<>(Point2D_I32::new);
 
 		boolean matched[] = new boolean[ expected.length ];
 

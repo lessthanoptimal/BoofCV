@@ -23,7 +23,7 @@ import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,8 +51,8 @@ public class PruneCloseTracks<T> {
 	// Way to look up all the tracks inside a grid. Each element is null if there are no tracks inside
 	private List<TrackDrop<T>>[] gridToCell = new List[0];
 
-	FastQueue<List<TrackDrop<T>>> storageLists = new FastQueue<>(ArrayList::new, List::clear);
-	FastQueue<TrackDrop<T>> storageDrops = new FastQueue<>(TrackDrop::new, TrackDrop::reset);
+	DogArray<List<TrackDrop<T>>> storageLists = new DogArray<>(ArrayList::new, List::clear);
+	DogArray<TrackDrop<T>> storageDrops = new DogArray<>(TrackDrop::new, TrackDrop::reset);
 
 	/**
 	 * Used to extract information about a track. Enables this class to work with different formats.

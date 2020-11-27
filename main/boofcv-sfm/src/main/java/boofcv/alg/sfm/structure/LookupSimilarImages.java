@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.sfm.structure;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public interface LookupSimilarImages {
 	 * @param target ID of target image
 	 * @param features Storage for pixel observations. Cleared upon each call
 	 */
-	void lookupPixelFeats( String target, FastQueue<Point2D_F64> features );
+	void lookupPixelFeats( String target, DogArray<Point2D_F64> features );
 
 	/**
 	 * Looks up associated features between the two views. Which view
@@ -56,7 +56,7 @@ public interface LookupSimilarImages {
 	 * @param pairs Storage for associated features. Cleared upon each call
 	 * @return true if views are similar and have known associations. False if not and results should be ignored
 	 */
-	boolean lookupMatches( String viewA, String viewB, FastQueue<AssociatedIndex> pairs );
+	boolean lookupMatches( String viewA, String viewB, DogArray<AssociatedIndex> pairs );
 
 	/**
 	 * Looks up the original images width and height

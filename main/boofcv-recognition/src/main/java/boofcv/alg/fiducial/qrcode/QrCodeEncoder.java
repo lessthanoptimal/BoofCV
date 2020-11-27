@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.qrcode;
 
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.ejml.ops.CommonOps_BDRM;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,9 +65,9 @@ public class QrCodeEncoder {
 	// workspace variables
 	PackedBits8 packed = new PackedBits8();
 	// storage for the data message
-	private GrowQueue_I8 message = new GrowQueue_I8();
+	private DogArray_I8 message = new DogArray_I8();
 	// storage fot the message's ecc
-	private GrowQueue_I8 ecc = new GrowQueue_I8();
+	private DogArray_I8 ecc = new DogArray_I8();
 
 	// Since QR Code version might not be known initially and the size of the length byte depends on the
 	// version, store the segments here until fixate is called.
@@ -777,7 +777,7 @@ public class QrCodeEncoder {
 		}
 	}
 
-	public static void flipBits8(GrowQueue_I8 array) {
+	public static void flipBits8(DogArray_I8 array) {
 		flipBits8(array.data, array.size);
 	}
 
@@ -791,7 +791,7 @@ public class QrCodeEncoder {
 		return (byte) b;
 	}
 
-	private void addPadding(GrowQueue_I8 queue, int dataBytes, int padding0, int padding1) {
+	private void addPadding(DogArray_I8 queue, int dataBytes, int padding0, int padding1) {
 
 		boolean a = true;
 		for (int i = dataBytes; i < queue.size; i++, a = !a) {
@@ -802,7 +802,7 @@ public class QrCodeEncoder {
 		}
 	}
 
-//	private void print(String name, GrowQueue_I8 queue) {
+//	private void print(String name, DogArray_I8 queue) {
 //		PackedBits8 bits = new PackedBits8();
 //		bits.size = queue.size * 8;
 //		bits.data = queue.data;
@@ -810,7 +810,7 @@ public class QrCodeEncoder {
 //		bits.print();
 //	}
 
-	private void copyIntoRawData(GrowQueue_I8 message, GrowQueue_I8 ecc, int offset, int stride,
+	private void copyIntoRawData(DogArray_I8 message, DogArray_I8 ecc, int offset, int stride,
 								 int startEcc, byte[] output) {
 		for (int i = 0; i < message.size; i++) {
 			output[i * stride + offset] = message.data[i];

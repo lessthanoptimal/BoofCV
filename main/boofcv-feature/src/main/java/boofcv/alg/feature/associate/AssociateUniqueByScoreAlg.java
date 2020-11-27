@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,10 @@ package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * If multiple associations are found for a single source and/or destination feature then this ambiguity is
@@ -42,8 +42,8 @@ public class AssociateUniqueByScoreAlg {
 	private boolean checkDestination;
 
 	// storage for the index of the best match found so far
-	private GrowQueue_I32 solutions = new GrowQueue_I32();
-	private GrowQueue_F64 scores = new GrowQueue_F64();
+	private DogArray_I32 solutions = new DogArray_I32();
+	private DogArray_F64 scores = new DogArray_F64();
 
 	// storage for found solutions
 	private final FastArray<AssociatedIndex> firstPass = new FastArray<>(AssociatedIndex.class);

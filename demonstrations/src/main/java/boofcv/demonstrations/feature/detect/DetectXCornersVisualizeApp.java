@@ -38,7 +38,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -78,7 +78,7 @@ public class DetectXCornersVisualizeApp
 	final Object lockAlgorithm = new Object();
 
 	final Object lockCorners = new Object();
-	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner::new);
+	DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
 
 	public DetectXCornersVisualizeApp( List<PathLabel> examples ) {
 		super(true, true, examples, ImageType.single(GrayF32.class));
@@ -187,7 +187,7 @@ public class DetectXCornersVisualizeApp
 			}
 
 			synchronized (lockCorners) {
-				FastQueue<ChessboardCorner> orig = detector.getCorners();
+				DogArray<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
 				for (int i = 0; i < orig.size(); i++) {
 					foundCorners.grow().setTo(orig.get(i));

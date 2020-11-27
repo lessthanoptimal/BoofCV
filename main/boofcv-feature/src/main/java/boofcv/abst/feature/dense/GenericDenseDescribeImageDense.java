@@ -23,7 +23,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -45,8 +45,8 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	int periodX;
 	int periodY;
 
-	FastQueue<Desc> descriptions;
-	FastQueue<Point2D_I32> locations = new FastQueue<>(Point2D_I32::new);
+	DogArray<Desc> descriptions;
+	DogArray<Point2D_I32> locations = new DogArray<>(Point2D_I32::new);
 
 	/**
 	 * Configures dense description.
@@ -61,7 +61,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 										   double samplePeriodX,
 										   double samplePeriodY ) {
 		this.alg = alg;
-		descriptions = new FastQueue<>(alg.getDescriptionType(), alg::createDescription);
+		descriptions = new DogArray<>(alg.getDescriptionType(), alg::createDescription);
 		configure(descriptorScale, samplePeriodX, samplePeriodY);
 	}
 

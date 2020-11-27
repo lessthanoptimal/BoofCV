@@ -52,8 +52,8 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"import pabeles.concurrency.GrowArray;\n" +
-				"import org.ddogleg.struct.GrowQueue_F32;\n" +
-				"import org.ddogleg.struct.GrowQueue_I32;\n" +
+				"import org.ddogleg.struct.DogArray_F32;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.filter.blur.BlurImageOps;\n" +
@@ -116,7 +116,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 		String imageName = imageIn.getSingleBandName();
 		String bitwise = imageIn.getBitWise();
 
-		String workType = ("GrowQueue_"+imageIn.getKernelType()).replace("S32","I32");
+		String workType = ("DogArray_"+imageIn.getKernelType()).replace("S32","I32");
 
 		out.print(
 				"\tpublic static GrayU8 localMean( "+imageName+" input , GrayU8 output ,\n" +

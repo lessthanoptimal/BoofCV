@@ -21,7 +21,7 @@ package boofcv.alg.geo.selfcalib;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Vector3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -89,7 +89,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 
 	//--------------------- Input Related
 	// storage for internally normalized camera matrices
-	FastQueue<DMatrixRMaj> normalizedP;
+	DogArray<DMatrixRMaj> normalizedP;
 
 	//--------------------- Output Related
 	// used to estimate the plane at infinity
@@ -133,7 +133,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 	PrintStream verbose;
 
 	public SelfCalibrationPraticalGuessAndCheckFocus() {
-		normalizedP = new FastQueue<>(() -> new DMatrixRMaj(3, 4));
+		normalizedP = new DogArray<>(() -> new DMatrixRMaj(3, 4));
 	}
 
 	/**

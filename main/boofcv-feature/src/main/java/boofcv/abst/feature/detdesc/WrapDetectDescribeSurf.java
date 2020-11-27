@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 
 import java.util.List;
 
@@ -58,11 +58,11 @@ public class WrapDetectDescribeSurf
 	protected II ii;
 
 	// storage for computed features
-	protected FastQueue<TupleDesc_F64> features;
+	protected DogArray<TupleDesc_F64> features;
 	// detected scale points
 	protected List<ScalePoint> foundPoints;
 	// orientation of features
-	protected GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
+	protected DogArray_F64 featureAngles = new DogArray_F64(10);
 
 	ImageType<T> imageType;
 
@@ -76,7 +76,7 @@ public class WrapDetectDescribeSurf
 		this.describe = describe;
 		this.imageType = ImageType.single(imageType);
 
-		features = new FastQueue<>(describe::createDescription);
+		features = new DogArray<>(describe::createDescription);
 	}
 
 	@Override

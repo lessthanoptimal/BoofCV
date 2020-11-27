@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.io.video.VideoMjpegCodec;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -51,7 +51,7 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 	T image;
 	int frameNumber;
 	ImageType<T> imageType;
-	GrowQueue_I8 buffer = new GrowQueue_I8();
+	DogArray_I8 buffer = new DogArray_I8();
 	byte[] rawData;
 
 	public ImageStreamSequence(InputStream in, boolean storeData , ImageType<T> imageType) {

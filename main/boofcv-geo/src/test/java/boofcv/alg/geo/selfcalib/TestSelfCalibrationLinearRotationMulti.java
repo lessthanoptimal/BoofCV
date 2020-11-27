@@ -26,7 +26,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF3;
@@ -66,7 +66,7 @@ public class TestSelfCalibrationLinearRotationMulti
 		alg.setConstraints(true,false,false,-1);
 		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
 
-		FastQueue<CameraPinhole> found = alg.getFound();
+		DogArray<CameraPinhole> found = alg.getFound();
 
 		for (int i = 0; i < found.size; i++) {
 			CameraPinhole f = found.get(i);
@@ -111,7 +111,7 @@ public class TestSelfCalibrationLinearRotationMulti
 		alg.setConstraints(false,true,false,-1);
 		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
 
-		FastQueue<CameraPinhole> found = alg.getFound();
+		DogArray<CameraPinhole> found = alg.getFound();
 
 		for (int i = 0; i < found.size; i++) {
 			CameraPinhole f = found.get(i);
@@ -138,7 +138,7 @@ public class TestSelfCalibrationLinearRotationMulti
 		alg.setConstraints(true,false,true,camera.fy/camera.fx);
 		assertSame(alg.estimate(viewsI_to_view0), GeometricResult.SUCCESS);
 
-		FastQueue<CameraPinhole> found = alg.getFound();
+		DogArray<CameraPinhole> found = alg.getFound();
 
 		for (int i = 0; i < found.size; i++) {
 			CameraPinhole f = found.get(i);

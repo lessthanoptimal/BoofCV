@@ -20,7 +20,7 @@ package boofcv.alg.enhance.impl;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
 import javax.annotation.Generated;
@@ -107,8 +107,8 @@ public class ImplEnhanceHistogram {
 	 * local region size
 	 */
 	public static void equalizeLocalNaive( GrayU8 input, int radius, int histogramLength, GrayU8 output ,
-										   GrowArray<GrowQueue_I32> workspaces ) {
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+										   GrowArray<DogArray_I32> workspaces ) {
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final int width = 2*radius + 1;
 		final int maxValue = histogramLength - 1;
 
@@ -170,9 +170,9 @@ public class ImplEnhanceHistogram {
 	 * Performs local histogram equalization just on the inner portion of the image
 	 */
 	public static void equalizeLocalInner( GrayU8 input, int radius, int histogramLength, GrayU8 output,
-										 GrowArray<GrowQueue_I32> workspaces ) {
+										 GrowArray<DogArray_I32> workspaces ) {
 
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		int width = 2*radius+1;
 		int area = width*width;
 		int maxValue = histogramLength - 1;
@@ -232,7 +232,7 @@ public class ImplEnhanceHistogram {
 	 * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalRow( GrayU8 input, int radius, int histogramLength, int startY, GrayU8 output,
-										 GrowArray<GrowQueue_I32> workspaces ) {
+										 GrowArray<DogArray_I32> workspaces ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -332,7 +332,7 @@ public class ImplEnhanceHistogram {
 	 * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalCol( GrayU8 input, int radius, int histogramLength, int startX, GrayU8 output,
-										 GrowArray<GrowQueue_I32> workspaces ) {
+										 GrowArray<DogArray_I32> workspaces ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -418,8 +418,8 @@ public class ImplEnhanceHistogram {
 	 * local region size
 	 */
 	public static void equalizeLocalNaive( GrayU16 input, int radius, int histogramLength, GrayU16 output ,
-										   GrowArray<GrowQueue_I32> workspaces ) {
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+										   GrowArray<DogArray_I32> workspaces ) {
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		final int width = 2*radius + 1;
 		final int maxValue = histogramLength - 1;
 
@@ -481,9 +481,9 @@ public class ImplEnhanceHistogram {
 	 * Performs local histogram equalization just on the inner portion of the image
 	 */
 	public static void equalizeLocalInner( GrayU16 input, int radius, int histogramLength, GrayU16 output,
-										 GrowArray<GrowQueue_I32> workspaces ) {
+										 GrowArray<DogArray_I32> workspaces ) {
 
-		final GrowQueue_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
 		int width = 2*radius+1;
 		int area = width*width;
 		int maxValue = histogramLength - 1;
@@ -543,7 +543,7 @@ public class ImplEnhanceHistogram {
 	 * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalRow( GrayU16 input, int radius, int histogramLength, int startY, GrayU16 output,
-										 GrowArray<GrowQueue_I32> workspaces ) {
+										 GrowArray<DogArray_I32> workspaces ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -643,7 +643,7 @@ public class ImplEnhanceHistogram {
 	 * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
 	public static void equalizeLocalCol( GrayU16 input, int radius, int histogramLength, int startX, GrayU16 output,
-										 GrowArray<GrowQueue_I32> workspaces ) {
+										 GrowArray<DogArray_I32> workspaces ) {
 
 		int width = 2*radius+1;
 		int area = width*width;

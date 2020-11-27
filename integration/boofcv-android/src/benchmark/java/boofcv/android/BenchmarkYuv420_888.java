@@ -22,7 +22,7 @@ import android.media.Image;
 import android.media.MockImage_420_888;
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.openjdk.jmh.annotations.*;
 import pabeles.concurrency.GrowArray;
 
@@ -53,7 +53,7 @@ public class BenchmarkYuv420_888 {
 	final InterleavedU8 interleavedU8 = new InterleavedU8(1, 1, 3);
 	final InterleavedF32 interleavedF32 = new InterleavedF32(1, 1, 3);
 
-	GrowArray<GrowQueue_I8> work = new GrowArray<>(GrowQueue_I8::new);
+	GrowArray<DogArray_I8> work = new GrowArray<>(DogArray_I8::new);
 
 	@Setup
 	public void setup() {

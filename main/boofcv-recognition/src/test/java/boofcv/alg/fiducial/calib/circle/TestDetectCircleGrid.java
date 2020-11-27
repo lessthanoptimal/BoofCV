@@ -22,7 +22,7 @@ import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.curve.EllipseRotated_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -132,7 +132,7 @@ public class TestDetectCircleGrid extends BoofStandardJUnit {
 
 	@Test
 	public void pruneIncorrectShape() {
-		FastQueue<Grid> grids = new FastQueue<>(Grid::new);
+		DogArray<Grid> grids = new DogArray<>(Grid::new);
 		grids.grow().setShape(4,5);
 		grids.grow().setShape(5,4);
 		grids.grow().setShape(4,3);

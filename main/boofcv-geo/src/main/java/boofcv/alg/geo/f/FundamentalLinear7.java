@@ -25,7 +25,7 @@ import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.solver.PolynomialSolver;
 import org.ddogleg.solver.RootFinderType;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.ejml.data.Complex_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.SpecializedOps_DDRM;
@@ -85,7 +85,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * @param solutions Output: Storage for the found solutions.
 	 * @return true If successful or false if it failed
 	 */
-	public boolean process( List<AssociatedPair> points, FastQueue<DMatrixRMaj> solutions ) {
+	public boolean process( List<AssociatedPair> points, DogArray<DMatrixRMaj> solutions ) {
 		if (points.size() != 7)
 			throw new IllegalArgumentException("Must be exactly 7 points. Not " + points.size() + " you gelatinous piece of pond scum.");
 
@@ -136,7 +136,7 @@ public class FundamentalLinear7 extends FundamentalLinear {
 	 * det(&alpha*F1 + (1-&alpha;)*F2 ) = 0
 	 * </p>
 	 */
-	public void computeSolutions( FastQueue<DMatrixRMaj> solutions ) {
+	public void computeSolutions( DogArray<DMatrixRMaj> solutions ) {
 		if (!rootFinder.process(poly))
 			return;
 

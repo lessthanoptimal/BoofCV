@@ -20,7 +20,7 @@ package boofcv.struct;
 
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -141,7 +141,7 @@ public class TestPackedSetsPoint2D_I32 extends BoofStandardJUnit {
 	private void checkPoint( int set , int point , int x , int y,
 							 PackedSetsPoint2D_I32 alg) {
 
-		FastQueue<Point2D_I32> list = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> list = new DogArray<>(Point2D_I32::new);
 		alg.getSet(set,list);
 
 		assertEquals(x,list.get(point).x);

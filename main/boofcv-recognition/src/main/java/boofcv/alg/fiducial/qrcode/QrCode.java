@@ -22,7 +22,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,7 +87,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Alignment pattern information
 	 */
-	public FastQueue<Alignment> alignment = new FastQueue<>(Alignment::new);
+	public DogArray<Alignment> alignment = new DogArray<>(Alignment::new);
 
 	/**
 	 * Text encoding mode

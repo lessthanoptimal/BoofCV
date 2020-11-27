@@ -19,9 +19,9 @@
 package boofcv.alg.feature.detect.selector;
 
 import boofcv.misc.BoofMiscOps;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
@@ -38,7 +38,7 @@ public class FeatureSelectRandom<Point> implements FeatureSelectLimit<Point> {
 	final Random rand;
 
 	// Work space
-	private GrowQueue_I32 indexes = new GrowQueue_I32();
+	private DogArray_I32 indexes = new DogArray_I32();
 
 	public FeatureSelectRandom( long seed ) {
 		rand = new Random(seed);

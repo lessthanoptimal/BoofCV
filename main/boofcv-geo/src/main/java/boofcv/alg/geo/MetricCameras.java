@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 /**
  * Describes the camera pose and intrinsic parameters for a set of cameras.
@@ -32,9 +32,9 @@ public class MetricCameras {
 	 * Motion relative to first camera.
 	 * First camera is implicit, not included in this list, and assumed to be the origin
 	 */
-	public final FastQueue<Se3_F64> motion_1_to_k = new FastQueue<>(Se3_F64::new);
+	public final DogArray<Se3_F64> motion_1_to_k = new DogArray<>(Se3_F64::new);
 	/** Intrinsic parameters for all cameras */
-	public final FastQueue<CameraPinhole> intrinsics = new FastQueue<>(CameraPinhole::new);
+	public final DogArray<CameraPinhole> intrinsics = new DogArray<>(CameraPinhole::new);
 
 	public void reset() {
 		motion_1_to_k.reset();

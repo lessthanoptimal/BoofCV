@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.struct.ConfigLength;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -67,11 +67,11 @@ public abstract class SplitMergeLineFit {
 	protected Point2D_F64 point2D = new Point2D_F64();
 
 	// list of vertexes
-	protected GrowQueue_I32 splits = new GrowQueue_I32();
-	GrowQueue_I32 work = new GrowQueue_I32();
+	protected DogArray_I32 splits = new DogArray_I32();
+	DogArray_I32 work = new DogArray_I32();
 
 	// indicates which line segments need to be checked for splits
-	protected GrowQueue_B changed = new GrowQueue_B();
+	protected DogArray_B changed = new DogArray_B();
 
 	// if there are more splits than this amount just give up.  It's probably noise
 	protected int abortSplits = Integer.MAX_VALUE;
@@ -99,7 +99,7 @@ public abstract class SplitMergeLineFit {
 	 * @param vertexes (Output) Indexes in the input list which are corners in the polyline
 	 * @return true if it could fit a polygon to the points or false if not
 	 */
-	public boolean process( List<Point2D_I32> list, GrowQueue_I32 vertexes ) {
+	public boolean process( List<Point2D_I32> list, DogArray_I32 vertexes ) {
 		this.contour = list;
 		this.minimumSideLengthPixel = minimumSideLength.computeI(contour.size());
 		splits.reset();

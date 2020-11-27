@@ -32,8 +32,8 @@ import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.GrowQueue_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,7 +60,7 @@ public class TestCompleteSift extends BoofStandardJUnit {
 
 		assertEquals(128,alg.getDescriptorLength());
 
-		GrowQueue_F64 orientations = alg.getOrientations();
+		DogArray_F64 orientations = alg.getOrientations();
 		FastAccess<ScalePoint> locations = alg.getLocations();
 		FastAccess<TupleDesc_F64> descriptions = alg.getDescriptions();
 

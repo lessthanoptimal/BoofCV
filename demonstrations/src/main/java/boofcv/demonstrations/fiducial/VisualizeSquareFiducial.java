@@ -47,7 +47,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -88,7 +88,7 @@ public class VisualizeSquareFiducial {
 		detector.process(undistorted);
 
 		System.out.println("Total Found: " + detector.squares.size());
-		FastQueue<FoundFiducial> fiducials = detector.getFound();
+		DogArray<FoundFiducial> fiducials = detector.getFound();
 
 		int N = Math.min(20, detector.squares.size());
 		ListDisplayPanel squares = new ListDisplayPanel();

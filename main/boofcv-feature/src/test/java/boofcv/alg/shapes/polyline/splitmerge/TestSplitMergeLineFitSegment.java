@@ -21,7 +21,7 @@ package boofcv.alg.shapes.polyline.splitmerge;
 import boofcv.struct.ConfigLength;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class TestSplitMergeLineFitSegment extends BoofStandardJUnit {
 
 	private static final ConfigLength MIN_SPLIT = ConfigLength.relative(0.1,0);
 
-	GrowQueue_I32 splits = new GrowQueue_I32();
+	DogArray_I32 splits = new DogArray_I32();
 	
 	/**
 	 * Tests contours with zero and one points in them

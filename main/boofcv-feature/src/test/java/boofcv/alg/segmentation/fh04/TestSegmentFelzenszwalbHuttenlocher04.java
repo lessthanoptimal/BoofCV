@@ -24,7 +24,7 @@ import boofcv.alg.segmentation.fh04.impl.FhEdgeWeights4_U8;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -208,13 +208,13 @@ public class TestSegmentFelzenszwalbHuttenlocher04 extends BoofStandardJUnit {
 
 		alg.computeOutput();
 
-		GrowQueue_I32 regionId = alg.getRegionId();
+		DogArray_I32 regionId = alg.getRegionId();
 		assertEquals(3,regionId.size);
 		assertEquals(2,regionId.get(0));
 		assertEquals(5,regionId.get(1));
 		assertEquals(15,regionId.get(2));
 
-		GrowQueue_I32 outputRegionSize = alg.getRegionSizes();
+		DogArray_I32 outputRegionSize = alg.getRegionSizes();
 		assertEquals(3,outputRegionSize.size);
 		assertEquals(3,outputRegionSize.get(0));
 		assertEquals(6,outputRegionSize.get(1));

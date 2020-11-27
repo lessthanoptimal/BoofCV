@@ -23,7 +23,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,8 +47,8 @@ public abstract class Motion2DPanel extends JPanel
 	Homography2D_F64 currToWorld = new Homography2D_F64();
 
 	// copies of feature location for GUI thread
-	FastQueue<Point2D_F64> inliers = new FastQueue<>(300, Point2D_F64::new);
-	FastQueue<Point2D_F64> allTracks = new FastQueue<>(300, Point2D_F64::new);
+	DogArray<Point2D_F64> inliers = new DogArray<>(300, Point2D_F64::new);
+	DogArray<Point2D_F64> allTracks = new DogArray<>(300, Point2D_F64::new);
 
 	boolean showImageView;
 	StitchingFromMotion2D.Corners corners;
@@ -117,8 +117,8 @@ public abstract class Motion2DPanel extends JPanel
 	 * Draw features after applying a homography transformation.
 	 */
 	protected void drawFeatures( float scale , int offsetX , int offsetY ,
-								 FastQueue<Point2D_F64> all,
-								 FastQueue<Point2D_F64> inliers,
+								 DogArray<Point2D_F64> all,
+								 DogArray<Point2D_F64> inliers,
 								 Homography2D_F64 currToGlobal, Graphics2D g2 ) {
 
 		Point2D_F64 distPt = new Point2D_F64();

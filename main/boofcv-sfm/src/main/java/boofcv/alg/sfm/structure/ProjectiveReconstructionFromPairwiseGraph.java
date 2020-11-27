@@ -21,8 +21,8 @@ package boofcv.alg.sfm.structure;
 import boofcv.alg.sfm.structure.PairwiseImageGraph.View;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -109,7 +109,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 		// TODO redo every component to use scaled pixels
 
 		// Find the common features
-		GrowQueue_I32 common = utils.findCommonFeatures(info.seed, info.motions);
+		DogArray_I32 common = utils.findCommonFeatures(info.seed, info.motions);
 		if (common.size < 6) // if less than the minimum it will fail
 			return false;
 
@@ -135,7 +135,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	/**
 	 * Initializes the scene at the seed view
 	 */
-	private boolean estimateInitialSceneFromSeed( LookupSimilarImages db, SeedInfo info, GrowQueue_I32 common ) {
+	private boolean estimateInitialSceneFromSeed( LookupSimilarImages db, SeedInfo info, DogArray_I32 common ) {
 		// initialize projective scene using common tracks
 		if (!initProjective.projectiveSceneN(db, info.seed, common, info.motions)) {
 			if (verbose != null) verbose.println("Failed initialize seed");

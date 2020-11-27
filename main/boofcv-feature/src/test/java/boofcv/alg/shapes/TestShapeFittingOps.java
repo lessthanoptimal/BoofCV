@@ -28,7 +28,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.trig.Circle2D_F64;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray_F64;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -204,7 +204,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 
 		// Pass in storage and see if it fails
 		found.error = 23; found.shape.center.x = 3;
-		GrowQueue_F64 optional = new GrowQueue_F64();
+		DogArray_F64 optional = new DogArray_F64();
 		optional.push(4);
 
 		ShapeFittingOps.averageCircle_I32(points, optional, found);
@@ -241,7 +241,7 @@ public class TestShapeFittingOps extends BoofStandardJUnit {
 
 		// Pass in storage and see if it fails
 		found.error = 23; found.shape.center.x = 3;
-		GrowQueue_F64 optional = new GrowQueue_F64();
+		DogArray_F64 optional = new DogArray_F64();
 		optional.push(4);
 
 		ShapeFittingOps.averageCircle_F64(points, optional, found);

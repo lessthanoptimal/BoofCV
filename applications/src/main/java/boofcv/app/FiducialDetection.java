@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
-import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.DogArray_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -232,7 +232,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		boolean robust=true;
 
 		List<String> paths = new ArrayList<>();
-		GrowQueue_F64 sizes = new GrowQueue_F64();
+		DogArray_F64 sizes = new DogArray_F64();
 		double borderWidth = 0.25;
 
 		for(; index < args.length; index++ ) {

@@ -25,7 +25,7 @@ import boofcv.struct.geo.PointIndex;
 import georegression.struct.GeoTuple;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Given a {@link SceneStructureMetric scene}, this will iterate through points in that scene that are inside
@@ -37,7 +37,7 @@ public class ScenePointsSetIterator<T extends PointIndex<T, P>, P extends GeoTup
 	// Reference to the scene. Only it's points are used
 	SceneStructureCommon scene;
 	// Set if points in the scene
-	GrowQueue_I32 indexes;
+	DogArray_I32 indexes;
 	// which element in 'indexes' is the current index
 	int index;
 	// Storage for the point. Returned by next
@@ -50,7 +50,7 @@ public class ScenePointsSetIterator<T extends PointIndex<T, P>, P extends GeoTup
 	 * @param indexes (Input) Indexes that specify which features in the scene it should be iterating through
 	 * @param point (Input,Output) Storage for the point. Make sure you get 3D vs homogenous correct.
 	 */
-	public ScenePointsSetIterator( SceneStructureCommon scene, GrowQueue_I32 indexes, T point ) {
+	public ScenePointsSetIterator( SceneStructureCommon scene, DogArray_I32 indexes, T point ) {
 		this(point);
 		initialize(scene, indexes);
 	}
@@ -60,7 +60,7 @@ public class ScenePointsSetIterator<T extends PointIndex<T, P>, P extends GeoTup
 	/**
 	 * Re-initializes and can be used to change the scene and set of indexes
 	 */
-	public void initialize( SceneStructureCommon scene, GrowQueue_I32 indexes ) {
+	public void initialize( SceneStructureCommon scene, DogArray_I32 indexes ) {
 		if (scene.isHomogenous() != point.p instanceof Point4D_F64)
 			throw new IllegalArgumentException("Scene point type does not match provided point type");
 

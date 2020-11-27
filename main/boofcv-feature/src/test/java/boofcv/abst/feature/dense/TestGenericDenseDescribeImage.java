@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -119,7 +119,7 @@ public class TestGenericDenseDescribeImage extends BoofStandardJUnit {
 		ImageType type = ImageType.single(GrayU8.class);
 		double inputRadius;
 		ImageBase image;
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
+		DogArray<Point2D_I32> points = new DogArray<>(Point2D_I32::new);
 		int count = 0;
 
 		@Override
