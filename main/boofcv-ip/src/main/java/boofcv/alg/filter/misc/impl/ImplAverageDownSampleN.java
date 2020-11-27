@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter.misc.impl;
 
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;

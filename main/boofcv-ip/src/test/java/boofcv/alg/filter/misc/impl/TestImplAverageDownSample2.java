@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter.misc.impl;
 
 import boofcv.BoofTesting;
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
@@ -28,11 +29,12 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static boofcv.alg.filter.misc.TestImplAverageDownSampleN.naive;
+import static boofcv.alg.filter.misc.impl.TestImplAverageDownSampleN.naive;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplAverageDownSample2 extends BoofStandardJUnit {
 
 	int numMethods = 7;
@@ -42,7 +44,7 @@ public class TestImplAverageDownSample2 extends BoofStandardJUnit {
 
 	@Test
 	public void compareToNaive() {
-		Method methods[] = ImplAverageDownSample2.class.getMethods();
+		Method[] methods = ImplAverageDownSample2.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;

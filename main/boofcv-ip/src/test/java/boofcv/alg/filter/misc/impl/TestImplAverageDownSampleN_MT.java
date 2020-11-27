@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter.misc.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 class TestImplAverageDownSampleN_MT extends CompareIdenticalFunctions
 {
 	int width = 640,height=480;

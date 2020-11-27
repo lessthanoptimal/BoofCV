@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter.misc.impl;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplAverageDownSampleN extends BoofStandardJUnit {
 
 	int numMethods = 7;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.alg.filter.misc.impl.*;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
@@ -37,7 +38,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"Duplicates", "rawtypes"})
 public class AverageDownSampleOps {
 	/**
 	 * Computes the length of a down sampled image based on the original length and the square width
@@ -64,17 +65,16 @@ public class AverageDownSampleOps {
 	}
 
 	public static void down(ImageBase input , int sampleWidth , ImageBase output ) {
-		switch( input.getImageType().getFamily()  ) {
-			case GRAY:
-				down((ImageGray)input, sampleWidth, (ImageGray)output );
+		switch (input.getImageType().getFamily()) {
+			case GRAY -> {
+				down((ImageGray)input, sampleWidth, (ImageGray)output);
 				return;
-
-			case PLANAR:
-				down((Planar) input, sampleWidth, (Planar)output );
+			}
+			case PLANAR -> {
+				down((Planar)input, sampleWidth, (Planar)output);
 				return;
-
-			case INTERLEAVED:
-				throw new IllegalArgumentException("Interleaved images are not yet supported");
+			}
+			case INTERLEAVED -> throw new IllegalArgumentException("Interleaved images are not yet supported");
 		}
 		throw new IllegalArgumentException("Unknown image type");
 	}
