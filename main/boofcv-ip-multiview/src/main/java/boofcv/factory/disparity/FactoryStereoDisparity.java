@@ -365,4 +365,18 @@ public class FactoryStereoDisparity {
 			throw new IllegalArgumentException("Only U8 input supported");
 		}
 	}
+
+	/**
+	 * Post processing filter the removes small regions from disparity image
+	 */
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>>
+	DisparitySmoother<T, DI> removeSpeckle( @Nullable ConfigSpeckleFilter config, Class<DI> dispType ) {
+		if (config==null)
+			config = new ConfigSpeckleFilter();
+
+		if (dispType != GrayF32.class)
+			throw new IllegalArgumentException("Not supported yet");
+
+		return new DisparitySmootherSpeckleFilter<>(config);
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,8 @@ import boofcv.struct.border.BorderType;
  * @author Peter Abeles
  */
 public class BoofDefaults {
+	/** Indicates that verbose mode should print out profiling information */
+	public static final String VERBOSE_PROFILING = "profile";
 
 	/**
 	 * Default tolerance for floats
@@ -41,5 +43,4 @@ public class BoofDefaults {
 
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
-
 }

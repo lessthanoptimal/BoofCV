@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 
 	@Override
 	public int getDisparityRange() {
-		return alg.getDisparityMax() - alg.getDisparityMin();
+		return alg.getDisparityRange();
 	}
 
 	@Override

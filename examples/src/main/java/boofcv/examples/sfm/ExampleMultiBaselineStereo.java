@@ -52,6 +52,7 @@ import org.ddogleg.struct.DogArray_I32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Multi Baseline Stereo (MBS) is a problem where you have one common/center image with multiple paired images that have
@@ -66,7 +67,8 @@ public class ExampleMultiBaselineStereo {
 	public static void main( String[] args ) {
 		// Compute a sparse reconstruction. This will give us intrinsic and extrinsic for all views
 		var example = new ExampleMultiViewSparseReconstruction();
-		example.compute("forest_path_01.mp4");
+//		example.compute("forest_path_01.mp4");
+		example.compute("house_01.mp4");
 
 		// We need a way to load images based on their ID. In this particular case the ID encodes the array index.
 		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);
@@ -120,9 +122,17 @@ public class ExampleMultiBaselineStereo {
 		// This is the actual MBS algorithm mentioned previously. It selects the best disparity for each pixel
 		// in the original image using a median filter.
 		var multiBaseline = new MultiBaselineStereoIndependent<>(imageLookup, ImageType.SB_U8);
-		multiBaseline.setVerbose(System.out, null);
 		multiBaseline.setStereoDisparity(
 				FactoryStereoDisparity.blockMatchBest5(configDisparity, GrayU8.class, GrayF32.class));
+
+		// Print out verbose debugging and profile information
+		multiBaseline.setVerbose(System.out, null);
+		multiBaseline.setVerboseProfiling(System.out);
+
+		// Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
+		multiBaseline.setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
+		// Print out debugging information from the smoother
+		Objects.requireNonNull(multiBaseline.getDisparitySmoother()).setVerbose(System.out,null);
 
 		// Creates a list where you can switch between different images/visualizations
 		var listDisplay = new ListDisplayPanel();

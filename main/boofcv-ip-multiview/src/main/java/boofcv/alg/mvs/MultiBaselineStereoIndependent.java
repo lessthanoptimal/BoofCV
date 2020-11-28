@@ -18,6 +18,8 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.BoofDefaults;
+import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.ImageDistort;
@@ -73,8 +75,21 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	/** Computes disparity between each image pair. Must be set. */
 	@Getter @Setter @Nullable StereoDisparity<Image, GrayF32> stereoDisparity = null;
 
+	/** Optional removal of speckle noise from disparity image. */
+	@Getter @Setter @Nullable DisparitySmoother<Image, GrayF32> disparitySmoother = null;
+
 	/** Used to retrieve images by their ID */
 	@Getter @Setter LookUpImages lookUpImages = null;
+
+	//------------ Profiling information
+	/** Sum of disparity calculations */
+	@Getter double timeDisparity;
+	/** Sum of disparity smoothing */
+	@Getter double timeDisparitySmooth;
+	/** Total time spent looking up images */
+	@Getter double timeLookUpImages;
+	/** Total time for all processing */
+	@Getter double timeTotal;
 
 	//------------ References to input objects
 	private SceneStructureMetric scene; // Camera placement and parameters
@@ -107,6 +122,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 	// Where verbose stdout is printed to
 	@Nullable PrintStream verbose = null;
+	@Nullable @Getter @Setter PrintStream verboseProfiling = null;
 
 	public MultiBaselineStereoIndependent( LookUpImages lookUpImages, ImageType<Image> imageType ) {
 		this(imageType);
@@ -132,6 +148,13 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	 */
 	public boolean process( SceneStructureMetric scene, int targetIdx, DogArray_I32 pairIdxs,
 							BoofLambdas.IndexToString sbaIndexToViewID ) {
+		// Reset profiling
+		timeDisparity = 0;
+		timeDisparitySmooth = 0;
+		timeTotal = 0;
+		timeLookUpImages = 0;
+
+		long time0 = System.nanoTime();
 		requireNonNull(stereoDisparity, "stereoDisparity must be configured");
 		requireNonNull(lookUpImages, "lookUpImages must be configured");
 		this.scene = scene;
@@ -141,6 +164,9 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 			if (verbose != null) verbose.println("Failed to load center image[" + targetIdx + "]");
 			return false;
 		}
+		long time1 = System.nanoTime();
+		timeLookUpImages += (time1 - time0)*1e-6;
+
 		int targetCamera = scene.views.get(targetIdx).camera;
 		computeRectification.setView1(scene.cameras.get(targetCamera).model, image1.width, image1.height);
 		scene.getWorldToView(scene.views.get(targetIdx), world_to_left, tmpse3);
@@ -173,6 +199,17 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		fusedParam.baseline = performFusion.getFusedBaseline();
 		CommonOps_DDRM.setIdentity(fusedParam.rotateToRectified);
 
+		// Filter disparity
+		filterDisparity(image1, fusedDisparity, fusedParam);
+
+		timeTotal = (System.nanoTime() - time0)*1e-6;
+
+		// Print out profiling information
+		if (verboseProfiling != null) {
+			verboseProfiling.printf("MultiBaseline: Timing (ms), disp=%5.1f smooth=%5.1f lookup=%5.1f all=%5.1f\n",
+					timeDisparity, timeDisparitySmooth, timeLookUpImages, timeTotal);
+		}
+
 		return true;
 	}
 
@@ -183,11 +220,15 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	 * @param rightIdx Which view to use for the right view
 	 */
 	private boolean computeDisparity( Image image1, int rightIdx, String rightID, StereoResults info ) {
+		long time0 = System.nanoTime();
 		// Look up the second image in the stereo image
 		if (!lookUpImages.loadImage(rightID, image2)) {
 			if (verbose != null) verbose.println("Failed to load second image[" + rightIdx + "]");
 			return false;
 		}
+		long time1 = System.nanoTime();
+		timeLookUpImages += (time1 - time0)*1e-6;
+
 		int rightCamera = scene.views.get(rightIdx).camera;
 
 		// Compute the baseline between the two cameras
@@ -232,11 +273,32 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		param.baseline = left_to_right.T.norm();
 		PerspectiveOps.matrixToPinhole(info.rectifiedK, rectifiedShape.width, rectifiedShape.height, param.pinhole);
 
+		long time2 = System.nanoTime();
+		timeDisparity += (time2 - time1)*1e-6;
+
+		// Filter disparity
+		filterDisparity(rectified1, info.disparity, info.param);
+
 		return true;
+	}
+
+	/**
+	 * Remove speckle noise from the disparity image. Noise is often small disconnected regions. There will be
+	 * false positives though.
+	 */
+	private void filterDisparity( Image left, GrayF32 disparity, DisparityParameters param ) {
+		long time0 = System.nanoTime();
+		if (disparitySmoother != null)
+			disparitySmoother.process(left, disparity, param.disparityRange);
+		timeDisparitySmooth += (System.nanoTime() - time0)*1e-6;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = out;
+		this.verboseProfiling = null;
+		if (configuration != null && configuration.contains(BoofDefaults.VERBOSE_PROFILING)) {
+			verboseProfiling = out;
+		}
 	}
 
 	/**
