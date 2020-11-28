@@ -26,7 +26,7 @@ import boofcv.alg.mvs.StereoPairGraph;
 import boofcv.alg.sfm.structure.PairwiseImageGraph;
 import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.core.image.LookUpColorRgbFormats;
-import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.ConfigDisparitySGM;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ShowImages;
@@ -61,16 +61,18 @@ import java.util.List;
 public class ExampleMultiViewDenseReconstruction {
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
-//		example.compute("house_01.mp4");
+		example.compute("house_01.mp4");
 //		example.compute("forest_path_01.mp4");
-		example.compute("rock_01.mp4");
+//		example.compute("rock_01.mp4");
 
-		// Configure how a disparity image is computed
-		var configDisparity = new ConfigDisparityBMBest5();
-		configDisparity.validateRtoL = 1;
-		configDisparity.texture = 0.5;
-		configDisparity.regionRadiusX = configDisparity.regionRadiusY = 4;
-		configDisparity.disparityRange = 50;
+		// SGM is a reasonable trade between quality and speed.
+		var configSgm = new ConfigDisparitySGM();
+		configSgm.validateRtoL = 0;
+		configSgm.texture = 0.75;
+		configSgm.disparityRange = 50;
+		configSgm.paths = ConfigDisparitySGM.Paths.P4;
+		configSgm.configBlockMatch.radiusX = 3;
+		configSgm.configBlockMatch.radiusY = 3;
 
 		// Looks up images based on their index in the file list
 		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);
@@ -80,8 +82,9 @@ public class ExampleMultiViewDenseReconstruction {
 		// Note that the stereo disparity algorithm used must output a GrayF32 disparity image as much of the code
 		// is hard coded to use it. MVS would not work without sub-pixel enabled.
 		var mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, ImageType.SB_U8);
-//		mvs.setVerbose(System.out, null);
-		mvs.setStereoDisparity(FactoryStereoDisparity.blockMatchBest5(configDisparity, GrayU8.class, GrayF32.class));
+		mvs.setStereoDisparity(FactoryStereoDisparity.sgm(configSgm, GrayU8.class, GrayF32.class));
+		// Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
+		mvs.getComputeFused().setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
 
 		// Grab intermediate results as they are computed
 		mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
@@ -132,7 +135,7 @@ public class ExampleMultiViewDenseReconstruction {
 		// Compute the dense 3D point cloud
 		BoofMiscOps.profile(() -> mvs.process(_structure, mvsGraph), "MVS Cloud");
 
-		System.out.println("Dense Cloud Size: "+mvs.getCloud().size());
+		System.out.println("Dense Cloud Size: " + mvs.getCloud().size());
 
 		// Colorize the cloud to make it easier to view. This is done by projecting points back into the
 		// first view they were seen in and reading the color

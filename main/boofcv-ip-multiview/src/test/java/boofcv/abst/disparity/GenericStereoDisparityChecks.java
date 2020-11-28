@@ -81,6 +81,10 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 				StereoDisparity<Image, Disparity> alg = createAlg(disparityMin, range);
 				alg.process(left, right);
 				checkDisparity(disparityMin, range, alg.getDisparity());
+
+				assertEquals(disparityMin, alg.getDisparityMin());
+				assertEquals(range, alg.getDisparityRange());
+				assertTrue(range <= alg.getInvalidValue());
 			}
 		}
 	}

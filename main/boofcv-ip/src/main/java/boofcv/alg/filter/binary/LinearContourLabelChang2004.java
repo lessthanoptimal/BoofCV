@@ -23,6 +23,8 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 
 /**
@@ -59,21 +61,21 @@ import org.ddogleg.struct.DogArray;
 public class LinearContourLabelChang2004 {
 
 	// The maximum number of elements in a contour that will be recorded
-	private int minContourSize = 0;
+	private @Getter @Setter int minContourSize = 0;
 	// The maximum number of elements in a contour that will be recorded
-	private int maxContourSize = Integer.MAX_VALUE;
+	private @Getter @Setter int maxContourSize = Integer.MAX_VALUE;
 	// If false it will not save internal contours as they are found
-	private boolean saveInternalContours = true;
+	private @Getter @Setter boolean saveInternalContours = true;
 
 	// traces edge pixels
 	private ContourTracer tracer;
 
 	// binary image with a border of zero.
-	private GrayU8 border = new GrayU8(1,1);
+	private final GrayU8 border = new GrayU8(1,1);
 
 	// predeclared/recycled data structures
-	PackedSetsPoint2D_I32 packedPoints = new PackedSetsPoint2D_I32(2000);
-	private DogArray<ContourPacked> contours = new DogArray<>(ContourPacked::new);
+	@Getter PackedSetsPoint2D_I32 packedPoints = new PackedSetsPoint2D_I32(2000);
+	private final DogArray<ContourPacked> contours = new DogArray<>(ContourPacked::new);
 
 	// internal book keeping variables
 	private int x,y,indexIn,indexOut;
@@ -209,39 +211,10 @@ public class LinearContourLabelChang2004 {
 		}
 	}
 
-	public PackedSetsPoint2D_I32 getPackedPoints() {
-		return packedPoints;
-	}
-
-	public int getMinContourSize() {
-		return minContourSize;
-	}
-
-	public void setMinContourSize(int minContourSize) {
-		this.minContourSize = minContourSize;
-	}
-
-	public int getMaxContourSize() {
-		return maxContourSize;
-	}
-
-	public void setMaxContourSize(int maxContourSize) {
-		this.maxContourSize = maxContourSize;
-	}
-
-	public boolean isSaveInternalContours() {
-		return saveInternalContours;
-	}
-
-	public void setSaveInternalContours(boolean saveInternalContours) {
-		this.saveInternalContours = saveInternalContours;
-	}
-
 	public void setConnectRule( ConnectRule rule ) {
 		if( rule != tracer.getConnectRule() )
 			tracer = new ContourTracer(rule);
 	}
-
 
 	public ConnectRule getConnectRule() {
 		return tracer.getConnectRule();

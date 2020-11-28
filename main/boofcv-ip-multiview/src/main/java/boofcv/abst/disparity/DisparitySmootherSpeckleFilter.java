@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.abst.disparity;
+
+import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.PrintStream;
+import java.util.Set;
+
+/**
+ * Wrapper around {@link ConnectedTwoRowSpeckleFiller} for {@link DisparitySmoother}
+ *
+ * @author Peter Abeles
+ */
+public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp extends ImageGray<Disp>>
+		implements DisparitySmoother<Image,Disp> {
+
+	@Getter ConnectedTwoRowSpeckleFiller filler = new ConnectedTwoRowSpeckleFiller();
+	@Getter ConfigSpeckleFilter config;
+
+	@Nullable PrintStream out;
+
+	public DisparitySmootherSpeckleFilter( ConfigSpeckleFilter config ) {
+		this.config = config;
+	}
+
+	@Override public void process( Image image, Disp disp, int disparityRange ) {
+
+		int size = config.maximumArea.computeI(disp.totalPixels());
+		if (disp instanceof GrayF32)
+			filler.process((GrayF32)disp,size,config.similarTol,disparityRange);
+		else
+			throw new IllegalArgumentException("Image type not supported yet");
+
+		if (out!=null)
+			out.println("Speckle maxArea="+size+" filled="+filler.getTotalFilled());
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.out = out;
+	}
+}
