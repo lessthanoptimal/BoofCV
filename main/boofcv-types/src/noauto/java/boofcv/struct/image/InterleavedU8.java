@@ -38,8 +38,7 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 		super(width, height, numBands);
 	}
 
-	public InterleavedU8() {
-	}
+	public InterleavedU8() {}
 
 	@Override
 	public ImageDataType getDataType() {

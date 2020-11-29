@@ -18,11 +18,14 @@
 
 package boofcv.struct.image;
 
+import lombok.Data;
+
 /**
  * Specifies the width and height of an image
  *
  * @author Peter Abeles
  */
+@Data
 public class ImageDimension {
 	public int width;
 	public int height;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,45 +27,42 @@ package boofcv.struct.image;
  */
 public class GrayS32 extends GrayI<GrayS32> {
 
-	public int data[];
+	public int[] data;
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
-	 * @param width  number of columns in the image.
+	 * @param width number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public GrayS32(int width, int height) {
+	public GrayS32( int width, int height ) {
 		super(width, height);
 	}
 
-	/**
-	 * Creates an image with no data declared and the width/height set to zero.
-	 */
-	public GrayS32() {
-	}
+	/** Creates an image with no data declared and the width/height set to zero. */
+	public GrayS32() {}
 
 	@Override
-	public void unsafe_set(int x, int y, int value) {
+	public void unsafe_set( int x, int y, int value ) {
 		data[getIndex(x, y)] = value;
 	}
 
 	@Override
-	public int unsafe_get(int x, int y) {
+	public int unsafe_get( int x, int y ) {
 		return data[getIndex(x, y)];
 	}
 
 	/**
 	 * Sets the value of the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
 	@Override
-	public void set(int x, int y, int value) {
+	public void set( int x, int y, int value ) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
+			throw new ImageAccessException("Requested pixel is out of bounds: " + x + " " + y);
 
 		data[getIndex(x, y)] = value;
 	}
@@ -81,24 +78,24 @@ public class GrayS32 extends GrayI<GrayS32> {
 	}
 
 	@Override
-	protected void _setData(Object data) {
-		this.data = (int[]) data;
+	protected void _setData( Object data ) {
+		this.data = (int[])data;
 	}
 
 	@Override
-	public GrayS32 createNew(int imgWidth, int imgHeight) {
+	public GrayS32 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new GrayS32();
 		return new GrayS32(imgWidth, imgHeight);
 	}
 
 	@Override
-	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		int[] dst = (int[])array;
 		int idxSrc = startIndex + stride*row0 + col;
 		int idxDst = offset;
-		int end = idxSrc + (row1-row0)*stride;
-		while( idxSrc < end ) {
+		int end = idxSrc + (row1 - row0)*stride;
+		while (idxSrc < end) {
 			dst[idxDst++] = data[idxSrc];
 			idxSrc += stride;
 		}
@@ -108,7 +105,7 @@ public class GrayS32 extends GrayI<GrayS32> {
 		return data;
 	}
 
-	public void setData(int[] data) {
+	public void setData( int[] data ) {
 		this.data = data;
 	}
 }

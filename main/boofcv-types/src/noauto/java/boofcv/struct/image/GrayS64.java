@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,23 +27,20 @@ package boofcv.struct.image;
  */
 public class GrayS64 extends ImageGray<GrayS64> {
 
-	public long data[];
+	public long[] data;
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
-	 * @param width  number of columns in the image.
+	 * @param width number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public GrayS64(int width, int height) {
+	public GrayS64( int width, int height ) {
 		super(width, height);
 	}
 
-	/**
-	 * Creates an image with no data declared and the width/height set to zero.
-	 */
-	public GrayS64() {
-	}
+	/** Creates an image with no data declared and the width/height set to zero. */
+	public GrayS64() {}
 
 	/**
 	 * Returns the value of the specified pixel.
@@ -52,32 +49,32 @@ public class GrayS64 extends ImageGray<GrayS64> {
 	 * @param y pixel coordinate.
 	 * @return Pixel intensity value.
 	 */
-	public long get(int x, int y) {
+	public long get( int x, int y ) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
+			throw new ImageAccessException("Requested pixel is out of bounds: " + x + " " + y);
 
-		return unsafe_get(x,y);
+		return unsafe_get(x, y);
 	}
 
-	public long unsafe_get(int x, int y) {
+	public long unsafe_get( int x, int y ) {
 		return data[getIndex(x, y)];
 	}
 
 	/**
 	 * Sets the value of the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
-	public void set(int x, int y, long value) {
+	public void set( int x, int y, long value ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
 		unsafe_set(x, y, value);
 	}
 
-	public void unsafe_set(int x, int y, long value) {
+	public void unsafe_set( int x, int y, long value ) {
 		data[getIndex(x, y)] = value;
 	}
 
@@ -92,24 +89,24 @@ public class GrayS64 extends ImageGray<GrayS64> {
 	}
 
 	@Override
-	protected void _setData(Object data) {
-		this.data = (long[]) data;
+	protected void _setData( Object data ) {
+		this.data = (long[])data;
 	}
 
 	@Override
-	public GrayS64 createNew(int imgWidth, int imgHeight) {
+	public GrayS64 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new GrayS64();
 		return new GrayS64(imgWidth, imgHeight);
 	}
 
 	@Override
-	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		long[] dst = (long[])array;
 		int idxSrc = startIndex + stride*row0 + col;
 		int idxDst = offset;
-		int end = idxSrc + (row1-row0)*stride;
-		while( idxSrc < end ) {
+		int end = idxSrc + (row1 - row0)*stride;
+		while (idxSrc < end) {
 			dst[idxDst++] = data[idxSrc];
 			idxSrc += stride;
 		}
@@ -119,7 +116,7 @@ public class GrayS64 extends ImageGray<GrayS64> {
 		return data;
 	}
 
-	public void setData(long[] data) {
+	public void setData( long[] data ) {
 		this.data = data;
 	}
 
@@ -127,7 +124,7 @@ public class GrayS64 extends ImageGray<GrayS64> {
 	public void print() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				System.out.printf("%3d ",get(x,y));
+				System.out.printf("%3d ", get(x, y));
 			}
 			System.out.println();
 		}

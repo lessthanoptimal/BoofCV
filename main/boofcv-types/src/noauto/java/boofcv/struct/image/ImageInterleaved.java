@@ -63,8 +63,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 		this.imageType.numBands = numBands;
 	}
 
-	protected ImageInterleaved() {
-	}
+	protected ImageInterleaved() {}
 
 	/**
 	 * Creates a sub-image from 'this' image.  The subimage will share the same internal array

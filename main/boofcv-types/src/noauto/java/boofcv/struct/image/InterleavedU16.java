@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,16 +30,15 @@ public class InterleavedU16 extends InterleavedI16<InterleavedU16> {
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.
 	 *
-	 * @param width	number of columns in the image.
-	 * @param height   number of rows in the image.
+	 * @param width number of columns in the image.
+	 * @param height number of rows in the image.
 	 * @param numBands number of bands/colors in the image.
 	 */
-	public InterleavedU16(int width, int height, int numBands) {
+	public InterleavedU16( int width, int height, int numBands ) {
 		super(width, height, numBands);
 	}
 
-	public InterleavedU16() {
-	}
+	public InterleavedU16() {}
 
 	@Override
 	public ImageDataType getDataType() {
@@ -47,7 +46,7 @@ public class InterleavedU16 extends InterleavedI16<InterleavedU16> {
 	}
 
 	@Override
-	public void unsafe_get(int x, int y, int[] storage) {
+	public void unsafe_get( int x, int y, int[] storage ) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index] & 0xFFFF;
@@ -57,13 +56,13 @@ public class InterleavedU16 extends InterleavedI16<InterleavedU16> {
 	/**
 	 * Returns the value of the specified band in the specified pixel.
 	 *
-	 * @param x	pixel coordinate.
-	 * @param y	pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param band which color band in the pixel
 	 * @return an intensity value.
 	 */
 	@Override
-	public int getBand(int x, int y, int band) {
+	public int getBand( int x, int y, int band ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
 		if (band < 0 || band >= numBands)
@@ -72,9 +71,8 @@ public class InterleavedU16 extends InterleavedI16<InterleavedU16> {
 		return data[getIndex(x, y, band)] & 0xFFFF;
 	}
 
-
 	@Override
-	public InterleavedU16 createNew(int imgWidth, int imgHeight) {
+	public InterleavedU16 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedU16();
 		return new InterleavedU16(imgWidth, imgHeight, numBands);

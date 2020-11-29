@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.struct.image;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -29,32 +31,20 @@ import java.io.Serializable;
  */
 @SuppressWarnings({"NullAway.Init"})
 public abstract class ImageBase<T extends ImageBase> implements Serializable, Cloneable {
-	/**
-	 * Index of the first pixel in the data array
-	 */
-	public int startIndex;
-	/**
-	 * How many elements need to be skipped over to go one row down.
-	 */
-	public int stride;
+	/** Index of the first pixel in the data array */
+	public @Getter @Setter int startIndex;
+	/** How many elements need to be skipped over to go one row down. */
+	public @Getter @Setter int stride;
 
-	/**
-	 * Number of columns in the image.
-	 */
-	public int width;
-	/**
-	 * Number of rows in the image.
-	 */
-	public int height;
+	/** Number of columns in the image. */
+	public @Getter @Setter int width;
+	/** Number of rows in the image. */
+	public @Getter @Setter int height;
 
-	/**
-	 * Indicates if it is a sub-image or not
-	 */
+	/** Indicates if it is a sub-image or not */
 	public boolean subImage = false;
 
-	/**
-	 * Description of the image data structure
-	 */
+	/** Description of the image data structure */
 	public ImageType imageType;
 
 	/**
@@ -141,38 +131,6 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 
 	public int getIndex(int x, int y) {
 		return startIndex + y * stride + x;
-	}
-
-	public final int getWidth() {
-		return width;
-	}
-
-	public final void setWidth(int width) {
-		this.width = width;
-	}
-
-	public final int getHeight() {
-		return height;
-	}
-
-	public final void setHeight(int height) {
-		this.height = height;
-	}
-
-	public int getStartIndex() {
-		return startIndex;
-	}
-
-	public void setStartIndex(int startIndex) {
-		this.startIndex = startIndex;
-	}
-
-	public int getStride() {
-		return stride;
-	}
-
-	public void setStride(int stride) {
-		this.stride = stride;
 	}
 
 	public int indexToPixelX( int index ) {

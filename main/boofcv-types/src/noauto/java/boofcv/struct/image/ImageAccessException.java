@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,18 +25,17 @@ package boofcv.struct.image;
  * @author Peter Abeles
  */
 public class ImageAccessException extends RuntimeException {
-	public ImageAccessException() {
-	}
+	public ImageAccessException() {}
 
-	public ImageAccessException(String message) {
+	public ImageAccessException( String message ) {
 		super(message);
 	}
 
-	public ImageAccessException(String message, Throwable cause) {
+	public ImageAccessException( String message, Throwable cause ) {
 		super(message, cause);
 	}
 
-	public ImageAccessException(Throwable cause) {
+	public ImageAccessException( Throwable cause ) {
 		super(cause);
 	}
 }

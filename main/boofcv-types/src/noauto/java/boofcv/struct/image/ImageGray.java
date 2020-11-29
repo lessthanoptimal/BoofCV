@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,18 +69,17 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * Creates a new image with all of its parameters initialized, including the
 	 * data array.
 	 *
-	 * @param width  Image's width.
+	 * @param width Image's width.
 	 * @param height Image's height.
 	 */
-	protected ImageGray(int width, int height) {
-		initialize(width,height);
+	protected ImageGray( int width, int height ) {
+		initialize(width, height);
 	}
 
-	protected ImageGray() {
-	}
+	protected ImageGray() {}
 
-	protected void initialize(int width, int height) {
-		_setData(Array.newInstance(getDataType().getDataType(), width * height));
+	protected void initialize( int width, int height ) {
+		_setData(Array.newInstance(getDataType().getDataType(), width*height));
 		this.startIndex = 0;
 		this.stride = width;
 		this.width = width;
@@ -93,7 +92,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * that stores each pixel's value.  Any changes to pixel values in the original image or the sub-image will
 	 * affect the other. A sub-image must be a sub-set of the original image and cannot specify a bounds larger
 	 * than the original.
-	  *</p>
+	 * </p>
 	 *
 	 * <p>
 	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive.  Thus,
@@ -108,7 +107,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * @return A sub-image of 'this' image.
 	 */
 	@Override
-	public T subimage(int x0, int y0, int x1, int y1, @Nullable T subimage) {
+	public T subimage( int x0, int y0, int x1, int y1, @Nullable T subimage ) {
 		if (x0 < 0 || y0 < 0)
 			throw new IllegalArgumentException("x0 or y0 is less than zero");
 		if (x1 < x0 || y1 < y0)
@@ -116,7 +115,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 		if (x1 > width || y1 > height)
 			throw new IllegalArgumentException("x1 or y1 is more than the width or height respectively");
 
-		if( subimage == null ) {
+		if (subimage == null) {
 			subimage = createNew(-1, -1);
 		}
 
@@ -124,7 +123,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 		subimage.stride = Math.max(width, stride);// ok why is this done?!?!  Shouldn't it always be stride?
 		subimage.width = x1 - x0;
 		subimage.height = y1 - y0;
-		subimage.startIndex = startIndex + y0 * stride + x0;
+		subimage.startIndex = startIndex + y0*stride + x0;
 		subimage.subImage = true;
 		subimage.imageType = imageType;
 
@@ -139,17 +138,17 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * @param height The new height.
 	 */
 	@Override
-	public void reshape(int width, int height) {
-		if( this.width == width && this.height == height )
+	public void reshape( int width, int height ) {
+		if (this.width == width && this.height == height)
 			return;
-		if( isSubimage() )
+		if (isSubimage())
 			throw new IllegalArgumentException("Can't reshape sub-images");
-		
+
 		Object data = _getData();
 
-		if( Array.getLength(data) < width*height ) {
+		if (Array.getLength(data) < width*height) {
 			// declare a new larger image to store the data
-			ImageGray a = createNew(width,height);
+			ImageGray a = createNew(width, height);
 			_setData(a._getData());
 		}
 
@@ -162,7 +161,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * Reshape to match the input image's width and height
 	 */
 	public void reshape( ImageBase img ) {
-		reshape(img.width,img.height);
+		reshape(img.width, img.height);
 	}
 
 	/**
@@ -173,12 +172,12 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 */
 	@SuppressWarnings({"SuspiciousSystemArraycopy"})
 	@Override
-	public void setTo(T orig) {
-		if( width != orig.width || height != orig.height)
-			reshape(orig.width,orig.height);
+	public void setTo( T orig ) {
+		if (width != orig.width || height != orig.height)
+			reshape(orig.width, orig.height);
 
 		if (!orig.isSubimage() && !isSubimage()) {
-			System.arraycopy(orig._getData(), orig.startIndex, _getData(), startIndex, stride * height);
+			System.arraycopy(orig._getData(), orig.startIndex, _getData(), startIndex, stride*height);
 		} else {
 			int indexSrc = orig.startIndex;
 			int indexDst = startIndex;
@@ -194,13 +193,11 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 * Creates a single band image of the specified type that will have the same
 	 * shape as this image
 	 */
-	public <B extends ImageGray<B>> B createSameShape( Class<B> type )
-	{
-		return create(type,width,height);
+	public <B extends ImageGray<B>> B createSameShape( Class<B> type ) {
+		return create(type, width, height);
 	}
 
-	public static <B extends ImageGray<B>> B create( Class<B> type , int width, int height )
-	{
+	public static <B extends ImageGray<B>> B create( Class<B> type, int width, int height ) {
 		if (type == GrayU8.class) {
 			return (B)new GrayU8(width, height);
 		} else if (type == GrayS8.class) {
@@ -217,17 +214,17 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 			return (B)new GrayF32(width, height);
 		} else if (type == GrayF64.class) {
 			return (B)new GrayF64(width, height);
-		} else if( (Class)type == GrayI.class ) {
+		} else if ((Class)type == GrayI.class) {
 			// ImageInteger is a generic type, so just create something
-			return (B)new GrayS32(width,height);
+			return (B)new GrayS32(width, height);
 		}
-		throw new IllegalArgumentException("Unknown type "+type);
+		throw new IllegalArgumentException("Unknown type " + type);
 	}
 
 	@Override
-	public void copyRow(int row, int col0, int col1, int offset, Object array) {
+	public void copyRow( int row, int col0, int col1, int offset, Object array ) {
 		int idxSrc = startIndex + stride*row + col0;
-		System.arraycopy(_getData(),idxSrc,array,offset,col1-col0);
+		System.arraycopy(_getData(), idxSrc, array, offset, col1 - col0);
 	}
 
 	/**
@@ -254,5 +251,5 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 *
 	 * @param data data array
 	 */
-	protected abstract void _setData(Object data);
+	protected abstract void _setData( Object data );
 }

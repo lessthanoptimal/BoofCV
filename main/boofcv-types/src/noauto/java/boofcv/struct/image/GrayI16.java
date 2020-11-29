@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,49 +27,48 @@ package boofcv.struct.image;
  */
 public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 
-	public short data[];
+	public short[] data;
 
-	protected GrayI16(int width, int height) {
+	protected GrayI16( int width, int height ) {
 		super(width, height);
 	}
 
-	protected GrayI16() {
-	}
+	protected GrayI16() {}
 
 	/**
 	 * Sets the value of the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
 	@Override
-	public void set(int x, int y, int value) {
+	public void set( int x, int y, int value ) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
+			throw new ImageAccessException("Requested pixel is out of bounds: " + x + " " + y);
 
-		data[getIndex(x, y)] = (short) value;
+		data[getIndex(x, y)] = (short)value;
 	}
 
 	/**
 	 * Sets the value of the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
 	@Override
-	public void unsafe_set(int x, int y, int value) {
-		data[getIndex(x, y)] = (short) value;
+	public void unsafe_set( int x, int y, int value ) {
+		data[getIndex(x, y)] = (short)value;
 	}
 
 	@Override
-	public void copyCol(int col , int row0 , int row1 , int offset, Object array) {
+	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		short[] dst = (short[])array;
 		int idxSrc = startIndex + stride*row0 + col;
 		int idxDst = offset;
-		int end = idxSrc + (row1-row0)*stride;
-		while( idxSrc < end ) {
+		int end = idxSrc + (row1 - row0)*stride;
+		while (idxSrc < end) {
 			dst[idxDst++] = data[idxSrc];
 			idxSrc += stride;
 		}
@@ -81,8 +80,8 @@ public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 	}
 
 	@Override
-	protected void _setData(Object data) {
-		this.data = (short[]) data;
+	protected void _setData( Object data ) {
+		this.data = (short[])data;
 	}
 
 	@Override
@@ -94,7 +93,7 @@ public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 		return data;
 	}
 
-	public void setData(short[] data) {
+	public void setData( short[] data ) {
 		this.data = data;
 	}
 }

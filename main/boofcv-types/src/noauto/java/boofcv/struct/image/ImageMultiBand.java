@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,17 +35,19 @@ public abstract class ImageMultiBand<T extends ImageMultiBand<T>> extends ImageB
 	/**
 	 * Changes the number of bands in the image while keeping the width and height the same. A simple reshape
 	 * is done if possible, if not then new internal data is defined
+	 *
 	 * @param bands number of bands
 	 */
 	public abstract void setNumberOfBands( int bands );
 
 	/**
 	 * Reshape for MultiBand images which allows the number of bands to be changed a the same time too
+	 *
 	 * @param width Desired image width
 	 * @param height Desired image height
 	 * @param numberOfBands Desired number of bands
 	 */
-	public void reshape( int width , int height , int numberOfBands ) {
+	public void reshape( int width, int height, int numberOfBands ) {
 		reshape(width, height);
 		setNumberOfBands(numberOfBands);
 	}
@@ -54,13 +56,13 @@ public abstract class ImageMultiBand<T extends ImageMultiBand<T>> extends ImageB
 	 * Reshapes to match the (width,height,bands) of input image
 	 */
 	public void reshape( ImageMultiBand image ) {
-		reshape(image.width,image.height,image.getNumBands());
+		reshape(image.width, image.height, image.getNumBands());
 	}
 
 	/**
 	 * Reshapes to match the (width,height) of input image. Number of bands is left the same
 	 */
 	public void reshape( ImageGray image ) {
-		reshape(image.width,image.height);
+		reshape(image.width, image.height);
 	}
 }
