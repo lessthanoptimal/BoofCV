@@ -85,6 +85,8 @@ public class ExampleMultiViewDenseReconstruction {
 		mvs.setStereoDisparity(FactoryStereoDisparity.sgm(configSgm, GrayU8.class, GrayF32.class));
 		// Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
 		mvs.getComputeFused().setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
+		// Print out profiling info from multi baseline stereo
+		mvs.getComputeFused().setVerboseProfiling(System.out);
 
 		// Grab intermediate results as they are computed
 		mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {

@@ -52,7 +52,6 @@ import org.ddogleg.struct.DogArray_I32;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 
 /**
  * Multi Baseline Stereo (MBS) is a problem where you have one common/center image with multiple paired images that have
@@ -132,7 +131,7 @@ public class ExampleMultiBaselineStereo {
 		// Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
 		multiBaseline.setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
 		// Print out debugging information from the smoother
-		Objects.requireNonNull(multiBaseline.getDisparitySmoother()).setVerbose(System.out,null);
+		//Objects.requireNonNull(multiBaseline.getDisparitySmoother()).setVerbose(System.out,null);
 
 		// Creates a list where you can switch between different images/visualizations
 		var listDisplay = new ListDisplayPanel();

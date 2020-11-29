@@ -35,7 +35,7 @@ public class ConfigSpeckleFilter implements Configuration {
 	public float similarTol = 1.0f;
 
 	/** The maximum area (in pixels) for a region to be filtered. If relative, then it's relative to width*height */
-	public final ConfigLength maximumArea = ConfigLength.relative(0.002,0.0);
+	public final ConfigLength maximumArea = ConfigLength.relative(0.0025,0.0);
 
 	@Override public void checkValidity() {
 		checkTrue(similarTol>=0.0f);

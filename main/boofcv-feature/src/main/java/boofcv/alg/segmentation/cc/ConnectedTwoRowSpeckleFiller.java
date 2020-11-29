@@ -20,7 +20,6 @@ package boofcv.alg.segmentation.cc;
 
 import boofcv.errors.BoofCheckFailure;
 import boofcv.struct.image.GrayF32;
-import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
@@ -47,10 +46,10 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
-public class ConnectedTwoRowSpeckleFiller {
+public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<GrayF32> {
 
 	/** Number of clusters that were filed in */
-	private @Getter int totalFilled;
+	private int totalFilled;
 
 	// Labels for each pixel in a row
 	DogArray_I32 labelsA = new DogArray_I32();
@@ -85,6 +84,7 @@ public class ConnectedTwoRowSpeckleFiller {
 	 * @param similarTol (Input) Two pixels are connected if their different in value is &le; than this.
 	 * @param fillValue (Input) The value that small regions are filled in with.
 	 */
+	@Override
 	public void process( final GrayF32 image, int maximumArea, float similarTol, float fillValue ) {
 		// Initialize data structures and save internal references
 		init(image, fillValue);
@@ -143,6 +143,10 @@ public class ConnectedTwoRowSpeckleFiller {
 				continue;
 			fillCluster(pixXinA.get(labelA), image.height - 1, count, similarTol);
 		}
+	}
+
+	@Override public int getTotalFilled() {
+		return totalFilled;
 	}
 
 	private void init( GrayF32 image, float fillValue ) {

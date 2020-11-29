@@ -18,6 +18,7 @@
 
 package boofcv.abst.disparity;
 
+import boofcv.alg.segmentation.cc.ConnectedSpeckleFiller;
 import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -36,7 +37,9 @@ import java.util.Set;
 public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp extends ImageGray<Disp>>
 		implements DisparitySmoother<Image,Disp> {
 
-	@Getter ConnectedTwoRowSpeckleFiller filler = new ConnectedTwoRowSpeckleFiller();
+	@Getter ConnectedSpeckleFiller<GrayF32> filler = new ConnectedTwoRowSpeckleFiller();
+//	@Getter ConnectedSpeckleFiller<GrayF32> filler = new ConnectedNaiveSpeckleFiller();
+
 	@Getter ConfigSpeckleFilter config;
 
 	@Nullable PrintStream out;
