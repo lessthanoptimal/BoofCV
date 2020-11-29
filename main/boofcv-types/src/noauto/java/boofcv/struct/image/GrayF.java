@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,24 +19,17 @@
 package boofcv.struct.image;
 
 /**
- * <p>
- * Base class for images with float pixels.
- * </p>
+ * <p> Base class for images with float pixels. </p>
  *
  * @author Peter Abeles
  */
 public abstract class GrayF<T extends GrayF<T>> extends ImageGray<T> {
 
-	protected GrayF(int width, int height) {
+	protected GrayF( int width, int height ) {
 		super(width, height);
 	}
 
-	protected GrayF() {
-	}
+	protected GrayF() {}
 
-	@Override
-	public ImageDataType getDataType() {
-		return ImageDataType.F;
-	}
-
+	@Override public ImageDataType getDataType() { return ImageDataType.F; }
 }

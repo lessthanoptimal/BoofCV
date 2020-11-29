@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,22 +30,21 @@ public class GrayU8 extends GrayI8<GrayU8> {
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
-	 * @param width  number of columns in the image.
+	 * @param width number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public GrayU8(int width, int height) {
+	public GrayU8( int width, int height ) {
 		super(width, height);
 	}
 
-	public GrayU8() {
-	}
+	public GrayU8() {}
 
-	public GrayU8(byte[][] input) {
+	public GrayU8( byte[][] input ) {
 		super(input);
 	}
 
 	@Override
-	public int unsafe_get(int x, int y) {
+	public int unsafe_get( int x, int y ) {
 		return data[getIndex(x, y)] & 0xFF;
 	}
 
@@ -55,7 +54,7 @@ public class GrayU8 extends GrayI8<GrayU8> {
 	}
 
 	@Override
-	public GrayU8 createNew(int imgWidth, int imgHeight) {
+	public GrayU8 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1) {
 			return new GrayU8();
 		}

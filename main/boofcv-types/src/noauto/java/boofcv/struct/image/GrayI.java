@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,7 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 		super(width, height);
 	}
 
-	protected GrayI() {
-	}
+	protected GrayI() {}
 
 	/**
 	 * Returns the value of the specified pixel.

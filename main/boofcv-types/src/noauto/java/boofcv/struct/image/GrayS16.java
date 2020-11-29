@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,21 +29,18 @@ public class GrayS16 extends GrayI16<GrayS16> {
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
-	 * @param width  number of columns in the image.
+	 * @param width number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public GrayS16(int width, int height) {
+	public GrayS16( int width, int height ) {
 		super(width, height);
 	}
 
-	/**
-	 * Creates an image with no data declared and the width/height set to zero.
-	 */
-	public GrayS16() {
-	}
+	/** Creates an image with no data declared and the width/height set to zero. */
+	public GrayS16() {}
 
 	@Override
-	public int unsafe_get(int x, int y) {
+	public int unsafe_get( int x, int y ) {
 		return data[getIndex(x, y)];
 	}
 
@@ -53,7 +50,7 @@ public class GrayS16 extends GrayI16<GrayS16> {
 	}
 
 	@Override
-	public GrayS16 createNew(int imgWidth, int imgHeight) {
+	public GrayS16 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new GrayS16();
 		return new GrayS16(imgWidth, imgHeight);

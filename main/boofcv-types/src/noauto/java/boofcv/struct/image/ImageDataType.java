@@ -110,6 +110,7 @@ public enum ImageDataType {
 	}
 
 	public static @Nullable ImageDataType classToType( Class imageClass ) {
+		// @formatter:off
 		if      (imageClass == GrayU8.class)         return U8;
 		else if (imageClass == GrayS8.class)         return S8;
 		else if (imageClass == GrayU16.class)        return U16;
@@ -134,6 +135,7 @@ public enum ImageDataType {
 		else if (imageClass == InterleavedI16.class) return I16;
 		else
 			return null;
+		// @formatter:on
 	}
 
 	public static Class typeToSingleClass( ImageDataType type ) {

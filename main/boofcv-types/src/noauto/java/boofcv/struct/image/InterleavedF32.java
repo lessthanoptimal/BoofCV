@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,20 +34,19 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.
 	 *
-	 * @param width	number of columns in the image.
-	 * @param height   number of rows in the image.
+	 * @param width number of columns in the image.
+	 * @param height number of rows in the image.
 	 * @param numBands number of bands/colors in the image.
 	 */
-	public InterleavedF32(int width, int height, int numBands) {
+	public InterleavedF32( int width, int height, int numBands ) {
 		super(width, height, numBands);
 	}
 
-	public InterleavedF32() {
-	}
+	public InterleavedF32() {}
 
 	@Override
-	public String toString_element(int index) {
-		return String.format("%5f",data[index]);
+	public String toString_element( int index ) {
+		return String.format("%5f", data[index]);
 	}
 
 	@Override
@@ -58,12 +57,12 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	/**
 	 * Returns the pixel's value for all the bands as an array.
 	 *
-	 * @param x	   pixel coordinate.
-	 * @param y	   pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param storage If not null then the pixel's value is written here.  If null a new array is created.
 	 * @return The pixel's value.
 	 */
-	public float[] get(int x, int y, @Nullable float[] storage) {
+	public float[] get( int x, int y, @Nullable float[] storage ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
@@ -79,7 +78,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		return storage;
 	}
 
-	public void unsafe_get(int x, int y, float[] storage ) {
+	public void unsafe_get( int x, int y, float[] storage ) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index];
@@ -89,11 +88,11 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	/**
 	 * Sets the pixel's value for all the bands using an array.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value for each band.
 	 */
-	public void set(int x, int y, float... value) {
+	public void set( int x, int y, float... value ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
@@ -103,7 +102,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		}
 	}
 
-	public void unsafe_set(int x, int y, float[] value) {
+	public void unsafe_set( int x, int y, float[] value ) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = value[i];
@@ -113,12 +112,12 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	/**
 	 * Returns the value of the specified band in the specified pixel.
 	 *
-	 * @param x	pixel coordinate.
-	 * @param y	pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param band which color band in the pixel
 	 * @return an intensity value.
 	 */
-	public float getBand(int x, int y, int band) {
+	public float getBand( int x, int y, int band ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
 		if (band < 0 || band >= numBands)
@@ -130,12 +129,12 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	/**
 	 * Returns the value of the specified band in the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
-	 * @param band  which color band in the pixel
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
+	 * @param band which color band in the pixel
 	 * @param value The new value of the element.
 	 */
-	public void setBand(int x, int y, int band, float value) {
+	public void setBand( int x, int y, int band, float value ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
 		if (band < 0 || band >= numBands)
@@ -145,14 +144,14 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	}
 
 	@Override
-	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		float[] dst = (float[])array;
 		int idxSrc = startIndex + stride*row0 + col*numBands;
 		int idxDst = offset;
-		int end = idxSrc + (row1-row0)*stride;
-		while( idxSrc < end ) {
+		int end = idxSrc + (row1 - row0)*stride;
+		while (idxSrc < end) {
 			for (int i = 0; i < numBands; i++) {
-				dst[idxDst++] = data[idxSrc+i];
+				dst[idxDst++] = data[idxSrc + i];
 			}
 			idxSrc += stride;
 		}
@@ -169,12 +168,12 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	}
 
 	@Override
-	protected void _setData(Object data) {
-		this.data = (float[]) data;
+	protected void _setData( Object data ) {
+		this.data = (float[])data;
 	}
 
 	@Override
-	public InterleavedF32 createNew(int imgWidth, int imgHeight) {
+	public InterleavedF32 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedF32();
 		return new InterleavedF32(imgWidth, imgHeight, numBands);
@@ -183,7 +182,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	public void print( String format ) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				System.out.printf(format+" "+format+"i ",getBand(x, y,0),getBand(x,y,1));
+				System.out.printf(format + " " + format + "i ", getBand(x, y, 0), getBand(x, y, 1));
 			}
 			System.out.println();
 		}
