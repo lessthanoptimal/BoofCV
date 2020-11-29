@@ -99,8 +99,7 @@ Version : 0.37
   * Fixed decomposeMetricCamera() so that it doesn't change the scale of T. This messed up common frames
   * Triangulate N-points using calibrated homogenous coordinates
 - Stereo
-  * Speckle noise removal algorithm
-  * TODO naive
+  * Speckle noise removal algorithm. Two implementations
   * TODO U8 variant
   * TODO add to examples
 - Calibration

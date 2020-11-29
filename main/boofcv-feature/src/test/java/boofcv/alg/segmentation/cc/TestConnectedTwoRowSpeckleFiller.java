@@ -21,7 +21,6 @@ package boofcv.alg.segmentation.cc;
 import boofcv.BoofTesting;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
-import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,118 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestConnectedTwoRowSpeckleFiller extends BoofStandardJUnit {
-	float valueStep = 0.6f;
-
-	GrayF32 input = new GrayF32(1, 1);
-	GrayF32 expected = new GrayF32(1, 1);
-
-	// @formatter:off
-	String case0 =
-			"200001\n" +
-			"000220\n" +
-			"002222\n" +
-			"002220\n" +
-			"000020\n" +
-			"000000";
-
-	String expected0 =
-			"300001\n" +
-			"000330\n" +
-			"003333\n" +
-			"003330\n" +
-			"000030\n" +
-			"000000";
-
-	// The 1 prevents the top cluster from being pruned as it connects it to the background
-	String case1 =
-			"222000\n" +
-			"001000\n" +
-			"000220\n" +
-			"002000\n" +
-			"010010\n" +
-			"000010";
-
-	String expected1 =
-			"222000\n" +
-			"001000\n" +
-			"000330\n" +
-			"003000\n" +
-			"010010\n" +
-			"000010";
-
-	// Checks to see if speckle on the bottom is handled and max region size
-	String case2 =
-			"222222\n" +
-			"022222\n" +
-			"002222\n" +
-			"002000\n" +
-			"010022\n" +
-			"202002";
-
-	String expected2 =
-			"222222\n" +
-			"022222\n" +
-			"002222\n" +
-			"002000\n" +
-			"010033\n" +
-			"303003";
-
-	String case3 =
-			"101010\n" +
-			"202020\n" +
-			"303030\n" +
-			"212020\n" +
-			"001110\n" +
-			"000000";
-	// @formatter:on
-
-	@Test void process_case0() {
-		// When the fill value is zero it will be all zeros
-		set(case0, input);
-		ImageMiscOps.fill(expected, 0);
-		var alg = new ConnectedTwoRowSpeckleFiller();
-		alg.process(input, 20, 1.0f, 0.0f);
-		BoofTesting.assertEquals(expected, input, 1e-4);
-
-		// There will be no change when the fill value is equal to the max value
-		set(case0, input);
-		expected.setTo(input);
-		alg.process(input, 20, 1.0f, valueStep*2);
-		BoofTesting.assertEquals(expected, input, 1e-4);
-
-		// More interesting when set to a value that's different
-		set(case0, input);
-		set(expected0, expected);
-		alg.process(input, 20, 1.0f, valueStep*3);
-		BoofTesting.assertEquals(expected, input, 1e-4);
-	}
-
-	@Test void process_case1() {
-		set(case1, input);
-		set(expected1, expected);
-		var alg = new ConnectedTwoRowSpeckleFiller();
-		alg.process(input, 20, 1.0f, valueStep*3);
-		BoofTesting.assertEquals(expected, input, 1e-4);
-	}
-
-	@Test void process_case2() {
-		set(case2, input);
-		set(expected2, expected);
-		var alg = new ConnectedTwoRowSpeckleFiller();
-		alg.process(input, 5, 1.0f, valueStep*3);
-		BoofTesting.assertEquals(expected, input, 1e-4);
-	}
-
-	@Test void process_case3() {
-		set(case3, input);
-		set(case3, expected);
-		var alg = new ConnectedTwoRowSpeckleFiller();
-		alg.process(input, 15, 1.0f, valueStep*4);
-		// there should be no change since everything is connect to one segment
-		BoofTesting.assertEquals(expected, input, 1e-4);
-	}
-
+class TestConnectedTwoRowSpeckleFiller extends CommonConnectedSpeckleFillerChecks {
 	/**
 	 * Call it multiple times and see if it gets the same result
 	 */
@@ -168,7 +56,6 @@ class TestConnectedTwoRowSpeckleFiller extends BoofStandardJUnit {
 	 * rigorous. Try 100 or 1000
 	 */
 	@Test void random() {
-		System.setOut(systemOut);
 		var alg = new ConnectedTwoRowSpeckleFiller();
 
 		int w = 20;
@@ -181,6 +68,20 @@ class TestConnectedTwoRowSpeckleFiller extends BoofStandardJUnit {
 			ImageMiscOps.fillUniform(image, rand, 0.0f, fillValue);
 			alg.process(image, 20, 1.0f, fillValue);
 		}
+	}
+
+	@Test void compareToNaive() {
+		var naive = new ConnectedNaiveSpeckleFiller();
+		var alg = new ConnectedTwoRowSpeckleFiller();
+
+		float fillValue = 3.0f;
+		GrayF32 found = new GrayF32(100, 90);
+		ImageMiscOps.fillUniform(found, rand, 0.0f, fillValue);
+		GrayF32 expected = found.clone();
+		naive.process(expected, 20, 1.0f, fillValue);
+		alg.process(found, 20, 1.0f, fillValue);
+
+		BoofTesting.assertEquals(expected, found, 0.0);
 	}
 
 	/** Check row labeling on a normal situation without any edge cases */
@@ -302,16 +203,7 @@ class TestConnectedTwoRowSpeckleFiller extends BoofStandardJUnit {
 		assertTrue(alg.countsB.isEquals(11, 7, 8, 9, 0));
 	}
 
-	private void set( String encoded, GrayF32 image ) {
-		String[] lines = encoded.split("\n");
-
-		image.reshape(lines[0].length(), lines.length);
-
-		for (int y = 0; y < lines.length; y++) {
-			String line = lines[y];
-			for (int x = 0; x < line.length(); x++) {
-				image.set(x, y, Integer.parseInt("" + line.charAt(x))*valueStep);
-			}
-		}
+	@Override public ConnectedSpeckleFiller<GrayF32> createAlg() {
+		return new ConnectedTwoRowSpeckleFiller();
 	}
 }

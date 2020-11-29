@@ -19,6 +19,7 @@
 package boofcv.disparity;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.segmentation.cc.ConnectedNaiveSpeckleFiller;
 import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller;
 import boofcv.struct.image.GrayF32;
 import org.openjdk.jmh.annotations.*;
@@ -49,13 +50,14 @@ public class BenchmarkSpeckleFilter {
 	GrayF32 outputF32 = new GrayF32(1, 1);
 
 	ConnectedTwoRowSpeckleFiller dualRow = new ConnectedTwoRowSpeckleFiller();
+	ConnectedNaiveSpeckleFiller naive = new ConnectedNaiveSpeckleFiller();
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		Random rand = new Random(234);
 
 		inputF32.reshape(size, size);
 
+		// TODO improve image construction. On real data dual row is 2x faster than naive. Here' they are similar
 		ImageMiscOps.fillUniform(inputF32, rand, 0, fillColor);
 		// give it a large flat region similar to what real data would have
 		ImageMiscOps.fillRectangle(inputF32, 20.1f, size/10, size/12, size/2, size/3);
@@ -64,11 +66,16 @@ public class BenchmarkSpeckleFilter {
 		}
 	}
 
-	@Benchmark
-	public void dualRow_F32() {
+	@Benchmark public void dualRow_F32() {
 		// copy the image since it's modified
 		outputF32.setTo(inputF32);
 		dualRow.process(outputF32, maximumArea, tolerance, fillColor);
+	}
+
+	@Benchmark public void naive_F32() {
+		// copy the image since it's modified
+		outputF32.setTo(inputF32);
+		naive.process(outputF32, maximumArea, tolerance, fillColor);
 	}
 
 	public static void main( String[] args ) throws RunnerException {
