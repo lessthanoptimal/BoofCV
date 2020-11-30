@@ -19,8 +19,7 @@
 package boofcv.abst.disparity;
 
 import boofcv.alg.segmentation.cc.ConnectedSpeckleFiller;
-import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller;
-import boofcv.struct.image.GrayF32;
+import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
@@ -30,31 +29,31 @@ import java.io.PrintStream;
 import java.util.Set;
 
 /**
- * Wrapper around {@link ConnectedTwoRowSpeckleFiller} for {@link DisparitySmoother}
+ * Wrapper around {@link ConnectedTwoRowSpeckleFiller_F32} for {@link DisparitySmoother}
  *
  * @author Peter Abeles
  */
 public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp extends ImageGray<Disp>>
 		implements DisparitySmoother<Image,Disp> {
 
-	@Getter ConnectedSpeckleFiller<GrayF32> filler = new ConnectedTwoRowSpeckleFiller();
-//	@Getter ConnectedSpeckleFiller<GrayF32> filler = new ConnectedNaiveSpeckleFiller();
+	@Getter ConnectedSpeckleFiller<Disp> filler;
 
 	@Getter ConfigSpeckleFilter config;
 
 	@Nullable PrintStream out;
 
-	public DisparitySmootherSpeckleFilter( ConfigSpeckleFilter config ) {
+	Class<Disp> dispType;
+
+	@SuppressWarnings("unchecked")
+	public DisparitySmootherSpeckleFilter( ConnectedSpeckleFiller<Disp> filler, ConfigSpeckleFilter config ) {
 		this.config = config;
+		this.filler = filler;
 	}
 
 	@Override public void process( Image image, Disp disp, int disparityRange ) {
 
 		int size = config.maximumArea.computeI(disp.totalPixels());
-		if (disp instanceof GrayF32)
-			filler.process((GrayF32)disp,size,config.similarTol,disparityRange);
-		else
-			throw new IllegalArgumentException("Image type not supported yet");
+		filler.process(disp,size,config.similarTol,disparityRange);
 
 		if (out!=null)
 			out.println("Speckle maxArea="+size+" filled="+filler.getTotalFilled());

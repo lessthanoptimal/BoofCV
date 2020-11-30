@@ -89,6 +89,9 @@ public class ExampleMultiViewSparseReconstruction {
 	SceneStructureMetric scene = null;
 
 	public static void main( String[] args ) {
+		// Turn on threaded code for bundle adjustment
+		DDoglegConcurrency.USE_CONCURRENT = true;
+
 		var example = new ExampleMultiViewSparseReconstruction();
 		example.compute("house_01.mp4");
 //		example.compute("forest_path_01.mp4");
@@ -98,9 +101,6 @@ public class ExampleMultiViewSparseReconstruction {
 	}
 
 	public void compute( String videoName ) {
-		// Turn on threaded code for bundle adjustment
-		DDoglegConcurrency.USE_CONCURRENT = true;
-
 		String path = UtilIO.pathExample("mvs/" + videoName);
 		workDirectory = "mvs_work/" + FilenameUtils.getBaseName(videoName);
 

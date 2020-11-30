@@ -251,5 +251,5 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 *
 	 * @param data data array
 	 */
-	protected abstract void _setData( Object data );
+	public abstract void _setData( Object data );
 }

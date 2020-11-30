@@ -27,6 +27,9 @@ import boofcv.alg.disparity.block.score.*;
 import boofcv.alg.disparity.block.select.SelectSparseCorrelationSubpixel;
 import boofcv.alg.disparity.block.select.SelectSparseCorrelationWithChecksWta_F32;
 import boofcv.alg.disparity.sgm.SgmStereoDisparity;
+import boofcv.alg.segmentation.cc.ConnectedSpeckleFiller;
+import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_F32;
+import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_U8;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.transform.census.FactoryCensusTransform;
@@ -374,9 +377,14 @@ public class FactoryStereoDisparity {
 		if (config==null)
 			config = new ConfigSpeckleFilter();
 
-		if (dispType != GrayF32.class)
-			throw new IllegalArgumentException("Not supported yet");
+		ConnectedSpeckleFiller<DI> filler;
+		if (dispType == GrayF32.class)
+			filler = (ConnectedSpeckleFiller)new ConnectedTwoRowSpeckleFiller_F32();
+		else if (dispType == GrayU8.class)
+			filler = (ConnectedSpeckleFiller)new ConnectedTwoRowSpeckleFiller_U8();
+		else
+			throw new IllegalArgumentException("Unknown disparity type.");
 
-		return new DisparitySmootherSpeckleFilter<>(config);
+		return new DisparitySmootherSpeckleFilter<>(filler, config);
 	}
 }

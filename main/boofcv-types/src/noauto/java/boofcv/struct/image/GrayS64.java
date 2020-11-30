@@ -88,8 +88,7 @@ public class GrayS64 extends ImageGray<GrayS64> {
 		return data;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override public void _setData( Object data ) {
 		this.data = (long[])data;
 	}
 

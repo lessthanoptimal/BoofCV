@@ -19,6 +19,7 @@
 package boofcv.alg.segmentation.cc;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
  * Connected component based speckle filler
@@ -34,8 +35,10 @@ public interface ConnectedSpeckleFiller<T extends ImageBase<T>> {
 	 * @param similarTol (Input) Two pixels are connected if their different in value is &le; than this.
 	 * @param fillValue (Input) The value that small regions are filled in with.
 	 */
-	void process( T image , int maximumArea, float similarTol, float fillValue );
+	void process( T image, int maximumArea, double similarTol, double fillValue );
 
 	/** Returns the number of filled in regions */
 	int getTotalFilled();
+
+	ImageType<T> getImageType();
 }

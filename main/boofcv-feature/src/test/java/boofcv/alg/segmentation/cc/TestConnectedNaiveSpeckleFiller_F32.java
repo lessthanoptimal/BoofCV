@@ -19,12 +19,17 @@
 package boofcv.alg.segmentation.cc;
 
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
  */
-public class TestConnectedNaiveSpeckleFiller extends CommonConnectedSpeckleFillerChecks {
+public class TestConnectedNaiveSpeckleFiller_F32 extends CommonConnectedSpeckleFiller<GrayF32> {
+	public TestConnectedNaiveSpeckleFiller_F32() {
+		super(ImageType.SB_F32);
+	}
+
 	@Override public ConnectedSpeckleFiller<GrayF32> createAlg() {
-		return new ConnectedNaiveSpeckleFiller();
+		return new ConnectedNaiveSpeckleFiller_F32();
 	}
 }

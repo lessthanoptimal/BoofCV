@@ -79,8 +79,7 @@ public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 		return data;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override public void _setData( Object data ) {
 		this.data = (short[])data;
 	}
 

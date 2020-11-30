@@ -77,8 +77,7 @@ public class GrayS32 extends GrayI<GrayS32> {
 		return data;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override public void _setData( Object data ) {
 		this.data = (int[])data;
 	}
 
