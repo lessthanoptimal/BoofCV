@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,8 +98,7 @@ public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 		return data;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override public void _setData( Object data ) {
 		this.data = (byte[])data;
 	}
 

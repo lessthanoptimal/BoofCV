@@ -18,9 +18,7 @@
 
 package boofcv.alg.segmentation.cc;
 
-import boofcv.errors.BoofCheckFailure;
-import boofcv.struct.image.GrayF32;
-import org.ddogleg.struct.DogArray;
+import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.DogArray_I32;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
@@ -46,10 +44,10 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
-public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<GrayF32> {
+public abstract class ConnectedTwoRowSpeckleFiller<T extends ImageGray<T>> implements ConnectedSpeckleFiller<T> {
 
 	/** Number of clusters that were filed in */
-	private int totalFilled;
+	protected int totalFilled;
 
 	// Labels for each pixel in a row
 	DogArray_I32 labelsA = new DogArray_I32();
@@ -69,29 +67,21 @@ public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<Gray
 
 	// List of clusters in A which are no longer visible and can't grow
 	final DogArray_I32 finished = new DogArray_I32();
-	// List of pixels which have yet to be examined in the search. Encoded by y*width + x
-	final DogArray<OpenPixel> open = new DogArray<>(OpenPixel::new);
 
 	// Copy parameters into class fields to make function arguments less verbose
-	GrayF32 image;
-	float fillValue;
+	T image;
 
 	/**
 	 * Finds non-smooth regions and fills them in with the fill value. Uses 4-connect rule.
-	 *
-	 * @param image (Input, Output) Image which is searched for speckle noise which is then filled in
-	 * @param maximumArea (Input) All regions with this number of pixels or fewer will be filled in.
-	 * @param similarTol (Input) Two pixels are connected if their different in value is &le; than this.
-	 * @param fillValue (Input) The value that small regions are filled in with.
 	 */
 	@Override
-	public void process( final GrayF32 image, int maximumArea, float similarTol, float fillValue ) {
+	public void process( final T image, int maximumArea, double _similarTol, double _fillValue ) {
 		// Initialize data structures and save internal references
-		init(image, fillValue);
+		initTypeSpecific(_similarTol, _fillValue);
+		init(image);
 
 		// Find connectivity in the first row A
-		countsA.size = labelRow(image.data, image.startIndex, image.width,
-				labelsA.data, countsA.data, pixXinA.data, fillValue, similarTol);
+		countsA.size = labelRow(image.startIndex, labelsA.data, countsA.data, pixXinA.data);
 
 		// Go through the remaining rows
 		for (int y = 1; y < image.height; y++) {
@@ -99,11 +89,10 @@ public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<Gray
 			int startRowA = startRowB - image.stride;
 
 			// Find connectivity in the second row B
-			countsB.size = labelRow(image.data, startRowB, image.width,
-					labelsB.data, countsB.data, pixXinB.data, fillValue, similarTol);
+			countsB.size = labelRow(startRowB, labelsB.data, countsB.data, pixXinB.data);
 
 			// Finds regions which are connected between the two rows
-			findConnectionsBetweenRows(startRowA, startRowB, similarTol);
+			findConnectionsBetweenRows(startRowA, startRowB);
 			// Merge rows in B together
 			mergeClustersInB();
 			// Update the region size counts in B
@@ -120,7 +109,7 @@ public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<Gray
 					continue;
 
 				// Fill in the row
-				fillCluster(pixXinA.get(labelA), y - 1, count, similarTol);
+				fillCluster(pixXinA.get(labelA), y - 1, count);
 			}
 
 			// swap references to avoid a copy A and B
@@ -141,17 +130,14 @@ public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<Gray
 			int count = countsA.data[labelA];
 			if (count == 0 || count > maximumArea)
 				continue;
-			fillCluster(pixXinA.get(labelA), image.height - 1, count, similarTol);
+			fillCluster(pixXinA.get(labelA), image.height - 1, count);
 		}
 	}
 
-	@Override public int getTotalFilled() {
-		return totalFilled;
-	}
+	protected abstract void initTypeSpecific( double similarTol, double fillValue );
 
-	private void init( GrayF32 image, float fillValue ) {
+	private void init( T image ) {
 		this.image = image;
-		this.fillValue = fillValue;
 		this.totalFilled = 0;
 
 		labelsA.resize(image.width);
@@ -167,57 +153,11 @@ public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<Gray
 	/**
 	 * Applies connectivity rule along a single row in 1D
 	 *
-	 * @param pixels array with image pixels
-	 * @param idx0 start of row (inclusive)
-	 * @param width Number of elements in the row.
 	 * @param labels Array that stores labels
 	 * @param labelCount Array that stores label counts
-	 * @param tol pixel similarity tolerance
 	 * @return number of clusters
 	 */
-	static int labelRow( final float[] pixels, final int idx0, final int width,
-						 final int[] labels, int[] labelCount, int[] locationX,
-						 final float fillValue,
-						 final float tol ) {
-		// compute the index it will end at
-		final int idx1 = idx0 + width;
-
-		// initialize the first cluster
-		int currentLabel;
-		if (pixels[idx0] == fillValue) {
-			// fillValue pixels can't be the start of a cluster
-			currentLabel = -1;
-		} else {
-			currentLabel = 0;
-			labelCount[currentLabel] = 1;
-			locationX[currentLabel] = 0;
-		}
-		labels[0] = currentLabel;
-
-		for (int i = idx0, j = idx0 + 1; j < idx1; i = j, j++) {
-			int col = j - idx0;
-			// See if these two pixels are connected. image[y,x] and image[y,x+1]
-			float pixel_i = pixels[i];
-			float pixel_j = pixels[j];
-			// can't connect to any pixel with fillValue
-			if (pixel_i != fillValue && pixel_j != fillValue && Math.abs(pixel_i - pixel_j) <= tol) {
-				// increment the total pixels in this cluster
-				labelCount[currentLabel]++;
-				labels[col] = currentLabel;
-			} else {
-				// don't create new clusters for fillValue pixels since there can be no cluster here
-				if (pixel_j == fillValue) {
-					labels[col] = -1;
-				} else {
-					// Initialize the new cluster
-					labelCount[++currentLabel] = 1;
-					locationX[currentLabel] = col;
-					labels[col] = currentLabel;
-				}
-			}
-		}
-		return currentLabel + 1;
-	}
+	protected abstract int labelRow( int idx0, final int[] labels, int[] labelCount, int[] locationX );
 
 	/**
 	 * Compres pxiel values between the two rows to find the mapping between the regions. This is also where
@@ -225,60 +165,13 @@ public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<Gray
 	 *
 	 * @param startRowA Index of row in image array
 	 * @param startRowB Index of row in image array
-	 * @param tol Pixel similarity tolerance
 	 */
-	final void findConnectionsBetweenRows( final int startRowA,
-										   final int startRowB,
-										   final float tol ) {
-		final float[] pixels = image.data;
-		final int width = image.width;
-		int idxRowA = startRowA;
-		int idxRowB = startRowB;
-
-		// Initially nothing is merged together or connected
-		merge.resize(countsB.size, -1);
-		connectAtoB.resize(countsA.size, -1);
-
-		// Check for connectivity one column at a time
-		for (int col = 0; col < width; col++, idxRowA++, idxRowB++) {
-			float valueA = pixels[idxRowA];
-			float valueB = pixels[idxRowB];
-			// don't connect if one of them is equal to the fill value
-			if (valueA == fillValue || valueB == fillValue)
-				continue;
-
-			// See if these two pixels are connected. image[y,x] and image[y+1,x]
-			if (Math.abs(valueA - valueB) > tol)
-				continue;
-
-			int labelA = labelsA.get(col);
-			int labelB = labelsB.get(col);
-
-			// Look up the corresponding cluster in B
-			int whatAinB = connectAtoB.data[labelA];
-
-			if (whatAinB == -1) {
-				// This label does not have a mapping already. So assign it one
-				connectAtoB.data[labelA] = traverseToEnd(labelB);
-				continue;
-			} else if (whatAinB == labelB) {
-				// It has a mapping but it's the same as what this pixel points too.
-				continue;
-			}
-
-			// Traverse to the end points from both nodes. If they are not already connected, connect them
-			int target1 = traverseToEnd(labelB);
-			int target2 = traverseToEnd(whatAinB);
-			if (target1 != target2) {
-				merge.data[target1] = target2;
-			}
-		}
-	}
+	protected abstract void findConnectionsBetweenRows( int startRowA, int startRowB );
 
 	/**
 	 * Traverses the graph until it hits an end point then and returns the end point/root.
 	 */
-	private int traverseToEnd( int labelB ) {
+	protected final int traverseToEnd( int labelB ) {
 		int targetB = labelB;
 		while (merge.data[targetB] != -1) {
 			targetB = merge.data[targetB];
@@ -339,74 +232,9 @@ public class ConnectedTwoRowSpeckleFiller implements ConnectedSpeckleFiller<Gray
 	 * Fill cluster by performing a search of connected pixels. This step can be slow and a memory hog
 	 * if the regions are large. It's also effectively the naive algorithm
 	 */
-	void fillCluster( int seedX, int seedY, int clusterSize, final float tol ) {
-		float seedValue = image.unsafe_get(seedX, seedY);
-		checkTrue(seedValue != fillValue, "BUG! Shouldn't have gotten this far");
+	protected abstract void fillCluster( int seedX, int seedY, int clusterSize );
 
-		totalFilled++;
-		image.unsafe_set(seedX, seedY, fillValue);
-
-		open.reset();
-		open.grow().setTo(seedX, seedY, seedValue);
-
-		int foundSize = 0;
-
-		while (!open.isEmpty()) {
-			foundSize++;
-			OpenPixel c = open.removeSwap(0);
-
-			// create a copy because 'c' just got recycled and might be modified by the functions below!
-			final int x = c.x;
-			final int y = c.y;
-			final float value = c.value;
-
-			// check 4-connect neighborhood for pixels which are connected and add them to the open list
-			// while marking them as visited
-			checkAndConnect(x + 1, y, value, tol);
-			checkAndConnect(x, y + 1, value, tol);
-			checkAndConnect(x - 1, y, value, tol);
-			checkAndConnect(x, y - 1, value, tol);
-		}
-
-		// Sanity check for bugs
-		if (clusterSize != foundSize)
-			throw new BoofCheckFailure("BUG! Fill does not match cluster size. Expected=" +
-					clusterSize + " Found=" + foundSize);
-	}
-
-	/**
-	 * Checks to see if the pixel at the specified coordinate could be connected to another pixel with the specified
-	 * value. If so it's added to the open list and filled in
-	 */
-	void checkAndConnect( final int x, final int y, float targetValue, final float tol ) {
-		if (!image.isInBounds(x, y))
-			return;
-
-		float value = image.unsafe_get(x, y);
-
-		if (Float.isInfinite(value) || Float.isNaN(value))
-			throw new RuntimeException("BAd value");
-
-		if (value == fillValue || Math.abs(value - targetValue) > tol)
-			return;
-
-		// Add it to the open list so that it's neighbors will be searched
-		open.grow().setTo(x, y, value);
-
-		// Fill it in now. This also prevents it from being added twice
-		image.unsafe_set(x, y, fillValue);
-	}
-
-	/** Information for a pixel that's in the open list when filling in a region */
-	private static class OpenPixel {
-		int x;
-		int y;
-		float value; // value of the pixel before it got filled in
-
-		public void setTo( int x, int y, float value ) {
-			this.x = x;
-			this.y = y;
-			this.value = value;
-		}
+	@Override public int getTotalFilled() {
+		return totalFilled;
 	}
 }

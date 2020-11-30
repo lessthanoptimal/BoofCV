@@ -163,8 +163,7 @@ public class TestImageGray extends BoofStandardJUnit {
 			return ImageDataType.S32;
 		}
 
-		@Override
-		protected void _setData(Object data) {
+		@Override public void _setData( Object data ) {
 			this.data = (int[]) data;
 		}
 

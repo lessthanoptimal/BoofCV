@@ -108,8 +108,7 @@ public class GrayF64 extends GrayF<GrayF64> {
 		return data;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override public void _setData( Object data ) {
 		this.data = (double[])data;
 	}
 

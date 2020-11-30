@@ -18,14 +18,14 @@
 
 package boofcv.abst.disparity;
 
-import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller;
+import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_F32;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
- * Configuration for {@link ConnectedTwoRowSpeckleFiller}.
+ * Configuration for {@link ConnectedTwoRowSpeckleFiller_F32}.
  *
  * @author Peter Abeles
  */
@@ -35,7 +35,7 @@ public class ConfigSpeckleFilter implements Configuration {
 	public float similarTol = 1.0f;
 
 	/** The maximum area (in pixels) for a region to be filtered. If relative, then it's relative to width*height */
-	public final ConfigLength maximumArea = ConfigLength.relative(0.0025,0.0);
+	public final ConfigLength maximumArea = ConfigLength.relative(0.002,0.0);
 
 	@Override public void checkValidity() {
 		checkTrue(similarTol>=0.0f);

@@ -111,8 +111,7 @@ public class GrayF32 extends GrayF<GrayF32> {
 		return data;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override public void _setData( Object data ) {
 		this.data = (float[])data;
 	}
 

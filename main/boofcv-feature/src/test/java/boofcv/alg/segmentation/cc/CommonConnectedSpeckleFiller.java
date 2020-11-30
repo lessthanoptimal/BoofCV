@@ -19,19 +19,23 @@
 package boofcv.alg.segmentation.cc;
 
 import boofcv.BoofTesting;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayF32;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public abstract class CommonConnectedSpeckleFillerChecks extends BoofStandardJUnit {
+public abstract class CommonConnectedSpeckleFiller<T extends ImageGray<T>> extends BoofStandardJUnit {
 	float valueStep = 0.6f;
 
-	GrayF32 input = new GrayF32(1, 1);
-	GrayF32 expected = new GrayF32(1, 1);
+	T input, expected;
 
 	// @formatter:off
 	String case0 =
@@ -93,13 +97,18 @@ public abstract class CommonConnectedSpeckleFillerChecks extends BoofStandardJUn
 			"000000";
 	// @formatter:on
 
-	public abstract ConnectedSpeckleFiller<GrayF32> createAlg();
+	protected CommonConnectedSpeckleFiller( ImageType<T> imageType ) {
+		input = imageType.createImage(1, 1);
+		expected = imageType.createImage(1, 1);
+	}
+
+	public abstract ConnectedSpeckleFiller<T> createAlg();
 
 	@Test void process_case0() {
 		// When the fill value is zero it will be all zeros
 		set(case0, input);
-		ImageMiscOps.fill(expected, 0);
-		ConnectedSpeckleFiller<GrayF32> alg = createAlg();
+		GImageMiscOps.fill(expected, 0);
+		ConnectedSpeckleFiller<T> alg = createAlg();
 		alg.process(input, 20, 1.0f, 0.0f);
 		BoofTesting.assertEquals(expected, input, 1e-4);
 
@@ -119,7 +128,7 @@ public abstract class CommonConnectedSpeckleFillerChecks extends BoofStandardJUn
 	@Test void process_case1() {
 		set(case1, input);
 		set(expected1, expected);
-		ConnectedSpeckleFiller<GrayF32> alg = createAlg();
+		ConnectedSpeckleFiller<T> alg = createAlg();
 		alg.process(input, 20, 1.0f, valueStep*3);
 		BoofTesting.assertEquals(expected, input, 1e-4);
 	}
@@ -127,7 +136,7 @@ public abstract class CommonConnectedSpeckleFillerChecks extends BoofStandardJUn
 	@Test void process_case2() {
 		set(case2, input);
 		set(expected2, expected);
-		ConnectedSpeckleFiller<GrayF32> alg = createAlg();
+		ConnectedSpeckleFiller<T> alg = createAlg();
 		alg.process(input, 5, 1.0f, valueStep*3);
 		BoofTesting.assertEquals(expected, input, 1e-4);
 	}
@@ -135,13 +144,35 @@ public abstract class CommonConnectedSpeckleFillerChecks extends BoofStandardJUn
 	@Test void process_case3() {
 		set(case3, input);
 		set(case3, expected);
-		ConnectedSpeckleFiller<GrayF32> alg = createAlg();
+		ConnectedSpeckleFiller<T> alg = createAlg();
 		alg.process(input, 15, 1.0f, valueStep*4);
 		// there should be no change since everything is connect to one segment
 		BoofTesting.assertEquals(expected, input, 1e-4);
 	}
 
-	private void set( String encoded, GrayF32 image ) {
+	/**
+	 * Call it multiple times and see if it gets the same result
+	 */
+	@Test void process_MultipleCalls() {
+		ConnectedSpeckleFiller<T> alg = createAlg();
+		T image = expected.createNew(40, 30);
+		T copy = expected.createNew(40, 30);
+
+		for (int trial = 0; trial < 10; trial++) {
+			image.reshape(rand.nextInt(10) + 30, rand.nextInt(10) + 30);
+			GImageMiscOps.fillUniform(image, rand, 0.0f, 10.0f);
+			copy.setTo(image);
+			alg.process(image, 20, 1.0f, 0.0f);
+			int filled = alg.getTotalFilled();
+			alg.process(copy, 20, 1.0f, 0.0f);
+			assertEquals(filled, alg.getTotalFilled());
+			assertTrue(filled > 2);// sanity check to make sure it's doing something
+
+			BoofTesting.assertEquals(input, copy, 0.0);
+		}
+	}
+
+	private void set( String encoded, T image ) {
 		String[] lines = encoded.split("\n");
 
 		image.reshape(lines[0].length(), lines.length);
@@ -149,7 +180,7 @@ public abstract class CommonConnectedSpeckleFillerChecks extends BoofStandardJUn
 		for (int y = 0; y < lines.length; y++) {
 			String line = lines[y];
 			for (int x = 0; x < line.length(); x++) {
-				image.set(x, y, Integer.parseInt("" + line.charAt(x))*valueStep);
+				GeneralizedImageOps.set(image, x, y, Integer.parseInt("" + line.charAt(x))*valueStep);
 			}
 		}
 	}

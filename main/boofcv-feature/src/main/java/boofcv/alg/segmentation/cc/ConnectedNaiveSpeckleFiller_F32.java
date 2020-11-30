@@ -21,6 +21,7 @@ package boofcv.alg.segmentation.cc;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
 
 /**
@@ -31,7 +32,7 @@ import org.ddogleg.struct.DogArray;
  *
  * @author Peter Abeles
  */
-public class ConnectedNaiveSpeckleFiller implements ConnectedSpeckleFiller<GrayF32> {
+public class ConnectedNaiveSpeckleFiller_F32 implements ConnectedSpeckleFiller<GrayF32> {
 	GrayS32 labels = new GrayS32(1, 1);
 	DogArray<Pixel> open = new DogArray<>(Pixel::new);
 
@@ -41,9 +42,9 @@ public class ConnectedNaiveSpeckleFiller implements ConnectedSpeckleFiller<GrayF
 	float fillValue;
 
 	@Override
-	public void process( final GrayF32 image, int maximumArea, float similarTol, float fillValue ) {
-		this.similarTolerance = similarTol;
-		this.fillValue = fillValue;
+	public void process( final GrayF32 image, int maximumArea, double similarTol, double fillValue ) {
+		this.similarTolerance = (float)similarTol;
+		this.fillValue = (float)fillValue;
 		this.totalFilled = 0;
 
 		labels.reshape(image);
@@ -69,7 +70,7 @@ public class ConnectedNaiveSpeckleFiller implements ConnectedSpeckleFiller<GrayF
 				// Fill in the region
 				for (int i = 0; i < open.size; i++) {
 					Pixel p = open.get(i);
-					image.unsafe_set(p.x, p.y, fillValue);
+					image.unsafe_set(p.x, p.y, this.fillValue);
 				}
 				totalFilled++;
 			}
@@ -78,6 +79,10 @@ public class ConnectedNaiveSpeckleFiller implements ConnectedSpeckleFiller<GrayF
 
 	@Override public int getTotalFilled() {
 		return totalFilled;
+	}
+
+	@Override public ImageType<GrayF32> getImageType() {
+		return ImageType.SB_F32;
 	}
 
 	/**
@@ -100,9 +105,9 @@ public class ConnectedNaiveSpeckleFiller implements ConnectedSpeckleFiller<GrayF
 
 			// connect-4 rule for neighborhood
 			checkAdd(image, x + 1, y, label, value);
-			checkAdd(image, x, y+1, label, value);
+			checkAdd(image, x, y + 1, label, value);
 			checkAdd(image, x - 1, y, label, value);
-			checkAdd(image, x, y-1, label, value);
+			checkAdd(image, x, y - 1, label, value);
 
 			location++;
 		}
