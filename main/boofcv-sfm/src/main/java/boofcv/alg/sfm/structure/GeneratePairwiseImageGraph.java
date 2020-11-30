@@ -45,7 +45,10 @@ import java.util.*;
  * If there is a geometric relationship or not is determined by the number of inliers. The minimum number is specified
  * by {@link #minimumInliers}. A threshold is used for classifying an edge as 3D or not {@link #ratio3D} len(F)/len(H)
  * a value of 1 just requires equality, greater than one means there must be more features from F (fundamental) than
- * H (homography).
+ * H (homography). See [1] for more details on this test.
+ *
+ * <p>[1] Pollefeys, Marc, et al. "Visual modeling with a hand-held camera." International Journal of Computer
+ * Vision 59.3 (2004): 207-232.</p>
  *
  * @author Peter Abeles
  */
