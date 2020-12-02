@@ -109,11 +109,11 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 		// map to quickly look up the ID of a view
-		Map<String, Integer> imageToindex = new HashMap<>();
+		Map<String, Integer> imageToIndex = new HashMap<>();
 
 		// Create a node in the graph for each image
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
-			imageToindex.put(imageIds.get(idxTgt), idxTgt);
+			imageToIndex.put(imageIds.get(idxTgt), idxTgt);
 			graph.createNode(imageIds.get(idxTgt));
 		}
 
@@ -135,7 +135,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 				String dst = similar.get(idxSimilar);
 
 				// make sure it isn't considering the same motion twice
-				int dstIdx = imageToindex.get(dst);
+				int dstIdx = imageToIndex.get(dst);
 				if (dstIdx <= idxTgt)
 					continue;
 

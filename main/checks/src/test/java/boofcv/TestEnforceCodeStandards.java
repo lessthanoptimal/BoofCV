@@ -79,17 +79,14 @@ public class TestEnforceCodeStandards {
 
 			boolean failed = false;
 			for (File classFile : files) {
-//				System.out.println(classFile.getPath());
-
 				String text = UtilIO.readAsString(new FileInputStream(classFile));
 				assertNotNull(text);
 
 				if (!checker.process(text)) {
 					failed = true;
-					System.err.println(classFile.getPath());
 					System.err.println();
 					for (var failure : checker.getFailures()) {
-						System.err.println("  line:   " + failure.line);
+						System.err.println(classFile.getAbsolutePath()+":"+failure.line);
 						System.err.println("  code:   " + failure.code.trim());
 						System.err.println("  reason: " + failure.check.reason);
 						System.err.println();
@@ -98,7 +95,8 @@ public class TestEnforceCodeStandards {
 			}
 
 			if (failed)
-				System.err.println("\nSee documentation for how to ignore false positives or exceptions to the rule");
+				System.err.println(
+						"\nSee documentation for how to ignore false positives or make exceptions to the rule");
 
 			assertFalse(failed);
 		}
@@ -107,8 +105,7 @@ public class TestEnforceCodeStandards {
 	/**
 	 * Makes sure all unit tests extend BoofStandardJUnit
 	 */
-	@Test
-	void unitTestsMustExtendBoofStandardJUnit() {
+	@Test void unitTestsMustExtendBoofStandardJUnit() {
 		String pathToMain = UtilIO.path("main");
 
 		File[] moduleDirectories = new File(pathToMain).listFiles();
@@ -163,7 +160,8 @@ public class TestEnforceCodeStandards {
 					}
 				}
 				if (!found) {
-					System.err.println("Does not extend: " + classPath);
+					System.err.println("Does not extend BoofStandardJUnit");
+					System.err.println(classFile.getAbsolutePath()+":1"); // todo real line number
 					failed = true;
 				}
 			}
@@ -172,8 +170,7 @@ public class TestEnforceCodeStandards {
 		}
 	}
 
-	@Test
-	void configsAllHaveValidUnitTests() throws IOException {
+	@Test void configsAllHaveValidUnitTests() throws IOException {
 		List<File> missing = new ArrayList<>();
 		List<File> invalid = new ArrayList<>();
 
@@ -199,7 +196,6 @@ public class TestEnforceCodeStandards {
 					DirectoryFileFilter.DIRECTORY);
 
 			for (File classFile : files) {
-
 				String text = UtilIO.readAsString(new FileInputStream(classFile));
 				assertNotNull(text);
 
@@ -226,14 +222,18 @@ public class TestEnforceCodeStandards {
 		}
 
 		// Print out the problems to make it easier to fix
+		if (!missing.isEmpty())
+			System.err.println("Missing:");
 		for (File f : missing) {
-			System.out.println("Missing " + f.getPath());
+			System.out.println(f.getAbsolutePath());
 			// commented out since a unit test really shouldn't auto generate code and commit it to git. Plus
 			// the commit part won't work on all architectures
 //			generateDefaultConfigTest(f);
 		}
+		if (!invalid.isEmpty())
+			System.err.println("Invalid:");
 		for (File f : invalid) {
-			System.out.println("Invalid " + f.getPath());
+			System.out.println(f.getAbsolutePath()+":1"); // TODO real line number
 		}
 
 		assertEquals(0, missing.size());
