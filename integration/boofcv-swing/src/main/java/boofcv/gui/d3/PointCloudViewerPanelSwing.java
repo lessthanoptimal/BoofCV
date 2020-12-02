@@ -51,6 +51,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -69,10 +70,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class PointCloudViewerPanelSwing extends JPanel
 		implements MouseMotionListener, MouseListener, MouseWheelListener {
 
-	// TODO right-click or shift-click  perform a roll
-
-	// TODO Mouse rotation rotates so that the point clicked is moved to where the mouse is
-	// use vectors to figure out that rotation
+	// TODO right click that brings up contextual menu that lets you configure how data is viewed
 
 	// Storage for xyz coordinates of points in the count
 	private @Getter final DogArray_F32 cloudXyz = new DogArray_F32(); // lock for reading/writing cloud data
@@ -104,7 +102,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	int prevY;
 
 	Keyboard keyboard = new Keyboard();
-	ScheduledExecutorService pressedTask;
+	@Nullable ScheduledExecutorService pressedTask = null;
 
 	// how far it moves in the world frame for each key press
 	volatile float stepSize;
@@ -149,19 +147,19 @@ public class PointCloudViewerPanelSwing extends JPanel
 			ScheduledFuture<?> future;
 			@Override
 			public void focusGained( FocusEvent e ) {
-//				System.out.println("focus gained");
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyboard);
 
 				// start a timed task which checks current key presses. Less OS dependent this way
+				if (pressedTask!=null)
+					throw new RuntimeException("BUG! pressedTask is not null");
 				pressedTask = Executors.newScheduledThreadPool(1);
-				future = pressedTask.scheduleAtFixedRate(new KeypressedTask(), 100, 30, TimeUnit.MILLISECONDS);
+				future = pressedTask.scheduleAtFixedRate(new KeyPressedTask(), 100, 30, TimeUnit.MILLISECONDS);
 			}
 
 			@Override
 			public void focusLost( FocusEvent e ) {
-//				System.out.println("focus lost");
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keyboard);
-				pressedTask.shutdown();
+				Objects.requireNonNull(pressedTask).shutdown();
 				pressedTask = null;
 				resetKey();
 			}
@@ -174,7 +172,12 @@ public class PointCloudViewerPanelSwing extends JPanel
 	}
 
 	public void resetKey() {
-		pressed.clear();
+		lockPressed.lock();
+		try {
+			pressed.clear();
+		} finally {
+			lockPressed.unlock();
+		}
 		shiftPressed = false;
 	}
 
@@ -234,7 +237,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		}
 	}
 
-	public void addPoints( float pointsXYZ[], int pointsRGB[], int length ) {
+	public void addPoints( float[] pointsXYZ, int[] pointsRGB, int length ) {
 		synchronized (cloudXyz) {
 			int idxSrc = cloudXyz.size*3;
 
@@ -488,16 +491,19 @@ public class PointCloudViewerPanelSwing extends JPanel
 		final GrayF32 imageDepth = rendering.imageDepth;
 		final GrayS32 imageRgb = rendering.imageRgb;
 
-		for (int i = -dotRadius; i <= dotRadius; i++) {
-			int y = cy + i;
-			if (y < 0 || y >= imageRgb.height)
-				continue;
-			for (int j = -dotRadius; j <= dotRadius; j++) {
-				int x = cx + j;
-				if (x < 0 || x >= imageRgb.width)
-					continue;
+		int x0 = cx - dotRadius;
+		int x1 = cx + dotRadius+1;
+		int y0 = cy - dotRadius;
+		int y1 = cy + dotRadius+1;
 
-				int pixelIndex = imageDepth.getIndex(x, y);
+		if (x0 < 0) x0 = 0;
+		if (x1 > imageRgb.width) x1 = imageRgb.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > imageRgb.height) y1 = imageRgb.height;
+
+		for (int y = y0; y < y1; y++) {
+			int pixelIndex = y*imageDepth.width + x0;
+			for (int x = x0; x < x1; x++, pixelIndex++) {
 				float depth = imageDepth.data[pixelIndex];
 				if (depth > Z) {
 					imageDepth.data[pixelIndex] = Z;
@@ -508,34 +514,41 @@ public class PointCloudViewerPanelSwing extends JPanel
 	}
 
 	boolean shiftPressed = false;
+	boolean controlPressed = false;
+
+
+	private final ReentrantLock lockPressed = new ReentrantLock();
 	private final Set<Integer> pressed = new HashSet<>();
 
 	private class Keyboard implements KeyEventDispatcher {
 
 		@Override
 		public boolean dispatchKeyEvent( KeyEvent e ) {
-			switch (e.getID()) {
-
-				case KeyEvent.KEY_PRESSED:
-//					System.out.println("Key pressed "+e.getKeyChar());
-					switch( e.getKeyCode() ) {
-						case KeyEvent.VK_SHIFT: shiftPressed=true; break;
-						default:pressed.add(e.getKeyCode());break;
+			lockPressed.lock();
+			try {
+				switch (e.getID()) {
+					case KeyEvent.KEY_PRESSED -> {
+						switch (e.getKeyCode()) {
+							case KeyEvent.VK_SHIFT -> shiftPressed = true;
+							case KeyEvent.VK_CONTROL -> controlPressed = true;
+							default -> pressed.add(e.getKeyCode());
+						}
 					}
-					break;
-
-				case KeyEvent.KEY_RELEASED:
-//					System.out.println("Key released "+e.getKeyChar());
-					switch( e.getKeyCode() ) {
-						case KeyEvent.VK_SHIFT: shiftPressed=false; break;
-						default:
-							if (!pressed.remove(e.getKeyCode())) {
-								System.err.println("Possible Java / Mac OS X bug related to 'character accent menu'" +
-										" if using Java 1.8 try upgrading to 11 or later");
+					case KeyEvent.KEY_RELEASED -> {
+						switch (e.getKeyCode()) {
+							case KeyEvent.VK_SHIFT -> shiftPressed = false;
+							case KeyEvent.VK_CONTROL -> controlPressed = false;
+							default -> {
+								if (!pressed.remove(e.getKeyCode())) {
+									System.err.println("Possible Java / Mac OS X bug related to 'character accent menu'" +
+											" if using Java 1.8 try upgrading to 11 or later");
+								}
 							}
-							break;
+						}
 					}
-					break;
+				}
+			} finally {
+				lockPressed.unlock();
 			}
 			return false;
 		}
@@ -546,10 +559,12 @@ public class PointCloudViewerPanelSwing extends JPanel
 		boolean reset = false;
 		boolean change = true;
 
-		synchronized (pressed) {
+		lockPressed.lock();
+		try {
 			float multiplier = shiftPressed ? 5 : 1;
-			Integer[] keys = pressed.toArray(new Integer[0]);
+			multiplier *= controlPressed ? 1.0f/5.0f : 1.0f;
 
+			Integer[] keys = pressed.toArray(new Integer[0]);
 			for( int k : keys ) {
 				switch (k) {
 					case KeyEvent.VK_W -> z -= multiplier;
@@ -562,6 +577,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 					default -> change = false;
 				}
 			}
+		} finally {
+			lockPressed.unlock();
 		}
 
 		if (change) {
@@ -583,20 +600,16 @@ public class PointCloudViewerPanelSwing extends JPanel
 		repaint();
 	}
 
-	private class KeypressedTask implements Runnable {
-
+	private class KeyPressedTask implements Runnable {
 		@Override
 		public void run() {
-			synchronized (pressed) {
-				handleKeyPress();
-			}
+			handleKeyPress();
 		}
 	}
 
 	@Override
 	public void mouseWheelMoved( MouseWheelEvent e ) {
 //		offsetZ -= e.getWheelRotation()*pixelToDistance;
-
 		repaint();
 	}
 
@@ -625,8 +638,18 @@ public class PointCloudViewerPanelSwing extends JPanel
 		float rotY = 0;
 		float rotZ = 0;
 
-		rotY += (e.getX() - prevX)*0.002f;
-		rotX += (prevY - e.getY())*0.002f;
+		if (controlPressed) {
+			// Roll if control is held down
+			int centerX = getWidth()/2;
+			int centerY = getHeight()/2;
+			double angle0 = Math.atan2(prevX-centerX, prevY-centerY);
+			double angle1 = Math.atan2(e.getX()-centerX, e.getY()-centerY);
+			rotZ += angle0-angle1;
+		} else {
+			// otherwise pan and tilt
+			rotY += (e.getX() - prevX)*0.002f;
+			rotX += (prevY - e.getY())*0.002f;
+		}
 
 		Se3_F32 rotTran = new Se3_F32();
 		ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ, rotX, rotY, rotZ, rotTran.getR());

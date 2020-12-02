@@ -31,8 +31,10 @@ Version : 0.37
 - Image Processing
   * PixelMath now supports Lambdas
   * Median blur supports kernel radius independently along x and y. Thanks thhart for the request.
-- GUI
-  * Added clip and fog controls to point cloud controls
+- GUI: Swing Point Cloud Viewer
+  * Added clip and fog controls
+  * Holding control slows down translation and switches mouse to doing roll
+  * Might have fixed halting issue
 - Features
   * Removed BrightFeature since dark/white has been moved into the detector in all situations
 - Feature Sets
