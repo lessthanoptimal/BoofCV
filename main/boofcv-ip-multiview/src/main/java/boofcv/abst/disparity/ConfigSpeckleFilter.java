@@ -18,14 +18,13 @@
 
 package boofcv.abst.disparity;
 
-import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_F32;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
- * Configuration for {@link ConnectedTwoRowSpeckleFiller_F32}.
+ * Configuration for {@link DisparitySmootherSpeckleFilter}.
  *
  * @author Peter Abeles
  */

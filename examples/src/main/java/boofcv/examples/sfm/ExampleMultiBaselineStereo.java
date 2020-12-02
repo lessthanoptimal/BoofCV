@@ -67,7 +67,7 @@ public class ExampleMultiBaselineStereo {
 		// Compute a sparse reconstruction. This will give us intrinsic and extrinsic for all views
 		var example = new ExampleMultiViewSparseReconstruction();
 //		example.compute("forest_path_01.mp4");
-		example.compute("house_01.mp4");
+		example.compute("landing_01.mp4");
 
 		// We need a way to load images based on their ID. In this particular case the ID encodes the array index.
 		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);
@@ -75,7 +75,7 @@ public class ExampleMultiBaselineStereo {
 		// The next task is selecting a view to act as the "center" then we will compute stereo disparity images from
 		// all of its neighbors. The process of selecting the best views to use as centers is a problem all it's own
 		// instead we will pick a view and just hope everything works out
-		int centerViewIdx = 20;
+		int centerViewIdx = 15;
 		SceneWorkingGraph.View center = example.working.getAllViews().get(centerViewIdx);
 
 		// The final scene refined by bundle adjustment is created by the Working graph. However the 3D relationship

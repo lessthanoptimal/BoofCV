@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.feature.disparity;
 
+import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.cloud.PointCloudWriter;
@@ -122,6 +123,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 
 	// instance of the selected algorithm
 	private StereoDisparity<T, D> activeAlg;
+	private DisparitySmoother<T,D> smoother;
 
 	// camera calibration matrix of rectified images
 	private DMatrixRMaj rectK;
@@ -255,11 +257,13 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			BoofConcurrency.USE_CONCURRENT = control.concurrent;
 			long time0 = System.nanoTime();
 			activeAlg.process(rectLeft, rectRight);
-			long time1 = System.nanoTime();
-			elapsedTime = time1 - time0;
 			disparityImage = activeAlg.getDisparity();
 			disparityMin = activeAlg.getDisparityMin();
 			disparityRange = activeAlg.getDisparityRange();
+			smoother.process(rectLeft, disparityImage, disparityRange);
+			long time1 = System.nanoTime();
+			elapsedTime = time1 - time0;
+
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			BoofSwingUtil.warningDialog(this, e);
@@ -475,6 +479,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	private void createAlgConcurrent() {
 		BoofConcurrency.USE_CONCURRENT = control.concurrent;
 		activeAlg = control.controlDisparity.createAlgorithm();
+		smoother = control.controlDisparity.createSmoother();
 		BoofConcurrency.USE_CONCURRENT = true;
 	}
 

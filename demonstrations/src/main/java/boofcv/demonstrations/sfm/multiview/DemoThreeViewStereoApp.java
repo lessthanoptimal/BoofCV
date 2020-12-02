@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
+import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -128,6 +129,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	// Saved disparity image for saving to disk
 	ImageGray disparity;
 
+	DisparitySmoother<GrayU8,?> smoother;
+
 	// Visualized Disparity
 	BufferedImage visualDisparity = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 	BufferedImage visualRect1 = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
@@ -139,7 +142,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	final Object lockProcessing = new Object();
 	boolean processing = false;
-	boolean exceptionOccurred = false; // if true that means a fatal error occured while processing
+	boolean exceptionOccurred = false; // if true that means a fatal error occurred while processing
 	boolean hasAllImages = false;
 	// change panels automatically while computing. Only do this the first time an image is opened
 	// after that you might be tweaking a setting and don't want the view to change
@@ -811,7 +814,12 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		StereoDisparity disparityAlg = controls.controlDisparity.createAlgorithm();
 		disparityAlg.process(rectifiedLeft, rectifiedRight);
 
-		return (ImageGray)disparityAlg.getDisparity();
+		ImageGray disparity = disparityAlg.getDisparity();
+
+		DisparitySmoother smoother = controls.controlDisparity.createSmoother();
+		smoother.process(rectifiedLeft, disparity, disparityAlg.getDisparityRange());
+
+		return disparity;
 	}
 
 	/**

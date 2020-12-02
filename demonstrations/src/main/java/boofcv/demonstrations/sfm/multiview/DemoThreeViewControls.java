@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
+import boofcv.abst.disparity.ConfigSpeckleFilter;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.ConfigDisparitySGM;
 import boofcv.factory.disparity.DisparityError;
@@ -41,26 +42,25 @@ import java.awt.event.KeyEvent;
  * @author Peter Abeles
  */
 public class DemoThreeViewControls extends StandardAlgConfigPanel
-	implements ChangeListener, ActionListener
-{
+		implements ChangeListener, ActionListener {
 
-	int view=0;
-	int maxImageSize=800;
+	int view = 0;
+	int maxImageSize = 800;
 	double inliers = 1.0;
 	int prune = 30; // percentage of features it will prune at the very end
-	boolean autoFocal=true;
+	boolean autoFocal = true;
 	int focal = 500;
 
-	JComboBox<String> imageView = combo(view,"Image 1","Matches","Inliers","Rectified","Disparity","3D");
+	JComboBox<String> imageView = combo(view, "Image 1", "Matches", "Inliers", "Rectified", "Disparity", "3D");
 
 	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
-	JSpinner sMaxSize = spinner(maxImageSize,50,1200,50);
-	JSpinner sInliers = spinner(inliers,0.1,10.0,0.1);
-	JSpinner sPrune = spinner(prune,0,100,5);
-	JCheckBox cFocalAuto = checkbox("Auto Focal",autoFocal,
+	JSpinner sMaxSize = spinner(maxImageSize, 50, 1200, 50);
+	JSpinner sInliers = spinner(inliers, 0.1, 10.0, 0.1);
+	JSpinner sPrune = spinner(prune, 0, 100, 5);
+	JCheckBox cFocalAuto = checkbox("Auto Focal", autoFocal,
 			"Automatic initial guess for focal length or user specified");
-	JSpinner sFocal = spinner(focal,100,3000,50);
-	JButton bCompute = button("Compute",true);
+	JSpinner sFocal = spinner(focal, 100, 3000, 50);
+	JButton bCompute = button("Compute", true);
 
 	JTextArea textInfo = new JTextArea();
 
@@ -81,17 +81,17 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 		textInfo.setEditable(false);
 
-		if( autoFocal ) {
+		if (autoFocal) {
 			sFocal.setEnabled(false);
 		}
 
 		JTabbedPane tabs = new JTabbedPane();
-		tabs.addTab("Calib",createSelfCalibPanel());
-		tabs.addTab("Feats",controlsDetDescAssoc);
-		tabs.addTab("Stereo",controlDisparity);
+		tabs.addTab("Calib", createSelfCalibPanel());
+		tabs.addTab("Feats", controlsDetDescAssoc);
+		tabs.addTab("Stereo", controlDisparity);
 		tabs.setMaximumSize(tabs.getPreferredSize());
 
-		addLabeled(imageView,"View");
+		addLabeled(imageView, "View");
 		add(tabs);
 		add(new JScrollPane(textInfo));
 		addAlignCenter(bCompute);
@@ -109,13 +109,13 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 			InputMap inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW);
 			ActionMap actionMap = getActionMap();
 
-			KeyStroke wStroke = KeyStroke.getKeyStroke(KeyEvent.VK_1+index, Event.CTRL_MASK);
+			KeyStroke wStroke = KeyStroke.getKeyStroke(KeyEvent.VK_1 + index, Event.CTRL_MASK);
 			inputMap.put(wStroke, wStroke.toString());
 			int _index = index;
 			actionMap.put(wStroke.toString(), new AbstractAction() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					if( !isEnabled() )
+				public void actionPerformed( ActionEvent e ) {
+					if (!isEnabled())
 						return;
 					imageView.setSelectedIndex(_index);
 				}
@@ -126,6 +126,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	private void addDisparityControls() {
 		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
 		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
+		ConfigSpeckleFilter configSpeckle = new ConfigSpeckleFilter();
 
 		configBM.disparityMin = configSGM.disparityMin = 0;
 		configBM.disparityRange = configSGM.disparityRange = 200;
@@ -133,18 +134,19 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		configBM.errorType = DisparityError.CENSUS;
 		configBM.configCensus.variant = CensusVariants.BLOCK_7_7;
 
-		controlDisparity = new ControlPanelDisparityDense(configBM,configSGM, GrayU8.class);
+		controlDisparity = new ControlPanelDisparityDense(configBM, configSGM, configSpeckle, GrayU8.class);
 		controlDisparity.setListener(this::handleStereoChanged);
 	}
 
 	private JPanel createSelfCalibPanel() {
 		StandardAlgConfigPanel panel = new StandardAlgConfigPanel();
-		panel.addLabeled(sMaxSize,"Max Image Size",
+		panel.addLabeled(sMaxSize, "Max Image Size",
 				"Maximum width/height of input image. Image is scaled down if larger");
-		panel.addLabeled(sInliers,"Inliers (px)","RANSAC inlier threshold in pixels for reprojection error.");
-		panel.addLabeled(sPrune,"Prune %","Prunes this percent of the worse matches after computing the solution once.");
+		panel.addLabeled(sInliers, "Inliers (px)", "RANSAC inlier threshold in pixels for reprojection error.");
+		panel.addLabeled(sPrune, "Prune %",
+				"Prunes this percent of the worse matches after computing the solution once.");
 		panel.addAlignLeft(cFocalAuto);
-		panel.addLabeled(sFocal,"Focal","User specified value for focal length in pixels.");
+		panel.addLabeled(sFocal, "Focal", "User specified value for focal length in pixels.");
 		return panel;
 	}
 
@@ -153,7 +155,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	}
 
 	public void addText( final String text ) {
-		String a = textInfo.getText()+text;
+		String a = textInfo.getText() + text;
 		textInfo.setText(a);
 	}
 
@@ -171,40 +173,43 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		boolean compute = true;
-		if( source == sInliers ) {
+		if (source == sInliers) {
 			inliers = ((Number)sInliers.getValue()).doubleValue();
 			stereoChanged = true;
-		} else if( source == sPrune ) {
+		} else if (source == sPrune) {
 			prune = ((Number)sInliers.getValue()).intValue();
 			stereoChanged = true;
-		} else if( source == sFocal ) {
+		} else if (source == sFocal) {
 			focal = ((Number)sFocal.getValue()).intValue();
 			stereoChanged = true;
-		} else if( source == sMaxSize ) {
+		} else if (source == sMaxSize) {
 			maxImageSize = ((Number)sMaxSize.getValue()).intValue();
 			scaleChanged = true;
-		} else if( source == imageView ) {
+		} else if (source == imageView) {
 			view = imageView.getSelectedIndex();
 			owner.updateVisibleGui();
 			compute = false;
-		} else if( source == cFocalAuto ) {
+		} else if (source == cFocalAuto) {
 			autoFocal = cFocalAuto.isSelected();
 			sFocal.setEnabled(!autoFocal);
 			stereoChanged = true;
-		} else if( source == bCompute ) {
+		} else if (source == bCompute) {
 			owner.handleComputePressed();
 			compute = false;
 		}
-		if( compute )
+		if (compute)
 			bCompute.setEnabled(true);
 	}
 
 	private class ControlPanelCustomDDA extends ControlPanelDdaComboTabs {
 
 		public ControlPanelCustomDDA() {
-			super(()->{featuresChanged=true;bCompute.setEnabled(true);}, true);
+			super(() -> {
+				featuresChanged = true;
+				bCompute.setEnabled(true);
+			}, true);
 		}
 
 		@Override

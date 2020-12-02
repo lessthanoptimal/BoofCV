@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,15 +32,16 @@ import java.text.NumberFormat;
 /**
  * Control for setting the value of a {@link ConfigLength} class.
  */
-public class JConfigLength extends JPanel implements PropertyChangeListener , ActionListener, ChangeListener {
+public class JConfigLength extends JPanel implements PropertyChangeListener, ActionListener, ChangeListener {
 	JCheckBox toggleFixed = new JCheckBox();
-	JSpinner spinnerFraction = new JSpinner(new SpinnerNumberModel(0.1,0.0,1.0,0.01));
+	JSpinner spinnerFraction = new JSpinner(new SpinnerNumberModel(0.1, 0.0, 1.0, 0.01));
 	JFormattedTextField textLength;
 
 	boolean integerMode;
+	// If the user is selecting a length in relative of fixed length mode
 	boolean modeRelative = true;
-	ConfigLength valueFraction = new ConfigLength(1,0.1);
-	ConfigLength valueFixed = new ConfigLength(1,-1);
+	ConfigLength valueFraction = new ConfigLength(1, 0.1);
+	ConfigLength valueFixed = new ConfigLength(1, -1);
 
 	Listener listener;
 
@@ -48,12 +49,12 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 	double maximumLength = Double.MAX_VALUE;
 
 	public JConfigLength( Listener listener, boolean integerMode ) {
-		setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
 		this.listener = listener;
 		this.integerMode = integerMode;
 
-		if( integerMode ) {
+		if (integerMode) {
 			textLength = new JFormattedTextField(NumberFormat.getIntegerInstance());
 		} else {
 			textLength = new JFormattedTextField(NumberFormat.getNumberInstance());
@@ -70,7 +71,7 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 		spinnerFraction.setToolTipText("Fractional value");
 		textLength.setValue(valueFraction.length);
 		textLength.setColumns(4);
-		textLength.addPropertyChangeListener("value",this);
+		textLength.addPropertyChangeListener("value", this);
 		textLength.setToolTipText("Selected length or minimum length if fractional");
 
 		add(toggleFixed);
@@ -79,13 +80,16 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 	}
 
 	@Override
-	public void setEnabled(boolean enabled) {
+	public void setEnabled( boolean enabled ) {
 		super.setEnabled(enabled);
 
-		if( enabled ) {
+		// absolutely bizarre, if this isn't here it will never disable
+		spinnerFraction.setEnabled(false);
+
+		if (enabled) {
 			toggleFixed.setEnabled(true);
-			if(modeRelative)
-				toggleFixed.setEnabled(true);
+			if (modeRelative)
+				spinnerFraction.setEnabled(true);
 			textLength.setEnabled(true);
 		} else {
 			toggleFixed.setEnabled(false);
@@ -94,7 +98,7 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 		}
 	}
 
-	public void setLengthBounds(double min , double max ) {
+	public void setLengthBounds( double min, double max ) {
 		this.minimumLength = min;
 		this.maximumLength = max;
 	}
@@ -102,15 +106,15 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 	public void setValue( ConfigLength v ) {
 //		BoofSwingUtil.checkGuiThread();
 
-		handleModeChange(v.isRelative(),false);
-		updateValues(v.fraction,v.length);
+		handleModeChange(v.isRelative(), false);
+		updateValues(v.fraction, v.length);
 	}
 
-	private void updateValues( double fraction , double length ) {
+	private void updateValues( double fraction, double length ) {
 		spinnerFraction.removeChangeListener(this);
-		textLength.removePropertyChangeListener("value",this);
+		textLength.removePropertyChangeListener("value", this);
 
-		if(modeRelative) {
+		if (modeRelative) {
 			valueFraction.fraction = fraction;
 			valueFraction.length = length;
 			spinnerFraction.setEnabled(true);
@@ -121,17 +125,18 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 			spinnerFraction.setValue(0);
 		}
 
-		if( integerMode )
+		if (integerMode)
 			textLength.setValue((int)length);
 		else
 			textLength.setValue(length);
 
 		spinnerFraction.addChangeListener(this);
-		textLength.addPropertyChangeListener("value",this);
+		textLength.addPropertyChangeListener("value", this);
 	}
 
-	private void handleModeChange( boolean relative , boolean updateValues) {
-		if( modeRelative == relative )
+	private void handleModeChange( boolean relative, boolean updateValues ) {
+		// See if the mode has not actually changed
+		if (modeRelative == relative)
 			return;
 
 		this.modeRelative = relative;
@@ -139,7 +144,7 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 		toggleFixed.setSelected(relative);
 		toggleFixed.addActionListener(this);
 
-		if( updateValues ) {
+		if (updateValues) {
 			if (modeRelative) {
 				updateValues(valueFraction.fraction, valueFraction.length);
 			} else {
@@ -149,67 +154,66 @@ public class JConfigLength extends JPanel implements PropertyChangeListener , Ac
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		double l = ((Number) textLength.getValue()).doubleValue();
+	public void propertyChange( PropertyChangeEvent evt ) {
+		double l = ((Number)textLength.getValue()).doubleValue();
 
 		boolean boundsIssue = l < minimumLength || l > maximumLength;
-		if( boundsIssue ) {
-			l = Math.min(maximumLength,Math.max(minimumLength,l));
+		if (boundsIssue) {
+			l = Math.min(maximumLength, Math.max(minimumLength, l));
 		}
 
-		if(modeRelative) {
+		if (modeRelative) {
 			valueFraction.length = l;
 		} else {
 			valueFixed.length = l;
 		}
 
-		if( boundsIssue ) {
-			textLength.removePropertyChangeListener("value",this);
-			if( integerMode )
+		if (boundsIssue) {
+			textLength.removePropertyChangeListener("value", this);
+			if (integerMode)
 				textLength.setValue((int)l);
 			else
 				textLength.setValue(l);
-			textLength.addPropertyChangeListener("value",this);
+			textLength.addPropertyChangeListener("value", this);
 		}
 
 		notifyListener();
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == toggleFixed ) {
-			handleModeChange(toggleFixed.isSelected(),true);
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == toggleFixed) {
+			handleModeChange(toggleFixed.isSelected(), true);
 			notifyListener();
 		}
 	}
 
 	public ConfigLength getValue() {
-		if(modeRelative)
+		if (modeRelative)
 			return valueFraction;
 		else
 			return valueFixed;
 	}
 
 	public void notifyListener() {
-		if(modeRelative) {
-			listener.changeConfigLength(this,valueFraction.fraction,valueFraction.length);
+		if (modeRelative) {
+			listener.changeConfigLength(this, valueFraction.fraction, valueFraction.length);
 		} else {
 			listener.changeConfigLength(this, -1, valueFixed.length);
 		}
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == spinnerFraction ) {
-			if(modeRelative) {
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == spinnerFraction) {
+			if (modeRelative) {
 				valueFraction.fraction = ((Number)spinnerFraction.getValue()).doubleValue();
 				notifyListener();
 			}
 		}
 	}
 
-	public interface Listener
-	{
-		void changeConfigLength(JConfigLength source, double fraction, double length);
+	public interface Listener {
+		void changeConfigLength( JConfigLength source, double fraction, double length );
 	}
 }

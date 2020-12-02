@@ -125,6 +125,19 @@ public class ExampleMultiViewSparseReconstruction {
 		computePairwiseGraph();
 		metricFromPairwise();
 		bundleAdjustmentRefine();
+
+		System.out.println("----------------------------------------------------------------------------");
+		System.out.println("Printing view info. Used "+scene.views.size+" / "+pairwise.nodes.size);
+		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
+			var wv = working.lookupView(pv.id);
+			if (wv == null)
+				continue;
+			int order = working.viewList.indexOf(wv);
+
+			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f}\n", order, wv.pview.id,
+					wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
+					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z);
+		}
 	}
 
 	/**

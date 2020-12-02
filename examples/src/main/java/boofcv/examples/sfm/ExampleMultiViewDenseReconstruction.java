@@ -53,8 +53,8 @@ import java.util.List;
  * neighbors for stereo computations using a heuristic. Then a global point cloud is created from the "center" view
  * disparity images while taking care to avoid adding duplicate points.
  *
- * As you can see there is still a fair amount of noise in the cloud. Additional filtering and processing is typically
- * required at this point.
+ * As you can see there is still a fair amount of noise in the cloud. Additional filtering and processing
+ * is typically required at this point.
  *
  * @author Peter Abeles
  */
@@ -98,7 +98,8 @@ public class ExampleMultiViewDenseReconstruction {
 			}
 
 			@Override
-			public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+			public void handleFusedDisparity( String name,
+											  GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
 				// Display the disparity for each center view
 				BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
 				ShowImages.showWindow(colorized, "Center " + name);

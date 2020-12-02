@@ -18,6 +18,8 @@
 
 package boofcv.gui.controls;
 
+import boofcv.abst.disparity.ConfigSpeckleFilter;
+import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.alg.disparity.sgm.SgmDisparityCost;
 import boofcv.factory.disparity.*;
@@ -44,6 +46,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	int selectedMethod = 0;
 	public final ConfigDisparityBMBest5 configBM;
 	public final ConfigDisparitySGM configSGM;
+	public final ConfigSpeckleFilter configSpeckle;
 
 	JComboBox<String> comboMethod, comboError;
 
@@ -59,6 +62,9 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	ControlsNCC controlNCC;
 	ControlsMutualInfo controlHMI;
 
+	// Disparity smoothing
+	ControlsSpeckleConnComp controlSpeckle;
+
 	boolean ignoreChanges = false;
 
 	Listener listener;
@@ -66,10 +72,12 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
 	public ControlPanelDisparityDense( ConfigDisparityBMBest5 configBM,
 									   ConfigDisparitySGM configSGM,
+									   ConfigSpeckleFilter configSpeckle,
 									   Class imageType ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.configBM = configBM;
 		this.configSGM = configSGM;
+		this.configSpeckle = configSpeckle;
 		this.imageType = imageType;
 
 		comboMethod = combo(e -> handleMethod(), selectedMethod, "BlockMatch-5", "BlockMatch", "SGM");
@@ -83,9 +91,11 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		controlCensus = new ControlsCensus();
 		controlNCC = new ControlsNCC();
 		controlHMI = new ControlsMutualInfo();
+		controlSpeckle = new ControlsSpeckleConnComp();
 
 		tabbedPane.addTab("Method", getModelControl(isBlockSelected()));
 		tabbedPane.addTab("Error", getErrorControl(comboError.getSelectedIndex()));
+		tabbedPane.addTab("Smooth", controlSpeckle);
 
 		// SGM is larger than BM, make the initial area larger
 		controlBM.setPreferredSize(controlSGM.getPreferredSize());
@@ -101,13 +111,14 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	public static ControlPanelDisparityDense createRange( int disparityMin, int disparityRange, Class imageType ) {
 		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
 		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
+		ConfigSpeckleFilter configSpeckle = new ConfigSpeckleFilter();
 
 		configBM.disparityMin = disparityMin;
 		configBM.disparityRange = disparityRange;
 		configSGM.disparityMin = disparityMin;
 		configSGM.disparityRange = disparityRange;
 
-		return new ControlPanelDisparityDense(configBM, configSGM, imageType);
+		return new ControlPanelDisparityDense(configBM, configSGM, configSpeckle, imageType);
 	}
 
 	public void broadcastChange() {
@@ -144,6 +155,19 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 			Class dispType = configSGM.subpixel ? GrayF32.class : GrayU8.class;
 			return FactoryStereoDisparity.sgm(configSGM, imageType, dispType);
 		}
+	}
+
+	public DisparitySmoother createSmoother() {
+		boolean block = isBlockSelected();
+
+		Class dispType;
+		if (block) {
+			dispType = configBM.subpixel ? GrayF32.class : GrayU8.class;
+		} else {
+			dispType = configSGM.subpixel ? GrayF32.class : GrayU8.class;
+		}
+
+		return FactoryStereoDisparity.removeSpeckle(configSpeckle, dispType);
 	}
 
 	public int getDisparityMin() {
@@ -478,6 +502,30 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 				settings.pyramidLayers.minHeight = ((Number)spinnerPyramidWidth.getValue()).intValue();
 			} else if (source == spinnerExtra) {
 				settings.extraIterations = ((Number)spinnerExtra.getValue()).intValue();
+			} else {
+				throw new RuntimeException("Unknown");
+			}
+			broadcastChange();
+		}
+	}
+
+	class ControlsSpeckleConnComp extends StandardAlgConfigPanel {
+		JSpinner spinnerSimilar = spinner(configSpeckle.similarTol, 0.0, 100.0, 0.5);
+		JConfigLength lengthRegion = configLength(configSpeckle.maximumArea, 0.0, 1e6);
+
+		public ControlsSpeckleConnComp() {
+			setBorder(BorderFactory.createEmptyBorder());
+			addLabeled(spinnerSimilar, "Simularity",
+					"How similar two pixel values need to be considered connected.");
+			addLabeled(lengthRegion, "Region","Maximum region size for removal");
+		}
+
+		@Override
+		public void controlChanged( final Object source ) {
+			if (source == spinnerSimilar) {
+				configSpeckle.similarTol = ((Number)spinnerSimilar.getValue()).floatValue();
+			} else if (source==lengthRegion) {
+				configSpeckle.maximumArea.setTo(lengthRegion.getValue());
 			} else {
 				throw new RuntimeException("Unknown");
 			}

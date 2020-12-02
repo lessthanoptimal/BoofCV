@@ -644,7 +644,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 			int centerY = getHeight()/2;
 			double angle0 = Math.atan2(prevX-centerX, prevY-centerY);
 			double angle1 = Math.atan2(e.getX()-centerX, e.getY()-centerY);
-			rotZ += (float)angle0-angle1;
+			rotZ += (float)(angle0-angle1);
 		} else {
 			// otherwise pan and tilt
 			rotY += (e.getX() - prevX)*0.002f;

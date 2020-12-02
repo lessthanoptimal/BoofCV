@@ -51,8 +51,11 @@ public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp
 	}
 
 	@Override public void process( Image image, Disp disp, int disparityRange ) {
-
 		int size = config.maximumArea.computeI(disp.totalPixels());
+
+		// Do nothing if it can't filer anything since the maximum size is zero
+		if (size==0)
+			return;
 		filler.process(disp,size,config.similarTol,disparityRange);
 
 		if (out!=null)
