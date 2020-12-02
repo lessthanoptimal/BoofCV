@@ -67,7 +67,6 @@ Version : 0.37
   * More efficient storage of candidate corners
 - RegionOrientation
   * Can now specify feature orientation approach using Configuration class
-  * TODO finish cleaning up that mess
 - PointTrackerKltPyramid
   * It now manages the track limit itself instead of letting the detector handle it
 - General Feature Detector
@@ -89,7 +88,6 @@ Version : 0.37
   * Projective from arbitrary images using PairwiseImageGraph
   * Projective to Metric for arbitrary number of views
   * PointTrackerToSimilarImages uses a tracker to match features for reconstruction
-      - TODO Add a smart mode where it will skip over frames with little change
   * TODO Create validation tests of nature scenes with known marks to provide ground truth
 - Multi-View Stereo
   - Added MultiViewToFusedDisparity to combine multiple disparity images into one
@@ -102,40 +100,21 @@ Version : 0.37
   * Triangulate N-points using calibrated homogenous coordinates
 - Stereo
   * Speckle noise removal algorithm. Supports U8 and F32 image types.
+  * TODO Add example
 - Calibration
   * Stereo calibration now performs a join bundle adjustment after estimating the stereo baseline
 - Concurrency
   * Removed WorkArrays since they were poorly designed
 
-TODO Add seek to SimpleSequence
-
 TODO Move projective to metric and similar from multiview to perspective
 
-TODO PointTracker
-  - Redesign PointTrackerTwoPass into PointTrackerHint
-    * Could this be done by adding two functions: hint(motion) and undo() to undo the last association
-  - Update Visual Odometry to use this new API when it makes sense
-    * This would be similar to the old two-pass VO approach which got removed
-
-TODO Sparse Disparity Undistort using camera model
-TODO Stereo Feature Association
-   - Formalize with a factory
-   - Do everything that greedy does now
-   - Take in max distance as a parameter too
-   - Verify that it doesn't allow impossible associations either
-
-- Scene Reconstruction
-  * TODO Improve stability of sparse metric upgrade. Local SBA and multiple seeds?
-  * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
-  * TODO when associating objects split into feature types, e.g. white and black blobs
-  * TODO try improving 3-view by estimating lens distortion in projective camera
-- Multi-View Stereo
-  * TODO Improve point filtering of dense cloud. Way too noisy now
-
-NOTES: Format lint checks
- - Checkstyle can't be used since it does not allow for concise blocks and there is no built in way to just run on
-   files that have been changed
- - Spotless is best option so far, but finding a flexible formatter is challenging. Might need to install eclipse
+TODO Uchiya Markers
+   - Compare to original implementation
+   - Speed up every step. See below
+   - Detect "dots" instead of ellipses. i.e. only look at radius. stdev for major/minor axis?
+   - Reduce amount of duplicate calculations related to LLAH
+     - combine tracker + detect into a single look up?
+     - Compute LLAH hash for each detected dot only once?
 
 ---------------------------------------------
 Date    : 2020/May/18
