@@ -100,7 +100,6 @@ Version : 0.37
   * Triangulate N-points using calibrated homogenous coordinates
 - Stereo
   * Speckle noise removal algorithm. Supports U8 and F32 image types.
-  * TODO Add example
 - Calibration
   * Stereo calibration now performs a join bundle adjustment after estimating the stereo baseline
 - Concurrency

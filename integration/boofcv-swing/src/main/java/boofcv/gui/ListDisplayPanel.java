@@ -109,6 +109,10 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 		addItem(new ImagePanel(image, scaling), name);
 	}
 
+	public void addImage( String name, BufferedImage image ) {
+		addImage(image, name, ScaleOptions.DOWN);
+	}
+
 	/**
 	 * Displays a new JPanel in the list.
 	 *
@@ -133,7 +137,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 			}
 			// update the list's size
 			Dimension d = listPanel.getMinimumSize();
-			listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
+			listPanel.setPreferredSize(new Dimension(10 + d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
 
 			// make sure it's preferred size is up to date
 			if (sizeChanged) {
@@ -144,6 +148,10 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 			}
 			validate();
 		});
+	}
+
+	public void addItem( final String name, final JComponent panel ) {
+		addItem(panel, name);
 	}
 
 	/**

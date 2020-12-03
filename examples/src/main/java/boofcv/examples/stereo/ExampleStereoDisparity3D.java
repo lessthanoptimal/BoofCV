@@ -34,6 +34,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,6 +54,52 @@ public class ExampleStereoDisparity3D {
 	// Specifies the disparity values which will be considered
 	private static final int disparityMin = 15;
 	private static final int disparityRange = 60;
+
+	/**
+	 * Given already computed rectified images and known stereo parameters, create a 3D cloud and visualize it
+	 */
+	public static JComponent computeAndShowCloud( StereoParameters param,
+												  GrayU8 rectLeft,
+												  RectifyCalibrated rectAlg, GrayF32 disparity ) {
+		// The point cloud will be in the left cameras reference frame
+		DMatrixRMaj rectK = rectAlg.getCalibrationMatrix();
+		DMatrixRMaj rectR = rectAlg.getRectifiedRotation();
+
+		// Put all the disparity parameters into one data structure
+		var disparityParameters = new DisparityParameters();
+		disparityParameters.baseline = param.getBaseline();
+		disparityParameters.disparityMin = disparityMin;
+		disparityParameters.disparityRange = disparityRange;
+		disparityParameters.rotateToRectified.set(rectR);
+		PerspectiveOps.matrixToPinhole(rectK, rectLeft.width, rectLeft.height, disparityParameters.pinhole);
+
+		// Iterate through each pixel in disparity image and compute its 3D coordinate
+		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
+		pcv.setTranslationStep(param.getBaseline()*0.1);
+
+		// Next create the 3D point cloud. The function below will handle conversion from disparity into
+		// XYZ, then transform from rectified into normal camera coordinate system. Feel free to glance at the
+		// source code to understand exactly what it's doing
+		MultiViewStereoOps.disparityToCloud(disparity, disparityParameters, null,
+				( pixX, pixY, x, y, z ) -> {
+					// look up the gray value. Then convert it into RGB
+					int v = rectLeft.unsafe_get(pixX, pixY);
+					pcv.addPoint(x, y, z, v << 16 | v << 8 | v);
+				});
+
+		// Configure the display
+//		pcv.setFog(true);
+//		pcv.setClipDistance(baseline*45);
+//		PeriodicColorizer colorizer = new TwoAxisRgbPlane.Z_XY(4.0);
+//		colorizer.setPeriod(baseline*5);
+//		pcv.setColorizer(colorizer); // sometimes pseudo color can be easier to view
+		pcv.setDotSize(1);
+		pcv.setCameraHFov(PerspectiveOps.computeHFov(param.left));
+//		pcv.setCameraToWorld(cameraToWorld);
+		JComponent viewer = pcv.getComponent();
+		viewer.setPreferredSize(new Dimension(600, 600*param.left.height/param.left.width));
+		return viewer;
+	}
 
 	public static void main( String[] args ) {
 		// ------------- Compute Stereo Correspondence
@@ -82,43 +129,7 @@ public class ExampleStereoDisparity3D {
 
 		// ------------- Convert disparity image into a 3D point cloud
 
-		// The point cloud will be in the left cameras reference frame
-		DMatrixRMaj rectK = rectAlg.getCalibrationMatrix();
-		DMatrixRMaj rectR = rectAlg.getRectifiedRotation();
-
-		// Put all the disparity parameters into one data structure
-		var disparityParameters = new DisparityParameters();
-		disparityParameters.baseline = param.getBaseline();
-		disparityParameters.disparityMin = disparityMin;
-		disparityParameters.disparityRange = disparityRange;
-		disparityParameters.rotateToRectified.set(rectR);
-		PerspectiveOps.matrixToPinhole(rectK, rectLeft.width, rectRight.height, disparityParameters.pinhole);
-
-		// Iterate through each pixel in disparity image and compute its 3D coordinate
-		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
-		pcv.setTranslationStep(param.getBaseline()*0.1);
-
-		// Next create the 3D point cloud. The function below will handle conversion from disparity into
-		// XYZ, then transform from rectified into normal camera coordinate system. Feel free to glance at the
-		// source code to understand exactly what it's doing
-		MultiViewStereoOps.disparityToCloud(disparity, disparityParameters,null,
-				( pixX, pixY, x, y, z ) -> {
-					// look up the gray value. Then convert it into RGB
-					int v = rectLeft.unsafe_get(pixX, pixY);
-					pcv.addPoint(x, y, z, v << 16 | v << 8 | v);
-				});
-
-		// Configure the display
-//		pcv.setFog(true);
-//		pcv.setClipDistance(baseline*45);
-//		PeriodicColorizer colorizer = new TwoAxisRgbPlane.Z_XY(4.0);
-//		colorizer.setPeriod(baseline*5);
-//		pcv.setColorizer(colorizer); // sometimes pseudo color can be easier to view
-		pcv.setDotSize(1);
-		pcv.setCameraHFov(PerspectiveOps.computeHFov(param.left));
-//		pcv.setCameraToWorld(cameraToWorld);
-		JComponent viewer = pcv.getComponent();
-		viewer.setPreferredSize(new Dimension(600, 600*param.left.height/param.left.width));
+		JComponent viewer = computeAndShowCloud(param, rectLeft, rectAlg, disparity);
 
 		// display the results.  Click and drag to change point cloud camera
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, disparityRange, 0);
