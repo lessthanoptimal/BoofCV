@@ -21,7 +21,7 @@ Version : 0.37
   * Created GUI for generating markers. Print or save to disk
   * Fully integrated into Applications
   * Rectangular markers are now fully supported
-  * TODO See if they can be speed up any
+  * Small runtime speed improvement by recycling memory
 - PointTracker
   * Orientation is now configurable using the new interface
   * Added back in or added for the first time association with sets using `AssociateDescriptionSets`
@@ -106,14 +106,6 @@ Version : 0.37
   * Removed WorkArrays since they were poorly designed
 
 TODO Move projective to metric and similar from multiview to perspective
-
-TODO Uchiya Markers
-   - Compare to original implementation
-   - Speed up every step. See below
-   - Detect "dots" instead of ellipses. i.e. only look at radius. stdev for major/minor axis?
-   - Reduce amount of duplicate calculations related to LLAH
-     - combine tracker + detect into a single look up?
-     - Compute LLAH hash for each detected dot only once?
 
 ---------------------------------------------
 Date    : 2020/May/18

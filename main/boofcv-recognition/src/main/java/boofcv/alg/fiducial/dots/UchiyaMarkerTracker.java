@@ -37,11 +37,14 @@ import lombok.Setter;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Detector and tracker for Uchiya Markers (a.k.a. Random Dot) see [1].</p>
@@ -55,12 +58,27 @@ import java.util.List;
  * to the current image pixels. This homography is then used to recompute the predicted location of all features,
  * even ones which were not observed. The new track LLAH description is computed from these predicted landmarks.
  *
+ * <p>NOTE: See in code comments about attempts to speed up this tracker.</p>
+ *
  * @author Peter Abeles
  * @see boofcv.alg.feature.describe.llah.LlahOperations
  *
  * <p>[1] Uchiyama, Hideaki, and Hideo Saito. "Random dot markers." 2011 IEEE Virtual Reality Conference. IEEE, 2011.</p>
  */
-public class UchiyaMarkerTracker {
+public class UchiyaMarkerTracker implements VerbosePrint {
+	// Optimizing the tracker appears to be more difficult than initially thought. Below are some attempts that failed.
+	//
+	// 1) Combining llahOps and llahTrackingOps together and making detection/tracking into a single step.
+	//    The combined detection/tracking step was faster, but track update was slower because it had to undo
+	//    the modification to llahOps when removing the old documents. Net result was about the same.
+	// 2) Looking up documents only using the feature hashcode and not the invariants since Uchiya doesn't need
+	//    invariants.
+	//    This ended up being slower. This could be because a hashmap was built instead of an inexpensive linked list
+	//    when going from hash code to features.
+	// 3) Simplifying image processing to use crude dots instead of refined ellipses would speed things up, but the
+	//    bottle neck is detection, tracking, and update steps.
+	//
+	// Profiling didn't show any obvious easy to fix inefficient code.
 
 	// Stores the "global" dictionary of documents
 	@Getter @Setter LlahOperations llahOps;
@@ -73,13 +91,13 @@ public class UchiyaMarkerTracker {
 	@Getter @Setter boolean tracking = true;
 
 	/** Print tracking and debugging messages */
-	private @Getter @Setter PrintStream verbose = null;
+	private PrintStream verbose = null;
 
 	// Storage for documents which have been lookd up
 	List<LlahOperations.FoundDocument> foundDocs = new ArrayList<>();
 
 	// List of tracks which were visible in the most recent frame
-	@Getter DogArray<Track> currentTracks = new DogArray<>(Track::new);
+	@Getter DogArray<Track> currentTracks = new DogArray<>(Track::new, Track::reset);
 	// Look up table that goes from global ID to Track
 	TIntObjectHashMap<Track> globalId_to_track = new TIntObjectHashMap<>();
 	// Lookup table from track ID to global ID
@@ -164,7 +182,6 @@ public class UchiyaMarkerTracker {
 		for (int i = 0; i < foundDocs.size(); i++) {
 			LlahOperations.FoundDocument foundTrackDoc = foundDocs.get(i);
 			Track track = currentTracks.grow();
-			track.reset();
 			if (fitHomographAndPredict(detectedDots, foundTrackDoc, track)) {
 				// convert from track doc to dictionary doc ID
 				int globalID = trackId_to_globalId.get(foundTrackDoc.document.documentID);
@@ -192,7 +209,6 @@ public class UchiyaMarkerTracker {
 				continue;
 
 			Track track = currentTracks.grow();
-			track.reset();
 			track.globalDoc = foundDoc.document;
 			if (fitHomographAndPredict(detectedDots, foundDoc, track)) {
 				globalId_to_track.put(track.globalDoc.documentID, track);
@@ -292,6 +308,10 @@ public class UchiyaMarkerTracker {
 			return ransac.getMatchSet().size() >= minLandmarkDoc;
 		}
 		return false;
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = out;
 	}
 
 	/**

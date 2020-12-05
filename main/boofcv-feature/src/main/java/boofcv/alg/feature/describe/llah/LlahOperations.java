@@ -76,7 +76,7 @@ public class LlahOperations {
 	@Getter final LlahHashTable hashTable = new LlahHashTable();
 
 	// List of all documents
-	@Getter final DogArray<LlahDocument> documents = new DogArray<>(LlahDocument::new);
+	@Getter final DogArray<LlahDocument> documents = new DogArray<>(LlahDocument::new, LlahDocument::reset);
 
 	//========================== Internal working variables
 	final NearestNeighbor<Point2D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint2D_F64());
@@ -93,8 +93,8 @@ public class LlahOperations {
 	// Used to compute all the combinations of a set
 	private final Combinations<Point2D_F64> combinator = new Combinations<>();
 
-	// recycle to avoid garbage collector
-	DogArray<DotCount> storageD2L = new DogArray<>(DotCount::new); // dot to landmark
+	// Recycling memory
+	DogArray<DotVotingBooth> votingBooths = new DogArray<>(DotVotingBooth::new, DotVotingBooth::reset);
 
 	/**
 	 * Configures the LLAH feature computation
@@ -111,7 +111,7 @@ public class LlahOperations {
 		this.hasher = hasher;
 
 		angles = new double[numberOfNeighborsN];
-		allFeatures = new DogArray<>(() -> new LlahFeature(numberOfInvariants));
+		allFeatures = new DogArray<>(() -> new LlahFeature(numberOfInvariants), LlahFeature::reset);
 	}
 
 	/**
@@ -176,7 +176,6 @@ public class LlahOperations {
 		checkListSize(locations2D);
 
 		LlahDocument doc = documents.grow();
-		doc.reset();
 		doc.documentID = documents.size() - 1;
 
 		// copy the points
@@ -198,7 +197,6 @@ public class LlahOperations {
 	private void createProcessor( LlahDocument doc, int idx ) {
 		// Given this set compute the feature
 		LlahFeature feature = allFeatures.grow();
-		feature.reset();
 		hasher.computeHash(permuteM, feature);
 
 		// save the results
@@ -290,12 +288,11 @@ public class LlahOperations {
 		if (dots.size() < numberOfNeighborsN + 1)
 			return;
 
-		storageD2L.reset();
+		votingBooths.reset();
 		foundMap.clear();
 		resultsStorage.reset();
 
 		// Used to keep track of what has been seen and what has not been seen
-		DogArray<DotVotingBooth> votingBooths = new DogArray<>(DotVotingBooth::new);
 		votingBooths.resize(dots.size());
 
 		var featureComputed = new LlahFeature(numberOfInvariants);
@@ -344,7 +341,7 @@ public class LlahOperations {
 	 * @param output storage for found document
 	 * @return true if successful
 	 */
-	public boolean lookupocument( List<Point2D_F64> dots, FoundDocument output ) {
+	public boolean lookUpDocument( List<Point2D_F64> dots, FoundDocument output ) {
 		throw new RuntimeException("Implement");
 	}
 
@@ -387,19 +384,26 @@ public class LlahOperations {
 	}
 
 	public static class DotVotingBooth {
+		// Stores the votes each dot casts for which document/feature it belongs to
 		final DogArray<DotToLandmark> votes = new DogArray<>(DotToLandmark::new);
+		// map from documentID to map from landmarkID to document
 		final TIntObjectHashMap<TIntObjectHashMap<DotToLandmark>> map = new TIntObjectHashMap<>();
+
+		// Recycles maps using in map.
+		final DogArray<TIntObjectHashMap<DotToLandmark>> storageMaps =
+				new DogArray<>(TIntObjectHashMap::new, TIntObjectHashMap::clear);
 
 		public void reset() {
 			votes.reset();
 			map.clear();
+			storageMaps.reset();
 		}
 
 		public DotToLandmark lookup( int documentID, int landmarkID ) {
 			TIntObjectHashMap<DotToLandmark> voteDoc = map.get(documentID);
 
 			if (voteDoc == null) {
-				voteDoc = new TIntObjectHashMap<>();
+				voteDoc = storageMaps.grow();
 				map.put(documentID, voteDoc);
 			}
 
