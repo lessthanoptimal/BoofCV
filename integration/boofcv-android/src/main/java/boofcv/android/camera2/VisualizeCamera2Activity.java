@@ -442,7 +442,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 				}
 			} break;
 
-			case NONE: throw new RuntimeException("Unsupported: " + bitmapMode);
+			case NONE: break;
 		}
 	}
 
@@ -477,7 +477,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 				}
 				break;
 
-			case NONE: throw new RuntimeException("Unsupported: " + bitmapMode);
+			case NONE: break;
 		}
 	}
 
