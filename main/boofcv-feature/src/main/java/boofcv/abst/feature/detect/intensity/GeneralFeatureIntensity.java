@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Extracts corners from a the image and or its gradient.  This is a generalized interface and lacks some of the functionality
@@ -113,12 +114,12 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageG
 	boolean localMaximums();
 
 	/**
-	 * Input image type
+	 * Input image type. Null if the input image isn't required.
 	 */
-	Class<I> getImageType();
+	@Nullable Class<I> getImageType();
 
 	/**
-	 * Derivative image type
+	 * Derivative image type. Null if the derivative image isn't required.
 	 */
-	Class<D> getDerivType();
+	@Nullable Class<D> getDerivType();
 }

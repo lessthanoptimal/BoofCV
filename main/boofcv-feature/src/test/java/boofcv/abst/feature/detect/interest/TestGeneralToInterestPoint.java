@@ -36,12 +36,11 @@ public class TestGeneralToInterestPoint extends BoofStandardJUnit {
 	/**
 	 * Several basic functionality tests
 	 */
-	@Test
-	void various() {
+	@Test void various() {
 		Helper detector = new Helper();
 		detector.maximum = true;
 		GeneralToInterestPoint<GrayF32,GrayF32> alg =
-				new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
+				new GeneralToInterestPoint<>(detector, 2.5);
 
 		alg.detect(input);
 		assertEquals(1, alg.getNumberOfSets());
@@ -60,19 +59,18 @@ public class TestGeneralToInterestPoint extends BoofStandardJUnit {
 	/**
 	 * Makes sure both minimums and maximums are added
 	 */
-	@Test
-	void checkMinimumsMaximums() {
+	@Test void checkMinimumsMaximums() {
 		Helper detector = new Helper();
 
 		// both turned off
-		var alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
+		var alg = new GeneralToInterestPoint<>(detector, 2.5);
 		alg.detect(input);
 		assertEquals(0, alg.getNumberOfSets());
 		assertEquals(0, alg.getNumberOfFeatures());
 
 		// just minimums
 		detector.minimum = true;
-		alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
+		alg = new GeneralToInterestPoint<>(detector, 2.5);
 		alg.detect(input);
 		assertEquals(1, alg.getNumberOfSets());
 		assertEquals(5, alg.getNumberOfFeatures());
@@ -82,7 +80,7 @@ public class TestGeneralToInterestPoint extends BoofStandardJUnit {
 
 		// both minimums and maximums
 		detector.maximum = true;
-		alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
+		alg = new GeneralToInterestPoint<>(detector, 2.5);
 		alg.detect(input);
 		assertEquals(2, alg.getNumberOfSets());
 		assertEquals(11,alg.getNumberOfFeatures());
@@ -95,7 +93,7 @@ public class TestGeneralToInterestPoint extends BoofStandardJUnit {
 
 		// just maximums
 		detector.minimum = false;
-		alg = new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
+		alg = new GeneralToInterestPoint<>(detector, 2.5);
 		alg.detect(input);
 		assertEquals(1, alg.getNumberOfSets());
 		assertEquals(6,alg.getNumberOfFeatures());
@@ -110,23 +108,20 @@ public class TestGeneralToInterestPoint extends BoofStandardJUnit {
 		public boolean minimum = false;
 		public boolean maximum = false;
 
-		@Override
-		public void process(GrayF32 image,
-							GrayF32 derivX, GrayF32 derivY,
-							GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY) {
+		@Override public void process(GrayF32 image,
+									  GrayF32 derivX, GrayF32 derivY,
+									  GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY) {
 			calledProcess++;
 		}
 
-		@Override
-		public QueueCorner getMinimums() {
+		@Override public QueueCorner getMinimums() {
 			QueueCorner ret = new QueueCorner();
 			for( int i = 0; i < 5; i++ )
 				ret.append(1,2);
 			return ret;
 		}
 
-		@Override
-		public QueueCorner getMaximums() {
+		@Override public QueueCorner getMaximums() {
 			QueueCorner ret = new QueueCorner();
 			for( int i = 0; i < 6; i++ )
 				ret.append(1,2);
@@ -137,5 +132,7 @@ public class TestGeneralToInterestPoint extends BoofStandardJUnit {
 		@Override public boolean isDetectMaximums() { return maximum; }
 		@Override public boolean getRequiresGradient() { return false; }
 		@Override public boolean getRequiresHessian() { return false; }
+		@Override public Class<GrayF32> getImageType() { return GrayF32.class; }
+		@Override public Class<GrayF32> getDerivType() { return GrayF32.class; }
 	}
 }

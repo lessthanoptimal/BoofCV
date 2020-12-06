@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * Detects features using {@link GeneralFeatureDetector} but Handles all the derivative computations automatically.
@@ -54,18 +57,28 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	 * @param imageType Type of input image
 	 * @param derivType If null then the derivative will be selected using the image type.
 	 */
-	public EasyGeneralFeatureDetector(GeneralFeatureDetector<T, D> detector ,
-									  Class<T> imageType, Class<D> derivType ) {
+	public EasyGeneralFeatureDetector( GeneralFeatureDetector<T, D> detector,
+									   @Nullable Class<T> imageType, @Nullable Class<D> derivType ) {
 		this.detector = detector;
 
-		if( derivType == null ) {
-			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		if (imageType == null) {
+			imageType = detector.getImageType();
 		}
 
-		if( detector.getRequiresGradient() || detector.getRequiresHessian()  ) {
-			gradient = FactoryDerivative.sobel(imageType, derivType);
+		if (derivType == null) {
+			derivType = detector.getDerivType();
 		}
-		if( detector.getRequiresHessian() ) {
+
+		if (derivType == null) {
+			Class<T> im = Objects.requireNonNull(imageType,"Must specify image type since detector doesn't");
+			derivType = GImageDerivativeOps.getDerivativeType(im);
+		}
+
+		if (detector.getRequiresGradient() || detector.getRequiresHessian()) {
+			Class<T> im = Objects.requireNonNull(imageType,"Must specify image type since detector doesn't");
+			gradient = FactoryDerivative.sobel(im, derivType);
+		}
+		if (detector.getRequiresHessian()) {
 			hessian = FactoryDerivative.hessianSobel(derivType);
 		}
 		declareDerivativeImages(gradient, hessian, derivType);
@@ -74,10 +87,10 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	/**
 	 * Constructor which allows the user to specify how derivatives are computed
 	 */
-	public EasyGeneralFeatureDetector(GeneralFeatureDetector<T, D> detector,
-									  ImageGradient<T, D> gradient,
-									  ImageHessian<D> hessian,
-									  Class<D> derivType ) {
+	public EasyGeneralFeatureDetector( GeneralFeatureDetector<T, D> detector,
+									   ImageGradient<T, D> gradient,
+									   ImageHessian<D> hessian,
+									   Class<D> derivType ) {
 		this.detector = detector;
 		this.gradient = gradient;
 		this.hessian = hessian;
@@ -88,15 +101,15 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	/**
 	 * Declare storage for image derivatives as needed
 	 */
-	private void declareDerivativeImages(ImageGradient<T, D> gradient, ImageHessian<D> hessian, Class<D> derivType) {
-		if( gradient != null || hessian != null ) {
+	private void declareDerivativeImages( ImageGradient<T, D> gradient, ImageHessian<D> hessian, Class<D> derivType ) {
+		if (gradient != null || hessian != null) {
 			derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
-			derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
+			derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 		}
-		if( hessian != null ) {
-			derivXX = GeneralizedImageOps.createSingleBand(derivType,1,1);
-			derivYY = GeneralizedImageOps.createSingleBand(derivType,1,1);
-			derivXY = GeneralizedImageOps.createSingleBand(derivType,1,1);
+		if (hessian != null) {
+			derivXX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+			derivYY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+			derivXY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 		}
 	}
 
@@ -104,9 +117,9 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	 * Detect features inside the image.  Excluding points in the exclude list.
 	 *
 	 * @param input Image being processed.
-	 * @param exclude List of points that should not be returned.
+	 * @param exclude List of points that should not be returned. Null if there are no excluded points.
 	 */
-	public void detect(T input, QueueCorner exclude ) {
+	public void detect( T input, @Nullable QueueCorner exclude ) {
 
 		initializeDerivatives(input);
 
@@ -122,7 +135,7 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	/**
 	 * Reshape derivative images to match the input image
 	 */
-	private void initializeDerivatives(T input) {
+	private void initializeDerivatives( T input ) {
 		// reshape derivatives if the input image has changed size
 		if (detector.getRequiresGradient() || detector.getRequiresHessian()) {
 			derivX.reshape(input.width, input.height);

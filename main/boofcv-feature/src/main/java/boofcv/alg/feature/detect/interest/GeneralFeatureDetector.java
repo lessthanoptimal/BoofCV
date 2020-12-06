@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	protected @Getter QueueCorner minimums = new QueueCorner(10);
 
 	/** Corners which should be excluded from detection */
-	protected @Getter @Setter QueueCorner exclude;
+	protected @Getter @Setter @Nullable QueueCorner exclude;
 
 	// selects the features with the largest intensity
 	protected @Getter FeatureSelectLimitIntensity<Point2D_I16> selectMax;
@@ -178,11 +178,12 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	private void markExcludedPixels(GrayF32 intensityImage, float value) {
-		if (exclude != null) {
-			for (int i = 0; i < exclude.size; i++) {
-				Point2D_I16 p = exclude.get(i);
-				intensityImage.unsafe_set(p.x, p.y, value);
-			}
+		if (exclude==null)
+			return;
+
+		for (int i = 0; i < exclude.size; i++) {
+			Point2D_I16 p = exclude.get(i);
+			intensityImage.unsafe_set(p.x, p.y, value);
 		}
 	}
 
@@ -273,11 +274,11 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 		return extractorMin != null ? extractorMin.getSearchRadius() : extractorMax.getSearchRadius();
 	}
 
-	public Class<I> getImageType() {
+	public @Nullable Class<I> getImageType() {
 		return intensity.getImageType();
 	}
 
-	public Class<D> getDerivType() {
+	public @Nullable Class<D> getDerivType() {
 		return intensity.getDerivType();
 	}
 }

@@ -189,20 +189,20 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		JSpinner spinnerFastTol;
 		JCheckBox checkWeighted = new JCheckBox("Weighted");
 
-		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(-1, 5, 0);
+		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(800, 5, 0);
 		boolean weighted = false;
 		int selectedAlgorithm = 0;
 		protected double zoom = 1;
 		protected int fastPixelTol = 20;
 
 		public ControlPanel() {
+			addAlgorithms();
 			final DefaultComboBoxModel<String> model = new DefaultComboBoxModel(comboBoxItems.toArray());
 			comboAlgorithms = new JComboBox<>(model);
 			comboAlgorithms.addActionListener(actionEvent -> {
 				selectedAlgorithm = comboAlgorithms.getSelectedIndex();
 				handleSettingsChanged();
 			});
-			addAlgorithms();
 			comboAlgorithms.setSelectedIndex(0);
 			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
 

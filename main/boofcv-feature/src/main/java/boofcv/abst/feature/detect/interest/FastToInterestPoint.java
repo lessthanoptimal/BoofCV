@@ -31,7 +31,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
 
 /**
- * Provides a wrapper around a fast corner detector for {@link PointDetector} no non-maximum suppression will be done
+ * Provides a wrapper around a fast corner detector for {@link InterestPointDetector} no non-maximum suppression will be done
  *
  * @author Peter Abeles
  */

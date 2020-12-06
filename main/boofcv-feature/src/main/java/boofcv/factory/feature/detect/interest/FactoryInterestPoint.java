@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,8 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryInterestPoint {
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> generic( ConfigDetectInterestPoint config , Class<T> inputType, @Nullable Class<D> derivType )
+	InterestPointDetector<T> generic( ConfigDetectInterestPoint config ,
+									  Class<T> inputType, @Nullable Class<D> derivType )
 	{
 		switch(config.type) {
 			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian,inputType);
@@ -87,7 +88,8 @@ public class FactoryInterestPoint {
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
 
-		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
+		FastCornerDetector<T> alg = FactoryIntensityPointAlg.fast(
+				configFast.pixelTol, configFast.minContinuous, imageType);
 
 		FeatureSelectLimit<Point2D_I16> selector = FactorySelectLimit.spatial(configSelect, Point2D_I16.class);
 
@@ -106,7 +108,8 @@ public class FactoryInterestPoint {
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, double scaleRadius , Class<T> inputType, Class<D> derivType) {
+	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature,
+									   double scaleRadius , Class<T> inputType, Class<D> derivType) {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
