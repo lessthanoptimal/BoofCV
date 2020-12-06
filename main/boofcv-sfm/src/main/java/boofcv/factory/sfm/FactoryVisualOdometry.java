@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -374,7 +374,8 @@ public class FactoryVisualOdometry {
 			case TICK_TOCK -> new TickTockKeyFrameManager(configVO.keyframes.tickPeriod);
 		};
 
-		DescribeRegionPoint<T, Desc> descriptor = FactoryDescribeRegionPoint.generic(hack.stereoDescribe, imageType);
+		DescribeRegionPoint<T, Desc> descriptor = FactoryDescribeRegionPoint.
+				generic(hack.stereoDescribe, ImageType.single(imageType));
 		Class<Desc> descType = descriptor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
 		AssociateStereo2D<Desc> associateL2R = new AssociateStereo2D<>(scorer, hack.epipolarTol, descType);

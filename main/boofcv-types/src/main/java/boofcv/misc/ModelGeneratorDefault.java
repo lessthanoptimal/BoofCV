@@ -16,8 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.factory.sfm;
+package boofcv.misc;
 
-import boofcv.struct.StandardConfigurationChecks;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 
-class TestConfigStereoDualTrackPnP extends StandardConfigurationChecks {}
+import java.util.List;
+
+/** Provides default implementations of {@link ModelGenerator}. Primarily used for testing. */
+public class ModelGeneratorDefault<Model,Point>	implements ModelGenerator<Model,Point> {
+	@Override public boolean generate( List<Point> dataSet, Model output ) {return true;}
+	@Override public int getMinimumPoints() {return 0;}
+}

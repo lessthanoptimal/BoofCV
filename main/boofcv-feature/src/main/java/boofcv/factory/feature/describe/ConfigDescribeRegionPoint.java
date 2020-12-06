@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,12 @@ public class ConfigDescribeRegionPoint implements Configuration {
 	}
 
 	public enum DescriptorType {
-		SURF_FAST,SURF_STABLE,SIFT,BRIEF,TEMPLATE,
+		SURF_FAST,
+		SURF_STABLE,
+		SURF_COLOR_FAST,
+		SURF_COLOR_STABLE,
+		SIFT,
+		BRIEF,
+		TEMPLATE,
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,10 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class Help {
 
-	static Class []options = new Class[]{
+	static Class[] options = new Class[]{
 			CreateFiducialSquareImage.class,
 			CreateFiducialSquareBinary.class,
 			CreateFiducialRandomDot.class,
@@ -38,41 +39,42 @@ public class Help {
 			CameraCalibration.class,
 			BatchScanQrCodes.class,
 			CreateCalibrationTarget.class,
-			CreateQrCodeDocument.class
+			CreateQrCodeDocument.class,
+			DownSelectVideoFramesFor3DApp.class,
 	};
 
 	public static void printHelp() {
 		System.out.println("Trying to run a command-line application?  Here are your options!");
 		System.out.println();
 
-		for( Class c : options ) {
-			System.out.println("  "+c.getSimpleName());
+		for (Class c : options) {
+			System.out.println("  " + c.getSimpleName());
 		}
 		System.out.println("Example:");
-		System.out.println("java -jar applications.jar "+options[0].getSimpleName());
+		System.out.println("java -jar applications.jar " + options[0].getSimpleName());
 	}
 
-	public static void main(String[] args) {
-		if( args.length == 1 ) {
-			if( args[0].equals("--GUI")) {
+	public static void main( String[] args ) {
+		if (args.length == 1) {
+			if (args[0].equals("--GUI")) {
 				new ApplicationLauncherGui();
 				return;
 			}
 		}
-		if( args.length > 0 ) {
-			String truncated[] = new String[args.length-1];
+		if (args.length > 0) {
+			String[] truncated = new String[args.length - 1];
 			System.arraycopy(args, 1, truncated, 0, truncated.length);
 
 			try {
-				Class appClass = Class.forName("boofcv.app."+args[0]);
+				Class appClass = Class.forName("boofcv.app." + args[0]);
 
-				Method m = appClass.getMethod("main",String[].class);
+				Method m = appClass.getMethod("main", String[].class);
 
-				m.invoke(null,new Object[]{truncated});
+				m.invoke(null, new Object[]{truncated});
 			} catch (ClassNotFoundException e) {
 				printHelp();
 				System.out.println();
-				System.out.println("Can't find application for "+args[0]);
+				System.out.println("Can't find application for " + args[0]);
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}

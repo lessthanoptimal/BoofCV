@@ -167,8 +167,10 @@ public class FactoryMultiViewRobust {
 		return config;
 	}
 
-	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalLMedS(ConfigFundamental fundamental,
-																			 ConfigLMedS lmeds ) {
+	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalLMedS( @Nullable ConfigFundamental fundamental,
+																			  ConfigLMedS lmeds ) {
+		if (fundamental==null)
+			fundamental = new ConfigFundamental();
 
 		fundamental.checkValidity();
 		lmeds.checkValidity();
@@ -179,20 +181,11 @@ public class FactoryMultiViewRobust {
 		GenerateEpipolarMatrix generateF = new GenerateEpipolarMatrix(estimateF);
 
 		// How the error is measured
-		DistanceFromModel<DMatrixRMaj,AssociatedPair> errorMetric;
-
-		switch( fundamental.errorModel ) {
-			case SAMPSON:
-				errorMetric = new DistanceFromModelResidual<>(new FundamentalResidualSampson());
-				break;
-
-			case GEOMETRIC:
-				errorMetric = new DistanceFundamentalGeometric();
-				break;
-
-			default:
-				throw new RuntimeException("Unknown");
-		}
+		DistanceFromModel<DMatrixRMaj,AssociatedPair> errorMetric = switch (fundamental.errorModel) {
+			case SAMPSON -> new DistanceFromModelResidual<>(new FundamentalResidualSampson());
+			case GEOMETRIC -> new DistanceFundamentalGeometric();
+			default -> throw new RuntimeException("Unknown");
+		};
 
 
 		LeastMedianOfSquares<DMatrixRMaj, AssociatedPair> config = new LeastMedianOfSquares<>

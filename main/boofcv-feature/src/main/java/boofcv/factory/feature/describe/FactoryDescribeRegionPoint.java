@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,16 +49,21 @@ public class FactoryDescribeRegionPoint {
 	 * Factory function for creating many different types of region descriptors
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends ImageGray<T>,Desc extends TupleDesc>
-	DescribeRegionPoint<T,Desc> generic(ConfigDescribeRegionPoint config , Class<T> imageType) {
-		switch(config.type) {
-			case SURF_FAST: return (DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surfFast, imageType);
-			case SURF_STABLE: return(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surfStability, imageType);
-			case SIFT: return (DescribeRegionPoint)FactoryDescribeRegionPoint.sift(config.scaleSpaceSift,config.sift, imageType);
-			case BRIEF: return (DescribeRegionPoint)FactoryDescribeRegionPoint.brief(config.brief, imageType);
-			case TEMPLATE: return (DescribeRegionPoint)FactoryDescribeRegionPoint.template(config.template, imageType);
-			default: throw new IllegalArgumentException("Unknown descriptor");
-		}
+	public static <T extends ImageBase<T>,Desc extends TupleDesc>
+	DescribeRegionPoint<T,Desc> generic(ConfigDescribeRegionPoint config , ImageType<T> imageType) {
+
+		Class imageClass = imageType.getImageClass();
+
+		return switch (config.type) {
+			case SURF_FAST -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surfFast, imageClass);
+			case SURF_STABLE -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surfStability, imageClass);
+			case SURF_COLOR_FAST -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorFast(config.surfFast, (ImageType)imageType);
+			case SURF_COLOR_STABLE -> (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorStable(config.surfStability, imageType);
+			case SIFT -> (DescribeRegionPoint)FactoryDescribeRegionPoint.sift(config.scaleSpaceSift, config.sift, imageClass);
+			case BRIEF -> (DescribeRegionPoint)FactoryDescribeRegionPoint.brief(config.brief, imageClass);
+			case TEMPLATE -> (DescribeRegionPoint)FactoryDescribeRegionPoint.template(config.template, imageClass);
+			default -> throw new IllegalArgumentException("Unknown descriptor");
+		};
 	}
 
 	/**

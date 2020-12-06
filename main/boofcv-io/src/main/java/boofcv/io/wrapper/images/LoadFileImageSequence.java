@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,6 +84,10 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		this.type = type;
 
 		findImages();
+
+		// load the first image so that we get the size
+		next();
+		index = 0; // go back to the first image again
 	}
 
 	@Override
@@ -225,6 +229,10 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		forwards = true;
 		image = null;
 		imageGUI = null;
+	}
+
+	public int getTotalImages() {
+		return fileNames.size();
 	}
 
 	public int getIndex() {

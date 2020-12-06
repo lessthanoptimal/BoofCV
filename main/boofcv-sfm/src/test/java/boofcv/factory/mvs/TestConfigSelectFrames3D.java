@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.factory.sfm;
+package boofcv.factory.mvs;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-class TestConfigStereoDualTrackPnP extends StandardConfigurationChecks {}
+/**
+ * @author Peter Abeles
+ */
+class TestConfigSelectFrames3D extends StandardConfigurationChecks {}

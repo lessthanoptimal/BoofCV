@@ -69,7 +69,7 @@ public class ExampleMultiViewDenseReconstruction {
 		var configSgm = new ConfigDisparitySGM();
 		configSgm.validateRtoL = 0;
 		configSgm.texture = 0.75;
-		configSgm.disparityRange = 50;
+		configSgm.disparityRange = 120;
 		configSgm.paths = ConfigDisparitySGM.Paths.P4;
 		configSgm.configBlockMatch.radiusX = 3;
 		configSgm.configBlockMatch.radiusY = 3;

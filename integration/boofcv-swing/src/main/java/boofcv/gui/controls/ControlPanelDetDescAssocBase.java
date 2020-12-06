@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.*;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 
@@ -185,7 +186,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		c.scaleSpaceSift = configDetDesc.scaleSpaceSift;
 		c.template = configDetDesc.describeTemplate;
 
-		return FactoryDescribeRegionPoint.generic(c, imageType);
+		return FactoryDescribeRegionPoint.generic(c, ImageType.single(imageType));
 	}
 
 	public AssociateDescription createAssociate( DescriptorInfo descriptor ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class BatchDownsizeImage {
 	private boolean guiMode = false;
 	@Option(name = "-w", aliases = {"--Width"}, usage="Sets output width. If zero then aspect is matched with height")
 	int width=0;
-	@Option(name = "-h", aliases = {"--Height"}, usage="Sets output width. If zero then aspect is matched with height")
+	@Option(name = "-h", aliases = {"--Height"}, usage="Sets output height. If zero then aspect is matched with width")
 	int height=0;
 	@Option(name = "--MaxLength", usage="Indicates that if only one dimension is set then that's the size of the largest side")
 	boolean maxLength=false;
