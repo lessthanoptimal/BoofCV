@@ -48,14 +48,14 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
+public class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 	public CameraPinhole intrinsic = new CameraPinhole(400, 410, 0, 420, 420, 800, 800);
 	public int numFeatures = 100;
 	public Random rand = BoofTesting.createRandom(3);
 	public boolean loop = true;
 
-	List<Feature> points = new ArrayList<>();
-	List<View> views = new ArrayList<>();
+	public List<Feature> points = new ArrayList<>();
+	public List<View> views = new ArrayList<>();
 
 	public MockLookupSimilarImagesRealistic() {}
 
@@ -379,11 +379,11 @@ class MockLookupSimilarImagesRealistic implements LookupSimilarImages {
 		return null;
 	}
 
-	static class Feature {
+	public static class Feature {
 		public Point3D_F64 world = new Point3D_F64();
 	}
 
-	static class Observation {
+	public static class Observation {
 		public Feature feature;
 		public Point2D_F64 pixel = new Point2D_F64();
 	}

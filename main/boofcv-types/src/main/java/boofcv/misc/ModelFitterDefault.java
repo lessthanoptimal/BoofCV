@@ -16,8 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.factory.sfm;
+package boofcv.misc;
 
-import boofcv.struct.StandardConfigurationChecks;
+import org.ddogleg.fitting.modelset.ModelFitter;
 
-class TestConfigStereoDualTrackPnP extends StandardConfigurationChecks {}
+import java.util.List;
+
+/**
+ * Provides default implementations of ModelFitter functions.
+ */
+public class ModelFitterDefault<Model,Point> implements ModelFitter<Model,Point> {
+	@Override public boolean fitModel( List<Point> dataSet, Model initial, Model found ) { return false; }
+	@Override public double getFitScore() { return 0; }
+}

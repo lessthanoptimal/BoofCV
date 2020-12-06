@@ -116,7 +116,7 @@ public class ExampleMultiBaselineStereo {
 		configDisparity.validateRtoL = 1;
 		configDisparity.texture = 0.5;
 		configDisparity.regionRadiusX = configDisparity.regionRadiusY = 4;
-		configDisparity.disparityRange = 50;
+		configDisparity.disparityRange = 120;
 
 		// This is the actual MBS algorithm mentioned previously. It selects the best disparity for each pixel
 		// in the original image using a median filter.
