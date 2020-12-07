@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	private final Listener listener;
 
 	private final JPyramidLevels controlLevels;
-	private final JSpinner spinnerMaxTracks;
+	private final JConfigLength spinnerMaxTracks;
 	private final JCheckBox checkPruneClose;
 	private final JSpinner spinnerIterations;
 	private final JSpinner spinnerMaxError;
@@ -61,7 +61,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		initializeConfiguration();
 
 		controlLevels = new JPyramidLevels(this.configKlt.pyramidLevels,listener::changedPointTrackerKlt);
-		spinnerMaxTracks = spinner(configKlt.maximumTracks,-1,10000,10);
+		spinnerMaxTracks = configLength(configKlt.maximumTracks,0,50000.0);
 		checkPruneClose = checkbox("Prune Close", this.configKlt.pruneClose,"If true then tracks which are clustered close to each other are pruned");
 		spinnerIterations = spinner(this.configKlt.config.maxIterations,1,500,1);
 		spinnerMaxError = spinner(this.configKlt.config.maxPerPixelError,0.0,255.0,5.0);
@@ -107,7 +107,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		if( source == spinnerDescRadius) {
 			configKlt.templateRadius = ((Number) spinnerDescRadius.getValue()).intValue();
 		} else if( source == spinnerMaxTracks) {
-			configKlt.maximumTracks = ((Number) spinnerMaxTracks.getValue()).intValue();
+			configKlt.maximumTracks.setTo(spinnerMaxTracks.getValue());
 		} else if( source == spinnerMaxError) {
 			configKlt.config.maxPerPixelError = ((Number) spinnerMaxError.getValue()).floatValue();
 		} else if( source == spinnerForwardsBackwards ) {

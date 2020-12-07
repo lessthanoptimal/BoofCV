@@ -120,12 +120,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		int period = 33;
 		if (o instanceof PathLabel) {
 			// These examples were made before mp4 capability was added and were kept small by reducing the frame rate
-			switch (((PathLabel) o).label) {
-				case "Shake":
-				case "Zoom":
-				case "Rotate":
-					period = 150;
-					break;
+			switch (((PathLabel)o).label) {
+				case "Shake", "Zoom", "Rotate" -> period = 150;
 			}
 		}
 		int _period = period;
@@ -242,22 +238,19 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					if( duration < minDuration )
 						continue;
 
-					switch( colorization ) {
-						case TRACK_ID: {
-							visualizeFlow.red = (int) (2.5 * (p.featureId % 100));
-							visualizeFlow.green = (int) ((255.0 / 150.0) * (p.featureId % 150));
-							visualizeFlow.blue = (int) (p.featureId % 255);
-						} break;
-
-						case FLOW: {
-							visualizeFlow.computeColor(p.pixel,tracksPrev.get(p.featureId),false);
-						} break;
-
-						case FLOW_LOG: {
-							visualizeFlow.computeColor(p.pixel,tracksPrev.get(p.featureId), true);
-						} break;
-
-						default: throw new RuntimeException("BUG");
+					switch (colorization) {
+						case TRACK_ID -> {
+							visualizeFlow.red = (int)(2.5*(p.featureId%100));
+							visualizeFlow.green = (int)((255.0/150.0)*(p.featureId%150));
+							visualizeFlow.blue = (int)(p.featureId%255);
+						}
+						case FLOW -> {
+							visualizeFlow.computeColor(p.pixel, tracksPrev.get(p.featureId), false);
+						}
+						case FLOW_LOG -> {
+							visualizeFlow.computeColor(p.pixel, tracksPrev.get(p.featureId), true);
+						}
+						default -> throw new RuntimeException("BUG");
 					}
 
 					double x = offsetX + scale*p.pixel.x;
@@ -267,27 +260,21 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					if( duration == 0 ) {
 						VisualizeFeatures.drawPoint(g2, x,y, 5, Color.GREEN,true,ellipse );
 					} else {
-						switch( markerType ) {
-							case Dot:
-								VisualizeFeatures.drawPoint(g2, x, y, 5, visualizeFlow.createColor(), true, ellipse);
-								break;
-
-							case Circle:
+						switch (markerType) {
+							case Dot -> VisualizeFeatures.drawPoint(g2, x, y, 5, visualizeFlow.createColor(), true, ellipse);
+							case Circle -> {
 								g2.setColor(visualizeFlow.createColor());
 								VisualizeFeatures.drawCircle(g2, x, y, 5, ellipse);
-								break;
-
-							case Line:
+							}
+							case Line -> {
 								Point2D_F64 prev = tracksPrev.get(p.featureId);
-
-								if( prev == null ) {
+								if (prev == null) {
 									// this is a bug... show something so that we know there's a bug
 									VisualizeFeatures.drawPoint(g2, x, y, 5, visualizeFlow.createColor(), true, ellipse);
 								} else {
-									visualizeFlow.drawLine(x,y,offsetX+scale*prev.x,offsetY+scale*prev.y,g2);
+									visualizeFlow.drawLine(x, y, offsetX + scale*prev.x, offsetY + scale*prev.y, g2);
 								}
-								break;
-
+							}
 						}
 					}
 					g2.setStroke(strokeBefore);
@@ -397,7 +384,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		examples.add(new PathLabel("Driving Night", UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
 
 		SwingUtilities.invokeLater(()->{
-			VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(examples,type);
+			var app = new VideoTrackerPointFeaturesApp(examples,type);
 			app.openFile(new File(examples.get(0).getPath()));
 			app.display( "Feature Tracker");
 		});

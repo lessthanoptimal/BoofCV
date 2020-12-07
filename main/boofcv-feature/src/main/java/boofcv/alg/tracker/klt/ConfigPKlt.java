@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.alg.tracker.klt;
 
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
@@ -41,9 +43,7 @@ public class ConfigPKlt implements Configuration
 	/** The radius of a feature descriptor in layer. 2 is a reasonable number. */
 	public int templateRadius = 2;
 
-	/**
-	 * Specifies the number of layers in the pyramid
-	 */
+	/** Specifies the number of layers in the pyramid */
 	public ConfigDiscreteLevels pyramidLevels = ConfigDiscreteLevels.minSize(40);
 
 	/**
@@ -53,12 +53,13 @@ public class ConfigPKlt implements Configuration
 	public boolean pruneClose=false;
 
 	/**
-	 * Specifies the maximum number of features it can track. If < 0 then there is no limit.
+	 * Specifies the maximum number of features it can track. If fixed at 0 then there is no limit. If relative
+	 * then it's relative to the total number of pixels in the image.
 	 *
 	 * <p>NOTE: {@link boofcv.abst.tracker.PointTrackerKltPyramid} will manage the number of detections and will
 	 * override {@link boofcv.abst.feature.detect.interest.ConfigGeneralDetector#maxFeatures}.</p>
 	 */
-	public int maximumTracks = -1;
+	public ConfigLength maximumTracks = ConfigLength.relative(0.002,50);
 
 	public ConfigPKlt() {}
 
@@ -76,6 +77,9 @@ public class ConfigPKlt implements Configuration
 	public void checkValidity() {
 		config.checkValidity();
 		pyramidLevels.checkValidity();
+		maximumTracks.checkValidity();
+		BoofMiscOps.checkTrue(templateRadius>=0); // 0 = 1 pixel wide. Still technically valid
+		// toleranceFB is valid for all values
 	}
 
 	public void setTo( ConfigPKlt src ) {
@@ -84,7 +88,7 @@ public class ConfigPKlt implements Configuration
 		this.templateRadius = src.templateRadius;
 		this.pyramidLevels.setTo(src.pyramidLevels);
 		this.pruneClose = src.pruneClose;
-		this.maximumTracks = src.maximumTracks;
+		this.maximumTracks.setTo(src.maximumTracks);
 	}
 
 	public ConfigPKlt copy() {

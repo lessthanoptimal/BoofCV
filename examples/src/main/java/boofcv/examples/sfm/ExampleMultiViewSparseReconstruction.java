@@ -127,7 +127,7 @@ public class ExampleMultiViewSparseReconstruction {
 		bundleAdjustmentRefine();
 
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("Printing view info. Used "+scene.views.size+" / "+pairwise.nodes.size);
+		System.out.println("Printing view info. Used " + scene.views.size + " / " + pairwise.nodes.size);
 		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
 			var wv = working.lookupView(pv.id);
 			if (wv == null)
@@ -156,7 +156,7 @@ public class ExampleMultiViewSparseReconstruction {
 		configTracker.klt.pruneClose = true;
 		configTracker.klt.toleranceFB = 2;
 		configTracker.klt.templateRadius = radius;
-		configTracker.klt.maximumTracks = 800;
+		configTracker.klt.maximumTracks.setFixed(800);
 		configTracker.klt.config.maxIterations = 30;
 		configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
 		configTracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
@@ -209,7 +209,8 @@ public class ExampleMultiViewSparseReconstruction {
 				pairwise = MultiViewIO.load(savePath.getPath(), (PairwiseImageGraph)null);
 				System.out.println("Loaded Pairwise Graph");
 				return;
-			} catch (UncheckedIOException ignore) {}
+			} catch (UncheckedIOException ignore) {
+			}
 
 		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
@@ -238,7 +239,8 @@ public class ExampleMultiViewSparseReconstruction {
 				working = MultiViewIO.load(savePath.getPath(), pairwise, null);
 				System.out.println("Loaded Metric Reconstruction");
 				return;
-			} catch (UncheckedIOException ignore) {}
+			} catch (UncheckedIOException ignore) {
+			}
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Metric Reconstruction");
@@ -271,7 +273,8 @@ public class ExampleMultiViewSparseReconstruction {
 				scene = MultiViewIO.load(savePath.getPath(), (SceneStructureMetric)null);
 				System.out.println("Loaded Refined Scene");
 				return;
-			} catch (UncheckedIOException ignore) {}
+			} catch (UncheckedIOException ignore) {
+			}
 
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Refining the scene");

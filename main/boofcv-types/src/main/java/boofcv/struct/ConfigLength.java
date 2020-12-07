@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,15 +100,12 @@ public class ConfigLength implements Configuration {
 			return -1;
 	}
 
-	/**
-	 * Returns the length as a rounded integer.
-	 */
+	/** Returns the length as a rounded integer. */
 	public int getLengthI() {
 		return (int)Math.round(length);
 	}
 
-	@Override
-	public void checkValidity() {
+	@Override public void checkValidity() {
 		if (length < 0 && fraction < 0)
 			throw new IllegalArgumentException("length and/or fraction must be >= 0");
 		if (isRelative())
@@ -127,8 +124,7 @@ public class ConfigLength implements Configuration {
 		return out;
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		String out = "ConfigLength{";
 		if (fraction >= 0)
 			out += "fraction=" + fraction + ", minimum=" + length;

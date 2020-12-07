@@ -62,6 +62,8 @@ Version : 0.37
   * Supports multiple point types
   * Variant with and without intensity information
   * Spatial approaches work when there are no images and intensity is derived from features
+- PKltTracker
+  * Maximum tracks is now ConfigLength to make it easier to tune once across image sizes
 - FAST Corner feature detector
   * Configurable in the GUI
   * More efficient storage of candidate corners

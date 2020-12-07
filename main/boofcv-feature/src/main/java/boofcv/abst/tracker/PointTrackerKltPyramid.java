@@ -24,6 +24,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.PruneCloseTracks;
 import boofcv.alg.tracker.klt.*;
 import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -45,7 +46,9 @@ import java.util.List;
 public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements PointTracker<I> {
 	// If this is a positive number it specifies the maximum number of allowed tracks
-	public @Getter @Setter int maximumAllowedTracks = -1;
+	public @Getter @Setter ConfigLength configMaxTracks = ConfigLength.fixed(0);
+	// The actual maximum after considering the number of pixels
+	int actualMaxTracks;
 
 	// reference to input image
 	protected I input;
@@ -233,14 +236,16 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		// Don't want to detect features again which are already being tracked
 		detector.setExclude(excludeList);
 		// Don't exceed the maximum tracking limit
-		if (maximumAllowedTracks > 0) {
-			int limit = maximumAllowedTracks - excludeList.size;
+		I baseLayer = currPyr.basePyramid.getLayer(0);
+		actualMaxTracks = configMaxTracks.computeI(baseLayer.totalPixels());
+		if (actualMaxTracks > 0) {
+			int limit = actualMaxTracks - excludeList.size;
 			if (limit <= 0)
 				return;
-			detector.setFeatureLimit(maximumAllowedTracks - excludeList.size);
+			detector.setFeatureLimit(actualMaxTracks - excludeList.size);
 		} else
 			detector.setFeatureLimit(-1);
-		detector.process(currPyr.basePyramid.getLayer(0), currPyr.derivX[0], currPyr.derivY[0], null, null, null);
+		detector.process(baseLayer, currPyr.derivX[0], currPyr.derivY[0], null, null, null);
 
 		// Create new tracks from the detected features
 		addToTracks(scaleBottom, detector.getMinimums());
@@ -293,7 +298,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 
 	@Override
 	public int getMaxSpawn() {
-		return maximumAllowedTracks;
+		return actualMaxTracks;
 	}
 
 	@Override

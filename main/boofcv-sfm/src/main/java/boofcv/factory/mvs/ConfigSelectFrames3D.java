@@ -65,7 +65,7 @@ public class ConfigSelectFrames3D implements Configuration {
 		// Improve stability of KLT tracks
 		tracker.klt.templateRadius = 3;
 		tracker.klt.config.maxIterations = 25;
-		tracker.klt.maximumTracks = 800; // TODO make dependent on image size?
+		tracker.klt.maximumTracks.setRelative(0.002,800);
 		tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
 
 		// best compromise between speed and stability

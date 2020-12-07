@@ -171,7 +171,7 @@ public class FactoryPointTracker {
 		var ret = new PointTrackerKltPyramid<>(config.config, config.toleranceFB,
 				config.templateRadius, config.pruneClose, pyramid, detector,
 				gradient, interpInput, interpDeriv, derivType);
-		ret.maximumAllowedTracks = config.maximumTracks;
+		ret.configMaxTracks = config.maximumTracks;
 		return ret;
 	}
 
