@@ -23,8 +23,9 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
+import boofcv.factory.mvs.ConfigSelectFrames3D;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.ConfigLength;
+import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
@@ -38,9 +39,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_I32;
-import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.sorting.QuickSelect;
+import org.ddogleg.struct.*;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,25 +72,18 @@ import java.util.Set;
  */
 public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements VerbosePrint {
 	// TODO Jump over frames which are destroyed by image glare
-	// TODO Specify maximum average feature translation. Smaller steps to improve tracking
 	// TODO Score frames based on an estimate of blur. Try to select in focus frames
+	// TODO If way too many tracks have been dropped go back and select a new key frame that's in the past
+	// TODO Plan a path that minimizes pointless jitter. Maybe a new algorithm completely. Local window?
 
-	/** Will attempt to skip over at most this number of bad frames. */
-	public @Getter @Setter int maxFrameSkip = 5;
+	/**
+	 * Returns the configuration with tuning parameters used. Note that settings for inner classes, e.g.
+	 * association and model matchers, are ignored. While not elegant, this config design avoids duplicate
+	 * code and comments.
+	 */
+	public @Getter final ConfigSelectFrames3D config = new ConfigSelectFrames3D();
 
-	/** Radius of the region used to compute the description. Might be ignored */
-	public @Getter @Setter ConfigLength featureRadius = ConfigLength.fixed(10);
-
-	/** A track is considered to not have moved if it's motion is less than this value */
-	public @Getter @Setter double motionInlier = 2.0;
-
-	/** If the difference in two values is more than or equal to this then it's significant */
-	public @Getter @Setter double significantFraction = 0.1;
-
-	/** Minimum number of features that must be available for an operation to be valid */
-	public @Getter @Setter int minimumFeatures = 15;
-
-	/** Frames which have been selected for output */
+	/** Output: Frames which have been selected to be saved. */
 	private @Getter final DogArray_I32 selectedFrames = new DogArray_I32();
 
 	/** Tracks features frame to frame */
@@ -140,6 +133,9 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	final Frame keyFrame;
 	// Storage for the current frame being processed
 	final Frame currentFrame;
+
+	// Storage for distances between tracks in each frame
+	final DogArray_F64 distances = new DogArray_F64();
 
 	@Nullable PrintStream verbose = null;
 
@@ -191,14 +187,23 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		} else {
 			createPairsWithKeyFrameTracking(keyFrame, currentFrame);
 
-			if (!isSceneStatic() && !isSceneClearlyNot3D()) {
-				saveImage = isScene3D();
-			}
+			// Compute how much the frame moved
+			double frameMotion = computeFrameRelativeMotion();
+			double minMotionThresh = config.minTranslation.computeI(Math.max(width, height));
+			double maxMotionThresh = config.maxTranslation.computeI(Math.max(width, height));
 
-			if (!saveImage) {
-				// TODO match using descriptors. If better matching with descriptors then save this frame as
-				//      there were probably bad frames between
-				// TODO Handle the number of skip frames hitting their limit
+			if (verbose != null) verbose.printf("  Motion: distance=%.1f min=%.1f max=%.1f\n",
+						frameMotion, minMotionThresh, maxMotionThresh);
+
+			if (frameMotion >= minMotionThresh) {
+				if (frameMotion > maxMotionThresh) {
+					saveImage = true;
+				} else if (!isSceneStatic() && !isSceneClearlyNot3D()) {
+					saveImage = isScene3D();
+					if (!saveImage) {
+						saveImage = checkSkippedBadFrame();
+					}
+				}
 			}
 
 			if (verbose != null) verbose.println("saveImage=" + saveImage);
@@ -209,6 +214,8 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 					saveImage = true;
 			}
 		}
+
+
 
 		// Save the frame and make it the new keyframe
 		if (saveImage) {
@@ -236,7 +243,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		descriptor.setImage(image);
 
 		// Compute the descriptor region size based in the input image size
-		int featureRadius = this.featureRadius.computeI(Math.max(width, height));
+		int featureRadius = config.featureRadius.computeI(Math.max(width, height));
 
 		// Extract feature and track information from the current frame
 		currentFrame.reserve(activeTracks.size());
@@ -277,7 +284,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 */
 	boolean isSceneStatic() {
 		// count the number of features which have moved
-		double tol = motionInlier*motionInlier;
+		double tol = config.motionInlier*config.motionInlier;
 		int moved = 0;
 		for (int pairIdx = 0; pairIdx < pairs.size; pairIdx++) {
 			AssociatedPair p = pairs.get(pairIdx);
@@ -291,7 +298,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 
 		if (verbose != null) verbose.printf("  Static: moved=%4d total=%d ratio=%f\n", moved, pairs.size, ratio);
 
-		return ratio < significantFraction;
+		return ratio < config.significantFraction;
 	}
 
 	/**
@@ -307,7 +314,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		if (!computeHomography.generate(pairs.toList(), foundHomography))
 			return true;
 
-		double tol = motionInlier*motionInlier;
+		double tol = config.motionInlier*config.motionInlier;
 		int inliers = 0;
 
 		var transformed = new Point2D_F64();
@@ -324,7 +331,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		if (verbose != null)
 			verbose.printf("  ClearlyNot3D: inliers=%4d total=%d ratio=%f\n", inliers, pairs.size, ratio);
 
-		return ratio < significantFraction;
+		return ratio < config.significantFraction;
 	}
 
 	/**
@@ -339,7 +346,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		if (!robust3D.process(pairs.toList()))
 			return false;
 		double fit3D = robust3D.getFitQuality();
-		if (robust3D.getMatchSet().size() < minimumFeatures)
+		if (robust3D.getMatchSet().size() < config.minimumFeatures)
 			return false;
 
 		if (!robustH.process(pairs.toList()))
@@ -348,7 +355,42 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 
 		if (verbose != null) verbose.printf("  Check3D: H=%4f 3D=%4f\n", Math.sqrt(fitH), Math.sqrt(fit3D));
 
-		return Objects.requireNonNull(compareFit).isFitABetter(fit3D, fitH, significantFraction);
+		return Objects.requireNonNull(compareFit).isFitABetter(fit3D, fitH, config.significantFraction);
+	}
+
+	/**
+	 * If tracks are dropped and association does much better that can indicate there was some even (like glare)
+	 * which caused the tracks to drop but is now gone. In that case save this frame and skip over the bad stuff
+	 */
+	boolean checkSkippedBadFrame() {
+		Objects.requireNonNull(associate);
+
+		associate.setSource(keyFrame.locations, keyFrame.descriptions);
+		associate.setDestination(currentFrame.locations, currentFrame.descriptions);
+		associate.associate();
+
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
+		boolean skip = matches.size > pairs.size*config.skipEvidenceRatio;
+
+		if (verbose != null)
+			verbose.printf("  Skip: associated=%d tracking=%d skip=%s\n", matches.size, pairs.size, skip);
+
+		return skip;
+	}
+
+	/**
+	 * Has there been so much motion that we should save the image anyways? If too many frames are skipped
+	 * the reconstruction can be bad or incomplete
+	 */
+	double computeFrameRelativeMotion() {
+		distances.reset();
+		distances.resize(pairs.size);
+
+		for (int pairIdx = 0; pairIdx < pairs.size; pairIdx++) {
+			distances.set(pairIdx, pairs.get(pairIdx).distance2());
+		}
+
+		return QuickSelect.select(distances.data, (int)(distances.size*0.9), distances.size);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

@@ -77,8 +77,6 @@ public class ExampleMultiViewSparseReconstruction {
 
 	// Instead of processing all the frames just process the first N frames
 	int maxFrames = 30;
-	// Recompute everything and ignore previously saved results
-	boolean forceRecompute = false;
 
 	String workDirectory;
 	List<String> imageFiles = new ArrayList<>();
@@ -88,19 +86,25 @@ public class ExampleMultiViewSparseReconstruction {
 	SceneWorkingGraph working = null;
 	SceneStructureMetric scene = null;
 
-	public static void main( String[] args ) {
-		// Turn on threaded code for bundle adjustment
-		DDoglegConcurrency.USE_CONCURRENT = true;
+	boolean rebuild = false;
 
+	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
-		example.compute("house_01.mp4");
-//		example.compute("forest_path_01.mp4");
+//		example.maxFrames = 100;       // This will process the entire sequence
+		example.compute("tree_snow_01.mp4");
+//		example.compute("ditch_02.mp4");
+//		example.compute("lights_snowman_01.mp4");
+//		example.compute("log_building_02.mp4");
 		example.visualizeSparseCloud();
 
 		System.out.println("done");
 	}
 
 	public void compute( String videoName ) {
+		// Turn on threaded code for bundle adjustment
+		DDoglegConcurrency.USE_CONCURRENT = true;
+
+		// Create a directory to store the work space
 		String path = UtilIO.pathExample("mvs/" + videoName);
 		workDirectory = "mvs_work/" + FilenameUtils.getBaseName(videoName);
 
@@ -113,12 +117,15 @@ public class ExampleMultiViewSparseReconstruction {
 		System.out.println("### Decoding Video");
 		BoofMiscOps.profile(() -> {
 			int frame = 0;
-			while (sequence.hasNext()) {
+			while (sequence.hasNext() && frame < maxFrames) {
+				InterleavedU8 image = sequence.next();
 				File imageFile = new File(imageDirectory, String.format("frame%d.png", frame++));
 				imageFiles.add(imageFile.getPath());
-				if (imageFile.exists())
-					continue;
-				UtilImageIO.saveImage(sequence.next(), imageFile.getPath());
+				// This is commented out for what appears to be a JRE bug.
+				// V  [libjvm.so+0xdc4059]  SWPointer::SWPointer(MemNode*, SuperWord*, Node_Stack*, bool)
+//				if (imageFile.exists())
+//					continue;
+				UtilImageIO.saveImage(image, imageFile.getPath());
 			}
 		}, "Video Decoding");
 
@@ -127,7 +134,6 @@ public class ExampleMultiViewSparseReconstruction {
 		bundleAdjustmentRefine();
 
 		System.out.println("----------------------------------------------------------------------------");
-		System.out.println("Printing view info. Used " + scene.views.size + " / " + pairwise.nodes.size);
 		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
 			var wv = working.lookupView(pv.id);
 			if (wv == null)
@@ -138,6 +144,7 @@ public class ExampleMultiViewSparseReconstruction {
 					wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
 					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z);
 		}
+		System.out.println("Printing view info. Used " + scene.views.size + " / " + pairwise.nodes.size);
 	}
 
 	/**
@@ -146,6 +153,8 @@ public class ExampleMultiViewSparseReconstruction {
 	 * not realize you're back at the initial location. Typically this results in a noticeable miss alignment.
 	 */
 	private void trackImageFeatures() {
+		if (similarImages!=null)
+			return;
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Similar Images");
 
@@ -204,13 +213,18 @@ public class ExampleMultiViewSparseReconstruction {
 	 */
 	public void computePairwiseGraph() {
 		var savePath = new File(workDirectory, "pairwise.yaml");
-		if (!forceRecompute)
-			try {
-				pairwise = MultiViewIO.load(savePath.getPath(), (PairwiseImageGraph)null);
-				System.out.println("Loaded Pairwise Graph");
-				return;
-			} catch (UncheckedIOException ignore) {
-			}
+		try {
+			pairwise = MultiViewIO.load(savePath.getPath(), (PairwiseImageGraph)null);
+		} catch (UncheckedIOException ignore) {}
+
+		// Recompute if the number of images has changed
+		if (!rebuild && pairwise != null && pairwise.nodes.size == imageFiles.size()) {
+			System.out.println("Loaded Pairwise Graph");
+			return;
+		} else {
+			rebuild = true;
+			pairwise = null;
+		}
 
 		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
@@ -234,14 +248,19 @@ public class ExampleMultiViewSparseReconstruction {
 	public void metricFromPairwise() {
 		var savePath = new File(workDirectory, "working.yaml");
 
-		if (!forceRecompute)
+		if (!rebuild) {
 			try {
 				working = MultiViewIO.load(savePath.getPath(), pairwise, null);
-				System.out.println("Loaded Metric Reconstruction");
-				return;
-			} catch (UncheckedIOException ignore) {
-			}
+			} catch (UncheckedIOException ignore) {}
+		}
 
+		// Recompute if the number of images has changed
+		if (working != null){
+			System.out.println("Loaded Metric Reconstruction");
+			return;
+		}
+
+		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Metric Reconstruction");
 
@@ -249,9 +268,8 @@ public class ExampleMultiViewSparseReconstruction {
 		metric.setVerbose(System.out, null);
 		metric.getInitProjective().setVerbose(System.out, null);
 		metric.getExpandMetric().setVerbose(System.out, null);
-		PairwiseImageGraph _pairwise = pairwise;
 		BoofMiscOps.profile(() -> {
-			if (!metric.process(similarImages, _pairwise)) {
+			if (!metric.process(similarImages, pairwise)) {
 				System.err.println("Reconstruction failed");
 				System.exit(0);
 			}
@@ -268,24 +286,27 @@ public class ExampleMultiViewSparseReconstruction {
 	public void bundleAdjustmentRefine() {
 		var savePath = new File(workDirectory, "structure.yaml");
 
-		if (!forceRecompute)
+		if (!rebuild) {
 			try {
 				scene = MultiViewIO.load(savePath.getPath(), (SceneStructureMetric)null);
-				System.out.println("Loaded Refined Scene");
-				return;
-			} catch (UncheckedIOException ignore) {
-			}
+			} catch (UncheckedIOException ignore) {}
+		}
+		// Recompute if the number of images has changed
+		if (scene != null) {
+			System.out.println("Loaded Refined Scene");
+			return;
+		}
 
+		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("Refining the scene");
 
 		var refine = new RefineMetricWorkingGraph();
-		SceneWorkingGraph _working = working;
 		BoofMiscOps.profile(() -> {
 			// Bundle adjustment is run twice, with the worse 5% of points discarded in an attempt to reduce noise
 			refine.bundleAdjustment.keepFraction = 0.95;
 			refine.bundleAdjustment.getSba().setVerbose(System.out, null);
-			if (!refine.process(similarImages, _working)) {
+			if (!refine.process(similarImages, working)) {
 				System.out.println("SBA REFINE FAILED");
 			}
 		}, "Bundle Adjustment refine");

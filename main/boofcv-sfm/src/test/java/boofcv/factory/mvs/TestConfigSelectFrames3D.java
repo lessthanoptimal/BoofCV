@@ -20,7 +20,4 @@ package boofcv.factory.mvs;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-/**
- * @author Peter Abeles
- */
 class TestConfigSelectFrames3D extends StandardConfigurationChecks {}
