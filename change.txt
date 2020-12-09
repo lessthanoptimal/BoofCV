@@ -95,8 +95,6 @@ Version : 0.37
   - Added MultiViewToFusedDisparity to combine multiple disparity images into one
   - Added MultiViewStereoFromKnownSceneStructure which computes a dense cloud from multiple disparity images
   - Added an application which down samples the frames in an image sequence based on quality of 3D geometry
-     * TODO force key frame based on track motion being too great
-  - TODO Needs to be smarter about selecting center views. It's not making enough. See ditch.
 - Sparse Bundle Adjustment
   * Fixed bug in how pixels are scaled in ScaleSceneStructure.
   * A view's pose can now be specified relative to other views. Can be a known or estimated parameter
@@ -109,8 +107,6 @@ Version : 0.37
   * Stereo calibration now performs a join bundle adjustment after estimating the stereo baseline
 - Concurrency
   * Removed WorkArrays since they were poorly designed
-
-TODO Move projective to metric and similar from multiview to perspective
 
 ---------------------------------------------
 Date    : 2020/May/18

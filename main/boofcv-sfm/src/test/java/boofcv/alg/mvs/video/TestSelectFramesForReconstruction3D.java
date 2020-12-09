@@ -23,13 +23,16 @@ import boofcv.abst.feature.describe.DescribeRegionPointDefault;
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.misc.ModelGeneratorDefault;
 import boofcv.misc.ModelMatcherDefault;
+import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.homography.Homography2D_F64;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastAccess;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -45,9 +48,13 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 
 	GrayF32 dummy = new GrayF32(width, height);
 
+	// how many matches Mock associate should return
+	int numMatches = 0;
+
 	/** Every frame will have significant motion */
 	@Test void moving3D() {
 		var alg = new MockFrameSelector<GrayF32>();
+		alg.config.minTranslation.setFixed(0); // disable this check to make the test easier to write
 
 		alg.is3D = true;
 		alg.isClearlyNot3D = false;
@@ -75,6 +82,7 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 	/** Runs but not every frame will meet the criteria to be 3D */
 	@Test void pausingAndResuming3D() {
 		var alg = new MockFrameSelector<GrayF32>();
+		alg.config.minTranslation.setFixed(0); // disable this check to make the test easier to write
 
 		// Can't call init because of null checks
 		alg.width = width;
@@ -132,24 +140,24 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 	@Test void isSceneStatic() {
 		double tol = 2.0;
 		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
-		alg.setMotionInlier(tol);
+		alg.config.motionInlier = tol;
 
 		// these will have a motion of 2.0 along the x-axis
 		for (int i = 0; i < 30; i++) {
 			alg.pairs.grow().setTo(0, 1, 2, 1);
 		}
 
-		alg.setMotionInlier(tol*1.01);
+		alg.config.motionInlier = tol*1.01;
 		assertTrue(alg.isSceneStatic());
 
-		alg.setMotionInlier(tol*0.99);
+		alg.config.motionInlier = tol*0.99;
 		assertFalse(alg.isSceneStatic());
 	}
 
 	@Test void isSceneClearlyNot3D() {
 		double tol = 2.0;
 		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
-		alg.setMotionInlier(tol);
+		alg.config.motionInlier = tol;
 		// It will generate a model that translate by 2.0 along x-axis
 		alg.setComputeHomography(new MockModelGenerator(2.0));
 		// these will have a motion of 4.0 along the x-axis
@@ -157,11 +165,11 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 			alg.pairs.grow().setTo(0, 1, 4, 1);
 		}
 
-		alg.setMotionInlier(tol*1.01);
+		alg.config.motionInlier = tol*1.01;
 		assertTrue(alg.isSceneClearlyNot3D());
 
 		// The tolerance should be just under now
-		alg.setMotionInlier(tol*0.99);
+		alg.config.motionInlier = tol*0.99;
 		assertFalse(alg.isSceneClearlyNot3D());
 	}
 
@@ -182,6 +190,19 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		alg.setRobustH(new DummyRobust(50));
 
 		assertFalse(alg.isScene3D());
+	}
+
+	/** Tracking is good, until one frame when it drops, then the next frame there's good association again */
+	@Test void checkSkippedBadFrame() {
+		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
+		alg.config.skipEvidenceRatio = 1.5;
+		for (int i = 0; i < 30; i++) {
+			alg.pairs.grow().setTo(0, 1, 4, 1);
+		}
+		numMatches = 45; // it will be just at the threshold
+		assertFalse(alg.checkSkippedBadFrame());
+		numMatches = 46; // 30*1.5=45
+		assertTrue(alg.checkSkippedBadFrame());
 	}
 
 	private <T extends ImageBase<T>> SelectFramesForReconstruction3D<T> createMockAlg() {
@@ -216,7 +237,15 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 
 	private static class MockTracker<T extends ImageBase<T>> extends PointTrackerDefault<T> {}
 
-	private static class MockAssociate extends AssociateDescription2DDefault<TupleDesc_F64> {}
+	private class MockAssociate extends AssociateDescription2DDefault<TupleDesc_F64> {
+		@Override public FastAccess<AssociatedIndex> getMatches() {
+			DogArray<AssociatedIndex> ret = new DogArray<>(AssociatedIndex::new);
+			for (int i = 0; i < numMatches; i++) {
+				ret.grow();
+			}
+			return ret;
+		}
+	}
 
 	private static class MockModelGenerator extends ModelGeneratorDefault<Homography2D_F64, AssociatedPair> {
 		double delta;

@@ -56,10 +56,7 @@ public class FactoryMultiViewStereo {
 		DescribeRegionPoint<T, TupleDesc_F64> describe = FactoryDescribeRegionPoint.generic(config.describe, imageType);
 
 		var alg = new SelectFramesForReconstruction3D<T>(describe);
-		alg.setMotionInlier(config.motionInlier);
-		alg.setMaxFrameSkip(config.maxFrameSkip);
-		alg.setMinimumFeatures(config.minimumFeatures);
-		alg.setSignificantFraction(config.significantFraction);
+		alg.config.setTo(config);
 
 		alg.setTracker(FactoryPointTracker.tracker(config.tracker, grayType, null));
 		alg.setAssociate(FactoryAssociation.generic2(config.associate,describe));

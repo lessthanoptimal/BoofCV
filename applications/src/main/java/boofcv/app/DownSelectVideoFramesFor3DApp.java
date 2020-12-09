@@ -21,6 +21,7 @@ package boofcv.app;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
 import boofcv.core.image.ConvertImage;
+import boofcv.factory.mvs.ConfigSelectFrames3D;
 import boofcv.factory.mvs.FactoryMultiViewStereo;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
@@ -46,6 +47,8 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class DownSelectVideoFramesFor3DApp {
+	ConfigSelectFrames3D config = new ConfigSelectFrames3D();
+
 	@Option(name = "-i", aliases = {"--Input"}, usage = "Path to input directory or file")
 	String pathInput;
 
@@ -61,6 +64,9 @@ public class DownSelectVideoFramesFor3DApp {
 	int height = 0;
 	@Option(name = "--MaxLength", usage = "Indicates that if only one dimension is set then that's the size of the largest side")
 	boolean maxLength = false;
+
+	@Option(name = "--MaxMotion", usage = "Maximum motion before a keyframe is forced. Ratio.")
+	double maxMotion = config.maxTranslation.fraction;
 
 	boolean cancel;
 
@@ -131,7 +137,9 @@ public class DownSelectVideoFramesFor3DApp {
 			}
 		}
 
-		SelectFramesForReconstruction3D<GrayU8> selector = FactoryMultiViewStereo.frameSelector3D(null, ImageType.SB_U8);
+		config.maxTranslation.setRelative(maxMotion, 20);
+		SelectFramesForReconstruction3D<GrayU8> selector =
+				FactoryMultiViewStereo.frameSelector3D(config, ImageType.SB_U8);
 		selector.initialize(smallWidth, smallHeight);
 		selector.setVerbose(System.out, null);
 

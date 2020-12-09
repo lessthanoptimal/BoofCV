@@ -61,9 +61,11 @@ import java.util.List;
 public class ExampleMultiViewDenseReconstruction {
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
-		example.compute("house_01.mp4");
-//		example.compute("forest_path_01.mp4");
-//		example.compute("rock_01.mp4");
+//		example.maxFrames = 100;       // This will process the entire sequence
+		example.compute("tree_snow_01.mp4");
+//		example.compute("ditch_02.mp4");
+//		example.compute("lights_snowman_01.mp4");
+//		example.compute("log_building_02.mp4");
 
 		// SGM is a reasonable trade between quality and speed.
 		var configSgm = new ConfigDisparitySGM();

@@ -23,6 +23,7 @@ import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
@@ -45,6 +46,18 @@ public class ConfigSelectFrames3D implements Configuration {
 
 	/** Number of iterations it uses when performing robust fitting */
 	public int robustIterations = 200;
+
+	/** How much more numerous associated features needs to be than tracks to be considered better */
+	public double skipEvidenceRatio = 1.5;
+
+	/** Don't let there be a new keyframe is the motion is less than this. Relative to max(width,height) */
+	public final ConfigLength minTranslation = ConfigLength.relative(0.04, 0);
+
+	/** Force keyframe if motion is more than this pixels. Relative to max(width,height) */
+	public final ConfigLength maxTranslation = ConfigLength.relative(0.15, 20);
+
+	/** Radius of the region used to compute the description. Might be ignored by descriptor. */
+	public final ConfigLength featureRadius = ConfigLength.fixed(10);
 
 	/** Configuration for frame-to-frame image tracker */
 	public final ConfigPointTracker tracker = new ConfigPointTracker();
@@ -70,6 +83,11 @@ public class ConfigSelectFrames3D implements Configuration {
 
 		// best compromise between speed and stability
 		describe.type = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
+		// Video sequence, improve results by assuming there are not huge jumps in location
+		associate.maximumDistancePixels.setRelative(0.25, 50);
+		associate.greedy.forwardsBackwards = true;
+		associate.greedy.scoreRatioThreshold = 0.9;
+		associate.type = ConfigAssociate.AssociationType.GREEDY;
 	}
 
 	@Override public void checkValidity() {
@@ -78,6 +96,11 @@ public class ConfigSelectFrames3D implements Configuration {
 		BoofMiscOps.checkTrue(significantFraction >= 0 && significantFraction <= 1.0);
 		BoofMiscOps.checkTrue(minimumFeatures >= 1);
 		BoofMiscOps.checkTrue(robustIterations >= 1);
+		BoofMiscOps.checkTrue(skipEvidenceRatio >= 0);
+
+		minTranslation.checkValidity();
+		maxTranslation.checkValidity();
+		featureRadius.checkValidity();
 
 		tracker.checkValidity();
 		describe.checkValidity();
@@ -90,6 +113,10 @@ public class ConfigSelectFrames3D implements Configuration {
 		this.significantFraction = src.significantFraction;
 		this.minimumFeatures = src.minimumFeatures;
 		this.robustIterations = src.robustIterations;
+		this.skipEvidenceRatio = src.skipEvidenceRatio;
+		this.minTranslation.setTo(src.minTranslation);
+		this.maxTranslation.setTo(src.maxTranslation);
+		this.featureRadius.setTo(src.featureRadius);
 		this.tracker.setTo(src.tracker);
 		this.describe.setTo(src.describe);
 		this.associate.setTo(src.associate);
