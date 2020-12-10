@@ -624,10 +624,10 @@ public class BoofMiscOps {
 		return out;
 	}
 
-	public static <V> V getOrThrow( Map map, Object key ) {
+	public static <V> V getOrThrow( Map map, Object key ) throws IOException {
 		V value = (V)map.get(key);
 		if (value == null)
-			throw new IllegalArgumentException("Key not found in map. key=" + key);
+			throw new IOException("Key not found in map. key=" + key);
 		return value;
 	}
 

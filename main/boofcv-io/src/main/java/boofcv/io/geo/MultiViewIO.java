@@ -203,7 +203,8 @@ public class MultiViewIO {
 	}
 
 	private static SceneStructureCommon.Point decodeScenePoint( Map<String, Object> map,
-																@Nullable SceneStructureCommon.Point p ) {
+																@Nullable SceneStructureCommon.Point p )
+			throws IOException {
 		List<Double> coordinate = getOrThrow(map, "coordinate");
 		List<Integer> views = getOrThrow(map, "views");
 
@@ -249,7 +250,8 @@ public class MultiViewIO {
 	}
 
 	private static SceneStructureCommon.Camera decodeSceneCamera( Map<String, Object> map,
-																  @Nullable SceneStructureCommon.Camera c ) {
+																  @Nullable SceneStructureCommon.Camera c )
+			throws IOException {
 		if (c == null)
 			c = new SceneStructureCommon.Camera();
 		c.known = getOrThrow(map, "known");
@@ -285,58 +287,61 @@ public class MultiViewIO {
 		Map<String, Object> data = yaml.load(reader);
 		try {
 			reader.close();
+			boolean homogenous = getOrThrow(data, "homogenous");
+
+			List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
+			List<Map<String, Object>> yamlMotions = getOrThrow(data, "motions");
+			List<Map<String, Object>> yamlRigids = getOrThrow(data, "rigids");
+			List<Map<String, Object>> yamlCameras = getOrThrow(data, "cameras");
+			List<Map<String, Object>> yamlPoints = getOrThrow(data, "points");
+
+			if (scene != null && scene.isHomogenous() != homogenous)
+				scene = null;
+			if (scene == null)
+				scene = new SceneStructureMetric(homogenous);
+			final SceneStructureMetric _scene = scene; // for lambas
+			scene.initialize(
+					yamlCameras.size(), yamlViews.size(), yamlMotions.size(), yamlPoints.size(), yamlRigids.size());
+
+			for (int i = 0; i < yamlViews.size(); i++) {
+				SceneStructureMetric.View v = scene.views.get(i);
+				Map<String, Object> yamlView = yamlViews.get(i);
+				v.camera = getOrThrow(yamlView, "camera");
+				v.parent_to_view = getOrThrow(yamlView, "parent_to_view");
+				v.parent = yamlView.containsKey("parent") ? scene.views.get(getOrThrow(yamlView, "parent")) : null;
+			}
+
+			for (int i = 0; i < yamlMotions.size(); i++) {
+				SceneStructureMetric.Motion m = scene.motions.grow();
+				Map<String, Object> yamlMotion = yamlMotions.get(i);
+				m.known = getOrThrow(yamlMotion, "known");
+				loadSE3(getOrThrow(yamlMotion, "motion"), m.motion);
+			}
+
+			for (int i = 0; i < yamlRigids.size(); i++) {
+				SceneStructureMetric.Rigid r = scene.rigids.get(i);
+				Map<String, Object> yamlRigid = yamlRigids.get(i);
+
+				r.known = getOrThrow(yamlRigid, "known");
+				r.indexFirst = getOrThrow(yamlRigid, "indexFirst");
+				loadSE3(getOrThrow(yamlRigid, "object_to_world"), r.object_to_world);
+				List<Map<String, Object>> points = getOrThrow(yamlRigid, "points");
+				r.points = new SceneStructureCommon.Point[points.size()];
+				for (int j = 0; j < r.points.length; j++) {
+					r.points[j] = decodeScenePoint(points.get(j), null);
+				}
+			}
+
+			for (int i = 0; i < scene.points.size; i++) {
+				decodeScenePoint(yamlPoints.get(i), scene.points.get(i));
+			}
+
+			for (int i = 0; i < yamlCameras.size(); i++) {
+				decodeSceneCamera(yamlCameras.get(i), scene.cameras.get(i));
+			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
-		boolean homogenous = getOrThrow(data, "homogenous");
-
-		List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
-		List<Map<String, Object>> yamlMotions = getOrThrow(data, "motions");
-		List<Map<String, Object>> yamlRigids = getOrThrow(data, "rigids");
-		List<Map<String, Object>> yamlCameras = getOrThrow(data, "cameras");
-		List<Map<String, Object>> yamlPoints = getOrThrow(data, "points");
-
-		if (scene != null && scene.isHomogenous() != homogenous)
-			scene = null;
-		if (scene == null)
-			scene = new SceneStructureMetric(homogenous);
-		final SceneStructureMetric _scene = scene; // for lambas
-		scene.initialize(
-				yamlCameras.size(), yamlViews.size(), yamlMotions.size(), yamlPoints.size(), yamlRigids.size());
-
-		for (int i = 0; i < yamlViews.size(); i++) {
-			SceneStructureMetric.View v = scene.views.get(i);
-			Map<String, Object> yamlView = yamlViews.get(i);
-			v.camera = getOrThrow(yamlView, "camera");
-			v.parent_to_view = getOrThrow(yamlView, "parent_to_view");
-			v.parent = yamlView.containsKey("parent") ? scene.views.get(getOrThrow(yamlView, "parent")) : null;
-		}
-
-		for (int i = 0; i < yamlMotions.size(); i++) {
-			SceneStructureMetric.Motion m = scene.motions.grow();
-			Map<String, Object> yamlMotion = yamlMotions.get(i);
-			m.known = getOrThrow(yamlMotion, "known");
-			loadSE3(getOrThrow(yamlMotion, "motion"), m.motion);
-		}
-
-		for (int i = 0; i < yamlRigids.size(); i++) {
-			SceneStructureMetric.Rigid r = scene.rigids.get(i);
-			Map<String, Object> yamlRigid = yamlRigids.get(i);
-
-			r.known = getOrThrow(yamlRigid, "known");
-			r.indexFirst = getOrThrow(yamlRigid, "indexFirst");
-			loadSE3(getOrThrow(yamlRigid, "object_to_world"), r.object_to_world);
-			List<Map<String, Object>> points = getOrThrow(yamlRigid, "points");
-			r.points = new SceneStructureCommon.Point[points.size()];
-			for (int j = 0; j < r.points.length; j++) {
-				r.points[j] = decodeScenePoint(points.get(j), null);
-			}
-		}
-
-		scene.points.forIdx(( i, p ) -> decodeScenePoint(yamlPoints.get(i), p));
-
-		BoofMiscOps.forIdx(yamlCameras, ( i, c ) -> decodeSceneCamera(yamlCameras.get(i), _scene.cameras.get(i)));
 
 		return scene;
 	}
@@ -369,42 +374,41 @@ public class MultiViewIO {
 		Map<String, Object> data = yaml.load(reader);
 		try {
 			reader.close();
+			List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
+			List<Map<String, Object>> yamlMotions = getOrThrow(data, "motions");
+
+			graph.nodes.resize(yamlViews.size());
+			graph.edges.resize(yamlMotions.size());
+
+			for (int i = 0; i < yamlViews.size(); i++) {
+				Map<String, Object> yamlView = yamlViews.get(i);
+				PairwiseImageGraph.View v = graph.nodes.get(i);
+				v.id = getOrThrow(yamlView, "id");
+				v.totalObservations = getOrThrow(yamlView, "total_observations");
+
+				List<Integer> yamlConnections = getOrThrow(yamlView, "connections");
+				v.connections.resize(yamlConnections.size());
+				v.connections.reset();
+				yamlConnections.forEach(it -> v.connections.add(_graph.edges.get(it)));
+
+				graph.mapNodes.put(v.id, v);
+			}
+
+			for (int i = 0; i < yamlMotions.size(); i++) {
+				Map<String, Object> yamlMotion = yamlMotions.get(i);
+				PairwiseImageGraph.Motion m = graph.edges.get(i);
+
+				m.countF = getOrThrow(yamlMotion, "count_f");
+				m.countH = getOrThrow(yamlMotion, "count_h");
+				m.is3D = getOrThrow(yamlMotion, "is_3D");
+				m.src = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "src"));
+				m.dst = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "dst"));
+				m.index = i;
+				copyIntoMatrix(getOrThrow(yamlMotion, "F"), m.F);
+				decodeInliers(getOrThrow(yamlMotion, "inliers"), m.inliers);
+			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		}
-
-		List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
-		List<Map<String, Object>> yamlMotions = getOrThrow(data, "motions");
-
-		graph.nodes.resize(yamlViews.size());
-		graph.edges.resize(yamlMotions.size());
-
-		for (int i = 0; i < yamlViews.size(); i++) {
-			Map<String, Object> yamlView = yamlViews.get(i);
-			PairwiseImageGraph.View v = graph.nodes.get(i);
-			v.id = getOrThrow(yamlView, "id");
-			v.totalObservations = getOrThrow(yamlView, "total_observations");
-
-			List<Integer> yamlConnections = getOrThrow(yamlView, "connections");
-			v.connections.resize(yamlConnections.size());
-			v.connections.reset();
-			yamlConnections.forEach(it -> v.connections.add(_graph.edges.get(it)));
-
-			graph.mapNodes.put(v.id, v);
-		}
-
-		for (int i = 0; i < yamlMotions.size(); i++) {
-			Map<String, Object> yamlMotion = yamlMotions.get(i);
-			PairwiseImageGraph.Motion m = graph.edges.get(i);
-
-			m.countF = getOrThrow(yamlMotion, "count_f");
-			m.countH = getOrThrow(yamlMotion, "count_h");
-			m.is3D = getOrThrow(yamlMotion, "is_3D");
-			m.src = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "src"));
-			m.dst = getOrThrow(graph.mapNodes, getOrThrow(yamlMotion, "dst"));
-			m.index = i;
-			copyIntoMatrix(getOrThrow(yamlMotion, "F"), m.F);
-			decodeInliers(getOrThrow(yamlMotion, "inliers"), m.inliers);
 		}
 
 		return graph;
@@ -417,7 +421,8 @@ public class MultiViewIO {
 		}
 	}
 
-	private static void decodeInliers( List<Map<String, Object>> encoded, DogArray<AssociatedIndex> inliers ) {
+	private static void decodeInliers( List<Map<String, Object>> encoded, DogArray<AssociatedIndex> inliers )
+			throws IOException {
 		inliers.resize(encoded.size());
 
 		for (int i = 0; i < inliers.size; i++) {
@@ -502,24 +507,24 @@ public class MultiViewIO {
 		Map<String, Object> data = yaml.load(reader);
 		try {
 			reader.close();
+
+			List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
+
+			// First declare all the views and link to their respective pview
+			for (Map<String, Object> yamlView : yamlViews) {
+				PairwiseImageGraph.View pview = pairwise.lookupNode(getOrThrow(yamlView, "pview"));
+				working.addView(pview);
+			}
+			for (Map<String, Object> yamlView : yamlViews) {
+				SceneWorkingGraph.View wview = working.lookupView(getOrThrow(yamlView, "pview"));
+				copyIntoMatrix(getOrThrow(yamlView, "projective"), wview.projective);
+				loadPinholeSimplified(getOrThrow(yamlView, "intrinsic"), wview.intrinsic);
+				loadSe3(getOrThrow(yamlView, "world_to_view"), wview.world_to_view);
+				loadDimension(getOrThrow(yamlView, "image_dimension"), wview.imageDimension);
+				loadInlierInfo(getOrThrow(yamlView, "inliers"), pairwise, wview.inliers);
+			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		}
-
-		List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
-
-		// First declare all the views and link to their respective pview
-		for (Map<String, Object> yamlView : yamlViews) {
-			PairwiseImageGraph.View pview = pairwise.lookupNode(getOrThrow(yamlView, "pview"));
-			working.addView(pview);
-		}
-		for (Map<String, Object> yamlView : yamlViews) {
-			SceneWorkingGraph.View wview = working.lookupView(getOrThrow(yamlView, "pview"));
-			copyIntoMatrix(getOrThrow(yamlView, "projective"), wview.projective);
-			loadPinholeSimplified(getOrThrow(yamlView, "intrinsic"), wview.intrinsic);
-			loadSe3(getOrThrow(yamlView, "world_to_view"), wview.world_to_view);
-			loadDimension(getOrThrow(yamlView, "image_dimension"), wview.imageDimension);
-			loadInlierInfo(getOrThrow(yamlView, "inliers"), pairwise, wview.inliers);
 		}
 
 		return working;
@@ -546,7 +551,8 @@ public class MultiViewIO {
 
 	public static SceneWorkingGraph.InlierInfo loadInlierInfo( Map<String, Object> map,
 															   PairwiseImageGraph pairwise,
-															   @Nullable SceneWorkingGraph.InlierInfo inliers ) {
+															   @Nullable SceneWorkingGraph.InlierInfo inliers )
+			throws IOException {
 		if (inliers == null)
 			inliers = new SceneWorkingGraph.InlierInfo();
 		SceneWorkingGraph.InlierInfo _inliers = inliers;
@@ -623,7 +629,7 @@ public class MultiViewIO {
 	}
 
 	public static Se3_F64 loadSE3( Map<String, Object> map,
-								   @Nullable Se3_F64 m ) {
+								   @Nullable Se3_F64 m ) throws IOException {
 		if (m == null)
 			m = new Se3_F64();
 
