@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -247,15 +247,13 @@ public class CalibrationIO {
 
 		try {
 			reader.close();
+			return load(data);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
-		return load(data);
 	}
 
-	private static <T> T load( Map<String, Object> data ) {
-
+	private static <T> T load( Map<String, Object> data ) throws IOException {
 //		int version = data.containsKey("version") ? (int)data.get("version") : 0;
 
 		String model = (String)data.get("model");
@@ -414,26 +412,35 @@ public class CalibrationIO {
 	}
 
 	public static void loadPinhole( Map<String, Object> map, CameraPinhole parameters ) {
-		parameters.width = getOrThrow(map, "width");
-		parameters.height = getOrThrow(map, "height");
-		parameters.fx = getOrThrow(map, "fx");
-		parameters.fy = getOrThrow(map, "fy");
-		parameters.skew = getOrThrow(map, "skew");
-		parameters.cx = getOrThrow(map, "cx");
-		parameters.cy = getOrThrow(map, "cy");
+		try {
+			parameters.width = getOrThrow(map, "width");
+			parameters.height = getOrThrow(map, "height");
+			parameters.fx = getOrThrow(map, "fx");
+			parameters.fy = getOrThrow(map, "fy");
+			parameters.skew = getOrThrow(map, "skew");
+			parameters.cx = getOrThrow(map, "cx");
+			parameters.cy = getOrThrow(map, "cy");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	public static Se3_F64 loadSe3( Map<String, Object> map, Se3_F64 transform ) {
 		if (transform == null)
 			transform = new Se3_F64();
-		List<Double> rotation = getOrThrow(map, "rotation");
 
-		transform.T.x = getOrThrow(map, "x");
-		transform.T.y = getOrThrow(map, "y");
-		transform.T.z = getOrThrow(map, "z");
+		try {
+			List<Double> rotation = getOrThrow(map, "rotation");
 
-		for (int i = 0; i < 9; i++) {
-			transform.R.data[i] = rotation.get(i);
+			transform.T.x = getOrThrow(map, "x");
+			transform.T.y = getOrThrow(map, "y");
+			transform.T.z = getOrThrow(map, "z");
+
+			for (int i = 0; i < 9; i++) {
+				transform.R.data[i] = rotation.get(i);
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 		return transform;
 	}
