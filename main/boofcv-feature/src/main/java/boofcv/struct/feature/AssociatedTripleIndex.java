@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.struct.feature;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Indexes of three associated features and the fit score.
@@ -26,13 +28,11 @@ package boofcv.struct.feature;
  */
 public class AssociatedTripleIndex {
 
-	/**
-	 * Index of feature in each view
-	 */
-	public int a,b,c;
+	/** Index of feature in each view */
+	public @Getter @Setter int a,b,c;
 
 	public AssociatedTripleIndex(AssociatedTripleIndex original ) {
-		set(original);
+		setTo(original);
 	}
 
 	public AssociatedTripleIndex(int a , int b , int c ) {
@@ -41,16 +41,15 @@ public class AssociatedTripleIndex {
 		this.c = c;
 	}
 
-	public AssociatedTripleIndex() {
-	}
+	public AssociatedTripleIndex() {}
 
-	public void set(int a , int b , int c ) {
+	public void setTo( int a , int b , int c ) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
 	}
 
-	public void set( AssociatedTripleIndex original ) {
+	public void setTo( AssociatedTripleIndex original ) {
 		this.a = original.a;
 		this.b = original.b;
 		this.c = original.c;
@@ -58,29 +57,5 @@ public class AssociatedTripleIndex {
 
 	public AssociatedTripleIndex copy() {
 		return new AssociatedTripleIndex(this);
-	}
-
-	public int getA() {
-		return a;
-	}
-
-	public void setA(int a) {
-		this.a = a;
-	}
-
-	public int getB() {
-		return b;
-	}
-
-	public void setB(int b) {
-		this.b = b;
-	}
-
-	public int getC() {
-		return c;
-	}
-
-	public void setC(int c) {
-		this.c = c;
 	}
 }

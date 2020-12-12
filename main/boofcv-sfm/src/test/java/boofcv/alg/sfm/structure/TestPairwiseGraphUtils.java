@@ -55,7 +55,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
 
 			for (int j = 0; j < 100; j++) {
-				motion.inliers.grow().setAssociation(j, j, 0);
+				motion.inliers.grow().setTo(j, j, 0);
 			}
 			seed.connections.add(motion);
 		}
@@ -65,7 +65,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		motionBC.src = seed.connections.get(0).dst;
 		motionBC.dst = seed.connections.get(1).dst;
 		for (int i = 0; i < seed.totalObservations; i++) {
-			motionBC.inliers.grow().setAssociation(i, i, 0);
+			motionBC.inliers.grow().setTo(i, i, 0);
 		}
 		motionBC.src.connections.add(motionBC);
 		motionBC.dst.connections.add(motionBC);
@@ -101,7 +101,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			motion.dst.totalObservations = 110; // give it a few extra and see if that causes a problem
 
 			for (int j = 0; j < 100; j++) {
-				motion.inliers.grow().setAssociation(j, j, 0);
+				motion.inliers.grow().setTo(j, j, 0);
 			}
 			seed.connections.add(motion);
 		}
@@ -111,7 +111,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		motionBC.src = seed.connections.get(0).dst;
 		motionBC.dst = seed.connections.get(1).dst;
 		for (int i = 0; i < seed.totalObservations; i++) {
-			motionBC.inliers.grow().setAssociation(i, i, 0);
+			motionBC.inliers.grow().setTo(i, i, 0);
 		}
 		motionBC.src.connections.add(motionBC);
 		motionBC.dst.connections.add(motionBC);

@@ -102,7 +102,7 @@ class TestDetectDescribeAssociateTracker extends BoofStandardJUnit {
 			DogArray<AssociatedIndex> queue = new DogArray<>(N, AssociatedIndex::new);
 
 			for( int i = 0; i < N; i++ ) {
-				queue.grow().setAssociation(i,i,1);
+				queue.grow().setTo(i,i,1);
 			}
 
 			return queue;

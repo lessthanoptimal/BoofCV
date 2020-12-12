@@ -119,7 +119,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 			}
 
 			if (bestIndex >= 0) {
-				matches.grow().setAssociation(i, bestIndex, bestScore);
+				matches.grow().setTo(i, bestIndex, bestScore);
 			} else {
 				unassociatedSrc.push(i);
 			}

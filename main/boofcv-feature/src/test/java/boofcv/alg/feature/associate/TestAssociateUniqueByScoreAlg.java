@@ -122,6 +122,6 @@ public class TestAssociateUniqueByScoreAlg extends BoofStandardJUnit {
 	}
 
 	private void add( int src , int dst , double score ) {
-		matches.grow().setAssociation(src,dst,score);
+		matches.grow().setTo(src,dst,score);
 	}
 }

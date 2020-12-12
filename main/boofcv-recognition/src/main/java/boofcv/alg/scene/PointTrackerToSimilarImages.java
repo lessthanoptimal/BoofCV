@@ -138,7 +138,7 @@ public class PointTrackerToSimilarImages implements LookUpSimilarImages {
 				int currentIdx = current.id_to_index.get(previous.getID(previousIdx));
 				if (currentIdx < 0)
 					continue;
-				pairs.grow().set(currentIdx, previousIdx);
+				pairs.grow().setTo(currentIdx, previousIdx);
 			}
 
 			if (pairs.size == 0)
@@ -231,9 +231,9 @@ public class PointTrackerToSimilarImages implements LookUpSimilarImages {
 		int size = m.size();
 		for (int i = 0; i < size; i++) {
 			if (swapped) {
-				pairs.grow().set(m.dst[i], m.src[i]);
+				pairs.grow().setTo(m.dst[i], m.src[i]);
 			} else {
-				pairs.grow().set(m.src[i], m.dst[i]);
+				pairs.grow().setTo(m.src[i], m.dst[i]);
 			}
 		}
 

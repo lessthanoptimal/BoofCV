@@ -143,9 +143,9 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 
 				for (int k = 0; k < numFeatures; k++) {
 					if (j%2 == 0) {
-						edge.inliers.grow().setAssociation(tableI[k], tableJ[k], 0.0);
+						edge.inliers.grow().setTo(tableI[k], tableJ[k], 0.0);
 					} else {
-						edge.inliers.grow().setAssociation(tableJ[k], tableI[k], 0.0);
+						edge.inliers.grow().setTo(tableJ[k], tableI[k], 0.0);
 					}
 				}
 
@@ -187,7 +187,7 @@ class MockLookupSimilarImages implements LookUpSimilarImages {
 
 		pairs.reset();
 		for (int i = 0; i < numFeatures; i++) {
-			pairs.grow().setAssociation(tableA[i], tableB[i], 0);
+			pairs.grow().setTo(tableA[i], tableB[i], 0);
 		}
 
 		return true;

@@ -36,11 +36,11 @@ public class TestEnsureUniqueAssociation extends BoofStandardJUnit {
 
 		DogArray<AssociatedIndex> matches = new DogArray<>(10, AssociatedIndex::new);
 
-		matches.grow().setAssociation(0,1,10);
-		matches.grow().setAssociation(1,0,20);
-		matches.grow().setAssociation(2,2,30);
+		matches.grow().setTo(0,1,10);
+		matches.grow().setTo(1,0,20);
+		matches.grow().setTo(2,2,30);
 		// add a duplicate dst
-		matches.grow().setAssociation(3,1,5);
+		matches.grow().setTo(3,1,5);
 
 		EnsureUniqueAssociation alg = new EnsureUniqueAssociation();
 

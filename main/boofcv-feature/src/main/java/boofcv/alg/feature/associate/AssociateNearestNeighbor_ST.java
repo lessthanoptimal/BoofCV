@@ -73,7 +73,7 @@ public class AssociateNearestNeighbor_ST<D>
 			for (int i = 0; i < listDst.size; i++) {
 				if (!search.findNearest(listDst.data[i], maxDistance, result))
 					continue;
-				matchesAll.grow().setAssociation(result.index, i, result.distance);
+				matchesAll.grow().setTo(result.index, i, result.distance);
 			}
 		} else {
 			for (int i = 0; i < listDst.size; i++) {
@@ -81,7 +81,7 @@ public class AssociateNearestNeighbor_ST<D>
 
 				if( result2.size == 1 ) {
 					NnData<D> r = result2.getTail();
-					matchesAll.grow().setAssociation(r.index, i, r.distance);
+					matchesAll.grow().setTo(r.index, i, r.distance);
 				} else if( result2.size == 2 ) {
 					NnData<D> r0 = result2.get(0);
 					NnData<D> r1 = result2.get(1);
@@ -95,7 +95,7 @@ public class AssociateNearestNeighbor_ST<D>
 
 					double foundRatio = ratioUsesSqrt ?Math.sqrt(r0.distance)/Math.sqrt(r1.distance) :r0.distance/r1.distance;
 					if( foundRatio <= scoreRatioThreshold) {
-						matchesAll.grow().setAssociation(r0.index, i, r0.distance);
+						matchesAll.grow().setTo(r0.index, i, r0.distance);
 					}
 				} else if( result2.size != 0 ){
 					throw new RuntimeException("BUG! 0,1,2 are acceptable not "+result2.size);
