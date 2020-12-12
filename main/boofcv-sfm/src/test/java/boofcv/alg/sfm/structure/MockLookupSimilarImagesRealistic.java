@@ -248,9 +248,9 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 					AssociatedIndex a = shared.get(i);
 
 					if (swap)
-						m.inliers.grow().set(a.dst, a.src);
+						m.inliers.grow().setTo(a.dst, a.src);
 					else
-						m.inliers.grow().set(a);
+						m.inliers.grow().setTo(a);
 				}
 			}
 		}
@@ -313,7 +313,7 @@ public class MockLookupSimilarImagesRealistic implements LookUpSimilarImages {
 
 		pairs.reset();
 		List<AssociatedIndex> shared = viewA.findShared(viewB);
-		shared.forEach(a -> pairs.grow().set(a));
+		shared.forEach(a -> pairs.grow().setTo(a));
 
 		return true;
 	}

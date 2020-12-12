@@ -118,7 +118,7 @@ public abstract class BaseAssociateSets<Desc> implements Associate {
 			AssociatedIndex sa = setMatches.get(assocIdx);
 			int inputIdxSrc = set.indexSrc.data[sa.src];
 			int inputIdxDst = set.indexDst.data[sa.dst];
-			matches.data[before + assocIdx].setAssociation(inputIdxSrc, inputIdxDst, sa.fitScore);
+			matches.data[before + assocIdx].setTo(inputIdxSrc, inputIdxDst, sa.fitScore);
 		}
 
 		// Copy unassociated indexes over and updated indexes to input indexes

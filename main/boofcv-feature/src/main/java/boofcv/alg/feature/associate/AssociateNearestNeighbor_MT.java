@@ -66,7 +66,7 @@ public class AssociateNearestNeighbor_MT<D>
 					for (int i = index0; i < index1; i++) {
 						if (!h.search.findNearest(listDst.data[i], maxDistance, h.result))
 							continue;
-						h.matches.grow().setAssociation(h.result.index, i, h.result.distance);
+						h.matches.grow().setTo(h.result.index, i, h.result.distance);
 					}
 				}
 			});
@@ -79,7 +79,7 @@ public class AssociateNearestNeighbor_MT<D>
 
 						if (h.result2.size == 1) {
 							NnData<D> r = h.result2.getTail();
-							h.matches.grow().setAssociation(r.index, i, r.distance);
+							h.matches.grow().setTo(r.index, i, r.distance);
 						} else if (h.result2.size == 2) {
 							NnData<D> r0 = h.result2.get(0);
 							NnData<D> r1 = h.result2.get(1);
@@ -93,7 +93,7 @@ public class AssociateNearestNeighbor_MT<D>
 
 							double foundRatio = ratioUsesSqrt ? Math.sqrt(r0.distance) / Math.sqrt(r1.distance) : r0.distance / r1.distance;
 							if (foundRatio <= scoreRatioThreshold) {
-								h.matches.grow().setAssociation(r0.index, i, r0.distance);
+								h.matches.grow().setTo(r0.index, i, r0.distance);
 							}
 						} else if (h.result2.size != 0) {
 							throw new RuntimeException("BUG! 0,1,2 are acceptable not " + h.result2.size);
@@ -130,7 +130,7 @@ public class AssociateNearestNeighbor_MT<D>
 				for (int i = 0; i < h.matches.size; i++)
 				{
 					AssociatedIndex a = h.matches.get(i);
-					matchesAll.grow().set(a);
+					matchesAll.grow().setTo(a);
 				}
 			}
 

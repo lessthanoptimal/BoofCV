@@ -103,7 +103,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		DogArray<AssociatedPair> associated = createAssociations(100, false, false);
 		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
-			associtedIdx.grow().setAssociation(i, i, 1);
+			associtedIdx.grow().setTo(i, i, 1);
 		}
 
 		alg.createEdge("moo", "foo", associated, associtedIdx);
@@ -128,7 +128,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		DogArray<AssociatedPair> associated = createAssociations(100, false, true);
 		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
-			associtedIdx.grow().setAssociation(i, i, 1);
+			associtedIdx.grow().setTo(i, i, 1);
 		}
 
 		alg.createEdge("moo", "foo", associated, associtedIdx);
@@ -153,7 +153,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 		DogArray<AssociatedPair> associated = createAssociations(100, true, false);
 		DogArray<AssociatedIndex> associtedIdx = new DogArray<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
-			associtedIdx.grow().setAssociation(i, i, 1);
+			associtedIdx.grow().setTo(i, i, 1);
 		}
 
 		alg.createEdge("moo", "foo", associated, associtedIdx);

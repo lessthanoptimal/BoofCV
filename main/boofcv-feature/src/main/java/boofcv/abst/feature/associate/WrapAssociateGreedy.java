@@ -89,7 +89,7 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 		for( int i = 0; i < listSrc.size; i++ ) {
 			int dst = pairs.data[i];
 			if( dst >= 0 )
-				matches.grow().setAssociation(i,dst,score.data[i]);
+				matches.grow().setTo(i,dst,score.data[i]);
 			else
 				unassocSrc.add(i);
 		}

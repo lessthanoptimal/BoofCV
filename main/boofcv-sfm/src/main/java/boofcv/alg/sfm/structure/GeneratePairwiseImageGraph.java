@@ -222,7 +222,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 		edge.inliers.resize(N);
 		for (int i = 0; i < N; i++) {
 			int idx = ransac.getInputIndex(i);
-			edge.inliers.get(i).set(matches.get(idx));
+			edge.inliers.get(i).setTo(matches.get(idx));
 		}
 	}
 

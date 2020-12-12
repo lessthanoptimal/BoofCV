@@ -110,7 +110,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 		tmpB.resize(pairs.size); tmpSetsB.resize(pairs.size);
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
-			matches.grow().set(p.src,p.dst,-1);
+			matches.grow().setTo(p.src,p.dst,-1);
 			// indexes of tmp lists will be the same as matches
 			tmpA.data[i] = featuresA.data[p.src];
 			tmpB.data[i] = featuresB.data[p.dst];
@@ -189,7 +189,7 @@ public class AssociateThreeByPairs<Desc extends TupleDesc> implements AssociateT
 			AssociatedTripleIndex a = matches.get(index);
 			// not matched. Remove it from the list by copying that last element over it
 			if( a.c == -1 ) {
-				a.set(matches.get(matches.size-1));
+				a.setTo(matches.get(matches.size-1));
 				matches.size--;
 			} else {
 				index++;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.struct.feature;
 
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Indexes of two associated features and the fit score..
@@ -25,73 +27,47 @@ package boofcv.struct.feature;
  * @author Peter Abeles
  */
 public class AssociatedIndex {
-
 	/** index of the feature in the source image */
-	public int src;
+	public @Getter @Setter int src;
 	/** index of the feature in the destination image */
-	public int dst;
+	public @Getter @Setter int dst;
 	/** The association score.  Meaning will very depending on implementation */
-	public double fitScore;
+	public @Getter @Setter double fitScore;
 
-	public AssociatedIndex(AssociatedIndex original ) {
-		set(original);
+	public AssociatedIndex( AssociatedIndex original ) {
+		setTo(original);
 	}
 
-	public AssociatedIndex(int src, int dst, double fitScore) {
+	public AssociatedIndex( int src, int dst, double fitScore ) {
 		this.src = src;
 		this.dst = dst;
 		this.fitScore = fitScore;
 	}
 
-	public AssociatedIndex(int src, int dst) {
+	public AssociatedIndex( int src, int dst ) {
 		this.src = src;
 		this.dst = dst;
 		this.fitScore = 0;
 	}
 
-	public AssociatedIndex() {
-	}
+	public AssociatedIndex() {}
 
-	public void setAssociation(int src , int dst , double fitScore ) {
+	public void setTo( int src, int dst, double fitScore ) {
 		this.src = src;
 		this.dst = dst;
 		this.fitScore = fitScore;
 	}
 
-	public void set(int src , int dst ) {
+	public void setTo( int src, int dst ) {
 		this.src = src;
 		this.dst = dst;
 		this.fitScore = 0;
 	}
 
-	public void set( AssociatedIndex a ) {
+	public void setTo( AssociatedIndex a ) {
 		src = a.src;
 		dst = a.dst;
 		fitScore = a.fitScore;
-	}
-
-	public int getSrc() {
-		return src;
-	}
-
-	public void setSrc(int src) {
-		this.src = src;
-	}
-
-	public int getDst() {
-		return dst;
-	}
-
-	public void setDst(int dst) {
-		this.dst = dst;
-	}
-
-	public double getFitScore() {
-		return fitScore;
-	}
-
-	public void setFitScore(double fitScore) {
-		this.fitScore = fitScore;
 	}
 
 	public AssociatedIndex copy() {

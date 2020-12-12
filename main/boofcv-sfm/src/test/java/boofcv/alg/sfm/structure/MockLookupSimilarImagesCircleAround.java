@@ -181,9 +181,9 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 
 				for (int i = 0; i < numFeatures; i++) {
 					if (standardOrder) {
-						m.inliers.grow().setAssociation(tableI[i], tableJ[i], 0.0);
+						m.inliers.grow().setTo(tableI[i], tableJ[i], 0.0);
 					} else {
-						m.inliers.grow().setAssociation(tableJ[i], tableI[i], 0.0);
+						m.inliers.grow().setTo(tableJ[i], tableI[i], 0.0);
 					}
 				}
 			}
@@ -254,7 +254,7 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 
 		pairs.reset();
 		for (int i = 0; i < numFeatures; i++) {
-			pairs.grow().setAssociation(tableA[i], tableB[i], 0);
+			pairs.grow().setTo(tableA[i], tableB[i], 0);
 		}
 
 		return true;

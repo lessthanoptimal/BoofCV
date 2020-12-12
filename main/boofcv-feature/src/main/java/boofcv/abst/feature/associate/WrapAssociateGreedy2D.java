@@ -79,7 +79,7 @@ public class WrapAssociateGreedy2D<D> implements AssociateDescription2D<D> {
 		matches.reset();
 		for (int i = 0; i < pairs.size; i++) {
 			int dst = pairs.data[i];
-			if (dst >= 0) matches.grow().setAssociation(i, dst, score.data[i]);
+			if (dst >= 0) matches.grow().setTo(i, dst, score.data[i]);
 			else unassocSrc.add(i);
 		}
 	}

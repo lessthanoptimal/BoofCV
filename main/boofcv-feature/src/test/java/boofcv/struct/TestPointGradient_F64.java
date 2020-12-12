@@ -31,7 +31,7 @@ public class TestPointGradient_F64 extends BoofStandardJUnit {
 	public void set_object() {
 		PointGradient_F64 a = new PointGradient_F64(1,2,3,4);
 		PointGradient_F64 b = new PointGradient_F64();
-		b.set(a);
+		b.setTo(a);
 
 		assertEquals(a.x,b.x,1e-8);
 		assertEquals(a.y,b.y,1e-8);
@@ -42,7 +42,7 @@ public class TestPointGradient_F64 extends BoofStandardJUnit {
 	@Test
 	public void set_values() {
 		PointGradient_F64 b = new PointGradient_F64();
-		b.set(1,2,3,4);
+		b.setTo(1,2,3,4);
 
 		assertEquals(1,b.x,1e-8);
 		assertEquals(2,b.y,1e-8);

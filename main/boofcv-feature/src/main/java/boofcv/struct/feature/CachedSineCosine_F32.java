@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,9 @@ public class CachedSineCosine_F32 {
 	float delta;
 
 	// cosine table
-	public float c[];
+	public float[] c;
 	// sine table
-	public float s[];
+	public float[] s;
 
 	public CachedSineCosine_F32( float minAngle, float maxAngle, int size )  {
 		this.minAngle = minAngle;
