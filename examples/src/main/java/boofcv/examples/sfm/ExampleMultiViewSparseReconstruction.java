@@ -82,7 +82,7 @@ public class ExampleMultiViewSparseReconstruction {
 	List<String> imageFiles = new ArrayList<>();
 
 	PairwiseImageGraph pairwise = null;
-	LookupSimilarImages similarImages;
+	LookUpSimilarImages similarImages;
 	SceneWorkingGraph working = null;
 	SceneStructureMetric scene = null;
 
