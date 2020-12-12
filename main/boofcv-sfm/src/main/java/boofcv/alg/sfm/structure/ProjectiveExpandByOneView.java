@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ProjectiveExpandByOneView extends ExpandByOneView {
 	 * @param cameraMatrix (output) the found camera matrix
 	 * @return true if successful and the camera matrix computed
 	 */
-	public boolean process( LookupSimilarImages db,
+	public boolean process( LookUpSimilarImages db,
 							SceneWorkingGraph workGraph,
 							View target,
 							DMatrixRMaj cameraMatrix ) {

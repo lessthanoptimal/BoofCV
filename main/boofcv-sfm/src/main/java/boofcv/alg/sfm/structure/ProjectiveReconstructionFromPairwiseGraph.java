@@ -88,7 +88,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	 * @param graph (input) Relationship between the images
 	 * @return true if successful or false if it failed and results can't be used
 	 */
-	public boolean process( LookupSimilarImages db, PairwiseImageGraph graph ) {
+	public boolean process( LookUpSimilarImages db, PairwiseImageGraph graph ) {
 		exploredViews.clear();
 		workGraph.reset();
 
@@ -135,7 +135,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	/**
 	 * Initializes the scene at the seed view
 	 */
-	private boolean estimateInitialSceneFromSeed( LookupSimilarImages db, SeedInfo info, DogArray_I32 common ) {
+	private boolean estimateInitialSceneFromSeed( LookUpSimilarImages db, SeedInfo info, DogArray_I32 common ) {
 		// initialize projective scene using common tracks
 		if (!initProjective.projectiveSceneN(db, info.seed, common, info.motions)) {
 			if (verbose != null) verbose.println("Failed initialize seed");
@@ -161,7 +161,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 	/**
 	 * Adds all the remaining views to the scene
 	 */
-	private void expandScene( LookupSimilarImages db ) {
+	private void expandScene( LookUpSimilarImages db ) {
 		if (verbose != null) verbose.println("ENTER Expanding Scene:");
 		// Create a list of views that can be added the work graph
 		FastArray<View> open = findAllOpenViews();

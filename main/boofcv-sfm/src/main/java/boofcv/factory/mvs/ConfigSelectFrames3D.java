@@ -21,6 +21,7 @@ package boofcv.factory.mvs;
 import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
 import boofcv.factory.feature.associate.ConfigAssociate;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
@@ -32,26 +33,38 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
  */
 public class ConfigSelectFrames3D implements Configuration {
 
-	/** Maximum number of "bad" frames it can skip. Larger number requires more memory. */
-	public int maxFrameSkip = 5;
+	/**
+	 * Number of recent frames it will save and consider when it needs to select a new key frame.
+	 * 0=current frame only.
+	 */
+	public int historyLength = 5;
 
-	/** Pixel error for what is considered significant motion. */
-	public double motionInlier = 8.0;
+	/** Error for what is considered significant motion. Increase to skip for frames. Units: Pixels */
+	public double motionInlierPx = 2.0;
 
-	/** Catch all value that determines how different two values need to be before they are significant. 0 to 1. */
-	public double significantFraction = 0.4;
+	/**
+	 * Ratio of outliers over all points. Used for quickly testing to see if there could be
+	 * 3D motion. 0.0 = always true for 3D, 1.0 means 100% outliers for it to be 3D.
+	 */
+	public double thresholdQuick = 0.1;
+
+	/** How much better 3D needs to be than homography. 0.0 = equal or worse. 1.0 = 2x better. 2.0 = 3x better. */
+	public double threshold3D = 0.5;
 
 	/** Minimum number of features in an image before all hope is lost */
-	public int minimumFeatures = 20;
+	public int minimumPairs = 100;
 
 	/** Number of iterations it uses when performing robust fitting */
-	public int robustIterations = 200;
+	public int robustIterations = 50;
 
-	/** How much more numerous associated features needs to be than tracks to be considered better */
+	/**
+	 * How much more numerous associated features need to be than tracks to be considered better. A value less than
+	 * 1.0 turn off this check. 1.5 means 50% better.
+	 */
 	public double skipEvidenceRatio = 1.5;
 
-	/** Don't let there be a new keyframe is the motion is less than this. Relative to max(width,height) */
-	public final ConfigLength minTranslation = ConfigLength.relative(0.04, 0);
+	/** A new keyframe can't be made until the motion is greater than this. Relative to max(width,height) */
+	public final ConfigLength minTranslation = ConfigLength.relative(0.01, 0);
 
 	/** Force keyframe if motion is more than this pixels. Relative to max(width,height) */
 	public final ConfigLength maxTranslation = ConfigLength.relative(0.15, 20);
@@ -80,6 +93,8 @@ public class ConfigSelectFrames3D implements Configuration {
 		tracker.klt.config.maxIterations = 25;
 		tracker.klt.maximumTracks.setRelative(0.002,800);
 		tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+		// force detection to be spread out some
+		tracker.detDesc.detectPoint.general.selector.setTo(ConfigSelectLimit.selectUniform(3.0));
 
 		// best compromise between speed and stability
 		describe.type = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
@@ -91,10 +106,11 @@ public class ConfigSelectFrames3D implements Configuration {
 	}
 
 	@Override public void checkValidity() {
-		BoofMiscOps.checkTrue(maxFrameSkip >= 0);
-		BoofMiscOps.checkTrue(motionInlier >= 0);
-		BoofMiscOps.checkTrue(significantFraction >= 0 && significantFraction <= 1.0);
-		BoofMiscOps.checkTrue(minimumFeatures >= 1);
+		BoofMiscOps.checkTrue(historyLength >= 0);
+		BoofMiscOps.checkTrue(motionInlierPx >= 0);
+		BoofMiscOps.checkTrue(thresholdQuick >= 0.0 && thresholdQuick <= 1.0);
+		BoofMiscOps.checkTrue(threshold3D >= 0.0);
+		BoofMiscOps.checkTrue(minimumPairs >= 1);
 		BoofMiscOps.checkTrue(robustIterations >= 1);
 		BoofMiscOps.checkTrue(skipEvidenceRatio >= 0);
 
@@ -108,10 +124,11 @@ public class ConfigSelectFrames3D implements Configuration {
 	}
 
 	public void setTo( ConfigSelectFrames3D src ) {
-		this.maxFrameSkip = src.maxFrameSkip;
-		this.motionInlier = src.motionInlier;
-		this.significantFraction = src.significantFraction;
-		this.minimumFeatures = src.minimumFeatures;
+		this.historyLength = src.historyLength;
+		this.motionInlierPx = src.motionInlierPx;
+		this.thresholdQuick = src.thresholdQuick;
+		this.threshold3D = src.threshold3D;
+		this.minimumPairs = src.minimumPairs;
 		this.robustIterations = src.robustIterations;
 		this.skipEvidenceRatio = src.skipEvidenceRatio;
 		this.minTranslation.setTo(src.minTranslation);

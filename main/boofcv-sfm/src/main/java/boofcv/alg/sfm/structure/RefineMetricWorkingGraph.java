@@ -112,7 +112,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	 * @param graph (Input, Output) Describes scene and provides initial estimate for parameters. Updated with refined
 	 * parameters on output.
 	 */
-	public boolean process( LookupSimilarImages db, SceneWorkingGraph graph ) {
+	public boolean process( LookUpSimilarImages db, SceneWorkingGraph graph ) {
 		// Pre-declare and compute basic data structures
 		initializeDataStructures(db, graph);
 		// Use observations defined in the graph to create the list of 3D features which will be optimized
@@ -126,7 +126,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	/**
 	 * Initialized several data structures and resets it into the initial state
 	 */
-	void initializeDataStructures( LookupSimilarImages db, SceneWorkingGraph graph ) {
+	void initializeDataStructures( LookUpSimilarImages db, SceneWorkingGraph graph ) {
 		viewToIntegerID.clear();
 		listPixelToNorm.clear();
 		listNormToPixel.clear();

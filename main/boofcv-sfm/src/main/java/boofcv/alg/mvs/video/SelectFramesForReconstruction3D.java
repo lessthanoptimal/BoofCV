@@ -47,8 +47,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Processes all the frames in a video sequence and decides which frames to keep for 3D reconstruction. The idea
@@ -102,7 +103,18 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	@Getter @Setter @Nullable ModelMatcher<Homography2D_F64, AssociatedPair> robustH = null;
 
 	/** Used to determine if 3D is significantly better than homography model */
-	@Getter @Setter @Nullable CompareGeometricModels compareFit = null;
+	@Getter @Setter @Nullable RelativeBetter compareFit = null;
+
+	//----------------------------- Access to intermediate results
+
+	/** Estimated number of pixels that the image moved. If not computed it will be NaN */
+	private @Getter double frameMotion;
+	/** Fit score for 3D. If not computed it will be NaN */
+	private @Getter double fitScore3D;
+	/** Fit score for homography. If not computed it will be NaN */
+	private @Getter double fitScoreH;
+	/** If it considered that new image could be 3D relative to the keyframe */
+	private @Getter boolean considered3D;
 
 	//----------------------------- Internally used fields
 
@@ -118,10 +130,10 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	int width, height;
 
 	// Storage for active tracks from the tracker
-	final List<PointTrack> activeTracks = new ArrayList<>();
+	@Getter final List<PointTrack> activeTracks = new ArrayList<>();
 
 	// Pairs of features between the current frame and key frame
-	final DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
+	@Getter final DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
 	// used to do a quick check to see if there is no chance of it being a 3D scene
 	@Getter @Setter ModelGenerator<Homography2D_F64, AssociatedPair> computeHomography =
@@ -165,30 +177,42 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		associate.initialize(width, height);
 		forceKeyFrame = true;
 		frameNumber = 0;
+		selectedFrames.reset();
 	}
 
 	/**
 	 * Process the next frame in the sequence
 	 *
 	 * @param image Image. All images are assumed to have the same shape
+	 * @return true if it decided to add a new keyframe. Might not be the current frame.
 	 */
-	public void next( T image ) {
+	public boolean next( T image ) {
 		BoofMiscOps.checkEq(image.width, width, "Width does not match.");
 		BoofMiscOps.checkEq(image.height, height, "Height does not match.");
+		frameMotion = Double.NaN;
+		fitScore3D = Double.NaN;
+		fitScoreH = Double.NaN;
+		considered3D = false;
 
 		performTracking(image);
 
 		copyTrackResultsIntoCurrentFrame(image);
 
 		boolean saveImage = false;
+		escape:
 		if (forceKeyFrame) {
 			forceKeyFrame = false;
 			saveImage = true;
 		} else {
 			createPairsWithKeyFrameTracking(keyFrame, currentFrame);
 
+			if (pairs.size < config.minimumPairs) {
+				if (verbose != null) verbose.printf("Too few pairs. pairs.size=%d\n",pairs.size);
+				break escape;
+			}
+
 			// Compute how much the frame moved
-			double frameMotion = computeFrameRelativeMotion();
+			frameMotion = computeFrameRelativeMotion();
 			double minMotionThresh = config.minTranslation.computeI(Math.max(width, height));
 			double maxMotionThresh = config.maxTranslation.computeI(Math.max(width, height));
 
@@ -199,37 +223,46 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 				if (frameMotion > maxMotionThresh) {
 					saveImage = true;
 				} else if (!isSceneStatic() && !isSceneClearlyNot3D()) {
+					considered3D = true;
 					saveImage = isScene3D();
 					if (!saveImage) {
 						saveImage = checkSkippedBadFrame();
 					}
 				}
 			}
-
-			if (verbose != null) verbose.println("saveImage=" + saveImage);
-
-			if (!saveImage) {
-				// See if this should be forced into saving the keyframe because so many tracks have been lost
-				if (pairs.size < keyFrame.size()/10)
-					saveImage = true;
-			}
 		}
 
-
+		if (verbose != null) verbose.println("saveImage=" + saveImage);
 
 		// Save the frame and make it the new keyframe
 		if (saveImage) {
 			keyFrameNumber = frameNumber;
 			selectedFrames.add(frameNumber);
 			keyFrame.setTo(currentFrame);
+			requireNonNull(associate).setSource(keyFrame.locations, keyFrame.descriptions);
 			if (verbose != null) verbose.printf("key_frame: total=%d / %d\n", selectedFrames.size, frameNumber);
 		}
 
 		frameNumber++;
+
+		return saveImage;
 	}
 
-	void performTracking( T frame ) {
-		Objects.requireNonNull(tracker, "Need to specify tracker. Did you call initialize too?");
+	/**
+	 * Retrieves the locations of tracks in the current frame which were visible in the key frame
+	 * @param tracks (Output) Storage for track locations
+	 */
+	public void lookupKeyFrameTracksInCurrentFrame( DogArray<Point2D_F64> tracks ) {
+		tracks.reset();
+		tracks.resize(pairs.size);
+
+		for (int i = 0; i < pairs.size; i++) {
+			tracks.get(i).setTo(pairs.get(i).p1);
+		}
+	}
+
+	protected void performTracking( T frame ) {
+		requireNonNull(tracker, "Need to specify tracker. Did you call initialize too?");
 		tracker.process(frame);
 		tracker.spawnTracks();
 		activeTracks.clear();
@@ -239,7 +272,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	/**
 	 * Copies results from image-to-image tracker into the 'currentFrame'
 	 */
-	void copyTrackResultsIntoCurrentFrame( T image ) {
+	protected void copyTrackResultsIntoCurrentFrame( T image ) {
 		descriptor.setImage(image);
 
 		// Compute the descriptor region size based in the input image size
@@ -260,7 +293,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	/**
 	 * Create a set of image pairs between the key frame and the current frame.
 	 */
-	void createPairsWithKeyFrameTracking( Frame keyFrame, Frame current ) {
+	protected void createPairsWithKeyFrameTracking( Frame keyFrame, Frame current ) {
 		pairs.reset();
 		pairs.reserve(keyFrame.size());
 
@@ -282,9 +315,9 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 *
 	 * @return true if it's nearly static
 	 */
-	boolean isSceneStatic() {
+	protected boolean isSceneStatic() {
 		// count the number of features which have moved
-		double tol = config.motionInlier*config.motionInlier;
+		double tol = config.motionInlierPx*config.motionInlierPx;
 		int moved = 0;
 		for (int pairIdx = 0; pairIdx < pairs.size; pairIdx++) {
 			AssociatedPair p = pairs.get(pairIdx);
@@ -298,7 +331,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 
 		if (verbose != null) verbose.printf("  Static: moved=%4d total=%d ratio=%f\n", moved, pairs.size, ratio);
 
-		return ratio < config.significantFraction;
+		return ratio < config.thresholdQuick;
 	}
 
 	/**
@@ -306,7 +339,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 *
 	 * @return true if this is clearly not a 3D change relative to the key frame.
 	 */
-	boolean isSceneClearlyNot3D() {
+	protected boolean isSceneClearlyNot3D() {
 		// Not sure what to do if it fails. Returning true is that it will skip over the 3D check and associated
 		// using descriptions will be run as this is likely to be a bad frame
 		if (pairs.size < computeHomography.getMinimumPoints())
@@ -314,24 +347,24 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		if (!computeHomography.generate(pairs.toList(), foundHomography))
 			return true;
 
-		double tol = config.motionInlier*config.motionInlier;
-		int inliers = 0;
+		double tol = config.motionInlierPx*config.motionInlierPx;
+		int outliers = 0;
 
 		var transformed = new Point2D_F64();
 		for (int pairIdx = 0; pairIdx < pairs.size; pairIdx++) {
 			AssociatedPair p = pairs.get(pairIdx);
 			HomographyPointOps_F64.transform(foundHomography, p.p1, transformed);
-			if (p.p2.distance2(transformed) <= tol) {
-				inliers++;
+			if (p.p2.distance2(transformed) > tol) {
+				outliers++;
 			}
 		}
 
-		double ratio = 1.0 - inliers/(double)pairs.size;
+		double ratio = outliers/(double)pairs.size;
 
 		if (verbose != null)
-			verbose.printf("  ClearlyNot3D: inliers=%4d total=%d ratio=%f\n", inliers, pairs.size, ratio);
+			verbose.printf("  ClearlyNot3D: outliers=%4d total=%d ratio=%f\n", outliers, pairs.size, ratio);
 
-		return ratio < config.significantFraction;
+		return ratio < config.thresholdQuick;
 	}
 
 	/**
@@ -340,32 +373,39 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 * @return true if 3D
 	 */
 	boolean isScene3D() {
-		Objects.requireNonNull(robust3D);
-		Objects.requireNonNull(robustH);
+		requireNonNull(robust3D);
+		requireNonNull(robustH);
 
 		if (!robust3D.process(pairs.toList()))
 			return false;
 		double fit3D = robust3D.getFitQuality();
-		if (robust3D.getMatchSet().size() < config.minimumFeatures)
+		if (robust3D.getMatchSet().size() < config.minimumPairs)
 			return false;
 
 		if (!robustH.process(pairs.toList()))
 			return false;
 		double fitH = robustH.getFitQuality();
 
-		if (verbose != null) verbose.printf("  Check3D: H=%4f 3D=%4f\n", Math.sqrt(fitH), Math.sqrt(fit3D));
+		fitScore3D = fit3D;
+		fitScoreH = fitH;
 
-		return Objects.requireNonNull(compareFit).isFitABetter(fit3D, fitH, config.significantFraction);
+		double betterRatio = requireNonNull(compareFit).computeBetterValue(fit3D, fitH);
+
+		if (verbose != null) verbose.printf("  Check3D: H=%4f 3D=%4f ratio=%.1f\n", fitH, fit3D, betterRatio);
+
+		return betterRatio > config.threshold3D;
 	}
 
 	/**
 	 * If tracks are dropped and association does much better that can indicate there was some even (like glare)
 	 * which caused the tracks to drop but is now gone. In that case save this frame and skip over the bad stuff
 	 */
-	boolean checkSkippedBadFrame() {
-		Objects.requireNonNull(associate);
+	protected boolean checkSkippedBadFrame() {
+		if (config.skipEvidenceRatio<1.0)
+			return false;
+		requireNonNull(associate);
 
-		associate.setSource(keyFrame.locations, keyFrame.descriptions);
+		// the source was set as the keyframe when it became the keyframe. Sometimes this saves computations.
 		associate.setDestination(currentFrame.locations, currentFrame.descriptions);
 		associate.associate();
 
@@ -382,7 +422,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 * Has there been so much motion that we should save the image anyways? If too many frames are skipped
 	 * the reconstruction can be bad or incomplete
 	 */
-	double computeFrameRelativeMotion() {
+	protected double computeFrameRelativeMotion() {
 		distances.reset();
 		distances.resize(pairs.size);
 
@@ -390,7 +430,8 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 			distances.set(pairIdx, pairs.get(pairIdx).distance2());
 		}
 
-		return QuickSelect.select(distances.data, (int)(distances.size*0.9), distances.size);
+		double distance2 = QuickSelect.select(distances.data, (int)(distances.size*0.9), distances.size);
+		return Math.sqrt(distance2);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
@@ -398,13 +439,13 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	}
 
 	/** Storage for feature and track information for a single image frame */
-	class Frame {
+	public class Frame {
 		// Descriptions of features
-		DogArray<TupleDesc_F64> descriptions = new DogArray<>(descriptor::createDescription);
+		public final DogArray<TupleDesc_F64> descriptions = new DogArray<>(descriptor::createDescription);
 		// Locations of features
-		DogArray<Point2D_F64> locations = new DogArray<>(Point2D_F64::new);
+		public final DogArray<Point2D_F64> locations = new DogArray<>(Point2D_F64::new);
 		// Conversion from track ID to feature index
-		TLongIntMap trackID_to_index = new TLongIntHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1, -1);
+		public final TLongIntMap trackID_to_index = new TLongIntHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1, -1);
 
 		public int size() {
 			return descriptions.size;
@@ -433,18 +474,5 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 				return true;
 			});
 		}
-	}
-
-	/** Used to compare fit score from robust model matchers */
-	public interface CompareGeometricModels {
-		/**
-		 * Determines if the first fit score is significantly better
-		 *
-		 * @param fitA Fit score from 3D model
-		 * @param fitB Fit score from Homography model
-		 * @param significantFraction How "similar" two values are to be similar. Fractional. 0.0 to 1.0.
-		 * @return true if fitA is significantly better
-		 */
-		boolean isFitABetter( double fitA, double fitB, double significantFraction );
 	}
 }

@@ -119,7 +119,7 @@ public class MetricExpandByOneView extends ExpandByOneView {
 	 * @return true if successful target view has an estimated calibration matrix and pose, which have already been
 	 * added to "workGraph"
 	 */
-	public boolean process( LookupSimilarImages db,
+	public boolean process( LookUpSimilarImages db,
 							SceneWorkingGraph workGraph,
 							View target ) {
 		checkTrue(!workGraph.isKnown(target), "Target shouldn't already be in the workGraph");

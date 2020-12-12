@@ -40,7 +40,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-class MockLookupSimilarImages implements LookupSimilarImages {
+class MockLookupSimilarImages implements LookUpSimilarImages {
 	CameraPinhole intrinsic = new CameraPinhole(400, 410, 0, 420, 420, 800, 800);
 	int numFeatures = 100;
 

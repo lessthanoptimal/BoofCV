@@ -45,7 +45,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * be considered a first pass and all optimization is done at a local level.
  *
  * <ol>
- * <li>Input: {@link PairwiseImageGraph} and {@link LookupSimilarImages image information}</li>
+ * <li>Input: {@link PairwiseImageGraph} and {@link LookUpSimilarImages image information}</li>
  * <li>Selected a set of views to estimate a projective scene based on having good geometry.
  * {@link ProjectiveInitializeAllCommon}</li>
  * <li>Metric elevation from initial seed views</li>
@@ -106,7 +106,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * @param graph (input) Relationship between the images
 	 * @return true if successful or false if it failed and results can't be used
 	 */
-	public boolean process( LookupSimilarImages db, PairwiseImageGraph graph ) {
+	public boolean process( LookUpSimilarImages db, PairwiseImageGraph graph ) {
 		exploredViews.clear();
 		workGraph.reset();
 
@@ -157,7 +157,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	/**
 	 * Initializes the scene at the seed view
 	 */
-	private boolean estimateProjectiveSceneFromSeed( LookupSimilarImages db, SeedInfo info, DogArray_I32 common ) {
+	private boolean estimateProjectiveSceneFromSeed( LookUpSimilarImages db, SeedInfo info, DogArray_I32 common ) {
 		// initialize projective scene using common tracks
 		if (!initProjective.projectiveSceneN(db, info.seed, common, info.motions)) {
 			if (verbose != null) verbose.println("Failed initialize seed");
@@ -245,7 +245,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	 * Adds all the remaining views to the scene one at a time. Known metric views are used to seed an upgrade
 	 * of each new view. If a metric upgrade fails that view is discarded from the metric scene.
 	 */
-	private void expandMetricScene( LookupSimilarImages db ) {
+	private void expandMetricScene( LookUpSimilarImages db ) {
 		if (verbose != null) verbose.println("ENTER expandMetricScene()");
 		// Mark known views as well known
 		workGraph.viewList.forEach(v -> exploredViews.add(v.pview.id));
