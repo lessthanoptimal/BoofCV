@@ -65,6 +65,12 @@ public class DownSelectVideoFramesFor3DApp {
 	@Option(name = "--MaxLength", usage = "Indicates that if only one dimension is set then that's the size of the largest side")
 	boolean maxLength = false;
 
+	@Option(name = "--Motion", usage = "Simple test used to see if scene is static or clearly not 3D. Pixels.")
+	double motionPx = config.motionInlierPx;
+
+	@Option(name = "--MinMotion", usage = "Minimum motion before a keyframe is allowed. Ratio.")
+	double minMotion = config.minTranslation.fraction;
+
 	@Option(name = "--MaxMotion", usage = "Maximum motion before a keyframe is forced. Ratio.")
 	double maxMotion = config.maxTranslation.fraction;
 
@@ -137,7 +143,10 @@ public class DownSelectVideoFramesFor3DApp {
 			}
 		}
 
+		config.motionInlierPx = motionPx;
+		config.minTranslation.setRelative(minMotion, 0);
 		config.maxTranslation.setRelative(maxMotion, 20);
+
 		SelectFramesForReconstruction3D<GrayU8> selector =
 				FactoryMultiViewStereo.frameSelector3D(config, ImageType.SB_U8);
 		selector.initialize(smallWidth, smallHeight);

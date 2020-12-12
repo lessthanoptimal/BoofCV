@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface LookupSimilarImages {
+public interface LookUpSimilarImages {
 
 	List<String> getImageIDs();
 

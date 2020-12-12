@@ -38,7 +38,7 @@ import java.io.PrintStream;
 import java.util.*;
 
 /**
- * Given a {@link LookupSimilarImages graph of images} with similar appearance, create a graph in which
+ * Given a {@link LookUpSimilarImages graph of images} with similar appearance, create a graph in which
  * images with a geometric relationship are connected to each other. Determine if that relationship has 3D geometry
  * or is composed of a homography.
  *
@@ -98,7 +98,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	 *
 	 * @param db Images with feature associations
 	 */
-	public void process( LookupSimilarImages db ) {
+	public void process( LookUpSimilarImages db ) {
 		this.imageIds = db.getImageIDs();
 		this.graph.reset();
 

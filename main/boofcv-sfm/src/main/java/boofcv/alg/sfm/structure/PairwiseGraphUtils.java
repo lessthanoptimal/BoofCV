@@ -59,7 +59,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  */
 public class PairwiseGraphUtils {
 
-	LookupSimilarImages db;
+	LookUpSimilarImages db;
 
 	DogArray_B visibleAll = new DogArray_B();
 	DogArray_B visibleMotion = new DogArray_B();

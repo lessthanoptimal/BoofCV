@@ -20,7 +20,7 @@ package boofcv.alg.scene;
 
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.sfm.structure.LookupSimilarImages;
+import boofcv.alg.sfm.structure.LookUpSimilarImages;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
@@ -35,7 +35,7 @@ import java.util.Map;
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
- * Processes frames from {@link PointTracker} and converts the tracking results into a {@link LookupSimilarImages}.
+ * Processes frames from {@link PointTracker} and converts the tracking results into a {@link LookUpSimilarImages}.
  * This is intended for scene reconstruction from video sequences.
  *
  * <ul>
@@ -50,7 +50,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
-public class PointTrackerToSimilarImages implements LookupSimilarImages {
+public class PointTrackerToSimilarImages implements LookUpSimilarImages {
 
 	/** Maximum number of frames in forwards and backwards direction which will be searched for being related  */
 	public int searchRadius = 5;

@@ -109,7 +109,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * @param seedConnIdx (Input) Indexes of motions in the seed view to use when initializing
 	 * @return true is successful or false if it failed
 	 */
-	public boolean projectiveSceneN( LookupSimilarImages db,
+	public boolean projectiveSceneN( LookUpSimilarImages db,
 									 View seed, DogArray_I32 seedFeatsIdx, DogArray_I32 seedConnIdx ) {
 		// Check preconditions. Exceptions are thrown since these are easily checked and shouldn't be ignored under
 		// the assumption that geometry was simply bad
@@ -188,7 +188,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Initializes the bundle adjustment structure for all views not just the initial set of 3. The seed view is
 	 * view index=0. The other views are in order of `seedConnIdx` after that.
 	 */
-	private void initializeStructureForAllViews( LookupSimilarImages db, int numberOfFeatures, View seed, DogArray_I32 seedConnIdx ) {
+	private void initializeStructureForAllViews( LookUpSimilarImages db, int numberOfFeatures, View seed, DogArray_I32 seedConnIdx ) {
 		utils.observations.initialize(1 + seedConnIdx.size);
 		utils.structure.initialize(1 + seedConnIdx.size, numberOfFeatures);
 		viewsByStructureIndex.resize(utils.structure.views.size, null);
@@ -308,7 +308,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 *
 	 * @return true if successful or false if not
 	 */
-	boolean findRemainingCameraMatrices( LookupSimilarImages db, View seed, DogArray_I32 seedConnIdx ) {
+	boolean findRemainingCameraMatrices( LookUpSimilarImages db, View seed, DogArray_I32 seedConnIdx ) {
 		BoofMiscOps.checkTrue(inlierToSeed.size == utils.inliersThreeView.size());
 
 		// Look up the 3D coordinates of features from the scene's structure previously computed

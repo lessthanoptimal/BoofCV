@@ -19,6 +19,7 @@
 package boofcv.factory.mvs;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.alg.mvs.video.RelativeBetter;
 import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -64,14 +65,22 @@ public class FactoryMultiViewStereo {
 		// Hard code this for now
 		ConfigLMedS configRobust = new ConfigLMedS();
 		configRobust.totalCycles = config.robustIterations;
+		configRobust.errorFraction = 0.75; // sometimes a homography can dominate, so shoot for more outlier error
 
 		alg.setRobust3D(FactoryMultiViewRobust.fundamentalLMedS(null,configRobust));
 		alg.setRobustH(FactoryMultiViewRobust.homographyLMedS(null,configRobust));
 
-		// Squared error is used for all the error metrics in robust I *think*,
-		// so the square root can be safely applied
-		alg.setCompareFit((error3D,errorH,tol)->(1.0-Math.sqrt(error3D)/(0.001+Math.sqrt(errorH)))>=tol);
+		// Squared error is used for all the error metrics in robust I *think*
+		alg.setCompareFit(new RelativeBetter.ErrorHardRatioSq(config.motionInlierPx));
 
 		return alg;
+	}
+
+	public static boolean isErrorSignificant3D( double error3D, double errorH, double significant, double tol ) {
+		// See if the homograph error is large enough to matter
+		// Without this check both errors can be very close to zero and return essentially random results
+		if (errorH < significant)
+			return false;
+		return errorH-error3D>=errorH*tol;
 	}
 }

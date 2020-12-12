@@ -56,6 +56,7 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		var alg = new MockFrameSelector<GrayF32>();
 		alg.config.minTranslation.setFixed(0); // disable this check to make the test easier to write
 
+		alg.config.minimumPairs = 0;
 		alg.is3D = true;
 		alg.isClearlyNot3D = false;
 		alg.isStatic = false;
@@ -84,6 +85,7 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		var alg = new MockFrameSelector<GrayF32>();
 		alg.config.minTranslation.setFixed(0); // disable this check to make the test easier to write
 
+		alg.config.minimumPairs = 0;
 		// Can't call init because of null checks
 		alg.width = width;
 		alg.height = height;
@@ -140,24 +142,24 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 	@Test void isSceneStatic() {
 		double tol = 2.0;
 		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
-		alg.config.motionInlier = tol;
+		alg.config.motionInlierPx = tol;
 
 		// these will have a motion of 2.0 along the x-axis
 		for (int i = 0; i < 30; i++) {
 			alg.pairs.grow().setTo(0, 1, 2, 1);
 		}
 
-		alg.config.motionInlier = tol*1.01;
+		alg.config.motionInlierPx = tol*1.01;
 		assertTrue(alg.isSceneStatic());
 
-		alg.config.motionInlier = tol*0.99;
+		alg.config.motionInlierPx = tol*0.99;
 		assertFalse(alg.isSceneStatic());
 	}
 
 	@Test void isSceneClearlyNot3D() {
 		double tol = 2.0;
 		SelectFramesForReconstruction3D<GrayF32> alg = createMockAlg();
-		alg.config.motionInlier = tol;
+		alg.config.motionInlierPx = tol;
 		// It will generate a model that translate by 2.0 along x-axis
 		alg.setComputeHomography(new MockModelGenerator(2.0));
 		// these will have a motion of 4.0 along the x-axis
@@ -165,11 +167,11 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 			alg.pairs.grow().setTo(0, 1, 4, 1);
 		}
 
-		alg.config.motionInlier = tol*1.01;
+		alg.config.motionInlierPx = tol*1.01;
 		assertTrue(alg.isSceneClearlyNot3D());
 
 		// The tolerance should be just under now
-		alg.config.motionInlier = tol*0.99;
+		alg.config.motionInlierPx = tol*0.99;
 		assertFalse(alg.isSceneClearlyNot3D());
 	}
 
@@ -207,17 +209,18 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 
 	private <T extends ImageBase<T>> SelectFramesForReconstruction3D<T> createMockAlg() {
 		var alg = new SelectFramesForReconstruction3D<T>(new MockDescriptor<>());
+		alg.config.minimumPairs = 20;
 		alg.setTracker(new MockTracker<>());
 		alg.setAssociate(new MockAssociate());
 		alg.setRobustH(new DummyRobust(0));
 		alg.setRobust3D(new DummyRobust(0));
-		alg.setCompareFit(( a, b, tol ) -> a > b*(1.0 + tol));
+		alg.setCompareFit(new RelativeBetter.MaximizeSoftRatio(1.0));
 
 		return alg;
 	}
 
 	/** Used to check high level logic for deciding when to add a frame */
-	private static class MockFrameSelector<T extends ImageBase<T>> extends SelectFramesForReconstruction3D<T> {
+	private class MockFrameSelector<T extends ImageBase<T>> extends SelectFramesForReconstruction3D<T> {
 		boolean isStatic = false;
 		boolean isClearlyNot3D = false;
 		boolean is3D = false;
@@ -226,13 +229,16 @@ class TestSelectFramesForReconstruction3D extends BoofStandardJUnit {
 		int callsCopy = 0;
 		int callsCreatePairs = 0;
 
-		public MockFrameSelector() {super(new MockDescriptor<>());}
-		@Override void performTracking( T frame ) {callsTracking++;}
-		@Override void copyTrackResultsIntoCurrentFrame( T image ) {callsCopy++;}
-		@Override void createPairsWithKeyFrameTracking( Frame keyFrame, Frame current ) {callsCreatePairs++;}
-		@Override boolean isSceneStatic() {return isStatic;}
-		@Override boolean isSceneClearlyNot3D() {return isClearlyNot3D;}
-		@Override boolean isScene3D() {return is3D;}
+		public MockFrameSelector() {
+			super(new MockDescriptor<>());
+			associate = new MockAssociate();
+		}
+		@Override protected void performTracking( T frame ) {callsTracking++;}
+		@Override protected void copyTrackResultsIntoCurrentFrame( T image ) {callsCopy++;}
+		@Override protected void createPairsWithKeyFrameTracking( Frame keyFrame, Frame current ) {callsCreatePairs++;}
+		@Override protected boolean isSceneStatic() {return isStatic;}
+		@Override protected boolean isSceneClearlyNot3D() {return isClearlyNot3D;}
+		@Override protected boolean isScene3D() {return is3D;}
 	}
 
 	private static class MockTracker<T extends ImageBase<T>> extends PointTrackerDefault<T> {}

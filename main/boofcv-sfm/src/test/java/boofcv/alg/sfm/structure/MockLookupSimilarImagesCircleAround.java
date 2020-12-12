@@ -44,7 +44,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-class MockLookupSimilarImagesCircleAround implements LookupSimilarImages {
+class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 	public CameraPinhole intrinsic = new CameraPinhole(400, 410, 0, 420, 420, 800, 800);
 	public int numFeatures = 100;
 	public Random rand = BoofTesting.createRandom(3);
