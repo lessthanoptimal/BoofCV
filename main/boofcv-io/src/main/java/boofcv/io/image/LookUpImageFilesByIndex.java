@@ -18,11 +18,12 @@
 
 package boofcv.io.image;
 
-import boofcv.misc.BoofMiscOps;
 import boofcv.misc.LookUpImages;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -36,27 +37,30 @@ import static boofcv.misc.BoofMiscOps.checkEq;
  * @author Peter Abeles
  */
 public class LookUpImageFilesByIndex implements LookUpImages {
-	List<String> paths;
-	ImageDimension dimension = new ImageDimension();
+	@Getter final List<String> paths;
+	final ImageDimension dimension = new ImageDimension(-1,-1);
+	@Getter @Setter LoadImage loader;
 
 	public LookUpImageFilesByIndex( List<String> paths ) {
-		BoofMiscOps.checkTrue(paths.size() > 0);
+		this(paths, (path,output)-> UtilImageIO.loadImage(path, true, output));
+	}
+	public LookUpImageFilesByIndex( List<String> paths , LoadImage loader) {
 		this.paths = paths;
-
-		if (paths.size() == 0)
-			return;
-
-		// load one image and assume all the rest are the same dimension
-		var gray = new GrayU8(1, 1);
-		loadImage(paths.get(0), true, gray);
-		dimension.width = gray.getWidth();
-		dimension.height = gray.getHeight();
+		this.loader = loader;
 	}
 
 	@Override public boolean loadShape( String name, ImageDimension shape ) {
 		int index = Integer.parseInt(name);
 		if (index < 0 || index >= paths.size())
 			return false;
+
+		if (dimension.height==-1) {
+			var gray = new GrayU8(1, 1);
+			loader.load(paths.get(0), gray);
+			dimension.width = gray.getWidth();
+			dimension.height = gray.getHeight();
+		}
+
 		shape.setTo(dimension);
 		return true;
 	}
@@ -66,18 +70,21 @@ public class LookUpImageFilesByIndex implements LookUpImages {
 		if (index < 0 || index >= paths.size())
 			return false;
 
-		loadImage(paths.get(index), true, output);
+		loader.load(paths.get(index), output);
 
 		// Validate the assumption that all images are the same size. if this is false then loadShape() is giving
 		// incorrect results
-		checkEq(dimension.width, output.width);
-		checkEq(dimension.height, output.height);
-
+		if (dimension.width==-1) {
+			loadShape(name,dimension);
+		} else {
+			checkEq(dimension.width, output.width);
+			checkEq(dimension.height, output.height);
+		}
 		return true;
 	}
 
-	/** Wrap for unit testing */
-	protected <T extends ImageBase<T>> T loadImage( String imagePath, boolean orderRgb, T output ) {
-		return UtilImageIO.loadImage(imagePath, orderRgb, output);
+	@FunctionalInterface
+	public interface LoadImage {
+		void load( String path, ImageBase output);
 	}
 }

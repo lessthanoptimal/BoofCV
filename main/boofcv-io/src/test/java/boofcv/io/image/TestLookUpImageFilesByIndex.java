@@ -19,7 +19,6 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -65,18 +64,12 @@ public class TestLookUpImageFilesByIndex extends BoofStandardJUnit {
 		assertFalse(alg.loadImage("10", image));
 	}
 
-	private class DummyLookupFileByIndex extends LookUpImageFilesByIndex {
+	private static class DummyLookupFileByIndex extends LookUpImageFilesByIndex {
 		public List<String> loaded = new ArrayList<>();
 
 		public DummyLookupFileByIndex( List<String> paths ) {
-			super(paths);
-		}
-
-		@Override protected <T extends ImageBase<T>> T loadImage( String imagePath, boolean orderRgb, T output ) {
-			if (loaded != null)
-				loaded.add(imagePath);
-			output.reshape(10, 15);
-			return output;
+			super(paths,(path,out)-> out.reshape(10,15));
+			setLoader((path,out)->{loaded.add(path);out.reshape(10,15);});
 		}
 	}
 }
