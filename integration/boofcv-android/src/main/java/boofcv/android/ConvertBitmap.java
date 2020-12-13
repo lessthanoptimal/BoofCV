@@ -39,8 +39,10 @@ public class ConvertBitmap {
 	 * Checks to see if the bitmap is the same shape as the input image. if not a new instance is returned which is
 	 * otherwise the same instance is returned.
 	 */
-	public static Bitmap checkDeclare( ImageBase input, Bitmap bitmap ) {
-		if (input.width != bitmap.getWidth() || input.height != bitmap.getHeight()) {
+	public static Bitmap checkDeclare( ImageBase input, @Nullable Bitmap bitmap ) {
+		if (bitmap==null) {
+			return Bitmap.createBitmap(input.width, input.height, Bitmap.Config.ARGB_8888);
+		} else if (input.width != bitmap.getWidth() || input.height != bitmap.getHeight()) {
 			return Bitmap.createBitmap(input.width, input.height, bitmap.getConfig());
 		} else {
 			return bitmap;

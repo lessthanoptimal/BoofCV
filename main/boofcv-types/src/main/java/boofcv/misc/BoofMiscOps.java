@@ -596,6 +596,16 @@ public class BoofMiscOps {
 		return out;
 	}
 
+	/** Returns the last element in the list. Does not check if the list is empty */
+	public static <T>T tail( List<T> list ) {
+		return list.get(list.size()-1);
+	}
+
+	/** Returns and removes the last element in the list. Does not check if the list is empty */
+	public static <T>T removeTail( List<T> list ) {
+		return list.remove(list.size()-1);
+	}
+
 	/**
 	 * Finds the row at the specified column with the maximum absolute value
 	 *

@@ -44,26 +44,73 @@ class TestLookUpSimilarGivenTracks extends BoofStandardJUnit {
 		alg.addFrame(10, 5, createFeatures(26, 50));
 		alg.addFrame(10, 5, createFeatures(5, 20));
 
-		alg.computeSimilarRelationships(true, 5);
+		alg.computeSimilarRelationships(true, 5, -1);
 		assertEquals(1, alg.frames.get(0).similar.size());
 		assertEquals(2, alg.frames.get(1).similar.size());
 		assertEquals(1, alg.frames.get(2).similar.size());
 		assertEquals(0, alg.frames.get(3).similar.size());
 		assertEquals(0, alg.frames.get(4).similar.size());
 
-		alg.computeSimilarRelationships(false, 5);
+		alg.computeSimilarRelationships(false, 5, -1);
 		assertEquals(2, alg.frames.get(0).similar.size());
 		assertEquals(3, alg.frames.get(1).similar.size());
 		assertEquals(1, alg.frames.get(2).similar.size());
 		assertEquals(0, alg.frames.get(3).similar.size());
 		assertEquals(2, alg.frames.get(4).similar.size());
 
-		alg.computeSimilarRelationships(true, 4);
+		alg.computeSimilarRelationships(true, 4, -1);
 		assertEquals(1, alg.frames.get(0).similar.size());
 		assertEquals(2, alg.frames.get(1).similar.size());
 		assertEquals(2, alg.frames.get(2).similar.size());
 		assertEquals(1, alg.frames.get(3).similar.size());
 		assertEquals(0, alg.frames.get(4).similar.size());
+	}
+
+	/**
+	 * Checks to see if the maxSimilar parameter is correctly enforced
+	 */
+	@Test void computeSimilarRelationships_MaxSimilar() {
+		var alg = new LookUpSimilarGivenTracks<PointIndex2D_F64>(a -> a.index, ( a, dst ) -> dst.setTo(a.p));
+
+		alg.addFrame(10, 5, createFeatures(10, 40));
+		alg.addFrame(10, 5, createFeatures(15, 40));
+		alg.addFrame(10, 5, createFeatures(30, 40));
+		alg.addFrame(10, 5, createFeatures(30, 45));
+		alg.addFrame(10, 5, createFeatures(30, 45));
+
+		// Only one connection is allowed
+		alg.computeSimilarRelationships(false, 0, 1);
+		assertEquals(1, alg.frames.get(0).similar.size());
+		assertEquals(1, alg.frames.get(1).similar.size());
+		assertEquals(0, alg.frames.get(2).similar.size());
+		assertEquals(1, alg.frames.get(3).similar.size());
+		assertEquals(1, alg.frames.get(4).similar.size());
+	}
+
+	/**
+	 * See if the situation where two equally good candidates have been found
+	 */
+	@Test void computeSimilarRelationships_MaxSimilar_SameCount() {
+		var alg = new LookUpSimilarGivenTracks<PointIndex2D_F64>(a -> a.index, ( a, dst ) -> dst.setTo(a.p));
+
+		alg.addFrame(10, 5, createFeatures(10, 40));
+		alg.addFrame(10, 5, createFeatures(10, 40));
+		alg.addFrame(10, 5, createFeatures(10, 40));
+		alg.addFrame(10, 5, createFeatures(10, 45));
+		alg.addFrame(10, 5, createFeatures(10, 45));
+
+		// Only one connection is allowed
+		alg.computeSimilarRelationships(false, 0, 1);
+		assertEquals(1, alg.frames.get(0).similar.size());
+		assertEquals(1, alg.frames.get(1).similar.size());
+		assertEquals(0, alg.frames.get(2).similar.size());
+		assertEquals(1, alg.frames.get(3).similar.size());
+		assertEquals(1, alg.frames.get(4).similar.size());
+
+		assertSame(alg.frames.get(0).similar.get(0).dst, alg.frames.get(1));
+		assertSame(alg.frames.get(1).similar.get(0).dst, alg.frames.get(0));
+		assertSame(alg.frames.get(3).similar.get(0).dst, alg.frames.get(4));
+		assertSame(alg.frames.get(4).similar.get(0).dst, alg.frames.get(3));
 	}
 
 	static List<PointIndex2D_F64> createFeatures( int id0, int id1 ) {
@@ -108,7 +155,8 @@ class TestLookUpSimilarGivenTracks extends BoofStandardJUnit {
 		try {
 			alg.getFrame("0");
 			fail("Failed");
-		} catch (IllegalArgumentException ignore) {}
+		} catch (IllegalArgumentException ignore) {
+		}
 
 		alg.addFrame(10, 5, new ArrayList<>());
 		alg.addFrame(10, 5, new ArrayList<>());
@@ -119,7 +167,8 @@ class TestLookUpSimilarGivenTracks extends BoofStandardJUnit {
 		try {
 			alg.getFrame("2");
 			fail("Failed");
-		} catch (IllegalArgumentException ignore) {}
+		} catch (IllegalArgumentException ignore) {
+		}
 	}
 
 	@Test void getImageIDs() {
@@ -142,8 +191,8 @@ class TestLookUpSimilarGivenTracks extends BoofStandardJUnit {
 		alg.addFrame(10, 5, new ArrayList<>());
 
 		// Only one frame will have non-empty similar list
-		alg.frames.get(1).similar.add(alg.frames.get(0));
-		alg.frames.get(1).similar.add(alg.frames.get(3));
+		alg.frames.get(1).similar.grow().setTo(alg.frames.get(0), 0);
+		alg.frames.get(1).similar.grow().setTo(alg.frames.get(3), 0);
 
 		// Create an array and initialize with an element to make sure it's cleared
 		var found = new ArrayList<String>();
@@ -189,8 +238,8 @@ class TestLookUpSimilarGivenTracks extends BoofStandardJUnit {
 		alg.addFrame(10, 5, featsA);
 		alg.addFrame(10, 5, featsB);
 
-		alg.frames.get(0).similar.add(alg.frames.get(1));
-		alg.frames.get(1).similar.add(alg.frames.get(0));
+		alg.frames.get(0).similar.grow().setTo(alg.frames.get(1), 0);
+		alg.frames.get(1).similar.grow().setTo(alg.frames.get(0), 0);
 
 		DogArray<AssociatedIndex> found = new DogArray<>(AssociatedIndex::new);
 		alg.lookupMatches("1", "0", found);

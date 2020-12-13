@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.structure;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
@@ -28,6 +29,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I64;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,6 +45,7 @@ public class LookUpSimilarGivenTracks<Track> implements LookUpSimilarImages {
 	DogArray<Frame> frames = new DogArray<>(Frame::new, Frame::reset);
 	List<String> frameIds = new ArrayList<>();
 
+	// storage for keys of all the features in a frame
 	DogArray_I64 keys = new DogArray_I64();
 
 	public LookUpSimilarGivenTracks( TrackToID<Track> lookupID, TrackToPixel<Track> lookupPixel ) {
@@ -80,22 +83,26 @@ public class LookUpSimilarGivenTracks<Track> implements LookUpSimilarImages {
 	 * at least minCommon features in common with each other. A brute force O(N^2) algorithm is used
 	 *
 	 * @param sequence If true it is assumed to be a sequence where the number of matches only decreases
-	 * @param minCommon Minimum number of common features between two similar images.
+	 * @param minFeatures Minimum number of common features between two similar images.
+	 * @param maxSimilar The maximum number of similar views a Frame can have. Preference is given to connections
+	 * with more features. If less than zero then there's no constraint
 	 */
-	public void computeSimilarRelationships( boolean sequence, int minCommon ) {
+	public void computeSimilarRelationships( boolean sequence, int minFeatures, int maxSimilar ) {
 		// Make sure everything is in the initial state
-		for (int idxA = 0; idxA < frames.size; idxA++) {
-			frames.get(idxA).similar.clear();
+		for (int idx = 0; idx < frames.size; idx++) {
+			frames.get(idx).similar.reset();
 		}
+
 		// Brute force O(N^2) checks to see if they are related
 		for (int idxA = 0; idxA < frames.size; idxA++) {
 			Frame frameA = frames.get(idxA);
+
 			for (int idxB = idxA + 1; idxB < frames.size; idxB++) {
 				Frame frameB = frames.get(idxB);
 				int common = countCommon(frameA, frameB);
 
 				// See if there are two few
-				if (common < minCommon) {
+				if (common < minFeatures) {
 					// if a sequence we assume the number of matches only goes down
 					if (sequence)
 						break;
@@ -103,9 +110,32 @@ public class LookUpSimilarGivenTracks<Track> implements LookUpSimilarImages {
 				}
 
 				// Add the relationship between these two frames
-				frameA.similar.add(frameB);
-				frameB.similar.add(frameA);
+				frameA.similar.grow().setTo(frameB, common);
+				frameB.similar.grow().setTo(frameA, common);
 			}
+		}
+
+		if (maxSimilar <= 0)
+			return;
+
+		// Enforce max views per frame
+		for (int idxA = 0; idxA < frames.size; idxA++) {
+			Frame frameA = frames.get(idxA);
+			if (frameA.similar.size() <= maxSimilar)
+				continue;
+
+			Collections.sort(frameA.similar.toList(), ( a, b ) -> Integer.compare(b.common, a.common));
+
+			while (frameA.similar.size > maxSimilar) {
+				Connected a_to_b = frameA.similar.removeTail();
+				Frame frameB = a_to_b.dst;
+				int indexOfAinB = frameB.similar.findIdx(a -> a.dst == frameA);
+				BoofMiscOps.checkTrue(indexOfAinB >= 0, "BUG! connectivity isn't symmetric");
+
+				frameB.similar.removeSwap(indexOfAinB);
+			}
+
+			BoofMiscOps.checkTrue(frameA.similar.size() <= maxSimilar);
 		}
 	}
 
@@ -146,7 +176,7 @@ public class LookUpSimilarGivenTracks<Track> implements LookUpSimilarImages {
 
 		similar.clear();
 		for (int i = 0; i < f.similar.size(); i++) {
-			similar.add(f.similar.get(i).id);
+			similar.add(f.similar.get(i).dst.id);
 		}
 	}
 
@@ -168,7 +198,7 @@ public class LookUpSimilarGivenTracks<Track> implements LookUpSimilarImages {
 		Frame frameB = getFrame(viewB);
 
 		// See if the two views have a similar relationship
-		if (!frameA.similar.contains(frameB))
+		if (null == frameA.findConnected(frameB))
 			return false;
 
 		// Look up all the feature IDs in frameA
@@ -199,15 +229,40 @@ public class LookUpSimilarGivenTracks<Track> implements LookUpSimilarImages {
 		// Looks up track to index and uses a value of -1 when there's no entry
 		final TLongIntMap trackToIndex = new TLongIntHashMap(
 				Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1, -1);
-		final List<Frame> similar = new ArrayList<>();
+		final DogArray<Connected> similar = new DogArray<>(Connected::new, Connected::reset);
+
 		String id = "";
 
 		void reset() {
 			shape.setTo(-1, -1);
 			pixels.reset();
 			trackToIndex.clear();
-			similar.clear();
+			similar.reset();
 			id = "";
+		}
+
+		Connected findConnected( Frame dst ) {
+			for (int i = 0; i < similar.size; i++) {
+				if (similar.get(i).dst == dst) {
+					return similar.get(i);
+				}
+			}
+			return null;
+		}
+	}
+
+	static class Connected {
+		Frame dst;
+		int common;
+
+		void setTo( Frame dst, int common ) {
+			this.dst = dst;
+			this.common = common;
+		}
+
+		void reset() {
+			dst = null;
+			common = -1;
 		}
 	}
 
