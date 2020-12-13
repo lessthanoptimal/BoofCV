@@ -40,7 +40,7 @@ public class ConvertBitmap {
 	 * otherwise the same instance is returned.
 	 */
 	public static Bitmap checkDeclare( ImageBase input, @Nullable Bitmap bitmap ) {
-		if (bitmap==null) {
+		if (bitmap == null) {
 			return Bitmap.createBitmap(input.width, input.height, Bitmap.Config.ARGB_8888);
 		} else if (input.width != bitmap.getWidth() || input.height != bitmap.getHeight()) {
 			return Bitmap.createBitmap(input.width, input.height, bitmap.getConfig());
@@ -88,6 +88,15 @@ public class ConvertBitmap {
 			case PLANAR:
 				Planar pl = (Planar)output;
 				bitmapToPlanar(input, pl, pl.getBandType(), storage);
+				break;
+
+			case INTERLEAVED:
+				if (output.getClass() == InterleavedU8.class)
+					bitmapToInterleaved(input, (InterleavedU8)output, storage);
+				else if (output.getClass() == InterleavedF32.class)
+					bitmapToInterleaved(input, (InterleavedF32)output, storage);
+				else
+					throw new IllegalArgumentException("Unsupported BoofCV Image Type");
 				break;
 
 			default:
@@ -193,6 +202,58 @@ public class ConvertBitmap {
 	}
 
 	/**
+	 * Converts Bitmap image into InterleavedU8.
+	 *
+	 * @param input Input Bitmap image.
+	 * @param output Output image.  If null a new one will be declared.
+	 * @param storage Byte array used for internal storage. If null it will be declared internally.
+	 * @return The converted gray scale image.
+	 */
+	public static InterleavedU8 bitmapToInterleaved( Bitmap input, InterleavedU8 output, @Nullable DogArray_I8 storage ) {
+		if (output == null) {
+			output = new InterleavedU8(input.getWidth(), input.getHeight(), 3);
+		} else {
+			if (output.getNumBands() < 3 || output.getNumBands() > 4)
+				output.reshape(input.getWidth(), input.getHeight(), 3);
+			else
+				output.reshape(input.getWidth(), input.getHeight());
+		}
+
+		storage = resizeStorage(input, storage);
+		input.copyPixelsToBuffer(ByteBuffer.wrap(storage.data));
+
+		ImplConvertBitmap.arrayToInterleaved_U8(storage.data, input.getConfig(), output);
+
+		return output;
+	}
+
+	/**
+	 * Converts Bitmap image into 	public static InterleavedF32 bitmapToInterleaved( Bitmap input, InterleavedU8 output, @Nullable DogArray_I8 storage ) {.
+	 *
+	 * @param input Input Bitmap image.
+	 * @param output Output image.  If null a new one will be declared.
+	 * @param storage Byte array used for internal storage. If null it will be declared internally.
+	 * @return The converted gray scale image.
+	 */
+	public static InterleavedF32 bitmapToInterleaved( Bitmap input, InterleavedF32 output, @Nullable DogArray_I8 storage ) {
+		if (output == null) {
+			output = new InterleavedF32(input.getWidth(), input.getHeight(), 3);
+		} else {
+			if (output.getNumBands() < 3 || output.getNumBands() > 4)
+				output.reshape(input.getWidth(), input.getHeight(), 3);
+			else
+				output.reshape(input.getWidth(), input.getHeight());
+		}
+
+		storage = resizeStorage(input, storage);
+		input.copyPixelsToBuffer(ByteBuffer.wrap(storage.data));
+
+		ImplConvertBitmap.arrayToInterleaved_F32(storage.data, input.getConfig(), output);
+
+		return output;
+	}
+
+	/**
 	 * Converts many BoofCV image types into a Bitmap.
 	 *
 	 * @param input Input BoofCV image.
@@ -238,7 +299,8 @@ public class ConvertBitmap {
 			}
 			break;
 
-			default: break;
+			default:
+				break;
 		}
 		throw new IllegalArgumentException("Unsupported input image type");
 	}
@@ -362,7 +424,8 @@ public class ConvertBitmap {
 					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 					return;
 
-				default: break;
+				default:
+					break;
 			}
 		}
 		throw new IllegalArgumentException("Unsupported BoofCV Type");
