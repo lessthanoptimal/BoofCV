@@ -404,6 +404,44 @@ public class UtilIO {
 	}
 
 	/**
+	 * Copies all the files and directories in 'src' into 'dst'.
+	 */
+	public static void copyRecursive( File src, File dst) {
+		try {
+			if (src.isDirectory()) {
+				if (!dst.exists() && !dst.mkdirs()) {
+					throw new IOException("Cannot create dir " + dst.getAbsolutePath());
+				}
+
+				String[] children = src.list();
+				for (int i = 0; i < children.length; i++) {
+					copyRecursive(new File(src, children[i]), new File(dst, children[i]));
+				}
+			} else {
+				// make sure the directory we plan to store the recording in exists
+				File directory = dst.getParentFile();
+				if (directory != null && !directory.exists() && !directory.mkdirs()) {
+					throw new IOException("Cannot create dir " + directory.getAbsolutePath());
+				}
+
+				InputStream in = new FileInputStream(src);
+				OutputStream out = new FileOutputStream(dst);
+
+				// Copy the file in chunks
+				byte[] buf = new byte[1024];
+				int len;
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
+				in.close();
+				out.close();
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
 	 * Reads an entire file and converts it into a text string
 	 */
 	public static String readAsString( String path ) {
