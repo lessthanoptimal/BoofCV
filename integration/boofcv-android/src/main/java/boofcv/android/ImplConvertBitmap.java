@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -589,7 +589,8 @@ public class ImplConvertBitmap {
 						}
 					}
 				} else {
-					throw new IllegalArgumentException("Expected 3 or 4 bands in output");
+					throw new IllegalArgumentException(
+							"Expected 3 or 4 bands in output. Not "+output.getNumBands());
 				}
 			}
 			break;
@@ -665,7 +666,8 @@ public class ImplConvertBitmap {
 						}
 					}
 				} else {
-					throw new IllegalArgumentException("Expected 3 or 4 bands in output");
+					throw new IllegalArgumentException(
+							"Expected 3 or 4 bands in output. Not "+output.getNumBands());
 				}
 			}
 			break;
@@ -685,6 +687,146 @@ public class ImplConvertBitmap {
 						B.data[indexDst] = b & 0xFF;
 						G.data[indexDst] = g & 0xFF;
 						R.data[indexDst] = r & 0xFF;
+					}
+				}
+			}
+			break;
+
+			case ALPHA_8:
+				throw new RuntimeException("ALPHA_8 seems to have some weired internal format and is not currently supported");
+
+			case ARGB_4444:
+				throw new RuntimeException("Isn't 4444 deprecated?");
+
+			default: throw new RuntimeException("Unsupported format: "+config);
+		}
+	}
+
+	public static void arrayToInterleaved_U8( byte[] input, Bitmap.Config config, InterleavedU8 outputImage ) {
+		final int h = outputImage.height;
+		final int w = outputImage.width;
+
+		byte[] output = outputImage.data;;
+		int indexSrc = 0;
+
+		switch (config) {
+			case ARGB_8888: {
+				if (outputImage.getNumBands() == 4) {
+					for (int y = 0; y < h; y++) {
+						int indexDst = outputImage.startIndex + y*outputImage.stride;
+						int end = indexDst + w*4;
+						// for (int x = 0; x < w; x++, indexSrc++) {
+						while (indexDst < end) {
+							output[indexDst++] = input[indexSrc++];
+							output[indexDst++] = input[indexSrc++];
+							output[indexDst++] = input[indexSrc++];
+							output[indexDst++] = input[indexSrc++];
+						}
+					}
+				} else if (outputImage.getNumBands() == 3) {
+					for (int y = 0; y < h; y++) {
+						int indexDst = outputImage.startIndex + y*outputImage.stride;
+						int end = indexDst + w*3;
+						// for (int x = 0; x < w; x++, indexSrc++) {
+						while (indexDst < end) {
+							output[indexDst++] = input[indexSrc++];
+							output[indexDst++] = input[indexSrc++];
+							output[indexDst++] = input[indexSrc++];
+							indexSrc++;
+						}
+					}
+				} else {
+					throw new IllegalArgumentException(
+							"Expected 3 or 4 bands in output. Not "+outputImage.getNumBands());
+				}
+			}
+			break;
+
+			case RGB_565: {
+				for (int y = 0; y < h; y++) {
+					int indexDst = outputImage.startIndex + y*outputImage.stride;
+					for (int x = 0; x < w; x++) {
+
+						int value = (input[indexSrc++] & 0xFF)
+								| ((input[indexSrc++] & 0xFF) << 8);
+
+						int r = (value >> 11)*0xFF/0x1F;
+						int g = ((value >> 5) & 0x3F)*0xFF/0x3F;
+						int b = (value & 0x1F)*0xFF/0x1F;
+
+						output[indexDst++] = (byte)b;
+						output[indexDst++] = (byte)g;
+						output[indexDst++] = (byte)r;
+					}
+				}
+			}
+			break;
+
+			case ALPHA_8:
+				throw new RuntimeException("ALPHA_8 seems to have some weired internal format and is not currently supported");
+
+			case ARGB_4444:
+				throw new RuntimeException("Isn't 4444 deprecated?");
+
+			default: throw new RuntimeException("Unsupported format: "+config);
+		}
+	}
+
+	public static void arrayToInterleaved_F32( byte[] input, Bitmap.Config config, InterleavedF32 outputImage ) {
+		final int h = outputImage.height;
+		final int w = outputImage.width;
+
+		float[] output = outputImage.data;;
+		int indexSrc = 0;
+
+		switch (config) {
+			case ARGB_8888: {
+				if (outputImage.getNumBands() == 4) {
+					for (int y = 0; y < h; y++) {
+						int indexDst = outputImage.startIndex + y*outputImage.stride;
+						int end = indexDst + w*4;
+						// for (int x = 0; x < w; x++, indexSrc++) {
+						while (indexDst < end) {
+							output[indexDst++] = input[indexSrc++]&0xFF;
+							output[indexDst++] = input[indexSrc++]&0xFF;
+							output[indexDst++] = input[indexSrc++]&0xFF;
+							output[indexDst++] = input[indexSrc++]&0xFF;
+						}
+					}
+				} else if (outputImage.getNumBands() == 3) {
+					for (int y = 0; y < h; y++) {
+						int indexDst = outputImage.startIndex + y*outputImage.stride;
+						int end = indexDst + w*3;
+						// for (int x = 0; x < w; x++, indexSrc++) {
+						while (indexDst < end) {
+							output[indexDst++] = input[indexSrc++]&0xFF;
+							output[indexDst++] = input[indexSrc++]&0xFF;
+							output[indexDst++] = input[indexSrc++]&0xFF;
+							indexSrc++;
+						}
+					}
+				} else {
+					throw new IllegalArgumentException(
+							"Expected 3 or 4 bands in output. Not "+outputImage.getNumBands());
+				}
+			}
+			break;
+
+			case RGB_565: {
+				for (int y = 0; y < h; y++) {
+					int indexDst = outputImage.startIndex + y*outputImage.stride;
+					for (int x = 0; x < w; x++) {
+
+						int value = (input[indexSrc++] & 0xFF)
+								| ((input[indexSrc++] & 0xFF) << 8);
+
+						int r = (value >> 11)*0xFF/0x1F;
+						int g = ((value >> 5) & 0x3F)*0xFF/0x3F;
+						int b = (value & 0x1F)*0xFF/0x1F;
+
+						output[indexDst++] = b;
+						output[indexDst++] = g;
+						output[indexDst++] = r;
 					}
 				}
 			}
