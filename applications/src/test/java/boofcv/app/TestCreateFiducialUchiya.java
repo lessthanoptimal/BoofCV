@@ -45,8 +45,8 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 	public void createDocument( String args ) {
 		CreateFiducialRandomDot.main(args.split("\\s+"));
-		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
-		err.reset();
+		out.used = false; // this will ignore the stdout usage which is unavoidable
+		err.used = false;
 	}
 
 	@Test

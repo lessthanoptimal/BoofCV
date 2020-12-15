@@ -38,8 +38,8 @@ public class TestCreateFiducialSquareBinary extends CommonFiducialPdfChecks {
 
 	public void createDocument( String args ) throws InterruptedException {
 		CreateFiducialSquareBinary.main(args.split("\\s+"));
-		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
-		err.reset();
+		out.used = false; // this will ignore the stdout usage which is unavoidable
+		err.used = false;
 	}
 
 	@Test

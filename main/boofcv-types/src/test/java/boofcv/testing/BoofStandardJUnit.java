@@ -22,7 +22,8 @@ import boofcv.BoofTesting;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Random;
 
@@ -38,8 +39,8 @@ public class BoofStandardJUnit {
 	protected final Random rand = BoofTesting.createRandom(234);
 
 	// Override output streams to keep log spam to a minimum
-	protected final ByteArrayOutputStream out = new ByteArrayOutputStream();
-	protected final ByteArrayOutputStream err = new ByteArrayOutputStream();
+	protected final MirrorStream out = new MirrorStream(System.out);
+	protected final MirrorStream err = new MirrorStream(System.err);
 	protected final PrintStream systemOut = System.out;
 	protected final PrintStream systemErr = System.err;
 
@@ -51,13 +52,37 @@ public class BoofStandardJUnit {
 
 	@AfterEach
 	public void revertStreams() {
-		boolean nonEmptyOut = out.size() > 0;
-		boolean nonEmptyErr = err.size() > 0;
-		systemOut.print(out.toString());
-		systemErr.print(err.toString());
-		assertFalse(nonEmptyOut,"stdout was written to which is forbidden by default");
-		assertFalse(nonEmptyErr,"stderr was written to which is forbidden by default");
+		assertFalse(out.used,"stdout was written to which is forbidden by default");
+		assertFalse(err.used,"stderr was written to which is forbidden by default");
 		System.setOut(systemOut);
 		System.setErr(systemErr);
+	}
+
+	public static class MirrorStream extends OutputStream {
+
+		PrintStream out;
+		public boolean used = false;
+
+		public MirrorStream( PrintStream out ) {
+			this.out = out;
+		}
+
+		@Override public void write( int b ) throws IOException {
+			used = true;
+			out.write(b);
+		}
+
+		@Override public void write( byte[] b, int off, int len ) throws IOException {
+			used = true;
+			out.write(b, off, len);
+		}
+
+		@Override public void flush() throws IOException {
+			out.flush();
+		}
+
+		@Override public void close() throws IOException {
+			out.close();
+		}
 	}
 }

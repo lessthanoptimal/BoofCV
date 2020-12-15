@@ -113,8 +113,8 @@ class TestUtilIO extends BoofStandardJUnit {
 		String nullClass = null;
 		assertEquals("",UtilIO.getSourcePath(nullPackage, nullClass));
 
-		// Flush err so that we don't get a false positive on the stderr check
-		err.reset();
+		// Avoid a false positive on the stderr check
+		err.used = false;
 	}
 
 	@SuppressWarnings("ConstantConditions")

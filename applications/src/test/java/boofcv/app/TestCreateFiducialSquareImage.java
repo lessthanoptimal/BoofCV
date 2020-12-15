@@ -50,8 +50,8 @@ class TestCreateFiducialSquareImage extends CommonFiducialPdfChecks {
 
 	private void createDocument( String args ) throws IOException {
 		CreateFiducialSquareImage.main(args.split("\\s+"));
-		out.reset(); // flush stdout to avoid a false positive on stdout restrictions
-		err.reset();
+		out.used = false; // this will ignore the stdout usage which is unavoidable
+		err.used = false;
 	}
 
 	private GrayF32 loadImageGray() throws IOException {
