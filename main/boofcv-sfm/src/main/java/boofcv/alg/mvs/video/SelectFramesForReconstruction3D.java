@@ -115,6 +115,8 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	private @Getter double fitScoreH;
 	/** If it considered that new image could be 3D relative to the keyframe */
 	private @Getter boolean considered3D;
+	/** True if there are too few pairs with the key frame to reliably estimate scene structure */
+	private @Getter boolean sufficientFeaturePairs;
 
 	//----------------------------- Internally used fields
 
@@ -193,6 +195,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 		fitScore3D = Double.NaN;
 		fitScoreH = Double.NaN;
 		considered3D = false;
+		sufficientFeaturePairs = false;
 
 		performTracking(image);
 
@@ -210,6 +213,8 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 				if (verbose != null) verbose.printf("Too few pairs. pairs.size=%d\n",pairs.size);
 				break escape;
 			}
+			// Note that there were enough feature pairs
+			sufficientFeaturePairs = true;
 
 			// Compute how much the frame moved
 			frameMotion = computeFrameRelativeMotion();
