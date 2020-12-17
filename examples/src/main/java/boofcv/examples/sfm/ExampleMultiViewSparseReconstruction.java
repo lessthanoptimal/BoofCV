@@ -44,9 +44,11 @@ import boofcv.struct.image.InterleavedU8;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.TwoAxisRgbPlane;
 import boofcv.visualize.VisualizeData;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import georegression.struct.so.Rodrigues_F64;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.DDoglegConcurrency;
 import org.ddogleg.struct.DogArray_I32;
@@ -133,18 +135,19 @@ public class ExampleMultiViewSparseReconstruction {
 		metricFromPairwise();
 		bundleAdjustmentRefine();
 
+		Rodrigues_F64 rod = new Rodrigues_F64();
 		System.out.println("----------------------------------------------------------------------------");
 		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
 			var wv = working.lookupView(pv.id);
 			if (wv == null)
 				continue;
 			int order = working.viewList.indexOf(wv);
-
-			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f}\n", order, wv.pview.id,
-					wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
-					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z);
+			ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R, rod);
+			System.out.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f T={%5.1f,%5.1f,%5.1f} R=%4.2f\n",
+					order, wv.pview.id, wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
+					wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z, rod.theta);
 		}
-		System.out.println("Printing view info. Used " + scene.views.size + " / " + pairwise.nodes.size);
+		System.out.println("   Views used: " + scene.views.size + " / " + pairwise.nodes.size);
 	}
 
 	/**
