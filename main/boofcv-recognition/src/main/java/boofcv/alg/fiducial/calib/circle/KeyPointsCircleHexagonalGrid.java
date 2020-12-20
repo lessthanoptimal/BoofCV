@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilVector2D_F64;
 import georegression.geometry.curves.TangentLinesTwoEllipses_F64;
@@ -49,7 +50,7 @@ public class KeyPointsCircleHexagonalGrid {
 	DogArray<Tangents> tangents = new DogArray<>(Tangents::new);
 
 	// detected location
-	DogArray<Point2D_F64> keypoints = new DogArray<>(Point2D_F64::new);
+	DogArray<PointIndex2D_F64> keypoints = new DogArray<>(PointIndex2D_F64::new);
 
 	// used to compute tangent lines between two ellipses
 	private final TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
@@ -193,8 +194,9 @@ public class KeyPointsCircleHexagonalGrid {
 		for (int tangentIdx = 0; tangentIdx < tangents.size(); tangentIdx++) {
 //			System.out.println("tangent id "+tangentIdx);
 			Tangents t = tangents.get(tangentIdx);
-			Point2D_F64 center = keypoints.grow();
-			center.setTo(0,0);
+			PointIndex2D_F64 keyPoint = keypoints.grow();
+			keyPoint.setTo(0,0,tangentIdx);
+			Point2D_F64 center = keyPoint.p;
 			double totalWeight = 0;
 
 			for (int i = 0; i < t.size(); i += 2) {
@@ -240,7 +242,7 @@ public class KeyPointsCircleHexagonalGrid {
 	 * Returns the location of each key point in the image from the most recently processed grid.
 	 * @return detected image location
 	 */
-	public DogArray<Point2D_F64> getKeyPoints() {
+	public DogArray<PointIndex2D_F64> getKeyPoints() {
 		return keypoints;
 	}
 

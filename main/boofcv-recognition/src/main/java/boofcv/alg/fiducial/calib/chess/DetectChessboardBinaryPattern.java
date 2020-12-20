@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
 
@@ -103,7 +103,7 @@ public class DetectChessboardBinaryPattern<T extends ImageGray<T>> {
 		return findSeeds;
 	}
 
-	public List<Point2D_F64> getCalibrationPoints() {
+	public List<PointIndex2D_F64> getCalibrationPoints() {
 		return findSeeds.getCalibrationPoints().toList();
 	}
 

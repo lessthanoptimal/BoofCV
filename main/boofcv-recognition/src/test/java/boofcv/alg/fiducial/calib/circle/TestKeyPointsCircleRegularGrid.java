@@ -69,10 +69,10 @@ public class TestKeyPointsCircleRegularGrid extends BoofStandardJUnit {
 				double cx = col * space;
 				double cy = row * space;
 
-				Point2D_F64 a = alg.getKeyPoints().get(index++);
-				Point2D_F64 b = alg.getKeyPoints().get(index++);
-				Point2D_F64 c = alg.getKeyPoints().get(index++);
-				Point2D_F64 d = alg.getKeyPoints().get(index++);
+				Point2D_F64 a = alg.getKeyPoints().get(index++).p;
+				Point2D_F64 b = alg.getKeyPoints().get(index++).p;
+				Point2D_F64 c = alg.getKeyPoints().get(index++).p;
+				Point2D_F64 d = alg.getKeyPoints().get(index++).p;
 
 				AffinePointOps_F64.transform(affine,cx,cy+r,p);
 				assertTrue(a.distance(p.x,p.y) <= BoofDefaults.TEST_DOUBLE_TOL);

@@ -32,6 +32,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.PointToPixelTransform_F32;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
@@ -103,10 +104,10 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialC
 		if( !keypoint.process(grids.get(0)) )
 			return false;
 
-		DogArray<Point2D_F64> foundPixels = keypoint.getKeyPoints();
+		DogArray<PointIndex2D_F64> foundPixels = keypoint.getKeyPoints();
 
 		for (int i = 0; i < foundPixels.size; i++) {
-			results.add(foundPixels.get(i),i);
+			results.add(foundPixels.get(i).p,i);
 		}
 		return true;
 	}

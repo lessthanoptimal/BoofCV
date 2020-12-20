@@ -20,11 +20,12 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Nested;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,17 +36,17 @@ class TestDetectChessboardXCornerPatterns extends BoofStandardJUnit {
 	@Nested
 	class SingleTarget extends GenericDetectFindChessboardCorners {
 		@Override
-		public List<Point2D_F64> findCorners(int numRows, int numCols, GrayF32 image) {
+		public List<PointIndex2D_F64> findCorners( int numRows, int numCols, GrayF32 image) {
 			ConfigChessboardX config = new ConfigChessboardX();
 			DetectChessboardXCornerPatterns<GrayF32> alg = new DetectChessboardXCornerPatterns<>(config,GrayF32.class);
 
 			alg.findPatterns(image);
 
-			List<GridInfo> found = alg.getFoundChessboard().toList();
-
-			for( GridInfo g : found ) {
+			for( GridInfo g : alg.getFoundChessboard().toList() ) {
 				if( g.rows == numRows-1 && g.cols == numCols-1 ) {
-					return (List)g.nodes;
+					List<PointIndex2D_F64> found = new ArrayList<>();
+					g.nodes.forEach(p->found.add(new PointIndex2D_F64(p,0)));
+					return found;
 				}
 			}
 			return null;

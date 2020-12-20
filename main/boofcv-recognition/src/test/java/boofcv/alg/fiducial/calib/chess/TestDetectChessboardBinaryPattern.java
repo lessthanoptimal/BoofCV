@@ -24,9 +24,9 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Nested;
 
 import java.util.List;
@@ -44,7 +44,7 @@ class TestDetectChessboardBinaryPattern extends BoofStandardJUnit {
 		}
 
 		@Override
-		public List<Point2D_F64> findCorners(int numRows, int numCols, GrayF32 image) {
+		public List<PointIndex2D_F64> findCorners( int numRows, int numCols, GrayF32 image) {
 			ConfigChessboardBinary configDet = new ConfigChessboardBinary();
 //			ConfigGridDimen configChess = new ConfigGridDimen(5, 5, 1);
 
