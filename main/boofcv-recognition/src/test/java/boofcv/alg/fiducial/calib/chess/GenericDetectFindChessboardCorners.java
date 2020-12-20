@@ -22,6 +22,7 @@ import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
@@ -54,7 +55,7 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 
 	boolean showRendered = false;
 
-	public abstract List<Point2D_F64> findCorners( int numRows , int numCols, GrayF32 image );
+	public abstract List<PointIndex2D_F64> findCorners( int numRows , int numCols, GrayF32 image );
 
 	@BeforeEach
 	public void setup() {
@@ -85,7 +86,7 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 //		ShowImages.showWindow(gray,"Rendered Image");
 //		try { Thread.sleep(1000); } catch (InterruptedException e) {}
 
-		List<Point2D_F64> found = findCorners(numRows,numCols,gray);
+		List<PointIndex2D_F64> found = findCorners(numRows,numCols,gray);
 		if( found == null ) {
 			UtilImageIO.saveImage(gray,"savedchessboard.png");
 			fail("Failed to detect target");
@@ -97,7 +98,7 @@ public abstract class GenericDetectFindChessboardCorners extends BoofStandardJUn
 		// check the ordering of the points
 		for( int i = 0; i < expected.size(); i++ ) {
 			Point2D_F64 e = expected.get(i);
-			Point2D_F64 f = found.get(i);
+			Point2D_F64 f = found.get(i).p;
 
 			if( transform != null ) {
 				SePointOps_F64.transform(transform,e,e);

@@ -28,6 +28,7 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.metric.UtilAngle;
@@ -120,7 +121,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 //		System.out.println("test grid "+ gridWidth + " " + gridHeight);
 		assertTrue(alg.process(gray, binary));
 
-		List<Point2D_F64> calib = alg.getCalibrationPoints().toList();
+		List<PointIndex2D_F64> calib = alg.getCalibrationPoints().toList();
 
 		double x0 = offsetX + squareLength;
 		double y0 = offsetY + squareLength;
@@ -133,7 +134,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 		int index = 0;
 		for (int row = 0; row < pointRows; row++) {
 			for (int col = 0; col < pointCols; col++) {
-				assertTrue(calib.get(index++).distance(x0 + col*squareLength, y0 + row*squareLength) < 3);
+				assertTrue(calib.get(index++).p.distance(x0 + col*squareLength, y0 + row*squareLength) < 3);
 			}
 		}
 	}
@@ -337,7 +338,7 @@ public class TestDetectChessboardSquarePoints extends BoofStandardJUnit {
 						double x = x0 + j*w;
 						double y = y0 + i*w;
 
-						Point2D_F64 p = alg.calibrationPoints.get(index++);
+						Point2D_F64 p = alg.calibrationPoints.get(index++).p;
 
 						assertTrue(p.distance(x, y) < 1e-8);
 					}

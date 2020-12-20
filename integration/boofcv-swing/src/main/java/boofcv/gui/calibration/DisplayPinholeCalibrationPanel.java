@@ -138,15 +138,15 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		Point2D_F32 adj = new Point2D_F32();
 
 		if (showOrder) {
-			List<Point2D_F64> adjusted;
+			List<PointIndex2D_F64> adjusted;
 			if (showUndistorted) {
 				adjusted = new ArrayList<>();
 				for (PointIndex2D_F64 p : set.points) {
 					remove_p_to_p.compute((float)p.p.x, (float)p.p.y, adj);
-					adjusted.add(new Point2D_F64(adj.x, adj.y));
+					adjusted.add(new PointIndex2D_F64(adj.x, adj.y));
 				}
 			} else {
-				adjusted = (List)set.points;
+				adjusted = set.points;
 			}
 			renderOrder(g2, scale, adjusted);
 		}
@@ -221,14 +221,14 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		}
 	}
 
-	public static void renderOrder( Graphics2D g2, double scale, List<Point2D_F64> points ) {
+	public static void renderOrder( Graphics2D g2, double scale, List<PointIndex2D_F64> points ) {
 		g2.setStroke(new BasicStroke(5));
 
 		Line2D.Double l = new Line2D.Double();
 
 		for (int i = 0, j = 1; j < points.size(); i = j, j++) {
-			Point2D_F64 p0 = points.get(i);
-			Point2D_F64 p1 = points.get(j);
+			Point2D_F64 p0 = points.get(i).p;
+			Point2D_F64 p1 = points.get(j).p;
 
 			double fraction = i/((double)points.size() - 2);
 //			fraction = fraction * 0.8 + 0.1;

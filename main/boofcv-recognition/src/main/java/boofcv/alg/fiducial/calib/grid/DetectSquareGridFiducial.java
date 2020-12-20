@@ -22,9 +22,9 @@ import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 	SquareRegularClustersIntoGrids c2g;
 
 	// output results.  Grid of calibration points in row-major order
-	List<Point2D_F64> calibrationPoints = new ArrayList<>();
+	List<PointIndex2D_F64> calibrationPoints = new ArrayList<>();
 	int calibRows;
 	int calibCols;
 
@@ -175,8 +175,8 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 		contourFinder.setSaveInnerContour(false);
 	}
 
-	List<Point2D_F64> row0 = new ArrayList<>();
-	List<Point2D_F64> row1 = new ArrayList<>();
+	List<PointIndex2D_F64> row0 = new ArrayList<>();
+	List<PointIndex2D_F64> row1 = new ArrayList<>();
 
 	/**
 	 * Extracts the calibration points from the corners of a fully ordered grid
@@ -190,10 +190,10 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 			for (int col = 0; col < grid.columns; col++) {
 				Polygon2D_F64 square = grid.get(row, col).square;
 
-				row0.add(square.get(0));
-				row0.add(square.get(1));
-				row1.add(square.get(3));
-				row1.add(square.get(2));
+				row0.add(new PointIndex2D_F64(square.get(0),0));
+				row0.add(new PointIndex2D_F64(square.get(1),0));
+				row1.add(new PointIndex2D_F64(square.get(3),0));
+				row1.add(new PointIndex2D_F64(square.get(2),0));
 			}
 			calibrationPoints.addAll(row0);
 			calibrationPoints.addAll(row1);
@@ -203,7 +203,7 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 //		calibRows = grid.rows*2;
 	}
 
-	public List<Point2D_F64> getCalibrationPoints() {
+	public List<PointIndex2D_F64> getCalibrationPoints() {
 		return calibrationPoints;
 	}
 

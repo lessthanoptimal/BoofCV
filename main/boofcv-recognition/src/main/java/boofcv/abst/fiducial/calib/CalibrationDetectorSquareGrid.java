@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.PointToPixelTransform_F32;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -69,9 +70,9 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	public boolean process(GrayF32 input) {
 		detected = new CalibrationObservation(input.width,input.height);
 		if( detector.process(input) )  {
-			List<Point2D_F64> found = detector.getCalibrationPoints();
+			List<PointIndex2D_F64> found = detector.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {
-				detected.add( found.get(i), i );
+				detected.add( found.get(i).p, i );
 			}
 			return true;
 		} else {

@@ -57,7 +57,7 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 				if( row%2 == 1 && col%2 == 0)
 					continue;
 
-				Point2D_F64 p = alg.getKeyPoints().get(idx++);
+				Point2D_F64 p = alg.getKeyPoints().get(idx++).p;
 
 				assertEquals(col*s, p.x, GrlConstants.TEST_F64);
 				assertEquals(row*s, p.y, GrlConstants.TEST_F64);
@@ -232,8 +232,8 @@ public class TestKeyPointsCircleHexagonalGrid extends BoofStandardJUnit {
 		alg.computeEllipseCenters();
 
 		assertEquals(1,alg.keypoints.size);
-		assertEquals(cx,alg.keypoints.get(0).x, GrlConstants.TEST_F64);
-		assertEquals(cy,alg.keypoints.get(0).y, GrlConstants.TEST_F64);
+		assertEquals(cx,alg.keypoints.get(0).p.x, GrlConstants.TEST_F64);
+		assertEquals(cy,alg.keypoints.get(0).p.y, GrlConstants.TEST_F64);
 	}
 
 	public static Grid createGrid(int numRows , int numCols , double space , double radius ) {

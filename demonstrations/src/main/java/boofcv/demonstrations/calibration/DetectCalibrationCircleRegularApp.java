@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.curve.EllipseRotated_F64;
@@ -147,11 +148,11 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 	}
 
 	@Override
-	public void renderOrder(Graphics2D g2, double scale , List<Point2D_F64> points ) {
+	public void renderOrder(Graphics2D g2, double scale , List<PointIndex2D_F64> points ) {
 		renderOrderA(g2,scale,points);
 	}
 
-	public static void renderOrderA(Graphics2D g2, double scale , List<Point2D_F64> points ) {
+	public static void renderOrderA(Graphics2D g2, double scale , List<PointIndex2D_F64> points ) {
 		g2.setStroke(new BasicStroke(5));
 
 		Color colorsSquare[] = new Color[4];
@@ -163,8 +164,8 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		Line2D.Double line = new Line2D.Double();
 
 		for (int i = 1; i+6 < points.size(); i += 4) {
-			Point2D_F64 p0 = points.get(i);
-			Point2D_F64 p1 = points.get(i+6);
+			Point2D_F64 p0 = points.get(i).p;
+			Point2D_F64 p1 = points.get(i+6).p;
 
 			double fraction = i / ((double) points.size() - 2);
 
@@ -181,10 +182,10 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		}
 
 		for (int i = 0; i+3 < points.size(); i += 4) {
-			Point2D_F64 p0 = points.get(i);
-			Point2D_F64 p1 = points.get(i+1);
-			Point2D_F64 p2 = points.get(i+2);
-			Point2D_F64 p3 = points.get(i+3);
+			Point2D_F64 p0 = points.get(i).p;
+			Point2D_F64 p1 = points.get(i+1).p;
+			Point2D_F64 p2 = points.get(i+2).p;
+			Point2D_F64 p3 = points.get(i+3).p;
 
 			line.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
 			g2.setColor(colorsSquare[0]);
@@ -220,7 +221,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 	}
 
 	@Override
-	protected List<Point2D_F64> getCalibrationPoints() {
+	protected List<PointIndex2D_F64> getCalibrationPoints() {
 		return detector.getKeypointFinder().getKeyPoints().toList();
 	}
 

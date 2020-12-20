@@ -22,6 +22,7 @@ import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareGridTools;
 import boofcv.alg.fiducial.calib.squares.TestSquareGridTools;
 import boofcv.alg.fiducial.calib.squares.TestSquareRegularClustersIntoGrids;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
@@ -34,21 +35,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 public class TestDetectSquareGridFiducial extends BoofStandardJUnit {
-	@Test
-	public void process() {
+	@Test void process() {
 		// intentionally blank.  tested in the wrapper class
 	}
 
-	@Test
-	public void extractCalibrationPoints() {
+	@Test void extractCalibrationPoints() {
 		SquareGrid grid = TestSquareGridTools.createGrid(3,4);
 
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(3,4,1,null,null);
+		DetectSquareGridFiducial<?> alg = new DetectSquareGridFiducial<>(3,4,1,null,null);
 
 		new SquareGridTools().orderSquareCorners(grid);
 
 		alg.extractCalibrationPoints(grid);
-		List<Point2D_F64> list = alg.getCalibrationPoints();
+		List<PointIndex2D_F64> list = alg.getCalibrationPoints();
 
 		assertEquals(4 * 3 * 4, list.size());
 
@@ -62,12 +61,11 @@ public class TestDetectSquareGridFiducial extends BoofStandardJUnit {
 				double x = x0 + col*w;
 				double y = y0 + row*w;
 
-				Point2D_F64 p = list.get(row*grid.columns*2+col);
+				Point2D_F64 p = list.get(row*grid.columns*2+col).p;
 
 				assertEquals(x,p.x,1e-8);
 				assertEquals(y,p.y,1e-8);
 			}
 		}
-
 	}
 }

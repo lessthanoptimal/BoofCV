@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,10 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.curve.EllipseRotated_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.swing.*;
@@ -87,7 +87,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	}
 
 	@Override
-	protected List<Point2D_F64> getCalibrationPoints() {
+	protected List<PointIndex2D_F64> getCalibrationPoints() {
 		return alg.getCalibrationPoints();
 	}
 

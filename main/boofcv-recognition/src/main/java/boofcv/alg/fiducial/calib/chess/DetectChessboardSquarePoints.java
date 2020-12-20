@@ -24,11 +24,13 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.misc.CircularIndex;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
 
@@ -44,21 +46,21 @@ import java.util.List;
 public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 	// detector for squares
-	DetectPolygonBinaryGrayRefine<T> detectorSquare;
+	@Getter DetectPolygonBinaryGrayRefine<T> detectorSquare;
 
 	// Converts detected squares into a graph and into grids
 	SquaresIntoCrossClusters s2c;
 	SquareCrossClustersIntoGrids c2g;
 
 	// size of square grids
-	private int numRows, numCols;
+	private @Getter int numRows, numCols;
 
 	// bounding quadrilateral
 	private Polygon2D_I32 boundPolygon = new Polygon2D_I32();
 
 	SquareGridTools tools = new SquareGridTools();
 
-	DogArray<Point2D_F64> calibrationPoints = new DogArray<>(Point2D_F64::new);
+	@Getter DogArray<PointIndex2D_F64> calibrationPoints = new DogArray<>(PointIndex2D_F64::new);
 
 	// maximum distance two corners can be from each other
 	ConfigLength maxCornerDistance;
@@ -327,6 +329,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 	boolean computeCalibrationPoints( SquareGrid grid ) {
 		calibrationPoints.reset();
 
+		int pointID = 0;
 		for (int row = 0; row < grid.rows - 1; row++) {
 			int offset = row%2;
 			for (int col = offset; col < grid.columns; col += 2) {
@@ -334,13 +337,17 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 				if (col > 0) {
 					SquareNode b = grid.get(row + 1, col - 1);
-					if (!setIntersection(a, b, calibrationPoints.grow()))
+					PointIndex2D_F64 p = calibrationPoints.grow();
+					p.index = pointID;
+					if (!setIntersection(a, b, p.p))
 						return false;
 				}
 
 				if (col < grid.columns - 1) {
 					SquareNode b = grid.get(row + 1, col + 1);
-					if (!setIntersection(a, b, calibrationPoints.grow()))
+					PointIndex2D_F64 p = calibrationPoints.grow();
+					p.index = pointID;
+					if (!setIntersection(a, b, p.p))
 						return false;
 				}
 			}
@@ -374,21 +381,5 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 	public SquareCrossClustersIntoGrids getGrids() {
 		return c2g;
-	}
-
-	public DetectPolygonBinaryGrayRefine<T> getDetectorSquare() {
-		return detectorSquare;
-	}
-
-	public DogArray<Point2D_F64> getCalibrationPoints() {
-		return calibrationPoints;
-	}
-
-	public int getNumRows() {
-		return numRows;
-	}
-
-	public int getNumCols() {
-		return numCols;
 	}
 }

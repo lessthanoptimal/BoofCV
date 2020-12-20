@@ -32,6 +32,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.curve.EllipseRotated_F64;
@@ -222,7 +223,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 	}
 
 	@Override
-	protected List<Point2D_F64> getCalibrationPoints() {
+	protected List<PointIndex2D_F64> getCalibrationPoints() {
 		return detector.getKeypointFinder().getKeyPoints().toList();
 	}
 

@@ -33,6 +33,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -112,7 +113,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 	protected abstract List<List<SquareNode>> getClusters();
 
-	protected abstract List<Point2D_F64> getCalibrationPoints();
+	protected abstract List<PointIndex2D_F64> getCalibrationPoints();
 
 	protected abstract List<Contour> getContours();
 
@@ -274,9 +275,9 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 					}
 
 					if (controlPanel.isShowPoints()) {
-						List<Point2D_F64> candidates = getCalibrationPoints();
-						for (Point2D_F64 c : candidates) {
-							VisualizeFeatures.drawPoint(g2, scale*c.x, scale*c.y, 4, Color.RED, false, storage);
+						List<PointIndex2D_F64> candidates = getCalibrationPoints();
+						for (PointIndex2D_F64 c : candidates) {
+							VisualizeFeatures.drawPoint(g2, scale*c.p.x, scale*c.p.y, 4, Color.RED, false, storage);
 						}
 					}
 					if (controlPanel.isShowNumbers()) {
@@ -310,7 +311,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 		}
 	}
 
-	public void renderOrder( Graphics2D g2, double scale, List<Point2D_F64> points ) {
+	public void renderOrder( Graphics2D g2, double scale, List<PointIndex2D_F64> points ) {
 		DisplayPinholeCalibrationPanel.renderOrder(g2, scale, points);
 	}
 
@@ -433,7 +434,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 		}
 	}
 
-	public static void drawNumbers( Graphics2D g2, List<Point2D_F64> foundTarget,
+	public static void drawNumbers( Graphics2D g2, List<PointIndex2D_F64> foundTarget,
 									Point2Transform2_F32 transform,
 									double scale ) {
 
@@ -447,12 +448,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 		AffineTransform at = new AffineTransform();
 		AffineTransform origTran = g2.getTransform();
 		for (int i = 0; i < foundTarget.size(); i++) {
-			Point2D_F64 p = foundTarget.get(i);
+			PointIndex2D_F64 p = foundTarget.get(i);
 
 			if (transform != null) {
-				transform.compute((float)p.x, (float)p.y, adj);
+				transform.compute((float)p.p.x, (float)p.p.y, adj);
 			} else {
-				adj.setTo((float)p.x, (float)p.y);
+				adj.setTo((float)p.p.x, (float)p.p.y);
 			}
 
 			String text = String.format("%2d", i);
