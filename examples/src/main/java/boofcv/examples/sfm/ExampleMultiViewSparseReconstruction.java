@@ -78,7 +78,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 public class ExampleMultiViewSparseReconstruction {
 
 	// Instead of processing all the frames just process the first N frames
-	int maxFrames = 30;
+	int maxFrames = 40;
 
 	String workDirectory;
 	List<String> imageFiles = new ArrayList<>();
