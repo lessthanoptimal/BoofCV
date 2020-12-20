@@ -39,9 +39,12 @@ Update prebuilt applications and demonstrations using https://github.com/lesstha
 
 --- Releasing to Maven Central
 
-Clean, build, and upload to Sonatype
-  cd main;git clean -fd;cd ..;./gradlew autogenerate;./gradlew clean;./gradlew uploadArchives -Dorg.gradle.parallel=false
+- Publish SNAPSHOT:
 
-A SNAPSHOT is created if SNAPSHOT is in its name.
+./gradlew uploadArchives
+
+- Publish Stable Release:
+
+git clean -fd main;./gradlew autogenerate;./gradlew assemble;./gradlew publish -Dorg.gradle.parallel=false
 
 log onto http://oss.sonatype.org
