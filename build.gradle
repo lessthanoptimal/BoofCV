@@ -111,6 +111,7 @@ subprojects {
 
     dependencies {
         api(group: 'org.georegression', name: 'georegression', version: '0.23')
+        api(group: 'org.ddogleg', name: 'ddogleg', version: '0.19')
 
         compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
 
