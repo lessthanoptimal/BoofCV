@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 //import net.ltgt.gradle.errorprone.CheckSeverity
 
 plugins {
-    id "com.peterabeles.gversion" version "1.9" apply false
+    id "com.peterabeles.gversion" version "1.10" apply false
     id "net.ltgt.errorprone" version "1.2.1" apply false
     id "com.diffplug.spotless" version "5.6.1" apply false
 }
@@ -33,7 +33,6 @@ if( project.hasProperty("native_arch")) {
     project.ext.native_arch = ["linux-x86_64", "macosx-x86_64", "windows-x86_64"]
 }
 
-
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
@@ -49,7 +48,7 @@ subprojects {
     }
 
     // Creates Java 8 byte code
-    tasks.withType(JavaCompile).all { options.compilerArgs = ["--release", "8",] }
+    tasks.withType(JavaCompile).all { options.compilerArgs = ["--release", "8"] }
 
     // To make ErrorProne and Kotlin plugins happy
     configurations.all {
@@ -111,8 +110,7 @@ subprojects {
     }
 
     dependencies {
-        api(group: 'org.georegression', name: 'georegression', version: '0.23-SNAPSHOT')
-        api(group: 'org.ddogleg', name: 'ddogleg', version: '0.19-SNAPSHOT')
+        api(group: 'org.georegression', name: 'georegression', version: '0.23')
 
         compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
 
@@ -192,13 +190,31 @@ subprojects {
 //        }
     }
 
-    javadoc.failOnError = false
-    javadoc.enabled = !project.version.contains("SNAPSHOT") // disable to stop it from spamming stdout
+    javadoc {
+        configure(options) {
+            links = ['http://docs.oracle.com/javase/8/docs/api/',
+                     'http://ejml.org/javadoc/',
+                     'http://ddogleg.org/javadoc/',
+                     'http://georegression.org/javadoc/']
+            failOnError = false
+            enabled = !project.version.contains("SNAPSHOT") // disable to stop it from spamming stdout
+        }
+
+        // https://github.com/gradle/gradle/issues/11182 Error introduced in JDK 11
+        if (JavaVersion.current().compareTo(JavaVersion.VERSION_1_9) >= 0) {
+            options.addStringOption("-release", "8")
+        }
+
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
 
     // Force the release build to fail if it depends on a SNAPSHOT
-    jar.dependsOn checkDependsOnSNAPSHOT
-    // Force uploadArchives to fail if trying to upload a stable release and git is dirty
-    uploadArchives.dependsOn failDirtyNotSnapshot
+    project.jar.dependsOn project.checkDependsOnSNAPSHOT
+
+    // Force publish to fail if trying to upload a stable release and git is dirty
+    project.publish.dependsOn failDirtyNotSnapshot
 
     // Skip these codeless directories when publishing jars locally or to a remote destination
     if (['main', 'integration', 'checks'].contains(name)) {
@@ -244,8 +260,6 @@ subprojects {
     if( !project.hasProperty('ossrhUsername') ) {
         ext.ossrhUsername = "dummy"
         ext.ossrhPassword = "dummy"
-    } else {
-        signing { sign configurations.archives }
     }
 
     publishing {
@@ -289,6 +303,10 @@ subprojects {
                 }
             }
         }
+    }
+
+    if( project.hasProperty('ossrhUsername') ) {
+        signing { sign publishing.publications.mavenJava }
     }
 }
 
@@ -396,7 +414,15 @@ task alljavadoc(type: Javadoc,  group: "Documentation") {
 
     // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
     options.addBooleanOption("-allow-script-in-comments", true)
-//    options.addBooleanOption("-no-module-directories", true) // removed from javadoc?
+
+    // Flag is no longer around in later versions of Java but required before
+    if (JavaVersion.current().ordinal() < JavaVersion.VERSION_13.ordinal()) {
+        options.addBooleanOption("-no-module-directories", true)
+    }
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 
     // Add a list of uses of a class to javadoc
     options.use = true
