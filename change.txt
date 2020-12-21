@@ -90,11 +90,10 @@ Version : 0.37
   * Projective from arbitrary images using PairwiseImageGraph
   * Projective to Metric for arbitrary number of views
   * PointTrackerToSimilarImages uses a tracker to match features for reconstruction
-  * TODO Create validation tests of nature scenes with known marks to provide ground truth
 - Multi-View Stereo
-  - Added MultiViewToFusedDisparity to combine multiple disparity images into one
-  - Added MultiViewStereoFromKnownSceneStructure which computes a dense cloud from multiple disparity images
-  - Added an application which down samples the frames in an image sequence based on quality of 3D geometry
+  * Added MultiViewToFusedDisparity to combine multiple disparity images into one
+  * Added MultiViewStereoFromKnownSceneStructure which computes a dense cloud from multiple disparity images
+  * Added an application which down samples the frames in an image sequence based on quality of 3D geometry
 - Sparse Bundle Adjustment
   * Fixed bug in how pixels are scaled in ScaleSceneStructure.
   * A view's pose can now be specified relative to other views. Can be a known or estimated parameter

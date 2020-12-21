@@ -16,14 +16,14 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.37-SNAPSHOT'
+    version = '0.37'
 
     ext.COMMONS_IO_VERSION = '2.6'
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
-project.ext.set("deepboof_version", '0.5-SNAPSHOT')
+project.ext.set("deepboof_version", '0.5')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
