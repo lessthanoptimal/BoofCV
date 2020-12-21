@@ -4,7 +4,7 @@
    * README.md
    * Android example should reference latest BoofCV
    * build.gradle
-- Set release data in change.txt
+- Set release date in change.txt
 - Make sure all examples work
 - Make sure all applications in evaluation work
 - Make sure android still works
