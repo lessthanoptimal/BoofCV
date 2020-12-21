@@ -132,7 +132,7 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 			List<QrCode> found = detector.getDetections();
 			for (int i = 0; i < found.size(); i++) {
 				QrCode qr = found.get(i);
-				foundQR.grow().set(qr.bounds);
+				foundQR.grow().setTo(qr.bounds);
 				message = qr.message;
 			}
 		}
