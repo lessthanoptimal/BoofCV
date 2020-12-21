@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -211,6 +211,14 @@ public class VisualizeDepthVisualOdometryApp
 		viewPanel.setPreferredSize(new Dimension(width*2 + 20, height));
 		viewPanel.setDividerLocation(width);
 		viewPanel.setMaximumSize(viewPanel.getPreferredSize());
+	}
+
+	@Override protected void openVideo( boolean reopen, String... filePaths ) {
+		if (filePaths.length==1) {
+			openFile(new File(filePaths[0]));
+			return;
+		}
+		super.openVideo(reopen, filePaths);
 	}
 
 	@Override

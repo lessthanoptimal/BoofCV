@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -654,7 +654,8 @@ public abstract class DemonstrationBase extends JPanel {
 
 		synchronized (inputStreams) {
 			if (inputStreams.size() != filePaths.length)
-				throw new IllegalArgumentException("Input streams not equal to " + filePaths.length + ".  Override openVideo()");
+				throw new IllegalArgumentException("inputStreams.size() != filePaths.length. Override openVideo(). "+
+						inputStreams.size() + " != " +filePaths.length);
 		}
 		inputFileSet = filePaths;
 

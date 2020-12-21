@@ -702,19 +702,12 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>>
 		}
 
 		private JComponent getControlVisOdom() {
-			JComponent control = null;
-			switch (approach) {
-				case 0:
-					control = controlMonoTrack;
-					break;
-				case 1:
-					control = controlDualTrack;
-					break;
-				case 2:
-					control = controlQuad;
-					break;
-			}
-			return control;
+			return switch (approach) {
+				case 0 -> controlMonoTrack;
+				case 1 -> controlDualTrack;
+				case 2 -> controlQuad;
+				default -> null;
+			};
 		}
 	}
 

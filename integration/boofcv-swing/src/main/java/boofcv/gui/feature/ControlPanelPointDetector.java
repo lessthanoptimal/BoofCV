@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
 
@@ -93,8 +94,11 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		if (source == comboType) {
 			config.type = PointDetectorTypes.FIRST_ONLY[comboType.getSelectedIndex()];
 			handleTypeChange();
+		} else if (source == spinnerScaleRadius) {
+			config.scaleRadius = ((Number)spinnerScaleRadius.getValue()).doubleValue();
 		} else {
-			throw new RuntimeException("Unknown source");
+			throw new RuntimeException("Unknown source: " +
+					BoofMiscOps.toString(source, o -> o.getClass().getSimpleName()));
 		}
 		listener.handleChangePointDetector();
 	}
@@ -149,22 +153,23 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 
 		@Override
 		public void controlChanged( final Object source ) {
-			if (source == spinnerScaleRadius) {
-				config.scaleRadius = ((Number)spinnerScaleRadius.getValue()).doubleValue();
-			} else if (source == spinnerKernel) {
+			if (source == spinnerKernel) {
 				switch (config.type) {
 					case SHI_TOMASI -> config.shiTomasi.radius = ((Number)spinnerKernel.getValue()).intValue();
 					case HARRIS -> config.harris.radius = ((Number)spinnerKernel.getValue()).intValue();
-					default -> {}
+					default -> {
+					}
 				}
 			} else if (source == checkWeighted) {
 				switch (config.type) {
 					case SHI_TOMASI -> config.shiTomasi.weighted = checkWeighted.isSelected();
 					case HARRIS -> config.harris.weighted = checkWeighted.isSelected();
-					default -> {}
+					default -> {
+					}
 				}
 			} else {
-				throw new RuntimeException("Unknown source");
+				throw new RuntimeException("Unknown source: " +
+						BoofMiscOps.toString(source, o -> o.getClass().getSimpleName()));
 			}
 			listener.handleChangePointDetector();
 		}

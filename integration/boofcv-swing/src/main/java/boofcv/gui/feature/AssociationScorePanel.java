@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,7 +94,7 @@ public class AssociationScorePanel<D>
 								 double scaleLeft, int leftX, int leftY,
 								 double scaleRight, int rightX, int rightY ) {
 		if (leftPts == null || rightPts == null) {
-			System.out.println("is null");
+//			System.out.println("leftPts or rightPts is null");
 			return;
 		}
 

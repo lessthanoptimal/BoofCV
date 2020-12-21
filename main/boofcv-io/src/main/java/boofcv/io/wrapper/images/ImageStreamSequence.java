@@ -39,8 +39,7 @@ import java.io.*;
  * @author Peter Abeles
  */
 public class ImageStreamSequence<T extends ImageBase<T>>
-		implements SimpleImageSequence<T>
-{
+		implements SimpleImageSequence<T> {
 	// If the data set was read from a file it can then be restarted
 	String fileName;
 
@@ -54,8 +53,8 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 	DogArray_I8 buffer = new DogArray_I8();
 	byte[] rawData;
 
-	public ImageStreamSequence(InputStream in, boolean storeData , ImageType<T> imageType) {
-		if( storeData ) {
+	public ImageStreamSequence( InputStream in, boolean storeData, ImageType<T> imageType ) {
+		if (storeData) {
 			try {
 				rawData = VideoMjpegCodec.convertToByteArray(in);
 				this.in = new DataInputStream(new ByteArrayInputStream(rawData));
@@ -67,23 +66,23 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 		}
 
 		this.imageType = imageType;
-		image = imageType.createImage(1,1);
+		image = imageType.createImage(1, 1);
 		readNext();
 	}
 
-	public ImageStreamSequence(String fileName, boolean storeData , ImageType<T> imageType) throws FileNotFoundException {
-		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),storeData,imageType);
+	public ImageStreamSequence( String fileName, boolean storeData, ImageType<T> imageType ) throws FileNotFoundException {
+		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName), 1024*200)), storeData, imageType);
 		this.fileName = fileName;
 	}
 
 	private void readNext() {
-			try {
-				CombineFilesTogether.readNext(in,buffer);
-				next = ImageIO.read(new ByteArrayInputStream(buffer.data,0,buffer.size));
-				frameNumber++;
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+		try {
+			CombineFilesTogether.readNext(in, buffer);
+			next = ImageIO.read(new ByteArrayInputStream(buffer.data, 0, buffer.size));
+			frameNumber++;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	@Override
@@ -104,8 +103,8 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 	@Override
 	public T next() {
 		original = next;
-		image.reshape(original.getWidth(),original.getHeight());
-		ConvertBufferedImage.convertFrom(original,image,true);
+		image.reshape(original.getWidth(), original.getHeight());
+		ConvertBufferedImage.convertFrom(original, image, true);
 		readNext();
 		return getImage();
 	}
@@ -122,18 +121,21 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 
 	@Override
 	public void close() {
-		try { in.close();} catch (IOException ignore) {}
+		try {
+			in.close();
+		} catch (IOException ignore) {
+		}
 		in = null;
 	}
 
 	@Override
 	public int getFrameNumber() {
-		return frameNumber-1;
+		return frameNumber - 1;
 	}
 
 	@Override
-	public void setLoop(boolean loop) {
-		if( loop )
+	public void setLoop( boolean loop ) {
+		if (loop)
 			throw new RuntimeException("Can't loop");
 	}
 
@@ -144,13 +146,13 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 
 	@Override
 	public void reset() {
-		if( rawData != null ) {
+		if (rawData != null) {
 			this.in = new DataInputStream(new ByteArrayInputStream(rawData));
 			frameNumber = 0;
 			readNext();
-		} else if( fileName != null ) {
+		} else if (fileName != null) {
 			try {
-				in = new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200));
+				in = new DataInputStream(new BufferedInputStream(new FileInputStream(fileName), 1024*200));
 				frameNumber = 0;
 				readNext();
 			} catch (FileNotFoundException e) {
@@ -161,10 +163,10 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 		}
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
-		var stream = new ImageStreamSequence<>("combined.mpng",true, ImageType.single(GrayU16.class));
+	public static void main( String[] args ) throws FileNotFoundException {
+		var stream = new ImageStreamSequence<>("combined.mpng", true, ImageType.single(GrayU16.class));
 
-		while( stream.hasNext() ) {
+		while (stream.hasNext()) {
 			System.out.println("Image");
 			stream.next();
 		}

@@ -31,6 +31,10 @@ public interface BoofLambdas {
 		String process( String input );
 	}
 
+	@FunctionalInterface interface ToString<T> {
+		String process( T input );
+	}
+
 	@FunctionalInterface interface Factory<T> {
 		T newInstance();
 	}
