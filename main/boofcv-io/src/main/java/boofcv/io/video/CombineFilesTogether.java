@@ -70,8 +70,8 @@ public class CombineFilesTogether {
 			else
 				throw new IllegalArgumentException("Bad header byte: " + r);
 
-		int length = ((fis.read() & 0xFF) << 24 | (fis.read() & 0xFF) << 16 |
-				(fis.read() & 0xFF) << 8 | fis.read()) & 0xFF;
+		int length = ((fis.read() & 0xFF) << 24) | ((fis.read() & 0xFF) << 16) |
+				((fis.read() & 0xFF) << 8) | (fis.read() & 0xFF);
 
 		output.resize(length);
 		int readLength = fis.read(output.data, 0, length);
