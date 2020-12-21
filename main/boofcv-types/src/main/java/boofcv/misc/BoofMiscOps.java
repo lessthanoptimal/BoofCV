@@ -606,6 +606,13 @@ public class BoofMiscOps {
 		return list.remove(list.size()-1);
 	}
 
+	/** Safe way to convert an object to string which checks to see if object is null */
+	public static <T> String toString( T o, BoofLambdas.ToString<T> op ) {
+		if (o==null)
+			return "Null";
+		return op.process(o);
+	}
+
 	/**
 	 * Finds the row at the specified column with the maximum absolute value
 	 *

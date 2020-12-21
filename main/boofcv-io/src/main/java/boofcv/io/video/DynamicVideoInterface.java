@@ -48,40 +48,40 @@ public class DynamicVideoInterface implements VideoInterface {
 	public DynamicVideoInterface() {
 		try {
 			ffmpeg = loadManager("boofcv.io.ffmpeg.FfmpegVideo");
-		} catch( RuntimeException ignore ) {}
+		} catch (RuntimeException ignore) {}
 
 		try {
 			jcodec = loadManager("boofcv.io.jcodec.JCodecVideoInterface");
-		} catch( RuntimeException ignore ) {}
+		} catch (RuntimeException ignore) {}
 	}
 
 	@Override
-	public <T extends ImageBase<T>> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
+	public <T extends ImageBase<T>> SimpleImageSequence<T> load( String fileName, ImageType<T> imageType ) {
 		URL url = UtilIO.ensureURL(fileName);
-		if( url == null )
-			throw new RuntimeException("Can't open "+fileName);
+		if (url == null)
+			throw new RuntimeException("Can't open " + fileName);
 
 		String protocol = url.getProtocol();
 
 		// See if it's a directory and then assume it's an image sequence
-		if( protocol.equals("file") ) {
+		if (protocol.equals("file")) {
 			File f = new File(url.getFile());
-			if( f.isDirectory() )
-				return new LoadFileImageSequence<>(imageType,url.getFile(),null);
+			if (f.isDirectory())
+				return new LoadFileImageSequence<>(imageType, url.getFile(), null);
 		}
 
 		String lowerName = fileName.toLowerCase();
 
-		InputStream stream=null;
+		InputStream stream = null;
 		try {
 			stream = url.openStream();
 
 			// Use built in movie readers for these file types
-			if( lowerName.endsWith("mjpeg") || lowerName.endsWith("mjpg") ) {
+			if (lowerName.endsWith("mjpeg") || lowerName.endsWith("mjpg")) {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
 				List<byte[]> data = codec.read(stream);
 				return new JpegByteImageSequence<>(imageType, data, false);
-			} else if( lowerName.endsWith("mpng") ) {
+			} else if (lowerName.endsWith("mpng")) {
 				return new ImageStreamSequence<>(stream, true, imageType);
 			}
 
@@ -89,32 +89,31 @@ public class DynamicVideoInterface implements VideoInterface {
 				if (ffmpeg != null) {
 					return ffmpeg.load(fileName, imageType);
 				}
-			} catch( UnsatisfiedLinkError e ){
+			} catch (UnsatisfiedLinkError e) {
 				// Trying to run on an architecture it doesn't have a binary for.
 				ffmpeg = null;
-			} catch( RuntimeException ignore ){}
+			} catch (RuntimeException ignore) {}
 
 			try {
-				if( jcodec != null ) {
-					SimpleImageSequence<T> sequence = jcodec.load(fileName,imageType);
+				if (jcodec != null) {
+					SimpleImageSequence<T> sequence = jcodec.load(fileName, imageType);
 					System.err.println("WARNING: Using JCodec to read movie files as a last resort. " +
 							"Great that it works, but it's very slow. Might want to look at alternatives.");
 					return sequence;
 				}
-			} catch( RuntimeException e ){
-				System.err.println("JCodec Error: "+e.getMessage());
+			} catch (RuntimeException e) {
+				System.err.println("JCodec Error: " + e.getMessage());
 			}
 			System.err.println("No working codec found for file: " + fileName);
-
 		} catch (IOException e) {
-			System.err.println("Error opening. "+e.getMessage());
+			System.err.println("Error opening. " + e.getMessage());
 			return null;
 		} finally {
-			if( stream != null ) {
+			if (stream != null) {
 				try {
 					stream.close();
 				} catch (IOException e) {
-					System.err.println("Failed to close stream. "+e.getMessage());
+					System.err.println("Failed to close stream. " + e.getMessage());
 				}
 			}
 		}
@@ -130,7 +129,7 @@ public class DynamicVideoInterface implements VideoInterface {
 	public static VideoInterface loadManager( String pathToManager ) {
 		try {
 			Class c = Class.forName(pathToManager);
-			return (VideoInterface) c.getConstructor().newInstance();
+			return (VideoInterface)c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Class not found.  Is it included in the class path?");
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {

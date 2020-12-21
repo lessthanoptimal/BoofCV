@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -261,6 +261,8 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			// custom configurations for this demo
 			configDetDesc.detectFastHessian.maxFeaturesPerScale = 200;
 			configDetDesc.detectSift.maxFeaturesPerScale = 400;
+			configDetDesc.detectPoint.general.maxFeatures = 800;
+			configDetDesc.detectPoint.general.radius = 5;
 
 			// create the algorithm controls
 			initializeControlsGUI();

@@ -37,6 +37,7 @@ import boofcv.gui.feature.AssociationPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
@@ -189,19 +190,13 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		// show a progress dialog if it is slow.  Needs to be in its own thread so if this stalls
 		// the window will pop up
 		progress = 0;
-		new Thread() {
-			@Override
-			public void run() {
-				while (progress < 3) {
-					SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progress));
-					try {
-						wait(100);
-					} catch (InterruptedException ignore) {
-					}
-				}
-				progressMonitor.close();
+		new Thread(() -> {
+			while (progress < 3) {
+				SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progress));
+				BoofMiscOps.sleep(100);
 			}
-		}.start();
+			progressMonitor.close();
+		}).start();
 
 
 		// find feature points  and descriptions
