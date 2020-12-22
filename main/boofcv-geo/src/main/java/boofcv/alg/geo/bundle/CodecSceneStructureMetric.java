@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			if (rigid.known)
 				continue;
 			rotation.setParameters(input, index);
-			rigid.object_to_world.R.set(rotation.getRotationMatrix());
+			rigid.object_to_world.R.setTo(rotation.getRotationMatrix());
 			index += rotation.getParameterLength();
 
 			rigid.object_to_world.T.x = input[index++];
@@ -82,7 +82,7 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			if (motion.known)
 				continue;
 			rotation.setParameters(input, index);
-			motion.motion.R.set(rotation.getRotationMatrix());
+			motion.motion.R.setTo(rotation.getRotationMatrix());
 			index += rotation.getParameterLength();
 
 			motion.motion.T.x = input[index++];

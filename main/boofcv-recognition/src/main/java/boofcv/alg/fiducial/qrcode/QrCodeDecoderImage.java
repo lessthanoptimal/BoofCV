@@ -212,7 +212,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 
 //		System.out.println("success "+success+" v "+qr.version+" mask "+qr.mask+" error "+qr.error);
-		qr.Hinv.set(gridReader.getTransformGrid().Hinv);
+		qr.Hinv.setTo(gridReader.getTransformGrid().Hinv);
 		return success;
 	}
 

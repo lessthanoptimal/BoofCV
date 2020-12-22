@@ -601,7 +601,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 	DMatrix3x3 random3x3() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3, 3, rand);
 		DMatrix3x3 f = new DMatrix3x3();
-		f.set(A);
+		f.setTo(A);
 		return f;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.gui.learning;
 
 import boofcv.gui.image.ShowImages;
+import lombok.Getter;
+import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.RandomMatrices_DDRM;
 
@@ -35,16 +37,15 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class ConfusionMatrixPanel extends JPanel {
-
 	DMatrixRMaj temp = new DMatrixRMaj(1, 1);
 	DMatrixRMaj confusion = new DMatrixRMaj(1, 1);
 	boolean dirty = false;
 
-	boolean gray = false;
+	@Getter @Setter boolean gray = false;
 
-	boolean showNumbers = true;
-	boolean showLabels = true;
-	boolean showZeros = true;
+	@Getter @Setter boolean showNumbers = true;
+	@Getter @Setter boolean showLabels = true;
+	@Getter @Setter boolean showZeros = true;
 
 	// fraction of the width that labels occupy
 	double labelViewFraction = 0.30;
@@ -90,42 +91,10 @@ public class ConfusionMatrixPanel extends JPanel {
 
 	public void setMatrix( DMatrixRMaj A ) {
 		synchronized (this) {
-			temp.set(A);
+			temp.setTo(A);
 			dirty = true;
 		}
 		repaint();
-	}
-
-	public boolean isGray() {
-		return gray;
-	}
-
-	public void setGray( boolean gray ) {
-		this.gray = gray;
-	}
-
-	public boolean isShowNumbers() {
-		return showNumbers;
-	}
-
-	public void setShowNumbers( boolean showNumbers ) {
-		this.showNumbers = showNumbers;
-	}
-
-	public boolean isShowZeros() {
-		return showZeros;
-	}
-
-	public void setShowZeros( boolean showZeros ) {
-		this.showZeros = showZeros;
-	}
-
-	public boolean isShowLabels() {
-		return showLabels;
-	}
-
-	public void setShowLabels( boolean showLabels ) {
-		this.showLabels = showLabels;
 	}
 
 	public void setLabels( List<String> labels ) {
@@ -144,7 +113,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	public synchronized void paint( Graphics g ) {
 		synchronized (this) {
 			if (dirty) {
-				confusion.set(temp);
+				confusion.setTo(temp);
 				dirty = false;
 			}
 		}

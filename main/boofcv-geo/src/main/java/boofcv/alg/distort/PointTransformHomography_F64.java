@@ -46,7 +46,7 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 	}
 
 	public void set( DMatrix transform ) {
-		this.model.set(transform);
+		this.model.setTo(transform);
 	}
 
 	@Override public void compute( double x, double y, Point2D_F64 out ) {
@@ -54,7 +54,7 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 	}
 
 	@Override public void setModel( Homography2D_F64 o ) {
-		model.set(o);
+		model.setTo(o);
 	}
 
 	@Override public Homography2D_F64 getModel() {

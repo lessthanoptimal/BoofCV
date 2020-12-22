@@ -470,9 +470,9 @@ class TestProjectiveInitializeAllCommon extends BoofStandardJUnit {
 		var alg = new ProjectiveInitializeAllCommon();
 		alg.utils.ransac = new MockRansac(offset, db.feats3D.size() - offset);
 		alg.utils.db = db;
-		alg.utils.P1.set(db.listCameraMatrices.get(0));
-		alg.utils.P2.set(db.listCameraMatrices.get(1));
-		alg.utils.P3.set(db.listCameraMatrices.get(3));
+		alg.utils.P1.setTo(db.listCameraMatrices.get(0));
+		alg.utils.P2.setTo(db.listCameraMatrices.get(1));
+		alg.utils.P3.setTo(db.listCameraMatrices.get(3));
 		alg.utils.commonIdx.setTo(DogArray_I32.range(0, db.feats3D.size()));
 		// order shouldn't mattter
 		PrimitiveArrays.shuffle(alg.utils.commonIdx.data, 0, alg.utils.commonIdx.size, rand);

@@ -117,16 +117,16 @@ public class BundleToRectificationStereoParameters {
 		rectifyAlg.process(K1, view1_to_view1, K2, view1_to_view2);
 
 		// rectification matrix for each image
-		undist_to_rect1.set(rectifyAlg.getUndistToRectPixels1());
-		undist_to_rect2.set(rectifyAlg.getUndistToRectPixels2());
-		rotate_orig_to_rect.set(rectifyAlg.getRectifiedRotation());
+		undist_to_rect1.setTo(rectifyAlg.getUndistToRectPixels1());
+		undist_to_rect2.setTo(rectifyAlg.getUndistToRectPixels2());
+		rotate_orig_to_rect.setTo(rectifyAlg.getRectifiedRotation());
 
 		// Sanity check to see if it's bad
 		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(undist_to_rect1));
 		BoofMiscOps.checkTrue(!MatrixFeatures_DDRM.hasUncountable(undist_to_rect2));
 
 		// New calibration matrix,
-		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
+		rectifiedK.setTo(rectifyAlg.getCalibrationMatrix());
 
 		// Maximize the view of the left image and adjust the size of the rectified image
 		RectifyImageOps.fullViewLeft(intrinsic1, undist_to_rect1, undist_to_rect2, rectifiedK, rectifiedShape);

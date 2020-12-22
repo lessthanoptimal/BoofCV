@@ -59,7 +59,7 @@ public class TestPositionFromPairLinear2 extends ChecksMotionNPoint {
 		assertTrue(alg.process(motion.getR(), locations, l));
 		
 		Se3_F64 found = new Se3_F64();
-		found.R.set(motion.R);
+		found.R.setTo(motion.R);
 		found.T.setTo(alg.getT());
 
 		return found;

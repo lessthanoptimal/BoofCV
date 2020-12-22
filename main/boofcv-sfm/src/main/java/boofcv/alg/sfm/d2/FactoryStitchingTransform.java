@@ -60,7 +60,7 @@ public class FactoryStitchingTransform {
 			public Homography2D_F64 convertH( Affine2D_F64 input, Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
-				output.set(
+				output.setTo(
 						input.a11, input.a12, input.tx,
 						input.a21, input.a22, input.ty,
 						0, 0, 1);
@@ -87,7 +87,7 @@ public class FactoryStitchingTransform {
 			public Homography2D_F64 convertH( Affine2D_F32 input, Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
-				output.set(
+				output.setTo(
 						input.a11, input.a12, input.tx,
 						input.a21, input.a22, input.ty,
 						0, 0, 1);
@@ -101,7 +101,7 @@ public class FactoryStitchingTransform {
 			@Override
 			public PixelTransform<Point2D_F32> convertPixel( Homography2D_F32 input, PixelTransform<Point2D_F32> output ) {
 				if (output != null) {
-					((PixelTransformHomography_F32)output).set(input);
+					((PixelTransformHomography_F32)output).setTo(input);
 				} else {
 					output = new PixelTransformHomography_F32(input);
 				}
@@ -113,7 +113,7 @@ public class FactoryStitchingTransform {
 			public Homography2D_F64 convertH( Homography2D_F32 input, Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
-				output.set(
+				output.setTo(
 						input.a11, input.a12, input.a13,
 						input.a21, input.a22, input.a23,
 						input.a31, input.a32, input.a33);
@@ -127,7 +127,7 @@ public class FactoryStitchingTransform {
 			@Override
 			public PixelTransform<Point2D_F32> convertPixel( Homography2D_F64 input, PixelTransform<Point2D_F32> output ) {
 				if (output != null) {
-					((PixelTransformHomography_F32)output).set(input);
+					((PixelTransformHomography_F32)output).setTo(input);
 				} else {
 					output = new PixelTransformHomography_F32(input);
 				}
@@ -139,7 +139,7 @@ public class FactoryStitchingTransform {
 			public Homography2D_F64 convertH( Homography2D_F64 input, Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
-				output.set(input);
+				output.setTo(input);
 				return output;
 			}
 		};

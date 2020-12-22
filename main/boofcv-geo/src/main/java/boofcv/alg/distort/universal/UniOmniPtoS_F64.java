@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,7 +118,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		UniOmniPtoS_F64 c = new UniOmniPtoS_F64();
 		c.distortion = new RadialTangential_F64(this.distortion);
 		c.mirrorOffset = this.mirrorOffset;
-		c.K_inv.set(this.K_inv);
+		c.K_inv.setTo(this.K_inv);
 		return c;
 	}
 }

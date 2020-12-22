@@ -62,7 +62,7 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	 * @param R rotation matrix
 	 */
 	public void setRotationWideToNarrow( DMatrixRMaj R ) {
-		this.rotateWideToNarrow.set(R);
+		this.rotateWideToNarrow.setTo(R);
 	}
 
 	/**

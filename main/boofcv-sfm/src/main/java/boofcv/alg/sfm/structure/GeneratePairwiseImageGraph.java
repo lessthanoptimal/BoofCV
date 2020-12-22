@@ -199,7 +199,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 		if (is3D) {
 			saveInlierMatches(ransac3D, matches, edge);
-			edge.F.set(ransac3D.getModelParameters());
+			edge.F.setTo(ransac3D.getModelParameters());
 		} else {
 			saveInlierMatches(ransacH, matches, edge);
 			Homography2D_F64 H = ransacH.getModelParameters();

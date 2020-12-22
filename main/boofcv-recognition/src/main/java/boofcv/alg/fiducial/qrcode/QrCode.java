@@ -448,7 +448,7 @@ public class QrCode implements Cloneable {
 		for (int i = 0; i < o.alignment.size; i++) {
 			this.alignment.grow().set(o.alignment.get(i));
 		}
-		this.Hinv.set(o.Hinv);
+		this.Hinv.setTo(o.Hinv);
 	}
 
 	/**

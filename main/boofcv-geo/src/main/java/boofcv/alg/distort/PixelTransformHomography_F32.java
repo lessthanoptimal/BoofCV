@@ -33,22 +33,21 @@ public class PixelTransformHomography_F32 implements PixelTransform<Point2D_F32>
 
 	final Homography2D_F32 homo = new Homography2D_F32();
 
-	public PixelTransformHomography_F32() {
-	}
+	public PixelTransformHomography_F32() {}
 
 	public PixelTransformHomography_F32( Homography2D_F32 homo ) {
-		this.homo.set(homo);
+		this.homo.setTo(homo);
 	}
 
 	public PixelTransformHomography_F32( Homography2D_F64 homo ) {
-		set(homo);
+		setTo(homo);
 	}
 
-	public void set( Homography2D_F32 transform ) {
-		this.homo.set(transform);
+	public void setTo( Homography2D_F32 transform ) {
+		this.homo.setTo(transform);
 	}
 
-	public void set( Homography2D_F64 transform ) {
+	public void setTo( Homography2D_F64 transform ) {
 		this.homo.a11 = (float)transform.a11;
 		this.homo.a12 = (float)transform.a12;
 		this.homo.a13 = (float)transform.a13;

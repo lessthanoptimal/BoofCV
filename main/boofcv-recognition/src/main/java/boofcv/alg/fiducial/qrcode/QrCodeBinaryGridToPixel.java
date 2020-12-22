@@ -100,7 +100,7 @@ public class QrCodeBinaryGridToPixel {
 
 		DMatrixRMaj HH = new DMatrixRMaj(3,3);
 		dlt.process(storagePairs2D.toList(),storagePairs3D.toList(),null,HH);
-		H.set(HH);
+		H.setTo(HH);
 		H.invert(Hinv);
 		ConvertFloatType.convert(Hinv, Hinv32);
 		ConvertFloatType.convert(H, H32);
@@ -246,7 +246,7 @@ public class QrCodeBinaryGridToPixel {
 	}
 
 	public void setHomographyInv(Homography2D_F64 Hinv) {
-		this.Hinv.set(Hinv);
+		this.Hinv.setTo(Hinv);
 		ConvertFloatType.convert(Hinv, Hinv32);
 	}
 }

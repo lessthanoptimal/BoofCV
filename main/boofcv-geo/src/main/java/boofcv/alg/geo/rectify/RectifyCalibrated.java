@@ -113,15 +113,15 @@ public class RectifyCalibrated {
 						v3.x, v3.y, v3.z});
 
 		// new calibration matrix that is an average of the original
-		K.set(sK1.plus(sK2).scale(0.5));
+		K.setTo(sK1.plus(sK2).scale(0.5));
 		K.set(0, 1, 0);// set skew to zero
 
 		// new projection rotation matrices
 		SimpleMatrix KRR = K.mult(RR);
 
 		// rectification transforms
-		undistToRectPixels1.set(KRR.mult(KR1.invert()).getDDRM());
-		undistToRectPixels2.set(KRR.mult(KR2.invert()).getDDRM());
+		undistToRectPixels1.setTo(KRR.mult(KR1.invert()).getDDRM());
+		undistToRectPixels2.setTo(KRR.mult(KR2.invert()).getDDRM());
 
 		rectifiedRotation = RR.getDDRM();
 	}

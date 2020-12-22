@@ -97,7 +97,7 @@ public class MultiBaselineDisparityMedian {
 		DisparityImage d = images.grow();
 		d.disparity.setTo(disparity);
 		d.mask.setTo(mask);
-		d.undist_to_rect_px.set(undist_to_rect_px);
+		d.undist_to_rect_px.setTo(undist_to_rect_px);
 		d.parameters.setTo(parameters);
 	}
 

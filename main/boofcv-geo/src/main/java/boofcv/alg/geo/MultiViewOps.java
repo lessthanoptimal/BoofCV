@@ -747,7 +747,7 @@ public class MultiViewOps {
 			F.reshape(3, 3);
 
 		createEssential(R, T, F);
-		F.set(createFundamental(F, K1, K2));
+		F.setTo(createFundamental(F, K1, K2));
 		return F;
 	}
 
@@ -1066,7 +1066,7 @@ public class MultiViewOps {
 		for (int i = 0; i < cameraMatrices.size(); i++) {
 			DMatrixRMaj P = cameraMatrices.get(i);
 			CommonOps_DDRM.mult(P, H, tmp);
-			P.set(tmp);
+			P.setTo(tmp);
 		}
 	}
 
@@ -1587,8 +1587,8 @@ public class MultiViewOps {
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		if (!alg.decompose(Q))
 			return false;
-		w.set(alg.getW());
-		p.set(alg.getP());
+		w.setTo(alg.getW());
+		p.setTo(alg.getP());
 		return true;
 	}
 

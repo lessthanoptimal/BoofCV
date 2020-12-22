@@ -39,7 +39,7 @@ public class DistanceTranGivenRotSq implements DistanceFromModel<Vector3D_F64,Po
 	Point3D_F64 localX = new Point3D_F64();
 
 	public void setRotation( DMatrixRMaj R ) {
-		motion.getR().set(R);
+		motion.getR().setTo(R);
 	}
 
 	@Override

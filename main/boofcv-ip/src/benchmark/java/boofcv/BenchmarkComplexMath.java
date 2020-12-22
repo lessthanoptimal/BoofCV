@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,65 +35,60 @@ public class BenchmarkComplexMath {
 
 	Random rand = new Random(234);
 
-	Complex_F64 number = new Complex_F64(1.5,0.3);
+	Complex_F64 number = new Complex_F64(1.5, 0.3);
 
-	Complex_F64 objectInput[] = new Complex_F64[N];
-	Complex_F64 objectOutput[] = new Complex_F64[N];
+	Complex_F64[] objectInput = new Complex_F64[N];
+	Complex_F64[] objectOutput = new Complex_F64[N];
 
-	double arrayInput[] = new double[2*N];
-	double arrayOutput[] = new double[2*N];
+	double[] arrayInput = new double[2*N];
+	double[] arrayOutput = new double[2*N];
 
 	public BenchmarkComplexMath() {
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			objectInput[i] = new Complex_F64();
 			objectOutput[i] = new Complex_F64();
 		}
 	}
 
-	private class ComplexObject extends PerformerBase
-	{
+	private class ComplexObject extends PerformerBase {
 
 		@Override
 		public void process() {
-
 			Complex_F64 a = number;
 
-			for( int i = 0; i < N; i++ ) {
+			for (int i = 0; i < N; i++) {
 				Complex_F64 b = objectInput[i];
 				Complex_F64 o = objectOutput[i];
 
-				o.real = a.real * b.real - a.imaginary*b.imaginary;
+				o.real = a.real*b.real - a.imaginary*b.imaginary;
 				o.imaginary = a.real*b.imaginary + a.imaginary*b.real;
 			}
 		}
 	}
 
-	private class PureArray extends PerformerBase
-	{
+	private class PureArray extends PerformerBase {
 
 		@Override
 		public void process() {
-
 			double ar = number.real;
 			double ai = number.imaginary;
 
-
-			for( int i = 0; i < N; i++ ) {
+			for (int i = 0; i < N; i++) {
 				int index = i*2;
 				double bi = arrayInput[index];
-				double br = arrayInput[index+1];
+				double br = arrayInput[index + 1];
 
 				arrayOutput[index] = ar*br - ai*bi;
-				arrayOutput[index+1] = ar*bi + ai*br;
+				arrayOutput[index + 1] = ar*bi + ai*br;
 			}
 		}
 	}
 
 	public void run() {
-		for( int i = 0; i < N; i++ ) {
-			objectInput[i].set(rand.nextGaussian(),rand.nextGaussian());
+		for (int i = 0; i < N; i++) {
+			objectInput[i].setTo(rand.nextGaussian(), rand.nextGaussian());
 			arrayInput[i*2] = objectInput[i].real;
-			arrayInput[i*2+1] = objectInput[i].imaginary;
+			arrayInput[i*2 + 1] = objectInput[i].imaginary;
 		}
 
 		ComplexObject object = new ComplexObject();

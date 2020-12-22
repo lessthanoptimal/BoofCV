@@ -151,8 +151,8 @@ class TestMetricExpandByOneView extends BoofStandardJUnit {
 
 		// P1 might not be identity
 		DMatrixRMaj P1 = db.views.get(viewIdx[0]).camera;
-		alg.utils.P2.set(db.views.get(viewIdx[1]).camera);
-		alg.utils.P3.set(db.views.get(viewIdx[2]).camera);
+		alg.utils.P2.setTo(db.views.get(viewIdx[1]).camera);
+		alg.utils.P3.setTo(db.views.get(viewIdx[2]).camera);
 		// make sure P1 is identity, which is what it would be coming out of the trifocal tensor
 		List<DMatrixRMaj> cameras = BoofMiscOps.asList(P1.copy(), alg.utils.P2, alg.utils.P3);
 		MultiViewOps.projectiveMakeFirstIdentity(cameras, null);

@@ -249,7 +249,7 @@ public class SelfCalibrationLinearRotationMulti {
 	 */
 	void convertW( Homography2D_F64 w , CameraPinhole c ) {
 		// inv(w) = K*K'
-		tmp.set(w);
+		tmp.setTo(w);
 		CommonOps_DDF3.divide(tmp,tmp.a33);
 		CommonOps_DDF3.cholU(tmp);
 		CommonOps_DDF3.invert(tmp,K);

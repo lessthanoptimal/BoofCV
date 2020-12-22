@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,9 +50,9 @@ public class TrifocalTensor {
 	}
 
 	public void set( TrifocalTensor a ) {
-		T1.set(a.T1);
-		T2.set(a.T2);
-		T3.set(a.T3);
+		T1.setTo(a.T1);
+		T2.setTo(a.T2);
+		T3.setTo(a.T3);
 	}
 
 	/**
@@ -100,9 +100,9 @@ public class TrifocalTensor {
 	 */
 	public TrifocalTensor copy() {
 		TrifocalTensor ret = new TrifocalTensor();
-		ret.T1.set(T1);
-		ret.T2.set(T2);
-		ret.T3.set(T3);
+		ret.T1.setTo(T1);
+		ret.T2.setTo(T2);
+		ret.T3.setTo(T3);
 		return ret;
 	}
 

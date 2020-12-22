@@ -387,7 +387,7 @@ public class TestSelfCalibrationLinearRotationMulti
 
 		SelfCalibrationLinearRotationMulti alg = new SelfCalibrationLinearRotationMulti();
 		alg.setConstraints(false,false,false,-1);
-		alg.W0.set(W0);
+		alg.W0.setTo(W0);
 
 		CameraPinhole found = new CameraPinhole();
 		alg.extractCalibration(H1_inv,found);

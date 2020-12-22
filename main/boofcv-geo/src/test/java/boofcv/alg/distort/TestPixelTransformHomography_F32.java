@@ -39,7 +39,7 @@ public class TestPixelTransformHomography_F32 extends BoofStandardJUnit {
 		Homography2D_F32 a = new Homography2D_F32(1,2,3,4,5,6,7,8,9);
 
 		PixelTransformHomography_F32 alg = new PixelTransformHomography_F32();
-		alg.set(a);
+		alg.setTo(a);
 
 		Point2D_F32 distorted = new Point2D_F32();
 		alg.compute(2,3, distorted);
@@ -56,7 +56,7 @@ public class TestPixelTransformHomography_F32 extends BoofStandardJUnit {
 		Homography2D_F64 a = new Homography2D_F64(1,2,3,4,5,6,7,8,9);
 
 		PixelTransformHomography_F32 alg = new PixelTransformHomography_F32();
-		alg.set(a);
+		alg.setTo(a);
 
 		Point2D_F32 distorted = new Point2D_F32();
 		alg.compute(2,3, distorted);

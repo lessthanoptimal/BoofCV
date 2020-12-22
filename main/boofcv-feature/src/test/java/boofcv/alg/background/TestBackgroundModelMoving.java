@@ -63,7 +63,7 @@ public class TestBackgroundModelMoving extends BoofStandardJUnit
 		@Override
 		public void initialize(int backgroundWidth, int backgroundHeight, Homography2D_F32 homeToWorld) {
 			this.background.reshape(backgroundWidth,backgroundHeight);
-			this.homeToWorld.set(homeToWorld);
+			this.homeToWorld.setTo(homeToWorld);
 			this.homeToWorld.invert(worldToHome);
 
 			this.backgroundWidth = backgroundWidth;

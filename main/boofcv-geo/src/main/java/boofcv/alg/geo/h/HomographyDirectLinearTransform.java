@@ -205,7 +205,7 @@ public class HomographyDirectLinearTransform {
 
 		SimpleMatrix result = c_inv.mult(a).mult(b);
 
-		M.set(result.getDDRM());
+		M.setTo(result.getDDRM());
 	}
 
 	private void adjustPoint( AssociatedPair pair , Point2D_F64 a1 , Point2D_F64 a2 ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,6 @@ public class ModelManagerEpipolarMatrix implements ModelManager<DMatrixRMaj> {
 
 	@Override
 	public void copyModel(DMatrixRMaj src, DMatrixRMaj dst) {
-		dst.set(src);
+		dst.setTo(src);
 	}
 }

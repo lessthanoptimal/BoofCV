@@ -148,7 +148,7 @@ public abstract class GenericBackgroundModelMovingChecks extends BoofStandardJUn
 		checkTransform(frame, segmented, alg, homeToCurrent,translationTol);
 
 		// make it more interesting
-		homeToCurrent.set(1.0f, 0.6f, 20, -0.6f, 0.95f, 20, 0, 0, 1);
+		homeToCurrent.setTo(1.0f, 0.6f, 20, -0.6f, 0.95f, 20, 0, 0, 1);
 		checkTransform(frame, segmented, alg, homeToCurrent, backgroundOutsideTol);
 	}
 

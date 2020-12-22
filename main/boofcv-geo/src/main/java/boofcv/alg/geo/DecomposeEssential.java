@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ public class DecomposeEssential {
 	 */
 	public void decompose( DMatrixRMaj E ) {
 		if (svd.inputModified()) {
-			E_copy.set(E);
+			E_copy.setTo(E);
 			E = E_copy;
 		}
 

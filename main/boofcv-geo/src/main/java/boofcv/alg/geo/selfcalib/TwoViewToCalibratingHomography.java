@@ -145,8 +145,8 @@ public class TwoViewToCalibratingHomography {
 		// TODO add image width,height here and use to normalize
 		BoofMiscOps.checkTrue(F21.numRows==3 && F21.numCols==3);
 		BoofMiscOps.checkTrue(P2.numRows==3 && P2.numCols==4);
-		this.F21.set(F21);
-		this.P2.set(P2);
+		this.F21.setTo(F21);
+		this.P2.setTo(P2);
 	}
 
 	/**
@@ -227,12 +227,12 @@ public class TwoViewToCalibratingHomography {
 		// Make view-1 = [I,0] again
 		MultiViewOps.projectiveToIdentityH(P1_prime,H_prime);
 		CommonOps_DDRM.mult(P2_prime,H_prime,P_tmp);
-		P2_prime.set(P_tmp);
+		P2_prime.setTo(P_tmp);
 
 		// P2*H ~= [A,a]*H = [A,a]*[K1 0;v',1]
 		// AK ~= A*K1
 		PerspectiveOps.projectionSplit(P2_prime,A,a);
-		AK1.set(A);
+		AK1.setTo(A);
 //		CommonOps_DDRM.mult(A,K1, AK1);
 
 		CommonOps_DDRM.setIdentity(calibratingH);

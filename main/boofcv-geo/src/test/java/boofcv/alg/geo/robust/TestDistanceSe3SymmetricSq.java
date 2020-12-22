@@ -25,7 +25,6 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.ClosestPoint3D_F64;
 import georegression.struct.EulerType;
@@ -37,6 +36,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
+import static georegression.geometry.ConvertRotation3D_F64.eulerToMatrix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -58,7 +58,7 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 	@Test
 	public void testPerfect() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		keyToCurr.getR().setTo(eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
@@ -80,7 +80,7 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 	@Test
 	public void testNoisy() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		keyToCurr.getR().setTo(eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
@@ -102,7 +102,7 @@ public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 	@Test
 	public void testBehindCamera() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		keyToCurr.getR().setTo(eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, -3);

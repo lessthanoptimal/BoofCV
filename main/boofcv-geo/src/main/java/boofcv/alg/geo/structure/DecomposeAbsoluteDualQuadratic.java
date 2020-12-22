@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ public class DecomposeAbsoluteDualQuadratic {
 		// force it to be positive definite. Solution will be of dubious value if this condition is triggered, but it
 		// seems to help much more often than it hurts
 		// I'm not sure if I flip these variables if others along the same row/col should be flipped too or not
-		k.set(w_inv);
+		k.setTo(w_inv);
 		k.a11 = Math.abs(k.a11);
 		k.a22 = Math.abs(k.a22);
 		k.a33 = Math.abs(k.a33);
