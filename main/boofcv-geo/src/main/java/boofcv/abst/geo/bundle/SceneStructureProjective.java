@@ -84,7 +84,7 @@ public class SceneStructureProjective extends SceneStructureCommon {
 	public void setView( int which, boolean fixed, DMatrixRMaj worldToView,
 						 int width, int height ) {
 		views.data[which].known = fixed;
-		views.data[which].worldToView.set(worldToView);
+		views.data[which].worldToView.setTo(worldToView);
 		views.data[which].width = width;
 		views.data[which].height = height;
 	}

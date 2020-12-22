@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,8 +116,8 @@ public class RefineThreeViewProjectiveGeometric {
 		}
 
 		// save the results
-		P2.set(structure.views.data[1].worldToView);
-		P3.set(structure.views.data[2].worldToView);
+		P2.setTo(structure.views.data[1].worldToView);
+		P3.setTo(structure.views.data[2].worldToView);
 
 		if( scale ) {
 			// don't use built in unscaling function because it undoes scaling on points. Those are disposable

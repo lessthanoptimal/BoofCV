@@ -187,12 +187,12 @@ public class ExampleImageStitching {
 		distort.setRenderAll(false);
 
 		// Render first image
-		model.set(fromWorkToA);
+		model.setTo(fromWorkToA);
 		distort.apply(colorA, work);
 
 		// Render second image
 		Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB, null);
-		model.set(fromWorkToB);
+		model.setTo(fromWorkToB);
 		distort.apply(colorB, work);
 
 		// Convert the rendered image into a BufferedImage

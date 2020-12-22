@@ -131,7 +131,7 @@ public class TestRectifyFundamental extends BoofStandardJUnit {
 
 		// define the camera's motion
 		motion = new Se3_F64();
-		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,-0.01, 0.1, 0.05, null));
+		motion.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,-0.01, 0.1, 0.05, null));
 		motion.getT().setTo(-0.5,0.1,-0.05);
 
 		DMatrixRMaj E = MultiViewOps.createEssential(motion.getR(), motion.getT(), null);

@@ -97,7 +97,7 @@ public abstract class GenericChecksJacobianSo3 extends BoofStandardJUnit {
 		public void process( /**/double[] input, /**/double[] output ) {
 			alg.setParameters(input, 0);
 			DMatrixRMaj M = DMatrixRMaj.wrap(3, 3, output);
-			M.set(alg.getRotationMatrix());
+			M.setTo(alg.getRotationMatrix());
 		}
 	}
 

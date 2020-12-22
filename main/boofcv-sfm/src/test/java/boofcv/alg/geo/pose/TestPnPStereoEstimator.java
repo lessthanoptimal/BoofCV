@@ -50,7 +50,7 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 		PnPStereoEstimator alg = new PnPStereoEstimator(pnp, distanceMono, numExtra);
 
 		Se3_F64 expected = new Se3_F64();
-		expected.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		expected.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		expected.getT().setTo(0.2, -0.1, 0.01);
 
 		generateScene(alg.getMinimumPoints(), expected, false);

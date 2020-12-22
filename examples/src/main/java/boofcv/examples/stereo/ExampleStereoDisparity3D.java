@@ -34,7 +34,6 @@ import boofcv.struct.image.GrayU8;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,7 +69,7 @@ public class ExampleStereoDisparity3D {
 		disparityParameters.baseline = param.getBaseline();
 		disparityParameters.disparityMin = disparityMin;
 		disparityParameters.disparityRange = disparityRange;
-		disparityParameters.rotateToRectified.set(rectR);
+		disparityParameters.rotateToRectified.setTo(rectR);
 		PerspectiveOps.matrixToPinhole(rectK, rectLeft.width, rectLeft.height, disparityParameters.pinhole);
 
 		// Iterate through each pixel in disparity image and compute its 3D coordinate

@@ -231,7 +231,7 @@ public class DecomposeHomography {
 		Se3_F64 se = solutionsSE.get(index);
 		Vector3D_F64 N = solutionsN.get(index);
 
-		se.getR().set(origSE.getR());
+		se.getR().setTo(origSE.getR());
 		N.x = -origN.x;
 		N.y = -origN.y;
 		N.z = -origN.z;

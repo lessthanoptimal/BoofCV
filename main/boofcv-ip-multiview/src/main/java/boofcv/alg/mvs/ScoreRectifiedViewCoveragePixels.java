@@ -112,7 +112,7 @@ public class ScoreRectifiedViewCoveragePixels {
 		checkTrue(quality3D >= 0.0f, "Quality must be positive");
 		checkTrue(scale != 0.0, "You must call initialize() first");
 
-		pixel_to_rect.set(rect);
+		pixel_to_rect.setTo(rect);
 
 		for (int y = 0, index = 0; y < viewed.height; y++) {
 			for (int x = 0; x < viewed.width; x++, index++) {

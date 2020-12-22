@@ -94,8 +94,8 @@ public class RectifyFundamental {
 
 		SimpleMatrix Ha = computeAffineH(observations, H.getDDRM(), Hzero.getDDRM());
 
-		rect1.set(Ha.mult(Hzero).getDDRM());
-		rect2.set(H.getDDRM());
+		rect1.setTo(Ha.mult(Hzero).getDDRM());
+		rect2.setTo(H.getDDRM());
 	}
 
 	/**

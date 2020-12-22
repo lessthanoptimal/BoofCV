@@ -44,7 +44,7 @@ public class TestDistanceTranGivenRotSq extends BoofStandardJUnit {
 	@Test
 	public void testPerfect() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		keyToCurr.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
@@ -65,7 +65,7 @@ public class TestDistanceTranGivenRotSq extends BoofStandardJUnit {
 	@Test
 	public void testNoisy() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		keyToCurr.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().setTo(0.1, -0.1, 0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);

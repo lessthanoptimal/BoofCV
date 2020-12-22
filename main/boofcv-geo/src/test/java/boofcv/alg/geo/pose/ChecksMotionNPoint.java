@@ -56,7 +56,7 @@ public abstract class ChecksMotionNPoint extends CommonMotionNPoint {
 	 */
 	public void standardTest( int N ) {
 		Se3_F64 motion = new Se3_F64();
-		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		motion.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		motion.getT().setTo(0.1,-0.1,0.01);
 
 		checkMotion(N, motion,false);
@@ -68,7 +68,7 @@ public abstract class ChecksMotionNPoint extends CommonMotionNPoint {
 	 */
 	public void planarTest( int N ) {
 		Se3_F64 motion = new Se3_F64();
-		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
+		motion.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		motion.getT().setTo(0.1,-0.1,0.01);
 
 		checkMotion(N, motion,true);

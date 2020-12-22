@@ -202,9 +202,9 @@ class MockLookupSimilarImagesCircleAround implements LookUpSimilarImages {
 			PairwiseImageGraph.View pv = graph.nodes.get(viewCnt);
 			SceneWorkingGraph.View wv = working.addView(pv);
 			if (zeroCP) {
-				wv.projective.set(listCameraMatricesZeroPrinciple.get(viewCnt));
+				wv.projective.setTo(listCameraMatricesZeroPrinciple.get(viewCnt));
 			} else {
-				wv.projective.set(listCameraMatrices.get(viewCnt));
+				wv.projective.setTo(listCameraMatrices.get(viewCnt));
 			}
 
 			wv.inliers.views.add(pv);

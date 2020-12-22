@@ -210,9 +210,9 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		alg.viewB = db.graph.nodes.get(1);
 		alg.viewC = db.graph.nodes.get(3);
 		alg.inliersThreeView = new ArrayList<>();
-		alg.P1.set(db.listCameraMatrices.get(0));
-		alg.P2.set(db.listCameraMatrices.get(1));
-		alg.P3.set(db.listCameraMatrices.get(3));
+		alg.P1.setTo(db.listCameraMatrices.get(0));
+		alg.P2.setTo(db.listCameraMatrices.get(1));
+		alg.P3.setTo(db.listCameraMatrices.get(3));
 
 		alg.inliersThreeView.add(new AssociatedTriple());
 
@@ -265,9 +265,9 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 		int offset = 5;
 		alg.db = db;
-		alg.P1.set(db.listCameraMatrices.get(0));
-		alg.P2.set(db.listCameraMatrices.get(1));
-		alg.P3.set(db.listCameraMatrices.get(3));
+		alg.P1.setTo(db.listCameraMatrices.get(0));
+		alg.P2.setTo(db.listCameraMatrices.get(1));
+		alg.P3.setTo(db.listCameraMatrices.get(3));
 		alg.inliersThreeView = new ArrayList<>();
 
 		// Create the set of inliers. Only these inliers will be considered when computing 3D features
@@ -318,9 +318,9 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 		int[] views = new int[]{0, 1, 3};
 		alg.db = db;
-		alg.P1.set(db.listCameraMatrices.get(views[0]));
-		alg.P2.set(db.listCameraMatrices.get(views[1]));
-		alg.P3.set(db.listCameraMatrices.get(views[2]));
+		alg.P1.setTo(db.listCameraMatrices.get(views[0]));
+		alg.P2.setTo(db.listCameraMatrices.get(views[1]));
+		alg.P3.setTo(db.listCameraMatrices.get(views[2]));
 		alg.inliersThreeView = new ArrayList<>();
 		for (int i = 0; i < db.feats3D.size(); i++) {
 			Point2D_F64 o1 = db.viewObs.get(views[0]).get(i);

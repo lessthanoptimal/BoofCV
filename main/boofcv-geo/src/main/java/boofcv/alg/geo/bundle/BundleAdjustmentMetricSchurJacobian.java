@@ -343,13 +343,13 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				motion.motion.T.y = input[paramIndex + 1];
 				motion.motion.T.z = input[paramIndex + 2];
 
-				motion.motion.getR().set(jacSO3.getRotationMatrix());
+				motion.motion.getR().setTo(jacSO3.getRotationMatrix());
 
 				// save the Jacobian if we need to
 				DMatrixRMaj[] savedJac = mapSO3Jac.get(view.parent_to_view);
 				if (savedJac != null) {
 					for (int i = 0; i < savedJac.length; i++) {
-						savedJac[i].set(jacSO3.getPartial(i));
+						savedJac[i].setTo(jacSO3.getPartial(i));
 					}
 				}
 			}
@@ -499,7 +499,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				if (view == null)
 					break;
 				CommonOps_DDRM.mult(accumulatedR, motion.motion.R, tmp3x3);
-				accumulatedR.set(tmp3x3);
+				accumulatedR.setTo(tmp3x3);
 				continue;
 			}
 			// look up the SO3 Jacobian
@@ -551,7 +551,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 			// accumulatedR = R[i,j]*R[j-1]
 			CommonOps_DDRM.mult(accumulatedR, motion.motion.R, tmp3x3);
-			accumulatedR.set(tmp3x3);
+			accumulatedR.setTo(tmp3x3);
 		}
 	}
 

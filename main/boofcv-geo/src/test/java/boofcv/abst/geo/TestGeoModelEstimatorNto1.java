@@ -135,11 +135,11 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 			Random rand = new Random(324);
 
 			for (int i = 0; i < numberOfSolutions; i++) {
-				solutions.grow().set(RandomMatrices_DDRM.rectangle(3, 3, rand));
+				solutions.grow().setTo(RandomMatrices_DDRM.rectangle(3, 3, rand));
 			}
 
 			if (correct != null)
-				solutions.get(1).set(correct);
+				solutions.get(1).setTo(correct);
 
 			return success;
 		}
@@ -151,7 +151,6 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 	}
 
 	private class DummyEstimator extends GeoModelEstimatorNto1<DMatrixRMaj,AssociatedPair> {
-
 		public DummyEstimator(GeoModelEstimatorN<DMatrixRMaj, AssociatedPair> alg,
 							  DistanceFromModel<DMatrixRMaj, AssociatedPair> distance,
 							  int numTest) {
@@ -160,7 +159,7 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 
 		@Override
 		protected void copy(DMatrixRMaj src, DMatrixRMaj dst) {
-			dst.set(src);
+			dst.setTo(src);
 		}
 	}
 

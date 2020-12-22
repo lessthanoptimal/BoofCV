@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,6 @@ public class EstimateNto1ofEpipolar
 
 	@Override
 	protected void copy(DMatrixRMaj src, DMatrixRMaj dst) {
-		dst.set(src);
+		dst.setTo(src);
 	}
 }

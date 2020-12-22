@@ -775,10 +775,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// rectification matrix for each image
 		DMatrixRMaj rect1 = rectifyAlg.getUndistToRectPixels1();
 		DMatrixRMaj rect2 = rectifyAlg.getUndistToRectPixels2();
-		rectifiedR.set(rectifyAlg.getRectifiedRotation());
+		rectifiedR.setTo(rectifyAlg.getRectifiedRotation());
 
 		// New calibration matrix,
-		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
+		rectifiedK.setTo(rectifyAlg.getCalibrationMatrix());
 
 		// Maximize the view of the left image and adjust the size of the rectified image
 		ImageDimension rectifiedShape = new ImageDimension();

@@ -208,7 +208,7 @@ public class SelfCalibrationEssentialGuessAndCheck implements VerbosePrint {
 		DMatrixRMaj K2 = CommonOps_DDRM.diag(F2,F2,1);
 
 		calibrator.process(K1, K2, observations);
-		rectifyingHomography.set(calibrator.getCalibrationHomography());
+		rectifyingHomography.setTo(calibrator.getCalibrationHomography());
 	}
 
 	/**

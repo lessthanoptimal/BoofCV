@@ -77,7 +77,7 @@ public class CommonTriangulationChecks extends BoofStandardJUnit {
 			// random motion from world to frame 'i'
 			Se3_F64 world_to_view = new Se3_F64();
 			if (i > 0) {
-				world_to_view.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
+				world_to_view.getR().setTo(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 						rand.nextGaussian()*0.01, rand.nextGaussian()*0.05, rand.nextGaussian()*0.1, null));
 				world_to_view.getT().setTo(0.2 + rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
 			}

@@ -73,7 +73,7 @@ public class DisparityParameters {
 		this.disparityRange = src.disparityRange;
 		this.baseline = src.baseline;
 		this.pinhole.setTo(src.pinhole);
-		this.rotateToRectified.set(src.rotateToRectified);
+		this.rotateToRectified.setTo(src.rotateToRectified);
 	}
 
 	/** Checks if specified parameters are valid */

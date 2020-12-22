@@ -161,7 +161,7 @@ public abstract class Motion2DPanel extends JPanel
 
 
 	public void setCurrToWorld(Homography2D_F64 currToWorld) {
-		this.currToWorld.set(currToWorld);
+		this.currToWorld.setTo(currToWorld);
 	}
 
 	public void setShowImageView(boolean showImageView) {

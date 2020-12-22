@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -169,7 +169,7 @@ public class FundamentalToProjective {
 				break;
 		}
 
-		P3.set(residual.computeP3(optimizer.getParameters()));
+		P3.setTo(residual.computeP3(optimizer.getParameters()));
 
 //		// used to sanity check the found solution
 //		double err[] = new double[9];
@@ -264,7 +264,7 @@ public class FundamentalToProjective {
 		}
 
 		public void setF32(DMatrixRMaj F32) {
-			this.F32.set(F32);
+			this.F32.setTo(F32);
 			double n = NormOps_DDRM.normF(this.F32);
 			CommonOps_DDRM.scale(1.0/n,this.F32);
 		}

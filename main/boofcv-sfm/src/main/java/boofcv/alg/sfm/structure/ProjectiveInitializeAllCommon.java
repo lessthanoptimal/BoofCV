@@ -391,7 +391,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// Estimate the camera matrix given homogenous pixel observations
 		if (utils.poseEstimator.processHomogenous(assocPixel.toList(), points3D.toList())) {
-			cameraMatrix.set(utils.poseEstimator.getProjective());
+			cameraMatrix.setTo(utils.poseEstimator.getProjective());
 			return true;
 		} else {
 			return false;
@@ -473,7 +473,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		// Copy results from bundle adjustment data structures
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
 			if (viewIdx != 0)
-				cameraMatrices.get(viewIdx - 1).set(utils.structure.views.get(viewIdx).worldToView);
+				cameraMatrices.get(viewIdx - 1).setTo(utils.structure.views.get(viewIdx).worldToView);
 			String id = viewsByStructureIndex.get(viewIdx).id;
 			viewIds.add(id);
 			utils.db.lookupShape(id, dimensions.get(viewIdx));

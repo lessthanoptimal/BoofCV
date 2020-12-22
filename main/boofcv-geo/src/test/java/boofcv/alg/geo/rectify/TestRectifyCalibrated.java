@@ -67,9 +67,9 @@ public class TestRectifyCalibrated extends BoofStandardJUnit {
 		// apply rectification transform
 		DMatrixRMaj temp = new DMatrixRMaj(3, 4);
 		CommonOps_DDRM.mult(alg.getUndistToRectPixels1(), foundP1, temp);
-		foundP1.set(temp);
+		foundP1.setTo(temp);
 		CommonOps_DDRM.mult(alg.getUndistToRectPixels2(), foundP2, temp);
-		foundP2.set(temp);
+		foundP2.setTo(temp);
 
 		CommonOps_DDRM.scale(0.1/Math.abs(foundP1.get(2, 3)), foundP1);
 

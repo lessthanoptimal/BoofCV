@@ -125,8 +125,8 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 		eq.process("A=[top;bottom]");
 
 		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
-		alg.X1.set(P.getDDRM());
-		alg.X2.set(X.getDDRM());
+		alg.X1.setTo(P.getDDRM());
+		alg.X2.setTo(X.getDDRM());
 		alg.constructA678();
 		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("A"),alg.A,UtilEjml.TEST_F64));
 	}
@@ -138,7 +138,7 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks {
 		SimpleMatrix P = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
 		SimpleMatrix X = SimpleMatrix.random_DDRM(N,2,-1,1,rand);
 
-		double H[] = new double[9];
+		double[] H = new double[9];
 		H[6] = 0.4;
 		H[7] = 0.8;
 		H[8] = -0.3;

@@ -6,6 +6,7 @@ Date Format: year/month/day
 Date    : 2021
 Version : 0.38
 
+- TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version
 - TODO Multi Camera Calibration

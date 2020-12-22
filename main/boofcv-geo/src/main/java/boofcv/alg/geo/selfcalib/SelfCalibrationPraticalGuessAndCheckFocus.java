@@ -243,7 +243,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 
 			if (score < bestScore) {
 				bestScore = score;
-				bestH.set(H);
+				bestH.setTo(H);
 				bestIndex = i;
 			}
 
@@ -288,7 +288,7 @@ public class SelfCalibrationPraticalGuessAndCheckFocus implements VerbosePrint {
 					minimumChanged = true;
 					bestIndex = j;
 					bestScore = score;
-					bestH.set(H);
+					bestH.setTo(H);
 				}
 
 				if (verbose != null) {

@@ -263,7 +263,7 @@ public class RefineDualQuadraticAlgebra extends SelfCalibrationBase
 
 		@Override
 		public void process(double[] input, double[] output) {
-			p.set(  input[0], input[1] , input[2] );
+			p.setTo(  input[0], input[1] , input[2] );
 			int indexInput = encodeK(K,0,3,input);
 
 			eq.alias(p,"p",K,"K");

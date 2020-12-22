@@ -240,11 +240,11 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 				image2.getWidth(), image2.getHeight(), left_to_right);
 
 		// Save the results
-		info.param.rotateToRectified.set(computeRectification.rotate_orig_to_rect);
-		info.undist_to_rect1.set(computeRectification.undist_to_rect1);
+		info.param.rotateToRectified.setTo(computeRectification.rotate_orig_to_rect);
+		info.undist_to_rect1.setTo(computeRectification.undist_to_rect1);
 
 		// New calibration matrix,
-		info.rectifiedK.set(computeRectification.rectifiedK);
+		info.rectifiedK.setTo(computeRectification.rectifiedK);
 
 		ImageDistort<Image, Image> distortLeft =
 				RectifyDistortImageOps.rectifyImage(computeRectification.intrinsic1,

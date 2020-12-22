@@ -349,7 +349,7 @@ public class ImplPerspectiveOps_F64 {
 		DMatrixRMaj temp = new DMatrixRMaj(3, 4);
 		CommonOps_DDRM.mult(K, ret, temp);
 
-		ret.set(temp);
+		ret.setTo(temp);
 
 		return ret;
 	}

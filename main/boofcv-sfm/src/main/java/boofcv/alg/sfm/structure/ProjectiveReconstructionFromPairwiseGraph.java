@@ -148,7 +148,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 			View view = initProjective.getPairwiseGraphViewByStructureIndex(structViewIdx);
 			if (verbose != null) verbose.println("  view.id=`" + view.id + "`");
 			DMatrixRMaj cameraMatrix = initProjective.utils.structure.views.get(structViewIdx).worldToView;
-			workGraph.addView(view).projective.set(cameraMatrix);
+			workGraph.addView(view).projective.setTo(cameraMatrix);
 			exploredViews.add(view.id);
 		}
 
@@ -186,7 +186,7 @@ public class ProjectiveReconstructionFromPairwiseGraph extends ReconstructionFro
 
 			// save the results
 			SceneWorkingGraph.View wview = workGraph.addView(selected);
-			wview.projective.set(cameraMatrix);
+			wview.projective.setTo(cameraMatrix);
 
 			// save which features were used for later use in metric reconstruction
 			BoofMiscOps.checkTrue(utils.seed == wview.pview);// just being paranoid
