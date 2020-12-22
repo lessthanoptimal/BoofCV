@@ -23,7 +23,6 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
-import lombok.Getter;
 
 /**
  * Applies an affine transform to a 2D point.
@@ -32,7 +31,6 @@ import lombok.Getter;
  */
 public class PointTransformAffine_F64 implements Point2Transform2Model_F64<Affine2D_F64> {
 
-	@Getter(onMethod = @__(@Override))
 	protected final Affine2D_F64 model = new Affine2D_F64();
 
 	public PointTransformAffine_F64( Affine2D_F64 affine ) {
@@ -51,6 +49,10 @@ public class PointTransformAffine_F64 implements Point2Transform2Model_F64<Affin
 
 	@Override public void setModel( Affine2D_F64 model ) {
 		this.model.setTo(model);
+	}
+
+	@Override public Affine2D_F64 getModel() {
+		return model;
 	}
 
 	@Override public Affine2D_F64 newInstanceModel() {

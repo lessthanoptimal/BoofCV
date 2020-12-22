@@ -23,7 +23,6 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
-import lombok.Getter;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 
@@ -34,7 +33,6 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class PointTransformHomography_F64 implements Point2Transform2Model_F64<Homography2D_F64> {
 
-	@Getter(onMethod = @__(@Override))
 	final Homography2D_F64 model = new Homography2D_F64();
 
 	public PointTransformHomography_F64() {}
@@ -57,6 +55,10 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 
 	@Override public void setModel( Homography2D_F64 o ) {
 		model.set(o);
+	}
+
+	@Override public Homography2D_F64 getModel() {
+		return model;
 	}
 
 	@Override public Homography2D_F64 newInstanceModel() {
