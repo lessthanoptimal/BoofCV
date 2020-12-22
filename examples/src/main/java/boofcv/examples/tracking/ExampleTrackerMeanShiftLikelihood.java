@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,13 +44,11 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleTrackerMeanShiftLikelihood {
-
 	/**
 	 * Very simple implementation of PixelLikelihood.  Uses linear distance to compute how close
 	 * a color is to the target color.
 	 */
 	public static class RgbLikelihood implements PixelLikelihood<Planar<GrayU8>> {
-
 		int targetRed,targetGreen,targetBlue;
 		float radius = 35;
 		Planar<GrayU8> image;
@@ -61,24 +59,15 @@ public class ExampleTrackerMeanShiftLikelihood {
 			this.targetBlue = targetBlue;
 		}
 
-		@Override
-		public void setImage(Planar<GrayU8> image) {
-			this.image = image;
-		}
+		@Override public void setImage(Planar<GrayU8> image) { this.image = image; }
 
-		@Override
-		public boolean isInBounds(int x, int y) {
-			return image.isInBounds(x,y);
-		}
+		@Override public boolean isInBounds(int x, int y) { return image.isInBounds(x,y); }
 
 		/**
 		 * This function is used to learn the target's model from the select image region.  Since the
 		 * model is provided in the constructor it isn't needed or used.
 		 */
-		@Override
-		public void createModel(RectangleLength2D_I32 target) {
-			throw new RuntimeException("Not supported");
-		}
+		@Override public void createModel(RectangleLength2D_I32 target) { throw new RuntimeException("Not supported"); }
 
 		@Override
 		public float compute(int x, int y) {

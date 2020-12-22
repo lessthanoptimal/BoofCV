@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,9 +52,8 @@ import static boofcv.io.image.UtilImageIO.loadImage;
  * @author Peter Abeles
  */
 public class ExampleFiducialImage {
-	public static void main(String[] args) {
-
-		String imagePath   = UtilIO.pathExample("fiducial/image/examples/");
+	public static void main( String[] args ) {
+		String imagePath = UtilIO.pathExample("fiducial/image/examples/");
 		String patternPath = UtilIO.pathExample("fiducial/image/patterns/");
 
 //		String imageName = "image00.jpg";
@@ -74,20 +73,20 @@ public class ExampleFiducialImage {
 
 		// give it a description of all the targets
 		double width = 4; // 4 cm
-		detector.addPatternImage(loadImage(patternPath , "ke.png",          GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "dog.png",         GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "yu.png",          GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "yu_inverted.png", GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "pentarose.png",   GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "text_boofcv.png", GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "leaf01.png",      GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "leaf02.png",      GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "hand01.png",      GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "chicken.png",     GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "h2o.png",         GrayF32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "yinyang.png",     GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "ke.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "dog.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "yu.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "yu_inverted.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "pentarose.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "text_boofcv.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "leaf01.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "leaf02.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "hand01.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "chicken.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "h2o.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath, "yinyang.png", GrayF32.class), 100, width);
 
-		detector.setLensDistortion(lensDistortion,param.width,param.height);
+		detector.setLensDistortion(lensDistortion, param.width, param.height);
 
 		detector.detect(original);
 
@@ -100,17 +99,17 @@ public class ExampleFiducialImage {
 			detector.getCenter(i, locationPixel);
 			detector.getBounds(i, bounds);
 
-			g2.setColor(new Color(50,50,255));
+			g2.setColor(new Color(50, 50, 255));
 			g2.setStroke(new BasicStroke(10));
-			VisualizeShapes.drawPolygon(bounds,true,1.0,g2);
+			VisualizeShapes.drawPolygon(bounds, true, 1.0, g2);
 
-			if( detector.hasID() )
-				System.out.println("Target ID = "+detector.getId(i));
-			if( detector.hasMessage() )
-				System.out.println("Message   = "+detector.getMessage(i));
-			System.out.println("2D Image Location = "+locationPixel);
+			if (detector.hasID())
+				System.out.println("Target ID = " + detector.getId(i));
+			if (detector.hasMessage())
+				System.out.println("Message   = " + detector.getMessage(i));
+			System.out.println("2D Image Location = " + locationPixel);
 
-			if( detector.is3D() ) {
+			if (detector.is3D()) {
 				detector.getFiducialToCamera(i, targetToSensor);
 				System.out.println("3D Location:");
 				System.out.println(targetToSensor);
@@ -121,6 +120,6 @@ public class ExampleFiducialImage {
 			}
 		}
 
-		ShowImages.showWindow(input,"Fiducials",true);
+		ShowImages.showWindow(input, "Fiducials", true);
 	}
 }

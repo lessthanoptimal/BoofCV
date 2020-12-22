@@ -46,7 +46,6 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleDepthPointCloud {
-
 	public static void main( String[] args ) {
 		String nameRgb = UtilIO.pathExample("kinect/basket/basket_rgb.png");
 		String nameDepth = UtilIO.pathExample("kinect/basket/basket_depth.png");
@@ -55,8 +54,8 @@ public class ExampleDepthPointCloud {
 		VisualDepthParameters param = CalibrationIO.load(nameCalib);
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
-		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered,null,true,GrayU8.class);
-		GrayU16 depth = ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
+		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered, null, true, GrayU8.class);
+		GrayU16 depth = ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth), null, GrayU16.class);
 
 		var cloud = new DogArray<>(Point3D_F64::new);
 		var cloudColor = new DogArray<>(() -> new int[3]);
@@ -67,22 +66,22 @@ public class ExampleDepthPointCloud {
 		viewer.setCameraHFov(PerspectiveOps.computeHFov(param.visualParam));
 		viewer.setTranslationStep(15);
 
-		for( int i = 0; i < cloud.size; i++ ) {
+		for (int i = 0; i < cloud.size; i++) {
 			Point3D_F64 p = cloud.get(i);
 			int[] color = cloudColor.get(i);
-			int c = (color[0] << 16 ) | (color[1] << 8) | color[2];
-			viewer.addPoint(p.x,p.y,p.z,c);
+			int c = (color[0] << 16) | (color[1] << 8) | color[2];
+			viewer.addPoint(p.x, p.y, p.z, c);
 		}
-		viewer.getComponent().setPreferredSize(new Dimension(rgb.width,rgb.height));
+		viewer.getComponent().setPreferredSize(new Dimension(rgb.width, rgb.height));
 
 		// ---------- Display depth image
 		// use the actual max value in the image to maximize its appearance
 		int maxValue = ImageStatistics.max(depth);
 		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, maxValue, 0);
-		ShowImages.showWindow(depthOut,"Depth Image", true);
+		ShowImages.showWindow(depthOut, "Depth Image", true);
 
 		// ---------- Display colorized point cloud
-		ShowImages.showWindow(viewer.getComponent(),"Point Cloud", true);
-		System.out.println("Total points = "+cloud.size);
+		ShowImages.showWindow(viewer.getComponent(), "Point Cloud", true);
+		System.out.println("Total points = " + cloud.size);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,6 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleTrackerObjectQuad {
-
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = UtilIO.pathExample("tracking/wildcat_robot.mjpeg");

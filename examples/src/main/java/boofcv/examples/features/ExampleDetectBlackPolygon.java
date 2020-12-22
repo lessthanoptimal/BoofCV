@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,12 +47,12 @@ import java.io.File;
  */
 public class ExampleDetectBlackPolygon {
 	public static void main(String[] args) {
-		String imagesConvex[] = new String[]{
+		String[] imagesConvex = new String[]{
 				"shapes/polygons01.jpg",
 				"shapes/shapes02.png",
 				"fiducial/image/examples/image01.jpg"};
 
-		String imagesConcave[] = new String[]{
+		String[] imagesConcave = new String[]{
 				"shapes/concave01.jpg"};
 
 		ListDisplayPanel panel = new ListDisplayPanel();

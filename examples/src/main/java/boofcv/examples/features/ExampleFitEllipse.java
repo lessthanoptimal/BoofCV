@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleFitEllipse {
-
 	public static void main( String[] args ) {
 		// load and convert the image into a usable format
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));

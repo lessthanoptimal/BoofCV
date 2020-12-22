@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,14 +40,14 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleRgbToGray {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		// load the image and convert it into a BoofCV data type
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
-		Planar<GrayU8> color = ConvertBufferedImage.convertFrom(buffered,true, ImageType.pl(3,GrayU8.class));
+		Planar<GrayU8> color = ConvertBufferedImage.convertFrom(buffered, true, ImageType.pl(3, GrayU8.class));
 
 		// Declare storage space for converted gray scale images
-		GrayU8 weighted = new GrayU8(color.width,color.height);
-		GrayU8 unweighted = new GrayU8(color.width,color.height);
+		GrayU8 weighted = new GrayU8(color.width, color.height);
+		GrayU8 unweighted = new GrayU8(color.width, color.height);
 
 		// Now run a benchmark to demonstrate the speed differences between the two approaches.  Both are very fast...
 		System.out.println("Running benchmark.  Should take a few seconds on a modern computer.\n");
@@ -55,34 +55,33 @@ public class ExampleRgbToGray {
 		int N = 2000;
 		startTime = System.nanoTime();
 		for (int i = 0; i < N; i++) {
-			ColorRgb.rgbToGray_Weighted(color,weighted); // weigh the bands based on how human vision sees each color
+			ColorRgb.rgbToGray_Weighted(color, weighted); // weigh the bands based on how human vision sees each color
 		}
-		double weightedFPS = N/((System.nanoTime()-startTime)*1e-9);
+		double weightedFPS = N/((System.nanoTime() - startTime)*1e-9);
 
 		startTime = System.nanoTime();
 		for (int i = 0; i < N; i++) {
-			ConvertImage.average(color,unweighted); // this equally averages all the bands together
+			ConvertImage.average(color, unweighted); // this equally averages all the bands together
 		}
-		double unweightedFPS = N/((System.nanoTime()-startTime)*1e-9);
+		double unweightedFPS = N/((System.nanoTime() - startTime)*1e-9);
 
-		System.out.println("FPS  averaged over "+N+" images");
+		System.out.println("FPS  averaged over " + N + " images");
 		System.out.println("      (higher is better)");
 		System.out.println();
-		System.out.printf("  weighted    %8.2f\n",weightedFPS);
-		System.out.printf("  unweighted  %8.2f\n",unweightedFPS);
+		System.out.printf("  weighted    %8.2f\n", weightedFPS);
+		System.out.printf("  unweighted  %8.2f\n", unweightedFPS);
 		System.out.println();
-		System.out.printf("Unweighted is %6.1f times faster.\n",(unweightedFPS/weightedFPS));
+		System.out.printf("Unweighted is %6.1f times faster.\n", (unweightedFPS/weightedFPS));
 		System.out.println();
 		System.out.println("WARNING:  This is a poorly implemented microbenchmark " +
 				"and results might not be accurate or consistent.");
 
-
 		// Display the results
 		ListDisplayPanel gui = new ListDisplayPanel();
-		gui.addImage(weighted,"Weighted");
-		gui.addImage(unweighted,"Unweighted");
-		gui.addImage(buffered,"RGB");
+		gui.addImage(weighted, "Weighted");
+		gui.addImage(unweighted, "Unweighted");
+		gui.addImage(buffered, "RGB");
 
-		ShowImages.showWindow(gui,"RGB to Gray", true);
+		ShowImages.showWindow(gui, "RGB to Gray", true);
 	}
 }

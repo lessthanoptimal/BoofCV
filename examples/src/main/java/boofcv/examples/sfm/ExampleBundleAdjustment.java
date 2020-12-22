@@ -62,7 +62,6 @@ import java.util.List;
  */
 public class ExampleBundleAdjustment {
 	public static void main( String[] args ) throws IOException {
-
 		// Because the Bundle Adjustment in the Large data set is popular, a file reader and writer is included
 		// with BoofCV.  BoofCV uses two data types to describe the parameters in a bundle adjustment problem
 		// BundleAdjustmentSceneStructure is used for camera parameters, camera locations, and 3D points
@@ -122,7 +121,6 @@ public class ExampleBundleAdjustment {
 	}
 
 	private static void visualizeInPointCloud( SceneStructureMetric structure ) {
-
 		List<Point3D_F64> cloudXyz = new ArrayList<>();
 		Point3D_F64 world = new Point3D_F64();
 		Point3D_F64 camera = new Point3D_F64();

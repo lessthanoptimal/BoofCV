@@ -63,7 +63,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleFundamentalMatrix {
-
 	/**
 	 * Given a set of noisy observations, compute the Fundamental matrix while removing the noise.
 	 *
@@ -73,7 +72,6 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches,
 												 List<AssociatedPair> inliers, double inlierThreshold ) {
-
 		ConfigRansac configRansac = new ConfigRansac();
 		configRansac.inlierThreshold = inlierThreshold;
 		configRansac.iterations = 1000;
@@ -154,7 +152,6 @@ public class ExampleFundamentalMatrix {
 	}
 
 	public static void main( String[] args ) {
-
 		String dir = UtilIO.pathExample("structure/");
 
 		BufferedImage imageA = UtilImageIO.loadImage(dir, "undist_cyto_01.jpg");

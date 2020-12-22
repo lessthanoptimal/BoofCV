@@ -46,26 +46,24 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleSegmentSuperpixels {
-
 	/**
 	 * Segments and visualizes the image
 	 */
 	public static <T extends ImageBase<T>>
-	void performSegmentation( ImageSuperpixels<T> alg , T color )
-	{
+	void performSegmentation( ImageSuperpixels<T> alg, T color ) {
 		// Segmentation often works better after blurring the image.  Reduces high frequency image components which
 		// can cause over segmentation
 		GBlurImageOps.gaussian(color, color, 0.5, -1, null);
 
 		// Storage for segmented image.  Each pixel will be assigned a label from 0 to N-1, where N is the number
 		// of segments in the image
-		GrayS32 pixelToSegment = new GrayS32(color.width,color.height);
+		GrayS32 pixelToSegment = new GrayS32(color.width, color.height);
 
 		// Segmentation magic happens here
-		alg.segment(color,pixelToSegment);
+		alg.segment(color, pixelToSegment);
 
 		// Displays the results
-		visualize(pixelToSegment,color,alg.getTotalSuperpixels());
+		visualize(pixelToSegment, color, alg.getTotalSuperpixels());
 	}
 
 	/**
@@ -74,8 +72,7 @@ public class ExampleSegmentSuperpixels {
 	 * between regions.
 	 */
 	public static <T extends ImageBase<T>>
-	void visualize(GrayS32 pixelToRegion , T color , int numSegments  )
-	{
+	void visualize( GrayS32 pixelToRegion, T color, int numSegments ) {
 		// Computes the mean color inside each region
 		ImageType<T> type = color.getImageType();
 		ComputeRegionMeanColor<T> colorize = FactorySegmentationAlg.regionMeanColor(type);
@@ -87,27 +84,27 @@ public class ExampleSegmentSuperpixels {
 		regionMemberCount.resize(numSegments);
 
 		ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);
-		colorize.process(color,pixelToRegion,regionMemberCount,segmentColor);
+		colorize.process(color, pixelToRegion, regionMemberCount, segmentColor);
 
 		// Draw each region using their average color
-		BufferedImage outColor = VisualizeRegions.regionsColor(pixelToRegion,segmentColor,null);
+		BufferedImage outColor = VisualizeRegions.regionsColor(pixelToRegion, segmentColor, null);
 		// Draw each region by assigning it a random color
 		BufferedImage outSegments = VisualizeRegions.regions(pixelToRegion, numSegments, null);
 
 		// Make region edges appear red
-		BufferedImage outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage outBorder = new BufferedImage(color.width, color.height, BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(color, outBorder, true);
-		VisualizeRegions.regionBorders(pixelToRegion,0xFF0000,outBorder);
+		VisualizeRegions.regionBorders(pixelToRegion, 0xFF0000, outBorder);
 
 		// Show the visualization results
 		ListDisplayPanel gui = new ListDisplayPanel();
-		gui.addImage(outColor,"Color of Segments");
+		gui.addImage(outColor, "Color of Segments");
 		gui.addImage(outBorder, "Region Borders");
 		gui.addImage(outSegments, "Regions");
-		ShowImages.showWindow(gui,"Superpixels", true);
+		ShowImages.showWindow(gui, "Superpixels", true);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_horses.jpg"));
 //		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_kangaroo.jpg"));
 //		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
@@ -119,20 +116,20 @@ public class ExampleSegmentSuperpixels {
 
 		// Select input image type.  Some algorithms behave different depending on image type
 		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3, GrayF32.class);
-//		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3,GrayU8.class);
+//		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3, GrayU8.class);
 //		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
 //		ImageType<GrayU8> imageType = ImageType.single(GrayU8.class);
 
 //		ImageSuperpixels alg = FactoryImageSegmentation.meanShift(null, imageType);
 //		ImageSuperpixels alg = FactoryImageSegmentation.slic(new ConfigSlic(400), imageType);
-		ImageSuperpixels alg = FactoryImageSegmentation.fh04(new ConfigFh04(100,30), imageType);
-//		ImageSuperpixels alg = FactoryImageSegmentation.watershed(null,imageType);
+		ImageSuperpixels alg = FactoryImageSegmentation.fh04(new ConfigFh04(100, 30), imageType);
+//		ImageSuperpixels alg = FactoryImageSegmentation.watershed(null, imageType);
 
 		// Convert image into BoofCV format
-		ImageBase color = imageType.createImage(image.getWidth(),image.getHeight());
+		ImageBase color = imageType.createImage(image.getWidth(), image.getHeight());
 		ConvertBufferedImage.convertFrom(image, color, true);
 
 		// Segment and display results
-		performSegmentation(alg,color);
+		performSegmentation(alg, color);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.examples.imageprocessing;
-
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
@@ -41,26 +40,24 @@ import java.util.List;
  * Demonstrates how to create binary images by thresholding, applying binary morphological operations, and
  * then extracting detected features by finding their contours.
  *
- * @see boofcv.examples.segmentation.ExampleThresholding
- *
  * @author Peter Abeles
+ * @see boofcv.examples.segmentation.ExampleThresholding
  */
 public class ExampleBinaryOps {
-
 	public static void main( String[] args ) {
 		// load and convert the image into a usable format
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 
 		// convert into a usable format
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
-		GrayU8 binary = new GrayU8(input.width,input.height);
-		GrayS32 label = new GrayS32(input.width,input.height);
+		GrayU8 binary = new GrayU8(input.width, input.height);
+		GrayS32 label = new GrayS32(input.width, input.height);
 
 		// Select a global threshold using Otsu's method.
 		double threshold = GThresholdImageOps.computeOtsu(input, 0, 255);
 
 		// Apply the threshold to create a binary image
-		ThresholdImageOps.threshold(input,binary,(float)threshold,true);
+		ThresholdImageOps.threshold(input, binary, (float)threshold, true);
 
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs
@@ -87,7 +84,6 @@ public class ExampleBinaryOps {
 		panel.addImage(visualFiltered, "Binary Filtered");
 		panel.addImage(visualLabel, "Labeled Blobs");
 		panel.addImage(visualContour, "Contours");
-		ShowImages.showWindow(panel,"Binary Operations",true);
+		ShowImages.showWindow(panel, "Binary Operations", true);
 	}
-
 }

@@ -105,6 +105,5 @@ public class ExampleDenseImageFeatures {
 
 		HighLevel(input);
 		LowLevelHOG(input);
-
 	}
 }

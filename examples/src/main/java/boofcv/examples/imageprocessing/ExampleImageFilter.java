@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.examples.imageprocessing;
-
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
@@ -54,26 +53,24 @@ public class ExampleImageFilter {
 
 	private static ListDisplayPanel panel = new ListDisplayPanel();
 
-	public static void procedural( GrayU8 input )
-	{
-		GrayU8 blurred = new GrayU8(input.width,input.height);
-		GrayS16 derivX = new GrayS16(input.width,input.height);
-		GrayS16 derivY = new GrayS16(input.width,input.height);
+	public static void procedural( GrayU8 input ) {
+		GrayU8 blurred = new GrayU8(input.width, input.height);
+		GrayS16 derivX = new GrayS16(input.width, input.height);
+		GrayS16 derivY = new GrayS16(input.width, input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
-		BlurImageOps.gaussian(input,blurred,-1,blurRadius,null);
+		BlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
 
 		// Calculate image's derivative
 		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorderAlgs.extend(input));
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1, null);
-		panel.addImage(outputImage,"Procedural Fixed Type");
+		panel.addImage(outputImage, "Procedural Fixed Type");
 	}
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	void generalized( T input )
-	{
+	void generalized( T input ) {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
@@ -85,16 +82,15 @@ public class ExampleImageFilter {
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
 
 		// Calculate image's derivative
-		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred, derivX, derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL, blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1, null);
-		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1, null);
+		panel.addImage(outputImage, "Generalized " + inputType.getSimpleName());
 	}
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	void filter( T input )
-	{
+	void filter( T input ) {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
@@ -104,19 +100,18 @@ public class ExampleImageFilter {
 
 		// declare image filters
 		BlurFilter<T> filterBlur = FactoryBlurFilter.gaussian(ImageType.single(inputType), -1, blurRadius);
-		ImageGradient<T,D> gradient = FactoryDerivative.sobel(inputType, derivType);
+		ImageGradient<T, D> gradient = FactoryDerivative.sobel(inputType, derivType);
 
 		// process the image
-		filterBlur.process(input,blurred);
-		gradient.process(blurred,derivX,derivY);
+		filterBlur.process(input, blurred);
+		gradient.process(blurred, derivX, derivY);
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1, null);
-		panel.addImage(outputImage,"Filter "+inputType.getSimpleName());
+		panel.addImage(outputImage, "Filter " + inputType.getSimpleName());
 	}
 
-	public static void nogenerics( ImageGray input )
-	{
+	public static void nogenerics( ImageGray input ) {
 		Class inputType = input.getClass();
 		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
@@ -128,15 +123,14 @@ public class ExampleImageFilter {
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
 
 		// Calculate image's derivative
-		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred, derivX, derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL, blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1, null);
-		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1, null);
+		panel.addImage(outputImage, "Generalized " + inputType.getSimpleName());
 	}
 
 	public static void main( String[] args ) {
-
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/kodim17.jpg"));
 
 		// produces the same results
@@ -148,6 +142,6 @@ public class ExampleImageFilter {
 		// try another image data type
 		generalized(ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class));
 
-		ShowImages.showWindow(panel,"Image Filter Examples", true);
+		ShowImages.showWindow(panel, "Image Filter Examples", true);
 	}
 }

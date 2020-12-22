@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,6 @@ public class ExampleNonMaximumSupression {
 	}
 
 	public static void main(String[] args) {
-
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("standard/boat.jpg"));
 
 		GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);

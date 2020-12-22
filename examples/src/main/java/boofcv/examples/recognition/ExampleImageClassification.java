@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,37 +43,36 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleImageClassification {
-
-	public static void main(String[] args) throws IOException {
+	public static void main( String[] args ) throws IOException {
 		ClassifierAndSource cs = FactoryImageClassifier.vgg_cifar10();  // Test set 89.9% for 10 categories
 //		ClassifierAndSource cs = FactoryImageClassifier.nin_imagenet(); // Test set 62.6% for 1000 categories
 
-		File modelPath = DeepBoofDataBaseOps.downloadModel(cs.getSource(),new File("download_data"));
+		File modelPath = DeepBoofDataBaseOps.downloadModel(cs.getSource(), new File("download_data"));
 
 		ImageClassifier<Planar<GrayF32>> classifier = cs.getClassifier();
 		classifier.loadModel(modelPath);
 		List<String> categories = classifier.getCategories();
 
 		String imagePath = UtilIO.pathExample("recognition/pixabay");
-		List<String> images = UtilIO.listByPrefix(imagePath,null,".jpg");
+		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
 		ImageClassificationPanel gui = new ImageClassificationPanel();
 		ShowImages.showWindow(gui, "Image Classification", true);
 
-		for( String path : images ) {
+		for (String path : images) {
 			File f = new File(path);
 			BufferedImage buffered = UtilImageIO.loadImage(path);
-			if( buffered == null)
+			if (buffered == null)
 				throw new RuntimeException("Couldn't find input image");
 
-			Planar<GrayF32> image = new Planar<>(GrayF32.class,buffered.getWidth(), buffered.getHeight(), 3);
-			ConvertBufferedImage.convertFromPlanar(buffered,image,true,GrayF32.class);
+			Planar<GrayF32> image = new Planar<>(GrayF32.class, buffered.getWidth(), buffered.getHeight(), 3);
+			ConvertBufferedImage.convertFromPlanar(buffered, image, true, GrayF32.class);
 
 			classifier.classify(image);
 
 			// add image and results to the GUI for display
-			gui.addImage(buffered,f.getName(),classifier.getAllResults(),categories);
+			gui.addImage(buffered, f.getName(), classifier.getAllResults(), categories);
 		}
 	}
 }

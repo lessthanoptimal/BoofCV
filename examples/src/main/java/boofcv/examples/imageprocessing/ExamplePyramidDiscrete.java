@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 	// specifies the image type
 	Class<T> imageType;
 
-	public ExamplePyramidDiscrete(Class<T> imageType) {
+	public ExamplePyramidDiscrete( Class<T> imageType ) {
 		this.imageType = imageType;
 	}
 
@@ -54,19 +54,19 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 	public void process( BufferedImage image ) {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 		PyramidDiscrete<T> pyramid = FactoryPyramid.discreteGaussian(
-				ConfigDiscreteLevels.levels(4),-1,2,true, ImageType.single(imageType));
+				ConfigDiscreteLevels.levels(4), -1, 2, true, ImageType.single(imageType));
 		pyramid.process(input);
 
 		DiscretePyramidPanel gui = new DiscretePyramidPanel();
 		gui.setPyramid(pyramid);
 		gui.render();
 
-		ShowImages.showWindow(gui,"Image Pyramid");
+		ShowImages.showWindow(gui, "Image Pyramid");
 
 		// To get an image at any of the scales simply call this get function
 		T imageAtScale = pyramid.getLayer(1);
 
-		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageAtScale,null,true),"Image at layer 1");
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageAtScale, null, true), "Image at layer 1");
 	}
 
 	public static void main( String[] args ) {

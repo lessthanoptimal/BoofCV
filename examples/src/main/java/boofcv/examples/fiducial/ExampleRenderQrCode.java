@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,14 +30,11 @@ import java.awt.image.BufferedImage;
  * A simple API is provided for creating your own QR Codes. Used extensively in BoofCV for testing purposes.
  * It's also easy to extending the rendering tools to support other file formats.
  *
- * @see boofcv.alg.fiducial.qrcode.QrCodeGenerator
- *
  * @author Peter Abeles
+ * @see boofcv.alg.fiducial.qrcode.QrCodeGenerator
  */
-public class ExampleRenderQrCode
-{
-	public static void main(String[] args) {
-
+public class ExampleRenderQrCode {
+	public static void main( String[] args ) {
 		// Uses a flow pattern to specify the QR Code. You can control all aspects of the QR
 		// like specifying the version, mask, and message types or let it select all of that for you.
 		QrCode qr = new QrCodeEncoder().
@@ -53,8 +50,8 @@ public class ExampleRenderQrCode
 		render.render(qr);
 
 		// Convert it to a BufferedImage for display purposes
-		BufferedImage image = ConvertBufferedImage.convertTo(render.getGray(),null);
-		ShowImages.showWindow(image,"Rendered QR Code", true);
+		BufferedImage image = ConvertBufferedImage.convertTo(render.getGray(), null);
+		ShowImages.showWindow(image, "Rendered QR Code", true);
 
 		// You can also save it to disk by uncommenting the line below
 //		UtilImageIO.saveImage(image,"qrcode.png");

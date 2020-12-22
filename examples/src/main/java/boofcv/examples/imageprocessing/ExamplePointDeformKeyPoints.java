@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,11 +48,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExamplePointDeformKeyPoints {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BufferedImage orig = UtilImageIO.loadImage(UtilIO.pathExample("standard/man_mls.jpg"));
-		BufferedImage bufferedOut = new BufferedImage(orig.getWidth(),orig.getHeight(),BufferedImage.TYPE_INT_RGB);
+		BufferedImage bufferedOut = new BufferedImage(orig.getWidth(), orig.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-		Planar<GrayF32> input = ConvertBufferedImage.convertFrom(orig,true, ImageType.pl(3,GrayF32.class));
+		Planar<GrayF32> input = ConvertBufferedImage.convertFrom(orig, true, ImageType.pl(3, GrayF32.class));
 		Planar<GrayF32> output = input.createSameShape();
 
 		List<Point2D_F32> src = new ArrayList<>();
@@ -67,28 +67,28 @@ public class ExamplePointDeformKeyPoints {
 		src.add(new Point2D_F32(375, 531));
 		src.add(new Point2D_F32(473, 238));
 
-		for(Point2D_F32 p : src ) {
-			dst.add( p.copy() );
+		for (Point2D_F32 p : src) {
+			dst.add(p.copy());
 		}
 
 		ConfigDeformPointMLS config = new ConfigDeformPointMLS();
 		PointDeformKeyPoints deform = FactoryDistort.deformMls(config);
-		deform.setImageShape(input.width,input.height);
+		deform.setImageShape(input.width, input.height);
 
 
-		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> distorter =
+		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> distorter =
 				FactoryDistort.distort(true, InterpolationType.BILINEAR,
-				BorderType.ZERO, input.getImageType(), input.getImageType());
+						BorderType.ZERO, input.getImageType(), input.getImageType());
 
-		deform.setImageShape(input.width,input.height);
+		deform.setImageShape(input.width, input.height);
 		deform.setSource(src);
 		deform.setDestination(dst);
 
 		ConvertBufferedImage.convertTo(output, bufferedOut, true);
-		ImagePanel panel = ShowImages.showWindow(bufferedOut,"Point Based Distortion Animation", true);
+		ImagePanel panel = ShowImages.showWindow(bufferedOut, "Point Based Distortion Animation", true);
 
 		int count = 0;
-		while( true ) {
+		while (true) {
 			// specify new locations of key points
 			double theta = count++*Math.PI/30;
 			dst.get(7).y = (float)(238 + Math.sin(theta)*30);       // right arm
@@ -98,7 +98,7 @@ public class ExamplePointDeformKeyPoints {
 			// tell the deformation algorithm that destination points have changed
 			deform.setDestination(dst);
 			// Tell the distorter that the model has changed. If cached is set to false you can ignore this step
-			distorter.setModel( new PointToPixelTransform_F32(deform));
+			distorter.setModel(new PointToPixelTransform_F32(deform));
 			// distort the image
 			distorter.apply(input, output);
 			// Show the results
@@ -107,6 +107,5 @@ public class ExamplePointDeformKeyPoints {
 
 			BoofMiscOps.sleep(30);
 		}
-
 	}
 }

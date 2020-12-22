@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,6 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleSegmentColor {
-
 	/**
 	 * Shows a color image and allows the user to select a pixel, convert it to HSV, print
 	 * the HSV values, and calls the function below to display similar pixels.
@@ -58,7 +57,6 @@ public class ExampleSegmentColor {
 				showSelectedColor("Selected",image,color[0],color[1]);
 			}
 		});
-
 		ShowImages.showWindow(gui,"Color Selector");
 	}
 

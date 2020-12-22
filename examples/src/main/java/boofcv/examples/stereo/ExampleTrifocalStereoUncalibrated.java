@@ -118,7 +118,6 @@ import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointClo
  * @author Peter Abeles
  */
 public class ExampleTrifocalStereoUncalibrated {
-
 	public static void main( String[] args ) {
 		String name = "rock_leaves_";
 //		String name = "mono_wall_";
