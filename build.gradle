@@ -430,7 +430,7 @@ task alljavadoc(type: Javadoc,  group: "Documentation") {
 
     configure(options) {
         failOnError = false
-        title = "BoofCV JavaDoc ($project.version)"
+        title = "BoofCV ($project.version)"
         links = [ 'http://docs.oracle.com/javase/8/docs/api/',
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',

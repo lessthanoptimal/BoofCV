@@ -15,6 +15,8 @@
 
 --- Fresh Checkout ---
 
+WARNING: Android will currently cause JavaDoc to fail. Either debug this or comment out in settings.gradle.
+
 VERSION=v0.XX
 git clone -b SNAPSHOT --recursive git@github.com:lessthanoptimal/BoofCV.git boofcv
 cd boofcv;./gradlew autogenerate;rm -rf .git;cd ..;zip -r boofcv-$VERSION-src.zip boofcv
