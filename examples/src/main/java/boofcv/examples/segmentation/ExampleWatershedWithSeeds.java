@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,19 +45,18 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleWatershedWithSeeds {
-	public static void main(String[] args) {
-
+	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 		GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 
 		// declare working data
-		GrayU8 binary = new GrayU8(input.width,input.height);
-		GrayS32 label = new GrayS32(input.width,input.height);
+		GrayU8 binary = new GrayU8(input.width, input.height);
+		GrayS32 label = new GrayS32(input.width, input.height);
 
 		// Try using the mean pixel value to create a binary image then erode it to separate the particles from
 		// each other
 		double mean = ImageStatistics.mean(input);
-		ThresholdImageOps.threshold(input, binary, (int) mean, true);
+		ThresholdImageOps.threshold(input, binary, (int)mean, true);
 		GrayU8 filtered = BinaryImageOps.erode8(binary, 2, null);
 		int numRegions = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, label).size() + 1;
 		// +1 to regions because contour only counts blobs and not the background
@@ -66,18 +65,18 @@ public class ExampleWatershedWithSeeds {
 		// ID > 0.  Luckily, a value of 0 was used for background pixels in the contour algorithm.
 		WatershedVincentSoille1991 watershed = FactorySegmentationAlg.watershed(ConnectRule.FOUR);
 
-		watershed.process(input,label);
+		watershed.process(input, label);
 
 		GrayS32 output = watershed.getOutput();
 
 		BufferedImage outLabeled = VisualizeBinaryData.renderLabeledBG(label, numRegions, null);
-		VisualizeRegions.watersheds(output,image,1);
+		VisualizeRegions.watersheds(output, image, 1);
 
 		// Removing the watersheds and update the region count
 		// NOTE: watershed.getTotalRegions() does not return correct results if seeds are used!
 		watershed.removeWatersheds();
 		numRegions -= 1;
-		BufferedImage outRegions = VisualizeRegions.regions(output,numRegions,null);
+		BufferedImage outRegions = VisualizeRegions.regions(output, numRegions, null);
 
 		ListDisplayPanel gui = new ListDisplayPanel();
 		gui.addImage(image, "Watersheds");

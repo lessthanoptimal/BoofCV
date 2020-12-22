@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,19 +53,17 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class ExampleVisualOdometryStereo {
-
 	public static void main( String[] args ) {
-
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
 		String directory = UtilIO.pathExample("vo/backyard/");
 
 		// load camera description and the video sequence
-		StereoParameters stereoParam = CalibrationIO.load(media.openFile(new File(directory , "stereo.yaml").getPath()));
+		StereoParameters stereoParam = CalibrationIO.load(media.openFile(new File(directory, "stereo.yaml").getPath()));
 		SimpleImageSequence<GrayU8> video1 = media.openVideo(
-				new File(directory , "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
+				new File(directory, "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
 		SimpleImageSequence<GrayU8> video2 = media.openVideo(
-				new File(directory,"right.mjpeg").getPath(), ImageType.single(GrayU8.class));
+				new File(directory, "right.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
 		// Specify which tracker and how it will behave
 		var configKlt = new ConfigPKlt();
@@ -99,9 +97,9 @@ public class ExampleVisualOdometryStereo {
 		configVisOdom.ransac.inlierThreshold = 1.0;
 
 		// Declare each component then visual odometry
-		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet,GrayU8.class, GrayS16.class);
+		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet, GrayU8.class, GrayS16.class);
 		StereoDisparitySparse<GrayU8> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayU8.class);
-		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(configVisOdom,disparity,tracker, GrayU8.class);
+		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoMonoPnP(configVisOdom, disparity, tracker, GrayU8.class);
 
 		// Optionally dump verbose debugging information to stdout
 //		Set<String> configuration = new HashSet<>();
@@ -114,11 +112,11 @@ public class ExampleVisualOdometryStereo {
 
 		// Process the video sequence and output the location plus number of inliers
 		long startTime = System.nanoTime();
-		while( video1.hasNext() ) {
+		while (video1.hasNext()) {
 			GrayU8 left = video1.next();
 			GrayU8 right = video2.next();
 
-			if( !visodom.process(left,right) ) {
+			if (!visodom.process(left, right)) {
 				throw new RuntimeException("VO Failed!");
 			}
 
@@ -127,14 +125,14 @@ public class ExampleVisualOdometryStereo {
 
 			System.out.printf("Location %8.2f %8.2f %8.2f    %s\n", T.x, T.y, T.z, trackStats(visodom));
 		}
-		System.out.printf("FPS %4.2f\n", video1.getFrameNumber()/((System.nanoTime()-startTime)*1e-9));
+		System.out.printf("FPS %4.2f\n", video1.getFrameNumber()/((System.nanoTime() - startTime)*1e-9));
 	}
 
 	/**
 	 * If the algorithm implements AccessPointTracks3D create a string which summarizing different tracking information
 	 */
-	public static String trackStats(StereoVisualOdometry alg) {
-		if( !(alg instanceof AccessPointTracks3D))
+	public static String trackStats( StereoVisualOdometry alg ) {
+		if (!(alg instanceof AccessPointTracks3D))
 			return "";
 
 		AccessPointTracks3D access = (AccessPointTracks3D)alg;
@@ -142,14 +140,14 @@ public class ExampleVisualOdometryStereo {
 		int count = 0;
 		int N = access.getTotalTracks();
 		int totalNew = 0;
-		for( int i = 0; i < N; i++ ) {
-			if( access.isTrackInlier(i) )
+		for (int i = 0; i < N; i++) {
+			if (access.isTrackInlier(i))
 				count++;
-			else if( access.isTrackNew(i) ) {
+			else if (access.isTrackNew(i)) {
 				totalNew++;
 			}
 		}
 
-		return String.format("inlier %5.1f%% new %4d total %d", 100.0 * count / (N-totalNew),totalNew,N);
+		return String.format("inlier %5.1f%% new %4d total %d", 100.0*count/(N - totalNew), totalNew, N);
 	}
 }

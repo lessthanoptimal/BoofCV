@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,18 +49,16 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class ExampleVisualOdometryMonocularPlane {
-
 	public static void main( String[] args ) {
-
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
 		String directory = UtilIO.pathExample("vo/drc/");
 
 		// load camera description and the video sequence
 		MonoPlaneParameters calibration = CalibrationIO.load(
-				media.openFile(new File(directory , "mono_plane.yaml").getPath()));
+				media.openFile(new File(directory, "mono_plane.yaml").getPath()));
 		SimpleImageSequence<GrayU8> video = media.openVideo(
-				new File(directory , "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
+				new File(directory, "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
 		// specify how the image features are going to be tracked
 		ConfigPKlt configKlt = new ConfigPKlt();
@@ -82,10 +80,10 @@ public class ExampleVisualOdometryMonocularPlane {
 		visualOdometry.setCalibration(calibration);
 
 		// Process the video sequence and output the location plus number of inliers
-		while( video.hasNext() ) {
+		while (video.hasNext()) {
 			GrayU8 image = video.next();
 
-			if( !visualOdometry.process(image) ) {
+			if (!visualOdometry.process(image)) {
 				System.out.println("Fault!");
 				visualOdometry.reset();
 			}
@@ -101,19 +99,19 @@ public class ExampleVisualOdometryMonocularPlane {
 	 * If the algorithm implements AccessPointTracks3D, then count the number of inlier features
 	 * and return a string.
 	 */
-	public static String inlierPercent(VisualOdometry<?> alg) {
-		if( !(alg instanceof AccessPointTracks3D))
+	public static String inlierPercent( VisualOdometry<?> alg ) {
+		if (!(alg instanceof AccessPointTracks3D))
 			return "";
 
 		AccessPointTracks3D access = (AccessPointTracks3D)alg;
 
 		int count = 0;
 		int N = access.getTotalTracks();
-		for( int i = 0; i < N; i++ ) {
-			if( access.isTrackInlier(i) )
+		for (int i = 0; i < N; i++) {
+			if (access.isTrackInlier(i))
 				count++;
 		}
 
-		return String.format("%%%5.3f", 100.0 * count / N);
+		return String.format("%%%5.3f", 100.0*count/N);
 	}
 }

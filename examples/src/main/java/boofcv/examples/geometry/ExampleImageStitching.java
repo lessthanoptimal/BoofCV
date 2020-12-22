@@ -59,10 +59,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p> Exampling showing how to combines two images together by finding the best fit image transform with point
- * features.</p>
- * <p>
- * Algorithm Steps:<br>
+ * Exampling showing how to combines two images together by finding the best fit image transform with point
+ * features. Algorithm Steps:
+ *
  * <ol>
  * <li>Detect feature locations</li>
  * <li>Compute feature descriptors</li>
@@ -70,27 +69,24 @@ import java.util.List;
  * <li>Use robust fitting to find transform</li>
  * <li>Render combined image</li>
  * </ol>
- * </p>
  *
  * @author Peter Abeles
  */
 public class ExampleImageStitching {
-
 	/**
 	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
 	 * in both images.  This code is completely model independent and is the core algorithms.
 	 */
-	public static<T extends ImageGray<T>, FD extends TupleDesc> Homography2D_F64
-	computeTransform( T imageA , T imageB ,
-					  DetectDescribePoint<T,FD> detDesc ,
-					  AssociateDescription<FD> associate ,
-					  ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher )
-	{
+	public static <T extends ImageGray<T>, FD extends TupleDesc> Homography2D_F64
+	computeTransform( T imageA, T imageB,
+					  DetectDescribePoint<T, FD> detDesc,
+					  AssociateDescription<FD> associate,
+					  ModelMatcher<Homography2D_F64, AssociatedPair> modelMatcher ) {
 		// get the length of the description
 		List<Point2D_F64> pointsA = new ArrayList<>();
-		DogArray<FD> descA = UtilFeature.createQueue(detDesc,100);
+		DogArray<FD> descA = UtilFeature.createQueue(detDesc, 100);
 		List<Point2D_F64> pointsB = new ArrayList<>();
-		DogArray<FD> descB = UtilFeature.createQueue(detDesc,100);
+		DogArray<FD> descB = UtilFeature.createQueue(detDesc, 100);
 
 		// extract feature locations and descriptions from each image
 		describeImage(imageA, detDesc, pointsA, descA);
@@ -105,17 +101,17 @@ public class ExampleImageStitching {
 		FastAccess<AssociatedIndex> matches = associate.getMatches();
 		List<AssociatedPair> pairs = new ArrayList<>();
 
-		for( int i = 0; i < matches.size(); i++ ) {
+		for (int i = 0; i < matches.size(); i++) {
 			AssociatedIndex match = matches.get(i);
 
 			Point2D_F64 a = pointsA.get(match.src);
 			Point2D_F64 b = pointsB.get(match.dst);
 
-			pairs.add( new AssociatedPair(a,b,false));
+			pairs.add(new AssociatedPair(a, b, false));
 		}
 
 		// find the best fit model to describe the change between these images
-		if( !modelMatcher.process(pairs) )
+		if (!modelMatcher.process(pairs))
 			throw new RuntimeException("Model Matcher failed!");
 
 		// return the found image transform
@@ -126,15 +122,15 @@ public class ExampleImageStitching {
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
 	private static <T extends ImageGray<T>, FD extends TupleDesc>
-	void describeImage(T image,
-					   DetectDescribePoint<T,FD> detDesc,
-					   List<Point2D_F64> points,
-					   DogArray<FD> listDescs) {
+	void describeImage( T image,
+						DetectDescribePoint<T, FD> detDesc,
+						List<Point2D_F64> points,
+						DogArray<FD> listDescs ) {
 		detDesc.detect(image);
 
 		listDescs.reset();
-		for( int i = 0; i < detDesc.getNumberOfFeatures(); i++ ) {
-			points.add( detDesc.getLocation(i).copy() );
+		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
+			points.add(detDesc.getLocation(i).copy());
 			listDescs.grow().setTo(detDesc.getDescription(i));
 		}
 	}
@@ -143,32 +139,30 @@ public class ExampleImageStitching {
 	 * Given two input images create and display an image where the two have been overlayed on top of each other.
 	 */
 	public static <T extends ImageGray<T>>
-	void stitch( BufferedImage imageA , BufferedImage imageB , Class<T> imageType )
-	{
+	void stitch( BufferedImage imageA, BufferedImage imageB, Class<T> imageType ) {
 		T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
 		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// Detect using the standard SURF feature descriptor and describer
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,2),scorer);
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null, null, imageType);
+		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 2), scorer);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
-		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =
-				FactoryMultiViewRobust.homographyRansac(null,new ConfigRansac(60,3));
+		ModelMatcher<Homography2D_F64, AssociatedPair> modelMatcher =
+				FactoryMultiViewRobust.homographyRansac(null, new ConfigRansac(60, 3));
 
 		Homography2D_F64 H = computeTransform(inputA, inputB, detDesc, associate, modelMatcher);
 
-		renderStitching(imageA,imageB,H);
+		renderStitching(imageA, imageB, H);
 	}
 
 	/**
 	 * Renders and displays the stitched together images
 	 */
-	public static void renderStitching( BufferedImage imageA, BufferedImage imageB ,
-										Homography2D_F64 fromAtoB )
-	{
+	public static void renderStitching( BufferedImage imageA, BufferedImage imageB,
+										Homography2D_F64 fromAtoB ) {
 		// specify size of output image
 		double scale = 0.5;
 
@@ -176,73 +170,72 @@ public class ExampleImageStitching {
 		Planar<GrayF32> colorA =
 				ConvertBufferedImage.convertFromPlanar(imageA, null, true, GrayF32.class);
 		Planar<GrayF32> colorB =
-				ConvertBufferedImage.convertFromPlanar(imageB, null,true, GrayF32.class);
+				ConvertBufferedImage.convertFromPlanar(imageB, null, true, GrayF32.class);
 
 		// Where the output images are rendered into
 		Planar<GrayF32> work = colorA.createSameShape();
 
 		// Adjust the transform so that the whole image can appear inside of it
-		Homography2D_F64 fromAToWork = new Homography2D_F64(scale,0,colorA.width/4,0,scale,colorA.height/4,0,0,1);
+		Homography2D_F64 fromAToWork = new Homography2D_F64(scale, 0, colorA.width/4, 0, scale, colorA.height/4, 0, 0, 1);
 		Homography2D_F64 fromWorkToA = fromAToWork.invert(null);
 
 		// Used to render the results onto an image
 		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
-		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> distort =
+		ImageDistort<Planar<GrayF32>, Planar<GrayF32>> distort =
 				DistortSupport.createDistortPL(GrayF32.class, model, interp, false);
 		distort.setRenderAll(false);
 
 		// Render first image
 		model.set(fromWorkToA);
-		distort.apply(colorA,work);
+		distort.apply(colorA, work);
 
 		// Render second image
-		Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB,null);
+		Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB, null);
 		model.set(fromWorkToB);
-		distort.apply(colorB,work);
+		distort.apply(colorB, work);
 
 		// Convert the rendered image into a BufferedImage
-		BufferedImage output = new BufferedImage(work.width,work.height,imageA.getType());
-		ConvertBufferedImage.convertTo(work,output,true);
+		BufferedImage output = new BufferedImage(work.width, work.height, imageA.getType());
+		ConvertBufferedImage.convertTo(work, output, true);
 
 		Graphics2D g2 = output.createGraphics();
 
 		// draw lines around the distorted image to make it easier to see
 		Homography2D_F64 fromBtoWork = fromWorkToB.invert(null);
 		Point2D_I32 corners[] = new Point2D_I32[4];
-		corners[0] = renderPoint(0,0,fromBtoWork);
-		corners[1] = renderPoint(colorB.width,0,fromBtoWork);
-		corners[2] = renderPoint(colorB.width,colorB.height,fromBtoWork);
-		corners[3] = renderPoint(0,colorB.height,fromBtoWork);
+		corners[0] = renderPoint(0, 0, fromBtoWork);
+		corners[1] = renderPoint(colorB.width, 0, fromBtoWork);
+		corners[2] = renderPoint(colorB.width, colorB.height, fromBtoWork);
+		corners[3] = renderPoint(0, colorB.height, fromBtoWork);
 
 		g2.setColor(Color.ORANGE);
 		g2.setStroke(new BasicStroke(4));
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.drawLine(corners[0].x,corners[0].y,corners[1].x,corners[1].y);
-		g2.drawLine(corners[1].x,corners[1].y,corners[2].x,corners[2].y);
-		g2.drawLine(corners[2].x,corners[2].y,corners[3].x,corners[3].y);
-		g2.drawLine(corners[3].x,corners[3].y,corners[0].x,corners[0].y);
+		g2.drawLine(corners[0].x, corners[0].y, corners[1].x, corners[1].y);
+		g2.drawLine(corners[1].x, corners[1].y, corners[2].x, corners[2].y);
+		g2.drawLine(corners[2].x, corners[2].y, corners[3].x, corners[3].y);
+		g2.drawLine(corners[3].x, corners[3].y, corners[0].x, corners[0].y);
 
-		ShowImages.showWindow(output,"Stitched Images", true);
+		ShowImages.showWindow(output, "Stitched Images", true);
 	}
 
-	private static Point2D_I32 renderPoint( int x0 , int y0 , Homography2D_F64 fromBtoWork )
-	{
+	private static Point2D_I32 renderPoint( int x0, int y0, Homography2D_F64 fromBtoWork ) {
 		Point2D_F64 result = new Point2D_F64();
 		HomographyPointOps_F64.transform(fromBtoWork, new Point2D_F64(x0, y0), result);
-		return new Point2D_I32((int)result.x,(int)result.y);
+		return new Point2D_I32((int)result.x, (int)result.y);
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage imageA,imageB;
+		BufferedImage imageA, imageB;
 		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_01.jpg"));
 		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_03.jpg"));
-		stitch(imageA,imageB, GrayF32.class);
+		stitch(imageA, imageB, GrayF32.class);
 		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_01.jpg"));
 		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_03.jpg"));
-		stitch(imageA,imageB, GrayF32.class);
+		stitch(imageA, imageB, GrayF32.class);
 		imageA = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_01.jpg"));
 		imageB = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_02.jpg"));
-		stitch(imageA,imageB, GrayF32.class);
+		stitch(imageA, imageB, GrayF32.class);
 	}
 }

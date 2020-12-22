@@ -41,7 +41,6 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleImageBlur {
-
 	public static void main( String[] args ) {
 		ListDisplayPanel panel = new ListDisplayPanel();
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("standard/kodim17.jpg"));

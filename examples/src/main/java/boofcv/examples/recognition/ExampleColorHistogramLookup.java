@@ -67,15 +67,15 @@ public class ExampleColorHistogramLookup {
 	 * HSV stores color information in Hue and Saturation while intensity is in Value.  This computes a 2D histogram
 	 * from hue and saturation only, which makes it lighting independent.
 	 */
-	public static List<double[]> coupledHueSat( List<String> images  ) {
+	public static List<double[]> coupledHueSat( List<String> images ) {
 		List<double[]> points = new ArrayList<>();
 
-		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
-		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class, 1, 1, 3);
+		Planar<GrayF32> hsv = new Planar<>(GrayF32.class, 1, 1, 3);
 
-		for( String path : images ) {
+		for (String path : images) {
 			BufferedImage buffered = UtilImageIO.loadImage(path);
-			if( buffered == null ) throw new RuntimeException("Can't load image!");
+			if (buffered == null) throw new RuntimeException("Can't load image!");
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
@@ -83,15 +83,15 @@ public class ExampleColorHistogramLookup {
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
 			ColorHsv.rgbToHsv(rgb, hsv);
 
-			Planar<GrayF32> hs = hsv.partialSpectrum(0,1);
+			Planar<GrayF32> hs = hsv.partialSpectrum(0, 1);
 
 			// The number of bins is an important parameter.  Try adjusting it
-			Histogram_F64 histogram = new Histogram_F64(12,12);
+			Histogram_F64 histogram = new Histogram_F64(12, 12);
 			histogram.setRange(0, 0, 2.0*Math.PI); // range of hue is from 0 to 2PI
 			histogram.setRange(1, 0, 1.0);         // range of saturation is from 0 to 1
 
 			// Compute the histogram
-			GHistogramFeatureOps.histogram(hs,histogram);
+			GHistogramFeatureOps.histogram(hs, histogram);
 
 			UtilFeature.normalizeL2(histogram); // normalize so that image size doesn't matter
 
@@ -105,7 +105,7 @@ public class ExampleColorHistogramLookup {
 	 * Computes two independent 1D histograms from hue and saturation.  Less affects by sparsity, but can produce
 	 * worse results since the basic assumption that hue and saturation are decoupled is most of the time false.
 	 */
-	public static List<double[]> independentHueSat( List<File> images  ) {
+	public static List<double[]> independentHueSat( List<File> images ) {
 		List<double[]> points = new ArrayList<>();
 
 		// The number of bins is an important parameter.  Try adjusting it
@@ -113,25 +113,26 @@ public class ExampleColorHistogramLookup {
 		TupleDesc_F64 histogramValue = new TupleDesc_F64(30);
 
 		List<TupleDesc_F64> histogramList = new ArrayList<>();
-		histogramList.add(histogramHue); histogramList.add(histogramValue);
+		histogramList.add(histogramHue);
+		histogramList.add(histogramValue);
 
-		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
-		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class, 1, 1, 3);
+		Planar<GrayF32> hsv = new Planar<>(GrayF32.class, 1, 1, 3);
 
-		for( File f : images ) {
+		for (File f : images) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if( buffered == null ) throw new RuntimeException("Can't load image!");
+			if (buffered == null) throw new RuntimeException("Can't load image!");
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
 			ColorHsv.rgbToHsv(rgb, hsv);
 
-			GHistogramFeatureOps.histogram(hsv.getBand(0), 0, 2*Math.PI,histogramHue);
+			GHistogramFeatureOps.histogram(hsv.getBand(0), 0, 2*Math.PI, histogramHue);
 			GHistogramFeatureOps.histogram(hsv.getBand(1), 0, 1, histogramValue);
 
 			// need to combine them into a single descriptor for processing later on
-			TupleDesc_F64 imageHist = UtilFeature.combine(histogramList,null);
+			TupleDesc_F64 imageHist = UtilFeature.combine(histogramList, null);
 
 			UtilFeature.normalizeL2(imageHist); // normalize so that image size doesn't matter
 
@@ -148,22 +149,22 @@ public class ExampleColorHistogramLookup {
 	public static List<double[]> coupledRGB( List<File> images ) {
 		List<double[]> points = new ArrayList<>();
 
-		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class, 1, 1, 3);
 
-		for( File f : images ) {
+		for (File f : images) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if( buffered == null ) throw new RuntimeException("Can't load image!");
+			if (buffered == null) throw new RuntimeException("Can't load image!");
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
 
 			// The number of bins is an important parameter.  Try adjusting it
-			Histogram_F64 histogram = new Histogram_F64(10,10,10);
+			Histogram_F64 histogram = new Histogram_F64(10, 10, 10);
 			histogram.setRange(0, 0, 255);
 			histogram.setRange(1, 0, 255);
 			histogram.setRange(2, 0, 255);
 
-			GHistogramFeatureOps.histogram(rgb,histogram);
+			GHistogramFeatureOps.histogram(rgb, histogram);
 
 			UtilFeature.normalizeL2(histogram); // normalize so that image size doesn't matter
 
@@ -180,10 +181,10 @@ public class ExampleColorHistogramLookup {
 	public static List<double[]> histogramGray( List<File> images ) {
 		List<double[]> points = new ArrayList<>();
 
-		GrayU8 gray = new GrayU8(1,1);
-		for( File f : images ) {
+		GrayU8 gray = new GrayU8(1, 1);
+		for (File f : images) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if( buffered == null ) throw new RuntimeException("Can't load image!");
+			if (buffered == null) throw new RuntimeException("Can't load image!");
 
 			gray.reshape(buffered.getWidth(), buffered.getHeight());
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
@@ -199,10 +200,10 @@ public class ExampleColorHistogramLookup {
 		return points;
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		String imagePath = UtilIO.pathExample("recognition/vacation");
-		List<String> images = UtilIO.listByPrefix(imagePath,null,".jpg");
+		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
 		// Different color spaces you can try
@@ -236,10 +237,10 @@ public class ExampleColorHistogramLookup {
 
 		// The results will be the 10 best matches, but their order can be arbitrary.  For display purposes
 		// it's better to do it from best fit to worst fit
-		Collections.sort(results.toList(), (Comparator<NnData>) (o1, o2) -> {
-			if( o1.distance < o2.distance)
+		Collections.sort(results.toList(), (Comparator<NnData>)( o1, o2 ) -> {
+			if (o1.distance < o2.distance)
 				return -1;
-			else if( o1.distance > o2.distance )
+			else if (o1.distance > o2.distance)
 				return 1;
 			else
 				return 0;
@@ -253,6 +254,6 @@ public class ExampleColorHistogramLookup {
 			gui.addImage(image, String.format("Error %6.3f", error), ScaleOptions.ALL);
 		}
 
-		ShowImages.showWindow(gui,"Similar Images",true);
+		ShowImages.showWindow(gui, "Similar Images", true);
 	}
 }

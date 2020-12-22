@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleInterpolation {
-
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		String imagePath;
 		imagePath = "eye01.jpg";
 //		imagePath = "small_sunflower.jpg";
@@ -49,17 +48,17 @@ public class ExampleInterpolation {
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
 		ListDisplayPanel gui = new ListDisplayPanel();
 
-		gui.addImage(buffered,"Original");
+		gui.addImage(buffered, "Original");
 
 		// For sake of simplicity assume it's a gray scale image.  Interpolation functions exist for planar and
 		// interleaved color images too
-		GrayF32 input  = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
-		GrayF32 scaled = input.createNew(500,500*input.height/input.width);
+		GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
+		GrayF32 scaled = input.createNew(500, 500*input.height/input.width);
 
-		for( InterpolationType type : InterpolationType.values() ) {
+		for (InterpolationType type : InterpolationType.values()) {
 			// Create the single band (gray scale) interpolation function for the input image
 			InterpolatePixelS<GrayF32> interp = FactoryInterpolation.
-					createPixelS(0,255,type,BorderType.EXTENDED,input.getDataType());
+					createPixelS(0, 255, type, BorderType.EXTENDED, input.getDataType());
 
 			// Tell it which image is being interpolated
 			interp.setImage(input);
@@ -74,15 +73,15 @@ public class ExampleInterpolation {
 				for (int x = 0; x < scaled.width; x++) {
 					float origX = x*input.width/(float)scaled.width;
 
-					scaled.data[indexScaled++] = interp.get(origX,origY);
+					scaled.data[indexScaled++] = interp.get(origX, origY);
 				}
 			}
 
 			// Add the results to the output
-			BufferedImage out = ConvertBufferedImage.convertTo(scaled,null,true);
-			gui.addImage(out,type.toString());
+			BufferedImage out = ConvertBufferedImage.convertTo(scaled, null, true);
+			gui.addImage(out, type.toString());
 		}
 
-		ShowImages.showWindow(gui,"Example Interpolation", true);
+		ShowImages.showWindow(gui, "Example Interpolation", true);
 	}
 }

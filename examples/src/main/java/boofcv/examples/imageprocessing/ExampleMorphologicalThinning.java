@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,12 +40,11 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class ExampleMorphologicalThinning {
-	public static void main(String[] args) {
-
-		String[] images = new String[]{"drawings/drawing_text.png","standard/fingerprint.jpg","drawings/drawing_face.png"};
+	public static void main( String[] args ) {
+		String[] images = new String[]{"drawings/drawing_text.png", "standard/fingerprint.jpg", "drawings/drawing_face.png"};
 
 		ListDisplayPanel uberPanel = new ListDisplayPanel();
-		for( String path : images ) {
+		for (String path : images) {
 			// load and convert the image into a usable format
 			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(path));
 
@@ -69,7 +68,7 @@ public class ExampleMorphologicalThinning {
 			panel.addImage(visualBinary, "Binary");
 			panel.addImage(image, "Original");
 
-			uberPanel.addItem(panel,new File(path).getName());
+			uberPanel.addItem(panel, new File(path).getName());
 		}
 		ShowImages.showWindow(uberPanel, "Thinned/Skeletonalized Images", true);
 	}

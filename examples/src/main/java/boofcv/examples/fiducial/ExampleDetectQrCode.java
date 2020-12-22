@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,11 +40,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleDetectQrCode {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
-		GrayU8 gray = ConvertBufferedImage.convertFrom(input,(GrayU8)null);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(input, (GrayU8)null);
 
-		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null,GrayU8.class);
+		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null, GrayU8.class);
 
 		detector.process(gray);
 
@@ -52,27 +52,27 @@ public class ExampleDetectQrCode {
 		List<QrCode> detections = detector.getDetections();
 
 		Graphics2D g2 = input.createGraphics();
-		int strokeWidth = Math.max(4,input.getWidth()/200); // in large images the line can be too thin
-		g2.setColor(Color.GREEN);g2.setStroke(new BasicStroke(strokeWidth));
-		for( QrCode qr : detections ) {
+		int strokeWidth = Math.max(4, input.getWidth()/200); // in large images the line can be too thin
+		g2.setColor(Color.GREEN); g2.setStroke(new BasicStroke(strokeWidth));
+		for (QrCode qr : detections) {
 			// The message encoded in the marker
-			System.out.println("message: "+qr.message);
+			System.out.println("message: " + qr.message);
 
 			// Visualize its location in the image
-			VisualizeShapes.drawPolygon(qr.bounds,true,1,g2);
+			VisualizeShapes.drawPolygon(qr.bounds, true, 1, g2);
 		}
 
 		// List of objects it thinks might be a QR Code but failed for various reasons
 		List<QrCode> failures = detector.getFailures();
 		g2.setColor(Color.RED);
-		for( QrCode qr : failures ) {
+		for (QrCode qr : failures) {
 			// If the 'cause' is ERROR_CORRECTION or later then it's probably a real QR Code that
-			if( qr.failureCause.ordinal() < QrCode.Failure.ERROR_CORRECTION.ordinal() )
+			if (qr.failureCause.ordinal() < QrCode.Failure.ERROR_CORRECTION.ordinal())
 				continue;
 
-			VisualizeShapes.drawPolygon(qr.bounds,true,1,g2);
+			VisualizeShapes.drawPolygon(qr.bounds, true, 1, g2);
 		}
 
-		ShowImages.showWindow(input,"Example QR Codes", true);
+		ShowImages.showWindow(input, "Example QR Codes", true);
 	}
 }

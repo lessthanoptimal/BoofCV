@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,6 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleVideoStabilization {
 	public static void main( String[] args ) {
-
 		// Configure the feature detector
 		ConfigPointDetector configDetector = new ConfigPointDetector();
 		configDetector.type = PointDetectorTypes.SHI_TOMASI;
@@ -59,21 +58,21 @@ public class ExampleVideoStabilization {
 		configDetector.general.radius = 2;
 
 		// Use a KLT tracker
-		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(4,configDetector,3,
-				GrayF32.class,GrayF32.class);
+		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(4, configDetector, 3,
+				GrayF32.class, GrayF32.class);
 
 		// This estimates the 2D image motion
 		// An Affine2D_F64 model also works quite well.
-		ImageMotion2D<GrayF32,Homography2D_F64> motion2D =
-				FactoryMotion2D.createMotion2D(200,3,2,30,0.6,0.5,false,tracker,new Homography2D_F64());
+		ImageMotion2D<GrayF32, Homography2D_F64> motion2D =
+				FactoryMotion2D.createMotion2D(200, 3, 2, 30, 0.6, 0.5, false, tracker, new Homography2D_F64());
 
 		// wrap it so it output color images while estimating motion from gray
-		ImageMotion2D<Planar<GrayF32>,Homography2D_F64> motion2DColor =
+		ImageMotion2D<Planar<GrayF32>, Homography2D_F64> motion2DColor =
 				new PlToGrayMotion2D<>(motion2D, GrayF32.class);
 
 		// This fuses the images together
-		StitchingFromMotion2D<Planar<GrayF32>,Homography2D_F64>
-				stabilize = FactoryMotion2D.createVideoStitch(0.5, motion2DColor,ImageType.pl(3,GrayF32.class));
+		StitchingFromMotion2D<Planar<GrayF32>, Homography2D_F64>
+				stabilize = FactoryMotion2D.createVideoStitch(0.5, motion2DColor, ImageType.pl(3, GrayF32.class));
 
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;
@@ -89,21 +88,21 @@ public class ExampleVideoStabilization {
 		stabilize.process(frame);
 
 		// Create the GUI for displaying the results + input image
-		ImageGridPanel gui = new ImageGridPanel(1,2);
-		gui.setImage(0,0,new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB));
-		gui.setImage(0,1,new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB));
+		ImageGridPanel gui = new ImageGridPanel(1, 2);
+		gui.setImage(0, 0, new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_INT_RGB));
+		gui.setImage(0, 1, new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_INT_RGB));
 		gui.autoSetPreferredSize();
 
-		ShowImages.showWindow(gui,"Example Stabilization", true);
+		ShowImages.showWindow(gui, "Example Stabilization", true);
 
 		// process the video sequence one frame at a time
-		while( video.hasNext() ) {
-			if( !stabilize.process(video.next()) )
+		while (video.hasNext()) {
+			if (!stabilize.process(video.next()))
 				throw new RuntimeException("Don't forget to handle failures!");
 
 			// display the stabilized image
-			ConvertBufferedImage.convertTo(frame,gui.getImage(0, 0),true);
-			ConvertBufferedImage.convertTo(stabilize.getStitchedImage(), gui.getImage(0, 1),true);
+			ConvertBufferedImage.convertTo(frame, gui.getImage(0, 0), true);
+			ConvertBufferedImage.convertTo(stabilize.getStitchedImage(), gui.getImage(0, 1), true);
 
 			gui.repaint();
 

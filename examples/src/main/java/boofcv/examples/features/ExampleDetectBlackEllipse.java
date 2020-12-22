@@ -43,7 +43,7 @@ import java.io.File;
  */
 public class ExampleDetectBlackEllipse {
 	public static void main(String[] args) {
-		String images[] = new String[]{
+		String[] images = new String[]{
 				"shapes/polygons01.jpg",
 				"shapes/shapes02.png",
 				"fiducial/circle_hexagonal/image00.jpg",

@@ -33,12 +33,8 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
-import static boofcv.examples.stereo.ExampleStereoDisparity.denseDisparity;
-import static boofcv.examples.stereo.ExampleStereoDisparity.rectify;
 
 /**
  * Stereo disparity images can be very noisy and often times post processing to reduce the
@@ -78,7 +74,7 @@ public class ExampleStereoDisparitySmoothing {
 		var gui = new ListDisplayPanel();
 		gui.addImage("Before", VisualizeImageData.disparity(disparity, null, disparityRange, 0));
 		gui.addItem("Before 3D",
-				ExampleStereoDisparity3D.computeAndShowCloud(param, rectLeft, rectifier, disparity ));
+				ExampleStereoDisparity3D.computeAndShowCloud(param, rectLeft, rectifier, disparity));
 
 		// Here's what we came here for. Time to remove the speckle
 		var configSpeckle = new ConfigSpeckleFilter();
@@ -90,9 +86,9 @@ public class ExampleStereoDisparitySmoothing {
 		smoother.process(rectLeft, disparity, disparityRange);
 		gui.addImage("After", VisualizeImageData.disparity(disparity, null, disparityRange, 0));
 		gui.addItem("After 3D",
-				ExampleStereoDisparity3D.computeAndShowCloud(param, rectLeft, rectifier, disparity ));
+				ExampleStereoDisparity3D.computeAndShowCloud(param, rectLeft, rectifier, disparity));
 
 		// Notice how in the "After 3D" view the number of randomly floating points is much less?
-		ShowImages.showWindow(gui,"Disparity Smoothing", true);
+		ShowImages.showWindow(gui, "Disparity Smoothing", true);
 	}
 }

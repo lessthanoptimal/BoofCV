@@ -62,7 +62,6 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class ExampleRectifyCalibratedStereo {
-
 	public static void main( String[] args ) {
 		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 

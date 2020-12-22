@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -57,8 +58,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleBackgroundRemovalMoving {
-	public static void main(String[] args) {
-
+	public static void main( String[] args ) {
 		// Example with a moving camera.  Highlights why motion estimation is sometimes required
 		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg");
 		// Camera has a bit of jitter in it.  Static kinda works but motion reduces false positives
@@ -80,14 +80,14 @@ public class ExampleBackgroundRemovalMoving {
 		PointTracker tracker = FactoryPointTracker.klt(4, configDetector, 3, GrayF32.class, null);
 
 		// This estimates the 2D image motion
-		ImageMotion2D<GrayF32,Homography2D_F64> motion2D =
+		ImageMotion2D<GrayF32, Homography2D_F64> motion2D =
 				FactoryMotion2D.createMotion2D(500, 0.5, 3, 100, 0.6, 0.5, false, tracker, new Homography2D_F64());
 
 		ConfigBackgroundBasic configBasic = new ConfigBackgroundBasic(30, 0.005f);
 
 		// Configuration for Gaussian model.  Note that the threshold changes depending on the number of image bands
 		// 12 = gray scale and 40 = color
-		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12,0.001f);
+		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12, 0.001f);
 		configGaussian.initialVariance = 64;
 		configGaussian.minimumDifference = 5;
 
@@ -113,9 +113,9 @@ public class ExampleBackgroundRemovalMoving {
 		//====== Initialize Images
 
 		// storage for segmented image.  Background = 0, Foreground = 1
-		GrayU8 segmented = new GrayU8(video.getWidth(),video.getHeight());
+		GrayU8 segmented = new GrayU8(video.getWidth(), video.getHeight());
 		// Grey scale image that's the input for motion estimation
-		GrayF32 grey = new GrayF32(segmented.width,segmented.height);
+		GrayF32 grey = new GrayF32(segmented.width, segmented.height);
 
 		// coordinate frames
 		Homography2D_F32 firstToCurrent32 = new Homography2D_F32();
@@ -124,10 +124,10 @@ public class ExampleBackgroundRemovalMoving {
 		homeToWorld.a23 = grey.height/2;
 
 		// Create a background image twice the size of the input image.  Tell it that the home is in the center
-		background.initialize(grey.width * 2, grey.height * 2, homeToWorld);
+		background.initialize(grey.width*2, grey.height*2, homeToWorld);
 
-		BufferedImage visualized = new BufferedImage(segmented.width,segmented.height,BufferedImage.TYPE_INT_RGB);
-		ImageGridPanel gui = new ImageGridPanel(1,2);
+		BufferedImage visualized = new BufferedImage(segmented.width, segmented.height, BufferedImage.TYPE_INT_RGB);
+		ImageGridPanel gui = new ImageGridPanel(1, 2);
 		gui.setImages(visualized, visualized);
 
 		ShowImages.showWindow(gui, "Detections", true);
@@ -135,13 +135,13 @@ public class ExampleBackgroundRemovalMoving {
 		double fps = 0;
 		double alpha = 0.01; // smoothing factor for FPS
 
-		while( video.hasNext() ) {
+		while (video.hasNext()) {
 			ImageBase input = video.next();
 
 			long before = System.nanoTime();
 			GConvertImage.convert(input, grey);
 
-			if( !motion2D.process(grey) ) {
+			if (!motion2D.process(grey)) {
 				throw new RuntimeException("Should handle this scenario");
 			}
 
@@ -149,19 +149,19 @@ public class ExampleBackgroundRemovalMoving {
 			ConvertMatrixData.convert(firstToCurrent64, firstToCurrent32);
 
 			background.segment(firstToCurrent32, input, segmented);
-			background.updateBackground(firstToCurrent32,input);
+			background.updateBackground(firstToCurrent32, input);
 			long after = System.nanoTime();
 
-			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));
+			fps = (1.0 - alpha)*fps + alpha*(1.0/((after - before)/1e9));
 
-			VisualizeBinaryData.renderBinary(segmented,false,visualized);
+			VisualizeBinaryData.renderBinary(segmented, false, visualized);
 			gui.setImage(0, 0, (BufferedImage)video.getGuiImage());
 			gui.setImage(0, 1, visualized);
 			gui.repaint();
 
-			System.out.println("FPS = "+fps);
+			System.out.println("FPS = " + fps);
 
-			try {Thread.sleep(5);} catch (InterruptedException e) {}
+			BoofMiscOps.sleep(5);
 		}
 	}
 }

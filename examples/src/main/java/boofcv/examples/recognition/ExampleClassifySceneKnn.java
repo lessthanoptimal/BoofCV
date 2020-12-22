@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,16 +91,16 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 	// Algorithms
 	ClusterVisualWords cluster;
-	DescribeImageDense<GrayU8,TupleDesc_F64> describeImage;
+	DescribeImageDense<GrayU8, TupleDesc_F64> describeImage;
 	NearestNeighbor<HistogramScene> nn;
 
-	ClassifierKNearestNeighborsBow<GrayU8,TupleDesc_F64> classifier;
+	ClassifierKNearestNeighborsBow<GrayU8, TupleDesc_F64> classifier;
 
-	public ExampleClassifySceneKnn(final DescribeImageDense<GrayU8, TupleDesc_F64> describeImage,
-								   ComputeClusters<double[]> clusterer,
-								   NearestNeighbor<HistogramScene> nn) {
+	public ExampleClassifySceneKnn( final DescribeImageDense<GrayU8, TupleDesc_F64> describeImage,
+									ComputeClusters<double[]> clusterer,
+									NearestNeighbor<HistogramScene> nn ) {
 		this.describeImage = describeImage;
-		this.cluster = new ClusterVisualWords(clusterer, describeImage.createDescription().size(),0xFEEDBEEF);
+		this.cluster = new ClusterVisualWords(clusterer, describeImage.createDescription().size(), 0xFEEDBEEF);
 		this.nn = nn;
 	}
 
@@ -112,7 +112,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		// Either load pre-computed words or compute the words from the training images
 		AssignCluster<double[]> assignment;
-		if( new File(CLUSTER_FILE_NAME).exists() ) {
+		if (new File(CLUSTER_FILE_NAME).exists()) {
 			assignment = UtilIO.load(CLUSTER_FILE_NAME);
 		} else {
 			System.out.println(" Computing clusters");
@@ -120,15 +120,15 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		}
 
 		// Use these clusters to assign features to words
-		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment,HISTOGRAM_HARD);
+		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment, HISTOGRAM_HARD);
 
 		// Storage for the work histogram in each image in the training set and their label
 		List<HistogramScene> memory;
 
-		if( !new File(HISTOGRAM_FILE_NAME).exists() ) {
+		if (!new File(HISTOGRAM_FILE_NAME).exists()) {
 			System.out.println(" computing histograms");
 			memory = computeHistograms(featuresToHistogram);
-			UtilIO.save(memory,HISTOGRAM_FILE_NAME);
+			UtilIO.save(memory, HISTOGRAM_FILE_NAME);
 		}
 	}
 
@@ -140,17 +140,17 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		// computes features in the training image set
 		List<TupleDesc_F64> features = new ArrayList<>();
-		for( String scene : train.keySet() ) {
+		for (String scene : train.keySet()) {
 			List<String> imagePaths = train.get(scene);
 			System.out.println("   " + scene);
 
-			for( String path : imagePaths ) {
+			for (String path : imagePaths) {
 				GrayU8 image = UtilImageIO.loadImage(path, GrayU8.class);
 				describeImage.process(image);
 
 				// the descriptions will get recycled on the next call, so create a copy
-				for( TupleDesc_F64 d : describeImage.getDescriptions() ) {
-					features.add( d.copy() );
+				for (TupleDesc_F64 d : describeImage.getDescriptions()) {
+					features.add(d.copy());
 				}
 			}
 		}
@@ -173,7 +173,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		List<HistogramScene> memory = UtilIO.load(HISTOGRAM_FILE_NAME);
 		AssignCluster<double[]> assignment = UtilIO.load(CLUSTER_FILE_NAME);
 
-		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment,HISTOGRAM_HARD);
+		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment, HISTOGRAM_HARD);
 
 
 		// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
@@ -188,14 +188,14 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	 * For all the images in the training data set it computes a {@link HistogramScene}.  That data structure
 	 * contains the word histogram and the scene that the histogram belongs to.
 	 */
-	private List<HistogramScene> computeHistograms(FeatureToWordHistogram_F64 featuresToHistogram ) {
+	private List<HistogramScene> computeHistograms( FeatureToWordHistogram_F64 featuresToHistogram ) {
 
 		List<String> scenes = getScenes();
 
 		List<HistogramScene> memory;// Processed results which will be passed into the k-NN algorithm
 		memory = new ArrayList<>();
 
-		for( int sceneIndex = 0; sceneIndex < scenes.size(); sceneIndex++ ) {
+		for (int sceneIndex = 0; sceneIndex < scenes.size(); sceneIndex++) {
 			String scene = scenes.get(sceneIndex);
 			System.out.println("   " + scene);
 			List<String> imagePaths = train.get(scene);
@@ -206,7 +206,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 				// reset before processing a new image
 				featuresToHistogram.reset();
 				describeImage.process(image);
-				for ( TupleDesc_F64 d : describeImage.getDescriptions() ) {
+				for (TupleDesc_F64 d : describeImage.getDescriptions()) {
 					featuresToHistogram.addFeature(d);
 				}
 				featuresToHistogram.process();
@@ -227,20 +227,20 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	}
 
 	@Override
-	protected int classify(String path) {
+	protected int classify( String path ) {
 		GrayU8 image = UtilImageIO.loadImage(path, GrayU8.class);
 
 		return classifier.classify(image);
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
-		ConfigDenseSurfFast surfFast = new ConfigDenseSurfFast(new DenseSampling(8,8));
+		ConfigDenseSurfFast surfFast = new ConfigDenseSurfFast(new DenseSampling(8, 8));
 //		ConfigDenseSurfStable surfStable = new ConfigDenseSurfStable(new DenseSampling(8,8));
 //		ConfigDenseSift sift = new ConfigDenseSift(new DenseSampling(6,6));
 //		ConfigDenseHoG hog = new ConfigDenseHoG();
 
-		DescribeImageDense<GrayU8,TupleDesc_F64> desc =
+		DescribeImageDense<GrayU8, TupleDesc_F64> desc =
 				FactoryDescribeImageDense.surfFast(surfFast, GrayU8.class);
 //				FactoryDescribeImageDense.surfStable(surfStable, GrayU8.class);
 //				FactoryDescribeImageDense.sift(sift, GrayU8.class);
@@ -251,25 +251,25 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		int pointDof = desc.createDescription().size();
 		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive(new KdTreeHistogramScene_F64(pointDof));
-		ExampleClassifySceneKnn example = new ExampleClassifySceneKnn(desc,clusterer,nn);
+		ExampleClassifySceneKnn example = new ExampleClassifySceneKnn(desc, clusterer, nn);
 
 		File trainingDir = new File(UtilIO.pathExample("learning/scene/train"));
 		File testingDir = new File(UtilIO.pathExample("learning/scene/test"));
 
-		if( !trainingDir.exists() || !testingDir.exists() ) {
+		if (!trainingDir.exists() || !testingDir.exists()) {
 			String addressSrc = "http://boofcv.org/notwiki/largefiles/bow_data_v001.zip";
-			File dst = new File(trainingDir.getParentFile(),"bow_data_v001.zip");
+			File dst = new File(trainingDir.getParentFile(), "bow_data_v001.zip");
 			try {
 				DeepBoofDataBaseOps.download(addressSrc, dst);
 				DeepBoofDataBaseOps.decompressZip(dst, dst.getParentFile(), true);
 				System.out.println("Download complete!");
-			} catch( IOException e ) {
+			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
 		} else {
 			System.out.println("Delete and download again if there are file not found errors");
-			System.out.println("   "+trainingDir);
-			System.out.println("   "+testingDir);
+			System.out.println("   " + trainingDir);
+			System.out.println("   " + testingDir);
 		}
 
 		example.loadSets(trainingDir, null, testingDir);
@@ -286,7 +286,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		// Show confusion matrix
 		// Not the best coloration scheme...  perfect = red diagonal and blue elsewhere.
 		ShowImages.showWindow(new ConfusionMatrixPanel(
-				confusion.getMatrix(),example.getScenes(), 400, true), "Confusion Matrix", true);
+				confusion.getMatrix(), example.getScenes(), 400, true), "Confusion Matrix", true);
 
 		// For SIFT descriptor the accuracy is          54.0%
 		// For  "fast"  SURF descriptor the accuracy is 52.2%

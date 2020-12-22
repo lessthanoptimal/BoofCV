@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleFiducialRandomDots {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		// The definitions file specifies where dots are on each marker and other bits of meta data
 		RandomDotDefinition defs = FiducialIO.loadRandomDotYaml(
 				UtilIO.fileExample("fiducial/random_dots/descriptions.yaml"));
@@ -64,7 +64,7 @@ public class ExampleFiducialRandomDots {
 		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config, GrayU8.class);
 
 		// Load / learn all the markers. This can take a few seconds if there are a lot of markers
-		for( List<Point2D_F64> marker : defs.markers ) {
+		for (List<Point2D_F64> marker : defs.markers) {
 			detector.addMarker(marker);
 		}
 
@@ -72,11 +72,11 @@ public class ExampleFiducialRandomDots {
 		// this information then just things like the bounding box will be returned
 		CameraPinholeBrown intrinsic = CalibrationIO.load(
 				UtilIO.fileExample("fiducial/random_dots/intrinsic.yaml"));
-		detector.setLensDistortion(LensDistortionFactory.narrow(intrinsic),intrinsic.width,intrinsic.height);
+		detector.setLensDistortion(LensDistortionFactory.narrow(intrinsic), intrinsic.width, intrinsic.height);
 
 		// It's now ready to start processing images. Let's load an image
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("fiducial/random_dots/image02.jpg"));
-		GrayU8 gray = ConvertBufferedImage.convertFrom(image,false, ImageType.SB_U8);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(image, false, ImageType.SB_U8);
 
 		detector.detect(gray);
 
@@ -89,18 +89,18 @@ public class ExampleFiducialRandomDots {
 			detector.getBounds(i, bounds);
 			detector.getCenter(i, center);
 
-			g2.setColor(new Color(50,50,255));
+			g2.setColor(new Color(50, 50, 255));
 			g2.setStroke(new BasicStroke(10));
-			VisualizeShapes.drawPolygon(bounds,true,1.0,g2);
+			VisualizeShapes.drawPolygon(bounds, true, 1.0, g2);
 			VisualizeFiducial.drawLabel(center, "" + detector.getId(i), g2);
 
-			System.out.println("Target ID = "+detector.getId(i));
+			System.out.println("Target ID = " + detector.getId(i));
 
-			if( detector.is3D() ) {
+			if (detector.is3D()) {
 				detector.getFiducialToCamera(i, targetToSensor);
 				VisualizeFiducial.drawCube(targetToSensor, intrinsic, detector.getWidth(i), 3, g2);
 			}
 		}
-		ShowImages.showWindow(image,"Random Dot Markers",true);
+		ShowImages.showWindow(image, "Random Dot Markers", true);
 	}
 }

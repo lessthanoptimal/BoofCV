@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class ExamplePyramidFloat<T extends ImageGray<T>> {
 	// The pyramid data structure
 	PyramidFloat<T> pyramid;
 
-	public ExamplePyramidFloat(Class<T> imageType) {
+	public ExamplePyramidFloat( Class<T> imageType ) {
 		this.imageType = imageType;
 	}
 
@@ -56,10 +56,10 @@ public class ExamplePyramidFloat<T extends ImageGray<T>> {
 	public void standard() {
 		// Scale factory for each layer can be any floating point value which is larger than
 		// the previous layer's scale.
-		double scales[] = new double[]{1,1.5,2,2.5,3,5,8,15};
+		double[] scales = new double[]{1, 1.5, 2, 2.5, 3, 5, 8, 15};
 		// the amount of blur which is applied to each layer in the pyramid after the previous layer has been sampled
-		double sigmas[] = new double[]{1,1,1,1,1,1,1,1};
-		pyramid = FactoryPyramid.floatGaussian(scales,sigmas,imageType);
+		double[] sigmas = new double[]{1, 1, 1, 1, 1, 1, 1, 1};
+		pyramid = FactoryPyramid.floatGaussian(scales, sigmas, imageType);
 	}
 
 	/**
@@ -73,14 +73,13 @@ public class ExamplePyramidFloat<T extends ImageGray<T>> {
 		gui.set(pyramid, true);
 		gui.render();
 
-		ShowImages.showWindow(gui,"Image Pyramid Float");
+		ShowImages.showWindow(gui, "Image Pyramid Float");
 
 		// To get an image at any of the scales simply call this get function
 		T imageAtScale = pyramid.getLayer(1);
 
-		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageAtScale,null,true),"Image at layer 1");
+		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageAtScale, null, true), "Image at layer 1");
 	}
-
 
 	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));

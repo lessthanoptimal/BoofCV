@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class ExampleImageConvert {
 	// gray scale image with element values from 0 to 255
 	GrayU8 gray;
 	// Derivative of gray image.  Elements are 16-bit signed integers
-	GrayS16 derivX,derivY;
+	GrayS16 derivX, derivY;
 
 	void convert() {
 		// Converting between BoofCV image types is easy with ConvertImage.  ConvertImage copies
@@ -57,23 +57,23 @@ public class ExampleImageConvert {
 		// in account the storage capabilities of these different class types.
 
 		// Going from an unsigned 8-bit image to unsigned 16-bit image is no problem
-		GrayU16 imageU16 = new GrayU16(gray.width,gray.height);
-		ConvertImage.convert(gray,imageU16);
+		GrayU16 imageU16 = new GrayU16(gray.width, gray.height);
+		ConvertImage.convert(gray, imageU16);
 
 		// You can convert back into the 8-bit image from the 16-bit image with no problem
 		// in this situation because imageU16 does not use the full range of 16-bit values
-		ConvertImage.convert(imageU16,gray);
+		ConvertImage.convert(imageU16, gray);
 
 		// Here is an example where you over flow the image after converting
 		// There won't be an exception or any error messages but the output image will be corrupted
-		GrayU8 imageBad = new GrayU8(derivX.width,derivX.height);
-		ConvertImage.convert(derivX,imageBad);
+		GrayU8 imageBad = new GrayU8(derivX.width, derivX.height);
+		ConvertImage.convert(derivX, imageBad);
 
 		// One way to get around this problem rescale and adjust the pixel values so that they
 		// will be within a valid range.
-		GrayS16 scaledAbs = new GrayS16(derivX.width,derivX.height);
-		GPixelMath.abs(derivX,scaledAbs);
-		GPixelMath.multiply(scaledAbs, 255.0 / ImageStatistics.max(scaledAbs), scaledAbs);
+		GrayS16 scaledAbs = new GrayS16(derivX.width, derivX.height);
+		GPixelMath.abs(derivX, scaledAbs);
+		GPixelMath.multiply(scaledAbs, 255.0/ImageStatistics.max(scaledAbs), scaledAbs);
 
 		// If you just want to see the values of a 16-bit image there are built in utility functions
 		// for visualizing their values too
@@ -82,14 +82,14 @@ public class ExampleImageConvert {
 		// Let's see what all the bad image looks like
 		// ConvertBufferedImage is similar to ImageConvert in that it does a direct coversion with out
 		// adjusting the pixel's value
-		BufferedImage outBad = new BufferedImage(imageBad.width,imageBad.height,BufferedImage.TYPE_INT_RGB);
-		BufferedImage outScaled = new BufferedImage(imageBad.width,imageBad.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage outBad = new BufferedImage(imageBad.width, imageBad.height, BufferedImage.TYPE_INT_RGB);
+		BufferedImage outScaled = new BufferedImage(imageBad.width, imageBad.height, BufferedImage.TYPE_INT_RGB);
 
 		ListDisplayPanel panel = new ListDisplayPanel();
-		panel.addImage(ConvertBufferedImage.convertTo(scaledAbs,outScaled),"Scaled");
-		panel.addImage(colorX,"Visualized");
-		panel.addImage(ConvertBufferedImage.convertTo(imageBad,outBad),"Bad");
-		ShowImages.showWindow(panel,"Image Convert",true);
+		panel.addImage(ConvertBufferedImage.convertTo(scaledAbs, outScaled), "Scaled");
+		panel.addImage(colorX, "Visualized");
+		panel.addImage(ConvertBufferedImage.convertTo(imageBad, outBad), "Bad");
+		ShowImages.showWindow(panel, "Image Convert", true);
 	}
 
 	/**
@@ -107,7 +107,6 @@ public class ExampleImageConvert {
 
 	public static void main( String[] args ) {
 		ExampleImageConvert app = new ExampleImageConvert();
-
 		app.createImages();
 		app.convert();
 	}

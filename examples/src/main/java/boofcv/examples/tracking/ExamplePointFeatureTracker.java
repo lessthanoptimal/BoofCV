@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,8 +54,7 @@ import java.io.FileNotFoundException;
  *
  * @author Peter Abeles
  */
-public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends ImageGray<D>>
-{
+public class ExamplePointFeatureTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	// type of input image
 	Class<T> imageType;
 	Class<D> derivType;
@@ -68,7 +67,7 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 
 	int pause;
 
-	public ExamplePointFeatureTracker(Class<T> imageType , int pause ) {
+	public ExamplePointFeatureTracker( Class<T> imageType, int pause ) {
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		this.pause = pause;
@@ -77,22 +76,22 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 	/**
 	 * Processes the sequence of images and displays the tracked features in a window
 	 */
-	public void process(SimpleImageSequence<T> sequence) {
+	public void process( SimpleImageSequence<T> sequence ) {
 
 		// Figure out how large the GUI window should be
 		T frame = sequence.next();
-		gui.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()));
-		ShowImages.showWindow(gui,"KTL Tracker", true);
+		gui.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight()));
+		ShowImages.showWindow(gui, "KTL Tracker", true);
 
 		// process each frame in the image sequence
-		while( sequence.hasNext() ) {
+		while (sequence.hasNext()) {
 			frame = sequence.next();
 
 			// tell the tracker to process the frame
 			tracker.process(frame);
 
 			// if there are too few tracks spawn more
-			if( tracker.getActiveTracks(null).size() < 130 )
+			if (tracker.getActiveTracks(null).size() < 130)
 				tracker.spawnTracks();
 
 			// visualize tracking results
@@ -106,20 +105,20 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 	/**
 	 * Draw tracked features in blue, or red if they were just spawned.
 	 */
-	private void updateGUI(SimpleImageSequence<T> sequence) {
+	private void updateGUI( SimpleImageSequence<T> sequence ) {
 		BufferedImage orig = sequence.getGuiImage();
 		Graphics2D g2 = orig.createGraphics();
 
 		// draw tracks with semi-unique colors so you can track individual points with your eyes
-		for( PointTrack p : tracker.getActiveTracks(null) ) {
+		for (PointTrack p : tracker.getActiveTracks(null)) {
 			int red = (int)(2.5*(p.featureId%100));
 			int green = (int)((255.0/150.0)*(p.featureId%150));
 			int blue = (int)(p.featureId%255);
-			VisualizeFeatures.drawPoint(g2, (int)p.pixel.x, (int)p.pixel.y, new Color(red,green,blue));
+			VisualizeFeatures.drawPoint(g2, (int)p.pixel.x, (int)p.pixel.y, new Color(red, green, blue));
 		}
 
 		// draw tracks which have just been spawned green
-		for( PointTrack p : tracker.getNewTracks(null) ) {
+		for (PointTrack p : tracker.getNewTracks(null)) {
 			VisualizeFeatures.drawPoint(g2, (int)p.pixel.x, (int)p.pixel.y, Color.green);
 		}
 
@@ -158,18 +157,18 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-
 		Class imageType = GrayF32.class;
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
 		int pause;
 		SimpleImageSequence sequence =
-				media.openVideo(UtilIO.pathExample("zoom.mjpeg"), ImageType.single(imageType)); pause=100;
+				media.openVideo(UtilIO.pathExample("zoom.mjpeg"), ImageType.single(imageType));
+		pause = 100;
 //				media.openCamera(null,640,480,ImageType.single(imageType)); pause = 5;
 		sequence.setLoop(true);
 
-		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType,pause);
+		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType, pause);
 
 		// Comment or un-comment to change the type of tracker being used
 		app.createKLT();

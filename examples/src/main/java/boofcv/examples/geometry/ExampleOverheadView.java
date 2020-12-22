@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,36 +45,36 @@ public class ExampleOverheadView {
 	public static void main( String[] args ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("road/left01.png"));
 
-		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromPlanar(input, null,true, GrayU8.class);
+		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
 
 		StereoParameters stereoParam = CalibrationIO.load(UtilIO.pathExample("road/stereo01.yaml"));
 		Se3_F64 groundToLeft = CalibrationIO.load(UtilIO.pathExample("road/ground_to_left_01.yaml"));
 
 		CreateSyntheticOverheadView<Planar<GrayU8>> generateOverhead =
-				new CreateSyntheticOverheadViewPL<>(InterpolationType.BILINEAR,3,GrayU8.class);
+				new CreateSyntheticOverheadViewPL<>(InterpolationType.BILINEAR, 3, GrayU8.class);
 
 		// size of cells in the overhead image in world units
 		double cellSize = 0.05;
 
 		// You can use this to automatically select reasonable values for the overhead image
-		SelectOverheadParameters selectMapSize = new SelectOverheadParameters(cellSize,20,0.5);
-		selectMapSize.process(stereoParam.left,groundToLeft);
+		SelectOverheadParameters selectMapSize = new SelectOverheadParameters(cellSize, 20, 0.5);
+		selectMapSize.process(stereoParam.left, groundToLeft);
 
 		int overheadWidth = selectMapSize.getOverheadWidth();
 		int overheadHeight = selectMapSize.getOverheadHeight();
 
 		Planar<GrayU8> overheadRGB =
-				new Planar<>(GrayU8.class,overheadWidth,overheadHeight,3);
-		generateOverhead.configure(stereoParam.left,groundToLeft,
-				selectMapSize.getCenterX(), selectMapSize.getCenterY(), cellSize,overheadRGB.width,overheadRGB.height);
+				new Planar<>(GrayU8.class, overheadWidth, overheadHeight, 3);
+		generateOverhead.configure(stereoParam.left, groundToLeft,
+				selectMapSize.getCenterX(), selectMapSize.getCenterY(), cellSize, overheadRGB.width, overheadRGB.height);
 
 		generateOverhead.process(imageRGB, overheadRGB);
 
 		// note that the left/right values are swapped in the overhead image.  This is an artifact of the plane's
 		// 2D coordinate system having +y pointing up, while images have +y pointing down.
-		BufferedImage output = ConvertBufferedImage.convertTo(overheadRGB,null,true);
+		BufferedImage output = ConvertBufferedImage.convertTo(overheadRGB, null, true);
 
-		ShowImages.showWindow(input,"Input Image",true);
-		ShowImages.showWindow(output,"Overhead Image",true);
+		ShowImages.showWindow(input, "Input Image", true);
+		ShowImages.showWindow(output, "Overhead Image", true);
 	}
 }

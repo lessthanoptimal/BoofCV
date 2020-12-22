@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,9 +64,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExamplePoseOfCalibrationTarget {
-
 	public static void main( String[] args ) {
-
 		// Load camera calibration
 		CameraPinholeBrown intrinsic =
 				CalibrationIO.load(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.yaml"));
@@ -81,9 +79,9 @@ public class ExamplePoseOfCalibrationTarget {
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
 		CalibrationFiducialDetector<GrayF32> detector =
-				FactoryFiducial.calibChessboardX(null,new ConfigGridDimen(4, 5, 0.03),GrayF32.class);
+				FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(4, 5, 0.03), GrayF32.class);
 
-		detector.setLensDistortion(lensDistortion,intrinsic.width,intrinsic.height);
+		detector.setLensDistortion(lensDistortion, intrinsic.width, intrinsic.height);
 
 		// Get the 2D coordinate of calibration points for visualization purposes
 		List<Point2D_F64> calibPts = detector.getCalibrationPoints();
@@ -94,14 +92,14 @@ public class ExamplePoseOfCalibrationTarget {
 		viewer.setTranslationStep(0.01);
 		viewer.setBackgroundColor(0xFFFFFF); // white background
 		// make the view more interest.  From the side.
-		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0,null);
-		viewer.setCameraToWorld(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)).invert(null));
+		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0, null);
+		viewer.setCameraToWorld(new Se3_F64(rotY, new Vector3D_F64(0.75, 0, 1.25)).invert(null));
 		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
 		JComponent viewerComponent = viewer.getComponent();
-		viewerComponent.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
-		PanelGridPanel gui = new PanelGridPanel(1,imagePanel,viewerComponent);
+		viewerComponent.setPreferredSize(new Dimension(intrinsic.width, intrinsic.height));
+		PanelGridPanel gui = new PanelGridPanel(1, imagePanel, viewerComponent);
 		gui.setMaximumSize(gui.getPreferredSize());
-		ShowImages.showWindow(gui,"Calibration Target Pose",true);
+		ShowImages.showWindow(gui, "Calibration Target Pose", true);
 
 		// Allows the user to click on the image and pause
 		MousePauseHelper pauseHelper = new MousePauseHelper(gui);
@@ -111,12 +109,11 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Process each frame in the video sequence
 		Se3_F64 targetToCamera = new Se3_F64();
-		while( video.hasNext() ) {
-
+		while (video.hasNext()) {
 			// detect calibration points
 			detector.detect(video.next());
 
-			if( detector.totalFound() == 1 ) {
+			if (detector.totalFound() == 1) {
 				detector.getFiducialToCamera(0, targetToCamera);
 
 				// Visualization.  Show a path with green points and the calibration points in black
@@ -138,12 +135,12 @@ public class ExamplePoseOfCalibrationTarget {
 				}
 			}
 
-			imagePanel.setImage((BufferedImage) video.getGuiImage());
+			imagePanel.setImage((BufferedImage)video.getGuiImage());
 			viewerComponent.repaint();
 			imagePanel.repaint();
 
 			BoofMiscOps.pause(30);
-			while( pauseHelper.isPaused() ) {
+			while (pauseHelper.isPaused()) {
 				BoofMiscOps.pause(30);
 			}
 		}

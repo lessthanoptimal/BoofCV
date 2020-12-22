@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleRemovePerspectiveDistortion {
-	public static void main(String[] args) {
-
+	public static void main( String[] args ) {
 		// load a color image
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("goals_and_stuff.jpg"));
 		Planar<GrayF32> input = ConvertBufferedImage.convertFromPlanar(buffered, null, true, GrayF32.class);
@@ -51,16 +50,16 @@ public class ExampleRemovePerspectiveDistortion {
 
 		// Specify the corners in the input image of the region.
 		// Order matters! top-left, top-right, bottom-right, bottom-left
-		if( !removePerspective.apply(input,
+		if (!removePerspective.apply(input,
 				new Point2D_F64(267, 182), new Point2D_F64(542, 68),
-				new Point2D_F64(519, 736), new Point2D_F64(276, 570)) ){
+				new Point2D_F64(519, 736), new Point2D_F64(276, 570))) {
 			throw new RuntimeException("Failed!?!?");
 		}
 
 		Planar<GrayF32> output = removePerspective.getOutput();
 
-		BufferedImage flat = ConvertBufferedImage.convertTo_F32(output,null,true);
-		ShowImages.showWindow(buffered,"Original Image",true);
-		ShowImages.showWindow(flat,"Without Perspective Distortion",true);
+		BufferedImage flat = ConvertBufferedImage.convertTo_F32(output, null, true);
+		ShowImages.showWindow(buffered, "Original Image", true);
+		ShowImages.showWindow(flat, "Without Perspective Distortion", true);
 	}
 }

@@ -44,7 +44,6 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleBackgroundRemovalStationary {
 	public static void main(String[] args) {
-
 		String fileName = UtilIO.pathExample("background/street_intersection.mp4");
 //		String fileName = UtilIO.pathExample("background/rubixfire.mp4"); // dynamic background
 //		String fileName = UtilIO.pathExample("background/horse_jitter.mp4"); // degraded performance because of jitter

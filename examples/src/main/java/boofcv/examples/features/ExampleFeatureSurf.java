@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleFeatureSurf {
-
 	/**
 	 * Use generalized interfaces for working with SURF.  This removes much of the drudgery, but also reduces flexibility
 	 * and slightly increases memory and computational requirements.
@@ -73,13 +72,10 @@ public class ExampleFeatureSurf {
 	}
 
 	/**
-	 * UPDATE THESE COMMENTS. SURF FEATURE NO LONGER EXISTS
-	 *
 	 * Configured exactly the same as the easy example above, but require a lot more code and a more in depth
-	 * understanding of how SURF works and is configured.  Instead of TupleDesc_F64, SurfFeature are computed in
-	 * this case.  They are almost the same as TupleDesc_F64, but contain the Laplacian's sign which can be used
-	 * to speed up association. That is an example of how using less generalized interfaces can improve performance.
-	 * 
+	 * understanding of how SURF works and is configured.  Each sub-problem which composes "SURF" is now explicitly
+	 * created and configured independently. This allows an advance user to tune it for a specific problem.
+	 *
 	 * @param image Input image type. DOES NOT NEED TO BE GrayF32, GrayU8 works too
 	 */
 	public static <II extends ImageGray<II>> void harder(GrayF32 image ) {
@@ -94,10 +90,9 @@ public class ExampleFeatureSurf {
 		FastHessianFeatureDetector<II> detector = FactoryInterestPointAlgs.fastHessian(config);
 
 		// estimate orientation
-		OrientationIntegral<II> orientation = 
-				FactoryOrientationAlgs.sliding_ii(null, integralType);
+		OrientationIntegral<II> orientation =  FactoryOrientationAlgs.sliding_ii(null, integralType);
 
-		DescribePointSurf<II> descriptor = FactoryDescribePointAlgs.<II>surfStability(null,integralType);
+		DescribePointSurf<II> descriptor = FactoryDescribePointAlgs.surfStability(null,integralType);
 		
 		// compute the integral image of 'image'
 		II integral = GeneralizedImageOps.createSingleBand(integralType,image.width,image.height);
@@ -131,9 +126,8 @@ public class ExampleFeatureSurf {
 	}
 
 	public static void main( String[] args ) {
-
 		// Need to turn off concurrency since the order in which feature are returned
-		// is not determininistic if turned on
+		// is not deterministic if turned on
 		BoofConcurrency.USE_CONCURRENT = false;
 
 		GrayF32 image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"), GrayF32.class);
@@ -143,6 +137,5 @@ public class ExampleFeatureSurf {
 		ExampleFeatureSurf.harder(image);
 		
 		System.out.println("Done!");
-		
 	}
 }

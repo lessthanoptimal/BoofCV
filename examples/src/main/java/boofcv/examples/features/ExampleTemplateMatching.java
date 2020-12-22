@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleTemplateMatching {
-
 	/**
 	 * Demonstrates how to search for matches of a template inside an image
 	 *
@@ -73,7 +72,6 @@ public class ExampleTemplateMatching {
 	 * a better match to the template.
 	 */
 	private static void showMatchIntensity(GrayF32 image, GrayF32 template, GrayF32 mask) {
-
 		// create algorithm for computing intensity image
 		TemplateMatchingIntensity<GrayF32> matchIntensity =
 				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_SQUARE_ERROR, GrayF32.class);
@@ -100,7 +98,6 @@ public class ExampleTemplateMatching {
 	}
 
 	public static void main(String[] args) {
-
 		// Load image and templates
 		String directory = UtilIO.pathExample("template");
 
