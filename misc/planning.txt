@@ -13,14 +13,6 @@ TODO Stereo Feature Association
    - Take in max distance as a parameter too
    - Verify that it doesn't allow impossible associations either
 
-- Scene Reconstruction
-  * TODO Improve stability of sparse metric upgrade. Local SBA and multiple seeds?
-  * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
-  * TODO when associating objects split into feature types, e.g. white and black blobs
-  * TODO try improving 3-view by estimating lens distortion in projective camera
-- Multi-View Stereo
-  * TODO Improve point filtering of dense cloud. Way too noisy now
-
 NOTES: Format lint checks
  - Checkstyle can't be used since it does not allow for concise blocks and there is no built in way to just run on
    files that have been changed
