@@ -43,7 +43,7 @@ Update prebuilt applications and demonstrations using https://github.com/lesstha
 
 - Publish SNAPSHOT:
 
-./gradlew uploadArchives
+./gradlew publish
 
 - Publish Stable Release:
 
