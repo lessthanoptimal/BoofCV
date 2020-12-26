@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,76 +19,64 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkEdgeNonMaxSupression {
 
-	static final long TEST_TIME = 1000;
-	static Random rand = new Random(234234);
+	@Param({"true", "false"})
+	boolean concurrent;
 
-	final static int width = 640;
-	final static int height = 480;
+	int imageSize = 800;
 
-	static GrayF32 intensity = new GrayF32(width,height);
-	static GrayF32 output = new GrayF32(width,height);
-	static GrayS8 direction4 = new GrayS8(width,height);
-	static GrayS8 direction8 = new GrayS8(width,height);
+	GrayF32 intensity, output;
+	GrayS8 direction4 = new GrayS8(imageSize, imageSize);
+	GrayS8 direction8 = new GrayS8(imageSize, imageSize);
 
+	@Setup public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+		var rand = new Random(234234);
 
-	public static class Naive4_F32 extends PerformerBase {
+		intensity = new GrayF32(imageSize, imageSize);
+		output = intensity.createSameShape();
 
-		@Override
-		public void process() {
-			ImplEdgeNonMaxSuppression.naive4(intensity, direction4,output);
-		}
-	}
-
-	public static class Main4_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction4,output);
-		}
-	}
-
-	public static class Naive8_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			ImplEdgeNonMaxSuppression.naive8(intensity,direction8,output);
-		}
-	}
-
-	public static class Main8_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.nonMaxSuppression8(intensity,direction8,output);
-		}
-	}
-
-	public static void main(String[] args) {
-		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
+		GImageMiscOps.fillUniform(intensity, rand, 0, 100);
 		ImageMiscOps.fillUniform(direction4, rand, -1, 3);
 		ImageMiscOps.fillUniform(direction8, rand, -3, 5);
+	}
 
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
-		System.out.println();
+	// @formatter:off
+	@Benchmark public void Naive4() {ImplEdgeNonMaxSuppression.naive4(intensity, direction4, output);}
+	@Benchmark public void Main4() {GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction4, output);}
+	@Benchmark public void Naive8() {ImplEdgeNonMaxSuppression.naive8(intensity, direction4, output);}
+	@Benchmark public void Main8() {GradientToEdgeFeatures.nonMaxSuppression8(intensity, direction4, output);}
+	// @formatter:on
 
-		ProfileOperation.printOpsPerSec(new Naive4_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Main4_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Naive8_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Main8_F32(), TEST_TIME);
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkEdgeNonMaxSupression.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
+		new Runner(opt).run();
 	}
 }

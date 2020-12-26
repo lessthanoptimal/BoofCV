@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,9 @@
 
 package boofcv.alg.transform.wavelet;
 
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
@@ -30,13 +28,21 @@ import boofcv.struct.image.ImageDimension;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode({Mode.AverageTime,Mode.Throughput})
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 2)
 public class BenchmarkWaveletTransform {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
@@ -45,81 +51,55 @@ public class BenchmarkWaveletTransform {
 	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 	static WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5,BorderType.REFLECT);
 
-	static GrayF32 orig_F32 = new GrayF32(imgWidth,imgHeight);
-	static GrayF32 temp1_F32 = new GrayF32(imgWidth,imgHeight);
-	static GrayF32 temp2_F32 = new GrayF32(imgWidth,imgHeight);
-	static GrayS32 orig_I32 = new GrayS32(imgWidth,imgHeight);
-	static GrayS32 temp1_I32 = new GrayS32(imgWidth,imgHeight);
-	static GrayS32 temp2_I32 = new GrayS32(imgWidth,imgHeight);
+	GrayF32 orig_F32 = new GrayF32(imgWidth,imgHeight);
+	GrayF32 temp1_F32 = new GrayF32(imgWidth,imgHeight);
+	GrayF32 temp2_F32 = new GrayF32(imgWidth,imgHeight);
+	GrayS32 orig_I32 = new GrayS32(imgWidth,imgHeight);
+	GrayS32 temp1_I32 = new GrayS32(imgWidth,imgHeight);
+	GrayS32 temp2_I32 = new GrayS32(imgWidth,imgHeight);
 
-	public static class Naive_F32 extends PerformerBase {
+	GrayF32 copy = new GrayF32(1,1);
 
-		@Override
-		public void process() {
-			ImplWaveletTransformNaive.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig_F32,temp1_F32);
-			ImplWaveletTransformNaive.vertical(desc_F32.getBorder(),desc_F32.getForward(),temp1_F32,temp2_F32);
-		}
-	}
-
-	public static class Standard_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			WaveletTransformOps.transform1(desc_F32,orig_F32,temp1_F32,temp1_F32);
-		}
-	}
-
-	public static class Naive_I32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			ImplWaveletTransformNaive.horizontal(desc_I32.getBorder(),desc_I32.getForward(),orig_I32,temp1_I32);
-			ImplWaveletTransformNaive.vertical(desc_I32.getBorder(),desc_I32.getForward(),temp1_I32,temp2_I32);
-		}
-	}
-
-	public static class Standard_I32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			WaveletTransformOps.transform1(desc_I32,orig_I32,temp1_I32,temp1_I32);
-		}
-	}
-
-	public static class FullLevel3_F32 extends PerformerBase {
-
-		static GrayF32 copy = new GrayF32(imgWidth,imgHeight);
-		GrayF32 tran;
-		GrayF32 storage;
-
-		public FullLevel3_F32() {
-			ImageDimension dim = UtilWavelet.transformDimension(copy,3);
-			tran = new GrayF32(dim.width,dim.height);
-			storage = new GrayF32(dim.width,dim.height);
-		}
-
-		@Override
-		public void process() {
-			// don't modify the input image
-			copy.setTo(orig_F32);
-			WaveletTransformOps.transformN(desc_F32,copy,tran,storage,3);
-		}
-	}
-
-
-	public static void main(String[] args) {
-
+	@Setup
+	public void setup() {
 		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(orig_F32, rand, 0, 100);
-		ImageMiscOps.fillUniform(orig_I32, rand, 0, 100);
 
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
+		GImageMiscOps.fillUniform(orig_F32, rand,0, 100);
+		GImageMiscOps.fillUniform(orig_I32, rand,0, 100);
+	}
 
-		ProfileOperation.printOpsPerSec(new FullLevel3_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Naive_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Standard_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Naive_I32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Standard_I32(), TEST_TIME);
+	@Benchmark public void Naive_F32() {
+		ImplWaveletTransformNaive.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig_F32,temp1_F32);
+		ImplWaveletTransformNaive.vertical(desc_F32.getBorder(),desc_F32.getForward(),temp1_F32,temp2_F32);
+	}
+
+	@Benchmark public void Standard_F32() {
+		WaveletTransformOps.transform1(desc_F32,orig_F32,temp1_F32,temp1_F32);
+	}
+
+	@Benchmark public void Naive_I32() {
+		ImplWaveletTransformNaive.horizontal(desc_I32.getBorder(),desc_I32.getForward(),orig_I32,temp1_I32);
+		ImplWaveletTransformNaive.vertical(desc_I32.getBorder(),desc_I32.getForward(),temp1_I32,temp2_I32);
+	}
+
+	@Benchmark public void Standard_I32() {
+		WaveletTransformOps.transform1(desc_I32,orig_I32,temp1_I32,temp1_I32);
+	}
+
+	@Benchmark public void FullLevel3_F32() {
+		// don't modify input image
+		copy.setTo(orig_F32);
+		ImageDimension dim = UtilWavelet.transformDimension(copy,3);
+		temp1_F32.reshape(dim.width,dim.height);
+		temp2_F32.reshape(dim.width,dim.height);
+		WaveletTransformOps.transformN(desc_F32,copy,temp1_F32,temp2_F32,3);
+	}
+
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkWaveletTransform.class.getSimpleName())
+				.build();
+
+		new Runner(opt).run();
 	}
 }

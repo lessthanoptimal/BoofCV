@@ -36,13 +36,13 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkDescriptorDistance {
 
 	static int NUM_FEATURES = 10000;
 
-	List<TupleDesc_B>  binaryA = new ArrayList<>();
-	List<TupleDesc_B>  binaryB = new ArrayList<>();
+	List<TupleDesc_B> binaryA = new ArrayList<>();
+	List<TupleDesc_B> binaryB = new ArrayList<>();
 	HammingTable16 table = new HammingTable16();
 
 	@Setup public void setup() {
@@ -57,19 +57,19 @@ public class BenchmarkDescriptorDistance {
 
 	@Benchmark public void hammingTable() {
 		for (int i = 0; i < binaryA.size(); i++) {
-			tableScore(binaryA.get(i),binaryB.get(i));
+			tableScore(binaryA.get(i), binaryB.get(i));
 		}
 	}
 
-	private int tableScore(TupleDesc_B a, TupleDesc_B b) {
+	private int tableScore( TupleDesc_B a, TupleDesc_B b ) {
 		int score = 0;
 
-		for( int i = 0; i < a.data.length; i++ ) {
+		for (int i = 0; i < a.data.length; i++) {
 			int dataA = a.data[i];
 			int dataB = b.data[i];
 
-			score += table.lookup( (short)dataA , (short)dataB );
-			score += table.lookup( (short)(dataA >> 16) , (short)(dataB >> 16) );
+			score += table.lookup((short)dataA, (short)dataB);
+			score += table.lookup((short)(dataA >> 16), (short)(dataB >> 16));
 		}
 
 		return score;
@@ -77,13 +77,13 @@ public class BenchmarkDescriptorDistance {
 
 	@Benchmark public void equationOld() {
 		for (int i = 0; i < binaryA.size(); i++) {
-			ExperimentalDescriptorDistance.hamming(binaryA.get(i),binaryB.get(i));
+			ExperimentalDescriptorDistance.hamming(binaryA.get(i), binaryB.get(i));
 		}
 	}
 
 	@Benchmark public void equation() {
 		for (int i = 0; i < binaryA.size(); i++) {
-			DescriptorDistance.hamming(binaryA.get(i),binaryB.get(i));
+			DescriptorDistance.hamming(binaryA.get(i), binaryB.get(i));
 		}
 	}
 
@@ -95,7 +95,7 @@ public class BenchmarkDescriptorDistance {
 		return feat;
 	}
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkDescriptorDistance.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
@@ -104,5 +104,4 @@ public class BenchmarkDescriptorDistance {
 
 		new Runner(opt).run();
 	}
-
 }

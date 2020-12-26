@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,93 +19,65 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkGradientToEdge {
 
-	static final long TEST_TIME = 1000;
-	static Random rand = new Random(234234);
+	@Param({"true", "false"})
+	boolean concurrent;
 
-	final static int width = 640;
-	final static int height = 480;
+	final int imageSize = 800;
 
-	static GrayF32 derivX_F32 = new GrayF32(width,height);
-	static GrayF32 derivY_F32 = new GrayF32(width,height);
+	GrayF32 derivX_F32 = new GrayF32(imageSize, imageSize);
+	GrayF32 derivY_F32 = new GrayF32(imageSize, imageSize);
 
-	static GrayF32 intensity_F32 = new GrayF32(width,height);
-	static GrayF32 orientation_F32 = new GrayF32(width,height);
+	GrayF32 intensity_F32 = new GrayF32(imageSize, imageSize);
+	GrayF32 orientation_F32 = new GrayF32(imageSize, imageSize);
 
-	static GrayS8 direction = new GrayS8(width,height);
+	GrayS8 direction = new GrayS8(imageSize, imageSize);
 
-	public static class Euclidian_F32 extends PerformerBase {
+	@Setup public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+		var rand = new Random(234234);
 
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.intensityE(derivX_F32,derivY_F32,intensity_F32);
-		}
-	}
-
-	public static class Abs_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.intensityAbs(derivX_F32,derivY_F32,intensity_F32);
-		}
-	}
-
-	public static class Orientation_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.direction(derivX_F32,derivY_F32,orientation_F32);
-		}
-	}
-
-	public static class Orientation2_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.direction2(derivX_F32,derivY_F32,orientation_F32);
-		}
-	}
-
-	public static class Discretize4 extends PerformerBase {
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.discretizeDirection4(intensity_F32,direction);
-		}
-	}
-
-	public static class Discretize8 extends PerformerBase {
-
-		@Override
-		public void process() {
-			GradientToEdgeFeatures.discretizeDirection8(intensity_F32,direction);
-		}
-	}
-
-	public static void main(String[] args) {
 		ImageMiscOps.fillUniform(derivX_F32, rand, 0, 255);
 		ImageMiscOps.fillUniform(derivY_F32, rand, 0, 255);
 		ImageMiscOps.fillUniform(orientation_F32, rand, (float)(-Math.PI/2.0), (float)(Math.PI/2.0));
+	}
 
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
-		System.out.println();
+	// @formatter:off
+	@Benchmark public void Euclidian_F32() {GradientToEdgeFeatures.intensityE(derivX_F32,derivY_F32,intensity_F32);}
+	@Benchmark public void Abs_F32() {GradientToEdgeFeatures.intensityAbs(derivX_F32,derivY_F32,intensity_F32);}
+	@Benchmark public void Orientation_F32() {GradientToEdgeFeatures.direction(derivX_F32,derivY_F32,intensity_F32);}
+	@Benchmark public void Orientation2_F32() {GradientToEdgeFeatures.direction2(derivX_F32,derivY_F32,intensity_F32);}
+	@Benchmark public void Discretize4() {GradientToEdgeFeatures.discretizeDirection4(intensity_F32,direction);}
+	@Benchmark public void Discretize8() {GradientToEdgeFeatures.discretizeDirection8(intensity_F32,direction);}
+	// @formatter:on
 
-		ProfileOperation.printOpsPerSec(new Euclidian_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Abs_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Orientation_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Orientation2_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Discretize4(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Discretize8(), TEST_TIME);
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkGradientToEdge.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
+
+		new Runner(opt).run();
 	}
 }

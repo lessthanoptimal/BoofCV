@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,9 +45,9 @@ public class BenchmarkBinaryOps  {
 	@Param({"2000"})
 	public int size;
 
-	private GrayU8 inputA = new GrayU8(size, size);
-	private GrayU8 inputB = new GrayU8(size, size);
-	private GrayU8 output = new GrayU8(size, size);
+	private final GrayU8 inputA = new GrayU8(size, size);
+	private final GrayU8 inputB = new GrayU8(size, size);
+	private final GrayU8 output = new GrayU8(size, size);
 
 	@Setup
 	public void setup() {

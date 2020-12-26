@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,20 +20,31 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseScaleGradient;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkSurfDescribeOps<T extends ImageGray<T>>
 {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
+	@Param({"SB_S32", "SB_F32"})
+	String imageTypeName;
+
 	Class<T> imageType;
 	
 	T input;
@@ -44,47 +55,50 @@ public class BenchmarkSurfDescribeOps<T extends ImageGray<T>>
 	double period = 1.2;
 	int regionSize = 20;
 	double kernelWidth = 5;
-	double derivX[] = new double[ regionSize*regionSize ];
-	double derivY[] = new double[ regionSize*regionSize ];
+	double[] derivX = new double[ regionSize*regionSize ];
+	double[] derivY = new double[ regionSize*regionSize ];
 
-	// kernel used to manually sample
-	SparseScaleGradient<T,?> g;
+	@Setup public void setup() {
+		int width = 640, height = 480;
 
-	public BenchmarkSurfDescribeOps() {
-		this((Class<T>)GrayF32.class);
+		var rand = new Random(234234);
+
+		imageType = ImageType.stringToType(imageTypeName, 3).getImageClass();
+		input = GeneralizedImageOps.createSingleBand(imageType,width,height);
+		GImageMiscOps.fillUniform(input, rand, 0, 1);
+
 	}
 
-	public BenchmarkSurfDescribeOps(Class<T> imageType) {
-		this.imageType = imageType;
-		Random rand = new Random(234);
-		input = GeneralizedImageOps.createSingleBand(imageType,imgWidth,imgHeight);
-		GImageMiscOps.fillUniform(input, rand, 0, 1);
-		g = SurfDescribeOps.createGradient(false,imageType);
+	@Benchmark public void Not_Haar() {
+		SurfDescribeOps.gradient(input, tl_x, tl_y, period, regionSize,
+				kernelWidth, false, derivX, derivY);
+	}
+
+	@Benchmark public void Haar() {
+		SurfDescribeOps.gradient(input, tl_x , tl_y , period, regionSize,
+				kernelWidth,true,derivX,derivY);
+	}
+
+	@Benchmark public void Not_Haar_Border() {
+		SparseScaleGradient<T,?> g = SurfDescribeOps.createGradient(false,imageType);
 		g.setWidth(kernelWidth);
 		g.setImage(input);
+		sampleBorder(g);
 	}
 
-	public int timeGradient_NotHaar(int reps) {
-		for( int i = 0; i < reps; i++ )
-			SurfDescribeOps.gradient(input, tl_x, tl_y, period, regionSize,
-					kernelWidth, false, derivX, derivY);
-		return 0;
-	}
-
-	public int timeGradient_Haar(int reps) {
-		for( int i = 0; i < reps; i++ )
-			SurfDescribeOps.gradient(input, tl_x , tl_y , period, regionSize,
-					kernelWidth,true,derivX,derivY);
-		return 0;
+	@Benchmark public void Haar_Border() {
+		SparseScaleGradient<T,?> g = SurfDescribeOps.createGradient(true,imageType);
+		g.setWidth(kernelWidth);
+		g.setImage(input);
+		sampleBorder(g);
 	}
 
 	/**
 	 * Sample the gradient using SparseImageGradient instead of the completely
 	 * unrolled code
 	 */
-	public int timeGradient_Sample(int reps) {
-
-		for( int i = 0; i < reps; i++ ) {
+	public void sampleBorder(SparseScaleGradient<T,?> g) {
+		for (int iter = 0; iter < 500; iter++) {
 			double tl_x = this.tl_x + 0.5;
 			double tl_y = this.tl_y + 0.5;
 
@@ -99,41 +113,16 @@ public class BenchmarkSurfDescribeOps<T extends ImageGray<T>>
 					derivY[j] = deriv.getY();
 				}
 			}
-
 		}
-		return 0;
 	}
 
-	/**
-	 * Sample the gradient, but just for boundary conditions
-	 */
-	public int timeGradient_SampleCheck(int reps) {
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkSurfDescribeOps.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		for( int i = 0; i < reps; i++ ) {
-			double tl_x = this.tl_x + 0.5;
-			double tl_y = this.tl_y + 0.5;
-
-			int j = 0;
-			for( int y = 0; y < regionSize; y++ ) {
-				for( int x = 0; x < regionSize; x++ , j++) {
-					int xx = (int)(tl_x + x * period);
-					int yy = (int)(tl_y + y * period);
-
-					if( g.isInBounds(xx,yy)) {
-						GradientValue deriv = g.compute(xx,yy);
-						derivX[j] = deriv.getX();
-						derivY[j] = deriv.getY();
-					}
-				}
-			}
-
-		}
-		return 0;
-	}
-	
-	public static void main( String[] args ) {
-		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight  +" ==========");
-
-//		Runner.main(BenchmarkSurfDescribeOps.class, args);
+		new Runner(opt).run();
 	}
 }

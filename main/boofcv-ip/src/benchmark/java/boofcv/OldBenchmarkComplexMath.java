@@ -27,7 +27,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkComplexMath {
+public class OldBenchmarkComplexMath {
 
 	public int TEST_TIME = 2000;
 
@@ -43,7 +43,7 @@ public class BenchmarkComplexMath {
 	double[] arrayInput = new double[2*N];
 	double[] arrayOutput = new double[2*N];
 
-	public BenchmarkComplexMath() {
+	public OldBenchmarkComplexMath() {
 		for (int i = 0; i < N; i++) {
 			objectInput[i] = new Complex_F64();
 			objectOutput[i] = new Complex_F64();
@@ -51,7 +51,6 @@ public class BenchmarkComplexMath {
 	}
 
 	private class ComplexObject extends PerformerBase {
-
 		@Override
 		public void process() {
 			Complex_F64 a = number;
@@ -67,7 +66,6 @@ public class BenchmarkComplexMath {
 	}
 
 	private class PureArray extends PerformerBase {
-
 		@Override
 		public void process() {
 			double ar = number.real;
@@ -99,7 +97,7 @@ public class BenchmarkComplexMath {
 	}
 
 	public static void main( String[] args ) {
-		BenchmarkComplexMath benchmark = new BenchmarkComplexMath();
+		OldBenchmarkComplexMath benchmark = new OldBenchmarkComplexMath();
 		benchmark.run();
 	}
 }
