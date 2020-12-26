@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,55 +19,55 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Benchmark for different convolution operations.
  *
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
 public class BenchmarkBinaryBlobLabeling {
 
-	static final long TEST_TIME = 1000;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static int imgWidth = 640;
-	static int imgHeight = 480;
+	//	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"1000"})
+	public int size;
 
-	static GrayU8 original = new GrayU8(imgWidth, imgHeight);
-	static GrayU8 input = new GrayU8(imgWidth, imgHeight);
-	static GrayS32 output = new GrayS32(imgWidth, imgHeight);
+	private final GrayU8 original = new GrayU8(size, size);
+	private final GrayU8 input = new GrayU8(size, size);
+	private final GrayS32 output = new GrayS32(size, size);
 
-	public static class NewAlg8 extends PerformerBase {
+	LinearContourLabelChang2004 chang4 = new LinearContourLabelChang2004(ConnectRule.FOUR);
+	LinearContourLabelChang2004 chang8 = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
-
-		@Override
-		public void process() {
-			alg.process(input,output);
-		}
-	}
-
-	public static class NewAlg4 extends PerformerBase {
-
-		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
-
-		@Override
-		public void process() {
-			alg.process(input,output);
-//			System.out.println("new 4 = "+alg.getContours().size);
-		}
-	}
-
-	public static void main(String[] args) {
-		System.out.println("=========  Profile Image Size "+ imgWidth +" x "+ imgHeight  +" ==========");
-
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
+
+		original.reshape(size, size);
+		input.reshape(size, size);
+		output.reshape(size, size);
+
 		ImageMiscOps.fillUniform(original, rand, 0, 2);
 
 		for( int y = 0; y < original.height; y++ ) {
@@ -76,11 +76,16 @@ public class BenchmarkBinaryBlobLabeling {
 					original.unsafe_set(x,y,0);
 			}
 		}
+	}
 
-		input.setTo(original);
+	@Benchmark public void Chang2004_4() { input.setTo(original); chang4.process(input, output); }
+	@Benchmark public void Chang2004_8() { input.setTo(original); chang8.process(input, output); }
 
-		ProfileOperation.printOpsPerSec(new NewAlg8(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NewAlg4(), TEST_TIME);
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkBinaryBlobLabeling.class.getSimpleName())
+				.build();
 
+		new Runner(opt).run();
 	}
 }

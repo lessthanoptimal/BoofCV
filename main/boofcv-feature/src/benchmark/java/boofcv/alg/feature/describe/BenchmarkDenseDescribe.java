@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,104 +20,81 @@ package boofcv.alg.feature.describe;
 
 import boofcv.abst.feature.dense.DescribeImageDense;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.dense.ConfigDenseHoG;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkDenseDescribe {
 
-	int width = 640;
-	int height = 480;
+	@Param({"true", "false"})
+	boolean concurrent;
 
-	static final long TEST_TIME = 1000;
-	static Random rand = new Random(234234);
+	@Param({"800"})
+	int size = 0;
 
-	GrayF32 gray = new GrayF32(width, height);
+	GrayF32 gray = new GrayF32(1, 1);
+	DescribeImageDense<GrayF32, TupleDesc_F64> alg;
 
-	public BenchmarkDenseDescribe() {
-		GImageMiscOps.fillUniform( gray , rand , 0 , 200);
+	@Setup public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+
+		Random rand = new Random(234234);
+		gray.reshape(size, size);
+		GImageMiscOps.fillUniform(gray, rand, 0, 200);
 	}
 
-	public class HoGFast extends PerformerBase {
-
-		DescribeImageDense<GrayF32, TupleDesc_F64> alg;
-
-		public HoGFast() {
-			ConfigDenseHoG config = new ConfigDenseHoG();
-			config.fastVariant = true;
-			alg = FactoryDescribeImageDense.hog(config, ImageType.single(GrayF32.class));
-		}
-
-		@Override
-		public void process() {
-			alg.process(gray);
-		}
+	@Benchmark public void HoG_fast() {
+		ConfigDenseHoG config = new ConfigDenseHoG();
+		config.fastVariant = true;
+		alg = FactoryDescribeImageDense.hog(config, ImageType.single(GrayF32.class));
+		alg.process(gray);
 	}
 
-	public class HoG extends PerformerBase {
-		DescribeImageDense<GrayF32, TupleDesc_F64> alg =
-				FactoryDescribeImageDense.hog(null, ImageType.single(GrayF32.class));
-
-		@Override
-		public void process() {
-			alg.process(gray);
-		}
+	@Benchmark public void HoG() {
+		alg = FactoryDescribeImageDense.hog(null, ImageType.single(GrayF32.class));
+		alg.process(gray);
 	}
 
-	public class SURF_FAST extends PerformerBase {
-		DescribeImageDense<GrayF32, TupleDesc_F64> alg =
-				FactoryDescribeImageDense.surfFast(null, GrayF32.class);
-
-		@Override
-		public void process() {
-			alg.process(gray);
-		}
+	@Benchmark public void SURF_fast() {
+		alg = FactoryDescribeImageDense.surfFast(null, GrayF32.class);
+		alg.process(gray);
 	}
 
-	public class SURF_STABLE extends PerformerBase {
-		DescribeImageDense<GrayF32, TupleDesc_F64> alg =
-				FactoryDescribeImageDense.surfStable(null, GrayF32.class);
-
-		@Override
-		public void process() {
-			alg.process(gray);
-		}
+	@Benchmark public void SURF_stable() {
+		alg = FactoryDescribeImageDense.surfStable(null, GrayF32.class);
+		alg.process(gray);
 	}
 
-	public class SIFT extends PerformerBase {
-		DescribeImageDense<GrayF32, TupleDesc_F64> alg =
-				FactoryDescribeImageDense.sift(null, GrayF32.class);
-
-		@Override
-		public void process() {
-			alg.process(gray);
-		}
+	@Benchmark public void SIFT() {
+		alg = FactoryDescribeImageDense.sift(null, GrayF32.class);
+		alg.process(gray);
 	}
 
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkDenseDescribe.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-	public void perform() {
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== ");
-		System.out.println();
-
-		ProfileOperation.printOpsPerSec(new HoGFast(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new HoG(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.SURF_FAST(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.SURF_STABLE(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.SIFT(), TEST_TIME);
-	}
-
-	public static void main(String[] args) {
-		BenchmarkDenseDescribe benchmark = new BenchmarkDenseDescribe();
-
-		benchmark.perform();
+		new Runner(opt).run();
 	}
 }

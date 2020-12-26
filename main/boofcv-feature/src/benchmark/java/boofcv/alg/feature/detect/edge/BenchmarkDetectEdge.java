@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,81 +20,76 @@ package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkDetectEdge {
-	static final long TEST_TIME = 1000;
+	GrayF32 input = new GrayF32(640, 480);
+	GrayU8 output = input.createSameShape(GrayU8.class);
 
-	int width = 640;
-	int height = 480;
+	final int iterations = 5;
 
-	Random rand = new Random(234);
-
-	GrayF32 input = new GrayF32(width,height);
+	@Setup public void setup() {
+		createImage();
+	}
 
 	public void createImage() {
-		for( int i = 0; i < 1000; i++ ) {
-			int width = 10+rand.nextInt(50);
-			int height = 10+rand.nextInt(50);
+		var rand = new Random(234234);
+		for (int i = 0; i < 1000; i++) {
+			int width = 10 + rand.nextInt(50);
+			int height = 10 + rand.nextInt(50);
 
 			int x = rand.nextInt(input.width);
 			int y = rand.nextInt(input.height);
 
-			int x1 = x+width;
-			int y1 = y+height;
-			if( x1 > input.width ) x1 = input.width;
-			if( y1 > input.height ) y1 = input.height;
+			int x1 = x + width;
+			int y1 = y + height;
+			if (x1 > input.width) x1 = input.width;
+			if (y1 > input.height) y1 = input.height;
 
-			width = x1-x;
-			height = y1-y;
+			width = x1 - x;
+			height = y1 - y;
 
-			ImageMiscOps.fillRectangle(input,rand.nextInt(100),x,y,width,height);
+			ImageMiscOps.fillRectangle(input, rand.nextInt(100), x, y, width, height);
 		}
 	}
 
-	public class CannyMark extends PerformerBase {
-
-		CannyEdge<GrayF32,GrayF32> alg = FactoryEdgeDetectors.canny(2,false, false, GrayF32.class, GrayF32.class);
-		GrayU8 output = new GrayU8(width,height);
-
-		@Override
-		public void process() {
-			alg.process(input,5,10,output);
+	@Benchmark public void CannyMark() {
+		CannyEdge<GrayF32, GrayF32> alg = FactoryEdgeDetectors.canny(2, false, false, GrayF32.class, GrayF32.class);
+		for (int i = 0; i < iterations; i++) {
+			alg.process(input, 5, 10, output);
 		}
 	}
 
-	public class CannyTrace extends PerformerBase {
-
-		CannyEdge<GrayF32,GrayF32> alg = FactoryEdgeDetectors.canny(2,true, false, GrayF32.class, GrayF32.class);
-		GrayU8 output = new GrayU8(width,height);
-
-		@Override
-		public void process() {
-			alg.process(input,5,10,output);
+	@Benchmark public void CannyTrace() {
+		CannyEdge<GrayF32, GrayF32> alg = FactoryEdgeDetectors.canny(2, true, false, GrayF32.class, GrayF32.class);
+		for (int i = 0; i < iterations; i++) {
+			alg.process(input, 5, 10, output);
 		}
 	}
 
-	public void performTests() {
-		createImage();
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkDetectEdge.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
-		System.out.println();
-
-		ProfileOperation.printOpsPerSec(new CannyMark(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new CannyTrace(), TEST_TIME);
+		new Runner(opt).run();
 	}
-
-	public static void main( String[] args ) {
-		BenchmarkDetectEdge benchmark = new BenchmarkDetectEdge();
-		benchmark.performTests();
-	}
-
 }

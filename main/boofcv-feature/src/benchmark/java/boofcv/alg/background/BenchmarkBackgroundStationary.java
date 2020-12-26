@@ -48,48 +48,48 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class BenchmarkBackgroundStationary {
 
 	File file = new File(UtilIO.pathExample("background/street_intersection.mp4"));
 
-	@Param({"SB_U8","PL_U8","SB_F32"})
+	@Param({"SB_U8", "PL_U8", "SB_F32"})
 	String imageTypeName;
 
 	ImageType imageType;
 
 	@Setup public void setup() {
-		imageType = ImageType.stringToType(imageTypeName,3);
+		imageType = ImageType.stringToType(imageTypeName, 3);
 	}
 
 	@Benchmark public void greedy() {
 		var config = new ConfigBackgroundBasic(12);
-		process(FactoryBackgroundModel.stationaryBasic(config,imageType));
+		process(FactoryBackgroundModel.stationaryBasic(config, imageType));
 	}
 
 	@Benchmark public void gaussian() {
-		var config =new ConfigBackgroundGaussian(12);
-		process(FactoryBackgroundModel.stationaryGaussian(config,imageType));
+		var config = new ConfigBackgroundGaussian(12);
+		process(FactoryBackgroundModel.stationaryGaussian(config, imageType));
 	}
 
 	@Benchmark public void gmm() {
 		var config = new ConfigBackgroundGmm();
-		process(FactoryBackgroundModel.stationaryGmm(config,imageType));
+		process(FactoryBackgroundModel.stationaryGmm(config, imageType));
 	}
 
-	private void process(BackgroundModelStationary alg) {
-		SimpleImageSequence sequence = DefaultMediaManager.INSTANCE.openVideo(file.getAbsolutePath(),imageType);
-		GrayU8 background = new GrayU8(sequence.getWidth(),sequence.getHeight());
+	private void process( BackgroundModelStationary alg ) {
+		SimpleImageSequence sequence = DefaultMediaManager.INSTANCE.openVideo(file.getAbsolutePath(), imageType);
+		GrayU8 background = new GrayU8(sequence.getWidth(), sequence.getHeight());
 
 		int total = 0;
-		while( sequence.hasNext() && total++ < 60 ) {
+		while (sequence.hasNext() && total++ < 60) {
 			ImageBase image = sequence.next();
-			alg.updateBackground(image,background);
+			alg.updateBackground(image, background);
 		}
 	}
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkBackgroundStationary.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))

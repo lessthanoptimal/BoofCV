@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -28,47 +27,55 @@ import boofcv.core.image.GConvertImage;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.misc.Performer;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_I32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 @SuppressWarnings("unchecked")
 public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, II extends ImageGray<II>> {
 
-	static final long TEST_TIME = 1000;
-	static Random rand = new Random(234234);
-	static int NUM_POINTS = 512;
+	@Param({"800"})
+	static int numPoints;
 
-	final static int width = 640;
-	final static int height = 480;
+	@Param({"SB_U8", "SB_F32"})
+	String imageTypeName;
+
+	Class<I> imageType;
 
 	I gray;
 	Planar<I> colorMS;
 
-	Point2D_I32 pts[];
-	double scales[];
-	double yaws[];
+	Point2D_I32[] pts;
+	double[] scales;
+	double[] yaws;
 
-	Class<I> imageType;
 	Class<D> derivType;
 	Class<II> integralType;
 
-	public BenchmarkDescribe( Class<I> imageType ) {
+	@Setup public void setup() {
+		int width = 640, height = 480;
 
-		this.imageType = imageType;
+		var rand = new Random(234234);
+
+		imageType = ImageType.stringToType(imageTypeName, 3).getImageClass();
 
 		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -76,112 +83,87 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 		colorMS = new Planar<>(imageType, width, height, 3);
 		GImageMiscOps.fillUniform(colorMS, rand, 0, 100);
 
-		gray = GConvertImage.average(colorMS,gray);
+		gray = GConvertImage.average(colorMS, gray);
 
-		pts = new Point2D_I32[ NUM_POINTS ];
-		scales = new double[ NUM_POINTS ];
-		yaws = new double[ NUM_POINTS ];
+		pts = new Point2D_I32[numPoints];
+		scales = new double[numPoints];
+		yaws = new double[numPoints];
 		int border = 20;
-		for( int i = 0; i < NUM_POINTS; i++ ) {
-			int x = rand.nextInt(width-border*2)+border;
-			int y = rand.nextInt(height-border*2)+border;
-			pts[i] = new Point2D_I32(x,y);
-			scales[i] = rand.nextDouble()*3+1;
-			yaws[i] = 2.0*(rand.nextDouble()-0.5)*Math.PI;
+		for (int i = 0; i < numPoints; i++) {
+			int x = rand.nextInt(width - border*2) + border;
+			int y = rand.nextInt(height - border*2) + border;
+			pts[i] = new Point2D_I32(x, y);
+			scales[i] = rand.nextDouble()*3 + 1;
+			yaws[i] = 2.0*(rand.nextDouble() - 0.5)*Math.PI;
 		}
-
 	}
 
-	public class Brief512 extends PerformerBase {
-
+	@Benchmark public void Brief512() {
 		DescribePointBrief<I> alg = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
+				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		@Override
-		public void process() {
-			alg.setImage(gray);
-			TupleDesc_B f = alg.createFeature();
-			for( int i = 0; i < pts.length; i++ ) {
-				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,f);
-			}
+		alg.setImage(gray);
+		TupleDesc_B f = alg.createFeature();
+		for (int i = 0; i < pts.length; i++) {
+			Point2D_I32 p = pts[i];
+			alg.process(p.x, p.y, f);
 		}
 	}
 
-	public class BriefSO512 extends PerformerBase {
-
+	@Benchmark public void BriefSO512() {
 		int briefRadius = 16;
 		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.
 				briefso(FactoryBriefDefinition.gaussian2(new Random(123), briefRadius, 512),
-				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
+						FactoryBlurFilter.gaussian(imageType, 0, 4));
 
-		@Override
-		public void process() {
+		alg.setImage(gray);
+		TupleDesc_B f = alg.createFeature();
+		for (int i = 0; i < pts.length; i++) {
+			Point2D_I32 p = pts[i];
+			alg.process(p.x, p.y, (float)yaws[i], (float)(briefRadius*scales[i]), f);
+		}
+	}
+
+	@Benchmark public void SURF_F() {
+		process(FactoryDescribeRegionPoint.<I, II>surfFast(null, imageType));
+	}
+
+	@Benchmark public void SURF_F_Color() {
+		process(FactoryDescribeRegionPoint.surfColorFast(null, ImageType.pl(3, imageType)));
+	}
+
+	@Benchmark public void SURF_S() {
+		process(FactoryDescribeRegionPoint.<I, II>surfStable(null, imageType));
+	}
+
+	@Benchmark public void SURF_S_Color() {
+		process(FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)));
+	}
+
+	@Benchmark public void SIFT() {
+		process(FactoryDescribeRegionPoint.sift(null, null, imageType));
+	}
+
+	public <PD extends TupleDesc> void process( DescribeRegionPoint alg ) {
+		if (alg.getImageType().getFamily() == ImageType.Family.GRAY)
 			alg.setImage(gray);
-			TupleDesc_B f = alg.createFeature();
-			for( int i = 0; i < pts.length; i++ ) {
-				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,(float)yaws[i],(float)(briefRadius*scales[i]),f);
-			}
+		else
+			alg.setImage(colorMS);
+
+		PD d = (PD)alg.createDescription();
+		for (int i = 0; i < pts.length; i++) {
+			Point2D_I32 p = pts[i];
+			alg.process(p.x, p.y, yaws[i], scales[i], d);
 		}
 	}
 
-	public class Describe<PD extends TupleDesc> implements Performer {
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkDescribe.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		DescribeRegionPoint alg;
-		String name;
-
-		public Describe(String name, DescribeRegionPoint alg) {
-			this.alg = alg;
-			this.name = name;
-		}
-
-		@Override
-		public void process() {
-			if( alg.getImageType().getFamily() == ImageType.Family.GRAY)
-				alg.setImage(gray);
-			else
-				alg.setImage(colorMS);
-
-			PD d = (PD)alg.createDescription();
-			for( int i = 0; i < pts.length; i++ ) {
-				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,yaws[i],scales[i],d);
-			}
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-	}
-
-	public void perform() {
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
-		System.out.println();
-
-		ConfigSurfDescribe.Fast surfSpeed = new ConfigSurfDescribe.Fast();
-		ConfigSurfDescribe.Stability surfStable = new ConfigSurfDescribe.Stability();
-
-		ProfileOperation.printOpsPerSec(new Describe("SURF-F",
-				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("SURF-F Color",
-				FactoryDescribeRegionPoint.surfColorFast(surfSpeed, ImageType.pl(3, imageType))),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("SURF-S",
-				FactoryDescribeRegionPoint.<I,II>surfStable(surfStable,  imageType)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Describe("SURF-S Color",
-				FactoryDescribeRegionPoint.surfColorStable(surfStable,  ImageType.pl(3, imageType))),TEST_TIME);
-
-//		if( imageType == GrayF32.class )
-//			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(null,null)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new BriefSO512(),TEST_TIME);
-	}
-
-	public static void main( String arg[ ] ) {
-		BenchmarkDescribe<GrayF32,?,?> alg = new BenchmarkDescribe(GrayF32.class);
-//		BenchmarkDescribe<GrayU8,?,?> alg = new BenchmarkDescribe(GrayU8.class);
-
-		alg.perform();
+		new Runner(opt).run();
 	}
 }

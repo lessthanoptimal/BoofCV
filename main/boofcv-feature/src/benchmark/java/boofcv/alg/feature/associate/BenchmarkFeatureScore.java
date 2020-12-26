@@ -18,136 +18,129 @@
 
 package boofcv.alg.feature.associate;
 
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
-import boofcv.abst.feature.associate.ScoreAssociateNccFeature;
-import boofcv.abst.feature.associate.ScoreAssociation;
-import boofcv.misc.Performer;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.abst.feature.associate.*;
 import boofcv.struct.feature.*;
 import org.ddogleg.struct.DogArray;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-
-/**
- * Compares different scoring functions.
- *
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkFeatureScore {
-
-	static final long TEST_TIME = 1000;
-	static final Random rand = new Random(234234);
-	static final int NUM_FEATURES = 2000;
+	@Param({"2000"})
+	static int NUM_FEATURES = 2000;
 
 	static final int DOF_TUPLE = 64;
 	static final int DOF_BRIEF = 512;
 
-	static final DogArray<TupleDesc_F64> listA = createSet();
-	static final DogArray<TupleDesc_F64> listB = createSet();
+	DogArray<TupleDesc_F64> listA, listB;
+	DogArray<TupleDesc_B> briefA, briefB;
+	DogArray<NccFeature> nccA, nccB;
 
-	static final DogArray<TupleDesc_B> briefA = createBriefSet();
-	static final DogArray<TupleDesc_B> briefB = createBriefSet();
+	@Setup public void setup() {
+		Random rand = new Random(234234);
 
-	static final DogArray<NccFeature> nccA = createNccSet();
-	static final DogArray<NccFeature> nccB = createNccSet();
+		listA = createSet(rand);
+		listB = createSet(rand);
 
-	public static class General implements Performer {
+		briefA = createBriefSet(rand);
+		briefB = createBriefSet(rand);
 
-		ScoreAssociation alg;
-		String name;
-
-		public General(String name, ScoreAssociation alg) {
-			this.alg = alg;
-			this.name = name;
-		}
-
-		@Override
-		public void process() {
-			for( int i = 0; i < listA.size; i++ )
-				for( int j = 0; j < listB.size; j++ )
-					alg.score(listA.data[i],listB.data[j]);
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
+		nccA = createNccSet(rand);
+		nccB = createNccSet(rand);
 	}
 
-	public static class Brief extends PerformerBase {
-
-		ScoreAssociateHamming_B scorer = new ScoreAssociateHamming_B();
-
-		@Override
-		public void process() {
-			for( int i = 0; i < briefA.size; i++ )
-				for( int j = 0; j < briefB.size; j++ )
-					scorer.score(briefA.data[i],briefB.data[j]);
-		}
+	@Benchmark public void hamming() {
+		var scorer = new ScoreAssociateHamming_B();
+		for (int i = 0; i < briefA.size; i++)
+			for (int j = 0; j < briefB.size; j++)
+				scorer.score(briefA.data[i], briefB.data[j]);
 	}
 
-	public static class Ncc extends PerformerBase {
-
-		ScoreAssociateNccFeature scorer = new ScoreAssociateNccFeature();
-
-		@Override
-		public void process() {
-			for( int i = 0; i < nccA.size; i++ )
-				for( int j = 0; j < nccB.size; j++ )
-					scorer.score(nccA.data[i],nccB.data[j]);
-		}
+	@Benchmark public void ncc() {
+		var scorer = new ScoreAssociateNccFeature();
+		for (int i = 0; i < nccA.size; i++)
+			for (int j = 0; j < nccB.size; j++)
+				scorer.score(nccA.data[i], nccB.data[j]);
 	}
 
-	private static DogArray<TupleDesc_F64> createSet() {
-		DogArray<TupleDesc_F64> ret = new DogArray<>(()->new TupleDesc_F64(DOF_TUPLE));
+	@Benchmark public void sad() {
+		var scorer = new ScoreAssociateSad.F64();
+		for (int i = 0; i < listA.size; i++)
+			for (int j = 0; j < listB.size; j++)
+				scorer.score(listA.data[i], listB.data[j]);
+	}
 
-		for( int i = 0; i < NUM_FEATURES; i++ ) {
+	@Benchmark public void euclidean_sq() {
+		var scorer = new ScoreAssociateEuclideanSq.F64();
+		for (int i = 0; i < listA.size; i++)
+			for (int j = 0; j < listB.size; j++)
+				scorer.score(listA.data[i], listB.data[j]);
+	}
+
+	@Benchmark public void correlation() {
+		var scorer = new ScoreAssociateCorrelation();
+		for (int i = 0; i < listA.size; i++)
+			for (int j = 0; j < listB.size; j++)
+				scorer.score(listA.data[i], listB.data[j]);
+	}
+
+	private DogArray<TupleDesc_F64> createSet( Random rand ) {
+		DogArray<TupleDesc_F64> ret = new DogArray<>(() -> new TupleDesc_F64(DOF_TUPLE));
+
+		for (int i = 0; i < NUM_FEATURES; i++) {
 			TupleDesc_F64 t = ret.grow();
-			for( int j = 0; j < DOF_TUPLE; j++ ) {
-				t.value[j] = (rand.nextDouble()-0.5)*20;
+			for (int j = 0; j < DOF_TUPLE; j++) {
+				t.value[j] = (rand.nextDouble() - 0.5)*20;
 			}
 		}
 		return ret;
 	}
 
-	private static DogArray<TupleDesc_B> createBriefSet() {
+	private DogArray<TupleDesc_B> createBriefSet( Random rand ) {
 		DogArray<TupleDesc_B> ret = new BriefFeatureQueue(DOF_BRIEF);
 
-		for( int i = 0; i < NUM_FEATURES; i++ ) {
+		for (int i = 0; i < NUM_FEATURES; i++) {
 			TupleDesc_B t = ret.grow();
-			for( int j = 0; j < t.data.length; j++ ) {
+			for (int j = 0; j < t.data.length; j++) {
 				t.data[j] = rand.nextInt();
 			}
 		}
 		return ret;
 	}
 
-	private static DogArray<NccFeature> createNccSet() {
+	private DogArray<NccFeature> createNccSet( Random rand ) {
 		DogArray<NccFeature> ret = new NccFeatureQueue(DOF_TUPLE);
 
-		for( int i = 0; i < NUM_FEATURES; i++ ) {
+		for (int i = 0; i < NUM_FEATURES; i++) {
 			NccFeature t = ret.grow();
-			for( int j = 0; j < t.value.length; j++ ) {
-				t.value[j] = (rand.nextDouble()-0.5)*20;
+			for (int j = 0; j < t.value.length; j++) {
+				t.value[j] = (rand.nextDouble() - 0.5)*20;
 			}
-			t.mean = (rand.nextDouble()-0.5)*20;
-			t.sigma = (rand.nextDouble()-0.5)*20;
+			t.mean = (rand.nextDouble() - 0.5)*20;
+			t.sigma = (rand.nextDouble() - 0.5)*20;
 		}
 		return ret;
 	}
 
-	public static void main( String argsp[ ] ) {
-		System.out.println("=========  Profile Description Length "+ DOF_TUPLE +" ========== Num Features "+NUM_FEATURES);
-		System.out.println();
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkFeatureScore.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		// the "fastest" seems to always be the first one tested
-//		ProfileOperation.printOpsPerSec(new General("Correlation", new ScoreAssociateCorrelation()),TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new General("Euclidean", new ScoreAssociateEuclidean_F64()),TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new General("Euclidean Sq", new ScoreAssociateEuclideanSq_F64()),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Brief(),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Ncc(),TEST_TIME);
-
+		new Runner(opt).run();
 	}
 }
