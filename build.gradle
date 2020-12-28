@@ -138,7 +138,7 @@ subprojects {
         benchmarkImplementation project.sourceSets.main.runtimeClasspath
         benchmarkImplementation project.sourceSets.main.compileClasspath
 
-        ['1.19'].each { String a ->// don't upgrade to 1.21! much slower
+        ['1.27'].each { String a ->
             benchmarkCompile('org.openjdk.jmh:jmh-core:' + a)
             benchmarkAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:' + a
         }

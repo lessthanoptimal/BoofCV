@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,6 +73,8 @@ public class ImageType<T extends ImageBase> implements Serializable {
 		this.numBands = numBands;
 	}
 
+	protected ImageType(){}
+
 	public static <I extends ImageGray<I>> ImageType<I> single( Class<I> imageType ) {
 		return new ImageType<>(Family.GRAY, ImageDataType.classToType(imageType), 1);
 	}
@@ -95,6 +97,43 @@ public class ImageType<T extends ImageBase> implements Serializable {
 
 	public static <I extends ImageInterleaved<I>> ImageType<I> il( int numBands, ImageDataType type ) {
 		return new ImageType<>(Family.INTERLEAVED, type, numBands);
+	}
+
+	/**
+	 * Converts the short hand string into an image type. A new instance is returned.
+	 */
+	@SuppressWarnings("unchecked")
+	public static<T extends ImageBase> ImageType<T> stringToType( String name , int numBands ) {
+		ImageType type = new ImageType();
+		type.setTo(switch (name) {
+			case "SB_U8" -> SB_U8;
+			case "SB_S8" -> SB_S8;
+			case "SB_S16" -> SB_S16;
+			case "SB_U16" -> SB_U16;
+			case "SB_S32" -> SB_S32;
+			case "SB_S64" -> SB_S64;
+			case "SB_F32" -> SB_F32;
+			case "SB_F64" -> SB_F64;
+			case "IL_U8" -> IL_U8;
+			case "IL_S8" -> IL_S8;
+			case "IL_S16" -> IL_S16;
+			case "IL_U16" -> IL_U16;
+			case "IL_S32" -> IL_S32;
+			case "IL_S64" -> IL_S64;
+			case "IL_F32" -> IL_F32;
+			case "IL_F64" -> IL_F64;
+			case "PL_U8" -> PL_U8;
+			case "PL_S8" -> PL_S8;
+			case "PL_S16" -> PL_S16;
+			case "PL_U16" -> PL_U16;
+			case "PL_S32" -> PL_S32;
+			case "PL_S64" -> PL_S64;
+			case "PL_F32" -> PL_F32;
+			case "PL_F64" -> PL_F64;
+			default -> throw new RuntimeException("Unknown "+name);
+		});
+		type.numBands = numBands;
+		return type;
 	}
 
 	public ImageDataType getDataType() {
