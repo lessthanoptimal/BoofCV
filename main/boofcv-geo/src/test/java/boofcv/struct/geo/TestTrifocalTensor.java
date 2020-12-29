@@ -47,7 +47,7 @@ public class TestTrifocalTensor extends BoofStandardJUnit {
 		t.T3.set(0,0,3);
 
 		TrifocalTensor a = new TrifocalTensor();
-		a.set(t);
+		a.setTo(t);
 
 		assertEquals(a.T1.get(0, 0), 1);
 		assertEquals(a.T2.get(0, 0), 2);

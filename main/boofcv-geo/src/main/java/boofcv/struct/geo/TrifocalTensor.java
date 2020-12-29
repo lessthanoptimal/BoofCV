@@ -49,7 +49,7 @@ public class TrifocalTensor {
 		throw new IllegalArgumentException("Invalid index");
 	}
 
-	public void set( TrifocalTensor a ) {
+	public void setTo( TrifocalTensor a ) {
 		T1.setTo(a.T1);
 		T2.setTo(a.T2);
 		T3.setTo(a.T3);

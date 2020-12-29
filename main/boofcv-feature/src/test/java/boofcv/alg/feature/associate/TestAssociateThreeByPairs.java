@@ -38,9 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	@Test
 	void perfect() {
-		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
 		DogArray_I32 featuresSetA = new DogArray_I32();
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();
@@ -92,9 +92,9 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	 */
 	@Test
 	void failOnCtoA() {
-		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
 		DogArray_I32 featuresSetA = new DogArray_I32();
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();
@@ -140,9 +140,9 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	 */
 	@Test
 	void failOnBtoC() {
-		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
 		DogArray_I32 featuresSetA = new DogArray_I32();
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();
@@ -189,9 +189,9 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 	 */
 	@Test
 	void failOnAtoB() {
-		DogArray<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
-		DogArray<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
+		DogArray<TupleDesc_F64> featuresA = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresB = UtilFeature.createArrayF64(1);
+		DogArray<TupleDesc_F64> featuresC = UtilFeature.createArrayF64(1);
 		DogArray_I32 featuresSetA = new DogArray_I32();
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();

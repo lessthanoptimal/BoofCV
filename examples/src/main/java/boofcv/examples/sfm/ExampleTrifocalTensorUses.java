@@ -16,22 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.robust;
-
-import boofcv.struct.geo.TrifocalTensor;
-import org.ddogleg.fitting.modelset.ModelManager;
+package boofcv.examples.sfm;
 
 /**
- * @author Peter Abeles
+ * Shows how the Trifocal tensor itself can be used once it's known.
  */
-public class ManagerTrifocalTensor implements ModelManager<TrifocalTensor> {
-	@Override
-	public TrifocalTensor createModelInstance() {
-		return new TrifocalTensor();
-	}
+public class ExampleTrifocalTensorUses {
+	public static void main( String[] args ) {
+		// TODO Point transfer
 
-	@Override
-	public void copyModel(TrifocalTensor src, TrifocalTensor dst) {
-		dst.setTo(src);
+		// TODO camera matrices
 	}
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.examples.stereo;
+package boofcv.examples.sfm;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
@@ -62,7 +62,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleFundamentalMatrix {
+public class ExampleComputeFundamentalMatrix {
 	/**
 	 * Given a set of noisy observations, compute the Fundamental matrix while removing the noise.
 	 *

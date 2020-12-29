@@ -84,9 +84,9 @@ public class ExampleImageStitching {
 					  ModelMatcher<Homography2D_F64, AssociatedPair> modelMatcher ) {
 		// get the length of the description
 		List<Point2D_F64> pointsA = new ArrayList<>();
-		DogArray<FD> descA = UtilFeature.createQueue(detDesc, 100);
+		DogArray<FD> descA = UtilFeature.createArray(detDesc, 100);
 		List<Point2D_F64> pointsB = new ArrayList<>();
-		DogArray<FD> descB = UtilFeature.createQueue(detDesc, 100);
+		DogArray<FD> descB = UtilFeature.createArray(detDesc, 100);
 
 		// extract feature locations and descriptions from each image
 		describeImage(imageA, detDesc, pointsA, descA);
