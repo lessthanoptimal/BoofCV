@@ -27,7 +27,6 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -36,6 +35,7 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
+import boofcv.examples.features.ExampleAssociateThreeView;
 import boofcv.examples.sfm.ExampleComputeTrifocalTensor;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.DisparityError;
@@ -62,13 +62,11 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -146,20 +144,24 @@ public class ExampleTrifocalStereoUncalibrated {
 		DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null, null, GrayU8.class);
 
-		// Stores image coordinate
-		var locations01 = new DogArray<>(Point2D_F64::new);
-		var locations02 = new DogArray<>(Point2D_F64::new);
-		var locations03 = new DogArray<>(Point2D_F64::new);
+		// Associate features across all three views using previous example code
+		var associateThree = new ExampleAssociateThreeView();
+		associateThree.initialize(detDesc);
+		associateThree.detectFeatures(image01, 0);
+		associateThree.detectFeatures(image02, 1);
+		associateThree.detectFeatures(image03, 2);
+		DogArray<AssociatedTripleIndex> associatedIdx = associateThree.threeViewPairwiseAssociate();
 
-		// Stores the descriptor for each feature
-		DogArray<TupleDesc_F64> features01 = UtilFeature.createArray(detDesc, 100);
-		DogArray<TupleDesc_F64> features02 = UtilFeature.createArray(detDesc, 100);
-		DogArray<TupleDesc_F64> features03 = UtilFeature.createArray(detDesc, 100);
+		System.out.println("features01.size = " + associateThree.features01.size);
+		System.out.println("features02.size = " + associateThree.features02.size);
+		System.out.println("features03.size = " + associateThree.features03.size);
 
-		// Indicates which "set" a feature belongs in. SURF can be white or black
-		var featureSet01 = new DogArray_I32();
-		var featureSet02 = new DogArray_I32();
-		var featureSet03 = new DogArray_I32();
+		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
+		var associated = new DogArray<>(AssociatedTriple::new);
+		associatedIdx.forEach(p->associated.grow().setTo(
+				associateThree.locations01.get(p.a),
+				associateThree.locations02.get(p.b),
+				associateThree.locations03.get(p.c)));
 
 		// Converting data formats for the found features into what can be processed by SFM algorithms
 		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
@@ -171,28 +173,10 @@ public class ExampleTrifocalStereoUncalibrated {
 		double cx = width/2;
 		double cy = height/2;
 
-		ExampleComputeTrifocalTensor.detectFeatures(detDesc, image01, locations01, features01, featureSet01);
-		ExampleComputeTrifocalTensor.detectFeatures(detDesc, image02, locations02, features02, featureSet02);
-		ExampleComputeTrifocalTensor.detectFeatures(detDesc, image03, locations03, features03, featureSet03);
-
 		// The self calibration step requires that the image coordinate system be in the image center
-		locations01.forEach(p->p.setTo(p.x-cx,p.y-cy));
-		locations02.forEach(p->p.setTo(p.x-cx,p.y-cy));
-		locations03.forEach(p->p.setTo(p.x-cx,p.y-cy));
-
-		System.out.println("features01.size = " + features01.size);
-		System.out.println("features02.size = " + features02.size);
-		System.out.println("features03.size = " + features03.size);
-
-		// Match features up pair-wise across all three views
-		DogArray<AssociatedTripleIndex> associatedIdx =
-				ExampleComputeTrifocalTensor.threeViewPairwiseAssociate(detDesc.getNumberOfSets(),
-				features01,features02,features03, featureSet01, featureSet02, featureSet03);
-
-		// Convert inliers from sets of matching indexes into AssociatedTriple with pixel coordinates
-		var associated = new DogArray<>(AssociatedTriple::new);
-		associatedIdx.forEach(p->associated.grow().setTo(
-				locations01.get(p.a), locations02.get(p.b), locations03.get(p.c)));
+		associateThree.locations01.forEach(p->p.setTo(p.x-cx,p.y-cy));
+		associateThree.locations02.forEach(p->p.setTo(p.x-cx,p.y-cy));
+		associateThree.locations03.forEach(p->p.setTo(p.x-cx,p.y-cy));
 
 		System.out.println("Total Matched Triples = " + associated.size);
 
