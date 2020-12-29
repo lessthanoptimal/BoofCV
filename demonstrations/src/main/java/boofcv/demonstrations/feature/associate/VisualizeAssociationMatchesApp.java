@@ -180,8 +180,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		long time0 = System.nanoTime();
 		final List<Point2D_F64> leftPts = new ArrayList<>();
 		final List<Point2D_F64> rightPts = new ArrayList<>();
-		DogArray<TupleDesc> leftDesc = UtilFeature.createQueue(descriptor, 10);
-		DogArray<TupleDesc> rightDesc = UtilFeature.createQueue(descriptor, 10);
+		DogArray<TupleDesc> leftDesc = UtilFeature.createArray(descriptor, 10);
+		DogArray<TupleDesc> rightDesc = UtilFeature.createArray(descriptor, 10);
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Associating Features",

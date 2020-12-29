@@ -449,7 +449,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		associate = FactoryAssociation.ensureUnique(associate);
 		associateThree = new AssociateThreeByPairs<>(associate, detDesc.getDescriptionType());
 		for (int i = 0; i < 3; i++) {
-			features[i] = UtilFeature.createQueue(detDesc, 100);
+			features[i] = UtilFeature.createArray(detDesc, 100);
 		}
 	}
 

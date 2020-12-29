@@ -84,8 +84,8 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 		pointsB = new ArrayList<>();
 
 		// stores the description of detected interest points
-		DogArray<TD> descA = UtilFeature.createQueue(detDesc,100);
-		DogArray<TD> descB = UtilFeature.createQueue(detDesc,100);
+		DogArray<TD> descA = UtilFeature.createArray(detDesc,100);
+		DogArray<TD> descB = UtilFeature.createArray(detDesc,100);
 
 		// describe each image using interest points
 		describeImage(inputA,pointsA,descA);

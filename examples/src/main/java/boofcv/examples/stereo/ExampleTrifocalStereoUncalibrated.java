@@ -19,8 +19,6 @@
 package boofcv.examples.stereo;
 
 import boofcv.abst.disparity.StereoDisparity;
-import boofcv.abst.feature.associate.AssociateDescription;
-import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
@@ -30,7 +28,6 @@ import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
-import boofcv.alg.feature.associate.AssociateThreeByPairs;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -39,13 +36,15 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
+import boofcv.examples.sfm.ExampleComputeTrifocalTensor;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.disparity.FactoryStereoDisparity;
-import boofcv.factory.feature.associate.ConfigAssociateGreedy;
-import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.geo.*;
+import boofcv.factory.geo.ConfigBundleAdjustment;
+import boofcv.factory.geo.ConfigTrifocal;
+import boofcv.factory.geo.EnumTrifocal;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.feature.AssociatedTriplePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -67,7 +66,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -148,16 +146,20 @@ public class ExampleTrifocalStereoUncalibrated {
 		DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null, null, GrayU8.class);
 
-		DogArray<Point2D_F64> locations01 = new DogArray<>(Point2D_F64::new);
-		DogArray<Point2D_F64> locations02 = new DogArray<>(Point2D_F64::new);
-		DogArray<Point2D_F64> locations03 = new DogArray<>(Point2D_F64::new);
+		// Stores image coordinate
+		var locations01 = new DogArray<>(Point2D_F64::new);
+		var locations02 = new DogArray<>(Point2D_F64::new);
+		var locations03 = new DogArray<>(Point2D_F64::new);
 
-		DogArray<TupleDesc_F64> features01 = UtilFeature.createQueue(detDesc, 100);
-		DogArray<TupleDesc_F64> features02 = UtilFeature.createQueue(detDesc, 100);
-		DogArray<TupleDesc_F64> features03 = UtilFeature.createQueue(detDesc, 100);
-		DogArray_I32 featureSet01 = new DogArray_I32();
-		DogArray_I32 featureSet02 = new DogArray_I32();
-		DogArray_I32 featureSet03 = new DogArray_I32();
+		// Stores the descriptor for each feature
+		DogArray<TupleDesc_F64> features01 = UtilFeature.createArray(detDesc, 100);
+		DogArray<TupleDesc_F64> features02 = UtilFeature.createArray(detDesc, 100);
+		DogArray<TupleDesc_F64> features03 = UtilFeature.createArray(detDesc, 100);
+
+		// Indicates which "set" a feature belongs in. SURF can be white or black
+		var featureSet01 = new DogArray_I32();
+		var featureSet02 = new DogArray_I32();
+		var featureSet03 = new DogArray_I32();
 
 		// Converting data formats for the found features into what can be processed by SFM algorithms
 		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
@@ -169,71 +171,38 @@ public class ExampleTrifocalStereoUncalibrated {
 		double cx = width/2;
 		double cy = height/2;
 
-		detDesc.detect(image01);
-		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
-			Point2D_F64 pixel = detDesc.getLocation(i);
-			locations01.grow().setTo(pixel.x - cx, pixel.y - cy);
-			features01.grow().setTo(detDesc.getDescription(i));
-			featureSet01.add(detDesc.getSet(i));
-		}
-		detDesc.detect(image02);
-		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
-			Point2D_F64 pixel = detDesc.getLocation(i);
-			locations02.grow().setTo(pixel.x - cx, pixel.y - cy);
-			features02.grow().setTo(detDesc.getDescription(i));
-			featureSet02.add(detDesc.getSet(i));
-		}
-		detDesc.detect(image03);
-		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
-			Point2D_F64 pixel = detDesc.getLocation(i);
-			locations03.grow().setTo(pixel.x - cx, pixel.y - cy);
-			features03.grow().setTo(detDesc.getDescription(i));
-			featureSet03.add(detDesc.getSet(i));
-		}
+		ExampleComputeTrifocalTensor.detectFeatures(detDesc, image01, locations01, features01, featureSet01);
+		ExampleComputeTrifocalTensor.detectFeatures(detDesc, image02, locations02, features02, featureSet02);
+		ExampleComputeTrifocalTensor.detectFeatures(detDesc, image03, locations03, features03, featureSet03);
+
+		// The self calibration step requires that the image coordinate system be in the image center
+		locations01.forEach(p->p.setTo(p.x-cx,p.y-cy));
+		locations02.forEach(p->p.setTo(p.x-cx,p.y-cy));
+		locations03.forEach(p->p.setTo(p.x-cx,p.y-cy));
 
 		System.out.println("features01.size = " + features01.size);
 		System.out.println("features02.size = " + features02.size);
 		System.out.println("features03.size = " + features03.size);
 
-		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 0.1), scorer);
+		// Match features up pair-wise across all three views
+		DogArray<AssociatedTripleIndex> associatedIdx =
+				ExampleComputeTrifocalTensor.threeViewPairwiseAssociate(detDesc.getNumberOfSets(),
+				features01,features02,features03, featureSet01, featureSet02, featureSet03);
 
-		AssociateThreeByPairs<TupleDesc_F64> associateThree = new AssociateThreeByPairs<>(associate, TupleDesc_F64.class);
+		// Convert inliers from sets of matching indexes into AssociatedTriple with pixel coordinates
+		var associated = new DogArray<>(AssociatedTriple::new);
+		associatedIdx.forEach(p->associated.grow().setTo(
+				locations01.get(p.a), locations02.get(p.b), locations03.get(p.c)));
 
-		associateThree.initialize(detDesc.getNumberOfSets());
-		associateThree.setFeaturesA(features01, featureSet01);
-		associateThree.setFeaturesB(features02, featureSet02);
-		associateThree.setFeaturesC(features03, featureSet03);
+		System.out.println("Total Matched Triples = " + associated.size);
 
-		associateThree.associate();
+		var model = new TrifocalTensor();
+		List<AssociatedTriple> inliers = ExampleComputeTrifocalTensor.computeTrifocal(associated, model);
 
-		System.out.println("Total Matched Triples = " + associateThree.getMatches().size);
-
-		ConfigRansac configRansac = new ConfigRansac();
-		configRansac.iterations = 500;
-		configRansac.inlierThreshold = 1;
-
-		ConfigTrifocal configTri = new ConfigTrifocal();
-		ConfigTrifocalError configError = new ConfigTrifocalError();
-		configError.model = ConfigTrifocalError.Model.REPROJECTION_REFINE;
-
-		Ransac<TrifocalTensor, AssociatedTriple> ransac =
-				FactoryMultiViewRobust.trifocalRansac(configTri, configError, configRansac);
-
-		DogArray<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();
-		DogArray<AssociatedTriple> associated = new DogArray<>(AssociatedTriple::new);
-		for (int i = 0; i < associatedIdx.size; i++) {
-			AssociatedTripleIndex p = associatedIdx.get(i);
-			associated.grow().setTo(locations01.get(p.a), locations02.get(p.b), locations03.get(p.c));
-		}
-		ransac.process(associated.toList());
-
-		List<AssociatedTriple> inliers = ransac.getMatchSet();
-		TrifocalTensor model = ransac.getModelParameters();
 		System.out.println("Remaining after RANSAC " + inliers.size());
 
 		// Show remaining associations from RANSAC
-		AssociatedTriplePanel triplePanel = new AssociatedTriplePanel();
+		var triplePanel = new AssociatedTriplePanel();
 		triplePanel.setPixelOffset(cx, cy);
 		triplePanel.setImages(buff01, buff02, buff03);
 		triplePanel.setAssociation(inliers);
@@ -241,6 +210,7 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		// estimate using all the inliers
 		// No need to re-scale the input because the estimator automatically adjusts the input on its own
+		var configTri = new ConfigTrifocal();
 		configTri.which = EnumTrifocal.ALGEBRAIC_7;
 		configTri.converge.maxIterations = 100;
 		Estimate1ofTrifocalTensor trifocalEstimator = FactoryMultiView.trifocal_1(configTri);
@@ -261,12 +231,12 @@ public class ExampleTrifocalStereoUncalibrated {
 			throw new RuntimeException("Can't refine P2 and P3!");
 
 
-		SelfCalibrationLinearDualQuadratic selfcalib = new SelfCalibrationLinearDualQuadratic(1.0);
+		var selfcalib = new SelfCalibrationLinearDualQuadratic(1.0);
 		selfcalib.addCameraMatrix(P1);
 		selfcalib.addCameraMatrix(P2);
 		selfcalib.addCameraMatrix(P3);
 
-		List<CameraPinhole> listPinhole = new ArrayList<>();
+		var listPinhole = new ArrayList<CameraPinhole>();
 		GeometricResult result = selfcalib.solve();
 		if (GeometricResult.SOLVE_FAILED != result) {
 			for (int i = 0; i < 3; i++) {
@@ -291,12 +261,12 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		System.out.println("Projective to metric");
 		// convert camera matrix from projective to metric
-		DMatrixRMaj H = new DMatrixRMaj(4, 4); // storage for rectifying homography
+		var H = new DMatrixRMaj(4, 4); // storage for rectifying homography
 		if (!MultiViewOps.absoluteQuadraticToH(selfcalib.getQ(), H))
 			throw new RuntimeException("Projective to metric failed");
 
-		DMatrixRMaj K = new DMatrixRMaj(3, 3);
-		List<Se3_F64> worldToView = new ArrayList<>();
+		var K = new DMatrixRMaj(3, 3);
+		var worldToView = new ArrayList<Se3_F64>();
 		for (int i = 0; i < 3; i++) {
 			worldToView.add(new Se3_F64());
 		}
@@ -310,10 +280,10 @@ public class ExampleTrifocalStereoUncalibrated {
 		adjustTranslationScale(worldToView);
 
 		// Construct bundle adjustment data structure
-		SceneStructureMetric structure = new SceneStructureMetric(false);
+		var structure = new SceneStructureMetric(false);
 		structure.initialize(3, 3, inliers.size());
 
-		SceneObservations observations = new SceneObservations();
+		var observations = new SceneObservations();
 		observations.initialize(3);
 
 		for (int i = 0; i < listPinhole.size(); i++) {
@@ -360,7 +330,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		// Convergence can be improved by considering that possibility
 
 		// Now that we have a decent solution, prune the worst outliers to improve the fit quality even more
-		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure, observations);
+		var pruner = new PruneStructureFromSceneMetric(structure, observations);
 		pruner.pruneObservationsByErrorRank(0.7);
 		pruner.pruneViews(10);
 		pruner.pruneUnusedMotions();
@@ -377,12 +347,12 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		System.out.println("\n\nComputing Stereo Disparity");
 		BundlePinholeSimplified cp = structure.getCameras().get(0).getModel();
-		CameraPinholeBrown intrinsic01 = new CameraPinholeBrown();
+		var intrinsic01 = new CameraPinholeBrown();
 		intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, width, height);
 		intrinsic01.fsetRadial(cp.k1, cp.k2);
 
 		cp = structure.getCameras().get(1).getModel();
-		CameraPinholeBrown intrinsic02 = new CameraPinholeBrown();
+		var intrinsic02 = new CameraPinholeBrown();
 		intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, width, height);
 		intrinsic02.fsetRadial(cp.k1, cp.k2);
 
@@ -440,8 +410,8 @@ public class ExampleTrifocalStereoUncalibrated {
 //		drawInliers(origLeft, origRight, intrinsic, inliers);
 
 		// Rectify and remove lens distortion for stereo processing
-		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
-		DMatrixRMaj rectifiedR = new DMatrixRMaj(3, 3);
+		var rectifiedK = new DMatrixRMaj(3, 3);
+		var rectifiedR = new DMatrixRMaj(3, 3);
 
 		// rectify a colored image
 		Planar<GrayU8> rectColorLeft = colorLeft.createSameShape();
@@ -466,7 +436,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		ConvertImage.average(rectColorRight, rectifiedRight);
 
 		// compute disparity
-		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
+		var config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.CENSUS;
 		config.disparityMin = minDisparity;
 		config.disparityRange = rangeDisparity;

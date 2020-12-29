@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.EstimatePlaneAtInfinityGivenK;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
+import boofcv.examples.sfm.ExampleComputeFundamentalMatrix;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.io.UtilIO;
@@ -115,11 +116,11 @@ public class ExampleStereoUncalibrated {
 		GrayU8 image02 = ConvertImage.average(color02, null);
 
 		// Find a set of point feature matches
-		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(buff01, buff02);
+		List<AssociatedPair> matches = ExampleComputeFundamentalMatrix.computeMatches(buff01, buff02);
 
 		// Prune matches using the epipolar constraint. use a low threshold to prune more false matches
 		var inliers = new ArrayList<AssociatedPair>();
-		DMatrixRMaj F = ExampleFundamentalMatrix.robustFundamental(matches, inliers, 0.1);
+		DMatrixRMaj F = ExampleComputeFundamentalMatrix.robustFundamental(matches, inliers, 0.1);
 
 		// Perform self calibration using the projective view extracted from F
 		// Note that P1 = [I|0]

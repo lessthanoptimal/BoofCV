@@ -27,6 +27,7 @@ import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
+import boofcv.examples.sfm.ExampleComputeFundamentalMatrix;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.disparity.FactoryStereoDisparity;
@@ -95,7 +96,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		GrayU8 distortedRight = ConvertBufferedImage.convertFrom(origRight, (GrayU8)null);
 
 		// matched features between the two images
-		List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(origLeft, origRight);
+		List<AssociatedPair> matchedFeatures = ExampleComputeFundamentalMatrix.computeMatches(origLeft, origRight);
 
 		// convert from pixel coordinates into normalized image coordinates
 		List<AssociatedPair> matchedCalibrated = convertToNormalizedCoordinates(matchedFeatures, intrinsic);

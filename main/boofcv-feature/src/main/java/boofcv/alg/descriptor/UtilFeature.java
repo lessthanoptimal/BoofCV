@@ -39,17 +39,17 @@ import java.util.List;
 public class UtilFeature {
 	/**
 	 * Creates a DogArray and declares new instances of the descriptor using the provided
-	 * {@link DetectDescribePoint}.  The queue will have declareInstance set to true, otherwise
+	 * {@link DetectDescribePoint}.  The array will have declareInstance set to true, otherwise
 	 * why would you be using this function?
 	 */
 	public static <TD extends TupleDesc>
-	DogArray<TD> createQueue(final DescriptorInfo<TD> detDesc , int initialMax ) {
+	DogArray<TD> createArray( final DescriptorInfo<TD> detDesc , int initialMax ) {
 		DogArray<TD> ret = new DogArray<>(detDesc::createDescription);
 		ret.reserve(initialMax);
 		return ret;
 	}
 
-	public static DogArray<TupleDesc_F64> createQueueF64( final int length ) {
+	public static DogArray<TupleDesc_F64> createArrayF64( final int length ) {
 		return new DogArray<>(()->new TupleDesc_F64(length));
 	}
 
