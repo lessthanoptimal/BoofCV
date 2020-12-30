@@ -227,6 +227,10 @@ public class UtilIO {
 		}
 	}
 
+	public static void write( OutputStream output, String message ) throws IOException {
+		output.write(message.getBytes(UTF_8));
+	}
+
 	public static String pathExample( String path ) {
 		File fpath = new File(path);
 		if (fpath.isAbsolute())
