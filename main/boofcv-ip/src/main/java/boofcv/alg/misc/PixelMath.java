@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( GrayI8 input, Function1_I8 function, GrayI8 output ) {
+	public static void operator1( GrayI8 input, Function1_I8 function, GrayI8 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -72,7 +72,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( InterleavedI8 input, Function1_I8 function, InterleavedI8 output ) {
+	public static void operator1( InterleavedI8 input, Function1_I8 function, InterleavedI8 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -96,7 +96,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( GrayI16 input, Function1_I16 function, GrayI16 output ) {
+	public static void operator1( GrayI16 input, Function1_I16 function, GrayI16 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -120,7 +120,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( InterleavedI16 input, Function1_I16 function, InterleavedI16 output ) {
+	public static void operator1( InterleavedI16 input, Function1_I16 function, InterleavedI16 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -144,7 +144,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( GrayS32 input, Function1_S32 function, GrayS32 output ) {
+	public static void operator1( GrayS32 input, Function1_S32 function, GrayS32 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -168,7 +168,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( InterleavedS32 input, Function1_S32 function, InterleavedS32 output ) {
+	public static void operator1( InterleavedS32 input, Function1_S32 function, InterleavedS32 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -192,7 +192,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( GrayS64 input, Function1_S64 function, GrayS64 output ) {
+	public static void operator1( GrayS64 input, Function1_S64 function, GrayS64 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -216,7 +216,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( InterleavedS64 input, Function1_S64 function, InterleavedS64 output ) {
+	public static void operator1( InterleavedS64 input, Function1_S64 function, InterleavedS64 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -240,7 +240,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( GrayF32 input, Function1_F32 function, GrayF32 output ) {
+	public static void operator1( GrayF32 input, Function1_F32 function, GrayF32 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -264,7 +264,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( InterleavedF32 input, Function1_F32 function, InterleavedF32 output ) {
+	public static void operator1( InterleavedF32 input, Function1_F32 function, InterleavedF32 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -288,7 +288,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( GrayF64 input, Function1_F64 function, GrayF64 output ) {
+	public static void operator1( GrayF64 input, Function1_F64 function, GrayF64 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -312,7 +312,7 @@ public class PixelMath {
 	 * @param function The function to apply.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void lambda1( InterleavedF64 input, Function1_F64 function, InterleavedF64 output ) {
+	public static void operator1( InterleavedF64 input, Function1_F64 function, InterleavedF64 output ) {
 
 		output.reshape(input.width,input.height);
 
@@ -337,7 +337,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( GrayI8 imgA, Function2_I8 function, GrayI8 imgB, GrayI8 output ) {
+	public static void operator2( GrayI8 imgA, Function2_I8 function, GrayI8 imgB, GrayI8 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -365,7 +365,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( InterleavedI8 imgA, Function2_I8 function, InterleavedI8 imgB, InterleavedI8 output ) {
+	public static void operator2( InterleavedI8 imgA, Function2_I8 function, InterleavedI8 imgB, InterleavedI8 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -393,7 +393,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( GrayI16 imgA, Function2_I16 function, GrayI16 imgB, GrayI16 output ) {
+	public static void operator2( GrayI16 imgA, Function2_I16 function, GrayI16 imgB, GrayI16 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -421,7 +421,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( InterleavedI16 imgA, Function2_I16 function, InterleavedI16 imgB, InterleavedI16 output ) {
+	public static void operator2( InterleavedI16 imgA, Function2_I16 function, InterleavedI16 imgB, InterleavedI16 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -449,7 +449,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( GrayS32 imgA, Function2_S32 function, GrayS32 imgB, GrayS32 output ) {
+	public static void operator2( GrayS32 imgA, Function2_S32 function, GrayS32 imgB, GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -477,7 +477,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( InterleavedS32 imgA, Function2_S32 function, InterleavedS32 imgB, InterleavedS32 output ) {
+	public static void operator2( InterleavedS32 imgA, Function2_S32 function, InterleavedS32 imgB, InterleavedS32 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -505,7 +505,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( GrayS64 imgA, Function2_S64 function, GrayS64 imgB, GrayS64 output ) {
+	public static void operator2( GrayS64 imgA, Function2_S64 function, GrayS64 imgB, GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -533,7 +533,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( InterleavedS64 imgA, Function2_S64 function, InterleavedS64 imgB, InterleavedS64 output ) {
+	public static void operator2( InterleavedS64 imgA, Function2_S64 function, InterleavedS64 imgB, InterleavedS64 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -561,7 +561,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( GrayF32 imgA, Function2_F32 function, GrayF32 imgB, GrayF32 output ) {
+	public static void operator2( GrayF32 imgA, Function2_F32 function, GrayF32 imgB, GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -589,7 +589,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( InterleavedF32 imgA, Function2_F32 function, InterleavedF32 imgB, InterleavedF32 output ) {
+	public static void operator2( InterleavedF32 imgA, Function2_F32 function, InterleavedF32 imgB, InterleavedF32 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -617,7 +617,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( GrayF64 imgA, Function2_F64 function, GrayF64 imgB, GrayF64 output ) {
+	public static void operator2( GrayF64 imgA, Function2_F64 function, GrayF64 imgB, GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
@@ -645,7 +645,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void lambda2( InterleavedF64 imgA, Function2_F64 function, InterleavedF64 imgB, InterleavedF64 output ) {
+	public static void operator2( InterleavedF64 imgA, Function2_F64 function, InterleavedF64 imgB, InterleavedF64 output ) {
 
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
