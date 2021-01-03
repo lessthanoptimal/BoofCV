@@ -66,7 +66,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	public double maxReprojectionErrorPixel = 1e100;
 
 	/** Bundle Adjustment functions and configurations */
-	public final MetricBundleAdjustmentUtils bundleAdjustment = new MetricBundleAdjustmentUtils();
+	public final MetricBundleAdjustmentUtils bundleAdjustment;
 
 	// pixels to undistorted normalized image coordinates and the erverse
 	protected final List<Point2Transform2_F64> listPixelToNorm = new ArrayList<>();
@@ -104,6 +104,14 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 	private final Point4D_F64 camera3D = new Point4D_F64();
 	// Storage for triangulated point
 	private final Point4D_F64 found3D = new Point4D_F64();
+
+	public RefineMetricWorkingGraph( MetricBundleAdjustmentUtils bundleAdjustment ) {
+		this.bundleAdjustment = bundleAdjustment;
+	}
+
+	public RefineMetricWorkingGraph() {
+		this(new MetricBundleAdjustmentUtils());
+	}
 
 	/**
 	 * Use the `graph` to define a 3D scene which can be optimized.

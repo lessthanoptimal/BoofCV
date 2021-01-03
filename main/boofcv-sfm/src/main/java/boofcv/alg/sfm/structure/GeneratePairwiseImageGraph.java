@@ -18,9 +18,6 @@
 
 package boofcv.alg.sfm.structure;
 
-import boofcv.factory.geo.ConfigFundamental;
-import boofcv.factory.geo.ConfigRansac;
-import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
@@ -72,24 +69,12 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	private PrintStream verbose;
 
 	/**
-	 * Configures and declares concensum matching algorithms
+	 * Specifies consensus matching algorithms
 	 */
-	public GeneratePairwiseImageGraph() {
-		ConfigRansac configRansacF = new ConfigRansac();
-		configRansacF.iterations = 500;
-		configRansacF.inlierThreshold = 1;
-
-		// F computes epipolar error, which isn't as strict as reprojection error for H, so give H a larger error tol
-		ConfigRansac configRansacH = new ConfigRansac();
-		configRansacH.iterations = 500;
-		configRansacH.inlierThreshold = 2.0;
-
-		ConfigFundamental configF = new ConfigFundamental();
-		configF.errorModel = ConfigFundamental.ErrorModel.GEOMETRIC;
-		configF.numResolve = 1;
-
-		ransac3D = FactoryMultiViewRobust.fundamentalRansac(configF, configRansacF);
-		ransacH = FactoryMultiViewRobust.homographyRansac(null, configRansacH);
+	public GeneratePairwiseImageGraph(ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D,
+									  ModelMatcher<Homography2D_F64, AssociatedPair> ransacH) {
+		this.ransac3D = ransac3D;
+		this.ransacH = ransacH;
 	}
 
 	/**

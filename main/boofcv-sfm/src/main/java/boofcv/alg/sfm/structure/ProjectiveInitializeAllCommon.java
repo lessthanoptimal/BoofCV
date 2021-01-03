@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/** Common algorithms for reconstructing the projective scene */
-	@Getter @Setter PairwiseGraphUtils utils = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
+	@Getter @Setter PairwiseGraphUtils utils;
 
 	/**
 	 * List of feature indexes in the seed view that are the inliers from robust model matching.
@@ -98,6 +98,14 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * of the inlier set.
 	 */
 	protected final DogArray_I32 seedToStructure = new DogArray_I32();
+
+	public ProjectiveInitializeAllCommon(ConfigProjectiveReconstruction configProjective) {
+		utils = new PairwiseGraphUtils(configProjective);
+	}
+
+	public ProjectiveInitializeAllCommon() {
+		this(new ConfigProjectiveReconstruction());
+	}
 
 	/**
 	 * Computes a projective reconstruction. Reconstruction will be relative the 'seed' and only use features

@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.scene;
+package boofcv.alg.sfm.structure;
 
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTrackerDefault;
-import boofcv.alg.scene.PointTrackerToSimilarImages.Frame;
-import boofcv.alg.scene.PointTrackerToSimilarImages.Matches;
+import boofcv.alg.sfm.structure.PointTrackerToSimilarImages.Frame;
+import boofcv.alg.sfm.structure.PointTrackerToSimilarImages.Matches;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;

@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.sfm.FactorySceneReconstruction;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
@@ -45,7 +46,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 	 */
 	@Test
 	void process_0_to_1() {
-		GeneratePairwiseImageGraph alg = new GeneratePairwiseImageGraph();
+		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 
 		for (int numViews = 0; numViews < 2; numViews++) {
 			MockLookupSimilarImages similar = new MockLookupSimilarImages(numViews, 123123);
@@ -62,7 +63,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 	 */
 	@Test
 	void process_connected() {
-		var alg = new GeneratePairwiseImageGraph();
+		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 
 		var similar = new MockLookupSimilarImages(4, 123123);
 		alg.process(similar);
@@ -96,7 +97,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 
 	@Test
 	void createEdge_3D() {
-		var alg = new GeneratePairwiseImageGraph();
+		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
 
@@ -121,7 +122,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 
 	@Test
 	void createEdge_Rotation() {
-		var alg = new GeneratePairwiseImageGraph();
+		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
 
@@ -146,7 +147,7 @@ class TestGeneratePairwiseImageGraph extends BoofStandardJUnit {
 
 	@Test
 	void createEdge_Planar() {
-		var alg = new GeneratePairwiseImageGraph();
+		GeneratePairwiseImageGraph alg = FactorySceneReconstruction.generatePairwise(null);
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
 

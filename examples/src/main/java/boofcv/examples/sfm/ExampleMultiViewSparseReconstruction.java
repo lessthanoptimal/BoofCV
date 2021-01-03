@@ -22,11 +22,11 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
-import boofcv.alg.scene.PointTrackerToSimilarImages;
 import boofcv.alg.sfm.structure.*;
 import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.sfm.FactorySceneReconstruction;
 import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
@@ -59,6 +59,7 @@ import java.io.File;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
@@ -187,6 +188,7 @@ public class ExampleMultiViewSparseReconstruction {
 			for (int frameId = 0; frameId < imageFiles.size(); frameId++) {
 				String filePath = imageFiles.get(frameId);
 				GrayU8 frame = UtilImageIO.loadImage(filePath, GrayU8.class);
+				Objects.requireNonNull(frame,"Failed to load image");
 				if (first) {
 					first = false;
 					trackerSimilar.initialize(frame.width, frame.height);
@@ -232,7 +234,7 @@ public class ExampleMultiViewSparseReconstruction {
 		trackImageFeatures();
 		System.out.println("----------------------------------------------------------------------------");
 		System.out.println("### Creating Pairwise");
-		var generatePairwise = new GeneratePairwiseImageGraph();
+		GeneratePairwiseImageGraph generatePairwise = FactorySceneReconstruction.generatePairwise(null);
 		BoofMiscOps.profile(() -> {
 			generatePairwise.setVerbose(System.out, null);
 			generatePairwise.process(similarImages);
