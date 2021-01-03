@@ -30,8 +30,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import static boofcv.alg.misc.TestPixelMath.createLambda1_Plus5;
-import static boofcv.alg.misc.TestPixelMath.createLambda2_AddPlus5;
+import static boofcv.alg.misc.TestPixelMath.createOperator1_Plus5;
+import static boofcv.alg.misc.TestPixelMath.createOperator2_AddPlus5;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -183,16 +183,16 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 			ret[0][2] = output;
-		} else if (name.equals("lambda1")) {
+		} else if (name.equals("operator1")) {
 			output = createImage(param[2], null);
 			ret[0][0] = inputA;
-			ret[0][1] = createLambda1_Plus5(inputA.imageType.getDataType());
+			ret[0][1] = createOperator1_Plus5(inputA.imageType.getDataType());
 			ret[0][2] = output;
-		} else if (name.equals("lambda2")) {
+		} else if (name.equals("operator2")) {
 			inputB = createImage(param[2], null);
 			output = createImage(param[3], null);
 			ret[0][0] = inputA;
-			ret[0][1] = createLambda2_AddPlus5(inputA.imageType.getDataType());
+			ret[0][1] = createOperator2_AddPlus5(inputA.imageType.getDataType());
 			ret[0][2] = inputB;
 			ret[0][3] = output;
 		}
@@ -296,10 +296,10 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 				inputs[2] = 8;
 			} else if (name.equals("log") || name.equals("logSign")) {
 				inputs[1] = BoofTesting.primitive(0.5, param[1]);
-			} else if (name.equals("lambda1")) {
-				inputs[1] = createLambda1_Plus5(ImageDataType.F32);
-			} else if (name.equals("lambda2")) {
-				inputs[1] = createLambda2_AddPlus5(ImageDataType.F32);
+			} else if (name.equals("operator1")) {
+				inputs[1] = createOperator1_Plus5(ImageDataType.F32);
+			} else if (name.equals("operator2")) {
+				inputs[1] = createOperator2_AddPlus5(ImageDataType.F32);
 			} else if (name.equals("averageBand")) {
 				continue;
 			}

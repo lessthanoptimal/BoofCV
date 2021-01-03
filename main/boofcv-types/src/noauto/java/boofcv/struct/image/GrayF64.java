@@ -80,6 +80,20 @@ public class GrayF64 extends GrayF<GrayF64> {
 		data[getIndex(x, y)] = value;
 	}
 
+	/**
+	 * Passes in the coordinate and value of each pixel in the image.
+	 *
+	 * @param function (Input) The function
+	 */
+	public void forEachPixel( EachPixel function ) {
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++) {
+				function.process(x, y, data[index++]);
+			}
+		}
+	}
+
 	@Override
 	public void print() {
 		print("%4.1f");
@@ -142,5 +156,9 @@ public class GrayF64 extends GrayF<GrayF64> {
 
 	public void setData( double[] data ) {
 		this.data = data;
+	}
+
+	@FunctionalInterface interface EachPixel {
+		void process( int x, int y, double value );
 	}
 }

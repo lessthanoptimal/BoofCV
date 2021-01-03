@@ -26,7 +26,7 @@ import javax.annotation.Generated;
 /**
  * Generalized version of {@link PixelMath}.  Type checking is performed at runtime instead of at compile type.
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GenerateGPixelMath</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateGPixelMath</p>
  *
  * @author Peter Abeles
  */
@@ -34,7 +34,7 @@ import javax.annotation.Generated;
 public class GPixelMath {
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 * Both the input and output image can be the same instance.
 	 */
 	public static <T extends ImageBase<T>> void operator1( T input, Function1 function, T output )
@@ -84,7 +84,7 @@ public class GPixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 * Both the imgA, imgB, and output images can be the same instance.
 	 */
 	public static <T extends ImageBase<T>> void operator2( T imgA, Function2 function, T imgB, T output )

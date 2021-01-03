@@ -39,7 +39,7 @@ package boofcv.struct.image;
  */
 public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 
-	protected GrayI(int width, int height ) {
+	protected GrayI( int width, int height ) {
 		super(width, height);
 	}
 
@@ -52,30 +52,30 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
-	public int get(int x, int y) {
+	public int get( int x, int y ) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
+			throw new ImageAccessException("Requested pixel is out of bounds: " + x + " " + y);
 
-		return unsafe_get(x,y);
+		return unsafe_get(x, y);
 	}
 
 	/**
 	 * Sets the value of the specified pixel.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
-	public abstract void set(int x, int y, int value );
+	public abstract void set( int x, int y, int value );
 
 	/**
 	 * Set function which does not perform bounds checking.
 	 *
-	 * @param x	 pixel coordinate.
-	 * @param y	 pixel coordinate.
+	 * @param x pixel coordinate.
+	 * @param y pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
-	public abstract void unsafe_set( int x , int y , int value );
+	public abstract void unsafe_set( int x, int y, int value );
 
 	/**
 	 * Get function which does not perform bounds checking.
@@ -84,18 +84,29 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 	 * @param y pixel coordinate.
 	 * @return an intensity value.
 	 */
-	public abstract int unsafe_get( int x , int y );
+	public abstract int unsafe_get( int x, int y );
 
-	@Override
-	public ImageDataType getDataType() {
+	/**
+	 * Passes in the coordinate and value of each pixel in the image.
+	 *
+	 * @param function (Input) The function
+	 */
+	public void forEachPixel( EachPixel function ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				function.process(x, y, unsafe_get(x, y));
+			}
+		}
+	}
+
+	@Override public ImageDataType getDataType() {
 		return ImageDataType.I;
 	}
 
-	@Override
-	public void print() {
+	@Override public void print() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				System.out.printf("%3d ",get(x,y));
+				System.out.printf("%3d ", get(x, y));
 			}
 			System.out.println();
 		}
@@ -104,20 +115,25 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 	public void printBinary() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				System.out.printf("%1d",get(x,y));
+				System.out.printf("%1d", get(x, y));
 			}
 			System.out.println();
 		}
 	}
+
 	public void printNotZero() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if( unsafe_get(x, y) == 0 )
+				if (unsafe_get(x, y) == 0)
 					System.out.print("0");
 				else
 					System.out.print("1");
 			}
 			System.out.println();
 		}
+	}
+
+	@FunctionalInterface interface EachPixel {
+		void process( int x, int y, int value );
 	}
 }

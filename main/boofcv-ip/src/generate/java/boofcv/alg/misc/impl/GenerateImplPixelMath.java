@@ -67,7 +67,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
-				"import boofcv.alg.misc.PixelMathOperators.*;\n" +
+				"import boofcv.alg.misc.PixelMathLambdas.*;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
@@ -79,7 +79,6 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	}
 
 	public void printAll() {
-
 		AutoTypeImage[] types = AutoTypeImage.getSpecificTypes();
 
 		for (AutoTypeImage t : types) {
@@ -702,8 +701,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-		GenerateImplPixelMath gen = new GenerateImplPixelMath();
-		gen.parseArguments(args);
-		gen.generateCode();
+		var gen = new GenerateImplPixelMath();
+		gen.setModuleName("boofcv-ip");
+		gen.generate();
 	}
 }
