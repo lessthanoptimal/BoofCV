@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,8 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
-		printFunction(lambda1(), AutoTypeImage.getGenericTypes());
-		printFunction2same(lambda2(), AutoTypeImage.getGenericTypes());
+		printFunction(operator1(), AutoTypeImage.getGenericTypes());
+		printFunction2same(operator2(), AutoTypeImage.getGenericTypes());
 		printFunction(abs(), signedTypes, signedTypes);
 		printFunction(negative(), signedTypes, signedTypes);
 		printFunction2(divide_ISI(false), standardTypes);
@@ -252,11 +252,11 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	public Function lambda1() {
+	public Function operator1() {
 		Function f = new Function() {
 			@Override
 			public String printJavadoc() {
-				return "\t * Applies the lambda function to each element in the input image. output[i] = function(input[i])\n" +
+				return "\t * Applies the lambda operation to each element in the input image. output[i] = function(input[i])\n" +
 						"\t * Both the input and output image can be the same instance.\n";
 			}
 			@Override
@@ -271,15 +271,15 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 			@Override
 			public String printCallPlanar() {return "in.getBand(i), function, out.getBand(i)";}
 		};
-		f.name = "lambda1";
+		f.name = "operator1";
 		return f;
 	}
 
-	public Function lambda2() {
+	public Function operator2() {
 		Function f = new Function() {
 			@Override
 			public String printJavadoc() {
-				return "\t * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])\n" +
+				return "\t * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])\n" +
 						"\t * Both the imgA, imgB, and output images can be the same instance.\n";
 			}
 			@Override
@@ -294,7 +294,7 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 			@Override
 			public String printCallPlanar() {return "_imgA.getBand(i), function, _imgB.getBand(i), out.getBand(i)";}
 		};
-		f.name = "lambda2";
+		f.name = "operator2";
 		return f;
 	}
 

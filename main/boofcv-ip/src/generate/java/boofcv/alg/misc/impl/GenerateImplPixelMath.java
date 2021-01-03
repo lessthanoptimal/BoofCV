@@ -41,8 +41,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
-		printLambda1(AutoTypeImage.getGenericTypes());
-		printLambda2(AutoTypeImage.getGenericTypes());
+		printOperator1(AutoTypeImage.getGenericTypes());
+		printOperator2(AutoTypeImage.getGenericTypes());
 		printAbs();
 		printNegative();
 
@@ -67,7 +67,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
-				"import boofcv.alg.misc.PixelMathLambdas.*;\n" +
+				"import boofcv.alg.misc.PixelMathOperators.*;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
@@ -136,16 +136,16 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	private void printLambda1( AutoTypeImage[] types ) {
+	private void printOperator1( AutoTypeImage[] types ) {
 		for (AutoTypeImage input : types) {
-			String lambdaType = input.getAbbreviatedType();
+			String operatorType = input.getAbbreviatedType();
 
 			String arrayType = input.getDataType();
 			out.println(
-					"\tpublic static void lambda1( " + arrayType + "[] input, int inputStart, int inputStride,\n" +
+					"\tpublic static void operator1( " + arrayType + "[] input, int inputStart, int inputStride,\n" +
 							"\t\t\t\t\t\t\t   " + arrayType + "[] output, int outputStart, int outputStride,\n" +
 							"\t\t\t\t\t\t\t   int rows, int cols,\n" +
-							"\t\t\t\t\t\t\t   Function1_" + lambdaType + " function ) {\n" +
+							"\t\t\t\t\t\t\t   Function1_" + operatorType + " function ) {\n" +
 							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor (int y = 0; y < rows; y++) {\n" +
 							"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
@@ -161,17 +161,17 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	private void printLambda2( AutoTypeImage[] types ) {
+	private void printOperator2( AutoTypeImage[] types ) {
 		for (AutoTypeImage input : types) {
-			String lambdaType = input.getAbbreviatedType();
+			String operatorType = input.getAbbreviatedType();
 			String arrayType = input.getDataType();
 
 			out.println(
-					"\tpublic static void lambda2( " + arrayType + "[] inputA, int inputStartA, int inputStrideA,\n" +
+					"\tpublic static void operator2( " + arrayType + "[] inputA, int inputStartA, int inputStrideA,\n" +
 							"\t\t\t\t\t\t\t   " + arrayType + "[] inputB, int inputStartB, int inputStrideB,\n" +
 							"\t\t\t\t\t\t\t   " + arrayType + "[] output, int outputStart, int outputStride,\n" +
 							"\t\t\t\t\t\t\t   int rows, int cols,\n" +
-							"\t\t\t\t\t\t\t   Function2_" + lambdaType + " function ) {\n" +
+							"\t\t\t\t\t\t\t   Function2_" + operatorType + " function ) {\n" +
 							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor (int y = 0; y < rows; y++) {\n" +
 							"\t\t\tint indexA = inputStartA + y*inputStrideA;\n" +

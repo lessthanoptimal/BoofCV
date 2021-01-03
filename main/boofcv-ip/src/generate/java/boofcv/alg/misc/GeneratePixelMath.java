@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
-		printLambda1();
-		printLambda2();
+		printOperator1();
+		printOperator2();
 		printAbs();
 		printNegative();
 
@@ -163,9 +163,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	public void printLambda1() {
+	public void printOperator1() {
 		String javadoc = "\t/**\n" +
-				"\t * Applies the lambda function to each element in the input image. output[i] = function(input[i])\n" +
+				"\t * Applies the lambda operation to each element in the input image. output[i] = function(input[i])\n" +
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param function The function to apply.\n" +
@@ -186,18 +186,18 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				}
 
 				out.println(javadoc+
-						"\tpublic static void lambda1( "+inputName+" input, Function1_"+lambdaType+" function, "+inputName+" output ) {\n" +
+						"\tpublic static void operator1( "+inputName+" input, Function1_"+lambdaType+" function, "+inputName+" output ) {\n" +
 						"\n" +
 						"\t\toutput.reshape(input.width,input.height);\n" +
 						"\n" +
 						"\t\tint columns = "+columns+";\n" +
 						"\t\tint N = input.width*input.height;\n" +
 						"\t\tif (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-						"\t\t\tImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,\n" +
+						"\t\t\tImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,\n" +
 						"\t\t\t\t\toutput.data, output.startIndex, output.stride,\n" +
 						"\t\t\t\t\tinput.height, columns, function);\n" +
 						"\t\t} else {\n" +
-						"\t\t\tImplPixelMath.lambda1(input.data, input.startIndex, input.stride,\n" +
+						"\t\t\tImplPixelMath.operator1(input.data, input.startIndex, input.stride,\n" +
 						"\t\t\t\t\toutput.data, output.startIndex, output.stride,\n" +
 						"\t\t\t\t\tinput.height, columns, function);\n" +
 						"\t\t}\n" +
@@ -206,9 +206,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		}
 	}
 
-	public void printLambda2() {
+	public void printOperator2() {
 		String javadoc = "\t/**\n" +
-				"\t * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])\n" +
+				"\t * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])\n" +
 				"\t *\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param function The function to apply.\n" +
@@ -230,7 +230,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				}
 
 				out.println(javadoc +
-						"\tpublic static void lambda2( " + inputName + " imgA, Function2_" + lambdaType +
+						"\tpublic static void operator2( " + inputName + " imgA, Function2_" + lambdaType +
 						" function, "+inputName+" imgB, " + inputName + " output ) {\n" +
 						"\n" +
 						"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
@@ -239,12 +239,12 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 						"\t\tint columns = " + columns + ";\n" +
 						"\t\tint N = imgA.width*imgA.height;\n" +
 						"\t\tif (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-						"\t\t\tImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,\n" +
+						"\t\t\tImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,\n" +
 						"\t\t\t\t\timgB.data, imgB.startIndex, imgB.stride,\n" +
 						"\t\t\t\t\toutput.data, output.startIndex, output.stride,\n" +
 						"\t\t\t\t\timgA.height, columns, function);\n" +
 						"\t\t} else {\n" +
-						"\t\t\tImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,\n" +
+						"\t\t\tImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,\n" +
 						"\t\t\t\t\timgB.data, imgB.startIndex, imgB.stride,\n" +
 						"\t\t\t\t\toutput.data, output.startIndex, output.stride,\n" +
 						"\t\t\t\t\timgA.height, columns, function);\n" +

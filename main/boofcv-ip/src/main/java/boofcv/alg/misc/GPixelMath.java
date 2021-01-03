@@ -37,37 +37,37 @@ public class GPixelMath {
 	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
 	 * Both the input and output image can be the same instance.
 	 */
-	public static <T extends ImageBase<T>> void lambda1( T input, Function1 function, T output )
+	public static <T extends ImageBase<T>> void operator1( T input, Function1 function, T output )
 	{
 		if( input instanceof ImageGray) {
 			if (GrayI8.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((GrayI8) input, (Function1_I8)function, (GrayI8) output);
+				PixelMath.operator1((GrayI8) input, (Function1_I8)function, (GrayI8) output);
 			} else if (GrayI16.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((GrayI16) input, (Function1_I16)function, (GrayI16) output);
+				PixelMath.operator1((GrayI16) input, (Function1_I16)function, (GrayI16) output);
 			} else if (GrayS32.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((GrayS32) input, (Function1_S32)function, (GrayS32) output);
+				PixelMath.operator1((GrayS32) input, (Function1_S32)function, (GrayS32) output);
 			} else if (GrayS64.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((GrayS64) input, (Function1_S64)function, (GrayS64) output);
+				PixelMath.operator1((GrayS64) input, (Function1_S64)function, (GrayS64) output);
 			} else if (GrayF32.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((GrayF32) input, (Function1_F32)function, (GrayF32) output);
+				PixelMath.operator1((GrayF32) input, (Function1_F32)function, (GrayF32) output);
 			} else if (GrayF64.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((GrayF64) input, (Function1_F64)function, (GrayF64) output);
+				PixelMath.operator1((GrayF64) input, (Function1_F64)function, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 			}
 		} else if( input instanceof ImageInterleaved ) {
 			if (InterleavedI8.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((InterleavedI8) input, (Function1_I8)function, (InterleavedI8) output);
+				PixelMath.operator1((InterleavedI8) input, (Function1_I8)function, (InterleavedI8) output);
 			} else if (InterleavedI16.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((InterleavedI16) input, (Function1_I16)function, (InterleavedI16) output);
+				PixelMath.operator1((InterleavedI16) input, (Function1_I16)function, (InterleavedI16) output);
 			} else if (InterleavedS32.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((InterleavedS32) input, (Function1_S32)function, (InterleavedS32) output);
+				PixelMath.operator1((InterleavedS32) input, (Function1_S32)function, (InterleavedS32) output);
 			} else if (InterleavedS64.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((InterleavedS64) input, (Function1_S64)function, (InterleavedS64) output);
+				PixelMath.operator1((InterleavedS64) input, (Function1_S64)function, (InterleavedS64) output);
 			} else if (InterleavedF32.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((InterleavedF32) input, (Function1_F32)function, (InterleavedF32) output);
+				PixelMath.operator1((InterleavedF32) input, (Function1_F32)function, (InterleavedF32) output);
 			} else if (InterleavedF64.class.isAssignableFrom(input.getClass())) {
-				PixelMath.lambda1((InterleavedF64) input, (Function1_F64)function, (InterleavedF64) output);
+				PixelMath.operator1((InterleavedF64) input, (Function1_F64)function, (InterleavedF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 			}
@@ -76,7 +76,7 @@ public class GPixelMath {
 			Planar out = (Planar)output;
 
 			for (int i = 0; i < in.getNumBands(); i++) {
-				lambda1(in.getBand(i), function, out.getBand(i));
+				operator1(in.getBand(i), function, out.getBand(i));
 			}
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
@@ -87,37 +87,37 @@ public class GPixelMath {
 	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
 	 * Both the imgA, imgB, and output images can be the same instance.
 	 */
-	public static <T extends ImageBase<T>> void lambda2( T imgA, Function2 function, T imgB, T output )
+	public static <T extends ImageBase<T>> void operator2( T imgA, Function2 function, T imgB, T output )
 	{
 		if( imgA instanceof ImageGray) {
 			if (GrayI8.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((GrayI8) imgA, (Function2_I8)function, (GrayI8) imgB, (GrayI8) output);
+				PixelMath.operator2((GrayI8) imgA, (Function2_I8)function, (GrayI8) imgB, (GrayI8) output);
 			} else if (GrayI16.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((GrayI16) imgA, (Function2_I16)function, (GrayI16) imgB, (GrayI16) output);
+				PixelMath.operator2((GrayI16) imgA, (Function2_I16)function, (GrayI16) imgB, (GrayI16) output);
 			} else if (GrayS32.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((GrayS32) imgA, (Function2_S32)function, (GrayS32) imgB, (GrayS32) output);
+				PixelMath.operator2((GrayS32) imgA, (Function2_S32)function, (GrayS32) imgB, (GrayS32) output);
 			} else if (GrayS64.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((GrayS64) imgA, (Function2_S64)function, (GrayS64) imgB, (GrayS64) output);
+				PixelMath.operator2((GrayS64) imgA, (Function2_S64)function, (GrayS64) imgB, (GrayS64) output);
 			} else if (GrayF32.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((GrayF32) imgA, (Function2_F32)function, (GrayF32) imgB, (GrayF32) output);
+				PixelMath.operator2((GrayF32) imgA, (Function2_F32)function, (GrayF32) imgB, (GrayF32) output);
 			} else if (GrayF64.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((GrayF64) imgA, (Function2_F64)function, (GrayF64) imgB, (GrayF64) output);
+				PixelMath.operator2((GrayF64) imgA, (Function2_F64)function, (GrayF64) imgB, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + imgA.getClass().getSimpleName());
 			}
 		} else if( imgA instanceof ImageInterleaved ) {
 			if (InterleavedI8.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((InterleavedI8) imgA, (Function2_I8)function, (InterleavedI8) imgB, (InterleavedI8) output);
+				PixelMath.operator2((InterleavedI8) imgA, (Function2_I8)function, (InterleavedI8) imgB, (InterleavedI8) output);
 			} else if (InterleavedI16.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((InterleavedI16) imgA, (Function2_I16)function, (InterleavedI16) imgB, (InterleavedI16) output);
+				PixelMath.operator2((InterleavedI16) imgA, (Function2_I16)function, (InterleavedI16) imgB, (InterleavedI16) output);
 			} else if (InterleavedS32.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((InterleavedS32) imgA, (Function2_S32)function, (InterleavedS32) imgB, (InterleavedS32) output);
+				PixelMath.operator2((InterleavedS32) imgA, (Function2_S32)function, (InterleavedS32) imgB, (InterleavedS32) output);
 			} else if (InterleavedS64.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((InterleavedS64) imgA, (Function2_S64)function, (InterleavedS64) imgB, (InterleavedS64) output);
+				PixelMath.operator2((InterleavedS64) imgA, (Function2_S64)function, (InterleavedS64) imgB, (InterleavedS64) output);
 			} else if (InterleavedF32.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((InterleavedF32) imgA, (Function2_F32)function, (InterleavedF32) imgB, (InterleavedF32) output);
+				PixelMath.operator2((InterleavedF32) imgA, (Function2_F32)function, (InterleavedF32) imgB, (InterleavedF32) output);
 			} else if (InterleavedF64.class.isAssignableFrom(imgA.getClass())) {
-				PixelMath.lambda2((InterleavedF64) imgA, (Function2_F64)function, (InterleavedF64) imgB, (InterleavedF64) output);
+				PixelMath.operator2((InterleavedF64) imgA, (Function2_F64)function, (InterleavedF64) imgB, (InterleavedF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + imgA.getClass().getSimpleName());
 			}
@@ -127,7 +127,7 @@ public class GPixelMath {
 			Planar out = (Planar)output;
 
 			for (int i = 0; i < _imgA.getNumBands(); i++) {
-				lambda2(_imgA.getBand(i), function, _imgB.getBand(i), out.getBand(i));
+				operator2(_imgA.getBand(i), function, _imgB.getBand(i), out.getBand(i));
 			}
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+imgA.getClass().getSimpleName());

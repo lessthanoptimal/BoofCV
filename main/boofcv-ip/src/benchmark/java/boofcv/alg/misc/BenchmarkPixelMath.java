@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,8 +72,8 @@ public class BenchmarkPixelMath {
 	}
 
 	@Benchmark
-	public void abs_Lambda() {
-		PixelMath.lambda1(input, a -> (byte)Math.abs(a),output);
+	public void abs_operator() {
+		PixelMath.operator1(input, a -> (byte)Math.abs(a),output);
 	}
 
 	@Benchmark
@@ -82,8 +82,8 @@ public class BenchmarkPixelMath {
 	}
 
 	@Benchmark
-	public void add_Lambda() {
-		GPixelMath.lambda2(input, (PixelMathLambdas.Function2_F32)Float::sum,input2,output);
+	public void add_operator() {
+		GPixelMath.operator2(input, (PixelMathLambdas.Function2_F32)Float::sum,input2,output);
 	}
 
 	public static void main(String[] args) throws RunnerException {
