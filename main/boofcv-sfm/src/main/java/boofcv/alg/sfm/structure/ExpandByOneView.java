@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,12 +44,20 @@ public abstract class ExpandByOneView implements VerbosePrint {
 	protected SceneWorkingGraph workGraph;
 
 	/** Common algorithms for reconstructing the projective scene */
-	protected @Getter @Setter PairwiseGraphUtils utils = new PairwiseGraphUtils(new ConfigProjectiveReconstruction());
+	protected @Getter @Setter PairwiseGraphUtils utils;
 
 	//------------------------- Local work space
 
 	// candidates for being used as known connections
 	protected List<PairwiseImageGraph.Motion> validCandidates = new ArrayList<>();
+
+	public ExpandByOneView(ConfigProjectiveReconstruction configProjective) {
+		utils = new PairwiseGraphUtils(configProjective);
+	}
+
+	public ExpandByOneView() {
+		this(new ConfigProjectiveReconstruction());
+	}
 
 	/**
 	 * Selects two views which are connected to the target by maximizing a score function. The two selected

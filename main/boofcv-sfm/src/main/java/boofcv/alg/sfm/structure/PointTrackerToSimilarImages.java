@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.scene;
+package boofcv.alg.sfm.structure;
 
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.sfm.structure.LookUpSimilarImages;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;

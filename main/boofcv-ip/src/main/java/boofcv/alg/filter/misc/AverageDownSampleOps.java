@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,10 +31,7 @@ import boofcv.struct.image.*;
  * by the intersection of the image and the square region.
  * </p>
  *
- * <p>
- * NOTE: Errors are reduced in integer images by rounding instead of standard integer division.
- * </p>
- *
+ * <p>NOTE: Errors are reduced in integer images by rounding instead of standard integer division.</p>
  *
  * @author Peter Abeles
  */
@@ -62,6 +59,26 @@ public class AverageDownSampleOps {
 		int h = downSampleSize(inputHeight,squareWidth);
 
 		image.reshape(w,h);
+	}
+
+	/**
+	 * If the full resolution image is too large it's down sampled to match the maximum allowed pixels.
+	 *
+	 * @param full Full resolution image
+	 * @param small Small image to store down sampled, if applicable
+	 * @param maxPixels Maximum number of pixels in the image
+	 * @return Either full resolution image or the small image
+	 */
+	public static<T extends ImageGray<T>> T downMaxPixels( T full , T small , int maxPixels ) {
+		if (full.width*full.height>maxPixels) {
+			double scale = Math.sqrt(maxPixels)/Math.sqrt(full.width*full.height);
+			small.reshape((int)(full.width*scale+0.5), (int)(full.height*scale+0.5));
+
+			// Use average to reduce aliasing. This causes a shift in the image center.
+			AverageDownSampleOps.down(full, small);
+			return small;
+		}
+		return full;
 	}
 
 	public static void down(ImageBase input , int sampleWidth , ImageBase output ) {

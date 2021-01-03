@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.TriangulateNViewsMetricH;
+import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.ConfigConverge;
 import lombok.Getter;
@@ -42,11 +43,20 @@ public class MetricBundleAdjustmentUtils {
 	public double keepFraction = 1.0;
 
 	/** The estimated scene structure. This the final estimated scene state */
-	public final @Getter SceneStructureMetric structure = new SceneStructureMetric(true);
+	public final @Getter SceneStructureMetric structure;
 	public final @Getter SceneObservations observations = new SceneObservations();
 	public @Getter @Setter BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
 	public @Getter @Setter TriangulateNViewsMetricH triangulator = FactoryMultiView.triangulateNViewMetricH(null);
 	public @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
+
+	public MetricBundleAdjustmentUtils( @Nullable ConfigTriangulation triangulation, boolean homogenous ) {
+		triangulator = FactoryMultiView.triangulateNViewMetricH(triangulation);
+		structure = new SceneStructureMetric(homogenous);
+	}
+
+	public MetricBundleAdjustmentUtils() {
+		this(null,true);
+	}
 
 	/**
 	 * Uses the already configured structure and observations to perform bundle adjustment
@@ -87,6 +97,10 @@ public class MetricBundleAdjustmentUtils {
 
 	/**
 	 * Prunes outliers and views/points with too few points/observations
+	 *
+	 * @param keepFraction Only keeps features which have the best reprojection error. 0.95 will keep 95%
+	 * @param pruneViews Prunes views if less than or equal to this many features
+	 * @param prunePoints Prunes points if less than this number of observations
 	 */
 	public void prune( double keepFraction, int pruneViews, int prunePoints ) {
 		prunePoints = Math.max(1, prunePoints);

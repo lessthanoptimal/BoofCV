@@ -578,6 +578,14 @@ public class BoofMiscOps {
 			throw new BoofCheckFailure(valA + " != " + valB + " " + message);
 	}
 
+	/**
+	 * Checks to see if the passed in value is a fraction from 0 to 1.0, inclusive
+	 */
+	public static void checkFraction( double fraction, String message ) {
+		if (fraction<0.0 || fraction > 1.0)
+			throw new BoofCheckFailure("Fraction out of range. "+fraction+" "+message);
+	}
+
 	public static <T> void forIdx( List<T> list, BoofLambdas.ProcessIndex<T> func ) {
 		for (int i = 0; i < list.size(); i++) {
 			func.process(i, list.get(i));
@@ -712,5 +720,4 @@ public class BoofMiscOps {
 		growable.reset();
 		return growable;
 	}
-
 }

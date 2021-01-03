@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,37 +29,54 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * @author Peter Abeles
- */
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class TestAverageDownSampleOps extends BoofStandardJUnit {
+
+	// The original image is too large and needs to be down sampled
+	@Test void downMaxPixels_Larger() {
+		GrayF32 full = new GrayF32(30, 40);
+		GrayF32 scaled = new GrayF32(1, 1);
+
+		assertSame(scaled, AverageDownSampleOps.downMaxPixels(full, scaled, 6*8));
+		assertEquals(6, scaled.width);
+		assertEquals(8, scaled.height);
+	}
+
+	// The original image is too small and should not be modified
+	@Test void downMaxPixels_Smaller() {
+		GrayF32 full = new GrayF32(30, 40);
+		GrayF32 scaled = new GrayF32(1, 1);
+
+		assertSame(full, AverageDownSampleOps.downMaxPixels(full, scaled, 100*100));
+	}
 
 	/**
 	 * Down sample with just two inputs.  Compare to results from raw implementation.
 	 */
-	@Test
-	public void down_2inputs() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		Class[] input = new Class[]{GrayU8.class, GrayU16.class,GrayF32.class, GrayF64.class};
-		Class[] middle = new Class[]{GrayF32.class, GrayF32.class,GrayF32.class, GrayF64.class};
+	@Test void down_2inputs() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		Class[] input = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class, GrayF64.class};
+		Class[] middle = new Class[]{GrayF32.class, GrayF32.class, GrayF32.class, GrayF64.class};
 
 		for (int i = 0; i < input.length; i++) {
-			ImageGray in = GeneralizedImageOps.createSingleBand(input[i],17,14);
-			ImageGray mid = GeneralizedImageOps.createSingleBand(middle[i],3,14);
-			ImageGray found = GeneralizedImageOps.createSingleBand(input[i],3,4);
-			ImageGray expected = GeneralizedImageOps.createSingleBand(input[i],3,4);
+			ImageGray in = GeneralizedImageOps.createSingleBand(input[i], 17, 14);
+			ImageGray mid = GeneralizedImageOps.createSingleBand(middle[i], 3, 14);
+			ImageGray found = GeneralizedImageOps.createSingleBand(input[i], 3, 4);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(input[i], 3, 4);
 
-			GImageMiscOps.fillUniform(in,rand,0,100);
+			GImageMiscOps.fillUniform(in, rand, 0, 100);
 
-			Method horizontal = ImplAverageDownSample.class.getDeclaredMethod("horizontal",input[i],middle[i]);
-			Method vertical = BoofTesting.findMethod(ImplAverageDownSample.class,"vertical",middle[i],input[i]);
+			Method horizontal = ImplAverageDownSample.class.getDeclaredMethod("horizontal", input[i], middle[i]);
+			Method vertical = BoofTesting.findMethod(ImplAverageDownSample.class, "vertical", middle[i], input[i]);
 
-			horizontal.invoke(null,in,mid);
-			vertical.invoke(null,mid,expected);
+			horizontal.invoke(null, in, mid);
+			vertical.invoke(null, mid, expected);
 
-			AverageDownSampleOps.down(in,found);
+			AverageDownSampleOps.down(in, found);
 
-			BoofTesting.assertEquals(expected,found,1e-4);
+			BoofTesting.assertEquals(expected, found, 1e-4);
 		}
 	}
 }
