@@ -106,5 +106,11 @@ public interface BoofLambdas {
 	@FunctionalInterface interface Match_S64 { boolean process( long value ); }
 	@FunctionalInterface interface Match_F32 { boolean process( float value ); }
 	@FunctionalInterface interface Match_F64 { boolean process( double value ); }
+	@FunctionalInterface interface Pixel_I8 { void process( int x, int y, byte value ); }
+	@FunctionalInterface interface Pixel_I16 { void process( int x, int y, short value ); }
+	@FunctionalInterface interface Pixel_S32 { void process( int x, int y, int value ); }
+	@FunctionalInterface interface Pixel_S64 { void process( int x, int y, long value ); }
+	@FunctionalInterface interface Pixel_F32 { void process( int x, int y, float value ); }
+	@FunctionalInterface interface Pixel_F64 { void process( int x, int y, double value ); }
 	// @formatter:on
 }

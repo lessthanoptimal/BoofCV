@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TestImageBase extends BoofStandardJUnit {
 
-	@Test
-	void isInBounds() {
+	@Test void isInBounds() {
 		Dummy a = new Dummy();
 		a.width = 10;
 		a.height = 11;
@@ -42,8 +41,7 @@ class TestImageBase extends BoofStandardJUnit {
 		assertFalse(a.isInBounds(0, 11));
 	}
 
-	@Test
-	void indexToPixel() {
+	@Test void indexToPixel() {
 		Dummy a = new Dummy();
 
 		a.startIndex = 7;
@@ -57,8 +55,7 @@ class TestImageBase extends BoofStandardJUnit {
 		assertEquals(6, a.indexToPixelY(index));
 	}
 
-	@Test
-	void isSubimage() {
+	@Test void isSubimage() {
 		Dummy a = new Dummy();
 		a.subImage = false;
 
@@ -68,12 +65,30 @@ class TestImageBase extends BoofStandardJUnit {
 		assertTrue(a.isSubimage());
 	}
 
-	@Test
-	void totalPixels() {
+	@Test void totalPixels() {
 		Dummy a = new Dummy();
 		a.width = 10;
 		a.height = 22;
 		assertEquals(10*22, a.totalPixels());
+	}
+
+	@Test void forEachXY() {
+		var helper = new ForEachHelper();
+		var a = new Dummy();
+		a.width = 10;
+		a.height = 22;
+
+		a.forEachXY(( x, y ) -> {
+			helper.count++;
+			helper.maxX = Math.max(x, helper.maxX);
+			helper.maxY = Math.max(y, helper.maxY);
+		});
+	}
+
+	private static class ForEachHelper {
+		int count = 0;
+		int maxX = 0;
+		int maxY = 0;
 	}
 
 	private static class Dummy extends ImageBase {
