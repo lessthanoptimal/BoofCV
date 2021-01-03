@@ -23,7 +23,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 /**
  * Describes region inside an image using a polygon and a regionID.
  */
-class PolygonRegion {
+public class PolygonRegion {
     /** Location of the region inside the image. Polygon in pixel coordinates */
     public final Polygon2D_F64 polygon = new Polygon2D_F64();
     /** Region ID for the polygon. */
