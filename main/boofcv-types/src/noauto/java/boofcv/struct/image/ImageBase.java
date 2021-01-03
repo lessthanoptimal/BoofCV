@@ -179,6 +179,17 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
+	 * For each for each (x,y) coordinate inside the image.
+	 */
+	public void forEachXY( PixelXY function ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				function.process(x,y);
+			}
+		}
+	}
+
+	/**
 	 * Copies the row into the array.
 	 * @param row Which row to copy.
 	 * @param col0 First column. Inclusive.
@@ -213,4 +224,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 
 		return ret;
 	}
+
+	/** Lambda for each (x,y) coordinate in the image */
+	public @FunctionalInterface interface PixelXY { void process( int x, int y); }
 }
