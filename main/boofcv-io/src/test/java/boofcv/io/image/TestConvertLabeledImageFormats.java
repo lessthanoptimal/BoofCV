@@ -19,29 +19,32 @@
 package boofcv.io.image;
 
 import boofcv.BoofTesting;
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayS32;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-class TestLabeledImageRleCodec extends BoofStandardJUnit {
-	@Test void encode_decode() throws IOException {
-		GrayS32 expected = new GrayS32(20, 30);
-		ImageMiscOps.fillRectangle(expected, 1, 10, 8, 6, 7);
-		ImageMiscOps.fillRectangle(expected, 2, 0, 1, 2, 7);
-		ImageMiscOps.fillRectangle(expected, 3, 10, 25, 12, 5);
+class TestConvertLabeledImageFormats extends BoofStandardJUnit {
+	/**
+	 * Tested using a simple rectangle
+	 */
+	@Test void rectangle() {
+		List<PolygonRegion> regions = new ArrayList<>();
+		var r = new PolygonRegion();
+		regions.add(r);
+		r.polygon.vertexes.grow().setTo(5,5);
+		r.polygon.vertexes.grow().setTo(15,5);
+		r.polygon.vertexes.grow().setTo(15,20);
+		r.polygon.vertexes.grow().setTo(5,20);
+		r.regionID = 3;
 
-		GrayS32 found = new GrayS32(1, 1);
+		var expected = new GrayS32(30,35);
+		GImageMiscOps.fillRectangle(expected,3,5,5,10,15);
 
-		var output = new ByteArrayOutputStream();
-		LabeledImageRleCodec.encode(expected, output);
-
-		var input = new ByteArrayInputStream(output.toByteArray());
-		LabeledImageRleCodec.decode(input, found);
+		GrayS32 found = ConvertLabeledImageFormats.convert(regions, expected.width, expected.height, null);
 
 		BoofTesting.assertEquals(expected, found, 1e-8);
 	}

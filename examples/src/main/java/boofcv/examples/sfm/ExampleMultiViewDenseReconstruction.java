@@ -62,7 +62,7 @@ public class ExampleMultiViewDenseReconstruction {
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
 //		example.maxFrames = 100;       // This will process the entire sequence
-		example.compute("tree_snow_01.mp4");
+		example.compute("steps_wide_01.mp4");
 //		example.compute("ditch_02.mp4");
 //		example.compute("holiday_display_01.mp4");
 //		example.compute("log_building_02.mp4");

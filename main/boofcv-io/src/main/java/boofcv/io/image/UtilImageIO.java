@@ -18,10 +18,12 @@
 
 package boofcv.io.image;
 
+import boofcv.BoofVersion;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.*;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray_I8;
+import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.*;
@@ -548,6 +550,41 @@ public class UtilImageIO {
 		os.write(gray.data,0,gray.width*gray.height);
 
 		os.close();
+	}
+
+	/**
+	 * Saves a labeled image in a RLE format.
+	 *
+	 * @see LabeledImageRleCodec
+	 *
+	 * @param labeled (Input) Labeled image to save
+	 * @param fileName (Input) Location where the image is to be written to.
+	 * @throws IOException Thrown if there is a problem reading the image
+	 */
+	public static void saveLabeledRle(GrayS32 labeled, String fileName ) throws IOException {
+		FileOutputStream out = new FileOutputStream(fileName);
+		LabeledImageRleCodec.encode(labeled, out,"BoofCV "+ BoofVersion.VERSION);
+		out.close();
+	}
+
+	/**
+	 * Loads a labeled image in a RLE format.
+	 *
+	 * @see LabeledImageRleCodec
+	 *
+	 * @param fileName Location where the image is to be read from.
+	 * @param labeled (Input) Optional storage for loaded labeled image
+	 * @throws IOException Thrown if there is a problem reading the image
+	 */
+	public static GrayS32 loadLabeledRle( String fileName, @Nullable GrayS32 labeled ) throws IOException {
+		if (labeled==null)
+			labeled = new GrayS32(1,1);
+
+		var input = new FileInputStream(fileName);
+		LabeledImageRleCodec.decode(input, labeled);
+		input.close();
+
+		return labeled;
 	}
 
 	private static String readLine( DataInputStream in ) throws IOException {
