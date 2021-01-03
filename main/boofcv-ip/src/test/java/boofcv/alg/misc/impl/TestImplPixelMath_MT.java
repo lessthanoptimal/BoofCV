@@ -64,23 +64,20 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 		Object[][] inputs = defaultInputs(types,candidate.getName());
 
 		if( inputs == null ) {
-			switch( candidate.getName() ) {
-				case "boundImage": return boundImage(types);
-				case "negative":
-				case "abs": return abs(types);
-				case "log":
-				case "logSign": return log(types);
-				case "lambda1": return lambda1(types);
-				case "lambda2": return lambda2(types);
-				default:
-					throw new RuntimeException("Unknown function "+candidate.getName());
-			}
+			return switch (candidate.getName()) {
+				case "boundImage" -> boundImage(types);
+				case "negative", "abs" -> abs(types);
+				case "log", "logSign" -> log(types);
+				case "operator1" -> operator1(types);
+				case "operator2" -> operator2(types);
+				default -> throw new RuntimeException("Unknown function " + candidate.getName());
+			};
 		} else {
 			return inputs;
 		}
 	}
 
-	private Object[][] lambda1( Class[] inputTypes ) {
+	private Object[][] operator1( Class[] inputTypes ) {
 		Object[] inputs = new Object[9];
 		inputs[0] = randomArray(inputTypes[0], 200, rand);
 		inputs[1] = 1;
@@ -90,12 +87,12 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 		inputs[5] = 10;
 		inputs[6] = 12;
 		inputs[7] = 9;
-		inputs[8] = TestPixelMath.createLambda1_Plus5(BoofTesting.pritiveToImageDataType(inputTypes[0]));
+		inputs[8] = TestPixelMath.createOperator1_Plus5(BoofTesting.pritiveToImageDataType(inputTypes[0]));
 
 		return new Object[][]{inputs};
 	}
 
-	private Object[][] lambda2( Class[] inputTypes ) {
+	private Object[][] operator2( Class[] inputTypes ) {
 		Object[] inputs = new Object[12];
 		inputs[0] = randomArray(inputTypes[0], 200, rand);
 		inputs[1] = 1;
@@ -108,7 +105,7 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 		inputs[8] = 10;
 		inputs[9] = 12;
 		inputs[10] = 9;
-		inputs[11] = TestPixelMath.createLambda2_AddPlus5(BoofTesting.pritiveToImageDataType(inputTypes[0]));
+		inputs[11] = TestPixelMath.createOperator2_AddPlus5(BoofTesting.pritiveToImageDataType(inputTypes[0]));
 
 		return new Object[][]{inputs};
 	}
@@ -203,7 +200,7 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 	}
 
 	private Object[][] defaultInputs( Class[] inputTypes , String name ) {
-		if( name.contains("lambda"))
+		if( name.contains("operator"))
 			return null;
 		if( inputTypes.length == 3 ) {
 			boolean allImages = true;

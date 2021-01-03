@@ -30,7 +30,7 @@ import javax.annotation.Generated;
 /**
  * Functions which perform basic arithmetic (e.g. addition, subtraction, multiplication, or division) on a pixel by pixel basis.
  *
- * <p>DO NOT MODIFY.  Automatically generated code created by GeneratePixelMath</p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GeneratePixelMath</p>
  *
  * @author Peter Abeles
  */
@@ -42,7 +42,7 @@ public class PixelMath {
 	public static int SMALL_IMAGE = 100*100;
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -55,18 +55,18 @@ public class PixelMath {
 		int columns = input.width;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -79,18 +79,18 @@ public class PixelMath {
 		int columns = input.width*input.numBands;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -103,18 +103,18 @@ public class PixelMath {
 		int columns = input.width;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -127,18 +127,18 @@ public class PixelMath {
 		int columns = input.width*input.numBands;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -151,18 +151,18 @@ public class PixelMath {
 		int columns = input.width;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -175,18 +175,18 @@ public class PixelMath {
 		int columns = input.width*input.numBands;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -199,18 +199,18 @@ public class PixelMath {
 		int columns = input.width;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -223,18 +223,18 @@ public class PixelMath {
 		int columns = input.width*input.numBands;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -247,18 +247,18 @@ public class PixelMath {
 		int columns = input.width;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -271,18 +271,18 @@ public class PixelMath {
 		int columns = input.width*input.numBands;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -295,18 +295,18 @@ public class PixelMath {
 		int columns = input.width;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(input[i])
+	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.
 	 * @param function The function to apply.
@@ -319,18 +319,18 @@ public class PixelMath {
 		int columns = input.width*input.numBands;
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath_MT.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		} else {
-			ImplPixelMath.lambda1(input.data, input.startIndex, input.stride,
+			ImplPixelMath.operator1(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns, function);
 		}
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -345,12 +345,12 @@ public class PixelMath {
 		int columns = imgA.width;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -358,7 +358,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -373,12 +373,12 @@ public class PixelMath {
 		int columns = imgA.width*imgA.numBands;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -386,7 +386,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -401,12 +401,12 @@ public class PixelMath {
 		int columns = imgA.width;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -414,7 +414,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -429,12 +429,12 @@ public class PixelMath {
 		int columns = imgA.width*imgA.numBands;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -442,7 +442,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -457,12 +457,12 @@ public class PixelMath {
 		int columns = imgA.width;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -470,7 +470,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -485,12 +485,12 @@ public class PixelMath {
 		int columns = imgA.width*imgA.numBands;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -498,7 +498,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -513,12 +513,12 @@ public class PixelMath {
 		int columns = imgA.width;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -526,7 +526,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -541,12 +541,12 @@ public class PixelMath {
 		int columns = imgA.width*imgA.numBands;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -554,7 +554,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -569,12 +569,12 @@ public class PixelMath {
 		int columns = imgA.width;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -582,7 +582,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -597,12 +597,12 @@ public class PixelMath {
 		int columns = imgA.width*imgA.numBands;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -610,7 +610,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -625,12 +625,12 @@ public class PixelMath {
 		int columns = imgA.width;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
@@ -638,7 +638,7 @@ public class PixelMath {
 	}
 
 	/**
-	 * Applies the lambda function to each element in the input image. output[i] = function(imA[i],imgB[i])
+	 * Applies the lambda operation to each element in the two input images. output[i] = function(imA[i],imgB[i])
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param function The function to apply.
@@ -653,12 +653,12 @@ public class PixelMath {
 		int columns = imgA.width*imgA.numBands;
 		int N = imgA.width*imgA.height;
 		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath_MT.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);
 		} else {
-			ImplPixelMath.lambda2(imgA.data, imgA.startIndex, imgA.stride,
+			ImplPixelMath.operator2(imgA.data, imgA.startIndex, imgA.stride,
 					imgB.data, imgB.startIndex, imgB.stride,
 					output.data, output.startIndex, output.stride,
 					imgA.height, columns, function);

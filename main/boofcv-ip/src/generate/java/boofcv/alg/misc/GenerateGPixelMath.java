@@ -938,8 +938,9 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-		GenerateGPixelMath gen = new GenerateGPixelMath();
+		var gen = new GenerateGPixelMath();
+		gen.setModuleName("boofcv-ip");
 		gen.parseArguments(args);
-		gen.generateCode();
+		gen.generate();
 	}
 }

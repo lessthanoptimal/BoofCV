@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,17 @@
 
 package boofcv.struct.image;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author Peter Abeles
  */
 public class TestGrayF32 extends StandardSingleBandTests<GrayF32> {
 
-
 	@Override
-	public GrayF32 createImage(int width, int height) {
+	public GrayF32 createImage( int width, int height ) {
 		return new GrayF32(width, height);
 	}
 
@@ -39,4 +42,19 @@ public class TestGrayF32 extends StandardSingleBandTests<GrayF32> {
 		return rand.nextFloat();
 	}
 
+	@Test void forEachPixel() {
+		var image = new GrayF32(10, 15);
+		setRandom(image);
+
+		image.forEachPixel(( x, y, v ) -> {
+			assertEquals(image.get(x, y), v);
+			image.set(x, y, y*image.width + x);
+		});
+
+		for (int y = 0; y < image.height; y++) {
+			for (int x = 0; x < image.width; x++) {
+				assertEquals(y*image.width + x, image.get(x, y));
+			}
+		}
+	}
 }

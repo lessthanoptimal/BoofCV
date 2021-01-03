@@ -9,6 +9,9 @@ Version : 0.38
 - Examples
   * Added an example for computing the Trifocal Tensor
   * TODO Added an example showing how the trifocal tensor can be used
+- Functional API
+  * Added forEachXY and forEachPixel to images
+  * PixelMath.lambda is now PixelMath.operator
 - TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version

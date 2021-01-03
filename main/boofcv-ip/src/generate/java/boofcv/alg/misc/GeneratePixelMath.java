@@ -803,7 +803,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GeneratePixelMath gen = new GeneratePixelMath();
+		gen.setModuleName("boofcv-ip");
 		gen.parseArguments(args);
-		gen.generateCode();
+		gen.generate();
 	}
 }

@@ -58,10 +58,10 @@ public class TestPixelMath extends BoofStandardJUnit {
 				continue;
 			try {
 //				System.out.println(m.getName()+"  "+m.getParameterTypes().length+"  "+m.getParameterTypes()[0].getSimpleName());
-				if (m.getName().compareTo("lambda1") == 0) {
-					testLambda1(m);
-				} else if (m.getName().compareTo("lambda2") == 0) {
-					testLambda2(m);
+				if (m.getName().compareTo("operator1") == 0) {
+					testOperator1(m);
+				} else if (m.getName().compareTo("operator2") == 0) {
+					testOperator2(m);
 				} else if (m.getName().compareTo("divide") == 0) {
 					if (m.getParameterTypes().length == 3) {
 						if (ImageBase.class.isAssignableFrom(m.getParameterTypes()[1])) {
@@ -143,7 +143,7 @@ public class TestPixelMath extends BoofStandardJUnit {
 		return false;
 	}
 
-	public static PixelMathLambdas.Function1 createLambda1_Plus5( ImageDataType type ) {
+	public static PixelMathLambdas.Function1 createOperator1_Plus5( ImageDataType type ) {
 		return switch( type ) {
 			case I8,S8,U8 -> new Function1_I8() { @Override public byte process( byte a ) { return (byte)(a + 5); } };
 			case I16,S16,U16 -> new Function1_I16() { @Override public short process( short a ) { return (short)(a + 5); } };
@@ -155,7 +155,7 @@ public class TestPixelMath extends BoofStandardJUnit {
 		};
 	}
 
-	public static PixelMathLambdas.Function2 createLambda2_AddPlus5( ImageDataType type ) {
+	public static PixelMathLambdas.Function2 createOperator2_AddPlus5( ImageDataType type ) {
 		return switch( type ) {
 			case I8,S8,U8 -> new Function2_I8() { @Override public byte process( byte a, byte b ) { return (byte)(a + b + 5); } };
 			case I16,S16,U16 -> new Function2_I16() { @Override public short process( short a, short b ) { return (short)(a + b + 5); } };
@@ -167,7 +167,7 @@ public class TestPixelMath extends BoofStandardJUnit {
 		};
 	}
 
-	private void testLambda1( Method m ) throws InvocationTargetException, IllegalAccessException {
+	private void testOperator1( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class[] paramTypes = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 		ImageBase output = GeneralizedImageOps.createImage(paramTypes[2], width, height, numBands);
@@ -181,7 +181,7 @@ public class TestPixelMath extends BoofStandardJUnit {
 			GImageMiscOps.fillUniform(input, rand, 0, 20);
 		}
 
-		m.invoke(null, input, createLambda1_Plus5(input.imageType.getDataType()), output);
+		m.invoke(null, input, createOperator1_Plus5(input.imageType.getDataType()), output);
 
 		double tol = input.getImageType().getDataType().isInteger() ? 1 : 1e-4;
 
@@ -197,7 +197,7 @@ public class TestPixelMath extends BoofStandardJUnit {
 		}
 	}
 
-	private void testLambda2( Method m ) throws InvocationTargetException, IllegalAccessException {
+	private void testOperator2( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class[] paramTypes = m.getParameterTypes();
 		ImageBase imgA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 		ImageBase imgB = GeneralizedImageOps.createImage(paramTypes[2], width, height, numBands);
@@ -215,7 +215,7 @@ public class TestPixelMath extends BoofStandardJUnit {
 			GImageMiscOps.fillUniform(imgB, rand, 0, 20);
 		}
 
-		m.invoke(null, imgA, createLambda2_AddPlus5(imgA.imageType.getDataType()), imgB, output);
+		m.invoke(null, imgA, createOperator2_AddPlus5(imgA.imageType.getDataType()), imgB, output);
 
 		double tol = imgA.getImageType().getDataType().isInteger() ? 1 : 1e-4;
 

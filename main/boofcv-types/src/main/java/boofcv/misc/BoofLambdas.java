@@ -26,7 +26,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public interface BoofLambdas {
-
 	@FunctionalInterface interface MassageString {
 		String process( String input );
 	}
@@ -44,11 +43,11 @@ public interface BoofLambdas {
 	}
 
 	@FunctionalInterface interface ProcessObject<T> {
-		void process(T object);
+		void process( T object );
 	}
 
 	@FunctionalInterface interface MassageObject<T> {
-		T process(T object);
+		T process( T object );
 	}
 
 	@FunctionalInterface interface ProcessI {
@@ -64,15 +63,15 @@ public interface BoofLambdas {
 	}
 
 	@FunctionalInterface interface SelectElement<T> {
-		int select(List<T> list);
+		int select( List<T> list );
 	}
 
-	@FunctionalInterface interface Extract<In,Out> {
-		Out process(In o);
+	@FunctionalInterface interface Extract<In, Out> {
+		Out process( In o );
 	}
 
 	@FunctionalInterface interface ProcessIndex<T> {
-		void process( int index , T object );
+		void process( int index, T object );
 	}
 
 	@FunctionalInterface interface IndexToString {
@@ -96,7 +95,7 @@ public interface BoofLambdas {
 	}
 
 	@FunctionalInterface interface IndexRgbConsumer {
-		void setRgb( int index, int red, int green, int blue);
+		void setRgb( int index, int red, int green, int blue );
 	}
 
 	// @formatter:off
@@ -106,11 +105,5 @@ public interface BoofLambdas {
 	@FunctionalInterface interface Match_S64 { boolean process( long value ); }
 	@FunctionalInterface interface Match_F32 { boolean process( float value ); }
 	@FunctionalInterface interface Match_F64 { boolean process( double value ); }
-	@FunctionalInterface interface Pixel_I8 { void process( int x, int y, byte value ); }
-	@FunctionalInterface interface Pixel_I16 { void process( int x, int y, short value ); }
-	@FunctionalInterface interface Pixel_S32 { void process( int x, int y, int value ); }
-	@FunctionalInterface interface Pixel_S64 { void process( int x, int y, long value ); }
-	@FunctionalInterface interface Pixel_F32 { void process( int x, int y, float value ); }
-	@FunctionalInterface interface Pixel_F64 { void process( int x, int y, double value ); }
 	// @formatter:on
 }
