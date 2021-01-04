@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.factory.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector_MT;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.impl.*;
 import boofcv.concurrency.BoofConcurrency;
@@ -30,9 +31,8 @@ import boofcv.struct.image.ImageGray;
 /**
  * Factory for creating various types of interest point intensity algorithms.
  *
- * @see FactoryIntensityPoint
- *
  * @author Peter Abeles
+ * @see FactoryIntensityPoint
  */
 @SuppressWarnings({"unchecked"})
 public class FactoryIntensityPointAlg {
@@ -46,10 +46,9 @@ public class FactoryIntensityPointAlg {
 	 * @return Fast corner
 	 */
 	public static <T extends ImageGray<T>>
-	FastCornerDetector<T> fast(int pixelTol, int minCont, Class<T> imageType)
-	{
+	FastCornerDetector<T> fast( int pixelTol, int minCont, Class<T> imageType ) {
 		FastCornerInterface helper;
-		if( imageType == GrayF32.class ) {
+		if (imageType == GrayF32.class) {
 			if (minCont == 9) {
 				helper = new ImplFastCorner9_F32(pixelTol);
 			} else if (minCont == 10) {
@@ -61,7 +60,7 @@ public class FactoryIntensityPointAlg {
 			} else {
 				throw new IllegalArgumentException("Specified minCont is not supported");
 			}
-		} else if( imageType == GrayU8.class ){
+		} else if (imageType == GrayU8.class) {
 			if (minCont == 9) {
 				helper = new ImplFastCorner9_U8(pixelTol);
 			} else if (minCont == 10) {
@@ -76,7 +75,11 @@ public class FactoryIntensityPointAlg {
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
-		return new FastCornerDetector(helper);
+
+		if (BoofConcurrency.isUseConcurrent())
+			return new FastCornerDetector_MT<>(helper);
+		else
+			return new FastCornerDetector<>(helper);
 	}
 
 	/**
@@ -89,35 +92,34 @@ public class FactoryIntensityPointAlg {
 	 * @param derivType Image derivative type it is computed from.  @return Harris corner
 	 */
 	public static <D extends ImageGray<D>>
-	GradientCornerIntensity<D> harris(int windowRadius, float kappa, boolean weighted, Class<D> derivType)
-	{
+	GradientCornerIntensity<D> harris( int windowRadius, float kappa, boolean weighted, Class<D> derivType ) {
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			if( derivType == GrayF32.class ) {
-				if( weighted )
-					return (GradientCornerIntensity)new ImplSsdCornerWeighted_F32_MT(windowRadius,new HarrisCorner_F32(kappa));
+		if (BoofConcurrency.USE_CONCURRENT) {
+			if (derivType == GrayF32.class) {
+				if (weighted)
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_F32_MT(windowRadius, new HarrisCorner_F32(kappa));
 				else
-					return (GradientCornerIntensity)new ImplSsdCorner_F32_MT(windowRadius,new HarrisCorner_F32(kappa));
-			} else if( derivType == GrayS16.class ) {
-				if( weighted )
-					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16_MT(windowRadius,new HarrisCorner_S32(kappa));
+					return (GradientCornerIntensity)new ImplSsdCorner_F32_MT(windowRadius, new HarrisCorner_F32(kappa));
+			} else if (derivType == GrayS16.class) {
+				if (weighted)
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16_MT(windowRadius, new HarrisCorner_S32(kappa));
 				else
-					return (GradientCornerIntensity)new ImplSsdCorner_S16_MT(windowRadius,new HarrisCorner_S32(kappa));
+					return (GradientCornerIntensity)new ImplSsdCorner_S16_MT(windowRadius, new HarrisCorner_S32(kappa));
 			}
 		} else {
 			if (derivType == GrayF32.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplSsdCornerWeighted_F32(windowRadius, new HarrisCorner_F32(kappa));
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_F32(windowRadius, new HarrisCorner_F32(kappa));
 				else
-					return (GradientCornerIntensity) new ImplSsdCorner_F32(windowRadius, new HarrisCorner_F32(kappa));
+					return (GradientCornerIntensity)new ImplSsdCorner_F32(windowRadius, new HarrisCorner_F32(kappa));
 			} else if (derivType == GrayS16.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplSsdCornerWeighted_S16(windowRadius,new HarrisCorner_S32(kappa));
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16(windowRadius, new HarrisCorner_S32(kappa));
 				else
-					return (GradientCornerIntensity) new ImplSsdCorner_S16(windowRadius, new HarrisCorner_S32(kappa));
+					return (GradientCornerIntensity)new ImplSsdCorner_S16(windowRadius, new HarrisCorner_S32(kappa));
 			}
 		}
-		throw new IllegalArgumentException("Unknown image type "+derivType);
+		throw new IllegalArgumentException("Unknown image type " + derivType);
 	}
 
 	/**
@@ -130,34 +132,33 @@ public class FactoryIntensityPointAlg {
 	 * @return KLT corner
 	 */
 	public static <D extends ImageGray<D>>
-	GradientCornerIntensity<D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType)
-	{
+	GradientCornerIntensity<D> shiTomasi( int windowRadius, boolean weighted, Class<D> derivType ) {
 
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		if (BoofConcurrency.USE_CONCURRENT) {
 			if (derivType == GrayF32.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplSsdCornerWeighted_F32_MT(windowRadius, new ShiTomasiCorner_F32());
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_F32_MT(windowRadius, new ShiTomasiCorner_F32());
 				else {
-					return (GradientCornerIntensity) new ImplSsdCorner_F32_MT(windowRadius, new ShiTomasiCorner_F32());
+					return (GradientCornerIntensity)new ImplSsdCorner_F32_MT(windowRadius, new ShiTomasiCorner_F32());
 				}
 			} else if (derivType == GrayS16.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplSsdCornerWeighted_S16_MT(windowRadius, new ShiTomasiCorner_S32());
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16_MT(windowRadius, new ShiTomasiCorner_S32());
 				else
-					return (GradientCornerIntensity) new ImplSsdCorner_S16_MT(windowRadius, new ShiTomasiCorner_S32());
+					return (GradientCornerIntensity)new ImplSsdCorner_S16_MT(windowRadius, new ShiTomasiCorner_S32());
 			}
 		} else {
 			if (derivType == GrayF32.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplSsdCornerWeighted_F32(windowRadius, new ShiTomasiCorner_F32());
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_F32(windowRadius, new ShiTomasiCorner_F32());
 				else {
-					return (GradientCornerIntensity) new ImplSsdCorner_F32(windowRadius, new ShiTomasiCorner_F32());
+					return (GradientCornerIntensity)new ImplSsdCorner_F32(windowRadius, new ShiTomasiCorner_F32());
 				}
 			} else if (derivType == GrayS16.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplSsdCornerWeighted_S16(windowRadius, new ShiTomasiCorner_S32());
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16(windowRadius, new ShiTomasiCorner_S32());
 				else
-					return (GradientCornerIntensity) new ImplSsdCorner_S16(windowRadius, new ShiTomasiCorner_S32());
+					return (GradientCornerIntensity)new ImplSsdCorner_S16(windowRadius, new ShiTomasiCorner_S32());
 			}
 		}
 		throw new IllegalArgumentException("Unknown image type " + derivType);
