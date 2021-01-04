@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,55 +22,57 @@ import boofcv.alg.feature.detect.intensity.IntegralImageFeatureIntensity;
 import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkFastHessianFeatureIntensity {
-	static int width = 640;
-	static int height = 480;
-	static long TEST_TIME = 1000;
+	@Param({"true","false"})
+	public boolean concurrent=false;
+
+	public int imageSize=2000;
 
 	static int skip = 1;
 	static int size = 15;
 
-	static Random rand = new Random(234);
+	GrayF32 original = new GrayF32(imageSize,imageSize);
+	GrayF32 integral = new GrayF32(imageSize,imageSize);
+	GrayF32 intensity = new GrayF32(imageSize,imageSize);
 
-	static GrayF32 original = new GrayF32(width,height);
-	static GrayF32 integral = new GrayF32(width,height);
-	static GrayF32 intensity = new GrayF32(width,height);
+	@Setup public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+		var rand = new Random(234234);
 
-	public static class Naive extends PerformerBase {
-
-		@Override
-		public void process() {
-			ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,intensity);
-		}
-	}
-
-	public static class Standard extends PerformerBase {
-
-		@Override
-		public void process() {
-			IntegralImageFeatureIntensity.hessian(integral,skip,size,intensity);
-		}
-	}
-
-	public static void main(String[] args) {
 		ImageMiscOps.fillUniform(original,rand,0,200);
 		IntegralImageOps.transform(original,integral);
+	}
 
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
-		System.out.println("     skip = "+skip+" size = "+size);
-		System.out.println();
+	// @formatter:off
+	@Benchmark public void Naive() {ImplIntegralImageFeatureIntensity.hessianNaive(integral,skip,size,intensity);}
+	@Benchmark public void Standard() {IntegralImageFeatureIntensity.hessian(integral,skip,size,intensity);}
+	// @formatter:on
 
-		ProfileOperation.printOpsPerSec(new Naive(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Standard(), TEST_TIME);
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkFastHessianFeatureIntensity.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
+
+		new Runner(opt).run();
 	}
 }

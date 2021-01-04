@@ -50,7 +50,7 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> extends BoofStandardJUnit 
 
 		@Override
 		public BruteForceBlockMatch<GrayU8> createNaive( BorderType borderType, ImageType<GrayU8> imageType ) {
-			BruteForceBlockMatch<GrayU8> naive = new BruteForceBlockMatch<GrayU8>(borderType, imageType) {
+			BruteForceBlockMatch<GrayU8> naive = new BruteForceBlockMatch<>(borderType, imageType) {
 				@Override
 				public double computeScore( ImageBorder<GrayU8> _left, ImageBorder<GrayU8> _right,
 											int cx, int cy, int disparity ) {
@@ -91,7 +91,7 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> extends BoofStandardJUnit 
 
 		@Override
 		public BruteForceBlockMatch<GrayF32> createNaive( BorderType borderType, ImageType<GrayF32> imageType ) {
-			BruteForceBlockMatch<GrayF32> naive = new BruteForceBlockMatch<GrayF32>(borderType, imageType) {
+			BruteForceBlockMatch<GrayF32> naive = new BruteForceBlockMatch<>(borderType, imageType) {
 				@Override
 				public double computeScore( ImageBorder<GrayF32> _left, ImageBorder<GrayF32> _right,
 											int cx, int cy, int disparity ) {
