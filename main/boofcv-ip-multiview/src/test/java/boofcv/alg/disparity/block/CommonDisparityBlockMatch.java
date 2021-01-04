@@ -26,13 +26,12 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 
 /**
  * @author Peter Abeles
  */
-public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> extends BoofStandardJUnit {
+public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 	public static final BorderType BORDER_TYPE = BorderType.REFLECT;
 	float eps = UtilEjml.F_EPS;
 

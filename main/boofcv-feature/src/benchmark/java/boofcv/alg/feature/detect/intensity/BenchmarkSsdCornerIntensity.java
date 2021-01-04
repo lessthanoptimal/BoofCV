@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,21 +28,17 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Benchmark for different convolution operations.
- *
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=2)
+@Fork(value = 1)
 public class BenchmarkSsdCornerIntensity {
 	@Param({"true","false"})
 	public boolean concurrent=false;
@@ -70,8 +66,7 @@ public class BenchmarkSsdCornerIntensity {
 	GradientCornerIntensity<GrayS16> harris_S16;
 	GradientCornerIntensity<GrayF32> harris_F32;
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 
 		derivX_F32.reshape(size, size);
@@ -92,29 +87,18 @@ public class BenchmarkSsdCornerIntensity {
 		harris_F32 = FactoryIntensityPointAlg.harris(radius,0.04f,weighted,GrayF32.class);
 	}
 
-	@Benchmark
-	public void ShiTomasi_S16() {
-		shitomasi_S16.process(derivX_S16,derivY_S16,intensity);
-	}
-
-	@Benchmark
-	public void ShiTomasi_F32() {
-		shitomasi_F32.process(derivX_F32,derivY_F32,intensity);
-	}
-
-	@Benchmark
-	public void Harris_S16() {
-		harris_S16.process(derivX_S16,derivY_S16,intensity);
-	}
-
-	@Benchmark
-	public void Harris_F32() {
-		harris_F32.process(derivX_F32,derivY_F32,intensity);
-	}
+	// @formatter:off
+	@Benchmark public void ShiTomasi_S16() {shitomasi_S16.process(derivX_S16,derivY_S16,intensity);}
+	@Benchmark public void ShiTomasi_F32() {shitomasi_F32.process(derivX_F32,derivY_F32,intensity);}
+	@Benchmark public void Harris_S16() {harris_S16.process(derivX_S16,derivY_S16,intensity);}
+	@Benchmark public void Harris_F32() {harris_F32.process(derivX_F32,derivY_F32,intensity);}
+	// @formatter:on
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkSsdCornerIntensity.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();

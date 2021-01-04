@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-class TestStereoDisparityWtoNaive extends BoofStandardJUnit {
+class TestDisparityBlockMatchNaive extends BoofStandardJUnit {
 
 	@Nested
 	class BasicTests extends BasicDisparityTests<GrayU8, GrayF32> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,22 +33,19 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>> {
-
 	@Param({"true","false"})
 	public boolean concurrent;
 
@@ -91,29 +88,27 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 		detectorSegment = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
 	}
 
-	@Benchmark
-	public void gradientHoughFoot() {
+	@Benchmark public void gradientHoughFoot() {
 		houghFoot.detect(input);
 	}
 
-	@Benchmark
-	public void gradientHoughPolar() {
+	@Benchmark public void gradientHoughPolar() {
 		houghPolar.detect(input);
 	}
 
-	@Benchmark
-	public void gradientHoughFootSub() {
+	@Benchmark public void gradientHoughFootSub() {
 		houghFootSub.detect(input);
 	}
 
-	@Benchmark
-	public void segment() {
+	@Benchmark public void segment() {
 		detectorSegment.detect(input);
 	}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkDetectLines.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();

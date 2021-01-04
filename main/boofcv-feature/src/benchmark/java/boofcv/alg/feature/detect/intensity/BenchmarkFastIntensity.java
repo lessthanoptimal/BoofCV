@@ -47,11 +47,11 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 public class BenchmarkFastIntensity {
 
-	static int imageSize = 800;
+	static int imageSize = 2000;
 
 	@State(Scope.Benchmark)
 	public static class NaiveState {
-		DetectorFastNaive naive9 = new DetectorFastNaive(3,9,60);
+		DetectorFastNaive naive9 = new DetectorFastNaive(3, 9, 60);
 		GrayU8 input;
 		GrayF32 intensity;
 
@@ -104,9 +104,11 @@ public class BenchmarkFastIntensity {
 		}
 	}
 
+	// @formatter:off
 	@Benchmark public void naive9(NaiveState state) {state.naive9.process(state.input);}
 	@Benchmark public void fast9(MainState state) {state.fast9.process(state.input);}
 	@Benchmark public void fast12(MainState state) {state.fast12.process(state.input);}
+	// @formatter:on
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
