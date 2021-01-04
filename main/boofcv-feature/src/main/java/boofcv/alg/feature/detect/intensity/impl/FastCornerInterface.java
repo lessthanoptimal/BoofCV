@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
  */
 public interface FastCornerInterface<T extends ImageGray<T>> {
 
-	void setImage( T image , int offsets[] );
+	void setImage( T image , int[] offsets );
 
 	/**
 	 * Sets the lower and upper thresholds relative to the current pixel value
@@ -39,4 +39,7 @@ public interface FastCornerInterface<T extends ImageGray<T>> {
 	void setThreshold( int index );
 
 	Class<T> getImageType();
+
+	/** Create a new instance of this class for concurrency */
+	FastCornerInterface<T> newInstance();
 }

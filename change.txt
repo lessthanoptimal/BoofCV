@@ -12,6 +12,8 @@ Version : 0.38
 - Functional API
   * Added forEachXY and forEachPixel to images
   * PixelMath.lambda is now PixelMath.operator
+- Image Features
+  * Fast Corners are now concurrent
 - TODO Loop Closure
 - TODO Generic calibration target for multi cameras
   * QR Code for first version

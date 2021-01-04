@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,10 @@ public class TestImplFastHelper_F32 extends GenericImplFastCornerInterfaceTests<
 			@Override
 			public int checkPixel(int index) {
 				return 0;
+			}
+
+			@Override public FastCornerInterface<GrayF32> newInstance() {
+				return null;
 			}
 		}, 10);
 	}

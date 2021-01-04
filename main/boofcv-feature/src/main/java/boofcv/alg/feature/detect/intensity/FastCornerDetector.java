@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,8 @@ import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
+
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -73,11 +75,11 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	// pixel index offsets for the circle
 	protected int []offsets;
 	// the image's stride.  Used to determine if the offsets need to be recomputed
-	private int stride = 0;
+	int stride = 0;
 
 	// list of pixels that might be corners.
-	private final @Getter ListIntPoint2D candidatesLow = new ListIntPoint2D();
-	private final @Getter ListIntPoint2D candidatesHigh = new ListIntPoint2D();
+	final @Getter ListIntPoint2D candidatesLow = new ListIntPoint2D();
+	final @Getter ListIntPoint2D candidatesHigh = new ListIntPoint2D();
 
 	// reference to the input image
 	protected T image;
@@ -93,6 +95,8 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 	public FastCornerDetector(FastCornerInterface<T> helper) {
 		this.helper = helper;
 	}
+
+	FastCornerDetector(){}
 
 	@Override public int getRadius() {return radius;}
 	@Override public int getIgnoreBorder() {return radius;}

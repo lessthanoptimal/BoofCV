@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,13 @@ public class TestImplFastHelper_U8 extends GenericImplFastCornerInterfaceTests<G
 
 	public TestImplFastHelper_U8() {
 		super(GrayU8.class, new ImplFastHelper_U8(10) {
-
 			@Override
 			public int checkPixel(int index) {
 				return 0;
+			}
+
+			@Override public FastCornerInterface<GrayU8> newInstance() {
+				return null;
 			}
 		}, 10);
 	}

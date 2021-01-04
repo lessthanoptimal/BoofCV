@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 	protected int tol;
 
 	// pixel index offsets for circle
-	protected int offsets[];
+	protected int[] offsets;
 	protected byte[] data;
 
 	int centerValue;
@@ -39,7 +39,7 @@ public abstract class ImplFastHelper_U8 implements FastCornerInterface<GrayU8> {
 	}
 
 	@Override
-	public void setImage(GrayU8 image , int offsets[] ) {
+	public void setImage( GrayU8 image , int[] offsets ) {
 		this.data = image.data;
 		this.offsets = offsets;
 	}

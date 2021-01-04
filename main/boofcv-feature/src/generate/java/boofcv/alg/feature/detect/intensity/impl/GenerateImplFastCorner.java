@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,7 @@ import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Generates a FAST corner detector. A heuristic is used to automatically select which pixels on the circle to sample
@@ -58,15 +55,13 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	// What is known about each bit
 	List<Sample>[] samples = new ArrayList[TOTAL_CIRCLE];
 
-	// used to compute the score. For each possible corner given the current samples incremenet by one
+	// used to compute the score. For each possible corner given the current samples increments by one
 	int[] possibleUp = new int[TOTAL_CIRCLE];
 	int[] possibleDown = new int[TOTAL_CIRCLE];
 
 	int tabs;
 
 	public GenerateImplFastCorner() {
-		super.className = "off";
-
 		for (int i = 0; i < samples.length; i++) {
 			samples[i] = new ArrayList<>();
 		}
@@ -106,22 +101,25 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		List<String> codes = new ArrayList<>();
 		List<String> names = new ArrayList<>();
 
-		// Need to split the code into smaller function to help the JVM optize the code
+		// Need to split the code into smaller function to help the JVM optimize the code
 		codes.add(generateSamples());
 		names.add("DUMMY");
 		splitIntoFunctions(codes, names, 0, 0);
 
 		out.print(
 				"\t/**\n" +
-						"\t * @return 1 = positive corner, 0 = no corner, -1 = negative corner\n" +
-						"\t */\n" +
-						"\t@Override\n" +
-						"\tpublic final int checkPixel( int index )\n" +
-						"\t{\n" +
-						"\t\tsetThreshold(index);\n" +
-						"\n");
+				"\t * @return 1 = positive corner, 0 = no corner, -1 = negative corner\n" +
+				"\t */\n" +
+				"\t@Override public final int checkPixel( int index ) {\n" +
+				"\t\tsetThreshold(index);\n" +
+				"\n");
 		out.println(codes.get(0));
 		out.println("\t}\n");
+
+		out.println("\t@Override public FastCornerInterface<"+imageType.getSingleBandName()+"> newInstance() {\n" +
+				"\t\treturn new "+className+"(tol);\n" +
+				"\t}\n");
+
 
 		for (int i = 1; i < codes.size(); i++) {
 			String inside = codes.get(i);
@@ -151,10 +149,10 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		int index3 = code.length() - 4;
 
 		String mainFunction = code.substring(0, index0);
-		mainFunction += "\t\t\treturn " + functionNameA + "( index );";
+		mainFunction += "\t\t\treturn " + functionNameA + "(index);";
 		mainFunction += code.substring(index1, index2);
-		mainFunction += "\t\t\treturn " + functionNameB + "( index );\n";
-		mainFunction += "\t\t}\n";
+		mainFunction += "\t\t\treturn " + functionNameB + "(index);\n";
+		mainFunction += "\t\t}";
 
 		codes.set(which, mainFunction);
 
@@ -186,11 +184,11 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		tabs = 2;
 
 		ArrayDeque<Action> actions = new ArrayDeque<>();
-		actions.add(selectNextSample());
+		actions.add(Objects.requireNonNull(selectNextSample()));
 		while (!actions.isEmpty()) {
-			Action action = actions.peek();
+			Action action = actions.peekLast();
 			System.out.println("Action bit=" + action.bit + " up=" + action.sampleUp + " n=" + action.consider + " TOTAL=" + actions.size());
-			debugSampleState();
+//			debugSampleState();
 
 			if (action.consider == 0) {
 				// First time this action is considered assume it's outcome is true
@@ -206,14 +204,14 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 				output += strElse(tabs++);
 				action.consider++;
 				removeSample(action.bit);
-				System.out.println("removed sample");
-				debugSampleState();
+//				System.out.println("removed sample");
+//				debugSampleState();
 				updateSamples(action);
 			} else {
 				// Remove consideration of this action and reconsider the previous one
 				removeSample(action.bit);
 				output += strCloseIf(tabs--);
-				actions.pop();
+				actions.removeLast();
 				continue;
 			}
 
@@ -250,29 +248,15 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	private void updateSamples( Action action ) {
 		if (action.sampleUp) {
 			switch (sampleAt(action.bit)) {
-				case UNKNOWN:
-					samples[action.bit].add(Sample.NOT_UP);
-					break;
-
-				case NOT_DOWN:
-					samples[action.bit].add(Sample.NEITHER);
-					break;
-
-				default:
-					throw new RuntimeException("BUG!");
+				case UNKNOWN -> samples[action.bit].add(Sample.NOT_UP);
+				case NOT_DOWN -> samples[action.bit].add(Sample.NEITHER);
+				default -> throw new RuntimeException("BUG!");
 			}
 		} else {
 			switch (sampleAt(action.bit)) {
-				case UNKNOWN:
-					samples[action.bit].add(Sample.NOT_DOWN);
-					break;
-
-				case NOT_UP:
-					samples[action.bit].add(Sample.NEITHER);
-					break;
-
-				default:
-					throw new RuntimeException("BUG!");
+				case UNKNOWN -> samples[action.bit].add(Sample.NOT_DOWN);
+				case NOT_UP -> samples[action.bit].add(Sample.NEITHER);
+				default -> throw new RuntimeException("BUG!");
 			}
 		}
 	}
@@ -317,7 +301,7 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	private String strSample( int numTabs, Action action ) {
 		String comparison = action.sampleUp ? "> upper" : "< lower";
 		String strElse = action.consider == 1 ? "} else " : "";
-		return tabs(numTabs) + strElse + "if( " + readBit(action.bit) + " " + comparison + " ) {\n";
+		return tabs(numTabs) + strElse + "if (" + readBit(action.bit) + " " + comparison + ") {\n";
 	}
 
 	private String strReturn( int numTabs, int value ) {
@@ -411,6 +395,9 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
+		out.print("import boofcv.struct.image."+imageType.getSingleBandName()+";\n" +
+				"\n" +
+				"import javax.annotation.Generated;\n");
 		out.print(
 				"\n" +
 						"/**\n" +
@@ -418,16 +405,8 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 						" * Contains logic for detecting fast corners. Pixels are sampled such that they can eliminate the most\n" +
 						" * number of possible corners, reducing the number of samples required.\n" +
 						" * </p>\n" +
-						" *\n" +
-						" * <p>\n" +
-						" * DO NOT MODIFY. Generated by " + getClass().getSimpleName() + ".\n" +
-						" * </p>\n" +
-						" *\n" +
-						" * @author Peter Abeles\n" +
-						" */\n" +
-						"public class " + className + " extends ImplFastHelper_" + imageType.getAbbreviatedType() + "\n" +
-						"{\n" +
-						"\n" +
+						generateDocString("Peter Abeles") +
+						"public class " + className + " extends ImplFastHelper_" + imageType.getAbbreviatedType() + " {\n" +
 						"\tpublic " + className + "(" + sumType + " pixelTol) {\n" +
 						"\t\tsuper(pixelTol);\n" +
 						"\t}\n\n");
@@ -480,6 +459,7 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplFastCorner gen = new GenerateImplFastCorner();
-		gen.generateCode();
+		gen.setModuleName("boofcv-feature");
+		gen.generate();
 	}
 }
