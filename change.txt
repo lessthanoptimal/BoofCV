@@ -12,6 +12,9 @@ Version : 0.38
 - Functional API
   * Added forEachXY and forEachPixel to images
   * PixelMath.lambda is now PixelMath.operator
+  * ImageBorder no longer uses reflection but uses a functional API instead
+- DownSelectVideoFramesFor3DApp
+  * Fixed image scaling issue when image was smaller than desired
 - Image Features
   * Fast Corners are now concurrent
 - TODO Loop Closure
