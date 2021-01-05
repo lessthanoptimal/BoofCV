@@ -16,32 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
-
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+package boofcv.struct.border;
 
 /**
- * @author Peter Abeles
+ * Factory for creating BorderIndex1D.
  */
-public class TestBorderIndex1D_Wrap extends BoofStandardJUnit {
-
-	int length = 10;
-
-	@Test void simple() {
-		BorderIndex1D_Wrap alg = new BorderIndex1D_Wrap();
-		alg.setLength(length);
-
-		for( int i = 0; i < 10; i++ ) {
-			assertEquals(i,alg.getIndex(i));
-		}
-
-		assertEquals(9,alg.getIndex(-1));
-		assertEquals(8,alg.getIndex(-2));
-		assertEquals(0,alg.getIndex(length));
-		assertEquals(1,alg.getIndex(length+1));
-	}
+@FunctionalInterface
+public interface FactoryBorderIndex1D {
+	BorderIndex1D newInstance();
 }

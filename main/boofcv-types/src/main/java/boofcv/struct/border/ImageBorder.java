@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageBase;
 @SuppressWarnings({"NullAway.Init"})
 public abstract class ImageBorder<T extends ImageBase<T>> {
 
-	T image;
+	protected T image;
 
 	protected ImageBorder( T image ) {
 		setImage(image);

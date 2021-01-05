@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,25 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.struct.border;
 
-import boofcv.struct.border.ImageBorder;
-import boofcv.struct.border.ImageBorder1D_IL_S32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedS32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageBorder1D_IL_S32 extends GenericImageBorder1DTests<InterleavedS32> {
+public class TestImageBorder1D_S32 extends GenericImageBorder1DTests<GrayS32> {
 
-	public TestImageBorder1D_IL_S32() {
-		super(ImageType.il(2, InterleavedS32.class));
+	public TestImageBorder1D_S32() {
+		super(ImageType.single(GrayS32.class));
 	}
 
 	@Override
-	public ImageBorder<InterleavedS32> wrap(InterleavedS32 image) {
-		ImageBorder1D_IL_S32<InterleavedS32> ret = new ImageBorder1D_IL_S32<>(BorderIndex1D_Wrap.class);
+	public ImageBorder<GrayS32> wrap( GrayS32 image ) {
+		ImageBorder1D_S32<GrayS32> ret = new ImageBorder1D_S32<>(DummyBorderIndex1D_Wrap::new);
 		ret.setImage(image);
 		return ret;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,26 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
-
-import boofcv.struct.border.ImageBorder;
-import boofcv.struct.border.ImageBorder1D_S32;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.ImageType;
+package boofcv.struct.border;
 
 /**
+ * Copy of the original class to get around cyclical dependencies for testing.
+ *
  * @author Peter Abeles
  */
-public class TestImageBorder1D_S32 extends GenericImageBorder1DTests<GrayS32> {
-
-	public TestImageBorder1D_S32() {
-		super(ImageType.single(GrayS32.class));
+public class DummyBorderIndex1D_Wrap extends BorderIndex1D {
+	@Override public int getIndex(int index) {
+		if( index < 0 )
+			return length+index;
+		else if( index >= length)
+			return index-length;
+		else
+			return index;
 	}
 
-	@Override
-	public ImageBorder<GrayS32> wrap(GrayS32 image) {
-		ImageBorder1D_S32 ret = new ImageBorder1D_S32(BorderIndex1D_Wrap.class);
-		ret.setImage(image);
-		return ret;
-	}
+	@Override public DummyBorderIndex1D_Wrap copy() {return new DummyBorderIndex1D_Wrap();}
 }

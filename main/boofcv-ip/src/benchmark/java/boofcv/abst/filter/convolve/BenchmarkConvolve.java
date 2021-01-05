@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -165,7 +165,7 @@ public class BenchmarkConvolve  {
 
 	public int timeConvolve2D_Extend_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImage.convolve(kernel2D_I32, input_U8, out_S16, new ImageBorder1D_S32<>(BorderIndex1D_Extend.class));
+			ConvolveImage.convolve(kernel2D_I32, input_U8, out_S16, new ImageBorder1D_S32<>(BorderIndex1D_Extend::new));
 		return 0;
 	}
 

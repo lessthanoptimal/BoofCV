@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,7 +71,7 @@ public class TestFactoryConvolve extends BoofStandardJUnit {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.EXTENDED,true);
 		conv.process(input,found);
-		ConvolveImage.horizontal(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		ConvolveImage.horizontal(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK NORMALIZED
@@ -103,7 +103,7 @@ public class TestFactoryConvolve extends BoofStandardJUnit {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,input.imageType,found.imageType,BorderType.EXTENDED,true);
 		conv.process(input,found);
-		ConvolveImage.horizontal(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
+		ConvolveImage.horizontal(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend::new));
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED
@@ -136,7 +136,7 @@ public class TestFactoryConvolve extends BoofStandardJUnit {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,GrayF32.class,GrayF32.class,BorderType.EXTENDED);
 		conv.process(input,found);
-		ConvolveImage.convolve(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		ConvolveImage.convolve(kernel,input,expected,new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 		BoofTesting.assertEquals(expected,found,1e-4f);
 
 		// CHECK NORMALIZED
@@ -168,7 +168,7 @@ public class TestFactoryConvolve extends BoofStandardJUnit {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,GrayU8.class,GrayI16.class,BorderType.EXTENDED);
 		conv.process(input,found);
-		ConvolveImage.convolve(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
+		ConvolveImage.convolve(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend::new));
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED

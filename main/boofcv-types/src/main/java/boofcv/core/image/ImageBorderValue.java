@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.struct.border;
+package boofcv.core.image;
 
+import boofcv.struct.border.*;
 import boofcv.struct.image.*;
 
 import java.util.Arrays;
@@ -29,7 +30,7 @@ import java.util.Arrays;
  */
 public class ImageBorderValue {
 
-	public static ImageBorder wrap(ImageGray image , double value ) {
+	public static ImageBorder wrap( ImageGray image , double value ) {
 		if( image.getDataType().isInteger() ) {
 			if( image.getDataType().getNumBits() <= 32 )
 				return wrap((GrayI)image,(int)value);
@@ -56,11 +57,11 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static ImageBorder_S64 wrap(GrayS64 image , long value ) {
+	public static ImageBorder_S64 wrap( GrayS64 image , long value ) {
 		return new Value_I64(image,value);
 	}
 
-	public static ImageBorder_F64 wrap(GrayF64 image , double value ) {
+	public static ImageBorder_F64 wrap( GrayF64 image , double value ) {
 		return new Value_F64(image,value);
 	}
 
@@ -68,7 +69,7 @@ public class ImageBorderValue {
 		return new Value_F32(image,value);
 	}
 
-	public static ImageBorder_S32 wrap(GrayI image , int value ) {
+	public static ImageBorder_S32 wrap( GrayI image , int value ) {
 		return new Value_I(image,value);
 	}
 

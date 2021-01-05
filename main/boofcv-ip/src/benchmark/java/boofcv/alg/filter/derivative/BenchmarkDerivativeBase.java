@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ public abstract class BenchmarkDerivativeBase {
 	public static int imgHeight = 480;
 	public static long TEST_TIME = 1000;
 	public static boolean border = true;
-	public static ImageBorder_S32 borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
-	public static ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+	public static ImageBorder_S32 borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend::new);
+	public static ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
 
 	public static GrayF32 imgFloat32;
 	public static GrayF32 derivX_F32;

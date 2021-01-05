@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,9 +90,9 @@ public class StandardGradientChecks {
 
 		Object border;
 		if( params[3] == ImageBorder_F32.class ) {
-			border = new ImageBorder1D_F32(BorderIndex1D_Wrap.class);
+			border = new ImageBorder1D_F32(BorderIndex1D_Wrap::new);
 		} else {
-			border = new ImageBorder1D_S32(BorderIndex1D_Wrap.class);
+			border = new ImageBorder1D_S32(BorderIndex1D_Wrap::new);
 		}
 
 		try {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,6 @@ package boofcv.struct.border;
 
 import boofcv.struct.image.GrayF64;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * @author Peter Abeles
  */
@@ -29,13 +27,9 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D 
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
-	public ImageBorder1D_F64( Class<?> type ) {
-		try {
-			this.rowWrap = (BorderIndex1D)type.getConstructor().newInstance();
-			this.colWrap = (BorderIndex1D)type.getConstructor().newInstance();
-		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
+	public ImageBorder1D_F64( FactoryBorderIndex1D factory ) {
+		this.rowWrap = factory.newInstance();
+		this.colWrap = factory.newInstance();
 	}
 
 	public ImageBorder1D_F64( BorderIndex1D rowWrap, BorderIndex1D colWrap ) {
@@ -43,15 +37,9 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D 
 		this.colWrap = colWrap;
 	}
 
-	@Override
-	public BorderIndex1D getRowWrap() {
-		return rowWrap;
-	}
+	@Override public BorderIndex1D getRowWrap() { return rowWrap; }
 
-	@Override
-	public BorderIndex1D getColWrap() {
-		return colWrap;
-	}
+	@Override public BorderIndex1D getColWrap() { return colWrap; }
 
 	@Override
 	public void setImage( GrayF64 image ) {

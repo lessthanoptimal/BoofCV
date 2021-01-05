@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.core.image.border;
 
 import boofcv.alg.border.GrowBorder;
 import boofcv.alg.border.GrowBorderSB;
+import boofcv.core.image.ImageBorderValue;
 import boofcv.struct.border.*;
 import boofcv.struct.image.*;
 
@@ -129,7 +130,7 @@ public class FactoryImageBorder {
 	public static <T extends ImageGray<T>,Border extends ImageBorder<T>> Border
 	single(BorderType borderType, Class<T> imageType)
 	{
-		Class<?> borderClass;
+		FactoryBorderIndex1D factory;
 		switch(borderType) {
 			case SKIP:
 				throw new IllegalArgumentException("Skip border can't be implemented here and has to be done " +
@@ -141,15 +142,15 @@ public class FactoryImageBorder {
 				throw new IllegalArgumentException("Normalized can't be supported by this border interface");
 			
 			case REFLECT:
-				borderClass = BorderIndex1D_Reflect.class;
+				factory = BorderIndex1D_Reflect::new;
 				break;
 
 			case EXTENDED:
-				borderClass = BorderIndex1D_Extend.class;
+				factory = BorderIndex1D_Extend::new;
 				break;
 
 			case WRAP:
-				borderClass = BorderIndex1D_Wrap.class;
+				factory = BorderIndex1D_Wrap::new;
 				break;
 
 			case ZERO:
@@ -160,13 +161,13 @@ public class FactoryImageBorder {
 		}
 
 		if( imageType == GrayF32.class )
-			return (Border)new ImageBorder1D_F32(borderClass);
+			return (Border)new ImageBorder1D_F32(factory);
 		if( imageType == GrayF64.class )
-			return (Border)new ImageBorder1D_F64(borderClass);
+			return (Border)new ImageBorder1D_F64(factory);
 		else if( GrayI.class.isAssignableFrom(imageType) )
-			return (Border)new ImageBorder1D_S32((Class)borderClass);
+			return (Border)new ImageBorder1D_S32(factory);
 		else if( imageType == GrayS64.class )
-			return (Border)new ImageBorder1D_S64(borderClass);
+			return (Border)new ImageBorder1D_S64(factory);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}
@@ -183,7 +184,7 @@ public class FactoryImageBorder {
 	public static <T extends ImageInterleaved<T>> ImageBorder<T>
 	interleaved(BorderType borderType, Class<T> imageType)
 	{
-		Class<?> borderClass;
+		FactoryBorderIndex1D factory;
 		switch(borderType) {
 			case SKIP:
 				throw new IllegalArgumentException("Skip border can't be implemented here and has to be done " +
@@ -196,15 +197,15 @@ public class FactoryImageBorder {
 				throw new IllegalArgumentException("Normalized can't be supported by this border interface");
 
 			case REFLECT:
-				borderClass = BorderIndex1D_Reflect.class;
+				factory = BorderIndex1D_Reflect::new;
 				break;
 
 			case EXTENDED:
-				borderClass = BorderIndex1D_Extend.class;
+				factory = BorderIndex1D_Extend::new;
 				break;
 
 			case WRAP:
-				borderClass = BorderIndex1D_Wrap.class;
+				factory = BorderIndex1D_Wrap::new;
 				break;
 
 			case ZERO:
@@ -215,13 +216,13 @@ public class FactoryImageBorder {
 		}
 
 		if( imageType == InterleavedF32.class )
-			return (ImageBorder<T>)new ImageBorder1D_IL_F32(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_IL_F32(factory);
 		else if( imageType == InterleavedF64.class )
-			return (ImageBorder<T>)new ImageBorder1D_IL_F64(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_IL_F64(factory);
 		else if( InterleavedInteger.class.isAssignableFrom(imageType) )
-			return (ImageBorder<T>)new ImageBorder1D_IL_S32(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_IL_S32(factory);
 		else if( imageType == InterleavedS64.class )
-			return (ImageBorder<T>)new ImageBorder1D_IL_S64(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_IL_S64(factory);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}

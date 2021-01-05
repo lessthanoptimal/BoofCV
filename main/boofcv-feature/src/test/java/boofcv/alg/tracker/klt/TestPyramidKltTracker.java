@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 		pyramid.process(image);
 
 		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
-			GradientSobel.process(pyramid.getLayer(i),derivX[i],derivY[i],new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+			GradientSobel.process(pyramid.getLayer(i),derivX[i],derivY[i],new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 		}
 	}
 

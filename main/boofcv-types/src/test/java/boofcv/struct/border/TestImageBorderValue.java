@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,18 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.struct.border;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.border.ImageBorder;
-import boofcv.struct.border.ImageBorderValue;
+import boofcv.core.image.ImageBorderValue;
 import boofcv.struct.image.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
+@SuppressWarnings("rawtypes")
 public class TestImageBorderValue extends GenericImageBorderTests {
 
 	int value = 43;
@@ -39,39 +36,37 @@ public class TestImageBorderValue extends GenericImageBorderTests {
 				ImageType.single(GrayS64.class),
 				ImageType.single(GrayF32.class),
 				ImageType.single(GrayF64.class),
-				ImageType.il(2,InterleavedU8.class),
-				ImageType.il(2,InterleavedU16.class),
-				ImageType.il(2,InterleavedS32.class),
-				ImageType.il(2,InterleavedS64.class),
-				ImageType.il(2,InterleavedF32.class),
-				ImageType.il(2,InterleavedF64.class)
-				);
-
+				ImageType.il(2, InterleavedU8.class),
+				ImageType.il(2, InterleavedU16.class),
+				ImageType.il(2, InterleavedS32.class),
+				ImageType.il(2, InterleavedS64.class),
+				ImageType.il(2, InterleavedF32.class),
+				ImageType.il(2, InterleavedF64.class)
+		);
 	}
 
 	@Override
-	public ImageBorder wrap(ImageBase image) {
-		if( image instanceof ImageGray)
-			return ImageBorderValue.wrap((ImageGray)image,value);
-		else if( image instanceof ImageInterleaved )
-			return ImageBorderValue.wrap((ImageInterleaved)image,value);
+	public ImageBorder wrap( ImageBase image ) {
+		if (image instanceof ImageGray)
+			return ImageBorderValue.wrap((ImageGray)image, value);
+		else if (image instanceof ImageInterleaved)
+			return ImageBorderValue.wrap((ImageInterleaved)image, value);
 		else
 			throw new RuntimeException("asdfasdf");
 	}
 
 	@Override
-	public void checkBorderSet(int x, int y, double[] pixel, ImageBase image) {
-	}
+	public void checkBorderSet( int x, int y, double[] pixel, ImageBase image ) {}
 
 	@Override
-	public void checkBorderGet(int x, int y, ImageBase image, double[] pixel) {
-		if( image.isInBounds(x,y)) {
+	public void checkBorderGet( int x, int y, ImageBase image, double[] pixel ) {
+		if (image.isInBounds(x, y)) {
 			for (int i = 0; i < pixel.length; i++) {
-				assertEquals(pixel[i], GeneralizedImageOps.get(image,x,y,i), 1e-5);
+				assertEquals(pixel[i], GeneralizedImageOps.get(image, x, y, i), 1e-5);
 			}
 		} else {
 			for (int i = 0; i < pixel.length; i++) {
-				assertEquals(value, (int) pixel[i]);
+				assertEquals(value, (int)pixel[i]);
 			}
 		}
 	}
