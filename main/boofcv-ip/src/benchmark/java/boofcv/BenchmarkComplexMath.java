@@ -16,12 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.fft;
+package boofcv;
 
-import boofcv.abst.transform.fft.DiscreteFourierTransform;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.InterleavedF32;
+import org.ejml.data.Complex_F64;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -38,29 +35,59 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 3)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkFastFourierTransform {
+public class BenchmarkComplexMath {
+	int N = 20000;
+	Complex_F64 number = new Complex_F64(1.5, 0.3);
 
-	static int imageSize = 1000;
+	Complex_F64[] objectInput = new Complex_F64[N];
+	Complex_F64[] objectOutput = new Complex_F64[N];
 
-	static GrayF32 input = new GrayF32(imageSize, imageSize);
-	static InterleavedF32 fourier = new InterleavedF32(imageSize, imageSize, 2);
-	static GrayF32 output = new GrayF32(imageSize, imageSize);
-
-	DiscreteFourierTransform<GrayF32, InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
+	double[] arrayInput = new double[2*N];
+	double[] arrayOutput = new double[2*N];
 
 	@Setup public void setup() {
+		for (int i = 0; i < N; i++) {
+			objectInput[i] = new Complex_F64();
+			objectOutput[i] = new Complex_F64();
+		}
+
 		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(input, rand, 0, 100);
-		ImageMiscOps.fillUniform(fourier, rand, 0, 100);
+		for (int i = 0; i < N; i++) {
+			objectInput[i].setTo(rand.nextGaussian(), rand.nextGaussian());
+			arrayInput[i*2] = objectInput[i].real;
+			arrayInput[i*2 + 1] = objectInput[i].imaginary;
+		}
 	}
 
-	@Benchmark public void forward() {dft.forward(input, fourier);}
+	@Benchmark public void ComplexObject() {
+		Complex_F64 a = number;
 
-	@Benchmark public void inverse() {dft.inverse(fourier, output);}
+		for (int i = 0; i < N; i++) {
+			Complex_F64 b = objectInput[i];
+			Complex_F64 o = objectOutput[i];
+
+			o.real = a.real*b.real - a.imaginary*b.imaginary;
+			o.imaginary = a.real*b.imaginary + a.imaginary*b.real;
+		}
+	}
+
+	@Benchmark public void PureArray() {
+		double ar = number.real;
+		double ai = number.imaginary;
+
+		for (int i = 0; i < N; i++) {
+			int index = i*2;
+			double bi = arrayInput[index];
+			double br = arrayInput[index + 1];
+
+			arrayOutput[index] = ar*br - ai*bi;
+			arrayOutput[index + 1] = ar*bi + ai*br;
+		}
+	}
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkFastFourierTransform.class.getSimpleName())
+				.include(BenchmarkComplexMath.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

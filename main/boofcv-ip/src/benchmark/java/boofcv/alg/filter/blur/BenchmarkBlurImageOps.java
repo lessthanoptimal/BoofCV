@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,13 +41,12 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkBlurImageOps {
-
 	public static final int radius = 5;
 
 	@Param({"true", "false"})
 	public boolean concurrent;
 
-	@Param({"100", "500", "2000"})
+	@Param({"100", "2000"})
 	public int size;
 
 	private final GrayU8 inputU8 = new GrayU8(size, size);
@@ -62,8 +61,7 @@ public class BenchmarkBlurImageOps {
 	private final GrowArray<DogArray_F32> workF32 = new GrowArray<>(DogArray_F32::new);
 	private final GrowArray<DogArray_F32> growArrayF32 = new GrowArray<>(DogArray_F32::new);
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,17 +33,14 @@ import org.openjdk.jmh.annotations.*;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkImageDistort {
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
@@ -53,33 +50,32 @@ public class BenchmarkImageDistort {
 	GrayF32 inputF32 = new GrayF32(size, size);
 	GrayF32 outputF32 = new GrayF32(size, size);
 
-	ImageDistort<GrayF32,GrayF32> nearest_sb;
-	ImageDistort<GrayF32,GrayF32> bilinear_sb;
-	ImageDistort<GrayF32,GrayF32> bilinear_cache_sb;
-
+	ImageDistort<GrayF32, GrayF32> nearest_sb;
+	ImageDistort<GrayF32, GrayF32> bilinear_sb;
+	ImageDistort<GrayF32, GrayF32> bilinear_cache_sb;
 
 	@Setup
 	public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		inputF32.reshape(size,size);
-		outputF32.reshape(size,size);
+		inputF32.reshape(size, size);
+		outputF32.reshape(size, size);
 
-		GImageMiscOps.fillUniform(inputF32,rand,0,200);
+		GImageMiscOps.fillUniform(inputF32, rand, 0, 200);
 
 		Affine2D_F32 affine = new Affine2D_F32(
-				0.9f,0.1f,0.0f,
-				0.05f,1.1f,02f);
+				0.9f, 0.1f, 0.0f,
+				0.05f, 1.1f, 02f);
 		PixelTransform<Point2D_F32> tran = new PixelTransformAffine_F32(affine);
 
 
 		nearest_sb = FactoryDistort.distort(false, InterpolationType.NEAREST_NEIGHBOR, BorderType.EXTENDED,
-				ImageType.single(GrayF32.class),ImageType.single(GrayF32.class));
+				ImageType.single(GrayF32.class), ImageType.single(GrayF32.class));
 		bilinear_sb = FactoryDistort.distort(false, InterpolationType.BILINEAR, BorderType.EXTENDED,
-				ImageType.single(GrayF32.class),ImageType.single(GrayF32.class));
+				ImageType.single(GrayF32.class), ImageType.single(GrayF32.class));
 		bilinear_cache_sb = FactoryDistort.distort(true, InterpolationType.BILINEAR, BorderType.EXTENDED,
-				ImageType.single(GrayF32.class),ImageType.single(GrayF32.class));
+				ImageType.single(GrayF32.class), ImageType.single(GrayF32.class));
 
 		nearest_sb.setModel(tran);
 		bilinear_sb.setModel(tran);
@@ -88,16 +84,16 @@ public class BenchmarkImageDistort {
 
 	@Benchmark
 	public void nn_F32() {
-		nearest_sb.apply(inputF32, outputF32,0,0,size,size);
+		nearest_sb.apply(inputF32, outputF32, 0, 0, size, size);
 	}
 
 	@Benchmark
 	public void bilinear_F32() {
-		bilinear_sb.apply(inputF32, outputF32,0,0,size,size);
+		bilinear_sb.apply(inputF32, outputF32, 0, 0, size, size);
 	}
 
 	@Benchmark
 	public void bilinear_cache_F32() {
-		bilinear_cache_sb.apply(inputF32, outputF32,0,0,size,size);
+		bilinear_cache_sb.apply(inputF32, outputF32, 0, 0, size, size);
 	}
 }

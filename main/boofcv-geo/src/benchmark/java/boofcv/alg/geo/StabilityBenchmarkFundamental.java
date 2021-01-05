@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkStabilityFundamental {
+public class StabilityBenchmarkFundamental {
 
 	Random rand = new Random(265);
 
@@ -68,7 +68,7 @@ public class BenchmarkStabilityFundamental {
 
 	List<Double> scores;
 
-	public BenchmarkStabilityFundamental() {
+	public StabilityBenchmarkFundamental() {
 		CommonOps_DDRM.invert(K, K_inv);
 	}
 
@@ -227,7 +227,7 @@ public class BenchmarkStabilityFundamental {
 	}
 
 	public static void main( String[] args ) {
-		BenchmarkStabilityFundamental app = new BenchmarkStabilityFundamental();
+		StabilityBenchmarkFundamental app = new StabilityBenchmarkFundamental();
 
 		app.createSceneCube();
 //		app.createScenePlane();

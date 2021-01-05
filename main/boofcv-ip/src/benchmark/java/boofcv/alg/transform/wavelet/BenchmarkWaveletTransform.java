@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,16 +37,15 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode({Mode.AverageTime,Mode.Throughput})
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 2)
-@Measurement(iterations = 5)
+@Measurement(iterations = 3)
 @State(Scope.Benchmark)
-@Fork(value = 2)
+@Fork(value = 1)
 public class BenchmarkWaveletTransform {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
 
 	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 	static WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5,BorderType.REFLECT);
@@ -60,8 +59,7 @@ public class BenchmarkWaveletTransform {
 
 	GrayF32 copy = new GrayF32(1,1);
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		Random rand = new Random(234);
 
 		GImageMiscOps.fillUniform(orig_F32, rand,0, 100);

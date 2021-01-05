@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
@@ -85,19 +86,14 @@ public class BenchmarkEnhanceImageOps {
 		EnhanceImageOps.applyTransform(inputU8,transform,outputU8);
 	}
 
-	@Benchmark
-	public void sharpen4() {
-		EnhanceImageOps.sharpen4(inputU8,outputU8);
-	}
-
-	@Benchmark
-	public void sharpen8() {
-		EnhanceImageOps.sharpen8(inputU8,outputU8);
-	}
+	@Benchmark public void sharpen4() {EnhanceImageOps.sharpen4(inputU8,outputU8);}
+	@Benchmark public void sharpen8() {EnhanceImageOps.sharpen8(inputU8,outputU8);}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkEnhanceImageOps.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,71 +18,57 @@
 
 package boofcv.alg.distort;
 
-import boofcv.misc.Performer;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.distort.PixelTransform;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.point.Point2D_F32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkPixelTransform {
 
+	private static final int size = 800;
 
-	public static final int imgWidth = 640;
-	public static final int imgHeight = 480;
-	
-	public static final int TEST_TIME = 1000;
+	Point2D_F32 distorted = new Point2D_F32();
 
-	public static class TestPixelTransform_F32 implements Performer {
-		PixelTransform<Point2D_F32> alg;
-		String name;
-		Point2D_F32 distorted = new Point2D_F32();
+	Affine2D_F32 affine = new Affine2D_F32();
+	Homography2D_F32 homography = new Homography2D_F32();
 
-		public TestPixelTransform_F32(PixelTransform<Point2D_F32> alg, String name ) {
-			this.alg = alg;
-			this.name = name;
-		}
-
-		@Override
-		public void process() {
-			for (int y = 0; y < imgHeight; y++ )
-				for (int x = 0; x < imgWidth; x++)
-					alg.compute(x, y, distorted);
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
+	@Setup public void configure() {
+		affine.setTo(1.1f, 0.1f, -0.1f, 0.9f, 0.5f, -0.2f);
+		homography.setTo(1.1f, 0.1f, 0.5f, -0.1f, 0.9f, -0.2f, 0, 0, 1);
 	}
 
-	
-	private static void benchmark(PixelTransform<Point2D_F32> alg , String name ) {
-		ProfileOperation.printOpsPerSec(new TestPixelTransform_F32(alg,name), TEST_TIME);
+	// @formatter:off
+	@Benchmark public void affine() {process(new PixelTransformAffine_F32(affine));}
+	@Benchmark public void homography() {process(new PixelTransformHomography_F32(homography));}
+	// @formatter:on
+
+	void process( PixelTransform<Point2D_F32> alg ) {
+		for (int y = 0; y < size; y++)
+			for (int x = 0; x < size; x++)
+				alg.compute(x, y, distorted);
 	}
-	
-	public static void main( String[] args ) {
-		Random rand = new Random(234);
 
-		Affine2D_F32 affine = new Affine2D_F32((float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian(),(float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian());
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkPixelTransform.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		Homography2D_F32 homography = new Homography2D_F32((float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian(),(float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian(),(float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian());
-
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
-
-//		benchmark(new PixelTransformHomography_F32(homography), "Homography");
-		benchmark(new PixelTransformAffine_F32(affine), "Affine");
-
+		new Runner(opt).run();
 	}
 }

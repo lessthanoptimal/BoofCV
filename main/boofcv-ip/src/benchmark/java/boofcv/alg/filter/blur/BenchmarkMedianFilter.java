@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,83 +21,59 @@ package boofcv.alg.filter.blur;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.DogArray_I32;
-import pabeles.concurrency.GrowArray;
+import boofcv.alg.filter.convolve.CommonBenchmarkConvolve;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Benchmark for different convolution operations.
- * @author Peter Abeles
- */
-public class BenchmarkMedianFilter  {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
+public class BenchmarkMedianFilter extends CommonBenchmarkConvolve {
+	@Param({"1", "4"})
+	public int radius;
 
-	static GrayF32 imgFloat32 = new GrayF32(imgWidth,imgHeight);
-	static GrayF32 out_F32 = new GrayF32(imgWidth,imgHeight);
-	static GrayU8 imgInt8 = new GrayU8(imgWidth,imgHeight);
-	static GrayS16 imgInt16 = new GrayS16(imgWidth,imgHeight);
-	static GrayU8 out_I8 = new GrayU8(imgWidth,imgHeight);
-	static GrayS16 out_I16 = new GrayS16(imgWidth,imgHeight);
-	static GrayS32 out_I32 = new GrayS32(imgWidth,imgHeight);
+	@Setup public void setup() {setup(radius);}
 
-	// iterate through different sized kernel radius
-	private int radius;
-
-	public BenchmarkMedianFilter() {
-		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(imgInt8,rand, 0, 100);
-		ImageMiscOps.fillUniform(imgFloat32,rand,0,200);
+	@Benchmark public void BlurImageOps_I8() {
+		BlurImageOps.median(input_U8, out_U8, radius, radius, work_I32);
 	}
 
-	public int timeBlurImageOps_I8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BlurImageOps.median(imgInt8, out_I8, radius, radius,null);
-		return 0;
+	@Benchmark public void BlurImageOps_F32() {
+		BlurImageOps.median(input_F32, out_F32, radius, radius, work_F32);
 	}
 
-	public int timeBlurImageOps_F32(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BlurImageOps.median(imgFloat32,out_F32,radius,radius,null);
-		return 0;
+	@Benchmark public void HistogramNaive_I8() {
+		ImplMedianHistogramInnerNaive.process(input_U8, out_U8, radius, radius, null, null);
 	}
 
-	public int timeHistogramNaive_I8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplMedianHistogramInnerNaive.process(imgInt8, out_I8, radius, radius,null, null);
-		return 0;
+	@Benchmark public void Histogram_I8() {
+		ImplMedianHistogramInner.process(input_U8, out_U8, radius, radius, work_I32);
 	}
 
-	public int timeHistogram_I8(int reps) {
-		GrowArray<DogArray_I32> work = new GrowArray<>(DogArray_I32::new);
-		for( int i = 0; i < reps; i++ )
-			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,radius,work);
-		return 0;
+	@Benchmark public void SortNaive_I8() {
+		ImplMedianSortNaive.process(input_U8, out_U8, radius, radius, work_I32);
 	}
 
-	public int timeSortNaive_I8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplMedianSortNaive.process(imgInt8,out_I8,radius,radius,(GrowArray)null);
-		return 0;
+	@Benchmark public void SortNaive_F32() {
+		ImplMedianSortNaive.process(input_F32, out_F32, radius, radius, work_F32);
 	}
 
-	public int timeSortNaive_F32(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplMedianSortNaive.process(imgFloat32,out_F32,radius,radius,(GrowArray)null);
-		return 0;
-	}
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkBlurImageOps.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-	public static void main( String[] args ) {
-		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
-		System.out.println();
-
-//		Runner.main(BenchmarkMedianFilter.class, args);
+		new Runner(opt).run();
 	}
 }

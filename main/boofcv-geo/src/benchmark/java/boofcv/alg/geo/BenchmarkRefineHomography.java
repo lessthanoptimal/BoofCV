@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.fft;
+package boofcv.alg.geo;
 
-import boofcv.abst.transform.fft.DiscreteFourierTransform;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.factory.geo.EpipolarError;
+import boofcv.struct.geo.AssociatedPair;
+import georegression.struct.point.Vector3D_F64;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -29,8 +31,9 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import static boofcv.factory.geo.FactoryMultiView.homographyRefine;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -38,29 +41,39 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 3)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkFastFourierTransform {
+public class BenchmarkRefineHomography extends ArtificialStereoScene {
+	@Param({"20", "2000"})
+	public int numPoints = 2000;
 
-	static int imageSize = 1000;
+	protected DMatrixRMaj estimateH = new DMatrixRMaj(3, 3);
+	DMatrixRMaj refinedH = new DMatrixRMaj(3, 3);
 
-	static GrayF32 input = new GrayF32(imageSize, imageSize);
-	static InterleavedF32 fourier = new InterleavedF32(imageSize, imageSize, 2);
-	static GrayF32 output = new GrayF32(imageSize, imageSize);
-
-	DiscreteFourierTransform<GrayF32, InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
+	ModelFitter<DMatrixRMaj, AssociatedPair> simple;
+	ModelFitter<DMatrixRMaj, AssociatedPair> sampson;
 
 	@Setup public void setup() {
-		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(input, rand, 0, 100);
-		ImageMiscOps.fillUniform(fourier, rand, 0, 100);
+		init(numPoints, true, true);
+
+		DMatrixRMaj perfectH = MultiViewOps.createHomography(motion.R, motion.T, 1.0, new Vector3D_F64(0, 0, 1), K);
+		estimateH.setTo(perfectH);
+		RandomMatrices_DDRM.addUniform(estimateH, -0.05, 0.05, rand);
+
+		double tol = 1e-16;
+		int MAX_ITER = 200;
+		simple = homographyRefine(tol, MAX_ITER, EpipolarError.SIMPLE);
+		sampson = homographyRefine(tol, MAX_ITER, EpipolarError.SAMPSON);
 	}
 
-	@Benchmark public void forward() {dft.forward(input, fourier);}
+	// @formatter:off
+	@Benchmark public void simple() {process(simple);}
+	@Benchmark public void sampson() {process(sampson);}
+	// @formatter:on
 
-	@Benchmark public void inverse() {dft.inverse(fourier, output);}
+	void process( ModelFitter<DMatrixRMaj, AssociatedPair> alg ) {alg.fitModel(pairs, estimateH, refinedH);}
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkFastFourierTransform.class.getSimpleName())
+				.include(BenchmarkRefineHomography.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

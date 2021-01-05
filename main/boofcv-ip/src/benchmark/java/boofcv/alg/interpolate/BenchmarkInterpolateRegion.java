@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,61 +18,55 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.BoofTesting;
 import boofcv.alg.interpolate.impl.BilinearRectangle_F32;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Benchmark interpolating rectangular regions
- *
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 3)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkInterpolateRegion {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
+	static int regionSize = 400;
 
-	static GrayF32 imgFloat32;
-	static GrayU8 imgInt8;
-	static GrayF32 outputImage;
+	static GrayF32 imgFloat32 = new GrayF32(imgWidth, imgHeight);
+	static GrayU8 imgInt8 = new GrayU8(imgWidth, imgHeight);
+	static GrayF32 outputImage = new GrayF32(regionSize, regionSize);
 
 	// defines the region its interpolation
 	static float start = 10.1f;
-	static int regionSize = 300;
 
-	public static class Bilinear_F32 extends PerformerBase {
-		BilinearRectangle_F32 alg = new BilinearRectangle_F32(imgFloat32);
+	BilinearRectangle_F32 alg = new BilinearRectangle_F32(imgFloat32);
 
-		@Override
-		public void process() {
-			alg.region(start, start, outputImage);
-		}
-	}
-
-	public static void main(String[] args) {
-		imgInt8 = new GrayU8(imgWidth, imgHeight);
-		imgFloat32 = new GrayF32(imgWidth, imgHeight);
-
-		outputImage = new GrayF32(regionSize,regionSize);
-
+	@Setup public void setup() {
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(imgInt8, rand, 0, 100);
 		ImageMiscOps.fillUniform(imgFloat32, rand, 0, 200);
+	}
 
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
+	@Benchmark public void Bilinear_F32() {alg.region(start, start, outputImage);}
 
-		ProfileOperation.printOpsPerSec(new Bilinear_F32(), TEST_TIME);
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkInterpolateRegion.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		System.out.println("   ---- Sub-Image ----");
-		outputImage = BoofTesting.createSubImageOf(outputImage);
-		ProfileOperation.printOpsPerSec(new Bilinear_F32(), TEST_TIME);
-
+		new Runner(opt).run();
 	}
 }
