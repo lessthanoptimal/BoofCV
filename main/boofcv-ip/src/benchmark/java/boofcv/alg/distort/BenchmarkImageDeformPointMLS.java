@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,50 +27,44 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkImageDeformPointMLS {
-//	@Param({"true","false"})
-//	public boolean concurrent;
-
-	//	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"1000"})
+	@Param({"5", "1000"})
 	public int size;
 
 	ImageDeformPointMLS_F32 affine = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 	ImageDeformPointMLS_F32 rigid = new ImageDeformPointMLS_F32(TypeDeformMLS.RIGID);
 	ImageDeformPointMLS_F32 similarity = new ImageDeformPointMLS_F32(TypeDeformMLS.SIMILARITY);
-	@Setup
-	public void configure() {
-		addPoints(20, affine);
-		addPoints(20, rigid);
-		addPoints(20, similarity);
+
+	@Setup public void configure() {
+		addPoints(size, affine);
+		addPoints(size, rigid);
+		addPoints(size, similarity);
 	}
 
-	private void addPoints( int N , ImageDeformPointMLS_F32 alg ) {
+	private void addPoints( int N, ImageDeformPointMLS_F32 alg ) {
 		alg.reset();
-		alg.configure(size,size,30,30);
+		alg.configure(N, N, 30, 30);
 		Random rand = new Random(2345);
 		for (int i = 0; i < N; i++) {
-			float sx = rand.nextFloat()*(size-1);
-			float sy = rand.nextFloat()*(size-1);
-			float dx = sx + (rand.nextFloat()-0.5f)*20f;
-			float dy = sy + (rand.nextFloat()-0.5f)*20f;
-			dx = BoofMiscOps.bound(dx,0,size-1);
-			dy = BoofMiscOps.bound(dy,0,size-1);
+			float sx = rand.nextFloat()*(N - 1);
+			float sy = rand.nextFloat()*(N - 1);
+			float dx = sx + (rand.nextFloat() - 0.5f)*20f;
+			float dy = sy + (rand.nextFloat() - 0.5f)*20f;
+			dx = BoofMiscOps.bound(dx, 0, N - 1);
+			dy = BoofMiscOps.bound(dy, 0, N - 1);
 
-			alg.add(sx,sy,dx,dy);
+			alg.add(sx, sy, dx, dy);
 		}
 		alg.fixate();
 	}
@@ -79,35 +73,33 @@ public class BenchmarkImageDeformPointMLS {
 		Point2D_F32 out = new Point2D_F32();
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
-				alg.compute(x,y,out);
+				alg.compute(x, y, out);
 			}
 		}
 	}
 
-	@Benchmark
-	public void affine_distort() {
+	@Benchmark public void affine_distort() {
 		apply(affine);
 	}
 
-	@Benchmark
-	public void rigid_distort() {
+	@Benchmark public void rigid_distort() {
 		apply(rigid);
 	}
 
-	@Benchmark
-	public void similarity_distort() {
+	@Benchmark public void similarity_distort() {
 		apply(similarity);
 	}
 
-	@Benchmark
-	public void rigid_distort_fixate() {
+	@Benchmark public void rigid_distort_fixate() {
 		rigid.fixate();
 		apply(rigid);
 	}
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkImageDeformPointMLS.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();

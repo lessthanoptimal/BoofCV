@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,21 +52,20 @@ public class BenchmarkCensus {
 	@Param({"2000"})
 	public int size;
 
-	private GrayU8 input = new GrayU8(size, size);
-	private GrayU8 output8 = new GrayU8(size, size);
-	private GrayS32 output32 = new GrayS32(size, size);
-	private GrayS64 output64 = new GrayS64(size, size);
-	private InterleavedU16 outputI16 = new InterleavedU16(size, size,1);
+	private final GrayU8 input = new GrayU8(size, size);
+	private final GrayU8 output8 = new GrayU8(size, size);
+	private final GrayS32 output32 = new GrayS32(size, size);
+	private final GrayS64 output64 = new GrayS64(size, size);
+	private final InterleavedU16 outputI16 = new InterleavedU16(size, size,1);
 
-	private ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.wrap(BorderType.ZERO,input);
+	private final ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.wrap(BorderType.ZERO,input);
 
-	private DogArray<Point2D_I32> points5x5 = CensusTransform.createBlockSamples(2);
-	private DogArray<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
-	private DogArray<Point2D_I32> points9x9 = CensusTransform.createBlockSamples(4);
-	private DogArray_I32 workSpace = new DogArray_I32();
+	private final DogArray<Point2D_I32> points5x5 = CensusTransform.createBlockSamples(2);
+	private final DogArray<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
+	private final DogArray<Point2D_I32> points9x9 = CensusTransform.createBlockSamples(4);
+	private final DogArray_I32 workSpace = new DogArray_I32();
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 

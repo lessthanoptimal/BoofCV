@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,67 +19,54 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayF32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-
-/**
- *
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 3)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkIntegralImage {
-	static int width = 640;
-	static int height = 480;
-	static long TEST_TIME = 1000;
+	static int size = 800;
 
-	static GrayF32 input = new GrayF32(width,height);
-	static GrayF32 integral = new GrayF32(width,height);
+	static GrayF32 input = new GrayF32(size, size);
+	static GrayF32 integral = new GrayF32(size, size);
+	static GrayF32 output = new GrayF32(size, size);
 
-	static GrayF32 output = new GrayF32(width,height);
+	IntegralKernel kernelXX = DerivativeIntegralImage.kernelDerivXX(9, null);
 
-
-	public static class ComputeIntegral extends PerformerBase {
-		@Override
-		public void process() {
-			IntegralImageOps.transform(input,integral);
-		}
-	}
-
-	public static class DerivXX extends PerformerBase {
-
-		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9,null);
-
-		@Override
-		public void process() {
-			DerivativeIntegralImage.derivXX(integral,output,9);
-			IntegralImageOps.convolveBorder(integral,kernel,output,4,4);
-		}
-	}
-
-	public static class GenericDerivXX extends PerformerBase {
-
-		IntegralKernel kernel = DerivativeIntegralImage.kernelDerivXX(9,null);
-
-		@Override
-		public void process() {
-			IntegralImageOps.convolve(integral,kernel,output);
-		}
-	}
-
-	public static void main(String[] args) {
-
+	@Setup public void setup() {
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(input, rand, 0, 100);
-		IntegralImageOps.transform(input,integral);
+		IntegralImageOps.transform(input, integral);
+	}
 
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ==========");
-		System.out.println();
+	@Benchmark public void ComputeIntegral() {IntegralImageOps.transform(input, integral);}
 
-		ProfileOperation.printOpsPerSec(new ComputeIntegral(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new DerivXX(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new GenericDerivXX(), TEST_TIME);
+	@Benchmark public void DerivXX() {
+		DerivativeIntegralImage.derivXX(integral, output, 9);
+		IntegralImageOps.convolveBorder(integral, kernelXX, output, 4, 4);
+	}
+
+	@Benchmark public void GenericDerivXX() {IntegralImageOps.convolve(integral, kernelXX, output);}
+
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkIntegralImage.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
+
+		new Runner(opt).run();
 	}
 }

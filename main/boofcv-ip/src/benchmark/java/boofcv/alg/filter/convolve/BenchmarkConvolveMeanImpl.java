@@ -18,13 +18,17 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.concurrency.BoofConcurrency;
+import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
+import org.ddogleg.struct.DogArray_F32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
+import pabeles.concurrency.GrowArray;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,61 +39,59 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
-public class BenchmarkConvolveMean extends CommonBenchmarkConvolve {
-	@Param({"true", "false"})
-	boolean concurrent;
-
-	@Param({"10"})
+public class BenchmarkConvolveMeanImpl extends CommonBenchmarkConvolve {
+	@Param({"1", "10"})
 	public int radius;
 
-	@Setup public void setup() {
-		BoofConcurrency.USE_CONCURRENT = concurrent;
-		setup(radius);
-	}
+	GrowArray<DogArray_I32> work_I32 = new GrowArray<>(DogArray_I32::new);
+	GrowArray<DogArray_F32> work_F32 = new GrowArray<>(DogArray_F32::new);
+	GrowArray<DogArray_F64> work_F64 = new GrowArray<>(DogArray_F64::new);
+	
+	@Setup public void setup() {setup(radius);}
 
 	@Benchmark public void vertical_U8() {
-		ConvolveImageMean.vertical(input_U8, out_U8, radius, radius*2+1, work_I32);
+		ImplConvolveMean.vertical(input_U8, out_U8, radius, radius*2+1, work_I32);
 	}
 
 	@Benchmark public void vertical_S16() {
-		ConvolveImageMean.vertical(input_S16, out_S16, radius, radius*2+1, work_I32);
+		ImplConvolveMean.vertical(input_S16, out_S16, radius, radius*2+1, work_I32);
 	}
 
 	@Benchmark public void vertical_U16() {
-		ConvolveImageMean.vertical(input_U16, out_S16, radius, radius*2+1, work_I32);
+		ImplConvolveMean.vertical(input_U16, out_S16, radius, radius*2+1, work_I32);
 	}
 
 	@Benchmark public void vertical_F32() {
-		ConvolveImageMean.vertical(input_F32, out_F32, radius, radius*2+1, work_F32);
+		ImplConvolveMean.vertical(input_F32, out_F32, radius, radius*2+1, work_F32);
 	}
 
 	@Benchmark public void vertical_F64() {
-		ConvolveImageMean.vertical(input_F64, out_F64, radius, radius*2+1, work_F64);
+		ImplConvolveMean.vertical(input_F64, out_F64, radius, radius*2+1, work_F64);
 	}
 
 	@Benchmark public void horizontal_U8() {
-		ConvolveImageMean.horizontal(input_U8, out_U8, radius, radius*2+1);
+		ImplConvolveMean.horizontal(input_U8, out_U8, radius, radius*2+1);
 	}
 
 	@Benchmark public void horizontal_S16() {
-		ConvolveImageMean.horizontal(input_S16, out_S16, radius, radius*2+1);
+		ImplConvolveMean.horizontal(input_S16, out_S16, radius, radius*2+1);
 	}
 
 	@Benchmark public void horizontal_U16() {
-		ConvolveImageMean.horizontal(input_U16, out_S16, radius, radius*2+1);
+		ImplConvolveMean.horizontal(input_U16, out_S16, radius, radius*2+1);
 	}
 
 	@Benchmark public void horizontal_F32() {
-		ConvolveImageMean.horizontal(input_F32, out_F32, radius, radius*2+1);
+		ImplConvolveMean.horizontal(input_F32, out_F32, radius, radius*2+1);
 	}
 
 	@Benchmark public void horizontal_F64() {
-		ConvolveImageMean.horizontal(input_F64, out_F64, radius, radius*2+1);
+		ImplConvolveMean.horizontal(input_F64, out_F64, radius, radius*2+1);
 	}
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkConvolveMean.class.getSimpleName())
+				.include(BenchmarkConvolveMeanImpl.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

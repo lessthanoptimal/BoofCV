@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.fft;
+package boofcv.alg.filter.derivative;
 
-import boofcv.abst.transform.fft.DiscreteFourierTransform;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.alg.filter.derivative.impl.GradientThree_Standard;
+import boofcv.concurrency.BoofConcurrency;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -29,38 +27,33 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
-@Measurement(iterations = 3)
+@Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkFastFourierTransform {
+public class BenchmarkGradientThree extends BenchmarkDerivativeBase {
+	@Param({"true", "false"})
+	public boolean concurrent;
 
-	static int imageSize = 1000;
-
-	static GrayF32 input = new GrayF32(imageSize, imageSize);
-	static InterleavedF32 fourier = new InterleavedF32(imageSize, imageSize, 2);
-	static GrayF32 output = new GrayF32(imageSize, imageSize);
-
-	DiscreteFourierTransform<GrayF32, InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
-
-	@Setup public void setup() {
-		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(input, rand, 0, 100);
-		ImageMiscOps.fillUniform(fourier, rand, 0, 100);
+	@Setup @Override public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+		super.setup();
 	}
 
-	@Benchmark public void forward() {dft.forward(input, fourier);}
-
-	@Benchmark public void inverse() {dft.inverse(fourier, output);}
+	// @formatter:off
+	@Benchmark public void Three_I8() {GradientThree.process(imgI8, dx_I16, dy_I16,borderI32);}
+	@Benchmark public void Three_F32() {GradientThree.process(imgF32, dx_F32, dy_F32,borderF32);}
+	@Benchmark public void Standard_I8() {GradientThree_Standard.process(imgI8, dx_I16, dy_I16);}
+	@Benchmark public void Standard_F32() {GradientThree_Standard.process(imgF32, dx_F32, dy_F32);}
+	// @formatter:on
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkFastFourierTransform.class.getSimpleName())
+				.include(BenchmarkHessianSobel.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,30 +18,41 @@
 
 package boofcv.alg.feature.peak;
 
+import boofcv.BoofTesting;
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.weights.WeightPixelGaussian_F32;
+import boofcv.alg.weights.WeightPixelUniform_F32;
 import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 
-	Random rand = new Random(234);
-	long TEST_TIME = 2000;
+	@Param({"SB_U8", "SB_F32"})
+	String type;
+
+	int radius = 2;
 
 	int width = 320;
 	int height = 240;
@@ -50,12 +61,14 @@ public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 	Class<T> imageType;
 	List<Point2D_F32> locations = new ArrayList<>();
 
-	public BenchmarkPeakFinding( Class<T> imageType ) {
-		this.imageType = imageType;
-		image = GeneralizedImageOps.createSingleBand(imageType,width,height);
+	@Setup public void setup() {
+		Random rand = new Random(BoofTesting.BASE_SEED);
+
+		this.imageType = ImageType.stringToType(type, 0).getImageClass();
+		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
-		for( int i = 0; i < 3000; i++ ) {
+		for (int i = 0; i < 10000; i++) {
 			Point2D_F32 p = new Point2D_F32();
 			p.x = rand.nextFloat()*width;
 			p.y = rand.nextFloat()*height;
@@ -63,65 +76,32 @@ public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 		}
 	}
 
-	public class MeanShiftGaussian extends PerformerBase {
+	@Benchmark public void MeanShiftGaussian() {
+		WeightPixel_F32 weight = new WeightPixelGaussian_F32();
+		process(new MeanShiftPeak<>(30, 0.1f, weight, true, imageType, BorderType.EXTENDED));
+	}
 
-		MeanShiftPeak alg;
+	@Benchmark public void MeanShiftUniform() {
+		WeightPixel_F32 weight = new WeightPixelUniform_F32();
+		process(new MeanShiftPeak<>(30, 0.1f, weight, true, imageType, BorderType.EXTENDED));
+	}
 
-		public MeanShiftGaussian( int radius ) {
-			WeightPixel_F32 weight = new WeightPixelGaussian_F32();
-			this.alg = new MeanShiftPeak(30,0.1f,weight,true,imageType, BorderType.EXTENDED);
-			alg.setRadius(radius);
-		}
-
-		@Override
-		public void process() {
-			alg.setImage(image);
-			for( int i = 0; i < locations.size(); i++ ) {
-				Point2D_F32 p = locations.get(i);
-				alg.search(p.x,p.y);
-			}
+	private void process( MeanShiftPeak<T> alg ) {
+		alg.setRadius(radius);
+		alg.setImage(image);
+		for (int i = 0; i < locations.size(); i++) {
+			Point2D_F32 p = locations.get(i);
+			alg.search(p.x, p.y);
 		}
 	}
 
-	public class MeanShiftUniform extends PerformerBase {
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkPeakFinding.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		MeanShiftPeak alg;
-
-		public MeanShiftUniform( int radius ) {
-			WeightPixel_F32 weight = new WeightPixelGaussian_F32();
-			this.alg = new MeanShiftPeak(30,0.1f,weight,true,imageType, BorderType.EXTENDED);
-			alg.setRadius(radius);
-		}
-
-		@Override
-		public void process() {
-			alg.setImage(image);
-			for( int i = 0; i < locations.size(); i++ ) {
-				Point2D_F32 p = locations.get(i);
-				alg.search(p.x,p.y);
-			}
-		}
-	}
-
-	public void evaluateAll() {
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
-		System.out.println();
-
-		int radius = 2;
-
-		ProfileOperation.printOpsPerSec(new MeanShiftGaussian(radius), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new MeanShiftUniform(radius), TEST_TIME);
-	}
-
-	public static void main( String[] args ) {
-		BenchmarkPeakFinding<GrayU8>
-				benchmark_U8 = new BenchmarkPeakFinding<>(GrayU8.class);
-
-		benchmark_U8.evaluateAll();
-
-		BenchmarkPeakFinding<GrayF32>
-				benchmark_F32 = new BenchmarkPeakFinding<>(GrayF32.class);
-
-		benchmark_F32.evaluateAll();
+		new Runner(opt).run();
 	}
 }

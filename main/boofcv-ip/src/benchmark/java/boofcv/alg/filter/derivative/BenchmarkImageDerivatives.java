@@ -44,8 +44,7 @@ public class BenchmarkImageDerivatives {
 	@Param({"true","false"})
 	public boolean concurrent;
 
-//	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"10000"})
+	@Param({"2000"})
 	public int size;
 
 	GrayU8 input = new GrayU8(size, size);

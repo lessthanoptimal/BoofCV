@@ -16,12 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.fft;
+package boofcv.alg.filter.convolve;
 
-import boofcv.abst.transform.fft.DiscreteFourierTransform;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -29,38 +26,52 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
-@Measurement(iterations = 3)
+@Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkFastFourierTransform {
+@SuppressWarnings({"UnusedDeclaration"})
+public class BenchmarkConvolveNormalize extends CommonBenchmarkConvolve {
+	@Param({"1", "4"})
+	public int radius;
 
-	static int imageSize = 1000;
+	@Setup public void setup() {setup(radius);}
 
-	static GrayF32 input = new GrayF32(imageSize, imageSize);
-	static InterleavedF32 fourier = new InterleavedF32(imageSize, imageSize, 2);
-	static GrayF32 output = new GrayF32(imageSize, imageSize);
-
-	DiscreteFourierTransform<GrayF32, InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
-
-	@Setup public void setup() {
-		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(input, rand, 0, 100);
-		ImageMiscOps.fillUniform(fourier, rand, 0, 100);
+	@Benchmark public void Horizontal_Naive_F32() {
+		ConvolveNormalizedNaive_SB.horizontal(kernelF32, input_F32, out_F32);
 	}
 
-	@Benchmark public void forward() {dft.forward(input, fourier);}
+	@Benchmark public void Horizontal_F32() {
+		ConvolveImageNormalized.horizontal(kernelF32,input_F32,out_F32);
+	}
 
-	@Benchmark public void inverse() {dft.inverse(fourier, output);}
+	@Benchmark public void Horizontal_I8() {
+		ConvolveImageNormalized.horizontal(kernelI32,input_U8,out_U8);
+	}
+
+	@Benchmark public void Horizontal_I16() {
+		ConvolveImageNormalized.horizontal(kernelI32,input_U16,out_S16);
+	}
+
+	@Benchmark public void Vertical_F32() {
+		ConvolveImageNormalized.vertical(kernelF32, input_F32, out_F32);
+	}
+
+	@Benchmark public void Vertical_I8() {
+		ConvolveImageNormalized.vertical(kernelI32,input_U8,out_U8);
+	}
+
+	@Benchmark public void Vertical_I16() {
+		ConvolveImageNormalized.vertical(kernelI32,input_U16,out_S16);
+	}
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkFastFourierTransform.class.getSimpleName())
+				.include(BenchmarkConvolveNormalize.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();

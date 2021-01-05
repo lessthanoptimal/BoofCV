@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkStabilityPnP extends ArtificialStereoScene {
+public class StabilityBenchmarkPnP extends ArtificialStereoScene {
 
 	static final int NUM_POINTS = 500;
 
@@ -153,7 +153,7 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 		double max = 15;
 		boolean planar = true;
 
-		BenchmarkStabilityPnP app = new BenchmarkStabilityPnP();
+		StabilityBenchmarkPnP app = new StabilityBenchmarkPnP();
 
 		app.evaluateAllMinimal(planar);
 

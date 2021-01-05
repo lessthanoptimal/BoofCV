@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,33 +18,45 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.BoofTesting;
 import boofcv.abst.feature.orientation.*;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.misc.Performer;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static boofcv.factory.feature.orientation.FactoryOrientationAlgs.*;
+import static java.lang.Math.PI;
 
-
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>> {
 
-	static final long TEST_TIME = 1000;
-	static Random rand = new Random(234234);
-	static int NUM_POINTS = 1000;
+	@Param({"SB_U8", "SB_F32"})
+	String imageTypeName;
+
+	int NUM_POINTS = 1000;
 	static int RADIUS = 6;
 	static double OBJECt_TO_SCALE = 1.0/2.0;
 
@@ -56,16 +68,20 @@ public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>
 	D derivY;
 	ImageGray ii;
 
-	Point2D_I32 pts[];
-	double radiuses[];
+	Point2D_I32[] pts;
+	double[] radiuses;
 
 	Class<I> imageType;
 	Class<D> derivType;
 
-	public BenchmarkOrientation( Class<I> imageType , Class<D> derivType ) {
+	ConfigAverageIntegral confAverageIIW = new ConfigAverageIntegral();
+	ConfigSlidingIntegral confSlidingIIW = new ConfigSlidingIntegral();
 
-		this.imageType = imageType;
-		this.derivType = derivType;
+	@Setup public void setup() {
+		Random rand = new Random(BoofTesting.BASE_SEED);
+
+		imageType = ImageType.stringToType(imageTypeName, 0).getImageClass();
+		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		Class integralType = GrayF32.class == imageType ? GrayF32.class : GrayS32.class;
 
@@ -75,131 +91,78 @@ public class BenchmarkOrientation<I extends ImageGray<I>, D extends ImageGray<D>
 		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 100);
-		GIntegralImageOps.transform(image,ii);
+		GIntegralImageOps.transform(image, ii);
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-		gradient.process(image,derivX,derivY);
+		ImageGradient<I, D> gradient = FactoryDerivative.sobel(imageType, derivType);
+		gradient.process(image, derivX, derivY);
 
 		pts = new Point2D_I32[NUM_POINTS];
 		radiuses = new double[NUM_POINTS];
 		int border = 6;
-		for( int i = 0; i < NUM_POINTS; i++ ) {
-			int x = rand.nextInt(width-border*2)+border;
-			int y = rand.nextInt(height-border*2)+border;
-			pts[i] = new Point2D_I32(x,y);
-			radiuses[i] = rand.nextDouble()*100+10;
+		for (int i = 0; i < NUM_POINTS; i++) {
+			int x = rand.nextInt(width - border*2) + border;
+			int y = rand.nextInt(height - border*2) + border;
+			pts[i] = new Point2D_I32(x, y);
+			radiuses[i] = rand.nextDouble()*100 + 10;
 		}
 
-	}
-
-	public class Gradient implements Performer {
-
-		OrientationGradient<D> alg;
-		String name;
-
-		public Gradient(String name, OrientationGradient<D> alg) {
-			this.alg = alg;
-			this.name = name;
-		}
-
-		@Override
-		public void process() {
-			alg.setImage(derivX,derivY);
-			for( int i = 0; i < pts.length; i++ ) {
-				Point2D_I32 p = pts[i];
-				alg.setObjectRadius(radiuses[i]);
-				alg.compute(p.x,p.y);
-			}
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-	}
-
-	public class Image implements Performer {
-
-		OrientationImage alg;
-		String name;
-
-		public Image(String name, OrientationImage alg) {
-			this.alg = alg;
-			this.name = name;
-		}
-
-		@Override
-		public void process() {
-			alg.setImage(image);
-			for( int i = 0; i < pts.length; i++ ) {
-				Point2D_I32 p = pts[i];
-				alg.setObjectRadius(radiuses[i]);
-				alg.compute(p.x,p.y);
-			}
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-	}
-
-	public class Integral implements Performer {
-
-		OrientationIntegral alg;
-		String name;
-
-		public Integral(String name, OrientationIntegral alg) {
-			this.alg = alg;
-			this.name = name;
-		}
-
-		@Override
-		public void process() {
-			alg.setImage(ii);
-			for( int i = 0; i < pts.length; i++ ) {
-				Point2D_I32 p = pts[i];
-				alg.setObjectRadius(radiuses[i]);
-				alg.compute(p.x,p.y);
-			}
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
-	}
-
-	public void perform() {
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
-		System.out.println();
-
-
-		ConfigAverageIntegral confAverageIIW = new ConfigAverageIntegral();
 		confAverageIIW.weightSigma = -1;
-		ConfigSlidingIntegral confSlidingIIW = new ConfigSlidingIntegral();
 		confSlidingIIW.weightSigma = -1;
-
-		ProfileOperation.printOpsPerSec(new Image("SIFT", FactoryOrientation.sift(null,null,imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Image("No Gradient", nogradient(OBJECt_TO_SCALE,RADIUS,imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Average", average(OBJECt_TO_SCALE,RADIUS,false,derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(OBJECt_TO_SCALE,RADIUS, true, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Histogram", histogram(0.5,15, RADIUS, false, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Histogram W", histogram(0.5,15, RADIUS, true, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Sliding", sliding(OBJECt_TO_SCALE,15, Math.PI / 3.0, RADIUS, false, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(OBJECt_TO_SCALE,15, Math.PI / 3.0, RADIUS, true, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Image II", image_ii(1.0/2.0,RADIUS, 1, 4, 0, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Image II W", image_ii(1.0/2.0,RADIUS, 1, 4, -1, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Average II", average_ii(null, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Average II W", average_ii(confAverageIIW, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Sliding II", sliding_ii(null, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Sliding II W", sliding_ii(confSlidingIIW, imageType)), TEST_TIME);
 	}
 
-	public static void main( String argsp[ ] ) {
-		BenchmarkOrientation<GrayF32,GrayF32> alg = new BenchmarkOrientation<>(GrayF32.class, GrayF32.class);
-//		BenchmarkOrientation<GrayU8,GrayS16> alg = new BenchmarkOrientation<GrayU8,GrayS16>(GrayU8.class, GrayS16.class);
+	// @formatter:off
+	@Benchmark public void Average() { gradient(average(OBJECt_TO_SCALE,RADIUS, false, derivType)); }
+	@Benchmark public void Average_W() { gradient(average(OBJECt_TO_SCALE,RADIUS, true, derivType)); }
+	@Benchmark public void Histogram() { gradient(histogram(0.5,15, RADIUS, false, derivType)); }
+	@Benchmark public void Histogram_W() { gradient(histogram(0.5,15, RADIUS, true, derivType)); }
+	@Benchmark public void Sliding() { gradient(sliding(OBJECt_TO_SCALE, 15, PI/3.0, RADIUS, false, derivType)); }
+	@Benchmark public void Sliding_W() { gradient(sliding(OBJECt_TO_SCALE, 15, PI/3.0, RADIUS, true, derivType)); }
 
-		alg.perform();
+	@Benchmark public void SIFT() { image(FactoryOrientation.sift(null, null, imageType)); }
+	@Benchmark public void No_Gradient() { image(nogradient(OBJECt_TO_SCALE, RADIUS, imageType)); }
+
+	@Benchmark public void Image_II() { integral(image_ii(1.0/2.0,RADIUS, 1, 4, 0, imageType)); }
+	@Benchmark public void Image_II_W() { integral(image_ii(1.0/2.0,RADIUS, 1, 4, -1, imageType)); }
+	@Benchmark public void Average_II() { integral(average_ii(null, imageType)); }
+	@Benchmark public void Average_II_W() { integral(average_ii(confAverageIIW, imageType)); }
+	@Benchmark public void Sliding_II() { integral(sliding_ii(null, imageType)); }
+	@Benchmark public void Sliding_II_W() { integral(sliding_ii(confSlidingIIW, imageType)); }
+	// @formatter:on
+
+	void gradient( OrientationGradient<D> alg ) {
+		alg.setImage(derivX, derivY);
+		for (int i = 0; i < pts.length; i++) {
+			Point2D_I32 p = pts[i];
+			alg.setObjectRadius(radiuses[i]);
+			alg.compute(p.x, p.y);
+		}
+	}
+
+	void image( OrientationImage<I> alg ) {
+		alg.setImage(image);
+		for (int i = 0; i < pts.length; i++) {
+			Point2D_I32 p = pts[i];
+			alg.setObjectRadius(radiuses[i]);
+			alg.compute(p.x, p.y);
+		}
+	}
+
+	void integral( OrientationIntegral alg ) {
+		alg.setImage(ii);
+		for (int i = 0; i < pts.length; i++) {
+			Point2D_I32 p = pts[i];
+			alg.setObjectRadius(radiuses[i]);
+			alg.compute(p.x, p.y);
+		}
+	}
+
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkOrientation.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
+
+		new Runner(opt).run();
 	}
 }

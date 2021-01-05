@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,13 +38,13 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkColorConvert {
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-//	@Param({"500", "5000"})
+	//	@Param({"500", "5000"})
 	@Param({"5000"})
 	public int size;
 
@@ -70,24 +70,25 @@ public class BenchmarkColorConvert {
 	public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 
-		src_F32 = new Planar<>(GrayF32.class,size,size,3);
-		dst_F32 = new Planar<>(GrayF32.class,size,size,3);
-		src_U8 = new Planar<>(GrayU8.class,size,size,3);
-		dst_U8 = new Planar<>(GrayU8.class,size,size,3);
-		gdst_F32 = new GrayF32(size,size);
-		gdst_U8 = new GrayU8(size,size);
+		src_F32 = new Planar<>(GrayF32.class, size, size, 3);
+		dst_F32 = new Planar<>(GrayF32.class, size, size, 3);
+		src_U8 = new Planar<>(GrayU8.class, size, size, 3);
+		dst_U8 = new Planar<>(GrayU8.class, size, size, 3);
+		gdst_F32 = new GrayF32(size, size);
+		gdst_U8 = new GrayU8(size, size);
 
-		isrc_F32 = new InterleavedF32(size,size,3);
-		idst_F32 = new InterleavedF32(size,size,3);
-		isrc_U8 = new InterleavedU8(size,size,3);
-		idst_U8 = new InterleavedU8(size,size,3);
+		isrc_F32 = new InterleavedF32(size, size, 3);
+		idst_F32 = new InterleavedF32(size, size, 3);
+		isrc_U8 = new InterleavedU8(size, size, 3);
+		idst_U8 = new InterleavedU8(size, size, 3);
 
-		GImageMiscOps.fillUniform(src_F32,rand,0,1.0);
-		GImageMiscOps.fillUniform(src_U8,rand,0,255);
-		GImageMiscOps.fillUniform(isrc_F32,rand,0,255);
-		GImageMiscOps.fillUniform(isrc_U8,rand,0,255);
+		GImageMiscOps.fillUniform(src_F32, rand, 0, 1.0);
+		GImageMiscOps.fillUniform(src_U8, rand, 0, 255);
+		GImageMiscOps.fillUniform(isrc_F32, rand, 0, 255);
+		GImageMiscOps.fillUniform(isrc_U8, rand, 0, 255);
 	}
 
+	// @formatter:off
 	@Benchmark public void RGB_to_HSV_F32() {ColorHsv.rgbToHsv(src_F32,dst_F32);}
 	@Benchmark public void HSV_to_RGB_F32() {ColorHsv.hsvToRgb(src_F32,dst_F32);}
 	@Benchmark public void RGB_to_YUV_F32() {ColorYuv.rgbToYuv(src_F32,dst_F32);}
@@ -105,6 +106,7 @@ public class BenchmarkColorConvert {
 	@Benchmark public void XYZ_to_RGB_U8() {ColorXyz.xyzToRgb(src_F32,dst_U8);}
 	@Benchmark public void LAB_to_RGB_F32() {ColorLab.labToRgb(src_F32,dst_F32);}
 	@Benchmark public void LAB_to_RGB_U8() {ColorLab.labToRgb(src_F32,dst_U8);}
+	// @formatter:on
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()

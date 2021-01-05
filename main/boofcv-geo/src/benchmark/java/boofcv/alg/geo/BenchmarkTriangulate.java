@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.fft;
+package boofcv.alg.geo;
 
-import boofcv.abst.transform.fft.DiscreteFourierTransform;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.alg.geo.triangulate.PixelDepthLinearMetric;
+import boofcv.alg.geo.triangulate.Triangulate2ViewsGeometricMetric;
+import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -29,7 +30,6 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -38,29 +38,39 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 3)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkFastFourierTransform {
+public class BenchmarkTriangulate extends ArtificialStereoScene {
+	@Param({"20", "2000"})
+	public int numPoints;
 
-	static int imageSize = 1000;
+	private final Point4D_F64 found4 = new Point4D_F64();
+	private final Point3D_F64 found3 = new Point3D_F64();
 
-	static GrayF32 input = new GrayF32(imageSize, imageSize);
-	static InterleavedF32 fourier = new InterleavedF32(imageSize, imageSize, 2);
-	static GrayF32 output = new GrayF32(imageSize, imageSize);
-
-	DiscreteFourierTransform<GrayF32, InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
+	private final TriangulateMetricLinearDLT dlt = new TriangulateMetricLinearDLT();
+	private final Triangulate2ViewsGeometricMetric view2 = new Triangulate2ViewsGeometricMetric();
+	private final PixelDepthLinearMetric pixelDepth = new PixelDepthLinearMetric();
 
 	@Setup public void setup() {
-		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(input, rand, 0, 100);
-		ImageMiscOps.fillUniform(fourier, rand, 0, 100);
+		init(numPoints, false, false);
 	}
 
-	@Benchmark public void forward() {dft.forward(input, fourier);}
+	@Benchmark public void dlt() {
+		for (int i = 0; i < numPoints; i++)
+			dlt.triangulate(pairs.get(i).p1, pairs.get(i).p2, motion, found4);
+	}
 
-	@Benchmark public void inverse() {dft.inverse(fourier, output);}
+	@Benchmark public void view2() {
+		for (int i = 0; i < numPoints; i++)
+			view2.triangulate(pairs.get(i).p1, pairs.get(i).p2, motion, found3);
+	}
+
+	@Benchmark public void depth() {
+		for (int i = 0; i < numPoints; i++)
+			pixelDepth.depth2View(pairs.get(i).p1, pairs.get(i).p2, motion);
+	}
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkFastFourierTransform.class.getSimpleName())
+				.include(BenchmarkTriangulate.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();
