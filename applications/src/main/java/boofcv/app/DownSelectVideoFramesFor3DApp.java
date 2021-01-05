@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,20 +127,26 @@ public class DownSelectVideoFramesFor3DApp {
 		if (maxLength && (width == 0 || height == 0)) {
 			int largestSide = Math.max(sequence.getWidth(), sequence.getHeight());
 			int desired = Math.max(width, height);
+			double scale = desired/(double)largestSide;
 
-			smallWidth = sequence.getWidth()*desired/largestSide;
-			smallHeight = sequence.getHeight()*desired/largestSide;
-		} else {
-			if (width == 0) {
-				smallWidth = sequence.getWidth()*height/sequence.getHeight();
+			if (scale < 1.0) {
+				smallWidth = (int)(sequence.getWidth()*scale + 0.5);
+				smallHeight = (int)(sequence.getHeight()*scale + 0.5);
 			} else {
-				smallWidth = width;
+				smallWidth = sequence.getWidth();
+				smallHeight = sequence.getHeight();
+			}
+		} else {
+			// Impossible for both width and height to be zero
+			double scale = 1.0;
+			if (width == 0) {
+				scale = Math.min(scale,height/(double)sequence.getHeight());
 			}
 			if (height == 0) {
-				smallHeight = sequence.getHeight()*width/sequence.getWidth();
-			} else {
-				smallHeight = height;
+				scale = Math.min(scale,width/(double)sequence.getWidth());
 			}
+			smallWidth = (int)(scale*sequence.getWidth()+0.5);
+			smallHeight = (int)(scale*sequence.getHeight()+0.5);
 		}
 
 		config.motionInlierPx = motionPx;
@@ -157,7 +163,7 @@ public class DownSelectVideoFramesFor3DApp {
 			Planar<GrayU8> original = sequence.next();
 			System.out.println("Selector " + sequence.getFrameNumber());
 
-			if (smallWidth > original.getWidth() || smallHeight > original.getHeight()) {
+			if (smallWidth == original.getWidth() && smallHeight == original.getHeight()) {
 				scaled.setTo(original);
 			} else {
 				scaled.reshape(smallWidth, smallHeight, original.getNumBands());
