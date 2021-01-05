@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.core.image.border;
 
+import boofcv.core.image.ImageBorderValue;
 import boofcv.struct.border.*;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
@@ -29,19 +30,19 @@ import boofcv.struct.image.GrayI;
 public class FactoryImageBorderAlgs {
 
 	public static ImageBorder1D_F64 extend(GrayF64 image ) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend.class);
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend::new);
 		ret.setImage(image);
 		return ret;
 	}
 
 	public static ImageBorder1D_F64 reflect( GrayF64 image ) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Reflect.class);
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Reflect::new);
 		ret.setImage(image);
 		return ret;
 	}
 
 	public static ImageBorder1D_F64 wrap( GrayF64 image ) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Wrap.class);
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Wrap::new);
 		ret.setImage(image);
 		return ret;
 	}
@@ -51,19 +52,19 @@ public class FactoryImageBorderAlgs {
 	}
 
 	public static ImageBorder1D_F32 extend(GrayF32 image ) {
-		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
 		ret.setImage(image);
 		return ret;
 	}
 
 	public static ImageBorder1D_F32 reflect( GrayF32 image ) {
-		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Reflect.class);
+		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Reflect::new);
 		ret.setImage(image);
 		return ret;
 	}
 
 	public static ImageBorder1D_F32 wrap( GrayF32 image ) {
-		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Wrap.class);
+		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Wrap::new);
 		ret.setImage(image);
 		return ret;
 	}
@@ -73,19 +74,19 @@ public class FactoryImageBorderAlgs {
 	}
 
 	public static <T extends GrayI<T>> ImageBorder1D_S32<T> extend(T image ) {
-		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>((Class) BorderIndex1D_Extend.class);
+		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>(BorderIndex1D_Extend::new);
 		ret.setImage(image);
 		return ret;
 	}
 
 	public static <T extends GrayI<T>> ImageBorder1D_S32<T> reflect(T image ) {
-		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>((Class) BorderIndex1D_Reflect.class);
+		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>(BorderIndex1D_Reflect::new);
 		ret.setImage(image);
 		return ret;
 	}
 
 	public static <T extends GrayI<T>> ImageBorder1D_S32<T> wrap(T image ) {
-		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>((Class) BorderIndex1D_Wrap.class);
+		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<>(BorderIndex1D_Wrap::new);
 		ret.setImage(image);
 		return ret;
 	}

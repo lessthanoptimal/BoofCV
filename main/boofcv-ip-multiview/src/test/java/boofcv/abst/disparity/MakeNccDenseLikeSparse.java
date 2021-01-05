@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.disparity;
 import boofcv.alg.disparity.DisparityBlockMatchRowFormat;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.ImageBorderWrapped;
 import boofcv.struct.border.ImageBorder;
-import boofcv.struct.border.ImageBorderWrapped;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 

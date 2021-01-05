@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,11 +59,11 @@ public class BenchmarkConvolveWithBorder {
 	static private InterleavedF32 src_IL_F32 = new InterleavedF32(imgWidth,imgHeight,numBands);
 	static private InterleavedF32 dst_IL_F32 = new InterleavedF32(imgWidth,imgHeight,numBands);
 
-	static private ImageBorder_S32 border_I32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
-	static private ImageBorder_F32 border_F32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
+	static private ImageBorder_S32 border_I32 = new ImageBorder1D_S32(BorderIndex1D_Extend::new);
+	static private ImageBorder_F32 border_F32 = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
 
-	static private ImageBorder_IL_S32 border_IL_S32 = new ImageBorder1D_IL_S32(BorderIndex1D_Extend.class);
-	static private ImageBorder_IL_F32 border_IL_F32 = new ImageBorder1D_IL_F32(BorderIndex1D_Extend.class);
+	static private ImageBorder_IL_S32 border_IL_S32 = new ImageBorder1D_IL_S32(BorderIndex1D_Extend::new);
+	static private ImageBorder_IL_F32 border_IL_F32 = new ImageBorder1D_IL_F32(BorderIndex1D_Extend::new);
 
 	static private ImageBorder<Planar<GrayU8>> border_PL_U8 = FactoryImageBorder.generic(BorderType.EXTENDED,
 			ImageType.pl(numBands,GrayU8.class));

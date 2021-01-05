@@ -16,32 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.struct.border;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import javax.annotation.Generated;
 
 /**
  * @author Peter Abeles
  */
-public class TestBorderIndex1D_Wrap extends BoofStandardJUnit {
+@Generated("boofcv.struct.border.TestImageBorder1D_IL_F64")
+public class TestImageBorder1D_IL_F32 extends GenericImageBorder1DTests<InterleavedF32> {
 
-	int length = 10;
+	public TestImageBorder1D_IL_F32() {
+		super(ImageType.il(2, InterleavedF32.class));
+	}
 
-	@Test void simple() {
-		BorderIndex1D_Wrap alg = new BorderIndex1D_Wrap();
-		alg.setLength(length);
-
-		for( int i = 0; i < 10; i++ ) {
-			assertEquals(i,alg.getIndex(i));
-		}
-
-		assertEquals(9,alg.getIndex(-1));
-		assertEquals(8,alg.getIndex(-2));
-		assertEquals(0,alg.getIndex(length));
-		assertEquals(1,alg.getIndex(length+1));
+	@Override
+	public ImageBorder<InterleavedF32> wrap( InterleavedF32 image ) {
+		ImageBorder1D_IL_F32 ret = new ImageBorder1D_IL_F32(DummyBorderIndex1D_Wrap::new);
+		ret.setImage(image);
+		return ret;
 	}
 }

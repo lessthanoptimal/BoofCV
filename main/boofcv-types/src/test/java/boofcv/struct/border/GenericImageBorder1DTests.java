@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.struct.border;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class GenericImageBorder1DTests<T extends ImageBase<T>> extends GenericImageBorderTests<T> {
 
-	BorderIndex1D_Wrap wrap = new BorderIndex1D_Wrap();
+	DummyBorderIndex1D_Wrap wrap = new DummyBorderIndex1D_Wrap();
 
 	protected GenericImageBorder1DTests( ImageType<T> imageType ) {
 		super(imageType);
@@ -37,7 +37,6 @@ public abstract class GenericImageBorder1DTests<T extends ImageBase<T>> extends 
 
 	@Override
 	public void checkBorderSet( int x, int y, double[] pixel, T image ) {
-
 		wrap.setLength(image.getWidth());
 		x = wrap.getIndex(x);
 		wrap.setLength(image.getHeight());

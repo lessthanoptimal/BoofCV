@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.struct.border;
 
-import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.border.ImageBorder;
+import boofcv.core.image.FactoryGImageMultiBand;
+import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class GenericImageBorderTests<T extends ImageBase<T>> extends BoofStandardJUnit {
 
-	Random rand = new Random(234);
 	List<ImageType<T>> imageTypes = new ArrayList<>();
 
 	int width = 20;
@@ -76,11 +75,24 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> extends Bo
 			init(imageType);
 
 			T img = imageType.createImage(width, height);
-			GImageMiscOps.fillUniform(img, rand, 0, 100);
+			fillUniform(img, rand, 0, 100);
 
 			ImageBorder<T> border = wrap(img);
 
 			checkGet(img, border);
+		}
+	}
+
+	public static void fillUniform( ImageBase image, Random rand, double min, double max ) {
+		GImageMultiBand wrap = FactoryGImageMultiBand.wrap(image);
+		float[] values = new float[wrap.getNumberOfBands()];
+		for (int y = 0; y < wrap.getHeight(); y++) {
+			for (int x = 0; x < wrap.getWidth(); x++) {
+				for (int i = 0; i < values.length; i++) {
+					values[i] = (float)(rand.nextDouble()*(max-min)+min);
+				}
+				wrap.set(x,y,values);
+			}
 		}
 	}
 
@@ -111,7 +123,7 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> extends Bo
 		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 			T img = imageType.createImage(width, height);
-			GImageMiscOps.fillUniform(img, rand, 0, 100);
+			fillUniform(img, rand, 0, 100);
 
 			ImageBorder<T> border = wrap(img);
 
@@ -123,7 +135,7 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> extends Bo
 		for (ImageType<T> imageType : imageTypes) {
 			init(imageType);
 			T img = imageType.createImage(width, height);
-			GImageMiscOps.fillUniform(img, rand, 0, 100);
+			fillUniform(img, rand, 0, 100);
 
 			ImageBorder<T> borderA = wrap(img);
 			ImageBorder<T> borderB = borderA.copy();

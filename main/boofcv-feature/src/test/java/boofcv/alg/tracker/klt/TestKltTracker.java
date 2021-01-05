@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	 */
 	@Test void testSubImages() {
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
-		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> trackerA = createDefaultTracker();
 		trackerA.setImage(image, derivX, derivY);
@@ -97,7 +97,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	@Test void testTracking_border1() {
 
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
-		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
@@ -132,7 +132,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	 */
 	@Test void testTracking_border2() {
 		ImageMiscOps.fillUniform(image, rand, 1, 100);
-		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
@@ -181,7 +181,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	@Test void setDescription_compare() {
 
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
-		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
@@ -243,7 +243,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 
 	@Test void compare_computeGandE_border_toInsideImage() {
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
-		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
+		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.struct.border;
 
-import boofcv.struct.border.ImageBorder;
-import boofcv.struct.border.ImageBorder1D_F64;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageType;
 
@@ -33,8 +31,8 @@ public class TestImageBorder1D_F64 extends GenericImageBorder1DTests<GrayF64> {
 	}
 
 	@Override
-	public ImageBorder<GrayF64> wrap(GrayF64 image) {
-		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Wrap.class);
+	public ImageBorder<GrayF64> wrap( GrayF64 image ) {
+		ImageBorder1D_F64 ret = new ImageBorder1D_F64(DummyBorderIndex1D_Wrap::new);
 		ret.setImage(image);
 		return ret;
 	}

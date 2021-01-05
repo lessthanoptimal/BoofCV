@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,25 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.struct.border;
 
-import boofcv.struct.border.ImageBorder;
-import boofcv.struct.border.ImageBorder1D_IL_S64;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedS64;
+import boofcv.struct.image.InterleavedF64;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageBorder1D_IL_S64 extends GenericImageBorder1DTests<InterleavedS64> {
+public class TestImageBorder1D_IL_F64 extends GenericImageBorder1DTests<InterleavedF64> {
 
-	public TestImageBorder1D_IL_S64() {
-		super(ImageType.il(2, InterleavedS64.class));
+	public TestImageBorder1D_IL_F64() {
+		super(ImageType.il(2, InterleavedF64.class));
 	}
 
 	@Override
-	public ImageBorder<InterleavedS64> wrap(InterleavedS64 image) {
-		ImageBorder1D_IL_S64 ret = new ImageBorder1D_IL_S64(BorderIndex1D_Wrap.class);
+	public ImageBorder<InterleavedF64> wrap( InterleavedF64 image ) {
+		ImageBorder1D_IL_F64 ret = new ImageBorder1D_IL_F64(DummyBorderIndex1D_Wrap::new);
 		ret.setImage(image);
 		return ret;
 	}

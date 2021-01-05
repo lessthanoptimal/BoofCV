@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.struct.border.ImageBorderValue;
+import boofcv.core.image.ImageBorderValue;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.DogArray_I32;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class BenchmarkImageDerivatives {
 	GrayU8 input = new GrayU8(size, size);
 	GrayS16 derivX = new GrayS16(size, size);
 	GrayS16 derivY = new GrayS16(size, size);
-	ImageBorder_S32<GrayU8> borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
+	ImageBorder_S32<GrayU8> borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend::new);
 
 	@Setup
 	public void setup() {
