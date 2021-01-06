@@ -19,59 +19,70 @@
 package boofcv.alg.sfm.structure;
 
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.sfm.ConfigSequenceToSparseScene;
 import boofcv.factory.sfm.FactorySceneReconstruction;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.image.LookUpImagesByIndex;
-import boofcv.misc.BoofMiscOps;
-import boofcv.simulation.SimulatePlanarWorld;
-import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.struct.se.SpecialEuclideanOps_F64;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.UtilPoint3D_F64;
+import georegression.struct.EulerType;
+import georegression.struct.point.Point3D_F64;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings({"SameParameterValue", "IntegerDivisionInFloatingPointContext"})
+@SuppressWarnings({"SameParameterValue"})
 class TestImageSequenceToSparseScene extends BoofStandardJUnit {
-	boolean visualize = false;
+	final static int width = 400;
+	final static int height = 400;
 
 	/**
-	 * This unit test just ensures that exceptions are not thrown.
+	 * Given perfect data does it return correct results?
 	 */
-	@Test void does_it_blow_up() {
+	@Test void perfect() {
 		var config = new ConfigSequenceToSparseScene();
 		// let's make it run faster
 		config.pairwise.ransacF.iterations = 30;
 		config.pairwise.ransacH.iterations = 30;
 		config.projective.ransac.iterations = 30;
 
-		ImageSequenceToSparseScene<GrayU8> alg = FactorySceneReconstruction.
-				sequenceToSparseScene(config, ImageType.SB_U8);
+		ImageSequenceToSparseScene<GrayF32> alg = FactorySceneReconstruction.
+				sequenceToSparseScene(config, ImageType.SB_F32);
+
+		alg.tracker = new DummyTracker();
+
+//		alg.generatePairwise.setVerbose(System.out, null);
+//		alg.metricFromPairwise.setVerbose(System.out, null);
+//		alg.metricFromPairwise.getInitProjective().setVerbose(System.out, null);
+//		alg.setVerbose(System.out, null);
 
 		// Create the input
-		List<GrayF32> frames = renderSceneSequence(6);
+		List<GrayF32> frames = new ArrayList<>();
+		for (int i = 0; i < 7; i++) {
+			frames.add(new GrayF32(width, height));
+		}
+
 		var lookup = new LookUpImagesByIndex<>(frames);
 		List<String> imageIDs = new ArrayList<>();
 		for (int i = 0; i < frames.size(); i++) {
-			imageIDs.add(i+"");
+			imageIDs.add(i + "");
 		}
 
 		// Run it
 		assertTrue(alg.process(imageIDs, lookup));
 
-//		System.out.printf("track %.1f\n",alg.getTimeTrackingMS());
-//		System.out.printf("Pairwise %.1f\n",alg.getTimePairwiseMS());
-//		System.out.printf("Metric %.1f\n",alg.getTimeMetricMS());
-//		System.out.printf("Refine %.1f\n",alg.getTimeRefineMS());
+//		System.out.printf("track %.1f\n", alg.getTimeTrackingMS());
+//		System.out.printf("Pairwise %.1f\n", alg.getTimePairwiseMS());
+//		System.out.printf("Metric %.1f\n", alg.getTimeMetricMS());
+//		System.out.printf("Refine %.1f\n", alg.getTimeRefineMS());
 
 		// Minimal sanity check
 		SceneStructureMetric scene = alg.getSceneStructure();
@@ -79,43 +90,30 @@ class TestImageSequenceToSparseScene extends BoofStandardJUnit {
 		assertEquals(frames.size(), scene.cameras.size);
 		assertEquals(frames.size(), scene.motions.size);
 
-		fail("Replace with a perfect point tracker and get rid of rendered scene");
+		// sanity check the solution
+		for (int i = 0; i < scene.cameras.size; i++) {
+			assertEquals( 150.0, ((BundlePinholeSimplified)scene.cameras.get(i).model).f, 1e-4 );
+		}
 	}
 
-	/**
-	 * Render an actual 3D scene in an attempt to stop it from aborting early and more fully testing it
-	 */
-	List<GrayF32> renderSceneSequence(int length) {
-		List<GrayF32> images = new ArrayList<>();
-
-		var textureA = new GrayF32(100, 100);
-		ImageMiscOps.fillUniform(textureA, rand, 50, 255);
-
-		var textureB = new GrayF32(100, 100);
-		ImageMiscOps.fillUniform(textureB, rand, 50, 255);
-
-		SimulatePlanarWorld sim = new SimulatePlanarWorld();
-		sim.addSurface(eulerXyz(-2.0, 0, 2.5, 0, Math.PI, 0, null), 3, textureA);
-		sim.addSurface(eulerXyz(1.0, 0, 1.5, 0.05, Math.PI, 0, null), 3, textureB);
-
-		int w = 240;
-		int h = 200;
-		var intrinsic = new CameraPinholeBrown().fsetK(w/3,w/3,0,w/2,h/2, w, h);
-
-		for (int i = 0; i < length; i++) {
-			sim.setCamera(intrinsic);
-			sim.setWorldToCamera(SpecialEuclideanOps_F64.eulerXyz(i*0.15,0,0,0,0,0,null));
-			images.add(sim.render().clone());
-
-			if (visualize)
-				ShowImages.showWindow(images.get(images.size() - 1), "Frame " + i);
+	/** Custom tracker that moves every frame */
+	class DummyTracker extends PointTrackerPerfectCloud<GrayF32> {
+		public DummyTracker() {
+			cloud = UtilPoint3D_F64.random(new Point3D_F64(1.0, 0, 2), -2, 2, -1, 1, -1, 1, 1000, rand);
+			setCamera(new CameraPinhole(150, 150, 0, 200, 200,
+					TestImageSequenceToSparseScene.width, TestImageSequenceToSparseScene.height));
 		}
 
-		if (visualize) {
-			BoofMiscOps.sleep(40_000);
-		}
+		@Override public void process( GrayF32 image ) {
+			world_to_view.T.x += (frameID + 1)*0.1;
 
-		return images;
+			// need to add these small motions to converge to a correct solution
+			world_to_view.T.y = (rand.nextDouble()-0.5)*0.2;
+			world_to_view.T.z = (rand.nextDouble()-0.5)*0.2;
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
+					rand.nextGaussian()*0.02, rand.nextGaussian()*0.02, rand.nextGaussian()*0.02, world_to_view.R);
+
+			super.process(image);
+		}
 	}
-
 }

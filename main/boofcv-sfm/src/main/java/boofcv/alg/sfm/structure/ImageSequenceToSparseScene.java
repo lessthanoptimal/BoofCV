@@ -42,15 +42,15 @@ import java.util.Set;
 public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements VerbosePrint {
 
 	/** Frame to frame image tracker */
-	final private @Getter PointTracker<T> tracker;
+	@Getter PointTracker<T> tracker;
 	/** Identifies similar images taking advantage of features being tracked in a sequence */
-	final private @Getter PointTrackerToSimilarImages trackerSimilar;
+	@Getter PointTrackerToSimilarImages trackerSimilar;
 	/** Creates a pairwise gram from similar images */
-	final private @Getter GeneratePairwiseImageGraph generatePairwise;
+	@Getter GeneratePairwiseImageGraph generatePairwise;
 	/** Create a metric scene from a pairwise image graph */
-	final private @Getter MetricFromUncalibratedPairwiseGraph metricFromPairwise;
+	@Getter MetricFromUncalibratedPairwiseGraph metricFromPairwise;
 	/** Refines the metric reconstruction */
-	final private @Getter RefineMetricWorkingGraph refineScene;
+	@Getter RefineMetricWorkingGraph refineScene;
 
 	/** Maximum image pixels before it down samples */
 	public int maxImagePixels = 800*600;
