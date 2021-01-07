@@ -23,6 +23,8 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.sfm.ConfigSequenceToSparseScene;
 import boofcv.factory.sfm.FactorySceneReconstruction;
 import boofcv.io.image.LookUpImagesByIndex;
+import boofcv.misc.BoofMiscOps;
+import boofcv.simulation.PointTrackerPerfectCloud;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -92,7 +94,7 @@ class TestImageSequenceToSparseScene extends BoofStandardJUnit {
 
 		// sanity check the solution
 		for (int i = 0; i < scene.cameras.size; i++) {
-			assertEquals( 150.0, ((BundlePinholeSimplified)scene.cameras.get(i).model).f, 1e-4 );
+			assertEquals(150.0, ((BundlePinholeSimplified)scene.cameras.get(i).model).f, 1e-4);
 		}
 	}
 
@@ -108,8 +110,8 @@ class TestImageSequenceToSparseScene extends BoofStandardJUnit {
 			world_to_view.T.x += (frameID + 1)*0.1;
 
 			// need to add these small motions to converge to a correct solution
-			world_to_view.T.y = (rand.nextDouble()-0.5)*0.2;
-			world_to_view.T.z = (rand.nextDouble()-0.5)*0.2;
+			world_to_view.T.y = BoofMiscOps.uniform(-0.1, 0.1, rand);
+			world_to_view.T.z = BoofMiscOps.uniform(-0.1, 0.1, rand);
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 					rand.nextGaussian()*0.02, rand.nextGaussian()*0.02, rand.nextGaussian()*0.02, world_to_view.R);
 

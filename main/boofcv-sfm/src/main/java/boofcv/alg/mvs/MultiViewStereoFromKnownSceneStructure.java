@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,6 +78,9 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * @see ScoreRectifiedViewCoveragePixels
 	 */
 	public @Getter @Setter double minimumQuality3D = 0.25;
+
+	/** Maximum number of stereo pairs that will be combined. If more than this number then the best are selected */
+	public @Getter @Setter int maxCombinePairs = 10;
 
 	/** Used to access temporary results before they are discarded */
 	protected @Getter @Setter @Nullable Listener<T> listener;
@@ -324,9 +327,19 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		indexSbaToViewID.clear();
 		imagePairIndexesSba.reset();
 
-		List<StereoPairGraph.Edge> connections = requireNonNull(pairs.vertexes.get(center.id)).pairs;
-		for (int connIdx = 0; connIdx < connections.size(); connIdx++) {
-			StereoPairGraph.Edge connected = connections.get(connIdx);
+		final List<StereoPairGraph.Edge> connections = requireNonNull(pairs.vertexes.get(center.id)).pairs;
+
+		final List<StereoPairGraph.Edge> connectionsSorted = new ArrayList<>(connections);
+		Collections.sort(connectionsSorted, Comparator.comparingDouble(a -> -a.quality3D));
+
+		// Put a limit of the computation expense when computing this disparity image
+		// NOTE: This does not take in account geometric diversity. For example, there
+		//       could be 5 identical images with the best score. A less naive would take
+		//       in account how similar the images are.
+		int totalConsider = Math.min(maxCombinePairs, connectionsSorted.size());
+
+		for (int connIdx = 0; connIdx < totalConsider; connIdx++) {
+			StereoPairGraph.Edge connected = connectionsSorted.get(connIdx);
 
 			// Check to see if there's enough 3D information
 			if (connected.quality3D < minimumQuality3D)

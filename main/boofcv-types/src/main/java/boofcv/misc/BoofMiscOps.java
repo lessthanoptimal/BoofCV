@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -602,6 +602,20 @@ public class BoofMiscOps {
 			out.add(func.process(input));
 		}
 		return out;
+	}
+
+	/**
+	 * Returns a random number from min to max, inclusive.
+	 */
+	public static double uniform( double min, double max, Random rand ) {
+		return rand.nextDouble()*(max-min)+min;
+	}
+
+	/**
+	 * Returns a random number from min to max, inclusive.
+	 */
+	public static float uniform( float min, float max, Random rand ) {
+		return rand.nextFloat()*(max-min)+min;
 	}
 
 	/** Returns the last element in the list. Does not check if the list is empty */

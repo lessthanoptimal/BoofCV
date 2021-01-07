@@ -71,18 +71,18 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	/**
 	 * Constructor which specifies all the internal implementations
 	 */
-	public ImageSequenceToSparseScene(PointTracker<T> tracker,
-									  PointTrackerToSimilarImages trackerSimilar,
-									  GeneratePairwiseImageGraph generatePairwise,
-									  MetricFromUncalibratedPairwiseGraph metricFromPairwise,
-									  RefineMetricWorkingGraph refineScene,
-									  ImageType<T> imageType ) {
+	public ImageSequenceToSparseScene( PointTracker<T> tracker,
+									   PointTrackerToSimilarImages trackerSimilar,
+									   GeneratePairwiseImageGraph generatePairwise,
+									   MetricFromUncalibratedPairwiseGraph metricFromPairwise,
+									   RefineMetricWorkingGraph refineScene,
+									   ImageType<T> imageType ) {
 		this.tracker = tracker;
 		this.trackerSimilar = trackerSimilar;
 		this.generatePairwise = generatePairwise;
 		this.metricFromPairwise = metricFromPairwise;
 		this.refineScene = refineScene;
-		this.imageFull = imageType.createImage(1,1);
+		this.imageFull = imageType.createImage(1, 1);
 		this.imageDown = imageFull.createSameShape();
 	}
 
@@ -95,6 +95,7 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process( List<String> imageIDs, LookUpImages lookUpImages ) {
+		// Reset internal profiling information
 		timeTrackingMS = 0;
 		timePairwiseMS = 0;
 		timeMetricMS = 0;
@@ -109,7 +110,7 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 			// are not scale invariant
 			T image = AverageDownSampleOps.downMaxPixels(imageFull, imageDown, maxImagePixels);
 
-			if (indexIDs==0) {
+			if (indexIDs == 0) {
 				trackerSimilar.initialize(image.width, image.height);
 			}
 
@@ -125,22 +126,22 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 
 		// Compute a first pass metric reconstruction
 		if (!metricFromPairwise.process(trackerSimilar, generatePairwise.getGraph())) {
-			if (verbose !=null) verbose.println("Failed at metric from pairwise");
+			if (verbose != null) verbose.println("Failed at metric from pairwise");
 			return false;
 		}
 		long time3 = System.nanoTime();
 
 		// Refine the entire scene all at once to get a better estimate
 		if (!refineScene.process(trackerSimilar, metricFromPairwise.getWorkGraph())) {
-			if (verbose !=null) verbose.println("Failed at scene refine");
+			if (verbose != null) verbose.println("Failed at scene refine");
 			return false;
 		}
 		long time4 = System.nanoTime();
 
-		timeTrackingMS = (time1-time0)*1e-6;
-		timePairwiseMS = (time2-time1)*1e-6;
-		timeMetricMS = (time3-time2)*1e-6;
-		timeRefineMS = (time4-time3)*1e-6;
+		timeTrackingMS = (time1 - time0)*1e-6;
+		timePairwiseMS = (time2 - time1)*1e-6;
+		timeMetricMS = (time3 - time2)*1e-6;
+		timeRefineMS = (time4 - time3)*1e-6;
 
 		return true;
 	}
@@ -154,7 +155,6 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	public SceneObservations getSceneObservations() {
 		return refineScene.bundleAdjustment.observations;
 	}
-
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {
 		this.verbose = out;

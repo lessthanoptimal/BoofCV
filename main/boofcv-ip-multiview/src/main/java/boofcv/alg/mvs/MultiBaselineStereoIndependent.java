@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -206,8 +206,10 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 		// Print out profiling information
 		if (verboseProfiling != null) {
-			verboseProfiling.printf("MultiBaseline: Timing (ms), disp=%5.1f smooth=%5.1f lookup=%5.1f all=%5.1f\n",
-					timeDisparity, timeDisparitySmooth, timeLookUpImages, timeTotal);
+			verboseProfiling.printf(
+					"MultiBaseline: Timing (ms), disp=%5.1f smooth=%5.1f lookup=%5.1f all=%5.1f, view=%s\n",
+					timeDisparity, timeDisparitySmooth, timeLookUpImages, timeTotal,
+					sbaIndexToViewID.process(targetIdx));
 		}
 
 		return true;
