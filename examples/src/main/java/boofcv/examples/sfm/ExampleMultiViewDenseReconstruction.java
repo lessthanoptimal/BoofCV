@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
-import boofcv.alg.mvs.StereoPairGraph;
-import boofcv.alg.sfm.structure.PairwiseImageGraph;
-import boofcv.alg.sfm.structure.SceneWorkingGraph;
+import boofcv.alg.sfm.structure.GenerateStereoPairGraphFromScene;
 import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.disparity.ConfigDisparitySGM;
 import boofcv.factory.disparity.FactoryStereoDisparity;
@@ -40,6 +38,7 @@ import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
@@ -62,7 +61,7 @@ public class ExampleMultiViewDenseReconstruction {
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
 //		example.maxFrames = 100;       // This will process the entire sequence
-		example.compute("steps_wide_01.mp4");
+		example.compute("tree_snow_01.mp4");
 //		example.compute("ditch_02.mp4");
 //		example.compute("holiday_display_01.mp4");
 //		example.compute("log_building_02.mp4");
@@ -114,31 +113,16 @@ public class ExampleMultiViewDenseReconstruction {
 		//
 		// StereoPairGraph contains this information and we will create it from Pairwise and Working graphs.
 
-		var mvsGraph = new StereoPairGraph();
-		PairwiseImageGraph _pairwise = example.pairwise;
 		SceneStructureMetric _structure = example.scene;
-		// Add a vertex for each view
-		BoofMiscOps.forIdx(example.working.viewList, ( i, wv ) -> mvsGraph.addVertex(wv.pview.id, i));
-		// Compute the 3D score for each connected view
-		BoofMiscOps.forIdx(example.working.viewList, ( workIdxI, wv ) -> {
-			var pv = _pairwise.mapNodes.get(wv.pview.id);
-			pv.connections.forIdx(( j, e ) -> {
-				// Look at the ratio of inliers for a homography and fundamental matrix model
-				PairwiseImageGraph.View po = e.other(pv);
-				double ratio = 1.0 - Math.min(1.0, e.countH/(1.0 + e.countF));
-				if (ratio <= 0.25)
-					return;
-				// There is sufficient 3D information between these two views
-				SceneWorkingGraph.View wvo = example.working.views.get(po.id);
-				int workIdxO = example.working.viewList.indexOf(wvo);
-				if (workIdxO <= workIdxI)
-					return;
-				mvsGraph.connect(pv.id, po.id, ratio);
-			});
-		});
+
+		// Create the stereo pair graph from the SBA sparse reconstruction
+		var viewToId = new TIntObjectHashMap<String>();
+		BoofMiscOps.forIdx(example.working.viewList, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));
+		var sparseToStereoGraph = new GenerateStereoPairGraphFromScene();
+		sparseToStereoGraph.process(viewToId, example.scene);
 
 		// Compute the dense 3D point cloud
-		BoofMiscOps.profile(() -> mvs.process(_structure, mvsGraph), "MVS Cloud");
+		BoofMiscOps.profile(() -> mvs.process(_structure, sparseToStereoGraph.getStereoGraph()), "MVS Cloud");
 
 		System.out.println("Dense Cloud Size: " + mvs.getCloud().size());
 

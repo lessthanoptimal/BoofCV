@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.structure;
+package boofcv.simulation;
 
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
@@ -48,7 +48,7 @@ import java.util.Objects;
 
 /**
  * Point tracker that provides perfect tracks. Perfect in that there is no miss association and perfect reprojections.
- * These are generated from a passed in set of 3D points.
+ * These are generated from a passed in set of 3D points. Intended for use in debugging and unit testing.
  *
  * @author Peter Abeles
  */

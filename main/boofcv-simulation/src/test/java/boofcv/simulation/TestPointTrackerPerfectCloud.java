@@ -16,14 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.structure;
+package boofcv.simulation;
 
 import boofcv.abst.tracker.PointTrack;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -36,10 +39,13 @@ class TestPointTrackerPerfectCloud extends BoofStandardJUnit {
 	/** Test basic functionality */
 	@Test void basics() {
 		var tracker = new PointTrackerPerfectCloud<>();
-		tracker.setCamera(new CameraPinhole(200,200,0,200,200,400,400));
-		tracker.cloud.add(new Point3D_F64(0,0,2));
-		tracker.cloud.add(new Point3D_F64(0.5,0,3));
-		tracker.cloud.add(new Point3D_F64(0,0.5,-2));
+		tracker.setCamera(new CameraPinhole(200, 200, 0, 200, 200, 400, 400));
+		tracker.cloud.add(new Point3D_F64(0.0, 0.0, 2));
+		tracker.cloud.add(new Point3D_F64(0.5, 0.0, 3));
+		tracker.cloud.add(new Point3D_F64(0.0, 0.5, -2));
+
+		// There is no max spawn
+		assertEquals(0, tracker.getMaxSpawn());
 
 		tracker.process(null);
 		assertEquals(0, tracker.getFrameID());
@@ -53,7 +59,7 @@ class TestPointTrackerPerfectCloud extends BoofStandardJUnit {
 		assertEquals(2, active.size());
 		assertEquals(200, active.get(0).pixel.x, UtilEjml.TEST_F64);
 		assertEquals(200, active.get(0).pixel.y, UtilEjml.TEST_F64);
-		assertTrue(active.get(1).pixel.x>0);
+		assertTrue(active.get(1).pixel.x > 0);
 		assertEquals(200, active.get(1).pixel.y, UtilEjml.TEST_F64);
 
 		// See what happens when we flip it around and it can only see the 3rd point
@@ -65,5 +71,30 @@ class TestPointTrackerPerfectCloud extends BoofStandardJUnit {
 		// it should just spawn the point with a negative coordinate
 		tracker.spawnTracks();
 		assertEquals(1, tracker.getTotalActive());
+	}
+
+	/** The view isn't moving and it's viewing the same objects */
+	@Test void multipleCallsStatic() {
+		var tracker = new PointTrackerPerfectCloud<>();
+		tracker.setCamera(new CameraPinhole(200, 200, 0, 200, 200, 400, 400));
+		tracker.cloud.add(new Point3D_F64(0, 0, 2));
+		tracker.cloud.add(new Point3D_F64(0.5, 0, 3));
+		tracker.cloud.add(new Point3D_F64(0, 0.5, -2));
+
+		tracker.process(null);
+		tracker.spawnTracks();
+		DogArray<Point2D_F64> expected = new DogArray<>(Point2D_F64::new);
+		tracker.getNewTracks(null).forEach(t -> expected.grow().setTo(t.pixel));
+
+		for (int i = 0; i < 5; i++) {
+			tracker.process(null);
+			assertEquals(2, tracker.getTotalActive());
+			assertEquals(0, tracker.getTotalInactive());
+			assertTrue(tracker.getDroppedTracks(null).isEmpty());
+			List<PointTrack> active = tracker.getActiveTracks(null);
+			BoofMiscOps.forIdx(active, ( idx, t ) -> {
+				assertEquals(0.0, t.pixel.distance(expected.get(idx)), UtilEjml.TEST_F64);
+			});
+		}
 	}
 }

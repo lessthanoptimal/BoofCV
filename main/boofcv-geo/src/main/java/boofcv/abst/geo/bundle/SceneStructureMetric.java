@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,15 @@
 
 package boofcv.abst.geo.bundle;
 
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
@@ -319,6 +323,41 @@ public class SceneStructureMetric extends SceneStructureCommon {
 			total += rigids.data[i].points.length;
 		}
 		return total;
+	}
+
+	/**
+	 * Projects the requested point onto the requested view and computes its predicted pixel coordinates.
+	 * @param pointIdx (Input) index of point
+	 * @param viewIdx (Input) index of view
+	 * @param world_to_view (Output) Internal work space
+	 * @param tmpSE (Output) Internal work space
+	 * @param tmpX (Output) Internal work space
+	 * @param pixel (Output) The projected pixel
+	 * @return true if it's in front of the camera or false if it's behind
+	 */
+	public boolean projectToPixel( int pointIdx, int viewIdx,
+								   Se3_F64 world_to_view, Se3_F64 tmpSE,
+								   Point3D_F64 tmpX, Point2D_F64 pixel ) {
+
+		// Get the coordinate transform
+		View view = views.get(viewIdx);
+		getWorldToView(view,world_to_view,tmpSE);
+
+		// extract the coordinate for 3D and homogenous case
+		Point p = points.get(pointIdx);
+		double x,y,z,w;
+		x = p.coordinate[0];
+		y = p.coordinate[1];
+		z = p.coordinate[2];
+		w = homogenous ? p.coordinate[3] : 1.0;
+
+		// Project the pixel while being careful for points at infinity
+		BundleAdjustmentCamera camera = Objects.requireNonNull(getViewCamera(view).model);
+		SePointOps_F64.transformV(world_to_view, x,y,z,w, tmpX);
+		camera.project(tmpX.x, tmpX.y, tmpX.z, pixel);
+
+		// if the sign is positive then it's in front
+		return z*w > 0.0;
 	}
 
 	/**
