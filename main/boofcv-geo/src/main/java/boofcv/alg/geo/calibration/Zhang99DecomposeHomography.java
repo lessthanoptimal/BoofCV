@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public class Zhang99DecomposeHomography {
 
 		Vector3D_F64 v1 = UtilVector3D_F64.convert(r1);
 		Vector3D_F64 v2 = UtilVector3D_F64.convert(r2);
-		Vector3D_F64 v3 = v1.cross(v2);
+		Vector3D_F64 v3 = v1.crossWith(v2);
 
 		UtilVector3D_F64.createMatrix(R, v1, v2, v3);
 

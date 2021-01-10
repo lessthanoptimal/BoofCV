@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,7 +104,7 @@ public class EstimatePlaneAtInfinityGivenK {
 		w2.setTo(W.a21,W.a22,W.a23);
 		w3.setTo(W.a31,W.a32,W.a33);
 		double n3 = w3.norm();
-		v.cross(w2,w3); // approximation here, w2 and w3 might not be orthogonal
+		v.crossSetTo(w2,w3); // approximation here, w2 and w3 might not be orthogonal
 		v.divideIP(n3);
 		v.x -= W.a11;
 		v.y -= W.a12;

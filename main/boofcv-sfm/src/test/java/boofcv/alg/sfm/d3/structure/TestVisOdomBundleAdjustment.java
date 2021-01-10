@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -272,7 +272,7 @@ class TestVisOdomBundleAdjustment extends BoofStandardJUnit {
 
 		for (int viewidx = 0; viewidx < 5; viewidx++) {
 			BFrame frame = vsba.addFrame(viewidx);
-			frame.frame_to_world.set(-1 + 2.0*viewidx/4.0, 0, 0, EulerType.XYZ, rand.nextGaussian()*0.1, 0, 0);
+			frame.frame_to_world.setTo(-1 + 2.0*viewidx/4.0, 0, 0, EulerType.XYZ, rand.nextGaussian()*0.1, 0, 0);
 
 			// add visible features to each view
 			for (int i = 0; i < cloud.size(); i++) {

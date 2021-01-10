@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -299,7 +299,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 		l0.setTo(R22.a11, R22.a21, b1);
 		l1.setTo(R22.a12, R22.a22, b2);
 
-		ca.cross(l0, l1); // ca = [c;a]
+		ca.crossSetTo(l0, l1); // ca = [c;a]
 
 		// This will be the solution for the two rotation matrices
 		// R1 = R_v*[R22, +c; b^T , a ]
