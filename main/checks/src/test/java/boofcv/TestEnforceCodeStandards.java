@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,7 +96,10 @@ public class TestEnforceCodeStandards {
 
 			if (failed)
 				System.err.println(
-						"\nSee documentation for how to ignore false positives or make exceptions to the rule");
+						"\nIf this is a false positive, the error can be turned off for the file or specific lines. E.g.\n" +
+						"    Ignore current line: \"// lint:forbidden ignore_line\"\n" +
+						"    Disable line below:  \"// lint:forbidden ignore_below\"\n" +
+						"    See documentation for more options.\n");
 
 			assertFalse(failed);
 		}
