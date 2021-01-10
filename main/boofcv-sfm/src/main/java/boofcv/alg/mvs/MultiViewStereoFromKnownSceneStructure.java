@@ -89,14 +89,15 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	protected final @Getter List<ViewInfo> listCenters = new ArrayList<>();
 
 	// Used to retrieve images from a data base. There could be easily too images to load all at once
-	final LookUpImages imageLookUp;
+	protected @Getter LookUpImages imageLookUp;
 
 	/** Computes the score for a given view acting as the "center" among its neighbors */
 	final @Getter ScoreRectifiedViewCoveragePixels scoreCoverage = new ScoreRectifiedViewCoveragePixels();
 
 	/** Computes rectification given intrinsic and extrinsic parameters */
-	final @Getter
-	BundleToRectificationStereoParameters computeRectification = new BundleToRectificationStereoParameters();
+	final @Getter BundleToRectificationStereoParameters computeRectification =
+			new BundleToRectificationStereoParameters();
+
 	/**
 	 * Given one "center" view and several other views which form a stereo pair, compute a single
 	 * combined disparity image
@@ -132,11 +133,21 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	// Workspace
 	Se3_F64 tmp = new Se3_F64();
 
+	// type of input image
+	final @Getter ImageType<T> imageType;
+
+	// Specify verbose output
 	@Nullable PrintStream verbose = null;
 
 	public MultiViewStereoFromKnownSceneStructure( LookUpImages imageLookUp, ImageType<T> imageType ) {
 		this.computeFused = new MultiBaselineStereoIndependent<>(imageLookUp, imageType);
 		this.imageLookUp = imageLookUp;
+		this.imageType = imageType;
+	}
+
+	public MultiViewStereoFromKnownSceneStructure( ImageType<T> imageType ) {
+		this.computeFused = new MultiBaselineStereoIndependent<>(imageType);
+		this.imageType = imageType;
 	}
 
 	/**
@@ -278,9 +289,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			center.score = scoreCoverage.getScore();
 			if (verbose != null) {
 				averageQuality = totalQualifiedConnections > 0 ? averageQuality/totalQualifiedConnections : -1;
-				verbose.println("View[" + center.relations.id + "] center score=" + center.score +
-						" aveQuality=" + averageQuality + " " +
-						" conn=" + totalQualifiedConnections + "/" + pairs.size());
+				verbose.printf("View[%s] center score=%5.2f aveQuality=%.2f conn=%d/%d\n",
+						center.relations.id,center.score,averageQuality,totalQualifiedConnections,pairs.size());
 			}
 		}
 	}
@@ -367,6 +377,11 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	/** Specifies which stereo disparity algorithm to use */
 	public void setStereoDisparity( StereoDisparity<T, GrayF32> stereoDisparity ) {
 		computeFused.setStereoDisparity(stereoDisparity);
+	}
+
+	public void setImageLookUp(LookUpImages imageLookUp) {
+		this.computeFused.setLookUpImages(imageLookUp);
+		this.imageLookUp = imageLookUp;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

@@ -48,18 +48,20 @@ class TestGenerateStereoPairGraphFromScene extends BoofStandardJUnit {
 		var viewToId = new TIntObjectHashMap<String>();
 		var scene = new SceneStructureMetric(false);
 
-		scene.initialize(3,3,10);
+		scene.initialize(3, 3, 10);
 		for (int i = 0; i < 3; i++) {
-			viewToId.put(i,""+(i+1));
-			scene.setView(i,i,true, new Se3_F64());
-			scene.setCamera(i,true,new CameraPinhole(200,200,0,150,150,300,300));
+			viewToId.put(i, "" + (i + 1));
+			scene.setView(i, i, true, new Se3_F64());
+			scene.setCamera(i, true, new CameraPinhole(200, 200, 0, 150, 150, 300, 300));
 			scene.motions.get(i).motion.T.x = i;
 		}
+
 		// Create the points far away
 		for (int i = 0; i < 5; i++) {
 			scene.setPoint(i, 0, 0, 1e4);
-			scene.points.get(i).views.setTo(0,1);
+			scene.points.get(i).views.setTo(0, 1);
 		}
+
 		// Add the up close points
 		for (int i = 5; i < 10; i++) {
 			scene.setPoint(i, 0, 0, 4);
@@ -67,7 +69,7 @@ class TestGenerateStereoPairGraphFromScene extends BoofStandardJUnit {
 		}
 
 		var alg = new GenerateStereoPairGraphFromScene();
-		alg.process(viewToId,scene);
+		alg.process(viewToId, scene);
 
 		StereoPairGraph found = alg.getStereoGraph();
 		assertEquals(3, found.vertexes.size());
@@ -95,16 +97,16 @@ class TestGenerateStereoPairGraphFromScene extends BoofStandardJUnit {
 		var scene = new SceneStructureMetric(false);
 
 		// Create a scene with 3 views and a simple formula relating visible points to views
-		scene.initialize(3,3,10);
+		scene.initialize(3, 3, 10);
 		for (int i = 0; i < 3; i++) {
-			scene.setView(i,i,true, new Se3_F64());
+			scene.setView(i, i, true, new Se3_F64());
 		}
 		for (int i = 0; i < scene.points.size; i++) {
-			scene.setPoint(i,0,0,2);
+			scene.setPoint(i, 0, 0, 2);
 			scene.points.get(i).views.add(0);
-			if (i%2==0)
+			if (i%2 == 0)
 				scene.points.get(i).views.add(1);
-			if (i%3==0)
+			if (i%3 == 0)
 				scene.points.get(i).views.add(2);
 		}
 

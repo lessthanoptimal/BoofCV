@@ -74,10 +74,10 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 	/**
 	 * Computes a {@link StereoPairGraph} from the sparse scene graph
 	 *
-	 * @param viewToId (Input) Look up table from view index in scene to the view ID/name
+	 * @param viewIdx_to_imageId (Input) Look up table from view index in scene to the image ID/name
 	 * @param scene (Input) Sparse 3D scene
 	 */
-	public void process( TIntObjectMap<String> viewToId, SceneStructureMetric scene ) {
+	public void process( TIntObjectMap<String> viewIdx_to_imageId, SceneStructureMetric scene ) {
 		stereoGraph.reset();
 
 		// Determine which views are visible to each other
@@ -86,7 +86,7 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 		estimateRadiansToPixels(scene);
 
 		// Use the previously found connected views to compute the graph and score using geometric info
-		createStereoGraph(viewToId);
+		createStereoGraph(viewIdx_to_imageId);
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 				findCommonFeatureAngles(viewA, viewB);
 
 				// If only a small fraction overlap don't consider the match
-				if (acuteAngles.size < Math.min(viewA.pointing.size,viewB.pointing.size)*minimumCommonFeaturesFrac)
+				if (acuteAngles.size < Math.min(viewA.pointing.size, viewB.pointing.size)*minimumCommonFeaturesFrac)
 					continue;
 
 				acuteAngles.sort();
@@ -238,7 +238,7 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 				double angle95 = acuteAngles.getFraction(0.95);
 				// Predict what the disparity would be. Use the camera of 50 and 95. Maybe this can be improved
 				double radianToPixels = Math.min(viewA.radianToPixels, viewB.radianToPixels);
-				double qualityDisparity = Math.min(1.0, radianToPixels*(angle50+angle95)/(2.0*targetDisparity));
+				double qualityDisparity = Math.min(1.0, radianToPixels*(angle50 + angle95)/(2.0*targetDisparity));
 
 				// Prefer a larger fraction of common features between the two views, but smooth it to avoid
 				// erratic results when the number is small
@@ -249,11 +249,11 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 
 				double quality = qualityDisparity*qualityCommon;
 
-				if (verbose!=null)
+				if (verbose != null)
 					verbose.printf("Quality: %4s - %4s %.2f : disp=%.2f com=%.2f\n",
-							nameA,nameB,quality,qualityDisparity,qualityCommon);
+							nameA, nameB, quality, qualityDisparity, qualityCommon);
 
-				if (quality!=0.0)
+				if (quality != 0.0)
 					stereoGraph.connect(nameA, nameB, quality);
 			}
 		}
@@ -273,6 +273,7 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 			if (idxA == -1)
 				return;
 
+			double angle = viewA.pointing.get(idxA).acute(viewB.pointing.get(idxB));
 			acuteAngles.add(viewA.pointing.get(idxA).acute(viewB.pointing.get(idxB)));
 		});
 	}
