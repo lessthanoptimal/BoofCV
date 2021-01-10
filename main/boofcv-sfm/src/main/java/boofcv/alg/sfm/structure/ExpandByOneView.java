@@ -51,11 +51,11 @@ public abstract class ExpandByOneView implements VerbosePrint {
 	// candidates for being used as known connections
 	protected List<PairwiseImageGraph.Motion> validCandidates = new ArrayList<>();
 
-	public ExpandByOneView(ConfigProjectiveReconstruction configProjective) {
+	protected ExpandByOneView(ConfigProjectiveReconstruction configProjective) {
 		utils = new PairwiseGraphUtils(configProjective);
 	}
 
-	public ExpandByOneView() {
+	protected ExpandByOneView() {
 		this(new ConfigProjectiveReconstruction());
 	}
 
