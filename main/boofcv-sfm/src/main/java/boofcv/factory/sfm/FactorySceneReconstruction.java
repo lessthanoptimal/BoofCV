@@ -20,10 +20,13 @@ package boofcv.factory.sfm;
 
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.sfm.structure.*;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F64;
@@ -36,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FactorySceneReconstruction {
 	/**
 	 * Creates {@link MetricBundleAdjustmentUtils}
@@ -71,7 +75,7 @@ public class FactorySceneReconstruction {
 	 * Creates {@link ImageSequenceToSparseScene}
 	 *
 	 * @param config (Input) Optional configuration. Null will use default values.
-	 * @param imageType Image type it uses internally.
+	 * @param imageType (Input) Image type it uses internally.
 	 * @return New instance
 	 */
 	public static <T extends ImageGray<T>> ImageSequenceToSparseScene<T>
@@ -90,5 +94,37 @@ public class FactorySceneReconstruction {
 		alg.maxImagePixels = config.maxImagePixels;
 
 		return alg;
+	}
+
+	/**
+	 * Creates {@link SparseSceneToDenseCloud} for creating dense clouds of a scene.
+	 *
+	 * @param config (Input) Optional configuration. Null will use default values.
+	 * @param imageType (Input) Image type it uses internally.
+	 * @return New instance
+	 */
+	public static <T extends ImageGray<T>>
+	SparseSceneToDenseCloud<T> sparseSceneToDenseCloud( @Nullable ConfigSparseToDenseCloud config,
+														ImageType<T> imageType ) {
+		if (config==null)
+			config = new ConfigSparseToDenseCloud();
+
+		Class<T> grayType = imageType.getImageClass();
+
+		SparseSceneToDenseCloud<T> s2c = new SparseSceneToDenseCloud<>(grayType);
+		MultiViewStereoFromKnownSceneStructure<T> mvs = s2c.getMultiViewStereo();
+
+		mvs.setStereoDisparity(FactoryStereoDisparity.generic(
+				config.disparity,grayType, GrayF32.class));
+		mvs.getComputeFused().setDisparitySmoother(
+				FactoryStereoDisparity.removeSpeckle(config.smoother, GrayF32.class));
+
+		GenerateStereoPairGraphFromScene generateGraph = s2c.getGenerateGraph();
+
+		generateGraph.targetDisparity = config.graph.targetDisparity;
+		generateGraph.countSmootherParam = config.graph.countSmootherParam;
+		generateGraph.minimumCommonFeaturesFrac = config.graph.minimumCommonFeaturesFrac;
+
+		return s2c;
 	}
 }

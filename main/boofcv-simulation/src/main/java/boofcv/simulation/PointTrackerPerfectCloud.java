@@ -129,7 +129,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	void dropUnobserved() {
 		// Make a list first to avoid modifying a data structure while traversing through it
 		DogArray_I64 dropList = new DogArray_I64();
-		for( long id : id_to_track.keys() ) {
+		for( long id : id_to_track.keys() ) { // lint:forbidden ignore_line
 			if (!observedID.contains(id)) {
 				dropList.add(id);
 			}
@@ -179,7 +179,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	}
 
 	@Override public boolean dropTrack( PointTrack track ) {
-		for( long id : id_to_track.keys() ) {
+		for( long id : id_to_track.keys() ) { // lint:forbidden ignore_line
 			if (id_to_track.get(id)==track) {
 				id_to_track.remove(id);
 				cloudIdx_to_id.remove(id_to_cloudIdx.get(id));

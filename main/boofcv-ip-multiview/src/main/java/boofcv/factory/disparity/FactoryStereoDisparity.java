@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,6 +59,19 @@ import org.jetbrains.annotations.Nullable;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryStereoDisparity {
+
+	/**
+	 * Function for creating any dense stereo disparity algorithm in BoofCV
+	 */
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
+	generic( ConfigDisparity config, Class<T> imageType, Class<DI> dispType ) {
+		return switch (config.approach) {
+			case BLOCK_MATCH -> blockMatch(config.approachBM, imageType, dispType);
+			case BLOCK_MATCH_5 -> blockMatchBest5(config.approachBM5, imageType, dispType);
+			case SGM -> sgm(config.approachSGM, imageType, dispType);
+			default -> throw new IllegalArgumentException("Unknown approach "+config.approach);
+		};
+	}
 
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
 	blockMatch( @Nullable ConfigDisparityBM config, Class<T> imageType, Class<DI> dispType ) {
