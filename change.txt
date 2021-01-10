@@ -22,6 +22,7 @@ Version : 0.38
   * QR Code for first version
 - TODO Multi Camera Calibration
 - Scene Reconstruction
+  * Added high level implementations which break down sparse and dense reconstruction down to their bare inputs
   * TODO Improve stability of sparse metric upgrade. Local SBA and multiple seeds?
   * TODO Pruning of views when creating pairwise graph. If too similar do not include it. Could be done before pairwise
   * TODO when associating objects split into feature types, e.g. white and black blobs
