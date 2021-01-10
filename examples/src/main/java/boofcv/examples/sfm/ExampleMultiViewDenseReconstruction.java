@@ -19,13 +19,13 @@
 package boofcv.examples.sfm;
 
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
-import boofcv.alg.sfm.structure.GenerateStereoPairGraphFromScene;
-import boofcv.core.image.LookUpColorRgbFormats;
+import boofcv.alg.sfm.structure.SparseSceneToDenseCloud;
+import boofcv.factory.disparity.ConfigDisparity;
 import boofcv.factory.disparity.ConfigDisparitySGM;
-import boofcv.factory.disparity.FactoryStereoDisparity;
+import boofcv.factory.sfm.ConfigSparseToDenseCloud;
+import boofcv.factory.sfm.FactorySceneReconstruction;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -52,9 +52,6 @@ import java.util.List;
  * neighbors for stereo computations using a heuristic. Then a global point cloud is created from the "center" view
  * disparity images while taking care to avoid adding duplicate points.
  *
- * As you can see there is still a fair amount of noise in the cloud. Additional filtering and processing
- * is typically required at this point.
- *
  * @author Peter Abeles
  */
 public class ExampleMultiViewDenseReconstruction {
@@ -66,8 +63,18 @@ public class ExampleMultiViewDenseReconstruction {
 //		example.compute("holiday_display_01.mp4");
 //		example.compute("log_building_02.mp4");
 
-		// SGM is a reasonable trade between quality and speed.
-		var configSgm = new ConfigDisparitySGM();
+		// Looks up images based on their index in the file list
+		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);
+
+		// We will use a high level algorithm that does almost all the work for us. It is highly configurable
+		// and just about every parameter can be tweaked using its Config. Internal algorithms can be accessed
+		// and customize directly if needed. Specifics for how it work is beyond this example but the code
+		// is easily accessible.
+
+		// Let's do some custom configuration for this scenario
+		var config = new ConfigSparseToDenseCloud();
+		config.disparity.approach = ConfigDisparity.Approach.SGM;
+		ConfigDisparitySGM configSgm = config.disparity.approachSGM;
 		configSgm.validateRtoL = 0;
 		configSgm.texture = 0.75;
 		configSgm.disparityRange = 120;
@@ -75,22 +82,15 @@ public class ExampleMultiViewDenseReconstruction {
 		configSgm.configBlockMatch.radiusX = 3;
 		configSgm.configBlockMatch.radiusY = 3;
 
-		// Looks up images based on their index in the file list
-		var imageLookup = new LookUpImageFilesByIndex(example.imageFiles);
+		// Create the sparse to dense reconstruction using a factory
+		SparseSceneToDenseCloud<GrayU8> sparseToDense =
+				FactorySceneReconstruction.sparseSceneToDenseCloud(config, ImageType.SB_U8);
 
-		// Create and configure MVS
-		//
-		// Note that the stereo disparity algorithm used must output a GrayF32 disparity image as much of the code
-		// is hard coded to use it. MVS would not work without sub-pixel enabled.
-		var mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, ImageType.SB_U8);
-		mvs.setStereoDisparity(FactoryStereoDisparity.sgm(configSgm, GrayU8.class, GrayF32.class));
-		// Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
-		mvs.getComputeFused().setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
-		// Print out profiling info from multi baseline stereo
-		mvs.getComputeFused().setVerboseProfiling(System.out);
+		// To help make the time go by faster while we wait about 1 to 2 minutes for it to finish, let's print stuff
+		sparseToDense.getMultiViewStereo().getComputeFused().setVerboseProfiling(System.out);
 
-		// Grab intermediate results as they are computed
-		mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
+		// To visualize intermediate results we will add a listener. This will show fused disparity images
+		sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
 			@Override
 			public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
 											 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
@@ -107,33 +107,15 @@ public class ExampleMultiViewDenseReconstruction {
 			}
 		});
 
-		// MVS stereo needs to know which view pairs have enough 3D information to act as a stereo pair and
-		// the quality of that 3D information. This is used to guide which views act as "centers" for accumulating
-		// 3D information which is then converted into the point cloud.
-		//
-		// StereoPairGraph contains this information and we will create it from Pairwise and Working graphs.
-
-		SceneStructureMetric _structure = example.scene;
-
-		// Create the stereo pair graph from the SBA sparse reconstruction
+		// It needs a look up table to go from SBA view index to image name. It loads images as needed to perform
+		// stereo disparity
 		var viewToId = new TIntObjectHashMap<String>();
 		BoofMiscOps.forIdx(example.working.viewList, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));
-		var sparseToStereoGraph = new GenerateStereoPairGraphFromScene();
-		sparseToStereoGraph.process(viewToId, example.scene);
+		if (!sparseToDense.process(example.scene, viewToId, imageLookup))
+			throw new RuntimeException("Dense reconstruction failed!");
 
-		// Compute the dense 3D point cloud
-		BoofMiscOps.profile(() -> mvs.process(_structure, sparseToStereoGraph.getStereoGraph()), "MVS Cloud");
-
-		System.out.println("Dense Cloud Size: " + mvs.getCloud().size());
-
-		// Colorize the cloud to make it easier to view. This is done by projecting points back into the
-		// first view they were seen in and reading the color
-		DogArray_I32 colorRgb = new DogArray_I32();
-		colorRgb.resize(mvs.getCloud().size());
-		var colorizeMvs = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), imageLookup);
-		colorizeMvs.processMvsCloud(example.scene, mvs,
-				( idx, r, g, b ) -> colorRgb.set(idx, (r << 16) | (g << 8) | b));
-		visualizeInPointCloud(mvs.getCloud(), colorRgb, example.scene);
+		// Display the dense cloud
+		visualizeInPointCloud(sparseToDense.getCloud(), sparseToDense.getColorRgb(), example.scene);
 	}
 
 	public static void visualizeInPointCloud( List<Point3D_F64> cloud, DogArray_I32 colorsRgb,
