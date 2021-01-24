@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.abst.geo.TriangulateNViewsMetricH;
+import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
@@ -37,6 +38,7 @@ import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.alg.geo.trifocal.TrifocalTransfer;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.*;
@@ -49,6 +51,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.Tuple2;
@@ -67,6 +70,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -1643,14 +1647,15 @@ public class MultiViewOps {
 		List<RemoveBrownPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.size; i++) {
 			RemoveBrownPtoN_F64 p2n = new RemoveBrownPtoN_F64();
-			if (structure.cameras.data[i].model instanceof BundlePinholeSimplified) {
-				BundlePinholeSimplified cam = (BundlePinholeSimplified)structure.cameras.data[i].model;
+			BundleAdjustmentCamera baseModel = Objects.requireNonNull(structure.cameras.data[i].model);
+			if (baseModel instanceof BundlePinholeSimplified) {
+				BundlePinholeSimplified cam = (BundlePinholeSimplified)baseModel;
 				p2n.setK(cam.f, cam.f, 0, 0, 0).setDistortion(new double[]{cam.k1, cam.k2}, 0, 0);
-			} else if (structure.cameras.data[i].model instanceof BundlePinhole) {
-				BundlePinhole cam = (BundlePinhole)structure.cameras.data[i].model;
+			} else if (baseModel instanceof BundlePinhole) {
+				BundlePinhole cam = (BundlePinhole)baseModel;
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{0, 0}, 0, 0);
-			} else if (structure.cameras.data[i].model instanceof BundlePinholeBrown) {
-				BundlePinholeBrown cam = (BundlePinholeBrown)structure.cameras.data[i].model;
+			} else if (baseModel instanceof BundlePinholeBrown) {
+				BundlePinholeBrown cam = (BundlePinholeBrown)baseModel;
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(cam.radial, cam.t1, cam.t2);
 			} else {
 				throw new RuntimeException("Unknown camera model!");
@@ -1769,6 +1774,12 @@ public class MultiViewOps {
 		return dst;
 	}
 
+	/**
+	 * Converts a list of associated {@link AssociatedTriple} in a {@link DogArray} of {@link AssociatedTuple}
+	 *
+	 * @param src (Input) List of AssociatedTriple
+	 * @param dst (Output) Array of AssociatedTuple. Array is reset.
+	 */
 	public static void convertTr( List<AssociatedTriple> src, DogArray<AssociatedTuple> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
@@ -1784,6 +1795,14 @@ public class MultiViewOps {
 		}
 	}
 
+	/**
+	 * Converts a list of associated {@link AssociatedTriple} in a {@link DogArray} of {@link AssociatedPair}
+	 *
+	 * @param src (Input) List of AssociatedTriple
+	 * @param idx0 (Input) which feature in the triple is p1 in the pair
+	 * @param idx1 (Input) which feature in the triple is p2 in the pair
+	 * @param dst (Output) Array of AssociatedPair. Array is reset.
+	 */
 	public static void convertTr( List<AssociatedTriple> src, int idx0, int idx1,
 								  DogArray<AssociatedPair> dst ) {
 		dst.resize(src.size());
@@ -1792,12 +1811,18 @@ public class MultiViewOps {
 
 		for (int i = 0; i < src.size(); i++) {
 			AssociatedTriple a = src.get(i);
-			AssociatedPair b = dst.get(i);
-			b.p1.setTo(a.get(idx0));
-			b.p2.setTo(a.get(idx1));
+			dst.get(i).setTo(a.get(idx0), a.get(idx1));
 		}
 	}
 
+	/**
+	 * Converts a list of associated {@link AssociatedTuple} in a {@link DogArray} of {@link AssociatedPair}
+	 *
+	 * @param src (Input) List of AssociatedTuple
+	 * @param idx0 (Input) which feature in the tuple is p1 in the pair
+	 * @param idx1 (Input) which feature in the tuple is p2 in the pair
+	 * @param dst (Output) Array of AssociatedPair. Array is reset.
+	 */
 	public static void convertTu( List<AssociatedTuple> src, int idx0, int idx1,
 								  DogArray<AssociatedPair> dst ) {
 		dst.resize(src.size());
@@ -1821,5 +1846,45 @@ public class MultiViewOps {
 		if (disparity < 0.0)
 			throw new IllegalArgumentException("Disparity can't be less than zero");
 		return focalLength*baseline/disparity;
+	}
+
+	/**
+	 * Projects points in the scene onto the specified image. Results are returned using a lambda that provides
+	 * the points index, the point's 3D location in the camera frame, and the projected pixels.
+	 *
+	 * No checks are done for th following:
+	 * <ul>
+	 *     <li>Was the feature observed by this view</li>
+	 *     <li>Does the feature appear behind the camera</li>
+	 *     <li>Is the projected pixel inside the image</li>
+	 * </ul>
+	 *
+	 * @param scene (Input) Metric scene
+	 * @param viewIdx (Input) Index of view for which points are projected
+	 * @param function (Output) Called with results (index, 3D camera location, pixel)
+	 */
+	public static void scenePointsToPixels( SceneStructureMetric scene, int viewIdx,
+											BoofLambdas.ProcessIndex2<Point3D_F64,Point2D_F64> function ) {
+		Se3_F64 world_to_view = new Se3_F64();
+
+		SceneStructureMetric.View view = scene.views.get(viewIdx);
+		scene.getWorldToView(view,world_to_view,null);
+		BundleAdjustmentCamera camera = Objects.requireNonNull(scene.getViewCamera(view).model);
+
+		Point3D_F64 camPoint = new Point3D_F64();
+		Point2D_F64 pixel = new Point2D_F64();
+
+		for (int pointIdx = 0; pointIdx < scene.points.size; pointIdx++) {
+			SceneStructureCommon.Point point = scene.points.get(pointIdx);
+			double x = point.coordinate[0];
+			double y = point.coordinate[1];
+			double z = point.coordinate[2];
+			double w = scene.isHomogenous() ? point.coordinate[3] : 1.0;
+
+			// Project the pixel while being careful for points at infinity
+			SePointOps_F64.transformV(world_to_view, x,y,z,w, camPoint);
+			camera.project(camPoint.x, camPoint.y, camPoint.z, pixel);
+			function.process(pointIdx, camPoint, pixel);
+		}
 	}
 }

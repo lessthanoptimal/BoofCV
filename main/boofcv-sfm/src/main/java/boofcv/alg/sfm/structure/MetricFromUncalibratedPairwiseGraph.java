@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,8 +121,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		// - Merge the two graphs
 		// Allow for multiple outputs of different graphs
 
-		if (seeds.size() == 0)
+		if (seeds.isEmpty()) {
+			if (verbose != null) verbose.println("No valid seeds found.");
 			return false;
+		}
 
 		if (verbose != null)
 			verbose.println("Selected seeds.size=" + seeds.size() + " seeds out of " + graph.nodes.size + " nodes");
@@ -132,8 +134,10 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 		// Find the common features
 		DogArray_I32 common = utils.findCommonFeatures(info.seed, info.motions);
-		if (common.size < 6) // if less than the minimum it will fail
+		if (common.size < 6) {// if less than the minimum it will fail
+			if (verbose != null) verbose.println("Too few common features in seed.");
 			return false;
+		}
 
 		if (verbose != null) verbose.println("Selected seed.id='" + info.seed.id + "' common=" + common.size);
 

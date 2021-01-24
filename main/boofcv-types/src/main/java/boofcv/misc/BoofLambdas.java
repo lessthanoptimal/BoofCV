@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,6 +62,10 @@ public interface BoofLambdas {
 		boolean process( int a, int b );
 	}
 
+	@FunctionalInterface interface ProcessDD {
+		void process( double a, double b );
+	}
+
 	@FunctionalInterface interface SelectElement<T> {
 		int select( List<T> list );
 	}
@@ -72,6 +76,10 @@ public interface BoofLambdas {
 
 	@FunctionalInterface interface ProcessIndex<T> {
 		void process( int index, T object );
+	}
+
+	@FunctionalInterface interface ProcessIndex2<A,B> {
+		void process( int index, A objectA, B objectB );
 	}
 
 	@FunctionalInterface interface IndexToString {
