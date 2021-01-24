@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,41 +18,39 @@
 
 package boofcv.io.image;
 
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestLookUpImagesByIndex extends BoofStandardJUnit {
-	List<GrayU8> images = new ArrayList<>();
-
-	public TestLookUpImagesByIndex() {
-		for (int i = 0; i < 4; i++) {
-			images.add(new GrayU8(10+i,5));
-		}
-	}
-
+/**
+ * @author Peter Abeles
+ */
+public class TestLookUpImageFilesByPath extends BoofStandardJUnit {
 	@Test void loadShape() {
-		var alg = new LookUpImagesByIndex<>(images);
-		var found = new ImageDimension();
-		for (int i = 0; i < 4; i++) {
-			alg.loadShape(""+i,found);
-			assertEquals(10+i,found.width);
-			assertEquals(5,found.height);
-		}
+		var alg = new DummyLookupFileByPath();
+		var dimension = new ImageDimension();
+		assertTrue(alg.loadShape("1", dimension));
+
+		assertEquals(10, dimension.width);
+		assertEquals(15, dimension.height);
 	}
 
 	@Test void loadImage() {
-		var found = new GrayF32(0,0);
-		var alg = new LookUpImagesByIndex<>(images);
-		alg.loadImage("1",found);
-		assertEquals(11,found.width);
-		assertEquals(5,found.height);
+		var alg = new DummyLookupFileByPath();
+		var image = new GrayU8(1, 1);
+		assertTrue(alg.loadImage("1", image));
+
+		assertEquals(10, image.width);
+		assertEquals(15, image.height);
+	}
+
+	private static class DummyLookupFileByPath extends LookUpImageFilesByPath {
+		public DummyLookupFileByPath() {
+			super((path,out)-> out.reshape(10,15));
+		}
 	}
 }

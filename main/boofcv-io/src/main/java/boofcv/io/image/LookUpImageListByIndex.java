@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,13 +32,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class LookUpImagesByIndex<Image extends ImageBase<Image>> implements LookUpImages {
+public class LookUpImageListByIndex<Image extends ImageBase<Image>> implements LookUpImages {
 	List<Image> images;
 
 	/** Function for converting images from the input to output type */
 	@Setter ConvertImage<Image> convert = GConvertImage::convert;
 
-	public LookUpImagesByIndex( List<Image> images ) {
+	public LookUpImageListByIndex( List<Image> images ) {
 		BoofMiscOps.checkTrue(images.size() > 0);
 		this.images = images;
 	}
