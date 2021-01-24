@@ -25,38 +25,29 @@ import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 import static boofcv.misc.BoofMiscOps.checkEq;
 
 /**
- * Implementation of {@link LookUpImages} that converts the name into an integer. The integer represents the index
- * of the image in the list of paths provided. It's assumed that all images have the same shape and the first image
- * is loaded to get the shape.
+ * The image ID or name is assumed to the path to the image
  *
  * @author Peter Abeles
  */
-public class LookUpImageFilesByIndex implements LookUpImages {
-	@Getter final List<String> paths;
+public class LookUpImageFilesByPath implements LookUpImages {
 	final ImageDimension dimension = new ImageDimension(-1,-1);
-	@Getter @Setter LoadImage loader;
+	@Getter @Setter LookUpImageFilesByIndex.LoadImage loader;
 
-	public LookUpImageFilesByIndex( List<String> paths ) {
-		this(paths, (path,output)-> UtilImageIO.loadImage(path, true, output));
-	}
-	public LookUpImageFilesByIndex( List<String> paths , LoadImage loader) {
-		this.paths = paths;
+	public LookUpImageFilesByPath( LookUpImageFilesByIndex.LoadImage loader ) {
 		this.loader = loader;
 	}
 
-	@Override public boolean loadShape( String name, ImageDimension shape ) {
-		int index = Integer.parseInt(name);
-		if (index < 0 || index >= paths.size())
-			return false;
+	public LookUpImageFilesByPath() {
+		this((path,output)-> UtilImageIO.loadImage(path, true, output));
+	}
 
+	@Override public boolean loadShape( String path, ImageDimension shape ) {
 		if (dimension.height==-1) {
 			var gray = new GrayU8(1, 1);
-			loader.load(paths.get(0), gray);
+			loader.load(path, gray);
 			dimension.width = gray.getWidth();
 			dimension.height = gray.getHeight();
 		}
@@ -65,12 +56,8 @@ public class LookUpImageFilesByIndex implements LookUpImages {
 		return true;
 	}
 
-	@Override public <LT extends ImageBase<LT>> boolean loadImage( String name, LT output ) {
-		int index = Integer.parseInt(name);
-		if (index < 0 || index >= paths.size())
-			return false;
-
-		loader.load(paths.get(index), output);
+	@Override public <LT extends ImageBase<LT>> boolean loadImage( String path, LT output ) {
+		loader.load(path, output);
 
 		// Validate the assumption that all images are the same size. if this is false then loadShape() is giving
 		// incorrect results
@@ -81,10 +68,5 @@ public class LookUpImageFilesByIndex implements LookUpImages {
 			checkEq(dimension.height, output.height);
 		}
 		return true;
-	}
-
-	@FunctionalInterface
-	public interface LoadImage {
-		void load( String path, ImageBase output);
 	}
 }

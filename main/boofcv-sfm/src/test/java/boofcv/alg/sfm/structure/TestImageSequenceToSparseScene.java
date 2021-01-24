@@ -22,7 +22,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.factory.sfm.ConfigSequenceToSparseScene;
 import boofcv.factory.sfm.FactorySceneReconstruction;
-import boofcv.io.image.LookUpImagesByIndex;
+import boofcv.io.image.LookUpImageListByIndex;
 import boofcv.misc.BoofMiscOps;
 import boofcv.simulation.PointTrackerPerfectCloud;
 import boofcv.struct.calib.CameraPinhole;
@@ -72,7 +72,7 @@ class TestImageSequenceToSparseScene extends BoofStandardJUnit {
 			frames.add(new GrayF32(width, height));
 		}
 
-		var lookup = new LookUpImagesByIndex<>(frames);
+		var lookup = new LookUpImageListByIndex<>(frames);
 		List<String> imageIDs = new ArrayList<>();
 		for (int i = 0; i < frames.size(); i++) {
 			imageIDs.add(i + "");
