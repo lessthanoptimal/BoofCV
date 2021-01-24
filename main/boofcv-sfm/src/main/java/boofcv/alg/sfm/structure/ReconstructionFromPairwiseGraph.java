@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -209,6 +209,10 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		// ignore nodes with too low of a score
 		double minScore = candidates.get(candidates.size() - 1).score*0.2;
 
+		if (verbose!=null) {
+			verbose.printf("SelectSeeds: candidates.size=%d minScore=%.2f\n",candidates.size,minScore);
+		}
+
 		// Collect summary information on rejections
 		int rejectedNeighbor = 0;
 		int rejectedScore = 0;
@@ -224,9 +228,9 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 				continue;
 			}
 
-			// All scores for now on will be below the minimum
+			// All scores for now on will be below the minimum since they are sorted
 			if (s.score <= minScore) {
-				rejectedScore++;
+				rejectedScore = i+1;
 				break;
 			}
 
@@ -252,7 +256,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		}
 
 		if (verbose!=null)
-			verbose.printf("Seed Rejections: neighbor=%3d score=%3d close=%d\n",
+			verbose.printf("Seed Rejections: neighbor=%3d score=%3d close=%3d\n",
 					rejectedNeighbor,rejectedScore,rejectedClose);
 
 

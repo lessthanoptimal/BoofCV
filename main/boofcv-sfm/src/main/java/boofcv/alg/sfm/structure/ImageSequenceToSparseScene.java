@@ -25,6 +25,8 @@ import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.misc.LookUpImages;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +53,8 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	@Getter MetricFromUncalibratedPairwiseGraph metricFromPairwise;
 	/** Refines the metric reconstruction */
 	@Getter RefineMetricWorkingGraph refineScene;
+	/** Lookup table from input image Id into the scene view index */
+	@Getter TObjectIntMap<String> imageIdToSceneViewIdx = new TObjectIntHashMap<>();
 
 	/** Maximum image pixels before it down samples */
 	public int maxImagePixels = 800*600;
@@ -101,6 +105,8 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 		timeMetricMS = 0;
 		timeRefineMS = 0;
 
+		imageIdToSceneViewIdx.clear();
+
 		long time0 = System.nanoTime();
 		// Load images and feed into feature tracker
 		for (int indexIDs = 0; indexIDs < imageIDs.size(); indexIDs++) {
@@ -130,6 +136,14 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 			return false;
 		}
 		long time3 = System.nanoTime();
+
+		// Order of views in this graph is the same as the views in the SBA scene
+		// Since the image name is lost in the tracker it's referred to by frame number
+		SceneWorkingGraph graph = metricFromPairwise.workGraph;
+		for (int sbaIdx = 0; sbaIdx < graph.viewList.size(); sbaIdx++) {
+			int imageIdx = Integer.parseInt(graph.viewList.get(sbaIdx).pview.id);
+			imageIdToSceneViewIdx.put(imageIDs.get(imageIdx), sbaIdx);
+		}
 
 		// Refine the entire scene all at once to get a better estimate
 		if (!refineScene.process(trackerSimilar, metricFromPairwise.getWorkGraph())) {

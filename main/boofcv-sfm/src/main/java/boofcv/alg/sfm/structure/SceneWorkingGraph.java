@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,11 +23,14 @@ import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
+import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -166,6 +169,23 @@ public class SceneWorkingGraph {
 	}
 
 	/**
+	 * Convenience function to get a mapping of view ID to index.
+	 *
+	 * @param storage (Output) Optional storage for output.
+	 * @return Map from view ID to view index
+	 */
+	public TObjectIntMap<String> lookupUsedViewIds( @Nullable TObjectIntMap<String> storage ) {
+		if (storage == null)
+			storage = new TObjectIntHashMap<>();
+
+		for (int i = 0; i < viewList.size(); i++) {
+			storage.put(viewList.get(i).pview.id, i);
+		}
+
+		return storage;
+	}
+
+	/**
 	 * Data structure related to an image. Points to image features, intrinsic parameters, and extrinsic parameters.
 	 */
 	static public class View {
@@ -187,7 +207,7 @@ public class SceneWorkingGraph {
 		public final ImageDimension imageDimension = new ImageDimension();
 
 		// Index of the view in the list. This will be the same index in the SBA scene
-		public int index=-1;
+		public int index = -1;
 
 		/**
 		 * Given the observation index return the feature associated with it. Return null if there are none

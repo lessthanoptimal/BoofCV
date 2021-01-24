@@ -50,19 +50,20 @@ public class ConfigSequenceToSparseScene implements Configuration {
 	{
 		// Give the tracker reasonable default parameters for this application
 		int radius = 5;
-		var configTracker = new ConfigPointTracker();
-		configTracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
-		configTracker.klt.pruneClose = true;
-		configTracker.klt.toleranceFB = 2;
-		configTracker.klt.templateRadius = radius;
-		configTracker.klt.maximumTracks.setFixed(800);
-		configTracker.klt.config.maxIterations = 30;
-		configTracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
-		configTracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
-		configTracker.detDesc.detectPoint.shiTomasi.radius = 6;
-		configTracker.detDesc.detectPoint.general.radius = 4;
-//		configTracker.detDesc.detectPoint.general.threshold = 0;
-		configTracker.detDesc.detectPoint.general.selector = ConfigSelectLimit.selectUniform(2.0);
+		tracker.typeTracker = ConfigPointTracker.TrackerType.KLT;
+		tracker.klt.pruneClose = true;
+		tracker.klt.toleranceFB = 2;
+		tracker.klt.templateRadius = radius;
+		tracker.klt.maximumTracks.setFixed(800);
+		tracker.klt.config.maxIterations = 30;
+		tracker.detDesc.typeDetector = ConfigDetectInterestPoint.DetectorType.POINT;
+		tracker.detDesc.detectPoint.type = PointDetectorTypes.SHI_TOMASI;
+		tracker.detDesc.detectPoint.shiTomasi.radius = 6;
+		tracker.detDesc.detectPoint.general.radius = 4;
+//		tracker.detDesc.detectPoint.general.threshold = 0;
+		tracker.detDesc.detectPoint.general.selector = ConfigSelectLimit.selectUniform(2.0);
+
+		bundleAdjustment.keepFraction = 0.95;
 	}
 
 	@Override public void checkValidity() {

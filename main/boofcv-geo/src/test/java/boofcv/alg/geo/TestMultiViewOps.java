@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,8 +113,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Check the trifocal tensor using its definition
 	 */
-	@Test
-	void createTrifocal_CameraMatrix2() {
+	@Test void createTrifocal_CameraMatrix2() {
 		TrifocalTensor found = MultiViewOps.createTrifocal(P2, P3, null);
 
 		List<Point3D_F64> points = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2), -1, 1, -1, -1, -0.1, 0.1, 20, rand);
@@ -150,8 +149,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Check using trifocal constraint
 	 */
-	@Test
-	void createTrifocal_CameraMatrix3() {
+	@Test void createTrifocal_CameraMatrix3() {
 		DMatrixRMaj P1 = PerspectiveOps.createCameraMatrix(worldToCam1.R, worldToCam1.T, K, null);
 		TrifocalTensor found = MultiViewOps.createTrifocal(P1, P2, P3, null);
 
@@ -178,8 +176,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Check the trifocal tensor using its definition
 	 */
-	@Test
-	void createTrifocal_SE() {
+	@Test void createTrifocal_SE() {
 
 		TrifocalTensor found = MultiViewOps.createTrifocal(worldToCam2, worldToCam3, null);
 
@@ -206,8 +203,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void constraint_Trifocal_lll() {
+	@Test void constraint_Trifocal_lll() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -219,8 +215,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, found.z, 1e-12);
 	}
 
-	@Test
-	void constraint_Trifocal_pll() {
+	@Test void constraint_Trifocal_pll() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -234,8 +229,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, found, 1e-12);
 	}
 
-	@Test
-	void constraint_Trifocal_plp() {
+	@Test void constraint_Trifocal_plp() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -252,8 +246,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, found.z, 1e-12);
 	}
 
-	@Test
-	void constraint_Trifocal_ppl() {
+	@Test void constraint_Trifocal_ppl() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -270,8 +263,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, found.z, 1e-12);
 	}
 
-	@Test
-	void constraint_Trifocal_ppp() {
+	@Test void constraint_Trifocal_ppp() {
 		// Point in 3D space being observed
 		Point3D_F64 X = new Point3D_F64(0.1, 0.5, 3);
 
@@ -291,8 +283,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void constraint_epipolar() {
+	@Test void constraint_epipolar() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(), K, X, null);
@@ -304,8 +295,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, MultiViewOps.constraint(F, p1, p2), 1e-8);
 	}
 
-	@Test
-	void constraint_homography() {
+	@Test void constraint_homography() {
 
 		double d = 2;
 		Vector3D_F64 N = new Vector3D_F64(0, 0, 1);
@@ -323,8 +313,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(p2.y, found.y, 1e-8);
 	}
 
-	@Test
-	void inducedHomography13() {
+	@Test void inducedHomography13() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -344,8 +333,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(p3.y, found.y, 1e-8);
 	}
 
-	@Test
-	void inducedHomography12() {
+	@Test void inducedHomography12() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -365,8 +353,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(p2.y, found.y, 1e-8);
 	}
 
-	@Test
-	void homographyStereo3Pts() {
+	@Test void homographyStereo3Pts() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		DMatrixRMaj H = MultiViewOps.homographyStereo3Pts(common.F, common.p1, common.p2, common.p3);
@@ -374,8 +361,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		common.checkHomography(H);
 	}
 
-	@Test
-	void homographyStereoLinePt() {
+	@Test void homographyStereoLinePt() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1, common.p2);
@@ -385,8 +371,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		common.checkHomography(H);
 	}
 
-	@Test
-	void homographyStereo2Lines() {
+	@Test void homographyStereo2Lines() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1, common.p2);
@@ -427,8 +412,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		return norm;
 	}
 
-	@Test
-	void extractEpipoles_threeview() {
+	@Test void extractEpipoles_threeview() {
 		Point3D_F64 found2 = new Point3D_F64();
 		Point3D_F64 found3 = new Point3D_F64();
 
@@ -450,8 +434,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, space.norm(), 1e-8);
 	}
 
-	@Test
-	void extractFundamental_threeview() {
+	@Test void extractFundamental_threeview() {
 		DMatrixRMaj found2 = new DMatrixRMaj(3, 3);
 		DMatrixRMaj found3 = new DMatrixRMaj(3, 3);
 
@@ -476,8 +459,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, MultiViewOps.constraint(found3, x1, x3), 1e-8);
 	}
 
-	@Test
-	void extractCameraMatrices() {
+	@Test void extractCameraMatrices() {
 		DMatrixRMaj P2 = new DMatrixRMaj(3, 4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3, 4);
 
@@ -506,8 +488,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void createEssential() {
+	@Test void createEssential() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.04, 0.1, null);
 		Vector3D_F64 T = new Vector3D_F64(2, 1, -3);
 		T.normalize();
@@ -524,8 +505,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, val, 1e-8);
 	}
 
-	@Test
-	void computeFundamental() {
+	@Test void computeFundamental() {
 		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
@@ -536,8 +516,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, MultiViewOps.constraint(F, p1, p2), 1e-8);
 	}
 
-	@Test
-	void computeFundamental2() {
+	@Test void computeFundamental2() {
 		DMatrixRMaj K2 = new DMatrixRMaj(3, 3, true, 80, 0.02, 190, 0, 30, 170, 0, 0, 1);
 
 		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T, null);
@@ -550,8 +529,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(0, MultiViewOps.constraint(F, p1, p2), 1e-8);
 	}
 
-	@Test
-	void createHomography_calibrated() {
+	@Test void createHomography_calibrated() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.01, 0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1, 1, 0.1);
 		T.normalize();
@@ -573,8 +551,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x1.y, found.y, 1e-8);
 	}
 
-	@Test
-	void createHomography_uncalibrated() {
+	@Test void createHomography_uncalibrated() {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 0.1, 0.001, 200, 0, 0.2, 250, 0, 0, 1);
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.01, 0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1, 1, 0.1);
@@ -599,8 +576,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x1.y, found.y, 1e-8);
 	}
 
-	@Test
-	void extractEpipoles_stereo() {
+	@Test void extractEpipoles_stereo() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(400, 400, 0.1, 410, 399);
 		for (int i = 0; i < 100; i++) {
 			double rotX = rand.nextGaussian();
@@ -636,8 +612,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void fundamentalToProjective_Two() {
+	@Test void fundamentalToProjective_Two() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5, 0.7, -0.3, EulerType.XYZ, 1, 2, -0.5, null);
 
@@ -669,8 +644,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(F, foundF, 1e-8));
 	}
 
-	@Test
-	void projectiveToFundamental_Two() {
+	@Test void projectiveToFundamental_Two() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
 		Se3_F64 M11 = new Se3_F64();
 		Se3_F64 M12 = SpecialEuclideanOps_F64.eulerXyz(-1, 0, -0.2, EulerType.XYZ, 0, -.2, 0, null);
@@ -692,8 +666,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void projectiveToFundamental_One() {
+	@Test void projectiveToFundamental_One() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
 		Se3_F64 M11 = new Se3_F64();
 		Se3_F64 M12 = SpecialEuclideanOps_F64.eulerXyz(-1, 0, -0.2, EulerType.XYZ, 0, -.2, 0, null);
@@ -716,8 +689,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(F21_expected, F21, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void fundamentalToEssential_one() {
+	@Test void fundamentalToEssential_one() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 
 		for (int i = 0; i < 50; i++) {
@@ -742,8 +714,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void fundamentalToEssential_two() {
+	@Test void fundamentalToEssential_two() {
 		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		DMatrixRMaj K2 = PerspectiveOps.pinholeToMatrix(250, 310, 0.5, 120, 200);
 
@@ -769,8 +740,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void fundamentalToProjective_Three() {
+	@Test void fundamentalToProjective_Three() {
 		// carefully constructed transforms to ensure that the three views are not colinear
 		// and have reasonable epipoles.
 		// needing to be this careful highlights why the trifocal tensor is a better choice...
@@ -801,8 +771,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(F32, foundF32, UtilEjml.TEST_F64_SQ));
 	}
 
-	@Test
-	void projectiveToIdentityH() {
+	@Test void projectiveToIdentityH() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5, 0.7, -0.3, EulerType.XYZ, 1, 2, -0.5, null);
 		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(T.R, T.T, K, null);
@@ -819,8 +788,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentity(found, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void fundamentalCompatible3() {
+	@Test void fundamentalCompatible3() {
 		// carefully constructed transforms to ensure that the three views are not colinear
 		// and have reasonable epipoles
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
@@ -849,8 +817,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertFalse(MultiViewOps.fundamentalCompatible3(F21, F31, F32, 1e-12));
 	}
 
-	@Test
-	void decomposeMetricCamera() {
+	@Test void decomposeMetricCamera() {
 		// compute an arbitrary projection matrix from known values
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 
@@ -887,8 +854,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void decomposeEssential() {
+	@Test void decomposeEssential() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 1, 2, -0.5, null);
 		Vector3D_F64 T = new Vector3D_F64(0.5, 0.7, -0.3);
 
@@ -920,8 +886,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(1, numMatched);
 	}
 
-	@Test
-	void decomposeHomography() {
+	@Test void decomposeHomography() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.2, -0.06, -0.05, null);
 		Vector3D_F64 T = new Vector3D_F64(2, 1, -3);
 
@@ -946,8 +911,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		TestDecomposeHomography.checkHasOriginal(solutionsSE, solutionsN, R, T, d, N);
 	}
 
-	@Test
-	void transfer13_PL() {
+	@Test void transfer13_PL() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -966,8 +930,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x3.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void transfer13_PP() {
+	@Test void transfer13_PP() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
@@ -985,8 +948,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x2.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void transfer12_PL() {
+	@Test void transfer12_PL() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		computeLines(X, line1, line2, line3);
@@ -1005,8 +967,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x2.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void transfer12_PP() {
+	@Test void transfer12_PP() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
@@ -1024,8 +985,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(x3.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void projectiveToMetric() {
+	@Test void projectiveToMetric() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		DMatrixRMaj foundK = new DMatrixRMaj(3, 3);
 		for (int i = 0; i < 50; i++) {
@@ -1057,8 +1017,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void projectiveToMetricKnownK() {
+	@Test void projectiveToMetricKnownK() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		for (int i = 0; i < 50; i++) {
 			double Tx = rand.nextGaussian();
@@ -1091,8 +1050,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Give it a valid Q but have the sign be inverted
 	 */
-	@Test
-	void enforceAbsoluteQuadraticConstraints_negative() {
+	@Test void enforceAbsoluteQuadraticConstraints_negative() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1116,8 +1074,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Give it a valid Q but request that zeros be constrained
 	 */
-	@Test
-	void enforceAbsoluteQuadraticConstraints_zeros() {
+	@Test void enforceAbsoluteQuadraticConstraints_zeros() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1141,8 +1098,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isIdentical(Q, Q_in, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void decomposeAbsDualQuadratic() {
+	@Test void decomposeAbsDualQuadratic() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("w=K*K'");
@@ -1165,8 +1121,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isIdentical(eq.lookupDDRM("p"), p, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void absoluteQuadraticToH() {
+	@Test void absoluteQuadraticToH() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1185,8 +1140,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isIdentical(H, foundH, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void rectifyHToAbsoluteQuadratic() {
+	@Test void rectifyHToAbsoluteQuadratic() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1204,8 +1158,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isIdentical(Q, foundQ, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void intrinsicFromAbsoluteQuadratic() {
+	@Test void intrinsicFromAbsoluteQuadratic() {
 		Equation eq = new Equation();
 		eq.process("K1=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("K2=[310 1 75;0 310 60; 0 0 1]");
@@ -1229,8 +1182,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(1, intrinsic.skew, 1e-6);
 	}
 
-	@Test
-	void decomposeDiac() {
+	@Test void decomposeDiac() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("w=1.5*K*K'");
@@ -1247,8 +1199,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(1, intrinsic.skew);
 	}
 
-	@Test
-	void split2() {
+	@Test void split2() {
 		List<AssociatedPair> triples = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
 			triples.add(new AssociatedPair());
@@ -1266,8 +1217,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void split3() {
+	@Test void split3() {
 		List<AssociatedTriple> triples = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
 			triples.add(new AssociatedTriple());
@@ -1290,8 +1240,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 	/**
 	 * Construct a scene with perfect observations. See if triangulation returns the same points
 	 */
-	@Test
-	void triangulatePoints() {
+	@Test void triangulatePoints() {
 		CameraPinhole intrinsic = new CameraPinhole(500, 500, 0, 500, 500, 1000, 1000);
 
 		List<Point3D_F64> points = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2), -0.5, 0.5, 100, rand);
@@ -1332,8 +1281,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void findScale() {
+	@Test void findScale() {
 		double expected = -1.8;
 		DMatrixRMaj a = RandomMatrices_DDRM.rectangleGaussian(5, 5, 0, 2, rand);
 		DMatrixRMaj b = a.copy();
@@ -1343,8 +1291,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(expected, found, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void splits3Lists() {
+	@Test void splits3Lists() {
 		DogArray<AssociatedTriple> triples = new DogArray<>(AssociatedTriple::new);
 		for (int i = 0; i < 8; i++) {
 			triples.grow().setTo(
@@ -1373,8 +1320,7 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void convertTr_pair() {
+	@Test void convertTr_pair() {
 		var triples = new DogArray<>(AssociatedTriple::new);
 		for (int i = 0; i < 8; i++) {
 			triples.grow().setTo(
@@ -1395,5 +1341,12 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		assertEquals(triples.size, found.size);
 		triples.forIdx((i,t)-> assertEquals(0.0,t.p3.distance(found.get(i).p1), UtilEjml.TEST_F64));
 		triples.forIdx((i,t)-> assertEquals(0.0,t.p2.distance(found.get(i).p2), UtilEjml.TEST_F64));
+	}
+
+	@Test void scenePointsToPixels() {
+		var scene = new SceneStructureMetric(false);
+		scene.initialize(2,3,10);
+
+		fail("Implement");
 	}
 }
