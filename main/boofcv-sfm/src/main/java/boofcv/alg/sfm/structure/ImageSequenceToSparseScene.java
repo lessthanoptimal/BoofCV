@@ -117,6 +117,7 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 			T image = AverageDownSampleOps.downMaxPixels(imageFull, imageDown, maxImagePixels);
 
 			if (indexIDs == 0) {
+				tracker.reset();
 				trackerSimilar.initialize(image.width, image.height);
 			}
 
