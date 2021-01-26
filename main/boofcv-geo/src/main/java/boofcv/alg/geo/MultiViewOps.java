@@ -1852,7 +1852,7 @@ public class MultiViewOps {
 	 * Projects points in the scene onto the specified image. Results are returned using a lambda that provides
 	 * the points index, the point's 3D location in the camera frame, and the projected pixels.
 	 *
-	 * No checks are done for th following:
+	 * No checks are done for the following:
 	 * <ul>
 	 *     <li>Was the feature observed by this view</li>
 	 *     <li>Does the feature appear behind the camera</li>
@@ -1864,11 +1864,11 @@ public class MultiViewOps {
 	 * @param function (Output) Called with results (index, 3D camera location, pixel)
 	 */
 	public static void scenePointsToPixels( SceneStructureMetric scene, int viewIdx,
-											BoofLambdas.ProcessIndex2<Point3D_F64,Point2D_F64> function ) {
+											BoofLambdas.ProcessIndex2<Point3D_F64, Point2D_F64> function ) {
 		Se3_F64 world_to_view = new Se3_F64();
 
 		SceneStructureMetric.View view = scene.views.get(viewIdx);
-		scene.getWorldToView(view,world_to_view,null);
+		scene.getWorldToView(view, world_to_view, null);
 		BundleAdjustmentCamera camera = Objects.requireNonNull(scene.getViewCamera(view).model);
 
 		Point3D_F64 camPoint = new Point3D_F64();
@@ -1882,9 +1882,74 @@ public class MultiViewOps {
 			double w = scene.isHomogenous() ? point.coordinate[3] : 1.0;
 
 			// Project the pixel while being careful for points at infinity
-			SePointOps_F64.transformV(world_to_view, x,y,z,w, camPoint);
+			SePointOps_F64.transformV(world_to_view, x, y, z, w, camPoint);
 			camera.project(camPoint.x, camPoint.y, camPoint.z, pixel);
 			function.process(pointIdx, camPoint, pixel);
+		}
+	}
+
+	/**
+	 * Converts the points in the scene into a 3D point cloud. A lambda is used pass in the results. This function
+	 * will work if it's homogenous or 3D coordinates.
+	 *
+	 * @param scene (Input) The scene
+	 * @param tol (Input) Only used if the scene is in homogenous coordinates.
+	 * Tolerance for points being at infinity. Smaller values means more tolerant. Try 1e-8.
+	 * @param func (Output) Results are passed in to this function with their index and 3D point.
+	 */
+	public static void sceneToCloud3( SceneStructureMetric scene, double tol,
+									  BoofLambdas.ProcessIndex<Point3D_F64> func ) {
+
+		Point3D_F64 out = new Point3D_F64();
+
+		final boolean homogenous = scene.isHomogenous();
+
+		for (int pointIdx = 0; pointIdx < scene.points.size; pointIdx++) {
+			SceneStructureCommon.Point point = scene.points.get(pointIdx);
+			double x = point.coordinate[0];
+			double y = point.coordinate[1];
+			double z = point.coordinate[2];
+
+			if (homogenous) {
+				double r = Math.sqrt(x*x + y*y + z*z);
+				double w = point.coordinate[3];
+
+				// Make sure the point isn't at infinity
+				if (r*tol > Math.abs(w)) {
+					continue;
+				}
+
+				x /= w;
+				y /= w;
+				z /= w;
+			}
+
+			out.setTo(x, y, z);
+			func.process(pointIdx, out);
+		}
+	}
+
+	/**
+	 * Converts the points in the scene into a homogenous point cloud. Results are passed in to the lambda.
+	 * It will work with a scene in homogenous or 3D coordinates.
+	 *
+	 * @param scene (Input) The scene
+	 * @param func (Output) Results are passed in to this function with their index and 3D point.
+	 */
+	public static void sceneToCloudH( SceneStructureMetric scene, BoofLambdas.ProcessIndex<Point4D_F64> func ) {
+
+		Point4D_F64 out = new Point4D_F64();
+
+		final boolean homogenous = scene.isHomogenous();
+
+		for (int pointIdx = 0; pointIdx < scene.points.size; pointIdx++) {
+			SceneStructureCommon.Point point = scene.points.get(pointIdx);
+			double x = point.coordinate[0];
+			double y = point.coordinate[1];
+			double z = point.coordinate[2];
+			double w = homogenous ? point.coordinate[3] : 1.0;
+			out.setTo(x, y, z, w);
+			func.process(pointIdx, out);
 		}
 	}
 }

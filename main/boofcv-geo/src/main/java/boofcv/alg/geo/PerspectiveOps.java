@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1020,5 +1020,18 @@ public class PerspectiveOps {
 	 */
 	public static double distance( Point4D_F64 a, Point4D_F64 b ) {
 		return ImplPerspectiveOps_F64.distance(a, b);
+	}
+
+	/**
+	 * Returns the Euclidean distance between a 3D point a point homogenous coordinates. If the homogenous point
+	 * is at infinity, within tolererance, then {@link Double#POSITIVE_INFINITY} is returned.
+	 *
+	 * @param a (Input) 3D point
+	 * @param b (Input) Homogenous point
+	 * @param tol (Input) Tolerance for point being at infinity. Closer to zero means more strict. Try 1e-8
+	 * @return Euclidean distance
+	 */
+	public static double distance3DvsH( Point3D_F64 a, Point4D_F64 b, double tol ) {
+		return ImplPerspectiveOps_F64.distance3DvsH(a,b,tol);
 	}
 }
