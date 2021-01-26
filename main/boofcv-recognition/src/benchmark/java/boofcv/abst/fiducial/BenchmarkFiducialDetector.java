@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,26 +22,50 @@ import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.UtilIO;
-import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 3)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkFiducialDetector<T extends ImageGray<T>> {
 
-	FiducialDetector<T> detector;
+	Class<T> imageType = (Class)GrayU8.class;
+
 	List<T> images = new ArrayList<>();
 
-	public BenchmarkFiducialDetector(FiducialDetector<T> detector) {
-		this.detector = detector;
+	int numIterations = 5;
+
+	FiducialDetector<T> detector = FactoryFiducial.squareBinary(
+			new ConfigFiducialBinary(0.2), ConfigThreshold.fixed(100) , imageType);
+
+	@Setup public void setup() {
+		String directory = UtilIO.pathExample("fiducial/binary");
+		addImage(directory + "/image0000.jpg");
+		addImage(directory + "/image0001.jpg");
+		addImage(directory + "/image0002.jpg");
+	}
+
+	@Benchmark public void SquareBinary() {
+		for (int i = 0; i < numIterations; i++) {
+			for (int j = 0; j < images.size(); j++) {
+				detector.detect(images.get(j));
+			}
+		}
 	}
 
 	public void addImage( String path ) {
@@ -51,42 +75,13 @@ public class BenchmarkFiducialDetector<T extends ImageGray<T>> {
 		images.add(image);
 	}
 
-	public double benchmark( int numIterations ) {
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkFiducialDetector.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		long before = System.nanoTime();
-		for (int i = 0; i < numIterations; i++) {
-			for (int j = 0; j < images.size(); j++) {
-				detector.detect(images.get(j));
-			}
-		}
-		long after = System.nanoTime();
-		double seconds = (after-before)/1e9;
-		return (numIterations*images.size())/seconds;
-	}
-
-	private static void perform(String directory, FiducialDetector detector) {
-		CameraPinholeBrown intrinsic = CalibrationIO.load(new File(directory , "intrinsic.yaml"));
-
-//		intrinsic.radial = null;
-//		intrinsic.t1 = intrinsic.t2 = 0;
-
-		BenchmarkFiducialDetector benchmark = new BenchmarkFiducialDetector(detector);
-		benchmark.addImage(directory + "image0000.jpg");
-		benchmark.addImage(directory + "image0001.jpg");
-		benchmark.addImage(directory + "image0002.jpg");
-
-		System.out.println("FPS = "+benchmark.benchmark(600));
-	}
-
-	public static void main(String[] args) {
-		String directory = UtilIO.pathExample("fiducial/binary/");
-
-		FiducialDetector detector = FactoryFiducial.squareBinary(
-				new ConfigFiducialBinary(0.2), ConfigThreshold.fixed(100) , GrayU8.class);
-		perform(directory, detector);
-
-//		detector = FactoryFiducial.
-//				squareBinaryRobust(new ConfigFiducialBinary(0.2), 6, GrayU8.class);
-//		perform(directory, detector);
+		new Runner(opt).run();
 	}
 }
