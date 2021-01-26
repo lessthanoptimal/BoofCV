@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,56 +22,59 @@ import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayF32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 3)
+@State(Scope.Benchmark)
+@Fork(value = 1)
 public class BenchmarkCalibrationDetectors {
-
-	public static final int TEST_TIME = 1000;
 
 	public static GrayF32 imageChess;
 	public static GrayF32 imageSquare;
 
-	public static class ChessboardBinary extends PerformerBase {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
-				chessboardB((ConfigChessboardBinary)null,new ConfigGridDimen(7, 5, 30));
+	DetectorFiducialCalibration chessboardB = FactoryFiducialCalibration.
+			chessboardB((ConfigChessboardBinary)null,new ConfigGridDimen(7, 5, 30));
+	DetectorFiducialCalibration chessboardX = FactoryFiducialCalibration.
+			chessboardX(null,new ConfigGridDimen(7, 5, 30));
+	DetectorFiducialCalibration squareGrid = FactoryFiducialCalibration.
+			squareGrid(new ConfigSquareGrid(),new ConfigGridDimen(4, 3, 30, 30));
 
-		@Override
-		public void process() {
-			if( !detector.process(imageChess) )
-				throw new RuntimeException("Can't find target!");
-		}
+	@Setup public void setup() {
+		String chess = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left01.jpg");
+		String square = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square/left01.jpg");
+
+		imageChess = loadImage(chess);
+		imageSquare = loadImage(square);
 	}
 
-	public static class ChessboardXCorner extends PerformerBase {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
-				chessboardX(null,new ConfigGridDimen(7, 5, 30));
-
-		@Override
-		public void process() {
-			if( !detector.process(imageChess) )
-				throw new RuntimeException("Can't find target!");
-		}
+	@Benchmark public void ChessboardBinary() {
+		if( !chessboardB.process(imageChess) )
+			throw new RuntimeException("Can't find target!");
 	}
 
-	public static class Square extends PerformerBase {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
-				squareGrid(new ConfigSquareGrid(),new ConfigGridDimen(4, 3, 30, 30));
+	@Benchmark public void ChessboardXCorner() {
+		if( !chessboardX.process(imageChess) )
+			throw new RuntimeException("Can't find target!");
+	}
 
-		@Override
-		public void process() {
-			if( !detector.process(imageSquare) )
-				throw new RuntimeException("Can't find target!");
-		}
+	@Benchmark public void Square() {
+		if( !squareGrid.process(imageSquare) )
+			throw new RuntimeException("Can't find target!");
 	}
 
 	public static GrayF32 loadImage(String fileName) {
@@ -85,15 +88,13 @@ public class BenchmarkCalibrationDetectors {
 		return ConvertBufferedImage.convertFrom(img, (GrayF32) null);
 	}
 
-	public static void main(String[] args) {
-		String chess = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left01.jpg");
-		String square = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square/left01.jpg");
+	public static void main( String[] args ) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkCalibrationDetectors.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
+				.build();
 
-		imageChess = loadImage(chess);
-		imageSquare = loadImage(square);
-
-		ProfileOperation.printOpsPerSec(new ChessboardBinary(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new ChessboardXCorner(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Square(), TEST_TIME);
+		new Runner(opt).run();
 	}
 }
