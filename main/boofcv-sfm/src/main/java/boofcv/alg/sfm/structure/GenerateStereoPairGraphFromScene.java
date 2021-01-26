@@ -273,7 +273,6 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 			if (idxA == -1)
 				return;
 
-			double angle = viewA.pointing.get(idxA).acute(viewB.pointing.get(idxB));
 			acuteAngles.add(viewA.pointing.get(idxA).acute(viewB.pointing.get(idxB)));
 		});
 	}
