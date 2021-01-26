@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -195,7 +195,7 @@ public class MultiViewIO {
 		return encoded;
 	}
 
-	private static Map<String, Object> encodeScenePoint( SceneStructureMetric.Point p ) {
+	private static Map<String, Object> encodeScenePoint( SceneStructureCommon.Point p ) {
 		Map<String, Object> encoded = new HashMap<>();
 		encoded.put("coordinate", p.coordinate);
 		encoded.put("views", p.views.toArray());
@@ -299,7 +299,6 @@ public class MultiViewIO {
 				scene = null;
 			if (scene == null)
 				scene = new SceneStructureMetric(homogenous);
-			final SceneStructureMetric _scene = scene; // for lambas
 			scene.initialize(
 					yamlCameras.size(), yamlViews.size(), yamlMotions.size(), yamlPoints.size(), yamlRigids.size());
 

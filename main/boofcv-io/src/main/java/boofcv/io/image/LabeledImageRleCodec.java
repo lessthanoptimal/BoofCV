@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Encodes a labeled image using Run Line Encoding (RLE) to reduce file size. This is a BoofCV format.
  */
@@ -41,9 +43,9 @@ public class LabeledImageRleCodec {
 	public static void encode( GrayS32 labeled, OutputStream writer, String... comments ) throws IOException {
 		int numLabels = ImageStatistics.max(labeled) + 1;
 		writer.write(String.format("LabeledRLE,w=%d,h=%d,labels=%d,format=txt,version=1\n",
-				labeled.width, labeled.height, numLabels).getBytes());
+				labeled.width, labeled.height, numLabels).getBytes(UTF_8));
 		for (String comment : comments) {
-			writer.write(("# " + comment + "\n").getBytes());
+			writer.write(("# " + comment + "\n").getBytes(UTF_8));
 		}
 		int value = labeled.get(0, 0);
 		int length = 0;
@@ -54,13 +56,13 @@ public class LabeledImageRleCodec {
 				if (v == value)
 					length++;
 				else {
-					writer.write((length + "," + value + "\n").getBytes());
+					writer.write((length + "," + value + "\n").getBytes(UTF_8));
 					value = v;
 					length = 1;
 				}
 			}
 		}
-		writer.write((length + "," + value + "\n").getBytes());
+		writer.write((length + "," + value + "\n").getBytes(UTF_8));
 	}
 
 	/**

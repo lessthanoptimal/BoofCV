@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * For reading and writing images which have been labeled with polygon regions. The image size and location of each
  * polygon in pixels is saved in a text format. The format does provide the potential for a binary format to be
@@ -49,9 +51,9 @@ public class LabeledImagePolygonCodec {
 	public static void encode( List<PolygonRegion> regions, int width, int height,
 							   OutputStream writer, String... comments ) throws IOException {
 		writer.write(String.format("LabeledPolygon,w=%d,h=%d,labels=%d,format=txt,version=1\n",
-				width, height, regions.size()).getBytes());
+				width, height, regions.size()).getBytes(UTF_8));
 		for (String comment : comments) {
-			writer.write(("# " + comment + "\n").getBytes());
+			writer.write(("# " + comment + "\n").getBytes(UTF_8));
 		}
 		for (PolygonRegion region : regions) {
 			String line = region.regionID + "," + region.polygon.size();
@@ -59,7 +61,7 @@ public class LabeledImagePolygonCodec {
 				Point2D_F64 p = region.polygon.get(i);
 				line += String.format(",%.17g,%.17g", p.x, p.y);
 			}
-			writer.write((line + "\n").getBytes());
+			writer.write((line + "\n").getBytes(UTF_8));
 		}
 	}
 
