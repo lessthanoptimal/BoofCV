@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,13 +57,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 class TestPerspectiveOps extends BoofStandardJUnit {
-
-	@Test
-	void approximatePinhole() {
+	@Test void approximatePinhole() {
 		CameraPinhole original = PerspectiveOps.createIntrinsic(640, 480, 75, 70);
 
 		LensDistortionPinhole distortion = new LensDistortionPinhole(original);
@@ -78,8 +73,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(original.fy, found.fy, 1);
 	}
 
-	@Test
-	void guessIntrinsic_two() {
+	@Test void guessIntrinsic_two() {
 
 		double hfov = 30;
 		double vfov = 35;
@@ -90,8 +84,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(UtilAngle.degreeToRadian(vfov), 2.0*Math.atan(found.cy/found.fy), 1e-6);
 	}
 
-	@Test
-	void guessIntrinsic_one() {
+	@Test void guessIntrinsic_one() {
 
 		double hfov = 30;
 
@@ -101,8 +94,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(found.fx, found.fy, 1e-6);
 	}
 
-	@Test
-	void scaleIntrinsic() {
+	@Test void scaleIntrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1, 0.3, 2);
 
 		CameraPinholeBrown param = new CameraPinholeBrown(200, 300, 2, 250, 260, 200, 300);
@@ -121,8 +113,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(a.y*0.5, b.y, 1e-8);
 	}
 
-	@Test
-	void adjustIntrinsic() {
+	@Test void adjustIntrinsic() {
 
 		DMatrixRMaj B = new DMatrixRMaj(3, 3, true, 2, 0, 1, 0, 3, 2, 0, 0, 1);
 
@@ -140,8 +131,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(expected, foundM, 1e-8));
 	}
 
-	@Test
-	void pinholeToMatrix_params_D() {
+	@Test void pinholeToMatrix_params_D() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(1.0, 2, 3, 4, 5);
 
 		assertEquals(1, K.get(0, 0), UtilEjml.TEST_F64);
@@ -152,8 +142,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(1, K.get(2, 2), UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void pinholeToMatrix_params_F() {
+	@Test void pinholeToMatrix_params_F() {
 		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(1.0f, 2f, 3f, 4, 5);
 
 		assertEquals(1, K.get(0, 0), UtilEjml.TEST_F32);
@@ -164,8 +153,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(1, K.get(2, 2), UtilEjml.TEST_F32);
 	}
 
-	@Test
-	void pinholeToMatrix_class_D() {
+	@Test void pinholeToMatrix_class_D() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(new CameraPinhole(1.0, 2, 3, 4, 5, 400, 500), (DMatrixRMaj)null);
 
 		assertEquals(1, K.get(0, 0), UtilEjml.TEST_F64);
@@ -176,8 +164,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(1, K.get(2, 2), UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void pinholeToMatrix_class_F() {
+	@Test void pinholeToMatrix_class_F() {
 		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(new CameraPinhole(1.0, 2, 3, 4, 5, 400, 500), (FMatrixRMaj)null);
 
 		assertEquals(1, K.get(0, 0), UtilEjml.TEST_F32);
@@ -188,8 +175,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(1, K.get(2, 2), UtilEjml.TEST_F32);
 	}
 
-	@Test
-	void matrixToPinhole_D() {
+	@Test void matrixToPinhole_D() {
 		double fx = 1;
 		double fy = 2;
 		double skew = 3;
@@ -208,8 +194,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(200, ret.height);
 	}
 
-	@Test
-	void matrixToPinhole_F() {
+	@Test void matrixToPinhole_F() {
 		float fx = 1;
 		float fy = 2;
 		float skew = 3;
@@ -231,8 +216,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 	/**
 	 * Test using a known pinhole model which fits its assumptions perfectly
 	 */
-	@Test
-	void estimatePinhole() {
+	@Test void estimatePinhole() {
 		CameraPinhole expected = new CameraPinhole(500, 550, 0, 600, 700, 1200, 1400);
 		Point2Transform2_F64 pixelToNorm = new LensDistortionPinhole(expected).distort_F64(true, false);
 
@@ -247,8 +231,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.height, found.height);
 	}
 
-	@Test
-	void convertNormToPixel_intrinsic_F64() {
+	@Test void convertNormToPixel_intrinsic_F64() {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown(100, 150, 0.1, 120, 209, 500, 600);
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
@@ -264,8 +247,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void convertNormToPixel_matrix() {
+	@Test void convertNormToPixel_matrix() {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.1, 120, 0, 150, 209, 0, 0, 1);
 
 		Point2D_F64 norm = new Point2D_F64(-0.1, 0.25);
@@ -279,8 +261,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void convertPixelToNorm_intrinsic_F64() {
+	@Test void convertPixelToNorm_intrinsic_F64() {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown
 				(100, 150, 0.1, 120, 209, 500, 600).fsetRadial(0.1, -0.05);
 
@@ -297,8 +278,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void convertPixelToNorm_intrinsic_F32() {
+	@Test void convertPixelToNorm_intrinsic_F32() {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown
 				(100, 150, 0.1, 120, 209, 500, 600).fsetRadial(0.1, -0.05);
 
@@ -315,8 +295,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, UtilEjml.TEST_F32);
 	}
 
-	@Test
-	void convertPixelToNorm_matrix() {
+	@Test void convertPixelToNorm_matrix() {
 		DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 100, 0.1, 120, 0, 150, 209, 0, 0, 1);
 		DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 		CommonOps_DDRM.invert(K, K_inv);
@@ -332,8 +311,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void renderPixel_SE() {
+	@Test void renderPixel_SE() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
 		Se3_F64 worldToCamera = new Se3_F64();
@@ -361,8 +339,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void renderPixel_intrinsic() {
+	@Test void renderPixel_intrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
 		CameraPinhole intrinsic = new CameraPinhole(100, 150, 0.1, 120, 209, 500, 600);
@@ -379,8 +356,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void renderPixel_SE3_intrinsic() {
+	@Test void renderPixel_SE3_intrinsic() {
 		Se3_F64 worldToCamera = SpecialEuclideanOps_F64.eulerXyz(0.2, 0.01, -0.03, 0.1, -0.05, 0.03, null);
 
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
@@ -400,8 +376,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void renderPixel_SE3_K_matrix() {
+	@Test void renderPixel_SE3_K_matrix() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
 		Se3_F64 worldToCamera = SpecialEuclideanOps_F64.eulerXyz(0.2, 0.01, -0.03, 0.1, -0.05, 0.03, null);
@@ -416,8 +391,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void renderPixel_SE3_homogenous() {
+	@Test void renderPixel_SE3_homogenous() {
 		var X3 = new Point3D_F64(0.1, -0.05, 3);
 		var X4 = new Point4D_F64(0.1, -0.05, 3, 1);
 		X4.scale(1.2);
@@ -448,8 +422,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void renderPixel_cameramatrix() {
+	@Test void renderPixel_cameramatrix() {
 		Point3D_F64 X = new Point3D_F64(0.1, -0.05, 3);
 
 		Se3_F64 worldToCamera = SpecialEuclideanOps_F64.eulerXyz(0.2, 0.01, -0.03, 0.1, -0.05, 0.03, null);
@@ -465,8 +438,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected.y, found.y, 1e-8);
 	}
 
-	@Test
-	void splitAssociated_pair() {
+	@Test void splitAssociated_pair() {
 		List<AssociatedPair> list = new ArrayList<>();
 		for (int i = 0; i < 12; i++) {
 			AssociatedPair p = new AssociatedPair();
@@ -491,8 +463,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void splitAssociated_triple() {
+	@Test void splitAssociated_triple() {
 		List<AssociatedTriple> list = new ArrayList<>();
 		for (int i = 0; i < 12; i++) {
 			AssociatedTriple p = new AssociatedTriple();
@@ -521,8 +492,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void createCameraMatrix() {
+	@Test void createCameraMatrix() {
 		SimpleMatrix R = SimpleMatrix.random_DDRM(3, 3, -1, 1, rand);
 		Vector3D_F64 T = new Vector3D_F64(2, 3, -4);
 		SimpleMatrix K = SimpleMatrix.wrap(RandomMatrices_DDRM.triangularUpper(3, 0, -1, 1, rand));
@@ -552,22 +522,19 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void computeHFov() {
+	@Test void computeHFov() {
 		CameraPinhole intrinsic = new CameraPinhole(500, 600, 0, 500, 500, 1000, 1000);
 
 		assertEquals(2*Math.atan(1.0), PerspectiveOps.computeHFov(intrinsic), UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void computeVFov() {
+	@Test void computeVFov() {
 		CameraPinhole intrinsic = new CameraPinhole(500, 600, 0, 500, 500, 1000, 1000);
 
 		assertEquals(2*Math.atan(500/600.0), PerspectiveOps.computeVFov(intrinsic), UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void multTranA_triple_dense() {
+	@Test void multTranA_triple_dense() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3, 3, rand);
 		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3, 3, rand);
 		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3, 3, rand);
@@ -582,8 +549,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isEquals(expected, D, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void multTranC_triple_dense() {
+	@Test void multTranC_triple_dense() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3, 3, rand);
 		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3, 3, rand);
 		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3, 3, rand);
@@ -605,8 +571,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		return f;
 	}
 
-	@Test
-	void multTranA_triple_fixed() {
+	@Test void multTranA_triple_fixed() {
 		DMatrix3x3 A = random3x3();
 		DMatrix3x3 B = random3x3();
 		DMatrix3x3 C = random3x3();
@@ -621,8 +586,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isEquals(expected, D));
 	}
 
-	@Test
-	void multTranC_triple_fixed() {
+	@Test void multTranC_triple_fixed() {
 		DMatrix3x3 A = random3x3();
 		DMatrix3x3 B = random3x3();
 		DMatrix3x3 C = random3x3();
@@ -637,8 +601,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_D.isEquals(expected, D));
 	}
 
-	@Test
-	void inplaceAdjustCameraMatrix() {
+	@Test void inplaceAdjustCameraMatrix() {
 		DMatrixRMaj P = RandomMatrices_DDRM.rectangle(3, 4, rand);
 
 		double sx = 0.3, sy = 0.7, tx = 0.9, ty = -0.5;
@@ -653,8 +616,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertTrue(MatrixFeatures_DDRM.isIdentical(expected, P, UtilEjml.TEST_F64));
 	}
 
-	@Test
-	void invariantCrossLine_2D() {
+	@Test void invariantCrossLine_2D() {
 		// Could probably just create an arbitrary H, but this is more realistic
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, 0.3, null);
 		DMatrixRMaj K = new DMatrixRMaj(new double[][]{{500, 0, 500}, {0, 500, 500}, {0, 0, 1}});
@@ -683,8 +645,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
 	}
 
-	@Test
-	void invariantCrossLine_3D() {
+	@Test void invariantCrossLine_3D() {
 		Se3_F64 motion = SpecialEuclideanOps_F64.eulerXyz(10, 15, -8, 0.1, -0.05, 0.9, null);
 
 		var points = new ArrayList<Point3D_F64>();
@@ -709,8 +670,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
 	}
 
-	@Test
-	void invariantCrossRatio() {
+	@Test void invariantCrossRatio() {
 		// Could probably just create an arbitrary H, but this is more realistic
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, 0.3, null);
 		DMatrixRMaj K = new DMatrixRMaj(new double[][]{{500, 0, 500}, {0, 500, 500}, {0, 0, 1}});
@@ -738,8 +698,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
 	}
 
-	@Test
-	void invariantAffine() {
+	@Test void invariantAffine() {
 		var affine = new Affine2D_F64(0.9, 0.2, -0.1, 1.1, -0.4, 10);
 
 		var points = new ArrayList<Point2D_F64>();
@@ -760,8 +719,7 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
 	}
 
-	@Test
-	void homogenousTo3dPositiveZ() {
+	@Test void homogenousTo3dPositiveZ() {
 		Point3D_F64 found = new Point3D_F64();
 		PerspectiveOps.homogenousTo3dPositiveZ(new Point4D_F64(4, 6, 8, 2), 1e8, 1e-8, found);
 		assertEquals(0.0, found.distance(2, 3, 4), UtilEjml.TEST_F64);
@@ -775,5 +733,16 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		double d = Math.sqrt(4.0*4.0 + 6.0*6.0 + 8.0*8.0);
 		PerspectiveOps.homogenousTo3dPositiveZ(new Point4D_F64(-4, -6, -8, 0), r, 1e-8, found);
 		assertEquals(0.0, found.distance(4*r/d, 6*r/d, 8*r/d), UtilEjml.TEST_F64);
+	}
+
+	@Test void distance3DvsH() {
+		Point3D_F64 a = new Point3D_F64(0,0,3);
+		Point4D_F64 b = new Point4D_F64(0,0,20,1.0);
+
+		assertEquals(17.0, PerspectiveOps.distance3DvsH(a,b,1e-8));
+		b.scale(-1e-10);
+		assertEquals(17.0, PerspectiveOps.distance3DvsH(a,b,1e-8));
+		b.w=0;
+		assertEquals(Double.POSITIVE_INFINITY, PerspectiveOps.distance3DvsH(a,b,1e-8));
 	}
 }

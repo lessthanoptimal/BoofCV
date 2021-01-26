@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -298,6 +298,27 @@ public class ImplPerspectiveOps_F64 {
 
 		pixel.x = x/z;
 		pixel.y = y/z;
+	}
+
+	public static double distance3DvsH( Point3D_F64 a, Point4D_F64 b, double tol ) {
+		// convert the homogenous point into a 3D point.
+		double x = b.x;
+		double y = b.y;
+		double z = b.z;
+
+		double r = Math.sqrt(x*x + y*y + z*z);
+
+		// See if the homogenous point is at infinity, within tolerance
+		if (r*tol > Math.abs(b.w)) {
+			return Double.POSITIVE_INFINITY;
+		}
+
+		// Finish the conversion to 3D
+		x /= b.w;
+		y /= b.w;
+		z /= b.w;
+
+		return a.distance(x, y, z);
 	}
 
 	public static double distance( Point4D_F64 a, Point4D_F64 b ) {

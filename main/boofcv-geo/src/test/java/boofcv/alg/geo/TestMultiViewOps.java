@@ -62,12 +62,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings("ConstantConditions")
 class TestMultiViewOps extends BoofStandardJUnit {
-
 	// camera calibration matrix
 	DMatrixRMaj K = new DMatrixRMaj(3, 3, true, 60, 0.01, 200, 0, 80, 150, 0, 0, 1);
 
@@ -1333,20 +1329,86 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		MultiViewOps.convertTr(triples.toList(), 0, 1, found);
 
 		assertEquals(triples.size, found.size);
-		triples.forIdx((i,t)-> assertEquals(0.0,t.p1.distance(found.get(i).p1), UtilEjml.TEST_F64));
-		triples.forIdx((i,t)-> assertEquals(0.0,t.p2.distance(found.get(i).p2), UtilEjml.TEST_F64));
+		triples.forIdx(( i, t ) -> assertEquals(0.0, t.p1.distance(found.get(i).p1), UtilEjml.TEST_F64));
+		triples.forIdx(( i, t ) -> assertEquals(0.0, t.p2.distance(found.get(i).p2), UtilEjml.TEST_F64));
 
 		MultiViewOps.convertTr(triples.toList(), 2, 1, found);
 
 		assertEquals(triples.size, found.size);
-		triples.forIdx((i,t)-> assertEquals(0.0,t.p3.distance(found.get(i).p1), UtilEjml.TEST_F64));
-		triples.forIdx((i,t)-> assertEquals(0.0,t.p2.distance(found.get(i).p2), UtilEjml.TEST_F64));
+		triples.forIdx(( i, t ) -> assertEquals(0.0, t.p3.distance(found.get(i).p1), UtilEjml.TEST_F64));
+		triples.forIdx(( i, t ) -> assertEquals(0.0, t.p2.distance(found.get(i).p2), UtilEjml.TEST_F64));
 	}
 
 	@Test void scenePointsToPixels() {
-		var scene = new SceneStructureMetric(false);
-		scene.initialize(2,3,10);
+		var helper = new BundleSceneHelper(false, 10);
 
-		fail("Implement");
+		Point3D_F64 expectedX = new Point3D_F64();
+		Point2D_F64 expectedPx = new Point2D_F64();
+		MultiViewOps.scenePointsToPixels(helper.scene, 1, ( idx, coor, pixel ) -> {
+			Point3D_F64 worldPt = helper.cloud3.get(idx);
+			PerspectiveOps.renderPixel(helper.world_to_view1, helper.intrinsic, worldPt, expectedPx);
+			assertEquals(0.0, expectedPx.distance(pixel), UtilEjml.TEST_F64);
+
+			helper.world_to_view1.transform(worldPt, expectedX);
+			assertEquals(0.0, expectedX.distance(coor), UtilEjml.TEST_F64);
+			helper.counter++;
+		});
+		assertEquals(10, helper.counter);
+	}
+
+	@Test void sceneToCloud3() {
+		for (boolean homogenous : new boolean[]{false, true}) {
+			var helper = new BundleSceneHelper(homogenous, 10);
+			MultiViewOps.sceneToCloud3(helper.scene, 1e-8, ( idx, coor ) -> {
+				assertEquals(0.0, helper.cloud3.get(idx).distance(coor), UtilEjml.TEST_F64);
+				helper.counter++;
+			});
+			assertEquals(10, helper.counter);
+		}
+	}
+
+	@Test void sceneToCloudH() {
+		for (boolean homogenous : new boolean[]{false, true}) {
+			var helper = new BundleSceneHelper(homogenous, 10);
+			MultiViewOps.sceneToCloudH(helper.scene, ( idx, coor ) -> {
+				double distance = PerspectiveOps.distance3DvsH(helper.cloud3.get(idx), coor, 1e-8);
+				assertEquals(0.0, distance, UtilEjml.TEST_F64);
+				helper.counter++;
+			});
+			assertEquals(10, helper.counter);
+		}
+	}
+
+	private class BundleSceneHelper {
+		Se3_F64 world_to_view0;
+		Se3_F64 world_to_view1;
+		SceneStructureMetric scene;
+		CameraPinhole intrinsic;
+		List<Point3D_F64> cloud3;
+		int counter;
+
+		public BundleSceneHelper( boolean homogenous, int numPoints ) {
+			world_to_view0 = SpecialEuclideanOps_F64.eulerXyz(0, 0.1, -0.2, 0.02, -0.04, 0.03, null);
+			world_to_view1 = SpecialEuclideanOps_F64.eulerXyz(0.3, 0.1, 0.2, 0.01, -0.06, 0.02, null);
+
+			intrinsic = new CameraPinhole(300, 350, 0, 300, 300, 600, 600);
+			cloud3 = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2),
+					-1, 1, -1, 1, -0.1, 0.1, numPoints, rand);
+
+			scene = new SceneStructureMetric(homogenous);
+			scene.initialize(1, 3, numPoints);
+			scene.setCamera(0, true, intrinsic);
+			scene.setView(0, 0, true, world_to_view0);
+			scene.setView(1, 0, true, world_to_view1);
+			for (int i = 0; i < cloud3.size(); i++) {
+				Point3D_F64 p = cloud3.get(i);
+				if (homogenous) {
+					double w = rand.nextDouble() + 0.1;
+					scene.setPoint(i, p.x*w, p.y*w, p.z*w, w);
+				} else {
+					scene.setPoint(i, p.x, p.y, p.z);
+				}
+			}
+		}
 	}
 }
