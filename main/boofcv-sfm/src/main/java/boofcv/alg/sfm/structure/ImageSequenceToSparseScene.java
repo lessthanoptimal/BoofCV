@@ -25,6 +25,7 @@ import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.misc.LookUpImages;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import gnu.trove.impl.Constants;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import lombok.Getter;
@@ -54,7 +55,8 @@ public class ImageSequenceToSparseScene<T extends ImageGray<T>> implements Verbo
 	/** Refines the metric reconstruction */
 	@Getter RefineMetricWorkingGraph refineScene;
 	/** Lookup table from input image Id into the scene view index */
-	@Getter TObjectIntMap<String> imageIdToSceneViewIdx = new TObjectIntHashMap<>();
+	@Getter TObjectIntMap<String> imageIdToSceneViewIdx =
+			new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY,Constants.DEFAULT_LOAD_FACTOR,-1);
 
 	/** Maximum image pixels before it down samples */
 	public int maxImagePixels = 800*600;
