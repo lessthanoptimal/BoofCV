@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
@@ -672,6 +669,24 @@ public class UtilIO {
 				ret.add(f.getAbsolutePath());
 			}
 		}
+
+		return ret;
+	}
+
+	/**
+	 * Returns a list of all the children as a file and sorts them
+	 */
+	public static List<File> listFilesSorted( File directory ) {
+		List<File> ret = new ArrayList<>();
+		if (!directory.isDirectory())
+			return ret;
+
+		File[] files = directory.listFiles();
+		if (files==null)
+			return ret;
+
+		ret.addAll(Arrays.asList(files));
+		Collections.sort(ret);
 
 		return ret;
 	}
