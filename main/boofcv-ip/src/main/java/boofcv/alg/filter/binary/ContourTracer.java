@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,10 +58,10 @@ public class ContourTracer {
 	private int indexLabel;
 
 	// the pixel index offset to each neighbor
-	private int offsetsBinary[];
-	private int offsetsLabeled[];
+	private final int[] offsetsBinary;
+	private final int[] offsetsLabeled;
 	// lookup table for which direction it should search next given the direction it traveled into the current pixel
-	private int nextDirection[];
+	private final int[] nextDirection;
 
 	/**
 	 * Specifies connectivity rule
@@ -95,7 +95,6 @@ public class ContourTracer {
 	 *
 	 * @param binary Binary image with a border of zeros added to the outside.
 	 * @param labeled Labeled image.  Size is the same as the original binary image without border.
-	 * @param storagePoints
 	 */
 	public void setInputs(GrayU8 binary , GrayS32 labeled , PackedSetsPoint2D_I32 storagePoints ) {
 		this.binary = binary;
@@ -111,7 +110,7 @@ public class ContourTracer {
 		}
 	}
 
-	private void setOffsets8( int offsets[] , int stride ) {
+	private void setOffsets8( int[] offsets, int stride ) {
 		int s = stride;
 		offsets[0] =  1;   // x =  1 y =  0
 		offsets[1] =  1+s; // x =  1 y =  1
@@ -123,7 +122,7 @@ public class ContourTracer {
 		offsets[7] =  1-s; // x =  1 y = -1
 	}
 
-	private void setOffsets4( int offsets[] , int stride ) {
+	private void setOffsets4( int[] offsets, int stride ) {
 		int s = stride;
 		offsets[0] =  1;   // x =  1 y =  0
 		offsets[1] =    s; // x =  0 y =  1
@@ -132,10 +131,6 @@ public class ContourTracer {
 	}
 
 	/**
-	 *
-	 * @param label
-	 * @param initialX
-	 * @param initialY
 	 * @param external True for tracing an external contour or false for internal.
 	 */
 	public void trace( int label , int initialX , int initialY , boolean external )

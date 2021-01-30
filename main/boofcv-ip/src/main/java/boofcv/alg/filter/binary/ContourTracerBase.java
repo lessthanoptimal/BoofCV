@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,9 +42,9 @@ public class ContourTracerBase {
 	protected int indexBinary;
 
 	// the pixel index offset to each neighbor
-	protected int offsetsBinary[];
+	protected int[] offsetsBinary;
 	// lookup table for which direction it should search next given the direction it traveled into the current pixel
-	protected int nextDirection[];
+	protected int[] nextDirection;
 
 	/**
 	 * Specifies connectivity rule
@@ -87,7 +87,7 @@ public class ContourTracerBase {
 		}
 	}
 
-	private void setOffsets8( int offsets[] , int stride ) {
+	private void setOffsets8( int[] offsets, int stride ) {
 		int s = stride;
 		offsets[0] =  1;   // x =  1 y =  0
 		offsets[1] =  1+s; // x =  1 y =  1
@@ -99,7 +99,7 @@ public class ContourTracerBase {
 		offsets[7] =  1-s; // x =  1 y = -1
 	}
 
-	private void setOffsets4( int offsets[] , int stride ) {
+	private void setOffsets4( int[] offsets, int stride ) {
 		int s = stride;
 		offsets[0] =  1;   // x =  1 y =  0
 		offsets[1] =    s; // x =  0 y =  1

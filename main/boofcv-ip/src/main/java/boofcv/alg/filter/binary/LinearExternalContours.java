@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class LinearExternalContours {
 	private int adjustX , adjustY;
 
 	private Tracer tracer;
-	private PackedSetsPoint2D_I32 storagePoints = new PackedSetsPoint2D_I32();
+	private final PackedSetsPoint2D_I32 storagePoints = new PackedSetsPoint2D_I32();
 
 	public LinearExternalContours( ConnectRule rule ) {
 		tracer = new Tracer(rule);
@@ -83,7 +83,7 @@ public class LinearExternalContours {
 		ImageMiscOps.fillBorder(binary, 0, 1);
 
 		tracer.setInputs(binary);
-		final byte binaryData[] = binary.data;
+		final byte[] binaryData = binary.data;
 
 		// Scan through the image one row at a time looking for pixels with 1
 		for (int y = 1; y < binary.height-1; y++) {
