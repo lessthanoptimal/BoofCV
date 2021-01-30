@@ -1,3 +1,0 @@
-- Fix labeling bug.  See visualize application
- * create unit test for that case
- * come up with a solution that will fix it no matter what
