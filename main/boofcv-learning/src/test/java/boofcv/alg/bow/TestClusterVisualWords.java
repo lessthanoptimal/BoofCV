@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,8 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.clustering.AssignCluster;
 import org.ddogleg.clustering.ComputeClusters;
+import org.ddogleg.struct.LArrayAccessor;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestClusterVisualWords extends BoofStandardJUnit {
 
-	int DOF = 2;
 	long SEED = 123;
 	int NUM_CLUSTERS = 12;
 	double DISTANCE = 394.5;
@@ -42,7 +40,7 @@ public class TestClusterVisualWords extends BoofStandardJUnit {
 	@Test
 	public void process() {
 		DummyClusters clusters = new DummyClusters();
-		ClusterVisualWords alg = new ClusterVisualWords(clusters,DOF,SEED);
+		ClusterVisualWords alg = new ClusterVisualWords(clusters,SEED);
 
 		alg.addReference(new TupleDesc_F64(2));
 		alg.addReference(new TupleDesc_F64(2));
@@ -62,16 +60,15 @@ public class TestClusterVisualWords extends BoofStandardJUnit {
 		int numInputPoints = 0;
 
 		@Override
-		public void init(int pointDimension, long randomSeed) {
+		public void initialize(long randomSeed) {
 			numInit++;
 
-			assertEquals(DOF, pointDimension);
 			assertEquals(SEED,randomSeed);
 
 		}
 
 		@Override
-		public void process(List<double[]> points, int numCluster) {
+		public void process( LArrayAccessor<double[]> points, int numCluster) {
 			numProcess++;
 
 			numInputPoints = points.size();

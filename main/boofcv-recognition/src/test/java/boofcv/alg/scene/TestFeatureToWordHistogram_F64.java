@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 
 		alg.process();
 
-		double histogram[] = alg.getHistogram();
+		double[] histogram = alg.getHistogram();
 
 		checkSumOne(alg, histogram);
 
@@ -79,7 +79,7 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 
 		alg.process();
 
-		double histogram[] = alg.getHistogram();
+		double[] histogram = alg.getHistogram();
 
 		checkSumOne(alg, histogram);
 
@@ -106,7 +106,7 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 		alg.addFeature(new TupleDesc_F64(5));
 		alg.process();
 
-		double histogram[] = alg.getHistogram();
+		double[] histogram = alg.getHistogram();
 
 		checkSumOne(alg, histogram);
 
@@ -117,7 +117,7 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 		assertEquals(0,histogram[4], 1e-8);
 	}
 
-	private class Assign implements AssignCluster<double[]> {
+	private static class Assign implements AssignCluster<double[]> {
 
 		int numCalls = 0;
 
@@ -136,11 +136,6 @@ public class TestFeatureToWordHistogram_F64 extends BoofStandardJUnit {
 		@Override
 		public int getNumberOfClusters() {
 			return NUM_CLUSTERS;
-		}
-
-		@Override
-		public AssignCluster<double[]> copy() {
-			return null;
 		}
 	}
 }
