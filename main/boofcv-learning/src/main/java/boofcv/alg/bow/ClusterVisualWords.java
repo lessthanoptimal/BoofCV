@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.alg.bow;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.clustering.AssignCluster;
 import org.ddogleg.clustering.ComputeClusters;
+import org.ddogleg.clustering.misc.ListAccessor;
+import org.ddogleg.struct.LArrayAccessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,18 +42,17 @@ public class ClusterVisualWords {
 
 	// inner arrays extracted from the input features
 	List<double[]> tuples = new ArrayList<>();
+	LArrayAccessor<double[]> accessor = new ListAccessor<>(tuples, ( a, b ) -> System.arraycopy(a, 0, b, 0, a.length));
 
 	/**
 	 * Constructor which configures the cluster finder.
 	 *
-	 * @param computeClusters Cluster finding algorithm.
-	 * @param featureDOF Number of elements in the feature
+	 * @param computeClusters Cluster finding algorithm
 	 * @param randomSeed Seed for random number generator
 	 */
-	public ClusterVisualWords(ComputeClusters<double[]> computeClusters, int featureDOF, long randomSeed) {
+	public ClusterVisualWords( ComputeClusters<double[]> computeClusters, long randomSeed ) {
 		this.computeClusters = computeClusters;
-
-		computeClusters.init(featureDOF,randomSeed);
+		computeClusters.initialize(randomSeed);
 	}
 
 	/**
@@ -59,16 +60,17 @@ public class ClusterVisualWords {
 	 *
 	 * @param feature image feature. Reference to inner array is saved.
 	 */
-	public void addReference(TupleDesc_F64 feature) {
+	public void addReference( TupleDesc_F64 feature ) {
 		tuples.add(feature.getValue());
 	}
 
 	/**
 	 * Clusters the list of features into the specified number of words
+	 *
 	 * @param numberOfWords Number of words/clusters it should find
 	 */
 	public void process( int numberOfWords ) {
-		computeClusters.process(tuples,numberOfWords);
+		computeClusters.process(accessor, numberOfWords);
 	}
 
 	/**
@@ -77,5 +79,4 @@ public class ClusterVisualWords {
 	public AssignCluster<double[]> getAssignment() {
 		return computeClusters.getAssignment();
 	}
-
 }

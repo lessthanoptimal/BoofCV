@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,24 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.scene.codec;
-
-import org.ddogleg.clustering.gmm.GaussianGmm_F64;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
+package boofcv.alg.scene.vocabtree;
 
 /**
  * @author Peter Abeles
- */
-public class CodecClusterGmm {
-
-	public void write( OutputStream out , List<GaussianGmm_F64> mixture ) {
-
-	}
-
-	public List<GaussianGmm_F64> read( InputStream in ) {
-		return null;
-	}
+ **/
+public class LearnHierarchicalTree {
+	// TODO Update kmeans in ddogleg to be more flexible
 }

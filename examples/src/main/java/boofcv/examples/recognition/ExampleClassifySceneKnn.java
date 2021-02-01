@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import boofcv.struct.learning.Confusion;
 import deepboof.io.DeepBoofDataBaseOps;
 import org.ddogleg.clustering.AssignCluster;
 import org.ddogleg.clustering.ComputeClusters;
+import org.ddogleg.clustering.ConfigKMeans;
 import org.ddogleg.clustering.FactoryClustering;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -100,7 +101,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 									ComputeClusters<double[]> clusterer,
 									NearestNeighbor<HistogramScene> nn ) {
 		this.describeImage = describeImage;
-		this.cluster = new ClusterVisualWords(clusterer, describeImage.createDescription().size(), 0xFEEDBEEF);
+		this.cluster = new ClusterVisualWords(clusterer, 0xFEEDBEEF);
 		this.nn = nn;
 	}
 
@@ -246,7 +247,11 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 //				FactoryDescribeImageDense.sift(sift, GrayU8.class);
 //				FactoryDescribeImageDense.hog(hog, ImageType.single(GrayU8.class));
 
-		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
+		ConfigKMeans configKMeans = new ConfigKMeans();
+		configKMeans.maxIterations = MAX_KNN_ITERATIONS;
+		configKMeans.maxConverge = 20;
+		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans(
+				configKMeans, desc.createDescription().size(), double[].class);
 		clusterer.setVerbose(true);
 
 		int pointDof = desc.createDescription().size();

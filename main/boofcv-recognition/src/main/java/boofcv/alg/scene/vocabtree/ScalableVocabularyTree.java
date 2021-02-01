@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,10 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.scene.codec;
+package boofcv.alg.scene.vocabtree;
 
 /**
  * @author Peter Abeles
- */
-public class CodecClusterKMeans {
+ **/
+public class ScalableVocabularyTree {
+
+
+
+	// https://www.cse.unr.edu/~bebis/CS491Y/Papers/Nister06.pdf
+	// https://sourceforge.net/projects/vocabularytree/
+	// https://sourceforge.net/p/vocabularytree/code-0/HEAD/tree/trunk/py_vt/src/
+	// http://webdiis.unizar.es/~dorian/index.php?p=31
+	// https://github.com/epignatelli/scalable-recognition-with-a-vocabulary-tree
+
 }
