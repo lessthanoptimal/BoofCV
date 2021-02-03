@@ -16,10 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.scene.vocabtree;
+package boofcv.struct.kmeans;
+
+import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.clustering.ConfigKMeans;
+import org.ddogleg.clustering.FactoryClustering;
+import org.ddogleg.clustering.kmeans.StandardKMeans;
 
 /**
  * @author Peter Abeles
- **/
-public class LookupLeafHierarchicalTree {
+ */
+public class FactoryTupleCluster {
+	public static StandardKMeans<TupleDesc_F64> kmeans( int dof ) {
+		var dconfig = new ConfigKMeans();
+		dconfig.maxConverge = 1000;
+		dconfig.maxIterations = 1000;
+		dconfig.convergeTol = 1e-8;
+
+		return FactoryClustering.kMeans(dconfig,
+				new ComputeMeanTuple_F64(),
+				new TuplePointDistanceEuclideanSq.F64(),
+				()->new TupleDesc_F64(dof));
+	}
 }

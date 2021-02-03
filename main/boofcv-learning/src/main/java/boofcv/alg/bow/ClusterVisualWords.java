@@ -42,7 +42,8 @@ public class ClusterVisualWords {
 
 	// inner arrays extracted from the input features
 	List<double[]> tuples = new ArrayList<>();
-	LArrayAccessor<double[]> accessor = new ListAccessor<>(tuples, ( a, b ) -> System.arraycopy(a, 0, b, 0, a.length));
+	LArrayAccessor<double[]> accessor = new ListAccessor<>(tuples,
+			( a, b ) -> System.arraycopy(a, 0, b, 0, a.length), double[].class);
 
 	/**
 	 * Constructor which configures the cluster finder.

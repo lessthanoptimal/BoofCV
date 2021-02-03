@@ -21,6 +21,8 @@ package boofcv.struct.feature;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Arrays;
+
 /**
  * Basic description of an image feature's attributes using an array.
  *
@@ -33,10 +35,18 @@ public class TupleDesc_F32 implements TupleDesc<TupleDesc_F32> {
 		this.value = new float[numFeatures];
 	}
 
+	public TupleDesc_F32( float ...src ) {
+		this.value = src.clone();
+	}
+
 	protected TupleDesc_F32() {}
 
 	public void setTo( float... value ) {
 		System.arraycopy(value, 0, this.value, 0, this.value.length);
+	}
+
+	public void fill( float value ) {
+		Arrays.fill(this.value, value);
 	}
 
 	@Override public void setTo( TupleDesc_F32 source ) {

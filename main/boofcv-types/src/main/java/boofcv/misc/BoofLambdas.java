@@ -106,6 +106,10 @@ public interface BoofLambdas {
 		void setRgb( int index, int red, int green, int blue );
 	}
 
+	@FunctionalInterface interface Map_I32_I32 {
+		int lookup( int src );
+	}
+
 	// @formatter:off
 	@FunctionalInterface interface Match_I8 { boolean process( byte value ); }
 	@FunctionalInterface interface Match_I16 { boolean process( short value ); }
