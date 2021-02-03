@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,8 +76,8 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray<T>>
 		alg.setImage(sub);
 		alg.process( input.width / 2, input.height / 2, desc2);
 
-		for( int i = 0; i < desc1.data.length; i++ ) {
-			assertEquals(desc1.data[i],desc2.data[i]);
+		for(int i = 0; i < desc1.value.length; i++ ) {
+			assertEquals(desc1.value[i],desc2.value[i]);
 		}
 	}
 

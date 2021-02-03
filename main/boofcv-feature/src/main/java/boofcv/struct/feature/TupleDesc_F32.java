@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,51 +18,40 @@
 
 package boofcv.struct.feature;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Basic description of an image feature's attributes using an array.
  *
  * @author Peter Abeles
  */
 public class TupleDesc_F32 implements TupleDesc<TupleDesc_F32> {
-	public float[] value;
+	public @Getter @Setter float[] value;
 
 	public TupleDesc_F32( int numFeatures ) {
 		this.value = new float[numFeatures];
 	}
 
-	protected TupleDesc_F32() { }
+	protected TupleDesc_F32() {}
 
-	public void set( float... value ) {
+	public void setTo( float... value ) {
 		System.arraycopy(value, 0, this.value, 0, this.value.length);
 	}
 
-	@Override
-	public TupleDesc_F32 copy() {
-		TupleDesc_F32 ret = new TupleDesc_F32(value.length);
-		System.arraycopy(value, 0, ret.value, 0, value.length);
-		return ret;
-	}
-
-	public float[] getValue() {
-		return value;
-	}
-
-	public void setValue( float[] value ) {
-		this.value = value;
-	}
-
-	@Override
-	public void setTo( TupleDesc_F32 source ) {
+	@Override public void setTo( TupleDesc_F32 source ) {
 		System.arraycopy(source.value, 0, value, 0, value.length);
 	}
 
-	@Override
-	public double getDouble( int index ) {
+	@Override public double getDouble( int index ) {
 		return value[index];
 	}
 
-	@Override
-	public int size() {
+	@Override public int size() {
 		return value.length;
+	}
+
+	@Override public TupleDesc_F32 newInstance() {
+		return new TupleDesc_F32(value.length);
 	}
 }

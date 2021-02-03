@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);
 
-		Arrays.fill(feature.data, 0);
+		Arrays.fill(feature.value, 0);
 
 		if( isInside ) {
 			for( int i = 0; i < definition.samplePoints.length; i++ ) {
@@ -120,7 +120,7 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 			Point2D_I32 comp = definition.compare[i];
 
 			if( values[comp.x] < values[comp.y] ) {
-				feature.data[ i/32 ] |= 1 << (i % 32);
+				feature.value[ i/32 ] |= 1 << (i % 32);
 			}
 		}
 	}

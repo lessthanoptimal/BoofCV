@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,8 +82,8 @@ public class TestDescribePointBriefSO extends BoofStandardJUnit {
 		alg.process(input.width/2, input.height/2, 1, briefRadius, desc2);
 
 		boolean identical = true;
-		for (int i = 0; i < desc1.data.length; i++) {
-			if (desc1.data[i] != desc2.data[i])
+		for (int i = 0; i < desc1.value.length; i++) {
+			if (desc1.value[i] != desc2.value[i])
 				identical = false;
 		}
 
@@ -105,8 +105,8 @@ public class TestDescribePointBriefSO extends BoofStandardJUnit {
 		alg.process(input.width/2, input.height/2, 0, 2*briefRadius, desc2);
 
 		boolean identical = true;
-		for (int i = 0; i < desc1.data.length; i++) {
-			if (desc1.data[i] != desc2.data[i])
+		for (int i = 0; i < desc1.value.length; i++) {
+			if (desc1.value[i] != desc2.value[i])
 				identical = false;
 		}
 
@@ -132,8 +132,8 @@ public class TestDescribePointBriefSO extends BoofStandardJUnit {
 		alg.setImage(sub);
 		alg.process(input.width/2, input.height/2, 0, briefRadius, desc2);
 
-		for (int i = 0; i < desc1.data.length; i++) {
-			assertEquals(desc1.data[i], desc2.data[i]);
+		for (int i = 0; i < desc1.value.length; i++) {
+			assertEquals(desc1.value[i], desc2.value[i]);
 		}
 	}
 
@@ -232,13 +232,13 @@ public class TestDescribePointBriefSO extends BoofStandardJUnit {
 		TupleDesc_B desc = alg.createFeature();
 
 		// part of sanity check
-		assertEquals(desc.data[0], 0);
+		assertEquals(desc.value[0], 0);
 
 		// just see if it blows up for now.  a more rigorous test would be better
 		alg.process(0, 0, 0.1f, briefRadius*1.2f, desc);
 		alg.process(width - 1, height - 1, 0.1f, briefRadius*1.2f, desc);
 
 		// sanity check.  the description should not be zero
-		assertTrue(desc.data[0] != 0);
+		assertTrue(desc.value[0] != 0);
 	}
 }

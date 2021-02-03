@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,9 +45,9 @@ public class TestScoreAssociateHamming_B extends StandardScoreAssociationChecks<
 		TupleDesc_B b = new TupleDesc_B(512);
 
 		for( int numTries = 0; numTries < 20; numTries++ ) {
-			for( int i = 0; i < a.data.length; i++ ) {
-				a.data[i] = rand.nextInt();
-				b.data[i] = rand.nextInt();
+			for(int i = 0; i < a.value.length; i++ ) {
+				a.value[i] = rand.nextInt();
+				b.value[i] = rand.nextInt();
 			}
 
 			int expected = DescriptorDistance.hamming(a,b);
@@ -64,8 +64,8 @@ public class TestScoreAssociateHamming_B extends StandardScoreAssociationChecks<
 	@Override
 	public TupleDesc_B createDescription() {
 		TupleDesc_B a = new TupleDesc_B(5);
-		for( int i = 0; i < a.data.length; i++ )
-			a.data[i] = rand.nextInt();
+		for(int i = 0; i < a.value.length; i++ )
+			a.value[i] = rand.nextInt();
 
 		return a;
 	}

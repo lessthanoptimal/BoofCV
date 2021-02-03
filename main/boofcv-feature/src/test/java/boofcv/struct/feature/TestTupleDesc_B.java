@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class TestTupleDesc_B extends BoofStandardJUnit {
 			expected[i] = rand.nextBoolean();
 
 			int index = i/32;
-			desc.data[index] |= expected[i] ? 1 << (i%32) : 0;
+			desc.value[index] |= expected[i] ? 1 << (i%32) : 0;
 		}
 
 		for( int i = 0; i < N; i++ ) {
@@ -51,15 +51,15 @@ public class TestTupleDesc_B extends BoofStandardJUnit {
 		int N = 40;
 		TupleDesc_B a = new TupleDesc_B(N);
 
-		for( int i = 0; i < a.data.length; i++ ) {
-			a.data[i] = rand.nextInt();
+		for(int i = 0; i < a.value.length; i++ ) {
+			a.value[i] = rand.nextInt();
 		}
 
 		TupleDesc_B b = new TupleDesc_B(80);
 		b.setTo(a);
 
-		for( int i = 0; i < a.data.length; i++ ) {
-			assertEquals(a.data[i],b.data[i]);
+		for(int i = 0; i < a.value.length; i++ ) {
+			assertEquals(a.value[i],b.value[i]);
 		}
 		assertEquals(a.numBits,b.numBits);
 	}
@@ -67,14 +67,14 @@ public class TestTupleDesc_B extends BoofStandardJUnit {
 	@Test
 	public void copy() {
 		TupleDesc_B a = new TupleDesc_B(512);
-		for( int i = 0; i < a.data.length; i++ ) {
-			a.data[i] = 100+i;
+		for(int i = 0; i < a.value.length; i++ ) {
+			a.value[i] = 100+i;
 		}
 
 		TupleDesc_B b = a.copy();
 		assertEquals(a.numBits,b.numBits);
-		for( int i = 0; i < a.data.length; i++ ) {
-			assertEquals(100+i,a.data[i]);
+		for(int i = 0; i < a.value.length; i++ ) {
+			assertEquals(100+i,a.value[i]);
 		}
 
 		assertEquals(a.numBits,b.numBits);

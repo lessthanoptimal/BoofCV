@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,7 +137,7 @@ public abstract class GenericAssociateGreedyChecks extends BoofStandardJUnit {
 		ret.resize(values.length);
 
 		for( int i = 0; i < values.length; i++ ) {
-			ret.get(i).set(values[i]);
+			ret.get(i).setTo(values[i]);
 		}
 
 		return ret;

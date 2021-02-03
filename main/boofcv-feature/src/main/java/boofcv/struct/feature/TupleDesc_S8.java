@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,15 +29,11 @@ public class TupleDesc_S8 extends TupleDesc_I8<TupleDesc_S8> {
 		super(numFeatures);
 	}
 
-	@Override
-	public TupleDesc_S8 copy() {
-		TupleDesc_S8 ret = new TupleDesc_S8(value.length);
-		System.arraycopy(value, 0, ret.value, 0, value.length);
-		return ret;
+	@Override public double getDouble( int index ) {
+		return value[index];
 	}
 
-	@Override
-	public double getDouble( int index ) {
-		return value[index];
+	@Override public TupleDesc_S8 newInstance() {
+		return new TupleDesc_S8(value.length);
 	}
 }
