@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,9 +64,9 @@ public class BenchmarkDescriptorDistance {
 	private int tableScore( TupleDesc_B a, TupleDesc_B b ) {
 		int score = 0;
 
-		for (int i = 0; i < a.data.length; i++) {
-			int dataA = a.data[i];
-			int dataB = b.data[i];
+		for (int i = 0; i < a.value.length; i++) {
+			int dataA = a.value[i];
+			int dataB = b.value[i];
 
 			score += table.lookup((short)dataA, (short)dataB);
 			score += table.lookup((short)(dataA >> 16), (short)(dataB >> 16));
@@ -89,8 +89,8 @@ public class BenchmarkDescriptorDistance {
 
 	private TupleDesc_B randomFeature( Random rand ) {
 		TupleDesc_B feat = new TupleDesc_B(512);
-		for (int j = 0; j < feat.data.length; j++) {
-			feat.data[j] = rand.nextInt();
+		for (int j = 0; j < feat.value.length; j++) {
+			feat.value[j] = rand.nextInt();
 		}
 		return feat;
 	}

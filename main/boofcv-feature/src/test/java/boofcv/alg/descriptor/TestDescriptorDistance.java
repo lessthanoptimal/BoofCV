@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -165,9 +165,9 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 		TupleDesc_B b = new TupleDesc_B(512);
 
 		for( int numTries = 0; numTries < 20; numTries++ ) {
-			for( int i = 0; i < a.data.length; i++ ) {
-				a.data[i] = rand.nextInt();
-				b.data[i] = rand.nextInt();
+			for(int i = 0; i < a.value.length; i++ ) {
+				a.value[i] = rand.nextInt();
+				b.value[i] = rand.nextInt();
 			}
 
 			assertEquals(hamming(a,b),DescriptorDistance.hamming(a, b),1e-4);
@@ -186,8 +186,8 @@ public class TestDescriptorDistance extends BoofStandardJUnit {
 
 	private int hamming( TupleDesc_B a, TupleDesc_B b) {
 		int ret = 0;
-		for( int i = 0; i < a.data.length; i++ ) {
-			ret += hamming(a.data[i],b.data[i]);
+		for(int i = 0; i < a.value.length; i++ ) {
+			ret += hamming(a.value[i],b.value[i]);
 		}
 		return ret;
 	}

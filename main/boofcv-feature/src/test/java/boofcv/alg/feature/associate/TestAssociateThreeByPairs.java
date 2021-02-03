@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,14 +45,14 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();
 
-		featuresB.grow().set(234234234);
-		featuresC.grow().set(2344234);
-		featuresC.grow().set(99234234);
+		featuresB.grow().setTo(234234234);
+		featuresC.grow().setTo(2344234);
+		featuresC.grow().setTo(99234234);
 
 		for (int i = 0; i < 10; i++) {
-			featuresA.grow().set(i);
-			featuresB.grow().set(i);
-			featuresC.grow().set(i);
+			featuresA.grow().setTo(i);
+			featuresB.grow().setTo(i);
+			featuresC.grow().setTo(i);
 		}
 
 		// there is only one set
@@ -99,14 +99,14 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();
 
-		featuresB.grow().set(234234234);
-		featuresC.grow().set(2344234);
-		featuresC.grow().set(99234234);
+		featuresB.grow().setTo(234234234);
+		featuresC.grow().setTo(2344234);
+		featuresC.grow().setTo(99234234);
 
 		for (int i = 0; i < 10; i++) {
-			featuresA.grow().set(i);
-			featuresB.grow().set(i+0.1);
-			featuresC.grow().set(i+0.2);
+			featuresA.grow().setTo(i);
+			featuresB.grow().setTo(i+0.1);
+			featuresC.grow().setTo(i+0.2);
 		}
 
 		// there is only one set
@@ -147,14 +147,14 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();
 
-		featuresB.grow().set(234234234);
-		featuresC.grow().set(2344234);
-		featuresC.grow().set(99234234);
+		featuresB.grow().setTo(234234234);
+		featuresC.grow().setTo(2344234);
+		featuresC.grow().setTo(99234234);
 
 		for (int i = 0; i < 10; i++) {
-			featuresA.grow().set(i);
-			featuresB.grow().set(i+0.1);
-			featuresC.grow().set(i+0.22);
+			featuresA.grow().setTo(i);
+			featuresB.grow().setTo(i+0.1);
+			featuresC.grow().setTo(i+0.22);
 		}
 
 		// there is only one set
@@ -196,14 +196,14 @@ class TestAssociateThreeByPairs extends BoofStandardJUnit {
 		DogArray_I32 featuresSetB = new DogArray_I32();
 		DogArray_I32 featuresSetC = new DogArray_I32();
 
-		featuresB.grow().set(234234234);
-		featuresC.grow().set(2344234);
-		featuresC.grow().set(99234234);
+		featuresB.grow().setTo(234234234);
+		featuresC.grow().setTo(2344234);
+		featuresC.grow().setTo(99234234);
 
 		for (int i = 0; i < 10; i++) {
-			featuresA.grow().set(i);
-			featuresB.grow().set(i+0.12);
-			featuresC.grow().set(i+0.3);
+			featuresA.grow().setTo(i);
+			featuresB.grow().setTo(i+0.12);
+			featuresC.grow().setTo(i+0.3);
 		}
 
 		// there is only one set

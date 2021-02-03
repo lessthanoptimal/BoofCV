@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ class TestAssociateGreedyDesc_MT extends BoofStandardJUnit {
 		DogArray<TupleDesc_F64> ret = new DogArray<>(count,()-> new TupleDesc_F64(1));
 
 		for( int i = 0; i < count; i++ ) {
-			ret.grow().set(rand.nextDouble()*10);
+			ret.grow().setTo(rand.nextDouble()*10);
 		}
 
 		return ret;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class ImplDescribeBinaryCompare_F32 extends DescribePointBinaryCompare<Gr
 	@Override
 	public void processInside( int c_x , int c_y , TupleDesc_B feature )
 	{
-		Arrays.fill(feature.data, 0);
+		Arrays.fill(feature.value, 0);
 
 		int index = image.startIndex + image.stride*c_y + c_x;
 
@@ -66,13 +66,13 @@ public class ImplDescribeBinaryCompare_F32 extends DescribePointBinaryCompare<Gr
 				}
 			}
 
-			feature.data[ i/32 ] = desc;
+			feature.value[ i/32 ] = desc;
 		}
 	}
 
 	@Override
 	public void processBorder( int c_x , int c_y , TupleDesc_B feature ) {
-		Arrays.fill(feature.data, 0);
+		Arrays.fill(feature.value, 0);
 
 		int index = image.startIndex + image.stride*c_y + c_x;
 
@@ -96,7 +96,7 @@ public class ImplDescribeBinaryCompare_F32 extends DescribePointBinaryCompare<Gr
 					}
 				}
 			}
-			feature.data[ i/32 ] = desc;
+			feature.value[ i/32 ] = desc;
 		}
 	}
 

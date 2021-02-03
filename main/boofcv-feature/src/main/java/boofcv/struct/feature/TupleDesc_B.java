@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,16 @@
 
 package boofcv.struct.feature;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Binary descriptor which is stored inside of an array of ints.
  *
  * @author Peter Abeles
  */
 public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
-	public int[] data;
+	public @Getter @Setter int[] value;
 	public int numBits;
 
 	public TupleDesc_B( int numBits ) {
@@ -34,33 +37,26 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 		}
 
 		this.numBits = numBits;
-		data = new int[numInts];
+		value = new int[numInts];
 	}
 
 	public TupleDesc_B( int numBits, int numInts ) {
 		this.numBits = numBits;
-		data = new int[numInts];
+		value = new int[numInts];
 	}
 
 	public boolean isBitTrue( int bit ) {
 		int index = bit/32;
-		return ((data[index] >> (bit%32)) & 0x01) == 1;
-	}
-
-	@Override
-	public TupleDesc_B copy() {
-		TupleDesc_B ret = new TupleDesc_B(numBits);
-		System.arraycopy(data, 0, ret.data, 0, data.length);
-		return ret;
+		return ((value[index] >> (bit%32)) & 0x01) == 1;
 	}
 
 	@Override
 	public void setTo( TupleDesc_B source ) {
-		if (data.length < source.data.length)
+		if (value.length < source.value.length)
 			throw new IllegalArgumentException("Data array is too small to store the source array.");
 
 		this.numBits = source.numBits;
-		System.arraycopy(source.data, 0, data, 0, source.data.length);
+		System.arraycopy(source.value, 0, value, 0, source.value.length);
 	}
 
 	@Override
@@ -74,5 +70,9 @@ public class TupleDesc_B implements TupleDesc<TupleDesc_B> {
 	@Override
 	public int size() {
 		return numBits;
+	}
+
+	@Override public TupleDesc_B newInstance() {
+		return new TupleDesc_B(numBits, value.length);
 	}
 }

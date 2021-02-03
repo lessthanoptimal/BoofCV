@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,5 +54,11 @@ public interface TupleDesc<T extends TupleDesc> extends Serializable {
 	 *
 	 * @return Copy
 	 */
-	T copy();
+	default T copy() {
+		T dst = newInstance();
+		dst.setTo(this);
+		return dst;
+	}
+
+	T newInstance();
 }

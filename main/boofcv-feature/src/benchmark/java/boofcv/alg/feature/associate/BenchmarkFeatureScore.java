@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,8 +113,8 @@ public class BenchmarkFeatureScore {
 
 		for (int i = 0; i < NUM_FEATURES; i++) {
 			TupleDesc_B t = ret.grow();
-			for (int j = 0; j < t.data.length; j++) {
-				t.data[j] = rand.nextInt();
+			for (int j = 0; j < t.value.length; j++) {
+				t.value[j] = rand.nextInt();
 			}
 		}
 		return ret;
