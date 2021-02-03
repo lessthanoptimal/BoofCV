@@ -26,7 +26,6 @@ import org.ddogleg.struct.LArrayAccessor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -37,8 +36,7 @@ public class TestClusterVisualWords extends BoofStandardJUnit {
 	int NUM_CLUSTERS = 12;
 	double DISTANCE = 394.5;
 
-	@Test
-	public void process() {
+	@Test public void process() {
 		DummyClusters clusters = new DummyClusters();
 		ClusterVisualWords alg = new ClusterVisualWords(clusters,SEED);
 
@@ -54,39 +52,34 @@ public class TestClusterVisualWords extends BoofStandardJUnit {
 	}
 
 	protected class DummyClusters implements ComputeClusters<double[]> {
-
 		int numInit = 0;
 		int numProcess = 0;
 		int numInputPoints = 0;
 
-		@Override
-		public void initialize(long randomSeed) {
+		@Override public void initialize(long randomSeed) {
 			numInit++;
 
 			assertEquals(SEED,randomSeed);
-
 		}
 
-		@Override
-		public void process( LArrayAccessor<double[]> points, int numCluster) {
+		@Override public void process( LArrayAccessor<double[]> points, int numCluster) {
 			numProcess++;
-
 			numInputPoints = points.size();
-			assertTrue(points != null);
 			assertEquals(NUM_CLUSTERS, numCluster);
 		}
 
-		@Override
-		public AssignCluster<double[]> getAssignment() {
+		@Override public AssignCluster<double[]> getAssignment() {
 			return null;
 		}
 
-		@Override
-		public double getDistanceMeasure() {
+		@Override public double getDistanceMeasure() {
 			return DISTANCE;
 		}
 
-		@Override
-		public void setVerbose(boolean verbose) {}
+		@Override public void setVerbose(boolean verbose) {}
+
+		@Override public ComputeClusters<double[]> newInstanceThread() {
+			return null;
+		}
 	}
 }

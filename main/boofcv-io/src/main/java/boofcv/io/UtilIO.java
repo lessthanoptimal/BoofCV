@@ -224,6 +224,23 @@ public class UtilIO {
 		}
 	}
 
+	public static int readInt( InputStream input ) throws IOException {
+		int v0 = checkEOF(input);
+		int v1 = checkEOF(input);
+		int v2 = checkEOF(input);
+		int v3 = checkEOF(input);
+
+		return (v0 << 24) | (v1 << 16) | (v2 << 8) | v3;
+	}
+
+	private static int checkEOF(InputStream input) throws IOException {
+		int value = input.read();
+		if (value == -1)
+			throw new IOException("EOF reached");
+		return value;
+	}
+
+
 	public static void write( OutputStream output, String message ) throws IOException {
 		output.write(message.getBytes(UTF_8));
 	}

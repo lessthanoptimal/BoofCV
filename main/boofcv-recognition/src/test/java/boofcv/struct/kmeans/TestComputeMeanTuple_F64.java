@@ -16,40 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.struct.kmeans;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.Arrays;
+import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.clustering.ComputeMeanClusters;
+import org.ddogleg.struct.DogArray_F64;
 
 /**
- * Feature description storage in an array of bytes.
- *
  * @author Peter Abeles
  */
-public abstract class TupleDesc_I8<TD extends TupleDesc_I8> implements TupleDesc<TD> {
-	public @Getter @Setter byte[] value;
+class TestComputeMeanTuple_F64 extends GenericComputeMeanClustersChecks<TupleDesc_F64> {
 
-	protected TupleDesc_I8( int numFeatures ) {
-		this.value = new byte[numFeatures];
+	int DOF = 3;
+
+	@Override public ComputeMeanClusters<TupleDesc_F64> createAlg() {
+		return new ComputeMeanTuple_F64();
 	}
 
-	public void setTo( byte... value ) {
-		System.arraycopy(value, 0, this.value, 0, this.value.length);
+	@Override public PackedArray<TupleDesc_F64> createArray() {
+		return new PackedTupleArray_F64(DOF);
 	}
 
-	public void fill( byte value ) {
-		Arrays.fill(this.value, value);
+	@Override public void pointToDoubleArray( TupleDesc_F64 src, DogArray_F64 dst ) {
+		dst.resize(DOF);
+		for (int i = 0; i < DOF; i++) {
+			dst.set(i, dst.get(i));
+		}
 	}
 
-	@Override
-	public void setTo( TD source ) {
-		System.arraycopy(source.value, 0, value, 0, value.length);
-	}
-
-	@Override
-	public int size() {
-		return value.length;
+	@Override public TupleDesc_F64 randomPoint() {
+		return new TupleDesc_F64(DOF);
 	}
 }
