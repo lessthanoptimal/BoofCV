@@ -47,7 +47,7 @@ public class HierarchicalVocabularyTree<Point, Data> {
 	public final FastArray<Data> listData;
 
 	/** Computes distance between two points. Together with the 'mean' points, this defines the sub-regions */
-	public final PointDistance<Point> distanceFunction;
+	public PointDistance<Point> distanceFunction;
 
 	// list of mean descriptors that define the discretized regions
 	public final PackedArray<Point> descriptions;

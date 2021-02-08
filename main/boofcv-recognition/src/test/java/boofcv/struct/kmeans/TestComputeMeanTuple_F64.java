@@ -37,7 +37,7 @@ class TestComputeMeanTuple_F64 extends GenericComputeMeanClustersChecks<TupleDes
 		return new PackedTupleArray_F64(DOF);
 	}
 
-	@Override public void pointToDoubleArray( TupleDesc_F64 src, DogArray_F64 dst ) {
+	@Override public void pointToCommonArray( TupleDesc_F64 src, /**/DogArray_F64 dst ) {
 		dst.resize(DOF);
 		for (int i = 0; i < DOF; i++) {
 			dst.set(i, dst.get(i));

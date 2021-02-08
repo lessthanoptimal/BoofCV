@@ -275,6 +275,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	}
 
 	public static class LeafData {
-		TIntObjectMap<ImageInfo> images = new TIntObjectHashMap<>();
+		/** images at this leaf. key=imageID value=ImageInfo */
+		public TIntObjectMap<ImageInfo> images = new TIntObjectHashMap<>();
 	}
 }

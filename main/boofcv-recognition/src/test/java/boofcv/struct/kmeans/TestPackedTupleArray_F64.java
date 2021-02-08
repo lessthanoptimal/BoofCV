@@ -33,7 +33,7 @@ class TestPackedTupleArray_F64 extends GenericPackedArrayChecks<TupleDesc_F64> {
 
 	@Override protected TupleDesc_F64 createRandomPoint() {
 		var point = new TupleDesc_F64(DOF);
-		point.value[0] = rand.nextGaussian();
+		point.value[0] = (double) rand.nextGaussian();
 		return point;
 	}
 
