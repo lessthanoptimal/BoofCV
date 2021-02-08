@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public enum Unit {
 		return value*Unit.conversion(this, to);
 	}
 
-	public double conversion( Unit to ) {
+	public double conversionTo( Unit to ) {
 		return Unit.conversion(this, to);
 	}
 
