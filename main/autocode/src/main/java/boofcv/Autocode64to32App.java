@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,7 @@ public class Autocode64to32App extends RecursiveConvert {
 				"main/boofcv-io/src/main/java/boofcv/io/points/impl",
 				"main/boofcv-ip/src/main/java/boofcv/alg/distort",
 				"main/boofcv-types/src/main/java/boofcv/struct",
+				"main/boofcv-recognition/src/main/java/boofcv/struct/kmeans",
 		};
 
 		ConvertFile32From64 converter = new ConvertFile32From64(false);

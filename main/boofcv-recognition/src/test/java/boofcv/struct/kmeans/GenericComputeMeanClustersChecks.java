@@ -54,7 +54,7 @@ public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJU
 	public abstract PackedArray<T> createArray();
 
 	/** Convert a point in to a generic format */
-	public abstract void pointToDoubleArray( T src, DogArray_F64 dst );
+	public abstract void pointToCommonArray( T src, DogArray_F64 dst );
 
 	/** Creates a random point */
 	public abstract T randomPoint();
@@ -63,7 +63,7 @@ public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJU
 	@Test public void computeMean() {
 		// determine DOF and create work space
 		var tmp = new DogArray_F64();
-		pointToDoubleArray(randomPoint(), tmp);
+		pointToCommonArray(randomPoint(), tmp);
 		int DOF = tmp.size;
 
 		// Create random points and assignments
@@ -82,7 +82,7 @@ public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJU
 		// Compare to expected
 		for (int label = 0; label < numLabels; label++) {
 			double[] e = expected.get(label);
-			pointToDoubleArray(clusters.get(label), tmp);
+			pointToCommonArray(clusters.get(label), tmp);
 
 			for (int i = 0; i < DOF; i++) {
 				assertEquals(e[i], tmp.get(i), UtilEjml.TEST_F32); // F32 since input could be float
@@ -134,8 +134,8 @@ public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJU
 		DogArray_F64 dog2 = new DogArray_F64();
 
 		for (int label = 0; label < numLabels; label++) {
-			pointToDoubleArray(clusters1.get(label), dog1);
-			pointToDoubleArray(clusters2.get(label), dog2);
+			pointToCommonArray(clusters1.get(label), dog1);
+			pointToCommonArray(clusters2.get(label), dog2);
 
 			for (int element = 0; element < dog1.size; element++) {
 				assertEquals(dog1.get(element), dog2.get(element), UtilEjml.TEST_F64);
@@ -153,7 +153,7 @@ public abstract class GenericComputeMeanClustersChecks<T> extends BoofStandardJU
 		for (int i = 0; i < list.size(); i++) {
 			int label = assignments.get(i);
 			T point = list.get(i);
-			pointToDoubleArray(point, tmp);
+			pointToCommonArray(point, tmp);
 
 			counts[label]++;
 			double[] cluster = expected.get(label);

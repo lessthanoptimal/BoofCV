@@ -114,7 +114,7 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 	/**
 	 * There isn't enough data to fully populate the tree. It should handle this gracefully.
 	 */
-	@Test void more_leads_than_data() {
+	@Test void more_leaves_than_data() {
 		var points = new Packed2D();
 		for (int i = 0; i < 100; i++) {
 			points.list.add(new Point2D_F64(rand.nextGaussian()*2, rand.nextGaussian()*2));
@@ -127,8 +127,9 @@ class TestLearnHierarchicalTree extends BoofStandardJUnit {
 		LearnHierarchicalTree<Point2D_F64> alg = createAlg();
 		alg.process(points, tree);
 
-		assertTrue(100 < tree.nodes.size);
-		assertTrue(100 < tree.descriptions.size());
+		assertTrue(100 >= tree.nodes.size);
+		// The root node has no description, hence the -1
+		assertEquals(tree.descriptions.size(), tree.nodes.size - 1);
 		assertEquals(0, tree.listData.size);
 	}
 
