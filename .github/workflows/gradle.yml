@@ -25,13 +25,13 @@ jobs:
         java-version: 14
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Test Spotless
+      run: ./gradlew spotlessJavaCheck
     - name: Auto Generate Code
       run: ./gradlew autogenerate
     - name: Build with Gradle
       run: ./gradlew assemble
     - name: Print Dependency Info
       run: ./gradlew -q --console plain dependencyInfo
-    - name: Test Spotless
-      run: ./gradlew spotlessJavaCheck
     - name: Unit Tests
       run: ./gradlew test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,13 @@ import boofcv.struct.feature.TupleDesc_F64;
 public class Histogram_F64 extends TupleDesc_F64 {
 
 	// number of elements in each dimension
-	int length[];
+	int[] length;
 	// precomputed strides.  strides[n] = strides[n-1]*length[n]
-	int strides[];
+	int[] strides;
 
 	// the range of each dimension
-	double valueMin[];
-	double valueMax[];
+	double[] valueMin;
+	double[] valueMax;
 
 	/**
 	 * Creates a multi dimensional histogram where each dimension has the specified lengths.
@@ -216,7 +216,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * @param coordinate N-D coordinate
 	 * @return index
 	 */
-	public final int getIndex( int coordinate[] ) {
+	public final int getIndex( int[] coordinate ) {
 		int index = coordinate[0]*strides[0];
 		for (int i = 1; i < coordinate.length; i++) {
 			index += strides[i]*coordinate[i];
@@ -251,15 +251,14 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * @param coordinate N-D coordinate
 	 * @return histogram value
 	 */
-	public double get( int coordinate[]  ) {
+	public double get( int[] coordinate ) {
 		return  value[getIndex(coordinate)];
 	}
 
 	/**
 	 * Creates an exact copy of "this" histogram
 	 */
-	@Override
-	public Histogram_F64 copy() {
+	@Override public Histogram_F64 copy() {
 		Histogram_F64 out = newInstance();
 
 		System.arraycopy(value,0,out.value,0,length.length);
@@ -270,7 +269,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	/**
 	 * Creates a new instance of this histogram which has the same "shape" and min / max values.
 	 */
-	public Histogram_F64 newInstance() {
+	@Override public Histogram_F64 newInstance() {
 		Histogram_F64 out = new Histogram_F64(length);
 
 		for (int i = 0; i < length.length; i++) {

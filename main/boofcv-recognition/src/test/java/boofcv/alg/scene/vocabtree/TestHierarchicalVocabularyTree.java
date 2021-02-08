@@ -149,6 +149,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		@Override public void getCopy( int index, Point2D_F64 dst ) {dst.setTo(list.get(index));}
 		@Override public void copy( Point2D_F64 src, Point2D_F64 dst ) {dst.setTo(src);}
 		@Override public int size() {return list.size();}
+		@Override public Class<Point2D_F64> getElementType() {return Point2D_F64.class;}
 	}
 	// @formatter:on
 }

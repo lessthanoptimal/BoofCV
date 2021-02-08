@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -138,7 +138,7 @@ public class ConfigDisparitySGM implements Configuration {
 	 */
 	public enum Paths {
 		P1(1), P2(2), P4(4), P8(8), P16(16);
-		private int count;
+		private final int count;
 
 		Paths( int count ) {
 			this.count = count;
