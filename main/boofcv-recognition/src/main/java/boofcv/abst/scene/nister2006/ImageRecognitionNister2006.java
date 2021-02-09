@@ -43,8 +43,6 @@ import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +62,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	@Getter HierarchicalVocabularyTree<TD, LeafData> tree;
 
 	/** Manages saving and locating images */
-	@Getter RecognitionVocabularyTreeNister2006<TD> database;
+	@Getter RecognitionVocabularyTreeNister2006<TD> databaseN;
 
 	/** Detects image features */
 	@Getter @Setter DetectDescribePoint<Image, TD> detector;
@@ -84,7 +82,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		this.config = config;
 		this.detector = FactoryDetectDescribe.generic(config.features, imageType.getImageClass());
 		this.imageFeatures = new DogArray<>(() -> detector.createDescription());
-		this.database = new RecognitionVocabularyTreeNister2006<>();
+		this.databaseN = new RecognitionVocabularyTreeNister2006<>();
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -148,18 +146,10 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		learnWeights.fixate();
 
 		// Initialize the database
-		database.initializeTree(tree);
+		databaseN.initializeTree(tree);
 	}
 
-	@Override public void saveDescription( Writer writer ) {
-
-	}
-
-	@Override public void loadDescription( Reader reader ) {
-
-	}
-
-	@Override public void addDataBase( String id, Image image ) {
+	@Override public void addImage( String id, Image image ) {
 		// Copy image features into an array
 		detector.detect(image);
 		imageFeatures.resize(detector.getNumberOfFeatures());
@@ -172,15 +162,11 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		imageIds.add(id);
 
 		// Add the image
-		database.addImage(imageIndex, imageFeatures.toList(), null);
+		databaseN.addImage(imageIndex, imageFeatures.toList(), null);
 	}
 
-	@Override public void saveDataBase( Writer writer ) {
-
-	}
-
-	@Override public void loadDataBase( Reader reader ) {
-
+	@Override public ImageRecognition.DataBase getDataBase() {
+		return null;
 	}
 
 	@Override public boolean findBestMatch( Image queryImage, DogArray<Match> matches ) {
@@ -192,8 +178,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		}
 
 		// Look up the closest matches
-		database.lookup(imageFeatures.toList());
-		DogArray<RecognitionVocabularyTreeNister2006.Match> found = database.getMatchScores();
+		databaseN.lookup(imageFeatures.toList());
+		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatchScores();
 		matches.resize(found.size);
 
 		// Copy results into output format

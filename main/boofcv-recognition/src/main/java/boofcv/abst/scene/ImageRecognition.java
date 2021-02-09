@@ -23,8 +23,6 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Iterator;
 
 /**
@@ -39,15 +37,14 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 
 	void learnDescription( Iterator<T> images );
 
-	void saveDescription( Writer writer );
+	void addImage( String id, T image );
 
-	void loadDescription( Reader reader );
-
-	void addDataBase( String id, T image );
-
-	void saveDataBase( Writer writer );
-
-	void loadDataBase( Reader reader );
+	/**
+	 * Returns a reference to the internal database. This can be used to save and load previously constructed models.
+	 * Using the returned object is likely to require knowledge about its type, which might require some reverse
+	 * engineering.
+	 */
+	DataBase getDataBase();
 
 	/**
 	 * Finds the best matches in the database to the query image.
@@ -67,4 +64,7 @@ public interface ImageRecognition<T extends ImageBase<T>> extends VerbosePrint {
 		/** Error. Larger the value less similar it is to the original. Meaning is implementation dependent. */
 		public double error;
 	}
+
+	/** Interface for model and database that defines an image recognition system */
+	interface DataBase {}
 }
