@@ -18,6 +18,8 @@
 
 package boofcv.struct.kmeans;
 
+//CUSTOM ignore org.ddogleg.struct.DogArray_F64;
+
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.clustering.ComputeMeanClusters;
 import org.ddogleg.struct.DogArray_F64;

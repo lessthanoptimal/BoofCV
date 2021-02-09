@@ -158,6 +158,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 				if (assignments.get(pointIdx) != label)
 					continue;
 				pointsInBranch.addCopy(pointsInParent.getTemp(pointIdx));
+				// todo batch copy?
 			}
 
 			// If there are two few points to be significant, abort the search here

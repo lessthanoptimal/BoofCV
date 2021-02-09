@@ -25,7 +25,9 @@ import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006;
 import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.LeafData;
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree;
 import boofcv.alg.scene.vocabtree.LearnHierarchicalTree;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
@@ -38,6 +40,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.clustering.FactoryClustering;
 import org.ddogleg.clustering.PointDistance;
+import org.ddogleg.clustering.kmeans.StandardKMeans;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -78,11 +81,17 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	// If not null then print verbose information
 	PrintStream verbose;
 
+	// Intenral Profiling
+	long timeLearnDescribeMS;
+	long timeLearnClusterMS;
+	long timeLearnWeightsMS;
+
 	public ImageRecognitionNister2006( ConfigImageRecognitionNister2006 config, ImageType<Image> imageType ) {
 		this.config = config;
 		this.detector = FactoryDetectDescribe.generic(config.features, imageType.getImageClass());
 		this.imageFeatures = new DogArray<>(() -> detector.createDescription());
 		this.databaseN = new RecognitionVocabularyTreeNister2006<>();
+		this.imageType = imageType;
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -94,6 +103,7 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		DogArray_I32 startIndex = new DogArray_I32();
 
 		// Detect features in all the images and save into a single array
+		long time0 = System.currentTimeMillis();
 		while (images.hasNext()) {
 			startIndex.add(packedFeatures.size());
 			detector.detect(images.next());
@@ -103,10 +113,11 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 				packedFeatures.addCopy(detector.getDescription(i));
 			}
 			if (verbose != null)
-				verbose.println("described.size=" + startIndex.size + " packed.size="+packedFeatures.size());
+				verbose.println("described.size=" + startIndex.size + " packed.size=" + packedFeatures.size());
 		}
 		startIndex.add(packedFeatures.size());
 		if (verbose != null) verbose.println("packedFeatures.size=" + packedFeatures.size());
+		long time1 = System.currentTimeMillis();
 
 		// Create the tree data structure
 		PointDistance distance = new TuplePointDistanceEuclideanSq.F64();
@@ -117,13 +128,18 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 
 		// Learn the tree's structure
 		if (verbose != null) verbose.println("learning the tree");
-		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
-				() -> (PackedArray)new PackedTupleArray_F64(DOF),
+
+		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = BoofConcurrency.isUseConcurrent() ?
+				() -> FactoryClustering.kMeans_MT(config.kmeans,
+						new ComputeMeanTuple_F64(), distance, () -> new TupleDesc_F64(DOF)) :
 				() -> FactoryClustering.kMeans(config.kmeans,
-						new ComputeMeanTuple_F64(), distance, () -> new TupleDesc_F64(DOF)),
-				config.randSeed);
+						new ComputeMeanTuple_F64(), distance, () -> new TupleDesc_F64(DOF));
+
+		LearnHierarchicalTree<TD> learnTree = new LearnHierarchicalTree<>(
+				() -> (PackedArray)new PackedTupleArray_F64(DOF), factoryKMeans, config.randSeed);
 		learnTree.setVerbose(verbose, null);
 		learnTree.process(packedFeatures, tree);
+		long time2 = System.currentTimeMillis();
 
 		if (verbose != null) {
 			verbose.println(" Tree {bf=" + tree.branchFactor + " ml=" + tree.maximumLevel +
@@ -144,9 +160,17 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 			learnWeights.addImage(imageFeatures.toList());
 		}
 		learnWeights.fixate();
+		long time3 = System.currentTimeMillis();
 
 		// Initialize the database
 		databaseN.initializeTree(tree);
+
+		// Compute internal profiling
+		timeLearnDescribeMS = time1-time0;
+		timeLearnClusterMS = time2-time1;
+		timeLearnWeightsMS = time3-time2;
+
+		System.out.println("TIme: describe="+timeLearnDescribeMS+" cluster="+timeLearnClusterMS+" weights="+timeLearnWeightsMS);
 	}
 
 	@Override public void addImage( String id, Image image ) {
