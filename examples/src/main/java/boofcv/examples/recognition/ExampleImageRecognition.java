@@ -25,44 +25,20 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.ImageFileListIterator;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
 
 import java.awt.image.BufferedImage;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Peter Abeles
  **/
 public class ExampleImageRecognition {
-
-	private static class ImageIterator<T extends ImageGray<T>> implements Iterator<T> {
-
-		T image;
-		List<String> paths;
-		int index = 0;
-
-		public ImageIterator( List<String> paths, ImageType<T> imageType ) {
-			image = imageType.createImage(1, 1);
-			this.paths = paths;
-		}
-
-		@Override public boolean hasNext() {
-			return index < paths.size();
-		}
-
-		@Override public T next() {
-			BufferedImage buffered = UtilImageIO.loadImage(paths.get(index++));
-			ConvertBufferedImage.convertFrom(buffered, true, image);
-			return image;
-		}
-	}
 
 	public static void main( String[] args ) {
 		String imagePath = "/home/pja/Downloads/inria/jpg";//UtilIO.pathExample("recognition/vacation");
@@ -76,13 +52,13 @@ public class ExampleImageRecognition {
 		ImageRecognition<GrayU8> recognizer = new ImageRecognitionNister2006<>(config, ImageType.SB_U8);
 		recognizer.setVerbose(System.out, null);
 
-		recognizer.learnDescription(new ImageIterator<>(images, ImageType.SB_U8));
+		recognizer.learnDescription(new ImageFileListIterator<>(images, ImageType.SB_U8));
 
 		// Add images to the data base
 		System.out.println("Adding images to the database");
-		var iterator = new ImageIterator<>(images, ImageType.SB_U8);
+		var iterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
 		while (iterator.hasNext()) {
-			recognizer.addImage(images.get(iterator.index), iterator.next());
+			recognizer.addImage(images.get(iterator.getIndex()), iterator.next());
 		}
 
 		ListDisplayPanel gui = new ListDisplayPanel();
@@ -92,7 +68,7 @@ public class ExampleImageRecognition {
 
 		// Look up images
 		DogArray<ImageRecognition.Match> matches = new DogArray<>(ImageRecognition.Match::new);
-		iterator = new ImageIterator<>(images, ImageType.SB_U8);
+		iterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
 		recognizer.findBestMatch(iterator.next(), matches);
 		for (int i = 1; i < Math.min(10,matches.size); i++) {
 			String file = matches.get(i).id;
@@ -101,7 +77,7 @@ public class ExampleImageRecognition {
 			gui.addImage(image, String.format("Error %6.3f", error), ScaleOptions.ALL);
 		}
 
-		System.out.println(images.get(iterator.index-1)+" -> "+matches.get(0).id+"  matches.size="+matches.size);
+		System.out.println(images.get(iterator.getIndex()-1)+" -> "+matches.get(0).id+" matches.size="+matches.size);
 
 		ShowImages.showWindow(gui, "Similar Images by Features", true);
 	}

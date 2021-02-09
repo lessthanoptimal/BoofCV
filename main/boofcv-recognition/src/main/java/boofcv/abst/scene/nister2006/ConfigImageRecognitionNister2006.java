@@ -61,15 +61,13 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		// Below, it's configured to re-initialize several times and give up at 30 iterations.
 		// From personal experimentation, re-initialization is important with smaller datasets.
 		// Probably washes out in larger ones
-		kmeans.maxIterations = 200;
-		kmeans.maxConverge = 30;
+		kmeans.reseedAfterIterations = 30;
+		kmeans.maxReSeed = 5;
+		kmeans.maxIterations = kmeans.reseedAfterIterations*kmeans.maxReSeed;
 
-		// Let's use SURF-FAST by default, but limit its scale invariance to make things run faster.
-		// Most of the time we aren't trying to match images with large scale differences.
+		// Let's use SURF-FAST by default
 		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_FAST;
 		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
-//		features.detectFastHessian.numberOfOctaves = 1;
-		features.detectFastHessian.extract.radius = 12;
 	}
 
 	@Override public void checkValidity() {
