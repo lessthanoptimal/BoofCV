@@ -82,7 +82,7 @@ public class ExampleImageRecognition {
 		System.out.println("Adding images to the database");
 		var iterator = new ImageIterator<>(images, ImageType.SB_U8);
 		while (iterator.hasNext()) {
-			recognizer.addDataBase(images.get(iterator.index), iterator.next());
+			recognizer.addImage(images.get(iterator.index), iterator.next());
 		}
 
 		ListDisplayPanel gui = new ListDisplayPanel();
