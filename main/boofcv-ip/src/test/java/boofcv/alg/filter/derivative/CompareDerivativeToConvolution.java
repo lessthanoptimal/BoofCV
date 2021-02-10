@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class CompareDerivativeToConvolution {
 	public void setKernel( int which, Kernel1D kernel, boolean isHorizontal ) {
 		outputFilters[which] = FactoryConvolve.convolve(kernel,
 				ImageType.single(inputType), ImageType.single(outputType), BorderType.EXTENDED, isHorizontal);
-		borders[which] = setBorder(kernel, isHorizontal);
+		borders[which] = setBorder(kernel, kernel);
 	}
 
 	public void setKernel( int which, Kernel2D kernel ) {
@@ -169,24 +169,6 @@ public class CompareDerivativeToConvolution {
 		Border b = new Border();
 		b.borderX0 = b.borderX1 = b.borderY0 = b.borderY1 = kernel.getRadius();
 		return b;
-	}
-
-	private Border setBorder( Kernel1D kernel, boolean isHorizontal ) {
-		return setBorder(kernel, kernel);
-		// just assume it is going to convolve both at the same time
-//		Border b = new Border();
-//		if( isHorizontal ) {
-//			b.borderX0 = kernel.getOffset();
-//			b.borderX1 = kernel.getWidth() - kernel.getOffset() - 1;
-//			b.borderY0 = 0;
-//			b.borderY1 = 0;
-//		} else {
-//			b.borderX0 = 0;
-//			b.borderX1 = 0;
-//			b.borderY0 = kernel.getOffset();
-//			b.borderY1 = kernel.getWidth() - kernel.getOffset() - 1;
-//		}
-//		return b;
 	}
 
 	private Border setBorder( Kernel1D horizontal, Kernel1D vertical ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public abstract class SgmCostBase<T extends ImageBase<T>> implements SgmDisparit
 		this.right = right;
 
 		// Declare the "tensor" with shape (lengthY,lengthX,lengthD)
-		costYXD.reshape(disparityRange, left.width, left.height);
+		costYXD.reshape(/* width= */disparityRange, /* height= */left.width, /* numberOfBands= */left.height);
 
 		for (int y = 0; y < left.height; y++) {
 			costXD = costYXD.getBand(y);

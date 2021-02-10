@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -171,8 +171,8 @@ public class TestEllipseClustersIntoGrid extends BoofStandardJUnit {
 	static Tuple2<List<Node>,List<EllipseRotated_F64>> createRegularGrid(int rows , int cols ) {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
-		for (int row = 0, i = 0; row < rows; row++) {
-			for (int col = 0; col < cols; col++, i++) {
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
 				ellipses.add( new EllipseRotated_F64(col,row,0.1,0.1,0) );
 			}
 		}

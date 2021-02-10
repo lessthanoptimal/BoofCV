@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -235,14 +235,6 @@ public class GenerateImplFastCorner extends CodeGeneratorBase {
 		}
 
 		return output;
-	}
-
-	private void debugSampleState() {
-		System.out.print("  S=");
-		for (int i = 0; i < samples.length; i++) {
-			System.out.print(sampleAt(i).ordinal());
-		}
-		System.out.println();
 	}
 
 	private void updateSamples( Action action ) {

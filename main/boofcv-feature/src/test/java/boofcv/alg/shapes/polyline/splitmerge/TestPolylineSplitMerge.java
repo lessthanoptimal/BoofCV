@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -365,7 +365,6 @@ public class TestPolylineSplitMerge extends BoofStandardJUnit {
 	@Test
 	public void selectCornerToSplit_loop() {
 		PolylineSplitMerge alg = new PolylineSplitMerge();
-		Element<Corner> c0 = alg.addCorner(0);
 		Element<Corner> c1 = alg.addCorner(10);
 		Element<Corner> c2 = alg.addCorner(20);
 		Element<Corner> c3 = alg.addCorner(30);

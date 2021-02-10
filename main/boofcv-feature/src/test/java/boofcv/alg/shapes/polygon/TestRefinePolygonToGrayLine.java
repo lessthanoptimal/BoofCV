@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -339,13 +339,13 @@ public class TestRefinePolygonToGrayLine extends CommonFitPolygonChecks {
 		assertTrue(Distance2D_F64.distance(found, input.b) <= 1e-4);
 	}
 
-	private double computeMaxDistance(Polygon2D_F64 expected, Polygon2D_F64 found ) {
-		double a = 0;
-		for (int i = 0; i < expected.size(); i++) {
-			a = max(a,expected.get(i).distance(found.get(i)));
+	private double computeMaxDistance(Polygon2D_F64 a, Polygon2D_F64 b ) {
+		double maxDistance = 0;
+		for (int i = 0; i < a.size(); i++) {
+			maxDistance = max(maxDistance,a.get(i).distance(b.get(i)));
 		}
 
-		return a;
+		return maxDistance;
 	}
 
 }

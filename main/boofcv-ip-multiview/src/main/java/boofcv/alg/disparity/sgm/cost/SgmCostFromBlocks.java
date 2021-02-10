@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 	public void process( T left, T right, Planar<GrayU16> costYXD ) {
 		InputSanityCheck.checkSameShape(left, right);
 		this.costYXD = costYXD;
-		costYXD.reshape(disparityRange, left.width, left.height);
+		costYXD.reshape(/* width= */disparityRange, /* height= */left.width, /* numberOfBands= */left.height);
 		maxRegionError = blockScore.getMaxRegionError();
 		blockScore.process(left, right, dummy);
 	}
