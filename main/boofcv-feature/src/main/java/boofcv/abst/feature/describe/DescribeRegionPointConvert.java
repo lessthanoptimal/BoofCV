@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,67 +28,57 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class DescribeRegionPointConvert<T extends ImageGray<T>,In extends TupleDesc,Out extends TupleDesc>
-	implements DescribeRegionPoint<T,Out>
-{
+public class DescribeRegionPointConvert<T extends ImageGray<T>, In extends TupleDesc<In>, Out extends TupleDesc<Out>>
+		implements DescribeRegionPoint<T, Out> {
 	// Computers the description
-	DescribeRegionPoint<T,In> original;
+	DescribeRegionPoint<T, In> original;
 	// Change the description type
-	ConvertTupleDesc<In,Out> converter;
+	ConvertTupleDesc<In, Out> converter;
 
 	// internal storage for the original descriptor
 	In storage;
 
-	public DescribeRegionPointConvert(DescribeRegionPoint<T, In> original,
-									  ConvertTupleDesc<In, Out> converter) {
+	public DescribeRegionPointConvert( DescribeRegionPoint<T, In> original,
+									   ConvertTupleDesc<In, Out> converter ) {
 		this.original = original;
 		this.converter = converter;
 
 		storage = original.createDescription();
 	}
 
-	@Override
-	public void setImage(T image) {
+	@Override public void setImage( T image ) {
 		original.setImage(image);
 	}
 
-	@Override
-	public Out createDescription() {
+	@Override public Out createDescription() {
 		return converter.createOutput();
 	}
 
-	@Override
-	public boolean process(double x, double y, double orientation, double radius, Out storage) {
-
-		if( !original.process(x,y,orientation, radius, this.storage) )
+	@Override public boolean process( double x, double y, double orientation, double radius, Out storage ) {
+		if (!original.process(x, y, orientation, radius, this.storage))
 			return false;
 		converter.convert(this.storage, storage);
 
 		return true;
 	}
 
-	@Override
-	public boolean isScalable() {
+	@Override public boolean isScalable() {
 		return original.isScalable();
 	}
 
-	@Override
-	public boolean isOriented() {
+	@Override public boolean isOriented() {
 		return original.isOriented();
 	}
 
-	@Override
-	public ImageType<T> getImageType() {
+	@Override public ImageType<T> getImageType() {
 		return original.getImageType();
 	}
 
-	@Override
-	public double getCanonicalWidth() {
+	@Override public double getCanonicalWidth() {
 		return original.getCanonicalWidth();
 	}
 
-	@Override
-	public Class<Out> getDescriptionType() {
+	@Override public Class<Out> getDescriptionType() {
 		return converter.getOutputType();
 	}
 }

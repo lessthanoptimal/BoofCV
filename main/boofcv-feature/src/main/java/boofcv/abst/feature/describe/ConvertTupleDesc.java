@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,14 +25,14 @@ import boofcv.struct.feature.TupleDesc;
  *
  * @author Peter Abeles
  */
-public interface ConvertTupleDesc<A extends TupleDesc, B extends TupleDesc> {
+public interface ConvertTupleDesc<A extends TupleDesc<A>, B extends TupleDesc<B>> {
 
 	/**
 	 * Creates a new instance of the output type.
 	 *
 	 * @return New instance of output data type
 	 */
-	public B createOutput();
+	B createOutput();
 
 	/**
 	 * Converts the input descriptor into the output descriptor type.
@@ -40,12 +40,12 @@ public interface ConvertTupleDesc<A extends TupleDesc, B extends TupleDesc> {
 	 * @param input Original input descriptor. Not modified.
 	 * @param output Converted output descriptor. Modified.
 	 */
-	public void convert( A input , B output );
+	void convert( A input, B output );
 
 	/**
 	 * Returns the class type of the output descriptor
 	 *
 	 * @return Output type
 	 */
-	public Class<B> getOutputType();
+	Class<B> getOutputType();
 }
