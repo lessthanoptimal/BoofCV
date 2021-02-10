@@ -249,7 +249,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		ConfigKMeans configKMeans = new ConfigKMeans();
 		configKMeans.maxIterations = MAX_KNN_ITERATIONS;
-		configKMeans.maxConverge = 20;
+		configKMeans.reseedAfterIterations = 20;
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans(
 				configKMeans, desc.createDescription().size(), double[].class);
 		clusterer.setVerbose(true);

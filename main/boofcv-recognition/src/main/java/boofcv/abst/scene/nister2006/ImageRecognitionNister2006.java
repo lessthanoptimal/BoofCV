@@ -32,10 +32,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.kmeans.ComputeMeanTuple_F64;
-import boofcv.struct.kmeans.PackedArray;
-import boofcv.struct.kmeans.PackedTupleArray_F64;
-import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
+import boofcv.struct.kmeans.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.clustering.FactoryClustering;
@@ -130,8 +127,13 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		if (verbose != null) verbose.println("learning the tree");
 
 		BoofLambdas.Factory<StandardKMeans<TD>> factoryKMeans = BoofConcurrency.isUseConcurrent() ?
-				() -> FactoryClustering.kMeans_MT(config.kmeans,
-						new ComputeMeanTuple_F64(), distance, () -> new TupleDesc_F64(DOF)) :
+				() -> {
+					int minimumForThreads = 500;
+					var computeMean = new ComputeMeanTuple_MT_F64(() -> new TupleDesc_F64(DOF));
+					computeMean.setMinimumForConcurrent(minimumForThreads);
+					return FactoryClustering.kMeans_MT(config.kmeans,minimumForThreads,
+							computeMean, distance, () -> new TupleDesc_F64(DOF));
+				} :
 				() -> FactoryClustering.kMeans(config.kmeans,
 						new ComputeMeanTuple_F64(), distance, () -> new TupleDesc_F64(DOF));
 
@@ -170,7 +172,9 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		timeLearnClusterMS = time2-time1;
 		timeLearnWeightsMS = time3-time2;
 
-		System.out.println("TIme: describe="+timeLearnDescribeMS+" cluster="+timeLearnClusterMS+" weights="+timeLearnWeightsMS);
+		if (verbose!=null)
+			verbose.printf("Time (s): describe=%.1f cluster=%.1f weights=%.1f\n",
+					timeLearnDescribeMS*1e-3, timeLearnClusterMS*1e-3, timeLearnWeightsMS*1e-3);
 	}
 
 	@Override public void addImage( String id, Image image ) {
@@ -184,6 +188,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		// Save the ID and convert into a format the database understands
 		int imageIndex = imageIds.size();
 		imageIds.add(id);
+
+		if (verbose!=null) verbose.println("detected["+imageIndex+"].size="+detector.getNumberOfFeatures()+" id="+id);
 
 		// Add the image
 		databaseN.addImage(imageIndex, imageFeatures.toList(), null);
@@ -202,7 +208,9 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		}
 
 		// Look up the closest matches
-		databaseN.lookup(imageFeatures.toList());
+		if (!databaseN.lookup(imageFeatures.toList()))
+			return false;
+
 		DogArray<RecognitionVocabularyTreeNister2006.Match> found = databaseN.getMatchScores();
 		matches.resize(found.size);
 

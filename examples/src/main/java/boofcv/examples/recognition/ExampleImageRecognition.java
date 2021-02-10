@@ -21,6 +21,7 @@ package boofcv.examples.recognition;
 import boofcv.abst.scene.ImageRecognition;
 import boofcv.abst.scene.nister2006.ConfigImageRecognitionNister2006;
 import boofcv.abst.scene.nister2006.ImageRecognitionNister2006;
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
@@ -29,9 +30,11 @@ import boofcv.io.image.ImageFileListIterator;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,24 +44,42 @@ import java.util.List;
 public class ExampleImageRecognition {
 
 	public static void main( String[] args ) {
-		String imagePath = "/home/pja/Downloads/inria/jpg";//UtilIO.pathExample("recognition/vacation");
+		String imagePath = "/home/pja/Downloads/inria/jpg1";//UtilIO.pathExample("recognition/vacation");
 		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
+		int maxResolution = 1024*768;
+		var scaled = new GrayU8(1024, 768);
+
 		// Learn how to describe images
 		var config = new ConfigImageRecognitionNister2006();
-		config.tree.branchFactor = 4;
+//		config.tree.branchFactor = 4;
 //		config.tree.maximumLevel = 4;
+		config.features.detectFastHessian.extract.radius = 3;
+//		config.features.detectFastHessian.extract.threshold = 0.0f;
 		ImageRecognition<GrayU8> recognizer = new ImageRecognitionNister2006<>(config, ImageType.SB_U8);
 		recognizer.setVerbose(System.out, null);
 
-		recognizer.learnDescription(new ImageFileListIterator<>(images, ImageType.SB_U8));
+		var imageIterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
+		imageIterator.setFilter((full)->{
+			double scale = Math.sqrt(maxResolution)/Math.sqrt(full.width*full.height);
+			if (scale < 1.0) {
+				scaled.reshape((int)(scale*full.width), (int)(scale*full.height));
+				AverageDownSampleOps.down(full,scaled);
+			} else {
+				scaled.setTo(full);
+			}
+			return scaled;
+		});
+
+		recognizer.learnDescription(imageIterator);
 
 		// Add images to the data base
 		System.out.println("Adding images to the database");
-		var iterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
-		while (iterator.hasNext()) {
-			recognizer.addImage(images.get(iterator.getIndex()), iterator.next());
+		imageIterator.reset();
+		while (imageIterator.hasNext()) {
+			GrayU8 image = imageIterator.next();
+			recognizer.addImage(images.get(imageIterator.getIndex()), image);
 		}
 
 		ListDisplayPanel gui = new ListDisplayPanel();
@@ -68,16 +89,18 @@ public class ExampleImageRecognition {
 
 		// Look up images
 		DogArray<ImageRecognition.Match> matches = new DogArray<>(ImageRecognition.Match::new);
-		iterator = new ImageFileListIterator<>(images, ImageType.SB_U8);
-		recognizer.findBestMatch(iterator.next(), matches);
-		for (int i = 1; i < Math.min(10,matches.size); i++) {
+		imageIterator.reset();
+		recognizer.findBestMatch(imageIterator.next(), matches);
+		for (int i = 0; i < Math.min(10, matches.size); i++) {
 			String file = matches.get(i).id;
 			double error = matches.get(i).error;
 			BufferedImage image = UtilImageIO.loadImage(file);
-			gui.addImage(image, String.format("Error %6.3f", error), ScaleOptions.ALL);
+			String name = FilenameUtils.getBaseName(new File(file).getName());
+			gui.addImage(image, String.format("%20s Error %6.3f",name, error), ScaleOptions.ALL);
 		}
 
-		System.out.println(images.get(iterator.getIndex()-1)+" -> "+matches.get(0).id+" matches.size="+matches.size);
+		System.out.println("Total images = "+images.size());
+		System.out.println(images.get(imageIterator.getIndex()) + " -> " + matches.get(0).id + " matches.size=" + matches.size);
 
 		ShowImages.showWindow(gui, "Similar Images by Features", true);
 	}

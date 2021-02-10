@@ -18,16 +18,25 @@
 
 package boofcv.abst.scene.nister2006;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
+import boofcv.abst.scene.GenericImageRecognitionChecks;
+import boofcv.abst.scene.ImageRecognition;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-class TestImageRecognitionNister2006 extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("Implement");
+class TestImageRecognitionNister2006 extends GenericImageRecognitionChecks<GrayU8> {
+	public TestImageRecognitionNister2006() {
+		super(ImageType.SB_U8);
+	}
+
+	@Override protected ImageRecognition<GrayU8> createAlg() {
+		var config = new ConfigImageRecognitionNister2006();
+		config.tree.branchFactor = 3;
+		config.tree.maximumLevel = 3;
+		config.features.detectFastHessian.extract.radius = 6;
+		return new ImageRecognitionNister2006<>(config, imageType);
 	}
 }

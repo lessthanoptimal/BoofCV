@@ -88,6 +88,12 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 		tree.reset();
 		this.totalPoints = points.size();
 
+		// Abourt if it can't do anything
+		if (points.size() == 0) {
+			if (verbose != null) verbose.println("No points to process!");
+			return;
+		}
+
 		// first level is provided by points
 		listPoints.resize(tree.maximumLevel - 1);
 		// each level has it's own k-means instance

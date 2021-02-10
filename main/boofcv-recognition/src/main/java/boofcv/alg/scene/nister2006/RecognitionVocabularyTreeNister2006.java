@@ -78,9 +78,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 	/**
 	 * Configures the tree by adding LeafData to all the leaves in the tree then saves a reference for future use
+	 *
 	 * @param tree Three which is to be used as the database. Saved internally.
 	 */
-	public void initializeTree(HierarchicalVocabularyTree<Point, LeafData> tree) {
+	public void initializeTree( HierarchicalVocabularyTree<Point, LeafData> tree ) {
 		this.tree = tree;
 		for (int i = 0; i < tree.nodes.size; i++) {
 			if (!tree.nodes.get(i).isLeaf())
@@ -97,6 +98,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * @param cookie Optional user defined data which will be attached to the image
 	 */
 	public void addImage( int imageID, List<Point> imageFeatures, Object cookie ) {
+		if (imageFeatures.isEmpty())
+			return;
+
 		ImageInfo info = imagesDB.grow();
 		info.imageId = imageID;
 		info.cookie = cookie;
@@ -118,9 +122,14 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	 * @param imageFeatures Feature descriptors from an image
 	 * @return The best matching image with score from the database
 	 */
-	public Match lookup( List<Point> imageFeatures ) {
+	public boolean lookup( List<Point> imageFeatures ) {
 		TIntSet candidates = new TIntHashSet();
 		matchScores.reset();
+
+		// Can't match to anything if it's empty
+		if (imageFeatures.isEmpty()) {
+			return false;
+		}
 
 		// Create a description of this image and collect potential matches from leaves
 		describe(imageFeatures, tempDescTermFreq, ( leafNode ) -> {
@@ -136,6 +145,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			}
 		});
 
+		if (matchScores.isEmpty())
+			return false;
+
 		for (int i = 0; i < matchScores.size(); i++) {
 			Match m = matchScores.get(i);
 			m.error = distanceL2Norm(tempDescTermFreq, m.image.descTermFreq);
@@ -143,7 +155,7 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 		Collections.sort(matchScores.toList());
 
-		return matchScores.get(0);
+		return true;
 	}
 
 	/**
@@ -163,6 +175,8 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		// Sum of the weight of all graph nodes it sees
 		for (int descIdx = 0; descIdx < imageFeatures.size(); descIdx++) {
 			int leafNodeIdx = tree.searchPathToLeaf(imageFeatures.get(descIdx), ( node ) -> {
+				if (node.weight == 0.0)
+					return;
 				Frequency f = node_to_frequency.get(node.id);
 				if (f == null) {
 					f = frequencies.grow();
@@ -175,6 +189,10 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 			// Process the leaf node in the passed in operation
 			op.process(tree.nodes.get(leafNodeIdx));
 		}
+
+		// No nodes with a non-zero weight that matched was found
+		if (node_to_frequency.isEmpty())
+			return;
 
 		//------ Create the TF-IDF descriptor for this image
 		// Normalize the vector such that the L2-norm is 1.0

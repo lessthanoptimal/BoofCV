@@ -44,8 +44,8 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkImageRecognitionLearn {
-//	@Param({"true","false"})
-	public boolean concurrent = false;
+	@Param({"true","false"})
+	public boolean concurrent;
 
 	String imagePath = UtilIO.pathExample("recognition/vacation");
 	List<String> images;
