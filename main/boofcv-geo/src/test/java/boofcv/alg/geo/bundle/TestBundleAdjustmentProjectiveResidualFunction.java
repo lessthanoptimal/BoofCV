@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
@@ -113,7 +114,7 @@ class TestBundleAdjustmentProjectiveResidualFunction extends BoofStandardJUnit {
 		obs.initialize(structure.views.size);
 
 		for (int j = 0; j < structure.points.size; j++) {
-			SceneStructureProjective.Point p = structure.points.data[j];
+			SceneStructureCommon.Point p = structure.points.data[j];
 
 			for (int i = 0; i < p.views.size; i++) {
 				SceneObservations.View v = obs.getView(p.views.get(i));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class TestConvertImage extends BoofStandardJUnit {
 			if (ImageInterleaved.class.isAssignableFrom(outputType))
 				checkConvertInterleaved(m, inputType, outputType);
 			else
-				checkConvertInterleavedToPlanar(m, inputType, outputType);
+				checkConvertInterleavedToPlanar(m, inputType);
 		} else {
 			checkConvertPlanarToInterleaved(m, inputType, outputType);
 		}
@@ -117,7 +117,6 @@ public class TestConvertImage extends BoofStandardJUnit {
 	public void checkConvertIntegerRange( Method m, ImageGray<?> input, GrayU8 output ) {
 		try {
 			GrayU8 ret;
-			double tol = selectTolerance(input, output);
 
 			// check it with a non-null output
 			ret = invokeConvertIntegerRange(m, input, output);
@@ -234,7 +233,7 @@ public class TestConvertImage extends BoofStandardJUnit {
 		}
 	}
 
-	private void checkConvertInterleavedToPlanar( Method m, Class inputType, Class outputType ) {
+	private void checkConvertInterleavedToPlanar( Method m, Class inputType) {
 		String methodName = m.getName();
 		ImageDataType dataIn, dataOut;
 

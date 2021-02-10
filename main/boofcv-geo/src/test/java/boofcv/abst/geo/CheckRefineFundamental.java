@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,11 +39,6 @@ public abstract class CheckRefineFundamental extends EpipolarTestSimulation {
 	public abstract RefineEpipolar createAlgorithm();
 
 	DMatrixRMaj found = new DMatrixRMaj(3,3);
-
-	@Test
-	public void checkMarkerInterface() {
-		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
-	}
 
 	@Test
 	public void perfectInput() {

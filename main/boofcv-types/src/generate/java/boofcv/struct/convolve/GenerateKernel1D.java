@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("OrphanedFormatString")
 public class GenerateKernel1D extends CodeGeneratorBase {
 	@Override
 	public void generateCode() throws FileNotFoundException {

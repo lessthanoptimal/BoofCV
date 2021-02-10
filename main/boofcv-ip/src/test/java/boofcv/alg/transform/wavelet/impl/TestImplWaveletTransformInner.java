@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -146,8 +146,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		int lowerBorder = UtilWavelet.borderForwardLower(desc.getInverse().getInnerCoefficients());
 		int upperBorder = input.width-UtilWavelet.borderForwardUpper(desc.getInverse().getInnerCoefficients(),input.width);
 
-		equalsTranHorizontal(expected.subimage(0,0,w/2,h, null),found.subimage(0,0,w/2,h, null),lowerBorder/2,upperBorder/2,"left");
-		equalsTranHorizontal(expected.subimage(w/2,0,w,h, null),found.subimage(w/2,0,w,h, null),lowerBorder/2,upperBorder/2,"right");
+		equalsTranHorizontal(expected.subimage(0,0,w/2,h, null),found.subimage(0,0,w/2,h, null),lowerBorder/2,upperBorder/2);
+		equalsTranHorizontal(expected.subimage(w/2,0,w,h, null),found.subimage(w/2,0,w,h, null),lowerBorder/2,upperBorder/2);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	 * affect the borders of internal segments inside the transformation.
 	 */
 	private void equalsTranHorizontal(ImageGray expected , ImageGray found ,
-									  int begin , int end , String quad ) {
+									  int begin , int end) {
 
 		GImageGray e = FactoryGImageGray.wrap(expected);
 		GImageGray f = FactoryGImageGray.wrap(found);
