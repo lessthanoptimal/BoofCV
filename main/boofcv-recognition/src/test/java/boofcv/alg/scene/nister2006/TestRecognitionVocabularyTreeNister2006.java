@@ -49,12 +49,14 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		List<List<Point2D_F64>> images = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			images.add(createRandomImage());
-			alg.addImage(i,images.get(i),i);
+			alg.addImage(i, images.get(i), i);
 		}
 
 		for (int i = 0; i < 5; i++) {
 			// The best match should be the input image since the exact same image is being passed in
-			Match best = alg.lookup(images.get(i));
+			assertTrue(alg.lookup(images.get(i)));
+			Match best = alg.getMatchScores().get(0);
+
 			assertEquals(0.0, best.error, UtilEjml.TEST_F32);
 			assertEquals(best.image.imageId, i);
 			// check to see if the cookie was correctly assigned
@@ -69,8 +71,8 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		List<Point2D_F64> ret = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			Point2D_F64 p = new Point2D_F64();
-			p.x = rand.nextDouble()*12-6;
-			p.y = rand.nextDouble()*3-1.5;
+			p.x = rand.nextDouble()*12 - 6;
+			p.y = rand.nextDouble()*3 - 1.5;
 			ret.add(p);
 		}
 		return ret;
@@ -101,8 +103,8 @@ class TestRecognitionVocabularyTreeNister2006 extends BoofStandardJUnit {
 		float f3 = descTermFreq.get(3);
 		float f5 = descTermFreq.get(5);
 		assertTrue(f1 > 0 && f2 > 0 && f3 > 0 && f5 > 0);
-		assertTrue(f1<f2);
-		assertTrue(f3<f5);
+		assertTrue(f1 < f2);
+		assertTrue(f3 < f5);
 
 		// L2-norm should be 1.0
 		float norm = (float)Math.sqrt(f1*f1 + f2*f2 + f3*f3 + f5*f5);

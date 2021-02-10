@@ -29,7 +29,7 @@ import org.ddogleg.clustering.kmeans.StandardKMeans;
 public class FactoryTupleCluster {
 	public static StandardKMeans<TupleDesc_F64> kmeans( int dof ) {
 		var dconfig = new ConfigKMeans();
-		dconfig.maxConverge = 1000;
+		dconfig.reseedAfterIterations = 1000;
 		dconfig.maxIterations = 1000;
 		dconfig.convergeTol = 1e-8;
 

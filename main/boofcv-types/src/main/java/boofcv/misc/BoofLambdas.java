@@ -46,7 +46,7 @@ public interface BoofLambdas {
 		void process( T object );
 	}
 
-	@FunctionalInterface interface MassageObject<T> {
+	@FunctionalInterface interface Filter<T> {
 		T process( T object );
 	}
 

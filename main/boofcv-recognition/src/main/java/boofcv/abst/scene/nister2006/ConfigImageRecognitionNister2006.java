@@ -58,15 +58,13 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 
 		// In the paper it didn't show a large improvement with lots of training cycles
 		// They maxed out at 50 iterations and saw little improvement past 25.
-		// Below, it's configured to re-initialize several times and give up at 30 iterations.
-		// From personal experimentation, re-initialization is important with smaller datasets.
-		// Probably washes out in larger ones
+		// This is configured to avoid re-initialization. Experimentation showed little change.
 		kmeans.reseedAfterIterations = 30;
-		kmeans.maxReSeed = 5;
-		kmeans.maxIterations = kmeans.reseedAfterIterations*kmeans.maxReSeed;
+		kmeans.maxIterations = 30;
+		kmeans.maxReSeed = 0;
 
 		// Let's use SURF-FAST by default
-		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_FAST;
+		features.typeDescribe = ConfigDescribeRegionPoint.DescriptorType.SURF_STABLE;
 		features.typeDetector = ConfigDetectInterestPoint.DetectorType.FAST_HESSIAN;
 	}
 

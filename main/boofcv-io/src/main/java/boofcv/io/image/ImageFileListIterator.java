@@ -18,9 +18,11 @@
 
 package boofcv.io.image;
 
+import boofcv.misc.BoofLambdas;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
@@ -34,20 +36,28 @@ import java.util.List;
 public class ImageFileListIterator<T extends ImageGray<T>> implements Iterator<T> {
 	protected @Getter T image;
 	protected @Getter List<String> paths;
-	protected @Getter int index = 0;
+	protected @Getter int index;
+
+	protected @Getter @Setter BoofLambdas.Filter<T> filter = (a)->a;
 
 	public ImageFileListIterator( List<String> paths, ImageType<T> imageType ) {
 		image = imageType.createImage(1, 1);
 		this.paths = paths;
+		reset();
+	}
+
+	public void reset() {
+		index = -1;
 	}
 
 	@Override public boolean hasNext() {
-		return index < paths.size();
+		return index+1 < paths.size();
 	}
 
 	@Override public T next() {
-		BufferedImage buffered = UtilImageIO.loadImage(paths.get(index++));
+		index++;
+		BufferedImage buffered = UtilImageIO.loadImage(paths.get(index));
 		ConvertBufferedImage.convertFrom(buffered, true, image);
-		return image;
+		return filter.process(image);
 	}
 }

@@ -32,10 +32,9 @@ import org.ddogleg.struct.LArrayAccessor;
 public class ComputeMeanTuple_F64 implements ComputeMeanClusters<TupleDesc_F64> {
 	DogArray_I32 counts = new DogArray_I32();
 
-	@Override
-	public void process( LArrayAccessor<TupleDesc_F64> points,
-						 DogArray_I32 assignments,
-						 FastAccess<TupleDesc_F64> clusters) {
+	@Override public void process( LArrayAccessor<TupleDesc_F64> points,
+								   DogArray_I32 assignments,
+								   FastAccess<TupleDesc_F64> clusters) {
 
 		if (assignments.size != points.size())
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
