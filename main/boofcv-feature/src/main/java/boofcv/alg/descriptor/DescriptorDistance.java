@@ -34,11 +34,11 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return Euclidean distance
 	 */
-	public static double euclidean(TupleDesc_F64 a, TupleDesc_F64 b) {
+	public static double euclidean( TupleDesc_F64 a, TupleDesc_F64 b ) {
 		final int N = a.value.length;
 		double total = 0;
-		for( int i = 0; i < N; i++ ) {
-			double d = a.value[i]-b.value[i];
+		for (int i = 0; i < N; i++) {
+			double d = a.value[i] - b.value[i];
 			total += d*d;
 		}
 
@@ -52,11 +52,11 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return Euclidean distance squared
 	 */
-	public static double euclideanSq(TupleDesc_F64 a, TupleDesc_F64 b) {
+	public static double euclideanSq( TupleDesc_F64 a, TupleDesc_F64 b ) {
 		final int N = a.value.length;
 		double total = 0;
-		for( int i = 0; i < N; i++ ) {
-			double d = a.value[i]-b.value[i];
+		for (int i = 0; i < N; i++) {
+			double d = a.value[i] - b.value[i];
 			total += d*d;
 		}
 
@@ -70,11 +70,29 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return Euclidean distance squared
 	 */
-	public static double euclideanSq(TupleDesc_F32 a, TupleDesc_F32 b) {
+	public static double euclideanSq( TupleDesc_U8 a, TupleDesc_U8 b ) {
+		final int N = a.value.length;
+		double total = 0;
+		for (int i = 0; i < N; i++) {
+			double d = (a.value[i] & 0xFF) - (b.value[i] & 0xFF);
+			total += d*d;
+		}
+
+		return total;
+	}
+
+	/**
+	 * Returns the Euclidean distance squared between the two descriptors.
+	 *
+	 * @param a First descriptor
+	 * @param b Second descriptor
+	 * @return Euclidean distance squared
+	 */
+	public static double euclideanSq( TupleDesc_F32 a, TupleDesc_F32 b ) {
 		final int N = a.value.length;
 		float total = 0;
-		for( int i = 0; i < N; i++ ) {
-			float d = a.value[i]-b.value[i];
+		for (int i = 0; i < N; i++) {
+			float d = a.value[i] - b.value[i];
 			total += d*d;
 		}
 
@@ -88,10 +106,10 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return Correlation score
 	 */
-	public static double correlation( TupleDesc_F64 a, TupleDesc_F64 b) {
+	public static double correlation( TupleDesc_F64 a, TupleDesc_F64 b ) {
 		final int N = a.value.length;
 		double total = 0;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			total += a.value[i]*b.value[i];
 		}
 
@@ -111,15 +129,15 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return NCC score
 	 */
-	public static double ncc(NccFeature a, NccFeature b) {
+	public static double ncc( NccFeature a, NccFeature b ) {
 		double top = 0;
 
 		final int N = a.value.length;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			top += a.value[i]*b.value[i];
 		}
 
-		return top/(N*a.sigma * b.sigma);
+		return top/(N*a.sigma*b.sigma);
 	}
 
 	/**
@@ -129,11 +147,11 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static int sad(TupleDesc_U8 a, TupleDesc_U8 b) {
+	public static int sad( TupleDesc_U8 a, TupleDesc_U8 b ) {
 
 		int total = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			total += Math.abs( (a.value[i] & 0xFF) - (b.value[i] & 0xFF));
+		for (int i = 0; i < a.value.length; i++) {
+			total += Math.abs((a.value[i] & 0xFF) - (b.value[i] & 0xFF));
 		}
 		return total;
 	}
@@ -145,11 +163,11 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static int sad(TupleDesc_S8 a, TupleDesc_S8 b) {
+	public static int sad( TupleDesc_S8 a, TupleDesc_S8 b ) {
 
 		int total = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			total += Math.abs( a.value[i] - b.value[i]);
+		for (int i = 0; i < a.value.length; i++) {
+			total += Math.abs(a.value[i] - b.value[i]);
 		}
 		return total;
 	}
@@ -161,11 +179,11 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static float sad(TupleDesc_F32 a, TupleDesc_F32 b) {
+	public static float sad( TupleDesc_F32 a, TupleDesc_F32 b ) {
 
 		float total = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			total += Math.abs( a.value[i] - b.value[i]);
+		for (int i = 0; i < a.value.length; i++) {
+			total += Math.abs(a.value[i] - b.value[i]);
 		}
 		return total;
 	}
@@ -177,11 +195,11 @@ public class DescriptorDistance {
 	 * @param b Second descriptor
 	 * @return SAD score
 	 */
-	public static double sad(TupleDesc_F64 a, TupleDesc_F64 b) {
+	public static double sad( TupleDesc_F64 a, TupleDesc_F64 b ) {
 
 		double total = 0;
-		for( int i = 0; i < a.value.length; i++ ) {
-			total += Math.abs( a.value[i] - b.value[i]);
+		for (int i = 0; i < a.value.length; i++) {
+			total += Math.abs(a.value[i] - b.value[i]);
 		}
 		return total;
 	}
@@ -196,7 +214,7 @@ public class DescriptorDistance {
 	public static int hamming( TupleDesc_B a, TupleDesc_B b ) {
 		int score = 0;
 		final int N = a.value.length;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			score += hamming(a.value[i] ^ b.value[i]);
 		}
 		return score;
@@ -215,11 +233,11 @@ public class DescriptorDistance {
 		int v = val;
 		v = v - ((v >> 1) & 0x55555555);
 		v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
-		c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+		c = ((v + (v >> 4) & 0xF0F0F0F)*0x1010101) >> 24;
 		return c;
 	}
 
 	public static int hamming( long val ) {
-		return hamming((int)val) + hamming((int)(val>>32));
+		return hamming((int)val) + hamming((int)(val >> 32));
 	}
 }

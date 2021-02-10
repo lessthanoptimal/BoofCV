@@ -22,6 +22,7 @@ import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_U8;
 import org.ddogleg.clustering.PointDistance;
 
 /**
@@ -40,6 +41,12 @@ public abstract class TuplePointDistanceEuclideanSq<T extends TupleDesc<T>> impl
 
 	public static class F32 extends TuplePointDistanceEuclideanSq<TupleDesc_F32> {
 		@Override public double distance( TupleDesc_F32 a, TupleDesc_F32 b ) {
+			return DescriptorDistance.euclideanSq(a, b);
+		}
+	}
+
+	public static class U8 extends TuplePointDistanceEuclideanSq<TupleDesc_U8> {
+		@Override public double distance( TupleDesc_U8 a, TupleDesc_U8 b ) {
 			return DescriptorDistance.euclideanSq(a, b);
 		}
 	}

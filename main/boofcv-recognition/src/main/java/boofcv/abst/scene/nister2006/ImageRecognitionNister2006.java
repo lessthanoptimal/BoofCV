@@ -78,10 +78,10 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 	// If not null then print verbose information
 	PrintStream verbose;
 
-	// Intenral Profiling
-	long timeLearnDescribeMS;
-	long timeLearnClusterMS;
-	long timeLearnWeightsMS;
+	// Internal Profiling. All times in milliseconds
+	@Getter long timeLearnDescribeMS;
+	@Getter long timeLearnClusterMS;
+	@Getter long timeLearnWeightsMS;
 
 	public ImageRecognitionNister2006( ConfigImageRecognitionNister2006 config, ImageType<Image> imageType ) {
 		this.config = config;
