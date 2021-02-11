@@ -24,6 +24,7 @@ allprojects {
 }
 
 project.ext.set("deepboof_version", '0.5')
+project.ext.set("lombok_version", '1.18.18')
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
@@ -54,7 +55,7 @@ subprojects {
     configurations.all {
         resolutionStrategy {
             force 'org.jetbrains:annotations:20.0.0'
-            force 'com.google.guava:guava:27.0.1-jre'
+            force 'com.google.guava:guava:30.1-jre'
             force 'com.google.errorprone:error_prone_annotations:2.4.0'
             force 'com.google.code.findbugs:jsr305:3.0.2'
             force 'org.checkerframework:checker-qual:2.10.0'
@@ -115,11 +116,11 @@ subprojects {
 
         compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
 
-        compileOnly 'org.projectlombok:lombok:1.18.10'
+        compileOnly "org.projectlombok:lombok:${project.lombok_version}"
         compileOnly 'org.jetbrains:annotations:20.0.0' // @Nullable
         compileOnly 'javax.annotation:jsr250-api:1.0'  // @Generated
 
-        noautoCompileOnly 'org.projectlombok:lombok:1.18.10'
+        noautoCompileOnly "org.projectlombok:lombok:${project.lombok_version}"
         noautoCompileOnly 'org.jetbrains:annotations:20.0.0' // @Nullable
         noautoCompileOnly 'javax.annotation:jsr250-api:1.0'  // @Generated
 
@@ -147,8 +148,8 @@ subprojects {
         annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
         noautoAnnotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
 
-        annotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
-        noautoAnnotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
+        annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
+        noautoAnnotationProcessor "org.projectlombok:lombok:${project.lombok_version}"  // @Getter @Setter
 
         errorprone("com.google.errorprone:error_prone_core:2.4.0")
         errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
