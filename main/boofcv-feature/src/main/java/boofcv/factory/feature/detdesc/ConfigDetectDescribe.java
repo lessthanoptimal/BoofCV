@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,8 @@ import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.struct.Configuration;
 
 /**
+ * Configuration for creating {@link boofcv.abst.feature.detdesc.DetectDescribePoint} implementations.
+ *
  * @author Peter Abeles
  */
 public class ConfigDetectDescribe implements Configuration {
@@ -55,7 +57,7 @@ public class ConfigDetectDescribe implements Configuration {
 	/** Configuration for estimating the region's orientation */
 	public ConfigOrientation2 orientation = new ConfigOrientation2();
 
-	public void copyRefTo(ConfigDescribeRegionPoint dst ) {
+	public void copyRefTo( ConfigDescribeRegionPoint dst ) {
 		dst.type = this.typeDescribe;
 		dst.scaleSpaceSift = this.scaleSpaceSift;
 		dst.template = this.describeTemplate;
@@ -76,7 +78,7 @@ public class ConfigDetectDescribe implements Configuration {
 		};
 	}
 
-	public void copyRefFrom(ConfigDescribeRegionPoint src ) {
+	public void copyRefFrom( ConfigDescribeRegionPoint src ) {
 		this.typeDescribe = src.type;
 		this.scaleSpaceSift = src.scaleSpaceSift;
 		this.describeTemplate = src.template;
