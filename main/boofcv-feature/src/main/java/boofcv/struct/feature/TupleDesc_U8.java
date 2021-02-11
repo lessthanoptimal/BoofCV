@@ -36,7 +36,7 @@ public class TupleDesc_U8 extends TupleDesc_I8<TupleDesc_U8> {
 		System.arraycopy(values, 0, this.value, 0, values.length);
 	}
 
-	public void setTo( byte... value ) {
+	@Override public void setTo( byte... value ) {
 		System.arraycopy(value, 0, this.value, 0, this.value.length);
 	}
 
