@@ -30,6 +30,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
@@ -62,6 +63,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	/** Scores for all candidate images which have been sorted */
 	protected @Getter final DogArray<Match> matchScores = new DogArray<>(Match::new, Match::reset);
 
+	/** Distance between two TF-IDF descriptors. L1 and L2 norms are provided */
+	protected @Getter @Setter DistanceFunction distanceFunction = this::distanceL1Norm;
+
 	//---------------- Internal Workspace
 
 	// The "frequency" that nodes in the tree appear in this image
@@ -75,6 +79,9 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	protected final DogArray_I32 keysDesc = new DogArray_I32(); // ONLY use in describe()
 	protected final DogArray_I32 keysDist = new DogArray_I32(); // ONLY use in distance functions.
 	protected final DogArray_I32 keysLookUp = new DogArray_I32(); // ONLY use in lookUp
+
+	// Set to store common non-zero key between two descriptors
+	protected final TIntSet commonKeys = new TIntHashSet();
 
 	/**
 	 * Configures the tree by adding LeafData to all the leaves in the tree then saves a reference for future use
@@ -212,6 +219,14 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 		}
 	}
 
+	/** Used to change distance function to one of the built in types */
+	public void setDistanceType( DistanceTypes type ) {
+		switch (type) {
+			case L1 -> distanceFunction = this::distanceL1Norm;
+			case L2 -> distanceFunction = this::distanceL2Norm;
+		}
+	}
+
 	/**
 	 * Computes L2-Norm for score between the two descriptions. Searches for common non-zero elements between
 	 * the two then uses the simplified equation from [1].
@@ -236,6 +251,56 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 
 		// max to avoid floating point error causing it to go slightly negative
 		return (float)Math.sqrt(Math.max(0.0f, 2.0f - 2.0f*sum)); // TODO should it use L2-norm squared for speed?
+	}
+
+	/**
+	 * Computes the L1-norm distance between the descriptors. This is more complex to compute
+	 * but according to the paper provides better results.
+	 */
+	public float distanceL1Norm( TIntFloatMap descA, TIntFloatMap descB ) {
+		// Find the set of common keys between the two descriptors
+		findCommonKeys(descA, descB, commonKeys, keysDist);
+
+		// Look up the common keys
+		keysDist.resize(commonKeys.size());
+		commonKeys.toArray(keysDist.data);
+
+		// L1-norm is the sum of the difference magnitude of each element
+		float sum = 0.0f;
+		for (int keyIdx = 0; keyIdx < keysDist.size; keyIdx++) {
+			int key = keysDist.data[keyIdx];
+
+			// If a key doesn't exist in the descriptor the default value is -1, but the actual value
+			// is 0.0, hence the max.
+			float valueA = Math.max(0.0f, descA.get(key));
+			float valueB = Math.max(0.0f, descB.get(key));
+
+			sum += Math.abs(valueA-valueB);
+		}
+
+		return sum;
+	}
+
+	/**
+	 * Finds common keys between the two descriptors
+	 */
+	private void findCommonKeys( TIntFloatMap descA, TIntFloatMap descB, TIntSet commonKeys,
+								 DogArray_I32 work ) {
+		commonKeys.clear();
+
+		// Add keys from descA
+		work.resize(descA.size());
+		descA.keys(work.data);
+		for (int i = 0; i < work.size; i++) {
+			commonKeys.add(work.get(i));
+		}
+
+		// Add keys from descB
+		work.resize(descB.size());
+		descB.keys(work.data);
+		for (int i = 0; i < work.size; i++) {
+			commonKeys.add(work.get(i));
+		}
 	}
 
 	/** Information about an image stored in the database */
@@ -295,5 +360,17 @@ public class RecognitionVocabularyTreeNister2006<Point> {
 	public static class LeafData {
 		/** images at this leaf. key=imageID value=ImageInfo */
 		public TIntObjectMap<ImageInfo> images = new TIntObjectHashMap<>();
+	}
+
+	/** Different built in distance norms. */
+	public enum DistanceTypes {L1,L2}
+
+	/** Computes the distance between two TF-IDF descriptors */
+	public interface DistanceFunction {
+		/**
+		 * Distance between the two descriptors. All empty elements in the maps are assumed to be zero, but
+		 * as a precondition the must return -1.
+		 */
+		float distance( TIntFloatMap descA, TIntFloatMap descB );
 	}
 }

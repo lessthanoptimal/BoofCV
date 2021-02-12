@@ -89,6 +89,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		this.imageFeatures = new DogArray<>(() -> detector.createDescription());
 		this.databaseN = new RecognitionVocabularyTreeNister2006<>();
 		this.imageType = imageType;
+
+		databaseN.setDistanceType(config.distanceNorm);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -215,7 +217,8 @@ public class ImageRecognitionNister2006<Image extends ImageBase<Image>, TD exten
 		matches.resize(found.size);
 
 		// Copy results into output format
-		for (int i = 0; i < found.size; i++) {
+		int count = config.maxMatches <= 0 ? found.size :  Math.min(config.maxMatches, found.size);
+		for (int i = 0; i < count; i++) {
 			RecognitionVocabularyTreeNister2006.Match f = found.get(i);
 			matches.get(i).id = imageIds.get(f.image.imageId);
 			matches.get(i).error = f.error;
