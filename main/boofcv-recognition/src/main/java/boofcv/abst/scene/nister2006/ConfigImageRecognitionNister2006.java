@@ -18,6 +18,7 @@
 
 package boofcv.abst.scene.nister2006;
 
+import boofcv.alg.scene.nister2006.RecognitionVocabularyTreeNister2006.DistanceTypes;
 import boofcv.alg.scene.vocabtree.ConfigHierarchicalVocabularyTree;
 import boofcv.factory.feature.describe.ConfigDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.ConfigDetectDescribe;
@@ -41,10 +42,13 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 	/** Image feature detector */
 	public ConfigDetectDescribe features = new ConfigDetectDescribe();
 
+	/** Specifies which norm to use. L1 should yield better results but is slower than L2 to compute. */
+	public DistanceTypes distanceNorm = DistanceTypes.L1;
+
 	// TODO make entropy weighting configurable
 
 	/** Maximum number of matches. If &le; 0, then all matches are returned */
-	public int maxMatches = 4; // TODO use this
+	public int maxMatches = 10;
 
 	/** Seed used in random number generators */
 	public long randSeed = 0xDEADBEEF;
@@ -53,8 +57,6 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		// Configure to behave like Method-A in the paper
 		tree.branchFactor = 10;
 		tree.maximumLevel = 6;
-
-		// TODO default to L1-Norm
 
 		// In the paper it didn't show a large improvement with lots of training cycles
 		// They maxed out at 50 iterations and saw little improvement past 25.
@@ -78,6 +80,7 @@ public class ConfigImageRecognitionNister2006 implements Configuration {
 		this.kmeans.setTo(src.kmeans);
 		this.tree.setTo(src.tree);
 		this.features.setTo(src.features);
+		this.distanceNorm = src.distanceNorm;
 		this.maxMatches = src.maxMatches;
 		this.randSeed = src.randSeed;
 	}
